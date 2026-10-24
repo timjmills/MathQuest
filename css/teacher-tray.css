@@ -45,7 +45,7 @@ body.teacher-mode.tv-on-screen:not(.tv-play):not(.tv-board):has(#teacherMain > .
 /* the bar's items: List (a name over an area line) · Chips · Thumbnails */
 #teacherApp .tt-li { display: inline-flex; align-items: center; gap: var(--sp-4); flex: none; min-height: var(--control); padding: 0 var(--sp-8); border: 0; border-bottom: var(--line-2) solid var(--a-bold); background: none; color: var(--text); font-family: var(--font-ui); font-size: var(--fs-14); font-weight: var(--fw-700); white-space: nowrap; cursor: pointer; }
 #teacherApp .tt-li svg { color: var(--a-deep); }
-#teacherApp .tt-li-a { font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-700); color: var(--a-deep); margin-left: var(--sp-4); flex: none; }
+#teacherApp .tt-li-a { font-family: var(--font-ui); font-size: var(--fs-12); font-weight: var(--fw-700); color: var(--a-deep); margin-left: var(--sp-4); flex: none; }
 #teacherApp .tt-chip {
   display: inline-flex; align-items: center; gap: var(--sp-8); flex: none; min-height: var(--control); padding: 0 var(--sp-16) 0 var(--sp-8); max-width: 100%; min-width: 0;
   border-radius: var(--r-8); border: var(--line-1) solid var(--a-deep); background: var(--a-bold); color: var(--a-on);
@@ -231,19 +231,19 @@ body.teacher-mode.tt-locked { overflow: hidden; }
 }
 
 /* ---------------------------------------------------------------- a chip's options sheet */
-#teacherApp .tc-sheet .tt-sheet-head > .gbadge { width: var(--sp-32); height: var(--sp-32); font-size: var(--fs-14); }
+#teacherApp .tc-sheet .tt-sheet-head > .gbadge { height: var(--sp-32); font-size: var(--fs-14); align-self: flex-start; margin-top: var(--sp-4); }
 #teacherApp .tc-area { display: inline-flex; align-items: center; gap: var(--sp-4); vertical-align: middle; font-weight: var(--fw-700); color: var(--a-deep); }
 #teacherApp .tc-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding: var(--sp-16) var(--sp-24); display: grid; gap: var(--sp-16); align-content: start; }
 #teacherApp .tc-preview { display: grid; gap: var(--sp-8); }
 #teacherApp .tc-preview-head { display: flex; align-items: center; gap: var(--sp-8); justify-content: space-between; }
 #teacherApp .tc-k { font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-700); text-transform: uppercase; letter-spacing: var(--ls-mono); color: var(--text-2); }
-#teacherApp .tc-frame { height: 160px; border: var(--line-1) solid var(--paper-ink); border-radius: var(--r-8); background: var(--paper); }
+#teacherApp .tc-frame { height: 200px; border: var(--line-1) solid var(--paper-ink); border-radius: var(--r-8); background: var(--paper); }
 #teacherApp .tc-note { margin: 0; font-size: var(--fs-14); color: var(--text-2); }
 #teacherApp .tc-often { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8) var(--sp-16); padding-top: var(--sp-16); border-top: var(--line-1) solid var(--line); }
 #teacherApp .tc-held { display: inline-flex; align-items: center; gap: var(--sp-4); font-weight: var(--fw-700); }
 #teacherApp .tc-opts { display: grid; gap: 0; min-width: 0; }
 #teacherApp .tc-opts .sko-group-head { margin: var(--sp-16) 0 0; font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-700); text-transform: uppercase; letter-spacing: var(--ls-mono); color: var(--text-2); }
-#teacherApp .tc-row { position: relative; padding: var(--sp-8) 0; border-bottom: var(--line-1) solid var(--line); min-width: 0; }
+#teacherApp .tc-row { position: relative; padding: var(--sp-8) calc(var(--control) + var(--sp-8)) var(--sp-8) 0; border-bottom: var(--line-1) solid var(--line); min-width: 0; }
 #teacherApp .tc-help { margin: var(--sp-4) 0 0; font-size: var(--fs-12); color: var(--text-2); }
 #teacherApp .tc-row button, #teacherApp .tc-row input, #teacherApp .tc-row select, #teacherApp .tc-opts summary { min-height: var(--control); }
 #teacherApp .tc-row .tv-select { width: 100%; }
@@ -260,7 +260,7 @@ body.teacher-mode.tt-locked { overflow: hidden; }
   #teacherApp .tt-sheet-foot .tt-btn { flex: 1 1 0; min-width: 0; padding: 0 var(--sp-8); white-space: normal; text-align: center; }
   #teacherApp .tc-foot .tt-primary { flex-basis: 100%; }
   #teacherApp .tc-body { padding: var(--sp-16); }
-  #teacherApp .tc-frame { height: 140px; }
+  #teacherApp .tc-frame { height: 180px; }
   #teacherApp .tt-dots { display: inline-flex; flex: none; font-size: var(--fs-20); }
   #teacherApp .tt-state { display: inline; }
   #teacherApp .tt-wide { display: none; }
@@ -319,3 +319,10 @@ body.teacher-mode.tt-locked { overflow: hidden; }
 #teacherApp .tt-chip .gbadge, #teacherApp .tt-mini .gbadge { border-color: var(--text); }
 #teacherApp .tt-hname .gbadge-long { justify-self: start; }
 #teacherApp .tc-opts .sko-tip { width: var(--control) !important; height: var(--control) !important; min-width: var(--control) !important; min-height: var(--control) !important; }
+/* the Total control in the popup foot (shared with the worksheet sheet's How much) */
+#teacherApp .tt-total { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
+#teacherApp .tt-total .tt-stepper input { width: 64px; min-height: var(--control); border: 0; text-align: center; font-family: var(--font-ui); font-size: var(--fs-16); font-weight: var(--fw-700); background: transparent; color: var(--text); }
+#teacherApp .tt-warn .tt-btn { margin-left: var(--sp-8); }
+/* the scroll container keeps rows clear of the tray bar (and the bottom bar below 820 px) */
+html:has(body.teacher-mode) { scroll-padding-bottom: 96px; }
+@media (max-width: 819px) { html:has(body.teacher-mode) { scroll-padding-bottom: calc(var(--tv2-bar, 64px) + 64px); } }

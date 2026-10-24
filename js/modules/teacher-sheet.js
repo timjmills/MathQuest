@@ -38,7 +38,7 @@ import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { mountSample } from './teacher-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { quizQuestionData } from './quiz-take.js';
-import { cellKindFor } from './screen-cell.js';
+import { cellKindFor, screenTwin } from './screen-cell.js';
 import { saveTest, compressTestForURL } from './quiz-storage.js';
 import { CCSS_STANDARDS, ESSENTIAL_ELEMENTS, skillsForStandard, SKILL_STANDARDS } from './standards.js';
 import { WRM_STEPS, WRM_BLOCKS, skillsForWrmStep } from './wrm.js';
@@ -130,13 +130,18 @@ function setLevel(key, lv) {
     window.skillQueue = [...currentSet()];
 }
 
-/** The page plan of the open sheet. */
+/**
+ * The page plan of the open sheet: the ONE source of every number the sheet shows (stepper, sub-lines, summary,
+ * area counts) and of every count the printed pages carry (requests() hands each page its exact counts).
+ * `perPage` is what one page holds: learned from the engine (a page-1 build that spills lowers it), else the
+ * size's default.
+ */
 function plan(list = items()) {
     const k = kindOf(list), o = S.opts, quiz = S.sheet === 'quiz';
-    const per = PER_PAGE[o.size] || PER_PAGE.M;
+    const per = perPageFor(list);
     let pages = o.pages;
     if (!touched('pages')) pages = k === 'single' ? Math.max(1, list.filter((x) => !x.leftOut).length) : isBig(list) ? Math.min(30, Math.ceil(list.length / per)) : 1;
-    return planPages(k, list, { groups: trayGroups(), locks: trayLocks(), amount: amountOf(pages), size: o.size, each: quiz ? 'new' : o.each, seed: S.seed, quiz, labelOf: (key) => (list.find((x) => keyOf(x) === key) || {}).label || key });
+    return planPages(k, list, { groups: trayGroups(), locks: trayLocks(), amount: amountOf(pages), perPage: per, each: quiz ? 'new' : o.each, seed: S.seed, quiz, labelOf: (key) => (list.find((x) => keyOf(x) === key) || {}).label || key });
 }
 /** How much? Pages · Problems in all · Problems of each skill (owner 2026-10-24). */
 function amountOf(defaultPages) {
@@ -147,6 +152,10 @@ function amountOf(defaultPages) {
     const m = S.opts.mode || 'pages';
     return { mode: m, n: m === 'pages' ? defaultPages : m === 'each' ? S.opts.nEach : S.opts.nTotal };
 }
+/* What one page holds, per size and set of skills, learned from the engine's own page 1. */
+const perLearned = new Map();
+function perBase(list) { return [kindOf(list), S.opts.size, S.opts.examples, list.filter((x) => !x.leftOut).map((x) => keyOf(x) + JSON.stringify(x.opts || {})).join('|')].join('#'); }
+function perPageFor(list) { return perLearned.get(perBase(list)) || PER_PAGE[S.opts.size] || PER_PAGE.M; }
 
 /* ================================================================= requests (the engine mapping) */
 
@@ -158,81 +167,57 @@ function skillRef(it, weight, force = false) {
 function common(seed, quiz, version) {
     const o = S.opts;
     const h = o.header || {};
+    const V = versionsOf(quiz);
     return {
         size: o.size, look: 'auto', paper: o.paper || 'A4',
         anchors: o.examples === 'sections' || o.examples === 'side' ? o.examples : 'off',
         header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz ? ((S.quiz.name || '').trim() || autoQuizName(items())) : true },
         key: { on: true, placement: o.keyPlace === 'after-page' ? 'after-page' : 'end', style: o.keyStyle === 'short' ? 'short' : 'copy' },
         seed: (seed + version * 104729) >>> 0,
+        version: V > 1 ? `Version ${version + 1} of ${V}` : '',
     };
 }
 /**
- * The buildSheet requests for one copy of the paper: [{req, copies}] (copies > 1 = "Same page again": the pupil page
- * printed that many times, ONE key for all).
+ * The buildSheet requests: ONE request per plan page, a section per skill on that page with the plan's exact count
+ * (so the printed counts are the plan's, and a section maps each printed item back to its plan key, presets too).
+ * [{req, copies, keys}] — copies > 1 = "Same page again" (that page printed N times, ONE key for all).
+ * Single skill with a fact Layout keeps its own role, by pages.
  */
 function requests(p, list, quiz, version = 0) {
     const byKey = Object.fromEntries(list.map((x) => [keyOf(x), x]));
     const out = [];
-    const each = p.each || 'new';
     let n = 0;
     const base = () => common(S.seed + 7919 * (n++), quiz, version);
-    // Exact numbers (How much = problems in all / of each, a skill's own count, every quiz): every part holds the
-    // plan's counts. Single skill: each skill its own part with its count; Mixed practice: each page one part of
-    // its skills dealt by those counts (the Mixed practice role takes no item count yet, so these pages print the
-    // skills in groups); Sections already carry counts.
-    const exact = p.mode !== 'pages' || list.some((x) => x.count > 0);
-    if (exact && p.kind !== 'sections') {
-        if (p.kind === 'single') {
-            for (const it of list) {
-                const c = p.byKey[keyOf(it)] || 0;
-                if (c > 0) out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: [skillRef(it)], count: c }] }), copies: 1, keys: [keyOf(it)] });
-            }
-        } else {
-            // one part for the whole paper (the engine paginates it, so no page is left half empty)
-            const order = list.map(keyOf).filter((k) => (p.byKey[k] || 0) > 0);
-            if (order.length) out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: order.map((k) => skillRef(byKey[k], p.byKey[k], true)), count: p.total }] }), copies: 1, keys: order });
-        }
-        return out;
-    }
-    if (p.kind === 'single') {
-        const layout = S.opts.layout;
+    if (p.kind === 'single' && S.opts.layout !== 'standard') {
         for (const it of list) {
             const pg = p.pagesBy ? p.pagesBy[keyOf(it)] || 0 : 0;
-            if (!pg) continue;
-            const fact = layout !== 'standard' && layoutOk(it);
-            if (fact) { out.push({ req: Object.assign(base(), { role: layout, look: 'auto', sections: [{ skills: [skillRef(it)], pages: pg }] }), copies: 1, keys: [keyOf(it)] }); continue; }
-            if (each === 'copy') out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: [skillRef(it)], pages: 1 }] }), copies: pg, keys: [keyOf(it)] });
-            else if (each === 'same' && pg > 1) out.push({ req: Object.assign(base(), { role: 'more-practice', letters: LETTERS.slice(0, Math.min(10, pg)), sections: [{ skills: [skillRef(it)] }] }), copies: 1, keys: [keyOf(it)] });
-            else out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: [skillRef(it)], pages: pg }] }), copies: 1, keys: [keyOf(it)] });
+            if (pg && layoutOk(it)) out.push({ req: Object.assign(base(), { role: S.opts.layout, look: 'auto', sections: [{ skills: [skillRef(it)], pages: pg }] }), copies: 1, keys: [keyOf(it)], pages: pg });
         }
-        return out;
+        if (out.length) return out;
     }
-    if (p.kind === 'sections') {
-        // one request: a section per skill, in the plan's order, each with its count (page 1's when every page repeats)
-        const unit = each !== 'new' && p.pages > 1 ? p.pageItems[0] : p.pageItems.flat();
-        const counts = {}; const order = [];
-        unit.forEach((k) => { if (!counts[k]) order.push(k); counts[k] = (counts[k] || 0) + 1; });
-        const req = () => Object.assign(base(), { role: 'independent', sections: order.map((k) => ({ skills: [skillRef(byKey[k])], count: counts[k] })) });
-        if (each === 'copy' && p.pages > 1) out.push({ req: req(), copies: p.pages, keys: order });
-        else if (each === 'same' && p.pages > 1) for (let i = 0; i < p.pages; i++) out.push({ req: req(), copies: 1, keys: order });
-        else out.push({ req: req(), copies: 1, keys: order });
-        return out;
-    }
-    // Mixed practice: a full mixed page per plan page (a big tray: the page's sample of skills), each skill weighted
-    // by its share (How often and any held %), as whole weights 1–9 for the engine
-    const pct = p.pct || {};
-    const top = Math.max(0, ...Object.values(pct));
-    const w = (k) => (top > 0 ? Math.max(1, Math.round(9 * (pct[k] || 0) / top)) : 1);
-    const pages = each === 'copy' && p.pages > 1 ? [p.pageItems[0]] : p.pageItems;
+    const copy = p.each === 'copy' && p.pages > 1;
+    const pages = copy ? [p.pageItems[0]] : p.pageItems;
     for (const pg of pages) {
-        const order = [...new Set(pg || [])];
+        const c = {}; const order = [];
+        (pg || []).forEach((k) => { if (!c[k]) order.push(k); c[k] = (c[k] || 0) + 1; });
         if (!order.length) continue;
-        const ws = order.map(w);
-        const same = ws.every((x) => x === ws[0]);
-        out.push({ req: Object.assign(base(), { role: 'mixed-practice', sections: [{ skills: order.map((k, i) => skillRef(byKey[k], same ? 1 : ws[i])) }] }), copies: each === 'copy' ? p.pages : 1, keys: order });
+        out.push({ req: Object.assign(base(), { role: 'independent', sections: order.map((k) => ({ skills: [skillRef(byKey[k])], count: c[k] })) }), copies: copy ? p.pages : 1, keys: order, pages: 1 });
     }
     return out;
 }
+
+/** The plan key of each printed item: by its section (a preset prints under its host id). */
+function countParts(res, part, copies, into) {
+    let n = 0;
+    for (const it of res.items || []) {
+        if (!it) continue;
+        const k = part.keys.length === 1 ? part.keys[0] : (Number.isInteger(it.section) && part.keys[it.section]) || (part.keys.includes(it.skill) ? it.skill : null);
+        if (!k) continue;
+        into[k] = (into[k] || 0) + copies; n += copies;
+    }
+    return n;
+}
+const yieldNow = () => new Promise((r) => setTimeout(r, 0));
 
 /* ================================================================= Layout (fact rows / timed check), probed per skill */
 
@@ -261,41 +246,48 @@ function sigOf(p, list, quiz) {
         skills: list.map((x) => [keyOf(x), x.opts || null, x.leftOut ? 0 : 1]) });
 }
 
+/** The version line on every pupil and key page ("Version 2 of 3"), where the engine prints its form letter. */
+function versionFooter(html, label) {
+    // one version: no form letter at all (a worksheet has no Form A); several: "Version 2 of 3"
+    if (!label) return String(html).replace(/Form [AB]\b\s*(·\s*)?/g, '');
+    return String(html).replace(/Form [AB]\b/g, label);
+}
+
 /**
- * Build every page of every version into ONE document. Each version: its own seed (seed + v), the same plan (mix,
- * per-skill counts, layout). Keys "after each version" (default) or "all at the end" (S.opts.keyVersions).
- * Calls onFirst(firstPupilHtml) as soon as page 1 exists.
+ * Build every page of every version into ONE document (Print only; yields between pages, so the page stays live).
+ * Each version: its own seed (seed + v), the same plan (mix, per-skill counts, layout). Keys "after each version"
+ * (default) or "all at the end" (S.opts.keyVersions).
  */
-async function buildAll(p, list, quiz, onFirst) {
+async function buildAll(p, list, quiz, onProgress) {
     const versions = versionsOf(quiz);
     const keysAtEnd = versions > 1 && S.opts.keyVersions === 'end';
     const out = { pupil: [], key: [], doc: '', pages: 0, pagesAll: 0, keyPages: 0, byKey: {}, total: 0, errors: [], perVersion: [] };
-    let first = true, tailKeys = '';
+    let tailKeys = '', done = 0;
+    const parts0 = requests(p, list, quiz, 0).length;
     for (let v = 0; v < versions; v++) {
         let vp = '', vk = '', vd = '', after = false;
         const vv = { byKey: {}, total: 0, pages: 0, first: '' };
+        const label = versions > 1 ? `Version ${v + 1} of ${versions}` : '';
         for (const part of requests(p, list, quiz, v)) {
-            const rq = versions > 1 ? Object.assign({}, part.req, { keySection: `Version ${v + 1}` }) : part.req;
+            if (onProgress) onProgress(++done, parts0 * versions);
+            await yieldNow();
+            const rq = versions > 1 ? Object.assign({}, part.req, { keySection: label }) : part.req;
             let res;
             try { res = await buildSheet(rq); } catch (e) {
                 out.errors.push((e && e.message) || 'This page could not be built.');
                 continue;
             }
-            if (first && onFirst) { first = false; onFirst(res.pupilHtml); }
-            if (!vv.first) vv.first = (res.pupilPages && res.pupilPages[0]) || res.pupilHtml;
             const copies = Math.max(1, part.copies || 1);
-            let pupil = res.pupilHtml;
-            if (copies > 1) pupil = Array.from({ length: copies }, () => res.pupilHtml).join('\n');
+            const pupil1 = versionFooter(res.pupilHtml, label);
+            if (!vv.first) vv.first = (res.pupilPages && res.pupilPages[0]) || pupil1;
+            const pupil = copies > 1 ? Array.from({ length: copies }, () => pupil1).join('\n') : pupil1;
+            const key = versionFooter(res.keyHtml || '', label);
             vp += pupil + '\n';
-            vk += (res.keyHtml || '') + '\n';
-            if (res.keyOptions && res.keyOptions.placement === 'after-page') { after = true; vd += (copies > 1 ? pupil + (res.keyHtml || '') : (res.docHtml || pupil)) + '\n'; }
+            vk += key + '\n';
+            if (res.keyOptions && res.keyOptions.placement === 'after-page') { after = true; vd += (copies > 1 ? pupil + key : versionFooter(res.docHtml || pupil, label)) + '\n'; }
             vv.pages += (res.pageCount || 0) * copies;
             out.keyPages += res.keyPageCount || 0;
-            for (const it of res.items || []) {
-                if (!it || !it.skill) continue;
-                vv.byKey[it.skill] = (vv.byKey[it.skill] || 0) + copies;
-                vv.total += copies;
-            }
+            vv.total += countParts(res, part, copies, vv.byKey);
         }
         out.perVersion.push(vv);
         out.pupil.push(vp); out.key.push(vk);
@@ -307,10 +299,11 @@ async function buildAll(p, list, quiz, onFirst) {
     out.doc += tailKeys;
     out.pupilHtml = out.pupil.join('\n');
     out.keyHtml = out.key.join('\n');
-    // the summary speaks of one version (every version holds the same mix and counts)
     const v0 = out.perVersion[0] || { byKey: {}, total: 0, pages: 0 };
     out.byKey = Object.assign({}, v0.byKey); out.total = v0.total; out.pages = v0.pages;
     out.sameCounts = out.perVersion.every((x) => JSON.stringify(Object.entries(x.byKey).sort()) === JSON.stringify(Object.entries(v0.byKey).sort()));
+    // the printed counts against the plan: never a silent drift
+    out.matchesPlan = Object.keys(p.byKey).every((k) => (p.byKey[k] || 0) === (out.byKey[k] || 0)) && Object.keys(out.byKey).every((k) => (p.byKey[k] || 0) === out.byKey[k]);
     out.versions = versions;
     return out;
 }
@@ -321,30 +314,54 @@ let buildTimer = null;
 let token = 0;
 function scheduleBuild(delay = 250) {
     clearTimeout(buildTimer);
-    buildTimer = setTimeout(runBuild, delay);
+    // after the sheet has painted: the preview never holds up the first frame
+    buildTimer = setTimeout(() => requestAnimationFrame(() => setTimeout(runPreview, 0)), delay);
 }
-async function runBuild() {
+/**
+ * The page-1 preview: ONE request (the plan's first page). If the engine needs more than one page for it, the plan's
+ * page holds too much: perPage is lowered and the plan dealt again (at most 3 tries), so the plan's pages are the
+ * printed pages.
+ */
+async function runPreview() {
     if (!S.sheet || S.sheet === 'share' || S.sheet === 'quizshare') return;
     const list = items();
-    if (!list.length) { S.built = null; renderSide(); return; }
-    const p = plan(list);
-    const quiz = S.sheet === 'quiz';
-    if (p.error) { S.built = null; renderSide(); return; }
-    const sig = sigOf(p, list, quiz);
-    if (S.built && S.built.sig === sig) { renderSide(); return; }
+    if (!list.length) { S.preview = null; renderSide(); return; }
     const my = ++token;
-    S.building = sig;
-    renderSide();
-    const res = await buildAll(p, list, quiz, (html) => { if (my === token) showPreview(html); });
-    if (my !== token) return;
-    res.sig = sig;
-    S.built = res;
-    S.building = null;
-    renderSide();
-    if (res.pupil[0]) showPreview(res.pupil[0]);
+    for (let tries = 0; tries < 3; tries++) {
+        const p = plan(list);
+        if (p.error) { S.preview = null; renderSide(); return; }
+        const quiz = S.sheet === 'quiz';
+        const sig = sigOf(p, list, quiz) + '|' + perPageFor(list);
+        if (S.preview && S.preview.sig === sig) { renderSide(); return; }
+        const part = requests(p, list, quiz, 0)[0];
+        if (!part) { S.preview = null; renderSide(); return; }
+        S.building = true; renderSide();
+        await yieldNow();
+        let res = null;
+        try { res = await buildSheet(part.req); } catch (e) { res = null; }
+        if (my !== token) return;
+        S.building = false;
+        if (!res) { S.preview = { sig, html: '', error: true }; renderSide(); return; }
+        const planned = part.pages || 1;
+        const got = res.pageCount || 1;
+        const onPage = (part.req.sections || []).reduce((t, x) => t + (x.count || 0), 0);
+        if (got > planned && onPage > 1 && p.kind !== 'single') {
+            // the engine's page holds fewer: learn it and deal the plan again
+            perLearned.set(perBase(list), Math.max(1, Math.floor(onPage * planned / got)));
+            continue;
+        }
+        if (got > planned && p.kind === 'single' && onPage > 1) {
+            perLearned.set(perBase(list), Math.max(1, Math.floor(onPage / got)));
+            continue;
+        }
+        S.preview = { sig, html: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml };
+        renderMain(); renderSide();
+        return;
+    }
+    S.building = false; renderMain(); renderSide();
 }
 
-/* ================================================================= the summary line */
+/* ================================================================= the summary line (from the plan) */
 
 function summary() {
     const list = items();
@@ -352,40 +369,40 @@ function summary() {
     const p = plan(list);
     if (p.error) return { line: p.error, more: '', error: true };
     const quiz = S.sheet === 'quiz';
-    const b = S.built && !S.building ? S.built : null;
-    if (!b) return { line: 'Counting the problems…', more: '', busy: true };
     const noun = quiz ? 'questions' : 'problems';
-    const pg = `${b.pages} page${b.pages === 1 ? '' : 's'}`;
-    const pts = quiz ? ` · ${b.total * (S.quiz.points === 2 ? 2 : 1)} points` : '';
-    const ver = '';
+    const pages = p.pagesBy ? Object.values(p.pagesBy).reduce((a, b) => a + b, 0) || p.pages : p.pages;
+    const pg = `${pages} page${pages === 1 ? '' : 's'}`;
+    const total = p.total;
+    const pts = quiz ? ` · ${total * (S.quiz.points === 2 ? 2 : 1)} points` : '';
     const active = list.filter((x) => !x.leftOut);
     const left = list.length - active.length ? ` · ${list.length - active.length} left out` : '';
-    const shown = active.filter((x) => (b.byKey[keyOf(x)] || 0) > 0).length;
-    const names0 = () => (isBig(list) ? byArea(active).map((a) => `${AREAS[a.area].short} ${a.list.reduce((t, x) => t + (b.byKey[keyOf(x)] || 0), 0)}`).join(', ') : list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : b.byKey[keyOf(x)] || 0}`).join(', '));
-    // the summary always gives all three numbers: pages · problems · (about) n of each (owner 2026-10-24)
-    const vals = active.map((x) => b.byKey[keyOf(x)] || 0).filter((c) => c > 0);
-    const eachN = vals.length ? (vals.every((c) => c === vals[0]) ? `${vals[0]} of each` : (Math.max(...vals) - Math.min(...vals) <= 1 ? `about ${Math.round(b.total / vals.length)} of each` : '')) : '';
+    const by = p.byKey;
+    const shown = active.filter((x) => (by[keyOf(x)] || 0) > 0).length;
+    const vals = active.map((x) => by[keyOf(x)] || 0).filter((c) => c > 0);
+    const eachN = vals.length ? (vals.every((c) => c === vals[0]) ? `${vals[0]} of each` : (Math.max(...vals) - Math.min(...vals) <= 1 ? `about ${Math.round(total / vals.length)} of each` : '')) : '';
     const ofEach = eachN && active.length > 1 ? ` · ${eachN}` : '';
-    const err = b.errors.length ? ` · ${b.errors.length} part${b.errors.length > 1 ? 's' : ''} could not be built` : '';
-    if (b.versions > 1) {
-        // "3 versions · 24 problems each · 9 pages + keys"
-        return { line: `${b.versions} versions · ${b.total} ${noun} each${ofEach}${pts} · ${b.pagesAll} pages + keys${S.opts.keyVersions === 'end' ? ' (keys at the end)' : ' (a key after each version)'}${left}${err}`,
-            more: names0() + ' · every version has its own problems, the same mix and counts' + (b.sameCounts ? '' : ' (the engine dealt slightly different counts in one version)') };
+    const names = isBig(list) ? byArea(active).map((a) => `${AREAS[a.area].short} ${a.list.reduce((t, x) => t + (by[keyOf(x)] || 0), 0)}`).join(', ')
+        : list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : (by[keyOf(x)] || 0) + (x.count > 0 ? ' (count)' : x.lockPct !== undefined ? ' (held)' : '')}`).join(', ');
+    const pr = S.printed && S.printed.sig === sigOf(p, list, quiz) ? S.printed : null;
+    const drift = pr && (pr.pages !== pages || !pr.matchesPlan) ? ` · printed on ${pr.pages} page${pr.pages === 1 ? '' : 's'}${pr.matchesPlan ? '' : ', the engine changed some counts'}` : '';
+    const V = versionsOf(quiz);
+    if (V > 1) {
+        return { line: `${V} versions · ${total} ${noun} each${ofEach}${pts} · ${pages * V} pages + keys${S.opts.keyVersions === 'end' ? ' (keys at the end)' : ' (a key after each version)'}${left}${drift}`,
+            more: names + ' · every version has its own problems, the same mix and counts' };
     }
     if (isBig(list)) {
         const areas = byArea(active);
-        const hit = areas.filter((a) => a.list.some((x) => b.byKey[keyOf(x)] > 0)).length;
+        const hit = areas.filter((a) => a.list.some((x) => by[keyOf(x)] > 0)).length;
         const cover = shown >= active.length ? 'every skill at least once' : `a sample of ${shown} of ${active.length} skills, New numbers re-deals the sample`;
-        return { line: `${pg} · ${b.total} ${noun}${ofEach} · ${hit === areas.length ? `${areas.length} area${areas.length > 1 ? 's' : ''}` : `${hit} of ${areas.length} areas`} · ${cover}${left}${pts}${ver}${err}`,
-            more: areas.map((a) => `${AREAS[a.area].short} ${a.list.reduce((t, x) => t + (b.byKey[keyOf(x)] || 0), 0)}`).join(', ') + ' · answer key at the end' };
+        return { line: `${pg} · ${total} ${noun}${ofEach} · ${hit === areas.length ? `${areas.length} area${areas.length > 1 ? 's' : ''}` : `${hit} of ${areas.length} areas`} · ${cover}${left}${pts}${drift}`,
+            more: names + ' · answer key at the end' };
     }
-    const names = list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : (b.byKey[keyOf(x)] || 0) + (x.count > 0 ? ' (count)' : x.lockPct !== undefined ? ' (held)' : '')}`).join(', ');
     const warn = p.warn.length ? ' · ' + p.warn.join(' ') : '';
     const each = quiz ? 'new' : p.each;
-    if (each === 'copy') return { line: `${b.pages} copies of the same page · ${b.total / Math.max(1, b.pages) | 0} ${noun} on each · ${b.total} in all${ofEach} · one key: “Key for all ${b.pages} copies”${left}`, more: names + ' · New numbers re-deals the page' };
-    if (each === 'same') return { line: `${pg} · the same ${noun} on each, new numbers · ${b.total} in all${ofEach} · answer key at the end${left}`, more: names + ' · New numbers re-deals every page' };
-    return { line: `${pg} · ${b.total} ${noun}${ofEach}${pts} · answer key at the end${left}${ver}${err}`,
-        more: names + (p.added === 'single' ? ` · pages raised to ${p.pages} so every skill keeps a page and the held % is met` : p.added ? ' · pages added so every skill comes up at least twice' : '') + warn };
+    if (each === 'copy') return { line: `${pages} copies of the same page · ${Math.round(total / Math.max(1, pages))} ${noun} on each · ${total} in all${ofEach} · one key: “Key for all ${pages} copies”${left}${drift}`, more: names + ' · New numbers re-deals the page' };
+    if (each === 'same') return { line: `${pg} · the same ${noun} on each, new numbers · ${total} in all${ofEach} · answer key at the end${left}${drift}`, more: names + ' · New numbers re-deals every page' };
+    return { line: `${pg} · ${total} ${noun}${ofEach}${pts} · answer key at the end${left}${drift}`,
+        more: names + (p.added === 'single' ? ` · pages raised to ${pages} so every skill keeps a page and the held % is met` : p.added ? ' · pages added so every skill comes up at least twice' : '') + warn };
 }
 function byArea(list) {
     const by = {};
@@ -432,6 +449,7 @@ function open(kind, ctx = {}) {
     S.fromLesson = !!ctx.fromLesson;
     if (S.fromLesson && !touched('kind')) S.kind = null;
     S.quizLink = '';
+    if (kind === 'share') S.shareRes = undefined;
     S.popup = null;
     if (kind === 'quiz') {
         if (ctx.buildFrom) { S.quiz.from = ctx.buildFrom; S.quiz.fromQuery = ''; } else if (!currentSet().length && S.quiz.from === 'skills') S.quiz.from = 'ccss';
@@ -439,10 +457,11 @@ function open(kind, ctx = {}) {
     }
     mount();
     render();
-    if (kind === 'share') makeLink();
+    // after the first paint: the code (Share) or the page-1 preview (Print / Quiz); the fact-layout probe last
+    if (kind === 'share') setTimeout(() => requestAnimationFrame(() => setTimeout(() => { if (S.sheet === 'share') makeLink(); }, 0)), 0);
     else scheduleBuild(0);
     const one = items();
-    if (one.length === 1) probeLayouts(one[0]).then(() => { if (S.sheet && S.sheet !== 'share') renderMain(); });
+    if (one.length === 1 && kind === 'print') setTimeout(() => { if (S.sheet === 'print') probeLayouts(one[0]).then(() => { if (S.sheet === 'print') renderMain(); }); }, 1500);
 }
 function close() {
     S.sheet = null;
@@ -630,20 +649,24 @@ function renderSide() {
     const sm = summary();
     const quiz = S.sheet === 'quiz';
     const has = items().length > 0;
-    const ready = has && !sm.error && S.built && !S.building;
-    const first = side.querySelector('#tvsPrevBox');
-    side.innerHTML = `<div class="tvs-sum" aria-live="polite"><p class="tvs-sum-line${sm.error ? ' is-error' : ''}" data-tvs-summary>${esc(sm.line)}</p>${sm.more ? `<p class="tvs-sum-more">${esc(sm.more)}</p>` : ''}</div>
-  <div class="tvs-prev" id="tvsPrevBox">${has ? '<iframe class="tvs-prev-frame" id="tvsPrevFrame" title="Page 1 preview" tabindex="-1"></iframe>' : ''}</div>
-  ${has ? '<p class="tvs-muted tvs-prev-cap">First page · every item drawn live by the app · Print shows every page</p>' : ''}
-  <div class="tvs-actions">
-    <button type="button" class="tvs-btn tvs-primary" data-act="print"${ready ? '' : ' aria-disabled="true"'}>${icon('print', 20)}<span>${has ? 'Print' : 'Tick skills first'}</span></button>
-    ${quiz ? `<button type="button" class="tvs-btn" data-act="quizshare"${has ? '' : ' aria-disabled="true"'}>${icon('link', 18)}<span>Share with pupils</span></button>
-    <button type="button" class="tvs-btn" data-act="quizsave"${has ? '' : ' aria-disabled="true"'}>${icon('bookmark', 18)}<span>Save</span></button>` : ''}
-    <button type="button" class="tvs-btn" data-act="renew"${has ? '' : ' aria-disabled="true"'}>${icon('shuffle', 18)}<span>New numbers</span></button>
-  </div>`;
-    if (first) { /* the iframe was replaced: redraw it */ }
-    if (S.built && S.built.pupil && S.built.pupil[0] && !S.building) showPreview(S.built.pupil[0]);
-    else if (S.firstHtml) showPreview(S.firstHtml);
+    const ready = has && !sm.error;
+    // the preview frame is made once and kept: re-rendering the summary never reloads it
+    if (!side.querySelector('#tvsSumBox')) {
+        side.innerHTML = `<div class="tvs-sum" id="tvsSumBox" aria-live="polite"></div>
+  <div class="tvs-prev" id="tvsPrevBox"></div>
+  <p class="tvs-muted tvs-prev-cap" id="tvsPrevCap"></p>
+  <div class="tvs-actions" id="tvsActBox"></div>`;
+    }
+    side.querySelector('#tvsSumBox').innerHTML = `<p class="tvs-sum-line${sm.error ? ' is-error' : ''}" data-tvs-summary>${esc(sm.line)}</p>${sm.more ? `<p class="tvs-sum-more">${esc(sm.more)}</p>` : ''}`;
+    const box = side.querySelector('#tvsPrevBox');
+    if (has && !box.querySelector('iframe')) box.innerHTML = '<iframe class="tvs-prev-frame" id="tvsPrevFrame" title="Page 1 preview" tabindex="-1"></iframe>';
+    if (!has) box.innerHTML = '';
+    side.querySelector('#tvsPrevCap').textContent = !has ? '' : S.building ? 'Drawing page 1…' : 'First page · every item drawn live by the app · Print makes every page';
+    side.querySelector('#tvsActBox').innerHTML = `<button type="button" class="tvs-btn tvs-primary" data-act="print"${ready ? '' : ` aria-disabled="true" data-why="${esc(has ? sm.line : 'Tick skills first')}"`}>${icon('print', 20)}<span>${has ? 'Print' : 'Tick skills first'}</span></button>
+    ${quiz ? `<button type="button" class="tvs-btn" data-act="quizshare"${ready ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('link', 18)}<span>Share with pupils</span></button>
+    <button type="button" class="tvs-btn" data-act="quizsave"${ready ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('bookmark', 18)}<span>Save</span></button>` : ''}
+    <button type="button" class="tvs-btn" data-act="renew"${has ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('shuffle', 18)}<span>New numbers</span></button>`;
+    if (S.preview && S.preview.html) showPreview(S.preview.html);
 }
 function showPreview(html) {
     S.firstHtml = html;
@@ -769,6 +792,7 @@ function shareHTML() {
     const list = items();
     if (!list.length) return `<div class="tvs-empty"><p class="tvs-strong">Tick skills first</p><p class="tvs-muted">Tick one or more skills on Skills, then press Share.</p></div>`;
     const r = S.shareRes;
+    if (r === undefined) return `${skillsHTML(list)}<div class="tvs-codebox"><p class="tvs-muted">Making the code…</p></div>`;
     const code = r ? pupilCode(r.code) : '';
     const s = S.share;
     const sel = (field, label, opts) => `<div class="tvs-field"><label class="tvs-label" for="tvsSh_${field}">${esc(label)}</label><select id="tvsSh_${field}" class="tvs-input" data-in="share" data-v="${field}">${opts.map(([v, l]) => `<option value="${esc(v)}"${String(s[field]) === v ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select></div>`;
@@ -841,16 +865,28 @@ async function quizShare() {
         let c = compressTestForURL(saved);
         const base = location.origin + location.pathname + '?quiz=';
         if ((base + c).length > 8000) {
-            // the link carries the whole quiz (8000 characters at most): an item the quiz screen draws from its kit cell
-            // (cellKindFor, quiz-take.js) never reads its legacy `visual`, so that copy leaves the LINK (the saved quiz keeps it)
+            // The link carries the whole quiz (8000 characters at most). The LINK leaves out what the quiz screen never
+            // reads: the legacy visual of an item it draws from its kit cell (cellKindFor) or its screen twin
+            // (screenTwin), the hint, the label, the answer options (the quiz takes typed answers) and default options.
+            // The saved quiz keeps everything.
             const slim = JSON.parse(JSON.stringify(saved));
+            const own = new Set(items().filter((x) => x.opts && Object.keys(x.opts).length).map((x) => x.skillId));
             for (const sec of slim.sections || []) for (const q of sec.questions || []) {
                 const qd = q.questionData || {};
-                let k = null; try { k = cellKindFor({ ...qd, options: [] }); } catch (e) { k = null; }
-                if (k && qd.visual) delete qd.visual;
+                let k = null, tw = null;
+                try { k = cellKindFor({ ...qd, options: [] }); } catch (e) { k = null; }
+                if (!k) { try { tw = screenTwin({ ...qd, skillId: qd.skillId || q.skillId }, { typedOrder: true }); } catch (e) { tw = null; } }
+                if ((k || tw) && qd.visual) delete qd.visual;
+                delete qd.hint; delete qd.skillLabel; delete qd.options;
+                if (!own.has(q.skillId)) delete qd.skillOptions;
             }
             c = compressTestForURL(slim);
-        }
+            if ((base + c).length > 8000) {
+                // still too long: say how many questions fit, and offer that
+                const n = (slim.sections || []).reduce((t, x) => t + (x.questions || []).length, 0);
+                S.quizFit = Math.max(1, Math.floor(n * (7900 - base.length) / c.length));
+            } else S.quizFit = 0;
+        } else S.quizFit = 0;
         S.quizLink = base + c;
         S.sheet = 'quizshare';
         render();
@@ -859,8 +895,9 @@ async function quizShare() {
 function quizShareHTML() {
     const long = S.quizLink.length > 8000;
     return `<div class="tvs-codebox"><p class="tvs-muted">Quiz link</p><p class="tvs-link-line"><code>${esc(S.quizLink)}</code></p></div>
-  <p class="tvs-muted">${long ? 'This quiz is too long for a link: make it shorter, or export it from Classes › Quizzes.' : 'The whole quiz travels in the link; pupils take it exactly as today. It is also saved in your quizzes.'}</p>
-  <div class="tvs-share-actions"><button type="button" class="tvs-btn tvs-primary" data-act="copyquiz"${long ? ' aria-disabled="true"' : ''}>${icon('copy', 20)}<span>Copy link</span></button>
+  <p class="tvs-muted">${long ? `This quiz is too long for one link. ${S.quizFit ? `${S.quizFit} questions fit.` : ''} It is saved in Classes › Quizzes.` : 'The whole quiz travels in the link; pupils take it exactly as today. It is also saved in your quizzes.'}</p>
+  ${long && S.quizFit ? `<button type="button" class="tvs-btn" data-act="quizfit" data-v="${S.quizFit}">Make it ${S.quizFit} questions and share</button>` : ''}
+  <div class="tvs-share-actions"><button type="button" class="tvs-btn tvs-primary" data-act="copyquiz"${long ? ' aria-disabled="true" data-why="This quiz is too long for one link"' : ''}>${icon('copy', 20)}<span>Copy link</span></button>
   <div class="tvs-two"><button type="button" class="tvs-btn" data-act="backquiz">${icon('back', 18)}<span>Back to the quiz</span></button><button type="button" class="tvs-btn" data-act="close">Done</button></div></div>`;
 }
 
@@ -871,16 +908,33 @@ async function doPrint() {
     if (!list.length) { toast('Tick skills first'); return; }
     const p = plan(list);
     if (p.error) { toast(p.error); return; }
-    if (S.building || !S.built || S.built.sig !== sigOf(p, list, S.sheet === 'quiz')) {
-        toast('Preparing the pages…');
-        clearTimeout(buildTimer);
-        await runBuild();
-    }
-    const b = S.built;
-    if (!b || !b.doc) { toast('These pages could not be built'); return; }
-    const title = S.sheet === 'quiz' ? (S.quiz.name || autoQuizName(list)) : list.length === 1 ? list[0].label : 'Worksheet';
-    S.lastDoc = sheetDocument(b.doc, title, { paper: S.opts.paper || 'A4' });
-    try { await printHtml(b.doc, title, S.opts.paper || 'A4'); } catch (e) { console.warn('[teacher-sheet] print failed', e); toast('Could not open the print dialog'); }
+    const quiz = S.sheet === 'quiz';
+    const sig = sigOf(p, list, quiz);
+    if (S.printing) return;
+    S.printing = true;
+    try {
+        let b = S.built && S.built.sig === sig ? S.built : null;
+        if (!b) {
+            b = await buildAll(p, list, quiz, (i, n) => { if (n > 2) toast(`Making the pages… ${i} of ${n}`); });
+            b.sig = sig;
+            S.built = b;
+            S.printed = { sig, pages: b.pages, matchesPlan: b.matchesPlan };
+            renderSide();
+        }
+        if (!b.doc) { toast('These pages could not be built'); return; }
+        const title = quiz ? (S.quiz.name || autoQuizName(list)) : list.length === 1 ? list[0].label : 'Worksheet';
+        S.lastDoc = sheetDocument(b.doc, title, { paper: S.opts.paper || 'A4' });
+        try { await printHtml(b.doc, title, S.opts.paper || 'A4'); } catch (e) { console.warn('[teacher-sheet] print failed', e); toast('Could not open the print dialog'); }
+    } finally { S.printing = false; }
+}
+/** For checks: build the whole paper now (as Print does) and return what it holds. */
+export async function buildNow() {
+    const list = items(); const p = plan(list); const quiz = S.sheet === 'quiz';
+    if (p.error) return { error: p.error };
+    const b = await buildAll(p, list, quiz);
+    b.sig = sigOf(p, list, quiz); S.built = b; S.printed = { sig: b.sig, pages: b.pages, matchesPlan: b.matchesPlan };
+    return { plan: { byKey: p.byKey, pages: p.pagesBy ? Object.values(p.pagesBy).reduce((a, c) => a + c, 0) : p.pages, total: p.total }, byKey: b.byKey, pages: b.pages, matchesPlan: b.matchesPlan, sameCounts: b.sameCounts, versions: b.versions,
+        perVersion: b.perVersion.map((x) => ({ byKey: x.byKey, total: x.total, pages: x.pages, firstHash: hashStr(x.first) })), formA: /Form A\b/.test(b.doc), doc: sheetDocument(b.doc, 'Worksheet', { paper: S.opts.paper || 'A4' }) };
 }
 
 /* ================================================================= events */
@@ -894,7 +948,7 @@ function onClick(e) {
     if (e.target === root) { close(); return; }
     const b = e.target.closest('[data-act]');
     if (!b || !root.contains(b)) return;
-    if (b.getAttribute('aria-disabled') === 'true') { toast(currentSet().length ? 'One moment: the pages are being made' : 'Tick skills first'); return; }
+    if (b.getAttribute('aria-disabled') === 'true') { toast(b.dataset.why || (currentSet().length ? 'Not ready yet' : 'Tick skills first')); return; }
     const v = b.dataset.v;
     const more = root.querySelector('.tvs-more');
     S.moreOpen = !!(more && more.open);
@@ -922,7 +976,7 @@ function onClick(e) {
         case 'keyplace': S.opts.keyPlace = v; changed(); return;
         case 'keystyle': S.opts.keyStyle = v; changed(); return;
         case 'paper': S.opts.paper = v; changed(); return;
-        case 'renew': S.seed = freshSeed(); S.built = null; scheduleBuild(0); renderSide(); return;
+        case 'renew': S.seed = freshSeed(); S.built = null; S.preview = null; scheduleBuild(0); renderSide(); return;
         case 'print': doPrint(); return;
         case 'popup': S.popup = v; renderPopup(); return;
         case 'popclose': { const k = S.popup; S.popup = null; renderPopup(); const back = root.querySelector(`[data-act="popup"][data-v="${CSS.escape(k || '')}"]`); if (back) back.focus(); return; }
@@ -932,6 +986,7 @@ function onClick(e) {
         case 'pickfrom': pickFrom(v); return;
         case 'quizsave': saveQuiz(false).catch(() => toast('Could not save the quiz')); return;
         case 'quizshare': quizShare(); return;
+        case 'quizfit': S.quiz.mode = 'total'; S.quiz.n = Number(v) || S.quiz.n; S.quiz.savedId = null; persist(); quizShare(); return;
         case 'backquiz': S.sheet = 'quiz'; render(); scheduleBuild(0); return;
         case 'copyquiz': copyText(S.quizLink).then((ok) => toast(ok ? 'Quiz link copied' : 'Could not copy')); return;
         case 'copylink': if (S.shareRes) copyText(S.shareRes.link).then((ok) => toast(ok ? 'Link copied' : 'Could not copy')); return;
@@ -953,7 +1008,7 @@ function onInput(e) {
         fromTimer = setTimeout(() => { const ul = root && root.querySelector('#tvsFromList'); if (ul) ul.innerHTML = fromResultsHTML(); }, 150);
     } else if (t.dataset.in === 'quizname') {
         S.quiz.name = t.value;
-        S.built = null; scheduleBuild(600);
+        S.built = null; S.preview = null; scheduleBuild(600);
     }
 }
 function onChange(e) {
@@ -975,11 +1030,29 @@ export function closeSheet() { if (S.sheet) close(); }
 export function sheetState() {
     const list = items();
     let p = null; try { p = list.length ? plan(list) : null; } catch (e) { p = null; }
-    return { sheet: S.sheet, kind: list.length ? kindOf(list) : null, plan: p, summary: summary(), built: S.built ? { pages: S.built.pages, total: S.built.total, byKey: S.built.byKey, versions: S.built.versions, errors: S.built.errors, sameCounts: S.built.sameCounts, perVersion: S.built.perVersion.map((x) => ({ byKey: x.byKey, total: x.total, pages: x.pages, firstHash: hashStr(x.first) })) } : null, building: !!S.building, share: S.shareRes, quizLink: S.quizLink, lastDoc: S.lastDoc || '', doc: S.built ? sheetDocument(S.built.doc, 'Worksheet', { paper: S.opts.paper || 'A4' }) : '' };
+    return { sheet: S.sheet, kind: list.length ? kindOf(list) : null, plan: p, summary: summary(), preview: !!(S.preview && S.preview.html), building: !!S.building,
+        built: S.built ? { pages: S.built.pages, total: S.built.total, byKey: S.built.byKey, versions: S.built.versions, errors: S.built.errors, matchesPlan: S.built.matchesPlan } : null,
+        share: S.shareRes, quizLink: S.quizLink, lastDoc: S.lastDoc || '' };
+}
+
+/** The worksheet's How much, shared with the tray popup's "Total" (T3a): { mode: 'pages' | 'total' | 'each', n, pages, total }. */
+export function sheetAmount() {
+    const list = items();
+    let p = null; try { p = list.length ? plan(list) : null; } catch (e) { p = null; }
+    const m = S.opts.mode || 'pages';
+    return { mode: m, n: m === 'pages' ? (p && p.pages ? p.pages : S.opts.pages) : m === 'each' ? S.opts.nEach : S.opts.nTotal, pages: p ? p.pages : null, total: p && !p.error ? p.total : null };
+}
+/** Set How much from the tray popup: 'pages' (1–30) or 'total' problems in all (1–999); kept like the sheet's own choice. */
+export function setSheetAmount(mode, n) {
+    if (mode === 'pages') { S.opts.mode = 'pages'; S.opts.pages = Math.max(1, Math.min(30, Math.round(Number(n) || 1))); touch('pages'); }
+    else { S.opts.mode = 'total'; S.opts.nTotal = Math.max(1, Math.min(999, Math.round(Number(n) || 1))); }
+    persist();
 }
 
 if (typeof window !== 'undefined') {
     window.tvOpenSheet = openSheet;
+    window.tvSheetAmount = { get: sheetAmount, set: setSheetAmount };
     window.tvCloseSheet = closeSheet;
     window.tvSheetState = sheetState;
+    window.tvSheetBuildNow = buildNow;
 }

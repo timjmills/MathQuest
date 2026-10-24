@@ -129,6 +129,7 @@ const T = {
     lockErr: '',
     releaseAsk: '',      // the held scope asking "Release the 40 %?"
     bulkN: 2,
+    need: 0,             // the total a refused count needs ("Raise the total to N")
     bulkCount: 4,        // the bulk bar's "Set count" 
     opener: null,
 };
@@ -157,17 +158,30 @@ let PLAN = null;
 import('./teacher-plan.js').then((m) => { if (m && typeof m.planCounts === 'function') { PLAN = m; refresh(); } }).catch(() => { /* not there yet: shares only */ });
 
 function trayTotal(n) { return PER_PAGE * Math.max(1, Math.ceil(n / SMALL)); }
+/** The worksheet's How much (teacher-sheet.js, shared with the popup's Total), or null before the sheet is in. */
+function sheetAmount() { try { return window.tvSheetAmount ? window.tvSheetAmount.get() : null; } catch (e) { return null; } }
+/** The problems the tray's counts are checked against: the sheet's current total (its kept Pages / Problems in all). */
+function curTotal(nAct) {
+    const a = sheetAmount();
+    if (a) {
+        if (a.mode === 'total' && a.n > 0) return a.n;
+        if (a.mode === 'each' && a.n > 0) return a.n * Math.max(1, nAct);
+        if (a.total) return a.total;
+        if (a.mode === 'pages' && (a.pages || a.n)) return (a.pages || a.n) * PER_PAGE;
+    }
+    return trayTotal(nAct);
+}
 
 /** { pct: key → %, byKey: key → n | null, total, error } for the tray as it stands. */
 function plan() {
     const list = trayItems();
     const act = list.filter((it) => it.leftOut !== true);
-    const total = trayTotal(act.length);
+    const total = curTotal(act.length);
     if (PLAN) {
         try {
             const r = PLAN.planCounts(list, total, planOpts());
             if (r && !r.error) return { pct: r.pct || {}, byKey: r.byKey || {}, total, error: '' };
-            if (r && r.error) return { pct: fallbackPct(list), byKey: null, total, error: r.error };
+            if (r && r.error) return { pct: fallbackPct(list), byKey: null, total, error: r.error, need: r.needTotal };
         } catch (e) { /* fall through */ }
     }
     return { pct: fallbackPct(list), byKey: null, total, error: '' };
@@ -175,7 +189,7 @@ function plan() {
 /** Before teacher-plan.js: shares by weight, held skills first (no area holds). */
 function fallbackPct(list) {
     const out = {};
-    const total = trayTotal(list.filter((it) => it.leftOut !== true).length);
+    const total = curTotal(list.filter((it) => it.leftOut !== true).length);
     const pctOf = (it) => (isNum(it.count) ? 100 * it.count / total : it.lockPct);
     const held = list.filter((it) => it.leftOut !== true && (isNum(it.lockPct) || isNum(it.count)));
     const used = held.reduce((t, it) => t + pctOf(it), 0);
@@ -188,7 +202,7 @@ function fallbackPct(list) {
 /** A % held over 100 is refused (the same arithmetic the sheet uses). */
 function lockError() {
     const list = trayItems();
-    const total = trayTotal(list.filter((it) => it.leftOut !== true).length);
+    const total = curTotal(list.filter((it) => it.leftOut !== true).length);
     if (PLAN) { try { const r = PLAN.planCounts(list, total, planOpts()); return r && r.error ? r.error : ''; } catch (e) { return ''; } }
     const counts = list.reduce((t, x) => t + (isNum(x.count) && x.leftOut !== true ? x.count : 0), 0);
     if (counts > total) return `Counts add up to ${counts}, more than the ${total} problems the page holds.`;
@@ -361,6 +375,8 @@ function evenRest(scope) {
     for (const it of trayItems()) if (!inScope.has(keyOfItem(it)) && it.leftOut !== true && heldText(it) === null) it.weight = 2;
 }
 function refuse(before, err, what) {
+    const p = plan();
+    T.need = p.need && isFinite(p.need) ? p.need : 0;
     restoreSnap(before);
     T.lockErr = `Not set: ${err} ${what}`;
 }
@@ -653,6 +669,19 @@ function rowHTML(k, p, oneGrade) {
     return `<div class="tt-row${w === 0 ? ' out' : ''}" data-domain="${a}"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(g)}${selBox(`k:${k}`, label)}<span class="tt-ricon">${areaIcon(a, 16)}</span><button type="button" class="tt-name-btn" data-act="chip" data-arg="${esc(k)}"${pv}>${esc(label)}</button>${tags}${x}${detail}</div>`;
 }
 
+/** Total: Pages · Problems in all, the same How much the worksheet sheet keeps (window.tvSheetAmount). */
+function totalHTML(p) {
+    const a = sheetAmount();
+    if (!a) return '';
+    const pages = a.mode === 'pages';
+    const n = pages ? (a.pages || a.n || 1) : (a.mode === 'total' ? a.n : p.total);
+    const b = (v, l) => `<button type="button" data-act="amode" data-arg="${v}" ${pressed((v === 'pages') === pages)}>${l}</button>`;
+    return `<div class="tt-total" role="group" aria-labelledby="tvTrayTotalL"><span class="tt-row-label" id="tvTrayTotalL">Total</span><div class="tt-seg-ctl">${b('pages', 'Pages')}${b('total', 'Problems in all')}</div>`
+        + `<span class="tt-stepper"><button type="button" data-act="astep" data-arg="-1" aria-label="Fewer"${n <= 1 ? ' disabled' : ''}>−</button><label><span class="tv-sr">${pages ? 'Pages' : 'Problems in all'}</span><input type="number" class="tt-amt" min="1" max="${pages ? 30 : 999}" value="${n}"></label><button type="button" data-act="astep" data-arg="1" aria-label="More">+</button></span>`
+        + `<span class="tt-note">${pages ? `${p.total} problems` : `${Math.max(1, Math.ceil(p.total / PER_PAGE))} pages`}</span></div>`;
+}
+function setAmount(mode, n) { try { window.tvSheetAmount.set(mode, n); } catch (e) { return; } T.lockErr = ''; T.need = 0; changed(); }
+
 function popHTML() {
     const p = plan();
     const keys = trayKeys();
@@ -708,7 +737,7 @@ function popHTML() {
         + `<button type="button" class="tt-btn tt-text" data-act="trayclear">Clear tray</button></div></div>`
         + (T.detailed ? `<div class="tt-rest tt-extra${T.more ? ' open' : ''}"><span class="tt-row-label">When you set a %, the rest</span><div class="tt-seg-ctl" role="group" aria-label="The rest">${[['even', 'Split evenly'], ['prop', 'Keep proportions']].map(([v, l]) => `<button type="button" data-act="rest" data-arg="${v}" ${pressed(T.rest === v)}>${l}</button>`).join('')}</div><button type="button" class="tt-btn tt-text" data-act="reseteq" data-arg="all">Reset all to equal</button><span class="tt-note">Weight 0 leaves a skill out for now; Less · Equal · More = 1 · 2 · 3.</span></div>` : '')
         + (T.groups.length ? `<div class="tt-groups">${T.groups.map((g, i) => `<span class="tt-group"><b>${plural(g.skills.length, 'skill')}</b> share ${g.pct !== undefined ? `${g.pct} % of the set` : plural(g.total, 'problem')}<span class="tt-note"> (${esc(g.skills.slice(0, 2).map((k) => shortName(infoOf(k).label)).join(', '))}${g.skills.length > 2 ? ' …' : ''})</span><button type="button" class="tt-btn tt-text" data-act="groupdel" data-arg="${i}" aria-label="Stop the shared total of these ${g.skills.length} skills">Remove</button></span>`).join('')}</div>` : '')
-        + (T.lockErr || p.error ? `<p class="tt-warn" role="alert">⚠ ${esc(T.lockErr || p.error)}</p>` : '')
+        + (T.lockErr || p.error ? `<p class="tt-warn" role="alert">⚠ ${esc(T.lockErr || p.error)}${(T.lockErr ? T.need : p.need) && isFinite(T.lockErr ? T.need : p.need) && sheetAmount() ? ` <button type="button" class="tt-btn" data-act="raise" data-arg="${T.lockErr ? T.need : p.need}">Raise the total to ${T.lockErr ? T.need : p.need}</button>` : ''}</p>` : '')
         + bulk;
     const empty = !keys.length ? '<p class="tt-note">The tray is empty. Tick skills on the Skills page and they wait here.</p>'
         : (body ? '' : `<p class="tt-note">No skill in the tray matches “${esc(T.tq)}”.</p>`);
@@ -721,7 +750,7 @@ function popHTML() {
       <div class="tt-sheet-head"><div class="tt-head-text"><p class="tt-eyebrow">Tray · ${esc(trayTitle(keys))}</p><h2 id="tvTrayPopTitle">Your tray</h2></div><button type="button" class="tt-btn tt-icon tt-close" data-act="close" aria-label="Close the tray">${icon('x', 20)}</button></div>
       <div class="tt-pop-head">${tools}</div>
       <div class="tt-pop-body">${byGrade}${body}${empty}</div>
-      <div class="tt-sheet-foot"><div class="tt-summary">${esc(summary)}</div><button type="button" class="tt-btn" data-act="tray-quiz">${icon('sheet', 20)}<span>Quiz</span></button><button type="button" class="tt-btn" data-act="tray-share"${dis}>${icon('link', 20)}<span>Share</span></button><button type="button" class="tt-btn tt-primary" data-act="tray-print"${dis}>${icon('print', 20)}<span>Print</span></button></div>
+      <div class="tt-sheet-foot">${totalHTML(p)}<div class="tt-summary">${esc(summary)}</div><button type="button" class="tt-btn" data-act="tray-quiz">${icon('sheet', 20)}<span>Quiz</span></button><button type="button" class="tt-btn" data-act="tray-share"${dis}>${icon('link', 20)}<span>Share</span></button><button type="button" class="tt-btn tt-primary" data-act="tray-print"${dis}>${icon('print', 20)}<span>Print</span></button></div>
     </div>`;
 }
 
@@ -746,6 +775,8 @@ function mountPop() {
     popEl.addEventListener('change', (e) => {
         const inp = e.target.closest('input.tt-pct');
         if (inp) { setLock(inp.dataset.scope, inp.value); changed(); focusAfter(`input.tt-pct[data-scope="${CSS.escape(inp.dataset.scope)}"]`); return; }
+        const amt = e.target.closest('input.tt-amt');
+        if (amt) { const a = sheetAmount(); setAmount(a && a.mode === 'pages' ? 'pages' : 'total', amt.value); focusAfter('input.tt-amt'); return; }
         const cnt = e.target.closest('input.tt-cnt');
         if (cnt) {
             if (cnt.value === '') { release(`k:${cnt.dataset.key}`); } else setCount(cnt.dataset.key, cnt.value);
@@ -755,7 +786,7 @@ function mountPop() {
     });
     popEl.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') { e.stopPropagation(); closePop(); return; }
-        const inp = e.target.closest('input.tt-pct, input.tt-cnt');
+        const inp = e.target.closest('input.tt-pct, input.tt-cnt, input.tt-amt');
         if (inp && e.key === 'Enter') { e.preventDefault(); inp.dispatchEvent(new Event('change', { bubbles: true })); }
     });
     return popEl;
@@ -877,6 +908,9 @@ function onClick(e) {
         case 'bulkn': T.bulkN = Math.max(0, Math.min(10, T.bulkN + Number(arg))); break;
         case 'bulkset': [...T.sel].forEach((k) => { if (!skillHeld(k)) setW(itemOf(k), T.bulkN); }); changed(); return;
         case 'bulkremove': takeOut([...T.sel], plural(T.sel.size, 'selected skill')); return;
+        case 'amode': { const a = sheetAmount(); if (!a) return; const p = plan(); setAmount(arg, arg === 'pages' ? Math.max(1, Math.ceil(p.total / PER_PAGE)) : p.total); return; }
+        case 'astep': { const a = sheetAmount(); if (!a) return; const pages = a.mode === 'pages'; const cur = pages ? (a.pages || a.n || 1) : (a.mode === 'total' ? a.n : plan().total); setAmount(pages ? 'pages' : 'total', cur + Number(arg)); return; }
+        case 'raise': setAmount('total', Number(arg)); return;
         case 'groupmode': T.groupMode = arg === 'pct' ? 'pct' : 'total'; break;
         case 'bulkgroup': {
             const inp = popEl && popEl.querySelector('#tvTrayGroupN');
