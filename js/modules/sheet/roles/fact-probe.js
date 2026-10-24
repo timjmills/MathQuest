@@ -132,14 +132,18 @@ export function plan(input = {}) {
         const h = hMinAt(items, cols, ctx);
         const rowsFit = Math.max(1, Math.floor(G / (Number.isFinite(h) ? h : G)));
         // the pages share the facts evenly (a rebalanced last page, PG-21), never a short tail
-        const nPages = Math.ceil(items.length / (cols * Math.min(rowsFit, Math.ceil(items.length / cols))));
-        const rows = Math.ceil(Math.ceil(items.length / nPages) / cols);
-        const per = cols * rows;
+        // The ROWS are shared (s3 precritic-2, PG-23): 20 facts in 3 columns, 3 rows a page, are
+        // 7 rows on 3 pages = 3 + 2 + 2 rows (9, 6, 5 facts), not 9, 9 and a 2-fact last page.
+        const totalRows = Math.ceil(items.length / cols);
+        const nPages = Math.ceil(totalRows / Math.min(rowsFit, totalRows));
+        const rowsOn = Array.from({ length: nPages }, (_, k) => Math.floor(totalRows / nPages) + (k < totalRows % nPages ? 1 : 0));
+        const rows = Math.max(...rowsOn);
         vRows = rows;
         vH = Math.min(Number.isFinite(h) ? 1.3 * h : G / rows, G / rows);
         const chunks = [];
-        for (let i = 0; i < items.length; i += per) chunks.push(items.slice(i, i + per));
-        const grids = chunks.map((ch, k) => gridPart(ch.map((it) => planItem(it, { cols })), { cols, rows: Math.ceil(ch.length / cols), cellH: vH, labels, start: 1 + k * per, cls: 'facts' }));
+        const starts = [];
+        for (let k = 0, i = 0; k < nPages && i < items.length; i += rowsOn[k] * cols, k++) { starts.push(i); chunks.push(items.slice(i, i + rowsOn[k] * cols)); }
+        const grids = chunks.map((ch, k) => gridPart(ch.map((it) => planItem(it, { cols })), { cols, rows: Math.ceil(ch.length / cols), cellH: vH, labels, start: 1 + starts[k], cls: 'facts' }));
         body = grids[0];
         if (grids.length > 1) extraPages = grids.slice(1).map((g) => ({ sections: [g] }));
         probeCols = cols;
