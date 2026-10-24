@@ -789,7 +789,9 @@ export default {
 export const measuredH = (it, cols) => {
     // A legacy cell's measurement is not trusted to size a row to (its markup reflows); rows of
     // legacy cells keep the uniform grid.
-    if (!it || it.legacy || it.template === 'legacy') return 0;
+    // ... except in a height-classed pool (`hClass`, print-sheet.js heightClassOf, critic 2026-10-24
+    // D2): there each problem's measured height IS what its row is sized to.
+    if (!it || ((it.legacy || it.template === 'legacy') && !it.hClass)) return 0;
     const m = it.measured && it.measured[cols];
     // + 1 mm: a grid's 1.5 pt frame and 0.75 pt rules come out of its height (as compose.js hMinAt)
     return m && Number.isFinite(m.hMm) ? m.hMm + 1 : 0;

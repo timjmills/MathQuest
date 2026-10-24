@@ -7,6 +7,8 @@
 //    (ws-legacy--readfig), never centred under a blank band.
 // 4. Add/Subtract Fractions (Unlike Denom) (No Visuals): a missing numerator prints as a stacked
 //    fraction (box over bar over denominator), never as "? 10".
+// 5. (critic 2026-10-24 D6) a multiple-choice option is printed as escaped TEXT: "3 < 5 and 7 > 2"
+//    prints whole (no tag-stripping of "< 5 and 7 >"), markup in an option is stripped, entities stay text.
 const { open } = require('../../../tests/lib/ws-harness.cjs');
 
 (async () => {
@@ -43,6 +45,12 @@ const { open } = require('../../../tests/lib/ws-harness.cjs');
                     if (out.frac.filter((f) => f.s === s).length >= 2) break;
                 }
             }
+            // 5. D6: the default branch's lettered choices escape their text
+            const q = window.generateQuestionFor({ category: 'data_analysis', skill: 'statistical_question', seed: 4101 });
+            const opts = ['3 < 5 and 7 > 2', '<b>12</b> apples', 'cats &amp; dogs', 'x<y'];
+            d.innerHTML = window.formatProblemForPrint(Object.assign({}, q, { options: opts, answerType: 'multiple-choice' }), 0, 1);
+            out.mc = [...d.querySelectorAll('.mc-opt span:last-child')].map((e) => e.textContent);
+            out.mcTags = d.querySelectorAll('.mc-opt b').length;
             return out;
         });
         for (const s of ['add_facts', 'shade_fraction']) {
@@ -58,6 +66,8 @@ const { open } = require('../../../tests/lib/ws-harness.cjs');
             ok(f.length > 0, `${s}: no missing-numerator item found to check`);
             ok(f.every((x) => x.stacked && !x.loose), `${s}: missing numerator not stacked: ${JSON.stringify(f)}`);
         }
+        const wantMc = ['3 < 5 and 7 > 2', '12 apples', 'cats & dogs', 'x<y'];
+        ok(JSON.stringify(r.mc) === JSON.stringify(wantMc) && r.mcTags === 0, `multiple-choice options not printed as escaped text (D6): ${JSON.stringify(r.mc)} tags ${r.mcTags}`);
         if (app.problems.length) fails.push(`console errors: ${app.problems.slice(0, 3).map((p) => p.text).join(' | ')}`);
     } catch (e) {
         fails.push(e.message);

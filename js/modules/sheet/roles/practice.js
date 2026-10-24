@@ -693,7 +693,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
                 // Likewise a DENSE section (12.1: the layout chose more rows than the practice
                 // ceiling, "Dense: 3 x 9") holds its rows: a div_facts Mix page at S, 3 x 9 by the
                 // layout, was paged 15 + 12 with half of page 1 blank.
-                gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed || L.rows * L.cols > L.ceiling ? L.rows : 0), cellH: L.cellH, force: !!L.packed,
+                gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed || L.rows * L.cols > L.ceiling ? L.rows : 0), cellH: L.cellH, force: !!L.packed || (itemsBySection[si].length > 0 && itemsBySection[si].every((it) => it && it.hClass)),
             })) || paginate(itemsBySection[si].length, L)));
     const pages = placeSections(
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
@@ -964,7 +964,19 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         return { header: head, sections };
     });
 
-    const fits = layouts.map((L, si) => ({
+    // A height-classed pool (print-sheet.js heightClassOf, critic 2026-10-24 D2) is paged by each
+    // problem's own height: the dialog's line reports the pages it really prints.
+    const classed = (si) => sheetItems[si].length > 0 && sheetItems[si].every((it) => it && it.hClass);
+    const fits = layouts.map((L0, si) => {
+        if (!classed(si)) return L0;
+        const parts = pages.flatMap((pg) => pg.parts.filter((pt) => pt.section === si));
+        if (!parts.length) return L0;
+        const per = Math.max(...parts.map((pt) => pt.chunk.count));
+        const rows = Math.max(...parts.map((pt) => pt.chunk.rows));
+        const said = String(L0.note || '').split(/(?<=\.)\s+/).filter((t) => t && !/^(Tall problems: \d+ row|Very tall problems|Rows sized to)/.test(t));
+        const note = [...said, 'Rows sized to the problems they hold.'].join(' ');
+        return Object.assign({}, L0, { rows, perPage: per, pages: parts.length, note });
+    }).map((L, si) => ({
         cols: L.cols, rows: L.rows, perPage: L.perPage, pages: L.pages, cellW: L.cellW, cellH: L.cellH,
         requested: L.requested, clamped: L.clamped,
         // The dialog's line tells the truth about a split-off group (splitWide).

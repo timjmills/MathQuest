@@ -6454,6 +6454,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const cd = problem.coordDistanceData;
         const maxCoord = cd.maxCoord || 12;
         const gridSpacing = maxCoord <= 10 ? 22 : 18;  // ≥250px target at maxCoord=10
+        // TY-11 (2026-10-24, D2 fix): every label at least 8 pt as printed (11 px at this 1:1 viewBox);
+        // the 8 / 10 px labels printed at 6 / 7.5 pt.
         const gridSize = maxCoord * gridSpacing + 36;
         const origin = { x: 22, y: gridSize - 22 };
         let gridLines = '';
@@ -6464,8 +6466,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="var(--print-rule)" stroke-width="0.5"/>`;
             gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="var(--print-rule)" stroke-width="0.5"/>`;
             if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
-                axisLabels += `<text x="${xPos}" y="${origin.y + 11}" text-anchor="middle" fill="var(--print-ink-mute)" font-size="8">${i}</text>`;
-                axisLabels += `<text x="${origin.x - 5}" y="${yPos + 3}" text-anchor="end" fill="var(--print-ink-mute)" font-size="8">${i}</text>`;
+                axisLabels += `<text x="${xPos}" y="${origin.y + 11}" text-anchor="middle" fill="var(--print-ink-mute)" font-size="11">${i}</text>`;
+                axisLabels += `<text x="${origin.x - 5}" y="${yPos + 3}" text-anchor="end" fill="var(--print-ink-mute)" font-size="11">${i}</text>`;
             }
         }
         const pxA = origin.x + cd.A.x * gridSpacing;
@@ -6473,8 +6475,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const pxB = origin.x + cd.B.x * gridSpacing;
         const pyB = origin.y - cd.B.y * gridSpacing;
         const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="var(--print-ink)" stroke-width="1.8"/>`;
-        const ptA = `<circle cx="${pxA}" cy="${pyA}" r="4" fill="var(--print-ink)"/><text x="${pxA + 6}" y="${pyA - 6}" fill="var(--print-ink)" font-size="10" font-weight="700">${cd.labels === 'some' ? 'A' : `A(${cd.A.x},${cd.A.y})`}</text>`;
-        const ptB = `<circle cx="${pxB}" cy="${pyB}" r="4" fill="var(--print-ink)"/><text x="${pxB + 6}" y="${pyB - 6}" fill="var(--print-ink)" font-size="10" font-weight="700">${cd.labels === 'some' ? 'B' : `B(${cd.B.x},${cd.B.y})`}</text>`;
+        const ptA = `<circle cx="${pxA}" cy="${pyA}" r="4" fill="var(--print-ink)"/><text x="${pxA + 6}" y="${pyA - 6}" fill="var(--print-ink)" font-size="11" font-weight="700">${cd.labels === 'some' ? 'A' : `A(${cd.A.x},${cd.A.y})`}</text>`;
+        const ptB = `<circle cx="${pxB}" cy="${pyB}" r="4" fill="var(--print-ink)"/><text x="${pxB + 6}" y="${pyB - 6}" fill="var(--print-ink)" font-size="11" font-weight="700">${cd.labels === 'some' ? 'B' : `B(${cd.B.x},${cd.B.y})`}</text>`;
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
@@ -6484,8 +6486,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                     <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="var(--print-ink)" stroke-width="1.2"/>
                     <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="var(--print-ink)" stroke-width="1.2"/>
                     ${axisLabels}
-                    <text x="${origin.x + maxCoord * gridSpacing - 4}" y="${origin.y - 4}" fill="var(--print-ink)" font-size="10" font-weight="700">x</text>
-                    <text x="${origin.x + 4}" y="${origin.y - maxCoord * gridSpacing + 10}" fill="var(--print-ink)" font-size="10" font-weight="700">y</text>
+                    <text x="${origin.x + maxCoord * gridSpacing - 4}" y="${origin.y - 4}" fill="var(--print-ink)" font-size="11" font-weight="700">x</text>
+                    <text x="${origin.x + 4}" y="${origin.y - maxCoord * gridSpacing + 10}" fill="var(--print-ink)" font-size="11" font-weight="700">y</text>
                     ${segment}
                     ${ptA}
                     ${ptB}
@@ -13140,7 +13142,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // choices (statistical_question, teacher-site T1 r6): its choices print, lettered, to circle.
     if (problem.answerType === 'multiple-choice' && Array.isArray(problem.options) && problem.options.length >= 2
         && problem.options.every(o => typeof o === 'string' || typeof o === 'number')) {
-        const mcOpts = problem.options.map((o, i) => `<div class="mc-opt" style="margin:4px 0;"><span style="font-weight:700;margin-right:8px;">${String.fromCharCode(65 + i)})</span><span>${String(o).replace(/<[^>]*>/g, '')}</span></div>`).join('');
+        // D6 (critic 2026-10-24): an option is TEXT. Only real markup tags are stripped (a known tag name
+        // right after "<"), entities are decoded, and the text is HTML-escaped, so "3 < 5 and 7 > 2"
+        // prints whole instead of losing "< 5 and 7 >" to a tag-stripping regex.
+        const mcOpts = problem.options.map((o, i) => `<div class="mc-opt" style="margin:4px 0;"><span style="font-weight:700;margin-right:8px;">${String.fromCharCode(65 + i)})</span><span>${mcOptionText(o)}</span></div>`).join('');
         return `
         <div class="worksheet-problem${fullWidthClass}${sizeClass}">
             ${num}
@@ -13162,6 +13167,21 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                 </div>
             </div>
         </div>`;
+}
+
+/**
+ * D6 (critic 2026-10-24): the printable text of a multiple-choice option. Strips only real HTML tags
+ * (a known tag name after "<" or "</"), decodes the common entities, then escapes &, <, >, " so the
+ * option is printed as text: "3 < 5 and 7 > 2" stays whole, "<b>12</b>" prints "12".
+ */
+const MC_TAGS = 'a|abbr|b|br|code|div|em|font|i|img|label|mark|p|s|small|span|strong|sub|sup|svg|u|math|mi|mn|mo|mfrac|mrow';
+const MC_TAG_RE = new RegExp(`<\\/?(?:${MC_TAGS})(?:\\s[^<>]*)?\\/?>`, 'gi');
+export function mcOptionText(o) {
+    const txt = String(o === null || o === undefined ? '' : o).replace(MC_TAG_RE, '')
+        .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
+        .replace(/&#(\d+);/g, (m, d) => String.fromCodePoint(Number(d))).replace(/&#x([0-9a-f]+);/gi, (m, h) => String.fromCodePoint(parseInt(h, 16)))
+        .replace(/&amp;/g, '&');
+    return txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 export function generateWorksheetHTML() {

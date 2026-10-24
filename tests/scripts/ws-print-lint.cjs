@@ -107,6 +107,9 @@
 //              ([data-ws-slot] box / box-unknown) is >= 4.4 mm wide as printed (pilot critic r1 D3: 4.06 mm at S).
 //   L-OVERLAP  H2 (kit / pack) neighbouring head labels of one drawing (stack `.head`s, the place letters over a pv
 //              mat's zones) sit >= 1 mm apart (critic r1 D7 overlap, r2 N8 0.74 mm apart).
+//              CL40-INK (kit / pack) no ink - a glyph's ink box, an SVG shape, a painted border or fill - inside the
+//              label keep-out: the (label side + 1 mm) square at the cell's top-left corner, or the tab's own width
+//              when a 2-3 digit tab is wider (CL-40; critic 2026-10-24 D1, top-started across facts on the tab).
 //   L-WRAP     WRAP-OP (kit / pack) no wrapped line of text ends in − + × ÷ = with its expression continued on the
 //              next line (critic r2 N6 vocabulary picture, N7 worked step). TY-21, H2 and WRAP-OP are measured by
 //              tests/lib/ws-geom-probe.cjs, the one definition ws-slot-clip's SLOT-W / HEADS read too.
@@ -965,6 +968,68 @@ function wsLintPage(cfg) {
                 const keep = Math.min(...row.map(b => b.below));
                 const excess = a.below - keep;
                 if (excess >= 0.3 * a.H) F('L-DENSITY', 'H13', 'major', a.c, `one empty band ${mm(a.below)} mm tall under the item in a ${mm(a.H)} mm cell, ${mm(excess)} mm (${Math.round((excess / a.H) * 100)}%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)`, 'row sized for a taller item');
+            }
+        }
+        /* L-OVERLAP CL40-INK (CL-40; critic 2026-10-24 D1: top-started across facts "48 ÷ 12" put their first
+           digit on the number tab's bottom-right corner). Nothing but the label paints inside the keep-out: the
+           square of (label side + 1 mm) at the cell's top-left corner, widened to the tab's own painted width
+           when a 2- or 3-digit tab is wider than that square (nothing paints on the tab either). Measured on INK,
+           not layout boxes: a text run's glyph box (canvas actualBoundingBox* on its baseline), an SVG shape's
+           geometry, a painted border side, a non-white background, an image. */
+        if (!isLegacy) {
+            const WHITE = /^(transparent|rgba\(0, 0, 0, 0\)|rgb\(255, 255, 255\)|#fff(fff)?|white|none)$/i;
+            const ctx2d = document.createElement('canvas').getContext('2d');
+            const lenPx = (v, el) => { const s = String(v || '').trim(); if (!s) return NaN; const p = document.createElement('div'); p.style.cssText = `position:absolute;visibility:hidden;width:${s}`; el.appendChild(p); const w = p.getBoundingClientRect().width; p.remove(); return w; };
+            for (const c of ri.cells) {
+                const lab = c.querySelector(':scope > .ws-tab, :scope > .ws-modeltab, :scope > .ws-letter');
+                if (!lab || !visible(lab)) continue;
+                const lr = lab.getBoundingClientRect();
+                const side = lab.classList.contains('ws-letter') ? lenPx(getComputedStyle(c).getPropertyValue('--ws-tab') || '5mm', c) : lr.height;
+                if (!(side > 0)) continue;
+                const cr = c.getBoundingClientRect();
+                const K = { l: cr.left, t: cr.top, r: cr.left + Math.max(side + PX, lab.classList.contains('ws-letter') ? 0 : lr.right - cr.left), b: cr.top + side + PX };
+                const tol = 0.1 * PX;
+                const inK = (b) => b.r > K.l + tol && b.l < K.r - tol && b.b > K.t + tol && b.t < K.b - tol;
+                let hit = null;
+                const walker = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
+                for (let n = walker.nextNode(); n && !hit; n = walker.nextNode()) {
+                    const p = n.parentElement;
+                    if (!p || p.closest('.ws-tab, .ws-modeltab, .ws-letter, [data-ws-label]') || !visible(p)) continue;
+                    const s = n.nodeValue; const i0 = s.search(/\S/); if (i0 < 0) continue;
+                    const i1 = s.length - (s.length - s.trimEnd().length);
+                    const ps = getComputedStyle(p);
+                    if (WHITE.test(ps.color) || ps.opacity === '0') continue;
+                    ctx2d.font = `${ps.fontStyle} ${ps.fontWeight} ${ps.fontSize} ${ps.fontFamily}`;
+                    const rg = document.createRange(); rg.setStart(n, i0); rg.setEnd(n, i1);
+                    const rects = [...rg.getClientRects()].filter(r => r.width && r.height);
+                    const m = ctx2d.measureText(s.slice(i0, i1));
+                    for (const r of rects) {
+                        const base = r.top + (r.height - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent;
+                        const b = { t: base - m.actualBoundingBoxAscent, b: base + m.actualBoundingBoxDescent,
+                            l: rects.length === 1 ? r.left - m.actualBoundingBoxLeft : r.left, r: rects.length === 1 ? r.left + m.actualBoundingBoxRight : r.right };
+                        if (inK(b)) { hit = { el: p, what: `"${s.slice(i0, i1).slice(0, 16)}"`, b }; break; }
+                    }
+                }
+                if (!hit) for (const d of c.querySelectorAll('*')) {
+                    if (d === lab || d.closest('.ws-tab, .ws-modeltab, .ws-letter, [data-ws-label]') || !visible(d)) continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width && !r.height) continue;
+                    const ds = getComputedStyle(d);
+                    const boxes = [];
+                    if (d instanceof SVGElement) {
+                        if (/^(path|rect|circle|ellipse|line|polyline|polygon|use|image)$/i.test(d.tagName) && (!WHITE.test(ds.fill) || !WHITE.test(ds.stroke))) boxes.push({ t: r.top, b: r.bottom, l: r.left, r: r.right });
+                    } else {
+                        if (/^(img|canvas)$/i.test(d.tagName) || !WHITE.test(ds.backgroundColor)) boxes.push({ t: r.top, b: r.bottom, l: r.left, r: r.right });
+                        const bw = k => (ds[`border${k}Style`] !== 'none' && !WHITE.test(ds[`border${k}Color`])) ? parseFloat(ds[`border${k}Width`]) || 0 : 0;
+                        if (bw('Top')) boxes.push({ t: r.top, b: r.top + bw('Top'), l: r.left, r: r.right });
+                        if (bw('Bottom')) boxes.push({ t: r.bottom - bw('Bottom'), b: r.bottom, l: r.left, r: r.right });
+                        if (bw('Left')) boxes.push({ t: r.top, b: r.bottom, l: r.left, r: r.left + bw('Left') });
+                        if (bw('Right')) boxes.push({ t: r.top, b: r.bottom, l: r.right - bw('Right'), r: r.right });
+                    }
+                    const b = boxes.find(inK);
+                    if (b) { hit = { el: d, what: `<${d.tagName.toLowerCase()}>`, b }; break; }
+                }
+                if (hit) F('L-OVERLAP', 'CL40-INK', 'major', hit.el, `ink of ${hit.what} at ${mm(hit.b.l - cr.left)} mm across, ${mm(hit.b.t - cr.top)} mm down enters the label keep-out (${mm(K.r - K.l)} x ${mm(K.b - K.t)} mm at the cell's top-left corner): nothing but the label paints there (CL-40)`, 'ink in label keep-out');
             }
         }
         if (!isLegacy) {
@@ -2353,6 +2418,17 @@ const SELF_TESTS = [
         c.setAttribute('data-ws-writeabove', '1');
         c.style.justifyContent = 'flex-start';
         c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    // CL40-INK (CL-40, critic 2026-10-24 D1): a top-started across fact whose first digit sits on the number tab's
+    // bottom-right corner. The plant puts a digit-size glyph where "48 ÷ 12" put its "4": just right of the tab, its
+    // ink top level with the tab's bottom edge.
+    { name: 'digit on the number tab corner (CL40-INK)', expect: ['L-OVERLAP', 'CL40-INK'], fn: () => {
+        const LAB = ':scope > .ws-tab, :scope > .ws-letter, :scope > .ws-modeltab';
+        const c = [...document.querySelectorAll('.ws-page [data-ws-cell]')].find(x => x.querySelector(LAB)) || document.querySelector('.ws-page [data-ws-cell]');
+        if (!c.querySelector(LAB)) c.insertAdjacentHTML('afterbegin', '<span class="ws-tab" data-ws-label="tab">1</span>');
+        const t = c.querySelector(LAB).getBoundingClientRect(), cr = c.getBoundingClientRect();
+        const MM = 96 / 25.4;
+        c.insertAdjacentHTML('beforeend', `<span style="position:absolute;left:${Math.max(t.height + MM, t.right - cr.left) - 1.2 * MM}px;top:${t.bottom - cr.top - 2.5 * MM}px;font-size:22pt;line-height:1;color:#000">4</span>`);
     } },
     // H13-ROW (pilot-su-c critic r2 N2): a short top cell in a row sized for its taller neighbour; the control is a
     // uniform row (both cells hold the tall item), which keeps equal bands and never fires.

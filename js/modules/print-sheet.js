@@ -30,13 +30,13 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
@@ -1821,10 +1821,55 @@ function oneColumnOnly(it, n) {
  * columns, the full-width ones under them, one row each (2026-09-25, AP4: Mixed Time printed three
  * clocks a page in one column because two of its nine skills are full width).
  */
+/**
+ * HEIGHT CLASSES (critic 2026-10-24 D2). A legacy cell's measurement is normally not trusted to size
+ * a row to (layout.js measuredH: its markup reflows), so a pool of legacy problems prints on a
+ * uniform grid sized for its tallest member. A ONE-skill section whose first measured run (the
+ * probe) is all legacy and spreads over 1.6 x in height is a pool of very different drawings
+ * (mixed_coordinates); when its tallest problem also takes over half the grid (so the uniform grid
+ * holds one row a page), its items are marked `hClass`, measuredH reads their measured heights, and
+ * the role pages them by height class. Decided once per section, from its first measure (the probe).
+ */
+const HCLASS_SPREAD = 1.6;
+function heightClassOf(sec, items, gridMm) {
+    if (!sec || !items || !items.length) return;
+    if (sec.heightClass === undefined) {
+        const hOf = (it) => { const m = it && it.measured; if (!m) return 0; const c = Object.keys(m).map(Number).sort((a, b) => a - b)[0]; return (m[c] && m[c].hMm) || 0; };
+        const hs = items.map(hOf);
+        // Local: only a pool whose TALLEST problem takes over half the grid, i.e. the uniform grid
+        // holds one row a page and a short problem would print alone in a page-tall cell.
+        sec.heightClass = (sec.skills || []).length === 1 && items.length >= 2 && hs.every((h) => h > 0)
+            && items.every((it) => it.legacy || it.template === 'legacy') && Math.max(...hs) > HCLASS_SPREAD * Math.min(...hs)
+            && Number(gridMm) > 0 && Math.max(...hs) > Number(gridMm) / 2
+            // ... and only a pool with read-only figures (sheet/adapters.js legacyReadFig): the cells
+            // CL-4b starts at the top, so a page-tall row leaves its whole spare height under them.
+            && items.some((it) => it.q && legacyReadFig(it.q));
+    }
+    if (sec.heightClass) for (const it of items) if (it) it.hClass = true;
+}
+
 function layoutOf(role, section, items, n, ctx) {
     const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
     const opts = { size: n.size, look: n.look, header: ctx.header };
     const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
+    // HEIGHT CLASSES (critic 2026-10-24 D2): a one-skill legacy pool whose problems differ a lot in
+    // height (mixed_coordinates: 95 mm read-only grids beside 217 mm transform choices) is paged by
+    // each problem's OWN measured height (heightClassOf), as the CL-41 split pages full-width
+    // problems apart: a page holds as many of the run as pack onto it, tallest class first
+    // (groupByHeight + packByHeight, the role's own pagination), so a short read-only grid is
+    // never one problem alone in a row sized for the tallest item of the pool.
+    if ((role === 'independent' || role === 'more-practice') && !(n.anchors && n.anchors !== 'off') && !section.gridH
+        && items.length && items.every((it) => it && it.hClass)) {
+        const maxRows = Math.max(1, Math.floor(whole.ceiling / whole.cols), whole.rows);
+        let cap = 0;
+        for (let k = 1; k <= Math.min(items.length, MAX_ITEMS); k++) {
+            const ch = packByHeight(groupByHeight(items.slice(0, k), whole.cols), whole.cols, { gridFirstMm: whole.gridH, gridContMm: whole.gridHCont, maxRows, cellH: whole.cellH, force: true });
+            if (!ch || ch.length > 1) break;
+            cap = k;
+        }
+        if (cap > whole.perPage) return Object.assign({}, whole, { perPage: cap, heightClass: true });
+        return whole;
+    }
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
     const wide = items.filter((it) => oneColumnOnly(it, n));
     const narrow = items.filter((it) => !oneColumnOnly(it, n));
@@ -2179,7 +2224,7 @@ async function buildSheetCore(req = {}) {
 
     const notes = [];
     let hostItems = [];
-    const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) });
+    const measure = (items, sec) => { measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) }); heightClassOf(sec, items, bodyHeightMm(paper, layoutHeader) - instrMm); };
     const PROBE = 16;
 
     /**
@@ -2463,7 +2508,7 @@ async function buildSheetCore(req = {}) {
         fits,
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
-            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
+            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass,
         })),
         gaps: out.gaps,
         numberLine,
