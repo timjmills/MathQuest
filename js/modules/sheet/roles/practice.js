@@ -63,6 +63,10 @@ export const SHEET_ENGINE_CSS = `
    clipped silently. The key's answer stamp costs no layout, so the problem sits where it sits on
    the pupil page (AK-1). */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy{align-items:stretch;padding-top:calc(var(--ws-tab,6mm) + 1mm)}
+/* R1: a legacy-sourced item a fact page redraws with the fact template (sub_facts on Fact rows)
+   keeps the fact cell's own top pad (--fp, set clear of the tab by factPadTop), as add_facts does;
+   the legacy 7 mm pushed the L key's answers 0.2 mm out of the 45 mm row (PG-12). */
+:is(.ws-page,.ws-sheet) .ws-cell.fact.mq-legacy{padding-top:var(--fp,2mm)}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy>.ws-legacy{width:100%;min-width:0}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .worksheet-problem{border:0!important;border-radius:0!important;padding:0!important;margin:0!important;overflow:visible!important;background:transparent!important;box-shadow:none!important}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content,:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content>div{overflow:visible}

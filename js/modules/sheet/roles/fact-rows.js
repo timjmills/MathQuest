@@ -119,6 +119,8 @@ export function factTitle(items) {
 
 const OP_SIGN = { add: '+', subtract: '-', multiply: 'x', divide: '/' };
 const LADDER_PTS = [28, 24, 20, 18, 16];
+/** The real-fit clearance of the column gate: 1 mm of white either side of the fact's ink (R1). */
+export const FIT_CLEAR_MM = 2;
 const ACROSS_ROW = { S: 18, M: 21, L: 24 };      // PT-FPR's horizontal row, 16 / 20 / 24 + the tab clearance
 /**
  * A bracket's digit track on a fact-rows page, in em of the rung's digit: 1 em leaves 0.44 em
@@ -269,12 +271,12 @@ function verticalPt(cols, n, look) {
  * Below 5 columns the rung is the size's Auto one (16 / 24 / 28 pt at S / M / L): the cell's
  * height (FACT_CELL_H_MM) is the Auto page's, so a bigger digit would stand out of it.
  */
-function verticalFitPt(cols, n, look, floor, size) {
+function verticalFitPt(cols, n, look, floor, size, clearMm = 5) {
     const { inner } = cellWidthMm(cols, LIVE_W_MM, look);
     const top = cols >= 5 ? factDigitPt(cols) : Math.min(factDigitPt(5), factDigitPt(AUTO[size] || 5));
     const pts = [...new Set([top, ...LADDER_PTS, floor])].filter((p) => p <= top && p >= Math.min(floor, top)).sort((a, b) => b - a);
     for (const pt of pts) {
-        if ((FACT_OP_TRACK_EM + n * FACT_TRACK_EM) * (EM_MM[pt] || (pt / 72) * 25.4) + 5 <= inner) return pt;
+        if ((FACT_OP_TRACK_EM + n * FACT_TRACK_EM) * (EM_MM[pt] || (pt / 72) * 25.4) + clearMm <= inner) return pt;
     }
     return 0;
 }
@@ -348,11 +350,14 @@ export function factRowsLayout(items, input) {
     }
     // A shorter fact steps its digits down the ladder first (VA-2); when even the ladder's last rung
     // does not fit the cell (critic s3-stack r2 F1: 4-digit sub_10k facts in 8 columns at S, ink on
-    // both frames), it drops columns too, instead of printing past its cell.
+    // both frames), it drops columns too, instead of printing past its cell. This gate tests REAL
+    // fit - the fact's drawn width plus 1 mm of clearance each side (critic r3 R1: the 5 mm rung
+    // budget used as a column gate cost add_facts / sub_facts their Auto 10 at S, and overrode an
+    // explicit teacher choice, though the facts fit with 1.7-4.4 mm to spare).
     const lastRung = LADDER_PTS[LADDER_PTS.length - 1];
     if (!divide && !bigFact) {
         const before = cols;
-        while (cols > 2 && verticalFitPt(cols, n, ctx.look, lastRung, ctx.size) === 0) cols--;
+        while (cols > 2 && verticalFitPt(cols, n, ctx.look, lastRung, ctx.size, FIT_CLEAR_MM) === 0) cols--;
         if (cols < before) note = [note, `${n}-digit facts: ${cols} columns so every fact fits its cell.`].filter(Boolean).join(' ');
     }
     const pt = tightDiv && fitsAt(cols) ? factDigitPt(cols)

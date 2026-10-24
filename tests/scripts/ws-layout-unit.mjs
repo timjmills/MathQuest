@@ -34,6 +34,9 @@ import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/rol
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
+import { factRowsLayout, FIT_CLEAR_MM } from '../../js/modules/sheet/roles/fact-rows.js';
+import { LIVE_W_MM } from '../../js/modules/sheet/roles/compose.js';
+import { EM_MM as KIT_EM_MM, FACT_TRACK_EM as KIT_FACT_TRACK_EM, FACT_OP_TRACK_EM as KIT_FACT_OP_TRACK_EM } from '../../js/modules/sheet/index.js';
 
 let pass = 0;
 const fails = [];
@@ -801,6 +804,25 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     const fp = hostPlan('fact-probe', [FACT_SKILL], (pool, sk, i) => factQ(1 + (i % 12), 3), { h: 30 });
     eq(fp.plan.meta.items, 20, 'PT 4.2: the probe holds 20 facts');
     ok(Array.isArray(fp.plan.meta.strip) && fp.plan.meta.strip[0] === 3, 'PT-FPR-3: a skip-count strip for a x3 set');
+}
+// Critic r3 R1: the fact-rows column gate tests REAL fit (fact width + 1 mm each side), not the
+// 5 mm rung budget - PT-FRW-2's Auto 10 / 6 / 5 holds at S for 2-digit facts, an explicit
+// teacher choice is kept unless it truly overflows, and F1 (4-digit sub_10k at S) stays fixed.
+{
+    const fq = (a, b, op, ans) => ({ q: { a, b, op, ans, text: `${a} ${op} ${b} = ?`, cell: { template: 'fact', v: 1, payload: { a, b, op } } } });
+    const many = (f) => Array.from({ length: 20 }, (_, i) => f(i));
+    const S = (items, extra = {}) => factRowsLayout(items, Object.assign({ skills: [], ctx: { size: 'S' } }, extra));
+    const addF = many((i) => fq(9, 2 + (i % 8), '+', 11 + (i % 8)));
+    eq(S(addF).cols, 10, 'R1 / PT-FRW-2: add_facts at S keep Auto 10 columns');
+    eq(S(addF, { columns: 10 }).cols, 10, 'R1: an explicit 10 columns on add_facts at S is kept');
+    eq(S(many(() => fq(18, 9, '-', 9))).cols, 10, 'R1 / PT-FRW-2: sub_facts at S keep Auto 10 columns');
+    eq(S(many(() => fq(12, 12, '×', 144))).cols, 8, 'R1 / PT-FRW-5: mult_facts at S print 8 columns');
+    eq(S(many(() => fq(87, 35, '-', 52))).cols, 10, 'R1: sub_100_no_regroup at S keeps 10 columns');
+    eq(S(many(() => fq(876, 345, '-', 531))).cols, 8, 'R1: sub_1k_no_regroup at S keeps 8 columns');
+    const f1 = S(many(() => fq(8765, 4321, '-', 4444)));
+    const inner = cellWidthMm(f1.cols, LIVE_W_MM, 'daily').inner;
+    const ink = (KIT_FACT_OP_TRACK_EM + f1.tracks * KIT_FACT_TRACK_EM) * (KIT_EM_MM[f1.digitPt] || (f1.digitPt / 72) * 25.4);
+    ok(f1.cols <= 7 && (inner - ink) / 2 >= 1 && FIT_CLEAR_MM >= 2, `F1: sub_10k_no_regroup at S <= 7 columns with >= 1 mm clearance each side (${f1.cols} cols, ${((inner - ink) / 2).toFixed(2)} mm)`);
 }
 // PT-MIX-1..7: Mixed practice - a shelf per skill, each with its own instruction, numbered 1..N.
 {
