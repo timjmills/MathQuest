@@ -1,0 +1,23 @@
+{
+ "about": "ws-sibling-compare: the APPROVED skills of each kit template (process rule 0b: a lane's red matrix row is engine debt only at or below these skills' counts on the same row and size). A skill is listed here when it passed its critic on that template; changed only with a STATUS note. Siblings must have the lane skill's SHAPE (template + digit tracks over 24 seeded items; lead ruling 2026-10-24); `peers` (optional) are same-shape comparison skills used, measured like siblings, when no approved sibling has that shape. `pairs` (optional) gives a lane skill the siblings of its own size band, as the pilot-su-c lead's comparison did (design/audit/runs/pilot-su-c/sibling-compare.cjs); without a pair every approved sibling of the template is used.",
+ "templates": {
+  "stack": {
+   "approved": [
+    "addition:add_100_regroup", "subtraction:sub_100_regroup", "addition:add_1k_regroup", "subtraction:sub_1k_regroup",
+    "addition:add_10k_regroup", "subtraction:sub_10k_regroup", "subtraction:sub_100k_regroup", "subtraction:sub_1m_regroup"
+   ],
+   "source": "the siblings the pilot-su-c lead and critic r1 compared against (critic-r1.md engine rulings; pilot status 2026-10-23 19:40)",
+   "peers": ["subtraction:sub_100_no_regroup", "subtraction:sub_50_no_regroup"],
+   "peersSource": "lead ruling 2026-10-24 (rule 0b compares SAME-SHAPE siblings: template + digit tracks): the 2-track stack has no approved same-shape sibling (add_100_regroup's answers reach 100, 3 tracks), so sub_100_regroup is compared with these same-shape peers, measured like siblings (pins, plus a fresh sibling run with --run-siblings: their pins predate the newer print-lint rules). Used only when no approved sibling of the skill's shape exists.",
+   "pairs": {
+    "subtraction:sub_50_no_regroup": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
+    "subtraction:sub_100_no_regroup": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
+    "subtraction:sub_2d_1d": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
+    "subtraction:sub_1k_no_regroup": ["addition:add_1k_regroup", "subtraction:sub_1k_regroup"],
+    "subtraction:sub_10k_no_regroup": ["addition:add_10k_regroup", "subtraction:sub_10k_regroup"],
+    "subtraction:sub_100k_no_regroup": ["subtraction:sub_100k_regroup"],
+    "subtraction:sub_1m_no_regroup": ["subtraction:sub_1m_regroup"]
+   }
+  }
+ }
+}

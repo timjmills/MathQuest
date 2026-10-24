@@ -73,7 +73,7 @@ const LETTER_CAP = 26;
  * @param {boolean} [opts.restartEachPage]  More Practice, Review, Test ...: every page starts at a.
  * @returns {{starts: number[], notes: string[]}}
  */
-export function labelStarts(counts, { style = 'letter', restartEachPage = false } = {}) {
+export function labelStarts(counts, { style = 'tab', restartEachPage = false } = {}) {
     const starts = [];
     const notes = [];
     let next = 1;

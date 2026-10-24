@@ -26,7 +26,19 @@
 //   --size S|M|L              kit: the print size of every sheet (default L; LESSONS_LEARNED L1/L2 run S and L)
 //   --count auto|N            kit practice roles: the problem count (default auto, as the print screen);
 //                             auto also turns on L-DENSITY PAGEFILL (an empty strip over 20% of a page)
-//   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR
+//   --anchors side|sections   kit: print with step-by-step anchor problems (S6); adds L-ANCHOR.
+//                             top|first (at the top of each page / the first time) are M4's modes:
+//                             refused with "needs M4" until sheet/anchors.js ANCHOR_MODES has them
+//   --kind single|sections|mixed  kit: one skill a document (default) / all --skills as sections of
+//                             one document / all --skills on one Mixed practice document (E1)
+//   --pages N  --columns N    kit: req.sections[i].pages / .columns (E1)
+//   --sections per-skill|grouped|parts  kit, --kind sections: grouped / parts need M4 (section titles)
+//   --bring-back              kit, sections / mixed: no buildSheet field yet (fails, naming it)
+//   --fade problems|page|packet  kit: Faded page = --cover fade; packet = fade + --pages N; problems
+//                             has no engine field yet (fails). See KIT REQUEST FLAGS below.
+//   --capabilities [--json]   what this tree's buildSheet takes for the flags above (no browser)
+//   --jobs jobs.json          kit: several documents in one browser start (ws-coverage-matrix)
+//   --check-jobs jobs.json    each job's flags against this tree, no browser: [{id, ok | pending, reason}]
 //   --supports all|id,id      kit: print every skill with supports on (S2): `all` ticks every
 //                             render-time support its Support control offers; adds L-SUPPORT
 //   --cover whole|needed|fade kit, with --supports: the sheet's coverage (default whole)
@@ -80,7 +92,9 @@
 //              the teacher footer / date line sits at the foot of its page, never mid-page.
 //   L-DENSITY  12.1 items per page within the ceiling for the page role and size (Independent / More
 //              Practice 6, or 16 for one-symbol answers); no page but the last of a sheet under half
-//              used (area, or items against the sheet's fullest page); PG-23 short last page rebalanced.
+//              used (area, or items against the sheet's fullest page); PG-23 short last page rebalanced;
+//              LONE ("L-LONE", H5) no page of a multi-page sheet holds one cell (item or model state) alone
+//              when a rebalance or fewer pages could avoid it (see lintLone).
 //   L-KEY      AK-1..AK-4 the key exists, is a facsimile (same page count, same cells within 0.5 mm,
 //              same slot count) and not a list; every slot answered; answers weight 700.
 //   L-VERBS    BD-12 / BD-17 no screen verbs on paper (click, tap, drag, select, press, highlight, hover,
@@ -89,6 +103,18 @@
 //              above the cells; BD-1 no "Part NN" section headings.
 //   L-ANSAREA  SL-1 answer lines >= 14 mm; SL-6 no underscore blanks; H12 an item that says draw / build /
 //              show has a drawing zone >= 30 mm tall with >= 60 % of it empty (measured and reported).
+//              TY-21 (kit / pack; S1 builder B) every digit-strip segment ([data-ws-seg]) and stand-alone answer box
+//              ([data-ws-slot] box / box-unknown) is >= 4.4 mm wide as printed (pilot critic r1 D3: 4.06 mm at S).
+//   L-OVERLAP  H2 (kit / pack) neighbouring head labels of one drawing (stack `.head`s, the place letters over a pv
+//              mat's zones) sit >= 1 mm apart (critic r1 D7 overlap, r2 N8 0.74 mm apart).
+//              CL40-INK (kit / pack) no ink - a glyph's ink box, an SVG shape, a painted border or fill - inside the
+//              label keep-out: the (label side + 1 mm) square at the cell's top-left corner, or the tab's own width
+//              when a 2-3 digit tab is wider (CL-40; critic 2026-10-24 D1, top-started across facts on the tab).
+//   L-WRAP     WRAP-OP (kit / pack) no wrapped line of text ends in − + × ÷ = with its expression continued on the
+//              next line (critic r2 N6 vocabulary picture, N7 worked step). TY-21, H2 and WRAP-OP are measured by
+//              tests/lib/ws-geom-probe.cjs, the one definition ws-slot-clip's SLOT-W / HEADS read too.
+//   (L-DENSITY H13-ROW: a top cell whose band below exceeds its row's smallest by >= 30 % of its height: the row is
+//              sized for a taller item, critic r2 N2. Findings carry `skill` (data-ws-skill) for D1 attribution.)
 //   L-INPUT    no <input>, <button>, <select>, <textarea> or contenteditable on a printed sheet.
 //   L-CCSS     SC-5 / HD-6 no CCSS code, "Grade N" or snake_case skill id outside the teacher footer.
 //   L-ANCHOR   S6 / PT-LBL-6 (kit, with --anchors side|sections): every step-by-step anchor cell carries
@@ -114,17 +140,147 @@ const { execFileSync } = require('child_process');
 const { pathToFileURL } = require('url');
 const puppeteer = require('puppeteer');
 const { ROOT, chromePath, startServer, open, waitFor, listSkills, renderPrint, hideOverlays } = require('../lib/ws-harness.cjs');
+const { GEOM_PROBE, MIN_SEG_MM, HEAD_GAP_MM } = require('../lib/ws-geom-probe.cjs');
 
 const argv = process.argv.slice(2);
-const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
-const has = k => argv.includes('--' + k);
-// --size S|M|L: the kit preset size (default L; LESSONS_LEARNED L1 asks for S and L).
-const KIT_SIZE = ['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L';
+// --jobs: while one job of a jobs file runs, its flags are read in place of the command line's
+// (E1, ws-coverage-matrix: several matrix rows per browser start). Everything reads flags through
+// arg() / has(), so a job is exactly the command line it stands for.
+let JOB_ARGV = null;
+const curArgv = () => JOB_ARGV || argv;
+const arg = (k, d) => { const a = curArgv(); const i = a.indexOf('--' + k); return i > -1 && a[i + 1] !== undefined ? a[i + 1] : d; };
+const has = k => curArgv().includes('--' + k);
+// --size S|M|L: the kit preset size (default L; LESSONS_LEARNED L1 asks for S and L). Read per
+// document, so a job can set its own.
+const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
+
+// =============================================================================================
+// KIT REQUEST FLAGS (E1, IMPROVEMENT_PLAN §1.6.2 "The coverage matrix")
+// =============================================================================================
+// What buildSheet(req) (js/modules/print-sheet.js) can be asked for TODAY is read from the tree
+// under test (MQ_ROOT), never assumed: a flag whose engine field does not exist yet fails with the
+// step that builds it, instead of printing the default page under the flag's name.
+//
+//   --kind single     one document per skill per role (req.sections = [{skills: [one]}]); the default
+//   --kind sections   ONE document of every --skills skill, each its own sub-section with its own
+//                     instruction: req = {role: independent, sections: [{skills: [all]}]} - buildSheet
+//                     groups a several-skill section one sub-section per skill (DN-31 / DN-34), which is
+//                     what the print screen sends today (teacher-print.js requestFor)
+//   --kind mixed      ONE document: role mixed-practice, its pools one per skill (mixed-practice.js
+//                     sources), shelves on the unit lattice (the GROUPED packing; M1/M2 add interleaving)
+//   --pages N         req.sections[i].pages (1-10): Single skill and Sections; the Independent role prints
+//                     N pages, More Practice N letters. Mixed practice: buildRoleSheet reads no page count
+//                     (rotation across pages is M2) -> fails "needs M2"
+//   --bring-back      Bring back earlier skills (spaced review, §2.5 on Sections and Mixed practice): no
+//                     request field exists (buildSheet has none; the Review role's `earlierSkills` is a
+//                     role, not an option) -> fails "needs a req.bringBack field", until normaliseRequest
+//                     reads one
+//   --sections per-skill|grouped|parts   Sections only. per-skill = today's grouped sub-sections (above).
+//                     grouped / parts need each section's title (`req.sections[i].title`, M4); today
+//                     normaliseRequest drops a section's title -> fails "needs M4"
+//   --anchors off|side|sections|top|first   passed through as req.anchors. `top` (an example at the top
+//                     of each page) and `first` (the first time each kind appears) are M4's: today
+//                     sheet/anchors.js normaliseAnchors() turns any mode outside ANCHOR_MODES into 'off',
+//                     so buildSheet would SILENTLY print no examples. This flag therefore checks the mode
+//                     against ANCHOR_MODES in the tree and fails "needs M4" until the mode is there; then
+//                     it passes through unchanged
+//   --fade problems|page|packet   the Fade supports choice (§2.5; MASTER_PLAN 4.1); implies --supports all
+//                     when no --supports is given. The engine fields:
+//                       Faded page   = coverage 'fade' (req.coverage; supports.js allocateSupports runs
+//                                      fadeLevel(j, n) with n = the skill's items over the WHOLE sheet)
+//                       Faded packet = the same coverage 'fade' with req.sections[i].pages = N (so the fade
+//                                      runs across the N pages, More Practice letters likewise); needs --pages >= 2
+//                       Faded problems (a support removed every N problems) = NO engine field: supports.js
+//                                      COVERAGES is whole|needed|fade, and fadeRung() fades ticked LEVELS in
+//                                      equal blocks of the count, not every N -> fails "needs a coverage value
+//                                      'problems' (+ N) in sheet/supports.js COVERAGES"
+//   --columns N|auto  req.sections[i].columns (the More option "columns")
+//   --capabilities    print what this tree's buildSheet takes for each flag above and exit (node only, no
+//                     browser; --json for ws-coverage-matrix)
+//   --jobs jobs.json  run several documents in one browser start: [{id, args: [...flags]}], each job's
+//                     flags replacing the command line's (--source, --json, --verbose stay global). A job
+//                     whose flag needs a later step is recorded as `pending` in --json, a role the skill
+//                     cannot take as `na`
+const KIT_CAP_FILES = { anchors: 'js/modules/sheet/anchors.js', sheet: 'js/modules/print-sheet.js', supports: 'js/modules/sheet/supports.js', mixed: 'js/modules/sheet/roles/mixed-practice.js' };
+let kitCapsMemo = null;
+function kitCapabilities() {
+    if (kitCapsMemo) return kitCapsMemo;
+    const read = (f) => { try { return fs.readFileSync(path.join(ROOT, f), 'utf8'); } catch (e) { return ''; } };
+    const listOf = (src, name) => { const m = new RegExp(`(?:const|let)\\s+${name}\\s*=\\s*(?:Object\\.freeze\\()?\\[([^\\]]*)\\]`).exec(src); return m ? [...m[1].matchAll(/(['"])([\w-]+)\1/g)].map(q => q[2]) : []; };
+    const sheet = read(KIT_CAP_FILES.sheet);
+    const norm = (/function normaliseRequest\([\s\S]*?\n}\n/.exec(sheet) || [''])[0];
+    const sectionMap = (/const sections = \(Array\.isArray\(req\.sections\)[\s\S]*?\.filter\(\(s\) => s\.skills\.length\)/.exec(norm) || [''])[0];
+    const roleSheet = (/async function buildRoleSheet\([\s\S]*?\n}\n/.exec(sheet) || [''])[0];
+    kitCapsMemo = {
+        root: ROOT,
+        anchorModes: listOf(read(KIT_CAP_FILES.anchors), 'ANCHOR_MODES'),
+        coverages: listOf(read(KIT_CAP_FILES.supports), 'COVERAGES'),
+        sectionTitle: /\btitle\b/.test(sectionMap),
+        sectionPages: /\bpages:/.test(sectionMap),
+        sectionColumns: /\bcolumns:/.test(sectionMap),
+        bringBack: /\breq\.bringBack\b/.test(norm),
+        mixedPages: /\bpages\b/.test((/const input = \{[\s\S]*?\n {4}\};/.exec(roleSheet) || [''])[0]) || /\binput\.pages\b/.test(read(KIT_CAP_FILES.mixed)),
+    };
+    return kitCapsMemo;
+}
+class NeedsStep extends Error { constructor(step, msg) { super(`needs ${step}: ${msg}`); this.step = step; } }
+/**
+ * The kit request fields for the current flags (job or command line), or a NeedsStep error naming
+ * the step that builds a missing engine field. Pure node; called before any document is built.
+ */
+function kitRequestFlags() {
+    const caps = kitCapabilities();
+    const kind = arg('kind', 'single');
+    if (!['single', 'sections', 'mixed'].includes(kind)) throw new Error(`unknown --kind ${kind} (single, sections, mixed)`);
+    const out = { kind, pages: null, columns: null, anchors: arg('anchors', 'off'), coverage: arg('cover', null), supports: arg('supports', null), sectionsMode: null };
+    const a = String(out.anchors).toLowerCase();
+    // a typo is unknown, not "needs M4": only the two modes M4 builds (top, first) wait for a step
+    const ANCHOR_KNOWN = ['off', 'on', 'side', 'sections', 'top', 'first'];
+    if (!ANCHOR_KNOWN.includes(a) && !caps.anchorModes.includes(a)) throw new Error(`unknown anchors mode --anchors ${out.anchors} (${ANCHOR_KNOWN.join(', ')})`);
+    if (!['off', 'on', 'side', 'sections'].includes(a) && !caps.anchorModes.includes(a)) {
+        throw new NeedsStep('M4', `--anchors ${out.anchors}: sheet/anchors.js ANCHOR_MODES is ${caps.anchorModes.join('|') || '(not found)'}; normaliseAnchors() turns '${out.anchors}' into 'off', so the page would print with no examples`);
+    }
+    if (arg('pages', null) !== null) {
+        const n = parseInt(arg('pages', ''), 10);
+        if (!(n >= 1 && n <= 10)) throw new Error(`--pages ${arg('pages', '')}: a whole number 1-10`);
+        if (kind === 'mixed' && n > 1 && !caps.mixedPages) throw new NeedsStep('M2', `--kind mixed --pages ${n}: buildRoleSheet passes no page count to the mixed-practice role (rotation across pages is M2's)`);
+        if (!caps.sectionPages) throw new Error('--pages: this tree\'s normaliseRequest keeps no req.sections[i].pages');
+        out.pages = n;
+    }
+    if (arg('columns', null) !== null && arg('columns', null) !== 'auto') {
+        const n = parseInt(arg('columns', ''), 10);
+        if (!(n >= 1 && n <= 10)) throw new Error(`--columns ${arg('columns', '')}: auto or a whole number 1-10`);
+        out.columns = n;
+    }
+    if (has('bring-back')) {
+        if (kind === 'single') throw new Error('--bring-back is a Sections / Mixed practice option (§2.5); use --kind sections or mixed');
+        if (!caps.bringBack) throw new NeedsStep('a req.bringBack field', 'Bring back earlier skills has no buildSheet field yet (§2.5 draws it from the Review / Daily spiral selection; no M-step names the field - the row-2 lane adds it to normaliseRequest)');
+        out.bringBack = true;
+    }
+    const sm = arg('sections', null);
+    if (sm !== null) {
+        if (kind !== 'sections') throw new Error('--sections is a Sections option; use --kind sections');
+        if (!['per-skill', 'grouped', 'parts'].includes(sm)) throw new Error(`unknown --sections ${sm} (per-skill, grouped, parts)`);
+        if (sm !== 'per-skill' && !caps.sectionTitle) throw new NeedsStep('M4', `--sections ${sm}: each section prints its title (req.sections[i].title, M4); this tree's normaliseRequest drops a section's title`);
+        out.sectionsMode = sm;
+    }
+    const fade = arg('fade', null);
+    if (fade !== null) {
+        if (!['problems', 'page', 'packet'].includes(fade)) throw new Error(`unknown --fade ${fade} (problems, page, packet)`);
+        if (fade === 'problems' && !caps.coverages.includes('problems')) throw new NeedsStep('a coverage value', `--fade problems (Faded problems: a support removed every N problems) has no engine field: sheet/supports.js COVERAGES is ${caps.coverages.join('|')}; it needs a coverage 'problems' with its N (row 2b, the owner of sheet/supports.js; Wave 4.1)`);
+        if (fade === 'packet' && !(out.pages >= 2)) throw new Error('--fade packet fades across the pages chosen: give --pages 2 or more');
+        if (fade !== 'problems') out.coverage = 'fade';
+        else out.coverage = 'problems';
+        if (!out.supports) out.supports = 'all';
+    }
+    if (out.coverage && !caps.coverages.includes(out.coverage)) throw new Error(`--cover ${out.coverage}: sheet/supports.js COVERAGES is ${caps.coverages.join('|')}`);
+    return out;
+}
 
 const TOOL = 'ws-print-lint';
 // INK-31: the answer-key ink (WORKSHEET_DESIGN_STANDARD.md INK-31).
 const KEY_INK = '#c2410c';
-const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT'];
+const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT', 'L-TOPSTART', 'L-OVERLAP', 'L-WRAP'];
 
 /**
  * L-SUPPORT (S2): runs IN the rendered sheet document (the page lintHtmlInSheetPage prints from).
@@ -377,6 +533,10 @@ function wsLintPage(cfg) {
         if (ri) { if (isLegacy) out.part = ri.key ? 'key' : 'pupil'; else out.page = ri.idx + 1; }
         const c = cellNo(el);
         if (c) out.cell = c;
+        // D1 (W0-A critic r7): the skill whose cell carries the finding, so a multi-skill sheet's partner skill can
+        // neither fail nor hide a lane defect (ws-coverage-matrix bySkill, ws-sibling-compare, ws-slot-clip)
+        const sk = el.closest && el.closest('[data-ws-skill]');
+        if (sk && sk.getAttribute('data-ws-skill')) out.skill = sk.getAttribute('data-ws-skill');
         if (isLegacy) out.tag = tagOf(el);
         return out;
     };
@@ -729,6 +889,7 @@ function wsLintPage(cfg) {
            holds. The content box is every visible in-flow descendant (absolutely placed labels, tabs
            and the key's answer stamp excluded); the band is measured inside the cell's padding. */
         if (!isLegacy) {
+            const topRows = [];   // H13-ROW: the top cells of this page, judged against their row after the loop
             for (const c of ri.cells) {
                 if (c.classList.contains('blankrun') || c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
                 const cr = c.getBoundingClientRect();
@@ -740,6 +901,9 @@ function wsLintPage(cfg) {
                     if (!visible(d)) continue;
                     if (d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
                     if (getComputedStyle(d).position === 'absolute') continue;
+                    // VA-70's hold (an across fact kept at the vertical fact's height) is room, not content: the
+                    // sentence inside it is what the band is measured from (pilot-su-c critic r2 N2)
+                    if (d.classList && d.classList.contains('ws-eq-hold')) continue;
                     const r = d.getBoundingClientRect();
                     if (!r.width || !r.height) continue;
                     if (d.children.length && !(d instanceof SVGElement) && !d.textContent.trim() && !/^(svg|img|canvas)$/i.test(d.tagName)) {
@@ -750,10 +914,122 @@ function wsLintPage(cfg) {
                 }
                 if (!box) continue;
                 const H = cr.height, W = cr.width;
-                const vBand = Math.max(box.t - inner.t, inner.b - box.b, 0);
+                /* L-TOPSTART (CL-4b, owner ruling 2026-10-23): top of the box is the default. A top
+                   cell's first printed row starts within 3 mm of the top pad (or just below the label keep-out,
+                   CL-40 / CL-41); a write-above cell (data-ws-writeabove:
+                   a regroup stack, a division bracket) is centred down the cell within 2 mm. Cells whose
+                   visual is the workspace (CL-4) and legacy pictures are not judged. */
+                const tmpl = c.getAttribute('data-ws-cell') || '';
+                const wa = c.hasAttribute('data-ws-writeabove') || !!c.querySelector('[data-ws-writeabove], .ws-stack-legacy i[data-ws-seg]');
+                const workspace = ['clock', 'frac-model', 'nl-place', 'number-line', 'hop-line', 'chartwindow', 'mult-chart', 'tenframe'].includes(tmpl) || (c.hasAttribute('data-ws-legacy') && !!c.querySelector('svg'));
+                const judged = (cfg.mode === 'pack' ? !!tmpl : c.hasAttribute('data-ws-cell')) && !workspace && !c.closest('[data-ws-topstart="off"]');
+                const fits = (box.b - box.t) < (inner.b - inner.t) - 4 * PX;
+                // the first PRINTED row: ink (text, a drawing, a stroked box), never an empty spacer
+                let inkTop = Infinity, inkBot = -Infinity;
+                for (const d of c.querySelectorAll('*')) {
+                    if (!visible(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                    const ds = getComputedStyle(d);
+                    if (ds.position === 'absolute') continue;
+                    const ink = [...d.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img|canvas)$/i.test(d.tagName)
+                        || ['Top', 'Bottom', 'Left', 'Right'].some(k => parseFloat(ds[`border${k}Width`]) > 0 && ds[`border${k}Style`] !== 'none');
+                    if (!ink) continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width && !r.height) continue;
+                    inkTop = Math.min(inkTop, r.top); inkBot = Math.max(inkBot, r.bottom);
+                }
+                if (inkTop === Infinity) { inkTop = box.t; inkBot = box.b; }
+                if (judged && fits && wa) {
+                    const off = ((box.t + box.b) / 2) - ((inner.t + inner.b) / 2);   // the laid-out problem, answer zone included
+                    if (Math.abs(off) > 2 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `write-above cell is ${mm(Math.abs(off))} mm ${off < 0 ? 'above' : 'below'} the cell's centre: the pupil writes above this problem, so it is centred down the box (CL-4b)`, 'write-above not centred');
+                } else if (judged && fits) {
+                    let top = inner.t;
+                    const lab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > .ws-modeltab, :scope > [data-ws-label]');
+                    if (lab) top = Math.max(top, lab.getBoundingClientRect().bottom + 1 * PX);   // CL-40 / CL-41: just below the tab
+                    const gap = inkTop - top;
+                    if (gap > 3 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `first printed row starts ${mm(gap)} mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)`, 'not at top of box');
+                }
+                // CL-4b: under a top cell the band below the problem is writing room, not a sizing error.
+                const topCell = judged && !wa && getComputedStyle(c).justifyContent === 'flex-start';
+                const vBand = topCell ? Math.max(box.t - inner.t, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
                 const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
                 if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
                 else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');
+                else if (topCell) topRows.push({ c, top: cr.top, H, below: Math.max(inner.b - box.b, 0) });
+            }
+            /* H13-ROW (RUBRIC H13 "a row ... sized for a taller item than it holds"; pilot-su-c critic r2 N2: a lesson
+               Warm-up fact cell 43-59 % empty beside a place-value cell). Under a top cell the band below is writing
+               room (CL-4b), but only as much of it as the row's other cells keep: a cell whose band below exceeds
+               the smallest band below of its row (cells of the same page with the same top and height, within
+               1 mm) by 30 % of its height holds a shorter item than the row was sized for. A uniform grid never
+               fires (equal items keep equal bands). */
+            for (const a of topRows) {
+                const row = topRows.filter(b => b !== a && Math.abs(b.top - a.top) <= PX && Math.abs(b.H - a.H) <= PX);
+                if (!row.length) continue;
+                const keep = Math.min(...row.map(b => b.below));
+                const excess = a.below - keep;
+                if (excess >= 0.3 * a.H) F('L-DENSITY', 'H13', 'major', a.c, `one empty band ${mm(a.below)} mm tall under the item in a ${mm(a.H)} mm cell, ${mm(excess)} mm (${Math.round((excess / a.H) * 100)}%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)`, 'row sized for a taller item');
+            }
+        }
+        /* L-OVERLAP CL40-INK (CL-40; critic 2026-10-24 D1: top-started across facts "48 ÷ 12" put their first
+           digit on the number tab's bottom-right corner). Nothing but the label paints inside the keep-out: the
+           square of (label side + 1 mm) at the cell's top-left corner, widened to the tab's own painted width
+           when a 2- or 3-digit tab is wider than that square (nothing paints on the tab either). Measured on INK,
+           not layout boxes: a text run's glyph box (canvas actualBoundingBox* on its baseline), an SVG shape's
+           geometry, a painted border side, a non-white background, an image. */
+        if (!isLegacy) {
+            const WHITE = /^(transparent|rgba\(0, 0, 0, 0\)|rgb\(255, 255, 255\)|#fff(fff)?|white|none)$/i;
+            const ctx2d = document.createElement('canvas').getContext('2d');
+            const lenPx = (v, el) => { const s = String(v || '').trim(); if (!s) return NaN; const p = document.createElement('div'); p.style.cssText = `position:absolute;visibility:hidden;width:${s}`; el.appendChild(p); const w = p.getBoundingClientRect().width; p.remove(); return w; };
+            for (const c of ri.cells) {
+                const lab = c.querySelector(':scope > .ws-tab, :scope > .ws-modeltab, :scope > .ws-letter');
+                if (!lab || !visible(lab)) continue;
+                const lr = lab.getBoundingClientRect();
+                const side = lab.classList.contains('ws-letter') ? lenPx(getComputedStyle(c).getPropertyValue('--ws-tab') || '5mm', c) : lr.height;
+                if (!(side > 0)) continue;
+                const cr = c.getBoundingClientRect();
+                const K = { l: cr.left, t: cr.top, r: cr.left + Math.max(side + PX, lab.classList.contains('ws-letter') ? 0 : lr.right - cr.left), b: cr.top + side + PX };
+                const tol = 0.1 * PX;
+                const inK = (b) => b.r > K.l + tol && b.l < K.r - tol && b.b > K.t + tol && b.t < K.b - tol;
+                let hit = null;
+                const walker = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
+                for (let n = walker.nextNode(); n && !hit; n = walker.nextNode()) {
+                    const p = n.parentElement;
+                    if (!p || p.closest('.ws-tab, .ws-modeltab, .ws-letter, [data-ws-label]') || !visible(p)) continue;
+                    const s = n.nodeValue; const i0 = s.search(/\S/); if (i0 < 0) continue;
+                    const i1 = s.length - (s.length - s.trimEnd().length);
+                    const ps = getComputedStyle(p);
+                    if (WHITE.test(ps.color) || ps.opacity === '0') continue;
+                    ctx2d.font = `${ps.fontStyle} ${ps.fontWeight} ${ps.fontSize} ${ps.fontFamily}`;
+                    const rg = document.createRange(); rg.setStart(n, i0); rg.setEnd(n, i1);
+                    const rects = [...rg.getClientRects()].filter(r => r.width && r.height);
+                    const m = ctx2d.measureText(s.slice(i0, i1));
+                    for (const r of rects) {
+                        const base = r.top + (r.height - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent;
+                        const b = { t: base - m.actualBoundingBoxAscent, b: base + m.actualBoundingBoxDescent,
+                            l: rects.length === 1 ? r.left - m.actualBoundingBoxLeft : r.left, r: rects.length === 1 ? r.left + m.actualBoundingBoxRight : r.right };
+                        if (inK(b)) { hit = { el: p, what: `"${s.slice(i0, i1).slice(0, 16)}"`, b }; break; }
+                    }
+                }
+                if (!hit) for (const d of c.querySelectorAll('*')) {
+                    if (d === lab || d.closest('.ws-tab, .ws-modeltab, .ws-letter, [data-ws-label]') || !visible(d)) continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width && !r.height) continue;
+                    const ds = getComputedStyle(d);
+                    const boxes = [];
+                    if (d instanceof SVGElement) {
+                        if (/^(path|rect|circle|ellipse|line|polyline|polygon|use|image)$/i.test(d.tagName) && (!WHITE.test(ds.fill) || !WHITE.test(ds.stroke))) boxes.push({ t: r.top, b: r.bottom, l: r.left, r: r.right });
+                    } else {
+                        if (/^(img|canvas)$/i.test(d.tagName) || !WHITE.test(ds.backgroundColor)) boxes.push({ t: r.top, b: r.bottom, l: r.left, r: r.right });
+                        const bw = k => (ds[`border${k}Style`] !== 'none' && !WHITE.test(ds[`border${k}Color`])) ? parseFloat(ds[`border${k}Width`]) || 0 : 0;
+                        if (bw('Top')) boxes.push({ t: r.top, b: r.top + bw('Top'), l: r.left, r: r.right });
+                        if (bw('Bottom')) boxes.push({ t: r.bottom - bw('Bottom'), b: r.bottom, l: r.left, r: r.right });
+                        if (bw('Left')) boxes.push({ t: r.top, b: r.bottom, l: r.left, r: r.left + bw('Left') });
+                        if (bw('Right')) boxes.push({ t: r.top, b: r.bottom, l: r.right - bw('Right'), r: r.right });
+                    }
+                    const b = boxes.find(inK);
+                    if (b) { hit = { el: d, what: `<${d.tagName.toLowerCase()}>`, b }; break; }
+                }
+                if (hit) F('L-OVERLAP', 'CL40-INK', 'major', hit.el, `ink of ${hit.what} at ${mm(hit.b.l - cr.left)} mm across, ${mm(hit.b.t - cr.top)} mm down enters the label keep-out (${mm(K.r - K.l)} x ${mm(K.b - K.t)} mm at the cell's top-left corner): nothing but the label paints there (CL-40)`, 'ink in label keep-out');
             }
         }
         if (!isLegacy) {
@@ -819,7 +1095,7 @@ function wsLintPage(cfg) {
         }
         // (not on the pack: its Daily-look panels, BD-6, set their instructions in page-local markup)
         const titled = ri.el.querySelector('.ws-title, .sheet-title, .worksheet-title');
-        const chart = /^Anchor chart$/.test(([...ri.el.querySelectorAll('.ws-tabbox span')].pop() || {}).textContent || '');
+        const chart = /^Anchor chart$/.test(([...ri.el.querySelectorAll('.ws-tabbox span')].pop() || {}).textContent || (ri.el.getAttribute('data-ws-tab') || '').split('|').pop());
         if (cfg.mode !== 'pack' && ri.cells.length && !list.length && !ri.key && !chart && titled && titled.textContent.trim()) F('L-VERBS', 'BD-10', 'minor', ri.el, `no instruction line above the cells: the task sentence is not a section instruction (BD-10: one instruction per section, never inside a cell)`, 'no instruction line');
         const HEAD_SEL = '.section-num, .worksheet-section-header, .ws-strip > b, h2, h3';
         for (const h of ri.el.querySelectorAll(HEAD_SEL)) {
@@ -990,7 +1266,9 @@ function wsLintPage(cfg) {
             const pr = pg.getBoundingClientRect();
             tagOf(pg);
             const cs = getComputedStyle(pg);
-            const tab = [...pg.querySelectorAll('.ws-tabbox span')].map(s => s.textContent.trim());
+            const tabSpans = [...pg.querySelectorAll('.ws-tabbox span')].map(s => s.textContent.trim());
+            // no printed tab since the owner ruling of 2026-10-23: the lines travel as data-ws-tab
+            const tab = tabSpans.length ? tabSpans : (pg.getAttribute('data-ws-tab') || '').split('|').filter(Boolean);
             const bands = [...pg.querySelectorAll('.ws-strip > b')].map(b => b.textContent.trim());
             const foot = pg.querySelector('[data-ws-teacher], .ws-foot');
             const footParts = foot ? [...foot.children].map(c => c.textContent.trim()) : [];
@@ -1355,6 +1633,14 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
         }
     });
 
+    // ---- L-ANSAREA TY-21, L-OVERLAP H2, L-WRAP WRAP-OP: the shared geometry probe (tests/lib/ws-geom-probe.cjs,
+    //      the same definitions ws-slot-clip's SLOT-W and HEADS read)
+    if (mode !== 'legacy') {
+        const geo = await page.evaluate(GEOM_PROBE, { minSeg: MIN_SEG_MM, minGap: HEAD_GAP_MM });
+        info.geom = { segs: geo.segs, heads: geo.heads, tpl: geo.tpl };
+        geomFindings(geo, F);
+    }
+
     // ---- pages, parts, split, density, key
     if (mode !== 'legacy') lintKitGeometry(dom, pdf, info, F);
     else lintLegacyGeometry(dom, pdf, info, F, contentH);
@@ -1364,7 +1650,41 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     return { info, findings, dom, pdf };
 }
 
+/**
+ * The shared geometry probe's items as findings (one per box, head pair or wrapped block), each located by page, cell
+ * and skill (D1). TY-21 and H2 are WDS minimums: never engine debt in ws-slot-clip, which reads the same probe.
+ */
+function geomFindings(geo, F) {
+    const at = (x) => { const o = { page: x.page, el: `<${x.tpl === '?' ? 'cell' : x.tpl}>${x.before ? ` "${x.before}"` : x.a ? ` "${x.a} ${x.b}"` : ''}` }; if (x.cell) o.cell = x.cell; if (x.skill) o.skill = x.skill; return o; };
+    for (const x of geo.narrow) F('L-ANSAREA', 'TY-21', 'major', at(x), `answer ${x.kind} ${x.w} mm wide as printed${x.key ? ' (key page)' : ''}: under ${MIN_SEG_MM} mm a pupil cannot write a digit in it (TY-21, VA-12)`, `narrow answer ${x.kind}`);
+    for (const x of geo.overlaps) F('L-OVERLAP', 'H2', 'major', at(x), `head labels "${x.a}" / "${x.b}" ${x.gap < 0 ? `overlap by ${-x.gap} mm` : `sit ${x.gap} mm apart`}: neighbouring heads need ${HEAD_GAP_MM} mm between them or they read as one run (H2)`, 'heads too close');
+    for (const x of geo.wraps) F('L-WRAP', 'WRAP-OP', 'major', at(x), `a wrapped line ends in "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)`, `wrap after ${x.op}`);
+}
+
 // ---- kit / pack pages: every [data-ws-page] / .ws-page is one printed A4 sheet
+/**
+ * L-DENSITY LONE ("L-LONE", IMPROVEMENT_PLAN §1.4 S2 / §1.6.3 H5; skip-count critic r4 D12: a Model with step 25,000 +
+ * one page printed 1 + 2 + 1 states on A4). A page of a multi-page sheet that holds ONE cell (an item or a model state)
+ * alone, when the sheet could have been dealt without it: either another page of the same sheet holds 3 or more cells
+ * (a rebalance gives every page 2), or the cells fit on fewer pages at the fullest page's count. Pupil pages only (the
+ * key is a facsimile and inherits the pupil plan). Cells are every boxed cell of the page, item or model state.
+ */
+function lintLone(parts, F) {
+    for (const pt of parts) {
+        if (pt.key || pt.pages.length < 2) continue;
+        const n = pt.pages.map(p => p.cells.length);
+        const total = n.reduce((a, b) => a + b, 0);
+        const max = Math.max(...n);
+        if (max < 2) continue;
+        const fewer = Math.ceil(total / max) < pt.pages.length;
+        pt.pages.forEach((p, j) => {
+            if (n[j] !== 1 || !(max >= 3 || fewer)) return;
+            const why = max >= 3 ? `another page of the sheet holds ${max}: rebalance so no page holds one alone` : `the ${total} cells fit on ${Math.ceil(total / max)} page(s) of ${max}`;
+            F('L-DENSITY', 'LONE', 'major', { page: p.idx }, `page ${p.idx} holds one cell alone (sheet pages ${n.join(' + ')}): ${why} (H5, PG-23; L-LONE)`, 'lone cell on a page');
+        });
+    }
+}
+
 function lintKitGeometry(dom, pdf, info, F) {
     const pages = dom.pages;
     info.pages = pages.length;
@@ -1442,6 +1762,7 @@ function lintKitGeometry(dom, pdf, info, F) {
             }
         });
     }
+    lintLone(parts, F);
     // key
     const pupilParts = parts.filter(p => !p.key), keyParts = parts.filter(p => p.key);
     if (info.mode === 'kit') {
@@ -1610,7 +1931,7 @@ function applyPackWaivers(file, r) {
 function selectSkills(all) {
     const ONLY = (arg('skills', '') || '').split(',').map(s => s.trim()).filter(Boolean);
     const FAMILY = arg('family', ONLY.length ? null : 'redone');
-    let skills = all.filter(s => !/^_?tomb|retired/i.test(s.skillId) && !/\(retired\)/i.test(s.label || ''));
+    let skills = all.filter(s => !s.retired && !/^_?tomb|retired/i.test(s.skillId) && !/\(retired\)/i.test(s.label || ''));
     if (FAMILY) {
         if (!FAMILIES[FAMILY]) throw new Error(`unknown --family ${FAMILY} (${Object.keys(FAMILIES).join(', ')})`);
         skills = skills.filter(s => FAMILIES[FAMILY].includes(s.categoryId));
@@ -1658,9 +1979,90 @@ async function legacyDocumentHtml(page) {
     });
 }
 
-async function lintHtmlInSheetPage(app, html, id, mode) {
+/**
+ * D1 fix r1 (runs IN the printed document): the sections and mixed-practice composers draw their cells without
+ * data-ws-skill (sheet/cell.js emits it only when a composer passes `skill`, and practice.js planItem does not), so
+ * every finding on a multi-skill sheet read as page-level. buildSheet's `items` (plan order, each with its skill)
+ * are matched to the dealt cells of each part (pupil pages, then the key's facsimile pages) in document order:
+ * the top-level cells carrying a number / letter tab (anchors, Model cells and untabbed cells excluded). A tab
+ * text equal to the item's letter is used when every item has one; otherwise the order is used, and only when the
+ * counts agree and the items' numbers appear in their cells (>= 80 %). Nothing is attributed when the match fails:
+ * the findings stay unattributed and ws-sibling-compare's attribution check fails the row (never silent).
+ */
+function attributeCells({ items, anchors }) {
+    let pages = [...document.querySelectorAll('[data-ws-page]')];
+    if (!pages.length) pages = [...document.querySelectorAll('.ws-page')];
+    const CELL = '[data-ws-cell], .ws-cell:not(.blankrun)';
+    const isKey = (p) => !!(p.closest('[data-ws-mode="key"]') || p.matches('[data-ws-mode="key"]'));
+    const res = { items: items.length, parts: [] };
+    for (const key of [false, true]) {
+        const cells = pages.filter((p) => isKey(p) === key).flatMap((p) => [...p.querySelectorAll(CELL)].filter((c) => !c.parentElement.closest(CELL)))
+            .filter((c) => !c.closest('.mq-anchorgrid') && !c.querySelector('[data-ws-anchor], .ws-modeltab') && c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > [data-ws-label]'));
+        const part = { key, cells: cells.length, attributed: 0, how: '' };
+        res.parts.push(part);
+        if (!cells.length) continue;
+        const lab = (c) => (c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > [data-ws-label]').textContent || '').replace(/[.)\s]/g, '');
+        let pairs = null;
+        if (items.every((it) => it.letter)) {
+            const byLab = new Map();
+            for (const c of cells) { const l = lab(c); if (!byLab.has(l)) byLab.set(l, []); byLab.get(l).push(c); }
+            const used = new Map();
+            pairs = [];
+            for (const it of items) { const l = it.letter.replace(/[.)\s]/g, ''); const list = byLab.get(l) || []; const k = used.get(l) || 0; if (list[k]) { pairs.push([list[k], it]); used.set(l, k + 1); } }
+            part.how = 'letter';
+            if (pairs.length !== items.length) pairs = null;
+        }
+        if (!pairs && cells.length === items.length) {
+            const nums = (s) => (String(s).match(/\d[\d,]*/g) || []).map((x) => x.replace(/,/g, ''));
+            const txt = (c) => (c.textContent || '').replace(/[\s, ]/g, '');
+            let judged = 0, hit = 0;
+            cells.forEach((c, i) => { const n = nums(items[i].text); if (!n.length) return; judged++; if (n.every((x) => txt(c).includes(x))) hit++; });
+            if (!judged || hit / judged >= 0.8) { pairs = cells.map((c, i) => [c, items[i]]); part.how = `order (${hit}/${judged} items' numbers in their cells)`; }
+            else part.how = `order refused: ${hit}/${judged} items' numbers in their cells`;
+        } else if (!pairs) part.how = `no match: ${cells.length} tabbed cells, ${items.length} items`;
+        for (const [c, it] of pairs || []) if (it.skill && !c.getAttribute('data-ws-skill')) { c.setAttribute('data-ws-skill', it.skill); part.attributed++; }
+    }
+    // anchor (worked example) cells: the example whose numbers ALL appear in the cell; attributed when the matching
+    // examples name one skill (a side anchor repeats on a section's later pages, so order cannot be used)
+    const nums = (t) => (String(t).match(/\d[\d,]*/g) || []).map((x) => x.replace(/,/g, ''));
+    const aCells = pages.flatMap((p) => [...p.querySelectorAll(CELL)].filter((c) => !c.parentElement.closest(CELL))).filter((c) => !c.getAttribute('data-ws-skill') && (c.classList.contains('mq-anchorcell') || c.querySelector('[data-ws-anchor]')));
+    res.anchors = { cells: aCells.length, examples: (anchors || []).length, attributed: 0 };
+    // score: the example's expression written out ("12−11") found in the cell beats its numbers found one by one;
+    // among number matches, the most digits matched wins; a tie between two skills attributes nothing
+    const core = (t) => (String(t).replace(/[\s,\u00a0]/g, '').match(/[\d\u2212+\u00d7\u00f7]{3,}/g) || []).filter((x) => /\d[\u2212+\u00d7\u00f7]\d/.test(x));
+    res.anchors.texts = (anchors || []).map((a) => `${a.skill}: ${a.text.slice(0, 40)}`);
+    for (const c of aCells) {
+        const txt = (c.textContent || '').replace(/[\s,\u00a0]/g, '');
+        const scored = (anchors || []).filter((a) => a.skill).map((a) => {
+            const e = core(a.text).filter((x) => txt.includes(x));
+            if (e.length) return { a, score: 1000 + e.join('').length };
+            const n = nums(a.text);
+            return { a, score: n.length && n.every((x) => txt.includes(x)) ? n.join('').length : 0 };
+        }).filter((x) => x.score > 0).sort((x, y) => y.score - x.score);
+        if (!scored.length) continue;
+        const top = new Set(scored.filter((x) => x.score === scored[0].score).map((x) => x.a.skill));
+        if (top.size === 1) { c.setAttribute('data-ws-skill', [...top][0]); res.anchors.attributed++; }
+    }
+    // an anchor whose example draws no numbers ("What is the perimeter?"): the skill of the problems it sits beside,
+    // the attributed item cells of the smallest enclosing block that holds any (a side anchor shares its section's
+    // band), when they name one skill
+    for (const c of aCells) {
+        if (c.getAttribute('data-ws-skill')) continue;
+        for (let up = c.parentElement; up && !up.matches('[data-ws-page], .ws-page'); up = up.parentElement) {
+            const near = [...up.querySelectorAll('[data-ws-skill]')].filter((x) => x !== c && !aCells.includes(x)).map((x) => x.getAttribute('data-ws-skill'));
+            if (!near.length) continue;
+            const one = new Set(near);
+            if (one.size === 1) { c.setAttribute('data-ws-skill', near[0]); res.anchors.attributed++; res.anchors.byPlace = (res.anchors.byPlace || 0) + 1; }
+            break;
+        }
+    }
+    return res;
+}
+
+async function lintHtmlInSheetPage(app, html, id, mode, items = null) {   // items: {items, anchors} (D1 fix r1)
     const SAVE = arg('save-html', null);
-    if (SAVE) { fs.mkdirSync(path.resolve(process.cwd(), SAVE), { recursive: true }); fs.writeFileSync(path.resolve(process.cwd(), SAVE, id.replace(/[^\w.-]+/g, '_') + '.html'), html); }
+    const saveTo = SAVE ? path.resolve(process.cwd(), SAVE, id.replace(/[^\w.-]+/g, '_') + '.html') : null;
+    if (SAVE) { fs.mkdirSync(path.resolve(process.cwd(), SAVE), { recursive: true }); fs.writeFileSync(saveTo, html); }
     const sheet = await app.page.browser().newPage();
     const failed = [];
     sheet.on('requestfailed', r => { if (/stylesheet|font/.test(r.resourceType()) && !/fonts\.(googleapis|gstatic)\.com/.test(r.url())) failed.push(r.url()); });
@@ -1672,7 +2074,15 @@ async function lintHtmlInSheetPage(app, html, id, mode) {
         await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
         // a sheet linted without its own stylesheets or fonts measures nothing real
         if (failed.length) throw new Error(`the document's stylesheet / font requests failed: ${failed.slice(0, 3).join(', ')}`);
+        // D1 fix r1: a multi-skill sheet's cells get the skill of the item they draw (and the saved document
+        // keeps it, so ws-slot-clip's probe reads the same attribution)
+        let attribution = null;
+        if (items && items.items.length && new Set(items.items.map((i) => i.skill)).size > 1) {
+            attribution = await sheet.evaluate(attributeCells, items);
+            if (saveTo) fs.writeFileSync(saveTo, '<!doctype html>\n' + await sheet.evaluate(() => document.documentElement.outerHTML));
+        }
         const res = await lintDocument(sheet, { id, mode });
+        if (attribution) res.info.attribution = attribution;
         if (mode === 'kit' && arg('supports', null)) {
             const sr = await sheet.evaluate(supportCheckInPage);
             res.findings.push(...sr.findings);
@@ -1682,28 +2092,19 @@ async function lintHtmlInSheetPage(app, html, id, mode) {
     } finally { await sheet.close(); }
 }
 
-async function runApp(source) {
-    const app = await open({ seed: 1 });
-    const results = [];
-    try {
+async function runAppDocs(app, source, skills, flags, results, jobId) {
         const { page } = app;
-        await page.evaluate(() => { try { window.setUserRole('teacher'); } catch (e) {} });
-        const skills = selectSkills(await listSkills(page));
-        if (!skills.length) throw new Error('no skills selected');
-        if (source === 'kit') {
-            const ok = await page.evaluate(() => typeof window.buildSheet === 'function' && typeof window.sheetDocument === 'function');
-            if (!ok) throw new Error('--source kit needs window.buildSheet(req) and window.sheetDocument(html, title) (js/modules/print-sheet.js), and this tree does not put them on window. Lint the legacy print path with --source legacy, or run on a tree that has the kit renderer.');
-        }
         // Kit practice roles print what the teacher's print screen prints: the count on Auto (the
         // page capacity, teacher-print.js) unless --count N fixes it. Legacy keeps its 20.
         const COUNT = parseInt(arg('count', '20'), 10);
-        console.log(`${TOOL}: source ${source}, ${skills.length} skill(s)${source === 'legacy' ? `, ${COUNT} items per section` : ''}`);
+        if (!jobId) console.log(`${TOOL}: source ${source}, ${skills.length} skill(s)${source === 'legacy' ? `, ${COUNT} items per section` : flags.kind !== 'single' ? `, kind ${flags.kind}` : ''}`);
         // --roles (kit only): every page role buildSheet composes, per skill. A role the skill
         // cannot take (a fact layout for a non-fact skill) is reported as n/a, not linted.
-        const kitRoles = source === 'kit' ? (arg('roles', 'independent') || 'independent').split(',').map(r => r.trim()).filter(Boolean) : [null];
-        for (const s of skills) for (const role of kitRoles) {
-            const id = `${s.categoryId}:${s.skillId}${role && role !== 'independent' ? '#' + role : ''}`;
-            const seed = hash(`${s.categoryId}__${s.skillId}:print`);
+        const docs = source === 'kit' ? kitDocList(skills, flags, jobId)
+            : skills.map(s => ({ id: `${s.categoryId}:${s.skillId}`, skills: [s], role: null, seed: hash(`${s.categoryId}__${s.skillId}:print`), label: s.label }));
+        for (const d of docs) {
+            const { id, seed, role } = d;
+            const s = d.skills[0];
             let r;
             let kitHalves = null;
             try {
@@ -1713,42 +2114,122 @@ async function runApp(source) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ s, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS }) => {
+                    html = await page.evaluate(async ({ S, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS, PAGES, COLUMNS, SECTIONS, LABEL }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
                         // S2: --supports ticks the skill's supports (all = every render-time value offered).
                         // --opts (O6, 2026-09-25): option values every skill carries (normalizeOptions
                         // drops what a skill does not declare, so one --opts serves a mixed list).
-                        let opts = OPTS ? { ...OPTS } : undefined;
-                        if (SUPPORTS) {
-                            const def = window.offeredOptionsFor(s.categoryId, s.skillId).find((d) => d.id === 'support' && d.supportsModel);
-                            if (def) {
-                                const want = SUPPORTS === 'all' ? def.render : SUPPORTS.split(',').filter((v) => def.render.includes(v));
-                                opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
+                        const optsOf = (s) => {
+                            let opts = OPTS ? { ...OPTS } : undefined;
+                            if (SUPPORTS) {
+                                const def = window.offeredOptionsFor(s.categoryId, s.skillId).find((d) => d.id === 'support' && d.supportsModel);
+                                if (def) {
+                                    const want = SUPPORTS === 'all' ? def.render : SUPPORTS.split(',').filter((v) => def.render.includes(v));
+                                    opts = { ...(opts || {}), support: [...new Set([...(def.default || []), ...want])] };
+                                }
                             }
-                        }
-                        const req = { role, sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId, opts }], count: practice ? COUNT : undefined }], size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: KEY_OPTS || true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                            return opts;
+                        };
+                        // --kind (E1): single = one skill a document; sections = every skill its own
+                        // sub-section of one section (buildSheet DN-31); mixed = the mixed-practice role.
+                        const skillsOf = (list) => list.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: optsOf(s) }));
+                        // --sections grouped | parts (M4 hook: reached only once normaliseRequest keeps
+                        // req.sections[i].title): grouped = the skills two to a titled section ("Group 1",
+                        // "Group 2" - the teacher's names stand in), parts = one titled part per skill.
+                        const groups = SECTIONS === 'grouped' ? S.reduce((g, s, i) => { if (i % 2 === 0) g.push([]); g[g.length - 1].push(s); return g; }, [])
+                            : SECTIONS === 'parts' ? S.map((s) => [s]) : [S];
+                        const sections = groups.map((list, gi) => {
+                            const section = { skills: skillsOf(list), count: practice ? COUNT : undefined };
+                            if (SECTIONS === 'grouped') section.title = `Group ${gi + 1}`;
+                            if (SECTIONS === 'parts') section.title = `Part ${'ABCDEFGHIJ'[gi]}`;
+                            if (PAGES) section.pages = PAGES;
+                            if (COLUMNS) section.columns = COLUMNS;
+                            return section;
+                        });
+                        const req = { role, sections, size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: KEY_OPTS || true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = out.docHtml || [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
-                        return { doc: window.sheetDocument(body, s.label), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml };
-                    }, { s, seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: arg('anchors', 'off'), SUPPORTS: arg('supports', null), COVER: arg('cover', null), MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE, KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null });
+                        // D1 fix r1: the skill of every dealt item, in plan order (the composers of sections / mixed
+                        // pages do not put data-ws-skill on their cells; buildSheet's own items list carries it)
+                        const sk = (x) => (x && typeof x === 'object' ? `${x.categoryId || ''}:${x.skillId || ''}` : String(x || ''));
+                        const items = (out.items || []).filter((it) => !it.part || it.part === 'practice' || it.part === 'mixed').map((it) => ({ skill: sk(it.skill), letter: it.letter == null ? '' : String(it.letter), text: String(it.text || '') }));
+                        // ... and of every anchor (worked example) cell: matched by the numbers it draws
+                        items.anchors = ((out.anchors && out.anchors.examples) || []).map((a) => ({ skill: sk(a.skill), text: String(a.text || '') }));
+                        return { doc: window.sheetDocument(body, LABEL), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml, items, anchorItems: items.anchors };
+                    }, { S: d.skills.map(k => ({ categoryId: k.categoryId, skillId: k.skillId })), seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: flags.anchors, SUPPORTS: flags.supports, COVER: flags.coverage, MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE: kitSize(), KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null, PAGES: flags.pages, COLUMNS: flags.columns, SECTIONS: flags.sectionsMode, LABEL: d.skills.length === 1 ? s.label : d.label });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {
                     process.stdout.write(`  ${id}: n/a (${html.unsupported})\n`);
+                    if (jobId) NA_DOCS.push({ id, reason: html.unsupported });
                     continue;
                 }
-                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit');
+                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit', kitHalves && d.skills.length > 1 ? { items: kitHalves.items, anchors: kitHalves.anchorItems || [] } : null);
                 if (kitHalves) r.findings.push(...anchorFindings(kitHalves.pupilHtml, kitHalves.keyHtml));
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
             }
-            r.info.label = s.label + (role && role !== 'independent' ? ` (${role})` : '');
+            r.info.label = d.label;
             results.push(r);
             process.stdout.write(`  ${id}: ${r.info.pages ?? '?'}+${r.info.keyPages ?? '?'} pages, ${r.findings.length} finding(s)\n`);
             await hideOverlays(page);
+        }
+}
+
+// Documents recorded by --jobs runs that were not linted: a flag that needs a later step
+// (`pending`), or a role the skill cannot take (`na`). Written to --json beside `documents`.
+const PENDING_DOCS = [];
+const NA_DOCS = [];
+
+/** The kit documents the current flags ask for: one per skill per role, or one of all skills. */
+function kitDocList(skills, flags, jobId) {
+    const kitRoles = (arg('roles', 'independent') || 'independent').split(',').map(r => r.trim()).filter(Boolean);
+    const ids = skills.map(s => `${s.categoryId}:${s.skillId}`);
+    if (flags.kind === 'single') {
+        const out = [];
+        for (const s of skills) for (const role of kitRoles) out.push({ id: `${s.categoryId}:${s.skillId}${role !== 'independent' ? '#' + role : ''}`, skills: [s], role, seed: hash(`${s.categoryId}__${s.skillId}:print`), label: s.label + (role !== 'independent' ? ` (${role})` : '') });
+        if (jobId) { if (out.length !== 1) throw new Error(`job ${jobId}: a job is one document (got ${out.length})`); out[0].id = jobId; }
+        return out;
+    }
+    if (skills.length < 2) throw new Error(`--kind ${flags.kind} needs two or more --skills (the skill and its partners)`);
+    const role = flags.kind === 'mixed' ? 'mixed-practice' : kitRoles[0];
+    if (flags.kind === 'sections' && !['independent', 'more-practice'].includes(role)) throw new Error(`--kind sections prints on a practice role (independent, more-practice), not ${role}`);
+    return [{ id: jobId || `${flags.kind}:${ids.join('+')}`, skills, role, seed: hash(`${flags.kind}:${ids.join(',')}:print`), label: `${skills.length} skills as ${flags.kind === 'mixed' ? 'Mixed practice' : 'sections'}` }];
+}
+
+async function runApp(source) {
+    const app = await open({ seed: 1 });
+    const results = [];
+    try {
+        const { page } = app;
+        await page.evaluate(() => { try { window.setUserRole('teacher'); } catch (e) {} });
+        const allSkills = await listSkills(page);
+        if (source === 'kit') {
+            const ok = await page.evaluate(() => typeof window.buildSheet === 'function' && typeof window.sheetDocument === 'function');
+            if (!ok) throw new Error('--source kit needs window.buildSheet(req) and window.sheetDocument(html, title) (js/modules/print-sheet.js), and this tree does not put them on window. Lint the legacy print path with --source legacy, or run on a tree that has the kit renderer.');
+        }
+        const JOBS = arg('jobs', null);
+        if (JOBS && source !== 'kit') throw new Error('--jobs is for --source kit');
+        const jobs = JOBS ? JSON.parse(fs.readFileSync(path.resolve(process.cwd(), JOBS), 'utf8')) : [null];
+        if (JOBS) console.log(`${TOOL}: ${jobs.length} job(s) from ${JOBS}`);
+        let skills = [];
+        for (const job of jobs) {
+            JOB_ARGV = job ? [...job.args, '--source', source] : null;
+            try {
+                skills = selectSkills(allSkills);
+                if (!skills.length) throw new Error('no skills selected');
+                let flags = null;
+                if (source === 'kit') {
+                    try { flags = kitRequestFlags(); } catch (e) {
+                        if (job && e instanceof NeedsStep) { PENDING_DOCS.push({ id: job.id, step: e.step, reason: e.message }); process.stdout.write(`  ${job.id}: PENDING (${e.message})\n`); continue; }
+                        throw e;
+                    }
+                }
+                await runAppDocs(app, source, skills, flags, results, job ? job.id : null);
+            } finally { JOB_ARGV = null; }
         }
         if (source === 'legacy' && skills.length > 1 && !has('no-combined')) {
             const id = 'combined:' + skills.length + '-sections';
@@ -1827,12 +2308,15 @@ function writeJson(results, source, file) {
         tool: TOOL, source, lints: LINTS,
         documents: results.map(r => ({
             id: r.info.id, label: r.info.label || '', mode: r.info.mode, pages: r.info.pages ?? null, keyPages: r.info.keyPages ?? null,
-            printedPages: r.info.printedPages ?? null, itemsPerPage: r.info.itemsPerPage || null, parts: r.info.parts || null, error: r.info.error || null,
+            printedPages: r.info.printedPages ?? null, itemsPerPage: r.info.itemsPerPage || null, parts: r.info.parts || null, error: r.info.error || null, attribution: r.info.attribution || undefined,
             counts: Object.fromEntries(LINTS.map(l => [l, r.findings.filter(f => f.lint === l && !f.waived).length])),
             findings: sortFindings(r.findings.map(f => { const { key, ...rest } = f; return rest; })),
             notes: r.info.notes || [],
         })),
     };
+    // --jobs (E1): documents not linted, so the coverage matrix can mark their rows PENDING / N/A
+    if (PENDING_DOCS.length) out.pending = PENDING_DOCS;
+    if (NA_DOCS.length) out.na = NA_DOCS;
     fs.writeFileSync(path.resolve(process.cwd(), file), JSON.stringify(out, null, 1));
     console.log(`wrote ${file}`);
 }
@@ -1897,6 +2381,23 @@ const SELF_TESTS = [
         p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
         [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
     } },
+    // L-LONE (H5; skip-count critic r4 D12): the second page of a two-page sheet holds one cell alone
+    { name: 'lone cell on the last page (L-LONE)', expect: ['L-DENSITY', 'LONE'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
+        [...p2.querySelectorAll('[data-ws-cell]')].slice(1).forEach(c => c.remove());
+    } },
+    // control: 2 + 1 cannot be dealt without a lone cell on two pages, so L-LONE stays quiet
+    { name: 'two + one cells (no rebalance possible)', expect: [], absent: ['L-DENSITY', 'LONE'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
+        [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+        [...p2.querySelectorAll('[data-ws-cell]')].slice(1).forEach(c => c.remove());
+    } },
     { name: 'empty band under a cell drawing (H13)', expect: ['L-DENSITY', 'H13'], fn: () => {
         const c = document.querySelector('.ws-page [data-ws-cell]');
         c.style.justifyContent = 'flex-start';
@@ -1904,6 +2405,60 @@ const SELF_TESTS = [
         const g = c.closest('.ws-grid');
         if (g) g.style.gridTemplateRows = `${Math.max(3 * c.getBoundingClientRect().height, 60 * 96 / 25.4)}px repeat(20, auto)`;
     } },
+    // L-TOPSTART (CL-4b, owner 2026-10-23): a top cell centred down a tall row, and a write-above cell pinned to the top.
+    { name: 'stack centred down a tall cell (L-TOPSTART)', expect: ['L-TOPSTART', 'CL-4b'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'stack');
+        c.style.justifyContent = 'center';
+        c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'regroup stack pinned to the top (L-TOPSTART)', expect: ['L-TOPSTART', 'CL-4b'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'stack');
+        c.setAttribute('data-ws-writeabove', '1');
+        c.style.justifyContent = 'flex-start';
+        c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    // CL40-INK (CL-40, critic 2026-10-24 D1): a top-started across fact whose first digit sits on the number tab's
+    // bottom-right corner. The plant puts a digit-size glyph where "48 ÷ 12" put its "4": just right of the tab, its
+    // ink top level with the tab's bottom edge.
+    { name: 'digit on the number tab corner (CL40-INK)', expect: ['L-OVERLAP', 'CL40-INK'], fn: () => {
+        const LAB = ':scope > .ws-tab, :scope > .ws-letter, :scope > .ws-modeltab';
+        const c = [...document.querySelectorAll('.ws-page [data-ws-cell]')].find(x => x.querySelector(LAB)) || document.querySelector('.ws-page [data-ws-cell]');
+        if (!c.querySelector(LAB)) c.insertAdjacentHTML('afterbegin', '<span class="ws-tab" data-ws-label="tab">1</span>');
+        const t = c.querySelector(LAB).getBoundingClientRect(), cr = c.getBoundingClientRect();
+        const MM = 96 / 25.4;
+        c.insertAdjacentHTML('beforeend', `<span style="position:absolute;left:${Math.max(t.height + MM, t.right - cr.left) - 1.2 * MM}px;top:${t.bottom - cr.top - 2.5 * MM}px;font-size:22pt;line-height:1;color:#000">4</span>`);
+    } },
+    // H13-ROW (pilot-su-c critic r2 N2): a short top cell in a row sized for its taller neighbour; the control is a
+    // uniform row (both cells hold the tall item), which keeps equal bands and never fires.
+    { name: 'short cell in a row sized for a taller item (H13-ROW)', expect: ['L-DENSITY', 'H13'], msg: /H13-ROW/, fn: () => {
+        const [a, b] = document.querySelectorAll('.ws-page [data-ws-cell]');
+        const g = a.closest('.ws-grid');
+        g.style.gridTemplateColumns = '1fr 1fr'; g.style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+        for (const c of [a, b]) { c.setAttribute('data-ws-cell', 'stack'); c.style.justifyContent = 'flex-start'; }
+        b.insertAdjacentHTML('beforeend', '<div style="height:52mm;width:30mm;border:0.75pt solid #000"></div>');
+    } },
+    { name: 'uniform row of tall items (H13-ROW control)', expect: [], absentMsg: [['L-DENSITY', 'H13'], /H13-ROW/], fn: () => {
+        const [a, b] = document.querySelectorAll('.ws-page [data-ws-cell]');
+        const g = a.closest('.ws-grid');
+        g.style.gridTemplateColumns = '1fr 1fr'; g.style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+        for (const c of [a, b]) { c.setAttribute('data-ws-cell', 'stack'); c.style.justifyContent = 'flex-start'; c.insertAdjacentHTML('beforeend', '<div style="height:52mm;width:30mm;border:0.75pt solid #000"></div>'); }
+    } },
+    // TY-21 (pilot-su-c critic r1 D3: answer boxes 4.06 mm at S): a 4 mm answer-strip segment and a 4 mm stand-alone
+    // answer box; the control is a 5 mm segment.
+    { name: 'answer-strip segment 4 mm wide (TY-21)', expect: ['L-ANSAREA', 'TY-21'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="ab" data-ws-seg="first" style="display:inline-block;width:4mm;height:8mm;border:0.75pt solid #000"></span>'); } },
+    { name: 'stand-alone answer box 4 mm wide (TY-21)', expect: ['L-ANSAREA', 'TY-21'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span data-ws-slot="x" data-ws-shape="box" style="display:inline-block;width:4mm;height:8mm;border:0.75pt solid #000"></span>'); } },
+    { name: 'answer-strip segment 5 mm wide (TY-21 control)', expect: [], absent: ['L-ANSAREA', 'TY-21'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="ab" data-ws-seg="first" style="display:inline-block;width:5mm;height:8mm;border:0.75pt solid #000"></span>'); } },
+    // L-OVERLAP (critic r1 D7 heads collide; r2 N8 heads 0.74 mm apart): stack heads on 4 mm tracks, place letters
+    // over 3 mm pv zones; the control is the same heads on 12 mm tracks.
+    { name: 'stack heads overlapping (L-OVERLAP)', expect: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="ws-stack" style="display:grid;grid-template-columns:repeat(3,4mm);font-size:11pt"><span class="head" style="white-space:nowrap;text-align:center">HTh</span><span class="head" style="white-space:nowrap;text-align:center">TTh</span><span class="head" style="white-space:nowrap;text-align:center">Th</span></div>'); } },
+    { name: 'place letters crowding over a pv mat (L-OVERLAP)', expect: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<svg width="30mm" height="20mm" viewBox="0 0 30 20"><text x="5" y="4" text-anchor="middle" font-size="4" font-weight="700" fill="#000">Th</text><text x="8" y="4" text-anchor="middle" font-size="4" font-weight="700" fill="#000">H</text><rect x="2" y="6" width="3" height="12" fill="none" stroke="#000" stroke-width="0.2" data-pv-zone="1000"/><rect x="5" y="6" width="3" height="12" fill="none" stroke="#000" stroke-width="0.2" data-pv-zone="100"/></svg>'); } },
+    { name: 'stack heads on wide tracks (L-OVERLAP control)', expect: [], absent: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="ws-stack" style="display:grid;grid-template-columns:repeat(3,12mm);font-size:11pt"><span class="head" style="white-space:nowrap;text-align:center">HTh</span><span class="head" style="white-space:nowrap;text-align:center">TTh</span><span class="head" style="white-space:nowrap;text-align:center">Th</span></div>'); } },
+    // L-WRAP (critic r2 N6 / N7): a line that wraps after its operator; the control is the same kind of text joined
+    // with no-break spaces in a box wide enough for it.
+    { name: 'a line wrapped after its operator (L-WRAP)', expect: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:24mm;font-size:16pt">12 + 345678</div>'); } },
+    { name: 'an expression joined with no-break spaces (L-WRAP control)', expect: [], absent: ['L-WRAP', 'WRAP-OP'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:60mm;font-size:16pt">Then 12&nbsp;+&nbsp;3&nbsp;=&nbsp;15 and 4&nbsp;&#8722;&nbsp;1&nbsp;=&nbsp;3.</div>'); } },
     { name: 'eight items on an Independent page', expect: ['L-DENSITY', 'DN-1'], fn: () => {
         const p1 = document.querySelector('.ws-page');
         p1.setAttribute('data-ws-role', 'independent');
@@ -1913,11 +2468,11 @@ const SELF_TESTS = [
         g.style.gridTemplateRows = 'repeat(4, 1fr)';
     } },
     { name: 'list answer key', expect: ['L-KEY', 'AK-1'], fn: () => {
-        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
         k.querySelector('.ws-grid').outerHTML = '<ol class="p11-list"><li>365</li><li>583</li><li>455</li><li>765</li><li>360</li><li>810</li></ol>';
     } },
     { name: 'unanswered key slot', expect: ['L-KEY', 'AK-2'], fn: () => {
-        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox, [data-ws-key="name"]')?.textContent || ''));
         k.querySelector('[data-ws-cell] [data-ws-slot]').querySelectorAll('.p11-key').forEach(e => e.remove());
     } },
     { name: 'screen verb on paper', expect: ['L-VERBS', 'BD-12'], fn: () => { document.querySelector('.ws-page .ws-instrline').textContent = 'Click the right answer.'; } },
@@ -2000,11 +2555,19 @@ async function selfTest() {
                 if (fired(r, t.absent)) bad.push(`${t.name}: ${t.absent.join(' ')} fired but must not`);
                 else console.log(`  ok   ${t.name}: ${t.absent.join(' ')} not fired`);
             }
+            if (t.absentMsg) {
+                asserts++;
+                const [[lint, rule], re] = t.absentMsg;
+                const hit = r.findings.find(f => f.lint === lint && f.rule === rule && re.test(f.msg));
+                if (hit) bad.push(`${t.name}: ${lint} ${rule} ${re} fired but must not: ${hit.msg.slice(0, 110)}`);
+                else console.log(`  ok   ${t.name}: ${lint} ${rule} ${re} not fired`);
+            }
             const exp = !t.expect.length ? [] : Array.isArray(t.expect[0]) ? t.expect : [t.expect];
             for (const e of exp) {
                 asserts++;
-                if (fired(r, e)) console.log(`  ok   ${t.name}: ${e.join(' ')} fired - ${r.findings.find(f => f.lint === e[0] && f.rule === e[1]).msg.slice(0, 110)}`);
-                else bad.push(`${t.name}: expected ${e.join(' ')}, got ${groupFindings(r.findings).map(g => `${g.lint} ${g.rule}`).join(', ') || 'nothing'}`);
+                const hit = r.findings.find(f => f.lint === e[0] && f.rule === e[1] && (!t.msg || t.msg.test(f.msg)));
+                if (hit) console.log(`  ok   ${t.name}: ${e.join(' ')} fired - ${hit.msg.slice(0, 110)}`);
+                else bad.push(`${t.name}: expected ${e.join(' ')}${t.msg ? ' ' + t.msg : ''}, got ${groupFindings(r.findings).map(g => `${g.lint} ${g.rule}`).join(', ') || 'nothing'}`);
             }
         }
         for (const t of LEGACY_SELF_TESTS) {
@@ -2089,8 +2652,44 @@ async function selfTest() {
 module.exports = { wsLintPage, wsPageBox, lintDocument, lintHtmlInSheetPage, analysePdf, CEILINGS, PACK_WAIVERS };
 if (require.main === module) (async () => {
     if (has('self-test')) return selfTest();
+    if (has('capabilities')) {
+        const caps = kitCapabilities();
+        if (has('json')) { process.stdout.write(JSON.stringify(caps, null, 1) + '\n'); return; }
+        console.log(`${TOOL}: what buildSheet takes in ${caps.root}`);
+        console.log(`  --anchors    ANCHOR_MODES ${caps.anchorModes.join('|')} (top / first: ${['top', 'first'].every(m => caps.anchorModes.includes(m)) ? 'built' : 'need M4'})`);
+        console.log(`  --pages      req.sections[i].pages ${caps.sectionPages ? 'yes' : 'NO'}; on Mixed practice ${caps.mixedPages ? 'yes' : 'needs M2'}`);
+        console.log(`  --columns    req.sections[i].columns ${caps.sectionColumns ? 'yes' : 'NO'}`);
+        console.log(`  --sections   grouped / parts (req.sections[i].title) ${caps.sectionTitle ? 'yes' : 'need M4'}`);
+        console.log(`  --bring-back req.bringBack ${caps.bringBack ? 'yes' : 'no field yet'}`);
+        console.log(`  --fade       coverages ${caps.coverages.join('|')}: page = coverage fade; packet = fade + --pages N; problems ${caps.coverages.includes('problems') ? 'yes' : 'no engine field'}`);
+        console.log(`${TOOL}: OK (capabilities)`);
+        return;
+    }
+    // --check-jobs jobs.json: each job's flags against this tree, no browser (ws-coverage-matrix
+    // --list marks a row PENDING from this, so the step a flag waits for is decided in one place).
+    if (arg('check-jobs', null)) {
+        const jobs = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), arg('check-jobs', null)), 'utf8'));
+        const out = jobs.map((job) => {
+            JOB_ARGV = [...job.args, '--source', 'kit'];
+            try { const f = kitRequestFlags(); return { id: job.id, ok: true, kind: f.kind }; } catch (e) {
+                return e instanceof NeedsStep ? { id: job.id, pending: e.step, reason: e.message } : { id: job.id, error: e.message };
+            } finally { JOB_ARGV = null; }
+        });
+        process.stdout.write(JSON.stringify(out) + '\n');
+        return;
+    }
     const source = arg('source', 'legacy');
     if (!['pack', 'legacy', 'kit'].includes(source)) throw new Error(`unknown --source ${source} (pack, legacy, kit)`);
+    // N6 (critic r2): --anchors is checked before anything runs, in every source. An unknown mode fails; a known mode
+    // outside --source kit fails too, because the legacy and pack sources would ignore it and lint without anchors.
+    if (arg('anchors', null) !== null && source !== 'kit') {
+        const a = String(arg('anchors', '')).toLowerCase();
+        const known = ['off', 'on', 'side', 'sections', 'top', 'first'];
+        if (!known.includes(a)) throw new Error(`unknown anchors mode --anchors ${arg('anchors', '')} (${known.join(', ')})`);
+        throw new Error(`--anchors ${arg('anchors', '')} applies only to --source kit; --source ${source} would ignore it and lint with no anchors`);
+    }
+    // a kit flag that needs a later step fails here, before a browser starts (E1)
+    if (source === 'kit' && !arg('jobs', null)) kitRequestFlags();
     let results;
     if (source === 'pack') {
         const only = (arg('files', '') || '').split(',').map(s => s.trim()).filter(Boolean);

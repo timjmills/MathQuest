@@ -31,14 +31,14 @@ import {
 } from './teacher-ui.js';
 import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './teacher-sets.js';
 import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
-import { renderLibraryScreen } from './teacher-library.js';
+import { renderLibraryScreen, renderSkillsScreen } from './teacher-library.js';
 import { renderMapScreen } from './teacher-map.js';
 import { renderWrmScreen, wrmHashActive, wrmOnHashChange, clearWrmHash } from './teacher-wrm.js';
 import { renderTodoScreen, openTodo, todoHashActive, clearTodoHash } from './teacher-todo.js';
 import { mapHashActive, clearMapHash } from './teacher-map-tasks.js';
 import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
 
-const SCREENS = ['home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress'];
+const SCREENS = ['skills', 'home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress'];
 // Legacy views a teacher is routed away from, to the teacher screen that replaces them
 // (the legacy views stay for their old entry points; pupils never reach the navigator).
 const REPLACED_VIEWS = { skillsOrganizerView: 'library', mapSelectorView: 'map' };
@@ -49,20 +49,98 @@ const LIB_FOR_VIEW = {
 };
 const SCREEN_KEY = 'mq_teacher_screen';
 
+// Teacher site 2.0 (T2, IMPROVEMENT_PLAN §2.3): four places. Until T3–T5 build their new content, each place
+// shows today's screens as tabs, so every old screen (and every tvGo(key)) stays reachable. Skills opens here.
+const PLACES = {
+    skills: { label: 'Skills', tabs: [['skills', 'Skills'], ['library', 'Skills library'], ['print', 'Print worksheets'], ['sets', 'Send a skill set'], ['home', 'Home']] },
+    lessons: { label: 'Lessons', tabs: [['wrm', 'White Rose lessons'], ['todo', 'Skills to be made']] },
+    classes: { label: 'Classes', tabs: [['run', 'Run on the board'], ['quizzes', 'Quizzes'], ['map', 'MAP tests'], ['progress', 'Progress']] },
+    me: { label: 'Me', tabs: [] },
+};
+const PLACE_OF = { settings: 'me' };
+for (const [place, p] of Object.entries(PLACES)) for (const [key] of p.tabs) PLACE_OF[key] = place;
+const DEFAULT_SCREEN = 'skills';
+
 const BOARD_WINDOW = (() => { try { return new URLSearchParams(location.search).get('board') === '1'; } catch (e) { return false; } })();
 
-let current = (() => { if (typeof location !== 'undefined' && wrmHashActive()) return 'wrm'; if (typeof location !== 'undefined' && mapHashActive()) return 'map'; if (typeof location !== 'undefined' && todoHashActive()) return 'todo'; try { const s = sessionStorage.getItem(SCREEN_KEY); return SCREENS.includes(s) ? s : 'home'; } catch (e) { return 'home'; } })();
+let current = (() => { if (typeof location !== 'undefined' && wrmHashActive()) return 'wrm'; if (typeof location !== 'undefined' && mapHashActive()) return 'map'; if (typeof location !== 'undefined' && todoHashActive()) return 'todo'; try { const s = sessionStorage.getItem(SCREEN_KEY); return SCREENS.includes(s) ? s : DEFAULT_SCREEN; } catch (e) { return DEFAULT_SCREEN; } })();
 let started = false;
 
 /* ================================================================= routing */
 
 function isTeacher() { return document.body.classList.contains('teacher-mode'); }
 
+// Each place reopens on the tab the teacher used last (T2 check: Classes always opened Run on the board).
+const LAST_TAB = {};
+
 function setNavCurrent(key) {
-    document.querySelectorAll('#teacherApp [data-tv-go]').forEach((a) => {
-        if (a.classList.contains('tv-brand')) return;
+    const place = PLACE_OF[key] || '';
+    if (place && place !== 'me') LAST_TAB[place] = key;
+    document.querySelectorAll('#teacherApp [data-tv-place]').forEach((a) => {
+        if (a.dataset.tvPlace === place) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    document.querySelectorAll('#tv2Profile [data-tv-go]').forEach((a) => {
         if (a.dataset.tvGo === key) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
+    renderPlaceTabs(key);
+}
+
+/** The current place's screens as tabs at the top of the workspace (none for the profile place). */
+function renderPlaceTabs(key) {
+    const nav = document.getElementById('tvPlaceTabs');
+    if (!nav) return;
+    const place = PLACES[PLACE_OF[key]];
+    const tabs = place ? place.tabs : [];
+    nav.setAttribute('aria-label', place ? place.label : 'Teacher');
+    const check = '<svg class="tv2-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4 10l4 4 8-9" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    nav.innerHTML = tabs.length > 1 ? tabs.map(([k, label]) => `<a href="#" class="tv2-tab" data-tv-go="${k}"${k === key ? ' aria-current="page"' : ''}>${k === key ? check : ''}<span>${esc(label)}</span></a>`).join('') : '';
+}
+
+/* ================================================================= the profile menu ("Me") */
+
+function profileButton() { return document.querySelector('#teacherApp .tv2-me'); }
+function profileMenu() { return document.getElementById('tv2Profile'); }
+
+function setProfileOpen(open, { focus = false } = {}) {
+    const btn = profileButton(), menu = profileMenu();
+    if (!btn || !menu) return;
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    if (open && focus) menu.querySelector('a, button')?.focus();
+}
+
+/* ================================================================= light only
+   Owner 2026-10-23: no dark mode on the teacher site ("for now do not make a dark mode"). While the teacher
+   site is on, the root's dark classes are held off and remembered; switching back to pupil view puts them
+   back, so the pupil app keeps its dark mode (system setting or the pupil's toggle). The board window
+   (?board=1) is pupil-facing and keeps the pupil theme. */
+
+const DARK_CLASSES = ['dark', 'dark-theme'];
+const pupilDark = new Set();   // the dark classes the pupil app had (or has asked for) while the teacher site holds light
+let holdingLight = false;
+
+function teacherLightWanted() { return isTeacher() && !BOARD_WINDOW; }
+
+function syncTheme() {
+    const root = document.documentElement;
+    if (teacherLightWanted()) {
+        holdingLight = true;
+        for (const c of DARK_CLASSES) if (root.classList.contains(c)) { pupilDark.add(c); root.classList.remove(c); }
+    } else if (holdingLight) {
+        holdingLight = false;
+        for (const c of pupilDark) root.classList.add(c);
+        pupilDark.clear();
+    }
+}
+
+/** The pupil view's theme while the teacher site is on (Settings › Pupil view theme). */
+export function pupilThemeIsDark() {
+    return holdingLight ? pupilDark.has('dark') : document.documentElement.classList.contains('dark');
+}
+function setPupilTheme(dark) {
+    if (!holdingLight) { if (dark !== document.documentElement.classList.contains('dark')) window.toggleTheme?.(); return; }
+    pupilDark.clear();
+    if (dark) DARK_CLASSES.forEach((c) => pupilDark.add(c));
 }
 
 function activeViewId() {
@@ -75,7 +153,7 @@ export function tvGo(key) {
     if (!isTeacher()) return;
     closeLegacyOverlays();
     if (key === 'student') { switchToStudent(); return; }
-    if (!SCREENS.includes(key)) key = 'home';
+    if (!SCREENS.includes(key)) key = DEFAULT_SCREEN;
     current = key;
     try { sessionStorage.setItem(SCREEN_KEY, key); } catch (e) { /* private mode */ }
     // Leave any legacy view first; the observer then brings the teacher screen up.
@@ -95,6 +173,7 @@ function showScreen(key) {
     if (key !== 'wrm') clearWrmHash(key);
     if (key !== 'map') clearMapHash();
     if (key !== 'todo') clearTodoHash();
+    placeScreens(key);
     document.querySelectorAll('#teacherMain .tv-screen').forEach((s) => s.classList.toggle('is-active', s.dataset.screen === key));
     setNavCurrent(key);
     const el = document.querySelector(`#teacherMain .tv-screen[data-screen="${key}"]`);
@@ -106,6 +185,65 @@ function showScreen(key) {
     }
     syncInert();
     window.scrollTo(0, 0);
+}
+
+/* ================================================================= parked screens
+   Only the screen on show is in the document. Every other screen that has been drawn is PARKED: its section
+   (with its DOM, listeners and state — ticks, view, preview) is swapped out for an empty placeholder and kept
+   here, and swapped back in before it is shown again. So a hidden screen never leaves a second live copy of a
+   shared control (List | Thumbnails, Options …) in the page, and coming back is exactly where the teacher
+   left it. A renderer keeps its own section as `root`, so late async work still lands in the parked section. */
+
+const parked = new Map();   // screen key -> its real (detached) section
+
+// A frame (the print preview, a sample) that is still loading is never detached: that would cancel its stylesheet
+// and font requests mid-load. Its screen is parked as soon as the frame has loaded. A frame is "loading" from the
+// moment it is added, given a src / srcdoc, or put back in the page, until its load event.
+let framesWatched = false;
+function watchFrames() {
+    if (framesWatched) return;
+    const main = document.getElementById('teacherMain');
+    if (!main) return;
+    framesWatched = true;
+    const mark = (f) => { f.dataset.tvLoading = '1'; };
+    new MutationObserver((records) => {
+        for (const r of records) {
+            if (r.type === 'attributes' && r.target.tagName === 'IFRAME') mark(r.target);
+            for (const n of r.addedNodes || []) {
+                if (n.nodeType !== 1) continue;
+                if (n.tagName === 'IFRAME') mark(n);
+                else n.querySelectorAll?.('iframe').forEach(mark);
+            }
+        }
+    }).observe(main, { subtree: true, childList: true, attributes: true, attributeFilter: ['src', 'srcdoc'] });
+    main.addEventListener('load', (e) => {
+        if (e.target.tagName !== 'IFRAME') return;
+        delete e.target.dataset.tvLoading;
+        if (document.body.classList.contains('tv-on-screen')) placeScreens(current);
+    }, true);
+}
+
+function placeScreens(key) {
+    watchFrames();
+    document.querySelectorAll('#teacherMain .tv-screen').forEach((sec) => {
+        if (sec.dataset.screen === key || sec.dataset.tvParked || !sec.firstChild) return;
+        if (sec.querySelector('iframe[data-tv-loading]')) return;   // parked once its frame has loaded
+        const ph = document.createElement('section');
+        ph.className = 'tv-screen';
+        ph.dataset.screen = sec.dataset.screen;
+        ph.dataset.tvParked = '1';
+        if (sec.hasAttribute('aria-label')) ph.setAttribute('aria-label', sec.getAttribute('aria-label'));
+        sec.classList.remove('is-active');
+        if (sec.contains(document.activeElement)) document.getElementById('teacherMain')?.focus({ preventScroll: true });
+        sec.replaceWith(ph);
+        parked.set(sec.dataset.screen, sec);
+    });
+    const real = parked.get(key);
+    if (!real) return;
+    const ph = document.querySelector(`#teacherMain .tv-screen[data-screen="${key}"]`);
+    real.querySelectorAll('iframe').forEach((f) => { f.dataset.tvLoading = '1'; });   // a frame put back reloads
+    if (ph) ph.replaceWith(real);
+    parked.delete(key);
 }
 
 /* ================================================================= legacy overlays + focus
@@ -199,6 +337,8 @@ function onViewChangeInner() {
 }
 
 function onRoleChange() {
+    syncTheme();
+    if (!isTeacher()) setProfileOpen(false);
     if (isTeacher()) {
         onViewChange();
         if (activeViewId() === 'homeView') showScreen(current);
@@ -258,11 +398,40 @@ function start() {
     });
 
     document.getElementById('teacherApp')?.addEventListener('click', (e) => {
+        if (e.target.closest('.tv2-me')) { setProfileOpen(profileMenu()?.hidden ?? false); return; }
         const a = e.target.closest('[data-tv-go]');
-        if (!a) return;
+        if (!a) { if (!e.target.closest('#tv2Profile') || e.target.closest('.tv2-menu-item')) setProfileOpen(false); return; }
         e.preventDefault();
-        tvGo(a.dataset.tvGo);
+        setProfileOpen(false);
+        tvGo((a.dataset.tvPlace && LAST_TAB[a.dataset.tvPlace]) || a.dataset.tvGo);
     });
+    // The profile menu closes on Esc (focus back on "Me"), on a click outside it, and when focus leaves it.
+    // The menu sits before "Me" in the page, so Tab from an open "Me" moves into the menu (T2 check).
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab' || e.shiftKey || profileMenu()?.hidden !== false || document.activeElement !== profileButton()) return;
+        const first = profileMenu().querySelector('a, button');
+        if (first) { e.preventDefault(); first.focus(); }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape' || profileMenu()?.hidden !== false) return;
+        setProfileOpen(false);
+        profileButton()?.focus();
+    });
+    document.addEventListener('click', (e) => { if (!e.target.closest('#teacherApp .tv2-foot')) setProfileOpen(false); });
+    document.getElementById('teacherApp')?.addEventListener('focusout', (e) => {
+        const foot = document.querySelector('#teacherApp .tv2-foot');
+        if (foot && e.relatedTarget && !foot.contains(e.relatedTarget)) setProfileOpen(false);
+    });
+
+    // Light only: hold the root's dark classes off while the teacher site is on (see syncTheme).
+    new MutationObserver(() => { if (holdingLight || teacherLightWanted()) syncTheme(); })
+        .observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    try {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (ev) => {
+            if (!holdingLight) return;
+            if (ev.matches) pupilDark.add('dark'); else pupilDark.delete('dark');
+        });
+    } catch (e) { /* no matchMedia */ }
 
     let pending = false;
     const flush = () => { pending = false; onViewChange(); };
@@ -783,7 +952,7 @@ function sw(id, on, labelId, descId) {
 
 function renderSettings(el) {
     const pd = printDefaults();
-    const dark = document.documentElement.classList.contains('dark');
+    const dark = pupilThemeIsDark();
     const segBtns = (name, cur, list) => `<div class="tv-seg" role="radiogroup" aria-label="${name}">${list.map(([v, t]) => `<button type="button" role="radio" data-set-${name.toLowerCase()}="${v}" aria-checked="${cur === v}">${t}</button>`).join('')}</div>`;
     el.innerHTML = `
 <header class="tv-header"><div><h1 class="tv-h1">Settings</h1><p class="tv-sub">Saved in this browser, on this device.</p></div></header>
@@ -813,8 +982,8 @@ function renderSettings(el) {
   <div class="tv-col">
     <section class="tv-card" aria-labelledby="tvLookH">
       <h2 class="tv-h2" id="tvLookH">Appearance</h2>
-      <div><span class="tv-label">Theme</span>${segBtns('Theme', dark ? 'dark' : 'light', [['light', 'Light'], ['dark', 'Dark']])}</div>
-      <p class="tv-cap" style="margin-top:-8px;">Worksheets always print black on white.</p>
+      <div><span class="tv-label">Pupil view theme</span>${segBtns('Theme', dark ? 'dark' : 'light', [['light', 'Light'], ['dark', 'Dark']])}</div>
+      <p class="tv-cap" style="margin-top:-8px;">The teacher site is always light. Worksheets always print black on white.</p>
       <div><span class="tv-label">Open the site in</span>${segBtns('Start', startRole(), [['student', 'Student view'], ['last', 'Last view used']])}</div>
       <p class="tv-cap" style="margin-top:-8px;">Student view is the default: switch to Teacher view each time with the toggle at the top.</p>
     </section>
@@ -899,10 +1068,7 @@ function onSettingsClick(e, el) {
     if (d.setAct === 'qs-reset') { window.resetQuickSkillsToDefault?.(); toast('The pupil start screen is back to its default cards'); }
     if (d.setAct && d.setAct.startsWith('qs-')) { renderSettings(el); el.querySelector(`[data-set-act="${d.setAct}"]`)?.focus(); return; }
     if (d.setAct === 'reset-adaptive') { window.confirmResetAdaptiveLevels?.(); return; }
-    if (d.setTheme) {
-        const dark = document.documentElement.classList.contains('dark');
-        if ((d.setTheme === 'dark') !== dark) window.toggleTheme?.();
-    }
+    if (d.setTheme) setPupilTheme(d.setTheme === 'dark');
     if (d.setStart) { try { localStorage.setItem('mathquest_start_role', d.setStart); } catch (e) { /* storage off */ } }
     if (d.setSize) savePrintDefaults({ size: d.setSize });
     if (d.setPaper) savePrintDefaults({ paper: d.setPaper });
@@ -997,6 +1163,7 @@ const RENDER = {
     sets: renderSetsScreen,
     print: renderPrintScreen,
     run: renderRun,
+    skills: renderSkillsScreen,
     library: renderLibraryScreen,
     wrm: renderWrmScreen,
     todo: renderTodoScreen,

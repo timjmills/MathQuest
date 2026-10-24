@@ -1,5 +1,5 @@
 // PRESET skills gate (owner rule 2026-10-17, design/PRESET_SKILLS.md).
-//   node tests/scripts/ws-presets-unit.mjs
+//   node tests/scripts/ws-presets-unit.mjs            [--no-baseline] [--write-baseline]   (D8 pin: see the end of the file)
 //
 // For every entry of js/modules/skill-presets.js:
 //   1. it is a live SKILLS entry (appended, `presetOf` naming the host), its host is live and not
@@ -15,7 +15,9 @@ import { createRequire } from 'node:module';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+// MQ_ROOT: the app tree to check (ws-backtest / state-run); the harness serves the same tree
+const ROOT = process.env.MQ_ROOT ? resolve(process.env.MQ_ROOT) : resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+let obeyNote = '';
 const M = (p) => pathToFileURL(join(ROOT, 'js', 'modules', p)).href;
 globalThis.localStorage = { getItem: () => null, setItem() {}, removeItem() {} };
 const realLog = console.log;
@@ -94,16 +96,78 @@ for (const [key, p] of entries) {
     if (mixed) check(!data.getMixedPoolSkills(cat, mixed.v).includes(id), `${key}: in the ${mixed.v} pool`);
 }
 
+// 6 (lane S1 check 9). The predicates: preset option id -> (item, value, host, category) -> true | false | null (the
+// item cannot be read for it). Self-contained (no closure), so the page runs the same source the self-test runs.
+function makeObey() {
+    const rd = (q) => {
+        const pl = q.cell && q.cell.payload;
+        if (pl && Array.isArray(pl.operands) && pl.operands.length >= 2) return pl.operands.slice(0, 2).map(Number);
+        if (Number.isFinite(q.a) && Number.isFinite(q.b)) return [q.a, q.b];
+        const m = /([\d,]+)\s*[−\-+×÷]\s*([\d,]+)/.exec(String(q.text || ''));
+        return m ? [+m[1].replace(/,/g, ''), +m[2].replace(/,/g, '')] : null;
+    };
+    const nd = (n) => String(Math.abs(Math.trunc(n))).length;
+    return {
+        // `tiles` on multiply / divide: "21" = a 2-digit number by a 1-digit one (the dividend for ÷)
+        tiles: (q, v, host) => { if (!['multiply', 'divide'].includes(host)) return null; const o = rd(q); return o ? nd(o[0]) === Math.floor(+v / 10) && nd(o[1]) === +v % 10 : null; },
+        lengths: (q, v) => { const o = rd(q); if (!o) return null; return v === 'shorter' ? nd(o[1]) < nd(o[0]) : v === 'same' ? nd(o[1]) === nd(o[0]) : null; },
+        // "within N" bounds the answer: the sum / product, the minuend / dividend
+        band: (q, v, host, cat) => { const o = rd(q); if (!o || !Number.isFinite(+v)) return null; const named = cat === 'addition' || cat === 'multiplication' ? Number(String(q.ans).replace(/,/g, '')) : o[0]; return Number.isFinite(named) ? named <= +v : null; },
+        // D8 spread (not an option id): the named number over a deep sample reaches the first and the last fifth of
+        // its digit class (10-99 for 2 digits; 2-9 for 1). null: no item read, or the named number has more than one
+        // length (a product of 2 x 1 digits), so there is no single class to span.
+        _spread: (items, cat) => {
+            const named = items.map((q) => { const o = rd(q); return !o ? NaN : cat === 'addition' || cat === 'multiplication' ? Number(String(q.ans).replace(/,/g, '')) : o[0]; }).filter(Number.isFinite);
+            if (named.length < 10) return null;
+            const lens = new Set(named.map(nd));
+            if (lens.size !== 1) return null;
+            const d = [...lens][0];
+            if (d < 2) return null;
+            const lo = 10 ** (d - 1), hi = 10 ** d - 1, w = hi - lo;
+            const min = Math.min(...named), max = Math.max(...named);
+            const needLo = Math.floor(lo + w / 5), needHi = Math.ceil(hi - w / 5);
+            return { ok: min <= needLo && max >= needHi, min, max, lo, hi, needLo, needHi, what: cat === 'addition' || cat === 'multiplication' ? 'answer' : 'first number' };
+        },
+    };
+}
+if (process.argv.includes('--self-test')) {
+    const O = makeObey(), bad = [];
+    const t = (c, m) => { if (!c) bad.push(m); };
+    t(O.tiles({ a: 47, b: 6 }, 21, 'multiply') === true, 'tiles 21: 47 × 6 obeys');
+    t(O.tiles({ a: 47, b: 36 }, 21, 'multiply') === false, 'tiles 21: 47 × 36 (a 2 × 2 item) breaks it');
+    t(O.tiles({ text: '96 ÷ 4 = ?' }, 21, 'divide') === true, 'tiles 21 ÷: read from the text');
+    t(O.tiles({ a: 4, b: 3 }, 21, 'area_model_mult') === null, 'tiles on another host: no predicate');
+    t(O.lengths({ cell: { payload: { operands: [57, 3] } } }, 'shorter') === true && O.lengths({ a: 57, b: 23 }, 'shorter') === false, 'lengths shorter');
+    t(O.band({ a: 7, b: 5, ans: 12 }, 10, 'add', 'addition') === false && O.band({ a: 9, b: 4, ans: 5 }, 10, 'sub', 'subtraction') === true, 'band bounds the sum / the minuend');
+    t(O.band({ text: 'no numbers' }, 10, 'x', 'addition') === null, 'band: unreadable is null');
+    // D8 spread: minuends 51-99 (pilot r1) are narrow; 21-99 (fix r1) reach the first fifth (10-27) and the last (81-99)
+    const subs = (lo, hi) => Array.from({ length: 30 }, (_, i) => ({ a: lo + Math.round((hi - lo) * i / 29), b: 1 }));
+    t(O._spread(subs(51, 99), 'subtraction').ok === false, 'spread: minuends 51-99 are a narrow set');
+    t(O._spread(subs(21, 99), 'subtraction').ok === true, 'spread: minuends 21-99 span the class');
+    t(O._spread([{ a: 12, b: 3, ans: 36 }, { a: 98, b: 7, ans: 686 }].concat(subs(10, 99).map((x) => ({ a: x.a, b: 2, ans: x.a * 2 }))), 'multiplication') === null, 'spread: a product of several lengths is not judged');
+    for (const b of bad) console.error('  - ' + b);
+    console.log(bad.length ? `ws-presets-unit: FAIL - self-test (${bad.length})` : 'ws-presets-unit: OK (self-test, 10 predicate cases)');
+    process.exit(bad.length ? 1 : 0);
+}
+
 // 3. generation, in the app
 const require = createRequire(import.meta.url);
 const { open } = require('../lib/ws-harness.cjs');
 const app = await open({ seed: 1 });
 try {
-    const res = await app.page.evaluate((list) => {
+    // (the page function and makeObey go in as source: makeObey is a function, which evaluate() cannot pass as an argument)
+    const pageCheck = async (list, makeObey) => {
         const out = [];
+        // the composer's own instruction reader (the module the app loaded: same URL, same registry)
+        let instrKeyOf = null;
+        try { instrKeyOf = (await import(new URL('js/modules/sheet/roles/compose.js', location.href).href)).instructionKeyOf || null; } catch (e) { instrKeyOf = null; }
+        if (!instrKeyOf) out.push('check 7: sheet/roles/compose.js instructionKeyOf could not be loaded: the instruction key was not checked');
+        let instrChecked = 0, spreadChecked = 0, spreadSkipped = 0;
         // the area model's input ids open with Date.now() (a per-call DOM id, not content): drop the clock part
         const strip = (q) => q && J2({ t: q.text, a: q.ans, v: q.visual, c: q.cell }).replace(/(data-area-idx=\\?")\d+/g, '$1');
         function J2(x) { return JSON.stringify(x); }
+        const OBEY = makeObey();
+        let obeyChecked = 0, obeySkipped = 0, genericChecked = 0;
         for (const [key, p] of list) {
             const [cat, id] = key.split(':');
             // A whole page of the preset, then a whole page of the host with the preset values: a page's
@@ -118,6 +182,40 @@ try {
                 if (strip(a) !== strip(b)) out.push(`${key} item ${i}: differs from ${p.skill} with ${J2(p.opts)}`);
                 if (a.presetId !== id || a.skillId !== p.skill) out.push(`${key} item ${i}: presetId=${a.presetId} skillId=${a.skillId}`);
             }
+            // 6. the preset's items OBEY its preset values (lane S1 check 9): check 3 compares the preset with the
+            // host given the same values, so a host that ignores a value passes it twice. Here (a) every preset value
+            // with a known predicate holds on every item, and (b) the preset's page is not the host's DEFAULT page
+            // (a preset whose values change nothing is not a preset).
+            for (let i = 0; i < 6; i++) {
+                const a = pa[i];
+                if (!a) continue;
+                for (const [ok, v] of Object.entries(p.opts)) {
+                    const pred = OBEY[ok];
+                    const r = pred ? pred(a, v, p.skill, cat) : null;
+                    if (r === null) { obeySkipped++; continue; }
+                    obeyChecked++;
+                    if (!r) out.push(`${key} item ${i}: does not obey its preset ${ok}=${J2(v)} (${String(a.text || '').slice(0, 40)} = ${a.ans})`);
+                }
+            }
+            // 7. pilot critic r1 D8 (lane S1 fix r1). (a) The INSTRUCTION: the sheet's instruction key for the preset's
+            // items, read the way the page composer reads it (compose.js instructionKeyOf, with the preset as the
+            // section's listed skill), is the host's key for the host's items with the preset values (D8: sub_2d_1d
+            // matched no listed skill and printed "Solve. Write the answer." where the host says "Subtract.").
+            if (instrKeyOf) {
+                const kp = instrKeyOf(pa.filter(Boolean).map((q) => ({ q })), [{ categoryId: cat, skillId: id, opts: p.opts }]);
+                const kh = instrKeyOf(pb.filter(Boolean).map((q) => ({ q })), [{ categoryId: cat, skillId: p.skill, opts: p.opts }]);
+                instrChecked++;
+                if (kp !== kh) out.push(`${key}: instruction key "${kp}" on its own page, but its host ${p.skill} says "${kh}" (pilot D8)`);
+            }
+            // (b) The SPREAD: over 60 items the number "within N" bounds (minuend / dividend; sum / product) reaches
+            // the first and the last fifth of its digit class (D8: minuends 51-99 only, for a 2-digit class 10-99).
+            const deep = Array.from({ length: 60 }, (_, i) => window.generateQuestionFor({ category: cat, skill: id, seed: 5000 + 13 * i, itemIndex: i, itemCount: 60 }));
+            const sv = ['addition', 'subtraction', 'multiplication', 'division'].includes(cat) ? OBEY._spread(deep.filter(Boolean), cat) : null;   // (the + − × ÷ ladder rungs: D8's class)
+            if (sv === null) spreadSkipped++;
+            else { spreadChecked++; if (!sv.ok) out.push(`${key}: narrow set: its ${sv.what} runs ${sv.min}-${sv.max} over 60 items, inside the ${sv.lo}-${sv.hi} class it must reach ${sv.needLo} or below and ${sv.needHi} or above (pilot D8)`); }
+            const pd = page(p.skill, undefined);
+            genericChecked++;
+            if (pa.every((a, i) => a && pd[i] && strip(a) === strip(pd[i]))) out.push(`${key}: its 6 items equal ${p.skill}'s DEFAULT items: the preset values ${J2(p.opts)} change nothing`);
             // explicit opts win over the preset values
             const k = Object.keys(p.opts)[0];
             const q = window.generateQuestionFor({ category: cat, skill: id, opts: { [k]: p.opts[k] }, seed: 5 });
@@ -125,9 +223,13 @@ try {
             // state restored
             if (window.state.skill === p.skill) out.push(`${key}: state.skill left on the host`);
         }
-        return out;
-    }, entries);
-    failures.push(...res);
+        return { out, obeyChecked, obeySkipped, genericChecked, instrChecked, spreadChecked, spreadSkipped };
+    };
+    const res = await app.page.evaluate(`(${pageCheck.toString()})(${JSON.stringify(entries)}, ${makeObey.toString()})`);
+    failures.push(...res.out);
+    obeyNote = `${res.obeyChecked} item×value predicate checks (tiles / lengths / band), ${res.obeySkipped} value(s) with no predicate, ${res.genericChecked} presets checked against the host default page; D8: ${res.instrChecked} instruction keys = the host's, ${res.spreadChecked} spreads checked (${res.spreadSkipped} with no single-length named number)`;
+    if (!res.instrChecked) failures.push('check 7: no preset instruction key was checked');
+    if (!res.genericChecked) failures.push('check 9: no preset was checked against its host default (0 items checked)');
     // the 2-char share code opens the preset
     const codeRes = await app.page.evaluate(() => {
         const c = window.SKILL_CODES['multiplication:mult_2by2_standard'];
@@ -140,5 +242,24 @@ try {
     await app.close();
 }
 
-if (failures.length) { console.error(`ws-presets-unit: FAIL (${failures.length})`); failures.slice(0, 40).forEach(f => console.error('  - ' + f)); process.exit(1); }
-console.log(`ws-presets-unit: OK (${entries.length} presets: host live, values legal, defaults = preset, explicit wins, seeded items = host items, tags + terms + print size + pinned code, options round-trip)`);
+// D8 pin (lane S1, 2026-10-24): the instruction-key / spread findings that already print on the base are pinned by their
+// exact text in tests/fixtures/precritic/presets-d8.baseline.json, so a lane touching a preset fails only on a NEW one.
+// Only "(pilot D8)" lines can be pinned; every other failure always fails. `--write-baseline` re-pins (STATUS note).
+// `--no-baseline` judges everything (the backtest rows run on old trees, which have no pin file of their own).
+{
+    const fsx = await import('node:fs');
+    const PIN = join(dirname(fileURLToPath(import.meta.url)), '..', 'fixtures', 'precritic', 'presets-d8.baseline.json');
+    const d8 = failures.filter((f) => / \(pilot D8\)$/.test(f));
+    if (process.argv.includes('--write-baseline')) {
+        fsx.writeFileSync(PIN, JSON.stringify({ note: 'ws-presets-unit pilot-D8 findings pinned on the base (lane S1, 2026-10-24): a preset whose own page uses another instruction key than its host, or a narrow set. Lower when fixed; never add one without a STATUS note.', pinned: d8.sort() }, null, 1) + '\n');
+        console.log(`ws-presets-unit: pinned ${d8.length} D8 finding(s) in ${PIN}`);
+    }
+    let pinned = new Set();
+    // only "(pilot D8)" lines are ever held (S1 critic r2 N-r2-2: a hand-added check-6 line in the pin was silenced)
+    if (!process.argv.includes('--no-baseline')) { try { pinned = new Set((JSON.parse(fsx.readFileSync(PIN, 'utf8')).pinned || []).filter((f) => / \(pilot D8\)$/.test(f))); } catch (e) { /* no pin: judge all */ } }
+    const held = failures.filter((f) => pinned.has(f));
+    if (held.length) console.log(`ws-presets-unit: ${held.length} pinned D8 finding(s) still print (${PIN.split('/').slice(-1)[0]})`);
+    for (let i = failures.length - 1; i >= 0; i--) if (pinned.has(failures[i])) failures.splice(i, 1);
+}
+if (failures.length) { console.error(`ws-presets-unit: FAIL (${failures.length})`); failures.slice(0, 60).forEach(f => console.error('  - ' + f)); process.exit(1); }
+console.log(`ws-presets-unit: OK (${entries.length} presets: host live, values legal, defaults = preset, explicit wins, seeded items = host items, items obey the preset values: ${obeyNote}, tags + terms + print size + pinned code, options round-trip)`);

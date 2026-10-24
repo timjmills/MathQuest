@@ -19,14 +19,28 @@
 //              problems cannot sit two to a shelf takes the band instead). Anchors are unscored,
 //              unlabelled and carry the Model tab; the numbering counts pupil problems only.
 //
-// SHUFFLED packing (2 x 2 blocks) is not built yet. Pure module (SCC-01).
+// MIXED arrangement (`input.arrangement === 'mixed'`, IMPROVEMENT_PLAN 3.3, phase M1): for skills
+// of ONE SIZE CLASS (`mixedClass`: the same cells across k on the lattice, cell heights within
+// MIX_H_RATIO of each other, and every skill's cells say their own task - the sign of a
+// computation, or an instruction kept in the cell), the page is shelves of k cells filled from
+// the interleaved queue (sheet/interleave.js: counts by `dealCounts`, two of each; order by
+// `interleave`, no run over 2). One band strip heads the page with the sheet instruction "Solve."
+// and no band title; each cell keeps its own instruction (the host does not strip it, B3). A
+// shelf is as tall as the tallest cell it holds; content never shrinks; whole shelves paginate;
+// numbering row-major. Skills of different size classes fall back to GROUPED, with the reason in
+// the notes. The 2 x 2 block packer for mixed size classes is M2's (PT-MIX-5).
+//
+// Pure module (SCC-01).
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
-    instructionText, assemble, poolItems, labelStyleOf, STRAND_BY_CATEGORY,
+    instructionText, assemble, poolItems, labelStyleOf, STRAND_BY_CATEGORY, deriveSeed,
 } from './compose.js';
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
+import { interleave, dealCounts } from '../interleave.js';
+import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
+import { factWidthMm, factDigitTracks } from '../cells/fact.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -151,7 +165,429 @@ function packing(poolsIn, input) {
     return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
 }
 
+/* ============================================================ the MIXED arrangement (M1) */
+
+/** A shelf's shorter cell keeps at least this share of the tallest's height (H13: < 30 % empty). */
+export const MIX_H_RATIO = 0.75;
+/** Instructions a computation cell's own sign already says: such a cell needs no cue on "Solve.". */
+const SIGN_KEYS = new Set(['add', 'subtract', 'multiply', 'divide', 'mixed-sign', 'mixed-ops', 'default-solve', 'default-write']);
+
+/**
+ * The shelf widths a mixed page may try, widest first. Grouped shelves (and any page with a cell
+ * other than the 1 x 1 fact cell) keep the divisors of the lattice up to 6. A page whose cells are
+ * ALL fact cells may also run 7 to N across (N = 8 Daily / 10 I Can at S): the TY-30 fact ladder
+ * sets the digits by the count across (20 / 18 / 16 pt at 7 / 8 / 10), so S prints more problems
+ * than M (critic M1 r1 D1). Every shelf of a page takes the same k, so its vertical rules still
+ * line up; the page's lattice is then k itself.
+ */
+function kCandidates(poolsIn, ids, N, ctx) {
+    const allFact = ids.every((id) => poolsIn[id].every((it) => it.template === 'fact'));
+    // (M1 r4, D2: an all-fact page runs any count across up to N whose ladder digits are at
+    // least the size's working digits - factPick chooses among them; this list is its fallback)
+    if (allFact && ctx) {
+        const floor = (SIZES[ctx.size] || SIZES.L).digitPt;
+        const ks = Array.from({ length: Math.min(10, N) }, (_, i) => Math.min(10, N) - i).filter((d) => FACT_LADDER[d] >= floor);
+        if (ks.length) return ks;
+    }
+    const wide = allFact ? Array.from({ length: Math.max(0, N - 6) }, (_, i) => N - i).filter((d) => d >= 7 && d <= 10) : [];
+    return [...wide, ...divisorsDesc(N).filter((d) => d <= 6)];
+}
+
+/** fitsAt, and above 6 across only where the cell was really measured there (no measure, no fit). */
+const fitsMeasured = (its, d, ctx) => fitsAt(its, d, ctx) && (d <= 6 || its.every((it) => it.measured && it.measured[d] && it.measured[d].fits !== false))
+    // (and a grid the layout really builds at this size: hMinAt is Infinity where it will not)
+    && Number.isFinite(hAtK(its, d, ctx));
+
+/** The tallest cell at k: the layout's own minimum up to 6, the measured height above it. */
+function hAtK(its, k, ctx) {
+    if (k <= 6) return hMinAt(its, k, ctx);
+    const hs = its.map((it) => it.measured && it.measured[k] && it.measured[k].hMm);
+    return hs.every((h) => Number.isFinite(h)) ? Math.max(...hs) + 1 : Infinity;
+}
+
+const latticeOf = (input, ctx) => ([4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size]);
+
+/* ------------------------------------------- the across count of an all-fact page (M1 r4) */
+
+/** TY-31: the fill of the column a fact section keeps (the fact's drawn width / the cell's). */
+export const FACT_FILL = Object.freeze({ lo: 0.55, hi: 0.75 });
+/** WORKSHEET_DESIGN_STANDARD 12.1: Mixed practice holds at most 9 / 7 / 5 rows (shelves). */
+const MAX_SHELVES = Object.freeze({ S: 9, M: 7, L: 5 });
+const SIZE_UP = Object.freeze({ S: 'M', M: 'L', L: null });
+
+const isAllFact = (poolsIn, ids) => ids.length > 0 && ids.every((id) => poolsIn[id].every((it) => it.template === 'fact'));
+const payloadOf = (it) => (it && it.q && it.q.cell && it.q.cell.payload) || {};
+/** A fact cell's digit tracks as it prints (the host gives every fact of a mixed page one count). */
+export const factTracksOf = (it) => { const p = payloadOf(it); return factDigitTracks(p.a, p.b, p.digits); };
+/** TY-31: the fill of the column of these facts at k across (the widest of them). */
+/** TY-31: the gap between neighbouring facts' rules is never below 6 mm. */
+export const FACT_RULE_GAP_MM = 6;
+/**
+ * The drawn grid of a fact band (critic M1 r5: ONE source for the fill and the rule gap, measured
+ * against the drawn rule). The band's 186 mm loses its two heavy sides (1.5 pt); its k cells share
+ * the rest with k - 1 gaps of the look's cell line (Daily 1.5 pt, I Can 0.75 pt). The pitch is
+ * cell + gap; the drawn rule is the fact's grid (factWidthMm), within 0.05 mm of the printed one.
+ */
+const PT_MM = 25.4 / 72;
+const BAND_SIDE_MM = 1.5 * PT_MM;
+const cellGapMm = (look) => (look === 'ican' ? 0.75 : 1.5) * PT_MM;
+export const factPitchMm = (k, look = 'daily') => (186 - 2 * BAND_SIDE_MM + cellGapMm(look)) / k;
+export const factCellWMm = (k, look = 'daily') => factPitchMm(k, look) - cellGapMm(look);
+const widestFactMm = (items, k, tracks) => {
+    const n = tracks || Math.max(2, ...items.map(factTracksOf));
+    return Math.max(0, ...items.map((it) => factWidthMm(k, n, payloadOf(it).b)));
+};
+/** The gap (mm) between the drawn rules of neighbouring facts at k across: the pitch less the widest rule. */
+export function factRuleGapAt(items, k, tracks = 0, look = 'daily') {
+    return factPitchMm(k, look) - widestFactMm(items, k, tracks);
+}
+/** What makes a page's facts 3 digits wide, in words ("a 3-digit answer", "2 3-digit dividends"). */
+function wideWords(items) {
+    let ans = 0;
+    let div = 0;
+    let other = 0;
+    for (const it of items) {
+        const p = payloadOf(it);
+        const q = (it && it.q) || {};
+        const a = String(p.a ?? '');
+        const b = String(p.b ?? '');
+        const v = String(p.ans !== undefined ? p.ans : (q.ans ?? ''));
+        if (/^(\/|\u00f7)$/.test(String(p.op)) && a.length >= 3) div++;
+        else if (v.length >= 3) ans++;
+        else if (a.length >= 3 || b.length >= 3) other++;
+    }
+    const NUM = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+    const w = (c, one, many) => (c ? (c === 1 ? `a 3-digit ${one}` : `${NUM[c] || c} 3-digit ${many}`) : '');
+    return [w(ans, 'answer', 'answers'), w(div, 'dividend', 'dividends'), w(other, 'number', 'numbers')].filter(Boolean).join(' and ');
+}
+export function factFillAt(items, k, tracks = 0, look = 'daily') {
+    return widestFactMm(items, k, tracks) / factCellWMm(k, look);
+}
+
+/**
+ * THE ACROSS COUNT OF AN ALL-FACT MIXED PAGE (critic M1 r3 D2, D3, D5). The fact ladder (TY-30)
+ * sets the digits by the count across, so k is chosen with three rules, in this order:
+ *   1. the digit floor: a k is allowed only when its ladder digits are at least the size's
+ *      working digits (16 / 22 / 28 pt at S / M / L), up to the look's lattice (I Can 10 / 8 / 6,
+ *      Daily 8 / 6 / 4), at every count across that the cells were measured to fit;
+ *   2. the size ladder (L1): the page prints more problems than the next size up would (S > M > L),
+ *      the next size's count worked out the same way from the same cells;
+ *   3. the fill (TY-31): the widest k whose fill of the column is within 55-75 %; when none is,
+ *      the k least above 75 % (a wider one on a tie), and the notes say so.
+ * Rows are the shelves the page's height holds (at most 9 / 7 / 5): this size's from its measured
+ * cells, another size's from the same cells moved to that size's VA-70 fact height.
+ * -> {k, fill, tracks, digitPt, problems, note, ladder}
+ */
+export function factPick(poolsIn, ids, input, ctx) {
+    const all = ids.flatMap((id) => poolsIn[id]);
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: 1 });
+    const head = layoutHeader(frame.header);
+    const lattice = (sz) => ([4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][sz]);
+    const fitK = new Map();
+    const fits = (k) => { if (!fitK.has(k)) fitK.set(k, fitsMeasured(all, k, ctx)); return fitK.get(k); };
+    const hHere = (k) => hAtK(all, k, ctx);
+    const rowsAt = (sz, k) => {
+        const m = bandMetrics(Object.assign({}, ctx, { size: sz }), head);
+        const h = sz === ctx.size ? hHere(k) : hHere(k) - factCellHMm(k, ctx.size) + factCellHMm(k, sz);
+        if (!Number.isFinite(h) || h <= 0) return 0;
+        return Math.max(1, Math.min(MAX_SHELVES[sz] || 5, Math.floor((m.budget - stripMmOf(input) - m.strip) / h)));
+    };
+    const tracks = Math.max(2, ...all.map(factTracksOf));
+    const allowed = (sz) => Array.from({ length: lattice(sz) }, (_, i) => lattice(sz) - i)
+        .filter((k) => FACT_LADDER[k] >= SIZES[sz].digitPt && fits(k));
+    const choose = (sz, must, n) => {
+        const fill = (k) => factFillAt(all, k, n, ctx.look);
+        const ok = allowed(sz);
+        if (!ok.length) return null;
+        const beat = ok.filter((k) => k * rowsAt(sz, k) > must);
+        const cands = beat.length ? beat : ok;
+        const inRange = cands.filter((k) => fill(k) >= FACT_FILL.lo - 1e-9 && fill(k) <= FACT_FILL.hi + 1e-9);
+        let k;
+        if (inRange.length) k = inRange[0];
+        else {
+            // TY-31's hard limit (critic M1 r4): the widest k whose neighbouring rules stay at least
+            // 6 mm apart; only when none does, the least overfilled.
+            const gapOk = cands.filter((x) => factRuleGapAt(all, x, n, ctx.look) >= FACT_RULE_GAP_MM - 1e-9);
+            const over = cands.filter((x) => fill(x) > FACT_FILL.hi);
+            k = gapOk.length ? gapOk[0] : over.length ? over.slice().sort((a, b) => fill(a) - fill(b) || b - a)[0] : cands[0];
+        }
+        return { k, problems: k * rowsAt(sz, k), ladder: !!beat.length || must === 0 };
+    };
+    // L first, then M, then S: each size must beat the one above it. The page of a bigger size is
+    // dealt again, so its facts may be narrower than these (no 3-digit number): it is taken at the
+    // most problems it could print, over 2 tracks and these (critic M1 r4 check, weighted 1 : 3).
+    const chain = [];
+    for (let sz = ctx.size; sz; sz = SIZE_UP[sz]) chain.unshift(sz);
+    let must = 0;
+    let got = null;
+    for (const sz of chain) {
+        if (sz !== ctx.size) {
+            const opts = [...new Set([2, tracks])].map((n) => choose(sz, must, n)).filter(Boolean);
+            if (!opts.length) return null;
+            must = Math.max(...opts.map((o) => o.problems));
+            continue;
+        }
+        got = choose(sz, must, tracks);
+        if (!got) return null;
+    }
+    const k = got.k;
+    const f = factFillAt(all, k, 0, ctx.look);
+    return { k, fill: f, tracks, digitPt: FACT_LADDER[k], problems: got.problems, note: fillNote(tracks, k, f, got.ladder, wideWords(all)), ladder: got.ladder, wide: wideWords(all) };
+}
+
+/** The teacher's note when a pick leaves TY-31's fill or the size ladder (factPick). */
+function fillNote(tracks, k, f, ladder = true, wide = '') {
+    const pct = Math.round(f * 100);
+    let note = '';
+    if (f > FACT_FILL.hi + 1e-9) {
+        const what = wide ? `${wide.charAt(0).toUpperCase()}${wide.slice(1)} on the page ${/^a /.test(wide) && !/ and /.test(wide) ? 'needs' : 'need'} a third digit place, so the facts` : `The ${tracks}-digit facts`;
+        note = `Mixed practice: ${what} fill ${pct}% of each box at ${k} across (the aim is 55-75%): the most across that keeps the answer lines 6 mm apart, so this size still prints more problems than the next size up.`;
+    } else if (f < FACT_FILL.lo - 1e-9) {
+        note = `Mixed practice: the facts fill ${pct}% of each box at ${k} across (the aim is 55-75%); more across would print the digits smaller than this size's.`;
+    }
+    if (!ladder) note = [note, 'Mixed practice: this size prints no more problems than the next size up.'].filter(Boolean).join(' ');
+    return note;
+}
+
+/** The plain words for a pool's skill (the notes): its strand or label. */
+function poolName(input, its) {
+    const it0 = its[0] || {};
+    const q = it0.q || {};
+    const skill = (input.skills || []).find((s) => `${s.categoryId}:${s.skillId}` === it0.skill)
+        || (input.skills || []).find((s) => s.skillId === q.skillId && (!q.categoryId || s.categoryId === q.categoryId)) || {};
+    return skill.label || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || q.skillId || 'This skill';
+}
+
+/**
+ * Do the page's skills share one size class (M1's test)? Each pool's k is the largest divisor of
+ * the lattice N (at most 6) whose cell width every one of its measured cells fits (DN-10), and its
+ * h the tallest of its cells at k. They share a class when every pool has the same k, the
+ * shortest h is at least MIX_H_RATIO of the tallest, and each pool's cells say their own task.
+ * -> {ok, k, h, N, why}
+ */
+export function mixedClass(poolsIn, input = {}) {
+    const ctx = ctxOf(input, DEFAULT_LOOK);
+    const N = latticeOf(input, ctx);
+    const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
+    if (ids.length < 2) return { ok: false, N, why: '' };
+    // M1 mixes kit cells only: a legacy cell (old print HTML) draws its own rule, column and sign
+    // spacing, so it would not line up with the kit cells it shares a shelf with (critic r1 D2).
+    const legacy = ids.filter((id) => poolsIn[id].some((it) => !it.template || it.template === 'legacy'));
+    if (legacy.length) {
+        return { ok: false, N, why: `Mixed practice: ${legacy.map((id) => poolName(input, poolsIn[id])).join(', ')} still uses the old drawing, so the page prints in sections for now.` };
+    }
+    const cands = kCandidates(poolsIn, ids, N, ctx);
+    // All fact cells: one drawing, so the page takes ONE k for every skill, chosen by the size's
+    // digit floor, the fill of the column and the size ladder (factPick, critic M1 r3 D2 / D3).
+    // Otherwise each skill's own k.
+    const allFact = isAllFact(poolsIn, ids);
+    const pick = allFact ? factPick(poolsIn, ids, input, ctx) : null;
+    const kAll = pick ? pick.k : 0;
+    const per = ids.map((id) => {
+        const its = poolsIn[id];
+        const k = kAll || cands.find((d) => fitsMeasured(its, d, ctx)) || 1;
+        const h = hAtK(its, k, ctx);
+        const key = instructionKeyOf(its, input.skills);
+        const own = SIGN_KEYS.has(key) || its.every((it) => !!it.cellPrompt);
+        return { id, k, h: Number.isFinite(h) ? h : Infinity, own, name: poolName(input, its) };
+    });
+    const ks = [...new Set(per.map((x) => x.k))];
+    if (ks.length > 1) {
+        return { ok: false, N, per, why: `Mixed practice: ${per.map((x) => `${x.name} fits ${x.k} across`).join(', ')}, so the page prints in sections until boxes of different sizes can share a page.` };
+    }
+    const hs = per.map((x) => x.h);
+    const hMax = Math.max(...hs);
+    const hMin = Math.min(...hs);
+    if (!Number.isFinite(hMax) || hMin / hMax < MIX_H_RATIO) {
+        const tall = per.find((x) => x.h === hMax);
+        return { ok: false, N, per, why: `Mixed practice: ${tall.name} needs much taller boxes than the other skills, so the page prints in sections until boxes of different sizes can share a page.` };
+    }
+    const silent = per.filter((x) => !x.own);
+    if (silent.length) {
+        return { ok: false, N, per, why: `Mixed practice: ${silent.map((x) => x.name).join(', ')} needs its own short instruction in each box, so the page prints in sections for now.` };
+    }
+    return { ok: true, k: ks[0], h: hMax, N: pick ? ks[0] : N, per, why: '', pick };
+}
+
+/** The mixed page's capacity: shelves of k under one "Solve." strip, counts dealt by weight. */
+function mixedPacking(poolsIn, input) {
+    const ctx = ctxOf(input, DEFAULT_LOOK);
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: 1 });
+    const m0 = bandMetrics(ctx, layoutHeader(frame.header));
+    const m = Object.assign({}, m0, { budget: m0.budget - stripMmOf(input) });
+    const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
+    let cls = mixedClass(poolsIn, input);
+    if (!cls.ok) {
+        // The host checked the probe; should the final items differ (a taller item dealt), the
+        // page stays mixed on the narrowest k every skill fits, as tall as its tallest cell.
+        const N = cls.N || latticeOf(input, ctx);
+        const cands = kCandidates(poolsIn, ids, N, ctx);
+        const kOf = (its) => cands.find((d) => fitsMeasured(its, d, ctx)) || 1;
+        const k = Math.min(...ids.map((id) => kOf(poolsIn[id])));
+        const h = Math.max(...ids.map((id) => hAtK(poolsIn[id], k, ctx)).map((x) => (Number.isFinite(x) ? x : 60)));
+        cls = { ok: false, k, h: h > 0 ? h : 60, N, why: cls.why };
+    }
+    // The host's k (`input.mixK`, picked from the probe it dealt the counts for, critic M1 r3 D4):
+    // the final items keep it when they fit it, so the shelves hold exactly the counts dealt.
+    const kHost = Number(input.mixK) || 0;
+    if (cls.ok && cls.pick && kHost && kHost !== cls.k && ids.every((id) => fitsMeasured(poolsIn[id], kHost, ctx))) {
+        const h = Math.max(...ids.map((id) => hAtK(poolsIn[id], kHost, ctx)));
+        if (Number.isFinite(h) && h > 0) {
+            const all = ids.flatMap((id) => poolsIn[id]);
+            cls = Object.assign({}, cls, { k: kHost, h, N: kHost, pick: Object.assign({}, cls.pick, { k: kHost, fill: factFillAt(all, kHost, 0, ctx.look), digitPt: FACT_LADDER[kHost], note: fillNote(cls.pick.tracks, kHost, factFillAt(all, kHost, 0, ctx.look), cls.pick.ladder, cls.pick.wide) }) });
+        }
+    }
+    const maxShelves = { S: 9, M: 7, L: 5 }[ctx.size] || 5;
+    const shelves = Math.max(1, Math.min(maxShelves, Math.floor((m.budget - m.strip) / cls.h)));
+    const total = shelves * cls.k;
+    const weights = Object.fromEntries((input.pools || []).filter((p) => ids.includes(p.id)).map((p) => [p.id, p.weight || 1]));
+    for (const id of ids) if (!(id in weights)) weights[id] = 1;
+    const deal = dealCounts(weights, total, { min: 2 });
+    // (a shelf wider than 6 - or any all-fact page - is the page's own lattice: every shelf takes the same k)
+    return { ctx, m, cls, ids, shelves, total, weights, deal, N: cls.k > 6 || cls.pick ? cls.k : cls.N };
+}
+
+/**
+ * A fact item whose CELL says the count across it is drawn at (its payload's `columns`): the
+ * cell's --fd and --fp then carry the ladder's digits for k, as its fact drawing already does,
+ * instead of the preset's Auto count (critic M1 r3: a 20 pt fact in a cell marked 16 pt). The
+ * drawing itself is the item's own render, unchanged.
+ */
+function atColumns(it, k) {
+    const c = it.q && it.q.cell;
+    if (!c || c.template !== 'fact' || !c.payload) return it;
+    return Object.assign({}, it, { q: Object.assign({}, it.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { columns: k }) }) }) });
+}
+
+/** The fact of an item as one key, a fact and its turnaround together (4 + 2 / 2 + 4). */
+function pairKeyOf(it) {
+    const p = payloadOf(it);
+    const op = { '+': '+', '*': 'x', x: 'x', '\u00d7': 'x', '-': '-', '\u2212': '-', '/': '/', '\u00f7': '/' }[String(p.op)] || '';
+    if (!op || p.a === undefined || p.b === undefined) return '';
+    const ab = [Number(p.a), Number(p.b)];
+    return `${op}:${op === '+' || op === 'x' ? ab.sort((x, y) => x - y).join(',') : ab.join(',')}`;
+}
+
+/**
+ * NO FACT TWICE ON ONE SHELF (critic M1 r4): a shelf holding the same fact twice, or a fact and
+ * its turnaround, swaps the later one with a problem OF THE SAME SKILL on another shelf where
+ * neither shelf then holds a pair twice (the skills' order - the interleave's runs - is kept).
+ * Only a page that deals a fact more than once (fill on, a short supply) has any to move.
+ */
+function spreadShelves(queue, k) {
+    const q = queue.slice();
+    const keys = q.map(pairKeyOf);
+    const shelfOf = (i) => Math.floor(i / k);
+    const onShelf = (s, key, except) => keys.some((x, i) => i !== except && shelfOf(i) === s && x === key);
+    for (let guard = 0; guard < q.length * 2; guard++) {
+        const j = keys.findIndex((x, i) => x && keys.some((y, h) => h < i && y === x && shelfOf(h) === shelfOf(i)));
+        if (j < 0) break;
+        let best = -1;
+        for (let d = 1; d < q.length && best < 0; d++) {
+            for (const t of [j + d, j - d]) {
+                if (t < 0 || t >= q.length || shelfOf(t) === shelfOf(j) || q[t].pool !== q[j].pool) continue;
+                if (onShelf(shelfOf(j), keys[t], j) || onShelf(shelfOf(t), keys[j], t)) continue;
+                best = t;
+                break;
+            }
+        }
+        if (best < 0) break;
+        [q[j], q[best]] = [q[best], q[j]];
+        [keys[j], keys[best]] = [keys[best], keys[j]];
+    }
+    return q;
+}
+
+function planMixed(input, pools) {
+    const p = mixedPacking(pools, input);
+    const { ctx, m, cls } = p;
+    const k = cls.k;
+    const labels0 = labelStyleOf(ctx.look, input.labels);
+    // The notes name a skill by its strand ("Time", "Multiplying"), or by its label when two skills share one.
+    const strandOf = (id) => {
+        const it0 = pools[id][0] || {};
+        const cat = String(it0.skill || '').split(':')[0] || (it0.q && it0.q.categoryId) || '';
+        return STRAND_BY_CATEGORY[cat] || '';
+    };
+    const strands = p.ids.map(strandOf);
+    const names = Object.fromEntries(p.ids.map((id, i) => {
+        const name = strands[i] && strands.filter((x) => x === strands[i]).length === 1 ? strands[i] : poolName(input, pools[id]);
+        return [id, { name, noun: `${name.toLowerCase()} problems` }];
+    }));
+    const items = p.ids.flatMap((id) => pools[id].map((it) => ({ key: id, it })));
+    const mix = interleave(items, p.weights, deriveSeed('mixed-practice', input.seed || 0), { labels: names });
+    const queue = spreadShelves(mix.order.map((e) => e.it), k);
+    // A short page (`fill` off, a share that ran out): its shelves keep the full page's height and
+    // the remainder stays plain paper (critic M1 r4: rows stretched to 43 mm floated the facts).
+    const shortPage = queue.length < p.total;
+    const shelves = [];
+    for (let s = 0; s < queue.length; s += k) {
+        const chunk = queue.slice(s, s + k);
+        const own = hAtK(chunk, k, ctx);
+        const h = Number.isFinite(own) && own > 0 ? Math.min(cls.h, own) : cls.h;
+        // H13: the shortest skill's cells on the shelf keep its drawing at least 70 % of the
+        // shelf's height, so the spare height shared in below never opens a 30 % empty band.
+        const short = Math.min(...[...new Set(chunk.map((it) => it.pool))].map((id) => hAtK(chunk.filter((it) => it.pool === id), k, ctx)).filter((x) => Number.isFinite(x) && x > 0), h);
+        shelves.push({ items: chunk, h, room: Math.max(0, short / 0.7 - h) });
+    }
+    const n = queue.length;
+    // CL-13: quiet letters never double (aa.). An I Can mixed page of more than 26 problems numbers
+    // every problem with the standard black tab instead (CL-21 "every fact numbered"; critic M1 r2).
+    const labels = labels0 === 'letter' && n > 26 ? 'tab' : labels0;
+    // CL-31 (critic M1 r3 D6): the tab follows the EFFECTIVE digit size - on an all-fact page the
+    // ladder's for k (20 pt at 7 across: a 5 mm tab with a 10 pt numeral), not the preset's.
+    const pick = cls.pick || null;
+    const tabStep = pick ? factTab(FACT_LADDER[k]) : 0;
+    const tabCls = tabStep && tabStep !== factTab(SIZES[ctx.size].digitPt) ? `ws-tab${tabStep}` : '';
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: n });
+    const instr = instructionText('default-solve');
+    const pages = [];
+    let cur = null;
+    let start = 1;
+    const used = shortPage ? m.strip + p.shelves * cls.h : m.strip + shelves.reduce((a, sh) => a + sh.h, 0);
+    // (1.5 mm kept back: shares that sum to the whole budget must not spill a shelf on rounding)
+    const spare = Math.max(0, m.budget - used - 1.5);
+    // (critic M1 r2: the whole spare is shared, within 12 mm a shelf and the H13 room of its shortest skill)
+    const grow = (sh) => (shelves.length ? Math.max(0, Math.min(12, sh.room, spare / (shortPage ? p.shelves : shelves.length))) : 0);
+    for (const sh of shelves) {
+        const budget = pages.length > 1 ? bandMetrics(ctx, layoutHeader(frame.header), { cont: true }).budget : m.budget;
+        const h = sh.h + grow(sh);
+        if (!cur || cur.used + h > budget) {
+            // PG-22: a page the mix continues on repeats the band's instruction.
+            cur = { sections: [], used: m.strip };
+            if (pages.length === 0 && input.stepStrip) cur.sections.push({ kind: 'html', html: input.stepStrip });
+            cur.band = { kind: 'band', label: '', instr, contents: [] };
+            cur.sections.push(cur.band);
+            pages.push(cur);
+        }
+        const cells = sh.items.map((it) => planItem(pick ? atColumns(it, k) : it, { cols: k }));
+        // A last shelf of fewer than k problems keeps the full grid (PG-15 / PT-ENG-7, owner
+        // 2026-10-23): the frame stays a closed rectangle at the full width, and the places it does
+        // not use are ONE unruled blank area inside it (grid.js blankRun) - no cell borders, no
+        // labels, never an empty box - at the full shelf height.
+        cur.band.contents.push(gridPart(cells, { cols: k, rows: 1, cellH: h, labels, start, cls: tabCls }));
+        start += sh.items.length;
+        cur.used += h;
+    }
+    const achieved = {};
+    for (const it of queue) achieved[it.pool] = (achieved[it.pool] || 0) + 1;
+    // (a page short of its places: the counts follow the supply, not the weights - no weights note)
+    const weightNote = (t) => /on a \d+-problem page gives/.test(t);
+    const notes = [...new Set([...p.deal.notes, ...mix.notes].filter((t) => !(shortPage && weightNote(t))).concat(pick && pick.note ? [pick.note] : []))];
+    return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
+        defaultLook: DEFAULT_LOOK,
+        meta: {
+            items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'mixed', notes,
+            // (the across pick of an all-fact page: digits, fill, tracks - the mixed-page check reads it)
+            factPick: pick ? { k, digitPt: FACT_LADDER[k], fill: Math.round(pick.fill * 1000) / 1000, tracks: pick.tracks, tabStep, ladder: pick.ladder } : null,
+            interleave: { keys: mix.order.map((e) => e.key), counts: mix.counts, cap: mix.cap, maxRun: mix.maxRun, longest: mix.longest, firstThird: mix.firstThird, relaxed: mix.relaxed, notes: mix.notes, deal: p.deal.counts },
+            fits: [{ cols: k, rows: shelves.length, line: `Fits: ${shelves.length} shelves of ${k} on a ${p.N}-unit lattice, ${n} problems mixed, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }],
+        },
+    });
+}
+
 export function counts(pools, input) {
+    if (input.arrangement === 'mixed') return Object.assign({}, mixedPacking(pools, input).deal.counts);
     const p = packing(pools, input);
     const out = {};
     for (const id of p.ids) out[id] = p.shelf[id].n * p.shelf[id].per;
@@ -161,6 +597,7 @@ export function counts(pools, input) {
 export function plan(input = {}) {
     const poolIds = [...new Set((input.items || []).map((it) => it.pool))];
     const pools = Object.fromEntries(poolIds.map((id) => [id, poolItems(input, id)]));
+    if (input.arrangement === 'mixed') return planMixed(input, pools);
     const p = packing(pools, input);
     const { ctx, m } = p;
     const labels = labelStyleOf(ctx.look, input.labels);
@@ -222,7 +659,11 @@ export function plan(input = {}) {
             bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
         }
         const first = sh.items.find((it) => !it.anchor);
-        const skill = (input.skills || []).find((s) => first && first.q && s.skillId === first.q.skillId) || {};
+        // A preset skill's items carry the host's id in q.skillId and the preset's in q.presetId
+        // (generate-question.js): the band is the skill the teacher chose (pilot D8).
+        const fq = (first && first.q) || null;
+        const skill = (fq && ((input.skills || []).find((s) => s.skillId === (fq.presetId || fq.skillId) && (!fq.categoryId || s.categoryId === fq.categoryId))
+            || (input.skills || []).find((s) => s.skillId === fq.skillId))) || {};
         // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
         const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
@@ -255,9 +696,9 @@ export function plan(input = {}) {
     for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
-        meta: { items: n, scoreOutOf: n, units: p.N, achieved,
+        meta: { items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'sections',
             fits: [{ cols: p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }
 
-export default { ROLE_ID, DEFAULT_LOOK, sources, measureCols, counts, plan };
+export default { ROLE_ID, DEFAULT_LOOK, sources, measureCols, counts, plan, mixedClass, MIX_H_RATIO, factPick, factFillAt, FACT_FILL };

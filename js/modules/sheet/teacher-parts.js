@@ -49,9 +49,9 @@ export function teacherPage({ tab, title, head = 'lifted', footer = {}, body, cl
         ? `<header class="ws-head dl-full"><div class="ws-rowA">${headerFields({})}${strandTab(lines)}</div>${pageTitle(title)}<div class="ws-headrule"></div></header>`
         : head === 'cont'
         ? `<header class="ws-head dl-cont"><div class="ws-rowA"><div class="ws-spacer"></div>`
-            + `<div class="ws-tabbox dl-tabline"><span>${esc(lines.join(' · '))}</span></div></div><div class="ws-headrule"></div></header>`
+            + `</div><div class="ws-headrule"></div></header>`
         : `<header class="ws-head dl-lift"><div class="ws-rowA">${headerFields({})}${pageTitle(title)}${strandTab(lines)}</div><div class="ws-headrule"></div></header>`;
-    return `<section class="ws-page ws-L ws-ican dl-page dl-${kind} ${cls}" data-ws-look="ican" data-ws-size="L" data-dl-page="${esc(id)}" data-dl-kind="${kind}">`
+    return `<section class="ws-page ws-L ws-ican dl-page dl-${kind} ${cls}" data-ws-look="ican" data-ws-size="L" data-dl-page="${esc(id)}" data-dl-kind="${kind}"${lines.length ? ` data-ws-tab="${esc(lines.join('|'))}"` : ''}>`
         + `${header}<main class="ws-body dl-body">${body}</main>${pageFooter(footer)}</section>`;
 }
 

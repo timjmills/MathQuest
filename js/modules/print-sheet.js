@@ -30,20 +30,20 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS } from './sheet/layout.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
-import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords } from './sheet/index.js';
+import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf } from './sheet/index.js';
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
@@ -75,6 +75,30 @@ const SHEET_STYLESHEETS = Object.freeze([
 /* ================================================================ request normalising */
 
 const clampInt = (v, lo, hi, d) => { const n = Math.floor(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
+
+/** 'mixed' | 'sections' | 'per-page' from a request's `arrangement` ('' when none was asked). */
+export function normaliseArrangement(v) {
+    const t = String(v === undefined || v === null ? '' : v).toLowerCase().replace(/[^a-z]/g, '');
+    if (t === 'mixed' || t === 'shuffled' || t === 'mix') return 'mixed';
+    if (t === 'sections' || t === 'section' || t === 'grouped') return 'sections';
+    if (t === 'perpage' || t === 'single' || t === 'singleskill') return 'per-page';
+    return '';
+}
+
+/**
+ * A Mixed practice page's `fill` (owner ruling 2026-10-23, "fill the page or not"): true (the
+ * default) fills a share the unique facts cannot fill with turnarounds, then repeats; false prints
+ * unique facts only and lets the page end early.
+ */
+export function normaliseFill(v) {
+    if (v === false || v === 0) return false;
+    return !/^(off|false|no|0|unique)$/i.test(String(v === undefined || v === null ? '' : v).trim());
+}
+
+/** A Mixed practice page's `families`: 'allow' lets related facts share a page (8 x 10 / 80 / 10); else 'off'. */
+export function normaliseFamilies(v) {
+    return v === true || /^(allow|on|true|yes|1)$/i.test(String(v === undefined || v === null ? '' : v).trim()) ? 'allow' : 'off';
+}
 
 function normaliseRequest(req = {}) {
     const asked = ROLE_ALIASES[req.role] || req.role;
@@ -125,8 +149,30 @@ function normaliseRequest(req = {}) {
             sec.count = rowCount; sec.pages = 1; sec.columns = 1; onePage = true;
         }
     }
+    // IMPROVEMENT_PLAN 3.3 (Q-M1, owner 2026-10-23): how a sheet of several skills is arranged -
+    // 'mixed' (Mixed practice: the skills interleaved on the page), 'sections' (one section per
+    // skill, the engine's GROUPED) or 'per-page' (Single skill with several skills: each skill on
+    // its own pages). The default is 'mixed' on a Mixed practice page of 2+ skills, EXCEPT practice
+    // printed from a lesson (`leadHalf`, the lesson packet's and the detailed lesson's Mixed page:
+    // the lesson's skills are new), which stays 'sections'; every other page keeps 'sections'
+    // (Independent and More practice already print a section per skill). In M1 only the Mixed
+    // practice role reads it; a Mixed practice page asked for examples (anchors 'sections' /
+    // 'side') prints in sections until the examples modes for mixed pages come (M4), and 'on'
+    // means none there (anchors.js).
+    const skillKeys = new Set(sections.flatMap((sec) => sec.skills.map((k) => `${k.categoryId}:${k.skillId}`)));
+    const arrAsked = normaliseArrangement(req.arrangement);
+    let arrangement = arrAsked || (role === 'mixed-practice' && skillKeys.size >= 2 && !req.leadHalf ? 'mixed' : 'sections');
+    const anchors = ANCHOR_ROLES.includes(role) ? normaliseAnchors(req.anchors, { role, arrangement }) : 'off';
+    const arrangementNotes = [];
+    if (arrangement === 'mixed' && role === 'mixed-practice' && anchors !== 'off') {
+        arrangement = 'sections';
+        arrangementNotes.push('Mixed practice with examples prints in sections for now.');
+    }
     return {
-        role, size: onePage ? 'S' : size, look, paper, seed, sections,
+        role, size: onePage ? 'S' : size, look, paper, seed, sections, arrangement, arrangementNotes,
+        // Mixed practice (owner ruling 2026-10-23): fill the page (default) or stop when the
+        // unique facts run out; related facts only when allowed (off by default).
+        fill: normaliseFill(req.fill), families: normaliseFamilies(req.families),
         form: req.role === 'test-b' || String(req.form || 'A').toUpperCase() === 'B' ? 'B' : 'A',
         key: req.key !== false,
         header: Object.assign({}, req.header || {}),
@@ -136,7 +182,7 @@ function normaliseRequest(req = {}) {
         photocopySafe: !!req.photocopySafe,
         // S6: step-by-step anchor problems - 'off' | 'side' | 'sections' (only the practice roles
         // and Mixed practice take them; 'on' means the role's default, sections).
-        anchors: ANCHOR_ROLES.includes(role) ? normaliseAnchors(req.anchors) : 'off',
+        anchors,
         // S2: how the supports each skill carries are spread over the sheet. null = each skill's
         // own `cover` / `mix` option (the default: every problem, clashing supports by section).
         coverage: req.coverage ? normCoverage(req.coverage) : null,
@@ -211,6 +257,58 @@ function dealSkills(skills, count) {
  * reprints the same page); a duplicate retries under `baseSeed + i + 7919 * k`. `itemIndex`
  * counts only the items of that skill that were KEPT (generateQuestionFor's contract).
  */
+/**
+ * What one skill's share of a Mixed practice page must not repeat (critic M1 r1 D3): the answer,
+ * and for + and x the fact turned round (3 + 7 after 7 + 3). Keys, never shown.
+ */
+function repeatKeys(q) {
+    if (!q) return [];
+    const keys = [`ans:${typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans)}`];
+    const p = (q.cell && q.cell.payload) || {};
+    const op = opKeyOf(p.op || q.op);
+    const ops = refOperands(q);
+    if ((op === '+' || op === '*') && ops.length === 2) keys.push(`turn:${op}:${ops.slice().sort((a, b) => a - b).join(',')}`);
+    // critic M1 r2: the related facts of - and / (13 - 6 / 13 - 7, 12 / 3 / 12 / 4) in one share
+    const fam = familyKey(q);
+    if (fam && (op === '-' || op === '/')) keys.push(`rel:${fam}`);
+    return keys;
+}
+
+/**
+ * What a Mixed practice PAGE may never print twice (critic M1 r3 D1): the same fact, and for + and
+ * x the same fact turned round (3 + 7 after 7 + 3). Kept page-wide, never relaxed.
+ */
+function exactKeys(q) {
+    if (!q) return [];
+    const p = (q.cell && q.cell.payload) || {};
+    const op = opKeyOf(p.op || q.op);
+    const ops = refOperands(q);
+    if (ops.length !== 2 || !op) return [`text:${String(q.text || '')}`];
+    const keys = [`ex:${op}:${ops.join(',')}`];
+    if (op === '+' || op === '*') keys.push(`turn:${op}:${ops.slice().sort((a, b) => a - b).join(',')}`);
+    return keys;
+}
+
+const opKeyOf = (o) => ({ '+': '+', '-': '-', '\u2212': '-', '*': '*', 'x': '*', '\u00d7': '*', '/': '/', '\u00f7': '/' }[String(o || '')] || String(o || ''));
+
+/**
+ * The fact family of a two-number + - x / item, the same for every fact of the family
+ * (8 x 10, 10 x 8, 80 / 10, 80 / 8 -> "x:8,10"; 6 + 7, 13 - 6, 13 - 7 -> "+:13:6,7"), or '' when
+ * the item is not such a fact. A Mixed practice page holds each family once (critic M1 r2).
+ */
+function familyKey(q) {
+    const p = (q && q.cell && q.cell.payload) || {};
+    const op = opKeyOf(p.op || (q && q.op));
+    const [a, b] = refOperands(q);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return '';
+    const pair = (x, y) => [x, y].sort((m, n) => m - n).join(',');
+    if (op === '+') return `+:${a + b}:${pair(a, b)}`;
+    if (op === '-') return `+:${a}:${pair(b, a - b)}`;
+    if (op === '*') return `x:${pair(a, b)}`;
+    if (op === '/' && b !== 0 && a % b === 0) return `x:${pair(b, a / b)}`;
+    return '';
+}
+
 /** The numeric operands of a generated item (its cell payload's, else its own a / b). */
 function refOperands(q) {
     const p = (q && q.cell && q.cell.payload) || {};
@@ -1613,6 +1711,28 @@ function spanGrades(sk) {
 }
 
 /**
+ * The words a Mixed practice note names a pool by (critic M1 r5): the option the skill's chosen
+ * values deal, not the host label - "Addition Facts, + 2 only", never "Addition Facts (within 20)".
+ * Without a ticked fact set the skill's own label stands.
+ */
+function mixedNoteLabel(sk, label, its) {
+    let set = '';
+    let def = null;
+    try {
+        set = factSetTitle(sk.categoryId, sk.skillId, sk.opts || {});
+        def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'constant') || null;
+    } catch (e) { set = ''; }
+    if (!set) return label;
+    const base = String(label).replace(/\s*\([^)]*\)\s*$/, '');
+    const verb = def ? String(def.titleVerb || def.label || '') : '';
+    const f = (its || []).map((it) => factOf(it.q)).find(Boolean);
+    const sign = f ? ({ '+': '+', '-': '\u2212', '*': '\u00d7', '/': '\u00f7' }[f.op] || f.op) : '';
+    const rest = verb && set.startsWith(verb) && !(def && def.zeroTitle && /,/.test(set)) ? set.slice(verb.length).trim() : '';
+    const what = sign && rest ? `${sign} ${rest}` : `${set.charAt(0).toLowerCase()}${set.slice(1)}`;
+    return `${base}, ${what} only`;
+}
+
+/**
  * The "I Can" title a fact drill's OPTIONS give it (P-31, OPTIONS-CRITIC-R2 §5 #15), or '' to
  * keep the skill's own. A ticked fact set names the page ("I Can add 6"), and a fact band other
  * than the default is said too ("I Can add 6 (facts to 10)", "I Can add facts to 10").
@@ -1701,10 +1821,55 @@ function oneColumnOnly(it, n) {
  * columns, the full-width ones under them, one row each (2026-09-25, AP4: Mixed Time printed three
  * clocks a page in one column because two of its nine skills are full width).
  */
+/**
+ * HEIGHT CLASSES (critic 2026-10-24 D2). A legacy cell's measurement is normally not trusted to size
+ * a row to (layout.js measuredH: its markup reflows), so a pool of legacy problems prints on a
+ * uniform grid sized for its tallest member. A ONE-skill section whose first measured run (the
+ * probe) is all legacy and spreads over 1.6 x in height is a pool of very different drawings
+ * (mixed_coordinates); when its tallest problem also takes over half the grid (so the uniform grid
+ * holds one row a page), its items are marked `hClass`, measuredH reads their measured heights, and
+ * the role pages them by height class. Decided once per section, from its first measure (the probe).
+ */
+const HCLASS_SPREAD = 1.6;
+function heightClassOf(sec, items, gridMm) {
+    if (!sec || !items || !items.length) return;
+    if (sec.heightClass === undefined) {
+        const hOf = (it) => { const m = it && it.measured; if (!m) return 0; const c = Object.keys(m).map(Number).sort((a, b) => a - b)[0]; return (m[c] && m[c].hMm) || 0; };
+        const hs = items.map(hOf);
+        // Local: only a pool whose TALLEST problem takes over half the grid, i.e. the uniform grid
+        // holds one row a page and a short problem would print alone in a page-tall cell.
+        sec.heightClass = (sec.skills || []).length === 1 && items.length >= 2 && hs.every((h) => h > 0)
+            && items.every((it) => it.legacy || it.template === 'legacy') && Math.max(...hs) > HCLASS_SPREAD * Math.min(...hs)
+            && Number(gridMm) > 0 && Math.max(...hs) > Number(gridMm) / 2
+            // ... and only a pool with read-only figures (sheet/adapters.js legacyReadFig): the cells
+            // CL-4b starts at the top, so a page-tall row leaves its whole spare height under them.
+            && items.some((it) => it.q && legacyReadFig(it.q));
+    }
+    if (sec.heightClass) for (const it of items) if (it) it.hClass = true;
+}
+
 function layoutOf(role, section, items, n, ctx) {
     const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
     const opts = { size: n.size, look: n.look, header: ctx.header };
     const whole = resolveSectionLayout(base, items, ctx.paper, LIVE_W_MM, opts);
+    // HEIGHT CLASSES (critic 2026-10-24 D2): a one-skill legacy pool whose problems differ a lot in
+    // height (mixed_coordinates: 95 mm read-only grids beside 217 mm transform choices) is paged by
+    // each problem's OWN measured height (heightClassOf), as the CL-41 split pages full-width
+    // problems apart: a page holds as many of the run as pack onto it, tallest class first
+    // (groupByHeight + packByHeight, the role's own pagination), so a short read-only grid is
+    // never one problem alone in a row sized for the tallest item of the pool.
+    if ((role === 'independent' || role === 'more-practice') && !(n.anchors && n.anchors !== 'off') && !section.gridH
+        && items.length && items.every((it) => it && it.hClass)) {
+        const maxRows = Math.max(1, Math.floor(whole.ceiling / whole.cols), whole.rows);
+        let cap = 0;
+        for (let k = 1; k <= Math.min(items.length, MAX_ITEMS); k++) {
+            const ch = packByHeight(groupByHeight(items.slice(0, k), whole.cols), whole.cols, { gridFirstMm: whole.gridH, gridContMm: whole.gridHCont, maxRows, cellH: whole.cellH, force: true });
+            if (!ch || ch.length > 1) break;
+            cap = k;
+        }
+        if (cap > whole.perPage) return Object.assign({}, whole, { perPage: cap, heightClass: true });
+        return whole;
+    }
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
     const wide = items.filter((it) => oneColumnOnly(it, n));
     const narrow = items.filter((it) => !oneColumnOnly(it, n));
@@ -2059,7 +2224,7 @@ async function buildSheetCore(req = {}) {
 
     const notes = [];
     let hostItems = [];
-    const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) });
+    const measure = (items, sec) => { measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) }); heightClassOf(sec, items, bodyHeightMm(paper, layoutHeader) - instrMm); };
     const PROBE = 16;
 
     /**
@@ -2343,7 +2508,7 @@ async function buildSheetCore(req = {}) {
         fits,
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
-            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
+            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass,
         })),
         gaps: out.gaps,
         numberLine,
@@ -2412,7 +2577,9 @@ export function arrangeKey(res, ko, req = {}) {
         // printout of several sections, the section ("Section 2 · Add within 20").
         const nameOf = (h) => {
             const tabBox = /<div class="ws-tabbox">([\s\S]*?)<\/div>/.exec(h || '');
-            const spans = tabBox ? [...tabBox[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1].trim()).filter(Boolean) : [];
+            const meta = /\sdata-ws-tab="([^"]*)"/.exec(h || '');
+            const spans = tabBox ? [...tabBox[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1].trim()).filter(Boolean)
+                : meta ? meta[1].split('|').map((t) => t.trim()).filter(Boolean) : [];
             const foot = /<footer class="ws-foot"[^>]*>[\s\S]*?<b>([^<]*)<\/b>/.exec(h || '');
             const nn = foot && /^(\d+)\/(\d+)$/.exec(foot[1].trim());
             const name = spans.length ? spans[spans.length - 1] : '';
@@ -2617,7 +2784,28 @@ async function buildRoleSheet(n, metaOf) {
         // The detailed lesson's Prerequisite Check: items per question (absent otherwise).
         perQuestion: n.perQuestion || undefined,
         growLast: !!n.growLast || undefined,
+        // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
+        arrangement: 'sections',
     };
+    // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
+    // line is "Solve.", so a cell's "Add." / "Write the time." is not said twice.
+    let keepPrompts = false;
+    let mixDigits = 0;
+    let mixedCheck = null;
+    let mixedRepeats = null;
+    let mixedTracks = null;
+    const dealNotes = [];
+    /** The digit tracks a mixed page's facts print at: the widest number dealt (critic M1 r3 D4). */
+    const widestTracks = (its) => Math.max(0, ...its.map((it) => {
+        const c = it.q && it.q.cell;
+        if (!c || c.template !== 'fact' || !c.payload) return 0;
+        const p = c.payload;
+        const ans = p.ans !== undefined ? p.ans : it.q.ans;
+        return Math.max(2, String(p.a ?? '').length, String(p.b ?? '').length, String(ans ?? '').length);
+    }));
+    /** The across count the role picks for these (probe) items, or 0 (roles/mixed-practice.js). */
+    const mixedPickK = (pp) => { const c = typeof mod.mixedClass === 'function' ? mod.mixedClass(pp, input) : null; return c && c.ok && c.pick ? c.pick.k : 0; };
+    const arrangementNotes = (n.arrangementNotes || []).slice();
 
     /**
      * `want` usable items for one pool. A pool of one skill is deterministic item by item (seed
@@ -2627,47 +2815,156 @@ async function buildRoleSheet(n, metaOf) {
      * its value on an answer line under the cell.
      */
     const flagsFor = (count) => (typeof mod.wrongFlags === 'function' ? mod.wrongFlags(count, n.seed) : []);
-    const dealPool = (pool, pi, want, seen0 = null) => {
+    const dealPool = (pool, pi, want, seen0 = null, pageFam = null) => {
         const base = (n.seed + pi * 100003) >>> 0;
         const st = { seen: new Set(seen0 || []), kept: new Map() };
         const flags = flagsFor(want);
         const out = [];
         let next = 0;
-        for (let pass = 0; pass < 4 && out.length < want; pass++) {
+        // A Mixed practice page (critic M1 r1 D3 / r3 D1, L10; owner ruling 2026-10-23 "fill the
+        // page or not") deals on a LADDER of rungs, five passes a rung (ten on the last):
+        //   unique    no fact twice, no turnaround, no fact family twice (8 x 10 / 80 / 10, 6 + 7 /
+        //             13 - 6, 13 - 6 / 13 - 7), no answer twice in the share
+        //   answers   an answer may come again
+        //   related   (`families: 'allow'` only) a fact of a family already on the page
+        //   turn      (`fill` on, the default) the turnaround of a fact on the page (4 + 1 -> 1 + 4)
+        //   repeat    (`fill` on) the same fact again - only once turnarounds have run out too
+        // With `fill` off a share the unique facts cannot fill prints short (`out.short`), and the
+        // host notes it. Related facts are never used to fill unless `families` allows them. Each
+        // item records its rung (`out.counts`). Grouped pages keep their four passes and no rule.
+        const noRepeat = keepPrompts;
+        const shareSeen = new Set();
+        const pageSeen = pageFam || new Set();
+        const famSeen = pageFam || new Set();
+        const rungs = ['unique', 'answers', ...(n.families === 'allow' ? ['related'] : []), ...(n.fill !== false ? ['turn', 'repeat'] : [])];
+        // (the generator deals up to the turnaround rung; a repeat is never taken from it - a
+        // random batch repeats whatever it happens to draw, critic M1 r4: "2 + 4" three times while
+        // other facts came once. Repeats come only from the even cycle below.)
+        const genRungs = rungs.filter((r) => r !== 'repeat');
+        const passes = noRepeat ? genRungs.length * 5 + 5 : 4;
+        const rungAt = (pass) => Math.min(genRungs.length - 1, Math.floor(pass / 5));
+        const R = (name) => { const i = rungs.indexOf(name); return i < 0 ? Infinity : i; };
+        const counts = { unique: 0, related: 0, turn: 0, repeat: 0 };
+        /** Offer one generated item to the share at a rung (`cap`): true when it is taken. */
+        const offer = (g0, pass, cap, cycled = false) => {
+            // A Mixed practice page of fact cells (critic M1 r1 D2): every fact on the page takes
+            // the page's widest answer zone, so the rules and the ones columns line up across a shelf.
+            // (A + fact keeps its fact drawing: a 3-track + band would otherwise draw the carry stack.)
+            // (critic M1 r3 D4: the page's count, up OR down - a band's 3-track answer zone on a
+            // page whose numbers are all 1- and 2-digit prints 2 tracks)
+            const pl = mixDigits && g0.q && g0.q.cell && g0.q.cell.template === 'fact' && g0.q.cell.payload;
+            const g = pl && Number(pl.digits) !== mixDigits
+                ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
+                : g0;
+            const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
+            if (keepPrompts) it.stripPrompt = false;
+            // Error analysis never falls back to an "Answer:" line under the cell: the shown work
+            // must sit in the cell's own slot, or the pupil sees two answer places (C1).
+            if (needsShow && (pass < 3 || strictShow) && !it.canShow()) return false;
+            const rk = noRepeat ? repeatKeys(g.q) : null;
+            const xk = noRepeat ? exactKeys(g.q) : null;
+            const rung = cap;
+            const fk = noRepeat ? familyKey(g.q) : '';
+            let kind = 'unique';
+            if (noRepeat) {
+                // what the candidate would be on this page: a repeat, a turnaround, a related fact
+                const isExact = !!xk.length && pageSeen.has(xk[0]);
+                const isTurn = !isExact && xk.slice(1).some((x) => pageSeen.has(x));
+                const isRel = !isExact && !isTurn && ((fk && famSeen.has(fk)) || rk.some((x) => x.startsWith('rel:') && shareSeen.has(x)));
+                kind = isExact ? 'repeat' : isTurn ? 'turn' : isRel ? 'related' : 'unique';
+                if (kind !== 'unique' && rung < R(kind)) return false;
+                if (kind === 'repeat' && !cycled) return false;
+                if (kind === 'unique' && rung < R('answers') && rk.some((x) => x.startsWith('ans:') && shareSeen.has(x))) return false;
+            }
+            const k = out.length;
+            const prepared = typeof mod.prepare === 'function'
+                ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
+                : it;
+            if (!prepared) return false;
+            prepared.pool = pool.id;
+            // A role that draws Model / Guided cells measures them at their tallest level.
+            if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
+            // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
+            // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
+            if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
+                prepared.wrapToCell = true;
+                // a wrapped count row redraws its arrows to the narrower pitch and takes more lines on purpose (digits keep their size)
+                if (prepared.template === 'count-row') { prepared.scalesWithCols = true; prepared.colsLayout = true; }
+            }
+            // critic r2 N4: a role whose cells are sized to their content (the Opener) drops the one-page sheet's air round a row
+            if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
+            prepared.section = 0;
+            if (rk) for (const x of rk) shareSeen.add(x);
+            if (xk) for (const x of xk) { shareSeen.add(x); pageSeen.add(x); }
+            if (fk) famSeen.add(fk);
+            if (noRepeat) { counts[kind]++; prepared.dealtAs = kind; }
+            if (noRepeat) prepared.dealtG = g;
+            out.push(prepared);
+            return true;
+        };
+        /**
+         * The turnaround of a + or x item (4 + 1 -> 1 + 4): the same question with its two numbers
+         * swapped, for a share whose generator does not deal turnarounds itself (the owner's fill
+         * ruling: turnarounds before any repeat). null for any other item.
+         */
+        const turnedOf = (g) => {
+            const q = g && g.q;
+            const c = q && q.cell;
+            const pl = c && c.template === 'fact' && c.payload;
+            if (!pl || !['+', '*', 'x', '\u00d7'].includes(String(pl.op)) || String(pl.a) === String(pl.b)) return null;
+            const re = new RegExp(`\\b${pl.a}(\\s*[+\u00d7x*]\\s*)${pl.b}\\b`);
+            const swap = (t) => (typeof t === 'string' ? t.replace(re, `${pl.b}$1${pl.a}`) : t);
+            const q2 = Object.assign({}, q, { text: swap(q.text), cell: Object.assign({}, c, { payload: Object.assign({}, pl, { a: pl.b, b: pl.a }) }) },
+                q.a !== undefined && q.b !== undefined ? { a: q.b, b: q.a } : {});
+            return Object.assign({}, g, { q: q2 });
+        };
+        for (let pass = 0; pass < passes && out.length < want; pass++) {
             const need = want - out.length;
-            const batch = pass === 0 ? need : need * 2 + 2;
+            const batch = pass === 0 ? need : noRepeat ? need * 3 + 6 : need * 2 + 2;
             const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
             next += batch;
-            for (const g of gen) {
+            // (a mixed page sweeps the batch once a rung, up to this pass's rung: unique facts first,
+            // then - only for places still open - what the next rung allows)
+            const caps = noRepeat ? Array.from({ length: rungAt(pass) + 1 }, (_, i) => i) : [0];
+            const taken = new Set();
+            for (const cap of caps) for (const [gi, g0] of gen.entries()) {
+                if (taken.has(gi)) continue;
                 if (out.length >= want) break;
-                const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
-                // Error analysis never falls back to an "Answer:" line under the cell: the shown work
-                // must sit in the cell's own slot, or the pupil sees two answer places (C1).
-                if (needsShow && (pass < 3 || strictShow) && !it.canShow()) continue;
-                const k = out.length;
-                const prepared = typeof mod.prepare === 'function'
-                    ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
-                    : it;
-                if (!prepared) continue;
-                prepared.pool = pool.id;
-                // A role that draws Model / Guided cells measures them at their tallest level.
-                if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
-                // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
-                // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
-                if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
-                    prepared.wrapToCell = true;
-                    // a wrapped count row redraws its arrows to the narrower pitch and takes more lines on purpose (digits keep their size)
-                    if (prepared.template === 'count-row') { prepared.scalesWithCols = true; prepared.colsLayout = true; }
-                }
-                // critic r2 N4: a role whose cells are sized to their content (the Opener) drops the one-page sheet's air round a row
-                if (mod.TIGHT_ROWS && prepared.template === 'count-row') prepared.tightRows = true;
-                prepared.section = 0;
-                out.push(prepared);
+                if (offer(g0, pass, cap)) taken.add(gi);
             }
         }
+        if (noRepeat && n.fill !== false && out.length < want && out.length) {
+            // (fill on: the share's own facts turned round, for a generator that deals none itself)
+            for (const it0 of out.slice()) {
+                if (out.length >= want) break;
+                const t = turnedOf(it0.dealtG);
+                if (t) offer(t, passes, R('turn'));
+            }
+            // (then the EVEN CYCLE: each fact - a fact and its turnaround counted as one - comes once
+            // more, in the order the facts first came, before any fact comes a third time)
+            const pairs = [];
+            const byKey = new Map();
+            for (const it0 of out) {
+                const f = factOf(it0.dealtG && it0.dealtG.q);
+                const key = f ? `${f.op}:${f.op === '+' || f.op === '*' ? [f.a, f.b].sort((x, y) => x - y).join(',') : `${f.a},${f.b}`}` : `t:${it0.q && it0.q.text}`;
+                if (!byKey.has(key)) { const e = { members: [], count: 0 }; byKey.set(key, e); pairs.push(e); }
+                const e = byKey.get(key);
+                e.members.push(it0.dealtG);
+                e.count++;
+            }
+            for (let guard = 0; out.length < want && pairs.length && guard < want * 4; guard++) {
+                const low = pairs.reduce((m, e) => (e.count < m.count ? e : m), pairs[0]);
+                offer(low.members[low.count % low.members.length], passes, R('repeat'), true);
+                low.count++;
+            }
+        }
+        if (noRepeat) { out.counts = counts; out.short = Math.max(0, want - out.length); }
         return out;
     };
     const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
+    // A mixed page of 1 x 1 fact cells may run the whole lattice across (8 Daily / 10 I Can at S,
+    // the TY-30 fact ladder; critic M1 r1 D1), so its cells are measured at 8 and 10 too.
+    const measureMixed = (items) => measureItems(items, { size: n.size, look: n.look, colsList: [...new Set([...colsList, 7, 8, 9, 10])] });
 
     // 1. The probe: enough items to measure the skill (PT-ENG-9), per pool.
     const PROBE = mod.PROBE || { 'scripted-model': 1, stretch: 2, 'word-problems': 4, 'reason-it': 4, 'fact-probe': 20 }[n.role] || 8;
@@ -2677,6 +2974,33 @@ async function buildRoleSheet(n, metaOf) {
         measure(probe[p.id]);
         input.floors[p.id] = floorOf(probe[p.id]);
     });
+
+    // IMPROVEMENT_PLAN 3.3, M1: Mixed practice interleaves the skills when they share one size
+    // class (roles/mixed-practice.js `mixedClass`); the probe is dealt again with each cell's own
+    // instruction kept and measured, and checked again. Otherwise the page prints in sections and
+    // the notes say why.
+    if (n.role === 'mixed-practice' && n.arrangement === 'mixed' && pools.length >= 2 && typeof mod.mixedClass === 'function') {
+        const first = mod.mixedClass(probe, input);
+        let last = first;
+        let ok = first.ok;
+        let why = first.why;
+        if (ok) {
+            keepPrompts = true;
+            mixDigits = widestTracks(pools.flatMap((p) => probe[p.id]));
+            const kept = {};
+            pools.forEach((p, pi) => { kept[p.id] = dealPool(p, pi, PROBE); measureMixed(kept[p.id]); });
+            const again = mod.mixedClass(kept, input);
+            ok = again.ok;
+            why = again.why;
+            last = again;
+            if (ok) {
+                for (const p of pools) { probe[p.id] = kept[p.id]; input.floors[p.id] = floorOf(kept[p.id]); }
+            } else { keepPrompts = false; mixDigits = 0; }
+        }
+        if (ok) input.arrangement = 'mixed';
+        else if (why) arrangementNotes.push(why);
+        mixedCheck = { ok, per: (last.per || []).map((x) => ({ id: x.id, name: x.name, k: x.k, h: Math.round(x.h * 10) / 10, own: x.own })) };
+    }
 
     // S6: Mixed practice's worked examples, one skill per pool, generated and measured before the
     // shelves are packed (sections: one anchor band per skill; side: a twin per problem).
@@ -2702,7 +3026,7 @@ async function buildRoleSheet(n, metaOf) {
     }
 
     // 2. How many items the page needs, from the measured probe.
-    const want = mod.counts(probe, input) || {};
+    let want = mod.counts(probe, input) || {};
 
     // 3. The final items: the probe again when it already holds them (same seeds, same items),
     //    else a fresh deal for the final count (the role's wrong/right pattern depends on it).
@@ -2722,7 +3046,96 @@ async function buildRoleSheet(n, metaOf) {
     // `avoidKeys`; lesson 2 r4, critic r2 D2: no answer twice, no near twins, no story name or unit
     // word twice on the page. Each later skill is dealt against the items already placed.)
     const pageLr6 = n.role === 'mixed-practice' && pools.some((p) => p.skills.some((s) => s.lr6)) ? new Set() : null;
-    pools.forEach((p, pi) => {
+    // A Mixed practice page (critic M1 r2) is dealt pool after pool against the fact families
+    // already on the page, and its answer zones follow the widest fact DEALT: should a dealt item
+    // be wider than the probe's, the page is dealt again at that width (seeded, so the same items).
+    const dealMixed = () => {
+        const fam = new Set();
+        let out = [];
+        pools.forEach((p, pi) => {
+            const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
+            const its = dealPool(p, pi, w, null, fam);
+            measureMixed(its);
+            out = out.concat(its);
+        });
+        return out;
+    };
+    if (input.arrangement === 'mixed') {
+        // critic M1 r3 D4: the track count follows the DEALT numbers. When the dealt page is wider
+        // or narrower than the probe's count, the probe is dealt and measured again at the dealt
+        // count, the across count and the counts re-picked, and the page dealt again (seeded, so
+        // deterministic). At most two re-picks; should the last deal still differ, the page keeps
+        // the wider count (an empty track, never a number wider than its tracks).
+        const repick = (tracks) => {
+            mixDigits = tracks;
+            pools.forEach((p, pi) => { probe[p.id] = dealPool(p, pi, PROBE); measureMixed(probe[p.id]); input.floors[p.id] = floorOf(probe[p.id]); });
+            // (the k first: the counts are the shelves of THAT k)
+            input.mixK = mixedPickK(probe);
+            want = mod.counts(probe, input) || {};
+        };
+        input.mixK = mixedPickK(probe);
+        items = dealMixed();
+        const tracksTried = [mixDigits];
+        for (let round = 0; round < 3; round++) {
+            const w = widestTracks(items);
+            if (!w || w === mixDigits) break;
+            if (round === 2 && w < mixDigits) break;
+            repick(w);
+            tracksTried.push(w);
+            items = dealMixed();
+        }
+        // (no fixpoint - more places at the narrower count deal a 3-digit fact, fewer at the wider
+        // one do not: the page keeps the wider count's k and counts, and its facts print at the
+        // tracks they need - the same items, a narrower drawing in the same boxes)
+        const wEnd = widestTracks(items);
+        if (wEnd && wEnd < mixDigits) { mixDigits = wEnd; tracksTried.push(wEnd); items = dealMixed(); }
+        mixedTracks = { tried: tracksTried, final: mixDigits, k: input.mixK };
+        // The page's machine check (critic M1 r3 D1, sheet/interleave.js pageRepeats; owner ruling
+        // 2026-10-23): what the page's options do not allow - a repeat or a turnaround with `fill`
+        // off, a related fact without `families: 'allow'` - never prints. The deal already keeps
+        // to them; should one slip through, it is dropped and the notes say so.
+        const fillOn = n.fill !== false;
+        const famOn = n.families === 'allow';
+        const rep0 = pageRepeats(items);
+        const drop = new Set([...(fillOn ? [] : [...rep0.exact, ...rep0.turnarounds]), ...(famOn ? [] : rep0.families)].map((x) => x.j));
+        if (drop.size) {
+            items = items.filter((_, i) => !drop.has(i));
+            dealNotes.push(`Mixed practice: ${drop.size} fact${drop.size > 1 ? 's' : ''} the page's settings do not allow ${drop.size > 1 ? 'were' : 'was'} left off.`);
+        }
+        const rep = pageRepeats(items);
+        const total = items.length;
+        const per = pools.map((p) => {
+            const its = items.filter((it) => it.pool === p.id);
+            const c = { unique: 0, related: 0, turn: 0, repeat: 0 };
+            for (const it of its) c[it.dealtAs || 'unique']++;
+            return { p, its, c, w: Math.floor(Number(want[p.id]) || 0), label: mixedNoteLabel(p.skills[0], metaOf(p.skills[0]).label, its) };
+        });
+        for (const x of per) {
+            const uniq = x.c.unique + x.c.related;
+            if (x.its.length < x.w) {
+                dealNotes.push(fillOn
+                    ? `Mixed practice: ${x.label} could not fill its ${x.w} places, so the page has ${total} problems.`
+                    : `Mixed practice: ${x.label}, has only ${uniq} different facts, so the page has ${total} problems.`);
+            }
+            if (x.c.turn || x.c.repeat) {
+                // (the example is the pool's own: a turnaround it dealt, in its own sign)
+                const tItem = x.its.find((it) => it.dealtAs === 'turn');
+                const tf = tItem ? factOf(tItem.q) : null;
+                const sign = tf ? ({ '+': '+', '*': '\u00d7' }[tf.op] || tf.op) : '';
+                const eg = tf ? ` (${tf.b} ${sign} ${tf.a} and ${tf.a} ${sign} ${tf.b})` : '';
+                const parts = [x.c.turn ? `${x.c.turn} turnaround${x.c.turn > 1 ? 's' : ''}${eg}` : '', x.c.repeat ? `${x.c.repeat} repeated fact${x.c.repeat > 1 ? 's' : ''}` : ''].filter(Boolean);
+                // (literally true when a double, 2 + 2, is its own turnaround: critic M1 r5)
+                const tail = x.c.repeat ? ', kept even: no fact (with its turnaround) comes back twice before every fact has come back once' : '';
+                dealNotes.push(`Mixed practice: ${x.label}, has only ${uniq} different facts, so the page is filled with ${parts.join(' and ')}${tail}.`);
+            }
+        }
+        if (rep.families.length) dealNotes.push(`Mixed practice: ${rep.families.length} related fact${rep.families.length > 1 ? 's' : ''} (such as 6 + 7 and 13 \u2212 6) on the page, as the settings allow.`);
+        mixedRepeats = {
+            fill: fillOn, families: famOn ? 'allow' : 'off',
+            exact: rep.exact.length, turnarounds: rep.turnarounds.length, related: rep.families.length,
+            pools: per.map((x) => Object.assign({ id: x.p.id, want: x.w, got: x.its.length }, x.c)),
+        };
+    } else pools.forEach((p, pi) => {
         const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
         let its = w <= probe[p.id].length && !mod.wrongFlags && !(pageLr6 && pi > 0) ? coverSlice(p, probe[p.id], w) : null;
         if (!its) { its = dealPool(p, pi, w, pageLr6 && pi > 0 ? pageLr6 : null); measure(its); }
@@ -2769,7 +3182,7 @@ async function buildRoleSheet(n, metaOf) {
     const out = renderPlan(plan, { key: n.key });
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
-    const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes];
+    const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t)), ...dealNotes];
     if (numberLine && numberLine.warn) notes.push(numberLine.warn);
     // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
     // are raised to L; the fit line says so instead of the page's own digit size alone.
@@ -2785,7 +3198,7 @@ async function buildRoleSheet(n, metaOf) {
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,
-            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy,
+            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, dealtAs: it.dealtAs, measured: it.measured, measureWhy: it.measureWhy,
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,
@@ -2795,6 +3208,14 @@ async function buildRoleSheet(n, metaOf) {
         role: n.role,
         title: plan.meta && plan.meta.title,
         notes,
+        // IMPROVEMENT_PLAN 3.3: how the skills were arranged ('mixed' | 'sections'), and the mixed order's record.
+        arrangement: (plan.meta && plan.meta.arrangement) || n.arrangement,
+        interleave: (plan.meta && plan.meta.interleave) || null,
+        mixedCheck,
+        // (a mixed page's own repeat check, sheet/interleave.js pageRepeats: exact / turnarounds always 0)
+        mixedRepeats,
+        // (the digit tracks the deal tried and kept, and the host's k - critic M1 r3 D4)
+        mixedTracks,
         plan,
         extras: input.extras || [],
     };
@@ -2979,6 +3400,8 @@ async function buildLesson(n, metaOf) {
             // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
             // partners' together), the earlier skills the rest.
             role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican',
+            // (practice printed from a lesson stays in sections - Q-M1: the lesson's skills are new)
+            arrangement: 'sections',
             // Lessons r3: never a problem the Practice page printed; the lesson skill at least
             // half the placed items (`leadHalf`, enforced after packing).
             sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }, packNums ? { avoidKeys: packNums.slice(), edgeLast: undefined } : {}), ...withSkills] }], latticeN: n.mixedLattice || 6, leadHalf: true, leadDrop: !!(packNums && n.mixedLeadDrop), growLast: !!packNums,
@@ -3568,13 +3991,13 @@ async function buildDetailedLesson(req = {}) {
         // Each question's items by the LETTERS P0 prints (critic D10): {pre.i.letters} 'a–d',
         // {pre.i.list} 'a. 61 · b. 80 ...'; {p0.list} every item. Read from the P0 plan, never typed.
         pre: d.prerequisites.map((p, i) => {
-            const mine = p0Cells.map((c, j) => Object.assign({ letter: 'abcdefghijklmnop'[j] }, c)).filter((c) => c.grid === i);
+            const mine = p0Cells.map((c, j) => Object.assign({ letter: String(j + 1) }, c)   /* CL-11a: number tabs, never letters */).filter((c) => c.grid === i);
             const c = mine[0] || p0Cells[i];
             const v = c ? dlItemVars(c.q, d) : { ans: '' };
             const L = mine.map((x) => x.letter);
             return Object.assign(v, { letters: L.length > 1 ? `${L[0]}–${L[L.length - 1]}` : (L[0] || ''), list: mine.map((x) => `${x.letter}. ${dlAns(x.q)}`).join(' · ') });
         }),
-        p0: { list: p0Cells.map((c, j) => `${'abcdefghijklmnop'[j]}. ${dlAns(c.q)}`).join(' · ') },
+        p0: { list: p0Cells.map((c, j) => `${j + 1}. ${dlAns(c.q)}`).join(' · ') },
         ns: { A: nsBands[0].its.map((it) => dlItemVars(it.q, d)), B: nsBands[1].its.map((it) => dlItemVars(it.q, d)) },
         // ({panel.second} / {panel.third} - lesson 5 r4, critic r2 D8: the printed panel numbers of the chart's other examples,
         // after its step panels, so a script never names an example by its order)

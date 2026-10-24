@@ -1,0 +1,46 @@
+# Known family ids for "Owner go: <family>, <YYYY-MM-DD>" lines (tests/scripts/ws-status-index.mjs, IMPROVEMENT_PLAN §1.6.3 step 6).
+# A go line's family is valid when it is a SKILLS category (js/modules/data.js), a spec-card id (design/cards/<id>/),
+# or a line of this file. This file holds the TEMPLATE-FAMILY ids the plan also goes live by (one lane per template
+# family, §1.6.6): the sheet-kit template ids (js/modules/sheet listCells(), 2026-10-23, without `legacy`). One id per line; '#' starts
+# a comment. Add an id here only when the owner gives a go by a family that is neither a category nor a card.
+add-three
+area-model
+arrays
+arrays-turn
+bar-graph
+base10
+bond
+chartwindow
+clock
+cloze-bank
+coins
+compare
+count-row
+counters
+division
+equation
+fact
+fact-family
+frac-model
+function-table
+hop-line
+money-columns
+mult-chart
+mult-grid
+nl-place
+number-line
+perimeter-shape
+pictograph
+pv
+rcdws
+remainder
+ruler
+seqstrip
+stack
+tally-chart
+tenframe
+thermometer
+timeline
+word-work
+wordpic
+words

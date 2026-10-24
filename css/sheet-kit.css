@@ -382,3 +382,42 @@
 /* owner 2026-10-09: the blank back of a key-on-a-new-sheet run carries one very small line in the
    footer band's centre cell (6 mm band, 7 pt, regular, black), level with the facing pages' footers. Additive. */
 .ws-page.ws-blank-back .ws-blank-foot > .ws-blank-note { font-weight: 400; color: var(--ws-ink); text-align: center; white-space: nowrap; }
+
+/* ---------- CL-4b (owner ruling 2026-10-23): top of the box is the default ----------
+   Additive over the round-3 "safe center" rule above (old saved HTML keeps rendering). Every print
+   cell starts at its top pad with the writing room below, facts included ("centred up, not in the
+   centre"). Exceptions: a cell whose pupil writes ABOVE the problem (data-ws-writeabove: a regroup
+   stack, a division bracket) stays centred down the box, and a cell whose visual IS the workspace
+   (draw the hands, shade the model, plot / place on a line: CL-4) keeps its placement. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell]:not(.blankrun):not([data-ws-writeabove]):not(:has([data-ws-writeabove], .ws-stack-legacy i[data-ws-seg])):not(:is([data-ws-cell="clock"], [data-ws-cell="frac-model"], [data-ws-cell="nl-place"], [data-ws-cell="number-line"], [data-ws-cell="hop-line"], [data-ws-cell="chartwindow"], [data-ws-cell="mult-chart"], [data-ws-cell="tenframe"], [data-ws-legacy]:has(svg))) { justify-content: flex-start; }
+.ws-page .ws-grid > .ws-cell:is([data-ws-writeabove], :has([data-ws-writeabove], .ws-stack-legacy i[data-ws-seg])):not(.blankrun) { justify-content: safe center; }
+/* A legacy stack that draws a carry box only draws it when the item regroups: it is write-above too.
+   A centred stack keeps its tab clearance (CL-41) on both sides so it sits on the cell's true centre. */
+.ws-page .ws-grid > .ws-cell > .ws-stack[data-ws-writeabove] { margin-bottom: calc(var(--ws-tab, 5mm) - 1mm); }
+/* CL-4b: a legacy stack with no carry box keeps no empty carry headroom, so its digits start at the top. */
+.ws-page .ws-cell .ws-stack-legacy:not(:has(i[data-ws-seg])) > span[style*="height:7mm"]:empty { display: none !important; }
+
+/* 2026-10-24 (teacher-site T1 r6, mixed_coordinates blank band): a legacy coordinates cell whose
+   grid is only read (sheet/adapters.js `ws-legacy--readfig`) starts at the top of its box (CL-4b).
+   Additive. */
+.ws-page .ws-grid > .ws-cell[data-ws-legacy]:has(> .ws-legacy--readfig):not(.blankrun) { justify-content: flex-start; }
+
+/* 2026-10-24 (CL-4b fix): a centred write-above stack sat 2.4 mm below its cell's centre wherever
+   the row was sized for ONE tab clearance (the stack's top margin) and the CL-4b block above added a
+   second one under it: the two margins no longer fitted, so "safe center" fell back to the top and
+   the stack ran low. The clearance is now two equal spacers that shrink together: the stack is on
+   the cell's true centre in every row height, with the full clearance above and below when the row
+   has room for it. CL-40: measured on add/sub 20 .. 1m regroup at S / M / L, Auto and 4 columns,
+   no inked part of a centred stack enters the tab's keep-out. Additive. */
+.ws-page .ws-grid > .ws-cell > .ws-stack[data-ws-writeabove] { margin-top: 0; margin-bottom: 0; }
+.ws-page .ws-grid > .ws-cell:has(> .ws-stack[data-ws-writeabove]):not(.blankrun)::before,
+.ws-page .ws-grid > .ws-cell:has(> .ws-stack[data-ws-writeabove]):not(.blankrun)::after { content: ''; display: block; flex: 0 1 calc(var(--ws-tab, 5mm) - 1mm); min-height: 0; }
+
+/* 2026-10-24 (CL-40, critic D1 on CL-4b): a top-started across division fact (cells/equation.js
+   `data-ws-across`) in a cell with a number tab or a letter box gets a top inset of (tab side + 1 mm)
+   on its INK: a shrinkable spacer of (tab side + 1 mm - the 3 mm pad - the 0.2 em of line box above a
+   digit's ink). Wide facts ("48 ÷ 12" in a 61 mm column) otherwise put their first digit on the tab's
+   corner. Every across fact of a row takes it, so one row keeps one baseline (AX-4); narrow facts
+   already clear the tab sideways (label side + 2 mm) and lose nothing. The spacer shrinks before it
+   overflows a tight row; ws-print-lint L-OVERLAP CL40-INK measures the ink. Additive. */
+.ws-page .ws-grid > .ws-cell:has(> :is(.ws-tab, .ws-letter)):has(> .ws-eq[data-ws-across]):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: 0 1 max(0mm, calc(var(--ws-tab, 5mm) - 2mm - 0.2 * var(--ws-digit, 22pt))); min-height: 0; }

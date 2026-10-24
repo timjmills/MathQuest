@@ -40,8 +40,10 @@ function chromePath() {
   const root = '/opt/pw-browsers';
   try {
     for (const d of fs.readdirSync(root).filter(n => /^chromium-\d+$/.test(n)).sort().reverse()) {
-      const exe = path.join(root, d, 'chrome-linux', 'chrome');
-      if (fs.existsSync(exe)) return exe;
+      for (const sub of ['chrome-linux64', 'chrome-linux']) {
+        const exe = path.join(root, d, sub, 'chrome');
+        if (fs.existsSync(exe)) return exe;
+      }
     }
   } catch (e) { /* no preinstalled browser: let puppeteer find its own */ }
   return undefined;
@@ -62,7 +64,14 @@ async function open({ seed = null, viewport = { width: 1280, height: 900, device
   const problems = [];
   page.on('pageerror', e => problems.push({ type: 'pageerror', text: e.message }));
   page.on('console', m => { if (m.type() === 'error') problems.push({ type: 'console.error', text: m.text() }); });
-  page.on('requestfailed', r => { if (r.url().startsWith(base)) problems.push({ type: 'requestfailed', text: r.url() }); });
+  // A font load (a .woff/.woff2 file or its css/fonts/ stylesheet) the browser cancels (net::ERR_ABORTED: the document reloaded or was replaced mid-load) is not a missing
+  // file; ws-teacher-shell failed 4 of 6 timed deploy runs on aborted Andika loads (2026-10-23). Any other failure counts.
+  page.on('requestfailed', r => {
+    if (!r.url().startsWith(base)) return;
+    const err = (r.failure() && r.failure().errorText) || '';
+    if (err === 'net::ERR_ABORTED' && (/\.woff2?(\?|$)/.test(r.url()) || /\/css\/fonts\//.test(r.url()))) return;   // the font files and their css/fonts/*.css
+    problems.push({ type: 'requestfailed', text: `${r.url()} <${err}>` });
+  });
   if (seed !== null) await page.evaluateOnNewDocument(seedScript(seed));
   // Returning-user flags so first-run overlays do not cover the app
   await page.evaluateOnNewDocument(() => { try { localStorage.setItem('mathquest_onboarded', '1'); } catch (e) {} });
@@ -88,7 +97,7 @@ function listSkills(page) {
     const out = [];
     for (const [categoryId, skills] of Object.entries(window.SKILLS)) {
       if (!Array.isArray(skills)) continue;
-      for (const s of skills) out.push({ categoryId, skillId: s.v, label: s.l, grade: window.getSkillGrade ? String(window.getSkillGrade(s.v, categoryId)) : '' });
+      for (const s of skills) out.push({ categoryId, skillId: s.v, label: s.l, retired: !!s.retired, grade: window.getSkillGrade ? String(window.getSkillGrade(s.v, categoryId)) : '' });
     }
     return out;
   });

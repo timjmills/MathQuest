@@ -1,0 +1,28 @@
+{
+ "tool": "ws-coverage-matrix",
+ "note": "Self-test fixture for ws-deploy-gates.sh --self-test (critic r4). \"HEAD\" as the commit resolves to the tree under test.",
+ "dirty": false,
+ "date": "2026-10-22",
+ "commit": "HEAD",
+ "finished": "2026-10-22T02:00:00Z",
+ "baseline": {
+  "file": "tests/fixtures/precritic/deploy/nightly/foreign-ok/baseline.json",
+  "dir": "tests/fixtures/precritic/deploy/nightly/foreign-ok"
+ },
+ "rows": [
+  {
+   "id": "addition:add_20_regroup|single/ex-each",
+   "kind": "single",
+   "skills": [
+    "addition:add_20_regroup"
+   ],
+   "status": "RED",
+   "rises": [
+    "S L-DENSITY PG-23: 0 -> 2"
+   ]
+  }
+ ],
+ "red": [
+  "addition:add_20_regroup|single/ex-each"
+ ]
+}

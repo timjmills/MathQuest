@@ -1,5 +1,16 @@
 # MathQuest master plan — waves (owner, 2026-10-02)
 
+> **2026-10-23 — read `design/IMPROVEMENT_PLAN.md` first (v20.4, independent critic PASS r22 — every owner question answered 2026-10-23 except the two kept for the lesson wave; §4.4 how much faster; §1.7 which builder effort and which kind of check, independent critic PASS r21; independent critic PASS on v19.1: §1.6 faster building for every product, certified (template, kind) pairs; owner 2026-10-23 — three kinds of worksheet for every live skill first, new lessons in a later wave).** It adds **Wave 0 (faster building at the
+> same quality: precritic checks proved by backtests, signed spec cards, golden renders + batch critics under quality
+> safeguards, sharded deploy gates, per-lane status files)**, rebuilds Wave 3 as **Teacher site 2.0** (four places —
+> Skills, Lessons, Classes, profile; a tray with Print · Quiz · Share; ≤ 4 steps per job; bold maths-area colours used on
+> purpose, eight areas in four strengths, checked for colour-blind teachers), builds **truly mixed pages** for Wave 4.2 (PT-MIX shuffled, never built until now), replaces the lettered A–J
+> practice pages with **three kinds of worksheet — Single skill · Sections · Mixed practice — each with plain options**
+> (How many pages? · How often each skill comes up · Examples · Fade supports · Layout · Bring back earlier skills · Size;
+> no other page types, no look choice; small preview, the PDF is the full view; owner 2026-10-23), and re-orders Waves 5–6 by template leverage
+> (9 templates are named by ≈ 40 % of the build list). Its §4.1 is the order of work; §4.3 the owner questions.
+
+
 The owner's order of importance:
 
 1. correct the program;
@@ -80,6 +91,9 @@ https://timjmills.github.io/awsajacademymath/. It is the source for grades → u
 
 ## Wave 4 — Three worksheets: skill, mixed, quiz
 
+> **Owner 2026-10-23:** the worksheet kinds are **Single skill · Sections · Mixed practice**, each with options; the quiz
+> is the Quiz button on the same three kinds (`design/IMPROVEMENT_PLAN.md` §2.5).
+
 | # | Item | Today |
 |---|---|---|
 | 4.1 | Skill worksheet: one skill with its I Can line, Daily look; option **Fade supports** (all → mixed → none), three named modes (owner 2026-10-03): **Faded problems** — a support is removed every N problems (e.g. every 3); **Faded page** — the fade runs across one page; **Faded packet** — the fade runs across 2, 3, 4, 5 … pages | the print screen offers about 16 page types (Practice / Teach / Check / Facts / Thinking) |
@@ -157,6 +171,10 @@ stay at the bottom of the student home.
 | 7.2 | Car race and boss battle made more interesting | emoji hero vs dinosaur on a timer; two-lane race vs a timed computer car (`boss-race.js`, 116 lines) |
 
 ## Wave 8 — Lessons
+
+> **Owner 2026-10-23:** "Any skill that we have live should be able to make the different worksheets, although custom
+> lessons — the short lesson (our original) and the longer V22 — can be made in a later wave if needed." New lessons
+> move to a later wave; every live skill making every worksheet type comes first (`design/IMPROVEMENT_PLAN.md` §1.6.5 and its E4).
 
 **Owner plan 2026-10-16 (detailed lesson maker):** the Atomisation Lesson Planner (V21 while in review; **V22** once passed — `design/lesson-planner/Atomisation_Lesson_Planner_V22.md`) is iterated
 until an independent critic scores >= 8 on every teacher and pupil page of its sample packs (the site is the gold standard).

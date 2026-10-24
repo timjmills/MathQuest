@@ -45,12 +45,43 @@
 //
 // Output: `ws-options-verify: OK` or `ws-options-verify: FAIL` with the failures grouped by the
 // generator file that owns the skill. Exit code 1 on FAIL (use --report-only to suppress).
+//
+// RENDER (W0-B2 / B7; pilot-su-c critic r2 N4: "Across" kept its promise and broke the page):
+//   node tests/scripts/ws-options-verify.cjs --render --skill cat:skill[,...] [--sizes S,L] [--root <tree>] [--json f]
+// prints every OFFERED appearance value of the touched skills (notation, layout, support level / heads, pictures, ...;
+// not the play controls, number sizes or free numbers) on the Independent page at S and L through ws-print-lint
+// --source kit, and FAILS where a value's page has more findings of a (lint, rule) than the skill's default page at the
+// same size and seed (tests/lib/options-render.cjs). Node; print-lint takes one browser slot (/tmp/mq-browser-run.sh,
+// or the slot it is already in). Verdict `ws-options-verify --render: OK|FAIL (...)`.
 const fs = require('fs');
 const path = require('path');
-const { ROOT, open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = k => process.argv.includes('--' + k);
+if (arg('root', null)) process.env.MQ_ROOT = path.resolve(arg('root', null));
+// S1 critic r1 N2: an unknown --skill (a typo) is a usage FAIL, never "OK (nothing to render)". A token is live when it
+// is a live category:skill, or (the plain mode's bare ids) a live skill id in any category.
+if (arg('skill', null)) {
+    const treeRoot = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
+    const src = `globalThis.localStorage={getItem:()=>null,setItem(){},removeItem(){}};console.log=console.info=()=>{};const d=await import(${JSON.stringify(require('url').pathToFileURL(path.join(treeRoot, 'js', 'modules', 'data.js')).href)});const o=[];for(const [c,l] of Object.entries(d.SKILLS||{}))for(const s of l||[])if(s&&s.v&&!s.retired)o.push(c+':'+s.v);process.stdout.write(JSON.stringify(o));`;
+    const r = require('child_process').spawnSync(process.execPath, ['--input-type=module', '-e', src], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+    let live = null;
+    try { live = new Set(JSON.parse(r.stdout)); } catch (e) { live = null; }
+    const name = has('render') ? 'ws-options-verify --render' : 'ws-options-verify';
+    if (!live) { console.log(`${name}: FAIL (cannot read the live skills from js/modules/data.js: ${String(r.stderr || '').trim().split('\n').pop()})`); process.exit(2); }
+    const ids = new Set([...live].map((k) => k.split(':')[1]));
+    const unknown = String(arg('skill', '')).split(',').map((s) => s.trim()).filter(Boolean).filter((t) => (t.includes(':') ? !live.has(t) : has('render') || !ids.has(t)));
+    if (unknown.length) { console.log(`${name}: FAIL (unknown skill(s) ${unknown.join(', ')}: not a live ${has('render') ? 'category:skill' : 'skill id or category:skill'})`); process.exit(2); }
+}
+if (has('render')) {
+    const keys = (arg('skill', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+    const sizes = (arg('sizes', 'S,L') || 'S,L').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    const root = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
+    require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m) })
+        .then((code) => process.exit(has('report-only') ? 0 : code), (e) => { console.log(e && e.stack || e); console.log('ws-options-verify --render: FAIL (crashed)'); process.exit(1); });
+    return;
+}
+const { ROOT, open } = require('../lib/ws-harness.cjs');
 const N = parseInt(arg('n', '12'), 10);
 const ONLY = arg('skill', null);
 const CAT = arg('category', null);
@@ -443,6 +474,17 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         }
     }
 
+    // PAGE NUMBER LINE (group 'nline', skill-options.js numberLineOptions): one line drawn under the
+    // title on the page, its key and the screen. It never changes the items, so every value is a
+    // render-time try (the items must stay the same, the printed sheet must differ). The six controls
+    // that shape the line only apply while it is on (appliesTo nlOn), so they are tried against a
+    // base with the line on — with it off they do nothing by design.
+    for (const t of tries) {
+        if (t.def.group !== 'nline') continue;
+        t.renderOnly = true;
+        if (t.def.id !== 'nlOn') t.base = Object.assign({}, t.base || {}, { nlOn: true });
+    }
+
     // ---------- static (definition) checks ----------
     const statics = [];
     const { OPTION_KEYS } = await import('/js/modules/skill-option-codec.js');
@@ -714,6 +756,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 const marks = (ps.pupilMarks || 0);
                 if (same) {
                     if (def.id === 'cover' || def.id === 'mix') warn('print', 'printed sheet identical to the default spread (every item already qualified / no clash dealt)');
+                    // A line control whose value is the one Auto already chose for this page (step 5,
+                    // every tick labelled, fifths) draws the same line. Whether the line is drawn at
+                    // all is checked by the nlOn try, which has no base.
+                    else if (def.group === 'nline' && def.id !== 'nlOn') warn('print', 'printed sheet identical to the line with this control on Auto, which already chose this value for the page');
                     else fail('print', 'the support is not drawn: printed sheet identical to the default');
                 }
                 if (def.id === 'support' && !marks) fail('print', 'no support drawn on the pupil page ([data-ws-support-on] / touch dots)');

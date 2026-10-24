@@ -1,0 +1,161 @@
+{
+ "v": 1,
+ "about": "critic r6 D3 backtest (card-rulings-partial-pilot): the pilot rulings block with the preset subtraction:sub_2d_1d forgotten (removed from skills and from every ruling). A --skill scope that includes the preset must read INCOMPLETE (exit 2, the preset named), never OK. Otherwise identical to rulings.json.",
+ "skills": [
+  "subtraction:sub_50_no_regroup",
+  "subtraction:sub_100_no_regroup",
+  "subtraction:sub_1k_no_regroup",
+  "subtraction:sub_10k_no_regroup",
+  "subtraction:sub_100k_no_regroup",
+  "subtraction:sub_1m_no_regroup"
+ ],
+ "rulings": [
+  {
+   "id": "R-BAND-50",
+   "source": "\u00a79.2",
+   "skills": [
+    "subtraction:sub_50_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 21,
+   "max": 50
+  },
+  {
+   "id": "R-BAND-100",
+   "source": "\u00a79.2",
+   "skills": [
+    "subtraction:sub_100_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 51,
+   "max": 99
+  },
+  {
+   "id": "R-BAND-1K",
+   "source": "\u00a79.2",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 100,
+   "max": 999
+  },
+  {
+   "id": "R-BAND-10K",
+   "source": "\u00a79.2",
+   "skills": [
+    "subtraction:sub_10k_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 1000,
+   "max": 9999
+  },
+  {
+   "id": "R-BAND-100K",
+   "source": "\u00a79.2",
+   "skills": [
+    "subtraction:sub_100k_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 10000,
+   "max": 99999
+  },
+  {
+   "id": "R-BAND-1M",
+   "source": "\u00a79.2",
+   "skills": [
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "assert": "range",
+   "of": "a",
+   "min": 100000,
+   "max": 999999
+  },
+  {
+   "id": "R-NO-REGROUP",
+   "source": "\u00a71 (the name)",
+   "assert": "noRegroup",
+   "op": "-"
+  },
+  {
+   "id": "R-SAME-LENGTH",
+   "source": "\u00a79.3 (lengths: same by default)",
+   "skills": [
+    "subtraction:sub_50_no_regroup",
+    "subtraction:sub_100_no_regroup",
+    "subtraction:sub_1k_no_regroup",
+    "subtraction:sub_10k_no_regroup",
+    "subtraction:sub_100k_no_regroup",
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "assert": "digits",
+   "of": "b",
+   "eq": "a"
+  },
+  {
+   "id": "R-ZERO-NOT-SEEDED",
+   "source": "\u00a79.4 (zeros off: never seeded; critic r1 D1 bound)",
+   "assert": "maxShare",
+   "when": "zeroCase",
+   "max": 0.1
+  },
+  {
+   "id": "R-BOXES-2",
+   "source": "\u00a73 (boxes = digits of the band's largest minuend)",
+   "skills": [
+    "subtraction:sub_50_no_regroup",
+    "subtraction:sub_100_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 2
+  },
+  {
+   "id": "R-BOXES-3",
+   "source": "\u00a73",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 3
+  },
+  {
+   "id": "R-BOXES-4",
+   "source": "\u00a73",
+   "skills": [
+    "subtraction:sub_10k_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 4
+  },
+  {
+   "id": "R-BOXES-5",
+   "source": "\u00a73",
+   "skills": [
+    "subtraction:sub_100k_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 5
+  },
+  {
+   "id": "R-BOXES-6",
+   "source": "\u00a73",
+   "skills": [
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "assert": "boxes",
+   "eq": 6
+  }
+ ],
+ "notOffered": [
+  {
+   "id": "N-BAND",
+   "source": "\u00a77 (the six skills ARE the number-size ladder; critic r1 D6)",
+   "option": "band"
+  }
+ ]
+}

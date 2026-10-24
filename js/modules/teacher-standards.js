@@ -139,3 +139,14 @@ function wire(el, std, labelOf) {
         drawList(el, labelOf);
     });
 }
+
+/**
+ * Teacher site 2.0 (T3a): the standards of one grade for the Skills gallery's Browse by › Standard, each marked
+ * covered / not yet the way this view marks it. `fw` 'ccss' | 'ee'; lettered parts are left out (they are counted
+ * under their standard here too). Rows: { code, short, text, grade, covered, skills: ['cat:skill'], domainCode }.
+ */
+export function coverageRows(std, { fw = 'ccss', grade = '' } = {}) {
+    if (!cov) cov = std.coverage();
+    const all = fw === 'ee' ? cov.ee : cov.ccss;
+    return all.filter((r) => (!grade || r.grade === grade) && (fw === 'ee' || !r.parent));
+}

@@ -13,7 +13,10 @@
 //   'side'      rows of [worked twin | pupil problem] pairs - example first, then the problem
 //   'sections'  an anchor band, then 3-4 problems, then the next anchor band ... (a BLOCK is an
 //               anchor plus its problems and is never split across pages, PG-21 / PG-23)
-// Mixed practice defaults to sections, one anchor per skill, on the skill's shelf band.
+// Mixed practice pages default to no examples ('on' means none on a page arranged 'mixed',
+// IMPROVEMENT_PLAN 3.3 Q-M1); grouped (Sections) pages keep sections, one anchor per skill, on
+// the skill's shelf band. (A Mixed practice page asked for 'sections' or 'side' prints in
+// sections until the mixed examples modes come, M4 - print-sheet.js's request normaliser.)
 //
 // Only skills whose provider really implements `workedSteps` (`p.real`, compose.js) get anchors;
 // the others print no anchor and the dialog says so (`ineligibleNote`).
@@ -24,9 +27,13 @@ import { esc, getProvider, hasCell, getCell, resolveCtx, SIZES } from './index.j
 
 export const ANCHOR_MODES = Object.freeze(['off', 'side', 'sections']);
 
-/** 'off' | 'side' | 'sections'. 'on' (and true) mean the role's default: sections (S6). */
-export function normaliseAnchors(v, { role = '' } = {}) {
+/**
+ * 'off' | 'side' | 'sections'. 'on' (and true) mean the role's default: sections (S6), except on
+ * a Mixed practice page arranged 'mixed', where the default is no examples.
+ */
+export function normaliseAnchors(v, { role = '', arrangement = '' } = {}) {
     const s = String(v === true ? 'on' : v === undefined || v === null ? 'off' : v).toLowerCase().replace(/[^a-z]/g, '');
+    if (s === 'on' && role === 'mixed-practice' && arrangement === 'mixed') return 'off';
     if (s === 'side' || s === 'sidebyside') return 'side';
     if (s === 'sections' || s === 'section' || s === 'on') return 'sections';
     return 'off';

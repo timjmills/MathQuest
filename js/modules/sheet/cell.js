@@ -26,12 +26,21 @@ const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
  * @param {number} n  1-based item number (CL-13: a run never passes z.)
  */
 export function label(style, n) {
+    // CL-11a (owner, 2026-10-23): "keep only the black box number style" - a letter request draws the tab.
+    if (style === 'letter') style = 'tab';
     // One page holding more than 26 items (a dense S page) runs on aa. bb. ... - never a second
     // "a." on the same sheet, which would make the key's references ambiguous (critic R1 D11).
     if (style === 'letter') return `<span class="ws-letter" data-ws-label="letter">${LETTERS[(n - 1) % 26].repeat(Math.floor((n - 1) / 26) + 1)}.</span>`;
     if (style === 'tab') return `<span class="ws-tab${n > 99 ? ' w3' : n > 9 ? ' w2' : ''}" data-ws-label="tab">${n}</span>`;
     if (style === 'model') return `<span class="ws-modeltab" data-ws-label="model">Model</span>`;
     return '';
+}
+
+/** CL-11a: a label text given as a letter ("c.", "aa.") reads as its number tab text ("3", "27"). */
+export function tabText(t) {
+    const s = String(t == null ? '' : t).trim().replace(/\.$/, '');
+    const m = /^([a-z])\1*$/i.exec(s);
+    return m ? String((LETTERS.indexOf(m[1].toLowerCase()) + 1) + 26 * (s.length - 1)) : s;
 }
 
 /** The label style a look defaults to (CL-10 / CL-30); the dialog may override it (CL-20). */
@@ -63,6 +72,15 @@ export const tabSideMm = (digitPt) => TAB_LADDER[factTab(digitPt)].sideMm;
  * @param {string} [opts.scope]     q.responseScope
  * @param {boolean} [opts.legacy]   marks a legacy-adapter cell (SCC-A5)
  */
+/**
+ * CL-4b: the pupil writes ABOVE this problem (a carry or exchange, a quotient over a bracket), so its
+ * cell is centred down the box instead of starting at the top. A template marks its own root element
+ * with `markWriteAbove(html)`; cell() then sets the same attribute on the cell, and the screen hosts
+ * read it with :has().
+ */
+export const WRITE_ABOVE = 'data-ws-writeabove="1"';
+export const markWriteAbove = (html) => String(html).replace(/^(\s*<[a-z][^>]*?)(\/?>)/i, `$1 ${WRITE_ABOVE}$2`);
+
 export function cell(inner, opts = {}) {
     const { label: lab = '', cls = '', style = '' } = opts;
     let a = opts.template ? ` data-ws-cell="${attr(opts.template)}"` : ' data-ws-cell';
@@ -75,7 +93,9 @@ export function cell(inner, opts = {}) {
     const body = opts.template ? `<div class="ws-cell-body">${inner}</div>` : inner;
     // `keyAttr` (key pages only): a data-ws-key-* hook after the style, so the page decorator's
     // `data-ws-cell style="` match is untouched
-    const extra = /^data-ws-key-[a-z-]+$/.test(opts.keyAttr || '') ? ` ${opts.keyAttr}` : '';
+    let extra = /^data-ws-key-[a-z-]+$/.test(opts.keyAttr || '') ? ` ${opts.keyAttr}` : '';
+    // CL-4b: after the style too, for the same reason
+    if (opts.writeAbove || String(inner).includes(WRITE_ABOVE)) extra += ` ${WRITE_ABOVE}`;
     return `<div class="ws-cell ${cls}"${a} style="${style}"${extra}>${lab}${body}</div>`;
 }
 
@@ -265,7 +285,7 @@ export function renderCellBox(q, ctx = {}, renderInner) {
     const tpl = (q && q.cell && q.cell.template) || 'legacy';
     const inner = typeof renderInner === 'function' ? renderInner(q, c) : '';
     const lab = c.label && c.label.style && c.label.style !== 'none'
-        ? (c.label.style === 'model' ? label('model') : `<span class="ws-${c.label.style === 'tab' ? 'tab' : 'letter'}" data-ws-label="${c.label.style}">${esc(c.label.text || '')}</span>`)
+        ? (c.label.style === 'model' ? label('model') : `<span class="ws-tab" data-ws-label="tab">${esc(tabText(c.label.text))}</span>`)
         : '';
     return cell(inner, {
         label: lab,

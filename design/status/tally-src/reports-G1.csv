@@ -1,0 +1,18 @@
+report,run,lane,round,date_added,commit_added,verdict,min_score,mean_score,n_open,notes
+design/audit/runs/wrm-tagging/MAP-critic-r1.md,wrm-tagging/MAP,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,11,min of 4 criteria 6/8/6/7
+design/audit/runs/wrm-tagging/MAP-critic-r2.md,wrm-tagging/MAP,wrm-tagging,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,11,criteria 7/7/6/7
+design/audit/runs/wrm-tagging/MAP-critic-r3.md,wrm-tagging/MAP,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,10,criteria 7/8/6/8; root cause default-option sampling
+design/audit/runs/wrm-tagging/MAP-critic-r4.md,wrm-tagging/MAP,wrm-tagging,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,8,criteria 8/8/7/8; recurring proposal classes
+design/audit/runs/wrm-tagging/MAP-critic.md,wrm-tagging/MAP,wrm-tagging,5,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,,7,round 5; criteria 9/9/8/8; lead fixed all 7 after the report
+design/audit/runs/wrm-tagging/R-Y1-critic-r10.md,wrm-tagging/R-Y1,wrm-tagging,10,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,7,near miss: step means R 7.97 / Y1 7.97
+design/audit/runs/wrm-tagging/R-Y1-critic-r11.md,wrm-tagging/R-Y1,wrm-tagging,11,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,8,near miss: R 8.00 / Y1 7.97; one seven
+design/audit/runs/wrm-tagging/R-Y1-critic-r12.md,wrm-tagging/R-Y1,wrm-tagging,12,2026-10-17T12:47:00+00:00,fbcc9bb,PASS,8,8.00,4,step means R 8.00 / Y1 8.00; text-only nits left
+design/audit/runs/wrm-tagging/R-Y1-critic-r2.md,wrm-tagging/R-Y1,wrm-tagging,2,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,5,,49,step means R 7.28 / Y1 7.12
+design/audit/runs/wrm-tagging/R-Y1-critic-r3.md,wrm-tagging/R-Y1,wrm-tagging,3,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,41,step means R 7.36 / Y1 7.36
+design/audit/runs/wrm-tagging/R-Y1-critic-r4.md,wrm-tagging/R-Y1,wrm-tagging,4,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,6,,26,step means R 7.56 / Y1 7.68
+design/audit/runs/wrm-tagging/R-Y1-critic-r5.md,wrm-tagging/R-Y1,wrm-tagging,5,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,11,step means R 7.84 / Y1 7.64
+design/audit/runs/wrm-tagging/R-Y1-critic-r6.md,wrm-tagging/R-Y1,wrm-tagging,6,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,14,step means R 7.86 / Y1 7.79
+design/audit/runs/wrm-tagging/R-Y1-critic-r7.md,wrm-tagging/R-Y1,wrm-tagging,7,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,10,step means R 7.93 / Y1 7.93
+design/audit/runs/wrm-tagging/R-Y1-critic-r8.md,wrm-tagging/R-Y1,wrm-tagging,8,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,7,step means R 7.89 / Y1 7.93
+design/audit/runs/wrm-tagging/R-Y1-critic-r9.md,wrm-tagging/R-Y1,wrm-tagging,9,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,7,,6,step means R 7.78 / Y1 7.85
+design/audit/runs/wrm-tagging/R-Y1-critic.md,wrm-tagging/R-Y1,wrm-tagging,1,2026-10-17T12:47:00+00:00,fbcc9bb,FAIL,3,,45,"step means R 6.80 / Y1 6.23 (per-step 0-10, pass needs mean 8)"

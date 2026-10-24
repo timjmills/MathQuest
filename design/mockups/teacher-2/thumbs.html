@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill Thumbnails</title>
+<script>document.documentElement.setAttribute('data-theme','light');/* dark mode parked: owner 2026-10-23 */</script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Fraunces:ital,opsz,wght@1,9..144,500&family=Inter:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../css/fonts/andika.css"><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="docs.css"><link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="doc doc-wide">
+  <div class="top"><a class="btn" href="index.html">← Overview</a><a class="btn" href="app.html">Open the mock-up</a></div>
+  <p class="eyebrow">Teacher site 2.0 · T1 · thumbnails</p>
+  <h1>Every skill’s thumbnail</h1>
+  <p class="lead">Each live skill with the picture its card shows, grouped by category. Nothing here is copied: every picture is drawn <b>live by the app</b> as you scroll (<code>live.mjs</code> imports the app’s <code>buildSheet</code> read-only, prints the skill’s seeded sheet with its default options and shows its first cell in the app’s own sheet styles). <code>node thumbs-check.cjs</code> holds every thumbnail to the booted app’s own sheet.</p>
+  <div class="row"><label class="search search-small"><span class="sr">Filter</span><input id="f" type="search" placeholder="Filter: a category, id or name"></label></div>
+  <div id="out"></div>
+</div>
+<script src="data.js"></script>
+<script src="thumbs.js"></script>
+<script>
+(function () {
+  const D = window.MQ_DATA, T = window.MQThumbs;
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  let render = function (q) {
+    q = (q || '').toLowerCase(); const by = {};
+    D.skills.forEach(s => { if (!q || (s.c + ' ' + s.v + ' ' + s.l).toLowerCase().includes(q)) (by[s.c] = by[s.c] || []).push(s); });
+    document.getElementById('out').innerHTML = Object.entries(by).map(([c, list]) => `<h2>${esc(c)} <span class="note">${list.length}</span></h2><div class="grid" data-view="medium">` +
+      list.map(s => `<div class="card thumb-card" data-domain="${s.a}" data-key="${esc(s.c + ':' + s.v)}"><div class="thumb">${T.draw(s)}</div><div class="card-name">${esc(s.l)}</div><div class="note">${esc(s.v)}</div></div>`).join('') + '</div>').join('');
+  }
+  const _render = render; render = (q) => { _render(q); T.fit(document); };
+  document.getElementById('f').addEventListener('input', (e) => render(e.target.value));
+  render(new URLSearchParams(location.search).get('q'));
+})();
+</script>
+</body>
+</html>

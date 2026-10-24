@@ -291,7 +291,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
                 { say: 'The rule must work for every row.', note: 'Say it together twice.' },
-                { do: 'Hand out the exit slip. No help. Sort the slips by item c.', note: 'a. [[{exit.0.rule}]] · b. [[{exit.1.rule}]] · c. [[{exit.2.rule}]].' },
+                { do: 'Hand out the exit slip. No help. Sort the slips by item 3.', note: '1. [[{exit.0.rule}]] · 2. [[{exit.1.rule}]] · 3. [[{exit.2.rule}]].' },
             ] },
     ],
     transitionsMin: 4,

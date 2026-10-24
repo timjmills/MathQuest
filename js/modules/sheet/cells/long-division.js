@@ -23,6 +23,7 @@
 // Pure module (SCC-01).
 
 import { register } from '../registry.js';
+import { markWriteAbove } from '../cell.js';
 import { geo, root, inkOf, slotValues, inked, box, esc, HAIR, HEAVY } from './ops-common.js';
 import { INK, stripPos } from '../tokens.js';
 import { stepMarks, WHOLE_SLOTS } from '../steps.js';
@@ -178,9 +179,10 @@ register('division', {
             }
         }
         const label = `${D} divided by ${V}`;
-        return root(g, 'division',
+        // CL-4b: the quotient is written above the bracket, so the cell is centred down the box.
+        return markWriteAbove(root(g, 'division',
             `<div role="group" aria-label="${esc(label)}" style="display:inline-grid;${cols}grid-template-rows:auto ${g.em(g.pt * 25.4 / 72 * 1.25)};align-items:stretch;margin:0 auto">${html}</div>`,
-            'text-align:center;', this.footprint(p, ctx).wMm);
+            'text-align:center;', this.footprint(p, ctx).wMm));
     },
     answerKey(p) {
         const k = keyOf(p);

@@ -1,5 +1,16 @@
 # Teacher screens — owner rulings (2026-09-26)
 
+> **2026-10-23:** the teacher side is being redesigned as **Teacher site 2.0** — `design/IMPROVEMENT_PLAN.md` §2 (four places, the
+> tray (Print · Quiz · Share) + the worksheet sheet, ≤ 4 steps per job, the bold colour system and its rules). The rulings below stay in force where §2 does not
+> change them; §4.3 lists the changes for the owner to confirm (Q-T1 replaces the six-tile home). **Owner 2026-10-23 (decided):**
+> the lettered A / B / C pages go — the worksheet choices are How many pages? (for section, single-skill and mixed pages alike) ·
+> How often each skill comes up · Examples · Size, plus a New numbers button (§2.5). **Owner 2026-10-23 (decided):** three
+> kinds of worksheet only — **Single skill · Sections · Mixed practice**, each with its options (Examples, Fade supports,
+> Layout: fact rows / timed check / Today's Number, Bring back earlier skills); no other page types and no "I Can / Daily"
+> look choice (the title follows the kind). **Owner 2026-10-23 (decided):** Mixed practice is the default for 2+ skills; Sections can be made one per skill, grouped by type (named sections) or as exam-style parts; Examples can be at the top of the page, the first time a problem appears in a section or on a page (beside it on mixed pages), every few problems, or with each problem.
+> **Owner 2026-10-23 (decided):** no full page preview on the website — a one-line summary plus a SMALL preview (the first page when every page has the same kind of problems; the first 2–3 pages when they differ); the PDF made by Print is the full view.
+
+
 The teacher side is organised around **three kinds of paper** (see `design/LESSON_LIBRARY_PLAN.md` §8e): **Practice**,
 **Quiz** and **Lesson**. These rulings simplify the screens to match.
 
@@ -17,7 +28,7 @@ The home screen shows **six large, visual actions** and nothing else competing w
 |---|---|---|
 | **Make skill sheet** | the Practice paper | one skill (→ "I Can" title), versions 1, size M |
 | **Make mixed review** | the same Practice paper | several skills, **equal weights** (each skill's weight is still editable), "Mix in prerequisite skills" available |
-| **Make quiz** | the Quiz paper | scored, versions A / B |
+| **Make quiz** | the Quiz paper | scored, versions A / B (2026-10-23: "How many versions? 1–6", no letters — IMPROVEMENT_PLAN Q-W3) |
 | **Make lesson** | the Lesson paper (the lesson library) | all parts; choose parts to print; "New numbers" per part |
 | **Send practice code** | the share-code / send screen | — |
 | **Practice map** | the pupil practice map | — |

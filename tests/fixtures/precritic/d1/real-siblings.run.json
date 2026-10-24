@@ -1,0 +1,428 @@
+{
+ "tool": "ws-coverage-matrix",
+ "date": "2026-10-24",
+ "started": "2026-10-24T10:39:01.841Z",
+ "finished": "2026-10-24T10:39:50.958Z",
+ "commit": "4b1878a4549895bb24b9ea929ebdae7125f93b45",
+ "dirty": true,
+ "partners": "tests/fixtures/precritic/matrix-partners.json",
+ "printInputsHash": "b75a1d36a86439025ecd9d736cf6de4e5aee4a546fa6c7eb4fe5b7a18404a25c",
+ "baseline": null,
+ "selection": {
+  "skills": [
+   "addition:add_100_regroup",
+   "subtraction:sub_100_regroup"
+  ],
+  "affected": null,
+  "seventh": null,
+  "slice": null,
+  "shard": null,
+  "kinds": null,
+  "rows": [
+   "sections/ex-each"
+  ],
+  "redFrom": null
+ },
+ "replay": "M4 replay: not built",
+ "liveSkills": 715,
+ "timing": {
+  "slots": 2,
+  "batch": 9,
+  "documents": 6,
+  "seconds": 47,
+  "slotWaitSeconds": 0,
+  "docsPerSec": 0.1276,
+  "batches": [
+   {
+    "chunk": 0,
+    "jobs": 6,
+    "ms": 47009,
+    "waitMs": 0
+   }
+  ]
+ },
+ "totals": {
+  "OK": 0,
+  "CACHED": 0,
+  "RED": 2,
+  "PENDING": 0,
+  "N/A": 0,
+  "ERROR": 0
+ },
+ "red": [
+  "addition:add_100_regroup|sections/ex-each",
+  "subtraction:sub_100_regroup|sections/ex-each"
+ ],
+ "rows": [
+  {
+   "id": "addition:add_100_regroup|sections/ex-each",
+   "skill": "addition:add_100_regroup",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "addition:add_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "2051bb3a5c3e1206141f88370de6a6e3cdf34229518ca78af9c3755f6aac42d6",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 18",
+    "S L-OVERFLOW PG-12: 0 -> 8",
+    "S L-DENSITY H13: 0 -> 4",
+    "S L-DENSITY PG-23: 0 -> 2",
+    "S L-WRAP WRAP-OP: 0 -> 2",
+    "M L-INK ILLEGIBLE: 0 -> 8",
+    "M L-SIZE TY-11: 0 -> 18",
+    "M L-OVERFLOW PG-12: 0 -> 8",
+    "M L-DENSITY DN-2: 0 -> 2",
+    "M L-DENSITY H13: 0 -> 4",
+    "M L-DENSITY PAGEFILL: 0 -> 1",
+    "L L-OVERFLOW PG-12: 0 -> 8",
+    "L L-DENSITY H13: 0 -> 2",
+    "L L-DENSITY PAGEFILL: 0 -> 2",
+    "L L-DENSITY PG-23: 0 -> 2",
+    "L L-WRAP WRAP-OP: 0 -> 2"
+   ],
+   "baselineKey": "none",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 18,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PG-23": 2,
+      "L-WRAP WRAP-OP": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 6,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 6,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-WRAP WRAP-OP|p2|a wrapped line ends in \"=\": \"Add:#+#+#=\" / \"#....\" - an expression never breaks after its operator (join it with no-brea": 1,
+      "L-WRAP WRAP-OP|p4|a wrapped line ends in \"=\": \"Add:#+#+#=\" / \"#....\" - an expression never breaks after its operator (join it with no-brea": 1
+     },
+     "bySkill": {
+      "?": {},
+      "addition:add_100_regroup": {
+       "L-SIZE TY-11": 6,
+       "L-DENSITY H13": 2
+      },
+      "addition:add_facts": {
+       "L-SIZE TY-11": 12,
+       "L-DENSITY H13": 2,
+       "L-WRAP WRAP-OP": 2
+      },
+      "algebra:tape_diagram": {
+       "L-OVERFLOW PG-12": 8
+      },
+      "": {
+       "L-DENSITY PG-23": 2
+      }
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-SIZE TY-11": 18,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 6,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 6,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p3|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "bySkill": {
+      "?": {},
+      "algebra:tape_diagram": {
+       "L-INK ILLEGIBLE": 8,
+       "L-OVERFLOW PG-12": 8
+      },
+      "addition:add_100_regroup": {
+       "L-SIZE TY-11": 6,
+       "L-DENSITY H13": 2
+      },
+      "addition:add_facts": {
+       "L-SIZE TY-11": 12,
+       "L-DENSITY H13": 2
+      },
+      "": {
+       "L-DENSITY DN-2": 2,
+       "L-DENSITY PAGEFILL": 1
+      }
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2,
+      "L-WRAP WRAP-OP": 2
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-WRAP WRAP-OP|p1|a wrapped line ends in \"=\": \"#regrouped=\" / \"#....\" - an expression never breaks after its operator (join it with no-bre": 1,
+      "L-WRAP WRAP-OP|p4|a wrapped line ends in \"=\": \"#regrouped=\" / \"#....\" - an expression never breaks after its operator (join it with no-bre": 1
+     },
+     "bySkill": {
+      "?": {},
+      "algebra:tape_diagram": {
+       "L-OVERFLOW PG-12": 8
+      },
+      "addition:add_facts": {
+       "L-DENSITY H13": 2
+      },
+      "": {
+       "L-DENSITY PAGEFILL": 2,
+       "L-DENSITY PG-23": 2
+      },
+      "addition:add_100_regroup": {
+       "L-WRAP WRAP-OP": 2
+      }
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100_regroup|sections/ex-each",
+   "skill": "subtraction:sub_100_regroup",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_100_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "aa79a043ce168b51248e791c405c4f616753735c62055b7d892c4201c8fc5a18",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 20",
+    "S L-OVERFLOW PG-12: 0 -> 8",
+    "S L-DENSITY H13: 0 -> 4",
+    "S L-DENSITY PG-23: 0 -> 2",
+    "M L-INK ILLEGIBLE: 0 -> 8",
+    "M L-SIZE TY-11: 0 -> 20",
+    "M L-OVERFLOW PG-12: 0 -> 8",
+    "M L-DENSITY DN-2: 0 -> 2",
+    "M L-DENSITY H13: 0 -> 4",
+    "M L-DENSITY PAGEFILL: 0 -> 1",
+    "M L-WRAP WRAP-OP: 0 -> 2",
+    "L L-INK ILLEGIBLE: 0 -> 8",
+    "L L-OVERFLOW PG-12: 0 -> 8",
+    "L L-DENSITY DN-2: 0 -> 2",
+    "L L-DENSITY H13: 0 -> 4",
+    "L L-DENSITY PAGEFILL: 0 -> 1",
+    "L L-WRAP WRAP-OP: 0 -> 2"
+   ],
+   "baselineKey": "none",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "bySkill": {
+      "?": {},
+      "subtraction:sub_100_regroup": {
+       "L-SIZE TY-11": 8,
+       "L-DENSITY H13": 2
+      },
+      "addition:add_facts": {
+       "L-SIZE TY-11": 6,
+       "L-DENSITY H13": 2
+      },
+      "area_perimeter:perimeter_intro": {
+       "L-SIZE TY-11": 6
+      },
+      "algebra:tape_diagram": {
+       "L-OVERFLOW PG-12": 8
+      },
+      "": {
+       "L-DENSITY PG-23": 2
+      }
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1,
+      "L-WRAP WRAP-OP": 2
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p3|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-WRAP WRAP-OP|p2|a wrapped line ends in \"+\": \"Add:#+#+\" / \"#+#=#....\" - an expression never breaks after its operator (join it with no-br": 1,
+      "L-WRAP WRAP-OP|p4|a wrapped line ends in \"+\": \"Add:#+#+\" / \"#+#=#....\" - an expression never breaks after its operator (join it with no-br": 1
+     },
+     "bySkill": {
+      "?": {},
+      "algebra:tape_diagram": {
+       "L-INK ILLEGIBLE": 8,
+       "L-OVERFLOW PG-12": 8
+      },
+      "subtraction:sub_100_regroup": {
+       "L-SIZE TY-11": 8,
+       "L-DENSITY H13": 2
+      },
+      "addition:add_facts": {
+       "L-SIZE TY-11": 6,
+       "L-DENSITY H13": 2
+      },
+      "area_perimeter:perimeter_intro": {
+       "L-SIZE TY-11": 6,
+       "L-WRAP WRAP-OP": 2
+      },
+      "": {
+       "L-DENSITY DN-2": 2,
+       "L-DENSITY PAGEFILL": 1
+      }
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1,
+      "L-WRAP WRAP-OP": 2
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p3|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-WRAP WRAP-OP|p2|a wrapped line ends in \"+\": \"Add:#+\" / \"#+#+#=#...\" - an expression never breaks after its operator (join it with no-bre": 1,
+      "L-WRAP WRAP-OP|p4|a wrapped line ends in \"+\": \"Add:#+\" / \"#+#+#=#...\" - an expression never breaks after its operator (join it with no-bre": 1
+     },
+     "bySkill": {
+      "?": {},
+      "algebra:tape_diagram": {
+       "L-INK ILLEGIBLE": 8,
+       "L-OVERFLOW PG-12": 8
+      },
+      "": {
+       "L-DENSITY DN-2": 2,
+       "L-DENSITY PAGEFILL": 1
+      },
+      "subtraction:sub_100_regroup": {
+       "L-DENSITY H13": 2
+      },
+      "addition:add_facts": {
+       "L-DENSITY H13": 2
+      },
+      "area_perimeter:perimeter_intro": {
+       "L-WRAP WRAP-OP": 2
+      }
+     },
+     "error": null
+    }
+   }
+  }
+ ],
+ "about": "D1 fix r1, REAL data: the paired siblings' sections/ex-each rows (`ws-coverage-matrix --skills addition:add_100_regroup,subtraction:sub_100_regroup --rows sections/ex-each`), same tree."
+}

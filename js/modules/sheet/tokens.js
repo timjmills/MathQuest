@@ -138,7 +138,7 @@ export const LOOKS = Object.freeze({
         cellBorderPt: STROKE.hair,   // 0.75 pt, shared
         trackEm: 0.72,               // TY-20
         rowGapMm: 0,                 // gap between operand rows
-        label: 'letter',             // CL-10 quiet lowercase letter
+        label: 'tab',                // CL-11a (owner, 2026-10-23): black number tab on every look; was CL-10 letter
         autoColsStacked: 2,
     }),
     daily: Object.freeze({

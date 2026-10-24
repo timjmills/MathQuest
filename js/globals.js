@@ -119,6 +119,7 @@ import { getWordProblemIcon } from './modules/word-problem-icons.js';
 
 // Teacher view shell (approved design 2026-09-24): sidebar + teacher screens, teacher mode only
 import { tvGo } from './modules/teacher-shell.js';
+import './modules/teacher-sheet.js';   // T3b: window.tvOpenSheet (the Worksheet, Quiz and Share sheets)
 // The word-work cell on screen: tap a sign, type in the column boxes, tap a unit word (2026-09-25).
 import './modules/word-work-screen.js';
 // The next answer box pulses yellow on every pupil screen (owner, 2026-10-04).

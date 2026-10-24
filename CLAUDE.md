@@ -59,8 +59,17 @@ outrank any general design advice or skill:
 - **Design it right the first time:** read `design/audit/LESSONS_LEARNED.md` before building or fixing anything. It lists the
   failure classes every critic round keeps finding (Size S ignored, wasted space, answer given away, paper ≠ screen …) with
   the design rule and the automatic check for each, and a PRE-FLIGHT checklist every lane runs before it reports.
+- **The speed reflection cycle runs after EVERY lane, family, pilot or tool build (owner, 2026-10-23: "always perform it so
+  that we get better and better, faster and faster")**: an independent auditor measures it against the targets, finds the
+  causes of every lost round or hour, turns each into a check, rule or tool fix before the next lane, and records it in
+  `design/status/speed-audit.md` + `metrics.md` (LESSONS_LEARNED "Process rules" 00) After EVERY critic round, pass or fail, the lane
+  records the automatic checks that would have caught each finding and the speed-ups the round revealed.
+- **Process rules (owner, 2026-10-23)** live in `design/audit/LESSONS_LEARNED.md` "Process rules" and `design/audit/RUBRIC.md`
+  "How a page counts as graded". Lanes write `design/status/<lane>.md`, never `design/STATUS.md`.
 - **8 or better, everywhere.** A redone skill is done only when it scores ≥ 8 on all four criteria
   of `design/audit/RUBRIC.md` on every page type and every screen host, graded by an independent critic.
+  The same bar holds for EVERYTHING that passes (owner, 2026-10-23): tools, engines, screens and mock-ups, lessons,
+  cards and plans each pass only at ≥ 8 on every criterion of their critic brief, graded by an independent critic.
 - Use `generateQuestionFor({category, skill, range, decimals, opts, seed})` for any generation
   outside live play. It carries the skill's options, restores state in `finally`, and its seed makes
   a page reproducible.
@@ -74,7 +83,14 @@ node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.
 node tests/scripts/ws-content-audit.cjs     # GATE: do + - x / skills match their own names?
 node tests/scripts/ws-stamp-assets.cjs      # BEFORE EVERY DEPLOY: cache-bust index.html (--check to verify)
 node tests/scripts/ws-search-terms.cjs       # GATE: every skill is findable (>= 5 search terms, 230+ real queries hit their top 5)
+node tests/scripts/ws-precritic.cjs --skill cat:skill --strict   # GATE before any critic (rule 0b): every machine check of what a lane touched
+node tests/scripts/ws-precritic.cjs --role lesson --strict       #   ... and per page role (H13 on lesson Warm-up cells)
+node tests/scripts/ws-spec-card.mjs --check-signed design/cards/<family>/<family>.md   # GATE at build start: card signed, every hosts-and-roles line decided
+node tests/scripts/ws-backtest.mjs           # every check FAILS on the state a critic failed and PASSES on its fix, and is on precritic's path (ws-precritic-plan)
+bash tests/scripts/ws-deploy-gates.sh        # BEFORE EVERY DEPLOY: the deploy gate sessions (--list for the plan)
 ```
+
+"Clean before critic" means precritic `--strict` plus the unit gates green on the lane branch MERGED WITH the current main branch.
 
 **A new skill must get search terms (`js/modules/search-terms.js`: a `CONCEPT_RULES` hit, plus `SKILL_TERMS` when its
 label is vague) in the same change; `ws-search-terms` is the gate.** Every skill search box calls `js/modules/skill-finder.js`
@@ -139,6 +155,16 @@ and delete the entry. Lanes in `FROZEN_LANES` keep their order: new entries for 
 `node tests/scripts/ws-wrm.cjs` is the WRM gate. It **fails until every small step has a skill** (by
 design); run it with `--report-only` meanwhile, and do not add it to an all-gates-must-pass list yet. A
 new skill that teaches a WRM step gets a `SKILL_WRM` entry, and its step comes off `WRM_PROPOSALS`.
+
+**Every new skill is linked in the same change (owner rule, 2026-10-23, "make sure and continue to tag all new skills"):**
+1. **White Rose lessons** — its `SKILL_WRM` tag(s) (`{step, partial}` when it covers part), and the curated year record in
+   `data/curriculum/links/<YEAR>.json` lists it as `direct` for that step (and for any school-site lesson it teaches);
+2. **Prerequisite skills** — it appears in the `pre` list of the steps / lessons it prepares for, and its own step's
+   `pre` names the skills a pupil needs first;
+3. **Related skills** — it appears in the `related` list of steps that share its CCSS code or sit next to it in the unit.
+A preset skill (an option recorded as a skill) is linked the same way. `node tests/scripts/ws-wrm-page-unit.mjs` and
+`ws-wrm.cjs --report-only` must stay green; a new skill with no WRM, prerequisite or related link is a defect the lane fixes
+before its critic.
 
 ## Researching Skills Before Implementation
 
@@ -517,13 +543,21 @@ Extensive SVG generation functions across 5 modules:
 - Never say "done" unless you have confirmed it works end to end
 - When creating or updating skills, ALWAYS research reference sites first (see "Researching Skills" section above)
 
+## Usage budget (owner rule, 2026-10-24)
+
+Use at most **80 % of the weekly usage limit** (window resets Thursday 22:00 UTC). Working figure: **1 % ≈ $28 of session `cost_usd`**, so 80 % ≈ $2,240 a week. Before starting lanes, sum `cost_usd` of the sessions since the reset and check the remaining budget; stop new work at 80 %. Benchmarks and the week's running total: `design/IMPROVEMENT_PLAN.md` "Usage budget".
+
 ## Agents — model and effort (owner rule, 2026-10-02, latest revision)
 
 - **Builders and fixers** run on **Opus 5.5 at LOW effort** (profile `mq-opus-low`, `model: "opus"`).
+- **Except (owner, 2026-10-23; `design/IMPROVEMENT_PLAN.md` §1.7, Q-S1 and Q-S7):** the first skill of each new drawing
+  (template), the first build of each new engine, tool or screen, and the rebuild of any work that failed a critic round
+  run on **Opus 5.5 at MEDIUM effort** (`mq-opus-medium`). Copies on an approved drawing and later changes go back to low.
 - **Critics / auditors / reviewers** run on **Opus 5.5 at MEDIUM effort** (profile `mq-opus-medium`, `model: "opus"`).
 - Explorers and small one-off checks: Opus low.
 
-Escalate a builder only when a problem persists: Opus low → Opus medium (the ceiling; never higher).
+Otherwise escalate a builder only when a problem persists: Opus low → Opus medium (the ceiling; never higher). If the same
+defect survives two rounds at medium, stop the loop: find the root cause, make it a machine check, and re-brief a fresh builder (§1.7).
 
 How to call them:
 - Pass `subagent_type` with the profile above and `model: "opus"` on every Agent call.

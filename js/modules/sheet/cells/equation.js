@@ -9,7 +9,7 @@
 // Pure module (SCC-01).
 
 import { opGlyph, DEFAULT_SIZE, blankWidth, STRETCH_CAP } from '../tokens.js';
-import { esc, line, box, circle, blank } from '../cell.js';
+import { esc, line, box, circle, blank, WRITE_ABOVE } from '../cell.js';
 import { register } from '../registry.js';
 import { stepMarks, singleSlotState } from '../steps.js';
 import { touchNumbers, touchNumberHTML, touchOpts } from '../support-draw.js';
@@ -134,7 +134,7 @@ register('equation', {
                 ? `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
                     + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;">${A}</span><span style="padding:0 0.2em;">${B}</span></span>`
                 : `${B}<span style="border-top:0.75pt solid #000;border-left:0.75pt solid #000;border-top-left-radius:0.4em;padding:0.05em 0.3em 0 0.3em;margin-left:0.15em;">${A}</span>`;
-            return `<div class="ws-eq" data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
+            return `<div class="ws-eq"${p.notation === 'bracket' ? ` ${WRITE_ABOVE}` : ''} data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
         }
         if (p.fact && u === 'result') {
             // A division FACT across (div_facts Standard, alone or in Mix, critic R2 R-2): ONE across
@@ -143,13 +143,15 @@ register('equation', {
             // warm-up. In a column too narrow for the answer line beside the sentence (judged on
             // the band's widest fact, so one page holds one form, AX-4) the line goes under it,
             // centred (DN-22's "answer stacked below"), never a smaller digit (PG-20).
+            // `data-ws-across` (CL-40, critic 2026-10-24 D1): a top-started across fact clears the label
+            // keep-out by its top inset (css/sheet-kit.css, CL-40 block), whatever its width.
             const o = (g) => `<span class="o" style="width:${ACROSS_OP_EM}em">${g}</span>`;
             const sentence = `<span>${num('a')}</span>${o(opGlyph(p.op))}<span>${num('b')}</span>${o('=')}`;
             if (acrossBelow(p, ctx)) {
-                return `<div class="ws-eq ws-eq-below" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
+                return `<div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_GAP_EM}em;white-space:nowrap">${sentence}</span>${slotHtml}</div>`;
             }
-            return `<div class="ws-eq" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
+            return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
         }
         const pieces = [
             u === 'a' ? slotHtml : `<span>${num('a')}</span>`,

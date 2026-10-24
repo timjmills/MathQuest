@@ -1,0 +1,1252 @@
+{
+ "rows": {
+  "addition:add_100_regroup|mixed/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_100_regroup|sections/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "addition:add_100_regroup|sections/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 18,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-SIZE TY-11": 18,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 1
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "addition:add_100_regroup|sections/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 18,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 18,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "addition:add_100_regroup|sections/pages-2": {
+   "S": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 10,
+    "L-DENSITY PAGEFILL": 3,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "addition:add_100_regroup|single/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_100_regroup|single/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 14,
+    "L-DENSITY H13": 6
+   },
+   "M": {
+    "L-SIZE TY-11": 14,
+    "L-DENSITY H13": 6
+   },
+   "L": {}
+  },
+  "addition:add_100_regroup|single/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 8
+   },
+   "M": {
+    "L-SIZE TY-11": 4,
+    "L-DENSITY PAGEFILL": 1
+   },
+   "L": {}
+  },
+  "addition:add_100_regroup|single/layout-fact-rows": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_100_regroup|single/layout-timed": {
+   "S": {},
+   "M": {},
+   "L": {
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "addition:add_100_regroup|single/layout-todays-number": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_100_regroup|single/more-cols2+nline+afterpage": {
+   "S": {
+    "L-DENSITY H13": 16
+   },
+   "M": {
+    "L-DENSITY H13": 12
+   },
+   "L": {}
+  },
+  "addition:add_100_regroup|single/more-cols2+nline+short": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {
+    "L-DENSITY H13": 6
+   },
+   "L": {}
+  },
+  "addition:add_100_regroup|single/more-cols2+short+afterpage": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {
+    "L-DENSITY H13": 6
+   },
+   "L": {}
+  },
+  "addition:add_100_regroup|single/more-nline+short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_100_regroup|single/pages-3": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|mixed/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|sections/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "addition:add_20_regroup|sections/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "addition:add_20_regroup|sections/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   }
+  },
+  "addition:add_20_regroup|sections/pages-2": {
+   "S": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 10,
+    "L-DENSITY PAGEFILL": 3,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "addition:add_20_regroup|single/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/ex-each": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/ex-group": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/fade-packet": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/fade-page": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/layout-fact-rows": {
+   "S": {
+    "L-OVERFLOW PG-12": 180
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 36
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 25
+   }
+  },
+  "addition:add_20_regroup|single/layout-timed": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/layout-todays-number": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/more-cols2+nline+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/more-cols2+nline+short": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/more-cols2+short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/more-nline+short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "addition:add_20_regroup|single/pages-3": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100_no_regroup|mixed/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 2
+   },
+   "M": {},
+   "L": {
+    "L-DENSITY H13": 4
+   }
+  },
+  "subtraction:sub_100_no_regroup|sections/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_100_no_regroup|sections/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 20,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-SIZE TY-11": 20,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 1
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_100_no_regroup|sections/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 20,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 20,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_100_no_regroup|sections/pages-2": {
+   "S": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 10,
+    "L-DENSITY PAGEFILL": 3,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_100_no_regroup|single/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100_no_regroup|single/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 24,
+    "L-DENSITY H13": 6
+   },
+   "M": {
+    "L-SIZE TY-11": 24,
+    "L-DENSITY H13": 6
+   },
+   "L": {
+    "L-DENSITY H13": 6
+   }
+  },
+  "subtraction:sub_100_no_regroup|single/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 16
+   },
+   "M": {
+    "L-SIZE TY-11": 8,
+    "L-DENSITY PAGEFILL": 1
+   },
+   "L": {}
+  },
+  "subtraction:sub_100_no_regroup|single/layout-fact-rows": {
+   "S": {
+    "L-OVERFLOW PG-12": 180
+   },
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100_no_regroup|single/layout-timed": {
+   "S": {},
+   "M": {},
+   "L": {
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_100_no_regroup|single/layout-todays-number": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100_no_regroup|single/more-cols2+nline+afterpage": {
+   "S": {
+    "L-DENSITY H13": 16
+   },
+   "M": {
+    "L-DENSITY H13": 12
+   },
+   "L": {
+    "L-DENSITY H13": 12
+   }
+  },
+  "subtraction:sub_100_no_regroup|single/more-cols2+nline+short": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {
+    "L-DENSITY H13": 6
+   },
+   "L": {
+    "L-DENSITY H13": 6
+   }
+  },
+  "subtraction:sub_100_no_regroup|single/more-cols2+short+afterpage": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {
+    "L-DENSITY H13": 6
+   },
+   "L": {
+    "L-DENSITY H13": 6
+   }
+  },
+  "subtraction:sub_100_no_regroup|single/more-nline+short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100_no_regroup|single/pages-3": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|mixed/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|sections/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_100k_no_regroup|sections/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_100k_no_regroup|sections/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   }
+  },
+  "subtraction:sub_100k_no_regroup|sections/pages-2": {
+   "S": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 3,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_100k_no_regroup|single/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/ex-each": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/ex-group": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/layout-fact-rows": {
+   "S": {
+    "L-INK ILLEGIBLE": 190,
+    "L-OVERFLOW PG-12": 128
+   },
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/layout-timed": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/layout-todays-number": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/more-cols2+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/more-cols2+short": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/more-short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_100k_no_regroup|single/pages-3": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|mixed/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|sections/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_10k_no_regroup|sections/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_10k_no_regroup|sections/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   }
+  },
+  "subtraction:sub_10k_no_regroup|sections/pages-2": {
+   "S": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 3,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_10k_no_regroup|single/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/ex-each": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/ex-group": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/layout-fact-rows": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/layout-timed": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/layout-todays-number": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/more-cols2+afterpage": {
+   "S": {
+    "L-DENSITY H13": 16
+   },
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/more-cols2+short": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/more-short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_10k_no_regroup|single/pages-3": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|mixed/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|sections/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_1k_no_regroup|sections/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_1k_no_regroup|sections/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   }
+  },
+  "subtraction:sub_1k_no_regroup|sections/pages-2": {
+   "S": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 10,
+    "L-DENSITY PAGEFILL": 3,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_1k_no_regroup|single/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/ex-each": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/ex-group": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/layout-fact-rows": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/layout-timed": {
+   "S": {},
+   "M": {},
+   "L": {
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_1k_no_regroup|single/layout-todays-number": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/more-cols2+nline+afterpage": {
+   "S": {
+    "L-DENSITY H13": 16
+   },
+   "M": {
+    "L-DENSITY H13": 12
+   },
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/more-cols2+nline+short": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {
+    "L-DENSITY H13": 6
+   },
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/more-cols2+short+afterpage": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {
+    "L-DENSITY H13": 6
+   },
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/more-nline+short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1k_no_regroup|single/pages-3": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|mixed/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|sections/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_1m_no_regroup|sections/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 2,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_1m_no_regroup|sections/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 12,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2
+   }
+  },
+  "subtraction:sub_1m_no_regroup|sections/pages-2": {
+   "S": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 3,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_1m_no_regroup|single/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/ex-each": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/ex-group": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/layout-fact-rows": {
+   "S": {
+    "L-INK ILLEGIBLE": 224,
+    "L-OVERFLOW PG-12": 128
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 66
+   },
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/layout-timed": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/layout-todays-number": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/more-cols2+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/more-cols2+short": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/more-short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_1m_no_regroup|single/pages-3": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_50_no_regroup|mixed/defaults": {
+   "S": {},
+   "M": {},
+   "L": {
+    "L-DENSITY H13": 4
+   }
+  },
+  "subtraction:sub_50_no_regroup|sections/defaults": {
+   "S": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_50_no_regroup|sections/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 20,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-SIZE TY-11": 20,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 4,
+    "L-DENSITY PAGEFILL": 1
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_50_no_regroup|sections/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 20,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-SIZE TY-11": 20,
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY PAGEFILL": 1,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-OVERFLOW PG-12": 8,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 1
+   }
+  },
+  "subtraction:sub_50_no_regroup|sections/pages-2": {
+   "S": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 10,
+    "L-DENSITY PAGEFILL": 3,
+    "L-DENSITY PG-23": 2
+   },
+   "M": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY H13": 8,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   },
+   "L": {
+    "L-INK ILLEGIBLE": 8,
+    "L-OVERFLOW PG-12": 16,
+    "L-DENSITY DN-2": 2,
+    "L-DENSITY H13": 6,
+    "L-DENSITY PAGEFILL": 2,
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_50_no_regroup|single/defaults": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_50_no_regroup|single/ex-each": {
+   "S": {
+    "L-SIZE TY-11": 24,
+    "L-DENSITY H13": 6
+   },
+   "M": {
+    "L-SIZE TY-11": 24,
+    "L-DENSITY H13": 6
+   },
+   "L": {
+    "L-DENSITY H13": 6
+   }
+  },
+  "subtraction:sub_50_no_regroup|single/ex-group": {
+   "S": {
+    "L-SIZE TY-11": 16
+   },
+   "M": {
+    "L-SIZE TY-11": 8,
+    "L-DENSITY PAGEFILL": 1
+   },
+   "L": {}
+  },
+  "subtraction:sub_50_no_regroup|single/layout-fact-rows": {
+   "S": {
+    "L-OVERFLOW PG-12": 180
+   },
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_50_no_regroup|single/layout-timed": {
+   "S": {},
+   "M": {},
+   "L": {
+    "L-DENSITY PG-23": 2
+   }
+  },
+  "subtraction:sub_50_no_regroup|single/layout-todays-number": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_50_no_regroup|single/more-cols2+nline+afterpage": {
+   "S": {
+    "L-DENSITY H13": 16
+   },
+   "M": {
+    "L-DENSITY H13": 12
+   },
+   "L": {
+    "L-DENSITY H13": 12
+   }
+  },
+  "subtraction:sub_50_no_regroup|single/more-cols2+nline+short": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {
+    "L-DENSITY H13": 6
+   },
+   "L": {
+    "L-DENSITY H13": 6
+   }
+  },
+  "subtraction:sub_50_no_regroup|single/more-cols2+short+afterpage": {
+   "S": {
+    "L-DENSITY H13": 8
+   },
+   "M": {
+    "L-DENSITY H13": 6
+   },
+   "L": {
+    "L-DENSITY H13": 6
+   }
+  },
+  "subtraction:sub_50_no_regroup|single/more-nline+short+afterpage": {
+   "S": {},
+   "M": {},
+   "L": {}
+  },
+  "subtraction:sub_50_no_regroup|single/pages-3": {
+   "S": {},
+   "M": {},
+   "L": {}
+  }
+ },
+ "tool": "ws-coverage-matrix",
+ "note": "Per-row baseline (IMPROVEMENT_PLAN §1.6.2): every finding count per (row, size, lint rule) at the commit below, for rows that printed. A red row is any count above it; a row that cannot print (L-SPLIT RENDER) is never pinned. Changed only with a STATUS note.",
+ "commit": "4bd91e89263d0c21d1a715fc14dacf26677d5608",
+ "date": "2026-10-23"
+}
