@@ -75,3 +75,9 @@ Report: design/audit/runs/s1-checks/critic-r1.md.
   lane touching a preset fails only on a new one; backtests s1-presets-obey and -seeded PASS with the pin in place.
 - Merged main 7bf5f587. All node + browser self-tests and unit gates green on the merged tree; ws-precritic-plan 20 OK.
 - Critic r2 started.
+- 11:25–12:05 Lead ruling (rule 0b compares SAME-SHAPE siblings): ws-sibling-compare measures each skill's shape (template +
+  digit tracks over 24 seeded items), keeps only same-shape siblings, and falls back to the lead-named same-shape `peers`
+  (siblings.json: sub_100_no_regroup, sub_50_no_regroup), measured fresh like siblings (their pins predate L-WRAP / H13-ROW /
+  TY-21). Self-test 20 → 24 cases (add_100_regroup 3 tracks is never sub_100_regroup's 2-track sibling). Real check on the 7
+  disputed sub_100_regroup rows: 20 counts at or below the peers, ABOVE only single/ex-each S/M TY-11 28 vs 24 — the one real
+  difference the lead's bisect named. Commit 96f5fcc2, added to critic r2's scope.
