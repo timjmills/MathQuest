@@ -220,6 +220,9 @@ function regroupTracks(kind, t, topDigits) {
  * CL-4b: does this item's written working put marks ABOVE the columns (a carry, an exchange)?
  * Read from the operands, never the skill name.
  */
+/** CL-4b per section: does this stack payload's own working regroup (its tracks read from it)? */
+export const stackRegroups = (p) => needsRegroup(p, tracksOf(p));
+
 export function needsRegroup(p, t) {
     if (p.op === '+' || p.op === '-' || p.op === '−') return regroupWorking(p, t).vals.some((v) => v);
     if (p.op === 'x' || p.op === '×' || p.op === '*') {
@@ -441,7 +444,10 @@ register('stack', {
         });
         // CL-4b: a stack whose working regroups is written ABOVE the columns, so its cell is
         // centred down the box (data-ws-writeabove on the stack, lifted onto the cell by cell()).
-        const top = needsRegroup(p, t) ? markWriteAbove(drawn) : drawn;
+        // Owner ruling 2026-10-24 (VA-10, AX-4): CL-4b is decided PER SECTION. When any stack of the
+        // section regroups, the role sets `sectionWriteAbove` on every stack of it, and each one that
+        // draws a regroup row is centred too - its position never tells which items regroup.
+        const top = needsRegroup(p, t) || (p.sectionWriteAbove && regroup) ? markWriteAbove(drawn) : drawn;
         return withCheck ? top + checkRowHtml(p, ctx, key) : top;
     },
     answerKey(p) {

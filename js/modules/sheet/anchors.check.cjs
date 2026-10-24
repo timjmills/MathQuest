@@ -56,6 +56,10 @@
 //              Model tab's width starts above the tab's bottom + 1 mm
 //   E16 net    (s3 precritic-2) a several-skill section with SECTIONS anchors chooses its columns on
 //              the grid height net of the anchor band (sub_50_no_regroup + 3 at L: >= 3 stack columns)
+//   E17 rows   (owner ruling 2026-10-24, CL-4b per SECTION; VA-10, AX-4) in one section and one
+//              template, the first inked row of every cell of a grid row sits within 1.5 mm of its
+//              neighbours: a mixed regroup page (addition:add_100_mixed at M, items 3, 6, 11, 12)
+//              never centres the regrouping stacks while the others start at the top
 //   E8 off     (critic anchors-r1 2) a page whose skill prints no example (no workedSteps, or a
 //              pair too tall for a page) is byte-identical to the same request with anchors 'off'
 //
@@ -74,7 +78,7 @@ const { open } = require(path.join(ROOT, 'tests/lib/ws-harness.cjs'));
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > -1 ? process.argv[i + 1] : d; };
 const MAX = Math.max(1, Number(arg('max', 40)) || 40);
-const ONLY = String(arg('only', 'E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16')).split(',');
+const ONLY = String(arg('only', 'E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17')).split(',');
 // Owner ruling (2026-10-24): these print their worked example in a band, never beside (E14)
 const WIDE = ['fractions:shade_fraction', 'measurement:money_count', 'placevalue:place_value_10x'];
 const PAD_MM = 2;          // E11
@@ -382,6 +386,46 @@ const MEASURE = () => {
         // to load, every page was measured in the fallback face - narrower than Andika - and E4 / E2
         // read pairs 3-4 mm shorter than they print)
         await doc.goto(app.page.url(), { waitUntil: 'domcontentloaded' });
+        // E17 rows: CL-4b is decided per section (see the header)
+        if (ONLY.includes('E17')) {
+            for (const [key, size, seed] of [['addition:add_100_mixed', 'M', 1730541811], ['subtraction:sub_100_mixed', 'M', 7]]) {
+                const [categoryId, skillId] = key.split(':');
+                const html = await app.page.evaluate(async (req) => { const o = await window.buildSheet(req); return window.sheetDocument(o.pupilHtml, 'p'); },
+                    { role: 'independent', anchors: 'off', size, look: 'ican', key: true, seed, sections: [{ skills: [{ categoryId, skillId, opts: {} }] }] });
+                await doc.setContent(html, { waitUntil: 'load', timeout: 60000 });
+                await doc.evaluate(async () => { if (document.fonts) await document.fonts.ready; });
+                const bad = await doc.evaluate(() => {
+                    const mm = 96 / 25.4, out = [];
+                    for (const g of document.querySelectorAll('.ws-grid')) {
+                        const rows = new Map();
+                        for (const c of g.querySelectorAll(':scope > .ws-cell[data-ws-cell]')) {
+                            const cr = c.getBoundingClientRect();
+                            let top = Infinity;
+                            for (const d of c.querySelectorAll('*')) {
+                                if (d.closest('[data-ws-label], .ws-letter, .ws-tab')) continue;
+                                const ds = getComputedStyle(d);
+                                if (ds.position === 'absolute' || ds.visibility === 'hidden' || ds.display === 'none') continue;
+                                const ink = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img)$/i.test(d.tagName)
+                                    || ['Top', 'Bottom', 'Left', 'Right'].some((k) => parseFloat(ds[`border${k}Width`]) > 0 && ds[`border${k}Style`] !== 'none');
+                                const r = d.getBoundingClientRect();
+                                if (ink && (r.width || r.height)) top = Math.min(top, r.top);
+                            }
+                            if (top === Infinity) continue;
+                            const k = `${c.getAttribute('data-ws-cell')}|${Math.round(cr.top)}`;
+                            if (!rows.has(k)) rows.set(k, []);
+                            const lab = c.querySelector('.ws-tab, .ws-letter, [data-ws-label]');
+                            rows.get(k).push({ off: (top - cr.top) / mm, n: lab ? lab.textContent.trim() : '?' });
+                        }
+                        for (const [k, cs] of rows) {
+                            const offs = cs.map((x) => x.off);
+                            if (cs.length > 1 && Math.max(...offs) - Math.min(...offs) > 1.5) out.push(`${k.split('|')[0]} row of items ${cs.map((x) => `${x.n}@${x.off.toFixed(1)}mm`).join(' ')}`);
+                        }
+                    }
+                    return out;
+                });
+                if (bad.length) { fail++; console.log(`FAIL E17 ${key} independent ${size}: ${bad.length} grid row(s) whose first inked rows differ by more than 1.5 mm (${bad.slice(0, 3).join('; ')})`); }
+            }
+        }
         for (const key of skills) {
             const [categoryId, skillId] = key.split(':');
             for (const mode of MODES) for (const size of SIZES_) {

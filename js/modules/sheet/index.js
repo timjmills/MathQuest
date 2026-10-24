@@ -79,7 +79,7 @@ export {
 } from './adapters.js';
 
 /* ------------------------------------------------- cell templates (register on load) */
-export { stack, stackTabStep, stackAnswerSlot, needsRegroup } from './cells/stack.js';
+export { stack, stackTabStep, stackAnswerSlot, needsRegroup, stackRegroups } from './cells/stack.js';
 export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY, factCue } from './cells/fact.js';
 export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
 // S1 touch numerals: the digit drawn with its touch dots on the strokes (design/SUPPORTS.md §S1).

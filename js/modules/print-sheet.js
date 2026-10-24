@@ -43,7 +43,7 @@ import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './she
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
-import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf } from './sheet/index.js';
+import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups } from './sheet/index.js';
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
@@ -1228,6 +1228,19 @@ function allocateHostSupports(items, n) {
  * function (the SAME one for the pupil page, the key and the measurement), the key, and the
  * class tokens the role writes onto the cell.
  */
+/**
+ * CL-4b per SECTION (owner ruling 2026-10-24; VA-10, AX-4): when any stack of a section regroups,
+ * every stack of the section is told so (`sectionWriteAbove`), and each one that draws a regroup
+ * row is centred like the regrouping ones - the cells of a row start together, and where an item
+ * sits never gives away whether it regroups. Called once a section's items are dealt.
+ */
+export function markSectionWriteAbove(items) {
+    const stacks = (items || []).filter((it) => it && it.q && it.q.cell && it.q.cell.template === 'stack' && it.q.cell.payload);
+    const any = stacks.some((it) => stackRegroups(it.q.cell.payload));
+    for (const it of stacks) it.q.cell.payload = Object.assign({}, it.q.cell.payload, { sectionWriteAbove: any || undefined });
+    return items;
+}
+
 function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = null } = {}) {
     const q0 = g.q;
     // S2: a legacy-drawn fact (sub_facts' vertical fact) that carries supports is drawn by the kit's
@@ -2622,7 +2635,7 @@ async function buildSheetCore(req = {}) {
                 if (again >= want) break;
                 want = again;
             }
-            hostItems = hostItems.concat(items);
+            hostItems = hostItems.concat(markSectionWriteAbove(items));
         });
     } else {
         // MORE PRACTICE: each letter under its own seed (PT-MPR-2). The first letter's probe fixes
@@ -2670,6 +2683,8 @@ async function buildSheetCore(req = {}) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
             }
             byLetter.forEach((items, k) => items.forEach((it) => { it.letter = letters[k]; }));
+            // (CL-4b per section: the letters of a section are one section)
+            markSectionWriteAbove(byLetter.flat());
             for (const items of byLetter) hostItems = hostItems.concat(items);
         });
     }
@@ -3436,6 +3451,12 @@ async function buildRoleSheet(n, metaOf) {
         input.extras = ex;
     }
 
+    // CL-4b per section (owner ruling 2026-10-24): each section of the role's items decides once.
+    {
+        const bySec = new Map();
+        for (const it of items) { const k = it && it.section !== undefined ? it.section : 0; if (!bySec.has(k)) bySec.set(k, []); bySec.get(k).push(it); }
+        for (const list of bySec.values()) markSectionWriteAbove(list);
+    }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
     const out = renderPlan(plan, { key: n.key });
