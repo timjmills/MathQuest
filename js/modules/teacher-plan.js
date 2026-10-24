@@ -112,15 +112,67 @@ function roundTree(exact, total, seed, info) {
 
 const countOf = (it) => { const c = Math.round(Number(it && it.count)); return c > 0 && !(it && it.leftOut) ? c : 0; };
 
+/* ---------------------------------------------------------------- group totals (owner 2026-10-24, level b)
+   A chosen group of skills shares ONE total, split among its members by How often: {skills: ['cat:skill', …], total}
+   or {skills, pct} (a % of the whole set's total).
+   The tray's bulk bar writes them with setCountGroups (T3a); the sheets read them with countGroups(). In memory and
+   in localStorage (mq_teacher_count_groups), so they travel with the set on this device. */
+const GROUPS_KEY = 'mq_teacher_count_groups';
+let groupsMem = null;
+export function countGroups() {
+    if (groupsMem) return groupsMem;
+    try { const g = JSON.parse((typeof localStorage !== 'undefined' && localStorage.getItem(GROUPS_KEY)) || '[]'); groupsMem = Array.isArray(g) ? g : []; } catch (e) { groupsMem = []; }
+    return groupsMem;
+}
+export function setCountGroups(list) {
+    groupsMem = (Array.isArray(list) ? list : []).filter((g) => g && Array.isArray(g.skills) && g.skills.length && (Number(g.total) > 0 || Number(g.pct) > 0))
+        .map((g) => (Number(g.pct) > 0 ? { skills: g.skills.map(String), pct: Math.min(100, Number(g.pct)), name: g.name ? String(g.name) : undefined }
+            : { skills: g.skills.map(String), total: Math.round(Number(g.total)), name: g.name ? String(g.name) : undefined }));
+    try { if (typeof localStorage !== 'undefined') localStorage.setItem(GROUPS_KEY, JSON.stringify(groupsMem)); } catch (e) { /* this device only */ }
+    return groupsMem;
+}
+
+/**
+ * The more specific level wins (owner 2026-10-24): (a) a skill's own count is fixed; (b) a group total covers the
+ * rest of its group, split by weight; (c) the overall total covers what is left. A % (lockPct) is level (a) too,
+ * a share of the overall total, for a skill outside any group.
+ */
 function prepare(items, opts) {
     const list = (items || []).filter((it) => it && it.categoryId && it.skillId);
     const info = {};
     list.forEach((it) => { info[keyOf(it)] = { a: areaKey(it), g: gradeKey(it), w: weightOf(it), c: countOf(it) }; });
     const act = list.filter((it) => weightOf(it) > 0).map(keyOf);
-    const locks = collectLocks(list.filter((it) => !countOf(it)), opts);
     const fixed = {}; act.forEach((k) => { if (info[k].c) fixed[k] = info[k].c; });
+    const label = (k) => (opts && opts.labelOf ? opts.labelOf(k) : k);
+    const groups = (opts && Array.isArray(opts.groups) ? opts.groups : countGroups()) || [];
+    const inGroup = new Set(); let groupError = null;
+    groups.forEach((g, gi) => {
+        const members = (g.skills || []).map(String).filter((k) => act.includes(k) && !inGroup.has(k));
+        if (!members.length) return;
+        members.forEach((k) => inGroup.add(k));
+        // a group total is a count, or a % of the whole set's total (largest remainder: Math.round of the share)
+        const overall = Math.max(0, Math.round(Number(opts && opts.overall) || 0));
+        const T = Number(g.pct) > 0 ? Math.round(overall * Math.min(100, Number(g.pct)) / 100) : Math.max(0, Math.round(Number(g.total) || 0));
+        const own = members.filter((k) => fixed[k]);
+        const ownSum = own.reduce((t, k) => t + fixed[k], 0);
+        const name = g.name || `the group of ${members.length}`;
+        if (ownSum > T && !groupError) {
+            const big = own.slice().sort((x, y) => fixed[y] - fixed[x])[0];
+            const lower = Math.max(0, fixed[big] - (ownSum - T));
+            groupError = { error: `The counts in ${name} come to ${ownSum}, more than its total of ${T}.`, fix: `Raise ${name} to ${ownSum}, or lower ${label(big)} to ${lower}.`, needGroup: { index: gi, total: ownSum }, lower: { key: big, count: lower } };
+            return;
+        }
+        const rest = members.filter((k) => !fixed[k]);
+        const ws = rest.reduce((t, k) => t + info[k].w, 0);
+        const room = T - ownSum;
+        const share = rest.length ? roundLR(Object.fromEntries(rest.map((k) => [k, ws ? room * info[k].w / ws : room / rest.length])), room, 'g' + gi + (opts && opts.seed !== undefined ? opts.seed : 0)) : {};
+        rest.forEach((k) => { fixed[k] = share[k] || 0; info[k].grp = true; });
+    });
+    const gPct = groups.reduce((t, g) => t + (Number(g.pct) > 0 ? Number(g.pct) : 0), 0);
+    if (gPct > 100 + 1e-6 && !groupError) groupError = { error: `The groups' percentages come to ${Math.round(gPct)} %, more than 100 %.`, fix: 'Lower one of the groups.' };
+    const locks = collectLocks(list.filter((it) => !countOf(it) && !inGroup.has(keyOf(it))), opts);
     const fixedSum = Object.values(fixed).reduce((a, b) => a + b, 0);
-    return { list, info, act, locks, fixed, fixedSum };
+    return { list, info, act, locks, fixed, fixedSum, groupError };
 }
 
 function lockError(errs) {
@@ -136,17 +188,20 @@ const pctSum = (locks) => Object.values(locks).reduce((a, b) => a + b, 0);
  * @returns {{counts:number[], byKey, pct, total, locked:boolean, warn:string[]} | {error:string, needTotal?:number}}
  */
 export function planCounts(items, total, opts = {}) {
-    const { list, info, act, locks, fixed, fixedSum } = prepare(items, opts);
+    const { list, info, act, locks, fixed, fixedSum, groupError } = prepare(items, Object.assign({}, opts, { overall: total }));
+    if (groupError) return Object.assign({}, groupError, { error: `${groupError.error} ${groupError.fix}` });
     const T = Math.max(0, Math.round(total || 0));
-    const free = act.filter((k) => !fixed[k]);
+    const free = act.filter((k) => !(k in fixed));
     const held = pctSum(locks);
     // the % locks are shares of the TOTAL; what the fixed counts leave is the room they come out of
     const room = T - fixedSum;
     const heldN = T * held / 100;
     if (fixedSum + heldN > T + 1e-6) {
         const need = held < 100 ? Math.ceil(fixedSum / (1 - held / 100) - 1e-9) : Infinity;
-        return { error: fixedSum && held ? `The counts (${fixedSum}) and the held ${Math.round(held)} % come to more than the ${T} problems there are.`
-            : fixedSum ? `The counts come to ${fixedSum}, more than the ${T} problems there are.` : lockError([{ keys: Object.keys(locks), used: Math.round(held), room: 100 }]), needTotal: need };
+        // never rescaled silently: say so and offer the fix
+        const fix = isFinite(need) ? ` Raise the total to ${need}.` : ' Lower the held %.';
+        return { error: (fixedSum && held ? `The counts (${fixedSum}) and the held ${Math.round(held)} % come to more than the ${T} problems there are.`
+            : fixedSum ? `The counts come to ${fixedSum}, more than the ${T} problems there are.` : lockError([{ keys: Object.keys(locks), used: Math.round(held), room: 100 }])) + fix, fix: fix.trim(), needTotal: need };
     }
     // rescale the % locks to the room the counts leave
     const scale = room > 0 ? T / room : 0;
@@ -188,7 +243,10 @@ export function planCounts(items, total, opts = {}) {
  *            added:false|'single'|true, warn:string[], big, shown, active, left, pct, each, needPages?:number, error?:string}}
  */
 export function planPages(kind, items, opts = {}) {
-    const { list, info, act, locks, fixed, fixedSum } = prepare(items, opts);
+    const per0 = Math.max(1, opts.perPage || PER_PAGE[opts.size] || PER_PAGE.M);
+    const amt0 = opts.amount && opts.amount.mode ? opts.amount : opts.quiz && opts.total ? { mode: 'total', n: opts.total } : { mode: 'pages', n: opts.pages };
+    const overall = amt0.mode === 'total' ? Number(amt0.n) || 0 : amt0.mode === 'pages' ? per0 * Math.max(1, Number(amt0.n) || 1) : 0;
+    const { list, info, act, locks, fixed, fixedSum, groupError } = prepare(items, Object.assign({}, opts, { overall }));
     const per = Math.max(1, opts.perPage || PER_PAGE[opts.size] || PER_PAGE.M);
     const n = list.length, big = n > 8, anyLock = Object.keys(locks).length > 0 || fixedSum > 0;
     const seed = opts.seed === undefined ? 0 : opts.seed;
@@ -196,15 +254,16 @@ export function planPages(kind, items, opts = {}) {
     const amount = opts.amount && ['pages', 'total', 'each'].includes(opts.amount.mode) ? opts.amount
         : opts.quiz && opts.total ? { mode: 'total', n: opts.total } : { mode: 'pages', n: opts.pages };
     const mode = amount.mode;
-    const free = act.filter((k) => !fixed[k]);
+    const free = act.filter((k) => !(k in fixed));
     const fail = (error, extra = {}) => Object.assign({ kind, mode, error, pages: 0, perPage: per, total: 0, about: 0, counts: list.map(() => 0), byKey: {}, pagesBy: null, pageItems: [], added: false, warn: [], big, shown: 0, active: act.length, left: n - act.length, pct: {}, each: 'new' }, extra);
     let pages, total, added = false, byKey = {}, warn = [], pagesBy = null, needPages;
+    if (groupError) return fail(`${groupError.error} ${groupError.fix}`, { fix: groupError.fix, lower: groupError.lower, needGroup: groupError.needGroup });
 
     if (mode === 'total' || mode === 'each') {
         const N = Math.max(1, Math.round(amount.n || 1));
         total = mode === 'total' ? N : N * free.length + fixedSum;
-        const pc = planCounts(list, total, { locks: opts.locks, seed, labelOf: opts.labelOf });
-        if (pc.error) return fail(pc.error, { needTotal: pc.needTotal });
+        const pc = planCounts(list, total, { groups: opts.groups, locks: opts.locks, seed, labelOf: opts.labelOf });
+        if (pc.error) return fail(pc.error, { needTotal: pc.needTotal, fix: pc.fix, lower: pc.lower });
         byKey = pc.byKey;
         if (mode === 'each') free.forEach((k) => { if (!Object.keys(locks).length) byKey[k] = N; });
         total = act.reduce((t, k) => t + (byKey[k] || 0), 0);
@@ -241,7 +300,7 @@ export function planPages(kind, items, opts = {}) {
             total = per * pages;
             if (!big && !anyLock && kind === 'mixed' && act.length * 2 > total) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
             if (!big && kind === 'sections' && act.length > total / 2 && !fixedSum) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
-            const pc = planCounts(list, total, { locks: opts.locks, seed, labelOf: opts.labelOf, minEach: (!big && !anyLock && total >= act.length * 2) ? 2 : 1 });
+            const pc = planCounts(list, total, { groups: opts.groups, locks: opts.locks, seed, labelOf: opts.labelOf, minEach: (!big && !anyLock && total >= act.length * 2) ? 2 : 1 });
             if (pc.error) {
                 // the counts (and held %) do not fit these pages: say how many would
                 needPages = isFinite(pc.needTotal) ? Math.ceil(pc.needTotal / per) : undefined;
