@@ -143,13 +143,15 @@ register('equation', {
             // warm-up. In a column too narrow for the answer line beside the sentence (judged on
             // the band's widest fact, so one page holds one form, AX-4) the line goes under it,
             // centred (DN-22's "answer stacked below"), never a smaller digit (PG-20).
+            // `data-ws-across` (CL-40, critic 2026-10-24 D1): a top-started across fact clears the label
+            // keep-out by its top inset (css/sheet-kit.css, CL-40 block), whatever its width.
             const o = (g) => `<span class="o" style="width:${ACROSS_OP_EM}em">${g}</span>`;
             const sentence = `<span>${num('a')}</span>${o(opGlyph(p.op))}<span>${num('b')}</span>${o('=')}`;
             if (acrossBelow(p, ctx)) {
-                return `<div class="ws-eq ws-eq-below" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
+                return `<div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_GAP_EM}em;white-space:nowrap">${sentence}</span>${slotHtml}</div>`;
             }
-            return `<div class="ws-eq" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
+            return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
         }
         const pieces = [
             u === 'a' ? slotHtml : `<span>${num('a')}</span>`,

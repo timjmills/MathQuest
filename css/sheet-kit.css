@@ -412,3 +412,12 @@
 .ws-page .ws-grid > .ws-cell > .ws-stack[data-ws-writeabove] { margin-top: 0; margin-bottom: 0; }
 .ws-page .ws-grid > .ws-cell:has(> .ws-stack[data-ws-writeabove]):not(.blankrun)::before,
 .ws-page .ws-grid > .ws-cell:has(> .ws-stack[data-ws-writeabove]):not(.blankrun)::after { content: ''; display: block; flex: 0 1 calc(var(--ws-tab, 5mm) - 1mm); min-height: 0; }
+
+/* 2026-10-24 (CL-40, critic D1 on CL-4b): a top-started across division fact (cells/equation.js
+   `data-ws-across`) in a cell with a number tab or a letter box gets a top inset of (tab side + 1 mm)
+   on its INK: a shrinkable spacer of (tab side + 1 mm - the 3 mm pad - the 0.2 em of line box above a
+   digit's ink). Wide facts ("48 ÷ 12" in a 61 mm column) otherwise put their first digit on the tab's
+   corner. Every across fact of a row takes it, so one row keeps one baseline (AX-4); narrow facts
+   already clear the tab sideways (label side + 2 mm) and lose nothing. The spacer shrinks before it
+   overflows a tight row; ws-print-lint L-OVERLAP CL40-INK measures the ink. Additive. */
+.ws-page .ws-grid > .ws-cell:has(> :is(.ws-tab, .ws-letter)):has(> .ws-eq[data-ws-across]):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: 0 1 max(0mm, calc(var(--ws-tab, 5mm) - 2mm - 0.2 * var(--ws-digit, 22pt))); min-height: 0; }
