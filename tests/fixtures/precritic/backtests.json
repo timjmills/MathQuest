@@ -405,6 +405,122 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "s1-zero-case-content-audit",
+   "check": "S1 check 1: ws-content-audit --skill enforces the spec card numeric rulings (zero-case rate)",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "ws-content-audit card-ruling (ws-card-rulings predicates)",
+   "fail": {
+    "commit": "27577cf",
+    "state": "pilot-su-c critic r1 D1: zero cases on 66 of 120 items of sub_50_no_regroup (card §9.4: within 50 never seeds one)"
+   },
+   "pass": {
+    "commit": "ff471fd",
+    "state": "fix round 1: each bottom digit 1 .. v-1, a top 0 one item in 10"
+   },
+   "command": "node tests/scripts/ws-content-audit.cjs --skill sub_50_no_regroup --category subtraction --no-mc --rulings tests/fixtures/precritic/pilot-su-c/rulings.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "s1-dealer-uniform",
+   "check": "S1 check 2: dealer uniformity (digits / values even, page caps, no pinned position)",
+   "kind": "commit-pair",
+   "rule": "ws-dealer-uniform UNIFORM / PAGE / PERIOD",
+   "fail": {
+    "commit": "03eda45",
+    "state": "the tree critic r2 graded: N1, the 2-digit dealer draws the bottom digit first (b ones 8 at 3.4x uniform), minuend 49 four times on a page, the zero item at itemIndex % 10 === 7"
+   },
+   "pass": {
+    "commit": "a930c43",
+    "state": "fix r2: pairs drawn uniformly from the valid set, at most 2 copies of a minuend and 3 of an answer per page, the zero case placed by the rng"
+   },
+   "command": "node tests/scripts/ws-dealer-uniform.mjs --root {root} --rulings tests/fixtures/precritic/pilot-su-c/rulings.json --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_2d_1d",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "s1-lesson-data",
+   "check": "S1 check 5: lesson-data presence (the lesson page would fall back)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint LESSON-DATA",
+   "fail": {
+    "commit": "27577cf",
+    "state": "pilot-su-c critic r1 D4 (H3): \"No lesson data for this skill yet\" on all seven lessons"
+   },
+   "pass": {
+    "commit": "ff471fd",
+    "state": "fix round 1: a LESSONS entry for each skill in lessons/prereqs.js"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules LESSON-DATA --no-baseline --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "s1-option-help",
+   "check": "S1 check 6: option help names only offered values (inherited _ap4 patches included)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint OPTION-HELP",
+   "fail": {
+    "commit": "03eda45",
+    "state": "critic r2 N3: the _ap4Patch level helpShort says \"2 adds the place heads\"; the panel offers 3 / 1 / 0"
+   },
+   "pass": {
+    "commit": "a930c43",
+    "state": "fix r2: the AP4 level help patch skips the no-regroup ids; the level keeps its own help (3 / 1 / 0)"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules OPTION-HELP --no-baseline --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_2d_1d",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "s1-wrong-fits",
+   "check": "S1 check 10: the provider wrongAnswer fits the item answer slot (node estimate: declared box count)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint WRONG-FITS",
+   "fail": {
+    "commit": "27577cf",
+    "state": "critic r1 D9 class: the \"added\" wrong answer (a + b) overflows the answer strip (110 in 2 boxes)"
+   },
+   "pass": {
+    "commit": "ff471fd",
+    "state": "fix round 1 (providers/subtraction.js): \"added\" only when the sum fits the strip"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules WRONG-FITS --no-baseline --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_2d_1d",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "s1-presets-obey",
+   "check": "S1 check 9: every preset skill's items obey its preset option values",
+   "kind": "fixture",
+   "browser": false,
+   "rule": "ws-presets-unit check 6 (items obey the preset values)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/presets-obey/bad.state.json",
+    "state": "SEEDED: 4fbc80c + a patch making the multiply sizer read tiles 21 as 22 (mult_2by1_column deals 2 x 2; preset = host-with-values, so the old check 3 passes)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/presets-obey/good.state.json",
+    "state": "4fbc80c as committed"
+   },
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- /tmp/mq-browser-run.sh node tests/scripts/ws-presets-unit.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

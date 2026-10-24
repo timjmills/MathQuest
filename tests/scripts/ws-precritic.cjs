@@ -42,7 +42,16 @@
 //             ws-card-rulings --check offered (the option panel offers nothing the card lists as not offered). A skill
 //               whose card has no machine-readable rulings block makes these two rows SKIPPED (no rulings): not run,
 //               and a scope where only SOME skills have rulings makes them INCOMPLETE (partial rulings; critic r6 D3),
-//               not passed, and an incomplete run under --strict
+//               not passed, and an incomplete run under --strict;
+//             and the lane S1 checks (2026-10-24): ws-content-audit --skill also enforces every numeric ruling the spec
+//               card makes on the skill (ws-card-rulings' predicates, class card-ruling), ws-dealer-uniform --skill
+//               (120 seeded items: per-place digits and values within 2σ of uniform over the valid set, at most 2 of a
+//               minuend / 3 of an answer per page, no seeded case on a fixed position; INCOMPLETE when the valid set is
+//               unknown; pins in tests/fixtures/precritic/dealer-uniform.baseline.json), ws-node-lint --rules
+//               LESSON-DATA,OPTION-HELP,WRONG-FITS (the lesson page has lesson data; the option help names only offered
+//               values; the provider's wrongAnswer fits the item's answer boxes; pins in
+//               tests/fixtures/precritic/node-lint-s1.baseline.json), and ws-presets-unit checks that every preset's
+//               items obey its preset values
 //   --template <id>   the --skill gates for every live skill whose kit cell template is <id> on ANY of its 8 seeded
 //             items (a "template skill scan" row names the skills that draw it, and FAILS naming any skill whose
 //             generation errored on every item, since whether it draws <id> is unknown), + ws-panes-unit, a
@@ -553,6 +562,19 @@ const PARSE = {
         if (v[1] !== 'OK') return { result: 'FAIL', findings: `${bad.length} row×size(s) failing; ${base}`, detail: bad.slice(0, 8).map((r) => `${r.id} ${r.size}: ${(r.findings || [r.status]).join('; ').slice(0, 180)}`), explainsExit: code === 1 };
         return { result: checked.some((r) => (r.slot || 0) + (r.clip || 0) > 0) ? 'PASS (baseline)' : 'PASS', findings: `${base}; every SLOT / CLIP count at or below the approved siblings`, detail: [], explainsExit: false };
     },
+    /** ws-dealer-uniform (lane S1): INCOMPLETE (exit 3: a skill's valid set unknown) is never PASS; pinned findings are PASS (baseline). */
+    dealerUniform(g, out, code) {
+        const inc = /^ws-dealer-uniform: INCOMPLETE - not fully checked: (.*?) \((.*)\)\s*$/m.exec(out);
+        if (inc && code === 3) return { result: 'INCOMPLETE (valid set unknown)', findings: `not fully checked: ${listShort(inc[1].split(', '), 4)}; ${inc[2]}`, detail: out.split('\n').filter((l) => /^ {6}note /.test(l)).slice(0, 6).map((l) => l.trim()), explainsExit: true };
+        const r = generic(g, out, code);
+        const m = /^ws-dealer-uniform: (?:OK|FAIL - [^(]*)\((.*)\)\s*$/m.exec(out);
+        const missing = (g.keys || []).filter((k) => !new RegExp(`^ {2}\\S+ +${reEsc(k)} `, 'm').test(out));
+        if (r.result === 'PASS' && missing.length) return { result: 'FAIL', findings: `${missing.length} skill(s) in scope not in the output: ${listShort(missing)}`, detail: tailLines(out), explainsExit: false };
+        const pinned = (out.match(/^ {6}pinned /gm) || []).length;
+        if (r.result === 'PASS') { r.findings = `${m ? m[1] : '-'}${pinned ? `; ${pinned} pinned finding(s)` : ''}`; if (pinned) r.result = 'PASS (baseline)'; }
+        else if (r.result === 'FAIL') r.detail = out.split('\n').filter((l) => /^ {6}FAIL /.test(l)).slice(0, 10).map((l) => l.trim());
+        return r;
+    },
     /** ws-card-rulings: NO-RULINGS (exit 4) is SKIPPED, never PASS. */
     cardRulings(g, out, code) {
         if (/^ws-card-rulings: NO-RULINGS\b/m.test(out) && code === 4) {
@@ -650,6 +672,10 @@ function buildPlan(ctx) {
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
+        // ---- lane S1 (2026-10-24): dealer uniformity, and the lesson-data / option-help / wrong-answer-fit node rules
+        add(gate('dealer-uniform', 'ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)', scope, 'node', 'ws-dealer-uniform', ['--skill', keys.join(',')], { parse: PARSE.dealerUniform, keys }));
+        const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
+        add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
     }
     if (ctx.template) {
         const t = ctx.template;

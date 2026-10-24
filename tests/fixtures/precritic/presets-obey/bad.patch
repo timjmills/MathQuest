@@ -1,0 +1,12 @@
+--- a/js/modules/gen-operations.js	2026-10-24 05:57:01.477105990 +0000
++++ b/js/modules/gen-operations.js	2026-10-24 05:57:08.084171838 +0000
+@@ -2480,7 +2480,8 @@
+ function _generateSizedMultDiv(q, skill, helpers) {
+     const { rng } = helpers;
+     if (skill === 'multiply') {
+-        const d = Number(_opt('tiles'));
++        // SEEDED DEFECT (backtest only): the multiply sizer ignores tiles 21 and deals 2 × 2
++        const d = Number(_opt('tiles')) === 21 ? 22 : Number(_opt('tiles'));
+         if (!d) return false;
+         const lo = (n) => (n === 1 ? 2 : 10 ** (n - 1)), hi = (n) => 10 ** n - 1;
+         const da = Math.floor(d / 10), db = d % 10;

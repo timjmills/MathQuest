@@ -33,6 +33,19 @@
 //   REPEATS   the first --page items (default 12) of a page deal — print-sheet's generateRun, emulated: seed
 //                   base + i, a duplicate retried 12 times under base + i + 7919k — hold no problem twice (the same
 //                   signature, or the same printed text with numbers and the same answer).
+//   OPT-IN (lane S1, 2026-10-24; run only when --rules names them, so the default sweep and its baseline are unchanged;
+//   ws-precritic runs them per skill against tests/fixtures/precritic/node-lint-s1.baseline.json):
+//   LESSON-DATA     the lesson page has lesson data: lessons/prereqs.js lessonFor(category, skill) is not null (else
+//                   sheet/roles/lesson.js prints "No lesson data for this skill yet" and the Warm-up falls back to the
+//                   skills listed before it; critic pilot-su-c r1 D4), and its `skills` / `mixWith` refs are live skills.
+//   OPTION-HELP     every value an option's help / helpShort names ("3 traces the answer, 2 adds ...", "level 1") is a
+//                   value offeredOptionsFor() offers the skill - the panel as shown, inherited _ap4* patches included
+//                   (critic pilot-su-c r2 N3). A number names a value when it opens a clause or follows "level"; a
+//                   capitalised label head when it appears capitalised; the universe is the values that option id takes
+//                   on any live skill.
+//   WRONG-FITS      the provider's wrongAnswer(q) has no more digits than the answer boxes the item's cell declares
+//                   (payload ansDigits / boxes): a NODE ESTIMATE - an item with no declared box count, or a non-number
+//                   wrong answer, is not judged (the browser lint L-ANSAREA measures write-on lines). Critic r1 D9 class.
 //
 // Baseline: design/audit/baselines/node-lint.json pins today's FINDING KEYS per skill (critic r1 D5), not counts. A key
 // is rule|kind|#item|signature: the dealt item (seed hashSeed(category:skill) + index, so stable) and the normalised
@@ -63,6 +76,9 @@ const arg = (f, d) => { const i = args.indexOf(f); return i >= 0 && i + 1 < args
 const argAll = (f) => args.flatMap((a, i) => (a === f && i + 1 < args.length ? String(args[i + 1]).split(',') : [])).map((s) => s.trim()).filter(Boolean);
 
 const ALL_RULES = ['NOTATION', 'L1', 'L3', 'L6', 'L10', 'REPEATS'];
+// Lane S1 rules: OPT-IN (run only when --rules names them), so the default sweep and its pinned baseline are unchanged;
+// ws-precritic runs them per skill against tests/fixtures/precritic/node-lint-s1.baseline.json.
+const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS'];
 const RULE_CITES = {
     NOTATION: 'C4; WORKSHEET_DESIGN_STANDARD TY-6, TY-7; PEDAGOGY_STANDARD 10.1 (P-14)',
     L1: 'LESSONS_LEARNED L1; WORKSHEET_DESIGN_STANDARD DN-1a',
@@ -70,6 +86,9 @@ const RULE_CITES = {
     L6: 'LESSONS_LEARNED L6',
     L10: 'LESSONS_LEARNED L10',
     REPEATS: 'IMPROVEMENT_PLAN §1.4 backtest "Repeats"; PAGE_TYPES no repeated problem on a page',
+    'LESSON-DATA': 'critic pilot-su-c r1 D4 (H3): "No lesson data for this skill yet" - the lesson page falls back to earlierSkills',
+    'OPTION-HELP': 'critic pilot-su-c r2 N3 (OC3 family): the option help names only values the panel offers',
+    'WRONG-FITS': 'SKILL_CELL_CONTRACT wrongAnswer (SCC 3.8); PT-ERR: the error-analysis key writes the wrong answer in the item slot',
 };
 const RETRIES = 12;                 // print-sheet.js generateRun: duplicate retries per item
 
@@ -393,6 +412,61 @@ export function libraryMatcher(library) {
 
 /* ============================================================================ self-test */
 
+/* -------------------------------------------- lane S1 rules: OPTION-HELP and WRONG-FITS helpers (pure, self-tested) */
+
+/** An option value's words as the help could name it: a number as itself, a label up to its first "  (" / " —". */
+export function valueWords(val) {
+    const v = val && typeof val === 'object' ? val.v : val;
+    const l = val && typeof val === 'object' && val.l != null ? String(val.l) : String(v);
+    const head = l.split(/\s{2}\(| \(| — | - /)[0].trim();
+    return { v, num: typeof v === 'number' || /^\d+$/.test(String(v)) ? Number(v) : null, head };
+}
+// words after a number that make it a count, not a level ("2 digits", "3 columns")
+const COUNT_WORDS = /^(?:digits?|places?|columns?|items?|problems?|rows?|numbers?|times?|tens?|ones?|hundreds?|thousands?|of|or|and|to|%|cm|mm|m|minutes?|hours?|days?|weeks?)\b/i;
+/**
+ * The values of an option that a help text NAMES (OPTION-HELP, critic pilot-su-c r2 N3: "3 traces the answer, 2 adds
+ * the place heads, 1 is the bare column" on a panel that offers 3 / 1 / 0). `universe` is every value the option id
+ * takes on ANY skill ({v, num, head}); a number is named when it opens a clause ("3 traces", ", 2 adds") or follows
+ * "level"; a label head (4+ letters, capitalised) is named when it appears as a capitalised word. Returns the
+ * universe values named.
+ */
+export function helpNamedValues(text, universe) {
+    const t = String(text || '');
+    const named = new Set();
+    const nums = new Map(universe.filter((u) => u.num !== null).map((u) => [u.num, u]));
+    if (nums.size) {
+        for (const m of t.matchAll(/(?:^|[.;:,]\s+|\(\s*|\blevels?\s+)(\d+)(?![\d,.]\d)(?=\s*(\S*))/gi)) {
+            const n = Number(m[1]);
+            const level = /levels?\s+$/i.test(t.slice(Math.max(0, m.index), m.index + m[0].indexOf(m[1])));
+            if (!nums.has(n)) continue;
+            if (!level && (!m[2] || COUNT_WORDS.test(m[2]))) continue;
+            named.add(nums.get(n).v);
+        }
+    }
+    for (const u of universe) {
+        if (u.num !== null || !u.head || u.head.length < 4 || !/^[A-Z][a-z]/.test(u.head)) continue;
+        const re = new RegExp(`(^|[^A-Za-z])${u.head.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z])`);
+        if (re.test(t)) named.add(u.v);
+    }
+    return [...named];
+}
+/**
+ * WRONG-FITS: does a wrong answer fit the answer slot the item declares? The slot's size is read from the cell payload
+ * (a row of digit boxes: `ansDigits`, `boxes`, `digits` on a stack / fact cell); a wrong answer FITS when its digit
+ * count (commas and spaces do not take a box) is at most the box count. Returns {judged, fits, digits, boxes}; an item
+ * with no declared box count is not judged (a write-on line has no fixed width in node: the browser lint L-ANSAREA
+ * measures it).
+ */
+export function wrongFitsSlot(wrong, payload) {
+    const p = payload || {};
+    const boxes = [p.ansDigits, p.answerDigits, p.boxes].map(Number).find((n) => Number.isFinite(n) && n > 0);
+    if (!boxes) return { judged: false };
+    const s = String(wrong == null ? '' : wrong).replace(/[,\s ]/g, '');
+    if (!/^-?\d+$/.test(s)) return { judged: false };
+    const digits = s.replace(/^-/, '').length + (s.startsWith('-') ? 1 : 0);
+    return { judged: true, fits: digits <= boxes, digits, boxes };
+}
+
 function selfTest() {
     const fails = [];
     const eq = (got, want, what) => { const g = JSON.stringify(got), w = JSON.stringify(want); if (g !== w) fails.push(`${what}: expected ${w}, got ${g}`); };
@@ -482,6 +556,20 @@ function selfTest() {
     eq([...givenNumbers({ cell: { payload: { rows: [{ value: 2 }, { value: 7 }] } } })], ['2', '7'], 'N2: value inside a list of rows is given');
     eq([...givenNumbers({ cell: { payload: { rows: [{ value: 2 }] } } })], [], 'N2: value inside a one-entry list is not');
     eq([...givenNumbers({ cell: { payload: { groups: 3, perGroup: 4 } } })], ['3', '4'], 'N2: groups / perGroup stay given');
+    // lane S1: OPTION-HELP (critic r2 N3) and WRONG-FITS
+    const lvl = [0, 1, 2, 3].map((n) => valueWords({ v: n, l: `${n} — x` }));
+    eq(helpNamedValues('3 traces the answer, 2 adds the place heads, 1 is the bare column.', lvl).sort(), [1, 2, 3], 'S1: N3 help names 3, 2 and 1');
+    eq(helpNamedValues('Level 3 writes each answer in grey, level 1 prints the heads, level 0 takes them away.', lvl).sort(), [0, 1, 3], 'S1: "level N" names N');
+    eq(helpNamedValues('Always stacked from within 1,000 up: the columns line the places up.', lvl), [], 'S1: 1,000 is not level 1');
+    eq(helpNamedValues('Support level: how much help each problem prints (3 most, 0 none).', lvl).sort(), [0, 3], 'S1: "(3 most, 0 none)"');
+    eq(helpNamedValues('Pick 2 digits or 3 digits.', lvl), [], 'S1: a count of digits is not a level');
+    const nota = [{ v: 'stacked', l: 'Stacked  (68 above − 25)' }, { v: 'across', l: 'Across  (68 − 25 = __)' }].map(valueWords);
+    eq(helpNamedValues('Across is offered here because no item regroups.', nota), ['across'], 'S1: a capitalised label is named');
+    eq(helpNamedValues('the columns go across the page', nota), [], 'S1: a lower-case word is not a label');
+    eq(wrongFitsSlot('145', { ansDigits: 2 }), { judged: true, fits: false, digits: 3, boxes: 2 }, 'S1: a 3-digit wrong answer in 2 boxes');
+    eq(wrongFitsSlot('1,234', { ansDigits: 4 }).fits, true, 'S1: a comma takes no box');
+    eq(wrongFitsSlot('12', {}).judged, false, 'S1: no declared boxes is not judged');
+    eq(wrongFitsSlot('8 R 5', { ansDigits: 2 }).judged, false, 'S1: a non-number is not judged');
     if (fails.length) {
         for (const f of fails) console.log('  ' + f);
         console.log(`ws-node-lint --self-test: FAIL (${fails.length})`);
@@ -537,8 +625,8 @@ const inLibrary = libraryMatcher(kit.INSTRUCTION_LIBRARY);
 const N = Math.max(6, Number(arg('--n', 30)) || 30);
 const PAGE = Math.max(2, Number(arg('--page', 12)) || 12);
 const wantRules = argAll('--rules').map((r) => r.toUpperCase());
-const badRule = wantRules.find((r) => !ALL_RULES.includes(r));
-if (badRule) { say(`ws-node-lint: unknown rule "${badRule}" (rules: ${ALL_RULES.join(', ')})`); process.exit(2); }
+const badRule = wantRules.find((r) => !ALL_RULES.includes(r) && !EXTRA_RULES.includes(r));
+if (badRule) { say(`ws-node-lint: unknown rule "${badRule}" (rules: ${ALL_RULES.concat(EXTRA_RULES).join(', ')})`); process.exit(2); }
 const fixtures = argAll('--fixture');
 
 /** A skill is the generator's (live SKILLS entry) or a fixture's. */
@@ -568,6 +656,21 @@ if (fixtures.length) {
     for (const k of argAll('--skill')) if (!subjects.some((s) => s.key === k)) { say(`ws-node-lint: "${k}" is not a live skill`); process.exit(2); }
 }
 const rules = wantRules.length ? wantRules : fixtures.length && subjects[0].fixture.rules ? subjects[0].fixture.rules.map((r) => r.toUpperCase()) : ALL_RULES;
+
+// Lane S1: the lesson data and the option panel, loaded only for the rules that read them (an old tree may lack one:
+// LESSON-DATA then finds every skill falling back, which is what that tree's lesson page does).
+let prereqs = null, skillOptions = null;
+if (rules.includes('LESSON-DATA') || rules.includes('OPTION-HELP')) {
+    mute();
+    try { prereqs = await import(M('lessons/prereqs.js')); } catch (e) { prereqs = { loadError: String(e && e.message || e) }; }
+    try {
+        skillOptions = await import(M('skill-options.js'));
+        for (const side of ['skill-options-derived.js', 'skill-options-pools.js', 'skill-presets.js']) { try { await import(M(side)); } catch (e) { /* not in this tree */ } }
+    } catch (e) { skillOptions = { loadError: String(e && e.message || e) }; }
+    unmute();
+}
+const LIVE_KEYS = new Set();
+for (const [cat, list] of Object.entries(data.SKILLS)) for (const s of list || []) if (s && s.v && !s.retired) LIVE_KEYS.add(`${cat}:${s.v}`);
 
 /* ========================================================================= the deal */
 
@@ -907,6 +1010,105 @@ function ruleL10(key, cells) {
     }
 }
 
+/**
+ * LESSON-DATA (lane S1; critic pilot-su-c r1 D4): the lesson page of a skill reads js/modules/lessons/prereqs.js
+ * LESSONS[category:skill] (print-sheet.js: `n.lessonData || lessonFor(...)`); with no entry, sheet/roles/lesson.js
+ * prints "No lesson data for this skill yet" and the Warm-up falls back to the skills listed before it (D4: a
+ * no-regrouping lesson dealt regrouping items). A skill with no entry is a finding; so is an entry whose warm-up
+ * (`skills`) or mixed-practice (`mixWith`) refs name a skill that is not live.
+ */
+function ruleLessonData(key, cat, skill) {
+    if (!prereqs || prereqs.loadError || typeof prereqs.lessonFor !== 'function') {
+        tick('LESSON-DATA', 1);
+        find(key, 'LESSON-DATA', 0, 'no-lesson-data', `no lessons/prereqs.js lessonFor() in this tree${prereqs && prereqs.loadError ? ` (${clip(prereqs.loadError, 60)})` : ''}: every lesson page falls back`, 'no-prereqs');
+        return;
+    }
+    let d = null;
+    try { d = prereqs.lessonFor(cat, skill); } catch (e) { d = null; }
+    tick('LESSON-DATA', 1);
+    if (!d) { find(key, 'LESSON-DATA', 0, 'no-lesson-data', `the lesson page falls back: lessons/prereqs.js LESSONS has no entry for ${key} (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)`, key); return; }
+    for (const [field, list] of [['skills', d.skills], ['mixWith', d.mixWith]]) {
+        for (const ref of Array.isArray(list) ? list : []) {
+            const k = ref && ref.key;
+            if (k && !LIVE_KEYS.has(k)) find(key, 'LESSON-DATA', 0, 'dead-ref', `LESSONS[${key}].${field} names ${k}, which is not a live skill`, `${field}:${k}`);
+        }
+    }
+}
+
+/**
+ * OPTION-HELP (lane S1, the cheap half; critic pilot-su-c r2 N3): every value an option's help text (help, helpShort;
+ * not the tip, the scale's generic legend) names is a value offeredOptionsFor() offers this skill - the panel as the teacher sees it, so the inherited
+ * `_ap4*` patches are included. A value is named as helpNamedValues() reads it, against the values that option id takes
+ * on ANY live skill (so "2 adds the place heads" is read as level 2 because some skill offers level 2).
+ */
+let HELP_UNIVERSE = null;
+function helpUniverse() {
+    if (HELP_UNIVERSE) return HELP_UNIVERSE;
+    HELP_UNIVERSE = new Map();
+    mute();
+    try {
+        for (const k of LIVE_KEYS) {
+            const [c, s] = k.split(':');
+            let offered = [];
+            try { offered = skillOptions.offeredOptionsFor(c, s) || []; } catch (e) { offered = []; }
+            for (const o of offered) {
+                if (!o || !Array.isArray(o.values)) continue;
+                const m = HELP_UNIVERSE.get(o.id) || new Map();
+                for (const v of o.values) { const w = valueWords(v); if (!m.has(String(w.v))) m.set(String(w.v), w); }
+                HELP_UNIVERSE.set(o.id, m);
+            }
+        }
+    } finally { unmute(); }
+    return HELP_UNIVERSE;
+}
+function ruleOptionHelp(key, cat, skill) {
+    if (!skillOptions || skillOptions.loadError || typeof skillOptions.offeredOptionsFor !== 'function') { skip('OPTION-HELP', 'no skill-options.js offeredOptionsFor in this tree (skills)'); return; }
+    let offered = [];
+    mute();
+    try { offered = skillOptions.offeredOptionsFor(cat, skill) || []; } catch (e) { offered = []; } finally { unmute(); }
+    const uni = helpUniverse();
+    let texts = 0;
+    for (const o of offered) {
+        if (!o || !Array.isArray(o.values) || !o.values.length) continue;
+        const here = new Set(o.values.map((v) => String(valueWords(v).v)));
+        const universe = [...(uni.get(o.id) || new Map()).values()];
+        for (const field of ['help', 'helpShort']) {   // (the tip is the scale's one generic legend, "3 most, 0 none", shared by every ladder)
+            if (!o[field]) continue;
+            texts++;
+            for (const v of helpNamedValues(o[field], universe)) {
+                if (here.has(String(v))) continue;
+                find(key, 'OPTION-HELP', 0, 'names-unoffered', `"${o.label || o.id}" ${field} names ${o.id} = ${v}, which this skill does not offer (offered: ${[...here].join(' / ')}): "${clip(o[field], 110)}"`, `${o.id}.${field}:${v}`);
+            }
+        }
+    }
+    tick('OPTION-HELP', texts);
+}
+
+/**
+ * WRONG-FITS (lane S1): the provider's wrongAnswer(q) - what the error-analysis page and its key write into the item's
+ * answer slot - has no more digits than the slot the item's cell declares (a row of `ansDigits` boxes; see
+ * wrongFitsSlot). NODE ESTIMATE: only items whose payload declares a box count are judged; a write-on line has no
+ * fixed width in node (ws-print-lint L-ANSAREA measures it in the browser), and a non-number wrong answer ("8 R 5")
+ * is not judged.
+ */
+function ruleWrongFits(key, cat, skill, cells) {
+    let p = null;
+    try { p = kit.getProvider(cat, skill); } catch (e) { p = null; }
+    if (!p || typeof p.wrongAnswer !== 'function') { skip('WRONG-FITS', 'no provider wrongAnswer (skills)'); return; }
+    let judged = 0;
+    cells.forEach((c, i) => {
+        let w = null;
+        mute();
+        try { w = p.wrongAnswer(c.q); } catch (e) { w = null; } finally { unmute(); }
+        if (!w || w.value === undefined || w.value === null || Array.isArray(w.value) || typeof w.value === 'object') return;
+        const r = wrongFitsSlot(w.display !== undefined ? w.display : w.value, c.q.cell && c.q.cell.payload);
+        if (!r.judged) return;
+        judged++;
+        if (!r.fits) find(key, 'WRONG-FITS', i, 'too-long', `wrongAnswer "${w.display !== undefined ? w.display : w.value}"${w.misconception ? ` (${clip(w.misconception, 40)})` : ''} has ${r.digits} digits; the item's answer slot holds ${r.boxes} (answer ${c.q.ans})`, `${r.digits}>${r.boxes}`);
+    });
+    if (judged) tick('WRONG-FITS', judged); else skip('WRONG-FITS', 'no item with a declared box count and a number wrong answer (skills)');
+}
+
 function ruleRepeats(key, cells) {
     const page = cells.slice(0, PAGE).map((c) => c.q);
     if (page.length < 2) { skip('REPEATS', 'fewer than 2 items dealt'); return; }
@@ -936,6 +1138,9 @@ for (const subject of subjects) {
     if (rules.includes('L6')) ruleL6(subject.key, cat, skill, cells);
     if (rules.includes('L10')) ruleL10(subject.key, cells);
     if (rules.includes('REPEATS')) ruleRepeats(subject.key, cells);
+    if (rules.includes('LESSON-DATA')) { if (subject.fixture) skip('LESSON-DATA', 'fixture (skills)'); else ruleLessonData(subject.key, cat, skill); }
+    if (rules.includes('OPTION-HELP')) { if (subject.fixture) skip('OPTION-HELP', 'fixture (skills)'); else ruleOptionHelp(subject.key, cat, skill); }
+    if (rules.includes('WRONG-FITS')) ruleWrongFits(subject.key, cat, skill, cells);
 }
 const RUN_MS = Date.now() - T1;
 

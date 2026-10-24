@@ -15,7 +15,9 @@ import { createRequire } from 'node:module';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+// MQ_ROOT: the app tree to check (ws-backtest / state-run); the harness serves the same tree
+const ROOT = process.env.MQ_ROOT ? resolve(process.env.MQ_ROOT) : resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+let obeyNote = '';
 const M = (p) => pathToFileURL(join(ROOT, 'js', 'modules', p)).href;
 globalThis.localStorage = { getItem: () => null, setItem() {}, removeItem() {} };
 const realLog = console.log;
@@ -94,16 +96,53 @@ for (const [key, p] of entries) {
     if (mixed) check(!data.getMixedPoolSkills(cat, mixed.v).includes(id), `${key}: in the ${mixed.v} pool`);
 }
 
+// 6 (lane S1 check 9). The predicates: preset option id -> (item, value, host, category) -> true | false | null (the
+// item cannot be read for it). Self-contained (no closure), so the page runs the same source the self-test runs.
+function makeObey() {
+    const rd = (q) => {
+        const pl = q.cell && q.cell.payload;
+        if (pl && Array.isArray(pl.operands) && pl.operands.length >= 2) return pl.operands.slice(0, 2).map(Number);
+        if (Number.isFinite(q.a) && Number.isFinite(q.b)) return [q.a, q.b];
+        const m = /([\d,]+)\s*[−\-+×÷]\s*([\d,]+)/.exec(String(q.text || ''));
+        return m ? [+m[1].replace(/,/g, ''), +m[2].replace(/,/g, '')] : null;
+    };
+    const nd = (n) => String(Math.abs(Math.trunc(n))).length;
+    return {
+        // `tiles` on multiply / divide: "21" = a 2-digit number by a 1-digit one (the dividend for ÷)
+        tiles: (q, v, host) => { if (!['multiply', 'divide'].includes(host)) return null; const o = rd(q); return o ? nd(o[0]) === Math.floor(+v / 10) && nd(o[1]) === +v % 10 : null; },
+        lengths: (q, v) => { const o = rd(q); if (!o) return null; return v === 'shorter' ? nd(o[1]) < nd(o[0]) : v === 'same' ? nd(o[1]) === nd(o[0]) : null; },
+        // "within N" bounds the answer: the sum / product, the minuend / dividend
+        band: (q, v, host, cat) => { const o = rd(q); if (!o || !Number.isFinite(+v)) return null; const named = cat === 'addition' || cat === 'multiplication' ? Number(String(q.ans).replace(/,/g, '')) : o[0]; return Number.isFinite(named) ? named <= +v : null; },
+    };
+}
+if (process.argv.includes('--self-test')) {
+    const O = makeObey(), bad = [];
+    const t = (c, m) => { if (!c) bad.push(m); };
+    t(O.tiles({ a: 47, b: 6 }, 21, 'multiply') === true, 'tiles 21: 47 × 6 obeys');
+    t(O.tiles({ a: 47, b: 36 }, 21, 'multiply') === false, 'tiles 21: 47 × 36 (a 2 × 2 item) breaks it');
+    t(O.tiles({ text: '96 ÷ 4 = ?' }, 21, 'divide') === true, 'tiles 21 ÷: read from the text');
+    t(O.tiles({ a: 4, b: 3 }, 21, 'area_model_mult') === null, 'tiles on another host: no predicate');
+    t(O.lengths({ cell: { payload: { operands: [57, 3] } } }, 'shorter') === true && O.lengths({ a: 57, b: 23 }, 'shorter') === false, 'lengths shorter');
+    t(O.band({ a: 7, b: 5, ans: 12 }, 10, 'add', 'addition') === false && O.band({ a: 9, b: 4, ans: 5 }, 10, 'sub', 'subtraction') === true, 'band bounds the sum / the minuend');
+    t(O.band({ text: 'no numbers' }, 10, 'x', 'addition') === null, 'band: unreadable is null');
+    for (const b of bad) console.error('  - ' + b);
+    console.log(bad.length ? `ws-presets-unit: FAIL - self-test (${bad.length})` : 'ws-presets-unit: OK (self-test, 7 predicate cases)');
+    process.exit(bad.length ? 1 : 0);
+}
+
 // 3. generation, in the app
 const require = createRequire(import.meta.url);
 const { open } = require('../lib/ws-harness.cjs');
 const app = await open({ seed: 1 });
 try {
-    const res = await app.page.evaluate((list) => {
+    // (the page function and makeObey go in as source: makeObey is a function, which evaluate() cannot pass as an argument)
+    const pageCheck = (list, makeObey) => {
         const out = [];
         // the area model's input ids open with Date.now() (a per-call DOM id, not content): drop the clock part
         const strip = (q) => q && J2({ t: q.text, a: q.ans, v: q.visual, c: q.cell }).replace(/(data-area-idx=\\?")\d+/g, '$1');
         function J2(x) { return JSON.stringify(x); }
+        const OBEY = makeObey();
+        let obeyChecked = 0, obeySkipped = 0, genericChecked = 0;
         for (const [key, p] of list) {
             const [cat, id] = key.split(':');
             // A whole page of the preset, then a whole page of the host with the preset values: a page's
@@ -118,6 +157,24 @@ try {
                 if (strip(a) !== strip(b)) out.push(`${key} item ${i}: differs from ${p.skill} with ${J2(p.opts)}`);
                 if (a.presetId !== id || a.skillId !== p.skill) out.push(`${key} item ${i}: presetId=${a.presetId} skillId=${a.skillId}`);
             }
+            // 6. the preset's items OBEY its preset values (lane S1 check 9): check 3 compares the preset with the
+            // host given the same values, so a host that ignores a value passes it twice. Here (a) every preset value
+            // with a known predicate holds on every item, and (b) the preset's page is not the host's DEFAULT page
+            // (a preset whose values change nothing is not a preset).
+            for (let i = 0; i < 6; i++) {
+                const a = pa[i];
+                if (!a) continue;
+                for (const [ok, v] of Object.entries(p.opts)) {
+                    const pred = OBEY[ok];
+                    const r = pred ? pred(a, v, p.skill, cat) : null;
+                    if (r === null) { obeySkipped++; continue; }
+                    obeyChecked++;
+                    if (!r) out.push(`${key} item ${i}: does not obey its preset ${ok}=${J2(v)} (${String(a.text || '').slice(0, 40)} = ${a.ans})`);
+                }
+            }
+            const pd = page(p.skill, undefined);
+            genericChecked++;
+            if (pa.every((a, i) => a && pd[i] && strip(a) === strip(pd[i]))) out.push(`${key}: its 6 items equal ${p.skill}'s DEFAULT items: the preset values ${J2(p.opts)} change nothing`);
             // explicit opts win over the preset values
             const k = Object.keys(p.opts)[0];
             const q = window.generateQuestionFor({ category: cat, skill: id, opts: { [k]: p.opts[k] }, seed: 5 });
@@ -125,9 +182,12 @@ try {
             // state restored
             if (window.state.skill === p.skill) out.push(`${key}: state.skill left on the host`);
         }
-        return out;
-    }, entries);
-    failures.push(...res);
+        return { out, obeyChecked, obeySkipped, genericChecked };
+    };
+    const res = await app.page.evaluate(`(${pageCheck.toString()})(${JSON.stringify(entries)}, ${makeObey.toString()})`);
+    failures.push(...res.out);
+    obeyNote = `${res.obeyChecked} item×value predicate checks (tiles / lengths / band), ${res.obeySkipped} value(s) with no predicate, ${res.genericChecked} presets checked against the host default page`;
+    if (!res.genericChecked) failures.push('check 9: no preset was checked against its host default (0 items checked)');
     // the 2-char share code opens the preset
     const codeRes = await app.page.evaluate(() => {
         const c = window.SKILL_CODES['multiplication:mult_2by2_standard'];
@@ -141,4 +201,4 @@ try {
 }
 
 if (failures.length) { console.error(`ws-presets-unit: FAIL (${failures.length})`); failures.slice(0, 40).forEach(f => console.error('  - ' + f)); process.exit(1); }
-console.log(`ws-presets-unit: OK (${entries.length} presets: host live, values legal, defaults = preset, explicit wins, seeded items = host items, tags + terms + print size + pinned code, options round-trip)`);
+console.log(`ws-presets-unit: OK (${entries.length} presets: host live, values legal, defaults = preset, explicit wins, seeded items = host items, items obey the preset values: ${obeyNote}, tags + terms + print size + pinned code, options round-trip)`);
