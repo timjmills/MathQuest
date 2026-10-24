@@ -118,3 +118,30 @@ its decisions, not re-decide them. The README there lists each round's decisions
 | Detailed lesson detour | flow table runs every Lessons row incl. a detailed lesson, not only the standard maker |
 | Repeat of T3's class (summary ≠ output) | every new print path must be added to plan-pdf-check in the same commit (brief rule for T5/T6) |
 | 2026-10-24 | Owner (direct): "T5 we don't need classes right now" → T5 skipped. Classes keeps T2's tabs onto today's screens (Run on the board, Quizzes, MAP tests, Progress), all reachable; no new Classes build. Next after T4: T6 | lane lead | T5 skipped |
+| 2026-10-24 | T4 fixed (756e8cf, 6f045e9, d709a7f), merged with base (5dfb551), 8 gates OK; PR #17 (T2–T4) merged by the lead | lane lead | done |
+| 2026-10-24 | T6 built (57f7bbb, da96fd3): menus = Skills · Lessons · Classes(4 tabs) · Me; redirects for ?code/?c, ?quiz, #wrm, #map, #todo/<entry>, mq_teacher_screen, mq_teacher_sets, tvGo, tvOpenPrintWith, ?board=1; shell gate rows. Draft PR #20 | mq-opus-low | built |
+| 2026-10-24 | T6 check (da96fd3): all redirects and 12 jobs work at 1366/390, no regressions; clear bugs: ws-teacher-shell's new visit() aborts CSS loads (gate bug); text still names removed tabs. Owner notes: teacher hash links land on the pupil home unless Settings › "Open the site in" = Last view; whole-grade print still slow (Grade 1: ~26 s sheet, ~118 s document) | mq-opus-medium | fixes running |
+
+### Per-round lists (rule 00), T6 check
+
+| Finding | Check that would have caught it |
+|---|---|
+| Gate's own navigation aborts loads | gate helper rule: every visit waits for `load` before leaving; a gate's console check runs 3× before commit |
+| Text names a removed tab | grep the teacher JS/HTML for every retired tab label when a tab is retired (same commit) |
+| Whole-grade print 118 s | a time budget on Print (not only on first render): 47-skill tray → document < 20 s |
+
+## Speed reflection (lane S2, 2026-10-24)
+
+**Agent spend** (subagent tokens): r6 fix 0.30 M · T2 0.32 M + check 0.19 M · T3a 0.66 M + T3b 0.46 M + check 0.24 M · T4 0.42 M +
+check 0.18 M · T6 0.14 M + check 0.18 M ≈ **3.1 M** (limit 20 M). Wall time ≈ 14 h, much of it waiting on slow gates
+(ws-teacher-wrm 15 min a run) and on builders' long verify loops (r6 fixer 2.6 h).
+
+| What cost time | Cause | Change for next time |
+|---|---|---|
+| r6 mock-up fixer ran 2.6 h after its fixes were committed | open-ended "run every check" loop on a gate that times out | give builders a time box and the exact final command list; stop at the first green run |
+| Gates run on a tree another agent was editing → false FAILs (wrm, boot) twice | parallel builders share one working tree | gates and checks always run in a frozen `git worktree` at a commit (adopted from T3 on) |
+| T3 split in two builders → field-name drift (groups / locks / total), one builder committed the other's WIP | no shared-state API fixed before the split | write the shared module's API in the brief first, or give the shared file to one builder only; never `git add` outside own paths |
+| Summary ≠ PDF found twice (T3, T4) | each new print path added without a summary=PDF check | rule: every print path is added to plan-pdf-check in the same commit |
+| Six owner design changes mid-T3 | owner saw screenshots and refined | worth it (owner wanted them); fold in at once, re-run the number checks after each |
+| Colour clash (indigo primary vs OA) found only by the token gate after the build | owner's new primary not run through the palette check when given | run `colour.py`-style check the moment an owner gives a new colour, before briefing builders |
+| Check-then-fix by resuming the same builder (SendMessage) | — | kept context, cheapest fix rounds of the lane; keep doing it |
