@@ -81,3 +81,55 @@ Report: design/audit/runs/s1-checks/critic-r1.md.
   TY-21). Self-test 20 → 24 cases (add_100_regroup 3 tracks is never sub_100_regroup's 2-track sibling). Real check on the 7
   disputed sub_100_regroup rows: 20 counts at or below the peers, ABOVE only single/ex-each S/M TY-11 28 vs 24 — the one real
   difference the lead's bisect named. Commit 96f5fcc2, added to critic r2's scope.
+| r2 (mq-opus-medium) | 11:25 | 11:46 | **PASS 9 / 9 / 8** (incl. the same-shape ruling 96f5fcc2); no blocking; nits N-r2-1…5 | 175 k |
+
+Report: design/audit/runs/s1-checks/critic-r2.md. N-r2-2 (the D8 pin reader held non-D8 lines) was a defect in the lead's own
+fix-round code: fixed after the PASS (only "(pilot D8)" pin lines are ever held). N-r2-1 (precritic-plan cannot see the presets /
+spec-card gates, whose rows name no skill), N-r2-3 (no stale-pin report for the 44 D8 pins), N-r2-4 (dealer N/A also covers ×
+skills such as arrays, count_by; no fractions backtest row), N-r2-5 (shape compares tracks, the template is matched by the
+candidate list) stay open as recorded follow-ups.
+
+## Totals
+- Wall time 05:15 → 12:15 UTC, **≈ 7.0 h** (builders 05:21–08:47, the longest B at 3 h 26 m; fix round 11:04–11:35; critics 16 + 21 min).
+- Agent tokens ≈ **1.71 M**: builder A 498 k (build + fix r1), B 431 k (build + D1 real-data fix), C 408 k, critic r1 197 k, r2 175 k.
+- Critic rounds: **2** (target ≤ 2: met). Builder runs: 3 first builds + 2 resumed fixes (A, B), all medium.
+
+## Checks delivered (all wired into ws-precritic; every one backtested FAIL → PASS on a real pilot commit pair or fixture)
+| # | Check | Tool / flag | Backtest |
+|---|---|---|---|
+| A | Card hosts-and-roles section; --check-signed fails on an undecided line or a new option / role / host; rulings + decisions hashed under the signature (r7 D2); 02c5308e folded in | ws-spec-card §7a/§7b, precritic `spec-card-signed` | card-gate-decisions, card-gate-rulings (fixtures) |
+| 1 | Zero-case rate / card numeric rulings as content-audit predicates (--skill enforces every card; unscoped sweeps signed cards only) | ws-content-audit `card-ruling` | s1-zero-case-content-audit 27577cf / ff471fd |
+| 2 | Dealer uniformity (±2σ digits / values, page caps, no fixed position; N/A without numbers) | ws-dealer-uniform | s1-dealer-uniform 03eda45 / a930c43 |
+| 3 | Answer box ≥ 4.4 mm (TY-21), shared probe | ws-print-lint L-ANSAREA, tests/lib/ws-geom-probe.cjs | ansarea-ty21-pilot 27577cf / ff471fd |
+| 4 | Head labels ≥ 1 mm apart (H2) | ws-print-lint L-OVERLAP | overlap-d7-pilot, overlap-n8-pilot |
+| 5 | Lesson data present | ws-node-lint LESSON-DATA | s1-lesson-data 27577cf / ff471fd |
+| 6 | Option help names only offered values | ws-node-lint OPTION-HELP | s1-option-help 03eda45 / a930c43 |
+| 7 | Every offered appearance value rendered at S / L through print-lint | ws-options-verify --render | options-render-pilot 03eda45 / a930c43 |
+| 8 | H13 on lesson pages (role sample AND the lane skills' own lesson pages, L and S) | ws-print-lint H13 / H13-ROW, precritic print-lint-lesson-L/S | h13-lesson-warmup-pilot |
+| 9 | Presets obey their values, differ from the host default, D8 instruction key + spread | ws-presets-unit | s1-presets-obey 27577cf / ff471fd, -seeded |
+| 10 | wrongAnswer fits its slot | ws-node-lint WRONG-FITS | s1-wrong-fits 27577cf / ff471fd |
+| 11 | No wrapped line ends in an operator | ws-print-lint L-WRAP | wrap-op-pilot 03eda45 / a930c43 |
+| D1 | Findings attributed by cell; partner skills non-blocking; > half unattributed = ERROR | ws-sibling-compare, ws-slot-clip, print-lint attributeCells | d1-partner-attribution, d1-real-partner, d1-real-unattributed |
+| 0b | Same-shape siblings (lead ruling) | ws-sibling-compare shapesOf / peers | self-test (real shapes) |
+| — | Every backtested check is on precritic's path | ws-precritic-plan (run by ws-backtest) | mutation test |
+
+## Speed reflection (process rule 00)
+- **Measure.** 2 critic rounds (target met), ≈ 7 h, ≈ 1.71 M tokens. r1 lost one round (7 / 8 / 7) to three defects.
+- **Causes of the lost round and the lost hours.**
+  1. *A check off the lane's path* (r1 D2): the lesson checks were backtested by calling print-lint directly, so green
+     backtests hid that precritic never ran them on the lane skill. → **ws-precritic-plan** (built; ws-backtest runs it).
+  2. *A new check never run on a non-numeric skill* (r1 D1): builder A tested on stack siblings only. → rule: a new
+     per-skill gate is run on one skill of each kit family (fact, stack, fraction, clock, legacy) before the critic; the
+     builder brief names them. (Owner: lead, LESSONS_LEARNED, before the next tool wave.)
+  3. *Fixture-only backtest where a real pair existed* (r1 D3, and D1 of r7 again): fixtures carried the data the real page
+     lacks (skills filled in). → rule: a fixture row is allowed only when the status file says no real pair exists; the
+     lead checks each fixture row against the real run before the critic (found D1's empty attribution in 1 run).
+  4. *Hours:* builder B's three full-size print-lint sweeps (≈ 3.5 h) and browser-slot waits (one backtest 59 min). → a
+     print-lint mode that prints each page once and lints it at S / M / L (B's proposal; owner: S1 next change); and run
+     backtests' browser rows in their own session when > 10 browser rows queue.
+  5. *Setup traps found by the lead, not a check:* precritic missed chrome-linux64; ws-backtest failed on a shallow clone;
+     precritic could not parse ws-grade-render; lesson pages were in no pin; a new check (D8) turned the presets gate red on
+     main (44 pre-existing). All fixed in the lane. → rule: "clean on the merged tree" includes one real precritic run of an
+     approved sibling and of `--role lesson` before the critic (it caught 4 of the 5).
+- **Speed-ups seen.** Three parallel builders with disjoint files merged with two trivial conflicts (backtests.json union by
+  row id is now the standard merge); narrow-scope critic r2 took 21 min against r1's 16 min for the full lane.

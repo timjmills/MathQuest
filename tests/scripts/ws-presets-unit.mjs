@@ -255,7 +255,8 @@ try {
         console.log(`ws-presets-unit: pinned ${d8.length} D8 finding(s) in ${PIN}`);
     }
     let pinned = new Set();
-    if (!process.argv.includes('--no-baseline')) { try { pinned = new Set(JSON.parse(fsx.readFileSync(PIN, 'utf8')).pinned || []); } catch (e) { /* no pin: judge all */ } }
+    // only "(pilot D8)" lines are ever held (S1 critic r2 N-r2-2: a hand-added check-6 line in the pin was silenced)
+    if (!process.argv.includes('--no-baseline')) { try { pinned = new Set((JSON.parse(fsx.readFileSync(PIN, 'utf8')).pinned || []).filter((f) => / \(pilot D8\)$/.test(f))); } catch (e) { /* no pin: judge all */ } }
     const held = failures.filter((f) => pinned.has(f));
     if (held.length) console.log(`ws-presets-unit: ${held.length} pinned D8 finding(s) still print (${PIN.split('/').slice(-1)[0]})`);
     for (let i = failures.length - 1; i >= 0; i--) if (pinned.has(failures[i])) failures.splice(i, 1);
