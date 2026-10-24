@@ -377,7 +377,9 @@ export function sideFit(L, items) {
         const need2 = Math.max(...twins.map((a) => Number(a.cols2 ? a.pairMm : a.pair2Mm) || 0), hs.length ? pr : 0, tw);
         // (no tolerance: a row shorter than its pair ran the twin's Say line into the 2 mm pad, E11)
         const rows = fitRows(G, need4);
-        if (2 * rows >= fitRows(G, need2)) {
+        // (only a four-column row that fits the grid: on a shared page a 60 mm share took a 100 mm
+        // four-column row because two columns did not fit either - S3)
+        if (2 * rows >= fitRows(G, need2) && (need4 <= G || need4 <= need2)) {
             return Object.assign({}, L, { cols: 4, drawCols: 2, side4: true, colsTpl4: twins[0].cols4, rows, perPage: rows * 4, cellW: Math.round((L.cellW || 93) / 2 * 10) / 10, cellH: Math.floor((G / rows) * 1000) / 1000 });
         }
     }

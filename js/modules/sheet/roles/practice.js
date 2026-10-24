@@ -687,6 +687,8 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     }
     const chunksBySection = layouts.map((L, si) => (L.blocks
         ? blockPages(itemsBySection[si].length, L.blocks, L.cols, L.anchorMm)
+        : anchors && anchors.mode === 'side' && L.cols === 2 && !L.side4 && sidePairPages(itemsBySection[si], L)
+            ? sidePairPages(itemsBySection[si], L)
         : L.pairs
             // Paginate PAIRS, then count them back as rows: a page break never falls inside one.
             ? paginate(Math.ceil(itemsBySection[si].length / 2), { cols: 1, rows: L.rows / 2 })
@@ -704,6 +706,40 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
     );
     return { layouts, chunksBySection, pages };
+}
+
+/**
+ * SIDE BY SIDE in two columns, pairs of different heights (S3; critic anchors-r2, add_10k side L:
+ * one tall worked twin set every row of the sheet, so a page held two pairs and the shorter twins
+ * stood in rows 40 % empty): the pairs go onto a page while their OWN measured heights (`pairMm`,
+ * the problem's own height when taller) fit the grid, frame and row rules included, and each row
+ * is as tall as its pair in proportion (`rowsTpl`). Null when the pairs are one height (the
+ * uniform rows of sideFit apply) or are not all measured.
+ */
+function sidePairPages(items, L) {
+    const hs = [];
+    for (let i = 0; i < items.length; i += 2) {
+        const tw = items[i], pr = items[i + 1];
+        if (!tw || !tw.anchor || !(Number(tw.pairMm) > 0)) return null;
+        const p = pr && pr.measured && pr.measured[2] && Number.isFinite(pr.measured[2].hMm) ? pr.measured[2].hMm + 1 : 0;
+        hs.push(Math.max(Number(tw.pairMm), p));
+    }
+    if (!hs.length || Math.max(...hs) < Math.min(...hs) * 1.1) return null;
+    const RULE = 0.6;   // the widest row rule of the looks, and the frame (layout.js cellBorderMm / FRAME_MM)
+    const out = [];
+    let r = 0;
+    while (r < hs.length) {
+        const G = (out.length ? Number(L.gridHCont) || Number(L.gridH) : Number(L.gridH)) || L.rows * L.cellH;
+        let n = 0, sum = 2 * RULE;
+        while (r + n < hs.length && (n === 0 || sum + RULE + hs[r + n] <= G)) { sum += (n ? RULE : 0) + hs[r + n]; n++; }
+        const rows = hs.slice(r, r + n);
+        const from = r * 2;
+        // (the last page stretches its rows no more than a third past what they hold - H13)
+        const gridMm = r + n >= hs.length ? Math.min(G, sum * 1.3) : G;
+        out.push({ index: out.length, from, count: Math.min(n * 2, items.length - from), rows: n, rebalanced: false, gridMm: Math.round(gridMm * 100) / 100, rowsTpl: rows.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ') });
+        r += n;
+    }
+    return out;
 }
 
 /** The anchor band height (mm) of section `si` in SECTIONS mode, else 0. */

@@ -2482,20 +2482,49 @@ async function buildSheetCore(req = {}) {
      * sum to one body, so nothing splits and nothing shrinks (PG-20, PG-21). Returns the item
      * count of each sub-section per page, or null for a section that is not grouped.
      */
+    // (S3: a side section's least is one ROW OF PAIRS as it prints - the twin's own measured
+    // pair, two- or four-column, whichever is shorter - not the layout's hMin; a shared page
+    // gave a 4-column side row 60 mm for a 100 mm pair, and its steps ran out of the cell)
+    const sideRowOf = (si, layouts) => {
+        if (anchorMode !== 'side' || !anchorSets[si] || !anchorSets[si].items.length || layouts[si].cols === 1) return 0;
+        const tw = anchorSets[si].items;
+        const two = Math.max(...tw.map((a) => anchorHeightMm(a, 2)));
+        const four = tw.every((a) => a.side4 && a.pair4Mm > 0) ? Math.max(...tw.map((a) => a.pair4Mm)) : Infinity;
+        return Math.min(two, four);
+    };
     const shareRows = (layouts) => {
         const out = n.sections.map(() => null);
         const groups = new Map();
         n.sections.forEach((sec, si) => { if (sec.group && !sec.count) { if (!groups.has(sec.group.id)) groups.set(sec.group.id, []); groups.get(sec.group.id).push(si); } });
         const body = bodyHeightMm(paper, layoutHeader) - 1;
         const instr = instructionMm(n.size);
-        for (const members of groups.values()) {
+        // S3: side by side, the members whose least rows do not all fit one page are packed onto
+        // pages in order, and each page's body is shared among the members it holds - not one
+        // page's share for all (the side pairs' measured rows overran it, the last members went
+        // overleaf and page 1 kept 2 problems over a 45 % empty strip: DN-2, PAGEFILL).
+        const pageGroups = [];
+        for (const all of groups.values()) {
+            if (anchorMode !== 'side') { pageGroups.push({ members: all, body }); continue; }
+            const bodyCont = bodyHeightMm(paper, layoutHeader, { cont: true }) - 1;
+            const least = (si) => Math.max(layouts[si].hMin * (anchorSets[si] && anchorSets[si].items.length && layouts[si].cols === 1 ? 2 : 1), sideRowOf(si, layouts)) + 1 + instr;
+            let cur = [], used = 0, pageBody = body;
+            for (const si of all) {
+                const nd = least(si);
+                if (cur.length && used + nd > pageBody) { pageGroups.push({ members: cur, body: pageBody }); cur = []; used = 0; pageBody = bodyCont; }
+                cur.push(si);
+                used += nd;
+            }
+            if (cur.length) pageGroups.push({ members: cur, body: pageBody });
+        }
+        for (const { members, body } of pageGroups) {
             // S6 sections: every member keeps room for its anchor band too.
             const band = (si) => (anchorMode === 'sections' && anchorSets[si] ? n.sections[si].anchorMm || 0 : 0);
             const avail = body - members.length * instr;
             // S6 side by side in ONE column: a twin sits above its problem, so a member's least is a
             // PAIR of rows (practice.js layoutSheet pages whole pairs), not one row.
             const pairOf = (si) => (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length && layouts[si].cols === 1 ? 2 : 1);
-            const needOf = (si) => layouts[si].hMin * pairOf(si) + 1 + band(si);
+            // (sideRowOf, S3: a side section's least is one row of pairs as it prints)
+            const needOf = (si) => Math.max(layouts[si].hMin * pairOf(si), sideRowOf(si, layouts)) + 1 + band(si);
             let need = members.map(needOf);
             // S6 sections: when the members' bands and one row each do not fit one page, every
             // member takes the COMPACT band (one state, steps beside; Mixed practice's), so a page of
