@@ -54,6 +54,8 @@
 //   E15 tab    (critic s3-stack r1 A1: the Model tab printed over the band's first line) on every
 //              anchor cell, no inked box (a text leaf, an svg, a bordered box) that runs under the
 //              Model tab's width starts above the tab's bottom + 1 mm
+//   E16 net    (s3 precritic-2) a several-skill section with SECTIONS anchors chooses its columns on
+//              the grid height net of the anchor band (sub_50_no_regroup + 3 at L: >= 3 stack columns)
 //   E8 off     (critic anchors-r1 2) a page whose skill prints no example (no workedSteps, or a
 //              pair too tall for a page) is byte-identical to the same request with anchors 'off'
 //
@@ -72,7 +74,7 @@ const { open } = require(path.join(ROOT, 'tests/lib/ws-harness.cjs'));
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > -1 ? process.argv[i + 1] : d; };
 const MAX = Math.max(1, Number(arg('max', 40)) || 40);
-const ONLY = String(arg('only', 'E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15')).split(',');
+const ONLY = String(arg('only', 'E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16')).split(',');
 // Owner ruling (2026-10-24): these print their worked example in a band, never beside (E14)
 const WIDE = ['fractions:shade_fraction', 'measurement:money_count', 'placevalue:place_value_10x'];
 const PAD_MM = 2;          // E11
@@ -357,6 +359,22 @@ const MEASURE = () => {
             });
             const want = [[1, 2, 8], [1, 2, 8], [1, 2, 4]];
             bp.forEach((b, i) => { if (b.blocksPerPage !== want[i][0] || b.blockRows !== want[i][1] || b.perPage !== want[i][2]) { fail++; console.log(`FAIL E13 blockPlan case ${i + 1}: ${b.blocksPerPage} block(s) of ${b.blockRows} rows, ${b.perPage} a page (want ${want[i][0]} of ${want[i][1]}, ${want[i][2]})`); } });
+        }
+        // E16 net (s3 precritic-2, ex-group H13): a section of several skills with worked examples as
+        // SECTIONS chooses its columns on the grid height NET of its anchor band. Before the fix the
+        // 2-digit no-regroup stacks (56 mm) were planned 2 rows x 2 columns on the band's share, the band
+        // took one row back, and 2 problems printed in two 92 mm cells (31 % side bands). Want: the stack
+        // sub-section's grid is 3 columns or more, and the sheet has no more pages than before (3).
+        if (ONLY.includes('E16')) {
+            const r16 = await app.page.evaluate(async () => {
+                const sk = (c, s) => ({ categoryId: c, skillId: s });
+                const o = await window.buildSheet({ role: 'independent', anchors: 'sections', size: 'L', look: 'ican', key: true, seed: 389510953,
+                    sections: [{ skills: [sk('subtraction', 'sub_50_no_regroup'), sk('addition', 'add_facts'), sk('algebra', 'tape_diagram'), sk('area_perimeter', 'perimeter_intro')] }] });
+                const d = new DOMParser().parseFromString(o.pupilHtml, 'text/html');
+                const g = [...d.querySelectorAll('.ws-grid')].find((x) => x.querySelector(':scope > .ws-cell[data-ws-cell="stack"]'));
+                return { cols: g ? g.querySelectorAll(':scope > .ws-cell[data-ws-cell="stack"]').length : 0, pages: o.pageCount };
+            });
+            if (r16.cols < 3 || r16.pages > 3) { fail++; console.log(`FAIL E16 sections L sub_50_no_regroup + 3: the stack row prints ${r16.cols} problem(s) on ${r16.pages} page(s) (want >= 3 columns, <= 3 pages: the column choice sees the grid net of the anchor band)`); }
         }
         const doc = await app.browser.newPage();
         // (S3: the printed document is opened on the app's origin, as ws-grade-render and

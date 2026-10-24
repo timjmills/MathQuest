@@ -642,8 +642,11 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const body = bodyHeightMm(paper, headerFirst);
     const split = new Set(sectionsIn.map((s) => s.splitOf).filter((x) => x !== undefined && x !== null));
     const layouts = sectionsIn.map((sec, si) => {
+        // S6 sections: the column choice sees the grid net of the anchor band (blockPlan below
+        // takes the band off the page; s3 precritic-2 ex-group H13).
+        const aMm0 = anchorBandOf(anchors, si);
         const L0 = resolveSectionLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH && aMm0 ? Math.max(1, Math.floor((sec.gridH - aMm0) * 1000) / 1000) : sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
