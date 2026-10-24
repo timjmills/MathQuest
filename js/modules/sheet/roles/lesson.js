@@ -182,6 +182,45 @@ function warmShape(pools, input) {
 /** H13 for the Warm-up: the most of a cell's height its own item may leave empty (RUBRIC: < 30 %). */
 const WARM_BAND = 0.25;
 
+/** The width (mm) the page's content gives a row of cells (A4: 186 mm less the band borders). */
+const ROW_W_MM = 183;
+
+/**
+ * The Warm-up row's track widths (mm), each half as wide as its cells draw, when equal halves
+ * would leave a cell more than WARM_BAND of its width empty (H13 width); null to keep halves.
+ * A cell's drawn width is read from its measurement at the half's column count: the cell's
+ * width less twice its least side slack (`slackMm`, CL-8).
+ */
+function warmTracks(halves, wPools, shape, rowsOf) {
+    if (halves.length !== 2) return null;
+    const info = halves.map((id) => {
+        const c = shape[id].cols;
+        const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
+        const cw = ROW_W_MM / c;
+        const sl = its.map((it) => it.measured && it.measured[c] && it.measured[c].slackMm);
+        if (!its.length || sl.some((v) => !Number.isFinite(v))) return null;
+        const ink = Math.max(...sl.map((v) => cw - 2 * v));
+        // the narrowest cell its items are measured to fit (a 4-column cell, a 3-column one ...)
+        const fitC = [4, 3].find((n) => n > c && its.every((it) => it.measured && it.measured[n] && it.measured[n].fits !== false && Number.isFinite(it.measured[n].slackMm) && it.measured[n].slackMm >= CL8_MM));
+        const minCell = fitC ? ROW_W_MM / fitC : cw;
+        return { k: shape[id].k, ink, minCell };
+    });
+    if (info.some((x) => !x || !(x.ink > 0))) return null;
+    const band = (x, w) => (w / x.k - x.ink) / 2 / (w / x.k);
+    const even = info.map((x) => band(x, ROW_W_MM / 2));
+    if (Math.max(...even) <= WARM_BAND) return null;
+    const need = info.map((x) => x.k * x.ink);
+    let w = need.map((n) => ROW_W_MM * n / need.reduce((a, b) => a + b, 0));
+    // never narrower than the half's items fit; the other half takes the rest
+    for (let i = 0; i < 2; i++) {
+        const lo = info[i].minCell * info[i].k;
+        if (w[i] < lo) { w[i] = lo; w[1 - i] = ROW_W_MM - lo; }
+    }
+    if (w.some((x, i) => x < info[i].minCell * info[i].k - 0.1)) return null;
+    const after = info.map((x, i) => band(x, w[i]));
+    return Math.max(...after) < Math.max(...even) - 0.02 ? w : null;
+}
+
 export function counts(pools, input) {
     const shape = warmShape(pools, input);
     // div_facts (one-number facts): the lesson sheet's Independent rows reach 18 at S (critic R3
@@ -1598,10 +1637,20 @@ function planOnce(input = {}) {
             const sameInstr = parts.length > 1 && t0 && parts.every((p) => String((p.parts[0] && p.parts[0].text) || '') === t0);
             if (sameInstr) for (const p of parts) p.parts = p.parts.slice(1);
             const charMm = 0.5 * m.textPt * (25.4 / 72);
-            const twoLines = !sameInstr && parts.length > 1 && parts.some((p) => String(p.parts[0].text || '').length * charMm > 93 - 8);
+            // Tracks as wide as their content (critic SU-C r2 N2 follow-up, H13 width): a narrow
+            // one-place column in half the page left a third of its cell's width empty on each
+            // side. When either half would leave more than WARM_BAND of its cell's width empty,
+            // the row's width is shared in proportion to what each half's cells draw (measured:
+            // the cell width less twice the item's side slack), never below the narrowest column
+            // the half's items are measured to fit, and only when that leaves every cell fuller.
+            const trackMm = warmTracks(halves, wPools, shape, rowsOf);
+            const instrFits = (p, w) => sameInstr || String((p.parts[0] && p.parts[0].text) || '').length * charMm <= 2 * (w - 8);
+            const tracks = trackMm && parts.every((p, i) => instrFits(p, trackMm[i])) ? trackMm : null;
+            const halfW = (i) => (tracks ? tracks[i] : 93);
+            const twoLines = !sameInstr && parts.length > 1 && parts.some((p, i) => String(p.parts[0].text || '').length * charMm > halfW(i) - 8);
             if (twoLines) for (const p of parts) p.cls += ' mq-lwarm2';
             const instrH = sameInstr ? 0 : twoLines ? m.instr * 1.75 : m.instr;
-            const content = parts.length > 1 ? { kind: 'row', cls: 'mq-lwarmrow', widths: parts.map(() => '1fr'), parts } : parts[0];
+            const content = parts.length > 1 ? { kind: 'row', cls: 'mq-lwarmrow', widths: parts.map((p, i) => (tracks ? `minmax(0, ${tracks[i].toFixed(2)}fr)` : '1fr')), parts } : parts[0];
             // The page's spare height may grow these cells only while each one's own item still
             // fills all but WARM_BAND of it (critic SU-C r2 N2: at L the grown row left a short
             // fact 39-40 % of a 65 mm cell empty); what it cannot take passes to the bands after it.
