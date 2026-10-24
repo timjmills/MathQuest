@@ -309,7 +309,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
                 { say: 'Turning does not change the total.', note: 'Say it together twice.' },
-                { do: 'Hand out the exit slip. No help. Then sort the slips.', note: 'a. [[{exit.0.ans}]] · b. [[{exit.1.ans}]] · c. [[{exit.2.ans}]].' },
+                { do: 'Hand out the exit slip. No help. Then sort the slips.', note: '1. [[{exit.0.ans}]] · 2. [[{exit.1.ans}]] · 3. [[{exit.2.ans}]].' },
             ] },
     ],
     transitionsMin: 4,

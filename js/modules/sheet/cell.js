@@ -26,12 +26,21 @@ const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
  * @param {number} n  1-based item number (CL-13: a run never passes z.)
  */
 export function label(style, n) {
+    // CL-11a (owner, 2026-10-23): "keep only the black box number style" - a letter request draws the tab.
+    if (style === 'letter') style = 'tab';
     // One page holding more than 26 items (a dense S page) runs on aa. bb. ... - never a second
     // "a." on the same sheet, which would make the key's references ambiguous (critic R1 D11).
     if (style === 'letter') return `<span class="ws-letter" data-ws-label="letter">${LETTERS[(n - 1) % 26].repeat(Math.floor((n - 1) / 26) + 1)}.</span>`;
     if (style === 'tab') return `<span class="ws-tab${n > 99 ? ' w3' : n > 9 ? ' w2' : ''}" data-ws-label="tab">${n}</span>`;
     if (style === 'model') return `<span class="ws-modeltab" data-ws-label="model">Model</span>`;
     return '';
+}
+
+/** CL-11a: a label text given as a letter ("c.", "aa.") reads as its number tab text ("3", "27"). */
+export function tabText(t) {
+    const s = String(t == null ? '' : t).trim().replace(/\.$/, '');
+    const m = /^([a-z])\1*$/i.exec(s);
+    return m ? String((LETTERS.indexOf(m[1].toLowerCase()) + 1) + 26 * (s.length - 1)) : s;
 }
 
 /** The label style a look defaults to (CL-10 / CL-30); the dialog may override it (CL-20). */
@@ -265,7 +274,7 @@ export function renderCellBox(q, ctx = {}, renderInner) {
     const tpl = (q && q.cell && q.cell.template) || 'legacy';
     const inner = typeof renderInner === 'function' ? renderInner(q, c) : '';
     const lab = c.label && c.label.style && c.label.style !== 'none'
-        ? (c.label.style === 'model' ? label('model') : `<span class="ws-${c.label.style === 'tab' ? 'tab' : 'letter'}" data-ws-label="${c.label.style}">${esc(c.label.text || '')}</span>`)
+        ? (c.label.style === 'model' ? label('model') : `<span class="ws-tab" data-ws-label="tab">${esc(tabText(c.label.text))}</span>`)
         : '';
     return cell(inner, {
         label: lab,
