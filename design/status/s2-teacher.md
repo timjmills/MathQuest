@@ -117,3 +117,4 @@ its decisions, not re-decide them. The README there lists each round's decisions
 | Loose skills dropped | tray-in == skills-printed set equality for mixed trays (groups + loose) |
 | Detailed lesson detour | flow table runs every Lessons row incl. a detailed lesson, not only the standard maker |
 | Repeat of T3's class (summary ≠ output) | every new print path must be added to plan-pdf-check in the same commit (brief rule for T5/T6) |
+| 2026-10-24 | Owner (direct): "T5 we don't need classes right now" → T5 skipped. Classes keeps T2's tabs onto today's screens (Run on the board, Quizzes, MAP tests, Progress), all reachable; no new Classes build. Next after T4: T6 | lane lead | T5 skipped |
