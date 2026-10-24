@@ -1,0 +1,34 @@
+ws-print-lint: source kit, 12 skill(s)
+  subtraction:sub_50_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_100_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_1k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_10k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_100k_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_no_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d: 2+1 pages, 0 finding(s)
+  addition:add_50_no_regroup: 2+1 pages, 0 finding(s)
+  addition:add_10k_regroup: 2+1 pages, 0 finding(s)
+  addition:add_100_regroup: 2+1 pages, 8 finding(s)
+  subtraction:sub_100_regroup: 2+1 pages, 0 finding(s)
+  subtraction:sub_1m_regroup: 2+1 pages, 0 finding(s)
+
+document                           pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART  result
+subtraction:sub_50_no_regroup        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100_no_regroup       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1k_no_regroup        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_10k_no_regroup       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_100k_no_regroup      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_no_regroup        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_2d_1d                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+addition:add_50_no_regroup           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+addition:add_10k_regroup             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+addition:add_100_regroup             2+1k    .     .    .    .        .     .       8    .     .       .     .    .      .       .        .  FAIL
+subtraction:sub_100_regroup          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+subtraction:sub_1m_regroup           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .  ok
+TOTAL                                        .     .    .    .        .     .       8    .     .       .     .    .      .       .        .
+
+addition:add_100_regroup (Add within 100 (With Regrouping))
+  [L-DENSITY H13 major] x8 (p1,2 cells 2,4,6,8,2,4,6,8) one empty band 34.8 mm tall in a 113.3 mm cell (31%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "1 1 + 4 9" | <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "2 1 6 + 4 8"
+
+ws-print-lint: FAIL - 12 document(s), source kit; 8 finding(s) in 1 document(s)
