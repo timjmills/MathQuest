@@ -24,3 +24,8 @@ Base: origin/claude/sweet-newton-c8wrv1 (e371ec9) + merge of `-wip-wave0-gates` 
   A matrix row that hits a pre-existing true positive goes RED, and rule 0b's sibling comparison decides whether it blocks the
   lane (it does only where the lane's skill is worse than its approved siblings, which show 0 for every new rule). print-lint's
   per-size pins carry the pre-existing findings per skill (never the pilot skills).
+- 09:50 ws-backtest on the merged tree: 34 PASS, 2 FAIL in 2746 s; the 2 (text-generator-wrm-tagging, repeats-lesson, both
+  pre-existing rows) failed only because the cloud clone was shallow (commit not present). After unshallow + fetch of every
+  branch: 2/2 PASS (221 s) → **36/36 PASS**. ws-backtest now names the shallow clone and the fix instead of a bare git error.
+- 09:50 ws-precritic could not find Chromium (it looked for chrome-linux/, this container has chrome-linux64/): fixed to read
+  both layouts like tests/lib/ws-harness.cjs.

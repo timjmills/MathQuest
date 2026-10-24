@@ -78,7 +78,12 @@ function addWorktree(commit, base, label) {
     const dir = join(base, `${label}-${commit}`);
     if (existsSync(dir)) git(['worktree', 'remove', '--force', dir], true);
     const r = git(['worktree', 'add', '--detach', dir, commit]);
-    if (r.status !== 0) throw new Error(`git worktree add ${commit}: ${(r.stderr || '').trim()}`);
+    if (r.status !== 0) {
+        // a commit missing from a shallow clone (the cloud default) is a setup problem, not a check result: say how to fix it
+        const shallow = spawnSync('git', ['rev-parse', '--is-shallow-repository'], { cwd: ROOT, encoding: 'utf8' }).stdout.trim() === 'true';
+        const hint = /invalid reference|unknown revision|not a valid/i.test(r.stderr || '') && shallow ? ' (this clone is shallow: run `git fetch --unshallow origin` and `git fetch origin "+refs/heads/*:refs/remotes/origin/*"`, then re-run)' : '';
+        throw new Error(`git worktree add ${commit}: ${(r.stderr || '').trim()}${hint}`);
+    }
     return dir;
 }
 function git(argv, quiet = false) {
