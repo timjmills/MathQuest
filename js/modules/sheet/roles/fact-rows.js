@@ -346,6 +346,15 @@ export function factRowsLayout(items, input) {
         while (cols > 2 && verticalFitPt(cols, n, ctx.look, floor, ctx.size) === 0) cols--;
         if (cols < before) note = [note, `${n}-digit facts: ${cols} columns so the digits keep the ${ctx.size} size.`].filter(Boolean).join(' ');
     }
+    // A shorter fact steps its digits down the ladder first (VA-2); when even the ladder's last rung
+    // does not fit the cell (critic s3-stack r2 F1: 4-digit sub_10k facts in 8 columns at S, ink on
+    // both frames), it drops columns too, instead of printing past its cell.
+    const lastRung = LADDER_PTS[LADDER_PTS.length - 1];
+    if (!divide && !bigFact) {
+        const before = cols;
+        while (cols > 2 && verticalFitPt(cols, n, ctx.look, lastRung, ctx.size) === 0) cols--;
+        if (cols < before) note = [note, `${n}-digit facts: ${cols} columns so every fact fits its cell.`].filter(Boolean).join(' ');
+    }
     const pt = tightDiv && fitsAt(cols) ? factDigitPt(cols)
         : (bigFact && verticalFitPt(cols, n, ctx.look, (SIZES[ctx.size] || SIZES.L).digitPt, ctx.size)) || verticalPt(cols, n, ctx.look);
     if (pt < factDigitPt(cols)) note = [note, `Digits ${pt} pt so ${n}-digit facts fit ${cols} columns.`].filter(Boolean).join(' ');
