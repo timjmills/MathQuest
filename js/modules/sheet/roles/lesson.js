@@ -158,9 +158,29 @@ function warmShape(pools, input) {
         const hOf1 = (id) => hAt(pools[id].slice(0, 3), out[id].cols);
         const hMax = Math.max(...ids.map(hOf1));
         for (const id of ids) out[id].rows = hOf1(id) > 0 && hOf1(id) * 2 <= hMax * 1.1 ? 2 : 1;
+        // Rows sized per item kind (critic SU-C r2 N2, H13; every lesson): a half whose cells would
+        // still leave more than WARM_BAND of the shared row empty - an across fact "7 − 3 = ___"
+        // beside a column stack or a place-value item - does not share the row. Each skill then
+        // takes a full-width row of its own, as tall as its own items (CL-3 holds per row), as many
+        // cells across as its measurement allows. `plan` keeps the shared row when the split rows
+        // would add a page (input._warmShared).
+        const hRow = Math.max(...ids.map((id) => Math.max(20, hOf1(id)) * out[id].rows));
+        const loose = ids.some((id) => hOf1(id) > 0 && 1 - (Math.max(20, hOf1(id)) * out[id].rows) / hRow > WARM_BAND);
+        if (loose && !(input && input._warmShared)) {
+            // (the cells of one row hold items of one height too: a skill whose items differ - a
+            // fraction sentence and a picture - takes fewer cells across rather than mix them)
+            const alike = (its, c) => { const hs = its.map((it) => Math.max(20, hOf(it, c))); return Math.min(...hs) >= Math.max(...hs) * (1 - WARM_BAND); };
+            for (const id of ids) {
+                const k = [4, 2].find((c) => pools[id].length >= c && fitsWidth(pools[id].slice(0, c), c) && alike(pools[id].slice(0, c), c)) || 1;
+                out[id] = { k, cols: k, stack: true, split: true };
+            }
+        }
     }
     return out;
 }
+
+/** H13 for the Warm-up: the most of a cell's height its own item may leave empty (RUBRIC: < 30 %). */
+const WARM_BAND = 0.25;
 
 export function counts(pools, input) {
     const shape = warmShape(pools, input);
@@ -170,6 +190,8 @@ export function counts(pools, input) {
     const divFacts = mainPool.length > 0 && mainPool.every((it) => it.q && it.q.divForm);
     const out = { main: divFacts ? PROBE + 12 : PROBE };
     for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1);
+    // (split rows per kind may fall back to the shared row in `plan`: deal enough for either)
+    if (Object.values(shape).some((s) => s.split)) for (const [id, s] of Object.entries(warmShape(pools, Object.assign({}, input, { _warmShared: true })))) out[id] = Math.max(out[id] || 0, s.k * (s.rows || 1));
     for (const id of Object.keys(pools)) if (/^x/.test(id)) out[id] = 3;
     return out;
 }
@@ -1476,6 +1498,15 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
 }
 
 export function plan(input = {}) {
+    // Warm-up rows per item kind (critic SU-C r2 N2): when split rows would push the sheet onto
+    // another page, the shared row is kept (the page count never grows for the split).
+    const p1 = planOnce(input);
+    if (!p1._warmSplit || input._warmShared) return p1;
+    const p0 = planOnce(Object.assign({}, input, { _warmShared: true }));
+    return (p1.pages || []).length > (p0.pages || []).length ? p0 : p1;
+}
+
+function planOnce(input = {}) {
     const ctx = ctxOf(input);
     const lesson = input.lesson || {};
     const data = lesson.data || null;
@@ -1571,7 +1602,17 @@ export function plan(input = {}) {
             if (twoLines) for (const p of parts) p.cls += ' mq-lwarm2';
             const instrH = sameInstr ? 0 : twoLines ? m.instr * 1.75 : m.instr;
             const content = parts.length > 1 ? { kind: 'row', cls: 'mq-lwarmrow', widths: parts.map(() => '1fr'), parts } : parts[0];
-            groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, { h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }));
+            // The page's spare height may grow these cells only while each one's own item still
+            // fills all but WARM_BAND of it (critic SU-C r2 N2: at L the grown row left a short
+            // fact 39-40 % of a 65 mm cell empty); what it cannot take passes to the bands after it.
+            const room = halves.map((id) => {
+                const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
+                const hs = its.map((it) => hOf(it, shape[id].cols));
+                if (!hs.length || hs.some((h) => !(h > 0))) return Infinity;
+                return rowsOf(id) * Math.max(20, Math.min(...hs)) / (1 - WARM_BAND) - hW;
+            });
+            const maxAdd = Math.max(0, Math.min(...room));
+            groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, Object.assign({ h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }, Number.isFinite(maxAdd) ? { maxAdd } : {})));
         }
     }
 
@@ -1766,10 +1807,14 @@ export function plan(input = {}) {
         // Independent rows, and a band that reaches its cap passes the rest of its share to the bands after it, so the
         // sheet does not end on a blank band; absent, as before)
         let left = spare;
+        let carry = 0;   // (what a band's `maxAdd` refused, passed to the bands after it)
         for (const [gi, g] of grows.entries()) {
             const cap0 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
             const cap = data && data.growAll ? Math.max(cap0, 0.5) : cap0;
-            const add = data && data.growAll ? Math.min(left / (grows.length - gi), g.h * cap) : Math.min(spare / grows.length, g.h * cap);
+            const share = data && data.growAll ? left / (grows.length - gi) : spare / grows.length + carry;
+            const add0 = Math.min(share, g.h * cap);
+            const add = g.maxAdd !== undefined ? Math.min(add0, g.maxAdd) : add0;
+            carry = data && data.growAll ? 0 : add0 - add;
             left -= add;
             for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
             if (g.box) g.box.html = g.box.html.replace(/height:[\d.]+mm/, `height:${(g.h + add).toFixed(2)}mm`);
@@ -1811,6 +1856,7 @@ export function plan(input = {}) {
     // header, the pages after it the continuation header (HD-20).
     plan0.pages = plan0.pages.map((pg, i) => (i > 0 && !out[i].header && pg.header === frame.header ? Object.assign({}, pg, { header: frame.contHeader }) : pg));
     plan0.cls = [plan0.cls || '', 'mq-lesson'].filter(Boolean).join(' ');
+    if (halves.some((id) => shape[id].split)) Object.defineProperty(plan0, '_warmSplit', { value: true, enumerable: false });
     return plan0;
 }
 
