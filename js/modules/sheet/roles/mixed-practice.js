@@ -659,7 +659,11 @@ export function plan(input = {}) {
             bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
         }
         const first = sh.items.find((it) => !it.anchor);
-        const skill = (input.skills || []).find((s) => first && first.q && s.skillId === first.q.skillId) || {};
+        // A preset skill's items carry the host's id in q.skillId and the preset's in q.presetId
+        // (generate-question.js): the band is the skill the teacher chose (pilot D8).
+        const fq = (first && first.q) || null;
+        const skill = (fq && ((input.skills || []).find((s) => s.skillId === (fq.presetId || fq.skillId) && (!fq.categoryId || s.categoryId === fq.categoryId))
+            || (input.skills || []).find((s) => s.skillId === fq.skillId))) || {};
         // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
         const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
