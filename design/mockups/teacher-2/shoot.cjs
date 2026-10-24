@@ -670,7 +670,7 @@ function writeIndex(shots, results) {
 <div class="tiles">
   <a class="tile" href="app.html"><b>The mock-up</b><span>Skills (opens here) with the tray, the worksheet sheet, Quiz, Share, Lessons, Classes and the profile menu. Works at any width. Light only: dark mode is parked by the owner (2026-10-23).</span></a>
   <a class="tile" href="flows.html"><b>The flows</b><span>Each job with its steps and clicks, today’s count beside it, and a “Walk it” button that shows each click in the mock-up.</span></a>
-  <a class="tile" href="palette.html"><b>Colour: board C</b><span>Eight maths areas in four strengths, light and dark, the colour-blind check, where each colour moved from the site, and boards B and A as reference pictures.</span></a>
+  <a class="tile" href="palette.html"><b>Colour: board C</b><span>Eight maths areas in four strengths (light; dark mode parked by the owner), the colour-blind check, where each colour moved from the site, and boards B and A as reference pictures.</span></a>
   <a class="tile" href="thumbs.html"><b>Every skill’s thumbnail</b><span>All 715 live skills, each drawn LIVE by the app as you scroll (<code>live.mjs</code>: the app’s own <code>buildSheet</code>); <code>thumbs-check.cjs</code> holds each thumbnail to the booted app’s own cell for the same skill and seed.</span></a>
   <a class="tile" href="files.html"><b>Teacher files: live and branches</b><span>Which teacher files are live, which are only on a branch, and what T2–T6 does with each (STATUS §7).</span></a>
 </div>
