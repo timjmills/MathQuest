@@ -47,7 +47,7 @@ import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf 
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
-    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, sideFit, SIDE_COLS, easeScore, ineligibleNote,
+    normaliseAnchors, ANCHOR_ROLES, anchorEligible, anchorItem, anchorHeightMm, sideFit, SIDE_COLS, side4Cols, SIDE4_BAND, easeScore, ineligibleNote,
     blockPlan, sideItems, pickDistinct,
 } from './sheet/anchors.js';
 import {
@@ -1502,6 +1502,87 @@ function measurePairs(pairs, { size, look }) {
     } finally { host.remove(); }
 }
 
+/**
+ * Owner ruling A (critic anchors-r1): a side page whose [twin | problem] pairs fill under about
+ * half of the two-column row prints FOUR columns, [twin | problem | twin | problem] (H13: no cell
+ * an island in a wide cell). Chosen by rule, never by skill:
+ *   1. each pair is drawn in the two-column side grid; it is LOW FILL when a cell's empty band
+ *      left or right of its content is SIDE4_BAND (H13's 30 %) or more - the pair fills under
+ *      half of the row however the width is shared;
+ *   2. the pairs are then drawn two to a row in the four-column grid at the cells' own drawing
+ *      width; that layout is taken only if every cell's content stays inside its cell.
+ * Returns {ok, hMm (the tallest four-column row), h2Mm (the tallest two-column row), fill}.
+ * anchors.js sideFit takes it only when a page holds at least as many pairs as in two columns.
+ */
+function measureSide4(pairs, { size, look }) {
+    const out = { ok: false, hMm: 0, h2Mm: 0, fill: 1, band: 0 };
+    if (typeof document === 'undefined' || !document.body || !pairs.length) return out;
+    ensureEngineStyle(document);
+    const s = SIZES[size] || SIZES.L;
+    const host = document.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;left:-10000px;top:0;width:220mm;visibility:hidden;pointer-events:none;contain:layout;';
+    host.innerHTML = `<div class="ws-sheet ws-${size} ws-${look} ws-tab${s.tabMm}" style="display:block;max-width:none;width:${LIVE_W_MM}mm;overflow:visible"></div>`;
+    document.body.appendChild(host);
+    const root = host.firstChild;
+    const PX_PER_MM = 96 / 25.4;
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    // the content's ink extent in a cell, and whether it stays inside the cell's padding box
+    const ink = (cell) => {
+        const r = cell.getBoundingClientRect();
+        const cs = getComputedStyle(cell);
+        let lo = Infinity, hi = -Infinity, top = Infinity, bot = -Infinity, inside = true;
+        for (const el of cell.querySelectorAll('*')) {
+            if (el.closest('.ws-letter,.ws-tab,.ws-label') || (el.parentElement && el.parentElement.closest('svg'))) continue;
+            if (getComputedStyle(el).position === 'absolute') continue;
+            if (el.children.length && el.tagName.toLowerCase() !== 'svg') continue;
+            const er = el.getBoundingClientRect();
+            if (!er.width || !er.height) continue;
+            lo = Math.min(lo, er.left); hi = Math.max(hi, er.right);
+            top = Math.min(top, er.top); bot = Math.max(bot, er.bottom);
+            // (inside the cell's border with a 1 mm margin: a subtraction's wide ones box overhangs its
+            // stack on purpose, into the padding)
+            if (er.right > r.right - PX_PER_MM || er.left < r.left + PX_PER_MM) inside = false;
+        }
+        // the height the content needs: its ink and the cell's own padding (the Model tab's clearance)
+        const need = bot > top ? bot - top + (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) : 0;
+        return { w: hi > lo ? hi - lo : 0, inside, band: hi > lo ? Math.max(lo - r.left, r.right - hi) / r.width : 1, need };
+    };
+    try {
+        let fill = 0, band = 0, h2 = 0, wP = 0;
+        for (const [twin, it] of pairs) {
+            root.innerHTML = `<div class="ws-grid fixed" style="grid-template-columns:${SIDE_COLS};grid-template-rows:auto;height:auto;align-items:start">${cellHtml(twin)}${cellHtml(it)}</div>`;
+            const g = root.firstChild;
+            const [a, b] = g.children;
+            const ia = ink(a), ib = ink(b);
+            fill = Math.max(fill, (ia.w + ib.w) / g.getBoundingClientRect().width);
+            band = Math.max(band, ia.band, ib.band);
+            wP = Math.max(wP, ib.w / PX_PER_MM);
+            h2 = Math.max(h2, g.getBoundingClientRect().height / PX_PER_MM);
+        }
+        out.fill = Math.round(fill * 1000) / 1000;
+        out.band = Math.round(band * 1000) / 1000;
+        out.h2Mm = Math.ceil(h2 * 10) / 10;
+        if (!(band >= SIDE4_BAND)) return out;
+        // The problem columns as wide as the widest problem's ink + 4 mm a side (a subtraction's
+        // wide ones box overhangs its stack); the twins share the rest.
+        const tpl = side4Cols(Math.ceil(wP + 8));
+        let h = 0;
+        for (let i = 0; i < pairs.length; i += 2) {
+            const two = [pairs[i], pairs[i + 1] || pairs[0]];
+            root.innerHTML = `<div class="ws-grid fixed" style="grid-template-columns:${tpl};grid-template-rows:auto;height:auto;align-items:start">${two.map(([t, it]) => cellHtml(t) + cellHtml(it)).join('')}</div>`;
+            const g = root.firstChild;
+            if ([...g.children].some((c) => !ink(c).inside) || g.scrollWidth > g.clientWidth + PX_PER_MM) return out;
+            h = Math.max(h, ...[...g.children].map((c) => ink(c).need / PX_PER_MM));
+        }
+        out.ok = true;
+        out.tpl = tpl;
+        out.hMm = Math.ceil(h * 10) / 10;
+        return out;
+    } finally { host.remove(); }
+}
+
 function measureItems(items, { size, look, colsList }) {
     if (typeof document === 'undefined' || !document.body || !items.length) return;
     ensureEngineStyle(document);
@@ -1940,7 +2021,7 @@ const ANCHOR_MAX = 48;            // candidates per skill at most (side by side 
  * `take(pupilItems, count)` then picks examples that are none of the pupil's problems (review
  * note 5: an anchor is a sibling item, never the same item).
  */
-function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
+function anchorSet(sk, si, n, { variant, colsList, twinCols, level }) {
     const cands = [];
     const seen = new Set();
     let next = 0;
@@ -1958,7 +2039,7 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols }) {
             const it = hostItem({ q, skill: sk }, si, n.size, { supports: false });
             if (eligible === null) eligible = anchorEligible(it);
             if (!eligible) return;
-            const a = anchorItem(it, { variant, twinCols });
+            const a = anchorItem(it, level === undefined ? { variant, twinCols } : { variant, twinCols, level, greyNewest: true });
             cands.push(a);
             fresh.push(a);
         }
@@ -1993,7 +2074,7 @@ function anchorSummary(mode, list, notes) {
     for (const a of list) {
         if (!a || !a.source || seen.has(a)) continue;
         seen.add(a);
-        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured, pairMm: a.pairMm });
+        examples.push({ section: a.section, pool: a.pool, variant: a.anchor, skill: a.skill, text: String(a.source.q.text || ''), ans: a.source.q.ans, sig: signature(a.source.q), measured: a.measured, pairMm: a.pairMm, pair4Mm: a.pair4Mm, pair2Mm: a.pair2Mm, side4: a.side4 });
     }
     return { mode, examples, notes: notes.slice() };
 }
@@ -2176,12 +2257,18 @@ async function buildSheetCore(req = {}) {
     // page capacity is decided, so the capacity reserves their band (sections) or their half of
     // every row (side by side). A skill with no real worked steps gets none, and the dialog says so.
     const anchorMode = n.anchors;
+    // Owner ruling B (critic anchors-r1): a side twin is drawn at the pupil's own scaffold level
+    // (practice.js composeSheet: level 1 on Independent and More Practice), so it has exactly the
+    // heads row and answer row the problem beside it has - same drawing, same scaffolds; and
+    // (ruling C, S5) its newest marks are grey (anchors.js anchorHtml greyNewest).
+    const PUPIL_LEVEL = 1;
     const anchorNotes = [];
     const instrMm = instructionMm(n.size);
+    const askedCols = n.sections.map((sec) => ({ columns: sec.columns, maxCols: sec.maxCols }));
     const anchorSets = anchorMode === 'off' ? [] : n.sections.map((sec, si) => {
         const sk = sec.skills[0];
         const set = anchorSet(sk, si, n, anchorMode === 'side'
-            ? { variant: 'side', colsList: [1, 2], twinCols: 2 } : { variant: 'band', colsList: [1], twinCols: 4 });
+            ? { variant: 'side', colsList: [1, 2], twinCols: 2, level: PUPIL_LEVEL } : { variant: 'band', colsList: [1], twinCols: 4 });
         if (!set.eligible) { anchorNotes.push(ineligibleNote(metaOf(sk).label)); return null; }
         if (anchorMode === 'side') sec.columns = 2;
         else { sec.maxCols = 4; sec.anchorMm = set.heightMm(1); }
@@ -2210,6 +2297,50 @@ async function buildSheetCore(req = {}) {
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
+    // Critic anchors-r1 (3): an example and one of its problems must share a page (PG-21). Side by
+    // side falls back to the twin above its problem (one column, practice.js layoutSheet), and a
+    // band to the compact band; a pair taller than the page even so (a whole multiplication chart
+    // above a chart) gets no example, and the dialog says so.
+    anchorSets.forEach((set, si) => {
+        if (!set || !set.items.length) return;
+        const sec = n.sections[si];
+        const G = (sec.gridH ? sec.gridH : bodyHeightMm(paper, layoutHeader) - instrMm) - 1;
+        const probe = build(si, sec, 4, (n.seed + si * 100003) >>> 0);
+        measureItems(probe, { size: n.size, look: n.look, colsList: [1] });
+        const pr = Math.max(0, ...probe.map((it) => (it.measured && it.measured[1] && Number.isFinite(it.measured[1].hMm) ? it.measured[1].hMm + 1 : 0)));
+        if (!(pr > 0)) return;
+        const twinMm = (s) => (anchorMode === 'side' ? Math.min(...s.items.map((a) => anchorHeightMm(a, 1))) : s.heightMm(1));
+        if (twinMm(set) + pr <= G) {
+            // Owner ruling A: pairs that fill under half of the two-column row print four columns
+            // (anchors.js sideFit reads `side4` / `pair4Mm` on the twins).
+            if (anchorMode === 'side') {
+                const s4 = measureSide4(probe.map((it, i) => [set.items[i % set.items.length], it]), { size: n.size, look: n.look });
+                for (const a of set.items) { a.side4 = s4.ok; a.pair4Mm = s4.ok ? s4.hMm : 0; a.pair2Mm = s4.h2Mm; a.cols4 = s4.tpl || ''; }
+            }
+            return;
+        }
+        if (anchorMode === 'sections') {
+            const compact = anchorSet(sec.skills[0], si, n, { variant: 'compact', colsList: [1], twinCols: 4 });
+            if (compact.eligible && compact.items.length && compact.heightMm(1) + pr <= G) {
+                anchorSets[si] = compact;
+                sec.anchorMm = compact.heightMm(1);
+                return;
+            }
+        }
+        anchorSets[si] = null;
+        if (anchorMode === 'side') sec.columns = askedCols[si].columns;
+        else { sec.maxCols = askedCols[si].maxCols; delete sec.anchorMm; }
+        anchorNotes.push(`${metaOf(sec.skills[0]).label}: a worked example and its problem are too tall to share a page at size ${n.size}, so this page prints without examples.`);
+    });
+    // Critic anchors-r1 (2): a sheet none of whose skills has worked steps prints no example, so
+    // it is planned EXACTLY as anchors 'off' (same columns, packing and splits); the dialog keeps
+    // the mode asked for and its notes.
+    if (anchorMode !== 'off' && anchorSets.every((s) => !s)) {
+        const res = await buildSheetCore(Object.assign({}, req, { anchors: 'off' }));
+        res.anchors = { mode: anchorMode, examples: [], notes: anchorNotes.slice() };
+        res.notes = [...new Set((res.notes || []).concat(anchorNotes))];
+        return res;
+    }
     const notes = [];
     let hostItems = [];
     const measure = (items, sec) => measureItems(items, { size: n.size, look: n.look, colsList: candidateCols(sec.columns, n.size) });
@@ -2426,6 +2557,12 @@ async function buildSheetCore(req = {}) {
                 const tw = set.take(hostItems, mine.length);
                 mine.forEach((it, i) => { it.twin = tw[i] || null; });
                 measurePairs(mine.filter((it) => it.twin).map((it) => [it.twin, it]), { size: n.size, look: n.look });
+                // Owner ruling A: the four-column side layout, held to the section's REAL pairs
+                const pairs = mine.filter((it) => it.twin).map((it) => [it.twin, it]);
+                if (pairs.some(([t]) => t.side4)) {
+                    const s4 = measureSide4(pairs, { size: n.size, look: n.look });
+                    for (const [t] of pairs) { t.side4 = s4.ok; t.pair4Mm = s4.ok ? s4.hMm : 0; t.pair2Mm = s4.h2Mm; t.cols4 = s4.tpl || ''; }
+                }
             } else {
                 // One example per block: enough for a sheet's blocks (a block holds 1-4 problems).
                 const perLetter = new Map();

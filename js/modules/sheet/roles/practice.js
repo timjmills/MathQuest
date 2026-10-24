@@ -31,7 +31,7 @@ import {
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
-import { ANCHOR_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages, sideFit, SIDE_COLS, SIDE_TOP } from '../anchors.js';
+import { ANCHOR_CSS, ANCHOR_PAGE_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages, sideFit, SIDE_COLS } from '../anchors.js';
 import { LESSON_CSS } from '../lesson-css.js';
 
 /* ======================================================================= engine stylesheet */
@@ -889,6 +889,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     const planPages = pages.map((pg, pi) => {
         const sections = [];
         if (pi === 0) sections.push({ kind: 'html', html: styleBlock() });
+        if (pi === 0 && anchors) sections.push({ kind: 'html', html: ANCHOR_PAGE_CSS });
         if (pg.cont) sections.push({ kind: 'html', html: CONT_MARK });
         // A lesson's step reminder strip (roles/lesson.js stripHtml) above the grid of every page;
         // the host took its height off the section's gridH.
@@ -954,12 +955,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // SIDE BY SIDE (two columns): each column as wide as what it holds, the spare
                 // width shared, so a narrow stack is not an island in a half-page cell (H13).
                 ...(L.cols === 2 && its.some((it) => it.anchor) ? { colsTpl: SIDE_COLS } : {}),
+                // (owner ruling A: the four-column side grid, [twin | problem | twin | problem])
+                ...(L.side4 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl4 } : {}),
                 rowGap: gap.gap || 0,
-                // SIDE BY SIDE (owner ruling CL-4): every twin and problem at the TOP of its cell,
-                // the writing room below - never centred down the cell.
-                items: its.some((it) => it.anchor)
-                    ? its.map((it) => { const p = planItem(it, level, L.cols); return Object.assign({}, p, { style: [p.style, SIDE_TOP].filter(Boolean).join(';') }); })
-                    : its.map((it) => planItem(it, level, L.cols)),
+                // (owner ruling A: a four-column side page draws each cell at its two-column width)
+                items: its.map((it) => planItem(it, level, L.side4 ? L.drawCols : L.cols)),
             });
         }
         // Wave 5.2: a page none of whose sections asked for the number line prints without it
