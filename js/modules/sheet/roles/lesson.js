@@ -127,6 +127,21 @@ function warmShape(pools, input) {
         const pick = opts.find(([, c]) => fitsWidth(its, c)) || opts[opts.length - 1];
         out[id] = { k: pick[0], cols: pick[1] };
     }
+    // `warmRows` (lesson data; pilot SU-C fix r2, critic r2 N2): two prerequisites whose cells
+    // differ in width - one-digit column facts fit a quarter of the page, a place-value word bank
+    // or a 5-digit column only a half - each take a full-width row of their own, the narrow one
+    // four cells across, so neither is drawn in a cell sized for the other (H13, CL-3 per row).
+    // Opt-in: every other lesson keeps its shared band.
+    // `warmRows: true` (every size) or a list of sizes (['S']).
+    const ldata = input && input.lesson && input.lesson.data;
+    const rowsAsked = ldata && (ldata.warmRows === true || (Array.isArray(ldata.warmRows) && ldata.warmRows.includes(ctx.size)));
+    if (ids.length > 1 && rowsAsked) {
+        const w4 = ids.map((id) => fitsWidth(pools[id].slice(0, 3), 4));
+        if (w4.some(Boolean) && !w4.every(Boolean)) {
+            ids.forEach((id, i) => { out[id] = w4[i] ? { k: 4, cols: 4, stack: true } : fitsWidth(pools[id].slice(0, 3), 2) ? { k: 2, cols: 2, stack: true } : { k: 1, cols: 1, stack: true }; });
+            return out;
+        }
+    }
     // The halves hold the same number of cells, so the Warm-up's cells are one size (CL-3).
     if (ids.length > 1 && ids.some((id) => !fitsWidth(pools[id].slice(0, 3), 2))) {
         // A cell too wide for half the page (a sentence with two boxes, a number line) never
@@ -195,6 +210,16 @@ export const CASE_TESTS = Object.freeze({
     endsFive: (it) => roundRest(it) === 5,
     // Lessons r3: a one-place take-away from a number with 0 ones (70 - 8), and the 90s -> 100.
     takeAwayZero: (it) => { const o = operandsOf((it && it.q) || {}); return o.length >= 2 && Number(o[0]) % 10 === 0 && Number(o[1]) < 10; },
+    // SU-C (critic r1 D4): a no-regrouping column subtraction that is NOT a zero case - no 0 in the
+    // top number, no n − 0, no column that leaves 0, an answer as long as the top number.
+    subNoZero: (it) => {
+        const o = operandsOf((it && it.q) || {}).map(Number);
+        if (o.length < 2 || !(o[0] > o[1]) || o[1] < 1) return false;
+        const A = String(o[0]), B = String(o[1]).padStart(A.length, 'x');
+        if (/0/.test(A) || String(o[0] - o[1]).length !== A.length) return false;
+        for (let i = 0; i < A.length; i++) if (B[i] !== 'x' && (B[i] === '0' || Number(B[i]) >= Number(A[i]))) return false;
+        return true;
+    },
     toHundred: (it) => {
         const c = it && it.q && it.q.cell;
         const n = c && c.payload ? Number(c.payload.n) : NaN;
@@ -1094,6 +1119,21 @@ function vocabPicture(pic, c) {
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;
         // A longer text picture ("10, 20, 30") at four fifths, so it never crowds its neighbour.
         case 'text': return `<span class="mq-lvpic-text" style="font-size:${String(pic.text || '').length > 7 ? Math.round(m.digitPt * 0.8) : m.digitPt}pt">${esc(pic.text)}</span>`;
+        // A small two-row column (pilot SU-C fix r2, critic r2 N6): {top, bottom, op}. Each
+        // character has its own grid column, so ones sit under ones (and commas under commas)
+        // whatever the font's digit widths; the operator stands left of the bottom row and a rule
+        // closes the column. Never wraps (one column per character).
+        case 'stack': {
+            const top = String(pic.top || ''), bot = String(pic.bottom || '');
+            const n = Math.max(top.length, bot.length);
+            const pt = n > 5 ? Math.round(m.digitPt * 0.8) : m.digitPt;
+            const cellsOf = (t, row) => t.padStart(n, ' ').split('').map((ch, i) => `<span style="grid-row:${row};grid-column:${i + 2};text-align:center">${ch === ' ' ? '' : esc(ch)}</span>`).join('');
+            return `<span class="mq-lvpic-stack" style="display:inline-grid;grid-auto-columns:auto;column-gap:0.15em;row-gap:0.6mm;font-size:${pt}pt;line-height:1;white-space:nowrap;align-items:end">`
+                + cellsOf(top, 1)
+                + `<span style="grid-row:2;grid-column:1;padding-right:0.15em">${esc(pic.op || '−')}</span>` + cellsOf(bot, 2)
+                + `<span style="grid-row:3;grid-column:1 / ${n + 2};border-top:${(1.5 * PT_MM).toFixed(3)}mm solid #000;height:0;margin-top:0.4mm"></span>`
+                + '</span>';
+        }
         case 'blocks': {
             // RP: a ten is a rod of ten unit squares, a one is one square (outlined, 0.75 pt).
             const u = { S: 2.8, M: 3.1, L: 3.4 }[c.size] || 3.4;     // lessons r1: 2.6 mm cubes were too small

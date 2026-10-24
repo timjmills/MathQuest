@@ -274,6 +274,21 @@
    "date": "2026-10-17",
    "ruling": "A distinct option (new size class, new task kind) is also a findable preset skill; small tweaks stay plain options.",
    "source": "CLAUDE.md"
+  },
+  {
+   "date": "2026-10-23",
+   "ruling": "Inherited, removed: the AP4 \"How it is written\" control (Stacked / Across) that skill-options.js declared on sub_50_no_regroup and sub_100_no_regroup (and so on the sub_2d_1d preset). Section 7 puts across on the `sub-setup` rewrite page; these six skills are always stacked (critic SU-C r2 N4).",
+   "source": "lead, pilot fix r2"
+  },
+  {
+   "date": "2026-10-23",
+   "ruling": "Inherited, removed: the AP4 Support-level help line (\"Always stacked from within 1,000 up ... 2 adds the place heads, 1 is the bare column\") and its hide-when-across rule, patched over these six ids. The level keeps its own help, kept as: \"3 traces the answer, 1 prints the place heads, 0 takes them away; the answer boxes stay at every level\" (levels offered: 3, 1, 0; critic SU-C r2 N3).",
+   "source": "lead, pilot fix r2"
+  },
+  {
+   "date": "2026-10-23",
+   "ruling": "Inherited, kept as the committed table: js/modules/skill-options-derived.js still lists level [3, 2, 1] for the six skills (a re-derive measures [3, 1, 0] for all seven ids, sub_2d_1d included). tests/scripts/ws-options-derive.cjs rewrites the whole table (about 260 other rows change), so the file is left for the options owner; the panel offers the levels _subNrLevel declares (3, 1, 0).",
+   "source": "lead, pilot fix r2"
   }
  ],
  "misconceptions": [

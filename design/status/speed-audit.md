@@ -685,3 +685,52 @@ under CL-4b (owner), band instruction for presets.
 | The critic measured by hand what a driver could table | One driver: render + measure (bands, overflow, page fill, frame closed) + anchors-off diff, writing a table |
 | Page-count regressions found only by the critic | Page-count table (anchors vs off) in every render run; > 2× off is an instant flag |
 | A builder labelled a real E4 failure as "drift" | A FAIL line in a gate is never re-labelled in a report; the report lists every FAIL verbatim |
+## Per-round findings
+
+### pilot-su-c · critic r1 (2026-10-23, FAIL)
+
+**Automatic checks** (critic r1 findings a machine could measure):
+
+| Finding | Class | Rule | Proposed check | Backtest | Existing check that should have caught it |
+|---|---|---|---|---|---|
+| D1 zero cases flood 2-digit pages (66/120 on sub_50) | CONTENT | card §9.4, P-1 | ws-content-audit: per-skill rate of zero-case items (a column leaving 0, n − 0, answer shorter than minuend) ≤ a declared cap unless `zeros:on` | pilot commit 27577cf FAILs, ff471fd passes | none |
+| D2 place heads off at the default level | SCAFFOLD | WDS VA-30/32 | print-lint L-SUPPORT: a stack whose skill declares `heads` structural must print `.head` at the default level | 27577cf FAIL / ff471fd pass | none |
+| D3 answer box 4.06 mm (< 4.4 mm) | SIZE | TY-21 | print-lint L-ANSAREA: every answer-strip segment ≥ 4.4 mm wide | 27577cf FAIL / ff471fd pass; also flags addition:add_three stacked (a true positive) | none |
+| D4 lesson uses the fallback (regroup warm-up, steps ≠ items) | LESSON | H3, L6 | ws-node-lint: every skill reachable as a Lesson has a prereqs.js entry, or the lesson role is refused for it | 27577cf FAIL / ff471fd pass | none |
+| D5 screen focus not on the ones box, 390 card clips (comma text) | SCREEN | SP-20, H6 | ws-screen-slots: first focused slot is the ones slot on every stack item; ws-chromebook-fit at 390 on 5-6 digit stacks | 27577cf FAIL / ff471fd pass | ws-screen-slots / ws-chromebook-fit SHOULD have (they passed: the 390 card is not in their sample, focus order not checked) |
+| D6 legacy `band` option offered (routes to the legacy cell) | OPTIONS | H4, H3 | ws-options-verify: every option value of a kit skill renders a kit cell (no legacy fallback) and stays in the skill's band | 27577cf FAIL / ff471fd pass | ws-options-verify SHOULD have (checks the promise, not the cell kind) |
+| D7 heads collide at 5-6 digits | INK | H2 | print-lint L-OVERLAP: bounding boxes of neighbouring `.ws-stack .head` text never intersect | 27577cf FAIL / ff471fd pass | none |
+| D8 preset instruction / narrow band | CONTENT | P-29 | ws-presets-unit: a preset's items carry the preset's instruction key; its operands span the preset's declared band | 27577cf FAIL / ff471fd pass | ws-presets-unit SHOULD have (it checks opening, not the dealt items) |
+| D9 wrong answer longer than the strip | KEY | AK-1 | ws-providers-unit: wrongAnswer fits the item's answer slot | unit fixture | none |
+| D11 option label promises items never dealt | OPTIONS | P-31 | ws-options-verify: the label's example items are dealt within N seeds | fixture | none |
+
+**Speed-ups** (what cost time in r1, and the smallest change):
+
+1. **The critic started before the pins were checked** (orchestrator error; the lead ruled r1 a failed round). Fix: rule 0b, now written. Owner: done.
+2. **My first sibling comparison was wrong** (236 vs a true 124): the matrix LOG prints at most 6 counts a row. Fix: the matrix gets a documented `--out` run file as the only comparison input, plus a `ws-coverage-matrix --compare-with <skills>` mode that does the sibling comparison itself. Owner: W0-A (checks).
+3. **The card was silent** on heads-on-by-default vs the support level, lesson data (prereqs.js), the legacy `band` option, and the screen comma path. Most r1 points were lost here. Fix: the spec-card generator adds a "Hosts and roles" section (lesson data present? options inherited from a legacy P11 loop? screen path for comma text?) from the repo. Owner: W0-process (card tool).
+4. **Builder strength**: low effort on an uncertified pair (stack × single had no certificate). Fix: rule 0a, now written. Owner: done.
+5. **Browser-slot waits**: precritic 22 min a pass, of which the coverage matrix is 21 min; three passes ran. Fix: precritic `--rows-from <red list>` to re-run only the red rows after a fix. Owner: W0-A.
+6. **check-signed fails after a correct build** (card §7 lists live options). Owner: W0-process (routed by the lead).
+
+### pilot-su-c · critic r2 (2026-10-23, FAIL)
+
+**Automatic checks:**
+
+| Finding | Class | Rule | Proposed check | Backtest | Existing check that should have caught it |
+|---|---|---|---|---|---|
+| N1 2-digit dealer skewed (top ones 9 on 39/120; 49 ×4 on one page; the zero item always at index 7) | PATTERN | L10, P-10 | ws-content-audit: per-digit and per-value frequency within ±2σ of uniform over the valid set; no value > 2 a page; position of a seeded case not periodic | pilot tip FAILs | ws-content-audit's repeat/cycle rule SHOULD have (it checks answers repeating, not digit skew or a fixed position) |
+| N2 lesson Warm-up fact cell 43-59 % empty | SPACE | H13 | print-lint H13 applied to lesson Warm-up cells | pilot tip FAILs; sub_100_regroup 38 % passes | print-lint H13 SHOULD have (does not reach lesson Warm-up cells) |
+| N3 option panel help false (level 2 named, not offered) | UNTRUE_TEXT | P-31 | ws-options-verify: every level / value named in a help string is offered, and its described effect is visible (heads on/off) | pilot tip FAILs | none |
+| N4 "Across" breaks the page (equation wraps, key digits over the subtrahend) | CLIP_OVERLAP | H2 | ws-options-verify renders every offered appearance value through print-lint (not only the promise) | pilot tip FAILs | ws-options-verify SHOULD have (checks the promise, not the render) |
+| N5 side anchors at L, empty band 32 % (D12 class moved) | SPACE | H13 | already caught: the matrix single/ex-each L row; it was pinned as class (a) | — | the coverage matrix DID catch it; the pin (my class (a) at L) was wrong: (a) is confirmed at S only |
+| N6 "line up" vocab picture wraps with a dangling minus | VISUAL_DESIGN | TY rules | print-lint: a line that ends in an operator glyph | fixture | none |
+| N7 a line break inside an equation in step 3 | STEPS_LAYOUT | C1 | print-lint: a wrapped line ending in "−"/"+"/"=" inside a step | fixture | none |
+| N8 HTh / TTh heads 0.74 mm apart at S | CLIP_OVERLAP | H2 | print-lint L-OVERLAP with a 1 mm minimum gap between head labels | fixture | none |
+
+**Speed-ups:**
+
+1. **Fix round 1 added new surfaces (lesson data, wide tracks, heads on screen) and nothing checked them before the critic.** N2, N4 and N6 came from fix-r1 changes or surfaces it newly exposed. Smallest change: precritic `--role lesson` plus every offered option value at S and L on the touched skills, run in the fix round's own report.
+2. **One wrong pin**: class (a) was pinned at L, where the siblings show 0 (N5). The rate table measured S only. Smallest change: the rate table measures every size it pins.
+3. **The dealer was rewritten in the fix round without a distribution check** (N1). Smallest change: the content-audit predicate above, run by the builder.
+4. **Critic wall time 32 min, ≈ 360k tokens a round**: fine. The cost is the round count. Two rounds of the same family each found 4+ card-level gaps (the across appearance, the option help, lesson Warm-up form), so the card is the cause: the card needs a section listing every option and appearance the panel offers, inherited ones included (`_ap4*` patches), with the decision for each.

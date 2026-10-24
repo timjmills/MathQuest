@@ -1,0 +1,3290 @@
+{
+ "tool": "ws-coverage-matrix",
+ "date": "2026-10-23",
+ "started": "2026-10-23T21:20:40.226Z",
+ "finished": "2026-10-23T21:25:59.091Z",
+ "commit": "fec865c0e9c1fa63f9415b564398dffb3afc6b6c",
+ "dirty": false,
+ "partners": "tests/fixtures/precritic/matrix-partners.json",
+ "printInputsHash": "a877a523a679e7f9b0316509d48c82dec7af05d1ca68d1969435ec9a1dfa2221",
+ "baseline": {
+  "file": "design/audit/matrix/baseline.json",
+  "dir": "design/audit/matrix",
+  "files": [
+   "baseline.json"
+  ],
+  "entries": 127,
+  "hash": "a8e8fa9627e1ab64"
+ },
+ "selection": {
+  "skills": [
+   "subtraction:sub_100_no_regroup",
+   "subtraction:sub_100k_no_regroup",
+   "subtraction:sub_10k_no_regroup",
+   "subtraction:sub_1k_no_regroup",
+   "subtraction:sub_1m_no_regroup",
+   "subtraction:sub_50_no_regroup"
+  ],
+  "affected": null,
+  "seventh": null,
+  "slice": null,
+  "shard": null,
+  "kinds": null,
+  "rows": [
+   "subtraction:sub_100_no_regroup|sections/ex-each",
+   "subtraction:sub_100_no_regroup|sections/ex-group",
+   "subtraction:sub_100_no_regroup|single/ex-each",
+   "subtraction:sub_100_no_regroup|single/ex-group",
+   "subtraction:sub_100_no_regroup|single/more-cols2+nline+afterpage",
+   "subtraction:sub_100_no_regroup|single/more-cols2+nline+short",
+   "subtraction:sub_100_no_regroup|single/more-cols2+short+afterpage",
+   "subtraction:sub_100k_no_regroup|sections/ex-each",
+   "subtraction:sub_100k_no_regroup|sections/ex-group",
+   "subtraction:sub_100k_no_regroup|single/ex-each",
+   "subtraction:sub_100k_no_regroup|single/ex-group",
+   "subtraction:sub_100k_no_regroup|single/layout-fact-rows",
+   "subtraction:sub_10k_no_regroup|sections/ex-each",
+   "subtraction:sub_10k_no_regroup|sections/ex-group",
+   "subtraction:sub_10k_no_regroup|sections/pages-2",
+   "subtraction:sub_10k_no_regroup|single/ex-each",
+   "subtraction:sub_10k_no_regroup|single/ex-group",
+   "subtraction:sub_10k_no_regroup|single/layout-timed",
+   "subtraction:sub_1k_no_regroup|sections/ex-each",
+   "subtraction:sub_1k_no_regroup|sections/ex-group",
+   "subtraction:sub_1k_no_regroup|single/ex-each",
+   "subtraction:sub_1k_no_regroup|single/ex-group",
+   "subtraction:sub_1k_no_regroup|single/more-cols2+nline+afterpage",
+   "subtraction:sub_1k_no_regroup|single/more-cols2+nline+short",
+   "subtraction:sub_1k_no_regroup|single/more-cols2+short+afterpage",
+   "subtraction:sub_1m_no_regroup|sections/ex-each",
+   "subtraction:sub_1m_no_regroup|sections/ex-group",
+   "subtraction:sub_1m_no_regroup|single/ex-each",
+   "subtraction:sub_1m_no_regroup|single/ex-group",
+   "subtraction:sub_1m_no_regroup|single/layout-fact-rows",
+   "subtraction:sub_50_no_regroup|mixed/defaults",
+   "subtraction:sub_50_no_regroup|sections/ex-each",
+   "subtraction:sub_50_no_regroup|sections/ex-group",
+   "subtraction:sub_50_no_regroup|single/ex-each",
+   "subtraction:sub_50_no_regroup|single/ex-group",
+   "subtraction:sub_50_no_regroup|single/more-cols2+nline+afterpage",
+   "subtraction:sub_50_no_regroup|single/more-cols2+nline+short",
+   "subtraction:sub_50_no_regroup|single/more-cols2+short+afterpage"
+  ],
+  "redFrom": null
+ },
+ "replay": "M4 replay: not built",
+ "liveSkills": 716,
+ "baselineWrite": {
+  "mode": "repin",
+  "target": [
+   "design/audit/matrix/baseline.json"
+  ],
+  "pinned": [
+   "subtraction:sub_100_no_regroup|sections/ex-each",
+   "subtraction:sub_100_no_regroup|sections/ex-group",
+   "subtraction:sub_100_no_regroup|single/ex-each",
+   "subtraction:sub_100_no_regroup|single/ex-group",
+   "subtraction:sub_100_no_regroup|single/more-cols2+nline+afterpage",
+   "subtraction:sub_100_no_regroup|single/more-cols2+nline+short",
+   "subtraction:sub_100_no_regroup|single/more-cols2+short+afterpage",
+   "subtraction:sub_100k_no_regroup|sections/ex-each",
+   "subtraction:sub_100k_no_regroup|sections/ex-group",
+   "subtraction:sub_100k_no_regroup|single/ex-each",
+   "subtraction:sub_100k_no_regroup|single/ex-group",
+   "subtraction:sub_100k_no_regroup|single/layout-fact-rows",
+   "subtraction:sub_10k_no_regroup|sections/ex-each",
+   "subtraction:sub_10k_no_regroup|sections/ex-group",
+   "subtraction:sub_10k_no_regroup|sections/pages-2",
+   "subtraction:sub_10k_no_regroup|single/ex-each",
+   "subtraction:sub_10k_no_regroup|single/ex-group",
+   "subtraction:sub_10k_no_regroup|single/layout-timed",
+   "subtraction:sub_1k_no_regroup|sections/ex-each",
+   "subtraction:sub_1k_no_regroup|sections/ex-group",
+   "subtraction:sub_1k_no_regroup|single/ex-each",
+   "subtraction:sub_1k_no_regroup|single/ex-group",
+   "subtraction:sub_1k_no_regroup|single/more-cols2+nline+afterpage",
+   "subtraction:sub_1k_no_regroup|single/more-cols2+nline+short",
+   "subtraction:sub_1k_no_regroup|single/more-cols2+short+afterpage",
+   "subtraction:sub_1m_no_regroup|sections/ex-each",
+   "subtraction:sub_1m_no_regroup|sections/ex-group",
+   "subtraction:sub_1m_no_regroup|single/ex-each",
+   "subtraction:sub_1m_no_regroup|single/ex-group",
+   "subtraction:sub_1m_no_regroup|single/layout-fact-rows",
+   "subtraction:sub_50_no_regroup|mixed/defaults",
+   "subtraction:sub_50_no_regroup|sections/ex-each",
+   "subtraction:sub_50_no_regroup|sections/ex-group",
+   "subtraction:sub_50_no_regroup|single/ex-each",
+   "subtraction:sub_50_no_regroup|single/ex-group",
+   "subtraction:sub_50_no_regroup|single/more-cols2+nline+afterpage",
+   "subtraction:sub_50_no_regroup|single/more-cols2+nline+short",
+   "subtraction:sub_50_no_regroup|single/more-cols2+short+afterpage"
+  ],
+  "kept": 0,
+  "redNotPinned": [],
+  "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane"
+ },
+ "timing": {
+  "slots": 2,
+  "batch": 9,
+  "documents": 114,
+  "seconds": 317.2,
+  "slotWaitSeconds": 0,
+  "docsPerSec": 0.3594,
+  "batches": [
+   {
+    "chunk": 1,
+    "jobs": 9,
+    "ms": 41237,
+    "waitMs": 0
+   },
+   {
+    "chunk": 0,
+    "jobs": 9,
+    "ms": 51358,
+    "waitMs": 0
+   },
+   {
+    "chunk": 2,
+    "jobs": 9,
+    "ms": 51834,
+    "waitMs": 0
+   },
+   {
+    "chunk": 3,
+    "jobs": 9,
+    "ms": 48128,
+    "waitMs": 0
+   },
+   {
+    "chunk": 5,
+    "jobs": 9,
+    "ms": 44743,
+    "waitMs": 0
+   },
+   {
+    "chunk": 4,
+    "jobs": 9,
+    "ms": 60797,
+    "waitMs": 0
+   },
+   {
+    "chunk": 7,
+    "jobs": 9,
+    "ms": 42539,
+    "waitMs": 0
+   },
+   {
+    "chunk": 6,
+    "jobs": 9,
+    "ms": 53248,
+    "waitMs": 0
+   },
+   {
+    "chunk": 9,
+    "jobs": 9,
+    "ms": 49411,
+    "waitMs": 0
+   },
+   {
+    "chunk": 8,
+    "jobs": 9,
+    "ms": 54024,
+    "waitMs": 0
+   },
+   {
+    "chunk": 11,
+    "jobs": 9,
+    "ms": 40547,
+    "waitMs": 0
+   },
+   {
+    "chunk": 10,
+    "jobs": 9,
+    "ms": 55551,
+    "waitMs": 0
+   },
+   {
+    "chunk": 12,
+    "jobs": 6,
+    "ms": 26182,
+    "waitMs": 0
+   }
+  ]
+ },
+ "totals": {
+  "OK": 0,
+  "CACHED": 0,
+  "RED": 38,
+  "PENDING": 0,
+  "N/A": 0,
+  "ERROR": 0
+ },
+ "red": [],
+ "repinned": [
+  "subtraction:sub_100_no_regroup|sections/ex-each",
+  "subtraction:sub_100_no_regroup|sections/ex-group",
+  "subtraction:sub_100_no_regroup|single/ex-each",
+  "subtraction:sub_100_no_regroup|single/ex-group",
+  "subtraction:sub_100_no_regroup|single/more-cols2+nline+afterpage",
+  "subtraction:sub_100_no_regroup|single/more-cols2+nline+short",
+  "subtraction:sub_100_no_regroup|single/more-cols2+short+afterpage",
+  "subtraction:sub_100k_no_regroup|sections/ex-each",
+  "subtraction:sub_100k_no_regroup|sections/ex-group",
+  "subtraction:sub_100k_no_regroup|single/ex-each",
+  "subtraction:sub_100k_no_regroup|single/ex-group",
+  "subtraction:sub_100k_no_regroup|single/layout-fact-rows",
+  "subtraction:sub_10k_no_regroup|sections/ex-each",
+  "subtraction:sub_10k_no_regroup|sections/ex-group",
+  "subtraction:sub_10k_no_regroup|sections/pages-2",
+  "subtraction:sub_10k_no_regroup|single/ex-each",
+  "subtraction:sub_10k_no_regroup|single/ex-group",
+  "subtraction:sub_10k_no_regroup|single/layout-timed",
+  "subtraction:sub_1k_no_regroup|sections/ex-each",
+  "subtraction:sub_1k_no_regroup|sections/ex-group",
+  "subtraction:sub_1k_no_regroup|single/ex-each",
+  "subtraction:sub_1k_no_regroup|single/ex-group",
+  "subtraction:sub_1k_no_regroup|single/more-cols2+nline+afterpage",
+  "subtraction:sub_1k_no_regroup|single/more-cols2+nline+short",
+  "subtraction:sub_1k_no_regroup|single/more-cols2+short+afterpage",
+  "subtraction:sub_1m_no_regroup|sections/ex-each",
+  "subtraction:sub_1m_no_regroup|sections/ex-group",
+  "subtraction:sub_1m_no_regroup|single/ex-each",
+  "subtraction:sub_1m_no_regroup|single/ex-group",
+  "subtraction:sub_1m_no_regroup|single/layout-fact-rows",
+  "subtraction:sub_50_no_regroup|mixed/defaults",
+  "subtraction:sub_50_no_regroup|sections/ex-each",
+  "subtraction:sub_50_no_regroup|sections/ex-group",
+  "subtraction:sub_50_no_regroup|single/ex-each",
+  "subtraction:sub_50_no_regroup|single/ex-group",
+  "subtraction:sub_50_no_regroup|single/more-cols2+nline+afterpage",
+  "subtraction:sub_50_no_regroup|single/more-cols2+nline+short",
+  "subtraction:sub_50_no_regroup|single/more-cols2+short+afterpage"
+ ],
+ "rows": [
+  {
+   "id": "subtraction:sub_100_no_regroup|sections/ex-each",
+   "skill": "subtraction:sub_100_no_regroup",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_100_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "1031ffc1aca126ef1dd666c6cad305c07cfacaa17c630a908e727ffea85f06d0",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY PG-23: 0 -> 2"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "a2a97900d50c3aad"
+   },
+   "baselineKey": "1550a765da861bef",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 6,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 1,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p6|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 1,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100_no_regroup|sections/ex-group",
+   "skill": "subtraction:sub_100_no_regroup",
+   "kind": "sections",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_100_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "0383756857a6961b426b65a8807a11a9f93afea9223c3b1df32107cf08194d3b",
+   "status": "RED",
+   "rises": [
+    "S L-DENSITY PAGEFILL: 1 -> 2"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "f147667617966b8f"
+   },
+   "baselineKey": "7ca2a4de2d9a2969",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 1,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 8,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 4,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 4,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100_no_regroup|single/ex-each",
+   "skill": "subtraction:sub_100_no_regroup",
+   "kind": "single",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_100_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "850e174b6a78d5dfbdf115bc21c497bca836fa86510169f91c70777eaeed2e74",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 24 -> 32",
+    "S L-DENSITY H13: 6 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "4068918f54ab6088"
+   },
+   "baselineKey": "52e74592e9974d51",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 32,
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 16,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 16,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 4,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 4
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24,
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100_no_regroup|single/ex-group",
+   "skill": "subtraction:sub_100_no_regroup",
+   "kind": "single",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_100_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "80c9615bbe212dbfd3944bb4fd9f85974a84956a908a9286450d18fda1417c35",
+   "status": "RED",
+   "rises": [
+    "M L-SIZE TY-11: 8 -> 16"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "463c30a4a8d3c817"
+   },
+   "baselineKey": "d92ee79ecbf0f878",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100_no_regroup|single/more-cols2+nline+afterpage",
+   "skill": "subtraction:sub_100_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+nline+afterpage",
+   "skills": [
+    "subtraction:sub_100_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-place",
+    "after-page",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "b4a0f9df2782a252f38a80d6794c4c76b2e40c8cbe431b2a2082f4b2a12ddf11",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 12 -> 16"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "fe60dcdf14247647"
+   },
+   "baselineKey": "b1786f711a6f8499",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 16
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 16
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 12
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 6,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 6
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100_no_regroup|single/more-cols2+nline+short",
+   "skill": "subtraction:sub_100_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+nline+short",
+   "skills": [
+    "subtraction:sub_100_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "d1f4d03a935a868d67d1a0d9c2407db63da2ad09c74d805008b7d043588cb0e4",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 6 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "8b4053fde1e45cbe"
+   },
+   "baselineKey": "db4658e6b78864bc",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 6
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100_no_regroup|single/more-cols2+short+afterpage",
+   "skill": "subtraction:sub_100_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+short+afterpage",
+   "skills": [
+    "subtraction:sub_100_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--key-place",
+    "after-page"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "d35bd4a09e6c503f21717f24cb2a55e83896f121bf813dc979b4ccf08efdf9d4",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 6 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "8b4053fde1e45cbe"
+   },
+   "baselineKey": "db4658e6b78864bc",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 6
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100k_no_regroup|sections/ex-each",
+   "skill": "subtraction:sub_100k_no_regroup",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_100k_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "cd155b649140d630e3bb499ef3c1052f35c1a3f77579ed2b48c175b844c12e38",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 12 -> 20",
+    "M L-INK ILLEGIBLE: 0 -> 8",
+    "M L-SIZE TY-11: 12 -> 20",
+    "M L-DENSITY DN-2: 0 -> 2",
+    "M L-DENSITY PAGEFILL: 0 -> 1",
+    "L L-DENSITY H13: 4 -> 6"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "3fc226f0c6384bd3"
+   },
+   "baselineKey": "bc6b2eef451b0c80",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p3|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 6,
+      "L-DENSITY PAGEFILL": 1,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 1,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p6|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100k_no_regroup|sections/ex-group",
+   "skill": "subtraction:sub_100k_no_regroup",
+   "kind": "sections",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_100k_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "88171cd18a45be8563a1d7de3aa006119b51ae5f8154deb16c1fa802fc49b2c9",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 12 -> 20",
+    "M L-SIZE TY-11: 12 -> 20"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "7b6b3c2c283f85b9"
+   },
+   "baselineKey": "35e446934980879d",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100k_no_regroup|single/ex-each",
+   "skill": "subtraction:sub_100k_no_regroup",
+   "kind": "single",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_100k_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "6f6cd2e6132a6be86fb18a7d63ed85651455ced75f8d00fb3ab89ba259263441",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 24",
+    "M L-SIZE TY-11: 0 -> 24",
+    "L L-DENSITY H13: 0 -> 2"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "5cb2eb1af82039a1"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 2
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100k_no_regroup|single/ex-group",
+   "skill": "subtraction:sub_100k_no_regroup",
+   "kind": "single",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_100k_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "bfeffd50948dece6fa96d0477d64e8ae4325b442c4dc3cc0c24dd8a013e55ec7",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 16",
+    "M L-SIZE TY-11: 0 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "ecede9619ed15944"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 8
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 4,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 4
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_100k_no_regroup|single/layout-fact-rows",
+   "skill": "subtraction:sub_100k_no_regroup",
+   "kind": "single",
+   "row": "layout-fact-rows",
+   "skills": [
+    "subtraction:sub_100k_no_regroup"
+   ],
+   "args": [
+    "--roles",
+    "fact-rows"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "7ccc2090fa1bb0513c9fefbc3df6f9a0c59df5c393e17633cbc10f225dd3c32c",
+   "status": "RED",
+   "rises": [
+    "S L-INK ILLEGIBLE: 190 -> 272"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "4386692ae1500aa9"
+   },
+   "baselineKey": "b9ea1203fb36605e",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-INK ILLEGIBLE": 272,
+      "L-OVERFLOW PG-12": 128
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p1|ILLEGIBLE: text \"−\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 8,
+      "L-INK ILLEGIBLE|p1|ILLEGIBLE: text \"#\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 128,
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"−\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 8,
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"#\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 128,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 64,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 64
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_10k_no_regroup|sections/ex-each",
+   "skill": "subtraction:sub_10k_no_regroup",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_10k_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "98db21c343c1906d86ad316c57e92fa6d8526241d733b949e365e9dacef0966c",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 12 -> 20",
+    "S L-DENSITY H13: 2 -> 4",
+    "M L-SIZE TY-11: 12 -> 20"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "b2072188fa7e32f3"
+   },
+   "baselineKey": "b89af8e4d84115bb",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_10k_no_regroup|sections/ex-group",
+   "skill": "subtraction:sub_10k_no_regroup",
+   "kind": "sections",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_10k_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "15f3e79f249e73175d2fdbd106ac36eea474488ed45ba1144692fb2404bc2a7d",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 12 -> 20",
+    "M L-SIZE TY-11: 12 -> 20"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "7b6b3c2c283f85b9"
+   },
+   "baselineKey": "35e446934980879d",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_10k_no_regroup|sections/pages-2",
+   "skill": "subtraction:sub_10k_no_regroup",
+   "kind": "sections",
+   "row": "pages-2",
+   "skills": [
+    "subtraction:sub_10k_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--pages",
+    "2"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "bc3f3561dfae9f338e6629bebb95a2d4c03d565a991cb77728ae3c46809d63ca",
+   "status": "RED",
+   "rises": [
+    "L L-DENSITY H13: 4 -> 6"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "0ba292e416ba214e"
+   },
+   "baselineKey": "4df54872bb5175ff",
+   "sizes": {
+    "S": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 8,
+      "L-DENSITY PAGEFILL": 3,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p9|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p8|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p9|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p6|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 4,
+      "L-DENSITY H13|p6|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 4,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p3|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p4|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p5|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p10|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 6,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p9|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p8|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p9|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p6|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 3,
+      "L-DENSITY H13|p6|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 3,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p3|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p5|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p10|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 10,
+     "keyPages": 5,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 16,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 6,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p9|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p8|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p9|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p6|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 3,
+      "L-DENSITY H13|p6|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 3,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p3|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p5|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p10|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_10k_no_regroup|single/ex-each",
+   "skill": "subtraction:sub_10k_no_regroup",
+   "kind": "single",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_10k_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "0ea4e58b9a5a9a01767cb896de5c99e3cf5acd26c5d75246e24bb1e770edda74",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 24",
+    "S L-DENSITY H13: 0 -> 6",
+    "M L-SIZE TY-11: 0 -> 24"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "d34c231acffc3bd9"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24,
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_10k_no_regroup|single/ex-group",
+   "skill": "subtraction:sub_10k_no_regroup",
+   "kind": "single",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_10k_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "8fea8b8b3e193f3b8fca3bc795c90275593a1500c5834b15bb1ea9ee1d28013c",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 16",
+    "M L-SIZE TY-11: 0 -> 16"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "0d0044c559f45bb4"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_10k_no_regroup|single/layout-timed",
+   "skill": "subtraction:sub_10k_no_regroup",
+   "kind": "single",
+   "row": "layout-timed",
+   "skills": [
+    "subtraction:sub_10k_no_regroup"
+   ],
+   "args": [
+    "--roles",
+    "fact-probe"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "30cb28831e9f5ddc3110fa3731afaa7207928789ebd196a1063822832ee18b18",
+   "status": "RED",
+   "rises": [
+    "L L-DENSITY PG-23: 0 -> 2"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "1ac72279ba468019"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "keys": {},
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup|sections/ex-each",
+   "skill": "subtraction:sub_1k_no_regroup",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_1k_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "f89bdacbe2d96e5ebd0e43f29aaaeab69af955097dfe3d89de78ccaa2ffc2ae1",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 12 -> 20",
+    "S L-DENSITY H13: 4 -> 6",
+    "M L-SIZE TY-11: 12 -> 20",
+    "M L-DENSITY H13: 4 -> 6"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "d865757d9c6e28d7"
+   },
+   "baselineKey": "19f24c6e3b10849f",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 6,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 6,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p6|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup|sections/ex-group",
+   "skill": "subtraction:sub_1k_no_regroup",
+   "kind": "sections",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_1k_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "70e4db56358211bc438318675b6bb6f21f19ae97975a2322f829436fca4e39a5",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 12 -> 20",
+    "M L-SIZE TY-11: 12 -> 20"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "3fd4d8064d1581a1"
+   },
+   "baselineKey": "2e9bdb4f05e9c2b2",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup|single/ex-each",
+   "skill": "subtraction:sub_1k_no_regroup",
+   "kind": "single",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "2cf7ef3713b832a1d6be0f0ddcdc8c72a0b728a58c5b2c41d02565c7de9c4c3a",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 24",
+    "S L-DENSITY H13: 0 -> 6",
+    "M L-SIZE TY-11: 0 -> 24",
+    "M L-DENSITY H13: 0 -> 6"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "bfcb5c94d36096d2"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24,
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24,
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup|single/ex-group",
+   "skill": "subtraction:sub_1k_no_regroup",
+   "kind": "single",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "a0f7c7ee08d9a2cb888c4254249517965ba9078676f93651c40198a7e06e3895",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 16",
+    "M L-SIZE TY-11: 0 -> 16"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "0d0044c559f45bb4"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup|single/more-cols2+nline+afterpage",
+   "skill": "subtraction:sub_1k_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+nline+afterpage",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-place",
+    "after-page",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "4fe345b03b1c7a0db36febd9778ef88667654d0b87272bdd0598c8cd3011108a",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 12 -> 16"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "2c9993e84f550923"
+   },
+   "baselineKey": "af1e07e37a6f7104",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 16
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 16
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup|single/more-cols2+nline+short",
+   "skill": "subtraction:sub_1k_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+nline+short",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "d2ef7e78868a33074091bd8b7543c43de63b980e0d74e6d69ecd9d8c41f535af",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 6 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "011ce62f53854073"
+   },
+   "baselineKey": "178336de0edee856",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1k_no_regroup|single/more-cols2+short+afterpage",
+   "skill": "subtraction:sub_1k_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+short+afterpage",
+   "skills": [
+    "subtraction:sub_1k_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--key-place",
+    "after-page"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "5559111cf757df7ff33c2f3d0c7c9629e2cdcd769beb025b33578ca3f4362406",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 6 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "011ce62f53854073"
+   },
+   "baselineKey": "178336de0edee856",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1m_no_regroup|sections/ex-each",
+   "skill": "subtraction:sub_1m_no_regroup",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_1m_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "01a2ec5e8b786ffc52bbd5c6f1f4056da834d68743aa2e702e6888535f58fa02",
+   "status": "RED",
+   "rises": [
+    "S L-INK ILLEGIBLE: 0 -> 8",
+    "S L-SIZE TY-11: 12 -> 20",
+    "S L-DENSITY DN-2: 0 -> 2",
+    "S L-DENSITY PAGEFILL: 0 -> 1",
+    "M L-SIZE TY-11: 12 -> 20",
+    "M L-DENSITY H13: 2 -> 4",
+    "M L-DENSITY PAGEFILL: 0 -> 2",
+    "L L-DENSITY DN-2: 0 -> 2"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "c1bb03199b771d93"
+   },
+   "baselineKey": "687af109cbd60cdb",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 2,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p3|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-INK ILLEGIBLE": 8,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY DN-2": 2,
+      "L-DENSITY H13": 2
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-INK ILLEGIBLE|p4|ILLEGIBLE: text \"Answer:\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 4,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY DN-2|p1|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY DN-2|p3|page # holds # item(s) while page # of the same sheet follows and its fullest page holds #: a page is never less than ha": 1,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1m_no_regroup|sections/ex-group",
+   "skill": "subtraction:sub_1m_no_regroup",
+   "kind": "sections",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_1m_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "f9563fea0cc07970ca7d3e1454975a60c1224851b8c70fdae1d2e6c1884585e9",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 12 -> 20",
+    "M L-SIZE TY-11: 12 -> 20"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "8ffe8a9295fadb67"
+   },
+   "baselineKey": "5b156d1e6d84a94e",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1m_no_regroup|single/ex-each",
+   "skill": "subtraction:sub_1m_no_regroup",
+   "kind": "single",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "9f01b53728a2520a1d7d2d145b78c52dd34ad72fc3a347127062243dc2ad9db3",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 24",
+    "M L-SIZE TY-11: 0 -> 16",
+    "M L-DENSITY H13: 0 -> 4"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "33fe1638ad47f475"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16,
+      "L-DENSITY H13": 4
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1m_no_regroup|single/ex-group",
+   "skill": "subtraction:sub_1m_no_regroup",
+   "kind": "single",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "fae644f01344a3698789d6da694bc2e00d42b563943d7279f9b4b1af4b2bf35a",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 0 -> 16",
+    "M L-SIZE TY-11: 0 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "ecede9619ed15944"
+   },
+   "baselineKey": "31c0a9b133ae49fa",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 8
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 4,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 4
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_1m_no_regroup|single/layout-fact-rows",
+   "skill": "subtraction:sub_1m_no_regroup",
+   "kind": "single",
+   "row": "layout-fact-rows",
+   "skills": [
+    "subtraction:sub_1m_no_regroup"
+   ],
+   "args": [
+    "--roles",
+    "fact-rows"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "a1a0cae49a72a5c0377fb9c279718d9630aff87c5f56b273dfe04d952817a340",
+   "status": "RED",
+   "rises": [
+    "M L-OVERFLOW PG-12: 66 -> 72"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "feee01538380bed6"
+   },
+   "baselineKey": "399e1584ad4ee925",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-INK ILLEGIBLE": 224,
+      "L-OVERFLOW PG-12": 128
+     },
+     "keys": {
+      "L-INK ILLEGIBLE|p1|ILLEGIBLE: text \"#\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 112,
+      "L-INK ILLEGIBLE|p2|ILLEGIBLE: text \"#\" in ## on ## (contrast #:#) - the pupil cannot read it (INK-#, AX-#)": 112,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 64,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 64
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-OVERFLOW PG-12": 72
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 36,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 36
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup|mixed/defaults",
+   "skill": "subtraction:sub_50_no_regroup",
+   "kind": "mixed",
+   "row": "defaults",
+   "skills": [
+    "subtraction:sub_50_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "mixed"
+   ],
+   "pairs": [
+    "fact--mixed",
+    "legacy--mixed",
+    "perimeter-shape--mixed",
+    "stack--mixed"
+   ],
+   "depHash": "70d2e0cdb862f809ae454fe385de58df96d8d71af36bc63633c169a7f2dc792c",
+   "status": "RED",
+   "rises": [
+    "S L-OVERFLOW PG-12: 0 -> 2"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "b5277c49043270f1"
+   },
+   "baselineKey": "bb0d1b349fc4f234",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-OVERFLOW PG-12": 2
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 1,
+      "L-OVERFLOW PG-12|p4|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {},
+     "keys": {},
+     "error": null
+    },
+    "L": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-DENSITY H13": 4
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup|sections/ex-each",
+   "skill": "subtraction:sub_50_no_regroup",
+   "kind": "sections",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_50_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "ba889d7ac6b97de168fde690a746c2994c215bc92455aff6b61f55a7cf45659c",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY PG-23: 0 -> 2"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "a2a97900d50c3aad"
+   },
+   "baselineKey": "1550a765da861bef",
+   "sizes": {
+    "S": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 4,
+     "keyPages": 2,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 4,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p1|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p3|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY PG-23|p2|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p4|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 6,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p3|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 1,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 2,
+      "L-DENSITY H13|p6|one empty band # mm tall in a # mm cell (#%): the row is sized for a taller item than it holds (RUBRIC H#)": 1,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup|sections/ex-group",
+   "skill": "subtraction:sub_50_no_regroup",
+   "kind": "sections",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_50_no_regroup",
+    "addition:add_facts",
+    "algebra:tape_diagram",
+    "area_perimeter:perimeter_intro"
+   ],
+   "args": [
+    "--kind",
+    "sections",
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "fact--sections",
+    "legacy--sections",
+    "perimeter-shape--sections",
+    "stack--sections"
+   ],
+   "depHash": "317c8b2fb1eba26875dabc861bfa62fa910bd816cc4c60277dbe5117228399b3",
+   "status": "RED",
+   "rises": [
+    "S L-DENSITY PAGEFILL: 1 -> 2"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "f147667617966b8f"
+   },
+   "baselineKey": "7ca2a4de2d9a2969",
+   "sizes": {
+    "S": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 2,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY PAGEFILL|p1|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-SIZE TY-11": 20,
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY PAGEFILL": 1,
+      "L-DENSITY PG-23": 2
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p3|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-SIZE TY-11|p4|# pt text: nothing a pupil reads is under # pt (TY-#)": 7,
+      "L-SIZE TY-11|p6|# pt text: nothing a pupil reads is under # pt (TY-#)": 3,
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1,
+      "L-DENSITY PG-23|p3|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1,
+      "L-DENSITY PG-23|p6|last page # holds # item(s), under a third of a full page (#): rows are rebalanced across the sheet's pages (PG-#)": 1
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 6,
+     "keyPages": 3,
+     "counts": {
+      "L-OVERFLOW PG-12": 8,
+      "L-DENSITY H13": 8,
+      "L-DENSITY PAGEFILL": 1
+     },
+     "keys": {
+      "L-OVERFLOW PG-12|p2|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-OVERFLOW PG-12|p5|sticks out of its cell by # mm (cell # x # mm) (PG-#, CL-#)": 4,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 4,
+      "L-DENSITY H13|p4|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 4,
+      "L-DENSITY PAGEFILL|p2|page #: an empty strip # mm tall under the problems (#% of the page): fill the page with more problems or spread the row": 1
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup|single/ex-each",
+   "skill": "subtraction:sub_50_no_regroup",
+   "kind": "single",
+   "row": "ex-each",
+   "skills": [
+    "subtraction:sub_50_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "side"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "e2208441311c19bf0b6c415aa012871d1737646e592f56b0d63e345144c3eaf4",
+   "status": "RED",
+   "rises": [
+    "S L-SIZE TY-11: 24 -> 32",
+    "S L-DENSITY H13: 6 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "4068918f54ab6088"
+   },
+   "baselineKey": "52e74592e9974d51",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 32,
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 16,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 16,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 4,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 4
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 24,
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 12,
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 3
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup|single/ex-group",
+   "skill": "subtraction:sub_50_no_regroup",
+   "kind": "single",
+   "row": "ex-group",
+   "skills": [
+    "subtraction:sub_50_no_regroup"
+   ],
+   "args": [
+    "--anchors",
+    "sections"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "1372b65699d507095a4c733b7352b5de1ddfff9e2017ee31d273764d75241293",
+   "status": "RED",
+   "rises": [
+    "M L-SIZE TY-11: 8 -> 16"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "463c30a4a8d3c817"
+   },
+   "baselineKey": "d92ee79ecbf0f878",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-SIZE TY-11": 16
+     },
+     "keys": {
+      "L-SIZE TY-11|p1|# pt text: nothing a pupil reads is under # pt (TY-#)": 8,
+      "L-SIZE TY-11|p2|# pt text: nothing a pupil reads is under # pt (TY-#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {},
+     "keys": {},
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup|single/more-cols2+nline+afterpage",
+   "skill": "subtraction:sub_50_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+nline+afterpage",
+   "skills": [
+    "subtraction:sub_50_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-place",
+    "after-page",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "e8c7ced0b5898a77cfbfd6c363e9d22613cbf113315dab618e82e326cfe48df8",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 12 -> 16"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "fe60dcdf14247647"
+   },
+   "baselineKey": "b1786f711a6f8499",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 16
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 16
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 12
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 6,
+      "L-DENSITY H13|p2|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 6
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup|single/more-cols2+nline+short",
+   "skill": "subtraction:sub_50_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+nline+short",
+   "skills": [
+    "subtraction:sub_50_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--opts",
+    "{\"nlOn\":true}"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "2121753ecd0626868a067053ff4cc612c38d86769cc23c739f52b3bb91672699",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 6 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "8b4053fde1e45cbe"
+   },
+   "baselineKey": "db4658e6b78864bc",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 6
+     },
+     "error": null
+    }
+   }
+  },
+  {
+   "id": "subtraction:sub_50_no_regroup|single/more-cols2+short+afterpage",
+   "skill": "subtraction:sub_50_no_regroup",
+   "kind": "single",
+   "row": "more-cols2+short+afterpage",
+   "skills": [
+    "subtraction:sub_50_no_regroup"
+   ],
+   "args": [
+    "--columns",
+    "2",
+    "--key-style",
+    "short",
+    "--key-place",
+    "after-page"
+   ],
+   "pairs": [
+    "stack--single"
+   ],
+   "depHash": "6550e869566e47dfa05715058a60e72055ee9e716a1ad7382eb47099867e6d10",
+   "status": "RED",
+   "rises": [
+    "M L-DENSITY H13: 6 -> 8"
+   ],
+   "repinned": {
+    "date": "2026-10-23",
+    "reason": "SU-C pilot: engine classes (a) H13 forced columns / side anchors, (b) TY-11 anchors.js, (c) fact-rows, (d) sections/mixed composer, fact-probe chunking; lead ruling 2026-10-23 per-cell-rate equivalence; rates in design/status/pilot-su-c.md; fixes owned by the mixed-pages lane",
+    "file": "baseline.json",
+    "key": "8b4053fde1e45cbe"
+   },
+   "baselineKey": "db4658e6b78864bc",
+   "sizes": {
+    "S": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "M": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 8
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 8
+     },
+     "error": null
+    },
+    "L": {
+     "pages": 2,
+     "keyPages": 1,
+     "counts": {
+      "L-DENSITY H13": 6
+     },
+     "keys": {
+      "L-DENSITY H13|p1|one empty band # mm wide in a # mm cell (#%): the content is pinned to one side (RUBRIC H#)": 6
+     },
+     "error": null
+    }
+   }
+  }
+ ]
+}

@@ -745,6 +745,7 @@ export const SKILL_STANDARDS = {
     'division:div_grouping_word_problems': { ccss: ['3.OA.A.2', '3.OA.A.3'], ee: ['M.EE.3.OA.2'] }, // Division Word Problems: Grouping
     'subtraction:sub_wp_compare': { ccss: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Subtraction Word Problems: How Many More?
     'subtraction:sub_wp_start_unknown': { ccss: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Subtraction Word Problems: Find the Start
+    'subtraction:sub_2d_1d': { ccss: ['2.NBT.B.5'], ee: ['M.EE.2.NBT.5'] }, // Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping)
     'integers:add_negative': { ccss: ['6.NS.C.5', '6.NS.C.6a'], ee: ['M.EE.6.NS.5', 'M.EE.6.NS.6'], approx: true, note: 'Adding and subtracting integers is CCSS 7.NS.A.1 (grade 7); 6.NS.5-6 are the grade-6 foundation.' }, // Add a Negative Number
     'integers:sub_negative': { ccss: ['6.NS.C.5', '6.NS.C.6a'], ee: ['M.EE.6.NS.5', 'M.EE.6.NS.6'], approx: true, note: 'Adding and subtracting integers is CCSS 7.NS.A.1 (grade 7); 6.NS.5-6 are the grade-6 foundation.' }, // Subtract a Negative Number
     'fractions:identify_fraction_nl': { ccss: ['3.NF.A.2', '3.NF.A.1'], ee: ['M.EE.3.NF.2'] }, // Identify Fractions on a Number Line

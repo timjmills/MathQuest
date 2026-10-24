@@ -995,6 +995,34 @@ const _opsBar = () => ({
     help: 'A part-part-whole bar drawn under every story, the unknown part left empty. None is the fade.',
 });
 
+const _subLengths = () => ({
+    id: 'lengths', label: 'Number lengths', type: 'enum', default: 'same', group: 'difficulty',
+    values: [
+        { v: 'same', l: 'Same length (86 − 42)' },
+        { v: 'shorter', l: 'Bottom number one digit shorter (86 − 4, 486 − 52)' },
+    ],
+    help: 'Shorter puts a number with one digit fewer under the top number, lined up under the ones. '
+        + 'Make it its own section: teach shorter first, then same length.',
+});
+const _subZeros = () => ({
+    id: 'zeros', label: 'Zeros', type: 'enum', default: 'off', group: 'difficulty',
+    values: [
+        { v: 'off', l: 'No zero cases' },
+        { v: 'on', l: 'Zero cases (405 − 203, 586 − 230, 586 − 236, 486 − 452)' },
+    ],
+    help: 'On makes every problem a zero case: a 0 in the top number, taking away 0, a column that '
+        + 'leaves 0, or an answer with fewer digits. From 3 digits up. Give it its own section.',
+});
+// The no-regrouping column ladder's support level (critic SU-C r1 D2): the place heads are a
+// structural scaffold (WDS VA-30 / VA-32), so they print at the default level 1 and leave only on
+// their own fade step, level 0. Level 2 would print what level 1 prints, so it is not offered.
+const _subNrLevel = () => ({
+    ...levelSubset([3, 1, 0], 1,
+        'Level 3 writes each answer in grey to trace (a worked example), level 1 prints the place-value '
+        + 'heads over the columns and the answer boxes, level 0 takes the heads away (the boxes stay).'),
+    helpShort: '3 traces the answer, 1 prints the place heads, 0 takes them away; the answer boxes stay at every level.',
+});
+
 const P11_OPS_OPTIONS = {
     // --- fact drills: the band and a fading picture cue sit beside the fact set -----------------
     'addition:add_facts': [constantOption(13, 'Add'), notationOption('+'), _opsFactBand(), ..._opsAddCue()],
@@ -1108,7 +1136,11 @@ for (const op of ['add', 'sub']) {
             // Every item regrouping within 10 is only the bridging rung, never a lower band.
             const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b !== 10 || rg !== 'regroup'));
             const opts = [];
-            if (bands.length > 1) opts.push(_opsBand(bands, max, { help: _OPS_BAND_HELP[op] }));
+            // The six no-regrouping column subtractions ARE the number-size ladder (card §7), so a
+            // smaller band is the rung below, never an option here (critic SU-C r1 D6: band 10 / 20
+            // routed to the legacy cell, band 100 dealt 2-digit items under "within 1,000,000").
+            const subNrKit = op === 'sub' && rg === 'no_regroup' && max >= 50;
+            if (bands.length > 1 && !subNrKit) opts.push(_opsBand(bands, max, { help: _OPS_BAND_HELP[op] }));
             if (rg === 'mixed' && max > 10) {
                 opts.push({
                     ..._opsRegroup('mixed', op === 'sub'),
@@ -1124,7 +1156,7 @@ for (const op of ['add', 'sub']) {
                 if (!bridging) opts.push(...opts.pop());
             } else {
                 // The column support level draws on column work only (a band of 50 or more).
-                opts.push({ ..._opsColumnLevel(), appliesTo: cur => !(Number(cur.band) <= 20) });
+                opts.push(subNrKit ? _subNrLevel() : { ..._opsColumnLevel(), appliesTo: cur => !(Number(cur.band) <= 20) });
                 if (op === 'sub' && max >= 1000 && rg !== 'no_regroup') {
                     opts.push({
                         ..._opsAcrossZeros(rg === 'regroup'),
@@ -1132,6 +1164,11 @@ for (const op of ['add', 'sub']) {
                     });
                 }
             }
+            // Column subtraction without regrouping (spec card subtraction.md §9.3 / §9.4): two plain
+            // options, each its own section. `lengths` from within 100 (within 100: 2-digit − 1-digit,
+            // the sub_2d_1d preset), `zeros` from within 1,000 (3 digits up; never seeded below).
+            if (subNrKit && max >= 100) opts.push(_subLengths());
+            if (subNrKit && max >= 1000) opts.push(_subZeros());
             P11_OPS_OPTIONS[`${cat}:${id}`] = opts;
         }
     }
@@ -3295,7 +3332,8 @@ const WORD_WORK_OPTIONS = (bar) => [
 //                          regrouping (2.NBT.5: tens and ones, mentally). A regrouping item, and
 //                          every item from within 1,000 up, stays stacked — the regroup box sits
 //                          over the next column, and past two digits the columns line the places
-//                          up. So the control is declared on the four 50 / 100 no-regrouping ids;
+//                          up. So the control is declared on the two addition 50 / 100 no-regrouping
+//                          ids (the subtraction ones are kit column skills: card subtraction.md §7);
 //                          on every other id the Support level's help line says "always stacked"
 //                          and why.
 //   mult_zeros             across (default) / stacked: 70 above × 8 is the column the algorithm
@@ -3357,6 +3395,11 @@ for (const op of ['add', 'sub']) {
         if (max < 50) continue;
         for (const rg of ['no_regroup', 'regroup', 'mixed']) {
             const key = `${cat}:${op}_${code}_${rg}`;
+            // The six no-regrouping column subtractions (spec card subtraction.md §7, pilot SU-C fix
+            // r2, critic r2 N3 / N4): no Across here (the card puts across on the sub-setup page,
+            // and across drew a broken page), and the Support level keeps its own help line
+            // (_subNrLevel), which names the levels it really offers.
+            if (op === 'sub' && rg === 'no_regroup' && max >= 50) continue;
             const oneLine = _ap4OneLine(max, rg);
             // Declared only where the id's OWN rung is one-line work (within 50 / 100, no
             // regrouping): a control whose value is overruled at the skill's default would be a
@@ -3613,7 +3656,8 @@ const _NL_SKILLS = {
  * name declares (the line's default end); `fraction` / `decimal` = the kind of line it needs.
  */
 export function numberLineSkillHints(categoryId, skillId) {
-    const id = String(skillId);
+    const pre = presetOf(categoryId, skillId);
+    const id = String(pre ? pre.skillId : skillId);
     const out = { skip: false, step: 0, within: 0, fraction: numberLineIsFraction(categoryId, skillId), decimal: categoryId === 'decimals' || /^(f_to_d|d_to_f|order_fdp)$/.test(id) };
     // count_sequence counts in ones ("what comes after 8?"): a plain line, not a skip line (critic nl-r2 D1).
     if (/^(seq_\d+|count_by_|skip_count|number_seq_fill|number_patterns_rule|nl_mult$|nl_div$)/.test(id)) out.skip = true;
@@ -3630,8 +3674,11 @@ export function numberLineSkillHints(categoryId, skillId) {
 }
 /** Does a number line at the top of the page help this skill? (judgement per family; see above) */
 export function numberLineFits(categoryId, skillId) {
+    // A preset offers its host's controls, so it draws the line exactly when its host does.
+    const pre = presetOf(categoryId, skillId);
+    const id = pre ? pre.skillId : skillId;
     const re = _NL_SKILLS[categoryId];
-    return !!(re && re.test(String(skillId)));
+    return !!(re && re.test(String(id)));
 }
 /** A fraction skill's line counts in fractions even when every number on the page is whole. */
 export const numberLineIsFraction = (categoryId, skillId) => categoryId === 'fractions' || categoryId === 'fraction_operations' || /fraction|frac/.test(String(skillId));
