@@ -11,7 +11,7 @@ Owner pre-approved the build (STATUS 2026-10-23 22:15). Light only on the teache
 | Date | Step | Who (profile) | Result |
 |---|---|---|---|
 | 2026-10-24 | Lane opened; merged T1 mock-up (e4b8da2d) | lane lead | — |
-| 2026-10-24 | Step 1: fix round r6 (critic-r6 items 1–6) | mq-opus-low | running |
+| 2026-10-24 | Step 1: fix round r6 (critic-r6 items 1–6): fa05d5a (check first), 3c13453, f6018b5. All six fixed; new `views-check.cjs` (186 states) OK; tokens OK; 24 flows in plan. Left: thumbs-check 3 faint-ink fails (thin-line shapes, symmetry); SVG labels may shrink to 8/7/6 px; 139 windows below 60 % drawn-area (best window shown). Not gated (owner ruling) | mq-opus-low | done |
 | 2026-10-24 | Owner ruling via lead: no 8/10 gate and no critic loop for the teacher site. Step 1 = r6 fixes then the build brief (no further mock-up critic). Each build stage = ONE independent check (mq-opus-medium; findings, not scores: bugs, broken flows, step counts over plan, layout at 1366/390, regressions); clear bugs fixed in the stage; automatic gates must pass; push + report each stage | lead | — |
 
 ## Build brief (Teacher site 2.0, T2–T6)
