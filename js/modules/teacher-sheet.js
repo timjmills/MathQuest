@@ -186,11 +186,9 @@ function requests(p, list, quiz, version = 0) {
                 if (c > 0) out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: [skillRef(it)], count: c }] }), copies: 1, keys: [keyOf(it)] });
             }
         } else {
-            for (const pg of p.pageItems) {
-                const c = {}; const order = [];
-                (pg || []).forEach((k) => { if (!c[k]) order.push(k); c[k] = (c[k] || 0) + 1; });
-                if (order.length) out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: order.map((k) => skillRef(byKey[k], c[k], true)), count: pg.length }] }), copies: 1, keys: order });
-            }
+            // one part for the whole paper (the engine paginates it, so no page is left half empty)
+            const order = list.map(keyOf).filter((k) => (p.byKey[k] || 0) > 0);
+            if (order.length) out.push({ req: Object.assign(base(), { role: 'independent', sections: [{ skills: order.map((k) => skillRef(byKey[k], p.byKey[k], true)), count: p.total }] }), copies: 1, keys: order });
         }
         return out;
     }
@@ -261,13 +259,19 @@ function sigOf(p, list, quiz) {
         skills: list.map((x) => [keyOf(x), x.opts || null, x.leftOut ? 0 : 1]) });
 }
 
-/** Build every page (all versions). Calls onFirst(firstPupilHtml) as soon as page 1 exists. */
+/**
+ * Build every page of every version into ONE document. Each version: its own seed (seed + v), the same plan (mix,
+ * per-skill counts, layout). Keys "after each version" (default) or "all at the end" (S.opts.keyVersions).
+ * Calls onFirst(firstPupilHtml) as soon as page 1 exists.
+ */
 async function buildAll(p, list, quiz, onFirst) {
-    const versions = quiz ? Math.max(1, Math.min(6, S.quiz.versions)) : 1;
-    const out = { pupil: [], key: [], doc: '', pages: 0, keyPages: 0, byKey: {}, total: 0, errors: [], perVersion: [] };
-    let first = true;
+    const versions = versionsOf(quiz);
+    const keysAtEnd = versions > 1 && S.opts.keyVersions === 'end';
+    const out = { pupil: [], key: [], doc: '', pages: 0, pagesAll: 0, keyPages: 0, byKey: {}, total: 0, errors: [], perVersion: [] };
+    let first = true, tailKeys = '';
     for (let v = 0; v < versions; v++) {
         let vp = '', vk = '', vd = '', after = false;
+        const vv = { byKey: {}, total: 0, pages: 0, first: '' };
         for (const part of requests(p, list, quiz, v)) {
             const rq = versions > 1 ? Object.assign({}, part.req, { keySection: `Version ${v + 1}` }) : part.req;
             let res;
@@ -276,33 +280,40 @@ async function buildAll(p, list, quiz, onFirst) {
                 continue;
             }
             if (first && onFirst) { first = false; onFirst(res.pupilHtml); }
+            if (!vv.first) vv.first = (res.pupilPages && res.pupilPages[0]) || res.pupilHtml;
             const copies = Math.max(1, part.copies || 1);
             let pupil = res.pupilHtml;
             if (copies > 1) pupil = Array.from({ length: copies }, () => res.pupilHtml).join('\n');
             vp += pupil + '\n';
             vk += (res.keyHtml || '') + '\n';
             if (res.keyOptions && res.keyOptions.placement === 'after-page') { after = true; vd += (copies > 1 ? pupil + (res.keyHtml || '') : (res.docHtml || pupil)) + '\n'; }
-            out.pages += (res.pageCount || 0) * copies;
+            vv.pages += (res.pageCount || 0) * copies;
             out.keyPages += res.keyPageCount || 0;
             for (const it of res.items || []) {
                 if (!it || !it.skill) continue;
-                out.byKey[it.skill] = (out.byKey[it.skill] || 0) + copies;
-                out.total += copies;
+                vv.byKey[it.skill] = (vv.byKey[it.skill] || 0) + copies;
+                vv.total += copies;
             }
         }
-        // each version: its pupil pages, then its own key (or each page followed by its key)
+        out.perVersion.push(vv);
         out.pupil.push(vp); out.key.push(vk);
-        out.doc += (after ? vd : vp + vk);
+        if (after) out.doc += vd;
+        else if (keysAtEnd) { out.doc += vp; tailKeys += vk; }
+        else out.doc += vp + vk;
+        out.pagesAll += vv.pages;
     }
+    out.doc += tailKeys;
     out.pupilHtml = out.pupil.join('\n');
     out.keyHtml = out.key.join('\n');
-    // totals per version (every version holds the same number of problems)
-    out.total = Math.round(out.total / versions);
-    out.pages = Math.round(out.pages / versions);
-    for (const k of Object.keys(out.byKey)) out.byKey[k] = Math.round(out.byKey[k] / versions);
+    // the summary speaks of one version (every version holds the same mix and counts)
+    const v0 = out.perVersion[0] || { byKey: {}, total: 0, pages: 0 };
+    out.byKey = Object.assign({}, v0.byKey); out.total = v0.total; out.pages = v0.pages;
+    out.sameCounts = out.perVersion.every((x) => JSON.stringify(Object.entries(x.byKey).sort()) === JSON.stringify(Object.entries(v0.byKey).sort()));
     out.versions = versions;
     return out;
 }
+/** Versions: a quiz 1–6 (the quiz path), a worksheet 1–20 (owner 2026-10-24). */
+function versionsOf(quiz) { return quiz ? Math.max(1, Math.min(6, S.quiz.versions)) : Math.max(1, Math.min(20, Number(S.opts.versions) || 1)); }
 
 let buildTimer = null;
 let token = 0;
@@ -344,15 +355,21 @@ function summary() {
     const noun = quiz ? 'questions' : 'problems';
     const pg = `${b.pages} page${b.pages === 1 ? '' : 's'}`;
     const pts = quiz ? ` · ${b.total * (S.quiz.points === 2 ? 2 : 1)} points` : '';
-    const ver = quiz && b.versions > 1 ? ` · ${b.versions} versions, each with its own order and key` : '';
+    const ver = '';
     const active = list.filter((x) => !x.leftOut);
     const left = list.length - active.length ? ` · ${list.length - active.length} left out` : '';
     const shown = active.filter((x) => (b.byKey[keyOf(x)] || 0) > 0).length;
+    const names0 = () => (isBig(list) ? byArea(active).map((a) => `${AREAS[a.area].short} ${a.list.reduce((t, x) => t + (b.byKey[keyOf(x)] || 0), 0)}`).join(', ') : list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : b.byKey[keyOf(x)] || 0}`).join(', '));
     // the summary always gives all three numbers: pages · problems · (about) n of each (owner 2026-10-24)
     const vals = active.map((x) => b.byKey[keyOf(x)] || 0).filter((c) => c > 0);
     const eachN = vals.length ? (vals.every((c) => c === vals[0]) ? `${vals[0]} of each` : `about ${Math.round(b.total / vals.length)} of each`) : '';
     const ofEach = eachN && active.length > 1 ? ` · ${eachN}` : '';
     const err = b.errors.length ? ` · ${b.errors.length} part${b.errors.length > 1 ? 's' : ''} could not be built` : '';
+    if (b.versions > 1) {
+        // "3 versions · 24 problems each · 9 pages + keys"
+        return { line: `${b.versions} versions · ${b.total} ${noun} each${ofEach}${pts} · ${b.pagesAll} pages + keys${S.opts.keyVersions === 'end' ? ' (keys at the end)' : ' (a key after each version)'}${left}${err}`,
+            more: names0() + ' · every version has its own problems, the same mix and counts' + (b.sameCounts ? '' : ' (the engine dealt slightly different counts in one version)') };
+    }
     if (isBig(list)) {
         const areas = byArea(active);
         const hit = areas.filter((a) => a.list.some((x) => b.byKey[keyOf(x)] > 0)).length;
@@ -546,7 +563,8 @@ function optionsHTML() {
             : mode === 'total' ? `Pages = ${noun} ÷ ${p.perPage} a page; the last page holds the rest` : 'A skill with its own count keeps it';
         h += row('How much?', sub, `${seg('mode', mode, [['pages', 'Pages'], ['total', quiz ? 'Questions in all' : 'Problems in all'], ['each', quiz ? 'Questions of each skill' : 'Problems of each skill']], 'How much')}<div class="tvs-pages">${ctl}</div>`);
     }
-    if (p.error && (p.needPages || p.needTotal)) h += `<div class="tvs-raise"><button type="button" class="tvs-btn" data-act="raise" data-v="${p.needPages ? 'p' + p.needPages : 't' + p.needTotal}">${p.needPages ? `Raise to ${p.needPages} pages` : `Raise to ${p.needTotal} problems`}</button></div>`;
+    if (p.error && p.lower && p.lower.key) { const lx = list.find((x) => keyOf(x) === p.lower.key); h += `<div class="tvs-raise"><button type="button" class="tvs-btn" data-act="lower" data-v="${esc(p.lower.key)}" data-n="${p.lower.count}">Lower ${esc(lx ? lx.label : p.lower.key)} to ${p.lower.count}</button></div>`; }
+    if (p.error && (p.needPages || p.needTotal)) h += `<div class="tvs-raise"><button type="button" class="tvs-btn" data-act="raise" data-v="${p.needPages ? 'p' + p.needPages : 't' + p.needTotal}">${p.needPages ? `Raise to ${p.needPages} pages` : `Raise the total to ${p.needTotal}`}</button></div>`;
     // How often
     if (list.length > 1 && !isBig(list)) {
         h += row('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="tvs-often">${list.map((x) => `<div class="tvs-often-row"><span class="tvs-often-name" data-domain="${esc(x.area)}">${gradeBadge(x.grade)}<span>${esc(x.label)}</span></span>${x.count > 0 || x.lockPct !== undefined ? heldHTML(x) : seg('often', levelOf(x, list), [['1', 'Less'], ['2', 'Equal'], ['3', 'More']], 'How often: ' + x.label, ` data-key="${esc(keyOf(x))}"`)}</div>`).join('')}</div>`);
@@ -560,6 +578,8 @@ function optionsHTML() {
     if (!quiz && p.pages > 1) {
         h += row('Each page', S.opts.each === 'copy' ? `One key: “Key for all ${p.pages} copies”` : 'What changes from page to page', seg('each', S.opts.each, [['new', 'New problems'], ['same', 'Same problems, new numbers'], ['copy', 'Same page again']], 'Each page'));
     }
+    // Versions (worksheet): the same set again with different problems, all in one PDF
+    if (!quiz) h += row('Versions', Number(S.opts.versions) > 1 ? 'Each version: different problems, the same mix, counts and layout' : 'The same set again with different problems', stepper('wversions', Math.max(1, Number(S.opts.versions) || 1), 1, 20, 'Versions') + (Number(S.opts.versions) > 1 ? keyVersionsSeg() : ''));
     // Layout: Single skill only, and only for a skill whose items fit the fact layouts
     if (k === 'single' && list.some((x) => layoutOk(x, 'fact-rows') || layoutOk(x, 'fact-probe'))) {
         const opts = [['standard', 'Standard']];
@@ -570,7 +590,7 @@ function optionsHTML() {
     h += row('Size', 'Bigger digits, fewer problems', seg('size', S.opts.size, [['S', 'S'], ['M', 'M'], ['L', 'L']], 'Size'));
     if (quiz) {
         h += row('Points', 'Shown on the summary', seg('points', S.quiz.points, [['1', '1 per question'], ['2', '2 per question']], 'Points'));
-        h += row('How many versions?', 'Each version has its own order and its own key', stepper('versions', S.quiz.versions, 1, 6, 'Versions'));
+        h += row('How many versions?', 'Each version has its own order and its own key', stepper('versions', S.quiz.versions, 1, 6, 'Versions') + (S.quiz.versions > 1 ? keyVersionsSeg() : ''));
     }
     h += moreHTML();
     return h;
@@ -581,6 +601,9 @@ function heldHTML(x) {
     const k = keyOf(x);
     if (S.release === k) return `<span class="tvs-held" role="group" aria-label="Release ${esc(what)}?"><span>Release the ${esc(what)}?</span><button type="button" class="tvs-btn" data-act="release" data-v="${esc(k)}">Release</button><button type="button" class="tvs-btn" data-act="keep">Keep</button></span>`;
     return `<button type="button" class="tvs-btn tvs-held-btn" data-act="askrelease" data-v="${esc(k)}" aria-label="${esc(what)}, held. Change it">${esc(what)} ${icon('lock', 16)}</button>`;
+}
+function keyVersionsSeg() {
+    return seg('keyversions', S.opts.keyVersions === 'end' ? 'end' : 'after', [['after', 'Key after each version'], ['end', 'All keys at the end']], 'Answer keys');
 }
 function moreHTML() {
     const o = S.opts, hd = o.header || {};
@@ -868,10 +891,13 @@ function onClick(e) {
         case 'neach': { const n = Math.max(1, Math.min(50, Number(v) || 1)); if (S.sheet === 'quiz') S.quiz.nEach = n; else S.opts.nEach = n; changed(); return; }
         case 'mode': if (S.sheet === 'quiz') S.quiz.mode = v; else S.opts.mode = v; changed(); return;
         case 'raise': { const n = Number(v.slice(1)); if (v[0] === 'p') { if (S.sheet === 'quiz') { S.quiz.mode = 'pages'; S.quiz.pages = n; } else { S.opts.mode = 'pages'; S.opts.pages = n; touch('pages'); } } else if (S.sheet === 'quiz') S.quiz.n = n; else S.opts.nTotal = n; changed(); return; }
+        case 'lower': { const it = currentSet().find((x) => `${x.categoryId}:${x.skillId}` === v); if (it) it.count = Math.max(0, Number(b.dataset.n) || 0) || undefined; window.skillQueue = [...currentSet()]; changed(); return; }
         case 'askrelease': S.release = v; renderMain(); return;
         case 'keep': S.release = null; renderMain(); return;
         case 'release': { const it = currentSet().find((x) => `${x.categoryId}:${x.skillId}` === v); if (it) { delete it.count; delete it.lockPct; } S.release = null; window.skillQueue = [...currentSet()]; changed(); return; }
         case 'versions': S.quiz.versions = Math.max(1, Math.min(6, Number(v) || 1)); changed(); return;
+        case 'wversions': S.opts.versions = Math.max(1, Math.min(20, Number(v) || 1)); changed(); return;
+        case 'keyversions': S.opts.keyVersions = v === 'end' ? 'end' : 'after'; changed(); return;
         case 'points': S.quiz.points = Number(v) === 2 ? 2 : 1; changed(false); renderSide(); return;
         case 'often': { const key = b.closest('[data-key]').dataset.key; setLevel(key, Number(v)); changed(); return; }
         case 'examples': S.opts.examples = v; changed(); return;
@@ -926,13 +952,15 @@ function onChange(e) {
 
 /* ================================================================= public */
 
+function hashStr(t) { let h = 2166136261; for (let i = 0; i < String(t).length; i++) { h ^= String(t).charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+
 export function openSheet(kind, ctx) { open(kind, ctx || {}); }
 export function closeSheet() { if (S.sheet) close(); }
 /** For checks and the flow counter: what the open sheet would print, and its summary. */
 export function sheetState() {
     const list = items();
     let p = null; try { p = list.length ? plan(list) : null; } catch (e) { p = null; }
-    return { sheet: S.sheet, kind: list.length ? kindOf(list) : null, plan: p, summary: summary(), built: S.built ? { pages: S.built.pages, total: S.built.total, byKey: S.built.byKey, versions: S.built.versions, errors: S.built.errors } : null, building: !!S.building, share: S.shareRes, quizLink: S.quizLink, lastDoc: S.lastDoc || '', doc: S.built ? sheetDocument(S.built.doc, 'Worksheet', { paper: S.opts.paper || 'A4' }) : '' };
+    return { sheet: S.sheet, kind: list.length ? kindOf(list) : null, plan: p, summary: summary(), built: S.built ? { pages: S.built.pages, total: S.built.total, byKey: S.built.byKey, versions: S.built.versions, errors: S.built.errors, sameCounts: S.built.sameCounts, perVersion: S.built.perVersion.map((x) => ({ byKey: x.byKey, total: x.total, pages: x.pages, firstHash: hashStr(x.first) })) } : null, building: !!S.building, share: S.shareRes, quizLink: S.quizLink, lastDoc: S.lastDoc || '', doc: S.built ? sheetDocument(S.built.doc, 'Worksheet', { paper: S.opts.paper || 'A4' }) : '' };
 }
 
 if (typeof window !== 'undefined') {

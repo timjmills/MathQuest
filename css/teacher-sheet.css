@@ -29,7 +29,7 @@ body.teacher-mode.tvs-open { overflow: hidden; }
 #teacherApp .tvs-grade[data-grade="3"] { --tvs-g: var(--grade-3, #7E9AC4); }
 #teacherApp .tvs-grade[data-grade="4"] { --tvs-g: var(--grade-4, #B589AF); }
 #teacherApp .tvs-grade[data-grade="5"] { --tvs-g: var(--grade-5, #8579B8); }
-#teacherApp .tvs-grade[data-grade="6"] { --tvs-g: var(--grade-6, var(--slate-soft)); }
+#teacherApp .tvs-grade[data-grade="6"] { --tvs-g: var(--grade-6, #5E9E9A); }
 #teacherApp .tvs-grade[data-grade="M"] { --tvs-g: var(--grade-m, var(--surface)); }
 
 #teacherApp .tvs-overlay {
