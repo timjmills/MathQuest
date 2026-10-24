@@ -216,12 +216,20 @@
   const anyLock = () => Object.keys(S.lock).length > 0;
   function plan(isQuiz) {
     const k = kind(), n = S.tray.length, per = PER_PAGE[S.opts.size], act = activeTray();
-    let pages = S.opts.pages, added = false, total, counts = {};
+    let pages = S.opts.pages, added = false, total, counts = {}, warn = [];
     const sh = shares();
     if (k === 'single') {
       // each skill its own pages, shared out by weight; the count starts at one page per skill
-      const pg = roundLR(Object.fromEntries(act.map(x => [x, pages * (sh.pct[x] || 0) / 100])), pages, 'p' + S.seed);
+      const deal = (P) => roundLR(Object.fromEntries(act.map(x => [x, P * (sh.pct[x] || 0) / 100])), P, 'p' + S.seed);
+      // critic r6 C2: with a held %, pages are raised until every skill keeps a page AND each held % is met
+      // (5 skills, one at 50 % → 8 pages: 4 · 1 · 1 · 1 · 1); if 30 pages cannot, a ⚠ names the skill left without one
+      const lockMet = (pg, P) => Object.keys(S.lock).every(sc => { const ks = scopeKeys(sc).filter(x => act.includes(x)); if (!ks.length) return true; return Math.abs(ks.reduce((t, x) => t + pg[x], 0) / P * 100 - S.lock[sc]) <= 2; });
+      let pg = deal(pages);
+      if (anyLock() && (act.some(x => pg[x] < 1) || !lockMet(pg, pages))) {
+        for (let P = pages + 1; P <= 30; P++) { const t = deal(P); if (act.every(x => t[x] >= 1) && lockMet(t, P)) { pg = t; pages = P; added = 'single'; break; } }
+      }
       act.forEach(x => { counts[x] = pg[x] * per; }); total = pages * per;
+      warn = act.filter(x => pg[x] < 1).map(x => `⚠ ${short(SK[x].l)} gets no page: add pages${anyLock() ? ' or lower the held %' : ''}.`);
     } else {
       total = isQuiz && S.quiz.n ? S.quiz.n : per * pages;
       // a small tray (2–8 skills, no locks): pages are added so every skill comes up at least twice
@@ -232,6 +240,8 @@
         for (const x of act) while (counts[x] < 2 && total >= act.length * 2) { const donor = act.filter(y => counts[y] > 2).sort((a, b) => counts[b] - counts[a])[0]; if (!donor) break; counts[donor]--; counts[x]++; }
       }
       if (isQuiz) pages = Math.max(1, Math.ceil(total / per));
+      // critic r6 C2: a small tray never drops a skill silently (a big tray's summary says it takes a sample)
+      if (!big()) warn = act.filter(x => !(counts[x] > 0)).map(x => `⚠ ${short(SK[x].l)} gets no problem: add pages${anyLock() ? ' or lower the held %' : ''}.`);
     }
     // deal the problems onto pages: Mixed shuffles (seeded), Sections and Single keep each skill together
     const items = []; S.tray.forEach(x => { for (let i = 0; i < (counts[x] || 0); i++) items.push(x); });
@@ -252,7 +262,7 @@
     const perPage = pageItems.map(pg => { const o = {}; pg.forEach(x => { o[x] = (o[x] || 0) + 1; }); return o; });
     const countsArr = S.tray.map(x => counts[x] || 0);
     const shown = act.filter(x => counts[x] > 0).length;
-    return { k, pages: Math.max(pages, pageItems.length), added, total, counts: countsArr, byKey: counts, perPage, pageItems, shown, active: act.length, left: n - act.length, pct: sh.pct, errs: sh.errs };
+    return { k, pages: Math.max(pages, pageItems.length), added, total, counts: countsArr, byKey: counts, perPage, pageItems, shown, active: act.length, left: n - act.length, pct: sh.pct, errs: sh.errs, warn };
   }
   // the Each page choice that applies: only with more than one page; a quiz never prints identical copies (versions do that)
   function eachMode(isQuiz) { const e = S.opts.each || 'new'; if (S.opts.pages <= 1) return 'new'; return isQuiz && e === 'copy' ? 'same' : e; }
@@ -273,7 +283,9 @@
     if (big()) {
       const areas = areasOf(activeTray());
       const cover = p.shown >= p.active ? 'every skill at least once' : `a sample of ${p.shown} of ${p.active} skills, New numbers re-deals the sample`;
-      return { line: `${pg} · ${p.total} ${isQuiz ? 'questions' : 'problems'} · ${plural(areas.length, 'area')} · ${cover}${left}${pts}${ver}`,
+      const hit = areas.filter(x => x.ks.some(k => (p.byKey[k] || 0) > 0)).length;     // critic r6 C4: only areas that get an item count
+      const areaW = hit === areas.length ? plural(areas.length, 'area') : `${hit} of ${areas.length} areas`;
+      return { line: `${pg} · ${p.total} ${isQuiz ? 'questions' : 'problems'} · ${areaW} · ${cover}${left}${pts}${ver}`,
         more: areas.map(x => `${AREAS[x.a].short} ${x.ks.reduce((t, k) => t + (p.byKey[k] || 0), 0)}`).join(', ') + ' · answer key at the end' };
     }
     const names = S.tray.map((s, i) => `${short(SK[s].l)} ${wOf(s) ? (anyLock() || S.detailed ? '≈ ' : '') + p.counts[i] : '(left out)'}`).join(', ');
@@ -282,7 +294,7 @@
     if (each === 'copy') return { line: `${p.pages} copies of the same page · ${onPage} problems on each · ${p.total} problems in all · one key: “Key for all ${p.pages} copies”${left}`, more: (S.tray.length > 1 ? names : short(SK[S.tray[0]].l)) + ' · New numbers re-deals the page' };
     return {
       line: `${pg} · ${p.total} ${isQuiz ? 'questions' : 'problems'}${pts} · answer key at the end${left}${ver}`,
-      more: (S.tray.length > 1 ? names : short(SK[S.tray[0]].l)) + (p.added ? ` · pages added so every skill comes up at least twice` : ''),
+      more: (S.tray.length > 1 ? names : short(SK[S.tray[0]].l)) + (p.added === 'single' ? ` · pages raised to ${p.pages} so every skill keeps a page and the held % is met` : p.added ? ` · pages added so every skill comes up at least twice` : '') + (p.warn.length ? ' · ' + p.warn.join(' ') : ''),
     };
   }
   const short = (l) => l.replace(/\s*\((?:Visual|MAP|black and white)\)/g, '').replace(/\s*\(No Pictures\)/, ' (no pictures)');
@@ -299,7 +311,7 @@
     const s = SK[k]; const a = s.a; const tag = opts.tag || 'button';
     const attrs = tag === 'button' ? `data-act="${opts.act || 'chip'}" data-arg="${esc(k)}" ${opts.pressed ? pressed(true) : ''}` : '';
     return `<${tag} class="chip" data-domain="${a}"${opts.noBadge ? ' data-grade-said' : ' data-grade-host'} ${attrs} title="${esc(s.l)} · ${areaName(a)} · ${gradeShort(s.g)}">` +
-      `${opts.noBadge ? '' : gbadge(s.g)}${opts.legend && !opts.dot ? '' : `<span class="chip-dot">${icon(AREAS[a].icon)}</span>`}<span class="name">${esc(short(s.l))}</span>${opts.legend ? '' : `<span class="chip-area">${AREAS[a].short}</span>`}${opts.pressed ? icon('check') : ''}</${tag}>`;
+      `${opts.noBadge ? '' : gbadge(s.g)}${opts.legend && !opts.dot ? '' : `<span class="chip-dot">${icon(AREAS[a].icon)}</span>`}<span class="name">${esc(short(s.l))}</span>${opts.legend ? '' : `<span class="chip-area">${AREAS[a].short}</span>`}${opts.mark ? `<span class="tray-li-a">${opts.mark}</span>` : ''}${opts.pressed ? icon('check') : ''}</${tag}>`;
   }
   // drop the area word on any chip whose name (or word) would otherwise be cut; called after every render
   // Critic r3 A3 / D3: the area word is decided per CONTAINER. If any chip in a stack would lose its word, every chip in
@@ -447,7 +459,7 @@
     let mid;
     if (!n) mid = `<div class="tray-empty">Tick skills to put them here. Quiz can also start from a standard, a White Rose step or a lesson.</div>`;
     // the bar follows the tray's view (owner 2026-10-23): List = one line of names, Chips = chips, Thumbnails = mini pictures
-    else if (!big()) mid = `<div class="tray-chips tray-v-${S.tview}">${S.tray.map(k => S.tview === 'chips' ? chipHTML(k, { legend: true, dot: true })
+    else if (!big()) mid = `<div class="tray-chips tray-v-${S.tview}">${S.tray.map(k => S.tview === 'chips' ? chipHTML(k, { legend: true, dot: true, mark: areas.length > 1 ? ABBR[SK[k].a] : '' })
       // Thumbnails in the bar: a small real item WITH its name (≥ 14 px), never a picture alone (critic r4 A3)
       : S.tview === 'thumbs' ? `<button class="tray-mini" data-domain="${SK[k].a}" data-skill="${esc(k)}" data-grade-host data-act="chip" data-arg="${esc(k)}" title="${esc(SK[k].l)}">${gbadge(SK[k].g)}<span class="tray-mini-pic">${T.draw(SK[k], 1, S.skillOpts[k])}</span><span class="tray-mini-name">${esc(short(SK[k].l))}</span>${areaMark(k)}</button>`
       : `<button class="tray-li" data-domain="${SK[k].a}" data-act="chip" data-arg="${esc(k)}">${icon(AREAS[SK[k].a].icon)}${esc(short(SK[k].l))}${areaMark(k)}</button>`).join('')}<button class="btn tray-more" data-act="trayopen" hidden>+0 more</button></div>`;
@@ -468,7 +480,7 @@
     for (const row of t.querySelectorAll('.tray-chips, .tray-segs')) {
       row.hidden = false;
       const more = row.querySelector('.tray-more'); const items = [...row.children].filter(c => c !== more);
-      items.forEach(c => { c.hidden = false; c.classList.remove('fit-wrap'); }); more.hidden = true; more.removeAttribute('aria-label'); row.classList.remove('abbr');
+      items.forEach(c => { c.hidden = false; c.classList.remove('fit-wrap', 'bare'); }); more.hidden = true; more.classList.remove('tight'); more.removeAttribute('aria-label'); row.classList.remove('abbr');
       if (row.scrollWidth <= row.clientWidth + 1) continue;
       if (row.classList.contains('tray-segs')) { row.classList.add('abbr'); if (row.scrollWidth <= row.clientWidth + 1) continue; }
       more.hidden = false; let hid = 0;
@@ -484,6 +496,9 @@
       if (row.classList.contains('tray-segs') && items.length && items.every(c => c.hidden)) {
         items[0].hidden = false; hid = items.length - 1;
         more.textContent = `+${hid}`; more.hidden = hid === 0; more.setAttribute('aria-label', `${hid} more areas: open the tray`);
+        // critic r6 A4: make room for "+N" (the segment drops its icon, then the "+N" its side padding) before giving up
+        if (row.scrollWidth > row.clientWidth + 1) items[0].classList.add('bare');
+        if (row.scrollWidth > row.clientWidth + 1) more.classList.add('tight');
         if (row.scrollWidth > row.clientWidth + 1) more.hidden = true;
       }
     }
@@ -533,8 +548,9 @@
       const detail = det ? `<span class="tp-det"><span class="stepper stepper-sm"><button data-act="wstep" data-arg="${esc(k)}|-1" aria-label="Less weight" ${w <= 0 ? 'disabled' : ''}>−</button><output>${w}</output><button data-act="wstep" data-arg="${esc(k)}|1" aria-label="More weight" ${w >= 10 ? 'disabled' : ''}>+</button></span>${pctCtl('k:' + k, p.pct[k] || 0)}<span class="tp-share">≈ ${p.byKey[k] || 0}<span class="l-of"> of ${p.total}</span></span></span>` : '';
       const x = `<button class="btn icon-btn" data-act="tpremove" data-arg="k:${esc(k)}" aria-label="Take ${esc(short(s.l))} out of the tray">${icon('close')}</button>`;
       // one grade in the tray: its grade header says the grade, so Chips and Thumbnails drop the badge as List does (critic r5 A5)
-      if (S.tview === 'chips') return `<div class="tp-item tp-chipitem ${w === 0 ? 'out' : ''}">${selBox('k:' + k, s.l)}${chipHTML(k, { legend: true, dot: true, noBadge: oneGrade })}${x}${tags}${detail}</div>`;
-      if (S.tview === 'thumbs') return `<div class="tp-item tp-thumb ${w === 0 ? 'out' : ''}" data-domain="${s.a}" data-skill="${esc(k)}"><div class="tp-thumb-top"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(s.g)}<button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(short(s.l))}</button></div><div class="thumb">${T.draw(s, 1, S.skillOpts[k])}</div><div class="tp-thumb-foot">${selBox('k:' + k, s.l)}${tags}${x}</div>${detail}</div>`;
+      // Detailed weights uses the one-line List row in every view (critic r6 A3): a chip or a picture per skill is too tall
+      if (S.tview === 'chips' && !det) return `<div class="tp-item tp-chipitem ${w === 0 ? 'out' : ''}">${selBox('k:' + k, s.l)}${chipHTML(k, { legend: true, dot: true, noBadge: oneGrade })}${x}${tags}${detail}</div>`;
+      if (S.tview === 'thumbs' && !det) return `<div class="tp-item tp-thumb ${w === 0 ? 'out' : ''}" data-domain="${s.a}" data-skill="${esc(k)}"><div class="tp-thumb-top"${oneGrade ? '' : ' data-grade-host'}>${selBox('k:' + k, s.l)}${oneGrade ? '' : gbadge(s.g)}<button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(short(s.l))}</button>${x}</div><div class="thumb">${T.draw(s, 1, S.skillOpts[k])}</div><div class="tp-thumb-foot">${tags}</div>${detail}</div>`;
       // one grade in the tray: the grade is said once, in the grade header, not on every row (critic r4 A5)
       return `<div class="tp-row ${w === 0 ? 'out' : ''}" data-domain="${s.a}"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(s.g)}${selBox('k:' + k, s.l)}<span class="tp-icon">${icon(AREAS[s.a].icon)}</span><button class="tp-name" data-act="chip" data-arg="${esc(k)}">${esc(s.l)}</button>${tags}${x}${detail}</div>`;
     };
@@ -549,7 +565,7 @@
           return `<div class="tp-grade"><div class="tp-ghead${ctlOpen(sc)}" data-grade-host>${gbadge(g)}${selBox(sc, gradeShort(g))}<span class="tp-hname"><b>${esc(gradeShort(g))}</b><span class="count">${plural(gk.length, 'skill')}<span class="tp-n"> · ≈ ${nOf(gk)} of ${p.total}</span><span class="tp-state"> · ${oftenWord(sc, sumOf(gk))}</span></span></span>` +
             dots(sc, `${AREAS[a].short} ${gradeShort(g)}`) +
             `<span class="tp-ctl">${howOften(sc)}<span class="tp-pp">${det ? pctCtl(sc, sumOf(gk)) + `<button class="btn btn-text" data-act="reseteq" data-arg="${esc(sc)}">Reset to equal</button>` : `<span class="tp-p">${Math.round(sumOf(gk))} %</span>`}</span><button class="btn btn-text tp-rm" data-act="tpremove" data-arg="${esc(sc)}">Remove grade</button></span></div>` +
-            `<div class="tp-items tp-v-${S.tview}">${gv.map(row).join('')}</div></div>`; }).join('')) + '</section>';
+            `<div class="tp-items tp-v-${det ? 'list' : S.tview}">${gv.map(row).join('')}</div></div>`; }).join('')) + '</section>';
     }).join('');
     const grades = gradesOf(S.tray);
     const byGrade = grades.length > 1 && !q ? `<section class="tp-bygrade" aria-label="Whole grades, all areas"><p class="row-label">Whole grades · all areas</p>${grades.map(x => { const sc = 'r:' + x.g;
@@ -593,7 +609,15 @@
 
   // ---------------- the worksheet sheet (Print) and the Quiz sheet ----------------
   // Less · Equal · More for one skill (a number weight 0–10 shows as its number)
-  function wSeg(k) { const w = wOf(k); return seg('How often', [['less', 'Less'], ['equal', 'Equal'], ['more', 'More']], ({ 1: 'less', 2: 'equal', 3: 'more' })[w] || '', 'weight:' + k); }
+  // a skill HELD at a % shows "50 % 🔒" in place of Less · Equal · More (critic r6 C1); pressing it asks before releasing
+  function wSeg(k) {
+    const held = heldPct('k:' + k);
+    if (held !== null) return S.releaseAsk === 'k:' + k
+      ? `<div class="release-ask" role="group" aria-label="Release the held %"><span>Release the ${held} %?</span><button class="btn" data-act="release" data-arg="k:${esc(k)}">Release</button><button class="btn" data-act="releasekeep">Keep ${held} %</button></div>`
+      : `<button class="btn held-btn" data-act="releaseask" data-arg="k:${esc(k)}" title="Held at ${held} %: press to release" aria-label="Held at ${held} %. Press to release">${held} %${icon('lock')}</button>`;
+    return wSegFree(k);
+  }
+  function wSegFree(k) { const w = wOf(k); return seg('How often', [['less', 'Less'], ['equal', 'Equal'], ['more', 'More']], ({ 1: 'less', 2: 'equal', 3: 'more' })[w] || '', 'weight:' + k); }
   // the worksheet sheet's read-only list for a big tray: area, then grade, each with its How often and share
   function areaWeightList() {
     const p = plan(); const many = gradesOf(S.tray).length > 1; return areasOf(S.tray).map(x => `<div class="aw-row" data-domain="${x.a}"><span class="aw-name">${icon(AREAS[x.a].icon)}${AREAS[x.a].short}</span><span class="aw-n">${plural(x.ks.length, 'skill')}</span><b class="aw-w">${heldPct('a:' + x.a) !== null ? `Held${icon('lock')}` : groupWord(x.ks)}</b><span class="aw-p">${Math.round(x.ks.reduce((t, k) => t + (p.pct[k] || 0), 0))} %</span></div>` +
@@ -607,6 +631,7 @@
   function hasLayout() { return S.tray.some(k => /facts|fluency|place|value|today/.test(k)); }
   function kindOptions(isQuiz) {
     const k = kind(), o = S.opts, n = S.tray.length; let h = '';
+    { const pw = plan(isQuiz).warn; if (pw.length) h += pw.map(w => `<p class="warn" data-warn-nopage>${esc(w)}</p>`).join(''); }
     if (k === 'single' && big()) h += `<p class="warn">⚠ ${plural(n, 'skill')} on Single skill = ${n} pages or more, one skill on each. Mixed practice puts them all on fewer pages.</p>`;
     if (isQuiz && big()) h += opt('How many questions?', `The quiz takes a sample of the ${n} skills; New numbers re-deals it`, stepper('qn', S.quiz.n || 20, 5, 60));
     else {
@@ -983,6 +1008,10 @@
     if (act === 'search' || act === 'lsearch' || act === 'tsearch') return;
     if (el.tagName === 'SUMMARY') return;
     e.preventDefault();
+    if (act === 'releaseask') { S.releaseAsk = arg; return render(); }
+    if (act === 'releasekeep') { S.releaseAsk = null; return render(); }
+    if (act === 'release') { delete S.lock[arg]; S.releaseAsk = null; S.lockErr = ''; toast('The held % is released: the skill is back to How often.'); return render(); }
+    if (act.startsWith('weight:') && S.lock['k:' + act.slice(7)] !== undefined) { S.releaseAsk = 'k:' + act.slice(7); return render(); }
     if (act.startsWith('weight:')) { const k = act.slice(7); S.w[k] = WEIGHT[arg] || 2; delete S.lock['k:' + k]; return render(); }
     if (act.startsWith('bopt:')) {   // the shared options sheet: one change, made in every selected skill
       const id = act.slice(5); for (const k of S.sel) { const o = (D.opts[SK[k].o] || []).find(x => x.id === id); if (!o) continue; const m = S.skillOpts[k] = S.skillOpts[k] || {}; const v = optVal(k, o);

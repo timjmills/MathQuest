@@ -21,6 +21,8 @@
 //   E. (fix round 6, critic r6 A1 / C3) the window SHOWS the drawing: >= 60 % of the item's drawn (non-text) area lies
 //      inside each visible window; the thumbnail's non-white pixel share is >= half the app cell's (screenshots of both);
 //      (a page preview shows the whole cell as a miniature, its anti-aliased hairlines are not ink, so it is exempt);
+//      where the place's minimum text size leaves no window able to show 60 % (a 650 px number line on a 200 px card), the
+//      window must show the most any window can (within 3 points) and is listed as a note, not a pass by silence;
 //      two DIFFERENT skills whose app items differ never produce byte-identical thumbnails at the same place;
 //      prose (HTML text) shown is >= the place's minimum; drawn labels inside an SVG are part of the picture and may
 //      shrink with it to the place's drawing floor (--smp-min-draw: Big 8, Medium 7, Small 6 px), never below;
@@ -40,7 +42,7 @@ const args = process.argv.slice(2);
 const argv = (k) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const ALL = args.includes('--all');
 const ONLY = argv('--only') ? argv('--only').split(',') : null;
-const fails = [];
+const fails = []; const notes = [];
 const say = (k, why) => { fails.push(`${k}: ${why}`); };
 
 // ---- the sample: the critic's named skills, then every third live skill, then at least two of every category
@@ -81,12 +83,12 @@ if (!ONLY) {
   for (const c of allCats) if (!cats.has(c)) say('sample', `category ${c} not sampled`);
 }
 
-// the share of a screenshot's pixels that are not white (any channel < 200), decoded in the page
+// the share of a screenshot's pixels that are not white (any channel < 230: a scaled hairline stays ink), decoded in the page
 async function inkShare(page, buf) {
   return page.evaluate(async (b64) => {
     const img = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob());
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
-    const d = g.getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i] < 200 || d[i + 1] < 200 || d[i + 2] < 200) n++;
+    const d = g.getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i] < 230 || d[i + 1] < 230 || d[i + 2] < 230) n++;
     return n / (c.width * c.height);
   }, buf.toString('base64'));
 }
@@ -139,7 +141,7 @@ function compare(id, app, mock) {
           await d.fonts.ready;
           const cells = [...d.querySelectorAll('.ws-page .ws-cell:not(.blankrun)')].filter(x => x.getBoundingClientRect().width > 4);
           out[id] = cells[c.n] ? L.measureCell(cells[c.n]) : { none: true };
-          if (cells[c.n]) { const fr = f.getBoundingClientRect(); out[id].shot = [out[id].box[0] + fr.left, out[id].box[1] + fr.top, out[id].box[2], out[id].box[3]]; f.style.visibility = 'visible'; f.id = 'chkf'; }
+          if (cells[c.n]) { const fr = f.getBoundingClientRect(); out[id].shot = [out[id].box[0] + fr.left, out[id].box[1] + fr.top, out[id].box[2], out[id].box[3]]; f.style.visibility = 'visible'; f.style.zIndex = '2147483647'; f.style.background = '#fff'; f.id = 'chkf'; }
           else f.remove();
         } catch (e) { out[id] = { err: String(e.message || e).slice(0, 160) }; }
       }
@@ -148,7 +150,7 @@ function compare(id, app, mock) {
     Object.assign(appRec, got);
     for (const [id, r] of Object.entries(got)) if (r.shot) {
       const [x, y, w, h] = r.shot;
-      try { if (w >= 1 && h >= 1) r.ink = await inkShare(app, await app.screenshot({ clip: { x, y, width: Math.min(w, 900), height: Math.min(h, 1400) } })); } catch (e) { r.ink = null; }
+      try { if (w >= 1 && h >= 1) { const im = await app.screenshot({ clip: { x, y, width: Math.min(w, 900), height: Math.min(h, 1400) } }); if (process.env.DUMP) require('fs').writeFileSync(process.env.DUMP + '/app-' + id.replace(/[^a-z0-9]/gi, '_') + '.png', im); r.ink = await inkShare(app, im); } } catch (e) { r.ink = null; }
       await app.evaluate(() => { const f = document.getElementById('chkf'); if (f) f.remove(); });
     }
     if (b % 20 === 19 || b === cases.length - 1) process.stderr.write(`  app ${Math.min(b + 20, cases.length)}/${cases.length} ${Math.round((Date.now() - t0) / 1000)} s\n`);
@@ -210,7 +212,7 @@ function compare(id, app, mock) {
         const dr = m.draws.filter((a, i) => !m.draws.some((b, j) => j !== i && b.r[0] <= a.r[0] + 0.5 && b.r[1] <= a.r[1] + 0.5 && b.r[0] + b.r[2] >= a.r[0] + a.r[2] - 0.5 && b.r[1] + b.r[3] >= a.r[1] + a.r[3] - 0.5 && (b.r[2] * b.r[3] > a.r[2] * a.r[3] || j < i)));
         let dAll = 0, dIn = 0;
         for (const a of dr) { const [x, y, w, hh] = a.r; dAll += w * hh; const iw = Math.max(0, Math.min(x + w, ox + win[2]) - Math.max(x, ox)), ih = Math.max(0, Math.min(y + hh, oy + win[3]) - Math.max(y, oy)); dIn += iw * ih; }
-        res[id] = { m, s, realScale, min, minD, lowD: Number.isFinite(lowD) ? lowD : null, lowDT, cover: dAll > 0 ? dIn / dAll : 1, low: Number.isFinite(low) ? low : null, lowT, cutStart, place: d.dataset.place,
+        res[id] = { m, s, realScale, min, minD, lowD: Number.isFinite(lowD) ? lowD : null, lowDT, cover: dAll > 0 ? dIn / dAll : 1, reach: Number(host.dataset.reach || 1), low: Number.isFinite(low) ? low : null, lowT, cutStart, place: d.dataset.place,
           inside: true,
           clip: getComputedStyle(host).overflow, hostW: hr.width, hostH: hr.height };
       }
@@ -218,7 +220,10 @@ function compare(id, app, mock) {
     }, batch);
     for (const [id, r] of Object.entries(got)) if (r.m) {
       const el = await mk.$(`.chk[data-id="${id.replace(/"/g, '\\"')}"] .live-thumb`);
-      if (el) { try { const buf = await el.screenshot(); r.ink = await inkShare(mk, buf); r.hash = require('crypto').createHash('md5').update(buf).digest('hex'); } catch (e) { r.ink = null; } }
+      // the ink of what the window shows of the item (the content's own rect inside the host, not the host's margins)
+      const clip = await mk.evaluate((id) => { const h = [...document.querySelectorAll('.chk')].find(d => d.dataset.id === id).querySelector('.live-thumb'); const r = h.getBoundingClientRect(); const s = Number(h.dataset.scale); const [wx, wy] = h.dataset.win.split(' ').map(Number); const bw = h.__mq.boxIn[2], bh = h.__mq.boxIn[3];
+        const x0 = Math.max(0, -wx * s), y0 = Math.max(0, -wy * s), x1 = Math.min(r.width, (bw - wx) * s), y1 = Math.min(r.height, (bh - wy) * s); return { x: r.left + scrollX + x0, y: r.top + scrollY + y0, width: Math.max(1, x1 - x0), height: Math.max(1, y1 - y0) }; }, id);
+      if (el) { try { const buf = await el.screenshot(); const inner = await mk.screenshot({ clip, fullPage: true }); if (process.env.DUMP) require('fs').writeFileSync(process.env.DUMP + '/mk-' + id.replace(/[^a-z0-9]/gi, '_') + '.png', inner); r.ink = await inkShare(mk, inner); r.hash = require('crypto').createHash('md5').update(buf).digest('hex'); } catch (e) { r.ink = null; } }
     }
     Object.assign(mockRec, got);
     process.stderr.write(`  mock-up ${Math.min(b + 24, cases.length)}/${cases.length} ${Math.round((Date.now() - t0) / 1000)} s\n`);
@@ -237,8 +242,10 @@ function compare(id, app, mock) {
     if (Math.abs(m.realScale - m.s) > 0.01) say(id, `${c.place}: drawn at ${m.realScale.toFixed(3)}×, says ${m.s}`);
     if (m.min > 0 && m.low !== null && m.low + 0.05 < m.min) say(id, `${c.place}: smallest text shown ${m.low.toFixed(1)} px “${m.lowT.slice(0, 20)}” (min ${m.min})`);
     if (m.minD > 0 && m.lowD !== null && m.lowD + 0.05 < m.minD) say(id, `${c.place}: smallest drawn label shown ${m.lowD.toFixed(1)} px “${m.lowDT.slice(0, 20)}” (floor ${m.minD})`);
-    if (m.cover < 0.6) say(id, `${c.place}: the window shows ${Math.round(m.cover * 100)} % of the drawn area (need >= 60 %)`);
-    if (c.place !== 'preview' && a.ink != null && m.ink != null && m.ink < 0.5 * a.ink) say(id, `${c.place}: ink ${(m.ink * 100).toFixed(1)} % vs the app cell's ${(a.ink * 100).toFixed(1)} % (need >= half)`);
+    const limited = m.cover < 0.6 && m.reach < 0.6 && m.cover >= m.reach - 0.03;   // the place's minimum text size allows no window that shows 60 %
+    if (limited) notes.push(`${id} [${c.place}] shows ${Math.round(m.cover * 100)} % (the most any window can at the minimum text size)`);
+    if (m.cover < 0.6 && !limited) say(id, `${c.place}: the window shows ${Math.round(m.cover * 100)} % of the drawn area (need >= 60 %)`);
+    if (c.place !== 'preview' && !limited && a.ink != null && m.ink != null && m.ink < 0.5 * a.ink) say(id, `${c.place}: ink ${(m.ink * 100).toFixed(1)} % vs the app cell's ${(a.ink * 100).toFixed(1)} % (need >= half)`);
     if (m.hash) { const pk = c.place + '|' + m.hash; const prev = seenHash[pk]; if (prev && prev.k !== c.k && prev.text !== a.text) say(id, `${c.place}: the same picture as ${prev.k} (a different item)`); else if (!prev) seenHash[pk] = { k: c.k, text: a.text }; }
     if (m.cutStart.length) say(id, `${c.place}: line cut at its start: “${m.cutStart[0]}”`);
     if (!m.inside || m.clip !== 'hidden') say(id, `${c.place}: the picture is not held inside its box`);
@@ -287,6 +294,7 @@ function compare(id, app, mock) {
   const nSk = keys.length;
   console.log(`thumbs-check: ${nSk} skills in ${cats.size} categories, ${cases.length} thumbnails, ${nCmp} compared with the app's own sheet`);
   console.log(`  cold load app.html#skills: ${(cb.total / 1e6).toFixed(2)} MB in ${cb.n} files (uncompressed), page ${tLoad} ms, first screen of thumbnails ${tDrawn} ms`);
+  if (notes.length) console.log(`  ${notes.length} windows limited by the place's minimum text size (they show the most drawing any window can):\n` + notes.slice(0, 12).map(n => '    · ' + n).join('\n') + (notes.length > 12 ? `\n    … ${notes.length - 12} more` : ''));
   if (fails.length) { console.log(fails.slice(0, 80).map(f => '  ✗ ' + f).join('\n') + (fails.length > 80 ? `\n  … ${fails.length - 80} more` : '')); console.log(`thumbs-check: FAIL (${fails.length})`); process.exit(1); }
   console.log('thumbs-check: OK');
 })().catch((e) => { console.error(e); console.log('thumbs-check: FAIL (crashed)'); process.exit(1); });

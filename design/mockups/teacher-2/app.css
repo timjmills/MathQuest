@@ -616,7 +616,7 @@ table.t th { color: var(--text-2); font-size: var(--fs-12); }
   .head-skills .search { flex-basis: 100%; max-width: none; }
   .grid[data-view="medium"] { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
   .grid[data-view="big"] { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-  .grid[data-view="small"] { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .grid[data-view="small"] { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
   .compact .pop-btn { flex: 0 1 240px; }
 }
 .tray-group { display: contents; }
@@ -794,7 +794,7 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 .tp-more-btn { display: none; }
 .tp-extra { display: contents; }
 .tp-rest.tp-extra, .tp-grades.tp-extra { display: flex; }
-@media (max-width: 819px) {
+@media (max-width: 1099px) {
   .tp-more-btn { display: inline-flex; }
   .tp-extra, .tp-rest.tp-extra, .tp-grades.tp-extra { display: none; }
   .tp-extra.open { display: flex; flex-wrap: wrap; gap: var(--sp-8); flex-basis: 100%; }
@@ -881,10 +881,7 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
   .tp-rgrade > .tp-dots { order: 9; }
   .tp-bygrade .row-label { padding: var(--sp-4) 0 0; }
 }
-@media (max-width: 819px) {
-  /* Detailed weights on a phone: every header shows its controls (the % boxes are what the teacher came for) */
-  .traypop.det .tp-ahead > .tp-ctl, .traypop.det .tp-ghead > .tp-ctl { display: flex; flex-wrap: wrap; flex-basis: 100%; padding: 0 0 var(--sp-8); }
-}
+/* (fix round 6, critic r6 A2: Detailed weights on a phone keeps every header to one line with its ⋯, as when it is off) */
 /* the one name that stays when nothing else fits: it wraps (never an ellipsis) and the row keeps one top line */
 .tray-chips:has(> .fit-wrap) { align-items: flex-start; }
 .tray-chips > .chip.fit-wrap { min-width: 9rem; height: auto; }
@@ -893,15 +890,15 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
    The host holds the app's own cell in a shadow root, anchored at the left / top of what the cell draws; the place's
    minimum text (--smp-min: Big 12 px, Medium 11, Small 9, the board 20) is met by cropping, and a cut edge fades.
    Page previews and the bar's mini picture show the whole cell (0), never above print size (--smp-cap). */
-.live-thumb { --smp-min: 11; --smp-cap: 1; position: relative; display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; background: var(--paper); color: var(--paper-ink); font-family: var(--font-pupil); justify-self: stretch; align-self: stretch; }
+.live-thumb { --smp-min: 11; --smp-min-draw: 7; --smp-cap: 1; position: relative; display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; background: var(--paper); color: var(--paper-ink); font-family: var(--font-pupil); justify-self: stretch; align-self: stretch; }
 .live-wait { display: grid; place-items: center; height: 100%; font-size: var(--fs-12); color: var(--paper-ink); opacity: 0.6; }
 .live-thumb.cut-r { -webkit-mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent); mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent); }
 .live-thumb.cut-b { -webkit-mask-image: linear-gradient(to bottom, var(--paper-ink) 80%, transparent); mask-image: linear-gradient(to bottom, var(--paper-ink) 80%, transparent); }
 .live-thumb.cut-r.cut-b { -webkit-mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent), linear-gradient(to bottom, var(--paper-ink) 80%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, var(--paper-ink) 84%, transparent), linear-gradient(to bottom, var(--paper-ink) 80%, transparent); mask-composite: intersect; }
-.grid[data-view="big"] .live-thumb, .thumb-lg .live-thumb { --smp-min: 12; }
-.grid[data-view="small"] .live-thumb { --smp-min: 9; }
-.board-card .live-thumb { --smp-min: 20; --smp-cap: 3; }
-.page-cell .live-thumb, .tray-mini-pic .live-thumb, .page .live-thumb { --smp-min: 0; }
+.grid[data-view="big"] .live-thumb, .thumb-lg .live-thumb { --smp-min: 12; --smp-min-draw: 8; }
+.grid[data-view="small"] .live-thumb { --smp-min: 9; --smp-min-draw: 6; }
+.board-card .live-thumb { --smp-min: 20; --smp-min-draw: 14; --smp-cap: 3; }
+.page-cell .live-thumb, .tray-mini-pic .live-thumb, .page .live-thumb { --smp-min: 0; --smp-min-draw: 0; }
 .board-card > .live-thumb { width: 100%; height: 100%; }
 /* How many pages: the stepper and three quick counts; Each page shows once there is more than one page */
 .pages-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
@@ -927,9 +924,6 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 /* ---- fix round 5 (critic r5 A3): a whole grade on a phone with Detailed weights: its name keeps its own line and the
    controls go on the line under it (they had been laid over "Grade 2 (all areas)") */
 @media (max-width: 819px) {
-  .traypop.det .tp-rgrade, .traypop.det .tp-rgrade:not(.ctl-open) { flex-wrap: wrap; }
-  .traypop.det .tp-rgrade > .tp-hname { flex: 1 1 0; min-width: 0; }
-  .traypop.det .tp-rgrade > .tp-ctl, .traypop.det .tp-rgrade:not(.ctl-open) > .tp-ctl { flex-basis: 100%; margin-left: 0; flex-wrap: wrap; padding: 0 0 var(--sp-8); }
   .traypop.det .tp-row .tp-det { gap: var(--sp-4); }
 }
 @media (min-width: 820px) and (max-width: 1099px) {
@@ -939,3 +933,43 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 }
 /* the card's picture takes the room the card has (a card in a row of longer names, or one without an area line) */
 .grid:not([data-view="list"]) .card > .thumb { flex: 1 0 auto; }
+
+/* fix round 6 (critic r6 C1): a held skill in the Print sheet shows its % in place of Less · Equal · More */
+.held-btn { min-height: var(--control); gap: var(--sp-4); font-weight: var(--fw-700); }
+.held-btn svg { width: var(--fs-16); height: var(--fs-16); }
+.release-ask { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); }
+.release-ask .btn { min-height: var(--control); }
+/* fix round 6 (critic r6 A5 / D2): the ✓ of a selected option is a real item before its label with a gap token, so it
+   never sits on the label, however narrow the button's padding (a phone's Browse pills) */
+.seg button[aria-pressed="true"]::before { position: static; transform: none; display: inline-block; margin-right: var(--sp-4); vertical-align: baseline; }
+.seg.seg-sm button[aria-pressed="true"] { padding-left: var(--sp-8); }
+/* fix round 6 (critic r6 D1): a tray chip names its area (the abbreviation, as List and Thumbnails do) */
+.chip .tray-li-a { flex: none; }
+/* fix round 6 (critic r6 A2): Detailed weights below 1100 px keeps each area / grade header to one line with its ⋯ (the
+   % and Reset open under it), so the skill rows, not the headers, fill the first screen */
+@media (max-width: 1099px) {
+  .traypop.det .tp-ahead > .tp-ctl, .traypop.det .tp-ghead:not(.tp-rgrade) > .tp-ctl { display: none; }
+  .traypop.det .tp-ahead > .tp-dots, .traypop.det .tp-ghead > .tp-dots { display: inline-flex; flex: none; font-size: var(--fs-20); font-weight: var(--fw-700); margin-left: auto; }
+  .traypop.det .tp-ahead, .traypop.det .tp-ghead { flex-wrap: wrap; }
+  .traypop.det .tp-ahead.ctl-open > .tp-ctl, .traypop.det .tp-ghead.ctl-open > .tp-ctl { display: flex; flex-wrap: wrap; flex-basis: 100%; padding: 0 0 var(--sp-8); }
+  .traypop.det .tp-state { display: inline; }
+}
+/* the popup's Thumbnails view: narrower pictures so a first screen holds 6 or more skills */
+.tp-items.tp-v-thumbs { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.tray-seg.bare .icon { display: none; }
+.tray-more.tight { padding: 0 var(--sp-4); min-width: var(--control); }
+/* fix round 6 (critic r6 A2): a phone's Detailed weights row is the name on a short line, then one control line with ✕
+   (select is in the plain view), about 72 px, so the first screen holds 6 or more skills */
+@media (max-width: 819px) {
+  .traypop.det .tp-row { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--sp-4); padding: var(--sp-4) 0 0; }
+  .traypop.det .tp-row > .selbox, .traypop.det .tp-row > .tp-tags { display: none; }
+  .traypop.det .tp-row > .tp-name { flex: 1 1 calc(100% - var(--sp-32)); min-height: 0; padding: 0; font-size: var(--fs-14); text-align: left; }
+  .traypop.det .tp-row > .tp-det { flex: 1 1 calc(100% - var(--control) - var(--sp-8)); min-width: 0; order: 3; display: flex; flex-wrap: nowrap; align-items: center; padding: 0; }
+  .traypop.det .tp-row > .icon-btn { order: 4; }
+  .traypop.det .tp-row .l-of { display: none; }
+}
+/* fix round 6: a popup thumbnail is select · name · ✕ over its picture (one line saved), so 6 or more fit a first screen */
+.tp-thumb-top .icon-btn { margin-left: auto; flex: none; }
+.tp-thumb-foot:not(:has(.tag)) { display: none; }
+@media (max-width: 819px) { .tp-thumb .thumb { height: 64px; } }
+.tray-seg.bare { padding: 0 var(--sp-4); }

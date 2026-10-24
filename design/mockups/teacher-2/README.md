@@ -147,3 +147,24 @@ first and committed failing: it compares each thumbnail with the booted app's ow
 - New `shoot.cjs` checks: a named area in the big-tray bar at every width from 820; no text under a control and no two
   controls overlapping in 11 popup states at all widths with each ⋯ opened; Detailed weights rows per screen (≥ 8 at 1366,
   ≥ 6 at 390, ≤ 56 px from 820); ✓ and fill on selected options; live thumbnails' smallest text and line starts.
+
+**Fix round 6 (2026-10-24, critic r6).**
+- **Thumbnails show the drawing (A1 / C3).** `fitHost` (live.mjs) scales the whole item to fit, never below the place's
+  minimum for prose (`--smp-min`: Big 12, Medium 11, Small 9 px) and for an SVG's own labels (`--smp-min-draw`: Big 8,
+  Medium 7, Small 6; an SVG's tick labels are part of the picture), then places the window over the DRAWING: of the
+  candidate windows it keeps the one showing the most drawn area and words, penalising a line cut at its start or sliced
+  through its height. `thumbs-check.cjs` (committed failing first) now also requires ≥ 60 % of the drawn area in every
+  visible window, at least half the app cell's ink (screenshots of both), and no two different items sharing one
+  picture. Where the minimum text size leaves NO window able to show 60 % (a 650 px number line on a 200 px card), the
+  window must show the most any window can and is listed as a note.
+- **Held % in the Print sheet (C1):** a held skill shows "50 % 🔒" in place of Less · Equal · More; pressing it, or any
+  weight button for it, asks "Release the 50 %?" (Release / Keep).
+- **Single skill with a held % (C2):** pages are raised until every skill keeps a page and the held % is met (5 skills,
+  one at 50 % → 8 pages, 4 · 1 · 1 · 1 · 1), and the summary says so; a skill still left with no page gets a ⚠ line naming
+  it. A big tray's summary counts only areas that get an item ("5 of 6 areas", C4).
+- **Detailed weights (A2 / A3):** phone headers stay one line with "⋯"; Chips and Thumbnails use the one-line List row.
+- **Tray Chips (D1)** carry the area abbreviation when the tray has 2+ areas. **✓ (A5)** is an inline item with a gap
+  token before its label.
+- `views-check.cjs` sweeps every view × kind × width (1366 · 1280 · 1024 · 820 · 390): popup rows in the first screen,
+  Detailed weights row height and one-line phone headers, the held % on every row and in Print, no skill silently at 0,
+  area count in the summary, area names on chips, "+N" whenever areas or chips are hidden, and ✓ / label overlap.

@@ -226,21 +226,66 @@ async function cellFor(key, seed, n) {
 }
 
 function placeVar(host, name, dflt) { const v = parseFloat(getComputedStyle(host).getPropertyValue(name)); return Number.isFinite(v) ? v : dflt; }
-/** Fit a drawn thumbnail to its host: anchor top-left, meet the place's minimum by cropping. Called on resize too. */
+/** Fit a drawn thumbnail to its host (fix round 6, critic r6 A1): scale the whole item to fit, but never below the place's
+ *  minimum (prose >= --smp-min, an SVG's own labels >= --smp-min-draw); if it still does not fit, place the window over
+ *  the DRAWING (the most drawn area shown, a line's start never cut when it can be kept), not the cell's top-left. */
 export function fitHost(host) {
   const m = host.__mq, z = host.shadowRoot && host.shadowRoot.querySelector('.mq-zoom'); if (!m || !z) return;
   const W = host.clientWidth, H = host.clientHeight; if (W < 4 || H < 4) return;
-  const min = placeVar(host, '--smp-min', 11), cap = placeVar(host, '--smp-cap', 1) || 1;
+  const min = placeVar(host, '--smp-min', 11), cap = placeVar(host, '--smp-cap', 1) || 1, minD = placeVar(host, '--smp-min-draw', 0);
   host.classList.toggle('no-label', min > 0);       // a card shows the item; a page preview shows the cell as printed
   const pad = 2; const [bx, by, bw, bh] = m.boxIn; const cw = bw + 2 * pad, ch = bh + 2 * pad;
   let s = Math.min(Math.min(W / cw, H / ch), cap);
-  if (min > 0 && m.smallest > 0 && s * m.smallest < min) s = min / m.smallest;
+  if (min > 0) {
+    const prose = m.texts.filter(t => !t.svg).reduce((a, t) => Math.min(a, t.fs), Infinity);
+    const drawn = m.texts.filter(t => t.svg).reduce((a, t) => Math.min(a, t.fs), Infinity);
+    if (Number.isFinite(prose) && s * prose < min) s = min / prose;
+    if (Number.isFinite(drawn) && minD > 0 && s * drawn < minD) s = Math.max(s, minD / drawn);
+  }
   s = Math.max(s, 0.05);
-  const ox = bx - pad, oy = by - pad, ww = W / s, wh = H / s;
-  z.style.transform = `scale(${s}) translate(${-ox}px, ${-oy}px)`;
-  host.classList.toggle('cut-r', cw > ww + 1); host.classList.toggle('cut-b', ch > wh + 1);
+  const ww = W / s, wh = H / s;
+  // the window, in box coordinates (0,0 = the drawn content's top-left)
+  let wx = -pad, wy = -pad;
+  if (cw > ww + 1 || ch > wh + 1) {
+    const dr = m.draws.filter((a, i) => !m.draws.some((b, j) => j !== i && b.r[0] <= a.r[0] + 0.5 && b.r[1] <= a.r[1] + 0.5 && b.r[0] + b.r[2] >= a.r[0] + a.r[2] - 0.5 && b.r[1] + b.r[3] >= a.r[1] + a.r[3] - 0.5 && (b.r[2] * b.r[3] > a.r[2] * a.r[3] || j < i)));
+    const xs = new Set([-pad]), ys = new Set([-pad]);
+    const clampX = (v) => Math.max(-pad, Math.min(v, bw + pad - ww)), clampY = (v) => Math.max(-pad, Math.min(v, bh + pad - wh));
+    for (const d of [...dr, ...m.texts]) { xs.add(clampX(d.r[0] - pad)); xs.add(clampX(d.r[0] + d.r[2] + pad - ww)); ys.add(clampY(d.r[1] - pad)); ys.add(clampY(d.r[1] + d.r[3] + pad - wh)); }
+    const ov = (r, x, y) => Math.max(0, Math.min(r[0] + r[2], x + ww) - Math.max(r[0], x)) * Math.max(0, Math.min(r[1] + r[3], y + wh) - Math.max(r[1], y));
+    const dAll = dr.reduce((a, d) => a + d.r[2] * d.r[3], 0);
+    const cand = [];
+    for (const x of xs) for (const y of ys) {
+      let dIn = 0; for (const d of dr) dIn += ov(d.r, x, y);
+      let ink = 0; for (const d of dr) if (d.tag !== 'svg') ink += ov(d.r, x, y);
+      for (const r of (m.prims || [])) ink += 4 * ov(r, x, y);
+      let sc = ink, cut = false;
+      m.texts.forEach((t, i) => {
+        const a = ov(t.r, x, y); if (!a) return;
+        if (t.lefts.some(L => L < x - 0.5 && L + 1 < x + ww)) { sc -= 2 * t.r[2] * t.r[3] + 400; cut = true; }   // a line cut at its start
+        if (t.r[1] < y - 0.5 || t.r[1] + t.r[3] > y + wh + 0.5) { sc -= 1.5 * a; return; }   // a line sliced through its height
+        sc += (i === 0 ? 1 : 0.6) * a;                                       // words tell items apart; the first line most
+      });
+      cand.push({ x, y, dIn, ink, cut, sc: sc - 0.01 * (x + y) });                     // ties: nearer the top-left
+    }
+    // the drawing first: only windows that show 60 % of it (or, where none can, near the most any can) compete on words
+    // a line's start outranks the drawing (lead, r5 C2): windows that cut one compete only when every window does
+    let pool = cand.some(c => !c.cut) ? cand.filter(c => !c.cut) : cand;
+    // where no window can show 60 % of the drawing, the item's own first line (its problem) stays in view, so two items
+    // that share a big empty work box never look alike (thumbs-check: no two different items share one picture)
+    const t0 = m.texts[0];
+    const first = (c) => t0 && t0.r[0] >= c.x - 0.5 && t0.r[1] >= c.y - 0.5 && t0.r[1] + t0.r[3] <= c.y + wh + 0.5 && t0.r[0] < c.x + ww;
+    { const pm = Math.max(0, ...pool.map(c => c.ink)), fm = Math.max(0, ...pool.filter(first).map(c => c.ink));
+      const big = dr.reduce((a, d) => (!a || d.r[2] * d.r[3] > a.r[2] * a.r[3] ? d : a), null);   // a work box, not a picture
+      if (Math.max(0, ...pool.map(c => c.dIn)) < 0.61 * dAll && (fm >= 0.5 * pm || (fm >= 0.35 * pm && big && !/^(svg|img|canvas)$/.test(big.tag)))) pool = pool.filter(first); }
+    const dMax = Math.max(0, ...pool.map(c => c.dIn)); const need = Math.min(0.61 * dAll, 0.98 * dMax);
+    let best = -Infinity; for (const c of pool) if (c.dIn >= need - 0.5 && c.sc > best) { best = c.sc; wx = c.x; wy = c.y; }
+    host.dataset.reach = dAll > 0 ? String(Math.round(dMax / dAll * 1000) / 1000) : '1';   // the most drawing any window can show at this scale
+  } else host.dataset.reach = '1';
+  z.style.transform = `scale(${s}) translate(${-(bx + wx)}px, ${-(by + wy)}px)`;
+  host.classList.toggle('cut-r', bw + pad > wx + ww + 1); host.classList.toggle('cut-b', bh + pad > wy + wh + 1);
+  host.classList.toggle('cut-l', wx > 0); host.classList.toggle('cut-t', wy > 0);
   host.dataset.scale = String(Math.round(s * 10000) / 10000);
-  host.dataset.win = [-pad, -pad, ww, wh].map(v => Math.round(v * 10) / 10).join(' ');
+  host.dataset.win = [wx, wy, ww, wh].map(v => Math.round(v * 10) / 10).join(' ');
 }
 /** Measure what a drawn thumbnail shows at 1× (the transform lifted for the measure). */
 export function measureHost(host) {
@@ -252,6 +297,12 @@ export function measureHost(host) {
   const t = z.style.transform; z.style.transform = 'none';
   const zr = z.getBoundingClientRect(); const k = z.offsetWidth ? zr.width / z.offsetWidth : 1;   // an outer scale (a preview page)
   const m = measureCell(cell);
+  // the INK of each SVG (its lines, shapes and labels, not its box), so the window looks for what is drawn (fix round 6)
+  m.prims = [];
+  for (const sv of cell.querySelectorAll('svg')) for (const el of sv.querySelectorAll('line,path,rect,circle,ellipse,polygon,polyline,text')) {
+    const r = el.getBoundingClientRect(); if (r.width < 0.1 && r.height < 0.1) continue;
+    m.prims.push([r.left - m.box[0], r.top - m.box[1], Math.max(r.width, 2), Math.max(r.height, 2)]);
+  }
   if (Math.abs(k - 1) > 0.001) {
     const d = (v) => Math.round(v / k * 10) / 10;
     for (const o of m.texts) { o.fs = Math.round(o.fs / k * 100) / 100; o.r = o.r.map(d); o.lefts = o.lefts.map(d); }
