@@ -440,3 +440,22 @@ skill) is next.
 | Date | Listed (checks / speed-ups) | Built with backtest | Built (rule / tool, no backtest needed) | Assigned with owner | Dropped |
 |---|--:|--:|--:|--:|--:|
 | 2026-10-23 22:25 | 18 / 10 (pilot r1 + r2) | 0 | 3 (rules 0a, 0b, per-round findings rule) | 25 (W0-A: checks + F3–F5; pilot session: F1) | 0 |
+
+## 2026-10-24 · Wind-down (owner: "stop after this work, don't try anything new")
+
+### W0-A, second phase (the five pilot-lesson checks, after the r5 PASS) — stopped at critic r7 FAIL
+
+- **Measure.** Pilot-lesson checks built after r5 (sibling comparison, SLOT/CLIP on every matrix row, 390 card, card rulings,
+  not-offered options; started 20:01, medium). Critic r6 FAIL 6 / 8 / 7; fix r6 merged 23:05; **critic r7 FAIL 7 / 9 / 7**
+  (r6 D1–D3 fixed; 8/8 pilot backtests pass). Stopped on the owner's instruction; no fix round 8 without the lead's go.
+  Lane total: 7 critic rounds in about 13.5 h (5 to PASS the gates, then 2 failing rounds on the pilot-lesson checks).
+- **Causes.** Two blocking defects, both in how a check decides what it is comparing: (D1) the sibling and slot-clip comparisons
+  count findings on multi-skill rows (mixed, sections) without tying them to a skill, so a partner skill's cell can fail the
+  lane or hide its defect; (D2) `ws-spec-card --rulings-only` refreshes the body hash, so a ruling on a signed card can be
+  weakened unnoticed, and precritic never runs `--check-signed`.
+- **Fixes (recorded for later; not started, per the owner):** tie every multi-skill finding to its skill before comparing; never
+  refresh a signed card's hash outside `--resign`; make `--strict` part of rule 0b so INCOMPLETE / SKIPPED never end
+  precritic OK. **Owner: W0-A, when work resumes.** The 11 generic checks from the pilot verdict and check 12 (CL-4b) stay
+  queued, not started.
+- **Lesson.** A check that compares counts must first say exactly which skill each count belongs to; that is the same root as the
+  pilot's 236 → 124 miscount. Recorded as one class: COMPARE_SCOPE.
