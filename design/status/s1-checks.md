@@ -29,3 +29,15 @@ Base: origin/claude/sweet-newton-c8wrv1 (e371ec9) + merge of `-wip-wave0-gates` 
   branch: 2/2 PASS (221 s) → **36/36 PASS**. ws-backtest now names the shallow clone and the fix instead of a bare git error.
 - 09:50 ws-precritic could not find Chromium (it looked for chrome-linux/, this container has chrome-linux64/): fixed to read
   both layouts like tests/lib/ws-harness.cjs.
+- 10:05 **Cross-lane, routed to the lead:** precritic --strict on the APPROVED `subtraction:sub_100_regroup` on main 75a6a25
+  fails rule 0b in 7 matrix rows (single/layout-fact-rows S PG-12 x180; single/ex-each S/M TY-11 28, S/M/L H13 6;
+  sections/ex-group; mixed/defaults L H13 4; more-cols2+... H13). The SAME counts come out of main's own tools (a worktree of
+  75a6a25, ws-coverage-matrix on the same rows): app state on main, not an S1 check.
+- 10:05 ws-precritic: `ws-grade-render` (no --golden) prints `done, N units`, never OK/FAIL, so the --role / --template
+  render rows were always "unparsed" FAIL: new PARSE.gradeRender (PASS when every unit rendered with no ERROR line).
+- 10:05 Lesson role pages pinned (they were in no pin, so --role lesson could never be green): the 20 role-sample skills
+  `#lesson` at L (382 findings) and S (368) appended to print-lint.json / print-lint.S.json, on main 75a6a25. Largest classes:
+  TY-1 150, TY-7 70, TY-2 36, INK-7 32, H13 26 / 16, AK-4 26 / 22, PG-12 15, WRAP-OP 13.
+- 10:05 D1 on REAL data (lead's pointer: the 7 sections/ex-each RED rows on the pilot ids come from the partner
+  algebra:tape_diagram): every finding of a real Sections row carries skill "" (bySkill {"": ...}), so partner findings still
+  block; the fixture row passed only because its fixture had skills filled in. Builder B fix round 1 (medium).

@@ -258,7 +258,7 @@ function gate(id, name, scope, kind, script, args, extra = {}) {
     let missing = null;
     if (!file) missing = extra.missingMsg || `${script} is not in this tree`;
     else for (const f of extra.needFlags || []) if (!srcHas(file, f)) { missing = `${script} has no --${f} flag`; break; }
-    return { id, name, scope, kind, script, file, args, missing, parse: extra.parse || null, note: extra.note || '', jsonOut: extra.jsonOut || null, keys: extra.keys || null, expect: extra.expect || null, expectFail: !!extra.expectFail, synthetic: null };
+    return { id, name, scope, kind, script, file, args, missing, parse: extra.parse || null, note: extra.note || '', jsonOut: extra.jsonOut || null, keys: extra.keys || null, expect: extra.expect || null, expectFail: !!extra.expectFail, expectUnits: extra.expectUnits || 0, synthetic: null };
 }
 /** A row this tool works out itself (nothing is spawned): {result, findings, detail}. */
 function synthetic(id, name, scope, res) {
@@ -576,6 +576,18 @@ const PARSE = {
         else if (r.result === 'FAIL') r.detail = out.split('\n').filter((l) => /^ {6}FAIL /.test(l)).slice(0, 10).map((l) => l.trim());
         return r;
     },
+    /** ws-grade-render without --golden prints no OK / FAIL line, only `ws-grade-render: done, N units, P pages`: it is the
+     *  render the critic grades (print-lint judges the pages). PASS when it rendered every unit with no ERROR line. */
+    gradeRender(g, out, code) {
+        if (/^ws-grade-render: (OK|FAIL)\b/m.test(out)) return generic(g, out, code);
+        const m = /^ws-grade-render: done, (\d+) units, (\d+) pages/m.exec(out);
+        if (!m) return unparsed('no "ws-grade-render: done|OK|FAIL" line', out);
+        const errs = out.split('\n').filter((l) => /^ {2}ERROR /.test(l)).map((l) => l.trim());
+        const want = g.expectUnits || 0;
+        if (code !== 0 || errs.length) return { result: 'FAIL', findings: `${errs.length} render error(s)${code ? `, exit ${code}` : ''}`, detail: errs.slice(0, 10), explainsExit: code !== 0 };
+        if (want && +m[1] < want) return { result: 'FAIL', findings: `rendered ${m[1]} of ${want} unit(s)`, detail: tailLines(out), explainsExit: false };
+        return { result: 'PASS', findings: `rendered ${m[1]} unit(s), ${m[2]} page(s) for the critic (print-lint judges them)`, detail: [], explainsExit: false };
+    },
     /** ws-card-rulings: NO-RULINGS (exit 4) is SKIPPED, never PASS. */
     cardRulings(g, out, code) {
         if (/^ws-card-rulings: NO-RULINGS\b/m.test(out) && code === 4) {
@@ -712,12 +724,12 @@ function buildPlan(ctx) {
         // a *.fail.mjs fixture holds the defect its check was built for: it must FAIL (ws-backtest's reading), a
         // *.pass.mjs fixture must pass; ws-node-lint --fixture never uses the baseline, so any finding fails it.
         for (const f of fx) add(gate(`fixture-${f}`, `template fixture ${f} (ws-node-lint --fixture, must ${/\.fail\.mjs$/.test(f) ? 'FAIL' : 'pass'})`, `template ${t}`, 'node', 'ws-node-lint', ['--fixture', `tests/fixtures/precritic/${f}`], { parse: PARSE.fixture, expectFail: /\.fail\.mjs$/.test(f) }));
-        add(gate('grade-render-template', 'ws-grade-render --template --contact-sheet', `template ${t}`, 'browser', 'ws-grade-render', ['--template', t, '--contact-sheet', '--out', path.join(ctx.logs, 'grade-render-template')], { needFlags: ['template', 'contact-sheet'] }));
+        add(gate('grade-render-template', 'ws-grade-render --template --contact-sheet', `template ${t}`, 'browser', 'ws-grade-render', ['--template', t, '--contact-sheet', '--out', path.join(ctx.logs, 'grade-render-template')], { needFlags: ['template', 'contact-sheet'], parse: PARSE.gradeRender }));
     }
     if (ctx.role) {
         const sample = ctx.roleSample;
         const sc = `role ${ctx.role} × ${sample.length} sample skills`;
-        add(gate(`grade-render-role-${ctx.role}`, `ws-grade-render --roles ${ctx.role}`, sc, 'browser', 'ws-grade-render', ['--roles', ctx.role, '--skills', sample.join(','), '--out', path.join(ctx.logs, `grade-render-${ctx.role}`)], { needFlags: ['roles'] }));
+        add(gate(`grade-render-role-${ctx.role}`, `ws-grade-render --roles ${ctx.role}`, sc, 'browser', 'ws-grade-render', ['--roles', ctx.role, '--skills', sample.join(','), '--out', path.join(ctx.logs, `grade-render-${ctx.role}`)], { needFlags: ['roles'], parse: PARSE.gradeRender, expectUnits: sample.length }));
         const pl = ['--source', 'kit', '--roles', ctx.role, '--skills', sample.join(',')];
         if (fs.existsSync(PRINT_BASE)) pl.push('--baseline', rel(PRINT_BASE));
         // print-lint names a role page "cat:skill#role" (independent: plain "cat:skill"); the pin lists those it holds.

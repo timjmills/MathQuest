@@ -17,12 +17,16 @@
   {
    "file": "print-lint-rest1.json",
    "documents": 248
+  },
+  {
+   "file": "ws-print-lint --source kit --roles lesson --skills <role-sample.json> --report-only --json (lane S1, 2026-10-24, on origin main 75a6a25: the lesson role pages, ids cat:skill#lesson)",
+   "documents": 20
   }
  ],
  "totals": {
-  "documents": 721,
-  "findings": 6614,
-  "documentsWithFindings": 384
+  "documents": 741,
+  "findings": 7133,
+  "documentsWithFindings": 409
  },
  "documents": [
   {
@@ -54882,6 +54886,3214 @@
      "el": "<div.ws-cell.mq-legacy[data-ws-cell=\"legacy\"]> \"2 Which word matches this de...\"",
      "page": 2,
      "cell": 2
+    }
+   ]
+  },
+  {
+   "id": "composing:number_bonds#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 2
+   },
+   "findings": [
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 2,
+     "msg": "a wrapped line ends in \"=\": \"gether:2+4=\" / \"6....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 5,
+     "msg": "a wrapped line ends in \"=\": \"gether:2+4=\" / \"6....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    }
+   ]
+  },
+  {
+   "id": "addition:add_facts#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "subtraction:sub_facts#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 1,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 2
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "PAGEFILL",
+     "sev": "major",
+     "page": 3,
+     "msg": "page 3: an empty strip 58 mm tall under the problems (22% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 1,
+     "msg": "a wrapped line ends in \"+\": \"addition:9+\" / \"?=11....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 4,
+     "msg": "a wrapped line ends in \"+\": \"addition:9+\" / \"?=11....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    }
+   ]
+  },
+  {
+   "id": "multiplication:mult_facts#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "division:div_facts#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "fractions:identify#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 6,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 5,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    }
+   ]
+  },
+  {
+   "id": "fraction_operations:add_fractions_like#lesson",
+   "pages": 8,
+   "keyPages": 4,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 30,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 6,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"4/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"8/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 1,
+     "msg": "slash fraction \"8/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"8/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"8/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"1/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"2/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"4/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"2/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"4/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"4/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 5,
+     "msg": "slash fraction \"4/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 5,
+     "msg": "slash fraction \"8/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 5,
+     "msg": "slash fraction \"8/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "slash fraction \"8/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "slash fraction \"8/11\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"1/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"2/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"4/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"2/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"4/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"4/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 1,
+     "msg": "sticks out of its cell by 0.4 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 1,
+     "msg": "sticks out of its cell by 0.4 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 1,
+     "msg": "sticks out of its cell by 0.4 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 5,
+     "msg": "sticks out of its cell by 0.4 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 5,
+     "msg": "sticks out of its cell by 0.4 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 5,
+     "msg": "sticks out of its cell by 0.4 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 55.6 mm wide in a 184.9 mm cell (30%): the content is pinned to one side (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 6,
+     "msg": "one empty band 55.6 mm wide in a 184.9 mm cell (30%): the content is pinned to one side (RUBRIC H13)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 7,
+     "msg": "key page 7 has 8 answer slots, pupil page 3 has 6 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "decimals:add_decimal#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 2,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 5,
+     "msg": "key page 5 has 7 answer slots, pupil page 2 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 6,
+     "msg": "key page 6 has 5 answer slots, pupil page 3 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "conversions:f_to_d#lesson",
+   "pages": 10,
+   "keyPages": 5,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 58,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 2,
+    "L-SPLIT": 0,
+    "L-DENSITY": 4,
+    "L-KEY": 2,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 5,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 5,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 5,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 5,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 10,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 10,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 10,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 10,
+     "msg": "font-weight 600: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/12\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"6/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"3/10\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "slash fraction \"7/10\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "slash fraction \"2/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "slash fraction \"50/100\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 5,
+     "msg": "slash fraction \"9/10\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 5,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"3/12\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"6/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "slash fraction \"3/5\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 8,
+     "msg": "slash fraction \"3/10\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 8,
+     "msg": "slash fraction \"7/10\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 9,
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 9,
+     "msg": "slash fraction \"1/2\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 9,
+     "msg": "slash fraction \"1/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 9,
+     "msg": "slash fraction \"2/8\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 9,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 9,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 9,
+     "msg": "slash fraction \"50/100\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 10,
+     "msg": "slash fraction \"9/10\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-7",
+     "sev": "major",
+     "page": 10,
+     "msg": "slash fraction \"3/4\": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 7,
+     "msg": "sticks out of its cell by 160.8 mm (cell 61.3 x 204.5 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 9,
+     "msg": "sticks out of its cell by 129.8 mm (cell 92.3 x 225.9 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 149.2 mm tall under the item in a 204.5 mm cell, 85.9 mm (42%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 4,
+     "msg": "one empty band 175.8 mm tall under the item in a 225.9 mm cell, 81.6 mm (36%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 7,
+     "msg": "one empty band 149.2 mm tall under the item in a 204.5 mm cell, 85.9 mm (42%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 9,
+     "msg": "one empty band 175.8 mm tall under the item in a 225.9 mm cell, 81.6 mm (36%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 7,
+     "msg": "key page 7 has 1 answer slots, pupil page 2 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 9,
+     "msg": "key page 9 has 1 answer slots, pupil page 4 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "shapes_early:name_2d_shapes#lesson",
+   "pages": 8,
+   "keyPages": 4,
+   "error": null,
+   "counts": {
+    "L-INK": 3,
+    "L-EMOJI": 32,
+    "L-FONT": 4,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 3,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-INK",
+     "rule": "INK-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 76.7 mm2 of coloured ink on the rendered page (raster or effect colour the vector check cannot name) (INK-1)"
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "printed page 3: 47.7 mm2 of coloured ink on the rendered page (raster or effect colour the vector check cannot name) (INK-1)"
+    },
+    {
+     "lint": "L-INK",
+     "rule": "INK-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 30.5 mm2 of coloured ink on the rendered page (raster or effect colour the vector check cannot name) (INK-1)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"🔷\" U+1F537 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 2,
+     "msg": "emoji / pictographic \"🟦\" U+1F7E6 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "emoji / pictographic \"🟦\" U+1F7E6 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 3,
+     "msg": "emoji / pictographic \"🟦\" U+1F7E6 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 4,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"🔷\" U+1F537 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 6,
+     "msg": "emoji / pictographic \"🟦\" U+1F7E6 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "emoji / pictographic \"🔺\" U+1F53A in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "emoji / pictographic \"🟦\" U+1F7E6 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 7,
+     "msg": "emoji / pictographic \"🟦\" U+1F7E6 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 8,
+     "msg": "emoji / pictographic \"⭐\" U+2B50 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 8,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-EMOJI",
+     "rule": "INK-7",
+     "sev": "major",
+     "page": 8,
+     "msg": "emoji / pictographic \"⭕\" U+2B55 in sheet text (INK-7, TY-6, RP-7)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 3 text run(s) embedded in \"DejaVuSans\", not Andika (e.g. \"▭\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 1 text run(s) embedded in \"DejaVuSans\", not Andika (e.g. \"⬢\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 6,
+     "msg": "printed page 6: 3 text run(s) embedded in \"DejaVuSans\", not Andika (e.g. \"▭\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "printed page 8: 1 text run(s) embedded in \"DejaVuSans\", not Andika (e.g. \"⬢\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 6,
+     "msg": "key page 6 has 3 answer slots, pupil page 2 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 7,
+     "msg": "key page 7 has 1 answer slots, pupil page 3 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 8,
+     "msg": "key page 8 has 1 answer slots, pupil page 4 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "area_perimeter:perimeter_intro#lesson",
+   "pages": 8,
+   "keyPages": 4,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 6,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 2
+   },
+   "findings": [
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 1,
+     "msg": "sticks out of its cell by 1 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 1,
+     "msg": "sticks out of its cell by 1 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 1,
+     "msg": "sticks out of its cell by 1 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 5,
+     "msg": "sticks out of its cell by 1 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 5,
+     "msg": "sticks out of its cell by 1 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 5,
+     "msg": "sticks out of its cell by 1 mm (cell 184.9 x 76.2 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 38 mm tall under the item in a 91.6 mm cell, 29 mm (32%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 6,
+     "msg": "one empty band 38 mm tall under the item in a 91.6 mm cell, 29 mm (32%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 1,
+     "msg": "a wrapped line ends in \"=\": \"dd:5+4+5+4=\" / \"18....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 5,
+     "msg": "a wrapped line ends in \"=\": \"dd:5+4+5+4=\" / \"18....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    }
+   ]
+  },
+  {
+   "id": "coordinates:coordinate_q1#lesson",
+   "pages": 16,
+   "keyPages": 8,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 14,
+    "L-KEY": 7,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 58.4 mm tall in a 165.7 mm cell (35%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 3,
+     "msg": "one empty band 69.6 mm tall in a 229 mm cell (30%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 4,
+     "msg": "one empty band 68 mm tall in a 225.9 mm cell (30%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 5,
+     "msg": "one empty band 125.9 mm tall in a 225.9 mm cell (56%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 6,
+     "msg": "one empty band 68 mm tall in a 225.9 mm cell (30%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 7,
+     "msg": "one empty band 118.7 mm tall in a 225.9 mm cell (53%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 8,
+     "msg": "one empty band 133.1 mm tall in a 225.9 mm cell (59%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 10,
+     "msg": "one empty band 58.4 mm tall in a 165.7 mm cell (35%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 11,
+     "msg": "one empty band 69.6 mm tall in a 229 mm cell (30%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 12,
+     "msg": "one empty band 68 mm tall in a 225.9 mm cell (30%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 13,
+     "msg": "one empty band 125.9 mm tall in a 225.9 mm cell (56%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 14,
+     "msg": "one empty band 68 mm tall in a 225.9 mm cell (30%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 15,
+     "msg": "one empty band 118.7 mm tall in a 225.9 mm cell (53%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 16,
+     "msg": "one empty band 133.1 mm tall in a 225.9 mm cell (59%): the row is sized for a taller item than it holds (RUBRIC H13)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 10,
+     "msg": "key page 10 has 1 answer slots, pupil page 2 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 11,
+     "msg": "key page 11 has 1 answer slots, pupil page 3 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 12,
+     "msg": "key page 12 has 1 answer slots, pupil page 4 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 13,
+     "msg": "key page 13 has 1 answer slots, pupil page 5 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 14,
+     "msg": "key page 14 has 1 answer slots, pupil page 6 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 15,
+     "msg": "key page 15 has 1 answer slots, pupil page 7 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 16,
+     "msg": "key page 16 has 1 answer slots, pupil page 8 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "measurement:time_hour#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "patterns:seq_2#lesson",
+   "pages": 8,
+   "keyPages": 4,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 5,
+    "L-KEY": 3,
+    "L-VERBS": 6,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 1
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 3,
+     "msg": "one empty band 54.7 mm tall under the item in a 73.7 mm cell, 33.1 mm (45%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 7,
+     "msg": "one empty band 54.7 mm tall under the item in a 73.7 mm cell, 33.1 mm (45%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "LONE",
+     "sev": "major",
+     "page": 4,
+     "msg": "page 4 holds one cell alone (sheet pages 5 + 1): another page of the sheet holds 5: rebalance so no page holds one alone (H5, PG-23; L-LONE)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "PG-23",
+     "sev": "major",
+     "page": 4,
+     "msg": "last page 4 holds 1 item(s), under a third of a full page (5): rows are rebalanced across the sheet's pages (PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "PG-23",
+     "sev": "major",
+     "page": 8,
+     "msg": "last page 8 holds 1 item(s), under a third of a full page (5): rows are rebalanced across the sheet's pages (PG-23)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 6,
+     "msg": "key page 6 has 5 answer slots, pupil page 2 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 7,
+     "msg": "key page 7 has 5 answer slots, pupil page 3 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 8,
+     "msg": "key page 8 has 1 answer slots, pupil page 4 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 2,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in reverse counting order. (counting down b\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 3,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in counting order. (counting up by 2s)\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 4,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in reverse counting order. (counting down b\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 6,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in reverse counting order. (counting down b\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 7,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in counting order. (counting up by 2s)\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-12",
+     "sev": "major",
+     "page": 8,
+     "msg": "screen verb \"Drag\" on paper: \"Drag the numbers in reverse counting order. (counting down b\" (BD-11, BD-12, BD-17)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 7,
+     "msg": "a wrapped line ends in \"=\": \"stepadds2.=\" / \"[\"t0\",\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    }
+   ]
+  },
+  {
+   "id": "algebra:tape_diagram#lesson",
+   "pages": 10,
+   "keyPages": 5,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "order_of_operations:oop_easy#lesson",
+   "pages": 8,
+   "keyPages": 4,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 30,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 3,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 2
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 2 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"4 × 3 − 3\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "printed page 3: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"10 + 12 ÷ 6\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 4 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"3 × 2 − 2\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 6,
+     "msg": "printed page 6: 2 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"4 × 3 − 3\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 6,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 6,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 7,
+     "msg": "printed page 7: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"10 + 12 ÷ 6\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "printed page 8: 4 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"3 × 2 − 2\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, Helvetica, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 3,
+     "msg": "one empty band 79.7 mm tall under the item in a 114.3 mm cell, 56.4 mm (49%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 7,
+     "msg": "one empty band 79.7 mm tall under the item in a 114.3 mm cell, 56.4 mm (49%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 6,
+     "msg": "key page 6 has 2 answer slots, pupil page 2 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 7,
+     "msg": "key page 7 has 4 answer slots, pupil page 3 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 8,
+     "msg": "key page 8 has 2 answer slots, pupil page 4 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 3,
+     "msg": "a wrapped line ends in \"+\": \"12×2÷4+\" / \"1...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 7,
+     "msg": "a wrapped line ends in \"+\": \"12×2÷4+\" / \"1...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    }
+   ]
+  },
+  {
+   "id": "placevalue:more_less_10#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 1,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "PAGEFILL",
+     "sev": "major",
+     "page": 3,
+     "msg": "page 3: an empty strip 89 mm tall under the problems (33% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)"
+    }
+   ]
+  },
+  {
+   "id": "number_sense:rounding_visual#lesson",
+   "pages": 6,
+   "keyPages": 3,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "number_theory:prime_composite#lesson",
+   "pages": 10,
+   "keyPages": 5,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 1,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 3,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 4
+   },
+   "findings": [
+    {
+     "lint": "L-OVERFLOW",
+     "rule": "PG-12",
+     "sev": "major",
+     "page": 7,
+     "msg": "sticks out of its cell by 69 mm (cell 122.9 x 143.6 mm) (PG-12, CL-1)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 7,
+     "msg": "key page 7 has 1 answer slots, pupil page 2 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 8,
+     "msg": "key page 8 has 2 answer slots, pupil page 3 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 9,
+     "msg": "key page 9 has 2 answer slots, pupil page 4 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 8,
+     "msg": "a wrapped line ends in \"=\": \"hemselves.=\" / \"[\"opt2\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 8,
+     "msg": "a wrapped line ends in \"=\": \"hemselves.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 9,
+     "msg": "a wrapped line ends in \"=\": \"hemselves.=\" / \"[\"opt0\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 9,
+     "msg": "a wrapped line ends in \"=\": \"hemselves.=\" / \"[\"opt1\"...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    }
+   ]
+  },
+  {
+   "id": "vocabulary:vocab_grade_K#lesson",
+   "pages": 10,
+   "keyPages": 5,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 128,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 2,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "printed page 3: 12 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"1.\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "printed page 3: 15 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"Match each definition to the c\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "printed page 3: 16 text run(s) embedded in \"DejaVuSansMono\", not Andika (e.g. \"In 1, 2,\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "printed page 3: 2 text run(s) embedded in \"LiberationSans-BoldItali\", not Andika (e.g. \"Write the matching letter on e\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 1 text run(s) embedded in \"LiberationSans-BoldItali\", not Andika (e.g. \"Write the matching letter on e\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 5 text run(s) embedded in \"DejaVuSansMono\", not Andika (e.g. \"A pair of\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"1.\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 8 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"Match each word to its definit\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "printed page 8: 12 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"1.\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "printed page 8: 15 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"Match each definition to the c\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "printed page 8: 16 text run(s) embedded in \"DejaVuSansMono\", not Andika (e.g. \"In 1, 2,\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "printed page 8: 2 text run(s) embedded in \"LiberationSans-BoldItali\", not Andika (e.g. \"Write the matching letter on e\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"\"Open Sans\", Inter, system-ui, -apple-system, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "printed page 9: 1 text run(s) embedded in \"LiberationSans-BoldItali\", not Andika (e.g. \"Write the matching letter on e\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "printed page 9: 5 text run(s) embedded in \"DejaVuSansMono\", not Andika (e.g. \"A pair of\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "printed page 9: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"1.\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "printed page 9: 8 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"Match each word to its definit\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "printed page 3: 2 italic run(s), e.g. \"Write the matching letter on e\" (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 1 italic run(s), e.g. \"Write the matching letter on e\" (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 5,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "printed page 8: 2 italic run(s), e.g. \"Write the matching letter on e\" (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 9,
+     "msg": "printed page 9: 1 italic run(s), e.g. \"Write the matching letter on e\" (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 9,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 10,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 8,
+     "msg": "key page 8 has 2 answer slots, pupil page 3 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 9,
+     "msg": "key page 9 has 1 answer slots, pupil page 4 has 0 (AK-4)"
     }
    ]
   }
