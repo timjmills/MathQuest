@@ -726,7 +726,7 @@ function renderSetup() {
     ${anchorsHTML()}
     <div class="tv-divided">
       <span class="tv-label">Header</span>
-      <div class="tv-fields-2" style="gap:4px 12px;">${check('name', 'Name')}${check('date', 'Date')}${check('score', 'Score')}${check('tab', 'Strand tab')}${check('title', 'Title')}</div>
+      <div class="tv-fields-2" style="gap:4px 12px;">${check('name', 'Name')}${check('date', 'Date')}${check('score', 'Score')}${check('title', 'Title')}</div>
     </div>
     <div class="tv-setting tv-divided">
       <div><div class="tv-h3" id="tvKeyL">Answer key</div><p class="tv-cap" id="tvKeyD">${pr.keyStyle === 'short' ? 'A short list of every answer, page by page.' : 'The same page with the answers written in.'}</p></div>

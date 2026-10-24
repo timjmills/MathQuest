@@ -230,7 +230,7 @@ function align(a, b) {
 
 /* ------------------------------------------------------------------ rows (data only) */
 
-const labelText = (style, k) => (style === 'letter' ? `${LETTERS[(k - 1) % 26]}.` : `${k}.`);
+const labelText = (style, k) => `${k}.`;   // CL-11a (owner, 2026-10-23): numbers only, never letters
 
 /** One plan's pages -> [{items: [{label, cell, key, words}]}], in renderPages' own walk order. */
 function planPageRows(plan) {

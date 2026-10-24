@@ -212,7 +212,7 @@ export function plan(input = {}) {
     const basic = items.some((it) => it.thinking && it.thinking.task && it.thinking.task.basic);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Stretch A', title: 'Stretch', score: 0,
         footerRight: [`Form ${input.form || 'A'}`, 'Answers vary', basic ? 'basic' : ''].filter(Boolean).join(' · ') });
-    const grid = gridPart(items.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows: items.length, labels: 'letter', start: 1 });
+    const grid = gridPart(items.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows: items.length, labels: 'tab', start: 1 });
     grid.cls = ''; grid.height = '';
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart('stretch'), grid] }], {
         meta: { items: items.length, scoreOutOf: 0, basic, fits: [{ cols: 1, rows: items.length, line: `Fits: 1 open problem${items.length > 1 ? 's' : ''} per page.` }] },

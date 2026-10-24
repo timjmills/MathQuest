@@ -834,7 +834,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     let sheetItems = split.items;
     const { size, look } = norm;
     const level = 1;                                        // PT 1.7: Independent and More Practice
-    const labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? input.labels
+    const labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? 'tab' /* CL-11a */
         : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).label;       // CL-10 / CL-30, dialog override CL-20
     // RUBRIC H13: within a section, problems of one height sit together (tall first), so rows
     // can be sized to what they hold. The column count is the one the layout would choose.

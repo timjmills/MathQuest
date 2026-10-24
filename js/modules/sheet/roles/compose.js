@@ -47,7 +47,7 @@ export function ctxOf(input = {}, defaultLook = 'ican') {
 
 /** The label style of a look (CL-10 / CL-30), or the dialog's override (CL-20). */
 export const labelStyleOf = (look, labels) =>
-    (labels === 'none' || labels === 'tab' || labels === 'letter' ? labels : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).label);
+    (labels === 'letter' ? 'tab' /* CL-11a */ : labels === 'none' || labels === 'tab' ? labels : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).label);
 
 /* ==================================================================== the frame words */
 

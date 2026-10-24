@@ -2532,7 +2532,9 @@ export function arrangeKey(res, ko, req = {}) {
         // printout of several sections, the section ("Section 2 · Add within 20").
         const nameOf = (h) => {
             const tabBox = /<div class="ws-tabbox">([\s\S]*?)<\/div>/.exec(h || '');
-            const spans = tabBox ? [...tabBox[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1].trim()).filter(Boolean) : [];
+            const meta = /\sdata-ws-tab="([^"]*)"/.exec(h || '');
+            const spans = tabBox ? [...tabBox[1].matchAll(/<span>([^<]*)<\/span>/g)].map((m) => m[1].trim()).filter(Boolean)
+                : meta ? meta[1].split('|').map((t) => t.trim()).filter(Boolean) : [];
             const foot = /<footer class="ws-foot"[^>]*>[\s\S]*?<b>([^<]*)<\/b>/.exec(h || '');
             const nn = foot && /^(\d+)\/(\d+)$/.exec(foot[1].trim());
             const name = spans.length ? spans[spans.length - 1] : '';
@@ -3944,13 +3946,13 @@ async function buildDetailedLesson(req = {}) {
         // Each question's items by the LETTERS P0 prints (critic D10): {pre.i.letters} 'a–d',
         // {pre.i.list} 'a. 61 · b. 80 ...'; {p0.list} every item. Read from the P0 plan, never typed.
         pre: d.prerequisites.map((p, i) => {
-            const mine = p0Cells.map((c, j) => Object.assign({ letter: 'abcdefghijklmnop'[j] }, c)).filter((c) => c.grid === i);
+            const mine = p0Cells.map((c, j) => Object.assign({ letter: String(j + 1) }, c)   /* CL-11a: number tabs, never letters */).filter((c) => c.grid === i);
             const c = mine[0] || p0Cells[i];
             const v = c ? dlItemVars(c.q, d) : { ans: '' };
             const L = mine.map((x) => x.letter);
             return Object.assign(v, { letters: L.length > 1 ? `${L[0]}–${L[L.length - 1]}` : (L[0] || ''), list: mine.map((x) => `${x.letter}. ${dlAns(x.q)}`).join(' · ') });
         }),
-        p0: { list: p0Cells.map((c, j) => `${'abcdefghijklmnop'[j]}. ${dlAns(c.q)}`).join(' · ') },
+        p0: { list: p0Cells.map((c, j) => `${j + 1}. ${dlAns(c.q)}`).join(' · ') },
         ns: { A: nsBands[0].its.map((it) => dlItemVars(it.q, d)), B: nsBands[1].its.map((it) => dlItemVars(it.q, d)) },
         // ({panel.second} / {panel.third} - lesson 5 r4, critic r2 D8: the printed panel numbers of the chart's other examples,
         // after its step panels, so a script never names an example by its order)
