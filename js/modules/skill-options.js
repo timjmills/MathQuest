@@ -3622,10 +3622,12 @@ function _measuredOptions(categoryId, skillId, own) {
 // left on Auto come from the page's own numbers, so the line covers every one of them.
 export const NLINE_GROUP = 'nline';
 export const isNumberLineOption = (def) => !!def && def.group === NLINE_GROUP;
+// The stacked no-regroup kit ids (sub_50 / sub_100 / sub_1k _no_regroup and their presets, e.g. sub_2d_1d)
+// draw no page number line: the signed subtraction card lists nlOn ... nlHops as not offered there.
 const _NL_SKILLS = {
     // add / subtract up to 1,000 (facts, within 10 … 1,000, adding on, counting back, word problems)
     addition: /^(add_facts|add_sub_10s|add_sub_100s|add|add_word_problems(_plain)?|add_three|comparison_word|add_5_pictures|add_(10|20|50|100|1k)_(no_regroup|regroup|mixed)|add_wp_(10|20|50|100|1k)(_plain)?|nl_add|number_line_add|mixed_addition)$/,
-    subtraction: /^(sub_facts|subtract|sub_word_problems(_plain)?|missing_add_sub|sub_5_pictures|unknown_start_wp|sub_(10|20|50|100|1k)_(no_regroup|regroup|mixed)|sub_wp_(10|20|50|100|1k)(_plain)?|nl_sub|number_line_sub|mixed_add_sub|mixed_subtraction)$/,
+    subtraction: /^(sub_facts|subtract|sub_word_problems(_plain)?|missing_add_sub|sub_5_pictures|unknown_start_wp|sub_(10|20)_(no_regroup|regroup|mixed)|sub_(50|100|1k)_(regroup|mixed)|sub_wp_(10|20|50|100|1k)(_plain)?|nl_sub|number_line_sub|mixed_add_sub|mixed_subtraction)$/,
     // × / ÷ on a number line: jumps of the factor
     multiplication: /^(nl_mult|count_by_tables)$/,
     division: /^(nl_div)$/,
