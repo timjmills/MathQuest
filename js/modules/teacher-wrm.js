@@ -67,7 +67,7 @@ let detailed = null;                 // data/curriculum/detailed-lessons.json, i
 const pick = createPicker({ idp: 'tvw', root: () => root, redraw: () => redrawDetail() });
 let preFor = '';                     // the lesson whose teaching skills were ticked on opening (T4: ticked by default)
 let tmOpen = false;                  // "Skills to be made for this lesson" unfolded (T4: folded by default)
-const resetPick = () => { pick.reset(); preFor = ''; };
+const resetPick = () => { pick.reset(); preFor = ''; tmOpen = false; };
 
 function load() {
     if (L) return Promise.resolve();
@@ -157,6 +157,7 @@ function secKeyFor(seg, gid = v.grade) {
     return SEQ.WRM_SEQUENCE.find((g) => g.id === gid)?.units.some((u) => u.id === seg) && secs.some((x) => x.extra) ? 'extra' : '';
 }
 function setLesson(l) {
+    if (v.lesson !== l.key) tmOpen = false;
     v.grade = l.grade;
     v.lesson = l.key;
     v.sec = (placeOf(l) || { sec: { key: '' } }).sec.key;
@@ -611,7 +612,7 @@ function actsHTML(l) {
     const made = madeLesson(l);
     const nPre = preItems().length;
     const nx = nextLesson();
-    const count = n ? `${n} skill${n === 1 ? '' : 's'} ticked` : 'Tick the skills you want';
+    const count = n ? `${n} skill${n === 1 ? '' : 's'} selected` : 'Tick the skills you want';
     const left = pick.link
         ? `<div class="tvw-linkbox"><label class="tvw-link-l" for="tvwLink">${esc(pick.linkNote || 'Practice link for pupils')}</label>
             <div class="tvw-linkrow"><input id="tvwLink" class="tv-input tvw-link" readonly value="${esc(pick.link)}">
@@ -648,6 +649,7 @@ async function shareLink() {
     const ok = await copyText(pick.link);
     pick.linkNote = ok ? `${what} · copied` : `${what} · copy it from the box`;
     redrawActs();
+    barH();
     toast(ok ? `Practice link copied · ${items.length} skill${items.length === 1 ? '' : 's'}` : 'Link ready: copy it from the box');
     root.querySelector('#tvwLink')?.select();
 }
@@ -753,8 +755,12 @@ function redrawDetail() {
 /** The picker's after-draw, then the toast sits above the TRAY bar (the lesson's actions are not a sticky bar). */
 function after(d) {
     pick.after(d);
+    barH();
+    requestAnimationFrame(barH);
+}
+function barH() {
     const tb = document.getElementById('tvTray');
-    const h = tb && tb.offsetParent ? tb.offsetHeight : 0;
+    const h = tb && tb.getClientRects().length ? tb.offsetHeight : 0;   // (a fixed bar has no offsetParent)
     document.documentElement.style.setProperty('--tv-bar-h', `${h}px`);
     document.documentElement.style.setProperty('--tvw-tray-h', `${h}px`);
 }
