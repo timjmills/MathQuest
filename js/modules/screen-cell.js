@@ -418,8 +418,10 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
         if (sepAfter(i)) cells.push('<span class="ab sep"></span>');
     }
     const label = operands.join(` ${spokenOp(k.op)} `);
+    // (critic s3-stack r1 S1: the operator track, which holds only the sign, is its own variable,
+    // so a 6-digit stack can narrow it on a phone - screen-cell.css, max-width 480px)
     return `<div class="ws-sheet mq-kit" role="group" aria-label="${attr(label)}">`
-        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}${seps.length ? `;grid-template-columns:${Array.from({ length: T }, (_, i) => `var(--ws-track)${sepAfter(i) ? ' 0.3em' : ''}`).join(' ')}` : ''}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
+        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}${seps.length || T >= 7 ? `;grid-template-columns:${Array.from({ length: T }, (_, i) => `${i === 0 ? 'var(--mq-optrack, var(--ws-track))' : 'var(--ws-track)'}${sepAfter(i) ? ' 0.3em' : ''}`).join(' ')}` : ''}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
 }
 
 /**
