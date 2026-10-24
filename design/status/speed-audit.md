@@ -459,3 +459,35 @@ skill) is next.
   queued, not started.
 - **Lesson.** A check that compares counts must first say exactly which skill each count belongs to; that is the same root as the
   pilot's 236 → 124 miscount. Recorded as one class: COMPARE_SCOPE.
+
+### SU-C pilot — FINAL: stopped by the stop rule before critic r3; FAIL against §4.4
+
+- **Measure.** After the interim verdict: fix r2 (N1–N8) 22:24–23:40 on mq-opus-medium (76 min); base merged 00:18;
+  precritic pass 5 red only on the side-anchor class (5 matrix rows), so rule 0b blocked critic r3; **stop at 00:56** under
+  §1.7 / process rule 7: D12 (r1) → N5 (r2) survived two medium fix rounds. Totals: **16:41–00:56 = 8 h 15 min; 3 builder runs
+  (1 low, 2 medium) + 1 orchestrator pass; 2 critic rounds, both FAIL; 5 precritic passes; not passed.** Against §4.4: rounds
+  missed (no PASS), builder runs 3 vs 1, time 8 h 15 min vs 4 h.
+- **Causes of the stop.** The surviving class is engine debt outside the lane's files: in side-anchor mode the anchor pair is
+  laid out 50/50 (`sheet/anchors.js:260`, `print-sheet.js:2150-2153`), so a narrow stack sits in a half-page cell with ≥ 30 %
+  empty, and the approved `sub_100_regroup` and `add_50_no_regroup` show the same 6 × 32 %. **The machine check existed** (the
+  coverage matrix's ex-each and sections rows at L caught it from r1); the loop failed because nobody routed the fix to the
+  owning lane (mixed pages) when it was first seen at 19:41. The lane spent two fix rounds working round a file it could not
+  change. N2 (lesson Warm-up at L) has the same shape: it needs the lesson composer.
+- **Fixes.**
+  - **Rule (lead, when work resumes): a finding whose fix lies outside the lane's files is routed to the owning lane at
+    the round it is first seen, with the proposed patch.** The lane pins it as engine debt with that lane's owner and date, and
+    its critic does not count it against the lane. One round is lost, not three.
+  - F7 now applies: **certify `stack` × Single skill**, which means fixing the side-anchor sizing (the pilot's proposed patch:
+    size the pair's columns from content) and the lesson Warm-up cell size in the engine, before any further family on `stack`.
+    **Owner: mixed-pages lane (anchors.js, print-sheet.js), when work resumes.**
+  - F1 (card section generated from the repo) and F2 (the nine checks + two extras) stay the conditions for the next family.
+    They are recorded, not started, per the owner's stop.
+- **What the pilot did prove.** The new tools work: precritic caught every regression before r2 and blocked r3 correctly; the
+  sibling comparison, once fixed, separated engine debt from lane defects; the stop rule fired as designed. The family's default
+  Practice pages and every screen host reached ≥ 8 by r2. What is not shown is the speed: per skill ≈ 1.2 h (8 h 15 min ÷ 7) with
+  no PASS, against ≈ 1.3 h a skill and 3–4 rounds before Wave 0.
+
+**Acted-on count, final for 2026-10-23:** listed 18 checks + 10 speed-ups (pilot) + W0-A r6/r7 items. Built and in use: rules
+0a, 0b, the per-round findings rule, and W0-A's five pilot-lesson checks (sibling comparison, SLOT/CLIP on matrix rows, 390 card,
+card rulings, not-offered options), backtested 8/8 but not yet passed by their critic (r7 FAIL). Assigned and held by the owner's
+stop: F1, F2 (11 checks), F3–F5, F7, the routing rule above, and W0-A r7's D1/D2. Dropped: 0.
