@@ -452,10 +452,18 @@ export function easeScore(q = {}) {
  * problems): an anchor is a sibling item, never one of the pupil's (review note 5). When the
  * skill has fewer distinct examples than asked, the list cycles; with none, it is empty.
  */
-export function pickDistinct(cands, exclude, count, sigOf) {
+export function pickDistinct(cands, exclude, count, sigOf, digitsOf = null) {
     const ok = cands.filter((a) => !exclude.has(sigOf(a)));
     if (!ok.length) return [];
-    return Array.from({ length: Math.max(0, count) }, (_, i) => ok[i % ok.length]);
+    if (!digitsOf) return Array.from({ length: Math.max(0, count) }, (_, i) => ok[i % ok.length]);
+    // (critic s3-stack r1 M1: 23 − 11 beside 23 − 12) two examples whose digits differ in one
+    // place or none are near twins: the easiest examples that differ by more come first, the
+    // near ones only when the skill runs out.
+    const near = (x, y) => { const a = digitsOf(x), b = digitsOf(y); if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) d++; return d <= 1; };
+    const order = [];
+    for (const a of ok) if (!order.some((b) => near(a, b))) order.push(a);
+    for (const a of ok) if (!order.includes(a)) order.push(a);
+    return Array.from({ length: Math.max(0, count) }, (_, i) => order[i % order.length]);
 }
 
 /* ================================================================ SIDE BY SIDE */

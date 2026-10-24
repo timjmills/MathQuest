@@ -2084,7 +2084,8 @@ function _renderQuestionImpl() {
     if (skillLabelEl) {
         // The item's own skill: in a mixed set state.skill is the pool ('custom_mixed'), whose
         // grade is 'M', so every item used to wear an "M" whatever its real level.
-        const _itemSkill = q.skillId || state.skill;
+        // (a preset - skill-presets.js - wears its own name, not its host's: critic s3-stack r1 N9)
+        const _itemSkill = q.presetId || q.skillId || state.skill;
         const _itemCat = q.poolMember || q.categoryId || state.category;
         const _teacher = typeof document !== 'undefined' && document.body.classList.contains('teacher-mode');
         // Teacher-launched: the plain skill label ("Add within 20 (No Regrouping)"), never the

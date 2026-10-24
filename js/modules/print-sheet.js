@@ -2137,7 +2137,7 @@ function anchorSet(sk, si, n, { variant, colsList, twinCols, level }) {
             const sigOf = (a) => signature(a.source.q);
             const free = () => cands.filter((a) => !sigs.has(sigOf(a))).length;
             if (free() < count) grow(cands.length + count - free() + 2);
-            return pickDistinct(cands, sigs, count, sigOf);
+            return pickDistinct(cands, sigs, count, sigOf, (a) => String((a.source.q && a.source.q.text) || '').replace(/[^0-9]/g, ''));
         },
     };
 }
