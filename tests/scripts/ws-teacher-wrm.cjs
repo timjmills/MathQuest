@@ -152,6 +152,24 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     await sleep(50);
     await page.click(sel);
   };
+  // T4: the quick tick row went (each list keeps its Select all): "Everything" = every list's Select all on
+  const tickAll = async (scope = '[data-screen="wrm"].is-active') => {
+    for (const b of await page.$$(`${scope} [data-w-all]`)) {
+      const on = await b.evaluate((x) => x.getAttribute('aria-checked') === 'true');
+      if (!on) { const sel = await b.evaluate((x) => `[data-w-all="${x.dataset.wAll}"]`); await tap(`${scope} ${sel}`); await sleep(80); }
+    }
+  };
+  const tickOnly = async (g, scope = '[data-screen="wrm"].is-active') => {
+    for (const x of ['direct', 'prereq', 'related']) {
+      const sel = `${scope} [data-w-all="${x}"]`;
+      if (!(await page.$(sel))) continue;
+      let on = await page.$eval(sel, (b) => b.getAttribute('aria-checked') === 'true');
+      if (on !== (x === g)) { await tap(sel); await sleep(80); on = await page.$eval(sel, (b) => b.getAttribute('aria-checked') === 'true'); }
+      if (on !== (x === g)) { await tap(sel); await sleep(80); }
+    }
+  };
+  // T4: "Skills to be made for this lesson" is folded at the end of the panel: unfold it before using it
+  const openTm = async () => { if (await page.$('[data-screen="wrm"].is-active [data-w-tm-toggle][aria-expanded="false"]')) { await tap('[data-screen="wrm"].is-active [data-w-tm-toggle]'); await sleep(150); } };
   const decode = (u) => page.evaluate((link) => {
     const c = new URL(link).searchParams.get('c') || '';
     return window.parseSkillCodeParts(c.split('|')[0]).map((s) => `${s.categoryId}|${s.skillId}`);
@@ -163,19 +181,18 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
   // B5: on a Chromebook the first skill row is on screen and no Tick button is under the sticky bar.
   const clearOfBar = async (tag) => {
     const r = await page.evaluate(() => {
-      const bar = document.querySelector('[data-screen="wrm"].is-active #tvwBar');
-      const barTop = bar ? bar.getBoundingClientRect().top : innerHeight;
-      // owner 2026-10-17: "Skills to be made for this lesson" sits right after the lesson head, before the skill groups,
-      // so on a Chromebook the first thing below the head that must be on screen is that card's heading (or the first
-      // skill row when the lesson has no card); the skill groups follow it
-      const row = document.querySelector('[data-screen="wrm"] #tvwToMake .tvw-tm-head') || document.querySelector('[data-screen="wrm"] .tvw-group .tvw-row, [data-screen="wrm"] .tvw-group .tvw-card');
+      // T4: the fixed bar is the TRAY (#tvTray); the lesson's actions (#tvwBar) sit in the panel under its head, so on a
+      // Chromebook the lesson's Print practice / Add to tray must be on screen and clear of the tray when it opens
+      const bar = document.querySelector('#tvTray');
+      const barTop = bar && bar.offsetParent ? bar.getBoundingClientRect().top : innerHeight;
+      const row = document.querySelector('[data-screen="wrm"] #tvwBar [data-w-act="tray"]') || document.querySelector('[data-screen="wrm"] .tvw-group .tvw-row, [data-screen="wrm"] .tvw-group .tvw-card');
       const rowTop = row ? row.getBoundingClientRect().top : 9999;
-      const under = [...document.querySelectorAll('[data-screen="wrm"] [data-w-quick], [data-screen="wrm"] [data-act="skill-view"]')]
+      const under = [...document.querySelectorAll('[data-screen="wrm"] #tvwBar button')]
         .filter((b) => { const q = b.getBoundingClientRect(); return q.width && q.bottom > barTop && q.top < innerHeight; }).map((b) => b.textContent.trim());
       return { barTop: Math.round(barTop), rowTop: Math.round(rowTop), under };
     });
-    check(r.rowTop + 40 <= r.barTop, `${tag}: first skill row at ${r.rowTop}px is not clear of the bar at ${r.barTop}px`);
-    check(!r.under.length, `${tag}: under the action bar: ${r.under.join(', ')}`);
+    check(r.rowTop + 40 <= r.barTop, `${tag}: the lesson's actions at ${r.rowTop}px are not clear of the tray bar at ${r.barTop}px`);
+    check(!r.under.length, `${tag}: under the tray bar: ${r.under.join(', ')}`);
   };
   const fit = async (tag, screen = 'wrm') => {
     const r = await page.evaluate((scr) => {
@@ -293,23 +310,31 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     await page.evaluate(() => window.scrollTo(0, 0));
     await shot('02-lesson-list-1366');
 
-    /* ---------------------------------------------------- tick: one, select all, quick groups */
+    /* ---------------------------------------------------- tick: the teaching skills come ticked (T4), one, select all */
+    const nDir = d.groups.find((g) => g[0] === 'direct')[1];
+    const nPre = d.groups.find((g) => g[0] === 'prereq')[1];
+    const ticked0 = await page.$$eval('[data-w-group="direct"] .tvw-tick[aria-checked="true"]', (b) => b.map((x) => x.dataset.wTick));
+    check(ticked0.length === nDir && await page.$$eval('.tvw-tick[aria-checked="true"]', (b) => b.length) === nDir, `opening: ${ticked0.length}/${nDir} teaching skills ticked (only they should be)`);
+    // untick the teaching skills (Select all twice: on, off), then one tick
+    await tap('[data-w-all="direct"]');
+    await sleep(100);
+    if (await page.$$eval('.tvw-tick[aria-checked="true"]', (b) => b.length)) { await tap('[data-w-all="direct"]'); await sleep(100); }
     const firstDirect = await page.$eval('[data-w-group="direct"] .tvw-tick', (b) => b.dataset.wTick);
     await tap('[data-w-group="direct"] .tvw-tick');
     await sleep(100);
-    check(await page.$eval('#tvwBar .tv-h3', (h) => /^1 skill ticked/.test(h.textContent)), 'tick: bar does not say 1 skill');
+    check(await page.$eval('#tvwBar .tv-h3', (h) => /^1 skill selected/.test(h.textContent)), 'tick: bar does not say 1 skill');
     await tap('[data-w-all="prereq"]');
     await sleep(100);
-    const nPre = d.groups.find((g) => g[0] === 'prereq')[1];
     check(await page.$eval('#tvwBar .tv-h3', (h, n) => h.textContent.startsWith(`${n + 1} skills`), nPre), 'select all prereq: count wrong');
-    await tap('[data-w-quick="direct"]');
+    await tap('[data-w-all="direct"]');
     await sleep(100);
-    const ticked = await page.$$eval('.tvw-tick[aria-checked="true"]', (b) => b.map((x) => x.dataset.wTick));
-    const nDir = d.groups.find((g) => g[0] === 'direct')[1];
-    check(ticked.length === nDir && ticked.includes(firstDirect), `quick direct ticked ${ticked.length}/${nDir}`);
-    await tap('[data-w-quick="prereq"]');
+    const ticked = await page.$$eval('[data-w-group="direct"] .tvw-tick[aria-checked="true"]', (b) => b.map((x) => x.dataset.wTick));
+    check(ticked.length === nDir && ticked.includes(firstDirect), `select all direct ticked ${ticked.length}/${nDir}`);
+    // only the do-first skills: untick the teaching ones again
+    await tap('[data-w-all="direct"]');
     await sleep(100);
     const tickedPre = await page.$$eval('.tvw-tick[aria-checked="true"]', (b) => [...new Set(b.map((x) => x.dataset.wTick))]);
+    check(tickedPre.length === new Set(await page.$$eval('[data-w-group="prereq"] .tvw-tick', (b) => b.map((x) => x.dataset.wTick))).size, `only do-first ticked: ${tickedPre.length}`);
 
     /* ---------------------------------------------------- practice link decodes to the ticked skills */
     await tap('[data-w-act="link"]');
@@ -337,32 +362,30 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     await page.click('[data-act="skill-view"][data-view="list"]');
     await sleep(150);
 
-    /* ---------------------------------------------------- print opens with the ticked skills */
-    const labels = await page.$$eval('.tvw-row', (rows) => rows.filter((r) => r.querySelector('.tvw-tick[aria-checked="true"]')).map((r) => r.querySelector('.tvw-row-name').textContent.trim()));
+    /* ---------------------------------------------------- Print practice: the sheet opens on ONLY the ticked skills (T4) */
+    const trayBefore = await page.evaluate(() => JSON.stringify((window.skillQueue || []).map((x) => `${x.categoryId}|${x.skillId}`)));
     await tap('[data-w-act="print"]');
-    await sleep(600);
-    const pr = await page.evaluate((names) => {
-      const el = document.querySelector('#teacherMain .tv-screen.is-active');
-      // the Print screen may name a skill by its library label ("(B&W)") or without the bracket
-      const forms = (n) => [n, n.replace(/([A-Za-z]{2,}), (?=[A-Za-z]{2,}\b)/g, "$1/"), n.replace(/\(black and white\)/g, '(B&W)'), n.replace(/\s*\(black and white\)/g, '')];
-      const miss = names.filter((n) => !forms(n).some((f) => el.textContent.includes(f)));
-      return { screen: el && el.dataset.screen, has: names.length - miss.length, miss, hash: location.hash };
-    }, labels);
-    check(pr.screen === 'print' && pr.has === labels.length, `print: ${JSON.stringify(pr)} of ${labels.length} (${rich.key})`);
-    check(pr.hash === '', `print: hash not cleared (${pr.hash})`);
+    await waitFor(page, () => !!document.querySelector('#tvSheet .tvs-sheet'), 8000, 'print sheet');
+    const pr = await page.evaluate(() => ({ st: window.tvSheetState(), keys: (window.skillQueue || []).map((x) => `${x.categoryId}|${x.skillId}`), hash: location.hash, screen: (document.querySelector('#teacherMain .tv-screen.is-active') || {}).dataset?.screen }));
+    check(pr.st.sheet === 'print' && pr.st.kind === 'sections' && pr.keys.length === tickedPre.length && tickedPre.every((k) => pr.keys.includes(k)), `print practice: sheet ${pr.st.sheet} ${pr.st.kind}, skills ${JSON.stringify(pr.keys)} not ${JSON.stringify(tickedPre)}`);
+    check(pr.screen === 'wrm' && pr.hash === links.lessonHash(rich), `print practice: left the lesson (${pr.screen} ${pr.hash})`);
+    await page.keyboard.press('Escape');
+    await sleep(300);
+    const back = await page.evaluate(() => ({ sheet: !!document.querySelector('#tvSheet'), tray: JSON.stringify((window.skillQueue || []).map((x) => `${x.categoryId}|${x.skillId}`)), title: (document.querySelector('.tvw-title') || {}).textContent || '' }));
+    check(!back.sheet && back.tray === trayBefore && back.title.includes(rich.title), `print practice closed: the tray did not come back, or the lesson left (${JSON.stringify(back)} vs ${trayBefore})`);
 
-    /* ---------------------------------------------------- Back returns to the lesson */
-    await page.goBack();
-    await waitFor(page, () => !!document.querySelector('#teacherMain .tv-screen.is-active[data-screen="wrm"] .tvw-head'), 8000, 'back to wrm').catch(() => {});
-    const back = await page.evaluate(() => ({ screen: (document.querySelector('#teacherMain .tv-screen.is-active') || {}).dataset?.screen, hash: location.hash, title: (document.querySelector('.tvw-title') || {}).textContent || '' }));
-    check(back.screen === 'wrm' && back.title.includes(rich.title), `back: ${JSON.stringify(back)}`);
-
-    /* ---------------------------------------------------- per-card quick buttons */
-    const oneKey = await page.$eval('[data-w-group="related"] [data-w-one="link"]', (b) => b.dataset.wKey);
-    await tap('[data-w-group="related"] [data-w-one="link"]');
+    /* ---------------------------------------------------- one tick → a one-skill practice link */
+    for (const g of ['direct', 'prereq', 'related']) {
+      if (await page.$eval(`[data-w-all="${g}"]`, (b) => b.getAttribute('aria-checked') === 'true').catch(() => false)) { await tap(`[data-w-all="${g}"]`); await sleep(80); }
+      while (await page.$(`[data-w-group="${g}"] .tvw-tick[aria-checked="true"]`)) { await tap(`[data-w-group="${g}"] .tvw-tick[aria-checked="true"]`); await sleep(80); }
+    }
+    const oneKey = await page.$eval('[data-w-group="related"] .tvw-tick', (b) => b.dataset.wTick);
+    await tap('[data-w-group="related"] .tvw-tick');
+    await sleep(100);
+    await tap('[data-w-act="link"]');
     await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'one link');
     const one = await decode(await page.$eval('#tvwLink', (i) => i.value));
-    check(one.length === 1 && one[0] === oneKey, `card Practice: link has ${JSON.stringify(one)} not ${oneKey}`);
+    check(one.length === 1 && one[0] === oneKey, `one tick: link has ${JSON.stringify(one)} not ${oneKey}`);
 
     /* ---------------------------------------------------- search jump */
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -433,15 +456,15 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
     await sleep(1000);
     await fit('1280 thumbs');
     await shot('11-thumbs-1280');
-    await tap('[data-w-quick="all"]');
+    await tickAll();
     await tap('[data-w-act="link"]');
     await sleep(300);
     await page.evaluate(() => window.scrollTo(0, 400));
     await fit('1280 link');
     await shot('12-everything-link-1280');
-    // the sticky bar stays on screen while the skills scroll
-    const bar = await page.$eval('#tvwBar', (b) => { const r = b.getBoundingClientRect(); return r.bottom <= window.innerHeight + 1 && r.top < window.innerHeight; });
-    check(bar, '1280: action bar not visible while scrolled');
+    // the tray bar stays on screen while the skills scroll (T4: the fixed bar of the Lessons place)
+    const bar = await page.$eval('#tvTray', (b) => { const r = b.getBoundingClientRect(); return r.bottom <= window.innerHeight + 1 && r.top < window.innerHeight; });
+    check(bar, '1280: tray bar not visible while scrolled');
     await page.click('[data-act="skill-view"][data-view="list"]');
 
     /* ---------------------------------------------------- dark mode, keyboard */
@@ -510,6 +533,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await page.evaluate(() => window.scrollTo(0, 0));
       await fit('1366 curated lesson');
       await shot('14-curated-to-be-built-1366');
+      await openTm();
       await tap('#tvwToMake .tvw-tm-link[data-todo-open]');
       await page.evaluate((id) => { window.__tbb = id; }, tbbId);
       await waitFor(page, () => !!document.querySelector(`[data-screen="todo"].is-active [data-t-item="${CSS.escape(window.__tbb)}"].is-open`), 15000, 'todo at entry');
@@ -523,7 +547,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await page.evaluate((h) => { location.hash = h; }, `${links.lessonHash(optLesson)}`);
       await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 10000, 'opt lesson');
       await sleep(300);
-      await tap('[data-w-quick="prereq"]');
+      await tickOnly('prereq');
       await tap('[data-w-act="link"]');
       await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'opt link');
       const od = await decodeOpts(await page.$eval('#tvwLink', (i) => i.value));
@@ -575,7 +599,9 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           covers: (r.querySelector('.tvw-tm-what') || {}).textContent || '', status: (r.querySelector('.tvw-tm-status') || {}).textContent || '',
           todo: (r.querySelector('[data-todo-open]') || { dataset: {} }).dataset.todoOpen || '', dl: !!r.querySelector('[data-w-dl-goto]'),
           link: ((r.querySelector('[data-todo-open], [data-w-dl-goto]') || {}).textContent || '').trim() }));
-        return { afterHead: head && head.nextElementSibling === c, title: c.querySelector('#tvwTmH').textContent, count: +((c.querySelector('.tvw-tm-head .tvw-tm-count') || {}).textContent || 0),
+        // T4: the card is folded into a section at the END of the lesson panel
+        const panel = document.querySelector('#tvwDetail');
+        return { afterHead: !!head && !!panel && panel.lastElementChild === c.closest('.tvw-tm-wrap'), folded: c.hidden && !!c.closest('.tvw-tm-wrap').querySelector('[data-w-tm-toggle][aria-expanded="false"]'), title: c.querySelector('#tvwTmH').textContent, count: +((c.querySelector('.tvw-tm-head .tvw-tm-count') || {}).textContent || 0),
           lead: (c.querySelector('.tvw-tm-lead') || {}).textContent || '', empty: (c.querySelector('.tvw-tm-empty') || {}).textContent || '',
           items: rows('lesson'), pre: rows('pre'), preHead: (c.querySelector('#tvwTmPre') || {}).textContent || '',
           oldLine: !!document.querySelector('#tvwDetail .tvw-head .tvw-tbb, #tvwDetail [data-w-group] .tvw-tbb') };
@@ -583,7 +609,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       const checkCard = async (l, tag) => {
         const want = tmOf(l);
         const f = await cardFacts();
-        check(f.afterHead && f.title === 'Skills to be made for this lesson', `${tag}: the card is not right after the lesson head (${f.title})`);
+        check(f.afterHead && f.title === 'Skills to be made for this lesson', `${tag}: the card is not folded at the end of the lesson panel (${f.title})`);
         check(!f.oldLine, `${tag}: the old "Still to make" line is still shown`);
         check(f.count === want.items.length && f.items.length === want.items.length, `${tag}: ${f.items.length} rows (badge ${f.count}), want ${want.items.length}`);
         check(JSON.stringify(f.items.map((x) => x.todo)) === JSON.stringify(want.items.map((x) => x.todo)), `${tag}: rows ${f.items.map((x) => x.todo)} not ${want.items.map((x) => x.todo)}`);
@@ -615,12 +641,15 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           await vp(w, h);
           await openLesson(l);
           const { f, want } = await checkCard(l, `to-make ${tag} ${l.key} @${w}`);
+          // folded when a lesson opens (the same lesson again keeps the teacher's unfolding)
+          if (w === 1280) check(f.folded, `to-make ${tag} ${l.key}: the card is not folded when the lesson opens`);
           if (w === 1280) report.push(`${tag} ${l.gradeLabel} "${l.title}": ${f.items.map((x) => `[${x.kind}] ${x.name}`).join(' | ') || f.empty}`);
           if (tag === 'c') check(f.items.some((x) => x.todo === 'mult_standard' && x.name === 'Multi-Digit Multiplication: Standard Algorithm'), `to-make c ${l.key}: mult_standard not listed`);
           if (tag === 'd') check(f.empty === TMK.EMPTY_FULL && !want.items.length, `to-make d ${l.key}: empty line "${f.empty}"`);
           await fit(`to-make ${tag} @${w}`);
           { const ov = await page.$$eval('#tvwToMake button, #tvwUnitToMake button', (bs) => bs.filter((x) => x.getClientRects().length && x.scrollWidth > x.clientWidth + 1).map((x) => x.textContent.trim()));
             check(!ov.length, `to-make @${w}: button text spills out of its button: ${ov.slice(0, 3).join(', ')}`); }
+          await openTm();
           await page.$eval('#tvwToMake', (el) => el.scrollIntoView({ block: 'start' }));
           await sleep(100);
           await elShot('#tvwToMake', `${name}-${w}`);
@@ -637,6 +666,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await vp(1366, 768);
       await openLesson(b || a);
       const first = await page.$eval('#tvwToMake [data-todo-open]', (x) => x.dataset.todoOpen);
+      await openTm();
       await tap('#tvwToMake [data-todo-open]');
       await page.evaluate((id) => { window.__tmo = id; }, first);
       await waitFor(page, () => !!document.querySelector(`[data-screen="todo"].is-active [data-t-item="${CSS.escape(window.__tmo)}"].is-open`), 15000, 'todo at the to-make entry');
@@ -656,7 +686,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           await page.evaluate(() => { navigator.clipboard.writeText = (t) => { window.__copied = t; return Promise.resolve(); }; });
           await sleep(150);
           const fold = await page.$eval(`[data-screen="wrm"].is-active [data-w-tmu-toggle="${u}"]`, (b) => ({ text: b.textContent.trim(), exp: b.getAttribute('aria-expanded'), hidden: document.querySelector(`#tvwTmu-${b.dataset.wTmuToggle}`).hidden }));
-          check(fold.exp === 'false' && fold.hidden && fold.text === `Skills to be made for this domain (${rows.length}) — show`, `unit ${g} ${u} @${w}: folded button ${JSON.stringify(fold)}`);
+          check(fold.exp === 'false' && fold.hidden && fold.text === `Skills to be made for this area (${rows.length}) — show`, `unit ${g} ${u} @${w}: folded button ${JSON.stringify(fold)}`);
           await tap(`[data-screen="wrm"].is-active [data-w-tmu-toggle="${u}"]`);
           await sleep(150);
           const uf = await page.evaluate((sel) => {
@@ -670,7 +700,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           const wantTitle = `Skills to be made for Grade ${g} · ${links.domainName(dom)}`;
           check(!uf.hidden && uf.title === wantTitle && uf.atTop, `unit ${g} ${u} @${w}: title "${uf.title}" (want "${wantTitle}"), open ${!uf.hidden}, at the top of its section ${uf.atTop}`);
           check(uf.count === rows.length && uf.shown === Math.min(6, rows.length), `unit ${g} ${u} @${w}: badge ${uf.count} rows ${uf.shown}, want ${rows.length} (first 6 shown)`);
-          check(rows.length ? uf.forOk : uf.empty === TMK.EMPTY_UNIT, `unit ${g} ${u} @${w}: a row lacks its parts or lessons`);
+          check(rows.length ? uf.forOk : uf.empty === TMK.EMPTY_UNIT.replace(/\bdomain\b/, 'area'), `unit ${g} ${u} @${w}: a row lacks its parts or lessons`);
           if (rows.length > 6) check(uf.all === `Show all ${rows.length}`, `unit ${g} ${u}: "Show all" button "${uf.all}"`);
           await fit(`unit ${g} ${u} @${w}`);
           { const ov = await page.$$eval(`#tvwToMake button, ${CARD} button, [data-w-tmu-toggle]`, (bs) => bs.filter((x) => x.getClientRects().length && x.scrollWidth > x.clientWidth + 1).map((x) => x.textContent.trim()));
@@ -1005,12 +1035,15 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await waitFor(page, `!!document.querySelector(${JSON.stringify(sel)})`, 20000, tag);
       await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.resolve(); });
       const scope = sel.split(' ')[0];
-      for (const b of [`${scope} [data-w-quick="all"]`, `${scope} [data-w-act="link"]`]) {
+      // T4: the Lessons place has no quick tick row and no sticky bar of its own: every Select all, and the tray bar
+      const wrmScope = /data-screen="wrm"/.test(scope);
+      if (wrmScope) await tickAll(scope);
+      for (const b of [...(wrmScope ? [] : [`${scope} [data-w-quick="all"]`]), `${scope} [data-w-act="link"]`]) {
         await page.$eval(b, (e) => e.scrollIntoView({ block: 'center' })); await sleep(80); await page.click(b); await sleep(250);
       }
       const r = await page.evaluate(() => {
         const t = [...document.querySelectorAll('.tv-toast')].find((x) => x.getBoundingClientRect().height);
-        const bar = document.querySelector('#teacherMain .tv-screen.is-active .tvw-bar');
+        const bar = document.querySelector('#teacherMain .tv-screen.is-active .tvw-bar') || document.querySelector('#tvTray');
         return { tb: t ? t.getBoundingClientRect().bottom : null, bt: bar.getBoundingClientRect().top };
       });
       check(r.tb !== null, `toast ${tag}: no toast after Practice link`);
@@ -1039,7 +1072,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       await page.goto(`${base}/index.html#wrm/2/D1/1`, { waitUntil: 'networkidle2', timeout: 60000 });
       await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'm8 wrm');
       await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.resolve(); });
-      await tap('[data-screen="wrm"].is-active [data-w-quick="all"]');
+      await tickAll();
       await tap('[data-screen="wrm"].is-active [data-w-act="link"]');
       await sleep(80);
       const on1 = await page.evaluate(() => document.getElementById('tvToast')?.classList.contains('is-on'));
@@ -1125,7 +1158,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         const tv = await page.evaluate(() => ({ tag: (document.querySelector('#tvwDetail [data-w-verdict-tag]') || {}).dataset?.wVerdictTag || '', flag: (document.querySelector('#tvwDetail [data-w-flag]') || {}).textContent || '' }));
         const r = links.linksFor(siteTagged);
         check(tv.tag === r.verdict && tv.flag === links.siteFlagText(siteTagged), `tagged site lesson head ${JSON.stringify(tv)} want ${r.verdict}`);
-        await tap('[data-w-quick="direct"]');
+        await tickOnly('direct');
         await tap('[data-w-act="link"]');
         await waitFor(page, () => !!document.querySelector('#tvwLink'), 5000, 'site link');
         const sd = await decode(await page.$eval('#tvwLink', (i) => i.value));
@@ -1411,9 +1444,10 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           const back = d.querySelector('[data-w-back]');
           const b = back && back.getBoundingClientRect();
           return { fixed: getComputedStyle(d).position, top: Math.round(r.top), right: Math.round(r.right), bottom: Math.round(r.bottom), W: innerWidth, H: innerHeight,
+            tray: ((t) => (t && t.getClientRects().length ? Math.round(t.getBoundingClientRect().top) : innerHeight))(document.querySelector('#tvTray')),
             back: b ? [Math.round(b.width), Math.round(b.height), Math.round(b.top), back.textContent.trim()] : null, focus: document.activeElement === back };
         });
-        check(o.fixed === 'fixed' && o.top === 0 && o.right === o.W && o.bottom === o.H && o.back && o.back[0] >= 44 && o.back[1] >= 44 && o.back[2] >= 0 && o.back[3] === 'Back to the lessons' && o.focus,
+        check(o.fixed === 'fixed' && o.top === 0 && o.right === o.W && Math.abs(o.bottom - o.tray) <= 1 && o.back && o.back[0] >= 44 && o.back[1] >= 44 && o.back[2] >= 0 && o.back[3] === 'Back to the lessons' && o.focus,
           `slide-over @${w}: ${JSON.stringify(o)}`);
         await side(`slide-over @${w}`);
         await rows390(`slide-over @${w}`);

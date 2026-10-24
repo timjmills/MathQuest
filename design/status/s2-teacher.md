@@ -105,3 +105,16 @@ its decisions, not re-decide them. The README there lists each round's decisions
 |---|---|
 | Two builders split one feature at the plan/tray boundary; field names drifted (groups, locks, total) | define the shared state module + its API in the brief before splitting |
 | Owner changes arrived mid-build (6 in one session) | fold them in at once but re-run the number checks after each, not only at the end |
+| 2026-10-24 | T3 fixed (64150b2, f77d44b, 991ceca, f8793e0) and merged with base (1ca4554); all 8 gates OK; reported to lead | lane lead | done |
+| 2026-10-24 | T4 built (dd51903, d3770d6, 7db3d1f, 9006b52): Lessons in the T3 look, lesson panel, multi-lesson sets with Print all | mq-opus-medium | built |
+| 2026-10-24 | T4 check (9006b52): clear bugs — loose skills dropped from a lesson-group print; summary false with lesson groups (says 3 pages · 12, PDFs 5–18 pages · 22–25); detailed Print lesson detours to the old print screen (6–7 actions, plan 4); pre-skills leaves a tray group. Clean: order, keys, ticked-only, #wrm, opens-where-last, no console errors; 8 gates OK | mq-opus-medium | fixes running (same builder) |
+
+### Per-round lists (rule 00), T4 check
+
+| Finding | Check that would have caught it |
+|---|---|
+| Summary false with lesson groups | summary numbers == PDF pages/problems for every Print option (same rule as T3's plan-pdf-check, extended to batches) |
+| Loose skills dropped | tray-in == skills-printed set equality for mixed trays (groups + loose) |
+| Detailed lesson detour | flow table runs every Lessons row incl. a detailed lesson, not only the standard maker |
+| Repeat of T3's class (summary ≠ output) | every new print path must be added to plan-pdf-check in the same commit (brief rule for T5/T6) |
+| 2026-10-24 | Owner (direct): "T5 we don't need classes right now" → T5 skipped. Classes keeps T2's tabs onto today's screens (Run on the board, Quizzes, MAP tests, Progress), all reachable; no new Classes build. Next after T4: T6 | lane lead | T5 skipped |

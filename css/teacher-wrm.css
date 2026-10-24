@@ -432,3 +432,79 @@ html.dark body.teacher-mode .tvw-tag.tvw-tm-kind { color: #f2f2f2; border-color:
     .tv-chip.tvw-dombtn { flex: 1 1 140px; }
 }
 html.dark body.teacher-mode .tvw-ngrid.is-open > .tvw-panel { box-shadow: -8px 0 24px rgba(0, 0, 0, .5); }
+
+/* =====================================================================================================================
+   Teacher site 2.0, T4: the LESSONS place in the T3 look (title + subtitle + meta, the search top right, ONE white
+   filter card: Grade · divider · Maths area; indigo selected states; grade pills in the grade colours, always with
+   their label). The lesson panel: head · the lesson's actions · the skill lists · detailed lesson · Skills to be made
+   (folded). The tray bar shows here too (lesson groups). Light only; tokens of css/teacher-tokens.css. ADDITIVE.
+   ===================================================================================================================== */
+body.teacher-mode.tv-on-screen:not(.tv-play):not(.tv-board):has(#teacherMain > .tv-screen.is-active[data-screen="wrm"]) #teacherApp #tvTray { display: flex; }
+#teacherApp .tv-screen[data-screen="wrm"] { padding-bottom: calc(var(--tvw-tray-h, 96px) + var(--sp-32)); }
+#teacherApp .tvw-top { margin-bottom: calc(var(--sp-8) + var(--sp-4)); }
+#teacherApp .tvw-top .ts-search { max-width: none; }
+#teacherApp .tvw-top .tvw-hits { z-index: 30; }
+#teacherApp .tvw-filters { margin-bottom: var(--sp-16); }
+#teacherApp .tvw-filters .ts-pill { min-width: var(--control); }
+#teacherApp .tvw-doms .tvw-dombtn.is-extra { border-style: dashed; }
+#teacherApp .tvw-doms .tvw-dombtn[aria-pressed="true"] { border-style: solid; }
+#teacherApp .tvw-navlist { max-height: calc(100vh - var(--sp-32) - var(--tvw-tray-h, 0px)); }
+#teacherApp .tvw-lesson.tvw-nrow[aria-current="true"] { background: var(--action-soft); border-color: var(--action); box-shadow: inset var(--sp-4) 0 0 var(--action); }
+#teacherApp .tvw-next {
+  display: inline-flex; align-items: center; margin-left: var(--sp-4); padding: 0 var(--sp-8); border-radius: var(--r-8);
+  background: var(--action); color: var(--action-on); font-size: var(--fs-12); line-height: 20px; font-weight: var(--fw-700); vertical-align: 2px;
+}
+
+/* the lesson's actions */
+#teacherApp .tvw-acts { display: flex; flex-direction: column; gap: var(--sp-16); }
+#teacherApp .tvw-acts-main { display: flex; flex-wrap: wrap; gap: var(--sp-8); }
+#teacherApp .tvw-acts-main .tv-btn, #teacherApp .tvw-acts-tray .tv-btn { min-height: 48px; height: auto; }
+#teacherApp .tvw-acts .tv-btn-primary, #teacherApp .tvw-lp .tvs-primary { background: var(--action); border-color: var(--action); color: var(--action-on); }
+#teacherApp .tvw-acts .tv-btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+#teacherApp .tvw-acts-sub { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-8) var(--sp-16); padding-top: var(--sp-16); border-top: var(--line-1) solid var(--line); }
+#teacherApp .tvw-acts-sub .tv-actionbar-text { min-width: 0; }
+#teacherApp .tvw-acts-sub .tv-cap { margin: 0; }
+#teacherApp .tvw-acts-tray { display: flex; flex-wrap: wrap; gap: var(--sp-8); }
+#teacherApp .tvw-skills-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-8); margin-top: var(--sp-8); }
+#teacherApp .tvw-skills-h .tv-h3 { margin: 0; }
+#teacherApp .tvw-skills-h .tvw-viewtog { margin-left: auto; }
+/* the ticks and the panel's actions replace the per-row Practice / Print buttons */
+#teacherApp .tv-screen[data-screen="wrm"] .tvw-q { display: none; }
+#teacherApp .tvw-row.is-on { border-color: var(--action); background: var(--action-soft); }
+#teacherApp .tvw-card.is-on { border-color: var(--action); }
+#teacherApp .tvw-tm-wrap { display: flex; flex-direction: column; gap: var(--sp-8); min-width: 0; }
+#teacherApp .tvw-tm-wrap > .tvw-tm { margin: 0; }
+#teacherApp .tvw-panel-top .tvw-nextl-top { margin-left: auto; }
+
+/* the Print sheet's lesson block */
+#teacherApp .tvw-lp .tvs-row-body { display: flex; flex-direction: column; gap: var(--sp-8); align-items: flex-start; }
+
+/* the tray bar's lesson groups */
+#teacherApp .tt-items.tt-lessons .tt-lesson .tt-name { font-weight: var(--fw-700); }
+#teacherApp .tt-lessonbox { display: flex; flex-direction: column; gap: var(--sp-8); margin-bottom: var(--sp-16); }
+#teacherApp .tt-lgroup { border: var(--line-1) solid var(--line); border-left: var(--sp-4) solid var(--action); border-radius: var(--r-8); padding: var(--sp-8); background: var(--surface); }
+#teacherApp .tt-lgroup .tt-items-p { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
+
+@media (max-width: 1023px) {
+  #teacherApp .tvw-ngrid.is-open > .tvw-panel { bottom: var(--tvw-tray-h, 0px); }
+}
+@media (max-width: 819px) {
+  #teacherApp .tvw-ngrid.is-open > .tvw-panel { left: 0; bottom: calc(var(--tv2-bar) + var(--tvw-tray-h, 0px)); }
+  #teacherApp .tv-screen[data-screen="wrm"] { padding-bottom: calc(var(--tvw-tray-h, 56px) + var(--sp-16)); }
+  #teacherApp .tvw-acts-main .tv-btn { flex: 1 1 calc(50% - var(--sp-8)); justify-content: center; }
+  #teacherApp .tvw-acts-tray { width: 100%; }
+  #teacherApp .tvw-acts-tray .tv-btn { flex: 1 1 0; justify-content: center; }
+}
+/* T4: the toast sits above the tray bar (the lesson's actions are not a sticky bar) */
+body.teacher-mode:has(#teacherMain .tv-screen.is-active[data-screen="wrm"]) .tv-toast { bottom: calc(var(--tvw-tray-h, 64px) + var(--sp-16)); }
+@media (max-width: 819px) {
+  body.teacher-mode:has(#teacherMain .tv-screen.is-active[data-screen="wrm"]) .tv-toast { bottom: calc(var(--tvw-tray-h, 56px) + var(--tv2-bar) + var(--sp-8)); }
+}
+/* T4 check: lesson chips in the tray bar are capped, so three fit at 1366 (the full name is the chip's title) */
+#teacherApp .tt-items.tt-lessons .tt-li { max-width: 150px; }
+#teacherApp .tt-items.tt-lessons .tt-li .tt-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* T4 check: the Share sheet's code and link wrap at 390 (never cut off) */
+#teacherApp .tvs-codebox { grid-template-columns: minmax(0, 1fr); }
+#teacherApp .tvs-codebox > * { min-width: 0; max-width: 100%; }
+#teacherApp .tvs-codebox .tvs-code, #teacherApp .tvs-codebox .tvs-link-line code { word-break: break-all; white-space: normal; }
+#teacherApp .tvs-batch-rows { margin: var(--sp-8) 0 0; padding-left: var(--sp-16); display: grid; gap: var(--sp-4); }

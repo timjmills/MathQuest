@@ -23,9 +23,13 @@
 //   #wrm/<grade>/<unit>/<n|slug> a lesson (unchanged from the unit pages, so old bookmarks still open it)
 // The sequence and link data (~350 KB with standards) load the first time the screen opens, never at boot.
 
-import { icon, esc, hideToast, toast, copyText } from './teacher-ui.js';
-import { skillView } from './teacher-preview.js';
-import { createPicker, liveKey, skillLabelOf, makePracticeLink } from './teacher-skillpick.js';
+import { icon, esc, hideToast, toast, copyText, findSkill } from './teacher-ui.js';
+import { skillView, viewToggleHTML } from './teacher-preview.js';
+import { createPicker, liveKey, skillLabelOf, makePracticeLink, k2p } from './teacher-skillpick.js';
+import { restoreTray, syncTray, trayAddLesson, trayLessons, trayBorrow, trayReturn, trayKeys } from './teacher-tray.js';
+import { setPrintExtra, onSheetClose, printBatch } from './teacher-sheet.js';
+import { buildSheet } from './print-sheet.js';
+import { printHtml } from './teacher-print.js';
 import { loadYear, loadDetailed, loadLinksData } from './links-data.js';
 import { indexDetailed, detailedOf, DETAILED_CAP } from './detailed-links.js';
 import { printDetailedLesson } from './teacher-print.js';
@@ -50,6 +54,7 @@ const VERDICT = {
     gap: ['No skill yet', 'is-gap'],
 };
 const GRADE_KEY = 'mq_teacher_wrm_grade';
+const LAST_KEY = 'mq_teacher_wrm_last';   // T4: the last lesson opened, so the place opens there with "Next" marked
 const NARROW = '(max-width: 1023px)';
 const narrow = () => typeof matchMedia === 'function' && matchMedia(NARROW).matches;
 
@@ -60,6 +65,9 @@ const v = {
 let links = null;                    // linksFor(current lesson)
 let detailed = null;                 // data/curriculum/detailed-lessons.json, indexed (detailed-links.js), when the file exists
 const pick = createPicker({ idp: 'tvw', root: () => root, redraw: () => redrawDetail() });
+let preFor = '';                     // the lesson whose teaching skills were ticked on opening (T4: ticked by default)
+let tmOpen = false;                  // "Skills to be made for this lesson" unfolded (T4: folded by default)
+const resetPick = () => { pick.reset(); preFor = ''; tmOpen = false; };
 
 function load() {
     if (L) return Promise.resolve();
@@ -107,7 +115,7 @@ export function openWrmLesson(siteId) {
         const l = L && L.lessonBySite(siteId);
         if (!l) return false;
         setLesson(l);
-        pick.reset();
+        resetPick();
         writeHash(false);
         return ensureCurated().then(() => { window.tvGo?.('wrm'); return true; });
     });
@@ -119,7 +127,7 @@ export function openWrmStep(stepId) {
         const l = L && L.allLessons().find((x) => x.step === stepId);
         if (!l) return false;
         setLesson(l);
-        pick.reset();
+        resetPick();
         writeHash(false);
         return ensureCurated().then(() => { window.tvGo?.('wrm'); return true; });
     });
@@ -149,10 +157,33 @@ function secKeyFor(seg, gid = v.grade) {
     return SEQ.WRM_SEQUENCE.find((g) => g.id === gid)?.units.some((u) => u.id === seg) && secs.some((x) => x.extra) ? 'extra' : '';
 }
 function setLesson(l) {
+    if (v.lesson !== l.key) tmOpen = false;
     v.grade = l.grade;
     v.lesson = l.key;
     v.sec = (placeOf(l) || { sec: { key: '' } }).sec.key;
     rememberGrade();
+    try { localStorage.setItem(LAST_KEY, l.key); } catch (e) { /* per-viewer convenience only */ }
+}
+function rememberedLesson() { try { return localStorage.getItem(LAST_KEY) || ''; } catch (e) { return ''; } }
+/** Every lesson of the grade in list order (domains in the site's order, then Extra lessons). */
+function orderOf(gid = v.grade) { return gradeData(gid).secs.flatMap((s) => s.lessons); }
+/** The lesson after the open one (or after the last one opened): marked "Next", and the Next lesson ▸ arrow. */
+function nextLesson() {
+    const order = orderOf();
+    const cur = v.lesson || rememberedLesson();
+    const i = order.findIndex((l) => l.key === cur);
+    return i >= 0 ? order[i + 1] || null : null;
+}
+/** The lesson's place in every grade's order (lesson groups in the tray keep this order). */
+function ordOf(l) {
+    const gi = grades().findIndex((g) => g.id === l.grade);
+    return (gi + 1) * 10000 + orderOf(l.grade).findIndex((x) => x.key === l.key) + 1;
+}
+/** "Lesson 4: Add within 20" — the name a lesson group carries in the tray and on its worksheet. */
+function lessonName(l) {
+    const p = placeOf(l);
+    const lead = l.type === 'assessment' ? 'Assessment' : L.isCoreLesson(l) ? `Lesson ${p ? p.n : l.n}` : `Extra lesson ${p ? p.n : ''}`.trim();
+    return `${lead}: ${l.title}`;
 }
 function rememberGrade() { try { localStorage.setItem(GRADE_KEY, v.grade); } catch (e) { /* per-viewer convenience only */ } }
 function rememberedGrade() { try { return localStorage.getItem(GRADE_KEY) || ''; } catch (e) { return ''; } }
@@ -236,17 +267,30 @@ export function renderWrmScreen(el) {
     root = el;
     if (!el.dataset.built) {
         el.dataset.built = '1';
-        el.innerHTML = `<header class="tv-header"><div><h1 class="tv-h1">White Rose lessons</h1>
-          <p class="tv-sub">Choose a grade, then a lesson. Its skills open on the side. Tick skills, then make a practice link or print.</p></div>
-          <div class="tv-header-actions"><button type="button" class="tv-btn tv-btn-ghost" data-w-todo="1">${icon('list', 18)}<span>Skills to be made</span></button></div></header>
+        el.innerHTML = `<div class="ts-top tvw-top"><div class="ts-head-text"><h1 class="tv-h1 ts-title">Lessons</h1>
+            <p class="ts-sub">Choose a lesson. Tick its skills, then print, share or add it to the tray.</p><p class="ts-meta" id="tvwMeta"></p></div>
+          <div class="ts-search tvw-search"><label class="tv-sr" for="tvwSearch">Find a lesson</label>${icon('search', 20)}
+            <input id="tvwSearch" type="search" autocomplete="off" placeholder="Find a lesson: name or code (3.NF.A.1)" aria-controls="tvwHits">
+            <ul class="tvw-hits" id="tvwHits" role="listbox" aria-label="Lessons found" hidden></ul></div></div>
           <div class="tvw-body" id="tvwBody"><p class="tv-cap">Loading the lessons…</p></div>`;
         wire(el);
     }
     pick.view = skillView();
+    restoreTray();
+    syncTray();
     load().then(() => {
         if (!L) { el.querySelector('#tvwBody').innerHTML = '<p class="tv-cap">Could not load the lessons. Reload the page to try again.</p>'; return; }
         if (wrmHashActive()) readHash();
-        if (!v.grade) { const r = rememberedGrade(); v.grade = grades().some((g) => g.id === r) ? r : '2'; }
+        // a phone coming back to Lessons sees the list at the last lesson's area, the next lesson marked "Next"
+        else if (narrow() && v.lesson) { const l0 = L.lessonByKey(v.lesson); v.sec = (placeOf(l0) || { sec: { key: v.sec } }).sec.key; v.lesson = ''; resetPick(); }
+        if (!v.grade) {
+            const r = rememberedGrade(); v.grade = grades().some((g) => g.id === r) ? r : '2';
+            // T4: opens where the teacher was last — that grade's last lesson, the next one marked "Next"
+            const last = L.lessonByKey(rememberedLesson());
+            // on a phone the list opens at that lesson's area with the next one marked (the panel would cover the
+            // grade and area rows); wider, the lesson itself is open beside the list
+            if (last && last.grade === v.grade) { if (narrow()) v.sec = (placeOf(last) || { sec: { key: '' } }).sec.key; else setLesson(last); }
+        }
         writeHash(true);
         ensureCurated().then(() => {
             draw();
@@ -265,7 +309,7 @@ export function wrmOnHashChange() {
         if (!v.lesson && v.sec !== before.sec && v.sec) jumpTo(v.sec, false);
         return;
     }
-    pick.reset();
+    resetPick();
     ensureCurated().then(() => {
         if (v.grade !== before.grade || !root.querySelector('#tvwLessons')) draw();
         else showLesson();
@@ -287,22 +331,20 @@ function draw() {
         }
     }
     const g = gradeRec();
+    drawMeta();
     body.innerHTML = `
-      <div class="tvw-find tvw-nfind">
-        <div class="tv-search tvw-search"><span aria-hidden="true">${icon('search', 18)}</span>
-          <label class="tv-sr" for="tvwSearch">Find a lesson</label>
-          <input id="tvwSearch" class="tv-input" type="search" autocomplete="off" placeholder="Find a lesson in any grade: title or standard (3.NF.A.1)" value="${esc(v.query)}" aria-controls="tvwHits">
-          <ul class="tvw-hits" id="tvwHits" role="listbox" aria-label="Lessons found" hidden></ul></div>
-        <div class="tvw-navrow" role="group" aria-labelledby="tvwGradeH"><span class="tvw-pick-h" id="tvwGradeH">Grade</span>
-          <div class="tvw-navbtns">${grades().map((x) => `<button type="button" class="tv-chip tvw-gradebtn" data-w-grade="${esc(x.id)}" aria-pressed="${x.id === v.grade}" aria-label="${esc(x.label)}">${esc(GRADE_BTN[x.id] || x.label)}</button>`).join('')}</div></div>
-        <nav class="tvw-navrow" aria-labelledby="tvwDomH"><span class="tvw-pick-h" id="tvwDomH">Domain</span>
-          <div class="tvw-navbtns" id="tvwDoms">${domButtonsHTML()}</div></nav>
+      <div class="ts-filters tvw-filters">
+        <div class="ts-frow" role="group" aria-labelledby="tvwGradeH"><span class="ts-flabel" id="tvwGradeH">Grade</span>
+          <div class="ts-pills">${grades().map((x) => `<button type="button" class="ts-pill tvw-gradebtn" data-w-grade="${esc(x.id)}" data-grade="${esc(x.id)}" aria-pressed="${x.id === v.grade}" aria-label="${esc(x.label)}"><i class="ts-gsw" aria-hidden="true"></i>${esc(GRADE_BTN[x.id] || x.label)}</button>`).join('')}</div></div>
+        <div class="ts-fdiv" role="presentation"></div>
+        <nav class="ts-frow" aria-labelledby="tvwDomH"><span class="ts-flabel" id="tvwDomH">Maths area</span>
+          <div class="ts-seg tvw-doms" id="tvwDoms">${domButtonsHTML()}</div></nav>
       </div>
       <div class="tvw-ngrid${v.lesson ? ' is-open' : ''}" id="tvwGrid">
         <div class="tvw-navlist" id="tvwLessons" data-grade="${esc(v.grade)}" role="region" aria-label="${esc(`Lessons of ${g ? g.label : ''}`)}">${listHTML()}</div>
         <section class="tvw-detail tvw-panel" id="tvwDetail" aria-live="polite" aria-label="The lesson">${panelHTML()}</section>
       </div>`;
-    pick.after(root.querySelector('#tvwDetail'));
+    after(root.querySelector('#tvwDetail'));
     const list = root.querySelector('#tvwLessons');
     const a = anchor && list.querySelector(anchor.sel);
     if (a) {
@@ -311,14 +353,26 @@ function draw() {
     } else { const cur = list.querySelector('.tvw-nrow[aria-current="true"]'); if (cur) scrollRowIntoList(cur); }
 }
 
+/** "Grade 2 • 29 lessons": the grade and the lessons of the maths area the teacher is in. */
+function drawMeta() {
+    const meta = root && root.querySelector('#tvwMeta');
+    if (!meta) return;
+    const g = gradeRec();
+    const secs = sections();
+    const s = secs.find((x) => x.key === curSecKey()) || secs[0];
+    const n = s ? s.lessons.length : 0;
+    meta.textContent = `${g ? g.label : ''}${s ? ` • ${s.name}` : ''} • ${n} lesson${n === 1 ? '' : 's'}`;
+}
 function curSecKey() { const l = v.lesson ? L.lessonByKey(v.lesson) : null; return (l && (placeOf(l) || { sec: {} }).sec.key) || v.sec; }
 function domButtonsHTML() {
     const cur = curSecKey();
-    return sections().map((s) => `<button type="button" class="tv-chip tvw-dombtn${s.extra ? ' is-extra' : ''}" data-w-sec="${esc(s.key)}" aria-controls="tvwSec-${esc(s.key)}"${s.key === cur ? ' aria-current="true"' : ''}>${esc(s.name)}</button>`).join('');
+    return sections().map((s) => `<button type="button" class="tvw-dombtn${s.extra ? ' is-extra' : ''}" data-w-sec="${esc(s.key)}" aria-controls="tvwSec-${esc(s.key)}" aria-pressed="${s.key === cur}"${s.key === cur ? ' aria-current="true"' : ''}>${esc(s.name)}</button>`).join('');
 }
 
+let nextKey = '';
 function listHTML() {
     const secs = sections();
+    nextKey = (nextLesson() || {}).key || '';
     if (!secs.length) return '<p class="tv-cap tvw-pad">This grade has no lessons yet.</p>';
     return secs.map(secHTML).join('');
 }
@@ -334,7 +388,7 @@ function secHTML(s) {
             : rows(s.lessons);
     return `<section class="tvw-sec${s.extra ? ' is-extra' : ''}" id="tvwSec-${esc(s.key)}" data-w-secbox="${esc(s.key)}" aria-labelledby="tvwSecH-${esc(s.key)}">
         <h2 class="tvw-sec-h" id="tvwSecH-${esc(s.key)}" tabindex="-1"><span class="tvw-sec-t">${esc(s.name)}</span> <span class="tvw-sec-n">${n} lesson${n === 1 ? '' : 's'}</span></h2>
-        ${s.extra ? '<p class="tvw-sec-cap">Support lessons, projects, enrichment and assessments from the school site that are not part of a domain.</p>' : ''}
+        ${s.extra ? '<p class="tvw-sec-cap">Support lessons, projects, enrichment and assessments from the school site that are not part of a maths area.</p>' : ''}
         ${tmuWrapHTML(s)}
         ${body}
       </section>`;
@@ -345,7 +399,7 @@ function rowHTML(l, n) {
     const build = L.siteFlagText(l) === 'CCSS · BUILD';
     const tags = `${c ? `<span class="tvw-tag tvw-ntag is-${c}">${COVER_TAG[c]}</span>` : ''}${build ? '<span class="tvw-tag tvw-ntag is-build">CCSS · BUILD</span>' : ''}`;
     return `<li><button type="button" class="tvw-lesson tvw-nrow${c === 'gap' ? ' is-gap' : ''}" data-w-lesson="${esc(l.key)}" data-w-verdict="${c || 'none'}"${l.site ? ` data-w-site="${esc(l.site)}"` : ''}${l.key === v.lesson ? ' aria-current="true"' : ''}>
-      <span class="tvw-nrow-n">${n}</span><span class="tvw-nrow-t">${esc(l.title)}</span>${tags ? `<span class="tvw-nrow-tags">${tags}</span>` : ''}</button></li>`;
+      <span class="tvw-nrow-n">${n}</span><span class="tvw-nrow-t">${esc(l.title)}${l.key === nextKey ? ' <span class="tvw-next" data-w-next-mark="1">Next</span>' : ''}</span>${tags ? `<span class="tvw-nrow-tags">${tags}</span>` : ''}</button></li>`;
 }
 
 /**
@@ -362,7 +416,7 @@ function detailedHTML(l) {
         <h3 class="tv-h3" id="tvwDl-${esc(r.id)}">Detailed lesson: ${esc(r.title)}</h3>
         <p class="tv-cap">${esc(DETAILED_CAP)}</p>
         ${labels.length ? `<p class="tvw-dl-skills">Its skills: ${esc(labels.join(', '))}.</p>` : ''}
-        ${r.build.length ? `<p class="tvw-dl-skills tvw-dl-build">What it still needs made is listed in <button type="button" class="tvw-tbb-link" data-w-tm-goto="1">Skills to be made for this lesson</button> above.</p>` : ''}
+        ${r.build.length ? `<p class="tvw-dl-skills tvw-dl-build">What it still needs made is listed in <button type="button" class="tvw-tbb-link" data-w-tm-goto="1">Skills to be made for this lesson</button> below.</p>` : ''}
         <div class="tvw-files">${r.pack ? `<a class="tv-btn tv-btn-primary" data-w-dl-pack="${esc(r.id)}" href="${esc(r.pack)}" target="_blank" rel="noopener">${icon('sheet', 18)}<span>Open the detailed lesson</span></a>` : ''}${live.length ? `<button type="button" class="tv-btn" data-w-dl-link="${esc(r.id)}">${icon('link', 18)}<span>Practice link</span></button>` : ''}${detailedLessonFor(r.id) ? `<button type="button" class="tv-btn" data-w-dl-make="${esc(r.id)}">${icon('print', 18)}<span>Make it</span></button>` : ''}</div>
       </section>`;
     }).join('');
@@ -410,9 +464,9 @@ function toMakeRowHTML(x, { lessons = null } = {}) {
 function lessonToMakeHTML(l, lk, { fullOk }) {
     if (l.type === 'assessment') return '';
     if (!TM || !queue) {
-        return `<section class="tv-card tvw-tm" id="tvwToMake" aria-labelledby="tvwTmH" data-w-tomake="loading">
+        return `<div class="tvw-tm-wrap"><p class="tvw-sec-cap tvw-tmu-wait">Skills to be made for this lesson: loading…</p><section class="tv-card tvw-tm" id="tvwToMake" aria-labelledby="tvwTmH" data-w-tomake="loading" hidden>
           <div class="tvw-tm-head"><h3 class="tv-h3" id="tvwTmH">Skills to be made for this lesson</h3></div>
-          <p class="tv-cap">Loading the list of skills to be made…</p></section>`;
+          <p class="tv-cap">Loading the list of skills to be made…</p></section></div>`;
     }
     const r = TM.lessonToMake(l, lk, { queue, detailed: detailedOf(detailed, l) });
     const n = r.items.length;
@@ -424,10 +478,11 @@ function lessonToMakeHTML(l, lk, { fullOk }) {
            <p class="tv-cap tvw-tm-precap">Lessons before this one need these too. They help pupils get ready for it.</p>
            <ul class="tvw-tm-list" data-w-tm-list="pre" aria-labelledby="tvwTmPre">${r.pre.map((x) => toMakeRowHTML(x)).join('')}</ul>`
         : '';
-    return `<section class="tv-card tvw-tm" id="tvwToMake" aria-labelledby="tvwTmH" data-w-tomake="${n}">
+    return `<div class="tvw-tm-wrap"><button type="button" class="tv-btn tv-btn-sm tvw-tmu-fold tvw-tm-fold" data-w-tm-toggle="1" aria-expanded="${tmOpen}" aria-controls="tvwToMake">${icon(tmOpen ? 'chevD' : 'chevR', 16)}<span>Skills to be made for this lesson (${n}) — ${tmOpen ? 'hide' : 'show'}</span></button>
+      <section class="tv-card tvw-tm" id="tvwToMake" aria-labelledby="tvwTmH" data-w-tomake="${n}"${tmOpen ? '' : ' hidden'}>
         <div class="tvw-tm-head"><h3 class="tv-h3" id="tvwTmH">Skills to be made for this lesson</h3><span class="tvw-tm-count" aria-label="${n} to be made">${n}</span></div>
         ${body}${pre}
-      </section>`;
+      </section></div>`;
 }
 
 /** The domain (or Extra lessons) summary card at the top of a section: one folded button, the card under it. */
@@ -435,7 +490,7 @@ function tmuWrapHTML(s) {
     const g = gradeRec();
     if (!g) return '';
     const sk = esc(s.key);
-    if (!TM || !queue) return `<div class="tvw-tmu-wrap" data-w-tmu-wrap="${sk}"><p class="tvw-sec-cap tvw-tmu-wait">Skills to be made for this ${s.extra ? 'section' : 'domain'}: loading…</p></div>`;
+    if (!TM || !queue) return `<div class="tvw-tmu-wrap" data-w-tmu-wrap="${sk}"><p class="tvw-sec-cap tvw-tmu-wait">Skills to be made for this ${s.extra ? 'section' : 'area'}: loading…</p></div>`;
     const key = `${v.grade}|${s.key}`;
     if (!unitCache.has(key)) {
         unitCache.set(key, TM.unitToMake(s.lessons.map((l) => ({ lesson: l, links: L.linksFor(l, { live }), detailed: detailedOf(detailed, l) })), { queue }));
@@ -445,13 +500,13 @@ function tmuWrapHTML(s) {
     const open = tmuOpen.has(key);
     const all = tmuAll.has(key);
     const shown = all ? rows : rows.slice(0, UNIT_ROWS);
-    const what = s.extra ? 'these extra lessons' : 'this domain';
+    const what = s.extra ? 'these extra lessons' : 'this area';
     const title = `Skills to be made for ${g.label} · ${s.name}`;
     return `<div class="tvw-tmu-wrap" data-w-tmu-wrap="${sk}">
         <button type="button" class="tv-btn tv-btn-sm tvw-tmu-fold" data-w-tmu-toggle="${sk}" aria-expanded="${open}" aria-controls="tvwTmu-${sk}">${icon(open ? 'chevD' : 'chevR', 16)}<span>Skills to be made for ${what} (${n}) — ${open ? 'hide' : 'show'}</span></button>
         <section class="tv-card tvw-tmu" id="tvwTmu-${sk}" data-w-tomake-unit="${n}" data-w-tmu-sec="${sk}" aria-labelledby="tvwTmuH-${sk}"${open ? '' : ' hidden'}>
           <div class="tvw-tm-head"><h3 class="tv-h3 tvw-tmu-h" id="tvwTmuH-${sk}">${esc(title)}</h3><span class="tvw-tm-count" aria-label="${n} to be made">${n}</span></div>
-          ${!open ? '' : !n ? `<p class="tvw-tm-empty" data-w-tm-empty="unit">${esc(TM.EMPTY_UNIT)}</p>` : `
+          ${!open ? '' : !n ? `<p class="tvw-tm-empty" data-w-tm-empty="unit">${esc(TM.EMPTY_UNIT.replace(/\bdomain\b/, 'area'))}</p>` : `
           <p class="tvw-tm-lead">To cover every lesson of ${what} and its standards, these will be made. Each names the lessons it is for.</p>
           <ul class="tvw-tm-list" data-w-tm-list="unit">${shown.map((x) => toMakeRowHTML(x, { lessons: x.lessons })).join('')}</ul>
           ${n > UNIT_ROWS ? `<button type="button" class="tv-btn tv-btn-sm tvw-tmu-all" data-w-tmu-all="${sk}" aria-expanded="${all}">${all ? `Show the first ${UNIT_ROWS}` : `Show all ${n}`}</button>` : ''}`}
@@ -472,19 +527,22 @@ function panelHTML() {
         return `<div class="tv-card tvw-empty"><span class="tv-empty-icon" aria-hidden="true">${icon('book', 22)}</span>
           <div class="tv-h3">Choose a lesson</div><p class="tv-cap">Pick a lesson in the list, or find one with the search box. You will see the skills that teach it, the skills to do first and the skills that go with it.</p></div>`;
     }
-    return `<div class="tvw-panel-top"><button type="button" class="tv-btn tvw-back" data-w-back="1">${icon('back', 18)}<span>Back to the lessons</span></button></div>${detailHTML(l)}`;
+    const nx = nextLesson();
+    return `<div class="tvw-panel-top"><button type="button" class="tv-btn tvw-back" data-w-back="1">${icon('back', 18)}<span>Back to the lessons</span></button>${nx ? `<button type="button" class="tv-btn tvw-nextl-top" data-w-nextl="${esc(nx.key)}" aria-label="${esc(`Next lesson: ${nx.title}`)}"><span>Next lesson</span>${icon('chevR', 18)}</button>` : ''}</div>${detailHTML(l)}`;
 }
 
 function detailHTML(l) {
     links = L.linksFor(l, { live });
     pick.setGroups({ direct: links.direct, prereq: links.prereq, related: links.related });
+    // T4: the lesson's teaching skills are ticked when it opens (Print practice is then one press)
+    if (preFor !== l.key) { preFor = l.key; pick.ticked.clear(); for (const x of links.direct) if (liveKey(x.key)) pick.ticked.add(k2p(x.key)); }
     const assess = l.type === 'assessment';
     const tagged = links.source === 'curated';
     const notTagged = untagged(l, links.source);
     // m20 (WRM page critic r8): a lesson with a detailed lesson names that lesson's skills, so its empty lines say so
     const hasDl = detailedOf(detailed, l).length > 0;
     const files = l.step ? (SEQ.WRM_STEP_FILES[l.step] || []) : [];
-    const fileBtn = (id, label, ic, url) => (id ? `<a class="tv-btn${label.startsWith('Open lesson') ? ' tv-btn-primary' : ''}" href="${esc(url || `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`)}" target="_blank" rel="noopener">${icon(ic, 18)}<span>${label}</span></a>` : '');
+    const fileBtn = (id, label, ic, url) => (id ? `<a class="tv-btn" href="${esc(url || `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`)}" target="_blank" rel="noopener">${icon(ic, 18)}<span>${label}</span></a>` : '');
     const ee = (links.step && links.step.ee) || (l.siteInfo && l.siteInfo.ee) || [];
     const strands = l.strands.split('').map((s) => STRAND[s]).filter(Boolean);
     const vd = assess || notTagged || (l.type === 'build' && !tagged) ? null : VERDICT[links.verdict];
@@ -520,13 +578,201 @@ function detailHTML(l) {
         ${about.length ? `<div class="tvw-about">${about.map((t) => `<p>${esc(t)}</p>`).join('')}</div>` : ''}
         ${files.length ? `<div class="tvw-files">${fileBtn(files[0], l.type === 'copied' && l.from ? `Open lesson (${gradeWord(l.from)} files)` : 'Open lesson', 'external')}${fileBtn(files[1], 'Teaching guide', 'book')}${files[2] ? fileBtn('x', 'Video', 'play', files[2]) : ''}</div>` : ''}
         <p class="tvw-verdict${assess || notTagged ? ' is-quiet' : links.verdict === 'gap' || (l.type === 'build' && !tagged) ? ' is-gap' : ''}">${verdict}</p>
-        ${assess ? '' : pick.quickHTML([['direct', 'All teaching skills'], ['prereq', 'Do-first skills'], ['related', 'Go-with skills'], ['all', 'Everything']])}
       </div>
-      ${lessonToMakeHTML(l, links, { fullOk: !!vd && links.verdict === 'full' })}
-      ${detailedHTML(l)}
+      ${assess ? '' : actsHTML(l)}
+      ${assess ? '' : `<div class="tvw-skills-h"><h3 class="tv-h3">Skills for this lesson</h3><span class="tvw-viewtog">${viewToggleHTML(pick.view)}</span></div>`}
       ${assess ? '' : GROUPS.map(([g, h, cap]) => pick.groupHTML(g, h, cap, emptyText(g, l, notTagged, hasDl), '')).join('')}
-      ${assess ? '' : pick.barWrapHTML()}`;
+      ${detailedHTML(l)}
+      ${lessonToMakeHTML(l, links, { fullOk: !!vd && links.verdict === 'full' })}`;
 }
+
+/* ================================================================= the lesson's actions (T4)
+ * Print lesson (only for a lesson the app can make: one of the detailed lessons, or the standard lesson maker on the
+ * lesson's first teaching skill) · Print practice · Share practice · Practise pre-skills; then Add to tray (the ticked
+ * skills as ONE group named after the lesson) and Next lesson ▸. Print / Share practice use ONLY this lesson's ticked
+ * skills: the tray is put aside while the sheet is open and comes back when it closes. */
+function madeLesson(l) {
+    if (!l || l.type === 'assessment') return null;
+    const dl = detailedOf(detailed, l).find((r) => detailedLessonFor(r.id));
+    if (dl) return { kind: 'detailed', id: dl.id };
+    const first = (links && links.direct || []).find((x) => liveKey(x.key));
+    return first ? { kind: 'standard', item: first } : null;
+}
+function tickedItems() {
+    const all = pick.all();
+    return [...pick.ticked].map((pk) => {
+        const [c, sk] = pk.split('|');
+        const hit = all.find((x) => x.key === `${c}:${sk}`);
+        const it = { categoryId: c, skillId: sk, weight: 1 };
+        if (hit && hit.opts && Object.keys(hit.opts).length) it.opts = hit.opts;
+        return it;
+    }).filter((x) => findSkill(x.categoryId, x.skillId));
+}
+const preItems = () => (links ? links.prereq : []).filter((x) => liveKey(x.key)).map((x) => { const [c, sk] = x.key.split(':'); return x.opts && Object.keys(x.opts).length ? { categoryId: c, skillId: sk, weight: 1, opts: x.opts } : { categoryId: c, skillId: sk, weight: 1 }; });
+
+function actsHTML(l) {
+    const n = pick.ticked.size;
+    const dis = n ? '' : ' aria-disabled="true" data-why="Tick skills first"';
+    const made = madeLesson(l);
+    const nPre = preItems().length;
+    const nx = nextLesson();
+    const count = n ? `${n} skill${n === 1 ? '' : 's'} selected` : 'Tick the skills you want';
+    const left = pick.link
+        ? `<div class="tvw-linkbox"><label class="tvw-link-l" for="tvwLink">${esc(pick.linkNote || 'Practice link for pupils')}</label>
+            <div class="tvw-linkrow"><input id="tvwLink" class="tv-input tvw-link" readonly value="${esc(pick.link)}">
+            <button type="button" class="tv-btn" data-w-act="copy">${icon('copy', 18)}<span>Copy</span></button></div></div>` : '';
+    return `<section class="tv-card tvw-acts" id="tvwBar" aria-label="Print and share this lesson">
+        <div class="tvw-acts-main">
+          ${made ? `<button type="button" class="tv-btn tv-btn-primary" data-w-act="lesson" data-w-made="${made.kind}">${icon('book', 18)}<span>Print lesson</span></button>` : ''}
+          <button type="button" class="tv-btn${made ? '' : ' tv-btn-primary'}" data-w-act="print"${dis}>${icon('print', 18)}<span>Print practice</span></button>
+          <button type="button" class="tv-btn" data-w-act="link"${dis}>${icon('link', 18)}<span>Share practice</span></button>
+          ${nPre ? `<button type="button" class="tv-btn" data-w-act="pre">${icon('back', 18)}<span>Practise pre-skills</span></button>` : ''}
+        </div>
+        <div class="tvw-acts-sub"><div class="tv-actionbar-text"><div class="tv-h3">${count}</div>
+            <p class="tv-cap">${n ? 'Print, share, or add them to the tray as this lesson.' : 'Tick skills below.'}</p></div>
+          <div class="tvw-acts-tray"><button type="button" class="tv-btn" data-w-act="tray"${dis}>${icon('plus', 18)}<span>Add to tray</span></button>
+            ${nx ? `<button type="button" class="tv-btn" data-w-nextl="${esc(nx.key)}" aria-label="${esc(`Next lesson: ${nx.title}`)}"><span>Next lesson</span>${icon('chevR', 18)}</button>` : ''}</div></div>
+        ${left}
+      </section>`;
+}
+
+/** Open a sheet on ONLY these skills; the tray comes back when it closes. */
+function sheetWith(kind, items, title = '') {
+    if (typeof window.tvOpenSheet !== 'function') { toast('Not ready yet'); return; }
+    hideToast();
+    trayBorrow(items);
+    const off = onSheetClose(() => { off(); trayReturn(); });
+    window.tvOpenSheet(kind, { fromLesson: true, title });
+}
+
+async function shareLink() {
+    const items = tickedItems();
+    if (!items.length) { toast('Tick at least one skill first'); return; }
+    pick.link = makePracticeLink(items);
+    const what = `Practice link · ${items.length} skill${items.length === 1 ? '' : 's'}${items.length > 1 ? ' mixed' : ''}`;
+    if (!pick.link) { pick.linkNote = what; redrawActs(); toast('Could not make a link'); return; }
+    const ok = await copyText(pick.link);
+    pick.linkNote = ok ? `${what} · copied` : `${what} · copy it from the box`;
+    redrawActs();
+    barH();
+    toast(ok ? `Practice link copied · ${items.length} skill${items.length === 1 ? '' : 's'}` : 'Link ready: copy it from the box');
+    root.querySelector('#tvwLink')?.select();
+}
+function redrawActs() {
+    const l = v.lesson ? L.lessonByKey(v.lesson) : null;
+    const box = root && root.querySelector('#tvwBar');
+    if (l && box) box.outerHTML = actsHTML(l);
+}
+
+function addToTray() {
+    const l = L.lessonByKey(v.lesson);
+    const items = tickedItems();
+    if (!l || !items.length) { toast('Tick skills first'); return; }
+    const opts = Object.fromEntries(items.filter((x) => x.opts).map((x) => [`${x.categoryId}:${x.skillId}`, x.opts]));
+    trayAddLesson({ id: l.key, name: lessonName(l), ord: ordOf(l), keys: items.map((x) => `${x.categoryId}:${x.skillId}`), opts });
+}
+
+function practisePre() {
+    // share only: the do-first skills are borrowed for the Share sheet and the tray comes back as it was
+    const l = L.lessonByKey(v.lesson);
+    const items = preItems();
+    if (!l || !items.length) return;
+    sheetWith('share', items, `Before ${lessonName(l)}`);
+}
+
+let lessonBusy = false;
+async function printLesson() {
+    const l = L.lessonByKey(v.lesson);
+    const made = madeLesson(l);
+    if (!made) return;
+    hideToast();
+    if (lessonBusy) return;
+    lessonBusy = true;
+    toast('Making the lesson…');
+    try {
+        let req;
+        if (made.kind === 'detailed') {
+            // the detailed lesson prints from here (the seed every ready-made pack was built and checked with)
+            const r = detailed.all.find((x) => x.id === made.id);
+            const sk = (r && r.used.find((x) => liveKey(x.key))) || null;
+            const [c, id] = sk ? sk.key.split(':') : ['', ''];
+            req = { role: 'detailed-lesson', lessonId: made.id, paper: 'A4', seed: 4242, key: { on: true }, sections: [{ skills: sk ? [{ categoryId: c, skillId: id, opts: sk.opts || {} }] : [] }] };
+        } else {
+            const [c, sk] = made.item.key.split(':');
+            req = { role: 'lesson', sections: [{ skills: [{ categoryId: c, skillId: sk, opts: made.item.opts || {} }] }], practicePages: 1, mixed: false,
+                size: 'M', look: 'auto', paper: 'A4', header: { name: true, date: true, score: true, title: true }, key: { on: true, placement: 'end', style: 'copy' }, seed: 4242 };
+        }
+        const res = await buildSheet(req);
+        // a lesson is not a test form: no "Form A" in its footer
+        const html = String(res.docHtml || res.pupilHtml || '').replace(/Form [AB]\b\s*(·\s*)?/g, '');
+        if (!html) throw new Error('empty');
+        hideToast();
+        await printHtml(html, lessonName(l), 'A4');
+    } catch (e) { console.warn('[teacher-wrm] lesson', e); toast('Could not make this lesson'); } finally { lessonBusy = false; }
+}
+
+/* ================================================================= the Print sheet's lesson block (T4, multi-lesson sets)
+ * When the tray holds lesson groups: one worksheet per lesson (each its own pages and key) · one for all (Mixed, or a
+ * section per lesson) · both. Print all makes ONE document in lesson order from only the added lessons and their skills. */
+const LP = { mode: 'each', all: 'mixed' };
+function lpUnits() {
+    const ls = trayLessons();
+    if (!ls.length) return [];
+    const inLesson = new Set(ls.flatMap((g) => g.skills));
+    // never dropped: the tray's skills that are in no lesson print too, as "Other skills"
+    const loose = trayKeys().filter((k) => !inLesson.has(k));
+    return [...ls.map((g) => ({ title: g.name, keys: g.skills })), ...(loose.length ? [{ title: 'Other skills', keys: loose }] : [])];
+}
+function lpParts() {
+    const units = lpUnits();
+    if (!units.length) return [];
+    const each = units.map((u) => ({ keys: u.keys, title: u.title }));
+    if (units.length < 2) return each;
+    const keys = [...new Set(units.flatMap((u) => u.keys))];
+    const nl = units.filter((u) => u.title !== 'Other skills').length;
+    const title = nl < units.length ? `${nl} lesson${nl === 1 ? '' : 's'} and other skills together` : `${nl} lessons together`;
+    const all = LP.all === 'lessons' ? [{ lessons: units.map((u) => ({ title: u.title, keys: u.keys })), title }] : [{ keys, kind: 'mixed', title }];
+    return LP.mode === 'each' ? each : LP.mode === 'all' ? all : [...each, ...all];
+}
+let lpBusy = false;
+function printAll() {
+    const ls = trayLessons();
+    if (!ls.length) return null;
+    if (lpBusy) return Promise.resolve();
+    lpBusy = true;
+    return printBatch(lpParts(), ls.length === 1 ? ls[0].name : `${ls.length} lessons`, (i, n) => { if (n > 1) toast(`Making worksheet ${i} of ${n}…`); })
+        .catch((e) => { console.warn('[teacher-wrm] print all', e); toast('Could not make these worksheets'); })
+        .finally(() => { lpBusy = false; });
+}
+/** For checks: the parts Print all would build now. */
+export function lessonPrintParts() { return lpParts(); }
+const lpRadio = (act, cur, list, label) => `<div class="tvs-radios" role="radiogroup" aria-label="${esc(label)}">${list.map(([val, t]) => `<button type="button" class="tvs-radio" role="radio" data-act="${act}" data-v="${val}" aria-checked="${cur === val}"><span class="tvs-radio-dot" aria-hidden="true"></span><span>${esc(t)}</span></button>`).join('')}</div>`;
+setPrintExtra({
+    html() {
+        const ls = trayLessons();
+        if (!ls.length) return '';
+        const units = lpUnits();
+        const parts = lpParts();
+        const loose = units.length > ls.length ? units[units.length - 1].keys.length : 0;
+        const choose = units.length > 1
+            ? `${lpRadio('x-lpmode', LP.mode, [['each', 'One worksheet per lesson (each with its own pages and key)'], ['all', 'One for all the lessons'], ['both', 'Both']], 'Worksheets')}
+            ${LP.mode === 'each' ? '' : `<p class="tvs-row-sub">The one for all:</p>${lpRadio('x-lpall', LP.all, [['mixed', 'Mixed practice'], ['lessons', 'A section per lesson']], 'The one for all')}`}` : '';
+        return `<section class="tvs-row tvw-lp" data-w-lp="${ls.length}"><div class="tvs-row-head"><h3 class="tvs-row-title">${ls.length} lesson${ls.length === 1 ? '' : 's'} in the tray</h3>
+            <p class="tvs-row-sub">${esc(units.map((u) => u.title).join(' · '))}</p></div>
+          <div class="tvs-row-body">${choose}
+            ${loose ? `<p class="tvs-muted" data-w-lp-loose="${loose}">${loose} skill${loose === 1 ? '' : 's'} in no lesson print as “Other skills”.</p>` : ''}
+            <p class="tvs-muted">Print all makes one PDF in lesson order: ${parts.length} worksheet${parts.length === 1 ? '' : 's'}, each with its key. The numbers are on the right.</p></div></section>`;
+    },
+    click(b) {
+        const act = b.dataset.act, val = b.dataset.v;
+        if (act === 'x-lpmode') { LP.mode = ['each', 'all', 'both'].includes(val) ? val : 'each'; return true; }
+        if (act === 'x-lpall') { LP.all = val === 'lessons' ? 'lessons' : 'mixed'; return true; }
+        if (act === 'x-lpprint') { printAll(); return false; }
+        return false;
+    },
+    print: () => printAll(),
+    parts: () => lpParts(),
+});
 
 function emptyText(g, l, notTagged, hasDl) {
     if (g === 'direct' && notTagged && hasDl) return 'Not tagged here yet; the detailed lesson above names its skills.';
@@ -537,7 +783,19 @@ function emptyText(g, l, notTagged, hasDl) {
 function redrawDetail() {
     const d = root.querySelector('#tvwDetail');
     d.innerHTML = panelHTML();
+    after(d);
+}
+/** The picker's after-draw, then the toast sits above the TRAY bar (the lesson's actions are not a sticky bar). */
+function after(d) {
     pick.after(d);
+    barH();
+    requestAnimationFrame(barH);
+}
+function barH() {
+    const tb = document.getElementById('tvTray');
+    const h = tb && tb.getClientRects().length ? tb.offsetHeight : 0;   // (a fixed bar has no offsetParent)
+    document.documentElement.style.setProperty('--tv-bar-h', `${h}px`);
+    document.documentElement.style.setProperty('--tvw-tray-h', `${h}px`);
 }
 
 /** The list stays; the current row, the domain buttons, the slide-over state and the panel follow v.lesson. */
@@ -547,6 +805,7 @@ function showLesson() {
     if (row) row.setAttribute('aria-current', 'true');
     const doms = root.querySelector('#tvwDoms');
     if (doms) doms.innerHTML = domButtonsHTML();
+    drawMeta();
     root.querySelector('#tvwGrid')?.classList.toggle('is-open', !!v.lesson);
     redrawDetail();
 }
@@ -603,7 +862,7 @@ function openLesson(key, focus = 'row') {
     hideToast();   // m8: a toast belongs to the lesson it was made on
     const same = l.grade === v.grade && !!root.querySelector('#tvwLessons');
     setLesson(l);
-    pick.reset();
+    resetPick();
     writeHash(false);
     return ensureCurated().then(() => {
         if (same) showLesson(); else draw();
@@ -615,7 +874,7 @@ function closeLesson() {
     const was = v.lesson;
     hideToast();
     v.lesson = '';
-    pick.reset();
+    resetPick();
     writeHash(false);
     showLesson();
     const row = was ? root.querySelector(`#tvwLessons .tvw-nrow[data-w-lesson="${CSS.escape(was)}"]`) : null;
@@ -626,7 +885,7 @@ function chooseGrade(gid) {
     hideToast();
     Object.assign(v, { grade: gid, sec: '', lesson: '' });
     rememberGrade();
-    pick.reset();
+    resetPick();
     writeHash(false);
     return ensureCurated().then(() => {
         draw();
@@ -662,14 +921,24 @@ function wire(el) {
         if (d.wSec) {
             v.sec = d.wSec;
             if (!v.lesson) writeHash(true);
-            for (const b of root.querySelectorAll('#tvwDoms [data-w-sec]')) { if (b === t) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); }
+            for (const b of root.querySelectorAll('#tvwDoms [data-w-sec]')) { b.setAttribute('aria-pressed', String(b === t)); if (b === t) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); }
+            drawMeta();
             jumpTo(d.wSec, true);
             return;
         }
         if (d.wBack) { closeLesson(); return; }
+        if (d.wNextl) { openLesson(d.wNextl, 'title'); return; }
+        if (t.getAttribute('aria-disabled') === 'true' && d.wAct) { toast(d.why || 'Tick skills first'); return; }
+        if (d.wAct === 'print') { const items = tickedItems(); const l = L.lessonByKey(v.lesson); if (items.length) sheetWith('print', items, l ? lessonName(l) : ''); else toast('Tick skills first'); return; }
+        if (d.wAct === 'link') { shareLink(); return; }
+        if (d.wAct === 'copy') { copyText(pick.link).then((ok) => toast(ok ? 'Practice link copied' : 'Select the link and copy it')); return; }
+        if (d.wAct === 'tray') { addToTray(); return; }
+        if (d.wAct === 'pre') { practisePre(); return; }
+        if (d.wAct === 'lesson') { printLesson(); return; }
+        if (d.wTmToggle) { tmOpen = !tmOpen; redrawDetail(); root.querySelector('[data-w-tm-toggle]')?.focus({ preventScroll: true }); return; }
         if (d.wLesson) { openLesson(d.wLesson, t.classList.contains('tvw-nrow') ? 'row' : 'title'); return; }
         if (d.wDlLink) { detailedLink(d.wDlLink); return; }
-        if (d.wTmGoto) { const c = root.querySelector('#tvwToMake'); if (c) { c.scrollIntoView({ block: 'start', behavior: 'instant' }); c.querySelector('h3')?.setAttribute('tabindex', '-1'); c.querySelector('h3')?.focus(); } return; }
+        if (d.wTmGoto) { if (!tmOpen) { tmOpen = true; redrawDetail(); } const c = root.querySelector('#tvwToMake'); if (c) { c.scrollIntoView({ block: 'start', behavior: 'instant' }); c.querySelector('h3')?.setAttribute('tabindex', '-1'); c.querySelector('h3')?.focus(); } return; }
         if (d.wDlGoto) { const c = root.querySelector(`[data-w-dl="${CSS.escape(d.wDlGoto)}"]`); if (c) { c.scrollIntoView({ block: 'start', behavior: 'instant' }); c.querySelector('h3')?.setAttribute('tabindex', '-1'); c.querySelector('h3')?.focus(); } return; }
         if (d.wTmuToggle) {
             const k = `${v.grade}|${d.wTmuToggle}`;

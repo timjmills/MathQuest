@@ -172,7 +172,7 @@ function common(seed, quiz, version) {
     return {
         size: o.size, look: 'auto', paper: o.paper || 'A4',
         anchors: o.examples === 'sections' || o.examples === 'side' ? o.examples : 'off',
-        header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz ? ((S.quiz.name || '').trim() || autoQuizName(items())) : true },
+        header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz ? ((S.quiz.name || '').trim() || autoQuizName(items())) : (S.batchTitle || true) },
         key: { on: true, placement: o.keyPlace === 'after-page' ? 'after-page' : 'end', style: o.keyStyle === 'short' ? 'short' : 'copy' },
         seed: (seed + version * 104729) >>> 0,
         version: V > 1 ? `Version ${version + 1} of ${V}` : '',
@@ -240,7 +240,7 @@ async function probeLayouts(it) {
 /* ================================================================= building */
 
 function sigOf(p, list, quiz) {
-    return JSON.stringify({ g: trayGroups(), l: trayLocks(), k: p.kind, pi: p.pageItems, pb: p.pagesBy, o: S.opts, seed: S.seed, quiz: quiz ? { v: S.quiz.versions, q: S.quiz, name: S.quiz.name } : null, cnt: list.map((x) => [x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.weight]),
+    return JSON.stringify({ t: S.batchTitle || '', g: trayGroups(), l: trayLocks(), k: p.kind, pi: p.pageItems, pb: p.pagesBy, o: S.opts, seed: S.seed, quiz: quiz ? { v: S.quiz.versions, q: S.quiz, name: S.quiz.name } : null, cnt: list.map((x) => [x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.weight]),
         skills: list.map((x) => [keyOf(x), x.opts || null, x.leftOut ? 0 : 1]) });
 }
 
@@ -259,7 +259,7 @@ function versionFooter(html, label) {
 async function buildAll(p, list, quiz, onProgress) {
     const versions = versionsOf(quiz);
     const keysAtEnd = versions > 1 && S.opts.keyVersions === 'end';
-    const out = { pupil: [], key: [], doc: '', pages: 0, pagesAll: 0, keyPages: 0, byKey: {}, total: 0, errors: [], perVersion: [] };
+    const out = { pupil: [], key: [], doc: '', pages: 0, pagesAll: 0, keyPages: 0, byKey: {}, total: 0, printed: 0, errors: [], perVersion: [] };
     let tailKeys = '', done = 0;
     const parts0 = requests(p, list, quiz, 0).length;
     for (let v = 0; v < versions; v++) {
@@ -286,6 +286,7 @@ async function buildAll(p, list, quiz, onProgress) {
             vv.pages += (res.pageCount || 0) * copies;
             out.keyPages += res.keyPageCount || 0;
             vv.total += countParts(res, part, copies, vv.byKey);
+            out.printed += (res.items || []).filter(Boolean).length * copies;   // every printed problem (T4 batch summary)
         }
         out.perVersion.push(vv);
         out.pupil.push(vp); out.key.push(vk);
@@ -322,6 +323,7 @@ function scheduleBuild(delay = 250) {
  */
 async function runPreview() {
     if (!S.sheet || S.sheet === 'share' || S.sheet === 'quizshare') return;
+    if (batchActive()) { ensureBatch(); return; }   // lesson groups: the side shows what Print all makes
     const list = items();
     if (!list.length) { S.preview = null; renderSide(); return; }
     const my = ++token;
@@ -446,6 +448,7 @@ function open(kind, ctx = {}) {
     S.sheet = kind;
     S.fromLesson = !!ctx.fromLesson;
     if (S.fromLesson && !touched('kind')) S.kind = null;
+    S.batchTitle = typeof ctx.title === 'string' ? ctx.title : '';   // T4: a lesson's practice carries the lesson's name
     S.quizLink = '';
     if (kind === 'share') S.shareRes = undefined;
     S.popup = null;
@@ -463,6 +466,8 @@ function open(kind, ctx = {}) {
 }
 function close() {
     S.sheet = null;
+    S.batchTitle = '';
+    B.tok++; B.sig = ''; B.res = null; B.busy = null;
     S.popup = null;
     token++;
     persist();
@@ -472,6 +477,7 @@ function close() {
     document.querySelectorAll('#teacherApp .tv2-nav').forEach((el) => el.removeAttribute('inert'));
     document.body.classList.remove('tvs-open');
     document.removeEventListener('keydown', onKey, true);
+    for (const fn of [...closeFns]) { try { fn(); } catch (e) { console.warn('[teacher-sheet] close hook', e); } }
     if (lastFocus && lastFocus.isConnected) { try { lastFocus.focus({ preventScroll: true }); } catch (e) { /* */ } }
 }
 function mount() {
@@ -561,6 +567,7 @@ function optionsHTML() {
     }
     if (quiz) h += `<div class="tvs-field"><label class="tvs-label" for="tvsQuizName">Quiz name</label><input id="tvsQuizName" class="tvs-input" data-in="quizname" value="${esc(S.quiz.name || autoQuizName(list))}"></div>`;
     h += skillsHTML(list);
+    if (!quiz && EXTRA && EXTRA.html) { try { h += EXTRA.html(list) || ''; } catch (e) { console.warn('[teacher-sheet] extra', e); } }
     const p = plan(list);
     const k = p.kind;
     h += `<div class="tvs-kinds" role="radiogroup" aria-label="Kind of worksheet">${[['single', 'Single skill', 'One skill on a page'], ['sections', 'Sections', 'Each skill in its own part'], ['mixed', 'Mixed practice', 'Skills mixed together']].map(([v, l, s]) => `<button type="button" class="tvs-kind" role="radio" data-act="kind" data-v="${v}" aria-checked="${k === v}">${k === v ? icon('check', 18) : ''}<span class="tvs-kind-name">${l}</span><span class="tvs-kind-sub">${s}</span></button>`).join('')}</div>`;
@@ -644,6 +651,8 @@ function autoQuizName(list) {
 function renderSide() {
     const side = root && root.querySelector('#tvsSide');
     if (!side) return;
+    if (batchActive()) { renderBatchSide(side); return; }
+    if (side.dataset.batch) { delete side.dataset.batch; side.innerHTML = ''; }
     const sm = summary();
     const quiz = S.sheet === 'quiz';
     const has = items().length > 0;
@@ -902,6 +911,7 @@ function quizShareHTML() {
 /* ================================================================= print */
 
 async function doPrint() {
+    if (S.sheet === 'print' && EXTRA && EXTRA.print) { const r = EXTRA.print(); if (r) { await r; return; } }
     const list = items();
     if (!list.length) { toast('Tick skills first'); return; }
     const p = plan(list);
@@ -950,6 +960,7 @@ function onClick(e) {
     const v = b.dataset.v;
     const more = root.querySelector('.tvs-more');
     S.moreOpen = !!(more && more.open);
+    if (EXTRA && EXTRA.click && /^x-/.test(b.dataset.act)) { if (EXTRA.click(b)) { changed(false); renderSide(); } return; }
     switch (b.dataset.act) {
         case 'close': close(); return;
         case 'kind': S.kind = v; touch('kind'); if (v !== 'single') S.opts.layout = 'standard'; changed(); return;
@@ -1047,10 +1058,141 @@ export function setSheetAmount(mode, n) {
     persist();
 }
 
+/* ================================================================= hooks (lane S2 T4: lesson sets)
+ * The Lessons place adds lesson groups to the tray. When the tray holds them, the Print sheet shows a block that
+ * asks "one worksheet per lesson / one for all / both" (EXTRA.html), and Print makes ONE document from a batch of
+ * buildSheet requests (buildBatch): each lesson its own pages and key, then the combined paper. */
+let EXTRA = null;
+const closeFns = new Set();
+/** { html(list) → string, click(button) → true to redraw, print() → Promise | null (null = the sheet prints as usual) }.
+ *  Its buttons use data-act="x-…". */
+export function setPrintExtra(x) { EXTRA = x && typeof x === 'object' ? x : null; }
+/** fn runs each time the sheet closes. Returns the remover. */
+export function onSheetClose(fn) { closeFns.add(fn); return () => closeFns.delete(fn); }
+/** The open sheet redraws (an EXTRA choice changed from outside). */
+export function redrawSheet() { if (root && S.sheet) changed(false); }
+/**
+ * Several worksheets in ONE document, in the order given, each with its own pages and key:
+ *   { keys, kind?: 'sections' | 'mixed' | 'single', title? }   a worksheet of those skills, planned as the sheet plans
+ *   { lessons: [{ title, keys }], title? }                        one worksheet, a section per lesson (each lesson's
+ *                                                                 skills together, as many problems as its own sheet)
+ * Returns { doc, pages, keyPages, parts: [{ title, pages, total, error? }] }.
+ */
+export function buildBatch(parts, onProgress) {
+    // one batch at a time: a batch sets the sheet's kind and title while it builds
+    const run = B.chain.then(() => buildBatchNow(parts, onProgress));
+    B.chain = run.catch(() => null);
+    return run;
+}
+async function buildBatchNow(parts, onProgress) {
+    const all = items();
+    const pick = (keys) => keys.map((k) => all.find((x) => keyOf(x) === k)).filter((x) => x && !x.leftOut);
+    const keepKind = S.kind, keepTitle = S.batchTitle;
+    const out = { doc: '', pages: 0, keyPages: 0, parts: [] };
+    let i = 0;
+    try {
+        for (const part of parts) {
+            if (onProgress) onProgress(++i, parts.length);
+            await yieldNow();
+            S.batchTitle = part.title || '';
+            if (part.lessons) {
+                const secs = [];
+                for (const l of part.lessons) {
+                    const list = pick(l.keys || []);
+                    if (!list.length) continue;
+                    S.kind = 'mixed';
+                    const p = plan(list);
+                    secs.push({ skills: list.map((it) => skillRef(it)), count: Math.max(1, p.error ? list.length * 2 : p.total) });
+                }
+                if (!secs.length) continue;
+                const req = Object.assign(common(S.seed + 7919 * (i + 50), false, 0), { role: 'independent', sections: secs });
+                let res;
+                try { res = await buildSheet(req); } catch (e) { out.parts.push({ title: part.title, pages: 0, total: 0, error: (e && e.message) || 'Could not be built' }); continue; }
+                out.doc += (res.keyOptions && res.keyOptions.placement === 'after-page' ? res.docHtml || res.pupilHtml : `${res.pupilHtml}\n${res.keyHtml || ''}`) + '\n';
+                out.pages += res.pageCount || 0; out.keyPages += res.keyPageCount || 0;
+                out.parts.push({ title: part.title, pages: res.pageCount || 0, keyPages: res.keyPageCount || 0, total: (res.items || []).filter(Boolean).length, first: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml });
+                continue;
+            }
+            const list = pick(part.keys || []);
+            if (!list.length) continue;
+            S.kind = part.kind || keepKind;
+            const p = plan(list);
+            if (p.error) { out.parts.push({ title: part.title, pages: 0, total: 0, error: p.error }); continue; }
+            const b = await buildAll(p, list, false);
+            out.doc += b.doc + '\n';
+            out.pages += b.pages; out.keyPages += b.keyPages;
+            out.parts.push({ title: part.title, pages: b.pages, keyPages: b.keyPages, total: b.printed, first: (b.perVersion[0] || {}).first || '' });
+        }
+    } finally { S.kind = keepKind; S.batchTitle = keepTitle; }
+    return out;
+}
+/* The lesson-group summary: built from the SAME batch Print all prints, so its numbers are the PDF's. */
+const B = { sig: '', res: null, busy: null, tok: 0, prog: '', chain: Promise.resolve() };
+function batchActive() { try { return S.sheet === 'print' && !!EXTRA && typeof EXTRA.parts === 'function' && (EXTRA.parts() || []).length > 0; } catch (e) { return false; } }
+function batchSig(parts) {
+    return JSON.stringify({ parts, seed: S.seed, o: S.opts, k: S.kind, l: trayLocks(), g: trayGroups(), it: items().map((x) => [keyOf(x), x.opts || null, x.weight, x.count || 0, x.lockPct === undefined ? -1 : x.lockPct, x.leftOut ? 0 : 1]) });
+}
+function ensureBatch(onProgress) {
+    const parts = EXTRA.parts();
+    const sig = batchSig(parts);
+    if (B.sig === sig && B.res) return Promise.resolve(B.res);
+    if (B.sig === sig && B.busy) { if (onProgress) B.onProg = onProgress; return B.busy; }
+    B.sig = sig; B.res = null; B.onProg = onProgress || null;
+    const my = ++B.tok;
+    B.busy = buildBatch(parts, (i, n) => {
+        if (my !== B.tok) return;
+        B.prog = `Making worksheet ${i} of ${n}…`;
+        if (B.onProg) B.onProg(i, n);
+        if (root) renderSide();
+    }).then((r) => { if (my === B.tok) { B.res = r; B.busy = null; B.prog = ''; if (root) renderSide(); } return r; });
+    return B.busy;
+}
+const pl = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+/** The words of a built batch: "4 worksheets · 9 pages + 4 key pages · 38 problems", and a line per worksheet. */
+export function batchSummary(r) {
+    if (!r) return null;
+    const ok = r.parts.filter((x) => !x.error);
+    const problems = ok.reduce((t, x) => t + x.total, 0);
+    return {
+        line: `${pl(ok.length, 'worksheet')} · ${pl(r.pages, 'page')} + ${pl(r.keyPages, 'key page')} · ${pl(problems, 'problem')}`,
+        rows: r.parts.map((x) => (x.error ? `${x.title}: ${x.error}` : `${x.title}: ${pl(x.pages, 'page')} · ${pl(x.total, 'problem')} · key ${pl(x.keyPages, 'page')}`)),
+        pages: r.pages, keyPages: r.keyPages, problems, worksheets: ok.length,
+    };
+}
+function renderBatchSide(side) {
+    if (!side.dataset.batch) {
+        side.dataset.batch = '1';
+        side.innerHTML = `<div class="tvs-sum" id="tvsSumBox" aria-live="polite"></div><div class="tvs-prev" id="tvsPrevBox"><iframe class="tvs-prev-frame" id="tvsPrevFrame" title="Page 1 preview" tabindex="-1"></iframe></div>
+  <p class="tvs-muted tvs-prev-cap" id="tvsPrevCap"></p><div class="tvs-actions" id="tvsActBox"></div>`;
+    }
+    const parts = EXTRA.parts();
+    const fresh = B.res && B.sig === batchSig(parts);
+    if (!fresh && !B.busy) setTimeout(() => ensureBatch(), 0);
+    const sm = fresh ? batchSummary(B.res) : null;
+    side.querySelector('#tvsSumBox').innerHTML = sm
+        ? `<p class="tvs-sum-line" data-tvs-summary data-tvs-batch="${sm.worksheets}|${sm.pages}|${sm.keyPages}|${sm.problems}">${esc(sm.line)}</p><ul class="tvs-sum-more tvs-batch-rows">${sm.rows.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`
+        : `<p class="tvs-sum-line" data-tvs-summary>${esc(`${pl(parts.length, 'worksheet')} · counting the pages…`)}</p><p class="tvs-sum-more" data-tvs-progress>${esc(B.prog || 'Making the worksheets…')}</p>`;
+    side.querySelector('#tvsPrevCap').textContent = fresh ? `First page of “${(B.res.parts[0] || {}).title || 'the first worksheet'}” · Print all makes every page` : 'Drawing the first page…';
+    side.querySelector('#tvsActBox').innerHTML = `<button type="button" class="tvs-btn tvs-primary" data-act="x-lpprint">${icon('print', 20)}<span>Print all</span></button>
+    <button type="button" class="tvs-btn" data-act="renew">${icon('shuffle', 18)}<span>New numbers</span></button>`;
+    if (fresh && B.res.parts[0] && B.res.parts[0].first) showPreview(B.res.parts[0].first);
+}
+
+/** buildBatch, then the print dialog (the document is kept as the sheet's last document). */
+export async function printBatch(parts, title, onProgress) {
+    // the same build the summary counted (built once, for the summary and the print), else a fresh one
+    const b = batchActive() && batchSig(parts) === B.sig ? await ensureBatch(onProgress) : await buildBatch(parts, onProgress);
+    if (!b.doc) { toast('These pages could not be built'); return b; }
+    S.lastDoc = sheetDocument(b.doc, title, { paper: S.opts.paper || 'A4' });
+    try { await printHtml(b.doc, title, S.opts.paper || 'A4'); } catch (e) { console.warn('[teacher-sheet] print failed', e); toast('Could not open the print dialog'); }
+    return b;
+}
+
 if (typeof window !== 'undefined') {
     window.tvOpenSheet = openSheet;
     window.tvSheetAmount = { get: sheetAmount, set: setSheetAmount };
     window.tvCloseSheet = closeSheet;
     window.tvSheetState = sheetState;
     window.tvSheetBuildNow = buildNow;
+    window.tvSheetHooks = { setPrintExtra, onSheetClose, redrawSheet, buildBatch, printBatch, batchSummary, batchNow: () => (batchActive() ? ensureBatch() : Promise.resolve(null)) };
 }

@@ -115,6 +115,7 @@ const UI_KEY = 'mq_teacher_tray_ui';
 const T = {
     locks: {},           // 'a:OA' | 'g:OA|3' → held %
     groups: [],          // owner 2026-10-24: "Problems for these" — [{ skills: ['cat:skill'], total } | { skills, pct }]
+    lessons: [],         // T4 (owner, multi-lesson sets): lesson groups [{ id, name, ord, skills: ['cat:skill'] }] in lesson order
     groupMode: 'total',  // the bulk bar's toggle: 'total' (problems) | 'pct'
     groupN: 12,
     sel: new Set(),      // selected keys in the popup
@@ -217,6 +218,7 @@ function snapshot() {
         items: trayItems().map(copyItem),
         locks: { ...T.locks },
         groups: trayGroups(),
+        lessons: trayLessons(),
     };
 }
 function restoreSnap(snap) {
@@ -229,6 +231,7 @@ function restoreSnap(snap) {
     }
     T.locks = { ...(snap.locks || {}) };
     T.groups = (Array.isArray(snap.groups) ? snap.groups : []).map((g) => ({ ...g, skills: (g.skills || []).filter(trayHas) })).filter((g) => g.skills.length);
+    if (Array.isArray(snap.lessons)) T.lessons = cleanLessons(snap.lessons);
     T.sel = new Set([...T.sel].filter(trayHas));
 }
 
@@ -267,20 +270,75 @@ export function trayLoadSet(set) {
     const skills = (set.skills || []).filter((x) => x && findSkill(x.categoryId, x.skillId));
     // a set saved by the older screens has every weight 1 (their default): that is Equal here
     const old = skills.every((x) => !(x.weight > 1));
-    restoreSnap({ items: skills.map((x) => ({ ...x, weight: old ? 2 : x.weight })), locks: set.locks || {}, groups: set.groups || [] });
+    restoreSnap({ items: skills.map((x) => ({ ...x, weight: old ? 2 : x.weight })), locks: set.locks || {}, groups: set.groups || [], lessons: set.lessons || [] });
     changed();
     undoToast(`${set.name || 'The set'} is in the tray (${plural(trayItems().length, 'skill')}).`, before);
+}
+
+/* ================================================================= lesson groups (T4, owner: multi-lesson sets)
+ * A lesson's ticked skills go in as ONE group named after the lesson ("Lesson 4: Add within 20"). The groups keep
+ * their lesson order (ord), are saved with the tray (and with Save as set), and the Print sheet offers one worksheet
+ * per lesson, one for all, or both. A skill can sit in two lessons' groups; it is in the tray once. */
+function cleanLessons(list) {
+    return (Array.isArray(list) ? list : []).map((g) => ({ id: String(g.id || g.name || ''), name: String(g.name || 'Lesson'), ord: Number(g.ord) || 0, skills: [...new Set((g.skills || []).filter(trayHas))] }))
+        .filter((g) => g.id && g.skills.length).sort((a, b) => a.ord - b.ord);
+}
+/** The lesson groups in lesson order: [{ id, name, ord, skills }]. */
+export function trayLessons() { return cleanLessons(T.lessons).map((g) => ({ ...g, skills: g.skills.slice() })); }
+/** Add a lesson's skills as its group (the same lesson again replaces its group), with Undo. */
+export function trayAddLesson({ id, name, ord = 0, keys = [], opts = {} }) {
+    const before = snapshot();
+    let n = 0;
+    for (const k of keys) if (addOne(k, opts[k] ? { opts: opts[k] } : {})) n++;
+    const live = keys.filter(trayHas);
+    if (!live.length) { undoToast('Tick skills first: they go in the tray as this lesson.', null); return 0; }
+    T.lessons = cleanLessons([...T.lessons.filter((g) => g.id !== id), { id, name, ord, skills: live }]);
+    changed();
+    const nl = T.lessons.length;
+    undoToast(`${name}: ${plural(live.length, 'skill')} in the tray${n < live.length ? ` (${live.length - n} already there)` : ''} · ${plural(nl, 'lesson')}, ${plural(trayItems().length, 'skill')}.`, before);
+    return live.length;
+}
+/** Take one lesson out: its group and the skills no other lesson holds. */
+function removeLesson(id) {
+    const g = T.lessons.find((x) => x.id === id);
+    if (!g) return;
+    const before = snapshot();
+    const others = new Set(T.lessons.filter((x) => x.id !== id).flatMap((x) => x.skills));
+    T.lessons = T.lessons.filter((x) => x.id !== id);
+    removeKeys(g.skills.filter((k) => !others.has(k)));
+    changed();
+    undoToast(`${g.name} taken out of the tray (${plural(trayItems().length, 'skill')} left).`, before);
+}
+/* Borrow: a lesson's Print practice / Share practice prints ONLY that lesson's skills. The tray is put aside (not
+ * saved over) and comes back when the sheet closes (trayReturn). */
+let borrowed = null;
+export function trayBorrow(list) {
+    if (!borrowed) borrowed = snapshot();
+    restoreSnap({ items: list.map((x) => ({ categoryId: x.categoryId, skillId: x.skillId, weight: 2, opts: x.opts })), locks: {}, groups: [], lessons: [] });
+    T.lessons = [];
+    window.skillQueue = [...currentSet()];
+}
+export function trayReturn() {
+    if (!borrowed) return;
+    const b = borrowed;
+    borrowed = null;
+    restoreSnap(b);
+    T.lessons = cleanLessons(b.lessons);
+    window.skillQueue = [...currentSet()];
+    refresh();
+    for (const fn of listeners) { try { fn(); } catch (e) { console.warn('[teacher-tray] listener', e); } }
 }
 
 function removeKeys(keys) {
     const set = new Set(keys);
     const keep = currentSet().filter((it) => !set.has(keyOfItem(it)));
     const snap = keep.map(copyItem);
-    restoreSnap({ items: snap, locks: T.locks, groups: T.groups });
+    restoreSnap({ items: snap, locks: T.locks, groups: T.groups, lessons: T.lessons });
     keys.forEach((k) => T.sel.delete(k));
     // a hold on an area or grade that has left the tray goes with it
     const left = trayKeys();
     for (const sc of Object.keys(T.locks)) if (!scopeKeys(sc, left).length) delete T.locks[sc];
+    T.lessons = cleanLessons(T.lessons);
 }
 
 function takeOut(keys, what) {
@@ -293,6 +351,7 @@ function takeOut(keys, what) {
 
 function changed() {
     T.sel = new Set([...T.sel].filter(trayHas));
+    T.lessons = cleanLessons(T.lessons);
     window.skillQueue = [...currentSet()];
     save();
     refresh();
@@ -327,6 +386,7 @@ function save() {
     };
     if (Object.keys(T.locks).length) rec.locks = { ...T.locks };
     if (T.groups.length) rec.groups = trayGroups();
+    if (T.lessons.length) rec.lessons = trayLessons();
     writeSets([rec, ...list]);
 }
 
@@ -338,7 +398,7 @@ export function restoreTray() {
     if (currentSet().length) return;
     const rec = savedSets().find((s) => s.id === TRAY_SET_ID);
     if (!rec || !rec.skills.length) return;
-    restoreSnap({ items: rec.skills.filter((x) => findSkill(x.categoryId, x.skillId)), locks: rec.locks || {}, groups: rec.groups || [] });
+    restoreSnap({ items: rec.skills.filter((x) => findSkill(x.categoryId, x.skillId)), locks: rec.locks || {}, groups: rec.groups || [], lessons: rec.lessons || [] });
     window.skillQueue = [...currentSet()];
 }
 
@@ -460,7 +520,7 @@ function openSheet(kind) {
     if (kind !== 'quiz' && !items.length) { undoToast('Tick skills first: they wait in the tray.', null); return; }
     closePop();
     closeChipSheet();
-    if (typeof window.tvOpenSheet === 'function') { window.tvOpenSheet(kind, { from: 'tray', empty: !items.length }); return; }
+    if (typeof window.tvOpenSheet === 'function') { window.tvOpenSheet(kind, { from: 'tray', empty: !items.length, fromLesson: T.lessons.length > 0 }); return; }
     // T3b's sheets are not in yet: today's screens, with the tray's skills
     const skills = items.filter((it) => it.leftOut !== true).map((it) => ({ categoryId: it.categoryId, skillId: it.skillId, weight: it.weight, opts: it.opts }));
     if (kind === 'print') { if (typeof window.tvOpenPrintWith === 'function') window.tvOpenPrintWith(skills); else window.tvGo?.('print'); return; }
@@ -497,6 +557,11 @@ function barHTML() {
     if (!n) {
         lead = `<div class="tt-label"><b>Tray</b><span>Empty</span></div>`;
         mid = `<div class="tt-empty">Tick skills to put them here. Quiz can also start from a standard, a White Rose step or a lesson.</div>`;
+    } else if (T.lessons.length) {
+        const nl = T.lessons.length;
+        const loose = keys.filter((k) => !T.lessons.some((g) => g.skills.includes(k))).length;
+        lead = `<div class="tt-label"><b>Tray</b><span>${plural(nl, 'lesson')} · ${plural(n, 'skill')}</span></div>`;
+        mid = `<div class="tt-items tt-lessons">${T.lessons.map((g) => `<button type="button" class="tt-li tt-lesson" data-act="trayopen" title="${esc(g.name)}: ${plural(g.skills.length, 'skill')}"><span class="tt-name">${esc(g.name)}</span><span class="tt-li-a">${g.skills.length}</span></button>`).join('')}${loose ? `<button type="button" class="tt-li" data-act="trayopen"><span class="tt-name">Other skills</span><span class="tt-li-a">${loose}</span></button>` : ''}<button type="button" class="tt-btn tt-more" data-act="trayopen" hidden>+0 more</button></div>`;
     } else if (!big) {
         lead = `<div class="tt-label"><b>Tray</b><span>${n} skill${n === 1 ? '' : 's'} selected</span></div>`;
         mid = `<div class="tt-items tt-v-${T.tview}">${keys.map((k) => barItemHTML(k, true)).join('')}<button type="button" class="tt-btn tt-more" data-act="trayopen" hidden>+0 more</button></div>`;
@@ -518,7 +583,7 @@ export function renderBar() {
     const bar = mountBar();
     if (!bar) return;
     const keys = trayKeys();
-    bar.classList.toggle('tt-big', keys.length > SMALL);
+    bar.classList.toggle('tt-big', keys.length > SMALL && !T.lessons.length);
     bar.classList.toggle('is-empty', !keys.length);
     bar.innerHTML = barHTML();
     bar.querySelectorAll('[data-tt-pic]').forEach((pic) => drawMini(pic));
@@ -722,6 +787,8 @@ function popHTML() {
         return `<div class="tt-ghead tt-rgrade${ctlOpen(s)}" data-grade-host>${selBox(s, gradeName(x.g))}<span class="tt-hname">${gbadge(x.g, true)}<b class="tt-wide">all areas</b><span class="tt-count-t">${plural(x.ks.length, 'skill')}${share(x.ks)}</span></span>`
             + dots(s, gradeName(x.g)) + `<span class="tt-ctl">${howOftenHTML(s)}<span class="tt-pp"><span class="tt-p">${Math.round(sumOf(x.ks))} %</span></span><button type="button" class="tt-btn tt-text tt-rm" data-act="tpremove" data-arg="${esc(s)}">Remove grade</button></span></div>`;
     }).join('')}</section>` : '';
+    const lessonsBox = T.lessons.length && !q ? `<section class="tt-lessonbox" aria-label="Lessons in the tray"><p class="tt-row-label">Lessons · in lesson order</p>${T.lessons.map((g) => `<div class="tt-lgroup" data-tt-lesson="${esc(g.id)}"><div class="tt-ghead"><span class="tt-hname"><b>${esc(g.name)}</b><span class="tt-count-t">${plural(g.skills.length, 'skill')}</span></span><button type="button" class="tt-btn tt-text tt-rm" data-act="lessonrm" data-arg="${esc(g.id)}" aria-label="Take ${esc(g.name)} out of the tray">Remove lesson</button></div>`
+        + `<div class="tt-items-p tt-pv-list">${g.skills.map((k) => { const x = infoOf(k); return `<button type="button" class="tt-li" data-domain="${x.a}" data-act="chip" data-arg="${esc(k)}">${gbadge(x.g)}${areaIcon(x.a, 16)}<span class="tt-name">${esc(shortName(x.label))}</span></button>`; }).join('')}</div></div>`).join('')}</section>` : '';
     const nSel = T.sel.size;
     const bulk = nSel ? `<div class="tt-bulk" role="group" aria-label="Selected skills"><b>${nSel} selected</b><span class="tt-row-label">How often</span><div class="tt-seg-ctl">${[['1', 'Less'], ['2', 'Equal'], ['3', 'More']].map(([v, l]) => `<button type="button" data-act="bulkw" data-arg="${v}">${l}</button>`).join('')}</div>`
         + (T.detailed ? `<span class="tt-stepper"><button type="button" data-act="bulkn" data-arg="-1" aria-label="Lower">−</button><output>${T.bulkN}</output><button type="button" data-act="bulkn" data-arg="1" aria-label="Higher">+</button></span><button type="button" class="tt-btn" data-act="bulkset">Set weight</button>` : '')
@@ -749,7 +816,7 @@ function popHTML() {
     <div class="tt-sheet tt-pop${T.detailed ? ' det' : ''}" role="dialog" aria-modal="true" aria-labelledby="tvTrayPopTitle">
       <div class="tt-sheet-head"><div class="tt-head-text"><p class="tt-eyebrow">Tray · ${esc(trayTitle(keys))}</p><h2 id="tvTrayPopTitle">Your tray</h2></div><button type="button" class="tt-btn tt-icon tt-close" data-act="close" aria-label="Close the tray">${icon('x', 20)}</button></div>
       <div class="tt-pop-head">${tools}</div>
-      <div class="tt-pop-body">${byGrade}${body}${empty}</div>
+      <div class="tt-pop-body">${lessonsBox}${byGrade}${body}${empty}</div>
       <div class="tt-sheet-foot">${totalHTML(p)}<div class="tt-summary">${esc(summary)}</div><button type="button" class="tt-btn" data-act="tray-quiz">${icon('sheet', 20)}<span>Quiz</span></button><button type="button" class="tt-btn" data-act="tray-share"${dis}>${icon('link', 20)}<span>Share</span></button><button type="button" class="tt-btn tt-primary" data-act="tray-print"${dis}>${icon('print', 20)}<span>Print</span></button></div>
     </div>`;
 }
@@ -935,6 +1002,7 @@ function onClick(e) {
             return;
         }
         case 'trayclear': takeOut(trayKeys(), 'Every skill'); return;
+        case 'lessonrm': removeLesson(arg); return;
         case 'tpcol': { const keys = trayKeys(); const def = areasOf(keys).length > 3; const cur = arg in T.collapsed ? T.collapsed[arg] : def; T.collapsed[arg] = !cur; break; }
         case 'tpall': areasOf(trayKeys()).forEach((x) => { T.collapsed[x.a] = arg !== 'open'; }); break;
         case 'tpdots': T.ctl = T.ctl === arg ? '' : arg; break;
