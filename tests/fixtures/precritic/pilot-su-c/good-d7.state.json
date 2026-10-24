@@ -1,0 +1,5 @@
+{
+ "about": "The PASS state of backtest row slot-clip-heads-pilot (critic r1 D7, place heads overlapping at 5-6 digits): good.state.json (b3948d88 + good.patch) + good-d7.patch, a SEEDED stand-in never committed anywhere. good.patch already makes critic r1's written D7 fix ('the 0.95 em track when heads are on', via D3's boxes -> wide), and ws-slot-clip still measures 24 overlapping head pairs (0.67 mm) at level 3, S, on it (and on the approved sub_1m_regroup on HEAD), so that fix is not enough. good-d7.patch widens the tracks of a stack whose heads are drawn at 5+ digits (t >= 6) to 1.3 em (css/sheet-kit.css .heads-wide; stack.js adds the class) and does nothing else. It is a test stand-in, not a design decision: the real fix is the pilot lane's.",
+ "commit": "b3948d88",
+ "patches": ["tests/fixtures/precritic/pilot-su-c/good.patch", "tests/fixtures/precritic/pilot-su-c/good-d7.patch"]
+}

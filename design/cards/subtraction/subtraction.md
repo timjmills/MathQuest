@@ -1,6 +1,54 @@
 <!-- spec-card
-{"card":"subtraction","kind":"family","template":"stack","families":[],"match":{"templates":["stack"]},"config":"design/cards/subtraction/card.json","indexSha":"e4855a641fe40d4e19914154f1da96fe97901b51","bodySha":"5499fa7902a40c86"}
-{"cited":"AX-9 C1 CL-9 DN-1a H2 H4 H5 H6 H7 H8 H9 H10 H11 H13 L1 L6 LR-4 LR-6 P-1 PT-FRM-6 PT-GDP-1 RP-1 SP-20 VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 90af7b AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-4b 12a353 31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223"}
+{"card":"subtraction","kind":"family","template":"stack","families":[],"match":{"templates":["stack"]},"config":"design/cards/subtraction/card.json","indexSha":"e4855a641fe40d4e19914154f1da96fe97901b51","bodySha":"1d92fab41f9647c6","format":2,"configSha":"7a817a9ac3df"}
+{"cited":"AX-9 C1 CL-9 DN-1a H2 H4 H5 H6 H7 H8 H9 H10 H11 H13 L1 L6 LR-4 LR-6 P-1 PT-FRM-6 PT-GDP-1 RP-1 SP-20 VA-10","rules":"VA-1 12d322 2 26885a 4 b05d12 7 13eea3 VA-10@WDS 9d9099 VA-11@WDS a5ab88 VA-12@WDS 60049e VA-13@WDS 05d8bb VA-13a c2dfad 20 ef38e6 22 045140 23 04bd6f AK-2 d4709f TY-21 53ed7d SP-23 fe1461 VA-3 770d75 5 1337f5 6 45cb76 21 8802ac 30 5b42ae 31 2f0077 32 898868 LS-8 59531d SL-12 3cbafa TY-20 8964d2 23 e741c0 24 e73e2c 26 cc6cf2 VA-40 914c3a 41 1325cb 42 1b3a08 50 905c89 51 ca8fb1 52 992853 SL-1 e3b064 2 f404d5 11 183e7a CL-6 102a92 9 accb97 PG-12 8e75fd 14 64a88e PT-CGR-5 3f7489 PT-EQD-2 ed82db DN-34 90af7b AK-1 a0cc12 4 8d027b INK-31 d7ece8 BD-7 81d3da PT-GDP-1 a0e2cc P-SC-7 65e105 SF-34@WDS.1 00e2f6 SP-1 87c2cc 2 1f2df0 3 7b7bfb 4 51a802 10 6ffb0a 12 1309f9 SCC-T3 359377 4 e83741 10 084029 14 b8671c 15 fc9373 17 c36547 SCC-P5 6387d4 6 d362fd BD-10 8d473f 11 29d891 12 36b79c PT-FRM-6 daac17 P-1 5a3076 29 89eb8e Q-10 50b907 P-10 256ad3 35 4b32c0 31 28b15c BD-4 b3947b PT-SCR-1 25f6f5 CL-1 277ec4 AX-4 2eb6c1 INK-5 631a6d TY-7 e3e1e1 RP-1 d529bd AX-9 74e9a4 DN-1a 4fcc05 PT-GDP-2 386bb5 SL-3 468d78 SP-20 cfb11a PT-REV-3 d5e0d9 C1 66f8a9 2 32e3b2 3 3d5192 4 e59efd H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 12 2de4f7 13 36f579 OC3 bb8551 4 00a5e1 7 81bde7 8 089b5e 10 ad6428 11 c55e70 14 18b2a5 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 9 f4b4c0 10 d2ca35 11 9ebe19 CL-4b 12a353 31 383ae0 INK-3 b9f1f1 4 fe5b27 P-LC-9 bc47bd SCC-01 8aa70b SF-10 f1a0d9 SL-10 9fe607 TY-2 510243 13 3d0f88 22 7e9b75 25 b0a223","entries":"R%3AR-BAND-50 18e69e R%3AR-BAND-100 fc263d R%3AR-BAND-1K 435a7c R%3AR-BAND-10K 619074 R%3AR-BAND-100K 5d5b6b R%3AR-BAND-1M c0857e R%3AR-BAND-2D1D 18fb90 R%3AR-NO-REGROUP 71d085 R%3AR-SAME-LENGTH 6e75e9 R%3AR-SHORTER-2D1D d43a78 R%3AR-ZERO-NOT-SEEDED e7ee95 R%3AR-BOXES-2 ace42a R%3AR-BOXES-3 b32a2d R%3AR-BOXES-4 0b0482 R%3AR-BOXES-5 34e155 R%3AR-BOXES-6 37d9fb N%3AN-BAND c6154e D%3Anotation%3Dstacked d55128 D%3Anotation%3Dacross d55128 D%3Aband%3D10 d55128 D%3Aband%3D20 d55128 D%3Aband%3D50 d55128 D%3Aband%3D100 d55128 D%3Aband%3D1000 d55128 D%3Aband%3D10000 d55128 D%3Aband%3D100000 d55128 D%3Aband%3D1000000 d55128 D%3Alevel%3D3 972948 D%3Alevel%3D1 972948 D%3Alevel%3D0 972948 D%3Alevel%3D2 d55128 D%3AnlOn%3Dtrue d55128 D%3AnlOn%3Dfalse d55128 D%3AnlFrom%3D* d55128 D%3AnlTo%3D* d55128 D%3AnlStep%3D1 d55128 D%3AnlStep%3D2 d55128 D%3AnlStep%3D5 d55128 D%3AnlStep%3D10 d55128 D%3AnlStep%3D20 d55128 D%3AnlStep%3D25 d55128 D%3AnlStep%3D50 d55128 D%3AnlStep%3D100 d55128 D%3AnlStep%3D1000 d55128 D%3AnlStep%3Dauto d55128 D%3AnlStep%3D1%2F2 d55128 D%3AnlStep%3D1%2F3 d55128 D%3AnlStep%3D1%2F4 d55128 D%3AnlStep%3D1%2F5 d55128 D%3AnlStep%3D1%2F6 d55128 D%3AnlStep%3D1%2F8 d55128 D%3AnlStep%3D1%2F10 d55128 D%3AnlStep%3D1%2F12 d55128 D%3AnlStep%3D0.1 d55128 D%3AnlStep%3D0.01 d55128 D%3AnlLabels%3Dauto d55128 D%3AnlLabels%3Dall d55128 D%3AnlLabels%3D2 d55128 D%3AnlLabels%3D5 d55128 D%3AnlLabels%3D10 d55128 D%3AnlLabels%3Dends d55128 D%3AnlLabels%3Dnone d55128 D%3AnlMinor%3Dauto d55128 D%3AnlMinor%3D0 d55128 D%3AnlMinor%3D2 d55128 D%3AnlMinor%3D4 d55128 D%3AnlMinor%3D5 d55128 D%3AnlMinor%3D10 d55128 D%3AnlHops%3Dtrue d55128 D%3AnlHops%3Dfalse d55128 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Atest 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Aword-problems 972948 D%3Arole%3Afact-rows 972948 D%3Arole%3Afact-probe 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Alesson 972948 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
+-->
+<!-- rulings
+{"v": 1, "card": "subtraction",
+"skills": ["subtraction:sub_100_no_regroup","subtraction:sub_100k_no_regroup","subtraction:sub_10k_no_regroup","subtraction:sub_1k_no_regroup","subtraction:sub_1m_no_regroup","subtraction:sub_2d_1d","subtraction:sub_50_no_regroup"],
+"rulings": [
+ {"id":"R-BAND-50","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_50_no_regroup"],"assert":"range","of":"a","min":21,"max":50},
+ {"id":"R-BAND-100","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_100_no_regroup"],"assert":"range","of":"a","min":51,"max":99},
+ {"id":"R-BAND-1K","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_1k_no_regroup"],"assert":"range","of":"a","min":100,"max":999},
+ {"id":"R-BAND-10K","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_10k_no_regroup"],"assert":"range","of":"a","min":1000,"max":9999},
+ {"id":"R-BAND-100K","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_100k_no_regroup"],"assert":"range","of":"a","min":10000,"max":99999},
+ {"id":"R-BAND-1M","source":"§9.2; §5.1 (within N bounds the minuend)","skills":["subtraction:sub_1m_no_regroup"],"assert":"range","of":"a","min":100000,"max":999999},
+ {"id":"R-BAND-2D1D","source":"§9.3 (2d − 1d is the sub_2d_1d preset)","skills":["subtraction:sub_2d_1d"],"assert":"digits","of":"a","eq":2},
+ {"id":"R-NO-REGROUP","source":"§1 (the name: no regrouping)","assert":"noRegroup","op":"-"},
+ {"id":"R-SAME-LENGTH","source":"§9.3 (lengths: same by default)","skills":["subtraction:sub_50_no_regroup","subtraction:sub_100_no_regroup","subtraction:sub_1k_no_regroup","subtraction:sub_10k_no_regroup","subtraction:sub_100k_no_regroup","subtraction:sub_1m_no_regroup"],"assert":"digits","of":"b","eq":"a"},
+ {"id":"R-SHORTER-2D1D","source":"§9.3 (2d − 1d)","skills":["subtraction:sub_2d_1d"],"assert":"digits","of":"b","eq":1},
+ {"id":"R-ZERO-NOT-SEEDED","source":"§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)","assert":"maxShare","when":"zeroCase","max":0.1},
+ {"id":"R-BOXES-2","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_50_no_regroup","subtraction:sub_100_no_regroup","subtraction:sub_2d_1d"],"assert":"boxes","eq":2},
+ {"id":"R-BOXES-3","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_1k_no_regroup"],"assert":"boxes","eq":3},
+ {"id":"R-BOXES-4","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_10k_no_regroup"],"assert":"boxes","eq":4},
+ {"id":"R-BOXES-5","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_100k_no_regroup"],"assert":"boxes","eq":5},
+ {"id":"R-BOXES-6","source":"§9.5 (boxes = digits of the band largest minuend, same on every item)","skills":["subtraction:sub_1m_no_regroup"],"assert":"boxes","eq":6}
+],
+"notOffered": [
+ {"id":"N-BAND","source":"§7 (O2 number size = the six skills themselves; critic r1 D6)","option":"band"},
+ {"id":"N-D-notation","source":"§7a (decision, PROPOSED: §5.8; critic SU-C r2 N4)","option":"notation","values":["stacked","across"]},
+ {"id":"N-D-band","source":"§7a (decision, PROPOSED: §7; critic SU-C r1 D6 (N-BAND))","option":"band","values":["10","20","50","100","1000","10000","100000","1000000"]},
+ {"id":"N-D-level","source":"§7a (decision, PROPOSED: §5.9, §5.10)","option":"level","values":["2"]},
+ {"id":"N-D-nlOn","source":"§7a (decision, PROPOSED: §7 (support ladder))","option":"nlOn"},
+ {"id":"N-D-nlFrom","source":"§7a (decision, PROPOSED: §7 (support ladder))","option":"nlFrom"},
+ {"id":"N-D-nlTo","source":"§7a (decision, PROPOSED: §7 (support ladder))","option":"nlTo"},
+ {"id":"N-D-nlStep","source":"§7a (decision, PROPOSED: §7 (support ladder))","option":"nlStep","values":["1","2","5","10","20","25","50","100","1000","auto","1/2","1/3","1/4","1/5","1/6","1/8","1/10","1/12","0.1","0.01"]},
+ {"id":"N-D-nlLabels","source":"§7a (decision, PROPOSED: §7 (support ladder))","option":"nlLabels","values":["auto","all","2","5","10","ends","none"]},
+ {"id":"N-D-nlMinor","source":"§7a (decision, PROPOSED: §7 (support ladder))","option":"nlMinor","values":["auto","0","2","4","5","10"]},
+ {"id":"N-D-nlHops","source":"§7a (decision, PROPOSED: §7 (support ladder))","option":"nlHops"}
+],
+"todo": [
+ {"id":"T-5.2","source":"§5.2","text":"Pupil-facing text says \"regroup\", never \"borrow\" (P-32); the legacy column caption \"Use..."},
+ {"id":"T-5.3","source":"§5.3","text":"Writing boxes are slightly rounded (SL-11); a row of digit boxes is ONE outline with di..."},
+ {"id":"T-5.4","source":"§5.4","text":"Key answers print reddish orange, keys only (INK-31)."},
+ {"id":"T-5.5","source":"§5.5","text":"SPEC, NOT BUILT: on screen the regroup boxes an item NEEDS are required and marked. A n..."},
+ {"id":"T-5.6","source":"§5.6","text":"SPEC, NOT BUILT: `carry: top | bottom` is addition and × only; subtraction stays at the..."},
+ {"id":"T-5.7","source":"§5.7","text":"A distinct option (new size class, new task kind) is also a findable preset skill; smal..."},
+ {"id":"T-9.1","source":"§9.1","text":"Shared defects D1, D2, D5 (legacy pink / orange column visual, \"borrowing\" caption, pla..."},
+ {"id":"T-9.6","source":"§9.6","text":"D6 (six digits at 2 columns is tight): shrink, or fewer columns?"},
+ {"id":"T-9.7","source":"§9.7","text":"SU-M1 (smaller from larger) is invisible on a no-regroup page. Seed regroup non-example..."},
+ {"id":"T-9.8","source":"§9.8","text":"MW4K / IXL research is pending logins (Q-H4). Sign now?"}
+]
+}
 -->
 # Spec card: Column subtraction without regrouping, within 50 to within 1,000,000 (pilot: six SU-C skills)
 
@@ -217,13 +265,58 @@ For answer keys, `wrongAnswer`, error analysis, True or False? and Reason It (P-
 - The ladder in O-rubric terms: O2 number size = the six skills themselves (within N, minuend-bounded); O3 support = place heads (hint, fades on its step), answer boxes and grid (structural, stay); O6 stacked / across (across belongs to the `sub-setup` rewrite page).
 - Proposed (section 9): `lengths: same | shorter` (ragged as its own section), `zeros: on | off` (zero-case section), `heads: on | off` via the support level. Each is a plain option, not a preset skill, except where section 9 says a new skill (`sub_2d_1d`, catalogue C3).
 
-**Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
+What the repo offers today (every option value, role and screen host, each with its decision) and the options and preset skills declared in the repo are listed after the Signed line (§7b, informational, not signed).
 
-- `level` Support level: 3 / 1 / 0 (6)
-- `lengths` Number lengths: same / shorter (5)
-- `zeros` Zeros: off / on (4)
+### 7a. Hosts, roles and options — the decisions (signed)
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): `subtraction:sub_2d_1d` → `subtraction:sub_100_no_regroup` {"lengths":"shorter"}
+What the critic grades and the panel may show. Each live line in §7b needs one of: **offered** (shown and graded on every page type and host it reaches), **hidden** (must not be offered on these skills: becomes a notOffered entry of the rulings block, checked by ws-card-rulings --check offered), **out of scope** (offered by the app but not graded on this card; say where it is graded). PROPOSED = pre-filled for the lead from existing rulings and status; signing the card accepts it.
+
+**Option values (offeredOptionsFor)**
+
+- `notation=stacked | across` — **hidden** (PROPOSED) — the inherited AP4 control is removed; these six are always stacked, across belongs to the `sub-setup` rewrite page (§5.8; critic SU-C r2 N4)
+- `band=10 | 20 | 50 | 100 | 1000 | 10000 | 100000 | 1000000` — **hidden** (PROPOSED) — O2 number size IS the six skills; the legacy band control would deal another skill's numbers (§7; critic SU-C r1 D6 (N-BAND))
+- `level=3 | 1 | 0` — **offered** (PROPOSED) — 3 traces the answer, 1 prints the place heads, 0 takes them away; the answer boxes stay at every level (§5.9, §5.10)
+- `level=2` — **hidden** (PROPOSED) — levels offered are 3, 1, 0 (the derived table's [3, 2, 1] is stale; a re-derive measures [3, 1, 0]) (§5.9, §5.10)
+- `nlOn=true | false` — **hidden** (PROPOSED) — Not in the section 7 support ladder (O3 = place heads, answer boxes, grid; the column is the lesson): a number line beside a column subtraction is a second strategy on one page (P-1). Lead to rule; if kept it is offered and graded (§7 (support ladder))
+- `nlFrom=*` — **hidden** (PROPOSED) — a sub-control of the number line (nlOn) (§7 (support ladder))
+- `nlTo=*` — **hidden** (PROPOSED) — a sub-control of the number line (nlOn) (§7 (support ladder))
+- `nlStep=1 | 2 | 5 | 10 | 20 | 25 | 50 | 100 | 1000 | auto | 1/2 | 1/3 | 1/4 | 1/5 | 1/6 | 1/8 | 1/10 | 1/12 | 0.1 | 0.01` — **hidden** (PROPOSED) — a sub-control of the number line (nlOn) (§7 (support ladder))
+- `nlLabels=auto | all | 2 | 5 | 10 | ends | none` — **hidden** (PROPOSED) — a sub-control of the number line (nlOn) (§7 (support ladder))
+- `nlMinor=auto | 0 | 2 | 4 | 5 | 10` — **hidden** (PROPOSED) — a sub-control of the number line (nlOn) (§7 (support ladder))
+- `nlHops=true | false` — **hidden** (PROPOSED) — a sub-control of the number line (nlOn) (§7 (support ladder))
+- `calculator=true | false` — **out of scope** (PROPOSED) — a play control of the screen practice session: it changes no cell, page or key; ws-options-verify checks it on the screen path (skill-options.js UNIVERSAL_OPTIONS (play group))
+- `skipAfter=*` — **out of scope** (PROPOSED) — a play control of the screen practice session: it changes no cell, page or key (skill-options.js UNIVERSAL_OPTIONS (play group))
+
+**Page roles (buildSheet)**
+
+- `independent` — **offered** (PROPOSED) — the plain page (CLAUDE.md (any skill on any page type, every page with a key))
+- `more-practice` — **offered** (PROPOSED) — More Practice A-J (CLAUDE.md (any skill on any page type, every page with a key))
+- `opener` — **offered** (PROPOSED) — the lesson opener (CLAUDE.md (any skill on any page type, every page with a key))
+- `scripted-model` — **offered** (PROPOSED) — worked steps from the provider (real on 2 of 6 on this tree: the build supplies the rest) (CLAUDE.md (any skill on any page type, every page with a key))
+- `guided` — **offered** (PROPOSED) — worked steps from the provider (as scripted-model) (CLAUDE.md (any skill on any page type, every page with a key))
+- `error-analysis` — **offered** (PROPOSED) — wrongAnswer from SU-M7 / M-ALIGN / M-ZERO (§9.7) (CLAUDE.md (any skill on any page type, every page with a key))
+- `review` — **offered** (PROPOSED) — earlier skills in data.js order (CLAUDE.md (any skill on any page type, every page with a key))
+- `test` — **offered** (PROPOSED) — forms A and B (CLAUDE.md (any skill on any page type, every page with a key))
+- `pre-skill-check` — **offered** (PROPOSED) — earlier skills in data.js order (CLAUDE.md (any skill on any page type, every page with a key))
+- `word-problems` — **offered** (PROPOSED) — provider stories (real on 2 of 6 on this tree) (CLAUDE.md (any skill on any page type, every page with a key))
+- `fact-rows` — **offered** (PROPOSED) — operations skills also get the fact layouts (CLAUDE.md); fact-rows at S for 5-6 digits is engine-owned (pilot status (c)) (CLAUDE.md (any skill on any page type, every page with a key))
+- `fact-probe` — **offered** (PROPOSED) — operations skills also get the fact layouts (CLAUDE.md) (CLAUDE.md (any skill on any page type, every page with a key))
+- `mixed-practice` — **offered** (PROPOSED) — with the earlier no-regroup rungs (CLAUDE.md (any skill on any page type, every page with a key))
+- `true-false` — **offered** (PROPOSED) — wrongAnswer (§9.7) (CLAUDE.md (any skill on any page type, every page with a key))
+- `reason-it` — **offered** (PROPOSED) — wrongAnswer and worked steps (§9.7) (CLAUDE.md (any skill on any page type, every page with a key))
+- `stretch` — **offered** (PROPOSED) — the stretch page (CLAUDE.md (any skill on any page type, every page with a key))
+- `lesson` — **offered** (PROPOSED) — needs a prereqs.js lesson entry per skill (critic SU-C r1 D4); on this tree all six run the FALLBACK (CLAUDE.md (any skill on any page type, every page with a key))
+
+**Screen hosts**
+
+- `practice-card` — **offered** (PROPOSED) — the practice card (RUBRIC (every screen host); screen-cell.js)
+- `online-worksheet` — **offered** (PROPOSED) — the online worksheet (RUBRIC (every screen host))
+- `quiz` — **offered** (PROPOSED) — the quiz (RUBRIC (every screen host))
+- `boss` — **out of scope** (PROPOSED) — Boss Battle draws the practice card's cell inside game chrome: graded as practice-card; fit checked by ws-chromebook-fit (screen-cell.js (one cell for every host))
+- `race` — **out of scope** (PROPOSED) — Car Race draws the practice card's cell inside game chrome: graded as practice-card; fit checked by ws-chromebook-fit (screen-cell.js (one cell for every host))
+- `map` — **out of scope** (PROPOSED) — a MAP session deals MAP items, not these skills by name (ws-screen-slots (MAP borrows the practice card))
+- `mode-dark` — **out of scope** (PROPOSED) — dark mode of the pupil app: the cell stays black on white (SC-2); checked by ws-screen-slots / ws-chromebook-fit --dark, not graded on this card (lead to rule)
+- `mode-bigboard` — **out of scope** (PROPOSED) — the big-board display of the practice card: checked by ws-screen-slots / ws-chromebook-fit --bigboard, not graded on this card (lead to rule)
 
 ## 8. Gates
 
@@ -257,3 +350,106 @@ Each runs as `node tests/scripts/<script> …`.
 8. **MW4K / IXL research is pending logins (Q-H4). Sign now?** Recommended: Yes, sign now; add the research to section 2 when the logins work, and re-sign only if the problem types or progression change.
 
 Signed: (not yet signed)
+
+<!-- informational: not signed. Not hashed, not compared, never read by any check. -->
+## 7b. What the repo offers today (informational, not signed)
+
+Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
+
+**Option values (offeredOptionsFor)** (55 lines; 0 undecided)
+
+- `notation=stacked` How it is written, default (sub_100_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `notation=across` How it is written (sub_100_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `band=10` Numbers to (all 6) [hidden, PROPOSED]
+- `band=20` Numbers to (all 6) [hidden, PROPOSED]
+- `band=50` Numbers to, default on sub_50_no_regroup (all 6) [hidden, PROPOSED]
+- `band=100` Numbers to, default on sub_100_no_regroup (sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
+- `level=3` Support level (all 6) [offered, PROPOSED]
+- `level=2` Support level (all 6) [hidden, PROPOSED]
+- `level=1` Support level, default (all 6) [offered, PROPOSED]
+- `nlOn=true` Show the number line [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlOn=false` Show the number line [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlFrom=*` Starts at [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlTo=*` Ends at [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=2` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=5` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=10` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=20` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=25` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=50` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=100` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1000` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=auto` Step between ticks [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1/2` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1/3` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1/4` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1/5` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1/6` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1/8` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1/10` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=1/12` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=0.1` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlStep=0.01` Step between ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlLabels=auto` Numbers under the ticks [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlLabels=all` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlLabels=2` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlLabels=5` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlLabels=10` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlLabels=ends` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlLabels=none` Numbers under the ticks [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlMinor=auto` Small ticks between [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlMinor=0` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlMinor=2` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlMinor=4` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlMinor=5` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlMinor=10` Small ticks between [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlHops=true` Hop arrows over each step [nline] (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `nlHops=false` Hop arrows over each step [nline], default (sub_100_no_regroup, sub_1k_no_regroup, sub_50_no_regroup) [hidden, PROPOSED]
+- `calculator=true` Calculator [play] (all 6) [out of scope, PROPOSED]
+- `calculator=false` Calculator [play], default (all 6) [out of scope, PROPOSED]
+- `skipAfter=*` Skip appears after [play] (all 6) [out of scope, PROPOSED]
+- `band=1000` Numbers to, default on sub_1k_no_regroup (sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
+- `band=10000` Numbers to, default on sub_10k_no_regroup (sub_100k_no_regroup, sub_10k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
+- `band=100000` Numbers to, default on sub_100k_no_regroup (sub_100k_no_regroup, sub_1m_no_regroup) [hidden, PROPOSED]
+- `band=1000000` Numbers to, default (sub_1m_no_regroup) [hidden, PROPOSED]
+
+**Page roles (buildSheet)** (17 lines; 0 undecided)
+
+- `role:independent` — the skill's own items (all 6) [offered, PROPOSED]
+- `role:more-practice` — the skill's own items (all 6) [offered, PROPOSED]
+- `role:opener` (also lesson-opener) — the skill's own items (all 6) [offered, PROPOSED]
+- `role:scripted-model` (also model) — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup); provider misconceptions: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 6) [offered, PROPOSED]
+- `role:test` (also test-a, test-b) — the skill's own items (all 6) [offered, PROPOSED]
+- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 6) [offered, PROPOSED]
+- `role:word-problems` — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:fact-rows` — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:fact-probe` — the skill's own items (all 6) [offered, PROPOSED]
+- `role:mixed-practice` (also mixed) — provider stories: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:true-false` — provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:reason-it` (also reason) — provider workedSteps: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup); provider wrongAnswer: real 2/6 (default on sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup) (all 6) [offered, PROPOSED]
+- `role:stretch` — the skill's own items (all 6) [offered, PROPOSED]
+- `role:lesson` — lesson data: prereqs.js 0/6 (FALLBACK, warm-up from the earlier skills in data.js order, on sub_100_no_regroup, sub_100k_no_regroup, sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup, sub_50_no_regroup) (all 6) [offered, PROPOSED]
+
+**Screen hosts** (8 lines; 0 undecided)
+
+- `host:boss` — driven by ws-chromebook-fit (all 6) [out of scope, PROPOSED]
+- `host:map` — driven by ws-screen-slots (all 6) [out of scope, PROPOSED]
+- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 6) [out of scope, PROPOSED]
+- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 6) [out of scope, PROPOSED]
+- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 6) [offered, PROPOSED]
+- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 6) [offered, PROPOSED]
+- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 6) [offered, PROPOSED]
+- `host:race` — driven by ws-chromebook-fit (all 6) [out of scope, PROPOSED]
+
+**Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
+
+- `band` Numbers to: 10 / 20 / 50 / 100 (6)
+- `level` Support level: 3 / 2 / 1 (6)
+- `notation` How it is written: stacked / across (2)
+
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): (none)
+<!-- /informational -->

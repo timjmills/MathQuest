@@ -456,5 +456,533 @@
    "recommended": "Yes, sign now; add the research to section 2 when the logins work, and re-sign only if the problem types or progression change."
   }
  ],
- "sourceChars": 90
+ "sourceChars": 90,
+ "rulings": {
+  "rulings": [
+   {
+    "id": "R-BAND-50",
+    "source": "§9.2; §5.1 (within N bounds the minuend)",
+    "skills": [
+     "subtraction:sub_50_no_regroup"
+    ],
+    "assert": "range",
+    "of": "a",
+    "min": 21,
+    "max": 50
+   },
+   {
+    "id": "R-BAND-100",
+    "source": "§9.2; §5.1 (within N bounds the minuend)",
+    "skills": [
+     "subtraction:sub_100_no_regroup"
+    ],
+    "assert": "range",
+    "of": "a",
+    "min": 51,
+    "max": 99
+   },
+   {
+    "id": "R-BAND-1K",
+    "source": "§9.2; §5.1 (within N bounds the minuend)",
+    "skills": [
+     "subtraction:sub_1k_no_regroup"
+    ],
+    "assert": "range",
+    "of": "a",
+    "min": 100,
+    "max": 999
+   },
+   {
+    "id": "R-BAND-10K",
+    "source": "§9.2; §5.1 (within N bounds the minuend)",
+    "skills": [
+     "subtraction:sub_10k_no_regroup"
+    ],
+    "assert": "range",
+    "of": "a",
+    "min": 1000,
+    "max": 9999
+   },
+   {
+    "id": "R-BAND-100K",
+    "source": "§9.2; §5.1 (within N bounds the minuend)",
+    "skills": [
+     "subtraction:sub_100k_no_regroup"
+    ],
+    "assert": "range",
+    "of": "a",
+    "min": 10000,
+    "max": 99999
+   },
+   {
+    "id": "R-BAND-1M",
+    "source": "§9.2; §5.1 (within N bounds the minuend)",
+    "skills": [
+     "subtraction:sub_1m_no_regroup"
+    ],
+    "assert": "range",
+    "of": "a",
+    "min": 100000,
+    "max": 999999
+   },
+   {
+    "id": "R-BAND-2D1D",
+    "source": "§9.3 (2d − 1d is the sub_2d_1d preset)",
+    "skills": [
+     "subtraction:sub_2d_1d"
+    ],
+    "assert": "digits",
+    "of": "a",
+    "eq": 2
+   },
+   {
+    "id": "R-NO-REGROUP",
+    "source": "§1 (the name: no regrouping)",
+    "assert": "noRegroup",
+    "op": "-"
+   },
+   {
+    "id": "R-SAME-LENGTH",
+    "source": "§9.3 (lengths: same by default)",
+    "skills": [
+     "subtraction:sub_50_no_regroup",
+     "subtraction:sub_100_no_regroup",
+     "subtraction:sub_1k_no_regroup",
+     "subtraction:sub_10k_no_regroup",
+     "subtraction:sub_100k_no_regroup",
+     "subtraction:sub_1m_no_regroup"
+    ],
+    "assert": "digits",
+    "of": "b",
+    "eq": "a"
+   },
+   {
+    "id": "R-SHORTER-2D1D",
+    "source": "§9.3 (2d − 1d)",
+    "skills": [
+     "subtraction:sub_2d_1d"
+    ],
+    "assert": "digits",
+    "of": "b",
+    "eq": 1
+   },
+   {
+    "id": "R-ZERO-NOT-SEEDED",
+    "source": "§9.4 (zeros off: never seeded; critic r1 D1 bound 10%)",
+    "assert": "maxShare",
+    "when": "zeroCase",
+    "max": 0.1
+   },
+   {
+    "id": "R-BOXES-2",
+    "source": "§9.5 (boxes = digits of the band largest minuend, same on every item)",
+    "skills": [
+     "subtraction:sub_50_no_regroup",
+     "subtraction:sub_100_no_regroup",
+     "subtraction:sub_2d_1d"
+    ],
+    "assert": "boxes",
+    "eq": 2
+   },
+   {
+    "id": "R-BOXES-3",
+    "source": "§9.5 (boxes = digits of the band largest minuend, same on every item)",
+    "skills": [
+     "subtraction:sub_1k_no_regroup"
+    ],
+    "assert": "boxes",
+    "eq": 3
+   },
+   {
+    "id": "R-BOXES-4",
+    "source": "§9.5 (boxes = digits of the band largest minuend, same on every item)",
+    "skills": [
+     "subtraction:sub_10k_no_regroup"
+    ],
+    "assert": "boxes",
+    "eq": 4
+   },
+   {
+    "id": "R-BOXES-5",
+    "source": "§9.5 (boxes = digits of the band largest minuend, same on every item)",
+    "skills": [
+     "subtraction:sub_100k_no_regroup"
+    ],
+    "assert": "boxes",
+    "eq": 5
+   },
+   {
+    "id": "R-BOXES-6",
+    "source": "§9.5 (boxes = digits of the band largest minuend, same on every item)",
+    "skills": [
+     "subtraction:sub_1m_no_regroup"
+    ],
+    "assert": "boxes",
+    "eq": 6
+   }
+  ],
+  "notOffered": [
+   {
+    "id": "N-BAND",
+    "source": "§7 (O2 number size = the six skills themselves; critic r1 D6)",
+    "option": "band"
+   }
+  ]
+ },
+ "decisions": {
+  "options": [
+   {
+    "option": "notation",
+    "values": [
+     "stacked",
+     "across"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§5.8; critic SU-C r2 N4",
+    "why": "the inherited AP4 control is removed; these six are always stacked, across belongs to the `sub-setup` rewrite page"
+   },
+   {
+    "option": "band",
+    "values": [
+     "10",
+     "20",
+     "50",
+     "100",
+     "1000",
+     "10000",
+     "100000",
+     "1000000"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§7; critic SU-C r1 D6 (N-BAND)",
+    "why": "O2 number size IS the six skills; the legacy band control would deal another skill's numbers"
+   },
+   {
+    "option": "level",
+    "values": [
+     "3",
+     "1",
+     "0"
+    ],
+    "d": "offered",
+    "proposed": true,
+    "source": "§5.9, §5.10",
+    "why": "3 traces the answer, 1 prints the place heads, 0 takes them away; the answer boxes stay at every level"
+   },
+   {
+    "option": "level",
+    "values": [
+     "2"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§5.9, §5.10",
+    "why": "levels offered are 3, 1, 0 (the derived table's [3, 2, 1] is stale; a re-derive measures [3, 1, 0])"
+   },
+   {
+    "option": "nlOn",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§7 (support ladder)",
+    "why": "Not in the section 7 support ladder (O3 = place heads, answer boxes, grid; the column is the lesson): a number line beside a column subtraction is a second strategy on one page (P-1). Lead to rule; if kept it is offered and graded"
+   },
+   {
+    "option": "nlFrom",
+    "values": [
+     "*"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§7 (support ladder)",
+    "why": "a sub-control of the number line (nlOn)"
+   },
+   {
+    "option": "nlTo",
+    "values": [
+     "*"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§7 (support ladder)",
+    "why": "a sub-control of the number line (nlOn)"
+   },
+   {
+    "option": "nlStep",
+    "values": [
+     "1",
+     "2",
+     "5",
+     "10",
+     "20",
+     "25",
+     "50",
+     "100",
+     "1000",
+     "auto",
+     "1/2",
+     "1/3",
+     "1/4",
+     "1/5",
+     "1/6",
+     "1/8",
+     "1/10",
+     "1/12",
+     "0.1",
+     "0.01"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§7 (support ladder)",
+    "why": "a sub-control of the number line (nlOn)"
+   },
+   {
+    "option": "nlLabels",
+    "values": [
+     "auto",
+     "all",
+     "2",
+     "5",
+     "10",
+     "ends",
+     "none"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§7 (support ladder)",
+    "why": "a sub-control of the number line (nlOn)"
+   },
+   {
+    "option": "nlMinor",
+    "values": [
+     "auto",
+     "0",
+     "2",
+     "4",
+     "5",
+     "10"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§7 (support ladder)",
+    "why": "a sub-control of the number line (nlOn)"
+   },
+   {
+    "option": "nlHops",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "hidden",
+    "proposed": true,
+    "source": "§7 (support ladder)",
+    "why": "a sub-control of the number line (nlOn)"
+   },
+   {
+    "option": "calculator",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "out of scope",
+    "proposed": true,
+    "source": "skill-options.js UNIVERSAL_OPTIONS (play group)",
+    "why": "a play control of the screen practice session: it changes no cell, page or key; ws-options-verify checks it on the screen path"
+   },
+   {
+    "option": "skipAfter",
+    "values": [
+     "*"
+    ],
+    "d": "out of scope",
+    "proposed": true,
+    "source": "skill-options.js UNIVERSAL_OPTIONS (play group)",
+    "why": "a play control of the screen practice session: it changes no cell, page or key"
+   }
+  ],
+  "roles": [
+   {
+    "key": "independent",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "the plain page"
+   },
+   {
+    "key": "more-practice",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "More Practice A-J"
+   },
+   {
+    "key": "opener",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "the lesson opener"
+   },
+   {
+    "key": "scripted-model",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "worked steps from the provider (real on 2 of 6 on this tree: the build supplies the rest)"
+   },
+   {
+    "key": "guided",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "worked steps from the provider (as scripted-model)"
+   },
+   {
+    "key": "error-analysis",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "wrongAnswer from SU-M7 / M-ALIGN / M-ZERO (§9.7)"
+   },
+   {
+    "key": "review",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "earlier skills in data.js order"
+   },
+   {
+    "key": "test",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "forms A and B"
+   },
+   {
+    "key": "pre-skill-check",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "earlier skills in data.js order"
+   },
+   {
+    "key": "word-problems",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "provider stories (real on 2 of 6 on this tree)"
+   },
+   {
+    "key": "fact-rows",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "operations skills also get the fact layouts (CLAUDE.md); fact-rows at S for 5-6 digits is engine-owned (pilot status (c))"
+   },
+   {
+    "key": "fact-probe",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "operations skills also get the fact layouts (CLAUDE.md)"
+   },
+   {
+    "key": "mixed-practice",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "with the earlier no-regroup rungs"
+   },
+   {
+    "key": "true-false",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "wrongAnswer (§9.7)"
+   },
+   {
+    "key": "reason-it",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "wrongAnswer and worked steps (§9.7)"
+   },
+   {
+    "key": "stretch",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "the stretch page"
+   },
+   {
+    "key": "lesson",
+    "d": "offered",
+    "proposed": true,
+    "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+    "why": "needs a prereqs.js lesson entry per skill (critic SU-C r1 D4); on this tree all six run the FALLBACK"
+   }
+  ],
+  "hosts": [
+   {
+    "key": "practice-card",
+    "d": "offered",
+    "proposed": true,
+    "source": "RUBRIC (every screen host); screen-cell.js",
+    "why": "the practice card"
+   },
+   {
+    "key": "online-worksheet",
+    "d": "offered",
+    "proposed": true,
+    "source": "RUBRIC (every screen host)",
+    "why": "the online worksheet"
+   },
+   {
+    "key": "quiz",
+    "d": "offered",
+    "proposed": true,
+    "source": "RUBRIC (every screen host)",
+    "why": "the quiz"
+   },
+   {
+    "key": "boss",
+    "d": "out of scope",
+    "proposed": true,
+    "source": "screen-cell.js (one cell for every host)",
+    "why": "Boss Battle draws the practice card's cell inside game chrome: graded as practice-card; fit checked by ws-chromebook-fit"
+   },
+   {
+    "key": "race",
+    "d": "out of scope",
+    "proposed": true,
+    "source": "screen-cell.js (one cell for every host)",
+    "why": "Car Race draws the practice card's cell inside game chrome: graded as practice-card; fit checked by ws-chromebook-fit"
+   },
+   {
+    "key": "map",
+    "d": "out of scope",
+    "proposed": true,
+    "source": "ws-screen-slots (MAP borrows the practice card)",
+    "why": "a MAP session deals MAP items, not these skills by name"
+   },
+   {
+    "key": "mode-dark",
+    "d": "out of scope",
+    "proposed": true,
+    "source": "lead to rule",
+    "why": "dark mode of the pupil app: the cell stays black on white (SC-2); checked by ws-screen-slots / ws-chromebook-fit --dark, not graded on this card"
+   },
+   {
+    "key": "mode-bigboard",
+    "d": "out of scope",
+    "proposed": true,
+    "source": "lead to rule",
+    "why": "the big-board display of the practice card: checked by ws-screen-slots / ws-chromebook-fit --bigboard, not graded on this card"
+   }
+  ]
+ }
 }

@@ -1,0 +1,9 @@
+{
+ "about": "ws-phone-card A14 'siblings clean' (critic r6 D2): approved skills the probe must pass at 390x844 and 390x664 on any tree. If one of them fails, the PROBE is wrong (it misjudged an approved skill), so ws-phone-card FAILs itself, whatever the lane's skills did. The first two are the legacy column twins critic r6 caught falsely failing FOCUS (the focused .column-answer-input.mq-active-box sits 3-4 px above its row); then an approved kit stack skill and a K skill. Change only with a STATUS note.",
+ "skills": [
+  "addition:add_10k_regroup",
+  "subtraction:sub_1m_regroup",
+  "addition:add_100_regroup",
+  "addition:add_10_no_regroup"
+ ]
+}

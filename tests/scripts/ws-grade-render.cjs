@@ -86,10 +86,10 @@
 //                   worksheet, quiz); <out>/contact/index.md lists them.
 // --envelope <template>--<kind>  renders the all-pairs sample `node tests/scripts/ws-envelope.mjs
 //                   --envelope <pair> --out <file>` writes, or the file given with --sample <file.json>.
-//                   By default the CRITIC sample (sample.critic: all pairs of option values deduped
-//                   across skills + a seeded random 20 % capped at 40 pages, §1.6.2); --full-sample the
-//                   machine sample (sample.print / sample.screen, every skill); --bounded-sample the bound
-//                   ws-envelope proposes when the strict critic set is over budget (sample.criticBounded).
+//                   By default the CRITIC sample (sample.critic, D8 ruling: the bounded all-pairs set +
+//                   a seeded random 20 %, the total capped at 40 pages a pair, §1.6.2); --strict-sample the
+//                   strict all-pairs set (sample.criticStrict, reference); --full-sample the machine
+//                   sample (sample.print / sample.screen, every skill).
 //                   ws-envelope's shape {sample: {print: [...], screen: [...]}} is mapped by
 //                   loadEnvelopeSample (print row -> role from its layout, opts from opt:*, size, and
 //                   examples / pages / fade / key as the unit's request; screen row -> that host only;
@@ -589,17 +589,21 @@ function loadEnvelopeSample() {
         return { categoryId, skillId };
     };
     const skipped = [];
-    // which part of ws-envelope's sample: the CRITIC sample by default (§1.6.2: all pairs of option values
-    // deduped across skills + the random 20 % capped at 40 pages); --bounded-sample the bound proposed when
-    // the strict set is over budget (sample.criticBounded); --full-sample the machine sample (every skill)
+    // which part of ws-envelope's sample: the CRITIC sample by default (D8 ruling: the bounded all-pairs set +
+    // the random 20 %, total capped at 40 pages a pair); --strict-sample the strict all-pairs set
+    // (sample.criticStrict); --full-sample the machine sample (every skill)
     let part = null;
     if (json.sample && !Array.isArray(json.sample) && (json.sample.print || json.sample.screen || json.sample.critic)) {
-        const want = has('full-sample') ? 'full' : has('bounded-sample') ? 'criticBounded' : 'critic';
+        const want = has('full-sample') ? 'full' : has('strict-sample') ? 'criticStrict' : 'critic';
         if (want === 'full' || !json.sample.critic) part = { name: want === 'full' ? 'full (sample.print / sample.screen)' : 'full (this file has no sample.critic: an older ws-envelope)', print: json.sample.print, screen: json.sample.screen };
-        else if (want === 'criticBounded') {
-            if (!json.sample.criticBounded) throw new Error('--bounded-sample: this envelope has no sample.criticBounded (its strict critic sample is within budget)');
-            part = { name: `criticBounded (${json.sample.criticBounded.variant})`, print: json.sample.criticBounded.print, screen: json.sample.criticBounded.screen };
-        } else part = { name: `critic (${json.sample.critic.rows.pairs} all-pairs + ${json.sample.critic.rows.random} random rows, ${json.sample.critic.pages.total} pages${json.sample.critic.overBudget ? '; OVER the plan budget: see sample.critic.proposal' : ''})`, print: json.sample.critic.print, screen: json.sample.critic.screen };
+        else if (want === 'criticStrict') {
+            if (!json.sample.criticStrict) throw new Error('--strict-sample: this envelope has no sample.criticStrict (an older ws-envelope: re-run --envelope)');
+            const st = json.sample.criticStrict;
+            part = { name: `criticStrict (${st.rows.pairs} all-pairs + ${st.rows.random} random rows, ${st.pages.total} pages)`, print: st.print, screen: st.screen };
+        } else {
+            const c = json.sample.critic;
+            part = { name: `critic${c.variant ? ` (${c.variant})` : ''} (${c.rows.pairs} all-pairs + ${c.rows.random} random rows, ${c.pages.total} pages${c.coverage ? `; ${c.coverage.coveredPairs} of ${c.coverage.requiredPairs} pairs of the ${c.coverage.of}` : ''})`, print: c.print, screen: c.screen };
+        }
         console.log(`ws-grade-render: envelope sample part: ${part.name}`);
     }
     if (part) {

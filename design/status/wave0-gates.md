@@ -49,7 +49,7 @@ Builders run in their own git worktrees and the lead merges them here.
 | Critic r4: FAIL 7 / 8 / 8 (D1 deploy session 1 ran the whole options pin; D2 fold order by name) | mq-opus-medium | 19:05 | 19:19 | — |
 | Fix r4: read-only options gate at deploy, fold every run file by finish time + nits — merged b261abf0 | mq-opus-medium (rebuild after a failed round) | 19:19 | — | — |
 | Critic r5: **PASS 9 / 9 / 8**, no blocking defects | mq-opus-medium | 20:00 | 19:56 | — |
-| Precritic additions from the pilot's critic r1 (sibling compare, SLOT/CLIP on every matrix row, 390 px card, card rulings, not-offered options), lead request 20:00 | mq-opus-medium (first build) | 20:01 | — | — |
+| Precritic additions from the pilot's critic r1 (sibling compare, SLOT/CLIP on every matrix row, 390 px card, card rulings, not-offered options), lead request 20:00 | mq-opus-medium (first build) | 20:01 | 21:07 | — |
 | S1 `ws-precritic` build (brought forward by the lead, 11:02; stopped: moved to the lead's session) | mq-opus-medium | 11:03 | 12:51 | 108 |
 
 ## Critic r1 (2026-10-23, `design/audit/runs/wave0-gates/critic-r1.md`): FAIL — plan 6, backtests 8, usable 6
@@ -167,7 +167,7 @@ mutant fails it). Lanes must commit before a clearing run (a dirty run never cle
 | Gate session | Run 1 | Run 2 | Run 3 | Notes |
 |---|---|---|---|---|
 | 1 (node gates, content-audit, print-lint kit, teacher-*, screen-answer, share-options, lesson repeats) | FAIL 27.9 min | FAIL 28.4 min | OK (1 FLAKE) 26.4 min | 0 s slot waits; print-lint ≈ 1,000 s and teacher-wrm ≈ 870 s set the length. The only non-OK gate: `ws-teacher-shell`, aborted Andika .woff2 loads (`net::ERR_ABORTED`) counted as console errors — a harness defect, fixed (`tests/lib/ws-harness.cjs` ignores aborted font loads only; 3/3 solo runs OK after) |
-| 2 (screen-slots + chromebook-fit sharded, big-board and dark sweeps, viewport, S9 check) | (still running) | | | |
+| 2 (screen-slots + chromebook-fit sharded, big-board and dark sweeps, viewport, S9 check) | OK 34.1 min | OK 34.3 min | OK 34.3 min | every gate OK, 0 s slot waits; browser work 4,027 s = 33.6 min floor on two slots, so it cannot meet 30 min as listed. Rebalanced: `ws-viewport-check` (≈ 690 s) moved to session 3 (`MQ_VIEWPORT_SESSION`), session 2 ≈ 27.8 min computed from the measured gate times, session 3 ≈ 22 min matrix budget + the viewport check on its free slot ≈ 28 min; confirmation runs below |
 | 3 (coverage matrix affected rows, digests hook, owner go) | OK (1 WARNING) 9.0 s | OK 8.6 s | OK 8.8 s | over budget (32,766 docs) with no nightly and no full baseline → the owner's WARNING; nothing rendered, so this times the verdict, not a render |
 
 ## Critic r5 (`design/audit/runs/wave0-gates/critic-r5.md`): **PASS** — plan 9, backtests 9, usable 8
@@ -177,3 +177,143 @@ legacy run file without `baseline` still clears red with a WARNING; N3 options-p
 N4 a crashed options-pin slice is not re-run before the full baseline (gate stays WARNING); N5 mc-production backtest feeds
 the judge directly, and CLAUDE.md "Checks to run" does not name ws-deploy-gates.sh / ws-backtest (lead's file); N6 renamed
 rows re-map nightly and never settle.
+
+Owner rule for the Repeated check ("if there is no credit when it runs, save that day for the next possible time"), merged
+d4771778: the steady-phase slice is the one after the last COMPLETED slice (newest finished, not-dirty run file), not the
+date's; the affected range already diffs from the last successful run. `ws-matrix-nightly.sh --self-test` (10 cases: one and
+two missed nights resume at the next slice and cover both nights' changes; dirty / unfinished runs don't count; 28 wraps to 1).
+Known behaviour: a forced `--slice k/28` re-run that completes resets the rotation to k+1 (use it only for the missed slice).
+
+## Precritic additions from the pilot's critic r1 (merged 27e67da4)
+Five checks in ws-precritic, each backtested: BAD = the pilot tree critic r1 graded (b3948d88), GOOD = b3948d88 + a seeded
+minimal fix patch (`tests/fixtures/precritic/pilot-su-c/good.patch`, never committed as app code; the pilot had no fix
+commit yet). `ws-backtest --row …-pilot`: 5/5 PASS (283 s).
+1. `ws-sibling-compare.cjs` — a red matrix row above the approved siblings' max (same row, size, rule) is FAIL; at or
+   below is engine red (rule 0b). Siblings in `tests/fixtures/precritic/siblings.json` (8 stack skills — to confirm).
+2. `ws-slot-clip.cjs` — L-ANSAREA / L-OVERFLOW on every matrix row × S/M/L + a probe for answer-box segment width ≥ 4.4 mm
+   (TY-21) and overlapping place-value heads (H2); the pilot's 4.06 mm segments at S are caught.
+3. `ws-phone-card.cjs` — the practice card at 390×844 / 390×664: no sideways clip, focus on the first (ones) box, in view.
+4. `ws-card-rulings.mjs --check rulings` — a card's `<!-- rulings {json} -->` block asserted over 300 seeded items a skill
+   (pilot: zero cases 55 % on sub_50 vs the 10 % bound).
+5. `--check offered` — the option panel offers nothing the card's `notOffered` lists (pilot: `band` on all 7 skills).
+Precritic on HEAD for subtraction:sub_100_no_regroup: OK, 15 PASS (2 baseline), 1 N/A, 2 SKIPPED (no rulings block on the
+card — the card owners need to add one; `--strict` makes that INCOMPLETE), 1581 s wall (1048 s of it a needless sibling
+measurement, since removed). The SLOT-W / HEADS probe lives in ws-slot-clip, not ws-print-lint yet.
+
+## Per-round findings (LESSONS_LEARNED rule 00)
+
+### Wave 0 part A (gates lane) — critic rounds r1–r5 (2026-10-23)
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r1 | FAIL 6 / 8 / 6 (D1–D8) | **A1 "checked nothing" self-check in every gate**: unknown `--skills` / `--category` / `--rows` and 0 checked items must FAIL (D3, four gates printed OK on nothing) — a shared helper in `tests/lib` so new tools get it free. **A2 verdict lint for runners**: SKIPPED / NOT YET never ends a run OK (D2). **A3 baseline-grain check**: a baseline pins findings by key, never a count (D5); a test that a swapped finding fails, for every tool with a baseline. **A4 per-skill pins only** (D6). **A5 plan-flag coverage**: grep the plan's named flags (§1.4, §1.6.7) against each tool's usage text (D7 missed: H8 multiple choice). | Brief every new tool with the cross-cutting contract up front (exit codes 0/1/2/3, INCOMPLETE, unknown-id FAIL, key-based baselines, run-file fields): r1–r4 found the same contract gaps tool by tool. Give interface contracts between tools in the brief (matrix ↔ deploy runner) — done from r1 on, it removed merge rework. |
+| r2 | FAIL 7 / 8 / 8 (D1) | **A6 state-fold property test** for any tool that reads run history (newest-only reads let red rows vanish). | A defect in shared state logic needs the invariants written first; fixing symptoms took r2→r4 (three rounds, one area). Rule: on the 2nd defect in the same area, brief the root cause and a property test (done at r3). |
+| r3 | FAIL 7 / 8 / 8 (D1) | **A7 baseline invariants I1–I5 as a reusable property test** (pin-new-only, verdict before pin, no re-pin by a nightly) — applies to node-lint, options-pin and matrix baselines alike. | Same as r2: escalate to "root cause + invariants" one round earlier. |
+| r4 | FAIL 7 / 8 / 8 (D1, D2) | **A8 deploy-list time budget**: `ws-deploy-gates --list` sums each gate's last measured seconds per session and FAILS when a session exceeds 30 min (would have caught the options pin auto-joining session 1, and session 2's 33.6-min floor). **A9 fold-order mutation in the property test** (sort by name vs `finished`). | Lead integration rule: a "switch on when the tool exists" line must be reviewed at merge (D1 was the lead's merge). Time each gate once and keep the table in the runner so rebalancing is arithmetic, not a 90-min timed run. |
+| r5 | **PASS 9 / 9 / 8** | Nits → checks: **A10** reject run files with a future `finished` (clock skew); **A11** legacy run files (no `baseline` field) clear nothing after a cut-off; **A12** options-pin `--resume` keyed by commit. | Run critics on the narrowest scope (r5 scoped to "r4 defects + regressions" took 10 min vs 29 min for r1). Timed deploy runs in parallel child sessions: three sessions × 3 runs in ≈ 1.5 h wall instead of ≈ 4.5 h serial. |
+
+**Queue of automatic checks this lane owns** (owner rule: the main owner of new checks; other lanes' "Automatic checks"
+items join here in priority order): A8 deploy-list time budget; A1 shared "checked nothing" helper; A3 key-based baseline
+test for every baselined tool; A10–A12; then other lanes' items as they are listed in speed-audit.md "Per-round findings".
+
+### Critic r6 (`design/audit/runs/wave0-gates/critic-r6.md`): FAIL 6 / 8 / 7 — the five pilot-lesson checks
+All five BAD states fail for the r1 defect's own reason (D1, D3, D5, D6 of pilot r1) and `good.patch` is a fair stand-in.
+Blocking: D1 sibling-compare only compares RED rows, but unpinned rows are PENDING(no-baseline), so a new skill (e.g. the
+pilot's `sub_2d_1d`, 38 counts above siblings) is never compared; D2 ws-phone-card picks the wrong "ones" box on legacy
+column cells (3–4 px raised active box) and false-FAILs approved 4–6-digit regroup skills; D3 ws-card-rulings prints OK when
+only part of the scope has rulings. Lead decision on N1: compare with the paired same-size siblings by default (as the lead's
+own comparison did). Fix r6 at Opus medium.
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r6 | FAIL 6 / 8 / 7 | **A13** every rule-0b tool must judge unpinned rows too (a "status filter" test: a fixture with only PENDING(no-baseline) rows must still be compared); **A14** every new screen probe is run on the approved siblings before it gates (a "siblings clean" self-check: an approved skill failing a new probe means the probe is wrong, not the skill); **A15** partial-scope = INCOMPLETE for any scoped check. | Run a new check on approved siblings in the builder's own loop (would have caught D2 before the critic); slot-clip costs ≈ 19 min of a precritic — batch its print-lint jobs with the matrix's own render (one render, two lints). |
+
+Queue items A8, A10–A12 merged (d9cd5f4a): `ws-deploy-gates.sh --budget` (and the first row of every session run) predicts
+each session's wall clock from the newest measured gate times (list-order scheduling on the 2 browser slots + 2 node
+workers; the matrix as 500 docs × 5.26 slot-s) and FAILs a session over 30 min (`MQ_SESSION_BUDGET_MIN`); prediction vs
+measured: session 2 old list 2058 s vs 2057.8 s. Old list (viewport in session 2) FAIL 34.3 min; options-pin --check in
+session 1 FAIL 139 min; today's list 27.3 / 28.1 / 27.8 min. The 2026-10-23 timed runs' lines (sessions 1 and 2, transcribed
+from the child sessions' reports — they were never committed there) are now in `design/audit/baselines/deploy-gate-timings.jsonl`.
+A10 future-dated run files clear nothing; A11 run files without `baseline` after 2026-10-23T19:46Z clear nothing; A12
+options-pin `--resume` keyed by commit. Self-tests: deploy 91, matrix 171 (A10/A11 mutations each fail it), options-pin 67.
+
+## Timed deploy-gate runs, confirmation (on ab511284, viewport-check moved to session 3)
+| Gate session | Runs | Wall clock | Verdict |
+|---|---|---|---|
+| 1 | 1 | 26.1 min | OK (1 FLAKE: ws-teacher-shell, an aborted `css/fonts/andika.css` load — the harness exemption covered only .woff files; widened to css/fonts/, 3/3 solo runs OK) |
+| 2 | 3 | 28.4 / 28.4 / 28.4 min | OK, every gate OK, 0 s slot waits |
+| 3 | 3 | 10.8 / 10.8 / 10.8 min | OK (matrix WARNING per the owner ruling: no nightly / full baseline yet; viewport-check ≈ 648 s) |
+With the earlier session 1 runs (27.9 / 28.4 / 26.4 min), every session has three timed runs ≤ 30 min. Session 3 will
+grow to ≈ 28 min (predicted by `--budget`) once the matrix renders its ≤ 500 documents after the full baseline.
+
+## Lead decisions 2026-10-23 22:05
+- "Repeated check" scheduled task created by the lead (daily 01:13 UTC, prompt from NIGHTLY.md).
+- D8: the critic sample is the bounded all-pairs set + 20 %, capped at 40 pages a pair (builder at low effort).
+- Approved siblings confirmed (`tests/fixtures/precritic/siblings.json`), template `stack`: add_100_regroup,
+  sub_100_regroup, add_1k_regroup, sub_1k_regroup, add_10k_regroup, sub_10k_regroup, sub_100k_regroup, sub_1m_regroup.
+  Pairs (same size band): sub_50_no_regroup, sub_100_no_regroup, sub_2d_1d → add_100_regroup + sub_100_regroup;
+  sub_1k_no_regroup → add_1k_regroup + sub_1k_regroup; sub_10k_no_regroup → add_10k_regroup + sub_10k_regroup;
+  sub_100k_no_regroup → sub_100k_regroup; sub_1m_no_regroup → sub_1m_regroup.
+- Spec-card rulings block: this lane's (ws-spec-card + README; stack and subtraction cards regenerated layout-only).
+- CLAUDE.md "Checks to run": the lead writes it from the draft after merge.
+- "Needs owners" defects go to each family's redo: per-skill pointer lines appended to design/audit/SKILL_UPGRADE_LIST.md.
+- Merged claude/sweet-newton-c8wrv1 (incl. 0b79cea1, the W0-defects viewport fix); ws-viewport-check re-run pending.
+- Rulings block (merged 471af9c2): ws-spec-card writes `<!-- rulings {json} -->` into every card from `card.json` "rulings"
+  (each entry cites its card section) with a `todo` list of prose rulings not yet machine-checked; `--rulings-only` adds the
+  block without touching signed text (the block is excluded from the signed-body compare but covered by bodySha, so a hand
+  edit is caught). Subtraction card: 16 rulings + N-BAND; today `ws-card-rulings` FAILs sub_100_no_regroup on R-BAND-100
+  (118/300), R-SAME-LENGTH (40/300), R-ZERO-NOT-SEEDED (44.3 % vs ≤ 10 %) and N-BAND (band offered) — the pilot's own fixes
+  are not merged yet. Stack card regenerated (unsigned). **For the lead:** the subtraction card's signature already fails
+  `--check-signed` because DN-34's excerpt changed upstream after signing — it needs `--resign` + your re-sign after the pilot.
+- D8 applied (merged 8aabacc0): `sample.critic` = bounded all-pairs (representatives) + 20 % random, total ≤ 40 pages a pair.
+  On stack × Single skill the bounded all-pairs alone fills the cap: 21 rows / 40 pages kept, 0 random, 36 all-pairs rows
+  cut → 531 of 656 bounded pairs covered (125 uncovered; uncapped it would be ≈ 76 pages). The page states the cut.
+  **For the lead:** keep the cap (125 pairs left to the machine sample) or allow ≈ 76 pages for this pair.
+- SKILL_UPGRADE_LIST.md: 346 pointer lines appended (292 skills), a "Wave 0 pinned defects (2026-10-23)" block under each
+  family: 26 MC-on-screen, 115 option-verify, 205 node-lint lines.
+- ws-viewport-check re-run after merging the W0-defects fix (0b79cea1): 64 sessions, 0 findings, OK (665 s); its baseline is already empty — add_word_problems and long_div_2digit leave "needs owners".
+
+## Queued (lead 22:23): the pilot verdict's 11 generic checks — starts after critic r7 passes and the lead merges
+1 zero-case caps as card rulings → content-audit predicates (per family); 2 dealer uniformity (±2σ over 120 seeded items,
+≤ 2 of one value a page, no periodic seeded position); 3 L-ANSAREA box ≥ 4.4 mm (true positive addition:add_three);
+4 L-OVERLAP heads + ≥ 1 mm gap (stack, pv); 5 node-lint lesson-data presence (prereqs.js or the role is refused);
+6 option-help truth (every level/value a help string names is offered); 7 options-verify render through print-lint at S
+and L (precritic: touched skills); 8 print-lint H13 on lesson roles (precritic --role lesson on touched skills);
+9 presets-unit item check (instruction key + declared band); 10 providers-unit wrongAnswer fits its slot; 11 print-lint:
+no wrapped line ends in an operator. Backtests from the pilot: 27577cf fails, ff471fd passes, pilot tip fails N1–N4.
+Plan: 3 parallel builders at mq-opus-medium (node checks / print-lint rules / options-verify render), then one critic.
+
+## Fix r6 merged (da55b299, e7f3a7ee) — 23:05
+D1 sibling-compare compares every printed row with findings (RED, OK, PENDING(no-baseline)); N1 paired siblings by default
+(reproduces all 124 + 16 of the lead's above-sibling counts that are really above; the other 112 in sibling-compare.txt were
+siblings at their pin read as 0); D2 phone-card finds the ones box structurally, A14 "siblings clean" self-check on 4
+approved skills; D3 partial rulings scope → INCOMPLETE (exit 2); N2 slot-clip extra pages (test, more-practice, supports on)
+catch pilot D7 (64 overlapping heads) — **engine finding: approved sub_1m_regroup overlaps the same way at support level 3, S
+(24 pairs, 0.67 mm)**; N4 temp cleanup, slot-clip 229 s (was 1161 s); N5 probes report measured / N/A per template. 8 pilot
+backtests PASS (two sibling rows scoped to H13, the defect they were built for; the D7 row's pass state is a seeded stand-in
+patch). Lead-side integration fix: the cards README's example block was read as a card (scanner now reads card sub-folders only).
+**Precritic on HEAD now FAILs `subtraction:sub_100_no_regroup`** on 3 counts above its paired siblings (mixed/defaults S
+PG-12 2 vs 0; sections/ex-each L H13 6 vs 4; single/ex-group S TY-11 16 vs 8) and on card rulings (band 118/300, same
+length 40/300, zero case 44.3 %, band offered) — the card-rulings FAILs and single/ex-group S TY-11 16 vs 8 are real, the pilot's to fix (rule 0b); **correction (critic r7 D1): the mixed/defaults S PG-12 2 vs 0 count is algebra:tape_diagram's partner cell, not the pilot's** (multi-skill rows are compared with counts not tied to a skill).
+12 (lead 23:07, owner ruling CL-4b, WORKSHEET_DESIGN_STANDARD 12ed112f): print-lint reads each cell's first printed row —
+top-default cells FAIL when the problem starts > 3 mm below the top pad; write-above cells (regrouping items, long-division
+brackets, judged from content) FAIL when not centred within 2 mm. REPORTING-ONLY until the mixed lane's kit change lands
+(the kit centres every stack today), then a gate. Backtest: today's tip FAILs on any no-regroup stack page; fact pages pass.
+
+**Owner instruction (via lead, 23:07): "stop after this work, don't try anything new".** The queued 11-check package and
+check 12 (CL-4b) are CANCELLED for now — recorded above for later, not started. The lane finishes critic r7 on the
+pilot-lesson checks, reports and stops; if r7 fails, no further round without the lead's go.
+
+## Critic r7 (`design/audit/runs/wave0-gates/critic-r7.md`): FAIL — asked 7, backtests 9, usable 7
+r6 D1–D3 verified fixed; 8/8 pilot backtests PASS and honest (H13 scoping, D7 stand-in, partial fixture). Blocking:
+D1 sibling-compare / slot-clip compare multi-skill rows (mixed, sections) by counts not tied to a skill, so a partner's
+cell (tape_diagram's legacy story) fails the lane or could hide a lane defect; D2 `ws-spec-card --rulings-only` refreshes
+bodySha and the signed-body compare strips the block, so a ruling can be weakened on a signed card unnoticed (and
+precritic never runs `--check-signed`). Nits: INCOMPLETE/SKIPPED still end precritic OK without `--strict` (make `--strict`
+part of rule 0b); `--report-only` exit on INCOMPLETE undocumented; approved sub_1m_regroup head overlap at level 3 S needs an
+owner; a clean sibling PASS should count rows. **Stopped here per the owner ("stop after this work"): no fix round 8 without
+the lead's go.**
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r7 | FAIL 7 / 9 / 7 (D1, D2) | **A16** multi-skill rows: a finding is attributed to the skill whose cell carries it (`data-ws-cell` + page/cell), partner findings never block a lane; **A17** a signed card's rulings are hashed under its signature (weakening a ruling or emptying `notOffered` voids the signature), checked by precritic. | Brief rule 0b tools with the multi-skill case up front (partners seeded per row differ by skill); have precritic run `ws-spec-card --check-signed` on the lane's cards. |

@@ -734,3 +734,28 @@ under CL-4b (owner), band instruction for presets.
 2. **One wrong pin**: class (a) was pinned at L, where the siblings show 0 (N5). The rate table measured S only. Smallest change: the rate table measures every size it pins.
 3. **The dealer was rewritten in the fix round without a distribution check** (N1). Smallest change: the content-audit predicate above, run by the builder.
 4. **Critic wall time 32 min, ≈ 360k tokens a round**: fine. The cost is the round count. Two rounds of the same family each found 4+ card-level gaps (the across appearance, the option help, lesson Warm-up form), so the card is the cause: the card needs a section listing every option and appearance the panel offers, inherited ones included (`_ap4*` patches), with the decision for each.
+
+---
+
+## Per-round findings
+
+### Wave 0 part A (gates lane) — critic rounds r1–r5 (2026-10-23)
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r1 | FAIL 6 / 8 / 6 (D1–D8) | **A1 "checked nothing" self-check in every gate**: unknown `--skills` / `--category` / `--rows` and 0 checked items must FAIL (D3, four gates printed OK on nothing) — a shared helper in `tests/lib` so new tools get it free. **A2 verdict lint for runners**: SKIPPED / NOT YET never ends a run OK (D2). **A3 baseline-grain check**: a baseline pins findings by key, never a count (D5); a test that a swapped finding fails, for every tool with a baseline. **A4 per-skill pins only** (D6). **A5 plan-flag coverage**: grep the plan's named flags (§1.4, §1.6.7) against each tool's usage text (D7 missed: H8 multiple choice). | Brief every new tool with the cross-cutting contract up front (exit codes 0/1/2/3, INCOMPLETE, unknown-id FAIL, key-based baselines, run-file fields): r1–r4 found the same contract gaps tool by tool. Give interface contracts between tools in the brief (matrix ↔ deploy runner) — done from r1 on, it removed merge rework. |
+| r2 | FAIL 7 / 8 / 8 (D1) | **A6 state-fold property test** for any tool that reads run history (newest-only reads let red rows vanish). | A defect in shared state logic needs the invariants written first; fixing symptoms took r2→r4 (three rounds, one area). Rule: on the 2nd defect in the same area, brief the root cause and a property test (done at r3). |
+| r3 | FAIL 7 / 8 / 8 (D1) | **A7 baseline invariants I1–I5 as a reusable property test** (pin-new-only, verdict before pin, no re-pin by a nightly) — applies to node-lint, options-pin and matrix baselines alike. | Same as r2: escalate to "root cause + invariants" one round earlier. |
+| r4 | FAIL 7 / 8 / 8 (D1, D2) | **A8 deploy-list time budget**: `ws-deploy-gates --list` sums each gate's last measured seconds per session and FAILS when a session exceeds 30 min (would have caught the options pin auto-joining session 1, and session 2's 33.6-min floor). **A9 fold-order mutation in the property test** (sort by name vs `finished`). | Lead integration rule: a "switch on when the tool exists" line must be reviewed at merge (D1 was the lead's merge). Time each gate once and keep the table in the runner so rebalancing is arithmetic, not a 90-min timed run. |
+| r5 | **PASS 9 / 9 / 8** | Nits → checks: **A10** reject run files with a future `finished` (clock skew); **A11** legacy run files (no `baseline` field) clear nothing after a cut-off; **A12** options-pin `--resume` keyed by commit. | Run critics on the narrowest scope (r5 scoped to "r4 defects + regressions" took 10 min vs 29 min for r1). Timed deploy runs in parallel child sessions: three sessions × 3 runs in ≈ 1.5 h wall instead of ≈ 4.5 h serial. |
+| r6 | FAIL 6 / 8 / 7 | **A13** every rule-0b tool must judge unpinned rows too (a "status filter" test: a fixture with only PENDING(no-baseline) rows must still be compared); **A14** every new screen probe is run on the approved siblings before it gates (a "siblings clean" self-check: an approved skill failing a new probe means the probe is wrong, not the skill); **A15** partial-scope = INCOMPLETE for any scoped check. | Run a new check on approved siblings in the builder's own loop (would have caught D2 before the critic); slot-clip costs ≈ 19 min of a precritic — batch its print-lint jobs with the matrix's own render (one render, two lints). |
+| r7 | FAIL 7 / 9 / 7 (D1, D2) | **A16** multi-skill rows: a finding is attributed to the skill whose cell carries it (`data-ws-cell` + page/cell), partner findings never block a lane; **A17** a signed card's rulings are hashed under its signature (weakening a ruling or emptying `notOffered` voids the signature), checked by precritic. | Brief rule 0b tools with the multi-skill case up front (partners seeded per row differ by skill); have precritic run `ws-spec-card --check-signed` on the lane's cards. |
+
+### Lane S1 (card gate + 11 generic checks) — critic rounds r1–r2 (2026-10-24)
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r1 | FAIL 7 / 8 / 7 (D1–D3) | **ws-precritic-plan** (built): every backtested check must be planned by `ws-precritic --skill <its skills>` (D2); run each new per-skill gate on one skill of every kit family before the critic (D1); a fixture backtest only where no real commit pair exists (D3) | three parallel builders on disjoint files; union backtests.json by row id at merge |
+| r2 | **PASS 9 / 9 / 8** | stale-pin report for pinned findings (N-r2-3); precritic-plan coverage for gates whose rows name no skill (N-r2-1) | narrow r2 scope (fixes + regressions) in 21 min; one real precritic run of an approved sibling and `--role lesson` on the merged tree before the critic caught 4 of the lane's 5 setup traps |
+
+Details and the reflection: design/status/s1-checks.md.

@@ -27,7 +27,31 @@
 //             own pin (cheap; they duplicate the matrix's single/defaults row),
 //             ws-screen-slots --skills (--baseline when the script has the flag; else this tool compares its findings
 //             with the same pinned file), ws-screen-answer --skills, ws-chromebook-fit --skills, ws-code-snapshot,
-//             ws-boot-smoke
+//             ws-boot-smoke, and the five checks from the pilot-su-c critic r1 lessons (2026-10-23):
+//             ws-sibling-compare --run <the matrix's run file> --run-siblings (process rule 0b: every printed matrix row
+//               with findings - RED, OK and PENDING(no-baseline) alike, critic r6 D1 - against its PAIRED siblings (N1);
+//               counts against the APPROVED siblings on the same template, tests/fixtures/precritic/siblings.json; it
+//               runs after the matrix. A count above the siblings' max is FAIL "worse than siblings"; when every red
+//               count is at or below them, the coverage-matrix row reads PASS (baseline) "engine red", non-blocking),
+//             ws-slot-clip --run <the matrix's run file> (print-lint's SLOT lint L-ANSAREA and CLIP lint L-OVERFLOW on
+//               EVERY matrix row at S / M / L, judged against the siblings, plus the box-width (TY-21) and place-head
+//               overlap (H2) probe; after the sibling comparison, so the sibling run is cached),
+//             ws-phone-card --skills (the practice card at 390 x 844 and 390 x 664: nothing cut off sideways, the
+//               first answer box focused and in view),
+//             ws-card-rulings --check rulings (the spec card's numeric rulings against 300 seeded items a skill) and
+//             ws-card-rulings --check offered (the option panel offers nothing the card lists as not offered). A skill
+//               whose card has no machine-readable rulings block makes these two rows SKIPPED (no rulings): not run,
+//               and a scope where only SOME skills have rulings makes them INCOMPLETE (partial rulings; critic r6 D3),
+//               not passed, and an incomplete run under --strict;
+//             and the lane S1 checks (2026-10-24): ws-content-audit --skill also enforces every numeric ruling the spec
+//               card makes on the skill (ws-card-rulings' predicates, class card-ruling), ws-dealer-uniform --skill
+//               (120 seeded items: per-place digits and values within 2σ of uniform over the valid set, at most 2 of a
+//               minuend / 3 of an answer per page, no seeded case on a fixed position; INCOMPLETE when the valid set is
+//               unknown; pins in tests/fixtures/precritic/dealer-uniform.baseline.json), ws-node-lint --rules
+//               LESSON-DATA,OPTION-HELP,WRONG-FITS (the lesson page has lesson data; the option help names only offered
+//               values; the provider's wrongAnswer fits the item's answer boxes; pins in
+//               tests/fixtures/precritic/node-lint-s1.baseline.json), and ws-presets-unit checks that every preset's
+//               items obey its preset values
 //   --template <id>   the --skill gates for every live skill whose kit cell template is <id> on ANY of its 8 seeded
 //             items (a "template skill scan" row names the skills that draw it, and FAILS naming any skill whose
 //             generation errored on every item, since whether it draws <id> is unknown), + ws-panes-unit, a
@@ -62,7 +86,8 @@
 //   --timeout <min>      per gate, slot wait included (default 90). A gate runs in its own process group; at the
 //                        limit the group and every process it started (Chromium too) get SIGTERM, then SIGKILL after
 //                        5 s, so the slot lock is freed, and the row is FAIL "timed out after <min> min".
-//   --strict             a run whose only non-green rows are SKIPPED-NOT-BUILT ends `ws-precritic: FAIL (incomplete ...)`
+//   --strict             a run whose only non-green rows are SKIPPED-NOT-BUILT / SKIPPED (no rulings) ends
+//                        `ws-precritic: FAIL (incomplete ...)`
 //                        (exit 3). Without it such a run ends `ws-precritic: OK: 11 PASS, 1 N/A, 1 SKIPPED-NOT-BUILT of 13 (...)`
 //                        (exit 0): the skipped and N/A gates are named in the table AND in the verdict line, never counted
 //                        as passed. (--allow-not-built, the old opt-in, is accepted and now the default.)
@@ -191,12 +216,13 @@ function prerequisites() {
     if (!chrome) {
         try {
             for (const d of fs.readdirSync('/opt/pw-browsers').filter((n) => /^chromium-\d+$/.test(n)).sort().reverse()) {
-                const exe = path.join('/opt/pw-browsers', d, 'chrome-linux', 'chrome');
-                if (fs.existsSync(exe)) { chrome = exe; break; }
+                // the same two layouts as tests/lib/ws-harness.cjs (Playwright 1.5x writes chrome-linux64)
+                const exe = ['chrome-linux64', 'chrome-linux'].map((sub) => path.join('/opt/pw-browsers', d, sub, 'chrome')).find((p) => fs.existsSync(p));
+                if (exe) { chrome = exe; break; }
             }
         } catch (e) { /* none */ }
     }
-    if (!chrome || !fs.existsSync(chrome)) bad.push('Chromium: no /opt/pw-browsers/chromium-*/chrome-linux/chrome and no PUPPETEER_EXECUTABLE_PATH. Fix: PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright install chromium (or set PUPPETEER_EXECUTABLE_PATH)');
+    if (!chrome || !fs.existsSync(chrome)) bad.push('Chromium: no /opt/pw-browsers/chromium-*/chrome-linux{64,}/chrome and no PUPPETEER_EXECUTABLE_PATH. Fix: PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright install chromium (or set PUPPETEER_EXECUTABLE_PATH)');
     try { require.resolve('puppeteer', { paths: [ROOT] }); } catch (e) { bad.push('puppeteer: not resolvable from the repo. Fix: npm install (in the repo root)'); }
     // the proxy CA in Chromium's NSS store (STATUS §8)
     if (fs.existsSync('/root/.ccr/ca-bundle.crt')) {
@@ -232,7 +258,7 @@ function gate(id, name, scope, kind, script, args, extra = {}) {
     let missing = null;
     if (!file) missing = extra.missingMsg || `${script} is not in this tree`;
     else for (const f of extra.needFlags || []) if (!srcHas(file, f)) { missing = `${script} has no --${f} flag`; break; }
-    return { id, name, scope, kind, script, file, args, missing, parse: extra.parse || null, note: extra.note || '', jsonOut: extra.jsonOut || null, keys: extra.keys || null, expect: extra.expect || null, expectFail: !!extra.expectFail, synthetic: null };
+    return { id, name, scope, kind, script, file, args, missing, parse: extra.parse || null, note: extra.note || '', jsonOut: extra.jsonOut || null, keys: extra.keys || null, expect: extra.expect || null, expectFail: !!extra.expectFail, expectUnits: extra.expectUnits || 0, synthetic: null };
 }
 /** A row this tool works out itself (nothing is spawned): {result, findings, detail}. */
 function synthetic(id, name, scope, res) {
@@ -487,7 +513,8 @@ const PARSE = {
             detail.push(`${r.status} ${r.id}${r.status === 'RED' && !inPin(r) ? ' (not in the pin)' : ''}`);
             for (const x of (r.rises || []).slice(0, 2)) detail.push(`  + ${x}`);
         }
-        if (red.length || err.length) return { result: 'FAIL', findings: parts.join('; '), detail, explainsExit: code === 1 };
+        // meta: the sibling comparison (rule 0b) may turn a red-only FAIL into engine red (finishRows)
+        if (red.length || err.length) return { result: 'FAIL', findings: parts.join('; '), detail, explainsExit: code === 1, meta: { red: red.length, err: err.length } };
         if (v[1] !== 'OK') return { result: 'FAIL', findings: `${parts[0]}; ${v[0]}`, detail: tailLines(out), explainsExit: false };
         return { result: okOnPin.length ? 'PASS (baseline)' : 'PASS', findings: parts.join('; '), detail: [], explainsExit: false };
     },
@@ -499,6 +526,85 @@ const PARSE = {
         if (code === 1 && v[1] === 'FAIL') return { result: 'PASS', findings: `fails as it must (${v[0]})`, detail: [], explainsExit: true };
         if (code === 0 && v[1] === 'OK') return { result: 'FAIL', findings: 'the fail fixture PASSED: the check cannot see the defect it was built for', detail: tailLines(out), explainsExit: true };
         return { result: 'FAIL', findings: v[0], detail: tailLines(out), explainsExit: false };
+    },
+    /** ws-sibling-compare --run <matrix run> --json: rule 0b. */
+    siblingCompare(g, out, code) {
+        const v = lastVerdict(out, g.script);
+        let j = null; try { j = JSON.parse(fs.readFileSync(g.jsonOut, 'utf8')); } catch (e) { /* crashed */ }
+        if (!v) return unparsed(`no "${g.script}: OK|FAIL" line`, out);
+        if (!j) return unparsed('no --json file written', out);
+        const missing = (g.keys || []).filter((k) => !(j.skills || []).includes(k));
+        if (missing.length) return { result: 'FAIL', findings: `${missing.length} skill(s) in scope absent from the comparison: ${listShort(missing)}`, detail: tailLines(out), explainsExit: false };
+        const sib = Object.entries(j.siblings || {}).map(([k, s]) => `${k.split(':')[1]}: ${s.length}`).join(', ');
+        const byS = Object.entries(j.byStatus || {}).map(([k, n]) => `${k} ${n}`).join(', ') || 'none';
+        const meta = { red: j.red, above: j.above.length, noSibling: j.noSibling.length, errors: j.errors.length, engine: j.engine.length };
+        if (v[1] !== 'OK') {
+            const detail = out.split('\n').filter((l) => /^(ABOVE|NO-SIBLING|ERROR) /.test(l)).slice(0, 10);
+            return { result: 'FAIL', findings: `worse than siblings: ${j.above.length} count(s) above the approved siblings in ${new Set(j.above.map((x) => x.id)).size} row(s), ${j.noSibling.length} with no sibling measured, ${j.errors.length} ERROR row(s); ${j.engine.length} at or below (engine) in ${j.rowsCompared} printed row(s) with findings (${byS}; siblings per skill: ${sib})`, detail, explainsExit: code === 1, meta };
+        }
+        if (!j.rowsCompared) return { result: 'PASS', findings: `no printed matrix row with findings to compare (siblings per skill: ${sib})`, detail: [], explainsExit: false, meta };
+        return { result: 'PASS (baseline)', findings: `${j.rowsCompared} printed row(s) with findings (${byS}): all ${j.engine.length} count(s) at or below the paired approved siblings (engine debt, non-blocking; siblings per skill: ${sib})`, detail: [], explainsExit: false, meta };
+    },
+    /** ws-slot-clip --json: per matrix row and size. */
+    slotClip(g, out, code) {
+        const v = lastVerdict(out, g.script);
+        let j = null; try { j = JSON.parse(fs.readFileSync(g.jsonOut, 'utf8')); } catch (e) { /* crashed */ }
+        if (!v) return unparsed(`no "${g.script}: OK|FAIL" line`, out);
+        if (!j) return unparsed('no --json file written', out);
+        const rows = j.rows || [];
+        const checked = rows.filter((r) => !['PENDING', 'N/A'].includes(r.status));
+        const none = (g.keys || []).filter((k) => !checked.some((r) => String(r.id).startsWith(`${k}|`)));
+        if (none.length) return { result: 'FAIL', findings: `checked nothing for ${none.length} of ${(g.keys || []).length} skill(s): ${listShort(none)}`, detail: tailLines(out), explainsExit: false };
+        const bad = checked.filter((r) => r.status !== 'ok');
+        const ids = new Set(checked.map((r) => r.id));
+        const nEx = new Set(checked.filter((r) => /\|extra\//.test(r.id)).map((r) => r.id)).size;
+        const naW = checked.filter((r) => r.slotW === 'N/A').length, naH = checked.filter((r) => r.headsProbe === 'N/A').length;
+        const base = `${ids.size - nEx} matrix row(s) × ${(j.sizes || []).join('/')} + ${nEx} extra document(s) (test, more-practice, supports on): ${checked.length} document(s), SLOT ${checked.reduce((a, r) => a + (r.slot || 0), 0)} / CLIP ${checked.reduce((a, r) => a + (r.clip || 0), 0)} finding(s), ${checked.reduce((a, r) => a + (r.segs || 0), 0)} box segment(s) and ${checked.reduce((a, r) => a + (r.heads || 0), 0)} head(s) probed (SLOT-W N/A on ${naW}, HEADS N/A on ${naH} document(s): no digit strip / no heads)`;
+        if (v[1] !== 'OK') return { result: 'FAIL', findings: `${bad.length} row×size(s) failing; ${base}`, detail: bad.slice(0, 8).map((r) => `${r.id} ${r.size}: ${(r.findings || [r.status]).join('; ').slice(0, 180)}`), explainsExit: code === 1 };
+        return { result: checked.some((r) => (r.slot || 0) + (r.clip || 0) > 0) ? 'PASS (baseline)' : 'PASS', findings: `${base}; every SLOT / CLIP count at or below the approved siblings`, detail: [], explainsExit: false };
+    },
+    /** ws-dealer-uniform (lane S1): INCOMPLETE (exit 3: a skill's valid set unknown) is never PASS; pinned findings are PASS (baseline). */
+    dealerUniform(g, out, code) {
+        const inc = /^ws-dealer-uniform: INCOMPLETE - not fully checked: (.*?) \((.*)\)\s*$/m.exec(out);
+        if (inc && code === 3) return { result: 'INCOMPLETE (valid set unknown)', findings: `not fully checked: ${listShort(inc[1].split(', '), 4)}; ${inc[2]}`, detail: out.split('\n').filter((l) => /^ {6}note /.test(l)).slice(0, 6).map((l) => l.trim()), explainsExit: true };
+        // S1 critic r1 D1: skills that deal no operands (fractions, clocks, shapes) have nothing to deal evenly: N/A, exit 4
+        const na = /^ws-dealer-uniform: N\/A - no operand-dealt items: (.*?) \((.*)\)\s*$/m.exec(out);
+        if (na && code === 4) return { result: 'N/A', findings: `no operand-dealt items (nothing to deal evenly): ${listShort(na[1].split(', '), 4)}`, detail: [], explainsExit: true };
+        const r = generic(g, out, code);
+        const m = /^ws-dealer-uniform: (?:OK|FAIL - [^(]*)\((.*)\)\s*$/m.exec(out);
+        const missing = (g.keys || []).filter((k) => !new RegExp(`^ {2}\\S+ +${reEsc(k)} `, 'm').test(out));
+        if (r.result === 'PASS' && missing.length) return { result: 'FAIL', findings: `${missing.length} skill(s) in scope not in the output: ${listShort(missing)}`, detail: tailLines(out), explainsExit: false };
+        const pinned = (out.match(/^ {6}pinned /gm) || []).length;
+        if (r.result === 'PASS') { r.findings = `${m ? m[1] : '-'}${pinned ? `; ${pinned} pinned finding(s)` : ''}`; if (pinned) r.result = 'PASS (baseline)'; }
+        else if (r.result === 'FAIL') r.detail = out.split('\n').filter((l) => /^ {6}FAIL /.test(l)).slice(0, 10).map((l) => l.trim());
+        return r;
+    },
+    /** ws-grade-render without --golden prints no OK / FAIL line, only `ws-grade-render: done, N units, P pages`: it is the
+     *  render the critic grades (print-lint judges the pages). PASS when it rendered every unit with no ERROR line. */
+    gradeRender(g, out, code) {
+        if (/^ws-grade-render: (OK|FAIL)\b/m.test(out)) return generic(g, out, code);
+        const m = /^ws-grade-render: done, (\d+) units, (\d+) pages/m.exec(out);
+        if (!m) return unparsed('no "ws-grade-render: done|OK|FAIL" line', out);
+        const errs = out.split('\n').filter((l) => /^ {2}ERROR /.test(l)).map((l) => l.trim());
+        const want = g.expectUnits || 0;
+        if (code !== 0 || errs.length) return { result: 'FAIL', findings: `${errs.length} render error(s)${code ? `, exit ${code}` : ''}`, detail: errs.slice(0, 10), explainsExit: code !== 0 };
+        if (want && +m[1] < want) return { result: 'FAIL', findings: `rendered ${m[1]} of ${want} unit(s)`, detail: tailLines(out), explainsExit: false };
+        return { result: 'PASS', findings: `rendered ${m[1]} unit(s), ${m[2]} page(s) for the critic (print-lint judges them)`, detail: [], explainsExit: false };
+    },
+    /** ws-card-rulings: NO-RULINGS (exit 4) is SKIPPED, never PASS. */
+    cardRulings(g, out, code) {
+        if (/^ws-card-rulings: NO-RULINGS\b/m.test(out) && code === 4) {
+            const m = /^ws-card-rulings: no card under (\S+) has a rulings block for (.*)$/m.exec(out);
+            return { result: 'SKIPPED (no rulings)', findings: `no machine-readable rulings block (<!-- rulings {json} -->, tests/scripts/ws-card-rulings.mjs) in the spec card${m ? ` for ${listShort(m[2].split(', '), 4)}` : ''}: not checked`, detail: [], explainsExit: true };
+        }
+        // critic r6 D3: a scope where only some skills have rulings is INCOMPLETE (exit 2), never PASS
+        const inc = /^ws-card-rulings: INCOMPLETE - not checked: (.*?) \((.*)\)\s*$/m.exec(out);
+        if (inc && code === 2) return { result: 'INCOMPLETE (partial rulings)', findings: `not checked (no rulings block entry): ${listShort(inc[1].split(', '), 4)}; ${inc[2]}`, detail: [], explainsExit: true };
+        const r = generic(g, out, code);
+        const m = /^ws-card-rulings: (?:OK|FAIL - [^(]*)\((.*)\)\s*$/m.exec(out);
+        if (r.result === 'PASS') r.findings = m ? m[1] : r.findings;
+        else if (r.result === 'FAIL') r.detail = out.split('\n').filter((l) => /^ {2}FAIL /.test(l)).slice(0, 10).map((l) => l.trim());
+        return r;
     },
 };
 
@@ -552,6 +658,20 @@ function buildPlan(ctx) {
             const unp = keys.filter((k) => !pinned.has(k));
             add(gate(`print-lint-kit-${sz}`, `ws-print-lint --source kit --size ${sz} (${dup})`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids: keys }, note: all ? '' : `not pinned at ${sz}: ${listShort(unp)} (${rel(file)})` }));
         }
+        // The lane skill's OWN lesson page at L and S (S1 critic r1 D2: H13 on the Warm-up and WRAP-OP sat on the pilot's own
+        // lesson pages, N2 / N6 / N7, and the role sample never held them). Against the lesson pins (ids cat:skill#lesson); a
+        // lesson page the pin does not hold must be clean. With --role lesson the keys join that role's sample instead.
+        if (ctx.role !== 'lesson') {
+            for (const sz of ['L', 'S']) {
+                const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+                const ids = keys.map((k) => `${k}#lesson`);
+                const pinnedL = pinnedIds(file);
+                const a = ['--source', 'kit', '--roles', 'lesson', ...(sz === 'S' ? ['--size', 'S'] : []), '--skills', keys.join(',')];
+                if (fs.existsSync(file)) a.push('--baseline', rel(file));
+                const unp = keys.filter((k) => !pinnedL.has(`${k}#lesson`));
+                add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
+            }
+        }
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));
@@ -565,6 +685,53 @@ function buildPlan(ctx) {
         add(gate('chromebook-fit', `ws-chromebook-fit --skills${cb.includes('--baseline') ? ' --baseline' : ''}`, scope, 'browser', 'ws-chromebook-fit', cb, { needFlags: ['skills'], expect: { mention: keys } }));
         add(gate('code-snapshot', 'ws-code-snapshot', 'all share codes', 'node', 'ws-code-snapshot', []));
         add(gate('boot-smoke', 'ws-boot-smoke', 'app boot', 'browser', 'ws-boot-smoke', []));
+        // ---- the pilot-su-c critic r1 lessons (2026-10-23). The sibling comparison and the slot / clip rows read the
+        // matrix's run file, so they run after it (a node gate each: both take their own browser slots); the slot / clip
+        // row runs after the comparison, so the siblings' matrix run is measured once and read from its cache.
+        const scJson = path.join(ctx.logs, 'sibling-compare.json');
+        const sc = gate('sibling-compare', 'ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings)', `${scope}: matrix rows with findings`, 'node', 'ws-sibling-compare', ['--run', cmJson, '--skills', keys.join(','), '--run-siblings', '--json', scJson], { parse: PARSE.siblingCompare, jsonOut: scJson, keys, missingMsg: 'ws-sibling-compare is not in this tree' });
+        sc.after = 'coverage-matrix';
+        if (matrix.missing && !sc.missing) sc.missing = `needs the coverage matrix's run file (${matrix.missing})`;
+        add(sc);
+        const clJson = path.join(ctx.logs, 'slot-clip.json');
+        const cl = gate('slot-clip', 'ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap)', `${scope} × matrix rows × S/M/L + extras at S`, 'node', 'ws-slot-clip', ['--run', cmJson, '--skills', keys.join(','), '--run-siblings', '--slots', '2', '--json', clJson], { parse: PARSE.slotClip, jsonOut: clJson, keys });
+        cl.after = 'sibling-compare';
+        if (matrix.missing && !cl.missing) cl.missing = `needs the coverage matrix's run file (${matrix.missing})`;
+        add(cl);
+        add(gate('phone-card', 'ws-phone-card (practice card at 390 px: clip, first-box focus)', `${scope} × 390x844, 390x664`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
+        const sk = keys.flatMap((k) => ['--skill', k]);
+        add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
+        add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
+        // ---- lane S1 (2026-10-24): dealer uniformity, and the lesson-data / option-help / wrong-answer-fit node rules
+        add(gate('dealer-uniform', 'ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)', scope, 'node', 'ws-dealer-uniform', ['--skill', keys.join(',')], { parse: PARSE.dealerUniform, keys }));
+        const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
+        add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
+        // W0-B2 (lane S1): the spec card that covers these skills is signed, its rulings / notOffered / decisions are as
+        // signed, and it decides every option value, role and screen host the repo offers today (ws-spec-card
+        // --check-signed --skill). No card covers them (exit 4): N/A. An UNSIGNED card (exit 5, "needs owner signature";
+        // a draft's other problems are listed) is INCOMPLETE, never PASS: the lane may run and the critic may grade, a
+        // --strict run fails. A SIGNED card that fails (an undecided line, a weakened ruling, a hand edit, a stale rule): FAIL.
+        add(gate('spec-card-signed', 'ws-spec-card --check-signed --skill (card signed; every host, role and option value decided)', scope, 'node', 'ws-spec-card', ['--check-signed', '--skill', keys.join(',')], { parse: (g, out, code) => {
+            const m = /^ws-spec-card: (OK|FAIL|NO-CARD) — (.*)$/m.exec(out);
+            if (!m) return unparsed('no "ws-spec-card: OK|FAIL|NO-CARD" line', out);
+            const det = out.split('\n').filter((l) => /^(FAIL|UNSIGNED) /.test(l)).slice(0, 10);
+            // S1 critic r1 N4: design/cards/README.md says "a build starts only after the owner has signed its card" - a
+            // rule for NEW builds; families approved before cards existed have none, so NO-CARD stays N/A (--strict
+            // accepts it) and the row says so in words, so a lane building a new family sees it has no card.
+            if (m[1] === 'NO-CARD' && code === 4) return { result: 'N/A', findings: `no spec card covers ${listShort(keys, 4)} (${m[2].slice(0, 120)}); a NEW family's build needs a signed card first (design/cards/README.md), an approved pre-card family has none`, detail: [], explainsExit: true };
+            if (m[1] === 'FAIL' && code === 5) return { result: 'INCOMPLETE (unsigned card)', findings: m[2], detail: det, explainsExit: true };
+            if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].slice(0, 200), detail: [], explainsExit: false };
+            return { result: 'FAIL', findings: m[2].slice(0, 200), detail: det, explainsExit: code === 1 };
+        } }));
+        // B7: every offered APPEARANCE value of the touched skills printed at S and L through ws-print-lint, against the
+        // skill's default page (pilot-su-c critic r2 N4: "Across" kept its promise and broke the page). A browser gate:
+        // print-lint runs inside the slot this row holds.
+        add(gate('options-render', 'ws-options-verify --render (each offered appearance value at S / L vs the default page)', `${scope} × S/L`, 'browser', 'ws-options-verify', ['--render', '--skill', keys.join(',')], { needFlags: ['render'], parse: (g, out, code) => {
+            const m = /^ws-options-verify --render: (OK|FAIL) \((.*)\)\s*$/m.exec(out);
+            if (!m) return unparsed('no "ws-options-verify --render: OK|FAIL" line', out);
+            if (m[1] === 'OK') return { result: /^nothing to render/.test(m[2]) ? 'N/A' : 'PASS', findings: m[2].slice(0, 220), detail: [], explainsExit: false };
+            return { result: 'FAIL', findings: m[2].slice(0, 220), detail: out.split('\n').filter((l) => /^ {2}FAIL /.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: code === 1 };
+        } }));
     }
     if (ctx.template) {
         const t = ctx.template;
@@ -577,12 +744,13 @@ function buildPlan(ctx) {
         // a *.fail.mjs fixture holds the defect its check was built for: it must FAIL (ws-backtest's reading), a
         // *.pass.mjs fixture must pass; ws-node-lint --fixture never uses the baseline, so any finding fails it.
         for (const f of fx) add(gate(`fixture-${f}`, `template fixture ${f} (ws-node-lint --fixture, must ${/\.fail\.mjs$/.test(f) ? 'FAIL' : 'pass'})`, `template ${t}`, 'node', 'ws-node-lint', ['--fixture', `tests/fixtures/precritic/${f}`], { parse: PARSE.fixture, expectFail: /\.fail\.mjs$/.test(f) }));
-        add(gate('grade-render-template', 'ws-grade-render --template --contact-sheet', `template ${t}`, 'browser', 'ws-grade-render', ['--template', t, '--contact-sheet', '--out', path.join(ctx.logs, 'grade-render-template')], { needFlags: ['template', 'contact-sheet'] }));
+        add(gate('grade-render-template', 'ws-grade-render --template --contact-sheet', `template ${t}`, 'browser', 'ws-grade-render', ['--template', t, '--contact-sheet', '--out', path.join(ctx.logs, 'grade-render-template')], { needFlags: ['template', 'contact-sheet'], parse: PARSE.gradeRender }));
     }
     if (ctx.role) {
-        const sample = ctx.roleSample;
+        // --role R --skill X: the lane skills join the role's pinned sample (S1 critic r1 D2), so X's own R page is linted
+        const sample = [...new Set([...ctx.roleSample, ...ctx.skills.map((s) => s.key)])];
         const sc = `role ${ctx.role} × ${sample.length} sample skills`;
-        add(gate(`grade-render-role-${ctx.role}`, `ws-grade-render --roles ${ctx.role}`, sc, 'browser', 'ws-grade-render', ['--roles', ctx.role, '--skills', sample.join(','), '--out', path.join(ctx.logs, `grade-render-${ctx.role}`)], { needFlags: ['roles'] }));
+        add(gate(`grade-render-role-${ctx.role}`, `ws-grade-render --roles ${ctx.role}`, sc, 'browser', 'ws-grade-render', ['--roles', ctx.role, '--skills', sample.join(','), '--out', path.join(ctx.logs, `grade-render-${ctx.role}`)], { needFlags: ['roles'], parse: PARSE.gradeRender, expectUnits: sample.length }));
         const pl = ['--source', 'kit', '--roles', ctx.role, '--skills', sample.join(',')];
         if (fs.existsSync(PRINT_BASE)) pl.push('--baseline', rel(PRINT_BASE));
         // print-lint names a role page "cat:skill#role" (independent: plain "cat:skill"); the pin lists those it holds.
@@ -590,6 +758,13 @@ function buildPlan(ctx) {
         const pinnedR = pinnedIds(PRINT_BASE);
         const unpinned = sample.filter((k) => !pinnedR.has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}`, `ws-print-lint --source kit --roles ${ctx.role}`, sc, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpinned.length ? `${unpinned.length} of ${sample.length} role pages not pinned in ${rel(PRINT_BASE)} (an unpinned page must be clean)` : '' }));
+        // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at S too, against
+        // the S pin (print-lint.S.json); a role page that pin does not hold must be clean
+        const plS = ['--source', 'kit', '--roles', ctx.role, '--size', 'S', '--skills', sample.join(',')];
+        const baseS = sizeBase('S');
+        if (fs.existsSync(baseS)) plS.push('--baseline', rel(baseS));
+        const unpS = sample.filter((k) => !pinnedIds(baseS).has(docId(k)));
+        add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
     }
     if (ctx.teacher) {
         for (const n of ['shell', 'library', 'preview', 'quiz']) add(gate(`teacher-${n}`, `ws-teacher-${n}`, 'teacher site', 'browser', `ws-teacher-${n}`, []));
@@ -882,16 +1057,39 @@ async function main() {
     const results = new Map();
     const runnable = rows.filter((g) => !g.missing && !g.synthetic);
     process.stderr.write(`${TOOL}: ${runnable.length} gate(s) (${runnable.filter((g) => g.kind === 'browser').length} browser), logs ${logs}\n`);
+    const done = new Map(); // gate id -> promise of its finishing
+    const finishOf = new Map();
+    for (const g of runnable) done.set(g.id, new Promise((res) => finishOf.set(g.id, res)));
     const doRun = async (g) => {
         const r = await runOne(g, ctx);
         const p = judge(g, r, (g.parse || generic)(g, r.out, r.code));
         results.set(g.id, Object.assign(r, p));
         process.stderr.write(`  ${p.result.padEnd(15)} ${g.name} (${Math.round(r.ms / 1000)} s${r.wait ? `, waited ${r.wait} s for a slot` : ''})\n`);
+        finishOf.get(g.id)();
     };
+    // a gate with `after` reads another gate's output: it starts when that gate has finished, outside the pools (so it
+    // never holds a pool worker while it waits), in a chain of its own
+    const deferred = runnable.filter((g) => g.after);
+    const chain = (async () => {
+        for (const g of deferred) {
+            if (done.has(g.after)) await done.get(g.after);
+            await doRun(g);
+        }
+    })();
     await Promise.all([
-        pool(runnable.filter((g) => g.kind === 'node'), +arg('node-jobs', '3'), doRun),
-        pool(runnable.filter((g) => g.kind === 'browser'), +arg('browser-jobs', '2'), doRun),
+        pool(runnable.filter((g) => g.kind === 'node' && !g.after), +arg('node-jobs', '3'), doRun),
+        pool(runnable.filter((g) => g.kind === 'browser' && !g.after), +arg('browser-jobs', '2'), doRun),
+        chain,
     ]);
+    // rule 0b: a coverage-matrix row that failed ONLY on RED rows (no ERROR row, nothing else wrong) is engine red when the
+    // sibling comparison found every red count at or below the approved siblings: PASS (baseline), non-blocking
+    const cmR = results.get('coverage-matrix'), scR = results.get('sibling-compare');
+    if (cmR && scR && cmR.result === 'FAIL' && cmR.meta && cmR.meta.red > 0 && cmR.meta.err === 0 && !cmR.timedOut && scR.result.startsWith('PASS') && scR.meta && scR.meta.red >= cmR.meta.red) {
+        cmR.result = 'PASS (baseline)';
+        cmR.findings += `; ENGINE RED: every count of the ${cmR.meta.red} red row(s) is at or below the approved siblings (ws-sibling-compare, rule 0b), so non-blocking`;
+    } else if (cmR && scR && cmR.result === 'FAIL' && cmR.meta && cmR.meta.red > 0 && scR.result === 'FAIL') {
+        cmR.findings += '; the sibling comparison found counts above the approved siblings: NOT engine red (rule 0b)';
+    }
 
     // ---- table
     const finished = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
@@ -917,6 +1115,7 @@ async function main() {
     }
     const failed = outRows.filter((r) => r.result === 'FAIL');
     const notBuilt = outRows.filter((r) => r.result === 'SKIPPED-NOT-BUILT');
+    const noData = outRows.filter((r) => r.result === 'SKIPPED (no rulings)' || r.result.startsWith('INCOMPLETE'));
     const na = outRows.filter((r) => r.result === 'N/A');
     const passed = outRows.filter((r) => r.result.startsWith('PASS'));
     const onBase = outRows.filter((r) => r.result === 'PASS (baseline)');
@@ -929,11 +1128,11 @@ async function main() {
         }
     }
     const ids = (list) => list.map((r) => r.id).join(', ');
-    const counts = `${failed.length ? `${failed.length} FAIL, ` : ''}${passed.length} PASS${onBase.length ? ` (${onBase.length} on the baseline)` : ''}, ${na.length} N/A, ${notBuilt.length} SKIPPED-NOT-BUILT of ${outRows.length}`;
-    const named = [failed.length && `FAIL: ${ids(failed)}`, na.length && `N/A (ran, nothing to check): ${ids(na)}`, notBuilt.length && `SKIPPED-NOT-BUILT (not run, not passed): ${ids(notBuilt)}`].filter(Boolean).join('; ');
+    const counts = `${failed.length ? `${failed.length} FAIL, ` : ''}${passed.length} PASS${onBase.length ? ` (${onBase.length} on the baseline)` : ''}, ${na.length} N/A, ${notBuilt.length} SKIPPED-NOT-BUILT${noData.length ? `, ${noData.length} SKIPPED / INCOMPLETE (no or partial rulings)` : ''} of ${outRows.length}`;
+    const named = [failed.length && `FAIL: ${ids(failed)}`, na.length && `N/A (ran, nothing to check): ${ids(na)}`, notBuilt.length && `SKIPPED-NOT-BUILT (not run, not passed): ${ids(notBuilt)}`, noData.length && `SKIPPED / INCOMPLETE (no or partial rulings: not all checked, not passed): ${ids(noData)}`].filter(Boolean).join('; ');
     let verdict, exit;
     if (failed.length) { verdict = `FAIL: ${counts} (${named})`; exit = 1; }
-    else if (notBuilt.length && has('strict')) { verdict = `FAIL (incomplete, --strict): ${counts} (${named})`; exit = 3; }
+    else if ((notBuilt.length || noData.length) && has('strict')) { verdict = `FAIL (incomplete, --strict): ${counts} (${named})`; exit = 3; }
     else { verdict = `OK: ${counts}${named ? ` (${named})` : ''}`; exit = 0; }
     table.push('');
     table.push(`${TOOL}: ${verdict}`);
