@@ -396,3 +396,8 @@
 .ws-page .ws-grid > .ws-cell > .ws-stack[data-ws-writeabove] { margin-bottom: calc(var(--ws-tab, 5mm) - 1mm); }
 /* CL-4b: a legacy stack with no carry box keeps no empty carry headroom, so its digits start at the top. */
 .ws-page .ws-cell .ws-stack-legacy:not(:has(i[data-ws-seg])) > span[style*="height:7mm"]:empty { display: none !important; }
+
+/* 2026-10-24 (teacher-site T1 r6, mixed_coordinates blank band): a legacy coordinates cell whose
+   grid is only read (sheet/adapters.js `ws-legacy--readfig`) starts at the top of its box (CL-4b).
+   Additive. */
+.ws-page .ws-grid > .ws-cell[data-ws-legacy]:has(> .ws-legacy--readfig):not(.blankrun) { justify-content: flex-start; }
