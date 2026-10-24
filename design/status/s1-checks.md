@@ -9,4 +9,10 @@ Base: origin/claude/sweet-newton-c8wrv1 (e371ec9) + merge of `-wip-wave0-gates` 
 |---|---|---|---|
 | A node checks | 1 zero-case predicates, 2 dealer uniformity, 5 lesson-data presence, 6 option-help truth, 9 presets item check, 10 wrongAnswer fits slot | 05:21 | 06:10 (450 k tokens, merged 4cb3825) |
 | B print-lint rules | 3 L-ANSAREA 4.4 mm, 4 L-OVERLAP, 11 operator line end, 8 H13 on lesson roles, D1 attribution | 05:22 | — |
-| C card tool + options render | Task A (hosts and roles, --check-signed, 02c5308e, D2), 7 options-verify render | 05:22 | — |
+| C card tool + options render | Task A (hosts and roles, --check-signed, 02c5308e, D2), 7 options-verify render | 05:21 | 06:14 (408 k tokens, merged 02eedf5) |
+
+## Lead integration notes
+- 06:20 ws-content-audit card rulings: an unscoped / --category / --family sweep (the deploy gate) enforces SIGNED cards only;
+  a --skill run (precritic) enforces every card that rules on the skill. Without this, merging S1 turned the full content-audit
+  gate red on main for the six SU-C skills, whose unsigned card describes the unmerged pilot. Verified: `--category subtraction`
+  OK, `--skill sub_50_no_regroup` FAIL (3 card-ruling).

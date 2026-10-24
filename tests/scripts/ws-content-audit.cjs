@@ -19,6 +19,8 @@
 //   node tests/scripts/ws-content-audit.cjs --mc-fixture tests/fixtures/precritic/mc-production.fail.json   # no browser
 //   node tests/scripts/ws-content-audit.cjs --no-mc                # the family sections only (the gate before H8)
 //   node tests/scripts/ws-content-audit.cjs --skill sub_50_no_regroup --rulings <file>   # card rulings from a file (backtest)
+//   (card rulings: a --skill run enforces every card that rules on the skill; an unscoped / --category / --family sweep
+//    enforces SIGNED cards only, so a lane's draft card cannot turn the deploy gate red)
 //   node tests/scripts/ws-content-audit.cjs --no-card-rulings      # leave CARD RULINGS out (--card-n N: items, default 120)
 //
 // MC-ALL (IMPROVEMENT_PLAN §1.6.3 H8): the default run ends with a section that samples EVERY live
@@ -2661,7 +2663,14 @@ function cardRulingsInto(out) {
     if (!keys.length) return;
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-audit-rulings-'));
     const json = path.join(tmp, 'rulings.json');
-    const files = process.argv.flatMap((a, i) => (a === '--rulings' && process.argv[i + 1] ? ['--rulings', process.argv[i + 1]] : []));
+    let files = process.argv.flatMap((a, i) => (a === '--rulings' && process.argv[i + 1] ? ['--rulings', process.argv[i + 1]] : []));
+    // A sweep that is not scoped to --skill (the full gate, --category, --family: what a deploy runs) enforces only SIGNED
+    // cards: an unsigned card is a draft for a lane still building (its rulings describe code not yet merged), so the
+    // lane's own --skill run (ws-precritic) enforces it and the deploy gate does not go red on it.
+    if (!files.length && !ONLY_SKILLS) {
+        files = signedRulingCards().flatMap((f) => ['--card', f]);
+        if (!files.length) return;
+    }
     const argv = [path.join(__dirname, 'ws-card-rulings.mjs'), '--root', ROOT, '--check', 'rulings', '--n', String(parseInt(arg('card-n', '120'), 10)), '--json', json, ...files, '--skill', keys.join(',')];
     const r = require('child_process').spawnSync(process.execPath, argv, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     let j = null;
@@ -2674,6 +2683,17 @@ function cardRulingsInto(out) {
         return;
     }
     foldRulings(out, j);
+}
+/** design/cards/<name>/<name>.md files that carry a rulings block AND an owner signature (`Signed: owner, YYYY-MM-DD`). */
+function signedRulingCards() {
+    const dir = path.join(ROOT, 'design', 'cards');
+    let names = [];
+    try { names = fs.readdirSync(dir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name); } catch (e) { return []; }
+    return names.map(n => path.join(dir, n, `${n}.md`)).filter((f) => {
+        let t = '';
+        try { t = fs.readFileSync(f, 'utf8'); } catch (e) { return false; }
+        return /^Signed: owner, \d{4}-\d{2}-\d{2}\s*$/m.test(t) && /<!-- rulings|```rulings/.test(t);
+    });
 }
 /** ws-card-rulings' --json results folded into the audit rows (pure; self-tested). */
 function foldRulings(out, j) {
