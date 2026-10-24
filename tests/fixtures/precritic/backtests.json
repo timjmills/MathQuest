@@ -698,6 +698,44 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "d1-real-partner",
+   "check": "D1 fix r1 on REAL data: sub_50_no_regroup sections/ex-each (partners add_facts, tape_diagram, perimeter_intro); tape_diagram's own PG-12 overflow is a partner finding and never blocks the lane",
+   "kind": "fixture",
+   "rule": "ws-print-lint attributeCells (buildSheet items + anchors -> data-ws-skill) -> ws-coverage-matrix bySkill -> ws-sibling-compare shareOf",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/d1/real-sub50-ex-each.moved.run.json",
+    "state": "the real run with ONE tape_diagram PG-12 finding at S re-attributed to the lane skill: ABOVE (1 > the siblings' 0)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/d1/real-sub50-ex-each.run.json",
+    "state": "the real run (fix r1): PG-12 8 per size on tape_diagram, partner, OK"
+   },
+   "command": "node tests/scripts/ws-sibling-compare.cjs --run {fixture} --skills subtraction:sub_50_no_regroup --siblings addition:add_100_regroup,subtraction:sub_100_regroup --sibling-run tests/fixtures/precritic/d1/real-siblings.run.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "d1-real-unattributed",
+   "check": "D1 fix r1: a multi-skill row whose findings mostly name no skill (attribution missing) is never a silent pass (the coordinator's pre-fix run: bySkill {'': all})",
+   "kind": "fixture",
+   "rule": "ws-sibling-compare attributionGap (more than half the (cell) findings unnamed -> ERROR)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/d1/real-sub50-ex-each.unattributed.run.json",
+    "state": "the real run as it read before fix r1: every finding under ''"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/d1/real-sub50-ex-each.run.json",
+    "state": "the real run (fix r1): every cell finding names its skill"
+   },
+   "command": "node tests/scripts/ws-sibling-compare.cjs --run {fixture} --skills subtraction:sub_50_no_regroup --siblings addition:add_100_regroup,subtraction:sub_100_regroup --sibling-run tests/fixtures/precritic/d1/real-siblings.run.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
