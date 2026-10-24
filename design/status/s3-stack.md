@@ -3,11 +3,13 @@ Title: S3 — stack × Single engine debt (side/sections anchors, lesson Warm-up
 Session: session_01CJ9HShunXfJxu24RbqcRjV (lead session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-wip-s3-stack
 Owner of files: sheet/anchors.js, layout.js, paginate.js, cells/stack.js, roles/practice.js, roles/lesson.js (+ lesson composer), roles/fact-rows.js, roles/mixed-practice.js, the anchor and section parts of print-sheet.js, the SU-C subtraction generators and providers
-State: building
+State: stopped (brief path used: fix round + critic r2 FAIL on one 7; F1 fixed after, not yet re-graded)
 Updated: 2026-10-24
 Builder profile: mq-opus-medium (failed-round rebuild, rule 0a)
 
 ## Now
+- RESULT: critic r2 FAIL on ONE 7 (F1, sub_10k fact rows at S, C3 7); every other pilot skill, page type, host and anchor sibling >= 8 on all four criteria. F1 fixed after the critic (60c1d5a: 6 x 6, digits clear; VA-2 holds) but not re-graded: the brief's one fix round + one more critic is used. Lead to decide on a focused re-check of fact rows S.
+- Out of the owner's bar, scored not counted (critic r2): EA1 error-analysis wrong answers shifted one place with a comma in a box (4-6 digits; error-analysis.js ~111 passes the comma-formatted value into stack()); W1 worked-example steps 1-3 show empty boxes (scripted-model.js); ST1 Stretch at L ~40 % empty. Nit L2: sub_50 lesson re-deals its model 35 − 21 as p3 item 5.
 - Merged mixed-m1 (anchors r2) and pilot-su-c (fix r2). c2160715's fact-rows column drop reverted on this branch (it breaks ws-layout-unit VA-2 on main; the lead lands a narrowed version); its D8 preset band heading stays.
 - Builder A (anchors: 50/50 sizing + measured pair heights, lone sections block, 2 mm bottom pad, twin = problem in the sections band, band-above for shade_fraction / money_count / place_value_10x, E10 grey) and builder B (lesson Warm-up rows per item kind, worktree) running.
 
@@ -36,3 +38,40 @@ Times: builder round (ex-group column choice resolveBandedLayout + E16; CL-4b pe
 Times: precritic pass 3 (--strict, 3caaf5d), start 2026-10-24T17:46Z — at 19:34Z: 20 PASS, card INCOMPLETE (unsigned), coverage-matrix + sibling-compare FAIL (13 counts above siblings in 8 rows, all page-level PG-23/PAGEFILL on sections ex-each/ex-group traced to the partner perimeter_intro's last-page section; lead ruling asked), slot-clip + options-render still running.
 Times: critic r2 (mq-opus-medium), start 2026-10-24T19:36Z (started under rule 0b's later-confirmation clause).
 - 19:35 lead ruling: the sections ex-each/ex-group PG-23/PAGEFILL (perimeter_intro's last-page section) are partner-driven, non-blocking for precritic; critic r2 counts; critic told to grade the pilot's cells and page fill where the pilot's section ends. Tool gap for S1: page-level findings (PG-23, PAGEFILL) need partner attribution by which section ends the page.
+
+## Per-round findings (LESSONS_LEARNED rule 00)
+
+### s3-stack · critic r1 (2026-10-24, FAIL: four 7s)
+| Finding | Automatic check that would have caught it | Existed? |
+|---|---|---|
+| A1 Model tab over the band's first line (band-above skills) | anchors.check E15: content top ≥ tab bottom + 1 mm (added, fails 32 before) | No |
+| S1 sub_1m 6-digit stack touches the frame at 390 | ws-phone-card / chromebook-fit: ≥ 8 px clear each side (now in precritic) | Partly (fit only, no clearance) |
+| N1b sub_2d_1d "− 1" on 17.5 % | ws-dealer-uniform: value share caps per page (now in precritic) | No (added by S1) |
+| N6b vocab picture wraps at L | probes/vocab-wrap.cjs: no picture wraps / overruns | No |
+| Fact rows S capacity (lead item) | row height includes the answer row; key answers inside cells | No |
+
+### s3-stack · precritic 2 (S1's widened gates)
+| Finding | Check | Existed? |
+|---|---|---|
+| Lesson Guided stacks 4 mm low | print-lint --roles lesson L-TOPSTART | Yes (new gate) |
+| sub_50 zero share 10.8 % | content-audit card ruling R-ZERO | Yes (new gate) |
+| nl* options offered against the card | ws-card-rulings --check offered | Yes (new gate) |
+| ex-group column choice ignores the anchor band | anchors.check E16 (added) | No |
+
+### s3-stack · critic r2 (2026-10-24, FAIL: one 7)
+| Finding | Automatic check | Existed? |
+|---|---|---|
+| F1 4-digit facts in 8 columns, ink on both frames (fact rows S) | print-lint: ink-to-frame clearance ≥ 1 mm in fact cells (the role's own slackMm < 0 must FAIL, not print) — for S1 | No: ws-print-lint finds nothing on this page |
+| L2 lesson re-deals its model problem | node-lint: lesson practice items ≠ model items | No |
+| EA1 comma in a digit box on error analysis | screen/print lint: no non-digit glyph in a digit track | No |
+
+## Speed reflection (rule 00)
+- Wall: 05:20Z → 22:00Z (~16.7 h) for 2 critic rounds; target ≤ 2 rounds: met on count, but the result is one 7 short.
+- Agent tokens: builder A 482k, builder B 217k, fix round 239k, cleanup builder 601k (two rounds), critic r1 415k, critic r2 ~317k ≈ 2.27 M.
+- Lost time, causes → fixes:
+  1. Precritic took > 90 min, then > 2 h, on 7 skills (slot-clip ~58–75 min alone): two runs killed by the harness cap. → S1: shard precritic, or run slot-clip from the matrix's own renders; the 2 h background cap must be a design limit.
+  2. S1's widened gate set arrived mid-lane, so precritic 2 found four new classes after critic r1. → Run the CURRENT precritic (merged with main) before each critic, as rule 0b says; I did, but the gate set changed between runs.
+  3. Page-level findings (PG-23 / PAGEFILL) on partner sections cost one triage and one lead ruling. → S1: attribute page-level findings to the section that ends the page.
+  4. F1 slipped through two critics because fact rows were treated as out of scope in r1, and no lint measures fact-cell clearance. → The role's own fit measure (slackMm < 0) must fail loud; add a print-lint fact-cell clearance check.
+  5. A merge committed with `git commit -a` swept conflict markers into print-sheet.js (fixed 3 min later). → Never `commit -a` during a merge; check `git diff --name-only --diff-filter=U` first (added to my own routine).
+  6. ws-precritic looks for chrome-linux/, the container has chrome-linux64/ → S1 (reported).
