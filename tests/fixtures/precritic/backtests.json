@@ -521,6 +521,64 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "options-render-pilot",
+   "check": "Every offered appearance option value renders as well as the default page (pilot-su-c critic r2 N4: the inherited Across control was offered on sub_100_no_regroup and broke the page)",
+   "kind": "commit-pair",
+   "browser": false,
+   "rule": "ws-options-verify --render (print-lint per value vs the default page, S and L)",
+   "fail": {
+    "commit": "03eda45",
+    "state": "critic r2 tree: AP4 notation Stacked / Across offered on sub_100_no_regroup; the Across page is worse than the stacked default"
+   },
+   "pass": {
+    "commit": "a930c43",
+    "state": "fix r2: the AP4 notation control skips the six no-regroup ids; level 3 / 1 / 0 and the number line render as well as the default"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --root {root} --skill subtraction:sub_100_no_regroup",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "card-gate-decisions",
+   "check": "The spec card decides every option value, role and screen host the repo offers (W0-B2; pilot-su-c critic r2 N4: the signed card was silent about the inherited AP4 Across control)",
+   "kind": "fixture",
+   "rule": "ws-spec-card --check-signed (e) decisions",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/card-gate/decisions.fail.mjs",
+    "state": "signed card decides band and level; the panel also offers notation Stacked / Across: undecided"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/card-gate/decisions.pass.mjs",
+    "state": "notation decided (hidden); a correct build adds the lengths option the card already decides"
+   },
+   "command": "node tests/scripts/ws-spec-card.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "card-gate-rulings",
+   "check": "A signed card's rulings and notOffered are signed content (W0-A critic r7 D2: --rulings-only refreshed bodySha, so a weakened ruling went unnoticed)",
+   "kind": "fixture",
+   "rule": "ws-spec-card --check-signed (d) signed entries",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/card-gate/rulings.fail.mjs",
+    "state": "after signing, card.json widens the minuend band 51-99 to 0-999 and empties notOffered"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/card-gate/rulings.pass.mjs",
+    "state": "the rulings and notOffered as signed"
+   },
+   "command": "node tests/scripts/ws-spec-card.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

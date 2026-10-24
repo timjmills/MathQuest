@@ -16,7 +16,22 @@
 //   node tests/scripts/ws-spec-card.mjs --check-signed design/cards/stack/stack.md      the build-start gate: signed with a
 //        real date not after today, body unchanged since generation (bodySha), coverage green against the current
 //        rule index, and card.json still generates the same card
+//   node tests/scripts/ws-spec-card.mjs --check-signed --skill cat:skill[,...]   the same gate on every card that covers
+//        those skills (ws-precritic's row): exit 0 OK, 1 a SIGNED card fails, 4 NO-CARD (none covers them), 5 an
+//        UNSIGNED card ("needs owner signature"; its other problems listed)
+//   node tests/scripts/ws-spec-card.mjs --fixture tests/fixtures/precritic/card-gate.fail.mjs   the gate on a seeded
+//        state (ws-backtest): generate, sign, move the repo, --check-signed (runFixture)
 //   node tests/scripts/ws-spec-card.mjs --self-test             seeded fixtures, no repo files touched
+//
+// HOSTS, ROLES AND OPTIONS (W0-B2; pilot-su-c: "the card did not decide what the critic graded"): every card lists,
+// from the repo, every value offeredOptionsFor() returns on its skills (inherited `_ap4*` patches included), every role
+// buildSheet accepts with its data source (prereqs.js lesson data or the fallback, earlier skills, provider members)
+// and every screen host the screen gates drive (deriveSurface). card.json "decisions" gives each line offered /
+// hidden / out of scope (signed, §7a; a hidden option becomes a notOffered entry of the rulings block); the live
+// listing with each line's marker is informational (§7b, after the Signed line, not hashed: W0-B fix 02c5308e).
+// --check-signed FAILS while a live line has no decision, and when a signed ruling, notOffered entry or decision was
+// changed, removed or added in card.json (W0-A critic r7 D2: the rulings block is signed content; --rulings-only no
+// longer refreshes a signed card's bodySha over a changed block).
 //
 // The RULE-ID INDEX reads the four standards (WORKSHEET_DESIGN_STANDARD.md, PEDAGOGY_STANDARD.md,
 // design/PAGE_TYPES.md, design/SKILL_CELL_CONTRACT.md), design/PROBLEM_TYPES.md, and the ids critics cite from
@@ -565,7 +580,120 @@ async function deriveFromRepo(root, cfg, idx) {
         const script = (/tests\/scripts\/[\w.-]+/.exec(g.cmd) || [])[0];
         d.gates.push({ ...g, exists: script ? fs.existsSync(path.join(root, script)) : true });
     }
+    d.surface = await deriveSurface(root, d.skills);
     return d;
+}
+
+/** A source file without its comments (so a role's data needs are read from code, not prose). */
+const stripComments = (src) => String(src).replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1');
+/** The provider members a role module reads (in its code or its header), and what each role's data comes from. */
+const ROLE_MEMBERS = ['workedSteps', 'wrongAnswer', 'wrongAnswers', 'stories', 'misconceptions'];
+/** The screen-host names the gates use, mapped to one id (ws-envelope's names win). */
+const HOST_ALIASES = { card: 'practice-card', worksheet: 'online-worksheet' };
+
+/**
+ * The live surface of the card's skills (W0-B2), read from the repo (nothing hand-listed):
+ *   options  every value offeredOptionsFor(cat, skill) returns (js/modules/skill-options.js, with the derived table, the
+ *            pools and the presets loaded, as ws-card-rulings loads them): one line per option=value, the skills that
+ *            offer it, its label and whether the value is the default;
+ *   roles    every role buildSheet accepts: the ids print-sheet.js SHEET_ROLES lists before its spread plus
+ *            sheet/roles/index.js ROLE_MODULES (aliases from ROLE_ALIASES), each with its data source: lesson data
+ *            (lessons/prereqs.js LESSONS) or the fallback, the earlier skills (data.js order), and the provider members
+ *            the role module reads (sheet/contract.js getProvider: real or default, per skill);
+ *   hosts    every screen host the screen gates drive: ws-envelope's host list and the `arg('hosts', '...')` defaults of
+ *            the tests/scripts screen gates (card = practice-card, worksheet = online-worksheet), plus the display modes
+ *            those gates take as flags (`--dark`, `--bigboard`).
+ * A part that cannot be read (a tree without the module) is an empty list plus a `problems` entry, never a guess.
+ */
+async function deriveSurface(root, skills) {
+    const s = { options: [], roles: [], hosts: [], problems: [] };
+    if (!skills.length) return s;
+    const short = (k) => k.split(':')[1];
+    // ---- options
+    try {
+        const SO = await importRepo(root, 'js/modules/skill-options.js');
+        for (const side of ['skill-options-derived.js', 'skill-options-pools.js', 'skill-presets.js']) {
+            if (fs.existsSync(path.join(root, 'js/modules', side))) { try { await importRepo(root, `js/modules/${side}`); } catch { /* optional */ } }
+        }
+        const lines = new Map();
+        for (const k of skills) {
+            const [cat, id] = k.split(':');
+            let defs = [];
+            try { defs = SO.offeredOptionsFor(cat, id) || []; } catch (e) { s.problems.push(`offeredOptionsFor(${k}) threw: ${e.message}`); continue; }
+            for (const def of defs) {
+                const isSet = def.type === 'set';
+                const dflt = isSet ? (Array.isArray(def.default) ? def.default.map(String) : []) : [String(def.default)];
+                let vals;
+                if (def.type === 'bool') vals = ['true', 'false'];
+                else if (Array.isArray(def.values) && def.values.length) vals = def.values.map((v) => (v && typeof v === 'object' ? String(v.v) : String(v)));
+                else vals = ['*'];
+                for (const v of vals) {
+                    const key = `${def.id}=${v}`;
+                    if (!lines.has(key)) lines.set(key, { key, option: def.id, value: v, label: def.label || def.id, group: def.group || '', skills: [], dflt: [] });
+                    const ln = lines.get(key);
+                    ln.skills.push(k);
+                    if (v !== '*' && dflt.includes(v)) ln.dflt.push(k);
+                }
+            }
+        }
+        for (const ln of lines.values()) {
+            const dl = ln.dflt.length === ln.skills.length ? ', default' : ln.dflt.length ? `, default on ${ln.dflt.map(short).join(', ')}` : '';
+            s.options.push({ key: ln.key, skills: ln.skills, text: `${ln.label}${ln.group ? ` [${ln.group}]` : ''}${dl}` });
+        }
+    } catch (e) { s.problems.push(`skill-options.js: ${e.message}`); }
+    // ---- roles
+    try {
+        const RI = await importRepo(root, 'js/modules/sheet/roles/index.js');
+        const ps = fs.readFileSync(path.join(root, 'js/modules/print-sheet.js'), 'utf8');
+        const m = /SHEET_ROLES\s*=\s*Object\.freeze\(\[([^\]]*)\]\)/.exec(ps);
+        const lead = m ? [...m[1].split('...')[0].matchAll(/'([\w-]+)'/g)].map((x) => x[1]) : ['independent', 'more-practice'];
+        if (!m) s.problems.push('print-sheet.js: SHEET_ROLES not found; took independent, more-practice');
+        const roles = [...new Set([...lead, ...Object.keys(RI.ROLE_MODULES || {})])];
+        const aliases = RI.ROLE_ALIASES || {};
+        let LS = null, K = null;
+        try { LS = await importRepo(root, 'js/modules/lessons/prereqs.js'); } catch { LS = null; }
+        try { K = await importRepo(root, 'js/modules/sheet/index.js'); if (fs.existsSync(path.join(root, 'js/modules/sheet/providers/index.js'))) await importRepo(root, 'js/modules/sheet/providers/index.js'); } catch { K = null; }
+        const prov = (k) => { try { return K && K.getProvider ? K.getProvider(...k.split(':')) : null; } catch { return null; } };
+        for (const r of roles) {
+            const f = path.join(root, 'js/modules/sheet/roles', `${r}.js`);
+            const full = fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : '';
+            const code = stripComments(full);
+            const parts = [];
+            if (r === 'lesson') {
+                const has = skills.filter((k) => LS && LS.LESSONS && LS.LESSONS[k]);
+                parts.push(`lesson data: prereqs.js ${has.length}/${skills.length}${has.length < skills.length ? ` (FALLBACK, warm-up from the earlier skills in data.js order, on ${skills.filter((k) => !has.includes(k)).map(short).join(', ')})` : ''}`);
+            } else if (/\bearlier\b/.test(code)) parts.push('earlier skills: data.js order (print-sheet.js earlierSkills)');
+            // the members a role names, in code or in its header (a role that reads a member through the host or
+            // compose.js documents it there: true-false "each from `wrongAnswer(q)`")
+            const used = ROLE_MEMBERS.filter((mm) => new RegExp(`\\b${mm}\\b`).test(full));
+            for (const mm of used) {
+                const real = skills.filter((k) => { const p = prov(k); return p && (p.real || []).includes(mm); });
+                parts.push(`provider ${mm}: real ${real.length}/${skills.length}${real.length < skills.length ? ` (default on ${skills.filter((k) => !real.includes(k)).map(short).join(', ')})` : ''}`);
+            }
+            if (!parts.length) parts.push("the skill's own items");
+            const al = Object.entries(aliases).filter(([, v]) => v === r).map(([a]) => a);
+            s.roles.push({ key: `role:${r}`, skills: skills.slice(), text: `${al.length ? `(also ${al.join(', ')}) ` : ''}— ${parts.join('; ')}` });
+        }
+    } catch (e) { s.problems.push(`roles: ${e.message}`); }
+    // ---- hosts
+    try {
+        const dir = path.join(root, 'tests/scripts');
+        const hosts = new Map();
+        const addH = (h, from) => { const id = HOST_ALIASES[h] || h; if (!hosts.has(id)) hosts.set(id, new Set()); hosts.get(id).add(from); };
+        const env = path.join(dir, 'ws-envelope.mjs');
+        if (fs.existsSync(env)) { const mm = /const hosts = \[([^\]]*)\]/.exec(fs.readFileSync(env, 'utf8')); if (mm) for (const q of mm[1].matchAll(/'([\w-]+)'/g)) addH(q[1], 'ws-envelope'); }
+        for (const f of fs.existsSync(dir) ? fs.readdirSync(dir).filter((x) => /^ws-.*\.(c|m)?js$/.test(x)).sort() : []) {
+            const src = fs.readFileSync(path.join(dir, f), 'utf8');
+            const mm = /const HOSTS = \(arg\('hosts',(.*)$/m.exec(src);
+            if (!mm) continue;
+            const name = f.replace(/\.(c|m)?js$/, '');
+            for (const q of mm[1].replace(/\bhas\('[^']*'\)/g, '').matchAll(/'([\w,-]+)'/g)) for (const h of q[1].split(',')) if (h) addH(h, name);
+            if (/\bhas\('dark'\)/.test(src)) addH('mode-dark', name);
+            if (/\bhas\('bigboard'\)/.test(src)) addH('mode-bigboard', name);
+        }
+        for (const [h, from] of [...hosts].sort((a, b) => (a[0] < b[0] ? -1 : 1))) s.hosts.push({ key: `host:${h}`, skills: skills.slice(), text: `— driven by ${[...from].sort().join(', ')}` });
+    } catch (e) { s.problems.push(`hosts: ${e.message}`); }
+    return s;
 }
 
 /* ================================================================ the card */
@@ -683,11 +811,180 @@ function shortHeading(h) {
     const u = t.replace(/\s*\([^)]*\)\s*$/, '').replace(/^Appendix [A-Z]\s*[—:-]\s*/, '');
     return u.length > 36 ? `${u.slice(0, 34).replace(/\s+\S*$/, '')} …` : u;
 }
-/** sha of a card's text without its Signed line and without the bodySha value itself (hand edits change it). */
+/*
+ * The informational block (card format 2; W0-B fix 02c5308e, ported). Everything the owner signs sits ABOVE the Signed
+ * line. The live listing of what the repo offers today (§7b: every option value offeredOptionsFor() returns, every
+ * role buildSheet takes and every screen host, each with the decision card.json gives it, plus the options and
+ * presets declared in skill-options.js / skill-presets.js) sits BELOW it, between these two fences: it is not hashed
+ * (bodySha), not compared (--check-signed (d)), and never read by any check (rules, skills, the Signed line are all
+ * parsed from the signed part only; the decision check (e) re-derives the live listing from the repo). A card without
+ * the fences is format 1 (the whole text is the signed part).
+ */
+const INFO_OPEN = '<!-- informational: not signed. Not hashed, not compared, never read by any check. -->';
+const INFO_CLOSE = '<!-- /informational -->';
+/** {signedPart, info, format}: the signed part ends with the Signed line and one newline. */
+export function splitCard(text) {
+    const at = text.indexOf(`\n${INFO_OPEN}\n`);
+    if (at < 0) return { signedPart: text, info: null, format: 1 };
+    return { signedPart: `${text.slice(0, at).replace(/\n+$/, '')}\n`, info: text.slice(at + 1), format: 2 };
+}
+/** Why a format-2 card's informational block is malformed (it may not hide signed content or carry rules). */
+function infoProblems(text) {
+    const { signedPart, info, format } = splitCard(text);
+    if (format === 1) return [];
+    const out = [];
+    const last = signedPart.trimEnd().split('\n').pop();
+    if (!/^Signed: /.test(last)) out.push('the informational block does not start right after the Signed line (signed content may not be fenced off)');
+    if (info.split(INFO_OPEN).length !== 2 || info.split(INFO_CLOSE).length !== 2) out.push('the informational block has more than one fence');
+    else if (info.slice(info.indexOf(INFO_CLOSE) + INFO_CLOSE.length).trim()) out.push('text after the informational block (the card must end with it)');
+    if (/^\s*- \*\*[A-Za-z]/m.test(info) || /^#{1,6} (?!7b\. )/m.test(info) || /<!-- rulings/.test(info)) out.push('the informational block carries a rule, a rulings block or a section heading (only §7b may sit there)');
+    return out;
+}
+/** sha of a card's signed part without its Signed line and without the bodySha value itself (hand edits change it). */
 function bodyShaOf(text) {
-    const t = text.split('\n').filter((l) => !/^Signed: /.test(l)).join('\n').replace(/"bodySha":"[0-9a-f]*"/, '"bodySha":""');
+    const t = splitCard(text).signedPart.split('\n').filter((l) => !/^Signed: /.test(l)).join('\n').replace(/"bodySha":"[0-9a-f]*"/, '"bodySha":""');
     return sha1(t).slice(0, BODY_SHA_LEN);
 }
+const INFO_POINTER = 'What the repo offers today (every option value, role and screen host, each with its decision) and the options and preset skills declared in the repo are listed after the Signed line (§7b, informational, not signed).';
+/** sha of the parsed card.json (whitespace-insensitive): any config change after signing fails --check-signed. */
+function configShaOf(cfg) { return sha1(JSON.stringify(cfg)).slice(0, 12); }
+
+/* ---------------------------------------------------------------- hosts, roles and options: the decisions (§7a) */
+/*
+ * W0-B2 "card hosts and roles" (pilot-su-c: the card did not decide what the critic graded). The repo is read for three
+ * listings (deriveSurface): every value offeredOptionsFor() returns on each card skill (the `_ap4*` patches and the
+ * universal / number-line / play controls included, since they are applied to SKILL_OPTIONS when skill-options.js
+ * loads), every role buildSheet accepts with the data it reads, and every screen host the screen gates drive. Each LINE
+ * has a key: `option=value` (`option=*` for a free number, `rows=*` for a rows editor), `role:<id>`, `host:<id>`. The
+ * DECISIONS live in card.json `decisions` {options, roles, hosts}: arrays of
+ *   {"key": "notation=across", "d": "offered"|"hidden"|"out of scope", "why": "...", "source": "§5.8",
+ *    "skills": ["cat:skill", ...]?   only these skills (a decision for one skill beats one for all),
+ *    "proposed": true?}              pre-filled for the lead, not yet confirmed: signing the card accepts it
+ * or {"option": "nlStep", "values": ["1", "2", ...], "d": ...} for several values of one option at once (values are
+ * listed, never wildcarded, so a NEW value is an undecided line; "*" is the free-number line's own value). The
+ * decisions print signed in §7a and feed the rulings block: every `hidden` option decision becomes a notOffered entry
+ * (`N-D-<option>`), which ws-card-rulings --check offered then holds the panel to. --check-signed (e) FAILS while a live
+ * line has no decision (a new option, value, role or host appeared) and NOTEs proposed decisions and decided lines the
+ * repo no longer has.
+ */
+export const DECISIONS = Object.freeze(['offered', 'hidden', 'out of scope']);
+const DEC_GROUPS = Object.freeze([['options', 'Option values (offeredOptionsFor)'], ['roles', 'Page roles (buildSheet)'], ['hosts', 'Screen hosts']]);
+/** The decision entries of card.json, expanded: one {group, key, d, why, source, skills, proposed} per line key. */
+export function expandDecisions(cfg) {
+    const dec = (cfg && cfg.decisions) || {};
+    const out = [];
+    for (const [g] of DEC_GROUPS) {
+        for (const e of dec[g] || []) {
+            const keys = e.option ? (e.values || []).map((v) => `${e.option}=${v}`) : [g === 'options' ? e.key : `${g === 'roles' ? 'role' : 'host'}:${String(e.key).replace(/^(role|host):/, '')}`];
+            for (const key of keys) out.push({ group: g, key, d: e.d, why: e.why || '', source: e.source || '', skills: e.skills || null, proposed: !!e.proposed });
+        }
+    }
+    return out;
+}
+/** Problems with the decision entries themselves (an unknown decision word, a key with no value). */
+function decisionProblems(cfg) {
+    const out = [];
+    for (const e of expandDecisions(cfg)) {
+        if (!DECISIONS.includes(e.d)) out.push(`decision "${e.key}": "${e.d}" is not one of ${DECISIONS.join(' / ')}`);
+        if (e.group === 'options' && !/^[\w-]+=.+$/.test(e.key)) out.push(`decision "${e.key}": an option decision is "option=value" (or {option, values})`);
+    }
+    return out;
+}
+/** The decision for one live line on one skill: the most specific entry (skills named beats all skills), else null. */
+function decisionFor(decs, key, skill) {
+    const hit = decs.filter((e) => e.key === key);
+    return hit.find((e) => e.skills && e.skills.includes(skill)) || hit.find((e) => !e.skills) || null;
+}
+/**
+ * Every live line with the decision for each of its skills: [{group, key, text, skills, by: {skill: decision|null}}].
+ * A line on several skills can carry different decisions (one entry with `skills`, one without).
+ */
+export function decideSurface(cfg, surface) {
+    const decs = expandDecisions(cfg);
+    const out = [];
+    for (const [g] of DEC_GROUPS) {
+        for (const ln of (surface && surface[g]) || []) {
+            const by = {};
+            for (const s of ln.skills) by[s] = decisionFor(decs, ln.key, s);
+            out.push({ group: g, ...ln, by });
+        }
+    }
+    return out;
+}
+/** The marker a §7b line carries: `[offered]`, `[hidden, PROPOSED]`, `[UNDECIDED]`, or per skill when they differ. */
+function markerOf(line) {
+    const tag = (d) => (d ? `${d.d}${d.proposed ? ', PROPOSED' : ''}` : 'UNDECIDED');
+    const vals = [...new Set(Object.values(line.by).map(tag))];
+    if (vals.length === 1) return `[${vals[0]}]`;
+    const per = new Map();
+    for (const [s, d] of Object.entries(line.by)) { const k = tag(d); if (!per.has(k)) per.set(k, []); per.get(k).push(s.split(':')[1]); }
+    return `[${[...per].map(([k, ss]) => `${k}: ${ss.join(', ')}`).join('; ')}]`;
+}
+/** notOffered entries the `hidden` option decisions add to the rulings block (one per option and skill scope). */
+export function hiddenNotOffered(cfg) {
+    const by = new Map();
+    for (const e of expandDecisions(cfg)) {
+        if (e.group !== 'options' || e.d !== 'hidden') continue;
+        const [opt, ...rest] = e.key.split('='); const v = rest.join('=');
+        const scope = (e.skills || []).slice().sort().join(',');
+        const k = `${opt}|${scope}`;
+        if (!by.has(k)) by.set(k, { id: `N-D-${opt}${scope ? `-${by.size + 1}` : ''}`, source: `§7a (decision${e.proposed ? ', PROPOSED' : ''}: ${e.source || 'card'})`, option: opt, values: [], ...(e.skills ? { skills: e.skills.slice().sort() } : {}), any: false });
+        const x = by.get(k);
+        if (v === '*') x.any = true; else x.values.push(v);
+        // a hidden on/off control (both values) is the whole control hidden: notOffered names the option alone
+        if (x.values.includes('true') && x.values.includes('false')) x.any = true;
+        if (e.proposed && !/PROPOSED/.test(x.source)) x.source = x.source.replace('(decision', '(decision, PROPOSED');
+    }
+    return [...by.values()].map(({ any, values, ...x }) => (any || !values.length ? x : { ...x, values }));
+}
+/** sha (6 hex) of every signed rulings / notOffered / decision entry, keyed R:id, N:id, D:key[@skills]. */
+function signedEntriesOf(cfg) {
+    const r = cfg.rulings || {};
+    const out = {};
+    for (const x of r.rulings || []) out[`R:${x.id}`] = sha1(JSON.stringify(x)).slice(0, SHA_LEN);
+    for (const x of r.notOffered || []) out[`N:${x.id}`] = sha1(JSON.stringify(x)).slice(0, SHA_LEN);
+    for (const e of expandDecisions(cfg)) out[`D:${e.key}${e.skills ? `@${e.skills.slice().sort().join(',')}` : ''}`] = sha1(JSON.stringify([e.d, e.proposed])).slice(0, SHA_LEN);
+    return out;
+}
+/** §7a: the signed decisions, from card.json, one line per entry (several values of one option on one line). */
+function decisionsSection(cfg) {
+    const dec = cfg.decisions || {};
+    const L = ['### 7a. Hosts, roles and options — the decisions (signed)', ''];
+    L.push(`What the critic grades and the panel may show. Each live line in §7b needs one of: **offered** (shown and graded on every page type and host it reaches), **hidden** (must not be offered on these skills: becomes a notOffered entry of the rulings block, checked by ws-card-rulings --check offered), **out of scope** (offered by the app but not graded on this card; say where it is graded). PROPOSED = pre-filled for the lead from existing rulings and status; signing the card accepts it.`, '');
+    let n = 0;
+    for (const [g, title] of DEC_GROUPS) {
+        const list = dec[g] || [];
+        if (!list.length) continue;
+        L.push(`**${title}**`, '');
+        for (const e of list) {
+            n++;
+            const key = e.option ? `${e.option}=${(e.values || []).join(' | ')}` : String(e.key);
+            L.push(`- \`${key}\` — **${e.d}**${e.proposed ? ' (PROPOSED)' : ''}${e.skills ? ` on ${e.skills.map((s) => `\`${s.split(':')[1]}\``).join(', ')}` : ''}${e.why ? ` — ${e.why}` : ''}${e.source ? ` (${e.source})` : ''}`);
+        }
+        L.push('');
+    }
+    if (!n) L.push('(no decisions yet: every line in §7b is UNDECIDED, and --check-signed fails until card.json `decisions` decides each)', '');
+    return L;
+}
+/** §7b body: every live line with its marker, grouped. */
+function surfaceListing(cfg, d) {
+    const L = [];
+    const lines = decideSurface(cfg, d.surface || {});
+    const nSk = (d.skills || []).length;
+    for (const [g, title] of DEC_GROUPS) {
+        const ls = lines.filter((x) => x.group === g);
+        L.push(`**${title}** (${ls.length} line${ls.length === 1 ? '' : 's'}${ls.length ? `; ${ls.filter((x) => Object.values(x.by).some((v) => !v)).length} undecided` : ''})`, '');
+        if (!ls.length) L.push('- (none found in the repo)');
+        for (const x of ls) {
+            const who = x.skills.length === nSk ? `all ${nSk}` : x.skills.map((s) => s.split(':')[1]).join(', ');
+            L.push(`- \`${x.key}\` ${x.text ? `${x.text} ` : ''}(${who}) ${markerOf(x)}`);
+        }
+        L.push('');
+    }
+    return L;
+}
+const packEntries = (o) => Object.entries(o).map(([k, v]) => `${encodeURIComponent(k)} ${v}`).join(' ');
+const unpackEntries = (s) => { const out = {}; const t = String(s || '').split(/\s+/).filter(Boolean); for (let i = 0; i + 1 < t.length; i += 2) out[decodeURIComponent(t[i])] = t[i + 1]; return out; };
 
 /**
  * The card's machine-readable RULINGS block (the format of tests/scripts/ws-card-rulings.mjs, which precritic runs as
@@ -699,7 +996,7 @@ function bodyShaOf(text) {
  */
 export function rulingsBlock(cfg, d) {
     const r = cfg.rulings || {};
-    const rulings = r.rulings || [], notOffered = r.notOffered || [];
+    const rulings = r.rulings || [], notOffered = [...(r.notOffered || []), ...hiddenNotOffered(cfg)];
     const named = [...rulings, ...notOffered].flatMap((x) => x.skills || []);
     const skills = [...new Set([...(d.skills || []), ...named])].sort();
     const cites = new Set([...rulings, ...notOffered].flatMap((x) => [...String(x.source || '').matchAll(/§(\d+\.\d+)/g)].map((m) => m[1])));
@@ -752,13 +1049,13 @@ export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [] } = 
     const meta = {
         card: cfg.id, kind: cfg.kind, template: tplId, families: cfg.families || [], match: { templates: match.templates },
         config: `${CARDS_REL}/${cfg.id}/card.json`, indexSha: idx.indexSha, bodySha: '',
-        cited, rules: metaRules,
+        format: 2, configSha: configShaOf(cfg), cited, rules: metaRules, entries: signedEntriesOf(cfg),
     };
     const L = [];
     L.push('<!-- spec-card');
-    const { rules: mr, cited: mc, ...mh } = meta;
+    const { rules: mr, cited: mc, entries: me, ...mh } = meta;
     L.push(JSON.stringify(mh).replace(/--/g, '- -'));
-    L.push(JSON.stringify({ cited: mc.join(' '), rules: packRules(mr) }).replace(/--/g, '- -'));
+    L.push(JSON.stringify({ cited: mc.join(' '), rules: packRules(mr), entries: packEntries(me) }).replace(/--/g, '- -'));
     L.push('-->');
     L.push(...rulingsBlock(cfg, d));
     L.push(`# Spec card: ${cfg.title}`, '');
@@ -856,16 +1153,12 @@ export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [] } = 
     if (blm.length) L.push(`- From the build list (entries hosted on ${[...fams].join(' / ')}): ${blm.join('; ')}`);
     L.push('');
 
-    // 7
+    // 7: what the card itself declares, asks for and DECIDES is signed; the live listing goes to §7b below the Signed line
     L.push('## 7. Options and presets', '');
     for (const n of cfg.options || []) L.push(`- ${n}`);
     if ((cfg.options || []).length) L.push('');
-    if (d.options.length) {
-        L.push(`**Options declared today** (\`js/modules/skill-options.js\`; id, label, values, skills that declare it):`, '');
-        for (const o of d.options) L.push(`- \`${o.id}\` ${o.label}: ${o.values.length ? o.values.join(' / ') : 'free'} (${o.skills})`);
-        L.push('');
-    }
-    L.push(`**Preset skills on these hosts** (\`js/modules/skill-presets.js\`): ${d.presets.length ? d.presets.map((p) => `\`${p.key}\` → \`${p.host}\` ${JSON.stringify(p.opts)}`).join('; ') : '(none)'}`, '');
+    L.push(INFO_POINTER, '');
+    L.push(...decisionsSection(cfg));
 
     // 8
     L.push('## 8. Gates', '');
@@ -881,6 +1174,20 @@ export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [] } = 
     L.push('');
     L.push(signedLine);
     L.push('');
+    // 7b: informational, after the Signed line, between fences (not signed, not hashed, not compared)
+    L.push(INFO_OPEN);
+    L.push('## 7b. What the repo offers today (informational, not signed)', '');
+    L.push('Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.', '');
+    L.push(...surfaceListing(cfg, d));
+    for (const p of (d.surface && d.surface.problems) || []) L.push(`NOT READ: ${p}`, '');
+    if (d.options.length) {
+        L.push(`**Options declared today** (\`js/modules/skill-options.js\`; id, label, values, skills that declare it):`, '');
+        for (const o of d.options) L.push(`- \`${o.id}\` ${o.label}: ${o.values.length ? o.values.join(' / ') : 'free'} (${o.skills})`);
+        L.push('');
+    }
+    L.push(`**Preset skills on these hosts** (\`js/modules/skill-presets.js\`): ${d.presets.length ? d.presets.map((p) => `\`${p.key}\` → \`${p.host}\` ${JSON.stringify(p.opts)}`).join('; ') : '(none)'}`);
+    L.push(INFO_CLOSE);
+    L.push('');
     let text = L.join('\n');
     meta.bodySha = bodyShaOf(text);
     text = text.replace('"bodySha":""', `"bodySha":"${meta.bodySha}"`);
@@ -888,7 +1195,8 @@ export function renderCard(cfg, d, idx, { signedLine = UNSIGNED, cited = [] } = 
 }
 
 /** Parse a card file: its machine block, its skills (section 1), its section-4 rule refs and its Signed line. */
-export function readCard(text) {
+export function readCard(fullText) {
+    const text = splitCard(fullText).signedPart;
     const m = /^<!-- spec-card\n([\s\S]*?)\n-->/.exec(text);
     if (!m) return null;
     const raw = m[1].replace(/- -/g, '--');
@@ -898,6 +1206,7 @@ export function readCard(text) {
         try { meta = { ...JSON.parse(parts[0]), ...JSON.parse(parts.slice(1).join('\n')) }; } catch { return null; }
     }
     meta.rules = unpackRules(meta.rules);
+    meta.entries = meta.entries === undefined ? null : unpackEntries(meta.entries);
     if (typeof meta.cited === 'string') meta.cited = meta.cited.split(/\s+/).filter(Boolean);
     meta.cited = meta.cited || meta.citedAtGeneration || [];
     const lines = text.split('\n');
@@ -919,13 +1228,54 @@ export function readCard(text) {
     return { meta, signed, isSigned: !!sm, signedDate: sm ? sm[1] : null, onCard: [...onCard], skills };
 }
 
-/** Compare two cards ignoring the Signed line, the index sha (it moves when any rule anywhere changes), the body sha and
- *  the ids cited at generation (a record of the tally, not card content). */
+/** Compare two cards' SIGNED parts ignoring the Signed line, the index sha (it moves when any rule anywhere changes), the
+ *  body sha and the ids cited at generation (a record of the tally, not card content). The machine rulings block IS
+ *  compared (W0-A critic r7 D2: a ruling weakened or a notOffered entry emptied under a signature voids it). */
 function cardBody(text) {
-    return text.split('\n').filter((l) => !/^Signed: /.test(l)).join('\n')
-        .replace(/^<!-- rulings\n[\s\S]*?\n-->\n/m, '')   // the machine rulings block encodes sections 1-9; not signed text
+    return splitCard(text).signedPart.split('\n').filter((l) => !/^Signed: /.test(l)).join('\n')
         .replace(/"indexSha":"[0-9a-f]+"/, '"indexSha":""').replace(/"bodySha":"[0-9a-f]*"/, '"bodySha":""')
         .replace(/"cited":"[^"]*"/, '"cited":""').replace(/sha `[0-9a-f]{12}`/, 'sha ``');
+}
+/** The card without its rulings block (spliceRulings: nothing but the block may change). */
+const stripRulings = (text) => cardBody(text).replace(/^<!-- rulings\n[\s\S]*?\n-->\n/m, '');
+
+/**
+ * cardBody with the REPO-DERIVED listings a correct build changes masked out (README "What a build may change"):
+ * §1 the skill list and its CCSS / EE / WRM tags (checked separately: nothing signed may disappear), the rulings block's
+ * derived "skills" line (the same list), §2 the build-list lines (a built entry is deleted from the build list), §7 the
+ * format-1 live options / presets listing (now §7b), §8 the PLANNED marker of a gate whose script has landed, and the
+ * machine-block fields format 2 added. Everything else — card.json content, rules and excerpts, rulings and notOffered,
+ * misconceptions, the options and decisions the card itself declares, gates, open questions — is compared byte for
+ * byte, and configSha catches any card.json change in a format-2 card.
+ */
+function comparableBody(text) {
+    const sec = (t, n, fn) => t.replace(new RegExp(`(\\n## ${n}\\. [^\\n]*\\n)([\\s\\S]*?)(?=\\n## \\d\\. )`), (m, h, b) => h + fn(b));
+    let t = cardBody(text).replace(/,"format":2,"configSha":"[0-9a-f]*"/, '').replace(/,"entries":"[^"]*"/, '')
+        .replace(/^("skills": )\[[^\n]*\],$/m, '$1#,');
+    t = sec(t, 1, (b) => b.replace(/^(\*\*Skills on this (?:template|family)\*\* \()\d+;/m, '$1#;')
+        .split('\n').filter((l) => !/^- \*\*[a-z0-9_]+\*\* \(\d+\): /.test(l)).join('\n')
+        .replace(/^(\*\*CCSS\*\* \(SKILL_STANDARDS of those skills\):).*$/m, '$1 #')
+        .replace(/^(\*\*Essential Elements:\*\*).*$/m, '$1 #')
+        .replace(/^(\*\*WRM small steps\*\* \(SKILL_WRM\):).*$/m, '$1 #'));
+    t = sec(t, 2, (b) => b.replace(/^\*\*Build-list entries[^\n]*\n\n(?:- `[^\n]*\n)*\n?/m, ''));
+    t = sec(t, 7, (b) => b.replace(/^\*\*Options declared today\*\*[^\n]*\n\n(?:- `[^\n]*\n)*\n?/m, '')
+        .replace(/^\*\*Preset skills on these hosts\*\*[^\n]*\n\n?/m, '').split(`${INFO_POINTER}\n\n`).join('').split(`${INFO_POINTER}\n`).join('').replace(/^\n+$/, ''));
+    return t.replace(/ — PLANNED \(not in the repo yet\)/g, '');
+}
+/** The signed §1 tags of a card: {ccss, ee, wrm}, parsed back from its lines. */
+function signedTags(text) {
+    const s1 = (/## 1\. What it teaches\n([\s\S]*?)\n## 2\./.exec(splitCard(text).signedPart) || [, ''])[1];
+    const list = (re) => { const m = re.exec(s1); return m && m[1].trim() !== '(none)' ? m[1].split(/,\s*/).map((x) => x.trim()).filter(Boolean) : []; };
+    const wrm = [];
+    const wl = (/^\*\*WRM small steps\*\* \(SKILL_WRM\): (.*)$/m.exec(s1) || [, ''])[1];
+    if (wl.trim() !== '(none)') for (const g of wl.split(/;\s*/).filter(Boolean)) { const m = /^(Y\d+\.B\d+) (.*)$/.exec(g); for (const x of (m ? m[2] : g).split(/,\s*/)) wrm.push(m ? `${m[1]}.${x}` : x); }
+    return { ccss: list(/^\*\*CCSS\*\* \(SKILL_STANDARDS of those skills\): (.*)$/m), ee: list(/^\*\*Essential Elements:\*\* (.*)$/m), wrm };
+}
+/** The build-list ids a card's §2 lists. */
+function signedBuildIds(text) {
+    const s2 = (/## 2\. Problem types and progression\n([\s\S]*?)\n## 3\./.exec(splitCard(text).signedPart) || [, ''])[1];
+    const b = (/\*\*Build-list entries[^\n]*\n\n((?:- `[^\n]*\n?)*)/.exec(s2) || [, ''])[1];
+    return [...b.matchAll(/^- `([^`]+)`/gm)].map((m) => m[1]);
 }
 
 /** Section byte sizes of a card: machine block, header, sections 1-9 (4 split into 4a / 4b). */
@@ -934,8 +1284,8 @@ export function sectionSizes(text) {
     const end = text.indexOf('\n-->') + 4;
     out.push(['machine block', Buffer.byteLength(text.slice(0, end + 1))]);
     const rest = text.slice(end + 1);
-    for (const part of rest.split(/\n(?=## \d\. |### 4[ab]\. )/)) {
-        const h = /^(## (\d)\.|### (4[ab])\.)/.exec(part);
+    for (const part of rest.split(/\n(?=## \d\. |## 7b\. |### 4[ab]\. |### 7a\. )/)) {
+        const h = /^(## (\d|7b)\.|### (4[ab]|7a)\.)/.exec(part);
         out.push([h ? (h[2] ? `§${h[2]}` : `§${h[3]}`) : 'title', Buffer.byteLength(part) + 1]);
     }
     out.push(['total', Buffer.byteLength(text)]);
@@ -973,12 +1323,19 @@ export async function generateCard(root, id, kind, { resign = false, rulingsOnly
     if (!b.ok) return b;
     const p = b.paths;
     const old = fs.existsSync(p.md) ? fs.readFileSync(p.md, 'utf8') : null;
-    if (rulingsOnly) return spliceRulings(root, p.md, old, b.text);
+    if (rulingsOnly) return spliceRulings(root, p.md, old, b.text, { resign });
     const oldCard = old ? readCard(old) : null;
     const wasSigned = !!(oldCard && oldCard.isSigned);
     let text = b.text;
     let note = '';
-    if (wasSigned && cardBody(old) !== cardBody(text)) {
+    const keepSigned = wasSigned && cardBody(old) !== cardBody(text) && !resign && comparableBody(old) === comparableBody(text)
+        && (!oldCard.meta.configSha || oldCard.meta.configSha === configShaOf(b.cfg)) && !infoProblems(old).length;
+    if (keepSigned) {
+        // only repo-derived listings moved (a build tagged a skill, deleted a built entry, added options): the signed
+        // part stays byte for byte as the owner signed it; only the informational block is refreshed
+        text = `${splitCard(old).signedPart}\n${splitCard(text).info}`;
+        note = ` — still signed (${oldCard.signed.replace(/^Signed: /, '')}); the signed part is kept as signed, only the informational §7b was refreshed (run --check-signed for the repo changes since signing)`;
+    } else if (wasSigned && cardBody(old) !== cardBody(text)) {
         if (!resign) return { ok: false, msg: `${rel(root, p.md)} is SIGNED (${oldCard.signed}) and its content would change; nothing written. Re-run with --resign to reset it to unsigned for the owner to sign again.` };
         note = ' — the signature was RESET (--resign): the owner must sign it again';
     } else if (wasSigned) {
@@ -993,21 +1350,30 @@ export async function generateCard(root, id, kind, { resign = false, rulingsOnly
 
 /**
  * --rulings-only: write ONLY the machine rulings block into an existing card (added after the spec-card comment, or
- * replacing the old block), leave every other byte and the Signed line as they are, and refresh bodySha (it covers the
- * block, so a hand edit of the block is still caught). For a signed card whose other content would also change on a
- * full regeneration: the block is an addition that encodes sections 1-9, not signed text.
+ * replacing the old block), leave every other byte as it is, and refresh bodySha. The block is SIGNED content (W0-A
+ * critic r7 D2: refreshing bodySha over a changed block let a signed card's rulings be weakened unnoticed): on a SIGNED
+ * card whose block would change, nothing is written unless --resign is given, and then the Signed line is reset.
+ * (configSha still records the card.json of the last full generation, so --check-signed also asks for a full
+ * regeneration before a new signature.)
  */
-function spliceRulings(root, mdPath, old, fresh) {
+function spliceRulings(root, mdPath, old, fresh, { resign = false } = {}) {
     if (old == null) return { ok: false, msg: `${rel(root, mdPath)} does not exist: generate it first (without --rulings-only)` };
     const BLK = /^<!-- rulings\n[\s\S]*?\n-->\n/m;
     const blk = BLK.exec(fresh)[0];
     let text = BLK.test(old) ? old.replace(BLK, blk) : old.replace(/^(<!-- spec-card\n[\s\S]*?\n-->\n)/, `$1${blk}`);
     if (text === old && !BLK.test(old)) return { ok: false, msg: `${rel(root, mdPath)}: no spec-card comment to put the block after` };
+    const oc = readCard(old);
+    let note = '';
+    if (text !== old && oc && oc.isSigned) {
+        if (!resign) return { ok: false, msg: `${rel(root, mdPath)} is SIGNED (${oc.signed}) and its rulings block would change: the rulings and notOffered entries are signed content; nothing written. Re-run with --resign (the card becomes unsigned for the owner to sign again).` };
+        text = text.replace(new RegExp(`^${oc.signed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'm'), UNSIGNED);
+        note = ' — the signature was RESET (--resign): the owner must sign it again';
+    }
     text = text.replace(/"bodySha":"[0-9a-f]*"/, `"bodySha":"${bodyShaOf(text)}"`);
-    if (cardBody(text) !== cardBody(old)) return { ok: false, msg: `${rel(root, mdPath)}: splicing the block would change other content; nothing written` };
+    if (stripRulings(text) !== stripRulings(old)) return { ok: false, msg: `${rel(root, mdPath)}: splicing the block would change other content; nothing written` };
     if (old !== text) fs.writeFileSync(mdPath, text);
     const c = readCard(text);
-    return { ok: true, path: mdPath, msg: `${old === text ? 'unchanged' : 'wrote the rulings block into'} ${rel(root, mdPath)}; the rest of the card is byte-identical${c && c.isSigned ? ` and still signed (${c.signed.replace(/^Signed: /, '')})` : ''}` };
+    return { ok: true, path: mdPath, msg: `${old === text ? 'unchanged' : 'wrote the rulings block into'} ${rel(root, mdPath)}; the rest of the card is byte-identical${c && c.isSigned ? ` and still signed (${c.signed.replace(/^Signed: /, '')})` : ''}${note}` };
 }
 
 /* ================================================================ checks */
@@ -1067,6 +1433,18 @@ export function checkCoverage(root, cardFile, { sources = SOURCES, findingsPath 
     return { ok, lines };
 }
 
+/** The cards whose skills (section 1, or the rulings block) include any of `keys` (cat:skill; a bare id matches too). */
+export function cardsCovering(root, keys) {
+    const want = (k) => keys.some((x) => x === k || (!x.includes(':') && k.endsWith(`:${x}`)));
+    return allCards(root).filter((f) => {
+        const text = fs.readFileSync(f, 'utf8');
+        const c = readCard(text);
+        const blk = /<!-- rulings\n([\s\S]*?)\n-->/.exec(splitCard(text).signedPart);
+        let bs = [];
+        try { bs = blk ? JSON.parse(blk[1].replace(/\\u002d/g, '-')).skills || [] : []; } catch { bs = []; }
+        return [...(c ? c.skills : []), ...bs].some(want);
+    });
+}
 function allCards(root) {
     const dir = path.join(root, CARDS_REL);
     if (!fs.existsSync(dir)) return [];
@@ -1099,26 +1477,84 @@ export async function checkSigned(root, cardFile, { today = localToday(), source
     const lines = [];
     const fail = (why, fix) => lines.push(`FAIL ${name}: ${why}${fix ? ` — ${fix}` : ''}`);
     // (a)
-    if (!card.signed) fail('no Signed line — the build may not start', 'the owner answers section 9 and replaces the last line with `Signed: owner, YYYY-MM-DD`');
-    else if (!card.isSigned) fail(`not signed (${card.signed}) — the build may not start`, 'the owner answers section 9 and replaces the last line with `Signed: owner, YYYY-MM-DD`');
+    if (!card.signed) fail('no Signed line — the build may not start', 'the owner answers section 9 and replaces the Signed line (above the informational §7b) with `Signed: owner, YYYY-MM-DD`');
+    else if (!card.isSigned) fail(`not signed (${card.signed}) — the build may not start`, 'the owner answers section 9 and replaces the Signed line (above the informational §7b) with `Signed: owner, YYYY-MM-DD`');
     else if (!validDate(card.signedDate)) fail(`"${card.signed}": ${card.signedDate} is not a real calendar date`, 'the owner writes the real date');
     else if (card.signedDate > today) fail(`"${card.signed}": ${card.signedDate} is in the future (today is ${today})`, 'the owner writes the date of signing');
-    // (b)
+    const unsigned = !card.isSigned;
+    // (b) the informational block may not hide signed content or carry rules
+    for (const why of infoProblems(text)) fail(why, FIX(id, kind));
     if (!card.meta.bodySha) fail('the machine block has no bodySha (generated by an older tool)', FIX(id, kind));
     else if (bodyShaOf(text) !== card.meta.bodySha) fail('the card was edited by hand after generation (its body no longer matches the bodySha in the machine block)', FIX(id, kind));
     // (c)
     const cov = checkCoverage(root, cardFile, { sources, findingsPath, requireFindings });
     for (const l of cov.lines) if (/^FAIL /.test(l)) lines.push(`${l}${/--resign/.test(l) ? '' : ` — ${FIX(id, kind)}`}`);
-    // (d)
+    // (d) the signed content is still what card.json and the repo generate; the repo-derived listings a correct build
+    // changes are masked (comparableBody) and reported as NOTE lines, except that nothing signed may disappear
     const b = await buildCard(root, id, kind, { sources, derive, findingsPath });
+    const notes = [];
     if (!b.ok) fail(`card.json no longer generates a card: ${b.msg}`, FIX(id, kind));
-    else if (cardBody(b.text) !== cardBody(text)) {
-        const a1 = cardBody(text).split('\n'), b1 = cardBody(b.text).split('\n');
-        let k = 0; while (k < a1.length && a1[k] === b1[k]) k++;
-        fail(`card.json or the repo now generates a different card (first difference at line ${k + 1}: "${(b1[k] || '(end)').slice(0, 80)}")`, FIX(id, kind));
+    else {
+        if (card.meta.configSha && card.meta.configSha !== configShaOf(b.cfg)) fail('card.json changed after the card was generated (configSha)', FIX(id, kind));
+        // the signed rulings / notOffered / decision entries, one by one (W0-A r7 D2: a weakened ruling is named)
+        if (card.meta.entries) {
+            const now = signedEntriesOf(b.cfg), was = card.meta.entries;
+            const changed = Object.keys(was).filter((k) => k in now && now[k] !== was[k]);
+            const gone = Object.keys(was).filter((k) => !(k in now));
+            const added = Object.keys(now).filter((k) => !(k in was));
+            if (changed.length) fail(`signed rulings / notOffered / decisions CHANGED in card.json since signing (a weakened ruling voids the signature): ${changed.join(', ')}`, FIX(id, kind));
+            if (gone.length) fail(`signed rulings / notOffered / decisions REMOVED from card.json since signing: ${gone.join(', ')}`, FIX(id, kind));
+            if (added.length) fail(`rulings / notOffered / decisions ADDED to card.json since signing (not signed yet): ${added.join(', ')}`, FIX(id, kind));
+        } else if (!card.meta.entries && card.meta.format === 2) fail('the machine block has no signed-entry list (entries)', FIX(id, kind));
+        if (comparableBody(b.text) !== comparableBody(text)) {
+            const a1 = comparableBody(text).split('\n'), b1 = comparableBody(b.text).split('\n');
+            let k = 0; while (k < a1.length && a1[k] === b1[k]) k++;
+            fail(`card.json or the repo now generates a different card (first difference at line ${k + 1} of the compared body: "${(b1[k] || '(end)').slice(0, 80)}")`, FIX(id, kind));
+        }
+        const live = b.d, tags = signedTags(text);
+        const diff = (label, signed, now, removalFails) => {
+            const gone = signed.filter((x) => !now.includes(x)), added = now.filter((x) => !signed.includes(x));
+            if (gone.length && removalFails) fail(`${label} signed on the card no longer in the repo: ${gone.join(', ')}`, FIX(id, kind));
+            else if (gone.length) notes.push(`${label} gone since signing: ${gone.join(', ')}`);
+            if (added.length) notes.push(`${label} added since signing (not signed; listed for the next re-sign): ${added.join(', ')}`);
+        };
+        diff('§1 skills', card.skills, live.skills, true);
+        diff('§1 CCSS', tags.ccss, live.standards.ccss, true);
+        diff('§1 EE', tags.ee, live.standards.ee, true);
+        diff('§1 WRM steps', tags.wrm, live.wrm, true);
+        diff('§2 build-list entries (a built entry is deleted from the build list)', signedBuildIds(text), live.buildEntries.map((e) => e.id), false);
+        const planned = (t) => [...splitCard(t).signedPart.matchAll(/^- `([^`]+)`[^\n]* — PLANNED \(not in the repo yet\)/gm)].map((m) => m[1]);
+        diff('§8 gates PLANNED', planned(text), planned(b.text), false);
+        if (splitCard(text).format === 1 && /\*\*Options declared today\*\*|\*\*Preset skills on these hosts\*\*/.test(text)) notes.push('format-1 card: its §7 live options / presets listing is not compared (it moved to the informational §7b); regenerate to refresh it without touching the signature');
+        // (e) hosts, roles and options: every line the repo offers today has a decision (W0-B2)
+        const dec = checkDecisions(b.cfg, live);
+        for (const f of dec.fails) fail(f, `decide it in design/cards/${id}/card.json "decisions" (offered / hidden / out of scope), run \`node tests/scripts/ws-spec-card.mjs --${kind} ${id} --resign\`, and have the owner sign`);
+        notes.push(...dec.notes);
     }
-    const ok = !lines.length;
-    return { ok, lines, msg: ok ? `${name}: ${card.signed}; body as generated; coverage green against the current rule index; card.json generates the same card — the build may start` : `${name}: ${lines.length} problem(s) — the build may not start` };
+    for (const n of notes) lines.push(`NOTE ${name}: ${n}`);
+    const fails = lines.filter((l) => /^FAIL /.test(l));
+    const ok = !fails.length;
+    // only the signature is missing: the lane may run (precritic reports it INCOMPLETE), the build may not be accepted
+    const onlyUnsigned = unsigned && fails.length === 1;
+    return { ok, onlyUnsigned, unsigned, lines, msg: ok ? `${name}: ${card.signed}; body as generated; coverage green against the current rule index; card.json generates the same signed content; every host, role and option value decided${notes.length ? ` (${notes.length} note(s), not failures)` : ''} — the build may start` : onlyUnsigned ? `${name}: needs owner signature (everything else green) — the build may not start` : `${name}: ${fails.length} problem(s) — the build may not start` };
+}
+
+/** (e): {fails, notes} — every live line decided on every skill; proposed decisions and stale decisions noted. */
+export function checkDecisions(cfg, d) {
+    const fails = [], notes = [];
+    for (const p of decisionProblems(cfg)) fails.push(p);
+    for (const p of (d.surface && d.surface.problems) || []) fails.push(`the repo listing (§7b) could not be read: ${p}`);
+    const lines = decideSurface(cfg, d.surface || {});
+    const undKeys = [...new Set(lines.filter((x) => Object.values(x.by).some((v) => !v)).map((x) => x.key))];
+    if (undKeys.length) fails.push(`${undKeys.length} host / role / option line(s) the repo offers have no decision (UNDECIDED: a new option, value, role or host, or never decided): ${undKeys.slice(0, 40).join(', ')}${undKeys.length > 40 ? ` … ${undKeys.length - 40} more` : ''}`);
+    const proposed = [...new Set(lines.flatMap((x) => Object.values(x.by).filter((v) => v && v.proposed).map(() => x.key)))];
+    if (proposed.length) notes.push(`${proposed.length} live line(s) carry a PROPOSED decision (pre-filled for the lead; signing the card accepts them): ${proposed.join(', ')}`);
+    const liveKeys = new Set(lines.map((x) => x.key));
+    const stale = [...new Set(expandDecisions(cfg).filter((e) => !liveKeys.has(e.key)).map((e) => `${e.key} (${e.d})`))];
+    if (stale.length) notes.push(`${stale.length} decided line(s) the repo does not offer today (a hidden one the build removed, or one still to build): ${stale.join(', ')}`);
+    const n = lines.length;
+    if (n) notes.push(`decisions: ${n} live line(s) — ${['offered', 'hidden', 'out of scope'].map((k) => `${lines.filter((x) => Object.values(x.by).every((v) => v && v.d === k)).length} ${k}`).join(', ')}, ${lines.filter((x) => new Set(Object.values(x.by).map((v) => (v ? v.d : '?'))).size > 1).length} mixed by skill, ${undKeys.length} undecided; ${proposed.length} PROPOSED`);
+    return { fails, notes };
 }
 
 /* ================================================================ self-test */
@@ -1191,14 +1627,15 @@ async function selfTest() {
             'r6,run-e,1,D6,SPACE,machine,no,major,RP-03,wrm-page,,the word add alone does not name the skill',
         ].join('\n');
         fs.writeFileSync(path.join(root, 'findings.csv'), csv);
-        const noDerive = async (r, c, idx) => ({ skills: ['addition:add'], labels: {}, standards: { ccss: ['2.NBT.B.5'], ee: [] }, wrm: [], buildEntries: [], options: [], presets: [], sourceRules: [], capacity: [], gates: [{ cmd: 'node tests/scripts/ws-precritic.cjs --template stack', exists: false }] });
+        const fx = { skills: ['addition:add'], standards: { ccss: ['2.NBT.B.5'], ee: [] }, options: [], presets: [], gates: [{ cmd: 'node tests/scripts/ws-precritic.cjs --template stack', exists: false }], surface: { options: [], roles: [], hosts: [] } };
+        const noDerive = async (r, c, idx) => ({ labels: {}, wrm: [], buildEntries: [], sourceRules: [], capacity: [], ...JSON.parse(JSON.stringify(fx)) });
         const opts = { sources: SRC, derive: noDerive, findingsPath: 'findings.csv' };
         const g1 = await generateCard(root, 'mini', 'template', opts);
         const md = path.join(cdir, 'mini.md');
         const c1 = fs.readFileSync(md, 'utf8');
         const g1b = await generateCard(root, 'mini', 'template', opts);
         t('card generation is byte-identical on re-run', g1.ok && g1b.ok && c1 === fs.readFileSync(md, 'utf8'));
-        t('card has the nine sections and ends unsigned', [1, 2, 3, 4, 5, 6, 7, 8, 9].every((n) => c1.includes(`\n## ${n}. `)) && c1.trimEnd().endsWith(UNSIGNED));
+        t('card has the nine sections and its signed part ends unsigned', [1, 2, 3, 4, 5, 6, 7, 8, 9].every((n) => c1.includes(`\n## ${n}. `)) && splitCard(c1).signedPart.trimEnd().endsWith(UNSIGNED));
         const cov1 = checkCoverage(root, md, { sources: SRC, findingsPath: 'findings.csv' });
         t('coverage FAILS when a cited id (VA-2) is missing from the card', !cov1.ok && cov1.lines.some((l) => /VA-2 was cited/.test(l)));
         t('coverage ignores other templates/families (VA-9 not demanded)', !cov1.lines.some((l) => /VA-9 was cited/.test(l)));
@@ -1259,6 +1696,127 @@ async function selfTest() {
         t('check-signed FAILS when card.json changed after signing (it generates a different card)', !cs6.ok && cs6.lines.some((l) => /generates a different card/.test(l)));
         fs.writeFileSync(path.join(cdir, 'card.json'), cfgText);
         t('check-signed is OK again once everything is restored', (await checkSigned(root, md, sOpts)).ok);
+        // 4b. (02c5308e, ported) the signed part vs the informational §7b: a correct build changes the repo listings
+        t('format 2: the live listing sits after the Signed line, between the fences', splitCard(signedText).format === 2 && /^Signed: owner, 2026-10-20$/m.test(splitCard(signedText).signedPart) && /## 7b\. What the repo offers/.test(splitCard(signedText).info) && !/## 7b/.test(splitCard(signedText).signedPart));
+        fx.options = [{ id: 'lengths', label: 'Number lengths', values: ['same', 'ragged'], skills: 1 }];
+        fx.presets = [{ key: 'addition:add_ragged', host: 'addition:add', opts: { lengths: 'ragged' } }];
+        const cs7 = await checkSigned(root, md, sOpts);
+        t('BACKTEST 02c: sign, add an option and a preset to the repo, --check-signed stays OK', cs7.ok);
+        const g7 = await generateCard(root, 'mini', 'template', opts);
+        const t7 = fs.readFileSync(md, 'utf8');
+        t('BACKTEST 02c: regenerating after the option lands keeps the signed part byte for byte and refreshes §7b', g7.ok && splitCard(t7).signedPart === splitCard(signedText).signedPart && /`lengths` Number lengths: same \/ ragged/.test(splitCard(t7).info) && (await checkSigned(root, md, sOpts)).ok);
+        fx.skills = ['addition:add', 'addition:add_ragged']; fx.standards = { ccss: ['2.NBT.B.5', '2.NBT.B.6'], ee: [] }; fx.gates = [{ ...fx.gates[0], exists: true }];
+        const cs8 = await checkSigned(root, md, sOpts);
+        t('BACKTEST 02c: a build that adds a preset skill, tags it and lands a PLANNED gate stays OK, with NOTE lines', cs8.ok && cs8.lines.some((l) => /^NOTE .*§1 skills added since signing.*add_ragged/.test(l)) && cs8.lines.some((l) => /^NOTE .*§8 gates PLANNED gone/.test(l)));
+        fx.skills = []; fx.standards = { ccss: [], ee: [] };
+        const cs8b = await checkSigned(root, md, sOpts);
+        t('BACKTEST 02c: a skill or tag signed on the card that disappears from the repo FAILS', !cs8b.ok && cs8b.lines.some((l) => /§1 skills signed on the card no longer in the repo: addition:add/.test(l)) && cs8b.lines.some((l) => /§1 CCSS signed/.test(l)));
+        fx.skills = ['addition:add']; fx.standards = { ccss: ['2.NBT.B.5'], ee: [] };
+        fs.writeFileSync(md, t7.replace('Carry under the line?', 'Carry above the line?'));
+        const cs9 = await checkSigned(root, md, sOpts);
+        t('BACKTEST 02c: sign, hand-edit a signed section (open question), FAIL', !cs9.ok && cs9.lines.some((l) => /edited by hand/.test(l)));
+        fs.writeFileSync(md, t7.replace('Number lengths', 'Number lengths (hand note)').replace('Not part of the signed card', 'Hand edit: not part of the signed card'));
+        t('BACKTEST 02c: edit only the informational block, still OK', (await checkSigned(root, md, sOpts)).ok);
+        fs.writeFileSync(md, t7.replace('**Options declared today**', '- **VA-9** a rule smuggled in\n\n**Options declared today**'));
+        t('the informational block may not carry a rule (FAIL)', !(await checkSigned(root, md, sOpts)).ok);
+        fs.writeFileSync(md, t7.replace('## 5. Owner rulings', `${INFO_OPEN}\n## 5. Owner rulings`));
+        t('a fence moved up to hide signed content FAILS', !(await checkSigned(root, md, sOpts)).ok);
+        fs.writeFileSync(md, `${t7}trailing text\n`);
+        t('text after the informational block FAILS', !(await checkSigned(root, md, sOpts)).ok);
+        fs.writeFileSync(md, t7);
+        fs.writeFileSync(path.join(root, 'std.md'), std.replace('the leftmost track.', 'the leftmost track, never boxed.'));
+        const cs11 = await checkSigned(root, md, sOpts);
+        t('BACKTEST 02c: change a rule after signing (options added meanwhile), still FAIL', !cs11.ok && cs11.lines.some((l) => /rule VA-2 changed since/.test(l)));
+        fs.writeFileSync(path.join(root, 'std.md'), std);
+        fs.writeFileSync(path.join(cdir, 'card.json'), JSON.stringify({ ...cfg, options: ['asks for `zeros`'] }, null, 1));
+        const cs12 = await checkSigned(root, md, sOpts);
+        t('an option the CARD asks for is signed content: changing it in card.json FAILS', !cs12.ok && cs12.lines.some((l) => /configSha/.test(l)));
+        fs.writeFileSync(path.join(cdir, 'card.json'), cfgText);
+        // format 1 (cards signed before §7b existed): the live §7 listing inside the signed body
+        const legacy = (txt, optLines) => {
+            const o = splitCard(txt).signedPart.replace(/,"format":2,"configSha":"[0-9a-f]*"/, '').replace(/,"entries":"[^"]*"/, '')
+                .replace(`${INFO_POINTER}\n\n`, `**Options declared today** (x):\n\n${optLines}\n**Preset skills on these hosts** (y): (none)\n\n`);
+            return o.replace(/"bodySha":"[0-9a-f]*"/, `"bodySha":"${bodyShaOf(o)}"`);
+        };
+        const old1 = legacy(t7, '- `band` Numbers to: 10 (1)\n');
+        fs.writeFileSync(md, old1);
+        const cs13 = await checkSigned(root, md, sOpts);
+        t('BACKTEST 02c format 1: a signed card whose live §7 options changed since stays OK, with a NOTE', cs13.ok && cs13.lines.some((l) => /^NOTE .*format-1 card/.test(l)));
+        fs.writeFileSync(md, old1.replace('Carry under the line?', 'Carry above the line?'));
+        t('format 1: a hand edit to its signed content still FAILS', !(await checkSigned(root, md, sOpts)).ok);
+        fs.writeFileSync(md, old1.replace('- `band` Numbers to: 10 (1)', '- `band` Numbers to: 20 (1)'));
+        t('format 1: a hand edit inside its old §7 listing FAILS (it was signed, so it stays hashed)', !(await checkSigned(root, md, sOpts)).ok);
+        fx.options = []; fx.presets = []; fx.gates = [{ ...fx.gates[0], exists: false }];
+        fs.writeFileSync(md, signedText);
+        // 4c. W0-B2: hosts, roles and options — every live line needs a decision
+        const live = (o) => ({ options: (o.options || []).map((k) => ({ key: k, skills: ['addition:add'], text: '' })), roles: (o.roles || []).map((k) => ({ key: `role:${k}`, skills: ['addition:add'], text: '' })), hosts: (o.hosts || []).map((k) => ({ key: `host:${k}`, skills: ['addition:add'], text: '' })) });
+        const setCfg = (c) => fs.writeFileSync(path.join(cdir, 'card.json'), JSON.stringify(c, null, 1));
+        const signNow = async () => { const g = await generateCard(root, 'mini', 'template', { ...opts, resign: true }); const tx = fs.readFileSync(md, 'utf8').replace(UNSIGNED, 'Signed: owner, 2026-10-20'); fs.writeFileSync(md, tx); return { g, tx }; };
+        fx.surface = live({ options: ['notation=stacked', 'notation=across'], roles: ['independent'], hosts: ['quiz'] });
+        const cs14 = await checkSigned(root, md, sOpts);
+        t('B2: a live option / role / host line with no decision FAILS (UNDECIDED, named)', !cs14.ok && cs14.lines.some((l) => /no decision \(UNDECIDED.*notation=across.*role:independent.*host:quiz/.test(l)));
+        const decided = { ...cfg, decisions: {
+            options: [{ key: 'notation=stacked', d: 'offered' }, { key: 'notation=across', d: 'hidden', why: 'across is its own page', proposed: true }, { option: 'lengths', values: ['same', 'shorter'], d: 'offered' }],
+            roles: [{ key: 'independent', d: 'offered' }], hosts: [{ key: 'quiz', d: 'offered' }, { key: 'race', d: 'out of scope', why: 'graded as the card' }] } };
+        setCfg(decided);
+        const s15 = await signNow();
+        const cs15 = await checkSigned(root, md, sOpts);
+        t('B2: every live line decided: OK; a PROPOSED decision is a NOTE, not a failure; decided lines not live are noted', s15.g.ok && cs15.ok && cs15.lines.some((l) => /^NOTE .*1 live line\(s\) carry a PROPOSED decision.*notation=across/.test(l)) && cs15.lines.some((l) => /^NOTE .*not offer today.*lengths=same/.test(l)));
+        t('B2: the decisions print signed in §7a and the markers in the informational §7b', /### 7a\.[\s\S]*`notation=across` — \*\*hidden\*\* \(PROPOSED\)/.test(splitCard(s15.tx).signedPart) && /`notation=across` \(all 1\) \[hidden, PROPOSED\]/.test(splitCard(s15.tx).info));
+        const blk15 = JSON.parse(/<!-- rulings\n([\s\S]*?)\n-->/.exec(s15.tx)[1]);
+        t('B2: a hidden option decision becomes a notOffered entry of the rulings block', blk15.notOffered.some((x) => x.id === 'N-D-notation' && x.option === 'notation' && x.values.join() === 'across'));
+        fx.surface = live({ options: ['notation=stacked', 'notation=across', 'zeros=on'], roles: ['independent'], hosts: ['quiz'] });
+        const cs16 = await checkSigned(root, md, sOpts);
+        t('B2 BACKTEST: a NEW option appears in the repo after signing: FAIL naming it', !cs16.ok && cs16.lines.some((l) => /UNDECIDED.*zeros=on/.test(l)) && !cs16.lines.some((l) => /UNDECIDED.*notation/.test(l)));
+        fx.surface = live({ options: ['notation=stacked', 'notation=across', 'notation=vertical'], roles: ['independent', 'lesson'], hosts: ['quiz', 'boss'] });
+        const cs16b = await checkSigned(root, md, sOpts);
+        t('B2: a new value of a decided option, a new role and a new host each FAIL', !cs16b.ok && cs16b.lines.some((l) => /UNDECIDED.*notation=vertical.*role:lesson.*host:boss/.test(l)));
+        fx.surface = live({ options: ['notation=stacked', 'notation=across', 'lengths=same', 'lengths=shorter'], roles: ['independent'], hosts: ['quiz'] });
+        fx.options = [{ id: 'lengths', label: 'Number lengths', values: ['same', 'shorter'], skills: 1 }];
+        const cs17 = await checkSigned(root, md, sOpts);
+        t('B2 BACKTEST: a correct build adds an option the card already decides (lengths): OK', cs17.ok && !cs17.lines.some((l) => /UNDECIDED/.test(l)));
+        fx.options = [];
+        const sk18 = { ...decided, decisions: { ...decided.decisions, options: [...decided.decisions.options, { key: 'notation=across', d: 'offered', skills: ['addition:add'] }] } };
+        t('B2: a decision naming the skill beats the one for all skills', decideSurface(sk18, live({ options: ['notation=across'] }))[0].by['addition:add'].d === 'offered');
+        t('B2: an unknown decision word is refused', checkDecisions({ decisions: { options: [{ key: 'notation=across', d: 'maybe' }] } }, { surface: live({ options: ['notation=across'] }) }).fails.some((f) => /not one of offered/.test(f)));
+        t('B2: a repo listing that could not be read FAILS (never a silent empty listing)', checkDecisions(decided, { surface: { options: [], roles: [], hosts: [], problems: ['skill-options.js: boom'] } }).fails.some((f) => /could not be read: skill-options\.js: boom/.test(f)));
+        // 4d. W0-A critic r7 D2: the rulings and notOffered are signed content
+        const ruled = { ...decided, rulings: { rulings: [{ id: 'R-BAND', source: '§9.1', assert: 'range', of: 'a', min: 10, max: 99 }], notOffered: [{ id: 'N-BAND', source: '§7', option: 'band' }] } };
+        setCfg(ruled);
+        const s19 = await signNow();
+        t('D2: a signed card with rulings checks OK', s19.g.ok && (await checkSigned(root, md, sOpts)).ok);
+        const weak = JSON.parse(JSON.stringify(ruled)); weak.rulings.rulings[0].max = 999;
+        setCfg(weak);
+        const cs20 = await checkSigned(root, md, sOpts);
+        t('D2 BACKTEST: weaken a ruling in card.json under a signature: FAIL naming it', !cs20.ok && cs20.lines.some((l) => /CHANGED in card\.json since signing.*R:R-BAND/.test(l)));
+        const r20 = await generateCard(root, 'mini', 'template', { ...opts, rulingsOnly: true });
+        t('D2 BACKTEST: --rulings-only on a SIGNED card refuses to write a weakened block (no bodySha refresh)', !r20.ok && /SIGNED/.test(r20.msg) && fs.readFileSync(md, 'utf8') === s19.tx);
+        const empty = JSON.parse(JSON.stringify(ruled)); empty.rulings.notOffered = [];
+        setCfg(empty);
+        const cs21 = await checkSigned(root, md, sOpts);
+        t('D2 BACKTEST: empty notOffered in card.json under a signature: FAIL naming it', !cs21.ok && cs21.lines.some((l) => /REMOVED from card\.json since signing.*N:N-BAND/.test(l)));
+        setCfg(ruled);
+        const forged = s19.tx.replace(/,"max":99\}/, ',"max":999}');
+        fs.writeFileSync(md, forged);
+        t('D2: a hand-weakened block in the card FAILS (body sha)', !(await checkSigned(root, md, sOpts)).ok);
+        fs.writeFileSync(md, forged.replace(/"bodySha":"[0-9a-f]*"/, `"bodySha":"${bodyShaOf(forged)}"`));
+        const cs22 = await checkSigned(root, md, sOpts);
+        t('D2: a hand-weakened block with its bodySha recomputed still FAILS (card.json generates a different block)', !cs22.ok && cs22.lines.some((l) => /generates a different card/.test(l)));
+        fs.writeFileSync(md, s19.tx);
+        setCfg(weak);
+        const r23 = await generateCard(root, 'mini', 'template', { ...opts, rulingsOnly: true, resign: true });
+        const t23 = fs.readFileSync(md, 'utf8');
+        t('D2: --rulings-only --resign writes the block and resets the signature', r23.ok && /RESET/.test(r23.msg) && !readCard(t23).isSigned && /"max":999/.test(t23));
+        setCfg(cfg);
+        fx.surface = { options: [], roles: [], hosts: [] };
+        await generateCard(root, 'mini', 'template', { ...opts, resign: true });
+        fs.writeFileSync(md, fs.readFileSync(md, 'utf8').replace(UNSIGNED, 'Signed: owner, 2026-10-20'));
+        t('restored: the mini card checks OK again', (await checkSigned(root, md, sOpts)).ok);
+        const cs24 = await checkSigned(root, md, sOpts);
+        fs.writeFileSync(md, fs.readFileSync(md, 'utf8').replace('Signed: owner, 2026-10-20', UNSIGNED));
+        const cs25 = await checkSigned(root, md, sOpts);
+        t('an unsigned card whose only problem is the signature reports onlyUnsigned ("needs owner signature")', cs24.ok && !cs25.ok && cs25.onlyUnsigned && /needs owner signature/.test(cs25.msg));
+        fs.writeFileSync(md, signedText);
         const g2 = await generateCard(root, 'mini', 'template', opts);
         t('regenerating an unchanged signed card keeps the signature', g2.ok && fs.readFileSync(md, 'utf8') === signedText);
         cfg.openQuestions.push({ q: 'A new question?', recommended: 'yes' });
@@ -1267,7 +1825,7 @@ async function selfTest() {
         t('a signed card is NOT overwritten when its content would change', !g3.ok && fs.readFileSync(md, 'utf8') === signedText);
         const g4 = await generateCard(root, 'mini', 'template', { ...opts, resign: true });
         const after = fs.readFileSync(md, 'utf8');
-        t('--resign rewrites it unsigned and says so', g4.ok && /RESET/.test(g4.msg) && after.trimEnd().endsWith(UNSIGNED) && after.includes('A new question?'));
+        t('--resign rewrites it unsigned and says so', g4.ok && /RESET/.test(g4.msg) && splitCard(after).signedPart.trimEnd().endsWith(UNSIGNED) && after.includes('A new question?'));
         t('a missing findings file is a warning, or a FAIL with --require-findings',
             checkCoverage(root, md, { sources: SRC, findingsPath: 'nope.csv' }).ok && !checkCoverage(root, md, { sources: SRC, findingsPath: 'nope.csv', requireFindings: true }).ok);
         t('CSV parser handles quoted commas', parseCsv(csv)[0].summary === 'key wrong, on page 2');
@@ -1283,6 +1841,41 @@ async function selfTest() {
     return { ok: !bad, msg: `${results.length - bad}/${results.length} self-test checks` };
 }
 
+/**
+ * --fixture <file.mjs>: the card gate on a seeded state (ws-backtest fixture rows; no repo files touched). The module's
+ * default export: {card: card.json object, std?: a mini standard (markdown), signedOn: 'YYYY-MM-DD', today?,
+ * atSign: {surface, options?, skills?}, now?: {surface?, card?}}. The card is generated in a temp tree from `card` with
+ * the repo listing `atSign`, signed, then the repo (and card.json) move to `now`, and --check-signed runs.
+ */
+async function runFixture(file) {
+    const fx = (await import(pathToFileURL(path.resolve(file)).href)).default;
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-spec-card-fx-'));
+    try {
+        const SRC = [{ key: 'STD', file: 'std.md' }];
+        fs.writeFileSync(path.join(root, 'std.md'), fx.std || '# Std\n\n## 1. Stacks\n\n- **VA-1** Track count: T = d + 1.\n');
+        const id = fx.card.id, kind = fx.card.kind;
+        const cdir = path.join(root, CARDS_REL, id);
+        fs.mkdirSync(cdir, { recursive: true });
+        fs.writeFileSync(path.join(cdir, 'card.json'), JSON.stringify(fx.card, null, 1));
+        let state = fx.atSign || {};
+        const derive = async () => ({ labels: {}, wrm: [], buildEntries: [], sourceRules: [], capacity: [], gates: [], presets: [], standards: { ccss: [], ee: [] },
+            skills: state.skills || [...new Set(Object.values(state.surface || {}).flatMap((ls) => (ls || []).flatMap((x) => x.skills || [])))].sort(),
+            options: state.options || [], surface: state.surface || { options: [], roles: [], hosts: [] } });
+        const o = { sources: SRC, derive, findingsPath: 'none.csv' };
+        const g = await generateCard(root, id, kind, o);
+        if (!g.ok) return g;
+        const md = path.join(cdir, `${id}.md`);
+        fs.writeFileSync(md, fs.readFileSync(md, 'utf8').replace(UNSIGNED, `Signed: owner, ${fx.signedOn || '2026-10-20'}`));
+        if (fx.now) {
+            state = { ...state, ...fx.now, surface: fx.now.surface || state.surface };
+            if (fx.now.card) fs.writeFileSync(path.join(cdir, 'card.json'), JSON.stringify(fx.now.card, null, 1));
+        }
+        const r = await checkSigned(root, md, { ...o, today: fx.today || '2026-10-24' });
+        r.lines.filter((l) => !/^NOTE .*no findings file/.test(l)).forEach((l) => console.log(l.replace(root + path.sep, '')));
+        return { ok: r.ok, msg: `fixture ${path.basename(file)}: ${r.msg.replace(root + path.sep, '')}` };
+    } finally { fs.rmSync(root, { recursive: true, force: true }); }
+}
+
 /* ================================================================ CLI */
 
 async function main(argv) {
@@ -1290,6 +1883,7 @@ async function main(argv) {
     const val = (f) => { const i = argv.indexOf(f); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : null; };
     const findingsPath = val('--findings');
     if (has('--self-test')) return selfTest();
+    if (has('--fixture')) { const f = val('--fixture'); if (!f) return { ok: false, msg: '--fixture needs a file' }; return runFixture(f); }
     if (has('--index')) {
         const r = runIndex(REPO, { check: has('--check') });
         if (r.idx.totals.collisions || r.idx.totals.duplicates) console.log(`note: ${r.idx.totals.collisions} cross-file collisions, ${r.idx.totals.duplicates} in-file duplicates, ${r.idx.totals.nearCollisions} near-collisions (see ${INDEX_MD_REL})`);
@@ -1316,19 +1910,33 @@ async function main(argv) {
     }
     if (has('--check-signed')) {
         const target = val('--check-signed');
-        if (!target) return { ok: false, msg: '--check-signed needs a card path' };
-        const r = await checkSigned(REPO, path.resolve(REPO, target), { findingsPath, requireFindings: has('--require-findings') });
-        r.lines.forEach((l) => console.log(l));
-        return { ok: r.ok, msg: r.msg };
+        const keys = argv.flatMap((a, i) => (a === '--skill' && argv[i + 1] ? argv[i + 1].split(',') : [])).map((x) => x.trim()).filter(Boolean);
+        if (!target && !keys.length) return { ok: false, msg: '--check-signed needs a card path, or --skill cat:skill[,...] (the cards that cover those skills)' };
+        const files = target ? [path.resolve(REPO, target)] : cardsCovering(REPO, keys);
+        if (!files.length) return { ok: true, verdict: 'NO-CARD', code: 4, msg: `no spec card under ${CARDS_REL} covers ${keys.join(', ')} (section 1 or the rulings block): nothing to check` };
+        const res = [];
+        for (const f of files) {
+            const r = await checkSigned(REPO, f, { findingsPath, requireFindings: has('--require-findings') });
+            r.lines.forEach((l) => console.log(l));
+            console.log(`${r.ok ? 'ok  ' : r.onlyUnsigned ? 'UNSIGNED' : 'FAIL'} ${r.msg}`);
+            res.push({ f, ...r });
+        }
+        // A SIGNED card that fails is a broken build gate: exit 1. An UNSIGNED card is a draft the owner has not signed:
+        // exit 5 (ws-precritic reports it INCOMPLETE "needs owner signature", never PASS), its other problems listed.
+        const names = (xs) => xs.map((r) => `${rel(REPO, r.f)}${r.onlyUnsigned ? '' : ` (also ${r.lines.filter((l) => /^FAIL /.test(l)).length - 1} other problem(s))`}`).join(', ');
+        const bad = res.filter((r) => !r.ok && !r.unsigned), uns = res.filter((r) => !r.ok && r.unsigned);
+        if (bad.length) return { ok: false, msg: files.length === 1 ? bad[0].msg : `${bad.length} of ${files.length} SIGNED card(s) failing: ${bad.map((r) => rel(REPO, r.f)).join(', ')}${uns.length ? `; needs owner signature: ${names(uns)}` : ''}` };
+        if (uns.length) return { ok: false, code: 5, msg: `needs owner signature: ${names(uns)}${uns.every((r) => r.onlyUnsigned) ? ' (everything else green)' : ''}` };
+        return { ok: true, msg: files.length === 1 ? res[0].msg : `${files.length} card(s) signed and green: ${names(res)}` };
     }
-    console.log('usage: --index [--check] | --template <id> | --family <id> [--resign | --rulings-only] | --check-coverage <card>|--all [--findings f] [--require-findings] | --check-signed <card> | --self-test');
+    console.log('usage: --index [--check] | --template <id> | --family <id> [--resign | --rulings-only] | --check-coverage <card>|--all [--findings f] [--require-findings] | --check-signed <card> | --check-signed --skill cat:skill[,...] | --self-test');
     return { ok: false, msg: 'no mode given' };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
     main(process.argv.slice(2)).then((r) => {
-        console.log(`ws-spec-card: ${r.ok ? 'OK' : 'FAIL'} — ${r.msg}`);
-        process.exit(r.ok ? 0 : 1);
+        console.log(`ws-spec-card: ${r.verdict || (r.ok ? 'OK' : 'FAIL')} — ${r.msg}`);
+        process.exit(r.code !== undefined ? r.code : r.ok ? 0 : 1);
     }, (e) => {
         console.error(e && e.stack || e);
         console.log('ws-spec-card: FAIL — crashed');

@@ -45,12 +45,29 @@
 //
 // Output: `ws-options-verify: OK` or `ws-options-verify: FAIL` with the failures grouped by the
 // generator file that owns the skill. Exit code 1 on FAIL (use --report-only to suppress).
+//
+// RENDER (W0-B2 / B7; pilot-su-c critic r2 N4: "Across" kept its promise and broke the page):
+//   node tests/scripts/ws-options-verify.cjs --render --skill cat:skill[,...] [--sizes S,L] [--root <tree>] [--json f]
+// prints every OFFERED appearance value of the touched skills (notation, layout, support level / heads, pictures, ...;
+// not the play controls, number sizes or free numbers) on the Independent page at S and L through ws-print-lint
+// --source kit, and FAILS where a value's page has more findings of a (lint, rule) than the skill's default page at the
+// same size and seed (tests/lib/options-render.cjs). Node; print-lint takes one browser slot (/tmp/mq-browser-run.sh,
+// or the slot it is already in). Verdict `ws-options-verify --render: OK|FAIL (...)`.
 const fs = require('fs');
 const path = require('path');
-const { ROOT, open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = k => process.argv.includes('--' + k);
+if (arg('root', null)) process.env.MQ_ROOT = path.resolve(arg('root', null));
+if (has('render')) {
+    const keys = (arg('skill', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+    const sizes = (arg('sizes', 'S,L') || 'S,L').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    const root = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
+    require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m) })
+        .then((code) => process.exit(has('report-only') ? 0 : code), (e) => { console.log(e && e.stack || e); console.log('ws-options-verify --render: FAIL (crashed)'); process.exit(1); });
+    return;
+}
+const { ROOT, open } = require('../lib/ws-harness.cjs');
 const N = parseInt(arg('n', '12'), 10);
 const ONLY = arg('skill', null);
 const CAT = arg('category', null);
