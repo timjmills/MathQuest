@@ -41,3 +41,11 @@ Base: origin/claude/sweet-newton-c8wrv1 (e371ec9) + merge of `-wip-wave0-gates` 
 - 10:05 D1 on REAL data (lead's pointer: the 7 sections/ex-each RED rows on the pilot ids come from the partner
   algebra:tape_diagram): every finding of a real Sections row carries skill "" (bySkill {"": ...}), so partner findings still
   block; the fixture row passed only because its fixture had skills filled in. Builder B fix round 1 (medium).
+- 10:46 Builder B D1 fix round 1 merged (956bc20a; +63 k tokens, 10:14–10:45): root cause, the Sections / Mixed composers draw
+  cells without `data-ws-skill` (sheet/cell.js writes it only when a composer passes `skill`; practice.js planItem does not),
+  so every finding read page-level. print-lint now tags cells from buildSheet's own items / anchors.examples before linting.
+  Real sub_50 sections/ex-each: tape_diagram PG-12 x8 a size (partner, non-blocking), 0 cell findings without a skill.
+  New: ERROR when > half a multi-skill row's cell findings name no skill. Rows d1-real-partner, d1-real-unattributed PASS.
+  **App-hook suggestion for the lead:** pass `skill` from practice.js planItem (and the mixed composer) into cell(), so the
+  page carries the attribution itself and print-lint's matching becomes a cross-check.
+- 10:47 Critic r1 started (mq-opus-medium), at 956bc20a.
