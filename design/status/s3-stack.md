@@ -16,3 +16,4 @@ Builder profile: mq-opus-medium (failed-round rebuild, rule 0a)
 ## Per-round findings
 
 ## Log
+Times: builder B (lesson Warm-up rows per kind, N2), start 2026-10-24T05:21Z, end 2026-10-24T06:15Z, profile mq-opus-medium, tokens 192k, 80 tool uses. Warm-up band ≤ 29 % on all seven + siblings (was ≤ 41 % on the critic-state fixture); ws-print-lint lesson role unchanged; open: horizontal H13 in a half-width place-value Warm-up cell at L on 4 skills (width band).
