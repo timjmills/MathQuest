@@ -95,3 +95,26 @@ New owner design ideas are recorded here and NOT folded into a running fix round
 | 2026-10-23 | Owner via lead: "stop after this work, don't try anything new". Finish fix round 5 + its critic. PASS → write the build brief, report, stop (do NOT start the build). FAIL → report and stop; no further round without the lead's go | lead | — |
 | 2026-10-24 | Fix round 5: thumbnails LIVE from the booted app (`live.mjs`, buildSheet), check green on 261 skills / 392 thumbnails; samples.js deleted; 820 bar always names an area; detailed rows 55 px (8 per screen at 1366); ✓ + fill on selected; light only (dark parked); no strand tab (HD-5a); all gates OK | mq-opus-medium | done |
 | 2026-10-24 | Critic round 6 (fresh critic; last round under the owner's stop instruction) | mq-opus-medium | running |
+| 2026-10-24 | Critic r6: A 7 · B 9 · C 7 · D 8 — FAIL (`critic-r6.md`): live crops hide the drawing on ~1 in 5 thumbnails; held % shown as "Equal" in the Print sheet and released silently; Single skill + lock drops a skill; phone detailed headers tall; chips with ≥ 4 areas lack the area word. Verified: all 24 flows in plan, % arithmetic, summary = preview, search, gates. Per the owner's stop instruction: reported and STOPPED; no further round without the lead's go | lead | FAIL — stopped |
+
+### Teacher site 2.0 T1, round r6 (2026-10-24)
+
+**(1) Automatic checks**
+
+| Finding | Check that measures it | Existing check should have caught it? |
+|---|---|---|
+| ~1 in 5 live thumbnails crop away the drawing (Line Plots blank, elapsed-time cards alike) | the crop window must contain ≥ X % of the cell's drawn-content box (SVG/IMG/canvas union), and distinct skills' crops must differ | no: `thumbs-check` compared text size and position, not drawing visibility |
+| Held % shows "✓ Equal" in the Print sheet; More silently releases the lock | every weight display of a locked item shows its % and lock; any change to a locked item needs a confirm | no |
+| Single skill + lock gives 16·8·8·8·0 (40 %, one skill dropped) | every non-zero-weight skill gets ≥ 1 problem, or a visible ⚠; the locked share is honoured within rounding | partly: the % check covered Mixed only |
+| Phone detailed headers inline → 1 row visible; Chips/Thumbnails rows 102/322 px | rows-in-first-viewport check in EVERY view, not only List | partly: the r5 check covered List only |
+| Tray Chips with ≥ 4 areas: no area word and no legend | the area name is visible for every chip (own label or a stack legend) | the r4 rule existed per stack; not run on this state |
+| Pill ✓ overlaps text on phone; 820 bar hides "+N" | text-overlap probe on selected pills; "+N" present when areas are hidden | partly |
+| Quiz "6 areas" while one area gets 0 | the summary's area count = areas with ≥ 1 item | no |
+
+**(2) Speed-ups**
+
+| Cost | Smallest change |
+|---|---|
+| Each fixed check was scoped to the state that failed (List only, Mixed only, chips only), so the same class reappeared in a sibling state | Write each check over ALL views × kinds × widths from the start (a state matrix in shoot.cjs) |
+| The live-thumbnail fix judged success by text metrics, so a crop hiding the picture still passed | Fidelity checks compare what is VISIBLE in the final crop, not only the source |
+| Six critic rounds for one mock-up | For T2+, the critic's probe scripts run inside the builder's verify step (kept in the lane folder), and every brief carries the full state matrix |
