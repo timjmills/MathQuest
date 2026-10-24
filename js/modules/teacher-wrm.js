@@ -281,11 +281,15 @@ export function renderWrmScreen(el) {
     load().then(() => {
         if (!L) { el.querySelector('#tvwBody').innerHTML = '<p class="tv-cap">Could not load the lessons. Reload the page to try again.</p>'; return; }
         if (wrmHashActive()) readHash();
+        // a phone coming back to Lessons sees the list at the last lesson's area, the next lesson marked "Next"
+        else if (narrow() && v.lesson) { const l0 = L.lessonByKey(v.lesson); v.sec = (placeOf(l0) || { sec: { key: v.sec } }).sec.key; v.lesson = ''; resetPick(); }
         if (!v.grade) {
             const r = rememberedGrade(); v.grade = grades().some((g) => g.id === r) ? r : '2';
             // T4: opens where the teacher was last — that grade's last lesson, the next one marked "Next"
             const last = L.lessonByKey(rememberedLesson());
-            if (last && last.grade === v.grade) setLesson(last);
+            // on a phone the list opens at that lesson's area with the next one marked (the panel would cover the
+            // grade and area rows); wider, the lesson itself is open beside the list
+            if (last && last.grade === v.grade) { if (narrow()) v.sec = (placeOf(last) || { sec: { key: '' } }).sec.key; else setLesson(last); }
         }
         writeHash(true);
         ensureCurated().then(() => {
