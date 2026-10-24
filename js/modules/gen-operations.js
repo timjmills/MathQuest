@@ -981,7 +981,7 @@ function _nr2Set(lo, hi, lenB, zero) {
 // opens at item 0 (generateQuestionFor), so the memory starts again there; a redrawn item
 // overwrites its own index, so a discarded duplicate is not counted.
 const _NR2_PAGE = new Map();
-const _NR2_WINDOW = 20, _NR2_MAX_MINUEND = 2, _NR2_MAX_ANSWER = 3, _NR2_MAX_ONE = 2;
+const _NR2_WINDOW = 20, _NR2_MAX_MINUEND = 2, _NR2_MAX_ANSWER = 3, _NR2_MAX_ONE = 2, _NR2_MAX_ZERO = 2;
 function _nr2Pair(lo, hi, lenB, rng) {
     const plain = _nr2Set(lo, hi, lenB, false);
     const zeroSet = _nr2Set(lo, hi, lenB, true);
@@ -998,8 +998,13 @@ function _nr2Pair(lo, hi, lenB, rng) {
             anss.set(d, (anss.get(d) || 0) + 1);
         }
     }
-    // about 1 item in 10 is the zero case, chosen by the seeded rng (never by position: L10)
-    const useZero = zeroSet.length > 0 && rng(0, 9) === 0;
+    // about 1 item in 10 is the zero case (1 in 8 drawn, then capped), chosen by the seeded rng
+    // (never by position: L10), and
+    // never more than _NR2_MAX_ZERO in a page's 20, so no run of the page reads above 1 in 10
+    // (card §9.4; precritic-2 R-ZERO-NOT-SEEDED: 13 of 120 with the rng alone).
+    let zeros = 0;
+    if (seen) for (const [k, v] of seen) if (k < at && k >= at - (_NR2_WINDOW - 1) && v[2]) zeros++;
+    const useZero = zeroSet.length > 0 && rng(0, 7) === 0 && zeros < _NR2_MAX_ZERO;
     const pool = useZero ? zeroSet : plain;
     // 2d − 1d (critic s3 r1 N1b): b = 1 is the trivial take-away. The uniform draw alone gives
     // it 8 pairs in 36 (22 %), so a drawn 1 is kept only 1 time in 2 (about 11 %), never more than
@@ -1026,7 +1031,7 @@ function _nr2Pair(lo, hi, lenB, rng) {
     }
     if (!pair) pair = [hi, 1];
     if (seen) {
-        seen.set(at, [pair[0], pair[0] - pair[1]]);
+        seen.set(at, [pair[0], pair[0] - pair[1], pair[0] % 10 === 0 && pair[1] % 10 === 0]);
         _NR2_PAGE.set(pkey, seen);
     }
     return [pair[0], pair[1]];
