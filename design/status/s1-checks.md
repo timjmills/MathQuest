@@ -67,3 +67,11 @@ Report: design/audit/runs/s1-checks/critic-r1.md.
 - D1, D3, N2, N4: builder A (resumed, medium).
 - N3: the app hook (pass `skill` from practice.js planItem into cell()) is with the lead (10:46 note).
 - N1 (spec-card §7b data source read from comments): left for the card tool's next change; recorded here.
+- D1, D3, N2, N4 (builder A, 11:04–11:16, merged): dealer-uniform N/A (exit 4) for skills that deal no numbers, unknown /
+  all-error still FAIL; presets D8 instruction key + minuend spread, real pair 27577cf FAIL / ff471fd OK (heading part is the
+  mixed lane's); unknown skill FAILS in options-verify and spec-card; no-card stays N/A with a note (README: only a build
+  starts after signing; older families have no card).
+- Lead: ws-presets-unit pins the 44 D8 findings already on the base (tests/fixtures/precritic/presets-d8.baseline.json), so a
+  lane touching a preset fails only on a new one; backtests s1-presets-obey and -seeded PASS with the pin in place.
+- Merged main 7bf5f587. All node + browser self-tests and unit gates green on the merged tree; ws-precritic-plan 20 OK.
+- Critic r2 started.
