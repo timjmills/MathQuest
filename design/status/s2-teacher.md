@@ -81,3 +81,4 @@ its decisions, not re-decide them. The README there lists each round's decisions
 - Not owned (report to the lead if needed): `sheet/*` (e.g. `roles/test.js` Quiz layer, new anchors modes `top`/`first`),
   `print-sheet.js`, generators, `tests/scripts/*` (so new teacher gates such as `ws-teacher-flows` are proposed to the
   lead; lane checks live in `design/mockups/teacher-2/` meanwhile).
+| 2026-10-24 | Owner (direct): "have an exact count for the how often equal OR a %" → How often per skill = Less · Equal · More, OR an exact count of problems (`count`, "6 🔒"), OR a % (`lockPct`); counts come off the total first, then %, then weights; over-total refused; built in T3 (planCounts + popup/chip/bulk bar) | lane lead → T3a, T3b | in T3 |
