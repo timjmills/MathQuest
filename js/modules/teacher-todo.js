@@ -58,6 +58,19 @@ function load() {
     return loading;
 }
 
+/** T6 redirect: the lesson that holds a "Skills to be made" entry ({site} or {step}), or null (then the list). */
+export function todoLessonFor(id) {
+    return load().then(() => {
+        const e = queue && queue.items.find((x) => x.id === id);
+        if (!e) return null;
+        if (e.siteLessons && e.siteLessons.length) return { site: e.siteLessons[0] };
+        const st = (e.wrmSteps || []).find((x) => lessonSteps && lessonSteps.has(x));
+        return st ? { step: st } : null;
+    });
+}
+/** The entry a #todo/<entry> hash names, or ''. */
+export function todoHashEntry() { const m = /^#todo\/([^/?#]+)/.exec(location.hash || ''); return m ? decodeURIComponent(m[1]) : ''; }
+
 /** Open the screen at one entry (from a "To be built" link). Filters clear so it is always visible. */
 export function openTodo(id) {
     t.sources.clear(); t.grades.clear(); t.domains.clear(); t.kinds.clear(); t.pair = ''; t.q = '';

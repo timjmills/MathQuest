@@ -33,8 +33,8 @@ import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './t
 import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
 import { renderLibraryScreen, renderSkillsScreen } from './teacher-library.js';
 import { renderMapScreen } from './teacher-map.js';
-import { renderWrmScreen, wrmHashActive, wrmOnHashChange, clearWrmHash } from './teacher-wrm.js';
-import { renderTodoScreen, openTodo, todoHashActive, clearTodoHash } from './teacher-todo.js';
+import { renderWrmScreen, wrmHashActive, wrmOnHashChange, clearWrmHash, openWrmLesson, openWrmStep } from './teacher-wrm.js';
+import { renderTodoScreen, openTodo, todoHashActive, clearTodoHash, todoLessonFor, todoHashEntry } from './teacher-todo.js';
 import { mapHashActive, clearMapHash } from './teacher-map-tasks.js';
 import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
 
@@ -52,18 +52,21 @@ const SCREEN_KEY = 'mq_teacher_screen';
 // Teacher site 2.0 (T2, IMPROVEMENT_PLAN §2.3): four places. Until T3–T5 build their new content, each place
 // shows today's screens as tabs, so every old screen (and every tvGo(key)) stays reachable. Skills opens here.
 const PLACES = {
-    skills: { label: 'Skills', tabs: [['skills', 'Skills'], ['library', 'Skills library'], ['print', 'Print worksheets'], ['sets', 'Send a skill set'], ['home', 'Home']] },
-    lessons: { label: 'Lessons', tabs: [['wrm', 'White Rose lessons'], ['todo', 'Skills to be made']] },
+    skills: { label: 'Skills', tabs: [['skills', 'Skills']], retired: ['library', 'print', 'sets', 'home'] },
+    lessons: { label: 'Lessons', tabs: [['wrm', 'White Rose lessons']], retired: ['todo'] },
     classes: { label: 'Classes', tabs: [['run', 'Run on the board'], ['quizzes', 'Quizzes'], ['map', 'MAP tests'], ['progress', 'Progress']] },
     me: { label: 'Me', tabs: [] },
 };
 const PLACE_OF = { settings: 'me' };
-for (const [place, p] of Object.entries(PLACES)) for (const [key] of p.tabs) PLACE_OF[key] = place;
+for (const [place, p] of Object.entries(PLACES)) for (const key of [...p.tabs.map((t) => t[0]), ...(p.retired || [])]) PLACE_OF[key] = place;
 const DEFAULT_SCREEN = 'skills';
+// T6 (IMPROVEMENT_PLAN §2.9): retired screens leave the menus but stay reachable by tvGo(key), hashes and old links.
+// A remembered (mq_teacher_screen) retired screen reopens at the place and tab that replaced it.
+const STORED_ALIAS = { home: 'skills', library: 'skills', print: 'skills', sets: 'skills', todo: 'wrm' };
 
 const BOARD_WINDOW = (() => { try { return new URLSearchParams(location.search).get('board') === '1'; } catch (e) { return false; } })();
 
-let current = (() => { if (typeof location !== 'undefined' && wrmHashActive()) return 'wrm'; if (typeof location !== 'undefined' && mapHashActive()) return 'map'; if (typeof location !== 'undefined' && todoHashActive()) return 'todo'; try { const s = sessionStorage.getItem(SCREEN_KEY); return SCREENS.includes(s) ? s : DEFAULT_SCREEN; } catch (e) { return DEFAULT_SCREEN; } })();
+let current = (() => { if (typeof location !== 'undefined' && wrmHashActive()) return 'wrm'; if (typeof location !== 'undefined' && mapHashActive()) return 'map'; if (typeof location !== 'undefined' && todoHashActive()) return 'todo'; try { const s0 = sessionStorage.getItem(SCREEN_KEY); const s = STORED_ALIAS[s0] || s0; return SCREENS.includes(s) ? s : DEFAULT_SCREEN; } catch (e) { return DEFAULT_SCREEN; } })();
 let started = false;
 
 /* ================================================================= routing */
@@ -173,6 +176,7 @@ function showScreen(key) {
     if (key !== 'wrm') clearWrmHash(key);
     if (key !== 'map') clearMapHash();
     if (key !== 'todo') clearTodoHash();
+    else if (todoRoutePending) { todoRoutePending = false; setTimeout(routeTodoHash, 0); }
     placeScreens(key);
     document.querySelectorAll('#teacherMain .tv-screen').forEach((s) => s.classList.toggle('is-active', s.dataset.screen === key));
     setNavCurrent(key);
@@ -354,6 +358,20 @@ function switchToStudent() {
     window.scrollTo(0, 0);
 }
 
+// A page loaded at #todo/<entry> routes to that entry's lesson the first time the teacher screen comes up.
+let todoRoutePending = typeof location !== 'undefined' && todoHashActive() && !!todoHashEntry();
+
+/** #todo/<entry>: open the lesson that holds that entry; with no entry, or none found, the Skills to be made list. */
+function routeTodoHash() {
+    const id = todoHashEntry();
+    const list = () => { if (isTeacher()) tvGo('todo'); };
+    if (!id) { list(); return; }
+    todoLessonFor(id).then((r) => {
+        if (!r || !isTeacher()) { list(); return; }
+        return (r.site ? openWrmLesson(r.site) : openWrmStep(r.step)).then((ok) => { if (!ok) list(); });
+    }).catch(list);
+}
+
 function start() {
     if (started) return;
     started = true;
@@ -388,7 +406,9 @@ function start() {
     // A #wrm/... link (bookmark, Back, Forward) opens the White Rose screen at that lesson.
     window.addEventListener('hashchange', () => {
         if (isTeacher() && mapHashActive()) { tvGo('map'); return; }   // #map/... (MAP task views)
-        if (isTeacher() && todoHashActive()) { tvGo('todo'); return; } // #todo/<entry> (Skills to be made, critic r6 m11)
+        // #todo/<entry> inside the app (Back, Forward) returns to the list at that entry (critic r6 m11); a page LOADED
+        // at #todo/<entry> (a shared or old link) opens the lesson that holds it (T6, todoRoutePending)
+        if (isTeacher() && todoHashActive()) { tvGo('todo'); return; }
         // N34 (critic r7): Forward onto the entry a screen made when it left the White Rose screen (no hash)
         const back = history.state && typeof history.state === 'object' ? history.state.tvScreen : '';
         if (isTeacher() && !location.hash && back && back !== current) { tvGo(back); return; }

@@ -11,6 +11,9 @@
 //   - The classic print dialog is retired for teachers: its entry points open the Print screen.
 //     openSimplePrintDialog() with no arguments does not throw (either role).
 //   - The game started by a teacher is headed by the set's name.
+//   - T6 (IMPROVEMENT_PLAN §2.9): the menus hold only Skills, Lessons, Classes and Me (plus Classes' tabs); every
+//     redirect (?c=, ?quiz=, #wrm/, #map/, #todo/<entry>, mq_teacher_screen, mq_teacher_sets, tvGo(old key),
+//     tvOpenPrintWith, ?board=1) lands in its place, tab and content, at 1366 and 390, with no sideways scroll.
 //   - No console errors.
 //
 //   node tests/scripts/ws-teacher-shell.cjs
@@ -408,6 +411,114 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   await shot('game-1280');
   if (/Mixed Mode|All Categories/.test(game.topic) || !game.topic.trim()) fail(`game header reads "${game.topic}"`);
   if (game.chip !== 'none') fail('the adaptive "L3" chip is still shown on the teacher board');
+
+
+  /* ------------------------------------------------------------ 7b T6: menus and redirects (one row per redirect) */
+  const RETIRED = ['home', 'library', 'print', 'sets', 'todo'];
+  const where = () => page.evaluate(() => ({
+    screen: (document.querySelector('#teacherMain .tv-screen.is-active') || {}).dataset?.screen || '',
+    on: document.body.classList.contains('tv-on-screen'),
+    place: (document.querySelector('#teacherApp [data-tv-place][aria-current="page"]') || {}).dataset?.tvPlace || '',
+    tab: ((document.querySelector('#tvPlaceTabs [aria-current="page"]') || {}).textContent || '').trim(),
+    tabs: [...document.querySelectorAll('#tvPlaceTabs .tv2-tab')].map((a) => a.textContent.trim()),
+    hash: location.hash, view: (document.querySelector('.view.active') || {}).id || '',
+    sideways: document.documentElement.scrollWidth > window.innerWidth + 1,
+    text: ((document.querySelector('#teacherMain .tv-screen.is-active') || {}).innerText || '').slice(0, 4000),
+  }));
+  // a FULL load (a hash-only goto is a same-document navigation); the teacher role is set again after the load
+  const visit = async (url, ms = 1500, teacher = true) => {
+    await page.goto('about:blank');
+    await page.goto(app.base + url, { waitUntil: 'networkidle2', timeout: 60000 });
+    for (let i = 0; i < 60 && !(await page.evaluate(() => typeof window.tvGo === 'function' && typeof window.setUserRole === 'function')); i++) await sleep(250);
+    if (teacher) await page.evaluate(() => window.setUserRole('teacher'));
+    await sleep(ms);
+    return where();
+  };
+  const T6 = [];
+  const row = (w, name, ok, info) => { T6.push(`${w} ${name}: ${ok ? 'OK' : 'FAIL'}`); if (!ok) fail(`T6 @${w} ${name}: ${JSON.stringify(info).slice(0, 300)}`); };
+  const ref = await page.evaluate(async () => {
+    const L = await import('/js/modules/wrm-links.js');
+    const ls = L.allLessons();
+    const l = ls.find((x) => x.site) || ls[10];
+    const Q = await import('/js/modules/build-queue.js');
+    const { loadLinksData } = await import('/js/modules/links-data.js');
+    let todo = '', todoSite = '';
+    try {
+      const data = await loadLinksData();
+      const items = Q.buildQueue({ curated: Object.values(data.years || {}), map: data.map }).items;
+      const e = items.find((x) => x.siteLessons && x.siteLessons.length);
+      if (e) { todo = e.id; todoSite = e.siteLessons[0]; }
+    } catch (err) { todo = ''; }
+    const S = await import('/js/modules/quiz-storage.js');
+    const q = window.generateQuestionFor({ category: 'addition', skill: 'add_facts', seed: 7 });
+    const quiz = S.compressTestForURL({ id: 't6quiz', name: 'T6 redirect quiz', sections: [{ label: 'A', layout: 'list', questions: [{ skillId: 'add_facts', questionData: q, points: 1 }] }], settings: {} });
+    window.UnifiedSkills.clear();
+    window.UnifiedSkills.add({ domainId: window.getDomainByCategory('addition'), categoryId: 'addition', skillId: 'add_facts', skillLabel: 'add_facts' });
+    const code = window.generateSkillCode();
+    return { hash: L.lessonHash(l), title: l.title || l.name || '', todo, todoSite, quiz, code };
+  });
+  if (!ref.todo) fail('T6: no "Skills to be made" entry with a lesson to test #todo/<entry>');
+  for (const [w, h] of [[1366, 900], [390, 844]]) {
+    await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+    await page.evaluate(() => { try { sessionStorage.removeItem('mq_teacher_screen'); } catch (e) { /* */ } window.setUserRole('teacher'); });
+    // the menus: four places, no retired tab anywhere in the chrome
+    let r = await visit('/index.html');
+    const menu = await page.evaluate((ret) => ({
+      places: [...document.querySelectorAll('#teacherApp .tv2-place')].map((a) => a.textContent.trim()),
+      retired: [...document.querySelectorAll('#teacherApp nav [data-tv-go], #tvPlaceTabs [data-tv-go], #tv2Profile [data-tv-go]')].map((a) => a.dataset.tvGo).filter((k) => ret.includes(k)),
+    }), RETIRED);
+    row(w, 'menus', menu.places.join('|') === 'Skills|Lessons|Classes|Me' && !menu.retired.length && r.place === 'skills' && !r.tabs.length && !r.sideways, { menu, r });
+    await page.evaluate(() => window.tvGo('wrm')); await sleep(800); r = await where();
+    row(w, 'Lessons has no tabs', r.place === 'lessons' && !r.tabs.length, r);
+    await page.evaluate(() => window.tvGo('run')); await sleep(500); r = await where();
+    row(w, 'Classes keeps its tabs', r.tabs.join('|') === 'Run on the board|Quizzes|MAP tests|Progress' && r.tab === 'Run on the board', r);
+    // tvGo(old key) aliases and tvOpenPrintWith
+    for (const [k, place] of [['home', 'skills'], ['library', 'skills'], ['print', 'skills'], ['sets', 'skills'], ['todo', 'lessons'], ['skills', 'skills'], ['wrm', 'lessons'], ['run', 'classes'], ['quizzes', 'classes'], ['map', 'classes'], ['progress', 'classes'], ['settings', 'me']]) {
+      await page.evaluate((key) => window.tvGo(key), k); await sleep(k === 'print' ? 1200 : 400); r = await where();
+      row(w, `tvGo('${k}')`, r.on && r.screen === k && r.place === place && r.text.trim().length > 20 && !r.sideways, r);
+    }
+    await page.evaluate(() => window.tvOpenPrintWith([{ categoryId: 'addition', skillId: 'add_facts' }])); await sleep(1200); r = await where();
+    row(w, 'tvOpenPrintWith', r.screen === 'print' && r.place === 'skills' && !r.sideways, r);
+    // hashes
+    r = await visit(`/index.html${ref.hash}`, 2500);
+    row(w, `#wrm/… (${ref.hash})`, r.screen === 'wrm' && r.place === 'lessons' && r.hash === ref.hash && (!ref.title || r.text.includes(ref.title)) && !r.sideways, r);
+    r = await visit('/index.html#map/tasks', 2000);
+    row(w, '#map/tasks', r.screen === 'map' && r.place === 'classes' && r.tab === 'MAP tests' && !r.sideways, r);
+    r = await visit(`/index.html#todo/${encodeURIComponent(ref.todo)}`, 4000);
+    row(w, `#todo/${ref.todo}`, r.screen === 'wrm' && r.place === 'lessons' && /^#wrm\//.test(r.hash) && !r.sideways, r);
+    r = await visit('/index.html#todo/no-such-entry', 3000);
+    row(w, '#todo/<unknown> → the list', r.screen === 'todo' && r.place === 'lessons' && /Skills to be made/.test(r.text), r);
+    // mq_teacher_screen old values
+    for (const [old, screen, place] of [['home', 'skills', 'skills'], ['library', 'skills', 'skills'], ['print', 'skills', 'skills'], ['sets', 'skills', 'skills'], ['todo', 'wrm', 'lessons'], ['map', 'map', 'classes'], ['quizzes', 'quizzes', 'classes']]) {
+      await page.evaluate((v) => sessionStorage.setItem('mq_teacher_screen', v), old);
+      r = await visit('/index.html', 1500);
+      row(w, `mq_teacher_screen=${old}`, r.screen === screen && r.place === place, r);
+    }
+    // mq_teacher_sets: the saved tray loads back into the tray
+    await page.evaluate(() => {
+      window.UnifiedSkills.clear(); window.skillQueue = [];
+      localStorage.setItem('mq_teacher_sets', JSON.stringify([{ id: 'tray', tray: true, name: 'Tray', createdAt: 1, lastUsed: 1, skills: [{ categoryId: 'addition', skillId: 'add_facts' }, { categoryId: 'subtraction', skillId: 'sub_facts' }] }]));
+      sessionStorage.setItem('mq_teacher_screen', 'skills');
+      try { localStorage.removeItem('mq_unified_skills'); } catch (e) { /* */ }
+    });
+    r = await visit('/index.html', 2000);
+    const tray = await page.evaluate(() => (window.skillQueue || []).map((x) => `${x.categoryId}:${x.skillId}`).sort().join(','));
+    row(w, 'mq_teacher_sets → tray', r.screen === 'skills' && tray === 'addition:add_facts,subtraction:sub_facts', { r, tray });
+    // ?c= share code opens the set (the landing card), ?quiz= opens the quiz
+    r = await visit(`/index.html?c=${encodeURIComponent(ref.code)}`, 2000, false);
+    const land = await page.evaluate(() => { const m = document.getElementById('studentLandingOverlay'); return !!(m && m.offsetHeight && /add_facts|Addition|Ready to Practice/i.test(m.innerText)); });
+    row(w, `?c=${ref.code}`, land, { r, land });
+    r = await visit(`/index.html?quiz=${ref.quiz}`, 2500, false);
+    const qz = await page.evaluate(() => ((document.getElementById('quizTakeView') || {}).innerText || '').includes('T6 redirect quiz'));
+    row(w, '?quiz=', r.view === 'quizTakeView' && qz, { r, qz });
+    // ?board=1 hides the shell
+    r = await visit('/index.html?board=1', 1500);
+    const board = await page.evaluate(() => ({ cls: document.body.classList.contains('tv-board'), app: (() => { const a = document.getElementById('teacherApp'); return !a || getComputedStyle(a).display === 'none' || !a.offsetHeight; })() }));
+    row(w, '?board=1', board.cls && board.app, board);
+  }
+  console.log(T6.join('\n'));
+  await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+  await page.goto(app.base + '/index.html'); await sleep(1500);
 
   /* ------------------------------------------------------------ 8 student side: the dialog still opens */
   const st = await page.evaluate(async () => {
