@@ -37,6 +37,7 @@ import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { mountSample } from './teacher-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { quizQuestionData } from './quiz-take.js';
+import { cellKindFor } from './screen-cell.js';
 import { saveTest, compressTestForURL } from './quiz-storage.js';
 import { CCSS_STANDARDS, ESSENTIAL_ELEMENTS, skillsForStandard, SKILL_STANDARDS } from './standards.js';
 import { WRM_STEPS, WRM_BLOCKS, skillsForWrmStep } from './wrm.js';
@@ -805,7 +806,8 @@ async function quizTest() {
             const sig = String(q.text || '') + '|' + JSON.stringify(q.ans);
             if (seen.has(sig) && tries < want * 3) continue;
             seen.add(sig);
-            qs.push({ skillId: it.skillId, questionData: quizQuestionData(q), points: S.quiz.points === 2 ? 2 : 1 });
+            const qd = quizQuestionData(q);
+            qs.push({ skillId: it.skillId, questionData: qd, points: S.quiz.points === 2 ? 2 : 1 });
         }
         bySkill.push({ it, qs });
     });
@@ -835,8 +837,20 @@ async function saveQuiz(silent) {
 async function quizShare() {
     try {
         const saved = await saveQuiz(true);
-        const c = compressTestForURL(saved);
-        S.quizLink = location.origin + location.pathname + '?quiz=' + c;
+        let c = compressTestForURL(saved);
+        const base = location.origin + location.pathname + '?quiz=';
+        if ((base + c).length > 8000) {
+            // the link carries the whole quiz (8000 characters at most): an item the quiz screen draws from its kit cell
+            // (cellKindFor, quiz-take.js) never reads its legacy `visual`, so that copy leaves the LINK (the saved quiz keeps it)
+            const slim = JSON.parse(JSON.stringify(saved));
+            for (const sec of slim.sections || []) for (const q of sec.questions || []) {
+                const qd = q.questionData || {};
+                let k = null; try { k = cellKindFor({ ...qd, options: [] }); } catch (e) { k = null; }
+                if (k && qd.visual) delete qd.visual;
+            }
+            c = compressTestForURL(slim);
+        }
+        S.quizLink = base + c;
         S.sheet = 'quizshare';
         render();
     } catch (e) { console.warn('[teacher-sheet] quiz share failed', e); toast('Could not make the quiz link'); }
