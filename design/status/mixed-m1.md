@@ -155,3 +155,35 @@ maxCols 2; `print-sheet.js` ~2150–2153: colsList [1, 2]), so a narrow stack le
 pushes the pupil problem to full width; reproduces on sub_100_regroup and add_50_no_regroup. Proposed: size the pair's
 columns from content (pupil column = widest stack + 2 × 3 mm + label box; twin takes the rest). Whether the current rebuild
 (content-sized `auto auto` columns, the four-column layout) already fixes it: to be recorded when it reports.
+
+### Anchor engine fixes + pilot patches — critic round 2 (on the merged tree, 6640347), 2026-10-24: FAIL — lane stopped (owner)
+
+Pilot patches PASS: fact-rows sub_100k / sub_1m at S and L (5 × 6 at 18 / 16 pt, 3 × 5 at 28 pt, all keys correct) and the
+preset band heading ("Multiplying"). Anchor spec items hold (step numbers ≥ 8 pt, no "=" line starts, key does not bold the
+anchor, twins match the problem, grey newest marks, no-example and over-tall fallbacks pixel-identical to anchors-off, the
+four-column layout on add_50). Failing pages: add_10k side L (C3 4: 6 pages, one pair a page), add_10k sections S (C3 5: the
+lone block takes 1 row of 4, 2 problems spill), add_50 side M (C3 5: E4 real — a second page), add_50 side S and add_10k
+sections L (C3/C4 7: the grid's bottom frame does not print). Open low items: "Thousands: 3 = 3." bring-down wording, Say-line
+orphan at L, sections band shows headings the problems lack (owner: does ruling B cover the band?), restating band state,
+Mixed key leaves × carry boxes empty, a carry box on add_50_no_regroup (pre-existing), exchange-mark room on 5–6-digit fact rows
+under CL-4b (owner), band instruction for presets.
+
+**Automatic checks**
+
+| Finding | Proposed check (backtest) | Existing check? |
+|---|---|---|
+| add_50 M: a second page from the pair-height estimate | E4 caught it — keep it a FAIL, never waive as drift; plan from the print-media measurement | Yes (E4), reported as "drift" by the builder — should have blocked |
+| add_10k side L: one pair a page, 46 % empty twin | Items per page vs what the measured pair heights allow; H13 on side twins at L | No |
+| add_10k sections S: lone block not filling the page | blockPlan assertion: one block fits → rows = min(fit, ceil(6 / cols)); warn when pages > anchors-off pages + 1 or a page < 50 % used | No |
+| Bottom frame not printed (4 page pairs) | Raster check on the PDF: the outer frame closes at its lowest point (~20 lines of Python) | No — L-OVERFLOW and the DOM say the border exists |
+| Anchor content 0.1 mm past its cell | Content bottom ≤ cell bottom − 2 mm pad | Partly (E2 at 0.5 mm) — tighten to the pad |
+| "N = N." step lines; orphaned last word on the Say line | String / line-box checks in the anchors check | No |
+| E5 (CL-4b) noisy on add_50 S | Fix E5's write-above classifier | E5 exists (WARN), misclassifies |
+
+**Speed-ups**
+
+| Cost | Smallest change |
+|---|---|
+| The critic measured by hand what a driver could table | One driver: render + measure (bands, overflow, page fill, frame closed) + anchors-off diff, writing a table |
+| Page-count regressions found only by the critic | Page-count table (anchors vs off) in every render run; > 2× off is an instant flag |
+| A builder labelled a real E4 failure as "drift" | A FAIL line in a gate is never re-labelled in a report; the report lists every FAIL verbatim |
