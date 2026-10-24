@@ -51,6 +51,9 @@
 //              problems, never beside them
 //   E9 band    (owner ruling, 2026-10-24) the sections band's states have the same structure as
 //              the problems of their block (no heads row or boxed answer row the pupil lacks)
+//   E15 tab    (critic s3-stack r1 A1: the Model tab printed over the band's first line) on every
+//              anchor cell, no inked box (a text leaf, an svg, a bordered box) that runs under the
+//              Model tab's width starts above the tab's bottom + 1 mm
 //   E8 off     (critic anchors-r1 2) a page whose skill prints no example (no workedSteps, or a
 //              pair too tall for a page) is byte-identical to the same request with anchors 'off'
 //
@@ -69,7 +72,7 @@ const { open } = require(path.join(ROOT, 'tests/lib/ws-harness.cjs'));
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > -1 ? process.argv[i + 1] : d; };
 const MAX = Math.max(1, Number(arg('max', 40)) || 40);
-const ONLY = String(arg('only', 'E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14')).split(',');
+const ONLY = String(arg('only', 'E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15')).split(',');
 // Owner ruling (2026-10-24): these print their worked example in a band, never beside (E14)
 const WIDE = ['fractions:shade_fraction', 'measurement:money_count', 'placevalue:place_value_10x'];
 const PAD_MM = 2;          // E11
@@ -90,7 +93,7 @@ const BAND = 0.30;         // H13
 // Measure one printed document (run in the browser page holding it).
 const MEASURE = () => {
     const mm = 96 / 25.4;
-    const out = { nums: [], over: [], band: [], cells: 0, dense: [], low: [], page: [], ink: [], eq: [], twin: [], grey: [], cols4: 0, pad: [], cols: [], colsWarn: [], pages: [], side: 0, bands: 0 };
+    const out = { nums: [], over: [], band: [], cells: 0, dense: [], low: [], page: [], ink: [], eq: [], twin: [], grey: [], cols4: 0, pad: [], cols: [], colsWarn: [], pages: [], side: 0, bands: 0, tab: [] };
     out.side = document.querySelectorAll('.ws-cell.mq-anchor-sidecell').length;
     out.bands = document.querySelectorAll('.mq-anchorgrid').length;
     // the ink of a cell (leaves, the label aside) and its label box
@@ -282,6 +285,23 @@ const MEASURE = () => {
             if (d > 0.5) { out.page.push(`${d.toFixed(1)}mm past the body`); break; }
         }
     }
+    // E15: nothing inked under the Model tab's width starts above the tab bottom + 1 mm
+    for (const cell of document.querySelectorAll('.ws-cell.mq-anchorcell')) {
+        const tab = cell.querySelector('.ws-modeltab');
+        if (!tab) continue;
+        const t = tab.getBoundingClientRect();
+        for (const el of cell.querySelectorAll('.mq-anchor *')) {
+            if (el.parentElement && el.parentElement.closest('svg')) continue;
+            const cs = getComputedStyle(el);
+            const svg = el.tagName.toLowerCase() === 'svg';
+            const text = !el.children.length && el.textContent.trim();
+            const border = ['Top', 'Left', 'Right', 'Bottom'].some((k) => parseFloat(cs[`border${k}Width`]) > 0 && cs[`border${k}Style`] !== 'none');
+            if (!svg && !text && !border) continue;
+            const r = el.getBoundingClientRect();
+            if (!r.width || !r.height || r.right <= t.left || r.left >= t.right) continue;
+            if (r.top < t.bottom + mm - 0.5) { out.tab.push(`${(el.textContent || el.tagName).trim().slice(0, 12)} ${((r.top - t.bottom) / mm).toFixed(1)}mm`); break; }
+        }
+    }
     // E6: every glyph of every anchor, in order: weight and colour
     for (const el of document.querySelectorAll('.mq-anchor *')) {
         if (el.children.length || !el.textContent.trim()) continue;
@@ -391,6 +411,7 @@ const MEASURE = () => {
                         const bad = m.dense.filter((d) => d.sparse > 0 && d.usableMm / (d.rows + 1) >= needAll);
                         if (bad.length) { fail++; console.log(`FAIL E4 ${tag}: a side grid could hold one more row (${bad.map((d) => `${d.rows} rows of ${d.cellMm} mm, content needs ${d.needMm} mm (the section ${needAll.toFixed(1)} mm), ${d.sparse} cells with a vertical band >= 30%`).join('; ')})`); }
                     }
+                    if (ONLY.includes('E15') && m.tab.length) { fail++; console.log(`FAIL E15 ${tag}: ${m.tab.length} anchor cells ink under the Model tab (${[...new Set(m.tab)].slice(0, 3).join('; ')}; want >= 1mm below it)`); }
                     if (ONLY.includes('E11') && m.pad.length) { fail++; console.log(`FAIL E11 ${tag}: ${m.pad.length} cells whose content comes within ${PAD_MM} mm of the cell bottom (${[...new Set(m.pad)].slice(0, 3).join('; ')})`); }
                     if (ONLY.includes('E12') && mode === 'side' && part === 'pupil' && m.cols.length) { fail++; console.log(`FAIL E12 ${tag}: ${m.cols.length} side grids not sized to their content (${[...new Set(m.cols)].slice(0, 2).join('; ')})`); }
                     if (ONLY.includes('E12') && mode === 'side' && part === 'pupil' && m.colsWarn.length) { warn++; console.log(`WARN E12 ${tag}: ${m.colsWarn.length} one-column side grids whose problem is wider than half the page (${[...new Set(m.colsWarn)].slice(0, 1).join('; ')})`); }

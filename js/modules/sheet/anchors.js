@@ -270,7 +270,10 @@ export function anchorHtml(it, c, { variant = 'band', twinCols = 2, level = 3, g
         // A side twin is centred in its cell at its own width (lead pilot E3, H13: never pinned to
         // one side of the pair's cell with an empty band beside it); a band keeps the full width.
         const centre = variant === 'side' ? ' style="width:auto;max-width:100%;align-self:center"' : '';
-        return `<div class="mq-anchor mq-anchor-${variant}" data-ws-anchor="${variant}" data-ws-states="1"${centre}>${body}${sayHtml}</div>`;
+        // A one-state band has no state column right of the tab: its content starts under the
+        // Model tab + 1 mm (critic s3-stack r1 A1; anchors.check E15).
+        const below = variant === 'band' ? ' mq-anchor-belowtab' : '';
+        return `<div class="mq-anchor mq-anchor-${variant}${below}" data-ws-anchor="${variant}" data-ws-states="1"${centre}>${body}${sayHtml}</div>`;
     }
     const n = groups.length;
     const size = stateSize(c.size, n);
@@ -565,6 +568,7 @@ export const ANCHOR_CSS = `
 :is(.ws-page,.ws-sheet) .mq-anchor-band .mq-anchor-state:first-child .mq-anchor-cell{padding-left:13mm}
 :is(.ws-page,.ws-sheet) .ws-cell:is(.mq-anchor-bandcell,.mq-anchor-compactcell){padding-top:2mm;padding-bottom:2mm}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-anchor-sidecell{padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-band.mq-anchor-belowtab{padding-top:calc(var(--ws-tab, 4.5mm) - 1mm)}
 :is(.ws-page,.ws-sheet) .mq-anchor-compact .mq-anchor-cell{padding-left:13mm}
 :is(.ws-page,.ws-sheet) .mq-anchor-states{display:grid;column-gap:0;width:100%}
 :is(.ws-page,.ws-sheet) .mq-anchor-state{display:flex;flex-direction:column;align-items:stretch;gap:1.5mm;padding:0 2.5mm;min-width:0}
