@@ -26,7 +26,7 @@ import {
 import { factRowsCapacity, gridHeightMm, cellWidthMm, SAFETY_H_MM } from '../layout.js';
 import {
     renderCell, cellAnswerKey, factDigitPt, factPadTop, EM_MM, FACT_TRACK_EM, FACT_OP_TRACK_EM, blankWidth,
-    metricsFor, SIZES,
+    metricsFor, SIZES, markWriteAbove, needsRegroup,
 } from '../index.js';
 
 export const ROLE_ID = 'fact-rows';
@@ -429,10 +429,18 @@ function factCell(it, L) {
         // (cells/fact.js drawsStack turns it into the regroup stack on a practice page)
         ...(op === '+' ? { regroup: false } : {}) };
     const q2 = Object.assign({}, q, { cell: { template: 'fact', payload, v: 1 } });
+    // CL-4b on fact rows (owner decision 2026-10-24 (3)): a 5-6-digit + - x fact whose working
+    // carries or exchanges is written ABOVE, so its cell is centred down the box like the same item
+    // on a practice page; every other fact starts at the top. Read from the digits, never the skill.
+    const sign = { '+': '+', '-': '-', x: 'x' }[op];
+    const wa = !!sign && Number(L.tracks) >= 5 && needsRegroup({ op: sign, a: o[0], b: o[1] }, Number(L.tracks) + 2);
     return Object.assign({}, it, {
         q: q2,
         template: 'fact',
-        render: (c) => renderCell(q2, Object.assign({}, c, { columns: L.cols, options: Object.assign({}, c.options || {}, { factColumns: L.cols }) })),
+        render: (c) => {
+            const html = renderCell(q2, Object.assign({}, c, { columns: L.cols, options: Object.assign({}, c.options || {}, { factColumns: L.cols }) }));
+            return wa ? markWriteAbove(html) : html;
+        },
         key: cellAnswerKey(q2),
         drawsAnswer: true, visual: false, cellCls: '',
     });

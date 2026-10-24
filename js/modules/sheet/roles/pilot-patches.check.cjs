@@ -4,6 +4,10 @@
 //       (its items carry q.presetId; q.skillId is the host), not the fallback 'Practice'
 //   P2  fact rows of 5- and 6-digit facts: no fact is wider than its cell (bounding boxes) at
 //       S / M / L; the page drops columns instead of shrinking the digits
+//   P3  CL-4b on fact rows (owner decision 2026-10-24 (3)): a 5-6-digit fact that regroups carries
+//       data-ws-writeabove and is centred down its cell; a no-regroup or 2-digit fact does not
+//       (backtest: FAIL 0/30 and 0/15 write-above on 7448778c). The write-above STACK centring is
+//       ws-print-lint L-TOPSTART's job (it caught the 2.4 mm drop on add_100_regroup sections L)
 //   node js/modules/sheet/roles/pilot-patches.check.cjs   ->  `pilot-patches check: OK` / `FAIL`
 const path = require('path');
 process.removeAllListeners('warning');
@@ -63,6 +67,35 @@ const sk = (id) => { const [categoryId, skillId] = id.split(':'); return { categ
                 const ok = r.cells > 0 && r.over === 0;
                 console.log(`P2 ${id} ${size}: ${r.cells} cells, ${r.over} overflow (worst ${r.worst.toFixed(2)} mm); ${r.fits ? `${r.fits.cols} cols x ${r.fits.rows}, ${r.fits.digitPt} pt` : ''} ${ok ? 'ok' : 'FAIL'}`);
                 if (!ok) fails.push(`P2 ${id} ${size}`);
+            }
+        }
+        // ---- P3
+        const measure = async (req) => app.page.evaluate(async (req) => {
+            const o = await window.buildSheet(req);
+            const host = document.createElement('div');
+            host.style.cssText = 'position:absolute;left:-12000px;top:0;width:230mm';
+            host.innerHTML = o.pupilHtml;
+            document.body.appendChild(host);
+            const res = { cells: 0, wa: 0, worstOff: 0 };
+            for (const c of host.querySelectorAll('.ws-cell[data-ws-cell]')) {
+                const body = c.querySelector(':scope > .ws-fact, :scope > .ws-stack');
+                if (!body) continue;
+                res.cells++;
+                if (!c.hasAttribute('data-ws-writeabove')) continue;
+                res.wa++;
+                const cr = c.getBoundingClientRect(), cs = getComputedStyle(c), br = body.getBoundingClientRect();
+                const mid = (cr.top + parseFloat(cs.paddingTop) + cr.bottom - parseFloat(cs.paddingBottom)) / 2;
+                res.worstOff = Math.max(res.worstOff, Math.abs((br.top + br.bottom) / 2 - mid) * 25.4 / 96);
+            }
+            host.remove();
+            return res;
+        }, req);
+        for (const [id, want] of [['subtraction:sub_100k_regroup', 'all'], ['addition:add_100k_regroup', 'all'], ['subtraction:sub_100k_no_regroup', 'none'], ['subtraction:sub_100_regroup', 'none']]) {
+            for (const size of ['S', 'L']) {
+                const r = await measure({ role: 'fact-rows', size, key: true, seed: 7, sections: [{ skills: [sk(id)] }] });
+                const ok = r.cells > 0 && (want === 'all' ? r.wa === r.cells && r.worstOff <= 0.5 : r.wa === 0);
+                console.log(`P3 ${id} ${size}: ${r.wa}/${r.cells} write-above, worst ${r.worstOff.toFixed(2)} mm off centre (want ${want}) ${ok ? 'ok' : 'FAIL'}`);
+                if (!ok) fails.push(`P3 ${id} ${size}`);
             }
         }
     } finally { await app.close(); }
