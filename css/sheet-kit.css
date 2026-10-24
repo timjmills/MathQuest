@@ -401,3 +401,14 @@
    grid is only read (sheet/adapters.js `ws-legacy--readfig`) starts at the top of its box (CL-4b).
    Additive. */
 .ws-page .ws-grid > .ws-cell[data-ws-legacy]:has(> .ws-legacy--readfig):not(.blankrun) { justify-content: flex-start; }
+
+/* 2026-10-24 (CL-4b fix): a centred write-above stack sat 2.4 mm below its cell's centre wherever
+   the row was sized for ONE tab clearance (the stack's top margin) and the CL-4b block above added a
+   second one under it: the two margins no longer fitted, so "safe center" fell back to the top and
+   the stack ran low. The clearance is now two equal spacers that shrink together: the stack is on
+   the cell's true centre in every row height, with the full clearance above and below when the row
+   has room for it. CL-40: measured on add/sub 20 .. 1m regroup at S / M / L, Auto and 4 columns,
+   no inked part of a centred stack enters the tab's keep-out. Additive. */
+.ws-page .ws-grid > .ws-cell > .ws-stack[data-ws-writeabove] { margin-top: 0; margin-bottom: 0; }
+.ws-page .ws-grid > .ws-cell:has(> .ws-stack[data-ws-writeabove]):not(.blankrun)::before,
+.ws-page .ws-grid > .ws-cell:has(> .ws-stack[data-ws-writeabove]):not(.blankrun)::after { content: ''; display: block; flex: 0 1 calc(var(--ws-tab, 5mm) - 1mm); min-height: 0; }
