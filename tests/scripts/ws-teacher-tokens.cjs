@@ -29,9 +29,11 @@
  *                (type 12 14 16 20 28 36, weights 500 700, spacing 4 8 16 24 32 48, radii 8 16, two shadows, 44 px controls);
  *   8. mock-up   the mock-up's own CSS (app.css beside the token file) uses no raw colour, font size, weight, radius or shadow;
  *   9. script    the mock-up's app.js writes no inline style (no style="…", no element.style; the body scroll lock excepted).
- *  10. action    (fix round 2) every bold, slate too, is clearly not the primary: CIEDE2000 >= 20 from ink #1A1614 and from
- *                the dark-mode primary #FBF7EF, and WCAG >= 2.0 : 1 against ink;
- *  13. badge     (owner 2026-10-23) the grade badge's rules use neutral tokens only; its text >= 4.5 : 1, light and dark;
+ *  10. action    (fix round 2; owner 2026-10-24) every bold, slate too, is clearly not the primary: CIEDE2000 >= 20 from the
+ *                indigo primary #3438C6 and from ink #1A1614, WCAG >= 2.0 : 1 against ink; the indigo carries white, its soft
+ *                fill ink and indigo, >= 4.5 : 1 (css/teacher-tokens.css --action / --action-soft);
+ *  13. badge     (owner 2026-10-23 / 2026-10-24) the grade badge always carries its label and, now, the grade's own colour:
+ *                css/teacher-tokens.css --grade-* = the owner's list, ink text >= 4.5 : 1 on every grade fill;
  *  12. tints     (fix round 2) every area tint >= 3 CIEDE2000 from what it sits on: the stone page, or the white frame
  *                the groups carry in light mode (the "group-frame" rule in app.css);
  *  14. watched   (fix round 5) the shared-grade pairs within 1.5 of the colour-blind floor are listed as "watched" (they
@@ -122,6 +124,11 @@ const PLAN = [
   ['G', 'g', 'Geometry (sea teal)', '#E8EEE6', '#C1DBD3', '#399993', '#205652', '#9AC8C1', '#172826'],
   ['RPNS', 'rpns', 'Ratio & number system (peach)', '#F8EFE4', '#F0DECE', '#D8A480', '#5F4838', '#EACEB8', '#332921'],
 ];
+// Owner 2026-10-24: the indigo primary / selected state and the grade colours (all confirmed; G6 teal via the lead), checked
+// against the APP's token file (the mock-up's tokens.css predates them).
+const ACTION = '#3438C6', ACTION_SOFT = '#E9EBFC';
+const GRADE_COLOURS = { PK: '#E2BD96', K: '#E6BD5E', '1': '#D56455', '2': '#96AE82', '3': '#7E9AC4', '4': '#B589AF', '5': '#8579B8', '6': '#5E9E9A' };
+const APP_TOKENS = path.join(ROOT, 'css/teacher-tokens.css'), APP_LIBRARY_CSS = path.join(ROOT, 'css/teacher-library.css'), APP_TRAY_JS = path.join(ROOT, 'js/modules/teacher-tray.js');
 const SLATE = '#736E64';   // warm stone (fix round 2: lifted from #57534E, which was 19.7 from ink and 2.5 : 1 on the dark page;
                            // fix round 3: #706C6A → #736E64, a warmer stone, so slate–NF under deuteranopia is 13.0, not 8.8)
 const PLAN_GRADES = { K: ['CC', 'OA', 'NBT', 'MEAS', 'DATA', 'G'], '1': ['OA', 'NBT', 'MEAS', 'DATA', 'G'], '2': ['OA', 'NBT', 'MEAS', 'DATA', 'G'],
@@ -260,11 +267,23 @@ function parseBlocks(css) {
   //       plum at 2.37 did not, so the line sits at 2.0, between the two. Slate is held to the same rule (its tray chips are
   //       solid too).
   const INKMIN = { de: 20, cr: 2.0 };
+  // Owner 2026-10-24 (design/mockups/teacher-2/owner-2026-10-24/skills-hierarchy.webp): the primary action and the selected
+  // state are INDIGO #3438C6 (soft selected fill #E9EBFC), no longer ink. The rule is unchanged — an area bold must never read
+  // as the primary — so the bolds are now measured against the indigo primary (and still against ink, the side menu and text).
   const inkRows = all.map(a => ({ k: a.k, b: a.plan ? a.plan.bold : SLATE }));
-  const dInk = minOf(inkRows, (a) => de00(a.b, INK)), dCream = minOf(inkRows, (a) => de00(a.b, DARK_TEXT)), cInk = minOf(inkRows, (a) => cr(a.b, INK));
-  row('CIEDE2000 bold vs the ink primary #1A1614', r1(dInk.v), '>= 20', dInk.p.k, dInk.v >= INKMIN.de);
+  const dAct = minOf(inkRows, (a) => de00(a.b, ACTION)), dInk = minOf(inkRows, (a) => de00(a.b, INK)), dCream = minOf(inkRows, (a) => de00(a.b, DARK_TEXT)), cInk = minOf(inkRows, (a) => cr(a.b, INK));
+  row(`CIEDE2000 bold vs the indigo primary ${ACTION}`, r1(dAct.v), '>= 20', dAct.p.k, dAct.v >= INKMIN.de);
+  row('CIEDE2000 bold vs ink #1A1614 (menu, text)', r1(dInk.v), '>= 20', dInk.p.k, dInk.v >= INKMIN.de);
   if (!DARK_PARKED) row('CIEDE2000 bold vs the dark-mode primary #FBF7EF', r1(dCream.v), '>= 20', dCream.p.k, dCream.v >= INKMIN.de);
   row('WCAG bold vs ink (an area never reads as ink)', cInk.v.toFixed(2), '>= 2.0', cInk.p.k, cInk.v >= INKMIN.cr);
+  // the indigo primary itself: white text on it, ink on its soft fill, both >= 4.5 : 1, and the app token file carries them
+  const actTok = parseBlocks(fs.existsSync(APP_TOKENS) ? fs.readFileSync(APP_TOKENS, 'utf8') : '')['body.teacher-mode'] || {};
+  const actBad = [];
+  if ((actTok['--action'] || '').toUpperCase() !== ACTION) actBad.push(`--action = ${actTok['--action'] || '(missing)'}`);
+  if ((actTok['--action-soft'] || '').toUpperCase() !== ACTION_SOFT) actBad.push(`--action-soft = ${actTok['--action-soft'] || '(missing)'}`);
+  const cAct = cr(ACTION, '#FFFFFF'), cSoft = cr(ACTION_SOFT, INK), cSoftA = cr(ACTION_SOFT, ACTION);
+  if (cAct < 4.5) actBad.push(`white on indigo ${cAct.toFixed(2)}`); if (cSoft < 4.5) actBad.push(`ink on the soft fill ${cSoft.toFixed(2)}`); if (cSoftA < 4.5) actBad.push(`indigo on the soft fill ${cSoftA.toFixed(2)}`);
+  row('indigo primary: white on it, ink / indigo on its soft fill', `${cAct.toFixed(2)} · ${cSoft.toFixed(2)} · ${cSoftA.toFixed(2)}`, '>= 4.5', actBad.join('; ') || path.relative(ROOT, APP_TOKENS), !actBad.length);
   // 11. dark mode keeps every group visibly coloured (critic r2 D1: the OA tint was 1.05 : 1 on the page, so the OA group
   //     panel vanished). Measured on the values actually in the board table / token file, not on the rule:
   //       every dark tint >= 1.2 : 1 against the dark page #0F0E0C (the group panel shows), and
@@ -286,24 +305,31 @@ function parseBlocks(css) {
   const tPage = minOf(tintRows, (a) => a.page), tWhite = minOf(tintRows, (a) => a.white);
   row(`tint vs stone page / white frame (CIEDE2000)`, `${r1(tPage.v)} ${tPage.p.k} / ${r1(tWhite.v)} ${tWhite.p.k}`, '>= 3', onFrame ? 'groups framed in white' : 'no frame', tWorst.v >= 3);
 
-  // 13. the GRADE badge (owner 2026-10-23): grade is told apart by a numbered ink circle, never by a second colour code.
-  //     Every app.css rule whose selector names .gbadge may use neutral tokens only (no area tint / soft / bold / deep /
-  //     on, no --a-*), and its text colour on its background is >= 4.5 : 1 in light and dark.
-  const badgeBad = []; let badgeCr = null;
+  // 13. the GRADE badge. Owner 2026-10-23: grade is told apart by a numbered badge, never by colour alone. Owner 2026-10-24
+  //     (owner-2026-10-24/grade-colours.png): each grade now ALSO has its own colour. The intent is kept: the badge always
+  //     carries its label (K, G1 … / "Grade 2"), so colour is never the only sign, and its text on its fill is >= 4.5 : 1.
+  //     Checked on the app: css/teacher-tokens.css holds the owner's grade colours exactly (--grade-*, ink text --grade-on),
+  //     every grade fill takes ink >= 4.5 : 1, the .gbadge rule (css/teacher-library.css) paints --gr with --grade-on text, and
+  //     the badge markup (js/modules/teacher-tray.js gbadge) writes the grade's label inside it.
+  const badgeBad = []; let badgeCr = Infinity, badgeAt = '';
   {
-    const ap = path.join(path.dirname(CSS_FILE), 'app.css');
-    const css = fs.existsSync(ap) ? fs.readFileSync(ap, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '') : '';
-    const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(m => /\.gbadge\b/.test(m[1]));
-    if (!rules.length) badgeBad.push('no .gbadge rule in app.css');
-    let fg = null, bg = null;
-    for (const m of rules) {
-      for (const v of m[2].matchAll(/var\((--[\w-]+)\)/g)) if (/^--(a|cc|oa|nbt|nf|meas|data|g|rpns|slate)-/.test(v[1])) badgeBad.push(`${m[1].trim()} uses ${v[1]}`);
-      if (/^\s*\.gbadge\s*$/.test(m[1])) { const c = m[2].match(/(?:^|;)\s*color:\s*var\(--([\w-]+)\)/), b = m[2].match(/background:\s*var\(--([\w-]+)\)/); if (c) fg = c[1]; if (b) bg = b[1]; }
+    const tok = parseBlocks(fs.existsSync(APP_TOKENS) ? fs.readFileSync(APP_TOKENS, 'utf8') : '')['body.teacher-mode'] || {};
+    for (const [g, hex] of Object.entries(GRADE_COLOURS)) {
+      const name = `--grade-${g.toLowerCase()}`;
+      if ((tok[name] || '').toUpperCase() !== hex) badgeBad.push(`${name} = ${tok[name] || '(missing)'}, want ${hex}`);
+      const c = cr(hex, (tok['--grade-on'] || INK)); if (c < badgeCr) { badgeCr = c; badgeAt = g; }
     }
-    if (!fg || !bg || !NEUTRALS[fg] || !NEUTRALS[bg]) badgeBad.push(`.gbadge colour ${fg} on ${bg} is not a neutral token pair`);
-    else { badgeCr = DARK_PARKED ? cr(NEUTRALS[fg][0], NEUTRALS[bg][0]) : Math.min(cr(NEUTRALS[fg][0], NEUTRALS[bg][0]), cr(NEUTRALS[fg][1], NEUTRALS[bg][1])); if (badgeCr < 4.5) badgeBad.push(`contrast ${badgeCr.toFixed(2)}`); }
+    if ((tok['--grade-on'] || '').toUpperCase() !== INK) badgeBad.push(`--grade-on = ${tok['--grade-on'] || '(missing)'}, want ink ${INK}`);
+    if (badgeCr < 4.5) badgeBad.push(`text on ${badgeAt} ${badgeCr.toFixed(2)}`);
+    const lib = fs.existsSync(APP_LIBRARY_CSS) ? fs.readFileSync(APP_LIBRARY_CSS, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '') : '';
+    const rule = [...lib.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(m => /#teacherApp \.gbadge\s*$/.test(m[1].trim()));
+    if (!rule) badgeBad.push('no #teacherApp .gbadge rule in css/teacher-library.css');
+    else { if (!/background:\s*var\(--gr\b/.test(rule[2])) badgeBad.push('.gbadge does not paint the grade colour (--gr)'); if (!/(?:^|;)\s*color:\s*var\(--grade-on\)/.test(rule[2])) badgeBad.push('.gbadge text is not --grade-on'); }
+    const tray = fs.existsSync(APP_TRAY_JS) ? fs.readFileSync(APP_TRAY_JS, 'utf8') : '';
+    const gb = tray.match(/export const gbadge = [^\n]+/);
+    if (!gb || !/data-grade=/.test(gb[0]) || !/>\$\{long \?[^}]*Grade \$\{g\}/.test(gb[0]) || !/gradeMark\(g\)/.test(gb[0])) badgeBad.push('gbadge markup does not write the grade label inside the badge');
   }
-  row(`grade badge: neutral tokens only, text >= 4.5 ${DARK_PARKED ? 'light' : 'light + dark'}`, badgeBad.length ? badgeBad.length + ' found' : `${badgeCr.toFixed(2)} : 1`, 'neutral', badgeBad.slice(0, 3).join('; '), !badgeBad.length);
+  row('grade badge: owner colours + its label, text >= 4.5', badgeBad.length ? badgeBad.length + ' found' : `${badgeCr.toFixed(2)} : 1 (${badgeAt})`, 'label+colour', badgeBad.slice(0, 3).join('; '), !badgeBad.length);
 
   // 7. tokens.css
   let tokBad = [];
