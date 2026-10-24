@@ -13030,7 +13030,11 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
 
         // Split by mixed numbers, fractions, operators — preserving delimiters
         // Matches: mixed numbers (2 3/4), fractions (3/4), operators (+−×÷=), or text chunks
-        const tokens = rawText.match(/\d+\s+\d+\/\d+|\d+\/\d+|[+\-\u2212\u00d7\u00f7×÷=]|[^+\-\u2212\u00d7\u00f7×÷=\d\/]+|\d+/g) || [rawText];
+        // A missing numerator ("1/3 + ?/10 = 5/6") is a stacked fraction too: the pupil writes in
+        // the numerator's box, over its bar and denominator (teacher-site T1: it printed "? 10").
+        const missNum = /\?\s*\/\s*\d+/.test(rawText);
+        const numBox = `<span class="frac-miss-num" style="min-width:30px;min-height:24px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span>`;
+        const tokens = rawText.match(/\d+\s+\d+\/\d+|\d+\/\d+|\?\s*\/\s*\d+|[+\-\u2212\u00d7\u00f7×÷=]|[^+\-\u2212\u00d7\u00f7×÷=\d\/?]+|\?|\d+/g) || [rawText];
 
         let rendered = tokens.map(tok => {
             // Mixed number: 2 3/4
@@ -13039,6 +13043,8 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
             // Simple fraction: 3/4
             const fracMatch = tok.match(/^(\d+)\/(\d+)$/);
             if (fracMatch) return stackFrac(fracMatch[1], fracMatch[2]);
+            const missMatch = tok.match(/^\?\s*\/\s*(\d+)$/);
+            if (missMatch) return stackFrac(numBox, missMatch[1]);
             // Operators
             if (/^[+\u2212\u00d7\u00f7×÷=]$/.test(tok)) return wrapOp(tok);
             if (tok === '-') return wrapOp('−');
@@ -13056,7 +13062,13 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const answerBox = ansIsFraction ? fracAnsBox : singleAnsBox;
 
         let content;
-        if (hasFracOp || hasEquals) {
+        if (missNum) {
+            // The box is IN the fraction: the equation prints whole, its instruction above it.
+            const say = (rawText.match(/[.]\s*([^.]*missing[^.]*\.?)\s*$/i) || [])[1] || 'Find the missing numerator.';
+            const eqn = rendered.replace(/\s*\.\s*Find the missing numerator\.?\s*$/i, '');
+            content = `<div><div class="p-prompt" style="margin-bottom:6px;">${say}</div>
+                <div class="print-frac-equation" style="gap:8px;">${eqn}</div></div>`;
+        } else if (hasFracOp || hasEquals) {
             // Equation style: expression = [answer box]
             rendered = rendered.replace(/\s*<span[^>]*>[=]<\/span>\s*$/, '');
             content = `<div class="print-frac-equation" style="gap:8px;">
@@ -13120,6 +13132,21 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                     <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer (with units):</span>
                     <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
                 </div>
+            </div>
+        </div>`;
+    }
+
+    // A multiple-choice item that reached the default branch printed its question with no
+    // choices (statistical_question, teacher-site T1 r6): its choices print, lettered, to circle.
+    if (problem.answerType === 'multiple-choice' && Array.isArray(problem.options) && problem.options.length >= 2
+        && problem.options.every(o => typeof o === 'string' || typeof o === 'number')) {
+        const mcOpts = problem.options.map((o, i) => `<div class="mc-opt" style="margin:4px 0;"><span style="font-weight:700;margin-right:8px;">${String.fromCharCode(65 + i)})</span><span>${String(o).replace(/<[^>]*>/g, '')}</span></div>`).join('');
+        return `
+        <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+            ${num}
+            <div class="problem-content">
+                <div class="p-prompt">${text}</div>
+                <div class="mc-opts" style="margin-top:6px;">${mcOpts}</div>
             </div>
         </div>`;
     }

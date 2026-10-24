@@ -66,6 +66,8 @@ for (const k of DEP_KEYS) DEPS[k] = null;
  * host that injects more than this build knows about does not crash it.
  * @returns {string[]} the keys that are now installed
  */
+const READ_FIG_TYPES = new Set(['number', 'text', 'multiple-choice', 'multi-select-check', 'coord-input']);
+
 export function installLegacyAdapters(fns = {}) {
     for (const k of DEP_KEYS) if (fns[k] !== undefined && fns[k] !== null) DEPS[k] = fns[k];
     return installedLegacy();
@@ -215,7 +217,13 @@ const LEGACY_TEMPLATE = register('legacy', {
         // the digits and NOTHING to write in - the regroup boxes, the sum rule and the answer
         // blanks all vanish. The class carries no colour: `.print-edition`'s tokens are already
         // retargeted onto the standard's black / white / single-grey palette.
-        return `<div class="ws-legacy print-edition">${stripLegacyHead(html)}${stamp(key, ctx)}</div>`;
+        // A coordinates item whose grid is only READ (a length, a distance, a choice, a named point)
+        // starts at the top of its cell, the writing room below (CL-4b). Only a plot item keeps
+        // its grid as the workspace. A mixed_coordinates page shares one cell height with its
+        // tallest item (a 2 x 2 transform choice), so a centred short item left a blank band
+        // above its question (teacher-site T1 r6).
+        const readFig = p && p.categoryId === 'coordinates' && READ_FIG_TYPES.has(p.answerType) ? ' ws-legacy--readfig' : '';
+        return `<div class="ws-legacy print-edition${readFig}">${stripLegacyHead(html)}${stamp(key, ctx)}</div>`;
     },
 
     answerKey(p) {

@@ -337,14 +337,17 @@ export function factRowsLayout(items, input) {
     // A long + - x fact (5-6 digits: sub_100k_regroup, sub_1m_regroup) that does not fit its cell
     // at the size's working digits drops columns until it does (PG-20: content never shrinks to
     // fit; print-lint ILLEGIBLE / PG-12 at 16 pt in 8 columns). Division keeps its own path above.
-    if (!divide) {
+    // Only 5-6-digit facts (owner, 2026-10-24: "big sums only"); x12 and other short facts keep
+    // their columns and step the digits down the ladder (ws-layout-unit VA-2).
+    const bigFact = !divide && n >= 5;
+    if (bigFact) {
         const floor = (SIZES[ctx.size] || SIZES.L).digitPt;
         const before = cols;
         while (cols > 2 && verticalFitPt(cols, n, ctx.look, floor, ctx.size) === 0) cols--;
         if (cols < before) note = [note, `${n}-digit facts: ${cols} columns so the digits keep the ${ctx.size} size.`].filter(Boolean).join(' ');
     }
     const pt = tightDiv && fitsAt(cols) ? factDigitPt(cols)
-        : (!divide && verticalFitPt(cols, n, ctx.look, (SIZES[ctx.size] || SIZES.L).digitPt, ctx.size)) || verticalPt(cols, n, ctx.look);
+        : (bigFact && verticalFitPt(cols, n, ctx.look, (SIZES[ctx.size] || SIZES.L).digitPt, ctx.size)) || verticalPt(cols, n, ctx.look);
     if (pt < factDigitPt(cols)) note = [note, `Digits ${pt} pt so ${n}-digit facts fit ${cols} columns.`].filter(Boolean).join(' ');
     const cap = factRowsCapacity(cols, ctx.size, ctx.paper, header);
     const rows = cap.rows;
