@@ -3,10 +3,10 @@ Title: Pilot — SU-C column subtraction without regrouping, six skills onto `st
 Session: session_01G5ktGS4kteYMuLFxnxGEgU
 Branch: claude/sweet-newton-c8wrv1-wip-pilot-su-c
 Owner of files: subtraction no-regroup generator branch (gen-operations.js ranged sub), subtraction provider, skill-options / skill-presets / standards / wrm / search-terms entries for the six + `sub_2d_1d`
-State: fix
+State: stopped
 Updated: 2026-10-23
 Builder profile: mq-opus-low
-Critic rounds: 2, FAIL
+Critic rounds: 2, FAIL (r3 not run: rule 0b + stop-loop)
 
 ## Now
 - PILOT RESULT: FAIL against the §4.4 bar (2 critic rounds, both FAIL; 1 builder run + 1 fix run; 5 h 37 m wall). Lead 22:21: carry on to 8/10 — fix r2 (N1-N8), precritic clean, critic r3; hard stop if r3 fails on a defect that survived two medium rounds.
@@ -115,3 +115,4 @@ Measured 21:20Z with `ws-print-lint --json` (findings of the rule) and `buildShe
 - 2026-10-23 23:35: add_three NOT CHANGED: its 0.72 em answer boxes come from its own payload (gen-operations.js add_three stacked branch, ~line 2564), not the sub ranged branch's `wideTracks: true` line (~3040); a fix is a second, different line, so it is logged here for the addition lane.
 - 2026-10-23 23:35: sub_100_regroup lesson HTML changed (S and L): its Warm-up deals sub_100_no_regroup items (the rung), which the N1 dealer now draws differently. With the r2 generator swapped back in, all 40 approved pupil / key hashes (add_1k_regroup, sub_1k_regroup, add_10k_regroup, sub_100_regroup, add_100_regroup x independent / lesson / test / mixed-practice x S / L) are identical, so the engine edits (stack.js, lesson.js) change no approved page.
 - 2026-10-24 00:20: fix r2 merged (a930c43); base merged (owner rulings HD-5a strand tab removed, CL-11a number tab only). Card regenerated --resign (inherited rulings added): UNSIGNED, awaits the lead.
+- 2026-10-24 00:56: STOP (CLAUDE.md §1.7 / process rule 7). D12 (critic r1) -> N5 (critic r2): the side-anchor empty band at L survived fix r1 and fix r2, both at mq-opus-medium. Precritic pass 5 is red only on that class (5 matrix rows), so rule 0b blocks critic r3. ROOT CAUSE: in side-anchor mode the anchor pair is laid out 50/50 (js/modules/sheet/anchors.js:260 footprint wMm 88, maxCols 2; js/modules/print-sheet.js:2150-2153 colsList [1,2], sec.columns = 2), so a narrow stack sits in a half-page cell with a >= 30 % empty band, and a 5-6 digit twin that needs the full width pushes the pupil problem into a 185 mm cell. Both files belong to the mixed-pages lane. The 2-digit case reproduces on the approved sub_100_regroup and add_50_no_regroup (same 6 x 32 %), so it is engine debt across the stack family, not only this lane's. MACHINE CHECK: it already exists (the coverage matrix single/ex-each and sections/ex-* rows at L catch it); the loop failed because the fix is outside the lane's files, not because a check was missing. PROPOSED PATCH (for the mixed-pages lane): in side mode, size the pair's columns from content: the pupil column = widest stack footprint + 2 x 3 mm + the label box; the twin takes the rest; at one column keep the problem beside the twin. Also open: N2 lesson Warm-up at L (H13 x2 on sub_50 / sub_2d_1d / sub_100k / sub_1m), which needs the lesson composer (CL-3: one cell size per band).
