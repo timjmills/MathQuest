@@ -93,3 +93,5 @@ New owner design ideas are recorded here and NOT folded into a running fix round
 
 | 2026-10-23 | Owner pre-approved the teacher-site build ("I approve the teacher site when its ready to build. I have seen enough"; STATUS 619a0521). No approval sitting. Exit = independent critic ≥ 8 on all four, then the build brief below in this file, then report to the lead | lead | — |
 | 2026-10-23 | Owner via lead: "stop after this work, don't try anything new". Finish fix round 5 + its critic. PASS → write the build brief, report, stop (do NOT start the build). FAIL → report and stop; no further round without the lead's go | lead | — |
+| 2026-10-24 | Fix round 5: thumbnails LIVE from the booted app (`live.mjs`, buildSheet), check green on 261 skills / 392 thumbnails; samples.js deleted; 820 bar always names an area; detailed rows 55 px (8 per screen at 1366); ✓ + fill on selected; light only (dark parked); no strand tab (HD-5a); all gates OK | mq-opus-medium | done |
+| 2026-10-24 | Critic round 6 (fresh critic; last round under the owner's stop instruction) | mq-opus-medium | running |
