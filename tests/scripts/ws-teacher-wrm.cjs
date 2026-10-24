@@ -601,7 +601,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           link: ((r.querySelector('[data-todo-open], [data-w-dl-goto]') || {}).textContent || '').trim() }));
         // T4: the card is folded into a section at the END of the lesson panel
         const panel = document.querySelector('#tvwDetail');
-        return { afterHead: !!head && !!panel && panel.lastElementChild === c.closest('.tvw-tm-wrap') && c.hidden && !!c.closest('.tvw-tm-wrap').querySelector('[data-w-tm-toggle][aria-expanded="false"]'), title: c.querySelector('#tvwTmH').textContent, count: +((c.querySelector('.tvw-tm-head .tvw-tm-count') || {}).textContent || 0),
+        return { afterHead: !!head && !!panel && panel.lastElementChild === c.closest('.tvw-tm-wrap'), folded: c.hidden && !!c.closest('.tvw-tm-wrap').querySelector('[data-w-tm-toggle][aria-expanded="false"]'), title: c.querySelector('#tvwTmH').textContent, count: +((c.querySelector('.tvw-tm-head .tvw-tm-count') || {}).textContent || 0),
           lead: (c.querySelector('.tvw-tm-lead') || {}).textContent || '', empty: (c.querySelector('.tvw-tm-empty') || {}).textContent || '',
           items: rows('lesson'), pre: rows('pre'), preHead: (c.querySelector('#tvwTmPre') || {}).textContent || '',
           oldLine: !!document.querySelector('#tvwDetail .tvw-head .tvw-tbb, #tvwDetail [data-w-group] .tvw-tbb') };
@@ -641,6 +641,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           await vp(w, h);
           await openLesson(l);
           const { f, want } = await checkCard(l, `to-make ${tag} ${l.key} @${w}`);
+          // folded when a lesson opens (the same lesson again keeps the teacher's unfolding)
+          if (w === 1280) check(f.folded, `to-make ${tag} ${l.key}: the card is not folded when the lesson opens`);
           if (w === 1280) report.push(`${tag} ${l.gradeLabel} "${l.title}": ${f.items.map((x) => `[${x.kind}] ${x.name}`).join(' | ') || f.empty}`);
           if (tag === 'c') check(f.items.some((x) => x.todo === 'mult_standard' && x.name === 'Multi-Digit Multiplication: Standard Algorithm'), `to-make c ${l.key}: mult_standard not listed`);
           if (tag === 'd') check(f.empty === TMK.EMPTY_FULL && !want.items.length, `to-make d ${l.key}: empty line "${f.empty}"`);
@@ -1442,9 +1444,10 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
           const back = d.querySelector('[data-w-back]');
           const b = back && back.getBoundingClientRect();
           return { fixed: getComputedStyle(d).position, top: Math.round(r.top), right: Math.round(r.right), bottom: Math.round(r.bottom), W: innerWidth, H: innerHeight,
+            tray: ((t) => (t && t.getClientRects().length ? Math.round(t.getBoundingClientRect().top) : innerHeight))(document.querySelector('#tvTray')),
             back: b ? [Math.round(b.width), Math.round(b.height), Math.round(b.top), back.textContent.trim()] : null, focus: document.activeElement === back };
         });
-        check(o.fixed === 'fixed' && o.top === 0 && o.right === o.W && o.bottom === o.H && o.back && o.back[0] >= 44 && o.back[1] >= 44 && o.back[2] >= 0 && o.back[3] === 'Back to the lessons' && o.focus,
+        check(o.fixed === 'fixed' && o.top === 0 && o.right === o.W && Math.abs(o.bottom - o.tray) <= 1 && o.back && o.back[0] >= 44 && o.back[1] >= 44 && o.back[2] >= 0 && o.back[3] === 'Back to the lessons' && o.focus,
           `slide-over @${w}: ${JSON.stringify(o)}`);
         await side(`slide-over @${w}`);
         await rows390(`slide-over @${w}`);
