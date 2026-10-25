@@ -22,7 +22,7 @@
 //                Clear tray with Undo.
 //   saving       the tray saves itself as the set 'tray' in mq_teacher_sets (Browse by › My sets lists it).
 //
-// Print · Quiz · Share call window.tvOpenSheet(kind, {from: 'tray'}) (T3b); without it the old screens open.
+// Quiz · Send · Save · Print (owner 2026-10-25; Send = the old Share). Print · Quiz · Send call window.tvOpenSheet(kind, {from: 'tray'}) (T3b); without it the old screens open.
 
 import { icon, esc, toast, findSkill, currentSet, addToCurrentSet, loadSetIntoQueue, savedSets, writeSets, readStore, writeStore } from './teacher-ui.js';
 import { areaOf, AREAS, AREA_ORDER, areaIcon } from './teacher-areas.js';
@@ -399,6 +399,54 @@ function save() {
     writeSets([rec, ...list]);
 }
 
+/**
+ * Save: the tray as its own named set (Browse by › My sets). The button turns into a name box in place (the same
+ * pattern as the share box); Enter or blur saves, Escape cancels. The name starts as the tray's title.
+ */
+function saveNamedInPlace(btn) {
+    if (!trayItems().length) { toast('Tick skills first'); return; }
+    if (!btn || !btn.parentNode) return;
+    const wrap = document.createElement('label');
+    wrap.className = 'tv-share-edit tt-save-edit';
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'tv-share-in tt-save-in';
+    inp.value = trayTitle();
+    inp.setAttribute('aria-label', 'Name of the set: press Enter to save');
+    wrap.append(inp);
+    btn.replaceWith(wrap);
+    inp.focus();
+    try { inp.select(); } catch (e) { /* */ }
+    let done = false;
+    const finish = (ok) => {
+        if (done) return;
+        done = true;
+        const name = inp.value.trim();
+        wrap.replaceWith(btn);
+        if (!ok || !name) { btn.focus(); return; }
+        saveNamed(name);
+        btn.focus();
+    };
+    inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); finish(true); }
+        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); finish(false); }
+    });
+    inp.addEventListener('blur', () => finish(true));
+}
+/** Write the tray as a new named set, most recent first. */
+export function saveNamed(name) {
+    const items = trayItems();
+    if (!items.length) return null;
+    const now = Date.now();
+    const rec = { id: 'set_' + now.toString(36) + Math.random().toString(36).slice(2, 6), name: String(name || trayTitle()), createdAt: now, lastUsed: now, skills: items.map(copyItem) };
+    if (Object.keys(T.locks).length) rec.locks = { ...T.locks };
+    if (T.groups.length) rec.groups = trayGroups();
+    if (T.lessons.length) rec.lessons = trayLessons();
+    writeSets([rec, ...savedSets()]);
+    toast(`Saved “${rec.name}” in My sets`);
+    return rec;
+}
+
 let restored = false;
 /** The first time Skills opens with an empty current set, the saved tray comes back. */
 export function restoreTray() {
@@ -447,15 +495,19 @@ function refuse(before, err, what) {
     const p = plan();
     T.need = p.need && isFinite(p.need) ? p.need : 0;
     restoreSnap(before);
-    T.lockErr = `Not set: ${err} ${what}`;
+    // say it once: a refusal that already names its fix gets no second one
+    T.lockErr = `Not set: ${err}${/\b(Lower|Raise)\b/.test(err) ? '' : ' ' + what}`;
 }
+/** The check a held share is held to: the tray's own total, or (from the print dialog) the dialog's. */
+let SHARE_CHECK = null;
+const checkNow = () => (SHARE_CHECK ? SHARE_CHECK() : lockError());
 function setLock(scope, v) {
     const val = Math.max(0, Math.min(100, Math.round(Number(v) || 0)));
     const before = snapshot();
     if (scope.startsWith('k:')) { const it = itemOf(scope.slice(2)); if (!it) return; it.lockPct = val; delete it.count; }
     else T.locks[scope] = val;
     evenRest(scope);
-    const err = lockError();
+    const err = checkNow();
     if (err) { refuse(before, err, 'Lower another held % or count first.'); return; }
     T.lockErr = '';
 }
@@ -469,7 +521,7 @@ function setCount(key, v) {
     delete it.lockPct;
     delete it.leftOut;
     evenRest(`k:${key}`);
-    const err = lockError();
+    const err = checkNow();
     if (err) { refuse(before, err, 'Lower another count or held % first.'); return; }
     T.lockErr = '';
 }
@@ -491,15 +543,20 @@ export function parseShare(text) {
     return { kind: m[2] ? 'pct' : 'count', n: Number(m[1]) };
 }
 /** Set one skill's share from typed text, with the tray's own checks; returns the refusal ('' when it took). */
-export function setShareFromText(key, text) {
+export function setShareFromText(key, text, check = null) {
     const it = itemOf(key);
     if (!it) return '';
     const p = parseShare(text);
-    if (p.kind === 'bad') T.lockErr = 'Not set: type a number of problems (6) or a % (40 %).';
-    else if (p.kind === 'pct' && p.n > 100) T.lockErr = 'Not set: a share can be at most 100 %.';
-    else if (p.kind === 'equal') { if (heldText(it) !== null) it.weight = 2; release(`k:${key}`); }
-    else if (p.kind === 'pct') setLock(`k:${key}`, p.n);
-    else setCount(key, p.n);
+    T.lockErr = '';
+    SHARE_CHECK = typeof check === 'function' ? check : null;
+    try {
+        if (p.kind === 'bad') T.lockErr = 'Not set: type a number of problems (6) or a % (40 %).';
+        else if (p.kind !== 'equal' && !Number.isInteger(p.n)) T.lockErr = 'Not set: whole numbers only (6 or 40 %).';
+        else if (p.kind === 'pct' && p.n > 100) T.lockErr = 'Not set: a share can be at most 100 %.';
+        else if (p.kind === 'equal' || p.n === 0) { if (heldText(it) !== null) it.weight = 2; release(`k:${key}`); }   // blank or 0: shares evenly again
+        else if (p.kind === 'pct') setLock(`k:${key}`, p.n);
+        else setCount(key, p.n);
+    } finally { SHARE_CHECK = null; }
     const err = T.lockErr;
     changed();
     return err;
@@ -651,9 +708,10 @@ function barHTML() {
     }
     return `${lead}${mid}
       <button type="button" class="tt-btn tt-count" data-act="trayopen">${n ? `${esc(label)} ▸` : 'Tray empty'}</button>
-      <div class="tt-actions">${n ? `<button type="button" class="tt-btn tt-review" data-act="trayopen">Review ${esc(label)}</button>` : '<span class="tt-hint">Tick skills first</span>'}
+      <div class="tt-actions">${n ? '' : '<span class="tt-hint">Tick skills first</span>'}
         <button type="button" class="tt-btn tt-ic" data-act="tray-quiz" aria-label="Quiz">${icon('sheet', 20)}<span class="tt-l">Quiz</span></button>
-        <button type="button" class="tt-btn tt-ic" data-act="tray-share" aria-label="Share"${dis}>${icon('link', 20)}<span class="tt-l">Share</span></button>
+        <button type="button" class="tt-btn tt-ic" data-act="tray-share" aria-label="Send"${dis}>${icon('link', 20)}<span class="tt-l">Send</span></button>
+        <button type="button" class="tt-btn tt-ic" data-act="tray-save" aria-label="Save"${dis}>${icon('bookmark', 20)}<span class="tt-l">Save</span></button>
         <button type="button" class="tt-btn${n ? ' tt-primary' : ''}" data-act="tray-print"${dis}>${icon('print', 20)}<span>Print</span></button>
       </div>`;
 }
@@ -898,7 +956,7 @@ function popHTML() {
       <div class="tt-sheet-head"><div class="tt-head-text"><p class="tt-eyebrow">Tray · ${esc(trayTitle(keys))}</p><h2 id="tvTrayPopTitle">Your tray</h2></div><button type="button" class="tt-btn tt-icon tt-close" data-act="close" aria-label="Close the tray">${icon('x', 20)}</button></div>
       <div class="tt-pop-head">${tools}</div>
       <div class="tt-pop-body">${lessonsBox}${byGrade}${body}${empty}</div>
-      <div class="tt-sheet-foot">${totalHTML(p)}<div class="tt-summary">${esc(summary)}</div><button type="button" class="tt-btn" data-act="tray-quiz">${icon('sheet', 20)}<span>Quiz</span></button><button type="button" class="tt-btn" data-act="tray-share"${dis}>${icon('link', 20)}<span>Share</span></button><button type="button" class="tt-btn tt-primary" data-act="tray-print"${dis}>${icon('print', 20)}<span>Print</span></button></div>
+      <div class="tt-sheet-foot">${totalHTML(p)}<div class="tt-summary">${esc(summary)}</div><button type="button" class="tt-btn" data-act="tray-quiz">${icon('sheet', 20)}<span>Quiz</span></button><button type="button" class="tt-btn" data-act="tray-share"${dis}>${icon('link', 20)}<span>Send</span></button><button type="button" class="tt-btn" data-act="tray-save"${dis}>${icon('bookmark', 20)}<span>Save</span></button><button type="button" class="tt-btn tt-primary" data-act="tray-print"${dis}>${icon('print', 20)}<span>Print</span></button></div>
     </div>`;
 }
 
@@ -1026,6 +1084,7 @@ function onClick(e) {
         case 'tray-print': openSheet('print'); return;
         case 'tray-quiz': openSheet('quiz'); return;
         case 'tray-share': openSheet('share'); return;
+        case 'tray-save': saveNamedInPlace(b); return;
         case 'trayopen': openTrayPopup(); return;
         case 'trayarea': openTrayPopup(arg); return;
         case 'chip': chipOpen(arg, b); return;
