@@ -738,6 +738,10 @@ const multi = () => G.grades.length > 1;
 const realGrades = () => G.grades.filter((g) => g !== 'M');
 /** One of each skill across every selected grade (or one area of them). */
 const wholeSetG = (a) => realGrades().flatMap((g) => wholeSet(g, a));
+function gradesNameOf(gs) {
+    const ls = gs.map((g) => (g === 'K' ? 'K' : g === 'M' ? 'Mixed levels' : g));
+    return ls.length > 1 ? `Grades ${ls.slice(0, -1).join(', ')} and ${ls[ls.length - 1]}` : gradeName(gs[0]);
+}
 function gradesName() {
     if (allOn()) return 'All grades';
     if (!multi()) return gradeName(G.grade);
@@ -838,7 +842,10 @@ function gGroup(a, list, { cross = false, addArea = false, budget, planned = [] 
         shown.forEach((s) => { let g = gs.find((x) => x.g === s.level); if (!g) gs.push(g = { g: s.level, l: [] }); g.l.push(s); });
         body = gs.map((g) => `<h3 class="ts-grade-head">${gbadge(g.g, true)}<span class="ts-count">${plural2(g.l.length, 'skill')}</span></h3><div class="ts-grid" data-view="${gv()}">${g.l.map(gCard).join('')}</div>`).join('');
     } else body = shown.length ? `<div class="ts-grid" data-view="${gv()}">${shown.map(gCard).join('')}</div>` : '';
-    if (planned.length) body += `<h3 class="ts-grade-head ts-plan-head"><span class="ts-plan-tag">Yet to be built</span><span class="ts-count">${plural2(planned.length, 'skill')} planned</span></h3><div class="ts-grid" data-view="${gv()}">${planned.map(planCard).join('')}</div>`;
+    const planShown = planned.slice(0, Math.max(0, budget.left));   // planned cards share the page limit (after the real ones)
+    budget.left -= planShown.length;
+    if (!shown.length && !planShown.length) return '';
+    if (planShown.length) body += `<h3 class="ts-grade-head ts-plan-head"><span class="ts-plan-tag">Yet to be built</span><span class="ts-count">${plural2(planned.length, 'skill')} planned</span></h3><div class="ts-grid" data-view="${gv()}">${planShown.map(planCard).join('')}</div>`;
     const n = addArea ? wholeSetG(a).length : 0;
     const add = addArea && n > 1 ? `<button type="button" class="ts-btn ts-add" data-act="addarea" data-arg="${a}">+ Add whole area (${n})</button>` : '';
     return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREAS[a].long, plural2(list.length, 'skill') + (planned.length ? ` · ${planned.length} yet to be built` : ''), layoutSegHTML() + add)}${body}</section>`;
@@ -872,10 +879,14 @@ function plannedByArea() {
 function planCard(e) {
     const a = PLAN_AREA[e.domain] || 'NOSTD';
     const v = gv();
-    const head = `${gbadge(e.level, v !== 'chip')}<span class="ts-area-tag">${areaIcon(a, 16)}${esc(AREAS[a].short)}</span>`;
-    const what = v === 'thumb' || v === 'big' || v === 'medium' || v === 'small' ? `<span class="ts-plan-what">${esc(e.teaches || 'Planned skill.')}</span>` : '';
-    return `<button type="button" class="ts-card ts-plancard" data-domain="${a}" data-act="todo" data-arg="${esc(e.id)}" title="Yet to be built: open it in All skills to be made">`
-        + `<span class="ts-card-top">${head}<span class="ts-plan-tag">Yet to be built</span></span><span class="ts-card-name">${esc(e.name)}</span>${what}</button>`;
+    const attrs = `data-domain="${a}" data-act="todo" data-arg="${esc(e.id)}" title="Yet to be built: open it in All skills to be made"`;
+    if (v === 'chip') {
+        return `<button type="button" class="ts-card ts-chipcard ts-plancard" ${attrs}>${gbadge(e.level)}<span class="ts-chip-ic">${areaIcon(a, 16)}</span><span class="ts-card-name">${esc(e.name)}</span><span class="ts-plan-tag">Yet to be built</span></button>`;
+    }
+    const list = v === 'list';
+    const what = list ? '' : `<span class="ts-plan-what"><span class="ts-plan-txt">${esc(e.teaches || 'Planned skill.')}</span></span>`;
+    return `<button type="button" class="ts-card ts-plancard" ${attrs}>`
+        + `<span class="ts-card-top">${gbadge(e.level, !list)}<span class="ts-plan-tag">Yet to be built</span></span><span class="ts-card-name">${esc(e.name)}</span>${what}</button>`;
 }
 
 /** An area band: the icon tile, the title with its count under it, then (on the right) the view and the add button. */
@@ -919,9 +930,9 @@ function gRender() {
         const plan = plannedByArea();
         const order = AREA_ORDER.filter((a) => by[a] || plan[a]);
         order.forEach((a) => { by[a] = (by[a] || []).sort(stdSort); });
-        html = (whole.length ? `<div class="ts-add-row"><button type="button" class="ts-btn ts-add" data-act="addgrade">${icon('plus', 18)}<span>${nG > 1 ? `Add all ${nG} grades` : 'Add whole grade'}</span></button><span class="ts-note">Add ${whole.length} ${esc(nG > 1 ? gradesName() : gradeName(realGrades()[0]))} skills to your tray (one of each: no Mixed pools or Maths words)</span></div>` : '')
+        html = (whole.length ? `<div class="ts-add-row"><button type="button" class="ts-btn ts-add" data-act="addgrade">${icon('plus', 18)}<span>${nG > 1 ? `Add all ${nG} grades` : 'Add whole grade'}</span></button><span class="ts-note">Add ${whole.length} skills from ${esc(allOn() ? 'every grade' : nG > 1 ? gradesNameOf(realGrades()) : gradeName(realGrades()[0]))} to your tray (one of each: no Mixed pools or Maths words)</span></div>` : '')
             + order.map((a) => gGroup(a, by[a], { cross: multi() || G.grade === 'M', addArea: nG > 0, budget, planned: plan[a] || [] })).join('')
-            + moreHTML(list.length - G.limit);
+            + moreHTML(list.length + Object.values(plan).reduce((n, l) => n + l.length, 0) - G.limit);
     } else if (G.browse === 'wrm') {
         eyebrow.textContent = `${gradesName()} · White Rose steps`;
         html = perGrade(wrmHTML);

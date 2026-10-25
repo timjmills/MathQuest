@@ -442,6 +442,7 @@ let flipTimer = null;
 let flip = null;            // { cat, sk, opts, i }
 function flipTo(i) {
     if (!flip || !pop) return;
+    if (!shownFor || !shownFor.isConnected) { hide(); return; }   // the grid was drawn again under the preview
     flip.i = (i + FLIP_N) % FLIP_N;
     const fr = pop.querySelector('.tvp-pop-frame');
     if (fr) { fr.innerHTML = ''; mountSample(fr, flip.cat, flip.sk, flip.opts, flip.i); }
@@ -643,7 +644,8 @@ export function installPreview() {
     });
 
     document.addEventListener('keydown', (e) => {
-        if (flip && pop && !pop.hidden && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        const typing = e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]');
+        if (flip && pop && !pop.hidden && !typing && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
             e.preventDefault();
             clearInterval(flipTimer); flipTimer = null;     // stepping by hand stops the automatic flip
             flipTo(flip.i + (e.key === 'ArrowRight' ? 1 : -1));
