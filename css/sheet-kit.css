@@ -421,3 +421,17 @@
    already clear the tab sideways (label side + 2 mm) and lose nothing. The spacer shrinks before it
    overflows a tight row; ws-print-lint L-OVERLAP CL40-INK measures the ink. Additive. */
 .ws-page .ws-grid > .ws-cell:has(> :is(.ws-tab, .ws-letter)):has(> .ws-eq[data-ws-across]):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: 0 1 max(0mm, calc(var(--ws-tab, 5mm) - 2mm - 0.2 * var(--ws-digit, 22pt))); min-height: 0; }
+
+/* 2026-10-25 (CL-40 on CL-4b, deploy gate L-OVERLAP CL40-INK): a top-started cell whose content is
+   left-aligned or wider than the room beside the tab (word-work stories, number words, counters,
+   sequence strips, remainder pictures) put its first ink beside the number tab, inside the keep-out
+   of (tab side + 1 mm). CL-40: such a visual's top inset becomes (tab side + 1 mm) instead of the
+   3 mm pad - a fixed spacer of (tab side - 2 mm): a shrinking one let the ink back in on tight rows.
+   A remainder picture's key rings stand 0.6 mm outside its counters ("the rings take no space",
+   cells/ops-counters.js groupRings): its spacer is 0.75 mm taller, on the pupil page too, so the
+   facsimile key keeps the pupil page's geometry. The measuring cell (print-sheet.js measureItems,
+   `.ws-sheet > .ws-cell.mqt--<template>`) takes the same spacer, so rows are sized with it. Additive. */
+.ws-page .ws-grid > .ws-cell:is([data-ws-cell="word-work"], [data-ws-cell="words"], [data-ws-cell="counters"], [data-ws-cell="seqstrip"], [data-ws-cell="remainder"]):has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before,
+.ws-sheet > .ws-cell:is(.mqt--word-work, .mqt--words, .mqt--counters, .mqt--seqstrip, .mqt--remainder):has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
+.ws-page .ws-grid > .ws-cell[data-ws-cell="remainder"]:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before,
+.ws-sheet > .ws-cell.mqt--remainder:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { height: max(0mm, calc(var(--ws-tab, 5mm) - 1.25mm)); }

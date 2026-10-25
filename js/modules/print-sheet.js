@@ -1392,7 +1392,8 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         visual: !!q.visual,
         footprint: fp,
         fclass: footprintClass(q, template, printSize),
-        cellCls: (legacy ? 'mq-legacy' : '') + (q.cell && q.cell.payload && q.cell.payload.compact ? ' ws-cell-compact' : ''),
+        // (`mqt--<template>`, as the page's cell carries it: the measuring cell meets the same CL-40 tab inset, sheet-kit.css)
+        cellCls: (legacy ? 'mq-legacy' : '') + (q.cell && q.cell.payload && q.cell.payload.compact ? ' ws-cell-compact' : '') + (template ? ` mqt--${template}` : ''),
         key,
         canShow,
         // S2: the supports box (shared by every clone a role makes of this item) and what it holds.
