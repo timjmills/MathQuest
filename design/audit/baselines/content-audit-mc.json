@@ -1,14 +1,14 @@
 {
  "about": "ws-content-audit MC-ALL pinned findings (IMPROVEMENT_PLAN §1.6.3 H8; P-29 / RM-P-01): per skill, the item kinds (print format or kit template / answerType) whose WRITTEN answer is offered as a row of buttons on screen while the paper cell prints no choices. Each entry is a real defect to fix, not an exemption. A run FAILS on any (skill, kind) not listed here; a fixed one is listed as gone. Re-pin with node tests/scripts/ws-content-audit.cjs --mc-all --mc-write-baseline (a --category / --skill run merges); never add an entry by hand.",
- "generated": "2026-10-23",
+ "generated": "2026-10-25",
  "n": 60,
- "skills": 26,
+ "skills": 23,
  "keys": {
   "algebra_mixed:number_sense_all": [
    "make-a-ten/multiple-choice"
   ],
   "all_mixed:all_domains_mixed": [
-   "legacy/text"
+   "geometry-measure-angle/choice"
   ],
   "all_mixed:grade_1_mixed": [
    "geometry-partitions/text",
@@ -68,17 +68,8 @@
   "geo_mixed:measurement_all": [
    "measurement-estimate/multiple-choice"
   ],
-  "integers:mixed_integers": [
-   "wide/multiple-choice"
-  ],
-  "integers:ordering_rationals": [
-   "wide/multiple-choice"
-  ],
   "measurement:estimate_length": [
    "measurement-estimate/multiple-choice"
-  ],
-  "number_ops_mixed:operations_all": [
-   "wide/multiple-choice"
   ],
   "number_sense:make_a_ten": [
    "make-a-ten/multiple-choice"
