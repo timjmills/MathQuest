@@ -207,7 +207,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       const small = [];
       document.querySelectorAll(`#teacherMain .tv-screen[data-screen="${scr}"] button, #teacherMain .tv-screen[data-screen="${scr}"] a.tv-btn`).forEach((b) => {
         const r = b.getBoundingClientRect();
-        if (!r.width || b.getAttribute('aria-hidden') === 'true' || b.closest('[hidden]')) return;
+        // (a thumbnail's drawn item sits in an inert, aria-hidden stage: its sign buttons are a picture, not targets)
+        if (!r.width || b.closest('[aria-hidden="true"], [inert]') || b.closest('[hidden]')) return;
         if (r.height < 43.5 || r.width < 43.5) small.push(`${(b.textContent || b.getAttribute('aria-label') || '').trim().slice(0, 30)} ${Math.round(r.width)}x${Math.round(r.height)}`);
       });
       return { scroll: document.documentElement.scrollWidth - W, over: over.slice(0, 5), small: small.slice(0, 5) };
