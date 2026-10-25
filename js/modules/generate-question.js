@@ -636,7 +636,10 @@ function generateResolvedQuestion() {
 
     // Build category-specific mixed skills DYNAMICALLY from SKILLS structure
     // This auto-updates when new skills are added to any category
+    // (Every key below starts with mixed_: the scan over all of SKILLS is skipped for any other skill -
+    // it ran on every item and was a third of a detailed lesson's build time.)
     const categoryMixedSkills = {};
+    if (String(state.skill).startsWith('mixed_')) {
     for (const [catId, catSkills] of Object.entries(SKILLS)) {
         if (!Array.isArray(catSkills)) continue;
         const playable = getSkillsForCategory(catId);
@@ -656,6 +659,7 @@ function generateResolvedQuestion() {
         skills: getSkillsForCategory('measurement').filter(s =>
             s.startsWith('time_') || s.startsWith('elapsed_'))
     };
+    }
 
     // Check if this is a mixed skill and resolve it
     let actualSkill = state.skill;

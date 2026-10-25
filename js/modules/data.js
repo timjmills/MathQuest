@@ -1473,13 +1473,13 @@ export const SKILLS = {
 // These derive skill lists from DOMAINS/SKILLS so they auto-update when skills are added
 
 /** Check if a skill ID is a meta/mixed skill (not a direct question generator) */
+// Real playable skills that happen to start with 'mixed_' or end with '_all'
+const REAL_PLAYABLE_SKILLS = new Set([
+    'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual', 'mixed_nl_drag',
+    'coordinate_all',
+]);
 export function isMixedMetaSkill(v) {
-    // Real playable skills that happen to start with 'mixed_' or end with '_all'
-    const realPlayableSkills = new Set([
-        'mixed_add_sub', 'mixed_mult_div', 'mixed_improper_visual', 'mixed_nl_drag',
-        'coordinate_all',
-    ]);
-    if (realPlayableSkills.has(v)) return false;
+    if (REAL_PLAYABLE_SKILLS.has(v)) return false;
 
     if (v === 'custom_mixed') return true;
     if (v === 'mixed') return true;
