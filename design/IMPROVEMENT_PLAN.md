@@ -1282,6 +1282,30 @@ passed per lane-week against the rate before Wave 0.
    kept untouched. At the next reset (new week), review them and make a plan for what is kept, merged or built upon under the
    current plan.
 
+## Vocabulary redesign and the graphic library (owner, 2026-10-25) — PLANNED, build after the week resets
+
+Today a vocabulary item (e.g. "Math Vocabulary – Grade 1: Data (Match)", a True or False line) fills a whole cell on its own page.
+The owner's design, from answers asked one by one:
+
+1. **Two problem types, both one boxed cell:**
+   - **Match 3 pictures:** three words and three pictures (or problems, drawings, graphs) labelled A, B, C; the pupil
+     **writes the letter** in a box beside each word. On screen: the letter is chosen per word (same response, no MC swap).
+   - **1 picture, 3 words:** one picture with a three-word bank; the pupil **copies the right word** onto a line under the
+     picture. On screen: tapping the word drops it onto the line.
+2. **Per page, by type and grade:** Match 3 pictures = 4 per page. 1 picture, 3 words = 6–8 per page, larger for lower grades
+   (K–1: 4, grades 2–3: 6, grades 4–6: 8).
+3. **Pictures:** very high quality, black and white, drawn by the app. One shared set serves BOTH the vocabulary page that
+   opens a lesson AND the vocabulary practice.
+4. **A graphic library (owner rule):** every drawing, picture and graph that has passed 8/10 is saved once and reused across
+   the app (skills, lessons, vocabulary, teacher screens) instead of being redesigned each time. When no approved graphic
+   exists, make one, pass it at ≥ 8/10, and add it to the library. Each entry: id, what it shows, the vocabulary words it
+   illustrates, its drawing function (`sheet/` kit, no DOM), the sizes it is approved at, and where it is used. Starts from the
+   approved kit drawings (shapes, number lines, bar and picture graphs, clocks, coins, fraction models, base-10, arrays) and
+   the `design/wrm-visuals` catalogue (V### ids).
+5. **Order:** plan now; build after the reset. Start with one grade's vocabulary to pass 8/10, then the other grades on the
+   same drawings. A vocabulary problem type is a distinct task kind, so each is ALSO a findable preset skill (owner rule
+   2026-10-17), with standards, WRM, search terms and share codes.
+
 ## Glossary (for builders)
 
 - **Precritic** — the automatic checks a builder runs before an independent critic grades the work.
