@@ -685,7 +685,7 @@ const SIZES = [['big', 'Big'], ['medium', 'Medium'], ['small', 'Small']];
 const LAYOUTS = [['thumb', 'Thumbnail', 'grid'], ['list', 'List', 'list'], ['chip', 'Chip', 'layers']];
 const GRADES = [['K', 'K', 'Kindergarten'], ['1', '1', 'Grade 1'], ['2', '2', 'Grade 2'], ['3', '3', 'Grade 3'], ['4', '4', 'Grade 4'], ['5', '5', 'Grade 5'], ['6', '6', 'Grade 6'], ['M', 'Mixed levels', 'Mixed levels']];
 
-const G = { q: '', browse: 'area', grade: '2', size: 'medium', layout: 'thumb', limit: G_PAGE, open: {}, fw: 'ccss', status: 'all' };
+const G = { q: '', browse: 'area', grade: '2', grades: ['2'], size: 'medium', layout: 'thumb', limit: G_PAGE, open: {}, fw: 'ccss', status: 'all' };
 /** The grid's data-view: a card size for thumbnails, else 'list' / 'chip'. */
 const gv = () => (G.layout === 'thumb' ? G.size : G.layout);
 (function restoreG() {
@@ -693,13 +693,16 @@ const gv = () => (G.layout === 'thumb' ? G.size : G.layout);
     if (!s || typeof s !== 'object') return;
     if (BROWSE.some((b) => b[0] === s.browse)) G.browse = s.browse;
     if (GRADES.some((g) => g[0] === s.grade)) G.grade = s.grade;
+    const gs = Array.isArray(s.grades) ? GRADES.map((g) => g[0]).filter((g) => s.grades.includes(g)) : [];
+    G.grades = gs.length ? gs : [G.grade];
+    G.grade = G.grades[0];
     if (SIZES.some((v) => v[0] === s.size)) G.size = s.size;
     if (LAYOUTS.some((v) => v[0] === s.layout)) G.layout = s.layout;
     if (s.view === 'list' && !s.layout) G.layout = 'list';
     if (s.fw === 'ee') G.fw = 'ee';
     if (['all', 'gaps', 'covered'].includes(s.status)) G.status = s.status;
 })();
-function persistG() { writeStore(G_KEY, { browse: G.browse, grade: G.grade, size: G.size, layout: G.layout, fw: G.fw, status: G.status }); }
+function persistG() { writeStore(G_KEY, { browse: G.browse, grade: G.grade, grades: G.grades, size: G.size, layout: G.layout, fw: G.fw, status: G.status }); }
 
 let groot = null;
 const gkey = (s) => `${s.categoryId}:${s.skillId}`;
@@ -725,6 +728,36 @@ const stdSort = (x, y) => (stdOf(x) || 'zz').localeCompare(stdOf(y) || 'zz', 'en
 function wholeSet(g, a) {
     return skillCatalogue().filter((s) => s.level === g && !adOf(s).pool && adOf(s).area !== 'WORDS' && (!a || adOf(s).area === a)
         && !/\((no pictures|no visuals)\)/i.test(s.label)).map(gkey);
+}
+
+// Several grades at once (owner 2026-10-25: "select multiple grades or all grades"): G.grades in pill order;
+// G.grade is the first one (the White Rose and Standard views draw one grade at a time).
+const ALL_GRADES = GRADES.map((g) => g[0]);
+const allOn = () => ALL_GRADES.every((g) => G.grades.includes(g));
+const multi = () => G.grades.length > 1;
+const realGrades = () => G.grades.filter((g) => g !== 'M');
+/** One of each skill across every selected grade (or one area of them). */
+const wholeSetG = (a) => realGrades().flatMap((g) => wholeSet(g, a));
+function gradesName() {
+    if (allOn()) return 'All grades';
+    if (!multi()) return gradeName(G.grade);
+    const ls = G.grades.map((g) => (g === 'K' ? 'K' : g === 'M' ? 'Mixed levels' : g));
+    return `Grades ${ls.slice(0, -1).join(', ')} and ${ls[ls.length - 1]}`;
+}
+function pickGrade(g) {
+    if (g === 'ALL') G.grades = allOn() ? ['2'] : ALL_GRADES.slice();
+    else if (allOn()) G.grades = [g];                           // from All, a grade means just that grade
+    else if (G.grades.includes(g)) { if (multi()) G.grades = G.grades.filter((x) => x !== g); }
+    else G.grades = ALL_GRADES.filter((x) => x === g || G.grades.includes(x));
+    G.grade = G.grades[0];
+}
+/** Draw `fn` once per selected grade (one at a time), each under its grade heading when there are several. */
+function perGrade(fn) {
+    const gs = realGrades().length ? realGrades() : G.grades;
+    if (gs.length === 1) { G.grade = gs[0]; const h = fn(); G.grade = G.grades[0]; return h; }
+    const out = gs.map((g) => { G.grade = g; return `<h2 class="ts-grade-head ts-grade-sec">${gbadge(g, true)}</h2>${fn()}`; }).join('');
+    G.grade = G.grades[0];
+    return out;
 }
 
 /* ------------------------------------------------------------------ public */
@@ -766,7 +799,7 @@ function gSyncControls() {
     const searching = !!G.q.trim();
     r.querySelector('#tsBrowse').innerHTML = BROWSE.map(([k, l]) => `<button type="button" data-act="browse" data-arg="${k}" ${pressedA(G.browse === k)}>${l}</button>`).join('');
     r.querySelector('#tsViews').innerHTML = SIZES.map(([k, l]) => `<button type="button" data-act="size" data-arg="${k}" ${pressedA(G.size === k)}${G.layout === 'thumb' ? '' : ' title="The size of the thumbnail cards"'}>${l}</button>`).join('');
-    r.querySelector('#tsGrades').innerHTML = GRADES.map(([g, l, long]) => `<button type="button" class="ts-pill" data-act="grade" data-arg="${g}" data-grade="${g}" ${pressedA(G.grade === g && !searching)}${l !== long ? ` aria-label="${esc(long)}"` : ''}><i class="ts-gsw" aria-hidden="true"></i>${esc(l)}</button>`).join('');
+    r.querySelector('#tsGrades').innerHTML = `<button type="button" class="ts-pill ts-pill-all" data-act="grade" data-arg="ALL" ${pressedA(allOn() && !searching)} title="Every grade at once">All</button>` + GRADES.map(([g, l, long]) => `<button type="button" class="ts-pill" data-act="grade" data-arg="${g}" data-grade="${g}" ${pressedA(G.grades.includes(g) && !allOn() && !searching)}${l !== long ? ` aria-label="${esc(long)}"` : ''}><i class="ts-gsw" aria-hidden="true"></i>${esc(l)}</button>`).join('');
     r.querySelector('#tsSearchNote').textContent = searching ? 'Searching all grades' : '';
     r.classList.toggle('ts-searching', searching);
 }
@@ -788,26 +821,61 @@ function gCard(s) {
         return `<button type="button" class="ts-card ts-chipcard" data-domain="${a}" data-act="tick" data-skill="${esc(k)}" ${pressedA(on)}${tvpAttrs(s.categoryId, s.skillId)}>${gbadge(s.level)}<span class="ts-chip-ic">${areaIcon(a, 16)}</span><span class="ts-card-name">${esc(s.label).replace(/\//g, '/<wbr>')}</span>${tick}</button>`;
     }
     const list = v === 'list';
-    const thumb = list ? '' : `<span class="ts-thumb" data-ts-thumb="${esc(s.categoryId)}|${esc(s.skillId)}" data-ts-size="${v}" aria-hidden="true"></span>`;
+    const thumb = list ? '' : `<span class="ts-thumb" data-ts-thumb="${esc(s.categoryId)}|${esc(s.skillId)}" data-ts-size="${v}"${tvpAttrs(s.categoryId, s.skillId, trayOpts(s.categoryId, s.skillId))} data-tvp-flip aria-hidden="true"></span>`;
     return `<button type="button" class="ts-card" data-domain="${a}" data-act="tick" data-skill="${esc(k)}" ${pressedA(on)}${list ? tvpAttrs(s.categoryId, s.skillId) : ''}>`
         + `<span class="ts-card-top">${gbadge(s.level, !list)}<span class="ts-area-tag">${areaIcon(a, 16)}${esc(AREAS[a].short)}</span>${d.pool ? '<span class="ts-mixed">mixed</span>' : ''}</span><span class="ts-card-name">${esc(s.label).replace(/\//g, '/<wbr>')}</span>${thumb}`
         + `${tick}</button>`;
 }
 
 /** A maths-area group: the band (icon, name, count, + Add whole area) and its cards (or grade sub-groups). */
-function gGroup(a, list, { cross = false, addArea = false, budget }) {
+function gGroup(a, list, { cross = false, addArea = false, budget, planned = [] }) {
     const shown = list.slice(0, Math.max(0, budget.left));
     budget.left -= shown.length;
-    if (!shown.length) return '';
+    if (!shown.length && !planned.length) return '';
     let body;
     if (cross && new Set(shown.map((s) => s.level)).size > 1) {
         const gs = [];
         shown.forEach((s) => { let g = gs.find((x) => x.g === s.level); if (!g) gs.push(g = { g: s.level, l: [] }); g.l.push(s); });
         body = gs.map((g) => `<h3 class="ts-grade-head">${gbadge(g.g, true)}<span class="ts-count">${plural2(g.l.length, 'skill')}</span></h3><div class="ts-grid" data-view="${gv()}">${g.l.map(gCard).join('')}</div>`).join('');
-    } else body = `<div class="ts-grid" data-view="${gv()}">${shown.map(gCard).join('')}</div>`;
-    const n = addArea ? wholeSet(G.grade, a).length : 0;
+    } else body = shown.length ? `<div class="ts-grid" data-view="${gv()}">${shown.map(gCard).join('')}</div>` : '';
+    if (planned.length) body += `<h3 class="ts-grade-head ts-plan-head"><span class="ts-plan-tag">Yet to be built</span><span class="ts-count">${plural2(planned.length, 'skill')} planned</span></h3><div class="ts-grid" data-view="${gv()}">${planned.map(planCard).join('')}</div>`;
+    const n = addArea ? wholeSetG(a).length : 0;
     const add = addArea && n > 1 ? `<button type="button" class="ts-btn ts-add" data-act="addarea" data-arg="${a}">+ Add whole area (${n})</button>` : '';
-    return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREAS[a].long, plural2(list.length, 'skill'), layoutSegHTML() + add)}${body}</section>`;
+    return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREAS[a].long, plural2(list.length, 'skill') + (planned.length ? ` · ${planned.length} yet to be built` : ''), layoutSegHTML() + add)}${body}</section>`;
+}
+
+/* ------------------------------------------------------------------ "Yet to be built" (owner 2026-10-25)
+   Every NEW skill on the build list ("All skills to be made") gets a card in its grade and area, outlined in orange.
+   It cannot go in the tray; pressing it opens its entry in the build list. */
+const PLAN_AREA = { CC: 'CC', OA: 'OA', NBT: 'NBT', NF: 'NF', MD: 'MEAS', G: 'G', X: 'RPNS' };
+let PLAN = null;
+let planLoading = null;
+function loadPlan() {
+    if (PLAN || planLoading) return;
+    planLoading = import('./teacher-todo.js').then((m) => m.plannedSkills()).then((list) => {
+        PLAN = list || [];
+        if (groot && groot.isConnected && G.browse === 'area' && !G.q.trim()) gRender();
+    }).catch((e) => { console.warn('[teacher-library] plan', e); planLoading = null; });
+}
+/** The planned skills in the selected grades, by area (each listed once, under the first selected grade it reaches). */
+function plannedByArea() {
+    if (!PLAN) { loadPlan(); return {}; }
+    const by = {};
+    PLAN.forEach((e) => {
+        const g = e.grades.find((x) => G.grades.includes(x));
+        if (!g) return;
+        const a = PLAN_AREA[e.domain] || 'NOSTD';
+        (by[a] = by[a] || []).push({ ...e, level: g });
+    });
+    return by;
+}
+function planCard(e) {
+    const a = PLAN_AREA[e.domain] || 'NOSTD';
+    const v = gv();
+    const head = `${gbadge(e.level, v !== 'chip')}<span class="ts-area-tag">${areaIcon(a, 16)}${esc(AREAS[a].short)}</span>`;
+    const what = v === 'thumb' || v === 'big' || v === 'medium' || v === 'small' ? `<span class="ts-plan-what">${esc(e.teaches || 'Planned skill.')}</span>` : '';
+    return `<button type="button" class="ts-card ts-plancard" data-domain="${a}" data-act="todo" data-arg="${esc(e.id)}" title="Yet to be built: open it in All skills to be made">`
+        + `<span class="ts-card-top">${head}<span class="ts-plan-tag">Yet to be built</span></span><span class="ts-card-name">${esc(e.name)}</span>${what}</button>`;
 }
 
 /** An area band: the icon tile, the title with its count under it, then (on the right) the view and the add button. */
@@ -842,22 +910,24 @@ function gRender() {
                 + order.map((a) => gGroup(a, by[a], { cross: true, budget })).join('') + moreHTML(hits.length - G.limit);
         }
     } else if (G.browse === 'area') {
-        const list = skillCatalogue().filter((s) => s.level === G.grade);
-        eyebrow.textContent = `${gradeName(G.grade)} • ${plural2(list.length, 'skill')}`;
+        const list = skillCatalogue().filter((s) => G.grades.includes(s.level));
+        eyebrow.textContent = `${gradesName()} • ${plural2(list.length, 'skill')}`;
         const { by } = byArea(list);
-        const whole = G.grade !== 'M' ? wholeSet(G.grade) : [];
+        const whole = wholeSetG();
+        const nG = realGrades().length;
         const budget = { left: G.limit };
-        const order = AREA_ORDER.filter((a) => by[a]);
-        order.forEach((a) => by[a].sort(stdSort));
-        html = (whole.length ? `<div class="ts-add-row"><button type="button" class="ts-btn ts-add" data-act="addgrade">${icon('plus', 18)}<span>Add whole grade</span></button><span class="ts-note">Add ${whole.length} ${esc(gradeName(G.grade))} skills to your tray (one of each: no Mixed pools or Maths words)</span></div>` : '')
-            + order.map((a) => gGroup(a, by[a], { cross: G.grade === 'M', addArea: G.grade !== 'M', budget })).join('')
+        const plan = plannedByArea();
+        const order = AREA_ORDER.filter((a) => by[a] || plan[a]);
+        order.forEach((a) => { by[a] = (by[a] || []).sort(stdSort); });
+        html = (whole.length ? `<div class="ts-add-row"><button type="button" class="ts-btn ts-add" data-act="addgrade">${icon('plus', 18)}<span>${nG > 1 ? `Add all ${nG} grades` : 'Add whole grade'}</span></button><span class="ts-note">Add ${whole.length} ${esc(nG > 1 ? gradesName() : gradeName(realGrades()[0]))} skills to your tray (one of each: no Mixed pools or Maths words)</span></div>` : '')
+            + order.map((a) => gGroup(a, by[a], { cross: multi() || G.grade === 'M', addArea: nG > 0, budget, planned: plan[a] || [] })).join('')
             + moreHTML(list.length - G.limit);
     } else if (G.browse === 'wrm') {
-        eyebrow.textContent = `${gradeName(G.grade)} · White Rose steps`;
-        html = wrmHTML();
+        eyebrow.textContent = `${gradesName()} · White Rose steps`;
+        html = perGrade(wrmHTML);
     } else if (G.browse === 'std') {
-        eyebrow.textContent = `${gradeName(G.grade)} · ${G.fw === 'ee' ? 'Essential Elements' : 'Common Core standards'}`;
-        html = stdHTML();
+        eyebrow.textContent = `${gradesName()} · ${G.fw === 'ee' ? 'Essential Elements' : 'Common Core standards'}`;
+        html = perGrade(stdHTML);
     } else if (G.browse === 'map') {
         eyebrow.textContent = 'MAP strands · every RIT band';
         html = mapHTML();
@@ -1065,16 +1135,17 @@ onTrayChange(syncTicks);
 function gAction(act, arg, b) {
     switch (act) {
         case 'tick': trayToggle(b.dataset.skill); return;
+        case 'todo': import('./teacher-todo.js').then((m) => m.openTodo(arg)); return;
         case 'browse': G.browse = arg; G.q = ''; G.limit = G_PAGE; persistG(); break;
-        case 'grade': G.grade = arg; G.q = ''; G.limit = G_PAGE; persistG(); break;
+        case 'grade': pickGrade(arg); G.q = ''; G.limit = G_PAGE; persistG(); break;
         case 'size': G.size = arg; if (G.layout !== 'thumb') G.layout = 'thumb'; persistG(); break;
         case 'layout': G.layout = arg; persistG(); break;
         case 'fw': G.fw = arg === 'ee' ? 'ee' : 'ccss'; persistG(); break;
         case 'status': G.status = arg; persistG(); break;
         case 'more': G.limit += G_PAGE; break;
         case 'showall': G.open[arg] = true; break;
-        case 'addgrade': trayAddMany(wholeSet(G.grade), `Whole ${gradeName(G.grade)}`); return;
-        case 'addarea': trayAddMany(wholeSet(G.grade, arg), `${AREAS[arg].name}, ${gradeName(G.grade)}`); return;
+        case 'addgrade': trayAddMany(wholeSetG(), realGrades().length > 1 ? gradesName() : `Whole ${gradeName(realGrades()[0])}`); return;
+        case 'addarea': trayAddMany(wholeSetG(arg), `${AREAS[arg].name}, ${realGrades().length > 1 ? gradesName() : gradeName(realGrades()[0])}`); return;
         case 'addkeys': trayAddMany(arg.split(',').filter(Boolean), b.dataset.what || 'These skills'); return;
         case 'maptask': { const t = MAPT && MAPT[Number(arg)]; if (t) trayAddMany(t.skills, t.task); return; }
         case 'openset': {

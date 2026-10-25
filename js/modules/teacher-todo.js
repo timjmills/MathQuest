@@ -58,6 +58,14 @@ function load() {
     return loading;
 }
 
+/** The NEW skills still to build (kind 'new'), in teachers' words, for the Skills screen's "Yet to be built" cards
+ *  (owner 2026-10-25). Resolves to [{ id, name, teaches, grades, domain }]. */
+export function plannedSkills() {
+    return load().then(() => (queue ? queue.items.filter((e) => e.kind === 'new').map((e) => ({
+        id: e.id, name: todoName(e), teaches: todoTeaches(e), grades: e.grades.slice(), domain: e.domain,
+    })) : []));
+}
+
 /** T6 redirect: the lesson that holds a "Skills to be made" entry ({site} or {step}), or null (then the list). */
 export function todoLessonFor(id) {
     return load().then(() => {

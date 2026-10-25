@@ -486,3 +486,22 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
   #teacherApp .ts-grid[data-view="list"] .ts-card-top { padding-right: var(--sp-48); }
   #teacherApp .ts-grid[data-view="small"] .ts-area-tag { display: none; }
 }
+
+/* Thumbnails show the whole problem (owner 2026-10-25: "make the thumbnails zoom smaller or be more square"):
+   squarer boxes; teacher-chip.js lets the item shrink further (MIN_PX) before anything is cut. */
+#teacherApp .ts-thumb { height: auto; aspect-ratio: 16 / 10; }
+#teacherApp .ts-grid[data-view="big"] .ts-thumb { height: auto; aspect-ratio: 4 / 3; }
+#teacherApp .ts-grid[data-view="small"] .ts-thumb { height: auto; aspect-ratio: 16 / 10; }
+
+/* Several grades at once (owner 2026-10-25): the All pill, and one heading per grade in the White Rose and Standard views */
+#teacherApp .ts-pill-all { min-width: 56px; }
+#teacherApp .ts-grade-sec { margin: var(--sp-24) 0 var(--sp-8); }
+
+/* "Yet to be built" cards (owner 2026-10-25): the planned skills from the build list, outlined in orange */
+#teacherApp .ts-plancard { border: 2px solid #E07B00; box-shadow: none; cursor: pointer; }
+#teacherApp .ts-plancard:hover { border-color: #B85F00; }
+#teacherApp .ts-plan-tag { display: inline-flex; align-items: center; height: var(--sp-24); padding: 0 var(--sp-8); border-radius: var(--r-8); background: #FCE3C4; border: var(--line-1) solid #E07B00; color: #1A1614; font-family: var(--font-ui); font-size: var(--fs-12); font-weight: var(--fw-700); white-space: nowrap; }
+#teacherApp .ts-plancard .ts-card-top .ts-plan-tag { margin-left: auto; }
+#teacherApp .ts-plan-what { display: block; flex: 1 0 auto; padding: var(--sp-8); border: var(--line-1) dashed #E07B00; border-radius: var(--r-8); background: var(--paper); color: var(--text-2); font-size: var(--fs-14); line-height: 1.35; text-align: left; }
+#teacherApp .ts-plan-head { gap: var(--sp-8); }
+#teacherApp .ts-plan-what { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; flex: 0 1 auto; }

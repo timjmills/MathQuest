@@ -434,6 +434,21 @@ let shownByFocus = false;   // the open preview came from keyboard focus (not ho
 let lastHide = 0;
 let pointer = { x: -1, y: -1 };
 let installed = false;
+// A thumbnail picture (data-tvp-flip, owner 2026-10-25): a larger preview that flips through several problems
+// of the skill while the pointer stays on the picture; ← / → step by hand.
+const FLIP_N = 5;
+const FLIP_MS = 2200;
+let flipTimer = null;
+let flip = null;            // { cat, sk, opts, i }
+function flipTo(i) {
+    if (!flip || !pop) return;
+    flip.i = (i + FLIP_N) % FLIP_N;
+    const fr = pop.querySelector('.tvp-pop-frame');
+    if (fr) { fr.innerHTML = ''; mountSample(fr, flip.cat, flip.sk, flip.opts, flip.i); }
+    const c = pop.querySelector('.tvp-pop-count');
+    if (c) c.innerHTML = `<span>Problem ${flip.i + 1} of ${FLIP_N}</span><span class="tvp-dots" aria-hidden="true">${Array.from({ length: FLIP_N }, (_, k) => `<i${k === flip.i ? ' class="on"' : ''}></i>`).join('')}</span>`;
+}
+function stopFlip() { clearInterval(flipTimer); flipTimer = null; flip = null; }
 
 function triggerOf(node) {
     const el = node && node.nodeType === 1 ? node : node && node.parentElement;
@@ -526,7 +541,14 @@ function show(t, focusEl) {
         fill(t);
         const { cat, sk, opts } = parseTrigger(t);
         mountSample(p.querySelector('.tvp-pop-frame'), cat, sk, opts);
+        if (t.hasAttribute('data-tvp-flip')) {
+            p.querySelector('.tvp-pop-frame').insertAdjacentHTML('afterend', '<div class="tvp-pop-count"></div>');
+            flip = { cat, sk, opts, i: 0 };
+            flipTo(0);
+            flipTimer = setInterval(() => flipTo(flip ? flip.i + 1 : 0), FLIP_MS);
+        }
     }
+    p.classList.toggle('is-flip', !!flip);
     place(t);
     shownFor = t;
     describedEl = focusEl || t;
@@ -537,6 +559,7 @@ function show(t, focusEl) {
 
 function hide(silent) {
     clearTimeout(timer);
+    stopFlip();
     timer = null;
     if (describedEl) {
         const rest = (describedEl.getAttribute('aria-describedby') || '').split(/\s+/).filter((x) => x && x !== POP_ID);
@@ -620,6 +643,12 @@ export function installPreview() {
     });
 
     document.addEventListener('keydown', (e) => {
+        if (flip && pop && !pop.hidden && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+            e.preventDefault();
+            clearInterval(flipTimer); flipTimer = null;     // stepping by hand stops the automatic flip
+            flipTo(flip.i + (e.key === 'ArrowRight' ? 1 : -1));
+            return;
+        }
         if (e.key !== 'Escape' || !pop || pop.hidden) {
             if (e.key === 'Escape') clearTimeout(timer);
             return;

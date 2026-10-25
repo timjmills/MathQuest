@@ -28,7 +28,7 @@ const INK = '#1A1614';
    sheet's preview 12); what still does not fit is cut on the right / bottom (anchored at the drawing's left / top, so
    every line keeps its start) and the cut edge fades. The measure is cached per skill + options + example. */
 
-const MIN_PX = { big: 12, medium: 11, small: 9, preview: 10 };
+const MIN_PX = { big: 10, medium: 9, small: 7, preview: 10 };   // owner 2026-10-25: thumbnails zoom out so the whole problem shows
 const MEAS = new Map();
 const MEAS_MAX = 1200;
 const mkey = (c, s, opts, ex) => `${c}|${s}|${opts && Object.keys(opts).length ? JSON.stringify(opts) : ''}|${ex || 0}`;

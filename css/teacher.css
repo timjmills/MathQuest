@@ -923,3 +923,11 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 .tv-btn.tv-btn-block[data-act="print"], #teacherApp .tv-btn.tv-btn-block[data-act="print"] { white-space: normal; height: auto; min-height: 48px; padding: 6px 16px; text-align: center; }
 .tv-btn.tv-btn-block[data-act="print"] > span { min-width: 0; overflow-wrap: anywhere; }
 .tv-btn.tv-btn-block[data-act="print"] .tv-print-l { white-space: nowrap; }
+
+/* The thumbnail preview (owner 2026-10-25): larger, and it flips through several problems */
+.tvp-pop.is-flip { width: 520px; }
+.tvp-pop.is-flip .tvp-pop-frame { height: 300px; }
+.tvp-pop-count { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; line-height: 16px; font-weight: 700; color: var(--tv-text-2); }
+.tvp-dots { display: inline-flex; gap: 6px; }
+.tvp-dots i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--tv-text-2); }
+.tvp-dots i.on { background: var(--tv-text); border-color: var(--tv-text); }
