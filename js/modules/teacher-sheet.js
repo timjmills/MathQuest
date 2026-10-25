@@ -32,7 +32,7 @@ import {
 } from './teacher-ui.js';
 import { areaOf, AREAS, AREA_ORDER, areaIcon } from './teacher-areas.js';
 import { planPages, planCounts, PER_PAGE, keyOf } from './teacher-plan.js';
-import { trayGroups, trayLocks } from './teacher-tray.js';
+import { trayGroups, trayLocks, editShareInPlace, setShareFromText, shareHeldText } from './teacher-tray.js';
 import { printHtml } from './teacher-print.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
@@ -519,6 +519,7 @@ function onKey(e) {
     if (!root) return;
     if (e.key === 'Escape') {
         if (document.getElementById('tvBoardOverlay')) return;
+        if (e.target && e.target.classList && e.target.classList.contains('tv-share-in')) return;   // the share input cancels itself
         e.preventDefault();
         if (S.popup) { S.popup = null; renderPopup(); return; }
         close();
@@ -613,7 +614,7 @@ function optionsHTML() {
     if (p.error && (p.needPages || p.needTotal)) h += `<div class="tvs-raise"><button type="button" class="tvs-btn" data-act="raise" data-v="${p.needPages ? 'p' + p.needPages : 't' + p.needTotal}">${p.needPages ? `Raise to ${p.needPages} pages` : `Raise the total to ${p.needTotal}`}</button></div>`;
     // How often
     if (list.length > 1 && !isBig(list)) {
-        h += row('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="tvs-often">${list.map((x) => `<div class="tvs-often-row"><span class="tvs-often-name" data-domain="${esc(x.area)}">${gradeBadge(x.grade)}<span>${esc(x.label)}</span></span>${x.count > 0 || x.lockPct !== undefined ? heldHTML(x) : seg('often', levelOf(x, list), [['1', 'Less'], ['2', 'Equal'], ['3', 'More']], 'How often: ' + x.label, ` data-key="${esc(keyOf(x))}"`)}</div>`).join('')}</div>`);
+        h += row('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="tvs-often">${list.map((x) => `<div class="tvs-often-row"><span class="tvs-often-name" data-domain="${esc(x.area)}">${gradeBadge(x.grade)}<span>${esc(x.label)}</span></span><span class="tvs-often-ctl">${shareBtnHTML(x, p)}${x.count > 0 || x.lockPct !== undefined ? (S.release === keyOf(x) ? heldHTML(x) : '') : seg('often', levelOf(x, list), [['1', 'Less'], ['2', 'Equal'], ['3', 'More']], 'How often: ' + x.label, ` data-key="${esc(keyOf(x))}"`)}</span></div>`).join('')}</div>`);
     } else if (isBig(list)) {
         const pct = p.pct || {};
         h += row('How often does each area come up?', 'Set in the tray: one place for every skill’s How often', `<table class="tvs-areas"><tbody>${byArea(list.filter((x) => !x.leftOut)).map((a) => `<tr data-domain="${esc(a.area)}"><th scope="row">${areaIcon(a.area, 18)}<span>${esc(AREAS[a.area].short)}</span></th><td>${a.list.length} skill${a.list.length > 1 ? 's' : ''}</td><td>${Math.round(a.list.reduce((t, x) => t + (pct[keyOf(x)] || 0), 0))} %</td></tr>`).join('')}</tbody></table>${typeof window.tvOpenTray === 'function' ? '<button type="button" class="tvs-btn" data-act="tray">Fine-tune in the tray ▸</button>' : ''}`);
@@ -647,6 +648,16 @@ function optionsHTML() {
     }
     h += moreHTML();
     return h;
+}
+/** The skill's share as a button typed over in place ("≈ 6 of 18", "40 % 🔒"); teacher-tray.js parses and checks it. */
+function shareBtnHTML(x, p) {
+    const k = keyOf(x);
+    const held = x.count > 0 ? String(x.count) : x.lockPct !== undefined ? `${Math.round(x.lockPct)} %` : null;
+    const n = p && p.byKey ? (p.byKey[k] || 0) : null;
+    const txt = held !== null ? `${esc(held)} ${icon('lock', 14)}` : n === null ? '' : `≈ ${n}<span class="tvs-share-of"> of ${p.total}</span>`;
+    if (!txt) return '';
+    const said = held !== null ? `held at ${held}` : `about ${n} of ${p.total}`;
+    return `<button type="button" class="tvs-btn tvs-share-btn${held !== null ? ' is-held' : ''}" data-act="shareedit" data-v="${esc(k)}" data-share-key="${esc(k)}" aria-label="Share of ${esc(x.label)}: ${esc(said)}. Press to type a number of problems or a %">${txt}</button>`;
 }
 /** A skill held at an exact count ("6 🔒") or a % ("40 % 🔒"): changing it first asks "Release the 6?". */
 function heldHTML(x) {
@@ -997,6 +1008,17 @@ function onClick(e) {
         case 'mode': if (S.sheet === 'quiz') S.quiz.mode = v; else S.opts.mode = v; changed(); return;
         case 'raise': { const n = Number(v.slice(1)); if (v[0] === 'p') { if (S.sheet === 'quiz') { S.quiz.mode = 'pages'; S.quiz.pages = n; } else { S.opts.mode = 'pages'; S.opts.pages = n; touch('pages'); } } else if (S.sheet === 'quiz') S.quiz.n = n; else S.opts.nTotal = n; changed(); return; }
         case 'lower': { const it = currentSet().find((x) => `${x.categoryId}:${x.skillId}` === v); if (it) it.count = Math.max(0, Number(b.dataset.n) || 0) || undefined; window.skillQueue = [...currentSet()]; changed(); return; }
+        case 'shareedit': {
+            const x = items().find((y) => keyOf(y) === v);
+            editShareInPlace(b, x ? x.label : v, shareHeldText(v), (text, refocus) => {
+                const err = setShareFromText(v, text);
+                window.skillQueue = [...currentSet()];
+                changed();
+                if (err) toast(err);
+                if (refocus) { const nb = root && root.querySelector(`[data-share-key="${CSS.escape(v)}"]`); if (nb) nb.focus(); }
+            });
+            return;
+        }
         case 'askrelease': S.release = v; renderMain(); return;
         case 'keep': S.release = null; renderMain(); return;
         case 'release': { const it = currentSet().find((x) => `${x.categoryId}:${x.skillId}` === v); if (it) { delete it.count; delete it.lockPct; } S.release = null; window.skillQueue = [...currentSet()]; changed(); return; }

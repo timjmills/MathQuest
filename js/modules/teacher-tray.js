@@ -471,6 +471,77 @@ function release(scope) {
     T.lockErr = '';
 }
 
+/* ================================================================= a share typed in place (owner 2026-10-25) */
+
+/** What a typed share means: '' → back to Equal, '40%' / '40 %' → a held %, '6' → an exact count of problems. */
+export function parseShare(text) {
+    const t = String(text == null ? '' : text).trim().replace(',', '.');
+    if (!t) return { kind: 'equal' };
+    const m = t.match(/^(\d+(?:\.\d+)?)\s*(%?)$/);
+    if (!m) return { kind: 'bad' };
+    return { kind: m[2] ? 'pct' : 'count', n: Number(m[1]) };
+}
+/** Set one skill's share from typed text, with the tray's own checks; returns the refusal ('' when it took). */
+export function setShareFromText(key, text) {
+    const it = itemOf(key);
+    if (!it) return '';
+    const p = parseShare(text);
+    if (p.kind === 'bad') T.lockErr = 'Not set: type a number of problems (6) or a % (40 %).';
+    else if (p.kind === 'pct' && p.n > 100) T.lockErr = 'Not set: a share can be at most 100 %.';
+    else if (p.kind === 'equal') { if (heldText(it) !== null) it.weight = 2; release(`k:${key}`); }
+    else if (p.kind === 'pct') setLock(`k:${key}`, p.n);
+    else setCount(key, p.n);
+    const err = T.lockErr;
+    changed();
+    return err;
+}
+/** The text a skill's held share starts from in the input ('40 %' | '6' | ''). */
+export function shareHeldText(key) { return heldText(itemOf(key)) || ''; }
+/**
+ * Turn a share <button> into an <input inputmode="decimal"> in place. Enter or blur commits (commit(text, refocus)),
+ * Escape cancels and gives the button its focus back. An unchanged value commits nothing.
+ */
+export function editShareInPlace(btn, label, current, commit) {
+    if (!btn || !btn.parentNode) return;
+    const wrap = document.createElement('label');
+    wrap.className = 'tv-share-edit';
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.setAttribute('inputmode', 'decimal');
+    inp.className = 'tv-share-in';
+    inp.value = current || '';
+    inp.placeholder = '6 or 40 %';
+    inp.setAttribute('aria-label', `Share of ${label}: type a number of problems or a %`);
+    const hint = document.createElement('span');
+    hint.className = 'tv-share-hint';
+    hint.textContent = 'problems or %';
+    hint.setAttribute('aria-hidden', 'true');
+    wrap.append(inp, hint);
+    btn.replaceWith(wrap);
+    inp.focus();
+    try { inp.select(); } catch (e) { /* */ }
+    let done = false;
+    const finish = (ok, refocus) => {
+        if (done) return;
+        done = true;
+        if (!ok || inp.value.trim() === String(current || '').trim()) { wrap.replaceWith(btn); if (refocus) btn.focus(); return; }
+        commit(inp.value, refocus);
+    };
+    inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); finish(true, true); }
+        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); finish(false, true); }
+    });
+    inp.addEventListener('blur', () => finish(true, false));
+}
+function shareBtn(k, p) {
+    const h = heldText(itemOf(k));
+    const n = p.byKey ? (p.byKey[k] || 0) : null;
+    const label = infoOf(k).label;
+    const txt = h !== null ? `${esc(h)}${icon('lock', 12)}` : n === null ? `${Math.round(p.pct[k] || 0)} %` : `≈ ${n}<span class="tt-of"> of ${p.total}</span>`;
+    const said = h !== null ? `held at ${h}` : n === null ? `${Math.round(p.pct[k] || 0)} %` : `about ${n} of ${p.total}`;
+    return `<button type="button" class="tt-share tv-share-btn${h !== null ? ' is-held' : ''}" data-act="shareedit" data-arg="${esc(k)}" data-share-key="${esc(k)}" aria-label="Share of ${esc(label)}: ${esc(said)}. Press to type a number of problems or a %">${txt}</button>`;
+}
+
 /* ================================================================= the Undo note */
 
 let undoTimer = 0;
@@ -719,7 +790,8 @@ function rowHTML(k, p, oneGrade) {
     const tags = `<span class="tt-tags">${changedOpts ? '<span class="tt-tag">changed</span>' : ''}${held ? `<span class="tt-tag tt-tag-w tt-tag-held">${esc(heldT)}${icon('lock', 12)}</span>` : w !== 2 ? `<span class="tt-tag tt-tag-w">${wWord(w)}</span>` : ''}</span>`;
     const n = p.byKey ? (p.byKey[k] || 0) : null;
     const sc = `k:${k}`;
-    const share = `<span class="tt-share">${n === null ? `${Math.round(p.pct[k] || 0)} %` : `≈ ${n}<span class="tt-of"> of ${p.total}</span>`}</span>`;
+    const share = shareBtn(k, p);
+    const tagsList = `<span class="tt-tags">${changedOpts ? '<span class="tt-tag">changed</span>' : ''}${!held && w !== 2 ? `<span class="tt-tag tt-tag-w">${wWord(w)}</span>` : ''}</span>`;
     const detail = !T.detailed ? '' : T.releaseAsk === sc ? `<span class="tt-det">${releaseHTML(sc, heldT)}${share}</span>`
         : `<span class="tt-det"><span class="tt-stepper"><button type="button" data-act="wstep" data-arg="${esc(k)}|-1" aria-label="Less weight for ${esc(label)}"${w <= 0 || held ? ' disabled' : ''}>−</button><output>${w}</output><button type="button" data-act="wstep" data-arg="${esc(k)}|1" aria-label="More weight for ${esc(label)}"${w >= 10 || held ? ' disabled' : ''}>+</button></span>${countCtl(k, n)}${pctCtl(sc, p.pct[k] || 0)}${share}</span>`;
     const x = `<button type="button" class="tt-btn tt-icon" data-act="tpremove" data-arg="k:${esc(k)}" aria-label="Take ${esc(shortName(label))} out of the tray">${icon('x', 18)}</button>`;
@@ -731,7 +803,7 @@ function rowHTML(k, p, oneGrade) {
     if (T.tview === 'thumbs' && !T.detailed) {
         return `<div class="tt-item tt-pthumb${w === 0 ? ' out' : ''}" data-domain="${a}" data-skill="${esc(k)}"><div class="tt-pthumb-top">${selBox(`k:${k}`, label)}${oneGrade ? '' : gbadge(g)}<button type="button" class="tt-name-btn" data-act="chip" data-arg="${esc(k)}">${esc(shortName(label))}</button>${x}</div><span class="tt-pthumb-pic ts-thumb" data-ts-thumb="${esc(c)}|${esc(s)}" data-ts-size="M" aria-hidden="true"></span>${tags}</div>`;
     }
-    return `<div class="tt-row${w === 0 ? ' out' : ''}" data-domain="${a}"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(g)}${selBox(`k:${k}`, label)}<span class="tt-ricon">${areaIcon(a, 16)}</span><button type="button" class="tt-name-btn" data-act="chip" data-arg="${esc(k)}"${pv}>${esc(label)}</button>${tags}${x}${detail}</div>`;
+    return `<div class="tt-row${w === 0 ? ' out' : ''}" data-domain="${a}"${oneGrade ? '' : ' data-grade-host'}>${oneGrade ? '' : gbadge(g)}${selBox(`k:${k}`, label)}<span class="tt-ricon">${areaIcon(a, 16)}</span><button type="button" class="tt-name-btn" data-act="chip" data-arg="${esc(k)}"${pv}>${esc(label)}</button>${tagsList}${T.detailed ? '' : share}${x}${detail}</div>`;
 }
 
 /** Total: Pages · Problems in all, the same How much the worksheet sheet keeps (window.tvSheetAmount). */
@@ -1034,6 +1106,12 @@ function onClick(e) {
             changed();
             return;
         }
+        case 'shareedit':
+            editShareInPlace(b, infoOf(arg).label, shareHeldText(arg), (text, refocus) => {
+                setShareFromText(arg, text);
+                if (refocus) focusAfter(`[data-share-key="${CSS.escape(arg)}"]`);
+            });
+            return;
         case 'releaseask': T.releaseAsk = arg; break;
         case 'releasekeep': T.releaseAsk = ''; break;
         case 'release': release(arg); changed(); return;

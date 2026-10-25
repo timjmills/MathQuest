@@ -288,3 +288,8 @@ body.teacher-mode.tvs-open { overflow: hidden; }
 #teacherApp .tvs-held { flex-wrap: wrap; gap: var(--sp-8); }
 #teacherApp .tvs-raise { margin-top: var(--sp-8); }
 #teacherApp .tvs-row-body > .tvs-seg + .tvs-pages { margin-top: var(--sp-4); }
+
+/* The share typed in place beside Less · Equal · More (owner 2026-10-25; the button and input look is in teacher-tray.css). */
+#teacherApp .tvs-often-ctl { display: inline-flex; align-items: center; gap: var(--sp-8); flex-wrap: wrap; min-width: 0; }
+#teacherApp .tvs-share-btn { font-family: var(--font-mono); white-space: nowrap; }
+#teacherApp .tvs-share-of { color: var(--text-2); }

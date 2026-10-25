@@ -326,3 +326,10 @@ body.teacher-mode.tt-locked { overflow: hidden; }
 /* the scroll container keeps rows clear of the tray bar (and the bottom bar below 820 px) */
 html:has(body.teacher-mode) { scroll-padding-bottom: 96px; }
 @media (max-width: 819px) { html:has(body.teacher-mode) { scroll-padding-bottom: calc(var(--tv2-bar, 64px) + 64px); } }
+
+/* A share typed in place (owner 2026-10-25): the value is a button that becomes an input. Shared by the print dialog. */
+#teacherApp .tv-share-btn { font-family: var(--font-mono); font-size: var(--fs-12); color: var(--text); background: transparent; border: 1px dashed var(--line); border-radius: var(--r-8); padding: 2px var(--sp-6, 6px); min-height: 32px; cursor: text; white-space: nowrap; display: inline-flex; align-items: center; gap: var(--sp-4, 4px); }
+#teacherApp .tv-share-btn:hover, #teacherApp .tv-share-btn:focus-visible { border-style: solid; }
+#teacherApp .tv-share-edit { display: inline-flex; align-items: center; gap: var(--sp-4, 4px); max-width: 100%; }
+#teacherApp .tv-share-in { width: 6.5rem; max-width: 40vw; min-height: 32px; font-family: var(--font-mono); font-size: var(--fs-14, 14px); color: var(--text); background: var(--surface, #fff); border: 2px solid var(--ring); border-radius: var(--r-8); padding: 2px var(--sp-6, 6px); }
+#teacherApp .tv-share-hint { font-size: var(--fs-12); color: var(--text-2); white-space: nowrap; }
