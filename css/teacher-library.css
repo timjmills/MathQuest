@@ -523,3 +523,10 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 #teacherApp .ts-set-menu { display: grid; min-width: 220px; }
 #teacherApp .ts-set-menu button { height: 44px; }
 #teacherApp .ts-set-rename { font-size: var(--fs-20); font-weight: var(--fw-700); width: 100%; min-width: 0; }
+
+/* "Yet to be built" as orange chips under each area band, and the Show filter (owner 2026-10-25) */
+#teacherApp .ts-plan-strip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); margin: 0 0 var(--sp-16); }
+#teacherApp .ts-planchip { display: inline-flex; align-items: center; min-height: 32px; padding: 0 var(--sp-12, 12px); border: 2px solid #E07B00; border-radius: 999px; background: var(--surface); color: var(--text); font-family: var(--font-ui); font-size: var(--fs-14); font-weight: var(--fw-700); line-height: 1.2; cursor: pointer; text-align: left; }
+#teacherApp .ts-planchip:hover { background: #FCE3C4; }
+#teacherApp .ts-planchip:focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: 2px; }
+#teacherApp .ts-show-plan[aria-pressed="true"] { box-shadow: inset 0 calc(-1 * var(--sp-4)) 0 #E07B00; }
