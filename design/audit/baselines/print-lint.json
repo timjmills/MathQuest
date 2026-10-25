@@ -14091,7 +14091,9 @@
    "pages": 2,
    "keyPages": 1,
    "error": null,
-   "counts": {},
+   "counts": {
+    "L-DENSITY": 1
+   },
    "findings": [
     {
      "lint": "L-DENSITY",
@@ -14110,6 +14112,14 @@
      "el": "<div.ws-cell.mqt--seqstrip[data-ws-cell=\"seqstrip\"]> \"4 20 30 40 50 60\"",
      "page": 2,
      "cell": 4
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "PAGEFILL",
+     "sev": "major",
+     "page": 1,
+     "msg": "page 1: empty strip ~21% of the page under the problems (CL-40 tab inset on top-started cells, 551ea24a, drops this mixed pool from 4 rows to 3)",
+     "pinned": "2026-10-25 deploy gates: legacy counting pool, accepted for this deploy; re-pack in the counting family lane (STATUS)"
     }
    ]
   },
