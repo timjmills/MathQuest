@@ -32,7 +32,8 @@ import {
 } from './teacher-ui.js';
 import { areaOf, AREAS, AREA_ORDER, areaIcon } from './teacher-areas.js';
 import { planPages, planCounts, PER_PAGE, keyOf } from './teacher-plan.js';
-import { trayGroups, trayLocks, editShareInPlace, setShareFromText, shareHeldText } from './teacher-tray.js';
+import { trayGroups, trayLocks, editShareInPlace, setShareFromText, shareHeldText, trayRecord, trayFromSetName } from './teacher-tray.js';
+import { encodeSetParam } from './teacher-ui.js';
 import { printHtml } from './teacher-print.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
@@ -884,6 +885,11 @@ function pickFrom(id) {
 function makeLink() {
     const s = S.share;
     S.shareRes = currentSet().length ? makeShareLink({ gameMode: s.gameMode, problemCount: s.problemCount, timer: s.timer }, 'direct', !!s.lock) : null;
+    // owner 2026-10-25: the link also carries the whole set (skills, options, amounts, print settings) as an optional
+    // &set= suffix, so a teacher who opens it gets it in My sets. ?c= is unchanged, so old readers ignore it.
+    if (S.shareRes) {
+        try { const p = encodeSetParam(Object.assign({ name: trayFromSetName() || '' }, trayRecord(), { print: printSettings() })); if (p) S.shareRes = { ...S.shareRes, link: S.shareRes.link + '&set=' + p }; } catch (e) { /* the plain link still works */ }
+    }
     renderMain();
 }
 function shareHTML() {
@@ -1163,6 +1169,20 @@ export function setSheetAmount(mode, n) {
     persist();
 }
 
+/** The print settings a saved set keeps (owner 2026-10-25): How much, sets, key, layout, size, examples, columns, paper, header, and the quiz's own amount. */
+export function printSettings() {
+    return { opts: JSON.parse(JSON.stringify(S.opts)), quiz: { mode: S.quiz.mode, n: S.quiz.n, nEach: S.quiz.nEach, pages: S.quiz.pages, versions: S.quiz.versions, points: S.quiz.points } };
+}
+/** Put a set's stored print settings back (a set saved before they were stored changes nothing). */
+export function applyPrintSettings(p) {
+    if (!p || typeof p !== 'object') return;
+    if (p.opts && typeof p.opts === 'object') Object.assign(S.opts, p.opts, { header: Object.assign({}, S.opts.header, p.opts.header || {}) });
+    if (p.quiz && typeof p.quiz === 'object') for (const k of ['mode', 'n', 'nEach', 'pages', 'versions', 'points']) if (p.quiz[k] !== undefined) S.quiz[k] = p.quiz[k];
+    S.preview = null;
+    persist();
+    if (root && S.sheet) changed(false);
+}
+
 /* ================================================================= hooks (lane S2 T4: lesson sets)
  * The Lessons place adds lesson groups to the tray. When the tray holds them, the Print sheet shows a block that
  * asks "one worksheet per lesson / one for all / both" (EXTRA.html), and Print makes ONE document from a batch of
@@ -1296,6 +1316,7 @@ export async function printBatch(parts, title, onProgress) {
 if (typeof window !== 'undefined') {
     window.tvOpenSheet = openSheet;
     window.tvSheetAmount = { get: sheetAmount, set: setSheetAmount };
+    window.tvSheetPrint = { get: printSettings, set: applyPrintSettings };
     window.tvCloseSheet = closeSheet;
     window.tvSheetState = sheetState;
     window.tvSheetBuildNow = buildNow;

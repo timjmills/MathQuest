@@ -515,3 +515,11 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 #teacherApp button.ts-card-open:focus-visible, #teacherApp button.ts-tick:focus-visible { outline: var(--line-2, 2px) solid var(--action); outline-offset: 2px; }
 #teacherApp button.ts-tick { appearance: none; background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; cursor: pointer; z-index: 1; }
 #teacherApp button.ts-tick[aria-pressed="true"] span { background: var(--action); border-color: var(--action); }
+
+/* owner 2026-10-25: My sets — each saved set has Quiz · Send · Print and a ⋯ menu (additive) */
+#teacherApp .ts-set.ts-set-saved { cursor: default; }
+#teacherApp .ts-set-acts { display: flex; flex-wrap: wrap; gap: var(--sp-8); align-items: center; }
+#teacherApp .ts-set-acts .tv-menu { right: 0; left: auto; z-index: 20; }
+#teacherApp .ts-set-menu { display: grid; min-width: 220px; }
+#teacherApp .ts-set-menu button { height: 44px; }
+#teacherApp .ts-set-rename { font-size: var(--fs-20); font-weight: var(--fw-700); width: 100%; min-width: 0; }

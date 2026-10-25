@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { importSharedSet } from './teacher-ui.js';
 import { warmSkillSearch } from './skill-finder.js';
 import { installSearchNotice } from './search-notice.js';
 import { createBackgroundShapes, loadState } from './ui-core.js';
@@ -192,6 +193,15 @@ export function checkURLParameters() {
         const cleanUrl = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
         return;
+    }
+
+    // A Send link's optional &set= (owner 2026-10-25): the whole set with its print settings goes in My sets.
+    const setParam = urlParams.get('set');
+    if (setParam) {
+        try {
+            const rec = importSharedSet(setParam);
+            if (rec && typeof window.showToast === 'function' && document.body.classList.contains('teacher-mode')) window.showToast(`“${rec.name}” is in Skills › My sets`, 'info');
+        } catch (e) { console.warn('[init] could not read the set in the link', e); }
     }
 
     // Check ?c= or ?code= (Direct Play link)

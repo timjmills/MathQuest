@@ -39,7 +39,7 @@ import {
     gbadge, gradeName, shortName, trayItems, TRAY_SET_ID, openTrayPopup,
 } from './teacher-tray.js';
 import { mountCropped, refitCropped, croppedReady, openChipSheet } from './teacher-chip.js';
-import { savedSets } from './teacher-ui.js';
+import { savedSets, writeSets } from './teacher-ui.js';
 
 // Standards (owner request 2026-09-25): the detail panel tags each skill with its CCSS standards
 // and Essential Elements, the search finds skills by a standard code (3.OA.7, EE.3.OA.6), and a
@@ -1096,12 +1096,75 @@ function setsHTML() {
         const a = adOf(hit).area;
         return `<span class="ts-mini-chip" data-domain="${a}">${gbadge(hit.level)}${areaIcon(a, 14)}<span>${esc(shortName(hit.label))}</span></span>`;
     };
-    return `<p class="ts-note ts-mb">Your tray saves itself as a set. Open a set to put its skills in the tray. Saved quizzes are in Classes › Quizzes.</p><div class="ts-sets">`
+    const chips = (live) => `<span class="ts-set-chips">${live.slice(0, 6).map(chipOf).join('')}${live.length > 6 ? `<span class="ts-muted">+${live.length - 6}</span>` : ''}</span>`;
+    return `<p class="ts-note ts-mb">Your tray saves itself as a set. Quiz, Send or Print a set straight from here: it goes in the tray with its own options and print settings (Undo puts your tray back). Saved quizzes are in Classes › Quizzes.</p><div class="ts-sets">`
         + setsShown.map((st, i) => {
             const live = st.skills.filter((x) => findSkill(x.categoryId, x.skillId));
-            const isTray = st.id === TRAY_SET_ID;
-            return `<button type="button" class="ts-set" data-act="openset" data-arg="${i}"><span class="ts-set-name">${esc(isTray ? 'Your tray (saved as you go)' : (st.name || 'Untitled set'))}</span><span class="ts-set-chips">${live.slice(0, 6).map(chipOf).join('')}${live.length > 6 ? `<span class="ts-muted">+${live.length - 6}</span>` : ''}</span><span class="ts-note">${plural2(live.length, 'skill')} · ${isTray ? 'open the tray' : 'open to print, quiz or share'}</span></button>`;
+            if (st.id === TRAY_SET_ID) return `<button type="button" class="ts-set" data-act="openset" data-arg="${i}"><span class="ts-set-name">Your tray (saved as you go)</span>${chips(live)}<span class="ts-note">${plural2(live.length, 'skill')} · open the tray</span></button>`;
+            const nm = esc(st.name || 'Untitled set');
+            const pr = st.print && st.print.opts ? setPrintWords(st.print.opts) : '';
+            return `<div class="ts-set ts-set-saved" data-set-id="${esc(st.id)}"><span class="ts-set-name">${nm}</span>${chips(live)}<span class="ts-note">${plural2(live.length, 'skill')}${pr ? ` · ${esc(pr)}` : ''}</span>
+  <span class="ts-set-acts">
+    <button type="button" class="tv-btn tv-btn-sm" data-act="setquiz" data-arg="${i}" aria-label="Quiz: ${nm}">${icon('sheet', 16)}<span>Quiz</span></button>
+    <button type="button" class="tv-btn tv-btn-sm" data-act="setsend" data-arg="${i}" aria-label="Send: ${nm}">${icon('link', 16)}<span>Send</span></button>
+    <button type="button" class="tv-btn tv-btn-sm" data-act="setprint" data-arg="${i}" aria-label="Print: ${nm}">${icon('print', 16)}<span>Print</span></button>
+    <span class="tv-menu-wrap"><button type="button" class="tv-icon-btn is-framed" data-act="setmenu" data-arg="${i}" aria-haspopup="true" aria-expanded="${setMenu === st.id}" aria-label="More for ${nm}">${icon('dots', 18)}</button>${setMenu === st.id ? `<span class="tv-menu ts-set-menu" role="menu">
+      <button type="button" role="menuitem" data-act="setedit" data-arg="${i}">${icon('edit', 16)}<span>Edit (open in the tray)</span></button>
+      <button type="button" role="menuitem" data-act="setrename" data-arg="${i}">${icon('edit', 16)}<span>Rename</span></button>
+      <button type="button" role="menuitem" data-act="setcopy" data-arg="${i}">${icon('copy', 16)}<span>Make a copy</span></button>
+      <hr><button type="button" role="menuitem" class="is-danger" data-act="setdelete" data-arg="${i}">${icon('trash', 16)}<span>Delete</span></button>
+    </span>` : ''}</span>
+  </span></div>`;
         }).join('') + '</div>';
+}
+
+let setMenu = null;   // the id of the saved set whose ⋯ menu is open
+/** "2 sets · Size S · Short key": the print settings a set keeps, in words. */
+function setPrintWords(o) {
+    const w = [];
+    const m = o.mode || 'pages';
+    w.push(m === 'pages' ? plural2(Number(o.pages) || 1, 'page') : m === 'each' ? `${o.nEach} of each skill` : `${o.nTotal} problems`);
+    if (Number(o.versions) > 1) w.push(`${o.versions} sets${o.setsSame === true ? ' (same)' : ''}`);
+    if (o.size) w.push(`Size ${o.size}`);
+    if (o.keyStyle === 'short') w.push('Short key');
+    return w.join(' · ');
+}
+/** The saved set goes in the tray (with Undo), its print settings come back, then the sheet opens. */
+function openSetIn(st, kind) {
+    trayLoadSet(st);
+    st.lastUsed = Date.now();
+    if (kind === 'tray') { openTrayPopup(); return; }
+    if (typeof window.tvOpenSheet === 'function') window.tvOpenSheet(kind);
+}
+function renameSetInPlace(st, b) {
+    const card = b.closest('.ts-set');
+    const nameEl = card && card.querySelector('.ts-set-name');
+    if (!nameEl) return;
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'tv-input ts-set-rename';
+    inp.value = st.name || '';
+    inp.setAttribute('aria-label', 'New name of the set: press Enter to keep it');
+    nameEl.replaceWith(inp);
+    inp.focus();
+    try { inp.select(); } catch (e) { /* */ }
+    let done = false;
+    const finish = (ok) => {
+        if (done) return;
+        done = true;
+        const nm = inp.value.trim();
+        if (ok && nm && nm !== st.name) {
+            writeSets(savedSets().map((x) => (x.id === st.id ? { ...x, name: nm } : x)));
+            toast(`Renamed “${nm}”`);
+        }
+        gRender();
+        groot.querySelector(`.ts-set[data-set-id="${CSS.escape(st.id)}"] [data-act="setmenu"]`)?.focus({ preventScroll: true });
+    };
+    inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); finish(true); }
+        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); finish(false); }
+    });
+    inp.addEventListener('blur', () => finish(true));
 }
 
 /* ------------------------------------------------------------------ thumbnails: the real item, cropped */
@@ -1197,6 +1260,37 @@ function gAction(act, arg, b) {
             if (!st) return;
             if (st.id === TRAY_SET_ID) { openTrayPopup(); return; }
             trayLoadSet(st);
+            return;
+        }
+        case 'setquiz': case 'setsend': case 'setprint': case 'setedit': case 'setrename': case 'setcopy': case 'setdelete': case 'setmenu': {
+            const st = setsShown[Number(arg)];
+            if (!st) return;
+            if (act === 'setmenu') { setMenu = setMenu === st.id ? null : st.id; gRender(); groot.querySelector(`.ts-set[data-set-id="${CSS.escape(st.id)}"] ${setMenu ? '.ts-set-menu button' : '[data-act="setmenu"]'}`)?.focus({ preventScroll: true }); return; }
+            setMenu = null;
+            if (act === 'setquiz') { openSetIn(st, 'quiz'); return; }
+            if (act === 'setsend') { openSetIn(st, 'share'); return; }
+            if (act === 'setprint') { openSetIn(st, 'print'); return; }
+            if (act === 'setedit') { openSetIn(st, 'tray'); return; }
+            if (act === 'setrename') { gRender(); const nb = groot.querySelector(`.ts-set[data-set-id="${CSS.escape(st.id)}"] [data-act="setmenu"]`); if (nb) renameSetInPlace(st, nb); return; }
+            if (act === 'setcopy') {
+                const now = Date.now();
+                const cp = JSON.parse(JSON.stringify(st));
+                Object.assign(cp, { id: 'set_' + now.toString(36) + Math.random().toString(36).slice(2, 6), name: `Copy of ${st.name || 'set'}`, createdAt: now, lastUsed: now });
+                const list = savedSets();
+                const at = list.findIndex((x) => x.id === st.id);
+                list.splice(at < 0 ? 0 : at + 1, 0, cp);
+                writeSets(list);
+                toast(`Made “${cp.name}”`);
+                gRender();
+                return;
+            }
+            if (act === 'setdelete') {
+                if (!window.confirm(`Delete the set “${st.name || 'Untitled set'}”? This cannot be undone.`)) { gRender(); return; }
+                writeSets(savedSets().filter((x) => x.id !== st.id));
+                toast(`Deleted “${st.name || 'the set'}”`);
+                gRender();
+                return;
+            }
             return;
         }
         default: return;
