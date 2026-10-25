@@ -701,7 +701,7 @@ const gv = () => (G.layout === 'thumb' ? G.size : G.layout);
     if (s.view === 'list' && !s.layout) G.layout = 'list';
     if (s.fw === 'ee') G.fw = 'ee';
     if (['all', 'gaps', 'covered'].includes(s.status)) G.status = s.status;
-    if (['both', 'built', 'plan'].includes(s.show)) G.show = s.show;
+    if (s.show === 'plan') G.show = 'plan';
 })();
 function persistG() { writeStore(G_KEY, { browse: G.browse, grade: G.grade, grades: G.grades, size: G.size, layout: G.layout, fw: G.fw, status: G.status, show: G.show }); }
 
@@ -793,7 +793,7 @@ function gShellHTML() {
   <div class="ts-fdiv" role="presentation"></div>
   <div class="ts-frow"><span class="ts-flabel" id="tsBrowseL">Browse by</span><div class="ts-seg ts-browse" role="group" aria-labelledby="tsBrowseL" id="tsBrowse"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsSizeL">Size</span><div class="ts-seg" role="group" aria-labelledby="tsSizeL" id="tsViews"></div>
-    <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsShowL">Show</span><div class="ts-seg" role="group" aria-labelledby="tsShowL" id="tsShow"></div></div>
+    <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsShowL">Skills to make</span><div class="ts-seg" role="group" aria-labelledby="tsShowL" id="tsShow"></div></div>
 </div>
 <div id="tsList" class="ts-list"></div>`;
 }
@@ -804,7 +804,7 @@ function gSyncControls() {
     if (inp && document.activeElement !== inp) inp.value = G.q;
     const searching = !!G.q.trim();
     const sh = r.querySelector('#tsShow');
-    if (sh) sh.innerHTML = [['both', 'Both'], ['built', 'Built'], ['plan', 'Yet to be built']].map(([k, l]) => `<button type="button" data-act="show" data-arg="${k}" ${pressedA(G.show === k)}${k === 'plan' ? ' class="ts-show-plan"' : ''}>${l}</button>`).join('');
+    if (sh) sh.innerHTML = `<button type="button" class="ts-show-plan" data-act="show" data-arg="${G.show === 'plan' ? 'both' : 'plan'}" ${pressedA(G.show === 'plan')}>Yet to be built: ${G.show === 'plan' ? 'On' : 'Off'}</button>`;
     r.querySelector('#tsBrowse').innerHTML = BROWSE.map(([k, l]) => `<button type="button" data-act="browse" data-arg="${k}" ${pressedA(G.browse === k)}>${l}</button>`).join('');
     r.querySelector('#tsViews').innerHTML = SIZES.map(([k, l]) => `<button type="button" data-act="size" data-arg="${k}" ${pressedA(G.size === k)}${G.layout === 'thumb' ? '' : ' title="The size of the thumbnail cards"'}>${l}</button>`).join('');
     r.querySelector('#tsGrades').innerHTML = `<button type="button" class="ts-pill ts-pill-all" data-act="grade" data-arg="ALL" ${pressedA(allOn() && !searching)} title="Every grade at once">All</button>` + GRADES.map(([g, l, long]) => `<button type="button" class="ts-pill" data-act="grade" data-arg="${g}" data-grade="${g}" ${pressedA(G.grades.includes(g) && !allOn() && !searching)}${l !== long ? ` aria-label="${esc(long)}"` : ''}><i class="ts-gsw" aria-hidden="true"></i>${esc(l)}</button>`).join('');
@@ -868,7 +868,8 @@ function openSkillOptions(k, anchor) {
 function gGroup(a, list, { cross = false, addArea = false, budget, planned = [], perArea = false }) {
     // Maths area browse (owner 2026-10-25): every area is on screen, each with its first AREA_FIRST built skills and
     // "Show all"; the other views keep the page-wide limit (budget).
-    const showPlan = G.show !== 'built', showBuilt = G.show !== 'plan';
+    // owner 2026-10-25: the skills still to make show only when the "Yet to be built" switch is on (G.show === 'plan')
+    const showPlan = G.show === 'plan', showBuilt = true;
     if (!showPlan) planned = [];
     const lim = perArea ? (G.open[`a${a}`] ? list.length : AREA_FIRST) : Math.max(0, budget.left);
     const shown = showBuilt ? list.slice(0, lim) : [];
@@ -882,10 +883,7 @@ function gGroup(a, list, { cross = false, addArea = false, budget, planned = [],
     } else body = shown.length ? `<div class="ts-grid" data-view="${gv()}">${shown.map(gCard).join('')}</div>` : '';
     if (perArea && showBuilt && list.length > shown.length) body += `<button type="button" class="ts-btn ts-more-btn" data-act="showall" data-arg="a${a}">Show all ${list.length} ${esc(AREAS[a].short.toLowerCase())} skills</button>`;
     // the skills still to make: compact orange chips under the band, always visible; full cards when only they are shown
-    let strip = '';
-    if (planned.length && showBuilt) strip = `<div class="ts-plan-strip"><span class="ts-plan-tag">Yet to be built · ${planned.length}</span>${planned.map(planChip).join('')}</div>`;
-    else if (planned.length) body += `<div class="ts-grid" data-view="${gv()}">${planned.map(planCard).join('')}</div>`;
-    body = strip + body;
+    if (planned.length) body += `<h3 class="ts-grade-head ts-plan-head"><span class="ts-plan-tag">Yet to be built</span><span class="ts-count">${plural2(planned.length, 'skill')} planned</span></h3><div class="ts-grid" data-view="${gv()}">${planned.map(planCard).join('')}</div>`;
     const n = addArea ? wholeSetG(a).length : 0;
     const add = addArea && n > 1 ? `<button type="button" class="ts-btn ts-add" data-act="addarea" data-arg="${a}">+ Add whole area (${n})</button>` : '';
     return `<section class="ts-group" data-domain="${a}">${bandHTML(a, AREAS[a].long, plural2(list.length, 'skill') + (planned.length ? ` · ${planned.length} yet to be built` : ''), layoutSegHTML() + add)}${body}</section>`;
@@ -1267,7 +1265,7 @@ function gAction(act, arg, b) {
         case 'status': G.status = arg; persistG(); break;
         case 'more': G.limit += G_PAGE; break;
         case 'showall': G.open[arg] = true; break;
-        case 'show': G.show = ['built', 'plan'].includes(arg) ? arg : 'both'; if (G.browse !== 'area') G.browse = 'area'; persistG(); break;
+        case 'show': G.show = arg === 'plan' ? 'plan' : 'both'; if (G.browse !== 'area') G.browse = 'area'; persistG(); break;
         case 'addgrade': trayAddMany(wholeSetG(), realGrades().length > 1 ? gradesName() : `Whole ${gradeName(realGrades()[0])}`); return;
         case 'addarea': trayAddMany(wholeSetG(arg), `${AREAS[arg].name}, ${realGrades().length > 1 ? gradesName() : gradeName(realGrades()[0])}`); return;
         case 'addkeys': trayAddMany(arg.split(',').filter(Boolean), b.dataset.what || 'These skills'); return;
