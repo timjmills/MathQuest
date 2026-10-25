@@ -291,6 +291,8 @@ async function e2e() {
         const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills, columns: 'auto' }], letters: ['A', 'B'], size: 'standard', look: 'ican', paper: 'A4', key: true, seed: 4242 });
         const div = document.createElement('div');
         div.innerHTML = res.pupilHtml;
+        // CL-11a: the number tab ("1", "2" ...) is its own element; textContent would glue it onto the item ("17 × 1").
+        div.querySelectorAll('[data-ws-label]').forEach(e => e.remove());
         const txt = div.textContent.replace(/\s+/g, ' ');
         return { pages: res.pageCount, items: txt.match(/\d+\s*×\s*\d+/g) || [], optsSent: skills.map(s => s.skillId + ':' + JSON.stringify(s.opts)) };
     });
@@ -303,6 +305,7 @@ async function e2e() {
         const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: {} }], columns: 'auto' }], letters: ['A', 'B'], size: 'standard', look: 'ican', paper: 'A4', key: false, seed: 4243 });
         const div = document.createElement('div');
         div.innerHTML = res.pupilHtml;
+        div.querySelectorAll('[data-ws-label]').forEach(e => e.remove());
         return div.textContent.replace(/\s+/g, ' ').match(/\d+\s*×\s*\d+/g) || [];
     });
     check(resetRow.some(t => MULT_OK(t) === false), `buildSheet with explicit default options still drilled only x7/x8: ${resetRow.join(', ')}`);
