@@ -2,7 +2,7 @@
  "about": "ws-node-lint pinned FINDING KEYS per skill (IMPROVEMENT_PLAN §1.4 S2; critic r1 D5). A key is rule|kind|#item|signature: the dealt item (seeded by hashSeed(category:skill) + index, so stable) and the normalised offending text. A run FAILS on any key not listed here, even when a pinned finding of the same skill and rule was fixed in the same change, and lists the pinned keys it no longer finds. Re-pin with node tests/scripts/ws-node-lint.mjs --write-baseline (a --skill / --category / --rules run merges into this file); never add a key by hand.",
  "format": "keys-v2",
  "key": "rule|kind|#item|signature",
- "generated": "2026-10-23",
+ "generated": "2026-10-25",
  "n": 30,
  "page": 12,
  "rules": [
@@ -13,9 +13,9 @@
   "L10",
   "REPEATS"
  ],
- "skills": 715,
+ "skills": 716,
  "totals": {
-  "NOTATION": 6408,
+  "NOTATION": 6407,
   "L1": 90,
   "L3": 5,
   "L6": 111,
@@ -82,18 +82,17 @@
    "NOTATION|minus|#4|1 -"
   ],
   "all_mixed:all_domains_mixed": [
-   "NOTATION|fraction|#15|3/3",
+   "NOTATION|fraction|#15|2/2",
    "NOTATION|fraction|#16|1/5",
-   "NOTATION|fraction|#22|4/5",
    "NOTATION|minus|#2|(-",
    "NOTATION|minus|#2|-"
   ],
   "all_mixed:custom_mixed": [
    "NOTATION|fraction|#13|1/2",
-   "NOTATION|fraction|#13|2/3",
+   "NOTATION|fraction|#13|2/2",
    "NOTATION|fraction|#15|1/12",
    "NOTATION|fraction|#15|1/6",
-   "NOTATION|fraction|#18|10/12",
+   "NOTATION|fraction|#18|1/2",
    "NOTATION|fraction|#18|2/3",
    "NOTATION|minus|#23|4 -",
    "NOTATION|minus|#27|5 -"
