@@ -70,6 +70,10 @@ outrank any general design advice or skill:
   of `design/audit/RUBRIC.md` on every page type and every screen host, graded by an independent critic.
   The same bar holds for EVERYTHING that passes (owner, 2026-10-23): tools, engines, screens and mock-ups, lessons,
   cards and plans each pass only at ≥ 8 on every criterion of their critic brief, graded by an independent critic.
+- **Which skills passed the 8/10 redesign lives in ONE place (owner, 2026-10-25): `js/modules/redesign-passed.js`.** A lane
+  that passes a skill at ≥ 8 (independent critic, every criterion, every page type and host) adds it there IN THE SAME CHANGE, with
+  its evidence line (lane, critic round, file, date); no other file records it. The Skills screen's corner mark reads only this
+  file; `node tests/scripts/ws-redesign-passed.mjs` is its gate (every id live, every id has evidence).
 - Use `generateQuestionFor({category, skill, range, decimals, opts, seed})` for any generation
   outside live play. It carries the skill's options, restores state in `finally`, and its seed makes
   a page reproducible.
