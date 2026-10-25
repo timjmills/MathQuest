@@ -143,6 +143,8 @@ function amountOf(defaultPages) {
 }
 /* What one page holds, per size and set of skills, learned from the engine's own page 1. */
 const perLearned = new Map();
+// the sets of skills whose page 1 the engine has built: until then the page count is a first guess (check r2 bug 2)
+const perChecked = new Set();
 function perBase(list) { return [kindOf(list), S.opts.size, S.opts.examples, list.filter((x) => !x.leftOut).map((x) => keyOf(x) + JSON.stringify(x.opts || {})).join('|')].join('#'); }
 function perPageFor(list) { return perLearned.get(perBase(list)) || PER_PAGE[S.opts.size] || PER_PAGE.M; }
 
@@ -364,7 +366,7 @@ async function runPreview() {
         try { res = await buildSheet(part.req); } catch (e) { res = null; }
         if (my !== token) return;
         S.building = false;
-        if (!res) { S.preview = { sig, html: '', error: true }; renderSide(); return; }
+        if (!res) { perChecked.add(perBase(list)); S.preview = { sig, html: '', error: true }; renderSide(); return; }
         const planned = part.pages || 1;
         const got = res.pageCount || 1;
         const onPage = (part.req.sections || []).reduce((t, x) => t + (x.count || 0), 0);
@@ -379,6 +381,7 @@ async function runPreview() {
             perLearned.set(perBase(list), Math.max(1, Math.floor(onPage / got)));
             continue;
         }
+        perChecked.add(perBase(list));
         S.preview = { sig, html: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml, fact: part.fact ? { cols: (res.fits && res.fits.cols) || 0, rows: (res.fits && res.fits.rows) || 0, onPage1: countOnPage1(res), pages: res.pageCount || 1 } : null };
         renderMain(); renderSide();
         return;
@@ -390,6 +393,11 @@ async function runPreview() {
 
 function summary() {
     const r = summaryCore();
+    const list0 = items();
+    if (!r.error && list0.length && !perChecked.has(perBase(list0))) {
+        r.line = 'Working out how many fit on a page…';
+        return r;
+    }
     if (setsSame() && !r.error) {
         const N = setsOf();
         r.line = `${N} sets of the same problems · ${r.line.replace(/ · answer key at the end/, '')} · each set · a cover page between sets · one key for all`;
@@ -427,7 +435,7 @@ function summaryCore() {
     }
     if (V > 1) {
         const w = quiz ? 'version' : 'set';
-        return { line: `${V} ${w}s · ${total} ${noun} each${ofEach}${pts} · ${pages * V} pages + keys${S.opts.keyVersions === 'end' ? ' (keys at the end)' : ` (a key after each ${w})`}${quiz ? '' : ' · a cover page between sets'}${left}${drift}`,
+        return { line: `${V} ${w}s · ${total} ${noun} each${ofEach}${pts} · ${pages * V} pages + keys${!quiz && S.opts.keyPlace === 'after-page' && !setsSame() ? ' (a key after each page)' : S.opts.keyVersions === 'end' ? ' (keys at the end)' : ` (a key after each ${w})`}${quiz ? '' : ' · a cover page between sets'}${left}${drift}`,
             more: names + ' · every version has its own problems, the same mix and counts' };
     }
     if (isBig(list)) {
@@ -630,7 +638,7 @@ function optionsHTML() {
         if (mode === 'pages') ctl = `${stepper('pages', quiz ? q.pages : pg, 1, 30, 'Pages')}${seg('pages', quiz ? q.pages : pg, [['2', '2'], ['3', '3'], ['5', '5']], 'Pages')}`;
         else if (mode === 'total') ctl = `${stepper('ntotal', quiz ? q.n : S.opts.nTotal, 1, 300, noun + ' in all')}${seg('ntotal', quiz ? q.n : S.opts.nTotal, [['10', '10'], ['20', '20'], ['30', '30']], noun + ' in all')}`;
         else ctl = `${stepper('neach', quiz ? q.nEach : S.opts.nEach, 1, 50, noun + ' of each skill')}${seg('neach', quiz ? q.nEach : S.opts.nEach, [['2', '2'], ['4', '4'], ['6', '6']], noun + ' of each skill')}`;
-        const sub = mode === 'pages' ? (k === 'single' && list.length > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : isBig(list) ? `${p.total} ${noun}; fewer pages take a sample of the skills` : 'The key follows')
+        const sub = mode === 'pages' ? (k === 'single' && list.length > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : isBig(list) ? `${p.total} ${noun}; fewer pages take a sample of the skills` : 'Pages of problems; the answer key is extra')
             : mode === 'total' ? `Pages = ${noun} ÷ ${p.perPage} a page; the last page holds the rest` : 'A skill with its own count keeps it';
         h += row('How much?', sub, `${seg('mode', mode, [['pages', 'Pages'], ['total', quiz ? 'Questions in all' : 'Problems in all'], ['each', quiz ? 'Questions of each skill' : 'Problems of each skill']], 'How much')}<div class="tvs-pages">${ctl}</div>`);
     }
@@ -710,7 +718,8 @@ function setsHTML() {
     if (n > 1) {
         h += seg('setssame', S.opts.setsSame === true ? 'same' : 'diff', [['same', 'Same problems'], ['diff', 'Different problems']], 'Sets');
         h += `<p class="tvs-muted">${S.opts.setsSame === true ? `${n} identical copies · one key for all · a cover page between sets` : 'Each set has new problems and its own key · a cover page between sets'}</p>`;
-        if (S.opts.setsSame !== true) h += keyVersionsSeg();
+        // "After each page" already puts every key right after its page: the per-set key choice only applies to "At the end"
+        if (S.opts.setsSame !== true && S.opts.keyPlace !== 'after-page') h += keyVersionsSeg();
     }
     return h + '</div>';
 }

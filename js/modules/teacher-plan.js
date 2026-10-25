@@ -219,8 +219,8 @@ export function planCounts(items, total, opts = {}) {
         const isHeld = (k) => locks['k:' + k] !== undefined;
         for (const k of free) {
             while ((byKey[k] || 0) < floor) {
-                const donor = free.filter((y) => byKey[y] > floor && !isHeld(y)).sort((a, b) => byKey[b] - byKey[a])[0]
-                    || free.filter((y) => byKey[y] > floor).sort((a, b) => byKey[b] - byKey[a])[0];
+                // a held % is the teacher's exact ask: never give from it (owner 2026-10-25); the warning below says who got none
+                const donor = free.filter((y) => byKey[y] > floor && !isHeld(y)).sort((a, b) => byKey[b] - byKey[a])[0];
                 if (!donor) break;
                 byKey[donor]--; byKey[k] = (byKey[k] || 0) + 1;
             }
