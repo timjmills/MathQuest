@@ -844,7 +844,19 @@ function openSkillOptions(k, anchor) {
         anchor,
         item: { opts: cur ? JSON.parse(JSON.stringify(cur)) : {} },
         primary: inTray ? 'Update in tray' : 'Add to tray',
-        onPrimary: (opts) => trayAddWithOpts(k, opts),
+        onPrimary: (opts) => {
+            const r = trayAddWithOpts(k, opts);
+            // the card's thumbnail and hover preview now draw the skill at its chosen options (check nit 1)
+            groot?.querySelectorAll(`[data-ts-thumb="${CSS.escape(`${c}|${sk}`)}"]`).forEach((h) => {
+                const o = trayOpts(c, sk);
+                if (o) h.dataset.tvpOpts = JSON.stringify(o); else delete h.dataset.tvpOpts;
+                delete h.dataset.tsDone;
+                drawThumb(h);
+            });
+            // a browse view that draws itself again (Map, Sets) keeps focus on this card (check nit 2)
+            setTimeout(() => { const b = groot?.querySelector(`.ts-card[data-skill="${CSS.escape(k)}"] .ts-card-open`); if (b && !b.contains(document.activeElement)) b.focus(); }, 0);
+            return r;
+        },
     });
 }
 
