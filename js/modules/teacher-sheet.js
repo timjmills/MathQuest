@@ -94,11 +94,16 @@ const touch = (k) => { if (!touched(k)) S.touched.push(k); };
 /* ================================================================= the set */
 
 function items() {
-    return currentSet().map((s) => {
+    const set = currentSet();
+    // Owner 2026-10-25: with up to BIG skills the dialog sets each skill's share by its own box only (blank = even,
+    // a number = exact, a % = held), so any Less/More weight from the tray does not change what this dialog prints.
+    // Above BIG, How often stays set per area in the tray and the weights still count.
+    const even = set.length <= BIG;
+    return set.map((s) => {
         const hit = findSkill(s.categoryId, s.skillId);
         return {
             categoryId: s.categoryId, skillId: s.skillId,
-            weight: Number(s.weight) > 0 ? Number(s.weight) : 0,
+            weight: !even && Number(s.weight) > 0 ? Number(s.weight) : 0,
             lockPct: typeof s.lockPct === 'number' ? s.lockPct : undefined,
             count: Number(s.count) > 0 ? Math.round(Number(s.count)) : undefined,
             leftOut: s.leftOut === true,
@@ -113,23 +118,6 @@ const shortLabel = (l) => String(l || '').replace(/\s*\((?:Visual|MAP|black and 
 const isBig = (list) => list.length > BIG;
 function autoKind(list) { if (S.fromLesson) return 'sections'; return list.length >= 2 ? 'mixed' : 'single'; }
 function kindOf(list) { return S.kind || autoKind(list); }
-
-/** How often, Less · Equal · More = 1 : 2 : 3. All the same = the default (no weight in the share code). */
-function levelOf(it, list) {
-    if (list.every((x) => !(x.weight > 1))) return 2;
-    return it.weight >= 3 ? 3 : it.weight === 2 ? 2 : 1;
-}
-function setLevel(key, lv) {
-    const list = items();
-    const levels = Object.fromEntries(list.map((x) => [keyOf(x), levelOf(x, list)]));
-    levels[key] = lv;
-    const same = new Set(Object.values(levels)).size === 1;
-    for (const s of currentSet()) {
-        const k = `${s.categoryId}:${s.skillId}`;
-        if (same) delete s.weight; else s.weight = levels[k];
-    }
-    window.skillQueue = [...currentSet()];
-}
 
 /**
  * The page plan of the open sheet: the ONE source of every number the sheet shows (stepper, sub-lines, summary,
@@ -167,15 +155,16 @@ function skillRef(it, weight, force = false) {
 }
 function common(seed, quiz, version) {
     const o = S.opts;
+    const sameKeyEnd = setsSame();
     const h = o.header || {};
     const V = versionsOf(quiz);
     return {
         size: o.size, look: 'auto', paper: o.paper || 'A4',
         anchors: o.examples === 'sections' || o.examples === 'side' ? o.examples : 'off',
         header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz ? ((S.quiz.name || '').trim() || autoQuizName(items())) : (S.batchTitle || true) },
-        key: { on: true, placement: o.keyPlace === 'after-page' ? 'after-page' : 'end', style: o.keyStyle === 'short' ? 'short' : 'copy' },
+        key: { on: true, placement: !sameKeyEnd && o.keyPlace === 'after-page' ? 'after-page' : 'end', style: o.keyStyle === 'short' ? 'short' : 'copy' },
         seed: (seed + version * 104729) >>> 0,
-        version: V > 1 ? `Version ${version + 1} of ${V}` : '',
+        version: V > 1 ? `${quiz ? 'Version' : 'Set'} ${version + 1} of ${V}` : '',
     };
 }
 /**
@@ -276,9 +265,10 @@ async function buildAll(p, list, quiz, onProgress) {
     let tailKeys = '', done = 0;
     const parts0 = requests(p, list, quiz, 0).length;
     for (let v = 0; v < versions; v++) {
-        let vp = '', vk = '', vd = '', after = false;
+        let vp = '', vk = '', vd = '', after = false, vp0 = '';
         const vv = { byKey: {}, total: 0, pages: 0, first: '' };
-        const label = versions > 1 ? `Version ${v + 1} of ${versions}` : '';
+        const label = versions > 1 ? `${quiz ? 'Version' : 'Set'} ${v + 1} of ${versions}` : '';
+        if (!quiz && v > 0) { const cv = coverHTML(v + 1, versions); vd = cv; vp0 = cv; }
         for (const part of requests(p, list, quiz, v)) {
             if (onProgress) onProgress(++done, parts0 * versions);
             await yieldNow();
@@ -305,11 +295,20 @@ async function buildAll(p, list, quiz, onProgress) {
         out.perVersion.push(vv);
         out.pupil.push(vp); out.key.push(vk);
         if (after) out.doc += vd;
-        else if (keysAtEnd) { out.doc += vp; tailKeys += vk; }
-        else out.doc += vp + vk;
+        else if (keysAtEnd) { out.doc += vp0 + vp; tailKeys += vk; }
+        else out.doc += vp0 + vp + vk;
         out.pagesAll += vv.pages;
     }
     out.doc += tailKeys;
+    if (setsSame()) {
+        // Same problems: the one build's pupil pages again for sets 2..N, each after its cover; ONE key for all, at the end
+        const N = setsOf(), pupil = out.pupil[0] || '', key = out.key[0] || '';
+        out.doc = '';
+        for (let i = 1; i <= N; i++) out.doc += (i > 1 ? coverHTML(i, N) : '') + pupil;
+        out.doc += key;
+        out.pagesAll = (out.perVersion[0] ? out.perVersion[0].pages : 0) * N;
+    }
+    out.sets = quiz ? 1 : setsOf();
     out.pupilHtml = out.pupil.join('\n');
     out.keyHtml = out.key.join('\n');
     const v0 = out.perVersion[0] || { byKey: {}, total: 0, pages: 0 };
@@ -321,7 +320,17 @@ async function buildAll(p, list, quiz, onProgress) {
     return out;
 }
 /** Versions: a quiz 1–6 (the quiz path), a worksheet 1–20 (owner 2026-10-24). */
-function versionsOf(quiz) { return quiz ? Math.max(1, Math.min(6, S.quiz.versions)) : Math.max(1, Math.min(20, Number(S.opts.versions) || 1)); }
+function versionsOf(quiz) { return quiz ? Math.max(1, Math.min(6, S.quiz.versions)) : setsSame() ? 1 : setsOf(); }
+/** How many sets? (owner 2026-10-25): a worksheet prints 1–30 sets; Same problems = one build copied, ONE key. */
+function setsOf() { return Math.max(1, Math.min(30, Number(S.opts.versions) || 1)); }
+function setsSame() { return S.sheet !== 'quiz' && S.opts.setsSame === true && setsOf() > 1; }
+/** The plain page between sets: "Set 2 of 5", the title and the date, nothing else. */
+function coverHTML(i, n) {
+    const list = items();
+    const t = S.batchTitle || (list.length === 1 ? list[0].label : 'Worksheet');
+    const d = new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+    return `<section class="ws-page ws-M mq-set-cover" data-ws-size="M" data-set-cover="${i}"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:240mm;text-align:center;color:#000;font-family:'Andika',sans-serif;"><p style="font-size:64px;font-weight:700;margin:0 0 24px;">Set ${i} of ${n}</p><p style="font-size:32px;margin:0 0 12px;">${esc(t)}</p><p style="font-size:24px;margin:0;">${esc(d)}</p></div></section>\n`;
+}
 
 let buildTimer = null;
 let token = 0;
@@ -361,7 +370,9 @@ async function runPreview() {
         const onPage = (part.req.sections || []).reduce((t, x) => t + (x.count || 0), 0);
         if (got > planned && onPage > 1 && p.kind !== 'single') {
             // the engine's page holds fewer: learn it and deal the plan again
-            perLearned.set(perBase(list), Math.max(1, Math.floor(onPage * planned / got)));
+            // what the engine's own page 1 holds (its cells), not a share of the spill: the same set learns the same number
+            const cells = ((res.pupilPages && res.pupilPages[0]) || '').split('class="ws-cell ').length - 1;
+            perLearned.set(perBase(list), Math.max(1, cells && cells < onPage ? cells : Math.floor(onPage * planned / got)));
             continue;
         }
         if (got > planned && p.kind === 'single' && onPage > 1) {
@@ -378,6 +389,14 @@ async function runPreview() {
 /* ================================================================= the summary line (from the plan) */
 
 function summary() {
+    const r = summaryCore();
+    if (setsSame() && !r.error) {
+        const N = setsOf();
+        r.line = `${N} sets of the same problems · ${r.line.replace(/ · answer key at the end/, '')} · each set · a cover page between sets · one key for all`;
+    }
+    return r;
+}
+function summaryCore() {
     const list = items();
     if (!list.length) return { line: 'Tick skills first', more: '' };
     const p = plan(list);
@@ -407,7 +426,8 @@ function summary() {
         return { line: `${fx.cols} across × ${fx.rows} rows = ${fx.cols * fx.rows} facts${fx.pages > 1 ? ` a page · ${fx.pages} pages` : ''} · answer key at the end${drift}`, more: names.replace(/ \d+( \((count|held)\))?/g, '') + ' · fact rows' };
     }
     if (V > 1) {
-        return { line: `${V} versions · ${total} ${noun} each${ofEach}${pts} · ${pages * V} pages + keys${S.opts.keyVersions === 'end' ? ' (keys at the end)' : ' (a key after each version)'}${left}${drift}`,
+        const w = quiz ? 'version' : 'set';
+        return { line: `${V} ${w}s · ${total} ${noun} each${ofEach}${pts} · ${pages * V} pages + keys${S.opts.keyVersions === 'end' ? ' (keys at the end)' : ` (a key after each ${w})`}${quiz ? '' : ' · a cover page between sets'}${left}${drift}`,
             more: names + ' · every version has its own problems, the same mix and counts' };
     }
     if (isBig(list)) {
@@ -467,6 +487,8 @@ function open(kind, ctx = {}) {
     lastFocus = document.activeElement;
     S.sheet = kind;
     S.fromLesson = !!ctx.fromLesson;
+    // the same set opens on the same problems (so the same page count) every time; New numbers re-deals it
+    if (!S.userSeed) S.seed = 100000 + (parseInt(hashStr(currentSet().map((x) => `${x.categoryId}:${x.skillId}`).join('|')), 36) % 900000);
     if (S.fromLesson && !touched('kind')) S.kind = null;
     S.batchTitle = typeof ctx.title === 'string' ? ctx.title : '';   // T4: a lesson's practice carries the lesson's name
     S.quizLink = '';
@@ -554,10 +576,15 @@ function renderMain() {
     const box = root && root.querySelector('#tvsMain');
     if (!box) return;
     const keep = box.scrollTop;
+    // a share button that had focus (or was just committed) gets it back after the redraw
+    const ae = document.activeElement;
+    const had = ae && box.contains(ae) && ae.dataset ? ae.dataset.shareKey || null : null;
+    const want = had || (S.refocus && (!ae || ae === document.body || box.contains(ae)) ? S.refocus : null);
     if (S.sheet === 'share') box.innerHTML = shareHTML();
     else if (S.sheet === 'quizshare') box.innerHTML = quizShareHTML();
     else box.innerHTML = optionsHTML();
     box.scrollTop = keep;
+    if (want) { const nb = box.querySelector(`[data-share-key="${CSS.escape(want)}"]`); if (nb) nb.focus({ preventScroll: true }); }
     // the side panel's content follows the options on a phone (the preview is never first)
     const side = root.querySelector('#tvsSide');
     if (side) side.dataset.kind = kindOf(items());
@@ -593,9 +620,6 @@ function optionsHTML() {
     const k = p.kind;
     h += `<div class="tvs-kinds" role="radiogroup" aria-label="Kind of worksheet">${[['single', 'Single skill', 'One skill on a page'], ['sections', 'Sections', 'Each skill in its own part'], ['mixed', 'Mixed practice', 'Skills mixed together']].map(([v, l, s]) => `<button type="button" class="tvs-kind" role="radio" data-act="kind" data-v="${v}" aria-checked="${k === v}">${k === v ? icon('check', 18) : ''}<span class="tvs-kind-name">${l}</span><span class="tvs-kind-sub">${s}</span></button>`).join('')}</div>`;
     if (!S.kind) h += `<p class="tvs-muted tvs-chosen">Chosen for you: ${S.fromLesson ? 'practice from a lesson prints in Sections' : list.length === 1 ? 'one skill makes a Single skill page' : `${list.length} skills make a Mixed practice page`}.</p>`;
-    if (p.error) h += `<p class="tvs-warn" role="alert">${icon('info', 18)}<span>${esc(p.error)} Change the held amounts in the tray.</span></p>`;
-    else if (p.warn.length) h += p.warn.map((w) => `<p class="tvs-warn">${icon('info', 18)}<span>${esc(w)}</span></p>`).join('');
-
     // How much? Pages · Problems in all · Problems of each skill
     {
         const q = quiz ? S.quiz : null;
@@ -610,11 +634,15 @@ function optionsHTML() {
             : mode === 'total' ? `Pages = ${noun} ÷ ${p.perPage} a page; the last page holds the rest` : 'A skill with its own count keeps it';
         h += row('How much?', sub, `${seg('mode', mode, [['pages', 'Pages'], ['total', quiz ? 'Questions in all' : 'Problems in all'], ['each', quiz ? 'Questions of each skill' : 'Problems of each skill']], 'How much')}<div class="tvs-pages">${ctl}</div>`);
     }
+    if (p.error) h += `<p class="tvs-warn" role="alert">${icon('info', 18)}<span>${esc(String(p.error).replace(/\s*Raise to \d+ pages?\?$/, '').replace(/\s*Raise the total to \d+\.?/, ''))}</span></p>`;
+    else if (p.warn.length) h += p.warn.map((w) => `<p class="tvs-warn">${icon('info', 18)}<span>${esc(w)}</span></p>`).join('');
+
+    h += keyRowHTML();
     if (p.error && p.lower && p.lower.key) { const lx = list.find((x) => keyOf(x) === p.lower.key); h += `<div class="tvs-raise"><button type="button" class="tvs-btn" data-act="lower" data-v="${esc(p.lower.key)}" data-n="${p.lower.count}">Lower ${esc(lx ? lx.label : p.lower.key)} to ${p.lower.count}</button></div>`; }
     if (p.error && (p.needPages || p.needTotal)) h += `<div class="tvs-raise"><button type="button" class="tvs-btn" data-act="raise" data-v="${p.needPages ? 'p' + p.needPages : 't' + p.needTotal}">${p.needPages ? `Raise to ${p.needPages} pages` : `Raise the total to ${p.needTotal}`}</button></div>`;
     // How often
     if (list.length > 1 && !isBig(list)) {
-        h += row('How often does each skill come up?', 'Less · Equal · More = 1 : 2 : 3', `<div class="tvs-often">${list.map((x) => `<div class="tvs-often-row"><span class="tvs-often-name" data-domain="${esc(x.area)}">${gradeBadge(x.grade)}<span>${esc(x.label)}</span></span><span class="tvs-often-ctl">${shareBtnHTML(x, p)}${x.count > 0 || x.lockPct !== undefined ? (S.release === keyOf(x) ? heldHTML(x) : '') : seg('often', levelOf(x, list), [['1', 'Less'], ['2', 'Equal'], ['3', 'More']], 'How often: ' + x.label, ` data-key="${esc(keyOf(x))}"`)}</span></div>`).join('')}</div>`);
+        h += row('Problems of each skill', 'Leave blank to share evenly, or type a number or a %', `<div class="tvs-often">${list.map((x) => `<div class="tvs-often-row"><span class="tvs-often-name" data-domain="${esc(x.area)}">${gradeBadge(x.grade)}<span>${esc(x.label)}</span></span><span class="tvs-often-ctl">${shareBtnHTML(x, p)}</span></div>`).join('')}</div>`);
     } else if (isBig(list)) {
         const pct = p.pct || {};
         h += row('How often does each area come up?', 'Set in the tray: one place for every skill’s How often', `<table class="tvs-areas"><tbody>${byArea(list.filter((x) => !x.leftOut)).map((a) => `<tr data-domain="${esc(a.area)}"><th scope="row">${areaIcon(a.area, 18)}<span>${esc(AREAS[a.area].short)}</span></th><td>${a.list.length} skill${a.list.length > 1 ? 's' : ''}</td><td>${Math.round(a.list.reduce((t, x) => t + (pct[keyOf(x)] || 0), 0))} %</td></tr>`).join('')}</tbody></table>${typeof window.tvOpenTray === 'function' ? '<button type="button" class="tvs-btn" data-act="tray">Fine-tune in the tray ▸</button>' : ''}`);
@@ -626,7 +654,6 @@ function optionsHTML() {
         h += row('Each page', S.opts.each === 'copy' ? `One key: “Key for all ${p.pages} copies”` : 'What changes from page to page', seg('each', S.opts.each, [['new', 'New problems'], ['same', 'Same problems, new numbers'], ['copy', 'Same page again']], 'Each page'));
     }
     // Versions (worksheet): the same set again with different problems, all in one PDF
-    if (!quiz) h += row('Versions', Number(S.opts.versions) > 1 ? 'Each version: different problems, the same mix, counts and layout' : 'The same set again with different problems', stepper('wversions', Math.max(1, Number(S.opts.versions) || 1), 1, 20, 'Versions') + (Number(S.opts.versions) > 1 ? keyVersionsSeg() : ''));
     // Layout: Single skill only, and only for a skill whose items fit the fact layouts
     if (k === 'single' && list.some((x) => layoutOk(x, 'fact-rows') || layoutOk(x, 'fact-probe'))) {
         const opts = [['standard', 'Standard']];
@@ -667,14 +694,31 @@ function heldHTML(x) {
     return `<button type="button" class="tvs-btn tvs-held-btn" data-act="askrelease" data-v="${esc(k)}" aria-label="${esc(what)}, held. Change it">${esc(what)} ${icon('lock', 16)}</button>`;
 }
 function keyVersionsSeg() {
-    return seg('keyversions', S.opts.keyVersions === 'end' ? 'end' : 'after', [['after', 'Key after each version'], ['end', 'All keys at the end']], 'Answer keys');
+    const w = S.sheet === 'quiz' ? 'version' : 'set';
+    return seg('keyversions', S.opts.keyVersions === 'end' ? 'end' : 'after', [['after', `Key after each ${w}`], ['end', 'All keys at the end']], 'Answer keys');
+}
+/** Answer key, near the amounts (owner 2026-10-25): where it prints and what it looks like. */
+function keyRowHTML() {
+    const o = S.opts;
+    const same = setsSame();
+    return row('Answer key', same ? 'Same problems: one key for every set, at the end' : 'Where it prints and how it looks', `${same ? '' : seg('keyplace', o.keyPlace === 'after-page' ? 'after-page' : 'end', [['after-page', 'After each page'], ['end', 'At the end']], 'Key placement')}${seg('keystyle', o.keyStyle === 'short' ? 'short' : 'copy', [['copy', 'Copy of the page with answers'], ['short', 'Short answer key']], 'Key style')}`);
+}
+/** How many sets? beside Print (worksheet): 1–30, Same problems (one key) or Different problems (a key each). */
+function setsHTML() {
+    const n = setsOf();
+    let h = `<div class="tvs-sets" role="group" aria-label="How many sets?"><p class="tvs-label">How many sets?</p>${stepper('wversions', n, 1, 30, 'Sets')}`;
+    if (n > 1) {
+        h += seg('setssame', S.opts.setsSame === true ? 'same' : 'diff', [['same', 'Same problems'], ['diff', 'Different problems']], 'Sets');
+        h += `<p class="tvs-muted">${S.opts.setsSame === true ? `${n} identical copies · one key for all · a cover page between sets` : 'Each set has new problems and its own key · a cover page between sets'}</p>`;
+        if (S.opts.setsSame !== true) h += keyVersionsSeg();
+    }
+    return h + '</div>';
 }
 function moreHTML() {
     const o = S.opts, hd = o.header || {};
     const ck = (key, label) => `<label class="tvs-check"><input type="checkbox" data-in="hdr" data-v="${key}"${hd[key] !== false ? ' checked' : ''}><span>${esc(label)}</span></label>`;
     return `<details class="tvs-more"${S.moreOpen ? ' open' : ''}><summary class="tvs-more-sum">More options</summary>
   ${row('Header', 'On every pupil page', `<div class="tvs-checks">${ck('name', 'Name')}${ck('date', 'Date')}${S.sheet === 'quiz' ? '' : `<label class="tvs-check"><input type="checkbox" data-in="hdr" data-v="score"${hd.score ? ' checked' : ''}><span>Score</span></label>`}</div>`)}
-  ${row('Answer key', 'Where it prints and how it looks', `${seg('keyplace', o.keyPlace === 'after-page' ? 'after-page' : 'end', [['end', 'At the end'], ['after-page', 'After each page']], 'Key placement')}${seg('keystyle', o.keyStyle === 'short' ? 'short' : 'copy', [['copy', 'Copy of the page'], ['short', 'Answers only']], 'Key style')}`)}
   ${row('Paper', '', seg('paper', o.paper === 'Letter' ? 'Letter' : 'A4', [['A4', 'A4'], ['Letter', 'Letter']], 'Paper'))}
   <p class="tvs-muted">Need another page type? Open the <button type="button" class="tvs-link" data-act="oldprint">Old print screen (all page types)</button>.</p>
 </details>`;
@@ -707,7 +751,7 @@ function renderSide() {
     if (has && !box.querySelector('iframe')) box.innerHTML = '<iframe class="tvs-prev-frame" id="tvsPrevFrame" title="Page 1 preview" tabindex="-1"></iframe>';
     if (!has) box.innerHTML = '';
     side.querySelector('#tvsPrevCap').textContent = !has ? '' : S.building ? 'Drawing page 1…' : 'First page · every item drawn live by the app · Print makes every page';
-    side.querySelector('#tvsActBox').innerHTML = `<button type="button" class="tvs-btn tvs-primary" data-act="print"${ready ? '' : ` aria-disabled="true" data-why="${esc(has ? sm.line : 'Tick skills first')}"`}>${icon('print', 20)}<span>${has ? 'Print' : 'Tick skills first'}</span></button>
+    side.querySelector('#tvsActBox').innerHTML = `${!quiz && has ? setsHTML() : ''}<button type="button" class="tvs-btn tvs-primary" data-act="print"${ready ? '' : ` aria-disabled="true" data-why="${esc(has ? sm.line : 'Tick skills first')}"`}>${icon('print', 20)}<span>${has ? 'Print' : 'Tick skills first'}</span></button>
     ${quiz ? `<button type="button" class="tvs-btn" data-act="quizshare"${ready ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('link', 18)}<span>Share with pupils</span></button>
     <button type="button" class="tvs-btn" data-act="quizsave"${ready ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('bookmark', 18)}<span>Save</span></button>` : ''}
     <button type="button" class="tvs-btn" data-act="renew"${has ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('shuffle', 18)}<span>New numbers</span></button>`;
@@ -996,6 +1040,7 @@ function onClick(e) {
     if (!b || !root.contains(b)) return;
     if (b.getAttribute('aria-disabled') === 'true') { toast(b.dataset.why || (currentSet().length ? 'Not ready yet' : 'Tick skills first')); return; }
     const v = b.dataset.v;
+    if (b.dataset.act !== 'shareedit') S.refocus = null;
     const more = root.querySelector('.tvs-more');
     S.moreOpen = !!(more && more.open);
     if (EXTRA && EXTRA.click && /^x-/.test(b.dataset.act)) { if (EXTRA.click(b)) { changed(false); renderSide(); } return; }
@@ -1011,11 +1056,12 @@ function onClick(e) {
         case 'shareedit': {
             const x = items().find((y) => keyOf(y) === v);
             editShareInPlace(b, x ? x.label : v, shareHeldText(v), (text, refocus) => {
-                const err = setShareFromText(v, text);
+                const err = setShareFromText(v, text, () => { const pp = plan(); return pp.error || ''; });
                 window.skillQueue = [...currentSet()];
                 changed();
                 if (err) toast(err);
-                if (refocus) { const nb = root && root.querySelector(`[data-share-key="${CSS.escape(v)}"]`); if (nb) nb.focus(); }
+                S.refocus = v;   // kept through the redraws that follow (renderMain gives it back)
+                const nb = root && root.querySelector(`[data-share-key="${CSS.escape(v)}"]`); if (nb && refocus) nb.focus();
             });
             return;
         }
@@ -1023,10 +1069,10 @@ function onClick(e) {
         case 'keep': S.release = null; renderMain(); return;
         case 'release': { const it = currentSet().find((x) => `${x.categoryId}:${x.skillId}` === v); if (it) { delete it.count; delete it.lockPct; } S.release = null; window.skillQueue = [...currentSet()]; changed(); return; }
         case 'versions': S.quiz.versions = Math.max(1, Math.min(6, Number(v) || 1)); changed(); return;
-        case 'wversions': S.opts.versions = Math.max(1, Math.min(20, Number(v) || 1)); changed(); return;
+        case 'wversions': S.opts.versions = Math.max(1, Math.min(30, Number(v) || 1)); changed(); renderSide(); return;
+        case 'setssame': S.opts.setsSame = v === 'same'; changed(); renderMain(); renderSide(); return;
         case 'keyversions': S.opts.keyVersions = v === 'end' ? 'end' : 'after'; changed(); return;
         case 'points': S.quiz.points = Number(v) === 2 ? 2 : 1; changed(false); renderSide(); return;
-        case 'often': { const key = b.closest('[data-key]').dataset.key; setLevel(key, Number(v)); changed(); return; }
         case 'examples': S.opts.examples = v; changed(); return;
         case 'each': S.opts.each = v; changed(); return;
         case 'layout': S.opts.layout = v; changed(); return;
@@ -1035,7 +1081,7 @@ function onClick(e) {
         case 'keyplace': S.opts.keyPlace = v; changed(); return;
         case 'keystyle': S.opts.keyStyle = v; changed(); return;
         case 'paper': S.opts.paper = v; changed(); return;
-        case 'renew': S.seed = freshSeed(); S.built = null; S.preview = null; scheduleBuild(0); renderSide(); return;
+        case 'renew': S.seed = freshSeed(); S.userSeed = true; S.built = null; S.preview = null; scheduleBuild(0); renderSide(); return;
         case 'print': doPrint(); return;
         case 'popup': S.popup = v; renderPopup(); return;
         case 'popclose': { const k = S.popup; S.popup = null; renderPopup(); const back = root.querySelector(`[data-act="popup"][data-v="${CSS.escape(k || '')}"]`); if (back) back.focus(); return; }

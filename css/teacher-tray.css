@@ -333,3 +333,15 @@ html:has(body.teacher-mode) { scroll-padding-bottom: 96px; }
 #teacherApp .tv-share-edit { display: inline-flex; align-items: center; gap: var(--sp-4, 4px); max-width: 100%; }
 #teacherApp .tv-share-in { width: 6.5rem; max-width: 40vw; min-height: 32px; font-family: var(--font-mono); font-size: var(--fs-14, 14px); color: var(--text); background: var(--surface, #fff); border: 2px solid var(--ring); border-radius: var(--r-8); padding: 2px var(--sp-6, 6px); }
 #teacherApp .tv-share-hint { font-size: var(--fs-12); color: var(--text-2); white-space: nowrap; }
+
+/* Save (owner 2026-10-25): the Save button becomes a name box in place */
+#teacherApp .tt-save-edit .tt-save-in { width: 14em; max-width: 50vw; }
+
+/* Tray rows (2026-10-25): the share button and × stay on the row's one line (one more column), and at phone width
+   the box being typed in leaves the name room (no hint, narrower box) */
+#teacherApp .tt-pop:not(.det) .tt-row[data-grade-host] { grid-template-columns: auto auto auto minmax(0, 1fr) auto auto auto; }
+#teacherApp .tt-pop:not(.det) .tt-row:not([data-grade-host]) { grid-template-columns: auto auto minmax(0, 1fr) auto auto auto; }
+@media (max-width: 819px) {
+  #teacherApp .tt-row .tv-share-hint { display: none; }
+  #teacherApp .tt-row .tv-share-in { width: 5.5rem; }
+}

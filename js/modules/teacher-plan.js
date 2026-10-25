@@ -299,13 +299,13 @@ export function planPages(kind, items, opts = {}) {
             warn = act.filter((x) => !(pg[x] >= 1)).map((x) => `${label(x)} gets no page: add pages${anyLock ? ' or lower the counts / held %' : ''}.`);
         } else {
             total = per * pages;
-            if (!big && !anyLock && kind === 'mixed' && act.length * 2 > total) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
-            if (!big && kind === 'sections' && act.length > total / 2 && !fixedSum) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
+            if (!big && kind === 'mixed' && act.length * 2 > total) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
+            if (!big && kind === 'sections' && act.length > total / 2) { pages = Math.ceil(act.length * 2 / per); total = per * pages; added = true; }
             const pc = planCounts(list, total, { groups: opts.groups, locks: opts.locks, seed, labelOf: opts.labelOf, minEach: (!big && !anyLock && total >= act.length * 2) ? 2 : 1 });
             if (pc.error) {
                 // the counts (and held %) do not fit these pages: say how many would
                 needPages = isFinite(pc.needTotal) ? Math.ceil(pc.needTotal / per) : undefined;
-                return fail(`${pc.error}${needPages ? ` Raise to ${needPages} page${needPages > 1 ? 's' : ''}?` : ''}`, { needPages });
+                return fail(`${pc.error}${needPages && !/\bRaise\b/.test(pc.error) ? ` Raise to ${needPages} page${needPages > 1 ? 's' : ''}?` : ''}`, { needPages });
             }
             byKey = pc.byKey;
             if (!big) warn = pc.warn;
