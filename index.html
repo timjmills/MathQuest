@@ -37,7 +37,7 @@
     <!-- Teacher site 2.0 (T2): board C tokens and the four-place shell, light only (additive; after every teacher sheet). -->
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&amp;family=Fraunces:ital,opsz,wght@1,9..144,500&amp;family=Inter:wght@500;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/teacher-tokens.css?v=d3c8c1131c">
-    <link rel="stylesheet" href="css/teacher-shell.css?v=81f11965a5">
+    <link rel="stylesheet" href="css/teacher-shell.css?v=b52a0e86ed">
     <!-- Teacher site 2.0 (T3b): the Worksheet, Quiz and Share sheets (additive). -->
     <link rel="stylesheet" href="css/teacher-sheet.css?v=697155d1ff">
     <link rel="stylesheet" href="css/teacher-tray.css?v=9fb21411dd">
@@ -65,6 +65,7 @@
                     <a href="#" class="tv2-menu-item" data-tv-go="student">Switch to pupil view</a>
                     <a href="help/teacher-online.html" class="tv2-menu-item" target="_blank" rel="noopener">Teacher help</a>
                 </div>
+                <a href="#" class="tv2-place tv2-student" data-tv-go="student"><svg class="tv2-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M2 8l8-4 8 4-8 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 10v4c2 2 6 2 8 0v-4" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Student view</span></a>
                 <button type="button" class="tv2-place tv2-me" data-tv-place="me" aria-expanded="false" aria-controls="tv2Profile"><svg class="tv2-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="7" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 18c0-4 3-6 7-6s7 2 7 6" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Me</span></button>
             </div>
         </nav>
@@ -1704,5 +1705,7 @@
 
 <!-- Owner ruling 2026-09-26: a copyright line on every web page as well as every printed page. -->
 <footer class="mq-site-copy" role="contentinfo">&copy; <span class="mq-site-year">2026</span> Cultivating the Digital. All rights reserved.</footer>
+<!-- If the app's modules fail to load (e.g. a half-updated browser cache right after a deploy), every button is dead: say so and offer a reload. -->
+<script>setTimeout(function(){try{if(typeof window.toggleUserRole==='function')return;var d=document.createElement('div');d.setAttribute('role','alert');d.style.cssText='position:fixed;left:16px;right:16px;top:16px;z-index:2147483647;padding:16px;background:#fff;color:#000;border:2px solid #000;border-radius:8px;font:600 18px/1.4 system-ui,sans-serif;text-align:center';d.innerHTML='Maths Quest did not finish loading. <button type="button" style="margin-left:8px;font:inherit;padding:6px 14px;border:2px solid #000;border-radius:6px;background:#3438C6;color:#fff;cursor:pointer">Reload</button>';d.querySelector('button').onclick=function(){location.reload();};document.body.appendChild(d);}catch(e){}},10000);</script>
 <script>try{document.querySelectorAll('.mq-site-year').forEach(function(e){e.textContent=new Date().getFullYear();});}catch(e){}</script>
 </body></html>

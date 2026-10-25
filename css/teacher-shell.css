@@ -170,3 +170,11 @@ body.teacher-mode.tv-play #teacherApp .tv2-nav,
 body.teacher-mode.tv-board #teacherApp .tv2-nav { display: none; }
 body.teacher-mode.tv-play,
 body.teacher-mode.tv-board { padding-bottom: 0; }
+
+/* ---------------------------------------------------------------- Student view: one click back from every screen
+   (owner 2026-10-25: the toggle disappears in Teacher view and "Switch to pupil view" sat inside Me) */
+#teacherApp .tv2-student { margin-bottom: var(--sp-8); }
+@media (max-width: 819px) {
+  #teacherApp .tv2-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  #teacherApp .tv2-student { margin-bottom: 0; }
+}

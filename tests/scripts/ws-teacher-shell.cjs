@@ -464,13 +464,13 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   for (const [w, h] of [[1366, 900], [390, 844]]) {
     await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
     await page.evaluate(() => { try { sessionStorage.removeItem('mq_teacher_screen'); } catch (e) { /* */ } window.setUserRole('teacher'); });
-    // the menus: four places, no retired tab anywhere in the chrome
+    // the menus: four places plus Student view (owner 2026-10-25: one click back to the pupil site), no retired tab anywhere in the chrome
     let r = await visit('/index.html');
     const menu = await page.evaluate((ret) => ({
       places: [...document.querySelectorAll('#teacherApp .tv2-place')].map((a) => a.textContent.trim()),
       retired: [...document.querySelectorAll('#teacherApp nav [data-tv-go], #tvPlaceTabs [data-tv-go], #tv2Profile [data-tv-go]')].map((a) => a.dataset.tvGo).filter((k) => ret.includes(k)),
     }), RETIRED);
-    row(w, 'menus', menu.places.join('|') === 'Skills|Lessons|Classes|Me' && !menu.retired.length && r.place === 'skills' && !r.tabs.length && !r.sideways, { menu, r });
+    row(w, 'menus', menu.places.join('|') === 'Skills|Lessons|Classes|Student view|Me' && !menu.retired.length && r.place === 'skills' && !r.tabs.length && !r.sideways, { menu, r });
     await page.evaluate(() => window.tvGo('wrm')); await sleep(800); r = await where();
     row(w, 'Lessons has no tabs', r.place === 'lessons' && !r.tabs.length, r);
     await page.evaluate(() => window.tvGo('run')); await sleep(500); r = await where();
