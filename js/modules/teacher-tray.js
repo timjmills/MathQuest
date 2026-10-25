@@ -220,9 +220,14 @@ function snapshot() {
         locks: { ...T.locks },
         groups: trayGroups(),
         lessons: trayLessons(),
+        // check r3 bug 1: Undo also puts back which set the tray came from and the print settings
+        fromSet: T.fromSet,
+        print: printNow(),
     };
 }
 function restoreSnap(snap) {
+    if ('fromSet' in snap) T.fromSet = snap.fromSet || null;
+    if (snap.print) { try { window.tvSheetPrint?.set(snap.print); } catch (e) { /* */ } }
     loadSetIntoQueue({ skills: snap.items.map((x) => ({ categoryId: x.categoryId, skillId: x.skillId, opts: x.opts })) });
     for (const x of snap.items) {
         const it = itemOf(`${x.categoryId}:${x.skillId}`);

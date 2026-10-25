@@ -530,3 +530,5 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 #teacherApp .ts-planchip:hover { background: #FCE3C4; }
 #teacherApp .ts-planchip:focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: 2px; }
 #teacherApp .ts-show-plan[aria-pressed="true"] { box-shadow: inset 0 calc(-1 * var(--sp-4)) 0 #E07B00; }
+/* check r3 nit: at phone width the ⋯ stays on the Quiz · Send · Print line */
+@media (max-width: 480px) { #teacherApp .ts-set-acts { flex-wrap: nowrap; } #teacherApp .ts-set-acts .tv-btn-sm { padding-left: var(--sp-8); padding-right: var(--sp-8); } }

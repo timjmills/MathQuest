@@ -1133,6 +1133,18 @@ function setsHTML() {
 }
 
 let setMenu = null;   // the id of the saved set whose ⋯ menu is open
+// check r3 nit: the ⋯ menu closes on Escape (focus back on ⋯) and on a click outside it
+function closeSetMenu(focus) {
+    if (!setMenu || !groot || !groot.isConnected) { setMenu = null; return; }
+    const id = setMenu;
+    setMenu = null;
+    gRender();
+    if (focus) groot.querySelector(`.ts-set[data-set-id="${CSS.escape(id)}"] [data-act="setmenu"]`)?.focus({ preventScroll: true });
+}
+if (typeof document !== 'undefined') {
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && setMenu) { e.stopPropagation(); closeSetMenu(true); } }, true);
+    document.addEventListener('pointerdown', (e) => { if (setMenu && !(e.target.closest && e.target.closest('.ts-set-menu, [data-act="setmenu"]'))) closeSetMenu(false); }, true);
+}
 /** "2 sets · Size S · Short key": the print settings a set keeps, in words. */
 function setPrintWords(o) {
     const w = [];
