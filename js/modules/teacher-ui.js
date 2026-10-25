@@ -157,6 +157,51 @@ export function savedSets() {
 }
 export function writeSets(list) { writeStore(SETS_KEY, list.slice(0, 50)); }
 
+/* A whole set in a link (owner 2026-10-25): the optional &set= suffix of a Send link. base64url of compact JSON
+ * {v:1, n:name, s:[items with opts / count / lockPct / weight / leftOut], l:locks, g:groups, ls:lessons, p:print}. */
+export function encodeSetParam(rec) {
+    if (!rec || !Array.isArray(rec.skills) || !rec.skills.length) return '';
+    const o = { v: 1, n: rec.name || '', s: rec.skills };
+    if (rec.locks && Object.keys(rec.locks).length) o.l = rec.locks;
+    if (rec.groups && rec.groups.length) o.g = rec.groups;
+    if (rec.lessons && rec.lessons.length) o.ls = rec.lessons;
+    if (rec.print) o.p = rec.print;
+    const bytes = new TextEncoder().encode(JSON.stringify(o));
+    let bin = '';
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+export function decodeSetParam(text) {
+    try {
+        const b = String(text || '').replace(/-/g, '+').replace(/_/g, '/');
+        const bin = atob(b + '==='.slice((b.length + 3) % 4));
+        const o = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
+        if (!o || o.v !== 1 || !Array.isArray(o.s)) return null;
+        const skills = o.s.filter((x) => x && typeof x.categoryId === 'string' && typeof x.skillId === 'string');
+        if (!skills.length) return null;
+        const rec = { name: String(o.n || ''), skills };
+        if (o.l && typeof o.l === 'object') rec.locks = o.l;
+        if (Array.isArray(o.g)) rec.groups = o.g;
+        if (Array.isArray(o.ls)) rec.lessons = o.ls;
+        if (o.p && typeof o.p === 'object') rec.print = o.p;
+        return rec;
+    } catch (e) { return null; }
+}
+/** A Send link's &set=: kept in My sets (once: the same set opened twice is not added twice). Returns the set or null. */
+export function importSharedSet(text) {
+    const rec = decodeSetParam(text);
+    if (!rec) return null;
+    const list = savedSets();
+    const same = (x) => JSON.stringify([x.skills, x.print || null]) === JSON.stringify([rec.skills, rec.print || null]);
+    const hit = list.find((x) => x.id !== 'tray' && same(x));
+    if (hit) return hit;
+    const now = Date.now();
+    const out = Object.assign({ id: 'set_' + now.toString(36) + Math.random().toString(36).slice(2, 6), createdAt: now, lastUsed: now, shared: true }, rec);
+    if (!out.name) out.name = 'Shared set';
+    writeSets([out, ...list]);
+    return out;
+}
+
 export function printDefaults() {
     const d = readStore(PRINT_DEFAULTS_KEY, {}) || {};
     return {

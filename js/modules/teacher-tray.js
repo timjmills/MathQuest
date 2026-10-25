@@ -133,6 +133,7 @@ const T = {
     need: 0,             // the total a refused count needs ("Raise the total to N")
     bulkCount: 4,        // the bulk bar's "Set count" 
     opener: null,
+    fromSet: null,       // owner 2026-10-25: the id of the saved set the tray was opened from (Save updates it)
 };
 (function restore() {
     const s = readStore(UI_KEY, null);
@@ -274,15 +275,30 @@ export function trayAddMany(keys, what) {
 }
 
 /** Replace the tray with a saved set (Browse by › My sets), with Undo. */
-export function trayLoadSet(set) {
+export function trayLoadSet(set, quiet = false) {
     const before = snapshot();
     const skills = (set.skills || []).filter((x) => x && findSkill(x.categoryId, x.skillId));
     // a set saved by the older screens has every weight 1 (their default): that is Equal here
     const old = skills.every((x) => !(x.weight > 1));
     restoreSnap({ items: skills.map((x) => ({ ...x, weight: old ? 2 : x.weight })), locks: set.locks || {}, groups: set.groups || [], lessons: set.lessons || [] });
+    // owner 2026-10-25: the set's own print settings come back with it, and the tray remembers which set it came from
+    if (set.print) { try { window.tvSheetPrint?.set(set.print); } catch (e) { /* */ } }
+    T.fromSet = set.id && set.id !== TRAY_SET_ID ? set.id : (set.fromSet || null);
     changed();
-    undoToast(`${set.name || 'The set'} is in the tray (${plural(trayItems().length, 'skill')}).`, before);
+    if (!quiet) undoToast(`${set.name || 'The set'} is in the tray (${plural(trayItems().length, 'skill')}).`, before);
 }
+/** The tray as a set record (skills with their options and amounts, holds, groups, lessons): for Save and Send. */
+export function trayRecord() {
+    const rec = { skills: trayItems().map(copyItem) };
+    if (Object.keys(T.locks).length) rec.locks = { ...T.locks };
+    if (T.groups.length) rec.groups = trayGroups();
+    if (T.lessons.length) rec.lessons = trayLessons();
+    return rec;
+}
+function printNow() { try { return window.tvSheetPrint ? window.tvSheetPrint.get() : null; } catch (e) { return null; } }
+function fromSetRec() { return T.fromSet ? savedSets().find((s) => s.id === T.fromSet) || null : null; }
+/** The name of the saved set the tray was opened from, or ''. */
+export function trayFromSetName() { const r = fromSetRec(); return r ? r.name || '' : ''; }
 
 /* ================================================================= lesson groups (T4, owner: multi-lesson sets)
  * A lesson's ticked skills go in as ONE group named after the lesson ("Lesson 4: Add within 20"). The groups keep
@@ -396,6 +412,9 @@ function save() {
     if (Object.keys(T.locks).length) rec.locks = { ...T.locks };
     if (T.groups.length) rec.groups = trayGroups();
     if (T.lessons.length) rec.lessons = trayLessons();
+    const pr = printNow();
+    if (pr) rec.print = pr;
+    if (T.fromSet) rec.fromSet = T.fromSet;
     writeSets([rec, ...list]);
 }
 
@@ -411,8 +430,8 @@ function saveNamedInPlace(btn) {
     const inp = document.createElement('input');
     inp.type = 'text';
     inp.className = 'tv-share-in tt-save-in';
-    inp.value = trayTitle();
-    inp.setAttribute('aria-label', 'Name of the set: press Enter to save');
+    inp.value = trayFromSetName() || trayTitle();
+    inp.setAttribute('aria-label', trayFromSetName() ? 'Name of the set: press Enter to save it (the same name updates the set)' : 'Name of the set: press Enter to save');
     wrap.append(inp);
     btn.replaceWith(wrap);
     inp.focus();
@@ -438,11 +457,22 @@ export function saveNamed(name) {
     const items = trayItems();
     if (!items.length) return null;
     const now = Date.now();
-    const rec = { id: 'set_' + now.toString(36) + Math.random().toString(36).slice(2, 6), name: String(name || trayTitle()), createdAt: now, lastUsed: now, skills: items.map(copyItem) };
-    if (Object.keys(T.locks).length) rec.locks = { ...T.locks };
-    if (T.groups.length) rec.groups = trayGroups();
-    if (T.lessons.length) rec.lessons = trayLessons();
+    const nm = String(name || trayTitle());
+    const pr = printNow();
+    // the tray came from a saved set and keeps its name: that set is updated (skills, options, amounts, print settings)
+    const old = fromSetRec();
+    if (old && old.name === nm) {
+        const rec = Object.assign({ id: old.id, name: nm, createdAt: old.createdAt || now }, trayRecord(), { lastUsed: now });
+        if (pr) rec.print = pr;
+        writeSets([rec, ...savedSets().filter((x) => x.id !== old.id)]);
+        toast(`Updated “${nm}” in My sets`);
+        return rec;
+    }
+    const rec = Object.assign({ id: 'set_' + now.toString(36) + Math.random().toString(36).slice(2, 6), name: nm, createdAt: now, lastUsed: now }, trayRecord());
+    if (pr) rec.print = pr;
     writeSets([rec, ...savedSets()]);
+    T.fromSet = rec.id;
+    save();
     toast(`Saved “${rec.name}” in My sets`);
     return rec;
 }
@@ -456,6 +486,7 @@ export function restoreTray() {
     const rec = savedSets().find((s) => s.id === TRAY_SET_ID);
     if (!rec || !rec.skills.length) return;
     restoreSnap({ items: rec.skills.filter((x) => findSkill(x.categoryId, x.skillId)), locks: rec.locks || {}, groups: rec.groups || [], lessons: rec.lessons || [] });
+    T.fromSet = rec.fromSet || null;
     window.skillQueue = [...currentSet()];
 }
 
