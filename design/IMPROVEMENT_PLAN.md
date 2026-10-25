@@ -1265,6 +1265,23 @@ passed per lane-week against the rate before Wave 0.
 
 ---
 
+## Owner decisions, 2026-10-25 (asked one by one; record of the owner's answers)
+
+1. **Subtraction spec card signed** (`design/cards/subtraction/subtraction.md`, `Signed: owner, 2026-10-25`): all 31 PROPOSED
+   decisions accepted as written (number-line nl* options hidden; dark and big board out of scope). The subtraction build may start.
+2. **Division fact rows reach 10 columns in every notation.** Owner: "Even with long division all three ways of writing division
+   facts (fraction, division sign, long division) should be small enough to get to the full 10 columns across." So fact-rows
+   ÷ items in fraction form (a/b), division-sign form (a ÷ b) and the long-division bracket each fit the Columns control up to
+   10 across (today ÷ facts fit only 3 because each is drawn as the full long-division cell). Build item for the fact-rows
+   engine; the fit gate (real fit plus 1 mm clear each side, VA-2) still applies.
+3. **Teacher links open their page.** A link to a teacher page (hash link: #wrm, #todo/…, a screen) opens that teacher page;
+   the plain site address still opens the pupil home unless Settings › "Open the site in" = Last view.
+4. **Mixed counting PAGEFILL** (3 rows instead of 4 since the CL-40 tab inset; pinned in print-lint.json): fixed in the counting
+   family rebuild, not before.
+5. **Old unmerged branches** (about 20 `claude/sweet-newton-c8wrv1-wip-*` and three small lane branches from September–October):
+   kept untouched. At the next reset (new week), review them and make a plan for what is kept, merged or built upon under the
+   current plan.
+
 ## Glossary (for builders)
 
 - **Precritic** — the automatic checks a builder runs before an independent critic grades the work.
