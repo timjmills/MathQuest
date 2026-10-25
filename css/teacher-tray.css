@@ -345,3 +345,11 @@ html:has(body.teacher-mode) { scroll-padding-bottom: 96px; }
   #teacherApp .tt-row .tv-share-hint { display: none; }
   #teacherApp .tt-row .tv-share-in { width: 5.5rem; }
 }
+
+/* owner 2026-10-25: a × on every tray-bar item, and Clear tray */
+#teacherApp .tt-itemwrap { display: inline-flex; align-items: center; flex: none; gap: 2px; }
+#teacherApp .tt-x { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: none; padding: 0; border: var(--line-1) solid var(--line); border-radius: 999px; background: var(--surface); color: var(--text); font: 700 16px/1 var(--font-ui); cursor: pointer; }
+#teacherApp .tt-x:hover { border-color: var(--text); }
+#teacherApp .tt-x:focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: 2px; }
+#teacherApp .tt-items > .tt-itemwrap.fit-wrap > :first-child { flex: 1 1 auto; min-width: 0; white-space: normal; height: auto; text-align: left; }
+#teacherApp .tt-items > .tt-itemwrap.fit-wrap .tt-mini-pic { display: none; }

@@ -703,7 +703,12 @@ function openSheet(kind) {
 
 /* ================================================================= the bar */
 
+// owner 2026-10-25: every item in the tray bar has its own × (take it out, with Undo)
 function barItemHTML(k, many) {
+    const { label } = infoOf(k);
+    return `<span class="tt-itemwrap">${barItemCore(k, many)}<button type="button" class="tt-x" data-act="chipx" data-arg="${esc(k)}" aria-label="Take ${esc(shortName(label))} out of the tray" title="Take out">×</button></span>`;
+}
+function barItemCore(k, many) {
     const { a, g, label } = infoOf(k);
     const mark = many && T.tview !== 'chips' ? `<span class="tt-li-a">${ABBR[a]}</span>` : '';
     const [c, s] = splitKey(k);
@@ -745,6 +750,7 @@ function barHTML() {
     return `${lead}${mid}
       <button type="button" class="tt-btn tt-count" data-act="trayopen">${n ? `${esc(label)} ▸` : 'Tray empty'}</button>
       <div class="tt-actions">${n ? '' : '<span class="tt-hint">Tick skills first</span>'}
+        ${n ? `<button type="button" class="tt-btn tt-ic tt-clear" data-act="tray-clear" aria-label="Clear the tray">${icon('trash', 20)}<span class="tt-l">Clear</span></button>` : ''}
         <button type="button" class="tt-btn tt-ic" data-act="tray-quiz" aria-label="Quiz">${icon('sheet', 20)}<span class="tt-l">Quiz</span></button>
         <button type="button" class="tt-btn tt-ic" data-act="tray-share" aria-label="Send"${dis}>${icon('link', 20)}<span class="tt-l">Send</span></button>
         <button type="button" class="tt-btn tt-ic" data-act="tray-save" aria-label="Save"${dis}>${icon('bookmark', 20)}<span class="tt-l">Save</span></button>
@@ -1124,6 +1130,8 @@ function onClick(e) {
         case 'trayopen': openTrayPopup(); return;
         case 'trayarea': openTrayPopup(arg); return;
         case 'chip': chipOpen(arg, b); return;
+        case 'chipx': takeOut([arg], shortName(infoOf(arg).label)); return;
+        case 'tray-clear': { const ks = trayKeys(); if (!ks.length) return; T.fromSet = null; takeOut(ks, plural(ks.length, 'skill')); return; }
         case 'close': closePop(); return;
         default: break;
     }
