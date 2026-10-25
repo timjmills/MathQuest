@@ -507,3 +507,11 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 #teacherApp .ts-plan-what { flex: 0 1 auto; }
 #teacherApp .ts-plan-txt { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; }
 #teacherApp .ts-plancard.ts-chipcard .ts-plan-tag { margin-left: auto; }
+
+/* Skills screen 2026-10-25: the card is a div; its name opens the options sheet, the tick is its own quick-add button */
+#teacherApp div.ts-card { cursor: pointer; text-align: left; }
+#teacherApp div.ts-card[data-on="true"] { border-color: var(--action); border-left-color: var(--a-bold); box-shadow: inset 0 0 0 var(--line-1) var(--action), var(--shadow-1); }
+#teacherApp button.ts-card-open { appearance: none; background: none; border: 0; margin: 0; padding-left: 0; padding-top: 0; padding-bottom: 0; color: inherit; font-family: inherit; text-align: left; cursor: pointer; }
+#teacherApp button.ts-card-open:focus-visible, #teacherApp button.ts-tick:focus-visible { outline: var(--line-2, 2px) solid var(--action); outline-offset: 2px; }
+#teacherApp button.ts-tick { appearance: none; background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; cursor: pointer; z-index: 1; }
+#teacherApp button.ts-tick[aria-pressed="true"] span { background: var(--action); border-color: var(--action); }

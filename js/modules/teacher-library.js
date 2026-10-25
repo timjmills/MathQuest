@@ -35,10 +35,10 @@ import { areaDetail, areaOfCode, AREAS, AREA_ORDER, areaIcon } from './teacher-a
 import { primaryStandard } from './standards.js';
 import { mapTaskList, mapStrandNames } from './teacher-map-tasks.js';
 import {
-    trayHas, trayToggle, trayAddMany, trayLoadSet, onTrayChange, renderBar, restoreTray, syncTray, setThumbDrawer,
+    trayHas, trayToggle, trayAddMany, trayAddWithOpts, trayLoadSet, onTrayChange, renderBar, restoreTray, syncTray, setThumbDrawer,
     gbadge, gradeName, shortName, trayItems, TRAY_SET_ID, openTrayPopup,
 } from './teacher-tray.js';
-import { mountCropped, refitCropped, croppedReady } from './teacher-chip.js';
+import { mountCropped, refitCropped, croppedReady, openChipSheet } from './teacher-chip.js';
 import { savedSets } from './teacher-ui.js';
 
 // Standards (owner request 2026-09-25): the detail panel tags each skill with its CCSS standards
@@ -820,15 +820,32 @@ function gCard(s) {
     const a = d.area;
     const on = trayHas(k);
     const v = gv();
-    const tick = `<span class="ts-tick" aria-hidden="true"><span>${on ? '✓' : ''}</span></span><span class="tv-sr">${on ? ', in the tray' : ', tick to add'}</span>`;
+    const nm = esc(String(s.label || '').replace(/\s*\((?:B&W|black and white)\)\s*$/i, ''));
+    const tick = `<button type="button" class="ts-tick" data-act="tick" data-skill="${esc(k)}" ${pressedA(on)} aria-label="${on ? `${nm}: in the tray. Take out` : `Quick add ${nm} to the tray`}"><span aria-hidden="true">${on ? '✓' : ''}</span></button>`;
+    const name = `<button type="button" class="ts-card-name ts-card-open" data-act="opts" data-skill="${esc(k)}" aria-label="${nm}: open its options${on ? ' (in the tray)' : ''}">${esc(s.label).replace(/\//g, '/<wbr>')}</button>`;
     if (v === 'chip') {
-        return `<button type="button" class="ts-card ts-chipcard" data-domain="${a}" data-act="tick" data-skill="${esc(k)}" ${pressedA(on)}${tvpAttrs(s.categoryId, s.skillId)}>${gbadge(s.level)}<span class="ts-chip-ic">${areaIcon(a, 16)}</span><span class="ts-card-name">${esc(s.label).replace(/\//g, '/<wbr>')}</span>${tick}</button>`;
+        return `<div class="ts-card ts-chipcard" data-domain="${a}" data-skill="${esc(k)}" data-on="${on}"${tvpAttrs(s.categoryId, s.skillId)}>${gbadge(s.level)}<span class="ts-chip-ic">${areaIcon(a, 16)}</span>${name}${tick}</div>`;
     }
     const list = v === 'list';
     const thumb = list ? '' : `<span class="ts-thumb" data-ts-thumb="${esc(s.categoryId)}|${esc(s.skillId)}" data-ts-size="${v}"${tvpAttrs(s.categoryId, s.skillId, trayOpts(s.categoryId, s.skillId))} data-tvp-flip aria-hidden="true"></span>`;
-    return `<button type="button" class="ts-card" data-domain="${a}" data-act="tick" data-skill="${esc(k)}" ${pressedA(on)}${list ? tvpAttrs(s.categoryId, s.skillId) : ''}>`
-        + `<span class="ts-card-top">${gbadge(s.level, !list)}<span class="ts-area-tag">${areaIcon(a, 16)}${esc(AREAS[a].short)}</span>${d.pool ? '<span class="ts-mixed">mixed</span>' : ''}</span><span class="ts-card-name">${esc(s.label).replace(/\//g, '/<wbr>')}</span>${thumb}`
-        + `${tick}</button>`;
+    return `<div class="ts-card" data-domain="${a}" data-skill="${esc(k)}" data-on="${on}"${list ? tvpAttrs(s.categoryId, s.skillId) : ''}>`
+        + `<span class="ts-card-top">${gbadge(s.level, !list)}<span class="ts-area-tag">${areaIcon(a, 16)}${esc(AREAS[a].short)}</span>${d.pool ? '<span class="ts-mixed">mixed</span>' : ''}</span>${name}${thumb}`
+        + `${tick}</div>`;
+}
+
+/** Card body: the skill's options sheet; Add to tray (or Update in tray) puts it in with those options. */
+function openSkillOptions(k, anchor) {
+    const i = k.indexOf(':');
+    const c = k.slice(0, i), sk = k.slice(i + 1);
+    const inTray = trayHas(k);
+    const cur = trayOpts(c, sk);
+    openChipSheet(c, sk, {
+        draft: true,
+        anchor,
+        item: { opts: cur ? JSON.parse(JSON.stringify(cur)) : {} },
+        primary: inTray ? 'Update in tray' : 'Add to tray',
+        onPrimary: (opts) => trayAddWithOpts(k, opts),
+    });
 }
 
 /** A maths-area group: the band (icon, name, count, + Add whole area) and its cards (or grade sub-groups). */
@@ -1132,12 +1149,15 @@ function syncTicks() {
     if (!groot || !groot.isConnected) return;
     groot.querySelectorAll('.ts-card[data-skill]').forEach((b) => {
         const on = trayHas(b.dataset.skill);
-        if ((b.getAttribute('aria-pressed') === 'true') === on) return;
-        b.setAttribute('aria-pressed', String(on));
+        if (b.dataset.on === String(on)) return;
+        b.dataset.on = String(on);
+        const tk = b.querySelector('button.ts-tick');
+        const nm = b.querySelector('.ts-card-open');
+        const label = nm ? nm.textContent : '';
+        if (tk) { tk.setAttribute('aria-pressed', String(on)); tk.setAttribute('aria-label', on ? `${label}: in the tray. Take out` : `Quick add ${label} to the tray`); }
         const t = b.querySelector('.ts-tick span');
         if (t) t.textContent = on ? '✓' : '';
-        const sr = b.querySelector(':scope > .tv-sr');
-        if (sr) sr.textContent = on ? ', in the tray' : ', tick to add';
+        if (nm) nm.setAttribute('aria-label', `${label}: open its options${on ? ' (in the tray)' : ''}`);
     });
     if (G.browse === 'map' || G.browse === 'sets') { if (!G.q.trim()) gRender(); }
 }
@@ -1146,6 +1166,7 @@ onTrayChange(syncTicks);
 function gAction(act, arg, b) {
     switch (act) {
         case 'tick': trayToggle(b.dataset.skill); return;
+        case 'opts': openSkillOptions(b.dataset.skill, b); return;
         case 'todo': import('./teacher-todo.js').then((m) => m.openTodo(arg)); return;
         case 'browse': G.browse = arg; G.q = ''; G.limit = G_PAGE; persistG(); break;
         case 'grade': pickGrade(arg); G.q = ''; G.limit = G_PAGE; persistG(); break;
@@ -1176,7 +1197,12 @@ function gAction(act, arg, b) {
 function gWire() {
     groot.addEventListener('click', (e) => {
         const b = e.target.closest('button[data-act]');
-        if (!b || !groot.contains(b)) return;
+        if (!b || !groot.contains(b)) {
+            // anywhere else on a skill card (its badge, thumbnail, padding) opens the options too
+            const card = e.target.closest('.ts-card[data-skill]');
+            if (card && groot.contains(card)) { const o = card.querySelector('.ts-card-open'); openSkillOptions(card.dataset.skill, o || card); }
+            return;
+        }
         gAction(b.dataset.act, b.dataset.arg || '', b);
     });
     let t = 0;

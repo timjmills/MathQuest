@@ -5,7 +5,8 @@
 // code and every print request carry them.
 //
 //   openChipSheet(cat, skill, ctx)   one skill (ctx from teacher-tray.js: item, weight(), held(), setWeight(w),
-//                                    remove(), changed())
+//                                    remove(), changed()); or a DRAFT (not in the tray yet): {draft: true,
+//                                    item: {opts}, primary: 'Add to tray', onPrimary(opts)}, no How often
 //   openBulkOptions(pairs, ctx)      the settings a selection of skills SHARES; a change is made in each of them
 //
 // Below 820 px the sheet is full screen above the bars; from 820 px a narrow sheet over a scrim.
@@ -189,7 +190,7 @@ function rowsHTML(defs, cur) {
 }
 
 function howOftenHTML() {
-    if (S.mode !== 'one') return '';
+    if (S.mode !== 'one' || S.ctx.draft) return '';
     const held = S.ctx.held ? S.ctx.held() : null;
     const sh = S.ctx.share ? S.ctx.share() : null;
     const shareLine = sh ? (sh.error ? `<p class="tt-warn" role="alert">⚠ ${esc(sh.error)}</p>`
@@ -228,7 +229,7 @@ function html() {
     <div class="tt-sheet tc-sheet" role="dialog" aria-modal="true" aria-labelledby="tcTitle">
       <div class="tt-sheet-head">${one ? gbadge(hit ? hit.level : 'M') : ''}<div class="tt-head-text">${head}<h2 id="tcTitle">${esc(title)}</h2></div><button type="button" class="tt-btn tt-icon tt-close" data-tc="close" aria-label="Close the options">${icon('x', 20)}</button></div>
       <div class="tc-body">${preview}${howOftenHTML()}<div class="tc-opts">${body}</div></div>
-      <div class="tt-sheet-foot tc-foot">${one && S.ctx.remove ? `<button type="button" class="tt-btn tt-text" data-tc="remove">${icon('trash', 18)}<span>Take out of the tray</span></button>` : ''}${defs.length ? '<button type="button" class="tt-btn" data-tc="reset">Reset to default</button>' : ''}<button type="button" class="tt-btn tt-primary" data-tc="close">Done</button></div>
+      <div class="tt-sheet-foot tc-foot">${one && S.ctx.remove ? `<button type="button" class="tt-btn tt-text" data-tc="remove">${icon('trash', 18)}<span>Take out of the tray</span></button>` : ''}${defs.length ? '<button type="button" class="tt-btn" data-tc="reset">Reset to default</button>' : ''}${one && S.ctx.onPrimary ? `<button type="button" class="tt-btn tt-primary" data-tc="primary">${esc(S.ctx.primary || 'Add to tray')}</button>` : '<button type="button" class="tt-btn tt-primary" data-tc="close">Done</button>'}</div>
     </div>`;
 }
 
@@ -275,6 +276,7 @@ function onClick(e) {
     if (!b || !S) return;
     switch (b.dataset.tc) {
         case 'close': closeChipSheet(); return;
+        case 'primary': { const f = S.ctx.onPrimary; const o = (S.ctx.item && S.ctx.item.opts) || {}; closeChipSheet(); if (f) f(o); return; }
         case 'example': S.example += 1; render(); return;
         case 'weight': if (S.ctx.setWeight) S.ctx.setWeight(Number(b.dataset.arg)); render(); return;
         case 'ask': S.ask = true; render(); el.querySelector('[data-tc="keep"]')?.focus({ preventScroll: true }); return;

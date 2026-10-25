@@ -252,6 +252,15 @@ export function trayToggle(key) {
     return true;
 }
 
+/** Add one skill WITH chosen options, or update the options of the tray item (Skills screen > card > options sheet). */
+export function trayAddWithOpts(key, opts) {
+    const o = opts && Object.keys(opts).length ? { ...opts } : {};
+    const it = itemOf(key);
+    if (it) it.opts = o; else if (!addOne(key, { opts: o })) return false;
+    changed();
+    return true;
+}
+
 /** Bulk add (Add whole grade / area / all N on a standard, a MAP task): says what it added, with Undo. */
 export function trayAddMany(keys, what) {
     const before = snapshot();
