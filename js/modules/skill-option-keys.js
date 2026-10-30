@@ -208,9 +208,10 @@ export const MULTI_KEYS = Object.freeze({
     units: '5L',         // measurement: which units
     parts: '5M',         // equal parts, or the parts a figure is split into
     divForm: '5N',       // div_facts: standard / long division / fraction / vertical / mix (2026-10-03)
-    amEdges: '5P',       // area models: the numbers around the box given / pupil writes them / mixed (2026-10-16)
-    amForm: '5Q',        // area-model division: the problem shown as ÷ sign / long division / fraction (a set)
-    // NEXT FREE IN BLOCK 5: 5R.
+    // (Lane D 2026-10-16 had 5P / 5Q, which main gave to answerSlot / winRows; the port moved them to 5V / 5W.)
+    amEdges: '5V',       // area models: the numbers around the box given / pupil writes them / mixed (2026-10-16)
+    amForm: '5W',        // area-model division: the problem shown as ÷ sign / long division / fraction (a set)
+    // NEXT FREE IN BLOCK 5: 5X (5P-5U are taken above: answerSlot, winRows, winCols, minFactor, ftTrap, ftFactors).
 
     // Block 6 — O2 easier / harder ladders (design/audit/OPTIONS-CRITIC-R2.md §5 #5, #13; 2026-09-25).
     // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
