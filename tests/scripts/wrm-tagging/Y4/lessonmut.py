@@ -209,6 +209,29 @@ def _(d): L(d, 'comparingmultiplicationstatements')['related'].append({'key': 'd
 def _(d): e = L(d, 'findtheruleinaninputoutputtable')['pre'][0]; e['why'] = e['why'].replace('wk W02', 'W09')
 @m('sweep: L21 related money_compare why names a coin it never deals ("half-dollars")', r'G8: names half-dollars, but no item deals a 50-cent coin')
 def _(d): L(d, 'poundstensonesandpenceusdollarscents')['related'][0]['why'] += ', with half-dollars'
+# ── A, G9 (lessons critic r4 §6, critic 2026-10-30 finding 2): the r4 R-mutations, read on the fixed probe ──
+def _cl(slug, role, i, old, new):
+    def f(d):
+        q = L(d, slug)[role][i]; fld = 'missing' if role == 'partial' else 'why'
+        assert old in q[fld], (slug, old); q[fld] = q[fld].replace(old, new)
+    return f
+for _n, _t, _f in [
+    ('G9 F6 / R6: L7 story objects narrowed to "floor, patio or wall"', r'G9 objects: says "story of a rectangular floor, patio or wall"', _cl('areaasmultiplication', 'partial', 1, 'kitchen floor, room, patio, wall or garden bed', 'floor, patio or wall')),
+    ('G9 R10: L9 "scales to 100, 200 or 500 mL" (1,000 dealt)', r'G9 scale: .*scales to 1000', _cl('measureandestimatemassandliquidvolumegkgmll', 'partial', 0, '100, 200, 500 or 1,000 mL', '100, 200 or 500 mL')),
+    ('G9 R9: L9 "(to 5 kg)" (10 kg dealt)', r'G9 top: says "\(to 5 kg\)"', _cl('measureandestimatemassandliquidvolumegkgmll', 'partial', 1, '(to 10 kg)', '(to 5 kg)')),
+    ('G9 R14: L20 "three to five fractions" (6 dealt)', r'G9 count: says "3 to 5 fractions"', _cl('orderfractions', 'partial', 0, 'three to six fractions', 'three to five fractions')),
+    ('G9 R15: L23 "8 to 10 counters" (12 dealt)', r'G9 count: says "8 to 10 counters"', _cl('sharingandgroupingfairshares', 'partial', 0, '8 to 12 counters', '8 to 10 counters')),
+    ('G9 R17: L22 "to 25 cents" (50 dealt)', r'G9 amount: says "to 25 cents"', _cl('selectmoney', 'partial', 0, 'to 50 cents', 'to 25 cents')),
+    ('G9 R16: L10 "a 12-inch ruler" (6 dealt)', r'G9 ruler: says "12-inch ruler"', _cl('measuretothehalfandquarterinch', 'partial', 0, '6-inch ruler', '12-inch ruler')),
+    ('G9 n9: L10 ruler "marked in halves" (quarters drawn)', r'G9 ruler: says "ruler marked in halves', _cl('measuretothehalfandquarterinch', 'partial', 0, 'marked in quarters', 'marked in halves')),
+    ('G9 R8: L13 related "1 or 2 hours later or earlier" (3 dealt)', r'G9 interval: .*180 min', _cl('comparedurationsoftime', 'related', 0, '1, 2 or 3 hours', '1 or 2 hours')),
+    ('G9 R13: L17 related "30 minutes later" (earlier dealt)', r'G9 direction: .*also count earlier', _cl('finddurationsoftime', 'related', 0, '30 minutes later or earlier', '30 minutes later')),
+    ('G9 R18: L13 partial "in whole hours" (half hours dealt)', r'G9 interval: says "in whole hours"', _cl('comparedurationsoftime', 'partial', 0, 'in whole and half hours', 'in whole hours')),
+    ('G9 R12: L11 "in halves or quarters" (eighths dealt)', r'G9 family: says "in halves or quarters", but items show /8', _cl('buildalineplotfrominchmeasurements', 'partial', 0, 'in halves, quarters or eighths, many of the plots in halves only', 'in halves or quarters')),
+    ('G9 R11 / r1-6: L7 "areas 6 to 48" (4 dealt, read on the fixed probe)', r'G2: says "areas 6 to 48", but items go below 6', _cl('areaasmultiplication', 'partial', 0, 'areas 4 to 48', 'areas 6 to 48'))]:
+    m(_n, _t)(_f)
+@m('G9 R3: L8 related half-unit claim "always a whole number" (halves shown)', r'G9 half: says')
+def _(d): L(d, 'distributiveandadditivearea')['related'][0]['why'] += '; each side is always a whole number'
 # controls: true claims of the same forms pass (the link has no finding)
 CTRL = [('control: L8 related "(2 sides of the L, 4 of the T)"', 'distributiveandadditivearea', L8W(_A + 'not every side is labelled (2 sides of the L, 4 of the T), so the missing lengths are worked out first')),
         ('control: L23 "groups such as 3 or 4"', 'sharingandgroupingfairshares', _c23('groups such as 3 or 4')),
@@ -229,7 +252,9 @@ AM.append(('audit row for a lesson that is not full', r'an audit row for a lesso
 missed = 0
 def runfit(p, extra=None):
     return subprocess.run(['node', os.path.join(H, 'lessonfit.mjs'), p], capture_output=True, text=True, env=dict(env, **(extra or {})))
+ONLY = os.environ.get('LESSONMUT_ONLY')   # e.g. LESSONMUT_ONLY=G9: run only the A mutations whose name holds it
 for name, target, f in M:
+    if ONLY and ONLY not in name: continue
     d = copy.deepcopy(base); f(d); p = os.path.join(TMP, 'm.json'); json.dump(d, open(p, 'w'), ensure_ascii=False)
     r = runfit(p)
     lines = [l.strip() for l in r.stdout.splitlines() if l.startswith('   ')]
