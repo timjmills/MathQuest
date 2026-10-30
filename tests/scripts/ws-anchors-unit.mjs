@@ -390,8 +390,10 @@ async function browserChecks() {
             for (const sk of [['addition', 'add_facts'], ['subtraction', 'subtract'], ['addition', 'add_column_multi']]) {
                 for (const role of ['independent', 'more-practice']) out.push({ what: `${role} side ${sk[1]}`, one: true, ...(await read(req(role, [sk], 'side'))) });
             }
+            // (sub_facts was the skill without worked steps until it joined the kit fact cell, 2026-10-30;
+            // sub_20_no_regroup is a legacy cell with none)
             out.push({ what: 'independent side, 3 skills (one without worked steps)', grouped: true,
-                ...(await read(req('independent', [['addition', 'add_facts'], ['addition', 'add_20_no_regroup'], ['subtraction', 'sub_facts']], 'side'))) });
+                ...(await read(req('independent', [['addition', 'add_facts'], ['addition', 'add_20_no_regroup'], ['subtraction', 'sub_20_no_regroup']], 'side'))) });
             return out;
         });
         for (const r of screen) {

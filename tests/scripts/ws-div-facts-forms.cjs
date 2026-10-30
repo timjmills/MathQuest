@@ -14,7 +14,7 @@
 //   codes   every value round-trips through the share-code option payload.
 //   roles   every form + Mix on EVERY role buildSheet composes (SHEET_ROLES), key built: it builds,
 //           the pupil page draws the item in its chosen form (or the role's documented fallback:
-//           fact-rows prints Long division / Fraction across, stretch and word-problems rewrite
+//           fact-rows prints Standard as the stacked ÷ fact (PT-FRW-9), stretch and word-problems rewrite
 //           the item), the key prints the answers, and Error analysis / True or False / Reason it
 //           carry their verdicts (ticks) on the key only, never on the pupil page.
 //   hosts   the online worksheet and the quiz draw each form and a right answer scores (driven by
@@ -64,7 +64,8 @@ const MARK = {
                 return { cols: res.fits && res.fits.cols, big, n: res.items.length, note: (res.fits && res.fits.note) || '',
                     cols2: two.fits && two.fits.cols, big2: two.items.some((i) => /\d{3}/.test(i.text)), note2: (two.fits && two.fits.note) || '' };
             }, size);
-            check(r.big ? (r.cols >= 5 && r.cols < 10) : r.cols === 10, `paper vertical fact-rows ${size}, tables to 12: ${r.cols} columns (${r.big ? '3-digit dividends: fewer columns, same digits' : '10'}), ${r.n} facts`);
+            // owner ruling 2026-10-30 (PT-FRW-9): 3-digit dividends keep all 10 columns too
+            check(r.cols === 10, `paper vertical fact-rows ${size}, tables to 12: ${r.cols} columns (10${r.big ? ', 3-digit dividends included' : ''}), ${r.n} facts`);
             check(r.cols2 === 10 && !r.big2, `paper vertical fact-rows ${size}, 2-digit dividends: 10 columns (${r.cols2})`);
             check(!/Digits \d+ pt so/.test(r.note + r.note2), `paper vertical fact-rows ${size}: no shrink ("${r.note}" / "${r.note2}")`);
         }
@@ -102,7 +103,10 @@ const MARK = {
                 else if (form === 'long') check(long > 0 && frac === 0 && vert === 0, `${tag}: draws the bracket (${long})`);
                 else if (form === 'fraction') check(frac > 0 && long === 0 && vert === 0, `${tag}: draws the fraction bar (${frac})`);
                 else if (form === 'vertical') check(vert > 0 && long === 0 && frac === 0, `${tag}: draws vertical facts (${vert})`);
+                // fact rows (owner ruling 2026-10-30, PT-FRW-7 / -9): Standard is the stacked ÷ fact there
+                else if (form === 'standard' && role === 'fact-rows') check(vert > 0 && long === 0 && frac === 0, `${tag}: draws the stacked ÷ fact (${vert})`);
                 else if (form === 'standard') check(vert === 0 && long === 0 && frac === 0 && /÷/.test(r.pupil), `${tag}: draws across, nothing stacked`);
+                else if (role === 'fact-rows' && r.n >= 3) check(long > 0 && frac > 0 && vert > 0, `${tag}: Mix draws the bracket, the fraction and the stacked ÷ (${long}/${frac}/${vert})`);
                 else if (r.n < 3) check(long + frac > 0 && vert === 0, `${tag}: one worked item, drawn in a Mix form`);
                 else check(long > 0 && frac > 0 && vert === 0, `${tag}: draws both bracket and fraction (${long}/${frac})`);
                 if (['error-analysis', 'true-false'].includes(role)) check(r.pupilTicks === 0 && r.keyTicks > 0, `${tag}: the verdicts are on the key only (pupil ${r.pupilTicks}, key ${r.keyTicks})`);
@@ -416,14 +420,22 @@ const MARK = {
         for (const size of ['S', 'L']) {
             const std = await evBuild('fact-rows', size, { divForm: 'standard' }, { seed: evSeed('fact-rows') });
             const stdPt = Number((/Digits (\d+) pt/.exec(std.note) || [])[1]) || 20;
+            // Fact rows draw Standard as the stacked ÷ fact (owner ruling 2026-10-30, PT-FRW-9): its
+            // open answer row is the band under its ink, held to the passed + - x fact rows' own band
+            // at this size (add_facts measures 0.40 / 0.41), not to the old across-only 0.32.
+            const addRef = worst((await inkScan(page, (await evBuild('fact-rows', size, {}, { skill: ['addition', 'add_facts'] })).doc)).pages[0]).bottom;
             for (const role of ['fact-rows', 'fact-probe']) {
                 const r = await evBuild(role, size, { divForm: 'mix' });
                 const ink = await inkScan(page, r.doc);
                 const w = worst(ink.pages[0]);
+                const bottomCap = role === 'fact-rows' ? Math.max(0.32, r2(addRef) + 0.02) : 0.32;
                 check(r.pages === 1 && (role === 'fact-rows' || r.n === 20), `D-C mix ${role} ${size}: one page (${r.n} facts)`);
-                check(r2(w.bottom) <= 0.32 && r2(sideOf(ink.pages[0].cells)) <= BAND && offCentre(ink.pages[0].cells) <= 0.06 && rowsEven(ink.pages[0]), `D-C mix ${role} ${size}: ink bottom ${f2(w.bottom)} <= 0.32, side ${f2(sideOf(ink.pages[0].cells))} <= ${BAND}, one-digit brackets centred, rows one height (${w.rowsH.join('/')} px)`);
-                const pts = [...new Set((r.pupil.match(/--ws-digit:(\d+)pt/g) || []).map((m) => Number(m.replace(/\D/g, ''))))];
-                check(pts.length === 1 && pts[0] >= stdPt, `D-C mix ${role} ${size}: every form at ${pts.join('/')} pt (Standard rows ${stdPt} pt)`);
+                check(r2(w.bottom) <= bottomCap && r2(sideOf(ink.pages[0].cells)) <= BAND && offCentre(ink.pages[0].cells) <= 0.06 && rowsEven(ink.pages[0]), `D-C mix ${role} ${size}: ink bottom ${f2(w.bottom)} <= ${f2(bottomCap)}, side ${f2(sideOf(ink.pages[0].cells))} <= ${BAND}, one-digit brackets centred, rows one height (${w.rowsH.join('/')} px)`);
+                const pts = [...new Set((r.pupil.match(/--(?:ws-digit|fd):(\d+)pt/g) || []).map((m) => Number(m.replace(/\D/g, ''))))];
+                // fact rows (PT-FRW-9): every form at the page's ladder digit, the Standard rows' own;
+                // the probe: its Mix rung (20 pt, MIX_RUNG_PT) or above
+                const rung = role === 'fact-rows' ? stdPt : 20;
+                check(pts.length === 1 && pts[0] >= rung, `D-C mix ${role} ${size}: every form at ${pts.join('/')} pt (${role === 'fact-rows' ? `Standard rows ${stdPt}` : 'the probe Mix rung 20'} pt)`);
                 const gaps = await page.evaluate((html) => {
                     const host = document.createElement('div');
                     host.className = 'ws-sheet';
@@ -483,7 +495,8 @@ const MARK = {
             const strip = (await inkScan(page, d.doc)).pages[1].strip;
             check(strip !== null && strip < 0.35, `R-2 divide lesson ${size} p2: page strip ${f2(strip)} < 0.35 (parent 0.37)`);
         }
-        // R-2: one across look - the div_facts equation cell's "÷" advance matches the fact rows'
+        // R-2: one across look - the div_facts equation cell's "÷" advance matches the fact probe's
+        // (fact rows print Standard as the stacked ÷ fact since the owner ruling of 2026-10-30, PT-FRW-9)
         {
             const adv = async (role) => {
                 const r = await evBuild(role, 'L', { divForm: 'standard' });
@@ -519,8 +532,8 @@ const MARK = {
                     return out.length ? out.reduce((a, b) => a + b, 0) / out.length : null;
                 }, r.pupil);
             };
-            const a = await adv('independent'), b = await adv('fact-rows');
-            check(a !== null && b !== null && Math.abs(a - b) <= 0.1 * Math.max(a, b) + 0.02, `R-2 one across look: digit-to-"÷" space ${f2(a)} em on Independent, ${f2(b)} em on fact rows`);
+            const a = await adv('independent'), b = await adv('fact-probe');
+            check(a !== null && b !== null && Math.abs(a - b) <= 0.1 * Math.max(a, b) + 0.02, `R-2 one across look: digit-to-"÷" space ${f2(a)} em on Independent, ${f2(b)} em on the fact probe`);
         }
 
         // ---------------------------------------------------------------- critic R3 defects (N-1 ... R-3)
