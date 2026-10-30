@@ -43,3 +43,24 @@ The 4 WIP commits after 235d44b4 (16406407 73f504ab 414f743a a31555a6) are not t
 | tests/scripts/ws-share-options.cjs | kept today | same change both sides (label stripped before reading a cell's text) |
 
 Also fixed after the port: `amEdges` / `amForm` option keys moved 5P / 5Q -> 5V / 5W (main had given 5P / 5Q to answerSlot / winRows; ws-code-snapshot caught the collision).
+
+Later port fixes (each its own commit): the pool dealer's page check (`pageCheck`) judges a top-started cell as
+today's lint does (CL-4b + H13-ROW), not as a centred one (it re-dealt almost every pool page); one-line equations /
+facts on a grid numbered past 9 start below the wide tab's keep-out (CSS, fact rows excepted); the lane's own
+L-OVERFLOW CL-40 lint is dropped for today's L-OVERLAP CL40-INK (same rule, ink measure; the lane's fired on
+div_facts fact rows that pass today's); an across fact hosted by a fact cell on fact rows (add_sub_10s) clears the tab;
+whole_as_fraction `forms` matchers read the lane's item text, narrowed `denoms` deal the den/den form.
+`js/modules/sheet/roles/fact-rows.js` is untouched.
+
+## Gates on the port (builder A, 2026-10-30; main = scratchpad worktree of fbeaa332)
+
+| Gate | Branch | Main (same scope) |
+|---|---|---|
+| syntax (every changed module), ws-boot-smoke, ws-layout-unit (570), ws-code-snapshot (723 codes), ws-share-options, ws-search-terms, ws-content-audit (full), ws-key-letters, ws-sheet-determinism S+L, ws-screen-answer (23 lane skills), ws-print-lint --self-test (75) | OK | - |
+| fact rows S/L (+, − at 10, × at 8, ÷ auto, Auto) | same grid, cells, pages and fit notes as main; HTML differs only in 3 dealt facts (page-deal) | - |
+| ws-print-lint kit, 23 lane skills, IND + MP, M | 0 findings | - |
+| ... S | 8 (TY-21 4.06 mm missing-digit box, mixed_multiplication) | pre-existing: same TY-21 on main |
+| ... L | 8 (number_families_add / _mult H13-ROW: a doubles family, 2 sentences, beside a 4-sentence one under CL-4b) | NEW, open |
+| ws-print-lint fact-rows L / S (div_facts, add_facts, sub_facts, mult_facts, add_sub_10s) | 0 | 0 (add_sub_10s n/a on main) |
+| ws-sheet-timing --seeds 10 | FAIL 10 of 20 (p90 3-9 s, max up to 17.9 s; 0 pages kept without a passing deal); the lane tip measured here at median 0.7-1.5 s | lane tip OK on the same 2 pools; open |
+| ws-precritic --strict (lane skills + 4 fact skills + fact-rows) | FAIL (15 of 28); see the builder A report for each gate against main | many pre-existing |
