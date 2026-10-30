@@ -13217,6 +13217,26 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         </div>`;
     }
 
+    // The teacher's answer-box option (`ansBox`, re-land 2026-10-30): a "a ± b = ?" sentence that falls
+    // through to the default (add_sub_10s, add_sub_100s) draws its answer place in the chosen style,
+    // the same slot as missing-factor's, so the key writes inside it. Automatic keeps the stretching box.
+    if (_ANSBOX != null && /^[^<]*=\s*\?\s*$/.test(text) && /^\d+$/.test(String(problem.ans))) {
+        // one width per section (SL-2): the band the step reaches (± 10 -> to 100, ± 100 -> to 1000), never this answer's length
+        const nums = (text.match(/\d+/g) || []).map(Number);
+        const step = nums.length >= 2 ? nums[1] : 0;
+        const band = Math.max(2, String(problem.ans).length, step ? String(step).length + 1 : 0);
+        const slot = wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"');
+        return `
+        <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+            ${num}
+            <div class="problem-content">
+                <div class="horizontal-problem" style="display:flex;align-items:center;gap:8px;">
+                    ${text.replace(/\?\s*$/, slot)}
+                </div>
+            </div>
+        </div>`;
+    }
+
     // Default: add answer line at the end if no blanks in text
     return `
         <div class="worksheet-problem${fullWidthClass}${sizeClass}">
