@@ -120,10 +120,11 @@ function planCheck(input, cut) {
     const TAG = routed ? ROUTE_TAG_MM : 0;
     const routeRows = [];
     const all = quads.flat();
-    const target = (input.targetSkill && input.targetSkill.iCan) || ((input.skills || [])[0] || {}).iCan || '';
+    // (a lesson's Prerequisite Check, LR-17: titled by the lesson it prepares - `checkFor`, the lesson skill's meta)
+    const target = (routed && input.checkFor && input.checkFor.iCan) || (input.targetSkill && input.targetSkill.iCan) || ((input.skills || [])[0] || {}).iCan || '';
     const skillsOn = (input.skills || []).filter((s) => all.some((it) => it.q && it.q.skillId === s.skillId && (!it.q.categoryId || it.q.categoryId === s.categoryId)));
     const frame = frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
-        tabId: `Check ${form}`, title: `Pre-skill check: ${topicOf(target)}`, score: all.length, twoLine: false });
+        tabId: `Check ${form}`, title: `${routed && input.checkFor ? 'Prerequisite check' : 'Pre-skill check'}: ${topicOf(target)}`, score: all.length, twoLine: false });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
     const labels = labelStyleOf(ctx.look, input.labels);
@@ -177,7 +178,33 @@ function planCheck(input, cut) {
             // (every item the description asks for prints when the whole check fits one page - critic D15)
             whole = need <= m.budget;
         }
-        for (const q0 of quads) {
+        if (routed && input.perQuestion) {
+            // A lesson's Prerequisite Check (LR-17: one question per prerequisite): two questions that each fit half the
+            // width share a row, so 3-4 questions fit one page; the rows grow to fill the body (at most GROW_MAX).
+            const units = [];
+            for (let j = 0; j < quads.length; j++) {
+                const a = quads[j], b = quads[j + 1];
+                // (two of like height only: a short item in a row sized for a tall one leaves its cell mostly empty, H13)
+                const alike = () => { const ha = hMinAt(a, 2, ctx), hb = hMinAt(b, 2, ctx); return Math.min(ha, hb) >= 0.75 * Math.max(ha, hb); };
+                if (b && fitsAt(a, 2, ctx) && fitsAt(b, 2, ctx) && alike()) { units.push([a, b]); j++; } else units.push([a]);
+            }
+            const colsOf = (q) => [4, 2, 1].find((c) => fitsAt(q, c, ctx)) || 1;
+            const hOfU = (u) => Math.max(...u.map((q) => hMinAt(q, u.length === 2 ? 2 : colsOf(q), ctx)));
+            const GAP = 3;   // (.mq-quadrow + .mq-quadrow: 3 mm)
+            const fixed = units.reduce((t, u, k) => t + m.strip + TAG + (k ? GAP : 0), 0);
+            const rowsH = units.reduce((t, u) => t + hOfU(u), 0);
+            // (at most 1.3 x the measured cell: an item never leaves 30 % of its cell empty, H13; the rest stays at the foot)
+            const g = fixed + rowsH < m.budget && rowsH > 0 ? Math.min(1.3, 1 + (m.budget - fixed - rowsH - 1) / rowsH) : 1;
+            for (const u of units) {
+                const h = hOfU(u) * g;
+                const uh = m.strip + TAG + h + (cur.sections.length ? GAP : 0);
+                if (cur.sections.length && cur.used + uh > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
+                if (u.length === 2) cur.sections.push({ kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-quadrow mq-lprerow', height: `${(m.strip + TAG + h).toFixed(2)}mm`, parts: u.map((q) => band(q, 1, 1, h, 2)) });
+                else cur.sections.push(band(u[0], 1, 1, h, colsOf(u[0])));
+                kept += u[0].length + (u[1] ? u[1].length : 0);
+                cur.used += uh;
+            }
+        } else for (const q0 of quads) {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
             const h = hMinAt(q0, cols, ctx) * grow;
             const share = (m.budget / quads.length - m.strip - TAG) * cut;
@@ -200,7 +227,7 @@ function planCheck(input, cut) {
     }
     const n = kept || all.length;
     const finalFrame = n === all.length ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
-        tabId: `Check ${form}`, title: `Pre-skill check: ${topicOf(target)}`, score: n, twoLine: false });
+        tabId: `Check ${form}`, title: `${routed && input.checkFor ? 'Prerequisite check' : 'Pre-skill check'}: ${topicOf(target)}`, score: n, twoLine: false });
     const rp = routed ? routePlan(input, routeRows) : null;
     return assemble(ROLE_ID, Object.assign({}, input, { form }), finalFrame, pages.map((p) => ({ sections: p.sections })), {
         scaffoldLevel: 0,

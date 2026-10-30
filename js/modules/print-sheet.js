@@ -44,6 +44,7 @@ import { practiceSection, practiceStackShapes, practiceRequest } from './sheet/l
 import { mixedRequest } from './sheet/lesson-pages/mixed.js';
 import { lessonPart, lessonPartIds } from './sheet/lesson-pages/index.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
+import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
 import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups } from './sheet/index.js';
@@ -214,6 +215,9 @@ function normaliseRequest(req = {}) {
         // prereqs.js LESSONS shape, used INSTEAD of lessonFor() when given (null otherwise, so
         // every standard lesson renders exactly as before).
         lessonData: req.lessonData && typeof req.lessonData === 'object' ? req.lessonData : null,
+        // A lesson packet by LESSON id (lessons/library.js, plan phase 0.4): the lesson's own practice skill
+        // and options (buildSheet sets the section), its library record. '' = by skill (its default lesson).
+        lessonId: req.role === 'lesson' && req.lessonId ? String(req.lessonId) : '',
         // The lesson's PARTS to print (LR-18, plan §8e): a subset of LESSON_PARTS, null = the packet as
         // practicePages / mixed describe it. And each part's own seed (`lessonSeeds`, lessonPartSeed): a part
         // refreshed with new numbers changes alone.
@@ -2862,6 +2866,13 @@ async function buildSheetCore(req = {}) {
 export async function buildSheet(req = {}) {
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own.
     if (req && req.role === 'detailed-lesson') return buildDetailedLesson(req);
+    // A lesson asked for by id: its section is the lesson's practice skill with the lesson's option values
+    // (a skill the request names is replaced - the lesson record decides, LINK-1).
+    if (req && req.role === 'lesson' && req.lessonId) {
+        const ref = lessonById(req.lessonId) ? practiceRef(req.lessonId) : null;
+        if (!ref) throw new Error(`buildSheet: no lesson "${req.lessonId}" in the library`);
+        req = Object.assign({}, req, { lessonId: lessonById(req.lessonId).id, sections: [Object.assign({}, (req.sections || [])[0] || {}, { skills: [ref] })] });
+    }
     const ko = normKeyOptions(req.key);
     const res = await buildSheetCore(Object.assign({}, req, { key: ko.on }));
     return arrangeKey(res, ko, req);
@@ -3120,6 +3131,7 @@ async function buildRoleSheet(n, metaOf) {
         perQuestion: n.perQuestion || undefined,
         // (a Prerequisite Check's routes: absent on every other sheet)
         routes: n.routes || undefined,
+        checkFor: n.checkFor || undefined,
         growLast: !!n.growLast || undefined,
         // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
         arrangement: 'sections',
@@ -3603,7 +3615,9 @@ export function lessonPartSeed(seed, part, refresh = 0) {
     const base = ((Number(seed) >>> 0) + ((def && def.offset) || 0)) >>> 0;
     const k = Math.max(0, Math.floor(Number(refresh) || 0));
     if (!k) return base;
-    let h = (base ^ Math.imul(k, 0x9e3779b1) ^ Math.imul(lessonPartIds().indexOf(part) + 1, 0x85ebca6b)) >>> 0;
+    // (the part's own salt from its id, so a part added to the registry never moves another part's refreshes)
+    const salt = String(part).split('').reduce((a, c) => (Math.imul(a, 31) + c.charCodeAt(0)) >>> 0, 7);
+    let h = (base ^ Math.imul(k, 0x9e3779b1) ^ Math.imul(salt, 0x85ebca6b)) >>> 0;
     h = Math.imul(h ^ (h >>> 16), 0x7feb352d) >>> 0;
     h = Math.imul(h ^ (h >>> 15), 0x846ca68b) >>> 0;
     return (h ^ (h >>> 16)) >>> 0;
@@ -3611,7 +3625,12 @@ export function lessonPartSeed(seed, part, refresh = 0) {
 
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
-    const data0 = n.lessonData || lessonFor(sk0.categoryId, sk0.skillId);
+    // The lesson record (plan phase 0.4): a detailed lesson's own `lessonData`; else the library lesson asked for by
+    // id, or the skill's default lesson (lessons/library.js - the same record prereqs.js lessonFor reads, plus its
+    // `prereqs`); else lessonFor (a skill with no library lesson).
+    const libId = n.lessonData ? '' : (n.lessonId || ((defaultLessonForSkill(sk0.categoryId, sk0.skillId) || {}).id || ''));
+    const recordOf = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId);
+    const data0 = recordOf(sk0);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
     if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
@@ -3626,8 +3645,12 @@ async function buildLesson(n, metaOf) {
     const sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
-    const data = n.lessonData || lessonFor(sk.categoryId, sk.skillId);
-    const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
+    const data = recordOf(sk);
+    // LR-17 (plan §8b, lead D1): a lesson whose record declares `prereqs` opens with its PREREQUISITE CHECK - one
+    // question per prerequisite, drawn by sheet/roles/pre-skill-check.js with each question's route - and its
+    // lesson sheet drops the Warm-up (the check is the warm-up). Every other lesson keeps its Warm-up.
+    const prereqs = !n.lessonData && data && Array.isArray(data.prereqs) && data.prereqs.length ? data.prereqs : null;
+    const warmSkills = prereqs ? [] : data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
     // The lesson's tags: the PRIMARY CCSS code (an approximate mapping is no tag) and its EEs.
@@ -3656,9 +3679,10 @@ async function buildLesson(n, metaOf) {
     const PART_IDS = lessonPartIds();
     const seeds = Object.fromEntries(PART_IDS.map((x) => [x, n.lessonSeeds && n.lessonSeeds[x] !== undefined ? n.lessonSeeds[x] : lessonPartSeed(n.seed, x)]));
     const refreshed = PART_IDS.filter((x) => seeds[x] !== lessonPartSeed(n.seed, x));
-    const printed = n.parts || PART_IDS.filter((x) => { const d = lessonPart(x); return !d.inPacket || d.inPacket(n); });
+    const printed = (n.parts || PART_IDS.filter((x) => { const d = lessonPart(x); return !d.inPacket || d.inPacket(Object.assign({}, n, { prereqCheck: !!prereqs })); }))
+        .filter((x) => x !== 'prereq' || prereqs);
     const partsMode = !!(n.parts || refreshed.length);
-    const lastAt = Math.max(1, ...printed.concat(refreshed).map((x) => PART_IDS.indexOf(x)));
+    const lastAt = Math.max(PART_IDS.indexOf('sheet'), ...printed.concat(refreshed).map((x) => PART_IDS.indexOf(x)));
     const built = partsMode ? PART_IDS.slice(0, lastAt + 1) : printed;
     const practicePages = partsMode ? Math.max(1, n.practicePages) : n.practicePages;
 
@@ -3670,6 +3694,14 @@ async function buildLesson(n, metaOf) {
         role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
     }), metaOf);
     let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
+    // The Prerequisite Check (LR-17): first in the packet; its key ends with the routing table.
+    const buildPrereq = (seed, avoid = (r) => r) => buildRoleSheet(Object.assign({}, nz, {
+        seed, role: 'pre-skill-check', header, look: 'ican', perQuestion: 1, checkFor: meta,
+        sections: [{ skills: prereqs.map((p) => avoid(Object.assign({}, p.ref))) }],
+        routes: prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', checks: p.why || '' })),
+        lessonInput: undefined,
+    }), metaOf);
+    if (prereqs && built.includes('prereq')) parts.unshift({ part: 'prereq', role: 'pre-skill-check', res: await buildPrereq(lessonPartSeed(n.seed, 'prereq')) });
 
     // 2. Massed practice: Independent pages with the chart's step strip, the grid filling the page
     // body in ONE frame (CL-1; lessons r1: no blank band above the footer, no gutters).
@@ -3797,7 +3829,7 @@ async function buildLesson(n, metaOf) {
     }, extra.sections ? { sections: extra.sections } : {}), metaOf);
     for (const x of built) {
         const d = lessonPart(x);
-        if (['chart', 'sheet', 'practice', 'mixed'].includes(x) || !d || d.role !== 'lesson') continue;
+        if (['prereq', 'chart', 'sheet', 'practice', 'mixed'].includes(x) || !d || d.role !== 'lesson') continue;
         parts.push({ part: x, role: 'lesson', res: await lessonRolePart(x, lessonPartSeed(n.seed, x)) });
     }
 
@@ -3821,7 +3853,8 @@ async function buildLesson(n, metaOf) {
         const others = [...new Set(parts.filter((p) => p.part !== key).flatMap((p) => textsOf(p.res)))];
         const avoid = (r) => Object.assign({}, r, { avoidTexts: others.concat(Array.isArray(r.avoidTexts) ? r.avoidTexts : []) });
         let res;
-        if (x === 'chart' || x === 'sheet' || parts[at].role === 'lesson') {
+        if (x === 'prereq') res = await buildPrereq(seeds.prereq, avoid);
+        else if (x === 'chart' || x === 'sheet' || parts[at].role === 'lesson') {
             res = await lessonRolePart(x, seeds[x], { lessonInput: { warmSkills: warmSkills.map(avoid) }, sections: [Object.assign({}, nz.sections[0], { skills: [avoid(sk)] }), ...nz.sections.slice(1)] });
             if (x === 'chart') chart = res;
             if (x === 'sheet') teach = res;
@@ -3855,7 +3888,7 @@ async function buildLesson(n, metaOf) {
     const pageCount = parts.reduce((a, p) => a + (p.res.pageCount || 0), 0);
     const keyPageCount = n.key ? parts.reduce((a, p) => a + (p.res.keyPageCount || 0), 0) : 0;
     const notes = [...new Set(sizeNote.concat(parts.flatMap((p) => p.res.notes || [])))];
-    const PART_NAME = { chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
+    const PART_NAME = { prereq: 'Prerequisite Check', chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
     const line = parts.map((p) => `${PART_NAME[p.part] || (lessonPart(p.part) || {}).name || p.part}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
     const tagPages = (list, p) => { const ids = sheetIds(p); return (list || []).map((h, i) => tagSheets(h, i === 0 ? ids[0] : ids[1], ids[1])); };
     return {
@@ -3883,7 +3916,9 @@ async function buildLesson(n, metaOf) {
         notes,
         plan: teach.plan,
         lesson: {
-            skill: `${sk.categoryId}:${sk.skillId}`, tags: { ccss, ee, line: tagLine },
+            id: libId, skill: `${sk.categoryId}:${sk.skillId}`, tags: { ccss, ee, line: tagLine },
+            // LR-17: the Prerequisite Check's questions and routes (null without one).
+            prereqCheck: prereqs ? prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', why: p.why || '', skill: `${p.ref.categoryId}:${p.ref.skillId}` })) : null,
             prerequisites: data
                 ? { skills: data.skills.map((s) => s.key), concepts: data.concepts.map((c) => c.text), vocab: data.vocab.map((v) => v.word) }
                 : { skills: warmSkills.map((s) => `${s.categoryId}:${s.skillId}`), concepts: [], vocab: [] },

@@ -75,7 +75,7 @@ async function inPage(page, fn, arg) {
             }
         } finally { await app.close(); }
         for (const f of fails) console.log(`  ${f}`);
-        console.log(fails.length ? `ws-lesson-baseline --parts: FAIL (${fails.length})` : `ws-lesson-baseline --parts: OK (${SAMPLES.length} lessons x 4 parts: alone = packet page; refresh changes only its part)`);
+        console.log(fails.length ? `ws-lesson-baseline --parts: FAIL (${fails.length})` : `ws-lesson-baseline --parts: OK (${SAMPLES.length} lessons x every part: alone = packet page; refresh changes only its part)`);
         process.exit(fails.length ? 1 : 0);
     }
     try {

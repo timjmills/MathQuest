@@ -13,7 +13,7 @@
 //   common.js     the shared pieces
 //
 // THE REGISTRY (lessons-phase0 lead decision D2). A lesson packet is a list of PARTS, looked up here by id, in `order`:
-//   chart (10) · sheet (20) · practice (30) · mixed (40)
+//   prereq (5, a lesson with `prereqs` only) · chart (10) · sheet (20) · practice (30) · mixed (40)
 // and the lesson SHEET is a list of BANDS, in `order`:
 //   vocab (10: Vocabulary + Remember) · warm-up (20) · guided (30)   (then the Independent rows fill the last page)
 // A new page job - the planned vocabulary pages - plugs in by registering a part (`registerLessonPart`) or a sheet band
@@ -66,6 +66,9 @@ export const lessonParts = () => [...PARTS.values()].sort((a, b) => a.order - b.
 /** The registered part ids, in packet order (print-sheet.js LESSON_PARTS). */
 export const lessonPartIds = () => lessonParts().map((p) => p.id);
 
+// LR-17 (plan §8b, lead D1): a lesson whose record declares `prereqs` opens with its Prerequisite Check, drawn by
+// roles/pre-skill-check.js (one question per prerequisite, each with its route; the routing table on the key).
+registerLessonPart({ id: 'prereq', order: 5, role: 'pre-skill-check', name: 'Prerequisite Check', sheet: 'lesson-prereq', offset: 31357, inPacket: (n) => !!n.prereqCheck });
 registerLessonPart({ id: 'chart', order: 10, role: 'lesson', name: 'Anchor chart', sheet: 'lesson-chart', offset: 0, size: 'L' });
 registerLessonPart({ id: 'sheet', order: 20, role: 'lesson', name: 'Lesson', sheet: 'lesson-sheet', offset: 0 });
 registerLessonPart({ id: 'practice', order: 30, role: 'independent', name: 'Practice', sheet: 'lesson-practice', offset: 7919, inPacket: (n) => n.practicePages > 0 });

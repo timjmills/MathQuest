@@ -72,6 +72,7 @@ import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrint
 import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
 // The sheet engine bridge (P7.2): page roles -> pupil sheet + facsimile key
 import { buildSheet, sheetDocument, lessonPartSeed, LESSON_PARTS } from './modules/print-sheet.js';
+import { lessonById, lessonData, lessonsForSkill, defaultLessonForSkill } from './modules/lessons/library.js';
 
 // Google Classroom Export
 import { exportPrintToGoogleForms, exportQuizToGoogleForms, openGoogleExportModal, closeGoogleExportModal, startGoogleExport, initGoogleAuth, isGoogleAuthenticated, revokeGoogleToken, listClassroomCourses } from './modules/google-classroom.js';
@@ -427,7 +428,7 @@ Object.assign(window, {
     generatePrintProblem, formatProblemForPrint, generateWorksheetHTML,
     generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType,
     closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet,
-    buildSheet, sheetDocument, lessonPartSeed, LESSON_PARTS,
+    buildSheet, sheetDocument, lessonPartSeed, LESSON_PARTS, lessonById, lessonData, lessonsForSkill, defaultLessonForSkill,
 
     // Skills Organizer
     openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory,
