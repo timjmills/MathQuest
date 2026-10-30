@@ -41,6 +41,35 @@ touches `print-sheet.js` `buildLesson` / `buildDetailedLesson` only where the pa
 
 ## Times
 
+### Builder A (node side), 2026-10-30, 17:28-18:05 UTC (about 37 min wall)
+- 17:28-17:32 read + port `sheet/lesson-rules.js`, `tests/lib/browser-lock.cjs` (+ harness, lock tested: stale holder broken,
+  waiter gets it on release, file gone) - commit e8409ccd.
+- 17:32-17:42 library: `schema.js`, `library.js`, ten family files (all ten lessons of today's `prereqs.js`), `prereqs.js`
+  as the view (deep-compare OK), `ws-lesson-seed` (curated links first), `ws-lesson-coverage`, `ws-lesson-hash` - e6b18f8c.
+- 17:42-17:44 build-list NEEDS + `ws-lesson-unit.mjs` (79 checks) - 457bea20.
+- 17:44-17:50 `LESSON_RULES.md`, plan §7/§8b notes, `ws-lesson-check` on today's engine (probe of the plan shape, 1 run) - 6ccf9938.
+- 17:50-18:02 gates (browser gates one at a time; render identity 6 min, lesson-warmup 5 min, lesson-check 3 min).
+
+### Builder A: what was ported, what was skipped
+- **Ported:** 588d053f lesson-rules.js, LESSON_RULES.md, ws-lesson-check (adapted: the packet check computed in the page
+  when the engine gives no `lesson.check`; LR-18 parts only where `window.lessonPartSeed` exists); 669df31a ws-lesson-hash
+  (no stamps file - B takes the baseline); 28a202a5 / c5847d4a library, schema, families, prereqs.js view (with TODAY's
+  data, all ten lessons, not the r5 data); 99607315 ws-lesson-seed -> seed-db.js + prereq-db.js (now from the curated
+  `data/curriculum/links` `pre` lists first: 391 of 557 fallbacks); aaa67de9 ws-lesson-coverage -> LESSON_COVERAGE.md,
+  status-db.js, passed-stamps.json (stamps empty until B's baseline; `--bind-stamps` fills them); 786f60a1 build-list
+  NEEDS + ws-standards line; 0e40332e browser-lock + harness; cf428e41 / ea22a97f / ebcf82e7 data, library, schema,
+  coverage, doc hunks (LR-17 per D1).
+- **Skipped (engine, not Builder A's):** 588d053f print-sheet / stack / pv / mixed-practice / tokens / teacher-print /
+  lesson.js / lesson-css / sheet/index hunks (r5: one avoid set, noNearTwin, maxUnder10, LESSON_PACKET_SIZE, stackMinSize /
+  atLeastSize, `lesson.check`, third chart example for the double and the answer under 10) - not on main; listed in
+  LESSON_RULES.md "Status on the main branch"; `ws-lesson-check` reports their findings against today's packets.
+  cf428e41 `lesson-pages/prereq-check.js` (D1), its print-sheet / lesson-css / teacher-print hunks (B). ebcf82e7 engine
+  hunks (B). The branch's ws-layout-unit lesson checks moved to `ws-lesson-unit.mjs` (no shared-file conflict with B).
+- **Data decisions:** the r5 data changes to the samples (third example `double`, `underTen`, `maxAnswer` / `ansDigits` on
+  partners) are NOT taken - today's records are kept byte-for-byte (D3); only the library-only `cases` / `caps` (gate data)
+  come from r5. The seven SU-C no-regrouping lessons share ONE routine (`sub-column-no-regroup`) with per-lesson `teach`
+  fields; they declare `prereqsPending` and `casesPending` (listed in LESSON_COVERAGE.md; `--strict` fails on them).
+
 ## Gates
 
 ## Critic rounds
