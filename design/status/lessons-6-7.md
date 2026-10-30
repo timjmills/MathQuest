@@ -15,6 +15,9 @@ Critic rounds: lesson 6: 2 (r2 FAIL, C2 7); lesson 7: 0
 - Lead 2026-10-30 18:47Z: when EACH lesson passes, save its page PNGs (+ the teacher screen that opens it) under
   design/status/lessons-6-7/, push, send_message the lead at once (PNG paths + head); each lesson goes live on its own.
 
+- Owner decision via lead 2026-10-30 18:50Z: finish 6-7 to their critic pass, then STOP; lessons 8-10 go to the end of the plan.
+  At the end this file becomes the hand-over (done, verdicts, everything left for 8-10 and lesson work, vocabulary dependency, open decisions).
+
 ## Owner go
 
 ## Open questions
