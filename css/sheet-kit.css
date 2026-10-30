@@ -472,3 +472,9 @@
    lane's r11 rule, rewritten for the top start. Fact rows (`.ws-grid.facts`) keep their own geometry. Additive. */
 .ws-page .ws-grid:not(.facts):has(> .ws-cell > .ws-tab.w2, > .ws-cell > .ws-tab.w3) > .ws-cell:is([data-ws-cell="equation"], [data-ws-cell="fact"]):has(> .ws-tab):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun) {
     --ws-ko2: calc(var(--ws-tab, 5mm) * 1.4 + 1mm); padding-top: max(var(--fp, 3mm), calc(var(--ws-ko2) + 2.6mm)); }
+
+/* 2026-10-30 (Lane D port, CL-40): an across fact on a fact-rows page whose host item is a fact cell (add_sub_10s,
+   a fact skill since Lane D) keeps the fact cell's 2 mm top pad, so "60 + 10 =" put its first digit beside tab 1
+   inside the keep-out. It takes the top pad its equation-hosted twins (div_facts across) clear the tab with: the
+   tab side + 1 mm. Fact rows' own vertical facts are unchanged. Additive. */
+.ws-page .ws-grid > .ws-cell.mq-hfactcell[data-ws-cell="fact"]:has(> .ws-tab, > .ws-letter):not(.blankrun) { padding-top: calc(var(--ws-tab, 5mm) + 1mm); }

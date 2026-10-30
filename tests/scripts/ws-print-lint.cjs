@@ -1039,49 +1039,9 @@ function wsLintPage(cfg) {
                 if (hit) F('L-OVERLAP', 'CL40-INK', 'major', hit.el, `ink of ${hit.what} at ${mm(hit.b.l - cr.left)} mm across, ${mm(hit.b.t - cr.top)} mm down enters the label keep-out (${mm(K.r - K.l)} x ${mm(K.b - K.t)} mm at the cell's top-left corner): nothing but the label paints there (CL-40)`, 'ink in label keep-out');
             }
         }
-        /* L-OVERFLOW CL-40 (label keep-out): nothing of the cell's content enters the label's square
-           plus 1 mm. The square is the label's real box (a w2 / w3 tab is wider); the content is its
-           ink: every glyph run of a text node, every box that paints a border or a non-white fill, and
-           every SVG shape. Labels themselves and the key's answer stamp are not content. */
-        if (!isLegacy) {
-            const MM1 = PX; // 1 mm in px
-            const isLab = el => !!el.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer');
-            for (const c of ri.cells) {
-                const lab = c.querySelector(':scope > [data-ws-label], :scope > .ws-tab, :scope > .ws-letter, :scope > .ws-modeltab');
-                if (!lab || !visible(lab)) continue;
-                const lr = lab.getBoundingClientRect();
-                if (!lr.width || !lr.height) continue;
-                const side = Math.max(lr.width, lr.height);
-                const ko = { l: lr.left - TOL, t: lr.top - TOL, r: lr.left + Math.max(lr.width, side) + MM1 - TOL, b: lr.top + side + MM1 - TOL };
-                const hitRect = r => r.width > 0 && r.height > 0 && r.left < ko.r && r.right > ko.l && r.top < ko.b && r.bottom > ko.t;
-                let hit = null;
-                const tw = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
-                for (let n = tw.nextNode(); n && !hit; n = tw.nextNode()) {
-                    if (!n.textContent.trim() || !n.parentElement || isLab(n.parentElement) || !visible(n.parentElement)) continue;
-                    if (n.parentElement.closest('style, script')) continue;
-                    const rg = document.createRange(); rg.selectNodeContents(n);
-                    for (const r of rg.getClientRects()) if (hitRect(r)) { hit = { el: n.parentElement, r, what: `text "${n.textContent.trim().slice(0, 24)}"` }; break; }
-                }
-                if (!hit) for (const d of c.querySelectorAll('*')) {
-                    if (d === lab || isLab(d) || !visible(d)) continue;
-                    let ink = false;
-                    if (d instanceof SVGElement) ink = /^(path|circle|ellipse|rect|line|polyline|polygon|text|use|image)$/i.test(d.tagName);
-                    else {
-                        const s = getComputedStyle(d);
-                        const bw = ['Top', 'Right', 'Bottom', 'Left'].some(k => parseFloat(s['border' + k + 'Width']) > 0 && s['border' + k + 'Style'] !== 'none');
-                        const bg = s.backgroundColor && !/rgba\(0, 0, 0, 0\)|transparent|rgb\(255, 255, 255\)/.test(s.backgroundColor);
-                        ink = bw || bg || /^(img|canvas)$/i.test(d.tagName);
-                    }
-                    if (!ink) continue;
-                    const r = d.getBoundingClientRect();
-                    if (hitRect(r)) { hit = { el: d, r, what: `<${d.tagName.toLowerCase()}> box` }; break; }
-                }
-                if (hit) {
-                    const gapX = hit.r.left - (lr.left + Math.max(lr.width, side)), gapY = hit.r.top - (lr.top + side);
-                    F('L-OVERFLOW', 'CL-40', 'major', hit.el, `${hit.what} enters the label keep-out: ${mm(Math.max(gapX, gapY))} mm from the ${mm(lr.width)} mm label (CL-40: label side + 1 mm stays empty)`, 'label keep-out');
-                }
-            }
-        }
+        /* (Lane D port 2026-10-30: the lane's own L-OVERFLOW CL-40 keep-out check - text line boxes against a
+           square of the label's width - is not taken: today's L-OVERLAP CL40-INK above measures the same rule on
+           the ink, and the two disagreed on fact rows that pass CL40-INK.) */
         if (!isLegacy) {
             const pg = ri.el;
             const pr = pg.getBoundingClientRect();
@@ -2592,12 +2552,6 @@ const SELF_TESTS = [
     { name: 'rejected digit variant cv01', expect: ['L-FONT', 'TY-4'], fn: () => { document.querySelector('.ws-page').style.fontFeatureSettings = '"cv04" 1, "cv01" 1'; } },
     { name: '6 pt pupil text', expect: ['L-SIZE', 'TY-11'], fn: () => { document.querySelector('.ws-page .ws-instrline').style.fontSize = '6pt'; } },
     { name: 'element sticking out of its cell', expect: ['L-OVERFLOW', 'PG-12'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="width:150mm;height:4mm;border-top:0.75pt solid #000"></div>'); } },
-    { name: 'text inside the label keep-out', expect: ['L-OVERFLOW', 'CL-40'], fn: () => {
-        const c = document.querySelector('.ws-page [data-ws-cell]');
-        c.querySelectorAll(':scope > [data-ws-label], :scope > .ws-tab, :scope > .ws-letter').forEach(e => e.remove());
-        c.insertAdjacentHTML('afterbegin', '<span class="ws-tab" data-ws-label="tab" style="position:absolute;left:0;top:0;width:6mm;height:6mm;background:#000;color:#fff">1</span>'
-            + '<span style="position:absolute;left:6.5mm;top:0.5mm;font-size:12pt">Ann</span>');
-    } },
     { name: 'clipped text', expect: ['L-OVERFLOW', 'TY-12'], fn: () => { const t = document.querySelector('.ws-page .ws-title'); t.style.overflow = 'hidden'; t.style.width = '30mm'; t.style.justifyContent = 'flex-start'; } },
     { name: 'split cell (page box taller than A4)', expect: ['L-SPLIT', 'PG-21'], fn: () => { document.querySelector('.ws-page').style.height = '380mm'; } },
     { name: 'footer in mid-page', expect: ['L-SPLIT', 'HD-30'], fn: () => { const b = document.querySelector('.ws-page .ws-body'); b.style.flex = 'none'; b.style.height = '120mm'; } },
