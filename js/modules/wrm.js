@@ -1574,10 +1574,11 @@ export const WRM_PROPOSALS = {
         steps: ['Y6.B3.S2'],
     },
     compare_numerator: {
-        kind: 'option', skill: 'fractions:compare', option: 'same numerator',
-        name: 'Compare Fractions by Numerator (option)',
-        teaches: 'comparing and ordering fractions with the same numerator (3/5 > 3/7) and by denominators',
-        representation: 'a comparison-type option on compare/order',
+        // W3 (WRM page critic 2026-10-30): one entry with frac_compare_same_part (the year files' id), see ENTRY_ALIASES
+        kind: 'option', skill: 'fractions:compare', option: 'pairs "same numerator" | "same denominator"',
+        name: 'Compare Fractions With the Same Numerator or Denominator (option)',
+        teaches: 'comparing and ordering unit fractions (1/3 > 1/5) and two fractions that share a numerator (3/5 > 3/7) or a denominator (3/8 < 5/8), with bars of the same whole, and saying why',
+        representation: 'the existing compare cell with two bars of the same whole; the < > = answer box',
         family: 'fractions',
         steps: ['Y6.B3.S4'],
     },

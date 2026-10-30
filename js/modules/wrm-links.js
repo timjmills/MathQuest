@@ -22,9 +22,10 @@
 import { WRM_SEQUENCE } from './wrm-sequence-db.js';
 import { skillsForWrmStep, wrmStep, wrmFor, WRM_PROPOSALS } from './wrm.js';
 import { skillsForStandard, SKILL_STANDARDS } from './standards.js';
-import { STANDARD_PROPOSALS, WRM_EXTENSIONS } from './build-list.js';
+import { STANDARD_PROPOSALS, WRM_EXTENSIONS, canonicalEntry } from './build-list.js';
 import { plainNote, isPlain } from './plain-words.js';
 import { SITE_LESSONS, SITE_ASSESSMENTS, STEP_SITE } from './site-lessons-db.js';
+import { LEGACY_HASHES, LEGACY_DATE, SLUG_ALIASES } from './wrm-legacy-hashes-db.js';
 
 // ---- curated links (data/curriculum/links/<YEAR>.json, written by the tagging lane) ------------
 // When a step has a curated record it wins over the computed rules: direct (with opts and partial),
@@ -87,6 +88,7 @@ let LESSONS = null;
 let BY_KEY = null;
 let BY_SITE = null;      // site id -> lesson (a sequence row the site names, or a lesson only the site has)
 let UNIT_ORDER = null;   // 'grade:unit' -> [lesson] in school-week order (the unit's list on screen)
+let BY_SLUG = null;      // 'grade|unit|slug' and 'grade|slug' -> lesson (the stable bookmark, critic 2026-10-30 W1)
 /** The slug part of a site id ("G4|-|lineplotswithfractions" -> "lineplotswithfractions"). */
 export const siteSlug = (id) => String(id || '').split('|-|')[1] || '';
 const titleSlug = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -190,6 +192,20 @@ function unpack() {
         BY_SITE.set(l.site, l);
         insertByWeek(UNIT_ORDER.get(`${l.grade}:${l.unit}`), l);
     }
+    // W1 (critic 2026-10-30): every lesson's bookmark is a SLUG of its title (the site's own id for a site lesson),
+    // never its list number, so a reordering cannot move a link. Two lessons of one unit with the same title (a
+    // repeat in the support block) are told apart by "-2", "-3" in list order.
+    BY_SLUG = new Map();
+    // the site's lessons first: their slug is the site id's, never suffixed
+    for (const l of [...LESSONS.filter((x) => x.site), ...LESSONS.filter((x) => !x.site)]) {
+        const base = l.site ? siteSlug(l.site) : titleSlug(l.rawTitle || l.title) || 'lesson';
+        const safe = /^\d+$/.test(base) ? `l${base}` : base;
+        let slug = safe;
+        for (let k = 2; BY_SLUG.has(`${l.grade}|${l.unit}|${slug}`); k += 1) slug = `${safe}-${k}`;
+        l.slug = slug;
+        BY_SLUG.set(`${l.grade}|${l.unit}|${slug}`, l);
+        if (!BY_SLUG.has(`${l.grade}|${slug}`)) BY_SLUG.set(`${l.grade}|${slug}`, l);
+    }
 }
 
 /** A unit's lessons as the screen lists them: the sequence's rows with the site's own lessons in week order. */
@@ -199,12 +215,57 @@ export function lessonBySite(id) { unpack(); return BY_SITE.get(String(id || '')
 /** The lesson of a grade whose site id ends in this slug (the bookmark form), or null. */
 export function lessonBySiteSlug(gradeId, slug) { unpack(); return BY_SITE.get(`${siteGrade(gradeId)}|-|${String(slug || '')}`) || null; }
 /**
- * The bookmark of a lesson: #wrm/<grade>/<unit>/<n> for a White Rose row, #wrm/<grade>/<unit>/<site slug> for a
- * lesson the school site names (stable while the site keeps the title, wherever the lesson is listed).
+ * The bookmark of a lesson: #wrm/<grade>/<unit>/<slug>. The slug is the site id's slug for a lesson the school site
+ * names, else the slug of its title (W1, critic 2026-10-30: stable while the title stays, whatever its number).
  */
 export function lessonHash(l) {
     if (!l) return '#wrm';
-    return `#wrm/${encodeURIComponent(l.grade)}/${encodeURIComponent(l.unit)}/${l.site ? siteSlug(l.site) : l.n}`;
+    unpack();
+    return `#wrm/${encodeURIComponent(l.grade)}/${encodeURIComponent(l.unit)}/${encodeURIComponent(l.slug)}`;
+}
+/** The lesson a slug names in a grade: in the unit first, then a site lesson, then anywhere in the grade, then an alias. */
+export function lessonBySlug(gradeId, unit, slug) {
+    unpack();
+    const g = String(gradeId || ''), s = String(slug || '');
+    const hit = BY_SLUG.get(`${g}|${unit}|${s}`) || lessonBySiteSlug(g, s) || BY_SLUG.get(`${g}|${s}`);
+    if (hit) return hit;
+    const alias = SLUG_ALIASES[`${g}/${s}`];
+    return alias ? resolveLessonHash(`#wrm/${alias}`).lesson : null;
+}
+/** The date the lesson list was renumbered (numbered links made before it are redirected). */
+export const RENUMBERED = LEGACY_DATE;
+/**
+ * What a #wrm hash opens: { grade, seg, lesson, legacy }. `seg` is the second segment (a section or unit id).
+ * A numbered lesson link (#wrm/3/D1/16, the form used until 2026-10-30) opens the lesson it was MADE for: the frozen
+ * table of the numbering before the school-site reorder (data/curriculum/wrm-legacy-hashes.json) names it, and
+ * `legacy` says so: { title (what it opens, or the old title), gone (no longer listed), alt (the lesson that number
+ * holds today: what a link made after the reorder meant) }. A number the table does not list meant the same lesson
+ * then and now, and opens it with no notice.
+ */
+export function resolveLessonHash(hash) {
+    unpack();
+    const m = /^#wrm(?:\/([^/]*))?(?:\/([^/]*))?(?:\/([^/?#]+))?/.exec(String(hash || ''));
+    const out = { grade: '', seg: '', lesson: null, legacy: null };
+    if (!m) return out;
+    const dec = (x) => { try { return decodeURIComponent(x || ''); } catch (e) { return String(x || ''); } };
+    out.grade = dec(m[1]);
+    out.seg = dec(m[2]);
+    const seg3 = dec(m[3]);
+    if (!seg3) return out;
+    if (/^\d+$/.test(seg3)) {
+        const now = BY_KEY.get(`${out.grade}:${out.seg}:${seg3}`) || null;
+        const old = LEGACY_HASHES[`${out.grade}/${out.seg}/${seg3}`];
+        if (!old) { out.lesson = now; return out; }
+        const [title, to] = old;
+        const target = to ? resolveLessonHash(`#wrm/${to}`).lesson : null;
+        out.lesson = target;
+        // a numbered link made after the reorder named the lesson that number holds now (a row the site does not name)
+        const alt = now && now !== target && !now.site ? now : null;
+        out.legacy = { title: target ? target.title : tidyTitle(title), gone: !target, alt };
+        return out;
+    }
+    out.lesson = lessonBySlug(out.grade, out.seg, seg3);
+    return out;
 }
 
 /** Every grade: [{ id, label, units: [{ id, domain, name, weeks, power, lessons: [lesson] }] }]. */
@@ -386,7 +447,7 @@ export function linksFor(lessonOrKey, opts = {}) {
 function curatedLinks(lesson, cur, ovr, live) {
     const seen = new Set();
     const keep = (x) => x && x.key && live(x.key) && !seen.has(x.key) && seen.add(x.key);
-    const build = (cur.build || []).slice();
+    const build = [...new Set((cur.build || []).map(canonicalEntry))];   // W3: merged ids read once
     const direct = applyOverride([
         ...(cur.direct || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: '', part: false })),
         ...(cur.partial || []).map((x) => ({ key: x.key, opts: x.opts || null, partial: composePartial(x.missing, build), part: true })),
@@ -398,7 +459,7 @@ function curatedLinks(lesson, cur, ovr, live) {
     const verdict = ['full', 'partial', 'gap'].includes(cur.verdict) ? cur.verdict
         : !direct.length ? 'gap' : direct.some((x) => !x.part) ? 'full' : 'partial';
     return onceEach({ lesson, step: lesson.step ? wrmStep(lesson.step) : null, direct, prereq, related, verdict, missing: composeMissing(cur.missing, build, cur.envision),
-        build, preBuild: (cur.preBuild || []).slice(), note: cur.note || '', source: 'curated' });
+        build, preBuild: [...new Set((cur.preBuild || []).map(canonicalEntry))], note: cur.note || '', source: 'curated' });
 }
 
 /**
