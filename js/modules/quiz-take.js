@@ -458,9 +458,9 @@ function _mountQuizCell(flatIdx) {
         if (vis && inp && adoptVisualBlank(vis, inp)) { area.remove(); wireSignCircle(vis, inp, { signs: signsFor(qd), onChange: (v) => { if (v) recordAnswer(flatIdx, v); } }); }
         else if (vis && inp && (qd.answerType === 'number' || !qd.answerType) && adoptSvgBlank(vis, inp)) area.remove();
         // several blanks in one drawing: an input in each, recorded in reading order
-        else if (vis && inp && wireCellSlots(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
+        else if (vis && inp && wireCellSlots(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordSlotAnswer(flatIdx, v); } })) {
             area.style.display = 'none';
-        } else if (vis && inp && area && wireCellInputs(vis, inp, qd, { onChange: (v) => { if (String(v).replace(/[,\s()]/g, '')) recordAnswer(flatIdx, v); } })) {
+        } else if (vis && inp && area && wireCellInputs(vis, inp, qd, { onChange: (v) => { if (String(v).replace(/[,\s()]/g, '')) recordSlotAnswer(flatIdx, v); } })) {
             // the drawing's own inputs are the answer area (owner ruling 2026-09-26)
             area.style.display = 'none';
         } else if (inp && area && !(vis && vis.querySelector('input, [data-mq-cell]'))) {
@@ -476,7 +476,7 @@ function _mountQuizCell(flatIdx) {
         if (vis) wireClozeBanks(vis);
         // a drawing with its own answer boxes (fact family, area model) answers through them: the
         // answer line under it is not drawn (H8)
-        if (vis && inp && area && area.isConnected && wireDrawnAnswers(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
+        if (vis && inp && area && area.isConnected && wireDrawnAnswers(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordSlotAnswer(flatIdx, v); } })) {
             area.style.display = 'none';
         }
         // a printed "Check one box." list is tapped (SP-3)
@@ -514,6 +514,7 @@ function _mountQuizCell(flatIdx) {
         });
         wireStackEntry(cellEl, { autofocus: !saved });
     }
+    wireSlotSettle(cellEl, flatIdx);
     restoreWorking(cellEl, _quizWorking.get(String(flatIdx)));
     // Green as soon as it is right (owner request 2026-09-25) - only when the quiz shows feedback
     // as the pupil goes: a test without instant feedback keeps its answers secret.
@@ -606,6 +607,81 @@ const isAnswered = (a) => !!a && a.studentAnswer !== '' && !a.partial;
 export function submitQuizMC(flatIdx, value) {
     recordAnswer(flatIdx, value);
     renderQuizInterface();
+}
+
+/** One wrong try on question `flatIdx`: its support ladder climbs a rung (instant feedback only). */
+function climbQuizLadder(flatIdx) {
+    const a = quizAnswers[flatIdx];
+    const item = state.quizAllQuestions[flatIdx];
+    if (!a || !item) return;
+    const qd = item.question.questionData;
+    try {
+        quizLadderWrong(qd, a.studentAnswer);
+        const ids = shownOf(qd).ids;
+        if (ids.length) a.help = ids;
+    } catch (e) { /* never break the answer */ }
+}
+
+/**
+ * A drawing's own boxes (several blanks, a table's cells, expanded form's place boxes): the answer
+ * is recorded at once, and with instant feedback its verdict and support-ladder rung are drawn in
+ * place, as for a typed answer (teacher follow-ups 2026-10-30: these boxes recorded silently, so the
+ * ladder never drew, and each box's change climbed a rung, so it was spent and showed the answer
+ * while the pupil was still filling the row). A wrong row is one try once the boxes have been still
+ * for a moment or the pupil leaves the drawing, as the practice card's one Check press.
+ */
+const QT_SLOT_SETTLE_MS = 1500;
+let _qtSlotSettle = null;
+function recordSlotAnswer(flatIdx, value) {
+    recordAnswer(flatIdx, value, { ladder: false });
+    if (_qtSlotSettle) clearTimeout(_qtSlotSettle.timer);
+    _qtSlotSettle = null;
+    const a = quizAnswers[flatIdx];
+    const fb = document.querySelector('#quizTakeView .qt-question-card > .qt-feedback');
+    if (!a || a.partial) { if (fb) fb.remove(); return; }
+    if (a.correct) { refreshQuizFeedback(flatIdx); return; }
+    // not right yet: no stale verdict while the pupil may still be changing a box
+    if (fb && !fb.classList.contains('mq-ladder-feedback')) fb.remove();
+    _qtSlotSettle = { flatIdx, timer: setTimeout(() => settleSlotAnswer(flatIdx), QT_SLOT_SETTLE_MS) };
+}
+function settleSlotAnswer(flatIdx) {
+    if (!_qtSlotSettle || _qtSlotSettle.flatIdx !== flatIdx) return;
+    clearTimeout(_qtSlotSettle.timer);
+    _qtSlotSettle = null;
+    const a = quizAnswers[flatIdx];
+    const test = state.currentQuiz;
+    if (!a || a.correct || a.partial || !String(a.studentAnswer).trim()) return;
+    if (test && test.settings && test.settings.showFeedback === 'instant') climbQuizLadder(flatIdx);
+    refreshQuizFeedback(flatIdx);
+}
+/** Typing in the drawing again holds the pending try; leaving the drawing ends it. */
+function wireSlotSettle(cellEl, flatIdx) {
+    let idle = null;
+    cellEl.addEventListener('input', () => {
+        const many = cellEl.querySelectorAll('input.mq-cellslot').length > 1;
+        if (_qtSlotSettle && _qtSlotSettle.flatIdx === flatIdx) {
+            clearTimeout(_qtSlotSettle.timer);
+            if (many) _qtSlotSettle = null;      // the row is still changing: the idle check below decides
+            else _qtSlotSettle.timer = setTimeout(() => settleSlotAnswer(flatIdx), QT_SLOT_SETTLE_MS);
+        }
+        // several boxes: the row, still for a moment with every box filled, is a try even before
+        // the last box's change (its blur) fires
+        if (!many) return;
+        clearTimeout(idle);
+        idle = setTimeout(() => {
+            const hidden = document.getElementById('qtAnswerInput');
+            const v = hidden && cellEl.contains(hidden) ? String(hidden.value || '').trim() : '';
+            const a = quizAnswers[flatIdx];
+            if (!v.replace(/[,\s]/g, '')) return;
+            if (!a || a.studentAnswer !== v) recordSlotAnswer(flatIdx, v);
+            else if (!a.correct && !a.partial) _qtSlotSettle = { flatIdx, timer: null };
+            settleSlotAnswer(flatIdx);
+        }, QT_SLOT_SETTLE_MS);
+    });
+    cellEl.addEventListener('focusout', (e) => {
+        if (e.relatedTarget && cellEl.contains(e.relatedTarget)) return;
+        setTimeout(() => settleSlotAnswer(flatIdx), 0);   // after the box's own change has recorded
+    });
 }
 
 export function submitQuizTextAnswer(flatIdx, value) {
@@ -703,7 +779,7 @@ function refreshQuizChrome() {
     });
 }
 
-function recordAnswer(flatIdx, studentAnswer) {
+function recordAnswer(flatIdx, studentAnswer, { ladder = true } = {}) {
     const qItem = state.quizAllQuestions[flatIdx];
     const qd = qItem.question.questionData;
     const timeSpent = Date.now() - quizQuestionStartTime;
@@ -760,12 +836,9 @@ function recordAnswer(flatIdx, studentAnswer) {
     // Instant feedback only: a wrong answer climbs the item's support ladder; what it showed is kept
     // with the answer (a short list of ids).
     const test = state.currentQuiz;
+    // (a drawing's several boxes come through recordSlotAnswer, which climbs once per finished row)
     if (!correct && String(studentAnswer).trim() && test && test.settings && test.settings.showFeedback === 'instant') {
-        try {
-            quizLadderWrong(qd, studentAnswer);
-            const ids = shownOf(qd).ids;
-            if (ids.length) quizAnswers[flatIdx].help = ids;
-        } catch (e) { /* never break the answer */ }
+        if (ladder) climbQuizLadder(flatIdx);
     } else if (correct) {
         const ids = shownOf(qd).ids;
         if (ids.length) quizAnswers[flatIdx].help = ids;
