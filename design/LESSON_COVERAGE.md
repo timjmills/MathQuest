@@ -24,11 +24,11 @@ render changed after that pass (re-grade due); **failed** when a page failed; **
 
 | Lesson | Title | Grade | Family | Archetype | Practice skill | Status | Why |
 |---|---|---|---|---|---|---|---|
-| Y1.B2.S9 (add-within-10) | Addition - add more | K | addsub | fact | `addition:add_facts` | **passed** | lessons-r4 (unstamped) |
+| Y1.B2.S9 (add-within-10) | Addition - add more | K | addsub | fact | `addition:add_facts` | **passed** | lessons-r4 |
 | Y2.B2.S17 | Subtract two 2-digit numbers (not across a 10) | 1 | addsub | column | `subtraction:sub_100_no_regroup` | **draft** | no critic round yet |
-| Y2.B2.S18 (subtract-2-digit-regroup) | Subtract two 2-digit numbers (across a 10) | 1 | addsub | column | `subtraction:sub_100_regroup` | **passed** | lessons-r4 (unstamped); robustness: practice seed 1001 |
+| Y2.B2.S18 (subtract-2-digit-regroup) | Subtract two 2-digit numbers (across a 10) | 1 | addsub | column | `subtraction:sub_100_regroup` | **passed** | lessons-r4; robustness: practice seed 1001 |
 | Y3.B2.S12 | Subtract two numbers (no exchange) | 2 | addsub | column | `subtraction:sub_1k_no_regroup` | **draft** | no critic round yet |
-| Y4.B1.S14 (round-nearest-10) | Round to the nearest 10 | 3 | placevalue | line | `number_sense:nearest_10` | **passed** | lessons-r4 (unstamped) |
+| Y4.B1.S14 (round-nearest-10) | Round to the nearest 10 | 3 | placevalue | line | `number_sense:nearest_10` | **passed** | lessons-r4 |
 | Y4.B2.S5 | Subtract two 4-digit numbers - no exchange | 3 | addsub | column | `subtraction:sub_10k_no_regroup` | **draft** | no critic round yet |
 | skill:subtraction:sub_100k_no_regroup | skill:subtraction:sub_100k_no_regroup |  | addsub | column | `subtraction:sub_100k_no_regroup` | **draft** | no critic round yet |
 | skill:subtraction:sub_1m_no_regroup | skill:subtraction:sub_1m_no_regroup |  | addsub | column | `subtraction:sub_1m_no_regroup` | **draft** | no critic round yet |

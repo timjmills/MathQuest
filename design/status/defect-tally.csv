@@ -218,4 +218,5 @@ design/lesson-planner/lessons/g3-oa9-input-output-rule/critic-r3.md,3,critic-rep
 design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r1.md,1,critic-report,FAIL,12,0,0,0,0,0,1,0,0,1,2,0,2,0,0,4,0,0,0,0,0,0,0,2,0,0,0,0
 design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r2.md,2,critic-report,FAIL,10,0,0,0,0,0,1,0,0,1,1,0,2,0,1,3,0,0,0,0,0,0,0,1,0,0,0,0
 design/lesson-planner/lessons/g3-oa9-mult-table-patterns/critic-r3.md,3,critic-report,PASS,8,0,0,0,0,0,0,0,0,1,0,0,3,0,0,3,0,0,0,0,0,0,0,1,0,0,0,0
-ALL,,,,7878,208,331,441,388,616,1273,279,57,210,178,167,206,235,509,321,20,247,21,54,524,180,45,569,242,344,188,25
+tests/scripts/key-options.cjs (pre-existing on origin/claude/sweet-newton-c8wrv1 a3392d38: puppeteer protocol timeout after every combination passes; lessons-phase0 B 2026-10-30),0,flake,FLAKE,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+ALL,,,,7879,208,331,441,388,616,1273,279,57,210,178,167,206,235,509,321,20,247,21,54,524,180,45,569,242,344,188,26

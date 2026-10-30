@@ -65,7 +65,11 @@ const escT = (t) => String(t === undefined || t === null ? '' : t).replace(/&/g,
 /** The words of a route's tag. */
 export const routeText = (r) => `If missed \u2192 Lesson ${r.lesson || ''}${r.title ? ` ${r.title}` : ''}`.replace(/\s+/g, ' ').trim();
 /** The teacher tag under a question (inline styles: the sheet's stylesheet is unchanged, so no other page changes). */
-export const routeTagHtml = (r) => `<p class="mq-lpretag" data-ws-teacher style="margin:0;padding:.6mm 3mm 1.4mm;height:${ROUTE_TAG_MM.toFixed(2)}mm;box-sizing:border-box;font-size:9pt;line-height:1.3;color:#949494;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none">${escT(routeText(r))}</p>`;
+export const routeTagHtml = (r, lines = 1) => `<p class="mq-lpretag" data-ws-teacher style="margin:0;padding:.6mm 3mm 1.4mm;height:${routeTagMm(lines).toFixed(2)}mm;box-sizing:border-box;font-size:9pt;line-height:1.3;color:#949494;flex:none">${escT(routeText(r))}</p>`;
+/** A tag's height (mm) at `lines` lines of 9 pt. */
+export const routeTagMm = (lines = 1) => 9 * PT_MM * 1.3 * Math.max(1, lines) + 2;
+/** The lines a route's tag wraps to in a band `wMm` wide (9 pt Andika: about 1.6 mm a character; never clipped, TY-12). */
+export const routeTagLines = (r, wMm) => (r ? Math.max(1, Math.ceil((routeText(r).length * 1.6) / Math.max(20, wMm - 8))) : 1);
 
 /**
  * THE ROUTING TABLE (one builder: the Prerequisite Check's key page here, and the standard lesson packet's key; the
@@ -86,7 +90,8 @@ export function routingTableHtml(rows) {
 export function routePlan(input, rows) {
     if (!rows.length) return null;
     const lesson = input.lesson || {};
-    const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
+    // (titled by the lesson the check prepares - `checkFor` - not by its first prerequisite)
+    const target = input.checkFor ? [input.checkFor] : input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const f = frameOf({ skills: target, input, tabId: 'Check key', score: 0, footerLeft: lesson.tagLine });
     const header = Object.assign({}, f.header, { name: false, date: false, score: false });
     const section = { kind: 'band', label: 'Prerequisite Check: where next', instr: '', html: routingTableHtml(rows) };
@@ -133,7 +138,7 @@ function planCheck(input, cut) {
     let bandNo = 0;
     // (the cell's own label: a black number tab on every look, CL-11a)
     const letterOf = (k) => String(k);
-    const band = (its, cols, rows, cellH, pageCols) => {
+    const band = (its, cols, rows, cellH, pageCols, tagLines = 1) => {
         const qi = qIndex[bandNo++];
         const instr = instructionText(instructionKeyOf(its, input.skills), its);
         const grid = gridPart(its.map((it) => planItem(input.perQuestion ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start });
@@ -141,7 +146,7 @@ function planCheck(input, cut) {
         const b = {
             kind: 'band', label: '', instr, extra: input.perQuestion ? '' : scoreTag(its.length),
             // (the detailed lesson's check centres each item in its grown cell, H13)
-            content: routed ? { kind: 'col', cls: 'mq-lprecol', parts: [grid, { kind: 'html', html: r ? routeTagHtml(r) : `<p class="mq-lpretag" data-ws-teacher style="margin:0;height:${ROUTE_TAG_MM.toFixed(2)}mm"></p>` }] } : grid,
+            content: routed ? { kind: 'col', cls: 'mq-lprecol', parts: [grid, { kind: 'html', html: r ? routeTagHtml(r, tagLines) : `<p class="mq-lpretag" data-ws-teacher style="margin:0;height:${routeTagMm(tagLines).toFixed(2)}mm;flex:none"></p>` }] } : grid,
         };
         if (r) routeRows.push({ letters: its.length > 1 ? `${letterOf(start)}\u2013${letterOf(start + its.length - 1)}` : letterOf(start), checks: r.checks || instr, lesson: r.lesson, title: r.title });
         start += its.length;
@@ -181,33 +186,53 @@ function planCheck(input, cut) {
         if (routed && input.perQuestion) {
             // A lesson's Prerequisite Check (LR-17: one question per prerequisite): two questions that each fit half the
             // width share a row, so 3-4 questions fit one page; the rows grow to fill the body (at most GROW_MAX).
+            const em = ((ctx.s && ctx.s.textPt) || 14) * PT_MM;
+            const extraLines = (q, w) => Math.max(0, Math.ceil((String(instructionText(instructionKeyOf(q, input.skills), q) || '').length * 0.5 * em) / Math.max(30, w - 10)) - 1);
             const units = [];
             for (let j = 0; j < quads.length; j++) {
                 const a = quads[j], b = quads[j + 1];
                 // (two of like height only: a short item in a row sized for a tall one leaves its cell mostly empty, H13)
-                const alike = () => { const ha = hMinAt(a, 2, ctx), hb = hMinAt(b, 2, ctx); return Math.min(ha, hb) >= 0.75 * Math.max(ha, hb); };
+                const alike = () => { const ha = hMinAt(a, 2, ctx), hb = hMinAt(b, 2, ctx); return Math.min(ha, hb) >= 0.7 * Math.max(ha, hb); };
                 if (b && fitsAt(a, 2, ctx) && fitsAt(b, 2, ctx) && alike()) { units.push([a, b]); j++; } else units.push([a]);
             }
             const colsOf = (q) => [4, 2, 1].find((c) => fitsAt(q, c, ctx)) || 1;
             const hOfU = (u) => Math.max(...u.map((q) => hMinAt(q, u.length === 2 ? 2 : colsOf(q), ctx)));
             const GAP = 3;   // (.mq-quadrow + .mq-quadrow: 3 mm)
             // (a half's instruction that wraps takes a second line: its strip is that much taller - stripExtraMm)
-            const em = ((ctx.s && ctx.s.textPt) || 14) * PT_MM;
-            const extraLines = (q, w) => Math.max(0, Math.ceil((String(instructionText(instructionKeyOf(q, input.skills), q) || '').length * 0.5 * em) / Math.max(30, w - 10)) - 1);
             const stripOf = (u) => m.strip + Math.max(0, ...u.map((q) => extraLines(q, u.length === 2 ? 93 : 186))) * em * 1.25;
-            const fixed = units.reduce((t, u, k) => t + stripOf(u) + TAG + (k ? GAP : 0), 0);
-            const rowsH = units.reduce((t, u) => t + hOfU(u), 0);
-            // (at most 1.3 x the measured cell: an item never leaves 30 % of its cell empty, H13; the rest stays at the foot)
-            const g = fixed + rowsH < m.budget && rowsH > 0 ? Math.min(1.3, 1 + (m.budget - fixed - rowsH - 1) / rowsH) : 1;
-            for (const u of units) {
-                const h = hOfU(u) * g;
-                const uh = stripOf(u) + TAG + h + (cur.sections.length ? GAP : 0);
+            // (each unit's tags as tall as its longest one wraps to: a pair's two tags take the same lines)
+            const unitIdx = []; { let j = 0; for (const u of units) { unitIdx.push(u.map((_, x) => qIndex[j + x])); j += u.length; } }
+            const tagLinesOf = (k) => Math.max(...unitIdx[k].map((qi) => routeTagLines(routeOf(input, qi), units[k].length === 2 ? 93 : 186)));
+            const tagOf = (k) => routeTagMm(tagLinesOf(k));
+            const fixed = units.reduce((t, u, k) => t + stripOf(u) + tagOf(k) + (k ? GAP : 0), 0);
+            // The spare height goes into the rows, each only as far as its item still fills all but a quarter of the cell
+            // below it (CL-4b, owner 2026-10-23: an item starts at the top of its box, so a grown cell's empty room is at
+            // its foot; H13: under 30 %) - the measured cell less ~3 mm of top pad, over 0.75; a pair takes its smaller
+            // item's cap. What the rows cannot take spaces the questions apart (at most 40 mm a gap), so the check does not
+            // end on a blank strip.
+            const capOf = (u) => Math.max(hOfU(u), Math.min(...u.map((q) => (hMinAt(q, u.length === 2 ? 2 : colsOf(q), ctx) - 3) / 0.75)));
+            const hs = units.map(hOfU);
+            let spare = m.budget - fixed - hs.reduce((t, v) => t + v, 0) - 1;
+            for (let pass = 0; pass < 6 && spare > 0.5; pass++) {
+                const open = units.map((u, k) => k).filter((k) => hs[k] < capOf(units[k]) - 0.05);
+                if (!open.length) break;
+                const w = open.reduce((t, k) => t + hs[k], 0);
+                let used = 0;
+                for (const k of open) { const add = Math.min(capOf(units[k]) - hs[k], spare * hs[k] / w); hs[k] += add; used += add; }
+                spare -= used;
+            }
+            const gapAdd = units.length > 1 && spare > 0.5 ? Math.min(40, spare / (units.length - 1)) : 0;
+            units.forEach((u, k) => {
+                const h = hs[k];
+                const lead = cur.sections.length ? GAP + gapAdd : 0;
+                const uh = stripOf(u) + tagOf(k) + h + lead;
                 if (cur.sections.length && cur.used + uh > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
-                if (u.length === 2) cur.sections.push({ kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-quadrow mq-lprerow', parts: u.map((q) => band(q, 1, 1, h, 2)) });
-                else cur.sections.push(band(u[0], 1, 1, h, colsOf(u[0])));
+                if (cur.sections.length && gapAdd) cur.sections.push({ kind: 'html', html: `<div class="mq-lpregap" aria-hidden="true" style="height:${gapAdd.toFixed(2)}mm;flex:none"></div>` });
+                if (u.length === 2) cur.sections.push({ kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-quadrow mq-lprerow', parts: u.map((q) => band(q, 1, 1, h, 2, tagLinesOf(k))) });
+                else cur.sections.push(band(u[0], 1, 1, h, colsOf(u[0]), tagLinesOf(k)));
                 kept += u[0].length + (u[1] ? u[1].length : 0);
                 cur.used += uh;
-            }
+            });
         } else for (const q0 of quads) {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
             const h = hMinAt(q0, cols, ctx) * grow;
