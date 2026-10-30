@@ -931,3 +931,6 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 .tvp-dots { display: inline-flex; gap: 6px; }
 .tvp-dots i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--tv-text-2); }
 .tvp-dots i.on { background: var(--tv-text); border-color: var(--tv-text); }
+
+/* owner 2026-10-30: the hover preview shows the whole problem (scaled to fit) in a taller frame */
+.tvp-pop .tvp-pop-frame { height: 240px; }

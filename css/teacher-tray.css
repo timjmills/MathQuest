@@ -353,3 +353,7 @@ html:has(body.teacher-mode) { scroll-padding-bottom: 96px; }
 #teacherApp .tt-x:focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: 2px; }
 #teacherApp .tt-items > .tt-itemwrap.fit-wrap > :first-child { flex: 1 1 auto; min-width: 0; white-space: normal; height: auto; text-align: left; }
 #teacherApp .tt-items > .tt-itemwrap.fit-wrap .tt-mini-pic { display: none; }
+
+/* owner 2026-10-30: the options sheet's preview shows the whole problem: a taller frame, scaled to fit, never cropped */
+#teacherApp .tc-frame { height: 300px; }
+@media (max-width: 819px) { #teacherApp .tc-frame { height: 260px; } }

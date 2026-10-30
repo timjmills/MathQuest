@@ -795,7 +795,12 @@ function gShellHTML() {
   <div class="ts-frow"><span class="ts-flabel" id="tsBrowseL">Browse by</span><div class="ts-seg ts-browse" role="group" aria-labelledby="tsBrowseL" id="tsBrowse"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsSizeL">Size</span><div class="ts-seg" role="group" aria-labelledby="tsSizeL" id="tsViews"></div>
     <span class="ts-fsep" role="presentation"></span><span class="ts-flabel" id="tsShowL">Skills to make</span><div class="ts-seg" role="group" aria-labelledby="tsShowL" id="tsShow"></div>
-    <span class="ts-pass-key ts-note"><span class="ts-pass" aria-hidden="true"></span>Passed the 8/10 redesign</span></div>
+    <details class="ts-marks"><summary><span class="ts-pass" aria-hidden="true"></span>What the marks mean</summary>
+      <div class="ts-marks-pop" role="note">
+        <p><b class="ts-marks-tick" aria-hidden="true">✓</b><span><b>Tick box, top right</b>: the skill is in your tray. Click it to add or take out.</span></p>
+        <p><span class="ts-pass" aria-hidden="true"></span><span><b>8/10, bottom right</b>: the skill has been redesigned and passed our quality check. An independent reviewer scored every page type (lesson, practice, test …) and every screen at 8 or more out of 10 for how it looks, how it teaches and that it is correct. Skills without it still work: they are older designs waiting for their redesign.</span></p>
+        <p><b class="ts-marks-plan" aria-hidden="true">&nbsp;</b><span><b>Orange outline, "Yet to be built"</b>: a planned skill, not in the app yet. Turn on "Yet to be built" to see them.</span></p>
+      </div></details></div>
 </div>
 <div id="tsList" class="ts-list"></div>`;
 }
@@ -829,7 +834,7 @@ function gCard(s) {
     const nm = esc(String(s.label || '').replace(/\s*\((?:B&W|black and white)\)\s*$/i, ''));
     const tick = `<button type="button" class="ts-tick" data-act="tick" data-skill="${esc(k)}" ${pressedA(on)} aria-label="${on ? `${nm}: in the tray. Take out` : `Quick add ${nm} to the tray`}"><span aria-hidden="true">${on ? '✓' : ''}</span></button>`;
     // the 8/10 redesign mark (owner 2026-10-25): a small folded corner, from redesign-passed.js only
-    const pass = REDESIGN_PASSED.has(k) ? '<span class="ts-pass" role="img" aria-label="Redesigned: passed 8/10" title="Redesigned: passed the 8/10 check"></span>' : '';
+    const pass = REDESIGN_PASSED.has(k) ? '<span class="ts-pass" role="img" aria-label="Redesigned: passed 8/10" title="Redesigned: passed the 8/10 quality check"></span>' : '';
     const name = `<button type="button" class="ts-card-name ts-card-open" data-act="opts" data-skill="${esc(k)}" aria-label="${nm}: open its options${on ? ' (in the tray)' : ''}">${esc(s.label).replace(/\//g, '/<wbr>')}</button>`;
     if (v === 'chip') {
         return `<div class="ts-card ts-chipcard" data-domain="${a}" data-skill="${esc(k)}" data-on="${on}"${tvpAttrs(s.categoryId, s.skillId)}>${gbadge(s.level)}<span class="ts-chip-ic">${areaIcon(a, 16)}</span>${name}${tick}${pass}</div>`;

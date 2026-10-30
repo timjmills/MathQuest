@@ -204,7 +204,8 @@ function fit(frame) {
     const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
     if (fw <= 0 || fh <= 0) return;
     const s = Math.min(1, fw / w, fh / h);
-    if (s < MIN_LEGIBLE && fh < 200) {
+    // the hover / pinned preview shows the whole problem (owner 2026-10-30): only small inline thumbnails crop
+    if (s < MIN_LEGIBLE && fh < 200 && !frame.closest('.tvp-pop')) {
         frame.classList.add('is-cropped');
         stage.style.transform = `scale(${CROP_SCALE})`;
         return;

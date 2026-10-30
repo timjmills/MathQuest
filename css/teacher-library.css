@@ -541,3 +541,23 @@ html:has(#teacherMain .tv-screen.is-active[data-screen="library"] .tvl-bar:not([
 #teacherApp .ts-chipcard .ts-pass::before, #teacherApp .ts-grid[data-view="list"] .ts-pass::before { border-width: 0 0 22px 22px; }
 #teacherApp .ts-pass-key { display: inline-flex; align-items: center; gap: var(--sp-8); }
 #teacherApp .ts-pass-key .ts-pass { position: relative; display: inline-block; border-radius: 0 0 4px 0; }
+
+/* owner 2026-10-30: the pass mark reads "8/10" (never a ✓, so it is not confused with the tray tick) */
+#teacherApp .ts-pass { width: auto; height: auto; overflow: visible; right: var(--sp-8); bottom: var(--sp-8); border-radius: var(--r-8); }
+#teacherApp .ts-pass::before { content: none; }
+#teacherApp .ts-pass::after { content: "8/10"; position: static; display: inline-block; padding: 1px 6px; border-radius: var(--r-8); background: var(--action); color: var(--action-on); font: 700 11px/1.4 var(--font-ui); }
+#teacherApp .ts-chipcard .ts-pass, #teacherApp .ts-grid[data-view="list"] .ts-pass { width: auto; height: auto; }
+#teacherApp .ts-pass-key .ts-pass { position: static; display: inline-block; }
+
+/* owner 2026-10-30: "What the marks mean" pop-up beside the filters */
+#teacherApp .ts-marks { position: relative; }
+#teacherApp .ts-marks > summary { display: inline-flex; align-items: center; gap: var(--sp-8); min-height: var(--control); padding: 0 var(--sp-12, 12px); border: var(--line-1) solid var(--line); border-radius: var(--r-8); background: var(--surface); color: var(--text); font: var(--fw-700) var(--fs-14)/1.2 var(--font-ui); cursor: pointer; list-style: none; }
+#teacherApp .ts-marks > summary::-webkit-details-marker { display: none; }
+#teacherApp .ts-marks > summary:focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: 2px; }
+#teacherApp .ts-marks .ts-pass { position: static; display: inline-block; width: auto; height: auto; }
+#teacherApp .ts-marks-pop { position: absolute; z-index: 30; top: calc(100% + 6px); right: 0; width: min(420px, calc(100vw - 32px)); padding: var(--sp-16); background: var(--surface); color: var(--text); border: var(--line-1) solid var(--text); border-radius: var(--r-8); box-shadow: var(--shadow-1); font: var(--fs-14)/1.45 var(--font-ui); }
+#teacherApp .ts-marks-pop p { display: flex; gap: var(--sp-12, 12px); align-items: flex-start; margin: 0 0 var(--sp-12, 12px); }
+#teacherApp .ts-marks-pop p:last-child { margin-bottom: 0; }
+#teacherApp .ts-marks-tick { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 2px solid var(--action); border-radius: 6px; color: var(--action); }
+#teacherApp .ts-marks-plan { flex: none; display: inline-block; width: 24px; height: 24px; border: 2px solid #E07B00; border-radius: 6px; }
+@media (max-width: 819px) { #teacherApp .ts-marks-pop { left: 0; right: auto; } }

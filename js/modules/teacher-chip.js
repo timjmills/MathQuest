@@ -95,7 +95,8 @@ function cropFrame(frame, remeasure) {
     if (W < 8 || H < 8) return;
     const min = MIN_PX[frame.dataset.tcSize] || 11;
     let s = Math.min((W - 2 * pad) / m.bw, (H - 2 * pad) / m.bh, 1);
-    if (m.minFs && s * m.minFs < min) s = min / m.minFs;
+    // a preview that pops up shows the WHOLE problem, never a crop (owner 2026-10-30); thumbnails keep their legibility floor
+    if (frame.dataset.tcSize !== 'preview' && m.minFs && s * m.minFs < min) s = min / m.minFs;
     const cutR = m.bw * s > W - 2 * pad + 1;
     const cutB = m.bh * s > H - 2 * pad + 1;
     const ox = cutR ? pad : (W - m.bw * s) / 2;
