@@ -2663,8 +2663,13 @@ const _SKIP_GROUPS = {
     g2: [['2s', '(2)'], ['5s', '(5)'], ['10s', '(10)']],
     step: [['2s, 5s and 10s', '(2|5|10)'], ['3s and 4s', '(3|4)']],
 };
-const _skipBy = (re, groups = 'wide') => _p12Kinds('step', 'Count by', _SKIP_GROUPS[groups].map(([l, g]) => [l, re(g)]),
-    'The friendly steps (2s, 5s, 10s) come first.');
+// The help per group set (critic skip-count r5 SC5): on the g2 groups every choice is a friendly step, so the help gives the order.
+const _SKIP_HELP = {
+    wide: 'The friendly steps (2s, 5s, 10s) come first.',
+    g2: 'Start with 10s, then 5s, then 2s.',
+    step: 'The friendly steps (2s, 5s, 10s) come first.',
+};
+const _skipBy = (re, groups = 'wide') => _p12Kinds('step', 'Count by', _SKIP_GROUPS[groups].map(([l, g]) => [l, re(g)]), _SKIP_HELP[groups]);
 const _seqGap = () => _p12Kinds('unknown', 'Which number is missing', [['The next number', '___ =>'], ['A number in the middle', ', ___, '],
     ['The first number', '^Complete: ___']], 'The next number is the easiest; the first number means counting back.');
 const _orderDrag = (fillLabel, fillRe) => _p12Match([[fillLabel, fillRe], ['Put numbers in order (drag)', '^Drag the numbers']]);

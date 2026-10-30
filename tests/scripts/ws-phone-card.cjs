@@ -13,6 +13,9 @@
 //             text, the drawn problem (every visible element inside #questionPaper), the answer inputs and Check / Next
 //             is cut off sideways: each lies inside the viewport's width AND inside every ancestor up to #questionCard
 //             whose overflow-x clips (hidden / clip / auto / scroll) by more than 1 px.
+//             A number or box inside an owner-ruled SWIPE WINDOW (a count row's [data-mq-swiperow], WORKSHEET_DESIGN_STANDARD
+//             SP-11a: the row swipes sideways inside its own cell on a phone) is clipped by design and not checked; the window
+//             itself is (it must fit the card). Critic skip-count r5 SC4: 246 CLIP-X findings were the swipe window's own content.
 //   FOCUS     the answer input the pupil writes first has the keyboard focus after load: the first non-optional answer
 //             input in ENTRY order (DOM order, except that a row of column digit boxes is entered ones first, right to
 //             left, as active-box.js / wireStackEntry order it; regroup and carry boxes are optional and never first).
@@ -136,9 +139,12 @@ function PROBE() {
     };
     const seen = new Set();
     const cut = [];
+    // (SC4) inside a swipe window: clipped by design; the window element itself stays a subject
+    const inSwipe = (el) => { const sw = el.parentElement && el.parentElement.closest('[data-mq-swiperow]'); return !!sw && sw !== el; };
     for (const el of subjects) {
         if (seen.has(el)) continue;
         seen.add(el);
+        if (inSwipe(el)) continue;
         const r = el.getBoundingClientRect();
         if (r.width < 1) continue;
         let why = '';
@@ -168,7 +174,11 @@ function PROBE() {
             const where = act && act !== document.body ? `${name(act)}${graded.includes(act) ? (columnItem ? (pa ? ` (the answer box at place ${pa.place}, counted from the ones = place 0, by ${pa.how}; ${graded.length} answer boxes)` : ` (an answer box of ${graded.length} with no place)`) : ` (answer box ${graded.indexOf(act) + 1} of ${graded.length} in entry order)`) : ''}` : 'nothing (body)';
             findings.push({ rule: 'FOCUS', msg: `focus is on ${where}; the pupil writes first in ${columnItem ? `the ones box (place 0, by ${onesHow || 'entry order'}) ` : ''}${name(want)}` });
         }
-        const fr = (act && graded.includes(act) ? act : want).getBoundingClientRect();
+        const fe = act && graded.includes(act) ? act : want;
+        const fr = fe.getBoundingClientRect();
+        // (SC4) ... and inside every box that clips it sideways - a swipe window scrolled away from it hides it in the viewport
+        const hid = clippers(fe).find((a) => { const ar = a.getBoundingClientRect(); return fr.left < ar.left - TOL || fr.right > ar.right + TOL; });
+        if (hid && !(fr.left < -TOL || fr.right > W + TOL)) findings.push({ rule: 'INVIEW', msg: `the first answer box is hidden sideways inside ${name(hid)} (overflow-x ${getComputedStyle(hid).overflowX}): left ${Math.round(fr.left)}, right ${Math.round(fr.right)}` });
         if (fr.left < -TOL || fr.right > W + TOL || fr.top < -TOL || fr.bottom > H + TOL) findings.push({ rule: 'INVIEW', msg: `the first answer box is not in view (left ${Math.round(fr.left)}, right ${Math.round(fr.right)}, top ${Math.round(fr.top)}, bottom ${Math.round(fr.bottom)} in ${W} x ${H})` });
     }
     return { focus, columnItem, onesHow, inputs: graded.length, findings: findings.map((f) => ({ rule: f.rule, msg: f.msg })), paperW: paper ? Math.round(paper.getBoundingClientRect().width) : 0 };
@@ -189,6 +199,15 @@ const BARE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{marg
 input{width:40px;height:40px}</style><div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"><div><span>4,367</span><span>- 2,244</span></div>
 <div><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"></div></div><button id="qcCheckBtn">Check</button></div>
 <script>window.state = { currentQ: { printFormat: 'column-sub', cell: { template: 'stack' } } }; (() => { const b = document.querySelectorAll('input.mq-cellslot')[${variant === 'bare-right' ? 3 : 0}]; b.classList.add('mq-active-box'); b.focus(); })();</script>`;
+// critic skip-count r5 SC4: a count row's swipe window ([data-mq-swiperow], overflow-x auto) holds a row wider than the card.
+// 'swipe' scrolls it to its first box (focused, in view): no CLIP-X, no INVIEW. 'swipe-wide' makes the WINDOW itself wider than
+// the card (CLIP-X on the window). 'swipe-hidden' leaves the focused box scrolled out of the window (INVIEW).
+const SWIPE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px;overflow:hidden}
+[data-mq-swiperow]{overflow-x:auto;width:${variant === 'swipe-wide' ? '600px' : '340px'}}.ln{display:flex;gap:20px;width:900px}.ln>*{flex:none;width:50px;height:44px}</style>
+<div id="questionCard"><div id="questionText">Count by 4.</div><div id="questionPaper"><div data-mq-swiperow="1"><div class="ln">
+<span>4</span><span>8</span><span>12</span><span>16</span><span>20</span><input id="b0" data-mq-cell="1"><span>28</span><span>32</span><input data-mq-cell="1"><span>40</span><span>44</span><span>48</span>
+</div></div></div><button id="qcCheckBtn">Check</button></div>
+<script>window.state = null; (() => { const w = document.querySelector('[data-mq-swiperow]'); const b = document.getElementById('b0'); b.focus({ preventScroll: true }); w.scrollLeft = ${variant === 'swipe-hidden' ? 0 : '(b.offsetLeft + b.offsetWidth) - w.clientWidth'}; })();</script>`;
 const LEGACY = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px}
 .column-answer-input{width:24px;height:24px}.mq-active-box{position:relative;top:-4px}</style>
 <div id="questionCard"><div id="questionText">Add.</div><div id="questionPaper"><div class="column-problem"><div>4 3 6 7</div><div>+ 1 2 2 1</div>
@@ -223,9 +242,16 @@ async function selfTest() {
         if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
         const br = await runB('bare-right');
         if (br.focus !== 'ok') fails.push(`r1 twin, ones box focused: must be ok (${JSON.stringify(br.findings)})`);
+        const runS = async (v) => { await page.setContent(SWIPE(v)); await page.waitForFunction(() => document.readyState === 'complete'); return page.evaluate(PROBE); };
+        const sw = await runS('swipe');
+        if (sw.findings.length || sw.focus !== 'ok') fails.push(`swipe window at its first box: no finding (SC4: its content is clipped by design) (${JSON.stringify(sw.findings)})`);
+        const sww = await runS('swipe-wide');
+        if (!sww.findings.some((x) => x.rule === 'CLIP-X')) fails.push('swipe window wider than the card: a CLIP-X finding on the window');
+        const swh = await runS('swipe-hidden');
+        if (!swh.findings.some((x) => x.rule === 'INVIEW')) fails.push('focused box scrolled out of its swipe window: an INVIEW finding');
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 7 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 10 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 

@@ -1658,13 +1658,15 @@ function wireSwipeRows(cellEl) {
         // the row's end lands on a column start too (a little air after the last line), so scrolling to the end cuts no number
         const body = w.querySelector('.k2-countrow-body');
         const items = () => { const ln = w.querySelector('.k2-countrow-line [data-mq-wrapped]'); return ln ? [...ln.children] : []; };
+        // every column of every line, in reading order (one line on a phone, `oneLine` below: its column starts run on past line 1)
+        const allItems = () => [...w.querySelectorAll('.k2-countrow-line [data-mq-wrapped]')].flatMap((ln) => [...ln.children]);
         const padEnd = () => {
             if (!body || !col) return;
             body.style.paddingRight = '0px';
             const cw = w.clientWidth, max0 = w.scrollWidth - cw;
             if (max0 <= 0) return;
             const v = w.getBoundingClientRect(), sl = w.scrollLeft;
-            const xs = items().map((e) => e.getBoundingClientRect().left - v.left + sl).filter((x) => x >= max0 - 0.5);
+            const xs = allItems().map((e) => e.getBoundingClientRect().left - v.left + sl).filter((x) => x >= max0 - 0.5);
             if (xs.length) body.style.paddingRight = `${Math.max(0, Math.min(...xs) - max0)}px`;
         };
         // critic C2 r6: when the row is wider than the cell, the step tab goes ABOVE line 1 (the window takes the cell's full width)
@@ -1724,8 +1726,37 @@ function wireSwipeRows(cellEl) {
             if (frame) { frame.removeAttribute('data-mq-swipes'); frame.removeAttribute('data-mq-tabtop'); frame.setAttribute('style', frame.dataset.mqOrigStyle); }
             w.style.width = ''; w.style.maxWidth = ''; w.style.overflowX = 'auto';
             if (body) body.style.paddingRight = '0px';
+            w.removeAttribute('data-mq-oneline');
+            if (body) {
+                body.style.columnGap = '';
+                // the wrap fitTwinRows set on the body (it runs once), back as it was before oneLine
+                if (body.dataset.mqOneWrap !== undefined) { const [v, pr, mw, mp] = body.dataset.mqOneWrap.split('|'); body.style.setProperty('flex-wrap', v, pr); body.style.setProperty('max-width', mw, mp); delete body.dataset.mqOneWrap; }
+            }
             const cues = w.querySelector('.k2-swipe-cues');
             if (cues) cues.querySelectorAll('.k2-swipe-cue, .k2-swipe-back').forEach((c) => { c.style.fontSize = ''; });
+        };
+        // critic skip-count r5 SC2: a row that SWIPES on a phone stands on ONE line (its lines side by side, a jump arrow into each
+        // line's first box, the turn arrows hidden): two stacked lines seen through a 3-column window read "2 -> 4 -> 6" over
+        // "[ ] -> 16 -> 18" as one row. CSS does the move (screen-cell.css, [data-mq-oneline]); nothing is re-parented, so the
+        // boxes keep their DOM (reading and answer) order.
+        const oneLine = () => {
+            const lines = conts();
+            if (lines.length < 2 || !body) return;
+            const proto = w.querySelector('.k2-jumpcell > .k2-jump');
+            lines.slice(1).forEach((ln) => {
+                const f = ln.firstElementChild;
+                if (!f || !proto || f.querySelector(':scope > [data-mq-flatjump]')) return;
+                const j = proto.cloneNode(true);
+                j.setAttribute('data-mq-flatjump', '');
+                f.setAttribute('data-mq-flatfirst', '');
+                f.appendChild(j);
+            });
+            body.style.columnGap = `${parseFloat(getComputedStyle(lines[0]).columnGap) || 0}px`;
+            // (fitTwinRows' generic pass may have set flex-wrap: wrap !important and max-width: 100% inline on the body)
+            if (body.dataset.mqOneWrap === undefined) body.dataset.mqOneWrap = [body.style.getPropertyValue('flex-wrap'), body.style.getPropertyPriority('flex-wrap'), body.style.getPropertyValue('max-width'), body.style.getPropertyPriority('max-width')].join('|');
+            body.style.setProperty('flex-wrap', 'nowrap', 'important');
+            body.style.setProperty('max-width', 'none', 'important');
+            w.setAttribute('data-mq-oneline', '');
         };
         // TY-10b (critic phone29), now a layout step rather than a second drawing (skip-count r2 D3): on a phone the worksheet's
         // and the quiz's gap between columns is capped at 24 px, and each jump arrow takes the gap it gets
@@ -1854,7 +1885,11 @@ function wireSwipeRows(cellEl) {
             const colW = () => (col ? col.getBoundingClientRect().width : 0);
             // measured on the drawing as it will stand: a number line's axis and arcs are mapped onto the numbers first (r3 D7)
             const tabTop = () => !!frame && (frame.hasAttribute('data-mq-tabtop') || frame.hasAttribute('data-mq-swipes'));
-            const fits = () => { alignAxis(); return body.getBoundingClientRect().width + (tabTop() ? 0 : colW()) <= inner + 1; };
+            // critic skip-count r5 SC2: the body is an inline-block, so its box is capped at the room the window gives it while its
+            // lines run on past it (two lines of six "fitted" a 251 px window and spilled 165 px out of the card): the row's width
+            // is its widest line's, measured by scroll width
+            const bodyW = () => Math.max(body.getBoundingClientRect().width, body.scrollWidth, ...[...body.querySelectorAll('.k2-countrow-line')].map((ln) => ln.scrollWidth));
+            const fits = () => { alignAxis(); return bodyW() + (tabTop() ? 0 : colW()) <= inner + 1; };
             // (4) choose: the row fits beside its step tab
             if (fits()) { w.style.overflowX = 'visible'; level(); return; }
             // a number line: the step tab goes above and the line is tried whole at its full size before anything shrinks (r1 order)
@@ -1872,7 +1907,7 @@ function wireSwipeRows(cellEl) {
                 const ir0 = inp ? inp.getBoundingClientRect() : null;
                 const small = r ? Math.min(r.width, r.height, ir0 && ir0.width ? ir0.width : Infinity) : 0;
                 const floorK = small > 0 ? cur * 44 / small : cur * 0.75;
-                const bw = body.getBoundingClientRect().width;
+                const bw = bodyW();
                 const k = Math.max(Math.min(cur, floorK), cur * (inner - (tabTop() ? 0 : colW())) / bw * 0.995);
                 if (k < cur - 0.01) {
                     twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`);
@@ -1891,6 +1926,7 @@ function wireSwipeRows(cellEl) {
             }
             if (!frame) return;
             frame.setAttribute('data-mq-swipes', '');
+            oneLine();
             level();
             alignAxis();
             const a = its[0].getBoundingClientRect(), b = its[1].getBoundingClientRect();
@@ -1935,7 +1971,8 @@ function wireSwipeRows(cellEl) {
             if (cellEl2) {
                 const roc = new ResizeObserver(() => {
                     if (!w.isConnected) { roc.disconnect(); return; }
-                    const w0 = w.style.width; w.style.width = '0px'; const now = cellInner(); w.style.width = w0;
+                    // (the probe width resets the window's scroll: put it back, or a pupil's swipe jumps to the start - critic r5 SC2)
+                    const w0 = w.style.width, sl0 = w.scrollLeft; w.style.width = '0px'; const now = cellInner(); w.style.width = w0; w.scrollLeft = sl0;
                     if (laidInner && Math.abs(now - laidInner) > 0.5) mode();
                 });
                 roc.observe(cellEl2);
@@ -1988,7 +2025,10 @@ function wireSwipeRows(cellEl) {
             if (!user) {
                 if (first) mode();
                 const keep = first || w.dataset.mqMoved !== '1' ? 0 : lastSL;
-                if (!shownAtStart(t) && (first || keep === 0)) { hold(t, keep); return; }
+                // owner ruling 2026-10-17 (3), critic skip-count r5 SC2: on a phone the card OPENS at the first answer box - the
+                // card's first focus is kept and the row snaps so that box is its last whole column (snap, firstFlag); only a later
+                // programmatic re-focus of a box the row does not show is still held back
+                if (!first && !shownAtStart(t) && keep === 0) { hold(t, keep); return; }
             }
             held = null;
             // (the step tab sits beside the row, outside it, so nothing scrolls under it). The row stops on a COLUMN start (the
@@ -1996,8 +2036,7 @@ function wireSwipeRows(cellEl) {
             // row's left edge; the browser's own focus scroll is undone first (the card opens at scrollLeft 0).
             const snap = () => {
                 const v2 = w.getBoundingClientRect(), r2 = t.getBoundingClientRect(), sl = w.scrollLeft, cw = w.clientWidth;
-                const line = w.querySelector('.k2-countrow-line [data-mq-wrapped]');
-                const xs = [0, ...(line ? [...line.children].map((x) => x.getBoundingClientRect().left - v2.left + sl) : [])];
+                const xs = [0, ...allItems().map((x) => x.getBoundingClientRect().left - v2.left + sl)];
                 const bl = r2.left - v2.left + sl, br = r2.right - v2.left + sl;
                 const ok = xs.filter((x) => x <= bl + 0.5 && br - x <= cw + 0.5);
                 if (!ok.length && firstFlag) w.scrollLeft = 0;      // no position shows the box: the row stays at its start (the start beats the box)
@@ -2018,7 +2057,6 @@ function wireSwipeRows(cellEl) {
                 firstSnap = () => {
                     if (document.activeElement !== t || w.dataset.mqMoved === '1') return;
                     mode();
-                    if (!shownAtStart(t) && !t.value) { delete w.dataset.mqFocused; firstSnap = null; hold(t, 0); return; }
                     snapAs(true);
                 };
             }

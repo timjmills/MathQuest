@@ -3657,7 +3657,10 @@ async function buildLesson(n, metaOf) {
     // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
     // `practiceShape` (lesson data; the detailed lesson maker): a one-line item too wide for two
     // columns prints [count, cols] a page instead (expanded form: 8 x 1).
-    const stackShapes = data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]];
+    // `practiceShapes` (lesson data; critic skip-count r5 SC3): several [count, cols], the fullest first - the first one
+    // whose whole rows fit the practice pages prints (a count row: 8 rows at M, fewer where the strip or wraps need room).
+    const stackShapes = data && Array.isArray(data.practiceShapes) && data.practiceShapes.length ? data.practiceShapes
+        : data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]];
     // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a
     // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
     // same count either way, so the pupil gets the bigger digits.

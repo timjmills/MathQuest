@@ -1817,3 +1817,13 @@ html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsb
 @media (max-width: 480px) {
     .mq-scell .mq-kit .ws-stack:is([style*="--t:7"], [style*="--t:8"]) { --ws-track: 46px; --mq-optrack: 32px; }
 }
+
+/* critic skip-count r5 SC2 (2026-10-30), additive: a count row that SWIPES on a phone stands on ONE line - its lines side by side
+   (screen-cell.js wireSwipeRows oneLine), a jump arrow into each later line's first box, the turn arrows hidden - so a 3-column
+   window never shows two lines whose numbers read as neighbours. */
+.mq-scell [data-mq-swiperow] [data-mq-flatjump] { display: none; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] .k2-countrow-body { display: inline-flex !important; flex-wrap: nowrap; align-items: flex-end; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] .k2-countrow-line { flex: none; margin-top: 0 !important; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] .k2-countrow-line > div + span { display: none !important; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] [data-mq-flatfirst] { position: relative; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] [data-mq-flatjump] { display: block; }

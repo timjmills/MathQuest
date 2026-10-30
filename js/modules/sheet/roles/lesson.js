@@ -606,7 +606,8 @@ export function pickWeDo(items, example, data, n) {
  * The step groups of the Model: one state per worked step; a closing check (a step that marks
  * nothing, after the last mark) rides with the state before it; at most 4 states.
  */
-export function stateGroups(steps) {
+export function stateGroups(steps, max = 4) {
+    const most = Math.max(2, Math.min(4, Number(max) || 4));
     const marked = (i) => ((steps[i] && steps[i].marks) || []).length > 0;
     const lastMark = steps.map((_, i) => i).filter(marked).pop();
     let groups = [];
@@ -614,7 +615,7 @@ export function stateGroups(steps) {
         if (groups.length && lastMark !== undefined && i > lastMark && !marked(i)) groups[groups.length - 1].push(i);
         else groups.push([i]);
     });
-    while (groups.length > 4) {
+    while (groups.length > most) {
         // Merge the shortest adjacent pair whose first group marks nothing (a "look" step joins
         // the step it prepares).
         let best = 0;
@@ -974,7 +975,9 @@ export function stateItems(example, data) {
     // writes nothing new - it is the line under the panels, not a panel of its own.
     const steps = data && data.tailLast ? ws.map((st, i) => (i === ws.length - 1 ? Object.assign({}, st, { marks: [] }) : st)) : ws;
     if (!steps.length) return [];
-    const groups = stateGroups(steps);
+    // `chartStates` (lesson data; critic skip-count r5 SC1): at most this many panels - four full-width count rows ran
+    // the chart 40 mm past its page, so the "look" step joins the step it prepares
+    const groups = stateGroups(steps, data && data.chartStates);
     const named = namedSteps(steps, data);
     const { variant } = chartLayout(groups.length, data);
     const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
@@ -1489,7 +1492,12 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
     // band; below zoom 1 the drawing shrinks a little rather than spill past the grid's rule)
     // (the band's grid takes its own frame rule: a panel measured one-up may still wrap its name - leave it 4 mm a row)
     const availP = tailItem ? avail - 4 * lay.rows : avail;
-    if (mode === 'one') z = solve((q) => lay.rows * H(q), availP, 1, zMax) || (tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1);
+    // (`chartWide` with panels of different heights - critic skip-count r5 SC1: a panel with two step names is taller - each
+    // full-width row is as tall as its own panel, so the chart is the SUM of the panels, never n times the tallest)
+    const perRow = wide && cols === 1 && mode === 'one';
+    const rowHs = (q) => states.map((st, k) => base[k] + (q - 1) * dH[k]);
+    const T = (q) => (perRow ? sum(rowHs(q)) : lay.rows * H(q));
+    if (mode === 'one') z = solve(T, availP, 1, zMax) || (tailItem ? solve(T, availP, 0.7, 1) || 0.7 : 1);
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
     let rowH;
@@ -1507,6 +1515,17 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         grid.rowsTpl = rowsMm.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ');
         grid.height = `${Math.round(sum(rowsMm) * 100) / 100}mm`;
         sections.push(sum(rowsMm) >= room - 2 ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
+    } else if (perRow) {
+        room = avail;
+        const hr = rowHs(z);
+        const k = Math.min(1.25, Math.max(1, room / sum(hr)));
+        const rowsMm = hr.map((h) => h * k);
+        rowH = Math.max(...rowsMm);
+        const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, labels: 'none', cls: 'mq-chartgrid' });
+        grid.rowsTpl = rowsMm.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ');
+        grid.height = `${Math.round(sum(rowsMm) * 100) / 100}mm`;
+        sections.push(sum(rowsMm) >= room - 2 ? Object.assign(grid, { height: '' }) : grid);
+        if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none', cls: 'mq-ctailgrid' }));
     } else {
         room = avail - (mode === 'row' ? band2 : mode === 'final' ? hF : 0);
         rowH = Math.max(H(z), Math.min(room / lay.rows, H(z) * 1.25));

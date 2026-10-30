@@ -46,7 +46,8 @@
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
-#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            ws-share-options, ws-phone-card (the swipe-row family at 390 px), ws-teacher-shell, -library, -preview, -quiz,
+#            ws-teacher-wrm, ws-teacher-wrm --fallback,
 #            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/.
 # Session 2  ws-screen-slots in MQ_SLOTS_SHARDS parts (default 4) with --baseline design/audit/baselines/screen-slots.json,
 #            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), the S9 regression (ws-screen-slots on measurement:reading_ruler_hard, card host, seeds 1-40,
@@ -810,6 +811,8 @@ build_list() {
   browser_gate 1 ws-teacher-preview ws-teacher-preview.cjs
   browser_gate 1 ws-teacher-quiz ws-teacher-quiz.cjs
   browser_gate 1 ws-share-options ws-share-options.cjs
+  # critic skip-count r5 SC2: the swipe-row family on a phone (opens at the first answer box, focused; nothing cut but by its window)
+  browser_gate 1 "ws-phone-card (swipe rows)" ws-phone-card.cjs --skills patterns:skip_count_grid,patterns:skip_count_line,multiplication:count_by_tables
   # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)
   local lf lid
   for lf in js/modules/lessons/detailed/*.js; do

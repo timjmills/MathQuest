@@ -272,7 +272,67 @@ export const LESSONS = Object.freeze({
         // 100, which comes after, and never two "Number Sense" sections).
         mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
     },
+
+    // ------------------------------------ Skip counting: the count-row family (2, 3; critic skip-count r5 SC3)
+    // One family, one drawing (sheet/cells/count-row.js): a row of up to 12 numbers is too wide for half the page, so
+    // the anchor chart stacks its four steps as full-width rows (`chartWide`) and the Guided problems take full-width
+    // rows under the step strip; the practice pages fill with whole rows (`practiceShapes`, the most that fit first).
+    // The steps match the provider's four worked steps (sheet/providers/countby.js rowSteps): the jump, the first gap,
+    // the next gap, every gap and the check.
+    ...skipCountLessons(),
 });
+
+function skipCountLessons() {
+    const VOCAB = [
+        { word: 'skip count', meaning: 'count on by the same jump', picture: { kind: 'text', text: '5, 10, 15, 20' } },
+        { word: 'jump', meaning: 'how much is added each time', picture: { kind: 'glyph', text: '+5' } },
+        { word: 'missing', meaning: 'the number in the empty box', picture: { kind: 'text', text: '10, ?, 30' } },
+    ];
+    const STEPS = [
+        { icon: 'look', text: 'Find the jump.' },
+        { icon: 'count', text: 'Add the jump.' },
+        { icon: 'write', text: 'Write the next number.' },
+        { icon: 'check', text: 'Every gap. Check each jump.' },
+    ];
+    const FORMAT = {
+        kind: 'numbered steps with icons + a chant',
+        why: 'The one thing pupils lose is the size of the jump at a gap; saying the count aloud in the jump keeps it the same every time.',
+    };
+    // Counting on by 1s and by 10s: the counts every skip count stands on (written answers only: no drag task on paper).
+    const after = { key: 'counting:count_sequence', opts: { band: 100, dir: 'forward' }, why: 'Say the number after: counting on by 1.' };
+    const tens = { key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward' }, why: 'Counting on by 10s: the first skip count.' };
+    const base = (o) => Object.assign({
+        concepts: [
+            { id: 'same-jump', text: 'Every jump is the same size.' },
+            { id: 'add-jump', text: 'Add the jump to get the next number.' },
+        ],
+        vocab: VOCAB, steps: STEPS, chant: 'Same jump, every time!', format: FORMAT,
+        example: { match: 'each jump adds' },
+        // (a count row is too wide for half the page: the chart's panels and the Guided cells take full-width rows)
+        chartWide: true, chartStates: 3, guidedRows: 2,
+        // (the practice pages: the most whole rows a page holds, most first; critic SC3, H13 - 6 rows in 2 x 3 left each cell half empty)
+        practiceShapes: [[8, 1], [7, 1], [6, 1], [5, 1], [4, 1]],
+    }, o);
+    return {
+        'patterns:skip_count_line': base({
+            skills: [tens, after],
+            mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward' } }, { key: 'counting:count_sequence', opts: { band: 100, dir: 'forward' } }],
+        }),
+        'patterns:skip_count_grid': base({
+            skills: [tens, after],
+            mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward' } }, { key: 'counting:count_sequence', opts: { band: 100, dir: 'forward' } }],
+        }),
+        'multiplication:count_by_tables': base({
+            // (a skip-count row of its own - or an array beside a track - ran the Warm-up to 118 mm and pushed Guided overleaf at L:
+            // the friendly counts by 5s and by 2s, each in one short track, are what every table count builds on)
+            skills: [
+                { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' }, why: 'Skip counting by 5s: a friendly count the tables build on.' },
+                { key: 'counting:number_seq_fill', opts: { step: 2, dir: 'forward' }, why: 'Skip counting by 2s: the 2 times-table as a count.' },
+            ],
+            mixWith: [{ key: 'patterns:skip_count_grid' }, { key: 'multiplication:arrays_groups' }],
+        }),
+    };
+}
 
 /** The lesson data of a skill, or null (a skill with no authored lesson yet). */
 export function lessonFor(categoryId, skillId) {

@@ -1100,6 +1100,11 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     eq(L.stateGroups([st(1), st(1), st(1), st(1), st(0)]).length, 4, 'lesson: a closing check joins the last state');
     eq(L.stateGroups([st(0), st(0), st(1)]).length, 3, 'lesson: every step before the last mark is a state');
     eq(L.stateGroups([st(1), st(1), st(1), st(1), st(1), st(1)]).length, 4, 'lesson: at most 4 states');
+    // critic skip-count r5 SC1: `chartStates` caps the chart (four full-width count rows ran 40 mm past the page); the "look"
+    // step (no mark) joins the step it prepares
+    const g3 = L.stateGroups([st(0), st(1), st(1), st(1)], 3);
+    eq(g3.length, 3, 'lesson: chartStates 3 -> 3 states');
+    eq(JSON.stringify(g3[0].steps), '[0,1]', 'lesson: chartStates - the look step joins the next');
     eq(JSON.stringify(L.chartLayout(4)), JSON.stringify({ cols: 2, rows: 2, variant: 'col' }), 'lesson: 4 steps make a 2 x 2 chart');
     eq(L.chartLayout(3).variant, 'row', 'lesson: 3 steps make full-width rows');
     eq(L.tagLine({ skillId: 'nearest_10', grade: '3', ccss: ['3.NBT.1'], ee: ['M.EE.3.NBT.1'] }), 'nearest_10 · Grade 3 · 3.NBT.1 · EE M.EE.3.NBT.1', 'lesson: the footer tag line');
