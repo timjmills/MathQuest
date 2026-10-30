@@ -482,7 +482,9 @@ export function sectionInstructionKey(keys) {
 /** A library instruction as printed: `_word_` is an underlined word (library convention). */
 export function instructionHtml(key, text) {
     const body = esc(text).replace(/_([^_]+)_/g, '<u>$1</u>');
-    return `<div class="ws-instrline" data-ws-instruction="${esc(key)}">${body}</div>`;
+    // The line is a flex box: a bare "the " text run beside <u>sign</u> lost its trailing space
+    // ("Look at thesign."). One inline run keeps the words spaced (ops-family G1).
+    return `<div class="ws-instrline" data-ws-instruction="${esc(key)}">${/<u>/.test(body) ? `<span>${body}</span>` : body}</div>`;
 }
 
 /** HD-14: how many lines the title takes at the preset size (a width estimate, 0.55 em a character). */

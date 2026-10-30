@@ -2617,7 +2617,9 @@ Object.assign(P12_OPTIONS, {
     'composing:odd_even': [_p12Match([['Odd or even? (one number)', '^Is \\d+ odd or even'], ['Click all the even or odd numbers', '^Click all'],
         ['Which number is even or odd?', '^Which number']])],
     'subtraction:missing_add_sub': [
-        _p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']]),
+        // The default is a missing-number page (the skill's name); "the answer" is opt-in (ops-family G1, 2026-10-30).
+        { ..._p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']],
+            'A number before the = sign is the skill. Tick the answer too to mix in plain sums and differences.'), default: [1] },
         _p12Kinds('task', 'Operation', [['Adding', '\\+'], ['Subtracting', ' - ']]),
     ],
     // Read by gen-operations.js (_p12Form): 0 = arrays, 1 = equal groups.

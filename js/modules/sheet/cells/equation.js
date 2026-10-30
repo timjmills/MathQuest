@@ -84,7 +84,12 @@ const acrossBesideMm = (p, ctx) => {
     const pt = (ctx.metrics && ctx.metrics.digitPt) || 28;
     const em = (pt / 72) * 25.4;
     const d = Math.max(1, Number(p.digits) || 2);
-    const aLen = Math.max(String(p.a).length, d + 1), bLen = Math.max(String(p.b).length, d);
+    // ÷: the band's widest fact has a dividend one digit longer than the answer band (144 ÷ 12).
+    // + − × (ops-family G1, "43 + 10 ="): the first number reaches the answer band's width, the
+    // second is as given, so every fact of one page still takes one form (AX-4).
+    const isDiv = p.op === '/' || p.op === '÷';
+    const aLen = isDiv ? Math.max(String(p.a).length, d + 1) : Math.max(String(p.a).length, d);
+    const bLen = isDiv ? Math.max(String(p.b).length, d) : String(p.b).length;
     return em * (0.56 * (aLen + bLen) + 2 * ACROSS_OP_EM + 4 * ACROSS_GAP_EM) + blankWidth(d, ctx.size);
 };
 /** The answer line under the sentence: on paper, in a column narrower than the line beside needs. */
@@ -115,7 +120,10 @@ register('equation', {
             // AK-2 (critic R1 D2): a value written on the line - the key's answer, a model's trace, a
             // pupil's claimed answer - is drawn at the DIGIT size, on the line, as the fact template
             // draws it; never the small caption size of the line's own default.
-            .replace(/(<span class="ws-line[^"]*" style="[^"]*)"/, `$1;font-size:1em;font-weight:${ctx.state === 'answered' || ctx.state === 'wrong' ? 700 : 400};display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1"`);
+            .replace(/(<span class="ws-line[^"]*" style="[^"]*)"/, `$1;font-size:1em;font-weight:${ctx.state === 'answered' || ctx.state === 'wrong' ? 700 : 400};display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1"`)
+            // ... and a value in a BOX (a missing number before =) stands centred in the box at the digit
+            // size, never hanging out of its bottom edge (ops-family G1 key).
+            .replace(/(<span class="ws-box[^"]*" style="[^"]*)"/, `$1;font-size:1em;font-weight:${ctx.state === 'answered' || ctx.state === 'wrong' ? 700 : 400};display:inline-flex;align-items:center;justify-content:center;line-height:1"`);
         // P11: a ÷ sentence written the way the teacher ticked (`notation`): the dividend over the
         // divisor on a fraction bar, or the divisor outside a long-division bracket. The unknown
         // keeps its slot wherever it sits.
@@ -160,7 +168,9 @@ register('equation', {
             `<span class="o">=</span>`,
             u === 'result' ? slotHtml : `<span>${esc(result)}</span>`,
         ];
-        return `<div class="ws-eq">${pieces.join('')}</div>`;
+        // A one-line sentence packed like a fact (`fact`, ops-family G1's missing numbers) starts at
+        // the top of its cell and clears the label keep-out the way the across fact does (CL-40).
+        return `<div class="ws-eq"${p.fact ? ' data-ws-across="1"' : ''}>${pieces.join('')}</div>`;
     },
     answerKey(p) {
         const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
@@ -170,8 +180,14 @@ register('equation', {
     },
     footprint(p, ctx) {
         const em = (ctx.metrics.digitPt / 72) * 25.4;
-        const chars = String(p.a).length + String(p.b).length + String(p.result ?? compute(p)).length;
-        const isDivFact = p.fact && (p.op === '/' || p.op === '÷') && (p.unknown || 'result') === 'result';
+        // The unknown is drawn as its slot (B(n), added below), so its own digits are not counted
+        // again (ops-family G1: "12 × [ ] = 96" was measured as six digits plus the box and fell
+        // to one column).
+        const u0 = p.unknown || 'result';
+        const chars = (u0 === 'a' ? 0 : String(p.a).length) + (u0 === 'b' ? 0 : String(p.b).length)
+            + (u0 === 'result' ? 0 : String(p.result ?? compute(p)).length);
+        // (any operation's across fact: div_facts' Standard form, and the + / − facts of ops-family G1)
+        const isDivFact = p.fact && (p.op === '/' || p.op === '÷' || !p.notation) && (p.unknown || 'result') === 'result';
         const A = String(p.a).length, B = String(p.b).length;
         // A division fact's width is its narrowest drawn form (the cell picks the form for its
         // column, see acrossBelow): across, the sentence with the line under it; fraction, the bar

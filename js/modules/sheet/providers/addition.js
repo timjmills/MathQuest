@@ -469,3 +469,93 @@ for (const op of ['add', 'sub']) {
     }
 }
 
+
+/* ============================================================= add_sub_10s, add_sub_100s */
+// Ten (a hundred) more or less than ANY number in the band (1.NBT.C.5, 2.NBT.B.8): 43 + 10,
+// 367 − 100. A mental fact read across, on the kit's `equation` cell (slot 'answer'). The instruction,
+// title and Say line follow the signs the page deals (`q.opsDealt`, from the `task` option), so a
+// page of adding only never says "Look at the sign" (L6).
+
+/** The signs a page deals: the item's own record, else the option's ticks (0 add, 1 subtract). */
+export function dealtOps(ref = {}) {
+    const q = ref.q || null;
+    if (q && Array.isArray(q.opsDealt) && q.opsDealt.length) return q.opsDealt;
+    const t = ref.opts && ref.opts.task;
+    const ticks = Array.isArray(t) ? t : (typeof t === 'number' ? [t] : null);
+    if (ticks && ticks.length === 1) return ticks[0] === 0 ? ['+'] : ['-'];
+    return ['+', '-'];
+}
+
+/** A `strings` member that picks one of three variants by the signs the page deals. */
+export function stringsByOps(variants) {
+    const fn = (ref = {}) => {
+        const ops = dealtOps(ref);
+        const v = ops.length === 1 ? (ops[0] === '+' ? variants.add : variants.sub) : variants.mixed;
+        return v(ref);
+    };
+    fn.def = variants.mixed.def;
+    return fn;
+}
+
+function moreLessProvider(stepN) {
+    const ten = stepN === 10;
+    const unit = ten ? 'ten' : 'hundred';
+    const place = ten ? 'tens' : 'hundreds';
+    const keep = ten ? 'the ones' : 'the tens and ones';
+    const glyph = (q) => (q.op === '-' || q.op === '−' ? '−' : '+');
+    const isSub = (q) => glyph(q) === '−';
+    const sayValues = (q) => {
+        const [a] = operands(q);
+        if (!Number.isFinite(a)) return null;
+        return `${fmt(stepN)} ${isSub(q) ? 'less' : 'more'} than ${fmt(a)} is ${fmt(num(q.ans))}.`;
+    };
+    const stepsFor = (q) => {
+        const [a] = operands(q);
+        if (!Number.isFinite(a)) return null;
+        return [`Find the ${place} digit in ${fmt(a)}.`, `${isSub(q) ? 'Count back' : 'Count on'} one ${unit}.`,
+            `Keep ${keep} the same.`, 'Write the answer.'];
+    };
+    const variant = (iCan, instructionKey, steps, say) => strings({ iCan, instructionKey, steps, stepsFor, say, sayValues });
+    return {
+        strings: stringsByOps({
+            mixed: variant(`I Can add and subtract ${stepN}`, 'mixed-sign',
+                ['Look at the sign.', `Count on or back one ${unit}.`, `Keep ${keep} the same.`, 'Write the answer.'],
+                `${stepN} more or ${stepN} less than __ is __.`),
+            add: variant(`I Can find ${stepN} more`, 'add',
+                [`Find the ${place} digit.`, `Count on one ${unit}.`, `Keep ${keep} the same.`, 'Write the answer.'],
+                `${stepN} more than __ is __.`),
+            sub: variant(`I Can find ${stepN} less`, 'subtract',
+                [`Find the ${place} digit.`, `Count back one ${unit}.`, `Keep ${keep} the same.`, 'Write the answer.'],
+                `${stepN} less than __ is __.`),
+        }),
+        misconceptions: ten ? ['changed-ones', 'wrong-direction'] : ['changed-tens', 'changed-ones', 'wrong-direction'],
+        workedSteps: (q) => {
+            const [a] = operands(q);
+            const ans = num(q.ans);
+            if (!Number.isFinite(a) || !Number.isFinite(ans)) return [];
+            const n = Math.floor(a / stepN);
+            const m = Math.floor(ans / stepN);
+            const plural = (k) => `${k} ${k === 1 ? unit : place}`;
+            return [
+                step(`Find the ${place}: ${fmt(a)} has ${plural(n)}.`),
+                step(`${isSub(q) ? 'Count back' : 'Count on'} one ${unit}: ${plural(m)}.`),
+                step(`Keep ${keep} the same.`),
+                step(`Write ${fmt(ans)}.`, [{ slot: 'answer', value: String(ans) }]),
+            ];
+        },
+        wrongAnswer: (q) => {
+            const [a] = operands(q);
+            if (!Number.isFinite(a)) return null;
+            const sgn = isSub(q) ? -1 : 1;
+            const c = [
+                { value: a + sgn, misconception: 'changed-ones', slot: 'answer', explain: `Changed the ones digit instead of the ${place}.` },
+                { value: a - sgn * stepN, misconception: 'wrong-direction', slot: 'answer', explain: isSub(q) ? `Added ${stepN} instead of taking it away.` : `Took ${stepN} away instead of adding it.` },
+            ];
+            if (!ten) c.unshift({ value: a + sgn * 10, misconception: 'changed-tens', slot: 'answer', explain: 'Changed the tens digit instead of the hundreds.' });
+            return chooseWrong(q, c);
+        },
+    };
+}
+
+registerSkill('addition:add_sub_10s', moreLessProvider(10));
+registerSkill('addition:add_sub_100s', moreLessProvider(100));

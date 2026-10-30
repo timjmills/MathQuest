@@ -272,6 +272,138 @@ export const LESSONS = Object.freeze({
         // 100, which comes after, and never two "Number Sense" sections).
         mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
     },
+
+    // ---------------------------------------- ops-family G1 (2026-10-30): one-line sentences
+    // Each lesson's steps match its provider's worked steps for the example, one step a state.
+    'addition:add_sub_10s': {
+        skills: [
+            { key: 'patterns:seq_10', why: 'Counting on and back by tens.' },
+            { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' },
+        ],
+        concepts: [
+            { id: 'ten-more', text: '10 more: the tens digit goes up by 1.' },
+            { id: 'ten-less', text: '10 less: the tens digit goes down by 1.' },
+            { id: 'ones-stay', text: 'The ones digit does not change.' },
+        ],
+        vocab: [
+            { word: 'tens', meaning: 'groups of ten', picture: { kind: 'blocks', tens: 3, ones: 0 } },
+            { word: '10 more', meaning: 'one more ten', picture: { kind: 'text', text: '43 \u2192 53' } },
+            { word: '10 less', meaning: 'one ten fewer', picture: { kind: 'text', text: '43 \u2192 33' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the tens.' },
+            { icon: 'count', text: 'One ten on or back.' },
+            { icon: 'look', text: 'Keep the ones.' },
+            { icon: 'write', text: 'Write the answer.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'One move in one place; four short steps said in order. No decision to cue, so no chant.' },
+        example: { match: 'one ten' },
+        mixWith: [{ key: 'placevalue:more_less_10' }, { key: 'patterns:seq_10' }],
+    },
+    'addition:add_sub_100s': {
+        skills: [
+            { key: 'addition:add_sub_10s', why: 'The same move one place to the right.' },
+            { key: 'placevalue:identify', opts: { band: 999, places: [1, 10, 100] }, why: 'Name the hundreds digit.' },
+        ],
+        concepts: [
+            { id: 'hundred-more', text: '100 more: the hundreds digit goes up by 1.' },
+            { id: 'hundred-less', text: '100 less: the hundreds digit goes down by 1.' },
+            { id: 'rest-stay', text: 'The tens and ones digits do not change.' },
+        ],
+        vocab: [
+            { word: 'hundreds', meaning: 'groups of a hundred', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: '100 more', meaning: 'one more hundred', picture: { kind: 'text', text: '367 \u2192 467' } },
+            { word: '100 less', meaning: 'one hundred fewer', picture: { kind: 'text', text: '367 \u2192 267' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the hundreds.' },
+            { icon: 'count', text: 'One hundred on or back.' },
+            { icon: 'look', text: 'Keep the tens and ones.' },
+            { icon: 'write', text: 'Write the answer.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'The same four steps as tens, one place over. No decision to cue, so no chant.' },
+        example: { match: 'one hundred' },
+        mixWith: [{ key: 'placevalue:more_less_100' }, { key: 'addition:add_sub_10s' }],
+    },
+    'subtraction:missing_add_sub': {
+        skills: [
+            { key: 'addition:add_facts', opts: { band: 20 }, why: 'Count on to find a part.' },
+            { key: 'subtraction:sub_facts', opts: { band: 20 }, why: 'Take away within 20.' },
+        ],
+        concepts: [
+            { id: 'whole-parts', text: 'Two parts make the whole.' },
+            { id: 'count-on', text: 'Count on from the part you know to the whole.' },
+            { id: 'check', text: 'Put the number in. Is the sentence true?' },
+        ],
+        vocab: [
+            { word: 'missing', meaning: 'the number in the box', picture: { kind: 'text', text: '? + 5 = 12' } },
+            { word: 'whole', meaning: 'the parts together', picture: { kind: 'text', text: '7 + 5 = 12' } },
+            { word: 'equals', meaning: 'the = sign: is the same as', picture: { kind: 'glyph', text: '=' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the whole.' },
+            { icon: 'count', text: 'Count on from the part.' },
+            { icon: 'check', text: 'Check the sentence.' },
+            { icon: 'write', text: 'Write the number.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'Find the whole, count on, check: three moves said in order, then write.' },
+        example: { match: 'Count on from' },
+        mixWith: [{ key: 'addition:add_facts', opts: { band: 20 } }, { key: 'subtraction:sub_facts', opts: { band: 20 } }],
+    },
+    'division:missing_mult_div': {
+        skills: [
+            { key: 'multiplication:mult_facts', why: 'Know the times facts.' },
+            { key: 'division:div_facts', why: 'Division is the times fact turned round.' },
+        ],
+        concepts: [
+            { id: 'fact', text: 'A times fact has two factors and a product.' },
+            { id: 'related', text: 'Every division has a times fact.' },
+            { id: 'check', text: 'Put the number in. Is the fact true?' },
+        ],
+        vocab: [
+            { word: 'factor', meaning: 'a number we multiply', picture: { kind: 'text', text: '6 \u00d7 7' } },
+            { word: 'missing', meaning: 'the number in the box', picture: { kind: 'text', text: '? \u00d7 6 = 42' } },
+            { word: 'divide', meaning: 'the \u00f7 sign: share equally', picture: { kind: 'glyph', text: '\u00f7' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the fact.' },
+            { icon: 'count', text: 'Count by the number.' },
+            { icon: 'check', text: 'Check the fact.' },
+            { icon: 'write', text: 'Write the number.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'Count by the number you know until you reach the total; the check says the whole fact.' },
+        example: { match: 'Count by' },
+        mixWith: [{ key: 'multiplication:mult_facts' }, { key: 'division:div_facts' }],
+    },
+    'division:div_zero_in_quotient': {
+        skills: [
+            { key: 'division:div_facts', why: 'Each place is a division fact.' },
+            { key: 'division:divide', why: 'Divide one place at a time.' },
+        ],
+        concepts: [
+            { id: 'one-place', text: 'Divide one place at a time, left to right.' },
+            { id: 'zero', text: 'If the divisor does not fit, write 0 in that place.' },
+            { id: 'every-place', text: 'Every place of the answer gets a digit.' },
+        ],
+        vocab: [
+            { word: 'quotient', meaning: 'the answer to a division', picture: { kind: 'text', text: '721 \u00f7 7 = 103' } },
+            { word: 'divisor', meaning: 'the number we divide by', picture: { kind: 'text', text: '7' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+        ],
+        steps: [
+            { icon: 'start', text: 'Divide the first place.' },
+            { icon: 'decide', text: 'Does not fit? Write 0.' },
+            { icon: 'subtract', text: 'Bring down. Divide again.' },
+        ],
+        chant: 'Does not fit? Write a zero.',
+        format: { kind: 'numbered steps with icons + a chant', why: 'The one move pupils skip is the 0; a short chant at step 2 cues it every time.' },
+        example: { match: 'write 0\\. Bring down' },
+        mixWith: [{ key: 'division:div_facts' }, { key: 'division:divide' }],
+    },
 });
 
 /** The lesson data of a skill, or null (a skill with no authored lesson yet). */
