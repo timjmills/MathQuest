@@ -70,6 +70,31 @@ touches `print-sheet.js` `buildLesson` / `buildDetailedLesson` only where the pa
   come from r5. The seven SU-C no-regrouping lessons share ONE routine (`sub-column-no-regroup`) with per-lesson `teach`
   fields; they declare `prereqsPending` and `casesPending` (listed in LESSON_COVERAGE.md; `--strict` fails on them).
 
+### Builder B (render side), 2026-10-30, 17:28-19:50 UTC (about 2 h 20 min wall)
+- 17:28-17:50 read; `tests/scripts/ws-lesson-baseline.cjs` (260 page hashes: 3 samples x L/M x seeds 4242/1001, 5 detailed
+  lessons). Two false starts: puppeteer's 180 s protocol timeout on a detailed lesson (fixed: the page reconnected with
+  no timeout), and the detailed doc's css links carrying the test server's port (fixed: normalised). ~25 min lost.
+- 17:35-18:20 extraction (scripted line-range moves, a missing-import check, then the hash run: 9-10 min a run) -
+  a0ba0331, hashes identical.
+- 18:20-18:50 parts + refresh (LR-18) - 13ebeb93, hashes identical, `--parts` OK.
+- 18:50-19:05 pre-skill-check routes - aec55f46, hashes identical.
+- 19:05-19:50 merge A (eab21f55, clean); lesson by id + the Prerequisite Check part (LR-17) - 847c332b, then the
+  check-page fixes from print-lint (two-up rows, wrapped strips, tag flex, routing page in key mode).
+
+### Builder B: what was built, deviations
+- `sheet/lesson-arch/` has EIGHT archetypes, not three: today's CASE_TESTS also hold the detailed lessons' cases (pv,
+  story, array, grid, table); `index.js` merges them and throws on a duplicate case name.
+- The Warm-up band is `lesson-pages/warm-up.js` (the branch's `prereq-check.js` name is not used: D1).
+- The registry (D2) holds parts (prereq 5, chart 10, sheet 20, practice 30, mixed 40) AND the lesson sheet's bands
+  (vocab 10, warm-up 20, guided 30); the role lays out the registry's bands and hands an unknown lesson-role part to its
+  `plan`; buildLesson builds every registered part.
+- Refresh avoidance uses today's `avoidTexts` (soft) instead of the branch's `avoidHard` / `avoidSoft` (stage 3 r5 hunk).
+- The routing table is a key page of its own (`ws-keyextra`): `arrangeKey` and `ws-print-lint` (AK-4 count, HD-30
+  footer pick) leave it out of the pupil/key pairing. Its styles are inline, so the shared sheet stylesheet (embedded in
+  every page) and every other page stay byte-identical.
+- A quadrant / stacked check with routes whose cells fill the page can take a second page (the tags need ~6 mm a band);
+  the lesson packet's check (perQuestion 1) fits one page.
+
 ## Gates
 
 ## Critic rounds

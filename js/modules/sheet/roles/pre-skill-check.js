@@ -65,7 +65,7 @@ const escT = (t) => String(t === undefined || t === null ? '' : t).replace(/&/g,
 /** The words of a route's tag. */
 export const routeText = (r) => `If missed \u2192 Lesson ${r.lesson || ''}${r.title ? ` ${r.title}` : ''}`.replace(/\s+/g, ' ').trim();
 /** The teacher tag under a question (inline styles: the sheet's stylesheet is unchanged, so no other page changes). */
-export const routeTagHtml = (r) => `<p class="mq-lpretag" data-ws-teacher style="margin:0;padding:.6mm 3mm 1.4mm;height:${ROUTE_TAG_MM.toFixed(2)}mm;box-sizing:border-box;font-size:9pt;line-height:1.3;color:#949494;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escT(routeText(r))}</p>`;
+export const routeTagHtml = (r) => `<p class="mq-lpretag" data-ws-teacher style="margin:0;padding:.6mm 3mm 1.4mm;height:${ROUTE_TAG_MM.toFixed(2)}mm;box-sizing:border-box;font-size:9pt;line-height:1.3;color:#949494;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none">${escT(routeText(r))}</p>`;
 
 /**
  * THE ROUTING TABLE (one builder: the Prerequisite Check's key page here, and the standard lesson packet's key; the
@@ -191,15 +191,19 @@ function planCheck(input, cut) {
             const colsOf = (q) => [4, 2, 1].find((c) => fitsAt(q, c, ctx)) || 1;
             const hOfU = (u) => Math.max(...u.map((q) => hMinAt(q, u.length === 2 ? 2 : colsOf(q), ctx)));
             const GAP = 3;   // (.mq-quadrow + .mq-quadrow: 3 mm)
-            const fixed = units.reduce((t, u, k) => t + m.strip + TAG + (k ? GAP : 0), 0);
+            // (a half's instruction that wraps takes a second line: its strip is that much taller - stripExtraMm)
+            const em = ((ctx.s && ctx.s.textPt) || 14) * PT_MM;
+            const extraLines = (q, w) => Math.max(0, Math.ceil((String(instructionText(instructionKeyOf(q, input.skills), q) || '').length * 0.5 * em) / Math.max(30, w - 10)) - 1);
+            const stripOf = (u) => m.strip + Math.max(0, ...u.map((q) => extraLines(q, u.length === 2 ? 93 : 186))) * em * 1.25;
+            const fixed = units.reduce((t, u, k) => t + stripOf(u) + TAG + (k ? GAP : 0), 0);
             const rowsH = units.reduce((t, u) => t + hOfU(u), 0);
             // (at most 1.3 x the measured cell: an item never leaves 30 % of its cell empty, H13; the rest stays at the foot)
             const g = fixed + rowsH < m.budget && rowsH > 0 ? Math.min(1.3, 1 + (m.budget - fixed - rowsH - 1) / rowsH) : 1;
             for (const u of units) {
                 const h = hOfU(u) * g;
-                const uh = m.strip + TAG + h + (cur.sections.length ? GAP : 0);
+                const uh = stripOf(u) + TAG + h + (cur.sections.length ? GAP : 0);
                 if (cur.sections.length && cur.used + uh > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
-                if (u.length === 2) cur.sections.push({ kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-quadrow mq-lprerow', height: `${(m.strip + TAG + h).toFixed(2)}mm`, parts: u.map((q) => band(q, 1, 1, h, 2)) });
+                if (u.length === 2) cur.sections.push({ kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-quadrow mq-lprerow', parts: u.map((q) => band(q, 1, 1, h, 2)) });
                 else cur.sections.push(band(u[0], 1, 1, h, colsOf(u[0])));
                 kept += u[0].length + (u[1] ? u[1].length : 0);
                 cur.used += uh;

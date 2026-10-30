@@ -3540,7 +3540,7 @@ async function buildRoleSheet(n, metaOf) {
     // A plan's own teacher page after its key (a Prerequisite Check's routing table, `meta.routePlan`).
     if (n.key && plan.meta && plan.meta.routePlan) {
         // (`ws-keyextra`: a key page with no pupil twin - arrangeKey pairs the other key pages with their pupil pages)
-        const extra = renderPlan(plan.meta.routePlan, { key: false }).pupilPages.map((h) => h.replace('class="ws-page ', 'class="ws-page ws-keyextra '));
+        const extra = renderPlan(plan.meta.routePlan, { key: true }).keyPages.map((h) => h.replace('class="ws-page ', 'class="ws-page ws-keyextra '));
         out.keyPages = out.keyPages.concat(extra);
         out.keyHtml = [out.keyHtml, ...extra].filter(Boolean).join('\n');
     }
