@@ -757,6 +757,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "skipcount-lesson-data",
+   "check": "Lesson data + option help on the count-row family (critic skip-count r5 SC3, SC5)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint --rules LESSON-DATA,OPTION-HELP (and LESSON-DATA screen-task)",
+   "browser": false,
+   "fail": {
+    "commit": "fe965324",
+    "state": "critic r5: no LESSONS entry for the three skills; the g2 help names 5s / 10s as unoffered"
+   },
+   "pass": {
+    "commit": "83d0ed29",
+    "state": "fix: LESSONS with written warm-ups; the g2 help per group"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill patterns:skip_count_grid,patterns:skip_count_line,multiplication:count_by_tables --rules LESSON-DATA,OPTION-HELP --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skipcount-lesson-page",
+   "check": "The count-row Lesson pages fit (critic skip-count r5 SC1: overflow 30, illegible 20, key 2)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint --source kit --roles lesson --size S",
+   "browser": true,
+   "fail": {
+    "commit": "fe965324",
+    "state": "critic r5: 52 findings"
+   },
+   "pass": {
+    "commit": "83d0ed29",
+    "state": "fix: 0"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size S --skills patterns:skip_count_grid,patterns:skip_count_line,multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skipcount-phone",
+   "check": "The 390 card opens at the first box; a swiping row on one line; arrow clearance; next box in view; turned (critic skip-count r5 SC2, small-fixes r11 G1-G4)",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS, INVIEW, ROW-LINES, ROW-ARROW, NEXT-INVIEW, ROTATE",
+   "browser": true,
+   "fail": {
+    "commit": "fe965324",
+    "state": "critic r5: INVIEW 8, FOCUS 10"
+   },
+   "pass": {
+    "commit": "a6b3c47b",
+    "state": "fix: 0"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills patterns:skip_count_grid,patterns:skip_count_line,multiplication:count_by_tables --items 2 --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
