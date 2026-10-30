@@ -549,7 +549,7 @@ Extensive SVG generation functions across 5 modules:
 
 ## Usage budget (owner rule, 2026-10-24)
 
-Use at most **80 % of the weekly usage limit** (window resets Thursday 22:00 UTC). Working figure: **1 % ≈ $28 of session `cost_usd`**, so 80 % ≈ $2,240 a week. Before starting lanes, sum `cost_usd` of the sessions since the reset and check the remaining budget; stop new work at 80 %. Benchmarks and the week's running total: `design/IMPROVEMENT_PLAN.md` "Usage budget".
+Use at most **80 % of the weekly usage limit** (window resets Thursday 22:00 UTC). Working figure: **1 % ≈ $28 of session `cost_usd`**, so 80 % ≈ $2,240 a week. Before starting lanes, sum `cost_usd` of the sessions since the reset and check the remaining budget; stop new work at 80 %. Benchmarks and the week's running total: `design/IMPROVEMENT_PLAN.md` "Usage budget". **Every spend figure told to the owner is also given as a % of the weekly limit** (owner, 2026-10-30; $28 ≈ 1 %).
 
 ## Agents — model and effort (owner rule, 2026-10-02, latest revision)
 

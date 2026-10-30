@@ -31,6 +31,7 @@ import {
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
+import { presetOf } from '../../skill-presets.js';   // pure table, SCC-01 safe
 import { ANCHOR_CSS, ANCHOR_PAGE_CSS, anchorPlanItem, sideItems, pupilCount, blockPlan, blockPages, sideFit, SIDE_COLS } from '../anchors.js';
 import { LESSON_CSS } from '../lesson-css.js';
 
@@ -391,8 +392,14 @@ export function skillWords(skill = {}) {
     let str = {};
     try {
         const p = getProvider(skill.categoryId || '', skill.skillId || '');
+        // A preset (no provider of its own) reads its HOST's strings as the host with the preset's
+        // values under the explicit opts: its own id matched none of the host's branches and fell to
+        // "default-write" (44 presets, pilot D8 class; gate ws-presets-unit check 7).
+        const pre = p.presetOf ? presetOf(skill.categoryId || '', skill.skillId || '') : null;
+        const sid = pre ? pre.skillId : skill.skillId;
+        const sopts = pre ? Object.assign({}, pre.opts, skill.opts || {}) : skill.opts;
         const raw = typeof p.strings === 'function'
-            ? p.strings({ categoryId: skill.categoryId, skillId: skill.skillId, label: skill.label, answerType: skill.answerType, printFormat: skill.printFormat, opts: skill.opts })
+            ? p.strings({ categoryId: skill.categoryId, skillId: sid, label: skill.label, answerType: skill.answerType, printFormat: skill.printFormat, opts: sopts })
             : p.strings;
         str = raw || {};
     } catch (e) { str = {}; }
