@@ -934,3 +934,11 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 
 /* owner 2026-10-30: the hover preview shows the whole problem (scaled to fit) in a taller frame */
 .tvp-pop .tvp-pop-frame { height: 240px; }
+
+/* Teacher follow-ups (audit R2 #20): a toast with one action ("Undo") takes clicks, with a 44 px button. */
+.tv-toast.has-act.is-on { pointer-events: auto; display: flex; align-items: center; gap: 12px; padding-top: 0; padding-bottom: 0; }
+.tv-toast .tv-toast-act { min-height: 44px; min-width: 44px; padding: 0 12px; border: 0; background: none; color: #fff; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.tv-toast .tv-toast-act:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* Teacher follow-ups: the 28 px "?" on each option keeps its look but takes a 44 px hit area. */
+.tv-sko .sko-tip::after { content: ''; position: absolute; inset: -8px; }

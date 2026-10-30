@@ -27,7 +27,7 @@ import { populateVoicePicker, setSelectedVoiceURI, testSelectedVoice, getSelecte
 import { isSfxEnabled } from './sfx.js';
 import {
     icon, esc, toast, copyText, fmtDay, savedSets, findSkill, levelText, levelsSummary, currentSet,
-    loadSetIntoQueue, skillCatalogue, optionsSummary, readStore, writeStore, PRINT_DEFAULTS_KEY, printDefaults, pupilCode, hideToast,
+    loadSetIntoQueue, skillCatalogue, optionsSummary, readStore, writeStore, PRINT_DEFAULTS_KEY, printDefaults, pupilCode, hideToast, toastAction,
 } from './teacher-ui.js';
 import { renderSetsScreen, openSavedSet, startNewSet, currentSetName } from './teacher-sets.js';
 import { renderPrintScreen, recentPrintouts, reprint, printoutMeta, openPrintWith } from './teacher-print.js';
@@ -1087,7 +1087,19 @@ function onSettingsClick(e, el) {
     if (d.setAct === 'qs-lock') window.toggleQuickStartLock?.();
     if (d.setAct === 'qs-reset') { window.resetQuickSkillsToDefault?.(); toast('The pupil start screen is back to its default cards'); }
     if (d.setAct && d.setAct.startsWith('qs-')) { renderSettings(el); el.querySelector(`[data-set-act="${d.setAct}"]`)?.focus(); return; }
-    if (d.setAct === 'reset-adaptive') { window.confirmResetAdaptiveLevels?.(); return; }
+    if (d.setAct === 'reset-adaptive') {
+        // No native confirm() (audit R2 #20): reset now, offer Undo in the toast.
+        const before = JSON.parse(JSON.stringify(state.adaptiveLevels || {}));
+        let saved = null;
+        try { saved = localStorage.getItem('mathquest_adaptive_levels'); } catch (e) { /* storage off */ }
+        window.resetAdaptiveLevels?.();
+        toastAction('Every skill is back to level 3.', 'Undo', () => {
+            state.adaptiveLevels = before;
+            try { if (saved !== null) localStorage.setItem('mathquest_adaptive_levels', saved); } catch (e) { /* storage off */ }
+            toast('Levels put back.');
+        });
+        return;
+    }
     if (d.setTheme) setPupilTheme(d.setTheme === 'dark');
     if (d.setStart) { try { localStorage.setItem('mathquest_start_role', d.setStart); } catch (e) { /* storage off */ } }
     if (d.setSize) savePrintDefaults({ size: d.setSize });

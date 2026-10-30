@@ -94,9 +94,31 @@ export function toast(msg) {
     const el = document.getElementById('tvToast');
     if (!el) return;
     el.textContent = msg;
+    el.classList.remove('has-act');
     el.classList.add('is-on');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove('is-on'), 2200);
+}
+
+/**
+ * A toast with one action button ("Undo"), in place of a native confirm(). It stays up for 6 s;
+ * the button runs `fn` once and takes the toast down. Teacher follow-ups (TEACHER-SCREENS-AUDIT-R2 #20).
+ */
+export function toastAction(msg, label, fn) {
+    const el = document.getElementById('tvToast');
+    if (!el) return;
+    el.textContent = '';
+    const span = document.createElement('span');
+    span.textContent = msg;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tv-toast-act';
+    b.textContent = label;
+    b.addEventListener('click', () => { try { fn(); } finally { hideToast(); } }, { once: true });
+    el.append(span, b);
+    el.classList.add('is-on', 'has-act');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('is-on', 'has-act'), 6000);
 }
 
 /** Take the toast down now (every screen change, critic r4 m8: it must not sit on the next screen's controls). */
@@ -104,7 +126,7 @@ export function hideToast() {
     clearTimeout(toastTimer);
     toastTimer = null;
     const el = document.getElementById('tvToast');
-    if (el) el.classList.remove('is-on');
+    if (el) el.classList.remove('is-on', 'has-act');
 }
 
 export async function copyText(text) {

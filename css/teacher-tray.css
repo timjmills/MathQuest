@@ -357,3 +357,7 @@ html:has(body.teacher-mode) { scroll-padding-bottom: 96px; }
 /* owner 2026-10-30: the options sheet's preview shows the whole problem: a taller frame, scaled to fit, never cropped */
 #teacherApp .tc-frame { height: 300px; }
 @media (max-width: 819px) { #teacherApp .tc-frame { height: 260px; } }
+
+/* Teacher follow-ups: the 28 px tray "x" keeps its look but takes a 44 px hit area. */
+#teacherApp .tt-x { position: relative; }
+#teacherApp .tt-x::after { content: ''; position: absolute; inset: -8px; }
