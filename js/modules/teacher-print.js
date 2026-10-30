@@ -863,6 +863,10 @@ function requestFor(s, i) {
         letters: s.role === 'more-practice' ? s.letters.slice() : undefined,
         practicePages: s.role === 'lesson' ? s.pages : undefined,
         mixed: s.role === 'lesson' ? !!s.mixed : undefined,
+        // LR-18: the lesson parts to print and each part's own seed (set on the section, e.g. by a "New numbers"
+        // control or a saved set - print-sheet.js LESSON_PARTS, lessonPartSeed). Absent: the packet as above.
+        parts: s.role === 'lesson' && Array.isArray(s.parts) ? s.parts.slice() : undefined,
+        lessonSeeds: s.role === 'lesson' && s.lessonSeeds ? Object.assign({}, s.lessonSeeds) : undefined,
         size: pr.size,
         // 'auto' lets each page type take its own default look (Daily on the fact layouts).
         look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',

@@ -42,6 +42,7 @@ import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
 import { practiceSection, practiceStackShapes, practiceRequest } from './sheet/lesson-pages/practice.js';
 import { mixedRequest } from './sheet/lesson-pages/mixed.js';
+import { lessonPart, lessonPartIds } from './sheet/lesson-pages/index.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
@@ -213,6 +214,13 @@ function normaliseRequest(req = {}) {
         // prereqs.js LESSONS shape, used INSTEAD of lessonFor() when given (null otherwise, so
         // every standard lesson renders exactly as before).
         lessonData: req.lessonData && typeof req.lessonData === 'object' ? req.lessonData : null,
+        // The lesson's PARTS to print (LR-18, plan §8e): a subset of LESSON_PARTS, null = the packet as
+        // practicePages / mixed describe it. And each part's own seed (`lessonSeeds`, lessonPartSeed): a part
+        // refreshed with new numbers changes alone.
+        parts: req.role === 'lesson' && Array.isArray(req.parts) ? lessonPartIds().filter((x) => req.parts.includes(x)) : null,
+        lessonSeeds: req.role === 'lesson' && req.lessonSeeds && typeof req.lessonSeeds === 'object'
+            ? Object.fromEntries(lessonPartIds().filter((x) => req.lessonSeeds[x] !== undefined && req.lessonSeeds[x] !== null && req.lessonSeeds[x] !== '' && Number.isFinite(Number(req.lessonSeeds[x]))).map((x) => [x, Number(req.lessonSeeds[x]) >>> 0]))
+            : null,
         perQuestion: Array.isArray(req.perQuestion) ? req.perQuestion.map(Number) : Number(req.perQuestion) >= 1 ? Math.floor(Number(req.perQuestion)) : undefined,
         // The detailed lesson: the Mixed page's partners and the Practice last-row rule (absent otherwise).
         mixedSkills: Array.isArray(req.mixedSkills) && req.mixedSkills.length ? req.mixedSkills : null,
@@ -3562,6 +3570,29 @@ async function buildRoleSheet(n, metaOf) {
 /** The note a lesson asked for at S carries (the print panel shows it as a warning). */
 export const LESSON_SIZE_NOTE = 'A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small.';
 
+/**
+ * THE LESSON'S PARTS (owner ruling 2026-09-26, plan §8e, LESSON_RULES.md LR-18), in packet order: the registry's
+ * (sheet/lesson-pages/index.js) - chart, sheet, practice, mixed. Every lesson HAS every part; the teacher prints any
+ * subset (`parts`) and can refresh any one with new numbers (`lessonSeeds`).
+ */
+export const LESSON_PARTS = Object.freeze(lessonPartIds());
+
+/**
+ * A part's seed: refresh 0 is the packet's own deal (the chart and the lesson sheet share the packet seed; Practice
+ * +7919, Mixed +15838 - the seeds every packet printed before parts had, so the default packet is byte-identical);
+ * refresh k > 0 is a new deal of that part alone. The Print screen passes the result in `lessonSeeds[part]`.
+ */
+export function lessonPartSeed(seed, part, refresh = 0) {
+    const def = lessonPart(part);
+    const base = ((Number(seed) >>> 0) + ((def && def.offset) || 0)) >>> 0;
+    const k = Math.max(0, Math.floor(Number(refresh) || 0));
+    if (!k) return base;
+    let h = (base ^ Math.imul(k, 0x9e3779b1) ^ Math.imul(lessonPartIds().indexOf(part) + 1, 0x85ebca6b)) >>> 0;
+    h = Math.imul(h ^ (h >>> 16), 0x7feb352d) >>> 0;
+    h = Math.imul(h ^ (h >>> 15), 0x846ca68b) >>> 0;
+    return (h ^ (h >>> 16)) >>> 0;
+}
+
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
     const data0 = n.lessonData || lessonFor(sk0.categoryId, sk0.skillId);
@@ -3602,14 +3633,27 @@ async function buildLesson(n, metaOf) {
     const nz = Object.assign({}, n, { size });
     const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
 
+    // THE PARTS (LR-18): what prints, what is built, and each part's seed. Without `parts` or `lessonSeeds` the
+    // request's practicePages / mixed decide, exactly as before. A part printed alone is the same page it is in the
+    // whole packet, so the parts before it are built too (they are what it avoids); a REFRESHED part (its seed not the
+    // packet's own) is dealt last, avoiding every other part's problems.
+    const PART_IDS = lessonPartIds();
+    const seeds = Object.fromEntries(PART_IDS.map((x) => [x, n.lessonSeeds && n.lessonSeeds[x] !== undefined ? n.lessonSeeds[x] : lessonPartSeed(n.seed, x)]));
+    const refreshed = PART_IDS.filter((x) => seeds[x] !== lessonPartSeed(n.seed, x));
+    const printed = n.parts || PART_IDS.filter((x) => { const d = lessonPart(x); return !d.inPacket || d.inPacket(n); });
+    const partsMode = !!(n.parts || refreshed.length);
+    const lastAt = Math.max(1, ...printed.concat(refreshed).map((x) => PART_IDS.indexOf(x)));
+    const built = partsMode ? PART_IDS.slice(0, lastAt + 1) : printed;
+    const practicePages = partsMode ? Math.max(1, n.practicePages) : n.practicePages;
+
     // 1. The anchor chart (always L) and the teaching sheet: Vocabulary, Warm-up, Guided, Independent.
-    const chart = await buildRoleSheet(Object.assign({}, nz, {
+    let chart = await buildRoleSheet(Object.assign({}, nz, {
         size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
     }), metaOf);
-    const teach = await buildRoleSheet(Object.assign({}, nz, {
+    let teach = await buildRoleSheet(Object.assign({}, nz, {
         role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
     }), metaOf);
-    const parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
+    let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
 
     // 2. Massed practice: Independent pages with the chart's step strip, the grid filling the page
     // body in ONE frame (CL-1; lessons r1: no blank band above the footer, no gutters).
@@ -3660,9 +3704,9 @@ async function buildLesson(n, metaOf) {
     // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
     // same count either way, so the pupil gets the bigger digits.
     const practiceSize = rounding ? 'L' : size;
-    const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1]) => practiceRequest({
-        common, size, practiceSize, lessonNo, section, facts, pages, withStrip, shape,
-        seed: (n.seed + 7919) >>> 0, strip, stripH, stripHtml,
+    const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1], seed = (n.seed + 7919) >>> 0, sec = section) => practiceRequest({
+        common, size, practiceSize, lessonNo, section: sec, facts, pages, withStrip, shape,
+        seed, strip, stripH, stripHtml,
     });
     const practiceTried = [];
     const practiceTexts = [];
@@ -3685,7 +3729,7 @@ async function buildLesson(n, metaOf) {
                 // (the pack's own tab: every Practice sheet names the lesson's strand)
                 header: Object.assign({}, common.header, Array.isArray(n.packTab) ? { tab: [...n.packTab, `Practice ${k}`] } : {}),
                 sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true }],
-                seed: (n.seed + 7919 * k) >>> 0,
+                seed: (seeds.practice + 7919 * (k - 1)) >>> 0,
                 // (`strip`: another chunk's step strip - the words sheet carries the words steps.)
                 stepStrip: ps.strip && ps.strip.html ? ps.strip : withStrip ? { html: stripHtml, hMm: stripH } : undefined,
             }));
@@ -3693,17 +3737,22 @@ async function buildLesson(n, metaOf) {
             for (const it of res.items || []) practiceTexts.push(refText(it));
             if (packNums) packNums.push(...planKeys(res));
         }
-    } else if (n.practicePages > 0) {
+    }
+    const buildPractice = async (seed, sec) => {
         let res = null;
         for (const shape of facts ? [null] : stackShapes) {
-            const r = await buildSheet(practiceReq(n.practicePages, true, shape || undefined));
+            const r = await buildSheet(practiceReq(practicePages, true, shape || undefined, seed, sec));
             const f0 = r.fits && r.fits.sections && r.fits.sections[0];
             const whole = f0 ? f0.clamped !== true : true;
             practiceTried.push({ shape, pages: r.pageCount, clamped: !whole, hMin: f0 && f0.hMin, cellH: f0 && f0.cellH, stripH: +stripH.toFixed(1) });
-            if (r.pageCount <= n.practicePages && whole) { res = r; break; }
+            if (r.pageCount <= practicePages && whole) { res = r; break; }
         }
         // The strip never pushes a page overleaf: without room for it the page prints without it.
-        if (!res) res = await buildSheet(practiceReq(n.practicePages, false));
+        if (!res) res = await buildSheet(practiceReq(practicePages, false, undefined, seed, sec));
+        return res;
+    };
+    if (!(Array.isArray(n.practiceSheets) && n.practiceSheets.length) && built.includes('practice')) {
+        const res = await buildPractice(lessonPartSeed(n.seed, 'practice'), section);
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
         for (const it of res.items || []) practiceTexts.push(refText(it));
         if (packNums) packNums.push(...planKeys(res));
@@ -3711,16 +3760,59 @@ async function buildLesson(n, metaOf) {
 
     // 3. Mixed practice (optional): the lesson skill with EARLIER skills only (lessons r1), each
     // skill its own section, the page filled in one frame per section.
-    if (n.mixed) {
+    const buildMixed = (seed, avoid = (r) => r, avoidTexts = practiceTexts) => {
         const withSkills0 = n.mixedSkills || (data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2));
-        const withSkills = packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0;
+        const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(avoid);
         // The mixed page (sheet/lesson-pages/mixed.js, the shared builder, §8c).
-        const res = await buildSheet(mixedRequest({
-            common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts, packNums,
-            mixedLattice: n.mixedLattice, mixedLeadDrop: n.mixedLeadDrop, seed: (n.seed + 15838) >>> 0,
+        return buildSheet(mixedRequest({
+            common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,
+            mixedLattice: n.mixedLattice, mixedLeadDrop: n.mixedLeadDrop, seed,
             stripHtml, stripH, mixedStrip: n.mixedStrip, packTab: n.packTab,
         }));
+    };
+    if (built.includes('mixed')) {
+        const res = await buildMixed(lessonPartSeed(n.seed, 'mixed'));
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
+    }
+    // A part the registry adds (lesson-pages/index.js registerLessonPart, role 'lesson'): drawn by the lesson role.
+    const lessonRolePart = (x, seed, extra = {}) => buildRoleSheet(Object.assign({}, nz, {
+        seed, size: (lessonPart(x) || {}).size || nz.size, role: 'lesson', header, look: 'ican',
+        lessonInput: Object.assign({}, lessonInput, { part: x }, extra.lessonInput || {}),
+    }, extra.sections ? { sections: extra.sections } : {}), metaOf);
+    for (const x of built) {
+        const d = lessonPart(x);
+        if (['chart', 'sheet', 'practice', 'mixed'].includes(x) || !d || d.role !== 'lesson') continue;
+        parts.push({ part: x, role: 'lesson', res: await lessonRolePart(x, lessonPartSeed(n.seed, x)) });
+    }
+
+    // REFRESHED parts (LR-18): each dealt again with its own seed, avoiding every OTHER part's problems (soft:
+    // `avoidTexts`, the dealer relaxes it only when a skill runs out) - the other parts never change.
+    const keyOfPart = (x) => (x === 'sheet' ? 'teach' : x);
+    const textsOf = (res) => {
+        const out = [];
+        for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) {
+            const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) out.push(refText(it.q)); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); };
+            (pg.sections || []).forEach(walk);
+        }
+        for (const q of (res.plan && res.plan.meta && res.plan.meta.exampleQs) || []) out.push(refText(q));
+        for (const it of res.items || []) if (res.plan && res.plan.role !== 'lesson') out.push(refText(it));
+        return out.filter(Boolean);
+    };
+    for (const x of refreshed) {
+        const key = keyOfPart(x);
+        const at = parts.findIndex((p) => p.part === key);
+        if (at < 0 || (x === 'practice' && Array.isArray(n.practiceSheets) && n.practiceSheets.length)) continue;
+        const others = [...new Set(parts.filter((p) => p.part !== key).flatMap((p) => textsOf(p.res)))];
+        const avoid = (r) => Object.assign({}, r, { avoidTexts: others.concat(Array.isArray(r.avoidTexts) ? r.avoidTexts : []) });
+        let res;
+        if (x === 'chart' || x === 'sheet' || parts[at].role === 'lesson') {
+            res = await lessonRolePart(x, seeds[x], { lessonInput: { warmSkills: warmSkills.map(avoid) }, sections: [Object.assign({}, nz.sections[0], { skills: [avoid(sk)] }), ...nz.sections.slice(1)] });
+            if (x === 'chart') chart = res;
+            if (x === 'sheet') teach = res;
+        } else if (x === 'practice') {
+            res = await buildPractice(seeds.practice, practiceSection({ skill: avoid(practiceSk), facts, rounding, divFactsOnly, besideCap }));
+        } else res = await buildMixed(seeds.mixed, avoid, others);
+        parts[at] = Object.assign({}, parts[at], { res }, key === 'practice' ? { strip: /data-mq-lesson-strip/.test(res.pupilHtml) } : {});
     }
 
     // Each part is a sheet of its own (its own header, Score and page count), and the anchor chart
@@ -3731,13 +3823,24 @@ async function buildLesson(n, metaOf) {
         return String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
     };
     const sheetIds = (p) => (p.part === 'teach' ? ['lesson-sheet', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
+    // (LR-18: every part built, each with its own pupil and key HTML; only the printed ones go on paper, in packet order)
+    const idOfPart = (p) => (p.part === 'teach' ? 'sheet' : p.part);
+    const partHtml = {};
+    for (const p of parts) {
+        const e = partHtml[idOfPart(p)] || (partHtml[idOfPart(p)] = { pupil: [], key: [] });
+        e.pupil.push(tagSheets(p.res.pupilHtml, ...sheetIds(p)));
+        if (n.key) e.key.push(tagSheets(p.res.keyHtml || '', ...sheetIds(p)));
+    }
+    for (const e of Object.values(partHtml)) { e.pupil = e.pupil.join('\n'); e.key = e.key.join('\n'); }
+    const allParts = parts;
+    parts = partsMode ? allParts.filter((p) => printed.includes(idOfPart(p))) : allParts;
     const pupilHtml = parts.map((p) => tagSheets(p.res.pupilHtml, ...sheetIds(p))).join('\n');
     const keyHtml = n.key ? parts.map((p) => tagSheets(p.res.keyHtml || '', ...sheetIds(p))).join('\n') : '';
     const pageCount = parts.reduce((a, p) => a + (p.res.pageCount || 0), 0);
     const keyPageCount = n.key ? parts.reduce((a, p) => a + (p.res.keyPageCount || 0), 0) : 0;
     const notes = [...new Set(sizeNote.concat(parts.flatMap((p) => p.res.notes || [])))];
     const PART_NAME = { chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
-    const line = parts.map((p) => `${PART_NAME[p.part]}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
+    const line = parts.map((p) => `${PART_NAME[p.part] || (lessonPart(p.part) || {}).name || p.part}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
     const tagPages = (list, p) => { const ids = sheetIds(p); return (list || []).map((h, i) => tagSheets(h, i === 0 ? ids[0] : ids[1], ids[1])); };
     return {
         pupilHtml, keyHtml, pageCount, keyPageCount,
@@ -3770,6 +3873,9 @@ async function buildLesson(n, metaOf) {
                 : { skills: warmSkills.map((s) => `${s.categoryId}:${s.skillId}`), concepts: [], vocab: [] },
             steps: data ? data.steps.map((s) => s.text) : [], chant: data ? data.chant : '', format: data ? data.format : null,
             parts: parts.map((p) => ({ part: p.part, role: p.role, pages: p.res.pageCount, keyPages: p.res.keyPageCount, strip: p.strip })),
+            // LR-18: the parts built (a printed part's earlier parts are built too), printed and refreshed, each part's
+            // seed, and each part's own pupil / key HTML.
+            partsBuilt: [...new Set(allParts.map(idOfPart))], printed: partsMode ? printed : [...new Set(allParts.map(idOfPart))], refreshed, seeds, partHtml,
             example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
             chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4, exampleQs: chart.plan.meta.exampleQs || [] } : null,
             practiceTried,

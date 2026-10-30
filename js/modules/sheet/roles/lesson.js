@@ -88,7 +88,9 @@ export function sources(skills, helpers = {}) {
     // floors (print-sheet.js refAccepts) - the chart's other examples come from it.
     const data = helpers.lesson && helpers.lesson.data;
     const extra = EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => ({
-        id: `x${k}`, skills: [Object.assign({ categoryId: main.categoryId, skillId: main.skillId }, main.opts ? { opts: main.opts } : {}, main.minTop !== undefined ? { minTop: main.minTop } : {}, main.maxTop !== undefined ? { maxTop: main.maxTop } : {}, data[k].ref)],
+        id: `x${k}`, skills: [Object.assign({ categoryId: main.categoryId, skillId: main.skillId }, main.opts ? { opts: main.opts } : {}, main.minTop !== undefined ? { minTop: main.minTop } : {}, main.maxTop !== undefined ? { maxTop: main.maxTop } : {},
+            // (a refreshed part avoids every other part's problems, its case pools too: LR-18)
+            Array.isArray(main.avoidTexts) ? { avoidTexts: main.avoidTexts } : {}, data[k].ref)],
     }));
     return [{ id: 'main', skills: [main] }, ...pre.map((s, i) => ({ id: `w${i}`, skills: [s] })), ...extra];
 }

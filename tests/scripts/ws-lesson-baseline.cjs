@@ -32,7 +32,8 @@ async function inPage(page, fn, arg) {
 }
 
 (async () => {
-    if (!WRITE && !CHECK) { console.log('usage: --write <file> | --check <file>'); process.exit(2); }
+    const PARTS = process.argv.includes('--parts');
+    if (!WRITE && !CHECK && !PARTS) { console.log('usage: --write <file> | --check <file> | --parts'); process.exit(2); }
     const app0 = await open({ seed: 1 });
     // (a detailed lesson can keep the page busy past puppeteer's 180 s protocol timeout: the same page, reconnected
     // without one)
@@ -40,6 +41,43 @@ async function inPage(page, fn, arg) {
     const pages = await conn.pages();
     const app = { page: pages.find((p) => p.url() === app0.page.url()) || pages[pages.length - 1], close: async () => { conn.disconnect(); await app0.close(); } };
     const out = {};
+    if (PARTS) {
+        // LR-18 (lessons-phase0 step 3): each part printed alone is its page in the packet; each part refreshed
+        // (refresh 1) changes that part and its key and no other part. Seed 4242, L, every sample.
+        const fails = [];
+        try {
+            for (const l of SAMPLES) {
+                const r = await inPage(app.page, async ({ skill }) => {
+                    const base = { role: 'lesson', sections: [{ skills: [skill] }], size: 'L', paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true };
+                    const whole = await window.buildSheet(base);
+                    const ids = window.LESSON_PARTS;
+                    const out = { ids, alone: {}, fresh: {}, refreshed: {} };
+                    for (const x of ids) {
+                        const a = await window.buildSheet(Object.assign({}, base, { parts: [x] }));
+                        // (the part's own HTML before the key is arranged for print; the printed pupil pages are exactly it)
+                        out.alone[x] = a.pupilHtml === whole.lesson.partHtml[x].pupil && a.lesson.partHtml[x].key === whole.lesson.partHtml[x].key && a.pupilHtml.length > 0;
+                        const f = await window.buildSheet(Object.assign({}, base, { lessonSeeds: { [x]: window.lessonPartSeed(4242, x, 1) } }));
+                        out.refreshed[x] = f.lesson.refreshed;
+                        out.fresh[x] = Object.fromEntries(ids.map((y) => [y, { pupil: f.lesson.partHtml[y].pupil === whole.lesson.partHtml[y].pupil, key: f.lesson.partHtml[y].key === whole.lesson.partHtml[y].key }]));
+                    }
+                    return out;
+                }, { skill: l.skill });
+                if (r.error) { fails.push(`${l.id}: ${r.error.split('\n')[0]}`); continue; }
+                for (const x of r.ids) {
+                    if (!r.alone[x]) fails.push(`${l.id}: part ${x} printed alone differs from its packet page`);
+                    for (const y of r.ids) {
+                        const same = r.fresh[x][y];
+                        if (y === x && (same.pupil || same.key)) fails.push(`${l.id}: refreshing ${x} left its ${same.pupil ? 'pupil page' : 'key'} unchanged`);
+                        if (y !== x && !(same.pupil && same.key)) fails.push(`${l.id}: refreshing ${x} changed ${y}`);
+                    }
+                }
+                log(`${l.id} parts`);
+            }
+        } finally { await app.close(); }
+        for (const f of fails) console.log(`  ${f}`);
+        console.log(fails.length ? `ws-lesson-baseline --parts: FAIL (${fails.length})` : `ws-lesson-baseline --parts: OK (${SAMPLES.length} lessons x 4 parts: alone = packet page; refresh changes only its part)`);
+        process.exit(fails.length ? 1 : 0);
+    }
     try {
         for (const l of SAMPLES) for (const size of ['L', 'M']) for (const seed of [4242, 1001]) {
             const r = await inPage(app.page, async ({ skill, size, seed }) => {
