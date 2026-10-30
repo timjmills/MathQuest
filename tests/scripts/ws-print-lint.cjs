@@ -1270,7 +1270,7 @@ function wsLintPage(cfg) {
             // no printed tab since the owner ruling of 2026-10-23: the lines travel as data-ws-tab
             const tab = tabSpans.length ? tabSpans : (pg.getAttribute('data-ws-tab') || '').split('|').filter(Boolean);
             const bands = [...pg.querySelectorAll('.ws-strip > b')].map(b => b.textContent.trim());
-            const foot = pg.querySelector('[data-ws-teacher], .ws-foot');
+            const foot = pg.querySelector('.ws-foot') || pg.querySelector('[data-ws-teacher]');   // (the page's footer, not a teacher tag in the body - a Prerequisite Check's routes)
             const footParts = foot ? [...foot.children].map(c => c.textContent.trim()) : [];
             const cells = ri.cells.map(c => {
                 tagOf(c);
@@ -1308,6 +1308,8 @@ function wsLintPage(cfg) {
             out.pages.push({
                 // Wave 4.4: a SHORT key page (labels + answers) and the items it lists, "page:cell"
                 short: pg.getAttribute('data-ws-key-style') === 'short',
+                // (a teacher page in the key with no pupil twin - a Prerequisite Check's routing table, `ws-keyextra`)
+                extra: pg.classList.contains('ws-keyextra'),
                 shortItems: [...pg.querySelectorAll('[data-ws-short-page]')].map(e => `${e.getAttribute('data-ws-short-page')}:${e.getAttribute('data-ws-short-cell')}`),
                 labelled: ri.cells.filter(c => c.querySelector('[data-ws-label="letter"], [data-ws-label="tab"]')).length,
                 idx: ri.idx + 1, tag: pg.id, key: ri.key, role, size, look: pg.getAttribute('data-ws-look') || '',
@@ -1767,7 +1769,7 @@ function lintKitGeometry(dom, pdf, info, F) {
     const pupilParts = parts.filter(p => !p.key), keyParts = parts.filter(p => p.key);
     if (info.mode === 'kit') {
         if (!keyParts.length) F('L-KEY', 'AK-1', 'critical', {}, 'no answer key pages: every generated page has a facsimile key (AK-1)', 'no key');
-        const pupil = pages.filter(p => !p.key), key = pages.filter(p => p.key && !p.short), shortKey = pages.filter(p => p.key && p.short);
+        const pupil = pages.filter(p => !p.key), key = pages.filter(p => p.key && !p.short && !p.extra), shortKey = pages.filter(p => p.key && p.short);
         // A facsimile key (at the end, or each page after its pupil page) is the same pages in the same order.
         if (key.length && key.length !== pupil.length) F('L-KEY', 'AK-4', 'critical', {}, `the key has ${key.length} page(s), the pupil sheet ${pupil.length}: the key is the same pages (AK-1, AK-4)`, 'key page count');
         key.forEach((k, i) => pupil[i] && compareKey(pupil[i], k, F));
