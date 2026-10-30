@@ -115,6 +115,18 @@ Reasoning steps ("spot the pattern", "compare", "estimate") stay in their host a
   `buildLesson(lessonId)` and `lessonId` through `teacher-print`, **samples byte-identical**. Split archetype code out of
   `lesson.js` into `lesson-arch/{fact,column,line}.js` (byte-identical). `ws-lesson-seed` → `seed-db.js`;
   `ws-lesson-coverage` (report-only, r4 samples read as passed); build-list integration; `tests/lib/browser-lock.cjs`.
+  *(lessons-phase0, 2026-10-30, Builder A: the node side landed - `lessons/{library,schema}.js`, the ten family files
+  holding all ten lessons of the old `prereqs.js` (now its back-compat view, `lessonFor` unchanged), `seed-db.js`,
+  `prereq-db.js` (the curated `data/curriculum/links` `pre` lists first), `status-db.js`, `ws-lesson-{seed,coverage,hash,
+  unit}`, `sheet/lesson-rules.js`, `LESSON_RULES.md`, build-list NEEDS, the browser lock. The render side is Builder B's.)*
+- **Phase 1, first in line — the samples' prerequisite lessons (§8b):** the three samples' Prerequisite
+  Checks route to 10 lessons not written yet (11 `NEEDS` entries; `design/LESSON_COVERAGE.md`,
+  "Waiting for prerequisite lessons"): Y1.B1.S2 Count objects, Y1.B1.S6 Count on from any number,
+  Y1.B1.S11 Fewer, more, same, Y1.B2.S5 Number bonds within 10 (for add within 10); Y2.B1.S4 Use a
+  place value chart, Y2.B1.S5 Partition numbers to 100, Y2.B2.S10 Subtract across 10 (for subtract
+  with regrouping; its fourth, Y2.B2.S17, is the SU-C no-regrouping lesson already in the library);
+  Y1.B9.S2 Count in 10s, Y2.B1.S10 10s and 1s on the number line to 100, Y2.B2.S13 10 more, 10 less
+  (for round to the nearest 10). They open the pilot list of their archetypes.
 - **Phase 1 — archetype certification.** Per archetype: 3 pilot lessons spanning its variation; E builds the module,
   `stepState`, icons, vocabulary pictures; the critic grades every page at L and M, seeds 4242 and 1001, keys included,
   until all ≥ 8. Waves: 1a A1, A2, A3, A4, A6 · 1b A5, A7, A10, A8 · 1c A9, A12, A11, A13.
@@ -171,6 +183,23 @@ then come back."
   prerequisite lesson is not built yet); `ws-lesson-coverage` fails a lesson whose check is missing, has fewer than 3 or
   more than 4 questions, or points at an unknown lesson; a prerequisite graph with no cycles (a lesson may not require
   itself through a chain). The coverage record lists lessons blocked only by a missing prerequisite lesson.
+- **One concept, one page (lead decision D1, lessons-phase0, 2026-10-30).** The check is ONE page type for every
+  lesson: `sheet/roles/pre-skill-check.js` (PAGE_TYPES 2.10), which the detailed lessons already print as P0 (with the
+  routing table on the teacher key, T6). The branch's second page builder (`lesson-pages/prereq-check.js`) is not ported.
+  The **data** has two shapes that say the same thing, and one validator (`lessons/schema.js validatePrereqs`) holds both
+  to the rules above:
+  - the library's lesson (`lessons/families/*.js`): `prereqs: [{lesson, title, key, opts?, why, ...floors}]` — `lesson` a
+    library id (`Y1.B1.S2`) or a `NEEDS` entry (`kind: 'lesson', prereq`), `title` the WRM step's title
+    (`ws-lesson-coverage` checks it against `seed-db.js`), `key` + `opts` the skill the question is dealt from;
+  - a detailed lesson (`lessons/detailed/*.js`): `prerequisites: [{atom, items?, ref: {categoryId, skillId, opts?},
+    lesson: {id, title}}]` — `lesson.id` may name a site lesson or a CCSS code (V22 Appendix H).
+  - **What the engine reads:** `library.js lessonData(id).prereqs` — per question `{lesson, title, why, ref:
+    {categoryId, skillId, opts?, ...floors}}` (the detailed lesson's `{lesson: {id, title}, ref}` flattened), one
+    question each, drawn by `pre-skill-check` with the optional `routes` input (the "If missed → Lesson <id> <title>"
+    tag, marked `data-ws-teacher`) and the routing table on the key. The routing rule itself is `library.js
+    prereqRoute(id, missed)` (earliest missed first, then back). A lesson whose check is not written yet declares
+    `prereqsPending: '<why>'` and keeps its Warm-up (today: the seven SU-C no-regrouping lessons); `prereqs.js lessonFor`
+    (the skill-keyed record) never carries `prereqs`, so skill-keyed packets are unchanged.
 
 ## 8c. Owner ruling: merge the stand-alone page types into the lesson designs (2026-09-26)
 
