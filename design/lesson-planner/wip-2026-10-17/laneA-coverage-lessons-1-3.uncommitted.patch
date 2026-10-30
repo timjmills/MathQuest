@@ -1,0 +1,1772 @@
+diff --git a/design/lesson-planner/DETAILED_MAKER.md b/design/lesson-planner/DETAILED_MAKER.md
+index 27cb2e7b..c856e651 100644
+--- a/design/lesson-planner/DETAILED_MAKER.md
++++ b/design/lesson-planner/DETAILED_MAKER.md
+@@ -155,6 +155,54 @@ The pool keys are `factKeyOf(q)` (an operation item's operands and sign, else it
+ instruction is `wordProblem.instruction` (fallback: the kit's `story` string); its lines are the
+ description's (placeholders) or the dealt item's own story.
+ 
++## Skill coverage: the shared Check Question response and the options lessons 1-3 use (lane A, 2026-10-17)
++
++The Skill coverage rule (owner, 2026-10-17) needs every printed item type to be a skill + options. Lane A
++closed the gaps the audit (`lessons/SKILL-COVERAGE-AUDIT-1-5.md`) found in lessons 1-3 and built the one
++response every lesson's Check Question shares.
++
++**"Which is right?" A to D - the universal option `whichRight` (share key 5Z).** One shared module,
++`js/modules/which-right.js`:
++
++- `whichRightAnswers(q, {rightOf})` - the item's right answer and its provider's distinct wrong answers
++  (`wrongAnswers` when the provider lists them, else `wrongAnswer` rotated by seed). `dlCheckQuestion`
++  (print-sheet.js) builds the board's A-D from it, so the board and the online item use ONE set.
++- `applyWhichRight(q, seed)` - the item turned into the choice: `answerType: 'multiple-choice'`, four
++  options (right + three wrong, a seeded order), `ans` the right one, the kit cell `which-right`
++  (`sheet/cells/which-right.js`: the stem, then A-D in ruled boxes with a tick box each; the key ticks
++  the right one). generate-question.js applies it after every other post layer when `opts.whichRight`
++  is true; an item whose provider gives fewer than two wrong answers keeps its own item.
++- The option is in `UNIVERSAL_OPTIONS` (skill-options.js) and is SHOWN only on a skill whose provider
++  names wrong answers (`registerWhichRightFits`).
++
++**How a lesson uses it.** Give the Check Question a ref with the option:
++`checkQuestion: { ref: { categoryId, skillId, opts: { ...the lesson skill's opts, whichRight: true } }, want, correct }`.
++The bridge deals the ref WITHOUT `whichRight` (the board shows the item and its A-D, letters claimed by
++`mistakes[].option`), and `skills.used` records the ref with `whichRight: true` - the online twin of the
++board question. Lessons 1, 2 and 3a do this; lessons 4 onward should too.
++
++**Options lessons 1-3 now set (were lesson-only ref keys).** Defaults change nothing, so every saved code
++deals as before; keys are pinned in skill-option-keys.js.
++
++| Skill | Option (key) | Replaces |
++|---|---|---|
++| composing:number_word_form | `band` 99 (21-99), 999 (101-999, no 1,000); `teens: 'some'` (4O) | `minNum` / `maxNum`, the `pvTeen` hope |
++| placevalue:expand | `teens: 'some'` (4O): one 3-digit number in six ends in a teen | — |
++| placevalue:combine | `story: true` (4N): the parts as a story (groups of 100 and 10, and more) | P5's hand-written `lines` |
++| addition:add_wp_20 | `wpParts: 'bridge'` (3Z), `barFill` (3Y), `wpEquation` (3X), `wpShort` (3W) | `partMin` / `noPart` / `crossTen`, `cellPayload.layout: 'bar'`, `signSlot` (online), `shortQuestion` |
++| multiplication:mult_properties | `task` 3 (a turn story), `minProduct` (3V), `maxProduct` (3U), `minFactor` (5S) | P5's `lines`, `minNum` / `maxNum` / `allTest: 'arrP2'` |
++| multiplication:multiply_three_numbers | NEW skill (build list `mult_three`, 3.OA.B.5 associative): `forms` 0-3, kit cell `three-factors` | lesson 3a's associative clause |
++
++`barFill` / `wpEquation` items answer in several boxes on screen (`q.ans` "13, 8, 5, 13"; the parts in
++either order are accepted) and carry `q.dealAnswer` = the story's answer, which `dlAns`, `itemNumberOf`
++and compose.js `answerOf` read - so the bridge deals and keys them exactly as a one-number story.
++`wpParts: 'bridge'` picks its whole-of-20 stories by the item's SEED (never its page index alone: a page
++place redrawing across seeds is never held to a 20).
++
++**Still lesson-only (page composition, not ranges):** `factorCap`, `edgeLast`, `want` / `allTest` page
++selections (`arrP1`), `fresh`, `itemSpread`, and the P0 / P1 / retrieval floors on earlier-content items
++(audit X3) - noted as `ref` in `skills.used`.
++
+ ## Adding a lesson
+ 
+ 1. Write `js/modules/lessons/detailed/<id>.js` in the format documented at the top of `index.js` (every
+diff --git a/js/modules/data.js b/js/modules/data.js
+index 448484f6..7524893f 100644
+--- a/js/modules/data.js
++++ b/js/modules/data.js
+@@ -98,7 +98,7 @@ export const SKILL_GRADES = {
+     'missing_mult_div': 3, 'mixed_mult_div': 3, 'mult_properties': 3, 'mult_chart': 3,
+     'mult_chart_easy': 3, 'mult_chart_medium': 4, 'mult_chart_hard': 5,
+     // 2026-09-25: count by 1-12 (3.OA.7 prep) and number patterns with a rule (3.OA.9 / 4.OA.5)
+-    'count_by_tables': 3, 'number_patterns_rule': 3,
++    'count_by_tables': 3, 'number_patterns_rule': 3, 'multiply_three_numbers': 3,
+     'number_families_mixed_med': 3, 'word_problems_mixed': 3, 'word_problems_mixed_plain': 3,
+     'number_families_mult_hard': 4, 'number_families_mixed_hard': 4,
+     'div_remainders': 4, 'area_model_mult': 4, 'area_model_div_2by1': 4,
+@@ -754,6 +754,8 @@ export const SKILLS = {
+         { v: "mult_missing_digit", l: "Find the Missing Digit (Multiplication)" },   // MB-12
+         // APPENDED 2026-09-25 (owner): one count-by row per table, to 12x (3.OA.7 prep).
+         { v: "count_by_tables", l: "Count by 1–12" },
++        // APPENDED 2026-10-17 (skill coverage lane A, build list mult_three): 3.OA.B.5, the associative property.
++        { v: "multiply_three_numbers", l: "Multiply Three Numbers" },
+     ],
+     division: [
+         { v: "div_facts", l: "Division Facts (1-12)" },
+@@ -1762,7 +1764,7 @@ export const SKILL_TIME_CATEGORY = {
+     area_model_mult: "extended", area_model_mult_hard: "extended",
+     area_model_div_2by1: "extended", area_model_div_3by1: "extended",
+     // Mult properties & remainders
+-    mult_properties: "quick", div_remainders: "quick",
++    mult_properties: "quick", div_remainders: "quick", multiply_three_numbers: "quick",
+     mult_chart: "quick",
+     mult_chart_easy: "extended", mult_chart_medium: "extended", mult_chart_hard: "extended",
+     // OoO extras
+@@ -2000,7 +2002,7 @@ export const SKILL_PRINT_SIZE = {
+     area_triangle: "medium", area_polygon_decompose: "wide",
+     coord_polygon: "wide", net_surface_area: "wide",
+     net_identify: "wide", cross_section_3d: "wide", compose_from_attributes: "wide",
+-    mult_properties: "medium", div_remainders: "medium",
++    mult_properties: "medium", div_remainders: "medium", multiply_three_numbers: "medium",
+     mult_chart: "medium",
+     mult_chart_easy: "wide", mult_chart_medium: "wide", mult_chart_hard: "wide",
+     // 2026-09-25: one full-width row each (the kit draws them; this is the legacy fallback)
+diff --git a/js/modules/gen-algebraic.js b/js/modules/gen-algebraic.js
+index f28bede0..798eba91 100644
+--- a/js/modules/gen-algebraic.js
++++ b/js/modules/gen-algebraic.js
+@@ -2707,21 +2707,28 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
+                 // `band` (0 = the Max Number setting, the old behaviour) and `zeroPlace` bound the
+                 // number itself: band 1000 deals 101-1,000, band 100 deals 21-100, band 20 deals 11-20.
+                 const wfO = state.skillOptions || {};
+-                const wfBand = [20, 100, 1000].includes(Number(wfO.band)) ? Number(wfO.band) : 0;
++                // (band 999 / 99, skill coverage lane A 2026-10-17: 101-999 and 21-99 - the lesson's paper range,
++                // 1,000 / 100 left out; they deal exactly as 1000 / 100 except that the top number never comes)
++                const wfBand = [20, 99, 100, 999, 1000].includes(Number(wfO.band)) ? Number(wfO.band) : 0;
+                 let num;
+                 if (wfBand) {
+-                    const lo = wfBand === 1000 ? 101 : wfBand === 100 ? 21 : 11;
++                    const top = wfBand === 999 ? 1000 : wfBand === 99 ? 100 : wfBand;
++                    const lo = top === 1000 ? 101 : top === 100 ? 21 : 11;
+                     const k = Number.isFinite(state.itemIndex) ? state.itemIndex : 0;
+-                    const wantZero = wfBand >= 100 && (wfO.zeroPlace === 'always' || (wfO.zeroPlace === 'some' && k % 3 === 2));
++                    const wantZero = top >= 100 && (wfO.zeroPlace === 'always' || (wfO.zeroPlace === 'some' && k % 3 === 2));
+                     num = rng(lo, wfBand);
+                     // A zero place: a 0 in the ones (or, at 1,000, the tens) - dealt, not hoped for.
+                     if (wantZero && !(wfBand === 1000 && num === 1000)) {
+-                        if (wfBand === 100) num = Math.max(30, Math.floor(num / 10) * 10);
++                        if (top === 100) num = Math.max(30, Math.floor(num / 10) * 10);
+                         // (1,000 is the band's own zero-place case: 0 hundreds, 0 tens, 0 ones - one zero item in four)
+-                        else if (rng(0, 3) === 0) num = 1000;
++                        else if (rng(0, 3) === 0 && wfBand === 1000) num = 1000;
+                         // (the 0 alternates: a 0 in the tens, then a 0 in the ones - both cases on every page)
+                         else num = Math.floor(num / 100) * 100 + (Math.floor(k / 3) % 2 === 0 ? rng(1, 9) : rng(1, 9) * 10);
++                    } else if (top === 1000 && wfO.teens === 'some' && k % 3 === 1 && num < 1000) {
++                        // (`teens`, lane A: every third number a teen ending - 213, not 230 - the Comparative atom's case)
++                        num = Math.floor(num / 100) * 100 + 10 + rng(1, 9);
+                     }
++                    if (num > wfBand) num = wfBand === 999 ? 999 : 99;
+                 } else {
+                     const maxNum = Math.max(10, Math.min(range, 9999));
+                     num = rng(10, maxNum);
+@@ -2746,7 +2753,10 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
+                     q.ans = num;
+                     q.answerType = "number";
+                     q.hint = `Read each part of the word form and combine: "${wordForm}" = ?`;
+-                    q.options = buildNumericOptions(num);
++                    // (H T O boxes are written, one digit a box, on every host - P-29: never a choice; the
++                    // options are still drawn so the seeded stream deals as before)
++                    const wfOpts = buildNumericOptions(num);
++                    q.options = wfO.answerSlot === 'hto' && num <= 1000 ? [] : wfOpts;
+                 }
+                 q.skillLabel = 'Word Form';
+                 // The kit cell (detailed lesson 1, 2026-10-16): the same item drawn by the `words`
+diff --git a/js/modules/gen-operations.js b/js/modules/gen-operations.js
+index 11db8895..e02225cb 100644
+--- a/js/modules/gen-operations.js
++++ b/js/modules/gen-operations.js
+@@ -3028,7 +3028,23 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
+                 const wpMinOperand = maxVal <= 20 ? 1 : Math.max(2, Math.floor(maxVal / 20));
+ 
+                 let a, b, answer;
+-                if (isAdd) {
++                // `wpParts: 'bridge'` (skill coverage lane A 2026-10-17 - detailed lesson 2's design, add_wp_20 only):
++                // both parts 3 to 9 and the whole past 10, so the pupil counts on across ten; one story in six
++                // has a whole of exactly 20 (11 to 17 and the rest), the edge case. No part is 1, 2 or 10.
++                const wpBridge = isAdd && maxVal === 20 && state.skillOptions && state.skillOptions.wpParts === 'bridge';
++                if (wpBridge) {
++                    // (by the item's seed when it has one - a page that redraws one place tries other seeds, so a
++                    // place is never held to the whole of 20 - else by its place on the page)
++                    const k = Number.isFinite(state.itemSeed) ? state.itemSeed : Number.isFinite(state.itemIndex) ? state.itemIndex : rng(0, 5);
++                    if (k % 6 === 5) { const big = rng(11, 17); [a, b] = rng(0, 1) ? [big, 20 - big] : [20 - big, big]; }
++                    else {
++                        // (one of the 34 ordered pairs, each as likely: parts 3 to 9, the whole 11 to 18)
++                        const pairs = [];
++                        for (let x = 3; x <= 9; x++) for (let y = 3; y <= 9; y++) if (x + y >= 11) pairs.push([x, y]);
++                        [a, b] = pairs[rng(0, pairs.length - 1)];
++                    }
++                    answer = a + b;
++                } else if (isAdd) {
+                     [a, b] = generateAddPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand });
+                     answer = a + b;
+                 } else {
+@@ -4139,6 +4155,65 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
+             // ========================================
+             // MULTIPLICATION PROPERTIES
+             // ========================================
++            if (mappedSkill === "multiply_three_numbers") {
++                // Skill coverage lane A (2026-10-17), build list `mult_three` (3.OA.B.5, the associative property):
++                // three 1-digit factors, multiplied a pair at a time. Forms (dealt in turn, `forms`):
++                //   0  the easy pair bracketed:    (2 × 5) × 7 = [10] × 7 = [70]
++                //   1  the pupil chooses the pair: 2 × 7 × 5 = [10] × 7 = [70]
++                //   2  two ways, the same product: (3 × 4) × 2 = [12] × 2 = [24] and 3 × (4 × 2) = 3 × [8] = [24]
++                //   3  the missing factor:         2 × [ ] × 7 = 70
++                const _f3 = _p12Narrowed('forms') || [0, 1, 2, 3];
++                const form = _f3[_dealRung(_f3.length, 'three')];
++                const B = (v) => ({ v });
++                let lines, ans;
++                if (form === 2) {
++                    let a = rng(2, 5), b = rng(2, 5), c = rng(2, 5);
++                    if (a === b && b === c) c = c === 5 ? 4 : c + 1;
++                    const ab = a * b, bc = b * c, P = a * b * c;
++                    lines = [['(', a, '×', b, ')', '×', c, '=', B(ab), '×', c, '=', B(P)], [a, '×', '(', b, '×', c, ')', '=', a, '×', B(bc), '=', B(P)]];
++                    ans = [ab, P, bc, P];
++                } else {
++                    // the easy pair makes 10 (2 and 5); the third factor 3 to 9
++                    const c = rng(3, 9);
++                    const two = rng(0, 1) ? [2, 5] : [5, 2];
++                    if (form === 3) {
++                        // the missing factor: one of the pair, or the third
++                        const order = rng(0, 1) ? [two[0], c, two[1]] : [two[0], two[1], c];
++                        const miss = rng(0, 2);
++                        const P = 10 * c;
++                        lines = [order.flatMap((x, i) => [...(i ? ['×'] : []), i === miss ? B(x) : x]).concat(['=', P])];
++                        ans = [order[miss]];
++                    } else if (form === 1) {
++                        // the pair apart, so the pupil must choose it: 2 × 7 × 5
++                        const order = [two[0], c, two[1]];
++                        lines = [[order[0], '×', order[1], '×', order[2], '=', B(10), '×', c, '=', B(10 * c)]];
++                        ans = [10, 10 * c];
++                    } else {
++                        lines = [['(', two[0], '×', two[1], ')', '×', c, '=', B(10), '×', c, '=', B(10 * c)]];
++                        ans = [10, 10 * c];
++                    }
++                }
++                let n = 0;
++                const cellLines = lines.map((l) => l.map((x) => (x && typeof x === 'object' ? { id: `b${n++}`, value: x.v } : String(x))));
++                const payload = { form, lines: cellLines };
++                q.cell = { template: 'three-factors', v: 1, payload };
++                const plain = cellLines.map((l) => l.map((x) => (typeof x === 'object' ? '___' : x)).join(' ')).join('   ');
++                q.text = plain.replace(/\( /g, '(').replace(/ \)/g, ')');
++                q.ans = ans.length === 1 ? ans[0] : ans.join(', ');
++                q.answerType = ans.length === 1 ? 'number' : 'text';
++                q.options = [];
++                q.op = '×';
++                q.visual = _kitTwin('three-factors', payload, ans.length === 1 ? {} : { join: ', ' });
++                q.hint = form === 3 ? 'Multiply the two numbers you know. What times that makes the product?'
++                    : form === 2 ? 'Multiply the pair in the brackets first. Both ways give the same product.'
++                        : 'Find the pair that makes 10. Multiply it first, then multiply by the last number.';
++                q.instructionKey = form === 3 ? 'missing' : 'multiply-pair';
++                q.screenInstr = form === 3 ? 'Write the missing number.' : form === 2 ? 'Multiply the brackets first. Write the numbers.' : 'Multiply the easy pair first. Write the numbers.';
++                q.printFormat = 'mult-three';
++                q.skillLabel = 'Multiply Three Numbers';
++                return;
++            }
++
+             if (mappedSkill === "mult_properties") {
+                 // P12: `forms` picks which properties are dealt (0 order, 1 distributive,
+                 // 2 identity, 3 zero); untouched, one is picked at random as before.
+@@ -4157,28 +4232,63 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
+                     //   task 2 'missing' no pictures: "r x c = P" and "c x r = [ ]" / "c x [ ] = P"
+                     // Pictured arrays: at most 5 rows and 5 in a row (RP-21). `band` 81 lets the
+                     // abstract task use factors to 9; pictures off deals the abstract task only.
+-                    const _tTypes = ['both', 'known', 'missing'];
++                    //   task 3 'story'   (skill coverage lane A 2026-10-17 - lesson 3a's word problem) a turn
++                    //                    story, no pictures: "A tray has 5 rows of 8 cakes. Sam turns it: now
++                    //                    it has 8 rows. How many in each row now?" - the missing factor
++                    const _tTypes = ['both', 'known', 'missing', 'story'];
+                     let _tSet = _opt('task');
+                     if (typeof _tSet === 'number') _tSet = [_tSet];
+-                    _tSet = Array.isArray(_tSet) ? [0, 1, 2].filter(v => _tSet.includes(v)) : [];
++                    _tSet = Array.isArray(_tSet) ? [0, 1, 2, 3].filter(v => _tSet.includes(v)) : [];
+                     if (!_tSet.length) _tSet = [0];
+                     // (pictures off: no arrays - the facts-only task, and (lesson 3a r2, exit a) a known fact
+                     // with no arrays when the known task is ticked; nothing else changes)
+-                    if (_opt('pictures') === false) _tSet = _tSet.filter(v => v === 1 || v === 2).length ? _tSet.filter(v => v === 1 || v === 2) : [2];
+-                    const type = _tTypes[_tSet[_dealRung(_tSet.length, 'turn')]];
++                    if (_opt('pictures') === false) _tSet = _tSet.filter(v => v >= 1).length ? _tSet.filter(v => v >= 1) : [2];
++                    const _type0 = _tTypes[_tSet[_dealRung(_tSet.length, 'turn')]];
++                    const _story = _type0 === 'story';
++                    const type = _story ? 'missing' : _type0;
+                     const _band = Number(_opt('band')) === 81 ? 9 : 5;
+                     // (pictures off on a 'known' item, lesson 3a exit a: no arrays - the fact turned
+                     // from the fact alone - takes the abstract task's factors)
+                     const _noDraw = type === 'known' && _opt('pictures') === false;
+                     const hi = type === 'missing' || _noDraw ? _band : 5;
+-                    let a = rng(2, hi), b = rng(2, hi);
+-                    // A square turns into itself: one item in five at most, the ★★★ edge case.
+-                    if (a === b && rng(1, 5) > 1) b = b === hi ? b - 1 : b + 1;
++                    // (`minProduct` / `maxProduct` / `minFactor`, skill coverage lane A 2026-10-17: lesson 3a's
++                    // product floors as options - 0 (the default) bounds nothing, so every saved code deals as before)
++                    const _minP = Number(_opt('minProduct')) || 0, _maxP = Number(_opt('maxProduct')) || 0;
++                    const _minF = Math.max(2, Number(_opt('minFactor')) || 2);
++                    let a = 2, b = 2;
++                    for (let _t = 0; _t < 60; _t++) {
++                        a = rng(Math.min(_minF, hi), hi); b = rng(Math.min(_minF, hi), hi);
++                        // A square turns into itself: one item in five at most, the ★★★ edge case.
++                        if (a === b && rng(1, 5) > 1) b = b === hi ? b - 1 : b + 1;
++                        if ((!_minP || a * b >= _minP) && (!_maxP || a * b <= _maxP) && Math.min(a, b) >= Math.min(_minF, hi)) break;
++                        if (!_minP && !_maxP && _minF <= 2) break;
++                    }
+                     const product = a * b;
+-                    const ask = type === 'missing' ? (_dealRung(2, 'ask') ? 'factor' : 'product') : null;
++                    const ask = _story ? 'factor' : type === 'missing' ? (_dealRung(2, 'ask') ? 'factor' : 'product') : null;
+                     const payload = { kind: 'turn', rows: a, cols: b, product, type };
+                     if (ask) payload.ask = ask;
+                     if (_noDraw) payload.draw = 'none';
++                    if (_story) {
++                        const _ctx = [['Sam', 'tray', 'cakes'], ['Mia', 'sheet', 'stickers'], ['Leo', 'box', 'crayons'], ['Ana', 'board', 'pegs'], ['Omar', 'card', 'stamps']];
++                        const _k = Number.isFinite(state.itemIndex) ? state.itemIndex : rng(0, 4);
++                        const [_who, _thing, _unit] = _ctx[_k % _ctx.length];
++                        payload.draw = 'none';
++                        payload.unit = _unit;
++                        payload.story = [`A ${_thing} has ${a} rows of ${b} ${_unit}.`, `${_who} turns it: now it has ${b} rows.`, 'How many in each row now?'];
++                        q.a = a; q.b = b; q.op = '×';
++                        q.cell = { template: 'arrays-turn', v: 1, payload };
++                        q.text = payload.story.join(' ');
++                        q.ans = a;
++                        q.answerType = 'number';
++                        q.options = [];
++                        q.hint = `Turning it does not change the total: ${a} × ${b} = ${b} × ?`;
++                        q.visual = _kitTwin('arrays-turn', payload);
++                        q.screenInstr = 'Read the story. Write the number.';
++                        q.instructionKey = 'story-k2';
++                        q.printFormat = 'mult-properties';
++                        q.skillLabel = 'Mult Properties';
++                        return;
++                    }
+                     q.a = a; q.b = b; q.op = '×';
+                     q.cell = { template: 'arrays-turn', v: 1, payload };
+                     if (type === 'both') {
+diff --git a/js/modules/gen-pv.js b/js/modules/gen-pv.js
+index aea85f61..e82c109d 100644
+--- a/js/modules/gen-pv.js
++++ b/js/modules/gen-pv.js
+@@ -395,6 +395,9 @@ function genExpandCombine(q, skill, o) {
+     }
+     let n = fromDigits(ds);
+     if (n < lo || n > hi) { n = randInt(lo, hi); ds = String(n).split('').map(Number); }
++    // (`teens`, skill coverage lane A 2026-10-17: one 3-digit number in six - an item with no 0 place -
++    // has 1 ten, a teen ending: 213 = 200 + 10 + 3, the Comparative atom of detailed lesson 1)
++    if (skill === 'expand' && o.teens === 'some' && !zero && ds.length === 3 && slot(6) === 2) { ds[1] = 1; n = fromDigits(ds); }
+     // ONE PART PER PLACE, zeros included (§2.4 rule 1): the box count never tells the pupil how
+     // many non-zero parts there are, and the key writes the zero part.
+     const parts = ds.map((d, i) => d * 10 ** (ds.length - 1 - i));
+@@ -454,6 +457,9 @@ function genExpandCombine(q, skill, o) {
+     }
+     // combine: the non-zero parts only, so 300 + 5 makes the pupil supply the 0 digit (M-V7).
+     let shown = parts.filter(p => p !== 0);
++    // (`story`, skill coverage lane A 2026-10-17 - detailed lesson 1's word problem: the parts as a story of
++    // groups of 100 and 10 and some more; the pupil writes the number. Our own words, a context per item.)
++    if (o.story === true && ds.length === 3) { combineStory(q, n, ds); return; }
+     if (o.order === 'scrambled' && shown.length > 1) {
+         const inOrder = shown.join();
+         for (let t = 0; t < 8 && shown.join() === inOrder; t++) shown = shuffle(shown.slice());
+@@ -472,6 +478,33 @@ function genExpandCombine(q, skill, o) {
+     setCell(q, { kind: 'frame', frame: `${expr} = ____` });
+ }
+ 
++// The story contexts of combine `story`: a name, the container (singular, plural) and the thing counted.
++const COMBINE_STORIES = [
++    ['Sam', 'bag', 'bags', 'beads'], ['Mia', 'box', 'boxes', 'pencils'], ['Leo', 'pack', 'packs', 'stickers'],
++    ['Ana', 'roll', 'rolls', 'tickets'], ['Omar', 'jar', 'jars', 'buttons'], ['Lily', 'tub', 'tubs', 'blocks'],
++];
++function combineStory(q, n, ds) {
++    const k = Number.isFinite(state.itemIndex) ? state.itemIndex : randInt(0, 5);
++    const run = Number.isFinite(state.itemSeed) ? (((state.itemSeed - k) % 6) + 6) % 6 : 0;
++    const [who, one, many, unit] = COMBINE_STORIES[(k + run) % COMBINE_STORIES.length];
++    const [h, t, o] = ds;
++    const lines = [`${who} has ${h} ${h === 1 ? one : many} of 100 ${unit}.`];
++    if (t) lines.push(`${who} has ${t} ${t === 1 ? one : many} of 10 ${unit}.`);
++    if (o) lines.push(`${who} has ${o} more ${unit}.`);
++    lines.push(`How many ${unit} does ${who} have?`);
++    q.text = lines.join(' ');
++    q.printText = 'Read the story. Write the number.';
++    q.instructionKey = 'story-k2';
++    q.ans = n;
++    q.answerType = 'number';
++    q.options = [];
++    q.visual = '';
++    q.hint = `Write the hundreds, the tens and the ones. A place with none gets a 0.`;
++    q.skillLabel = 'Standard Form';
++    q.pv = { kind: 'combine', n, parts: ds.map((d, i) => d * 10 ** (2 - i)).filter((v) => v !== 0), story: true };
++    setCell(q, { kind: 'frame', story: lines, who, unit, frame: `${who} has ____ ${unit}.` });
++}
++
+ /** EF-9 / EF-10: unit form, and renaming more than 9 of one place (47 tens, 3 hundreds 15 tens). */
+ function genUnitForm(q, skill, o) {
+     const cap = capOf('placevalue', skill, o, 999);
+diff --git a/js/modules/generate-question.js b/js/modules/generate-question.js
+index 8810d952..97015b3d 100644
+--- a/js/modules/generate-question.js
++++ b/js/modules/generate-question.js
+@@ -21,6 +21,7 @@ import { dealIndex, resetPageDeals } from './page-deal.js';
+ // Every whole-number word problem is drawn as ONE cell type: the story, a small + − × ÷ row,
+ // column boxes and "Answer: [ ] ____" (owner ruling 2026-09-25; word-work.js).
+ import { applyWordWork } from './word-work.js';
++import { applyWhichRight } from './which-right.js';
+ // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
+ // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
+ import './skill-options-derived.js';
+@@ -295,7 +296,7 @@ export function generateQuestion() {
+     const restoreSettings = applySkillSettings();
+     try {
+         const accept = p12Acceptor();
+-        if (!accept) return applyWordWork(p12Post(generateAliasedQuestion()));
++        if (!accept) return whichRightPost(applyWordWork(p12Post(generateAliasedQuestion())));
+         // P12 ACCEPT LAYER: an option honoured by keeping only the items that have the property
+         // asked for (a fraction page "denominators 2, 4 and 8" keeps the items whose fractions
+         // all have those denominators). The item is simply drawn again, so the generator needs
+@@ -306,12 +307,23 @@ export function generateQuestion() {
+             q = generateAliasedQuestion();
+             if (!q || accept(q)) break;
+         }
+-        return applyWordWork(p12Post(q));
++        return whichRightPost(applyWordWork(p12Post(q)));
+     } finally {
+         if (restoreSettings) restoreSettings();
+     }
+ }
+ 
++// The shared "Which is right?" response (which-right.js; universal option `whichRight`, skill coverage
++// lane A 2026-10-17): the item asked as a choice of its right answer and three of its provider's wrong
++// answers, on every host. Off (the default) leaves every item exactly as it was.
++function whichRightPost(q) {
++    const o = state.skillOptions;
++    if (!q || !o || o.whichRight !== true) return q;
++    q.categoryId = q.categoryId || state.category;
++    q.skillId = q.skillId || state.skill;
++    return applyWhichRight(q, Number.isFinite(state.itemSeed) ? state.itemSeed : undefined);
++}
++
+ // ---- P12 accept layer -------------------------------------------------------------------------
+ /** The fractions an item shows, as denominators: from "a/b" in its words and answer, and from the
+  *  fraction markup (`<span class="den">`) in its picture. Whole numbers ("3/1") are left out. */
+diff --git a/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js b/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
+index fa7fd74c..76aade32 100644
+--- a/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
++++ b/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
+@@ -9,7 +9,12 @@
+ // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
+ 
+ const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
+-const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 3, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true, fresh: true, itemSpread: true, dealTries: 4000, lr6Names: true }, extra || {});
++// (skill coverage lane A, 2026-10-17: the lesson's story design is the skill's own OPTIONS, so online practice with
++// add_wp_20 + these opts deals the same stories and asks the same response - `wpParts: 'bridge'` both parts 3 to 9
++// across ten, some wholes of 20 (was the lesson-only partMin / noPart / crossTen); `barFill` the parts and the whole
++// written in the bar (was cellPayload layout 'bar'); `wpShort` the short question (was shortQuestion).)
++const WP_OPTS = { pictures: false, support: 'bar', wpCues: false, wpBank: false, wpParts: 'bridge', barFill: true, wpShort: true };
++const WP = (extra, payload, opts) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: Object.assign({}, WP_OPTS, opts || {}) }, payload ? { cellPayload: payload } : {}, { instructionKey: 'story-bar', fresh: true, itemSpread: true, dealTries: 4000, lr6Names: true }, extra || {});
+ // (`fresh` / `itemSpread` - the items dealt one by one (exit slip, Check Question): first a story whose turn-around no
+ // page dealt (V22: a turn-around only when the pool is spent), and every name and noun the generator has - critic r3 D3, m3)
+ // (`shortQuestion`: the question in its short form - "How many books now?", "How many books in all?" -
+@@ -41,7 +46,7 @@ export default {
+     // A join story within 20 (the sum <= 20), the kit part-part-whole bar under it, all labels blank.
+     // (the chart, Guided and Practice stories all cross ten - no whole of 20 - so the pool holds enough
+     // put-together stories for the chart AND Guided cell 2; the whole of 20 is the Practice page's ★★★ case)
+-    skill: WP({ minNum: 11, maxNum: 18, crossTenExcept: [], sectionLabel: 'Stories' }),
++    skill: WP({ minNum: 11, maxNum: 18, sectionLabel: 'Stories' }),
+     // The last row of every Practice page (★★★): the edge cases - equal parts and a whole of 20
+     // (RESEARCH.md §5; every other story crosses ten with parts of 3 to 9: partMin / noPart / crossTen on every story ref).
+     edgeTest: 'wpEdge',
+@@ -61,7 +66,8 @@ export default {
+     // ten (both parts 9 or less) or a whole of 20 - and every other skill's places by list. E24 recomputes it.
+     pool: { kind: 'plus', skill: 'add_wp_20', partMin: 3, noPart: [10], crossTen: true, sums: [20], maxSum: 20 },
+     // (`wpClean`: no part is the difference of the parts, so option C's wrong-sign top is no story number - critic r3 D3)
+-    checkQuestion: { want: ['wpBridgeBigFirst', 'wpClean'], correct: 'D' },
++    // (`ref` with `whichRight`: online, the Check Question is the skill's own "Which bar is right?" item - which-right.js)
++    checkQuestion: { ref: WP({ minNum: 11, maxNum: 18, sectionLabel: 'Stories' }, null, { whichRight: true }), want: ['wpBridgeBigFirst', 'wpClean'], correct: 'D' },
+     practicePages: 1,
+     // No Mixed page (V22 §9.5: optional). Lesson 2 r5: a + fact is ONE fact across the pack in either order (LR-5,
+     // lead ruling 2026-10-17), and the crossing-ten stories with parts 3 to 9 are 15 facts. The chart (2), Guided (2),
+@@ -136,7 +142,8 @@ export default {
+     // ------------------------------------------------------------------ P5 Word problem
+     // The same skill with the bar OFF: the pupil draws the bar (the fade).
+     wordProblem: {
+-        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 3, noPart: [10], crossTen: true, shortQuestion: true, fresh: true, itemSpread: true, dealTries: 4000 },
++        // (`wpEquation`: the pupil writes the equation and its sign - the skill's response online too; was signSlot only)
++        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { pictures: false, support: 'none', wpCues: false, wpBank: false, wpParts: 'bridge', wpEquation: true, wpShort: true }, minNum: 11, maxNum: 19, fresh: true, itemSpread: true, dealTries: 4000 },
+         want: 'wpBridgeSmallFirst',
+         // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
+         answerLine: 'The answer: __ {wp.unit}.',
+diff --git a/js/modules/lessons/detailed/g2-nbt3-read-write-1000.js b/js/modules/lessons/detailed/g2-nbt3-read-write-1000.js
+index 23a9113b..c6895216 100644
+--- a/js/modules/lessons/detailed/g2-nbt3-read-write-1000.js
++++ b/js/modules/lessons/detailed/g2-nbt3-read-write-1000.js
+@@ -9,8 +9,11 @@
+ // in ./index.js. Pure data (no DOM, no state). Every number a script speaks is a {placeholder} filled
+ // from the DEALT items through the kit's readers and `vars` below, never typed here.
+ 
+-const PV = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 999, zeroPlace: 'some' }, opts || {}), minNum: 101, maxNum: 999 }, extra || {});
+-const WORDS = (way, extra, opts) => Object.assign({ categoryId: 'composing', skillId: 'number_word_form', opts: Object.assign({ wordform: [way], band: 1000, zeroPlace: 'some' }, way === 'to_number' ? { answerSlot: 'hto' } : {}, opts || {}), minNum: 101, maxNum: 999 }, extra || {});
++// (skill coverage lane A, 2026-10-17: every range and case the paper deals is a skill OPTION, so online practice
++// with the same skill + opts deals the same items - band 999 is 101 to 999 (no 1,000, board-only), `teens` deals the
++// teen endings, `zeroPlace` only where the skill has it; no lesson-only floors)
++const PV = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 999 }, skillId === 'expand' || skillId === 'combine' ? { zeroPlace: 'some' } : {}, skillId === 'expand' ? { teens: 'some' } : {}, opts || {}) }, extra || {});
++const WORDS = (way, extra, opts) => Object.assign({ categoryId: 'composing', skillId: 'number_word_form', opts: Object.assign({ wordform: [way], band: 999, zeroPlace: 'some' }, way === 'to_number' ? { answerSlot: 'hto', teens: 'some' } : {}, opts || {}) }, extra || {});
+ // P1's bank types (V22 §9.2, critic D11): 2-digit prior knowledge, never today's new skill.
+ const NS = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 99 }, opts || {}), minNum: 10, maxNum: 99 }, extra || {});
+ 
+@@ -37,7 +40,7 @@ export default {
+         { id: 'a', name: 'Numeral to expanded form' },
+         {
+             // (to 999: 1,000 is board-only - `boardOnly` below)
+-            id: 'b', name: 'Number name to numeral', skill: WORDS('to_number', { maxNum: 999 }),
++            id: 'b', name: 'Number name to numeral', skill: WORDS('to_number'),
+             lessonData: {
+                 skills: [],
+                 concepts: [{ id: 'zero', text: 'No tens word? Write 0 tens.' }],
+@@ -75,20 +78,22 @@ export default {
+     // Each Practice page its own sheet (V22 §9.5): 1 = numeral to expanded form (the chart's steps on
+     // top), 2 = number name to numeral (the words form).
+     // (its ★★★ last row: a 0 tens and one more edge case - critic D2; never 1,000, board-only)
+-    practiceSheets: [{}, { skill: WORDS('to_number', { maxNum: 999 }), shape: [8, 2], chunk: 'b', edgeLast: { per: 8, cols: 2, wants: ['pvZeroTens', 'pvTeen'] } }],
++    practiceSheets: [{}, { skill: WORDS('to_number'), shape: [8, 2], chunk: 'b', edgeLast: { per: 8, cols: 2, wants: ['pvZeroTens', 'pvTeen'] } }],
+     // Mixed: the lesson skill with its other forms - expanded form back to the numeral and the
+     // number name to the numeral (H T O boxes). No number is WRITTEN in words (owner ruling, R1).
+     // (no Steps band on the mixed page - critic D18)
+-    mixed: { skills: [PV('combine'), WORDS('to_number', { sectionLabel: 'Number names', maxNum: 999 }), PV('unit_form'), PV('value')], strip: false },
++    mixed: { skills: [PV('combine'), WORDS('to_number', { sectionLabel: 'Number names' }), PV('unit_form'), PV('value')], strip: false },
+ 
+     // The lesson's own placeholder names (index.js): a 3-digit number's parts.
+     vars: (q, b) => {
+         const pc = (q && q.cell && q.cell.payload) || {};
+         if (pc.kind === 'compare') return { a: pc.a, b: pc.b, big: Math.max(Number(pc.a), Number(pc.b)) };
++        // (combine `story`: the story's name and the thing counted - the P5 answer line)
++        const story = pc.who ? { who: pc.who, unit: pc.unit } : {};
+         const n = Number(b.n);
+         if (!Number.isFinite(n) || b.n === '') return {};
+         const h = Math.floor(n / 100) * 100, t = Math.floor((n % 100) / 10) * 10, o = n % 10;
+-        return { h: h / 100, t: t / 10, o, hv: h, hto: `${h / 100} | ${t / 10} | ${o}`, tv: t, ov: o, parts: `${h} + ${t} + ${o}`, say: `${h} plus ${t} plus ${o}`, tens: Math.floor(n / 10), eqParts: [h, t, o], eqOp: '+' };
++        return { ...story, h: h / 100, t: t / 10, o, hv: h, hto: `${h / 100} | ${t / 10} | ${o}`, tv: t, ov: o, parts: `${h} + ${t} + ${o}`, say: `${h} plus ${t} plus ${o}`, tens: Math.floor(n / 10), eqParts: [h, t, o], eqOp: '+' };
+     },
+ 
+     // The anchor chart / lesson sheet data, in the prereqs.js LESSONS shape (roles/lesson.js).
+@@ -132,7 +137,7 @@ export default {
+     prerequisites: [
+         // Routes (critic D22): the site has no lesson for these yet, so each names the CCSS code and a
+         // short title (V22 Appendix H); `routeNote` says so on T2b.
+-        { atom: 1, items: 4, ref: { categoryId: 'composing', skillId: 'number_word_form', opts: { wordform: ['to_number'], band: 100, zeroPlace: 'none' }, minNum: 21, maxNum: 99 },
++        { atom: 1, items: 4, ref: { categoryId: 'composing', skillId: 'number_word_form', opts: { wordform: ['to_number'], band: 99, zeroPlace: 'none' } },
+             lesson: { id: '1.NBT.A.1', title: 'Read and write numbers to 120' } },
+         { atom: 2, items: 3, ref: PV('unit_form'), lesson: { id: '2.NBT.A.1', title: 'Hundreds, tens and ones' } },
+         { atom: 3, items: 2, ref: PV('value'), lesson: { id: '2.NBT.A.1', title: 'The value of a digit' } },
+@@ -147,15 +152,15 @@ export default {
+     },
+ 
+     // ------------------------------------------------------------------ P5 Word problem (Q5)
+-    // Our own words (Q6). The numbers come from a dealt `combine` item (hundreds + ones, a 0 tens).
++    // The skill's own story (placevalue:combine `story`, skill coverage lane A 2026-10-17): groups of 100 and
++    // some more, a 0 tens - our own words, dealt by the skill, so online practice tells the same stories.
+     wordProblem: {
+-        ref: PV('combine'),
++        ref: PV('combine', { story: true }),
+         want: 'pvZeroTens',
+         instruction: 'Read the story. Draw it. Solve.',
+-        lines: ['Sam has {wp.h} bags of 100 beads.', 'Sam has {wp.o} more beads.', 'How many beads does Sam have?'],
+-        answerLine: 'Sam has __ beads.',
++        answerLine: '{wp.who} has __ {wp.unit}.',
+         // (the number in words too - critic D19)
+-        say: 'Sam has __ beads.',
++        say: '{wp.who} has __ {wp.unit}.',
+     },
+ 
+     // ------------------------------------------------------------------ P6 Exit slip (Q8)
+@@ -163,8 +168,8 @@ export default {
+     // expanded form back to the numeral (chunk 1's read-back, step 4), d numeral to expanded form with
+     // a 0 place (chunk 1, the Critical Atom). The tens-word case is b.
+     exit: [
+-        { case: 'name, no 0 place', ref: WORDS('to_number', { maxNum: 999 }), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side: three hundred forty-seven = 30047.' },
+-        { case: 'name, no tens word (Critical Atom)', ref: WORDS('to_number', { maxNum: 999 }), want: 'pvZeroTens', instr: 'Write the number.', detects: 'Drops the 0: six hundred five = 65.' },
++        { case: 'name, no 0 place', ref: WORDS('to_number'), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side: three hundred forty-seven = 30047.' },
++        { case: 'name, no tens word (Critical Atom)', ref: WORDS('to_number'), want: 'pvZeroTens', instr: 'Write the number.', detects: 'Drops the 0: six hundred five = 65.' },
+         { case: 'expanded form to the numeral, no 0 place', ref: PV('combine'), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side: 500 + 30 + 9 = 500309.' },
+         { case: 'numeral to expanded form, a 0 place', ref: PV('expand'), want: 'pvZeroTens', instr: 'Write the number in expanded form.', detects: 'Writes 10 for the empty tens: 400 + 10 + 7.' },
+     ],
+@@ -237,7 +242,8 @@ export default {
+         // (the Comparative atom's own example, 213: a teen ending is ones)
+         { name: 'Teen or ty swap', step: 5, looks: '230 for 213', fix: 'Say the end: teen is ones.', option: '', caught: 'Practice 2' },
+     ],
+-    checkQuestion: { want: 'pvZeroTens', correct: 'D' },
++    // (`ref` with `whichRight`: the Check Question is the skill's own "Which is right?" item online - which-right.js)
++    checkQuestion: { ref: PV('expand', { whichRight: true }), want: 'pvZeroTens', correct: 'D' },
+ 
+     // ------------------------------------------------------------------ T3-T5 delivery scripts
+     // Sections 1-10 (the 60-minute budget, V22 Lesson Time Budget). Placeholders: index.js.
+@@ -324,7 +330,7 @@ export default {
+             rows: [
+                 { do: 'Read the story aloud two times. Pupils tick each box.' },
+                 { ask: 'How many hundreds? How many ones?', note: 'Expected: [[{wp.h}]] hundreds, [[{wp.o}]] ones.' },
+-                { ask: 'How many beads? Say it in words.', note: 'Expected: [[{wp.eq}]]; said: {wp.words}.' },
++                { ask: 'How many {wp.unit}? Say it in words.', note: 'Expected: [[{wp.eq}]]; said: {wp.words}.' },
+             ] },
+         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
+             rows: [
+diff --git a/js/modules/lessons/detailed/g3-oa5-mult-properties.js b/js/modules/lessons/detailed/g3-oa5-mult-properties.js
+index 32050acb..202f243d 100644
+--- a/js/modules/lessons/detailed/g3-oa5-mult-properties.js
++++ b/js/modules/lessons/detailed/g3-oa5-mult-properties.js
+@@ -5,13 +5,13 @@
+ // design/lesson-planner/lessons/g3-oa5-mult-properties/RESEARCH.md §4. Flow: Standard (2 New steps).
+ // The file id keeps the owner's lesson name; this pack is lesson 3a. 3b and 3c are `followOn`.
+ //
+-// Practice skill MEANWHILE: multiplication:arrays_groups forms:[0] (arrays only, rows and columns 2..5,
+-// so every pictured array meets RP-21 on its own terms: at most 5 rows, at most 5 in a row, never a
+-// row past 5 that would need the fives gap - E27 must read the arrays template's rows/cols, see the
+-// lead's build list). Its frame accepts rows-of-cols in EITHER order, which is exactly the turned fact.
+-// multiplication:mult_properties is NOT used on any pupil page: its prompt gives the answer away
+-// (MU-A7) and it has no kit cell; proposal P-A (RESEARCH §3) redoes form 0 under its own id, and this
+-// file's `skill` then becomes {categoryId: 'multiplication', skillId: 'mult_properties', opts: {forms: [0]}}.
++// Practice skill: multiplication:mult_properties form 0 (the order property), drawn by the kit's
++// `arrays-turn` cell - task 0 an array and its turn (both products), 1 a known fact gives the turned
++// fact, 2 facts only (the missing number), 3 a turn story (the word problem). multiplication:
++// arrays_groups forms [0] is the Prerequisite Check's array item only. Every range the paper deals is a
++// skill option (skill coverage lane A, 2026-10-17): `minProduct` / `maxProduct` / `minFactor`, so online
++// practice with the same skill + opts deals the same facts; the associative property is
++// multiplication:multiply_three_numbers (follow-on 3d).
+ // Pure data (no DOM, no state). Every number a script speaks is a {placeholder} filled from a DEALT item.
+ 
+ // The array item: one picture, `___ rows of ___ make ___ in all.` (gen-operations.js arrays_groups).
+@@ -46,18 +46,23 @@ export default {
+     cra: 'Concrete → Pictorial',
+     flowNote: 'One chunk: turn the array; the product stays the same.',
+     // Lead ruling 2026-10-16: 3a = commutative only. 3b and 3c are their own lessons.
++    // (3d and the division note - skill coverage lane A 2026-10-17: every clause of 3.OA.B.5 names its skill)
+     followOn: [
+         { title: 'Multiply by 1 and by 0', iCan: 'I Can multiply by 1 and by 0', skill: 'multiplication:mult_properties', opts: { forms: [2, 3] }, ccss: '3.OA.B.5',
+             note: '× 1 is the property; × 0 is the contrast only. Needs P-A (no answer in the prompt, a kit cell).' },
+         { title: 'Break apart an array', iCan: 'I Can break apart an array', skill: 'multiplication:mult_properties', opts: { forms: [1] }, ccss: '3.OA.B.5',
+             note: 'Distributive: split at the fives line (7 = 5 + 2). After 3a and 3b.' },
++        { title: 'Multiply three numbers', iCan: 'I Can multiply three numbers', skill: 'multiplication:multiply_three_numbers', opts: { forms: [0, 1, 2, 3] }, ccss: '3.OA.B.5',
++            note: 'Associative: multiply a pair first - (2 × 5) × 7 = 10 × 7; two ways give the same product.' },
++        { title: 'Break apart to divide', iCan: 'I Can break apart a number to divide', skill: 'division:area_model_div_2by1', opts: {}, ccss: '3.OA.B.5',
++            note: 'Properties as strategies to divide: 48 ÷ 4 = 40 ÷ 4 + 8 ÷ 4 (the distributive property; the skill is tagged 4.NBT.B.6).' },
+     ],
+ 
+     // ------------------------------------------------------------------ the practice skill
+     // (products to 20: the chart and Guided cell 1 at most 4 by 4, Guided cell 2 the widest, 4 by 5;
+     // `turn-two` keeps the Guided header on one line beside the Steps)
+     // (r2, critic D2: tasks both AND known - Guided cell 2 is the known fact, the Practice 1 response, its first box traced)
+-    skill: Object.assign(TURN(0, { minNum: 6, maxNum: 20, instructionKey: 'missing-many' }), { opts: { forms: [0], task: [0, 1], band: 25 } }),
++    skill: Object.assign(TURN(0, { instructionKey: 'missing-many' }), { opts: { forms: [0], task: [0, 1], band: 25, minProduct: 6, maxProduct: 20 } }),
+     // (no pool: the pack's own places; there are only 10 rows-by-cols pairs, so ONE Practice page)
+     practicePages: 2,
+     // ★★★ last row: a square array (does it change when turned?) and a 5-row array.
+@@ -70,8 +75,9 @@ export default {
+     practiceSheets: [
+         // (products to 16: rows + in each row at most 8, so the array and its turn fit a half-width cell at L)
+         // (r2, critic D1: row 1 two non-squares, the last row the one square and a 5-row array)
+-        { skill: TURN(1, { minNum: 6, maxNum: 16, allTest: 'arrP1', instructionKey: 'turn-look' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['arrBigSquare', 'arrFiveRows'] } },
+-        { skill: FACTS({ minNum: 12, factorCap: 4, allTest: 'arrP2' }), shape: [10, 2], edgeLast: { per: 10, cols: 2, first: true, wants: ['arrSquare', 'arrFive'] } },
++        { skill: Object.assign(TURN(1, { allTest: 'arrP1', instructionKey: 'turn-look' }), { opts: { forms: [0], task: [1], band: 25, minProduct: 6, maxProduct: 16 } }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['arrBigSquare', 'arrFiveRows'] } },
++        // (`minProduct` 12 and `minFactor` 3: the products 12 and up, no × 2 fact - was the lesson-only minNum / allTest arrP2)
++        { skill: Object.assign(FACTS({ factorCap: 4 }), { opts: { forms: [0], task: [2], band: 81, minProduct: 12, minFactor: 3 } }), shape: [10, 2], edgeLast: { per: 10, cols: 2, first: true, wants: ['arrSquare', 'arrFive'] } },
+     ],
+     // No Mixed page: a Mixed page leads with the lesson skill (half its items), and only ten arrays up to
+     // 5 x 5 exist - the chart, the lesson sheet, Practice 1, the exit slip and the Check Question use them
+@@ -83,7 +89,7 @@ export default {
+         const p = (q && q.cell && q.cell.payload) || {};
+         if (p.rows !== undefined && p.cols !== undefined) {
+             const r = Number(p.rows), c = Number(p.cols), t = r * c;
+-            return { rows: r, cols: c, total: t, fact: `${r} × ${c} = ${t}`, turned: `${c} × ${r} = ${t}`, both: `${r} × ${c} = ${t} and ${c} × ${r} = ${t}`, eqParts: [r, c], eqOp: '×', eqN: t, eqTurn: true };
++            return { unit: p.unit || 'cakes', rows: r, cols: c, total: t, fact: `${r} × ${c} = ${t}`, turned: `${c} × ${r} = ${t}`, both: `${r} × ${c} = ${t} and ${c} × ${r} = ${t}`, eqParts: [r, c], eqOp: '×', eqN: t, eqTurn: true };
+         }
+         const a = Number(b.a), c = Number(b.b);
+         if (Number.isFinite(a) && Number.isFinite(c)) return { fact: `${a} × ${c} = ${a * c}`, turned: `${c} × ${a} = ${a * c}` };
+@@ -158,12 +164,12 @@ export default {
+     // Our own words; the numbers come from a dealt facts-only item (a non-square product item, factors to 9).
+     // (r2, critic D5: the story IS the turn - 5 rows of 6 to 9, a count by 5; it asks the turned row, and the pupil
+     // writes both facts; the Say frame holds both)
++    // (the skill's own turn story - mult_properties task 3, skill coverage lane A 2026-10-17: online practice deals it too)
+     wordProblem: {
+-        ref: FACTS(),
++        ref: Object.assign(FACTS(), { opts: { forms: [0], task: [3], band: 81 } }),
+         want: 'arrWpTurn',
+         instruction: 'Read the story. Draw it. Solve.',
+-        lines: ['A tray has {wp.rows} rows of {wp.cols} cakes.', 'Sam turns it: now it has {wp.cols} rows.', 'How many in each row now?'],
+-        answerLine: 'There are __ cakes in each row.',
++        answerLine: 'There are __ {wp.unit} in each row.',
+         eqTurn: true,
+         // (r4, critic r2 m4: rows of 6 are past the counters' 5 - the tray is drawn as a box, RP-21)
+         schematic: true,
+@@ -236,7 +242,8 @@ export default {
+     ],
+     // The Check Question is a fact on the board (no dots: the Critical Atom, same product, after the I Do's
+     // facts-only rows), a fresh pair; its options are the provider's wrong products, each written as a fact.
+-    checkQuestion: { ref: FACTS(), want: 'arrProductP2', correct: 'C',
++    // (`whichRight`: online, the Check Question is the skill's own "Which is right?" item - which-right.js)
++    checkQuestion: { ref: Object.assign(FACTS(), { opts: { forms: [0], task: [2], band: 81, whichRight: true } }), want: 'arrProductP2', correct: 'C',
+         show: (v, q) => { const p = (q && q.cell && q.cell.payload) || {}; return `${p.cols} × ${p.rows} = ${v}`; } },
+ 
+     // ------------------------------------------------------------------ T3-T5 delivery scripts
+@@ -303,7 +310,7 @@ export default {
+         { n: 9, name: 'Word problem', min: 5, page: 'P5',
+             rows: [
+                 { do: 'Read the story aloud two times. Pupils tick each box.' },
+-                { ask: 'How many rows now? How many cakes in each row?', note: 'Expected: [[{wp.cols}]] rows, [[{wp.rows}]] in each.' },
++                { ask: 'How many rows now? How many {wp.unit} in each row?', note: 'Expected: [[{wp.cols}]] rows, [[{wp.rows}]] in each.' },
+                 { ask: 'Say both facts.', note: 'Expected: {wp.both}.' },
+             ] },
+         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
+@@ -320,7 +327,7 @@ export default {
+         'Exit a: only {exit.0.turned}; writing {exit.0.fact} again is the no-swap mistake.',
+         'Practice 2 and exit b, c: one number in each box, no working needed.',
+         'Practice 1: a turned fact read off the turned array is right even if the pupil counted it.',
+-        'Cake story: {wp.rows} in each row; the two facts {wp.both}, in either order; the label “cakes” may be left off.',
++        'The story: {wp.rows} in each row; the two facts {wp.both}, in either order; the label “{wp.unit}” may be left off.',
+     ],
+     wrongAnswers: [
+         { wrote: '{exit.1.wrong.turnrecount} (b)', mistake: 'A new product', next: 'Tray: turn it; “Did a dot move away?”' },
+diff --git a/js/modules/print-sheet.js b/js/modules/print-sheet.js
+index a5837324..1b32bfc9 100644
+--- a/js/modules/print-sheet.js
++++ b/js/modules/print-sheet.js
+@@ -30,6 +30,7 @@ import { mergedLine } from './refline-screen.js';
+ import { opsRoutedSkill } from './gen-operations.js';
+ import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
+ import { kitCellSpec } from './print-generate.js';
++import { whichRightAnswers } from './which-right.js';
+ import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML } from './sheet/index.js';
+ import { plan as independentPlan } from './sheet/roles/independent.js';
+ import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
+@@ -348,6 +349,9 @@ export function itemNumberOf(q) {
+     if (q.pattern && Array.isArray(q.pattern.values) && Number.isFinite(Number(q.pattern.values[0]))) return Number(q.pattern.values[0]);
+     // (an array and its turn, lesson 3a: its product - the ref floors minNum / maxNum read it)
+     if (q.cell && q.cell.template === 'arrays-turn' && Number.isFinite(Number(p.rows) * Number(p.cols))) return Number(p.rows) * Number(p.cols);
++    // (a numeric `dealAnswer` - a story whose response is several boxes, add_wp_20 barFill / wpEquation: its answer)
++    const da = typeof q.dealAnswer === 'string' ? q.dealAnswer.replace(/,/g, '').trim() : null;
++    if (da !== null && /^\d+$/.test(da)) return Number(da);
+     const a = typeof q.ans === 'object' ? null : String(q.ans).replace(/,/g, '').trim();
+     if (a !== null && /^\d+$/.test(a)) return Number(a);
+     const t = refText(q).replace(/,(?=\d{3})/g, '');
+@@ -3223,28 +3227,11 @@ function dlWrongs(q) {
+  * provider on copies of the item that differ only in their seed (its rotation start).
+  */
+ function dlCheckQuestion(q, d) {
+-    let right = dlAns(q);
+-    const wrongs = [];
+-    let p = null;
+-    try { p = getProvider(q.categoryId || '', q.skillId || ''); } catch (e) { p = null; }
+-    // A provider that lists EVERY misconception (`wrongAnswers`, with the right answer written the
+-    // same way as `correct: true`) gives the options directly; else the one `wrongAnswer`, rotated.
+-    let all = null;
+-    try { all = p && typeof p.wrongAnswers === 'function' ? p.wrongAnswers(q) : null; } catch (e) { all = null; }
+-    if (Array.isArray(all) && all.length) {
+-        const r = all.find((w) => w.correct);
+-        if (r) right = String(r.display);
+-        for (const w of all) if (!w.correct && w.display !== undefined && !wrongs.some((x) => x.display === String(w.display))) wrongs.push({ display: String(w.display), misconception: w.misconception || '' });
+-    }
+-    const fromAll = wrongs.length > 0;
+-    for (let s = 0; p && !fromAll && typeof p.wrongAnswer === 'function' && s < 40 && wrongs.length < 6; s++) {
+-        let w = null;
+-        try { w = p.wrongAnswer(Object.assign({}, q, { seed: s })); } catch (e) { w = null; }
+-        if (!w || w.display === undefined) continue;
+-        const disp = String(w.display);
+-        if (disp === right || wrongs.some((x) => x.display === disp)) continue;
+-        wrongs.push({ display: disp, misconception: w.misconception || '' });
+-    }
++    // (the shared "Which is right?" choices, which-right.js - the same right answer and provider wrong answers
++    // the skill's `whichRight` option deals online; skill coverage lane A 2026-10-17)
++    const wr = whichRightAnswers(q, { rightOf: dlAns });
++    let right = wr.right;
++    const wrongs = wr.wrongs;
+     const cq = d.checkQuestion || {};
+     const correct = cq.correct || 'D';
+     const letters = ['A', 'B', 'C', 'D'];
+@@ -3415,7 +3402,10 @@ async function buildDetailedLesson(req = {}) {
+     // (`checkQuestion.first`, lesson 4 r4: the Check Question is dealt before the exit slip - both must be fresh against
+     // every page, and the slip's three windows, dealt first, left no fresh window with the row-only case; absent, as before)
+     const cqFirst = !!(d.checkQuestion && d.checkQuestion.first);
+-    const cqDeal = () => dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
++    // (a `whichRight` ref - the Check Question as the skill's own choice online - is dealt as its item; the board's
++    // A-D are made from that item by dlCheckQuestion, the same choices the option deals: which-right.js)
++    const cqRef = (d.checkQuestion || {}).ref || d.skill;
++    const cqDeal = () => dealOne(bo(cqRef && cqRef.opts && cqRef.opts.whichRight ? Object.assign({}, cqRef, { opts: Object.fromEntries(Object.entries(cqRef.opts).filter(([k]) => k !== 'whichRight')) }) : cqRef), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
+     const cqD0 = cqFirst ? cqDeal() : null;
+     const exitD = d.exit.map((e, i) => { const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys); exAns.add(dlAns(x.q)); return x; });
+     // (`want` on a retrieval row - lesson 3a r2: no x 0 or x 1 fact, lesson 3b's content; absent = any, as before)
+diff --git a/js/modules/screen-cell.js b/js/modules/screen-cell.js
+index b1ea4d35..faa3d779 100644
+--- a/js/modules/screen-cell.js
++++ b/js/modules/screen-cell.js
+@@ -3414,6 +3414,7 @@ function _wireRoundLines() {
+  */
+ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
+     const c = q && q.cell;
++    if (c && c.template === 'words') return wordsHtoTwin(q, categoryId);
+     if (!c || c.template !== 'pv' || !c.payload || typeof c.payload !== 'object') return null;
+     if (typeof document === 'undefined') return null;
+     const p = c.payload;
+@@ -3554,6 +3555,44 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
+     return { mode, html: body, instr, count: mode === 'slots' && !chart && !order ? slots.length : 0, kit: 'pv' };
+ }
+ 
++/**
++ * The screen twin of the `words` cell written in H T O boxes (composing:number_word_form, answerSlot
++ * 'hto'; skill coverage lane A 2026-10-17): the number name, and under it the place letters over one
++ * box a digit - the paper's structural scaffold ("3 boxes, 3 digits"). The digits join, left to
++ * right, into the number the host checks (data-mq-join=""), as the place-value chart does.
++ * Any other `words` item (a line, or numeral to words) keeps the host's own input.
++ */
++function wordsHtoTwin(q, categoryId) {
++    const p = q.cell && q.cell.payload;
++    if (!p || p.slot !== 'hto' || p.way === 'to_words' || typeof document === 'undefined') return null;
++    if (!PV_TWIN_TYPES.has(q.answerType)) return null;
++    let html = '';
++    let digitPt = 28;
++    try {
++        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
++        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
++        html = renderCell(Object.assign({}, q, { cell: { template: 'words', payload: p, v: 1 } }), ctx);
++    } catch (e) { return null; }
++    if (!html) return null;
++    const tpl = document.createElement('template');
++    tpl.innerHTML = _screenSizes(html, digitPt);
++    const row = tpl.content.querySelector('[data-ws-hto]');
++    const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]'));
++    if (!row || !slots.length) return null;
++    row.setAttribute('data-mq-join', '');
++    slots.forEach((s, k) => {
++        const t = document.createElement('template');
++        t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`, true);
++        const box = t.content.firstChild;
++        box.classList.add('mq-cellbox--chart');
++        s.replaceWith(box);
++    });
++    const wrap = document.createElement('div');
++    wrap.appendChild(tpl.content);
++    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="words" data-mq-kind="hto">${wrap.innerHTML}</div>`;
++    return { mode: 'slots', html: body, instr: printInstructionFor(q, categoryId) || 'Write the number.', count: 0, kit: 'words' };
++}
++
+ /**
+  * A sign circle is tapped, not typed on a phone keyboard (SP-3 / H3): three sign tiles under the
+  * drawing write the sign into the circle's input (it can still be typed). The tiles are the
+diff --git a/js/modules/search-terms.js b/js/modules/search-terms.js
+index d6f723cb..e181c340 100644
+--- a/js/modules/search-terms.js
++++ b/js/modules/search-terms.js
+@@ -452,6 +452,10 @@ export const SKILL_TERMS = {
+     'angles_lines:identify_angles': ['angles', 'right angle', 'acute', 'obtuse', 'types of angles', 'clockwise', 'anticlockwise', 'counterclockwise', 'quarter turn', 'half turn', 'turns'],
+     // critic r3 C-E
+     'shapes_early:count_sides_vertices_2d': ['vertex', 'corner'],
++    // skill coverage lane A (2026-10-17): the associative property has its skill (of addition: adding three numbers, any pair first)
++    'addition:add_three': ['associative property of addition', 'add three numbers', 'adding three numbers'],
++    'multiplication:multiply_three_numbers': ['associative', 'associative property', 'associative property of multiplication', 'multiply three numbers',
++        'three factors', 'multiplying three numbers', 'grouping property', '3 factors', 'multiply 3 numbers'],
+     // critic r5 P-E / C-G: what _mpTypes really deals (commutative, distributive, identity, zero), never associative
+     'multiplication:mult_properties': ['commutative', 'commutative property', 'commutative property of multiplication', 'turnaround facts',
+         'distributive property', 'distributive property of multiplication', 'identity', 'identity property', 'identity property of multiplication',
+@@ -508,6 +512,9 @@ export const PRIMARY_SKILLS = {
+     'shapes_early:shape_corners_count': ['corner', 'corners', 'count corners'],
+     'conversions:d_to_f': ['decimals to fractions', 'decimal to fraction', 'decimal to fractions', 'decimals to fraction', 'convert decimals to fractions'],
+     'conversions:f_to_d': ['fractions to decimals', 'fraction to decimal', 'fraction to decimals', 'fractions to decimal', 'convert fractions to decimals'],
++    // (skill coverage lane A 2026-10-17: multiply_three_numbers deals the associative property and leads for it)
++    'multiplication:multiply_three_numbers': ['associative property', 'associative', 'associative property of multiplication', 'multiply three numbers'],
++    'addition:add_three': ['associative property of addition'],
+     // critic r5: no skill deals the associative property, so 'associative' finds nothing (REAL_WORDS keeps it uncorrected);
+     // 'distributive property' leads with the skill named for it (R-F); 'zero / identity property' reach the skill that deals them (C-G)
+     'multiplication:mult_properties': ['commutative property', 'commutative', 'properties of multiplication', 'multiplication properties',
+diff --git a/js/modules/sheet/cells/arrays-turn.js b/js/modules/sheet/cells/arrays-turn.js
+index 3c521ed0..e6af0f6a 100644
+--- a/js/modules/sheet/cells/arrays-turn.js
++++ b/js/modules/sheet/cells/arrays-turn.js
+@@ -94,7 +94,12 @@ function facts(p) {
+     return [[r, '×', c, '=', P], [{ id: 'b1', digits: c.length }, '×', { id: 'b2', digits: r.length }, '=', { id: 'b3', digits: d }]];
+ }
+ 
++/** A turn story's lines and its answer line (task 3, `story`). */
++const storyAnswer = (p) => ['There are', { id: 'm', digits: String(N(p.rows)).length, mark: 'blank' }, `${p.unit || ''} in each row.`.trim()];
++
+ function geometry(g, p) {
++    // (`story`, task 3 - skill coverage lane A 2026-10-17: the story's lines across the cell, no pictures)
++    if (Array.isArray(p.story) && p.story.length) return { wMm: 160, pictures: false, story: true };
+     const [f1, f2] = facts(p);
+     const fw = Math.max(factWidth(g, f1), factWidth(g, f2));
+     // (`draw` 'none' on a 'known' item - lesson 3a exit a: the known fact and three boxes, no array to recount)
+@@ -117,6 +122,13 @@ export function turnRender(p, ctx) {
+     const [f1, f2] = facts(p);
+     const geom = geometry(g, p);
+     let inner;
++    if (geom.story) {
++        // the story at text size + 2, one sentence a line, then "There are [ ] cakes in each row."
++        const t = (g.textEm * (g.s.textPt + 2) / g.s.textPt).toFixed(3);
++        inner = `<div style="text-align:left;font-size:${t}em;line-height:1.35">${p.story.map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
++            + `<div style="margin-top:${g.em(3)};display:flex;justify-content:flex-start;font-size:${t}em">${factLine(g, storyAnswer(p), at)}</div>`;
++        return root(g, 'arrays-turn', inner, 'text-align:left;width:100%;', turnFootprint(p, ctx).wMm);
++    }
+     if (!geom.pictures) {
+         inner = `<div style="display:flex;flex-direction:column;align-items:center;gap:${g.em(3)}">${factLine(g, f1, at)}${factLine(g, f2, at)}</div>`;
+     } else {
+@@ -147,7 +159,7 @@ export function turnAnswerKey(p) {
+ export function turnFootprint(p, ctx) {
+     const g = geo(ctx);
+     const geom = geometry(g, p);
+-    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures ? 2 : 3 };
++    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.story ? 1 : geom.pictures ? 2 : 3 };
+ }
+ 
+ export function turnInputs(p) {
+diff --git a/js/modules/sheet/cells/pv.js b/js/modules/sheet/cells/pv.js
+index 03d23e9a..26219914 100644
+--- a/js/modules/sheet/cells/pv.js
++++ b/js/modules/sheet/cells/pv.js
+@@ -546,7 +546,9 @@ register('pv', {
+             case 'frame':
+                 // `slotDigits` fixes the slot's width for the whole skill, so a 3-digit answer (100)
+                 // never gets a longer line than its neighbours.
+-                return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${frameHTML(ctx, p.frame, kv, Math.max(digits, Number(p.slotDigits) || 0))}</div>`;
++                // (`story`, combine as a story - skill coverage lane A 2026-10-17: one sentence a line at text
++                // size + 2, the question last, then the answer frame)
++                return `<div class="pv-cell">${Array.isArray(p.story) && p.story.length ? `<div class="pv-story" style="font-size:${pt(m.textPt + 2)};line-height:1.35;margin:0 0 3mm;">${p.story.map((l) => `<div>${esc(l)}</div>`).join('')}</div>` : ''}${p.showNumeral ? center(numeral({})) : ''}${frameHTML(ctx, p.frame, kv, Math.max(digits, Number(p.slotDigits) || 0))}</div>`;
+             case 'compare': {
+                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
+                 return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
+@@ -689,7 +691,8 @@ register('pv', {
+             || (p.kind === 'expand' && (nd >= 4 || (nd === 3 && ctx.size === 'L')))
+             || ((p.kind === 'blanks' || p.kind === 'expand-line') && String(p.frame || p.n || '').length > 34)
+             || (p.kind === 'order' && (p.nums || []).length >= 5)
+-            || (p.kind === 'estimate' && ctx.size === 'L' && String(p.expr || '').length > 11);
++            || (p.kind === 'estimate' && ctx.size === 'L' && String(p.expr || '').length > 11)
++            || (p.kind === 'frame' && Array.isArray(p.story) && p.story.length > 0);
+         // A long word-name list is ONE column, never measured into two: squeezed, every name wraps
+         // to three lines and a page holds one item beside an empty column. Its height is the
+         // numeral plus four one-line names.
+diff --git a/js/modules/sheet/cells/three-factors.js b/js/modules/sheet/cells/three-factors.js
+new file mode 100644
+index 00000000..60ca497c
+--- /dev/null
++++ b/js/modules/sheet/cells/three-factors.js
+@@ -0,0 +1,69 @@
++// js/modules/sheet/cells/three-factors.js
++// The `three-factors` template (multiplication:multiply_three_numbers, skill coverage lane A 2026-10-17;
++// build list `mult_three`, 3.OA.B.5 associative property): one to two number sentences of three factors,
++// each written a pair at a time, the pupil's numbers in boxes.
++//
++// payload: {form, a, b, c, lines: [[part, ...], ...]}
++//   a part is a string (a number, a sign, a bracket) or {id, value} (a box the pupil writes; value = the key)
++//   form 0  (2 × 5) × 7 = [10] × 7 = [70]                  the easy pair bracketed (the prompt)
++//   form 1  2 × 7 × 5 = [10] × 7 = [70]                    no brackets: the pupil chooses the pair
++//   form 2  (3 × 4) × 2 = [12] × 2 = [24]                   two ways, the same product (associative)
++//           3 × (4 × 2) = 3 × [8] = [24]
++//   form 3  2 × [ ] × 7 = 70                               the missing factor
++//
++// Black and white, Andika, digits at the page's digit size (ctx metrics, ops-common geo), boxes at the
++// strip height. Key (AK-1): every box filled. Slot ids b0, b1, ... in reading order (on screen they join,
++// ", ", into the item's answer).
++//
++// Pure module (SCC-01).
++
++import { register } from '../registry.js';
++import { geo, root, inkOf, slotValues, box, esc, splitList } from './ops-common.js';
++
++const boxesOf = (p) => (p.lines || []).flat().filter((x) => x && typeof x === 'object');
++const keyOf = (p) => { const o = {}; boxesOf(p).forEach((x) => { o[x.id] = String(x.value); }); return o; };
++const boxW = (g, v) => Math.max(g.writeMm * (String(v).length > 1 ? 1.8 : 1.2), String(v).length * 0.62 * g.E + 3);
++
++function lineHTML(g, parts, at) {
++    return `<div style="display:inline-flex;align-items:center;gap:0.22em;white-space:nowrap">${parts.map((x) => (typeof x === 'object'
++        ? box(g, x.id, { wMm: boxW(g, x.value), hMm: g.stripMm, value: at(x.id).value, ink: at(x.id).ink, mark: 'cell' })
++        : `<span>${esc(x)}</span>`)).join('')}</div>`;
++}
++function widthMm(g, p) {
++    let w = 0;
++    for (const parts of p.lines || []) {
++        let lw = 0;
++        for (const x of parts) lw += (typeof x === 'object' ? boxW(g, x.value) : String(x).length * 0.62 * g.E) + 0.22 * g.E;
++        w = Math.max(w, lw);
++    }
++    return w;
++}
++
++register('three-factors', {
++    render(p, ctx) {
++        const g = geo(ctx);
++        const ink = inkOf(ctx);
++        const key = keyOf(p);
++        const ids = Object.keys(key);
++        const vals = slotValues(ctx, key, (w) => { const l = splitList(w); const o = {}; ids.forEach((id, i) => { o[id] = l[i]; }); return o; });
++        const at = (id) => ({ value: vals[id] || '', ink });
++        const inner = `<div${g.twin ? ' data-mq-join=", "' : ''} style="display:flex;flex-direction:column;align-items:center;gap:${g.em(3)}">${(p.lines || []).map((l) => lineHTML(g, l, at)).join('')}</div>`;
++        return root(g, 'three-factors', inner, 'text-align:center;width:100%;', widthMm(g, p) + 6);
++    },
++    answerKey(p) {
++        const k = keyOf(p);
++        const ids = Object.keys(k);
++        const slots = {};
++        ids.forEach((id) => { slots[id] = { value: k[id], graded: true }; });
++        const display = ids.map((id) => k[id]).join(', ');
++        return { value: ids.length === 1 ? Number(k[ids[0]]) : display, display, slots };
++    },
++    footprint(p, ctx) {
++        const w = Math.ceil(widthMm(geo(ctx), p) + 8);
++        return { wMm: w, hMm: null, measure: true, factLike: false, maxCols: w > 88 ? 1 : 2 };
++    },
++    inputs(p) { return Object.keys(keyOf(p)).map((id, i) => ({ id, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full'] })); },
++    layout(p) { return { card: 'card-medium-visual', checker: Object.keys(keyOf(p)).length === 1 ? 'value' : 'list' }; },
++});
++
++export default {};
+diff --git a/js/modules/sheet/cells/which-right.js b/js/modules/sheet/cells/which-right.js
+new file mode 100644
+index 00000000..cac01456
+--- /dev/null
++++ b/js/modules/sheet/cells/which-right.js
+@@ -0,0 +1,54 @@
++// js/modules/sheet/cells/which-right.js
++// The `which-right` template (skill coverage lane A, 2026-10-17): ANY skill's item asked as "Which is
++// right?" - the item's own question, then four answers A to D, one right and three of the skill
++// provider's wrong answers (its named misconceptions). The pupil ticks one box. It is the Check
++// Question of every detailed lesson as a pupil item (the shared `whichRight` option,
++// js/modules/which-right.js, applies it to any skill on every host).
++//
++// payload: {stem: [lines], choices: [4 strings], correct: index}
++//
++// Black and white, Andika, the kit's sizes (ctx metrics through k2kit): the stem at text size + 2,
++// each answer in a ruled box at digit size x 0.8 with its letter, a tick box beside it.
++// Key (AK-1): the right answer's box ticked. Error analysis ticks the provider's wrong answer.
++//
++// Pure module (SCC-01).
++
++import { register } from '../registry.js';
++import { esc } from '../cell.js';
++import { L, P, B, INK, root, checkBox, textPt, digitPt } from './k2kit.js';
++
++const LETTERS = ['A', 'B', 'C', 'D'];
++
++function tickedIndex(p, ctx) {
++    if (ctx.state === 'blank') return -1;
++    if (ctx.state === 'wrong') {
++        const w = String((ctx.wrong && ctx.wrong.value) || '').trim();
++        const i = (p.choices || []).findIndex((c) => String(c).trim() === w);
++        return i >= 0 ? i : ((p.correct || 0) + 1) % Math.max(1, (p.choices || []).length);
++    }
++    return p.correct || 0;
++}
++
++register('which-right', {
++    render(p, ctx) {
++        const on = tickedIndex(p, ctx);
++        const stem = (p.stem || []).map((l) => `<div>${esc(l)}</div>`).join('');
++        const rows = (p.choices || []).map((c, i) => `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.5)} 0;">`
++            + `<b style="width:${L(ctx, 6)};text-align:right;font-size:${P(ctx, textPt(ctx) + 2)};">${LETTERS[i]}</b>`
++            + `<span style="flex:1;border:${B(ctx, 1)} solid ${INK};border-radius:${L(ctx, 1.5)};padding:${L(ctx, 1)} ${L(ctx, 3)};text-align:left;`
++            + `font-size:${P(ctx, digitPt(ctx) * 0.8)};font-weight:700;line-height:1.15;">${esc(c)}</span>`
++            + checkBox(ctx, { id: `c${i}`, on: on === i, slot: false }) + '</div>').join('');
++        return root(ctx, 'k2-which-right', `<div style="text-align:left;font-size:${P(ctx, textPt(ctx) + 2)};line-height:1.3;margin-bottom:${L(ctx, 2)};">${stem}</div>`
++            + `<div data-ws-slot="answer" data-ws-shape="check"${on >= 0 ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : ''}>${rows}</div>`);
++    },
++    answerKey(p) {
++        const i = p.correct || 0;
++        const v = (p.choices || [])[i];
++        return { value: v, display: `${LETTERS[i]} ${v}`, slots: { answer: { value: v, graded: true } } };
++    },
++    footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 }; },
++    inputs() { return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }]; },
++    layout() { return { card: 'card-medium-visual', checker: 'choice' }; },
++});
++
++export default {};
+diff --git a/js/modules/sheet/cells/word-work.js b/js/modules/sheet/cells/word-work.js
+index 48c16705..e768ed34 100644
+--- a/js/modules/sheet/cells/word-work.js
++++ b/js/modules/sheet/cells/word-work.js
+@@ -983,16 +983,25 @@ function barLayout(p, ctx) {
+     const wa = pa === pb ? W / 2 : (pa > pb ? W - small : small);
+     const fmt = (n) => Number(n).toLocaleString('en-US');
+     // (`gradeParts`, lesson 2 r4 - critic r2 n9: the exit slip's sort reads the bar, so its boxes are graded there)
+-    const lab = (v) => `<span${p.gradeParts ? '' : ' data-ws-graded="0"'} data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}"${put && ink ? ` data-ws-ink="${ink}"` : ''}>${put ? esc(fmt(v)) : ''}</span>`;
++    // (`barFill`, the skill option - skill coverage lane A 2026-10-17: on screen every bar box and the answer box is
++    // a typed box, joined in reading order - whole, part, part, answer - into the item's answer)
++    const twin = isTwin(ctx);
++    const cell = (label) => (twin ? ` data-mq-cell data-mq-w="2" data-mq-label="${esc(label)}"` : '');
++    let li = 0;
++    const lab = (v) => `<span${p.gradeParts ? '' : ' data-ws-graded="0"'} data-ws-slot="bar"${cell(['the whole', 'a part', 'the other part'][li++] || 'a part')} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}"${put && ink ? ` data-ws-ink="${ink}"` : ''}>${put ? esc(fmt(v)) : ''}</span>`;
+     const seg = (w, v, left) => `<span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, segH)};border:${B(ctx, 1)} solid ${INK};${left ? '' : 'border-left:none;'}background:#fff;">${lab(v)}</span>`;
+     const bar = `<div class="mq-wwbar" aria-label="bar model" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 1.5)};">`
+         + `<div style="display:flex;">${seg(W, whole, true)}</div><div style="display:flex;">${seg(wa, pa, true)}${seg(W - wa, pb, false)}</div></div>`;
+     const bx = boxMm(ctx);
+     const aw = Math.max(blankWidth(2, size), bx * 1.4);
+     const shown = put ? String(p.ans) : '';
+-    const box = `<span data-ws-slot="answer" data-ws-shape="box"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, aw)};height:${tw(ctx, bx + 1)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}">${esc(shown)}</span>`;
++    const box = `<span data-ws-slot="answer" data-ws-shape="box"${cell('the answer')}${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, aw)};height:${tw(ctx, bx + 1)};border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}">${esc(shown)}</span>`;
+     const ans = `<div class="mq-wwanswer" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx) + 1)};">${box}${p.unit ? `<span style="font-weight:700;line-height:1.1;">${esc(p.unit)}</span>` : ''}</div>`;
+-    const work = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 3)};">${bar}${ans}</div>`;
++    const work = `<div${twin ? ' data-mq-join=", "' : ''} style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 3)};${twin ? 'flex-wrap:wrap;justify-content:center;' : ''}">${bar}${ans}</div>`;
++    if (twin) {
++        return `<div class="mq-ww mq-wwbarlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;">${storyHTML(ctx, p, true)}`
++            + `<div style="margin-top:${L(ctx, 2)};display:flex;justify-content:center;">${work}</div></div>`;
++    }
+     // (`storyTight`, lesson 2 r4: a one-across cell sets its story at the Practice cells' size and leading,
+     // so two full-size stories with their bars fit a 132.5 mm exit-slip half)
+     // (`beside`: the story on the left, the bar and answer on the right - a one-across cell on a half page)
+@@ -1004,10 +1013,38 @@ function barLayout(p, ctx) {
+         + `<div style="margin-top:${L(ctx, 1.5)};">${work}</div></div>`;
+ }
+ 
++/**
++ * `layout: 'eq'` (the skill option `wpEquation`, skill coverage lane A 2026-10-17 - detailed lesson 2's word
++ * problem): the story, then the equation the pupil writes - a number box, a sign circle, a number box, "=",
++ * the answer box - and the label word printed after it. On screen the four places are typed boxes joined in
++ * that order (the sign box takes a sign: data-mq-kind). The story numbers may come in either order.
++ */
++function eqLayout(p, ctx) {
++    const size = sizeOf(ctx);
++    const put = filled(ctx);
++    const ink = put ? inkOf(ctx) : null;
++    const twin = isTwin(ctx);
++    const st = p.steps[0];
++    const bx = boxMm(ctx);
++    const w = Math.max(blankWidth(2, size), bx * 1.4);
++    const fmt = (n) => Number(n).toLocaleString('en-US');
++    const cell = (label, kind) => (twin ? ` data-mq-cell data-mq-w="2" data-mq-label="${esc(label)}"${kind ? ` data-mq-kind="${kind}"` : ''}` : '');
++    const box = (id, v, label, heavy) => `<span data-ws-slot="${id}" data-ws-shape="box"${id === 'answer' ? '' : ' data-ws-graded="0"'}${cell(label)}${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx + 1)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1.25)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}">${put ? esc(v) : ''}</span>`;
++    const d = bx + 1;
++    const sign = `<span data-ws-slot="op0" data-ws-shape="circle" data-ws-graded="0"${cell('the sign', 'sign')}${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, d)};height:${tw(ctx, d)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${ink === 'trace' ? GREY : INK};">${put ? esc(GLYPH[st.op]) : ''}</span>`;
++    const eq = `<span style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;">=</span>`;
++    const row = `<div class="mq-wweq"${twin ? ' data-mq-join=", "' : ''} style="display:flex;align-items:center;gap:${L(ctx, 2)};flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:${twin ? 'center' : 'flex-start'};">`
++        + `${box('eq-a', fmt(st.top), 'a story number')}${sign}${box('eq-b', fmt(st.bottom), 'the other number')}${eq}${box('answer', fmt(p.ans), 'the answer', true)}`
++        + `${p.unit ? `<span style="font-size:${P(ctx, textPt(ctx) + 2)};font-weight:700;">${esc(p.unit)}</span>` : ''}</div>`;
++    return `<div class="mq-ww mq-wweqlayout" data-ww-ops="${st.op}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, 2.5)};">${storyHTML(ctx, p, true)}`
++        + `<div style="margin-top:${L(ctx, 2.5)};">${row}</div></div>`;
++}
++
+ register(WW_TEMPLATE, {
+     render(p, ctx) {
+         if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
+-        if (p.layout === 'bar' && p.bar && p.steps.length === 1 && !isTwin(ctx)) return barLayout(p, ctx);
++        if (p.layout === 'bar' && p.bar && p.steps.length === 1 && (!isTwin(ctx) || p.barFill)) return barLayout(p, ctx);
++        if (p.layout === 'eq' && p.steps.length === 1) return eqLayout(p, ctx);
+         const twin = isTwin(ctx);
+         // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
+         // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
+@@ -1054,13 +1091,14 @@ register(WW_TEMPLATE, {
+     answerKey(p) {
+         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };
+         // the answer row's digit boxes (the one answer place when the answer is the row's result)
+-        if (p.inRow !== false && p.layout !== 'bar' && Array.isArray(p.steps) && p.steps.length) {
++        if (p.inRow !== false && p.layout !== 'bar' && p.layout !== 'eq' && Array.isArray(p.steps) && p.steps.length) {
+             const st = p.steps[p.steps.length - 1];
+             const T = st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
+             const d = String(p.ans).padStart(T, ' ');
+             for (let i = 0; i < T; i++) slots[`ans-${i}`] = { value: d[i] === ' ' ? '' : d[i], graded: d[i] !== ' ' };
+         }
+-        if (p.unit && p.layout !== 'bar') slots['answer-label'] = { value: p.unit, graded: false };
++        if (p.unit && p.layout !== 'bar' && p.layout !== 'eq') slots['answer-label'] = { value: p.unit, graded: false };
++        if (p.layout === 'eq' && Array.isArray(p.steps) && p.steps.length === 1) { slots['eq-a'] = { value: String(p.steps[0].top), graded: false }; slots['eq-b'] = { value: String(p.steps[0].bottom), graded: false }; }
+         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });
+         return { value: p.ans, display: p.unit ? `${Number(p.ans).toLocaleString('en-US')} ${p.unit}` : String(p.ans), slots };
+     },
+diff --git a/js/modules/sheet/contract.js b/js/modules/sheet/contract.js
+index 63d3ed4a..0623b0e3 100644
+--- a/js/modules/sheet/contract.js
++++ b/js/modules/sheet/contract.js
+@@ -55,6 +55,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
+     add: 'Add.',
+     subtract: 'Subtract.',
+     multiply: 'Multiply.',
++    // (three factors, a pair at a time - multiplication:multiply_three_numbers, skill coverage lane A 2026-10-17)
++    'multiply-pair': 'Multiply a pair first. Write the numbers.',
+     divide: 'Divide.',
+     'mixed-sign': 'Add or subtract. Look at the _sign_.',
+     'mixed-ops': 'Look at the _sign_. Solve.',
+diff --git a/js/modules/sheet/index.js b/js/modules/sheet/index.js
+index 5e0911a0..04983641 100644
+--- a/js/modules/sheet/index.js
++++ b/js/modules/sheet/index.js
+@@ -130,6 +130,10 @@ import './cells/bond.js';
+ import './cells/chartwindow.js';
+ import './cells/seqstrip.js';
+ import './cells/compare.js';
++// Any skill's item asked as "Which is right?" A-D (the shared `whichRight` option; skill coverage lane A, 2026-10-17).
++import './cells/which-right.js';
++// Three factors, a pair at a time (multiplication:multiply_three_numbers, 3.OA.B.5 associative; lane A 2026-10-17).
++import './cells/three-factors.js';
+ import './cells/wordpic.js';
+ // Every whole-number word problem (owner ruling 2026-09-25): story, sign row, column boxes, answer + unit bank.
+ export { barMini } from './cells/word-work.js';
+diff --git a/js/modules/sheet/providers/multiplication.js b/js/modules/sheet/providers/multiplication.js
+index dcb800b3..8c8b6f57 100644
+--- a/js/modules/sheet/providers/multiplication.js
++++ b/js/modules/sheet/providers/multiplication.js
+@@ -225,6 +225,56 @@ registerSkill('multiplication:area_model_mult_hard', {
+ // (fill, the factors on its edges, shading multiples, a row's rule), and each needs its own words.
+ 
+ 
++/* ===================================================================== multiply_three_numbers */
++// Skill coverage lane A (2026-10-17), build list mult_three (3.OA.B.5, the associative property): the
++// `three-factors` cell. Misconceptions: adds the third number (2 × 5 = 10, 10 + 7 = 17), multiplies one
++// pair and stops (10), and (two ways) a different product for the second way.
++const threeOf = (q) => {
++    const c = q && q.cell;
++    if (!c || c.template !== 'three-factors') return null;
++    const p = obj(c.payload);
++    if (!p || !Array.isArray(p.lines)) return null;
++    const boxes = p.lines.flat().filter((x) => x && typeof x === 'object');
++    const nums = (p.lines[0] || []).filter((x) => typeof x === 'string' && /^\d+$/.test(x)).map(Number);
++    return { form: Number(p.form) || 0, boxes, nums, lines: p.lines };
++};
++registerSkill('multiplication:multiply_three_numbers', {
++    strings: (ref = {}) => {
++        const t = threeOf(ref && ref.q);
++        return strings({
++            iCan: 'I Can multiply three numbers',
++            instructionKey: t && t.form === 3 ? 'missing' : 'multiply-pair',
++            steps: t && t.form === 3 ? ['Multiply the two numbers you know.', 'What times that makes the product?', 'Write the missing number.']
++                : ['Find the easy pair.', 'Multiply the pair first.', 'Multiply by the last number.'],
++            say: 'I multiply a pair first. The product is __.',
++            sayValues: (q) => { const t2 = threeOf(q); return t2 && t2.boxes.length ? [t2.boxes[t2.boxes.length - 1].value] : ''; },
++        })(ref);
++    },
++    misconceptions: ['three-adds-third', 'three-stops', 'three-new-product'],
++    workedSteps: (q) => {
++        const t = threeOf(q);
++        if (!t) return [];
++        return t.boxes.map((b, i) => step(i === 0 ? `Multiply the pair first: ${b.value}.` : `Then: ${b.value}.`, [{ slot: b.id, value: String(b.value) }]));
++    },
++    wrongAnswer: (q) => {
++        const t = threeOf(q);
++        if (!t) return null;
++        const v = t.boxes.map((b) => Number(b.value));
++        if (t.form === 3) {
++            const P = Number(t.lines[0][t.lines[0].length - 1]);
++            return chooseWrong(q, [{ value: P, misconception: 'three-stops', explain: 'Wrote the product, not the missing factor.' }]);
++        }
++        const third = v[0] ? v[1] / v[0] : 0;
++        const cands = [
++            { value: [v[0], v[0] + third, ...v.slice(2)].join(', '), misconception: 'three-adds-third', explain: `Added the last number: ${v[0]} + ${third}. Multiply it.` },
++            { value: [v[0], v[0], ...v.slice(2)].join(', '), misconception: 'three-stops', explain: `Multiplied one pair and stopped at ${v[0]}.` },
++        ];
++        if (t.form === 2 && v[2]) cands.push({ value: [v[0], v[1], v[2], v[3] / v[2] + v[2]].join(', '), misconception: 'three-new-product', explain: `Added the last pair: ${v[3] / v[2]} + ${v[2]}. Both ways give the same product.` });
++        return chooseWrong(q, cands);
++    },
++    footprint: { kind: 'three-factors', factLike: false, maxCols: 2, measure: true },
++});
++
+ /* ===================================================================== mult_properties */
+ // Form 0 (the order property, lesson 3a) draws the `arrays-turn` cell; forms 1-3 are still legacy
+ // items, so every hook below answers for a turn item and stays out of the way of the others.
+diff --git a/js/modules/sheet/roles/compose.js b/js/modules/sheet/roles/compose.js
+index b73affeb..147d1c8b 100644
+--- a/js/modules/sheet/roles/compose.js
++++ b/js/modules/sheet/roles/compose.js
+@@ -268,6 +268,10 @@ export function instructionText(key, items) {
+ export function answerOf(it) {
+     const k = it.key || {};
+     const q = it.q || {};
++    // (a story written in its bar or as its equation - add_wp_20 barFill / wpEquation, skill coverage lane A
++    // 2026-10-17: the item's answer is the story's answer; q.ans lists every box the screen joins)
++    const wp = q.cell && q.cell.template === 'word-work' && q.cell.payload;
++    if (wp && (wp.barFill || wp.layout === 'eq') && wp.ans !== undefined) return String(wp.ans);
+     if (q.ans !== undefined && q.ans !== null && typeof q.ans !== 'object') return String(q.ans);
+     // A several-part answer (a cloze's two parts): its parts in order, comma separated - the
+     // form the host writes into a cell's boxes one part per box.
+diff --git a/js/modules/skill-option-keys.js b/js/modules/skill-option-keys.js
+index d5f61448..9e4a5470 100644
+--- a/js/modules/skill-option-keys.js
++++ b/js/modules/skill-option-keys.js
+@@ -194,6 +194,10 @@ export const MULTI_KEYS = Object.freeze({
+     tenValues: '4F',     // value form times: write both values before circling
+     tenPlain: '4G',      // value form times: the digit and zeros only (700 and 70)
+     // NEXT FREE IN 4E-4O: 4H.
++    // Skill coverage lane A (2026-10-17) takes 4E-4O TOP-DOWN (the lesson builders take it bottom-up).
++    teens: '4O',         // expand, number_word_form: some numbers end in a teen (213, not 230)
++    story: '4N',         // combine: the parts told as a story (groups of 100, of 10, and more)
++    // NEXT FREE FROM THE TOP OF 4E-4O: 4M.
+ 
+     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
+     members: '5A',       // mixed pools: which member skills / categories the pool draws from
+@@ -210,6 +214,8 @@ export const MULTI_KEYS = Object.freeze({
+     units: '5L',         // measurement: which units
+     parts: '5M',         // equal parts, or the parts a figure is split into
+     divForm: '5N',       // div_facts: standard / long division / fraction / vertical / mix (2026-10-03)
++    // Skill coverage lane A (2026-10-17) takes the lessons sub-range 5N-5Z TOP-DOWN.
++    whichRight: '5Z',    // EVERY skill (universal): the item asked as "Which is right?" A to D (which-right.js)
+     // NEXT FREE IN BLOCK 5: 5P.
+ 
+     // Block 6 — O2 easier / harder ladders (design/audit/OPTIONS-CRITIC-R2.md §5 #5, #13; 2026-09-25).
+@@ -234,6 +240,13 @@ export const MULTI_KEYS = Object.freeze({
+     wpCues: '8A',        // bold + underline the key words in the story
+     wpBank: '8B',        // the keyword bank box beside the story
+     wpBar: '8C',         // a bar model with blank labels under the story
++    // Skill coverage lane A (2026-10-17) takes the operations sub-range 3N-3Z TOP-DOWN: add_wp_20 (detailed lesson 2).
++    wpParts: '3Z',       // add_wp_20: any two numbers / both 3-9 across ten (+ some wholes of 20)
++    barFill: '3Y',       // add_wp_20: the parts and the whole written in the bar
++    wpEquation: '3X',    // add_wp_20: the equation written, sign included
++    wpShort: '3W',       // add_wp_20: the question in its short form
++    minProduct: '3V',    // mult_properties (lesson 3a): the smallest product of an Order item
++    maxProduct: '3U',    // mult_properties (lesson 3a): the largest product of an Order item
+     // NEXT FREE IN BLOCK 8: 8D.
+ 
+     // Block 9 — O6 appearance (2026-09-25). 9F-9J: lane AP2 (figures and data). Figure labels
+@@ -296,6 +309,8 @@ export const VALUE_TOKENS = Object.freeze({
+         // block 1 P10 time + money (`all` reuses A)
+         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
+     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
++    teens: Object.freeze({ none: 'N', some: 'S' }),
++    wpParts: Object.freeze({ any: 'A', bridge: 'B' }),
+     answerSlot: Object.freeze({ line: 'L', hto: 'H' }),
+     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
+     order: Object.freeze({ largest: 'L', scrambled: 'S',
+@@ -450,6 +465,8 @@ export const SCALAR_ONLY = Object.freeze({
+     winRows: 'decimal', winCols: 'decimal', minFactor: 'decimal', ftTrap: 'bool',
+     // lesson 6 (2026-10-17)
+     tenValues: 'bool', tenPlain: 'bool',
++    // skill coverage lane A (2026-10-17)
++    story: 'bool', whichRight: 'bool', barFill: 'bool', wpEquation: 'bool', wpShort: 'bool', minProduct: 'decimal', maxProduct: 'decimal',
+     // wave 5.2: the number line (Start / End are signed decimals: N = minus, P = point)
+     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
+ });
+diff --git a/js/modules/skill-options.js b/js/modules/skill-options.js
+index e33ab288..16b90f90 100644
+--- a/js/modules/skill-options.js
++++ b/js/modules/skill-options.js
+@@ -649,6 +649,13 @@ const _pvExpandFrame = () => ({
+     ],
+     help: 'The boxes are the support; the line is the fade. On the line a zero part may be left out.',
+ });
++// `teens` (skill coverage lane A, 2026-10-17; detailed lesson 1's Comparative atom): a teen ending
++// (213, 517) dealt by option, not hoped for. Off by default, so every saved code deals as before.
++const _pvTeens = (help) => ({
++    id: 'teens', label: 'A teen ending (213, 517)', type: 'enum', default: 'none', group: 'difficulty',
++    values: [{ v: 'none', l: 'As it comes' }, { v: 'some', l: 'Some numbers' }],
++    help,
++});
+ const _pvExpandForm = () => ({
+     id: 'form', label: 'How the parts are written', type: 'enum', default: 'sum', group: 'layout',
+     values: [
+@@ -734,11 +741,16 @@ function _pvRoundNl(id) {
+ const P9_PV_OPTIONS = {
+     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
+     'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions()],
+-    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
++    'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm(),
++        _pvTeens('Some 3-digit numbers (one in six) have 1 ten: 213 = 200 + 10 + 3, not 200 + 30 + 1.')],
+     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
+         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
+         values: [{ v: 'largest', l: 'Largest first' }, { v: 'scrambled', l: 'Scrambled (5 + 300 + 20)' }],
+         help: 'Scrambled parts are harder: the pupil has to put each part in its place.',
++    }, {
++        // Skill coverage lane A (2026-10-17): detailed lesson 1's word problem, dealt by the skill.
++        id: 'story', label: 'As a story', type: 'bool', default: false, group: 'layout',
++        help: 'The parts told as a story: "Sam has 4 bags of 100 beads. Sam has 6 more beads." The pupil writes the number. 3-digit numbers (Numbers to 999).',
+     }],
+     'placevalue:compare': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvCloseness(), _pvLengths()],
+     'placevalue:order_least_to_greatest': [_pvBand([99, 999, 9999, 99999, 999999], 999), _pvOrderCount(), _pvCloseness(), _pvLengths()],
+@@ -1558,8 +1570,11 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
+     // Max Number setting, the old behaviour (10 up to Max Number), so every saved code deals as it
+     // did. 20 / 100 / 1,000 deal from just above the band below (11-20, 21-100, 101-1,000).
+     id: 'band', label: 'Numbers to', type: 'enum', default: 0, group: 'difficulty',
+-    values: [{ v: 0, l: 'Max Number setting' }, { v: 20, l: '20' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }],
+-    help: 'The numbers the page reads and writes. 1,000 deals 101 to 1,000.',
++    // (99 and 999 appended, skill coverage lane A 2026-10-17: the detailed lesson's paper ranges, 21-99 and
++    // 101-999 - 1,000 is shown on the board, never written by the pupil)
++    values: [{ v: 0, l: 'Max Number setting' }, { v: 20, l: '20' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' },
++        { v: 99, l: '99 (21 to 99)' }, { v: 999, l: '999 (101 to 999, no 1,000)' }],
++    help: 'The numbers the page reads and writes. 1,000 deals 101 to 1,000; 999 deals 101 to 999.',
+ }, {
+     id: 'zeroPlace', label: 'A zero place (305, 340)', type: 'enum', default: 'none', group: 'difficulty',
+     values: [{ v: 'none', l: 'Never' }, { v: 'some', l: 'Some numbers (every third)' }, { v: 'always', l: 'Every number' }],
+@@ -1571,7 +1586,7 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
+     id: 'answerSlot', label: 'Write the number', type: 'enum', default: 'line', group: 'support',
+     values: [{ v: 'line', l: 'On a line' }, { v: 'hto', l: 'In H T O boxes (one digit a box)' }],
+     help: 'H T O boxes: three boxes, three digits - a missing tens word still gets its 0. Words to numeral only.',
+-}];
++}, _pvTeens('Some numbers (every third) end in a teen: two hundred thirteen is 213, not 230. Numbers to 999 or 1,000.')];
+ 
+ // ===========================================================================
+ // P10 · TIME + MONEY  (design/research/time-money.md §2.5, owner rulings of 2026-09-25 in §20)
+@@ -2069,6 +2084,12 @@ const P12_OPTIONS = {
+             { v: 'none', l: 'None: the pupil counts the rows and the columns' }], 'label',
+         'The caption names the two factors; without it the pupil finds them in the picture.', 'support'),
+     ],
++    // Skill coverage lane A (2026-10-17, build list mult_three; 3.OA.B.5 associative): three factors, a pair at a time.
++    'multiplication:multiply_three_numbers': [
++        formsOption([{ v: 0, l: 'The easy pair in brackets: (2 × 5) × 7' }, { v: 1, l: 'Choose the pair: 2 × 7 × 5' },
++            { v: 2, l: 'Two ways, the same product: (3 × 4) × 2 and 3 × (4 × 2)' }, { v: 3, l: 'The missing factor: 2 × __ × 7 = 70' }],
++        { label: 'Which items', help: 'Most support first: the brackets show the pair to multiply first. Two ways shows the order of the pairs does not change the product.' }),
++    ],
+     'multiplication:mult_properties': [
+         formsOption([{ v: 0, l: 'Order (3 × 4 = 4 × 3)' }, { v: 1, l: 'Breaking apart (6 × 7 = 6 × 5 + 6 × 2)' },
+             { v: 2, l: 'Times 1' }, { v: 3, l: 'Times 0' }], { label: 'Which property' }),
+@@ -2076,11 +2097,23 @@ const P12_OPTIONS = {
+         // Lesson 3a (2026-10-16): what an Order item asks (form 0 only), and how big its factors get.
+         { id: 'task', label: 'Order items ask', type: 'set', group: 'difficulty', default: [0],
+             values: [{ v: 0, l: 'An array and its turn: write both products' }, { v: 1, l: 'A known fact: write the turned fact' },
+-                { v: 2, l: 'Facts only, no pictures: the missing number' }],
+-            allLabel: 'All three, mixed',
++                { v: 2, l: 'Facts only, no pictures: the missing number' },
++                // (3 appended, skill coverage lane A 2026-10-17: lesson 3a's word problem as the skill's own item)
++                { v: 3, l: 'A turn story: "A tray has 5 rows of 8. Turn it. How many in each row now?"' }],
++            allLabel: 'All four, mixed',
+             help: 'Order (3 × 4 = 4 × 3) items only. One kind is one page instruction; tick more to mix them. The pictured arrays are at most 5 rows of 5.' },
+         _opsBand([25, 81], 25, { label: 'Order factors to', labels: { 25: '5 (5 × 5)', 81: '9 (9 × 9, facts only)' },
+             help: 'The largest factor of an Order item: the product is at most 25 or 81. The arrays stay at 5 × 5; 9 reaches the facts-only items.' }),
++        // Lesson 3a's product floors as options (skill coverage lane A, 2026-10-17). 0 / 2 (the defaults) bound nothing.
++        { id: 'minProduct', label: 'Smallest product', type: 'enum', default: 0, group: 'difficulty',
++            values: [{ v: 0, l: 'Any (from 4)' }, { v: 6, l: '6' }, { v: 12, l: '12' }],
++            help: 'Order items only. Leaves out the smallest facts (2 × 2, 2 × 3), so the pupil cannot just count.' },
++        { id: 'maxProduct', label: 'Largest product', type: 'enum', default: 0, group: 'difficulty',
++            values: [{ v: 0, l: 'As the factors allow' }, { v: 16, l: '16' }, { v: 20, l: '20' }],
++            help: 'Order items only. Small arrays and their turns stand side by side in a half-width cell.' },
++        { id: 'minFactor', label: 'Smallest factor', type: 'enum', default: 2, group: 'difficulty',
++            values: [{ v: 2, l: '2' }, { v: 3, l: '3 (no × 2 facts)' }],
++            help: 'Order items only. 3 leaves out every × 2 fact: both numbers are 3 or more.' },
+     ],
+     'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
+         { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],
+@@ -3282,6 +3315,23 @@ const WORD_WORK_OPTIONS = (bar) => [
+     }
+ }
+ 
++// ---- add_wp_20: detailed lesson 2's story as skill options (skill coverage lane A, 2026-10-17) ----------
++// Every range, case and response lesson 2's paper deals, so a pupil practising add_wp_20 online with the
++// lesson's options meets the same stories and writes the same things. All OFF by default (old codes unchanged).
++SKILL_OPTIONS['addition:add_wp_20'] = [...(SKILL_OPTIONS['addition:add_wp_20'] || []),
++    { id: 'wpParts', label: 'The two numbers', type: 'enum', default: 'any', group: 'difficulty',
++        values: [{ v: 'any', l: 'Any two numbers (sum to 20)' }, { v: 'bridge', l: 'Both 3 to 9, the sum past 10 (count on across ten); some sums of 20' }],
++        help: 'Across ten: both story numbers are 3 to 9 and the whole is 11 to 18, so the pupil counts on past 10. One story in six has a whole of 20 (the edge case). No 1, 2 or 10.' },
++    { id: 'barFill', label: 'Write in the bar', type: 'bool', default: false, group: 'layout',
++        appliesTo: (cur) => cur.support === 'bar',
++        help: 'With the bar model on: the pupil writes the two parts and the whole in the bar, then the answer. Without it only the answer is written.' },
++    { id: 'wpEquation', label: 'Write the equation', type: 'bool', default: false, group: 'layout',
++        appliesTo: (cur) => cur.support !== 'bar' || !cur.barFill,
++        help: 'The pupil writes the equation: a story number, the sign, the other number and the answer (8 + 5 = 13). The sign is never printed.' },
++    { id: 'wpShort', label: 'Short question', type: 'bool', default: false, group: 'layout',
++        help: '"How many books now?" in place of "How many books does Mia have now?": every sentence fits one line.' },
++];
++
+ // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
+ // design/audit/OPTIONS-RUBRIC.md §1 O6. Each control changes how an item LOOKS — never the numbers
+ // dealt (O2) or the Support level (O3) — and the generator writes the choice into the item's kit
+@@ -3491,7 +3541,20 @@ export const skipAfterOption = () => ({
+     tip: 'Skip: how many wrong tries before the pupil may skip a question (0 = never).',
+     group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip after ${Number(v)}` : 'Skip off'),
+ });
+-export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];
++// `whichRight` (skill coverage lane A, 2026-10-17): the item asked as "Which is right?" A to D - its
++// right answer and three of the skill provider's wrong answers (which-right.js, the Check Question of
++// every detailed lesson). OFF by default, so every saved code deals as before; a skill whose provider
++// gives fewer than two wrong answers keeps its own item.
++export const whichRightOption = () => ({
++    id: 'whichRight', label: 'Which is right? (A to D)', type: 'bool', default: false, group: 'layout',
++    help: 'Each item becomes a choice: its right answer and three answers made by a common mistake. The pupil ticks (on paper) or taps (on screen) the right one. Skills with no known mistakes keep their own items.',
++    summary: (v) => (v ? 'Which is right? A to D' : ''),
++});
++export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption(), whichRightOption()];
++// Which skills can be asked as a choice (their provider names wrong answers): registered by
++// which-right.js, so this file stays import-free. Until it is registered the control is not shown.
++let _whichRightFits = null;
++export function registerWhichRightFits(fn) { _whichRightFits = typeof fn === 'function' ? fn : null; }
+ 
+ // ---------------------------------------------------------------------------
+ // MEASURED OPTIONS — every skill gets the settings its generator was seen to read
+@@ -3713,6 +3776,7 @@ export function offeredOptionsFor(categoryId, skillId) {
+         // stays in the model so an old share code still decodes, but the teacher never sees it.
+         if (o.hidden) continue;
+         if (sized && o.id === 'range' && !ownIds.has('range')) continue;
++        if (o.id === 'whichRight' && !(_whichRightFits && _whichRightFits(categoryId, skillId))) continue;
+         if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
+         // A review's own "Support, for the whole review" sets every member's level already.
+         if (ownIds.has('poolSupport')) continue;
+diff --git a/js/modules/standards-audit.js b/js/modules/standards-audit.js
+index 1f558354..6f0f9912 100644
+--- a/js/modules/standards-audit.js
++++ b/js/modules/standards-audit.js
+@@ -117,7 +117,9 @@ export const CCSS_AUDIT = {
+     '3.OA.A.2': F(['division:div_word_problems', 'division:share_into_groups', 'division:nl_div']),
+     '3.OA.A.3': F(['multiplication:mult_word_problems', 'division:div_word_problems', 'algebra:build_expr_multdiv']),
+     '3.OA.A.4': F(['division:missing_mult_div', 'number_ops_mixed:missing_factor_or_addend']),
+-    '3.OA.B.5': P(['multiplication:mult_properties'], ['the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0'], ['mult_three']),
++    // (skill coverage lane A 2026-10-17: multiply_three_numbers deals the associative property; properties as strategies to
++    // DIVIDE are dealt by division:area_model_div_2by1 (break apart to divide, tagged 4.NBT.B.6) - not judged full here)
++    '3.OA.B.5': P(['multiplication:mult_properties', 'multiplication:multiply_three_numbers'], ['properties as strategies to divide at grade 3 (break apart to divide: division:area_model_div_2by1, tagged 4.NBT.B.6)'], ['mult_three']),
+     '3.OA.B.6': F(['multiplication:mult_div_fact_family', 'division:missing_mult_div']),
+     '3.OA.C.7': F(['multiplication:mult_facts', 'division:div_facts']),
+     '3.OA.D.8': P(['algebra:multi_step_word', 'number_sense:estimate_sums_diffs'], ['two-step problems with × and ÷ (the skill\'s two steps are + and − only)', 'an equation with a letter for the unknown', 'one-step pools and tape diagrams were tagged here: tags moved to the one-step standards'], ['multi_step_four_ops', 'mental_estimate']),
+diff --git a/js/modules/standards.js b/js/modules/standards.js
+index 15df29e1..26a37e6d 100644
+--- a/js/modules/standards.js
++++ b/js/modules/standards.js
+@@ -194,6 +194,7 @@ export const SKILL_STANDARDS = {
+     'multiplication:arrays_groups': { ccss: ['2.OA.C.4', '3.OA.A.1'], ee: ['M.EE.2.OA.4', 'M.EE.3.OA.1', 'M.EE.4.OA.4'] }, // Arrays & Equal Groups (Visual)
+     'multiplication:dot_array_mult': { ccss: ['2.OA.C.4', '3.OA.A.1'], ee: ['M.EE.2.OA.4', 'M.EE.3.OA.1', 'M.EE.4.OA.4'] }, // Dot Array Multiplication (B&W)
+     'multiplication:mult_properties': { ccss: ['3.OA.B.5'], ee: [] }, // Multiplication Properties (Visual)
++    'multiplication:multiply_three_numbers': { ccss: ['3.OA.B.5', '4.OA.B.4'], ee: ['M.EE.4.OA.4'] }, // Multiply Three Numbers (skill coverage lane A, 2026-10-17: the associative property)
+     'multiplication:mult_word_problems': { ccss: ['3.OA.A.3'], ee: [] }, // Multiplication Word Problems
+     'multiplication:mult_word_problems_plain': { ccss: ['3.OA.A.3'], ee: [] }, // Multiplication Word Problems (No Pictures)
+     'multiplication:mult_comparison': { ccss: ['4.OA.A.2', '4.OA.A.1'], ee: ['M.EE.4.OA.2', 'M.EE.4.OA.1'] }, // Times as Many Word Problems (Visual)
+diff --git a/js/modules/which-right.js b/js/modules/which-right.js
+new file mode 100644
+index 00000000..67da3cf3
+--- /dev/null
++++ b/js/modules/which-right.js
+@@ -0,0 +1,118 @@
++// which-right.js — THE shared "Which is right?" response (skill coverage lane A, 2026-10-17).
++//
++// Every detailed lesson's Check Question asks "which is right?" A to D: one item of a skill, its right
++// answer and three of the skill provider's wrong answers (each a named misconception, the same set the
++// error-analysis and True or False? roles read). This module is the ONE place those choices are made:
++//
++//   whichRightAnswers(q)   {right, wrongs: [{display, misconception}]} from the item's provider -
++//                          its `wrongAnswers` list when it has one, else its `wrongAnswer` rotated
++//                          by seed (print-sheet.js's lesson Check Question reads this too)
++//   applyWhichRight(q)     the item turned into the choice, in place: answerType 'multiple-choice',
++//                          four options (the right one and three wrong ones, in a seeded order),
++//                          ans the right one, and the kit's `which-right` cell (print and key)
++//
++// The skill option is universal: `whichRight` (skill-options.js UNIVERSAL_OPTIONS, share key 5Z), so a
++// lesson's Check Question ref - `{categoryId, skillId, opts: {..., whichRight: true}}` - deals the same
++// item type online (practice card, online worksheet, quiz: answer buttons) and on paper (the
++// `which-right` cell, a tick box per answer). generate-question.js applies it after every other
++// post layer. An item whose provider gives fewer than two distinct wrong answers is left as it was
++// (a choice with one wrong answer is a coin toss), and so is an item that is already a choice.
++//
++// Layer 4 (reads the kit's provider registry; no DOM).
++
++import { getProvider } from './sheet/index.js';
++import { registerWhichRightFits } from './skill-options.js';
++
++// The control is offered on a skill whose provider names wrong answers (skill-options.js offeredOptionsFor).
++registerWhichRightFits((cat, skill) => {
++    let p = null;
++    try { p = getProvider(cat, skill); } catch (e) { p = null; }
++    return !!p && (typeof p.wrongAnswers === 'function' || typeof p.wrongAnswer === 'function');
++});
++
++/** The item's answer as one display string (an array joined, an object as JSON). */
++export const plainAnswer = (q) => (q && typeof q.ans === 'object' && q.ans !== null
++    ? (Array.isArray(q.ans) ? q.ans.join(', ') : JSON.stringify(q.ans))
++    : String(q && q.ans !== undefined ? q.ans : ''));
++
++/**
++ * The right answer and the provider's distinct wrong answers of one item.
++ * `rightOf(q)` writes the right answer the way the caller compares it (default: plainAnswer);
++ * `max` caps the rotated wrong answers (the `wrongAnswers` list is taken whole).
++ */
++export function whichRightAnswers(q, { rightOf = plainAnswer, max = 6 } = {}) {
++    let right = rightOf(q);
++    const wrongs = [];
++    let p = null;
++    try { p = getProvider((q && q.categoryId) || '', (q && q.skillId) || ''); } catch (e) { p = null; }
++    // A provider that lists EVERY misconception (`wrongAnswers`, with the right answer written the
++    // same way as `correct: true`) gives the options directly; else the one `wrongAnswer`, rotated.
++    let all = null;
++    try { all = p && typeof p.wrongAnswers === 'function' ? p.wrongAnswers(q) : null; } catch (e) { all = null; }
++    if (Array.isArray(all) && all.length) {
++        const r = all.find((w) => w.correct);
++        if (r) right = String(r.display);
++        for (const w of all) if (!w.correct && w.display !== undefined && !wrongs.some((x) => x.display === String(w.display))) wrongs.push({ display: String(w.display), misconception: w.misconception || '' });
++    }
++    const fromAll = wrongs.length > 0;
++    for (let s = 0; p && !fromAll && typeof p.wrongAnswer === 'function' && s < 40 && wrongs.length < max; s++) {
++        let w = null;
++        try { w = p.wrongAnswer(Object.assign({}, q, { seed: s })); } catch (e) { w = null; }
++        if (!w || w.display === undefined) continue;
++        const disp = String(w.display);
++        if (disp === right || wrongs.some((x) => x.display === disp)) continue;
++        wrongs.push({ display: disp, misconception: w.misconception || '' });
++    }
++    return { right, wrongs };
++}
++
++/** The item's question as plain lines (its story sentences, or its words), for the choice's stem. */
++function stemLines(q) {
++    const strip = (s) => String(s == null ? '' : s).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
++    const p = q && q.cell && q.cell.payload;
++    const words = (v) => Array.isArray(v) && v.length && v.every((l) => typeof l === 'string');
++    if (p && words(p.lines)) return p.lines.map(strip).filter(Boolean);
++    if (p && words(p.story)) return p.story.map(strip).filter(Boolean);
++    const t = strip(q && q.text);
++    return t ? t.split(/(?<=[.?!])\s+(?=[A-Z0-9])/).filter(Boolean) : [];
++}
++
++/** A seeded order of 0..n-1 (the item's seed, so a reprint is the same page; else Math.random). */
++function order(n, seed) {
++    let a = Number.isFinite(Number(seed)) ? (Number(seed) >>> 0) || 1 : Math.floor(Math.random() * 1e9) + 1;
++    const rnd = () => { a = (Math.imul(a ^ (a >>> 15), 2246822507) + 0x9E3779B9) >>> 0; return a / 4294967296; };
++    const out = Array.from({ length: n }, (_, i) => i);
++    for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
++    return out;
++}
++
++/**
++ * Turn one item into "Which is right?" A to D, in place, and return it. The item's own question
++ * stays (its words on the screen, its lines as the stem on paper); the original answer, text and
++ * cell are kept on `q.whichRightOf`.
++ */
++export function applyWhichRight(q, seed) {
++    if (!q || typeof q !== 'object' || q.whichRightOf) return q;
++    if (q.answerType === 'multiple-choice' || q.answerType === 'choice') return q;
++    const { right, wrongs } = whichRightAnswers(q);
++    if (!right || wrongs.length < 2) return q;
++    const picks = [right, ...wrongs.slice(0, 3).map((w) => w.display)];
++    const ord = order(picks.length, seed !== undefined ? seed : q.seed);
++    const choices = ord.map((i) => picks[i]);
++    const stem = stemLines(q);
++    q.whichRightOf = { text: q.text, ans: q.ans, answerType: q.answerType, cell: q.cell || null, misconceptions: wrongs.slice(0, 3) };
++    q.text = `${stem.join(' ')} Which answer is right?`.trim();
++    q.printText = 'Which answer is right? Tick it.';
++    q.screenInstr = 'Which answer is right? Tap it.';
++    q.instructionKey = '';
++    q.answerType = 'multiple-choice';
++    q.options = choices;
++    q.ans = right;
++    q.acceptedAnswers = [right];
++    q.inlineBlanksData = undefined;
++    q.interactiveType = undefined;
++    q.visual = '';
++    q.printFormat = 'which-right';
++    q.cell = { template: 'which-right', v: 1, payload: { stem: stem.concat(['Which answer is right?']), choices, correct: choices.indexOf(right) } };
++    return q;
++}
+diff --git a/js/modules/word-work.js b/js/modules/word-work.js
+index 74d61f8c..82ddb0d2 100644
+--- a/js/modules/word-work.js
++++ b/js/modules/word-work.js
+@@ -35,6 +35,15 @@ const TWO_STEP = new Set(['multi_step_word', 'multi_step_word_plain']);
+ /** Is `skillId` one of the word-problem skills that take the word-work cell? */
+ export const isWordWorkSkill = (skillId) => WP_RANGED.test(String(skillId || '')) || WP_SKILLS.has(String(skillId || ''));
+ 
++/**
++ * The question sentence in its short form (`wpShort`, skill coverage lane A 2026-10-17 - detailed lesson 2,
++ * AX-3 / SF-50): "How many books does Mia have now?" -> "How many books now?", "How many books do they have
++ * in all?" -> "How many books in all?", so every sentence of a story fits one line of its cell. The numbers
++ * never change. (print-sheet.js's lesson ref key `shortQuestion` is the same rewrite.)
++ */
++const SHORT_Q = [[/How many (\w+) does [A-Z][a-z]+ have now\?/, 'How many $1 now?'], [/How many (\w+) do they have in all\?/, 'How many $1 in all?']];
++export const shortStoryQuestion = (t) => SHORT_Q.reduce((a, [re, to]) => a.replace(re, to), String(t));
++
+ /** A support option's value for this item (the set's / caller's choice; OFF when not declared). */
+ function opt(id) {
+     const o = state.skillOptions;
+@@ -99,6 +108,15 @@ export function applyWordWork(q) {
+         }
+     } catch (e) { payload = null; }
+     if (!payload) return q;
++    if (opt('wpShort')) payload.lines = payload.lines.map(shortStoryQuestion);
++    // `barFill` / `wpEquation` (skill coverage lane A 2026-10-17 - detailed lesson 2): the response the paper
++    // asks for, on every host - the parts and the whole written in the bar (the answer box too), or the
++    // equation written with its sign. One story, one step, + or −.
++    const one = payload.steps.length === 1 && (payload.steps[0].op === '+' || payload.steps[0].op === '-');
++    const fill = one && opt('barFill') && payload.bar;
++    const eqn = one && !fill && opt('wpEquation');
++    if (fill) Object.assign(payload, { layout: 'bar', barFill: true });
++    if (eqn) Object.assign(payload, { layout: 'eq' });
+     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
+     const retold = q.text !== payload.lines.join(' ');
+     q.text = payload.lines.join(' ');
+@@ -117,6 +135,23 @@ export function applyWordWork(q) {
+     q.screenInstr = 'Tap the sign. Type the numbers in the boxes. Solve.';
+     // what the work expects, for a host that marks each box as it is filled
+     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
++    if (fill || eqn) {
++        const st = payload.steps[0];
++        const G = st.op === '+' ? '+' : '\u2212';
++        // the bar: whole, part, part, answer (the parts in either order); the equation: number, sign, number, answer
++        const whole = st.op === '+' ? st.ans : st.top, pa = st.op === '+' ? st.top : st.bottom, pb = st.op === '+' ? st.bottom : st.ans;
++        const rows = fill ? [[whole, pa, pb, whole], [whole, pb, pa, whole]]
++            : st.op === '+' ? [[st.top, G, st.bottom, st.ans], [st.bottom, G, st.top, st.ans], [st.top, '+', st.bottom, st.ans], [st.bottom, '+', st.top, st.ans]]
++                : [[st.top, G, st.bottom, st.ans], [st.top, '-', st.bottom, st.ans]];
++        q.answerType = 'text';
++        q.ans = rows[0].join(', ');
++        q.acceptedAnswers = [...new Set(rows.map((r) => r.join(', ')))];
++        // the one number a lesson's deal compares (print-sheet.js dlAns): the story's answer
++        q.dealAnswer = String(payload.ans);
++        q.printText = fill ? 'Read the story. Fill in the bar. Solve.' : 'Read the story. Write the equation. Solve.';
++        q.screenInstr = fill ? 'Read the story. Type the parts and the whole in the bar. Solve.' : 'Read the story. Type the equation and the sign. Solve.';
++        q.instructionKey = fill ? 'story-bar' : '';
++    }
+     return q;
+ }
+ 
+diff --git a/js/modules/wrm.js b/js/modules/wrm.js
+index 05884250..c377b3ca 100644
+--- a/js/modules/wrm.js
++++ b/js/modules/wrm.js
+@@ -342,6 +342,8 @@ export const SKILL_WRM = {
+         { step: 'Y3.B3.S2', note: 'arrays' },
+     ],
+     'multiplication:dot_array_mult': ['Y1.B9.S6', 'Y2.B5.S6', 'Y3.B3.S2'],
++    // skill coverage lane A (2026-10-17): build list mult_three
++    'multiplication:multiply_three_numbers': ['Y4.B4.S13', { step: 'Y4.B5.S2', partial: 'using factor pairs to multiply mentally (12 × 5 = 6 × 2 × 5)' }],
+     'multiplication:mult_properties': [
+         'Y3.B4.S3',
+         'Y4.B4.S11',
+diff --git a/tests/baselines/codec-registry.snapshot.json b/tests/baselines/codec-registry.snapshot.json
+index f189bddf..6ddd82df 100644
+--- a/tests/baselines/codec-registry.snapshot.json
++++ b/tests/baselines/codec-registry.snapshot.json
+@@ -116,7 +116,16 @@
+     "ftFactors": "5U",
+     "tenDir": "4E",
+     "tenValues": "4F",
+-    "tenPlain": "4G"
++    "tenPlain": "4G",
++    "teens": "4O",
++    "story": "4N",
++    "whichRight": "5Z",
++    "wpParts": "3Z",
++    "barFill": "3Y",
++    "wpEquation": "3X",
++    "wpShort": "3W",
++    "minProduct": "3V",
++    "maxProduct": "3U"
+   },
+   "blocks": {
+     "0": {
+@@ -757,7 +766,22 @@
+       "both": "B"
+     },
+     "tenValues": {},
+-    "tenPlain": {}
++    "tenPlain": {},
++    "teens": {
++      "none": "N",
++      "some": "S"
++    },
++    "story": {},
++    "whichRight": {},
++    "wpParts": {
++      "any": "A",
++      "bridge": "B"
++    },
++    "barFill": {},
++    "wpEquation": {},
++    "wpShort": {},
++    "minProduct": {},
++    "maxProduct": {}
+   },
+   "scalarOnly": {
+     "range": "decimal",
+@@ -801,7 +825,14 @@
+     "minFactor": "decimal",
+     "ftTrap": "bool",
+     "tenValues": "bool",
+-    "tenPlain": "bool"
++    "tenPlain": "bool",
++    "story": "bool",
++    "whichRight": "bool",
++    "barFill": "bool",
++    "wpEquation": "bool",
++    "wpShort": "bool",
++    "minProduct": "decimal",
++    "maxProduct": "decimal"
+   },
+   "subranges": {
+     "3B-3M": "build lane k2 (BUILD_LIST.md)",
+diff --git a/tests/lib/ws-harness.cjs b/tests/lib/ws-harness.cjs
+index 2fe2f2ba..7daff931 100644
+--- a/tests/lib/ws-harness.cjs
++++ b/tests/lib/ws-harness.cjs
+@@ -56,7 +56,7 @@ async function open({ seed = null, viewport = { width: 1280, height: 900, device
+   let server = null;
+   let base = process.env.MQ_BASE ? process.env.MQ_BASE.replace(/\/index\.html$/, '').replace(/\/$/, '') : null;
+   if (!base) ({ server, base } = await startServer());
+-  const browser = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
++  const browser = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'], protocolTimeout: Number(process.env.WS_PROTOCOL_TIMEOUT) || 600000 });
+   const page = await browser.newPage();
+   await page.setViewport(viewport);
+   const problems = [];
+diff --git a/tests/scripts/ws-search-terms.cjs b/tests/scripts/ws-search-terms.cjs
+index 05f13564..88761afc 100644
+--- a/tests/scripts/ws-search-terms.cjs
++++ b/tests/scripts/ws-search-terms.cjs
+@@ -407,6 +407,11 @@ const TOP1 = [
+     ['multi digit multiplication', ['multiplication:multiply']],
+     ['multi-digit multiplication', ['multiplication:multiply']],
+     ['skip counting', ['multiplication:count_by_tables']],
++    // skill coverage lane A (2026-10-17): the associative property has its skills now
++    ['associative', ['multiplication:multiply_three_numbers']],
++    ['associative property', ['multiplication:multiply_three_numbers']],
++    ['associative property of multiplication', ['multiplication:multiply_three_numbers']],
++    ['associative property of addition', ['addition:add_three']],
+ ];
+ 
+ // [query, the second skill] for a pinned order (critic r2 P-B: Halving first, Division Facts second)
+@@ -417,8 +422,7 @@ const TOP2 = [
+ // Correctly spelt words no skill teaches: 0 results is the honest answer (they must NOT be "corrected"
+ // into a nearby vocabulary word: compass -> compare, east -> past, days -> ways, root -> foot ...).
+ const EXPECT0 = ['compass directions', 'lost', 'tie', 'pond', 'may', 'compass', 'east', 'west', 'north', 'south', 'days', 'bead', 'beads', 'root', 'calendar',
+-    // critic r5 P-E: no skill deals the associative property (Multiplication Properties deals commutative, distributive, identity, zero)
+-    'associative', 'associative property', 'associative property of addition', 'associative property of multiplication'];
++    ];
+ // [query, the correction shown, or null for none]
+ const CORRECTIONS = [['tile', null], ['tiles', null], ['compass', null], ['days', null], ['full', null], ['area', null],
+     ['tme', 'time'], ['aera', 'area'], ['perimter', 'perimeter'], ['subtracton', 'subtraction'], ['fractoins', 'fractions'],
