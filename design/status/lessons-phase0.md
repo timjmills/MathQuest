@@ -117,7 +117,7 @@ touches `print-sheet.js` `buildLesson` / `buildDetailedLesson` only where the pa
   nearest_10 (not in the precritic set) it reports, beside pre-existing practice-page findings, the H13 width band
   (sub S) and AK-4 on the check's key for nearest_10 (7 answer slots vs 6 - an item's key slot, not yet traced).
 - `ws-lesson-coverage --bind-stamps` bound the three samples' earlier critic passes to the NEW renders (they now open
-  with the Prerequisite Check, which no critic has graded): status reads them `passed`. Re-grade before relying on it.
+  with the Prerequisite Check, which no critic has graded). The lead reset them (b8ba85bd): they read STALE (re-grade due).
 
 ## Gates
 
@@ -129,7 +129,7 @@ Builder B, merged tree (e6fe3c61 + the fix round), 2026-10-30:
 - `ws-detailed-lesson --check`: FAIL x5 (E11 / E15, pre-existing, above).
 - `ws-layout-unit`: OK (542). `ws-lesson-unit`: OK (79). `ws-boot-smoke`: OK. `ws-code-snapshot`: OK (723 codes, 35 categories).
 - `ws-lesson-baseline`: detailed lessons 0 of 140 changed; the 120 sample hashes change (LR-17, intended). `--parts`: OK.
-- `ws-lesson-hash --write`: 18 stamps; `ws-lesson-coverage`: OK (10 lessons: 3 passed, 0 stale, 0 failed, 7 draft).
+- `ws-lesson-hash --write`: 18 stamps; `ws-lesson-coverage`: OK (10 lessons: 0 passed, 3 stale, 0 failed, 7 draft) after the lead's reset.
 
 ### Critic-ready pages (Builder B, LR-17 + LR-18 samples)
 The three packets, seed 4242, PNGs at 110 dpi: `design/lesson-samples/<packet>/` (L) and `design/lesson-samples/<packet>/S/`
@@ -141,4 +141,64 @@ The three packets, seed 4242, PNGs at 110 dpi: `design/lesson-samples/<packet>/`
 
 ## Critic rounds
 
+| Round | When | Verdict | Report |
+|---|---|---|---|
+| r1 | 2026-10-30 ~21:55-22:01 UTC (critic ≈6 min) | **FAIL, min 3** (round key-p1 H1; round Q4 H3; H13 on every check page; engine 6/7/7/6). The add lesson sheet without its Warm-up passed (8 8 8 8). | `design/audit/runs/lessons-phase0-r1/REPORT.md`, `grades.jsonl` |
+
+**Owner decision (via the lead, 2026-10-30 20:28): pause after the current pieces — one critic round, then stop.** No fix
+round has been started. Screenshots for the owner are kept for the pass (the PNGs the critic graded are under
+`design/lesson-samples/<packet>/`).
+
 ## Per-round findings (automatic checks · speed-ups)
+
+### r1 — automatic checks (each critic finding a machine could have measured)
+- D1 doubled slot (H8): NEW check — answer slots per cell vs key answers (ws-print-lint), backtest on add Q2.
+- D2 / D12 route text ≠ item: NEW — schema field `checks` per prerequisite + name-read of the dealt item (content-audit reader).
+- D3 / D7 range: NEW — ws-lesson-coverage deals each prereq ref and holds its numbers to the step's range.
+- D5 unpinned prereq pool: NEW — deal N seeds per prereq ref, content-audit name reader against the prereq lesson title.
+- D6 AK-4: EXISTS (ws-print-lint) but not on precritic's path for these skills — add the three sample skills to
+  `ws-precritic --role lesson` and make AK-4 blocking.
+- D4 / D9 / D11 H13 and blank feet: EXISTS (ws-lesson-samples sheetCheck) but non-blocking — make it a gate.
+- D8 supports on a check: NEW — precritic rule "pre-skill-check cells: no scaffold elements, one response".
+- D10 clipped strip: EXISTS in part (L-OVERLAP) — extend to strip text + pupil/key twin geometry diff.
+- D13 / D14 / D15: NEW cheap greps (one title constant; one routing-table export; no literal styles in roles output).
+- D17 `--bind-stamps` re-binding changed renders: NEW — the tool refuses when the render hash changed since the grade.
+
+### r1 — speed-ups
+- The builder knew D6 and D9 from its own tools and handed over anyway (the lead accepted known reds to fit the owner's
+  one-round instruction): a known red machine finding goes to the critic only with the owner's say-so.
+- Builder B lost ~25 min to the baseline script (puppeteer protocol timeout, css port) and ~1 h to 3-4 layout
+  iterations at ~8-10 min a render: a single-page render mode for the check page (one lesson, one size, one part)
+  would cut each iteration to ~1 min.
+- Content defects D2 D3 D5 D8 were data choices in `families/*.js` made without dealing the items: the prereq-item checks
+  above would have caught them at build time.
+
+## Hand-over (for when the owner resumes)
+
+**Done (on this branch):** library / schema / ten family files / prereqs.js as a view (A: e8409ccd e6b18f8c 457bea20
+6ccf9938 b4e5f2ee); seed-db, prereq-db, status-db and their generators; ws-lesson-coverage, ws-lesson-seed,
+ws-lesson-hash, ws-lesson-check, ws-lesson-unit; build-list lesson NEEDS; browser-lock (merge eab21f55). Page extraction
+into `lesson-pages/` (registry) + `lesson-arch/` (a0ba0331, byte-identical); parts + refresh LR-18 (13ebeb93);
+pre-skill-check `routes` + routing table (aec55f46); lessonId + LR-17 Prerequisite Check part (847c332b); fix round
+(merged df2e2147). Main merged at e6fe3c61.
+
+**Half-done:** the LR-17 check page and routing page (critic r1 FAIL: D1-D13, D20); D14 (detailed T6 not on the shared
+table); D15 (inline styles); D16 (no unit tests of the routed plan); D18 (parts registry only half plug-in).
+
+**Remaining (in order):** (1) fix round r2 on Opus medium (a failed round's rebuild): data fixes D2 D3 D5 D8 D20 in
+`families/*.js`; seq_10 kit cell D6/D7; one grid layout for the check page D4 D9; `checks` field + routing table in the
+check key's spare room D12; title constant D13; D10 / D11 sheet reflow; (2) the automatic checks above, with backtests,
+before the r2 critic; (3) critic r2 (≥ 8 everywhere), then screenshots under `design/status/lessons-phase0/` and
+`--bind-stamps` on the graded render; (4) follow-up lane: the r5 engine hunks of 588d053f (one avoid set, noNearTwin,
+maxUnder10, LESSON_PACKET_SIZE, stackMinSize / atLeastSize, `lesson.check`, the chart's third example) to bring
+ws-lesson-check (81 findings) to 0 — out of item 5's commit list, not approved for this lane; (5) the vocabulary
+redesign registers its pages in `lesson-pages/index.js` (D2) — not built.
+
+**Open decisions:** whether the check's question order is curriculum order or closeness to the lesson (D20); whether the
+routing table belongs on the check key (D12) or its own page; whether detailed T6 moves to the shared table (D14, changes
+passed detailed pages — needs the lessons 6-7 session).
+
+**Pre-existing reds (not this lane):** `placevalue:more_less_10#lesson` CL40-INK pin drift; `key-options.cjs` protocol
+timeout; `ws-detailed-lesson --check` E11 / E15 on all five detailed lessons.
+
+**Cost:** ≈ $95 estimated (builders A + B + critic + lead ≈ 1.7 M tokens); ≈ 3.4 % of the weekly limit at $28 ≈ 1 %.

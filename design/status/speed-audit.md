@@ -759,3 +759,8 @@ under CL-4b (owner), band instruction for presets.
 | r2 | **PASS 9 / 9 / 8** | stale-pin report for pinned findings (N-r2-3); precritic-plan coverage for gates whose rows name no skill (N-r2-1) | narrow r2 scope (fixes + regressions) in 21 min; one real precritic run of an approved sibling and `--role lesson` on the merged tree before the critic caught 4 of the lane's 5 setup traps |
 
 Details and the reflection: design/status/s1-checks.md.
+
+## 2026-10-30 · lessons-phase0 r1 (FAIL, min 3) — per-round findings
+Automatic checks and speed-ups: `design/status/lessons-phase0.md` "Per-round findings". Headline: 5 of 13 content defects
+(D2 D3 D5 D7 D8) are prerequisite-item choices no gate deals and reads; 2 (D6 AK-4, D9 H13) were measured by existing tools
+that are not blocking on the lesson path. Lane paused by the owner after r1; fixes assigned to the r2 builder when resumed.
