@@ -703,18 +703,19 @@
     ]
    },
    "critic": {
-    "verdict": "FAIL",
-    "round": 2,
+    "verdict": "PASS",
+    "round": 3,
     "min": [
      8,
-     7,
+     8,
      8,
      8
     ],
-    "reports": "design/lesson-planner/lessons/g4-nbt1-ten-times-value/critic-r1..r2.md",
-    "fixes": "fix-r4.md"
+    "reports": "design/lesson-planner/lessons/g4-nbt1-ten-times-value/critic-r1..r3.md",
+    "fixes": "fix-r4.md",
+    "note": "r3 2026-10-30, 8 minors (n1 near-look 92,163 / 92,715 on P4-2; n2 T3 '4000' comma) none below 8"
    },
-   "status": "in review",
+   "status": "passed",
    "pack": {
     "dir": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/",
     "pdf": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/pack.pdf",
@@ -1010,10 +1011,18 @@
     "wpFrames is a scaffold fade (an option only, no preset); msOps mult / div are the two chunks of one lesson (options; the preset is multdiv)"
    ],
    "critic": {
-    "verdict": "pending",
-    "round": 0
+    "verdict": "FAIL",
+    "round": 1,
+    "min": [
+     8,
+     7,
+     7,
+     7
+    ],
+    "reports": "design/lesson-planner/lessons/g3-oa8-two-step-wp/critic-r1.md",
+    "note": "D1 chart zoom fallback (P2/P2b), D2 fact-family repeats, D3 T5 script vs P5; paused by the owner 2026-10-30"
    },
-   "status": "built, awaiting critic r1",
+   "status": "critic r1 FAIL, paused",
    "pack": {
     "dir": "design/lesson-samples/detailed/g3-oa8-two-step-wp/",
     "pdf": "design/lesson-samples/detailed/g3-oa8-two-step-wp/pack.pdf",
