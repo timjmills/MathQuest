@@ -21,7 +21,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 - 277 entries: **133 new skills, 88 new options, 2 repairs**, and **54 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 29 option, 1 skill, 6 migration, 1 band).
 - 162 from the White Rose audit (42 extended for standards), 61 from the standards audit.
-- They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
+- They close 113 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
 - 30 new sheet-kit templates and panes are needed; each is owned by one lane.
 - Lanes `k2` and `operations` were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.
@@ -30,8 +30,8 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 |---|---|---|---|---|---|---|---|---|---|
 | Counting and early number (K-1 pictures) (`k2`) | 35 | 16 | 7 | 0 | 12 | 20 | 34 | 55 | 454 |
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 42 | 19 | 10 | 1 | 12 | 21 | 50 | 35 | 316 |
-| Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 9 | 36 | 23 | 327 |
-| Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 19 | 20 | 17 | 104 |
+| Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 8 | 36 | 23 | 327 |
+| Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 18 | 20 | 17 | 104 |
 | Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
 | Geometry, area, volume, coordinates (`geometry`) | 46 | 30 | 12 | 1 | 3 | 35 | 78 | 33 | 144 |
 | Measurement (length, mass, capacity, conversions) (`measurement`) | 23 | 12 | 9 | 0 | 2 | 14 | 34 | 11 | 74 |
@@ -1244,7 +1244,7 @@ Owns: `js/modules/gen-pv.js`, `js/modules/sheet/cells/{pv,value-line,line-labels
 ### 20. Mental Calculation and Estimation — `mental_estimate`
 
 - **What:** new skill `number_sense:estimate_and_check`. Grade 5 · family operations · source White Rose audit.
-- **Closes (standards):** 3.OA.D.8 · tag with CCSS 5.OA.A.2, 4.NBT.A.3, EE M.EE.4.NBT.3
+- **Closes (standards):** none not already full · tag with CCSS 5.OA.A.2, 4.NBT.A.3, EE M.EE.4.NBT.3
 - **Closes (White Rose steps):** Y6.B2.S16
 - **Teaches:** estimating to check answers to calculations with all four operations and choosing mental methods.
 - **Problem types:** (1) estimate to check; (2) is the answer reasonable?; (3) choose a mental method; (4) round then calculate.
@@ -1439,19 +1439,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 like terms → distributive → both · O3 substitution table → none · O6 plain.
 - **Misconceptions:** one value that works proves equivalence; 3y = y + 3.
 
-### 15. Two-Step Problems With All Four Operations (option) — `multi_step_four_ops`
-
-- **What:** option on `algebra:multi_step_word` (and `algebra:multi_step_word_plain`): two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate. Grade 3-4 · family algebra · source standards audit.
-- **Closes (standards):** 3.OA.D.8, 4.OA.A.3 · tag with CCSS 3.OA.D.8, 4.OA.A.3, EE M.EE.3.OA.7, M.EE.4.OA.3
-- **Closes (White Rose steps):** none · strengthens Y3.B4.S10, Y4.B5.S13
-- **Teaches:** two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating.
-- **Problem types:** (1) × then −; (2) ÷ then +; (3) write the equation with n; (4) remainder decides the answer; (5) is the answer reasonable? (round).
-- **Representation:** Templates: `word-work`; new: `bar-model`.
-- **Answer:** write each step answer; write the equation.
-- **Ladder:** O2 within 100 → 1,000; two steps → three · O3 bar model and step boxes → step boxes → none · O6 pictures / plain.
-- **Misconceptions:** answers the first step; uses the letter as a label, not a number; ignores the remainder.
-
-### 16. What Do You Notice? — `patterns_notice`
+### 15. What Do You Notice? — `patterns_notice`
 
 - **What:** new skill `patterns:notice_patterns`. Grade 3-4 · family algebra · source standards audit.
 - **Closes (standards):** 3.OA.D.9, 4.OA.C.5 · tag with CCSS 3.OA.D.9, 4.OA.C.5, EE M.EE.3.OA.8, M.EE.4.OA.5
@@ -1463,7 +1451,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track.
 - **Misconceptions:** a pattern seen in three terms always continues; odd × odd is even.
 
-### 17. Compare Number Sentences — `compare_sentences`
+### 16. Compare Number Sentences — `compare_sentences`
 
 - **What:** new skill `algebra:compare_number_sentences`. Grade 1 · family operations · source White Rose audit.
 - **Closes (standards):** 1.OA.D.7 · tag with CCSS 1.OA.D.7, EE M.EE.1.OA.7
@@ -1475,7 +1463,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 one change → two changes · O3 matching parts linked → none · O6 plain.
 - **Misconceptions:** calculates every side; bigger first number means bigger.
 
-### 18. Count in 50s, 100s and 1,000s (option) — `count_50s`
+### 17. Count in 50s, 100s and 1,000s (option) — `count_50s`
 
 - **What:** option on `patterns:count_by_step_up`: steps 50, 100, 1,000. Grade 2-3 · family algebra · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.NBT.A.1, 2.NBT.A.2, 4.NBT.A.1, 4.NBT.A.2, EE M.EE.2.NBT.1, M.EE.2.NBT.2, M.EE.4.NBT.2
@@ -1487,7 +1475,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 step 100 → 50 → 1,000, forwards then backwards · O3 base-10 picture above each term → none · O6 track / number line.
 - **Misconceptions:** changes the wrong digit (350 + 50 = 355); forgets the crossing of 1,000 (950, 1,000, 1,050).
 
-### 19. Formulae — `formulae`
+### 18. Formulae — `formulae`
 
 - **What:** new skill `algebra:use_formulae`. Grade 5 · family algebra · source White Rose audit.
 - **Closes (standards):** 6.EE.A.2c · tag with CCSS 5.OA.A.2, 6.EE.A.2c, EE -
@@ -1500,7 +1488,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 one operation → two operations → brackets and powers (V = s³) · O3 substitution line printed (P = 2 × ( __ + __ )) → none · O6 formula in words / letters.
 - **Misconceptions:** adds instead of multiplying where letters touch (2l = 2 + l); ignores the brackets.
 
-### 20. Why Does It Work? — `explain_strategy`
+### 19. Why Does It Work? — `explain_strategy`
 
 - **What:** new skill `number_sense:why_it_works`. Grade 2 · family operations · source standards audit.
 - **Closes (standards):** 2.NBT.B.9 · tag with CCSS 2.NBT.B.9, EE -
@@ -1513,7 +1501,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Misconceptions:** compensation changes the answer; the order of subtraction does not matter.
 - **After:** `add_sub_patterns` (lane `operations`).
 
-### 21. Write and Graph Inequalities (option) — `inequality_write_graph`
+### 20. Write and Graph Inequalities (option) — `inequality_write_graph`
 
 - **What:** option on `algebra:inequalities`: task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow) (also a named preset skill once built, design/PRESET_SKILLS.md). Grade 6 · family algebra · source standards audit.
 - **Closes (standards):** 6.EE.B.8 · tag with CCSS 6.EE.B.8, EE -
@@ -1525,7 +1513,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 > < → ≥ ≤ · O3 circle drawn, pupil adds the arrow → none · O6 horizontal / vertical line.
 - **Misconceptions:** only whole numbers are solutions; closed circle for >.
 
-### 22. Subtract Back Through Ten (option) — `make_ten_subtract`
+### 21. Subtract Back Through Ten (option) — `make_ten_subtract`
 
 - **What:** option on `number_sense:make_a_ten`: subtraction: back through ten (13 − 4 = 13 − 3 − 1). Grade 1 · family operations · source standards audit.
 - **Closes (standards):** 1.OA.C.6 · tag with CCSS 1.OA.C.6, EE -
@@ -1536,6 +1524,18 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Answer:** write the split and the answer in the step boxes.
 - **Ladder:** O2 teens − 1-digit crossing 10 · O3 ten frame pair drawn → number line → none · O6 frames / line.
 - **Misconceptions:** takes the whole second number from 10; splits the wrong number.
+
+### 22. Two-Step Problems With All Four Operations (option) — `multi_step_four_ops`
+
+- **What:** option on `algebra:multi_step_word` (and `algebra:multi_step_word_plain`): two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate. Grade 3-4 · family algebra · source standards audit.
+- **Closes (standards):** 4.OA.A.3 · tag with CCSS 3.OA.D.8, 4.OA.A.3, EE M.EE.3.OA.7, M.EE.4.OA.3
+- **Closes (White Rose steps):** none · strengthens Y3.B4.S10, Y4.B5.S13
+- **Teaches:** two-step and multistep word problems with the four operations, represented by an equation with a letter, remainders interpreted, and checked by estimating.
+- **Problem types:** (1) × then −; (2) ÷ then +; (3) write the equation with n; (4) remainder decides the answer; (5) is the answer reasonable? (round).
+- **Representation:** Templates: `word-work`; new: `bar-model`.
+- **Answer:** write each step answer; write the equation.
+- **Ladder:** O2 within 100 → 1,000; two steps → three · O3 bar model and step boxes → step boxes → none · O6 pictures / plain.
+- **Misconceptions:** answers the first step; uses the letter as a label, not a number; ignores the remainder.
 
 ### 23. Parts of an Expression — `parts_of_expression`
 
