@@ -5099,6 +5099,43 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 // and not the Step 1 answer (M1 / M3 always give a different number). Fixed domain: the
                 // Max Number does not apply. Default 'addsub' = the four + / − archetypes below, unchanged.
                 const msOpsOpt = state.skillOptions && typeof state.skillOptions.msOps === 'string' ? state.skillOptions.msOps : 'addsub';
+                // 'addmult' / 'adddiv' (3.OA.D.8, brackets): a + or − step first, then × or ÷ -
+                // (5 red + 3 blue) in each of 4 bags; (12 + 18) shared by 5; (30 − 6) shared by 4.
+                if (msOpsOpt === 'addmult' || msOpsOpt === 'adddiv') {
+                    let a1, b1, op1, s1v, n2, fin, guard = 0;
+                    for (;;) {
+                        guard++;
+                        op1 = pick(['+', '-']);
+                        if (msOpsOpt === 'addmult') {
+                            n2 = rng(2, 6); s1v = rng(4, 10);
+                            if (op1 === '+') { a1 = rng(2, s1v - 2); b1 = s1v - a1; } else { b1 = rng(2, 6); a1 = s1v + b1; }
+                            fin = s1v * n2;
+                        } else {
+                            n2 = rng(2, 6); const qq = rng(2, 9); s1v = n2 * qq;
+                            if (op1 === '+') { a1 = rng(2, s1v - 2); b1 = s1v - a1; } else { b1 = rng(2, 9); a1 = s1v + b1; }
+                            fin = qq;
+                        }
+                        const story = [a1, b1, n2];
+                        const ok = a1 !== b1 && !story.includes(fin) && fin !== s1v && !story.includes(s1v) && n2 !== a1 && n2 !== b1 && a1 >= 1 && b1 >= 1;
+                        if (ok || guard > 400) break;
+                    }
+                    const G1 = op1 === '+' ? '+' : '\u2212', G2 = msOpsOpt === 'addmult' ? '\u00d7' : '\u00f7';
+                    q._variant = `${op1 === '+' ? 'add' : 'sub'}_then_${msOpsOpt === 'addmult' ? 'mult' : 'div'}`;
+                    q.msOps = { first: op1 === '+' ? 'add' : 'sub', second: msOpsOpt === 'addmult' ? 'mult' : 'div', a: a1, b: b1, step1: s1v, c: n2 };
+                    q.text = msOpsOpt === 'addmult'
+                        ? (op1 === '+' ? `Each bag has ${a1} red ${msItem} and ${b1} blue ${msItem}. ${msName} has ${n2} bags. How many ${msItem} does ${msName} have?`
+                            : `Each bag had ${a1} ${msItem}. ${b1} were taken out of each bag. ${msName} has ${n2} bags. How many ${msItem} are in the bags now?`)
+                        : (op1 === '+' ? `${msName} has ${a1} red ${msItem} and ${b1} blue ${msItem}. ${msName} shares them equally among ${n2} friends. How many ${msItem} does each friend get?`
+                            : `${msName} has ${a1} ${msItem}. ${msName} keeps ${b1}. ${msName} shares the rest equally among ${n2} friends. How many ${msItem} does each friend get?`);
+                    q.ans = fin;
+                    q.op = G1; q.a = a1; q.b = b1;
+                    q.hint = `Step 1: ${a1} ${G1} ${b1} = ${s1v}. Step 2: ${s1v} ${G2} ${n2} = ${fin}`;
+                    q.skillLabel = 'Multi-Step';
+                    q.printFormat = 'multi-step-word';
+                    q.options = buildNumericOptions(fin);
+                    q.answerType = 'number';
+                    return;
+                }
                 if (msOpsOpt === 'mult' || msOpsOpt === 'div' || msOpsOpt === 'multdiv') {
                     const first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
                     let s1a, s1b, p1, c2, op2, fin, guard = 0;

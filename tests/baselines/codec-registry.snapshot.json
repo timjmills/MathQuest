@@ -120,7 +120,9 @@
     "tenWrite": "4H",
     "tenTask": "4I",
     "msOps": "4P",
-    "wpFrames": "4Q"
+    "wpFrames": "4Q",
+    "msLetter": "4R",
+    "msCheck": "4S"
   },
   "blocks": {
     "0": {
@@ -774,9 +776,13 @@
       "addsub": "A",
       "mult": "M",
       "div": "D",
-      "multdiv": "B"
+      "multdiv": "B",
+      "addmult": "P",
+      "adddiv": "Q"
     },
-    "wpFrames": {}
+    "wpFrames": {},
+    "msLetter": {},
+    "msCheck": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -821,7 +827,9 @@
     "ftTrap": "bool",
     "tenValues": "bool",
     "tenPlain": "bool",
-    "wpFrames": "bool"
+    "wpFrames": "bool",
+    "msLetter": "bool",
+    "msCheck": "bool"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",

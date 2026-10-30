@@ -159,6 +159,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-bar': 'Read the story. Fill in the bar. Solve.',
     // detailed lesson 7 (2026-10-17): the word-work cell's compact frames form (one number sentence a step)
     'story-steps': 'Read the story. Write each step. Solve.',
+    'story-letter': 'Read the story. Write the equation. Find n.',
+    'story-check': 'Solve. Estimate. Circle Yes or No.',
     'pick-parts': 'Write one number from each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',

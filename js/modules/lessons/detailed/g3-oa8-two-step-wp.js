@@ -36,10 +36,13 @@ export default {
     eeNote: 'Sheet code M.EE.3.OA.8 quotes the M.EE.3.OA.7 text; the repo tag is M.EE.3.OA.7.',
     cra: 'Pictorial → Abstract',
     flowNote: 'Chunk 1 (5a, 6a): × first. Chunk 2 (5b, 6b): ÷ first. Step 2 is always + or −.',
+    // The other clauses of 3.OA.D.8 are built as options of the same skill (round 2, owner skill coverage rule) and
+    // taught in follow-on lessons: + or − first (brackets) msOps addmult / adddiv; one equation with a letter
+    // msLetter; reasonableness by rounding to tens msCheck. The coverage of 3.OA.D.8 is full across the skill.
     followOn: [
-        { title: 'Two-step stories: add first, then divide', skill: 'algebra:multi_step_word_plain', opts: {}, ccss: '3.OA.D.8', note: 'Brackets: (12 + 18) ÷ 5. Build list multi_step_four_ops.' },
-        { title: 'Write the equation with a letter', skill: 'algebra:multi_step_word_plain', opts: {}, ccss: '3.OA.D.8', note: '4 × 6 − 5 = n. Build list multi_step_four_ops.' },
-        { title: 'Is the answer reasonable? Round to check', skill: 'number_sense:estimate_sums_diffs', opts: {}, ccss: '3.OA.D.8' },
+        { title: 'Two-step stories: add or take away first, then multiply or divide', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'adddiv' }, ccss: '3.OA.D.8', note: 'Brackets: (12 + 18) ÷ 5; msOps addmult for (5 + 3) × 4.' },
+        { title: 'Write the equation with a letter', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'multdiv', msLetter: true }, ccss: '3.OA.D.8', note: '5 × 4 − 6 = n, then n.' },
+        { title: 'Is the answer reasonable? Round to check', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'addsub', band: 100, msCheck: true }, ccss: '3.OA.D.8' },
     ],
     // The two SITUATIONS the lesson teaches (E31): groups then a change (chunk a), a fair share then a change (chunk b).
     situations: [{ id: 'groups-then-change', test: 'msMult' }, { id: 'share-then-change', test: 'msDiv' }],

@@ -420,6 +420,21 @@ export function tellTwoStep(s1, s2, k = 0) {
     const T = pickAt(WW_THINGS, k * 7 + 3);
     // A × or ÷ first step (msOps, 3.OA.D.8): equal groups or a fair share, then a change. s1.a / s1.b keep the
     // story's order (groups, each / total, friends); the change is the Step 2 number.
+    // A + or − first step, then × or ÷ (msOps addmult / adddiv, brackets): parts in each group / a total shared.
+    if ((s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/')) {
+        const n = s2.bottom;
+        if (s2.op === '*') {
+            const C = pickAt(WW_CONTAINERS, k * 5 + 1);
+            const L = s1.op === '+'
+                ? [`Each ${C.one} has ${num(s1.a)} red ${s1.a === 1 ? T.one : T.many} and ${num(s1.b)} blue ${s1.b === 1 ? T.one : T.many}.`, `${n1} has ${countOf(n, C)}.`, `How many ${T.many} does ${n1} have?`]
+                : [`Each ${C.one} had ${countOf(s1.a, T)}.`, `${n1} took ${num(s1.b)} out of each ${C.one}.`, `${n1} has ${countOf(n, C)}.`, `How many ${T.many} are in the ${C.many} now?`];
+            return { lines: L, unit: T, ans: s2.ans };
+        }
+        const L = s1.op === '+'
+            ? [`${n1} has ${num(s1.a)} red ${s1.a === 1 ? T.one : T.many} and ${num(s1.b)} blue ${s1.b === 1 ? T.one : T.many}.`, `${n1} shares them equally among ${num(n)} friends.`, `How many ${T.many} does each friend get?`]
+            : [`${n1} has ${countOf(s1.a, T)}.`, `${n1} keeps ${num(s1.b)}.`, `${n1} shares the rest equally among ${num(n)} friends.`, `How many ${T.many} does each friend get?`];
+        return { lines: L, unit: T, ans: s2.ans };
+    }
     if (s1.op === '*' || s1.op === '/') {
         const c = s2.bottom;
         if (s1.op === '*') {
@@ -1042,38 +1057,69 @@ export function twoStepPart(p, k, ctx) {
  * exit slip and the Prerequisite Check (the fade of the two step blocks; the response is still produced).
  */
 function framesLayout(p, ctx) {
-    const put = filled(ctx);
+    const twin = isTwin(ctx);
+    const put = filled(ctx) && !twin;
     const ink = put ? inkOf(ctx) : null;
     const col = ink === 'trace' ? GREY : INK;
     const bx = boxMm(ctx);
     const pt = digitPt(ctx);
     const two = p.steps.length > 1;
     const lastI = p.steps.length - 1;
+    const face = (w, heavy) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};text-align:center;${KEY_FEATURES}`;
+    // one number box; on screen an input as wide as its number (the answer: the host's own cell, `data-mq-cell`)
     const box = (id, v, digits, graded = false, heavy = false) => {
         const w = Math.max(bx * 1.25, blankWidth(Math.max(2, digits), sizeOf(ctx)));
-        return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};${KEY_FEATURES}">${put ? esc(v) : ''}</span>`;
+        if (twin) {
+            if (graded) return `<span class="mq-wwans" data-ws-slot="${esc(id)}" data-ws-shape="box" data-mq-cell="1" data-mq-w="${Math.max(1, digits)}" data-mq-label="answer" data-mq-expect="${esc(v)}" style="${face(w, true)}"></span>`;
+            return `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(v)}" data-ws-graded="0" maxlength="${Math.max(1, digits)}" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="number" style="${face(w, heavy)}padding:0;margin:0;">`;
+        }
+        return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="${face(w, heavy)}">${put ? esc(v) : ''}</span>`;
     };
-    const sign = (id, op) => `<span data-ws-slot="${esc(id)}" data-ws-shape="circle" data-ws-graded="0"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, bx * 0.9)};height:${L(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;line-height:1;color:${col};">${put ? GLYPH[op] : ''}</span>`;
-    const eq = `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">=</span>`;
-    const rows = p.steps.map((st, i) => {
-        const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
-        const r = st.op === '/' ? st.q : st.ans;
-        const res = i === lastI ? box('answer', String(p.ans), String(r).length, true, true) : box(`fr${i}-r`, String(r), String(r).length);
-        const cap = two ? `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;min-width:${L(ctx, 17)};">Step ${i + 1}:</span>` : '';
-        return `<div class="mq-wwframe" style="display:flex;align-items:center;gap:${L(ctx, 2.2)};">${cap}${box(`fr${i}-a`, String(x), String(x).length)}${sign(`op${i}`, st.op)}${box(`fr${i}-b`, String(y), String(y).length)}${eq}${res}</div>`;
-    }).join('');
+    const sign = (id, op) => (twin
+        ? `<input type="text" class="mq-wwork" data-mq-kind="sign" data-mq-expect="${GLYPH[op]}" data-ws-graded="0" maxlength="1" autocomplete="off" spellcheck="false" aria-label="sign" style="box-sizing:border-box;width:${tw(ctx, bx * 0.9)};height:${tw(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;text-align:center;padding:0;margin:0;">`
+        : `<span data-ws-slot="${esc(id)}" data-ws-shape="circle" data-ws-graded="0"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, bx * 0.9)};height:${L(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;line-height:1;color:${col};">${put ? GLYPH[op] : ''}</span>`);
+    const sym = (t) => `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${t}</span>`;
+    const cap = (t) => `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;min-width:${L(ctx, 17)};">${t}</span>`;
+    const row = (html) => `<div class="mq-wwframe" style="display:flex;align-items:center;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.2)};">${html}</div>`;
+    let rows;
+    if (p.letter) {
+        // msLetter (3.OA.D.8): the whole story as ONE equation with a letter, then the letter's value
+        const [s1, s2] = p.steps;
+        const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
+        const brk = two && (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
+        const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length)}`;
+        const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length)}` : first;
+        rows = row(`${eqn}${sym('=')}${sym('n')}`) + row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
+    } else {
+        rows = p.steps.map((st, i) => {
+            const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+            const r = st.op === '/' ? st.q : st.ans;
+            const res = i === lastI ? box('answer', String(p.ans), String(r).length, true, true) : box(`fr${i}-r`, String(r), String(r).length);
+            return row(`${two ? cap(`Step ${i + 1}:`) : ''}${box(`fr${i}-a`, String(x), String(x).length)}${sign(`op${i}`, st.op)}${box(`fr${i}-b`, String(y), String(y).length)}${sym('=')}${res}`);
+        }).join('');
+    }
+    // msCheck (3.OA.D.8): each story number rounded to the nearest ten, the estimate, and the pupil's own answer judged
+    if (p.check) {
+        const c = p.check;
+        const est = row(`${cap('Estimate:')}${box('es-a', String(c.a), String(c.a).length)}${sign('es-op0', p.steps[0].op)}${box('es-b', String(c.b), String(c.b).length)}`
+            + (two ? `${sign('es-op1', p.steps[1].op)}${box('es-c', String(c.c), String(c.c).length)}` : '') + `${sym('=')}${box('es-r', String(c.est), String(c.est).length)}`);
+        const ring = (w) => (twin
+            ? `<button type="button" class="mq-wwword" data-mq-word="${w}" style="min-height:44px;min-width:44px;padding:0 ${L(ctx, 1.5)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font:inherit;cursor:pointer;">${w}</button>`
+            : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === 'Yes' ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
+        rows += est + row(`${cap('Is my answer close to the estimate?')}${ring('Yes')}${ring('No')}`);
+    }
     const work = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
     // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
-    const unit = p.unit ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
-    return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};padding-top:${L(ctx, 1.5)};">${storyHTML(ctx, p, true)}`
-        + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
+    const unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
+    return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, 2.5)};padding-top:${L(ctx, 1.5)};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
+        + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
 }
 
 register(WW_TEMPLATE, {
     render(p, ctx) {
         if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
         if (p.layout === 'bar' && p.bar && p.steps.length === 1 && !isTwin(ctx)) return barLayout(p, ctx);
-        if (p.layout === 'frames' && !isTwin(ctx)) return framesLayout(p, ctx);
+        if (p.layout === 'frames') return framesLayout(p, ctx);
         const twin = isTwin(ctx);
         // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
         // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
@@ -1130,10 +1176,16 @@ register(WW_TEMPLATE, {
         if (p.layout === 'frames' && Array.isArray(p.steps)) {
             const lastI = p.steps.length - 1;
             p.steps.forEach((st, i) => {
+                if (p.letter && i > 0) { slots[`fr${i}-b`] = { value: String(st.bottom), graded: false }; return; }
                 slots[`fr${i}-a`] = { value: String(st.op === '*' ? st.a : st.top), graded: false };
                 slots[`fr${i}-b`] = { value: String(st.op === '*' ? st.b : st.bottom), graded: false };
-                if (i !== lastI) slots[`fr${i}-r`] = { value: String(st.op === '/' ? st.q : st.ans), graded: false };
+                if (i !== lastI && !p.letter) slots[`fr${i}-r`] = { value: String(st.op === '/' ? st.q : st.ans), graded: false };
             });
+            if (p.check) {
+                const c = p.check;
+                Object.assign(slots, { 'es-a': { value: String(c.a), graded: false }, 'es-b': { value: String(c.b), graded: false }, 'es-r': { value: String(c.est), graded: false }, 'es-op0': { value: GLYPH[p.steps[0].op], graded: false } });
+                if (p.steps.length > 1) Object.assign(slots, { 'es-c': { value: String(c.c), graded: false }, 'es-op1': { value: GLYPH[p.steps[1].op], graded: false } });
+            }
         }
         if (p.unit && p.layout !== 'bar' && p.layout !== 'frames') slots['answer-label'] = { value: p.unit, graded: false };
         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });

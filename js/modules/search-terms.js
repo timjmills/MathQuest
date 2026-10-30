@@ -417,6 +417,8 @@ export const SKILL_TERMS = {
     'shapes_early:partition_shapes': ['half', 'fractions', 'halves', 'quarters', 'fourths', 'thirds', 'equal parts', 'fractions of shapes'],
     'fractions:identify': ['what fraction', 'name the fraction', 'fraction pictures', 'shaded part'],
     'conversions:percent_of_number': ['percent of', 'percentage of an amount', 'percent of a quantity'],
+    'algebra:multi_step_word': ['two step word problems', 'two-step problems', 'multi-step', 'equation with a letter', 'letter for the unknown', 'estimate to check', 'is the answer reasonable', 'multiply then subtract', 'divide then add', 'add then divide'],
+    'algebra:multi_step_word_plain': ['two step word problems', 'two-step problems', 'equation with a letter', 'estimate to check', 'reasonable answer', 'four operations word problems'],
     'algebra:solve_unknown': ['solve for x', 'find x', 'missing number'],
     'algebra:balance_addsub': ['balance', 'equal sign', 'balancing equations', 'equals means same as'],
     'addition:equal_sign': ['equal sign', 'equals', 'true or false', 'balance'],

@@ -252,3 +252,8 @@ Built for `g3-oa8-two-step-wp` (build list `multi_step_four_ops`, first part):
   wrong answers `ms-stop-step1`, `ms-story-number`, `ms-one-op` (Check Question, T6).
 - **Lesson data**: `chartRow` (with `chartWide`: heads beside the drawings), `noStripChant`, `tailRead`. Case tests `ms*`.
 - **P5** `wordProblem.eqSteps` (with the vars hook `eqSteps`): one number-sentence line a step. Library string `story-steps`.
+- **Round 2 (owner skill coverage rule)**: `msOps` `addmult` / `adddiv` (+ or − first, then × or ÷; tokens P / Q);
+  `msLetter` (codec 4R: one equation with n, brackets when + or − comes first, then n) and `msCheck` (codec 4S: + / −
+  stories - each story number rounded to the nearest ten, the estimate, Yes / No) - both drawn by the frames layout;
+  library strings `story-letter`, `story-check`. The frames layout has a screen twin (inputs for every number and sign,
+  the answer box the host's cell), so wpFrames / msLetter / msCheck practise online as on paper. 3.OA.D.8 is FULL.

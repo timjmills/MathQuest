@@ -2595,6 +2595,8 @@ const _msOps = () => ({
         { v: 'mult', l: 'Multiply, then add or take away (4 bags of 6, 5 given away)' },
         { v: 'div', l: 'Divide, then add or take away (24 shared by 4, 2 more each)' },
         { v: 'multdiv', l: 'Multiply or divide, then add or take away' },
+        { v: 'addmult', l: 'Add or take away, then multiply ((5 + 3) in each of 4 bags)' },
+        { v: 'adddiv', l: 'Add or take away, then divide ((12 + 18) shared by 5)' },
     ],
     help: 'The new thing in Grade 3 is a × or ÷ step whose answer is used in the + or − step. One first step at a time, then mixed.',
 });
@@ -3359,6 +3361,14 @@ for (const key of ['multiplication:mult_word_problems', 'division:div_word_probl
     for (const k of [key, `${key}_plain`]) SKILL_OPTIONS[k] = [...(SKILL_OPTIONS[k] || []), {
         id: 'wpFrames', label: 'Number sentences, no column boxes', type: 'bool', default: false, group: 'layout',
         help: 'Each step is written as one number sentence (Step 1: __ ○ __ = __), the unit word printed. The fade of the column boxes; a compact story.' }];
+}
+// msLetter / msCheck (3.OA.D.8, detailed lesson 7 round 2): the standard's two other clauses as responses.
+for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
+    SKILL_OPTIONS[k] = [...(SKILL_OPTIONS[k] || []),
+        { id: 'msLetter', label: 'Write one equation with a letter', type: 'bool', default: false, group: 'layout',
+            help: 'The pupil writes the whole story as one equation with n for the unknown (5 × 4 − 6 = n; brackets when the + or − comes first), then n.' },
+        { id: 'msCheck', label: 'Estimate to check', type: 'bool', default: false, group: 'layout',
+            help: 'Add and take-away stories: the pupil works the two steps, rounds each story number to the nearest ten, estimates, and rings Yes or No: is my answer close?' }];
 }
 
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
