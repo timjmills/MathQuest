@@ -4144,6 +4144,7 @@ async function buildDetailedLesson(req = {}) {
     // a SKILL_STANDARDS tag (either form, 2.NBT.A.3 / 2.NBT.3) of one of the lesson's skills, an EE
     // one of their EEs. A tag that fails is dropped and named in the notes.
     const st0 = await loadStandards();
+    MDOC = await measureDocument();   // the measuring frame, re-synced (measureDocument)
     const lessonSkills = [d.skill, ...(d.mixed ? d.mixed.skills : []), ...((d.practiceSheets || []).map((x) => x.skill).filter(Boolean))];
     const recs = { ccss: [], ee: [] };
     for (const sk of lessonSkills) { try { const st = st0 ? st0.standardsFor(sk.categoryId, sk.skillId) : null; if (st) { recs.ccss.push(...(st.ccss || [])); recs.ee.push(...(st.ee || [])); } } catch (e) { /* none */ } }
