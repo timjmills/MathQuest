@@ -263,8 +263,6 @@ export const SHEET_ENGINE_CSS = `
 /* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{justify-content:center}
-/* (Lane D port 2026-10-30: the lane's "mq-spread centres every cell" rule is not taken - CL-4b, owner
-   2026-10-23, starts every cell at the top of its box; the class stays as a marker for the lint.) */
 /* AX-4: one place for the Correct / Fix-it block on every cell of a page - under the work, beside it (the two centred together), or in the item's own answer column */
 :is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow>.mq-judge-row{flex:1 1 100%;min-width:100%}
 :is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow:not(.mq-jstack):not(.mq-judge-drawn) .mq-judge-row{flex-direction:row;align-items:flex-start;column-gap:8mm}
@@ -1186,8 +1184,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 rows: part.chunk.rows,
                 labels: labelStyle,
                 start,
-                // every practice cell holds its problem in the middle (mq-spread): a row taller than one
-                // of its problems splits the spare above and below it (H13), never one band under it
+                // (mq-spread: the lane marks a practice grid whose rows share the page; CL-4b still starts each cell at its top,
+                // the lane's "centre every cell" CSS was not taken in the 2026-10-30 port)
                 cls: spread ? 'fixed mq-spread' : fillByFlex && !shape ? 'mq-spread' : 'fixed mq-spread',
                 height: spread ? `${spread.heightMm}mm` : gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
                 // SIDE BY SIDE in one column: each pair's twin row and problem row as tall as each
