@@ -508,3 +508,10 @@ body.teacher-mode:has(#teacherMain .tv-screen.is-active[data-screen="wrm"]) .tv-
 #teacherApp .tvs-codebox > * { min-width: 0; max-width: 100%; }
 #teacherApp .tvs-codebox .tvs-code, #teacherApp .tvs-codebox .tvs-link-line code { word-break: break-all; white-space: normal; }
 #teacherApp .tvs-batch-rows { margin: var(--sp-8) 0 0; padding-left: var(--sp-16); display: grid; gap: var(--sp-4); }
+/* W1 (critic 2026-10-30): the notice a numbered link from before the lesson-list reorder shows in the lesson head */
+.tvw-legacy-note { margin: 0; display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--tv-accent);
+    border-radius: 8px; background: var(--tv-accent-tint); font-size: 14px; line-height: 20px; color: var(--tv-text); }
+.tvw-legacy-note svg { flex: none; margin-top: 1px; color: var(--tv-accent); }
+.tvw-legacy-note a { color: var(--tv-accent); font-weight: 600; display: inline-block; min-height: 24px; }
+/* n1: "Week 35" stays on one line in the lesson head */
+.tvw-week { white-space: nowrap; }

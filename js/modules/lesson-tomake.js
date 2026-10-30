@@ -17,7 +17,7 @@
 
 import { CCSS_AUDIT, EE_AUDIT } from './standards-audit.js';
 import { WRM_PROPOSALS } from './wrm.js';
-import { WRM_EXTENSIONS, STANDARD_PROPOSALS } from './build-list.js';
+import { WRM_EXTENSIONS, STANDARD_PROPOSALS, canonicalEntry } from './build-list.js';
 import { todoName, todoTeaches } from './todo-text.js';
 import { liveSkillLabel, proposalLabel } from './wrm-links.js';
 import { plainNote, isPlain } from './plain-words.js';
@@ -168,7 +168,8 @@ export function lessonToMake(lesson, links, { queue = [], detailed = [] } = {}) 
     const codes = lessonCodes(lesson, links);
     const order = [];
     const hit = new Map();      // id -> { sources:Set, codes:Set, clauses:[] }
-    const add = (id, source, code = '', clauses = []) => {
+    const add = (id0, source, code = '', clauses = []) => {
+        const id = canonicalEntry(id0);   // W3: a merged id is listed once, under the id it was merged into
         if (!id) return;
         if (!hit.has(id)) { hit.set(id, { sources: new Set(), codes: new Set(), clauses: [] }); order.push(id); }
         const h = hit.get(id);
