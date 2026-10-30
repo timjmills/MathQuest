@@ -5319,6 +5319,7 @@ function pageCheck(html) {
             // and the padding left out) against the row's inner height; the median row under half
             // is a page of stretched rows (mixed_multiplication L: a lone row of facts at 86 mm)
             const spreadRows = new Map();
+            const topRows = [];
             const lastOfSeveral = pages.length > 1 && i === pages.length - 1;
             for (const c of pg.querySelectorAll('.ws-grid > .ws-cell:not(.blankrun)')) {
                 if (c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
@@ -5361,12 +5362,22 @@ function pageCheck(html) {
                     box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right };
                 }
                 if (!box) continue;
-                const vBand = Math.max(box.t - inner.t, inner.b - box.b, 0);
+                // CL-4b (owner 2026-10-23, Lane D port): under a cell that starts at the top of its box the band
+                // below the problem is writing room, not a sizing error - judged as lint L-DENSITY H13 does
+                // today: the band above it, and (H13-ROW, after the loop) the band below against its row's.
+                const topCell = cs.justifyContent === 'flex-start' && !c.hasAttribute('data-ws-writeabove') && !c.querySelector('[data-ws-writeabove]');
+                const vBand = topCell ? Math.max(box.t - inner.t, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
                 const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
                 if (vBand >= 0.29 * cr.height || hBand >= 0.29 * cr.width) {
                     bands++;
                     banded.push(`${c.getAttribute('data-ws-cell') || '?'} ${vBand >= 0.29 * cr.height ? 'v' : 'h'}${Math.round(100 * Math.max(vBand / cr.height, hBand / cr.width))}%`);
-                }
+                } else if (topCell) topRows.push({ c, top: cr.top, H: cr.height, below: Math.max(inner.b - box.b, 0) });
+            }
+            for (const a of topRows) {
+                const row = topRows.filter((b) => b !== a && Math.abs(b.top - a.top) <= PX_PER_MM && Math.abs(b.H - a.H) <= PX_PER_MM);
+                if (!row.length) continue;
+                const excess = a.below - Math.min(...row.map((b) => b.below));
+                if (excess >= 0.29 * a.H) { bands++; banded.push(`${a.c.getAttribute('data-ws-cell') || '?'} row${Math.round((100 * excess) / a.H)}%`); }
             }
             const fills = [...spreadRows.values()].filter((r) => r.h >= 20).map((r) => r.h / r.inner).sort((a, b) => a - b);
             if (fills.length) {
