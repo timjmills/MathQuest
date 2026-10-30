@@ -351,10 +351,8 @@ registerSkill('division:div_zero_in_quotient', {
             k += 1;
             part -= d * b;
         }
-        // One step a quotient place (the lesson's Model draws one panel a step, three across): the
-        // last place's step writes the whole quotient too.
-        if (out.length) out[out.length - 1].marks.push({ slot: 'answer', value: String(L.quotient) });
-        return out.length >= 3 ? clampSteps(out) : out.concat(step(`Write ${fmt(L.quotient)}.`, [{ slot: 'answer', value: String(L.quotient) }]));
+        out.push(step(`Write ${fmt(L.quotient)}.`, [{ slot: 'answer', value: String(L.quotient) }]));
+        return clampSteps(out);
     },
     wrongAnswer: (q) => {
         const [a, b] = operands(q);

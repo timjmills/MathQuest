@@ -277,8 +277,8 @@ export const LESSONS = Object.freeze({
     // Each lesson's steps match its provider's worked steps for the example, one step a state.
     'addition:add_sub_10s': {
         skills: [
-            { key: 'patterns:seq_10', why: 'Counting on and back by tens.' },
             { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' },
+            { key: 'patterns:skip_count_line', opts: { step: [2] }, why: 'Counting on by tens.' },
         ],
         concepts: [
             { id: 'ten-more', text: '10 more: the tens digit goes up by 1.' },
@@ -286,7 +286,7 @@ export const LESSONS = Object.freeze({
             { id: 'ones-stay', text: 'The ones digit does not change.' },
         ],
         vocab: [
-            { word: 'tens', meaning: 'groups of ten', picture: { kind: 'blocks', tens: 3, ones: 0 } },
+            { word: 'tens', meaning: 'groups of ten', picture: { kind: 'text', text: '40 = 4 tens' } },
             { word: '10 more', meaning: 'one more ten', picture: { kind: 'text', text: '43 \u2192 53' } },
             { word: '10 less', meaning: 'one ten fewer', picture: { kind: 'text', text: '43 \u2192 33' } },
         ],
@@ -299,7 +299,7 @@ export const LESSONS = Object.freeze({
         chant: '',
         format: { kind: 'numbered steps with icons', why: 'One move in one place; four short steps said in order. No decision to cue, so no chant.' },
         example: { match: 'one ten' },
-        mixWith: [{ key: 'placevalue:more_less_10' }, { key: 'patterns:seq_10' }],
+        mixWith: [{ key: 'placevalue:more_less_10' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
     },
     'addition:add_sub_100s': {
         skills: [
@@ -330,7 +330,7 @@ export const LESSONS = Object.freeze({
     'subtraction:missing_add_sub': {
         skills: [
             { key: 'addition:add_facts', opts: { band: 20 }, why: 'Count on to find a part.' },
-            { key: 'subtraction:sub_facts', opts: { band: 20 }, why: 'Take away within 20.' },
+            { key: 'composing:number_bonds', opts: { band: 10 }, why: 'Two parts make a whole.' },
         ],
         concepts: [
             { id: 'whole-parts', text: 'Two parts make the whole.' },
@@ -351,7 +351,7 @@ export const LESSONS = Object.freeze({
         chant: '',
         format: { kind: 'numbered steps with icons', why: 'Find the whole, count on, check: three moves said in order, then write.' },
         example: { match: 'Count on from' },
-        mixWith: [{ key: 'addition:add_facts', opts: { band: 20 } }, { key: 'subtraction:sub_facts', opts: { band: 20 } }],
+        mixWith: [{ key: 'addition:add_facts', opts: { band: 20 } }, { key: 'composing:number_bonds', opts: { band: 10 } }],
     },
     'division:missing_mult_div': {
         skills: [
@@ -398,6 +398,7 @@ export const LESSONS = Object.freeze({
             { icon: 'start', text: 'Divide the first place.' },
             { icon: 'decide', text: 'Does not fit? Write 0.' },
             { icon: 'subtract', text: 'Bring down. Divide again.' },
+            { icon: 'write', text: 'Write the quotient.' },
         ],
         chant: 'Does not fit? Write a zero.',
         format: { kind: 'numbered steps with icons + a chant', why: 'The one move pupils skip is the 0; a short chant at step 2 cues it every time.' },

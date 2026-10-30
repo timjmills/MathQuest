@@ -170,7 +170,9 @@ register('equation', {
         ];
         // A one-line sentence packed like a fact (`fact`, ops-family G1's missing numbers) starts at
         // the top of its cell and clears the label keep-out the way the across fact does (CL-40).
-        return `<div class="ws-eq"${p.fact ? ' data-ws-across="1"' : ''}>${pieces.join('')}</div>`;
+        // (on paper it also starts 1.5 mm lower, so a sentence as wide as its cell never inks the
+        // label's 7 mm keep-out, CL-40)
+        return `<div class="ws-eq"${p.fact ? ` data-ws-across="1"${ctx.mode !== 'screen' ? ' style="padding-top:1.5mm"' : ''}` : ''}>${pieces.join('')}</div>`;
     },
     answerKey(p) {
         const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
