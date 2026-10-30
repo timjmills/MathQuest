@@ -130,6 +130,10 @@ export const SKILL_PRESETS = Object.freeze({
     'placevalue:digit_value_unit_form': { skill: 'value', opts: { form: 'unit' } },
     'placevalue:digit_value_notation': { skill: 'value', opts: { form: 'notation' } },
     'placevalue:count_pv_disks': { skill: 'place_value_disks', opts: { task: 'count' } },
+    // (2026-10-30, detailed lesson 6 r4: build-list value_ten_times is `preset: true` - the form, its other direction and its story)
+    'placevalue:ten_times_value': { skill: 'value', opts: { form: 'times', band: 9999 } },
+    'placevalue:one_tenth_value': { skill: 'value', opts: { form: 'times', band: 9999, tenDir: 'tenth' } },
+    'placevalue:ten_times_story': { skill: 'value', opts: { form: 'times', band: 9999, tenTask: 'story' } },
     'composing:write_numbers_in_words': { skill: 'number_word_form', opts: { wordform: ['to_words'] } },
     'measurement:count_notes': { skill: 'money_count', opts: { kind: 'note' } },
     'measurement:count_notes_and_coins': { skill: 'money_count', opts: { kind: 'both' } },

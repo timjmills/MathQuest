@@ -1515,7 +1515,9 @@ const PV_OP_GLYPH = { '+': /\+/, '−': /[−–]|\s-\s/, '×': /×/, '÷': /÷/
 
 /** The place a pv NAME rounds to, or 0. The id is read first: it is the permanent declaration. */
 function pvNamePlace(id, label) {
-    const hay = `${String(id).replace(/_/g, ' ')} ${label}`.toLowerCase();
+    // ("one tenth of" / "a tenth of" is a RELATION - 4.NBT.A.1, the 7 in 70 is one tenth of the 7 in 700 - not the tenths
+    // place; lesson 6 r4. A place reads "tenths", "the tenth(s) place" or "nearest tenth".)
+    const hay = `${String(id).replace(/_/g, ' ')} ${label}`.toLowerCase().replace(/\b(one|a) tenth\b(?! place)/g, 'onetenthrelation');
     if (/\bhundredths?\b/.test(hay)) return 0.01;
     if (/\btenths?\b/.test(hay)) return 0.1;
     const m = hay.match(/nearest\s+(million|1,000,000|100,000|100000|10,000|10000|1,000|1000|100|10)\b/);

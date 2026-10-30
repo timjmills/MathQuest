@@ -198,7 +198,8 @@ export const MULTI_KEYS = Object.freeze({
     tenPlain: '4G',      // value form times: the digit and zeros only (700 and 70)
     tenWrite: '4H',      // value form times: both values / the top value only (lesson 6 r2)
     tenTask: '4I',       // value form times: compare / story (700 ÷ 70 = 10)
-    // NEXT FREE IN 4E-4O: 4J.
+    tenChoice: '4J',     // value form times, ring only: two words / four (the Check Question's A-D: + the same as, 100 times) - lesson 6 r4 (critic r2 D2)
+    // NEXT FREE IN 4E-4O: 4K.
     // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
     msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
     wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
@@ -354,6 +355,7 @@ export const VALUE_TOKENS = Object.freeze({
     tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
     tenWrite: Object.freeze({ both: 'B', top: 'T' }),
     tenTask: Object.freeze({ compare: 'C', story: 'S' }),
+    tenChoice: Object.freeze({ two: 'T', four: 'F' }),
     msOps: Object.freeze({ addsub: 'A', mult: 'M', div: 'D', multdiv: 'B', addmult: 'P', adddiv: 'Q' }),
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),

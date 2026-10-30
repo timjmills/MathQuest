@@ -808,6 +808,10 @@ export const SKILL_STANDARDS = {
     'number_sense:reasonable_quotients': { ccss: ['4.OA.A.3', '4.NBT.B.6'], ee: ['M.EE.4.OA.3'] }, // Is the Quotient Reasonable?
     'placevalue:digit_value_unit_form': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Value of a Digit in Unit Form (7 Hundreds)
     'placevalue:digit_value_notation': { ccss: ['4.NBT.A.2', '2.NBT.A.1'], ee: ['M.EE.4.NBT.2'] }, // Value of a Digit in Expanded Notation (7 × 100)
+    // (2026-10-30 presets of value form "times", detailed lesson 6: Wisconsin files 4.NBT.1 as "use M.EE.5.NBT.1")
+    'placevalue:ten_times_value': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // 10 Times and One Tenth: the Same Digit One Place Apart
+    'placevalue:one_tenth_value': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // One Tenth of a Digit's Value (One Place Right)
+    'placevalue:ten_times_story': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // How Many Times as Many? (700 ÷ 70 = 10)
     'placevalue:count_pv_disks': { ccss: ['2.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Count the Place-Value Disks in One Place
     'composing:write_numbers_in_words': { ccss: ['2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Write Numbers in Words
     'measurement:count_notes': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Count Notes (Bills)

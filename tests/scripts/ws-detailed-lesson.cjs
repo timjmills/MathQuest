@@ -161,10 +161,19 @@ function measure(LIBRARY) {
                 for (let x = Math.max(0, Math.floor((r.left - cr.left) / MM)); x < Math.min(W, Math.ceil((r.right - cr.left) / MM)); x++) g[y * W + x] = 1;
             const ink = g.reduce((a, v) => a + v, 0);
             const small = !box || cr.height < 40 || cr.width < 40;
-            const v = box ? Math.max(box.t - cr.top, cr.bottom - box.b, 0) / cr.height : 0;
+            // CL-4b (owner ruling 2026-10-23, "top of the box is the default"): under a TOP cell (justify-content
+            // flex-start, not a write-above cell) the band below the item is writing room, not a sizing error - the
+            // site lint's rule (ws-print-lint L-DENSITY H13); that band is judged against the row's other cells
+            // instead (H13-ROW, below in the verdict). Every other cell keeps both bands.
+            const tmpl = c.getAttribute('data-ws-cell') || '';
+            const wa = c.hasAttribute('data-ws-writeabove') || !!c.querySelector('[data-ws-writeabove], .ws-stack-legacy i[data-ws-seg]');
+            const workspace = ['clock', 'frac-model', 'nl-place', 'number-line', 'hop-line', 'chartwindow', 'mult-chart', 'tenframe'].includes(tmpl) || (c.hasAttribute('data-ws-legacy') && !!c.querySelector('svg'));
+            const topCell = !!tmpl && !wa && !workspace && getComputedStyle(c).justifyContent === 'flex-start';
+            const v = box ? (topCell ? Math.max(box.t - cr.top, 0) : Math.max(box.t - cr.top, cr.bottom - box.b, 0)) / cr.height : 0;
             const h = box ? Math.max(box.l - cr.left, cr.right - box.r, 0) / cr.width : 0;
             const sec = (c.closest('.ws-band, .ws-grid') || {}).className || '';
             return { w: +(cr.width / MM).toFixed(1), h: +(cr.height / MM).toFixed(1), free: Math.round((1 - ink / (W * H)) * 100), band: Math.round(Math.max(v, h) * 100),
+                topCell, top: cr.top / MM, below: box ? Math.max(cr.bottom - box.b, 0) / MM : 0,
                 skip: small, read: !!c.querySelector('[data-read], .ws-story') || !!c.closest('.dl-wppanel, .dl-wpstory'), draw: !!c.querySelector('[data-work], [data-draw]'),
                 grid: `${gridIds.get(gEl)}:${gEl.classList.contains('ws-grid') ? 'ws-grid' : ''}`, empty: !rects.length };
         });
@@ -230,6 +239,43 @@ function measure(LIBRARY) {
     }
     const pj = document.getElementById('v21-pool'); out.pool = pj ? JSON.parse(pj.textContent) : null;
     return out;
+}
+
+/* ------------------------------------------------------------------- E41 (pure) */
+// Lesson 6 critic r2 D1: a T4 note said "Smaller, so one tenth of" for a pair whose top value was bigger (E29 reads the
+// numbers, not the relation word). Every relation a teacher page STATES is true of the numbers it names: "100 is 10 times
+// 10", "30 and 300, one tenth of", "9,000, 900, 10 times" (the first value compared with the second); "Bigger / Smaller,
+// so …" answers the pair stated just before it (the cell the row names) and must match its values and relation. T6's
+// wrong-answer table is left out (it prints wrong answers on purpose). No relation stated: 0 statements, a pass.
+// `--e41-fixture <file.txt>` runs it on a text file (ws-backtest rows e41-relation).
+function relationCheck(texts) {
+    const N = '(\\d{1,3}(?:,\\d{3})+|\\d+)';
+    const num = (s0) => Number(String(s0).replace(/,/g, ''));
+    const REL = '(10 times|one tenth of|one tenth)';
+    const holds = (a, b, rel) => (/^10 times/.test(rel) ? a === 10 * b : a * 10 === b);
+    const probs = []; let n = 0;
+    for (const p of texts) {
+        const text = String(p.text || '').split('Wrong answers to look for')[0];
+        for (const m of text.matchAll(new RegExp(`${N} is ${REL} ${N}`, 'g'))) { n++; if (!holds(num(m[1]), num(m[3]), m[2])) probs.push(`${p.id}: "${m[0]}"`); }
+        for (const m of text.matchAll(new RegExp(`(?<![\\d,])${N},? (?:and )?${N}, ${REL}`, 'g'))) { n++; if (!holds(num(m[1]), num(m[2]), m[3])) probs.push(`${p.id}: "${m[0]}"`); }
+        const re = new RegExp(`(?<![\\d,])${N},? (?:and )?${N}, ${REL}|(Bigger|Smaller), so ${REL}`, 'g');
+        let pair = null;
+        for (const m of text.matchAll(re)) {
+            if (m[1] !== undefined) { pair = { a: num(m[1]), b: num(m[2]), rel: m[3] }; continue; }
+            n++;
+            const big = m[4] === 'Bigger';
+            if (big !== /^10 times/.test(m[5])) probs.push(`${p.id}: "${m[0]}"`);
+            else if (pair && (big !== (pair.a > pair.b) || /^10 times/.test(pair.rel) !== /^10 times/.test(m[5]))) probs.push(`${p.id}: "${m[0]}" after "${pair.a}, ${pair.b}, ${pair.rel}"`);
+        }
+    }
+    return { probs, n };
+}
+if (has('e41-fixture')) {
+    const r = relationCheck([{ id: 'fixture', text: fs.readFileSync(path.resolve(ROOT, arg('e41-fixture')), 'utf8').replace(/\s+/g, ' ') }]);
+    for (const x of r.probs) console.log(`  E41 ${x}`);
+    console.log(`  ${r.n} statements read`);
+    console.log(`ws-detailed-lesson --e41-fixture: ${r.probs.length ? 'FAIL' : 'OK'}`);
+    process.exit(r.probs.length ? 1 : 0);
 }
 
 /* ------------------------------------------------------------------- E24 (pure, V22) */
@@ -383,7 +429,17 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     const low = cells.filter((c) => !c.read && !c.draw && c.free < 40);
     row('E10', 'Every item cell ≥ 40 % free (reading cells exempt)', `${cells.length} cells; min free ${Math.min(...cells.filter((c) => !c.read).map((c) => c.free))} %; below 40 %: ${[...new Set(low.map((c) => c.page))].join(', ') || 'none'}`, !low.length);
     const band = cells.filter((c) => !c.skip && !c.draw && c.band >= 30);
-    row('E11', 'No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box)', `worst ${Math.max(0, ...cells.filter((c) => !c.skip && !c.draw).map((c) => c.band))} %; failing: ${band.map((c) => `${c.page} (${Math.round(c.w)}×${Math.round(c.h)} ${c.band}%)`).slice(0, 8).join(', ') || 'none'}`, !band.length);
+    // H13-ROW (ws-print-lint, CL-4b): a top cell whose band below exceeds the smallest band below of its row (same page,
+    // same top and height within 1 mm) by 30 % of its height holds a shorter item than the row was sized for.
+    for (const a of cells) {
+        if (a.skip || a.draw || !a.topCell) continue;
+        const rowMates = cells.filter((b) => b !== a && b.page === a.page && b.topCell && Math.abs(b.top - a.top) <= 1 && Math.abs(b.h - a.h) <= 1);
+        if (!rowMates.length) continue;
+        const excess = a.below - Math.min(...rowMates.map((b) => b.below));
+        if (excess >= 0.3 * a.h) band.push({ ...a, band: Math.round(excess / a.h * 100), rowBand: true });
+    }
+    const topN = cells.filter((c) => !c.skip && !c.draw && c.topCell).length;
+    row('E11', 'No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box; CL-4b: under a top cell the band below is writing room, judged against its row - H13-ROW)', `worst ${Math.max(0, ...cells.filter((c) => !c.skip && !c.draw).map((c) => c.band))} %; ${topN} top cells; failing: ${band.map((c) => `${c.page} (${Math.round(c.w)}×${Math.round(c.h)} ${c.band}%${c.rowBand ? ' over its row' : ''})`).slice(0, 8).join(', ') || 'none'}`, !band.length);
     // E12: equal cells within each grid of a page; Practice cells equal across Practice pages
     const uneq = [];
     for (const p of pupil) { const by = {}; for (const c of p.cells) (by[c.grid] = by[c.grid] || []).push(c);
@@ -677,6 +733,15 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
             const k5 = pages.find((p) => p.id === 'P5-key'); const marks = k5 ? (k5.bodyText || '') : '';
             for (const v of gl.match(/\d+/g) || []) { n++; if (!new RegExp(`(^|[^0-9])${v}([^0-9]|$)`).test(marks)) probs.push(`T6 P5 glance ${v} is not on the P5 key`); } }
         row('E29', 'Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing, T6 P5 glance)', probs.length ? probs.slice(0, 6).join('; ') : `${n} quotes, all on their pages`, n > 0 && !probs.length);
+    }
+    // E41 (lesson 6 critic r2 D1: a T4 note said "Smaller, so one tenth of" for a pair whose top value was bigger - E29 reads
+    // the numbers, not the relation word). Every relation a teacher page STATES is true of the numbers it names: "100 is
+    // 10 times 10", "30 and 300, one tenth of", "9,000, 900, 10 times" (the first value compared with the second), and
+    // "Bigger, so 10 times" / "Smaller, so one tenth of". T6's wrong-answer table is left out (it prints wrong answers on
+    // purpose). A pack whose teacher pages state no relation passes with 0 statements.
+    {
+        const { probs, n } = relationCheck(pages.filter((x) => x.teacher).map((p) => ({ id: p.id, text: p.text })));
+        row('E41', 'Every relation a teacher page states is true of the numbers it names (10 times / one tenth of; Bigger / Smaller, so …)', probs.length ? probs.slice(0, 6).join('; ') : `${n} statements, all true`, !probs.length);
     }
     const p4 = pages.filter((p) => /^P4/.test(p.id)), extra = p4.flatMap((p) => p.bandLabels.filter((t) => /^(Say|Rule|Remember):/.test(t)).map((t) => `${p.id} ${t}`));
     row('E28', 'No Say:, Rule: or Remember: band on a Practice page', `${p4.length} Practice / Mixed pages; extra bands ${extra.join(', ') || 0}`, p4.length > 0 && !extra.length);

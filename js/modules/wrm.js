@@ -1158,6 +1158,10 @@ export const SKILL_WRM = {
     'algebra:write_equation_story': ['Y6.B7.S6'],
     'order_of_operations:square_numbers': [{ step: 'Y5.B3.S6', partial: 'square numbers as square arrays; recognising squares' }],
     'placevalue:digit_value_unit_form': [{ step: 'Y2.B1.S4', note: 'band 99' }],
+    // (2026-10-30, detailed lesson 6 presets: no WRM step is exactly 4.NBT.A.1's comparison - each covers part of one)
+    'placevalue:ten_times_value': [{ step: 'Y5.B1.S6', partial: 'each place is 10 times the place to its right, read on the same digit in two numbers' }, { step: 'Y4.B5.S3', partial: 'the digit one place left is worth 10 times as much' }],
+    'placevalue:one_tenth_value': [{ step: 'Y4.B5.S5', partial: 'the digit one place right is worth one tenth as much' }],
+    'placevalue:ten_times_story': [{ step: 'Y5.B1.S6', partial: 'how many times as many: 700 ÷ 70 = 10' }],
     'composing:write_numbers_in_words': [{ step: 'Y2.B1.S6', note: 'Max Number 100' }],
     'measurement:count_notes': [{ step: 'Y2.B4.S2', partial: 'counting notes' }],
     'measurement:count_notes_and_coins': [{ step: 'Y2.B4.S3', partial: 'counting notes and coins together' }],

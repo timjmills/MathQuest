@@ -165,10 +165,12 @@ function timesWrong(q) {
     const p = pvOf(q);
     const swap = p.dir === 'times' ? TEN_REL.tenth : TEN_REL.times;
     if (!p.values) {
+        // (`tenChoice` four: every wrong answer is one of the four printed words - "100 times" on either direction)
+        const far = p.four || p.dir === 'times' ? '100 times' : 'one hundredth of';
         return choose(q, [
             { value: swap, misconception: 'M-T1', explain: 'Read the comparison the wrong way round.', slots: { rel: swap } },
             { value: 'the same as', misconception: 'M-V2', explain: 'Saw the same digit and called the values equal.', slots: { rel: 'the same as' } },
-            { value: p.dir === 'times' ? '100 times' : 'one hundredth of', misconception: 'M-V14', explain: 'Counted one place too many.', slots: { rel: p.dir === 'times' ? '100 times' : 'one hundredth of' } },
+            { value: far, misconception: 'M-V14', explain: 'Counted one place too many.', slots: { rel: far } },
         ]);
     }
     if (p.top) {

@@ -4290,6 +4290,22 @@ async function buildDetailedLesson(req = {}) {
         const bar = `<div role="img" aria-label="bar model" style="display:flex;flex-direction:column;gap:1.5mm">${bx(W, wpV.ans)}<div style="display:flex">${bx(wa, A)}${bx(W - wa, B, true)}</div></div>`;
         p5.keyPages = p5.keyPages.map((k) => String(k).replace('<div class="dl-work" data-work data-draw></div>', `<div class="dl-work" data-work data-draw style="display:flex;align-items:center;justify-content:center">${bar}</div>`));
     }
+    // (`wordProblem.workChart` - lesson 6 r4, critic r2 n2: "Draw it." for two amounts like 6,000 and 600 is a place chart;
+    // the Workspace prints an empty one - its heads, a row of boxes for each amount - and the key writes the two amounts in it)
+    if (d.wordProblem.workChart && wpD && wpD.q && Array.isArray(wpD.q.wpParts) && wpD.q.wpParts.length === 2) {
+        const nums = wpD.q.wpParts.map((v) => String(Math.round(Number(v))));
+        const w = Math.max(...nums.map((s) => s.length));
+        const HEAD = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
+        const td = (inner, st) => `<td style="width:13mm;height:13mm;text-align:center;vertical-align:middle;padding:0;${st}">${inner}</td>`;
+        const chart = (key) => `<table class="dl-workchart" role="img" aria-label="place chart" style="border-collapse:collapse;margin:8mm 0 0 8mm;color:#000">`
+            + `<tr>${Array.from({ length: w }, (_, i) => `<td style="text-align:center;font-size:var(--ws-text,15pt);padding:0 0 1mm">${HEAD[w - 1 - i]}</td>`).join('')}</tr>`
+            + nums.map((s) => `<tr>${Array.from({ length: w }, (_, i) => { const ch = s.padStart(w, ' ')[i];
+                return td(key && ch !== ' ' ? `<span data-ws-key-ans style="font-size:var(--ws-digit,28pt);font-weight:700;color:var(--ws-key-ink)">${ch}</span>` : '', 'border:0.75pt solid #000;'); }).join('')}</tr>`).join('')
+            + `</table>`;
+        const put = (html, key) => String(html).replace('<div class="dl-work" data-work data-draw></div>', `<div class="dl-work" data-work data-draw>${chart(key)}</div>`);
+        p5.pupilPages = p5.pupilPages.map((h) => put(h, false));
+        p5.keyPages = p5.keyPages.map((h) => put(h, true));
+    }
     if (sayD) p6.keyPages = p6.keyPages.map((k) => sayFill(k, d.exitSayAns ? fillPlaceholders(d.exitSayAns, { say: sayV }) : dlAns(sayD.q)));
     p6.keyPages = p6.keyPages.map((k) => String(k).split('<div class="ws-field name">Name<i></i></div>').join(`<div class="ws-field name"><span data-ws-key="name">Answer Key</span><i></i></div>`));
 
@@ -4417,7 +4433,7 @@ async function buildDetailedLesson(req = {}) {
     // (the story's own answer first when the frame totals something else - lesson 3a r4, critic r2 m7)
     // (a table word problem - lesson 5 r4, critic r2 D7: its answer is the rule only; no equation is asked)
     glance.push({ page: 'P5 Word problem', answers: d.wordProblem.tableItem ? String(wpV.ans) : eqN !== wpV.ans ? `${wpV.ans} · ${wpV.eq}` : wpV.eq, fade: DL_FADE.P5 });
-    // (CL-11a: the exit items are number tabs, so the glance quotes 1. 2., never a. b. - lesson 7 r2)
+    // (CL-11a, owner 2026-10-23: the slip's items are number tabs - the glance names them 1. 2. 3., as the key prints them)
     glance.push({ page: 'P6 Exit slip', answers: exVars.map((x, i) => `${i + 1}. ${x.ans}`).join(' · '), fade: DL_FADE.P6 });
     const prereqAtoms = d.atoms.filter((x) => x.prereq);
     const routing = d.prerequisites.map((p, i) => {

@@ -69,6 +69,16 @@ export default {
         };
     },
 
+    // (r4, critic r2 n9: T5's "last rows" names each pair as printed - 3,078 and 307 - with its place pair and direction)
+    lastName: (q) => {
+        const p = q && q.pv;
+        if (!p || p.kind !== 'times') return '';
+        return `${fmt(p.n)} and ${fmt(p.m)} (${WORD[Math.max(p.place, p.placeM)]} and ${WORD[Math.min(p.place, p.placeM)]}, ${p.dir === 'times' ? '10 times' : 'one tenth'})`;
+    },
+
+    // (r4, critic r2 n3: a T6 answer as the key prints it - 4,000, never 4000)
+    answerShow: (t) => String(t).replace(/(^|[^\d,])(\d{4,})(?![\d,])/g, (m, a, n) => a + Number(n).toLocaleString('en-US')),
+
     lessonData: {
         skills: [],
         concepts: [
@@ -100,10 +110,10 @@ export default {
 
     // ------------------------------------------------------------------ P0 Prerequisite Check
     prerequisites: [
-        { atom: 1, items: 4, ref: PV('identify', { band: 999, response: 'circle' }), lesson: { id: '4.NBT.A.2', title: 'Name the place of a digit' } },
-        { atom: 2, items: 4, ref: PV('value', { band: 9999, form: 'value' }), lesson: { id: '4.NBT.A.2', title: 'The value of a digit' } },
-        { atom: 3, items: 4, ref: PV('place_value_10x', { op: 'x', power: [10], band: 1000 }), lesson: { id: '3.NBT.A.3', title: 'Multiply by 10' } },
-        { atom: 4, items: 4, ref: PV('place_value_10x', { op: '/', power: [10], band: 1000 }), lesson: { id: '4.NBT.B.6', title: 'Divide by 10' } },
+        { atom: 1, items: 2, ref: PV('identify', { band: 999, response: 'circle' }), lesson: { id: '4.NBT.A.2', title: 'Name the place of a digit' } },
+        { atom: 2, items: 2, ref: PV('value', { band: 9999, form: 'value' }), lesson: { id: '4.NBT.A.2', title: 'The value of a digit' } },
+        { atom: 3, items: 2, ref: PV('place_value_10x', { op: 'x', power: [10], band: 1000 }), lesson: { id: '3.NBT.A.3', title: 'Multiply by 10' } },
+        { atom: 4, items: 2, ref: PV('place_value_10x', { op: '/', power: [10], band: 1000 }), lesson: { id: '4.NBT.B.6', title: 'Divide by 10' } },
     ],
 
     // ------------------------------------------------------------------ P1 Number sense
@@ -122,6 +132,8 @@ export default {
         ref: TEN({ tenTask: 'story', tenDir: 'times', band: 9999 }),
         want: ['tenThou'],
         instruction: 'Read the story. Draw it. Solve.',
+        // (r4, critic r2 n2: the drawing is a place chart - the Workspace prints an empty one, the key writes both amounts)
+        workChart: true,
         answerLine: '',
         say: 'Mia has __ times as many.',
         sayAns: '{wp.eqN}',
@@ -176,7 +188,7 @@ export default {
     routine: [
         { step: 'Find the digit in each row. Read its place.', tag: 'Pre-requisite', check: 'Prerequisite Check: places' },
         { step: 'Write what each digit is worth.', tag: 'New', check: 'Every worth box filled' },
-        { step: 'Bigger value: 10 times. Smaller: one tenth.', tag: 'New', critical: true, check: 'Check Question; exit b' },
+        { step: 'Bigger value: 10 times. Smaller: one tenth.', tag: 'New', critical: true, check: 'Check Question; exit 2' },
     ],
     howToTeach: 'Build it with blocks first: 10 rods make a flat. Then the chart: the same digit one column left is worth 10 times as much. Model 10 times, then the same pair read the other way: one tenth.',
     board: 'Th H T O chart: {chart.nF} over {chart.mF}, the {chart.d}s underlined.',
@@ -186,7 +198,8 @@ export default {
         { name: 'Counted two places', step: 1, looks: '“{cq.C}” for {cq.v0} and {cq.v1}', fix: 'Point: one column apart.', option: 'C', misconception: 'M-V14' },
         { name: 'Digit, not value', step: 2, looks: '{we.1.d} and {we.1.d} for {we.1.v0} and {we.1.v1}', fix: 'Write the zeros: the place.', option: '', caught: 'Guided 2 · Practice 1' },
     ],
-    checkQuestion: { want: 'tenTimesMid', ref: TEN({ tenValues: false }), correct: 'D', show: (v) => String(v).replace(/ \(.*\)$/, '') },
+    // (r4, critic r2 D2: the board's A-D form is the skill's own tenChoice four - the same four words online)
+    checkQuestion: { want: 'tenTimesMid', ref: TEN({ tenValues: false, tenChoice: 'four' }), correct: 'D', show: (v) => String(v).replace(/ \(.*\)$/, '') },
 
     // ------------------------------------------------------------------ T3-T5 delivery scripts
     sections: [
@@ -255,7 +268,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
                 { say: 'Left is ten times. Right is one tenth.', note: 'Say the chant together twice.' },
-                { do: 'Hand out the exit slip. No help. Sort the slips by item b.', note: 'a. [[{exit.0.v0}]], [[{exit.0.rel}]] · b. [[{exit.1.v0}]], [[{exit.1.rel}]] · c. [[{exit.2.v0}]], [[{exit.2.rel}]].' },
+                { do: 'Hand out the exit slip. No help. Sort the slips by item 2.', note: '1. [[{exit.0.v0}]], [[{exit.0.rel}]] · 2. [[{exit.1.v0}]], [[{exit.1.rel}]] · 3. [[{exit.2.v0}]], [[{exit.2.rel}]].' },
             ] },
     ],
     transitionsMin: 4,
@@ -268,9 +281,9 @@ export default {
     ],
     wrongAnswers: [
         // (each row an answer the slip can show: two values and a ring - critic r1 D3)
-        { wrote: '{exit.0.wrong.MV2} for {exit.0.nF} and {exit.0.mF} (exit a)', mistake: 'Digit, not value', next: 'Cover one row; write its value.' },
-        { wrote: '{exit.1.wrong.MT1} for {exit.1.nF} and {exit.1.mF} (exit b)', mistake: 'Wrong way round', next: '“Which value is bigger?” first.' },
-        { wrote: '{exit.2.wrong.MV14} for {exit.2.nF} and {exit.2.mF} (exit c)', mistake: 'Place next to it', next: 'Point to the heads: read the place.' },
+        { wrote: '{exit.0.wrong.MV2} for {exit.0.nF} and {exit.0.mF} (exit 1)', mistake: 'Digit, not value', next: 'Cover one row; write its value.' },
+        { wrote: '{exit.1.wrong.MT1} for {exit.1.nF} and {exit.1.mF} (exit 2)', mistake: 'Wrong way round', next: '“Which value is bigger?” first.' },
+        { wrote: '{exit.2.wrong.MV14} for {exit.2.nF} and {exit.2.mF} (exit 3)', mistake: 'Place next to it', next: 'Point to the heads: read the place.' },
         { wrote: '“{cq.wrong.MT1}” for {cq.v0} and {cq.v1} (Check Question)', mistake: 'Wrong way round', next: 'Rods and a flat: which is more?' },
     ],
 };

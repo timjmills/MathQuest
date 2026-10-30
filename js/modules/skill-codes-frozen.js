@@ -366,6 +366,9 @@ export const FROZEN_SKILL_CODES = {
     // auto assigner's VH (a dropped draft) and not Y7-Y9 (left to the parallel lesson-6 lane). APPEND ONLY. ----
     "algebra:two_step_mult_div_first": "ZA", "algebra:two_step_add_then_mult": "ZB", "algebra:two_step_add_then_div": "ZC",
     "algebra:two_step_letter_equation": "ZD", "algebra:two_step_estimate_check": "ZE",
+    // ---- 2026-10-30 detailed lesson 6 presets (placevalue:value form "times", 4.NBT.A.1). Y7-Y9, the next free codes
+    // after Y6. APPEND ONLY. ----
+    "placevalue:ten_times_value": "Y7", "placevalue:one_tenth_value": "Y8", "placevalue:ten_times_story": "Y9",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

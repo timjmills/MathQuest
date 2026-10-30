@@ -306,6 +306,9 @@ function genPlace(q, skill, o) {
  * payload carry each row as a string with its place, so decimals (5.NBT.A.1) reuse both.
  */
 export const TEN_REL = Object.freeze({ times: '10 times', tenth: 'one tenth of' });
+// `tenChoice` four (lesson 6 r4, critic r2 D2): the board Check Question's four words, ONE fixed set for every item and
+// direction, so the set never tells the answer ("100 times" is offered on a one-tenth item too).
+export const TEN_CHOICES4 = Object.freeze([TEN_REL.times, TEN_REL.tenth, 'the same as', '100 times']);
 function genTimesValue(q, o) {
     const cap = capOf('placevalue', 'value', o, 999);
     const nd = Math.max(2, String(digitSpan(cap)[1]).length);
@@ -316,6 +319,7 @@ function genTimesValue(q, o) {
     const story = o.tenTask === 'story';
     const values = o.tenValues !== false;
     const top = values && o.tenWrite === 'top';
+    const four = !values && o.tenChoice === 'four';
     const plain = !!o.tenPlain || story;
     const d = randInt(1, 9);
     // A number holding `d` once, at place `pl`, its length between pl's and nd digits.
@@ -348,7 +352,7 @@ function genTimesValue(q, o) {
     if (story) {
         // (`tenTask` story, 4.NBT.A.1's own example: 700 ÷ 70 = 10 - two amounts, the digit and zeros, the bigger first)
         const B = Math.max(first, second), Sm = Math.min(first, second);
-        q.text = `Mia has ${fmt(B)} stickers. Leo has ${fmt(Sm)} stickers. Look at the ${d} in each number. Mia has how many times as many?`;
+        q.text = `Mia has ${fmt(B)} stickers. Leo has ${fmt(Sm)} sticker${Sm === 1 ? '' : 's'}. Look at the ${d} in each number. Mia has how many times as many?`;
         q.printText = q.text;
         q.storyText = q.text;
         inlineBlanks(q, `${q.text} ___ ÷ ___ = ___`, [[B, Sm, 10], [fmt(B), fmt(Sm), 10]], [String(B).length + 2, String(Sm).length + 2, 3]);
@@ -378,16 +382,16 @@ function genTimesValue(q, o) {
     } else {
         q.text = `The ${d} in ${F} is ___ the ${d} in ${S}.`;
         q.answerType = 'multiple-choice';
-        q.options = [TEN_REL.times, TEN_REL.tenth];
+        q.options = four ? TEN_CHOICES4.slice() : [TEN_REL.times, TEN_REL.tenth];
         q.ans = rel;
         // (the key names the two values too, so two ring items of a page never share one key line)
         q.dealAnswer = `${rel} (${fmt(v0)} and ${fmt(v1)})`;
     }
-    q.pv = { kind: 'times', n: first, m: second, place: dir === 'times' ? P : P / 10, placeM: dir === 'times' ? P / 10 : P, digit: d, dir, values, plain, v0, v1, rel, top };
+    q.pv = { kind: 'times', n: first, m: second, place: dir === 'times' ? P : P / 10, placeM: dir === 'times' ? P / 10 : P, digit: d, dir, values, plain, v0, v1, rel, top, four };
     q.cell = { template: 'pv-times', v: 1, payload: {
         kind: 'times', digit: d, dir, values, ...(top ? { oneValue: true } : {}),
         rows: [{ n: String(first), place: q.pv.place }, { n: String(second), place: q.pv.placeM }],
-        keys: { v0: fmt(v0), v1: fmt(v1), rel }, choices: [TEN_REL.times, TEN_REL.tenth], keyValue: q.ans,
+        keys: { v0: fmt(v0), v1: fmt(v1), rel }, choices: four ? TEN_CHOICES4.slice() : [TEN_REL.times, TEN_REL.tenth], keyValue: q.ans,
     } };
     q.printFormat = 'pv-cell';
     q.visual = '';

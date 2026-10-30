@@ -6,7 +6,7 @@
   "gate": "node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check",
   "source": "data/curriculum/source/Lessons_To_Build_K-5_2026-27.xlsx, sheet 'Build order (all grades)', rows 1-5 (owner 2026-10-16)",
   "joins": "siteLessonId = data/curriculum/site-lessons.json lessons[].id; skills keys = 'category:skill' as in data/curriculum/links/*.json",
-  "updated": "2026-10-17"
+  "updated": "2026-10-30"
  },
  "lessons": [
   {
@@ -394,6 +394,333 @@
    "rulings": [
     "x rules x2, x3, x5, x10 (x10 alone ran out of fresh pairs; P0 has a x3 band)"
    ]
+  },
+  {
+   "id": "g4-nbt1-ten-times-value",
+   "order": 6,
+   "grade": "4",
+   "level": 4,
+   "title": "I Can find 10 times and one tenth",
+   "ownerTitle": "Place value: 10 times and one tenth of a digit's value",
+   "siteLessonId": "G4|-|placevalue10timesandonetenthofadigitsvalue",
+   "wrmYear": "Y5",
+   "wrmSteps": [],
+   "wrmNear": [
+    "Y5.B1.S6",
+    "Y4.B5.S3",
+    "Y4.B5.S5"
+   ],
+   "ccss": [
+    "4.NBT.A.1"
+   ],
+   "ee": [
+    "M.EE.5.NBT.1"
+   ],
+   "ccssOwnerList": [
+    "4.NBT.A.1",
+    "5.NBT.A.1"
+   ],
+   "eeNote": "Wisconsin files 4.NBT.1 as \"use M.EE.5.NBT.1\"; 5.NBT.A.1 (decimals) is lesson 9",
+   "flow": "Standard (one chunk: 10 times first, then one tenth; the same chart every time)",
+   "skills": {
+    "used": [
+     {
+      "key": "placevalue:identify",
+      "opts": {
+       "band": 999,
+       "response": "circle"
+      },
+      "role": "P0"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "band": 9999,
+       "form": "value"
+      },
+      "role": "P0"
+     },
+     {
+      "key": "placevalue:place_value_10x",
+      "opts": {
+       "op": "x",
+       "power": [
+        10
+       ],
+       "band": 1000
+      },
+      "role": "P0"
+     },
+     {
+      "key": "placevalue:place_value_10x",
+      "opts": {
+       "op": "/",
+       "power": [
+        10
+       ],
+       "band": 1000
+      },
+      "role": "P0"
+     },
+     {
+      "key": "placevalue:more_less_100",
+      "opts": {
+       "step": [
+        10,
+        100
+       ],
+       "dir": [
+        "more",
+        "less"
+       ]
+      },
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:compare",
+      "opts": {
+       "band": 999,
+       "closeness": [
+        "far",
+        "close"
+       ]
+      },
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenDir": "both",
+       "tenValues": true
+      },
+      "role": "P2 chart, P3 Guided + Independent, P4-1",
+      "preset": "placevalue:ten_times_value"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 99999,
+       "tenDir": "both",
+       "tenValues": true
+      },
+      "role": "P4-2"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenTask": "story",
+       "tenDir": "times"
+      },
+      "role": "P5",
+      "preset": "placevalue:ten_times_story"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenWrite": "top",
+       "tenDir": [
+        "times",
+        "tenth"
+       ]
+      },
+      "role": "P6"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenValues": false,
+       "tenChoice": "four"
+      },
+      "role": "Check Question (board A-D)"
+     },
+     {
+      "key": "multiplication:mult_facts",
+      "opts": {
+       "constant": [
+        10
+       ]
+      },
+      "role": "retrieval"
+     },
+     {
+      "key": "placevalue:unit_form",
+      "opts": {
+       "band": 9999
+      },
+      "role": "retrieval"
+     },
+     {
+      "key": "placevalue:compare",
+      "opts": {
+       "band": 999,
+       "closeness": "close"
+      },
+      "role": "retrieval"
+     }
+    ],
+    "built": [
+     "placevalue:value form \"times\" (gen-pv.js genTimesValue) with options tenDir 4E, tenValues 4F, tenPlain 4G, tenWrite 4H, tenTask 4I, tenChoice 4J (r4, critic r2 D2: the Check Question's four words)",
+     "kit template pv-times (two-row place chart, worth boxes, the ring sentence; stepState for the chart) + its screen twin (screen-cell.js pvTimesTwin)",
+     "provider branch (sheet/providers/pv.js): worked steps, wrong answers M-T1 / M-V2 / M-V14"
+    ],
+    "presets": [
+     {
+      "key": "placevalue:ten_times_value",
+      "opts": {
+       "form": "times",
+       "band": 9999
+      },
+      "code": "Y7"
+     },
+     {
+      "key": "placevalue:one_tenth_value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenDir": "tenth"
+      },
+      "code": "Y8"
+     },
+     {
+      "key": "placevalue:ten_times_story",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenTask": "story"
+      },
+      "code": "Y9"
+     }
+    ],
+    "plainOptions": "tenValues (a scaffold on/off), tenPlain (the digit and zeros: a range tweak), tenWrite (one worth box: a short check), tenChoice (four words to choose from: the response set), tenDir both (the mixed default of ten_times_value)",
+    "coverage": [
+     {
+      "item": "4.NBT.A.1 \"a digit in one place represents ten times what it represents in the place to its right\"",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenDir": "times"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "4.NBT.A.1 \"multi-digit whole number\"",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": [
+        9999,
+        99999,
+        999999
+       ]
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "4.NBT.A.1 \"recognize that 700 ÷ 70 = 10 by applying concepts of place value and division\"",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenTask": "story"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "one tenth, whole numbers (the site lesson title; 5.NBT.A.1's clause in words)",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenDir": "tenth"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "5.NBT.A.1 with decimals; 1/10 written as a fraction or 0.1",
+      "skill": "",
+      "opts": {},
+      "verdict": "elsewhere: lesson 9 (5.NBT.A.1), the same pv-times template with decimal rows"
+     },
+     {
+      "item": "Atoms 1-4 (places, value, x 10, / 10) - P0",
+      "skill": "placevalue:identify · placevalue:value · placevalue:place_value_10x",
+      "opts": {
+       "form": "value",
+       "op": [
+        "x",
+        "/"
+       ],
+       "power": [
+        10
+       ]
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "Atoms 5-8 (one place left, left or right, any place, one tenth) - P2, P3, P4",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": [
+        9999,
+        99999
+       ],
+       "tenDir": "both"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "Routine step 3 (bigger value: 10 times; smaller: one tenth) - P6 exit slip, one worth box then the ring",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenWrite": "top"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "Check Question (board A-D: one tenth of · the same as · 100 times · 10 times)",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenValues": false,
+       "tenChoice": "four"
+      },
+      "verdict": "full"
+     }
+    ]
+   },
+   "critic": {
+    "verdict": "FAIL",
+    "round": 2,
+    "min": [
+     8,
+     7,
+     8,
+     8
+    ],
+    "reports": "design/lesson-planner/lessons/g4-nbt1-ten-times-value/critic-r1..r2.md",
+    "fixes": "fix-r4.md"
+   },
+   "status": "in review",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/",
+    "pdf": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/pack.pdf",
+    "html": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/SELF-CHECK.md"
+   }
   },
   {
    "id": "g3-oa8-two-step-wp",

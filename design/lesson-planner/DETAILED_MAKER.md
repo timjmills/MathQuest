@@ -192,7 +192,8 @@ to `SELF-CHECK.md` in V22's table format. They are V22's `js v21-selfcheck` port
 | Check | How it runs here |
 |---|---|
 | E1, E1b, E2–E7, E9, E10, E12–E14, E16, E16b, E17, E17b, E18–E23, E25–E28 | ported from V22 Appendix E |
-| E9b, E11 | the site's own `sheetCheck` (ws-lesson-samples H13 and its body-blank lint), line for line |
+| E9b, E11 | the site's own `sheetCheck` (ws-lesson-samples H13 and its body-blank lint); E11 follows `ws-print-lint` L-DENSITY since CL-4b (owner, 2026-10-23, "top of the box is the default"): under a top cell the band below the item is writing room, judged against its row's other cells (H13-ROW) - 2026-10-30, lesson 6 r4 |
+| E41 | every relation a teacher page states is true of the numbers it names ("100 is 10 times 10", "30 and 300, one tenth of", "Bigger / Smaller, so …" against the pair before it); lesson 6 critic r2 D1; `--e41-fixture` runs it on a text file (ws-backtest row `e41-relation`) |
 | E8 (28 pt working digits) | the kit sets `--ws-digit: 28pt` at L for every pupil page; measured by `ws-print-lint --source kit` |
 | E15 | V22 Appendix C.1 **or** the kit's `INSTRUCTION_LIBRARY` (sheet/contract.js, the PED 10.1 library C.1 copies); strings found only in the kit are listed in the result |
 | E24, E24b | read the `#v21-pool` JSON. Its `places` list is the kit equivalent of V22's `data-item` / `data-rep` / `data-row`: the bridge reads every PRINTED cell from the plans the pages render from. The pool is V22's `{kind: 'list'}` form (the description's range, lesson 1: 21–999). E24b also fails near twins: two one-number items of one skill on a page within 2 (405 / 406, V22 LR-6) |
