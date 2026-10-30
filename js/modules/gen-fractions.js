@@ -3713,7 +3713,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // repeats it. The bars are the whole number drawn (never the answer, RP-1). ONE kind
                 // to a page: `forms` 0 = a whole number over 1 (default), 1 = 1 as den/den.
                 const f = state.skillOptions && state.skillOptions.forms;
-                const _wfForms = Array.isArray(f) ? [0, 1].filter(v => f.includes(v)) : [];
+                // (Lane D port: a teacher who narrows the denominators - the `denoms` option, main 2026-10 - asks
+                // for the den/den form, the one form with a denominator to choose; form 0 is always over 1)
+                const _wfForms0 = Array.isArray(f) ? [0, 1].filter(v => f.includes(v)) : [];
+                const _wfForms = !_fChanged('forms') && _fChanged('denoms') ? [1] : _wfForms0;
                 const _wfKind = (_wfForms.length ? _wfForms : [0])[Math.floor(Math.random() * (_wfForms.length || 1))];
                 q.skillLabel = 'Whole Numbers as Fractions';
                 q.answerType = 'number';

@@ -2638,7 +2638,7 @@ Object.assign(P12_OPTIONS, {
     'composing:fraction_number_line': [_p12Denoms(), _p12Match([['Read the dot (0 to 1)', 'show\\? =>'], ['Read the shaded line (0 to 1)', 'shaded\\?'],
         ['Read a dot past 1', 'past 1'], ['Pick the number line that shows a fraction', '^Which number line'], ['Mark a fraction on the line', '^Put ']], { dflt: [0],
         help: 'One kind to a page: reading the dot comes first. Tick more kinds to mix them.' })],
-    'composing:whole_as_fraction': [_p12Denoms(), _p12Match([['A whole number over 1 (4 = 4/1)', 'denominator 1\\.'], ['1 as all the parts (1 = 6/6)', 'denominator [2-9]\\.']], { dflt: [0],
+    'composing:whole_as_fraction': [_p12Denoms(), _p12Match([['A whole number over 1 (4 = 4/1)', 'whole number as a fraction'], ['1 as all the parts (1 = 6/6)', '^Write 1 as a fraction']], { dflt: [0],
         help: 'A whole number over 1 comes first. Tick both to mix them.' })],
     'subtraction:missing_add_sub': [
         _p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']]),
