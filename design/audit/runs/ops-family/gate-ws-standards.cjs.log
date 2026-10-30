@@ -1,0 +1,12 @@
+standards: 177 CCSS (+61 parts), 117 EE
+skills: 716 live, 607 with CCSS (31 approx), 56 pools, 53 with a reason
+coverage: CCSS 166/177 (94%), EE 115/117 (98%)
+  by level: K 95%  1 100%  2 85%  3 100%  4 96%  5 92%  6 90%
+full coverage (audit): CCSS 76/177 full, 90 partial, 11 gap; parts and leaves 103/217 full, 92 partial, 22 gap; EE 81/117 full, 33 partial, 3 gap
+  tag fixes: 8 mis-tags, 1 flagged, 68 missing tags added; build list: 277 entries (133 new skills, 88 options, 2 repairs, 54 added from the visual catalogue) in 10 lanes
+visual catalogue: 575 year rows -> 210 representations (MATCH 6, PARTIAL 103, GAP 101); 54 build-list entries added from it
+ws-standards: OK
+(node:19744) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/MathQuest/js/modules/data.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/MathQuest/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)

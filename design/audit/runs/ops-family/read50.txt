@@ -1,0 +1,173 @@
+== addition:add_sub_10s null  distinct=36/50 top=4 bad=0
+   75 + 10 = ? | 85 | equation d3 result
+   71 + 10 = ? | 81 | equation d3 result
+   51 − 10 = ? | 41 | equation d3 result
+   60 + 10 = ? | 70 | equation d3 result
+   34 + 10 = ? | 44 | equation d3 result
+   53 − 10 = ? | 43 | equation d3 result
+   68 + 10 = ? | 78 | equation d3 result
+   87 + 10 = ? | 97 | equation d3 result
+== addition:add_sub_10s {"task":[0]}  distinct=40/50 top=2 bad=0
+   80 + 10 = ? | 90 | equation d3 result
+   77 + 10 = ? | 87 | equation d3 result
+   54 + 10 = ? | 64 | equation d3 result
+   89 + 10 = ? | 99 | equation d3 result
+   85 + 10 = ? | 95 | equation d3 result
+   66 + 10 = ? | 76 | equation d3 result
+   86 + 10 = ? | 96 | equation d3 result
+   16 + 10 = ? | 26 | equation d3 result
+== addition:add_sub_10s {"task":[1]}  distinct=40/50 top=3 bad=0
+   73 − 10 = ? | 63 | equation d2 result
+   26 − 10 = ? | 16 | equation d2 result
+   81 − 10 = ? | 71 | equation d2 result
+   30 − 10 = ? | 20 | equation d2 result
+   28 − 10 = ? | 18 | equation d2 result
+   57 − 10 = ? | 47 | equation d2 result
+   38 − 10 = ? | 28 | equation d2 result
+   73 − 10 = ? | 63 | equation d2 result
+== addition:add_sub_10s {"band":50}  distinct=26/50 top=4 bad=0
+   20 − 10 = ? | 10 | equation d2 result
+   16 + 10 = ? | 26 | equation d2 result
+   11 + 10 = ? | 21 | equation d2 result
+   35 − 10 = ? | 25 | equation d2 result
+   45 − 10 = ? | 35 | equation d2 result
+   24 − 10 = ? | 14 | equation d2 result
+   18 + 10 = ? | 28 | equation d2 result
+   41 − 10 = ? | 31 | equation d2 result
+== addition:add_sub_100s null  distinct=50/50 top=1 bad=0
+   370 − 100 = ? | 270 | equation d4 result
+   614 + 100 = ? | 714 | equation d4 result
+   197 + 100 = ? | 297 | equation d4 result
+   367 + 100 = ? | 467 | equation d4 result
+   227 + 100 = ? | 327 | equation d4 result
+   360 − 100 = ? | 260 | equation d4 result
+   623 − 100 = ? | 523 | equation d4 result
+   230 + 100 = ? | 330 | equation d4 result
+== addition:add_sub_100s {"task":[0]}  distinct=49/50 top=2 bad=0
+   268 + 100 = ? | 368 | equation d4 result
+   313 + 100 = ? | 413 | equation d4 result
+   339 + 100 = ? | 439 | equation d4 result
+   451 + 100 = ? | 551 | equation d4 result
+   851 + 100 = ? | 951 | equation d4 result
+   741 + 100 = ? | 841 | equation d4 result
+   522 + 100 = ? | 622 | equation d4 result
+   267 + 100 = ? | 367 | equation d4 result
+== addition:add_sub_100s {"task":[1]}  distinct=48/50 top=2 bad=0
+   128 − 100 = ? | 28 | equation d3 result
+   751 − 100 = ? | 651 | equation d3 result
+   219 − 100 = ? | 119 | equation d3 result
+   548 − 100 = ? | 448 | equation d3 result
+   561 − 100 = ? | 461 | equation d3 result
+   661 − 100 = ? | 561 | equation d3 result
+   427 − 100 = ? | 327 | equation d3 result
+   291 − 100 = ? | 191 | equation d3 result
+== addition:add_sub_100s {"band":500}  distinct=48/50 top=2 bad=0
+   484 − 100 = ? | 384 | equation d3 result
+   474 − 100 = ? | 374 | equation d3 result
+   183 − 100 = ? | 83 | equation d3 result
+   308 + 100 = ? | 408 | equation d3 result
+   166 + 100 = ? | 266 | equation d3 result
+   485 − 100 = ? | 385 | equation d3 result
+   248 − 100 = ? | 148 | equation d3 result
+   171 − 100 = ? | 71 | equation d3 result
+== subtraction:missing_add_sub null  distinct=17/50 top=8 bad=1
+   17 − ___ = 8 | 9 | equation d2 b
+   6 + ___ = 13 | 7 | equation d2 b
+   ___ + 15 = 19 | 4 | equation d2 a
+   18 − ___ = 12 | 6 | equation d2 b
+   ___ + 9 = 16 | 7 | equation d2 a
+   ___ + 4 = 5 | 1 | equation d2 a
+   10 + ___ = 19 | 9 | equation d2 b
+   ___ + 6 = 7 | 1 | equation d2 a
+   BAD: hint has ans 4 − ___ = 2 :: Start at 2. Count on to 4. How many did you count?
+== subtraction:missing_add_sub {"unknown":[0]}  distinct=19/50 top=6 bad=0
+   2 + 9 = ___ | 11 | equation d2 result
+   10 − 9 = ___ | 1 | equation d2 result
+   12 + 6 = ___ | 18 | equation d2 result
+   14 + 1 = ___ | 15 | equation d2 result
+   9 − 7 = ___ | 2 | equation d2 result
+   20 − 7 = ___ | 13 | equation d2 result
+   17 − 7 = ___ | 10 | equation d2 result
+   14 − 6 = ___ | 8 | equation d2 result
+== subtraction:missing_add_sub {"unknown":[0,1]}  distinct=18/50 top=5 bad=1
+   ___ + 2 = 10 | 8 | equation d2 a
+   6 + ___ = 12 | 6 | equation d2 b
+   3 + ___ = 4 | 1 | equation d2 b
+   12 + 2 = ___ | 14 | equation d2 result
+   ___ − 5 = 3 | 8 | equation d2 a
+   6 + 1 = ___ | 7 | equation d2 result
+   2 + 14 = ___ | 16 | equation d2 result
+   ___ − 6 = 2 | 8 | equation d2 a
+   BAD: hint has ans 20 − ___ = 10 :: Start at 10. Count on to 20. How many did you count?
+== subtraction:missing_add_sub {"task":[0]}  distinct=16/50 top=7 bad=0
+   ___ + 9 = 11 | 2 | equation d2 a
+   9 + ___ = 10 | 1 | equation d2 b
+   ___ + 6 = 18 | 12 | equation d2 a
+   ___ + 1 = 15 | 14 | equation d2 a
+   7 + ___ = 9 | 2 | equation d2 b
+   7 + ___ = 20 | 13 | equation d2 b
+   7 + ___ = 17 | 10 | equation d2 b
+   6 + ___ = 14 | 8 | equation d2 b
+== subtraction:missing_add_sub {"task":[1]}  distinct=18/50 top=6 bad=0
+   ___ − 2 = 9 | 11 | equation d2 a
+   10 − ___ = 1 | 9 | equation d2 b
+   ___ − 12 = 6 | 18 | equation d2 a
+   ___ − 14 = 1 | 15 | equation d2 a
+   9 − ___ = 2 | 7 | equation d2 b
+   20 − ___ = 13 | 7 | equation d2 b
+   17 − ___ = 10 | 7 | equation d2 b
+   14 − ___ = 8 | 6 | equation d2 b
+== division:missing_mult_div null  distinct=18/50 top=7 bad=0
+   ___ × 4 = 32 | 8 | equation d3 a
+   ___ × 5 = 15 | 3 | equation d3 a
+   6 ÷ ___ = 2 | 3 | equation d3 b
+   12 × ___ = 120 | 10 | equation d3 b
+   44 ÷ ___ = 11 | 4 | equation d3 b
+   32 ÷ ___ = 8 | 4 | equation d3 b
+   6 × ___ = 66 | 11 | equation d3 b
+   ___ ÷ 5 = 5 | 25 | equation d3 a
+== division:missing_mult_div {"notation":["bracket"]}  distinct=17/50 top=6 bad=0
+   ___ ÷ 8 = 2 | 16 | equation d3 a/bracket
+   ___ × 6 = 66 | 11 | equation d3 a
+   8 × ___ = 96 | 12 | equation d3 b
+   ___ × 9 = 45 | 5 | equation d3 a
+   ___ ÷ 2 = 8 | 16 | equation d3 a/bracket
+   132 ÷ ___ = 11 | 12 | equation d3 b/bracket
+   22 ÷ ___ = 11 | 2 | equation d3 b/bracket
+   ___ ÷ 4 = 7 | 28 | equation d3 a/bracket
+== division:missing_mult_div {"notation":["fraction"]}  distinct=17/50 top=6 bad=0
+   ___ ÷ 8 = 2 | 16 | equation d3 a/fraction
+   ___ × 6 = 66 | 11 | equation d3 a
+   8 × ___ = 96 | 12 | equation d3 b
+   ___ × 9 = 45 | 5 | equation d3 a
+   ___ ÷ 2 = 8 | 16 | equation d3 a/fraction
+   132 ÷ ___ = 11 | 12 | equation d3 b/fraction
+   22 ÷ ___ = 11 | 2 | equation d3 b/fraction
+   ___ ÷ 4 = 7 | 28 | equation d3 a/fraction
+== division:missing_mult_div {"notation":["across","bracket","fraction"]}  distinct=21/50 top=8 bad=0
+   ___ ÷ 3 = 6 | 18 | equation d3 a/fraction
+   ___ × 6 = 66 | 11 | equation d3 a
+   8 × ___ = 96 | 12 | equation d3 b
+   ___ × 9 = 45 | 5 | equation d3 a
+   ___ ÷ 5 = 11 | 55 | equation d3 a/bracket
+   42 ÷ ___ = 7 | 6 | equation d3 b/bracket
+   ___ ÷ 4 = 11 | 44 | equation d3 a/fraction
+   ___ ÷ 6 = 11 | 66 | equation d3 a
+== division:div_zero_in_quotient null  distinct=29/50 top=4 bad=0
+   440 ÷ 4 = ? | 110 | division d  wr6
+   432 ÷ 4 = ? | 108 | division d  wr6
+   818 ÷ 2 = ? | 409 | division d  wr6
+   749 ÷ 7 = ? | 107 | division d  wr6
+   416 ÷ 2 = ? | 208 | division d  wr6
+   808 ÷ 2 = ? | 404 | division d  wr6
+   408 ÷ 4 = ? | 102 | division d  wr6
+   804 ÷ 4 = ? | 201 | division d  wr6
+== division:div_zero_in_quotient {"_range":1000}  distinct=46/50 top=2 bad=0
+   412 ÷ 2 = ? | 206 | division d  wr6
+   8,216 ÷ 4 = ? | 2054 | division d  wr8
+   8,188 ÷ 2 = ? | 4094 | division d  wr8
+   900 ÷ 6 = ? | 150 | division d  wr6
+   280 ÷ 2 = ? | 140 | division d  wr6
+   210 ÷ 2 = ? | 105 | division d  wr6
+   500 ÷ 2 = ? | 250 | division d  wr6
+   906 ÷ 3 = ? | 302 | division d  wr6

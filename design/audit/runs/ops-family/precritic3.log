@@ -1,0 +1,12 @@
+ws-precritic: 24 gate(s) (13 browser), logs /tmp/mq-precritic/20261030-184437-29551
+  N/A             ws-providers-unit --skill (0 s)
+  PASS            ws-node-lint (1 s)
+  SKIPPED (no rulings) ws-card-rulings --check rulings (spec card numeric rulings, 300 items) (0 s)
+  SKIPPED (no rulings) ws-card-rulings --check offered (panel offers nothing the card bans) (1 s)
+  PASS            ws-code-snapshot (2 s)
+  PASS            ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot) (1 s)
+  INCOMPLETE (unsigned card) ws-spec-card --check-signed --skill (card signed; every host, role and option value decided) (1 s)
+  PASS            ws-content-audit --skill (7 s)
+  FAIL            ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) (6 s)
+  PASS            ws-options-verify --skill (134 s)
+  PASS            ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) (165 s, waited 127 s for a slot)

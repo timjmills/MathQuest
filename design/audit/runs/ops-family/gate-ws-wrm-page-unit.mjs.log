@@ -1,0 +1,12 @@
+Built 723 skill codes
+to-make gate: 2066 lesson cards, 4114 rows, 94 unit cards (every row: name, kind, covers, status; union exact)
+site lessons placed by their own CCSS code: 56
+site lessons: 143 lessons + 34 assessments listed (72 are sequence rows the site also names); tagged 139, not tagged 0 (site-only lessons with no step)
+detailed lessons: 5 read, 5 joined to a school-site lesson
+M11 gate: template-id / build-syntax lines on Skills to be made: 0
+M12 gate: "How it looks" lines against the answer field, the Kind line and the drawing sources: 0
+truth gate: 14962 lesson lines, 0 untrue or repeated
+plain-English gate: 48880 teacher-facing lines checked, 0 not plain {"White Rose lesson lines":42629,"Skills to be made fields":5863,"MAP task notes":388}
+free-text notes hidden (not plain as written; the composed sentence stands): R.json 333/503 (66%), Y1.json 548/805 (68%), Y2.json 915/1063 (86%), Y3.json 1077/1276 (84%), Y4.json 669/1046 (64%), Y5.json 662/1138 (58%), Y6.json 673/1164 (58%), MAP.json 112/119 (94%)
+navigation: 33 domain sections, 109 extra lessons, every lesson listed once
+ws-wrm-page-unit: OK — 1067 lessons, 894 mapped

@@ -1,0 +1,8 @@
+ws-grade-render: 5 skills -> design/audit/runs/ops-family/before-render
+  [1/5] addition:add_sub_10s  independent 1p+1k 3x6  12s
+  [2/5] addition:add_sub_100s  independent 1p+1k 3x6  23s
+  [3/5] subtraction:missing_add_sub  independent 1p+1k 4x5  35s
+  [4/5] division:missing_mult_div  independent 1p+1k 3x6  47s
+  [5/5] division:div_zero_in_quotient  independent 1p+1k 2x2  60s
+ws-grade-render: done, 5 units, 35 pages, 60s
+EXIT 0
