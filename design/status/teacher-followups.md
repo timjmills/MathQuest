@@ -100,3 +100,17 @@ exactly one rung per wrong row, no answer in the ladder text, right answers scor
 - Hand-offs from the triage: `select_even_odd` contradicting instruction (number-sense lane); support controls and size ladders
   on most families' option panels (family lanes); the options gate / Max Number tool items (tool lane); library thumbnails of
   table skills ~6 px text (preview work).
+
+## Hand-over (paused 2026-10-30 by the owner, after checker round 1 fixes)
+
+- State: all three scope items done; checker findings B1, B2, S1, S2, S4, S5 and the minors fixed in d23ec44 and re-checked
+  with the checker's script; every listed gate green on d23ec44. Draft PR #23 (→ `claude/sweet-newton-c8wrv1`). Not deployed.
+- Not re-run after d23ec44: `ws-chromebook-fit` (green on a0de0ae; d23ec44 changes no pupil layout) and a full checker
+  round 2. Before going live: one short checker pass over d23ec44 (ladder on worksheet/quiz, Undo toast focus, tray "×").
+- Next pieces, in order: (1) mixed whole-grade pages half empty / the 184-skill mix at 1 problem a page (plan + layout,
+  teacher-plan.js / layout); (2) quiz expanded form → place boxes with the ladder; (3) the tray toast over the Print sheet;
+  (4) aria-labels on the worksheet expand boxes. Hand-offs to other lanes are listed in §4 and in the triage file.
+- Speed reflection: the lost time was gates run in parallel (time-outs), a 5-minute baseline per grade on the old code
+  (kept: `ws-grade-print-timing.cjs` with `MQ_ROOT=` makes a before/after one command), and a stale gate wait
+  (ws-support-ladder 0.35 s) that a design change made wrong — a settle time belongs in one exported constant the gate reads.
+- Cost: ≈ $27 on this session's counter ≈ 1 % of the weekly limit (at $28 ≈ 1 %).
