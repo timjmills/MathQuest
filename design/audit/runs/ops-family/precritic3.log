@@ -10,3 +10,104 @@ ws-precritic: 24 gate(s) (13 browser), logs /tmp/mq-precritic/20261030-184437-29
   FAIL            ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) (6 s)
   PASS            ws-options-verify --skill (134 s)
   PASS            ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) (165 s, waited 127 s for a slot)
+  FAIL            ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) (100 s, waited 61 s for a slot)
+  FAIL            ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) (139 s, waited 86 s for a slot)
+  FAIL            ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) (172 s, waited 55 s for a slot)
+  FAIL            ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) (176 s, waited 62 s for a slot)
+  PASS            ws-screen-slots --skills (115 s, waited 99 s for a slot)
+  PASS            ws-screen-answer --skills (159 s, waited 107 s for a slot)
+  PASS            ws-boot-smoke (68 s, waited 64 s for a slot)
+  PASS            ws-chromebook-fit --skills (313 s, waited 66 s for a slot)
+  PASS            ws-phone-card (practice card at 390 px: clip, first-box focus) (289 s, waited 152 s for a slot)
+  FAIL            ws-options-verify --render (each offered appearance value at S / L vs the default page) (388 s, waited 115 s for a slot)
+  PASS            ws-coverage-matrix --skills (1674 s)
+  FAIL            ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) (1 s)
+  FAIL            ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) (1434 s)
+
+### ws-precritic — --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient
+
+commit `6773adf897` + uncommitted changes (310 file(s)) (claude/sweet-newton-c8wrv1-ops-family) · started 2026-10-30T18:44:37Z · finished 2026-10-30T19:36:26Z · wall 3109 s · logs `/tmp/mq-precritic/20261030-184437-29551`
+
+| Gate | Scope | Result | Findings vs baseline | Seconds |
+|---|---|---|---|---|
+| ws-node-lint | 5 skills | PASS | 0 found, 0 pinned, 0 new | 1 |
+| ws-providers-unit --skill | 5 skills | N/A | no provider test for addition:add_sub_10s, addition:add_sub_100s, subtraction:missing_add_sub, division:missing_mult_div, division:div_zero_in_quotient | 0 |
+| ws-content-audit --skill | 5 skills | PASS | 5 skill(s) audited | 7 |
+| ws-options-verify --skill | 5 skills | PASS | 147 value(s) checked; 0 failing, 0 pinned, 0 new | 134 |
+| ws-coverage-matrix --skills | 5 skills × kinds × S/M/L | PASS | 21 of 168 row(s) run × S/M/L: OK 21, RED 0, ERROR 0; PENDING 117, N/A 30 | 1674 |
+| ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) | 5 skills | PASS | 0 found (5 doc(s)) | 165 (127 waiting) |
+| ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) | 5 skills | FAIL | 13 found in 2 of 5 doc(s); 2 (document, lint, rule) count(s) above the pin | 139 (86 waiting) |
+| ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) | 5 skills | FAIL | 1 found in 1 of 5 doc(s); 1 (document, lint, rule) count(s) above the pin | 100 (61 waiting) |
+| ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) | 5 skills | FAIL | 13 found in 5 of 5 doc(s); 7 (document, lint, rule) count(s) above the pin; lesson page not pinned at L: addition:add_sub_10s, addition:add_sub_100s, subtraction:missing_add_sub, division:missing_mult_div, division:div_zero_in_quotient (must be clean) | 172 (55 waiting) |
+| ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) | 5 skills | FAIL | 11 found in 5 of 5 doc(s); 6 (document, lint, rule) count(s) above the pin; lesson page not pinned at S: addition:add_sub_10s, addition:add_sub_100s, subtraction:missing_add_sub, division:missing_mult_div, division:div_zero_in_quotient (must be clean) | 176 (62 waiting) |
+| ws-screen-slots --skills | 5 skills | PASS | 0 found, 0 pinned, 0 new (20 host renders, --baseline design/audit/baselines/screen-slots.json) | 115 (99 waiting) |
+| ws-screen-answer --skills | 5 skills | PASS | - | 159 (107 waiting) |
+| ws-chromebook-fit --skills | 5 skills | PASS | - | 313 (66 waiting) |
+| ws-code-snapshot | all share codes | PASS | - | 2 |
+| ws-boot-smoke | app boot | PASS | - | 68 (64 waiting) |
+| ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) | 5 skills: matrix rows with findings | FAIL | worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 145 with no sibling measured, 0 ERROR row(s); 0 at or below (engine) in 47 printed row(s) with findings (PENDING(no-baseline) 47; siblings per skill: add_sub_10s: 0, add_sub_100s: 0, missing_add_sub: 0, missing_mult_div: 0, div_zero_in_quotient: 0) | 1 |
+| ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) | 5 skills × matrix rows × S/M/L + extras at S | FAIL | 10 row×size(s) failing; 68 matrix row(s) × S/M/L + 10 extra document(s) (test, more-practice, supports on): 214 document(s), SLOT 0 / CLIP 676 finding(s), 3790 box segment(s) and 0 head(s) probed (SLOT-W N/A on 58, HEADS N/A on 214 document(s): no digit strip / no heads) | 1434 |
+| ws-phone-card (practice card at 390 px: clip, first-box focus) | 5 skills × 390x844, 390x664 | PASS | - | 289 (152 waiting) |
+| ws-card-rulings --check rulings (spec card numeric rulings, 300 items) | 5 skills | SKIPPED (no rulings) | no machine-readable rulings block (<!-- rulings {json} -->, tests/scripts/ws-card-rulings.mjs) in the spec card: not checked | 0 |
+| ws-card-rulings --check offered (panel offers nothing the card bans) | 5 skills | SKIPPED (no rulings) | no machine-readable rulings block (<!-- rulings {json} -->, tests/scripts/ws-card-rulings.mjs) in the spec card: not checked | 1 |
+| ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) | 5 skills | FAIL | ws-dealer-uniform: FAIL - missing_mult_div (1), div_zero_in_quotient (4) (3 OK, 2 FAIL, 0 INCOMPLETE, 0 N/A of 5 skill(s); 5.9 s) | 6 |
+| ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot) | 5 skills | PASS | 0 found, 0 pinned, 0 new | 1 |
+| ws-spec-card --check-signed --skill (card signed; every host, role and option value decided) | 5 skills | INCOMPLETE (unsigned card) | needs owner signature: design/cards/ops-g1/ops-g1.md (also 41 other problem(s)) | 1 |
+| ws-options-verify --render (each offered appearance value at S / L vs the default page) | 5 skills × S/L | FAIL | 3 value page(s) worse than the default: missing_mult_div notation="fraction" @S, missing_mult_div notation="bracket" @L, missing_mult_div notation="fraction" @L; 24 value page(s) (4 skill(s) x S/L) against 8 default page | 388 (115 waiting) |
+
+Failing rows (first lines; the full output is in the log):
+- **ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row)** (exit 1, `/tmp/mq-precritic/20261030-184437-29551/print-lint-kit-S.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --size S --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --baseline design/audit/baselines/print-lint.S.json`
+  - `- addition:add_sub_100s L-DENSITY PAGEFILL: 0 -> 1`
+  - `- division:div_zero_in_quotient L-DENSITY H13: 0 -> 12`
+- **ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row)** (exit 1, `/tmp/mq-precritic/20261030-184437-29551/print-lint-kit-M.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --size M --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --baseline design/audit/baselines/print-lint.M.json`
+  - `- addition:add_sub_10s L-DENSITY PAGEFILL: 0 -> 1`
+- **ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...)** (exit 1, `/tmp/mq-precritic/20261030-184437-29551/print-lint-lesson-L.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --baseline design/audit/baselines/print-lint.json`
+  - `pin (STATUS note required): node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills <skills> --report-only --json <out>, then merge its documents into the pin`
+  - `- addition:add_sub_10s#lesson L-DENSITY PAGEFILL: 0 -> 1`
+  - `- addition:add_sub_10s#lesson L-KEY AK-4: 0 -> 1`
+  - `- addition:add_sub_100s#lesson L-DENSITY PAGEFILL: 0 -> 1`
+  - `- subtraction:missing_add_sub#lesson L-DENSITY PAGEFILL: 0 -> 1`
+  - `- division:missing_mult_div#lesson L-OVERLAP CL40-INK: 0 -> 2`
+  - `- division:missing_mult_div#lesson L-DENSITY PAGEFILL: 0 -> 1`
+  - `- division:div_zero_in_quotient#lesson L-OVERFLOW PG-12: 0 -> 6`
+- **ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...)** (exit 1, `/tmp/mq-precritic/20261030-184437-29551/print-lint-lesson-S.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size S --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --baseline design/audit/baselines/print-lint.S.json`
+  - `pin (STATUS note required): node tests/scripts/ws-print-lint.cjs --source kit --size S --roles lesson --skills <skills> --report-only --json <out>, then merge its documents into the pin`
+  - `- addition:add_sub_10s#lesson L-DENSITY PAGEFILL: 0 -> 1`
+  - `- addition:add_sub_10s#lesson L-KEY AK-4: 0 -> 1`
+  - `- addition:add_sub_100s#lesson L-DENSITY PAGEFILL: 0 -> 1`
+  - `- subtraction:missing_add_sub#lesson L-DENSITY PAGEFILL: 0 -> 1`
+  - `- division:missing_mult_div#lesson L-DENSITY PAGEFILL: 0 -> 1`
+  - `- division:div_zero_in_quotient#lesson L-OVERFLOW PG-12: 0 -> 6`
+- **ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings)** (exit 1, `/tmp/mq-precritic/20261030-184437-29551/sibling-compare.log`); rerun alone: `node tests/scripts/ws-sibling-compare.cjs --run /tmp/mq-precritic/20261030-184437-29551/coverage-matrix.json --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --run-siblings --json /tmp/mq-precritic/20261030-184437-29551/sibling-compare.json`
+  - `NO-SIBLING addition:add_sub_100s|mixed/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at S`
+  - `NO-SIBLING addition:add_sub_100s|mixed/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at M`
+  - `NO-SIBLING addition:add_sub_100s|sections/defaults S L-OVERFLOW PG-12: ours 8, no approved sibling measured sections/defaults at S`
+  - `NO-SIBLING addition:add_sub_100s|sections/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at S`
+  - `NO-SIBLING addition:add_sub_100s|sections/defaults M L-OVERFLOW PG-12: ours 6, no approved sibling measured sections/defaults at M`
+  - `NO-SIBLING addition:add_sub_100s|sections/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at M`
+  - `NO-SIBLING addition:add_sub_100s|sections/defaults L L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at L`
+  - `NO-SIBLING addition:add_sub_100s|sections/defaults L L-OVERLAP CL40-INK: ours 6, no approved sibling measured sections/defaults at L`
+  - `NO-SIBLING addition:add_sub_100s|sections/ex-group S L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at S`
+  - `NO-SIBLING addition:add_sub_100s|sections/ex-group S L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at S`
+- **ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap)** (exit 1, `/tmp/mq-precritic/20261030-184437-29551/slot-clip.log`); rerun alone: `node tests/scripts/ws-slot-clip.cjs --run /tmp/mq-precritic/20261030-184437-29551/coverage-matrix.json --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --run-siblings --slots 2 --json /tmp/mq-precritic/20261030-184437-29551/slot-clip.json`
+  - `addition:add_sub_100s|sections/defaults S: L-OVERFLOW PG-12 8: no sibling measured this row`
+  - `addition:add_sub_100s|sections/defaults M: L-OVERFLOW PG-12 6: no sibling measured this row`
+  - `addition:add_sub_100s|sections/pages-2 S: L-OVERFLOW PG-12 8: no sibling measured this row`
+  - `addition:add_sub_100s|sections/pages-2 M: L-OVERFLOW PG-12 6: no sibling measured this row`
+  - `addition:add_sub_10s|sections/defaults S: L-OVERFLOW PG-12 10: no sibling measured this row`
+  - `addition:add_sub_10s|sections/defaults M: L-OVERFLOW PG-12 8: no sibling measured this row`
+  - `addition:add_sub_10s|sections/defaults L: L-OVERFLOW PG-12 6: no sibling measured this row`
+  - `addition:add_sub_10s|sections/pages-2 S: L-OVERFLOW PG-12 10: no sibling measured this row`
+- **ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)** (exit 1, `/tmp/mq-precritic/20261030-184437-29551/dealer-uniform.log`); rerun alone: `node tests/scripts/ws-dealer-uniform.mjs --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient`
+  - `FAIL UNIFORM b ones digit (kind 2d / 1d): over-dealt under every reading of uniform (also kinds: b ones digit); pairs: χ² 27.7 on 7 df (tail 0.00025, below the 1 % family-wise bar 0.0015) over 42 items; above 2σ: 5 10× (`
+  - `FAIL UNIFORM a ones digit: over-dealt under every reading of uniform (also kinds: a ones digit, a tens digit, b ones digit, ans ones digit, ans tens digit; digits: a ones digit, a tens digit, b ones digit, ans ones digit`
+  - `FAIL UNIFORM a tens digit: over-dealt under every reading of uniform (also kinds: a ones digit, a tens digit, b ones digit, ans ones digit, ans tens digit; digits: a ones digit, a tens digit, b ones digit, ans ones digit`
+  - `FAIL UNIFORM ans ones digit: over-dealt under every reading of uniform (also kinds: a ones digit, a tens digit, b ones digit, ans ones digit, ans tens digit; digits: a ones digit, a tens digit, b ones digit, ans ones dig`
+  - `FAIL UNIFORM ans tens digit: over-dealt under every reading of uniform (also kinds: a ones digit, a tens digit, b ones digit, ans ones digit, ans tens digit; digits: a ones digit, a tens digit, b ones digit, ans ones dig`
+- **ws-options-verify --render (each offered appearance value at S / L vs the default page)** (exit 1, `/tmp/mq-precritic/20261030-184437-29551/options-render.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-options-verify.cjs --render --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient`
+  - `FAIL division:missing_mult_div S notation="fraction": L-DENSITY H13: 0 -> 19 (one empty band 7.3 mm tall under the item in a 20.6 mm cell, 7.3 mm (35%) more than its row's other cells keep: the row is sized for a talle);`
+  - `FAIL division:missing_mult_div L notation="bracket": L-OVERLAP CL40-INK: 0 -> 4 (ink of <span> at 6.7 mm across, 6.4 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paint`
+  - `FAIL division:missing_mult_div L notation="fraction": L-OVERLAP CL40-INK: 0 -> 4 (ink of <span> at 6.7 mm across, 6.4 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label pa`
+
+ws-precritic: FAIL: 8 FAIL, 12 PASS, 1 N/A, 0 SKIPPED-NOT-BUILT, 3 SKIPPED / INCOMPLETE (no or partial rulings) of 24 (FAIL: print-lint-kit-S, print-lint-kit-M, print-lint-lesson-L, print-lint-lesson-S, sibling-compare, slot-clip, dealer-uniform, options-render; N/A (ran, nothing to check): providers; SKIPPED / INCOMPLETE (no or partial rulings: not all checked, not passed): card-rulings, card-not-offered, spec-card-signed)
+EXIT 1

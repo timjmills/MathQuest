@@ -1,0 +1,20 @@
+ws-print-lint: source kit, 5 skill(s)
+  addition:add_sub_10s: 2+1 pages, 1 finding(s)
+  addition:add_sub_100s: 2+1 pages, 0 finding(s)
+  subtraction:missing_add_sub: 2+1 pages, 0 finding(s)
+  division:missing_mult_div: 2+1 pages, 0 finding(s)
+  division:div_zero_in_quotient: 2+1 pages, 0 finding(s)
+
+document                         pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_sub_10s               2+1k    .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .  FAIL
+addition:add_sub_100s              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:missing_mult_div          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_zero_in_quotient      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                      .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .
+
+addition:add_sub_10s (Add & Subtract by 10s)
+  [L-DENSITY PAGEFILL major] (p1) page 1: an empty strip 56 mm tall under the problems (21% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+ws-print-lint: FAIL - ratchet: 1 count(s) rose above design/audit/baselines/print-lint.M.json
+  - addition:add_sub_10s L-DENSITY PAGEFILL: 0 -> 1

@@ -1,0 +1,42 @@
+ws-print-lint: source kit, 5 skill(s)
+  addition:add_sub_10s#lesson: 6+3 pages, 2 finding(s)
+  addition:add_sub_100s#lesson: 6+3 pages, 1 finding(s)
+  subtraction:missing_add_sub#lesson: 6+3 pages, 1 finding(s)
+  division:missing_mult_div#lesson: 6+3 pages, 1 finding(s)
+  division:div_zero_in_quotient#lesson: 8+4 pages, 14 finding(s)
+
+document                                pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_sub_10s#lesson               6+3k    .     .    .    .        .     .       1    1     .       .     .    .      .       .        .       .    .  FAIL
+addition:add_sub_100s#lesson              6+3k    .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .  FAIL
+subtraction:missing_add_sub#lesson        6+3k    .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .  FAIL
+division:missing_mult_div#lesson          6+3k    .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .  FAIL
+division:div_zero_in_quotient#lesson      8+4k    6     .    .    .        8     .       .    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                             6     .    .    .        8     .       4    1     .       .     .    .      .       .        .       .    .
+
+addition:add_sub_10s#lesson (Add & Subtract by 10s (lesson))
+  [L-KEY AK-4 critical] (p5) key page 5 has 10 answer slots, pupil page 2 has 9 (AK-4)
+  [L-DENSITY PAGEFILL major] (p3) page 3: an empty strip 136 mm tall under the problems (51% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+addition:add_sub_100s#lesson (Add & Subtract by 100s (lesson))
+  [L-DENSITY PAGEFILL major] (p3) page 3: an empty strip 90 mm tall under the problems (34% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+subtraction:missing_add_sub#lesson (Missing Numbers (+/−) (lesson))
+  [L-DENSITY PAGEFILL major] (p3) page 3: an empty strip 136 mm tall under the problems (51% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+division:missing_mult_div#lesson (Missing Factors (×/÷) (lesson))
+  [L-DENSITY PAGEFILL major] (p3) page 3: an empty strip 136 mm tall under the problems (51% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+division:div_zero_in_quotient#lesson (Zero in the Quotient (lesson))
+  [L-INK ILLEGIBLE critical] x6 (p1,5 cells 1,2,4,1,2,4) ILLEGIBLE: text "6 ÷ 3 = 2. Subtract " in #000000 on #000000 (contrast 1.00:1) - the pupil cannot read it (INK-5, AX-1)
+      e.g. <div> "6 ÷ 3 = 2. Subtract 6." | <div> "Bring down 2. 3 does not fit..."
+  [L-OVERFLOW PG-12 major] x8 (p1,5 cells 1,2,3,4,1,2,3,4) sticks out of its cell by 16 mm (cell 92.3 x 106.2 mm) (PG-12, CL-1)
+      e.g. <div.mq-cstate.mq-cstate-col> "1 Divide the first place. 2 ..." | <div.mq-cstate.mq-cstate-col> "2 Does not fit? Write 0. 2 0..."
+
+ws-print-lint: FAIL - ratchet: 7 count(s) rose above design/audit/baselines/print-lint.json
+  - addition:add_sub_10s#lesson L-DENSITY PAGEFILL: 0 -> 1
+  - addition:add_sub_10s#lesson L-KEY AK-4: 0 -> 1
+  - addition:add_sub_100s#lesson L-DENSITY PAGEFILL: 0 -> 1
+  - subtraction:missing_add_sub#lesson L-DENSITY PAGEFILL: 0 -> 1
+  - division:missing_mult_div#lesson L-DENSITY PAGEFILL: 0 -> 1
+  - division:div_zero_in_quotient#lesson L-INK ILLEGIBLE: 0 -> 6
+  - division:div_zero_in_quotient#lesson L-OVERFLOW PG-12: 0 -> 8

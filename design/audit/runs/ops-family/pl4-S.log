@@ -1,0 +1,25 @@
+ws-print-lint: source kit, 5 skill(s)
+  addition:add_sub_10s: 2+1 pages, 0 finding(s)
+  addition:add_sub_100s: 2+1 pages, 1 finding(s)
+  subtraction:missing_add_sub: 2+1 pages, 0 finding(s)
+  division:missing_mult_div: 2+1 pages, 0 finding(s)
+  division:div_zero_in_quotient: 2+1 pages, 12 finding(s)
+
+document                         pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_sub_10s               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s              2+1k    .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .  FAIL
+subtraction:missing_add_sub        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:missing_mult_div          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_zero_in_quotient      2+1k    .     .    .    .        .     .      12    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                      .     .    .    .        .     .      13    .     .       .     .    .      .       .        .       .    .
+
+addition:add_sub_100s (Add & Subtract by 100s)
+  [L-DENSITY PAGEFILL major] (p1) page 1: an empty strip 58 mm tall under the problems (22% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+division:div_zero_in_quotient (Zero in the Quotient)
+  [L-DENSITY H13 major] x12 (p1,2 cells 1,2,3,4,5,6,1,2...) one empty band 30.9 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--division[data-ws-cell="division"]> "1 2 7 8 0 − − −" | <div.ws-cell.mqt--division[data-ws-cell="division"]> "2 2 8 6 0 − − −"
+
+ws-print-lint: FAIL - ratchet: 2 count(s) rose above design/audit/baselines/print-lint.S.json
+  - addition:add_sub_100s L-DENSITY PAGEFILL: 0 -> 1
+  - division:div_zero_in_quotient L-DENSITY H13: 0 -> 12
