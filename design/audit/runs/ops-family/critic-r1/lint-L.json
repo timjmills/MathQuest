@@ -1,0 +1,1513 @@
+{
+ "tool": "ws-print-lint",
+ "source": "kit",
+ "lints": [
+  "L-INK",
+  "L-EMOJI",
+  "L-FONT",
+  "L-SIZE",
+  "L-OVERFLOW",
+  "L-SPLIT",
+  "L-DENSITY",
+  "L-KEY",
+  "L-VERBS",
+  "L-ANSAREA",
+  "L-INPUT",
+  "L-CCSS",
+  "L-ANCHOR",
+  "L-SUPPORT",
+  "L-TOPSTART",
+  "L-OVERLAP",
+  "L-WRAP"
+ ],
+ "documents": [
+  {
+   "id": "addition:add_sub_10s",
+   "label": "Add & Subtract by 10s",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_10s#more-practice",
+   "label": "Add & Subtract by 10s (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_10s#test",
+   "label": "Add & Subtract by 10s (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_10s#lesson",
+   "label": "Add & Subtract by 10s (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s#opener",
+   "label": "Add & Subtract by 10s (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s#guided",
+   "label": "Add & Subtract by 10s (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_10s#review",
+   "label": "Add & Subtract by 10s (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_100s",
+   "label": "Add & Subtract by 100s",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_100s#more-practice",
+   "label": "Add & Subtract by 100s (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_100s#test",
+   "label": "Add & Subtract by 100s (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_100s#lesson",
+   "label": "Add & Subtract by 100s (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s#opener",
+   "label": "Add & Subtract by 100s (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s#guided",
+   "label": "Add & Subtract by 100s (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_sub_100s#review",
+   "label": "Add & Subtract by 100s (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:missing_add_sub",
+   "label": "Missing Numbers (+/−)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:missing_add_sub#more-practice",
+   "label": "Missing Numbers (+/−) (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:missing_add_sub#test",
+   "label": "Missing Numbers (+/−) (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:missing_add_sub#lesson",
+   "label": "Missing Numbers (+/−) (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 30.7 mm wide in a 91.4 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"1 2 + 9\"",
+     "page": 2,
+     "cell": 2
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 30.7 mm wide in a 91.4 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"1 2 + 9 1 1\"",
+     "page": 5,
+     "cell": 2
+    }
+   ],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub#opener",
+   "label": "Missing Numbers (+/−) (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub#guided",
+   "label": "Missing Numbers (+/−) (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:missing_add_sub#review",
+   "label": "Missing Numbers (+/−) (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 8,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"9 1 5 − 9\"",
+     "page": 1,
+     "cell": 9
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"10 1 5 − 3\"",
+     "page": 1,
+     "cell": 10
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"11 1 2 − 3\"",
+     "page": 1,
+     "cell": 11
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"12 1 2 − 8\"",
+     "page": 1,
+     "cell": 12
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"9 1 5 − 9 6\"",
+     "page": 2,
+     "cell": 9
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"10 1 5 − 3 1 2\"",
+     "page": 2,
+     "cell": 10
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"11 1 2 − 3 9\"",
+     "page": 2,
+     "cell": 11
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.fact[data-ws-cell=\"fact\"]> \"12 1 2 − 8 4\"",
+     "page": 2,
+     "cell": 12
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:missing_mult_div",
+   "label": "Missing Factors (×/÷)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:missing_mult_div#more-practice",
+   "label": "Missing Factors (×/÷) (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:missing_mult_div#test",
+   "label": "Missing Factors (×/÷) (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:missing_mult_div#lesson",
+   "label": "Missing Factors (×/÷) (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div#opener",
+   "label": "Missing Factors (×/÷) (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div#guided",
+   "label": "Missing Factors (×/÷) (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:missing_mult_div#review",
+   "label": "Missing Factors (×/÷) (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "msg": "key page 2 has 12 answer slots, pupil page 1 has 8 (AK-4)",
+     "page": 2
+    }
+   ],
+   "notes": []
+  }
+ ]
+}
