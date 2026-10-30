@@ -95,7 +95,49 @@ touches `print-sheet.js` `buildLesson` / `buildDetailedLesson` only where the pa
 - A quadrant / stacked check with routes whose cells fill the page can take a second page (the tags need ~6 mm a band);
   the lesson packet's check (perQuestion 1) fits one page.
 
+### Builder B fix round (2026-10-30, 19:55-21:50 UTC)
+- Prerequisite Check page: cells keep CL-4b's top start (owner 2026-10-23; an inline centring tried first raised
+  L-TOPSTART CL-4b 0 -> 6 on add_facts#lesson, so it was dropped: `mq-lvcenter` loses to CL-4b on the Warm-up too).
+  The spare height goes into the rows only while a cell's foot band stays under ~25 % (the measured cell less 3 mm,
+  over 0.75); the rest spaces the questions apart (at most 40 mm a gap). Tags wrap (never clipped, TY-12) and take the
+  lines they need; the routing page is titled by the lesson (`checkFor`).
+- `placevalue:more_less_10#lesson` CL40-INK 0 -> 2: the same 2 findings on origin/claude/sweet-newton-c8wrv1
+  (a3392d38, temporary worktree, `ws-print-lint --source kit --roles lesson --skills placevalue:more_less_10`) -
+  PIN DRIFT, not this lane (that skill has no library lesson; its packet path is unchanged).
+- `tests/scripts/key-options.cjs`: PRE-EXISTING DEFECT (flake) - on origin/claude/sweet-newton-c8wrv1 a3392d38 too,
+  every combination line prints, then a puppeteer `Runtime.callFunctionOn timed out` (180 s protocol timeout) ends it
+  with `key-options: FAIL`. Recorded in design/status/defect-tally.csv.
+- `ws-detailed-lesson.cjs --check`: FAIL on all five detailed lessons, E11 (H13 in the P0 check cells, 30-51 %) and E15
+  (instruction strings). Every detailed page is byte-identical to the pre-lane baseline (`ws-lesson-baseline`: 0 of
+  140 changed), so this is not this lane's; the lessons 6-7 session owns that content.
+- Open on the lesson Prerequisite Check page (`ws-lesson-samples` sheetCheck, H13 >= 30 %): add S cell 4 32 % tall and
+  a 25 % foot; sub S cells 1-2 31-33 % WIDE (one narrow item per full-width row); round L/S cell 1 41-42 % tall (the
+  legacy count-in-10s cell is measured taller than it draws, even unstretched), round S cell 2 31 % wide and cell 4
+  40 % tall. `ws-print-lint` (the precritic judge) is clean on add_facts#lesson at L and S; for sub_100_regroup and
+  nearest_10 (not in the precritic set) it reports, beside pre-existing practice-page findings, the H13 width band
+  (sub S) and AK-4 on the check's key for nearest_10 (7 answer slots vs 6 - an item's key slot, not yet traced).
+- `ws-lesson-coverage --bind-stamps` bound the three samples' earlier critic passes to the NEW renders (they now open
+  with the Prerequisite Check, which no critic has graded): status reads them `passed`. Re-grade before relying on it.
+
 ## Gates
+
+Builder B, merged tree (e6fe3c61 + the fix round), 2026-10-30:
+- `ws-precritic --role lesson --strict`: FAIL only on `placevalue:more_less_10#lesson L-OVERLAP CL40-INK: 0 -> 2` (L and S),
+  which pinned main has too (above); ws-grade-render PASS (20 units, 259 pages).
+- `ws-wrm-page-unit`: OK - 1067 lessons, 894 mapped. `ws-wrm --report-only`: FAIL (report only: exit 0), 359 steps
+  without a full skill (by design).
+- `ws-detailed-lesson --check`: FAIL x5 (E11 / E15, pre-existing, above).
+- `ws-layout-unit`: OK (542). `ws-lesson-unit`: OK (79). `ws-boot-smoke`: OK. `ws-code-snapshot`: OK (723 codes, 35 categories).
+- `ws-lesson-baseline`: detailed lessons 0 of 140 changed; the 120 sample hashes change (LR-17, intended). `--parts`: OK.
+- `ws-lesson-hash --write`: 18 stamps; `ws-lesson-coverage`: OK (10 lessons: 3 passed, 0 stale, 0 failed, 7 draft).
+
+### Critic-ready pages (Builder B, LR-17 + LR-18 samples)
+The three packets, seed 4242, PNGs at 110 dpi: `design/lesson-samples/<packet>/` (L) and `design/lesson-samples/<packet>/S/`
+(S, printed at M), for <packet> = `add-within-10`, `subtract-2-digit-regroup`, `round-nearest-10`:
+- pupil: `pupil-p1.png` Prerequisite Check (new) · `pupil-p2.png` anchor chart · `pupil-p3.png` lesson sheet (no Warm-up
+  now) · `pupil-p4.png` Practice · `pupil-p5.png` Mixed; `chart-grey.png` the chart in greyscale
+- key: `key-p1.png` Prerequisite Check key · **`key-p2.png` the ROUTING TABLE page** · `key-p3.png` chart · `key-p4.png`
+  lesson sheet · `key-p5.png` Practice · `key-p6.png` Mixed
 
 ## Critic rounds
 
