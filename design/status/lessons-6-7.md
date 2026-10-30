@@ -12,6 +12,9 @@ Critic rounds: lesson 6: 2 (r2 FAIL, C2 7); lesson 7: 0
 - Two builders in parallel worktrees: lesson 6 fix round 4 (r2 D2 still open, gate E9b/E11/E29), lesson 7 build-to-gate (E9/E9b/E20/E29, round-2 options unfinished).
 - Next: merge both, merge with claude/sweet-newton-c8wrv1, clean-before-critic, ONE critic (mq-opus-medium) for both lessons.
 
+- Lead 2026-10-30 18:47Z: when EACH lesson passes, save its page PNGs (+ the teacher screen that opens it) under
+  design/status/lessons-6-7/, push, send_message the lead at once (PNG paths + head); each lesson goes live on its own.
+
 ## Owner go
 
 ## Open questions
@@ -21,7 +24,7 @@ Critic rounds: lesson 6: 2 (r2 FAIL, C2 7); lesson 7: 0
   Main has drifted since they passed; the lesson-6 builder is looking for the shared cause.
 
 ## Times
-Times: builder lesson-7 build-r2, start 2026-10-30T17:45Z, end —, profile mq-opus-low
+Times: builder lesson-7 build-r2, start 2026-10-30T17:45Z, end 2026-10-30T18:50Z, profile mq-opus-low
 Times: builder lesson-6 fix-r4, start 2026-10-30T17:45Z, end —, profile mq-opus-medium
 
 ## Log
