@@ -146,6 +146,7 @@ register('division', {
         // A fact-rows page past 4 columns (owner ruling 2026-10-30: the bracket reaches 10 columns)
         // hands its own narrow gutter (`factRowGutter`, mm): the arc then hugs the space between the
         // divisor's last digit and the dividend's first (bracketArc's compact path).
+        const rowTrack = p.fact && ctx.mode !== 'screen' && Number((ctx.metrics || {}).factRowTrack) > 0 ? trackMm : 0;
         const rowGutter = rowTrack && Number(ctx.metrics.factRowGutter) > 0 ? Number(ctx.metrics.factRowGutter) : 0;
         const gutterMm = rowGutter || trackMm * 1.1;
         const k = keyOf(p);
@@ -242,6 +243,7 @@ register('division', {
         const n = String(p.dividend).length, dv = String(p.divisor).length;
         const trackMm = trackOf(p, ctx, g);
         const rows = rowsOf(p);
+        const rowTrack = p.fact && ctx.mode !== 'screen' && Number((ctx.metrics || {}).factRowTrack) > 0 ? trackMm : 0;
         const rowGutter = rowTrack && Number((ctx.metrics || {}).factRowGutter) > 0 ? Number(ctx.metrics.factRowGutter) : 0;
         return {
             wMm: Math.ceil((n + dv + (p.rbox ? 2.1 : 0)) * trackMm + (rowGutter || 1.1 * trackMm) + 8),
