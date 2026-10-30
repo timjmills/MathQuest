@@ -3591,6 +3591,9 @@ const OWNS_ITS_NUMBERS = new Set(['constant', 'band', 'place', 'most']);
 // four story kinds at their own sizes, so "Up to 10" still printed 49 and "Tenths" printed whole
 // numbers (the stories have no decimal form).
 const P12_NO_MEASURED = new Set(['number_ops_mixed:word_problems_mixed', 'number_ops_mixed:word_problems_mixed_plain']);
+// (OPTIONS-CRITIC-R2 §5 #14 asked to drop the measured Decimal places on number_ops_mixed:mixed,
+// algebra:solve_unknown and evaluate_expression; checked 2026-10-30, they DO deal decimals (106.2, 34.5,
+// 1.9 at Tenths), so the control stays: hiding it hid a setting that still applies.)
 
 function _measuredOptions(categoryId, skillId, own) {
     const d = DERIVED[`${categoryId}:${skillId}`];
@@ -3606,7 +3609,8 @@ function _measuredOptions(categoryId, skillId, own) {
         // A decimals skill deals decimals at the app's "whole numbers" setting too, so its null
         // value must not read "Use the Decimals setting (now whole numbers)" (OPTIONS-CRITIC-R2 §5 #9).
         const own = categoryId === 'decimals' || DECIMAL_SKILLS_ELSEWHERE.has(skillId);
-        out.push(own ? { ...decimalsOption(d.decimals), nullLabel: 'Tenths and hundredths (this skill\'s own)' } : decimalsOption(d.decimals));
+        const dec = own ? { ...decimalsOption(d.decimals), nullLabel: 'Tenths and hundredths (this skill\'s own)' } : decimalsOption(d.decimals);
+        out.push(dec);
     }
     return out;
 }
