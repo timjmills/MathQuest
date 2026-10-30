@@ -620,7 +620,7 @@ A band is a full-width horizontal slice of the body frame with a label. Bands st
 ```
 
 - **VA-1** Track count: add / subtract d-digit operands T = d + 1; multiply m-digit by 1-digit T = m + 1; multiply m by n (n >= 2) T = m + n + 1; a unit sign adds 1; each separator adds a 0.3 em track.
-- **VA-2** **Operator track**: the leftmost track. The operator (700) sits on the bottom operand's row only, and never moves right to sit beside a shorter operand. The top operand's operator track is empty (the label sits above it).
+- **VA-2** **Operator track**: the leftmost track. The operator (700) sits on the bottom operand's row only, and never moves right to sit beside a shorter operand. The top operand's operator track is empty (the label sits above it). Its width is 1.2 em; 0.72 em when the operator's row leaves its first digit track empty (a band of 3 or more tracks over a shorter second operand); **0.62 em for ÷** in that case (owner ruling 2026-10-30: the ÷ ink is 0.45 em, so a stacked 144 ÷ 12 is 15.7 mm at 16 pt and fits a 10-column fact row, PAGE_TYPES PT-FRW-9).
 - **VA-3** **Rule line**: 1.5 pt, from the left edge of the operator track to the right edge of the ones track, with 1 mm clear above and below. One rule for add / subtract / 1-digit multiply; a second identical rule under the partial products.
 - **VA-4** **Answer row**: 8 / 10 / 12 mm tall (design value; never below Hw), open space with no lines or boxes on paper. An answer track exists under **every** track including the operator track, so a carry-out digit is written under the operator and the layout never reveals whether one occurs. In Guided cells the answer row shows grey 1 pt ticks, 2 mm long, at each track boundary.
 - **VA-5** The stack is anchored to the top of the cell at label + 2 mm and centred horizontally (CL-9 for 1 column). Spare height goes under the rule.
@@ -713,11 +713,12 @@ Minimum cell height (mm), I Can / Daily:
 ```
 
 - **VA-60** Bracket: one SVG path, 1.5 pt: a right-bowing arc the height of the dividend row joined to a horizontal vinculum spanning every dividend track. Tracks: divisor digits + 0.6 (bracket gutter) + dividend digits + R block (2 tracks) when remainders are in play.
+  - **VA-60a** On a fact-rows page of 5 to 10 columns (owner ruling 2026-10-30, PAGE_TYPES PT-FRW-9) a division FACT's bracket is compact: digit tracks of 0.54 to 1.0 em (the largest that fits the column), a gutter of 0.6 track less 0.15 em (0.17 to 0.45 em) with the arc starting at 47 % of it, the bracket centred on its ink, the quotient written in the open space over the vinculum. The digits stay at the column's ladder size, never below 16 pt.
 - **VA-61** The quotient row sits above the vinculum at 8 / 10 / 12 mm. With the digit grid off, the vinculum itself is the answer line: no boxes, nothing reveals the quotient's length. With the grid on (Model and Guided only), there is a 0.75 pt box over **every** dividend track.
 - **VA-62** On a remainders section the "R" label and its box print in **every** cell, including items whose remainder is 0. The box is sized from the divisor's digit count.
 - **VA-63** Work grid: two work rows per quotient digit at 6 / 8 / 10 mm; the subtract rule under each pair is 0.75 pt; the `−` is pre-printed in the gutter of each subtract row (structural). The alignment guides are 1 pt grey dotted verticals at track pitch, sized to the dividend and extended one row above the bracket; they appear in Model and Guided only.
 - **VA-64** Optional helpers (the multiples strip is a hint; the estimation box and check frame are structural): a multiples strip (page-side rounded strip for single-divisor sections, 9 / 10 / 12 mm wide with a 4 mm gap; per-cell strip only in Model and Guided of mixed-divisor sections), an estimation box for 2-digit divisors (rounded, SF-40 styling), a two-row check frame `[q] x [d]` / `+ [R] = [D]` on the track grid.
-- **VA-65** Bracket division is always its own section with its own instruction line; it is never mixed with `+ − ×` stacks, because its answer sits above the problem instead of below it. Vertical division facts clamp to 8 columns (basic) or 6 (2-digit divisor or 3-digit dividend).
+- **VA-65** Bracket division is always its own section with its own instruction line; it is never mixed with `+ − ×` stacks, because its answer sits above the problem instead of below it. Division FACTS on fact rows do not clamp (owner ruling 2026-10-30, replacing "vertical division facts clamp to 8 columns (basic) or 6 (2-digit divisor or 3-digit dividend)"): all three notations reach 10 columns (PAGE_TYPES PT-FRW-9), and div_facts Mix puts the bracket, the stacked ÷ and the fraction on one page by the owner's choice.
 - **VA-66** Long-division cells: minimum cell width 30 mm, maximum 6 columns, default 2 x 2 at L. In the Daily look the track may compress from 0.95 to 0.80 em only when that lifts the maximum from 1 column to 2.
 
 ### 10.8 Vertical facts
@@ -974,7 +975,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 
 | Page type | Auto columns | Hard cap |
 |---|---|---|
-| Fact rows | 10 / 6 / 5 | 10; 8 when answers exceed 99; 8 for basic bracket division; 6 for wide division |
+| Fact rows | 10 / 6 / 5 | 10; 8 when answers exceed 99; division facts 10 in every notation (owner ruling 2026-10-30) |
 | Fact probe | 5 | 5-10 (a choice of 1-4 becomes 5); division probes 2-3 |
 | Computation grid | 3 Daily, 2 I Can | 6 |
 | Long division | by table | 6, min cell width 30 mm |

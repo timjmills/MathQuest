@@ -38,7 +38,7 @@ export function fact(a, b, op, { pt, padTop = 2, digits = 0, touch = null } = {}
     // S2: `touch` = {a, b, o}: touch dots laid over the digits of a (and / or) b (support-draw.js).
     // The overlay takes no space, so the fact's geometry is the same with and without it.
     const r = (s, on) => [...s].map((ch) => (ch === ' ' ? '<span></span>' : (touch && on && touchDigit(ch, true, touch.o)) || `<span>${ch}</span>`)).join('');
-    const html = `<div class="ws-fact" style="${factGridStyle(n, b)}"><span></span>${r(A, touch && touch.a)}<span class="op">${opGlyph(op)}</span>${r(B, touch && touch.b)}<span class="rule"></span></div>`;
+    const html = `<div class="ws-fact" style="${factGridStyle(n, b, op)}"><span></span>${r(A, touch && touch.a)}<span class="op">${opGlyph(op)}</span>${r(B, touch && touch.b)}<span class="rule"></span></div>`;
     return { cls: 'fact', style: `--fd:${pt}pt;--fp:${padTop}mm`, html };
 }
 
@@ -55,17 +55,31 @@ export const FACT_OP_TRACK_EM = 1.2;
  * has the empty track). A 3-digit dividend over a 1- or 2-digit divisor takes it too.
  */
 export const FACT_OP_TRACK_TIGHT_EM = FACT_TRACK_EM;
+/**
+ * The tight operator track of a stacked DIVISION fact (owner ruling 2026-10-30: ÷ facts reach 10
+ * fact-row columns in every notation). A 3-digit dividend over a 1- or 2-digit divisor ("144" over
+ * "÷ 12") leaves the divisor row's first digit track empty, so the "÷" (Andika ink 0.45 em) needs
+ * only its own ink plus 0.085 em each side: 0.62 em. The empty track still keeps it clear of the
+ * divisor (VA-2), and the fact is (0.62 + 3 x 0.72) em = 15.7 mm at 16 pt, which fits a 10-column
+ * cell (18.0 mm) with the 1 mm clearance each side of the fit gate (fact-rows.js FIT_CLEAR_MM).
+ */
+export const FACT_DIV_OP_TRACK_TIGHT_EM = 0.62;
 /** Digit tracks of a vertical fact: operands and answer, at least 2 (TY-22 keeps 0.72 em). */
 export const factDigitTracks = (a, b, n = 0) =>
     Math.max(2, String(a).length, String(b).length, Number(n) || 0);
-/** The operator track (em) of a fact with `n` digit tracks whose second operand is `b`. */
-export const factOpTrackEm = (n, b) =>
-    (b !== undefined && b !== null && n >= 3 && String(b).length < n ? FACT_OP_TRACK_TIGHT_EM : FACT_OP_TRACK_EM);
+const isDivOp = (op) => op === '/' || op === '÷';
+/**
+ * The operator track (em) of a fact with `n` digit tracks whose second operand is `b` (and, when
+ * given, operator `op`: a division fact takes the tighter ÷ track, FACT_DIV_OP_TRACK_TIGHT_EM).
+ */
+export const factOpTrackEm = (n, b, op) =>
+    (b !== undefined && b !== null && n >= 3 && String(b).length < n
+        ? (isDivOp(op) ? FACT_DIV_OP_TRACK_TIGHT_EM : FACT_OP_TRACK_TIGHT_EM) : FACT_OP_TRACK_EM);
 /**
  * The inline grid a vertical fact carries: one operator track, then n digit tracks. Without `b`
  * (the screen host's older call) the operator keeps the full 1.2 em track.
  */
-export const factGridStyle = (n, b) => `grid-template-columns:${factOpTrackEm(n, b)}em repeat(${n}, ${FACT_TRACK_EM}em)`;
+export const factGridStyle = (n, b, op) => `grid-template-columns:${factOpTrackEm(n, b, op)}em repeat(${n}, ${FACT_TRACK_EM}em)`;
 
 /**
  * CL-21 / CL-30: the top padding a fact cell needs so the black number tab clears the digits.
@@ -77,7 +91,7 @@ export const factPadTop = (labelStyle, cols) => (labelStyle === 'tab' ? (cols >=
  * TY-31: fill of column stays between 55% and 75%; 2.64 em is the drawn width of a 2-track
  * fact. With `b`, a band of 3+ tracks takes the tight operator track (factOpTrackEm).
  */
-export const factWidthMm = (cols, n = 2, b) => (factOpTrackEm(n, b) + n * FACT_TRACK_EM) * (EM_MM[factDigitPt(cols)] || 9.88);
+export const factWidthMm = (cols, n = 2, b, op) => (factOpTrackEm(n, b, op) + n * FACT_TRACK_EM) * (EM_MM[factDigitPt(cols)] || 9.88);
 export const factFillOfColumn = (cols, liveWMm = 186) => factWidthMm(cols) / (liveWMm / cols);
 
 /* ------------------------------------------------------------------ the fact cue (P11) */
@@ -364,7 +378,7 @@ register('fact', {
         if (drawsStack(p, ctx)) return getCell('stack').footprint(stackPayload(p), ctx);
         const cols = columnsOf(p, ctx);
         const n = factDigitTracks(p.a, p.b, p.digits || String(compute(p) ?? '').length);
-        const vertW = Math.ceil(factWidthMm(cols, n, p.b) + 4);
+        const vertW = Math.ceil(factWidthMm(cols, n, p.b, p.op) + 4);
         if (drawsAcross(p, ctx)) {
             // VA-71: a horizontal fact follows the equation fit function (DN-22), which clamps it
             // to 4 columns. It has three drawings, chosen by the column count it is drawn at:
@@ -399,6 +413,12 @@ register('fact', {
         return {
             wMm: vertW,
             hMm: factCellHMm(cols, ctx.size),      // VA-70
+            // RUBRIC H13 (sub_facts / add_facts / mult_facts Independent at S, 48 % empty under the
+            // rule): VA-70's height already holds the fact's open answer zone (1.15 em of writing room
+            // under the rule) and its pads, so the dense pass's extra fifth of room (layout.js
+            // DENSE_ROOM 1.2) cost S a row - 4 rows of 20 facts, each then stretched to 57 mm. A bare
+            // fact asks for none: S prints 5 x 5 and M 4 x 5 in 45 mm rows.
+            denseRoom: 1,
             measure: false, factLike: true, maxCols: 10, tracks: FACT_TRACKS,
         };
     },

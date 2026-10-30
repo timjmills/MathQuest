@@ -2289,7 +2289,10 @@ function _intLineKit(q, a, b, op) {
     q.nlMax = max;
 }
 
-const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
+// sub_facts joined 2026-10-30 (Lane D restart, logged H13 "sub_facts independent S 48 %"): it was
+// the one fact drill left out of the P8c migration, so every page but Fact rows printed its legacy
+// cell, measured at 40.8 mm and stretched to 57 mm rows at S.
+const _KIT_FACT_SKILLS = new Set(['add_facts', 'sub_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
 const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
 
 /**

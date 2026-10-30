@@ -118,7 +118,7 @@ import './cells/ops-counters.js';
 import './cells/arrays-turn.js';
 import './cells/number-line.js';
 import './cells/family.js';
-export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
+export { factDigitTracks, factGridStyle, factOpTrackEm, FACT_OP_TRACK_EM, FACT_DIV_OP_TRACK_TIGHT_EM } from './cells/fact.js';
 export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'arrays-turn', 'remainder', 'number-line', 'fact-family', 'cloze-bank'];
 
 
