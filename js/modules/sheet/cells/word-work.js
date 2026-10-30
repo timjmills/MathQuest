@@ -829,7 +829,9 @@ function storyHTML(ctx, p, narrow = false) {
     // a repeat of its text line (screen-cell.js hideRepeatedPrompt skips a block that holds one);
     // the host hides its own line instead (visualRepeatsText), so the story is said once, here.
     const keep = isTwin(ctx) ? '<svg aria-hidden="true" width="0" height="0" style="position:absolute;"></svg>' : '';
-    return `<div class="mq-wwstory" style="flex:1 1 auto;min-width:0;text-align:left;font-size:${P(ctx, textPt(ctx) + (narrow && !isTwin(ctx) ? 0 : 2))};line-height:${narrow && !isTwin(ctx) ? 1.2 : 1.4};">${keep}${lines}</div>`;
+    // (a two-step story prints at the WDS text line-height 1.3 - TY-13 / AX-3; lesson 7 r2: the Guided page of two
+    // two-step cells overflowed by 3 mm at 1.4, and content never shrinks: the type size is unchanged)
+    return `<div class="mq-wwstory" style="flex:1 1 auto;min-width:0;text-align:left;font-size:${P(ctx, textPt(ctx) + (narrow && !isTwin(ctx) ? 0 : 2))};line-height:${narrow && !isTwin(ctx) ? 1.2 : (Array.isArray(p.steps) && p.steps.length > 1 && !isTwin(ctx) ? 1.3 : 1.4)};">${keep}${lines}</div>`;
 }
 
 /** The keyword bank box: each sign with its cue phrases (a fixed panel, the same on every item). */
@@ -1111,7 +1113,9 @@ function framesLayout(p, ctx) {
     const work = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
     // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
     const unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
-    return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, 2.5)};padding-top:${L(ctx, 1.5)};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
+    // (the story starts level with the item tab, in a gutter beside it - the frames cell takes no tab spacer, CSS
+    // .mq-wwframes in sheet-kit.css: lesson 7 r2, the exit slip half overflowed by 8 mm and content never shrinks)
+    return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
         + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
 }
 

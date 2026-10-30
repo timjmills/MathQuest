@@ -4370,6 +4370,10 @@
     {
      "key": "algebra:multi_step_word",
      "why": "Y5.B2.S6 Multi-step addition and subtraction problems (prior learning wk W12)"
+    },
+    {
+     "key": "algebra:two_step_letter_equation",
+     "why": "a two-step story written as one equation with a letter (3.OA.D.8) before solving 2-step equations"
     }
    ],
    "preBuild": [],
@@ -4509,6 +4513,10 @@
     {
      "key": "algebra:write_equation",
      "why": "an equation for each condition"
+    },
+    {
+     "key": "algebra:two_step_letter_equation",
+     "why": "a story written as an equation with a letter for the unknown"
     }
    ],
    "note": "",

@@ -39,10 +39,12 @@ export default {
     // The other clauses of 3.OA.D.8 are built as options of the same skill (round 2, owner skill coverage rule) and
     // taught in follow-on lessons: + or − first (brackets) msOps addmult / adddiv; one equation with a letter
     // msLetter; reasonableness by rounding to tens msCheck. The coverage of 3.OA.D.8 is full across the skill.
+    // Each is also a findable PRESET skill (owner rule 2026-10-17; skill-presets.js): two_step_mult_div_first (this lesson),
+    // two_step_add_then_mult, two_step_add_then_div, two_step_letter_equation, two_step_estimate_check.
     followOn: [
-        { title: 'Two-step stories: add or take away first, then multiply or divide', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'adddiv' }, ccss: '3.OA.D.8', note: 'Brackets: (12 + 18) ÷ 5; msOps addmult for (5 + 3) × 4.' },
-        { title: 'Write the equation with a letter', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'multdiv', msLetter: true }, ccss: '3.OA.D.8', note: '5 × 4 − 6 = n, then n.' },
-        { title: 'Is the answer reasonable? Round to check', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'addsub', band: 100, msCheck: true }, ccss: '3.OA.D.8' },
+        { title: 'Two-step stories: add or take away first, then multiply or divide', skill: 'algebra:two_step_add_then_div', opts: {}, ccss: '3.OA.D.8', note: 'Brackets: (12 + 18) ÷ 5; preset two_step_add_then_mult for (5 + 3) × 4.' },
+        { title: 'Write the equation with a letter', skill: 'algebra:two_step_letter_equation', opts: {}, ccss: '3.OA.D.8', note: '5 × 4 − 6 = n, then n.' },
+        { title: 'Is the answer reasonable? Round to check', skill: 'algebra:two_step_estimate_check', opts: {}, ccss: '3.OA.D.8' },
     ],
     // The two SITUATIONS the lesson teaches (E31): groups then a change (chunk a), a fair share then a change (chunk b).
     situations: [{ id: 'groups-then-change', test: 'msMult' }, { id: 'share-then-change', test: 'msDiv' }],
@@ -138,13 +140,13 @@ export default {
 
     // ------------------------------------------------------------------ P0 Prerequisite Check
     prerequisites: [
-        { atom: 1, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [3, 4, 5, 6], notation: ['stacked'], band: 100 }, allTest: 'factNoZeroOne' },
-            lesson: { id: '3.OA.C.7', title: 'Multiply within 100' } },
-        { atom: 2, ref: { categoryId: 'multiplication', skillId: 'mult_word_problems_plain', opts: { forms: [0], pictures: false, wpCues: false, wpBank: false, wpFrames: true }, instructionKey: 'story-steps' },
+        // (no × fact band: four bands overflowed one page by 4 mm and content never shrinks; the × facts are Spaced
+        // retrieval §3 and the Step 1 of every story here - atom 1 is checked there)
+        { atom: 2, items: 1, ref: { categoryId: 'multiplication', skillId: 'mult_word_problems_plain', opts: { forms: [0], pictures: false, wpCues: false, wpBank: false, wpFrames: true }, instructionKey: 'story-steps' },
             lesson: { id: '3.OA.A.3', title: 'Equal-groups stories' } },
-        { atom: 3, ref: { categoryId: 'division', skillId: 'div_word_problems_plain', opts: { forms: [0], pictures: false, wpCues: false, wpBank: false, wpFrames: true }, instructionKey: 'story-steps' },
+        { atom: 3, items: 2, ref: { categoryId: 'division', skillId: 'div_word_problems_plain', opts: { forms: [0], pictures: false, wpCues: false, wpBank: false, wpFrames: true }, instructionKey: 'story-steps' },
             lesson: { id: '3.OA.A.3', title: 'Sharing stories' } },
-        { atom: 4, ref: { categoryId: 'algebra', skillId: 'multi_step_word_plain', opts: { forms: [0], band: 30, pictures: false, wpCues: false, wpBank: false, wpFrames: true }, instructionKey: 'story-steps' },
+        { atom: 4, items: 1, ref: { categoryId: 'algebra', skillId: 'multi_step_word_plain', opts: { forms: [0], band: 30, pictures: false, wpCues: false, wpBank: false, wpFrames: true }, instructionKey: 'story-steps' },
             lesson: { id: 'Y2 B4 S10', title: 'Two-step problems' } },
     ],
 
@@ -165,7 +167,9 @@ export default {
         want: ['msMultSub', 'msClean'],
         lines: ['{wp.l0}', '{wp.l1}', '{wp.l2}', '{wp.qShort}'],
         answerLine: 'The answer: __ {wp.unit}.',
-        say: 'First I find the groups. Then I take away.',
+        // (a Say with a blank the key fills from the dealt item: the Step 1 answer that Step 2 uses)
+        say: 'My Step 1 answer is __. Then I take away.',
+        sayAns: '{wp.s1}',
         eqSteps: true,
     },
 
@@ -183,7 +187,7 @@ export default {
     // ------------------------------------------------------------------ retrieval (MWB)
     retrieval: [
         { ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [3, 4], notation: ['across'], band: 100 }, allTest: 'factNoZeroOne' }, ask: '{ret.0.text}' },
-        { ref: { categoryId: 'division', skillId: 'div_facts', opts: { constant: [3, 4], notation: ['across'] } }, ask: '{ret.1.text}' },
+        { ref: { categoryId: 'division', skillId: 'div_facts', opts: { constant: [3, 4], notation: ['across'] }, minNum: 2, maxNum: 10 }, ask: '{ret.1.text}' },
         { ref: { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 100, notation: ['across'] } }, ask: '{ret.2.text}' },
     ],
 
@@ -193,7 +197,7 @@ export default {
         { kind: 'language', title: '“Each”', text: '“Each bag has 6” means every bag has 6: equal groups. Act it out with cups.' },
         { kind: 'watch', title: 'A story number in Step 2', text: 'The mistake to stop today: Step 2 done with a story number. Draw the arrow from the Step 1 answer.' },
     ],
-    materials: ['Cups and counters, 6 cups and 40 counters per pair', 'Mini whiteboards and pens', 'Anchor charts 1 and 2', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
+    materials: ['Cups and counters, 6 cups and 60 counters per pair', 'Mini whiteboards and pens', 'Anchor charts 1 and 2', 'Pupil packet, one per pupil', 'Exit slips, cut in half'],
     vocabulary: [
         { word: 'step', gloss: 'one part of the work', diagram: { kind: 'text', text: 'Step 1 → Step 2' } },
         { word: 'each', gloss: 'every group has the same', diagram: { kind: 'text', text: '3 bags of 4' } },
@@ -202,10 +206,10 @@ export default {
 
     // ------------------------------------------------------------------ T2 Atomisation template
     atoms: [
-        { type: 'Fact', prereq: true, skill: '× facts to 10 × 10', notes: 'Prerequisite Check {pre.0.letters}.' },
-        { type: 'Category', prereq: true, skill: 'Equal groups: multiply', notes: 'Prerequisite Check {pre.1.letters}.' },
-        { type: 'Category', prereq: true, skill: 'Share equally: divide', notes: 'Prerequisite Check {pre.2.letters}.' },
-        { type: 'Conceptual', prereq: true, skill: 'Two steps with + and −', notes: 'Prerequisite Check {pre.3.letters}.' },
+        { type: 'Fact', prereq: true, skill: '× facts to 10 × 10', notes: 'Spaced retrieval, Section 3.' },
+        { type: 'Category', prereq: true, skill: 'Equal groups: multiply', notes: 'Prerequisite Check {pre.0.letters}.' },
+        { type: 'Category', prereq: true, skill: 'Share equally: divide', notes: 'Prerequisite Check {pre.1.letters}.' },
+        { type: 'Conceptual', prereq: true, skill: 'Two steps with + and −', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Category', skill: '“Each” names Step 1', notes: 'The first two lines are Step 1.' },
         { type: 'Conceptual', critical: true, skill: 'Step 1 answer: a Step 2 number', notes: 'Draw the arrow into Step 2.' },
         { type: 'Comparative', skill: 'Two steps or one step', notes: 'Is the Step 1 answer the question?' },
@@ -213,9 +217,9 @@ export default {
     ],
     routine: [
         { step: 'Read it. What do I find first?', tag: 'New', check: 'Guided cell 1' },
-        { step: 'Step 1: the groups or the share. × or ÷.', tag: 'Pre-requisite', check: 'Prerequisite Check a to c' },
-        { step: 'Step 2: use my Step 1 answer.', tag: 'New', critical: true, check: 'Check Question; exit slip a' },
-        { step: 'Write the answer and the unit.', tag: 'Pre-requisite', check: 'Practice 1 a to d' },
+        { step: 'Step 1: the groups or the share. × or ÷.', tag: 'Pre-requisite', check: 'Prerequisite Check 1–2' },
+        { step: 'Step 2: use my Step 1 answer.', tag: 'New', critical: true, check: 'Check Question; exit slip 1' },
+        { step: 'Write the answer and the unit.', tag: 'Pre-requisite', check: 'Practice 1 and 2' },
     ],
     howToTeach: [
         'Cups and counters first: the groups, then take some away or add some.',
@@ -225,10 +229,9 @@ export default {
     ],
     board: 'Two boxes: Step 1 {chart.step1} → Step 2 {chart.step2}.',
     mistakes: [
-        { name: 'Stops after Step 1', step: 3, looks: '{cq.A}', fix: '“Is that the question? Read the last line.”', option: 'A', misconception: 'ms-stop-step1', caught: 'exit a' },
-        { name: 'Story number in Step 2', step: 3, looks: '{cq.B}', fix: 'Arrow: the Step 1 answer goes into Step 2.', option: 'B', misconception: 'ms-story-number' },
+        { name: 'Stops after Step 1', step: 3, looks: '{cq.A}', fix: '“Is that the question? Read the last line.”', option: 'A', misconception: 'ms-stop-step1', caught: 'Exit 1' },
+        { name: 'Story number in Step 2', step: 3, looks: '{cq.B}', fix: 'Arrow: the Step 1 answer goes into Step 2.', option: 'B', misconception: 'ms-story-number', caught: 'Exit 2' },
         { name: 'One sign for all', step: 2, looks: '{cq.C}', fix: '“How many steps?” Count the boxes.', option: 'C', misconception: 'ms-one-op' },
-        { name: 'Story number in Step 2', step: 3, looks: '{exit.1.wrong.msstorynumber} for exit b', fix: 'One share first, then the change.', option: '', caught: 'Exit b' },
     ],
     checkQuestion: { want: ['msMultSub', 'msClean', 'msMid'], correct: 'D' },
     slotRows: [{ shape: 'box', use: 'a step box: Step 1 or Step 2' }, { shape: 'line', use: 'P5: the answer on the story line' }],
@@ -276,7 +279,7 @@ export default {
                 { say: 'Cell 1: the Step 1 sign is done in grey.', note: 'Step 1 [[{we.0.step1}]]; Step 2 [[{we.0.step2}]].' },
                 { ask: 'Which number goes into Step 2 first?', note: 'Expected: the Step 1 answer, [[{we.0.s1}]].' },
                 { do: 'Pairs do cell 2: A reads, B points to each box.', note: 'Expected: [[{we.1.step1}]], then [[{we.1.step2}]] {we.1.unit}.' },
-                { ask: 'Cell 2: which sign is Step 2? How do you know?', note: 'Gets more: [[+]]. Gives away: [[−]]. The third line tells.' },
+                { ask: 'Cell 2: which sign is Step 2? How do you know?', note: 'Expected: [[{we.1.op2}]]. The third line tells: gets more is +, gives away is −.' },
                 { do: 'A pupil who stops after Step 1: point to the last line.', note: 'Read the question aloud together. Is the Step 1 answer the question?' },
                 { ask: 'Where did your Step 1 answer go?', note: 'Pupils point: the top row of Step 2.' },
                 { say: 'First the groups. Then the change.', note: 'The chant. Say it twice together.' },
@@ -316,7 +319,7 @@ export default {
         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
             rows: [
                 { say: 'First the groups. Then the change.', note: 'Say the chant together twice.' },
-                { do: 'Hand out the exit slip. No help. Sort the slips by the boxes ticked.', note: 'a. [[{exit.0.whole}]] · b. [[{exit.1.whole}]].' },
+                { do: 'Hand out the exit slip. No help. Sort the slips by the boxes ticked.', note: '1. [[{exit.0.whole}]] · 2. [[{exit.1.whole}]].' },
             ] },
     ],
     transitionsMin: 4,
@@ -330,9 +333,9 @@ export default {
         'Step 1 right and Step 2 a slip of one: not yet right; ask the pupil to check Step 2.',
     ],
     wrongAnswers: [
-        { wrote: '{exit.0.wrong.msstopstep1} (a)', mistake: 'Stops after Step 1', next: '“Is that the question?” Read the last line.' },
-        { wrote: '{exit.0.wrong.msstorynumber} (a)', mistake: 'Story number in Step 2', next: 'The arrow from Step 1 into Step 2.' },
-        { wrote: '{exit.1.wrong.msstopstep1} (b)', mistake: 'Stops after Step 1', next: 'Point to the Step 2 box.' },
-        { wrote: '{exit.1.wrong.msstorynumber} (b)', mistake: 'Story number in Step 2', next: 'Cups: one share first, then the change.' },
+        { wrote: '{exit.0.wrong.msstopstep1} (1)', mistake: 'Stops after Step 1', next: '“Is that the question?” Read the last line.' },
+        { wrote: '{exit.0.wrong.msstorynumber} (1)', mistake: 'Story number in Step 2', next: 'The arrow from Step 1 into Step 2.' },
+        { wrote: '{exit.1.wrong.msstopstep1} (2)', mistake: 'Stops after Step 1', next: 'Point to the Step 2 box.' },
+        { wrote: '{exit.1.wrong.msstorynumber} (2)', mistake: 'Story number in Step 2', next: 'Cups: one share first, then the change.' },
     ],
 };

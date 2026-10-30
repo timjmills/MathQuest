@@ -798,6 +798,11 @@ export const SKILL_STANDARDS = {
     'algebra:factor_out_gcf': { ccss: ['6.NS.B.4', '6.EE.A.3'], ee: ['M.EE.6.EE.3'] }, // Factor Out the Greatest Common Factor
     'algebra:function_table_find_rule': { ccss: ['4.OA.C.5', '5.OA.B.3'], ee: ['M.EE.4.OA.5'] }, // Function Tables: Find the Rule
     'algebra:function_table_find_inputs': { ccss: ['4.OA.C.5', '5.OA.B.3'], ee: ['M.EE.4.OA.5'] }, // Function Tables: Find the Missing In Numbers
+    'algebra:two_step_mult_div_first': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: Multiply or Divide First
+    'algebra:two_step_add_then_mult': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: Add or Take Away, Then Multiply
+    'algebra:two_step_add_then_div': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: Add or Take Away, Then Divide
+    'algebra:two_step_letter_equation': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: One Equation With a Letter
+    'algebra:two_step_estimate_check': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: Estimate to Check
     'order_of_operations:square_numbers': { ccss: ['6.EE.A.1'], ee: ['M.EE.6.EE.1-2'] }, // Square Numbers (5²)
     'order_of_operations:cube_numbers': { ccss: ['6.EE.A.1'], ee: ['M.EE.6.EE.1-2'] }, // Cube Numbers (5³)
     'number_sense:reasonable_quotients': { ccss: ['4.OA.A.3', '4.NBT.B.6'], ee: ['M.EE.4.OA.3'] }, // Is the Quotient Reasonable?

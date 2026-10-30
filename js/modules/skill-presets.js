@@ -118,6 +118,12 @@ export const SKILL_PRESETS = Object.freeze({
     'algebra:factor_out_gcf': { skill: 'distributive_expr', opts: { forms: [2] } },
     'algebra:function_table_find_rule': { skill: 'function_table_easy', opts: { ftTask: 'rule' } },
     'algebra:function_table_find_inputs': { skill: 'function_table_easy', opts: { ftTask: 'inputs' } },
+    // --- two-step stories (detailed lesson 7, 3.OA.D.8; host multi_step_word_plain): each a lesson of its own -------
+    'algebra:two_step_mult_div_first': { skill: 'multi_step_word_plain', opts: { msOps: 'multdiv' } },
+    'algebra:two_step_add_then_mult': { skill: 'multi_step_word_plain', opts: { msOps: 'addmult' } },
+    'algebra:two_step_add_then_div': { skill: 'multi_step_word_plain', opts: { msOps: 'adddiv' } },
+    'algebra:two_step_letter_equation': { skill: 'multi_step_word_plain', opts: { msOps: 'multdiv', msLetter: true } },
+    'algebra:two_step_estimate_check': { skill: 'multi_step_word_plain', opts: { msCheck: true } },
     'order_of_operations:square_numbers': { skill: 'exponents_simple', opts: { forms: [0], step: [0] } },
     'order_of_operations:cube_numbers': { skill: 'exponents_simple', opts: { forms: [1], step: [0] } },
     'number_sense:reasonable_quotients': { skill: 'estimate_quotient', opts: { task: 'reasonable' } },
