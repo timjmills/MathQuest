@@ -1775,6 +1775,10 @@
     {
      "key": "subtraction:sub_check_by_adding",
      "why": "the next step: checking"
+    },
+    {
+     "key": "algebra:two_step_estimate_check",
+     "why": "round each story number to the nearest ten to check a two-step answer"
     }
    ],
    "note": "Both option sets are partial covers: {place:100} rounds 3-digit numbers only (sums to 2,000); {place:1000, task:\"reasonable\"} deals 4-digit numbers but its sums pass 10,000. The build list holds both within 10,000.",
@@ -3508,6 +3512,10 @@
        0
       ]
      }
+    },
+    {
+     "key": "placevalue:ten_times_value",
+     "why": "shares 4.NBT.A.1: the digit one place left is worth 10 times as much"
     }
    ],
    "note": "mult_zeros with form ×10 only; existing partial tags become full with opts."
@@ -3637,6 +3645,10 @@
        0
       ]
      }
+    },
+    {
+     "key": "placevalue:one_tenth_value",
+     "why": "shares 4.NBT.A.1: the digit one place right is worth one tenth as much"
     }
    ],
    "note": "School teaches this as enrichment (W35)."
@@ -7394,6 +7406,10 @@
     {
      "key": "addition:add_100_regroup",
      "why": "Y2.B2.S16 Add two 2-digit numbers (across a 10) (lower grade, same idea)"
+    },
+    {
+     "key": "algebra:two_step_mult_div_first",
+     "why": "a two-step × or ÷ then + or − story before money calculations of two steps"
     }
    ],
    "preBuild": [],
@@ -7408,6 +7424,10 @@
      "opts": {
       "range": 100
      }
+    },
+    {
+     "key": "algebra:two_step_mult_div_first",
+     "why": "two-step stories that mix × or ÷ with + or − (3.OA.D.8, the code this step shares)"
     }
    ],
    "note": "Generated with defaults the money skill added whole dollars only (16, 8); with step 5 and USD it deals dollars and cents."
@@ -12469,7 +12489,28 @@
     "block": "Y4.B4",
     "power": false
    },
-   "direct": [],
+   "direct": [
+    {
+     "key": "algebra:two_step_mult_div_first",
+     "why": "detailed lesson 7 (g3-oa8-two-step-wp): a × or ÷ step, then a + or − step"
+    },
+    {
+     "key": "algebra:two_step_add_then_mult",
+     "why": "the + or − step first, then ×: (5 + 3) × 4"
+    },
+    {
+     "key": "algebra:two_step_add_then_div",
+     "why": "the + or − step first, then ÷: (12 + 18) ÷ 5"
+    },
+    {
+     "key": "algebra:two_step_letter_equation",
+     "why": "the story as one equation with a letter for the unknown"
+    },
+    {
+     "key": "algebra:two_step_estimate_check",
+     "why": "the answer checked by rounding to tens and estimating"
+    }
+   ],
    "partial": [
     {
      "key": "algebra:multi_step_word",
@@ -12481,8 +12522,8 @@
      "missing": "one-step stories with +, −, × or ÷ (5 plates of 8 beads; 10 stamps, 2 in each jar; how many more), the factors and divisors within the tables at Max Number 100, and \"times as many\" comparisons in about 1 in 5 (Noor has 90 crayons, 9 times as many as Omar: 4.OA.A.2, Grade 4 content); never a second step"
     }
    ],
-   "verdict": "partial",
-   "missing": "two-step stories that mix × or ÷ with + or − (3 boxes of 8 pens and 5 more pens), written as an equation with a letter for the unknown and checked by estimating",
+   "verdict": "direct",
+   "missing": "",
    "build": [
     "multi_step_four_ops"
    ],
@@ -12525,7 +12566,7 @@
      "why": "a bar model of a one-step story: one of the two bars of a two-step story"
     }
    ],
-   "note": "Awsaj supplement lesson, W06-W07, 3.OA.D.8, block Y4.B4.",
+   "note": "Awsaj supplement lesson, W06-W07, 3.OA.D.8, block Y4.B4. Lesson 7 (2026-10-30): the five presets deal every clause of 3.OA.D.8.",
    "rule5": "Searched for a two-step story with a × or ÷ step: algebra:multi_step_word forms 0-3 (+ and − only, wpBar draws a bar but keeps + and −), algebra:multi_step_word_plain (the same), number_ops_mixed:word_problems_mixed (four operations, one step), algebra:algebra_word_mixed (one equation), multiplication:mult_word_problems forms 0-2 (one step), measurement:money (one step). None has two steps with × or ÷; multi_step_four_ops (STANDARD_PROPOSALS) is the build.",
    "envision": [
     {
@@ -12996,7 +13037,7 @@
        2
       ]
      },
-     "missing": "reads where an arrow points on a 6-inch ruler marked in halves or quarters (3 1/4, 4 1/2); never lays an object on the ruler"
+     "missing": "reads where an arrow points on a 6-inch ruler marked in quarters, the arrow at a half or a quarter (3 1/4, 4 1/2); never lays an object on the ruler"
     }
    ],
    "verdict": "partial",

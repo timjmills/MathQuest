@@ -1,0 +1,427 @@
+diff --git a/PEDAGOGY_STANDARD.md b/PEDAGOGY_STANDARD.md
+index 2cb33be2..46a95724 100644
+--- a/PEDAGOGY_STANDARD.md
++++ b/PEDAGOGY_STANDARD.md
+@@ -1331,6 +1331,8 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
+ | `number-words` | Write the number in words. | numeral to number name (added 2026-10-16, detailed lessons, composing:number_word_form) |
+ | `story-bar` | Read the story. Fill in the bar. Solve. | word problem with a part-whole bar to fill (added 2026-10-16, detailed lesson 2) |
+ | `story-steps` | Read the story. Write each step. Solve. | word problem written as one number sentence a step (added 2026-10-17, detailed lesson 7) |
++| `story-letter` | Read the story. Write the equation. Find n. | two-step story as one equation with a letter (msLetter, 2026-10-17) |
++| `story-check` | Solve. Estimate. Circle Yes or No. | two-step story checked by an estimate from tens (msCheck, 2026-10-17) |
+ | `turn-facts` | Look at the array. Write two facts. | an array and its turn: write both multiplication facts (added 2026-10-16, mult_properties form 0) |
+ | `turn-new` | Turn the array. Write the new fact. | one fact known, write the turned fact (added 2026-10-16, mult_properties form 0) |
+ | `turn-look` | Look at the turned array. Write the new fact. | the turned array is drawn; write its fact (added 2026-10-17, detailed lesson 3a) |
+diff --git a/design/lesson-planner/DETAILED_MAKER.md b/design/lesson-planner/DETAILED_MAKER.md
+index d380a477..1962efae 100644
+--- a/design/lesson-planner/DETAILED_MAKER.md
++++ b/design/lesson-planner/DETAILED_MAKER.md
+@@ -218,3 +218,8 @@ Built for `g3-oa8-two-step-wp` (build list `multi_step_four_ops`, first part):
+   wrong answers `ms-stop-step1`, `ms-story-number`, `ms-one-op` (Check Question, T6).
+ - **Lesson data**: `chartRow` (with `chartWide`: heads beside the drawings), `noStripChant`, `tailRead`. Case tests `ms*`.
+ - **P5** `wordProblem.eqSteps` (with the vars hook `eqSteps`): one number-sentence line a step. Library string `story-steps`.
++- **Round 2 (owner skill coverage rule)**: `msOps` `addmult` / `adddiv` (+ or − first, then × or ÷; tokens P / Q);
++  `msLetter` (codec 4R: one equation with n, brackets when + or − comes first, then n) and `msCheck` (codec 4S: + / −
++  stories - each story number rounded to the nearest ten, the estimate, Yes / No) - both drawn by the frames layout;
++  library strings `story-letter`, `story-check`. The frames layout has a screen twin (inputs for every number and sign,
++  the answer box the host's cell), so wpFrames / msLetter / msCheck practise online as on paper. 3.OA.D.8 is FULL.
+diff --git a/js/modules/gen-algebraic.js b/js/modules/gen-algebraic.js
+index cce59325..1298a8b4 100644
+--- a/js/modules/gen-algebraic.js
++++ b/js/modules/gen-algebraic.js
+@@ -5259,6 +5259,43 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
+                 // and not the Step 1 answer (M1 / M3 always give a different number). Fixed domain: the
+                 // Max Number does not apply. Default 'addsub' = the four + / − archetypes below, unchanged.
+                 const msOpsOpt = state.skillOptions && typeof state.skillOptions.msOps === 'string' ? state.skillOptions.msOps : 'addsub';
++                // 'addmult' / 'adddiv' (3.OA.D.8, brackets): a + or − step first, then × or ÷ -
++                // (5 red + 3 blue) in each of 4 bags; (12 + 18) shared by 5; (30 − 6) shared by 4.
++                if (msOpsOpt === 'addmult' || msOpsOpt === 'adddiv') {
++                    let a1, b1, op1, s1v, n2, fin, guard = 0;
++                    for (;;) {
++                        guard++;
++                        op1 = pick(['+', '-']);
++                        if (msOpsOpt === 'addmult') {
++                            n2 = rng(2, 6); s1v = rng(4, 10);
++                            if (op1 === '+') { a1 = rng(2, s1v - 2); b1 = s1v - a1; } else { b1 = rng(2, 6); a1 = s1v + b1; }
++                            fin = s1v * n2;
++                        } else {
++                            n2 = rng(2, 6); const qq = rng(2, 9); s1v = n2 * qq;
++                            if (op1 === '+') { a1 = rng(2, s1v - 2); b1 = s1v - a1; } else { b1 = rng(2, 9); a1 = s1v + b1; }
++                            fin = qq;
++                        }
++                        const story = [a1, b1, n2];
++                        const ok = a1 !== b1 && !story.includes(fin) && fin !== s1v && !story.includes(s1v) && n2 !== a1 && n2 !== b1 && a1 >= 1 && b1 >= 1;
++                        if (ok || guard > 400) break;
++                    }
++                    const G1 = op1 === '+' ? '+' : '\u2212', G2 = msOpsOpt === 'addmult' ? '\u00d7' : '\u00f7';
++                    q._variant = `${op1 === '+' ? 'add' : 'sub'}_then_${msOpsOpt === 'addmult' ? 'mult' : 'div'}`;
++                    q.msOps = { first: op1 === '+' ? 'add' : 'sub', second: msOpsOpt === 'addmult' ? 'mult' : 'div', a: a1, b: b1, step1: s1v, c: n2 };
++                    q.text = msOpsOpt === 'addmult'
++                        ? (op1 === '+' ? `Each bag has ${a1} red ${msItem} and ${b1} blue ${msItem}. ${msName} has ${n2} bags. How many ${msItem} does ${msName} have?`
++                            : `Each bag had ${a1} ${msItem}. ${b1} were taken out of each bag. ${msName} has ${n2} bags. How many ${msItem} are in the bags now?`)
++                        : (op1 === '+' ? `${msName} has ${a1} red ${msItem} and ${b1} blue ${msItem}. ${msName} shares them equally among ${n2} friends. How many ${msItem} does each friend get?`
++                            : `${msName} has ${a1} ${msItem}. ${msName} keeps ${b1}. ${msName} shares the rest equally among ${n2} friends. How many ${msItem} does each friend get?`);
++                    q.ans = fin;
++                    q.op = G1; q.a = a1; q.b = b1;
++                    q.hint = `Step 1: ${a1} ${G1} ${b1} = ${s1v}. Step 2: ${s1v} ${G2} ${n2} = ${fin}`;
++                    q.skillLabel = 'Multi-Step';
++                    q.printFormat = 'multi-step-word';
++                    q.options = buildNumericOptions(fin);
++                    q.answerType = 'number';
++                    return;
++                }
+                 if (msOpsOpt === 'mult' || msOpsOpt === 'div' || msOpsOpt === 'multdiv') {
+                     const first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
+                     let s1a, s1b, p1, c2, op2, fin, guard = 0;
+diff --git a/js/modules/lessons/detailed/g3-oa8-two-step-wp.js b/js/modules/lessons/detailed/g3-oa8-two-step-wp.js
+index 83ae60c6..60453c96 100644
+--- a/js/modules/lessons/detailed/g3-oa8-two-step-wp.js
++++ b/js/modules/lessons/detailed/g3-oa8-two-step-wp.js
+@@ -36,10 +36,13 @@ export default {
+     eeNote: 'Sheet code M.EE.3.OA.8 quotes the M.EE.3.OA.7 text; the repo tag is M.EE.3.OA.7.',
+     cra: 'Pictorial → Abstract',
+     flowNote: 'Chunk 1 (5a, 6a): × first. Chunk 2 (5b, 6b): ÷ first. Step 2 is always + or −.',
++    // The other clauses of 3.OA.D.8 are built as options of the same skill (round 2, owner skill coverage rule) and
++    // taught in follow-on lessons: + or − first (brackets) msOps addmult / adddiv; one equation with a letter
++    // msLetter; reasonableness by rounding to tens msCheck. The coverage of 3.OA.D.8 is full across the skill.
+     followOn: [
+-        { title: 'Two-step stories: add first, then divide', skill: 'algebra:multi_step_word_plain', opts: {}, ccss: '3.OA.D.8', note: 'Brackets: (12 + 18) ÷ 5. Build list multi_step_four_ops.' },
+-        { title: 'Write the equation with a letter', skill: 'algebra:multi_step_word_plain', opts: {}, ccss: '3.OA.D.8', note: '4 × 6 − 5 = n. Build list multi_step_four_ops.' },
+-        { title: 'Is the answer reasonable? Round to check', skill: 'number_sense:estimate_sums_diffs', opts: {}, ccss: '3.OA.D.8' },
++        { title: 'Two-step stories: add or take away first, then multiply or divide', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'adddiv' }, ccss: '3.OA.D.8', note: 'Brackets: (12 + 18) ÷ 5; msOps addmult for (5 + 3) × 4.' },
++        { title: 'Write the equation with a letter', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'multdiv', msLetter: true }, ccss: '3.OA.D.8', note: '5 × 4 − 6 = n, then n.' },
++        { title: 'Is the answer reasonable? Round to check', skill: 'algebra:multi_step_word_plain', opts: { msOps: 'addsub', band: 100, msCheck: true }, ccss: '3.OA.D.8' },
+     ],
+     // The two SITUATIONS the lesson teaches (E31): groups then a change (chunk a), a fair share then a change (chunk b).
+     situations: [{ id: 'groups-then-change', test: 'msMult' }, { id: 'share-then-change', test: 'msDiv' }],
+diff --git a/js/modules/search-terms.js b/js/modules/search-terms.js
+index d6f723cb..3fcdc50d 100644
+--- a/js/modules/search-terms.js
++++ b/js/modules/search-terms.js
+@@ -413,6 +413,8 @@ export const SKILL_TERMS = {
+     'shapes_early:partition_shapes': ['half', 'fractions', 'halves', 'quarters', 'fourths', 'thirds', 'equal parts', 'fractions of shapes'],
+     'fractions:identify': ['what fraction', 'name the fraction', 'fraction pictures', 'shaded part'],
+     'conversions:percent_of_number': ['percent of', 'percentage of an amount', 'percent of a quantity'],
++    'algebra:multi_step_word': ['two step word problems', 'two-step problems', 'multi-step', 'equation with a letter', 'letter for the unknown', 'estimate to check', 'is the answer reasonable', 'multiply then subtract', 'divide then add', 'add then divide'],
++    'algebra:multi_step_word_plain': ['two step word problems', 'two-step problems', 'equation with a letter', 'estimate to check', 'reasonable answer', 'four operations word problems'],
+     'algebra:solve_unknown': ['solve for x', 'find x', 'missing number'],
+     'algebra:balance_addsub': ['balance', 'equal sign', 'balancing equations', 'equals means same as'],
+     'addition:equal_sign': ['equal sign', 'equals', 'true or false', 'balance'],
+diff --git a/js/modules/sheet/cells/word-work.js b/js/modules/sheet/cells/word-work.js
+index c2502e6f..b57a8399 100644
+--- a/js/modules/sheet/cells/word-work.js
++++ b/js/modules/sheet/cells/word-work.js
+@@ -420,6 +420,21 @@ export function tellTwoStep(s1, s2, k = 0) {
+     const T = pickAt(WW_THINGS, k * 7 + 3);
+     // A × or ÷ first step (msOps, 3.OA.D.8): equal groups or a fair share, then a change. s1.a / s1.b keep the
+     // story's order (groups, each / total, friends); the change is the Step 2 number.
++    // A + or − first step, then × or ÷ (msOps addmult / adddiv, brackets): parts in each group / a total shared.
++    if ((s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/')) {
++        const n = s2.bottom;
++        if (s2.op === '*') {
++            const C = pickAt(WW_CONTAINERS, k * 5 + 1);
++            const L = s1.op === '+'
++                ? [`Each ${C.one} has ${num(s1.a)} red ${s1.a === 1 ? T.one : T.many} and ${num(s1.b)} blue ${s1.b === 1 ? T.one : T.many}.`, `${n1} has ${countOf(n, C)}.`, `How many ${T.many} does ${n1} have?`]
++                : [`Each ${C.one} had ${countOf(s1.a, T)}.`, `${n1} took ${num(s1.b)} out of each ${C.one}.`, `${n1} has ${countOf(n, C)}.`, `How many ${T.many} are in the ${C.many} now?`];
++            return { lines: L, unit: T, ans: s2.ans };
++        }
++        const L = s1.op === '+'
++            ? [`${n1} has ${num(s1.a)} red ${s1.a === 1 ? T.one : T.many} and ${num(s1.b)} blue ${s1.b === 1 ? T.one : T.many}.`, `${n1} shares them equally among ${num(n)} friends.`, `How many ${T.many} does each friend get?`]
++            : [`${n1} has ${countOf(s1.a, T)}.`, `${n1} keeps ${num(s1.b)}.`, `${n1} shares the rest equally among ${num(n)} friends.`, `How many ${T.many} does each friend get?`];
++        return { lines: L, unit: T, ans: s2.ans };
++    }
+     if (s1.op === '*' || s1.op === '/') {
+         const c = s2.bottom;
+         if (s1.op === '*') {
+@@ -1042,38 +1057,69 @@ export function twoStepPart(p, k, ctx) {
+  * exit slip and the Prerequisite Check (the fade of the two step blocks; the response is still produced).
+  */
+ function framesLayout(p, ctx) {
+-    const put = filled(ctx);
++    const twin = isTwin(ctx);
++    const put = filled(ctx) && !twin;
+     const ink = put ? inkOf(ctx) : null;
+     const col = ink === 'trace' ? GREY : INK;
+     const bx = boxMm(ctx);
+     const pt = digitPt(ctx);
+     const two = p.steps.length > 1;
+     const lastI = p.steps.length - 1;
++    const face = (w, heavy) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};text-align:center;${KEY_FEATURES}`;
++    // one number box; on screen an input as wide as its number (the answer: the host's own cell, `data-mq-cell`)
+     const box = (id, v, digits, graded = false, heavy = false) => {
+         const w = Math.max(bx * 1.25, blankWidth(Math.max(2, digits), sizeOf(ctx)));
+-        return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};${KEY_FEATURES}">${put ? esc(v) : ''}</span>`;
++        if (twin) {
++            if (graded) return `<span class="mq-wwans" data-ws-slot="${esc(id)}" data-ws-shape="box" data-mq-cell="1" data-mq-w="${Math.max(1, digits)}" data-mq-label="answer" data-mq-expect="${esc(v)}" style="${face(w, true)}"></span>`;
++            return `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(v)}" data-ws-graded="0" maxlength="${Math.max(1, digits)}" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="number" style="${face(w, heavy)}padding:0;margin:0;">`;
++        }
++        return `<span data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="${face(w, heavy)}">${put ? esc(v) : ''}</span>`;
+     };
+-    const sign = (id, op) => `<span data-ws-slot="${esc(id)}" data-ws-shape="circle" data-ws-graded="0"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, bx * 0.9)};height:${L(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;line-height:1;color:${col};">${put ? GLYPH[op] : ''}</span>`;
+-    const eq = `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">=</span>`;
+-    const rows = p.steps.map((st, i) => {
+-        const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
+-        const r = st.op === '/' ? st.q : st.ans;
+-        const res = i === lastI ? box('answer', String(p.ans), String(r).length, true, true) : box(`fr${i}-r`, String(r), String(r).length);
+-        const cap = two ? `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;min-width:${L(ctx, 17)};">Step ${i + 1}:</span>` : '';
+-        return `<div class="mq-wwframe" style="display:flex;align-items:center;gap:${L(ctx, 2.2)};">${cap}${box(`fr${i}-a`, String(x), String(x).length)}${sign(`op${i}`, st.op)}${box(`fr${i}-b`, String(y), String(y).length)}${eq}${res}</div>`;
+-    }).join('');
++    const sign = (id, op) => (twin
++        ? `<input type="text" class="mq-wwork" data-mq-kind="sign" data-mq-expect="${GLYPH[op]}" data-ws-graded="0" maxlength="1" autocomplete="off" spellcheck="false" aria-label="sign" style="box-sizing:border-box;width:${tw(ctx, bx * 0.9)};height:${tw(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;text-align:center;padding:0;margin:0;">`
++        : `<span data-ws-slot="${esc(id)}" data-ws-shape="circle" data-ws-graded="0"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, bx * 0.9)};height:${L(ctx, bx * 0.9)};border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;font-size:${P(ctx, pt * 0.85)};font-weight:700;line-height:1;color:${col};">${put ? GLYPH[op] : ''}</span>`);
++    const sym = (t) => `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${t}</span>`;
++    const cap = (t) => `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;min-width:${L(ctx, 17)};">${t}</span>`;
++    const row = (html) => `<div class="mq-wwframe" style="display:flex;align-items:center;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.2)};">${html}</div>`;
++    let rows;
++    if (p.letter) {
++        // msLetter (3.OA.D.8): the whole story as ONE equation with a letter, then the letter's value
++        const [s1, s2] = p.steps;
++        const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
++        const brk = two && (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
++        const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length)}`;
++        const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length)}` : first;
++        rows = row(`${eqn}${sym('=')}${sym('n')}`) + row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
++    } else {
++        rows = p.steps.map((st, i) => {
++            const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
++            const r = st.op === '/' ? st.q : st.ans;
++            const res = i === lastI ? box('answer', String(p.ans), String(r).length, true, true) : box(`fr${i}-r`, String(r), String(r).length);
++            return row(`${two ? cap(`Step ${i + 1}:`) : ''}${box(`fr${i}-a`, String(x), String(x).length)}${sign(`op${i}`, st.op)}${box(`fr${i}-b`, String(y), String(y).length)}${sym('=')}${res}`);
++        }).join('');
++    }
++    // msCheck (3.OA.D.8): each story number rounded to the nearest ten, the estimate, and the pupil's own answer judged
++    if (p.check) {
++        const c = p.check;
++        const est = row(`${cap('Estimate:')}${box('es-a', String(c.a), String(c.a).length)}${sign('es-op0', p.steps[0].op)}${box('es-b', String(c.b), String(c.b).length)}`
++            + (two ? `${sign('es-op1', p.steps[1].op)}${box('es-c', String(c.c), String(c.c).length)}` : '') + `${sym('=')}${box('es-r', String(c.est), String(c.est).length)}`);
++        const ring = (w) => (twin
++            ? `<button type="button" class="mq-wwword" data-mq-word="${w}" style="min-height:44px;min-width:44px;padding:0 ${L(ctx, 1.5)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font:inherit;cursor:pointer;">${w}</button>`
++            : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === 'Yes' ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
++        rows += est + row(`${cap('Is my answer close to the estimate?')}${ring('Yes')}${ring('No')}`);
++    }
+     const work = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
+     // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
+-    const unit = p.unit ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
+-    return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};padding-top:${L(ctx, 1.5)};">${storyHTML(ctx, p, true)}`
+-        + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
++    const unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
++    return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, 2.5)};padding-top:${L(ctx, 1.5)};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
++        + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
+ }
+ 
+ register(WW_TEMPLATE, {
+     render(p, ctx) {
+         if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
+         if (p.layout === 'bar' && p.bar && p.steps.length === 1 && !isTwin(ctx)) return barLayout(p, ctx);
+-        if (p.layout === 'frames' && !isTwin(ctx)) return framesLayout(p, ctx);
++        if (p.layout === 'frames') return framesLayout(p, ctx);
+         const twin = isTwin(ctx);
+         // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
+         // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
+@@ -1130,10 +1176,16 @@ register(WW_TEMPLATE, {
+         if (p.layout === 'frames' && Array.isArray(p.steps)) {
+             const lastI = p.steps.length - 1;
+             p.steps.forEach((st, i) => {
++                if (p.letter && i > 0) { slots[`fr${i}-b`] = { value: String(st.bottom), graded: false }; return; }
+                 slots[`fr${i}-a`] = { value: String(st.op === '*' ? st.a : st.top), graded: false };
+                 slots[`fr${i}-b`] = { value: String(st.op === '*' ? st.b : st.bottom), graded: false };
+-                if (i !== lastI) slots[`fr${i}-r`] = { value: String(st.op === '/' ? st.q : st.ans), graded: false };
++                if (i !== lastI && !p.letter) slots[`fr${i}-r`] = { value: String(st.op === '/' ? st.q : st.ans), graded: false };
+             });
++            if (p.check) {
++                const c = p.check;
++                Object.assign(slots, { 'es-a': { value: String(c.a), graded: false }, 'es-b': { value: String(c.b), graded: false }, 'es-r': { value: String(c.est), graded: false }, 'es-op0': { value: GLYPH[p.steps[0].op], graded: false } });
++                if (p.steps.length > 1) Object.assign(slots, { 'es-c': { value: String(c.c), graded: false }, 'es-op1': { value: GLYPH[p.steps[1].op], graded: false } });
++            }
+         }
+         if (p.unit && p.layout !== 'bar' && p.layout !== 'frames') slots['answer-label'] = { value: p.unit, graded: false };
+         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });
+diff --git a/js/modules/sheet/contract.js b/js/modules/sheet/contract.js
+index e2f4e04f..3ca351ec 100644
+--- a/js/modules/sheet/contract.js
++++ b/js/modules/sheet/contract.js
+@@ -156,6 +156,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
+     'story-bar': 'Read the story. Fill in the bar. Solve.',
+     // detailed lesson 7 (2026-10-17): the word-work cell's compact frames form (one number sentence a step)
+     'story-steps': 'Read the story. Write each step. Solve.',
++    'story-letter': 'Read the story. Write the equation. Find n.',
++    'story-check': 'Solve. Estimate. Circle Yes or No.',
+     'pick-parts': 'Write one number from each list to make the sum.',
+     'fact-family': 'Use the three numbers. Fill in the fact family.',
+     'chart-fill': 'Fill in the missing products.',
+diff --git a/js/modules/skill-option-keys.js b/js/modules/skill-option-keys.js
+index 344b35a2..8dc5c521 100644
+--- a/js/modules/skill-option-keys.js
++++ b/js/modules/skill-option-keys.js
+@@ -197,7 +197,9 @@ export const MULTI_KEYS = Object.freeze({
+     // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
+     msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
+     wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
+-    // NEXT FREE IN 4P-4Z: 4R.
++    msLetter: '4R',      // multi_step_word(_plain): write the story as one equation with a letter (5 × 4 − 6 = n), then n
++    msCheck: '4S',       // multi_step_word(_plain): + / − stories - estimate from tens, then judge the answer
++    // NEXT FREE IN 4P-4Z: 4T (lane A/B fixers take 4Z downwards).
+ 
+     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
+     members: '5A',       // mixed pools: which member skills / categories the pool draws from
+@@ -345,7 +347,7 @@ export const VALUE_TOKENS = Object.freeze({
+     // P9 step 8 (block 0)
+     form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S', times: 'T' }),
+     tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
+-    msOps: Object.freeze({ addsub: 'A', mult: 'M', div: 'D', multdiv: 'B' }),
++    msOps: Object.freeze({ addsub: 'A', mult: 'M', div: 'D', multdiv: 'B', addmult: 'P', adddiv: 'Q' }),
+     frame: Object.freeze({ boxes: 'B', line: 'L' }),
+     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
+     divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),
+@@ -448,7 +450,7 @@ export const SCALAR_ONLY = Object.freeze({
+     // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)
+     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
+     // block 8 (word problems)
+-    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool', wpFrames: 'bool',
++    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool', wpFrames: 'bool', msLetter: 'bool', msCheck: 'bool',
+     // Wave 1 lane A
+     calculator: 'bool', skipAfter: 'decimal',
+     // lessons 4 and 5 (2026-10-16)
+diff --git a/js/modules/skill-options.js b/js/modules/skill-options.js
+index 9fe33e2d..76d5342e 100644
+--- a/js/modules/skill-options.js
++++ b/js/modules/skill-options.js
+@@ -2537,6 +2537,8 @@ const _msOps = () => ({
+         { v: 'mult', l: 'Multiply, then add or take away (4 bags of 6, 5 given away)' },
+         { v: 'div', l: 'Divide, then add or take away (24 shared by 4, 2 more each)' },
+         { v: 'multdiv', l: 'Multiply or divide, then add or take away' },
++        { v: 'addmult', l: 'Add or take away, then multiply ((5 + 3) in each of 4 bags)' },
++        { v: 'adddiv', l: 'Add or take away, then divide ((12 + 18) shared by 5)' },
+     ],
+     help: 'The new thing in Grade 3 is a × or ÷ step whose answer is used in the + or − step. One first step at a time, then mixed.',
+ });
+@@ -3301,6 +3303,14 @@ for (const key of ['multiplication:mult_word_problems', 'division:div_word_probl
+         id: 'wpFrames', label: 'Number sentences, no column boxes', type: 'bool', default: false, group: 'layout',
+         help: 'Each step is written as one number sentence (Step 1: __ ○ __ = __), the unit word printed. The fade of the column boxes; a compact story.' }];
+ }
++// msLetter / msCheck (3.OA.D.8, detailed lesson 7 round 2): the standard's two other clauses as responses.
++for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
++    SKILL_OPTIONS[k] = [...(SKILL_OPTIONS[k] || []),
++        { id: 'msLetter', label: 'Write one equation with a letter', type: 'bool', default: false, group: 'layout',
++            help: 'The pupil writes the whole story as one equation with n for the unknown (5 × 4 − 6 = n; brackets when the + or − comes first), then n.' },
++        { id: 'msCheck', label: 'Estimate to check', type: 'bool', default: false, group: 'layout',
++            help: 'Add and take-away stories: the pupil works the two steps, rounds each story number to the nearest ten, estimates, and rings Yes or No: is my answer close?' }];
++}
+ 
+ // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
+ // design/audit/OPTIONS-RUBRIC.md §1 O6. Each control changes how an item LOOKS — never the numbers
+diff --git a/js/modules/standards-audit.js b/js/modules/standards-audit.js
+index 8d87823e..e1fe6423 100644
+--- a/js/modules/standards-audit.js
++++ b/js/modules/standards-audit.js
+@@ -120,7 +120,7 @@ export const CCSS_AUDIT = {
+     '3.OA.B.5': P(['multiplication:mult_properties'], ['the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0'], ['mult_three']),
+     '3.OA.B.6': F(['multiplication:mult_div_fact_family', 'division:missing_mult_div']),
+     '3.OA.C.7': F(['multiplication:mult_facts', 'division:div_facts']),
+-    '3.OA.D.8': P(['algebra:multi_step_word', 'number_sense:estimate_sums_diffs'], ['two-step problems with + / − first, then × or ÷ (brackets; msOps covers × or ÷ first, then + or −)', 'an equation with a letter for the unknown', 'checking an answer by rounding (mental estimate)', 'one-step pools and tape diagrams were tagged here: tags moved to the one-step standards'], ['multi_step_four_ops', 'mental_estimate']),
++    '3.OA.D.8': F(['algebra:multi_step_word', 'algebra:multi_step_word_plain', 'number_sense:estimate_sums_diffs'], 'two steps, four operations: msOps addsub / mult / div / multdiv (× or ÷ first) and addmult / adddiv (+ or − first, brackets); the equation with a letter: msLetter; reasonableness by rounding to tens: msCheck (detailed lesson 7, 2026-10-17)'),
+     '3.OA.D.9': P(['multiplication:mult_chart', 'patterns:number_patterns_rule', 'patterns:count_by_fill'], ['patterns in the addition table', 'explain a pattern with a property (4 × n is always even)'], ['patterns_notice']),
+     '3.NBT.A.1': F(['number_sense:nearest_10', 'number_sense:nearest_100', 'number_sense:rounding_visual']),
+     '3.NBT.A.2': F(['addition:add_1k_mixed', 'subtraction:sub_1k_mixed']),
+diff --git a/js/modules/word-work.js b/js/modules/word-work.js
+index 2dc04087..42b6df0f 100644
+--- a/js/modules/word-work.js
++++ b/js/modules/word-work.js
+@@ -101,6 +101,17 @@ export function applyWordWork(q) {
+     if (!payload) return q;
+     // `wpFrames` (detailed lesson 7): one number sentence a step (the kit cell's `layout: 'frames'`)
+     if (opt('wpFrames') && !payload.bar) payload.layout = 'frames';
++    // `msLetter` / `msCheck` (3.OA.D.8, detailed lesson 7 round 2): the compact cell answers as ONE equation with a
++    // letter (5 × 4 − 6 = n, then n), or with an estimate from numbers rounded to the nearest ten and a yes / no check
++    if (opt('msLetter') && !payload.bar) { payload.layout = 'frames'; payload.letter = true; }
++    if (opt('msCheck') && !payload.bar && payload.steps.every((st) => st.op === '+' || st.op === '-')) {
++        const r10 = (n) => Math.round(n / 10) * 10;
++        const [s1, s2] = payload.steps;
++        const ea = r10(s1.top), eb = r10(s1.bottom), ec = s2 ? r10(s2.bottom) : 0;
++        const e1 = s1.op === '+' ? ea + eb : ea - eb;
++        const est = s2 ? (s2.op === '+' ? e1 + ec : e1 - ec) : e1;
++        if (e1 >= 0 && est >= 0) { payload.layout = 'frames'; payload.check = { a: ea, b: eb, c: ec, est }; }
++    }
+     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
+     const retold = q.text !== payload.lines.join(' ');
+     q.text = payload.lines.join(' ');
+@@ -115,8 +126,14 @@ export function applyWordWork(q) {
+     // not a `word*` format: the page measures the cell's columns (print-sheet.js footprintClass)
+     q.printFormat = 'story-work';
+     q.printText = 'Circle the sign. Write the numbers in the boxes. Solve.';
++    if (payload.letter) { q.printText = 'Read the story. Write the equation. Find n.'; }
++    else if (payload.check) { q.printText = 'Solve. Estimate. Circle Yes or No.'; }
++    else if (payload.layout === 'frames') { q.printText = 'Read the story. Write each step. Solve.'; }
+     // the same instruction in screen verbs (PEDAGOGY 10.2): the hosts print it over the cell
+     q.screenInstr = 'Tap the sign. Type the numbers in the boxes. Solve.';
++    if (payload.letter) q.screenInstr = 'Read the story. Type the equation. Find n.';
++    else if (payload.check) q.screenInstr = 'Solve. Estimate. Tap Yes or No.';
++    else if (payload.layout === 'frames') q.screenInstr = 'Read the story. Type each step. Solve.';
+     // what the work expects, for a host that marks each box as it is filled
+     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
+     return q;
+diff --git a/tests/baselines/codec-registry.snapshot.json b/tests/baselines/codec-registry.snapshot.json
+index a0ea8a6d..153156b1 100644
+--- a/tests/baselines/codec-registry.snapshot.json
++++ b/tests/baselines/codec-registry.snapshot.json
+@@ -118,7 +118,9 @@
+     "tenValues": "4F",
+     "tenPlain": "4G",
+     "msOps": "4P",
+-    "wpFrames": "4Q"
++    "wpFrames": "4Q",
++    "msLetter": "4R",
++    "msCheck": "4S"
+   },
+   "blocks": {
+     "0": {
+@@ -764,9 +766,13 @@
+       "addsub": "A",
+       "mult": "M",
+       "div": "D",
+-      "multdiv": "B"
++      "multdiv": "B",
++      "addmult": "P",
++      "adddiv": "Q"
+     },
+-    "wpFrames": {}
++    "wpFrames": {},
++    "msLetter": {},
++    "msCheck": {}
+   },
+   "scalarOnly": {
+     "range": "decimal",
+@@ -811,7 +817,9 @@
+     "ftTrap": "bool",
+     "tenValues": "bool",
+     "tenPlain": "bool",
+-    "wpFrames": "bool"
++    "wpFrames": "bool",
++    "msLetter": "bool",
++    "msCheck": "bool"
+   },
+   "subranges": {
+     "3B-3M": "build lane k2 (BUILD_LIST.md)",
+diff --git a/tests/scripts/_dbg7.cjs b/tests/scripts/_dbg7.cjs
+new file mode 100644
+index 00000000..5b18b94c
+--- /dev/null
++++ b/tests/scripts/_dbg7.cjs
+@@ -0,0 +1,18 @@
++// temporary debug harness (lesson 7 build) - deleted before commit
++const { open } = require('../lib/ws-harness.cjs');
++const fs = require('fs');
++(async () => {
++    const app = await open({ seed: 1 });
++    try {
++        const out = await app.page.evaluate(async (code) => (new Function('return (async () => {' + code + '})()'))(), fs.readFileSync(process.argv[2], 'utf8'));
++        if (out && out.html && process.argv[3]) {
++            const pg = await app.browser.newPage();
++            await pg.goto(app.page.url(), { waitUntil: 'domcontentloaded' });
++            await pg.setContent(out.html, { waitUntil: 'networkidle0' });
++            if (out.screen) { await pg.setViewport({ width: 700, height: 900 }); await pg.screenshot({ path: process.argv[3] + '.png', fullPage: true }); }
++            else { await pg.emulateMediaType('print'); await pg.pdf({ path: process.argv[3] + '.pdf', printBackground: true, preferCSSPageSize: true }); }
++            delete out.html;
++        }
++        console.log(JSON.stringify(out, null, 1).slice(0, 6000));
++    } finally { await app.close(); }
++})();

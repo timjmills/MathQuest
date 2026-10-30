@@ -305,11 +305,14 @@ export const SKILL_GRADES = {
     'solve_x_minus_a': 6, 'solve_ax_eq_b': 6, 'solve_x_div_a': 6, 'solve_ax_plus_b': 6, 'solve_ax_minus_b': 6,
     'solve_x_div_a_plus_b': 6, 'solve_bracket_div': 6, 'write_equation_story': 6, 'factor_out_gcf': 6, 'function_table_find_rule': 4,
     'function_table_find_inputs': 4, 'square_numbers': 5, 'cube_numbers': 5, 
+    // (lesson 7 presets, 3.OA.D.8)
+    'two_step_mult_div_first': 3, 'two_step_add_then_mult': 3, 'two_step_add_then_div': 3, 'two_step_letter_equation': 3, 'two_step_estimate_check': 3,
     'reasonable_quotients': 4, 'digit_value_unit_form': 2, 'digit_value_notation': 4, 'count_pv_disks': 2, 'write_numbers_in_words': 2,
     'count_notes': 2, 'count_notes_and_coins': 2, 'convert_feet_to_inches': 4, 'convert_yards_to_feet': 4, 'convert_yards_to_inches': 4,
     'convert_miles_to_feet': 4, 'convert_cm_to_mm': 4, 'convert_m_to_cm': 4, 'convert_m_to_mm': 4, 'convert_km_to_m': 4,
     'clock_hands': 1, 'minutes_by_fives_all': 2, 'order_notes': 1, 'money_amount_in_words': 2, 'sort_prime_composite': 4,
     'list_multiples': 4, 'missing_multiples': 4, 'common_factors': 5, 'common_multiples': 5,
+    'ten_times_value': 4, 'one_tenth_value': 4, 'ten_times_story': 4,   // 4.NBT.A.1 (2026-10-30 presets, detailed lesson 6)
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -1285,6 +1288,13 @@ export const SKILLS = {
         { v: "factor_out_gcf", l: "Factor Out the Greatest Common Factor", presetOf: "distributive_expr" },
         { v: "function_table_find_rule", l: "Function Tables: Find the Rule", presetOf: "function_table_easy" },
         { v: "function_table_find_inputs", l: "Function Tables: Find the Missing In Numbers", presetOf: "function_table_easy" },
+        // APPENDED 2026-10-30 - PRESET skills of detailed lesson 7 (3.OA.D.8; skill-presets.js): the two-step story
+        // options msOps / msLetter / msCheck that teach a lesson of their own.
+        { v: "two_step_mult_div_first", l: "Two-Step Word Problems: Multiply or Divide First", presetOf: "multi_step_word_plain" },
+        { v: "two_step_add_then_mult", l: "Two-Step Word Problems: Add or Take Away, Then Multiply", presetOf: "multi_step_word_plain" },
+        { v: "two_step_add_then_div", l: "Two-Step Word Problems: Add or Take Away, Then Divide", presetOf: "multi_step_word_plain" },
+        { v: "two_step_letter_equation", l: "Two-Step Word Problems: One Equation With a Letter", presetOf: "multi_step_word_plain" },
+        { v: "two_step_estimate_check", l: "Two-Step Word Problems: Estimate to Check", presetOf: "multi_step_word_plain" },
     ],
     order_of_operations: [
         { v: "oop_easy", l: "OoO Easy: Two Ops, No Parens" },
@@ -1327,6 +1337,10 @@ export const SKILLS = {
         { v: "digit_value_unit_form", l: "Value of a Digit in Unit Form (7 Hundreds)", presetOf: "value" },
         { v: "digit_value_notation", l: "Value of a Digit in Expanded Notation (7 × 100)", presetOf: "value" },
         { v: "count_pv_disks", l: "Count the Place-Value Disks in One Place", presetOf: "place_value_disks" },
+        // APPENDED 2026-10-30 — PRESET skills (skill-presets.js; detailed lesson 6, 4.NBT.A.1): value form "times".
+        { v: "ten_times_value", l: "10 Times and One Tenth: the Same Digit One Place Apart", presetOf: "value" },
+        { v: "one_tenth_value", l: "One Tenth of a Digit's Value (One Place Right)", presetOf: "value" },
+        { v: "ten_times_story", l: "How Many Times as Many? (700 ÷ 70 = 10)", presetOf: "value" },
     ],
     number_sense: [
         { v: "rounding_visual", l: "Round on a Number Line" },

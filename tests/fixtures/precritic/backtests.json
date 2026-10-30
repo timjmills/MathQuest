@@ -759,6 +759,25 @@
    }
   },
   {
+   "id": "e41-relation",
+   "check": "A relation a teacher page states is true of the numbers it names (ws-detailed-lesson E41; lesson 6 critic r2 D1: \"Smaller, so one tenth of\" after \"40 and 4, 10 times\")",
+   "kind": "fixture",
+   "rule": "ws-detailed-lesson E41 (relationCheck): \"a is 10 times b\", \"a and b, REL\", and \"Bigger / Smaller, so REL\" against the pair stated before it",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/e41-relation.fail.txt",
+    "state": "lesson 6 r2 T4 section 6: cell 2 is 40 and 4 (10 times), the note says Smaller, so one tenth of"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/e41-relation.pass.txt",
+    "state": "lesson 6 r4: cell 2 is 30 and 300 (one tenth of), the note from the item: Smaller, so one tenth of"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --e41-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "skipcount-lesson-data",
    "check": "Lesson data + option help on the count-row family (critic skip-count r5 SC3, SC5)",
    "kind": "commit-pair",

@@ -364,6 +364,12 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
         const k = factKeyOf(cand);
         if (k === null) return false;
         if (sk.avoidKeys && sk.avoidKeys.includes(k)) return false;
+        // (`spreadMax` with `q.spreadKey`, lesson 6 r2: no more than n items of the pack share a spread key - one digit -
+        // counted over the pack's keys and this page's; absent on every other ref)
+        if (sk.spreadMax && typeof cand.spreadKey === 'string' && [...(sk.avoidKeys || []), ...[...seen].map((x) => String(x).replace(/^key:/, ''))]
+            .filter((x) => String(x).startsWith(`${cand.spreadKey}:`)).length >= Number(sk.spreadMax)) return false;
+        // (and at most one a page while the page can be dealt - lead ruling, lesson 6 r2 n11; `seen` is this page's)
+        if (sk.spreadMax && sk.lr6 && typeof cand.spreadKey === 'string' && [...seen].some((x) => String(x).replace(/^key:/, '').startsWith(`${cand.spreadKey}:`))) return false;
         // (a function table: no shared (In, Out) pair, no rule on a third table - across the pack and on this page; lesson 5 r3)
         if (ftParts(k) && ftClash(k, (sk.avoidKeys || []).concat([...seen].filter((x) => /^key:ft/.test(x))))) return false;
         // (a + fact's identity across the pack is its unordered pair - 7 + 5 and 5 + 7 are one fact: lead ruling and
@@ -515,6 +521,9 @@ export const gridNear = (k, keys, sameShape = false, anyTask = false) => {
  */
 export function factKeyOf(q) {
     if (!q) return null;
+    // (`q.factKey`, lesson 6: a generator that names the fact the pupil produces - the digit and the place pair of a
+    // "10 times" item, either direction one fact - keys it so; absent on every other item)
+    if (typeof q.factKey === 'string' && q.factKey) return q.factKey;
     // An array (arrays-turn, lesson 3a): keyed rows x cols, so 3 x 4, 4 x 3 and 2 x 6 are three facts. The
     // pictured arrays stop at 5 x 5 (RP-21): one key per turned pair would leave a pack ten arrays, and it
     // needs about fourteen. The turned pair is kept off ONE page instead (turnedKeyOf, refAccepts).
@@ -1533,6 +1542,65 @@ async function printMeasureDoc() {
     return document;
 }
 
+/**
+ * The document the cells are measured in (speed, whole-grade print 2026-10-30). A forced layout in
+ * the app page costs ~33 ms (5,700 nodes and its :has() rules re-checked on every write); the same
+ * cell in a hidden same-origin frame that carries the SAME stylesheets, in the same order, at the
+ * same viewport width, with the page's html / body classes, costs ~0.4 ms. So the cells measure
+ * exactly as they did (the Grade 1 / 3 / 5 papers are byte-identical) in a fraction of the time.
+ * The frame is kept and re-synced before each build; any failure measures in the app page as before.
+ */
+let MEASURE_FRAME = null;
+let MEASURE_SIG = '';
+let MDOC = null;
+async function measureDocument() {
+    if (typeof document === 'undefined' || !document.body || typeof window === 'undefined') return null;
+    try {
+        let f = MEASURE_FRAME;
+        if (!f || !f.isConnected || !f.contentDocument || !f.contentDocument.body) {
+            f = document.createElement('iframe');
+            f.setAttribute('aria-hidden', 'true');
+            f.setAttribute('tabindex', '-1');
+            f.setAttribute('data-mq-measure', '');
+            document.body.appendChild(f);
+            const d0 = f.contentDocument;
+            d0.open(); d0.write('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>'); d0.close();
+            MEASURE_FRAME = f; MEASURE_SIG = '';
+        }
+        f.style.cssText = `position:fixed !important;left:-20000px !important;top:0 !important;display:block !important;width:${window.innerWidth}px !important;height:${window.innerHeight}px !important;border:0 !important;visibility:hidden !important;pointer-events:none !important;`;
+        const d = f.contentDocument;
+        for (const [src, dst] of [[document.documentElement, d.documentElement], [document.body, d.body]]) {
+            for (const a of [...dst.attributes]) if (!src.hasAttribute(a.name)) dst.removeAttribute(a.name);
+            for (const a of [...src.attributes]) if (dst.getAttribute(a.name) !== a.value) dst.setAttribute(a.name, a.value);
+        }
+        const sheets = [...document.querySelectorAll('link[rel~="stylesheet"], style')].filter((n) => !d.contains(n));
+        const sig = sheets.map((n) => (n.tagName === 'LINK' ? `L${n.href}|${n.media}|${n.disabled}` : `S${n.media}|${n.textContent}`)).join('\n');
+        if (sig !== MEASURE_SIG) {
+            for (const n of [...d.head.querySelectorAll('link, style')]) n.remove();
+            const loads = [];
+            for (const n of sheets) {
+                const c = n.cloneNode(true);
+                if (n.tagName === 'LINK') {
+                    c.href = n.href;
+                    loads.push(new Promise((r) => { c.onload = c.onerror = () => r(); setTimeout(r, 4000); }));
+                }
+                d.head.appendChild(c);
+            }
+            await Promise.all(loads);
+            MEASURE_SIG = sig;
+        }
+        if (d.fonts) {
+            const sample = '0123456789 +\u2212\u00d7\u00f7= ,.:? Say Ones Tens Write Regroup';
+            await Promise.race([
+                Promise.all(['12pt Andika', 'bold 12pt Andika'].map((ft) => d.fonts.load(ft, sample).catch(() => null))).then(() => d.fonts.ready),
+                new Promise((r) => setTimeout(r, 3000)),
+            ]);
+        }
+        if (!d.defaultView || !(d.defaultView.innerWidth > 0)) return null;
+        return d;
+    } catch (e) { return null; }
+}
+
 /** A hidden sheet root to measure in: the print-measure document when given, else the app page. */
 function measureHost(size, look, mdoc) {
     const doc = mdoc && mdoc.body ? mdoc : document;
@@ -1669,7 +1737,9 @@ function measureSide4(pairs, { size, look, mdoc = null }) {
 }
 
 function measureItems(items, { size, look, colsList }) {
-    if (typeof document === 'undefined' || !document.body || !items.length) return;
+    if (typeof globalThis.document === 'undefined' || !globalThis.document.body || !items.length) return;
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;   // the measuring frame (measureDocument)
+    const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
     ensureEngineStyle(document);
     const s = SIZES[size] || SIZES.L;
     const host = document.createElement('div');
@@ -1682,17 +1752,35 @@ function measureItems(items, { size, look, colsList }) {
     const baseW = new Map();          // item -> Map(svg index -> width at 1 column)
     const baseLeaves = new Map();     // item -> widths of its grid / table leaves at 1 column
     try {
+        // Speed (whole-grade print, 2026-10-30): every cell of a pass (one column count, one state) is
+        // written first and read after ONE layout. Writing and reading one cell at a time forced a
+        // layout of the whole app page per cell (93 % of a Grade 1 print). Each cell is parsed on its
+        // own, exactly as before, and stays a direct child of the sheet root, so it measures the same.
+        const scratch = document.createElement('div');
         for (const c of cols) {
             const { inner } = cellWidthMm(c, LIVE_W_MM, look);
-            for (const it of items) {
-                let best = { hMm: 0, fits: true };
-                for (const state of ['blank', 'answered']) {
+            const bests = new Map();
+            for (const state of ['blank', 'answered']) {
+                const ctxs = [];
+                const frag = document.createDocumentFragment();
+                for (const it of items) {
                     const ctx = Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: it.measureLevel || 1, state }), it.wrapToCell ? { wrapToCell: true } : {}, it.tightRows ? { tightRows: true } : {});
                     let body = '';
                     try { body = it.render(ctx, { cols: c }); } catch (e) { body = ''; }
-                    root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+                    scratch.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
                         + `<span class="ws-letter">m.</span>${body}</div>`;
-                    const cell = root.firstChild;
+                    ctxs.push(ctx);
+                    frag.appendChild(scratch.firstChild || document.createElement('div'));
+                }
+                scratch.innerHTML = '';
+                root.innerHTML = '';
+                root.appendChild(frag);
+                const cellEls = Array.from(root.children);
+                for (let ii = 0; ii < items.length; ii++) {
+                    const it = items[ii];
+                    const ctx = ctxs[ii];
+                    let best = bests.get(it) || { hMm: 0, fits: true };
+                    const cell = cellEls[ii];
                     const r = cell.getBoundingClientRect();
                     const cs = getComputedStyle(cell);
                     const padL = parseFloat(cs.paddingLeft) || 0;
@@ -1772,9 +1860,11 @@ function measureItems(items, { size, look, colsList }) {
                             let mb = '';
                             try { mb = it.render(ctx, { cols: c, judge: mode }); } catch (e) { mb = ''; }
                             if (!mb || !String(mb).includes(`data-judge-mode="${mode}"`)) { vary[mode] = null; continue; }
-                            root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+                            // drawn beside the pass's cells (after them) and removed once read
+                            scratch.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
                                 + `<span class="ws-letter">m.</span>${mb}</div>`;
-                            const mc = root.firstChild;
+                            const mc = scratch.firstChild || document.createElement('div');
+                            root.appendChild(mc);
                             const cr = mc.getBoundingClientRect();
                             let over = false;
                             // the ink's width: the leftmost to the rightmost drawn thing (a text run, a
@@ -1790,13 +1880,18 @@ function measureItems(items, { size, look, colsList }) {
                             }
                             vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
                             if (!over && hi > lo) inkW[mode] = Math.max(inkW[mode] || 0, (hi - lo) / PX_PER_MM);
+                            mc.remove();
                         }
                     }
                     const modes = Object.assign({}, best.modes || {});
                     for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
                     best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW,
                         slackMm: Math.min(best.slackMm === undefined ? Infinity : best.slackMm, slackPx / PX_PER_MM) };
+                    bests.set(it, best);
                 }
+            }
+            for (const it of items) {
+                const best = bests.get(it) || { hMm: 0, fits: true };
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
                 if (Number.isFinite(best.slackMm)) it.measured[c].slackMm = Math.floor(best.slackMm * 10) / 10;
@@ -1836,7 +1931,8 @@ function measureItems(items, { size, look, colsList }) {
 
 /** HD-14: how many lines the title takes at the preset size, measured in Andika 700. */
 function measureTitleLines(text, size) {
-    if (!text || typeof document === 'undefined' || !document.body) return 1;
+    if (!text || typeof globalThis.document === 'undefined' || !globalThis.document.body) return 1;
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;
     const s = SIZES[size] || SIZES.L;
     const span = document.createElement('span');
     span.style.cssText = `position:absolute;left:-10000px;top:0;visibility:hidden;white-space:nowrap;font-family:'Andika',sans-serif;font-weight:700;font-size:${s.titlePt}pt;font-feature-settings:"cv04" 1;`;
@@ -2327,6 +2423,7 @@ async function buildSheetCore(req = {}) {
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
     await loadStandards();
+    MDOC = await measureDocument();
     const paper = n.paper;
 
     // The frame words decide the header height, which decides gridH (HD-12 / HD-14): resolve the
@@ -3849,7 +3946,9 @@ function planCells(plan) {
 const dlRep = (q) => String((q && q.skillId) || '') + (q && q.cell && q.cell.template === 'arrays-turn' && q.cell.payload && q.cell.payload.type ? `:${q.cell.payload.type}` : '');
 const dlTag = (html, id, kind) => String(html).replace(/<section (data-ws-sheet="[^"]*" )?class="ws-page/, (m, sh) => `<section data-dl-page="${id}" data-dl-kind="${kind}" ${sh || ''}class="ws-page`);
 // (a tap / shade item - lesson 4's windows: its printed answer, the shaded numbers, never its option ids)
-const dlAns = (q) => (q && q.answerType === 'multi-select-check' && q.printAnswer ? String(q.printAnswer) : q && typeof q.ans === 'object' ? (Array.isArray(q.ans) ? q.ans.join(', ') : JSON.stringify(q.ans)) : String(q && q.ans !== undefined ? q.ans : ''));
+// (`dealAnswer`, lesson 6: an item whose answer is one of two words - a ring - names what tells it apart, so two
+// ring items of one page are not "the same answer"; absent on every other item)
+const dlAns = (q) => (q && typeof q.dealAnswer === 'string' ? q.dealAnswer : q && q.answerType === 'multi-select-check' && q.printAnswer ? String(q.printAnswer) : q && typeof q.ans === 'object' ? (Array.isArray(q.ans) ? q.ans.join(', ') : JSON.stringify(q.ans)) : String(q && q.ans !== undefined ? q.ans : ''));
 /** A `want`: a case test of roles/lesson.js (bigFirst, pvZeroTens, ...); '' or unknown = any item. */
 // (a list of names: every test must pass - lesson 2 r4, the exit slip's situation AND its case)
 const dlWant = (want) => (Array.isArray(want) ? (want.every((w) => LESSON_CASE_TESTS[w]) && want.length ? (it) => want.every((w) => LESSON_CASE_TESTS[w](it)) : null) : (want && LESSON_CASE_TESTS[want]) || null);
@@ -3866,6 +3965,7 @@ function dealOne(ref, seed, used, want, avoidAns = null, near = null, names = nu
     return dealOne1(ref, seed, used, want, avoidAns, near, names, null);
 }
 const DL_GROUPS = new WeakMap();
+const DL_SPREAD = new WeakMap();
 function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
     const ok = dlWant(want);
     // (why each candidate was turned away: named in the error when none is left)
@@ -3884,6 +3984,10 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         const key = factKeyOf(q), v = itemNumberOf(q);
         if (key === null || (ok && !ok({ q }))) { why.want++; continue; }
         if (used.has(key)) { why.used++; continue; }
+        if (ref.spreadMax && typeof q.spreadKey === 'string' && [...used].filter((x) => String(x).startsWith(`${q.spreadKey}:`)).length >= Number(ref.spreadMax)) { why.used++; continue; }
+        // (`spreadPage`, lesson 6 r3: the refs of one page - the exit slip - hold one spread key each)
+        const spg = ref.spreadPage && typeof q.spreadKey === 'string' ? (DL_SPREAD.get(used) || DL_SPREAD.set(used, new Map()).get(used)) : null;
+        if (spg && (spg.get(ref.spreadPage) || []).includes(q.spreadKey)) { why.near++; continue; }
         // (a function table's rule and pairs across the pack - lesson 5 r3: `ftRuleMax` 1 keeps a rule off every other table)
         if (ftParts(key) && ftClash(key, used, ref.ftRuleMax || 2)) { why.used++; continue; }
         // (a + fact turned round is the same fact across the pack - E24's unordered identity)
@@ -3921,6 +4025,7 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (near) lr6Record(q, ref.skillId, near);
         for (const x of nms) names.add(x);
         used.add(key);
+        if (spg) spg.set(ref.spreadPage, (spg.get(ref.spreadPage) || []).concat([q.spreadKey]));
         if (grp) grp.set(ref.pageGroup, (grp.get(ref.pageGroup) || []).concat([key]));
         return { q, v, key };
     }
@@ -4059,6 +4164,7 @@ async function buildDetailedLesson(req = {}) {
     // a SKILL_STANDARDS tag (either form, 2.NBT.A.3 / 2.NBT.3) of one of the lesson's skills, an EE
     // one of their EEs. A tag that fails is dropped and named in the notes.
     const st0 = await loadStandards();
+    MDOC = await measureDocument();   // the measuring frame, re-synced (measureDocument)
     const lessonSkills = [d.skill, ...(d.mixed ? d.mixed.skills : []), ...((d.practiceSheets || []).map((x) => x.skill).filter(Boolean))];
     const recs = { ccss: [], ee: [] };
     for (const sk of lessonSkills) { try { const st = st0 ? st0.standardsFor(sk.categoryId, sk.skillId) : null; if (st) { recs.ccss.push(...(st.ccss || [])); recs.ee.push(...(st.ee || [])); } } catch (e) { /* none */ } }
@@ -4180,7 +4286,8 @@ async function buildDetailedLesson(req = {}) {
 
     // ---------------------------------------------------------------- P5 Word problem
     const wpV = dlItemVars(wpD.q, d);
-    const storyText = String(wpD.q.text || '').replace(/<[^>]+>/g, ' ');
+    // (`q.storyText`, lesson 6 r2: a story item whose screen text also carries its answer blanks prints the story alone)
+    const storyText = String((typeof wpD.q.storyText === 'string' && wpD.q.storyText) || wpD.q.text || '').replace(/<[^>]+>/g, ' ');
     const lines = Array.isArray(d.wordProblem.lines) && d.wordProblem.lines.length
         ? d.wordProblem.lines.map((l) => fillPlaceholders(l, { wp: wpV }))
         : storyText.split(/(?<=[.?!])\s+/).map((x) => x.trim()).filter(Boolean);
@@ -4194,6 +4301,8 @@ async function buildDetailedLesson(req = {}) {
     wpV.eq = `${eqParts.join(` ${eqOp} `)} = ${eqN}` + (eqTurn ? ` · ${eqParts.slice().reverse().join(` ${eqOp} `)} = ${eqN}` : '');
     const wpPlan = wordProblemPlan({
         lines, answerLine: fillPlaceholders(d.wordProblem.answerLine, { wp: wpV }), wordsLine: d.wordProblem.wordsLine ? fillPlaceholders(d.wordProblem.wordsLine, { wp: wpV }) : '', words: wpV.words, say: fillPlaceholders(d.wordProblem.say, { wp: wpV }), n: wpV.wpAns !== undefined ? wpV.wpAns : wpV.ans, eqN, eqTurn, schematic: d.wordProblem.schematic && wpV.rows ? { rows: wpV.rows, cols: wpV.cols } : null, parts: eqParts, op: eqOp, signSlot: !!d.wordProblem.signSlot, item: String(wpD.key),
+        // (`wordProblem.eqSteps` - lesson 7: one number sentence a step, from the lesson's vars hook `eqSteps`)
+        eqSteps: d.wordProblem.eqSteps && Array.isArray(wpV.eqSteps) ? wpV.eqSteps : null,
         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
         // (`wordProblem.tableItem` - lesson 5 r3: the story's own table, its rule frame the answer, under the story)
         panelRows: d.wordProblem.panelRows || null, topMm: d.wordProblem.topMm || null,
@@ -4272,6 +4381,22 @@ async function buildDetailedLesson(req = {}) {
         const bx = (w, v, l) => `<span data-ws-key-ans style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${w.toFixed(2)}mm;height:12mm;border:0.75pt solid #000;${l ? 'border-left:none;' : ''}font-size:22pt;font-weight:700;color:var(--ws-key-ink)">${escText(String(v))}</span>`;
         const bar = `<div role="img" aria-label="bar model" style="display:flex;flex-direction:column;gap:1.5mm">${bx(W, wpV.ans)}<div style="display:flex">${bx(wa, A)}${bx(W - wa, B, true)}</div></div>`;
         p5.keyPages = p5.keyPages.map((k) => String(k).replace('<div class="dl-work" data-work data-draw></div>', `<div class="dl-work" data-work data-draw style="display:flex;align-items:center;justify-content:center">${bar}</div>`));
+    }
+    // (`wordProblem.workChart` - lesson 6 r4, critic r2 n2: "Draw it." for two amounts like 6,000 and 600 is a place chart;
+    // the Workspace prints an empty one - its heads, a row of boxes for each amount - and the key writes the two amounts in it)
+    if (d.wordProblem.workChart && wpD && wpD.q && Array.isArray(wpD.q.wpParts) && wpD.q.wpParts.length === 2) {
+        const nums = wpD.q.wpParts.map((v) => String(Math.round(Number(v))));
+        const w = Math.max(...nums.map((s) => s.length));
+        const HEAD = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
+        const td = (inner, st) => `<td style="width:13mm;height:13mm;text-align:center;vertical-align:middle;padding:0;${st}">${inner}</td>`;
+        const chart = (key) => `<table class="dl-workchart" role="img" aria-label="place chart" style="border-collapse:collapse;margin:8mm 0 0 8mm;color:#000">`
+            + `<tr>${Array.from({ length: w }, (_, i) => `<td style="text-align:center;font-size:var(--ws-text,15pt);padding:0 0 1mm">${HEAD[w - 1 - i]}</td>`).join('')}</tr>`
+            + nums.map((s) => `<tr>${Array.from({ length: w }, (_, i) => { const ch = s.padStart(w, ' ')[i];
+                return td(key && ch !== ' ' ? `<span data-ws-key-ans style="font-size:var(--ws-digit,28pt);font-weight:700;color:var(--ws-key-ink)">${ch}</span>` : '', 'border:0.75pt solid #000;'); }).join('')}</tr>`).join('')
+            + `</table>`;
+        const put = (html, key) => String(html).replace('<div class="dl-work" data-work data-draw></div>', `<div class="dl-work" data-work data-draw>${chart(key)}</div>`);
+        p5.pupilPages = p5.pupilPages.map((h) => put(h, false));
+        p5.keyPages = p5.keyPages.map((h) => put(h, true));
     }
     if (sayD) p6.keyPages = p6.keyPages.map((k) => sayFill(k, d.exitSayAns ? fillPlaceholders(d.exitSayAns, { say: sayV }) : dlAns(sayD.q)));
     p6.keyPages = p6.keyPages.map((k) => String(k).split('<div class="ws-field name">Name<i></i></div>').join(`<div class="ws-field name"><span data-ws-key="name">Answer Key</span><i></i></div>`));
@@ -4382,7 +4507,8 @@ async function buildDetailedLesson(req = {}) {
     ];
     for (const { ch } of chunkRes) {
         glance.push({ page: `P3${ch.id} Guided`, answers: V[ch.id].we.map((x) => x.ans).join(' · '), fade: '★' });
-        glance.push({ page: `P3${ch.id} Independent`, answers: V[ch.id].indep.map((x) => x.ans).join(' · '), fade: '★★' });
+        // (lesson 7 r2: no row for a chunk sheet with no Independent cells, as P3 above)
+        if (V[ch.id].indep.length) glance.push({ page: `P3${ch.id} Independent`, answers: V[ch.id].indep.map((x) => x.ans).join(' · '), fade: '★★' });
     }
     let pNo = 0;
     for (const pl of partPlan('practice')) {
@@ -4399,7 +4525,8 @@ async function buildDetailedLesson(req = {}) {
     // (the story's own answer first when the frame totals something else - lesson 3a r4, critic r2 m7)
     // (a table word problem - lesson 5 r4, critic r2 D7: its answer is the rule only; no equation is asked)
     glance.push({ page: 'P5 Word problem', answers: d.wordProblem.tableItem ? String(wpV.ans) : eqN !== wpV.ans ? `${wpV.ans} · ${wpV.eq}` : wpV.eq, fade: DL_FADE.P5 });
-    glance.push({ page: 'P6 Exit slip', answers: exVars.map((x, i) => `${'abcd'[i]}. ${x.ans}`).join(' · '), fade: DL_FADE.P6 });
+    // (CL-11a, owner 2026-10-23: the slip's items are number tabs - the glance names them 1. 2. 3., as the key prints them)
+    glance.push({ page: 'P6 Exit slip', answers: exVars.map((x, i) => `${i + 1}. ${x.ans}`).join(' · '), fade: DL_FADE.P6 });
     const prereqAtoms = d.atoms.filter((x) => x.prereq);
     const routing = d.prerequisites.map((p, i) => {
         const a = prereqAtoms[Math.max(0, p.atom - 1)] || d.atoms[0];

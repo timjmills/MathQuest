@@ -192,6 +192,21 @@ export const MULTI_KEYS = Object.freeze({
     mix: '4C',
     anchors: '4D',
     // NEXT FREE IN BLOCK 4: 4E.
+    // Build lane placevalue (sub-range 4E-4O): value_ten_times (detailed lesson 6, 2026-10-17).
+    tenDir: '4E',        // value form times: the first digit one place left (times) / right (tenth) / both
+    tenValues: '4F',     // value form times: write both values before circling
+    tenPlain: '4G',      // value form times: the digit and zeros only (700 and 70)
+    tenWrite: '4H',      // value form times: both values / the top value only (lesson 6 r2)
+    tenTask: '4I',       // value form times: compare / story (700 ÷ 70 = 10)
+    tenChoice: '4J',     // value form times, ring only: two words / four (the Check Question's A-D: + the same as, 100 times) - lesson 6 r4 (critic r2 D2)
+    // NEXT FREE IN 4E-4O: 4K.
+    // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
+    msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
+    wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
+    msLetter: '4R',      // multi_step_word(_plain): write the story as one equation with a letter (5 × 4 − 6 = n), then n
+    msCheck: '4S',       // multi_step_word(_plain): + / − stories - estimate from tens, then judge the answer
+    msChoose: '4T',      // multi_step_word(_plain), × / ÷ first: choose the answer from four (A-D), the three two-step errors (lesson 7 r3)
+    // NEXT FREE IN 4P-4Z: 4U (lane A/B fixers take 4Z downwards).
 
     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
     members: '5A',       // mixed pools: which member skills / categories the pool draws from
@@ -337,7 +352,12 @@ export const VALUE_TOKENS = Object.freeze({
     units: Object.freeze({ metric: 'M', customary: 'C', mixed: 'X' }),
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     // P9 step 8 (block 0)
-    form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S' }),
+    form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S', times: 'T' }),
+    tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
+    tenWrite: Object.freeze({ both: 'B', top: 'T' }),
+    tenTask: Object.freeze({ compare: 'C', story: 'S' }),
+    tenChoice: Object.freeze({ two: 'T', four: 'F' }),
+    msOps: Object.freeze({ addsub: 'A', mult: 'M', div: 'D', multdiv: 'B', addmult: 'P', adddiv: 'Q' }),
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
     divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),
@@ -441,11 +461,13 @@ export const SCALAR_ONLY = Object.freeze({
     // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
     // block 8 (word problems)
-    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
+    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool', wpFrames: 'bool', msLetter: 'bool', msCheck: 'bool',
     // Wave 1 lane A
     calculator: 'bool', skipAfter: 'decimal',
     // lessons 4 and 5 (2026-10-16)
     winRows: 'decimal', winCols: 'decimal', minFactor: 'decimal', ftTrap: 'bool',
+    // lesson 6 (2026-10-17)
+    tenValues: 'bool', tenPlain: 'bool',
     // wave 5.2: the number line (Start / End are signed decimals: N = minus, P = point)
     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
 });
