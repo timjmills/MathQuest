@@ -3508,6 +3508,10 @@
        0
       ]
      }
+    },
+    {
+     "key": "placevalue:ten_times_value",
+     "why": "shares 4.NBT.A.1: the digit one place left is worth 10 times as much"
     }
    ],
    "note": "mult_zeros with form ×10 only; existing partial tags become full with opts."
@@ -3637,6 +3641,10 @@
        0
       ]
      }
+    },
+    {
+     "key": "placevalue:one_tenth_value",
+     "why": "shares 4.NBT.A.1: the digit one place right is worth one tenth as much"
     }
    ],
    "note": "School teaches this as enrichment (W35)."

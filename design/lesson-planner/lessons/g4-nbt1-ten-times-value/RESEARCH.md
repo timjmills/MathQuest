@@ -59,7 +59,9 @@ skills.used (all `placevalue:*`, value = `placevalue:value` form `times`):
 - P1: `more_less_100` {step 10 more / 100 less / 100 more / 10 less} · `compare` {band 999, far | close}
 - P2 chart, P3 Guided + Independent, P4-1: value {form times, band 9999, tenDir both, tenValues on}; P4-2: the same, band 99999
 - P5: value {form times, tenTask story, tenDir times, band 9999} · P6: value {form times, tenWrite top, tenDir times | tenth, band 9999}
-- Check Question: value {form times, tenValues off, band 9999}
+- Check Question: value {form times, tenValues off, tenChoice four, band 9999} (r4, critic r2 D2: the board's four words online)
+- P0 (r4): two items per prerequisite (the page prints two; `items: 4` was cut to two by the role)
+- Presets (r4, owner rule "a distinct option is also a findable skill"): `placevalue:ten_times_value` (Y7), `placevalue:one_tenth_value` (Y8), `placevalue:ten_times_story` (Y9)
 
 skills.coverage:
 | Clause / atom | Skill + opts | Verdict |
@@ -71,3 +73,5 @@ skills.coverage:
 | 5.NBT.A.1 with decimals; 1/10 written as a fraction or 0.1 | — | elsewhere: lesson 9 (5.NBT.A.1), the same template with decimal rows |
 | Atoms 1-4 (places, value, × 10, ÷ 10) | identify · value {form value} · place_value_10x {x | /} | full |
 | Atoms 5-8 (one place left, left or right, any place, one tenth) | value {form times, tenDir both, bands to 99999} | full |
+| Routine step 3 on the exit slip (one worth box, then the ring) | value {form times, tenWrite top} | full |
+| Check Question (board A-D: one tenth of · the same as · 100 times · 10 times) | value {form times, tenValues off, tenChoice four} | full (r4; recorded in data/curriculum/detailed-lessons.json) |

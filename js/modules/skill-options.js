@@ -623,27 +623,36 @@ const _pvValueForm = () => ({
         { v: 'times', l: 'Ten times / one tenth (the 7 in 700 and the 7 in 70)' },
     ],
     help: 'One way per page. Unit form and expanded notation name the place and the digit. Ten times compares the same digit in two numbers, one place apart (4.NBT.A.1).',
+    // (lesson 6 r4: "times" draws a two-row place chart in each cell - a value that ADDS a drawing may cost page room,
+    // tests/lib/options-render.cjs)
+    addsDrawingValues: ['times'],
 });
 // value_ten_times (4.NBT.A.1, detailed lesson g4-nbt1-ten-times-value): the options of form "times" only.
+// (r4: each applies only with form "times" - `appliesTo` hides it otherwise; `appliesBase` is the context ws-options-verify
+// tries it in, so a control that only works with form times is not read as inert)
 const _pvTenOptions = () => [
-    { id: 'tenDir', label: 'Ten times: which way', type: 'enum', default: 'both', group: 'difficulty',
+    { id: 'tenDir', label: 'Ten times: which way', type: 'enum', default: 'both', group: 'difficulty', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
         values: [
             { v: 'times', l: 'The first digit is one place left: 10 times' },
             { v: 'tenth', l: 'The first digit is one place right: one tenth' },
             { v: 'both', l: 'Both, mixed' },
         ],
         help: 'Ten times only. One way at a time first; both mixed so the order of the rows never gives the answer.' },
-    { id: 'tenValues', label: 'Ten times: write both values first', type: 'bool', default: true, group: 'support',
+    { id: 'tenValues', label: 'Ten times: write both values first', type: 'bool', default: true, group: 'support', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
         help: 'Ten times only. On: the pupil writes what each digit is worth, then circles. Off: circle only (the fade).' },
-    { id: 'tenPlain', label: 'Ten times: the digit and zeros only (700 and 70)', type: 'bool', default: false, group: 'difficulty',
+    { id: 'tenPlain', label: 'Ten times: the digit and zeros only (700 and 70)', type: 'bool', default: false, group: 'difficulty', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
         help: 'Ten times only. On: numbers like 700 and 70. Off: other digits round the digit (740 and 372).' },
     // (lesson 6 r2, owner skill-coverage rule: the exit slip's item and the word problem are skill options, not page code)
-    { id: 'tenWrite', label: 'Ten times: values written', type: 'enum', default: 'both', group: 'support',
+    { id: 'tenWrite', label: 'Ten times: values written', type: 'enum', default: 'both', group: 'support', appliesTo: (cur) => cur.form === 'times' && cur.tenValues !== false && cur.tenTask !== 'story', appliesBase: { form: 'times' },
         values: [{ v: 'both', l: 'Both values' }, { v: 'top', l: 'The top value only (a short check)' }],
         help: 'Ten times with values on. Top: one worth box, the first number\'s digit, then circle.' },
-    { id: 'tenTask', label: 'Ten times: the task', type: 'enum', default: 'compare', group: 'layout',
+    { id: 'tenTask', label: 'Ten times: the task', type: 'enum', default: 'compare', group: 'layout', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
         values: [{ v: 'compare', l: 'Compare the digit in two numbers' }, { v: 'story', l: 'A story: how many times as many? (700 ÷ 70 = 10)' }],
         help: 'Ten times only. Story: two amounts, the digit and zeros (6,000 and 600); the pupil writes the division and 10.' },
+    // (lesson 6 r4, critic r2 D2: the board Check Question's A-D form is a skill option too)
+    { id: 'tenChoice', label: 'Ten times: words to choose from', type: 'enum', default: 'two', group: 'difficulty', appliesTo: (cur) => cur.form === 'times' && cur.tenValues === false && cur.tenTask !== 'story', appliesBase: { form: 'times', tenValues: false },
+        values: [{ v: 'two', l: '10 times or one tenth of' }, { v: 'four', l: 'Four: 10 times, one tenth of, the same as, 100 times' }],
+        help: 'Ten times with values off (circle only). Four adds the two wrong ideas: the same digit is the same value, and two places is 100 times.' },
 ];
 const _pvZeroDigit = () => ({
     id: 'zeroDigit', label: 'Ask the value of a 0', type: 'bool', default: false, group: 'difficulty',

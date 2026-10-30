@@ -362,6 +362,9 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-10-23 SU-C pilot preset (2-digit − 1-digit, no regrouping). Pinned at Y6, the first free code after
     // Y5, NOT the auto assigner's VH (a dropped draft keeps VH unused). APPEND ONLY. ----
     "subtraction:sub_2d_1d": "Y6",
+    // ---- 2026-10-30 detailed lesson 6 presets (placevalue:value form "times", 4.NBT.A.1). Y7-Y9, the next free codes
+    // after Y6. APPEND ONLY. ----
+    "placevalue:ten_times_value": "Y7", "placevalue:one_tenth_value": "Y8", "placevalue:ten_times_story": "Y9",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

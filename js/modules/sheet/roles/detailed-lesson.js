@@ -463,6 +463,8 @@ export const DETAILED_PUPIL_CSS = `
 .ws-page .dl-work{flex:1 1 auto;min-height:60mm}
 .ws-page .dl-eq .ws-input--circle{align-self:center;display:inline-flex;align-items:center;justify-content:center;line-height:1}
 .ws-page .dl-wpeq .ws-cell{justify-content:center;align-items:center}
+/* CL-4b (2026-10-23) top-starts every [data-ws-cell] cell of a .ws-grid at a higher specificity: the P5 equation strip is one row of answer boxes in a fixed band, so it stays centred down it (E11) */
+.ws-page .ws-grid.dl-wpeq>.ws-cell{justify-content:center!important}
 .ws-page .dl-eq{display:flex;align-items:center;gap:5mm;font-size:28pt}
 .ws-page .dl-eq2{display:flex;flex-direction:column;align-items:center;gap:4mm}
 .ws-page .dl-eq .dl-eqcap{font-size:16pt;font-weight:700;min-width:24mm}
