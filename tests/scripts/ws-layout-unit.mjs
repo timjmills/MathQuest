@@ -21,7 +21,7 @@
 
 import {
     gridHeightMm, bodyHeightMm, headerHeightMm, FULL_HEADER, factRowsCapacity, stackMaxColumns,
-    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit,
+    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit, packByHeight,
 } from '../../js/modules/sheet/layout.js';
 import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
@@ -31,6 +31,7 @@ import {
     renderPlan, sectionInstructionKey, instructionHtml, levelLine, estimateTitleLines,
 } from '../../js/modules/sheet/roles/practice.js';
 import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/roles/index.js';
+import { fineSplit } from '../../js/modules/sheet/roles/practice.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
@@ -272,6 +273,7 @@ eq(labelStarts([6, 6, 4, 4]).starts, [1, 7, 13, 17], 'CL-12: letters run on acro
 }
 eq(labelStarts([6, 6, 6, 6, 6], { style: 'tab' }).starts, [1, 7, 13, 19, 25], 'CL-33: Daily tabs number 1 to N across the sheet');
 eq(labelStarts([6, 6], { restartEachPage: true }).starts, [1, 1], 'PT-LBL-7: pages handed out alone restart at a.');
+eq(labelStarts([20, 4, 10], { pageOf: [0, 0, 1] }).starts, [1, 21, 1], 'CL-13: a run restarts at a. only at a page boundary, never inside a page (two parts of one page)');
 eq(scoreDenominator([6, 6, 4, 4]), 20, 'PT-FRM-4: Score = every scored cell on the sheet');
 {
     // Two sections: the second joins the first page only when its instruction and rows fit.
@@ -1210,6 +1212,97 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(dense.packed && dense.perPage > 6, `packing: a dense mixed-height section packs past the practice ceiling (${dense.cols} x ${dense.rows})`);
     const plain = L(items, 'auto', 'S');
     ok(plain.perPage <= dense.perPage, 'packing: a section that is not dense keeps its ceiling');
+}
+
+// Wave 1 lane D (critic 2026-10-02): rows of DIFFERENT heights packed by height never leave an
+// orphan last page (dot_array_mult dealt 4 + 1: a last page three quarters empty). PG-23 for
+// packByHeight: a last page of a third of a page or less is rebalanced across the same pages.
+{
+    const mk = (hs) => hs.map((h, i) => ({ id: `p${i}`, measured: { 1: { hMm: h, fits: true } }, footprint: { measure: true, hMm: null, maxCols: 1 } }));
+    const grid = { gridFirstMm: 240, gridContMm: 250, maxRows: 12, cellH: 60, force: true };
+    const orphan = packByHeight(mk([50, 60, 57, 60, 40]), 1, grid);
+    eq(orphan.map((c) => c.count), [3, 2], 'PG-23 (packByHeight): 4 + 1 rows of mixed height are spread 3 + 2, not left as an orphan page');
+    ok(orphan.every((c, i, a) => i === 0 || c.from === a[i - 1].from + a[i - 1].count), 'PG-23 (packByHeight): no row is lost or repeated');
+    const used = (c, hs) => hs.slice(c.from, c.from + c.count).reduce((a, b) => a + b, 0);
+    ok(orphan.every((c) => used(c, [50, 60, 57, 60, 40]) <= grid.gridFirstMm - 1), 'PG-23 (packByHeight): every page still fits its grid');
+    const full = packByHeight(mk([50, 60, 57, 60, 40, 55, 50, 52, 45]), 1, grid);
+    ok(full.length === 2 && full[1].count * 3 > full[0].count, `PG-23 (packByHeight): a last page is never under a third of the first (${full.map((c) => c.count).join(' + ')})`);
+    const one = packByHeight(mk([50, 60, 57, 40]), 1, grid);
+    eq(one.map((c) => c.count), [4], 'PG-23 (packByHeight): a section that fits one page stays one page');
+}
+
+// Wave 1 lane D (2026-10-02): a mixed section's column problems form a group of their own in more
+// columns than the stories and pictures they are dealt with (RUBRIC H13: a three-digit column fact
+// alone in a 92 mm cell, two thirds of it empty).
+{
+    const story = (i) => ({ id: `w${i}`, template: 'word-work', fclass: 'standard', measured: { 1: { hMm: 50, fits: true }, 2: { hMm: 75, fits: true }, 3: { hMm: 80, fits: false } }, footprint: { wMm: 93, hMm: null, measure: true, maxCols: 2 } });
+    const col = (i) => ({ id: `s${i}`, template: 'stack', fclass: 'standard', measured: { 1: { hMm: 45, fits: true }, 2: { hMm: 45, fits: true }, 3: { hMm: 45, fits: true }, 4: { hMm: 45, fits: true } }, footprint: { wMm: 36, hMm: null, measure: true, maxCols: 4 } });
+    const base = { role: 'independent', columns: 'auto', dense: true };
+    const opts = { size: 'L', look: 'ican', header: FULL_HEADER };
+    const two = fineSplit(base, [story(1), col(1), story(2), col(2)], 'A4', 186, opts);
+    ok(two && two.fine.length === 2 && two.mid.length === 2 && two.cols > 2, `fineSplit: two column facts among stories take their own columns (${two && two.cols})`);
+    const six = fineSplit(base, [story(1), col(1), col(2), col(3), col(4), col(5), col(6)], 'A4', 186, opts);
+    ok(six && six.fine.length % six.cols === 0, `fineSplit: six column facts fill whole rows (${six && six.cols} columns)`);
+    ok(fineSplit(base, [story(1), col(1), story(2)], 'A4', 186, opts) === null, 'fineSplit: one column fact stays with the section');
+    ok(fineSplit(base, [col(1), col(2), col(3)], 'A4', 186, opts) === null, 'fineSplit: a section of column facts only is not split');
+}
+
+/* ============================================== wave 1 lane D round 4 (print layout / density) */
+{
+    const T = (template, payload) => ({ cell: { template, v: 1, payload } });
+    const at = (size, state = 'blank') => ({ mode: 'print', size, look: 'ican', state });
+    // D3 / L1: the one-line add_sub_10s fact follows the sheet size below its 24 pt ceiling
+    const beside = T('fact', { a: 100, b: 10, op: '-', notation: 'horiz', digits: 3, across: 'beside', pt: 24 });
+    const fS = cellFootprint(beside, resolveCtx(at('S'))), fL = cellFootprint(beside, resolveCtx(at('L')));
+    ok(fS.wMm < fL.wMm && fS.hMm < fL.hMm, `D3: the beside fact is smaller at S than at L (${fS.wMm}x${fS.hMm} vs ${fL.wMm}x${fL.hMm})`);
+    ok(/--ws-digit:16pt/.test(renderCell(beside, resolveCtx(at('S')))), 'D3: the beside fact draws 16 pt digits at S');
+    ok(/--ws-digit:24pt/.test(renderCell(beside, resolveCtx(at('L')))), 'D3: the beside fact keeps its 24 pt at L');
+    // D10: the number family is a kit cell sized by the sheet, one box per missing number, keyed
+    const nf = T('number-family', { nums: [5, 4, 9], eqs: [{ nums: [5, 4, 9], op: '+' }, { nums: [4, 5, 9], op: '+' }, { nums: [9, 5, 4], op: '-' }, { nums: [9, 4, 5], op: '-' }], miss: [[2], [2], [2], [2]] });
+    const nk = cellAnswerKey(nf);
+    eq(nk.display, '9, 9, 4, 5', 'D10: the number family keys its four boxes in reading order');
+    const nB = renderCell(nf, resolveCtx(at('S'))), nA = renderCell(nf, resolveCtx(at('S', 'answered')));
+    eq((nB.match(/data-ws-slot="nf\d"/g) || []).length, 4, 'D10: one box per missing number on the pupil page');
+    eq((nA.match(/data-ws-slot="nf\d"/g) || []).length, 4, 'D10: the key has the same four boxes (AK-4)');
+    ok(!/Number Family/.test(nB), 'D10: no heading inside the cell (L7)');
+    ok(cellFootprint(nf, resolveCtx(at('S'))).wMm < cellFootprint(nf, resolveCtx(at('L'))).wMm, 'D10: the family is narrower at S than at L');
+    // D2: a 3 x 10 dot array fits a 2-column cell at L (the drawing is as wide as its dots)
+    const arr = T('arrays', { kind: 'frame', rows: 3, cols: 10 });
+    ok(cellFootprint(arr, resolveCtx(at('L'))).wMm <= 93, `D2: a 3 x 10 array is at most a half page wide at L (${cellFootprint(arr, resolveCtx(at('L'))).wMm} mm)`);
+    // D6: long division at S may take 3 x 3 (dense ceiling 9)
+    const ld = (i) => ({ id: `ld${i}`, template: 'long-division', fclass: 'long', measured: { 1: { hMm: 49, fits: true }, 2: { hMm: 49, fits: true }, 3: { hMm: 49, fits: true }, 4: { hMm: 49, fits: true } }, footprint: { wMm: 40, hMm: null, measure: true, maxCols: 2 } });
+    const Ld = resolveSectionLayout({ role: 'independent', columns: 'auto', dense: true }, Array.from({ length: 9 }, (_, i) => ld(i)), 'A4', 186, { size: 'S', look: 'ican', header: FULL_HEADER });
+    ok(Ld.cols === 3 && Ld.perPage === 9, `D6: long division at S prints 3 x 3 (${Ld.cols} x ${Ld.rows})`);
+}
+
+/* ============================================ wave 1 lane D round 5: free rows, even rows */
+{
+    const { evenRows, TWO_COL_ROWS } = await import('../../js/modules/sheet/layout.js');
+    // D-E: rows of the same content stand at one height (the smallest any of them was given)
+    const H = evenRows([47.6, 47.6, 47.6, 30], [52.4, 56.7, 52.4, 45]);
+    ok(H[0] === 52.4 && H[1] === 52.4 && H[2] === 52.4 && H[3] === 45, `D-E: same-content rows take one height (${H.join(' / ')})`);
+    // D-B / D-D: a section in free rows may take two columns of any row count (CL-2's 2/3/4/5/8 otherwise)
+    const eq = (i) => ({ id: `eq${i}`, template: 'equation', fclass: 'short', measured: { 1: { hMm: 23, fits: true }, 2: { hMm: 23, fits: true } }, footprint: { wMm: 80, hMm: null, measure: true, maxCols: 2 } });
+    const its = Array.from({ length: 18 }, (_, i) => eq(i));
+    const L8 = resolveSectionLayout({ role: 'independent', columns: 2, count: 18, dense: true }, its, 'A4', 186, { size: 'L', look: 'ican', header: FULL_HEADER });
+    const L9 = resolveSectionLayout({ role: 'independent', columns: 2, count: 18, dense: true, freeRows: true }, its, 'A4', 186, { size: 'L', look: 'ican', header: FULL_HEADER });
+    ok(TWO_COL_ROWS.includes(L8.rows), `CL-2: two columns keep a permitted row count without free rows (${L8.rows})`);
+    ok(L9.rows >= 9 && L9.pages === 1, `D-D: free rows hold 18 short problems on one L page in 2 x 9 (${L9.cols} x ${L9.rows}, ${L9.pages} page)`);
+}
+
+/* ============================================== round 6 (critic r5 D5-5): a short last row is re-laid */
+{
+    const { grid: g6 } = await import('../../js/modules/sheet/grid.js');
+    const a = g6(['a', 'b'], { cols: 4 });
+    ok(!/blankrun/.test(a) && /relaid/.test(a) && /repeat\(4,1fr\)/.test(a) && (a.match(/span 2;/g) || []).length === 2, 'D5-5: 2 problems in a 4-column grid share the row (2 + 2 of 4 tracks), no empty area');
+    const b = g6(['a', 'b', 'c'], { cols: 2 });
+    ok(!/blankrun/.test(b) && (b.match(/span 1;/g) || []).length === 2 && (b.match(/span 2;/g) || []).length === 1, 'D5-5: 3 in 2 columns: the last problem takes the whole last row');
+    const c = g6(['a', 'b', 'c', 'd', 'e'], { cols: 3 });
+    ok(/repeat\(6,1fr\)/.test(c) && (c.match(/span 2;/g) || []).length === 3 && (c.match(/span 3;/g) || []).length === 2, 'D5-5: 5 in 3 columns: last row 2 equal cells over 6 tracks');
+    const d = g6(['a', 'b', 'c', 'd'], { cols: 2 });
+    ok(!/relaid|blankrun|span/.test(d), 'D5-5: whole rows are untouched');
+    const e = g6(['a', 'b', 'c'], { cols: 2, rows: 3 });
+    ok(/blankrun/.test(e) && !/class="ws-cell blankrun cut"/.test(e), 'PG-15: an explicit taller grid keeps one blank run inside the closed frame (no `cut`)');
 }
 
 /* ======================================================================= report */

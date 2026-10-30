@@ -32,8 +32,13 @@ const PITCH = { S: 7.5, M: 8.5, L: 9.5 };      // centre to centre in a row, mm
 // stays inside the box below, which is what a 2-column cell leaves it (86 mm wide at every
 // size; about 38 mm tall at L for 3 rows once the two sentence lines are drawn).
 const MIN_PITCH = { S: 7, M: 8, L: 9 };
+// dot_array_mult's compact array (owner 2026-10-09): dot diameter floor 3 mm at S, 4 mm at L.
+const DOT_DENSE = { S: 3, M: 3.5, L: 4 };
+const DENSE_GAP = 1.2;                          // white between two dots of a row, mm
+const SUBITISE_GAP = 1.5;                       // RP-81: after the 5th row and column
 const PIC_BOX = { S: [84, 40], M: [84, 39], L: [84, 38] };
-const RING_SEP = 4;                             // gap between two group rings, mm
+const ARRAY_ROW_MM = 85.6;                      // the widest a dot row is drawn: a 2-column cell's content width less 0.7 mm
+const RING_SEP = 4;                            // gap between two group rings, mm
 const RING_PAD = 2;                             // ring to dot, mm
 /** Dots per line inside a group ring, by group size: subitisable, never n - 1 + 1. */
 const PER_LINE = { 1: 1, 2: 2, 3: 3, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 9: 3, 10: 5, 11: 4, 12: 4 };
@@ -78,7 +83,12 @@ function arrayGeometry(size, p) {
     const clamp = (v) => Math.max(min, Math.min(top, v));
     if (p.kind !== 'equal_groups') {
         const pitch = clamp(Math.min(bw / Math.max(1, cols), bh / Math.max(1, rows)));
-        return { pitch, d: Math.min(d0, pitch - 2.5) };
+        // The pitch never closes below RP-3; a wide array (10 across at L) instead draws its dots
+        // a little smaller (never under 4 mm) so the row fits a 2-column cell's 86 mm (D2).
+        // One dot size per page (round 5 D-H2: a 3 x 10 array at L drew smaller dots than its
+        // 5-across neighbours): every array at a size takes the dot the widest one (10 across at
+        // the closest pitch) can hold, so arrays side by side never differ in dot size.
+        return { pitch, d: Math.max(Math.min(4, d0), Math.min(d0, min - 2.5, ARRAY_ROW_MM - 9 * min)) };
     }
     const per = PER_LINE[cols] || Math.ceil(Math.sqrt(cols));
     const lines = Math.ceil(cols / per);
@@ -131,14 +141,31 @@ function arraysPicture(g, p) {
         }
         return { svg: svgMm(g, W, H, body, `${rows} groups`), wMm: W };
     }
-    const W = cols * pitch, H = rows * pitch;
-    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) body += dot(pitch / 2 + j * pitch, pitch / 2 + i * pitch, r, false);
+    if (p.kind === 'frame' || p.kind === 'count_all') {
+        // dot_array_mult (owner 2026-10-09): a much smaller array, so 8 / 6 / 4-6 cells fill a page
+        // at S / M / L. Dots stay countable (3 / 3.5 / 4 mm across, a 1.2 mm gap) and an array
+        // over 5 takes RP-81's 1.5 mm subitising gap after its 5th row and column.
+        const dd = DOT_DENSE[g.size] || DOT_DENSE.L, pp = dd + DENSE_GAP, rr = dd / 2, m0 = 0.2;
+        const at = (k) => k * pp + (k >= 5 ? SUBITISE_GAP : 0);
+        const W0 = at(cols - 1) + dd + 2 * m0, H0 = at(rows - 1) + dd + 2 * m0;
+        let b = '';
+        for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) b += dot(m0 + rr + at(j), m0 + rr + at(i), rr, false);
+        return { svg: svgMm(g, W0, H0, b, 'array of dots'), wMm: W0 };
+    }
+    // The picture is as wide as its dots (wave 1 lane D round 4, D2): a half pitch of white on each
+    // side made a 3 x 10 array 90 mm at L, too wide for a 2-column cell, so it took a full row.
+    const m = 0.2;
+    const W = (cols - 1) * pitch + d + 2 * m, H = (rows - 1) * pitch + d + 2 * m;
+    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) body += dot(m + r + j * pitch, m + r + i * pitch, r, false);
     return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W };
 }
 
+/** One answer box: count_all (the pupil counts) and frame (the rows and columns are given). */
+const oneBox = (p) => p.kind === 'count_all' || p.kind === 'frame';
+
 function arraysKey(p) {
     const rows = Number(p.rows), cols = Number(p.cols);
-    return p.kind === 'count_all' ? { total: String(rows * cols) } : { first: String(rows), second: String(cols), total: String(rows * cols) };
+    return oneBox(p) ? { total: String(rows * cols) } : { first: String(rows), second: String(cols), total: String(rows * cols) };
 }
 
 register('arrays', {
@@ -148,20 +175,25 @@ register('arrays', {
         const key = arraysKey(p);
         const vals = slotValues(ctx, key, (w) => {
             const l = splitList(w);
-            if (p.kind === 'count_all' || l.length === 1) return { total: l[l.length - 1] };
+            if (oneBox(p) || l.length === 1) return { total: l[l.length - 1] };
             return { first: l[0], second: l[1], total: l[2] };
         });
         const pic = arraysPicture(g, p);
+        const rows = Number(p.rows), cols = Number(p.cols);
         // "[ ] groups of [ ]." mirrors "[ ] rows of [ ]." ("There are" made the line 97 mm at L,
         // wider than a 2-column cell).
         const words = p.kind === 'equal_groups'
             ? [{ id: 'first' }, 'groups of', { id: 'second' }, '|', { id: 'total' }, 'in all.']
             : p.kind === 'write_mult'
                 ? [{ id: 'first' }, 'rows of', { id: 'second' }, '|', { id: 'total' }, 'in all.']
-                : [{ id: 'total', mark: 'blank' }, 'in all.'];
+                : p.kind === 'frame'
+                    // The ROWS x COLUMNS frame (dot_array_mult, wave 1 lane D): the counts are written,
+                    // so the pupil multiplies the two numbers instead of counting the dots one by one.
+                    ? [`${rows} rows \u00d7 ${cols} columns`, '|', `${rows} \u00d7 ${cols} =`, { id: 'total', mark: 'blank' }]
+                    : [{ id: 'total', mark: 'blank' }, 'in all.'];
         // On screen the rows-of / groups-of sentence is the host's own inline-blank prompt, so
         // the twin draws the picture alone; the count-all box is the one answer (SL-7).
-        const showSentence = !g.twin || p.kind === 'count_all';
+        const showSentence = !g.twin || oneBox(p);
         const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1 }) : '';
         return root(g, 'arrays', `${pic.svg}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
@@ -169,7 +201,7 @@ register('arrays', {
         const k = arraysKey(p);
         const slots = {};
         for (const [id, v] of Object.entries(k)) slots[id] = { value: v, graded: true };
-        return { value: Number(k.total), display: p.kind === 'count_all' ? k.total : `${k.first}, ${k.second}, ${k.total}`, slots };
+        return { value: Number(k.total), display: oneBox(p) ? k.total : `${k.first}, ${k.second}, ${k.total}`, slots };
     },
     footprint(p, ctx) {
         const g = geo(ctx);
@@ -178,7 +210,7 @@ register('arrays', {
         return { wMm: Math.ceil(Math.max(pic.wMm, 66) + 6), hMm: null, measure: true, factLike: false, maxCols: 2 };
     },
     inputs(p) {
-        const ids = p.kind === 'count_all' ? ['total'] : ['first', 'second', 'total'];
+        const ids = oneBox(p) ? ['total'] : ['first', 'second', 'total'];
         return ids.map((id, i) => ({ id, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full'] }));
     },
     layout() { return { card: 'card-medium-visual', checker: 'inline-blanks', requiresVisual: true }; },

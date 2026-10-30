@@ -1,6 +1,6 @@
 // gen-operations.js - Number & Operations + Integers question generation
 import { state } from './state.js';
-import { dealIndex, dealPick } from './page-deal.js';
+import { dealIndex, dealPick, onNewPage, blockPermutation } from './page-deal.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
@@ -106,6 +106,8 @@ function _dealStride(len) {
 }
 let _constantCursor = 0;
 let _constantOffset = 0;   // where this page starts in the fact-set cycle; redrawn at item 0
+let _constantFresh = true; // a new page has not drawn its offset yet (page-deal.js onNewPage)
+onNewPage(() => { _constantFresh = true; });
 function factConstantFor(narrowTo) {
     let def = null;
     try {
@@ -138,7 +140,8 @@ function factConstantFor(narrowTo) {
     // The offset is drawn once per page, from Math.random, so a seeded page still reproduces
     // exactly (the harness and generateQuestionFor both seed it) while successive live pages move
     // through the whole set.
-    if (at === 0) _constantOffset = Math.floor(Math.random() * len);
+    if (at === 0 || (_constantFresh && Number.isFinite(state.itemIndex))) _constantOffset = Math.floor(Math.random() * len);
+    _constantFresh = false;
     const step = (((at + _constantOffset) % len) + len) % len;
     return ticked[(step * _dealStride(len)) % len];
 }
@@ -1453,7 +1456,9 @@ function _generateLadderV2(q, skill, helpers, range) {
         }
         // The hidden digit lives in one of the two printed operand rows. The answer row is the
         // one thing the cell must SHOW, so it is never the hole.
-        const t = Math.max(String(a).length, String(b).length) + 1;
+        // The stack template's tracks are sized by the ANSWER too (stack.js tracksOf), so the hole's
+        // index must be counted on the same tracks: a 2-digit x 1-digit item has a 3-digit answer.
+        const t = Math.max(String(a).length, String(b).length, String(total).length) + 1;
         const rowPick = rng(0, 1);                       // 0 = the top number, 1 = the bottom
         const src = String(rowPick === 0 ? a : b).padStart(t, ' ');
         const positions = [];
@@ -1900,7 +1905,20 @@ function _generateLadderV2(q, skill, helpers, range) {
     // quotient is BUILT to carry an interior zero, and the item is checked for it below.
     if (skill === 'div_zero_in_quotient') {
         let dividend = 0, divisor = 0, quotient = 0;
-        for (let t = 0; t < 40; t++) {
+        // critic r5 D5-6: the second named edge case, a zero in the quotient's ONES (840 ÷ 4 = 210),
+        // is dealt on 1 cell in 4 (balanced per page, page-deal.js); the rest keep the middle zero
+        const onesZero = dealIndex(`dzq-ones:${state.skill}`, 4) === 0;
+        for (let t = 0; onesZero && t < 40; t++) {
+            const d = rng(2, 9);
+            const maxQ = Math.floor(999 / d);
+            if (maxQ < 110) continue;
+            const h = rng(1, Math.min(9, Math.floor(maxQ / 100)));
+            const tMax = Math.min(9, Math.floor((maxQ - h * 100) / 10));
+            if (tMax < 1) continue;
+            const qq = h * 100 + rng(1, tMax) * 10;     // h, t, 0 — the zero is the ones place
+            dividend = qq * d; divisor = d; quotient = qq; break;
+        }
+        for (let t = 0; !divisor && t < 40; t++) {
             const fourDigit = range >= 1000 && rng(0, 2) === 0;
             const d = fourDigit ? rng(2, 4) : rng(2, 9);
             if (fourDigit) {
@@ -1927,14 +1945,17 @@ function _generateLadderV2(q, skill, helpers, range) {
         const head = Math.floor(quotient / 100) * divisor;
         q.hint = `${divisor} does not go into the next digit, so write 0 above it — do not skip the place. `
             + `${divisor} goes into ${String(dividend)[0]}${String(dividend).length > 3 ? String(dividend)[1] : ''} `
-            + `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times, then 0, then finish.`;
-        q.visual = _wsCell(
-            `<div style="display:inline-flex;align-items:flex-end;font-size:1.9rem;font-weight:700;">`
-            + `<span style="padding-bottom:6px;">${divisor}</span>`
-            + `<div style="border-top:2.25px solid ${_WS_INK};border-left:2.25px solid ${_WS_INK};`
-            + `padding:6px 16px 6px 12px;border-top-left-radius:8px;">${dividend}</div></div>`
-            + `<div style="margin-top:8px;font-size:1rem;">Write a digit in <b>every</b> place of the answer.</div>`);
-        q.printFormat = 'long-division';
+            + (quotient % 10 === 0
+                ? `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times. When ${divisor} does not go into the last digit, write 0 in the ones place.`
+                : `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times, then 0, then finish.`);
+        // The kit's `short-division` bus stop (lint 2026-09-26: the legacy bracket was Arial and had
+        // no named slot): a quotient box over EVERY digit, so the pupil sees the place the 0 must
+        // fill, and the exchange boxes carry what is left to the next digit. Paper, key and the
+        // screen twin are the same drawing; the quotient boxes are typed one digit each.
+        const _zqPayload = { dividend, divisor, level: 1 };
+        q.cell = { template: 'short-division', v: 1, payload: _zqPayload };
+        q.visual = _kitTwin('short-division', _zqPayload, { join: '' });
+        q.printFormat = 'short-div-kit';
         q.notation = 'bracket';
         return true;
     }
@@ -2289,7 +2310,10 @@ function _intLineKit(q, a, b, op) {
     q.nlMax = max;
 }
 
-const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract']);
+const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract', 'mixed_mult_div', 'add_sub_10s', 'add_sub_100s', 'multiply']);
+// Adding and subtracting tens / hundreds ("60 + 10 = [ ]") are mental facts read across, whatever
+// their digits: the kit's horizontal fact, never a column (lint AK-4 on the legacy cell, 2026-09-26).
+const _KIT_ACROSS_SKILLS = new Set(['add_sub_10s', 'add_sub_100s']);
 const _KIT_OP = { '+': '+', '-': '-', '−': '-', '×': '*', '÷': '/' };
 
 /**
@@ -2319,6 +2343,13 @@ function _applyKitFactCell(q, skill, range) {
         q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits } };
         return;
     }
+    if (_KIT_ACROSS_SKILLS.has(skill) && (op === '+' || op === '-')) {
+        // the answer stays on the equation line (`across: 'beside'`), at 24 pt so a three-digit
+        // sentence ("100 - 10 = ___") still fits two columns of a page
+        q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: 'horiz', digits, across: 'beside', pt: 24 } };
+        q.notation = 'across';
+        return;
+    }
     const across = q.notation === 'across' || /horizontal/.test(String(q.printFormat || ''));
     // P11 (critic round 2): a stacked two-digit add / subtract item that REGROUPS is column work,
     // not a fact: it prints on the stack template with its carry (or borrow) strip, and the screen
@@ -2340,6 +2371,10 @@ function _applyKitFactCell(q, skill, range) {
     }
     if (small) {
         q.cell = { template: 'fact', v: 1, payload: { a, b, op, notation: across ? 'horiz' : 'vertical', digits } };
+        // mixed_multiplication deals facts among boxed column work: its fact prints the same answer
+        // box, never an open zone beside boxed neighbours. `boxAns` (boolean) is this lane's flag;
+        // it is NOT Lane B's teacher option `ansBox` ('one'|'digit'|'off'), so the two never clash.
+        if (skill === 'multiply' && !across && state.skill === 'mixed_multiplication') q.cell.payload.boxAns = true;
         if (!across && /column-(add|sub)/.test(String(q.printFormat || ''))) {
             // A basic fact on screen is the same vertical fact: no place heads, no regroup row
             // (screen-cell.js draws a `facts-column-visual` item with the kit's fact markup).
@@ -2384,11 +2419,78 @@ function _opt(id) {
     const v = o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, id) ? o[id] : undefined;
     return v === undefined ? def.default : v;
 }
+// A number family's two parts, DEALT across a page (critic r4 D-E): the family is the unordered
+// pair {a, b} (2, 8, 10 and 8, 2, 10 are one family), so a page never repeats one while the band
+// has enough. The order the two parts print in is still free.
+// Wave 1 lane D round 7: on a page every family of the band (the unequal pairs AND the doubles /
+// squares) is dealt once before any comes again: one seeded block of all of them per run of that
+// many items (page-deal.js blockPermutation). A square takes one random place in every six while
+// pairs remain (a page of 6 shows one), and the squares left over close the block. The 5 x 5
+// band's 10 families (6 pairs + 4 squares) all reach a page of 10; before, a square slot used up
+// a slot of the 6-pair deck, so a page of 10 printed only about 8 distinct families. In live play
+// (no page position) a family is drawn as before: a square one time in six, else a pair.
+function _familyPair(key, lo, hi) {
+    const vals = [];
+    for (let v = lo; v <= hi; v++) vals.push(v);
+    const uneq = [];
+    for (let i = 0; i < vals.length; i++) for (let j = i + 1; j < vals.length; j++) uneq.push([vals[i], vals[j]]);
+    let pair;
+    if (!uneq.length) pair = [vals[0], vals[0]];
+    else if (!Number.isFinite(state.itemIndex)) {
+        const sq = dealIndex(`${key}:sq`, 6) === 0;
+        pair = sq ? (v => [v, v])(dealPick(`${key}:s`, vals)) : dealPick(`${key}:n`, uneq).slice();
+    } else {
+        const U = uneq.length, Q = vals.length, L = U + Q;
+        const at = Math.max(0, Math.floor(state.itemIndex));
+        const block = Math.floor(at / L), pos = at % L;
+        let nu = 0, nq = 0, isSq = false;
+        for (let p = 0; p <= pos; p++) {
+            const slot = blockPermutation(`${key}:o${Math.floor(p / 6)}`, 6, block)[0];
+            isSq = nq < Q && (nu >= U || p % 6 === slot);
+            if (p < pos) { if (isSq) nq++; else nu++; }
+        }
+        pair = isSq ? (v => [v, v])(vals[blockPermutation(`${key}:q`, Q, block)[nq]])
+            : uneq[blockPermutation(`${key}:u`, U, block)[nu]].slice();
+    }
+    if (Math.random() < 0.5) pair.reverse();
+    return pair;
+}
+
 // ---- P12 OPTIONS (skill-options.js P12 block: the × / ÷ ladder steps and the number families) ----
 // Same rule as the layer above: each helper returns "not chosen" at the option's default, so the
 // untouched skill takes its old branch and draws the same random numbers as before.
 /** A SET option the teacher CHANGED from its default: the ticked values, else null (untouched,
  *  or none ticked, which means "no restriction"). */
+// ---- r12 area-model options (owner 2026-10-16): amEdges (given / blank / mixed), amForm (a set) ----
+// Mixed choices are dealt from the seeded page deck in aligned blocks of n (a seeded shuffle of the
+// n choices per block), so the same seed reprints the same page and any 2n - 1 items in a row hold
+// every choice: a page of 4 or more is never all given or all blank. At the defaults nothing here
+// draws a random number, so the untouched skill deals exactly what it dealt before.
+const _amCursors = new Map();
+function _amDeal(key, n) {
+    let at;
+    if (Number.isFinite(state.itemIndex)) at = Math.max(0, Math.floor(state.itemIndex));
+    else { at = _amCursors.get(key) || 0; _amCursors.set(key, at + 1); }
+    return blockPermutation(key, n, Math.floor(at / n))[at % n];
+}
+/** 'given' | 'blank' for this item. */
+function _amEdges(skill) {
+    const v = _opt('amEdges');
+    if (v === 'blank') return 'blank';
+    if (v !== 'mixed') return 'given';
+    return _amDeal(`amEdges:${skill}`, 2) === 0 ? 'given' : 'blank';
+}
+/** 'sign' | 'long' | 'fraction' for this item: one ticked form, or the ticked forms dealt down the page. */
+function _amForm(skill) {
+    const legal = ['sign', 'long', 'fraction'];
+    let t = _opt('amForm');
+    if (typeof t === 'string') t = [t];
+    t = Array.isArray(t) ? legal.filter((v) => t.includes(v)) : [];
+    if (!t.length) return 'sign';
+    if (t.length === 1) return t[0];
+    return t[_amDeal(`amForm:${skill}`, t.length)];
+}
+
 function _p12Narrowed(id) {
     const def = _optDef(id);
     if (!def || def.type !== 'set') return null;
@@ -2941,7 +3043,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                 }
 
-                q.text = `Count the array: ${rows} rows \u00d7 ${cols} columns = ?`;
+                // the paper instruction (contract 'multiply-array'), never the frame restated
+                // ("2 rows × 4 columns") above a cell that already prints it (critic r3 D11)
+                q.text = 'Multiply the rows by the columns. Write the answer.';
+                q.screenInstr = 'Multiply the rows by the columns. Type the answer.';
                 q.ans = product;
                 q.a = rows; q.b = cols;
                 q.answerType = 'number';
@@ -2955,7 +3060,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     window.tagDistractor(q, String(rows * (cols - 1)), "Off by one column \u2014 re-count how many DOTS are in each row.");
                 }
                 q.visual = `<div style="text-align:center;">
-                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;" font-family='${FONTS.sans}'>
+                    <svg class="mq-dotarray" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;" font-family='${FONTS.sans}'>
                         ${dots}
                     </svg>
                     <div style="margin-top:6px;font-size:0.95rem;color:${COLORS.text};font-weight:600;">${rows} rows \u00d7 ${cols} columns</div>
@@ -2963,9 +3068,19 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 if (_daBare) {
                     // P12 support 'none': the pupil counts the rows and the columns himself.
                     q.text = 'How many dots are in the array? Write the multiplication.';
+                    q.screenInstr = 'How many dots are in the array? Type the multiplication.';
                     q.hint = 'Count the rows, then the dots in one row. Multiply rows by dots in a row.';
                     q.visual = q.visual.replace(/<div style="margin-top:6px;[^>]*>[^<]*<\/div>/, '');
                 }
+                // 2026-10-02 (print-check backlog, TY-1 / TY-11 / H13 / AK-4): the kit's `arrays`
+                // template draws the dots (4 mm minimum, fixed pitch), the count-all box is a named
+                // slot, and the "R rows x C columns" caption (an Arial SVG line under 8 pt) is the
+                // item's own text, which the kit prints in Andika.
+                // support 'label' (the default): the rows x columns frame, "7 rows x 8 columns / 7 x 8 = [ ]";
+                // support 'none': the pupil counts both himself, then writes how many in all.
+                const _daPayload = { kind: _daBare ? 'count_all' : 'frame', rows, cols };
+                q.cell = { template: 'arrays', v: 1, payload: _daPayload };
+                q.visual = _kitTwin('arrays', _daPayload);
                 q.printFormat = 'dot-array-visual';
                 q.skillLabel = 'Dot Array Multiplication';
                 return;
@@ -3618,7 +3733,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         <rect x="${60 + barBW}" y="20" width="${barAW - barBW}" height="${barH}" rx="4" fill="${colorDiff}" opacity="0.3" stroke="${colorDiff}" stroke-width="2" stroke-dasharray="5,3"/>
                         <text x="${60 + barBW + (barAW - barBW) / 2}" y="${20 + barH / 2 + 5}" text-anchor="middle" font-size="13" font-weight="700" fill="${colorDiff}">?</text>
                         <!-- Difference label -->
-                        <text x="${60 + barBW + (barAW - barBW) / 2}" y="${svgH - 10}" text-anchor="middle" font-size="11" font-weight="600" fill="${colorDiff}">Difference = ?</text>
+                        <text x="${60 + barBW + (barAW - barBW) / 2}" y="${svgH - 10}" text-anchor="middle" font-size="13" font-weight="700" fill="${colorDiff}">Difference = ?</text>
                     </svg>
                 </div>`;
                 q.options = buildNumericOptions(difference);
@@ -3689,15 +3804,21 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Scale with state.range
                 const maxBase = Math.max(5, Math.min(Math.floor(Math.sqrt(range)), 20));
-                const base = rng(2, maxBase);
-                const multiplier = rng(2, Math.min(9, Math.floor(range / base)));
+                // L10 (critic r3 D4: all four answers on one L page were 2): the base, the
+                // multiplier and the story form are DEALT across the page (page-deal.js), so the
+                // answers spread over the whole table instead of clustering on the smallest value.
+                const _mcSpan = (lo, hi) => Array.from({ length: Math.max(1, hi - lo + 1) }, (_, i) => lo + i);
+                const base = dealPick(`mc-base:${state.skill}`, _mcSpan(2, maxBase));
+                const _mcCap = Math.max(2, Math.min(9, Math.floor(range / base)));
+                let multiplier = Math.min(_mcCap, dealPick(`mc-mult:${state.skill}`, _mcSpan(2, 9)));
+                // r5 D-A: 2 x 2 = 4 lets 4 - 2 = 2 read as a take-away story; never deal it.
+                if (base === 2 && multiplier === 2) multiplier = Math.min(Math.max(3, _mcCap), 9);
                 const product = base * multiplier;
 
                 const namePair = pickTwoNames();
                 const item = pickNoun();
 
-                // Randomly decide format
-                const format = rng(0, 2);
+                const format = dealIndex(`mc-form:${state.skill}`, 3);
                 if (format === 0) {
                     q.text = `${namePair[0]} has ${base} ${item}. ${namePair[1]} has ${multiplier} times as many. How many ${item} does ${namePair[1]} have?`;
                     q.ans = product;
@@ -3711,6 +3832,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.ans = base;
                     q.hint = `Divide to find the base amount: ${product} \u00F7 ${multiplier} = ${base}`;
                 }
+                // A times-as-many story is solved by x or / only (never retold as + or -). Not q.op: the
+                // name-audit reads q.op, and this skill legitimately deals both directions.
+                q.storyOps = ['*', '/'];
                 q.answerType = "number";
 
                 // Tape diagram visual: two bars showing multiplier relationship
@@ -3881,6 +4005,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         </div>`).join('')}
                     </div>
                 </div>`;
+                // 2026-10-02 (L-KEY AK-4, TY-1): the one-notation division family (the default) is the kit's
+                // `fact-family` cell (op '*'): bond of the three numbers, one line per fact, one named
+                // box per fact. The bracket / fraction notations keep the legacy drawing.
+                if (notation === 'symbol') {
+                    const _mfPayload = { a: factor1, b: factor2, op: '*' };
+                    q.cell = { template: 'fact-family', v: 1, payload: _mfPayload };
+                    q.visual = _kitTwin('fact-family', _mfPayload);
+                }
                 q.options = [];
                 return;
             }
@@ -3899,17 +4031,23 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // 20" = each addend to 10, so the sum is at most 20), and the level (the branch)
                 // owns only which boxes are blank. The default, 20, is the old level-2 draw.
                 const maxNum = Math.max(1, Math.floor(_p12FamilyBand('number_families_add', 20, [10, 20, 40, 100]) / 2));
-                const addend1 = rng(1, maxNum);
-                const addend2 = rng(1, maxNum);
+                const [addend1, addend2] = _familyPair(`nfa:${state.skill}`, 1, maxNum);
                 const sum = addend1 + addend2;
                 
                 // Create the four equations with consistent structure
                 // Each equation: [num1, op, num2, equals, result]
+                // A DOUBLE (3 + 3 = 6) has two facts, not four: "3 + 3" and "6 − 3" would each
+                // print twice. Collapse it the way the × family collapses a square (critic r3 D10).
+                const isDouble = addend1 === addend2;
                 const familyData = {
                     a: addend1,
                     b: addend2,
                     c: sum,
-                    equations: [
+                    isSquare: isDouble,
+                    equations: isDouble ? [
+                        { nums: [addend1, addend2, sum], op: '+', type: 'add' },
+                        { nums: [sum, addend1, addend2], op: '−', type: 'sub' }
+                    ] : [
                         { nums: [addend1, addend2, sum], op: '+', type: 'add' },
                         { nums: [addend2, addend1, sum], op: '+', type: 'add' },
                         { nums: [sum, addend1, addend2], op: '−', type: 'sub' },
@@ -4003,10 +4141,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const isHard = mappedSkill === "number_families_mult_hard";
                 
                 // P12 (the P-1 split): `band` is the largest table (5 × 5, 10 × 10, 12 × 12) at every
-                // support level; the level (the branch) owns only which boxes are blank.
-                const maxFactor = { 25: 5, 100: 10, 144: 12 }[_p12FamilyBand('number_families_mult', 25, [25, 100, 144])] || 5;
-                const factor1 = rng(2, maxFactor);
-                const factor2 = rng(2, maxFactor);
+                // support level (6 × 6 added 2026-10-10); the level (the branch) owns only which boxes are blank.
+                const maxFactor = { 25: 5, 36: 6, 100: 10, 144: 12 }[_p12FamilyBand('number_families_mult', 25, [25, 36, 100, 144])] || 5;
+                const [factor1, factor2] = _familyPair(`nfm:${state.skill}`, 2, maxFactor);
                 const product = factor1 * factor2;
                 const isSquare = factor1 === factor2;
                 
@@ -4439,16 +4576,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     splitDots += `<line x1="${pad - 5}" y1="${lineY}" x2="${svgW - pad + 5}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2" stroke-dasharray="6,4"/>`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Distributive Property</div>
-                        <div style="margin-bottom:8px;font-size:1.1rem;">${a} × ${b} = <span style="color:var(--accent-green);">${splitPart} × ${b}</span> + <span style="color:var(--accent-orange);">? × ${b}</span></div>
-                        <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
+                                                <div style="margin-bottom:8px;font-size:1.1rem;">${a} × ${b} = <span style="color:var(--accent-green);">${splitPart} × ${b}</span> + <span style="color:var(--accent-orange);">? × ${b}</span></div>
+                        <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;height:22mm;width:auto;">
                             <rect x="0" y="0" width="${svgW}" height="${svgH}" rx="8" fill="var(--bg-card)" stroke="var(--accent-cyan)" stroke-width="2"/>
                             ${splitDots}
                         </svg>
-                        <div style="display:flex;justify-content:center;gap:15px;margin-top:8px;font-size:0.85rem;">
-                            <span style="color:var(--accent-green);">${splitPart} rows</span>
-                            <span style="color:var(--accent-orange);">? rows</span>
-                        </div>
                     </div>`;
 
                 } else if (propType === 'identity') {
@@ -4468,12 +4600,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Identity Property</div>
                         <div style="font-size:1.3rem;padding:15px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                             <span style="color:var(--accent-green);font-weight:700;">${num}</span>
-                            <span style="margin:0 8px;">x</span>
+                            <span style="margin:0 8px;">×</span>
                             <span style="color:var(--accent-orange);font-weight:700;">1</span>
                             <span style="margin:0 8px;">=</span>
                             <span style="color:var(--accent-cyan);font-weight:700;">?</span>
                         </div>
-                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number × 1 = that number</div>
                     </div>`;
 
                 } else {
@@ -4494,15 +4625,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Zero Property</div>
                         <div style="font-size:1.3rem;padding:15px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                             <span style="color:var(--accent-green);font-weight:700;">${num}</span>
-                            <span style="margin:0 8px;">x</span>
+                            <span style="margin:0 8px;">×</span>
                             <span style="color:var(--accent-orange);font-weight:700;">0</span>
                             <span style="margin:0 8px;">=</span>
                             <span style="color:var(--accent-cyan);font-weight:700;">?</span>
                         </div>
-                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number x 0 = 0</div>
                     </div>`;
                 }
 
+                // Round 8 (critic r6 D6-2): the identity / zero cell no longer prints its rule line
+                // ("Any number × 0 = 0") under the question - it states the answer. The rule stays
+                // in q.hint, which the screen shows only when the pupil asks for help.
                 // P12: `pictures` off prints the question alone, without the arrays and the
                 // property's name (the name is a hint: it tells the pupil which rule to use).
                 if (_opt('pictures') === false) q.visual = '';
@@ -4640,6 +4773,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     : `Think: What number makes this subtraction true?`;
                 q.missingNumberData = { position, a, b, c };
                 q.printFormat = "missing-number";
+                // The kit's `equation` cell (lint AK-4, 2026-09-26: the legacy sentence's 40 px box
+                // was not a named slot, so the key stamped its answer under the cell). One box
+                // width for the whole page: the widest answer the band allows (L-LEAK).
+                q.cell = { template: 'equation', v: 1, payload: {
+                    a, b, op: position.includes('add') || position === 'sum' ? '+' : '-', result: c,
+                    unknown: position === 'first_add' || position === 'minuend' ? 'a' : position === 'second_add' || position === 'subtrahend' ? 'b' : 'result',
+                    digits: String(missingMax).length + (useDec ? dp + 1 : 0),
+                    // every unknown is a box, the result too (critic r4 D-G: one slot shape a page)
+                    resultBox: true,
+                } };
                 q.options = buildNumericOptions(ans);
                 return;
             }
@@ -4704,7 +4847,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
             if (mappedSkill === "missing_mult_div") {
                 // Missing Factors - Multiplication/Division
-                const positions = ['first_factor', 'second_factor', 'product', 'dividend', 'divisor', 'quotient'];
+                // The NAME is the declaration: every item hides a factor (or, in a ÷ fact, the
+                // dividend, divisor or quotient). A bare product "4 × 5 = ___" is plain
+                // multiplication, so 'product' is never dealt (critic r3 D9).
+                const positions = ['first_factor', 'second_factor', 'dividend', 'divisor', 'quotient'];
                 // P11: when the teacher ticks a ÷ notation other than Across alone, the ÷ items are
                 // DEALT on alternate cells and the ticked notations are dealt over those ÷ cells
                 // only, so every ticked notation reaches the page (three ticked: all three). The
@@ -4722,7 +4868,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // balanced but in a random order, never × ÷ × ÷.
                 const _mmDiv = _mmDeal && dealIndex(`mm-op:${state.skill}`, 2) === 0;
                 const position = !_mmDeal ? pick(positions)
-                    : (_mmDiv ? pick(['dividend', 'divisor', 'quotient']) : pick(['first_factor', 'second_factor', 'product']));
+                    : (_mmDiv ? pick(['dividend', 'divisor', 'quotient']) : pick(['first_factor', 'second_factor']));
                 const _mmNotation = _mmDeal ? dealPick(`mm-notation:${state.skill}`, _mmTicked) : null;
                 // Scale factor range: for range<=100 use 2-12 (times tables), for larger ranges scale up
                 const mmFactorMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 25);
@@ -4812,13 +4958,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.missingNumberData = { position, a, b, c, displayText };
                 q.printFormat = "missing-factor";
                 // P11: a ÷ item written on a bracket or a fraction bar prints that way too (the kit's
-                // `equation` cell, its ÷ notation branch); Across keeps the one-line legacy cell.
-                if ((q.notation === 'bracket' || q.notation === 'fraction') && q.op === '÷') {
-                    q.cell = { template: 'equation', v: 1, payload: {
-                        a, b, op: '/', result: c, notation: q.notation, digits: String(ans).length,
-                        unknown: position === 'dividend' ? 'a' : position === 'divisor' ? 'b' : 'result',
-                    } };
-                }
+                // `equation` cell, its ÷ notation branch); Across is the same cell as one sentence
+                // (lint AK-4, 2026-09-26: the legacy box was not a named slot). One box width for the
+                // page: the widest answer the band allows, never this answer's own length (L-LEAK).
+                const _mmDiv2 = q.op === '÷';
+                q.cell = { template: 'equation', v: 1, payload: {
+                    a, b, op: _mmDiv2 ? '/' : '*', result: c, digits: String(mmFactorMax * mmFactorMax).length,
+                    ...(_mmDiv2 && (q.notation === 'bracket' || q.notation === 'fraction') ? { notation: q.notation } : {}),
+                    unknown: position === 'dividend' || position === 'first_factor' ? 'a' : position === 'divisor' || position === 'second_factor' ? 'b' : 'result',
+                    resultBox: true,
+                } };
                 
                 q.visual = `<div style="text-align:center;font-size:1.5rem;font-weight:600;margin:20px 0;">
                     ${displayText || text}
@@ -4842,7 +4991,6 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q._variant = problemType;
                 
                 let multiplier, multiplicand, parts;
-                const colors = ['#5fd4c3', '#f8b878', '#f8a0c8']; // teal, orange, pink
                 
                 if (problemType === '2digit') {
                     multiplier = rng(2, 9);
@@ -4877,6 +5025,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // and one for the total, all keyed. The screen twin keeps the
                 // `area-model-input` / `area-model-total` inputs the checkers read.
                 const _amPayload = { multiplier, parts: parts.map(p => p.value), product, uid: `am${multiplier}x${multiplicand}` };
+                // r12: "Numbers around the box: Pupil writes them" - the edge parts become boxes.
+                if (_amEdges('area_model_mult') === 'blank') _amPayload.edges = 'blank';
                 q.cell = { template: 'area-model', v: 1, payload: _amPayload };
                 q.visual = _kitTwin('area-model', _amPayload);
                 q.options = [];
@@ -4894,11 +5044,6 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     ? window.pickVariant('area_model_mult_hard', ['2x2', '2x3'], [3, 2])
                     : (Math.random() < 0.6 ? '2x2' : '2x3');
                 q._variant = problemType;
-                const colors = [
-                    ['#f8e473', '#5fd4c3'],  // Row 1: yellow, teal
-                    ['#f8b878', '#f8a0c8']   // Row 2: orange, pink
-                ];
-                
                 let num1, num2, rowParts, colParts;
                 
                 if (problemType === '2x2') {
@@ -4936,75 +5081,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 };
                 q.printFormat = "area-model-mult-hard";
                 
-                // Calculate all partial products (row × col)
-                const partialProducts = [];
-                for (let r = 0; r < rowParts.length; r++) {
-                    for (let c = 0; c < colParts.length; c++) {
-                        partialProducts.push({
-                            row: r,
-                            col: c,
-                            value: rowParts[r] * colParts[c]
-                        });
-                    }
+                // r12b: the kit's grid (black line art, every box keyed) for every edges choice.
+                const _amhE = _amEdges('area_model_mult_hard');
+                {   // r12b: every item draws the kit grid (defaults too: black and white, the design contract)
+                    const _amhPayload = { multiplier: num1, rows: rowParts.slice(), parts: colParts.slice(), product, uid: `amh${num1}x${num2}` };
+                    if (_amhE === 'blank') _amhPayload.edges = 'blank';
+                    q.cell = { template: 'area-model', v: 1, payload: _amhPayload };
+                    q.visual = _kitTwin('area-model', _amhPayload);
+                    q.options = [];
+                    return;
                 }
-                
-                const uniqueIdArea = Date.now() + Math.random().toString(36).substr(2, 9);
-                const baseBoxWidth = 120; // bumped from 85
-                const baseBoxHeight = 105; // bumped from 75
-                
-                // Generate the 2D grid visual
-                q.visual = `<div class="area-model-container" style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);">Use the model to find <span style="font-size:1.2rem;">${num1} × ${num2}</span></div>
-                    <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;">First, find the area of each rectangle.</div>
-
-                    <!-- Area Model 2D Grid -->
-                    <div class="area-model-grid" style="display:inline-block;position:relative;">
-                        <!-- Top labels (column values) -->
-                        <div style="display:flex;margin-left:45px;margin-bottom:5px;">
-                            ${colParts.map((col, c) => {
-                                const digitCount = Math.max(...rowParts.map(r => (r * col).toString().length));
-                                const cellWidth = baseBoxWidth + (digitCount - 2) * 8;
-                                return `<div style="width:${cellWidth}px;text-align:center;font-weight:700;font-size:1.1rem;">${col}</div>`;
-                            }).join('')}
-                        </div>
-
-                        <!-- Grid rows -->
-                        ${rowParts.map((row, r) => {
-                            return `
-                            <div style="display:flex;align-items:center;${r > 0 ? '' : ''}">
-                                <!-- Row label -->
-                                <div style="font-weight:700;font-size:1.2rem;margin-right:10px;width:35px;text-align:center;">${row}</div>
-                                <!-- Row cells -->
-                                <div style="display:flex;border:2px solid #555;${r === 0 ? 'border-radius:4px 4px 0 0;' : 'border-top:none;border-radius:0 0 4px 4px;'}overflow:hidden;">
-                                    ${colParts.map((col, c) => {
-                                        const partialVal = row * col;
-                                        const digitCount = partialVal.toString().length;
-                                        const cellWidth = baseBoxWidth + (digitCount - 2) * 8;
-                                        const inputWidth = 50 + digitCount * 10;
-                                        const colorRow = r % 2;
-                                        const colorCol = c % 2;
-                                        const bgColor = colors[colorRow][colorCol] || colors[0][0];
-                                        return `
-                                        <div style="width:${cellWidth}px;height:${baseBoxHeight}px;background:${bgColor};display:flex;align-items:center;justify-content:center;${c > 0 ? 'border-left:2px solid #555;' : ''}">
-                                            <input type="text" class="area-model-input" data-area-idx="${uniqueIdArea}-cell-${r}-${c}" data-answer="${partialVal}"
-                                                style="width:${inputWidth}px;height:36px;border:2px solid #fff;border-radius:6px;background:rgba(255,255,255,0.9);text-align:center;font-size:1rem;font-weight:600;" placeholder="">
-                                        </div>
-                                    `}).join('')}
-                                </div>
-                            </div>`;
-                        }).join('')}
-                    </div>
-
-                    <!-- Total calculation -->
-                    <div style="margin-top:20px;font-style:italic;color:var(--text-secondary);">Then, find the total area.</div>
-                    <div class="area-model-total-row" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
-                        <span>${num1} × ${num2} = </span>
-                        <input type="text" class="area-model-total" data-area-idx="${uniqueIdArea}-total" data-answer="${product}"
-                            style="width:${60 + product.toString().length * 12}px;height:40px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card-light);text-align:center;font-size:1.2rem;font-weight:700;">
-                    </div>
-                </div>`;
-                q.options = [];
-                return;
             }
             
             // Area Model Division - 2-digit by 1-digit (e.g., 55 ÷ 5)
@@ -5049,56 +5135,38 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { value: part2, quotient: part2 / divisor }
                 ];
                 
-                const colors = ['#f8b878', '#f8a0c8']; // orange, pink
-                const uniqueIdDiv = Date.now() + Math.random().toString(36).substr(2, 9);
-                
                 q.ans = quotient;
                 q.text = `Use the area model to find ${dividend} ÷ ${divisor}`;
                 q.hint = `Break ${dividend} into parts: ${parts[0].value} + ${parts[1].value}. Find what times ${divisor} equals each part, then add.`;
-                q.answerType = "area-model-div";
+                q.answerType = "area-model";   // r12: the area-model checker (the card typed into a single answer box before)
                 q.areaModelDivData = { divisor, dividend, quotient, parts };
+                q.areaModelData = q.areaModelDivData;   // r12: the card's area-model checker reads it
                 q.printFormat = "area-model-div";
-                
-                // Visual with area model for division
-                q.visual = `<div class="area-model-container" style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);">Use the model to find <span style="font-size:1.2rem;">${dividend} ÷ ${divisor}</span></div>
-                    <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;">First, find the missing side lengths.</div>
+                // r12b: the kit's division area model for every item (black line art, the problem as
+                // ÷, the long-division bracket or a fraction).
+                {
+                    const _amdSk = String(dividend).length > 2 ? 'area_model_div_3by1' : 'area_model_div_2by1';
+                    const _amdE = _amEdges(_amdSk);
+                    const _amdF = _amForm(_amdSk);
+                    {   // r12b: every item draws the kit model (defaults too)
+                        // A part of 0 (60 ÷ 5 split 60 + 0) is no split at all: the kit model splits
+                        // at the largest multiple of ten times the divisor below the dividend, else in half.
+                        let _amdParts = parts.map(p => p.value);
+                        if (_amdParts.some(v => v <= 0)) {
+                            const _q = dividend / divisor;
+                            let _a = divisor * 10 * Math.floor(_q / 10);
+                            if (!(_a > 0 && _a < dividend)) _a = divisor * Math.floor(_q / 2);
+                            _amdParts = [_a, dividend - _a];
+                            q.hint = `Break ${dividend} into parts: ${_amdParts[0]} + ${_amdParts[1]}. Find what times ${divisor} equals each part, then add.`;
+                        }
+                        const _amdPayload = { dividend, divisor, parts: _amdParts, form: _amdF, edges: _amdE, uid: `amd${dividend}d${divisor}` };
+                        q.cell = { template: 'area-model-div', v: 1, payload: _amdPayload };
+                        q.visual = _kitTwin('area-model-div', _amdPayload);
+                        q.options = [];
+                        return;
+                    }
+                }
 
-                    <!-- Area Model Grid -->
-                    <div class="area-model-grid" style="display:inline-block;position:relative;">
-                        <!-- Top labels (unknown - to be filled in) -->
-                        <div style="display:flex;margin-left:40px;margin-bottom:5px;">
-                            ${parts.map((p, i) => `
-                                <div style="width:${80 + (i === 0 ? 20 : 0)}px;text-align:center;">
-                                    <input type="text" class="area-model-input" data-area-idx="${uniqueIdDiv}-top-${i}" data-answer="${p.quotient}"
-                                        style="width:50px;height:28px;border:2px solid #888;border-radius:4px;background:white;text-align:center;font-size:0.95rem;font-weight:600;">
-                                </div>
-                            `).join('')}
-                        </div>
-
-                        <!-- Main grid with divisor on left -->
-                        <div style="display:flex;align-items:center;">
-                            <div style="font-weight:700;font-size:1.3rem;margin-right:10px;width:30px;text-align:center;">${divisor}</div>
-                            <div style="display:flex;border:2px solid #888;border-radius:4px;overflow:hidden;">
-                                ${parts.map((p, i) => `
-                                    <div style="width:${80 + (i === 0 ? 20 : 0)}px;height:70px;background:${colors[i]};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:2px solid #888;' : ''}">
-                                        <span style="font-weight:700;font-size:1.2rem;">${p.value}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quotient calculation -->
-                    <div style="margin-top:20px;font-style:italic;color:var(--text-secondary);">Then, find the quotient.</div>
-                    <div class="area-model-total-row" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
-                        <span>${dividend} ÷ ${divisor} = </span>
-                        <input type="text" class="area-model-total" data-area-idx="${uniqueIdDiv}-total" data-answer="${quotient}"
-                            style="width:60px;height:40px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card-light);text-align:center;font-size:1.2rem;font-weight:700;">
-                    </div>
-                </div>`;
-                q.options = [];
-                return;
             }
             
             // Area Model Division - 3-digit by 1-digit (e.g., 927 ÷ 9)
@@ -5147,56 +5215,38 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { value: part2, quotient: part2 / divisor }
                 ];
                 
-                const colors = ['#f8b878', '#f8a0c8']; // orange, pink
-                const uniqueIdDiv3 = Date.now() + Math.random().toString(36).substr(2, 9);
-                
                 q.ans = quotient;
                 q.text = `Use the area model to find ${dividend} ÷ ${divisor}`;
                 q.hint = `Break ${dividend} into parts: ${parts[0].value} + ${parts[1].value}. Find what times ${divisor} equals each part, then add.`;
-                q.answerType = "area-model-div";
+                q.answerType = "area-model";   // r12: the area-model checker (the card typed into a single answer box before)
                 q.areaModelDivData = { divisor, dividend, quotient, parts };
+                q.areaModelData = q.areaModelDivData;   // r12: the card's area-model checker reads it
                 q.printFormat = "area-model-div";
-                
-                // Visual with area model for division
-                q.visual = `<div class="area-model-container" style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);">Use the model to find <span style="font-size:1.2rem;">${dividend} ÷ ${divisor}</span></div>
-                    <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;">First, find the missing side lengths.</div>
+                // r12b: the kit's division area model for every item (black line art, the problem as
+                // ÷, the long-division bracket or a fraction).
+                {
+                    const _amdSk = String(dividend).length > 2 ? 'area_model_div_3by1' : 'area_model_div_2by1';
+                    const _amdE = _amEdges(_amdSk);
+                    const _amdF = _amForm(_amdSk);
+                    {   // r12b: every item draws the kit model (defaults too)
+                        // A part of 0 (60 ÷ 5 split 60 + 0) is no split at all: the kit model splits
+                        // at the largest multiple of ten times the divisor below the dividend, else in half.
+                        let _amdParts = parts.map(p => p.value);
+                        if (_amdParts.some(v => v <= 0)) {
+                            const _q = dividend / divisor;
+                            let _a = divisor * 10 * Math.floor(_q / 10);
+                            if (!(_a > 0 && _a < dividend)) _a = divisor * Math.floor(_q / 2);
+                            _amdParts = [_a, dividend - _a];
+                            q.hint = `Break ${dividend} into parts: ${_amdParts[0]} + ${_amdParts[1]}. Find what times ${divisor} equals each part, then add.`;
+                        }
+                        const _amdPayload = { dividend, divisor, parts: _amdParts, form: _amdF, edges: _amdE, uid: `amd${dividend}d${divisor}` };
+                        q.cell = { template: 'area-model-div', v: 1, payload: _amdPayload };
+                        q.visual = _kitTwin('area-model-div', _amdPayload);
+                        q.options = [];
+                        return;
+                    }
+                }
 
-                    <!-- Area Model Grid -->
-                    <div class="area-model-grid" style="display:inline-block;position:relative;">
-                        <!-- Top labels (unknown - to be filled in) -->
-                        <div style="display:flex;margin-left:40px;margin-bottom:5px;">
-                            ${parts.map((p, i) => `
-                                <div style="width:${90 + (i === 0 ? 30 : 0)}px;text-align:center;">
-                                    <input type="text" class="area-model-input" data-area-idx="${uniqueIdDiv3}-top-${i}" data-answer="${p.quotient}"
-                                        style="width:55px;height:28px;border:2px solid #888;border-radius:4px;background:white;text-align:center;font-size:0.95rem;font-weight:600;">
-                                </div>
-                            `).join('')}
-                        </div>
-
-                        <!-- Main grid with divisor on left -->
-                        <div style="display:flex;align-items:center;">
-                            <div style="font-weight:700;font-size:1.3rem;margin-right:10px;width:30px;text-align:center;">${divisor}</div>
-                            <div style="display:flex;border:2px solid #888;border-radius:4px;overflow:hidden;">
-                                ${parts.map((p, i) => `
-                                    <div style="width:${90 + (i === 0 ? 30 : 0)}px;height:75px;background:${colors[i]};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:2px solid #888;' : ''}">
-                                        <span style="font-weight:700;font-size:1.2rem;">${p.value}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quotient calculation -->
-                    <div style="margin-top:20px;font-style:italic;color:var(--text-secondary);">Then, find the quotient.</div>
-                    <div class="area-model-total-row" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
-                        <span>${dividend} ÷ ${divisor} = </span>
-                        <input type="text" class="area-model-total" data-area-idx="${uniqueIdDiv3}-total" data-answer="${quotient}"
-                            style="width:70px;height:40px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card-light);text-align:center;font-size:1.2rem;font-weight:700;">
-                    </div>
-                </div>`;
-                q.options = [];
-                return;
             }
             
             // ===== WORD PROBLEMS WITH VISUALS =====

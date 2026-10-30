@@ -90,18 +90,31 @@ function workRows(p, rows, shown = null) {
     return out.slice(0, rows);
 }
 
+/**
+ * The digit track (mm). ONE pitch for every problem of a page (critic 2026-10-03: a per-problem
+ * widening gave "8 8 0" wider digits than "4183" in the next cell). On paper at Size S the
+ * tracks are 1.2 x wider for every problem alike, so the small digits get more room to write and
+ * the cell is not three quarters empty (RUBRIC H13); M and L keep the base pitch.
+ */
+function trackOf(p, ctx, g) {
+    // A division fact's quotient box is at least the writing height wide (critic R1 D13: 4.5 mm
+    // boxes for 6 mm handwriting at S).
+    // A fact on a fact-rows / probe page is drawn at the row's rung and tracked from THAT digit
+    // (`factRowTrack`, critic R2 D-C: a writing-height track spread "72" into "7  2").
+    const rowTrack = p.fact && ctx.mode !== 'screen' && Number((ctx.metrics || {}).factRowTrack) > 0 ? Number(ctx.metrics.factRowTrack) : 0;
+    if (rowTrack) return rowTrack;
+    const base = Math.max(ctx.metrics.trackMm || 0, g.writeMm * (p.fact && ctx.size === 'S' ? 1 : 0.8));
+    if (ctx.mode === 'screen' || p.fact) return base;
+    return ctx.size === 'S' ? base * 1.2 : base;
+}
+
 register('division', {
     render(p, ctx) {
         const g = geo(ctx);
         const D = String(p.dividend), V = String(p.divisor);
         const n = D.length, dv = V.length;
         const rows = rowsOf(p);
-        // A division fact's quotient box is at least the writing height wide (critic R1 D13: 4.5 mm
-        // boxes for 6 mm handwriting at S).
-        // A fact on a fact-rows / probe page is drawn at the row's rung and tracked from THAT digit
-        // (`factRowTrack`, critic R2 D-C: a writing-height track spread "72" into "7  2").
-        const rowTrack = p.fact && ctx.mode !== 'screen' && Number(ctx.metrics.factRowTrack) > 0 ? Number(ctx.metrics.factRowTrack) : 0;
-        const trackMm = rowTrack || Math.max(ctx.metrics.trackMm || 0, g.writeMm * (p.fact && ctx.size === 'S' ? 1 : 0.8));
+        const trackMm = trackOf(p, ctx, g);
         // VA-61: the digit grid over the dividend is a Model / Guided scaffold. A division FACT on
         // an Independent, Test, Probe ... page (scaffold level below 2) writes its quotient on the
         // vinculum's open space, one digit per track, with no boxes (critic R1 D13). Screen twins
@@ -199,8 +212,7 @@ register('division', {
     footprint(p, ctx) {
         const g = geo(ctx);
         const n = String(p.dividend).length, dv = String(p.divisor).length;
-        const rowTrack = p.fact && ctx.mode !== 'screen' && Number((ctx.metrics || {}).factRowTrack) > 0 ? Number(ctx.metrics.factRowTrack) : 0;
-        const trackMm = rowTrack || Math.max(ctx.metrics.trackMm || 0, g.writeMm * (p.fact && ctx.size === 'S' ? 1 : 0.8));
+        const trackMm = trackOf(p, ctx, g);
         const rows = rowsOf(p);
         return {
             wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),

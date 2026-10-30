@@ -37,6 +37,7 @@ import { MONO, MONO_STROKE } from './design-tokens.js';
 import { k2Twin, K2_SHAPES } from './sheet/index.js';
 import { optionsFor } from './skill-options.js';
 import { fadeRung } from './sheet/index.js';
+import { onNewPage } from './page-deal.js';
 
 /* ================================================= P11 · the teacher's options (skill-options.js) */
 // The K-2 options P11_K2_OPTIONS declares (count to, objects, arrangement, support level, compare
@@ -178,7 +179,9 @@ function _kBeginItem() {
     _kAt = Number.isFinite(state.itemIndex) ? state.itemIndex : (++_kLiveCursor);
 }
 function _kDeal(n) {
-    if (_kAt === 0) _kOffset[n] = Math.floor(Math.random() * n);
+    // drawn at the page's first use (resetPageDeals forgets it), not only on item 0: a pool page's
+    // item 0 may be another member, and the last page's offset must never carry over
+    if (_kAt === 0 || _kOffset[n] === undefined) _kOffset[n] = Math.floor(Math.random() * n);
     return (((_kAt + (_kOffset[n] || 0)) % n) + n) % n;
 }
 
@@ -350,6 +353,10 @@ const K2_PICTURE_KINDS = ['ball', 'apple', 'fish', 'flower'];
  * per page, P-28). Live play has no page, so it deals round-robin instead.
  */
 const _kPageHeld = {};
+// A new printed page forgets every per-page choice above (page-deal.js onNewPage).
+onNewPage(() => {
+    for (const o of [_kOffset, _kPerm, _kPageHeld]) for (const k of Object.keys(o)) delete o[k];
+});
 function _kPageDeal(key, n) {
     if (!Number.isFinite(state.itemIndex)) return _kDeal(n);
     if (state.itemIndex === 0 || _kPageHeld[key] === undefined) _kPageHeld[key] = Math.floor(Math.random() * n);

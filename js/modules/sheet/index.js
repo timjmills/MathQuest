@@ -113,13 +113,14 @@ export {
 // chart window, arrays, remainder, number line, fact family, cloze bank).
 export { divisionSteps } from './cells/long-division.js';
 import './cells/area-model.js';
+import './cells/area-model-div.js';
 import './cells/mult-chart.js';
 import './cells/ops-counters.js';
 import './cells/arrays-turn.js';
 import './cells/number-line.js';
 import './cells/family.js';
 export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
-export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'arrays-turn', 'remainder', 'number-line', 'fact-family', 'cloze-bank'];
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'arrays-turn', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'area-model-div'];
 
 
 // K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,
@@ -133,6 +134,10 @@ import './cells/chartwindow.js';
 import './cells/seqstrip.js';
 import './cells/compare.js';
 import './cells/wordpic.js';
+// 2026-09-26: odd and even (pairs, which, sort) and a whole from unit-fraction pieces.
+import './cells/long-multiplication.js';
+import './cells/parity.js';
+import './cells/frac-wall.js';
 // Every whole-number word problem (owner ruling 2026-09-25): story, sign row, column boxes, answer + unit bank.
 export { barMini } from './cells/word-work.js';
 export { wordWorkPayload, wordWorkTwin, solveStory, parseTwoStep, storyLines, unitOf, cueRanges, columnRows, KEYWORD_BANK, WW_TEMPLATE } from './cells/word-work.js';

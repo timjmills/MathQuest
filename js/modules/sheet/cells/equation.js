@@ -98,7 +98,9 @@ const acrossBelow = (p, ctx) => {
 };
 const slotShape = (p) => {
     const u = p.unknown || 'result';
-    return u === 'op' ? 'circle' : u === 'result' ? 'line' : 'box';
+    // `resultBox`: a page whose other items box their unknown boxes the result too (one answer shape
+    // on the page, missing_mult_div, critic 2026-10-03)
+    return u === 'op' ? 'circle' : u === 'result' ? (p.resultBox ? 'box' : 'line') : 'box';
 };
 
 register('equation', {
@@ -170,9 +172,13 @@ register('equation', {
     },
     footprint(p, ctx) {
         const em = (ctx.metrics.digitPt / 72) * 25.4;
-        const chars = String(p.a).length + String(p.b).length + String(p.result ?? compute(p)).length;
         const isDivFact = p.fact && (p.op === '/' || p.op === '÷') && (p.unknown || 'result') === 'result';
         const A = String(p.a).length, B = String(p.b).length;
+        // the drawn sentence: the GIVEN numbers (the unknown is the slot, counted once as the
+        // blank), two 1 em operator tracks, four .28 em gaps (critic 2026-10-03: counting the
+        // unknown's digits as well made "12 x 8 = ___" a full-width line at L, one column of 8)
+        const u = p.unknown || 'result';
+        const known = (u === 'a' ? '' : String(p.a)) + (u === 'b' ? '' : String(p.b)) + (u === 'result' ? '' : String(p.result ?? compute(p)));
         // A division fact's width is its narrowest drawn form (the cell picks the form for its
         // column, see acrossBelow): across, the sentence with the line under it; fraction, the bar
         // with "=" and the line beside it. Other sentences keep their across estimate.
@@ -180,11 +186,14 @@ register('equation', {
             ? em * (0.56 * Math.max(A, B) + 0.4 + 2 * 0.28 + 1) + blankWidth(p.digits || 2, ctx.size) + 6
             : isDivFact && !p.notation
                 ? Math.max(em * (0.56 * (A + B) + 2 * ACROSS_OP_EM + 3 * ACROSS_GAP_EM), blankWidth(p.digits || 2, ctx.size)) + 6
-                : chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
+                : known.length * em * 0.58 + 2 * em + 4 * 0.28 * em + blankWidth(p.digits || 2, ctx.size) + 6;
+        // a one-line sentence is its digit line (+1.5 mm); a fraction-bar or a division fact (its
+        // line under it) adds the writing line
+        const tall = p.notation === 'fraction' || isDivFact;
         return {
             // `fact` (div_facts' Fraction form): a one-line fact cell, packed like the other
             // fact forms of its page instead of measured as a visual.
-            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction' && !p.fact,
+            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + (tall ? ctx.metrics.writeMm + 4 : 1.5)) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction' && !p.fact,
             factLike: !!p.fact, maxCols: 4, stretchCap: STRETCH_CAP.equation,
         };
     },

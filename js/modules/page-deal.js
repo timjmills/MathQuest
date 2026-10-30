@@ -32,8 +32,22 @@ const MAX_RUN = 3;
 
 const _consts = new Map();    // key -> a number drawn once per page
 
+const _pageResets = [];       // per-page caches other modules keep (onNewPage)
+
+/**
+ * A module that keeps its own per-page choice (an offset, a shuffled permutation, a held value)
+ * registers how to forget it here. Such a choice used to be redrawn only when the generator
+ * happened to run on item 0, so a pool page whose item 0 was another member — or any page whose
+ * item 0 skipped that draw — reused the choice the PREVIOUS page left behind, and one seed dealt
+ * different items alone and after other skills (wave 1 lane D, 2026-10-09: counting_all S).
+ */
+export function onNewPage(fn) { if (typeof fn === 'function') _pageResets.push(fn); }
+
 /** A new page: forget every deck, so the page is a function of its own seeds. */
-export function resetPageDeals() { _decks.clear(); _consts.clear(); }
+export function resetPageDeals() {
+    _decks.clear(); _consts.clear();
+    for (const fn of _pageResets) { try { fn(); } catch (e) { /* a reset never stops a page */ } }
+}
 
 /**
  * A whole number in [0, n) drawn ONCE per page from the seeded rng (at its first use after the

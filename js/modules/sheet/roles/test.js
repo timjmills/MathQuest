@@ -15,8 +15,10 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, instructionKeyOf, assemble,
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
+    hMinAt, splitByWidth,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit } from '../layout.js';
+import { GRID_BORDERS_MM } from './practice.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -80,15 +82,113 @@ function layout(items, input, count) {
     }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
 }
 
+const TARGET = { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } };
+
+/**
+ * Wave 1 lane D r12c (RUBRIC H13): a Test whose problems come in two widths - an area model of
+ * 1 x 2 parts fits a half column, one of 1 x 3 parts at M and L (or 2 x 3 at S) only a full one -
+ * prints them in two groups under its one instruction, as the practice pages do (practice.js
+ * splitWide / fineSplit): the narrow problems in their columns, whole rows, and the full-width ones
+ * under them, one a row. Before, one full-width problem pulled the whole Test to one column and every
+ * narrow model sat in a 185 mm cell more than 30 % empty (area_model_mult Test at M and L).
+ * The page keeps the dealt mix: the share of full-width problems is the deal's (at least one), so
+ * "Both grids, dealt" stays both grids. Returns null when the Test is one width (or the teacher
+ * fixed the columns). {cols, nn, w, hN, hW, narrow, wide, G, perPage, Ln}
+ */
+function widthSplit(items, input, count) {
+    if ((input.columns && input.columns !== 'auto') || items.some((it) => it.fclass === 'long')) return null;
+    const ctx = ctxOf(input);
+    const sp = splitByWidth(items, ctx);
+    if (!sp) return null;
+    const { narrow, wide } = sp;
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Test A', title: 'Test A', score: 1 });
+    const Ln = resolveSectionLayout({
+        role: 'test', columns: 'auto', count: narrow.length, target: TARGET, ceiling: CEILING, dense: DENSE,
+    }, narrow, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+    const cols = Ln.cols;
+    if (cols < 2) return null;
+    const hN = hMinAt(narrow, cols, ctx);
+    const hW = hMinAt(wide, 1, ctx);
+    if (!Number.isFinite(hN) || !Number.isFinite(hW)) return null;
+    const G = Ln.gridH - SAFETY_H_MM;
+    const share = wide.length / items.length;
+    const ceil = Math.min(CEILING[ctx.size] || CEILING.L, count ? Number(count) : Infinity);
+    let best = null;
+    for (let N = cols + 1; N <= ceil; N++) {
+        const ideal = share * N;
+        for (let w = 1; w <= Math.min(wide.length, N - cols); w++) {
+            const nn = N - w;
+            if (nn % cols || nn > narrow.length) continue;
+            const h = (nn / cols) * hN + w * hW + GRID_BORDERS_MM;
+            if (h > G) continue;
+            const d = Math.abs(w - ideal);
+            if (!best || N > best.perPage || (N === best.perPage && d < best.d - 1e-9)) best = { perPage: N, nn, w, d };
+        }
+    }
+    if (!best) return null;
+    return { cols, nn: best.nn, w: best.w, hN, hW, narrow, wide, G, perPage: best.perPage, Ln };
+}
+
 export function counts(pools, input) {
-    const L = layout(pools.main || [], input);
+    const all = pools.main || [];
+    const sp = widthSplit(all, input, input.count);
+    // A Test of two widths takes its narrow and its full-width problems from a wider deal (the
+    // plan prints only what it places), so each group can be filled to whole rows.
+    if (sp) return { main: Math.min(40, Math.max(all.length, 3 * sp.perPage)) };
+    const L = layout(all, input);
     return { main: input.count ? Math.min(input.count, L.perPage) : L.perPage };
+}
+
+/** The two-width Test page (widthSplit): the narrow group's rows, then the full-width rows. */
+function planSplit(input, sp, items) {
+    const ctx = ctxOf(input);
+    const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
+    let nar = sp.narrow.slice(0, sp.nn);
+    let wid = sp.wide.slice(0, sp.w);
+    // PT-TST-1: Form B is Form A re-ordered under (seed, form), each group in itself.
+    if (form === 'B') {
+        const r = rng(deriveSeed(input.seed === undefined ? 0 : input.seed, 'test', 'B'));
+        nar = shuffle(r, nar);
+        wid = shuffle(r, wid);
+    }
+    nar = groupByHeight(nar, sp.cols);
+    const all = nar.concat(wid);
+    const rowsN = nar.length / sp.cols;
+    const rowHs = [];
+    for (let i = 0; i < nar.length; i += sp.cols) rowHs.push(hMinAt(nar.slice(i, i + sp.cols), sp.cols, ctx));
+    const wideHs = wid.map((it) => hMinAt([it], 1, ctx));
+    const used = rowHs.concat(wideHs).reduce((a, b) => a + b, 0);
+    // The page's spare height goes INTO the rows, each up to its fill limit (layout.rowGapFor's one
+    // rule: never between rows); what is left stays under the grids.
+    const k = Math.max(1, Math.min(FILL_CAP, (sp.G - GRID_BORDERS_MM) / Math.max(1, used)));
+    const grow = (h) => Math.round(Math.max(h, Math.min(k * h, fillLimit(h))) * 10) / 10;
+    const hsN = rowHs.map(grow);
+    const hsW = wideHs.map(grow);
+    const sum = (a) => Math.round(a.reduce((x, y) => x + y, 0) * 100) / 100;
+    const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
+    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: all.length });
+    const labels = labelStyleOf(ctx.look, input.labels);
+    const gN = gridPart(nar.map((it) => planItem(it, { cols: sp.cols, level: 0 })), { cols: sp.cols, rows: rowsN, labels, start: 1 });
+    gN.rowsTpl = hsN.map((x) => `${x}fr`).join(' ');
+    gN.height = `${sum(hsN)}mm`;
+    const gW = gridPart(wid.map((it) => planItem(it, { cols: 1, level: 0 })), { cols: 1, rows: wid.length, labels, start: nar.length + 1 });
+    gW.rowsTpl = hsW.map((x) => `${x}fr`).join(' ');
+    gW.height = `${sum(hsW)}mm`;
+    const sections = [instructionPart(instructionKeyOf(all, input.skills), all), gN, gW];
+    const line = `Fits: ${sp.cols} columns x ${rowsN} rows + 1 column x ${wid.length} rows (full width), ${all.length} per page.`;
+    const fits = Object.assign({}, sp.Ln, { cols: sp.cols, rows: rowsN + wid.length, perPage: all.length, count: all.length, split: true, line });
+    return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
+        scaffoldLevel: 0,
+        meta: { items: all.length, scoreOutOf: all.length, form, fits: [fits], notes: [`${nar.length} problems in ${sp.cols} columns, ${wid.length} full width.`] },
+    });
 }
 
 export function plan(input = {}) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
     let items = poolItems(input, 'main');
+    const sp = widthSplit(items, input, input.count);
+    if (sp) return planSplit(input, sp, items);
     const L = layout(items, input);
     items = items.slice(0, L.perPage);
     // PT-TST-1: Form B is Form A re-ordered under (seed, form).

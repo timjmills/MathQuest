@@ -3,7 +3,7 @@ import { state } from './state.js';
 import { skipAfterFor } from './skip-rule.js';
 import { isOrderFreeFamily, familyBoxVerdict } from './number-family-check.js';
 import { updateSkillProgress } from './progress.js';
-import { SKILLS } from './data.js';
+import { SKILLS, isMixedMetaSkill } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
@@ -15,7 +15,8 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
-    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
+    fitCellDigits, capDotArrays, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
@@ -837,6 +838,11 @@ function _wsItemKey(q) {
     if (!q) return '';
     return plainText(q.text) + '\u0001' + String(q.ans) + '\u0001' + plainText(q.visual || '');
 }
+const WS_K2_POOL_CATS = new Set(['counting', 'comparing', 'composing', 'counting_mixed']);
+// a kit member the SCREEN draws as its kit twin (the paper cell's static twin, or its build model):
+// a parity / fraction-wall cell whose screen is still a check-box list or tile widget does not count
+const _wsKitCell = (q) => !!(q && q.cell && q.cell.template && q.cell.template !== 'legacy'
+    && /class="k2-twin"|data-mq-model=/.test(String(q.visual || '')));
 function _wsGenerate(i) {
     const base = (state.worksheetSeed >>> 0) || 1;
     const earlier = state.worksheetQs.slice(0, i);
@@ -844,7 +850,19 @@ function _wsGenerate(i) {
     const prevKey = i > 0 ? _wsItemKey(earlier[i - 1]) : null;
     let q = null;
     let fallback = null;                 // the first candidate that is not a copy of the item before it
-    for (let attempt = 0; attempt < 12; attempt++) {
+    const kitPool = WS_K2_POOL_CATS.has(state.category) && isMixedMetaSkill(state.skill);
+    // Round 5 (critic r4 D-F): skipping the members the screen cannot draw left the rest of the pool
+    // over-weighted (3 of 6 cards whole_as_fraction, two in a row). A kit pool redraws (more seeded
+    // tries, still deterministic) until the member differs from the card before it and holds at most
+    // 2 of any 6 cards in a row (the window this card closes); the cap relaxes only when the tries
+    // run out.
+    const memberOf = (x) => (x && (x.poolMember || x.skillId)) || '';
+    const win = earlier.slice(Math.max(0, i - 5)).map(memberOf);
+    const prevMember = i > 0 ? memberOf(earlier[i - 1]) : '';
+    const fairMember = (m) => !m || (m !== prevMember && win.filter((x) => x === m).length < 2);
+    let kitFallback = null;              // a kit cell that broke only the variety rule
+    const tries = kitPool ? 24 : 12;
+    for (let attempt = 0; attempt < tries; attempt++) {
         const seed = attempt === 0 ? deriveSeed(base, 'item', i) : deriveSeed(base, 'item', i, 'retry', attempt);
         let cand = null;
         try {
@@ -856,11 +874,21 @@ function _wsGenerate(i) {
             console.error('worksheet: generateQuestionFor failed', e);
         }
         if (!cand) continue;
+        // D7 (wave 1 lane D): a K-2 counting & cardinality POOL deals the kit members only, as
+        // the paper deal does (print-sheet.js generateRun): a member drawn in the legacy look
+        // (a check-box list with Submit, a trade chart with buttons) is passed over while a few
+        // tries remain, so every card is a kit cell with a paper twin.
+        if (kitPool && attempt < 20 && !_wsKitCell(cand)) { if (!q) q = cand; continue; }
+        if (kitPool && attempt < 20 && !fairMember(memberOf(cand))) {
+            if (!kitFallback && !seen.has(_wsItemKey(cand))) kitFallback = cand;
+            continue;
+        }
         const key = _wsItemKey(cand);
         if (!seen.has(key)) { q = cand; break; }
         if (!fallback && key !== prevKey) fallback = cand;
         if (!q) q = cand;
     }
+    if (kitPool && kitFallback && (!_wsKitCell(q) || seen.has(_wsItemKey(q)))) q = kitFallback;
     if (q && seen.has(_wsItemKey(q)) && fallback) q = fallback;
     if (!q) {
         // Last resort: the unseeded live-play path, as before this wave.
@@ -957,6 +985,7 @@ function _wsFitCard(card) {
             if (kids[0].dataset.mqFitShort === '1') return false;
         }
     }
+    capDotArrays(cellEl);
     // a drawing that scrolls inside itself (a long number line) does not fit this column either
     if (Array.from(cellEl.querySelectorAll('[data-mq-scroll]')).some(s => s.scrollWidth > s.clientWidth + 1)) return false;
     return cellEl.scrollWidth <= cellEl.clientWidth + 1;
@@ -1342,8 +1371,10 @@ function _wsRenderCard(grid, q, i) {
             .replace(/id="divSortNo"/g, `id="ws_divSortNo_${i}"`);
         questionDisplay = modifiedVisual;
     } else if (isNumberFamily) {
-        // For number families, modify input IDs to be unique per problem
-        let modifiedVisual = q.visual
+        // For number families, modify input IDs to be unique per problem. Round 5: the kit
+        // number-family cell (paper's drawing) replaces the legacy coloured family when it can draw it
+        const nfKit = q.answerType === 'number-family' ? familyScreenVisual(q) : '';
+        let modifiedVisual = (nfKit || q.visual)
             .replace(/class="number-family-input"/g, `class="number-family-input ws-number-family-input"`)
             .replace(/class="fact-family-input"/g, `class="fact-family-input ws-fact-family-input"`)
             .replace(/onclick="checkNumberFamily\(\)"/g, `onclick="checkWorksheetNumberFamily(${i})"`)
@@ -1440,7 +1471,7 @@ function _wsRenderCard(grid, q, i) {
             slotInCell = true;
         }
     }
-    const instrLine = kind ? instructionForKind(kind) : twin ? screenInstruction(twin.instr) : '';
+    const instrLine = kind ? instructionForKind(kind) : twin ? screenInstruction(twin.instr) : (isNumberFamily && q.answerType === 'number-family' && familyScreenVisual(q)) ? FAMILY_SCREEN_INSTRUCTION : '';
     const answerRow = (!slotInCell && !answerInputStyle) ? `<div class="mq-answerrow">${inputHtml}</div>` : '';
     const parkedInput = (!slotInCell && answerInputStyle) ? inputHtml : '';
 

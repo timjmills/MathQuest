@@ -221,6 +221,9 @@
 :is(.ws-page, .ws-sheet) .ws-eq .o { font-weight: 700; width: 1em; text-align: center; }
 :is(.ws-page, .ws-sheet) .ws-line { display: inline-block; width: var(--w, 14mm); height: var(--ws-hw); border-bottom: var(--ws-hair) solid var(--ws-ink); }
 :is(.ws-page, .ws-sheet) .ws-box { display: inline-block; width: var(--w, 14mm); height: var(--ws-hw); border: var(--ws-hair) solid var(--ws-ink); }
+/* wave 1 lane D round 6 (critic r5 D5-6, SL-4): the box's CLEAR height is Hw (6 mm at S), so the
+   hairline border sits outside it - the writing room never falls under 6 mm */
+:is(.ws-page, .ws-sheet) .ws-box { height: calc(var(--ws-hw) + 2 * var(--ws-hair)); }
 :is(.ws-page, .ws-sheet) .ws-circle { display: inline-block; width: calc(var(--ws-hw) + 2mm); height: calc(var(--ws-hw) + 2mm); border: 1pt solid var(--ws-ink); border-radius: 50%; }
 :is(.ws-page, .ws-sheet) .ws-check { display: inline-block; width: 5mm; height: 5mm; border: var(--ws-hair) solid var(--ws-ink); vertical-align: -1mm; margin-right: 2mm; }
 
@@ -319,6 +322,32 @@
    vertical padding (row chrome), never its digits. Additive. */
 :is(.ws-page, .ws-sheet) .ws-cell.ws-cell-compact { padding-top: 1.5mm; padding-bottom: 1.5mm; }
 
+/* wave 1 lane D (critic 2026-10-03): a key's value in an equation's answer box sits in the MIDDLE
+   of the box at a size it holds ("120" no longer runs past the box edge from its bottom-left). */
+:is(.ws-page, .ws-sheet) .ws-eq .ws-box[data-ws-ink] { display: inline-flex; align-items: center; justify-content: center; overflow: hidden; font-size: .72em; line-height: 1; vertical-align: bottom; }
+
+/* wave 1 lane D round 8 (critic r6 D6-1, additive): a fact's answer box among boxed column work
+   (cells/fact.js boxAns) is drawn at the fact's OWN digit size - a digit line tall (never under Hw)
+   and as wide as the widest answer's tracks - so the pupil writes at the size of the problem and a
+   key's "110" sits inside its box instead of hanging out of it. */
+:is(.ws-page, .ws-sheet) .ws-fact > .ws-factans--box { height: auto; justify-content: flex-end; margin-top: .5mm; }
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factbox { box-sizing: border-box; width: max(var(--w, 14mm), calc(var(--fn, 2) * 0.72em + 2mm + 2 * var(--ws-hair)));
+    height: calc(max(var(--ws-hw), 1.2em) + 2 * var(--ws-hair)); display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1em; line-height: 1; vertical-align: top; overflow: visible; }
+
+/* ---------- CL-40 label keep-out (Lane D round 10) ----------
+   A cell that carries a tab or a letter publishes the keep-out edge: --ws-ko is the label's real
+   width + 1 mm from the cell's left edge (a w2 / w3 tab is 1.4 / 1.5 tab sides wide), and --ws-koin
+   is the same edge measured from the cell's content box (the 3 mm padding, 2 mm in a fact cell).
+   A template whose content starts at the top-left uses max(its own inset, var(--ws-koin)). */
+:is(.ws-page, .ws-sheet) .ws-cell:has(> .ws-tab, > .ws-letter) { --ws-ko: calc(var(--ws-tab, 5mm) + 1mm); --ws-koin: calc(var(--ws-ko) - 3mm); }
+:is(.ws-page, .ws-sheet) .ws-cell:has(> .ws-tab.w2) { --ws-ko: calc(var(--ws-tab, 5mm) * 1.4 + 1mm); }
+:is(.ws-page, .ws-sheet) .ws-cell:has(> .ws-tab.w3) { --ws-ko: calc(var(--ws-tab, 5mm) * 1.5 + 1mm); }
+:is(.ws-page, .ws-sheet) .ws-cell.fact:has(> .ws-tab, > .ws-letter) { --ws-koin: calc(var(--ws-ko) - 2mm); }
+/* (Lane D port 2026-10-30: the lane's own CL-40 top band - padding-top max(3 mm, keep-out) on every
+   labelled cell, and a seqstrip / counters / remainder step to the right - is NOT taken: today's CL-4b
+   top start with the CL-40 / CL-41 spacers below wins. The two variables above stay; templates read
+   --ws-koin for a left inset only.) */
 /* ---------- INK-31: the answer-key ink (Wave 4.4, owner 2026-10-03) ----------
    Key answers only: reddish orange #C2410C (5.2:1 on white; luma ~98/255, so a mono copy prints
    it as a dark grey, darker than the trace grey #949494). Pupil pages, the key's copy of the
