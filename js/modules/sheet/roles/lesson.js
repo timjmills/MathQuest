@@ -48,7 +48,7 @@ import {
     instructionText, instructionPart, assemble, poolItems, answerOf, oralFrameOf, operandsOf, opOf, labelStyleOf,
     esc, blank, stripExtraMm,
 } from './compose.js';
-import { resolveCtx, numeralTracksHTML } from '../index.js';
+import { resolveCtx, numeralTracksHTML, getCell, hasCell } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
 import { evenGridState, factGridMini } from '../cells/mult-grid.js';
 import { dotTile, countCueOf, countCueRow } from './guided.js';
@@ -976,6 +976,9 @@ function stateDrawing(it, steps, groups, k, c) {
         try { html = it.render(Object.assign({}, ctx, { gridSteps: evenGridState(it.q.cell.payload || {}, merged, k) }), { cols: 2 }); } catch (e) { html = ''; }
         return unslot(html);
     }
+    // a template's lesson-only states (count-row: the chart writes the answers box by box, critic skip-count r5 SC1)
+    const lt = it.q && it.q.cell && hasCell(it.q.cell.template) ? getCell(it.q.cell.template) : null;
+    if (lt && typeof lt.lessonStepState === 'function') return unslot(lt.lessonStepState(Object.assign({}, it.q.cell.payload || {}), merged, k, Object.assign({}, ctx, { step: k })));
     const t = stepTemplateOf(it);
     if (t) {
         const payload = Object.assign({}, it.q.cell.payload || {});

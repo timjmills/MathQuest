@@ -765,6 +765,7 @@ Details and the reflection: design/status/s1-checks.md.
 | Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
 |---|---|---|---|
 | r5 | FAIL 3 (Lesson C1/C3), 390 card 6 | SC1: `ws-print-lint --roles lesson` existed on precritic's path and was not run (now 0 at S/M/L). SC2: `ws-phone-card` FOCUS / INVIEW existed (now 0) + NEW ROW-LINES (a swiping row on one line), and phone-card joins ws-deploy-gates.sh. SC3: NEW ws-node-lint LESSON-DATA `screen-task` (24 seeded deals of each Warm-up / Mixed ref; backtested). SC4: NEW phone-card swipe-window fixtures. G2-G4 (small-fixes r11, re-checked on today's row): NEW phone-card ROW-ARROW, NEXT-INVIEW (360x780, 844x390), ROTATE. Details: design/status/skip-count.md. | Render every role in the scope (the Lesson) in the fix loop; the family's own phone test (wave1-c2-phone) is off precritic's path, so its essentials moved into ws-phone-card. |
+
 ### Lane lessons-6-7 (detailed lessons 6 + 7) — builder rounds before critic r3 / r1 (2026-10-30)
 
 | Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |

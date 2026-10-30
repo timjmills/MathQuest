@@ -278,7 +278,9 @@ function tightGeom(p, ctx, c) {
 /** The one-page sheet's single line of `n` boxes in `avail` mm: {w, gap, pt} or null (two lines). Mirrored by count-rows.js rowLines. */
 // Owner / coordinator 2026-10-03: keep 12 per line; every gap holds a REAL arrow (COMPACT_ARROW_MM, the same on every row) with
 // 1 mm clear each side. Only a box needs writing width; a printed number takes its glyph width (+ 0.3 mm each side).
-export const COMPACT_MIN_BOX = 9, COMPACT_ARROW_MM = 2.2, COMPACT_MIN_GAP = COMPACT_ARROW_MM + 2;
+// (skip-count fix 2026-10-30, small-fixes r11 G2: a 3-digit given's ink ran 0.06 mm past its glyph estimate and left the arrow 0.94 mm
+// clear; the arrow is 2.0 mm, the gap stays 4.2 mm (count-rows.js S_GAP), so it keeps >= 1 mm of INK clearance - ws-print-lint L-OVERLAP ARROW)
+export const COMPACT_MIN_BOX = 9, COMPACT_ARROW_MM = 2.0, COMPACT_MIN_GAP = 4.2;
 /**
  * `nBox` of the `n` numbers are boxes (the rest printed). Returns {w (box), gw (printed), gap, pt} or null (two lines). The digits
  * keep the working size whenever the line holds them; only a row too full even then (very many boxes of 3+ digits) shrinks them
@@ -730,7 +732,9 @@ register('count-row', {
      * marks on slots blank0, blank1 ...) draws every answer written up to step k - the ones written at step k grey (the newest,
      * P-LC-9), the earlier ones black - so the chart shows the count growing box by box, never three blank rows and a finished one.
      */
-    stepState(p, steps, k, ctx) {
+    // (named `lessonStepState`, not `stepState`: the S6 anchors read `stepState` and draw a count row WHOLE - a band of states of a
+    // full-width row clipped its cell, precritic slot-clip on skip_count_line single/ex-group)
+    lessonStepState(p, steps, k, ctx) {
         const slots = {};
         (steps || []).slice(0, k + 1).forEach((g, gi) => {
             for (const m of (g && g.marks) || []) {

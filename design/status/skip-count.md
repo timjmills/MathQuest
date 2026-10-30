@@ -46,5 +46,14 @@ Times: fix r5, start 2026-10-30T17:40Z, end —, profile mq-opus-medium
 2. `wave1-c2-phone` (the family's own phone test) is not on precritic's path; ws-phone-card now carries its essentials (one line, open at the first box, wide-number cases, 360 / landscape, turn), so precritic sees them.
 3. Debugging the phone layout cost the most time: a small probe that dumps a swipe row's lines, column starts and scroll writes (scratchpad phonedbg / wsdbg) found three root causes in minutes; worth a `--debug` flag on ws-phone-card.
 
+## Small-fixes critic r11 G1-G6 on today's count row (lead, 2026-10-30)
+The sleepy-pasteur small-fixes work is not re-landed (today's wireSwipeRows replaced it); each item was re-checked on today's row:
+- G1 (1,000,000 row one a line at 360): today the row SWIPES on one line (one row high) at 360 and 390. Check: ws-phone-card ROW-LINES with the wide-number cases at 360x780 / 390x844.
+- G2 (arrow ink < 1.0 mm): screen was 0.98 mm on the phone worksheet; fixed (arrows 1.5 px in from each gap end): >= 1.25 mm on card and worksheet at 1280-360; paper >= 1.0 mm (S 2.3, L 1.0). Checks: tests/lib/ws-arrow-clear.cjs in ws-phone-card ROW-ARROW and ws-print-lint L-OVERLAP ARROW (self-tested).
+- G3 (next box below the fold at 360 / landscape): passes; check ws-phone-card NEXT-INVIEW at 360x780 and 844x390.
+- G4 (layout fixed at first render): passes (wireSwipeRows re-lays out on resize); check ws-phone-card ROTATE (390x844 <-> 844x390 vs a fresh load).
+- G5 (gates): wave1-c2-phone's wide-row box floor back to SP-10's 48 px tall (measured 53). Left bands: the row rests on column starts, nothing cut at the left edge (wave1-c2-phone TABCHK). Phone mixed sheet: still not gated (open).
+- G6 (docs): the wrap amendment never landed here; TY-10b now records the owner ruling (3) and the one-line swipe.
+
 ## Log
 - 2026-10-30: fix round after critic r5 (SC1-SC6), and the small-fixes r11 G1-G6 audit on today's count row.
