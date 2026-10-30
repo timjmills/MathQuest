@@ -114,11 +114,15 @@ export function toastAction(msg, label, fn) {
     b.type = 'button';
     b.className = 'tv-toast-act';
     b.textContent = label;
-    b.addEventListener('click', () => { try { fn(); } finally { hideToast(); } }, { once: true });
+    // focus goes to the button (a keyboard user reaches Undo at once) and back when the toast goes
+    const back = document.activeElement;
+    const restore = () => { if (document.activeElement === b && back && back.isConnected && typeof back.focus === 'function') back.focus(); };
+    b.addEventListener('click', () => { restore(); hideToast(); fn(); }, { once: true });
     el.append(span, b);
     el.classList.add('is-on', 'has-act');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('is-on', 'has-act'), 6000);
+    toastTimer = setTimeout(() => { restore(); el.classList.remove('is-on', 'has-act'); }, 6000);
+    try { b.focus({ preventScroll: true }); } catch (e) { /* no focus */ }
 }
 
 /** Take the toast down now (every screen change, critic r4 m8: it must not sit on the next screen's controls). */

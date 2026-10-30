@@ -1095,7 +1095,8 @@ function onSettingsClick(e, el) {
         window.resetAdaptiveLevels?.();
         toastAction('Every skill is back to level 3.', 'Undo', () => {
             state.adaptiveLevels = before;
-            try { if (saved !== null) localStorage.setItem('mathquest_adaptive_levels', saved); } catch (e) { /* storage off */ }
+            // (the levels in play, when none were saved yet: they are saved now, so a reload keeps them)
+            try { localStorage.setItem('mathquest_adaptive_levels', saved !== null ? saved : JSON.stringify(before || {})); } catch (e) { /* storage off */ }
             toast('Levels put back.');
         });
         return;

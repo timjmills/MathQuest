@@ -754,6 +754,10 @@ function answerTokens(q, steps) {
     // a several-box answer joined in one string ("730; 130; 150; 980"): the whole row is never
     // printed by the worked steps, however long (teacher follow-ups 2026-10-30)
     if (q && typeof q.ans === 'string' && /;/.test(q.ans) && q.ans.trim().length > 12) out.add(q.ans.trim());
+    // ... nor any one box of it: each row's value, each expanded-form part (checker 2026-10-30: the
+    // worksheet's first rung printed "The 9 is in the tens place: 90" for every place box)
+    if (q && typeof q.ans === 'string' && /;/.test(q.ans)) q.ans.split(';').forEach(add);
+    if (q && Array.isArray(q.expandedValues)) q.expandedValues.forEach(add);
     // a set of chosen option ids ("Click ALL ..."): the steps print it joined ("Answer: opt0,opt2")
     if (q && q.answerType === 'multi-select-check' && Array.isArray(q.ans) && q.ans.length) {
         q.ans.forEach(add);

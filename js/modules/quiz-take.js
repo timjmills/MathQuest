@@ -6,6 +6,7 @@ import { quizLadderWrong, drawLadder, shownOf, ladderMessage } from './support-l
 import { SKILLS } from './data.js';
 import { clearOfPinnedBar } from './touch-tap.js';
 import { shuffle } from './utils.js';
+import { timeAnswersMatch } from './answer-check.js';
 import { renderMultiSelectCheck, multiSelectMatches, multiSelectAnswerText } from './widgets/multi-select-check.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
@@ -800,10 +801,14 @@ function recordAnswer(flatIdx, studentAnswer, { ladder = true } = {}) {
     } else if (sNorm === aNorm) {
         correct = true;
     } else {
-        // Numeric comparison
+        // Numeric comparison (checker 2026-10-30: parseFloat read "12:00" and "12:15" as 12, so a
+        // wrong minute scored as right)
+        // (a time compares as a time)
         const sNum = parseFloat(sNorm);
         const aNum = parseFloat(aNorm);
-        if (!isNaN(sNum) && !isNaN(aNum) && Math.abs(sNum - aNum) < 0.001) {
+        if (/:/.test(sNorm) || /:/.test(aNorm)) {
+            correct = timeAnswersMatch(sNorm, aNorm, qd.skillId);
+        } else if (!isNaN(sNum) && !isNaN(aNum) && Math.abs(sNum - aNum) < 0.001) {
             correct = true;
         }
     }

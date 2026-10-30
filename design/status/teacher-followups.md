@@ -68,3 +68,35 @@ DONE (commit ee9d6a3, builder Opus low).
 Triage of all 85 open items: `design/status/teacher-followups-triage.md`. 69 already fixed by Teacher site 2.0, 2 dropped,
 5 fixed now (Settings reset: no `confirm()`, toast with Undo; 44 px "?" and tray "×" targets; Send "Clear all" size;
 Decimal places hidden where the skill has no decimals), 6 handed off to family lanes, 4 lead items.
+
+## 4. Independent checker (Opus medium) — round 1, and the fixes
+
+Verdict on a0de0ae: print speed **GO** (byte-identical, 13–20× faster; the measuring frame is aria-hidden, never focused,
+no scroll width, same output after a 1366↔390 resize, light and dark); audit fixes **GO** with should-fixes; support
+ladder **NOT GO**. Evidence: `teacher-followups/check-*.png` (69 files). Fixed in the next commit:
+
+| # | Finding | Fix |
+|---|---|---|
+| B1 blocker | Worksheet expanded form: the first rung's worked steps printed every place value ("The 9 is in the tens place: 90") | `answerTokens` also hides each part of a several-box answer (`q.expandedValues`, each ";" row) — closes should-fix 6 (rounding table showed the other rows' answers) too |
+| B2 blocker (older) | Quiz: a time with the right hour and a wrong minute scored as right (`parseFloat("12:00") === 12`) | quiz-take `recordAnswer`: a value with ":" compares with `timeAnswersMatch` |
+| S1 | Worksheet time item climbed before the settle and two rungs on a retype | the settle also covers time skills |
+| S2 | 900 ms settle too short for a slow typist | 1500 ms, as the quiz |
+| S4 | Decimal places hidden, but those three skills DO deal decimals at Tenths | reverted: the control is shown again (the critic's #14 premise was wrong) |
+| S5 | Undo 19 Tabs away, toast 6 s | focus moves to Undo, and back when the toast goes |
+| minor | "Levels put back." never showed; Undo after no saved levels lost them on reload | toast hidden before the action runs; the restored levels are saved |
+| minor | Hit areas 42 px; tray "×" reached over the chip's own button | "?" inset −9 px (44 px); tray "×" 44 px tall, no reach to the left (a tap on the chip must not remove it) |
+
+Gate change: `ws-support-ladder` waits 1.7 s after a worksheet answer (past the 1.5 s settle) instead of 0.35 s.
+
+Re-check (checker's own script, 1366): worksheet expand / time / rounding table and quiz time / rounding table each climb
+exactly one rung per wrong row, no answer in the ladder text, right answers score.
+
+**Open, not this lane's change (older behaviour):**
+- Quiz expanded form is one typed box and draws no ladder.
+- Whole-grade papers leave the right half of mixed rows empty (blank filler beside ~2 items a page, Grade 2: 30 pages) — same
+  output before this lane; a plan/layout item for the lead (with the 184-skill mix printing one problem a page).
+- Tray "Whole Grade N added … Undo" toast sits over the Print sheet's controls when the sheet opens.
+- Worksheet expand place boxes have no aria-label.
+- Hand-offs from the triage: `select_even_odd` contradicting instruction (number-sense lane); support controls and size ladders
+  on most families' option panels (family lanes); the options gate / Max Number tool items (tool lane); library thumbnails of
+  table skills ~6 px text (preview work).

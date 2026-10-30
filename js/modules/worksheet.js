@@ -2381,7 +2381,7 @@ export function wsSkipCard(idx) {
 // keystroke of one box is not yet a finished try: the card's support ladder climbs once per Check
 // press, so here it climbs once the boxes have been still for a moment (teacher follow-ups, 2026-10-30:
 // the ladder ran through every rung, and went red, while the pupil was still typing one box).
-const WS_SLOT_SETTLE_MS = 900;
+const WS_SLOT_SETTLE_MS = 1500;   // as the quiz: a slow typist pauses inside a number (checker 2026-10-30)
 
 export function checkWorksheetAnswer(idx, settled) {
     const q = state.worksheetQs[idx];
@@ -2455,7 +2455,8 @@ export function checkWorksheetAnswer(idx, settled) {
         isCorrect = normalizeText(value) === normalizeText(q.ans);
     }
 
-    if (!isCorrect && slotVerdict === false && settled !== true) {
+    // (a time's hour and minute boxes feed one value without slots: the same wait, checker 2026-10-30)
+    if (!isCorrect && (slotVerdict === false || isTimeSkill(state.skill)) && settled !== true) {
         // several boxes, all filled, not right yet: neutral while the pupil may still be typing
         input.style.borderColor = "";
         card.style.background = "var(--bg-card)";
