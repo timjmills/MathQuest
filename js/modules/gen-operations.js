@@ -1393,7 +1393,9 @@ function _pageDeal(key, total, decode) {
     };
     while (d.seq.length <= at) {
         const win = d.seq.slice(Math.max(0, d.seq.length - _PAGE_WINDOW));
+        // (`c`: a missing-number sentence's result, capped like an answer: it is the sentence's answer side)
         const fits = (it) => win.filter((w) => w.a === it.a).length < 2 && win.filter((w) => w.ans === it.ans).length < 3
+            && (it.c === undefined || win.filter((w) => w.c === it.c).length < 3)
             && !win.some((w) => w.a === it.a && w.b === it.b);
         let pickIt = null;
         for (let k = 0; k < d.wait.length; k++) if (fits(d.wait[k])) { pickIt = d.wait.splice(k, 1)[0]; break; }
@@ -4694,7 +4696,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         // (a, b, ans as the item will carry them: a op b = c)
                         const A = add ? p1 : w, B = add ? w - p1 : p1, C = add ? w : w - p1;
                         const ans = pos === 'first_add' || pos === 'minuend' ? A : pos === 'second_add' || pos === 'subtrahend' ? B : C;
-                        return { pos, whole: w, part1: p1, a: A, b: B, ans };
+                        return { pos, whole: w, part1: p1, a: A, b: B, ans, c: C };
                     });
                     position = _dl.pos; whole = _dl.whole; part1 = _dl.part1;
                 } else {
@@ -4825,7 +4827,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const _mmDeal = !(_mmTicked.length === 1 && _mmTicked[0] === 'across');
                 // L10: ÷ or × per cell and the ÷ notation are two independent deals (page-deal.js),
                 // balanced but in a random order, never × ÷ × ÷.
-                const _mmDiv = _mmDeal && dealIndex(`mm-op:${state.skill}`, 2) === 0;
+                // ops-family G1: a page whose ticked ways are ALL ÷ forms (Bracket, Fraction bar - no Across)
+                // is a page of ÷ sentences: a × sentence cannot be written on a bracket or a bar, and a
+                // one-line × beside a two-line fraction left one band in every mixed row (H13).
+                const _mmDiv = _mmDeal && (!_mmTicked.includes('across') || dealIndex(`mm-op:${state.skill}`, 2) === 0);
                 // ops-family G1 (2026-10-30): the skill is "Missing Factors", so every item hides a number
                 // BEFORE the = sign (___ × 6 = 42, 42 ÷ ___ = 7). The plain product / quotient after = is
                 // the fact drills' job (mult_facts, div_facts) and is no longer dealt here.
@@ -4844,7 +4849,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // (a, b, ans as the item will carry them: a × b = c, a ÷ b = c)
                     const r = pos === 'first_factor' ? { a: f2, b: f1, ans: f2 } : pos === 'second_factor' ? { a: f1, b: f2, ans: f2 }
                         : pos === 'dividend' ? { a: f1 * f2, b: f1, ans: f1 * f2 } : { a: f1 * f2, b: f2, ans: f2 };
-                    return { pos, f1, f2, ...r };
+                    // (c: the sentence's result - the product, or the quotient)
+                    const cc = pos === 'first_factor' || pos === 'second_factor' ? f1 * f2 : pos === 'dividend' ? f2 : f1;
+                    return { pos, f1, f2, ...r, c: cc };
                 });
                 const position = _mmDl.pos;
                 const _mmF1 = _mmDl.f1, _mmF2 = _mmDl.f2;

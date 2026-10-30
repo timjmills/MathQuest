@@ -56,3 +56,23 @@ Budget: lane cap ~$300
     (add_sub_10s/100s across fact drawn beside in a mixed-sections column: render has no column count), sibling-compare
     (no approved sibling on `equation` / `division`: 145 counts unproven).
   - After PNGs: design/status/ops-family/after/<skill>-{paper,card}.png. Run logs: design/audit/runs/ops-family/.
+- 2026-10-30 G1 fix round (lead ruling): add_sub_10s, add_sub_100s, missing_add_sub, missing_mult_div only.
+  - Times: fix round ~75 min builder wall time (sibling check 5 min, fixes 25 min, slot-clip attempt 15 min + 20 min rerun, gates 10 min).
+  - Rulings recorded: `equation` + `fact: true` accepted for add_sub_10s/100s (card updated); missing_mult_div keeps no
+    product/quotient-after-= (option/preset candidate); div_zero_in_quotient HELD OUT of the critic round.
+  - OPEN ENGINE ITEM (no owner in this lane): lesson.js chart cannot hold a 6-row long-division bracket (div_zero lesson
+    L/S: OVERFLOW ×8, ILLEGIBLE ×6 - the step words fall under the drawing into the Say / Rule bands; a zoom-below-1
+    fallback did not help and was reverted). div_zero's S side band (34 %) is the class pinned on long_div_2digit (31 %).
+  - Fixed: PAGEFILL (S add_sub_100s 29 %, M add_sub_10s 27 % -> clean; sibling sub_100_no_regroup clean on main, so ours
+    was fixed: a section of top-start one-line sentences fills the grid, layout.js `topFill`); options-render Fraction
+    (H13 + CL-40 -> clean: a Bracket/Fraction-only page deals ÷ sentences only, the fraction sentence clears the label);
+    dealer-uniform (missing_mult_div 1 -> OK: ws-card-rulings readItem reads a missing-number sentence's result as `ans`,
+    and the page dealer caps the result too; results for the 7 approved / div_facts / add_facts unchanged).
+  - Still red: options-render capacity, Fraction ticked (S 28 vs 30, L 15 vs 16: the two-line fraction form is a drawing
+    the tool counts as appearance - asks for a ruling); slot-clip on mixed-sections pages (add_sub_10s/100s, CLIP 6-8 own
+    a row): see cause below.
+  - slot-clip cause: on a Sections sheet the composer gives the add_sub across-fact rows the BESIDE-form height
+    (17.3 / 14.9 / 12.4 mm at L / M / S) while the cell, at 3-4 columns, draws the answer-below form (~26 mm at L), so it
+    spills 4-8 mm. Change needed: the sections composer (print-sheet shareRows / resolveBandedLayout) must size a section's
+    rows from `measured[cols]` at the column count it finally draws. Attempt (draw below whenever the column count is
+    unknown) moved the spill from horizontal to vertical; reverted.

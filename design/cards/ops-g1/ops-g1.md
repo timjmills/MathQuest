@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"ops-g1","kind":"family","template":"equation","families":["addition","subtraction","division"],"match":{"templates":["equation","division"]},"config":"design/cards/ops-g1/card.json","indexSha":"102112580fef3696b7c0d0eec27f441c4e4b949f","bodySha":"756eba6e9056b0db","format":2,"configSha":"726b40c4e2ce"}
+{"card":"ops-g1","kind":"family","template":"equation","families":["addition","subtraction","division"],"match":{"templates":["equation","division"]},"config":"design/cards/ops-g1/card.json","indexSha":"102112580fef3696b7c0d0eec27f441c4e4b949f","bodySha":"5192fc5eaaf39c49","format":2,"configSha":"249d4a75c218"}
 {"cited":"AK-1 AK-2 AX-4 BD-4 BD-7 BD-10 BD-11 CL-8 CL-40 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L2 L3 L5 L6 P-1 PG-14 PT-FPR-6 PT-FRM-6 PT-FRW-5 PT-FRW-6 PT-GDP-1 PT-GDP-2 PT-SCR-1 RP-1 RP-20 RP-21 SL-2 SL-3 SP-1 SP-2 SP-10 SP-12 VA-10 VA-60 VA-61 VA-62 VA-63 VA-66 WRM-rule-18","rules":"DN-22 9d3337 TY-25 b0a223 PG-11 2a95c0 SL-12 3cbafa AK-4 8d027b VA-60 acb280 61 841427 63 ab9c70 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 10 d2ca35 H13 36f579 SP-1 87c2cc 3 7b7bfb CL-4b 12a353 AK-2 d4709f AX-4 2eb6c1 CL-40 2a6dbb P-LC-9 bc47bd PG-20 9c7999 SCC-01 8aa70b TY-7 e3e1e1","entries":""}
 -->
 <!-- rulings
@@ -12,8 +12,8 @@
 "todo": [
  {"id":"T-5.1","source":"§5.1","text":"\"Within N\" bounds the ANSWER (the sum, the number you take from, the product, the numbe..."},
  {"id":"T-5.2","source":"§5.2","text":"A distinct option is ALSO a findable skill: 10 more / 10 less (and 100) and the answer-..."},
- {"id":"T-9.1","source":"§9.1","text":"add_sub_10s / add_sub_100s on `fact` (horiz) as briefed, or on `equation`?"},
- {"id":"T-9.2","source":"§9.2","text":"missing_mult_div: drop the plain product / quotient (after =) from the default?"},
+ {"id":"T-9.1","source":"§9.1","text":"add_sub_10s / add_sub_100s on `fact` (horiz) or `equation`?"},
+ {"id":"T-9.2","source":"§9.2","text":"missing_mult_div: the plain product / quotient after =?"},
  {"id":"T-9.3","source":"§9.3","text":"Split add_sub_10s / add_sub_100s into add / sub skills (catalogue)?"}
 ]
 }
@@ -109,7 +109,7 @@ add_sub_10s: 10 more / 10 less than any number to 100 (1.NBT.C.5, 1.NBT.C.6 part
 
 ## 3. The drawing
 
-Template `equation` — `js/modules/sheet/cells/equation.js`; also div_zero_in_quotient is drawn on the `division` template (js/modules/sheet/cells/long-division.js). The brief named `fact` (notation horiz) for add_sub_10s / add_sub_100s; measured, the fact cell kept its 38 mm VA-70 height and its own digit ladder at every size (S printed the L page, 3 x 4; cells more than half empty), so G1 draws them on `equation` with unknown 'result' (open question 1)..
+Template `equation` — `js/modules/sheet/cells/equation.js`; also div_zero_in_quotient is drawn on the `division` template (js/modules/sheet/cells/long-division.js). The brief named `fact` (notation horiz) for add_sub_10s / add_sub_100s; measured, the fact cell kept its 38 mm VA-70 height and its own digit ladder at every size (S printed the L page, 3 x 4; cells more than half empty), so G1 draws them on `equation` with unknown 'result' - RULED by the lead 2026-10-30: `equation` with `fact: true` ACCEPTED for add_sub_10s / add_sub_100s on this measurement (equation: L 16 / 15, M 24, S 30 / 28 a page, independent print-lint S/M/L clean). div_zero_in_quotient is HELD OUT of the G1 critic round (its lesson chart overflow is a lesson.js engine item)..
 
 **Sizes S / M / L:** digits 16 / 22 / 28 pt at S / M / L (tokens.js SIZES); the slot B(n) from the widest answer the page's band allows (L3). Equation rows stretch at most 2.0 x (PG-11). The division bracket: one box over every dividend digit, two work rows per dividend digit.
 
@@ -211,8 +211,8 @@ Each runs as `node tests/scripts/<script> …`.
 
 ## 9. Open questions (recommended answers)
 
-1. **add_sub_10s / add_sub_100s on `fact` (horiz) as briefed, or on `equation`?** Recommended: `equation` (unknown 'result'): measured, `fact` across printed 3 x 4 = 12 items at both S and L with the answer line under the sentence and > 50 % of every cell empty; `equation` reads S / M / L (L 2 x 5, S 3 x 7 for 10s).
-2. **missing_mult_div: drop the plain product / quotient (after =) from the default?** Recommended: Yes, done in G1: the skill is 'Missing Factors'; the plain fact is mult_facts / div_facts. An `unknown` option like missing_add_sub's can bring it back if the owner wants it.
+1. **add_sub_10s / add_sub_100s on `fact` (horiz) or `equation`?** Recommended: Ruled 2026-10-30 (lead): `equation` with `fact: true`, from the measurement in section 3.
+2. **missing_mult_div: the plain product / quotient after =?** Recommended: Ruled 2026-10-30 (lead): dropped for a 'missing' skill; an `unknown` option or a preset is a candidate for later, not built now.
 3. **Split add_sub_10s / add_sub_100s into add / sub skills (catalogue)?** Recommended: Keep the ids (share codes); the task option gives one operation per page, and presets make each findable.
 
 Signed: (not yet signed)
@@ -299,7 +299,7 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:true-false` — provider wrongAnswer: real 5/5 (all 5) [UNDECIDED]
 - `role:reason-it` (also reason) — provider workedSteps: real 5/5; provider wrongAnswer: real 5/5 (all 5) [UNDECIDED]
 - `role:stretch` — the skill's own items (all 5) [UNDECIDED]
-- `role:lesson` — lesson data: prereqs.js 0/5 (FALLBACK, warm-up from the earlier skills in data.js order, on add_sub_100s, add_sub_10s, div_zero_in_quotient, missing_mult_div, missing_add_sub) (all 5) [UNDECIDED]
+- `role:lesson` — lesson data: prereqs.js 5/5 (all 5) [UNDECIDED]
 
 **Screen hosts** (8 lines; 8 undecided)
 

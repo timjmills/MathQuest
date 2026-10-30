@@ -142,7 +142,11 @@ register('equation', {
                 ? `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
                     + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;">${A}</span><span style="padding:0 0.2em;">${B}</span></span>`
                 : `${B}<span style="border-top:0.75pt solid #000;border-left:0.75pt solid #000;border-top-left-radius:0.4em;padding:0.05em 0.3em 0 0.3em;margin-left:0.15em;">${A}</span>`;
-            return `<div class="ws-eq"${p.notation === 'bracket' ? ` ${WRITE_ABOVE}` : ''} data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
+            // (a missing-number fraction sentence - ops-family G1, `fact` with its unknown before = - is a
+            // top cell like the across facts: it clears the label keep-out the same way, CL-40)
+            const acr = p.fact && p.notation === 'fraction' && u !== 'result' ? ' data-ws-across="1"' : '';
+            const pad = acr && ctx.mode !== 'screen' ? ';padding-top:2.5mm' : '';
+            return `<div class="ws-eq"${p.notation === 'bracket' ? ` ${WRITE_ABOVE}` : ''}${acr} data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ` style="align-items:center${pad}"` : ''}>${body}<span class="o">=</span>${R}</div>`;
         }
         if (p.fact && u === 'result') {
             // A division FACT across (div_facts Standard, alone or in Mix, critic R2 R-2): ONE across
@@ -204,6 +208,9 @@ register('equation', {
             // fact forms of its page instead of measured as a visual.
             wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction' && !p.fact,
             factLike: !!p.fact, maxCols: 4, stretchCap: STRETCH_CAP.equation,
+            // ops-family G1's one-line sentences (+ − × facts, a missing number, never div_facts' own
+            // ÷ fact) start at the top of their cell: the section fills the grid (layout.js topFill)
+            ...(p.fact && !p.notation && !(isDivFact && (p.op === '/' || p.op === '÷')) ? { topFill: true } : {}),
         };
     },
     inputs(p, ctx) {
