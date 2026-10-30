@@ -1,5 +1,7 @@
 # Unfinished work, lined up with the current plan (2026-10-30)
 
+Verified against the code on 2026-10-30. Method: for each branch, every added source line (over 25 characters) was looked up in the same file on HEAD (`48fa04aa`), and `git merge-tree` against HEAD showed which files conflict. "x/y" below = added lines already on HEAD / added lines.
+
 Owner request: "check all of the previous work that was unfinished to line it up with our current work if possible."
 
 **Summary.** 21 remote branches are not merged into `origin/master` (fetched 2026-10-30, master at `433cbbd8`). Almost all are
@@ -7,35 +9,35 @@ September/October WIP saves from lanes the owner paused; master has moved on a l
 wave 0 process, 7 skills passed in `js/modules/redesign-passed.js`). Nothing should be merged wholesale. Two small branches
 are worth taking (quiz multi-select, the four shape skills); the paused family lanes are worth *mining* when their family
 comes up again, and every family lane that draws pictures should now wait for the representation-choice rule and the
-graphic library that start today. Verdicts: MERGE 2, MINE 12, SUPERSEDED 5, DROP 2.
+graphic library that start today. Verdicts after the code check: MERGE 2 (bold-volta done as `48fa04aa`; fervent-brahmagupta), MINE 14, SUPERSEDED 4, DROP 1. Three verdicts changed: the wind-down snapshot `a3256` is the only copy of Lane D rounds 4-12 (MINE, not DROP); `af686` holds the Wave 1 Lane B answer-box option, which is not on master (MINE, not superseded: the "Lane B" that passed on master is Wave 0 lane B, a different lane); `wip-laneD` and `wip-laneB` are superseded by those two branches, not by master.
 
 ## 1. Branches not merged into master
 
 Effort: S = under an hour, M = a lane round, L = a full lane.
 
-| Branch | What / last commit | State | Verdict | Where it goes in the plan | Effort |
+| Branch | What | Checked against code | Verdict (changed?) | Where it goes | Effort |
 |---|---|---|---|---|---|
-| `bold-volta-ht8krw` | 2026-10-17 quiz answers "Click ALL ..." items with multi-select tiles; 1 commit, 6 files | `quiz-take.js` on master has no multi-select support, so the bug is still live | MERGE: cherry-pick the one commit onto a fresh branch, rerun boot smoke + a quiz browser check | Teacher site 2.0 (quiz host); before truly mixed pages, which will mix these items in | S |
-| `fervent-brahmagupta-tlfbhw` | 2026-10-17 four searchable shape skills on `shape-art.js` (3 commits) | `shape-art.js` not on master; diff touches the generated catalogue (7k lines) | MERGE carefully: take `shape-art.js`, data.js, gen-geometry, skill-options, standards, wrm, search-terms, skill-codes-frozen; REGENERATE the catalogue/coverage files instead of merging them; check the code snapshot only appends | Geometry family; drawings must then be checked against the new graphic library | M |
-| `sleepy-pasteur-psyvgl` | 2026-10-17 Small fixes item 8 rounds 8-11 (r11 FAIL G1-G6); 10 commits, 253 files (mostly renders) | Small fixes lane PASSED at r10; r11 findings open | MINE: the code commits for G1-G6 only, skip the render PNGs | Build-speed process "small fixes" queue | S |
-| `...-wip-a3256e8dfc9684535` | 2026-10-17 "WIP at wind-down (unverified)"; 122 commits, 1968 files | Huge unverified wind-down snapshot; most of it is the other WIP branches and renders | DROP (keep the branch as an archive; mine from the named lane branches instead) | none | - |
-| `...-wip-adbb61b8450078736` | 2026-10-17 Fraction key helper paused (critic r8 FAIL) | Paused, not passed | MINE: the key-rendering fixes | Fractions family lane, after the graphic library (fraction bars/circles are library drawings) | M |
-| `...-wip-aea16a31534a8fe34` | 2026-10-09 Steps-box gate results note, 1 file | Steps box PASSED on master | SUPERSEDED | - | - |
-| `...-wip-af686f163db04a00a` | 2026-10-09 Lane B r6 (answer strips, page fill) | Lane B passed later on master (wave 1) | SUPERSEDED (check `git log` for "Lane B r6" only if a strip bug reappears) | - | - |
-| `...-wip-anchors` | 2026-09-26 worked examples anchor-r2 fixes | Anchors not passed, paused | MINE: "real-move stack examples" + key-safe generators | Lessons engine / model page role; after the vocabulary redesign | M |
-| `...-wip-countby-shrink` | 2026-10-03 WIP save, 37 files, 0 line changes (PNG only) | Renders only | DROP | - | - |
-| `...-wip-detailed-lessons-2` | 2026-10-17 lesson 6 fix round 3 paused | Detailed lessons 6-10 not done | MINE: lesson 6 work as the starting point | Lessons lane, after vocabulary redesign (lessons use the new word list) | M |
-| `...-wip-figures` | 2026-09-26 figures-r8 fixes done, final re-render pending | Not passed (8 rounds) | MINE: graph-row width fix | Data/graphs family; depends on graphic library | L |
-| `...-wip-fractions` | 2026-09-26 fractions-r1 fixes started, unverified | Not passed | MINE (low value, unverified) | Fractions family, with the Fraction key branch | M |
-| `...-wip-geometry` | 2026-09-26 geometry-r2 footprints (shape-figure beside layout) | Not passed | MINE: beside-layout footprints | Geometry family, with the shape skills above; depends on graphic library | L |
-| `...-wip-k2` | 2026-09-26 odd_even parity cell, compose_whole frac-wall; mixed_composing S H13 open | Not passed | MINE: parity cell + frac-wall; fix S H13 in the lane | K-2 family; truly mixed pages need mixed_composing | M |
-| `...-wip-laneB` | 2026-10-02 Lane B r2 + answer-box teacher option | Lane B passed on master | SUPERSEDED | - | - |
-| `...-wip-laneD` | 2026-10-03 Lane D r3: rows share the page, boxed fact answers | Lane D print backlog paused at r8 FAIL; this is older | SUPERSEDED by the later Lane D rounds; the open issue is the r8 FAIL itself (section 2) | - | - |
-| `...-wip-lessons` | 2026-09-26 Prerequisite Check part (LR-17), 25-seed gate to triage | Lessons engine passed later; LR-17 status unclear | MINE: LR-17 if master has no Prerequisite Check part | Lessons lane | S |
-| `...-wip-operations` | 2026-09-26 ops lint fixes: add_sub_10s/100s, missing_* and div_zero_in_quotient to kit cells | Matches the BACKLOG ops list, still open | MINE: these cell moves | Operations family lane (first of the family lanes; fact skills feed truly mixed pages) | M |
-| `...-wip-placevalue` | 2026-09-26 pv-r3 fixes, renders/gates not re-run | Not passed | MINE: layout/deal/wording fixes | Place value family; base-10 blocks depend on graphic library | M |
-| `...-wip-teacher-ui` | 2026-09-26 teacher home six actions, one find bar | Teacher site 2.0 replaced this home | SUPERSEDED | - | - |
-| `...-wip-wave0-process` | 2026-10-23 ws-spec-card unhashed options block (7b) | master's `ws-spec-card.mjs` already has the informational block (S1 fix 2026-10-24) | SUPERSEDED (diff once to confirm the 64 backtests are on master) | - | - |
+| `bold-volta-ht8krw` | quiz multi-select | cherry-picked as `48fa04aa` | DONE | - | - |
+| `fervent-brahmagupta-tlfbhw` | four shape skills on `shape-art.js` | `shape-art.js` absent on HEAD; data.js 0/12, skill-options 0/27, gen-geometry 5/47 lines present. Conflicts only in generated files, `index.html` (asset stamp) and `skill-codes-frozen.js` (append both) | MERGE (same): commits `b380d217`, `af18d8f0`, `da59b430`; regenerate catalogue/coverage, restamp, keep both frozen-code appends | Geometry family | M |
+| `sleepy-pasteur-psyvgl` | Small fixes item 8, count rows wrap on screen | none of it is on HEAD: count-row.js 0/63, screen-cell.js 2/97, new gate `small-fixes-countrow-wide.cjs` absent. So even the r10 PASS code never reached master. Conflicts in 5 files | MINE (wider than before): code commits `84613f3e`, `e4aae4b5`, `40209b63`, `680d1bbc` (r7-r10, passed) and `f0d4a489` (r11 G1-G6, unverified); skip render/report commits | Small fixes queue | M |
+| `...-wip-a3256e8dfc9684535` | wind-down snapshot | NOT just copies: it is Lane D rounds 3 to 12d (critic r3-r8 reports, r12 area-model kit cells, pool page judge, long-multiplication/parity/frac-wall/area-model-div cells, `ws-sheet-timing`, `ws-sheet-determinism`, `ws-key-letters` gates). Almost none on HEAD (practice.js 0/229, layout.js 1/133, print-sheet.js 16/1045). 19 source files conflict | MINE (was DROP): take Lane D from here, last critic r8 FAIL (`ffbe879f`); r12 commits are unverified. Start from `235d44b4` (r12d) and re-gate | Lane D restart (section 2) | L |
+| `...-wip-adbb61b8450078736` | Fraction key r9 | `cells/fos.js` absent; utils.js 0/69, multi-select-check 3/53, review.js 2/121. 11 files conflict | MINE (same): `030fb05b`, `d5fa165f`, `db3bc33b`, `d45b3e22` and the r9 WIP `296146fc` | Fractions family | M |
+| `...-wip-aea16a31534a8fe34` | steps-box note | 1 doc file, merges clean | SUPERSEDED (same) | - | - |
+| `...-wip-af686f163db04a00a` | Wave 1 Lane B r2-r6: answer-box teacher option, strip entry | `skill-ansbox-skills.js` absent; no `ansBox` option in skill-options.js; screen-cell 8/241. 15 files conflict | MINE (was SUPERSEDED): `755cffc3`, `28f79e60`, `81405d61`, `7c29d978`, `e7a99aa1`, `041d2047`, `d5fbf5d5` | Screen hosts (Teacher site 2.0) / fact layouts | M |
+| `...-wip-anchors` | worked-example anchors r2 | anchors.js 4/325; `ws-anchor-steps.cjs` absent; 6 conflicts | MINE (same) | Lessons engine / model page | M |
+| `...-wip-countby-shrink` | PNG only | no source change | DROP (same) | - | - |
+| `...-wip-detailed-lessons-2` | detailed lesson 6 | `lessons/detailed/g4-nbt1-ten-times-value.js` and `cells/pv-times.js` absent; code merges clean (only CLAUDE.md and STATUS.md conflict) | MINE (same, easy): `c2a6d8b4`, `f0990693`, `88f7d2d0` + research `9051b4f8`, `1f5ec74a`, rule `c922be81` | Lessons | M |
+| `...-wip-figures` | figures r8 | figures cell 11/504, providers 22/273; 6 conflicts | MINE (same) | Data/graphs, after graphic library | L |
+| `...-wip-fractions` | fractions r1 | gen-fractions 245/775, frac-model 9/429; `hundred-square.js`, `frac-text.js` absent; 12 conflicts | MINE (same, low value) | Fractions family | M |
+| `...-wip-geometry` | geometry r2 | `gen-geo-kit.js`, `geo-compose.js`, `shape-figure/shape-fill/shape-grid/coord-grid/solid-kit` cells and 4 unit gates absent; 4 conflicts. Drop its `tests/scripts/tmp-*` files | MINE (same) | Geometry family | L |
+| `...-wip-k2` | K-2 r? | `parity.js`, `frac-wall.js`, `picture-row.js`, `sort-rings.js` absent; k2 provider 16/594; 17 conflicts | MINE (same) | K-2 family | M |
+| `...-wip-laneB` | Lane B r2 | ancestor of `af686` | SUPERSEDED by `af686` (was: by master) | - | - |
+| `...-wip-laneD` | Lane D r3 | ancestor of `a3256` | SUPERSEDED by `a3256` (was: by master) | - | - |
+| `...-wip-lessons` | lesson library phase 0 + LR-17 | NOT on HEAD: `lessons/library.js`, `seed-db.js`, `prereq-db.js`, `sheet/lesson-pages/*` (incl. `prereq-check.js`), `lesson-rules.js`, `tests/lib/browser-lock.cjs`, 4 lesson gates all absent. HEAD's `roles/pre-skill-check.js` is a different page (PAGE_TYPES 2.10, prerequisites = earlier skills in the category); no "LR-17" anywhere on HEAD | MINE (same, bigger): `cf428e41`, `ea22a97f` (LR-17), `ebcf82e7` (LR-18), phase 0.1-0.9 `669df31a`..`0e40332e`; 8 conflicts incl. roles/lesson.js | Lessons, after vocabulary redesign | L |
+| `...-wip-operations` | ops kit cells | `gen-ops-build.js`, `fact-ladder/int-line/long-multiplication/share-plates` cells, `providers/integers.js` absent; 11 conflicts | MINE (same) | Operations family | M |
+| `...-wip-placevalue` | pv r3 | gen-pv 50/529, pv cell 2/467, `ws-pv-deal.cjs` absent; 15 conflicts | MINE (same) | Place value family | M |
+| `...-wip-teacher-ui` | old teacher home | teacher-print 16/338; `teacher-find.js`, `sheet/papers.js`, `prerequisite-skills.js` absent | SUPERSEDED (same): Teacher site 2.0 replaced the home. `sheet/papers.js` (paper sizes) worth a look if Letter/A4 comes up | - | - |
+| `...-wip-wave0-process` | ws-spec-card informational block | ported: HEAD `ws-spec-card.mjs` lines 815-839 carry the same block, citing "W0-B fix 02c5308e, ported"; HEAD is the later version (diff is HEAD's newer code) | SUPERSEDED (same, confirmed) | - | - |
 
 ## 2. Paused lanes and logged-for-later items
 

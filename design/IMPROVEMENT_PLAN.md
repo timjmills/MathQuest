@@ -1306,6 +1306,44 @@ The owner's design, from answers asked one by one:
    same drawings. A vocabulary problem type is a distinct task kind, so each is ALSO a findable preset skill (owner rule
    2026-10-17), with standards, WRM, search terms and share codes.
 
+## Work order from 2026-10-30: every unfinished branch and paused lane, integrated (owner: "check all of the unfinished work on branches to integrate them into our current plans")
+
+Source: `design/status/unfinished-2026-10-30.md`, **verified against the code** (each branch's added lines looked up on HEAD,
+conflicts by `git merge-tree`). Lead decisions (owner: "do what you think is best"): WRM Y4 site lessons get one fix round
+(7.96 is not 8); the shape skills merge after the graphic library so their drawings are made once; old draft PRs #13/#14/#18
+and archive branches are kept (nothing is deleted). A branch is MINED by cherry-picking the named commits into the lane that
+owns its family, then that lane runs its full process (spec card, precritic, independent critic ≥ 8). Nothing is merged
+wholesale. Every lane that draws pictures waits for the representation-choice rule and the graphic library (in progress
+2026-10-30: `design/specs/visual-redesign-2026-10-30.md`, `design/GRAPHIC_LIBRARY.md`).
+
+**Two lanes recorded as done have no code on the site** (found by the check): Small fixes r10 (count-row code, branch
+`sleepy-pasteur-psyvgl`) and the Wave 1 Lane B answer-box teacher option (branch `wip-af686f163db04a00a`). Both are re-landed
+in step 1, through a critic, not trusted from the old record.
+
+| # | Work | From (branch · commits) | Waits on | Effort |
+|---|---|---|---|---|
+| 0 | Done 2026-10-30: quiz "Click ALL" multi-select | `bold-volta-ht8krw` · 95ced723 (live as 48fa04aa) | — | — |
+| 1 | Process fixes: 44 presets' instruction key + its gate; ws-teacher-shell first-run flake; ws-backtest in a shallow clone | — (running 2026-10-30) | — | S |
+| 1a | Re-land Small fixes count-row (r10) + r11 G1–G6 fixes, then one critic round | `sleepy-pasteur-psyvgl` · 84613f3e e4aae4b5 40209b63 680d1bbc f0d4a489 | — | S |
+| 1b | Re-land the answer-box teacher option (skill-ansbox-skills.js, ansBox option), then one critic round | `wip-af686f163db04a00a` · 755cffc3 28f79e60 81405d61 7c29d978 e7a99aa1 041d2047 d5fbf5d5 | — | M |
+| 1c | Missing critic rounds: Skip-count (r5), White Rose page (r9); WRM Y4 site lessons one fix round | — | — | S |
+| 2 | Detailed lessons 6–10: merge lesson 6–7 code (applies cleanly), finish 6, review 7, build 8–10 | `wip-detailed-lessons-2` · c2a6d8b4 f0990693 88f7d2d0 (+ research 9051b4f8 1f5ec74a) | vocabulary redesign for 8–10 | L |
+| 3 | **Lane D restart** (fact layouts) from the only copy of rounds 3–12d: long-multiplication, parity, frac-wall, area-model-div cells, pool page judge, ws-sheet-timing / ws-sheet-determinism / ws-key-letters gates; plus ÷ facts in 10 columns in all three notations and sub_facts S H13 | `wip-a3256e8dfc9684535` · restart from 235d44b4 (r8 FAIL ffbe879f; r12 unverified; 19 files conflict) | — | L |
+| 4 | Operations family lane (first family lane): kit cells for add_sub_10s/100s, missing_*, div_zero_in_quotient | `wip-operations` | representation rule + graphic library | M |
+| 5 | Lessons engine phase 0 (library, seed-db, prereq-db, lesson-pages, browser-lock) + Prerequisite Check part LR-17 | `wip-lessons` · cf428e41 ea22a97f ebcf82e7 + phase 0.1–0.9 (669df31a..0e40332e) | vocabulary redesign | L |
+| 6 | Graphic library first entries: tape diagram (fixes tape_diagram overflow), bar model, number bond / fact-family house, base-10, fraction bar/circle, shapes | — | the library spec | M |
+| 7 | Geometry family + the four shape skills (shape-art.js; regenerate the generated catalogues; keep both appends in skill-codes-frozen.js) + beside-layout footprints | `fervent-brahmagupta-tlfbhw` · b380d217 af18d8f0 da59b430; `wip-geometry` (skip tmp-* files) | graphic library | L |
+| 8 | Fractions family + Fraction key | `wip-adbb61b8450078736` · 030fb05b d5fa165f db3bc33b d45b3e22 296146fc; `wip-fractions` | graphic library | L |
+| 9 | K-2 family: parity cell, frac-wall, mixed_composing S H13 (needed by truly mixed pages) | `wip-k2` | graphic library | M |
+| 10 | Place value family | `wip-placevalue` | graphic library (base-10) | M |
+| 11 | Data/graphs (Figures) family: graph-row width fix | `wip-figures` | graphic library | L |
+| 12 | Anchors / worked examples (real-move stack examples, key-safe generators); guided W1, stretch ST1, error analysis EA1 | `wip-anchors` | vocabulary redesign | M |
+| 13 | Teacher site 2.0 follow-ups: whole-grade print speed, support ladder on worksheet/quiz hosts, double edge, option panels audit | — | — | M |
+
+Superseded (nothing to take): `wip-laneD` (an ancestor of `wip-a3256…`), `wip-laneB` (an ancestor of `wip-af686…`),
+`wip-teacher-ui` (Teacher site 2.0 replaced it), `wip-aea16a31534a8fe34` (a note), `wip-wave0-process` (HEAD's
+ws-spec-card.mjs is the later version). Drop: `wip-countby-shrink` (renders only). Branches stay on GitHub as archives.
+
 ## Glossary (for builders)
 
 - **Precritic** — the automatic checks a builder runs before an independent critic grades the work.
