@@ -222,6 +222,9 @@ function normaliseRequest(req = {}) {
             ? Object.fromEntries(lessonPartIds().filter((x) => req.lessonSeeds[x] !== undefined && req.lessonSeeds[x] !== null && req.lessonSeeds[x] !== '' && Number.isFinite(Number(req.lessonSeeds[x]))).map((x) => [x, Number(req.lessonSeeds[x]) >>> 0]))
             : null,
         perQuestion: Array.isArray(req.perQuestion) ? req.perQuestion.map(Number) : Number(req.perQuestion) >= 1 ? Math.floor(Number(req.perQuestion)) : undefined,
+        // A Prerequisite Check's routes (pre-skill-check.js, plan §8b, lessons-phase0 D1): per question
+        // {lesson, title, checks?} - its "If missed" teacher tag and the key's routing table. Absent otherwise.
+        routes: Array.isArray(req.routes) && req.routes.length ? req.routes.map((r) => (r && typeof r === 'object' ? { lesson: String(r.lesson || ''), title: String(r.title || ''), checks: r.checks ? String(r.checks) : undefined } : null)) : undefined,
         // The detailed lesson: the Mixed page's partners and the Practice last-row rule (absent otherwise).
         mixedSkills: Array.isArray(req.mixedSkills) && req.mixedSkills.length ? req.mixedSkills : null,
         mixedLattice: [4, 6, 8, 10].includes(Number(req.mixedLattice)) ? Number(req.mixedLattice) : 0,
@@ -2889,7 +2892,11 @@ export function arrangeKey(res, ko, req = {}) {
     let keyPages = res.keyPages || (res.keyHtml ? [res.keyHtml] : []);
     // INK-31 (critic r1, B1): only the answers take the key ink; a given claim, the made-up
     // pupil's work and every printed number keep their ink. Each key page is matched to its twin.
-    keyPages = keyPages.map((k, i) => tagKeyAnswers(pupil.length === keyPages.length ? pupil[i] : '', k));
+    // (a `ws-keyextra` page - a Prerequisite Check's routing table - has no pupil twin: it is not paired or tagged)
+    const extraKey = (k) => /class="ws-page ws-keyextra /.test(String(k).slice(0, 400));
+    const twinCount = keyPages.filter((k) => !extraKey(k)).length;
+    let twinAt = 0;
+    keyPages = keyPages.map((k) => (extraKey(k) ? k : tagKeyAnswers(pupil.length === twinCount ? pupil[twinAt++] : '', k)));
     let groupsByPage = null;
     if (ko.style === 'short') {
         const plans = res.keyPlans || (res.plan ? [res.plan] : []);
@@ -3111,6 +3118,8 @@ async function buildRoleSheet(n, metaOf) {
         leadDrop: !!n.leadDrop || undefined,
         // The detailed lesson's Prerequisite Check: items per question (absent otherwise).
         perQuestion: n.perQuestion || undefined,
+        // (a Prerequisite Check's routes: absent on every other sheet)
+        routes: n.routes || undefined,
         growLast: !!n.growLast || undefined,
         // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
         arrangement: 'sections',
@@ -3516,6 +3525,13 @@ async function buildRoleSheet(n, metaOf) {
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
     const out = renderPlan(plan, { key: n.key });
+    // A plan's own teacher page after its key (a Prerequisite Check's routing table, `meta.routePlan`).
+    if (n.key && plan.meta && plan.meta.routePlan) {
+        // (`ws-keyextra`: a key page with no pupil twin - arrangeKey pairs the other key pages with their pupil pages)
+        const extra = renderPlan(plan.meta.routePlan, { key: false }).pupilPages.map((h) => h.replace('class="ws-page ', 'class="ws-page ws-keyextra '));
+        out.keyPages = out.keyPages.concat(extra);
+        out.keyHtml = [out.keyHtml, ...extra].filter(Boolean).join('\n');
+    }
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t)), ...dealNotes];
