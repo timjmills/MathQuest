@@ -87,3 +87,14 @@ Effort: S = under an hour, M = a lane round, L = a full lane.
 - WRM Y4 site lessons at 7.96: count as done, or one fix round?
 - OK to close draft PRs #13, #14, #18 and delete the DROP branches (or keep them as archives)?
 - Should the shape skills merge now, or wait for the graphic library so their drawings are made once?
+
+## Wind-down note, 2026-10-30 23:20 UTC
+
+- **Visual quality + graphic library** (owner ask 3) and **fast PDF previews** (owner ask 2): **not started.** Both agents
+  were stopped at 16:31 by the owner's "STOP… wait" and were never restarted. The worktree `/home/user/mq-visual`
+  (branch `visual-quality-wip`) has no commits beyond the base. First jobs tomorrow, after the lessons 6/7 share-link fix:
+  1. the visual investigation (why answer areas look unpolished, e.g. "Addition Word Problems (within 20, No Pictures)";
+     a number-family drawing for "Is It a Fact Family?"), revising the MD guidance and starting the graphic library;
+  2. fast PDF previews of printouts.
+- Lane D (session_013pHDnLXQQUYhTy6YS4oDjX) is still merging main and running its critic. It goes live only once the
+  owner signs `design/cards/facts/facts.md`.
