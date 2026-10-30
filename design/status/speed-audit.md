@@ -759,3 +759,18 @@ under CL-4b (owner), band instruction for presets.
 | r2 | **PASS 9 / 9 / 8** | stale-pin report for pinned findings (N-r2-3); precritic-plan coverage for gates whose rows name no skill (N-r2-1) | narrow r2 scope (fixes + regressions) in 21 min; one real precritic run of an approved sibling and `--role lesson` on the merged tree before the critic caught 4 of the lane's 5 setup traps |
 
 Details and the reflection: design/status/s1-checks.md.
+
+## ops-family 2026-10-30 (Operations family lane, G1) — self-reflection; the independent auditor (rule 00) is still owed
+- Result: 1 critic round, FAIL (min 4), owner pause after it. Builder 2 runs (≈ 4 h 50 min, 646k tokens) + critic 353k.
+- Causes of the lost round:
+  1. The critic started on a red precritic (8 FAIL) under a lead ruling to meet the pause; two of the red gates (slot-clip,
+     lesson H13) became critical findings F1 / F17. → Rule 0b holds even under a deadline: a red row a lane cannot fix goes to
+     its owner BEFORE the critic, not into the critic.
+  2. 15 of 19 findings had no machine check; three checks exist but are off precritic's path for these roles (L1 --sizes,
+     PAGEFILL on mixed/Test, card-rulings skipped while a card is unsigned). → Put them on the path; the card-rulings skip
+     hides real content defects (F6) — run its predicates with the unsigned card's provisional values.
+  3. Unsigned card with 81 undecided lines: the builder had no rulings on hosts × roles, so Lesson / Test / Sections were
+     not targeted at all. → Card first (rule 3) — no family lane builds before the owner signs.
+  4. Precritic slow (one browser slot; ~50 min of the critic's time was rendering). → Shard renders (S1 tools backlog).
+  5. Lane brief scoped the builder to "the skills"; most failures were page roles (lesson, test, sections). → Brief names
+     every role × size the critic will grade.

@@ -3,7 +3,7 @@ Title: Operations family lane (work order item 4) — first family lane
 Session: session_013pHDnPm6jsqM66jkj7eD7L (lead session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-ops-family (base claude/sweet-newton-c8wrv1 fbeaa332)
 Scope: addition / subtraction / multiplication / division skills, EXCEPT fact skills (Lane D) and the 7 passed column-subtraction skills
-State: G1 building
+State: STOPPED (owner pause, 2026-10-30) after G1 critic r1 FAIL — hand-over below
 Updated: 2026-10-30
 Budget: lane cap ~$300
 
@@ -21,8 +21,57 @@ Budget: lane cap ~$300
 ## Groups (same-shape siblings, one batch each)
 | Group | Skills | Template | State |
 |---|---|---|---|
-| G1 one-line sentences | addition:add_sub_10s, addition:add_sub_100s, subtraction:missing_add_sub, division:missing_mult_div, division:div_zero_in_quotient | fact (horiz), equation, division | building |
+| G1 one-line sentences | addition:add_sub_10s, addition:add_sub_100s, subtraction:missing_add_sub, division:missing_mult_div, division:div_zero_in_quotient | equation (fact look), equation, division | critic r1 FAIL (min 4); div_zero held out |
 | later | word problems (wait for the spec), box_division / area_model_div, number families, mult_properties … (BACKLOG ops list) | — | queued |
+
+
+## HAND-OVER (2026-10-30, owner pause after the current pieces)
+
+**Nothing passed; nothing goes into redesign-passed.js.** Do not merge this branch for deploy yet: the four sentence skills
+are better than main on Independent / More practice / screen hosts (≥ 8 there per critic r1) but fail on Sections, Lesson,
+Test S, mixed pages and the Bracket notation. Critic report: design/audit/runs/ops-family/critic-r1/REPORT.md.
+
+### Done (on the branch)
+- add_sub_10s / add_sub_100s on the kit `equation` cell (fact look): 10 / 100 more or less than ANY number in the band
+  (1.NBT.C.5, 2.NBT.B.8), `task` + band options read, answer line from the widest page answer, hint names the move, page
+  dealer with caps. missing_add_sub: default deals the unknown before =, whole numbers, `unknown` default [1].
+  missing_mult_div: equation cell in every notation, unknown always before =, box width from the band, Bracket/Fraction-only
+  pages deal ÷ only. div_zero_in_quotient: kit `division` bracket, a box over every dividend digit, three kinds.
+- Providers + lesson data for all five; kit fixes: equation footprint double-counted unknown digits (DN-22), key value out of
+  its box, "thesign" space, Guided strip `_sign_`, lesson practice packs one-line fact sentences 10 a page, CL-40 pad,
+  card shows `q.screenInstr`; layout.js `topFill` (top-start one-line sections fill the grid); ws-card-rulings readItem
+  reads a missing-number sentence's result as the answer.
+- Spec card drafted UNSIGNED: design/cards/ops-g1/ops-g1.md (81 option/host lines undecided).
+- PNGs: design/status/ops-family/before|after/<skill>-{paper,card}.png (independent paper L + card 1280, all five).
+
+### Remaining (next round, rebuild of failed work → mq-opus-medium)
+1. F1 Sections overflow — the sections composer (print-sheet.js shareRows / resolveBandedLayout) must size rows from
+   `measured[cols]` at the drawn column count. Engine-owned; was red in precritic before the critic.
+2. F5 Bracket notation: quotient above the bar, never "= 7" after it; never mix bracket items with × in one section.
+3. F6/F7/F8 options: missing_mult_div products ≤ Max; missing_add_sub "Up to 100" must deal past 20; support `level`
+   must change print (or declare levelSubset).
+4. F2/F17/F11/F3/F18 lesson: anchor chart page fill, warm-up band, one item per box, vocab pairs, warm-up grade.
+5. F4 role titles; F9 Test S empty ruled cell; F10 M capacity > L; F13 mixed heading; F14 page fill on mixed/Test;
+   F15 card 390 gap; F16 hints; F19 tags (add_sub_10s primary 1.NBT.C.5; EE for missing_*), option help text.
+6. div_zero_in_quotient: lesson.js chart cannot hold a 6-row bracket (engine item, no owner); then its own critic.
+7. Word problems: wait for design/specs/visual-redesign-2026-10-30.md (not on main at stop time).
+
+### Open decisions (lead / owner)
+- Sign the ops-g1 spec card (81 undecided lines).
+- Presets (owner rule "a distinct option is also a findable skill"): 10 more, 10 less, 100 more, 100 less; missing_mult_div
+  × only / ÷ only; missing_add_sub with the answer position. Not built.
+- options-render: is Fraction a drawing change (accept 28/15 capacity) — lead ruled yes in-lane; confirm.
+- Owner of the sections composer row sizing (F1) and lesson.js long-division chart.
+- Advisory from the critic, outside this lane: quiz builder's own print (printQuizTest) is the legacy renderer for every
+  skill; Fact rows / probe refused with a false reason; Guided / Scripted model pages at L 45–70 % empty.
+
+### Per-round findings (rule 00) — critic r1
+Automatic checks that would have caught each finding: see the Check column of REPORT.md. Already existing and red at
+round start: F1 (slot-clip), F17 (print-lint lesson). Not on precritic's path: L1 --sizes (F10), PAGEFILL on mixed/Test
+(F14), card-rulings (SKIPPED because the card is unsigned → F6). New checks proposed: lesson p1 PAGEFILL, VOCAB-TYPE,
+ROLE-TITLE, L-NOTATION, options-verify range-max + level, EMPTYCELL, L-CELL-ONE, L-ANSAREA SHAPE, mixed heading,
+phone-card inner gap, providers HINT, warm-up grade, OPTION-HELP dealable example.
+Speed-ups: see design/status/speed-audit.md "ops-family 2026-10-30".
 
 ## Owner design list
 
@@ -76,3 +125,5 @@ Budget: lane cap ~$300
     spills 4-8 mm. Change needed: the sections composer (print-sheet shareRows / resolveBandedLayout) must size a section's
     rows from `measured[cols]` at the column count it finally draws. Attempt (draw below whenever the column count is
     unknown) moved the spill from horizontal to vertical; reverted.
+Times: critic r1 (mq-opus-medium), start 2026-10-30T~22:15Z, wall ≈ 1 h 50 min (≈ 50 min renders on one browser slot), tokens ≈ 353k — FAIL min 4.
+Times: lane totals — builder 2 runs ≈ 4 h 50 min, 646k tokens; critic 353k; lead session cost see report.

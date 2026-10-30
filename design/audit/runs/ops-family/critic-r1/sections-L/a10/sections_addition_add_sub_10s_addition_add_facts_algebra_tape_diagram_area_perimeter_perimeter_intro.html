@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="en" data-ws-fonts="ready"><head>
+<meta charset="utf-8">
+<title>4 skills as sections</title>
+<meta name="copyright" content="© 2026 Cultivating the Digital. All rights reserved.">
+<meta name="author" content="Cultivating the Digital">
+<link rel="stylesheet" href="http://127.0.0.1:44559/css/brand.css">
+<link rel="stylesheet" href="http://127.0.0.1:44559/css/variables.css">
+<link rel="stylesheet" href="http://127.0.0.1:44559/css/base.css">
+<link rel="stylesheet" href="http://127.0.0.1:44559/css/ui-components.css">
+<link rel="stylesheet" href="http://127.0.0.1:44559/css/word-problem-visuals.css">
+<link rel="stylesheet" href="http://127.0.0.1:44559/css/print-worksheet.css">
+<link rel="stylesheet" href="http://127.0.0.1:44559/css/fonts/andika.css">
+<link rel="stylesheet" href="http://127.0.0.1:44559/css/sheet-kit.css">
+<style data-mq-sheet-engine="">/* HD-14: a title that does not fit one line wraps to two and takes 6 mm from the body. */
+:is(.ws-page,.ws-sheet) .ws-title{white-space:normal;height:auto;min-height:8mm;line-height:7mm;text-align:center}
+/* HD-20: pages 2+ carry a 12 mm header - Name line, a one-line outlined tab 8 mm tall, the rule. */
+.ws-page:has(.mq-cont) .ws-rowA{height:9mm}
+.ws-page:has(.mq-cont) .ws-rowA .ws-field{height:9mm}
+.ws-page:has(.mq-cont) .ws-rowA .ws-field i{height:8mm}
+.ws-page:has(.mq-cont) .ws-tabbox{width:auto;height:8mm;flex-direction:row;align-items:center;align-self:flex-end;padding:0 3mm;font-size:9pt;line-height:1;white-space:nowrap}
+.ws-page:has(.mq-cont) .ws-tabbox span{font-weight:700}
+.ws-page:has(.mq-cont) .ws-tabbox span:last-child{font-weight:400}
+.ws-page:has(.mq-cont) .ws-tabbox span+span::before{content:"\00a0\00b7\00a0";font-weight:400}
+/* BD-14: an underlined word inside a library instruction. */
+:is(.ws-page,.ws-sheet) .ws-instrline u{text-decoration-thickness:.75pt;text-underline-offset:1.2mm}
+/* SCC-A5: a legacy cell. The legacy markup was written for a full-width column, so it spans the
+   cell; its content starts below the label box (CL-40); the legacy shell's own border, padding
+   and clipping are dropped because the kit cell is the one box (CL-1, CL-7), and nothing may be
+   clipped silently. The key's answer stamp costs no layout, so the problem sits where it sits on
+   the pupil page (AK-1). */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy{align-items:stretch;padding-top:calc(var(--ws-tab,6mm) + 1mm)}
+/* R1: a legacy-sourced item a fact page redraws with the fact template (sub_facts on Fact rows)
+   keeps the fact cell's own top pad (--fp, set clear of the tab by factPadTop), as add_facts does;
+   the legacy 7 mm pushed the L key's answers 0.2 mm out of the 45 mm row (PG-12). */
+:is(.ws-page,.ws-sheet) .ws-cell.fact.mq-legacy{padding-top:var(--fp,2mm)}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy>.ws-legacy{width:100%;min-width:0}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .worksheet-problem{border:0!important;border-radius:0!important;padding:0!important;margin:0!important;overflow:visible!important;background:transparent!important;box-shadow:none!important}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content,:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content>div{overflow:visible}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .stack{margin-left:auto;margin-right:auto}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer{position:absolute;left:3mm;right:3mm;bottom:1.5mm;display:block;text-align:center;font-size:var(--ws-zone);font-weight:700;line-height:1.2}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer .ws-zone{font-size:inherit}
+/* ---- P7.2b roles (roles/compose.js). Scoped to the sheet roots; additive. ---- */
+/* INK-3: a traced value stays grey in print. css/print-worksheet.css forces every legacy
+   .worksheet-problem descendant to black under @media print; the trace is the one exception. */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"],:is(.ws-page,.ws-sheet) .worksheet-problem .ws-trace{color:#949494!important}
+/* TY-2: Andika has 400 and 700 only. Legacy markup asks for 600 in places (visual labels, the
+   "Answer:" caption); inside a sheet it takes the 700 the face really has, never a synthetic bold. */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy :is([style*="font-weight:600"],[style*="font-weight: 600"],.visual-label){font-weight:700!important}
+/* The engine's style block (and page 2's continuation marker) sit before the first band, so the
+   kit's :first-child band rule is restated for them (BD-3: the header rule closes the header). */
+.ws-body>:is(style,.mq-cont):first-child+:is(.ws-band,.mq-row),.ws-body>style:first-child+.mq-cont+:is(.ws-band,.mq-row){margin-top:1.5mm}
+.ws-body>:is(style,.mq-cont):first-child+.ws-band,.ws-body>style:first-child+.mq-cont+.ws-band{border-top-width:var(--ws-heavy)}
+:is(.ws-page,.ws-sheet) .ws-band>.ws-grid.fixed{flex:none}
+/* a value written into a line slot sits on the rule (a key, shown work) */
+:is(.ws-page,.ws-sheet) .ws-line[data-ws-ink]{display:inline-flex;align-items:flex-end;justify-content:center;font-weight:700;line-height:1.1;padding-bottom:.6mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .ws-line.ws-trace[data-ws-ink]{font-weight:400}
+/* PT-OPN-2: parts side by side in one band row (Model | Steps, quadrants, a probe and its strip) */
+:is(.ws-page,.ws-sheet) .mq-row{flex:none;display:grid;column-gap:0;margin-top:-1.5pt;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol{min-width:0;min-height:0;display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band{flex:1 1 auto;margin-top:0;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol+.mq-rowcol>.ws-band{border-left:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band>.ws-grid{flex:1 1 auto}
+:is(.ws-page,.ws-sheet) .mq-row.mq-proberow{margin-top:0;column-gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-col{display:flex;flex-direction:column;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-quadrow+.mq-quadrow{margin-top:3mm}
+:is(.ws-page,.ws-sheet) .mq-quadrow .ws-band{margin-top:0}
+:is(.ws-page,.ws-sheet) .mq-quadscore{margin-left:auto;font-weight:700;white-space:nowrap}
+/* BD-4: the Steps list. Two text columns on the Guided page (PT-GDP-2). */
+:is(.ws-page,.ws-sheet) .mq-stepsband{padding:1mm 3mm 3mm 4mm}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps2{display:block;columns:2;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps2 li{break-inside:avoid;margin-bottom:2.2mm}
+:is(.ws-page,.ws-sheet) .mq-stepszone{padding:1.5mm 3mm 0 4mm;overflow:hidden}
+:is(.ws-page,.ws-sheet) .mq-steptext{width:100%;height:100%;display:flex;gap:2.5mm;align-items:flex-start;padding-top:2mm;font-size:var(--ws-text);line-height:1.3;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-steptext>em{flex:none;font-style:normal;width:7mm;height:7mm;border:var(--ws-hair) solid var(--ws-ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--ws-zone);font-weight:700}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-stepcell{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-steptop{width:100%;height:calc(2 * (1.3em) + 4mm);flex:none}
+/* check-box lines and one-line sentence frames (section 6, P-TH-3) */
+:is(.ws-page,.ws-sheet) .mq-checkline{display:inline-flex;align-items:center;gap:2.5mm;white-space:nowrap;font-size:var(--ws-text);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-checkline .ws-check{margin:0;vertical-align:0;flex:none}
+:is(.ws-page,.ws-sheet) .mq-frame{display:flex;align-items:flex-end;gap:1.5mm;white-space:nowrap;font-size:var(--ws-text);line-height:1.1}
+/* Error analysis and True or False?: the finished work beside the judgement (04-E mock-up) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-thinkcell{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-judge{width:100%;flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:3mm;row-gap:3mm;align-items:end}
+:is(.ws-page,.ws-sheet) .mq-judge-work{min-width:0;align-self:start;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-judge-row{display:flex;flex-direction:column;align-items:flex-start;gap:4mm;padding-bottom:1mm}
+:is(.ws-page,.ws-sheet) .mq-fixline{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-fixline .ws-line{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-tf{grid-template-columns:minmax(0,1fr);align-content:space-between;row-gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-tf>.mq-judge-row{flex-direction:row;gap:12mm;padding:0 0 0 4mm}
+:is(.ws-page,.ws-sheet) .mq-tf>.mq-frame{justify-self:start;padding:0 0 1mm 4mm}
+/* A thinking cell draws its shown answer in the flow (it is measured with it), never over the picture. */
+:is(.ws-page,.ws-sheet) .ws-cell :is(.mq-judge-work,.mq-abbox,.mq-wpcell) .ws-legacy-answer.mq-shown{position:static;margin-top:2mm;left:auto;right:auto;bottom:auto}
+:is(.ws-page,.ws-sheet) .mq-shownline{display:flex;align-items:flex-end;gap:2mm;margin-top:2mm;font-size:var(--ws-text);line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-shownline b{font-weight:700;border-bottom:var(--ws-hair) solid var(--ws-ink);min-width:14mm;text-align:center}
+/* Reason It, "Which is correct" (09-B mock-up): two finished answers A and B, then the frames */
+:is(.ws-page,.ws-sheet) .mq-ab{width:100%;display:grid;grid-template-columns:1fr 1fr minmax(52mm,auto);column-gap:5mm;align-items:start;padding-top:2mm}
+:is(.ws-page,.ws-sheet) .mq-abbox{position:relative;min-width:0;border:var(--ws-hair) solid var(--ws-ink);padding:10mm 2mm 3mm 2mm;display:flex;flex-direction:column;align-items:center;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-abtag{position:absolute;left:0;top:0;width:8mm;height:8mm;border-right:var(--ws-hair) solid var(--ws-ink);border-bottom:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center;font-size:var(--ws-text);font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-abresp{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:6mm;padding:1mm 0 1mm}
+:is(.ws-page,.ws-sheet) .mq-abchoice{display:flex;gap:10mm;padding-left:2mm}
+:is(.ws-page,.ws-sheet) .ws-choice{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;height:12mm;padding:0 1.5mm;font-size:var(--ws-digit);font-weight:700;line-height:1}
+/* Stretch (09-D mock-up): the prompt box, the results table, the closing frames */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell{align-items:stretch;padding:4mm 5mm 4mm 9mm}
+:is(.ws-page,.ws-sheet) .mq-stretch{width:100%;display:flex;flex-direction:column;gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-prompt{padding:2.5mm 5mm}
+:is(.ws-page,.ws-sheet) .mq-stretch-main{display:flex;align-items:flex-end;gap:7mm}
+:is(.ws-page,.ws-sheet) .mq-table{flex:none;border-collapse:collapse;border:var(--ws-heavy) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-table th,:is(.ws-page,.ws-sheet) .mq-table td{border:var(--ws-hair) solid var(--ws-ink);padding:0 2mm;text-align:center;vertical-align:middle}
+:is(.ws-page,.ws-sheet) .mq-table th{height:10mm;font-size:var(--ws-zone);font-weight:700;line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-table td{height:calc(var(--ws-hw) + 3mm);min-width:28mm;font-size:var(--ws-text);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols3 td{width:30mm}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols2 td:first-child{width:60mm}
+:is(.ws-page,.ws-sheet) .mq-table td b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-closing{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6mm;padding-bottom:1mm}
+/* Word problems v2 (07-D mock-up): story box with the answer row, then the equation frame */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-wpcellbox{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-wp{width:100%;flex:1 1 auto;display:flex;flex-direction:column;padding-left:6mm}
+:is(.ws-page,.ws-sheet) .mq-wpstory>div{white-space:normal}
+:is(.ws-page,.ws-sheet) .mq-wpcell{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;padding:3mm 4mm;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wpanswer{display:flex;align-items:flex-end;justify-content:flex-end;gap:4mm;margin-top:2mm;padding-right:4mm}
+:is(.ws-page,.ws-sheet) .mq-ansslot{display:inline-flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-ansslot small{font-size:var(--ws-zone);line-height:1.2;margin-top:.8mm}
+:is(.ws-page,.ws-sheet) .mq-wpwork{flex:1 1 auto;display:flex;align-items:flex-start;padding:8mm 0 0 4mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-wpwork .ws-circle{margin:0 1mm}
+/* Fact probe: horizontal facts and the skip-count strip (PT-FPR-3) */
+:is(.ws-page,.ws-sheet) .mq-hfact{width:100%;display:flex;align-items:flex-end;gap:2mm;padding-top:2mm;font-size:var(--ws-digit);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-hfact .ws-line{font-size:var(--ws-digit)}
+:is(.ws-page,.ws-sheet) .mq-skipstrip{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;display:flex;flex-direction:column;justify-content:space-around;align-items:center;font-size:var(--ws-text);font-weight:700;line-height:1}
+/* ---- 2026-09-25 re-grade fixes (additive) ---- */
+/* Guided Steps band: row-major, so the steps read 1 2 / 3 4 left to right (never 1 3 / 2). */
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows{display:grid;grid-template-columns:1fr 1fr;column-gap:8mm;row-gap:2.2mm;columns:auto}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows.mq-steps-one{grid-template-columns:1fr}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows li{margin-bottom:0}
+/* Error analysis: the judgement beside the work, in the top of the cell (no dead band), and one
+   square write box the pupil writes the fix in. */
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2{align-items:start;column-gap:6mm}
+:is(.ws-page,.ws-sheet) .mq-judge2>.mq-judge-row{align-self:start;gap:4mm;padding:1mm 1mm 1mm 0}
+:is(.ws-page,.ws-sheet) .mq-fixrow{display:flex;flex-direction:column;align-items:flex-start;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-fixslot{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2.mq-judge-stack{grid-template-columns:minmax(0,1fr);row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack>.mq-judge-row{flex-direction:row;align-items:flex-start;gap:10mm;padding-left:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixrow{flex-direction:row;align-items:flex-start;gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixslot{margin-left:0}
+:is(.ws-page,.ws-sheet) .mq-fixslot .ws-box,:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer .ws-box{height:calc(var(--ws-hw) + 4mm);min-height:calc(var(--ws-hw) + 4mm);display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1}
+/* Word problems v2: story, work space, answer row - square corners on paper. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{padding-left:6mm;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpstory{border-radius:0}
+:is(.ws-page,.ws-sheet) .mq-wpspace{position:relative;flex:1 1 auto;min-height:30mm;border:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-wpspace>small{position:absolute;left:2mm;top:1mm;font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:calc(var(--ws-text) * 1.35);font-weight:700;line-height:1.15;text-align:center;padding:0 2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer{margin-top:0;padding-right:0;justify-content:flex-end;gap:6mm}
+/* INK-3: everything inside a traced slot is trace grey, the legacy key's inline-black <b> and a
+   drawn model's currentColor strokes included (print-worksheet.css forces legacy text black). */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"] *{color:#949494!important}
+/* Guided fade: a partially traced value keeps its geometry; the untraced part is not printed. */
+:is(.ws-page,.ws-sheet) .mq-untraced{visibility:hidden}
+/* ---- critic round 2 (2026-09-25) ---- */
+/* AK-1 facsimile: a key answer is Andika 700 and keeps the sheet's open 4 (cv04, TY-4) however deep
+   it sits (a legacy key style or an inline font shorthand reset it, and the 4 closed). cv01 is NOT
+   set: TY-4 (owner ruling 2026-09-19) rejects it, so the bold face keeps its own flagged 1. */
+:is(.ws-page,.ws-sheet) :is(b,strong,th,.ws-tab,[data-ws-ink="solid"],[data-ws-ink="solid"] *,.ws-legacy-answer,.ws-legacy-answer *){font-feature-settings:"cv04" 1}
+.ws-key [data-ws-ink="solid"]:not(.mq-pupil):not(:is(.mq-pupil,.mq-judge-work,.mq-abbox,.mq-tf) *){font-weight:700}
+/* Guided cells: the count cue of a level-2 cell (H3), grey, beside the fact. */
+:is(.ws-page,.ws-sheet) .mq-cuewrap{display:flex;align-items:flex-start;justify-content:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cue{display:flex;flex-direction:column;gap:1mm;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-cue svg{display:block}
+/* R3: a K story's label word stands in one fixed width, so the number box is in the same place in every cell. */
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk .mq-klabel{min-width:30mm;justify-content:flex-start}
+:is(.ws-page,.ws-sheet) .mq-cue.mq-cue-b{padding-top:calc(var(--fd,var(--ws-digit)) * 1.15 + .5mm)}
+:is(.ws-page,.ws-sheet) .mq-cuecol{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-thinkcue{font-size:var(--ws-text);line-height:1.2;white-space:nowrap;border:1pt solid #949494;border-radius:2mm;padding:1mm 3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-modelcell{padding-top:calc(var(--ws-tab,6mm) + 1.5mm)}
+/* Error analysis: what the pupil wrote is shown in "pupil writing" (trace grey, tagged), so it is
+   never confused with the printed numbers (critic round 2, C1). */
+:is(.ws-page,.ws-sheet) .mq-pupiltag{position:absolute;left:8mm;top:1mm;font-size:var(--ws-zone);line-height:1.2;font-style:normal;white-space:nowrap}
+/* the "<name> wrote:" tag sits on the letter's line; the work starts under it */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{padding-top:calc(var(--ws-zone) * 1.2 + 2.5mm)}
+:is(.ws-page,.ws-sheet) .mq-pupil,:is(.ws-page,.ws-sheet) .mq-pupil *{color:#949494!important}
+:is(.ws-page,.ws-sheet) .mq-klabel{display:inline-flex;align-items:center;min-height:calc(var(--ws-hw) + 4mm);font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-pupilwork{font-size:var(--ws-digit);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixes{display:flex;gap:3mm;flex-wrap:wrap}
+:is(.ws-page,.ws-sheet) .mq-redraw{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-redraw>small{font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-fixchoice{display:flex;flex-direction:column;gap:2mm}
+/* VA-2: the operator keeps to the left of its own track, clear of a two-digit bottom number. */
+:is(.ws-page,.ws-sheet) .ws-fact>.op{justify-content:flex-start}
+/* Fact rows across form (PT-FRW-7) and the division sentence frame under a picture. */
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across{justify-content:flex-start;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across>span{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe{display:flex;align-items:flex-end;justify-content:center;gap:1.5mm;margin-top:1mm;font-size:var(--ws-text);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe .ws-line{height:7mm}
+/* Word problems: the skill's named model in the work space, a picture row for K. */
+/* The answer column sits BESIDE the work space, at its foot, so a story with its model fits three
+   (or two) to a page instead of one: story across the top, work space left, number and label right. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpstory{grid-column:1 / -1;padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpspace{grid-column:1;grid-row:2;min-height:20mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpanswer{grid-column:2;grid-row:2;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer{flex-direction:row;align-items:flex-start;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer .mq-ansslot small:empty{display:none}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder>.mq-wpanswer{grid-column:1;grid-row:3;flex-direction:row;align-items:flex-end}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel{align-items:stretch;justify-content:center;padding:6mm 2mm 2mm}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel>div{width:100%;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wppics{display:flex;flex-wrap:wrap;gap:3mm;justify-content:center;align-items:center;padding:2mm}
+/* ---- Error analysis, critic round 3 (2026-09-25): the fix copies the item's own answer shape ---- */
+:is(.ws-page,.ws-sheet) .mq-fixpat{display:inline-flex;align-items:center;flex-wrap:nowrap;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-fixglue{font-size:var(--ws-text);font-weight:400;line-height:1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixchoice.mq-fixletters{flex-direction:row;gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-fixglue.mq-fixsym{font-size:var(--ws-digit);font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-fixes>.mq-ansslot small{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixtext .ws-line{font-size:var(--ws-text);font-weight:700;max-width:100%}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-fixslot small{font-size:max(var(--ws-zone),11pt)}
+:is(.ws-page,.ws-sheet) .mq-fixcols{gap:0}
+:is(.ws-page,.ws-sheet) [data-ws-tagged]{position:relative}
+:is(.ws-page,.ws-sheet) .mq-frac{display:inline-flex;flex-direction:column;align-items:center;font-size:.55em;line-height:1.05}
+:is(.ws-page,.ws-sheet) .mq-frac>span+span{border-top:1.5pt solid currentColor;padding-top:.3mm}
+:is(.ws-page,.ws-sheet) .mq-slottag,:is(.ws-page,.ws-sheet) .mq-pupil .mq-slottag{position:absolute;top:.4mm;left:.8mm;font-size:var(--ws-zone);font-style:normal;font-weight:700;line-height:1;color:#000!important}
+:is(.ws-page,.ws-sheet) .mq-fixsign .ws-circle{display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1;vertical-align:middle}
+:is(.ws-page,.ws-sheet) .mq-eatask{font-size:var(--ws-text);line-height:1.2;margin:0 0 1mm;align-self:flex-start}
+:is(.ws-page,.ws-sheet) .mq-fixcols>.ws-box+.ws-box{margin-left:-.75pt}
+/* the flow judgement: beside the work when --mq-jw fits, under it when not */
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge3{display:flex;flex-wrap:wrap;align-items:flex-start;align-content:flex-start;justify-content:center;column-gap:6mm;row-gap:2mm;width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-judge-work{flex:0 1 auto;min-width:0;max-width:100%;align-self:flex-start}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-judge-row{flex:1 1 var(--mq-jw,44mm);min-width:min(var(--mq-jw,44mm),100%);max-width:100%;display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:1mm 0 0 2mm}
+:is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixslot{margin-left:0}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-redraw{flex:1 1 100%}
+/* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{justify-content:center}
+/* AX-4: one place for the Correct / Fix-it block on every cell of a page - under the work, beside it (the two centred together), or in the item's own answer column */
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow>.mq-judge-row{flex:1 1 100%;min-width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow:not(.mq-jstack):not(.mq-judge-drawn) .mq-judge-row{flex-direction:row;align-items:flex-start;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside{flex-wrap:nowrap;justify-content:center;column-gap:10mm}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-work{flex:0 0 auto;min-width:auto}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-row{flex:0 0 auto;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside:not(.mq-judge-drawn) .mq-fixrow{flex-direction:column;align-items:flex-start;row-gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-judgecol{margin-top:3mm;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-judgecol>.mq-judge-row{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:0}
+:is(.ws-page,.ws-sheet) .mq-judgecol .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
+/* EA r5 (B): ONE Correct / Fix-it layout on every cell - "Correct" on its line, "Fix it" and the whole fix (every box, its captions) on the next, never wrapped */
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-judge-row{flex-direction:column;align-items:flex-start;flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixrow{flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixes,:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixpat{flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixfrac{font-size:1em;line-height:1;row-gap:0}
+:is(.ws-page,.ws-sheet) .mq-fixfrac>span:first-child{padding-bottom:1.2mm}
+:is(.ws-page,.ws-sheet) .mq-fixfrac>span+span{border-top-width:1.5pt;padding-top:1.2mm}
+/* EA r5 (B): a graph's question follows the page - beside its picture in one column, under it in two or more, on every cell */
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askside div:has(> .fg-ask){flex-wrap:nowrap !important}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askunder div:has(> .fg-ask){flex-direction:column !important;flex-wrap:nowrap !important;align-items:center !important}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askunder .fg-ask{flex:0 0 auto !important;max-width:none !important;align-self:stretch}
+:is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixrow{display:contents}
+:is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixzone{flex:0 0 100%}
+/* the key's correction is black Andika 700, even inside the pupil's grey work (a fix box per fact) */
+:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]):is([data-ws-ink="solid"],[data-ws-ink="solid"] *),:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]) :is([data-ws-ink="solid"],[data-ws-ink="solid"] *){color:#000!important;font-weight:700}
+
+:is(.ws-page,.ws-sheet) .ws-cell.mq-anchorcell{justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-anchor{width:100%;display:flex;flex-direction:column;gap:1mm;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-anchor-band .mq-anchor-state:first-child .mq-anchor-cell{padding-left:13mm}
+:is(.ws-page,.ws-sheet) .ws-cell:is(.mq-anchor-bandcell,.mq-anchor-compactcell){padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-anchor-sidecell{padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-band.mq-anchor-belowtab{padding-top:calc(var(--ws-tab, 4.5mm) - 1mm)}
+:is(.ws-page,.ws-sheet) .mq-anchor-compact .mq-anchor-cell{padding-left:13mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-states{display:grid;column-gap:0;width:100%}
+:is(.ws-page,.ws-sheet) .mq-anchor-state{display:flex;flex-direction:column;align-items:stretch;gap:1.5mm;padding:0 2.5mm;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-anchor-state+.mq-anchor-state{border-left:var(--ws-hair) solid var(--ws-grey,#949494)}
+:is(.ws-page,.ws-sheet) .mq-anchor-cell{display:flex;justify-content:center;align-items:flex-start;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps{list-style:none;margin:0;padding:0;font-size:calc(var(--ws-zone) * 0.92);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li{display:flex;gap:1.6mm;align-items:flex-start;margin:0 0 0.5mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li>em{flex:none;font-style:normal;width:4.6mm;height:4.6mm;border:var(--ws-hair) solid var(--ws-ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85em;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li.mq-anchor-cont{margin-top:-0.4mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li.mq-anchor-cont>em{border-color:transparent}
+:is(.ws-page,.ws-sheet) .mq-anchor-one{display:flex;flex-direction:column;align-items:stretch;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside{flex-direction:row;align-items:flex-start;gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-cell{flex:none}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-steps{flex:1;min-width:0;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-say{font-size:var(--ws-zone);line-height:1.2;padding-top:1mm;border-top:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-anchor-say>b{font-weight:700}
+
+
+:is(.ws-page,.ws-sheet){--mq-lesson-accent:#5B2A86}
+:is(.ws-page,.ws-sheet) svg :is(text,tspan)[data-ws-ink="trace"]{fill:#949494!important}
+
+:is(.ws-page,.ws-sheet) .mq-licon{flex:none;display:block;overflow:visible;color:var(--mq-lesson-accent)}
+:is(.ws-page,.ws-sheet) .mq-licon .f{fill:currentColor;stroke:none}
+:is(.ws-page,.ws-sheet) .mq-licon *{vector-effect:non-scaling-stroke}
+
+:is(.ws-page,.ws-sheet) .mq-lnum{flex:none;font-style:normal;box-sizing:border-box;width:6.4mm;height:6.4mm;border:1pt solid var(--mq-lesson-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:max(11pt,var(--ws-zone));font-weight:700;color:var(--mq-lesson-accent);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-lstrip{flex:none;display:flex;align-items:flex-start;gap:3mm;padding:1.6mm 0 2mm;border-bottom:var(--ws-hair) solid var(--ws-ink);margin-bottom:1mm;font-size:max(11pt,var(--ws-zone));line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-lstrip-l{flex:none;font-weight:700;font-size:var(--ws-text);padding-top:.6mm}
+:is(.ws-page,.ws-sheet) .mq-lstrip ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:1.5mm 5mm;flex:1;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-lstrip li{display:flex;align-items:center;gap:1.4mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lstripcell{padding:0;justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-lsteps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2.2mm;font-size:max(11pt,calc(var(--ws-text) - 2pt));line-height:1.2;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-lsteps li{display:flex;gap:1.8mm;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-lsteps li>span{min-width:0}
+:is(.ws-page,.ws-sheet) .mq-lstepszone{padding:2.5mm 3mm 0 3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lstepscell{padding:0;justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox{display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox>.mq-lstepszone{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;padding-bottom:2.5mm}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox .mq-lsteps{flex:1 1 auto;justify-content:space-evenly}
+:is(.ws-page,.ws-sheet) .mq-lwedotop>.mq-lstrip{padding-left:3mm;padding-right:3mm;margin-bottom:0}
+:is(.ws-page,.ws-sheet) .mq-lstripchant{flex:none;display:flex;align-items:center;gap:3mm;padding:0 3mm;font-size:max(11pt,calc(var(--ws-text) - 2pt));line-height:1.2;border-bottom:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-lstripchant>span{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-lchant{margin:3mm 0 0;font-size:max(11pt,calc(var(--ws-text) - 2pt));font-weight:700;line-height:1.2}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cstatecell{justify-content:center;align-items:stretch;padding:3mm 4mm}
+:is(.ws-page,.ws-sheet) .mq-cstate{width:100%;min-height:0;display:flex}
+:is(.ws-page,.ws-sheet) .mq-cstate-col{flex:none;flex-direction:column;align-items:stretch;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-row{flex:1 1 auto;flex-direction:row;align-items:stretch;gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-row>.mq-cdraw{flex:0 0 42%;display:flex;justify-content:center;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-cside{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-around;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-cheads{display:flex;flex-direction:column;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-chead{display:flex;align-items:center;gap:2.5mm;font-size:var(--ws-title);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-chead>.mq-lnum{width:10mm;height:10mm;border-width:1.5pt;font-size:var(--ws-title)}
+:is(.ws-page,.ws-sheet) .mq-chead>b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-cdraw{display:flex;justify-content:center;align-items:flex-start}
+:is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cdraw{flex:none;align-items:center}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-ctailcell{justify-content:center;align-items:stretch;padding:2mm 4mm}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-chartgrid:has(+ .ws-grid.mq-ctailgrid){border-bottom-width:var(--ws-cell)}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-ctailgrid{border-top-width:0}
+:is(.ws-page,.ws-sheet) .mq-ctail{display:flex;flex-direction:column;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-ctailw{margin-left:6mm;font-size:var(--ws-text);font-weight:400}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-c2cell{justify-content:center;align-items:center;padding:2mm 2mm}
+:is(.ws-page,.ws-sheet) .mq-c2{display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-c2nums{display:flex;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-cwords{font-size:var(--ws-text);line-height:1.3;display:flex;flex-direction:column;gap:.8mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cwords{text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cwords>.mq-cnote{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-hopwrap{display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-chops>.mq-hops{margin:0!important}
+:is(.ws-page,.ws-sheet) :is(.mq-cfinal-h,.mq-cnote,.mq-cstate-n .mq-chead>b){text-wrap:balance}
+:is(.ws-page,.ws-sheet) .mq-cstate-n{gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead{font-size:var(--ws-text);gap:1mm 1.8mm;flex-wrap:wrap;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>b{flex:1 1 100%;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>.mq-lnum{width:8.5mm;height:8.5mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cfinalcell{justify-content:center;align-items:stretch;padding:1.5mm 3mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal-h{font-size:var(--ws-text);line-height:1.25;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cfinal-h>b{font-weight:700;display:block}
+:is(.ws-page,.ws-sheet) .mq-cfinal>.mq-cdraw{align-items:center}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cdrawcell{padding:0;justify-content:flex-start;align-items:flex-start}
+:is(.ws-page,.ws-sheet) .ws-band.mq-cchantband{flex:none;display:flex;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-cchant{display:flex;align-items:center;gap:5mm;padding:0 3mm;width:100%}
+:is(.ws-page,.ws-sheet) .mq-cchant>b{font-size:var(--ws-text);font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-cchant>span{flex:1;border:1.5pt solid var(--ws-ink);border-radius:3mm;padding:1.2mm 5mm;font-size:var(--ws-title);font-weight:700;line-height:1.25;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-lround{display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-lround-top{display:flex;align-items:flex-end;gap:1mm;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-lring{outline:var(--ws-hair) solid var(--ws-ink);outline-offset:.06em;border-radius:50%}
+:is(.ws-page,.ws-sheet) .mq-lring.mq-lring-t{outline:1pt solid #949494}
+:is(.ws-page,.ws-sheet) .mq-wwbarlayout .mq-lring{display:inline-block;margin:0 .2em;padding:0 .08em;line-height:1.05}
+:is(.ws-page,.ws-sheet) .mq-luline{border-bottom:1pt solid #949494;display:inline-block;line-height:1}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvocabcell{justify-content:center;align-items:stretch;padding:2.5mm 3mm}
+:is(.ws-page,.ws-sheet) .mq-lvocab{width:100%;display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-lvrow{display:grid;grid-template-columns:repeat(var(--n),1fr)}
+:is(.ws-page,.ws-sheet) .mq-lvpic{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-lvpic-in{min-height:12mm;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-lvword{display:flex;flex-direction:column;align-items:center;gap:1.5mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-lvword b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-ldot{display:block;width:2mm;height:2mm;border-radius:50%;background:#000}
+:is(.ws-page,.ws-sheet) .mq-lvgap{position:relative;height:calc(var(--ws-hw) * 1.05)}
+:is(.ws-page,.ws-sheet) .mq-lvgap>svg{position:absolute;left:0;top:-1mm;width:100%;height:calc(100% + 2mm);overflow:visible}
+:is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol{border-left:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol{display:flex;flex-direction:column;min-width:0}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter{justify-content:center}
+/* CL-4b (s3 precritic-2): a Guided cell carries no tab, so a stack that is not write-above keeps no
+   tab clearance above it: its digits start at the top pad. Write-above stacks keep their centring. */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter:not(:has(> .ws-tab, > .ws-letter, > .ws-modeltab, > [data-ws-label])) > .ws-stack:not([data-ws-writeabove]){margin-top:0}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol>.ws-instrline{padding-left:3mm;padding-right:2mm}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol.mq-lwarm2>.ws-instrline{height:calc(var(--ws-instr) * 1.75);line-height:1.2;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol .ws-grid{border-left-width:0}</style>
+<style>
+@page { size: A4; margin: 0; @top-left { content: none; } @top-right { content: none; } @bottom-left { content: none; } @bottom-right { content: none; } @bottom-center { content: none; } }
+@page mqsheet { size: A4; margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+@page mqsheetletter { size: Letter; margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+html { color-scheme: light; }
+html, body { margin: 0; padding: 0; background: #fff; color: #000; font-family: 'Andika', sans-serif; }
+body.mq-sheet { min-height: 0; overflow: visible; }
+.mq-sheet > .ws-page:last-child { break-after: auto; }
+@media screen { body.mq-sheet { background: #d9d9d9; padding: 6mm 0; } }
+@media print { body.mq-sheet { background: #fff; padding: 0; } }
+</style>
+</head>
+<body class="mq-sheet">
+
+<section class="ws-page ws-L ws-ican ws-tab6 " data-ws-page="1" data-ws-paper="a4" data-ws-role="independent" data-ws-mode="print" data-ws-look="ican" data-ws-size="L" data-ws-tab="Level 1-4|Lesson 1">
+  <header class="ws-head"><div class="ws-rowA notab"><div class="ws-field name">Name<i></i></div><div class="ws-field date">Date<i></i></div><div class="ws-field score">Score<i></i><b>/13</b></div></div><div class="ws-title">Mixed practice</div><div class="ws-headrule"></div></header>
+  <main class="ws-body"><style data-mq-sheet-engine="">/* HD-14: a title that does not fit one line wraps to two and takes 6 mm from the body. */
+:is(.ws-page,.ws-sheet) .ws-title{white-space:normal;height:auto;min-height:8mm;line-height:7mm;text-align:center}
+/* HD-20: pages 2+ carry a 12 mm header - Name line, a one-line outlined tab 8 mm tall, the rule. */
+.ws-page:has(.mq-cont) .ws-rowA{height:9mm}
+.ws-page:has(.mq-cont) .ws-rowA .ws-field{height:9mm}
+.ws-page:has(.mq-cont) .ws-rowA .ws-field i{height:8mm}
+.ws-page:has(.mq-cont) .ws-tabbox{width:auto;height:8mm;flex-direction:row;align-items:center;align-self:flex-end;padding:0 3mm;font-size:9pt;line-height:1;white-space:nowrap}
+.ws-page:has(.mq-cont) .ws-tabbox span{font-weight:700}
+.ws-page:has(.mq-cont) .ws-tabbox span:last-child{font-weight:400}
+.ws-page:has(.mq-cont) .ws-tabbox span+span::before{content:"\00a0\00b7\00a0";font-weight:400}
+/* BD-14: an underlined word inside a library instruction. */
+:is(.ws-page,.ws-sheet) .ws-instrline u{text-decoration-thickness:.75pt;text-underline-offset:1.2mm}
+/* SCC-A5: a legacy cell. The legacy markup was written for a full-width column, so it spans the
+   cell; its content starts below the label box (CL-40); the legacy shell's own border, padding
+   and clipping are dropped because the kit cell is the one box (CL-1, CL-7), and nothing may be
+   clipped silently. The key's answer stamp costs no layout, so the problem sits where it sits on
+   the pupil page (AK-1). */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy{align-items:stretch;padding-top:calc(var(--ws-tab,6mm) + 1mm)}
+/* R1: a legacy-sourced item a fact page redraws with the fact template (sub_facts on Fact rows)
+   keeps the fact cell's own top pad (--fp, set clear of the tab by factPadTop), as add_facts does;
+   the legacy 7 mm pushed the L key's answers 0.2 mm out of the 45 mm row (PG-12). */
+:is(.ws-page,.ws-sheet) .ws-cell.fact.mq-legacy{padding-top:var(--fp,2mm)}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy>.ws-legacy{width:100%;min-width:0}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .worksheet-problem{border:0!important;border-radius:0!important;padding:0!important;margin:0!important;overflow:visible!important;background:transparent!important;box-shadow:none!important}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content,:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content>div{overflow:visible}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .stack{margin-left:auto;margin-right:auto}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer{position:absolute;left:3mm;right:3mm;bottom:1.5mm;display:block;text-align:center;font-size:var(--ws-zone);font-weight:700;line-height:1.2}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer .ws-zone{font-size:inherit}
+/* ---- P7.2b roles (roles/compose.js). Scoped to the sheet roots; additive. ---- */
+/* INK-3: a traced value stays grey in print. css/print-worksheet.css forces every legacy
+   .worksheet-problem descendant to black under @media print; the trace is the one exception. */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"],:is(.ws-page,.ws-sheet) .worksheet-problem .ws-trace{color:#949494!important}
+/* TY-2: Andika has 400 and 700 only. Legacy markup asks for 600 in places (visual labels, the
+   "Answer:" caption); inside a sheet it takes the 700 the face really has, never a synthetic bold. */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy :is([style*="font-weight:600"],[style*="font-weight: 600"],.visual-label){font-weight:700!important}
+/* The engine's style block (and page 2's continuation marker) sit before the first band, so the
+   kit's :first-child band rule is restated for them (BD-3: the header rule closes the header). */
+.ws-body>:is(style,.mq-cont):first-child+:is(.ws-band,.mq-row),.ws-body>style:first-child+.mq-cont+:is(.ws-band,.mq-row){margin-top:1.5mm}
+.ws-body>:is(style,.mq-cont):first-child+.ws-band,.ws-body>style:first-child+.mq-cont+.ws-band{border-top-width:var(--ws-heavy)}
+:is(.ws-page,.ws-sheet) .ws-band>.ws-grid.fixed{flex:none}
+/* a value written into a line slot sits on the rule (a key, shown work) */
+:is(.ws-page,.ws-sheet) .ws-line[data-ws-ink]{display:inline-flex;align-items:flex-end;justify-content:center;font-weight:700;line-height:1.1;padding-bottom:.6mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .ws-line.ws-trace[data-ws-ink]{font-weight:400}
+/* PT-OPN-2: parts side by side in one band row (Model | Steps, quadrants, a probe and its strip) */
+:is(.ws-page,.ws-sheet) .mq-row{flex:none;display:grid;column-gap:0;margin-top:-1.5pt;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol{min-width:0;min-height:0;display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band{flex:1 1 auto;margin-top:0;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol+.mq-rowcol>.ws-band{border-left:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band>.ws-grid{flex:1 1 auto}
+:is(.ws-page,.ws-sheet) .mq-row.mq-proberow{margin-top:0;column-gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-col{display:flex;flex-direction:column;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-quadrow+.mq-quadrow{margin-top:3mm}
+:is(.ws-page,.ws-sheet) .mq-quadrow .ws-band{margin-top:0}
+:is(.ws-page,.ws-sheet) .mq-quadscore{margin-left:auto;font-weight:700;white-space:nowrap}
+/* BD-4: the Steps list. Two text columns on the Guided page (PT-GDP-2). */
+:is(.ws-page,.ws-sheet) .mq-stepsband{padding:1mm 3mm 3mm 4mm}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps2{display:block;columns:2;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps2 li{break-inside:avoid;margin-bottom:2.2mm}
+:is(.ws-page,.ws-sheet) .mq-stepszone{padding:1.5mm 3mm 0 4mm;overflow:hidden}
+:is(.ws-page,.ws-sheet) .mq-steptext{width:100%;height:100%;display:flex;gap:2.5mm;align-items:flex-start;padding-top:2mm;font-size:var(--ws-text);line-height:1.3;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-steptext>em{flex:none;font-style:normal;width:7mm;height:7mm;border:var(--ws-hair) solid var(--ws-ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--ws-zone);font-weight:700}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-stepcell{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-steptop{width:100%;height:calc(2 * (1.3em) + 4mm);flex:none}
+/* check-box lines and one-line sentence frames (section 6, P-TH-3) */
+:is(.ws-page,.ws-sheet) .mq-checkline{display:inline-flex;align-items:center;gap:2.5mm;white-space:nowrap;font-size:var(--ws-text);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-checkline .ws-check{margin:0;vertical-align:0;flex:none}
+:is(.ws-page,.ws-sheet) .mq-frame{display:flex;align-items:flex-end;gap:1.5mm;white-space:nowrap;font-size:var(--ws-text);line-height:1.1}
+/* Error analysis and True or False?: the finished work beside the judgement (04-E mock-up) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-thinkcell{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-judge{width:100%;flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:3mm;row-gap:3mm;align-items:end}
+:is(.ws-page,.ws-sheet) .mq-judge-work{min-width:0;align-self:start;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-judge-row{display:flex;flex-direction:column;align-items:flex-start;gap:4mm;padding-bottom:1mm}
+:is(.ws-page,.ws-sheet) .mq-fixline{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-fixline .ws-line{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-tf{grid-template-columns:minmax(0,1fr);align-content:space-between;row-gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-tf>.mq-judge-row{flex-direction:row;gap:12mm;padding:0 0 0 4mm}
+:is(.ws-page,.ws-sheet) .mq-tf>.mq-frame{justify-self:start;padding:0 0 1mm 4mm}
+/* A thinking cell draws its shown answer in the flow (it is measured with it), never over the picture. */
+:is(.ws-page,.ws-sheet) .ws-cell :is(.mq-judge-work,.mq-abbox,.mq-wpcell) .ws-legacy-answer.mq-shown{position:static;margin-top:2mm;left:auto;right:auto;bottom:auto}
+:is(.ws-page,.ws-sheet) .mq-shownline{display:flex;align-items:flex-end;gap:2mm;margin-top:2mm;font-size:var(--ws-text);line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-shownline b{font-weight:700;border-bottom:var(--ws-hair) solid var(--ws-ink);min-width:14mm;text-align:center}
+/* Reason It, "Which is correct" (09-B mock-up): two finished answers A and B, then the frames */
+:is(.ws-page,.ws-sheet) .mq-ab{width:100%;display:grid;grid-template-columns:1fr 1fr minmax(52mm,auto);column-gap:5mm;align-items:start;padding-top:2mm}
+:is(.ws-page,.ws-sheet) .mq-abbox{position:relative;min-width:0;border:var(--ws-hair) solid var(--ws-ink);padding:10mm 2mm 3mm 2mm;display:flex;flex-direction:column;align-items:center;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-abtag{position:absolute;left:0;top:0;width:8mm;height:8mm;border-right:var(--ws-hair) solid var(--ws-ink);border-bottom:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center;font-size:var(--ws-text);font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-abresp{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:6mm;padding:1mm 0 1mm}
+:is(.ws-page,.ws-sheet) .mq-abchoice{display:flex;gap:10mm;padding-left:2mm}
+:is(.ws-page,.ws-sheet) .ws-choice{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;height:12mm;padding:0 1.5mm;font-size:var(--ws-digit);font-weight:700;line-height:1}
+/* Stretch (09-D mock-up): the prompt box, the results table, the closing frames */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell{align-items:stretch;padding:4mm 5mm 4mm 9mm}
+:is(.ws-page,.ws-sheet) .mq-stretch{width:100%;display:flex;flex-direction:column;gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-prompt{padding:2.5mm 5mm}
+:is(.ws-page,.ws-sheet) .mq-stretch-main{display:flex;align-items:flex-end;gap:7mm}
+:is(.ws-page,.ws-sheet) .mq-table{flex:none;border-collapse:collapse;border:var(--ws-heavy) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-table th,:is(.ws-page,.ws-sheet) .mq-table td{border:var(--ws-hair) solid var(--ws-ink);padding:0 2mm;text-align:center;vertical-align:middle}
+:is(.ws-page,.ws-sheet) .mq-table th{height:10mm;font-size:var(--ws-zone);font-weight:700;line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-table td{height:calc(var(--ws-hw) + 3mm);min-width:28mm;font-size:var(--ws-text);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols3 td{width:30mm}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols2 td:first-child{width:60mm}
+:is(.ws-page,.ws-sheet) .mq-table td b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-closing{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6mm;padding-bottom:1mm}
+/* Word problems v2 (07-D mock-up): story box with the answer row, then the equation frame */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-wpcellbox{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-wp{width:100%;flex:1 1 auto;display:flex;flex-direction:column;padding-left:6mm}
+:is(.ws-page,.ws-sheet) .mq-wpstory>div{white-space:normal}
+:is(.ws-page,.ws-sheet) .mq-wpcell{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;padding:3mm 4mm;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wpanswer{display:flex;align-items:flex-end;justify-content:flex-end;gap:4mm;margin-top:2mm;padding-right:4mm}
+:is(.ws-page,.ws-sheet) .mq-ansslot{display:inline-flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-ansslot small{font-size:var(--ws-zone);line-height:1.2;margin-top:.8mm}
+:is(.ws-page,.ws-sheet) .mq-wpwork{flex:1 1 auto;display:flex;align-items:flex-start;padding:8mm 0 0 4mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-wpwork .ws-circle{margin:0 1mm}
+/* Fact probe: horizontal facts and the skip-count strip (PT-FPR-3) */
+:is(.ws-page,.ws-sheet) .mq-hfact{width:100%;display:flex;align-items:flex-end;gap:2mm;padding-top:2mm;font-size:var(--ws-digit);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-hfact .ws-line{font-size:var(--ws-digit)}
+:is(.ws-page,.ws-sheet) .mq-skipstrip{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;display:flex;flex-direction:column;justify-content:space-around;align-items:center;font-size:var(--ws-text);font-weight:700;line-height:1}
+/* ---- 2026-09-25 re-grade fixes (additive) ---- */
+/* Guided Steps band: row-major, so the steps read 1 2 / 3 4 left to right (never 1 3 / 2). */
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows{display:grid;grid-template-columns:1fr 1fr;column-gap:8mm;row-gap:2.2mm;columns:auto}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows.mq-steps-one{grid-template-columns:1fr}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows li{margin-bottom:0}
+/* Error analysis: the judgement beside the work, in the top of the cell (no dead band), and one
+   square write box the pupil writes the fix in. */
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2{align-items:start;column-gap:6mm}
+:is(.ws-page,.ws-sheet) .mq-judge2>.mq-judge-row{align-self:start;gap:4mm;padding:1mm 1mm 1mm 0}
+:is(.ws-page,.ws-sheet) .mq-fixrow{display:flex;flex-direction:column;align-items:flex-start;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-fixslot{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2.mq-judge-stack{grid-template-columns:minmax(0,1fr);row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack>.mq-judge-row{flex-direction:row;align-items:flex-start;gap:10mm;padding-left:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixrow{flex-direction:row;align-items:flex-start;gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixslot{margin-left:0}
+:is(.ws-page,.ws-sheet) .mq-fixslot .ws-box,:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer .ws-box{height:calc(var(--ws-hw) + 4mm);min-height:calc(var(--ws-hw) + 4mm);display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1}
+/* Word problems v2: story, work space, answer row - square corners on paper. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{padding-left:6mm;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpstory{border-radius:0}
+:is(.ws-page,.ws-sheet) .mq-wpspace{position:relative;flex:1 1 auto;min-height:30mm;border:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-wpspace>small{position:absolute;left:2mm;top:1mm;font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:calc(var(--ws-text) * 1.35);font-weight:700;line-height:1.15;text-align:center;padding:0 2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer{margin-top:0;padding-right:0;justify-content:flex-end;gap:6mm}
+/* INK-3: everything inside a traced slot is trace grey, the legacy key's inline-black <b> and a
+   drawn model's currentColor strokes included (print-worksheet.css forces legacy text black). */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"] *{color:#949494!important}
+/* Guided fade: a partially traced value keeps its geometry; the untraced part is not printed. */
+:is(.ws-page,.ws-sheet) .mq-untraced{visibility:hidden}
+/* ---- critic round 2 (2026-09-25) ---- */
+/* AK-1 facsimile: a key answer is Andika 700 and keeps the sheet's open 4 (cv04, TY-4) however deep
+   it sits (a legacy key style or an inline font shorthand reset it, and the 4 closed). cv01 is NOT
+   set: TY-4 (owner ruling 2026-09-19) rejects it, so the bold face keeps its own flagged 1. */
+:is(.ws-page,.ws-sheet) :is(b,strong,th,.ws-tab,[data-ws-ink="solid"],[data-ws-ink="solid"] *,.ws-legacy-answer,.ws-legacy-answer *){font-feature-settings:"cv04" 1}
+.ws-key [data-ws-ink="solid"]:not(.mq-pupil):not(:is(.mq-pupil,.mq-judge-work,.mq-abbox,.mq-tf) *){font-weight:700}
+/* Guided cells: the count cue of a level-2 cell (H3), grey, beside the fact. */
+:is(.ws-page,.ws-sheet) .mq-cuewrap{display:flex;align-items:flex-start;justify-content:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cue{display:flex;flex-direction:column;gap:1mm;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-cue svg{display:block}
+/* R3: a K story's label word stands in one fixed width, so the number box is in the same place in every cell. */
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk .mq-klabel{min-width:30mm;justify-content:flex-start}
+:is(.ws-page,.ws-sheet) .mq-cue.mq-cue-b{padding-top:calc(var(--fd,var(--ws-digit)) * 1.15 + .5mm)}
+:is(.ws-page,.ws-sheet) .mq-cuecol{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-thinkcue{font-size:var(--ws-text);line-height:1.2;white-space:nowrap;border:1pt solid #949494;border-radius:2mm;padding:1mm 3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-modelcell{padding-top:calc(var(--ws-tab,6mm) + 1.5mm)}
+/* Error analysis: what the pupil wrote is shown in "pupil writing" (trace grey, tagged), so it is
+   never confused with the printed numbers (critic round 2, C1). */
+:is(.ws-page,.ws-sheet) .mq-pupiltag{position:absolute;left:8mm;top:1mm;font-size:var(--ws-zone);line-height:1.2;font-style:normal;white-space:nowrap}
+/* the "<name> wrote:" tag sits on the letter's line; the work starts under it */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{padding-top:calc(var(--ws-zone) * 1.2 + 2.5mm)}
+:is(.ws-page,.ws-sheet) .mq-pupil,:is(.ws-page,.ws-sheet) .mq-pupil *{color:#949494!important}
+:is(.ws-page,.ws-sheet) .mq-klabel{display:inline-flex;align-items:center;min-height:calc(var(--ws-hw) + 4mm);font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-pupilwork{font-size:var(--ws-digit);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixes{display:flex;gap:3mm;flex-wrap:wrap}
+:is(.ws-page,.ws-sheet) .mq-redraw{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-redraw>small{font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-fixchoice{display:flex;flex-direction:column;gap:2mm}
+/* VA-2: the operator keeps to the left of its own track, clear of a two-digit bottom number. */
+:is(.ws-page,.ws-sheet) .ws-fact>.op{justify-content:flex-start}
+/* Fact rows across form (PT-FRW-7) and the division sentence frame under a picture. */
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across{justify-content:flex-start;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across>span{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe{display:flex;align-items:flex-end;justify-content:center;gap:1.5mm;margin-top:1mm;font-size:var(--ws-text);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe .ws-line{height:7mm}
+/* Word problems: the skill's named model in the work space, a picture row for K. */
+/* The answer column sits BESIDE the work space, at its foot, so a story with its model fits three
+   (or two) to a page instead of one: story across the top, work space left, number and label right. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpstory{grid-column:1 / -1;padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpspace{grid-column:1;grid-row:2;min-height:20mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpanswer{grid-column:2;grid-row:2;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer{flex-direction:row;align-items:flex-start;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer .mq-ansslot small:empty{display:none}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder>.mq-wpanswer{grid-column:1;grid-row:3;flex-direction:row;align-items:flex-end}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel{align-items:stretch;justify-content:center;padding:6mm 2mm 2mm}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel>div{width:100%;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wppics{display:flex;flex-wrap:wrap;gap:3mm;justify-content:center;align-items:center;padding:2mm}
+/* ---- Error analysis, critic round 3 (2026-09-25): the fix copies the item's own answer shape ---- */
+:is(.ws-page,.ws-sheet) .mq-fixpat{display:inline-flex;align-items:center;flex-wrap:nowrap;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-fixglue{font-size:var(--ws-text);font-weight:400;line-height:1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixchoice.mq-fixletters{flex-direction:row;gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-fixglue.mq-fixsym{font-size:var(--ws-digit);font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-fixes>.mq-ansslot small{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixtext .ws-line{font-size:var(--ws-text);font-weight:700;max-width:100%}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-fixslot small{font-size:max(var(--ws-zone),11pt)}
+:is(.ws-page,.ws-sheet) .mq-fixcols{gap:0}
+:is(.ws-page,.ws-sheet) [data-ws-tagged]{position:relative}
+:is(.ws-page,.ws-sheet) .mq-frac{display:inline-flex;flex-direction:column;align-items:center;font-size:.55em;line-height:1.05}
+:is(.ws-page,.ws-sheet) .mq-frac>span+span{border-top:1.5pt solid currentColor;padding-top:.3mm}
+:is(.ws-page,.ws-sheet) .mq-slottag,:is(.ws-page,.ws-sheet) .mq-pupil .mq-slottag{position:absolute;top:.4mm;left:.8mm;font-size:var(--ws-zone);font-style:normal;font-weight:700;line-height:1;color:#000!important}
+:is(.ws-page,.ws-sheet) .mq-fixsign .ws-circle{display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1;vertical-align:middle}
+:is(.ws-page,.ws-sheet) .mq-eatask{font-size:var(--ws-text);line-height:1.2;margin:0 0 1mm;align-self:flex-start}
+:is(.ws-page,.ws-sheet) .mq-fixcols>.ws-box+.ws-box{margin-left:-.75pt}
+/* the flow judgement: beside the work when --mq-jw fits, under it when not */
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge3{display:flex;flex-wrap:wrap;align-items:flex-start;align-content:flex-start;justify-content:center;column-gap:6mm;row-gap:2mm;width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-judge-work{flex:0 1 auto;min-width:0;max-width:100%;align-self:flex-start}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-judge-row{flex:1 1 var(--mq-jw,44mm);min-width:min(var(--mq-jw,44mm),100%);max-width:100%;display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:1mm 0 0 2mm}
+:is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixslot{margin-left:0}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-redraw{flex:1 1 100%}
+/* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{justify-content:center}
+/* AX-4: one place for the Correct / Fix-it block on every cell of a page - under the work, beside it (the two centred together), or in the item's own answer column */
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow>.mq-judge-row{flex:1 1 100%;min-width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow:not(.mq-jstack):not(.mq-judge-drawn) .mq-judge-row{flex-direction:row;align-items:flex-start;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside{flex-wrap:nowrap;justify-content:center;column-gap:10mm}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-work{flex:0 0 auto;min-width:auto}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-row{flex:0 0 auto;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside:not(.mq-judge-drawn) .mq-fixrow{flex-direction:column;align-items:flex-start;row-gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-judgecol{margin-top:3mm;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-judgecol>.mq-judge-row{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:0}
+:is(.ws-page,.ws-sheet) .mq-judgecol .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
+/* EA r5 (B): ONE Correct / Fix-it layout on every cell - "Correct" on its line, "Fix it" and the whole fix (every box, its captions) on the next, never wrapped */
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-judge-row{flex-direction:column;align-items:flex-start;flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixrow{flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixes,:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixpat{flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixfrac{font-size:1em;line-height:1;row-gap:0}
+:is(.ws-page,.ws-sheet) .mq-fixfrac>span:first-child{padding-bottom:1.2mm}
+:is(.ws-page,.ws-sheet) .mq-fixfrac>span+span{border-top-width:1.5pt;padding-top:1.2mm}
+/* EA r5 (B): a graph's question follows the page - beside its picture in one column, under it in two or more, on every cell */
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askside div:has(> .fg-ask){flex-wrap:nowrap !important}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askunder div:has(> .fg-ask){flex-direction:column !important;flex-wrap:nowrap !important;align-items:center !important}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askunder .fg-ask{flex:0 0 auto !important;max-width:none !important;align-self:stretch}
+:is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixrow{display:contents}
+:is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixzone{flex:0 0 100%}
+/* the key's correction is black Andika 700, even inside the pupil's grey work (a fix box per fact) */
+:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]):is([data-ws-ink="solid"],[data-ws-ink="solid"] *),:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]) :is([data-ws-ink="solid"],[data-ws-ink="solid"] *){color:#000!important;font-weight:700}
+
+:is(.ws-page,.ws-sheet) .ws-cell.mq-anchorcell{justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-anchor{width:100%;display:flex;flex-direction:column;gap:1mm;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-anchor-band .mq-anchor-state:first-child .mq-anchor-cell{padding-left:13mm}
+:is(.ws-page,.ws-sheet) .ws-cell:is(.mq-anchor-bandcell,.mq-anchor-compactcell){padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-anchor-sidecell{padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-band.mq-anchor-belowtab{padding-top:calc(var(--ws-tab, 4.5mm) - 1mm)}
+:is(.ws-page,.ws-sheet) .mq-anchor-compact .mq-anchor-cell{padding-left:13mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-states{display:grid;column-gap:0;width:100%}
+:is(.ws-page,.ws-sheet) .mq-anchor-state{display:flex;flex-direction:column;align-items:stretch;gap:1.5mm;padding:0 2.5mm;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-anchor-state+.mq-anchor-state{border-left:var(--ws-hair) solid var(--ws-grey,#949494)}
+:is(.ws-page,.ws-sheet) .mq-anchor-cell{display:flex;justify-content:center;align-items:flex-start;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps{list-style:none;margin:0;padding:0;font-size:calc(var(--ws-zone) * 0.92);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li{display:flex;gap:1.6mm;align-items:flex-start;margin:0 0 0.5mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li>em{flex:none;font-style:normal;width:4.6mm;height:4.6mm;border:var(--ws-hair) solid var(--ws-ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85em;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li.mq-anchor-cont{margin-top:-0.4mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li.mq-anchor-cont>em{border-color:transparent}
+:is(.ws-page,.ws-sheet) .mq-anchor-one{display:flex;flex-direction:column;align-items:stretch;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside{flex-direction:row;align-items:flex-start;gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-cell{flex:none}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-steps{flex:1;min-width:0;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-say{font-size:var(--ws-zone);line-height:1.2;padding-top:1mm;border-top:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-anchor-say>b{font-weight:700}
+
+
+:is(.ws-page,.ws-sheet){--mq-lesson-accent:#5B2A86}
+:is(.ws-page,.ws-sheet) svg :is(text,tspan)[data-ws-ink="trace"]{fill:#949494!important}
+
+:is(.ws-page,.ws-sheet) .mq-licon{flex:none;display:block;overflow:visible;color:var(--mq-lesson-accent)}
+:is(.ws-page,.ws-sheet) .mq-licon .f{fill:currentColor;stroke:none}
+:is(.ws-page,.ws-sheet) .mq-licon *{vector-effect:non-scaling-stroke}
+
+:is(.ws-page,.ws-sheet) .mq-lnum{flex:none;font-style:normal;box-sizing:border-box;width:6.4mm;height:6.4mm;border:1pt solid var(--mq-lesson-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:max(11pt,var(--ws-zone));font-weight:700;color:var(--mq-lesson-accent);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-lstrip{flex:none;display:flex;align-items:flex-start;gap:3mm;padding:1.6mm 0 2mm;border-bottom:var(--ws-hair) solid var(--ws-ink);margin-bottom:1mm;font-size:max(11pt,var(--ws-zone));line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-lstrip-l{flex:none;font-weight:700;font-size:var(--ws-text);padding-top:.6mm}
+:is(.ws-page,.ws-sheet) .mq-lstrip ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:1.5mm 5mm;flex:1;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-lstrip li{display:flex;align-items:center;gap:1.4mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lstripcell{padding:0;justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-lsteps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2.2mm;font-size:max(11pt,calc(var(--ws-text) - 2pt));line-height:1.2;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-lsteps li{display:flex;gap:1.8mm;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-lsteps li>span{min-width:0}
+:is(.ws-page,.ws-sheet) .mq-lstepszone{padding:2.5mm 3mm 0 3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lstepscell{padding:0;justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox{display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox>.mq-lstepszone{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;padding-bottom:2.5mm}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox .mq-lsteps{flex:1 1 auto;justify-content:space-evenly}
+:is(.ws-page,.ws-sheet) .mq-lwedotop>.mq-lstrip{padding-left:3mm;padding-right:3mm;margin-bottom:0}
+:is(.ws-page,.ws-sheet) .mq-lstripchant{flex:none;display:flex;align-items:center;gap:3mm;padding:0 3mm;font-size:max(11pt,calc(var(--ws-text) - 2pt));line-height:1.2;border-bottom:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-lstripchant>span{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-lchant{margin:3mm 0 0;font-size:max(11pt,calc(var(--ws-text) - 2pt));font-weight:700;line-height:1.2}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cstatecell{justify-content:center;align-items:stretch;padding:3mm 4mm}
+:is(.ws-page,.ws-sheet) .mq-cstate{width:100%;min-height:0;display:flex}
+:is(.ws-page,.ws-sheet) .mq-cstate-col{flex:none;flex-direction:column;align-items:stretch;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-row{flex:1 1 auto;flex-direction:row;align-items:stretch;gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-row>.mq-cdraw{flex:0 0 42%;display:flex;justify-content:center;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-cside{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-around;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-cheads{display:flex;flex-direction:column;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-chead{display:flex;align-items:center;gap:2.5mm;font-size:var(--ws-title);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-chead>.mq-lnum{width:10mm;height:10mm;border-width:1.5pt;font-size:var(--ws-title)}
+:is(.ws-page,.ws-sheet) .mq-chead>b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-cdraw{display:flex;justify-content:center;align-items:flex-start}
+:is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cdraw{flex:none;align-items:center}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-ctailcell{justify-content:center;align-items:stretch;padding:2mm 4mm}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-chartgrid:has(+ .ws-grid.mq-ctailgrid){border-bottom-width:var(--ws-cell)}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-ctailgrid{border-top-width:0}
+:is(.ws-page,.ws-sheet) .mq-ctail{display:flex;flex-direction:column;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-ctailw{margin-left:6mm;font-size:var(--ws-text);font-weight:400}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-c2cell{justify-content:center;align-items:center;padding:2mm 2mm}
+:is(.ws-page,.ws-sheet) .mq-c2{display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-c2nums{display:flex;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-cwords{font-size:var(--ws-text);line-height:1.3;display:flex;flex-direction:column;gap:.8mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cwords{text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cwords>.mq-cnote{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-hopwrap{display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-chops>.mq-hops{margin:0!important}
+:is(.ws-page,.ws-sheet) :is(.mq-cfinal-h,.mq-cnote,.mq-cstate-n .mq-chead>b){text-wrap:balance}
+:is(.ws-page,.ws-sheet) .mq-cstate-n{gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead{font-size:var(--ws-text);gap:1mm 1.8mm;flex-wrap:wrap;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>b{flex:1 1 100%;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>.mq-lnum{width:8.5mm;height:8.5mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cfinalcell{justify-content:center;align-items:stretch;padding:1.5mm 3mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal-h{font-size:var(--ws-text);line-height:1.25;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cfinal-h>b{font-weight:700;display:block}
+:is(.ws-page,.ws-sheet) .mq-cfinal>.mq-cdraw{align-items:center}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cdrawcell{padding:0;justify-content:flex-start;align-items:flex-start}
+:is(.ws-page,.ws-sheet) .ws-band.mq-cchantband{flex:none;display:flex;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-cchant{display:flex;align-items:center;gap:5mm;padding:0 3mm;width:100%}
+:is(.ws-page,.ws-sheet) .mq-cchant>b{font-size:var(--ws-text);font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-cchant>span{flex:1;border:1.5pt solid var(--ws-ink);border-radius:3mm;padding:1.2mm 5mm;font-size:var(--ws-title);font-weight:700;line-height:1.25;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-lround{display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-lround-top{display:flex;align-items:flex-end;gap:1mm;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-lring{outline:var(--ws-hair) solid var(--ws-ink);outline-offset:.06em;border-radius:50%}
+:is(.ws-page,.ws-sheet) .mq-lring.mq-lring-t{outline:1pt solid #949494}
+:is(.ws-page,.ws-sheet) .mq-wwbarlayout .mq-lring{display:inline-block;margin:0 .2em;padding:0 .08em;line-height:1.05}
+:is(.ws-page,.ws-sheet) .mq-luline{border-bottom:1pt solid #949494;display:inline-block;line-height:1}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvocabcell{justify-content:center;align-items:stretch;padding:2.5mm 3mm}
+:is(.ws-page,.ws-sheet) .mq-lvocab{width:100%;display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-lvrow{display:grid;grid-template-columns:repeat(var(--n),1fr)}
+:is(.ws-page,.ws-sheet) .mq-lvpic{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-lvpic-in{min-height:12mm;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-lvword{display:flex;flex-direction:column;align-items:center;gap:1.5mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-lvword b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-ldot{display:block;width:2mm;height:2mm;border-radius:50%;background:#000}
+:is(.ws-page,.ws-sheet) .mq-lvgap{position:relative;height:calc(var(--ws-hw) * 1.05)}
+:is(.ws-page,.ws-sheet) .mq-lvgap>svg{position:absolute;left:0;top:-1mm;width:100%;height:calc(100% + 2mm);overflow:visible}
+:is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol{border-left:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol{display:flex;flex-direction:column;min-width:0}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter{justify-content:center}
+/* CL-4b (s3 precritic-2): a Guided cell carries no tab, so a stack that is not write-above keeps no
+   tab clearance above it: its digits start at the top pad. Write-above stacks keep their centring. */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter:not(:has(> .ws-tab, > .ws-letter, > .ws-modeltab, > [data-ws-label])) > .ws-stack:not([data-ws-writeabove]){margin-top:0}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol>.ws-instrline{padding-left:3mm;padding-right:2mm}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol.mq-lwarm2>.ws-instrline{height:calc(var(--ws-instr) * 1.75);line-height:1.2;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol .ws-grid{border-left-width:0}</style><div class="ws-instrline" data-ws-instruction="mixed-sign"><span>Add or subtract. Look at the <u>sign</u>.</span></div><div class="ws-grid fixed" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(1,1fr);height:18.4mm;"><div class="ws-cell  mqt--equation mqt--equation mqa--number mql--1" data-ws-cell="equation" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="addition:add_sub_10s"><span class="ws-tab" data-ws-label="tab">1</span><div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em"><span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap"><span>80</span><span class="o" style="width:0.8em">−</span><span>10</span><span class="o" style="width:0.8em">=</span></span><span class="ws-line" style="--w:25mm;font-size:1em;font-weight:400;display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1" data-ws-slot="answer" data-ws-shape="line"></span></div></div><div class="ws-cell  mqt--equation mqt--equation mqa--number mql--1" data-ws-cell="equation" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="addition:add_sub_10s"><span class="ws-tab" data-ws-label="tab">2</span><div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em"><span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap"><span>14</span><span class="o" style="width:0.8em">+</span><span>10</span><span class="o" style="width:0.8em">=</span></span><span class="ws-line" style="--w:25mm;font-size:1em;font-weight:400;display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1" data-ws-slot="answer" data-ws-shape="line"></span></div></div><div class="ws-cell  mqt--equation mqt--equation mqa--number mql--1" data-ws-cell="equation" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="addition:add_sub_10s"><span class="ws-tab" data-ws-label="tab">3</span><div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em"><span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap"><span>53</span><span class="o" style="width:0.8em">−</span><span>10</span><span class="o" style="width:0.8em">=</span></span><span class="ws-line" style="--w:25mm;font-size:1em;font-weight:400;display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1" data-ws-slot="answer" data-ws-shape="line"></span></div></div></div><div class="ws-instrline" data-ws-instruction="add">Add.</div><div class="ws-grid fixed" style="grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(1,1fr);height:43.1mm;"><div class="ws-cell fact  mqt--fact mqt--fact mqa--number mql--1" data-ws-cell="fact" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="--fd:28pt;--fp:2mm" data-ws-skill="addition:add_facts"><span class="ws-tab" data-ws-label="tab">4</span><div class="ws-fact" style="--fd:28pt;grid-template-columns:1.2em repeat(2, 0.72em)"><span></span><span></span><span>7</span><span class="op">+</span><span></span><span>6</span><span class="rule"></span><span class="ws-factans" data-ws-slot="ans" data-ws-shape="open" style="grid-column:2 / -1;font-weight:400;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(2, 0.72em);justify-content:end;height:1.15em;line-height:1.15"><span style="text-align:center"></span><span style="text-align:center"></span></span></div></div><div class="ws-cell fact  mqt--fact mqt--fact mqa--number mql--1" data-ws-cell="fact" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="--fd:28pt;--fp:2mm" data-ws-skill="addition:add_facts"><span class="ws-tab" data-ws-label="tab">5</span><div class="ws-fact" style="--fd:28pt;grid-template-columns:1.2em repeat(2, 0.72em)"><span></span><span></span><span>4</span><span class="op">+</span><span></span><span>3</span><span class="rule"></span><span class="ws-factans" data-ws-slot="ans" data-ws-shape="open" style="grid-column:2 / -1;font-weight:400;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(2, 0.72em);justify-content:end;height:1.15em;line-height:1.15"><span style="text-align:center"></span><span style="text-align:center"></span></span></div></div><div class="ws-cell fact  mqt--fact mqt--fact mqa--number mql--1" data-ws-cell="fact" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="--fd:28pt;--fp:2mm" data-ws-skill="addition:add_facts"><span class="ws-tab" data-ws-label="tab">6</span><div class="ws-fact" style="--fd:28pt;grid-template-columns:1.2em repeat(2, 0.72em)"><span></span><span></span><span>8</span><span class="op">+</span><span></span><span>3</span><span class="rule"></span><span class="ws-factans" data-ws-slot="ans" data-ws-shape="open" style="grid-column:2 / -1;font-weight:400;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(2, 0.72em);justify-content:end;height:1.15em;line-height:1.15"><span style="text-align:center"></span><span style="text-align:center"></span></span></div></div><div class="ws-cell fact  mqt--fact mqt--fact mqa--number mql--1" data-ws-cell="fact" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="--fd:28pt;--fp:2mm" data-ws-skill="addition:add_facts"><span class="ws-tab" data-ws-label="tab">7</span><div class="ws-fact" style="--fd:28pt;grid-template-columns:1.2em repeat(2, 0.72em)"><span></span><span></span><span>2</span><span class="op">+</span><span></span><span>5</span><span class="rule"></span><span class="ws-factans" data-ws-slot="ans" data-ws-shape="open" style="grid-column:2 / -1;font-weight:400;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(2, 0.72em);justify-content:end;height:1.15em;line-height:1.15"><span style="text-align:center"></span><span style="text-align:center"></span></span></div></div></div><div class="ws-instrline" data-ws-instruction="default-write">Solve. Write the answer.</div><div class="ws-grid fixed" style="grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(1,1fr);height:115.5mm;"><div class="ws-cell mq-legacy mqt--legacy mqt--legacy mqa--number mql--1 mq-legacy" data-ws-cell="legacy" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" data-ws-legacy="1" style="" data-ws-skill="algebra:tape_diagram"><span class="ws-tab" data-ws-label="tab">8</span><div class="ws-legacy print-edition"><div class="worksheet-problem full-width"><div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">Zoe has 10 marbles and gets 29 more. How many marbles in all?</div>
+            <div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;"><div style="text-align:center;">
+                        
+                        <div style="max-width:600px;width:100%;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid #000;border-right:2px solid #000;height:14px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:#000;margin-bottom:8px;">? total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:159px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">10</div>
+                                <div style="width:461px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">29</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1rem;color:#000;margin-top:12px;">Add the two parts to find the whole.</div>
+                    </div></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #000;">&nbsp;</span></div>
+        </div></div></div></div><div class="ws-cell mq-legacy mqt--legacy mqt--legacy mqa--number mql--1 mq-legacy" data-ws-cell="legacy" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" data-ws-legacy="1" style="" data-ws-skill="algebra:tape_diagram"><span class="ws-tab" data-ws-label="tab">9</span><div class="ws-legacy print-edition"><div class="worksheet-problem full-width"><div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">Mia needs 126 stickers. He already has 76. How many more does he need?</div>
+            <div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;"><div style="text-align:center;">
+                        
+                        <div style="max-width:600px;width:100%;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid #000;border-right:2px solid #000;height:14px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:#000;margin-bottom:8px;">126 total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:374px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">76</div>
+                                <div style="width:246px;height:110px;border:2px solid #000;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:2rem;color:#000;background:#fff;">?</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1rem;color:#000;margin-top:12px;">Subtract the known part from the whole.</div>
+                    </div></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #000;">&nbsp;</span></div>
+        </div></div></div></div><div class="ws-cell mq-legacy mqt--legacy mqt--legacy mqa--number mql--1 mq-legacy" data-ws-cell="legacy" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" data-ws-legacy="1" style="" data-ws-skill="algebra:tape_diagram"><span class="ws-tab w2" data-ws-label="tab">10</span><div class="ws-legacy print-edition"><div class="worksheet-problem full-width"><div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">Sam had 200 apples. She used 13. How many remain?</div>
+            <div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;"><div style="text-align:center;">
+                        
+                        <div style="max-width:600px;width:100%;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid #000;border-right:2px solid #000;height:14px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:#000;margin-bottom:8px;">200 total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:40px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">13</div>
+                                <div style="width:580px;height:110px;border:2px solid #000;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:2rem;color:#000;background:#fff;">?</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1rem;color:#000;margin-top:12px;">Subtract the known part from the whole.</div>
+                    </div></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #000;">&nbsp;</span></div>
+        </div></div></div></div><div class="ws-cell mq-legacy mqt--legacy mqt--legacy mqa--number mql--1 mq-legacy" data-ws-cell="legacy" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" data-ws-legacy="1" style="" data-ws-skill="algebra:tape_diagram"><span class="ws-tab w2" data-ws-label="tab">11</span><div class="ws-legacy print-edition"><div class="worksheet-problem full-width"><div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">Ben had 56 shells. She used 33. How many remain?</div>
+            <div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;"><div style="text-align:center;">
+                        
+                        <div style="max-width:600px;width:100%;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid #000;border-right:2px solid #000;height:14px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:#000;margin-bottom:8px;">56 total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:365px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">33</div>
+                                <div style="width:255px;height:110px;border:2px solid #000;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:2rem;color:#000;background:#fff;">?</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1rem;color:#000;margin-top:12px;">Subtract the known part from the whole.</div>
+                    </div></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #000;">&nbsp;</span></div>
+        </div></div></div></div></div></main>
+  <footer class="ws-foot" data-ws-teacher=""><span>add_sub_10s, add_facts, tape_diagram +1 · Grade 1-4 · 1.NBT.4, 1.OA.6, 2.OA.1, 3.MD.8</span><b>1/2</b><span>Form A · seed 2257497613</span><small class="ws-copy">© 2026 Cultivating the Digital. All rights reserved.</small></footer>
+</section>
+
+<section class="ws-page ws-L ws-ican ws-tab6 " data-ws-page="2" data-ws-paper="a4" data-ws-role="independent" data-ws-mode="print" data-ws-look="ican" data-ws-size="L" data-ws-tab="Level 1-4|Lesson 1">
+  <header class="ws-head"><div class="ws-rowA notab"><div class="ws-field name">Name<i></i></div></div><div class="ws-headrule"></div></header>
+  <main class="ws-body"><i class="mq-cont" hidden=""></i><div class="ws-instrline" data-ws-instruction="add-sides">Add the lengths of all the sides. Write the perimeter.</div><div class="ws-grid fixed" style="grid-template-columns:repeat(2,1fr);grid-template-rows:84.1fr;height:84.1mm;"><div class="ws-cell  mqt--perimeter-shape mqt--perimeter-shape mqa--number mql--1" data-ws-cell="perimeter-shape" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="area_perimeter:perimeter_intro"><span class="ws-tab w2" data-ws-label="tab">12</span><div class="k2-cell fg-perimeter-cell" style="color:#000;font-family:'Andika','Open Sans',sans-serif;text-align:center;"><div style="display:inline-block;"><svg class="k2-svg fg-perimeter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54.65 39.41" role="img" aria-label="triangle with sides 8, 6, 5 m" style="display:block;width:54.65mm;height:auto;max-width:100%;overflow:visible;"><polygon points="5.15,25.54 53.15,25.54 25.02,3.06" fill="#fff" stroke="#000" stroke-width="0.53" stroke-linejoin="round"></polygon><text x="29.15" y="36.43" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">8</tspan><tspan font-size="5.29"> m</tspan></text><text x="45.37" y="9.9" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">6</tspan><tspan font-size="5.29"> m</tspan></text><text x="7.43" y="10.99" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">5</tspan><tspan font-size="5.29"> m</tspan></text></svg></div><div style="display:flex;align-items:center;justify-content:center;gap:2mm;margin-top:4mm;white-space:nowrap;"><span style="font-size:15pt;line-height:1.25;">Perimeter =</span><span style="display:inline-flex;align-items:center;gap:2mm;" data-ws-shape="unit"><span class="k2-box" data-ws-slot="answer" data-ws-shape="box" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:17mm;height:12mm;border:0.75pt solid #000;border-radius:1.25mm;background:#fff;vertical-align:middle;font-size:28pt;font-weight:700;line-height:1;color:#000;flex:none;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;"></span><span style="font-size:15pt;line-height:1.25;">m</span></span></div></div></div><div class="ws-cell  mqt--perimeter-shape mqt--perimeter-shape mqa--number mql--1" data-ws-cell="perimeter-shape" data-ws-state="blank" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="area_perimeter:perimeter_intro"><span class="ws-tab w2" data-ws-label="tab">13</span><div class="k2-cell fg-perimeter-cell" style="color:#000;font-family:'Andika','Open Sans',sans-serif;text-align:center;"><div style="display:inline-block;"><svg class="k2-svg fg-perimeter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.85 47.38" role="img" aria-label="triangle with sides 3, 3, 3 m" style="display:block;width:50.85mm;height:auto;max-width:100%;overflow:visible;"><polygon points="6.95,33.5 43.9,33.5 25.43,1.5" fill="#fff" stroke="#000" stroke-width="0.53" stroke-linejoin="round"></polygon><text x="25.43" y="44.4" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">3</tspan><tspan font-size="5.29"> m</tspan></text><text x="43.42" y="15.9" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">3</tspan><tspan font-size="5.29"> m</tspan></text><text x="7.43" y="15.9" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">3</tspan><tspan font-size="5.29"> m</tspan></text></svg></div><div style="display:flex;align-items:center;justify-content:center;gap:2mm;margin-top:4mm;white-space:nowrap;"><span style="font-size:15pt;line-height:1.25;">Perimeter =</span><span style="display:inline-flex;align-items:center;gap:2mm;" data-ws-shape="unit"><span class="k2-box" data-ws-slot="answer" data-ws-shape="box" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:17mm;height:12mm;border:0.75pt solid #000;border-radius:1.25mm;background:#fff;vertical-align:middle;font-size:28pt;font-weight:700;line-height:1;color:#000;flex:none;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;"></span><span style="font-size:15pt;line-height:1.25;">m</span></span></div></div></div></div></main>
+  <footer class="ws-foot" data-ws-teacher=""><span>add_sub_10s, add_facts, tape_diagram +1 · Grade 1-4 · 1.NBT.4, 1.OA.6, 2.OA.1, 3.MD.8</span><b>2/2</b><span>Form A · seed 2257497613</span><small class="ws-copy">© 2026 Cultivating the Digital. All rights reserved.</small></footer>
+</section>
+
+<section class="ws-page ws-L ws-ican ws-tab6 ws-key" data-ws-page="1" data-ws-paper="a4" data-ws-role="independent" data-ws-mode="key" data-ws-look="ican" data-ws-size="L" data-ws-tab="Level 1-4|Answer Key">
+  <header class="ws-head"><div class="ws-rowA notab"><div class="ws-field name"><span data-ws-key="name">Answer Key</span><i></i></div><div class="ws-field date">Date<i></i></div><div class="ws-field score">Score<i></i><b>/13</b></div></div><div class="ws-title">Mixed practice</div><div class="ws-headrule"></div></header>
+  <main class="ws-body"><style data-mq-sheet-engine="">/* HD-14: a title that does not fit one line wraps to two and takes 6 mm from the body. */
+:is(.ws-page,.ws-sheet) .ws-title{white-space:normal;height:auto;min-height:8mm;line-height:7mm;text-align:center}
+/* HD-20: pages 2+ carry a 12 mm header - Name line, a one-line outlined tab 8 mm tall, the rule. */
+.ws-page:has(.mq-cont) .ws-rowA{height:9mm}
+.ws-page:has(.mq-cont) .ws-rowA .ws-field{height:9mm}
+.ws-page:has(.mq-cont) .ws-rowA .ws-field i{height:8mm}
+.ws-page:has(.mq-cont) .ws-tabbox{width:auto;height:8mm;flex-direction:row;align-items:center;align-self:flex-end;padding:0 3mm;font-size:9pt;line-height:1;white-space:nowrap}
+.ws-page:has(.mq-cont) .ws-tabbox span{font-weight:700}
+.ws-page:has(.mq-cont) .ws-tabbox span:last-child{font-weight:400}
+.ws-page:has(.mq-cont) .ws-tabbox span+span::before{content:"\00a0\00b7\00a0";font-weight:400}
+/* BD-14: an underlined word inside a library instruction. */
+:is(.ws-page,.ws-sheet) .ws-instrline u{text-decoration-thickness:.75pt;text-underline-offset:1.2mm}
+/* SCC-A5: a legacy cell. The legacy markup was written for a full-width column, so it spans the
+   cell; its content starts below the label box (CL-40); the legacy shell's own border, padding
+   and clipping are dropped because the kit cell is the one box (CL-1, CL-7), and nothing may be
+   clipped silently. The key's answer stamp costs no layout, so the problem sits where it sits on
+   the pupil page (AK-1). */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy{align-items:stretch;padding-top:calc(var(--ws-tab,6mm) + 1mm)}
+/* R1: a legacy-sourced item a fact page redraws with the fact template (sub_facts on Fact rows)
+   keeps the fact cell's own top pad (--fp, set clear of the tab by factPadTop), as add_facts does;
+   the legacy 7 mm pushed the L key's answers 0.2 mm out of the 45 mm row (PG-12). */
+:is(.ws-page,.ws-sheet) .ws-cell.fact.mq-legacy{padding-top:var(--fp,2mm)}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy>.ws-legacy{width:100%;min-width:0}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .worksheet-problem{border:0!important;border-radius:0!important;padding:0!important;margin:0!important;overflow:visible!important;background:transparent!important;box-shadow:none!important}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content,:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .problem-content>div{overflow:visible}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .stack{margin-left:auto;margin-right:auto}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer{position:absolute;left:3mm;right:3mm;bottom:1.5mm;display:block;text-align:center;font-size:var(--ws-zone);font-weight:700;line-height:1.2}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer .ws-zone{font-size:inherit}
+/* ---- P7.2b roles (roles/compose.js). Scoped to the sheet roots; additive. ---- */
+/* INK-3: a traced value stays grey in print. css/print-worksheet.css forces every legacy
+   .worksheet-problem descendant to black under @media print; the trace is the one exception. */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"],:is(.ws-page,.ws-sheet) .worksheet-problem .ws-trace{color:#949494!important}
+/* TY-2: Andika has 400 and 700 only. Legacy markup asks for 600 in places (visual labels, the
+   "Answer:" caption); inside a sheet it takes the 700 the face really has, never a synthetic bold. */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-legacy :is([style*="font-weight:600"],[style*="font-weight: 600"],.visual-label){font-weight:700!important}
+/* The engine's style block (and page 2's continuation marker) sit before the first band, so the
+   kit's :first-child band rule is restated for them (BD-3: the header rule closes the header). */
+.ws-body>:is(style,.mq-cont):first-child+:is(.ws-band,.mq-row),.ws-body>style:first-child+.mq-cont+:is(.ws-band,.mq-row){margin-top:1.5mm}
+.ws-body>:is(style,.mq-cont):first-child+.ws-band,.ws-body>style:first-child+.mq-cont+.ws-band{border-top-width:var(--ws-heavy)}
+:is(.ws-page,.ws-sheet) .ws-band>.ws-grid.fixed{flex:none}
+/* a value written into a line slot sits on the rule (a key, shown work) */
+:is(.ws-page,.ws-sheet) .ws-line[data-ws-ink]{display:inline-flex;align-items:flex-end;justify-content:center;font-weight:700;line-height:1.1;padding-bottom:.6mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .ws-line.ws-trace[data-ws-ink]{font-weight:400}
+/* PT-OPN-2: parts side by side in one band row (Model | Steps, quadrants, a probe and its strip) */
+:is(.ws-page,.ws-sheet) .mq-row{flex:none;display:grid;column-gap:0;margin-top:-1.5pt;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol{min-width:0;min-height:0;display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band{flex:1 1 auto;margin-top:0;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol+.mq-rowcol>.ws-band{border-left:0}
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band>.ws-grid{flex:1 1 auto}
+:is(.ws-page,.ws-sheet) .mq-row.mq-proberow{margin-top:0;column-gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-col{display:flex;flex-direction:column;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-quadrow+.mq-quadrow{margin-top:3mm}
+:is(.ws-page,.ws-sheet) .mq-quadrow .ws-band{margin-top:0}
+:is(.ws-page,.ws-sheet) .mq-quadscore{margin-left:auto;font-weight:700;white-space:nowrap}
+/* BD-4: the Steps list. Two text columns on the Guided page (PT-GDP-2). */
+:is(.ws-page,.ws-sheet) .mq-stepsband{padding:1mm 3mm 3mm 4mm}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps2{display:block;columns:2;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps2 li{break-inside:avoid;margin-bottom:2.2mm}
+:is(.ws-page,.ws-sheet) .mq-stepszone{padding:1.5mm 3mm 0 4mm;overflow:hidden}
+:is(.ws-page,.ws-sheet) .mq-steptext{width:100%;height:100%;display:flex;gap:2.5mm;align-items:flex-start;padding-top:2mm;font-size:var(--ws-text);line-height:1.3;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-steptext>em{flex:none;font-style:normal;width:7mm;height:7mm;border:var(--ws-hair) solid var(--ws-ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--ws-zone);font-weight:700}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-stepcell{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-steptop{width:100%;height:calc(2 * (1.3em) + 4mm);flex:none}
+/* check-box lines and one-line sentence frames (section 6, P-TH-3) */
+:is(.ws-page,.ws-sheet) .mq-checkline{display:inline-flex;align-items:center;gap:2.5mm;white-space:nowrap;font-size:var(--ws-text);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-checkline .ws-check{margin:0;vertical-align:0;flex:none}
+:is(.ws-page,.ws-sheet) .mq-frame{display:flex;align-items:flex-end;gap:1.5mm;white-space:nowrap;font-size:var(--ws-text);line-height:1.1}
+/* Error analysis and True or False?: the finished work beside the judgement (04-E mock-up) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-thinkcell{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-judge{width:100%;flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:3mm;row-gap:3mm;align-items:end}
+:is(.ws-page,.ws-sheet) .mq-judge-work{min-width:0;align-self:start;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-judge-row{display:flex;flex-direction:column;align-items:flex-start;gap:4mm;padding-bottom:1mm}
+:is(.ws-page,.ws-sheet) .mq-fixline{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-fixline .ws-line{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-tf{grid-template-columns:minmax(0,1fr);align-content:space-between;row-gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-tf>.mq-judge-row{flex-direction:row;gap:12mm;padding:0 0 0 4mm}
+:is(.ws-page,.ws-sheet) .mq-tf>.mq-frame{justify-self:start;padding:0 0 1mm 4mm}
+/* A thinking cell draws its shown answer in the flow (it is measured with it), never over the picture. */
+:is(.ws-page,.ws-sheet) .ws-cell :is(.mq-judge-work,.mq-abbox,.mq-wpcell) .ws-legacy-answer.mq-shown{position:static;margin-top:2mm;left:auto;right:auto;bottom:auto}
+:is(.ws-page,.ws-sheet) .mq-shownline{display:flex;align-items:flex-end;gap:2mm;margin-top:2mm;font-size:var(--ws-text);line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-shownline b{font-weight:700;border-bottom:var(--ws-hair) solid var(--ws-ink);min-width:14mm;text-align:center}
+/* Reason It, "Which is correct" (09-B mock-up): two finished answers A and B, then the frames */
+:is(.ws-page,.ws-sheet) .mq-ab{width:100%;display:grid;grid-template-columns:1fr 1fr minmax(52mm,auto);column-gap:5mm;align-items:start;padding-top:2mm}
+:is(.ws-page,.ws-sheet) .mq-abbox{position:relative;min-width:0;border:var(--ws-hair) solid var(--ws-ink);padding:10mm 2mm 3mm 2mm;display:flex;flex-direction:column;align-items:center;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-abtag{position:absolute;left:0;top:0;width:8mm;height:8mm;border-right:var(--ws-hair) solid var(--ws-ink);border-bottom:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center;font-size:var(--ws-text);font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-abresp{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:6mm;padding:1mm 0 1mm}
+:is(.ws-page,.ws-sheet) .mq-abchoice{display:flex;gap:10mm;padding-left:2mm}
+:is(.ws-page,.ws-sheet) .ws-choice{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;height:12mm;padding:0 1.5mm;font-size:var(--ws-digit);font-weight:700;line-height:1}
+/* Stretch (09-D mock-up): the prompt box, the results table, the closing frames */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-stretchcell{align-items:stretch;padding:4mm 5mm 4mm 9mm}
+:is(.ws-page,.ws-sheet) .mq-stretch{width:100%;display:flex;flex-direction:column;gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-prompt{padding:2.5mm 5mm}
+:is(.ws-page,.ws-sheet) .mq-stretch-main{display:flex;align-items:flex-end;gap:7mm}
+:is(.ws-page,.ws-sheet) .mq-table{flex:none;border-collapse:collapse;border:var(--ws-heavy) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-table th,:is(.ws-page,.ws-sheet) .mq-table td{border:var(--ws-hair) solid var(--ws-ink);padding:0 2mm;text-align:center;vertical-align:middle}
+:is(.ws-page,.ws-sheet) .mq-table th{height:10mm;font-size:var(--ws-zone);font-weight:700;line-height:1.1}
+:is(.ws-page,.ws-sheet) .mq-table td{height:calc(var(--ws-hw) + 3mm);min-width:28mm;font-size:var(--ws-text);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols3 td{width:30mm}
+:is(.ws-page,.ws-sheet) .mq-table.mq-cols2 td:first-child{width:60mm}
+:is(.ws-page,.ws-sheet) .mq-table td b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-closing{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6mm;padding-bottom:1mm}
+/* Word problems v2 (07-D mock-up): story box with the answer row, then the equation frame */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-wpcellbox{align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-wp{width:100%;flex:1 1 auto;display:flex;flex-direction:column;padding-left:6mm}
+:is(.ws-page,.ws-sheet) .mq-wpstory>div{white-space:normal}
+:is(.ws-page,.ws-sheet) .mq-wpcell{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;padding:3mm 4mm;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wpanswer{display:flex;align-items:flex-end;justify-content:flex-end;gap:4mm;margin-top:2mm;padding-right:4mm}
+:is(.ws-page,.ws-sheet) .mq-ansslot{display:inline-flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-ansslot small{font-size:var(--ws-zone);line-height:1.2;margin-top:.8mm}
+:is(.ws-page,.ws-sheet) .mq-wpwork{flex:1 1 auto;display:flex;align-items:flex-start;padding:8mm 0 0 4mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-wpwork .ws-circle{margin:0 1mm}
+/* Fact probe: horizontal facts and the skip-count strip (PT-FPR-3) */
+:is(.ws-page,.ws-sheet) .mq-hfact{width:100%;display:flex;align-items:flex-end;gap:2mm;padding-top:2mm;font-size:var(--ws-digit);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-hfact .ws-line{font-size:var(--ws-digit)}
+:is(.ws-page,.ws-sheet) .mq-skipstrip{border:var(--ws-heavy) solid var(--ws-ink);border-radius:3mm;display:flex;flex-direction:column;justify-content:space-around;align-items:center;font-size:var(--ws-text);font-weight:700;line-height:1}
+/* ---- 2026-09-25 re-grade fixes (additive) ---- */
+/* Guided Steps band: row-major, so the steps read 1 2 / 3 4 left to right (never 1 3 / 2). */
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows{display:grid;grid-template-columns:1fr 1fr;column-gap:8mm;row-gap:2.2mm;columns:auto}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows.mq-steps-one{grid-template-columns:1fr}
+:is(.ws-page,.ws-sheet) .ws-steps.mq-steps-rows li{margin-bottom:0}
+/* Error analysis: the judgement beside the work, in the top of the cell (no dead band), and one
+   square write box the pupil writes the fix in. */
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2{align-items:start;column-gap:6mm}
+:is(.ws-page,.ws-sheet) .mq-judge2>.mq-judge-row{align-self:start;gap:4mm;padding:1mm 1mm 1mm 0}
+:is(.ws-page,.ws-sheet) .mq-fixrow{display:flex;flex-direction:column;align-items:flex-start;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-fixslot{margin-left:9mm}
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge2.mq-judge-stack{grid-template-columns:minmax(0,1fr);row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack>.mq-judge-row{flex-direction:row;align-items:flex-start;gap:10mm;padding-left:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixrow{flex-direction:row;align-items:flex-start;gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-judge-stack .mq-fixslot{margin-left:0}
+:is(.ws-page,.ws-sheet) .mq-fixslot .ws-box,:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer .ws-box{height:calc(var(--ws-hw) + 4mm);min-height:calc(var(--ws-hw) + 4mm);display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1}
+/* Word problems v2: story, work space, answer row - square corners on paper. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{padding-left:6mm;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpstory{border-radius:0}
+:is(.ws-page,.ws-sheet) .mq-wpspace{position:relative;flex:1 1 auto;min-height:30mm;border:var(--ws-hair) solid var(--ws-ink);display:flex;align-items:center;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-wpspace>small{position:absolute;left:2mm;top:1mm;font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-wpsentence{font-size:calc(var(--ws-text) * 1.35);font-weight:700;line-height:1.15;text-align:center;padding:0 2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2 .mq-wpanswer{margin-top:0;padding-right:0;justify-content:flex-end;gap:6mm}
+/* INK-3: everything inside a traced slot is trace grey, the legacy key's inline-black <b> and a
+   drawn model's currentColor strokes included (print-worksheet.css forces legacy text black). */
+:is(.ws-page,.ws-sheet) [data-ws-ink="trace"] *{color:#949494!important}
+/* Guided fade: a partially traced value keeps its geometry; the untraced part is not printed. */
+:is(.ws-page,.ws-sheet) .mq-untraced{visibility:hidden}
+/* ---- critic round 2 (2026-09-25) ---- */
+/* AK-1 facsimile: a key answer is Andika 700 and keeps the sheet's open 4 (cv04, TY-4) however deep
+   it sits (a legacy key style or an inline font shorthand reset it, and the 4 closed). cv01 is NOT
+   set: TY-4 (owner ruling 2026-09-19) rejects it, so the bold face keeps its own flagged 1. */
+:is(.ws-page,.ws-sheet) :is(b,strong,th,.ws-tab,[data-ws-ink="solid"],[data-ws-ink="solid"] *,.ws-legacy-answer,.ws-legacy-answer *){font-feature-settings:"cv04" 1}
+.ws-key [data-ws-ink="solid"]:not(.mq-pupil):not(:is(.mq-pupil,.mq-judge-work,.mq-abbox,.mq-tf) *){font-weight:700}
+/* Guided cells: the count cue of a level-2 cell (H3), grey, beside the fact. */
+:is(.ws-page,.ws-sheet) .mq-cuewrap{display:flex;align-items:flex-start;justify-content:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cue{display:flex;flex-direction:column;gap:1mm;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-cue svg{display:block}
+/* R3: a K story's label word stands in one fixed width, so the number box is in the same place in every cell. */
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk .mq-klabel{min-width:30mm;justify-content:flex-start}
+:is(.ws-page,.ws-sheet) .mq-cue.mq-cue-b{padding-top:calc(var(--fd,var(--ws-digit)) * 1.15 + .5mm)}
+:is(.ws-page,.ws-sheet) .mq-cuecol{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-thinkcue{font-size:var(--ws-text);line-height:1.2;white-space:nowrap;border:1pt solid #949494;border-radius:2mm;padding:1mm 3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-modelcell{padding-top:calc(var(--ws-tab,6mm) + 1.5mm)}
+/* Error analysis: what the pupil wrote is shown in "pupil writing" (trace grey, tagged), so it is
+   never confused with the printed numbers (critic round 2, C1). */
+:is(.ws-page,.ws-sheet) .mq-pupiltag{position:absolute;left:8mm;top:1mm;font-size:var(--ws-zone);line-height:1.2;font-style:normal;white-space:nowrap}
+/* the "<name> wrote:" tag sits on the letter's line; the work starts under it */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{padding-top:calc(var(--ws-zone) * 1.2 + 2.5mm)}
+:is(.ws-page,.ws-sheet) .mq-pupil,:is(.ws-page,.ws-sheet) .mq-pupil *{color:#949494!important}
+:is(.ws-page,.ws-sheet) .mq-klabel{display:inline-flex;align-items:center;min-height:calc(var(--ws-hw) + 4mm);font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-pupilwork{font-size:var(--ws-digit);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixes{display:flex;gap:3mm;flex-wrap:wrap}
+:is(.ws-page,.ws-sheet) .mq-redraw{display:flex;flex-direction:column;align-items:flex-start;gap:1mm}
+:is(.ws-page,.ws-sheet) .mq-redraw>small{font-size:var(--ws-zone);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-fixchoice{display:flex;flex-direction:column;gap:2mm}
+/* VA-2: the operator keeps to the left of its own track, clear of a two-digit bottom number. */
+:is(.ws-page,.ws-sheet) .ws-fact>.op{justify-content:flex-start}
+/* Fact rows across form (PT-FRW-7) and the division sentence frame under a picture. */
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across{justify-content:flex-start;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-hfact.mq-across>span{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe{display:flex;align-items:flex-end;justify-content:center;gap:1.5mm;margin-top:1mm;font-size:var(--ws-text);line-height:1.1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-sframe .ws-line{height:7mm}
+/* Word problems: the skill's named model in the work space, a picture row for K. */
+/* The answer column sits BESIDE the work space, at its foot, so a story with its model fits three
+   (or two) to a page instead of one: story across the top, work space left, number and label right. */
+:is(.ws-page,.ws-sheet) .mq-wp.mq-wp2{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpstory{grid-column:1 / -1;padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpspace{grid-column:1;grid-row:2;min-height:20mm}
+:is(.ws-page,.ws-sheet) .mq-wp2>.mq-wpanswer{grid-column:2;grid-row:2;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer{flex-direction:row;align-items:flex-start;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpk>.mq-wpanswer .mq-ansslot small:empty{display:none}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto}
+:is(.ws-page,.ws-sheet) .mq-wp2.mq-wpunder>.mq-wpanswer{grid-column:1;grid-row:3;flex-direction:row;align-items:flex-end}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel{align-items:stretch;justify-content:center;padding:6mm 2mm 2mm}
+:is(.ws-page,.ws-sheet) .mq-wpspace.mq-wpmodel>div{width:100%;display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-wppics{display:flex;flex-wrap:wrap;gap:3mm;justify-content:center;align-items:center;padding:2mm}
+/* ---- Error analysis, critic round 3 (2026-09-25): the fix copies the item's own answer shape ---- */
+:is(.ws-page,.ws-sheet) .mq-fixpat{display:inline-flex;align-items:center;flex-wrap:nowrap;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-fixglue{font-size:var(--ws-text);font-weight:400;line-height:1;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixchoice.mq-fixletters{flex-direction:row;gap:5mm}
+:is(.ws-page,.ws-sheet) .mq-fixglue.mq-fixsym{font-size:var(--ws-digit);font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-fixes>.mq-ansslot small{white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixtext .ws-line{font-size:var(--ws-text);font-weight:700;max-width:100%}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-fixslot small{font-size:max(var(--ws-zone),11pt)}
+:is(.ws-page,.ws-sheet) .mq-fixcols{gap:0}
+:is(.ws-page,.ws-sheet) [data-ws-tagged]{position:relative}
+:is(.ws-page,.ws-sheet) .mq-frac{display:inline-flex;flex-direction:column;align-items:center;font-size:.55em;line-height:1.05}
+:is(.ws-page,.ws-sheet) .mq-frac>span+span{border-top:1.5pt solid currentColor;padding-top:.3mm}
+:is(.ws-page,.ws-sheet) .mq-slottag,:is(.ws-page,.ws-sheet) .mq-pupil .mq-slottag{position:absolute;top:.4mm;left:.8mm;font-size:var(--ws-zone);font-style:normal;font-weight:700;line-height:1;color:#000!important}
+:is(.ws-page,.ws-sheet) .mq-fixsign .ws-circle{display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1;vertical-align:middle}
+:is(.ws-page,.ws-sheet) .mq-eatask{font-size:var(--ws-text);line-height:1.2;margin:0 0 1mm;align-self:flex-start}
+:is(.ws-page,.ws-sheet) .mq-fixcols>.ws-box+.ws-box{margin-left:-.75pt}
+/* the flow judgement: beside the work when --mq-jw fits, under it when not */
+:is(.ws-page,.ws-sheet) .mq-judge.mq-judge3{display:flex;flex-wrap:wrap;align-items:flex-start;align-content:flex-start;justify-content:center;column-gap:6mm;row-gap:2mm;width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-judge-work{flex:0 1 auto;min-width:0;max-width:100%;align-self:flex-start}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-judge-row{flex:1 1 var(--mq-jw,44mm);min-width:min(var(--mq-jw,44mm),100%);max-width:100%;display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:1mm 0 0 2mm}
+:is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-judge3 .mq-fixslot{margin-left:0}
+:is(.ws-page,.ws-sheet) .mq-judge3>.mq-redraw{flex:1 1 100%}
+/* the finished work and its judgement sit in the middle of the cell like every kit cell (H13: no band pinned under it) */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell>.mq-judge.mq-judge3{flex:0 0 auto}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-eacell{justify-content:center}
+/* AX-4: one place for the Correct / Fix-it block on every cell of a page - under the work, beside it (the two centred together), or in the item's own answer column */
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow>.mq-judge-row{flex:1 1 100%;min-width:100%}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbelow:not(.mq-jstack):not(.mq-judge-drawn) .mq-judge-row{flex-direction:row;align-items:flex-start;column-gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside{flex-wrap:nowrap;justify-content:center;column-gap:10mm}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-work{flex:0 0 auto;min-width:auto}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside>.mq-judge-row{flex:0 0 auto;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-judge3.mq-jbeside:not(.mq-judge-drawn) .mq-fixrow{flex-direction:column;align-items:flex-start;row-gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-judgecol{margin-top:3mm;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-judgecol>.mq-judge-row{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:6mm;row-gap:2mm;padding:0}
+:is(.ws-page,.ws-sheet) .mq-judgecol .mq-fixrow{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:4mm;row-gap:2mm}
+/* EA r5 (B): ONE Correct / Fix-it layout on every cell - "Correct" on its line, "Fix it" and the whole fix (every box, its captions) on the next, never wrapped */
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-judge-row{flex-direction:column;align-items:flex-start;flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixrow{flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixes,:is(.ws-page,.ws-sheet) .mq-judge3:not(.mq-judge-drawn) .mq-fixpat{flex-wrap:nowrap}
+:is(.ws-page,.ws-sheet) .mq-fixfrac{font-size:1em;line-height:1;row-gap:0}
+:is(.ws-page,.ws-sheet) .mq-fixfrac>span:first-child{padding-bottom:1.2mm}
+:is(.ws-page,.ws-sheet) .mq-fixfrac>span+span{border-top-width:1.5pt;padding-top:1.2mm}
+/* EA r5 (B): a graph's question follows the page - beside its picture in one column, under it in two or more, on every cell */
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askside div:has(> .fg-ask){flex-wrap:nowrap !important}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askunder div:has(> .fg-ask){flex-direction:column !important;flex-wrap:nowrap !important;align-items:center !important}
+:is(.ws-page,.ws-sheet) .mq-eacell .mq-askunder .fg-ask{flex:0 0 auto !important;max-width:none !important;align-self:stretch}
+:is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixrow{display:contents}
+:is(.ws-page,.ws-sheet) .mq-judge-drawn .mq-fixzone{flex:0 0 100%}
+/* the key's correction is black Andika 700, even inside the pupil's grey work (a fix box per fact) */
+:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]):is([data-ws-ink="solid"],[data-ws-ink="solid"] *),:is(.ws-page,.ws-sheet) .mq-judge-work :is([data-ws-slot^="x"],[data-ws-slot^="fix"]) :is([data-ws-ink="solid"],[data-ws-ink="solid"] *){color:#000!important;font-weight:700}
+
+:is(.ws-page,.ws-sheet) .ws-cell.mq-anchorcell{justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-anchor{width:100%;display:flex;flex-direction:column;gap:1mm;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-anchor-band .mq-anchor-state:first-child .mq-anchor-cell{padding-left:13mm}
+:is(.ws-page,.ws-sheet) .ws-cell:is(.mq-anchor-bandcell,.mq-anchor-compactcell){padding-top:2mm;padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-anchor-sidecell{padding-bottom:2mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-band.mq-anchor-belowtab{padding-top:calc(var(--ws-tab, 4.5mm) - 1mm)}
+:is(.ws-page,.ws-sheet) .mq-anchor-compact .mq-anchor-cell{padding-left:13mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-states{display:grid;column-gap:0;width:100%}
+:is(.ws-page,.ws-sheet) .mq-anchor-state{display:flex;flex-direction:column;align-items:stretch;gap:1.5mm;padding:0 2.5mm;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-anchor-state+.mq-anchor-state{border-left:var(--ws-hair) solid var(--ws-grey,#949494)}
+:is(.ws-page,.ws-sheet) .mq-anchor-cell{display:flex;justify-content:center;align-items:flex-start;min-height:0}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps{list-style:none;margin:0;padding:0;font-size:calc(var(--ws-zone) * 0.92);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li{display:flex;gap:1.6mm;align-items:flex-start;margin:0 0 0.5mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li>em{flex:none;font-style:normal;width:4.6mm;height:4.6mm;border:var(--ws-hair) solid var(--ws-ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85em;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li.mq-anchor-cont{margin-top:-0.4mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-steps li.mq-anchor-cont>em{border-color:transparent}
+:is(.ws-page,.ws-sheet) .mq-anchor-one{display:flex;flex-direction:column;align-items:stretch;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside{flex-direction:row;align-items:flex-start;gap:4mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-cell{flex:none}
+:is(.ws-page,.ws-sheet) .mq-anchor-one.mq-anchor-beside>.mq-anchor-steps{flex:1;min-width:0;padding-top:1mm}
+:is(.ws-page,.ws-sheet) .mq-anchor-say{font-size:var(--ws-zone);line-height:1.2;padding-top:1mm;border-top:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-anchor-say>b{font-weight:700}
+
+
+:is(.ws-page,.ws-sheet){--mq-lesson-accent:#5B2A86}
+:is(.ws-page,.ws-sheet) svg :is(text,tspan)[data-ws-ink="trace"]{fill:#949494!important}
+
+:is(.ws-page,.ws-sheet) .mq-licon{flex:none;display:block;overflow:visible;color:var(--mq-lesson-accent)}
+:is(.ws-page,.ws-sheet) .mq-licon .f{fill:currentColor;stroke:none}
+:is(.ws-page,.ws-sheet) .mq-licon *{vector-effect:non-scaling-stroke}
+
+:is(.ws-page,.ws-sheet) .mq-lnum{flex:none;font-style:normal;box-sizing:border-box;width:6.4mm;height:6.4mm;border:1pt solid var(--mq-lesson-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:max(11pt,var(--ws-zone));font-weight:700;color:var(--mq-lesson-accent);line-height:1}
+:is(.ws-page,.ws-sheet) .mq-lstrip{flex:none;display:flex;align-items:flex-start;gap:3mm;padding:1.6mm 0 2mm;border-bottom:var(--ws-hair) solid var(--ws-ink);margin-bottom:1mm;font-size:max(11pt,var(--ws-zone));line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-lstrip-l{flex:none;font-weight:700;font-size:var(--ws-text);padding-top:.6mm}
+:is(.ws-page,.ws-sheet) .mq-lstrip ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:1.5mm 5mm;flex:1;min-width:0}
+:is(.ws-page,.ws-sheet) .mq-lstrip li{display:flex;align-items:center;gap:1.4mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lstripcell{padding:0;justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-lsteps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2.2mm;font-size:max(11pt,calc(var(--ws-text) - 2pt));line-height:1.2;text-align:left}
+:is(.ws-page,.ws-sheet) .mq-lsteps li{display:flex;gap:1.8mm;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-lsteps li>span{min-width:0}
+:is(.ws-page,.ws-sheet) .mq-lstepszone{padding:2.5mm 3mm 0 3mm}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lstepscell{padding:0;justify-content:flex-start;align-items:stretch}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox{display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox>.mq-lstepszone{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;padding-bottom:2.5mm}
+:is(.ws-page,.ws-sheet) .mq-lstepsbox .mq-lsteps{flex:1 1 auto;justify-content:space-evenly}
+:is(.ws-page,.ws-sheet) .mq-lwedotop>.mq-lstrip{padding-left:3mm;padding-right:3mm;margin-bottom:0}
+:is(.ws-page,.ws-sheet) .mq-lstripchant{flex:none;display:flex;align-items:center;gap:3mm;padding:0 3mm;font-size:max(11pt,calc(var(--ws-text) - 2pt));line-height:1.2;border-bottom:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-lstripchant>span{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-lchant{margin:3mm 0 0;font-size:max(11pt,calc(var(--ws-text) - 2pt));font-weight:700;line-height:1.2}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cstatecell{justify-content:center;align-items:stretch;padding:3mm 4mm}
+:is(.ws-page,.ws-sheet) .mq-cstate{width:100%;min-height:0;display:flex}
+:is(.ws-page,.ws-sheet) .mq-cstate-col{flex:none;flex-direction:column;align-items:stretch;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-row{flex:1 1 auto;flex-direction:row;align-items:stretch;gap:8mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-row>.mq-cdraw{flex:0 0 42%;display:flex;justify-content:center;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-cside{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-around;gap:3mm}
+:is(.ws-page,.ws-sheet) .mq-cheads{display:flex;flex-direction:column;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-chead{display:flex;align-items:center;gap:2.5mm;font-size:var(--ws-title);line-height:1.2}
+:is(.ws-page,.ws-sheet) .mq-chead>.mq-lnum{width:10mm;height:10mm;border-width:1.5pt;font-size:var(--ws-title)}
+:is(.ws-page,.ws-sheet) .mq-chead>b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-cdraw{display:flex;justify-content:center;align-items:flex-start}
+:is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cdraw{flex:none;align-items:center}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-ctailcell{justify-content:center;align-items:stretch;padding:2mm 4mm}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-chartgrid:has(+ .ws-grid.mq-ctailgrid){border-bottom-width:var(--ws-cell)}
+:is(.ws-page,.ws-sheet) .ws-grid.mq-ctailgrid{border-top-width:0}
+:is(.ws-page,.ws-sheet) .mq-ctail{display:flex;flex-direction:column;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-ctailw{margin-left:6mm;font-size:var(--ws-text);font-weight:400}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-c2cell{justify-content:center;align-items:center;padding:2mm 2mm}
+:is(.ws-page,.ws-sheet) .mq-c2{display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-c2nums{display:flex;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-cwords{font-size:var(--ws-text);line-height:1.3;display:flex;flex-direction:column;gap:.8mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-col>.mq-cwords{text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cwords>.mq-cnote{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-hopwrap{display:flex;flex-direction:column;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-chops>.mq-hops{margin:0!important}
+:is(.ws-page,.ws-sheet) :is(.mq-cfinal-h,.mq-cnote,.mq-cstate-n .mq-chead>b){text-wrap:balance}
+:is(.ws-page,.ws-sheet) .mq-cstate-n{gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead{font-size:var(--ws-text);gap:1mm 1.8mm;flex-wrap:wrap;justify-content:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>b{flex:1 1 100%;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cstate-n .mq-chead>.mq-lnum{width:8.5mm;height:8.5mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cfinalcell{justify-content:center;align-items:stretch;padding:1.5mm 3mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal{width:100%;display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-cfinal-h{font-size:var(--ws-text);line-height:1.25;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-cfinal-h>b{font-weight:700;display:block}
+:is(.ws-page,.ws-sheet) .mq-cfinal>.mq-cdraw{align-items:center}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-cdrawcell{padding:0;justify-content:flex-start;align-items:flex-start}
+:is(.ws-page,.ws-sheet) .ws-band.mq-cchantband{flex:none;display:flex;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-cchant{display:flex;align-items:center;gap:5mm;padding:0 3mm;width:100%}
+:is(.ws-page,.ws-sheet) .mq-cchant>b{font-size:var(--ws-text);font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-cchant>span{flex:1;border:1.5pt solid var(--ws-ink);border-radius:3mm;padding:1.2mm 5mm;font-size:var(--ws-title);font-weight:700;line-height:1.25;text-align:center}
+:is(.ws-page,.ws-sheet) .mq-lround{display:flex;flex-direction:column;align-items:center;gap:2mm}
+:is(.ws-page,.ws-sheet) .mq-lround-top{display:flex;align-items:flex-end;gap:1mm;white-space:nowrap}
+:is(.ws-page,.ws-sheet) .mq-lring{outline:var(--ws-hair) solid var(--ws-ink);outline-offset:.06em;border-radius:50%}
+:is(.ws-page,.ws-sheet) .mq-lring.mq-lring-t{outline:1pt solid #949494}
+:is(.ws-page,.ws-sheet) .mq-wwbarlayout .mq-lring{display:inline-block;margin:0 .2em;padding:0 .08em;line-height:1.05}
+:is(.ws-page,.ws-sheet) .mq-luline{border-bottom:1pt solid #949494;display:inline-block;line-height:1}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvocabcell{justify-content:center;align-items:stretch;padding:2.5mm 3mm}
+:is(.ws-page,.ws-sheet) .mq-lvocab{width:100%;display:flex;flex-direction:column}
+:is(.ws-page,.ws-sheet) .mq-lvrow{display:grid;grid-template-columns:repeat(var(--n),1fr)}
+:is(.ws-page,.ws-sheet) .mq-lvpic{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-lvpic-in{min-height:12mm;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
+:is(.ws-page,.ws-sheet) .mq-lvword{display:flex;flex-direction:column;align-items:center;gap:1.5mm;font-size:var(--ws-text)}
+:is(.ws-page,.ws-sheet) .mq-lvword b{font-weight:700}
+:is(.ws-page,.ws-sheet) .mq-ldot{display:block;width:2mm;height:2mm;border-radius:50%;background:#000}
+:is(.ws-page,.ws-sheet) .mq-lvgap{position:relative;height:calc(var(--ws-hw) * 1.05)}
+:is(.ws-page,.ws-sheet) .mq-lvgap>svg{position:absolute;left:0;top:-1mm;width:100%;height:calc(100% + 2mm);overflow:visible}
+:is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol{border-left:var(--ws-hair) solid var(--ws-ink)}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol{display:flex;flex-direction:column;min-width:0}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter{justify-content:center}
+/* CL-4b (s3 precritic-2): a Guided cell carries no tab, so a stack that is not write-above keeps no
+   tab clearance above it: its digits start at the top pad. Write-above stacks keep their centring. */
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter:not(:has(> .ws-tab, > .ws-letter, > .ws-modeltab, > [data-ws-label])) > .ws-stack:not([data-ws-writeabove]){margin-top:0}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol>.ws-instrline{padding-left:3mm;padding-right:2mm}
+:is(.ws-page,.ws-sheet) .mq-lwarmcol.mq-lwarm2>.ws-instrline{height:calc(var(--ws-instr) * 1.75);line-height:1.2;align-items:center}
+:is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol .ws-grid{border-left-width:0}</style><div class="ws-instrline" data-ws-instruction="mixed-sign"><span>Add or subtract. Look at the <u>sign</u>.</span></div><div class="ws-grid fixed" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(1,1fr);height:18.4mm;"><div class="ws-cell  mqt--equation mqt--equation mqa--number mql--1" data-ws-cell="equation" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="addition:add_sub_10s"><span class="ws-tab" data-ws-label="tab">1</span><div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em"><span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap"><span>80</span><span class="o" style="width:0.8em">−</span><span>10</span><span class="o" style="width:0.8em">=</span></span><span data-ws-key-ans="" class="ws-line" style="--w:25mm;font-size:1em;font-weight:700;display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1" data-ws-slot="answer" data-ws-shape="line" data-ws-ink="solid">70</span></div></div><div class="ws-cell  mqt--equation mqt--equation mqa--number mql--1" data-ws-cell="equation" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="addition:add_sub_10s"><span class="ws-tab" data-ws-label="tab">2</span><div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em"><span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap"><span>14</span><span class="o" style="width:0.8em">+</span><span>10</span><span class="o" style="width:0.8em">=</span></span><span data-ws-key-ans="" class="ws-line" style="--w:25mm;font-size:1em;font-weight:700;display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1" data-ws-slot="answer" data-ws-shape="line" data-ws-ink="solid">24</span></div></div><div class="ws-cell  mqt--equation mqt--equation mqa--number mql--1" data-ws-cell="equation" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="addition:add_sub_10s"><span class="ws-tab" data-ws-label="tab">3</span><div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em"><span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap"><span>53</span><span class="o" style="width:0.8em">−</span><span>10</span><span class="o" style="width:0.8em">=</span></span><span data-ws-key-ans="" class="ws-line" style="--w:25mm;font-size:1em;font-weight:700;display:inline-flex;align-items:flex-end;justify-content:center;line-height:1.1" data-ws-slot="answer" data-ws-shape="line" data-ws-ink="solid">43</span></div></div></div><div class="ws-instrline" data-ws-instruction="add">Add.</div><div class="ws-grid fixed" style="grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(1,1fr);height:43.1mm;"><div class="ws-cell fact  mqt--fact mqt--fact mqa--number mql--1" data-ws-cell="fact" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="--fd:28pt;--fp:2mm" data-ws-skill="addition:add_facts"><span class="ws-tab" data-ws-label="tab">4</span><div class="ws-fact" style="--fd:28pt;grid-template-columns:1.2em repeat(2, 0.72em)"><span></span><span></span><span>7</span><span class="op">+</span><span></span><span>6</span><span class="rule"></span><span data-ws-key-ans="" data-ws-key-mark="" class="ws-factans" data-ws-slot="ans" data-ws-shape="open" data-ws-ink="solid" style="grid-column:2 / -1;font-weight:700;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(2, 0.72em);justify-content:end;height:1.15em;line-height:1.15"><span style="text-align:center"><span data-ws-key-ans="" data-ws-key-text="">1</span></span><span style="text-align:center"><span data-ws-key-ans="" data-ws-key-text="">3</span></span></span></div></div><div class="ws-cell fact  mqt--fact mqt--fact mqa--number mql--1" data-ws-cell="fact" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="--fd:28pt;--fp:2mm" data-ws-skill="addition:add_facts"><span class="ws-tab" data-ws-label="tab">5</span><div class="ws-fact" style="--fd:28pt;grid-template-columns:1.2em repeat(2, 0.72em)"><span></span><span></span><span>4</span><span class="op">+</span><span></span><span>3</span><span class="rule"></span><span data-ws-key-ans="" data-ws-key-mark="" class="ws-factans" data-ws-slot="ans" data-ws-shape="open" data-ws-ink="solid" style="grid-column:2 / -1;font-weight:700;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(2, 0.72em);justify-content:end;height:1.15em;line-height:1.15"><span style="text-align:center"></span><span style="text-align:center"><span data-ws-key-ans="" data-ws-key-text="">7</span></span></span></div></div><div class="ws-cell fact  mqt--fact mqt--fact mqa--number mql--1" data-ws-cell="fact" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="--fd:28pt;--fp:2mm" data-ws-skill="addition:add_facts"><span class="ws-tab" data-ws-label="tab">6</span><div class="ws-fact" style="--fd:28pt;grid-template-columns:1.2em repeat(2, 0.72em)"><span></span><span></span><span>8</span><span class="op">+</span><span></span><span>3</span><span class="rule"></span><span data-ws-key-ans="" data-ws-key-mark="" class="ws-factans" data-ws-slot="ans" data-ws-shape="open" data-ws-ink="solid" style="grid-column:2 / -1;font-weight:700;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(2, 0.72em);justify-content:end;height:1.15em;line-height:1.15"><span style="text-align:center"><span data-ws-key-ans="" data-ws-key-text="">1</span></span><span style="text-align:center"><span data-ws-key-ans="" data-ws-key-text="">1</span></span></span></div></div><div class="ws-cell fact  mqt--fact mqt--fact mqa--number mql--1" data-ws-cell="fact" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="--fd:28pt;--fp:2mm" data-ws-skill="addition:add_facts"><span class="ws-tab" data-ws-label="tab">7</span><div class="ws-fact" style="--fd:28pt;grid-template-columns:1.2em repeat(2, 0.72em)"><span></span><span></span><span>2</span><span class="op">+</span><span></span><span>5</span><span class="rule"></span><span data-ws-key-ans="" data-ws-key-mark="" class="ws-factans" data-ws-slot="ans" data-ws-shape="open" data-ws-ink="solid" style="grid-column:2 / -1;font-weight:700;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;display:grid;grid-template-columns:repeat(2, 0.72em);justify-content:end;height:1.15em;line-height:1.15"><span style="text-align:center"></span><span style="text-align:center"><span data-ws-key-ans="" data-ws-key-text="">7</span></span></span></div></div></div><div class="ws-instrline" data-ws-instruction="default-write">Solve. Write the answer.</div><div class="ws-grid fixed" style="grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(1,1fr);height:115.5mm;"><div class="ws-cell mq-legacy mqt--legacy mqt--legacy mqa--number mql--1 mq-legacy" data-ws-cell="legacy" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" data-ws-legacy="1" style="" data-ws-skill="algebra:tape_diagram"><span class="ws-tab" data-ws-label="tab">8</span><div class="ws-legacy print-edition"><div class="worksheet-problem full-width"><div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">Zoe has 10 marbles and gets 29 more. How many marbles in all?</div>
+            <div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;"><div style="text-align:center;">
+                        
+                        <div style="max-width:600px;width:100%;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid #000;border-right:2px solid #000;height:14px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:#000;margin-bottom:8px;">? total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:159px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">10</div>
+                                <div style="width:461px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">29</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1rem;color:#000;margin-top:12px;">Add the two parts to find the whole.</div>
+                    </div></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #000;"><b data-ws-key-ans="" data-ws-ink="solid" style="font-weight:700;color:#000;">39</b></span></div>
+        </div></div></div></div><div class="ws-cell mq-legacy mqt--legacy mqt--legacy mqa--number mql--1 mq-legacy" data-ws-cell="legacy" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" data-ws-legacy="1" style="" data-ws-skill="algebra:tape_diagram"><span class="ws-tab" data-ws-label="tab">9</span><div class="ws-legacy print-edition"><div class="worksheet-problem full-width"><div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">Mia needs 126 stickers. He already has 76. How many more does he need?</div>
+            <div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;"><div style="text-align:center;">
+                        
+                        <div style="max-width:600px;width:100%;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid #000;border-right:2px solid #000;height:14px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:#000;margin-bottom:8px;">126 total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:374px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">76</div>
+                                <div style="width:246px;height:110px;border:2px solid #000;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:2rem;color:#000;background:#fff;">?</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1rem;color:#000;margin-top:12px;">Subtract the known part from the whole.</div>
+                    </div></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #000;"><b data-ws-key-ans="" data-ws-ink="solid" style="font-weight:700;color:#000;">50</b></span></div>
+        </div></div></div></div><div class="ws-cell mq-legacy mqt--legacy mqt--legacy mqa--number mql--1 mq-legacy" data-ws-cell="legacy" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" data-ws-legacy="1" style="" data-ws-skill="algebra:tape_diagram"><span class="ws-tab w2" data-ws-label="tab">10</span><div class="ws-legacy print-edition"><div class="worksheet-problem full-width"><div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">Sam had 200 apples. She used 13. How many remain?</div>
+            <div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;"><div style="text-align:center;">
+                        
+                        <div style="max-width:600px;width:100%;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid #000;border-right:2px solid #000;height:14px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:#000;margin-bottom:8px;">200 total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:40px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">13</div>
+                                <div style="width:580px;height:110px;border:2px solid #000;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:2rem;color:#000;background:#fff;">?</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1rem;color:#000;margin-top:12px;">Subtract the known part from the whole.</div>
+                    </div></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #000;"><b data-ws-key-ans="" data-ws-ink="solid" style="font-weight:700;color:#000;">187</b></span></div>
+        </div></div></div></div><div class="ws-cell mq-legacy mqt--legacy mqt--legacy mqa--number mql--1 mq-legacy" data-ws-cell="legacy" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" data-ws-legacy="1" style="" data-ws-skill="algebra:tape_diagram"><span class="ws-tab w2" data-ws-label="tab">11</span><div class="ws-legacy print-edition"><div class="worksheet-problem full-width"><div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">Ben had 56 shells. She used 33. How many remain?</div>
+            <div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;"><div style="text-align:center;">
+                        
+                        <div style="max-width:600px;width:100%;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid #000;border-right:2px solid #000;height:14px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1.2rem;color:#000;margin-bottom:8px;">56 total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:365px;height:110px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.8rem;border:1px solid #000">33</div>
+                                <div style="width:255px;height:110px;border:2px solid #000;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:2rem;color:#000;background:#fff;">?</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1rem;color:#000;margin-top:12px;">Subtract the known part from the whole.</div>
+                    </div></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:700;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #000;"><b data-ws-key-ans="" data-ws-ink="solid" style="font-weight:700;color:#000;">23</b></span></div>
+        </div></div></div></div></div></main>
+  <footer class="ws-foot" data-ws-teacher=""><span>add_sub_10s, add_facts, tape_diagram +1 · Grade 1-4 · 1.NBT.4, 1.OA.6, 2.OA.1, 3.MD.8</span><b>1/2</b><span>Key · Form A · seed 2257497613</span><small class="ws-copy">© 2026 Cultivating the Digital. All rights reserved.</small></footer>
+</section>
+
+<section class="ws-page ws-L ws-ican ws-tab6 ws-key" data-ws-page="2" data-ws-paper="a4" data-ws-role="independent" data-ws-mode="key" data-ws-look="ican" data-ws-size="L" data-ws-tab="Level 1-4|Answer Key">
+  <header class="ws-head"><div class="ws-rowA notab"><div class="ws-field name"><span data-ws-key="name">Answer Key</span><i></i></div></div><div class="ws-headrule"></div></header>
+  <main class="ws-body"><i class="mq-cont" hidden=""></i><div class="ws-instrline" data-ws-instruction="add-sides">Add the lengths of all the sides. Write the perimeter.</div><div class="ws-grid fixed" style="grid-template-columns:repeat(2,1fr);grid-template-rows:84.1fr;height:84.1mm;"><div class="ws-cell  mqt--perimeter-shape mqt--perimeter-shape mqa--number mql--1" data-ws-cell="perimeter-shape" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="area_perimeter:perimeter_intro"><span class="ws-tab w2" data-ws-label="tab">12</span><div class="k2-cell fg-perimeter-cell" style="color:#000;font-family:'Andika','Open Sans',sans-serif;text-align:center;"><div style="display:inline-block;"><svg class="k2-svg fg-perimeter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54.65 39.41" role="img" aria-label="triangle with sides 8, 6, 5 m" style="display:block;width:54.65mm;height:auto;max-width:100%;overflow:visible;"><polygon points="5.15,25.54 53.15,25.54 25.02,3.06" fill="#fff" stroke="#000" stroke-width="0.53" stroke-linejoin="round"></polygon><text x="29.15" y="36.43" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">8</tspan><tspan font-size="5.29"> m</tspan></text><text x="45.37" y="9.9" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">6</tspan><tspan font-size="5.29"> m</tspan></text><text x="7.43" y="10.99" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">5</tspan><tspan font-size="5.29"> m</tspan></text></svg></div><div style="display:flex;align-items:center;justify-content:center;gap:2mm;margin-top:4mm;white-space:nowrap;"><span style="font-size:15pt;line-height:1.25;">Perimeter =</span><span style="display:inline-flex;align-items:center;gap:2mm;" data-ws-shape="unit"><span data-ws-key-ans="" class="k2-box" data-ws-slot="answer" data-ws-shape="box" data-ws-ink="solid" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:17mm;height:12mm;border:0.75pt solid #000;border-radius:1.25mm;background:#fff;vertical-align:middle;font-size:28pt;font-weight:700;line-height:1;color:#000;flex:none;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;">19</span><span style="font-size:15pt;line-height:1.25;">m</span></span></div></div></div><div class="ws-cell  mqt--perimeter-shape mqt--perimeter-shape mqa--number mql--1" data-ws-cell="perimeter-shape" data-ws-state="answered" data-ws-level="1" data-ws-answer-type="number" style="" data-ws-skill="area_perimeter:perimeter_intro"><span class="ws-tab w2" data-ws-label="tab">13</span><div class="k2-cell fg-perimeter-cell" style="color:#000;font-family:'Andika','Open Sans',sans-serif;text-align:center;"><div style="display:inline-block;"><svg class="k2-svg fg-perimeter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.85 47.38" role="img" aria-label="triangle with sides 3, 3, 3 m" style="display:block;width:50.85mm;height:auto;max-width:100%;overflow:visible;"><polygon points="6.95,33.5 43.9,33.5 25.43,1.5" fill="#fff" stroke="#000" stroke-width="0.53" stroke-linejoin="round"></polygon><text x="25.43" y="44.4" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">3</tspan><tspan font-size="5.29"> m</tspan></text><text x="43.42" y="15.9" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">3</tspan><tspan font-size="5.29"> m</tspan></text><text x="7.43" y="15.9" text-anchor="middle" font-family="Andika, 'Open Sans', sans-serif" font-weight="700" fill="#000"><tspan font-size="9.88">3</tspan><tspan font-size="5.29"> m</tspan></text></svg></div><div style="display:flex;align-items:center;justify-content:center;gap:2mm;margin-top:4mm;white-space:nowrap;"><span style="font-size:15pt;line-height:1.25;">Perimeter =</span><span style="display:inline-flex;align-items:center;gap:2mm;" data-ws-shape="unit"><span data-ws-key-ans="" class="k2-box" data-ws-slot="answer" data-ws-shape="box" data-ws-ink="solid" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:17mm;height:12mm;border:0.75pt solid #000;border-radius:1.25mm;background:#fff;vertical-align:middle;font-size:28pt;font-weight:700;line-height:1;color:#000;flex:none;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;">9</span><span style="font-size:15pt;line-height:1.25;">m</span></span></div></div></div></div></main>
+  <footer class="ws-foot" data-ws-teacher=""><span>add_sub_10s, add_facts, tape_diagram +1 · Grade 1-4 · 1.NBT.4, 1.OA.6, 2.OA.1, 3.MD.8</span><b>2/2</b><span>Key · Form A · seed 2257497613</span><small class="ws-copy">© 2026 Cultivating the Digital. All rights reserved.</small></footer>
+</section>
+<script>(function(){var d=document;function done(){d.documentElement.setAttribute('data-ws-fonts','ready');}
+try{if(d.fonts&&d.fonts.ready){d.fonts.ready.then(done,done);}else{done();}}catch(e){done();}})();</script>
+
+</body></html>
