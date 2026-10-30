@@ -50,7 +50,18 @@ New tool: `tests/scripts/ws-grade-print-timing.cjs` (times, page count, document
 
 ## 2. Support ladder on the worksheet / quiz hosts, double edge
 
-(see below — builder report)
+DONE (commit ee9d6a3, builder Opus low).
+- **Worksheet, multi-box rows (rounding_table):** the row was re-checked on every keystroke once full, so every keystroke
+  spent a rung (one row used the whole ladder). Now a wrong full row counts once, after 900 ms still (`worksheetWrongTimers`).
+- **Worksheet, expanded form:** `checkWorksheetExpandedAnswer` never called the ladder (straight to red). It now climbs it.
+- **Quiz:** drawn answer boxes were recorded silently (no verdict, no rung) and every box's change added a rung. New
+  `recordSlotAnswer` / `settleSlotAnswer` / `wireSlotSettle` / `climbQuizLadder`: one rung per wrong full row after 1.5 s or on leaving.
+- **Every host:** the worked step printed the whole row ("Fill in: 730; 130; 150; 980"); `answerTokens` now hides a long ";" answer.
+- **Double edge:** the expand place boxes had an inline 4 px border plus the cell's 3 px focus outline 1 px outside it. Additive
+  rules in `css/screen-cell.css`: one 2.6 px border, an inset focus ring.
+- Not changed: the practice card's expand boxes keep their own retry message (the card was reported working);
+  `ws-support-ladder --skills placevalue:expand,...` cannot test multi-part answers (its wrong answer is n+1 → "NaN"; fails on HEAD too).
+- Screenshots: `teacher-followups/ladder-*-{before,after}.png`, `double-edge-{before,after}.png`.
 
 ## 3. Option panels and Teacher screens audit R2
 
