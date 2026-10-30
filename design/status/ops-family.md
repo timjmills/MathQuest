@@ -45,3 +45,14 @@ Budget: lane cap ~$300
   - Preset candidates for the lead (not built): 10 more, 10 less, 100 more, 100 less (task presets of add_sub_10s/100s);
     missing_add_sub with the answer position; missing_mult_div × only / ÷ only.
 
+  - Precritic (merged with main 89a19189, commit a42b896d), `--strict`: 12 PASS, 8 FAIL, 1 N/A, 3 SKIPPED/INCOMPLETE.
+    Green: node-lint, code-snapshot, LESSON-DATA/OPTION-HELP/WRONG-FITS, content-audit, options-verify, print-lint L,
+    screen-slots, screen-answer, boot-smoke, chromebook-fit, phone-card, coverage-matrix.
+    Red (ours, open): print-lint S (add_sub_100s PAGEFILL at count 20; div_zero H13 side band 34 % - the `division`
+    template's own, long_div_2digit pinned at 31 %), print-lint M (add_sub_10s PAGEFILL at count 20), lesson L/S
+    (div_zero chart overflow + illegible words under a 6-row bracket; missing_add_sub warm-up add_facts cell 34 % band),
+    dealer-uniform (div_zero: zero digits are the skill - the learner cannot express "has a 0"; missing_mult_div ÷:
+    divisibility not learnable), options-render (missing_mult_div Fraction mixes 2-line ÷ with 1-line ×), slot-clip
+    (add_sub_10s/100s across fact drawn beside in a mixed-sections column: render has no column count), sibling-compare
+    (no approved sibling on `equation` / `division`: 145 counts unproven).
+  - After PNGs: design/status/ops-family/after/<skill>-{paper,card}.png. Run logs: design/audit/runs/ops-family/.
