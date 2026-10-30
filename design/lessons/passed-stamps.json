@@ -2,17 +2,17 @@
  "_note": "The render each lesson's critic pass is bound to (ws-lesson-coverage.cjs): a lesson whose current render (render-stamps.json, ws-lesson-hash.cjs) differs is STALE - re-grade due. Rounds before render stamps (lessons r1-r4) are bound to the phase-0 baseline taken on the 2026-10-30 tree (lessons-phase0, Builder B; the owner's ruling that the r4 samples read as passed): `node tests/scripts/ws-lesson-coverage.cjs --bind-stamps` fills `stamp` once that baseline exists. Empty stamp = passed (unstamped).",
  "Y1.B2.S9": {
   "round": "lessons-r4",
-  "stamp": "d9195aaeebd51c3f.d4610b634e43e5f1",
+  "stamp": "pre-LR-17-render",
   "basis": "phase-0 baseline (graded before stamps)"
  },
  "Y2.B2.S18": {
   "round": "lessons-r4",
-  "stamp": "be6546f1c7ce4146.c5d597e1f6f5fb53",
+  "stamp": "pre-LR-17-render",
   "basis": "phase-0 baseline (graded before stamps)"
  },
  "Y4.B1.S14": {
   "round": "lessons-r4",
-  "stamp": "85e2d89c94fad6d4.5ff23f1a750058a5",
+  "stamp": "pre-LR-17-render",
   "basis": "phase-0 baseline (graded before stamps)"
  }
 }

@@ -12,23 +12,23 @@ render changed after that pass (re-grade due); **failed** when a page failed; **
 | Year | Grade | WRM steps | With a lesson | Passed |
 |---|---|---|---|---|
 | R | PK | 119 | 0 | 0 |
-| Y1 | K | 116 | 1 | 1 |
-| Y2 | 1 | 124 | 2 | 1 |
+| Y1 | K | 116 | 1 | 0 |
+| Y2 | 1 | 124 | 2 | 0 |
 | Y3 | 2 | 134 | 1 | 0 |
-| Y4 | 3 | 129 | 2 | 1 |
+| Y4 | 3 | 129 | 2 | 0 |
 | Y5 | 4 | 136 | 0 | 0 |
 | Y6 | 5 | 114 | 0 | 0 |
-| **All** | | **872** | **6** | **3** |
+| **All** | | **872** | **6** | **0** |
 
 ## Lessons
 
 | Lesson | Title | Grade | Family | Archetype | Practice skill | Status | Why |
 |---|---|---|---|---|---|---|---|
-| Y1.B2.S9 (add-within-10) | Addition - add more | K | addsub | fact | `addition:add_facts` | **passed** | lessons-r4 |
+| Y1.B2.S9 (add-within-10) | Addition - add more | K | addsub | fact | `addition:add_facts` | **stale** | lessons-r4 passed; the render has changed since (re-grade due) |
 | Y2.B2.S17 | Subtract two 2-digit numbers (not across a 10) | 1 | addsub | column | `subtraction:sub_100_no_regroup` | **draft** | no critic round yet |
-| Y2.B2.S18 (subtract-2-digit-regroup) | Subtract two 2-digit numbers (across a 10) | 1 | addsub | column | `subtraction:sub_100_regroup` | **passed** | lessons-r4; robustness: practice seed 1001 |
+| Y2.B2.S18 (subtract-2-digit-regroup) | Subtract two 2-digit numbers (across a 10) | 1 | addsub | column | `subtraction:sub_100_regroup` | **stale** | lessons-r4 passed; the render has changed since (re-grade due) |
 | Y3.B2.S12 | Subtract two numbers (no exchange) | 2 | addsub | column | `subtraction:sub_1k_no_regroup` | **draft** | no critic round yet |
-| Y4.B1.S14 (round-nearest-10) | Round to the nearest 10 | 3 | placevalue | line | `number_sense:nearest_10` | **passed** | lessons-r4 |
+| Y4.B1.S14 (round-nearest-10) | Round to the nearest 10 | 3 | placevalue | line | `number_sense:nearest_10` | **stale** | lessons-r4 passed; the render has changed since (re-grade due) |
 | Y4.B2.S5 | Subtract two 4-digit numbers - no exchange | 3 | addsub | column | `subtraction:sub_10k_no_regroup` | **draft** | no critic round yet |
 | skill:subtraction:sub_100k_no_regroup | skill:subtraction:sub_100k_no_regroup |  | addsub | column | `subtraction:sub_100k_no_regroup` | **draft** | no critic round yet |
 | skill:subtraction:sub_1m_no_regroup | skill:subtraction:sub_1m_no_regroup |  | addsub | column | `subtraction:sub_1m_no_regroup` | **draft** | no critic round yet |
@@ -39,9 +39,9 @@ render changed after that pass (re-grade due); **failed** when a page failed; **
 
 | Archetype | Lessons | Passed | Certified by |
 |---|---|---|---|
-| line | 1 | 1 | round-nearest-10 |
-| fact | 1 | 1 | add-within-10 |
-| column | 8 | 1 | subtract-2-digit-regroup |
+| line | 1 | 0 | - |
+| fact | 1 | 0 | - |
+| column | 8 | 0 | - |
 
 ## CCSS by lessons
 
@@ -50,11 +50,11 @@ Only codes a lesson touches are listed; every other code is a gap by lessons.
 
 | Code | Skills verdict | Lessons tagged | Passed | By lessons |
 |---|---|---|---|---|
-| K.OA.A.2 | full | 1 | 1 | partial |
-| 1.NBT.C.6 | partial | 2 | 1 | partial |
-| 2.NBT.B.5 | full | 2 | 1 | partial |
+| K.OA.A.2 | full | 1 | 0 | gap |
+| 1.NBT.C.6 | partial | 2 | 0 | gap |
+| 2.NBT.B.5 | full | 2 | 0 | gap |
 | 2.NBT.B.7 | partial | 1 | 0 | gap |
-| 3.NBT.A.1 | full | 1 | 1 | partial |
+| 3.NBT.A.1 | full | 1 | 0 | gap |
 | 3.NBT.A.2 | full | 1 | 0 | gap |
 | 4.NBT.B.4 | full | 1 | 0 | gap |
 
@@ -64,10 +64,10 @@ Only codes a lesson touches are listed; every other code is a gap by lessons.
 
 | EE | Skills verdict | Lessons tagged | Passed | By lessons |
 |---|---|---|---|---|
-| M.EE.1.NBT.6 | partial | 2 | 1 | partial |
-| M.EE.2.NBT.5 | partial | 2 | 1 | partial |
+| M.EE.1.NBT.6 | partial | 2 | 0 | gap |
+| M.EE.2.NBT.5 | partial | 2 | 0 | gap |
 | M.EE.2.NBT.7 | full | 1 | 0 | gap |
-| M.EE.3.NBT.1 | full | 1 | 1 | partial |
+| M.EE.3.NBT.1 | full | 1 | 0 | gap |
 | M.EE.3.NBT.2 | full | 1 | 0 | gap |
 | M.EE.4.NBT.4 | full | 1 | 0 | gap |
 
