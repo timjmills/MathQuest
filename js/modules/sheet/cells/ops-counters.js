@@ -21,6 +21,7 @@
 import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, splitRemainder, HAIR, HEAVY } from './ops-common.js';
 import { INK } from '../tokens.js';
+import { styledAnswerSlot } from '../cell.js';
 import { looseArray } from './k2kit.js';
 
 /* ------------------------------------------------------------------ shared drawing */
@@ -286,7 +287,16 @@ register('add-three', {
         const ink = inkOf(ctx);
         const sum = String(Number(p.a) + Number(p.b) + Number(p.c));
         const vals = slotValues(ctx, { answer: sum });
-        const slot = box(g, 'answer', { wMm: 2 * 0.62 * g.E + 5, hMm: g.stripMm, value: vals.answer || '', ink, mark: g.twin ? 'blank' : null });
+        let slot = box(g, 'answer', { wMm: 2 * 0.62 * g.E + 5, hMm: g.stripMm, value: vals.answer || '', ink, mark: g.twin ? 'blank' : null });
+        // the + − × ÷ answer-box option (`ansBox`, critic B r4 D3): one box per digit of the band
+        // (sums to 2 digits) or Off (the plain ruled line), on paper as the fact and equation cells
+        // draw it; on screen 'digit' is the digit strip the host draws (screen-cell.js), 'off' a wash.
+        const onPaper = ctx.mode !== 'screen' || ctx.static;
+        if (p.ansBox === 'digit' && onPaper) {
+            slot = styledAnswerSlot(slot, 'digit', { n: Math.max(2, sum.length), ctx, value: vals.answer || sum });
+        } else if (p.ansBox === 'off' && onPaper) {
+            slot = slot.replace(/border:[^;]*;border-radius:[^;]*;/, `border:0;border-bottom:${HAIR} solid ${INK.ink};`);
+        } else if (p.ansBox === 'off') slot = `<span class="mq-ansoff">${slot}</span>`;
         const o = (t) => `<span style="font-weight:700;width:1em;text-align:center">${t}</span>`;
         const eq = `<div class="ws-eq" style="display:inline-flex;align-items:center;gap:0.2em;white-space:nowrap;margin-top:${p.pictures === false ? 0 : g.em(4)}">`
             + `<span>${esc(p.a)}</span>${o('+')}<span>${esc(p.b)}</span>${o('+')}<span>${esc(p.c)}</span>${o('=')}${slot}</div>`;

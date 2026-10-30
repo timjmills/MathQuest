@@ -18,7 +18,7 @@
 // change made in the mixed settings shows up in the share panel and in the next link. A host may
 // instead keep the values on its own rows (a Quick Start card carries its `opts` in localStorage)
 // by supplying read / write.
-import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isMoreOption, playSummary, isNumberLineOption, numberLineSummary } from './skill-options.js';
+import { offeredOptionsFor, normalizeOptions, packOptions, describeOptions, isPlayOption, isClosedOption, isMoreOption, playSummary, isNumberLineOption, numberLineSummary } from './skill-options.js';
 import { normalizeRows, downStart, onePagePlan, ROW_MAX, STEP_MAX, AT_MAX } from './count-rows.js';
 import { getSetOptions, setSetOptions, onSetOptionsChanged } from './skill-option-store.js';
 import { SKILLS } from './data.js';
@@ -121,10 +121,11 @@ function _liveDef(def) {
  */
 export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
     const all = defs.filter(def => !(typeof def.appliesTo === 'function' && !def.appliesTo(cur)));
-    const shown = all.filter(d => !isPlayOption(d) && !isMoreOption(d) && !isNumberLineOption(d));
+    const shown = all.filter(d => !isClosedOption(d) && !isMoreOption(d) && !isNumberLineOption(d));
     const nline = defs.filter(isNumberLineOption).filter(d => !(typeof d.appliesTo === 'function' && !d.appliesTo(cur)));
     const more = all.filter(isMoreOption);
     const play = all.filter(isPlayOption);
+    const boxes = all.filter(d => isClosedOption(d) && !isPlayOption(d));
     const used = OPTION_GROUPS.filter(g => shown.some(d => optionGroup(d) === g.id));
     const hs = headingStyle || 'font-size:0.68rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);margin:10px 0 0;';
     const heads = used.length > 1 || (used[0] && used[0].id !== 'difficulty');
@@ -137,6 +138,14 @@ export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
             + `<summary class="sko-play-sum" style="cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:var(--text);">`
             + `<span aria-hidden="true">&#9662;</span><span>Pupil play</span><span class="sko-play-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(playSummary(play, cur))}</span></summary>`
             + play.map(row).join('') + '</details>'
+        : '';
+    // Answer boxes (+ − × ÷, owner ruling 2026-10-02): its own closed disclosure, the current value in the summary.
+    const boxesSum = boxes.map((d) => (typeof d.summary === 'function' ? d.summary(cur[d.id] === undefined ? d.default : cur[d.id]) : d.label)).join(' · ');
+    const boxDisclosure = boxes.length
+        ? `<details class="sko-group sko-boxes" data-sko-group="boxes"${_boxesOpen ? ' open' : ''} ontoggle="skoBoxesOpen(this.open)" style="margin-top:10px;">`
+            + `<summary class="sko-play-sum" style="cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;color:var(--text);">`
+            + `<span aria-hidden="true">&#9662;</span><span>Answer boxes</span><span class="sko-play-vals" style="font-weight:500;color:var(--text-dim);">${escHTML(boxesSum)}</span></summary>`
+            + boxes.map((d) => row({ ...d, label: 'Draw the answer as' })).join('') + '</details>'
         : '';
     // Wave 1 lane C2: "More" - the layout choices a crowded panel keeps behind one closed disclosure, values in its summary.
     const moreSummary = more.map((d) => (typeof d.summary === 'function' ? d.summary(cur[d.id] === undefined ? d.default : cur[d.id]) : d.label)).join(' · ');
@@ -164,7 +173,7 @@ export function groupedOptionRowsHTML(defs, cur, row, headingStyle) {
             + (nlWarn ? `<div class="sko-nline-warn" role="alert" data-sko-warn="nline" style="margin:4px 0;padding:6px 8px;border:1px solid #b45309;border-radius:6px;font-size:0.75rem;color:var(--text);">&#9888; ${escHTML(nlWarn)}</div>` : '')
             + nline.map(row).join('') + '</details>'
         : '';
-    return groups + nlBox + moreBox + disclosure;
+    return groups + boxDisclosure + nlBox + moreBox + disclosure;
 }
 let _nlOpen = false;
 let _nlCoverCheck = null;
@@ -172,6 +181,9 @@ let _nlCoverCheck = null;
 export function skoNlineOpen(open) { _nlOpen = !!open; }
 /** The app installs the coverage check (refline-screen.js): (categoryId, skillId, opts) -> warning text or ''. */
 export function setNumberLineCoverCheck(fn) { _nlCoverCheck = typeof fn === 'function' ? fn : null; }
+let _boxesOpen = false;
+/** Remembers whether the Answer boxes disclosure is open across a redraw. */
+export function skoBoxesOpen(open) { _boxesOpen = !!open; }
 let _playOpen = false;
 let _moreOpen = false;
 /** Remembers whether the More disclosure is open, so a redraw after a change keeps it open. */

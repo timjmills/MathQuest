@@ -371,7 +371,7 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 |---|---|---|---|---|---|---|
 | AP-01 | Perimeter: sum the sides; count on a grid | 3 | RL-28 thin figure with tick-marked sides, or on a unit grid | cells 2x2 | write + unit ("P = __ units") | `perimeter_intro`, `perimeter_grid`, `perimeter` |
 | AP-02 | Area: count unit squares -> rows x columns -> formula | 3-4 | RL-28 figure on a unit grid, then labelled rectangle | cells 2x2 | write + unit ("A = __ square units") | `area_unit_squares`, `area`, `area_distributive_visual` |
-| AP-03 | Area and perimeter together | 3-4 | labelled rectangle | cells 2x2, two labelled answer lines | write x2 | `area_perimeter` |
+| AP-03 | Area and perimeter together | 3-4 | labelled rectangle | cells 2x2, two labelled answer boxes | write x2 | `area_perimeter` |
 | AP-04 | Composite (L, T, U) shapes | 4-5 | RL-28 figure with a dotted split line (modelled, then pupil-drawn) | pair or cells 2x2 | partition, write | `composite_shapes`, `area_polygon_decompose` |
 | AP-05 | Area of a triangle | 6 | triangle inside a hairline rectangle, dotted height guide | cells 2x2 | write | `area_triangle` |
 | AP-06 | Missing side from area or perimeter | 4 | labelled rectangle, one side a square box | cells 2x3 | write | NEW; nearest `area`, `perimeter` |
@@ -544,7 +544,7 @@ layer) is required.
 
 | Id | Short name | Paper form | On-screen twin | Existing answerType | Scored |
 |---|---|---|---|---|---|
-| RM-01 | write | Black answer line of width B(n), never under 14 mm (design standard 6.1), for a whole number; square box for one missing number | Tap the slot, type digits | `number`, `numpad-input`, `inline-blanks`, `inline-cloze` | yes |
+| RM-01 | write | Black answer box of width B(n), never under 14 mm (design standard 6.1), for a whole number and for one missing number; on + − × ÷ skills the teacher's answer-box option draws it as one box per digit, one box, or off (a plain line) (SL-3 as changed 2026-10-02; previous: an answer line, a square box for a missing number) | Tap the slot, type digits | `number`, `numpad-input`, `inline-blanks`, `inline-cloze` | yes |
 | RM-02 | digit-grid | One digit per hairline box; regroup row above; heavy operation rule. Quotient boxes sit above the bracket | One single-digit input per box. Focus moves right to left for + - x, left to right for a quotient; regroup boxes are optional inputs | `col-arith`, `col-add`, `col-subtract`, `col-multiply`, `long-division`, `box-division`, `area-model` (keeps the `.column-answer-input` contract) | yes; regroup boxes no |
 | RM-03 | template | The printed shape cues the form: fraction bar, whole box + fraction, `__:__`, `__.__`, `( __ , __ )`, "__ r __", `__:__` ratio | Composite input with fixed separators; equivalence-aware checking where the skill allows it | `fraction-input`, `dual-fraction`, `dual`, `coord-input`, `coordinate-multi`, `text` (time) | yes |
 | RM-04 | write + unit | Line followed by the printed unit word ("__ inches"). v2 word problems: number blank + label blank | Inline number input; unit is printed, not typed. v2: second input takes a word from the story's nouns (chips) | `inline-blanks`; new sub-mode for the label chips | yes |
@@ -581,9 +581,9 @@ layer) is required.
 
 | Slot shape on the page | Allowed modes |
 |---|---|
-| Black line | RM-01, RM-04, RM-14, RM-27 |
-| Square box, digit-sized | RM-02, RM-29; RM-01 when one missing number |
-| Square box, digit-sized, **dashed** (short dash) | RM-02 for the unknown digit of a missing-digit item (AS-16, MU-15); scored. Dashed = unknown, so it is never confused with the solid regroup box |
+| Black box (SL-3 as changed 2026-10-02; previous: black line) | RM-01, RM-04, RM-14, RM-27 |
+| Box, digit-sized (slightly rounded, SL-11) | RM-02, RM-29; RM-01 when one missing number |
+| Box, digit-sized (slightly rounded, SL-11), **dashed** (short dash) | RM-02 for the unknown digit of a missing-digit item (AS-16, MU-15); scored. Dashed = unknown, so it is never confused with the solid regroup box |
 | Open circle | RM-05, the sign part of RM-28 |
 | Fraction bar / composite template | RM-03 |
 | Hollow check box | RM-12 |

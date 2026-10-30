@@ -25,6 +25,7 @@ import { applyWordWork } from './word-work.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
 import './skill-options-derived.js';
+import './skill-ansbox-skills.js';
 // Side effect: registers the "Which skills" control of every mixed review (P12), and the review's
 // own pitch / support (option-panel round 3), which poolMemberOptions() hands to each member.
 import { poolMemberOptions } from './skill-options-pools.js';
@@ -279,6 +280,23 @@ function applySkillSettings() {
 // that replaced it for the duration of the call, then state is put back so favourites,
 // progress keys and share codes keep seeing the id the caller selected.
 export function generateQuestion() {
+    return _stampAnsBox(_generateQuestion());
+}
+
+// Wave 1 lane B (owner ruling 2026-10-02): a + − × ÷ skill's answer-box style travels on the item
+// (q.ansBox) and inside its kit payload, so print, the key and every screen host draw the same
+// boxes. null = automatic (resolveAnsBox in skill-options.js: stack per digit, otherwise one box).
+function _stampAnsBox(q) {
+    if (!q || typeof q !== 'object') return q;
+    const o = state.skillOptions;
+    if (!o || !Object.prototype.hasOwnProperty.call(o, 'ansBox')) return q;
+    const v = o.ansBox == null ? null : o.ansBox;
+    q.ansBox = v;
+    if (v != null && q.cell && q.cell.payload && typeof q.cell.payload === 'object') q.cell.payload.ansBox = v;
+    return q;
+}
+
+function _generateQuestion() {
     // A PRESET skill (skill-presets.js) is its host with set option values: for this one call
     // the host generates, with the preset values UNDER whatever options the caller or the
     // teacher's set gave (explicit wins). The item says both ids; state is put back in finally.

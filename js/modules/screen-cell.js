@@ -28,7 +28,7 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
-import { optionsFor } from './skill-options.js';
+import { optionsFor, resolveAnsBox } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
@@ -100,6 +100,92 @@ export function binaryParts(q) {
  *   division  US bracket division, quotient slot above the vinculum (VA-60, VA-61)
  */
 export function cellKindFor(q) {
+    const k = _cellKindFor(q);
+    return k ? withAnsBox(q, k) : _missingOperandStrip(q);
+}
+
+/**
+ * A missing-number sentence whose blank is NOT after "=" ("[ ] + 5 = 18", "6 × [ ] = 42") at ansBox
+ * 'digit': the blank is drawn as the same digit strip as "13 + 5 = [ ][ ]", so one section has one
+ * slot shape on screen as on paper (critic B r5 D6). Every other value keeps the legacy drawing.
+ */
+function _missingOperandStrip(q) {
+    if (!q || (q.printFormat !== 'missing-number' && q.printFormat !== 'missing-factor')) return null;
+    if (Array.isArray(q.options) && q.options.length > 0) return null;
+    if (q.answerType && q.answerType !== 'number') return null;
+    const raw = q.ansBox != null ? q.ansBox : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox : null;
+    if (resolveAnsBox(raw, 'other') !== 'digit') return null;
+    const m = plainText(q.text).match(/^(\d{1,7}|\?|_+)\s*([+\-−–×xX*÷/])\s*(\d{1,7}|\?|_+)\s*=\s*(\d{1,7})\s*$/);
+    if (!m) return null;
+    const blankA = !/^\d/.test(m[1]), blankB = !/^\d/.test(m[3]);
+    if (blankA === blankB) return null;
+    const op = OP_NORM[m[2]];
+    const ans = Number(String(q.ans).replace(/,/g, ''));
+    if (!op || !Number.isInteger(ans) || ans < 0) return null;
+    const a = blankA ? ans : Number(m[1]), b = blankB ? ans : Number(m[3]), c = Number(m[4]);
+    if (computeOp(a, op, b) !== c) return null;
+    const band = q.printFormat === 'missing-factor' ? 3 : 2;              // the paper slot's band (SL-2)
+    const strip = Math.max(String(ans).length, band);
+    return { kind: 'stack', layout: 'eq', missing: blankA ? 'a' : 'b', a, b, c, op, ans, strip, T: strip, regroup: false, ansBox: 'digit', ltr: true };
+}
+
+/**
+ * Owner ruling 2026-10-02: the + − × ÷ answer-box option on screen (`ansBox`; automatic = one box
+ * per digit for column work, one box for a fact or an equation). 'digit' on a fact or an equation
+ * becomes digit boxes: a vertical fact is drawn as the stack it is (no regroup row), an equation
+ * keeps its line and gets a digit strip after "=" (`layout: 'eq'`); both use the
+ * stack's digit inputs, so every host checks them, and marks them, box by box.
+ */
+function withAnsBox(q, k) {
+    if (!k || k.kind === 'division') return k;
+    const raw = q && (q.ansBox != null ? q.ansBox : q.cell && q.cell.payload && q.cell.payload.ansBox != null ? q.cell.payload.ansBox
+        : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox : null);
+    const ab = resolveAnsBox(raw, k.kind === 'stack' ? 'stack' : 'other');
+    if (ab === 'digit' && (k.kind === 'fact' || k.kind === 'eq') && Number.isFinite(Number(k.a)) && Number.isFinite(Number(k.b))) {
+        const ansLen = String(k.ans != null ? k.ans : '').length;
+        // the band's width (SL-2): the kit payload's digits, else the legacy band rule (as printed)
+        const A0 = String(k.a), B0 = String(k.b), d0 = Math.max(A0.length, B0.length);
+        const band = Number(k.band) || Number(q && q.cell && q.cell.payload && q.cell.payload.digits)
+            || (k.op === '+' ? d0 + 1 : k.op === '*' ? A0.length + B0.length : k.op === '/' ? Math.max(1, A0.length - B0.length + 1) : d0);
+        const strip = Math.max(ansLen, band, 1);
+        if (k.kind === 'fact') {
+            const T = Math.max(String(k.a).length, String(k.b).length, strip) + 1;
+            return { ...k, kind: 'stack', T, strip, regroup: false, ansBox: ab, fromFact: true, ltr: true };
+        }
+        return { ...k, kind: 'stack', layout: 'eq', strip, T: strip, regroup: false, ansBox: ab, ltr: true };
+    }
+    // A column stack's strip is the BAND's width on every item (SL-2, critic B r2 #4): the kit
+    // payload's ansDigits when the generator gives one (add_100_regroup: always 3), never the answer's.
+    if (k.kind === 'stack' && !k.strip) {
+        // without one (a legacy column): the same band rule as the printed legacy strip
+        // (print-generate.js wsStackHTML): a sum one place past the widest operand, a 1-digit product
+        // both lengths, a difference the widest operand.
+        const ops = (Array.isArray(k.operands) && k.operands.length >= 2 ? k.operands : [k.a, k.b]).map((x) => String(x));
+        const dw = Math.max(...ops.map((x) => x.length));
+        const legacyBand = ops.length === 2 && !(q && q.cell) ? (k.op === '+' ? dw + 1 : k.op === '*' ? ops[0].length + ops[1].length : dw) : 0;
+        const ad = Number(q && q.cell && q.cell.payload && q.cell.payload.ansDigits) || legacyBand;
+        if (ad > 0) {
+            const ansLen = String(k.ans != null ? k.ans : '').length;
+            const strip = Math.max(ad, ansLen);
+            return { ...k, strip, T: Math.max(k.T || 0, strip + 1), ansBox: ab };
+        }
+    }
+    return { ...k, ansBox: ab };
+}
+
+function _cellKindFor(q) {
+    // add_three's counters sentence with ansBox 'digit' (critic B r4 D3): the kit's own drawing (the
+    // three groups and "a + b + c ="), its answer box replaced by the digit strip (eqDigitsHTML)
+    if (q && q.cell && q.cell.template === 'add-three' && q.cell.payload) {
+        const pay = q.cell.payload;
+        const ab = q.ansBox != null ? q.ansBox : pay.ansBox;
+        const ops = [pay.a, pay.b, pay.c].map(Number);
+        if (ab === 'digit' && ops.every(Number.isFinite)) {
+            const ans = ops[0] + ops[1] + ops[2];
+            const strip = Math.max(2, String(ans).length);
+            return { kind: 'stack', layout: 'eq', twin: 'add-three', payload: pay, op: '+', operands: ops, a: ops[0], b: ops[2], ans, strip, T: strip, regroup: false, ltr: true };
+        }
+    }
     const multi = multiAddParts(q);
     if (multi) return multi;
     const p = binaryParts(q);
@@ -117,6 +203,13 @@ export function cellKindFor(q) {
         // The generator says whether the item regroups; a plain fact gets no regroup row (the
         // paper prints none), so the screen does not add one either.
         return { kind: 'stack', T, ...p, ...(q.regroup === false ? { regroup: false } : {}) };
+    }
+    // A legacy column item that prints as a column (printFormat column-add / column-sub) but whose
+    // screen visual is its own drawing (sub_across_zeros): drawn as the kit stack too, so the column
+    // is the same on screen as on paper and honours the answer-box option (owner ruling 2026-10-02).
+    if (!q.cell && /^column-(add|sub)$/.test(String(q.printFormat || '')) && (p.op === '+' || p.op === '-') && !/column-answer-input/.test(v)) {
+        const T = Math.max(A.length, B.length) + 1;
+        if (ANS.length <= T) return { kind: 'stack', T, ...p };
     }
     // Round 3 ("cards 1, 3, 6: the cell is empty except a short underline"): a generator that
     // names its kit cell (q.cell) is drawn from it even when its legacy visual is not recognised.
@@ -151,7 +244,12 @@ export function cellKindFor(q) {
     // page the slot under the sentence as paper prints it (critic R3 §6: 0.7 em on screen against
     // 0.29 em on paper; the Mix slot beside on screen, under on paper).
     if (cellT === 'equation' && pay.fact && !pay.notation && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', ...p, divFact: true, mix: !!pay.mix };
-    if (!v.trim()) return { kind: 'eq', ...p };
+    // a missing-number sentence's "= ___": the same band as its paper slot (print-generate.js, SL-2)
+    if (!v.trim()) return { kind: 'eq', ...p, ...(q.printFormat === 'missing-number' ? { band: 2 } : {}) };
+    // missing_mult_div's "a × b = ___" (its visual only repeats the sentence): the same equation as
+    // missing_add_sub's, so the answer-box option reaches it (critic B r4 D3). A blank elsewhere in the
+    // sentence is a missing-number box (SL-3 scope) and keeps its legacy drawing.
+    if (q.printFormat === 'missing-factor' && !q.cell) return { kind: 'eq', ...p, band: 3 };
     return null;
 }
 
@@ -421,7 +519,7 @@ export function stackHTML(k, { idPrefix = '', regroup = true, answerClass = 'col
     // (critic s3-stack r1 S1: the operator track, which holds only the sign, is its own variable,
     // so a 6-digit stack can narrow it on a phone - screen-cell.css, max-width 480px)
     return `<div class="ws-sheet mq-kit" role="group" aria-label="${attr(label)}">`
-        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}" style="--t:${T}${seps.length || T >= 7 ? `;grid-template-columns:${Array.from({ length: T }, (_, i) => `${i === 0 ? 'var(--mq-optrack, var(--ws-track))' : 'var(--ws-track)'}${sepAfter(i) ? ' 0.3em' : ''}`).join(' ')}` : ''}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
+        + `<div class="ws-stack${rg ? ' wide' : ''}${operands.length > 2 ? ' mq-multi' : ''}${k.ansBox === 'one' ? ' mq-ans-one' : k.ansBox === 'off' ? ' mq-ans-off' : ''}"${k.ltr ? ' data-mq-ltr="1"' : ''} style="--t:${T}${seps.length || T >= 7 ? `;grid-template-columns:${Array.from({ length: T }, (_, i) => `${i === 0 ? 'var(--mq-optrack, var(--ws-track))' : 'var(--ws-track)'}${sepAfter(i) ? ' 0.3em' : ''}`).join(' ')}` : ''}" data-ws-slot="answer" data-ws-shape="open">${cells.join('')}</div></div>`;
 }
 
 /**
@@ -441,16 +539,65 @@ function spokenOp(op) {
     return { '+': 'plus', '-': 'minus', '*': 'times', '/': 'divided by' }[op] || op;
 }
 
+/**
+ * An equation with one box per digit after "=" (ansBox 'digit'): the same digit inputs as a stack's
+ * answer strip (answerClass + mq-digit, read left to right by every checker, right-aligned like the
+ * key), inside a `.ws-stack` strip, so it auto-advances exactly like the existing digit boxes (SP-20).
+ */
+export function eqDigitsHTML(k, { idPrefix = '', answerClass = 'column-answer-input' } = {}) {
+    const strip = Math.max(1, Number(k.strip) || String(k.ans != null ? k.ans : '').length || 1);
+    const PL = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands', 'hundred thousands'];
+    const seg = (i, n) => (n === 1 ? 'only' : i === 0 ? 'first' : i === n - 1 ? 'last' : 'mid');
+    let cells = '';
+    for (let i = 0; i < strip; i++) {
+        const place = PL[strip - 1 - i] || `place ${strip - i}`;
+        cells += `<span class="ab" data-ws-seg="${seg(i, strip)}"><input type="text" class="${answerClass} mq-digit" data-slot="ans-${strip - 1 - i}" data-ws-slot="ans-${strip - 1 - i}" data-ws-shape="box"`
+            + ` inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" spellcheck="false"`
+            + ` aria-label="answer, ${place} digit" data-_col-adv-attached="1"${idPrefix ? ` data-mq-stack="${attr(idPrefix)}"` : ''}></span>`;
+    }
+    const digits = `<span class="ws-stack mq-eqdigits" data-mq-ltr="1" style="--t:${strip}" data-ws-slot="answer" data-ws-shape="open">${cells}</span>`;
+    if (k.twin === 'add-three' && k.payload) {
+        // the kit's own counters sentence (drawn as on paper), its one answer box swapped for the strip
+        // Drawn exactly as the auto twin is (gen-operations _kitTwin: the screen ctx, whose digit size
+        // fits the host width), and "= [ ][ ]" kept together as one unit that wraps under the sum
+        // when the row does not fit, so the strip never crosses the frame at 390 (critic B r5 D3).
+        try {
+            const ctx = resolveCtx({ mode: 'screen', static: true, size: 'L', look: 'ican', state: 'blank' });
+            const html = renderCell({ cell: { template: 'add-three', v: 1, payload: Object.assign({}, k.payload, { ansBox: null }) } }, ctx);
+            const swapped = String(html)
+                .replace(/(<div class="ws-eq" style="display:inline-flex;)([^"]*?)white-space:nowrap;/, '$1flex-wrap:wrap;justify-content:center;max-width:100%;$2')
+                .replace(/(<span style="[^"]*">=<\/span>)<span data-ws-slot="answer"[^>]*>[^<]*<\/span>/,
+                    (m, eq) => `<span class="mq-eqtail" style="display:inline-flex;align-items:center;gap:0.2em;white-space:nowrap">${eq}${digits}</span>`);
+            if (swapped.includes('mq-eqdigits')) return `<div class="ws-sheet mq-kit">${swapped}</div>`;
+        } catch (e) { /* fall back to the plain sentence */ }
+    }
+    if (k.missing === 'a' || k.missing === 'b') {
+        // the blank where the sentence has it, the given result after "=" (critic B r5 D6)
+        const side = (w, x) => (k.missing === w ? digits : `<span>${x}</span>`);
+        const said = `${k.missing === 'a' ? 'blank' : k.a} ${spokenOp(k.op)} ${k.missing === 'b' ? 'blank' : k.b} equals ${k.c}`;
+        return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(said)}">`
+            + `${side('a', k.a)}<span class="o">${opGlyph(k.op)}</span>${side('b', k.b)}<span class="o">=</span><span>${k.c}</span></div></div>`;
+    }
+    const ops = Array.isArray(k.operands) && k.operands.length > 2 ? k.operands : [k.a, k.b];
+    const lhs = ops.map((x) => `<span>${x}</span>`).join(`<span class="o">${opGlyph(k.op)}</span>`);
+    return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(ops.join(` ${spokenOp(k.op)} `))}">`
+        + `${lhs}<span class="o">=</span>${digits}</div></div>`;
+}
+
 /** The kit drawing for a kind, with the answer slot the host supplies. */
 export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answerClass = 'column-answer-input', supports = null } = {}) {
     if (!k) return '';
     // S2: the item's supports (screenSupportsFor): touch dots on the digits, and the cues, tally
     // row and panes drawn round the problem by the same code as paper (support-draw.js).
-    const kk = supports && supports.on && supports.on.length ? Object.assign({}, k, { supports }) : k;
+    // a missing-operand strip's blank operand holds the answer: no supports are drawn from it (r5 D6)
+    const kk = supports && supports.on && supports.on.length && !k.missing ? Object.assign({}, k, { supports }) : k;
     let html = '';
+    // ansBox 'off' (the plain look): the host's slot keeps a ruled writing line, no box.
+    if (k.ansBox === 'off' && slotHtml && (kk.kind === 'eq' || kk.kind === 'fact')) slotHtml = `<span class="mq-ansoff">${slotHtml}</span>`;
     if (kk.kind === 'eq') html = equationHTML(kk, slotHtml);
     else if (kk.kind === 'fact') html = factHTML(kk, slotHtml);
     else if (kk.kind === 'division') html = divisionHTML(kk, slotHtml);
+    else if (kk.kind === 'stack' && kk.layout === 'eq') html = eqDigitsHTML(kk, { idPrefix, answerClass });
     else if (kk.kind === 'stack') html = stackHTML(kk, { idPrefix, regroup, answerClass, heads: kk.heads === true });
     if (!html || kk === k) return html;
     const p = { a: k.a, b: k.b, op: k.op, operands: k.operands, supports: { ...supports, reserve: [] } };
@@ -468,7 +615,7 @@ const SCREEN_TEMPLATE = { eq: 'equation', fact: 'fact', stack: 'stack', division
  * on the online worksheet and in live practice). null when there is none.
  */
 export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '', skillId = '', options = null } = {}) {
-    if (!q || !k) return null;
+    if (!q || !k || k.missing) return null;
     const o = q.skillOptions || options || {};
     let def = null;
     try { def = optionsFor(q.categoryId || categoryId, q.requestedSkillId || q.skillId || skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
@@ -502,6 +649,51 @@ export function regroupFor(skillId) {
     return !/no_?regroup|without_regroup/i.test(String(skillId || ''));
 }
 
+/**
+ * The ONE rule for a fact / equation written in digit boxes (ansBox 'digit', data-mq-ltr), used by
+ * the live mark, the card's Check, the worksheet's column check and the quiz (critic B r3 D3/D4):
+ *   - empty boxes at either END are ignored ("9_" and "_9" are 9);
+ *   - an empty box BETWEEN digits is a gap: never green live, wrong on Check ("1_2" is not 12);
+ *   - the value is judged as a NUMBER: leading zeros are dropped ("07" is 7), live and on Check alike.
+ * Returns {text, value, gap, zerosOnly}: `text` is what Check compares ('' when empty; with a gap it
+ * keeps a space so no numeric compare can pass), `value` the digits without leading zeros.
+ */
+export function ltrStripValue(inputs) {
+    const v = Array.from(inputs || []).map((e) => String((e && e.value) || '').replace(/[^0-9]/g, ''));
+    let a = 0; while (a < v.length && !v[a]) a++;
+    let b = v.length - 1; while (b >= a && !v[b]) b--;
+    if (a > b) return { text: '', value: '', gap: false, zerosOnly: false };
+    const mid = v.slice(a, b + 1);
+    const gap = mid.some((d) => !d);
+    const raw = mid.join('');
+    const value = raw.replace(/^0+(?=\d)/, '');
+    return { text: gap ? mid.map((d) => d || ' ').join('') : value, value, gap, zerosOnly: /^0+$/.test(raw) };
+}
+
+/**
+ * Right-align a fact strip's digits when the pupil leaves it, so a 1-digit answer sits in the ones
+ * box on screen exactly as the paper key prints it (critic B r3 D5). A strip with a gap is left alone.
+ */
+export function rightAlignLtrStrip(stk) {
+    if (!stk) return false;
+    const boxes = Array.from(stk.querySelectorAll('input.mq-digit, input.column-answer-input, input.mq-qt-digit'));
+    const uniq = boxes.filter((b, i) => boxes.indexOf(b) === i);
+    const r = ltrStripValue(uniq);
+    if (!r.text || r.gap) return false;
+    // the VALUE's digits, leading zeros dropped (r4 D4): "07" leaves as "_7", the same as the key prints
+    const digits = r.value.split('');
+    const pad = uniq.length - digits.length;
+    let moved = false;
+    uniq.forEach((e, i) => {
+        const want = i >= pad ? digits[i - pad] : '';
+        if ((e.value || '') !== want) { e.value = want; moved = true; }
+    });
+    // 'change' re-judges each box; one 'input' on the LAST box (whose entry handler moves no focus) lets
+    // the card's auto-advance see the moved value, as for a plain "7" (r4 D4)
+    if (moved) uniq.forEach((e, i) => { try { e.dispatchEvent(new Event(i === uniq.length - 1 ? 'input' : 'change', { bubbles: true })); } catch (x) { /* no events */ } });
+    return moved;
+}
+
 /* ------------------------------------------------------------------ entry order (SP-20) */
 
 /**
@@ -521,6 +713,12 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
             inp.addEventListener('input', () => {
                 const v = (inp.value || '').replace(/[^0-9]/g, '');
                 if (v !== inp.value) inp.value = v;
+                if (stk.hasAttribute('data-mq-ltr')) {
+                    // a fact or an equation in digit boxes (ansBox 'digit'): typed in reading order,
+                    // left to right (critic B r2 #1); only column work enters ones first (SP-20)
+                    if (v.length >= 1 && i < boxes.length - 1) { boxes[i + 1].focus(); try { boxes[i + 1].select(); } catch (e) { /* not selectable */ } }
+                    return;
+                }
                 if (v.length >= 1 && i > 0) {
                     const left = boxes[i - 1];
                     left.focus();
@@ -528,7 +726,9 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
                 }
             });
             inp.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && !(inp.value || '') && i < boxes.length - 1) {
+                if (e.key === 'Backspace' && !(inp.value || '') && stk.hasAttribute('data-mq-ltr')) {
+                    if (i > 0) { e.preventDefault(); boxes[i - 1].focus(); }
+                } else if (e.key === 'Backspace' && !(inp.value || '') && i < boxes.length - 1) {
                     e.preventDefault();
                     boxes[i + 1].focus();
                 } else if (e.key === 'ArrowLeft' && i > 0) {
@@ -558,8 +758,15 @@ export function wireStackEntry(root, { autofocus = false } = {}) {
                 }
             });
         });
+        if (stk.hasAttribute('data-mq-ltr') && stk.dataset.mqAlign !== '1') {
+            stk.dataset.mqAlign = '1';
+            stk.addEventListener('focusout', (e) => {
+                if (e.relatedTarget && stk.contains(e.relatedTarget)) return;
+                rightAlignLtrStrip(stk);
+            });
+        }
         if (autofocus) {
-            const ones = boxes[boxes.length - 1];
+            const ones = stk.hasAttribute('data-mq-ltr') ? boxes[0] : boxes[boxes.length - 1];
             try { ones.focus({ preventScroll: true }); } catch (e) { ones.focus(); }
         }
     });
@@ -980,13 +1187,88 @@ function _wireClear() {
     window.addEventListener('resize', () => Array.from(MIRRORS.keys()).forEach(_mirrorPlace));
 }
 /**
+ * A fact / equation in digit boxes (ansBox 'digit', data-mq-ltr), critic B r5 D2. GREEN and NEUTRAL
+ * follow the strip's VALUE (ltrStripValue: "07" is 7, a gap is never green, a correct prefix is
+ * neutral). RED is judged per box BY PLACE VALUE, the A3 rule (wrongDigitPattern): the answer's
+ * digits are right-aligned into the strip's boxes; a box whose digit differs is the wrong digit
+ * (mq-live-wrong + A3's mq-wrong-digit blink and underline), an empty box where the answer has a digit
+ * is a missing digit (mq-wd-empty), a right digit stays unmarked. Red is shown when the strip is
+ * complete: every box filled, the pupil leaves the strip (after the right-align), or Check.
+ */
+const STRIPS = new WeakMap();          // the strip -> { group: its digit inputs, want: the answer's digits }
+function _stripExpect(group, want) {
+    const pad = group.length - want.length;
+    return group.map((_, i) => (i >= pad ? want[i - pad] : ''));
+}
+function _stripUnmark(e) { _liveSet(e, false, false); e.classList.remove('mq-wrong-digit', 'mq-wd-empty'); }
+/** Judge one strip. `final`: the pupil left it or pressed Check. Returns 'right' | 'wrong' | 'open'. */
+export function judgeLtrStrip(stk, final = false) {
+    const s = stk && STRIPS.get(stk);
+    if (!s) return 'open';
+    const { group, want } = s;
+    if (_inQuiz(stk)) return 'open';
+    const r = ltrStripValue(group);
+    const digit = (e) => String(e.value || '').replace(/[^0-9]/g, '');
+    if (!r.gap && r.text !== '' && r.value === want) {
+        group.forEach((e) => { e.classList.remove('mq-wrong-digit', 'mq-wd-empty'); _liveSet(e, digit(e) !== '', false); });
+        return 'right';
+    }
+    group.forEach((e) => { if (e.classList.contains('mq-live-correct')) _liveSet(e, false, false); });
+    if (r.text === '' && !r.gap) return 'open';
+    const full = group.every((e) => digit(e) !== '');
+    if (!final && !full) return 'open';                       // still being written: no new red
+    const exp = _stripExpect(group, want);
+    group.forEach((e, i) => {
+        const v = digit(e);
+        if (v === exp[i]) { if (e.classList.contains('mq-live-wrong')) _stripUnmark(e); return; }
+        if (exp[i]) LIVE_WANT.set(e, [exp[i]]); else LIVE_WANT.delete(e);
+        _liveSet(e, false, true);                              // red + its corner mark (A2)
+        if (v === '') e.classList.add('mq-wrong-digit', 'mq-wd-empty');   // a missing digit (A3)
+        else e.classList.add('mq-wrong-digit');                // the wrong digit blinks (A3)
+    });
+    return 'wrong';
+}
+/** Bind a strip to its answer (idempotent; a redraw re-binds the new inputs). Returns the boxes bound. */
+export function bindLtrStrip(stk, ans) {
+    const group = Array.from(stk.querySelectorAll('input.mq-digit'));
+    if (!group.length) return 0;
+    const want = String(ans == null ? '' : ans).replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+    STRIPS.set(stk, { group, want });
+    group.forEach((e) => {
+        LIVE_FN.delete(e);
+        LIVE_EXPECT.set(e, ['']);                              // bound (markBoxSubmitted, unwire)
+        if (e.dataset.mqLive === '1') return;
+        e.dataset.mqLive = '1';
+        // editing a box clears its own red (A2); the strip is then judged again as unfinished
+        e.addEventListener('input', () => { if (e.classList.contains('mq-live-wrong') || e.classList.contains('mq-wd-empty')) _stripUnmark(e); judgeLtrStrip(stk, false); });
+        e.addEventListener('change', () => judgeLtrStrip(stk, false));
+    });
+    if (stk.dataset.mqStripJudge !== '1') {
+        stk.dataset.mqStripJudge = '1';
+        stk.addEventListener('focusout', (ev) => {
+            if (ev.relatedTarget && stk.contains(ev.relatedTarget)) return;
+            if (_toControl(ev)) return;                          // Check / Hint judge it themselves
+            stk.dataset.mqLeft = '1';                            // complete: a host's own check may judge it
+            rightAlignLtrStrip(stk);
+            judgeLtrStrip(stk, true);
+        });
+        stk.addEventListener('focusin', () => { delete stk.dataset.mqLeft; });
+    }
+    judgeLtrStrip(stk, false);
+    return group.length;
+}
+
+/**
  * The item was judged wrong at Check: the digit boxes the pupil left empty are missing digits, so
- * they are marked too (an answer digit box only; a regroup box may rightly stay empty).
+ * they are marked too (an answer digit box only; a regroup box may rightly stay empty). A digit
+ * strip (data-mq-ltr) is judged by place value as a whole (judgeLtrStrip).
  */
 export function markMissingDigits(root) {
     if (!root || _inQuiz(root)) return 0;
     let n = 0;
+    root.querySelectorAll('[data-mq-ltr]').forEach((stk) => { if (STRIPS.has(stk) && judgeLtrStrip(stk, true) === 'wrong') n++; });
     root.querySelectorAll('input.mq-digit, input.mq-cellslot:not(.mq-cellslot-host), input.ib-cell').forEach((el) => {
+        if (el.closest('[data-mq-ltr]') && STRIPS.has(el.closest('[data-mq-ltr]'))) return;
         if (el.classList.contains('mq-carry') || LIVE_FN.has(el) || String(el.value || '').trim() !== '') return;
         const want = LIVE_EXPECT.get(el);
         if (!want || !want.some((w) => w !== '') || !el.offsetWidth) return;
@@ -1320,7 +1602,13 @@ export function wireLiveCorrect(root, { q = null, kind = null, single = null } =
     const stk = root.querySelector('.ws-stack');
     if (stk && kind && kind.kind === 'stack') {
         const ex = stackExpectations(kind);
-        stk.querySelectorAll('input.mq-digit').forEach((inp) => {
+        if (stk.hasAttribute('data-mq-ltr')) {
+            // a fact / equation in digit boxes is written left to right: box i holds the i-th digit
+            // judged by the VALUE the boxes hold together (empty boxes ignored: "_9" and "9_" are 9);
+            // a value still on its way to the answer stays neutral
+            const a = String(kind.ans != null ? kind.ans : '').replace(/[^0-9]/g, '');
+            n += bindLtrStrip(stk, a);
+        } else stk.querySelectorAll('input.mq-digit').forEach((inp) => {
             const col = Number(String(inp.getAttribute('data-ws-slot') || '').replace('ans-', ''));
             if (Number.isFinite(col) && ex.ans[col] !== undefined && _liveBind(inp, ex.ans[col])) n++;
         });

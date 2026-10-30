@@ -441,8 +441,12 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     // by their OWN behaviour test below (not "differs from the default"): generation and the printed
     // page must be UNCHANGED, the value must round-trip a share code, and the screen gate must obey it.
     const BEHAVIOUR = { calculator: [true], skipAfter: [0, 2, 20] };
+    const abSig = {};   // ansBox value -> how the card draws its answer place (computed edges)
     for (const def of defs) {
         if (BEHAVIOUR[def.id]) { for (const v of BEHAVIOUR[def.id]) tries.push({ def, value: v, behaviour: true }); continue; }
+        // ANSWER BOXES (Wave 1 lane B, owner ruling 2026-10-02): `ansBox` restyles the answer place
+        // only. Every value is tried (automatic already equals one of them on each layout).
+        if (def.id === 'ansBox') { for (const v of ['digit', 'one', 'off']) tries.push({ def, value: v, ansBox: true }); continue; }
         if (supDef && (def.id === 'cover' || def.id === 'mix')) {
             const base = supportBase(def.id);
             for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l, base, renderOnly: true });
@@ -610,6 +614,68 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             r.checks.trip = JSON.stringify(back) === JSON.stringify(packed) ? 'ok' : 'fail';
             if (r.checks.trip === 'fail') fail('trip', `packed ${JSON.stringify(packed)} -> "${suffix}" -> ${JSON.stringify(back)}`);
         } catch (e) { r.checks.trip = 'fail'; fail('trip', String(e && e.message || e)); }
+
+        if (t.ansBox) {
+            // (a) generation: the same numbers as the default (the option draws, it never deals)
+            const ai = gen(opts, APP_RANGE), ad = dfltAt(APP_RANGE);
+            if (!ai.length) fail('gen', 'no items');
+            else if (coarse(ai) !== coarse(ad)) fail('gen', 'the answer-box option changed the generated items (it must not)');
+            r.checks.gen = r.fails.some(f => f.startsWith('gen:')) ? 'fail' : 'ok';
+            // (b) print: the chosen box style is drawn, and the key writes every answer
+            const MARK = {
+                // kit cells, then the legacy print slots (print-generate.js wsStackHTML / wsAnswerLine)
+                digit: /ws-digitboxes|ws-factans--digit|<span class="ab[^"]*" data-ws-seg|ws-fact-write--digit|ws-slot--digits/,
+                one: /ansrow--box|class="ws-factans(?: ws-trace| ws-dotted)?"|class="ws-line"(?![^>]*ws-line--off)|class="ws-fact-write" style="[^"]*border:|class="ws-slot" data-ws-shape="line" style="[^"]*border:[^"]*border-radius/,
+                off: /ws-line--off|ws-factans--off|class="ansrow"|<span class="(?:ws-trace )?an"|class="ws-fact-write" style="grid-column:1 \/ -1;height:[\d.]+mm;(?:"|display:grid)|class="ws-slot" data-ws-shape="line" style="[^"]*border-bottom:[^"]*"/,   // a key's open zone: plain digits, no box
+            };
+            try {
+                const rs = await W.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });
+                if (!MARK[value].test(rs.pupilHtml)) fail('print', `ansBox ${value}: the pupil page draws no ${value} answer place`);
+                if (!MARK[value].test(rs.keyHtml)) fail('print', `ansBox ${value}: the key draws no ${value} answer place`);
+                const keyText = plain(rs.keyHtml).replace(/(\d),(?=\d{3}\b)/g, '$1').replace(/\s+/g, '');
+                const miss = rs.items.filter(i => /^\d+$/.test(String(i.ans)) && !keyText.includes(String(i.ans)));
+                if (miss.length) fail('print', `ansBox ${value}: ${miss.length} answer(s) not written on the key (e.g. ${miss[0].ans})`);
+            } catch (e) { fail('print', `buildSheet threw: ${String(e && e.message || e)}`); }
+            r.checks.print = r.fails.some(f => f.startsWith('print:')) ? 'fail' : 'ok';
+            // (c) screen: the value from the set's store reaches the practice card's drawing
+            const sv = { category: st.category, skill: st.skill, range: st.range, skillOptions: st.skillOptions, gameMode: st.gameMode, currentQ: st.currentQ, quiz: st.quizMode };
+            try {
+                W.clearSetOptions({ silent: true });
+                W.setSetOptions(categoryId, skillId, opts, { silent: true });
+                st.category = categoryId; st.skill = skillId; st.range = APP_RANGE; st.skillOptions = null; st.gameMode = 'practice'; st.quizMode = false; st.isMixedMode = false; st.hasAnswered = false;
+                const q = W.generateQuestion();
+                if (!q || q.ansBox !== value) fail('screen/practice', `the question does not carry ansBox=${value} from the store`);
+                else {
+                    W.showView('gameView'); st.currentQ = q; W.renderQuestion();
+                    await new Promise(res => setTimeout(res, 250));
+                    const card = document.getElementById('visualAid');
+                    const { cellKindFor } = await import('/js/modules/screen-cell.js');
+                    const kind = cellKindFor(q);
+                    if (card && kind && kind.kind !== 'division') {
+                        const has = (sel) => !!card.querySelector(sel);
+                        if (value === 'digit' && !has('input.mq-digit')) fail('screen/practice', 'ansBox digit: the card has no digit boxes');
+                        if (value === 'off' && !has('.mq-ansoff, .mq-ans-off')) fail('screen/practice', 'ansBox off: the card still boxes the answer');
+                        if (value === 'one' && (has('.mq-ansoff, .mq-ans-off') || (kind.kind === 'stack' && !has('.mq-ans-one')))) fail('screen/practice', 'ansBox one: the card does not draw one box');
+                        // the three values must LOOK different: the computed edges of the answer places
+                        abSig[value] = Array.from(card.querySelectorAll('input')).filter(e => e.getBoundingClientRect().width > 0 && !e.classList.contains('mq-carry'))
+                            .map(e => { const cs = getComputedStyle(e); return [cs.borderTopWidth, cs.borderTopStyle, cs.borderTopColor, cs.borderLeftWidth, cs.borderBottomWidth, cs.borderBottomColor, cs.boxShadow].join(' '); }).join('|');
+                        if (value === 'off' && abSig.digit !== undefined && abSig.one !== undefined) {
+                            const kindName = kind.kind;
+                            if (abSig.off === abSig.one || abSig.off === abSig.digit || (kindName === 'stack' && abSig.one === abSig.digit))
+                                fail('screen/practice', `ansBox: the card draws the same answer place for two values (${['digit', 'one', 'off'].filter(v => Object.values(abSig).filter(x => x === abSig[v]).length > 1).join(' = ')})`);
+                        }
+                    }
+                }
+            } catch (e) { fail('screen/practice', String(e && e.message || e)); }
+            finally {
+                W.clearSetOptions({ silent: true });
+                try { W.showView('homeView'); } catch (_) {}
+                Object.assign(st, { category: sv.category, skill: sv.skill, range: sv.range, skillOptions: sv.skillOptions, gameMode: sv.gameMode, currentQ: sv.currentQ, quizMode: sv.quiz });
+            }
+            r.checks.screen = r.fails.some(f => f.startsWith('screen')) ? 'fail' : 'ok';
+            results.push(r);
+            continue;
+        }
 
         if (t.behaviour) {
             // generation and print unchanged

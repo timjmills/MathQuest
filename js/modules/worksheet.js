@@ -15,7 +15,7 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
-    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
+    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks, ltrStripValue, judgeLtrStrip,
 } from './screen-cell.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
@@ -1865,7 +1865,24 @@ export function checkWorksheetAnswerFromColumns(idx) {
     });
     enteredValue = enteredValue.trim().replace(/\s+/g, '');
 
-    const isCorrect = enteredValue === expectedAnswer;
+    let isCorrect = enteredValue === expectedAnswer;
+    const ltrStrip = columnInputs.length && columnInputs[0].closest('[data-mq-ltr]');
+    if (ltrStrip) {
+        // a fact strip (ansBox 'digit'): the one rule of the live mark and the card (ltrStripValue) -
+        // a gap between digits is wrong, leading zeros are dropped ("07" is 7), and zeros typed on
+        // their way to a longer answer are not judged yet (critic B r3 D3/D4)
+        const r = ltrStripValue(columnInputs);
+        const want = expectedAnswer.replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+        if (!r.gap && r.zerosOnly && want !== '0' && filledCount < columnInputs.length) return;
+        enteredValue = r.text;
+        isCorrect = !r.gap && r.value === want;
+        // critic B r5 D2: a wrong strip is judged when it is COMPLETE (every box filled, or the pupil
+        // left it), and then by place value, box by box (judgeLtrStrip): only the wrong digits go red
+        if (!isCorrect) {
+            if (filledCount < columnInputs.length && ltrStrip.dataset.mqLeft !== '1') return;
+            judgeLtrStrip(ltrStrip, true);
+        }
+    }
 
     if (isCorrect) {
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
@@ -1895,7 +1912,8 @@ export function checkWorksheetAnswerFromColumns(idx) {
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
-        columnInputs.forEach(input => {
+        // a digit strip is marked digit by digit (judgeLtrStrip above), never every box
+        if (!ltrStrip) columnInputs.forEach(input => {
             input.style.borderColor = "var(--incorrect)";
             input.style.background = "rgba(239,71,111,0.15)";
         });
@@ -2272,9 +2290,12 @@ export function advanceToNextProblem(currentIdx, pending = null) {
     const t2 = setTimeout(() => {
         if (pending) { if (_wsAdv !== pending) return; _wsAdv = null; }
         if (nextQ.isVerticalFormat) {
-            // Focus on the ONES box: column answers are entered right to left (SP-20).
+            // Focus on the ONES box: column answers are entered right to left (SP-20). A fact /
+            // equation strip (data-mq-ltr) is typed in reading order, so it starts at its FIRST box
+            // (critic B r3 D1).
             const colInputs = nextCard.querySelectorAll('.column-answer-input');
-            const onesInput = colInputs.length ? colInputs[colInputs.length - 1] : null;
+            const ltr = colInputs.length && colInputs[0].closest('[data-mq-ltr]');
+            const onesInput = colInputs.length ? colInputs[ltr ? 0 : colInputs.length - 1] : null;
             if (onesInput) onesInput.focus();
         } else if (nextQ.isFunctionTable) {
             // Focus on the first function table input

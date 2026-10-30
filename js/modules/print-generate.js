@@ -12,6 +12,7 @@ import { generateQuestion } from './generate-question.js';
 import { blankWidth, SIZES, STROKE, INK, EM_MM, SLOT, slotRadiusMm, stripSegStyle, stripPos } from './sheet/tokens.js';
 // The ink pass every printed cell goes through (INK-1..INK-5). Pure, no imports of its own.
 import { inkHTML } from './print-ink.js';
+import { resolveAnsBox } from './skill-options.js';
 // The rest of the kit, for the STRANGLER HOOK at the top of formatProblemForPrint
 // (see "THE STRANGLER HOOK" below). `sheet/index.js` imports nothing outside
 // `sheet/`, so this direction stays acyclic: print-generate.js -> sheet/**, never
@@ -4113,7 +4114,30 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     html += A.padStart(T, ' ').split('').map(ch => cell(ch)).join('');
     html += cell(op, 'font-weight:700;') + B.padStart(T - 1, ' ').split('').map(ch => cell(ch)).join('');
     html += `<span class="rule" style="grid-column:1 / -1;height:1mm;border-top:${FACT_RULE_WEIGHT} solid #000;margin-top:1mm;"></span>`;
-    html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${o.answerMm || size.answerMm}mm;"></span>`;
+    // Owner ruling 2026-10-02 (SL-3): the open answer zone is a full black-outlined box, one box
+    // across the stack's tracks (same height as the old zone, so the cell geometry holds).
+    // ansBox (owner ruling 2026-10-02): column work defaults to one box per digit, a fact to one box.
+    const ab = resolveAnsBox(_ANSBOX, o.cls === 'ws-fact' ? 'other' : 'stack');
+    // (critic B r3 D2) a drawn answer box stands at least 1.5 mm clear of the sum rule, so the rule and
+    // the box's top edge never read as one double rule
+    const FACT_BOX_GAP_MM = 1.5;
+    const zoneH = o.answerMm || size.answerMm;
+    if (ab === 'digit') {
+        // one box per digit track (never the operator track): a strip of joined boxes; the key fills each
+        // the band's width on every item (SL-2): a sum can carry one place past the widest operand,
+        // a 1-digit product two; the strip may then reach under the operator's track
+        const d = Math.max(A.length, B.length);
+        const n = Math.min(T, Math.max(T - 1, op === '+' ? d + 1 : /[×x*]/.test(op) ? A.length + B.length : d));
+        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:${T - n + 1} / -1;height:${zoneH}mm;margin-top:${FACT_BOX_GAP_MM}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
+            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:flex;align-items:center;justify-content:center;font-style:normal;height:100%;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
+            + '</span>';
+    } else if (ab === 'off') {
+        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;"></span>`;
+    } else {
+        // the open answer zone is ONE full black-outlined box across the stack's tracks
+        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;margin-top:${FACT_BOX_GAP_MM}mm;box-sizing:border-box;`
+            + `border:${STROKE.hair}pt solid #000;border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
+    }
     return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
         + `grid-template-columns:repeat(${T},${trackEm}em);justify-content:center;`
         + `font-variant-numeric:lining-nums tabular-nums;color:#000;">${html}</div>`;
@@ -4467,7 +4491,7 @@ function notationBlankDigits(problem, op) {
 }
 
 /**
- * The `line` slot of section 6: a 0.75 pt baseline rule, B(n) wide, with Hw of
+ * The `line` slot of section 6 (drawn as a full box since owner ruling 2026-10-02, SL-3): B(n) wide, Hw of
  * clear writing height above it. A ruled line means "write a number" (SL-3);
  * nothing else on the sheet may look like one.
  */
@@ -4475,10 +4499,28 @@ const wsBlankMm = (digits) =>
     blankWidth(digits, WS_SIZE, Math.max(0, Math.floor((digits - 1) / 3)));
 
 function wsAnswerLine(digits, shiftMm = 0) {
+    const ab = resolveAnsBox(_ANSBOX, 'other');
+    if (ab === 'digit') {
+        // one box per digit (owner ruling 2026-10-02): a joined strip the key fills digit by digit
+        const n = Math.max(1, digits);
+        const w = (wsWriteMm() * 0.95).toFixed(2);
+        return `<span class="ws-slot ws-slot--digits" data-ws-shape="box" style="display:inline-flex;vertical-align:middle;`
+            + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '') + `">`
+            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:inline-flex;align-items:center;justify-content:center;font-style:normal;width:max(${w}mm, 0.82em);height:max(${wsWriteMm()}mm, 1.15em);line-height:1;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
+            + '</span>';
+    }
+    // (critic B r3 D2) the slot is never shorter than the printed operands: at least 1.15 em tall (as the
+    // digit strip above), so the key's digit, set at the slot's writing size, sits clear inside it
+    const slotH = `max(${wsWriteMm()}mm, 1.15em)`;
+    const slotW = `max(${wsBlankMm(digits)}mm, ${(Math.max(1, digits) * 0.62 + 0.8).toFixed(2)}em)`;
+    if (ab === 'off') {
+        return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;width:${slotW};height:${slotH};`
+            + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '') + `border-bottom:${STROKE.hair}pt solid ${INK.ink};"></span>`;
+    }
     return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;`
-        + `width:${wsBlankMm(digits)}mm;height:${wsWriteMm()}mm;`
+        + `width:${slotW};height:${slotH};`
         + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '')
-        + `border-bottom:${STROKE.hair}pt solid ${INK.ink};"></span>`;
+        + `box-sizing:border-box;border:${STROKE.hair}pt solid ${INK.ink};border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
 }
 
 // TY-25: a horizontal equation keeps natural digit spacing, with a 1 em slot
@@ -5172,8 +5214,15 @@ function problemHeadHTML(index, skillLabel, showSkillLabels, isCompact) {
  * cell, the answer-key facsimile — reaches the legacy branches through this one function, so
  * this is the one place the ink rule has to live for markup the generators still colour.
  */
+// The + − × ÷ answer-box option (owner ruling 2026-10-02, `ansBox`) of the problem being formatted:
+// the legacy stack / fact / equation slots below read it, so a legacy-printed skill honours the
+// teacher's choice exactly as the kit does (one box per digit / one box / off).
+let _ANSBOX = null;
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
-    return inkHTML(formatProblemForPrintRouted(problem, index, columns, sizeCategory, showSkillLabels));
+    const prev = _ANSBOX;
+    _ANSBOX = problem && problem.ansBox != null ? problem.ansBox : null;
+    try { return inkHTML(formatProblemForPrintRouted(problem, index, columns, sizeCategory, showSkillLabels)); }
+    finally { _ANSBOX = prev; }
 }
 
 function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
@@ -11322,7 +11371,13 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     
     // Missing Number - Addition/Subtraction
     if (problem.printFormat === "missing-number") {
-        const emptyBox = '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
+        // every blank in the sentence honours the answer-box option, wherever it sits (critic B r5 D6:
+        // one slot shape per section - "[ ][ ] + 5 = 18" beside "13 + 5 = [ ][ ]" at 'digit')
+        // both carry data-ws-slot so the pupil page and its key count the same slots (AK-4) and the key
+        // writes its value INSIDE the box (legacyKeyFill), not on a separate "Answer:" line
+        // one width per section (SL-2): the band the skill can reach (sums / differences to 99, products to 144)
+        const band = Math.max(String(problem.ans).replace(/[^0-9]/g, '').length || 1, problem.printFormat === 'missing-factor' ? 3 : 2);
+        const emptyBox = wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"');
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -11336,7 +11391,13 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
 
     // Missing Factor - Multiplication/Division
     if (problem.printFormat === "missing-factor") {
-        const emptyBox = '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
+        // every blank in the sentence honours the answer-box option, wherever it sits (critic B r5 D6:
+        // one slot shape per section - "[ ][ ] + 5 = 18" beside "13 + 5 = [ ][ ]" at 'digit')
+        // both carry data-ws-slot so the pupil page and its key count the same slots (AK-4) and the key
+        // writes its value INSIDE the box (legacyKeyFill), not on a separate "Answer:" line
+        // one width per section (SL-2): the band the skill can reach (sums / differences to 99, products to 144)
+        const band = Math.max(String(problem.ans).replace(/[^0-9]/g, '').length || 1, problem.printFormat === 'missing-factor' ? 3 : 2);
+        const emptyBox = wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"');
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}

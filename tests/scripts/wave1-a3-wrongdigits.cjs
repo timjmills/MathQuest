@@ -26,6 +26,8 @@ const SCENARIOS = [
   { c: 'addition', k: 'add_100_regroup', kind: 'stack' },                    // a column stack, one digit per box
   { c: 'addition', k: 'add_facts', kind: 'single', size: 'big', tagName: 'add_facts_2digit' },   // several digits in one box: mirror
   { c: 'multiplication', k: 'count_by_tables', kind: 'row' },               // a row of boxes, several digits each
+  // lane B (critic r5 D2): a fact in digit boxes (ansBox 'digit', data-mq-ltr), judged by place value
+  { c: 'addition', k: 'add_facts', kind: 'strip', size: 'big', opts: { ansBox: 'digit' }, tagName: 'add_facts_digit_strip' },
 ];
 
 async function boot(page) {
@@ -39,6 +41,7 @@ async function setup(page, host, s) {
     const st = window.state;
     st.category = s.c; st.skill = s.k; st.range = 100; st.decimalPlaces = 0; st.isMixedMode = false; st.quizMode = false; st.hasAnswered = false;
     st.skillOptions = null;
+    try { window.clearSetOptions({ silent: true }); if (s.opts) window.setSetOptions(s.c, s.k, s.opts, { silent: true }); } catch (e) { /* no set options */ }
     const fits = (q) => q && (!s.size || (s.size === 'big') === (String(q.ans).length >= 2))
       && (s.kind !== 'row' || String(q.ans).split(',').some((x) => x.trim().length >= 2));
     if (host === 'card') {
@@ -65,6 +68,11 @@ async function tag(page, host, s) {
     if (s.kind === 'row') {
       els = Array.from(root.querySelectorAll('input.mq-cellslot:not(.mq-cellslot-host)'));
       exp = ans.split(/\s*,\s*/);
+    } else if (s.kind === 'strip') {
+      // left to right; the answer's digits right-aligned into the boxes, as the key prints them
+      const d = ans.replace(/[^0-9]/g, '');
+      els = Array.from(root.querySelectorAll('[data-mq-ltr] input.mq-digit'));
+      exp = els.map((_, i) => (i >= els.length - d.length ? d[i - (els.length - d.length)] : ''));
     } else if (s.kind === 'stack') {
       const d = ans.replace(/[^0-9]/g, '');
       els = Array.from(root.querySelectorAll('input.mq-digit')).filter((e) => /^ans-\d+$/.test(e.getAttribute('data-ws-slot') || ''))
@@ -124,6 +132,27 @@ async function scenario(page, host, s, w, reduce) {
   await setup(page, host, s);
   const t = await tag(page, host, s);
   if (!t.n) { check(false, `${t0} has answer boxes`); return; }
+  if (s.kind === 'strip') {
+    // the tens digit wrong, the ones right ("25" for 15): only the tens box is marked, by place value
+    const k = t.exp.findIndex((x) => x !== '');
+    if (t.n < 2 || k < 0 || k >= t.n - 1) { check(false, `${t0} a 2-digit answer in a digit strip (${t.n} boxes, ${t.ans})`); return; }
+    for (let i = 0; i < t.n; i++) if (t.exp[i] !== '') await typeInto(page, i, i === k ? flip(t.exp[i]) : t.exp[i]);
+    await blurAll(page); await sleep(250);
+    const r = []; for (let i = 0; i < t.n; i++) r.push(await info(page, i));
+    check(r[k].bad && r[k].wd && r.every((x, i) => i === k || (!x.bad && !x.wd)), `${t0} only the wrong tens digit is marked (${r.map((x) => (x.wd ? 'W' : x.bad ? 'x' : x.v ? '.' : '_')).join('')})`);
+    if (!reduce) check(r[k].anim > 0, `${t0} the wrong digit blinks (${r[k].anim} animation)`);
+    else check(r[k].anim === 0 && r[k].color === RED, `${t0} reduced motion: no blink, steady red (${r[k].anim}, ${r[k].color})`);
+    if (!reduce) await shot(page, host, name + '-wrong', w);
+    if (host === 'card') {
+      await page.evaluate(() => { window.submitAnswer && window.submitAnswer(); });
+      await sleep(300);
+      const c = []; for (let i = 0; i < t.n; i++) c.push(await info(page, i));
+      check(c[k].bad && c.every((x, i) => i === k || !x.bad), `${t0} after Check the same digit, and only it, is red (${c.map((x) => (x.bad ? 'x' : '.')).join('')})`);
+    }
+    await tap(page, k); await sleep(120);
+    { const c = await info(page, k); check(c.v === '' && !c.bad && !c.wd, `${t0} a tap on the red box empties it and removes the red (${JSON.stringify(c.v)})`); }
+    return;
+  }
   if (s.kind === 'stack') {
     // tens right, ones wrong (others right): only the ones box is the wrong digit
     if (t.n < 2) { check(false, `${t0} a 2+ digit stack (${t.n})`); return; }

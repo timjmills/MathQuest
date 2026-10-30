@@ -112,7 +112,8 @@
     "winRows": "5Q",
     "winCols": "5R",
     "minFactor": "5S",
-    "ftTrap": "5T"
+    "ftTrap": "5T",
+    "ansBox": "6Q"
   },
   "blocks": {
     "0": {
@@ -740,7 +741,12 @@
     "winRows": {},
     "winCols": {},
     "minFactor": {},
-    "ftTrap": {}
+    "ftTrap": {},
+    "ansBox": {
+      "digit": "D",
+      "one": "O",
+      "off": "N"
+    }
   },
   "scalarOnly": {
     "range": "decimal",
@@ -799,6 +805,7 @@
     "2U-2Z": "wave 1 lane C: skip-count lines and the number grid",
     "6X-6Z": "Wave 1 lane A (pupil practice: calculator, skip)",
     "1W-1Z": "wave 1 lane C2: count_by_tables row list and multiplication labels",
-    "0R-0X": "wave 5.2: the custom number line at the top of the page"
+    "0R-0X": "wave 5.2: the custom number line at the top of the page",
+    "6Q-6W": "wave 1 lane B: answer boxes (+ − × ÷)"
   }
 }

@@ -40,7 +40,7 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null, wide = false, trackEm = 0, headEms = null } = {}) {
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null, wide = false, trackEm = 0, headEms = null, oneBox = false } = {}) {
     // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
     // every one of them sits on the digit tracks with an empty operator track (VA-2).
     const tops = (Array.isArray(a) ? a : [a]).map(String);
@@ -147,9 +147,12 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     // Lessons r2 (VA-4, AK-1): the open answer zone is a REAL row, as tall as the answer strip
     // (12 mm at L, 10 mm at M), so the pupil page and its key - whose answer digits fill that
     // row - share one geometry: the key never redraws the problem higher or its Check lower.
-    if (answer === 'open') html += `<span class="ansrow" aria-hidden="true"></span>`;
-    if (answer === 'traced' && ans !== null) { const pa = pad(String(ans)); html += J(pa.map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`), (i) => `<span class="ws-trace an sep">${isDigit(pa[i]) ? ',' : ''}</span>`); }
-    if (answer === 'solid' && ans !== null) { const pa = pad(String(ans)); html += J(pa.map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`), (i) => `<span class="an sep" data-ws-ink="solid">${isDigit(pa[i]) ? ',' : ''}</span>`); }
+    // ansBox 'one' (owner ruling 2026-10-02): the open zone is ONE box (CSS .ansrow--box) and a
+    // key's digits sit inside it, a subgrid row on the stack's own tracks.
+    const wrapKey = (cells) => (oneBox ? `<span class="ansrow ansrow--box ansrow--key" style="display:grid;grid-template-columns:subgrid">${cells}</span>` : cells);
+    if (answer === 'open') html += `<span class="ansrow${oneBox ? ' ansrow--box' : ''}" aria-hidden="true"></span>`;
+    if (answer === 'traced' && ans !== null) { const pa = pad(String(ans)); html += wrapKey(J(pa.map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`), (i) => `<span class="ws-trace an sep">${isDigit(pa[i]) ? ',' : ''}</span>`)); }
+    if (answer === 'solid' && ans !== null) { const pa = pad(String(ans)); html += wrapKey(J(pa.map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`), (i) => `<span class="an sep" data-ws-ink="solid">${isDigit(pa[i]) ? ',' : ''}</span>`)); }
     if (answer === 'slots' && slots) {
         // A null slot is a track with no box (the operator track, SL-12): the strip skips it.
         const live = slots.filter((s) => s !== null && s !== undefined).length;
@@ -385,9 +388,24 @@ register('stack', {
         // the scaffold level alone and the state only decides what ink goes in it. A Guided or
         // Model cell keeps its digit boxes in every state and the digits sit inside them; an
         // Independent cell keeps its open zone and the digits sit in it.
+        // Owner ruling 2026-10-02 (SL-3): every answer slot is a FULL box, so the open zone is
+        // drawn as the answer digit strip (same row height), and a printed answer / key fills the
+        // boxes instead of floating digits.
+        // The teacher's answer-box option (owner ruling 2026-10-02, `ansBox`; automatic = per digit
+        // for column work): 'digit' draws the answer strip, one box per digit, the key's digits in
+        // them; 'one' draws the open zone as ONE box, the key's digits inside it; 'off' keeps the
+        // plain open zone (no box). A Guided cell's digit boxes are a scaffold and stay either way.
+        // A missing-digit item (p.unknown, VA-7) GIVES its answer row: its answer place is the one
+        // missing digit, so the answer row keeps its plain printed digits and the option does not
+        // apply (critic B r5 D4: given digits never wear the answer-box shape).
+        const ansBox = p.unknown ? null : p.ansBox === 'one' || p.ansBox === 'off' ? p.ansBox : 'digit';
         let answer = p.answer || (level >= 2 ? 'boxes' : 'open');
         let boxInk = null;
-        if (ctx.state !== 'blank') {
+        if (ansBox === 'digit') {
+            if (answer === 'open') answer = 'boxes';
+            else if (answer === 'solid' || answer === 'traced') { boxInk = answer === 'traced' ? 'trace' : 'solid'; answer = 'boxes'; }
+            if (ctx.state !== 'blank') boxInk = ctx.state === 'traced' ? 'trace' : 'solid';
+        } else if (ctx.state !== 'blank') {
             const ink = ctx.state === 'traced' ? 'trace' : 'solid';
             if (answer === 'boxes') boxInk = ink;
             else answer = ink === 'trace' ? 'traced' : 'solid';
@@ -436,7 +454,7 @@ register('stack', {
         const tm = touchMode(p);
         const rowsTd = tm ? touchColumns([...(Array.isArray(a) ? a : [a]), b], t, p.op, tm) : null;
         const drawn = stack(a, b, p.op, {
-            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes, seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t), headEms: headEmsOf(p, ctx, heads, t),
+            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes, oneBox: ansBox === 'one', seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t), headEms: headEmsOf(p, ctx, heads, t),
             touch: rowsTd ? { rows: rowsTd, o: touchOpts(ctx.metrics ? ctx.metrics.digitPt : 28, ctx.mode === 'screen' ? 'px' : 'pt', 'solid', ctx.photocopySafe) } : null,
             grey: level === 2 && ctx.state === 'blank',
             ans: shown === undefined ? null : shown,

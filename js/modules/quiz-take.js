@@ -13,7 +13,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
-    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank, screenSupportsFor,
+    fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank, screenSupportsFor, ltrStripValue,
 } from './screen-cell.js';
 
 let quizTimerInterval = null;
@@ -221,13 +221,19 @@ const QUIZ_CELL_FIELDS = ['printFormat', 'gridFill', 'clozeOptions', 'inlineBlan
     // as it does on the card and the worksheet
     'screenInstr',
     // touch round 2: the teacher's skill options (touch dots and the other supports) travel too
-    'skillOptions'];
+    'skillOptions',
+    // wave 1 lane B r4: the answer-box option (legacy items carry it here, kit items also in cell.payload)
+    'ansBox'];
 export function quizQuestionData(q) {
     if (!q) return null;
     const d = {
         text: q.text, ans: q.ans, hint: q.hint, options: q.options,
         answerType: q.answerType, visual: q.visual, skillLabel: q.skillLabel,
     };
+    // r4 D1: the answer-box option travels with every item (a legacy item has no kit payload to carry it)
+    const ab = q.ansBox != null ? q.ansBox : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox
+        : q.cell && q.cell.payload && q.cell.payload.ansBox != null ? q.cell.payload.ansBox : null;
+    if (ab != null) d.ansBox = ab;
     for (const k of QUIZ_CELL_FIELDS) {
         const v = q[k];
         if (v === undefined || v === null || typeof v === 'function') continue;
@@ -497,10 +503,13 @@ function _mountQuizCell(flatIdx) {
         // restore a saved answer, right-aligned across the tracks
         const saved = String(hidden.value || '').replace(/[^0-9]/g, '');
         if (saved) {
-            const pad = boxes.length - saved.length;
-            boxes.forEach((b, i) => { b.value = i >= pad ? saved.charAt(i - pad) : ''; });
+            // right-aligned for columns AND fact strips: the paper key puts a 1-digit answer in the ones box (r3 D5)
+            const pad = Math.max(0, boxes.length - saved.length);
+            boxes.forEach((b, i) => { b.value = i >= pad ? (saved.charAt(i - pad) || '') : ''; });
         }
-        const compose = () => boxes.map(b => (b.value || '').trim()).join('');
+        const ltrStrip = boxes[0].closest('[data-mq-ltr]');
+        // a fact strip: one rule with the card and the worksheet - a gap is kept (wrong), "07" is 7
+        const compose = () => ltrStrip ? ltrStripValue(boxes).text : boxes.map(b => (b.value || '').trim()).join('');
         boxes.forEach(b => {
             b.addEventListener('input', () => { hidden.value = compose(); });
             b.addEventListener('change', () => {

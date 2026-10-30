@@ -1550,6 +1550,43 @@ html body .mq-scell [data-mq-swiperow][data-mq-end] .k2-swipe-cues > .k2-swipe-c
 html body .mq-scell [data-mq-swiperow]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue { display: inline-block; }
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled] .k2-swipe-cues > .k2-swipe-back { display: inline-block; }
 
+/* ---- WAVE 1 / 1.1 (additive). Owner ruling 2026-10-02: every typed answer slot is a FULL black box,
+   as on paper, including the slot after "=". A light wash of the single grey (#949494 at 14%) stays
+   inside; the black outline is the cue. Compatible with Lane A2: a per-box live fill
+   (.mq-live-ok / .mq-live-wrong) overrides background-color, a wrong box may switch to a dashed
+   border. Focus / active highlight is Lane A's (above). */
+/* No specificity war with Lane A2 (`html body .mq-scell.mq-scell.mq-scell input.mq-live-correct /
+   .mq-live-wrong`, (0,4,3), !important): the colour, style and fill of the box are set at (0,3,2), below
+   A2, so a right box's green and a wrong box's dashed red always win. Only the WIDTHS and the radius,
+   which A2 never sets, are set by the host-specific selectors that must beat the older line-slot rules. */
+html .mq-scell input.mq-slot:not(.mq-slot--circle) {
+    border-style: solid !important; border-color: #000 !important;
+    background-color: rgba(148, 148, 148, 0.14) !important;
+}
+html .mq-scell input.mq-slot:not(.mq-slot--circle),
+html .online-edition .problem-card.mq-wscard .mq-scell input.mq-slot:not(.mq-slot--circle),
+html .qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:not(.mq-slot--circle) {
+    border-width: 1px !important; border-radius: var(--mq-slot-r, 6px) !important;
+}
+
+/* WAVE 1 / 1.1 (additive, critic B D2): a `___` blank inside question text (.answer-blank-inline) is a
+   full box too, never a bottom rule alone. Place-value / static line slots inside a screen cell
+   (.ws-line, not the Say band) draw as the same box; an input adopted into one keeps the only box. */
+:where(.mq-scell .answer-blank-inline) {
+    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important; display: inline-block; min-width: 2.4em; min-height: 1.2em; vertical-align: middle;
+}
+:where(.mq-scell .ws-line:not(.ws-line--say):not(:has(input))) {
+    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important; box-sizing: border-box;
+}
+:where(.mq-scell .ws-line:has(> input.mq-slot)) { border: 0 !important; }
+
+/* WAVE 1 / 1.1: the + − × ÷ answer-box option on screen (owner ruling 2026-10-02, additive).
+   'one' on a column stack: the digit inputs read as ONE box (outer edges only: top, bottom, the
+   first box's left and the last box's right); 'off': no box, a ruled writing line under the inputs.
+   An equation's digit strip ('digit') sits inline after "=". Specificity stays low (:where) except
+   where an older !important rule must be beaten; Lane A2's .mq-live-ok / .mq-live-wrong fills keep winning. */
+.mq-kit .ws-stack.mq-eqdigits { display: inline-flex !important; vertical-align: middle; grid-template-columns: none; }
+.mq-kit .ws-stack.mq-eqdigits > .ab { width: auto; }
 /* ---- WAVE 1 fix (owner 2026-10-02): the four Start buttons live INSIDE the Choose Mode box, in the
    place of the mode cards, each in its original mode-card colour (ui-components.css .mode-card:nth-child). */
 .mode-cards > .student-start-wrap { grid-column: 1 / -1; }
@@ -1622,6 +1659,40 @@ html body .mq-scell [data-mq-swiperow][data-mq-scrolled] .k2-swipe-cues > .k2-sw
 .mq-diskwin .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
 .mq-diskwin[data-mq-end] .k2-swipe-cue { display: none; }
 @media print { .mq-diskwin .k2-swipe-cue { display: none !important; } }
+
+/* (critic B D2) a kit twin's in-drawing line slot (place-value disks, a value line ...) is the same
+   full box on screen: widths and radius only, so A2's per-box colours still decide the edge colour. */
+html body .mq-scell.mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    border-width: 1px !important; border-radius: var(--mq-slot-r, 6px) !important;
+}
+
+/* WAVE 1 / 1.1 r2 (critic B r2 #2, #6): the stack's digit boxes are DRAWN by inset box-shadows
+   (the strip rule above), so the answer-box option restyles those shadows. 'one': top and bottom on
+   every box, the left edge on the first and the right on the last (one outline, no inner seams);
+   'off': no edge at all, only the light grey wash (paper's plain open zone). Specificity (0,6,2)
+   stays below Lane A2's right / wrong marks, so their green and dashed red still win. */
+html .mq-scell .ws-stack.mq-ans-one .ab[data-ws-seg] > input.mq-digit {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, var(--mq-segr) !important; }
+html .mq-scell .ws-stack.mq-ans-one .ab:is([data-ws-seg="first"], [data-ws-seg="only"]) > input.mq-digit {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr) !important; }
+html .mq-scell .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit { box-shadow: none !important; }
+/* a fact / equation with 'off': the host input keeps only the grey wash (no box, no line), as paper's blank zone */
+html .mq-scell .mq-ansoff input.mq-slot { border-color: transparent !important; }
+/* (owner follow-up) a FOCUSED box of a 'one' / 'off' strip keeps the strip's own edges, so "One box"
+   still reads as one box while the pupil types: the focus is shown by the yellow fill only. Lane A2's
+   right / wrong marks are left alone (:not(.mq-live-*)). */
+html .mq-scell .mq-kit .ws-stack.mq-ans-one .ab[data-ws-seg] > input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, var(--mq-segr) !important; background-color: #FFF3A0 !important; }
+html .mq-scell .mq-kit .ws-stack.mq-ans-one .ab:is([data-ws-seg="first"], [data-ws-seg="only"]) > input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr) !important; }
+html .mq-scell .mq-kit .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit:focus:not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
+    box-shadow: none !important; background-color: #FFF3A0 !important; }
+
+/* WAVE 1 / B r3 (critic B r3 D6): a stack with 'off' keeps a visible writing zone when no box is
+   focused - the light grey wash a fact with 'off' shows (no edge, no line), so a pupil who taps away
+   still sees where to write. Below Lane A2's marks and the yellow focus fill. */
+html .mq-scell .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit:not(:focus):not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong) {
+    background-color: #EEEEEE !important; }
 /* count-by rows (critic C2 r6): a box's tile never wraps. On the online worksheet ui-components.css wraps every inline flex
    inside .problem-card (specificity 0,7,0); the worksheet's own nowrap rule matches only while the tile's style attribute reads
    "display:flex", which the active-box highlight rewrites, and the 44 px input then sat 2 px low in its tile. This beats both. */
@@ -1817,3 +1888,10 @@ html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsb
 @media (max-width: 480px) {
     .mq-scell .mq-kit .ws-stack:is([style*="--t:7"], [style*="--t:8"]) { --ws-track: 46px; --mq-optrack: 32px; }
 }
+
+/* ---- WAVE 1 / 1.1 r6 (lane B, additive): an 'off' answer place keeps no black edge while it is the
+   next box. active-box.js now gives that box the focus, and the quiz's focus rule (black border,
+   specificity 0,6,0) beat the 'off' rule; the yellow inset ring of .mq-active-box is the focus cue.
+   Lane A2's right / wrong marks are left alone. */
+html body .qt-question-card .ws-cell.mq-scell .mq-ansoff .qt-answer-input.mq-slot:is(:focus, .mq-active-box):not(.mq-live-correct):not(.mq-live-wrong),
+html body .mq-scell .mq-ansoff input.mq-slot:is(:focus, .mq-active-box):not(.mq-live-correct):not(.mq-live-wrong) { border-color: transparent !important; }

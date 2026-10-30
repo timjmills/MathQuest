@@ -18,7 +18,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, ltrStripValue, rightAlignLtrStrip,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -829,11 +829,52 @@ function attachZoomBehavior(visualAidEl, q) {
 //
 // Public surface (also attached to window in globals.js):
 //   wireBoxValidation(visualAidEl, q)
+// The digit strip's right answer is submitted like a typed one (critic B r5 D1): its value goes into
+// the hidden #answerInput and the card's checker takes it from there (score, message, XP, advance).
+function _wireLtrStripSubmit(strip, cols, q) {
+    if (!strip || !cols.length || !q) return;
+    const want = String(q.ans == null ? '' : q.ans).replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+    if (!want) return;
+    let busy = false;
+    const tryRight = () => {
+        if (busy || state.hasAnswered || state.currentQ !== q) return;
+        if (cols.some(el => el.disabled || el.readOnly || !el.isConnected)) return;
+        const r = ltrStripValue(cols);
+        if (r.gap || r.text === '' || r.value !== want) return;
+        busy = true;
+        try {
+            // the digits sit right-aligned, as the key prints them ("7" in the ones box), before the verdict
+            rightAlignLtrStrip(strip);
+            const ai = document.getElementById('answerInput');
+            if (ai) ai.value = r.text;
+            if (typeof window.submitAnswer === 'function') window.submitAnswer();
+            // answered: the strip is read-only (never disabled before the verdict), so no empty box of it
+            // pulses as "the next answer box" while the card moves on (active-box.js skips read-only)
+            if (state.hasAnswered) cols.forEach(el => { el.readOnly = true; });
+        } finally { busy = false; }
+    };
+    cols.forEach(el => {
+        if (el.dataset._ltrSubmit === '1') return;
+        el.dataset._ltrSubmit = '1';
+        el.addEventListener('input', tryRight);
+    });
+}
+
 export function wireBoxValidation(visualAidEl, q) {
     if (!visualAidEl || !q) return;
 
     // Detect which box system(s) are present.
-    const colInputs = Array.from(visualAidEl.querySelectorAll('.column-answer-input'));
+    let colInputs = Array.from(visualAidEl.querySelectorAll('.column-answer-input'));
+    // A fact / equation in digit boxes (ansBox 'digit', data-mq-ltr) is ONE answer written in boxes,
+    // so it is left to the card's own checker, exactly as the single 'one' box is (critic B r5 D1):
+    // a right value goes through submitAnswer -> checkAnswer, which scores, shows the message,
+    // awards XP once and advances. The live red/green is the strip's own (screen-cell judgeLtrStrip).
+    const ltrStrip = colInputs.length && colInputs[0].closest('[data-mq-ltr]');
+    if (ltrStrip) {
+        const stripCols = colInputs.filter(el => el.closest('[data-mq-ltr]') === ltrStrip);
+        colInputs = colInputs.filter(el => !stripCols.includes(el));
+        _wireLtrStripSubmit(ltrStrip, stripCols, q);
+    }
     const bxInputs = Array.from(visualAidEl.querySelectorAll('.bx-roof, .bx-sub, .bx-rem'));
     const amInputs = Array.from(visualAidEl.querySelectorAll('.area-model-input, .area-model-total'));
     const nfInputs = Array.from(visualAidEl.querySelectorAll('.number-family-input, .fact-family-input'));
@@ -862,7 +903,7 @@ export function wireBoxValidation(visualAidEl, q) {
 
     const anyBoxes = colInputs.length > 0 || bxInputs.length > 0 || amInputs.length > 0
         || nfInputs.length > 0 || lkInputs.length > 0 || ibCells.length > 0 || hasDual
-        || ciInputs.length > 0 || gfCells.length > 0 || npInputs.length > 0 || hasFi;
+        || ciInputs.length > 0 || gfCells.length > 0 || npInputs.length > 0 || hasFi || !!ltrStrip;
     if (!anyBoxes) return;
 
     // Hide #answerInputArea + global Check button — student types only into the boxes.
@@ -904,7 +945,7 @@ export function wireBoxValidation(visualAidEl, q) {
         } else if (ansStr.length <= N) {
             const pad = N - ansStr.length;
             for (let i = 0; i < N; i++) {
-                const ch = i < pad ? '' : ansStr.charAt(i - pad);
+                const ch = i < pad ? '' : (ansStr.charAt(i - pad) || '');
                 slots.push({ el: colInputs[i], expect: ch, norm: numNorm });
             }
         } else {
@@ -1066,6 +1107,7 @@ export function wireBoxValidation(visualAidEl, q) {
             s.el.classList.add('box-correct');
             return;
         }
+        if (typeof s.pending === 'function' && s.pending()) return;   // still being typed
         // For fraction-input pairs, hold the wrong-paint until BOTH halves
         // are filled — otherwise typing the numerator (e.g. "2" en route to
         // "2/4") flashes red while the denominator is still empty. The
@@ -1108,6 +1150,7 @@ export function wireBoxValidation(visualAidEl, q) {
     const tryAdvance = () => {
         if (advanced) return;
         if (state.hasAnswered) return;
+        if (!slots.length) return;          // only a digit strip: the card's checker owns it
         if (!allCorrect()) {
             if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
             return;
@@ -1618,6 +1661,11 @@ function _applyScreenCell() {
             visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), supports: _supportsOf(q, kind) });
             visualAid.style.display = 'block';
             wireStackEntry(visualAid, { autofocus: !state.hasAnswered });
+            // A fact or equation drawn with one box per digit (ansBox 'digit') may come from a text-only
+            // item the legacy visual path never wired: give its digit boxes the same live per-box
+            // validation, which also hides #answerInputArea (idempotent).
+            setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 0);
+            setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 220);
         } else {
             visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>', supports: _supportsOf(q, kind) })
                 + (kind.kind === 'division' ? workRowsHTML(kind) : '');

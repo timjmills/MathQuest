@@ -503,7 +503,7 @@ level 0  TEST                          no hints  + structure (option) assessment
 | P-SC-3 | Across the steps of a ladder, the level-2 hint set never grows except at a step whose delta is `representation` (a new picture brings its own hints). |
 | P-SC-4 | Removing a structural scaffold is a step of its own, with `delta: 'scaffold'`, a What's New sentence that names the support, and its own Model. |
 | P-SC-5 | Hints on tests, structural supports on tests, and all timing marks are teacher OPTIONS (P-31). No page type hard-codes them. |
-| P-SC-6 | The think box above division facts is an optional helper drawn in grey. It is a place to write the related multiplication fact. The black answer line is the only place an answer goes, and only the answer line is checked on screen. When the option is on, the page drops one row and gives the freed height to every cell, so the fact stays in the top half of its cell: the top-half rule (design standard CL-4) is never broken, and the item count falls with the row (a 3 x 7 division probe becomes 3 x 6: 18 facts, Score /18). |
+| P-SC-6 | The think box above division facts is an optional helper drawn in grey. It is a place to write the related multiplication fact. The black answer box (design standard SL-3 as changed 2026-10-02; previous: answer line) is the only place an answer goes, and only the answer box is checked on screen. When the option is on, the page drops one row and gives the freed height to every cell, so the fact stays in the top half of its cell: the top-half rule (design standard CL-4) is never broken, and the item count falls with the row (a 3 x 7 division probe becomes 3 x 6: 18 facts, Score /18). |
 | P-SC-7 | Place-value labels default to bold letters (H T O, and Th) above the columns. The full words appear once in the Model cell and in the vocabulary box of the step that introduces them. |
 | P-SC-8 | In Photocopy-safe mode the meaning of every scaffold is unchanged: grey fills become fine 45-degree hatching and trace digits become dotted outlines. No scaffold may depend on grey being distinguishable from black. |
 
@@ -715,7 +715,7 @@ table; multiples of the divisor.
 | 4 | format | Read Division in a Bracket | format | The same fact in both notations; match, then copy. |
 | 5 | bridging | Divide on a Number Line | representation | 0-20 line; hop by d to the total; count the hops. |
 | 6 | decide | Circle the Multiples of 5 | responseScope | Near misses included (24, 51). Warm-up for ÷ 5. |
-| 7 | procedure | Divide by 5 (tally box) | responseScope: full | Count by 5 to the total; one tally per count; write the tally count on the answer line. |
+| 7 | procedure | Divide by 5 (tally box) | responseScope: full | Count by 5 to the total; one tally per count; write the tally count in the answer box (SL-3 as changed 2026-10-02). |
 | 8 | case | Divide 0, Divide a Number by Itself, Divide by 1 | range | `0 ÷ 5`, `5 ÷ 5`, `7 ÷ 1`. |
 | 9 | range | Divide by 2, 10, then 3, 4, 6, then 7, 8, 9, then 11, 12 (one per step) | range | Same order as L-6 (P-FL-18); 5, 0 and 1 are steps 7 and 8. Review every two steps; both notations. Divide by 11 and by 12 are dropped when the fact range is limited to 10 (P-FL-19). |
 | 10 | concept | Build a Fact Family (multiply and divide) | representation | Three numbers, four facts. The optional think box belongs from here on. |

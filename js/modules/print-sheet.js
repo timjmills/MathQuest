@@ -1005,6 +1005,23 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         }
     }
 
+    // 1b. (ansBox 'digit', owner ruling 2026-10-02) ONE strip of digit boxes - a column's write row
+    // (`ws-fact-write--digit`) or an equation's (`ws-slot--digits`): the key writes each digit in its
+    // own box, right-aligned to the ones.
+    const digitStrips = html.match(/<span class="(?:ws-fact-write ws-fact-write--digit|ws-slot ws-slot--digits)"[^>]*>(?:<i [^>]*><\/i>)+<\/span>/g) || [];
+    if (digitStrips.length === 1 && /^\d+$/.test(digits)) {
+        const boxes = digitStrips[0].match(/<i [^>]*><\/i>/g) || [];
+        if (digits.length <= boxes.length) {
+            const pad = boxes.length - digits.length;
+            let k = 0;
+            const filled = digitStrips[0].replace(/<i ([^>]*)><\/i>/g, (m, attrs) => {
+                const d = k >= pad ? digits[k - pad] : ''; k++;
+                return d ? `<i ${attrs} data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:0.8em;">${d}</b></i>` : m;
+            });
+            return html.replace(digitStrips[0], filled);
+        }
+    }
+
     // 2. A vertical fact's open write row: three tracks under the rule, digits right-aligned.
     const factRows = html.match(/<span class="ws-fact-write" style="([^"]*)"><\/span>/g) || [];
     if (factRows.length === 1 && /^\d+$/.test(digits)) {
@@ -1016,15 +1033,19 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         const at = html.indexOf(factRows[0]);
         const tracks = [...html.slice(0, at).matchAll(/grid-template-columns:\s*repeat\((\d+),/g)].map((m) => Number(m[1])).pop() || 3;
         if (digits.length > tracks) return null;
-        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:${h};line-height:${h};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
-        return html.replace(factRows[0], cells);
+        // The answer digits sit INSIDE the same box the pupil page draws (owner ruling 2026-10-02):
+        // the box is the zone itself, a grid of the stack's own tracks.
+        // (critic B r3 D2) the digit is set at the box's writing size (never taller than the box), so it
+        // sits clear inside it with padding instead of crossing its bottom edge
+        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:100%;line-height:1;font-size:min(1em, calc(${h} * 0.82));display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
+        return html.replace(factRows[0], `<span class="ws-fact-write" style="${style}display:grid;grid-template-columns:repeat(${tracks},1fr);">${cells}</span>`);
     }
 
     // 2b. A horizontal equation's own write slot ("36 ÷ 4 = ____"): one empty `.ws-slot` line or
     // box, the value written on it.
     const eqSlots = html.match(/<span class="ws-slot" data-ws-shape="(?:line|box)"[^>]*><\/span>/g) || [];
     if (eqSlots.length === 1 && display && /style="[^"]*"><\/span>$/.test(eqSlots[0])) {
-        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:flex-end;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;">${escText(display)}</b></span>`));
+        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:center;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:0.8em;">${escText(display)}</b></span>`));
     }
 
     // 3. One "Answer:" line: a label, then a ruled blank that stretches (28+ print branches).
@@ -1034,6 +1055,15 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         const fl = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
         const v = fl ? `<span class="mq-frac" style="font-size:1em;"><span>${fl[1]}</span><span>${fl[2]}</span></span>` : escText(display);
         return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${v}</b>${close}`);
+    }
+
+    // 3a. (owner ruling 2026-10-02, SL-3) A legacy horizontal question's ONE stretching answer place
+    // (`flex:1;border-bottom:2px solid #000`), drawn as a box on kit pages (sheet-kit.css): the key
+    // writes the value INSIDE that box, never in an "Answer:" stamp under it.
+    const hpRe = /(<span style="flex:1;border-bottom:2px solid #(?:000|333);?")>(?:&nbsp;|\s)*<\/span>/g;
+    const hps = html.match(hpRe) || [];
+    if (hps.length === 1 && display && !/Answer:/.test(html) && display.length <= 24) {
+        return html.replace(hpRe, (m, open) => `${open} data-ws-ink="${inkAttr}" class="ws-hp-ans"><b style="${INK_STYLE}">${escText(display)}</b></span>`);
     }
 
     // 3b. ONE empty inline write place with no "Answer:" label - a ruled underline ("Perimeter =
