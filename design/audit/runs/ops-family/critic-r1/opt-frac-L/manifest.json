@@ -1,0 +1,582 @@
+[
+  {
+    "skill": "division:missing_mult_div",
+    "category": "division",
+    "skillId": "missing_mult_div",
+    "label": "Missing Factors (×/÷)",
+    "grade": "3",
+    "dir": "division__missing_mult_div",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 3,
+          "rows": 5,
+          "perPage": 15,
+          "pages": 1,
+          "trimmed": 0,
+          "note": "Fits: 3 columns x 5 rows, 15 per page, 1 page. Digits 28 pt. Dense: 3 x 5, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 3,
+              "rows": 5,
+              "perPage": 15,
+              "pages": 1,
+              "cellW": 62,
+              "cellH": 45.4,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 3 x 5, cells sized to the problems.",
+              "line": "Fits: 3 columns x 5 rows, 15 per page, 1 page. Digits 28 pt. Dense: 3 x 5, cells sized to the problems.",
+              "cls": "short",
+              "digitPt": 28,
+              "hMin": 32.8,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 495367,
+        "title": "I Can find the missing number in × and ÷",
+        "notes": [
+          "Dense: 3 x 5, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "63 ÷ ___ = 7",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 11 = 5",
+            "ans": "55",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "80 ÷ ___ = 8",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 11 = 2",
+            "ans": "22",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "14 ÷ ___ = 2",
+            "ans": "7",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "24 ÷ ___ = 2",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 2 = 5",
+            "ans": "10",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "32 ÷ ___ = 8",
+            "ans": "4",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 12 = 8",
+            "ans": "96",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 11 = 4",
+            "ans": "44",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "84 ÷ ___ = 7",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "42 ÷ ___ = 7",
+            "ans": "6",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 10 = 11",
+            "ans": "110",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 65.1
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 18.8
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 3.4
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -4.3
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "60 ÷ ___ = 12",
+            "ans": "5",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 64.8
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 18.5
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 3
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -4.7
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "18 ÷ ___ = 3",
+            "ans": "6",
+            "measured": {
+              "1": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 67.5
+              },
+              "2": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 21.2
+              },
+              "3": {
+                "hMm": 32.8,
+                "fits": true,
+                "slackMm": 5.8
+              },
+              "4": {
+                "hMm": 32.8,
+                "fits": false,
+                "slackMm": -2
+              }
+            }
+          }
+        ],
+        "role": "independent",
+        "size": "L",
+        "opts": {
+          "notation": [
+            "fraction"
+          ]
+        },
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 98,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 116,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            15
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 71
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "0779d0d7487017ea"
+          ],
+          "measured": [
+            {
+              "cells": 15,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 15,
+                "minMm": [
+                  25,
+                  10
+                ],
+                "sizes": [
+                  "25x10 mm ×15"
+                ]
+              },
+              "band": {
+                "hPct": 35.5,
+                "wPct": 9.2,
+                "cell": 15
+              },
+              "footPct": 0.2
+            }
+          ]
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            15
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 86
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "715280cbae50e25a"
+          ],
+          "measured": [
+            {
+              "cells": 15,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 15,
+                "minMm": [
+                  25,
+                  10
+                ],
+                "sizes": [
+                  "25x10 mm ×15"
+                ]
+              },
+              "band": {
+                "hPct": 34.5,
+                "wPct": 9.2,
+                "cell": 1
+              },
+              "footPct": 0.2
+            }
+          ]
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

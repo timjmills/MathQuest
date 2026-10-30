@@ -1,0 +1,6 @@
+ws-grade-render: 4 skills -> design/audit/runs/ops-family/critic-r1/S
+  [1/4] addition:add_sub_10s  independent 1p+1k 3x10  more-practice 1p+1k 3x10  test 1p+1k 4x5  lesson 3p+3k 1x1  opener 1p+1k 4x3  guided 1p+1k 2x5  scripted-model 1p+1k 2x4  review 1p+1k 4x4  pre-skill-check 1p+1k 4x2  word-problems n/a  fact-rows n/a  fact-probe n/a  stretch 1p+1k 1x2  81s
+  [2/4] addition:add_sub_100s  independent 1p+1k 4x7  more-practice 1p+1k 4x7  test 1p+1k 4x5  lesson 3p+3k 1x1  opener 1p+1k 4x3  guided 1p+1k 2x5  scripted-model 1p+1k 2x4  review 1p+1k 4x4  pre-skill-check 1p+1k 4x2  word-problems n/a  fact-rows n/a  fact-probe n/a  stretch 1p+1k 1x2  160s
+  [3/4] subtraction:missing_add_sub  independent 1p+1k 3x10  more-practice 1p+1k 3x10  test 1p+1k 3x7  lesson 3p+3k 1x1  opener 1p+1k 3x3  guided 1p+1k 2x5  scripted-model 1p+1k 2x4  review 1p+1k 3x5  pre-skill-check 1p+1k 4x2  word-problems n/a  fact-rows n/a  fact-probe n/a  stretch 1p+1k 1x2  241s
+  [4/4] division:missing_mult_div  independent 1p+1k 3x10  more-practice 1p+1k 3x10  test 1p+1k 3x7  lesson 3p+3k 1x1  opener 1p+1k 3x3  guided 1p+1k 2x5  scripted-model 1p+1k 2x4  review 1p+1k 3x6  pre-skill-check 2p+2k 4x2  word-problems n/a  fact-rows n/a  fact-probe n/a  stretch 1p+1k 1x2  321s
+ws-grade-render: done, 4 units, 98 pages, 322s
