@@ -40,6 +40,8 @@ import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, body
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
+import { practiceSection, practiceStackShapes, practiceRequest } from './sheet/lesson-pages/practice.js';
+import { mixedRequest } from './sheet/lesson-pages/mixed.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
@@ -3651,25 +3653,16 @@ async function buildLesson(n, metaOf) {
     const reflow = (c) => mainIts.some((it) => it.template === 'equation' && it.measured && it.measured[1] && it.measured[c]
         && Number.isFinite(it.measured[1].hMm) && Number.isFinite(it.measured[c].hMm) && it.measured[c].hMm > it.measured[1].hMm * 1.25);
     const besideCap = [4, 3, 2].find((c) => !reflow(c)) || 1;
-    const section = facts ? { skills: [practiceSk], pages: 0, noCap: true, dense: rounding ? { S: 15, M: 15, L: 15 } : { S: 16, M: 16, L: divFactsOnly ? 16 : 15 }, ...(besideCap < 4 ? { maxCols: besideCap } : {}) } : { skills: [practiceSk], count: 0, columns: 2, noCap: true, ...(practiceSk.instructionKey ? { instructionKey: practiceSk.instructionKey } : {}) };
-    // (a ref's `instructionKey` - the detailed lesson maker, lesson 2 - heads its Practice section too)
-    // Taller problems: 12.1's six a page (2 x 3) at every size - an Independent page holds 6 at
-    // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
-    // `practiceShape` (lesson data; the detailed lesson maker): a one-line item too wide for two
-    // columns prints [count, cols] a page instead (expanded form: 8 x 1).
-    const stackShapes = data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]];
+    // The practice section and its grid shapes (sheet/lesson-pages/practice.js, the shared builder, §8c).
+    const section = practiceSection({ skill: practiceSk, facts, rounding, divFactsOnly, besideCap });
+    const stackShapes = practiceStackShapes(data);
     // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a
     // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
     // same count either way, so the pupil gets the bigger digits.
     const practiceSize = rounding ? 'L' : size;
-    const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1]) => Object.assign({}, common, {
-        size: practiceSize,
-        role: 'independent', tabId: `Practice ${lessonNo}`,
-        sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
-        seed: (n.seed + 7919) >>> 0,
-        // (At L type the strip's words are a point bigger: 2 mm more for it.)
-        stepStrip: withStrip && stripHtml ? (practiceSize === size ? { html: stripHtml, hMm: stripH }
-            : { html: strip.render(resolveCtx({ size: practiceSize, look: 'ican', mode: 'print' })), hMm: stripH + 2 }) : undefined,
+    const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1]) => practiceRequest({
+        common, size, practiceSize, lessonNo, section, facts, pages, withStrip, shape,
+        seed: (n.seed + 7919) >>> 0, strip, stripH, stripHtml,
     });
     const practiceTried = [];
     const practiceTexts = [];
@@ -3721,20 +3714,11 @@ async function buildLesson(n, metaOf) {
     if (n.mixed) {
         const withSkills0 = n.mixedSkills || (data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2));
         const withSkills = packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0;
-        const res = await buildSheet(Object.assign({}, common, {
-            // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
-            // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
-            // partners' together), the earlier skills the rest.
-            role: 'mixed-practice', look: n.lookAsked === 'daily' ? 'daily' : 'ican',
-            // (practice printed from a lesson stays in sections - Q-M1: the lesson's skills are new)
-            arrangement: 'sections',
-            // Lessons r3: never a problem the Practice page printed; the lesson skill at least
-            // half the placed items (`leadHalf`, enforced after packing).
-            sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }, packNums ? { avoidKeys: packNums.slice(), edgeLast: undefined } : {}), ...withSkills] }], latticeN: n.mixedLattice || 6, leadHalf: true, leadDrop: !!(packNums && n.mixedLeadDrop), growLast: !!packNums,
-            seed: (n.seed + 15838) >>> 0,
-            // (`mixedStrip: false`, the detailed lesson maker - critic D18: one routine's Steps do not head a mixed page)
-            stepStrip: stripHtml && n.mixedStrip !== false ? { html: stripHtml, hMm: stripH } : undefined,
-            ...(Array.isArray(n.packTab) ? { header: Object.assign({}, common.header, { tab: [...n.packTab, 'Mixed 1'] }) } : {}),
+        // The mixed page (sheet/lesson-pages/mixed.js, the shared builder, §8c).
+        const res = await buildSheet(mixedRequest({
+            common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts, packNums,
+            mixedLattice: n.mixedLattice, mixedLeadDrop: n.mixedLeadDrop, seed: (n.seed + 15838) >>> 0,
+            stripHtml, stripH, mixedStrip: n.mixedStrip, packTab: n.packTab,
         }));
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
     }
