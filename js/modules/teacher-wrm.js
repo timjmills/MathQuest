@@ -209,7 +209,9 @@ function readHash() {
     const r = L.resolveLessonHash(location.hash || '');
     if (!/^#wrm/.test(location.hash || '')) return;
     if (r.grade && SEQ.WRM_SEQUENCE.some((g) => g.id === r.grade)) v.grade = r.grade;
-    v.legacy = r.legacy ? { ...r.legacy, for: r.lesson ? r.lesson.key : '', alt: r.legacy.alt ? r.legacy.alt.key : '' } : null;
+    // the notice stays while the same lesson is re-read from its rewritten (slug) link, e.g. the screen re-opening
+    if (r.legacy) v.legacy = { ...r.legacy, for: r.lesson ? r.lesson.key : '', alt: r.legacy.alt ? r.legacy.alt.key : '' };
+    else if (!(v.legacy && r.lesson && v.legacy.for === r.lesson.key)) v.legacy = null;
     if (r.lesson) { setLesson(r.lesson); return; }
     v.lesson = '';
     v.sec = secKeyFor(r.seg);
@@ -380,7 +382,8 @@ function drawMeta() {
 }
 function curSecKey() { const l = v.lesson ? L.lessonByKey(v.lesson) : null; return (l && (placeOf(l) || { sec: {} }).sec.key) || v.sec; }
 function domButtonsHTML() {
-    const cur = curSecKey();
+    // n3 (critic 2026-10-30): the area the subtitle names is marked, also before a lesson opens (the first section)
+    const cur = curSecKey() || (sections()[0] || {}).key;
     return sections().map((s) => `<button type="button" class="tvw-dombtn${s.extra ? ' is-extra' : ''}" data-w-sec="${esc(s.key)}" aria-controls="tvwSec-${esc(s.key)}" aria-pressed="${s.key === cur}"${s.key === cur ? ' aria-current="true"' : ''}>${esc(s.name)}</button>`).join('');
 }
 
@@ -834,8 +837,11 @@ function scrollRowIntoList(row) {
     const list = root.querySelector('#tvwLessons');
     if (listScrolls(list)) {
         const top = row.offsetTop, h = row.offsetHeight;
+        // the part of the list the teacher can see: not under the tray bar at the foot of the window (W4 run 2026-10-30)
+        const lr = list.getBoundingClientRect();
+        const seen = Math.max(h + 56, Math.min(list.clientHeight, (typeof innerHeight === 'number' ? innerHeight : 1e5) - 96 - Math.max(0, lr.top)));
         if (top < list.scrollTop + 48) list.scrollTop = Math.max(0, top - 48);
-        else if (top + h > list.scrollTop + list.clientHeight - 8) list.scrollTop = top + h - list.clientHeight + 8;
+        else if (top + h > list.scrollTop + seen - 8) list.scrollTop = top + h - seen + 8;
     } else row.scrollIntoView({ block: 'nearest' });
 }
 
