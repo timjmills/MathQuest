@@ -5138,10 +5138,15 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 }
                 if (msOpsOpt === 'mult' || msOpsOpt === 'div' || msOpsOpt === 'multdiv') {
                     const first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
+                    // msChoose (lesson 7 r3, critic rule: the board Check Question's A-D online): a take-away Step 2, and the
+                    // three two-step errors (ms-stop-step1 / ms-story-number / ms-one-op, providers/word-work.js
+                    // wordWorkWrongs) are three different whole numbers with the answer neither the biggest nor the
+                    // smallest of the four - an add Step 2 makes the answer the biggest, so the set would give it away.
+                    const msChoose = !!(state.skillOptions && state.skillOptions.msChoose === true);
                     let s1a, s1b, p1, c2, op2, fin, guard = 0;
                     for (;;) {
                         guard++;
-                        op2 = pick(['+', '-']);
+                        op2 = msChoose ? '-' : pick(['+', '-']);
                         if (first === 'mult') { s1a = rng(2, 6); s1b = rng(2, 9); p1 = s1a * s1b; }
                         else { const d = rng(2, 6), qq = rng(2, 9); s1a = d * qq; s1b = d; p1 = qq; }
                         const small = first === 'mult' ? [s1a, s1b] : [s1b, p1];
@@ -5151,7 +5156,13 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                         const ok = s1a !== s1b && !(first === 'div' && s1b === p1) && fin >= 1 && fin <= 100
                             && !story.slice(0, 2).includes(c2) && c2 !== p1 && !story.includes(fin) && fin !== p1
                             && !small.includes(fin) && c2 >= 2;
-                        if (ok || guard > 400) break;
+                        let okChoose = true;
+                        if (msChoose) {
+                            const m3 = Math.abs(s1b - c2), m2 = (first === 'mult' ? s1a + s1b : s1a - s1b) - c2;
+                            const four = [fin, p1, m3, m2];
+                            okChoose = m2 >= 0 && new Set(four).size === 4 && fin !== Math.max(...four) && fin !== Math.min(...four);
+                        }
+                        if ((ok && okChoose) || guard > 2000) break;
                     }
                     const G1 = first === 'mult' ? '×' : '÷', G2 = op2 === '+' ? '+' : '−';
                     q._variant = `${first}_then_${op2 === '+' ? 'add' : 'sub'}`;

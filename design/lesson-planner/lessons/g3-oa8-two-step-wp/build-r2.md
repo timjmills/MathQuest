@@ -80,10 +80,23 @@ dealt: two-step four ops (msOps), letter equation (msLetter), rounding check (ms
 
 ## Open questions for the lead
 
-1. **Check Question A-D online.** The Check Question is a board item (multi_step_word_plain msOps mult, the same story
-   the skill deals). Online the skill is production (the step boxes), never a choice among the three two-step errors.
-   Lessons 1-5 passed with the same board pattern; if the critic reads rule 1 strictly, an `msChoose` response option is
-   the build.
+1. **Check Question A-D online. ANSWERED (r3, 2026-10-30).** Built as lesson 6 r4 did for its D2 (`tenChoice`, 4J):
+   `algebra:multi_step_word(_plain)` option **`msChoose`** (bool, codec key **4T**, group layout; applies with msOps
+   mult / div / multdiv). The story kind is the board's (a × or ÷ step, then a take-away step); the response is four rows
+   "A  27 [ ]" and the pupil checks one box (the kit cell's `layout: 'choose'`, `sheet/cells/word-work.js` chooseLayout;
+   on screen each row is a tap target through `wireTickBoxes` on the card, the worksheet and the quiz). The three
+   distractors are the provider's wrong answers ms-stop-step1 (the Step 1 answer), ms-story-number (a story number in
+   Step 2), ms-one-op (one sign for both) - `providers/word-work.js` wordWorkWrongs, now exported through `sheet/index.js`.
+   The set never gives the answer away: the generator (`gen-algebraic.js`, msOps branch) deals only stories whose four
+   values are different whole numbers with the answer neither the biggest nor the smallest (a + Step 2 would make the
+   answer the biggest, so msChoose deals take-away Step 2s only - the board's own msMultSub kind); the order rotates
+   with the item's place, so the answer is not always D. The lesson's Check Question ref is now
+   `MS('mult', {msChoose: true})` (`g3-oa8-two-step-wp.js` checkQuestion); `detailed-lessons.json` lists it in
+   `skills.used` (role "Check Question (board A-D)") and in `skills.coverage` (full), and records msChoose in `built`
+   and `plainOptions`. **Option only, no preset skill:** a response mode of this same lesson (owner rule 2026-10-17:
+   it does not teach a different lesson, difficulty or task), as tenChoice on lesson 6. Codec snapshot append-only (OK).
+   `ws-screen-answer --skills algebra:multi_step_word_plain,algebra:multi_step_word` card / worksheet / quiz OK for
+   `{msOps: mult, msChoose: true}`, `{msOps: div, msChoose: true}`, `{msOps: multdiv, msChoose: true}`.
 2. **msCheck covers + / − stories only** (rounding × / ÷ stories to tens is not a Grade 3 estimate). 3.OA.D.8's
    reasonableness clause is FULL on that reading; say if the owner wants a × / ÷ estimate too.
 3. **Shared changes** (kept small): the frames-cell tab gutter (CSS appended + word-work.js), the two-step story line
@@ -96,3 +109,25 @@ dealt: two-step four ops (msOps), letter equation (msLetter), rounding check (ms
    wpBank=true page leaves a 54 mm strip, and no approved sibling has been measured. That is the work of a whole skill
    redesign lane (the 8/10 bar for `multi_step_word*`), not of a detailed lesson. Brief it as a separate lane before
    critic r1, or have the critic grade the lesson pack while the skill redesign stays open.
+
+## Gates (r3, msChoose, merged with claude/sweet-newton-c8wrv1, seed 4242, 2026-10-30)
+
+| Gate | Result |
+|---|---|
+| ws-detailed-lesson --lesson g4-nbt1-ten-times-value --check --copy | OK |
+| ws-detailed-lesson --lesson g4-nbt1-ten-times-value --repeats | OK (35 places, 0 findings) |
+| ws-detailed-lesson --lesson g3-oa8-two-step-wp --check --copy | OK |
+| ws-detailed-lesson --lesson g3-oa8-two-step-wp --repeats | OK (29 places, 0 findings) |
+| ws-precritic --role lesson --strict | FAIL, only row: placevalue:more_less_10#lesson L-OVERLAP CL40-INK 0 -> 2 (L and S), the same row as on main fbeaa332 |
+| ws-boot-smoke | OK |
+| ws-code-snapshot | OK (731 codes, +159 appended, nothing moved, 3200 option round trips) |
+| ws-content-audit --category algebra | OK (0 failing) |
+| ws-content-audit --category placevalue | OK (0 failing) |
+| ws-standards | OK |
+| ws-search-terms | OK (715 skills, 239/239) |
+| ws-presets-unit | OK (123 presets) |
+| ws-wrm-page-unit | OK (1067 lessons) |
+| ws-backtest | OK (40 PASS, 0 FAIL) |
+| ws-redesign-passed | OK (7 skills) |
+| ws-screen-answer multi_step_word(_plain) msChoose (mult / div / multdiv) | OK card / worksheet / quiz |
+| node --input-type=module --check, touched JS | OK |

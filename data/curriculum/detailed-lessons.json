@@ -849,6 +849,17 @@
       "role": "P1"
      },
      {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "msOps": "mult",
+       "msChoose": true,
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false
+      },
+      "role": "Check Question (board A-D)"
+     },
+     {
       "key": "multiplication:mult_facts",
       "opts": {
        "constant": [
@@ -972,13 +983,23 @@
        "msOps": "multdiv"
       },
       "verdict": "full"
+     },
+     {
+      "clause": "Check Question: the board's A-D choice (the answer and the three two-step errors) practised online",
+      "skill": "algebra:multi_step_word_plain",
+      "opts": {
+       "msOps": "mult",
+       "msChoose": true
+      },
+      "verdict": "full"
      }
     ],
     "built": [
-     "algebra:multi_step_word(_plain) options msOps (4P: mult / div / multdiv / addmult / adddiv), msLetter (4R), msCheck (4S); every word-work skill wpFrames (4Q); kit two-step grammar, frames layout and its screen twin; provider two-step steps and wrong answers",
+     "algebra:multi_step_word(_plain) options msOps (4P: mult / div / multdiv / addmult / adddiv), msLetter (4R), msCheck (4S), msChoose (4T, r3: the Check Question's A-D - the answer and ms-stop-step1 / ms-story-number / ms-one-op); every word-work skill wpFrames (4Q); kit two-step grammar, frames layout and its screen twin; provider two-step steps and wrong answers",
      "presets algebra:two_step_mult_div_first, two_step_add_then_mult, two_step_add_then_div, two_step_letter_equation, two_step_estimate_check (codes ZA-ZE)"
     ],
-    "proposed": []
+    "proposed": [],
+    "plainOptions": "msChoose (choose the answer A-D: a response mode of the same lesson, not a new lesson - option only, no preset skill)"
    },
    "followOn": [
     "two_step_add_then_mult / two_step_add_then_div (brackets)",

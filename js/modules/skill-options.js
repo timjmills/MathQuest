@@ -3377,7 +3377,11 @@ for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
         { id: 'msLetter', label: 'Write one equation with a letter', type: 'bool', default: false, group: 'layout',
             help: 'The pupil writes the whole story as one equation with n for the unknown (5 × 4 − 6 = n; brackets when the + or − comes first), then n.' },
         { id: 'msCheck', label: 'Estimate to check', type: 'bool', default: false, group: 'layout',
-            help: 'Add and take-away stories: the pupil works the two steps, rounds each story number to the nearest ten, estimates, and rings Yes or No: is my answer close?' }];
+            help: 'Add and take-away stories: the pupil works the two steps, rounds each story number to the nearest ten, estimates, and rings Yes or No: is my answer close?' },
+        // (lesson 7 r3: the board Check Question's A-D choice is a skill option too - a response mode, no preset skill)
+        { id: 'msChoose', label: 'Choose the answer (A to D)', type: 'bool', default: false, group: 'layout',
+            appliesTo: (cur) => ['mult', 'div', 'multdiv'].includes(cur.msOps), appliesBase: { msOps: 'mult' },
+            help: 'Multiply or divide first, then take away. The pupil checks one of four answers: the right one and the three two-step mistakes (stopped after Step 1, a story number in Step 2, one sign for both).' }];
 }
 
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================

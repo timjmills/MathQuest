@@ -38,3 +38,27 @@ Times: builder lesson-6 fix-r4, start 2026-10-30T17:45Z, end —, profile mq-opu
   Visual redesign spec / graphic library not on claude/sweet-newton-c8wrv1 yet: built to today's standards.
   Gate state at start: lesson 6 E9b, E11, E29 FAIL; lesson 7 E9, E9b, E20, E29 FAIL; repeats OK for both; precritic --role lesson:
   placevalue:more_less_10 L-OVERLAP CL40-INK 0 -> 2, Size S row timed out at the 580 s wall.
+
+### pre-critic gates 2026-10-30 (merged)
+
+Lesson 7 Check Question A-D now dealt online: algebra:multi_step_word(_plain) option msChoose (4T).
+
+| Gate | Result |
+|---|---|
+| ws-detailed-lesson --lesson g4-nbt1-ten-times-value --check --copy | OK |
+| ws-detailed-lesson --lesson g4-nbt1-ten-times-value --repeats | OK (35 places, 0 findings) |
+| ws-detailed-lesson --lesson g3-oa8-two-step-wp --check --copy | OK |
+| ws-detailed-lesson --lesson g3-oa8-two-step-wp --repeats | OK (29 places, 0 findings) |
+| ws-precritic --role lesson --strict | FAIL, only row: placevalue:more_less_10#lesson L-OVERLAP CL40-INK 0 -> 2 (L and S), the same row as on main fbeaa332 |
+| ws-boot-smoke | OK |
+| ws-code-snapshot | OK (731 codes, +159 appended, nothing moved, 3200 option round trips) |
+| ws-content-audit --category algebra | OK (0 failing) |
+| ws-content-audit --category placevalue | OK (0 failing) |
+| ws-standards | OK |
+| ws-search-terms | OK (715 skills, 239/239) |
+| ws-presets-unit | OK (123 presets) |
+| ws-wrm-page-unit | OK (1067 lessons) |
+| ws-backtest | OK (40 PASS, 0 FAIL) |
+| ws-redesign-passed | OK (7 skills) |
+| ws-screen-answer multi_step_word(_plain) msChoose (mult / div / multdiv) | OK card / worksheet / quiz |
+| node --input-type=module --check, touched JS | OK |

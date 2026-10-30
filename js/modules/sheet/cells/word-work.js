@@ -46,7 +46,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import { blankWidth } from '../tokens.js';
-import { L, P, B, INK, GREY, KEY_FEATURES, isTwin, sizeOf, digitPt, textPt, zonePt, shapeOf, n2 } from './k2kit.js';
+import { L, P, B, INK, GREY, KEY_FEATURES, isTwin, sizeOf, digitPt, textPt, zonePt, shapeOf, n2, checkBox } from './k2kit.js';
 import { divisionSteps } from './long-division.js';
 
 export const WW_TEMPLATE = 'word-work';
@@ -1119,9 +1119,34 @@ function framesLayout(p, ctx) {
         + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
 }
 
+/** The A-D labels of a `choose` cell, as printed and as the key names them. */
+export const chooseLabels = (p) => (p.choices || []).map((v, i) => `${'ABCD'[i]}  ${Number(v).toLocaleString('en-US')}`);
+
+/**
+ * `layout: 'choose'` (option msChoose - the detailed lesson maker, lesson 7 r3: the board Check Question's A-D form
+ * online): the story, then four rows "A  20 [ ]" - the answer and the three two-step errors; the pupil checks one box.
+ * ONE decision, so ONE slot (the group, AK-2). Each row is one label span + one box span: the shape wireTickBoxes
+ * turns into a tap target on the card, the worksheet and the quiz.
+ */
+function chooseLayout(p, ctx) {
+    const twin = isTwin(ctx);
+    const labels = chooseLabels(p);
+    const on = !filled(ctx) || twin ? -1 : ctx.state === 'wrong'
+        ? labels.findIndex((l) => String(l).replace(/^[A-D]\s+/, '').replace(/,/g, '') === String(ctx.wrong && ctx.wrong.value))
+        : p.correct;
+    const pt = digitPt(ctx);
+    const rows = labels.map((lab, i) => `<div style="display:flex;align-items:center;gap:${L(ctx, 4)};margin:${L(ctx, 1.2)} 0;">`
+        + `<span style="flex:none;min-width:${L(ctx, 22)};white-space:pre;font-size:${P(ctx, pt)};font-weight:700;line-height:1.1;">${esc(lab)}</span>`
+        + checkBox(ctx, { id: `ch${i}`, on: i === on, slot: false }) + `</div>`).join('');
+    const ink = on >= 0 ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : '';
+    return `<div class="mq-ww mq-wwframes mq-wwchoose" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
+        + `<div data-ws-slot="answer" data-ws-shape="check"${ink} style="display:grid;grid-template-columns:repeat(2, max-content);column-gap:${L(ctx, 14)};margin-top:${L(ctx, 2)};">${rows}</div></div>`;
+}
+
 register(WW_TEMPLATE, {
     render(p, ctx) {
         if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
+        if (p.layout === 'choose' && Array.isArray(p.choices) && p.choices.length === 4) return chooseLayout(p, ctx);
         if (p.layout === 'bar' && p.bar && p.steps.length === 1 && !isTwin(ctx)) return barLayout(p, ctx);
         if (p.layout === 'frames') return framesLayout(p, ctx);
         const twin = isTwin(ctx);
@@ -1168,6 +1193,11 @@ register(WW_TEMPLATE, {
         return `<div class="mq-ww" data-ww-ops="${p.steps.map((s) => s.op).join(' ')}" style="width:100%;${fullW}box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : L(ctx, narrow ? 2.5 : 5)};">${head}${body}</div>`;
     },
     answerKey(p) {
+        // (`layout: 'choose'`, msChoose: the key checks the right row - its label, with the number it names)
+        if (p.layout === 'choose' && Array.isArray(p.choices) && p.choices.length === 4) {
+            const lab = chooseLabels(p)[p.correct];
+            return { value: p.ans, display: lab, slots: { answer: { value: lab, graded: true, accept: [String(p.ans)] } } };
+        }
         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };
         // the answer row's digit boxes (the one answer place when the answer is the row's result)
         if (p.inRow !== false && p.layout !== 'bar' && p.layout !== 'frames' && Array.isArray(p.steps) && p.steps.length) {

@@ -1,6 +1,6 @@
 # V22 self-check: g3-oa8-two-step-wp
 
-Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-30. **48 / 48 PASS**.
+Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to the kit's markup; Chromium print media) on `pack.html`, seed 4242, 2026-10-30. **49 / 49 PASS**.
 
 | # | Check | Measured | Result |
 |---|---|---|---|
@@ -17,7 +17,7 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E9c | Teacher pages: one continued is ≥ 92 % used (V22 3131); every teacher page listed | T1 97, T2 93, T2b 91, T3 91, T4 99, T4-2 60, T5 92, T6 79; continued under 92 %: none | PASS |
 | E9b | Body ≤ 8 % blank below its last band (site lint) | max 4 %; over 8 %: none | PASS |
 | E10 | Every item cell ≥ 40 % free (reading cells exempt) | 74 cells; min free 47 %; below 40 %: none | PASS |
-| E11 | No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box) | worst 23 %; failing: none | PASS |
+| E11 | No empty band ≥ 30 % in a cell (the site sheetCheck H13, from the border box; CL-4b: under a top cell the band below is writing room, judged against its row - H13-ROW) | worst 22 %; 52 top cells; failing: none | PASS |
 | E12 | Equal cells within each grid (±0.5 mm) and across the Practice pages | all grids equal; Practice cells 4, spread 0.0 × 0.1 mm | PASS |
 | E13 | No underscore characters on pupil pages (slot widths: ws-print-lint --source kit) | underscores 0 | PASS |
 | E14 | No dashed line except the cut line and the missing-digit box | 0 outside a cut line | PASS |
@@ -48,12 +48,13 @@ Run by `tests/scripts/ws-detailed-lesson.cjs --check` (V22 Appendix E, ported to
 | E39 | No band has more columns than items (an empty bordered track reads as a missing item) | 36 grids, none | PASS |
 | E30 | No boardOnly number on a pupil page or key (item, answer, digits or name) | none declared: on no pupil page or key (20 pages) | PASS |
 | E29 | Every item letter and answer a teacher page quotes is on the pupil page it names (T3 §1, T5 §10, T6 routing, T6 P5 glance) | 13 quotes, all on their pages | PASS |
+| E41 | Every relation a teacher page states is true of the numbers it names (10 times / one tenth of; Bigger / Smaller, so …) | 0 statements, all true | PASS |
 | E28 | No Say:, Rule: or Remember: band on a Practice page | 4 Practice / Mixed pages; extra bands 0 | PASS |
 | E27 | Counters in rows of at most 5 | no counters | PASS |
 | E26 | Every anchor-chart step panel adds a grey (newest) mark | P2 3 / 3 panels; P2b 3 / 3 panels | PASS |
 | E25 | One key per pupil page (anchor chart included) | 10 pupil pages, 10 keys | PASS |
 
-**48 / 48 pass.**
+**49 / 49 pass.**
 
 ## Per page
 

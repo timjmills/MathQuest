@@ -20,7 +20,7 @@
 
 import { state } from './state.js';
 import { pageConstant } from './page-deal.js';
-import { renderCell, wordWorkPayload, wordWorkTwin, WW_TEMPLATE } from './sheet/index.js';
+import { renderCell, wordWorkPayload, wordWorkTwin, wordWorkWrongs, WW_TEMPLATE } from './sheet/index.js';
 
 /** The word-problem skills the cell is for (the ids a generated item carries). */
 const WP_RANGED = /^(add|sub)_wp_(10|20|50|100|1k|10k|100k|1m)(_plain)?$/;
@@ -112,6 +112,22 @@ export function applyWordWork(q) {
         const est = s2 ? (s2.op === '+' ? e1 + ec : e1 - ec) : e1;
         if (e1 >= 0 && est >= 0) { payload.layout = 'frames'; payload.check = { a: ea, b: eb, c: ec, est }; }
     }
+    // `msChoose` (3.OA.D.8, detailed lesson 7 r3: the board Check Question's A-D online): a two-step story whose first
+    // step is × or ÷ answers by checking one of four - the answer and the three two-step errors, each a different
+    // number (the generator deals only such stories), in an order drawn from the item's place (never always D).
+    if (opt('msChoose') && !payload.bar && payload.steps.length === 2 && (payload.steps[0].op === '*' || payload.steps[0].op === '/')) {
+        let ws = [];
+        try { ws = wordWorkWrongs({ cell: { template: WW_TEMPLATE, payload } }) || []; } catch (e) { ws = []; }
+        const vals = ws.filter((w) => !w.correct).map((w) => Number(w.value));
+        if (vals.length === 3 && new Set([...vals, Number(payload.ans)]).size === 4) {
+            const four = [Number(payload.ans), ...vals];
+            const r = ((k % 4) + 4) % 4;
+            const order = four.slice(r).concat(four.slice(0, r));
+            payload.layout = 'choose';
+            payload.choices = order;
+            payload.correct = order.indexOf(Number(payload.ans));
+        }
+    }
     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
     const retold = q.text !== payload.lines.join(' ');
     q.text = payload.lines.join(' ');
@@ -126,6 +142,14 @@ export function applyWordWork(q) {
     // not a `word*` format: the page measures the cell's columns (print-sheet.js footprintClass)
     q.printFormat = 'story-work';
     q.printText = 'Circle the sign. Write the numbers in the boxes. Solve.';
+    if (payload.layout === 'choose') {
+        // (one label span + one box span a row: wireTickBoxes makes each row a tap target on every host)
+        q.printAnswer = `${'ABCD'[payload.correct]}  ${payload.ans}`;
+        q.printText = 'Read the story. Check the right answer.';
+        q.screenInstr = 'Read the story. Tap the right answer.';
+        q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit, choose: true };
+        return q;
+    }
     if (payload.letter) { q.printText = 'Read the story. Write the equation. Find n.'; }
     else if (payload.check) { q.printText = 'Solve. Estimate. Circle Yes or No.'; }
     else if (payload.layout === 'frames') { q.printText = 'Read the story. Write each step. Solve.'; }

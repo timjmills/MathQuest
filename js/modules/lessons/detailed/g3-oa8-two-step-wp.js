@@ -233,7 +233,9 @@ export default {
         { name: 'Story number in Step 2', step: 3, looks: '{cq.B}', fix: 'Arrow: the Step 1 answer goes into Step 2.', option: 'B', misconception: 'ms-story-number', caught: 'Exit 2' },
         { name: 'One sign for all', step: 2, looks: '{cq.C}', fix: '“How many steps?” Count the boxes.', option: 'C', misconception: 'ms-one-op' },
     ],
-    checkQuestion: { want: ['msMultSub', 'msClean', 'msMid'], correct: 'D' },
+    // (r3, critic rule 1 as lesson 6 r2 D2: the board's A-D form is the skill's own msChoose - the same story kind and the
+    // same three errors online, in an order that is not always D)
+    checkQuestion: { want: ['msMultSub', 'msClean', 'msMid'], ref: MS('mult', { opts: { msOps: 'mult', msChoose: true, pictures: false, wpCues: false, wpBank: false } }), correct: 'D' },
     slotRows: [{ shape: 'box', use: 'a step box: Step 1 or Step 2' }, { shape: 'line', use: 'P5: the answer on the story line' }],
     caseNames: { msEdge: 'the Step 2 number bigger than both Step 1 numbers' },
     routeNote: '3.OA.C.7 · 3.OA.A.3 · Y2 B4 S10 Two-step problems: the lessons P0 routes back to (T6).',

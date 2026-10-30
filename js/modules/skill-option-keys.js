@@ -205,7 +205,8 @@ export const MULTI_KEYS = Object.freeze({
     wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
     msLetter: '4R',      // multi_step_word(_plain): write the story as one equation with a letter (5 × 4 − 6 = n), then n
     msCheck: '4S',       // multi_step_word(_plain): + / − stories - estimate from tens, then judge the answer
-    // NEXT FREE IN 4P-4Z: 4T (lane A/B fixers take 4Z downwards).
+    msChoose: '4T',      // multi_step_word(_plain), × / ÷ first: choose the answer from four (A-D), the three two-step errors (lesson 7 r3)
+    // NEXT FREE IN 4P-4Z: 4U (lane A/B fixers take 4Z downwards).
 
     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
     members: '5A',       // mixed pools: which member skills / categories the pool draws from
