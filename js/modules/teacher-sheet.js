@@ -353,6 +353,7 @@ async function runPreview() {
     const list = items();
     if (!list.length) { S.preview = null; renderSide(); return; }
     const my = ++token;
+    let last = null;   // the last page built: shown when the tries run out (never "Working out…" for good)
     for (let tries = 0; tries < 3; tries++) {
         const p = plan(list);
         if (p.error) { S.preview = null; renderSide(); return; }
@@ -368,6 +369,7 @@ async function runPreview() {
         if (my !== token) return;
         S.building = false;
         if (!res) { perChecked.add(perBase(list)); S.preview = { sig, html: '', error: true }; renderSide(); return; }
+        last = { sig, res, list };
         const planned = part.pages || 1;
         const got = res.pageCount || 1;
         const onPage = (part.req.sections || []).reduce((t, x) => t + (x.count || 0), 0);
@@ -387,7 +389,14 @@ async function runPreview() {
         renderMain(); renderSide();
         return;
     }
-    S.building = false; renderMain(); renderSide();
+    S.building = false;
+    // A big mix (two whole grades) can still spill after 3 tries: show the last page built and stop
+    // "Working out how many fit on a page…" (it never ended before, 2026-10-30).
+    if (last && my === token) {
+        perChecked.add(perBase(last.list));
+        S.preview = { sig: last.sig, html: (last.res.pupilPages && last.res.pupilPages[0]) || last.res.pupilHtml, fact: null };
+    }
+    renderMain(); renderSide();
 }
 
 /* ================================================================= the summary line (from the plan) */

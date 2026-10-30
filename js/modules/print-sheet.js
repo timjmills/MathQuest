@@ -1533,6 +1533,65 @@ async function printMeasureDoc() {
     return document;
 }
 
+/**
+ * The document the cells are measured in (speed, whole-grade print 2026-10-30). A forced layout in
+ * the app page costs ~33 ms (5,700 nodes and its :has() rules re-checked on every write); the same
+ * cell in a hidden same-origin frame that carries the SAME stylesheets, in the same order, at the
+ * same viewport width, with the page's html / body classes, costs ~0.4 ms. So the cells measure
+ * exactly as they did (the Grade 1 / 3 / 5 papers are byte-identical) in a fraction of the time.
+ * The frame is kept and re-synced before each build; any failure measures in the app page as before.
+ */
+let MEASURE_FRAME = null;
+let MEASURE_SIG = '';
+let MDOC = null;
+async function measureDocument() {
+    if (typeof document === 'undefined' || !document.body || typeof window === 'undefined') return null;
+    try {
+        let f = MEASURE_FRAME;
+        if (!f || !f.isConnected || !f.contentDocument || !f.contentDocument.body) {
+            f = document.createElement('iframe');
+            f.setAttribute('aria-hidden', 'true');
+            f.setAttribute('tabindex', '-1');
+            f.setAttribute('data-mq-measure', '');
+            document.body.appendChild(f);
+            const d0 = f.contentDocument;
+            d0.open(); d0.write('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>'); d0.close();
+            MEASURE_FRAME = f; MEASURE_SIG = '';
+        }
+        f.style.cssText = `position:fixed !important;left:-20000px !important;top:0 !important;display:block !important;width:${window.innerWidth}px !important;height:${window.innerHeight}px !important;border:0 !important;visibility:hidden !important;pointer-events:none !important;`;
+        const d = f.contentDocument;
+        for (const [src, dst] of [[document.documentElement, d.documentElement], [document.body, d.body]]) {
+            for (const a of [...dst.attributes]) if (!src.hasAttribute(a.name)) dst.removeAttribute(a.name);
+            for (const a of [...src.attributes]) if (dst.getAttribute(a.name) !== a.value) dst.setAttribute(a.name, a.value);
+        }
+        const sheets = [...document.querySelectorAll('link[rel~="stylesheet"], style')].filter((n) => !d.contains(n));
+        const sig = sheets.map((n) => (n.tagName === 'LINK' ? `L${n.href}|${n.media}|${n.disabled}` : `S${n.media}|${n.textContent}`)).join('\n');
+        if (sig !== MEASURE_SIG) {
+            for (const n of [...d.head.querySelectorAll('link, style')]) n.remove();
+            const loads = [];
+            for (const n of sheets) {
+                const c = n.cloneNode(true);
+                if (n.tagName === 'LINK') {
+                    c.href = n.href;
+                    loads.push(new Promise((r) => { c.onload = c.onerror = () => r(); setTimeout(r, 4000); }));
+                }
+                d.head.appendChild(c);
+            }
+            await Promise.all(loads);
+            MEASURE_SIG = sig;
+        }
+        if (d.fonts) {
+            const sample = '0123456789 +\u2212\u00d7\u00f7= ,.:? Say Ones Tens Write Regroup';
+            await Promise.race([
+                Promise.all(['12pt Andika', 'bold 12pt Andika'].map((ft) => d.fonts.load(ft, sample).catch(() => null))).then(() => d.fonts.ready),
+                new Promise((r) => setTimeout(r, 3000)),
+            ]);
+        }
+        if (!d.defaultView || !(d.defaultView.innerWidth > 0)) return null;
+        return d;
+    } catch (e) { return null; }
+}
+
 /** A hidden sheet root to measure in: the print-measure document when given, else the app page. */
 function measureHost(size, look, mdoc) {
     const doc = mdoc && mdoc.body ? mdoc : document;
@@ -1669,7 +1728,9 @@ function measureSide4(pairs, { size, look, mdoc = null }) {
 }
 
 function measureItems(items, { size, look, colsList }) {
-    if (typeof document === 'undefined' || !document.body || !items.length) return;
+    if (typeof globalThis.document === 'undefined' || !globalThis.document.body || !items.length) return;
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;   // the measuring frame (measureDocument)
+    const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
     ensureEngineStyle(document);
     const s = SIZES[size] || SIZES.L;
     const host = document.createElement('div');
@@ -1682,17 +1743,35 @@ function measureItems(items, { size, look, colsList }) {
     const baseW = new Map();          // item -> Map(svg index -> width at 1 column)
     const baseLeaves = new Map();     // item -> widths of its grid / table leaves at 1 column
     try {
+        // Speed (whole-grade print, 2026-10-30): every cell of a pass (one column count, one state) is
+        // written first and read after ONE layout. Writing and reading one cell at a time forced a
+        // layout of the whole app page per cell (93 % of a Grade 1 print). Each cell is parsed on its
+        // own, exactly as before, and stays a direct child of the sheet root, so it measures the same.
+        const scratch = document.createElement('div');
         for (const c of cols) {
             const { inner } = cellWidthMm(c, LIVE_W_MM, look);
-            for (const it of items) {
-                let best = { hMm: 0, fits: true };
-                for (const state of ['blank', 'answered']) {
+            const bests = new Map();
+            for (const state of ['blank', 'answered']) {
+                const ctxs = [];
+                const frag = document.createDocumentFragment();
+                for (const it of items) {
                     const ctx = Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: it.measureLevel || 1, state }), it.wrapToCell ? { wrapToCell: true } : {}, it.tightRows ? { tightRows: true } : {});
                     let body = '';
                     try { body = it.render(ctx, { cols: c }); } catch (e) { body = ''; }
-                    root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+                    scratch.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
                         + `<span class="ws-letter">m.</span>${body}</div>`;
-                    const cell = root.firstChild;
+                    ctxs.push(ctx);
+                    frag.appendChild(scratch.firstChild || document.createElement('div'));
+                }
+                scratch.innerHTML = '';
+                root.innerHTML = '';
+                root.appendChild(frag);
+                const cellEls = Array.from(root.children);
+                for (let ii = 0; ii < items.length; ii++) {
+                    const it = items[ii];
+                    const ctx = ctxs[ii];
+                    let best = bests.get(it) || { hMm: 0, fits: true };
+                    const cell = cellEls[ii];
                     const r = cell.getBoundingClientRect();
                     const cs = getComputedStyle(cell);
                     const padL = parseFloat(cs.paddingLeft) || 0;
@@ -1772,9 +1851,11 @@ function measureItems(items, { size, look, colsList }) {
                             let mb = '';
                             try { mb = it.render(ctx, { cols: c, judge: mode }); } catch (e) { mb = ''; }
                             if (!mb || !String(mb).includes(`data-judge-mode="${mode}"`)) { vary[mode] = null; continue; }
-                            root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+                            // drawn beside the pass's cells (after them) and removed once read
+                            scratch.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
                                 + `<span class="ws-letter">m.</span>${mb}</div>`;
-                            const mc = root.firstChild;
+                            const mc = scratch.firstChild || document.createElement('div');
+                            root.appendChild(mc);
                             const cr = mc.getBoundingClientRect();
                             let over = false;
                             // the ink's width: the leftmost to the rightmost drawn thing (a text run, a
@@ -1790,13 +1871,18 @@ function measureItems(items, { size, look, colsList }) {
                             }
                             vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
                             if (!over && hi > lo) inkW[mode] = Math.max(inkW[mode] || 0, (hi - lo) / PX_PER_MM);
+                            mc.remove();
                         }
                     }
                     const modes = Object.assign({}, best.modes || {});
                     for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
                     best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW,
                         slackMm: Math.min(best.slackMm === undefined ? Infinity : best.slackMm, slackPx / PX_PER_MM) };
+                    bests.set(it, best);
                 }
+            }
+            for (const it of items) {
+                const best = bests.get(it) || { hMm: 0, fits: true };
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
                 if (Number.isFinite(best.slackMm)) it.measured[c].slackMm = Math.floor(best.slackMm * 10) / 10;
@@ -1836,7 +1922,8 @@ function measureItems(items, { size, look, colsList }) {
 
 /** HD-14: how many lines the title takes at the preset size, measured in Andika 700. */
 function measureTitleLines(text, size) {
-    if (!text || typeof document === 'undefined' || !document.body) return 1;
+    if (!text || typeof globalThis.document === 'undefined' || !globalThis.document.body) return 1;
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;
     const s = SIZES[size] || SIZES.L;
     const span = document.createElement('span');
     span.style.cssText = `position:absolute;left:-10000px;top:0;visibility:hidden;white-space:nowrap;font-family:'Andika',sans-serif;font-weight:700;font-size:${s.titlePt}pt;font-feature-settings:"cv04" 1;`;
@@ -2327,6 +2414,7 @@ async function buildSheetCore(req = {}) {
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
     await loadStandards();
+    MDOC = await measureDocument();
     const paper = n.paper;
 
     // The frame words decide the header height, which decides gridH (HD-12 / HD-14): resolve the
