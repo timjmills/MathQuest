@@ -42,7 +42,21 @@ const base = path.resolve(process.env.MQ_STATE_TMP || path.join(os.tmpdir(), 'mq
 const dir = path.join(base, tag);
 const stamp = path.join(dir, '.state-ok');
 
+// A shallow clone (the cloud default, `--depth 50`) lacks the old commits the states name: deepen it once, saying so,
+// instead of failing every state "(setup)" (2026-10-30: 9 states failed in a deploy gate session, passed in a full clone).
+function ensureCommit(commit) {
+    const has = () => spawnSync('git', ['-C', HERE, 'cat-file', '-e', `${commit}^{commit}`]).status === 0;
+    if (has()) return;
+    const shallow = spawnSync('git', ['-C', HERE, 'rev-parse', '--is-shallow-repository'], { encoding: 'utf8' }).stdout.trim() === 'true';
+    if (!shallow) die(`commit ${commit} is not in this repository (and the clone is not shallow): fetch the branch that holds it`);
+    process.stderr.write(`${NAME}: commit ${commit} is missing from this shallow clone: running \`git fetch --unshallow\` once (the states name old commits)\n`);
+    const remotes = spawnSync('git', ['-C', HERE, 'remote'], { encoding: 'utf8' }).stdout.split('\n').filter(Boolean);
+    const r = spawnSync('git', ['-C', HERE, 'fetch', '--unshallow', '--quiet', remotes.includes('origin') ? 'origin' : (remotes[0] || 'origin')], { encoding: 'utf8' });
+    if (r.status !== 0 || !has()) die(`commit ${commit} is missing from this shallow clone and \`git fetch --unshallow\` did not bring it (${(r.stderr || '').trim() || 'not on the remote'}): run \`git fetch --unshallow origin\` and \`git fetch origin "+refs/heads/*:refs/remotes/origin/*"\`, then re-run`);
+}
+
 if (!fs.existsSync(stamp)) {
+    ensureCommit(state.commit);
     fs.rmSync(dir, { recursive: true, force: true });
     fs.mkdirSync(dir, { recursive: true });
     const arch = spawnSync('bash', ['-c', `git -C "${HERE}" archive --format=tar "${state.commit}" | tar -x -C "${dir}"`], { encoding: 'utf8' });
