@@ -72,6 +72,8 @@
 //           path draws its "Part NN" section headings.
 //
 // THE LINTS (rule ids from WORKSHEET_DESIGN_STANDARD.md)
+//   L-OVERLAP ARROW  a count row's jump arrow keeps >= 1.0 mm of ink from the number or box on each side (SL-3a; small-fixes
+//              critic r11 G2), measured by tests/lib/ws-arrow-clear.cjs
 //   L-INK      INK-1 every paint (text colour, background, border, outline, underline, text stroke, SVG
 //              fill / stroke) inside the sheet is #000, #fff or #949494; INK-2 no shadow, filter, blend,
 //              gradient, background image or opacity < 1; INK-5 no solid black fill over 7 mm in both
@@ -141,6 +143,7 @@ const { pathToFileURL } = require('url');
 const puppeteer = require('puppeteer');
 const { ROOT, chromePath, startServer, open, waitFor, listSkills, renderPrint, hideOverlays } = require('../lib/ws-harness.cjs');
 const { GEOM_PROBE, MIN_SEG_MM, HEAD_GAP_MM } = require('../lib/ws-geom-probe.cjs');
+const { ARROW_CLEAR } = require('../lib/ws-arrow-clear.cjs');
 
 const argv = process.argv.slice(2);
 // --jobs: while one job of a jobs file runs, its flags are read in place of the command line's
@@ -1639,6 +1642,11 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
         const geo = await page.evaluate(GEOM_PROBE, { minSeg: MIN_SEG_MM, minGap: HEAD_GAP_MM });
         info.geom = { segs: geo.segs, heads: geo.heads, tpl: geo.tpl };
         geomFindings(geo, F);
+        // L-OVERLAP ARROW (small-fixes critic r11 G2, re-checked on the skip-count fix 2026-10-30): a count row's jump arrow keeps
+        // >= 1.0 mm of ink from the number or box on each side (SL-3a), the same measure ws-phone-card reads on screen
+        const ac = await page.evaluate((src) => (new Function('return (' + src + ')'))()({ root: document.body }), ARROW_CLEAR.toString());
+        info.arrowClear = { n: ac.n, min: ac.min };
+        if (ac.below.length) F('L-OVERLAP', 'ARROW', 'major', {}, `${ac.below.length} count-row jump arrow side(s) under 1.0 mm from the ink beside them; worst ${ac.worst} (SL-3a)`, 'arrow clearance');
     }
 
     // ---- pages, parts, split, density, key
@@ -2479,6 +2487,8 @@ const SELF_TESTS = [
     { name: 'instruction over 12 words', expect: ['L-VERBS', 'BD-10'], fn: () => { document.querySelector('.ws-page .ws-instrline').textContent = 'Add the two numbers and then write the answer in the boxes below the line.'; } },
     { name: '"Part 01" section heading', expect: ['L-VERBS', 'BD-1'], fn: () => { document.querySelector('.ws-page .ws-body').insertAdjacentHTML('afterbegin', '<h2 class="section-num" style="font-size:12pt;margin:0">Part 01</h2>'); } },
     { name: 'answer line under 14 mm', expect: ['L-ANSAREA', 'SL-1'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="ws-line" data-ws-slot="x" data-ws-shape="line" style="--w:10mm"></span>'); } },
+    { name: 'count-row jump arrow touching the next number (G2)', expect: ['L-OVERLAP', 'ARROW'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="k2-countrow-line"><div><div style="display:flex;gap:2mm"><span class="k2-given" style="display:inline-block;width:10mm">12</span><span class="k2-jumpcell" style="position:relative;display:block"><span class="k2-jump" style="position:absolute;right:100%;top:0;display:block;width:2mm;height:5mm"><svg viewBox="0 0 2 5" style="display:block;width:100%;height:100%"><path d="M0 2.5 H2" stroke="#000" stroke-width="0.5"/></svg></span><span class="k2-given" style="display:inline-block;width:10mm">24</span></span></div></div></div>'); } },
+    { name: 'count-row jump arrow centred in a 6 mm gap (G2 control)', expect: [], absent: ['L-OVERLAP', 'ARROW'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="k2-countrow-line"><div><div style="display:flex;gap:6mm"><span class="k2-given" style="display:inline-block;width:10mm;text-align:right">12</span><span class="k2-jumpcell" style="position:relative;display:block"><span class="k2-jump" style="position:absolute;right:100%;top:0;display:block;width:6mm;height:5mm"><svg viewBox="0 0 6 5" style="display:block;width:100%;height:100%"><path d="M1.5 2.5 H4.5" stroke="#000" stroke-width="0.5"/></svg></span><span class="k2-given" style="display:inline-block;width:10mm">24</span></span></div></div></div>'); } },
     { name: 'underscore blank', expect: ['L-ANSAREA', 'SL-6'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span>_____ blocks</span>'); } },
     { name: 'draw zone too small for the model', expect: ['L-ANSAREA', 'H12'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="font-size:11pt">Draw 169 with disks.</div><div data-ws-zone="hundreds" style="width:40mm;height:18mm;border:0.75pt solid #000"></div>'); } },
     { name: 'narrow Lines write-on line at size M (SL-3a: S only)', expect: ['L-ANSAREA', 'SL-1'], fn: () => { const p = document.querySelector('.ws-page'); p.setAttribute('data-ws-size', 'M'); p.querySelectorAll('[data-ws-cell]').forEach((c) => c.setAttribute('data-ws-size', 'M')); p.querySelector('[data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="k2-tile k2-line-slot" data-ws-slot="x" data-ws-shape="line" style="display:inline-block;width:10mm;height:8mm;border-bottom:2px solid #000"></span>'); } },

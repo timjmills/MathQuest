@@ -1659,7 +1659,10 @@ function wireSwipeRows(cellEl) {
         const body = w.querySelector('.k2-countrow-body');
         const items = () => { const ln = w.querySelector('.k2-countrow-line [data-mq-wrapped]'); return ln ? [...ln.children] : []; };
         // every column of every line, in reading order (one line on a phone, `oneLine` below: its column starts run on past line 1)
-        const allItems = () => [...w.querySelectorAll('.k2-countrow-line [data-mq-wrapped]')].flatMap((ln) => [...ln.children]);
+        // (the LINE containers only: fitTwinRows marks other flex rows inside a tile `data-mq-wrapped` too, and their children are
+        // no column starts - a box's own inner row gave the snap a start 24 px left of a column, cutting the next number)
+        const LINES = '.k2-countrow-line > div > [data-mq-wrapped]';
+        const allItems = () => [...w.querySelectorAll(LINES)].flatMap((ln) => [...ln.children]);
         const padEnd = () => {
             if (!body || !col) return;
             body.style.paddingRight = '0px';
@@ -1694,7 +1697,7 @@ function wireSwipeRows(cellEl) {
         // ONE state machine (critic skip-count r1 D1-D3, 2026-10-16), run at load, on every resize and after the late fit:
         // (1) clear the wrap, (2) clear the swipe, (3) measure the row against the cell, (4) choose: whole / tab above /
         // wrapped (Chromebook, not a number line) / swipe. So a resize in either direction ends as a fresh load does.
-        const conts = () => [...w.querySelectorAll('.k2-countrow-line [data-mq-wrapped]')];
+        const conts = () => [...w.querySelectorAll(LINES)];
         // fitTwinRows' generic pass may not wrap the frame (it would drop the step tab onto a line of its own, centred: the band)
         if (frame) { if (frame.dataset.mqOrigStyle === undefined) frame.dataset.mqOrigStyle = frame.getAttribute('style') || ''; frame.dataset.mqWrapped = '1'; }
         const isAxis = !!w.querySelector('.k2-countrow-axis');
@@ -1868,7 +1871,18 @@ function wireSwipeRows(cellEl) {
         // the cue's state, from the row as it stands (skip-count r3 D7: set at the end of every layout and late fit, never stale)
         const upd = () => { level(); lastSL = w.scrollLeft; w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', !moreRight()); };
         let laidInner = 0;
-        const mode = () => { layout(); alignAxis(); upd(); };
+        // owner ruling 2026-10-17 (3), critic skip-count r5 SC2: a box that HAS the focus stays in view through every re-layout (a
+        // late fit, a resize observer) - the row rests at the leftmost column start that shows it whole, as the first focus left it
+        const reveal = () => {
+            const t = document.activeElement;
+            if (!t || t === w || !w.contains(t) || w.scrollWidth <= w.clientWidth + 1) return;
+            const v = w.getBoundingClientRect(), r = t.getBoundingClientRect();
+            if (r.left >= v.left - 0.5 && r.right <= v.right + 0.5) return;
+            const sl = w.scrollLeft, cw = w.clientWidth, bl = r.left - v.left + sl, br = r.right - v.left + sl;
+            const ok = [0, ...allItems().map((x) => x.getBoundingClientRect().left - v.left + sl)].filter((x) => x <= bl + 0.5 && br - x <= cw + 0.5);
+            if (ok.length) w.scrollLeft = Math.min(...ok);
+        };
+        const mode = () => { layout(); alignAxis(); reveal(); upd(); };
         const layout = () => {
             clearAll();
             // the phone draws ~29 px digits (fitTwinRows' phone rule reads the fonts only), then caps the gap

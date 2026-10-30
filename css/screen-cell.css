@@ -1827,3 +1827,11 @@ html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsb
 .mq-scell [data-mq-swiperow][data-mq-oneline] .k2-countrow-line > div + span { display: none !important; }
 .mq-scell [data-mq-swiperow][data-mq-oneline] [data-mq-flatfirst] { position: relative; }
 .mq-scell [data-mq-swiperow][data-mq-oneline] [data-mq-flatjump] { display: block; }
+/* (SC2) only a line's own columns are snap points: the joining arrow and the inner rows fitTwinRows marks `data-mq-wrapped` inside
+   a column are not (a snap 24 px left of a column cut the next number at the window's right edge) */
+.mq-scell [data-mq-swiperow] [data-mq-flatjump],
+.mq-scell [data-mq-swiperow] .k2-countrow-line > div > [data-mq-wrapped] > * [data-mq-wrapped] > * { scroll-snap-align: none !important; }
+/* small-fixes critic r11 G2 (re-checked 2026-10-30 on today's row): a jump arrow keeps >= 1.0 mm of ink clearance from the number
+   or box on each side on every screen host (the phone worksheet's 24 px gap left 0.98 mm): the arrow draws 1.5 px in from each
+   end of its gap. Measured by tests/lib/ws-arrow-clear.cjs (ws-phone-card ROW-ARROW). Additive. */
+.mq-scell .k2-jump { padding: 0 1.5px; box-sizing: border-box; }

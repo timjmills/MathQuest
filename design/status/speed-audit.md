@@ -759,3 +759,9 @@ under CL-4b (owner), band instruction for presets.
 | r2 | **PASS 9 / 9 / 8** | stale-pin report for pinned findings (N-r2-3); precritic-plan coverage for gates whose rows name no skill (N-r2-1) | narrow r2 scope (fixes + regressions) in 21 min; one real precritic run of an approved sibling and `--role lesson` on the merged tree before the critic caught 4 of the lane's 5 setup traps |
 
 Details and the reflection: design/status/s1-checks.md.
+
+### skip-count · critic r5 (2026-10-30, FAIL 3) - fix round
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r5 | FAIL 3 (Lesson C1/C3), 390 card 6 | SC1: `ws-print-lint --roles lesson` existed on precritic's path and was not run (now 0 at S/M/L). SC2: `ws-phone-card` FOCUS / INVIEW existed (now 0) + NEW ROW-LINES (a swiping row on one line), and phone-card joins ws-deploy-gates.sh. SC3: NEW ws-node-lint LESSON-DATA `screen-task` (24 seeded deals of each Warm-up / Mixed ref; backtested). SC4: NEW phone-card swipe-window fixtures. G2-G4 (small-fixes r11, re-checked on today's row): NEW phone-card ROW-ARROW, NEXT-INVIEW (360x780, 844x390), ROTATE. Details: design/status/skip-count.md. | Render every role in the scope (the Lesson) in the fix loop; the family's own phone test (wave1-c2-phone) is off precritic's path, so its essentials moved into ws-phone-card. |
