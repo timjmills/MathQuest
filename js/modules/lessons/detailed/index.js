@@ -82,6 +82,8 @@ import lesson2 from './g1-oa1-bar-model-wp-20.js';
 import lesson3a from './g3-oa5-mult-properties.js';
 import lesson4 from './g3-oa9-mult-table-patterns.js';
 import lesson5 from './g3-oa9-input-output-rule.js';
+import lesson6 from './g4-nbt1-ten-times-value.js';
+import lesson7 from './g3-oa8-two-step-wp.js';
 
 export const DETAILED_LESSONS = Object.freeze({
     [lesson1.id]: lesson1,
@@ -89,6 +91,8 @@ export const DETAILED_LESSONS = Object.freeze({
     [lesson3a.id]: lesson3a,
     [lesson4.id]: lesson4,
     [lesson5.id]: lesson5,
+    [lesson6.id]: lesson6,
+    [lesson7.id]: lesson7,
 });
 
 /** The description of a detailed lesson, or null. */
@@ -145,6 +149,11 @@ export function validateDescription(d) {
     if (total !== 60) errs.push(`the sections add up to ${total} minutes, not 60`);
     for (const s of d.sections || []) for (const r of s.rows || []) for (const k of ['say', 'ask']) {
         if (r[k] && String(r[k]).replace(/\{[^}]+\}/g, 'x').split(/\s+/).length > 12) errs.push(`section ${s.n}: a ${k} line over 12 words`);
+    }
+    // (`ringWords`, lesson 6 r2 D1: an answer word a script may only say through the placeholder of the item it names -
+    // a literal goes stale when the deal changes; absent on every other lesson)
+    for (const w of d.ringWords || []) for (const s of d.sections || []) for (const r of s.rows || []) for (const k of ['do', 'say', 'ask', 'note']) {
+        if (r[k] && String(r[k]).replace(/\{[^}]+\}/g, '').toLowerCase().includes(String(w).toLowerCase())) errs.push(`section ${s.n}: "${w}" written literally (name the item: {x.rel})`);
     }
     return errs;
 }

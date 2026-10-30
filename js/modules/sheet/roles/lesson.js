@@ -54,7 +54,7 @@ import { evenGridState, factGridMini } from '../cells/mult-grid.js';
 import { dotTile, countCueOf, countCueRow } from './guided.js';
 import { stepIcon, iconForText } from '../lesson-icons.js';
 import { numberWords } from '../cells/words.js';
-import { barMini } from '../cells/word-work.js';
+import { barMini, twoStepPart } from '../cells/word-work.js';
 
 export const ROLE_ID = 'lesson';
 /**
@@ -255,6 +255,8 @@ const ftRuleOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.t
 /** Row 1 of a + table fits no taught × rule (x 2, x 5, x 10): 2 -> 10 is also x 5 (lesson 5 r3, critic D2). */
 const ftPlainFirst = (p) => ![2, 3, 5, 10].some((m) => p.x1 * m === p.y1);
 /** An arrays-turn payload's {rows, cols} (detailed lesson 3a), else null. */
+/** A value form "times" item's description (gen-pv.js), else null. */
+const tenOf = (it) => { const p = it && it.q && it.q.pv; return p && p.kind === 'times' ? p : null; };
 const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'arrays-turn' && c.payload; return p ? { rows: Number(p.rows), cols: Number(p.cols) } : null; };
 
 /**
@@ -397,6 +399,34 @@ export const CASE_TESTS = Object.freeze({
     wpBridgePT: (it) => CASE_TESTS.wpBridge(it) && CASE_TESTS.wpPutTogether(it) && !CASE_TESTS.wpEqual(it),
     wpBridgeSmallFirstAT: (it) => CASE_TESTS.wpBridgeSmallFirst(it) && CASE_TESTS.wpAddToAny(it),
     wpBridgeBigFirstPT: (it) => CASE_TESTS.wpBridgeBigFirst(it) && CASE_TESTS.wpPutTogether(it),
+    // The detailed lesson maker, lesson 6 (the same digit one place apart, 4.NBT.A.1; value form "times"): read
+    // from q.pv (gen-pv.js genTimesValue), so lesson 9 (decimals, 5.NBT.A.1) reuses them.
+    tenAny: (it) => !!tenOf(it),
+    tenTimes: (it) => { const p = tenOf(it); return !!p && p.dir === 'times'; },
+    tenTenth: (it) => { const p = tenOf(it); return !!p && p.dir === 'tenth'; },
+    tenPlain: (it) => { const p = tenOf(it); return !!p && !!p.plain; },
+    tenMixed: (it) => { const p = tenOf(it); return !!p && !p.plain; },
+    // (the two numbers of different lengths: the digits do not line up by position from the left)
+    tenLengths: (it) => { const p = tenOf(it); return !!p && String(p.n).length !== String(p.m).length; },
+    // (the pair reaches the thousands: Th and H)
+    tenThou: (it) => { const p = tenOf(it); return !!p && Math.max(p.place, p.placeM) >= 1000; },
+    // (the pair is tens and ones: 7 and 70)
+    tenOnes: (it) => { const p = tenOf(it); return !!p && Math.min(p.place, p.placeM) === 1; },
+    // (★★★: the thousands, or the ones, with numbers of different lengths)
+    tenEdge: (it) => (CASE_TESTS.tenThou(it) || CASE_TESTS.tenOnes(it)) && CASE_TESTS.tenMixed(it),
+    // (the chart model: hundreds and tens, other digits round them, 10 times)
+    tenChart: (it) => { const p = tenOf(it); return !!p && p.dir === 'times' && !p.plain && Math.min(p.place, p.placeM) === 10 && Math.max(p.place, p.placeM) === 100; },
+    tenThouTimes: (it) => CASE_TESTS.tenThou(it) && CASE_TESTS.tenTimes(it),
+    tenThouTenth: (it) => CASE_TESTS.tenThou(it) && CASE_TESTS.tenTenth(it) && CASE_TESTS.tenMixed(it),
+    tenOnesTimes: (it) => CASE_TESTS.tenOnes(it) && CASE_TESTS.tenTimes(it) && CASE_TESTS.tenMixed(it),
+    // (the chart's other example, lesson 6 r2 n7: one tenth on another place pair than the main example's H / T)
+    tenTenthOther: (it) => { const p = tenOf(it); return !!p && p.dir === 'tenth' && !p.plain && !(Math.min(p.place, p.placeM) === 10 && Math.max(p.place, p.placeM) === 100); },
+    // (a Guided 10 times cell, lesson 6 r3: H / T or Th / H, other digits round it - not the ones edge)
+    tenTimesGuided: (it) => CASE_TESTS.tenTimes(it) && CASE_TESTS.tenMixed(it) && !CASE_TESTS.tenOnes(it),
+    tenTenthGuided: (it) => CASE_TESTS.tenTenth(it) && CASE_TESTS.tenMixed(it) && !CASE_TESTS.tenOnes(it),
+    tenNoOnes: (it) => CASE_TESTS.tenMixed(it) && !CASE_TESTS.tenOnes(it),
+    tenTimesMid: (it) => CASE_TESTS.tenTimes(it) && !CASE_TESTS.tenEdge(it),
+    tenTenthMid: (it) => CASE_TESTS.tenTenth(it) && !CASE_TESTS.tenEdge(it),
     pvEdge: (it) => { const n = pvNumberOf(it); return n !== null && (n === 1000 || (n >= 100 && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0 || Math.floor(n / 10) % 10 === 1))); },
     // The detailed lesson maker, lesson 5 (find the rule, 3.OA.D.9): a one-step find-the-rule table.
     // + / − / × with a plain first row (+: not 1 -> 1 + k, which is also x (1 + k)); the trap:
@@ -413,9 +443,38 @@ export const CASE_TESTS = Object.freeze({
     // (no two Ins back to back - lesson 5 r4, critic r2 n14: testing row 3 after row 2 is then a real test)
     ftSpread: (it) => { const c = it && it.q && it.q.cell; const p = c && c.template === 'function-table' && c.payload; if (!p || !Array.isArray(p.rows)) return false; const xs = p.rows.map((r) => Number(r.x)).sort((a, b) => a - b); return xs.every((v, i) => !i || v - xs[i - 1] >= 2); },
     ftEdge: (it) => CASE_TESTS.ftTimes(it) || CASE_TESTS.ftSubZero(it),
+    // The detailed lesson maker, lesson 7 (two-step stories, 3.OA.D.8; multi_step_word msOps): a × or ÷ step that
+    // feeds a + or − step, read from the word-work payload's two steps.
+    msAny: (it) => !!msOf(it),
+    msMult: (it) => { const s = msOf(it); return !!s && s[0].op === '*'; },
+    msDiv: (it) => { const s = msOf(it); return !!s && s[0].op === '/'; },
+    msAdd: (it) => { const s = msOf(it); return !!s && s[1].op === '+'; },
+    msSub: (it) => { const s = msOf(it); return !!s && s[1].op === '-'; },
+    // (★★★, the M3 trap: the Step 2 number is bigger than both small Step 1 numbers - groups and each, or friends and
+    // each share - so "Step 2 with a story number" gives a believable answer)
+    msEdge: (it) => { const s = msOf(it); if (!s) return false; const sm = s[0].op === '*' ? [s[0].a, s[0].b] : [s[0].b, s[0].ans]; return s[1].bottom > Math.max(...sm); },
+    msMid: (it) => !!msOf(it) && !CASE_TESTS.msEdge(it),
+    // (the three two-step errors give three different numbers, none the answer: a Check Question / exit item)
+    msClean: (it) => { const s = msOf(it); if (!s) return false; const [s1, s2] = s; const c = s2.bottom;
+        const f = (x) => (s2.op === '+' ? x + c : x - c); const m3 = s2.op === '+' ? s1.b + c : Math.abs(s1.b - c);
+        const m2 = s1.op === '*' ? f(s1.a + s1.b) : f(s1.a - s1.b); const v = [s1.ans, m3, m2, s2.ans];
+        return v.every((x) => x >= 0) && new Set(v).size === 4; },
+    msMultAdd: (it) => CASE_TESTS.msMult(it) && CASE_TESTS.msAdd(it),
+    msMultSub: (it) => CASE_TESTS.msMult(it) && CASE_TESTS.msSub(it),
+    msDivAdd: (it) => CASE_TESTS.msDiv(it) && CASE_TESTS.msAdd(it),
+    msDivSub: (it) => CASE_TESTS.msDiv(it) && CASE_TESTS.msSub(it),
+    msMultMid: (it) => CASE_TESTS.msMult(it) && CASE_TESTS.msMid(it),
+    msDivMid: (it) => CASE_TESTS.msDiv(it) && CASE_TESTS.msMid(it),
     ftLessonAny: (it) => CASE_TESTS.ftAdd(it) || CASE_TESTS.ftSub(it) || CASE_TESTS.ftTimes(it),
     ftPracticeAny: (it) => CASE_TESTS.ftAdd(it) || CASE_TESTS.ftSub(it) || CASE_TESTS.ftEdge(it),
 });
+
+/** A two-step story's steps whose first step is × or ÷ (msOps, lesson 7), or null. */
+function msOf(it) {
+    const c = it && it.q && it.q.cell;
+    const st = c && c.template === 'word-work' && c.payload && c.payload.steps;
+    return Array.isArray(st) && st.length === 2 && (st[0].op === '*' || st[0].op === '/') ? st : null;
+}
 
 /** A two-part story's parts [a, b] as numbers, or null. */
 function wpParts(it) {
@@ -546,12 +605,15 @@ export function pickWeDo(items, example, data, n) {
         // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
         // (lesson 2 r5, critic r3 m3: no story person twice on the sheet while the deal can - "Lena has 7 cards" and "Lena has 6")
         const people = (x) => { const ls = (x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.lines) || []; return ls.slice(0, -1).map((l) => (String(l).match(/^([A-Z][a-z]+)\b/) || [])[1]).filter(Boolean); };
-        const meets = (x, y, nm) => twin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        // (lesson 7 r2: two two-step stories never share a Step 1 number or a Step 1 answer - "30 shared by 6", "30 shared by 5")
+        const ms1 = (x) => { const s = x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.steps; return Array.isArray(s) && s.length === 2 && s[0] ? [s[0].a, s[0].b, s[0].ans] : null; };
+        const msTwin = (x, y) => { const a = ms1(x), b = ms1(y); return !!a && !!b && (a[0] === b[0] || a[2] === b[2] || (a[0] === b[1] && a[1] === b[0])); };
+        const meets = (x, y, nm) => twin(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
         const pickLead = (k, chosen, nm) => {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
             if (!t) return pickLead(k + 1, chosen, nm);
-            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !msTwin(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
             return null;
         };
         const fit = pickLead(0, [], true) || pickLead(0, [], false);
@@ -883,7 +945,25 @@ function barState(it, k, c, { keepSlots = false } = {}) {
     return keepSlots ? html : html;
 }
 
+/**
+ * A two-step story whose first step is x or / (msOps, the detailed lesson maker, lesson 7): panel k draws only its own
+ * part (sheet/cells/word-work.js twoStepPart) - 0 the story with the Step 1 numbers ringed grey, 1 Step 1, 2 Step 2 and
+ * its unit word - so three panels and the closing line fit one chart.
+ */
+function twoState(it, k, c) {
+    const p = it.q.cell.payload;
+    const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 1, metrics: undefined }));
+    let html = twoStepPart(p, k, ctx);
+    if (k === 0) {
+        const s1 = p.steps[0];
+        let ringed = 0;
+        html = html.replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${s1.a}|${s1.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring mq-lring-t">${n}</span>`) : n))}<`));
+    }
+    return html;
+}
+
 function stateDrawing(it, steps, groups, k, c) {
+    if (msOf({ q: it.q }) && steps.length === 4 && groups.length === 3) return unslot(twoState(it, k, c));
     if (isWordBar(it) && steps.length && /^bar-step-/.test((((steps[0] || {}).marks || [])[0] || {}).slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
@@ -956,7 +1036,7 @@ export function namedSteps(steps, data, { general = false } = {}) {
 export const stepMarker = (n) => `<em class="mq-lnum" data-mq-accent>${n}</em>`;
 
 /** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
-export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: 'col' }
+export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: data.chartRow ? 'row' : 'col' }
     : n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
 // `chartWide` (lesson data; the detailed lesson maker, 2026-10-16): a drawing too wide for half the
 // page (expanded form, 3 boxes) - every panel is a full-width row, the step head above its drawing.
@@ -1022,7 +1102,8 @@ export function stateItems(example, data) {
     }));
     const tails = tail.length ? [Object.assign({}, base, {
         lessonTail: true, cellCls: 'mq-ctailcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 },
-        render: (c) => `<div class="mq-ctail">${tail.map((i) => `<div class="mq-chead">${stepMarker(i + 1)}${stepIcon(named[i].icon, c.size, { mm: { S: 7, M: 8.5, L: 10 }[c.size] || 10 })}<b>${esc(named[i].name)}</b>`
+        // (`tailRead`, lesson data - the detailed lesson maker, lesson 7: the closing line is read, not worked: a reading cell)
+        render: (c) => `<div class="mq-ctail"${data && data.tailRead ? ' data-read' : ''}>${tail.map((i) => `<div class="mq-chead">${stepMarker(i + 1)}${stepIcon(named[i].icon, c.size, { mm: { S: 7, M: 8.5, L: 10 }[c.size] || 10 })}<b>${esc(named[i].name)}</b>`
             + `${named[i].words ? `<span class="mq-ctailw">${esc(named[i].words)}</span>` : ''}</div>`).join('')}</div>`,
     })] : [];
     // Lessons r2: the same closing step as a PANEL, for the 3-column chart (its words in the
@@ -1757,7 +1838,8 @@ function planOnce(input = {}) {
         // rule is what the pupil needs beside the Guided cells), else under the strip.
         const rem = groups.find((g) => g.sections[0] && g.sections[0].label === 'Remember:');
         if (rem && data && data.chant) Object.assign(rem.sections[0], { label: 'Rule:', instr: data.chant });
-        const chantH = data && data.chant && !rem ? m.instr : 0;
+        // (`noStripChant` - the detailed lesson maker, lesson 7: two Guided cells fill the page; the chant is on the chart)
+        const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
@@ -1984,6 +2066,16 @@ function weDoRender(it, i) {
             const steps = workedStepsOf(it);
             // (the key: every box answered, the prompt drawn exactly as on the pupil page - INK-31, critic r2 R9)
             if (t && steps.length > 1) return answered ? t.render(Object.assign({}, it.q.cell.payload, { under: 0 }), c) : t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
+        }
+        // (a two-step story whose first step is x or / - lesson 7: Guided cell 1 has its Step 1 sign ringed grey; the key too,
+        // a facsimile of the pupil page)
+        if (i === 0 && msOf(it)) return it.render(c, Object.assign({}, o, { payload: { traceOp0: true } }));
+        // (a template that opts in with `guidedStepOne` - pv-times, lesson 6: Guided cell 1 drawn at its first
+        // step, that step's marks traced grey; generic for any template with a stepState)
+        if (!answered && i === 0) {
+            const t = stepTemplateOf(it);
+            const steps = workedStepsOf(it);
+            if (t && t.guidedStepOne && steps.length > 1) return t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
         }
         // An array-and-turn Guided cell 1 (the detailed lesson maker, lesson 3a): step 2 done in grey - the
         // first product traced; the turned fact stays the pupil's (the Critical Atom).

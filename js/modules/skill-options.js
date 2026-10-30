@@ -620,9 +620,40 @@ const _pvValueForm = () => ({
         { v: 'value', l: 'The value (700)' },
         { v: 'unit', l: 'Unit form (7 hundreds)' },
         { v: 'notation', l: 'Expanded notation (7 × 100)' },
+        { v: 'times', l: 'Ten times / one tenth (the 7 in 700 and the 7 in 70)' },
     ],
-    help: 'One way per page. Unit form and expanded notation name the place and the digit.',
+    help: 'One way per page. Unit form and expanded notation name the place and the digit. Ten times compares the same digit in two numbers, one place apart (4.NBT.A.1).',
+    // (lesson 6 r4: "times" draws a two-row place chart in each cell - a value that ADDS a drawing may cost page room,
+    // tests/lib/options-render.cjs)
+    addsDrawingValues: ['times'],
 });
+// value_ten_times (4.NBT.A.1, detailed lesson g4-nbt1-ten-times-value): the options of form "times" only.
+// (r4: each applies only with form "times" - `appliesTo` hides it otherwise; `appliesBase` is the context ws-options-verify
+// tries it in, so a control that only works with form times is not read as inert)
+const _pvTenOptions = () => [
+    { id: 'tenDir', label: 'Ten times: which way', type: 'enum', default: 'both', group: 'difficulty', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
+        values: [
+            { v: 'times', l: 'The first digit is one place left: 10 times' },
+            { v: 'tenth', l: 'The first digit is one place right: one tenth' },
+            { v: 'both', l: 'Both, mixed' },
+        ],
+        help: 'Ten times only. One way at a time first; both mixed so the order of the rows never gives the answer.' },
+    { id: 'tenValues', label: 'Ten times: write both values first', type: 'bool', default: true, group: 'support', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
+        help: 'Ten times only. On: the pupil writes what each digit is worth, then circles. Off: circle only (the fade).' },
+    { id: 'tenPlain', label: 'Ten times: the digit and zeros only (700 and 70)', type: 'bool', default: false, group: 'difficulty', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
+        help: 'Ten times only. On: numbers like 700 and 70. Off: other digits round the digit (740 and 372).' },
+    // (lesson 6 r2, owner skill-coverage rule: the exit slip's item and the word problem are skill options, not page code)
+    { id: 'tenWrite', label: 'Ten times: values written', type: 'enum', default: 'both', group: 'support', appliesTo: (cur) => cur.form === 'times' && cur.tenValues !== false && cur.tenTask !== 'story', appliesBase: { form: 'times' },
+        values: [{ v: 'both', l: 'Both values' }, { v: 'top', l: 'The top value only (a short check)' }],
+        help: 'Ten times with values on. Top: one worth box, the first number\'s digit, then circle.' },
+    { id: 'tenTask', label: 'Ten times: the task', type: 'enum', default: 'compare', group: 'layout', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
+        values: [{ v: 'compare', l: 'Compare the digit in two numbers' }, { v: 'story', l: 'A story: how many times as many? (700 ÷ 70 = 10)' }],
+        help: 'Ten times only. Story: two amounts, the digit and zeros (6,000 and 600); the pupil writes the division and 10.' },
+    // (lesson 6 r4, critic r2 D2: the board Check Question's A-D form is a skill option too)
+    { id: 'tenChoice', label: 'Ten times: words to choose from', type: 'enum', default: 'two', group: 'difficulty', appliesTo: (cur) => cur.form === 'times' && cur.tenValues === false && cur.tenTask !== 'story', appliesBase: { form: 'times', tenValues: false },
+        values: [{ v: 'two', l: '10 times or one tenth of' }, { v: 'four', l: 'Four: 10 times, one tenth of, the same as, 100 times' }],
+        help: 'Ten times with values off (circle only). Four adds the two wrong ideas: the same digit is the same value, and two places is 100 times.' },
+];
 const _pvZeroDigit = () => ({
     id: 'zeroDigit', label: 'Ask the value of a 0', type: 'bool', default: false, group: 'difficulty',
     help: 'On underlines a zero on some items: its value is 0, but it holds the place.',
@@ -719,7 +750,7 @@ function _pvRoundNl(id) {
 }
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions()],
     'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
@@ -2563,6 +2594,21 @@ Object.assign(P12_OPTIONS, {
         ['Sort by how likely (drag)', 'Drag each']])],
 });
 
+// msOps (3.OA.D.8, detailed lesson g3-oa8-two-step-wp; build list multi_step_four_ops): the first step's
+// operation. 'addsub' = the four + / − archetypes (the default, every old code unchanged); 'mult' / 'div' = a ×
+// or ÷ step that feeds a + or − step (facts within 10 × 10, the answer never a story number).
+const _msOps = () => ({
+    id: 'msOps', label: 'Two steps: the first step', type: 'enum', default: 'addsub', group: 'difficulty',
+    values: [
+        { v: 'addsub', l: 'Add or take away, then add or take away' },
+        { v: 'mult', l: 'Multiply, then add or take away (4 bags of 6, 5 given away)' },
+        { v: 'div', l: 'Divide, then add or take away (24 shared by 4, 2 more each)' },
+        { v: 'multdiv', l: 'Multiply or divide, then add or take away' },
+        { v: 'addmult', l: 'Add or take away, then multiply ((5 + 3) in each of 4 bags)' },
+        { v: 'adddiv', l: 'Add or take away, then divide ((12 + 18) shared by 5)' },
+    ],
+    help: 'The new thing in Grade 3 is a × or ÷ step whose answer is used in the + or − step. One first step at a time, then mixed.',
+});
 // ======================= WORD PROBLEMS: WHAT IS MISSING (gen-operations.js) ===============
 // The story kinds each word-problem generator already rotates through (pickVariant) become the
 // teacher's "What is missing" control, added to the P11 panel. The _plain twin carries the same
@@ -2587,7 +2633,7 @@ Object.assign(P12_OPTIONS, {
     'division:div_word_problems': [...(SKILL_OPTIONS['division:div_word_problems'] || []), _wpDiv()],
     'division:div_word_problems_plain': [_wpDiv()],
     'algebra:multi_step_word_plain': [_p12Variants('multi_step_word', ['add_then_sub', 'sub_then_add', 'add_then_add', 'sub_then_sub'],
-        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
+        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' }), _msOps()],
 });
 
 // ======================= FRACTION AND MEASUREMENT LEFTOVERS =================================
@@ -2692,7 +2738,7 @@ Object.assign(P12_OPTIONS, {
     'algebra:tape_diagram_plain': [_p12Kinds('forms', 'The story', [['Joining (gets more)', 'gets \\d+ more'], ['Taking away (used some)', 'used \\d+'],
         ['How many more are needed', 'needs \\d+']])],
     'algebra:multi_step_word': [_p12Variants('multi_step_word', ['add_then_sub', 'sub_then_add', 'add_then_add', 'sub_then_sub'],
-        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
+        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' }), _msOps()],
     'algebra:solve_unknown': [_p12Match([['x + a = b', 'Solve: x \\+'], ['x − a = b', 'Solve: x -'], ['ax = b', 'Solve: \\d+x ='], ['Click the values that work', '^Click ALL']])],
     'algebra:balance_addsub': [_p12Kinds('unknown', 'Where the blank is', [['At the start (___ + 4 = 9 − 2)', 'equal: ___'], ['In the middle (12 − ___ = 3 + 4)', 'equal: \\d+ - ___'],
         ['On the right (5 + 3 = ___ + 2)', '= ___ \\+']])],
@@ -3317,6 +3363,25 @@ const WORD_WORK_OPTIONS = (bar) => [
         const hasBar = cur.some(o => o.id === 'support' && Array.isArray(o.values) && o.values.some(v => v.v === 'bar'));
         SKILL_OPTIONS[key] = [...cur, ...WORD_WORK_OPTIONS(!hasBar)];
     }
+}
+// `wpFrames` (detailed lesson 7, 2026-10-17): the compact form - one number sentence a step - on the × / ÷ and
+// two-step stories its lesson deals (the exit slip and the Prerequisite Check).
+for (const key of ['multiplication:mult_word_problems', 'division:div_word_problems', 'algebra:multi_step_word']) {
+    for (const k of [key, `${key}_plain`]) SKILL_OPTIONS[k] = [...(SKILL_OPTIONS[k] || []), {
+        id: 'wpFrames', label: 'Number sentences, no column boxes', type: 'bool', default: false, group: 'layout',
+        help: 'Each step is written as one number sentence (Step 1: __ ○ __ = __), the unit word printed. The fade of the column boxes; a compact story.' }];
+}
+// msLetter / msCheck (3.OA.D.8, detailed lesson 7 round 2): the standard's two other clauses as responses.
+for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
+    SKILL_OPTIONS[k] = [...(SKILL_OPTIONS[k] || []),
+        { id: 'msLetter', label: 'Write one equation with a letter', type: 'bool', default: false, group: 'layout',
+            help: 'The pupil writes the whole story as one equation with n for the unknown (5 × 4 − 6 = n; brackets when the + or − comes first), then n.' },
+        { id: 'msCheck', label: 'Estimate to check', type: 'bool', default: false, group: 'layout',
+            help: 'Add and take-away stories: the pupil works the two steps, rounds each story number to the nearest ten, estimates, and rings Yes or No: is my answer close?' },
+        // (lesson 7 r3: the board Check Question's A-D choice is a skill option too - a response mode, no preset skill)
+        { id: 'msChoose', label: 'Choose the answer (A to D)', type: 'bool', default: false, group: 'layout',
+            appliesTo: (cur) => ['mult', 'div', 'multdiv'].includes(cur.msOps), appliesBase: { msOps: 'mult' },
+            help: 'Multiply or divide first, then take away. The pupil checks one of four answers: the right one and the three two-step mistakes (stopped after Step 1, a story number in Step 2, one sign for both).' }];
 }
 
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================

@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 393 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 396 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -2568,12 +2568,14 @@ whatever happens to the WRM gaps.
   Vocabulary: split, any order, partition  
 - **Y4.B5.S3** Multiply by 10 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 10}; Multiply by 10 (`multiplication:mult_by_ten`)  
+  Partial: 10 Times and One Tenth: the Same Digit One Place Apart (`placevalue:ten_times_value`), missing the digit one place left is worth 10 times as much  
   Vocabulary: 10 times the size, place value, placeholder  
 - **Y4.B5.S4** Multiply by 100 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 100}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 100}; Multiply by 100 (`multiplication:mult_by_hundred`)  
   Vocabulary: 100 times the size, scaling, placeholder  
 - **Y4.B5.S5** Divide by 10 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 10}  
+  Partial: One Tenth of a Digit's Value (One Place Right) (`placevalue:one_tenth_value`), missing the digit one place right is worth one tenth as much  
   Vocabulary: divide, tenth, one-tenth the size  
 - **Y4.B5.S6** Divide by 100 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 100}  
@@ -2883,6 +2885,8 @@ whatever happens to the WRM gaps.
   Vocabulary: comma, placeholder zero, and  
 - **Y5.B1.S6** Powers of 10 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`)  
+  Partial: 10 Times and One Tenth: the Same Digit One Place Apart (`placevalue:ten_times_value`), missing each place is 10 times the place to its right, read on the same digit in two numbers  
+  Partial: How Many Times as Many? (700 ÷ 70 = 10) (`placevalue:ten_times_story`), missing how many times as many: 700 ÷ 70 = 10  
   Vocabulary: column, row, ten times the size, one-tenth  
 - **Y5.B1.S7** 10 100 1,000 10,000 100,000 more or less — PARTIAL. _4.NBT.A.1_  
   Partial: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`), missing 10,000 and 100,000 more or less  

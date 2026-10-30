@@ -1590,6 +1590,8 @@ function _slotChars(v, kind) {
     const glyph = (t) => t.replace(/[*xX]/g, '×').replace(/[/:]/g, '÷').replace(/-/g, '−');
     if (kind === 'sign') { const m = glyph(String(v)).match(/[+−×÷]/g); return m ? m[m.length - 1] : ''; }
     if (kind === 'rule') return glyph(String(v)).replace(/[^0-9+−×÷ ]/g, '');
+    // (a word box - the pv-times ring on screen, lesson 6: letters, digits, spaces and /)
+    if (kind === 'word') return String(v).replace(/[^0-9a-zA-Z /]/g, '').slice(0, 16);
     return String(v).replace(/[^0-9]/g, '');
 }
 
@@ -3652,8 +3654,56 @@ function _wireRoundLines() {
  * The screen twin of a kit-drawn cell, or null when the item has no kit cell this can draw.
  * @returns {{mode: 'blank'|'slots', html: string, instr: string, count: number, kit: string}|null}
  */
+/**
+ * The `pv-times` twin (lesson 6, 4.NBT.A.1): the paper's own cell - the two-row place chart, a typed box for each
+ * value the paper asks for, and the two printed words to ring, which on screen are tapped (the cloze bank tiles
+ * write the word into the cell's last box). Same item, same response as the paper.
+ */
+function pvTimesTwin(q, categoryId) {
+    if (typeof document === 'undefined') return null;
+    const p = q.cell.payload;
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        html = renderCell(Object.assign({}, q, { cell: { template: 'pv-times', payload: p, v: 1 } }), ctx);
+    } catch (e) { return null; }
+    if (!html) return null;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const boxes = Array.from(tpl.content.querySelectorAll('[data-ws-slot^="v"]'));
+    const w = Math.max(2, ...(p.rows || []).map((r) => String(r.n).replace(/[^0-9]/g, '').length));
+    boxes.forEach((s, k) => { const t = document.createElement('template'); t.innerHTML = cellSlot(w, `value ${k + 1}`); s.replaceWith(t.content.firstChild); });
+    const rings = Array.from(tpl.content.querySelectorAll('[data-ws-slot="rel"]'));
+    if (!rings.length) return null;
+    const k = boxes.length;
+    rings.forEach((r) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mq-banktile';
+        b.dataset.mqBankFor = String(k);
+        b.dataset.v = r.textContent.trim();
+        b.textContent = r.textContent.trim();
+        r.replaceWith(b);
+    });
+    // the ringed word's box: filled by a tap on a word (it can still be typed), read last
+    const t = document.createElement('template');
+    t.innerHTML = cellSlot(8, 'the words you circle');
+    const relBox = t.content.firstChild;
+    relBox.setAttribute('data-mq-kind', 'word');
+    relBox.setAttribute('data-mq-max', '16');
+    const say = tpl.content.querySelector('.pv-times-say');
+    (say || tpl.content).appendChild(relBox);
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin mq-cloze" data-mq-join=", " data-mq-kit="pv-times">${wrap.innerHTML}</div>`;
+    return { mode: 'slots', html: body, instr: printInstructionFor(q, categoryId) || plainText(q.text), count: k + 1, kit: 'pv-times' };
+}
+
 export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const c = q && q.cell;
+    if (c && c.template === 'pv-times' && c.payload) return pvTimesTwin(q, categoryId);
     if (!c || c.template !== 'pv' || !c.payload || typeof c.payload !== 'object') return null;
     if (typeof document === 'undefined') return null;
     const p = c.payload;

@@ -5025,6 +5025,10 @@
      "opts": {
       "currency": "usd"
      }
+    },
+    {
+     "key": "algebra:two_step_mult_div_first",
+     "why": "the next two-step story: a × or ÷ step, then a + or − step (3.OA.D.8)"
     }
    ],
    "note": ""
