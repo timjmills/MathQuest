@@ -630,8 +630,11 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             };
             try {
                 const rs = await W.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });
-                if (!MARK[value].test(rs.pupilHtml)) fail('print', `ansBox ${value}: the pupil page draws no ${value} answer place`);
-                if (!MARK[value].test(rs.keyHtml)) fail('print', `ansBox ${value}: the key draws no ${value} answer place`);
+                // the key's ink tags (key-short.js tagKeyAnswers: data-ws-key-ans / -mark / -add / -fill) and the
+                // slot tag print-sheet.js adds to a legacy answer place (data-ws-slot) are read past
+                const untag = (h) => String(h || '').replace(/ data-ws-key-(?:ans|mark|add|fill)(?:="[^"]*")?| data-ws-slot="[^"]*"/g, '');
+                if (!MARK[value].test(untag(rs.pupilHtml))) fail('print', `ansBox ${value}: the pupil page draws no ${value} answer place`);
+                if (!MARK[value].test(untag(rs.keyHtml))) fail('print', `ansBox ${value}: the key draws no ${value} answer place`);
                 const keyText = plain(rs.keyHtml).replace(/(\d),(?=\d{3}\b)/g, '$1').replace(/\s+/g, '');
                 const miss = rs.items.filter(i => /^\d+$/.test(String(i.ans)) && !keyText.includes(String(i.ans)));
                 if (miss.length) fail('print', `ansBox ${value}: ${miss.length} answer(s) not written on the key (e.g. ${miss[0].ans})`);

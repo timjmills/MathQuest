@@ -400,6 +400,10 @@ register('stack', {
         // apply (critic B r5 D4: given digits never wear the answer-box shape).
         const ansBox = p.unknown ? null : p.ansBox === 'one' || p.ansBox === 'off' ? p.ansBox : 'digit';
         let answer = p.answer || (level >= 2 ? 'boxes' : 'open');
+        // a generator's own per-digit default (`answer: 'boxes'`, the column ruling) is the automatic
+        // style: the teacher's 'one' / 'off' replaces it at the independent levels (a Guided cell's
+        // boxes, level 2+, and a worked item's traced boxes stay scaffolds)
+        if (p.answer === 'boxes' && (ansBox === 'one' || ansBox === 'off') && level < 2 && !p.traceAns) answer = 'open';
         let boxInk = null;
         if (ansBox === 'digit') {
             if (answer === 'open') answer = 'boxes';
