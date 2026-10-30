@@ -932,7 +932,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
 
     /* ==================================================== critic r3 m4 / m5 / m6 / m7 */
     {
-      await page.goto(`${base}/index.html#wrm/2/D1/1`, { waitUntil: 'networkidle2', timeout: 60000 });
+      await page.goto(`${base}/index.html${links.lessonHash(links.lessonByKey('2:D1:1'))}`, { waitUntil: 'networkidle2', timeout: 60000 });
       await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'm4 wrm');
       const wtxt = await page.$eval('[data-screen="wrm"].is-active', (e) => e.innerText);
       const wcode = /\bW\d\d\b/.exec(wtxt);
@@ -1057,7 +1057,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
       const tid = await page.$eval('[data-screen="map"].is-active [data-mk-task]:not(.is-gap)', (b) => b.dataset.mkTask);
       await toastCase(`#map/tasks/npv/all/${tid}`, '#tvmkDetail .tvw-head', '820 MAP task');
     });
-    await step('toast 820 White Rose lesson', () => toastCase('#wrm/2/D1/1', '[data-screen="wrm"].is-active .tvw-head', '820 White Rose lesson'));
+    await step('toast 820 White Rose lesson', () => toastCase(links.lessonHash(links.lessonByKey('2:D1:1')), '[data-screen="wrm"].is-active .tvw-head', '820 White Rose lesson'));
 
     /* ==================================================== critic r4: B8 m8 m9 N17 N20 N22, and the rendered-text sweep */
     await step('r4 checks', async () => {
@@ -1070,7 +1070,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         check(vt === 'partial', `B8: ${partLesson.key} shows verdict ${vt}, the file says partial`);
       }
       // m8: a toast never follows the teacher to the next screen
-      await page.goto(`${base}/index.html#wrm/2/D1/1`, { waitUntil: 'networkidle2', timeout: 60000 });
+      await page.goto(`${base}/index.html${links.lessonHash(links.lessonByKey('2:D1:1'))}`, { waitUntil: 'networkidle2', timeout: 60000 });
       await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, 'm8 wrm');
       await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.resolve(); });
       await tickAll();
@@ -1279,7 +1279,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         });
       }
       await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
-      await freshLoad('#wrm/2/D1/2', '[data-screen="wrm"].is-active .tvw-head');   // back on the White Rose screen for the phone checks
+      await freshLoad(links.lessonHash(links.lessonByKey('2:D1:2')), '[data-screen="wrm"].is-active .tvw-head');   // back on the White Rose screen for the phone checks
     }
 
     /* ==================================================== owner 2026-10-17: the list beside the panel (1280, 1024), deep links */
@@ -1300,11 +1300,17 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         await navCheck('3', `nav Grade 3 @${w}`);
         await fit(`${w} Grade 3 list`);
         if (w === 1280) await shotNav('1280-list-grade3');
-        // an old D-number bookmark (#wrm/<grade>/<unit>/<n>) opens its lesson, beside the list
-        const l = links.lessonByKey('3:D1:3');
-        await freshLoad('#wrm/3/D1/3', '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
-        const t = await page.evaluate(() => ({ title: document.querySelector('#tvwDetail .tvw-title').textContent, n: document.querySelector('#tvwDetail .tvw-title-n').textContent, cur: (document.querySelector('.tvw-nrow[aria-current="true"]') || {}).dataset?.wLesson }));
-        check(t.title.includes(l.title) && t.cur === l.key && t.n === `Lesson ${links.gradeSections('3')[0].lessons.indexOf(l) + 1}`, `old link #wrm/3/D1/3 @${w}: ${JSON.stringify(t)}`);
+        // W1 (critic 2026-10-30): an old numbered bookmark (#wrm/<grade>/<unit>/<n>, made before the 2026-10-17 reorder)
+        // opens the lesson it was MADE for, beside the list, says so, offers the lesson that number holds today, and the
+        // address becomes the lesson's stable slug link
+        const old = links.resolveLessonHash('#wrm/3/D1/16');
+        const l = old.lesson;
+        await freshLoad('#wrm/3/D1/16', '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
+        const t = await page.evaluate(() => ({ title: document.querySelector('#tvwDetail .tvw-title').textContent, n: document.querySelector('#tvwDetail .tvw-title-n').textContent, cur: (document.querySelector('.tvw-nrow[aria-current="true"]') || {}).dataset?.wLesson,
+          note: (document.querySelector('#tvwDetail .tvw-legacy-note') || {}).innerText || '', alt: (document.querySelector('#tvwDetail .tvw-legacy-note a') || {}).textContent || '', hash: location.hash }));
+        const secOf = links.gradeSections('3').find((s) => s.lessons.includes(l));
+        check(l && l.title === 'Patterns on the multiplication table' && t.title.includes(l.title) && t.cur === l.key && t.n === `Lesson ${secOf.lessons.indexOf(l) + 1}`, `old link #wrm/3/D1/16 @${w}: ${JSON.stringify(t)}`);
+        check(/made before the lesson list was reordered/.test(t.note) && t.alt === old.legacy.alt.title && t.hash === links.lessonHash(l) && !/\/\d+$/.test(t.hash), `old link #wrm/3/D1/16 @${w}: notice / slug ${JSON.stringify(t)}`);
         await besideCheck(`${w} lesson`);
         await fit(`${w} lesson beside the list`);
         await clearOfBar(`${w} lesson beside the list`);
@@ -1329,9 +1335,14 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         const r = await page.evaluate((sec) => { const l = document.querySelector('#tvwLessons').getBoundingClientRect(); const s = document.querySelector(`#tvwSecH-${sec}`); const q = s && s.getBoundingClientRect(); return { hash: location.hash, top: !!q && q.top >= l.top - 1 && q.top < l.top + 80, empty: !!document.querySelector('#tvwDetail .tvw-empty') }; }, sec);
         check(r.top && r.empty, `deep link ${h}: section ${sec} at the top of the list ${JSON.stringify(r)}`);
       }
-      // a link from before the site order (#wrm/<grade>/E/<n>: the workbook's enrichment unit is gone) opens the grade's list
-      await freshLoad('#wrm/3/E/1');
-      check(await page.evaluate(() => !!document.querySelector('#tvwDetail .tvw-empty') && /^#wrm\/3$/.test(location.hash)), `old enrichment link #wrm/3/E/1 does not fall back to the Grade 3 list (${await hash()})`);
+      // a link from before the site order (#wrm/<grade>/E/<n>: the workbook's enrichment unit is gone) opens the lesson
+      // it was made for (W1), wherever the site lists it now; a numbered link to a lesson no longer listed opens the list
+      const e1 = links.resolveLessonHash('#wrm/3/E/1').lesson;
+      await freshLoad('#wrm/3/E/1', '[data-screen="wrm"].is-active #tvwDetail .tvw-head');
+      check(await page.evaluate((h) => location.hash === h && !!document.querySelector('#tvwDetail .tvw-legacy-note'), links.lessonHash(e1)), `old enrichment link #wrm/3/E/1 does not open "${e1 && e1.title}" (${await hash()})`);
+      const goneKey = Object.entries(require(path.join(ROOT, 'data/curriculum/wrm-legacy-hashes.json')).hashes).find(([k, v]) => !v[1] && k.startsWith('3/'));
+      await freshLoad(`#wrm/${goneKey[0]}`);
+      check(await page.evaluate(() => !!document.querySelector('#tvwDetail .tvw-empty') && /^#wrm\/3(\/|$)/.test(location.hash)), `a link to a lesson no longer listed (#wrm/${goneKey[0]}) does not fall back to the Grade 3 list (${await hash()})`);
       // the grade is remembered per viewer: a plain #wrm opens the last grade chosen
       await page.click('[data-w-grade="4"]');
       await sleep(200);
@@ -1348,7 +1359,7 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
         wide: [...document.querySelectorAll('#teacherMain .tv-screen.is-active *')].filter((n) => n.getBoundingClientRect().right > innerWidth + 1 && !n.closest('.tvp-frame, [hidden]') && getComputedStyle(n).position !== 'fixed').slice(0, 3).map((n) => `${n.tagName}.${n.className}`.slice(0, 50)) }));
       check(r.sw <= r.w, `390 ${tag}: page scrolls sideways (${r.sw} > ${r.w}) ${r.wide.join(', ')}`);
     };
-    await page.goto(`${base}/index.html#wrm/2/D1/2`, { waitUntil: 'networkidle2', timeout: 60000 });
+    await page.goto(`${base}/index.html${links.lessonHash(links.lessonByKey('2:D1:2'))}`, { waitUntil: 'networkidle2', timeout: 60000 });
     await waitFor(page, () => !!document.querySelector('[data-screen="wrm"].is-active .tvw-head'), 20000, '390 wrm');
     await sleep(300);
     await side('White Rose lesson');

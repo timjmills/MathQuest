@@ -116,6 +116,27 @@ export function laneFor(skillKey) {
     return CATEGORY_LANE[skillKey.split(':')[0]] || 'algebra';
 }
 
+/* ================================================================ merged entries */
+// W3 (WRM page critic 2026-10-30): two ids for ONE piece of planned work. The second id (left) is read as the first
+// (right) everywhere an entry id is read: the Skills to be made queue, a lesson's build list, the lesson cards. The
+// year files keep the old id as written; ws-wrm-page-unit's near-duplicate check fails on a new unmerged pair.
+export const ENTRY_ALIASES = {
+    frac_compare_same_part: 'compare_numerator',   // same option on fractions:compare, same 3.NF.A.3d clause
+    compare_kind: 'compare_numerator',             // Y3's "unit / same denominator / same numerator" kind: the same option
+    roman_numerals: 'roman_100',                   // Y4/Y5's id for the one new placevalue:roman_numerals skill (bands as options)
+};
+/** The id an entry is listed under (its own, or the id it was merged into). */
+export const canonicalEntry = (id) => ENTRY_ALIASES[id] || id;
+/**
+ * Pairs the near-duplicate check may list as different work (same host skill and code, a different task), each
+ * with the reason. 'a|b' with a < b.
+ */
+export const DISTINCT_ENTRIES = {
+    'compare_numerator|frac_same_whole': 'same-numerator or same-denominator pairs vs. judging whether two fractions of different wholes can be compared',
+    'dec_context|mult_dec_dec': 'word problems that multiply or divide decimals vs. the calculation decimal × decimal',
+    'frac_add_multi|within_whole':'three or more addends and "from a whole" vs. sums and differences that stay within one whole',
+};
+
 /* ================================================================ extensions of WRM proposals */
 // Where a standards clause is built by a WRM proposal that does not yet reach all of it, the extra
 // scope goes on that proposal (one entry on the build list, not two). `adds` is the scope; the codes
