@@ -362,6 +362,10 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-10-23 SU-C pilot preset (2-digit − 1-digit, no regrouping). Pinned at Y6, the first free code after
     // Y5, NOT the auto assigner's VH (a dropped draft keeps VH unused). APPEND ONLY. ----
     "subtraction:sub_2d_1d": "Y6",
+    // ---- 2026-10-30 detailed lesson 7 presets (3.OA.D.8, two-step stories). Pinned at ZA-ZE, an unused range, NOT the
+    // auto assigner's VH (a dropped draft) and not Y7-Y9 (left to the parallel lesson-6 lane). APPEND ONLY. ----
+    "algebra:two_step_mult_div_first": "ZA", "algebra:two_step_add_then_mult": "ZB", "algebra:two_step_add_then_div": "ZC",
+    "algebra:two_step_letter_equation": "ZD", "algebra:two_step_estimate_check": "ZE",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

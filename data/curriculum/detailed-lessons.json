@@ -394,6 +394,284 @@
    "rulings": [
     "x rules x2, x3, x5, x10 (x10 alone ran out of fresh pairs; P0 has a x3 band)"
    ]
+  },
+  {
+   "id": "g3-oa8-two-step-wp",
+   "order": 7,
+   "grade": "3",
+   "level": 3,
+   "title": "I Can solve two-step stories",
+   "ownerTitle": "Two-step word problems with the four operations",
+   "siteLessonId": "G3|-|twostepwordproblemswiththefouroperations",
+   "wrmYear": "Y4",
+   "wrmBlock": "Y4.B4",
+   "wrmSteps": [],
+   "wrmNear": [
+    "Y2.B4.S10",
+    "Y4.B10.S5"
+   ],
+   "ccss": [
+    "3.OA.D.8"
+   ],
+   "ee": [
+    "M.EE.3.OA.7"
+   ],
+   "eeOwnerList": [
+    "M.EE.3.OA.8"
+   ],
+   "eeNote": "Sheet code M.EE.3.OA.8 quotes the M.EE.3.OA.7 text; the repo tag is M.EE.3.OA.7.",
+   "flow": "Chunked (a: × first, then + or −; b: ÷ first, then + or −)",
+   "skills": {
+    "used": [
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "msOps": "mult"
+      },
+      "role": "main chunk a: P2, P3, P4-1, P5, Check Question (preset algebra:two_step_mult_div_first)"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "msOps": "div"
+      },
+      "role": "main chunk b: P2b, P3b, P4-2 (preset algebra:two_step_mult_div_first)"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "msOps": "mult",
+       "wpFrames": true
+      },
+      "role": "P6 exit 1"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "msOps": "div",
+       "wpFrames": true
+      },
+      "role": "P6 exit 2"
+     },
+     {
+      "key": "multiplication:mult_word_problems_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "forms": [
+        0
+       ],
+       "wpFrames": true
+      },
+      "role": "P0 1"
+     },
+     {
+      "key": "division:div_word_problems_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "forms": [
+        0
+       ],
+       "wpFrames": true
+      },
+      "role": "P0 2-3"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "forms": [
+        0
+       ],
+       "band": 30,
+       "wpFrames": true
+      },
+      "role": "P0 4"
+     },
+     {
+      "key": "placevalue:more_less_10",
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:more_less_100",
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:compare",
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:unit_form",
+      "role": "P1"
+     },
+     {
+      "key": "multiplication:mult_facts",
+      "opts": {
+       "constant": [
+        3,
+        4
+       ],
+       "notation": [
+        "across"
+       ],
+       "band": 100
+      },
+      "role": "retrieval (Section 3)"
+     },
+     {
+      "key": "division:div_facts",
+      "opts": {
+       "constant": [
+        3,
+        4
+       ],
+       "notation": [
+        "across"
+       ]
+      },
+      "role": "retrieval (Section 3)"
+     },
+     {
+      "key": "subtraction:sub_facts",
+      "opts": {
+       "band": 100,
+       "notation": [
+        "across"
+       ]
+      },
+      "role": "retrieval (Section 3)"
+     }
+    ],
+    "coverage": [
+     {
+      "clause": "3.OA.D.8: two-step word problems using the four operations (× or ÷ step, then + or −)",
+      "skill": "algebra:two_step_mult_div_first",
+      "opts": {
+       "msOps": "multdiv"
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "3.OA.D.8: two-step problems whose + or − step comes first (brackets)",
+      "skill": "algebra:two_step_add_then_mult / algebra:two_step_add_then_div",
+      "opts": {
+       "msOps": "addmult | adddiv"
+      },
+      "verdict": "elsewhere: follow-on lesson (presets two_step_add_then_mult, two_step_add_then_div)"
+     },
+     {
+      "clause": "3.OA.D.8: represent the problem using an equation with a letter for the unknown",
+      "skill": "algebra:two_step_letter_equation",
+      "opts": {
+       "msOps": "multdiv",
+       "msLetter": true
+      },
+      "verdict": "elsewhere: follow-on lesson (preset two_step_letter_equation)"
+     },
+     {
+      "clause": "3.OA.D.8: assess the reasonableness of answers using mental computation and estimation strategies including rounding",
+      "skill": "algebra:two_step_estimate_check",
+      "opts": {
+       "msCheck": true
+      },
+      "verdict": "elsewhere: follow-on lesson (preset two_step_estimate_check)"
+     },
+     {
+      "clause": "atom 1: × facts to 10 × 10",
+      "skill": "multiplication:mult_facts",
+      "opts": {
+       "constant": [
+        3,
+        4
+       ]
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "atom 2: equal groups: multiply",
+      "skill": "multiplication:mult_word_problems_plain",
+      "opts": {
+       "forms": [
+        0
+       ],
+       "wpFrames": true
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "atom 3: share equally: divide",
+      "skill": "division:div_word_problems_plain",
+      "opts": {
+       "forms": [
+        0
+       ],
+       "wpFrames": true
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "atom 4: two steps with + and −",
+      "skill": "algebra:multi_step_word_plain",
+      "opts": {
+       "forms": [
+        0
+       ],
+       "band": 30,
+       "wpFrames": true
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "atoms 5-8: \"each\" names Step 1; the Step 1 answer is a Step 2 number (Critical Atom); two steps or one; gives away − / gets more +",
+      "skill": "algebra:two_step_mult_div_first",
+      "opts": {
+       "msOps": "multdiv"
+      },
+      "verdict": "full"
+     }
+    ],
+    "built": [
+     "algebra:multi_step_word(_plain) options msOps (4P: mult / div / multdiv / addmult / adddiv), msLetter (4R), msCheck (4S); every word-work skill wpFrames (4Q); kit two-step grammar, frames layout and its screen twin; provider two-step steps and wrong answers",
+     "presets algebra:two_step_mult_div_first, two_step_add_then_mult, two_step_add_then_div, two_step_letter_equation, two_step_estimate_check (codes ZA-ZE)"
+    ],
+    "proposed": []
+   },
+   "followOn": [
+    "two_step_add_then_mult / two_step_add_then_div (brackets)",
+    "two_step_letter_equation",
+    "two_step_estimate_check"
+   ],
+   "rulings": [
+    "wpFrames is a scaffold fade (an option only, no preset); msOps mult / div are the two chunks of one lesson (options; the preset is multdiv)"
+   ],
+   "critic": {
+    "verdict": "pending",
+    "round": 0
+   },
+   "status": "built, awaiting critic r1",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g3-oa8-two-step-wp/",
+    "pdf": "design/lesson-samples/detailed/g3-oa8-two-step-wp/pack.pdf",
+    "html": "design/lesson-samples/detailed/g3-oa8-two-step-wp/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g3-oa8-two-step-wp/SELF-CHECK.md"
+   }
   }
  ]
 }

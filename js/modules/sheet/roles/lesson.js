@@ -605,12 +605,15 @@ export function pickWeDo(items, example, data, n) {
         // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
         // (lesson 2 r5, critic r3 m3: no story person twice on the sheet while the deal can - "Lena has 7 cards" and "Lena has 6")
         const people = (x) => { const ls = (x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.lines) || []; return ls.slice(0, -1).map((l) => (String(l).match(/^([A-Z][a-z]+)\b/) || [])[1]).filter(Boolean); };
-        const meets = (x, y, nm) => twin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        // (lesson 7 r2: two two-step stories never share a Step 1 number or a Step 1 answer - "30 shared by 6", "30 shared by 5")
+        const ms1 = (x) => { const s = x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.steps; return Array.isArray(s) && s.length === 2 && s[0] ? [s[0].a, s[0].b, s[0].ans] : null; };
+        const msTwin = (x, y) => { const a = ms1(x), b = ms1(y); return !!a && !!b && (a[0] === b[0] || a[2] === b[2] || (a[0] === b[1] && a[1] === b[0])); };
+        const meets = (x, y, nm) => twin(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
         const pickLead = (k, chosen, nm) => {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
             if (!t) return pickLead(k + 1, chosen, nm);
-            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !msTwin(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
             return null;
         };
         const fit = pickLead(0, [], true) || pickLead(0, [], false);

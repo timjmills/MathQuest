@@ -4399,7 +4399,8 @@ async function buildDetailedLesson(req = {}) {
     ];
     for (const { ch } of chunkRes) {
         glance.push({ page: `P3${ch.id} Guided`, answers: V[ch.id].we.map((x) => x.ans).join(' · '), fade: '★' });
-        glance.push({ page: `P3${ch.id} Independent`, answers: V[ch.id].indep.map((x) => x.ans).join(' · '), fade: '★★' });
+        // (lesson 7 r2: no row for a chunk sheet with no Independent cells, as P3 above)
+        if (V[ch.id].indep.length) glance.push({ page: `P3${ch.id} Independent`, answers: V[ch.id].indep.map((x) => x.ans).join(' · '), fade: '★★' });
     }
     let pNo = 0;
     for (const pl of partPlan('practice')) {
@@ -4416,7 +4417,8 @@ async function buildDetailedLesson(req = {}) {
     // (the story's own answer first when the frame totals something else - lesson 3a r4, critic r2 m7)
     // (a table word problem - lesson 5 r4, critic r2 D7: its answer is the rule only; no equation is asked)
     glance.push({ page: 'P5 Word problem', answers: d.wordProblem.tableItem ? String(wpV.ans) : eqN !== wpV.ans ? `${wpV.ans} · ${wpV.eq}` : wpV.eq, fade: DL_FADE.P5 });
-    glance.push({ page: 'P6 Exit slip', answers: exVars.map((x, i) => `${'abcd'[i]}. ${x.ans}`).join(' · '), fade: DL_FADE.P6 });
+    // (CL-11a: the exit items are number tabs, so the glance quotes 1. 2., never a. b. - lesson 7 r2)
+    glance.push({ page: 'P6 Exit slip', answers: exVars.map((x, i) => `${i + 1}. ${x.ans}`).join(' · '), fade: DL_FADE.P6 });
     const prereqAtoms = d.atoms.filter((x) => x.prereq);
     const routing = d.prerequisites.map((p, i) => {
         const a = prereqAtoms[Math.max(0, p.atom - 1)] || d.atoms[0];
