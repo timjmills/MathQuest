@@ -2310,7 +2310,10 @@ function _intLineKit(q, a, b, op) {
     q.nlMax = max;
 }
 
-const _KIT_FACT_SKILLS = new Set(['add_facts', 'mult_facts', 'div_facts', 'add', 'subtract', 'mixed_mult_div', 'add_sub_10s', 'add_sub_100s', 'multiply']);
+// sub_facts joined 2026-10-30 (Lane D restart, logged H13 "sub_facts independent S 48 %"): it was
+// the one fact drill left out of the P8c migration, so every page but Fact rows printed its legacy
+// cell, measured at 40.8 mm and stretched to 57 mm rows at S.
+const _KIT_FACT_SKILLS = new Set(['add_facts', 'sub_facts', 'mult_facts', 'div_facts', 'add', 'subtract', 'mixed_mult_div', 'add_sub_10s', 'add_sub_100s', 'multiply']);
 // Adding and subtracting tens / hundreds ("60 + 10 = [ ]") are mental facts read across, whatever
 // their digits: the kit's horizontal fact, never a column (lint AK-4 on the legacy cell, 2026-09-26).
 const _KIT_ACROSS_SKILLS = new Set(['add_sub_10s', 'add_sub_100s']);

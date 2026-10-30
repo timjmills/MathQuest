@@ -76,6 +76,14 @@ const unknownValue = (p) => {
 const ACROSS_OP_EM = 0.8;
 const ACROSS_GAP_EM = 0.18;
 /**
+ * The fraction fact on a fact-rows page (owner ruling 2026-10-30): the bar's side pad, the gap
+ * before "=" and the "=" track (em). The "=" glyph's ink is 0.48 em, so a 0.62 em track keeps it
+ * whole; the fraction 144 over 12 with its "=" is then 2.66 em of ink, 15.0 mm at 16 pt.
+ */
+export const FRAC_ROW_PAD_EM = 0.1;
+export const FRAC_ROW_GAP_EM = 0.15;
+export const FRAC_ROW_EQ_EM = 0.62;
+/**
  * Width (mm) of a division fact across with its answer line beside it, for the band's WIDEST
  * fact (a dividend one digit longer than the answer band, a divisor as long as it: 144 ÷ 12),
  * so every fact of one page takes the same form.
@@ -130,6 +138,22 @@ register('equation', {
             const A = u === 'a' ? slotHtml : `<span>${esc(p.a)}</span>`;
             const B = u === 'b' ? slotHtml : `<span>${esc(p.b)}</span>`;
             const R = u === 'result' ? slotHtml : `<span>${esc(result)}</span>`;
+            if (p.notation === 'fraction' && p.fact && u === 'result' && ctx.mode !== 'screen' && ctx.metrics && Number(ctx.metrics.factRowLineMm) > 0) {
+                // A fact-rows page of 5 to 10 columns (owner ruling 2026-10-30: the fraction reaches 10
+                // columns): the vertical-fact grammar - the fraction and its "=" on top, the answer line
+                // under them, centred, in the column's width (DN-22's "answer stacked below"). The bar's
+                // side pad and the "=" track are tightened (FRAC_ROW_*); the line is the band's blank
+                // width, capped at the column's room (`factRowLineMm`), the same on every item (L3).
+                const lineMm = Number(ctx.metrics.factRowLineMm);
+                const slot = slotHtml.replace(/--w:[\d.]+mm/, `--w:${lineMm.toFixed(1)}mm`);
+                // CL-40: the numerator's ink clears the number tab's keep-out (tab side + 1 mm) below the
+                // cell's 3 mm pad - the digit's line box starts 0.2 em above its ink, plus 0.3 mm.
+                return `<div class="ws-eq ws-eq-below" data-ws-notation="fraction" data-ws-fracrow="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em;margin-top:max(0mm, calc(var(--ws-tab, 5mm) - 1.7mm - 0.2em))">`
+                    + `<span style="display:flex;align-items:center;gap:${FRAC_ROW_GAP_EM}em;white-space:nowrap">`
+                    + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
+                    + `<span style="border-bottom:1.5pt solid #000;padding:0 ${FRAC_ROW_PAD_EM}em;">${A}</span><span style="padding:0 ${FRAC_ROW_PAD_EM}em;">${B}</span></span>`
+                    + `<span class="o" style="width:${FRAC_ROW_EQ_EM}em">=</span></span>${slot}</div>`;
+            }
             const body = p.notation === 'fraction'
                 // D3 (critic R1): the fraction bar is a Heavy stroke (1.5 pt, stroke table), and "=" and the
                 // answer line sit on the bar's axis (align-items:center below), on paper as on screen.

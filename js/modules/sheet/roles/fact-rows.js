@@ -7,12 +7,20 @@
 //   Cell       every item redrawn by the FACT template (critic round 2: the page used to be the
 //              Independent grid with tabs - 4 columns, or 2 x 3 for division): vertical facts at
 //              the ladder's point size, stepped down when the widest fact would not fit its column
-//              (VA-2's operator track included); division facts ACROSS, "24 ÷ 6 = ___"
-//              (PT-FRW-6/7), 3 columns (2 when 3 do not fit) in 16 / 20 / 24 mm rows
+//              (VA-2's operator track included). Division facts (owner ruling 2026-10-30: ÷ facts
+//              reach the full 10 columns in all three notations) take the vertical-fact grammar
+//              in the column's own width: the ÷ sign STACKED like + - x (div_facts Standard and
+//              Vertical), the fraction with its "=" over the answer line, the long-division
+//              bracket on narrow tracks with the quotient above (`formRows`, PT-FRW-6/7). A ÷
+//              fact of another skill whose notation is across still prints across, 3 columns
+//              (2 when 3 do not fit) in 16 / 20 / 24 mm rows
 //   Columns    Auto 10 / 6 / 5 (S / M / L, PT-FRW-2); columns drive the digit size along the
 //              fact ladder (PT-FRW-1)
 //   Rows       floor((G - 1) / h) with h from table 4.1 (`factRowsCapacity`), stretch cap 1.3;
-//              answers over 99 clamp to 8 columns (PT-FRW-5). The page is filled to the table.
+//              answers over 99 clamp to 8 columns (PT-FRW-5; a ÷ fact's answer never passes 12,
+//              so division keeps 10). The page is filled to the table. Every ÷ form passes the
+//              real-fit gate - drawn ink + 1 mm of white each side (FIT_CLEAR_MM) - at the
+//              column's ladder digit, never below the Size S fact digit (16 pt).
 //   Who        two numbers and one sign per cell: a sum of three or four addends is refused
 //   Look       Daily by default (PAGE_TYPES appendix 4): hairline interiors, black number tabs
 //              ("every fact numbered", PT-FRW-4); tab "Facts"; title the fact stub (HD-13)
@@ -26,8 +34,10 @@ import {
 import { factRowsCapacity, gridHeightMm, cellWidthMm, SAFETY_H_MM } from '../layout.js';
 import {
     renderCell, cellAnswerKey, factDigitPt, factPadTop, EM_MM, FACT_TRACK_EM, FACT_OP_TRACK_EM, blankWidth,
-    metricsFor, SIZES, markWriteAbove, needsRegroup,
+    metricsFor, SIZES, markWriteAbove, needsRegroup, factOpTrackEm, SLOT,
 } from '../index.js';
+import { FRAC_ROW_PAD_EM, FRAC_ROW_GAP_EM, FRAC_ROW_EQ_EM } from '../cells/equation.js';
+import { DIGIT_ADV_EM, bracketLeadEm } from '../cells/long-division.js';
 
 export const ROLE_ID = 'fact-rows';
 export const DEFAULT_LOOK = 'daily';
@@ -129,11 +139,12 @@ const ACROSS_ROW = { S: 18, M: 21, L: 24 };      // PT-FPR's horizontal row, 16 
  */
 const FACT_ROW_TRACK_EM = 1;
 
-/** A division fact prints ACROSS ("24 ÷ 6 = ___", PT-FRW-6/7): vertical division is not a fact form. */
-// A division fact the teacher asked for Vertical (div_facts `divForm`) is stacked in the vertical
-// rows (up to 10 columns), like + - x; every other division fact prints across.
-// Long division and Fraction (and Mix, which deals them with Standard) are drawn in their own
-// forms too (critic R1 D5; PT-FRW-5/6): see `formRows` below.
+/**
+ * A division fact of a skill that is not div_facts prints ACROSS ("24 ÷ 6 = ___") when its
+ * notation is across. div_facts' own forms (`divForm`) never do on fact rows (owner ruling
+ * 2026-10-30): Standard and Vertical are the stacked ÷ fact in the vertical rows, Long division
+ * and Fraction (and Mix, which deals them with Standard) their fact-rows drawings (`formRows`).
+ */
 const notationOfItem = (it) => String((((it.q || {}).cell || {}).payload || {}).notation || '');
 const isAcross = (items) => items.some((it) => (opOf(it.q || {}) === 'divide' && notationOfItem(it) !== 'vertical')
     || /horiz/.test(notationOfItem(it)));
@@ -190,41 +201,143 @@ function formHeightMm(forms, pt, size, cols) {
 }
 const factCellHMmSafe = (cols, size) => { try { return factRowsCapacity(cols, size).cellH * 0.8; } catch (e) { return 0; } };
 
+/* ---------------------------------- ÷ facts at 5 to 10 columns (owner ruling 2026-10-30) */
+//
+// The owner's ruling (2026-10-30): a page of division facts reaches the full 10 columns of the
+// fact rows in ALL THREE notations - the ÷ sign, the fraction and the long-division bracket - at
+// Size S Auto and whenever the teacher picks 10 columns, at any size. Each form takes the
+// vertical-fact grammar (the problem on top, the answer under it or, for the bracket, above it,
+// in the column's own width), at the column's ladder digit (PT-FRW-1), never below the Size S fact
+// digit (16 pt), and passes the real-fit gate: drawn ink + 1 mm of white each side (FIT_CLEAR_MM).
+//
+//   ÷ sign     stacked like + - x: dividend, "÷ divisor" under it, the rule, the answer row; a 3-digit
+//              dividend over a shorter divisor takes the 0.62 em ÷ track (cells/fact.js
+//              FACT_DIV_OP_TRACK_TIGHT_EM): (0.62 + 3 x 0.72) em = 15.7 mm at 16 pt in an 18.0 mm cell
+//   fraction   the dividend over the divisor on a 1.5 pt bar, "=" beside the bar, the answer line under
+//              them, centred (cells/equation.js FRAC_ROW_*): 144 over 12 is 15.0 mm of ink at 16 pt
+//   bracket    the divisor, a narrow arc and the vinculum over the dividend, the quotient written above:
+//              digit tracks from a ladder of 1.0 down to 0.54 em and a gutter of 0.6 track less 0.15 em
+//              (BRACKET_TRACKS, bracketGutterEm), the largest that fits: "12 ) 144" is 15.8 mm of ink
+//              at 16 pt (0.54 em tracks, 0.17 em gutter)
+//
+// Columns are never dropped while a form fits the column at its rung; Mix draws every form at one
+// rung in one cell height, one third of each.
+
+/** Size S's fact digit: the floor of a ÷ fact on a fact-rows page (owner ruling 2026-10-30). */
+const FLOOR_PT = SIZES.S.digitPt;
+/** The bracket's digit track (em) on a fact-rows page: the largest of these that fits the column. */
+const BRACKET_TRACKS = [1, 0.9, 0.8, 0.72, 0.64, 0.58, 0.55, 0.54];
+/** The bracket's gutter (em) for a digit track of `t` em: 0.6 track less 0.15, between 0.17 and 0.45. */
+export const bracketGutterEm = (t) => Math.min(0.45, Math.max(0.17, 0.6 * t - 0.15));
 /**
- * The page for a section of bracket / fraction division facts (or Mix): every fact in its own
- * form, one uniform cell. Columns from the Auto count down, clamped at 8 for bracket facts and 6
- * for a 3-digit dividend (PT-FRW-5); the ladder's point size for the column count, stepped down
- * (never below 16 pt) only when the widest fact would not fit; rows as the cell height allows.
- * Mix keeps one third of each form: its count is a multiple of 3 where the grid allows.
+ * The ink width (em) of a bracket fact drawn on tracks of `t` em with a gutter of `g` em: from the
+ * divisor's first digit's ink (a glyph centred on its track) to the vinculum's end, which is the
+ * end of the dividend's last track. The template centres this ink in the cell (bracketLeadEm).
+ */
+export function bracketInkEm(divisor, dividend, t, g) {
+    return (String(divisor).length + String(dividend).length) * t + g - bracketLeadEm(divisor, t);
+}
+/** The ink width (em) of a fraction fact: the bar over `digits` digits with its pads, the gap, "=". */
+const fractionInkEm = (digits) => digits * DIGIT_ADV_EM + 2 * FRAC_ROW_PAD_EM + FRAC_ROW_GAP_EM
+    + (FRAC_ROW_EQ_EM / 2 - DIGIT_ADV_EM / 2 + 0.53);
+/** The ink width (em) of a stacked ÷ fact of `n` tracks: the rule spans the operator and the digits. */
+const stackedInkEm = (n, b) => factOpTrackEm(n, b, '/') + n * FACT_TRACK_EM;
+
+/**
+ * The geometry of a division-forms row at `cols` columns and `pt` digits, or null when a form of
+ * the section does not fit its column with FIT_CLEAR_MM of white: the bracket's track and gutter
+ * (em), the fraction's answer line (mm), the widest ink (mm).
+ */
+export function rowGeometry(items, forms, cols, pt, size, look) {
+    const em = EM_MM[pt] || (pt / 72) * 25.4;
+    const { inner } = cellWidthMm(cols, LIVE_W_MM, look);
+    const room = inner - FIT_CLEAR_MM;
+    const n = tracksOf(items);
+    const ops = (f) => items.filter((it) => formOf(it) === f).map((it) => operandsOf(it.q || {}));
+    let ink = 0;
+    const out = { pt, cols, inner, tracks: n };
+    if (forms.has('standard') || forms.has('vertical')) {
+        const bMax = Math.max(1, ...items.map((it) => String(operandsOf(it.q || {})[1] || '').length));
+        const w = stackedInkEm(n, '9'.repeat(bMax)) * em;
+        if (w > room) return null;
+        ink = Math.max(ink, w);
+    }
+    if (forms.has('fraction')) {
+        const digits = Math.max(1, ...ops('fraction').map((o) => Math.max(String(o[0] || '').length, String(o[1] || '').length)));
+        const w = fractionInkEm(digits) * em;
+        if (w > room) return null;
+        ink = Math.max(ink, w);
+        const ansDigits = Math.max(2, ...items.map((it) => String(answerOf(it)).length));
+        // the band's blank width (SL-6), capped at the column's room so the line keeps 1 mm each side
+        out.lineMm = Math.floor(Math.min(blankWidth(ansDigits, size), room) * 10) / 10;
+    }
+    if (forms.has('long')) {
+        const os = ops('long');
+        const t = BRACKET_TRACKS.find((tt) => os.every((o) => bracketInkEm(o[1], o[0], tt, bracketGutterEm(tt)) * em <= room));
+        if (!t) return null;
+        out.trackEm = t;
+        out.gutterEm = bracketGutterEm(t);
+        ink = Math.max(ink, ...os.map((o) => bracketInkEm(o[1], o[0], t, out.gutterEm) * em));
+    }
+    out.inkMm = Math.round(ink * 100) / 100;
+    return out;
+}
+
+/** Height (mm) a row of these forms needs at the geometry's digit size: the tallest form's. */
+function rowFormHeightMm(forms, geo, size, labels, cols) {
+    const em = EM_MM[geo.pt] || (geo.pt / 72) * 25.4;
+    const sz = SIZES[size] || SIZES.L;
+    // the number tab's keep-out over a top cell (CL-40), as the + - x rows keep it
+    const padTop = Math.max(factPadTop(labels, cols), sz.tabMm + 1);
+    let h = 0;
+    // the stacked ÷: the + - x fact's own need (factRowsLayout)
+    if (forms.has('standard') || forms.has('vertical')) h = Math.max(h, padTop + 2.3 * em + 2.1 + Math.max(1.15 * em, sz.writeMm) + 2);
+    // the fraction: two digit lines over and under the 1.5 pt bar, the 0.12 em gap, the answer line
+    if (forms.has('fraction')) h = Math.max(h, padTop + 2.42 * em + 0.6 + sz.writeMm + 3);
+    // the bracket (write-above, centred down the cell, CL-4b): the quotient zone and the bracket row
+    if (forms.has('long')) h = Math.max(h, 2 + ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 1.33 * em + 2 + 2);
+    return Math.ceil(h * 10) / 10;
+}
+
+/**
+ * The page for a section of division facts in their written forms (div_facts `divForm`: a bracket
+ * or a fraction, alone or in Mix): Auto 10 / 6 / 5 columns (PT-FRW-2) or the teacher's count, at
+ * the column's ladder digit (PT-FRW-1), every form in its fact-rows drawing (above). Should a form
+ * not fit its column even at 16 pt, the page drops a column and says so. Rows: floor((G - 1) / h)
+ * with h the tallest form's need, stretch cap 1.3. Mix keeps one third of each form.
  */
 function formRows(items, input, ctx, G, labels, forms) {
-    let cols = input.columns && input.columns !== 'auto' ? Math.max(2, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
-    const notes = [];
-    if (forms.has('long')) {
-        const wide = items.some((it) => formOf(it) === 'long' && String(operandsOf(it.q || {})[0] || '').length >= 3);
-        const cap = wide ? 6 : 8;
-        if (cols > cap) { cols = cap; notes.push(`Bracket division: at most ${cap} columns (PT-FRW-5).`); }
-    }
-    let pt = 0;
-    // Mix (critic R2 D-C): every form at the Standard fact rows' rung (MIX_RUNG_PT), in the most
-    // columns at which the widest fact of each form fits at it - never a smaller rung to squeeze a
-    // fourth column in. A page whose facts do not fit the rung in 2 columns falls back below.
-    const mixPick = forms.size > 1 && !(input.columns && input.columns !== 'auto') ? pickMixRung(items, forms, ctx, Math.min(cols, 4)) : null;
-    if (mixPick) ({ cols, pt } = mixPick);
-    for (; !mixPick && cols >= 2; cols--) {
-        const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
-        pt = LADDER_PTS.filter((p) => p <= factDigitPt(cols)).find((p) => formWidthMm(items, forms, p, ctx.size) <= inner) || 0;
-        if (pt) break;
+    const asked = input.columns && input.columns !== 'auto' ? Math.max(2, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
+    let geo = null;
+    let cols = asked;
+    for (; cols >= 2; cols--) {
+        const rung = factDigitPt(Math.max(cols, 5));
+        for (const pt of [...new Set([rung, ...LADDER_PTS])].filter((p) => p <= rung && p >= FLOOR_PT).sort((a, b) => b - a)) {
+            geo = rowGeometry(items, forms, cols, pt, ctx.size, ctx.look);
+            if (geo) break;
+        }
+        if (geo) break;
     }
     cols = Math.max(2, cols);
-    pt = pt || 16;
-    const h = formHeightMm(forms, pt, ctx.size, cols) + (labels === 'tab' ? 2 : 0);
-    let rows = Math.max(1, Math.floor((G - SAFETY_H_MM) / h));
+    if (!geo) geo = { pt: FLOOR_PT, cols, tracks: tracksOf(items), trackEm: 0.54, gutterEm: 0.17, lineMm: 14 };
+    const pt = geo.pt;
+    const em = EM_MM[pt] || (pt / 72) * 25.4;
+    const notes = [];
+    if (cols < asked) notes.push(`Division facts: ${cols} columns so every fact fits its cell.`);
+    if (pt < factDigitPt(Math.max(cols, 5))) notes.push(`Digits ${pt} pt so every form fits ${cols} columns.`);
+    const h = rowFormHeightMm(forms, geo, ctx.size, labels, cols);
+    const rows = Math.max(1, Math.floor((G - SAFETY_H_MM) / h));
     let perPage = cols * rows;
     if (forms.size > 1) perPage -= perPage % 3;
-    const names = [...forms].map((f) => ({ long: 'bracket', fraction: 'fraction', standard: 'across', vertical: 'vertical' }[f] || f)).join(' + ');
+    const names = [...forms].map((f) => ({ long: 'bracket', fraction: 'fraction', standard: 'stacked ÷', vertical: 'stacked ÷' }[f] || f)).join(' + ');
     notes.unshift(`Division facts as written (${names}): ${cols} columns x ${rows} rows.`);
-    return { across: false, forms, cols, rows, perPage, cellH: Math.min(G / rows, h * 1.3), hMin: h, digitPt: pt, tracks: tracksOf(items), gridH: G, labels, note: notes.join(' ') };
+    const row = {
+        trackMm: geo.trackEm ? Math.round(geo.trackEm * em * 1000) / 1000 : 0,
+        gutterMm: geo.gutterEm ? Math.round(geo.gutterEm * em * 1000) / 1000 : 0,
+        lineMm: geo.lineMm || 0,
+        inkMm: geo.inkMm || 0,
+    };
+    return { across: false, forms, row, cols, rows, perPage, cellH: Math.min(G / rows, h * 1.3), hMin: h, digitPt: pt, tracks: geo.tracks || tracksOf(items), gridH: G, labels, note: notes.join(' ') };
 }
 
 /** The rung every form of a Mix page is drawn at: the Standard fact rows' across rung (20 pt). */
@@ -304,7 +417,11 @@ export function factRowsLayout(items, input) {
     const labels = labelStyleOf(ctx.look, input.labels);
     const forms = divForms(items);
     if (forms) return formRows(items, input, ctx, G, labels, forms);
-    if (isAcross(items)) {
+    // div_facts Standard ("12 ÷ 3 = __") and Vertical: on a fact-rows page both are the STACKED ÷
+    // fact (owner ruling 2026-10-30: the ÷ sign reaches 10 columns; the across sentence of a 3-digit
+    // dividend is 28 mm at 16 pt and cannot fit a 5-column cell at its rung, let alone 10).
+    const divStacked = items.length > 0 && items.every((it) => opOf(it.q || {}) === 'divide' && /^(standard|vertical)$/.test(formOf(it)));
+    if (isAcross(items) && !divStacked) {
         let cols = 3;
         let pt = 24;
         for (const c of [3, 2]) {
@@ -329,12 +446,16 @@ export function factRowsLayout(items, input) {
     // (PG-20: content never shrinks to fit).
     const askedCols = cols;
     const divide = items.some((it) => opOf(it.q || {}) === 'divide');
-    // The drawn width: a 3-track division fact's divisor is shorter than its dividend, so the
-    // operator takes the tight track (cells/fact.js factOpTrackEm): n + 1 tracks of 0.72 em, inside
-    // the cell's side pads (about 4 mm).
-    const tightDiv = divide && n >= 3;
-    const fitsAt = (c) => { const pt = factDigitPt(c); return (n + 1) * FACT_TRACK_EM * (EM_MM[pt] || (pt / 72) * 25.4) <= cellWidthMm(c, LIVE_W_MM, ctx.look).inner - 4.5; };
-    while (tightDiv && cols > 5 && !fitsAt(cols)) cols--;
+    // The drawn width of a stacked ÷ fact: the operator's track (0.62 em when a 3-digit dividend sits
+    // over a shorter divisor, cells/fact.js FACT_DIV_OP_TRACK_TIGHT_EM) and n tracks of 0.72 em, the
+    // rule under all of them. The real-fit gate (FIT_CLEAR_MM, 1 mm of white each side) at the
+    // column's own rung: it holds at 5, 6, 8 and 10 columns (owner ruling 2026-10-30: ÷ facts reach
+    // 10 columns), so the page keeps its columns and its digits (PG-20: content never shrinks).
+    const bMax = Math.max(1, ...items.map((it) => String(operandsOf(it.q || {})[1] || '').length));
+    const divInk = (c) => { const pt = factDigitPt(c); return stackedInkEm(n, '9'.repeat(bMax)) * (EM_MM[pt] || (pt / 72) * 25.4); };
+    const fitsAt = (c) => divInk(c) + FIT_CLEAR_MM <= cellWidthMm(c, LIVE_W_MM, ctx.look).inner;
+    const tightDiv = divide;
+    while (tightDiv && cols > 2 && !fitsAt(cols)) cols--;
     if (cols < askedCols) note = [note, `${n}-digit numbers: ${cols} columns so the digits keep their size.`].filter(Boolean).join(' ');
     // A long + - x fact (5-6 digits: sub_100k_regroup, sub_1m_regroup) that does not fit its cell
     // at the size's working digits drops columns until it does (PG-20: content never shrinks to
@@ -418,6 +539,20 @@ export const formCell = (it, L) => factCell(it, L);
 export const counts = (pools, input) => ({ main: factRowsLayout(pools.main || [], input).perPage });
 
 /**
+ * Does a stacked ÷ fact's first dividend digit fall under the number tab's keep-out (tab side +
+ * 1 mm, CL-40)? The fact is centred in its column: its first digit stands the operator's track
+ * (0.62 em beside a 3-digit dividend, cells/fact.js) plus its own side bearing (about 0.1 em) in
+ * from the fact's left edge.
+ */
+function divUnderTab(L) {
+    const em = EM_MM[L.digitPt] || (L.digitPt / 72) * 25.4;
+    const { inner } = cellWidthMm(L.cols, LIVE_W_MM, L.look || DEFAULT_LOOK);
+    const opEm = factOpTrackEm(L.tracks, '9'.repeat(Math.max(1, L.tracks - 1)), '/');
+    const firstX = (inner - (opEm + L.tracks * FACT_TRACK_EM) * em) / 2 + (opEm + 0.1) * em;
+    return firstX < ((SIZES[L.size] || SIZES.L).tabMm || 4) + 1 + 0.3;
+}
+
+/**
  * One item as a fact-row cell, drawn by the FACT template (VA-70): vertical at the page's point
  * size and track count, or across ("a ÷ b = ___") for division. The host's own cell (a stack,
  * an equation) is not used on this page: fact rows are one fact form in one size (PT-FRW-3).
@@ -428,10 +563,14 @@ function factCell(it, L) {
     const op = OP_SIGN[opOf(q)];
     if (o.length < 2 || !op) return it;
     const ans = answerOf(it);
-    if (L.forms) {
+    // A fact-rows page (L.row, owner ruling 2026-10-30): Standard and Vertical are the stacked ÷
+    // fact below; the bracket and the fraction take the row's narrow geometry.
+    if (L.forms && !(L.row && /^(standard|vertical)$/.test(formOf(it)))) {
         // the item's OWN cell (bracket, fraction or across), at the page's point size and tracks
+        const rowM = L.row ? { factRowTrack: L.row.trackMm, factRowGutter: L.row.gutterMm, factRowLineMm: L.row.lineMm }
+            : L.forms.size > 1 ? { factRowTrack: (EM_MM[L.digitPt] || (L.digitPt / 72) * 25.4) * FACT_ROW_TRACK_EM } : {};
         const metrics = Object.assign({}, metricsFor(L.size || 'L', L.look || DEFAULT_LOOK, { factColumns: L.cols }),
-            { digitPt: L.digitPt, ...(L.forms.size > 1 ? { factRowTrack: (EM_MM[L.digitPt] || (L.digitPt / 72) * 25.4) * FACT_ROW_TRACK_EM } : {}) });
+            { digitPt: L.digitPt, ...rowM });
         return Object.assign({}, it, {
             // (the equation template's digits follow the page's --ws-digit: set it to the row's size)
             render: (c) => `<div style="--ws-digit:${L.digitPt}pt">${renderCell(q, Object.assign({}, c, { columns: L.cols, metrics: Object.assign({}, c.metrics || {}, metrics) }))}</div>`,
@@ -451,7 +590,11 @@ function factCell(it, L) {
         });
     }
     const payload = { a: o[0], b: o[1], op, ans: Number.isFinite(Number(ans)) && ans !== '' ? Number(ans) : undefined, columns: L.cols, pt: L.digitPt, digits: L.tracks,
-        padTop: factPadTop(L.labels, L.cols),
+        // CL-40: a stacked ÷ fact's narrow operator track (0.62 em) puts a 3-digit dividend's first
+        // digit 5.7 mm in from the cell's edge, under the M / L number tab's keep-out (6 / 7 mm) at
+        // 10 columns: it starts below the keep-out instead (the row height already holds it).
+        padTop: op === '/' && L.labels === 'tab' && divUnderTab(L) ? Math.max(factPadTop(L.labels, L.cols), ((SIZES[L.size] || SIZES.L).tabMm || 4) + 1)
+            : factPadTop(L.labels, L.cols),
         // a fact-rows page is a fact drill: a 3+-track sum stays a fact in 4 columns or fewer too
         // (cells/fact.js drawsStack turns it into the regroup stack on a practice page)
         ...(op === '+' ? { regroup: false } : {}) };

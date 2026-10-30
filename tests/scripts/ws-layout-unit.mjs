@@ -826,6 +826,37 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     const ink = (KIT_FACT_OP_TRACK_EM + f1.tracks * KIT_FACT_TRACK_EM) * (KIT_EM_MM[f1.digitPt] || (f1.digitPt / 72) * 25.4);
     ok(f1.cols <= 7 && (inner - ink) / 2 >= 1 && FIT_CLEAR_MM >= 2, `F1: sub_10k_no_regroup at S <= 7 columns with >= 1 mm clearance each side (${f1.cols} cols, ${((inner - ink) / 2).toFixed(2)} mm)`);
 }
+// Owner ruling 2026-10-30 (PAGE_TYPES PT-FRW-9): div_facts reaches the full 10 fact-row columns in
+// all three notations - the ÷ sign (Standard / Vertical, stacked), the fraction and the bracket -
+// at Size S Auto and at an explicit 10 at every size; 5 / 6 / 8 are honoured; Mix keeps thirds;
+// digits never below 16 pt; every form's ink + FIT_CLEAR_MM fits its column (the real-fit gate).
+{
+    const dq = (a, b, form) => ({ q: { a, b, op: '÷', ans: a / b, divForm: form, categoryId: 'division', skillId: 'div_facts', text: `${a} ÷ ${b} = ?`,
+        cell: form === 'long' ? { template: 'division', v: 1, payload: { dividend: a, divisor: b, fact: true } }
+            : { template: form === 'fraction' ? 'equation' : 'fact', v: 1, payload: { a, b, op: '/', ...(form === 'fraction' ? { notation: 'fraction', fact: true } : {}) } } } });
+    // the 12 x 12 band's widest facts (3-digit dividends over 2-digit divisors) and some narrow ones
+    const PAIRS = [[144, 12], [132, 11], [120, 10], [108, 9], [121, 11], [7, 7], [0, 12], [81, 9], [56, 8], [110, 10], [99, 11], [36, 4]];
+    const MIX = ['standard', 'long', 'fraction'];
+    const set = (form) => PAIRS.map(([a, b], i) => dq(a, b, form === 'mix' ? MIX[i % 3] : form));
+    const em = (pt) => KIT_EM_MM[pt] || (pt / 72) * 25.4;
+    for (const form of ['standard', 'vertical', 'long', 'fraction', 'mix']) {
+        for (const size of ['S', 'M', 'L']) {
+            for (const columns of ['auto', 5, 6, 8, 10]) {
+                const want = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
+                const L = factRowsLayout(set(form), { skills: [], ctx: { size }, columns });
+                const tag = `PT-FRW-9 div_facts ${form} ${size} columns ${columns}`;
+                eq(L.cols, want, `${tag}: ${want} columns`);
+                ok(L.digitPt >= 16, `${tag}: digits ${L.digitPt} pt >= 16`);
+                const inner = cellWidthMm(L.cols, LIVE_W_MM, 'daily').inner;
+                // the stacked ÷: the rule spans the 0.62 em ÷ track and three 0.72 em digit tracks
+                const ink = L.row ? L.row.inkMm : (0.62 + L.tracks * KIT_FACT_TRACK_EM) * em(L.digitPt);
+                ok(ink + FIT_CLEAR_MM <= inner + 1e-6, `${tag}: ink ${ink.toFixed(2)} mm + ${FIT_CLEAR_MM} mm fits the ${inner.toFixed(2)} mm cell`);
+                if (form === 'mix') ok(L.perPage % 3 === 0, `${tag}: Mix keeps thirds (${L.perPage} a page)`);
+                ok(!L.across, `${tag}: never the 3-column across page`);
+            }
+        }
+    }
+}
 // PT-MIX-1..7: Mixed practice - a shelf per skill, each with its own instruction, numbered 1..N.
 {
     const skills4 = [ADD_SKILL, SUB_SKILL, FACT_SKILL, Object.assign({}, ADD_SKILL, { skillId: 'add_100_regroup', label: 'Add within 100' })];

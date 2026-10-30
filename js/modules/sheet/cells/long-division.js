@@ -28,6 +28,29 @@ import { geo, root, inkOf, slotValues, inked, box, esc, HAIR, HEAVY } from './op
 import { INK, stripPos } from '../tokens.js';
 import { stepMarks, WHOLE_SLOTS } from '../steps.js';
 
+/**
+ * The bracket's arc in its gutter (viewBox 10 x 40): `x` where the arc starts at the top and ends
+ * at the bottom, `q` the control point of its bow. WIDE_ARC is VA-60's gutter of 1.1 tracks. On a
+ * fact-rows page of 5 to 10 columns the gutter is narrow (`factRowGutter`, about 0.19 em at 10
+ * columns), so the arc starts nearer the gutter's middle - clear of the divisor's last digit by
+ * its stroke - and bows into the dividend's first digit's side bearing.
+ */
+const WIDE_ARC = Object.freeze({ x: 1.5, q: 9 });
+const COMPACT_ARC = Object.freeze({ x: 4.7, q: 12.7 });
+/**
+ * Andika's digit advance (em) and each digit's ink, left and right edge within its advance (em),
+ * measured in the browser (canvas measureText, Andika Regular). A compact bracket is centred on its
+ * INK, not its box: a divisor starting "1" (10, 11, 12) has 0.1 em of white before its ink, so a
+ * box-centred "12 ) 144" leaves the fit gate's 1 mm on the left and too little on the right.
+ */
+export const DIGIT_ADV_EM = 0.586;
+export const DIGIT_INK_EM = Object.freeze({
+    0: [0.04, 0.55], 1: [0.10, 0.51], 2: [0.05, 0.53], 3: [0.05, 0.54], 4: [0.04, 0.55],
+    5: [0.06, 0.52], 6: [0.05, 0.55], 7: [0.04, 0.54], 8: [0.04, 0.55], 9: [0.05, 0.55],
+});
+/** White (em) before the ink of a bracket's first divisor digit on a track of `t` em (glyph centred). */
+export const bracketLeadEm = (divisor, t) => t / 2 - DIGIT_ADV_EM / 2 + (DIGIT_INK_EM[String(divisor)[0]] || [0.04])[0];
+
 /** Work rows: the payload's count, else two per step of the algorithm (at least two). */
 // A division FACT (`fact: true`, div_facts' long-division form): the bracket and the quotient
 // boxes only - a fact is recalled, not worked, so no work rows.
@@ -120,7 +143,11 @@ register('division', {
         // vinculum's open space, one digit per track, with no boxes (critic R1 D13). Screen twins
         // keep their typed boxes (the input needs a target).
         const openQ = !!p.fact && !g.twin && ctx.mode !== 'screen' && !((Number(ctx.scaffoldLevel) || 1) >= 2);
-        const gutterMm = trackMm * 1.1;
+        // A fact-rows page past 4 columns (owner ruling 2026-10-30: the bracket reaches 10 columns)
+        // hands its own narrow gutter (`factRowGutter`, mm): the arc then hugs the space between the
+        // divisor's last digit and the dividend's first (bracketArc's compact path).
+        const rowGutter = rowTrack && Number(ctx.metrics.factRowGutter) > 0 ? Number(ctx.metrics.factRowGutter) : 0;
+        const gutterMm = rowGutter || trackMm * 1.1;
         const k = keyOf(p);
         const ink = inkOf(ctx);
         const vals = slotValues(ctx, k.slots, (w) => {
@@ -155,8 +182,9 @@ register('division', {
         }
         // Row 2: divisor, bracket, dividend. The vinculum is the top border of the dividend row.
         for (let i = 0; i < dv; i++) html += cell(esc(V[i]), i + 1, 2);
+        const A = rowGutter ? COMPACT_ARC : WIDE_ARC;
         const arc = `<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible">`
-            + `<path d="M1.5 0 H10 M1.5 0 Q9 20 1.5 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
+            + `<path d="M${A.x} 0 H10 M${A.x} 0 Q${A.q} 20 ${A.x} 40" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}" vector-effect="non-scaling-stroke"/></svg>`;
         // The arc's stroke is centred on y 0 while the vinculum (the dividend's border-top) lies
         // inside its row: the arc drops half a stroke so the two meet in one line.
         html += `<span style="grid-column:${dv + 1};grid-row:2;align-self:stretch;display:block;position:relative;top:calc(${HEAVY} / 2)">${arc}</span>`;
@@ -166,7 +194,7 @@ register('division', {
         for (let i = 0; i < n; i++) html += cell(esc(D[i]), o + i, 2, `border-top:${HEAVY} solid transparent;`);
         // (it starts over the arc's own top stroke - 15 % into the arc's track, where the path starts -
         // so the arc and the bar meet in one unbroken line, no step at the join)
-        html += `<span aria-hidden="true" style="grid-column:${dv + 1} / span ${n + 1};grid-row:2;align-self:start;display:block;height:0;margin-left:calc(${g.em(gutterMm)} * 0.15);border-top:${HEAVY} solid ${INK.ink}"></span>`;
+        html += `<span aria-hidden="true" style="grid-column:${dv + 1} / span ${n + 1};grid-row:2;align-self:start;display:block;height:0;margin-left:calc(${g.em(gutterMm)} * ${A.x / 10});border-top:${HEAVY} solid ${INK.ink}"></span>`;
         // Work rows (VA-63). The key and a Model cell write the finished work; the pupil page
         // leaves the rows open. The "−" and the rule under each subtract row are structural.
         const shownQ = ctx.state === 'wrong' ? Object.keys(k.slots).map((id) => vals[id] || ' ').join('') : null;
@@ -194,7 +222,7 @@ register('division', {
         const label = `${D} divided by ${V}`;
         // CL-4b: the quotient is written above the bracket, so the cell is centred down the box.
         return markWriteAbove(root(g, 'division',
-            `<div role="group" aria-label="${esc(label)}" style="display:inline-grid;${cols}grid-template-rows:auto ${g.em(g.pt * 25.4 / 72 * 1.25)};align-items:stretch;margin:0 auto">${html}</div>`,
+            `<div role="group" aria-label="${esc(label)}" style="display:inline-grid;${cols}grid-template-rows:auto ${g.em(g.pt * 25.4 / 72 * 1.25)};align-items:stretch;margin:0 auto${rowGutter ? `;position:relative;left:-${(bracketLeadEm(V, trackMm / g.E) / 2).toFixed(3)}em` : ''}">${html}</div>`,
             'text-align:center;', this.footprint(p, ctx).wMm));
     },
     answerKey(p) {
@@ -214,8 +242,9 @@ register('division', {
         const n = String(p.dividend).length, dv = String(p.divisor).length;
         const trackMm = trackOf(p, ctx, g);
         const rows = rowsOf(p);
+        const rowGutter = rowTrack && Number((ctx.metrics || {}).factRowGutter) > 0 ? Number(ctx.metrics.factRowGutter) : 0;
         return {
-            wMm: Math.ceil((n + dv + 1.1 + (p.rbox ? 2.1 : 0)) * trackMm + 8),
+            wMm: Math.ceil((n + dv + (p.rbox ? 2.1 : 0)) * trackMm + (rowGutter || 1.1 * trackMm) + 8),
             hMm: Math.ceil(g.stripMm + g.E * 1.3 + rows * (Math.max(g.writeMm, 6) + 1) + 6),
             measure: !p.fact, factLike: !!p.fact, maxCols: p.fact ? 4 : 2, tracks: n + dv + 1,
         };
