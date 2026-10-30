@@ -409,6 +409,8 @@ register('stack', {
             if (answer === 'open') answer = 'boxes';
             else if (answer === 'solid' || answer === 'traced') { boxInk = answer === 'traced' ? 'trace' : 'solid'; answer = 'boxes'; }
             if (ctx.state !== 'blank') boxInk = ctx.state === 'traced' ? 'trace' : 'solid';
+            // Support level 3 (a worked item): the answer digits printed grey IN the boxes (below)
+            else if (p.traceAns) boxInk = 'trace';
         } else if (ctx.state !== 'blank') {
             const ink = ctx.state === 'traced' ? 'trace' : 'solid';
             if (answer === 'boxes') boxInk = ink;

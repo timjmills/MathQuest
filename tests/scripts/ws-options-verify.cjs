@@ -625,8 +625,8 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             const MARK = {
                 // kit cells, then the legacy print slots (print-generate.js wsStackHTML / wsAnswerLine)
                 digit: /ws-digitboxes|ws-factans--digit|<span class="ab[^"]*" data-ws-seg|ws-fact-write--digit|ws-slot--digits/,
-                one: /ansrow--box|class="ws-factans(?: ws-trace| ws-dotted)?"|class="ws-line"(?![^>]*ws-line--off)|class="ws-fact-write" style="[^"]*border:|class="ws-slot" data-ws-shape="line" style="[^"]*border:[^"]*border-radius/,
-                off: /ws-line--off|ws-factans--off|class="ansrow"|<span class="(?:ws-trace )?an"|class="ws-fact-write" style="grid-column:1 \/ -1;height:[\d.]+mm;(?:"|display:grid)|class="ws-slot" data-ws-shape="line" style="[^"]*border-bottom:[^"]*"/,   // a key's open zone: plain digits, no box
+                one: /ansrow--box|class="ws-factans(?: ws-trace| ws-dotted)?"|class="ws-line"(?![^>]*ws-line--off)|class="ws-fact-write" style="[^"]*border:|class="ws-slot" data-ws-shape="line" style="[^"]*border:[^"]*border-radius|<span data-ws-shape="box" style="[^"]*;border:[^;]*solid[^;]*;border-radius/,   // ... and the add-three counters' box (ops-common.js box)
+                off: /ws-line--off|ws-factans--off|class="ansrow"|<span class="(?:ws-trace )?an"|class="ws-fact-write" style="grid-column:1 \/ -1;height:[\d.]+mm;(?:"|display:grid)|class="ws-slot" data-ws-shape="line" style="[^"]*border-bottom:[^"]*"|<span data-ws-shape="box" style="[^"]*;border:0;border-bottom:/,   // a key's open zone: plain digits, no box
             };
             try {
                 const rs = await W.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });
@@ -635,7 +635,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 const untag = (h) => String(h || '').replace(/ data-ws-key-(?:ans|mark|add|fill)(?:="[^"]*")?| data-ws-slot="[^"]*"/g, '');
                 if (!MARK[value].test(untag(rs.pupilHtml))) fail('print', `ansBox ${value}: the pupil page draws no ${value} answer place`);
                 if (!MARK[value].test(untag(rs.keyHtml))) fail('print', `ansBox ${value}: the key draws no ${value} answer place`);
-                const keyText = plain(rs.keyHtml).replace(/(\d),(?=\d{3}\b)/g, '$1').replace(/\s+/g, '');
+                const keyText = plain(rs.keyHtml).replace(/\s+/g, '').replace(/(\d),(?=\d{3})/g, '$1');   // whitespace first: a cell's number tab may follow the ones digit
                 const miss = rs.items.filter(i => /^\d+$/.test(String(i.ans)) && !keyText.includes(String(i.ans)));
                 if (miss.length) fail('print', `ansBox ${value}: ${miss.length} answer(s) not written on the key (e.g. ${miss[0].ans})`);
             } catch (e) { fail('print', `buildSheet threw: ${String(e && e.message || e)}`); }
