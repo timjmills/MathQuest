@@ -464,3 +464,11 @@
 .ws-sheet > .ws-cell:is(.mqt--word-work, .mqt--words, .mqt--counters, .mqt--seqstrip, .mqt--remainder):has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
 .ws-page .ws-grid > .ws-cell[data-ws-cell="remainder"]:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before,
 .ws-sheet > .ws-cell.mqt--remainder:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { height: max(0mm, calc(var(--ws-tab, 5mm) - 1.25mm)); }
+
+/* 2026-10-30 (Lane D port, CL-40 on CL-4b): one-line equations and facts on a grid numbered past 9 (a w2 / w3 tab,
+   whose keep-out - its width + 1 mm, square - is taller than the 1-digit tab's) start below that keep-out: every such
+   cell of the grid takes a top pad of the keep-out + 2.6 mm (a digit's glyph box rises above its line box), so
+   "55 ÷ ☐ = 11" under tab 10 no longer starts inside the tab's square and one row keeps one band (H13-ROW). The
+   lane's r11 rule, rewritten for the top start. Fact rows (`.ws-grid.facts`) keep their own geometry. Additive. */
+.ws-page .ws-grid:not(.facts):has(> .ws-cell > .ws-tab.w2, > .ws-cell > .ws-tab.w3) > .ws-cell:is([data-ws-cell="equation"], [data-ws-cell="fact"]):has(> .ws-tab):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun) {
+    --ws-ko2: calc(var(--ws-tab, 5mm) * 1.4 + 1mm); padding-top: max(var(--fp, 3mm), calc(var(--ws-ko2) + 2.6mm)); }
