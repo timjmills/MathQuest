@@ -10,7 +10,8 @@ Critic rounds: 5, FAIL (r5, 2026-10-30: lowest 3, the Lesson pages; 390 card 6)
 
 ## Now
 - Fix round after critic r5 (design/audit/critic/2026-10-30/skip-count.md): SC1-SC6 fixed, plus the small-fixes r11 G1-G6 audit on today's count row.
-- Next: precritic --strict on the branch merged with the main branch, then critic r6 (Lesson and the 390 card in full).
+- precritic --strict (merged with origin 1bacb0b1): 20 PASS; FAIL sibling-compare (count-row has no approved sibling: 77 unproven matrix counts, mostly section/mixed density) and options-verify --render (shape / jumps=15 capacity, one-page CL40-INK: the same on the critic tree fe965324); SKIPPED card rulings (no spec card). --role lesson: ratchet rise placevalue:more_less_10 CL40-INK, the same on origin main.
+- Next: the lead's ruling on those three pre-existing reds, then critic r6 (Lesson and the 390 card in full).
 
 ## Owner go
 
