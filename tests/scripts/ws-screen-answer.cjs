@@ -198,6 +198,9 @@ function PLAN(rootSel, which) {
     const tiles = all('.mq-banktile');
     if (tiles.length) {
         parts(ans).forEach((v, k) => { const t = tiles.find(x => x.dataset.mqBankFor === String(k) && x.dataset.v === v); if (t) tag(t, { type: 'click' }); });
+        // (a cloze whose first boxes are typed and whose last is a tapped word - pv-times, lesson 6: type the rest)
+        const typed = all('input.mq-cellslot');
+        parts(ans).forEach((v, k) => { if (!tiles.some(x => x.dataset.mqBankFor === String(k)) && typed[k]) tag(typed[k], { type: 'text', value: v }); });
         return { plan, q: String(ans) };
     }
     const slots = all('input.mq-cellslot, input.cloze-cell');

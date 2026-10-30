@@ -72,7 +72,8 @@ function appearanceValues(defs) {
             if (isDefault) continue;
             const opts = { [id]: def.type === 'set' ? [v] : v };
             // a value that ADDS a drawing to the cell (a number line, pictures, a support pane) may cost page room
-            const adds = def.group === 'nline' || def.group === 'support' || ADDS_DRAWING.test(id);
+            // (`addsDrawingValues` on the def: the values of a non-support option that add one - value form "times", lesson 6 r4)
+            const adds = def.group === 'nline' || def.group === 'support' || ADDS_DRAWING.test(id) || (Array.isArray(def.addsDrawingValues) && def.addsDrawingValues.some((x) => String(x) === String(v)));
             out.push({ option: id, label: def.label || id, value: v, opts, adds });
         }
     }

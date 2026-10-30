@@ -52,6 +52,21 @@ div_facts fact rows that pass today's); an across fact hosted by a fact cell on 
 whole_as_fraction `forms` matchers read the lane's item text, narrowed `denoms` deal the den/den form.
 `js/modules/sheet/roles/fact-rows.js` is untouched.
 
+## Merge of main 9d6f07b8 (merge-and-gates builder, 2026-10-30)
+
+`git merge origin/claude/sweet-newton-c8wrv1` (9d6f07b8, 55 commits) onto 43e6fe35. Six files conflicted:
+
+| File | Resolution | Why |
+|---|---|---|
+| css/sheet-kit.css | both | additive blocks: the lane's CL-40 grid-past-9 top pad and fact-rows across-fact pad, then main's lesson 7 r2 `.mq-wwframes` no-spacer rule |
+| js/modules/print-sheet.js | combined | main's measuring frame (`MDOC` / `measureDocument()`, awaited in buildSheetDeal and the detailed lesson) with the lane's batched + cached `measureItems` / `measureFresh` / `MEASURE_CACHE`: both functions now take `document` = the frame document (app page as fallback), and `measureFresh` reads `getComputedStyle` through the frame's own window, as main's measureItems did. Main's own batching (one pass per column count and state) is dropped for the lane's, which batches the same way and also caches; main changed nothing else in the function |
+| js/modules/screen-cell.js | both | `kitCellTwin`: main's `pv-times` twin first, then the lane's `equationKitTwin` |
+| js/modules/sheet/cells/word-work.js | combined | lane's `renderWork` split kept; main's new `twoStepPart`, `framesLayout`, `chooseLabels`, `chooseLayout` placed before it; main's dispatch (choose, bar, frames) at the top of `renderWork`; main's `factDiv` margin in the full-width body; stepBlock: lane's `st.fact` (no working rows) AND main's `factDiv` skip of step 1's rows |
+| js/modules/sheet/contract.js | both | the lane's story-work-ring / story-work-div and main's story-steps / story-letter / story-check instruction strings |
+| js/modules/word-work.js | combined | the lane's sign-ring / no-sign print and screen instructions as the default; main's `choose` early return and its letter / check / frames overrides after them |
+
+Syntax: every module under js/ passes `node --input-type=module --check`; ws-boot-smoke OK on the merge.
+
 ## Gates on the port (builder A, 2026-10-30; main = scratchpad worktree of fbeaa332)
 
 | Gate | Branch | Main (same scope) |

@@ -182,7 +182,9 @@ async function giveWorksheet(page, i, value) {
             window.checkWorksheetAnswer(i);
         }
     }, i, value);
-    await sleep(350);
+    // a wrong several-box or time answer counts once the boxes are still for 1.5 s (worksheet.js
+    // WS_SLOT_SETTLE_MS, teacher follow-ups 2026-10-30): wait past it, as a pupil's pause would
+    await sleep(1700);
 }
 
 async function giveQuiz(page, value) {

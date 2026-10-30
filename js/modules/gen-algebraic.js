@@ -5030,6 +5030,92 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 const msName = pick(msNames);
                 const msItem = pick(msItems);
 
+                // msOps (3.OA.D.8, detailed lesson g3-oa8-two-step-wp): a × or ÷ step that feeds a + or − step.
+                // Facts within 10 × 10; the Step 2 number is no Step 1 number; the answer is no story number
+                // and not the Step 1 answer (M1 / M3 always give a different number). Fixed domain: the
+                // Max Number does not apply. Default 'addsub' = the four + / − archetypes below, unchanged.
+                const msOpsOpt = state.skillOptions && typeof state.skillOptions.msOps === 'string' ? state.skillOptions.msOps : 'addsub';
+                // 'addmult' / 'adddiv' (3.OA.D.8, brackets): a + or − step first, then × or ÷ -
+                // (5 red + 3 blue) in each of 4 bags; (12 + 18) shared by 5; (30 − 6) shared by 4.
+                if (msOpsOpt === 'addmult' || msOpsOpt === 'adddiv') {
+                    let a1, b1, op1, s1v, n2, fin, guard = 0;
+                    for (;;) {
+                        guard++;
+                        op1 = pick(['+', '-']);
+                        if (msOpsOpt === 'addmult') {
+                            n2 = rng(2, 6); s1v = rng(4, 10);
+                            if (op1 === '+') { a1 = rng(2, s1v - 2); b1 = s1v - a1; } else { b1 = rng(2, 6); a1 = s1v + b1; }
+                            fin = s1v * n2;
+                        } else {
+                            n2 = rng(2, 6); const qq = rng(2, 9); s1v = n2 * qq;
+                            if (op1 === '+') { a1 = rng(2, s1v - 2); b1 = s1v - a1; } else { b1 = rng(2, 9); a1 = s1v + b1; }
+                            fin = qq;
+                        }
+                        const story = [a1, b1, n2];
+                        const ok = a1 !== b1 && !story.includes(fin) && fin !== s1v && !story.includes(s1v) && n2 !== a1 && n2 !== b1 && a1 >= 1 && b1 >= 1;
+                        if (ok || guard > 400) break;
+                    }
+                    const G1 = op1 === '+' ? '+' : '\u2212', G2 = msOpsOpt === 'addmult' ? '\u00d7' : '\u00f7';
+                    q._variant = `${op1 === '+' ? 'add' : 'sub'}_then_${msOpsOpt === 'addmult' ? 'mult' : 'div'}`;
+                    q.msOps = { first: op1 === '+' ? 'add' : 'sub', second: msOpsOpt === 'addmult' ? 'mult' : 'div', a: a1, b: b1, step1: s1v, c: n2 };
+                    q.text = msOpsOpt === 'addmult'
+                        ? (op1 === '+' ? `Each bag has ${a1} red ${msItem} and ${b1} blue ${msItem}. ${msName} has ${n2} bags. How many ${msItem} does ${msName} have?`
+                            : `Each bag had ${a1} ${msItem}. ${b1} were taken out of each bag. ${msName} has ${n2} bags. How many ${msItem} are in the bags now?`)
+                        : (op1 === '+' ? `${msName} has ${a1} red ${msItem} and ${b1} blue ${msItem}. ${msName} shares them equally among ${n2} friends. How many ${msItem} does each friend get?`
+                            : `${msName} has ${a1} ${msItem}. ${msName} keeps ${b1}. ${msName} shares the rest equally among ${n2} friends. How many ${msItem} does each friend get?`);
+                    q.ans = fin;
+                    q.op = G1; q.a = a1; q.b = b1;
+                    q.hint = `Step 1: ${a1} ${G1} ${b1} = ${s1v}. Step 2: ${s1v} ${G2} ${n2} = ${fin}`;
+                    q.skillLabel = 'Multi-Step';
+                    q.printFormat = 'multi-step-word';
+                    q.options = buildNumericOptions(fin);
+                    q.answerType = 'number';
+                    return;
+                }
+                if (msOpsOpt === 'mult' || msOpsOpt === 'div' || msOpsOpt === 'multdiv') {
+                    const first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
+                    // msChoose (lesson 7 r3, critic rule: the board Check Question's A-D online): a take-away Step 2, and the
+                    // three two-step errors (ms-stop-step1 / ms-story-number / ms-one-op, providers/word-work.js
+                    // wordWorkWrongs) are three different whole numbers with the answer neither the biggest nor the
+                    // smallest of the four - an add Step 2 makes the answer the biggest, so the set would give it away.
+                    const msChoose = !!(state.skillOptions && state.skillOptions.msChoose === true);
+                    let s1a, s1b, p1, c2, op2, fin, guard = 0;
+                    for (;;) {
+                        guard++;
+                        op2 = msChoose ? '-' : pick(['+', '-']);
+                        if (first === 'mult') { s1a = rng(2, 6); s1b = rng(2, 9); p1 = s1a * s1b; }
+                        else { const d = rng(2, 6), qq = rng(2, 9); s1a = d * qq; s1b = d; p1 = qq; }
+                        const small = first === 'mult' ? [s1a, s1b] : [s1b, p1];
+                        c2 = op2 === '+' ? rng(2, first === 'mult' ? 20 : 9) : rng(2, Math.max(2, p1 - 1));
+                        fin = op2 === '+' ? p1 + c2 : p1 - c2;
+                        const story = [s1a, s1b, c2];
+                        const ok = s1a !== s1b && !(first === 'div' && s1b === p1) && fin >= 1 && fin <= 100
+                            && !story.slice(0, 2).includes(c2) && c2 !== p1 && !story.includes(fin) && fin !== p1
+                            && !small.includes(fin) && c2 >= 2;
+                        let okChoose = true;
+                        if (msChoose) {
+                            const m3 = Math.abs(s1b - c2), m2 = (first === 'mult' ? s1a + s1b : s1a - s1b) - c2;
+                            const four = [fin, p1, m3, m2];
+                            okChoose = m2 >= 0 && new Set(four).size === 4 && fin !== Math.max(...four) && fin !== Math.min(...four);
+                        }
+                        if ((ok && okChoose) || guard > 2000) break;
+                    }
+                    const G1 = first === 'mult' ? '×' : '÷', G2 = op2 === '+' ? '+' : '−';
+                    q._variant = `${first}_then_${op2 === '+' ? 'add' : 'sub'}`;
+                    q.msOps = { first, op2, a: s1a, b: s1b, step1: p1, c: c2 };
+                    q.text = first === 'mult'
+                        ? `${msName} has ${s1a} bags. Each bag has ${s1b} ${msItem}. ${op2 === '+' ? `${msName} gets ${c2} more ${msItem}.` : `${msName} gives away ${c2} ${msItem}.`} How many ${msItem} does ${msName} have ${op2 === '+' ? 'now' : 'left'}?`
+                        : `${msName} has ${s1a} ${msItem}. ${msName} shares them equally among ${s1b} friends. Each friend ${op2 === '+' ? `gets ${c2} more` : `gives away ${c2}`}. How many ${msItem} does each friend have now?`;
+                    q.ans = fin;
+                    q.op = G1; q.a = s1a; q.b = s1b;
+                    q.hint = `Step 1: ${s1a} ${G1} ${s1b} = ${p1}. Step 2: ${p1} ${G2} ${c2} = ${fin}`;
+                    q.skillLabel = 'Multi-Step';
+                    q.printFormat = 'multi-step-word';
+                    q.options = buildNumericOptions(fin);
+                    q.answerType = 'number';
+                    return;
+                }
+
                 // LRU rotation across the 4 multi-step archetypes so students see all forms.
                 const problemType = (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('multi_step_word', ["add_then_sub", "sub_then_add", "add_then_add", "sub_then_sub"])
@@ -5073,6 +5159,12 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     step2Text = `gave away ${step2Val}`;
                 }
 
+                // (no cancel - lesson 7 research: "got 9 more, then lost 9" leaves the start, a one-step answer)
+                if ((problemType === "add_then_sub" || problemType === "sub_then_add") && step2Val === step1Val) {
+                    step2Val += step2Val > 3 ? -1 : 1;
+                    finalVal = problemType === "add_then_sub" ? afterStep1 - step2Val : afterStep1 + step2Val;
+                    step2Text = problemType === "add_then_sub" ? `gave ${step2Val} to a friend` : `found ${step2Val} more`;
+                }
                 q.text = `${msName} had ${startVal} ${msItem}. She ${step1Text}, then ${step2Text}. How many ${msItem} does she have now?`;
                 q.ans = finalVal;
 

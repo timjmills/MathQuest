@@ -478,3 +478,8 @@
    inside the keep-out. It takes the top pad its equation-hosted twins (div_facts across) clear the tab with: the
    tab side + 1 mm. Fact rows' own vertical facts are unchanged. Additive. */
 .ws-page .ws-grid > .ws-cell.mq-hfactcell[data-ws-cell="fact"]:has(> .ws-tab, > .ws-letter):not(.blankrun) { padding-top: calc(var(--ws-tab, 5mm) + 1mm); }
+
+/* Lesson 7 r2 (additive): a two-step frames cell (cells/word-work.js framesLayout) sets its story in a gutter beside the
+   item tab, so it takes no tab spacer above the story - on the page and in the measuring cell alike. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell="word-work"]:has(.mq-wwframes)::before,
+.ws-sheet > .ws-cell.mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }

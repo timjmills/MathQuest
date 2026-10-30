@@ -2707,6 +2707,10 @@
      "key": "subtraction:sub_check_by_adding",
      "why": "Y3.B2.S21 Inverse operations (next step, W8: the same idea one step further)",
      "opts": {}
+    },
+    {
+     "key": "algebra:two_step_estimate_check",
+     "why": "estimate a two-step story by rounding to tens, then judge the answer"
     }
    ],
    "note": ""

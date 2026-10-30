@@ -37,6 +37,7 @@ const so = await import(R + 'js/modules/skill-options.js');
 const U = await import(R + 'js/modules/utils.js');
 console.log = _log; console.warn = _warn;
 const fs = await import('fs');
+const PHOST = await import('../presethost.mjs');
 const CL = await import('./claims.mjs');
 const TR = await import('./titlerep.mjs');
 const args = process.argv.slice(2);
@@ -282,6 +283,7 @@ function missedOptions(s) {
   const near = (p, ws) => { for (let j = 0; j + 1 < p.length; j++) for (let q = j + 1; q <= j + 3 && q < p.length; q++) if (p[j] === ws[0] && p[q] === ws[1]) return true; return false; };
   for (const k of pool) { const [c, sk] = k.split(':');
     if (isNamed(c, sk)) continue;
+    if (PHOST.presetCovered(k, isNamed, mine, pool)) continue;   // a preset is read through its host (critic 2026-10-30 Y4 F1)
     for (const def of so.optionsFor(c, sk) || []) { if (!def.values || def.group === 'support' || ['band', 'range', 'support', 'cover', 'mix'].includes(def.id)) continue;
       for (const v of def.values) { const L = String(v.l ?? '');
         if (/^(no|off|none)\b/i.test(L)) continue;

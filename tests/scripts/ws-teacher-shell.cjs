@@ -33,6 +33,23 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   const app = await open({ viewport: { width: 1280, height: 900, deviceScaleFactor: 1 } });
   const { page } = app;
   const shot = async (name) => { if (SHOTS) await page.screenshot({ path: path.join(SHOTS, `${name}.png`) }); };
+  // The first run after an edit (a re-stamped tree: every module and font is fetched cold) failed and the re-run passed
+  // (2026-10-25 x2, 10-30): fixed sleeps (5-6 s for a print build, 1.5 s after a load) raced the cold fetches. Wait for the
+  // REAL signals instead: the print stage's own state (teacher-print.js #tvStage data-state building -> ready|error), an
+  // optional page predicate, the fonts, and a quiet network; a 90 s cap only stops a hung build.
+  const quiet = async () => {
+    await page.waitForNetworkIdle({ idleTime: 400, timeout: 30000 }).catch(() => {});
+    await page.evaluate(() => document.fonts && document.fonts.ready).catch(() => {});
+  };
+  const printReady = async (pred) => {
+    await sleep(500);   // past the preview's 350 ms build debounce, so a build that is about to start has started
+    await page.waitForFunction((p) => {
+      const st = document.getElementById('tvStage');
+      if (st && st.dataset.state === 'building') return false;
+      return p ? (0, eval)(`(${p})`)() : true;
+    }, { timeout: 90000, polling: 100 }, pred ? pred.toString() : '').catch(() => {});
+    await quiet();
+  };
 
   await page.evaluate(() => {
     try { localStorage.removeItem('mq_teacher_sets'); } catch (e) { /* */ }
@@ -45,7 +62,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   /* ------------------------------------------------------------ 1 focus stays in the teacher app */
   for (const key of SCREENS) {
     await page.evaluate((k) => { window.tvGo(k); document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0); }, key);
-    await sleep(key === 'print' ? 1500 : 300);
+    if (key === "print") await printReady(); else await sleep(300);
     const leaks = [];
     let steps = 0;
     await page.evaluate(() => document.body.focus());
@@ -68,7 +85,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   /* ------------------------------------------------------------ 2 targets ≥ 44 px */
   for (const key of SCREENS) {
     await page.evaluate((k) => window.tvGo(k), key);
-    await sleep(key === 'print' ? 1500 : 300);
+    if (key === "print") await printReady(); else await sleep(300);
     const small = await page.evaluate(() => {
       const out = [];
       const sel = '#teacherApp button, #teacherApp a[href], #teacherApp select, #teacherApp input, #teacherApp [role="switch"], #teacherApp summary';
@@ -246,7 +263,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     };
   });
   await page.evaluate(pickRole, 'independent');
-  await sleep(5000);
+  await printReady();
   const pr = await page.evaluate(() => {
     const what = document.querySelector('.tv-print-what').getBoundingClientRect();
     const prev = document.querySelector('.tv-preview-card').getBoundingClientRect();
@@ -286,7 +303,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   await page.evaluate(() => { window.tvOpenPrintWith([{ categoryId: 'composing', skillId: 'base10_regroup' }]); window.tvGo('print'); });
   await sleep(200);
   await page.evaluate(pickRole, 'fact-rows');
-  await sleep(5000);
+  await printReady();
   const unfit = await page.evaluate(() => {
     const why = document.querySelector('#teacherMain [data-screen="print"] .tv-ptype-why');
     const card = document.querySelector('#teacherMain [data-screen="print"] .tv-ptype.is-static');
@@ -327,7 +344,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   });
   await sleep(200);
   await page.evaluate(pickRole, 'review');
-  await sleep(6000);
+  await printReady();
   // Review prints one section per skill (guided-r1), so four skills normally all fit; the rule is
   // that a skill missing from the sheet is always named, never that a warning always shows.
   const reviewFit = await page.evaluate(async () => {
@@ -352,7 +369,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   await page.evaluate(() => { document.querySelector('.tv-extras').open = true; document.querySelector('[data-act="classic-opt"][data-v="worked"]').click(); });
   await sleep(100);
   await page.evaluate(() => document.querySelector('[data-act="classic-build"]').click());
-  await sleep(6000);
+  await printReady(() => { const b = document.getElementById("printPreviewContainer"); return !!(b && getComputedStyle(b).display !== "none" && b.querySelector(".tv-classic-bar")); });
   const mixed = await page.evaluate(() => {
     const box = document.getElementById('printPreviewContainer');
     return {
@@ -435,6 +452,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     for (let i = 0; i < 60 && !(await page.evaluate(() => typeof window.tvGo === 'function' && typeof window.setUserRole === 'function')); i++) await sleep(250);
     if (teacher) await page.evaluate(() => window.setUserRole('teacher'));
     await sleep(ms);
+    await quiet();
     return where();
   };
   const T6 = [];
@@ -521,7 +539,7 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
   }
   console.log(T6.join('\n'));
   await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
-  await page.goto(app.base + '/index.html'); await sleep(1500);
+  await page.goto(app.base + "/index.html", { waitUntil: "networkidle0", timeout: 60000 }); await sleep(1500); await quiet();
 
   /* ------------------------------------------------------------ 8 student side: the dialog still opens */
   const st = await page.evaluate(async () => {

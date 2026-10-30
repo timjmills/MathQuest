@@ -1868,3 +1868,21 @@ html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsb
 @media (max-width: 480px) {
     .mq-scell .mq-kit .ws-stack:is([style*="--t:7"], [style*="--t:8"]) { --ws-track: 46px; --mq-optrack: 32px; }
 }
+
+/* Teacher follow-ups (2026-10-30, BACKLOG "cellboxes have a double edge on the practice card (expand)"):
+   expanded form's place boxes carry an inline 4 px border, and the focused one also took the cell's
+   3 px black focus outline 1 px outside it: a box inside a box. The box is ONE edge at the slot
+   stroke; the focused / next box thickens or glows INSIDE that edge (as the kit's digit boxes do),
+   never a second line around it. ADDITIVE; the inline style of saved HTML is overridden, not removed. */
+html body .mq-scell input.expanded-input-box.expanded-input-box,
+html body .mq-scell input.ws-expanded-input.ws-expanded-input {
+    border-width: 2.6px !important; border-style: solid !important;
+}
+html body .mq-scell input.expanded-input-box.expanded-input-box:is(:focus, :focus-visible),
+html body .mq-scell input.ws-expanded-input.ws-expanded-input:is(:focus, :focus-visible) {
+    outline: none !important;
+}
+html body .mq-scell input.expanded-input-box.expanded-input-box:focus:not(.mq-active-box):not(.box-correct):not(.box-wrong):not([style*="var(--"]),
+html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-active-box):not(.box-correct):not(.box-wrong):not([style*="var(--"]) {
+    box-shadow: inset 0 0 0 3px #000 !important;
+}

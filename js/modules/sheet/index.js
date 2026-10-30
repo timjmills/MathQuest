@@ -112,6 +112,7 @@ export {
 // The operations templates that are not a plain stack or fact (long division, area model,
 // chart window, arrays, remainder, number line, fact family, cloze bank).
 export { divisionSteps } from './cells/long-division.js';
+import './cells/pv-times.js';
 import './cells/area-model.js';
 import './cells/area-model-div.js';
 import './cells/mult-chart.js';
@@ -191,6 +192,7 @@ export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
     'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work',
     ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS, 'words'];
 
+export { wordWorkWrongs } from './providers/word-work.js';
 /* ------------------------------------------------- skill providers (register on load) */
 // The real per-skill providers (strings, workedSteps, wrongAnswer, stories). Importing the
 // barrel registers them once; a skill without one keeps the default adapters.
