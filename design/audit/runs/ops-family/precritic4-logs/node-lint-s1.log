@@ -1,0 +1,14 @@
+$ node tests/scripts/ws-node-lint.mjs --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --rules LESSON-DATA,OPTION-HELP,WRONG-FITS --baseline tests/fixtures/precritic/node-lint-s1.baseline.json --json /tmp/mq-precritic/20261030-194652-15083/node-lint-s1.json
+
+ws-node-lint: 5 skill(s), 30 items each, page 12, root /home/user/MathQuest
+
+rule        skills   items  findings  skills hit  skipped
+LESSON-DATA       5       5         0           0  -
+OPTION-HELP       5      19         0           0  -
+WRONG-FITS       0       0         0           0  5 no item with a declared box count and a number wrong answer (skills)
+
+baseline: tests/fixtures/precritic/node-lint-s1.baseline.json (7 finding keys pinned at n=30, page=12)
+no finding beyond the baseline
+json: /tmp/mq-precritic/20261030-194652-15083/node-lint-s1.json
+time: load 0.5 s, lint 0.4 s, total 1.0 s
+ws-node-lint: OK

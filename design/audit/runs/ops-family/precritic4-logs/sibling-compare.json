@@ -1,0 +1,1934 @@
+{
+ "tool": "ws-sibling-compare",
+ "root": "/home/user/MathQuest",
+ "skills": [
+  "addition:add_sub_10s",
+  "addition:add_sub_100s",
+  "subtraction:missing_add_sub",
+  "division:missing_mult_div",
+  "division:div_zero_in_quotient"
+ ],
+ "siblings": {
+  "addition:add_sub_10s": [],
+  "addition:add_sub_100s": [],
+  "subtraction:missing_add_sub": [],
+  "division:missing_mult_div": [],
+  "division:div_zero_in_quotient": []
+ },
+ "templates": {
+  "addition:add_sub_10s": "equation",
+  "addition:add_sub_100s": "equation",
+  "subtraction:missing_add_sub": "equation",
+  "division:missing_mult_div": "equation",
+  "division:div_zero_in_quotient": "division",
+  "addition:add_100_regroup": "stack",
+  "subtraction:sub_100_regroup": "stack",
+  "addition:add_1k_regroup": "stack",
+  "subtraction:sub_1k_regroup": "stack",
+  "addition:add_10k_regroup": "stack",
+  "subtraction:sub_10k_regroup": "stack",
+  "subtraction:sub_100k_regroup": "stack",
+  "subtraction:sub_1m_regroup": "stack",
+  "subtraction:sub_100_no_regroup": "stack",
+  "subtraction:sub_50_no_regroup": "stack"
+ },
+ "sources": [
+  "pins (design/audit/matrix/baseline.json)"
+ ],
+ "rowsCompared": 45,
+ "byStatus": {
+  "PENDING(no-baseline)": 45
+ },
+ "red": 0,
+ "noBaseline": 45,
+ "above": [],
+ "noSibling": [
+  {
+   "id": "addition:add_sub_100s|mixed/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|mixed/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "L",
+   "rule": "L-OVERLAP CL40-INK",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "L",
+   "rule": "L-OVERLAP CL40-INK",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/layout-todays-number",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+short+afterpage",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-nline+short+afterpage",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/pages-3",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|mixed/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|mixed/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|mixed/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 10,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "M",
+   "rule": "L-OVERLAP CL40-INK",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "M",
+   "rule": "L-OVERLAP CL40-INK",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 10,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "M",
+   "rule": "L-OVERLAP CL40-INK",
+   "n": 8,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/layout-todays-number",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+short+afterpage",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-nline+short+afterpage",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/pages-3",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 10,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 8,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/defaults",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 12,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 8,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/layout-todays-number",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 12,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-cols2+afterpage",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 12,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-cols2+short",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-short+afterpage",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/pages-3",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 36,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|mixed/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|mixed/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|mixed/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "L",
+   "rule": "L-OVERLAP CL40-INK",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|single/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|single/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "division:missing_mult_div|single/pages-3",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|mixed/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|mixed/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|mixed/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/pages-3",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  }
+ ],
+ "engine": [],
+ "errors": [],
+ "partner": [
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-each",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-each",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-each",
+   "size": "M",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 2,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-each",
+   "size": "L",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-each",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "S",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "M",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "L",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "S",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 4,
+   "skills": [
+    "addition:add_facts",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "M",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 2,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "L",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "L",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 2,
+   "skills": [
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "S",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "M",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "L",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "S",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "M",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "L",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "S",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 4,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "S",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "M",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 4,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "M",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 2,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "S",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "M",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "L",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "S",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 2,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "S",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "M",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "L",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|mixed/defaults",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "S",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "S",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "M",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "M",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "L",
+   "rule": "L-INK ILLEGIBLE",
+   "n": 8,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "L",
+   "rule": "L-OVERFLOW PG-12",
+   "n": 16,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  }
+ ],
+ "rowsAboveSiblings": [
+  "addition:add_sub_100s|mixed/defaults",
+  "addition:add_sub_100s|sections/defaults",
+  "addition:add_sub_100s|sections/ex-group",
+  "addition:add_sub_100s|sections/pages-2",
+  "addition:add_sub_100s|single/defaults",
+  "addition:add_sub_100s|single/ex-group",
+  "addition:add_sub_100s|single/layout-todays-number",
+  "addition:add_sub_100s|single/more-cols2+short+afterpage",
+  "addition:add_sub_100s|single/more-nline+short+afterpage",
+  "addition:add_sub_100s|single/pages-3",
+  "addition:add_sub_10s|mixed/defaults",
+  "addition:add_sub_10s|sections/defaults",
+  "addition:add_sub_10s|sections/ex-each",
+  "addition:add_sub_10s|sections/ex-group",
+  "addition:add_sub_10s|sections/pages-2",
+  "addition:add_sub_10s|single/defaults",
+  "addition:add_sub_10s|single/layout-todays-number",
+  "addition:add_sub_10s|single/more-cols2+short+afterpage",
+  "addition:add_sub_10s|single/more-nline+short+afterpage",
+  "addition:add_sub_10s|single/pages-3",
+  "division:div_zero_in_quotient|sections/defaults",
+  "division:div_zero_in_quotient|sections/ex-each",
+  "division:div_zero_in_quotient|sections/ex-group",
+  "division:div_zero_in_quotient|sections/pages-2",
+  "division:div_zero_in_quotient|single/defaults",
+  "division:div_zero_in_quotient|single/ex-group",
+  "division:div_zero_in_quotient|single/layout-todays-number",
+  "division:div_zero_in_quotient|single/more-cols2+afterpage",
+  "division:div_zero_in_quotient|single/more-cols2+short",
+  "division:div_zero_in_quotient|single/more-short+afterpage",
+  "division:div_zero_in_quotient|single/pages-3",
+  "division:missing_mult_div|mixed/defaults",
+  "division:missing_mult_div|sections/defaults",
+  "division:missing_mult_div|sections/ex-each",
+  "division:missing_mult_div|sections/ex-group",
+  "division:missing_mult_div|sections/pages-2",
+  "division:missing_mult_div|single/ex-each",
+  "division:missing_mult_div|single/pages-3",
+  "subtraction:missing_add_sub|mixed/defaults",
+  "subtraction:missing_add_sub|sections/defaults",
+  "subtraction:missing_add_sub|sections/ex-each",
+  "subtraction:missing_add_sub|sections/ex-group",
+  "subtraction:missing_add_sub|sections/pages-2",
+  "subtraction:missing_add_sub|single/pages-3"
+ ],
+ "seconds": 0.5
+}

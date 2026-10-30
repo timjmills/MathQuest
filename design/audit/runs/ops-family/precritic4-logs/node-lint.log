@@ -1,0 +1,17 @@
+$ node tests/scripts/ws-node-lint.mjs --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --json /tmp/mq-precritic/20261030-194652-15083/node-lint.json
+
+ws-node-lint: 5 skill(s), 30 items each, page 12, root /home/user/MathQuest
+
+rule        skills   items  findings  skills hit  skipped
+NOTATION         5     150         0           0  -
+L1               5      52         0           0  1 measured footprint: grid check needs the browser (drawing-scale check run)
+L3               5      90         0           0  60 answer equals a number the question gives (items)
+L6               5     150         0           0  -
+L10              5     150         0           0  -
+REPEATS          5      60         0           0  -
+
+baseline: design/audit/baselines/node-lint.json (6834 finding keys pinned at n=30, page=12)
+no finding beyond the baseline
+json: /tmp/mq-precritic/20261030-194652-15083/node-lint.json
+time: load 0.3 s, lint 0.2 s, total 0.5 s
+ws-node-lint: OK

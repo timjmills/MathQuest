@@ -1,0 +1,116 @@
+$ node tests/scripts/ws-coverage-matrix.cjs --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --baseline design/audit/matrix/baseline.json --slots 2 --out /tmp/mq-precritic/20261030-194652-15083/coverage-matrix.json
+
+ws-coverage-matrix: 168 row(s) (single 78, sections 50, mixed 25, quiz 15) for 5 skill(s) of 716 live; partners from tests/fixtures/precritic/matrix-partners.json; 197 print-input files hashed (dc7a83edaa4f)
+  RUN 78 · PENDING 70 · N/A 20 · documents to run 234
+ws-coverage-matrix: running 78 row(s) = 234 document(s) on 2 slot(s), 9 document(s) a browser start
+  batch 1/26: 9 document(s) in 105.9 s (4 s of it waiting for a slot)
+  batch 2/26: 9 document(s) in 211.3 s (106 s of it waiting for a slot)
+  batch 3/26: 9 document(s) in 115.7 s (62 s of it waiting for a slot)
+  batch 4/26: 9 document(s) in 107.5 s (52 s of it waiting for a slot)
+  batch 5/26: 9 document(s) in 105.5 s (44 s of it waiting for a slot)
+  batch 6/26: 9 document(s) in 230.4 s (128 s of it waiting for a slot)
+  batch 7/26: 9 document(s) in 231.5 s (125 s of it waiting for a slot)
+  batch 8/26: 9 document(s) in 79.4 s (17 s of it waiting for a slot)
+  batch 9/26: 9 document(s) in 108.4 s (54 s of it waiting for a slot)
+  batch 10/26: 9 document(s) in 94.6 s (44 s of it waiting for a slot)
+  batch 11/26: 9 document(s) in 151.4 s (56 s of it waiting for a slot)
+  batch 12/26: 9 document(s) in 265.2 s (144 s of it waiting for a slot)
+  batch 13/26: 9 document(s) in 229.2 s (144 s of it waiting for a slot)
+  batch 14/26: 9 document(s) in 106.4 s (60 s of it waiting for a slot)
+  batch 15/26: 9 document(s) in 109.4 s (48 s of it waiting for a slot)
+  batch 16/26: 9 document(s) in 145.5 s (63 s of it waiting for a slot)
+  batch 17/26: 9 document(s) in 114.0 s (29 s of it waiting for a slot)
+  batch 18/26: 9 document(s) in 205.5 s (83 s of it waiting for a slot)
+  batch 19/26: 9 document(s) in 44.8 s
+  batch 20/26: 9 document(s) in 58.3 s
+  batch 21/26: 9 document(s) in 98.3 s
+  batch 22/26: 9 document(s) in 118.6 s
+  batch 23/26: 9 document(s) in 80.5 s
+  batch 24/26: 9 document(s) in 46.7 s
+  batch 25/26: 9 document(s) in 56.2 s
+  batch 26/26: 9 document(s) in 79.0 s
+  204 document(s) linted in 1665.3 s: 0.123 documents/s (8.16 s a document, browser starts included; 1263 s of batch time spent waiting for a slot another session held)
+
+row                                                             S          M          L          status
+addition:add_sub_100s|mixed/defaults                            4+2k 2     4+2k 2     4+2k .     PENDING(no-baseline)
+addition:add_sub_100s|sections/defaults                         4+2k 18    4+2k 16    4+2k 16    PENDING(no-baseline)
+addition:add_sub_100s|sections/ex-each                          4+2k 8     4+2k 10    4+2k 16    PENDING(no-baseline)
+addition:add_sub_100s|sections/ex-group                         6+3k 12    6+3k 12    6+3k 10    PENDING(no-baseline)
+addition:add_sub_100s|sections/pages-2                          10+5k 41   10+5k 38   10+5k 36   PENDING(no-baseline)
+addition:add_sub_100s|single/defaults                           2+1k 1     2+1k .     2+1k .     PENDING(no-baseline)
+addition:add_sub_100s|single/ex-each                            2+1k .     2+1k .     2+1k .     OK
+addition:add_sub_100s|single/ex-group                           2+1k .     2+1k .     2+1k 1     PENDING(no-baseline)
+addition:add_sub_100s|single/layout-fact-rows                   n/a        n/a        n/a        N/A
+addition:add_sub_100s|single/layout-timed                       n/a        n/a        n/a        N/A
+addition:add_sub_100s|single/layout-todays-number               2+1k 1     2+1k .     2+1k .     PENDING(no-baseline)
+addition:add_sub_100s|single/more-cols2+nline+afterpage         2+1k .     2+1k .     2+1k .     OK
+addition:add_sub_100s|single/more-cols2+nline+short             2+1k .     2+1k .     2+1k .     OK
+addition:add_sub_100s|single/more-cols2+short+afterpage         2+1k 1     2+1k .     2+1k .     PENDING(no-baseline)
+addition:add_sub_100s|single/more-nline+short+afterpage         2+1k 1     2+1k .     2+1k .     PENDING(no-baseline)
+addition:add_sub_100s|single/pages-3                            6+3k 2     6+3k .     6+3k .     PENDING(no-baseline)
+addition:add_sub_10s|mixed/defaults                             4+2k 2     4+2k 2     4+2k 2     PENDING(no-baseline)
+addition:add_sub_10s|sections/defaults                          4+2k 20    4+2k 24    4+2k 16    PENDING(no-baseline)
+addition:add_sub_10s|sections/ex-each                           4+2k 12    4+2k 12    4+2k 18    PENDING(no-baseline)
+addition:add_sub_10s|sections/ex-group                          6+3k 12    6+3k 20    6+3k 12    PENDING(no-baseline)
+addition:add_sub_10s|sections/pages-2                           10+5k 39   10+5k 44   10+5k 36   PENDING(no-baseline)
+addition:add_sub_10s|single/defaults                            2+1k .     2+1k 1     2+1k .     PENDING(no-baseline)
+addition:add_sub_10s|single/ex-each                             2+1k .     2+1k .     2+1k .     OK
+addition:add_sub_10s|single/ex-group                            2+1k .     2+1k .     2+1k .     OK
+addition:add_sub_10s|single/layout-fact-rows                    n/a        n/a        n/a        N/A
+addition:add_sub_10s|single/layout-timed                        n/a        n/a        n/a        N/A
+addition:add_sub_10s|single/layout-todays-number                2+1k .     2+1k 1     2+1k .     PENDING(no-baseline)
+addition:add_sub_10s|single/more-cols2+nline+afterpage          2+1k .     2+1k .     2+1k .     OK
+addition:add_sub_10s|single/more-cols2+nline+short              2+1k .     2+1k .     2+1k .     OK
+addition:add_sub_10s|single/more-cols2+short+afterpage          2+1k 1     2+1k .     2+1k .     PENDING(no-baseline)
+addition:add_sub_10s|single/more-nline+short+afterpage          2+1k .     2+1k 1     2+1k .     PENDING(no-baseline)
+addition:add_sub_10s|single/pages-3                             6+3k .     6+3k 2     6+3k .     PENDING(no-baseline)
+division:div_zero_in_quotient|mixed/defaults                    4+2k .     4+2k .     4+2k .     OK
+division:div_zero_in_quotient|sections/defaults                 4+2k 17    4+2k 17    4+2k 17    PENDING(no-baseline)
+division:div_zero_in_quotient|sections/ex-each                  4+2k 16    4+2k 14    6+3k 12    PENDING(no-baseline)
+division:div_zero_in_quotient|sections/ex-group                 6+3k 11    6+3k 11    6+3k 12    PENDING(no-baseline)
+division:div_zero_in_quotient|sections/pages-2                  10+5k 39   10+5k 36   10+5k 30   PENDING(no-baseline)
+division:div_zero_in_quotient|single/defaults                   2+1k 12    2+1k .     2+1k .     PENDING(no-baseline)
+division:div_zero_in_quotient|single/ex-each                    2+1k .     2+1k .     2+1k .     OK
+division:div_zero_in_quotient|single/ex-group                   2+1k 8     2+1k .     2+1k .     PENDING(no-baseline)
+division:div_zero_in_quotient|single/layout-fact-rows           n/a        n/a        n/a        N/A
+division:div_zero_in_quotient|single/layout-timed               n/a        n/a        n/a        N/A
+division:div_zero_in_quotient|single/layout-todays-number       2+1k 12    2+1k .     2+1k .     PENDING(no-baseline)
+division:div_zero_in_quotient|single/more-cols2+afterpage       2+1k 12    2+1k .     2+1k .     PENDING(no-baseline)
+division:div_zero_in_quotient|single/more-cols2+short           2+1k 6     2+1k .     2+1k .     PENDING(no-baseline)
+division:div_zero_in_quotient|single/more-short+afterpage       2+1k 6     2+1k .     2+1k .     PENDING(no-baseline)
+division:div_zero_in_quotient|single/pages-3                    6+3k 36    6+3k .     6+3k .     PENDING(no-baseline)
+division:missing_mult_div|mixed/defaults                        4+2k 2     4+2k 2     4+2k 2     PENDING(no-baseline)
+division:missing_mult_div|sections/defaults                     4+2k 10    4+2k 10    4+2k 10    PENDING(no-baseline)
+division:missing_mult_div|sections/ex-each                      4+2k 12    6+3k 14    6+3k 10    PENDING(no-baseline)
+division:missing_mult_div|sections/ex-group                     6+3k 12    6+3k 14    6+3k 10    PENDING(no-baseline)
+division:missing_mult_div|sections/pages-2                      10+5k 31   10+5k 30   10+5k 32   PENDING(no-baseline)
+division:missing_mult_div|single/defaults                       2+1k .     2+1k .     2+1k .     OK
+division:missing_mult_div|single/ex-each                        2+1k .     2+1k .     2+1k 3     PENDING(no-baseline)
+division:missing_mult_div|single/ex-group                       2+1k .     2+1k .     2+1k .     OK
+division:missing_mult_div|single/layout-fact-rows               n/a        n/a        n/a        N/A
+division:missing_mult_div|single/layout-timed                   n/a        n/a        n/a        N/A
+division:missing_mult_div|single/layout-todays-number           2+1k .     2+1k .     2+1k .     OK
+division:missing_mult_div|single/more-cols2+afterpage           2+1k .     2+1k .     2+1k .     OK
+division:missing_mult_div|single/more-cols2+short               2+1k .     2+1k .     2+1k .     OK
+division:missing_mult_div|single/more-short+afterpage           2+1k .     2+1k .     2+1k .     OK
+division:missing_mult_div|single/pages-3                        6+3k 1     6+3k .     6+3k .     PENDING(no-baseline)
+subtraction:missing_add_sub|mixed/defaults                      4+2k 4     4+2k 2     4+2k 2     PENDING(no-baseline)
+subtraction:missing_add_sub|sections/defaults                   4+2k 10    4+2k 10    4+2k 10    PENDING(no-baseline)
+subtraction:missing_add_sub|sections/ex-each                    4+2k 10    4+2k 10    6+3k 10    PENDING(no-baseline)
+subtraction:missing_add_sub|sections/ex-group                   6+3k 12    6+3k 10    6+3k 10    PENDING(no-baseline)
+subtraction:missing_add_sub|sections/pages-2                    10+5k 31   10+5k 30   10+5k 30   PENDING(no-baseline)
+subtraction:missing_add_sub|single/defaults                     2+1k .     2+1k .     2+1k .     OK
+subtraction:missing_add_sub|single/ex-each                      2+1k .     2+1k .     2+1k .     OK
+subtraction:missing_add_sub|single/ex-group                     2+1k .     2+1k .     2+1k .     OK
+subtraction:missing_add_sub|single/layout-fact-rows             n/a        n/a        n/a        N/A
+subtraction:missing_add_sub|single/layout-timed                 n/a        n/a        n/a        N/A
+subtraction:missing_add_sub|single/layout-todays-number         2+1k .     2+1k .     2+1k .     OK
+subtraction:missing_add_sub|single/more-cols2+nline+afterpage   2+1k .     2+1k .     2+1k .     OK
+subtraction:missing_add_sub|single/more-cols2+nline+short       2+1k .     2+1k .     2+1k .     OK
+subtraction:missing_add_sub|single/more-cols2+short+afterpage   2+1k .     2+1k .     2+1k .     OK
+subtraction:missing_add_sub|single/more-nline+short+afterpage   2+1k .     2+1k .     2+1k .     OK
+subtraction:missing_add_sub|single/pages-3                      6+3k 1     6+3k .     6+3k .     PENDING(no-baseline)
+
+ws-coverage-matrix: OK 23 · CACHED 0 · RED 0 · PENDING 115 · N/A 30 · ERROR 0
+wrote ../../../tmp/mq-precritic/20261030-194652-15083/coverage-matrix.json
+ws-coverage-matrix: OK (168 row(s), 78 run, 0 cached, 1669 s; 45 row(s) PENDING(no-baseline): printed, not judged)

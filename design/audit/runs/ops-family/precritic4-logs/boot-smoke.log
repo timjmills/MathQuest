@@ -1,0 +1,4 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-boot-smoke.cjs
+
+mq-browser-run: slot 1 after 56s
+ws-boot-smoke: OK

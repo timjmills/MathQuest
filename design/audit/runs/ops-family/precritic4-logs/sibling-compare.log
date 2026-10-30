@@ -1,0 +1,246 @@
+$ node tests/scripts/ws-sibling-compare.cjs --run /tmp/mq-precritic/20261030-194652-15083/coverage-matrix.json --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --run-siblings --json /tmp/mq-precritic/20261030-194652-15083/sibling-compare.json
+
+ws-sibling-compare: 5 lane skill(s) on this tree; 168 row(s), 0 RED, 45 PENDING(no-baseline), 0 ERROR; comparing every printed row with findings (RED, OK, PENDING(no-baseline)) with the paired siblings (all approved where the skill has no pair)
+  addition:add_sub_10s: template equation; siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  addition:add_sub_100s: template equation; siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  subtraction:missing_add_sub: template equation, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  division:missing_mult_div: template equation, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  division:div_zero_in_quotient: template division; siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  sibling counts from: pins (design/audit/matrix/baseline.json): 0 sibling row(s)
+NO-SIBLING addition:add_sub_100s|mixed/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at S
+NO-SIBLING addition:add_sub_100s|mixed/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at M
+NO-SIBLING addition:add_sub_100s|sections/defaults S L-OVERFLOW PG-12: ours 8, no approved sibling measured sections/defaults at S
+NO-SIBLING addition:add_sub_100s|sections/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at S
+NO-SIBLING addition:add_sub_100s|sections/defaults M L-OVERFLOW PG-12: ours 6, no approved sibling measured sections/defaults at M
+NO-SIBLING addition:add_sub_100s|sections/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at M
+NO-SIBLING addition:add_sub_100s|sections/defaults L L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at L
+NO-SIBLING addition:add_sub_100s|sections/defaults L L-OVERLAP CL40-INK: ours 6, no approved sibling measured sections/defaults at L
+NO-SIBLING addition:add_sub_100s|sections/ex-group S L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING addition:add_sub_100s|sections/ex-group S L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING addition:add_sub_100s|sections/ex-group M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING addition:add_sub_100s|sections/ex-group M L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING addition:add_sub_100s|sections/ex-group L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING addition:add_sub_100s|sections/pages-2 S L-OVERFLOW PG-12: ours 8, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_sub_100s|sections/pages-2 S L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_sub_100s|sections/pages-2 S L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_sub_100s|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_sub_100s|sections/pages-2 M L-OVERFLOW PG-12: ours 6, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_sub_100s|sections/pages-2 M L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_sub_100s|sections/pages-2 M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_sub_100s|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_sub_100s|sections/pages-2 L L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_sub_100s|sections/pages-2 L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_sub_100s|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_sub_100s|sections/pages-2 L L-OVERLAP CL40-INK: ours 6, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_sub_100s|single/defaults S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/defaults at S
+NO-SIBLING addition:add_sub_100s|single/ex-group L L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/ex-group at L
+NO-SIBLING addition:add_sub_100s|single/layout-todays-number S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/layout-todays-number at S
+NO-SIBLING addition:add_sub_100s|single/more-cols2+short+afterpage S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/more-cols2+short+afterpage at S
+NO-SIBLING addition:add_sub_100s|single/more-nline+short+afterpage S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/more-nline+short+afterpage at S
+NO-SIBLING addition:add_sub_100s|single/pages-3 S L-DENSITY PAGEFILL: ours 2, no approved sibling measured single/pages-3 at S
+NO-SIBLING addition:add_sub_10s|mixed/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at S
+NO-SIBLING addition:add_sub_10s|mixed/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at M
+NO-SIBLING addition:add_sub_10s|mixed/defaults L L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at L
+NO-SIBLING addition:add_sub_10s|sections/defaults S L-OVERFLOW PG-12: ours 10, no approved sibling measured sections/defaults at S
+NO-SIBLING addition:add_sub_10s|sections/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at S
+NO-SIBLING addition:add_sub_10s|sections/defaults M L-OVERFLOW PG-12: ours 8, no approved sibling measured sections/defaults at M
+NO-SIBLING addition:add_sub_10s|sections/defaults M L-OVERLAP CL40-INK: ours 6, no approved sibling measured sections/defaults at M
+NO-SIBLING addition:add_sub_10s|sections/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at M
+NO-SIBLING addition:add_sub_10s|sections/defaults L L-OVERFLOW PG-12: ours 6, no approved sibling measured sections/defaults at L
+NO-SIBLING addition:add_sub_10s|sections/defaults L L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at L
+NO-SIBLING addition:add_sub_10s|sections/ex-each M L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-each at M
+NO-SIBLING addition:add_sub_10s|sections/ex-group S L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING addition:add_sub_10s|sections/ex-group S L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING addition:add_sub_10s|sections/ex-group M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING addition:add_sub_10s|sections/ex-group M L-OVERLAP CL40-INK: ours 6, no approved sibling measured sections/ex-group at M
+NO-SIBLING addition:add_sub_10s|sections/ex-group L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING addition:add_sub_10s|sections/ex-group L L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING addition:add_sub_10s|sections/pages-2 S L-OVERFLOW PG-12: ours 10, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_sub_10s|sections/pages-2 S L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_sub_10s|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_sub_10s|sections/pages-2 M L-OVERFLOW PG-12: ours 8, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_sub_10s|sections/pages-2 M L-OVERLAP CL40-INK: ours 8, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_sub_10s|sections/pages-2 M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_sub_10s|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_sub_10s|sections/pages-2 L L-OVERFLOW PG-12: ours 6, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_sub_10s|sections/pages-2 L L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_sub_10s|sections/pages-2 L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_sub_10s|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_sub_10s|single/defaults M L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/defaults at M
+NO-SIBLING addition:add_sub_10s|single/layout-todays-number M L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/layout-todays-number at M
+NO-SIBLING addition:add_sub_10s|single/more-cols2+short+afterpage S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/more-cols2+short+afterpage at S
+NO-SIBLING addition:add_sub_10s|single/more-nline+short+afterpage M L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/more-nline+short+afterpage at M
+NO-SIBLING addition:add_sub_10s|single/pages-3 M L-DENSITY PAGEFILL: ours 2, no approved sibling measured single/pages-3 at M
+NO-SIBLING division:div_zero_in_quotient|sections/defaults S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/defaults at S
+NO-SIBLING division:div_zero_in_quotient|sections/defaults M L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/defaults at M
+NO-SIBLING division:div_zero_in_quotient|sections/defaults L L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/defaults at L
+NO-SIBLING division:div_zero_in_quotient|sections/ex-each L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING division:div_zero_in_quotient|sections/ex-each L L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING division:div_zero_in_quotient|sections/ex-group S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/ex-group at S
+NO-SIBLING division:div_zero_in_quotient|sections/ex-group S L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING division:div_zero_in_quotient|sections/ex-group M L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/ex-group at M
+NO-SIBLING division:div_zero_in_quotient|sections/ex-group M L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING division:div_zero_in_quotient|sections/ex-group L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING division:div_zero_in_quotient|sections/ex-group L L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 S L-DENSITY H13: ours 10, no approved sibling measured sections/pages-2 at S
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 S L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at S
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 M L-DENSITY H13: ours 8, no approved sibling measured sections/pages-2 at M
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 L L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING division:div_zero_in_quotient|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING division:div_zero_in_quotient|single/defaults S L-DENSITY H13: ours 12, no approved sibling measured single/defaults at S
+NO-SIBLING division:div_zero_in_quotient|single/ex-group S L-DENSITY H13: ours 8, no approved sibling measured single/ex-group at S
+NO-SIBLING division:div_zero_in_quotient|single/layout-todays-number S L-DENSITY H13: ours 12, no approved sibling measured single/layout-todays-number at S
+NO-SIBLING division:div_zero_in_quotient|single/more-cols2+afterpage S L-DENSITY H13: ours 12, no approved sibling measured single/more-cols2+afterpage at S
+NO-SIBLING division:div_zero_in_quotient|single/more-cols2+short S L-DENSITY H13: ours 6, no approved sibling measured single/more-cols2+short at S
+NO-SIBLING division:div_zero_in_quotient|single/more-short+afterpage S L-DENSITY H13: ours 6, no approved sibling measured single/more-short+afterpage at S
+NO-SIBLING division:div_zero_in_quotient|single/pages-3 S L-DENSITY H13: ours 36, no approved sibling measured single/pages-3 at S
+NO-SIBLING division:missing_mult_div|mixed/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at S
+NO-SIBLING division:missing_mult_div|mixed/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at M
+NO-SIBLING division:missing_mult_div|mixed/defaults L L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at L
+NO-SIBLING division:missing_mult_div|sections/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at S
+NO-SIBLING division:missing_mult_div|sections/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at M
+NO-SIBLING division:missing_mult_div|sections/defaults L L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at L
+NO-SIBLING division:missing_mult_div|sections/ex-each S L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-each at S
+NO-SIBLING division:missing_mult_div|sections/ex-each M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-each at M
+NO-SIBLING division:missing_mult_div|sections/ex-each L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING division:missing_mult_div|sections/ex-group S L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING division:missing_mult_div|sections/ex-group S L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING division:missing_mult_div|sections/ex-group M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING division:missing_mult_div|sections/ex-group L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING division:missing_mult_div|sections/pages-2 S L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING division:missing_mult_div|sections/pages-2 S L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at S
+NO-SIBLING division:missing_mult_div|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING division:missing_mult_div|sections/pages-2 M L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING division:missing_mult_div|sections/pages-2 M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING division:missing_mult_div|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING division:missing_mult_div|sections/pages-2 L L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING division:missing_mult_div|sections/pages-2 L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING division:missing_mult_div|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING division:missing_mult_div|sections/pages-2 L L-OVERLAP CL40-INK: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING division:missing_mult_div|single/ex-each L L-DENSITY H13: ours 2, no approved sibling measured single/ex-each at L
+NO-SIBLING division:missing_mult_div|single/ex-each L L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/ex-each at L
+NO-SIBLING division:missing_mult_div|single/pages-3 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/pages-3 at S
+NO-SIBLING subtraction:missing_add_sub|mixed/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at S
+NO-SIBLING subtraction:missing_add_sub|mixed/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at M
+NO-SIBLING subtraction:missing_add_sub|mixed/defaults L L-DENSITY PG-23: ours 2, no approved sibling measured mixed/defaults at L
+NO-SIBLING subtraction:missing_add_sub|sections/defaults S L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at S
+NO-SIBLING subtraction:missing_add_sub|sections/defaults M L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at M
+NO-SIBLING subtraction:missing_add_sub|sections/defaults L L-DENSITY PG-23: ours 2, no approved sibling measured sections/defaults at L
+NO-SIBLING subtraction:missing_add_sub|sections/ex-each S L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-each at S
+NO-SIBLING subtraction:missing_add_sub|sections/ex-each M L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-each at M
+NO-SIBLING subtraction:missing_add_sub|sections/ex-each L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING subtraction:missing_add_sub|sections/ex-group S L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING subtraction:missing_add_sub|sections/ex-group S L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-group at S
+NO-SIBLING subtraction:missing_add_sub|sections/ex-group M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING subtraction:missing_add_sub|sections/ex-group L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 S L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 S L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 M L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 L L-DENSITY DN-2: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:missing_add_sub|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:missing_add_sub|single/pages-3 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/pages-3 at S
+partner    addition:add_sub_100s|sections/defaults S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/defaults M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/defaults L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/ex-each S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/ex-each M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/ex-each M L-WRAP WRAP-OP: 2 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/ex-each L L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/ex-each L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/ex-group S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/ex-group M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/ex-group L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/pages-2 S L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/pages-2 S L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/pages-2 S L-DENSITY H13: 2 on the partner skill(s)' cells (area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/pages-2 M L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/pages-2 M L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/pages-2 M L-DENSITY H13: 2 on the partner skill(s)' cells (area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/pages-2 L L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_100s|sections/pages-2 L L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/defaults S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/defaults M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/defaults L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-each S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-each S L-WRAP WRAP-OP: 4 on the partner skill(s)' cells (addition:add_facts, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-each M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-each M L-WRAP WRAP-OP: 2 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-each L L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-each L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-each L L-WRAP WRAP-OP: 2 on the partner skill(s)' cells (area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-group S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-group M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-group M L-DENSITY H13: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/ex-group L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/pages-2 S L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/pages-2 S L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/pages-2 M L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/pages-2 M L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/pages-2 L L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_sub_10s|sections/pages-2 L L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/defaults S L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/defaults S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/defaults M L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/defaults M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/defaults L L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/defaults L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-each S L-INK ILLEGIBLE: 4 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-each S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-each S L-WRAP WRAP-OP: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-each M L-INK ILLEGIBLE: 4 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-each M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-each M L-WRAP WRAP-OP: 2 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-each L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-group S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-group M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/ex-group L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/pages-2 S L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/pages-2 S L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/pages-2 M L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/pages-2 M L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/pages-2 L L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:div_zero_in_quotient|sections/pages-2 L L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/defaults S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/defaults M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/defaults L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-each S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-each S L-WRAP WRAP-OP: 2 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-each M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-each M L-DENSITY H13: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-each L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-group S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-group M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-group M L-DENSITY H13: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/ex-group L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/pages-2 S L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/pages-2 S L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/pages-2 M L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/pages-2 M L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/pages-2 L L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    division:missing_mult_div|sections/pages-2 L L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|mixed/defaults S L-DENSITY H13: 2 on the partner skill(s)' cells (area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/defaults S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/defaults M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/defaults L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/ex-each S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/ex-each M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/ex-each L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/ex-group S L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/ex-group M L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/ex-group L L-OVERFLOW PG-12: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/pages-2 S L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/pages-2 S L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/pages-2 M L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/pages-2 M L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/pages-2 L L-INK ILLEGIBLE: 8 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    subtraction:missing_add_sub|sections/pages-2 L L-OVERFLOW PG-12: 16 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+  no approved siblings for addition:add_sub_10s, addition:add_sub_100s, subtraction:missing_add_sub, division:missing_mult_div, division:div_zero_in_quotient: every red count of theirs is unproven
+ws-sibling-compare: FAIL - worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 140 unproven (no sibling), 0 ERROR (45 row(s) with findings compared (PENDING(no-baseline) 45); 0 count(s) at or below the siblings (engine red, non-blocking), 0 above, 140 with no sibling measured, 0 ERROR row(s), 95 partner-skill count(s) (non-blocking); 0.5 s (lane matrix 0 s, sibling matrix 0 s))

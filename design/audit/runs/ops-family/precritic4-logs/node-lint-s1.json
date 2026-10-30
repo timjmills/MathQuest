@@ -1,0 +1,40 @@
+{
+ "root": "/home/user/MathQuest",
+ "n": 30,
+ "page": 12,
+ "rules": [
+  "LESSON-DATA",
+  "OPTION-HELP",
+  "WRONG-FITS"
+ ],
+ "subjects": [
+  "addition:add_sub_10s",
+  "addition:add_sub_100s",
+  "subtraction:missing_add_sub",
+  "division:missing_mult_div",
+  "division:div_zero_in_quotient"
+ ],
+ "checked": {
+  "LESSON-DATA": {
+   "skills": 5,
+   "items": 5
+  },
+  "OPTION-HELP": {
+   "skills": 5,
+   "items": 19
+  }
+ },
+ "skipped": {
+  "WRONG-FITS": {
+   "no item with a declared box count and a number wrong answer (skills)": 5
+  }
+ },
+ "counts": {},
+ "findings": [],
+ "added": [],
+ "gone": [],
+ "ms": {
+  "load": 540,
+  "run": 420
+ }
+}

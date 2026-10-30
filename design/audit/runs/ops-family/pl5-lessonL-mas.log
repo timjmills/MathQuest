@@ -1,0 +1,13 @@
+ws-print-lint: source kit, 1 skill(s)
+  subtraction:missing_add_sub#lesson: 6+3 pages, 2 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+subtraction:missing_add_sub#lesson      6+3k    .     .    .    .        .     .       2    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                           .     .    .    .        .     .       2    .     .       .     .    .      .       .        .       .    .
+
+subtraction:missing_add_sub#lesson (Missing Numbers (+/−) (lesson))
+  [L-DENSITY H13 major] x2 (p2,5 cells 2,2) one empty band 48.6 mm tall under the item in a 63.9 mm cell, 48.6 mm (76%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)
+      e.g. <div.ws-cell.fact[data-ws-cell="fact"]> "1 2 + 9 =" | <div.ws-cell.fact[data-ws-cell="fact"]> "1 2 + 9 = 11"
+
+ws-print-lint: FAIL - ratchet: 1 count(s) rose above design/audit/baselines/print-lint.json
+  - subtraction:missing_add_sub#lesson L-DENSITY H13: 0 -> 2

@@ -1,0 +1,3097 @@
+{
+ "counts": {
+  "skillsLive": 5,
+  "skillsWithOptions": 5,
+  "skillsWithoutOptions": 0,
+  "values": 147,
+  "valuesPass": 147,
+  "valuesFail": 0,
+  "skillsPass": 5,
+  "skillsFail": 0,
+  "gated": 0,
+  "bySurface": {
+   "trip": 0,
+   "gen": 0,
+   "print": 0,
+   "screen": 0
+  }
+ },
+ "results": [
+  {
+   "key": "addition:add_sub_10s",
+   "categoryId": "addition",
+   "skillId": "add_sub_10s",
+   "label": "Add & Subtract by 10s",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [],
+   "options": [
+    {
+     "id": "task",
+     "label": "Operation",
+     "type": "set",
+     "n": 2,
+     "default": [
+      0,
+      1
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "task",
+     "label": "Operation",
+     "value": [
+      0
+     ],
+     "valueLabel": "Adding tens",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "66 + 10 = ? = 76",
+      "87 + 10 = ? = 97"
+     ]
+    },
+    {
+     "option": "task",
+     "label": "Operation",
+     "value": [
+      1
+     ],
+     "valueLabel": "Subtracting tens",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "98 - 10 = ? = 88",
+      "71 - 10 = ? = 61"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 50,
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "18 - 10 = ? = 8",
+      "35 - 10 = ? = 25"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "addition:add_sub_100s",
+   "categoryId": "addition",
+   "skillId": "add_sub_100s",
+   "label": "Add & Subtract by 100s",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [],
+   "options": [
+    {
+     "id": "task",
+     "label": "Operation",
+     "type": "set",
+     "n": 2,
+     "default": [
+      0,
+      1
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "task",
+     "label": "Operation",
+     "value": [
+      0
+     ],
+     "valueLabel": "Adding hundreds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "261 + 100 = ? = 361",
+      "139 + 100 = ? = 239"
+     ]
+    },
+    {
+     "option": "task",
+     "label": "Operation",
+     "value": [
+      1
+     ],
+     "valueLabel": "Subtracting hundreds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "608 - 100 = ? = 508",
+      "186 - 100 = ? = 86"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 500,
+     "valueLabel": "500",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "267 - 100 = ? = 167",
+      "316 - 100 = ? = 216"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "subtraction:missing_add_sub",
+   "categoryId": "subtraction",
+   "skillId": "missing_add_sub",
+   "label": "Missing Numbers (+/−)",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [],
+   "options": [
+    {
+     "id": "unknown",
+     "label": "What is missing",
+     "type": "set",
+     "n": 2,
+     "default": [
+      1
+     ]
+    },
+    {
+     "id": "task",
+     "label": "Operation",
+     "type": "set",
+     "n": 2,
+     "default": [
+      0,
+      1
+     ]
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "range",
+     "label": "Max Number",
+     "type": "enum",
+     "n": 3,
+     "default": null
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "unknown",
+     "label": "What is missing",
+     "value": [
+      0
+     ],
+     "valueLabel": "The answer (8 + 5 = __)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "8 + 3 = ___ = 11",
+      "4 + 14 = ___ = 18"
+     ]
+    },
+    {
+     "option": "unknown",
+     "label": "What is missing",
+     "value": [
+      0,
+      1
+     ],
+     "valueLabel": "All of them, mixed",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "___ - 15 = 4 = 19",
+      "3 + 15 = ___ = 18"
+     ]
+    },
+    {
+     "option": "task",
+     "label": "Operation",
+     "value": [
+      0
+     ],
+     "valueLabel": "Adding",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "___ + 3 = 11 = 8",
+      "___ + 14 = 18 = 4"
+     ]
+    },
+    {
+     "option": "task",
+     "label": "Operation",
+     "value": [
+      1
+     ],
+     "valueLabel": "Subtracting",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "___ - 8 = 3 = 11",
+      "___ - 4 = 14 = 18"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "range",
+     "label": "Max Number",
+     "value": 10,
+     "valueLabel": "Up to 10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "7 + ___ = 9 = 2",
+      "___ + 3 = 10 = 7"
+     ]
+    },
+    {
+     "option": "range",
+     "label": "Max Number",
+     "value": 100,
+     "valueLabel": "Up to 100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 10,
+      "decimals": 0
+     },
+     "sample": [
+      "15 - ___ = 8 = 7",
+      "13 - ___ = 7 = 6"
+     ]
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "division:missing_mult_div",
+   "categoryId": "division",
+   "skillId": "missing_mult_div",
+   "label": "Missing Factors (×/÷)",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [],
+   "options": [
+    {
+     "id": "notation",
+     "label": "How it is written",
+     "type": "set",
+     "n": 3,
+     "default": [
+      "across"
+     ]
+    },
+    {
+     "id": "range",
+     "label": "Max Number",
+     "type": "enum",
+     "n": 3,
+     "default": null
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "notation",
+     "label": "How it is written",
+     "value": [
+      "bracket"
+     ],
+     "valueLabel": "Long division bracket  (4⟌48)",
+     "fails": [],
+     "warns": [
+      "gen: 6/12 items overruled to  (multi-digit exception)"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "___ ÷ 8 = 9 = 72",
+      "2 × ___ = 4 = 2"
+     ]
+    },
+    {
+     "option": "notation",
+     "label": "How it is written",
+     "value": [
+      "fraction"
+     ],
+     "valueLabel": "Fraction bar  (48 over 4)",
+     "fails": [],
+     "warns": [
+      "gen: 6/12 items overruled to  (multi-digit exception)"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "___ ÷ 8 = 9 = 72",
+      "2 × ___ = 4 = 2"
+     ]
+    },
+    {
+     "option": "notation",
+     "label": "How it is written",
+     "value": [
+      "across",
+      "bracket",
+      "fraction"
+     ],
+     "valueLabel": "All three ways, mixed",
+     "fails": [],
+     "warns": [
+      "gen: 6/12 items overruled to  (multi-digit exception)"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "___ ÷ 7 = 11 = 77",
+      "2 × ___ = 4 = 2"
+     ]
+    },
+    {
+     "option": "range",
+     "label": "Max Number",
+     "value": 100,
+     "valueLabel": "Up to 100",
+     "fails": [],
+     "warns": [
+      "gen: \"Up to 100\" but the answer reaches 108 and the numbers 110"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 1000,
+      "decimals": 0
+     },
+     "sample": [
+      "108 ÷ ___ = 12 = 9",
+      "___ ÷ 11 = 9 = 99"
+     ]
+    },
+    {
+     "option": "range",
+     "label": "Max Number",
+     "value": 1000,
+     "valueLabel": "Up to 1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "18 × ___ = 108 = 6",
+      "___ ÷ 22 = 6 = 132"
+     ]
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "division:div_zero_in_quotient",
+   "categoryId": "division",
+   "skillId": "div_zero_in_quotient",
+   "label": "Zero in the Quotient",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [],
+   "options": [
+    {
+     "id": "range",
+     "label": "Max Number",
+     "type": "enum",
+     "n": 3,
+     "default": null
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "range",
+     "label": "Max Number",
+     "value": 100,
+     "valueLabel": "Up to 100",
+     "fails": [],
+     "warns": [
+      "gen: \"Up to 100\" but the answer reaches 480 and the numbers 980",
+      "print: \"Up to 100\" but the answer reaches 440 and the numbers 880"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 1000,
+      "decimals": 0
+     },
+     "sample": [
+      "880 ÷ 4 = ? = 220",
+      "540 ÷ 2 = ? = 270"
+     ]
+    },
+    {
+     "option": "range",
+     "label": "Max Number",
+     "value": 1000,
+     "valueLabel": "Up to 1,000",
+     "fails": [],
+     "warns": [
+      "gen: \"Up to 1000\" but the answer reaches 4013 and the numbers 8388",
+      "print: \"Up to 1000\" but the answer reaches 4013 and the numbers 8026"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "750 ÷ 5 = ? = 150",
+      "8,026 ÷ 2 = ? = 4013"
+     ]
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  }
+ ],
+ "noOptions": []
+}
