@@ -5,8 +5,8 @@ Branch: claude/sweet-newton-c8wrv1-lessons-6-7
 Owner of files: js/modules/lessons/detailed/g4-nbt1-ten-times-value.js, g3-oa8-two-step-wp.js; cells/pv-times.js; word-work frames/choose layouts; design/lesson-planner/lessons/{g4-nbt1-ten-times-value,g3-oa8-two-step-wp}/
 State: paused
 Updated: 2026-10-30
-Builder profile: mq-opus-medium (lesson 6 fix r4), mq-opus-low (lesson 7 build r2, msChoose)
-Critic rounds: lesson 6: 3, r3 PASS (min 8/8/8/8); lesson 7: 1, r1 FAIL (min 8/7/7/7)
+Builder profile: mq-opus-medium
+Critic rounds: 3, PASS (lesson 6 r3 PASS 8/8/8/8; lesson 7 r1 FAIL 8/7/7/7 — see Hand-over)
 
 ## Now
 - PAUSED by the owner 2026-10-30 after this critic round (no fix round). Lesson 6 PASSED and is ready to go live from this branch.
