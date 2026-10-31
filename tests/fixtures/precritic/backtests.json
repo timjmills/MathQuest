@@ -776,6 +776,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "detailed-link-every-use",
+   "check": "A detailed lesson's Practice link decodes to skills.used use by use, each with its own options (lessons 6-7 merge: the link de-duplicated by skill id)",
+   "kind": "commit-pair",
+   "rule": "ws-teacher-wrm round 9 detailed cards: link decodes to skills.used in order; options compared per use",
+   "browser": true,
+   "fail": {
+    "commit": "5c6063a5",
+    "state": "lessons 6-7 merged: lesson 6 link holds 7 of its 14 uses, 11 option sets lost"
+   },
+   "pass": {
+    "commit": "c5675779",
+    "state": "makePracticeLink encodes its items, not the de-duplicated queue"
+   },
+   "command": "node tests/scripts/ws-teacher-wrm.cjs --grade 4",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

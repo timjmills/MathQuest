@@ -106,6 +106,12 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    runs `ws-stamp-assets`. The owner's go for a family is the line `Owner go: <family>, <YYYY-MM-DD>` in the lane file
    (§1.6.3 step 6).
    *Check:* the deploy is refused for a family with no go line.
+9. **A lane's gate set includes every gate that reads what it ships (lessons 6-7 merge, 2026-10-31).** Detailed lessons
+   6 and 7 merged with their own gates green (ws-detailed-lesson, precritic --role lesson), but ws-teacher-wrm, which
+   decodes each detailed lesson's teacher Practice link, was not on the lessons lane's path and went red: the link was
+   built from the de-duplicated skill queue, so a skill used twice with different options lost its second use and its
+   options. Root fix: the link encodes its own items (each (skill, options) use). The gate compares use by use.
+   *Check:* `ws-precritic --role lesson` now runs ws-teacher-wrm; backtest row `detailed-link-every-use`.
 
 ## PRE-FLIGHT checklist (every lane, before reporting)
 1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at
