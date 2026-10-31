@@ -215,3 +215,34 @@ chromebook-fit had not reported when the budget stopped.
    and diff coverage-matrix / sibling-compare / slot-clip logs against /tmp/mq-precritic/20261031-132149-21153.
 5. Then `node tests/scripts/ws-precritic.cjs --strict --skill addition:add_100_regroup --skill addition:add_10_regroup --skill addition:add_facts --skill multiplication:mult_facts --skill addition:add_sub_10s --skill multiplication:multiply --skill division:div_facts`
    (now also runs render-delta) and `node tests/scripts/ws-ansbox-default-parity.mjs --skills ansbox`.
+
+### r3b (owner decisions a + b applied, 2026-10-31 evening) - HAND-OVER at the budget stop
+**Owner rule, check f (replaces "no two values alike on any host"):** every offered value draws what its LABEL says on every
+host; two offered values may coincide on one host only where both labels stay true there (One box on a fact screen that already
+shows one box; Off on paper where Automatic is already the plain space). Recorded as LESSONS L22.
+**Done:** `ans-slot.js` offers all four values on facts / equations / legacy facts / columns (b); `offeredAnsValues(layout, key, look)`
+drops "One box per digit" on an across look (a) and the stamp (`generate-question.js`) passes the look, so a value the look cannot
+draw draws Automatic; `ws-ansbox-shape` measures each look with ITS offered values and applies the label-truth f.
+**Gates on 7a…(HEAD before this note):** parity `ws-ansbox-default-parity: OK (2310 documents byte-identical to merge-base 5c6063a, 70 skills)`;
+boot-smoke OK; code-snapshot OK (731); stamp --check OK. Precritic r3b (logs: newest /tmp/mq-precritic/2026*): PASS providers,
+node-lint, code-snapshot, content-audit, lessonfit, ansbox-parity, presets, print-lint kit L/S/M, screen-slots, screen-answer,
+boot-smoke; FAIL as on main: dealer-uniform, node-lint-s1, print-lint-lesson-L/S; FAIL new: options-verify, ansbox-shape,
+render-delta (below). options-render / coverage-matrix / sibling-compare / slot-clip had not finished: ⊆-main diff NOT done.
+`ws-ansbox-shape --full` was cut at 20/70 skills: 108 f + 2 g.
+
+**Not done (next builder, in order):**
+1. Draw the re-offered values on the legacy paths I had gated off in r3: 'off' on `print-generate.js` wsAnswerLine (today it
+   falls back to Automatic's line - options-verify "ansBox off: the pupil page draws no off answer place" on add_sub_10s) and the
+   legacy key (add_10_regroup off key; add_sub_10s off key writes 12 px, check d); 'one' on the kit fact stacked zone
+   (`ws-factans--one` exists in CSS; options-verify add_facts one says no one place: the MARK regex in ws-options-verify.cjs
+   needs `ws-factans--one`); div_facts S 'one' key ink crosses its box (render-delta NEW L-KEY AK-2: give the across/fraction
+   'one' slot the ansSlot height in styledAnswerSlot).
+2. Check f's label-truth class reads the WHOLE cell's boxes, so a column's carry strip makes an open answer row look "one box"
+   (add_100_regroup auto vs off on paper): classify from the answer place only (`m.pupil[i].digits` / the answer-row element),
+   not every box in the cell (tests/scripts/ws-ansbox-shape.cjs, `truthful`).
+3. g: multiply digit L (34 % vs 29 %), div_facts fraction digit S (49 % vs 33 %).
+4. Panel per look in the UI (skill-options-ui.js re-reads offeredAnsValues(…, look) when notation changes); today the panel
+   shows the union and the model maps an undrawable value to Automatic.
+5. Commands: `node tests/scripts/ws-ansbox-shape.cjs --full` (~1 h, run in a worktree), `node tests/scripts/ws-ansbox-default-parity.mjs --skills ansbox`,
+   `node tests/scripts/ws-precritic.cjs --strict --skill addition:add_100_regroup --skill addition:add_10_regroup --skill addition:add_facts --skill multiplication:mult_facts --skill addition:add_sub_10s --skill multiplication:multiply --skill division:div_facts`,
+   then diff options-render / coverage-matrix / sibling-compare / slot-clip logs against /tmp/mq-precritic/20261031-132149-21153.
