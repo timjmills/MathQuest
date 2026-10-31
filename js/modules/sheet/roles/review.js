@@ -132,7 +132,11 @@ function geometry(pools, input) {
         }
     }
     const split = eOpts.length > 0;
-    if (!split) for (let c = E.cols; c >= 1; c--) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
+    // Lane D restart r3 (R2-5, RUBRIC H13): an earlier step whose problems all fit two columns never
+    // prints them one a row - "30 − 10 =" (62 mm) centred in a 185 mm cell left two 56 mm bands
+    // (add_facts Review M, cells 10-12). One column stays for a pool of one problem (its only row).
+    const oneColOk = E.cols < 2 || earlier.length < 2;
+    if (!split) for (let c = E.cols; c >= (oneColOk ? 1 : 2); c--) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
     const availOf = (kindBands) => m.body - 2 - (bands + kindBands - 1) * m.strip - wrap;
     // What mr rows of the skill's own problems ARE: the bands allocate() prints (one per item
     // kind, whole rows), each row grouped by height and as tall as what it holds (H13). Heights

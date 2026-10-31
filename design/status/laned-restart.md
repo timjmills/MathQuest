@@ -337,33 +337,43 @@ Same command, `ws-print-lint --source kit --skills addition:add_facts --roles re
   no L-DENSITY finding.
 - branch: AK-4 clean; `L-DENSITY H13 x6` cells 10-12 (p1, p2): one empty band 56.1 mm in a 184.9 mm cell (30 %).
 So it is the branch's (the merged CL-40 / review.js across-row work gives cells 10-12 their slot, and the full-width across
-cell then reads as pinned left), but main's page is worse (a missing answer slot). Not fixed this round (budget); left
-red / open, not pinned. Next: review.js across Mixed Review rows at M - narrower cells or the across fact centred.
+cell then reads as pinned left), but main's page is worse (a missing answer slot).
+**FIXED (r3 closing).** Root cause: not the CL-40 pad and not the row height - the COLUMN COUNT. The 3 earlier items
+(add_sub_10s across facts, "30 − 10 =", 62.4 mm with its hold) measure `fits` at 2 columns (slack 14.9 mm), but review.js
+geometry() offered the Mixed Review band every column count down to 1, and at the M ceiling (12) 9 main + 3 x 1 column won
+(n = 12) over 2 columns (n = 11). Each fact sat centred in a 184.9 mm cell: 56.1 mm white each side (30 %, H13). Fix
+(review.js, the non-split eOpts): one column is offered only when the earlier pool cannot take two (E.cols < 2) or holds
+one problem. add_facts Review now prints the across facts 2 to a row (92.3 mm cells), each with its slot (AK-4 stays
+fixed). Lint `--roles review` add_facts S / M / L: 0 findings (no H13, no AK-4); sub_facts / mult_facts / div_facts M:
+0 findings; ws-layout-unit OK (1758); ws-boot-smoke OK. Automatic check that caught it: ws-print-lint L-DENSITY H13
+(already on precritic's path); speed-up: the probe that read `measured[2].fits` beside the chosen eCols found it in one
+step - a column choice narrower than the items' own measured fit is the first thing to read on a full-width H13.
 
 ### Precritic (`--skill add_facts,sub_facts,mult_facts,div_facts,div_facts_long --role fact-rows --strict`, run once)
-Run /tmp/mq-precritic/20261031-182404-21025: 10 FAIL, 31 PASS (7 on the baseline), 2 SKIPPED (no rulings) of 43. It started
-on f7a27938 (8-column bracket); the owner's reversal landed mid-run, so the bracket gates that ran early saw the 8-column
-code. The reverted bracket is r2's drawing byte for byte (616908b1), which round 2's precritic and critic r2 already ran; the
-new ARC-INK guard passes it (backtest), and `--supports all --size S`, layout-unit, self-test and boot-smoke were re-run on the
-final tree.
+Re-run once after the R2-5 fix (r3 closing, final tree): /tmp/mq-precritic/20261031-194447-17561: **9 FAIL, 32 PASS (7 on the
+baseline), 2 SKIPPED (no rulings) of 43**. spec-card --check-signed now PASSES (card re-signed, 4f39d005); every FAIL below is
+main-red or an owner pin; the fact-rows print-lint rows (M, S) and grade-render pass.
 
 | Gate | Finding | Status |
 |---|---|---|
-| print-lint-probe S / M / L (new) | 0 | PASS |
-| print-lint --supports all S | 0 (TEXT-FRAME, CL40-INK) | PASS (re-run on the final tree: 0) |
-| print-lint divForm long L, mix L | Review CL40-INK x6 (R1-11), Reason It CL40-INK (R1-9), Mixed practice H13 x2 / x4 cell 8, 28.5 mm | pinned (owner ruling) / main-red (r2 table) |
-| print-lint lesson S | sub_facts WRAP-OP x4 (R1-5); div_facts_long Lesson SPREAD p3 43 % | pinned / main-red (r2 table) |
+| print-lint-probe S / M / L | 0 | PASS |
+| print-lint fact-rows M / S | 0 | PASS |
+| print-lint --supports all S | 0 (TEXT-FRAME, CL40-INK) | PASS |
+| spec-card --check-signed | - | PASS (re-signed against the 10-column text) |
+| print-lint divForm long L, mix L | Mixed practice H13 x2 / x4 (long), x2 (mix), cell 8, 28.5 mm; Review CL40-INK x6 (R1-11) and Reason It CL40-INK (R1-9) filtered as pinned | main-red (r2 table) / pinned (owner ruling) |
+| print-lint lesson S | div_facts_long Lesson SPREAD p3 (sub_facts WRAP-OP x4 filtered as pinned, R1-5) | main-red (r2 table) / pinned |
 | options-verify --skill | div_facts_long support=touch/skip/array/think/boxsign/all: no support drawn | main-red (r2 table) |
-| options-verify --render | value pages worse than default (array H13, divForm capacity ...) | main-red (r2 table) |
+| options-verify --render | value pages worse than default (across capacity, array H13, CL40-INK across L, divForm capacity) | main-red (r2 table) |
 | slot-clip | div_facts sections/defaults L CLIP 6 (`ws-eq-below`) | main-red (r2 table) |
 | dealer-uniform | add / sub / mult / div / div_facts_long | main-red (r2 table) |
-| node-lint s1 | LESSON-DATA (no lessons/prereqs.js entry) | main-red (r2 table) |
-| sibling-compare | no approved fact-family sibling | structural (r2 table) |
-| spec-card --check-signed | PT-FRW-5 / PT-FRW-9 changed | **lead**: f2c597a8 was signed against f7a27938's 8-column text; the 10-column text (66420cca) is restored as the reversal asks - re-sign the card |
+| node-lint s1 | LESSON-DATA (no lessons/prereqs.js entry: div_facts, div_facts_long) | main-red (r2 table) |
+| sibling-compare | no approved fact-family sibling (sub_facts sections rows) | structural (r2 table) |
 
-Unit / other gates on the final tree: ws-print-lint --self-test OK (86 assertions, 74 planted defects), ws-layout-unit OK
-(1758), ws-boot-smoke OK, ws-backtest arc-ink-laned PASS (31a856fd FAIL / 616908b1 OK), grid-even-probe-laned PASS
-(616908b1 FAIL / f7a27938 OK).
+Earlier run (r3 mid-round, /tmp/mq-precritic/20261031-182404-21025): 10 FAIL, 31 PASS - the 10th was spec-card (since re-signed).
+R2-5 (add_facts Review M H13) is not on precritic's fact-rows path; its own lint is 0 at S / M / L (above).
+
+Unit / other gates on the final tree: ws-layout-unit OK (1758), ws-boot-smoke OK; earlier this round ws-print-lint --self-test
+OK (86 assertions, 74 planted defects), ws-backtest arc-ink-laned PASS, grid-even-probe-laned PASS.
 
 ### After-r3 PNGs (150 dpi, design/status/laned-restart/)
 after-r3-bracket-S-c10.png (100 / 100) and after-r3-bracket-L-c10.png (80 / 80) - r2's bracket at 10 columns;
