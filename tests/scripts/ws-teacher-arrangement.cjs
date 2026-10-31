@@ -90,6 +90,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       check(rq.every((x) => x.req.role === 'mixed-practice' && x.req.arrangement === 'mixed'), `${label}: Mixed up sends ${JSON.stringify(rq.map((x) => [x.req.role, x.req.arrangement]))}`);
       check(rq.every((x) => x.req.sections.every((s) => s.skills.length === 1 && s.count > 0)), `${label}: a mixed request section has no exact count`);
       const tot = {};
+      // r3 D1 (brief, 2026-10-31): Mixed up "New problems" is ONE flowed request carrying the plan's WHOLE counts; the
+      // engine paginates it (its pages are the plan's pages; every-page-mixed / runs / spread are mixed-m3's checks)
+      if (rq.length === 1 && rq[0].flow) {
+        const x = rq[0]; const all = {}; p.pageItems.flat().forEach((k) => { all[k] = (all[k] || 0) + 1; });
+        x.keys.forEach((k, j) => { tot[k] = (tot[k] || 0) + x.req.sections[j].count * x.copies; check(x.req.sections[j].count === all[k], `${label}: the sheet sends ${x.req.sections[j].count} of ${k}, the plan has ${all[k]}`); });
+        check(x.keys.length >= 2, `${label}: the sheet is not mixed (${x.keys.join(', ')})`);
+        Object.keys(p.byKey).forEach((k) => check((tot[k] || 0) === p.byKey[k], `${label}: ${k} prints ${tot[k] || 0}, the plan says ${p.byKey[k]}`));
+        return { pages: p.pages, total: Object.values(tot).reduce((a, b) => a + b, 0) };
+      }
       rq.forEach((x, i) => {
         const pg = {}; (p.pageItems[i] || []).forEach((k) => { pg[k] = (pg[k] || 0) + 1; });
         x.keys.forEach((k, j) => { tot[k] = (tot[k] || 0) + x.req.sections[j].count * x.copies; check(x.req.sections[j].count === pg[k], `${label}: page ${i + 1} sends ${x.req.sections[j].count} of ${k}, the plan has ${pg[k]}`); });
@@ -104,7 +113,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.evaluate(() => { const b = document.querySelector('[data-act="pages"][data-v="3"]'); if (b) b.click(); });
     await sleep(300);
     const m3 = await mixedOk('Pages 3');
-    check(m3 && m3.pages === 3, `Pages 3 sends ${m3 && m3.pages} page requests`);
+    check(m3 && m3.pages === 3, `Pages 3 prints ${m3 && m3.pages} page(s)`);
     await page.evaluate(() => { const b = document.querySelector('[data-act="mode"][data-v="total"]'); if (b) b.click(); });
     await sleep(300);
     await page.evaluate(() => { const b = document.querySelector('[data-act="ntotal"][data-v="20"]'); if (b) b.click(); });
@@ -189,6 +198,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const old = await page.evaluate(() => ({ choice: !!document.querySelector('[data-tv-arrange] [data-act="arrange"][data-v="mixed"]'), req: window.tvPrintChecks && window.tvPrintChecks.req() }));
     check(old.choice, 'the print screen has no In sections | Mixed up choice for More practice with 2 skills');
     check(old.req && old.req.parts[0] && old.req.parts[0].arrangement === 'sections', `More practice sends arrangement ${old.req && old.req.parts[0] && old.req.parts[0].arrangement}`);
+    // r3 D4: the In sections page of two skills is titled by its skills, never "Mixed practice" nor the generic fallback
+    const oldTitle = old.req && old.req.parts[0] && old.req.parts[0].header && old.req.parts[0].header.title;
+    check(typeof oldTitle === 'string' && /^I Can /.test(oldTitle) && !/Mixed practice|practise each skill in its own part/i.test(oldTitle), `the print screen's In sections page of 2 skills is titled ${JSON.stringify(oldTitle)}`);
     await page.evaluate(() => document.querySelector('[data-tv-arrange] [data-act="arrange"][data-v="mixed"]').click());
     await sleep(300);
     if (SHOTS) { await page.evaluate(() => document.querySelector('[data-tv-arrange]').scrollIntoView({ block: 'center' })); await page.screenshot({ path: path.join(SHOTS, 'dialog-print-screen.png') }); }

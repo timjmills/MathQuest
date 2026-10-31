@@ -24,6 +24,13 @@
 //   spare    (checkSpare)    the pupil body is >= 85 % used and no more than 25 mm is blank under the lowest cell, on
 //                            every page of a fill page (no counts) and every page but the last of an exact-count print.
 //
+//   boxes    (checkBoxes)    (critic r3 P1) every area enclosed by drawn rules holds a problem: inside a problem grid, no
+//                            area of 100 mm2 or more is covered by no problem cell (an empty ruled box, a trailing
+//                            blank box, an empty row track).
+//   across   (checkAcross)   (critic r3 P3, PT-MIX-3) one count across for every FULL row of a sheet: the full rows of
+//                            every page of one print hold the same number of problems. Mixed up, exact counts.
+//   width    (checkWidth)    (critic r3 P2, H13 by width) no problem cell is wider than its content / 0.45 (>= 30 %
+//                            empty each side), measured on the drawing's own ink box.
 //   node js/modules/sheet/mixed-m3.check.cjs [--quick] [--seeds 2] [--only a,b] [--checks runs,rowfill] [--all]
 //   node js/modules/sheet/mixed-m3.check.cjs --fixture <page.html> [--checks ...]   # a saved / hand-made page (backtest)
 //   node js/modules/sheet/mixed-m3.check.cjs --capture <dir>                         # save the matrix's pages as fixtures
@@ -39,7 +46,10 @@ const path = require('path');
 const fs = require('fs');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
+// (`boxes`, `width` and `across` are measured but run only when named (--checks boxes,width,across): critic r3 P1 / P2 / P3 are OPEN
+// (108 cells / e-M at 2026-10-31, design/status/mixed-pages.md); they join ALL_CHECKS when the engine passes them)
 const ALL_CHECKS = ['runs', 'rowfill', 'spread', 'align', 'digits', 'spare'];
+const KNOWN_CHECKS = [...ALL_CHECKS, 'width'];
 const MM = 96 / 25.4;
 
 /* ================================================================ pure judges (node) */
@@ -152,7 +162,31 @@ function checkSpare(pages, ctx) {
     return out;
 }
 
-const JUDGES = { runs: checkRuns, rowfill: checkRowFill, spread: checkSpread, align: checkAlign, digits: checkDigits, spare: checkSpare };
+/** 7 boxes: no empty ruled area inside a problem grid. */
+function checkBoxes(pages) {
+    const out = [];
+    pages.forEach((pg, i) => { for (const h of pg.holes || []) if (h.mm2 >= 100) out.push(`boxes: page ${i + 1} grid ${h.grid + 1}: an area of ${Math.round(h.mm2)} mm2 enclosed by rules holds no problem (near ${h.at})`); });
+    return out;
+}
+
+/** 8 across: every full row of a mixed exact-count print holds the same count of problems. */
+function checkAcross(pages, ctx) {
+    const out = [];
+    if (ctx.arrangement !== 'mixed' || !ctx.counts || pages.length < 2) return out;
+    const per = pages.map((pg) => (pg.fullRows || []).map((r) => r.n));
+    const all = [...new Set(per.flat())];
+    if (all.length > 1) out.push(`across: the full rows hold ${per.map((xs, i) => `page ${i + 1}: ${[...new Set(xs)].join('/') || '-'}`).join('; ')} problems across (one count for every full row of the sheet)`);
+    return out;
+}
+
+/** 9 width: a cell no wider than its content / 0.45. */
+function checkWidth(pages) {
+    const out = [];
+    pages.forEach((pg, i) => { for (const c of pg.wide || []) out.push(`width: page ${i + 1} cell ${c.label} (${c.tpl}) is ${c.cellMm.toFixed(0)} mm wide for ${c.inkMm.toFixed(0)} mm of problem (${Math.round((c.inkMm / c.cellMm) * 100)} %; >= 45 %)`); });
+    return out;
+}
+
+const JUDGES = { boxes: checkBoxes, across: checkAcross, width: checkWidth, runs: checkRuns, rowfill: checkRowFill, spread: checkSpread, align: checkAlign, digits: checkDigits, spare: checkSpare };
 function judge(pages, ctx, checks = ALL_CHECKS) {
     const out = {};
     for (const c of checks) out[c] = JUDGES[c](pages, ctx);
@@ -183,7 +217,7 @@ const MEASURE_FN = async ({ html, perPage }) => {
     pgs.forEach((pg, pi) => {
         const body = pg.querySelector('.ws-body') || pg;
         const bb = body.getBoundingClientRect();
-        const out = { last: pi === pgs.length - 1, bodyMm: bb.height / mm, freeMm: 0, cells: [], rows: [], stacks: [], unattributed: 0 };
+        const out = { last: pi === pgs.length - 1, bodyMm: bb.height / mm, freeMm: 0, cells: [], rows: [], stacks: [], unattributed: 0, holes: [], fullRows: [], wide: [] };
         const grids = [...pg.querySelectorAll('.ws-grid')].filter((g) => !g.parentElement.closest('.ws-cell'));
         // attribution by order (plan grid items of this page) where the cells carry no data-ws-skill
         const tabbed = grids.flatMap((g) => [...g.children].filter((c) => c.matches(CELL) && c.querySelector(':scope > .ws-tab, :scope > .ws-letter')));
@@ -217,9 +251,37 @@ const MEASURE_FN = async ({ html, perPage }) => {
                 const w = (xs) => xs.filter(over).reduce((a, c) => a + c.getBoundingClientRect().width, 0);
                 out.rows.push({ grid: gi, row: ti, usedFrac: Math.min(1, w(cells) / gr.width), trailFrac: w(trails) / gr.width, lastOnPage: gi === grids.length - 1 && ti === lastTrack });
             });
+            // boxes: lattice points (3 mm) inside the grid covered by no problem cell (a blank run counts as empty)
+            {
+                const rs = cells.map((c) => c.getBoundingClientRect());
+                const st = 3 * mm;
+                let miss = 0; let at = '';
+                for (let y = gr.top + st / 2; y < gr.bottom - 1; y += st) for (let x = gr.left + st / 2; x < gr.right - 1; x += st) {
+                    if (!rs.some((r) => x >= r.left - 1 && x <= r.right + 1 && y >= r.top - 1 && y <= r.bottom + 1)) { miss++; if (!at) at = `${Math.round((x - gr.left) / mm)} mm, ${Math.round((y - gr.top) / mm)} mm`; }
+                }
+                if (miss) out.holes.push({ grid: gi, mm2: miss * 9, at });
+            }
+            // across: the rows whose problems fill the grid's width (full rows), with their count of problems
+            tracks.forEach(([y0, y1]) => {
+                const mid = (y0 + y1) / 2;
+                const on = cells.filter((c) => { const r = c.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid && c.querySelector(':scope > .ws-tab, :scope > .ws-letter'); });
+                const w = on.reduce((a, c) => a + c.getBoundingClientRect().width, 0);
+                if (on.length && w >= gr.width * 0.98) out.fullRows.push({ n: on.length });
+            });
             for (const c of cells) {
                 const r = c.getBoundingClientRect();
                 const tab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter');
+                // width: the drawing's ink box (every leaf box but the tab), against the cell's width
+                if (tab) {
+                    let lo = Infinity; let hi = -Infinity;
+                    for (const e of c.querySelectorAll('*')) {
+                        if (e.closest('.ws-tab,.ws-letter') || e.children.length) continue;
+                        const er = e.getBoundingClientRect();
+                        if (er.width <= 0 || er.height <= 0) continue;
+                        lo = Math.min(lo, er.left); hi = Math.max(hi, er.right);
+                    }
+                    if (hi > lo && (hi - lo) / r.width < 0.45) out.wide.push({ label: tab.textContent.trim(), tpl: c.getAttribute('data-ws-cell') || '', cellMm: r.width / mm, inkMm: (hi - lo) / mm });
+                }
                 const label = tab ? tab.textContent.trim() : '';
                 if (!tab) continue;
                 const n = Number(label.replace(/\D/g, '')) || out.cells.length + 1;
@@ -275,6 +337,9 @@ function scenarios() {
     if (want('e')) for (const seed of seeds(SETS.a.seed)) for (const size of QUICK ? ['M', 'S'] : ['S', 'M', 'L']) out.push({ id: `e exact 3:37 daily ${size} seed ${seed}`, set: SETS.a.skills, counts: [3, 37], arr: 'mixed', look: 'daily', size, seed });
     if (want('f') && (QUICK || !want('b'))) out.push({ id: `f mixed ican L seed ${SETS.b.seed}`, set: SETS.b.skills, arr: 'mixed', look: 'ican', size: 'L', seed: SETS.b.seed });
     if (want('g')) for (const seed of seeds(SETS.b.seed)) for (const size of QUICK ? ['M', 'S'] : ['S', 'M', 'L']) out.push({ id: `g sections daily ${size} seed ${seed}`, set: SETS.b.skills, arr: 'sections', look: 'daily', size, seed });
+    // h (critic r3 P1): the Independent sheet of two parts with counts (add facts 10 + subtract facts 10)
+    // (OPEN, critic r3 P1 second half: run with --only h until practice.js flowLayout picks a count across that divides)
+    if (ONLY && ONLY.includes('h')) for (const size of QUICK ? ['M', 'S'] : ['S', 'M', 'L']) out.push({ id: `h independent 10+10 daily ${size} seed 4242`, set: ['addition:add_facts', 'subtraction:sub_facts'], counts: [10, 10], arr: 'sections', role: 'independent', look: 'daily', size, seed: 4242 });
     return out;
 }
 
@@ -319,7 +384,7 @@ async function main() {
             for (const sc of scenarios()) {
                 const counts = !!sc.counts;
                 const sections = counts ? sc.set.map((id, i) => ({ skills: [sk(id)], count: sc.counts[i] })) : [{ skills: sc.set.map(sk) }];
-                const req = { role: 'mixed-practice', arrangement: sc.arr, sections, size: sc.size, look: sc.look, seed: sc.seed, key: false };
+                const req = { role: sc.role || 'mixed-practice', arrangement: sc.arr, sections, size: sc.size, look: sc.look, seed: sc.seed, key: false };
                 let b;
                 try { b = await app.page.evaluate(BUILD_FN, req); } catch (e) { fails.push({ check: 'build', line: `${sc.id}: build failed: ${String(e.message || e).slice(0, 200)}` }); continue; }
                 const pages = await app.page.evaluate(MEASURE_FN, { html: b.html, perPage: b.perPage });
@@ -360,5 +425,5 @@ async function main() {
     process.exit(fails.length ? 1 : 0);
 }
 
-module.exports = { judge, checkRuns, checkRowFill, checkSpread, checkAlign, checkDigits, checkSpare, printOrder, ALL_CHECKS, MEASURE_FN };
+module.exports = { judge, checkBoxes, checkAcross, checkWidth, checkRuns, checkRowFill, checkSpread, checkAlign, checkDigits, checkSpare, printOrder, ALL_CHECKS, MEASURE_FN };
 if (require.main === module) main().catch((e) => { console.error(e); process.exit(1); });

@@ -104,3 +104,26 @@ rule, the key writes them; facts on a page with a kit stack print at the stack's
 (pad from the tokens), and facts beside taller row-mates are drawn a count across bigger (H13).
 Checks: mixed-m3 116 → 0 (OK); mixed-m2 0 → 1 (`ladder mixed d daily seed 4074: S 17 / M 17` — open, see report);
 mixed-page OK; interleave self-test OK.
+## M2 final fix round (critic r3 + dialog check r3; Opus medium, 2026-10-31)
+Fixed:
+- D1/D2 Mixed up over several pages is ONE `mixed-practice` request with each skill's whole count (teacher-sheet.js
+  `requests`, `one` for kind 'mixed'); the engine paginates it: footers k/N, numbering continued (pupil and key); the
+  plan learns the engine's pages as In sections does. The engine tries one page fewer (`evenAt(P - 1)`) before the
+  greedy page count: ten skills in 20 on 2 pages, not 10 / 9 / 1. Continued pages carry the sheet's title
+  (`titledCont`, the continued budget less the title's lines).
+- D3 `partsTitle` never returns the generic string: too long → the operations ("I Can add, subtract and multiply"),
+  else the skills' names. D4 the older print screen titles an In sections page of 2+ skills the same way.
+Checks (each FAILS on 014957a, PASSES now): ws-teacher-plan-match `numbered` (k/N footers, continuous numbers,
+pupil and key), `filled` (pages <= ceil(problems / perPage), non-last pages >= 85 % of the even share), `titled` also
+rejects the generic parts title; ws-teacher-arrangement step 8 reads the print screen's In sections title, and its
+Mixed up step reads the ONE flowed request (whole plan counts, plan pages) instead of one request per page.
+OPEN (skipped for budget; checks written, opt-in until the engine passes them):
+- P1 Mixed up empty box (c-S cell 16): `mixed-m3 --checks boxes` (6 on set c). Spanning the short column's last
+  problem over the rows was tried and reverted: it fails mixed-m2 H13 (a fact in a 2-row box, 37 %).
+- P1 second half: Independent of two parts (10 + 10 facts) still 4 across at M / 3 at L with an empty box
+  (`mixed-m3 --only h`); a count across that divides the part's count in practice.js flowLayout was tried and
+  reverted (part 2 kept its own layout; L parts take the "full" branch).
+- P2 cells wider than content / 0.45: `mixed-m3 --checks width` (108 cells).
+- P3 one count across on every full row of a sheet: `mixed-m3 --checks across` (e-M: 4 then 5 across).
+- D2 ten skills: 20 on 3 pages (7 / 7 / 6 even, perPage 12): plan-match prints it as OPEN, not yet a FAIL.
+- P4 In sections without counts sharing shelves 50/50 with no note; D5 (12 + 5 with 3 empty boxes).

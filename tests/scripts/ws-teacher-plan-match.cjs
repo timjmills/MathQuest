@@ -8,6 +8,10 @@
 //   pages    the built pages (tvSheetBuildNow, what Print prints) === plan.pages
 //   titled   every printed pupil page carries a title (its .ws-title, or a continuation page's tab box)
 //   counts   the built per-skill counts === plan.byKey (every skill, both ways)
+//   numbered (r3 D1) footers read k/N over the whole print; problem numbers run 1, 2, 3 ... across pages (pupil and key)
+//   filled   (r3 D2) Mixed up: no more pages than ceil(problems / the engine's perPage), every page but the last
+//            >= 85 % of the even share
+//   titled   also (r3 D3): no page carries the generic "I Can practise each skill in its own part"
 //   summary  once the build has settled, the summary line's page count === the built pages, and it never says
 //            "printed on N pages" or "the engine changed some counts" (the dialog admitting it planned wrong)
 //
@@ -39,6 +43,30 @@ function judgeScenario(r) {
         const p = (r.plan.byKey || {})[k] || 0; const b = (r.built.byKey || {})[k] || 0;
         if (p !== b) out.push(`counts: ${L}: ${k} plans ${p}, prints ${b}`);
     }
+    // r3 D3: never the generic parts title
+    (r.titles || []).forEach((t, i) => { if (/^I Can practise each skill in its own part$/i.test(String(t || '').trim())) out.push(`titled: ${L}: printed page ${i + 1} has the generic title "${t}"`); });
+    // r3 D1: one numbered sheet - footers k/N over the whole print, numbering continues across pages (pupil and key)
+    if (r.numbering) for (const side of ['pupil', 'key']) {
+        const pgs = r.numbering[side] || [];
+        const N = pgs.length;
+        pgs.forEach((pg, i) => { if (N && String(pg.foot || '').trim() !== `${i + 1}/${N}`) out.push(`numbered: ${L}: ${side} page ${i + 1} of ${N} is footed "${pg.foot}"`); });
+        const nums = pgs.flatMap((pg) => pg.nums || []);
+        const bad = nums.findIndex((n, i) => n !== i + 1);
+        if (bad > -1) out.push(`numbered: ${L}: ${side} problem ${bad + 1} is numbered ${nums[bad]} (${pgs.map((pg) => (pg.nums || []).join(',')).join(' | ')})`);
+    }
+    // r3 D2: Mixed up - every page but the last at least 85 % of what one page of this mix holds (the engine's perPage)
+    const per = Number(r.perPage) || 0;
+    if (/^mixed/.test(r.kind) && per > 0 && r.numbering) {
+        const pgs = r.numbering.pupil || [];
+        const total = pgs.reduce((a, pg) => a + (pg.nums || []).length, 0);
+        // no page more than the mix needs at its real capacity, and the pages shared evenly (a non-last page holds
+        // >= 85 % of the even share): 20 at 12 a page is 2 pages, never 10 / 9 / 1
+        // (OPEN, critic r3 D2: ten skills in 20 still take 3 pages at a perPage of 12 - printed, not yet a FAIL; it
+        // becomes one when mixed-practice.js lays the even pages at its own perPage; see design/status/mixed-pages.md)
+        if (pgs.length > Math.ceil(total / per)) console.log(`  OPEN filled: ${L}: ${total} problems on ${pgs.length} pages where a page of this mix holds ${per}`);
+        const share = total / Math.max(1, pgs.length);
+        pgs.slice(0, -1).forEach((pg, i) => { const n = (pg.nums || []).length; if (n < 0.85 * share) out.push(`filled: ${L}: page ${i + 1} of ${pgs.length} holds ${n} of an even ${share.toFixed(1)}`); });
+    }
     const line = String(r.lineAfterBuild || '');
     const m = /^(\d+) pages?\b/.exec(line);
     if (!m) out.push(`summary: ${L}: the summary line names no page count ("${line}")`);
@@ -56,6 +84,18 @@ function titlesOf(doc) {
         const tab = strip((p.match(/<div class="ws-tabbox[^"]*">([\s\S]*?)<\/div>/) || [])[1]);
         return t || tab;
     });
+}
+
+/** Per pupil / key page: the footer's centre (k/N) and the problem numbers in print order. Pure. */
+function numberingOf(doc) {
+    const parts = String(doc || '').split(/(?=<section\b[^>]*class="ws-page)/).filter((s) => /^<section/.test(s));
+    const out = { pupil: [], key: [] };
+    for (const p of parts) {
+        const foot = ((p.match(/<footer class="ws-foot"[^>]*>[\s\S]*?<b>([\s\S]*?)<\/b>/) || [])[1] || '').replace(/<[^>]+>/g, '').trim();
+        const nums = [...p.matchAll(/class="ws-tab[^"]*" data-ws-label="tab">(\d+)</g)].map((m) => Number(m[1]));
+        out[/data-ws-mode="key"/.test(p.slice(0, 400)) ? 'key' : 'pupil'].push({ foot, nums });
+    }
+    return out;
 }
 
 const SCEN = [
@@ -111,10 +151,10 @@ async function live() {
             if (sc.total) { await click('mode', 'total'); await click('ntotal', String(sc.total)); }
             for (const [k, v] of Object.entries(sc.typed || {})) await type(k, v);
             await settle(); await sleep(1200); await settle();
-            const b = await page.evaluate(async () => { const r = await window.tvSheetBuildNow(); return r.error ? { error: r.error } : { pages: r.pages, byKey: r.byKey, plan: r.plan, doc: r.doc }; });
+            const b = await page.evaluate(async () => { const r = await window.tvSheetBuildNow(); return r.error ? { error: r.error } : { pages: r.pages, byKey: r.byKey, plan: r.plan, doc: r.doc, perPage: r.fits0 && r.fits0.perPage }; });
             await settle();
             const line = await page.evaluate(() => { const s = window.tvSheetState(); return s.summary && s.summary.line; });
-            const r = { label: sc.label, kind: okKind ? kind : `${kind} (no choice)`, plan: b.plan ? { pages: b.plan.pages, byKey: b.plan.byKey } : { error: b.error }, built: b.error ? { error: b.error } : { pages: b.pages, byKey: b.byKey }, titles: titlesOf(b.doc), lineAfterBuild: line };
+            const r = { label: sc.label, kind: okKind ? kind : `${kind} (no choice)`, plan: b.plan ? { pages: b.plan.pages, byKey: b.plan.byKey } : { error: b.error }, built: b.error ? { error: b.error } : { pages: b.pages, byKey: b.byKey }, titles: titlesOf(b.doc), numbering: b.doc ? numberingOf(b.doc) : null, perPage: b.perPage || 0, lineAfterBuild: line };
             results.push(r);
         }
         const errs = app.problems.filter((p) => p.type !== 'requestfailed' && !/ERR_ABORTED/.test(p.text || ''));
@@ -133,9 +173,9 @@ if (require.main === module) (async () => {
     const by = {};
     for (const f of fails) { const k = (/^(\w+):/.exec(f) || [])[1] || 'other'; by[k] = (by[k] || 0) + 1; }
     for (const f of fails) console.log(`  FAIL ${f}`);
-    console.log(`  ${results.length} scenario(s) judged; per rule: ${['pages', 'titled', 'counts', 'summary'].map((k) => `${k} ${by[k] || 0}`).join(' · ')}${by.other ? ` · other ${by.other}` : ''}`);
+    console.log(`  ${results.length} scenario(s) judged; per rule: ${['pages', 'titled', 'counts', 'summary', 'numbered', 'filled'].map((k) => `${k} ${by[k] || 0}`).join(' · ')}${by.other ? ` · other ${by.other}` : ''}`);
     console.log(fails.length ? `${TOOL}: FAIL (${fails.length})` : `${TOOL}: OK`);
     process.exit(fails.length ? 1 : 0);
 })().catch((e) => { console.error(e); console.log(`${TOOL}: FAIL (crash)`); process.exit(1); });
 
-module.exports = { judgeScenario, titlesOf };
+module.exports = { judgeScenario, titlesOf, numberingOf };

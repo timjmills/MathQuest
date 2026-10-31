@@ -38,6 +38,7 @@ import {
 } from './compose.js';
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
+import { HEADER_PARTS_MM } from '../layout.js';
 import { interleave, dealCounts } from '../interleave.js';
 import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
 import { factWidthMm, factDigitTracks, factPadTop } from '../cells/fact.js';
@@ -776,7 +777,15 @@ function m2Budgets(input, ctx) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: input.mixTabId || 'Mixed 1', title: input.mixTitle || 'Mixed practice', twoLine: true, score: 1 });
     const m0 = bandMetrics(ctx, layoutHeader(frame.header));
     const mc = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
-    return { m0, first: m0.budget - stripMmOf(input) - m0.strip, cont: mc.budget - mc.strip, maxRows: MAX_SHELVES[ctx.size] || 5 };
+    // r3 D1: a continued page carries the sheet's title too (every page titled), so its body is less the title's lines
+    const tMm = contTitleMm(frame);
+    return { m0, first: m0.budget - stripMmOf(input) - m0.strip, cont: mc.budget - mc.strip - tMm, maxRows: MAX_SHELVES[ctx.size] || 5 };
+}
+const contTitleMm = (frame) => (frame.header && frame.header.title ? HEADER_PARTS_MM.title + HEADER_PARTS_MM.titleWrap * (Math.max(1, Number(frame.header.titleLines) || 1) - 1) : 0);
+/** The continued pages' header: the sheet's title on every page (as practice.js flowLayout's sheets). */
+function titledCont(frame) {
+    if (frame.header && frame.header.title) frame.contHeader = Object.assign({}, frame.contHeader, { title: frame.header.title, titleLines: frame.header.titleLines });
+    return frame;
 }
 
 const m2Weights = (input, ids) => {
@@ -892,52 +901,59 @@ function m2Layout(c, byPool, b, hOf, seed) {
         // EVEN PAGES, FULL PAGES (critic r2 / mixed-m3 spare): the problems shared evenly over the
         // pages (whole columns), and each page's columns spread over as many full-width shelves as
         // its height holds - every page but the last as full as the first, no blank band.
-        const allCols = shelves.flatMap((sh) => sh.cols);
-        const nOf = (cs) => cs.reduce((a, col) => a + col.items.length, 0);
-        const total = nOf(allCols);
-        const groups = [];
-        let at = 0;
-        for (let pi = 0; pi < P; pi++) {
-            const want = Math.round(((pi + 1) * total) / P) - Math.round((pi * total) / P);
-            const g = [];
-            let got = 0;
-            while (at < allCols.length && (got < want || pi === P - 1)) { g.push(allCols[at]); got += allCols[at].items.length; at++; }
-            groups.push(g);
-        }
-        const short = (col) => rp.R > 1 && !col.tall && col.items.length < rp.R;
-        const split = (cs, sN) => {
-            const out = [];
-            let i = 0;
-            for (let k = 0; k < sN; k++) {
-                const left = sN - k;
-                const remW = cs.slice(i).reduce((a, col) => a + wOf(col), 0);
-                const target = remW / left;
-                const sh = [];
-                let w = 0;
-                while (i < cs.length && (cs.length - i) > (left - 1)) {
-                    const cw = wOf(cs[i]);
-                    if (sh.length && (w + cw > 1 + 1e-6 || (k < sN - 1 && Math.abs(w + cw - target) > Math.abs(w - target)))) break;
-                    sh.push(cs[i]); w += cw; i++;
-                    if (short(sh[sh.length - 1])) break;
+        const evenAt = (P) => {
+            const allCols = shelves.flatMap((sh) => sh.cols);
+            const nOf = (cs) => cs.reduce((a, col) => a + col.items.length, 0);
+            const total = nOf(allCols);
+            const groups = [];
+            let at = 0;
+            for (let pi = 0; pi < P; pi++) {
+                const want = Math.round(((pi + 1) * total) / P) - Math.round((pi * total) / P);
+                const g = [];
+                let got = 0;
+                while (at < allCols.length && (got < want || pi === P - 1)) { g.push(allCols[at]); got += allCols[at].items.length; at++; }
+                groups.push(g);
+            }
+            const short = (col) => rp.R > 1 && !col.tall && col.items.length < rp.R;
+            const split = (cs, sN) => {
+                const out = [];
+                let i = 0;
+                for (let k = 0; k < sN; k++) {
+                    const left = sN - k;
+                    const remW = cs.slice(i).reduce((a, col) => a + wOf(col), 0);
+                    const target = remW / left;
+                    const sh = [];
+                    let w = 0;
+                    while (i < cs.length && (cs.length - i) > (left - 1)) {
+                        const cw = wOf(cs[i]);
+                        if (sh.length && (w + cw > 1 + 1e-6 || (k < sN - 1 && Math.abs(w + cw - target) > Math.abs(w - target)))) break;
+                        sh.push(cs[i]); w += cw; i++;
+                        if (short(sh[sh.length - 1])) break;
+                    }
+                    if (!sh.length) return null;
+                    out.push(sh);
                 }
-                if (!sh.length) return null;
-                out.push(sh);
-            }
-            if (i < cs.length) return null;
-            return out.every((sh) => sh.reduce((a, col) => a + wOf(col), 0) <= 1 + 1e-6) ? out.map(metrics) : null;
+                if (i < cs.length) return null;
+                return out.every((sh) => sh.reduce((a, col) => a + wOf(col), 0) <= 1 + 1e-6) ? out.map(metrics) : null;
+            };
+            const laid = groups.map((cs, pi) => {
+                if (!cs.length) return null;
+                // (the last page keeps its rows full and may end short; the others fill the height)
+                const order = Array.from({ length: Math.min(cs.length, b.maxRows) }, (_, i) => i + 1);
+                for (const sN of pi === P - 1 ? order : order.reverse()) {
+                    const shs = split(cs, sN);
+                    if (!shs) continue;
+                    if (shs.reduce((a, sh) => a + sh.H, 0) <= budgetOf(pi) + 1e-6 && shs.reduce((a, sh) => a + sh.rows, 0) <= b.maxRows) return shs;
+                }
+                return null;
+            });
+            return laid.every(Boolean) ? laid : null;
         };
-        const laid = groups.map((cs, pi) => {
-            if (!cs.length) return null;
-            // (the last page keeps its rows full and may end short; the others fill the height)
-            const order = Array.from({ length: Math.min(cs.length, b.maxRows) }, (_, i) => i + 1);
-            for (const sN of pi === P - 1 ? order : order.reverse()) {
-                const shs = split(cs, sN);
-                if (!shs) continue;
-                if (shs.reduce((a, sh) => a + sh.H, 0) <= budgetOf(pi) + 1e-6 && shs.reduce((a, sh) => a + sh.rows, 0) <= b.maxRows) return shs;
-            }
-            return null;
-        });
-        if (laid.every(Boolean)) pages = laid;
+        // r3 D2: one page fewer when the even pages lay (the real capacity of THIS mix, not the greedy shelves'):
+        // 20 problems of ten skills on 2 full pages, not 10 / 9 / 1
+        const fewer = P > 1 ? evenAt(P - 1) : null;
+        const laid = fewer || evenAt(P);
+        if (laid) pages = laid;
     }
     // the spare height into the shelves (PT-MIX-4: answer room, never a blank band), water-filled
     // up to each shelf's H13 room
@@ -1111,7 +1127,7 @@ function planMixedM2(input, pools) {
     const L = m2Layout(c, byPool, b, (x) => cellH(x.it, x.pool), seed0);
     const n = L.seq.length;
     const labels = labels0 === 'letter' && n > 26 ? 'tab' : labels0;
-    const frame = frameOf({ skills: input.skills || [], input, tabId: input.mixTabId || 'Mixed 1', title: input.mixTitle || 'Mixed practice', twoLine: true, score: n });
+    const frame = titledCont(frameOf({ skills: input.skills || [], input, tabId: input.mixTabId || 'Mixed 1', title: input.mixTitle || 'Mixed practice', twoLine: true, score: n }));
     const instr = instructionText('default-solve');
     const notes = [];
     const pages = [];

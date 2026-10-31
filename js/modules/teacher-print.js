@@ -32,6 +32,7 @@ import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
 import { normalizeOptions } from './skill-options.js';
 import { getProvider } from './sheet/index.js';
+import { partsTitle } from './teacher-sheet.js';
 import { stretchWhy, hasOwnOpen, NO_STRETCH_REASON } from './sheet/roles/stretch.js';
 // The detailed lesson maker (V22, 2026-10-16): its lessons, picked by name (no skill choice).
 import { detailedLessonList, detailedLessonFor } from './lessons/detailed/index.js';
@@ -866,6 +867,9 @@ function requestFor(s, i) {
         return o;
     });
     const h = pr.header;
+    // r3 D4: an In sections page of 2+ skills is titled by its skills (as the Print sheet does), never "Mixed practice"
+    const parts = ARRANGE_ROLES.includes(s.role) && skills.length >= 2 && arrangeOf(s) === 'sections';
+    const title = h.title ? (pr.title.trim() || (parts ? partsTitle(s.skills.map((k) => ({ categoryId: k.categoryId, skillId: k.skillId, opts: k.opts, label: k.skillLabel || k.label }))) : true)) : false;
     return {
         role: s.role,
         // A lesson is one skill: the first skill of the section (roles/lesson.js).
@@ -879,7 +883,7 @@ function requestFor(s, i) {
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
-        header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
+        header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title },
         testHints: !!pr.testHints,
         // M2: In sections | Mixed up, for the roles that take several skills (the role's default when not chosen)
         arrangement: ARRANGE_ROLES.includes(s.role) && skills.length >= 2 ? arrangeOf(s) : undefined,
