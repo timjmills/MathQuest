@@ -53,7 +53,7 @@ register(FAMILY_CHECK, {
             if (twin) {
                 return `<button type="button" class="mq-choicebtn" data-mq-choice="${esc(w)}" aria-pressed="false" `
                     + `style="min-width:max(64px, ${L(ctx, 20)});min-height:max(48px, ${L(ctx, 12)});padding:0 ${L(ctx, 3)};border:${B(ctx, 1)} solid ${INK};border-radius:999px;`
-                    + `background:#fff;color:${INK};${FONT}font-size:${P(ctx, pt)};font-weight:700;line-height:1;cursor:pointer;">${esc(w)}</button>`;
+                    + `background:#fff;color:${INK};${FONT}font-size:${P(ctx, pt)};font-weight:700;line-height:1;cursor:pointer;"><span>${esc(w)}</span></button>`;
             }
             const ring = i === on
                 ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -2.2)};top:${L(ctx, -1.6)};right:${L(ctx, -2.2)};bottom:${L(ctx, -1.6)};color:${ink === 'trace' ? GREY : INK};border:${B(ctx, 1.5)} solid currentColor;border-radius:50%;"></span>`

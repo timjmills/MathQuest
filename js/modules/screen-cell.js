@@ -1398,6 +1398,8 @@ export function wireTickBoxes(cellEl, q, input) {
         btns.forEach((b) => {
             if (b.dataset.mqTick === '1') return;
             b.dataset.mqTick = '1';
+            // (a tick row like the label + box rows below: the label is its first child, hosts and gates read it)
+            b.classList.add('mq-tickrow');
             b.setAttribute('role', 'radio');
             b.setAttribute('aria-checked', 'false');
             b.addEventListener('click', (e) => { e.preventDefault(); if (!input.disabled) choose(b); });
