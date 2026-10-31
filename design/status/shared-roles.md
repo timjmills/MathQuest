@@ -115,3 +115,30 @@ This is handed to the vocabulary skills' owner, and that ws-columns row is not p
 - Builder B round 2 had a harness "credential materialization" warning. I checked its commits and worktree and found no credential or secret in either; the lane did not act on it further.
 - Builder B's baseline re-pin covers only the 20 role-sample `#pre-skill-check` documents. None was pinned before, because before this fix the page tested the skill's own items. Three role-level rows are open: coordinate_q1 LONE at S, seq_2 H13-ROW at S, vocab_grade_K DN-2 at S.
 - Cost at 344b754: $119.6 of session cost (≈ 4.3 % of the weekly limit).
+
+## Precritic on the merge (344b754 vs base 512542a, 2026-10-31, 3 h 20 m wall)
+
+Every row is red on both trees, because skill-level reds were already there at lane start. Rows at or below base:
+- **Roles:**
+  - scripted-model: 10 findings, base 39 / 55.
+  - lesson: 357 / 341, base 384 / 370.
+  - opener: identical to base.
+  - reason-it: 76 / 94, base 108 / 106.
+  - guided M, review M: fewer than base.
+  - pre-skill-check print-lint: green (all pinned).
+- **Skills:**
+  - sub_2d_1d, mult_facts, div_facts: the same failing set as base.
+  - add_facts: its new think gates show the pre-existing Review AK-4.
+  - fractions:identify: its new think gates show the pre-existing TY-7 / PG-12.
+
+**Regressions, sent to a fixer (shared-roles-F) before any critic:**
+- guided S: div_facts H13 +1.
+- review S:
+  - add_fractions_like TY-2 +4, INK-5 +2;
+  - prime_composite H13 +2;
+  - add_decimal TY-7 +1.
+- pre-skill-check ws-columns: vocab_grade_K, one placeable prerequisite.
+
+**Backtests:** 44 / 50 PASS. The 6 FAILs were a shallow clone ("invalid reference"); the fixer is rerunning them.
+
+**Speed-up noted:** a precritic run on both trees takes 3 h 20 m, and the first batch hit the 2 h background limit. Next time, run HEAD and base per role in separate jobs of 1 h or less, and unshallow the clone before backtests.
