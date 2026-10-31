@@ -54,6 +54,12 @@
 //   --report-only             print everything, exit 0 (never prints OK when something failed)
 //   --verbose                 print every finding group, not just the first 12 per document
 //   --save-html dir           app sources: also write each linted document's HTML there (for the critic / debugging)
+//   --seeds N                 kit: lint every POOL skill (mixed_*, *_all) at N seeds - its usual one plus N - 1
+//                             derived (hash(cat__skill:print:k)) - each page its own document `cat:skill@seed`
+//                             (a pool deals different members at every seed: critic r6 D6-6)
+//   --seed-list a,b,c         kit: lint every pool skill at exactly these seeds instead
+//   --letters A,B             kit, --roles more-practice: the letters asked (the teacher print screen's
+//                             default is A,B); without it the role prints its one default letter
 //
 // WHAT A DOCUMENT IS
 //   pack    one file of the mock-up pack; every `.ws-page` is one printed A4 sheet.
@@ -102,7 +108,8 @@
 //              explain / describe / justify / discuss / prove; BD-10 one instruction line of <= 12 words
 //              above the cells; BD-1 no "Part NN" section headings.
 //   L-ANSAREA  SL-1 answer lines >= 14 mm; SL-6 no underscore blanks; H12 an item that says draw / build /
-//              show has a drawing zone >= 30 mm tall with >= 60 % of it empty (measured and reported).
+//              show has a drawing zone >= 30 mm tall with >= 60 % of it empty (measured and reported);
+//              H8 no cell with both an "Answer:" row and its own option list / check boxes.
 //              TY-21 (kit / pack; S1 builder B) every digit-strip segment ([data-ws-seg]) and stand-alone answer box
 //              ([data-ws-slot] box / box-unknown) is >= 4.4 mm wide as printed (pilot critic r1 D3: 4.06 mm at S).
 //   L-OVERLAP  H2 (kit / pack) neighbouring head labels of one drawing (stack `.head`s, the place letters over a pv
@@ -110,6 +117,13 @@
 //              CL40-INK (kit / pack) no ink - a glyph's ink box, an SVG shape, a painted border or fill - inside the
 //              label keep-out: the (label side + 1 mm) square at the cell's top-left corner, or the tab's own width
 //              when a 2-3 digit tab is wider (CL-40; critic 2026-10-24 D1, top-started across facts on the tab).
+//              ARC-INK (kit / pack) a long-division bracket's arc keeps white on BOTH sides: >= 0.3 mm before the
+//              dividend's first digit (VA-60a; critic r1 R1-1: "4 ) 8" read 48) and >= 0.25 mm after the divisor's last
+//              (critic r2 R2-1, a regression guard at r2's 0.27 mm: the owner keeps the 10-column bracket, 2026-10-31).
+//   (L-DENSITY COUNT-FITS, kit / pack: a fact-rows page fills whole rows and Score /N = facts printed; r2 R2-2.)
+//              TEXT-FRAME (kit / pack) a line of text that starts inside a bordered box ends inside it (CL-1; r2 R2-4).
+//   (L-DENSITY GRID-EVEN, kit / pack: every cell of a kit grid `.ws-grid` has one width within 0.2 mm (r2 R2-3: all grids);
+//              RUBRIC C3, PT-FRW-3; Lane D restart critic r1 R1-2.)
 //   L-WRAP     WRAP-OP (kit / pack) no wrapped line of text ends in − + × ÷ = with its expression continued on the
 //              next line (critic r2 N6 vocabulary picture, N7 worked step). TY-21, H2 and WRAP-OP are measured by
 //              tests/lib/ws-geom-probe.cjs, the one definition ws-slot-clip's SLOT-W / HEADS read too.
@@ -1032,6 +1046,155 @@ function wsLintPage(cfg) {
                 if (hit) F('L-OVERLAP', 'CL40-INK', 'major', hit.el, `ink of ${hit.what} at ${mm(hit.b.l - cr.left)} mm across, ${mm(hit.b.t - cr.top)} mm down enters the label keep-out (${mm(K.r - K.l)} x ${mm(K.b - K.t)} mm at the cell's top-left corner): nothing but the label paints there (CL-40)`, 'ink in label keep-out');
             }
         }
+        /* L-OVERLAP ARC-INK (VA-60a, owner 2026-10-31; Lane D restart critic r1 R1-1: the compact fact-rows bracket's
+           arc ran into the dividend's first digit, so "4 ) 8" read as "48" and "3 ) 0" as "30"). For every
+           long-division bracket (the `division` template: an SVG arc in the gutter between the divisor and the
+           dividend), the white between the arc's INK and the first dividend digit's INK, measured at the height of
+           that digit's ink, must be at least ARC_GAP_MM. The arc is sampled along its path (stroke half-width
+           added); the digit's ink comes from canvas measureText at 20x the printed size (at print size canvas rounds
+           the ink to whole pixels, 0.26 mm). */
+        if (!isLegacy) {
+            // the dividend side: >= 0.3 mm (r1 R1-1). The divisor side (critic r2 R2-1) is a REGRESSION GUARD at r2's
+            // measured clearance - the owner keeps the 10-column bracket (2026-10-31, "i like the long division even at
+            // 10 columns"): never closer than r2's 0.27 mm, never touching ink.
+            const ARC_GAP_MM = (cfg && Number(cfg.arcGapMm)) || 0.3;   // (MQ_ARC_GAP_MM: a diagnostic floor, to print every gap)
+            const ARC_GAP_DV_MM = (cfg && Number(cfg.arcGapMm)) || 0.25;
+            const ctxA = document.createElement('canvas').getContext('2d');
+            const K = 20;
+            const inkOfDigit = (sp) => {
+                const rg = document.createRange(); rg.selectNodeContents(sp);
+                const r = rg.getBoundingClientRect(); const cs = getComputedStyle(sp);
+                ctxA.font = `${cs.fontStyle} ${cs.fontWeight} ${parseFloat(cs.fontSize) * K}px ${cs.fontFamily}`;
+                const m = ctxA.measureText(sp.textContent.trim());
+                const fa = m.fontBoundingBoxAscent / K, fd = m.fontBoundingBoxDescent / K;
+                const base = r.top + (r.height - (fa + fd)) / 2 + fa;
+                return { l: r.left - m.actualBoundingBoxLeft / K, r: r.left + m.actualBoundingBoxRight / K, t: base - m.actualBoundingBoxAscent / K, b: base + m.actualBoundingBoxDescent / K };
+            };
+            for (const c of ri.cells) {
+                for (const svg of c.querySelectorAll('[data-ws-ops="division"] [role="group"] svg')) {
+                    const path = svg.querySelector('path');
+                    if (!path || !/Q/.test(path.getAttribute('d') || '') || !visible(svg)) continue;
+                    const grid = svg.closest('[role="group"]');
+                    const kids = [...grid.children];
+                    const ai = kids.indexOf(svg.parentElement);
+                    if (ai < 0) continue;
+                    const row = svg.parentElement.style.gridRow;
+                    const dd = kids.slice(ai + 1).find((s) => s.style.gridRow === row && /^\d$/.test(s.textContent.trim()) && visible(s));
+                    // the divisor's last digit: the last digit span before the arc on the arc's row
+                    const dv = kids.slice(0, ai).reverse().find((s) => s.style.gridRow === row && /^\d$/.test(s.textContent.trim()) && visible(s));
+                    const sw = (parseFloat(path.getAttribute('stroke-width')) || 1.5) * 96 / 72 / 2;
+                    const M = path.getScreenCTM();
+                    const L = path.getTotalLength();
+                    // the arc's ink extent (right edge, left edge) at the height of a digit's ink
+                    const arcAt = (ink, side) => {
+                        let v = side > 0 ? -Infinity : Infinity;
+                        for (let i = 0; i <= 200; i++) {
+                            const p = path.getPointAtLength((L * i) / 200);
+                            const q = new DOMPoint(p.x, p.y).matrixTransform(M);
+                            if (q.y < ink.t - sw || q.y > ink.b + sw) continue;
+                            v = side > 0 ? Math.max(v, q.x + sw) : Math.min(v, q.x - sw);
+                        }
+                        return v;
+                    };
+                    const say = (gap, what, d, floor = ARC_GAP_MM) => `the bracket's arc ${gap < 0 ? `runs ${(-gap).toFixed(2)} mm into` : `comes within ${gap.toFixed(2)} mm of`} the ${what} "${d.textContent.trim()}" (${grid.getAttribute('aria-label') || 'division'}): keep at least ${floor} mm of white between the arc's ink and the digit's ink, or "4 ) 8" reads as "48" and "11 )" as one run of ink (VA-60a, owner 2026-10-31)`;
+                    if (dd) {
+                        const di = inkOfDigit(dd);
+                        const right = arcAt(di, 1);
+                        const gap = (di.l - right) / PX;
+                        if (Number.isFinite(right) && gap < ARC_GAP_MM) F('L-OVERLAP', 'ARC-INK', 'major', grid, say(gap, "dividend's first digit", dd), 'arc on the dividend');
+                    }
+                    if (dv) {
+                        const vi = inkOfDigit(dv);
+                        const left = arcAt(vi, -1);
+                        const gap = (left - vi.r) / PX;
+                        if (Number.isFinite(left) && gap < ARC_GAP_DV_MM) F('L-OVERLAP', 'ARC-INK', 'major', grid, say(gap, "divisor's last digit", dv, ARC_GAP_DV_MM), 'arc on the divisor');
+                    }
+                }
+            }
+        }
+        /* L-DENSITY COUNT-FITS (PT-FRW-2 / PT 4.1 capacity, PT-DLG fits line; Lane D restart critic r2 R2-2: a mixed
+           + - x ÷ page printed 56 facts in a 10-column grid said to hold 70, "Score /56"). On a fact-rows page the
+           facts printed fill the lattice - no unruled run after the last fact - and the Score's denominator is the
+           number of facts printed. */
+        // (a fact-rows page: its tab is "Facts", data-ws-tab; or a key page marked data-ws-role="fact-rows")
+        if (!isLegacy && (/(^|\|)Facts(\||$)/.test(ri.el.getAttribute('data-ws-tab') || '') || ri.el.getAttribute('data-ws-role') === 'fact-rows')) {
+            for (const g of ri.el.querySelectorAll('.ws-grid.facts')) {
+                if (!visible(g)) continue;
+                const cells = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun'));
+                const run = [...g.children].find((c) => c.classList.contains('blankrun'));
+                const sc = ri.el.querySelector('.ws-field.score b');
+                const n = sc ? Number((sc.textContent.match(/\/\s*(\d+)/) || [])[1]) : NaN;
+                if (run) F('L-DENSITY', 'COUNT-FITS', 'major', run, `the fact grid prints ${cells.length} facts and leaves the rest of its last row unruled: a fact-rows page deals whole rows - the count printed is the grid's columns x rows (PT-FRW-2, critic r2 R2-2)`, 'short fact page');
+                if (Number.isFinite(n) && n !== cells.length && ri.el.querySelectorAll('.ws-grid.facts').length === 1) F('L-DENSITY', 'COUNT-FITS', 'major', g, `the page prints ${cells.length} facts but its Score says /${n}: the Score's denominator is the facts printed (HD-2, critic r2 R2-2)`, 'score count');
+            }
+        }
+        /* L-OVERLAP TEXT-FRAME (CL-1 ink inside its own box, H2; Lane D restart critic r2 R2-4: "Think: 12 x [ ] = 108"
+           ran past the think box's right edge in 6 of 12 cells). A line of text that starts inside a bordered box -
+           an SVG <rect> with a stroke round a <text>, or an HTML element with a border on both sides round its own
+           text - ends inside that box's inner edge too. */
+        if (!isLegacy) {
+            let nTF = 0;
+            for (const svg of ri.el.querySelectorAll('svg')) {
+                if (nTF > 5 || !visible(svg)) continue;
+                const rects = [...svg.querySelectorAll('rect')].filter((r) => (r.getAttribute('stroke') || getComputedStyle(r).stroke || 'none') !== 'none').map((r) => {
+                    const b = r.getBoundingClientRect(); const sw = (parseFloat(r.getAttribute('stroke-width')) || 0) * (b.width / Math.max(1e-6, r.width.baseVal.value || 1)) / 2;
+                    return { el: r, l: b.left + sw, r: b.right - sw, t: b.top + sw, b: b.bottom - sw };
+                }).filter((r) => r.r - r.l > 4 * PX);
+                if (!rects.length) continue;
+                for (const t of svg.querySelectorAll('text')) {
+                    const tb = t.getBoundingClientRect();
+                    if (!tb.width) continue;
+                    const cy = (tb.top + tb.bottom) / 2;
+                    // the smallest box the text STARTS in (its left edge and its mid-height inside)
+                    const box = rects.filter((r) => tb.left >= r.l - 0.1 && tb.left < r.r && cy > r.t && cy < r.b).sort((x, y) => (x.r - x.l) - (y.r - y.l))[0];
+                    if (!box) continue;
+                    if (tb.right > box.r + 0.1 * PX) { nTF++; F('L-OVERLAP', 'TEXT-FRAME', 'major', t, `the text "${(t.textContent || '').trim().slice(0, 24)}" runs ${mm(tb.right - box.r)} mm past the right edge of the box it starts in: text inside a bordered box ends inside the border (CL-1, H2)`, 'text over its frame'); }
+                }
+            }
+            for (const d of ri.el.querySelectorAll('.ws-page *')) {
+                if (nTF > 5 || !visible(d) || d.closest('svg')) continue;
+                const cs = getComputedStyle(d);
+                const bl = parseFloat(cs.borderLeftWidth) || 0, br = parseFloat(cs.borderRightWidth) || 0;
+                if (bl < 0.5 || br < 0.5 || cs.borderLeftStyle === 'none' || cs.borderRightStyle === 'none') continue;
+                if (cs.overflow !== 'visible' && cs.overflowX !== 'visible') continue;
+                const own = [...d.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim());
+                if (!own.length) continue;
+                const b = d.getBoundingClientRect();
+                const inner = b.right - br;
+                for (const n of own) {
+                    const rg = document.createRange(); rg.selectNodeContents(n);
+                    const r = rg.getBoundingClientRect();
+                    if (r.width && r.right > inner + 0.3 * PX) { nTF++; F('L-OVERLAP', 'TEXT-FRAME', 'major', d, `the text "${n.textContent.trim().slice(0, 24)}" runs ${mm(r.right - inner)} mm past the right border of its own box: text inside a bordered box ends inside the border (CL-1, H2)`, 'text over its frame'); break; }
+                }
+            }
+        }
+        /* L-DENSITY GRID-EVEN (RUBRIC C3 "cells are equal in size across a section, arranged in a regular grid";
+           PT-FRW-3; Lane D restart critic r1 R1-2: div_facts Mix fact rows re-laid a 9-cell last row at 20.7 mm under
+           18.6 mm cells). On a fact-rows grid (`.ws-grid.facts` on a fact-rows page) every cell of the section has one
+           width (within 0.2 mm); the unruled blank run (PG-15) and a declared full-width cell are not cells of the
+           lattice. */
+        if (!isLegacy) {
+            // (critic r2 R2-3: every kit grid section, the fact probe first - not only fact rows; a declared full-width
+            // span (wider than the grid less 2 mm) is exempt below)
+            for (const g of ri.el.querySelectorAll('.ws-grid')) {
+                if (!visible(g)) continue;
+                const gw = g.getBoundingClientRect().width;
+                const cs = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun') && visible(c));
+                // (a cell as wide as the grid is a declared full-width span - unless the grid RE-LAID its short last
+                // row (`.relaid`, grid.js): then the widened cell is the defect, critic r2 R2-3's cell 20)
+                const relaid = g.classList.contains('relaid');
+                const ws = cs.map((c) => c.getBoundingClientRect().width).filter((w) => relaid || w < gw - 2 * PX);
+                if (ws.length < 2) continue;
+                const lo = Math.min(...ws), hi = Math.max(...ws);
+                if (hi - lo > 0.2 * PX) {
+                    const odd = cs.find((c) => Math.abs(c.getBoundingClientRect().width - lo) > 0.2 * PX) || g;
+                    F('L-DENSITY', 'GRID-EVEN', 'major', odd, `the cells of one fact grid are ${mm(lo)} to ${mm(hi)} mm wide: one cell width per section, a short last row keeps the lattice and leaves the rest unruled (RUBRIC C3, PT-FRW-3, PG-15)`, 'uneven grid');
+                }
+            }
+        }
+        /* (Lane D port 2026-10-30: the lane's own L-OVERFLOW CL-40 keep-out check - text line boxes against a
+           square of the label's width - is not taken: today's L-OVERLAP CL40-INK above measures the same rule on
+           the ink, and the two disagreed on fact rows that pass CL40-INK.) */
         if (!isLegacy) {
             const pg = ri.el;
             const pr = pg.getBoundingClientRect();
@@ -1285,6 +1448,21 @@ function wsLintPage(cfg) {
                     item: !model && !ITEM_BANDS.test(bandLabel),
                     // a one-line fact, equation or number track: one short answer (PT 2.9 packs 20)
                     short: !!c.querySelector('.ws-fact, .ws-eq, .mq-hfact, .k2-seqstrip, .pv-round1'),
+                    // L-DENSITY SPREAD: how tall the problem's own drawing is (its ink, the item label
+                    // and the cell padding left out), against the cell's inner height
+                    ink: (() => {
+                        const cr = c.getBoundingClientRect();
+                        const padT = parseFloat(getComputedStyle(c).paddingTop) || 0, padB = parseFloat(getComputedStyle(c).paddingBottom) || 0;
+                        let t = Infinity, b = -Infinity;
+                        for (const d of c.querySelectorAll('*')) {
+                            if (d.matches('[data-ws-label], [data-ws-label] *') || !visible(d)) continue;
+                            const r = d.getBoundingClientRect();
+                            if (!r.height || !r.width || r.height >= cr.height - 1) continue;
+                            t = Math.min(t, r.top); b = Math.max(b, r.bottom);
+                        }
+                        const inner = cr.height - padT - padB;
+                        return b > t && inner > 0 ? { h: mm(b - t), inner: mm(inner) } : null;
+                    })(),
                 };
             });
             let role = pg.getAttribute('data-ws-role') || '';
@@ -1305,7 +1483,80 @@ function wsLintPage(cfg) {
             const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter(g => g.getBoundingClientRect().height > 0);
             const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
+            // L-DENSITY HOLE (wave 1 lane D round 5, critic r4 D-B): a bordered empty run of grid
+            // tracks after the last problem (the kit's .ws-cell.blankrun, or any empty bordered cell)
+            const holes = [...pg.querySelectorAll('.ws-grid > .ws-cell')].filter(e => {
+                const r = e.getBoundingClientRect();
+                if (r.width < 4 || r.height < 4) return false;
+                // an empty run after the last problem is a hole inside PG-15's closed frame, always
+                // (critic r5 D5-5: no border trick hides it; the layout removes it)
+                // (... except on the fact probe: PT-FPR-6 deals a fixed 20 and PT 4.2 draws the remainder after the 20th
+                // fact unruled - Lane D restart critic r2 R2-3's own fix: "the 20th fact stays in column 1 with the
+                // remainder unruled", never a re-laid wider cell)
+                if (e.classList.contains('blankrun')) return !/(^|\|)Probe\b/.test(pg.getAttribute('data-ws-tab') || '');
+                const st = getComputedStyle(e);
+                const bordered = ['Top', 'Right', 'Bottom', 'Left'].some(k => parseFloat(st['border' + k + 'Width']) > 0 && st['border' + k + 'Style'] !== 'none');
+                return bordered && !(e.textContent || '').trim() && !e.querySelector('svg, img, canvas, [data-ws-slot], input');
+            }).length;
+            // L-DENSITY REPEAT (critic r4 D-B: add_sub_10s S printed 30 + 10 twice): the same problem
+            // drawn twice on one page. A problem's identity is its drawing less its item label.
+            const sigOf = (c) => {
+                // a cell whose template declares an order-free identity (a number family's set
+                // {a, b, whole}: critic r5 D5-1) is compared by it, so a reordered family repeats
+                const dk = c.querySelector('[data-ws-dedupe]');
+                if (dk && dk.getAttribute('data-ws-dedupe')) return 'dk|' + dk.getAttribute('data-ws-dedupe');
+                const k = c.cloneNode(true);
+                k.querySelectorAll('[data-ws-label], .ws-letter, .ws-tabnum').forEach(e => e.remove());
+                return k.innerHTML.replace(/\s(id|aria-labelledby|aria-describedby|data-ws-item|data-ws-n)="[^"]*"/g, '').replace(/\s+/g, ' ').trim();
+            };
+            const seenSig = new Map();
+            const repeats = [];
+            ri.cells.forEach((c, i) => {
+                if (!cells[i] || !cells[i].item) return;
+                const sg = sigOf(c);
+                if (!sg) return;
+                if (seenSig.has(sg)) repeats.push(`${seenSig.get(sg)} = ${i + 1}`);
+                else seenSig.set(sg, i + 1);
+            });
+            // L-KEY AK-2 OVERFLOW (wave 1 lane D round 8, critic r6 D6-1/D6-6: the key's "110" hung
+            // 4 mm out of its fact box and no lint saw it): a key answer is written INSIDE its box.
+            // The ink of every written value in a bordered slot (box or digit box) is measured -
+            // the text's range rect for its width, the glyphs' own ascent / descent (canvas
+            // actualBoundingBox) against the baseline for its height - and must stay within the
+            // box's outer edge (1 px).
+            const keyOver = [];
+            if (ri.key) {
+                const cv = document.createElement('canvas').getContext('2d');
+                for (const sl of pg.querySelectorAll('.ws-box, [data-ws-slot]')) {
+                    const br = sl.getBoundingClientRect();
+                    if (br.width < 2 || br.height < 2 || !visible(sl)) continue;
+                    const st = getComputedStyle(sl);
+                    const bordered = ['Top', 'Bottom', 'Left', 'Right'].every(k => parseFloat(st['border' + k + 'Width']) > 0 && st['border' + k + 'Style'] !== 'none');
+                    if (!bordered) continue;
+                    const tw = document.createTreeWalker(sl, NodeFilter.SHOW_TEXT);
+                    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+                        const t = (n.nodeValue || '').trim();
+                        if (!t || !n.parentElement || !visible(n.parentElement)) continue;
+                        // a nested bordered slot judges its own text
+                        const own = n.parentElement.closest('.ws-box, [data-ws-slot]');
+                        if (own && own !== sl && sl.contains(own)) { const os = getComputedStyle(own); if (parseFloat(os.borderTopWidth) > 0 && parseFloat(os.borderBottomWidth) > 0) continue; }
+                        const ps = getComputedStyle(n.parentElement);
+                        cv.font = `${ps.fontStyle} ${ps.fontWeight} ${ps.fontSize} ${ps.fontFamily}`;
+                        const m = cv.measureText(t);
+                        const rg = document.createRange();
+                        rg.selectNodeContents(n);
+                        for (const tr of rg.getClientRects()) {
+                            if (tr.width < 0.5) continue;
+                            const fb = (m.fontBoundingBoxAscent || 0) + (m.fontBoundingBoxDescent || 0);
+                            const base = tr.top + (fb > 0 ? (m.fontBoundingBoxAscent * tr.height) / fb : tr.height * 0.8);
+                            const d = Math.max(br.top - (base - m.actualBoundingBoxAscent), (base + m.actualBoundingBoxDescent) - br.bottom, br.left - tr.left, tr.right - br.right);
+                            if (d > 1) { keyOver.push({ text: t.slice(0, 12), mm: mm(d), tag: tagOf(sl) }); break; }
+                        }
+                    }
+                }
+            }
             out.pages.push({
+                keyOver,
                 // Wave 4.4: a SHORT key page (labels + answers) and the items it lists, "page:cell"
                 short: pg.getAttribute('data-ws-key-style') === 'short',
                 shortItems: [...pg.querySelectorAll('[data-ws-short-page]')].map(e => `${e.getAttribute('data-ws-short-page')}:${e.getAttribute('data-ws-short-cell')}`),
@@ -1316,7 +1567,10 @@ function wsLintPage(cfg) {
                 accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length, gridBottom, gridTop,
+                footRect, cells, items: items.length, gridBottom, gridTop, holes, repeats,
+                // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
+                // option list / check boxes (two answer places, H8)
+                doubled: ri.cells.filter(c => c.querySelector('.ws-legacy-answer') && c.querySelector('.opt-list, input[type="checkbox"], [data-ws-shape="check"], [data-ws-shape="circle"]')).length,
                 oneSymbol: (itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)))
                     // a page of one-line facts is a page of one-number answers on the Independent
                     // page too (12.1: up to 16; the engine's dense packing calls them `short`)
@@ -1576,7 +1830,7 @@ function tmpFile(name) {
     return path.join(TMP, name);
 }
 
-async function lintDocument(page, { id, mode, printBackground = false, notes = [] }) {
+async function lintDocument(page, { id, mode, printBackground = false, notes = [], pool = false }) {
     await page.emulateMediaType('print');
     await page.evaluate(() => document.fonts && document.fonts.ready);
     const box = await page.evaluate(wsPageBox);
@@ -1586,15 +1840,16 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     await page.setViewport({ width: Math.round((mode === 'legacy' ? contentW : Math.max(box.w, 210)) * PX_PER_MM), height: 1400, deviceScaleFactor: 1 });
     await sleep(120);
     await page.evaluate(() => document.fonts && document.fonts.ready);
-    const dom = await page.evaluate(wsLintPage, { mode, printBackground, contentWidthPx: contentW * PX_PER_MM });
+    const dom = await page.evaluate(wsLintPage, { mode, printBackground, contentWidthPx: contentW * PX_PER_MM, arcGapMm: Number(process.env.MQ_ARC_GAP_MM) || 0 });
     const pdfPath = tmpFile(`${id.replace(/[^\w.-]+/g, '_')}.pdf`);
     await page.pdf({ path: pdfPath, format: 'A4', printBackground, preferCSSPageSize: true });
     const pdf = analysePdf(pdfPath, box);
+    const sectionHits = mode !== 'legacy' ? sectionOverlap(pdfPath, await page.evaluate(SECTION_LABELS_IN_PAGE)) : [];   // L-OVERLAP SECTION
     fs.unlinkSync(pdfPath);
     const findings = dom.findings.map(f => ({ ...f }));
     const F = (lint, rule, sev, loc, msg, key) => findings.push({ lint, rule, sev, msg, key: key || msg, ...loc });
     const dest = t => pdf.dests[t] || null;
-    const info = { id, mode, printedPages: pdf.pages.length, box, notes: [...notes] };
+    const info = { id, mode, printedPages: pdf.pages.length, box, notes: [...notes], pool };
 
     // ---- legacy: printed page of every tagged element
     if (mode === 'legacy') {
@@ -1640,6 +1895,7 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
         info.geom = { segs: geo.segs, heads: geo.heads, tpl: geo.tpl };
         geomFindings(geo, F);
     }
+    sectionOverlapFindings(sectionHits, F);
 
     // ---- pages, parts, split, density, key
     if (mode !== 'legacy') lintKitGeometry(dom, pdf, info, F);
@@ -1659,6 +1915,62 @@ function geomFindings(geo, F) {
     for (const x of geo.narrow) F('L-ANSAREA', 'TY-21', 'major', at(x), `answer ${x.kind} ${x.w} mm wide as printed${x.key ? ' (key page)' : ''}: under ${MIN_SEG_MM} mm a pupil cannot write a digit in it (TY-21, VA-12)`, `narrow answer ${x.kind}`);
     for (const x of geo.overlaps) F('L-OVERLAP', 'H2', 'major', at(x), `head labels "${x.a}" / "${x.b}" ${x.gap < 0 ? `overlap by ${-x.gap} mm` : `sit ${x.gap} mm apart`}: neighbouring heads need ${HEAD_GAP_MM} mm between them or they read as one run (H2)`, 'heads too close');
     for (const x of geo.wraps) F('L-WRAP', 'WRAP-OP', 'major', at(x), `a wrapped line ends in "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)`, `wrap after ${x.op}`);
+}
+
+// =============================================================================================
+// L-OVERLAP SECTION (Lane D restart r2, F2 2026-10-31; critic laned-restart R1-6). A section's ink never covers a
+// section heading: no paint printed AFTER a band's strip label ("Warm-up:", "Guided Practice:") may land on that
+// label. Read on the PRINTED PDF, not the DOM: the add_facts lesson's Warm-up cells measured 3 mm short, laid out
+// inside their grid rows on screen, but in print the rows grew to the cells' content and the second cell's white
+// fill (a positioned cell paints late) was drawn over the top of "Guided Practice:" - the DOM and ws-print-lint's
+// other checks read the page as clean. pymupdf gives every text span and drawing its paint order (seqno).
+// (Its own block, so the parallel F1 edits of this file merge cleanly.)
+// =============================================================================================
+/** In the page: the text of every band strip label (the bold run of `.ws-band > .ws-strip`). */
+const SECTION_LABELS_IN_PAGE = () => [...new Set([...document.querySelectorAll('.ws-page .ws-band > .ws-strip > b')]
+    .map((b) => b.textContent.replace(/\s+/g, ' ').trim()).filter((t) => t.length >= 2))];
+const SECTION_PY = String.raw`
+import sys, json, pymupdf
+pdf, labels = sys.argv[1], set(json.loads(sys.argv[2]))
+MM = 72 / 25.4
+out = []
+for pi, page in enumerate(pymupdf.open(pdf)):
+    pr = page.rect
+    spans = []
+    for s in page.get_texttrace():
+        t = ''.join(chr(c[0]) for c in s['chars']).replace('\xa0', ' ').strip()
+        if t in labels: spans.append((t, s['seqno'], pymupdf.Rect(s['bbox'])))
+    if not spans: continue
+    draws = [d for d in page.get_drawings() if not (d['rect'].width >= pr.width * 0.9 and d['rect'].height >= pr.height * 0.9)]
+    for t, seq, b in spans:
+        h = b.height
+        # the glyphs' ink band: the span box less its line gap (12 % above the cap line, 25 % under the baseline)
+        g = pymupdf.Rect(b.x0 + 0.2 * MM, b.y0 + 0.12 * h, b.x1 - 0.2 * MM, b.y1 - 0.25 * h)
+        for d in draws:
+            if d['seqno'] <= seq: continue
+            r = d['rect']
+            if r.is_empty and not (r.width or r.height): continue
+            if r.x1 <= g.x0 or r.x0 >= g.x1 or r.y1 <= g.y0 or r.y0 >= g.y1: continue
+            out.append({'page': pi + 1, 'label': t, 'kind': 'fill' if d.get('fill') is not None else 'stroke',
+                        'over': round((min(r.y1, g.y1) - g.y0) / MM, 2),
+                        'at': [round(r.x0 / MM, 1), round(r.y0 / MM, 1), round(r.width / MM, 1), round(r.height / MM, 1)],
+                        'label_at': [round(b.x0 / MM, 1), round(b.y0 / MM, 1)]})
+            break
+print(json.dumps(out))
+`;
+/** The labels each printed page paints something over (PDF paint order), or [] when nothing does. */
+function sectionOverlap(pdfPath, labels) {
+    if (!labels || !labels.length) return [];
+    try {
+        const out = execFileSync('python3', ['-c', SECTION_PY, pdfPath, JSON.stringify(labels)], { encoding: 'utf8', maxBuffer: 16 << 20 });
+        return JSON.parse(out.trim().split('\n').pop());
+    } catch (e) { return [{ page: 0, label: '?', error: String(e.message || e).slice(0, 120) }]; }
+}
+function sectionOverlapFindings(hits, F) {
+    for (const x of hits) {
+        if (x.error) { F('L-OVERLAP', 'SECTION', 'minor', {}, `L-OVERLAP SECTION could not read the PDF (${x.error})`, 'section probe error'); continue; }
+        F('L-OVERLAP', 'SECTION', 'major', { page: x.page, el: `strip "${x.label}"` }, `printed page ${x.page}: a ${x.kind} printed after the heading "${x.label}" (at ${x.label_at[0]}, ${x.label_at[1]} mm) covers it (${x.at[2]} x ${x.at[3]} mm at ${x.at[0]}, ${x.at[1]} mm): the section above runs into the next section's heading strip and clips it (H2, C3, PG-12)`, `section ink over "${x.label}"`);
+    }
 }
 
 // ---- kit / pack pages: every [data-ws-page] / .ws-page is one printed A4 sheet
@@ -1749,16 +2061,79 @@ function lintKitGeometry(dom, pdf, info, F) {
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
             const last = j === pt.pages.length - 1;
-            if (comparable && !last && max > 0 && p.items < max / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${pt.pages[pt.pages.length - 1].idx} of the same sheet follows and its fullest page holds ${max}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
+            // DN-2 (owner 2026-10-10, PT-MPR-1): every More Practice letter is a sheet of its own, so a
+            // letter's pages are compared with each other only - letter A's count never judges letter
+            // B's. A page with no letter (any other role) is compared across its whole sheet as before.
+            const dnLetter = (q) => { const m = /\bPractice ([A-J])\b/.exec((q.tab || []).join(' ')); return q.role === 'more-practice' && m ? m[1] : ''; };
+            const dnL = dnLetter(p);
+            const dnGroup = dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages;
+            const dnMax = Math.max(...dnGroup.map(q => q.items));
+            const dnLast = dnGroup[dnGroup.length - 1] === p;
+            if (comparable && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
             if (comparable && last && pt.pages.length > 1 && max > 0 && p.items > 0 && p.items < max / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${max}): rows are rebalanced across the sheet's pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
             // print screen's default; --count N fixes it and turns this off), a practice page whose
             // problems end more than 20% of the body above the footer wastes the page. The last page
             // of a multi-page sheet may be short (PG-23).
-            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !(last && pt.pages.length > 1)) {
-                const body = p.footRect[1] - (p.padT || 0);
+            // (wave 1 lane D round 9, critic r7 D7-1) every More Practice letter is a sheet of its
+            // own, handed out alone (PT-MPR-1): only the last page of a LETTER that runs to several
+            // pages may be short, never letter B because it prints after letter A
+            const letterOf = (q) => { const m = /\bPractice ([A-J])\b/.exec((q.tab || []).join(' ')); return m ? m[1] : ''; };
+            const mpLetter = p.role === 'more-practice' ? letterOf(p) : '';
+            const shortOk = mpLetter
+                ? (() => { const same = pt.pages.filter(q => q.role === 'more-practice' && letterOf(q) === mpLetter); return same.length > 1 && same[same.length - 1] === p; })()
+                : (last && pt.pages.length > 1);
+            // L-DENSITY POOL-MIN (round 9, critic r7 D7-1: mixed_multiplication More Practice printed
+            // ONE problem a page): a mixed pool's Auto page is a review, at least three problems
+            if (info.pool && info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.items > 0 && p.items < 3 && !shortOk)
+                F('L-DENSITY', 'POOL-MIN', 'major', { page: p.idx }, `page ${p.idx} of a mixed pool holds ${p.items} problem(s): a review page holds at least three (RUBRIC H5 / C3, LESSONS L2)`, 'pool page under three problems');
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk) {
+                // measured against the PROBLEM AREA (the grid's top to the footer), not the whole
+                // page above the footer: a 53 mm strip was 23 % of the problem area but under 20 %
+                // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
+                const body = p.footRect[1] - p.gridTop;
                 const strip = p.footRect[1] - p.gridBottom;
-                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+            }
+            // L-DENSITY HOLE (critic r4 D-B): an empty bordered run of cells after the last problem
+            // reads as a missing problem; a page deals whole rows or spans its last problem.
+            if (!pt.key && p.holes > 0) F('L-DENSITY', 'HOLE', 'major', { page: p.idx }, `page ${p.idx}: ${p.holes} empty bordered cell area(s) in the grid (a blank run after the last problem): deal whole rows (RUBRIC C3)`, 'empty bordered area');
+            // L-DENSITY REPEAT (critic r4 D-B): a practice page never prints the same problem twice.
+            if (info.mode === 'kit' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.repeats && p.repeats.length) F('L-DENSITY', 'REPEAT', 'major', { page: p.idx }, `page ${p.idx}: the same problem printed twice (items ${p.repeats.slice(0, 4).join(', ')}): a page holds the skill's distinct problems (RUBRIC C2)`, 'repeated problem');
+            // L-ANSAREA DOUBLE (wave 1 lane D round 4, critic r3 D1, H8): one problem, one answer place.
+            if (p.doubled > 0) F('L-ANSAREA', 'H8', 'critical', { page: p.idx }, `page ${p.idx}: ${p.doubled} cell(s) carry an "Answer:" row under their own option list or check boxes: two answer places (H8)`, 'doubled answer place');
+            // L-DENSITY PG-23 ORPHAN (wave 1 lane D, critic 2026-10-02: dot_array_mult dealt 4 + 1, the
+            // last page three quarters empty; the item-count check above reads 1 of 4 as a quarter
+            // of the page but not when the items differ in height). With the problem count on Auto,
+            // the LAST page of a multi-page practice sheet may be short, but its problems must fill
+            // at least a third of the page body: under that, the pages were not rebalanced.
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && last && pt.pages.length > 1
+                && p.footRect && p.gridBottom !== null && p.gridTop !== null) {
+                const body = p.footRect[1] - (p.padT || 0);
+                const used = p.gridBottom - p.gridTop;
+                if (body > 0 && used < body / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx}: its problems fill ${Math.round((used / body) * 100)}% of the page body, under a third: the rows were not rebalanced across the sheet's pages (PG-23)`, 'orphan last page');
+            }
+            // L-DENSITY SPREAD (wave 1 lane D, critic 2026-10-03, RUBRIC C3): rows stretched to share a
+            // page read as padding when the page holds few problems. With the count on Auto, the
+            // problems of a practice page must fill their cells: the median row's tallest drawing at
+            // least half of the row's inner height (a row stretched to twice what it holds fails;
+            // the engine's SPREAD_CAP is 1.7 x). Fill the count first, then stretch. The last page of a multi-page sheet may be short.
+            // One-line problems (drawing under 20 mm: a fact, an equation) are left to DN-1's counts.
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && !(last && pt.pages.length > 1)) {
+                // per ROW: the row's tallest drawing against the row's inner height (a short problem
+                // beside a tall one is the tall one's row, not padding)
+                const rowsAt = new Map();
+                for (const x of p.cells.filter(c => c.item && c.ink && c.ink.inner > 0)) {
+                    const k = Math.round(x.rect[1]);
+                    const r = rowsAt.get(k) || { h: 0, inner: x.ink.inner };
+                    r.h = Math.max(r.h, x.ink.h); r.inner = Math.max(r.inner, x.ink.inner);
+                    rowsAt.set(k, r);
+                }
+                const fills = [...rowsAt.values()].filter(r => r.h >= 20).map(r => r.h / r.inner).sort((a, b) => a - b);
+                if (fills.length) {
+                    const med = fills[Math.floor((fills.length - 1) / 2)];
+                    if (med < 0.5) F('L-DENSITY', 'SPREAD', 'major', { page: p.idx }, `page ${p.idx}: the problems fill ${Math.round(med * 100)}% of their cells' height (median of ${fills.length} rows): rows stretched to share the page read as padding; put more problems on the page before stretching rows (RUBRIC C3 / H13)`, 'stretched rows');
+                }
             }
         });
     }
@@ -1796,6 +2171,7 @@ function lintKitGeometry(dom, pdf, info, F) {
         const empty = p.cells.reduce((n, c) => n + (c.slots - c.answered), 0);
         if (empty > 0) F('L-KEY', 'AK-2', 'critical', { page: p.idx }, `key page ${p.idx}: ${empty} of ${p.slots} answer slot(s) carry no answer (AK-2, AK-4)`, 'unanswered slot');
         if (p.cells.some(c => !c.weightOk)) F('L-KEY', 'AK-2', 'minor', { page: p.idx }, `key page ${p.idx}: answers not in weight 700 (AK-2)`, 'key weight');
+        for (const o of (p.keyOver || [])) F('L-KEY', 'AK-2', 'major', { page: p.idx }, `key page ${p.idx}: the answer "${o.text}" runs ${o.mm} mm outside its box: a key writes each answer inside the slot the pupil writes in (AK-2, critic r6 D6-1)`, 'key answer outside its box');
     }
 }
 function maxDev(a, b) {
@@ -2059,7 +2435,7 @@ function attributeCells({ items, anchors }) {
     return res;
 }
 
-async function lintHtmlInSheetPage(app, html, id, mode, items = null) {   // items: {items, anchors} (D1 fix r1)
+async function lintHtmlInSheetPage(app, html, id, mode, items = null, { pool = false } = {}) {   // items: {items, anchors} (D1 fix r1); pool: lane D pool judge
     const SAVE = arg('save-html', null);
     const saveTo = SAVE ? path.resolve(process.cwd(), SAVE, id.replace(/[^\w.-]+/g, '_') + '.html') : null;
     if (SAVE) { fs.mkdirSync(path.resolve(process.cwd(), SAVE), { recursive: true }); fs.writeFileSync(saveTo, html); }
@@ -2081,7 +2457,7 @@ async function lintHtmlInSheetPage(app, html, id, mode, items = null) {   // ite
             attribution = await sheet.evaluate(attributeCells, items);
             if (saveTo) fs.writeFileSync(saveTo, '<!doctype html>\n' + await sheet.evaluate(() => document.documentElement.outerHTML));
         }
-        const res = await lintDocument(sheet, { id, mode });
+        const res = await lintDocument(sheet, { id, mode, pool });
         if (attribution) res.info.attribution = attribution;
         if (mode === 'kit' && arg('supports', null)) {
             const sr = await sheet.evaluate(supportCheckInPage);
@@ -2114,7 +2490,7 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                     await renderPrint(page, s, { problemCount: COUNT, includeAnswerKey: true });
                     html = await legacyDocumentHtml(page);
                 } else {
-                    html = await page.evaluate(async ({ S, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS, PAGES, COLUMNS, SECTIONS, LABEL }) => {
+                    html = await page.evaluate(async ({ S, seed, COUNT, role, ANCHORS, SUPPORTS, COVER, MIX, OPTS, KIT_SIZE, KEY_OPTS, LETTERS, PAGES, COLUMNS, SECTIONS, LABEL }) => {
                         // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
                         // pupilHtml and keyHtml (the facsimile key, same plan).
                         const practice = role === 'independent' || role === 'more-practice';
@@ -2148,7 +2524,7 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                             if (COLUMNS) section.columns = COLUMNS;
                             return section;
                         });
-                        const req = { role, sections, size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: KEY_OPTS || true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined };
+                        const req = { role, sections, size: KIT_SIZE, look: practice ? 'ican' : 'auto', key: KEY_OPTS || true, seed, anchors: ANCHORS, coverage: COVER || undefined, mix: MIX || undefined, letters: role === 'more-practice' && LETTERS ? LETTERS : undefined };
                         let out;
                         try { out = await window.buildSheet(req); } catch (e) { if (e && e.unsupported) return { unsupported: e.message }; throw e; }
                         const body = out.docHtml || [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
@@ -2159,7 +2535,7 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                         // ... and of every anchor (worked example) cell: matched by the numbers it draws
                         items.anchors = ((out.anchors && out.anchors.examples) || []).map((a) => ({ skill: sk(a.skill), text: String(a.text || '') }));
                         return { doc: window.sheetDocument(body, LABEL), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml, items, anchorItems: items.anchors };
-                    }, { S: d.skills.map(k => ({ categoryId: k.categoryId, skillId: k.skillId })), seed, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: flags.anchors, SUPPORTS: flags.supports, COVER: flags.coverage, MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE: kitSize(), KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null, PAGES: flags.pages, COLUMNS: flags.columns, SECTIONS: flags.sectionsMode, LABEL: d.skills.length === 1 ? s.label : d.label });
+                    }, { S: d.skills.map(k => ({ categoryId: k.categoryId, skillId: k.skillId })), seed, LETTERS: arg('letters', null) ? arg('letters', '').split(',').map(x => x.trim().toUpperCase()).filter(Boolean) : null, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: flags.anchors, SUPPORTS: flags.supports, COVER: flags.coverage, MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE: kitSize(), KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null, PAGES: flags.pages, COLUMNS: flags.columns, SECTIONS: flags.sectionsMode, LABEL: d.skills.length === 1 ? s.label : d.label });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
                 if (html && html.unsupported) {
@@ -2167,7 +2543,7 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                     if (jobId) NA_DOCS.push({ id, reason: html.unsupported });
                     continue;
                 }
-                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit', kitHalves && d.skills.length > 1 ? { items: kitHalves.items, anchors: kitHalves.anchorItems || [] } : null);
+                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit', kitHalves && d.skills.length > 1 ? { items: kitHalves.items, anchors: kitHalves.anchorItems || [] } : null, { pool: source === 'kit' && d.skills.length === 1 && poolSkill(s) });
                 if (kitHalves) r.findings.push(...anchorFindings(kitHalves.pupilHtml, kitHalves.keyHtml));
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
@@ -2185,18 +2561,38 @@ const PENDING_DOCS = [];
 const NA_DOCS = [];
 
 /** The kit documents the current flags ask for: one per skill per role, or one of all skills. */
+// --seeds N / --seed-list a,b (wave 1 lane D round 8, critic r6 D6-6): a POOL page (mixed_*, *_all) deals
+// different members at every seed, so one seed proves one page. Each pool skill is linted at the usual seed
+// plus N - 1 derived ones (hash(cat__skill:print:k)), or at the seeds listed; every other skill keeps its one
+// seed. Each extra page is its own document (`cat:skill@seed`), so PAGEFILL, L-KEY and the rest are judged
+// page by page. (--kind single only.)
+const poolSkill = (s) => /^mixed_|_all$/.test(s.skillId) || s.skillId === 'all_domains_mixed';
+function seedsOf(s) {
+    const SEEDS_N = Math.max(1, parseInt(arg('seeds', '1'), 10) || 1);
+    const SEED_LIST = (arg('seed-list', '') || '').split(',').map(x => x.trim()).filter(Boolean).map(Number).filter(Number.isFinite);
+    const base = hash(`${s.categoryId}__${s.skillId}:print`);
+    if (!poolSkill(s)) return [base];
+    if (SEED_LIST.length) return SEED_LIST.map(x => x >>> 0);
+    return [base, ...Array.from({ length: SEEDS_N - 1 }, (_, k) => hash(`${s.categoryId}__${s.skillId}:print:${k + 1}`))];
+}
+
 function kitDocList(skills, flags, jobId) {
     const kitRoles = (arg('roles', 'independent') || 'independent').split(',').map(r => r.trim()).filter(Boolean);
     const ids = skills.map(s => `${s.categoryId}:${s.skillId}`);
     if (flags.kind === 'single') {
         const out = [];
-        for (const s of skills) for (const role of kitRoles) out.push({ id: `${s.categoryId}:${s.skillId}${role !== 'independent' ? '#' + role : ''}`, skills: [s], role, seed: hash(`${s.categoryId}__${s.skillId}:print`), label: s.label + (role !== 'independent' ? ` (${role})` : '') });
+        for (const s of skills) for (const role of kitRoles) for (const seed of seedsOf(s)) {
+            const extra = seed !== hash(`${s.categoryId}__${s.skillId}:print`);
+            out.push({ id: `${s.categoryId}:${s.skillId}${role !== 'independent' ? '#' + role : ''}${extra ? '@' + seed : ''}`, skills: [s], role, seed,
+                label: s.label + (role !== 'independent' ? ` (${role})` : '') + (extra ? ` (seed ${seed})` : '') });
+        }
         if (jobId) { if (out.length !== 1) throw new Error(`job ${jobId}: a job is one document (got ${out.length})`); out[0].id = jobId; }
         return out;
     }
     if (skills.length < 2) throw new Error(`--kind ${flags.kind} needs two or more --skills (the skill and its partners)`);
     const role = flags.kind === 'mixed' ? 'mixed-practice' : kitRoles[0];
-    if (flags.kind === 'sections' && !['independent', 'more-practice'].includes(role)) throw new Error(`--kind sections prints on a practice role (independent, more-practice), not ${role}`);
+    // (fact-rows: one grid of every skill's facts, owner ruling 2026-10-31 - the mixed fast-facts page)
+    if (flags.kind === 'sections' && !['independent', 'more-practice', 'fact-rows'].includes(role)) throw new Error(`--kind sections prints on a practice role (independent, more-practice) or fact-rows, not ${role}`);
     return [{ id: jobId || `${flags.kind}:${ids.join('+')}`, skills, role, seed: hash(`${flags.kind}:${ids.join(',')}:print`), label: `${skills.length} skills as ${flags.kind === 'mixed' ? 'Mixed practice' : 'sections'}` }];
 }
 
@@ -2430,6 +2826,51 @@ const SELF_TESTS = [
         const MM = 96 / 25.4;
         c.insertAdjacentHTML('beforeend', `<span style="position:absolute;left:${Math.max(t.height + MM, t.right - cr.left) - 1.2 * MM}px;top:${t.bottom - cr.top - 2.5 * MM}px;font-size:22pt;line-height:1;color:#000">4</span>`);
     } },
+    // ARC-INK (VA-60a; Lane D restart critic r1 R1-1: the compact bracket's arc ran into the dividend's first digit,
+    // "4 ) 8" read as "48"): 7 ) 84 at 16 pt on 0.55 em tracks with r1's 1 mm gutter and its arc (x 4.7, bow to 12.7);
+    // the control is the same fact in a 3 mm gutter with a shallow arc (1.7 mm of white).
+    { name: 'bracket arc on the dividend\'s first digit (ARC-INK)', expect: ['L-OVERLAP', 'ARC-INK'], fn: () => {
+        const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 1mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M4.7 0 H10 M4.7 0 Q12.7 20 4.7 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+    } },
+    { name: 'bracket arc clear of the dividend (ARC-INK control)', expect: [], absent: ['L-OVERLAP', 'ARC-INK'], fn: () => {
+        const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 4mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M3.5 0 H10 M3.5 0 Q6.5 20 3.5 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+    } },
+    // ARC-INK divisor side (critic r2 R2-1; a regression guard at r2's 0.27 mm, floor 0.25 mm): 7 ) 84 with the arc
+    // starting at the gutter's left edge (no white after the "7"), dividend side clear.
+    { name: 'bracket arc on the divisor\'s last digit (ARC-INK divisor side)', expect: ['L-OVERLAP', 'ARC-INK'], msg: /divisor's last digit/, fn: () => {
+        const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 3mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M0.3 0 H10 M0.3 0 Q0.8 20 0.3 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+    } },
+    // COUNT-FITS (critic r2 R2-2: 56 facts in a 10-column grid, the rest unruled): a fact-rows grid with an unruled run
+    // after its last fact; the control is a full fact grid.
+    { name: 'fact-rows page with a short last row (COUNT-FITS)', expect: ['L-DENSITY', 'COUNT-FITS'], fn: () => {
+        const g = document.querySelector('.ws-page .ws-grid'); g.classList.add('facts');
+        document.querySelector('.ws-page').setAttribute('data-ws-tab', 'Facts');
+        g.insertAdjacentHTML('beforeend', '<div class="ws-cell blankrun" style="--from:2"></div>');
+    } },
+    { name: 'full fact-rows grid (COUNT-FITS control)', expect: [], absent: ['L-DENSITY', 'COUNT-FITS'], fn: () => {
+        document.querySelector('.ws-page .ws-grid').classList.add('facts');
+        document.querySelector('.ws-page').setAttribute('data-ws-tab', 'Facts');
+    } },
+    // TEXT-FRAME (CL-1; Lane D restart critic r2 R2-4): the old 36 mm think box with "= 108" at x 28.4 runs past its
+    // border; the control is the same text in a box measured from it (40 mm).
+    { name: 'think text past its box (TEXT-FRAME)', expect: ['L-OVERLAP', 'TEXT-FRAME'], fn: () => {
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<svg viewBox="0 0 36 9" width="36mm" height="9mm" style="display:block;font-family:Andika"><rect x="0.3" y="0.3" width="35.4" height="8.4" rx="1.5" fill="none" stroke="#000" stroke-width="0.35"/><text x="3" y="6" font-size="3.6">Think: 12 ×</text><rect x="21.5" y="1.8" width="5.4" height="5.4" fill="none" stroke="#000" stroke-width="0.35"/><text x="28.4" y="6" font-size="3.6">= 108</text></svg>`);
+    } },
+    { name: 'think text inside its box (TEXT-FRAME control)', expect: [], absent: ['L-OVERLAP', 'TEXT-FRAME'], fn: () => {
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<svg viewBox="0 0 40 9" width="40mm" height="9mm" style="display:block;font-family:Andika"><rect x="0.3" y="0.3" width="39.4" height="8.4" rx="1.5" fill="none" stroke="#000" stroke-width="0.35"/><text x="2" y="6" font-size="3.6">Think: 12 ×</text><rect x="21.92" y="1.8" width="5.4" height="5.4" fill="none" stroke="#000" stroke-width="0.35"/><text x="28.52" y="6" font-size="3.6">= 108</text></svg>`);
+    } },
+    // GRID-EVEN (RUBRIC C3, PT-FRW-3; Lane D restart critic r1 R1-2: a re-laid last row of wider cells on fact rows):
+    // a fact grid whose first column is 30 mm and the rest share the width; the control is the same grid with equal cells.
+    { name: 'fact grid with a widened cell (GRID-EVEN)', expect: ['L-DENSITY', 'GRID-EVEN'], fn: () => {
+        const g = document.querySelector('.ws-page .ws-grid'); g.classList.add('facts');
+        g.style.gridTemplateColumns = '30mm 1fr 1fr';
+    } },
+    { name: 'fact grid of equal cells (GRID-EVEN control)', expect: [], absent: ['L-DENSITY', 'GRID-EVEN'], fn: () => {
+        document.querySelector('.ws-page .ws-grid').classList.add('facts');
+    } },
     // H13-ROW (pilot-su-c critic r2 N2): a short top cell in a row sized for its taller neighbour; the control is a
     // uniform row (both cells hold the tall item), which keeps equal bands and never fires.
     { name: 'short cell in a row sized for a taller item (H13-ROW)', expect: ['L-DENSITY', 'H13'], msg: /H13-ROW/, fn: () => {
@@ -2454,6 +2895,20 @@ const SELF_TESTS = [
     // over 3 mm pv zones; the control is the same heads on 12 mm tracks.
     { name: 'stack heads overlapping (L-OVERLAP)', expect: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="ws-stack" style="display:grid;grid-template-columns:repeat(3,4mm);font-size:11pt"><span class="head" style="white-space:nowrap;text-align:center">HTh</span><span class="head" style="white-space:nowrap;text-align:center">TTh</span><span class="head" style="white-space:nowrap;text-align:center">Th</span></div>'); } },
     { name: 'place letters crowding over a pv mat (L-OVERLAP)', expect: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<svg width="30mm" height="20mm" viewBox="0 0 30 20"><text x="5" y="4" text-anchor="middle" font-size="4" font-weight="700" fill="#000">Th</text><text x="8" y="4" text-anchor="middle" font-size="4" font-weight="700" fill="#000">H</text><rect x="2" y="6" width="3" height="12" fill="none" stroke="#000" stroke-width="0.2" data-pv-zone="1000"/><rect x="5" y="6" width="3" height="12" fill="none" stroke="#000" stroke-width="0.2" data-pv-zone="100"/></svg>'); } },
+    // L-OVERLAP SECTION (critic laned-restart R1-6): a Warm-up cell taller than its row (a positioned white cell) is
+    // printed over the next band's "Guided Practice:" heading; the control has the same two bands, clear of each other.
+    { name: 'section ink over the next heading (L-OVERLAP SECTION)', expect: ['L-OVERLAP', 'SECTION'], fn: () => {
+        const pg = document.querySelector('.ws-page');
+        (pg.firstElementChild || pg).insertAdjacentHTML('afterend', '<div class="ws-band" style="border:0.5mm solid #000"><div class="ws-strip"><b>Planted Warm-up:</b></div>'
+            + '<div style="position:relative;height:14mm;margin-bottom:-9mm;background:#fff;border:0.5mm solid #000;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div></div>'
+            + '<div class="ws-band" style="border:0.5mm solid #000"><div class="ws-strip" style="height:6mm;font-size:12pt"><b>Planted Guided:</b> Add.</div></div>');
+    } },
+    { name: 'section clear of the next heading (L-OVERLAP SECTION control)', expect: [], absent: ['L-OVERLAP', 'SECTION'], fn: () => {
+        const pg = document.querySelector('.ws-page');
+        (pg.firstElementChild || pg).insertAdjacentHTML('afterend', '<div class="ws-band" style="border:0.5mm solid #000"><div class="ws-strip"><b>Planted Warm-up:</b></div>'
+            + '<div style="position:relative;height:14mm;background:#fff;border:0.5mm solid #000;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div></div>'
+            + '<div class="ws-band" style="border:0.5mm solid #000"><div class="ws-strip" style="height:6mm;font-size:12pt"><b>Planted Guided:</b> Add.</div></div>');
+    } },
     { name: 'stack heads on wide tracks (L-OVERLAP control)', expect: [], absent: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="ws-stack" style="display:grid;grid-template-columns:repeat(3,12mm);font-size:11pt"><span class="head" style="white-space:nowrap;text-align:center">HTh</span><span class="head" style="white-space:nowrap;text-align:center">TTh</span><span class="head" style="white-space:nowrap;text-align:center">Th</span></div>'); } },
     // L-WRAP (critic r2 N6 / N7): a line that wraps after its operator; the control is the same kind of text joined
     // with no-break spaces in a box wide enough for it.
@@ -2485,6 +2940,112 @@ const SELF_TESTS = [
     { name: 'narrow Lines write-on line at size S (SL-3a exception)', absent: ['L-ANSAREA', 'SL-1'], expect: [], fn: () => { const p = document.querySelector('.ws-page'); p.setAttribute('data-ws-size', 'S'); p.querySelectorAll('[data-ws-cell]').forEach((c) => c.setAttribute('data-ws-size', 'S')); p.querySelector('[data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="k2-tile k2-line-slot" data-ws-slot="x" data-ws-shape="line" style="display:inline-block;width:10mm;height:8mm;border-bottom:2px solid #000"></span>'); } },
     { name: 'an input on paper', expect: ['L-INPUT', 'SP-10'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<input style="width:14mm">'); } },
     { name: 'grade and CCSS code in a cell', expect: ['L-CCSS', 'SC-5'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<span style="font-size:11pt">Grade 3 3.NBT.A.2</span>'); } },
+    // wave 1 lane D round 5: the page-fill gaps the critic found on kit pages (mode kit)
+    { name: 'strip of a fifth of the problem area (kit)', mode: 'kit', expect: ['L-DENSITY', 'PAGEFILL'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const g = p1.querySelector('.ws-grid');
+        const top = g.getBoundingClientRect().top;
+        const foot = p1.querySelector('[data-ws-teacher], .ws-foot').getBoundingClientRect().top;
+        // the grid ends 24 % of its problem area above the footer
+        g.style.flex = 'none'; g.style.height = `${(foot - top) * 0.76}px`; g.style.gridTemplateRows = 'repeat(3, 1fr)';
+    } },
+    // wave 1 lane D round 8 (critic r6 D6-6): a pool page's split-off column work is a second grid on
+    // the page; the strip under the LAST grid is what PAGEFILL measures (first grid top to footer)
+    { name: 'strip under a page of two grids (kit)', mode: 'kit', expect: ['L-DENSITY', 'PAGEFILL'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const g = p1.querySelector('.ws-grid');
+        const top = g.getBoundingClientRect().top;
+        const foot = p1.querySelector('[data-ws-teacher], .ws-foot').getBoundingClientRect().top;
+        const g2 = g.cloneNode(false);
+        g2.removeAttribute('id');
+        const cells = [...g.querySelectorAll(':scope > [data-ws-cell]')];
+        cells.slice(Math.ceil(cells.length / 2)).forEach(c => g2.appendChild(c));
+        g.after(g2);
+        // the two grids end 28 % of the problem area above the footer
+        for (const x of [g, g2]) { x.style.flex = 'none'; x.style.height = `${(foot - top) * 0.36}px`; x.style.gridTemplateRows = 'repeat(2, 1fr)'; }
+    } },
+    // wave 1 lane D round 9 (critic r7 D7-1): More Practice letter B is a sheet of its own, so a strip
+    // under its problems fails although it prints after letter A
+    { name: 'strip under More Practice letter B (kit)', mode: 'kit', expect: ['L-DENSITY', 'PAGEFILL'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p, i) => {
+            p.setAttribute('data-ws-role', 'more-practice');
+            const sp = [...p.querySelectorAll('.ws-tabbox span')];
+            if (sp.length) sp[sp.length - 1].textContent = `Practice ${'AB'[i]}`;
+        });
+        const g = p2.querySelector('.ws-grid');
+        const top = g.getBoundingClientRect().top;
+        const foot = p2.querySelector('[data-ws-teacher], .ws-foot').getBoundingClientRect().top;
+        g.style.flex = 'none'; g.style.height = `${(foot - top) * 0.7}px`; g.style.gridTemplateRows = 'repeat(3, 1fr)';
+    } },
+    // owner 2026-10-10 (DN-2 per letter): letter A's two-problem last page beside a full letter B is
+    // not half-empty (each letter is its own sheet, PT-MPR-1) ...
+    { name: 'More Practice letter A short beside a full letter B (kit)', mode: 'kit', expect: [], absent: ['L-DENSITY', 'DN-2'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p, i) => {
+            p.setAttribute('data-ws-role', 'more-practice');
+            const sp = [...p.querySelectorAll('.ws-tabbox span')];
+            if (sp.length) sp[sp.length - 1].textContent = `Practice ${'AB'[i]}`;
+        });
+        p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
+        [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+    } },
+    // ... but two pages of ONE letter are still compared: a half-empty first page of letter A fails
+    { name: 'half-empty first page inside More Practice letter A (kit)', mode: 'kit', expect: ['L-DENSITY', 'DN-2'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p) => {
+            p.setAttribute('data-ws-role', 'more-practice');
+            const sp = [...p.querySelectorAll('.ws-tabbox span')];
+            if (sp.length) sp[sp.length - 1].textContent = 'Practice A';
+        });
+        p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
+        [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+    } },
+    { name: 'a mixed pool page of one problem (kit)', mode: 'kit', pool: true, expect: ['L-DENSITY', 'POOL-MIN'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const g = p1.querySelector('.ws-grid');
+        const cells = [...g.querySelectorAll(':scope > [data-ws-cell]')];
+        cells.slice(1).forEach(c => c.remove());
+        g.style.gridTemplateColumns = '1fr'; g.style.gridTemplateRows = '1fr';
+    } },
+    // wave 1 lane D round 8 (critic r6 D6-1): the key's "110" hung 4 mm out of its answer box
+    { name: 'key answer outside its box', expect: ['L-KEY', 'AK-2'], fn: () => {
+        const k = [...document.querySelectorAll('.ws-page')].find(p => /Answer Key/.test(p.querySelector('.ws-tabbox')?.textContent || ''));
+        k.querySelector('[data-ws-cell]').insertAdjacentHTML('beforeend', '<span class="ws-box" style="display:inline-block;width:12mm;height:6mm;border:0.75pt solid #000;font-size:28pt;line-height:6mm;font-weight:700;overflow:visible">110</span>');
+    } },
+    { name: 'empty bordered run after the last problem', mode: 'kit', expect: ['L-DENSITY', 'HOLE'], fn: () => {
+        const g = document.querySelector('.ws-page .ws-grid');
+        const cells = [...g.querySelectorAll(':scope > [data-ws-cell]')];
+        cells[cells.length - 1].remove();
+        g.insertAdjacentHTML('beforeend', '<div class="ws-cell blankrun" style="--from:2"></div>');
+    } },
+    { name: 'a number family reordered on the same page', mode: 'kit', expect: ['L-DENSITY', 'REPEAT'], fn: () => {
+        // critic r5 D5-1: 4, 5, 20 and 5, 4, 20 draw differently but are one family (data-ws-dedupe)
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const cells = [...p1.querySelectorAll('.ws-grid > [data-ws-cell]')];
+        cells[0].insertAdjacentHTML('beforeend', '<div data-ws-dedupe="nfx:4,5,20">4, 5, 20</div>');
+        cells[1].insertAdjacentHTML('beforeend', '<div data-ws-dedupe="nfx:4,5,20">5, 4, 20</div>');
+    } },
+    { name: 'the same problem twice on a page', mode: 'kit', expect: ['L-DENSITY', 'REPEAT'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        p1.setAttribute('data-ws-role', 'independent');
+        const cells = [...p1.querySelectorAll('.ws-grid > [data-ws-cell]')];
+        const copy = cells[0].cloneNode(true);
+        const lab = copy.querySelector('[data-ws-label], .ws-letter');
+        const lab1 = cells[1].querySelector('[data-ws-label], .ws-letter');
+        if (lab && lab1) lab.textContent = lab1.textContent;
+        cells[1].replaceWith(copy);
+    } },
 ];
 
 // A synthetic sheet in the legacy DOM shape (.worksheet-set / .worksheet-problem / .answer-key-grid,
@@ -2548,7 +3109,7 @@ async function selfTest() {
             const page = await prepare();
             await page.evaluate(t.fn);
             await sleep(50);
-            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: 'pack' });
+            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack', pool: !!t.pool });
             await page.close();
             if (t.absent) {
                 asserts++;

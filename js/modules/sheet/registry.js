@@ -161,6 +161,15 @@ export function renderCell(q, ctx = {}) {
         // or under.
         let fp = null;
         try { fp = tpl.footprint ? tpl.footprint.call(tpl, withoutSupports(payload), c) : null; } catch (e) { fp = null; }
+        // ONE placement per page (critic r2 R2-4: the boxed sign stood before "12 ÷ 3" and under "108 ÷ 12" on
+        // one page): a division fact decides beside / before / under from the widest fact of its set (144 ÷ 12),
+        // so every cell of a section places its supports alike.
+        if (fp && /^(\/|÷|divide)$/.test(String(payload.op || '')) && Number(payload.a) <= 144 && Number(payload.b) <= 12) {
+            try {
+                const wide = tpl.footprint.call(tpl, Object.assign(withoutSupports(payload), { a: 144, b: 12, ans: 12 }), c);
+                if (wide && wide.wMm > fp.wMm) fp = Object.assign({}, fp, { wMm: wide.wMm });
+            } catch (e) { /* keep the item's own */ }
+        }
         return SUPPORTS.withSupports(html, payload, spec.template, c, { problemWMm: fp && fp.wMm ? Math.max(10, fp.wMm - 5) : 40, problemHMm: (fp && fp.hMm) || 30 });
     } catch (e) {
         return FALLBACK.render({ text: (q && q.text) || '' }, c);

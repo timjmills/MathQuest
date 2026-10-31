@@ -464,3 +464,8 @@ against this row.
 | Print build, 4-page sheet + key (4×) | was 5.4 s before the dialog; now usually already built in the background |
 | Preview vs PDF: pages / pixels | equal in 6 printouts / ≤ 0.002 % differing (limit 0.02 %) |
 | Critic rounds to pass | r1 FAIL; r2 pending |
+Lane D restart (2026-10-30/31): 1 critic round, FAIL (4/4 fact skills), 16 findings (9 already red in gates before the critic);
+3 builders + 1 critic, all mq-opus-medium; ~9 h wall; ~$164 session cost (≈ 5.9 % of the weekly limit). Paused by the owner after r1.
+
+Lane D restart r2 (2026-10-31): critic r2 FAIL (5/5 incl. the new preset div_facts_long), 5 findings (R2-1…R2-5), 4 builders + 1 critic,
+all mq-opus-medium; ~7 h wall; ~$118 (≈ 4.2 % of the weekly limit). Lane total ~$282 (≈ 10.1 %). Stopped: stop-loop on the arc + weekly-limit warning.

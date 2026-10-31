@@ -143,6 +143,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'count-all': 'Count them all. Write how many.',
     'count-kind': 'Count one kind. Write how many.',
     'count-tens': 'Write how many tens.',
+    'check-odd-even': 'Odd or even? Check one box.',
+    'check-asked': 'Read the question. Check one box.',
+    'circle-even': 'Circle the even numbers. Cross out the odd numbers.',
+    'make-whole': 'Use the pieces. Write the fractions that make 1 whole.',
     'ring-remainder': 'Circle groups of {n}. Write the quotient and the remainder.',
     // 2026-09-25 critic round 2: the same tasks when the section's items do not share one {n}
     // (each cell prints its own group size / divisor). Their fallback used to be `groups-of`,
@@ -157,6 +161,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-rcdws': 'Read the story. Draw it. Solve.',
     // detailed lesson 2 (2026-10-16): the word-work cell's compact bar form (story, bar, answer)
     'story-bar': 'Read the story. Fill in the bar. Solve.',
+    // a story that chooses x or / in a neutral sentence: ONE sign place, the ring (critic r3 D4)
+    'story-work-ring': 'Write the sign in the circle. Write the numbers. Solve.',
+    // a division story by its name (remainder_*): no sign to choose, so none to circle
+    'story-work-div': 'Write the numbers in the boxes. Divide. Answer the question.',
     // detailed lesson 7 (2026-10-17): the word-work cell's compact frames form (one number sentence a step)
     'story-steps': 'Read the story. Write each step. Solve.',
     'story-letter': 'Read the story. Write the equation. Find n.',
@@ -248,6 +256,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'frac-name': 'Write the fraction, or circle the model that shows it.',
     'models-complete': 'Look at the two models. Complete the number sentence.',
     'line-mark-each': 'Mark each number on the line.',
+    // Wave 1 lane D (2026-10-02): whole_as_fraction and fraction_number_line move to the kit.
+    'whole-as-fraction': 'Write the whole number as a fraction.',
+    'circle-line': 'Circle the number line that shows the fraction.',
+    'multiply-array': 'Multiply the rows by the columns. Write the answer.',
     // O6 lane AP2 round 3 (2026-09-25): the figure and data cells moved to the kit.
     'read-thermometer': 'Read the thermometer. Write the temperature.',
     'read-ruler': 'Read the ruler. Write the number the arrow points to.',

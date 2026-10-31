@@ -26,9 +26,9 @@ import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK,
 } from '../index.js';
 import {
-    resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM,
+    resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
 } from '../layout.js';
-import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
+import { paginate, labelStarts, lettersFit, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
 import { presetOf } from '../../skill-presets.js';   // pure table, SCC-01 safe
@@ -489,7 +489,10 @@ export function sectionInstructionKey(keys) {
 /** A library instruction as printed: `_word_` is an underlined word (library convention). */
 export function instructionHtml(key, text) {
     const body = esc(text).replace(/_([^_]+)_/g, '<u>$1</u>');
-    return `<div class="ws-instrline" data-ws-instruction="${esc(key)}">${body}</div>`;
+    // The line is a flex box: bare text beside a <u> becomes anonymous flex items whose edge spaces collapse
+    // ("Look at the_sign_" printed "thesign"). A line with an underlined word keeps its text in one inline span.
+    const inner = body.includes('<u>') ? `<span>${body}</span>` : body;
+    return `<div class="ws-instrline" data-ws-instruction="${esc(key)}">${inner}</div>`;
 }
 
 /** HD-14: how many lines the title takes at the preset size (a width estimate, 0.55 em a character). */
@@ -626,8 +629,65 @@ function planItem(it, level, cols) {
  * each row is as tall as its tallest problem with DENSE_ROOM to spare, never the even share of the
  * grid a lone section fills, and three rows of either leave the page's 1 mm safety (PG-12).
  */
-export function splitCellH(L) {
-    return Math.round(Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows)) * 1000) / 1000;
+export function splitCellH(L, rowsUsed = 0, held = 0) {
+    // A part that holds fewer rows than its page allows (wave 1 lane D: Mixed Multiplication's two
+    // story rows drawn at a third of the page each, 1 mm over their content, a story overflowed)
+    // takes 6 mm over its tallest problem (at most DENSE_ROOM), within the grid its rows can have.
+    if (rowsUsed > 0 && rowsUsed < L.rows) return Math.round(Math.min(Math.max(L.cellH, L.hMin + 6), L.hMin * DENSE_ROOM, (L.gridH - 1) / rowsUsed) * 1000) / 1000;
+    // a lone row of a split part holds its tallest problem AND the grid's two 1.5 pt borders
+    // (critic 2026-10-03: mixed_multiplication's 74.8 mm area model in a 75.3 mm one-row grid
+    // overflowed its own bottom border on paper)
+    const one = L.rows === 1 || held === 1 ? Math.min(L.hMin + GRID_BORDERS_MM, L.gridH - 1) : 0;
+    return Math.round(Math.max(one, Math.min(L.cellH, L.hMin * DENSE_ROOM, (L.gridH - 1) / Math.max(1, L.rows))) * 1000) / 1000;
+}
+
+/** The top and bottom border of one grid (2 x 1.5 pt), which every split-off grid adds to the page. */
+export const GRID_BORDERS_MM = 1.2;
+
+/**
+ * The row height a SPLIT part's rows are shaped against (critic 2026-10-03, dot_array_mult L: the
+ * part's cellH came from the tallest problem of the whole section, so a row of 67 mm arrays was
+ * drawn 97 mm tall): what the part's own tallest problem needs, with a little room, never more
+ * than the layout's cell. A section that is not split keeps its layout's cell.
+ */
+function partCellH(isSplit, its, L) {
+    if (!isSplit) return L.cellH;
+    const hs = its.map((it) => measuredH(it, L.cols)).filter((h) => h > 0);
+    if (!hs.length || hs.length < its.length) return L.cellH;
+    return Math.min(L.cellH, Math.max(...hs) + GRID_BORDERS_MM + 2);
+}
+
+/**
+ * A row may be stretched to this multiple (1.7) of what it holds (critic 2026-10-03, RUBRIC C3: rows
+ * stretched up to 1.9 x read as padding on a page of three problems). The page is filled with
+ * problems first (print-sheet.js counts what it holds); the stretch only shares the last few mm.
+ */
+export const SPREAD_CAP = 1.7;
+
+/**
+ * The rows of a lone grid that leaves more than a tenth of its page empty (round 5: the lint reads a
+ * strip against the problem area), stretched to share the
+ * page: each row as tall as its tallest problem x k, k the same for every row, no row past
+ * SPREAD_CAP x its shortest problem, the grid no taller than the page's grid less 1 mm (PG-12). null when
+ * the grid already fills four fifths of the page or nothing is measured.
+ */
+export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
+    if (!(rows >= 1) || !(availMm > 0) || baseMm >= 0.9 * availMm) return null;
+    const w = [], mins = [];
+    for (let r = 0; r < rows; r++) {
+        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols)).filter((h) => h > 0);
+        w.push(hs.length ? Math.max(...hs) : hMin || baseMm / rows);
+        mins.push(hs.length ? Math.min(...hs) : w[r]);
+    }
+    const S = w.reduce((a, b) => a + b, 0);
+    if (!(S > 0)) return null;
+    // one stretch k for every row, but no row past SPREAD_CAP x its SHORTEST problem (a short
+    // problem beside a tall one would otherwise sit in a band of a third of its cell)
+    const k = Math.min(SPREAD_CAP, (availMm - 1) / S);
+    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r]))));
+    const total = H.reduce((a, b) => a + b, 0);
+    if (total <= baseMm + 0.5) return null;
+    return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
 }
 
 /**
@@ -652,17 +712,19 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
     const instr = instructionMm(size);
     const body = bodyHeightMm(paper, headerFirst);
     const split = new Set(sectionsIn.map((s) => s.splitOf).filter((x) => x !== undefined && x !== null));
+    // the parts of a section whose column problems were split off (fineSplit): rows sized to what they hold
+    const fineParts = new Set(sectionsIn.flatMap((s, i) => (s.fineSplit ? [i, s.splitOf] : [])));
     const layouts = sectionsIn.map((sec, si) => {
         // S6 sections: the column choice sees the grid net of the anchor band (blockPlan below
         // takes the band off the page; s3 precritic-2 ex-group H13).
         const aMm0 = anchorBandOf(anchors, si);
         const L0 = resolveBandedLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap }, aMm0,
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows }, aMm0,
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
         const L = (sec.splitOf !== undefined && sec.splitOf !== null) || split.has(si)
-            ? Object.assign({}, L0, { cellH: splitCellH(L0), fill: false }) : L0;
+            ? Object.assign({}, L0, { cellH: splitCellH(L0, fineParts.has(si) ? Math.ceil(itemsBySection[si].length / Math.max(1, L0.cols)) : 0, Math.ceil(itemsBySection[si].length / Math.max(1, L0.cols))), fill: false }) : L0;
         // S6 SECTIONS: anchor band + 3-4 problems per block; the band's height comes off the page
         // (anchors.js blockPlan) and a block is never split.
         const aMm = anchorBandOf(anchors, si);
@@ -715,6 +777,33 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
                 // layout, was paged 15 + 12 with half of page 1 blank.
                 gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed || L.rows * L.cols > L.ceiling ? L.rows : 0), cellH: L.cellH, force: !!L.packed || (itemsBySection[si].length > 0 && itemsBySection[si].every((it) => it && it.hClass)),
             })) || paginate(itemsBySection[si].length, L)));
+    // A SPLIT part's grid prints its rows as dealt (composeSheet: rowShape against partCellH), not
+    // rows x its layout's cell. Placed at rows x cellH, a split page was charged up to 30 mm more
+    // than it prints, so a sixth problem that fits went to a page of its own and page 1 kept a
+    // 56 mm strip (kit lint PAGEFILL, mixed_multiplication L, 2026-10-09). Each chunk carries
+    // the height and row template it will print at, so the page is placed as it prints.
+    if (!anchors) {
+        chunksBySection.forEach((chunks, si) => {
+            const L = layouts[si];
+            const sec = sectionsIn[si] || {};
+            const isSplit = (sec.splitOf !== undefined && sec.splitOf !== null) || sectionsIn.some((x) => x && x.splitOf === si);
+            if (!isSplit || L.blocks || L.pairs || sec.noCap || !Array.isArray(chunks)) return;
+            chunks.forEach((c, ci) => {
+                // (r12d: a packed chunk - packByHeight - is shaped against the WHOLE grid, so a split
+                // part's rows were stretched to fill the page before its other group was placed and
+                // that group ran onto a second page: mixed_addition M More Practice. It is shaped
+                // against its part's cell as well, the shorter kept.)
+                if (c.blocks) return;
+                const its = itemsBySection[si].slice(c.from, c.from + c.count);
+                if (!its.length || its.some((it) => it.anchor)) return;
+                const pcH = partCellH(true, its, L);
+                const sh = rowShape(its, L.cols, c.rows, pcH);
+                const mm = sh ? sh.heightMm : pcH < L.cellH - 0.5 ? Math.round(c.rows * pcH * 100) / 100 : 0;
+                const was = Number(c.gridMm) > 0 ? Number(c.gridMm) : c.rows * L.cellH;
+                if (mm > 0 && mm < was) chunks[ci] = Object.assign({}, c, { gridMm: mm, rowsTpl: sh ? sh.rowsTpl : '' });
+            });
+        });
+    }
     const pages = placeSections(
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
         { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
@@ -809,6 +898,32 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
  * printed again on the same page). Not with step-by-step anchors (their bands are keyed by
  * section).
  */
+/**
+ * RUBRIC H13 for a MIXED section (wave 1 lane D, 2026-10-02: Mixed Multiplication printed a
+ * three-digit column fact alone in a 92 mm cell, two thirds of the cell empty beside it). Column
+ * and fact work (the `stack` / `fact` templates) stands in more columns than the pictures and
+ * stories it is dealt with; when at least two of them share a section with problems that hold
+ * fewer columns, they form a group of their own in their own columns (one row: the rest of
+ * the row left open; more: as many columns as fill whole rows). Returns {mid, fine, cols} or null. Used by splitWide here and by the host's
+ * capacity count (print-sheet.js layoutOf), so the page is counted as it prints.
+ */
+export function fineSplit(base, narrow, paper, availableWidthMm, opts) {
+    const tpl = (it) => (it && (it.template || (it.q && it.q.cell && it.q.cell.template))) || '';
+    const isFine = (it) => tpl(it) === 'stack' || tpl(it) === 'fact';
+    const fine = narrow.filter(isFine);
+    const mid = narrow.filter((it) => !isFine(it));
+    if (fine.length < 2 || !mid.length) return null;
+    const Lm = resolveSectionLayout(Object.assign({}, base, { count: mid.length }), mid, paper, availableWidthMm, opts);
+    const Lf = resolveSectionLayout(Object.assign({}, base, { count: fine.length, floor: null }), fine, paper, availableWidthMm, opts);
+    // as many columns as the group fills: three facts are one row of three, never a row of four with a hole
+    // one row: the group's own columns, the rest of the row left open (a blank run, never a box);
+    // more: as many columns as fill whole rows
+    let cols = Lf.cols;
+    if (fine.length > Lf.cols) while (cols > Lm.cols && fine.length % cols !== 0) cols--;
+    if (cols <= Lm.cols) return null;
+    return { mid, fine, cols };
+}
+
 export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM } = {}) {
     const { size, look, paper } = norm;
     const sections = [];
@@ -817,12 +932,31 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const its = sheetItems[si] || [];
         const keep = () => { sections.push(Object.assign({}, sec, { srcIndex: si })); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
-        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap };
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
         const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
         const wide = its.filter(one);
         const narrow = its.filter((it) => !one(it));
+        const fs = !sec.columns || sec.columns === 'auto' ? fineSplit(Object.assign({}, base, { floor: null }), narrow, paper, availableWidthMm, { size, look }) : null;
+        if (fs) {
+            // Round 8 (critic r6 D6-1): ONE digit size in the column-work row. A fact dealt beside
+            // stacks (a mixed pool's 4 + 2 among 3117 + 2947) is drawn at the size's digit metric,
+            // the size the stacks use, never the fact ladder's 28 pt beside 16 pt stacks at S. The
+            // item's own question carries it (`pt`), so the pupil page, the key and the screen-free
+            // measurement draw the same fact; never below the metric (content never shrinks).
+            oneDigitSize(fs.fine, size);
+            const at = sections.length;
+            sections.push(Object.assign({}, sec));
+            items.push(fs.mid);
+            sections.push(Object.assign({}, sec, { columns: fs.cols, floor: null, splitOf: at, fineSplit: true }));
+            items.push(fs.fine);
+            if (wide.length) {
+                sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: at }));
+                items.push(wide);
+            }
+            return;
+        }
         if (!wide.length || !narrow.length) return keep();
         // (narrow keeps its order here; composeSheet groups by height once the columns are known)
         const L = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: sec.floor }), narrow, paper, availableWidthMm, { size, look });
@@ -835,7 +969,31 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         sections.push(Object.assign({}, sec, { columns: 1, floor: null, splitOf: sections.length - 1, srcIndex: si }));
         items.push(wide);
     });
+    // Round 9 (critic r7 D7-4): the same one digit size in EVERY grid that holds a stack, not only
+    // the split-off column-work group (mixed_addition S: "14 + 6" at 10 mm beside 4.5 mm stacks in
+    // an ordinary row of a page that did not split).
+    for (const list of items) oneDigitSize(list, size);
     return { norm: Object.assign({}, norm, { sections }), items };
+}
+
+/**
+ * Round 8 (critic r6 D6-1) / round 9 (D7-4): ONE digit size where facts share a grid with stacks.
+ * A vertical fact dealt beside stacks (a mixed pool's 4 + 2 among 3117 + 2947) is drawn at the
+ * size's digit metric, the size the stacks use, never the fact ladder's 28 pt beside 16 pt stacks
+ * at S. The item's own question carries it (`pt`), so the pupil page and the key draw the same
+ * fact; never below the metric (content never shrinks). A horizontal fact is a sentence, not a
+ * column, and keeps its size.
+ */
+function oneDigitSize(list, size) {
+    const tplOf = (it) => (it && (it.template || (it.q && it.q.cell && it.q.cell.template))) || '';
+    if (!Array.isArray(list) || !list.some((it) => tplOf(it) === 'stack') || !list.some((it) => tplOf(it) === 'fact')) return;
+    const metricPt = (SIZES[size] || SIZES[DEFAULT_SIZE]).digitPt;
+    for (const it of list) {
+        const q = it.q;
+        const pl = q && q.cell && q.cell.payload;
+        if (tplOf(it) !== 'fact' || !pl || pl.pt || pl.notation === 'horiz' || pl.notation === 'horizontal') continue;
+        q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, pl, { pt: metricPt }) });
+    }
 }
 
 /**
@@ -888,14 +1046,14 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     let sheetItems = split.items;
     const { size, look } = norm;
     const level = 1;                                        // PT 1.7: Independent and More Practice
-    const labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? 'tab' /* CL-11a */
+    let labelStyle = input.labels === 'none' ? 'none' : input.labels === 'tab' || input.labels === 'letter' ? 'tab' /* CL-11a */
         : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).label;       // CL-10 / CL-30, dialog override CL-20
     // RUBRIC H13: within a section, problems of one height sit together (tall first), so rows
     // can be sized to what they hold. The column count is the one the layout would choose.
     if (!input.anchors) {
         sheetItems = sheetItems.map((its, si) => {
             const sec = norm.sections[si] || {};
-            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap },
+            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows },
                 its, norm.paper, Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM, { size, look });
             return groupByHeight(its, Lp.cols);
         });
@@ -933,7 +1091,14 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     const partsInOrder = pages.flatMap((pg) => pg.parts);
     // Only pupil problems are labelled and scored: a worked twin or an anchor band is neither.
     const counts = partsInOrder.map((p) => pupilCount(sheetItems[p.section].slice(p.chunk.from, p.chunk.from + p.chunk.count)));
-    const { starts, notes: labelNotes } = labelStarts(counts, { style: labelStyle, restartEachPage: false });
+    // the page each part prints on, so a letter run restarts only at a page boundary
+    const pageOf = pages.flatMap((pg, pi) => pg.parts.map(() => pi));
+    const pageCounts = pages.map((_, pi) => counts.reduce((a, c, j) => a + (pageOf[j] === pi ? c : 0), 0));
+    // CL-13: a page of more than 26 problems is numbered (CL-30 tabs), never lettered past z.
+    const lettersOff = labelStyle === 'letter' && !lettersFit(pageCounts);
+    if (lettersOff) labelStyle = 'tab';
+    const { starts, notes: labelNotes } = labelStarts(counts, { style: labelStyle, restartEachPage: false, pageOf });
+    if (lettersOff) labelNotes.push('More than 26 problems on a page: they are numbered, never lettered past z.');
     // Every cell on these roles is scored (none is a Model or a Guided cell, CL-14).
     const score = scoreDenominator(counts);
     const { first, cont } = sheetHeaders(input, { ...words }, score);
@@ -962,7 +1127,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // instruction (splitWide): the line is not printed twice.
             const sec = norm.sections[part.section] || {};
             const prevPart = pg.parts[pg.parts.indexOf(part) - 1];
-            const shares = sec.splitOf !== undefined && prevPart && prevPart.section === sec.splitOf;
+            const shares = sec.splitOf !== undefined && prevPart && (prevPart.section === sec.splitOf || (norm.sections[prevPart.section] || {}).splitOf === sec.splitOf);
             if (!shares) sections.push({ kind: 'html', html: instructionHtml(instr[part.section].key, instr[part.section].text) });
             if (L.blocks && part.chunk.blocks) {
                 // S6 SECTIONS: each block is its anchor band (its own Model tab, no label, no
@@ -988,35 +1153,122 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // RUBRIC H13: each row as tall as what it holds (rowShape), when the rows differ.
             // (`noCap`, a lesson practice page: one frame, every row the same, no row gaps.)
             const noCapSec = !!(norm.sections[part.section] || {}).noCap;
-            const shape = part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, L.cellH, L.fillRefH);
+            const pcH = partCellH((sec.splitOf !== undefined && sec.splitOf !== null) || norm.sections.some((x) => x && x.splitOf === part.section), its, L);
+            // (a lone first page of a skill held to its owner page ceiling - print-sheet.js PAGE_CAP,
+            // critic r8 D8-2 - fills its page by size: its rows keep their proportions, scaled to the grid)
+            const capFill = noCapSec && Number(sec.pageCap) > 0 && lone && !pg.cont && part.chunk.gridMm && part.chunk.rowsTpl;
+            const shape0 = capFill ? { heightMm: Math.max(part.chunk.gridMm, L.gridH - 1), rowsTpl: part.chunk.rowsTpl }
+                : part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
+                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, pcH, L.fillRefH);
+            // a split part's uniform rows take what the part holds, never the section's tallest cell
+            const shape = shape0 || (!fillByFlex && !noCapSec && pcH < L.cellH - 0.5 && !its.some((it) => it.anchor)
+                ? { heightMm: Math.round(part.chunk.rows * pcH * 100) / 100, rowsTpl: '' } : null);
             // A lone grid shorter than its page (the teacher's count, a capped row) spends the
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;
             const baseMm = shape ? shape.heightMm : fillByFlex ? 0 : part.chunk.rows * L.cellH;
             const gap = lone && baseMm && !noCapSec && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
+            // SPREAD (wave 1 lane D, 2026-10-02): a lone grid that leaves more than a fifth of its
+            // page under it (a count the teacher set, a page at its item ceiling) shares the page
+            // height among its rows instead - each row up to SPREAD_CAP x what it holds, every
+            // cell's content in its MIDDLE (so the spare splits above and below, never one band
+            // over 30 %, RUBRIC H13). Never gaps between rows (the owner's spare-height rule).
+            // (one-page sections only: a section over several pages keeps one cell height, PT-ENG-6)
+            const chunks = laidOut.chunksBySection[part.section] || [];
+            let spread = null;
+            if (!gap.gap && lone && baseMm && !noCapSec && !its.some((it) => it.anchor) && !L.blocks) {
+                if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin);
+                else if (chunks.every((c) => !c.blocks)) {
+                    // a section over several pages: the FIRST page's stretch, applied to every page
+                    // of the section, so a cell keeps one height across its pages (PT-ENG-6)
+                    const c0 = chunks[0];
+                    const its0 = sheetItems[part.section].slice(c0.from, c0.from + c0.count);
+                    const sh0 = c0.gridMm ? c0.gridMm : (rowShape(its0, L.cols, c0.rows, L.cellH) || {}).heightMm || c0.rows * L.cellH;
+                    const sp0 = spreadRows(its0, L.cols, c0.rows, sh0, L.gridH, L.hMin);
+                    if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin);
+                }
+            }
             sections.push({
                 kind: 'grid',
                 cols: L.cols,
                 rows: part.chunk.rows,
                 labels: labelStyle,
                 start,
-                cls: fillByFlex && !shape ? '' : 'fixed',
-                height: gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
+                // (mq-spread: the lane marks a practice grid whose rows share the page; CL-4b still starts each cell at its top,
+                // the lane's "centre every cell" CSS was not taken in the 2026-10-30 port)
+                cls: spread ? 'fixed mq-spread' : fillByFlex && !shape ? 'mq-spread' : 'fixed mq-spread',
+                height: spread ? `${spread.heightMm}mm` : gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
                 // SIDE BY SIDE in one column: each pair's twin row and problem row as tall as each
                 // needs (anchors.js sideFit), so a tall twin never runs out of its row.
-                rowsTpl: shape ? shape.rowsTpl : L.pairMm && L.pairs ? Array.from({ length: part.chunk.rows }, (_, r) => `${L.pairMm[r % 2]}fr`).join(' ') : '',
+                rowsTpl: spread ? spread.rowsTpl : shape ? shape.rowsTpl : L.pairMm && L.pairs ? Array.from({ length: part.chunk.rows }, (_, r) => `${L.pairMm[r % 2]}fr`).join(' ') : '',
                 // SIDE BY SIDE (two columns): each column as wide as what it holds, the spare
                 // width shared, so a narrow stack is not an island in a half-page cell (H13).
                 // (S3 task 1: the content-sized pair columns, anchors.js sideFit `colsTpl2`)
                 ...(L.cols === 2 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl2 || SIDE_COLS } : {}),
                 // (owner ruling A: the four-column side grid, [twin | problem | twin | problem])
                 ...(L.side4 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl4 } : {}),
-                rowGap: gap.gap || 0,
-                // (owner ruling A: a four-column side page draws each cell at its two-column width)
+                rowGap: gap.gap || 0, availMm: lone ? avail : undefined,
                 items: its.map((it) => planItem(it, level, L.side4 ? L.drawCols : L.cols)),
+                _its: its,
             });
         }
+        // SPREAD across parts (wave 1 lane D): a page of several grids (a mixed pool dealt by height
+        // class) that leaves more than a fifth of its body empty shares the spare among its grids'
+        // rows the same way a lone grid does (spreadRows), never as gaps between rows.
+        if (!lone && !input.stepStrip && !pg.parts.some((pp) => layouts[pp.section].blocks || (norm.sections[pp.section] || {}).noCap)) {
+            const grids = sections.filter((x) => x.kind === 'grid' && x._its && !x.rowGap && /fixed/.test(x.cls) && parseFloat(x.height) > 0 && !/mq-anchorgrid/.test(x.cls));
+            // the page body less the instruction lines it prints (a split-off group shares its line)
+            const hdr = { tab: input.header && input.header.tab === false ? false : words.tabLines, title: input.header && input.header.title === false ? '' : words.title, titleLines };
+            const availAll = bodyHeightMm(norm.paper, hdr, pg.cont ? { cont: true } : undefined) - sections.filter((x) => x.kind === 'html').length * instructionMm(size) - 2;
+            const used = grids.reduce((a, x) => a + parseFloat(x.height), 0);
+            if (grids.length === pg.parts.length && used > 0 && used < 0.9 * availAll) {
+                const f = (availAll - grids.length) / used;
+                for (const x of grids) {
+                    const b = parseFloat(x.height);
+                    const sp = spreadRows(x._its, x.cols, x.rows, b, b * f + 1, 0);
+                    if (sp) { x.height = `${sp.heightMm}mm`; x.rowsTpl = sp.rowsTpl; }
+                }
+            }
+        }
+        // A grid of a several-grid page whose last row is short (a mixed pool's split group: three
+        // word problems in two columns) widens its last problem over the empty track(s), so no
+        // cell-sized hole is left beside it (wave 1 lane D, kit lint PAGEFILL).
+        {
+            for (const x of sections) {
+                if (x.kind !== 'grid' || !x._its || x.cols < 2 || /mq-anchorgrid/.test(x.cls)) continue;
+                const rem = x.items.length % x.cols;
+                if (!rem || x.items.length < x.cols) continue;
+                const last = x.items[x.items.length - 1];
+                // only a problem wide enough for the widened cell (a word problem's 93 mm), never a
+                // small fact left alone in a strip twice its width (H13 the other way)
+                const span = x.cols - rem + 1;
+                const w = (itemInfo(x._its[x._its.length - 1], { size }).fp || {}).wMm || 0;
+                // ... or a tall drawn problem (an area model, a story): a bordered empty cell beside
+                // it reads as a missing problem (critic 2026-10-03, mixed_multiplication c.)
+                const tall = (measuredH(x._its[x._its.length - 1], x.cols) || 0) >= 40;
+                // (a lone grid keeps its rows as dealt: the pool fills whole rows, print-sheet.js)
+                if (lone || !(w >= 0.7 * (LIVE_W_MM * span / x.cols) || (tall && w >= 0.45 * (LIVE_W_MM * span / x.cols)))) continue;
+                last.style = `${last.style || ''}grid-column:span ${span};`;
+            }
+        }
+        // Round 8 (critic r6 D6-2): how much of the problem area a page of SEVERAL grids fills (the
+        // first grid's top to the page body's foot, as lint PAGEFILL measures it), so the host's
+        // fill can judge a pool page whose column work is split off (fineSplit) like a lone grid.
+        let fill;
+        {
+            const gs = sections.filter((x) => x.kind === 'grid');
+            const L0 = pg.parts.length ? layouts[pg.parts[0].section] : null;
+            const area = L0 ? (pg.cont ? L0.gridHCont : L0.gridH) : 0;
+            if (gs.length > 1 && area > 0 && gs.every((x) => parseFloat(x.height) > 0)) {
+                // the first grid's own page height (the lone grid's `availMm`), and every grid and
+                // instruction line under its top
+                const at = sections.indexOf(gs[0]);
+                const inner = sections.slice(at).filter((x) => x.kind === 'html' && /ws-instrline/.test(String(x.html || ''))).length;
+                const used = gs.reduce((a, x) => a + parseFloat(x.height), 0) + inner * instructionMm(size);
+                fill = Math.round((used / area) * 1000) / 1000;
+            }
+        }
+        for (const x of sections) delete x._its;
         // Wave 5.2: a page none of whose sections asked for the number line prints without it
         // (its height stays reserved, so every page keeps one geometry).
         // A part split off a section ("full width, at the bottom": splitOf) belongs to that section
@@ -1029,7 +1281,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         if (head.refBand && Array.isArray(input.refSections) && !pg.parts.some((pt) => refSec(pt.section))) {
             head = Object.assign({}, head, { refBand: `<div class="ws-refline-gap" style="flex:none;height:${Number(head.refBandMm)}mm"></div>` });
         }
-        return { header: head, sections };
+        return fill !== undefined ? { header: head, sections, fill } : { header: head, sections };
     });
 
     // A height-classed pool (print-sheet.js heightClassOf, critic 2026-10-24 D2) is paged by each
@@ -1048,10 +1300,12 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         cols: L.cols, rows: L.rows, perPage: L.perPage, pages: L.pages, cellW: L.cellW, cellH: L.cellH,
         requested: L.requested, clamped: L.clamped,
         // The dialog's line tells the truth about a split-off group (splitWide).
-        note: norm.sections[si].splitOf !== undefined
+        note: norm.sections[si].fineSplit ? [`${sheetItems[si].length} column problems in ${L.cols} columns.`, L.note].filter(Boolean).join(' ')
+            : norm.sections[si].splitOf !== undefined
             ? [`${sheetItems[si].length} problem${sheetItems[si].length === 1 ? ' is' : 's are'} too wide for ${layouts[norm.sections[si].splitOf].cols} columns: full width, at the bottom.`, L.note].filter(Boolean).join(' ')
             : L.note,
-        line: norm.sections[si].splitOf !== undefined
+        line: norm.sections[si].fineSplit ? `${fitsLine(L)} ${sheetItems[si].length} column problems in ${L.cols} columns.`
+            : norm.sections[si].splitOf !== undefined
             ? `${fitsLine(L)} ${sheetItems[si].length} full-width problem${sheetItems[si].length === 1 ? '' : 's'} at the bottom.` : fitsLine(L),
         cls: L.cls, digitPt: L.digitPt,
         hMin: L.hMin, anchorMm: L.anchorMm || 0, blocks: L.blocks || null,

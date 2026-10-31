@@ -19,9 +19,10 @@ import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-op
 import { registerVariantOverride } from './variant-cycler.js';
 // L10: the page dealer. Every choice dealt down a page goes through it; reset at item 0.
 import { dealIndex, resetPageDeals, setRedraw } from './page-deal.js';
+import { renderCell, wordWorkTwin } from './sheet/index.js';
 // Every whole-number word problem is drawn as ONE cell type: the story, a small + − × ÷ row,
 // column boxes and "Answer: [ ] ____" (owner ruling 2026-09-25; word-work.js).
-import { applyWordWork } from './word-work.js';
+import { applyWordWork, isWordWorkSkill } from './word-work.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
 import './skill-options-derived.js';
@@ -79,13 +80,42 @@ function tunedPoolMember(memberCat, member) {
     state.skillOptions = tuned;
     try {
         const q = generateQuestion();
-        if (q) { q.poolMember = member; q.skillId = q.skillId || member; }
+        if (q) { q.poolMember = member; q.skillId = q.skillId || member; poolCellInstructions(q, saved.skill); }
         return q || null;
     } finally {
         state.category = saved.category;
         state.skill = saved.skill;
         state.skillOptions = saved.skillOptions;
     }
+}
+
+// A pool page prints one generic instruction ("Solve."), so a member that needs its own verb
+// carries it inside its cell, as the parity sort does (critic r3 D5, D13):
+//   - a word-work story dealt into a pool that is not itself a story pool: its own instruction
+//     line ("Circle the sign. Write the numbers in the boxes. Solve.");
+//   - a base-ten draw task: "Draw the number."
+// And mixed_multiplication prints ONE answer shape for its vertical facts: the box its column
+// work uses (boxAns), whatever member dealt the fact (critic r3 D5, L: open zone beside a box).
+function poolCellInstructions(q, outerSkill) {
+    if (!q || !q.poolMember || !q.cell || !q.cell.payload) return;
+    const t = q.cell.template;
+    const add = (extra) => { q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, extra) }); };
+    if (t === 'word-work' && !q.cell.payload.caption && !isWordWorkSkill(outerSkill) && q.printText) {
+        // ONE sign place (critic r4 D-C, H8): the column frame's sign box. A neutral ring frame or
+        // a no-sign (remainder) story keeps its own line; every other story drops the sign row.
+        const p0 = q.cell.payload;
+        if (!p0.neutral && p0.signs !== false && Array.isArray(p0.steps) && p0.steps.length === 1 && p0.steps[0].op !== '/') {
+            const unitP = p0.unit ? ' Write the unit word.' : '';
+            const unitS = p0.unit ? ' Tap the unit word.' : '';
+            q.printText = `Write the sign. Solve.${unitP}`;
+            q.screenInstr = `Type the sign. Solve.${unitS}`;
+            add({ signRow: false, caption: q.printText, captionScreen: q.screenInstr });
+            // the screen twin is redrawn from the same payload: no tap-the-sign row there either
+            try { q.visual = wordWorkTwin(renderCell, Object.assign({}, q.cell.payload, { caption: '', captionScreen: '' })); } catch (e) { /* keep the old visual */ }
+        } else add({ caption: q.printText, captionScreen: q.screenInstr || q.printText });
+    }
+    else if (t === 'base10' && !q.cell.payload.caption) add({ caption: 'Draw the number.' });
+    if (outerSkill === 'mixed_multiplication' && t === 'fact' && q.cell.payload.notation === 'vertical' && q.cell.payload.boxAns !== true) add({ boxAns: true });
 }
 
 // Plain (no-picture) word problem variants - map to base skill for generation
@@ -319,9 +349,12 @@ export function generateQuestion() {
         }
     }
     const restoreSettings = applySkillSettings();
+    const outerSkill = state.skill;
+    // the word-work cell is made here, after the dispatch: a pool's in-cell instruction follows it
+    const finish = (q) => { const r = applyWordWork(p12Post(q)); poolCellInstructions(r, outerSkill); return r; };
     try {
         const accept = p12Acceptor();
-        if (!accept) return applyWordWork(p12Post(generateAliasedQuestion()));
+        if (!accept) return finish(generateAliasedQuestion());
         // P12 ACCEPT LAYER: an option honoured by keeping only the items that have the property
         // asked for (a fraction page "denominators 2, 4 and 8" keeps the items whose fractions
         // all have those denominators). The item is simply drawn again, so the generator needs
@@ -338,7 +371,7 @@ export function generateQuestion() {
             try { q = generateAliasedQuestion(); } finally { setRedraw(false); }
             if (!q || accept(q)) break;
         }
-        return applyWordWork(p12Post(q));
+        return finish(q);
     } finally {
         if (restoreSettings) restoreSettings();
     }
@@ -665,6 +698,7 @@ function generateResolvedQuestion() {
 
     // Check if this is a mixed skill and resolve it
     let actualSkill = state.skill;
+    const outerSkill = state.skill;   // the pool (or skill) the page asked for, before it resolves
     let forcedMappedCategory = null;
     let poolPlainSkill = null;
     let poolMember = null;     // P12: the pool member drawn (a word pool's own id, before it resolves)
@@ -960,6 +994,18 @@ function generateResolvedQuestion() {
                 }
             }
 
+            // "All Counting & Cardinality" is a K-2 review by its name: its domain's composing topic
+            // also holds Grade 3 fraction skills (a fraction wall sum), which it never deals (wave 1
+            // lane D, critic 2026-10-03: a skill's name is its declaration).
+            if (originalSkill === 'counting_all') {
+                const k2 = (sk, cat) => { const g = String(getSkillGrade(sk, cat)); return g === 'K' || g === '0' || g === '1' || g === '2'; };
+                const idx = allSkillsFlattened.map((s, i) => i).filter((i) => k2(allSkillsFlattened[i], allSkillCats[i]));
+                if (idx.length) {
+                    allSkillsFlattened = idx.map((i) => allSkillsFlattened[i]);
+                    allSkillCats = idx.map((i) => allSkillCats[i]);
+                }
+            }
+
             let targetCategory, targetSkill;
             let skillsWithCategories = [];
 
@@ -1102,6 +1148,13 @@ function generateResolvedQuestion() {
 
     if (poolMember) q.poolMember = poolMember;
     else if (mixedWordSkill) q.poolMember = wordMember;
+    // A pool page prints one generic instruction ("Solve."): a parity sort dealt there carries its
+    // own task line in the cell (parity.js `caption`), or the pupil has a row of numbers and no
+    // question (critic 2026-10-03, counting_all S).
+    if (q.poolMember && q.cell && q.cell.template === 'parity' && q.cell.payload && q.cell.payload.task === 'sort' && !q.cell.payload.caption) {
+        q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { caption: true }) });
+    }
+    poolCellInstructions(q, outerSkill);
     if (mixedWordSkill && !isPlainWord) state.skill = mixedWordSkill;
     // P12: a plain word-problem member drawn by a mixed pool prints plain, like the skill itself.
     if (poolPlainSkill && !isPlainWord) {

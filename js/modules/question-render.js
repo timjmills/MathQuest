@@ -18,7 +18,8 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
-    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, kitTwinPrompt,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -1659,7 +1660,11 @@ function _applyScreenCell() {
         // repeats the equation drawn under the line
         // A word-work story prints its story inside the cell: the line above it is the task
         // (round-4 critic: the card had no instruction), in screen verbs.
-        const _wwInstr = q.cell && q.cell.template === 'word-work' && q.screenInstr ? screenInstruction(q.screenInstr) : '';
+        // critic r3 D11: a kit twin that already shows every number of the text takes the paper's
+        // instruction, never a prompt line restating the cell
+        const _ktPrompt = qt && !paper.classList.contains('mq-twin') ? kitTwinPrompt(q, state.category) : '';
+        const _wwInstr = q.cell && q.cell.template === 'word-work' && q.screenInstr ? screenInstruction(q.screenInstr)
+            : _ktPrompt ? screenInstruction(_ktPrompt) : '';
         if (qt && (isNumberLineItem(q) || _wwInstr)) {
             qt.classList.remove('mq-dup');
             qt.style.cssText = '';
@@ -2519,7 +2524,10 @@ function _renderQuestionImpl() {
         document.getElementById("answerOptions").style.display = "none";
         document.getElementById("answerInputArea").style.display = "none";
         visualAid.style.display = "block";
-        visualAid.innerHTML = q.visual;
+        // round 5: the kit number-family cell (paper's drawing) when it can draw the item
+        const nfKit = q.answerType === "number-family" ? familyScreenVisual(q) : '';
+        visualAid.innerHTML = nfKit || q.visual;
+        if (nfKit) { const qtEl = document.getElementById('questionText'); if (qtEl) qtEl.textContent = FAMILY_SCREEN_INSTRUCTION; }
         document.getElementById("feedbackArea").style.display = "none";
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";

@@ -125,6 +125,57 @@ registerSkill('multiplication:arrays_groups', {
     },
 });
 
+/* ======================================================================== dot_array_mult */
+// Wave 1 lane D (2026-10-02, critic): the dot array carries a ROWS x COLUMNS frame ("7 rows x 8
+// columns", "7 x 8 = [ ]"), so the pupil multiplies two written numbers and does not count 56
+// dots; with Support "none" the counts are not written and the pupil finds them in the picture.
+
+const daOf = (q) => {
+    const p = q && q.cell && q.cell.template === 'arrays' && q.cell.payload;
+    const rows = p ? num(p.rows) : num(q && q.a), cols = p ? num(p.cols) : num(q && q.b);
+    return Number.isFinite(rows) && Number.isFinite(cols) ? { rows, cols, bare: !!p && p.kind === 'count_all' } : null;
+};
+const DA_FRAME = strings({
+    iCan: 'I Can multiply using a dot array',
+    instructionKey: 'multiply-array',
+    steps: ['Read the rows and the columns.', 'Multiply the rows by the columns.', 'Write the answer in the box.'],
+    say: '__ rows of __ is __.',
+    sayValues: (q) => { const d = daOf(q); return d ? [d.rows, d.cols, d.rows * d.cols] : null; },
+    vocabulary: ['row', 'column', 'array'],
+});
+const DA_BARE = strings(Object.assign({}, DA_FRAME.def, {
+    instructionKey: 'count-all',
+    steps: ['Count the rows.', 'Count the dots in one row.', 'Multiply the two numbers. Write how many in all.'],
+}));
+const daStrings = (ref = {}) => ((ref && ref.q && (daOf(ref.q) || {}).bare) ? DA_BARE : DA_FRAME)(ref);
+daStrings.def = DA_FRAME.def;
+
+registerSkill('multiplication:dot_array_mult', {
+    strings: daStrings,
+    misconceptions: ['added', 'one-row-short', 'miscounted'],
+    workedSteps: (q) => {
+        const d = daOf(q);
+        const t = num(q.ans);
+        if (!d || !Number.isFinite(t)) return [];
+        return [
+            step(`There are ${d.rows} rows and ${d.cols} columns.`),
+            step(`Multiply: ${d.rows} \u00d7 ${d.cols}. Skip count by ${d.cols}, ${d.rows} times: ${countList(d.cols, t, d.cols)}.`),
+            step(`${d.rows} \u00d7 ${d.cols} = ${t}. Write ${t}.`, [{ slot: 'total', value: String(t) }]),
+        ];
+    },
+    wrongAnswer: (q) => {
+        const d = daOf(q);
+        if (!d) return null;
+        const t = d.rows * d.cols;
+        return chooseWrong(q, [
+            { value: d.rows + d.cols, misconception: 'added', slot: 'total', slots: { total: String(d.rows + d.cols) },
+                explain: `Added ${d.rows} and ${d.cols}. An array is ${d.rows} rows OF ${d.cols}: multiply.` },
+            { value: t - d.cols, misconception: 'one-row-short', slot: 'total', slots: { total: String(t - d.cols) },
+                explain: `Counted ${d.rows - 1} rows, not ${d.rows}.` },
+        ].map((c) => Object.assign(c, { value: typeof q.ans === 'string' ? String(c.value) : c.value })));
+    },
+});
+
 /* ======================================================================== area models */
 
 /** 80 -> 8, 300 -> 3: the product a pupil gets when the zeros are dropped. */

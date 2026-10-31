@@ -36,18 +36,35 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
  *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0 } = {}) {
+// `relay` (default true): false keeps the lattice - a short last row stays on the full rows' columns
+// and the rest is the unruled blank run (PG-15). Fact rows: one cell width per section (Lane D restart
+// critic r1 R1-2: a re-laid 9-cell last row was 20.7 mm wide under 18.6 mm cells).
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, relay: relayOk = true } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
+    // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
+    // a cell that spans tracks (grid-column:span N in its style) fills them: no blank run for them
+    const spans = cells.reduce((a, c) => { const m = c && typeof c === 'object' && /grid-column:\s*span\s+(\d+)/.exec(c.style || ''); return a + (m ? Number(m[1]) - 1 : 0); }, 0);
+    const used = cells.length + spans + (spanFirst ? cols - 1 : 0);
+    // PG-15 / RUBRIC C3 (wave 1 lane D round 6, critic r5 D5-5): a last row short of the columns
+    // is RE-LAID, never left as an empty area: the grid is cut into lcm(cols, rem) tracks, every
+    // full row's cells span lcm/cols of them and the last row's `rem` cells share the whole row
+    // equally (lcm/rem each). The frame stays closed round problems only; each row's cells are
+    // equal (CL-3). Only a plain grid (no spanning cell, rows = the rows the cells need).
+    const rem = used % cols;
+    const rowStrips = rowGap > 0 && Math.ceil(used / cols) > 1 && Number.isFinite(parseFloat(height));
+    const relay = relayOk && rem > 0 && cols > 1 && !spans && !spanFirst && !rowStrips && (!rows || rows === Math.ceil(used / cols));
+    const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+    const tracks = relay ? (cols * rem) / gcd(cols, rem) : cols;
     let k = start;
     const out = cells.map((c, i) => {
         const item = typeof c === 'string' ? { html: c } : c;
         const lab = unlabelled.includes(i) || item.nolabel ? (item.model ? label('model') : '') : label(labels, k++);
-        return cell(item.html, { label: lab, cls: item.cls || '', style: item.style || '', keyAttr: item.keyAttr || '' });
+        const sp = relay ? `grid-column:span ${i >= cells.length - rem ? tracks / rem : tracks / cols};` : '';
+        return cell(item.html, { label: lab, cls: item.cls || '', style: sp + (item.style || ''), keyAttr: item.keyAttr || '' });
     });
-    // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
-    const used = cells.length + (spanFirst ? cols - 1 : 0);
-    if (used < n) out.push(blankRun((used % cols) + 1));
+    if (!relay && used < n) out.push(blankRun((used % cols) + 1));
     const r = rows || Math.ceil(cells.length / cols);
+    if (relay) { cls = `${cls} relaid`.trim(); cols = tracks; }
     // `rowGap` (mm, RUBRIC H13 page fill): a sheet whose problem count is fixed (a Test, the
     // teacher's count) spends the page's spare height as WHITESPACE BETWEEN rows - each row its
     // own framed strip - never as empty space inside the cells. Only with a fixed height.

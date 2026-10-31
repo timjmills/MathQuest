@@ -778,6 +778,126 @@
    }
   },
   {
+   "id": "arc-ink-laned",
+   "check": "The long-division bracket's arc keeps white on BOTH sides: >= 0.3 mm before the dividend's first digit (Lane D restart critic r1 R1-1: \"4 ) 8\" read as \"48\") and >= 0.25 mm after the divisor's last (critic r2 R2-1, a regression guard at r2's 0.27 mm: the owner keeps the 10-column bracket, 2026-10-31)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP ARC-INK",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Long fact rows at S, 10 columns, the arc 0.27 mm INTO the dividend's first digit"
+   },
+   "pass": {
+    "commit": "616908b1",
+    "state": "r2 bracket the owner keeps (2026-10-31): dividend side 0.62 mm, divisor side 0.27 mm at 10 columns"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --columns 10 --opts '{\"divForm\":[\"long\"]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grid-even-probe-laned",
+   "check": "One cell width per fact-probe grid: the 20th across fact keeps its column, the rest unruled (Lane D restart critic r2 R2-3: cell 20 spanned the across block)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN (every kit grid)",
+   "browser": true,
+   "fail": {
+    "commit": "616908b1",
+    "state": "critic r2 FAIL commit: add_facts fact probe at S, the 20th across fact re-laid the width of the block"
+   },
+   "pass": {
+    "commit": "f7a27938",
+    "state": "fix r3: every probe grid keeps its lattice (relay false)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_facts --roles fact-probe --size S --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grid-even-laned",
+   "check": "One cell width per fact grid (Lane D restart critic r1 R1-2: div_facts Mix fact rows re-laid a 9-cell last row at 20.7 mm under 18.6 mm cells)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Mix fact rows at S, 69 facts, last row re-laid"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the lattice kept, whole rows dealt (70 facts)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --opts '{\"divForm\":[\"mix\"]}' --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "frac-keepout-laned",
+   "check": "A division fact's fraction numerator clears the number tab's keep-out off the fact-rows page (Lane D restart critic r1 R1-15: \"110\" in the L tab's keep-out on the Opener)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK with --opts divForm (ws-precritic plans every form x fact-family role x S/L)",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Fraction Opener at L, CL40-INK"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the fraction's line box starts below the keep-out"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles opener --size L --opts '{\"divForm\":[\"fraction\"]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-uniform-laned",
+   "check": "One digit size per online worksheet and equal paper cells per row of cards (Lane D restart critic r1 R1-16: div_facts Mix brackets at 29 px beside 40 px fractions)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --uniform (worksheet:digits, worksheet:rows)",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Mix online worksheet, two digit sizes, uneven paper cells"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the sheet's touch-floor digit on every card, rows even, Mix slot inline"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills division:div_facts --hosts worksheet --uniform --opts '{\"divForm\":\"mix\"}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "section-overlap-lesson-warmup",
+   "check": "L-OVERLAP SECTION: a section's ink never covers the next section's heading (critic laned-restart R1-6: the add_facts lesson Warm-up printed over \"Guided Practice:\")",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP SECTION (H2, C3, PG-12): read on the printed PDF, no paint after a band's strip label lands on it",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 commit: add_facts lesson at S, page 2: the Warm-up's second counters cell (measured 3 mm short) covers the top of \"Guided Practice:\""
+   },
+   "pass": {
+    "commit": "279f556d",
+    "state": "F2 r2 fix: the measuring cell takes the counters tab spacer; the Warm-up splits into two rows of 2 (main's layout) and clears the strip"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_facts --roles lesson --size S --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "detailed-link-every-use",
    "check": "A detailed lesson's Practice link decodes to skills.used use by use, each with its own options (lessons 6-7 merge: the link de-duplicated by skill id)",
    "kind": "commit-pair",

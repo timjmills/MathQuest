@@ -30,11 +30,11 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
-import { renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH } from './sheet/roles/practice.js';
+import { composePractice, renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH, fineSplit, GRID_BORDERS_MM } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
 import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
@@ -64,7 +64,28 @@ export const SHEET_ROLES = Object.freeze(['independent', 'more-practice', ...Obj
 const ROLES = new Set(SHEET_ROLES);
 const LETTERS = 'ABCDEFGHIJ';
 const MAX_ITEMS = 160;            // ten More Practice pages of 16 one-symbol items
-const RETRIES = 12;               // duplicate retries per item before a duplicate is accepted
+/**
+ * The OWNER's per-skill page ceiling (design/STATUS.md 2, 2026-10-09), by print size: the most
+ * problems one page of a single-skill section holds when the page decides the count. The page is
+ * then filled by the problems' size (rows grow), never by adding more of them (critic r8 D8-2:
+ * dot_array_mult dealt 16 arrays at S and 9 at L when short arrays left height).
+ */
+const PAGE_CAP = Object.freeze({
+    'multiplication:dot_array_mult': { S: 8, M: 6, L: 6 },
+    // (r11, critic r8 D8-3) number families: the owner's S 8-12 / M 8 / L 6, at the counts the page
+    // already deals (+/-: 12 / 9 / 6, x/÷: 8 / 9 / 6); the rows now share the grid, so the M page no
+    // longer ends over a 17 % strip (fill 0.83)
+    'addition:number_families_add': { S: 12, M: 9, L: 6 },
+    'multiplication:number_families_mult': { S: 8, M: 9, L: 6 },
+});
+/** The page ceiling of a section (Infinity when its skill has none). */
+function pageCapOf(sec, size) {
+    const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
+    const c = sk && PAGE_CAP[`${sk.categoryId}:${sk.skillId}`];
+    const v = c && Number(c[String(size || 'L').toUpperCase()]);
+    return v > 0 ? v : Infinity;
+}
+const RETRIES = 40;               // duplicate retries per item before a duplicate is accepted (12 let a 20-fact pool repeat at 18, round 4 D-B)
 
 /** The stylesheets a sheet document renders with, in the app's cascade order. */
 const SHEET_STYLESHEETS = Object.freeze([
@@ -129,8 +150,20 @@ function normaliseRequest(req = {}) {
             // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
             // gaps) - the caller has chosen a count whose cells stay under H13's band.
             noCap: !!(s && s.noCap),
+            // A single-skill page held short by its own pool, laid in fewer, longer columns
+            // (buildSheet): two columns may take any row count, not only CL-2's 2/3/4/5/8.
+            freeRows: !!(s && s.freeRows),
         }))
         .filter((s) => s.skills.length);
+    // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
+    // problems' size: its rows share the whole grid instead of leaving a strip under capped rows.
+    // The ceiling is the section's own dense ceiling too, so the grid is laid for that count.
+    for (const sec of sections) {
+        if (!Number.isFinite(pageCapOf(sec, size))) continue;
+        sec.noCap = true;
+        sec.pageCap = pageCapOf(sec, size);
+        if (sec.dense) sec.dense = { S: pageCapOf(sec, 'S'), M: pageCapOf(sec, 'M'), L: pageCapOf(sec, 'L') };
+    }
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
     // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
     let onePage = false;
@@ -228,8 +261,20 @@ function normaliseRequest(req = {}) {
 
 /* ======================================================================= generation */
 
-/** A question's identity for de-duplication: what the pupil would see as "the same problem". */
-function signature(q) {
+/**
+ * A question's identity for de-duplication: what the pupil would see as "the same problem".
+ * Exported, and stamped on every host item as `sig` (round 9): the kit's More Practice role reads
+ * `it.sig` rather than keeping a copy of this rule (the kit may not import the app, SCC-01).
+ */
+export function signature(q) {
+    // A template that knows when two items are the same problem in another order (a number
+    // family: 4, 5, 20 = 5, 4, 20; critic r5 D5-1) supplies an order-free `dedupeKey`.
+    try {
+        const spec = (q.cell && q.cell.template && q.cell.template !== 'legacy') ? q.cell : numberFamilySpec(q);
+        const t = spec && spec.template ? getCell(spec.template) : null;
+        const dk = t && typeof t.dedupeKey === 'function' ? t.dedupeKey(spec.payload || {}) : '';
+        if (dk) return `dk|${dk}`;
+    } catch (e) { /* fall through to the drawn identity */ }
     const payload = q.cell && q.cell.payload ? JSON.stringify(q.cell.payload) : '';
     const ans = typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans);
     return `${String(q.text || '').replace(/\s+/g, ' ').trim()}|${ans}|${payload}`;
@@ -666,7 +711,22 @@ const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'ob
 /** An item's text as a packet compares it ("67 − 9 = ?"), tags and spaces removed. */
 export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null } = {}) {
+/** The counting & cardinality categories whose mixed pools are dealt in the kit look only. */
+const K2_POOL_CATS = new Set(['counting', 'comparing', 'composing', 'counting_mixed']);
+/** Round 8 (critic r6 D6-2): every mixed pool page is one look, not only the K-2 pools above. */
+const POOL_ONE_LOOK = true;
+/** How many draws a pool slot passes over a legacy-look member before it keeps one. */
+const POOL_LEGACY_TRIES = 16;
+/** Is the item drawn by a kit cell on paper (its own template, or one the host redraws it with)? */
+const kitDrawn = (q) => !!(q && ((q.cell && q.cell.template && q.cell.template !== 'legacy') || kitCellSpec(q) || numberFamilySpec(q)));
+
+/**
+ * `want(q, sk)` (wave 1 lane D round 7): the page asks for an item of one KIND - a mixed pool's
+ * column work, to fill that group's last row (buildSheetOnce, whole rows). A draw of another kind
+ * is passed over for the next derived seed while tries remain (deterministic: the same seeds in
+ * the same order); the first draw is kept if no try gives the kind.
+ */
+function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set(), kept = new Map(), itemCount = null, want = null } = {}) {
     const slots = dealSkills(skills, startIndex + count).slice(startIndex);
     // S2: a ticked support LEVEL fades down the page. With the section's count known it is dealt
     // in equal blocks of that count; otherwise two items a level (supports.js fadeRung). The same
@@ -723,7 +783,12 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             for (let k = 0; k <= tries; k++) {
                 const seed = (runSeed + i + 7919 * k) >>> 0;
                 let cand = null;
-                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : itemIndex, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
+                // (Lane D r6) A page dealer (page-deal.js) gives a kept item the same slot on every retry, so a
+                // slot whose choice the page already holds (a number family's block of 6 pairs dealt a second
+                // time: critic r5 D5-1) repeats however the seed moves. After half the retries the item is
+                // asked for at a later page position, which deals from a fresh block.
+                const at = k >= tries / 2 ? itemIndex + 6 * (k - Math.floor(tries / 2) + 1) + (k % 5) : itemIndex;
+                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
                 if (!cand) continue;
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
@@ -731,6 +796,14 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 const strict = soft && !(relaxLast && k === tries);
                 if (hard && !refHardOk(sk, cand)) continue;
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
+                // A MIXED POOL page is one look (wave 1 lane D, critic 2026-10-03; round 8, critic r6 D6-2):
+                // a member drawn in the legacy look (no kit cell: a long "Answer:" line, a chart with
+                // nothing to write; two answer places, H8) is passed over for another draw while a few
+                // tries remain; the last try keeps it (a member the host redraws as a kit cell -
+                // kitCellSpec, a number family - is a kit cell here).
+                if (k < Math.min(tries, K2_POOL_CATS.has(sk.categoryId) ? 8 : POOL_LEGACY_TRIES) && (K2_POOL_CATS.has(sk.categoryId) || POOL_ONE_LOOK) && isMixedMetaSkill(sk.skillId) && !kitDrawn(cand)) { if (!got) got = cand; continue; }
+                // `want` (lane D round 7): the page asks for an item of one KIND (a pool's column work)
+                if (want && k < tries && !want(cand, sk)) { if (!got) got = cand; continue; }
                 // (a case the last row WANTS is kept for it: no other place of the page deals it)
                 if (strict && edgeAt < 0 && sk.edgeLast && Array.isArray(sk.edgeLast.wants) && sk.edgeLast.wants.some((w) => w && LESSON_CASE_TESTS[w] && LESSON_CASE_TESTS[w]({ q: cand }))) continue;
                 got = cand;
@@ -838,7 +911,10 @@ const LEGACY_TAB_RE = /<span class="ws-tab" data-ws-label="tab" style="position:
 const legacyClean = (html) => balanceDivs(String(html).replace(LEGACY_TAB_RE, ''));
 
 /** Registered K-2 templates that pack as one-symbol answers (a ten frame, a number track, a chart window). */
-const SHORT_TEMPLATES = new Set(['tenframe', 'seqstrip', 'chartwindow']);
+// 'short-division' (div_zero_in_quotient, wave 1 lane D): a one-digit bus stop is 46 mm tall and 60 mm
+// wide, so fifteen stand on a page (3 x 5) where the standard ceiling stopped at twelve and left a
+// strip of a fifth of the page empty.
+const SHORT_TEMPLATES = new Set(['tenframe', 'seqstrip', 'chartwindow', 'short-division']);
 
 /** A fact drawn across ("a ÷ b = ___"): the fact template in its horizontal notation. */
 function isAcrossFact(q, template) {
@@ -862,6 +938,13 @@ function footprintClass(q, template, size) {
     // div_facts' Long-division and Fraction forms (payload `fact`): a recalled fact with one
     // short answer, no work rows - packed with the page's other fact forms, never as long work.
     if ((template === 'division' || template === 'equation') && q.cell && q.cell.payload && q.cell.payload.fact) return 'short';
+    // The same holds for the kit's one-line equation with one box ("[ ] + 2 = 11"): 2 x 8 fits where
+    // the dense standard ceiling stopped at 2 x 5 (kit lint PAGEFILL, 2026-10-02). The ÷ bracket
+    // and fraction-bar notations are taller and keep the standard class.
+    if (template === 'equation') {
+        const en = String(((q.cell && q.cell.payload) || {}).notation || '');
+        if (en !== 'bracket' && en !== 'fraction') return 'short';
+    }
     const operands = (q.cell && q.cell.payload && q.cell.payload.operands) || [q.a, q.b];
     if (/long-div|long_div/.test(f) || template === 'division') return 'long';
     if (/^column-mult/.test(f) && Number(operands[1]) >= 10) return 'long';
@@ -931,7 +1014,11 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
     // (one box) or its comma list (several).
     const boxSlots = html.match(/<span class="blank-box" data-ws-slot="[^"]*" data-ws-shape="box"[^>]*><\/span>/g) || [];
     if (boxSlots.length >= 1) {
-        const parts = (Array.isArray(q && q.keyParts) ? q.keyParts.map(String)
+        // a number family's boxes, in reading order (each equation's missing places, left to right)
+        const nf = q && q.numberFamilyData && Array.isArray(q.numberFamilyData.equations) && Array.isArray(q.numberFamilyData.missingPositions)
+            ? q.numberFamilyData.equations.flatMap((eq, i) => [...(q.numberFamilyData.missingPositions[i] || [])].sort((x, y) => x - y).map((p) => eq.nums[p]))
+            : null;
+        const parts = (nf ? nf.map(String) : Array.isArray(q && q.keyParts) ? q.keyParts.map(String)
             : key && Array.isArray(key.value) ? key.value.map(String)
                 : boxSlots.length === 1 ? [display || raw] : raw.split(','))
             .map((t) => String(t).trim()).filter((t) => t !== '');
@@ -1101,6 +1188,49 @@ function sentenceHtml(sf, c, ink) {
     }).join('')}</div>`;
 }
 
+/**
+ * D1 (wave 1 lane D round 4): a legacy cell that answers in its own option list - the
+ * multi-select print branch's `.opt-list` ("Circle ALL sums that equal 1") - when the question
+ * says which options are right, so its key can ring them.
+ */
+function selfAnswering(html, q) {
+    return /<div class="opt-list[^"]*">/.test(html) && Array.isArray(q && q.options) && q.options.some((o) => o && o.correct);
+}
+
+/** The option list as the cell's one slot; `ink` rings the right options (the key, or traced). */
+function markOptions(html, q, ink) {
+    const out = html.replace(/<div class="(opt-list[^"]*)">/, '<div class="$1" data-ws-slot="answer" data-ws-shape="open">');
+    if (!ink) return out;
+    const style = ink === 'trace' ? 'font-weight:700;color:#949494;' : SOLID_STYLE;
+    let i = 0;
+    return out.replace(/<span class="opt">([\s\S]*?)<\/span>(?=<span class="opt">|<\/div>)/g, (m, inner) => {
+        const o = q.options[i++];
+        if (!o || !o.correct) return m;
+        // (r11, merged answer-key options INK-31) the ring is the answer and the printed option a
+        // given: no inner element the pupil page lacks, or the key would ink the option's text too
+        return `<span class="opt" data-ws-ink="${ink}" style="outline:0.6mm solid currentColor;outline-offset:0.8mm;border-radius:999px;${style}">${inner}</span>`;
+    });
+}
+
+/**
+ * D10 (wave 1 lane D round 4, LESSONS L1): a number family (+/- or x/÷) is drawn on paper by the
+ * kit's `number-family` cell, sized from the sheet's metrics, instead of the legacy branch's fixed
+ * px (which printed the same 2 x 2 at S as at L). The screen hosts are not affected.
+ */
+function numberFamilySpec(q) {
+    const d = q && q.numberFamilyData;
+    if (!d || !/^number-family-(add-sub|mult-div)$/.test(String(q.printFormat || '')) || !hasCell('number-family')) return null;
+    if (!Array.isArray(d.equations) || !Array.isArray(d.missingPositions) || d.equations.some((e) => !e || !Array.isArray(e.nums) || e.nums.length !== 3)) return null;
+    return {
+        template: 'number-family',
+        payload: {
+            nums: [d.a, d.b, d.c].filter((v) => v !== undefined && v !== null),
+            eqs: d.equations.map((e) => ({ nums: e.nums.slice(), op: e.op })),
+            miss: d.equations.map((_, i) => (Array.isArray(d.missingPositions[i]) ? d.missingPositions[i].slice() : [])),
+        },
+    };
+}
+
 /* ============================================================= S2 · the supports model */
 
 /**
@@ -1254,7 +1384,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     const q0 = g.q;
     // S2: a legacy-drawn fact (sub_facts' vertical fact) that carries supports is drawn by the kit's
     // fact template, which can draw them - the same upgrade the old fact cue made in the generator.
-    const resolved = kitCellSpec(q0) || (withSupports ? supportFactSpec(g.skill, q0) : null);
+    const resolved = kitCellSpec(q0) || numberFamilySpec(q0) || (withSupports ? supportFactSpec(g.skill, q0) : null);
     const q = Object.assign({}, q0);
     let template;
     if (resolved) {
@@ -1337,10 +1467,24 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws
             // the WRONG model, boxed slots take the wrong value, never the right parts.
-            const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined });
+            const asQ = v === answer ? q0 : Object.assign({}, q0, { ans: v, target: v, keyParts: undefined, printAnswer: undefined, numberFamilyData: undefined });
             const filled = legacyKeyFill(html.replace(STAMP_RE, ''), asQ, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid', shown: true });
             if (filled !== null) return filled;
             return html + shownLine(v, ink);
+        }
+        // Wave 1 lane D round 4 (D1, H8): a legacy "Circle ALL ..." item answers in its own option
+        // list, so it never also carries the adapter's "Answer: ____" row (two answer places). The
+        // list is the item's one slot on the pupil page and the key; the key rings the right options.
+        if (legacy && STAMP_RE.test(html) && selfAnswering(html, q0)) {
+            const ink = ctx.state === 'answered' ? 'solid' : ctx.state === 'traced' ? 'trace' : '';
+            return markOptions(html.replace(STAMP_RE, ''), q0, ink);
+        }
+        // 2026-10-02 (L-KEY AK-4): the pupil page draws the adapter's writing row only where the key
+        // cannot write into the cell's own slot - the very test the key applies below - so a key and
+        // its pupil page always carry the same named slots.
+        if (legacy && ctx.state === 'blank' && STAMP_RE.test(html)) {
+            const bare = html.replace(STAMP_RE, '');
+            return legacyKeyFill(bare, q0, key) !== null ? bare : html;
         }
         if (!legacy || ctx.state !== 'answered') return html;
         // The legacy key: the answer in the pupil's own slot when there is one, else the stamp.
@@ -1736,174 +1880,280 @@ function measureSide4(pairs, { size, look, mdoc = null }) {
     } finally { done(); }
 }
 
-function measureItems(items, { size, look, colsList }) {
+/**
+ * Round 9 (critic r7 D7-2: a pool page spent 95 % of its build time here, one forced layout per
+ * item, column count and state, so a page dealt again and again froze the app). Two things make
+ * it cheap without changing a single figure:
+ *   - BATCHED: the cells of one column count and state are laid out TOGETHER, each in its own
+ *     block (cells never touch one another's geometry), so the browser lays out once and the
+ *     rest is reads. A batch whose markup does not parse into one cell per item falls back to
+ *     the cell-by-cell measure.
+ *   - REMEMBERED: a cell drawn exactly the same at every column count and state (a re-deal, a
+ *     re-count and the next sheet deal many of the same problems) takes the figures it was
+ *     measured at before. The drawings ARE the key, so a different drawing is measured afresh.
+ */
+const MEASURE_CACHE = new Map();
+const MEASURE_CACHE_MAX = 5000;
+/** cyrb53: a 53-bit string hash (the cache key of a cell's drawings). */
+function hash53(str, seed = 0) {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for (let i = 0; i < str.length; i++) {
+        const ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+const MEASURE_STATES = Object.freeze(['blank', 'answered']);
+
+function measureItems(items, { size, look, colsList, serial = false, noCache = false }) {
     if (typeof globalThis.document === 'undefined' || !globalThis.document.body || !items.length) return;
     const document = MDOC && MDOC.body ? MDOC : globalThis.document;   // the measuring frame (measureDocument)
+    const t0 = nowMs();
+    BUILD_STATS.measured += items.length;
+    try {
+        ensureEngineStyle(document);
+        const cols = [...new Set([1, ...colsList])].sort((a, b) => a - b);
+        const ctxCache = new Map();
+        // (an item's own drawing flags - wrapToCell, tightRows - are part of its context and its key)
+        const ctxOf = (state, level, it = null) => {
+            const wrap = !!(it && it.wrapToCell), tight = !!(it && it.tightRows);
+            const k = `${state}|${level}|${wrap ? 1 : 0}${tight ? 1 : 0}`;
+            if (!ctxCache.has(k)) ctxCache.set(k, Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: level, state }), wrap ? { wrapToCell: true } : {}, tight ? { tightRows: true } : {}));
+            return ctxCache.get(k);
+        };
+        // every drawing, at every column count and state (string work, no layout)
+        const bodies = new Map();
+        for (const it of items) {
+            bodies.set(it, cols.map((c) => MEASURE_STATES.map((state) => {
+                try { return it.render(ctxOf(state, it.measureLevel || 1, it), { cols: c }); } catch (e) { return ''; }
+            })));
+        }
+        // a cell measured before Andika has loaded (fontsReady gives up after 3 s) is never
+        // remembered: the next sheet measures it again in the real face
+        let faceReady = true;
+        try { faceReady = !document.fonts || !document.fonts.check || (document.fonts.check('400 28px Andika') && document.fonts.check('700 28px Andika')); } catch (e) { faceReady = false; }
+        const dpr = typeof window !== 'undefined' && window.devicePixelRatio ? window.devicePixelRatio : 1;
+        const keyOf = (it) => {
+            if (noCache || !faceReady || Array.isArray(it.judgeModes) || it.colsLayout) return null;
+            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, it.measureLevel || 1].join('|');
+            const text = `${size}|${look}|${cols.join(',')}|${flags}|${bodies.get(it).map((b) => b.join('\u0001')).join('\u0002')}`;
+            return `${hash53(text)}:${text.length}`;
+        };
+        const fresh = [];
+        const keys = new Map();
+        for (const it of items) {
+            const k = keyOf(it);
+            keys.set(it, k);
+            const hit = k ? MEASURE_CACHE.get(k) : null;
+            if (!hit) { fresh.push(it); continue; }
+            BUILD_STATS.measureHits++;
+            it.measured = it.measured || {};
+            for (const [c, m] of Object.entries(hit.measured)) it.measured[c] = JSON.parse(JSON.stringify(m));
+            for (const [c, w] of Object.entries(hit.why)) why(it, c, w);
+        }
+        if (fresh.length) measureFresh(fresh, { size, look, cols, bodies, ctxOf, serial });
+        for (const it of fresh) {
+            const k = keys.get(it);
+            if (!k) continue;
+            if (MEASURE_CACHE.size >= MEASURE_CACHE_MAX) MEASURE_CACHE.delete(MEASURE_CACHE.keys().next().value);
+            const measured = {};
+            const whyC = {};
+            for (const c of cols) {
+                if (it.measured && it.measured[c]) measured[c] = JSON.parse(JSON.stringify(it.measured[c]));
+                if (it.measureWhy && it.measureWhy[c]) whyC[c] = it.measureWhy[c];
+            }
+            MEASURE_CACHE.set(k, { measured, why: whyC });
+        }
+    } finally {
+        BUILD_STATS.measureMs += nowMs() - t0;
+    }
+}
+
+/** Lay out and read the cells not measured before (measureItems); `serial` measures one cell at a time. */
+function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }) {
+    // every DOM use in the measuring frame's document (measureDocument; main 2026-10-30), read with that frame's window
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;
     const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
-    ensureEngineStyle(document);
     const s = SIZES[size] || SIZES.L;
     const host = document.createElement('div');
     host.setAttribute('aria-hidden', 'true');
     host.style.cssText = 'position:absolute;left:-10000px;top:0;width:220mm;visibility:hidden;pointer-events:none;contain:layout;';
-    host.innerHTML = `<div class="ws-sheet ws-${size} ws-${look} ws-tab${s.tabMm}" style="display:block;max-width:none;width:220mm;overflow:visible"></div>`;
+    // Wave 1 lane D r12c: each cell is measured where the page draws it - a cell of a `.ws-grid`
+    // inside a `.ws-page` - so every page-scoped cell rule applies to the measured box too. The
+    // CL-40 label keep-out (sheet-kit.css: `.ws-page .ws-grid > .ws-cell:has(> .ws-tab, > .ws-letter)`
+    // pads the top to the label side + 1 mm) did not match a bare `.ws-sheet`, so every measured
+    // cell read 3 mm of top padding where it prints with tab + 1 mm (2 / 3 / 4 mm short at S / M / L),
+    // and a row sized to the measurement ran its content past the row (area_model_div_2by1 Review M).
+    // The page and grid boxes themselves are neutralised inline (no paper size, frame or gap).
+    host.innerHTML = `<div class="ws-page ws-${size} ws-${look} ws-tab${s.tabMm}" style="display:block;max-width:none;width:220mm;height:auto;min-height:0;margin:0;padding:0;overflow:visible;break-after:auto">`
+        + '<div class="ws-grid" style="display:block;height:auto;min-height:0;border:0;background:none;gap:0;overflow:visible"></div></div>';
     document.body.appendChild(host);
-    const root = host.firstChild;
-    const cols = [...new Set([1, ...colsList])].sort((a, b) => a - b);
+    const root = host.firstChild.firstChild;
     const baseW = new Map();          // item -> Map(svg index -> width at 1 column)
     const baseLeaves = new Map();     // item -> widths of its grid / table leaves at 1 column
-    try {
-        // Speed (whole-grade print, 2026-10-30): every cell of a pass (one column count, one state) is
-        // written first and read after ONE layout. Writing and reading one cell at a time forced a
-        // layout of the whole app page per cell (93 % of a Grade 1 print). Each cell is parsed on its
-        // own, exactly as before, and stays a direct child of the sheet root, so it measures the same.
-        const scratch = document.createElement('div');
-        for (const c of cols) {
-            const { inner } = cellWidthMm(c, LIVE_W_MM, look);
-            const bests = new Map();
-            for (const state of ['blank', 'answered']) {
-                const ctxs = [];
-                const frag = document.createDocumentFragment();
-                for (const it of items) {
-                    const ctx = Object.assign(resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: it.measureLevel || 1, state }), it.wrapToCell ? { wrapToCell: true } : {}, it.tightRows ? { tightRows: true } : {});
-                    let body = '';
-                    try { body = it.render(ctx, { cols: c }); } catch (e) { body = ''; }
-                    scratch.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
-                        + `<span class="ws-letter">m.</span>${body}</div>`;
-                    ctxs.push(ctx);
-                    frag.appendChild(scratch.firstChild || document.createElement('div'));
-                }
-                scratch.innerHTML = '';
-                root.innerHTML = '';
-                root.appendChild(frag);
-                const cellEls = Array.from(root.children);
-                for (let ii = 0; ii < items.length; ii++) {
-                    const it = items[ii];
-                    const ctx = ctxs[ii];
-                    let best = bests.get(it) || { hMm: 0, fits: true };
-                    const cell = cellEls[ii];
-                    const r = cell.getBoundingClientRect();
-                    const cs = getComputedStyle(cell);
-                    const padL = parseFloat(cs.paddingLeft) || 0;
-                    const padR = parseFloat(cs.paddingRight) || 0;
-                    let hPx = r.height;
-                    let fits = true;
-                    let slackPx = Infinity;
-                    let contentBottom = r.top;
-                    let stampH = 0;
-                    const pics = [];
-                    const leaves = [];
-                    for (const el of cell.querySelectorAll('*')) {
-                        const er = el.getBoundingClientRect();
-                        if (!er.width && !er.height) continue;
-                        const ecs = getComputedStyle(el);
-                        if (ecs.position === 'absolute') {
-                            if (el.classList.contains('ws-legacy-answer')) stampH = Math.max(stampH, er.height);
-                            continue;
-                        }
-                        if (el.closest('.ws-legacy-answer')) continue;
-                        contentBottom = Math.max(contentBottom, er.bottom);
-                        // CL-8: how near the drawing comes to the cell's side borders (its leaves,
-                        // the label aside) - a role choosing columns keeps 3 mm (critic R4 R-4)
-                        if ((!el.children.length || el.tagName === 'svg') && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) {
-                            slackPx = Math.min(slackPx, er.left - r.left, r.right - er.right);
-                        }
-                        if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) { fits = false; why(it, c, `x ${el.tagName}.${el.className} +${((er.right - (r.right - padR)) / PX_PER_MM).toFixed(1)}mm w${(er.width / PX_PER_MM).toFixed(1)} of ${((r.width - padL - padR) / PX_PER_MM).toFixed(1)}`); }
-                        // A clip under 1 mm is a stroke or a line box, not hidden content.
-                        if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) { fits = false; why(it, c, `ox ${el.tagName}.${el.className}`); }
-                        if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + PX_PER_MM) { fits = false; why(it, c, `oy ${el.tagName}.${el.className}`); }
-                        if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
-                        // A chart or table squeezed into a narrow column: its numbers touch the
-                        // cell walls and run together ("100110"). A leaf of a grid or table is
-                        // cramped when it is narrower than it is at one column AND its text now
-                        // fills it (a box drawn exactly two digits wide at every width is not).
-                        if (state === 'blank' && !el.children.length && el.textContent.trim().length >= 2) {
-                            const pd = el.parentElement ? getComputedStyle(el.parentElement).display : '';
-                            if (/grid|table/.test(pd) || /table-cell/.test(ecs.display)) {
-                                const k = leaves.length;
-                                leaves.push(er.width);
-                                const w1 = (baseLeaves.get(it) || [])[k];
-                                if (c !== cols[0] && w1 && er.width < w1 * 0.9) {
-                                    const rg = document.createRange();
-                                    rg.selectNodeContents(el);
-                                    const tw = rg.getBoundingClientRect().width;
-                                    if (tw > er.width - 0.8 * PX_PER_MM) { fits = false; why(it, c, `cramp ${el.tagName} ${el.textContent.trim()}`); }
-                                }
-                            }
-                        }
-                    }
-                    // The key's answer stamp sits at the foot of the cell and costs no layout
-                    // (AK-1); its line is reserved under the content so it never covers it.
-                    if (stampH) hPx = Math.max(hPx, contentBottom - r.top + 1 * PX_PER_MM + stampH + 1.5 * PX_PER_MM);
-                    if (state === 'blank') {
-                        if (c === cols[0]) { baseW.set(it, pics); baseLeaves.set(it, leaves); }
-                        else {
-                            // DN-10: a picture never shrinks to fit a narrower column. A registered
-                            // visual is held to that exactly; a legacy picture declares no minimum
-                            // size (RP-3's minimums belong to the templates that replace it), so a
-                            // scale-down of up to 10% is read as the same picture.
-                            const tol = it.legacy ? 0.9 : 0.98;
-                            const b = baseW.get(it) || [];
-                            // (A lesson chart's other example draws its number line to the
-                            // column on purpose, `scalesWithCols`: not a shrunk picture.)
-                            if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
-                        }
-                    }
-                    // A role that places part of the cell in one of several ways (error analysis,
-                    // AX-4: the Correct / Fix-it block in ONE place on every cell of a page) names
-                    // them in `judgeModes`; each is drawn and measured here, and the role picks the
-                    // one the whole page can use. null: that way does not fit (or does not apply).
-                    const vary = {};
-                    const inkW = best.inkW || {};
-                    if (fits && Array.isArray(it.judgeModes)) {
-                        const grow = (Math.max(hPx, r.height) - r.height) / PX_PER_MM;
-                        for (const mode of it.judgeModes) {
-                            let mb = '';
-                            try { mb = it.render(ctx, { cols: c, judge: mode }); } catch (e) { mb = ''; }
-                            if (!mb || !String(mb).includes(`data-judge-mode="${mode}"`)) { vary[mode] = null; continue; }
-                            // drawn beside the pass's cells (after them) and removed once read
-                            scratch.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
-                                + `<span class="ws-letter">m.</span>${mb}</div>`;
-                            const mc = scratch.firstChild || document.createElement('div');
-                            root.appendChild(mc);
-                            const cr = mc.getBoundingClientRect();
-                            let over = false;
-                            // the ink's width: the leftmost to the rightmost drawn thing (a text run, a
-                            // box, a picture), so the role can tell a one-line item in a full-width
-                            // cell (half of it empty) from one that fills it (critic EA r5, H13 W)
-                            let lo = Infinity, hi = -Infinity;
-                            for (const el of mc.querySelectorAll('*')) {
-                                const er = el.getBoundingClientRect();
-                                if ((!er.width && !er.height) || getComputedStyle(el).position === 'absolute') continue;
-                                if (er.right > cr.right - padR + 1 || er.left < cr.left + padL - 1) { over = true; break; }
-                                const leaf = !el.children.length || el.tagName.toLowerCase() === 'svg';
-                                if (leaf && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) { lo = Math.min(lo, er.left); hi = Math.max(hi, er.right); }
-                            }
-                            vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
-                            if (!over && hi > lo) inkW[mode] = Math.max(inkW[mode] || 0, (hi - lo) / PX_PER_MM);
-                            mc.remove();
-                        }
-                    }
-                    const modes = Object.assign({}, best.modes || {});
-                    for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
-                    best = { hMm: Math.max(best.hMm, hPx / PX_PER_MM), fits: best.fits && fits, modes, inkW,
-                        slackMm: Math.min(best.slackMm === undefined ? Infinity : best.slackMm, slackPx / PX_PER_MM) };
-                    bests.set(it, best);
-                }
+    const best = new Map(items.map((it) => [it, { hMm: 0, fits: true }]));
+    const cellHtml = (it, inner, body) => `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
+        + `<span class="ws-letter">m.</span>${body}</div>`;
+    const parser = document.createElement('div');
+    /** Put the cells of `list` in the root, each parsed on its own (a cell's stray markup stays its own). */
+    const place = (list) => {
+        root.textContent = '';
+        const cells = [];
+        for (const [, html] of list) {
+            parser.innerHTML = html;
+            cells.push(parser.firstChild);
+            while (parser.firstChild) root.appendChild(parser.firstChild);
+        }
+        return cells;
+    };
+    /** Read one laid-out cell: the same reads, in the same order, as the cell-by-cell measure. */
+    const readCell = (it, cell, c, state, ctx) => {
+        const r = cell.getBoundingClientRect();
+        const cs = getComputedStyle(cell);
+        const padL = parseFloat(cs.paddingLeft) || 0;
+        const padR = parseFloat(cs.paddingRight) || 0;
+        let hPx = r.height;
+        let fits = true;
+        let contentBottom = r.top;
+        let stampH = 0;
+        let slackPx = Infinity;
+        const pics = [];
+        const leaves = [];
+        for (const el of cell.querySelectorAll('*')) {
+            const er = el.getBoundingClientRect();
+            if (!er.width && !er.height) continue;
+            const ecs = getComputedStyle(el);
+            if (ecs.position === 'absolute') {
+                if (el.classList.contains('ws-legacy-answer')) stampH = Math.max(stampH, er.height);
+                continue;
             }
-            for (const it of items) {
-                const best = bests.get(it) || { hMm: 0, fits: true };
-                it.measured = it.measured || {};
-                it.measured[c] = { hMm: Math.ceil(best.hMm * 10) / 10, fits: best.fits };
-                if (Number.isFinite(best.slackMm)) it.measured[c].slackMm = Math.floor(best.slackMm * 10) / 10;
-                if (best.modes && Object.keys(best.modes).length) {
-                    it.measured[c].modes = {};
-                    for (const [mode, h] of Object.entries(best.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
-                    it.measured[c].inkW = {};
-                    for (const [mode, w] of Object.entries(best.inkW || {})) it.measured[c].inkW[mode] = Math.ceil(w * 10) / 10;
-                    it.measured[c].innerMm = inner;
+            if (el.closest('.ws-legacy-answer')) continue;
+            contentBottom = Math.max(contentBottom, er.bottom);
+            // CL-8: how near the drawing comes to the cell's side borders (its leaves,
+            // the label aside) - a role choosing columns keeps 3 mm (critic R4 R-4)
+            if ((!el.children.length || el.tagName === 'svg') && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) {
+                slackPx = Math.min(slackPx, er.left - r.left, r.right - er.right);
+            }
+            if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) { fits = false; why(it, c, `x ${el.tagName}.${el.className} +${((er.right - (r.right - padR)) / PX_PER_MM).toFixed(1)}mm w${(er.width / PX_PER_MM).toFixed(1)} of ${((r.width - padL - padR) / PX_PER_MM).toFixed(1)}`); }
+            // A clip under 1 mm is a stroke or a line box, not hidden content.
+            if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) { fits = false; why(it, c, `ox ${el.tagName}.${el.className}`); }
+            if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + PX_PER_MM) { fits = false; why(it, c, `oy ${el.tagName}.${el.className}`); }
+            if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
+            // A chart or table squeezed into a narrow column: its numbers touch the
+            // cell walls and run together ("100110"). A leaf of a grid or table is
+            // cramped when it is narrower than it is at one column AND its text now
+            // fills it (a box drawn exactly two digits wide at every width is not).
+            if (state === 'blank' && !el.children.length && el.textContent.trim().length >= 2) {
+                const pd = el.parentElement ? getComputedStyle(el.parentElement).display : '';
+                if (/grid|table/.test(pd) || /table-cell/.test(ecs.display)) {
+                    const k = leaves.length;
+                    leaves.push(er.width);
+                    const w1 = (baseLeaves.get(it) || [])[k];
+                    if (c !== cols[0] && w1 && er.width < w1 * 0.9) {
+                        const rg = document.createRange();
+                        rg.selectNodeContents(el);
+                        const tw = rg.getBoundingClientRect().width;
+                        if (tw > er.width - 0.8 * PX_PER_MM) { fits = false; why(it, c, `cramp ${el.tagName} ${el.textContent.trim()}`); }
+                    }
                 }
             }
         }
+        // The key's answer stamp sits at the foot of the cell and costs no layout
+        // (AK-1); its line is reserved under the content so it never covers it.
+        if (stampH) hPx = Math.max(hPx, contentBottom - r.top + 1 * PX_PER_MM + stampH + 1.5 * PX_PER_MM);
+        if (state === 'blank') {
+            if (c === cols[0]) { baseW.set(it, pics); baseLeaves.set(it, leaves); }
+            else {
+                // DN-10: a picture never shrinks to fit a narrower column. A registered
+                // visual is held to that exactly; a legacy picture declares no minimum
+                // size (RP-3's minimums belong to the templates that replace it), so a
+                // scale-down of up to 10% is read as the same picture.
+                const tol = it.legacy ? 0.9 : 0.98;
+                const b = baseW.get(it) || [];
+                // (A lesson chart's other example draws its number line to the
+                // column on purpose, `scalesWithCols`: not a shrunk picture.)
+                if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
+            }
+        }
+        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx };
+    };
+    /** Fold one cell's reading into the item's figures (and measure its judge modes, which re-lay the root). */
+    const fold = (it, c, inner, m) => {
+        const b0 = best.get(it);
+        // A role that places part of the cell in one of several ways (error analysis,
+        // AX-4: the Correct / Fix-it block in ONE place on every cell of a page) names
+        // them in `judgeModes`; each is drawn and measured here, and the role picks the
+        // one the whole page can use. null: that way does not fit (or does not apply).
+        const vary = {};
+        const inkW = b0.inkW || {};
+        if (m.fits && Array.isArray(it.judgeModes)) {
+            const grow = (Math.max(m.hPx, m.rH) - m.rH) / PX_PER_MM;
+            for (const mode of it.judgeModes) {
+                let mb = '';
+                try { mb = it.render(m.ctx, { cols: c, judge: mode }); } catch (e) { mb = ''; }
+                if (!mb || !String(mb).includes(`data-judge-mode="${mode}"`)) { vary[mode] = null; continue; }
+                root.innerHTML = cellHtml(it, inner, mb);
+                const mc = root.firstChild;
+                const cr = mc.getBoundingClientRect();
+                let over = false;
+                // the ink's width: the leftmost to the rightmost drawn thing (a text run, a
+                // box, a picture), so the role can tell a one-line item in a full-width
+                // cell (half of it empty) from one that fills it (critic EA r5, H13 W)
+                let lo = Infinity, hi = -Infinity;
+                for (const el of mc.querySelectorAll('*')) {
+                    const er = el.getBoundingClientRect();
+                    if ((!er.width && !er.height) || getComputedStyle(el).position === 'absolute') continue;
+                    if (er.right > cr.right - m.padR + 1 || er.left < cr.left + m.padL - 1) { over = true; break; }
+                    const leaf = !el.children.length || el.tagName.toLowerCase() === 'svg';
+                    if (leaf && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) { lo = Math.min(lo, er.left); hi = Math.max(hi, er.right); }
+                }
+                vary[mode] = over ? null : cr.height / PX_PER_MM + grow;
+                if (!over && hi > lo) inkW[mode] = Math.max(inkW[mode] || 0, (hi - lo) / PX_PER_MM);
+            }
+        }
+        const modes = Object.assign({}, b0.modes || {});
+        for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
+        best.set(it, { hMm: Math.max(b0.hMm, m.hPx / PX_PER_MM), fits: b0.fits && m.fits, modes, inkW,
+            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM) });
+    };
+    try {
+        cols.forEach((c, ci) => {
+            const { inner } = cellWidthMm(c, LIVE_W_MM, look);
+            MEASURE_STATES.forEach((state, si) => {
+                const list = items.map((it) => [it, cellHtml(it, inner, bodies.get(it)[ci][si])]);
+                let cells = serial ? null : place(list);
+                // every cell must parse into a .ws-cell of its own, else this batch is measured cell by cell
+                if (cells && !cells.every((el) => el && el.nodeType === 1 && el.classList.contains('ws-cell') && el.parentNode === root)) cells = null;
+                if (cells) {
+                    BUILD_STATS.layouts++;
+                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, it.measureLevel || 1, it)));
+                    items.forEach((it, i) => fold(it, c, inner, readings[i]));
+                } else {
+                    items.forEach((it, i) => {
+                        root.innerHTML = list[i][1];
+                        BUILD_STATS.layouts++;
+                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, it.measureLevel || 1, it)));
+                    });
+                }
+            });
+            for (const it of items) {
+                const b = best.get(it);
+                it.measured = it.measured || {};
+                it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits };
+                if (Number.isFinite(b.slackMm)) it.measured[c].slackMm = Math.floor(b.slackMm * 10) / 10;
+                if (b.modes && Object.keys(b.modes).length) {
+                    it.measured[c].modes = {};
+                    for (const [mode, h] of Object.entries(b.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
+                    it.measured[c].inkW = {};
+                    for (const [mode, w] of Object.entries(b.inkW || {})) it.measured[c].inkW[mode] = Math.ceil(w * 10) / 10;
+                    it.measured[c].innerMm = inner;
+                }
+                best.set(it, { hMm: 0, fits: true });
+            }
+        });
         // A MINIMUM COLUMN WIDTH for legacy markup that reflows instead of overflowing (an area
         // model whose part boxes wrap into a pile, a chart window whose rows break): when a
         // narrower column makes the cell much taller than it is at one column, the content has
@@ -1946,7 +2196,18 @@ function measureTitleLines(text, size) {
 /* ==================================================================== the one entry point */
 
 async function fontsReady() {
-    try { if (typeof document !== 'undefined' && document.fonts) await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 3000))]); } catch (e) { /* print anyway */ }
+    // document.fonts.ready only waits for faces ALREADY loading: on a page's first print the
+    // Andika faces the measurement host uses had not been requested yet, so the first sheet was
+    // measured in the fallback font and dealt a different count than every later sheet with the
+    // same seed (critic 2026-10-03: the lint sweep and a single-skill run disagreed). The faces
+    // are requested explicitly before anything is measured.
+    try {
+        if (typeof document !== 'undefined' && document.fonts) {
+            const faces = ['400 28px Andika', '700 28px Andika', 'italic 400 28px Andika', 'italic 700 28px Andika'];
+            const load = Promise.all(faces.map((f) => (document.fonts.load ? document.fonts.load(f, '0123456789') : null)).filter(Boolean)).catch(() => {});
+            await Promise.race([load.then(() => document.fonts.ready), new Promise((r) => setTimeout(r, 3000))]);
+        }
+    } catch (e) { /* print anyway */ }
 }
 
 /** The column counts a section's layout may choose, so each gets measured. */
@@ -2143,8 +2404,22 @@ function heightClassOf(sec, items, gridMm) {
     if (sec.heightClass) for (const it of items) if (it) it.hClass = true;
 }
 
+const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows });
+
+/**
+ * The column-work group a practice page splits off (practice.js fineSplit), exactly as the role
+ * splits it, or null: {mid, fine, cols}. layoutOf counts the page with it, and buildSheetOnce's
+ * whole-rows check fills that group's last row with column work (wave 1 lane D round 7).
+ */
+function fineSplitOf(role, section, items, n, ctx) {
+    if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return null;
+    if (section.columns && section.columns !== 'auto') return null;
+    const narrow0 = items.filter((it) => !oneColumnOnly(it, n));
+    return fineSplit(Object.assign({}, layoutBase(role, section, items), { floor: null }), narrow0, ctx.paper, LIVE_W_MM, { size: n.size, look: n.look });
+}
+
 function layoutOf(role, section, items, n, ctx) {
-    const base = { role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap };
+    const base = layoutBase(role, section, items);
     const opts = { size: n.size, look: n.look, header: ctx.header };
     // (S6 sections: the columns are also tried on the grid net of the anchor band - layout.js resolveBandedLayout)
     const whole = resolveBandedLayout(base, section.anchorMm || 0, items, ctx.paper, LIVE_W_MM, opts);
@@ -2168,43 +2443,73 @@ function layoutOf(role, section, items, n, ctx) {
     }
     if (!(role === 'independent' || role === 'more-practice') || (n.anchors && n.anchors !== 'off') || section.gridH || items.length < 2) return whole;
     const wide = items.filter((it) => oneColumnOnly(it, n));
-    const narrow = items.filter((it) => !oneColumnOnly(it, n));
-    if (!wide.length || !narrow.length) return whole;
+    const narrow0 = items.filter((it) => !oneColumnOnly(it, n));
+    // the column problems of a mixed section in a group of their own (practice.js fineSplit)
+    const fs = fineSplitOf(role, section, items, n, ctx);
+    const narrow = fs ? fs.mid : narrow0;
+    if (!fs && (!wide.length || !narrow.length)) return whole;
     const Ln = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: floorOf(narrow) }), narrow, ctx.paper, LIVE_W_MM, opts);
-    if (Ln.cols <= whole.cols) return whole;
-    const Lw = resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts);
+    if (!fs && Ln.cols <= whole.cols) return whole;
+    const Lw = wide.length ? resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts) : null;
+    const Lf = fs ? resolveSectionLayout(Object.assign({}, base, { columns: fs.cols, count: fs.fine.length, floor: null }), fs.fine, ctx.paper, LIVE_W_MM, opts) : null;
     // How many of the run a page holds: the items come in the order they are dealt (the probe is
     // the start of the run), so the first N are counted exactly; past the probe, the probe's share
-    // of full-width problems is assumed.
-    // The narrow group's rows and the wide group's rows are drawn at their layouts' cell heights;
-    // the wide group shares the section's instruction line (paginate.js placeSections).
+    // of each group is assumed. Each group's rows are drawn at its layout's cell height; the
+    // split-off groups share the section's instruction line (paginate.js placeSections).
     const G = Ln.gridH;
-    const hN = splitCellH(Ln), hW = splitCellH(Lw);
-    const isWide = items.map((it) => oneColumnOnly(it, n));
-    const f = wide.length / items.length;
-    const count = (Gm, a, b, Lna, Lwa, squeeze) => {
-        let n = 1;
-        for (let N = 2; N <= 40; N++) {
-            const nw = N <= items.length ? isWide.slice(0, N).filter(Boolean).length : Math.round(N * f);
-            const nn = N - nw;
-            const rowsN = Math.ceil(nn / Lna.cols);
-            if (rowsN * a + nw * b > Gm - 0.99 && !(squeeze && splitPairH(a, Lna.hMin, rowsN, b, Lwa.hMin, nw, Gm - 1.01))) break;
-            n = N;
+    // Wave 5.2 (critic nl-r4 D1 / D2): a page with the number-line band and no column-work group
+    // counts its two parts with the band's squeeze (splitPairH), as main does; otherwise the lane's
+    // three-group count (narrow / wide / column work, wave 1 lane D round 7 - r12d) below.
+    if (!fs && Lw && Number(ctx.header && ctx.header.refBandMm) > 0) {
+        const hN = splitCellH(Ln), hW = splitCellH(Lw);
+        const isWide = items.map((it) => oneColumnOnly(it, n));
+        const f = wide.length / items.length;
+        const count = (Gm, a, b, Lna, Lwa, squeeze) => {
+            let n = 1;
+            for (let N = 2; N <= 40; N++) {
+                const nw = N <= items.length ? isWide.slice(0, N).filter(Boolean).length : Math.round(N * f);
+                const nn = N - nw;
+                const rowsN = Math.ceil(nn / Lna.cols);
+                if (rowsN * a + nw * b > Gm - 0.99 && !(squeeze && splitPairH(a, Lna.hMin, rowsN, b, Lwa.hMin, nw, Gm - 1.01))) break;
+                n = N;
+            }
+            return n;
+        };
+        let best = count(G, hN, hW, Ln, Lw, false);
+        // Wave 5.2 (critic nl-r4 D1 / D2): with the number-line band the two parts' rows give up their
+        // slack (practice.js splitPairH, as the role lays them out), up to the count the page holds
+        // without the band - never more, so the band never packs a page tighter than its absence.
+        if (Number(ctx.header && ctx.header.refBandMm) > 0) {
+            const opts0 = Object.assign({}, opts, { header: Object.assign({}, ctx.header, { refBandMm: 0 }) });
+            const Ln0 = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: floorOf(narrow) }), narrow, ctx.paper, LIVE_W_MM, opts0);
+            const Lw0 = resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts0);
+            if (Ln0.cols === Ln.cols) {
+                const off = count(Ln0.gridH, splitCellH(Ln0), splitCellH(Lw0), Ln0, Lw0, false);
+                best = Math.max(best, Math.min(off, count(G, hN, hW, Ln, Lw, true)));
+            }
         }
-        return n;
-    };
-    let best = count(G, hN, hW, Ln, Lw, false);
-    // Wave 5.2 (critic nl-r4 D1 / D2): with the number-line band the two parts' rows give up their
-    // slack (practice.js splitPairH, as the role lays them out), up to the count the page holds
-    // without the band - never more, so the band never packs a page tighter than its absence.
-    if (Number(ctx.header && ctx.header.refBandMm) > 0) {
-        const opts0 = Object.assign({}, opts, { header: Object.assign({}, ctx.header, { refBandMm: 0 }) });
-        const Ln0 = resolveSectionLayout(Object.assign({}, base, { count: narrow.length, floor: floorOf(narrow) }), narrow, ctx.paper, LIVE_W_MM, opts0);
-        const Lw0 = resolveSectionLayout(Object.assign({}, base, { columns: 1, count: wide.length, floor: null }), wide, ctx.paper, LIVE_W_MM, opts0);
-        if (Ln0.cols === Ln.cols) {
-            const off = count(Ln0.gridH, splitCellH(Ln0), splitCellH(Lw0), Ln0, Lw0, false);
-            best = Math.max(best, Math.min(off, count(G, hN, hW, Ln, Lw, true)));
-        }
+        return Object.assign({}, Ln, { perPage: best, splitWide: true });
+    }
+    const hW = Lw ? splitCellH(Lw) : 0, hF = Lf ? splitCellH(Lf) : 0;
+    const fineSet = new Set(fs ? fs.fine : []);
+    const kind = items.map((it) => (oneColumnOnly(it, n) ? 'w' : fineSet.has(it) ? 'f' : 'n'));
+    const share = (k) => kind.filter((x) => x === k).length / items.length;
+    let best = 1;
+    for (let N = 2; N <= 40; N++) {
+        const cnt = (k) => (N <= items.length ? kind.slice(0, N).filter((x) => x === k).length : Math.round(N * share(k)));
+        const nw = cnt('w'), nf = cnt('f'), nn = N - nw - nf;
+        const rN = Math.ceil(nn / Ln.cols);
+        // every row of a split-off group holds its tallest problem and its grid's borders
+        // r12d: never under the row a split part PRINTS (practice.js partCellH: its tallest problem's
+        // measured row + the grid's borders + 2 mm, within its cell). With the true cell heights
+        // (r12c) the old estimate had no hidden slack left, so pool deals counted ~3 mm a row short
+        // ran onto a second page (mixed_addition M More Practice letter A: 3 problems where B had 7).
+        const partH = (L) => (L ? Math.min(L.cellH, L.hMin + 1 + GRID_BORDERS_MM + 2) : 0);
+        const hWr = Lw ? Math.max(hW, Lw.hMin + GRID_BORDERS_MM, partH(Lw)) : 0;
+        const groups = (rN > 0 ? 1 : 0) + (nw > 0 ? 1 : 0) + (nf > 0 ? 1 : 0);
+        const h = rN * Math.max(splitCellH(Ln, fs ? rN : 0), partH(Ln)) + nw * hWr + (Lf ? Math.ceil(nf / Lf.cols) * Math.max(hF, partH(Lf)) : 0) + Math.max(0, groups - 1) * GRID_BORDERS_MM;
+        if (h > G - 0.99) break;
+        best = N;
     }
     return Object.assign({}, Ln, { perPage: best, splitWide: true });
 }
@@ -2406,6 +2711,31 @@ function numberLineRequest(n) {
 }
 
 /**
+ * Round 9 (critic r7 D7-2): every deal starts in a task of its own, so a sheet that is dealt
+ * several times never blocks the page for the whole search, and the work is counted (`stats`).
+ */
+const BUILD_STATS = { deals: 0, dealMs: 0, checks: 0, checkMs: 0, measured: 0, measureHits: 0, measureMs: 0, layouts: 0 };
+const nowMs = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
+/** Resolve in a NEW macrotask (the page paints and answers input in between). */
+function nextTask() {
+    return new Promise((res) => {
+        if (typeof window === 'undefined') { res(); return; }
+        if (typeof MessageChannel === 'function') {
+            const ch = new MessageChannel();
+            ch.port1.onmessage = () => { ch.port1.close(); res(); };
+            ch.port2.postMessage(0);
+        } else if (typeof setTimeout === 'function') setTimeout(res, 0);
+        else res();
+    });
+}
+async function buildSheetOnce(req = {}) {
+    await nextTask();
+    const t0 = nowMs();
+    BUILD_STATS.deals++;
+    try { return await buildSheetDeal(req); } finally { BUILD_STATS.dealMs += nowMs() - t0; }
+}
+
+/**
  * SF-34: touch numerals never print under 24 pt, so on an S / M page the touch cells are raised
  * (stacks and sentences to L, 28 pt; facts to 24 pt or more). The fit line says so instead of
  * naming the page's own digit size alone.
@@ -2417,7 +2747,7 @@ function touchFitLine(line, html, size) {
     return line.replace(/Digits (\d+) pt\./, (m, pt) => `Digits ${pt} pt; ${what}.`);
 }
 
-async function buildSheetCore(req = {}) {
+async function buildSheetDeal(req = {}) {
     setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
@@ -2522,7 +2852,7 @@ async function buildSheetCore(req = {}) {
             return blockPlan({ cols: L.cols, hMin: L.hMin, cellH: L.cellH, bodyMm: body, instrMm, anchorMm: sec.anchorMm, count: sec.count || undefined }).perPage;
         }
         if (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length) return Math.max(1, Math.floor((L.cols === 1 ? sideFit(Object.assign({}, L, { rows: Math.max(2, L.rows - (L.rows % 2)) }), anchorSets[si].items).rows : sideFit(L, anchorSets[si].items).perPage) / 2));
-        return L.perPage;
+        return Math.min(L.perPage, pageCapOf(sec, n.size));
     };
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
 
@@ -2583,7 +2913,7 @@ async function buildSheetCore(req = {}) {
         anchorNotes.push(`${metaOf(sec.skills[0]).label}: a worked example and its problem are too tall to share a page at size ${n.size}, so this page prints without examples.`);
     });
     if (anchorMode === 'side' && bandInstead.length) {
-        const res = await buildSheetCore(Object.assign({}, req, { anchors: 'sections' }));
+        const res = await buildSheetDeal(Object.assign({}, req, { anchors: 'sections' }));
         const note = `${bandInstead.join(', ')}: the worked example is too wide to stand beside its problem, so it prints in a band above the problems.`;
         res.anchors = Object.assign({}, res.anchors, { mode: 'sections', asked: 'side', notes: ((res.anchors && res.anchors.notes) || []).concat(note) });
         res.notes = [...new Set((res.notes || []).concat(anchorNotes, note))];
@@ -2593,7 +2923,7 @@ async function buildSheetCore(req = {}) {
     // it is planned EXACTLY as anchors 'off' (same columns, packing and splits); the dialog keeps
     // the mode asked for and its notes.
     if (anchorMode !== 'off' && anchorSets.every((s) => !s)) {
-        const res = await buildSheetCore(Object.assign({}, req, { anchors: 'off' }));
+        const res = await buildSheetDeal(Object.assign({}, req, { anchors: 'off' }));
         res.anchors = { mode: anchorMode, examples: [], notes: anchorNotes.slice() };
         res.notes = [...new Set((res.notes || []).concat(anchorNotes))];
         return res;
@@ -2717,7 +3047,7 @@ async function buildSheetCore(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveBandedLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap }, sec.anchorMm || 0,
+                const L = resolveBandedLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows }, sec.anchorMm || 0,
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = capFromL(sec, si, L);
             });
@@ -2726,14 +3056,21 @@ async function buildSheetCore(req = {}) {
     };
     let probesOf = () => [];
 
-    if (n.role === 'independent') {
+    // Round 9 (critic r7 D7-1): ONE letter of a More Practice pool page (buildSheet deals each
+    // letter as a page of its own, `_mpLetter`) is dealt exactly as an Independent pool page is -
+    // the count settles on the problems it holds - under the letter's own seed (PT-MPR-2).
+    const mpLetter = n.role === 'more-practice' && req._mpLetter && n.letters && n.letters.length === 1 && n.anchors === 'off' ? n.letters[0] : null;
+    if (n.role === 'independent' || mpLetter) {
         const makeProbes = () => n.sections.map((sec, si) => {
-            const base = (n.seed + si * 100003) >>> 0;
+            const base = ((mpLetter ? letterSeed(n.seed, mpLetter) : n.seed) + si * 100003) >>> 0;
             const probe = probeRun(sec, si, base);
             sec.floor = floorWith(si, probe.items);
             return { base, probe };
         });
         let probes = makeProbes();
+        // (round 9, critic r7 D7-2) the probe's measures are the longest stretch of a deal: the
+        // page gets a turn before the count is settled
+        await nextTask();
         // S2: the sub-sections of a support split share the page. When one row of each does not
         // fit one page, the split is undone: the alternatives are dealt in blocks in one section.
         if (n.sections !== unsplit && n.sections.some((sec) => !sec.count)) {
@@ -2761,7 +3098,8 @@ async function buildSheetCore(req = {}) {
         }
         probesOf = (si) => probes[si].probe.items;
         const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, withTwins(si, probes[si].probe.items), n, lctx)));
-        n.sections.forEach((sec, si) => {
+        // (a loop, not forEach: the deal yields to the page between its passes - round 9, D7-2)
+        for (const [si, sec] of n.sections.entries()) {
             const { base, probe } = probes[si];
             const pagesWanted = sec.pages || 1;
             // "A page" (or N pages) when no count is given: the page decides the count. The floor
@@ -2769,17 +3107,231 @@ async function buildSheetCore(req = {}) {
             const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
             let items = [];
-            for (let pass = 0; pass < 3; pass++) {
+            // A MIXED POOL (mixed_composing, counting_all ...) is one skill whose items come from
+            // many templates, 25 to 110 mm tall. Its probe's tallest item sized every page, so a page
+            // that was dealt short items printed three of them over a 20-35 % empty strip (kit lint
+            // PAGEFILL, 2026-09-26). A pool page is sized by the items it HOLDS: the count grows or
+            // shrinks with them until it settles, and the largest count that fits is kept.
+            const pool = !sec.count && shared[si] === null && sec.skills.length === 1 && isMixedMetaSkill(sec.skills[0].skillId);
+            let fitBest = 0;
+            for (let pass = 0; pass < (pool ? 6 : 3); pass++) {
+                if (pass) await nextTask();
                 items = finalRun(sec, si, base, want, probe);
                 if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
-                sec.floor = floorWith(si, probe.items.concat(items));
+                sec.floor = floorWith(si, pool ? items : probe.items.concat(items));
                 if (sec.count) break;
                 const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
+                if (pool) {
+                    if (again >= want) fitBest = Math.max(fitBest, want);
+                    if (again === want) break;
+                    // grown past a count that fitted and now shrinking: settle on the one that fitted
+                    const next = again > want ? again : fitBest > 0 && fitBest < want ? fitBest : again;
+                    if (next === want || (next > want && fitBest >= next)) break;
+                    want = next;
+                    continue;
+                }
                 if (again >= want) break;
                 want = again;
             }
+            if (pool && fitBest > 0 && items.length !== fitBest) {
+                items = finalRun(sec, si, base, fitBest, probe);
+                sec.floor = floorWith(si, items);
+            }
+            // A pool's count estimate comes from the few items it has dealt (their rows); one more
+            // item is tried while the page still holds it WITH ROOM FOR ONE MORE (the estimate
+            // draws every row at one height; the page lays them as dealt, so the last item of a
+            // count that only just fits could spill to a second page), so a page of short items
+            // is filled.
+            // The pool's helpers (round 9): column work, and `cnt` more problems dealt from a
+            // derived stream (its start index fixes it: the same request deals the same problems).
+            const poolKey = `${sec.skills[0].categoryId}:${sec.skills[0].skillId}`;
+            const fineQ = (q, sk) => { try { const sp = kitCellSpec(q) || numberFamilySpec(q) || supportFactSpec(sk, q); return !!sp && (sp.template === 'stack' || sp.template === 'fact'); } catch (e) { return false; } };
+            const isFine = (it) => it.template === 'stack' || it.template === 'fact';
+            const dealtAt = (its, cnt, want, start) => {
+                const out = build(si, sec, cnt, base, { startIndex: start, seen: new Set(its.map((it) => signature(it.q))), kept: new Map([[poolKey, its.length]]), want });
+                measure(out, sec);
+                return out;
+            };
+            const prefixOf = (its) => its.every((it, i) => probe.items[i] === it);
+            if (pool && fitBest > 0) {
+                const ceilP = ({ S: 30, M: 20, L: 12 })[String(n.size || 'M').toUpperCase()] || 12;
+                const roomFor = (more) => {
+                    sec.floor = floorWith(si, more);
+                    return capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, more), n, lctx)) * pagesWanted > more.length;
+                };
+                let alt = 0;
+                for (let g = 0; g < 16 && items.length < MAX_ITEMS && items.length < ceilP * pagesWanted; g++) {
+                    await nextTask();
+                    if (prefixOf(items)) {
+                        const more = finalRun(sec, si, base, items.length + 1, probe);
+                        if (more.length > items.length && roomFor(more)) { items = more; continue; }
+                    }
+                    // Round 9 (critic r7 D7-1 / D7-2 fix 5): the next problem does not fit (a
+                    // 12 x 12 chart dealt after one fact left a page of ONE problem), so the slot
+                    // takes another draw that does, a few tries a page, before the page is closed.
+                    let placed = false;
+                    while (!placed && alt < POOL_SLOT_TRIES) {
+                        const add = dealtAt(items, 1, null, 2000 + 101 * alt++);
+                        if (add.length && roomFor(items.concat(add))) { items = items.concat(add); placed = true; }
+                    }
+                    if (!placed) break;
+                }
+                sec.floor = floorWith(si, items);
+            }
+            // whole rows: a page never leaves a bordered empty cell after its last problem
+            // (critic 2026-10-03: counting_all S, 7 problems in 2 columns; mixed_multiplication L,
+            // a lone area model beside an empty cell; round 3 D2: dot_array_mult S, a single-skill
+            // page, 7 in 2 x 4). Only the problems that share the column grid count (a full-width
+            // problem has its own row). The row is filled when the page still holds it (up to four
+            // more problems are tried); else a single-skill page drops back to whole rows, and a
+            // pool page is dealt again from a derived seed (buildSheet's reseat).
+            const single = !pool && !sec.count && shared[si] === null && sec.skills.length === 1 && pagesWanted === 1 && anchorMode === 'off';
+            if ((pool && fitBest > 0) || single) {
+                if (pool) await nextTask();
+                try {
+                    const ceilF = ({ S: 30, M: 20, L: 12 })[String(n.size || 'M').toUpperCase()] || 12;
+                    const holeOf = (its) => {
+                        const Lr = layoutOf(n.role, sec, withTwins(si, its), n, lctx);
+                        const cols = Math.max(1, Number(Lr && Lr.cols) || 1);
+                        // column work (stack / fact) split off into its own grid (practice.js
+                        // fineSplit) is counted there: only the other column problems share this
+                        // one, and the group's own last row is `frem` short of its columns
+                        const narrow = its.filter((it) => !oneColumnOnly(it, n));
+                        const fs = fineSplitOf(n.role, sec, withTwins(si, its), n, lctx);
+                        const narrowN = fs ? fs.mid.length : narrow.length;
+                        return {
+                            cols, rem: cols > 1 ? narrowN % cols : 0, cap: capFromL(sec, si, Lr) * pagesWanted,
+                            fineCols: fs ? fs.cols : 0, frem: fs ? fs.fine.length % fs.cols : 0,
+                        };
+                    };
+                    const floorFor = (its) => floorWith(si, pool ? its : probe.items.concat(its));
+                    // Round 9 (critic r7: 'stack h40%' was the commonest fault of a pool deal).
+                    // Column work the role cannot split into a grid of its own - one stack among
+                    // word problems, or five stacks that fill no whole row - stands in a cell sized
+                    // for the other problems, with a band beside it (H13). The pool deals more
+                    // column work to make a group of its own, else other problems in its place.
+                    if (pool) {
+                        const narrowOf = (its) => its.filter((it) => !oneColumnOnly(it, n));
+                        const loneFine = (its) => {
+                            const nw = narrowOf(its);
+                            const f = nw.filter(isFine).length;
+                            return f > 0 && f < nw.length && !fineSplitOf(n.role, sec, withTwins(si, its), n, lctx);
+                        };
+                        if (loneFine(items)) {
+                            const fits = (its) => { sec.floor = floorFor(its); const hx = holeOf(its); return hx.cap >= its.length && its.length <= ceilF * pagesWanted && !hx.frem && !loneFine(its); };
+                            const fineN = narrowOf(items).filter(isFine).length;
+                            let fixed = null;
+                            for (let add = 1; add <= 4 && !fixed; add++) {
+                                const more = items.concat(dealtAt(items, add, fineQ, 3000 + 10 * add));
+                                if (more.slice(items.length).every(isFine) && fits(more)) fixed = more;
+                            }
+                            if (!fixed) {
+                                const kept = items.filter((it) => !isFine(it) || oneColumnOnly(it, n));
+                                const other = (q, sk) => !fineQ(q, sk);
+                                const counts = [];
+                                for (let c = fineN; c <= fineN + 2; c++) counts.push(c);
+                                for (let c = fineN - 1; c >= 0; c--) counts.push(c);
+                                for (const cnt of counts) {
+                                    const more = cnt ? kept.concat(dealtAt(kept, cnt, other, 4000 + 10 * cnt)) : kept;
+                                    if (more.length && more.slice(kept.length).every((it) => !isFine(it)) && fits(more)) { fixed = more; break; }
+                                }
+                            }
+                            if (fixed) items = fixed;
+                            sec.floor = floorFor(items);
+                        }
+                    }
+                    let h = holeOf(items);
+                    if (h.rem) {
+                        let done = false;
+                        for (let add = 1; add <= 4 && !done; add++) {
+                            const more = !pool || prefixOf(items) ? finalRun(sec, si, base, items.length + add, probe) : items.concat(dealtAt(items, add, null, 5000 + 10 * add));
+                            sec.floor = floorFor(more);
+                            const hm = holeOf(more);
+                            if (hm.cap < more.length || more.length > ceilF * pagesWanted) break;
+                            if (!hm.rem) { items = more; done = true; }
+                        }
+                        // a single-skill page that cannot take the row's last problems drops back to
+                        // whole rows (its rows then share the page, practice.js spreadRows)
+                        if (!done && single && items.length - h.rem >= h.cols) {
+                            const fewer = items.slice(0, items.length - h.rem);
+                            sec.floor = floorFor(fewer);
+                            if (!holeOf(fewer).rem) { items = fewer; done = true; }
+                        }
+                        sec.floor = floorFor(items);
+                    }
+                    // A MIXED POOL's column work stands in a grid of its own (practice.js
+                    // fineSplit); a part-filled last row there is re-laid into wider cells (grid.js
+                    // `relaid`) with bands beside the stacks (round 6: mixed_multiplication S, 3
+                    // stacks in 61.5 mm cells, H13). The pool deals column work to fill that row
+                    // (generateRun `want`, derived seeds: reproducible) while the page holds it;
+                    // else the row's column work is dealt as other problems.
+                    h = holeOf(items);
+                    if (pool && !h.rem && h.frem) {
+                        const dealt = (cnt, want) => dealtAt(items, cnt, want, 1000 + items.length);
+                        const whole = (its) => { sec.floor = floorFor(its); const hx = holeOf(its); return hx.cap >= its.length && its.length <= ceilF * pagesWanted && !hx.rem && !hx.frem; };
+                        let fixed = null;
+                        // fill the row: one, then two rows' worth, of column work
+                        for (let r = 0; r < 2 && !fixed; r++) {
+                            const more = items.concat(dealt(h.fineCols - h.frem + r * h.fineCols, fineQ));
+                            if (more.every((it, i) => i < items.length || isFine(it)) && whole(more)) fixed = more;
+                        }
+                        // else the short row's column work is dealt again as other problems, in
+                        // whole rows of the main grid
+                        if (!fixed) {
+                            const fineIdx = items.map((it, i) => (isFine(it) ? i : -1)).filter((i) => i >= 0);
+                            const drop = new Set(fineIdx.slice(fineIdx.length - h.frem));
+                            const kept = items.filter((_, i) => !drop.has(i));
+                            const other = (q, sk) => !fineQ(q, sk);
+                            // as many as were dropped first, then more, then fewer
+                            const counts = [];
+                            for (let c = h.frem; c <= h.frem + h.cols; c++) counts.push(c);
+                            for (let c = h.frem - 1; c >= 0; c--) counts.push(c);
+                            for (const cnt of counts) {
+                                const more = cnt ? kept.concat(dealt(cnt, other)) : kept;
+                                if (more.slice(kept.length).every((it) => !isFine(it)) && whole(more)) { fixed = more; break; }
+                            }
+                        }
+                        if (fixed) items = fixed;
+                        sec.floor = floorFor(items);
+                    }
+                    // Wave 1 lane D r12c: a pool page whose groups are whole rows takes another whole
+                    // row - of column work, else of the other problems - while the page still holds it
+                    // (the true cell heights, r12c, made mixed_subtraction M a page of 2 stories and 3
+                    // stacks whose rows were stretched to half full, L-DENSITY SPREAD).
+                    h = holeOf(items);
+                    if (pool && !h.rem && !h.frem && !ROW_FILL.off) {
+                        const hadFine = h.fineCols > 0;
+                        const whole = (its) => { sec.floor = floorFor(its); const hx = holeOf(its); return hx.cap >= its.length && its.length <= ceilF * pagesWanted && !hx.rem && !hx.frem && (hx.fineCols > 0) === hadFine; };
+                        const other = (q, sk) => !fineQ(q, sk);
+                        for (let r = 0; r < 2; r++) {
+                            const hx = holeOf(items);
+                            const tryRow = (cnt, want, fine, salt) => {
+                                const more = items.concat(dealtAt(items, cnt, want, salt));
+                                return more.length === items.length + cnt && more.every((it, i) => i < items.length || isFine(it) === fine) && whole(more) ? more : null;
+                            };
+                            const more = (hx.fineCols > 0 ? tryRow(hx.fineCols, fineQ, true, 6000 + 10 * r + items.length) : null) || tryRow(hx.cols, other, false, 6500 + 10 * r + items.length);
+                            if (!more) break;
+                            items = more;
+                            ROW_FILL.used = true;
+                        }
+                        sec.floor = floorFor(items);
+                    }
+                    // A single-skill page never prints the same problem twice to fill its grid
+                    // (round 4: add_sub_10s S filled 3 x 10 from a pool of about 20 facts, so 30 + 10
+                    // printed three times). It holds the skill's distinct problems, in whole rows.
+                    if (single) {
+                        const met = new Set();
+                        const uniq = items.filter((it) => { const s = signature(it.q); if (met.has(s)) return false; met.add(s); return true; });
+                        if (uniq.length < items.length) {
+                            const c = holeOf(uniq).cols;
+                            const k = c > 1 ? uniq.length - (uniq.length % c) : uniq.length;
+                            if (k >= Math.max(2, c)) { items = uniq.slice(0, k); sec.floor = floorFor(items); }
+                        }
+                    }
+                } catch (e) { /* keep the count */ }
+            }
             hostItems = hostItems.concat(markSectionWriteAbove(items));
-        });
+        }
     } else {
         // MORE PRACTICE: each letter under its own seed (PT-MPR-2). The first letter's probe fixes
         // the page capacity; the requested count is spread over the letters like a paginated run
@@ -2832,6 +3384,9 @@ async function buildSheetCore(req = {}) {
         });
     }
 
+    if (mpLetter) for (const it of hostItems) it.letter = mpLetter;
+    for (const it of hostItems) if (it && it.q && !it.sig) it.sig = signature(it.q);
+
     // S6: attach the worked examples - never one of the pupil's problems (signatures differ).
     let anchorsIn = null;
     if (anchorMode !== 'off') {
@@ -2878,7 +3433,7 @@ async function buildSheetCore(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -2890,7 +3445,10 @@ async function buildSheetCore(req = {}) {
         // Wave 5.2: only the pages holding a section that asked for the line print it (D8).
         refSections: nline ? [...nline.sections] : null,
     };
-    let plan = n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
+    // (round 9) one letter dealt by the Independent page's rules (`_mpLetter`) is composed as that page is: the deal
+    // already holds distinct problems in whole rows, and buildSheet checks the printed page; the role's
+    // own re-fit is for letters dealt from the first letter's sample (several skills, worked examples)
+    let plan = mpLetter ? composePractice('more-practice', input) : n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
     // Wave 5.2 (critic nl-r4 D1): the number line never adds a page. A page-driven Independent
     // sheet ("a page", no count) whose band pushes a part overleaf (a split section's full-width
     // group under its grid) gives up its last problems, one at a time, until it is the pages it
@@ -2902,6 +3460,25 @@ async function buildSheetCore(req = {}) {
         plan = t.plan; trimmed = t.trimmed;
     }
     const out = renderPlan(plan, { key: n.key });
+    // NARROW CELLS: problems that print in a cell so much wider than they are that a third of the
+    // cell is empty on each side (RUBRIC H13: a two-digit column sum in a 92 mm cell beside a
+    // six-digit one). buildSheet's reseat never trades a page for a deal with more of them.
+    let narrowCells = 0;
+    try {
+        const byQ = new Map(hostItems.map((it) => [it.q, it]));
+        for (const pg of plan.pages || []) {
+            for (const s of pg.sections || []) {
+                if (s.kind !== 'grid' || !(s.cols > 1) || /mq-anchorgrid/.test(s.cls || '')) continue;
+                for (const pi of s.items || []) {
+                    const it = byQ.get(pi && pi.q);
+                    if (!it) continue;
+                    const span = Number((/grid-column:span (\d+)/.exec(pi.style || '') || [])[1]) || 1;
+                    const w = (itemInfo(it, { size: n.size, look: n.look, paper: n.paper, mode: 'print' }).fp || {}).wMm || 0;
+                    if (w > 0 && w < 0.4 * (LIVE_W_MM * span / s.cols)) narrowCells++;
+                }
+            }
+        }
+    } catch (e) { narrowCells = 0; }
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const pageCount = out.pupilPages.length;
@@ -2923,10 +3500,11 @@ async function buildSheetCore(req = {}) {
         fits,
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
-            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass,
+            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q),
         })),
         gaps: out.gaps,
         numberLine,
+        narrowCells,
         anchors: anchorSummary(anchorMode, anchorsIn ? anchorsIn.bySection.flat().concat(hostItems.map((it) => it.twin).filter(Boolean)) : [], anchorNotes),
         floors: n.sections.map((s) => s.floor || null),
         seed: n.seed,
@@ -2943,12 +3521,9 @@ async function buildSheetCore(req = {}) {
  * The sheet is built exactly as before; the key pages are then restyled (short) and ordered.
  * Adds `docHtml` (pupil and key pages in print order) and `keyOptions` to the result.
  */
-export async function buildSheet(req = {}) {
-    // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own.
-    if (req && req.role === 'detailed-lesson') return buildDetailedLesson(req);
+function keyedSheet(req, build) {
     const ko = normKeyOptions(req.key);
-    const res = await buildSheetCore(Object.assign({}, req, { key: ko.on }));
-    return arrangeKey(res, ko, req);
+    return build(Object.assign({}, req, { key: ko.on })).then((res) => arrangeKey(res, ko, req));
 }
 
 /**
@@ -3622,6 +4197,7 @@ async function buildRoleSheet(n, metaOf) {
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,
             text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, dealtAs: it.dealtAs, measured: it.measured, measureWhy: it.measureWhy,
+            sig: it.q ? signature(it.q) : undefined,
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
         gaps: out.gaps,
@@ -3784,7 +4360,9 @@ async function buildLesson(n, metaOf) {
             const shape = Array.isArray(ps.shape) ? ps.shape : stackShapes[stackShapes.length - 1];
             const sk1 = Object.assign({}, own, n.edgeLast || ps.edgeLast ? { edgeLast: ps.edgeLast || { per: shape[0], cols: shape[1] } } : {});
             const withStrip = (!ps.skill || ps.steps) && stripHtml;   // (`steps`: a sheet with its own skill ref keeps the lesson's Steps - lesson 4 r2)
-            const res = await buildSheet(Object.assign({}, common, {
+            // (Lane D port: inside a queued build, a lesson's own sheets are built without the queue - buildSheet
+            // queues builds one at a time, so a nested buildSheet would wait for itself)
+            const res = await keyedSheet(Object.assign({}, common, {
                 size: practiceSize, role: 'independent', tabId: `Practice ${k}`,
                 // (the pack's own tab: every Practice sheet names the lesson's strand)
                 header: Object.assign({}, common.header, Array.isArray(n.packTab) ? { tab: [...n.packTab, `Practice ${k}`] } : {}),
@@ -3792,7 +4370,7 @@ async function buildLesson(n, metaOf) {
                 seed: (n.seed + 7919 * k) >>> 0,
                 // (`strip`: another chunk's step strip - the words sheet carries the words steps.)
                 stepStrip: ps.strip && ps.strip.html ? ps.strip : withStrip ? { html: stripHtml, hMm: stripH } : undefined,
-            }));
+            }), buildSheetCounted);
             parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml), sheet: k });
             for (const it of res.items || []) practiceTexts.push(refText(it));
             if (packNums) packNums.push(...planKeys(res));
@@ -3800,14 +4378,14 @@ async function buildLesson(n, metaOf) {
     } else if (n.practicePages > 0) {
         let res = null;
         for (const shape of facts ? [null] : stackShapes) {
-            const r = await buildSheet(practiceReq(n.practicePages, true, shape || undefined));
+            const r = await buildSheetInner(practiceReq(n.practicePages, true, shape || undefined));
             const f0 = r.fits && r.fits.sections && r.fits.sections[0];
             const whole = f0 ? f0.clamped !== true : true;
             practiceTried.push({ shape, pages: r.pageCount, clamped: !whole, hMin: f0 && f0.hMin, cellH: f0 && f0.cellH, stripH: +stripH.toFixed(1) });
             if (r.pageCount <= n.practicePages && whole) { res = r; break; }
         }
         // The strip never pushes a page overleaf: without room for it the page prints without it.
-        if (!res) res = await buildSheet(practiceReq(n.practicePages, false));
+        if (!res) res = await buildSheetInner(practiceReq(n.practicePages, false));
         parts.push({ part: 'practice', role: 'independent', res, strip: /data-mq-lesson-strip/.test(res.pupilHtml) });
         for (const it of res.items || []) practiceTexts.push(refText(it));
         if (packNums) packNums.push(...planKeys(res));
@@ -3818,7 +4396,7 @@ async function buildLesson(n, metaOf) {
     if (n.mixed) {
         const withSkills0 = n.mixedSkills || (data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2));
         const withSkills = packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0;
-        const res = await buildSheet(Object.assign({}, common, {
+        const res = await buildSheetInner(Object.assign({}, common, {
             // The lesson's own look (I Can) unless the teacher chose Daily for the packet.
             // Lessons r2: the lesson's own skill fills at least half the page (its weight is the
             // partners' together), the earlier skills the rest.
@@ -4710,6 +5288,601 @@ ${html}
 try{if(d.fonts&&d.fonts.ready){d.fonts.ready.then(done,done);}else{done();}}catch(e){done();}})();</script>
 </body>
 </html>`;
+}
+
+/**
+ * Build a sheet (the one public entry). Builds run one at a time: the teacher print screen starts
+ * a build on every option change, and two builds never interleave their deals (each deal starts in
+ * a task of its own, so a build in progress no longer blocks the page - round 9, critic r7 D7-2).
+ * The result carries `stats`: the build's time, deals, page checks and cell measurements.
+ */
+let buildQueue = Promise.resolve();
+export function buildSheet(req = {}) {
+    // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own (outside the
+    // queue: it builds its pages through buildSheet itself).
+    if (req && req.role === 'detailed-lesson') return buildDetailedLesson(req);
+    const run = buildQueue.then(() => keyedSheet(req, buildSheetCounted));
+    buildQueue = run.catch(() => {});
+    return run;
+}
+
+async function buildSheetCounted(req) {
+    const s0 = Object.assign({}, BUILD_STATS);
+    const t0 = nowMs();
+    const r = await buildSheetInner(req);
+    if (r && typeof r === 'object') {
+        const stats = { ms: Math.round(nowMs() - t0) };
+        for (const k of Object.keys(BUILD_STATS)) stats[k] = Math.round(BUILD_STATS[k] - s0[k]);
+        r.stats = stats;
+    }
+    return r;
+}
+
+/**
+ * Build a sheet, then check that an Auto-count Independent page printed on the pages it was asked
+ * for. The page capacity the section is dealt from is an estimate from the measured items; when
+ * the rows it dealt really need one page more (dot_array_mult: 4 + 1, the last page three
+ * quarters empty - wave 1 lane D, critic 2026-10-02), the count steps down until the sheet is the
+ * pages asked for. Nothing else is touched: a teacher's own count, a lesson's pages and every
+ * other role keep what they were dealt. A mixed pool's page (Independent, or every letter of More
+ * Practice) is filled by `poolPage` instead.
+ */
+async function buildSheetInner(req = {}) {
+    if (morePracticeByLetter(req)) return buildMorePracticeLetters(req);
+    if (autoPoolPage(req)) return poolPage(req);
+    const r = await buildSheetFill0(req);
+    // (round 6, critic r5 D5-5) PG-15: a short last row is never left as an empty area. grid.js
+    // re-lays it (class `relaid`) when nothing better exists; before that, an auto single-skill
+    // independent page is dealt again from a derived seed (seed + k x 7919, reproducible) at the
+    // same count, then one problem fewer, and the first page of whole rows on the pages
+    // asked is kept.
+    try {
+        const secs = Array.isArray(req.sections) ? req.sections : [];
+        const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
+        const s = secs[0];
+        const auto = s && (s.count === undefined || s.count === null || s.count === 'auto' || s.count === '');
+        const holed = (x) => /class="ws-cell blankrun|class="ws-grid[^"]*\brelaid\b/.test(String(x.pupilHtml || ''));
+        if (req._noReseat || asked !== 'independent' || secs.length !== 1 || (s.skills || []).length !== 1 || !auto || !Array.isArray(r.items) || !holed(r)) return r;
+        const wanted = Math.max(1, Math.min(10, Number(s.pages) || 1));
+        const n = r.items.length;
+        const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+        const dupOf = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+        const ok = (alt, k) => alt && alt.pageCount <= wanted && !holed(alt) && !dupOf(alt) && alt.items.length === k;
+        for (let k = 1; k <= 3; k++) {
+            const alt = await buildSheetFill0(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, _noReseat: true }));
+            if (ok(alt, n)) return alt;
+        }
+        for (let d = 1; d <= 1 && n - d >= 2; d++) {
+            for (let k = 0; k <= 2; k++) {
+                const alt = await buildSheetOnce(Object.assign({}, req, k ? { seed: (base + k * 7919) >>> 0 } : {}, { sections: [Object.assign({}, s, { count: n - d })] }));
+                if (ok(alt, n - d)) return alt;
+            }
+        }
+    } catch (e) { /* keep the page as built */ }
+    return r;
+}
+
+/**
+ * Round 8 (critic r6 D6-2): the share of the problem area a sheet's pages fill - the last grid's
+ * bottom against the page body, as lint PAGEFILL measures it - the least over every page but the
+ * last of a sheet of several (PG-23 lets a last page be short). A lone grid reads its height
+ * against its own page (availMm), a page of several grids (a pool's split-off column work,
+ * practice.js fineSplit) the `fill` the role records for it; a page that fills by flex is full.
+ */
+function pageFillOf(x) {
+    const pages = (x && x.plan && Array.isArray(x.plan.pages)) ? x.plan.pages : [];
+    const judged = pages.length > 1 ? pages.slice(0, -1) : pages;
+    let least = 1;
+    for (const pg of judged) {
+        let f = 1;
+        if (typeof pg.fill === 'number') f = pg.fill;
+        else {
+            const grids = (pg.sections || []).filter((g) => g.kind === 'grid');
+            if (grids.length === 1 && grids[0].availMm > 0 && parseFloat(grids[0].height) > 0) f = parseFloat(grids[0].height) / grids[0].availMm;
+        }
+        least = Math.min(least, f);
+    }
+    return least;
+}
+
+/**
+ * Round 8 (critic r6 D6-2 / D6-6): the printed pupil page itself, measured the way lint PAGEFILL
+ * and H13 measure it - the pages are laid out in an off-screen host of the app document (the kit's
+ * stylesheet is the app's), so a pool deal is judged by what prints, not by the plan's estimate:
+ *   fill   the least share of the problem area (first grid's top to the footer) the grids fill,
+ *          over every page but the last of a sheet of several
+ *   bands  cells whose drawing leaves one empty band of 30 % or more of the cell's height or
+ *          width (H13: a narrow fact alone in a half-page cell, a row sized for a taller problem)
+ *   over   cells something sticks out of (PG-12, lint L-OVERFLOW)
+ * null where there is no DOM (the node unit tests): the plan's fill is used instead.
+ */
+function pageCheck(html) {
+    if (typeof document === 'undefined' || !document.body || !html) return null;
+    ensureEngineStyle(document);
+    const host = document.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;left:-30000px;top:0;opacity:0;pointer-events:none;';
+    host.innerHTML = html;
+    document.body.appendChild(host);
+    try {
+        const pages = [...host.querySelectorAll('.ws-page')];
+        if (!pages.length) return null;
+        const shown = (el) => { const cs = getComputedStyle(el); return cs.display !== 'none' && cs.visibility !== 'hidden'; };
+        let fill = 1, bands = 0, over = 0;
+        const banded = [];
+        pages.forEach((pg, i) => {
+            const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter((g) => g.getBoundingClientRect().height > 0);
+            const foot = pg.querySelector('[data-ws-teacher], .ws-foot');
+            if (grids.length && foot && !(pages.length > 1 && i === pages.length - 1)) {
+                const top = Math.min(...grids.map((g) => g.getBoundingClientRect().top));
+                const bot = Math.max(...grids.map((g) => g.getBoundingClientRect().bottom));
+                const ft = foot.getBoundingClientRect().top;
+                if (ft > top) fill = Math.min(fill, (bot - top) / (ft - top));
+            }
+            // r12c: lint L-DENSITY SPREAD - per row, the tallest drawing (20 mm or more, the label
+            // and the padding left out) against the row's inner height; the median row under half
+            // is a page of stretched rows (mixed_multiplication L: a lone row of facts at 86 mm)
+            const spreadRows = new Map();
+            const topRows = [];
+            const lastOfSeveral = pages.length > 1 && i === pages.length - 1;
+            for (const c of pg.querySelectorAll('.ws-grid > .ws-cell:not(.blankrun)')) {
+                if (c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
+                const cr = c.getBoundingClientRect();
+                if (!lastOfSeveral && c.querySelector('[data-ws-label]')) {
+                    const ccs = getComputedStyle(c);
+                    let t = Infinity, b = -Infinity;
+                    for (const d of c.querySelectorAll('*')) {
+                        if (d.matches('[data-ws-label], [data-ws-label] *') || !shown(d)) continue;
+                        const r = d.getBoundingClientRect();
+                        if (!r.height || !r.width || r.height >= cr.height - 1) continue;
+                        t = Math.min(t, r.top); b = Math.max(b, r.bottom);
+                    }
+                    const inner = cr.height - (parseFloat(ccs.paddingTop) || 0) - (parseFloat(ccs.paddingBottom) || 0);
+                    if (b > t && inner > 0) {
+                        const k = Math.round(cr.top);
+                        const row = spreadRows.get(k) || { h: 0, inner: 0 };
+                        row.h = Math.max(row.h, (b - t) / PX_PER_MM); row.inner = Math.max(row.inner, inner / PX_PER_MM);
+                        spreadRows.set(k, row);
+                    }
+                }
+                // PG-12: nothing sticks out of its cell (lint L-OVERFLOW's 0.75 px)
+                for (const d of c.querySelectorAll('*')) {
+                    if (!shown(d)) continue;
+                    const r = d.getBoundingClientRect();
+                    if (r.width && r.height && Math.max(r.right - cr.right, cr.left - r.left, r.bottom - cr.bottom, cr.top - r.top) > 0.75) { over++; break; }
+                }
+                if (cr.height < 12 * PX_PER_MM || cr.width < 12 * PX_PER_MM) continue;
+                const cs = getComputedStyle(c);
+                const inner = { t: cr.top + parseFloat(cs.paddingTop), b: cr.bottom - parseFloat(cs.paddingBottom), l: cr.left + parseFloat(cs.paddingLeft), r: cr.right - parseFloat(cs.paddingRight) };
+                let box = null;
+                for (const d of c.querySelectorAll('*')) {
+                    if (!shown(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                    const ds = getComputedStyle(d);
+                    if (ds.position === 'absolute') continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width || !r.height) continue;
+                    if (d.children.length && !(typeof SVGElement !== 'undefined' && d instanceof SVGElement) && !d.textContent.trim() && !/^(svg|img|canvas)$/i.test(d.tagName)
+                        && !(parseFloat(ds.borderTopWidth) || parseFloat(ds.borderBottomWidth))) continue;
+                    box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right };
+                }
+                if (!box) continue;
+                // CL-4b (owner 2026-10-23, Lane D port): under a cell that starts at the top of its box the band
+                // below the problem is writing room, not a sizing error - judged as lint L-DENSITY H13 does
+                // today: the band above it, and (H13-ROW, after the loop) the band below against its row's.
+                const topCell = cs.justifyContent === 'flex-start' && !c.hasAttribute('data-ws-writeabove') && !c.querySelector('[data-ws-writeabove]');
+                const vBand = topCell ? Math.max(box.t - inner.t, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
+                const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
+                if (vBand >= 0.29 * cr.height || hBand >= 0.29 * cr.width) {
+                    bands++;
+                    banded.push(`${c.getAttribute('data-ws-cell') || '?'} ${vBand >= 0.29 * cr.height ? 'v' : 'h'}${Math.round(100 * Math.max(vBand / cr.height, hBand / cr.width))}%`);
+                } else if (topCell) topRows.push({ c, top: cr.top, H: cr.height, below: Math.max(inner.b - box.b, 0) });
+            }
+            for (const a of topRows) {
+                const row = topRows.filter((b) => b !== a && Math.abs(b.top - a.top) <= PX_PER_MM && Math.abs(b.H - a.H) <= PX_PER_MM);
+                if (!row.length) continue;
+                const excess = a.below - Math.min(...row.map((b) => b.below));
+                if (excess >= 0.29 * a.H) { bands++; banded.push(`${a.c.getAttribute('data-ws-cell') || '?'} row${Math.round((100 * excess) / a.H)}%`); }
+            }
+            const fills = [...spreadRows.values()].filter((r) => r.h >= 20).map((r) => r.h / r.inner).sort((a, b) => a - b);
+            if (fills.length) {
+                const med = fills[Math.floor((fills.length - 1) / 2)];
+                if (med < 0.51) { bands++; banded.push(`spread ${Math.round(med * 100)}%`); }
+            }
+        });
+        return { fill, bands, over, banded };
+    } catch (e) {
+        return null;
+    } finally {
+        host.remove();
+    }
+}
+
+/**
+ * A pool page's quality for the fill below: its printed fill and H13 bands (pageCheck), else the
+ * plan's fill with no band count. `ok`: the page reaches the PAGEFILL floor with no band. The key
+ * is laid out only for a pupil page that passes (round 9: a deal that fails on its pupil page
+ * needs no key to say so).
+ */
+function poolQuality(x) {
+    const t0 = nowMs();
+    try {
+        const m = x && x.pupilHtml ? pageCheck(x.pupilHtml) : null;
+        BUILD_STATS.checks++;
+        const pupilOk = !!m && m.fill >= POOL_FILL_FLOOR && m.bands + m.over === 0;
+        const k = pupilOk && x.keyHtml ? pageCheck(x.keyHtml) : null;
+        if (k) BUILD_STATS.checks++;
+        const fill = m ? m.fill : pageFillOf(x) - 0.02;
+        // a band or an overflow on the pupil page, or an overflow on its key (a key's answer drawn
+        // wider than the pupil's empty slot), is a fault of this deal
+        const bands = m ? m.bands + m.over + (k ? k.over : 0) : 0;
+        return { fill, bands, banded: m ? m.banded : [], ok: fill >= POOL_FILL_FLOOR && bands === 0 };
+    } finally {
+        BUILD_STATS.checkMs += nowMs() - t0;
+    }
+}
+
+/** r12d: the pool page's whole-row fill (buildSheetOnce): `used` when it added a row, `off` to build a deal without it. */
+const ROW_FILL = { used: false, off: false };
+/** PAGEFILL (RUBRIC H13): an Auto pool page leaves no strip over a fifth of its problem area. */
+const POOL_FILL_FLOOR = 0.81;   // measured on the printed page (pageCheck): 1 % of margin over the lint's 80 %
+/** A review page deals at least this many problems where a deal on the page allows it: one 12 x 12
+ *  chart alone (or a chart and one fact) is a page of one kind, not a review (LESSONS L2). */
+const POOL_MIN_ITEMS = 3;
+/**
+ * Round 9 (critic r7 D7-2): the search is a FIXED budget of deals, never a wall-clock limit, so the
+ * same request always prints the same page. Each deal now costs about 0.1-0.3 s in this container
+ * (batched, remembered cell measures), and a deal fills far more often (the slot redraw and the
+ * column-work group in buildSheetDeal), so a passing deal is found within the first few: measured
+ * over 1000 pool builds (5 pools x S/L x Independent/More Practice x 50 seeds) the latest was deal
+ * 11, and ws-sheet-timing holds the build to p90 <= 5 s, max <= 10 s.
+ */
+const POOL_DEALS = 16;
+/** D7-3: a page whose deals all failed is never kept with a band, a strip or under three problems
+ *  while this many deals in all have not been tried (a re-laid short row is the only fault kept). */
+const POOL_DEALS_WIDE = 28;
+/** How many redraws one deal's fill may take for slots whose next problem does not fit. */
+const POOL_SLOT_TRIES = 6;
+
+/** Is this request an Auto-count page of ONE mixed pool (mixed_*, *_all): an Independent page, or
+ *  one letter of a More Practice pool page (`_mpLetter`, buildMorePracticeLetters)? */
+function autoPoolPage(req) {
+    const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
+    const secs = Array.isArray(req.sections) ? req.sections : [];
+    const s = secs[0];
+    if (!(asked === 'independent' || (asked === 'more-practice' && req._mpLetter)) || secs.length !== 1 || !s || (s.skills || []).length !== 1) return false;
+    if (!(s.count === undefined || s.count === null || s.count === 'auto' || s.count === '')) return false;
+    const id = String(s.skills[0].skillId || '');
+    return isMixedMetaSkill(id) || /_all$/.test(id);
+}
+
+/** A More Practice request of ONE skill, Auto count, no worked examples: its letters are dealt one by one. */
+function morePracticeByLetter(req) {
+    const asked = ROLE_ALIASES[req.role] || req.role;
+    if (asked !== 'more-practice' || req._mpLetter || (req.anchors && req.anchors !== 'off')) return false;
+    const secs = Array.isArray(req.sections) ? req.sections : [];
+    const s = secs[0];
+    if (secs.length !== 1 || !s || (s.skills || []).length !== 1) return false;
+    return s.count === undefined || s.count === null || s.count === 'auto' || s.count === '';
+}
+
+/** How many derived deals a single-skill More Practice letter tries before it keeps its best. */
+const LETTER_DEALS = 4;
+
+/**
+ * Round 9 (orchestrator, after critic r7 D7-1): a single-skill More Practice letter is dealt as
+ * the Independent page is (buildSheetFill0: the count fills the page, whole rows, the skill's
+ * distinct problems), under the letter's own seed - never from the FIRST letter's sample, which let
+ * a later letter dealt taller problems (dot arrays) run onto a second side. A letter that still
+ * prints on two sides or fails the printed-page check is dealt again from a derived seed (seed +
+ * k x 7919, reproducible), LETTER_DEALS deals at most; the best is kept: one side first.
+ */
+async function letterPage(req) {
+    const base = Number(req.seed) >>> 0;
+    const blank = (x) => /class="ws-cell blankrun/.test(String(x.pupilHtml || ''));
+    const dupOf = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+    const rank = (x, q) => [x.pageCount <= 1 ? 1 : 0, blank(x) || dupOf(x) ? 0 : 1, -q.bands, q.fill >= POOL_FILL_FLOOR ? 1 : 0, q.fill];
+    const better = (a, b) => { for (let i = 0; i < a.length; i++) { const t = i === a.length - 1 ? 0.01 : 0; if (a[i] > b[i] + t) return true; if (a[i] < b[i] - t) return false; } return false; };
+    let best = null, bestRank = null;
+    const tried = [];
+    for (let k = 0; k < LETTER_DEALS; k++) {
+        const x = await buildSheetFill0(Object.assign({}, req, { seed: k ? (base + k * 7919) >>> 0 : base }));
+        if (!x || !Array.isArray(x.items)) continue;
+        await nextTask();
+        const q = poolQuality(x);
+        tried.push(`${k}:${x.items.length}/${x.pageCount}p/${q.fill.toFixed(2)}${q.bands ? `/b${q.bands}` : ''}`);
+        if (x.pageCount <= 1 && q.ok && !blank(x) && !dupOf(x)) { x.pool = { deal: k, passed: true, tried }; return x; }
+        const rk = rank(x, q);
+        if (!best || better(rk, bestRank)) { best = x; bestRank = rk; best.pool = { deal: k, passed: false, tried }; }
+    }
+    return best;
+}
+
+/**
+ * Round 9 (critic r7 D7-1 [CRITICAL]): More Practice is the teacher print screen's default page
+ * type, and a mixed pool there printed ONE problem a page on 11 of 20 seeds - its letters were
+ * dealt from the first letter's probe capacity (a 12 x 12 chart in the probe made it 1) and the
+ * Independent page's fill never ran. Every letter is now a pool page of its own: dealt under its
+ * own seed (letterSeed, PT-MPR-2, so Practice C reprints the same whatever else prints with it),
+ * filled and checked exactly as an Independent pool page, and the letters are joined into one
+ * sheet in order (each keeps its own header, Score and "1/1" footer, PT-MPR-1).
+ */
+async function buildMorePracticeLetters(req) {
+    const s = req.sections[0];
+    const asked = Array.isArray(req.letters) ? req.letters.map((l) => String(l).toUpperCase()).filter((l) => l.length === 1 && LETTERS.includes(l)) : [];
+    const letters = asked.length ? asked : LETTERS.slice(0, Math.max(1, Math.min(LETTERS.length, Number(s.pages) || 1))).split('');
+    const seed = Number.isFinite(Number(req.seed)) && req.seed !== null && req.seed !== '' ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
+    const parts = [];
+    const pool = autoPoolPage(Object.assign({}, req, { role: 'independent' }));
+    for (const L of letters) {
+        const one = Object.assign({}, req, { seed, letters: [L], _mpLetter: true });
+        parts.push(await (pool ? poolPage(one) : letterPage(one)));
+    }
+    return mergeLetterSheets(parts, seed);
+}
+
+/** Join single-letter More Practice sheets into one (the shape buildSheetOnce returns). */
+function mergeLetterSheets(parts, seed) {
+    if (parts.length === 1) return parts[0];
+    const renumber = (html) => { let i = 0; return html.replace(/(<section class="ws-page [^"]*" )data-ws-page="\d+"/g, (m, a) => `${a}data-ws-page="${++i}"`); };
+    const sheets = parts.flatMap((p) => (p.plan && p.plan.sheets && p.plan.sheets.length ? p.plan.sheets : [p.plan]).filter(Boolean));
+    const first = parts[0];
+    const plan = Object.assign({}, first.plan, {
+        pages: sheets.flatMap((sh) => sh.pages || []),
+        sheets,
+        meta: Object.assign({}, first.plan && first.plan.meta, {
+            letters: sheets.map((sh) => sh.meta && sh.meta.letter),
+            items: parts.reduce((a, p) => a + p.items.length, 0),
+            scoreOutOf: sheets.map((sh) => sh.meta && sh.meta.scoreOutOf),
+            pages: sheets.reduce((a, sh) => a + (sh.pages || []).length, 0),
+            notes: [...new Set(parts.flatMap((p) => (p.plan && p.plan.meta && p.plan.meta.notes) || []))],
+        }),
+    });
+    const pageCount = parts.reduce((a, p) => a + p.pageCount, 0);
+    const notes = [...new Set(parts.flatMap((p) => p.notes || []))];
+    // The per-page lists travel too (r11, merge of the answer-key options): arrangeKey orders and
+    // restyles the key from pupilPages / keyPages / keyPlans, so letter B's pages must be in them
+    // (they held letter A's alone), numbered through the sheet as pupilHtml is.
+    const renumberList = (list) => { let i = 0; return list.map((h) => String(h).replace(/(<section class="ws-page [^"]*" )data-ws-page="\d+"/g, (m, a) => `${a}data-ws-page="${++i}"`)); };
+    const pagesOf = (p, k) => (Array.isArray(p[k + 'Pages']) ? p[k + 'Pages'] : (p[k + 'Html'] ? [p[k + 'Html']] : []));
+    return Object.assign({}, first, {
+        pupilHtml: renumber(parts.map((p) => p.pupilHtml).join('\n')),
+        keyHtml: renumber(parts.map((p) => p.keyHtml || '').filter(Boolean).join('\n')),
+        pupilPages: renumberList(parts.flatMap((p) => pagesOf(p, 'pupil'))),
+        keyPages: renumberList(parts.flatMap((p) => pagesOf(p, 'key'))),
+        keyPlans: parts.flatMap((p) => p.keyPlans || (p.plan ? [p.plan] : [])),
+        pageCount,
+        keyPageCount: parts.reduce((a, p) => a + (p.keyPageCount || 0), 0),
+        fits: Object.assign({}, first.fits, { pages: pageCount }),
+        items: parts.flatMap((p) => p.items),
+        gaps: parts.flatMap((p) => p.gaps || []),
+        narrowCells: parts.reduce((a, p) => a + (p.narrowCells || 0), 0),
+        notes,
+        seed,
+        plan,
+        pool: parts.map((p) => p.pool).filter(Boolean),
+    });
+}
+
+/**
+ * Round 8 (critic r6 D6-2) and round 9 (critic r7 D7-1, D7-2, D7-3): an Auto pool page that fills
+ * its page. A deal is dealt from derived seeds (seed + k x 7919, the same derivation as everywhere
+ * else, so the same request always prints the same page) and judged on its PRINTED pupil page
+ * (pageCheck: the PAGEFILL floor, no H13 band, nothing out of its cell), the key laid out only for
+ * a pupil page that passes. The first deal that passes and holds at least POOL_MIN_ITEMS problems in
+ * whole rows is kept. Round 9 makes this cheap and bounded: every deal starts in a task of its own
+ * (the page stays live), a deal fills its slots far more often, and the search stops after
+ * POOL_DEALS deals - a deterministic budget, never a clock. When no deal passes, the deal kept is
+ * the best by the lint's own order: no band and the floor reached first.
+ */
+async function poolPage(req) {
+    const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
+    const s = req.sections[0];
+    const wanted = asked === 'more-practice' ? 1 : Math.max(1, Math.min(10, Number(s.pages) || 1));
+    const base = Number.isFinite(Number(req.seed)) && req.seed !== null && req.seed !== '' ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
+    // a bordered empty run is never kept; a re-laid short last row (grid.js `relaid`) is taken
+    // only when no deal gives whole rows that fill the page
+    const blank = (x) => /class="ws-cell blankrun/.test(String(x.pupilHtml || ''));
+    const relaid = (x) => /class="ws-grid[^"]*\brelaid\b/.test(String(x.pupilHtml || ''));
+    const dupOf = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+    // the better of two pages: no H13 band or overflow, then the floor reached, then enough
+    // problems for a review, then whole rows, then the fuller
+    const rank = (x, q) => [-q.bands, q.fill >= POOL_FILL_FLOOR ? 1 : 0, Math.min(x.items.length, POOL_MIN_ITEMS), relaid(x) ? 0 : 1, q.fill];
+    const better = (a, b) => { for (let i = 0; i < a.length; i++) { const t = i === a.length - 1 ? 0.01 : 0; if (a[i] > b[i] + t) return true; if (a[i] < b[i] - t) return false; } return false; };
+    let first = null, best = null, bestRank = null, bestK = -1, seenMax = 0;
+    const tried = [];
+    // the lint's own faults: an H13 band or an overflow, a strip under the floor, under three problems
+    const clean = (rk) => !!rk && rk[0] === 0 && rk[1] === 1 && rk[2] >= POOL_MIN_ITEMS;
+    for (let k = 0; k < POOL_DEALS_WIDE; k++) {
+        if (k >= POOL_DEALS && clean(bestRank)) break;
+        const dealReq = Object.assign({}, req, { seed: k ? (base + k * 7919) >>> 0 : base });
+        ROW_FILL.used = false;
+        let x = await buildSheetOnce(dealReq);
+        // r12d: the whole-row fill counts its page from the layout's estimate; when the row it
+        // added runs the deal onto another page, the same deal is built again without it (one
+        // build, never a lost deal: mixed_multiplication S More Practice tried 17 deals)
+        if (ROW_FILL.used && x && x.pageCount > wanted) {
+            ROW_FILL.off = true;
+            try { x = await buildSheetOnce(dealReq); } finally { ROW_FILL.off = false; }
+        }
+        if (!first) first = x;
+        if (!x || !Array.isArray(x.items) || x.pageCount > wanted || blank(x) || dupOf(x)) { tried.push(`${k}:invalid`); continue; }
+        await nextTask();
+        const q = poolQuality(x);
+        tried.push(`${k}:${x.items.length}/${q.fill.toFixed(2)}${q.bands ? `/b${q.bands}` : ''}${relaid(x) ? '/relaid' : ''}`);
+        // r12d (PG-20 / DN-2): a passing deal is kept only when it holds at least half the problems
+        // the fullest valid deal of this page showed it can hold (mixed_addition M More Practice:
+        // letter A kept a 3-problem deal after a 7-problem one)
+        seenMax = Math.max(seenMax, x.items.length);
+        if (q.ok && x.items.length >= POOL_MIN_ITEMS && !relaid(x) && 2 * x.items.length >= seenMax) { x.pool = { deal: k, passed: true, tried }; return x; }
+        const rk = rank(x, q);
+        if (!best || better(rk, bestRank)) { best = x; bestRank = rk; bestK = k; }
+    }
+    const out = best || first;
+    if (out) out.pool = { deal: best ? bestK : 0, passed: false, tried };
+    return out;
+}
+
+async function buildSheetFill0(req = {}) {
+    const r = await buildSheetOnce(req);
+    try {
+        const asked = ROLE_ALIASES[req.role] || req.role || 'independent';
+        const secs = Array.isArray(req.sections) ? req.sections : [];
+        // (round 9) one letter of a single-skill More Practice page is filled as an Independent page
+        if (!(asked === 'independent' || (asked === 'more-practice' && req._mpLetter)) || secs.length !== 1 || (secs[0].skills || []).length !== 1 || !Array.isArray(r.items)) return r;
+        const s = secs[0];
+        if (s.count !== undefined && s.count !== null && s.count !== 'auto' && s.count !== '') return r;
+        const wanted = Math.max(1, Math.min(10, Number(s.pages) || 1));
+        if (!(r.pageCount > wanted)) {
+            // FILL THE COUNT FIRST (critic 2026-10-03, RUBRIC C3): the capacity estimate can stop short
+            // (dot_array_mult L dealt 3 problems where 5 stand), and the rows were then stretched to
+            // share the page. One more problem at a time is tried while the sheet stays on the
+            // pages asked for, the rows measured as dealt, so the page holds what it can.
+            let best = r;
+            // never past the page ceiling the gate holds a page to (12.3 dense capacity: 30 / 20 / 12
+            // standard problems at S / M / L): the fill never adds past it
+            const sz = String(req.size || 'M').toUpperCase();
+            // (critic r8 D8-2) and never past the skill's own owner ceiling (PAGE_CAP)
+            const ceil = () => Math.min(({ S: 30, M: 20, L: 12 })[sz] || 12, pageCapOf(s, sz));
+            // A count that leaves a bordered empty run after the last problem (grid.js blankRun) is
+            // a hole on the page (critic 2026-10-03: mixed_multiplication L, a lone area model
+            // beside an empty cell): the largest count without one is kept, stepping back one
+            // problem when the counts tried all leave one.
+            // (round 6: grid.js re-lays a short last row - class `relaid` - so no hole prints; whole rows
+            // of the skill's own problems are still preferred, so a re-laid page counts here too)
+            const hole = (x) => /class="ws-cell blankrun|class="ws-grid[^"]*\brelaid\b/.test(String(x.pupilHtml || ''));
+            // the share of a lone grid's page its rows fill (first page; 1 when not measured)
+            const fillOf = (x) => {
+                const pg = x.plan && x.plan.pages && x.plan.pages[0];
+                const grids = pg ? pg.sections.filter((g) => g.kind === 'grid') : [];
+                if (grids.length !== 1 || !(grids[0].availMm > 0)) return 1;
+                // (a grid that fills its page by flex carries no height: it fills it)
+                if (grids[0].height === '' || grids[0].height === undefined) return 1;
+                return (parseFloat(grids[0].height) || 0) / grids[0].availMm;
+            };
+            // A single-skill page never prints the same problem twice (round 4 D-B: add_sub_10s S
+            // dealt 22 from a pool of 20 facts): the fill stops at the skill's distinct problems.
+            const dup = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+            const tried = [r];
+            for (let k = 0; k < 4 && best.items.length < 40 && best.items.length + 1 <= ceil() * wanted; k++) {
+                const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
+                if (!(more.pageCount <= wanted) || more.items.length <= best.items.length) break;
+                if (dup(more) && !dup(best)) break;
+                // (critic r8 D8-4) one problem more never trades a filled page for a strip (missing_add_sub
+                // M: 16 in 2 x 8 at 93 % grew to 18 in 3 x 6 at 72 %)
+                if (fillOf(best) >= 0.85 && fillOf(more) < 0.85) break;
+                best = more;
+                tried.push(more);
+            }
+            // A page held short by the skill's own pool (no more distinct problems) and leaving a
+            // strip under its rows is laid in fewer, wider columns: the same distinct problems in
+            // more rows fill the page (round 4 D-B: add_sub_10s S, 18 facts in 3 x 6 over a 40 %
+            // strip; 20 in 2 x 10 fill it). Only whole rows, no repeat, still one page.
+            if (!req._noReseat && (s.columns === undefined || s.columns === null || s.columns === 'auto')) {
+                const capped = (hole(best) || fillOf(best) < 0.85) && (dup(best) || (best.items.length < ceil() * wanted && await (async () => {
+                    const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
+                    return dup(more) || more.items.length <= best.items.length;
+                })()));
+                // Fewer, longer columns for the distinct problems the skill can give (the page
+                // is held short by its own pool): the fullest whole-row layout on the pages asked.
+                const relay = async (pick0) => {
+                    const c0 = Number(best.fits && best.fits.cols) || 1;
+                    let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
+                    for (let c = c0; c >= 1; c--) {
+                        for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
+                            if (n % c || n > ceil() * wanted) continue;
+                            const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n, columns: c, freeRows: true })] }));
+                            if (alt.pageCount > wanted || dup(alt) || hole(alt) || alt.items.length !== n || Number(alt.fits && alt.fits.cols) !== c) continue;
+                            const f = fillOf(alt);
+                            if (f > 1.001) continue;
+                            const better = !pick || (pickFill < 0.85 && f > pickFill + 0.02) || (f >= 0.85 && alt.items.length > pick.items.length);
+                            if (better) { pick = alt; pickFill = f; }
+                            break;
+                        }
+                        if (pickFill >= 0.85) break;
+                    }
+                    return pick;
+                };
+                if (capped) {
+                    const pick = await relay(hole(best) || dup(best) ? null : best);
+                    if (pick) return pick;
+                } else if (!hole(best) && !dup(best) && fillOf(best) < 0.85) {
+                    // A page that still has distinct problems to give and leaves a strip under
+                    // its rows (round 4 D-D: missing_mult_div L, 2 x 8 over a 16 % strip where a
+                    // ninth row stands) takes whole rows more in the same columns while the page
+                    // holds them: two columns then take any row count, not only CL-2's 2/3/4/5/8.
+                    // A row that repeats a problem is dealt again from a derived seed (seed +
+                    // k x 7919, reproducible); when no deal gives the row without a repeat, the
+                    // pool caps the page and it is re-laid in fewer columns (round 5 follow-up:
+                    // number_families_mult_med S, 9 in 3 x 3 over a 30 % strip).
+                    const c0 = Number(best.fits && best.fits.cols) || 1;
+                    const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+                    let pick = best, pickFill = fillOf(best), poolCapped = false;
+                    for (let n = best.items.length + c0; n <= best.items.length + 3 * c0 && n <= Math.max(ceil(), best.items.length + 2 * c0) * wanted && n <= pageCapOf(s, sz) * wanted; n += c0) {
+                        let alt = null;
+                        for (let k = 0; k <= 3; k++) {
+                            const a1 = await buildSheetOnce(Object.assign({}, req, k ? { seed: (base + k * 7919) >>> 0 } : {}, { sections: [Object.assign({}, s, { count: n, columns: c0, freeRows: true })] }));
+                            if (!dup(a1)) { alt = a1; break; }
+                        }
+                        if (!alt) { poolCapped = true; break; }
+                        if (alt.pageCount > wanted || hole(alt) || alt.items.length !== n) break;
+                        const f = fillOf(alt);
+                        if (f > 1.001 || f <= pickFill) break;
+                        pick = alt; pickFill = f;
+                    }
+                    // (critic r8 D8-4) a page the same columns cannot fill - its ceiling stops the
+                    // rows (missing_add_sub M: 18 in 3 x 6 over a 29 % strip, DN-1 holds 20) - is laid
+                    // in fewer, longer columns too, whether the pool or the ceiling stopped it
+                    if (pickFill < 0.85) return relay(pick);
+                    return pick;
+                }
+            }
+            if (!hole(best) || req._noReseat) return best;
+            const whole = tried.filter((x) => !hole(x) && x.items.length >= best.items.length).sort((a, b) => b.items.length - a.items.length)[0];
+            if (whole) return whole;
+            // Dropping the lone problem leaves a strip under the rows (PAGEFILL), so the page is
+            // dealt again from a derived seed (seed + k x 7919, reproducible: the same request
+            // always lands on the same deal) until one fills its rows with as many problems.
+            const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+            const alts = [];
+            for (let k = 1; k <= 4; k++) {
+                const alt = await buildSheetInner(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, _noReseat: true }));
+                if (!hole(alt) && alt.pageCount <= wanted && alt.items.length >= best.items.length && (alt.narrowCells || 0) <= (best.narrowCells || 0)) return alt;
+                alts.push(alt);
+            }
+            // (round 6, critic r5 D5-5) no deal gives whole rows at this count: a deal of whole rows
+            // one problem shorter is taken before the re-laid last row (grid.js `relaid`), which
+            // stretches one problem across a row it was not drawn for
+            let shorter = alts.find((alt) => !hole(alt) && alt.pageCount <= wanted && alt.items.length >= best.items.length - 1);
+            for (let d = 1; !shorter && d <= 2 && best.items.length - d >= 2; d++) {
+                const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length - d })] }));
+                if (!hole(alt) && alt.pageCount <= wanted && alt.items.length === best.items.length - d) shorter = alt;
+            }
+            return shorter || best;
+        }
+        let n = r.items.length, best = r;
+        for (let k = 0; k < 8 && n > 1 && best.pageCount > wanted; k++) {
+            n -= 1;
+            best = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n })] }));
+        }
+        // (round 6, critic r5 D5-5) the count that fits the pages asked can leave a short last row
+        // (re-laid by grid.js, or a blank run): a deal from a derived seed, else one or two
+        // problems fewer in whole rows, is taken first
+        const holed = (x) => /class="ws-cell blankrun|class="ws-grid[^"]*\brelaid\b/.test(String(x.pupilHtml || ''));
+        if (best.pageCount <= wanted && holed(best) && !req._noReseat) {
+            const base = Number.isFinite(Number(req.seed)) ? Number(req.seed) : 0;
+            for (let k = 1; k <= 3; k++) {
+                const alt = await buildSheetOnce(Object.assign({}, req, { seed: (base + k * 7919) >>> 0, sections: [Object.assign({}, s, { count: n })] }));
+                if (alt.pageCount <= wanted && !holed(alt) && alt.items.length === n) return alt;
+            }
+            for (let d = 1; d <= 2 && n - d >= 2; d++) {
+                const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n - d })] }));
+                if (alt.pageCount <= wanted && !holed(alt) && alt.items.length === n - d) return alt;
+            }
+        }
+        return best;
+    } catch (e) {
+        return r;
+    }
 }
 
 export default { buildSheet, sheetDocument };

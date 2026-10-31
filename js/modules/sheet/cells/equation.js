@@ -76,6 +76,14 @@ const unknownValue = (p) => {
 const ACROSS_OP_EM = 0.8;
 const ACROSS_GAP_EM = 0.18;
 /**
+ * The fraction fact on a fact-rows page (owner ruling 2026-10-30): the bar's side pad, the gap
+ * before "=" and the "=" track (em). The "=" glyph's ink is 0.48 em, so a 0.62 em track keeps it
+ * whole; the fraction 144 over 12 with its "=" is then 2.66 em of ink, 15.0 mm at 16 pt.
+ */
+export const FRAC_ROW_PAD_EM = 0.1;
+export const FRAC_ROW_GAP_EM = 0.15;
+export const FRAC_ROW_EQ_EM = 0.62;
+/**
  * Width (mm) of a division fact across with its answer line beside it, for the band's WIDEST
  * fact (a dividend one digit longer than the answer band, a divisor as long as it: 144 ÷ 12),
  * so every fact of one page takes the same form.
@@ -98,7 +106,9 @@ const acrossBelow = (p, ctx) => {
 };
 const slotShape = (p) => {
     const u = p.unknown || 'result';
-    return u === 'op' ? 'circle' : u === 'result' ? 'line' : 'box';
+    // `resultBox`: a page whose other items box their unknown boxes the result too (one answer shape
+    // on the page, missing_mult_div, critic 2026-10-03)
+    return u === 'op' ? 'circle' : u === 'result' ? (p.resultBox ? 'box' : 'line') : 'box';
 };
 
 register('equation', {
@@ -128,13 +138,34 @@ register('equation', {
             const A = u === 'a' ? slotHtml : `<span>${esc(p.a)}</span>`;
             const B = u === 'b' ? slotHtml : `<span>${esc(p.b)}</span>`;
             const R = u === 'result' ? slotHtml : `<span>${esc(result)}</span>`;
+            if (p.notation === 'fraction' && p.fact && u === 'result' && ctx.mode !== 'screen' && ctx.metrics && Number(ctx.metrics.factRowLineMm) > 0) {
+                // A fact-rows page of 5 to 10 columns (owner ruling 2026-10-30: the fraction reaches 10
+                // columns): the vertical-fact grammar - the fraction and its "=" on top, the answer line
+                // under them, centred, in the column's width (DN-22's "answer stacked below"). The bar's
+                // side pad and the "=" track are tightened (FRAC_ROW_*); the line is the band's blank
+                // width, capped at the column's room (`factRowLineMm`), the same on every item (L3).
+                const lineMm = Number(ctx.metrics.factRowLineMm);
+                const slot = slotHtml.replace(/--w:[\d.]+mm/, `--w:${lineMm.toFixed(1)}mm`);
+                // CL-40: the numerator's ink clears the number tab's keep-out (tab side + 1 mm) below the
+                // cell's 3 mm pad - the digit's line box starts 0.2 em above its ink, plus 0.3 mm.
+                return `<div class="ws-eq ws-eq-below" data-ws-notation="fraction" data-ws-fracrow="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em;margin-top:max(0mm, calc(var(--ws-tab, 5mm) - 1.7mm - 0.2em))">`
+                    + `<span style="display:flex;align-items:center;gap:${FRAC_ROW_GAP_EM}em;white-space:nowrap">`
+                    + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
+                    + `<span style="border-bottom:1.5pt solid #000;padding:0 ${FRAC_ROW_PAD_EM}em;">${A}</span><span style="padding:0 ${FRAC_ROW_PAD_EM}em;">${B}</span></span>`
+                    + `<span class="o" style="width:${FRAC_ROW_EQ_EM}em">=</span></span>${slot}</div>`;
+            }
             const body = p.notation === 'fraction'
                 // D3 (critic R1): the fraction bar is a Heavy stroke (1.5 pt, stroke table), and "=" and the
                 // answer line sit on the bar's axis (align-items:center below), on paper as on screen.
                 ? `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
                     + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;">${A}</span><span style="padding:0 0.2em;">${B}</span></span>`
                 : `${B}<span style="border-top:0.75pt solid #000;border-left:0.75pt solid #000;border-top-left-radius:0.4em;padding:0.05em 0.3em 0 0.3em;margin-left:0.15em;">${A}</span>`;
-            return `<div class="ws-eq"${p.notation === 'bracket' ? ` ${WRITE_ABOVE}` : ''} data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
+            // CL-40 / PT-FRW-9 (Lane D restart critic r1 R1-15: "110" over its bar in the L tab's keep-out on
+            // the Opener, Review and Reason It): a division FACT's numerator clears the number tab's keep-out
+            // on every page type, as on fact rows - its line box starts below (tab side - 1.7 mm - 0.2 em).
+            const eq = `<div class="ws-eq"${p.notation === 'bracket' ? ` ${WRITE_ABOVE}` : ''} data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
+            return p.notation === 'fraction' && p.fact && ctx.mode !== 'screen'
+                ? `<div data-ws-fractop="1" style="padding-top:max(0mm, calc(var(--ws-tab, 5mm) - 1.7mm - 0.2 * var(--ws-digit, 22pt)))">${eq}</div>` : eq;
         }
         if (p.fact && u === 'result') {
             // A division FACT across (div_facts Standard, alone or in Mix, critic R2 R-2): ONE across
@@ -170,9 +201,13 @@ register('equation', {
     },
     footprint(p, ctx) {
         const em = (ctx.metrics.digitPt / 72) * 25.4;
-        const chars = String(p.a).length + String(p.b).length + String(p.result ?? compute(p)).length;
         const isDivFact = p.fact && (p.op === '/' || p.op === '÷') && (p.unknown || 'result') === 'result';
         const A = String(p.a).length, B = String(p.b).length;
+        // the drawn sentence: the GIVEN numbers (the unknown is the slot, counted once as the
+        // blank), two 1 em operator tracks, four .28 em gaps (critic 2026-10-03: counting the
+        // unknown's digits as well made "12 x 8 = ___" a full-width line at L, one column of 8)
+        const u = p.unknown || 'result';
+        const known = (u === 'a' ? '' : String(p.a)) + (u === 'b' ? '' : String(p.b)) + (u === 'result' ? '' : String(p.result ?? compute(p)));
         // A division fact's width is its narrowest drawn form (the cell picks the form for its
         // column, see acrossBelow): across, the sentence with the line under it; fraction, the bar
         // with "=" and the line beside it. Other sentences keep their across estimate.
@@ -180,11 +215,14 @@ register('equation', {
             ? em * (0.56 * Math.max(A, B) + 0.4 + 2 * 0.28 + 1) + blankWidth(p.digits || 2, ctx.size) + 6
             : isDivFact && !p.notation
                 ? Math.max(em * (0.56 * (A + B) + 2 * ACROSS_OP_EM + 3 * ACROSS_GAP_EM), blankWidth(p.digits || 2, ctx.size)) + 6
-                : chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
+                : known.length * em * 0.58 + 2 * em + 4 * 0.28 * em + blankWidth(p.digits || 2, ctx.size) + 6;
+        // a one-line sentence is its digit line (+1.5 mm); a fraction-bar or a division fact (its
+        // line under it) adds the writing line
+        const tall = p.notation === 'fraction' || isDivFact;
         return {
             // `fact` (div_facts' Fraction form): a one-line fact cell, packed like the other
             // fact forms of its page instead of measured as a visual.
-            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction' && !p.fact,
+            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + (tall ? ctx.metrics.writeMm + 4 : 1.5)) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction' && !p.fact,
             factLike: !!p.fact, maxCols: 4, stretchCap: STRETCH_CAP.equation,
         };
     },

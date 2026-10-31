@@ -154,6 +154,9 @@ export const SKILL_PRESETS = Object.freeze({
     'number_theory:missing_multiples': { skill: 'multiples', opts: { forms: [3] } },
     'number_theory:common_factors': { skill: 'gcf_easy', opts: { forms: [1] } },
     'number_theory:common_multiples': { skill: 'lcm', opts: { forms: [1] } },
+    // 2026-10-31 (owner, facts card Q4): the long-division bracket on division facts is its own lesson; the
+    // fraction form stays an option.
+    'division:div_facts_long': { skill: 'div_facts', opts: { divForm: 'long' } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

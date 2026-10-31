@@ -38,7 +38,7 @@ export function fact(a, b, op, { pt, padTop = 2, digits = 0, touch = null } = {}
     // S2: `touch` = {a, b, o}: touch dots laid over the digits of a (and / or) b (support-draw.js).
     // The overlay takes no space, so the fact's geometry is the same with and without it.
     const r = (s, on) => [...s].map((ch) => (ch === ' ' ? '<span></span>' : (touch && on && touchDigit(ch, true, touch.o)) || `<span>${ch}</span>`)).join('');
-    const html = `<div class="ws-fact" style="${factGridStyle(n, b)}"><span></span>${r(A, touch && touch.a)}<span class="op">${opGlyph(op)}</span>${r(B, touch && touch.b)}<span class="rule"></span></div>`;
+    const html = `<div class="ws-fact" style="${factGridStyle(n, b, op)}"><span></span>${r(A, touch && touch.a)}<span class="op">${opGlyph(op)}</span>${r(B, touch && touch.b)}<span class="rule"></span></div>`;
     return { cls: 'fact', style: `--fd:${pt}pt;--fp:${padTop}mm`, html };
 }
 
@@ -55,17 +55,31 @@ export const FACT_OP_TRACK_EM = 1.2;
  * has the empty track). A 3-digit dividend over a 1- or 2-digit divisor takes it too.
  */
 export const FACT_OP_TRACK_TIGHT_EM = FACT_TRACK_EM;
+/**
+ * The tight operator track of a stacked DIVISION fact (owner ruling 2026-10-30: ÷ facts reach 10
+ * fact-row columns in every notation). A 3-digit dividend over a 1- or 2-digit divisor ("144" over
+ * "÷ 12") leaves the divisor row's first digit track empty, so the "÷" (Andika ink 0.45 em) needs
+ * only its own ink plus 0.085 em each side: 0.62 em. The empty track still keeps it clear of the
+ * divisor (VA-2), and the fact is (0.62 + 3 x 0.72) em = 15.7 mm at 16 pt, which fits a 10-column
+ * cell (18.0 mm) with the 1 mm clearance each side of the fit gate (fact-rows.js FIT_CLEAR_MM).
+ */
+export const FACT_DIV_OP_TRACK_TIGHT_EM = 0.62;
 /** Digit tracks of a vertical fact: operands and answer, at least 2 (TY-22 keeps 0.72 em). */
 export const factDigitTracks = (a, b, n = 0) =>
     Math.max(2, String(a).length, String(b).length, Number(n) || 0);
-/** The operator track (em) of a fact with `n` digit tracks whose second operand is `b`. */
-export const factOpTrackEm = (n, b) =>
-    (b !== undefined && b !== null && n >= 3 && String(b).length < n ? FACT_OP_TRACK_TIGHT_EM : FACT_OP_TRACK_EM);
+const isDivOp = (op) => op === '/' || op === '÷';
+/**
+ * The operator track (em) of a fact with `n` digit tracks whose second operand is `b` (and, when
+ * given, operator `op`: a division fact takes the tighter ÷ track, FACT_DIV_OP_TRACK_TIGHT_EM).
+ */
+export const factOpTrackEm = (n, b, op) =>
+    (b !== undefined && b !== null && n >= 3 && String(b).length < n
+        ? (isDivOp(op) ? FACT_DIV_OP_TRACK_TIGHT_EM : FACT_OP_TRACK_TIGHT_EM) : FACT_OP_TRACK_EM);
 /**
  * The inline grid a vertical fact carries: one operator track, then n digit tracks. Without `b`
  * (the screen host's older call) the operator keeps the full 1.2 em track.
  */
-export const factGridStyle = (n, b) => `grid-template-columns:${factOpTrackEm(n, b)}em repeat(${n}, ${FACT_TRACK_EM}em)`;
+export const factGridStyle = (n, b, op) => `grid-template-columns:${factOpTrackEm(n, b, op)}em repeat(${n}, ${FACT_TRACK_EM}em)`;
 
 /**
  * CL-21 / CL-30: the top padding a fact cell needs so the black number tab clears the digits.
@@ -77,7 +91,7 @@ export const factPadTop = (labelStyle, cols) => (labelStyle === 'tab' ? (cols >=
  * TY-31: fill of column stays between 55% and 75%; 2.64 em is the drawn width of a 2-track
  * fact. With `b`, a band of 3+ tracks takes the tight operator track (factOpTrackEm).
  */
-export const factWidthMm = (cols, n = 2, b) => (factOpTrackEm(n, b) + n * FACT_TRACK_EM) * (EM_MM[factDigitPt(cols)] || 9.88);
+export const factWidthMm = (cols, n = 2, b, op) => (factOpTrackEm(n, b, op) + n * FACT_TRACK_EM) * (EM_MM[factDigitPt(cols)] || 9.88);
 export const factFillOfColumn = (cols, liveWMm = 186) => factWidthMm(cols) / (liveWMm / cols);
 
 /* ------------------------------------------------------------------ the fact cue (P11) */
@@ -181,11 +195,21 @@ export function factCue(p, { px = 0 } = {}) {
         return wrap(cols * pitch + 1, rows * pitch + 1, body, `${rows} rows of ${cols}`);
     }
     if (kind === 'think') {
-        const w = 36, h = 9;
-        const body = `<rect x="0.3" y="0.3" width="${w - 0.6}" height="${h - 0.6}" rx="1.5" fill="none" stroke="${INK}" stroke-width="0.35"/>`
-            + text(3, 6, `Think: ${b} ×`, 3.6, 'start')
-            + `<rect x="21.5" y="1.8" width="5.4" height="5.4" rx="0.8" fill="none" stroke="${INK}" stroke-width="0.35"/>`
-            + text(28.4, 6, `= ${a}`, 3.6, 'start');
+        // (critic r2 R2-4: "= 108" ran over the 36 mm box's border and the box touched the "x". The box is
+        // measured from its text - Andika advances, "Think:" 2.9 em, a digit 0.59 em, a space 0.26 em, a
+        // sign 0.6 em - and sized for a 2-digit factor and a 3-digit product, so every cell of a page draws
+        // one box of one width with 2 mm of white inside each end.)
+        const fs = 3.6, ADV = 0.59, SP = 0.26, SG = 0.6;
+        const bd = Math.max(2, String(b).length), ad = Math.max(3, String(a).length);
+        const leftW = (2.9 + SP + bd * ADV + SP + SG) * fs;
+        const bx = 2 + leftW + 1.8, bw = 5.4;
+        const rx = bx + bw + 1.2;
+        const rightW = (SG + SP + ad * ADV) * fs;
+        const w = Math.ceil((rx + rightW + 2) * 10) / 10, h = 9;
+        const body = `<rect x="0.3" y="0.3" width="${f2(w - 0.6)}" height="${h - 0.6}" rx="1.5" fill="none" stroke="${INK}" stroke-width="0.35"/>`
+            + text(2, 6, `Think: ${b} ×`, fs, 'start')
+            + `<rect x="${f2(bx)}" y="1.8" width="${bw}" height="5.4" rx="0.8" fill="none" stroke="${INK}" stroke-width="0.35"/>`
+            + text(rx, 6, `= ${a}`, fs, 'start');
         return wrap(w, h, body, `think ${b} times what is ${a}`);
     }
     return '';
@@ -208,6 +232,14 @@ const withCue = (html, p) => (p && p.cue ? `${html}<div class="ws-factcue" style
  * before, so a page whose dialog chose 10 columns was laid out at the 5-column footprint.
  */
 const columnsOf = (p, ctx) => p.columns || (ctx && ctx.options && ctx.options.factColumns) || FACT_AUTO_COLS[ctx && ctx.size] || FACT_AUTO_COLS.L;
+/**
+ * Wave 1 lane D round 8 (critic r6 D6-1): a fact dealt among boxed column work (`boxAns`, Mixed
+ * Multiplication) is drawn on paper at its size's digit metric - the size the missing-digit
+ * stacks and the column work beside it use - so one row of column problems holds ONE digit size
+ * (the fact ladder's 28 pt beside 16 pt stacks at S read as two scales). Never smaller than the
+ * size's metric (content never shrinks); 0 when the fact is not boxed or is drawn on screen.
+ */
+const boxedPt = (p, ctx) => (p.boxAns === true && ctx && !(ctx.mode === 'screen' && !ctx.static) && SIZES[ctx.size] ? SIZES[ctx.size].digitPt : 0);
 
 /* ----------------------------------------------------------------- the across form */
 
@@ -218,6 +250,8 @@ const ACROSS_TIGHT_OP_EM = 0.8;
 const ACROSS_TIGHT_GAP_EM = 0.18;
 /** The drawn height of a vertical fact (em): two operand rows, the rule, the answer zone. */
 const VERT_FACT_EM = 3.6;
+/** An across fact whose answer stays beside it is one line tall (em): the line, and room to write. */
+const BESIDE_FACT_EM = 1.6;
 /** Advance of one Andika digit (em), for the width estimates below. */
 const DIGIT_EM = 0.56;
 /** A cell's content width at `cols` columns: the nominal width less the side pads and borders. */
@@ -243,8 +277,23 @@ const belowMm = (p, pt, size) => {
     const glyphs = DIGIT_EM * (String(p.a).length + String(p.b).length) + 2 * ACROSS_TIGHT_OP_EM + 3 * ACROSS_TIGHT_GAP_EM;
     return Math.max(em * glyphs, blankWidth(Math.max(2, Number(p.digits) || 3), size));
 };
+/**
+ * The digit size of an across fact. `across: 'beside'` (one line, its answer on it) follows the
+ * sheet's SIZE on paper: the payload's point size (or the ladder's) is its ceiling, the preset's
+ * digit size its value below that (wave 1 lane D round 4, D3 / LESSONS L1: at S the ladder grew
+ * the line back to 24 pt, so S printed the same 2 x 8 page as L). Other facts keep TY-30.
+ */
+const acrossPt = (p, ctx, base) => {
+    if (p.across !== 'beside' || !ctx || ctx.mode === 'screen') return base;
+    const s = SIZES[ctx.size];
+    return s && s.digitPt ? Math.min(base, s.digitPt) : base;
+};
 /** 'beside' when the answer fits beside the sentence at this column count, else 'below'. */
 const acrossForm = (p, ctx, pt) => {
+    // `across: 'beside'` (add_sub_10s / add_sub_100s, wave 1 lane D, critic 2026-10-02): the answer
+    // stays ON the equation line at every column count; the page takes as few columns as the
+    // whole sentence needs, never the "answer stacked below" form.
+    if (p.across === 'beside') return 'beside';
     const cols = explicitCols(p, ctx);
     if (!cols || (ctx && ctx.mode === 'screen')) return 'beside';
     return besideMm(p, pt, ctx.size) <= contentMm(cols) - 1 ? 'beside' : 'below';
@@ -289,7 +338,7 @@ register('fact', {
     renderFact(p, ctx) {
         const value = p.ans !== undefined ? p.ans : compute(p);
         const cols = columnsOf(p, ctx);
-        const pt = p.pt || factDigitPt(cols);
+        const pt = drawsAcross(p, ctx) ? acrossPt(p, ctx, p.pt || factDigitPt(cols)) : (p.pt || boxedPt(p, ctx) || factDigitPt(cols));
         // VA-71 / the notation option: vertical rows first, then a horizontal block. An across
         // fact on a page of more than 4 columns (a fact-rows page) is drawn vertical (VA-65).
         const tn = touchNumbers(p);
@@ -306,7 +355,10 @@ register('fact', {
             // height whichever way it is drawn), the spare below the answer (PG-14). So the
             // same item measured across at 1 column and vertical at 5 is one height, not a
             // "collapse" (the host's reflow check), and the answer stays in the top half (CL-4).
-            const hold = ctx.mode === 'screen' ? '' : `min-height:${VERT_FACT_EM}em;`;
+            // `across: 'beside'` holds no spare height: the one line stands in the MIDDLE of its cell
+            // (margin:auto), so a row stretched to share the page splits its spare above and below
+            // (wave 1 lane D: the line pinned to the top of a cell half empty under it).
+            const hold = ctx.mode === 'screen' ? '' : p.across === 'beside' ? 'margin:auto 0;' : `min-height:${VERT_FACT_EM}em;`;
             if (acrossForm(p, ctx, pt) === 'below') {
                 // DN-22's "answer stacked below": the sentence on one line with tighter operator
                 // tracks, the same answer line under it, centred. Its width is the sentence
@@ -326,12 +378,20 @@ register('fact', {
         // the registry the template must stand alone, so the same value is inlined here.
         item.html = item.html.replace('<div class="ws-fact" style="', `<div class="ws-fact" style="--fd:${pt}pt;`);
         // SCC-T15 parity: the open answer zone is typed on screen, in the same place.
-        if (ctx.mode === 'screen' && !ctx.static) {
+        // `boxAns` (a fact dealt among boxed column work, mixed_multiplication): the printed answer is
+        // the kit's answer box too, so the pupil sees where to write (wave 1 lane D).
+        if ((ctx.mode === 'screen' && !ctx.static) || (p.boxAns === true && !Array.isArray(ctx.stepTracks))) {
             const slot = blank({
                 id: 'ans', kind: 'number', shape: 'box', digits: n, graded: true, order: 0,
                 maxLength: n, inputmode: 'numeric', scopes: ['full', 'answer-only'],
             }, ctx, this.answerKey(p));
-            return item.html.replace('<span class="rule"></span>', `<span class="rule"></span><span class="ws-factans" style="grid-column:2 / -1">${slot}</span>`);
+            // (round 8, critic r6 D6-1) on paper the box is sized from the fact's OWN digit size: as
+            // tall as a digit line (never under Hw) and as wide as the widest answer's digit tracks,
+            // so the pupil writes at the size of the problem and the key's digits sit inside it.
+            const paperBox = ctx.mode !== 'screen' || ctx.static
+                ? slot.replace('class="ws-box', 'class="ws-box ws-factbox').replace(/style="--w:([\d.]+)mm"/, `style="--w:$1mm;--fn:${Math.max(n, String(this.answerKey(p).value ?? '').length)}"`)
+                : slot;
+            return item.html.replace('<span class="rule"></span>', `<span class="rule"></span><span class="ws-factans${paperBox !== slot ? ' ws-factans--box' : ''}" style="grid-column:2 / -1">${paperBox}</span>`);
         }
         // The answer zone under the sum rule is open (PG-14: all spare height goes below the
         // rule). It is the same slot in every state (AK-4: the key and the pupil page carry the
@@ -364,7 +424,7 @@ register('fact', {
         if (drawsStack(p, ctx)) return getCell('stack').footprint(stackPayload(p), ctx);
         const cols = columnsOf(p, ctx);
         const n = factDigitTracks(p.a, p.b, p.digits || String(compute(p) ?? '').length);
-        const vertW = Math.ceil(factWidthMm(cols, n, p.b) + 4);
+        const vertW = Math.ceil(factWidthMm(cols, n, p.b, p.op) + 4);
         if (drawsAcross(p, ctx)) {
             // VA-71: a horizontal fact follows the equation fit function (DN-22), which clamps it
             // to 4 columns. It has three drawings, chosen by the column count it is drawn at:
@@ -373,8 +433,15 @@ register('fact', {
             // With no column count yet, the footprint is the narrowest of them (the host
             // measures each count it may choose, DN-10); with one, it is the form drawn there.
             const cAt = explicitCols(p, ctx);
-            const ptA = p.pt || factDigitPt(Math.min(cAt || ACROSS_MAX_COLS, ACROSS_MAX_COLS));
-            const across = Math.ceil((cAt && acrossForm(p, ctx, ptA) === 'beside' ? besideMm(p, ptA, ctx.size) : belowMm(p, ptA, ctx.size)) + 4);
+            const ptA = acrossPt(p, ctx, p.pt || factDigitPt(Math.min(cAt || ACROSS_MAX_COLS, ACROSS_MAX_COLS)));
+            const across = Math.ceil((p.across === 'beside' || (cAt && acrossForm(p, ctx, ptA) === 'beside') ? besideMm(p, ptA, ctx.size) : belowMm(p, ptA, ctx.size)) + 4);
+            if (p.across === 'beside') {
+                // One line tall (BESIDE_FACT_EM) with the label keep-out above and a pad below: the
+                // cell is as tall as its sentence needs, and the width is the whole sentence, so the
+                // page picks the widest column count the sentence fits.
+                const emA = EM_MM[ptA] || (ptA / 72) * 25.4;
+                return { wMm: across, hMm: Math.ceil(emA * BESIDE_FACT_EM + 8), measure: false, factLike: true, maxCols: ACROSS_MAX_COLS };
+            }
             return {
                 wMm: cAt ? across : Math.min(across, vertW), hMm: factCellHMm(cols, ctx.size) + cueHMm(p), measure: !!p.cue,
                 // No `tracks`: an across fact is not stacked work, so 12.3's stacked-digit clamp
@@ -399,6 +466,12 @@ register('fact', {
         return {
             wMm: vertW,
             hMm: factCellHMm(cols, ctx.size),      // VA-70
+            // RUBRIC H13 (sub_facts / add_facts / mult_facts Independent at S, 48 % empty under the
+            // rule): VA-70's height already holds the fact's open answer zone (1.15 em of writing room
+            // under the rule) and its pads, so the dense pass's extra fifth of room (layout.js
+            // DENSE_ROOM 1.2) cost S a row - 4 rows of 20 facts, each then stretched to 57 mm. A bare
+            // fact asks for none: S prints 5 x 5 and M 4 x 5 in 45 mm rows.
+            denseRoom: 1,
             measure: false, factLike: true, maxCols: 10, tracks: FACT_TRACKS,
         };
     },
@@ -409,7 +482,7 @@ register('fact', {
         const horiz = drawsAcross(p, ctx);
         const screen = ctx && ctx.mode === 'screen' && !ctx.static;
         return [{
-            id: 'ans', kind: 'number', shape: horiz ? 'line' : (screen ? 'box' : 'open'), graded: true,
+            id: 'ans', kind: 'number', shape: horiz ? 'line' : (screen || p.boxAns === true ? 'box' : 'open'), graded: true,
             order: 0, maxLength: 3, inputmode: 'numeric', scopes: ['full', 'answer-only'],
         }];
     },
@@ -432,7 +505,7 @@ register('fact', {
     gridItem(p, ctx) {
         if (drawsStack(p, ctx)) return { cls: '', style: '' };
         const cols = columnsOf(p, ctx);
-        const pt = p.pt || factDigitPt(cols);
+        const pt = drawsAcross(p, ctx) ? acrossPt(p, ctx, p.pt || factDigitPt(cols)) : (p.pt || boxedPt(p, ctx) || factDigitPt(cols));
         return { cls: 'fact', style: `--fd:${pt}pt;--fp:${p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols)}mm` };
     },
 });

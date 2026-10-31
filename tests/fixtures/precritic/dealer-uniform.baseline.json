@@ -1,7 +1,23 @@
 {
- "about": "ws-dealer-uniform pins (2026-10-24, lane S1 builder A). Real findings on APPROVED skills, pinned so the gate stays green until their dealers get the page cap: neither generateSubPair/_subOnesBorrow nor generateAddPair/_splitOnesCarry caps a page, so the default 6-page run prints one minuend (or first addend) three times on a page of 20 - the observation critic pilot-su-c r2 N1 counts as the dealer defect ('79 three times'; the fix caps a page at 2 copies of any minuend). Keys are a finding's text up to its first ' ('. Remove a key when the dealer is fixed (the tool reports a pinned key it no longer finds).",
+ "about": "ws-dealer-uniform pins (2026-10-24, lane S1 builder A). Real findings on APPROVED skills, pinned so the gate stays green until their dealers get the page cap: neither generateSubPair/_subOnesBorrow nor generateAddPair/_splitOnesCarry caps a page, so the default 6-page run prints one minuend (or first addend) three times on a page of 20 - the observation critic pilot-su-c r2 N1 counts as the dealer defect ('79 three times'; the fix caps a page at 2 copies of any minuend). Keys are a finding's text up to its first ' ('. Remove a key when the dealer is fixed (the tool reports a pinned key it no longer finds). | 2026-10-31 (Lane D restart r2, F2): division:div_zero_in_quotient is pinned by OWNER RULING 2026-10-31 (design/cards/facts/facts.md hand-over, design/status/laned-restart.md open decisions): the skill KEEPS its 1-in-4 ones-zero deal (a zero in the quotient's tens always, a zero in its ones one item in four), so its a / b / answer digits are over-dealt by design, and the narrow answer set (1..4 hundreds, 0 tens) repeats an answer up to 4 times on a page of 20.",
  "skills": {
-  "subtraction:sub_100_regroup": ["PAGE 4: a = 71 3 times"],
-  "addition:add_100_regroup": ["PAGE 2: a = 7 3 times", "PAGE 2: a = 28 3 times", "PAGE 3: a = 7 3 times", "PAGE 5: a = 17 3 times", "PAGE 6: a = 7 3 times"]
+  "subtraction:sub_100_regroup": [
+   "PAGE 4: a = 71 3 times"
+  ],
+  "addition:add_100_regroup": [
+   "PAGE 2: a = 7 3 times",
+   "PAGE 2: a = 28 3 times",
+   "PAGE 3: a = 7 3 times",
+   "PAGE 5: a = 17 3 times",
+   "PAGE 6: a = 7 3 times"
+  ],
+  "division:div_zero_in_quotient": [
+   "UNIFORM a ones digit: over-dealt under every reading of uniform",
+   "UNIFORM a tens digit: over-dealt under every reading of uniform",
+   "UNIFORM b ones digit: over-dealt under every reading of uniform",
+   "UNIFORM ans ones digit: over-dealt under every reading of uniform",
+   "UNIFORM ans tens digit: over-dealt under every reading of uniform",
+   "PAGE 4: ans = 109 4 times"
+  ]
  }
 }

@@ -1,0 +1,741 @@
+{
+  "id": "facts",
+  "kind": "family",
+  "title": "The four fact drills: + − × ÷ facts on the fact template, fact rows 5 to 10 columns, and ÷ facts in three notations",
+  "template": {
+    "id": "fact",
+    "source": "js/modules/sheet/cells/fact.js",
+    "also": "Fact rows (`js/modules/sheet/roles/fact-rows.js`) redraw every item: + − × and the ÷ sign stacked on `fact`; div_facts' Long division on `division` (`cells/long-division.js`, the compact fact-rows bracket VA-60a) and Fraction on `equation` (`cells/equation.js`, the fact-rows fraction with its answer line under it). `screen-cell.js` draws the same cells on the practice card, online worksheet and quiz."
+  },
+  "families": [],
+  "findingsMatch": {
+    "templates": [
+      "fact"
+    ]
+  },
+  "skills": {
+    "include": [
+      "addition:add_facts",
+      "subtraction:sub_facts",
+      "multiplication:mult_facts",
+      "division:div_facts"
+    ]
+  },
+  "excerptChars": 140,
+  "summary": "Family card for the four fact drills. Each deals one two-number fact per boxed cell from a fact set (a constant, the band, the table) and prints it on the kit `fact` template on every page type; on the fact-rows page (5 to 10 columns) every fact is redrawn at the column ladder's digit. div_facts has five written forms (`divForm`): Standard, Long division, Fraction, Vertical and Mix; on fact rows all three notations - the ÷ sign, the fraction and the bracket - reach the full 10 columns (owner ruling 2026-10-30).",
+  "teaches": "Recall the basic facts: addition and subtraction within 20 (1.OA.6, 2.OA.2), multiplication and division within 100 / 144 (3.OA.7). A fact is recalled, not worked: no regroup boxes, no work rows, one answer. \"Facts to N\" bounds the ANSWER for + (the sum) and the number started from for − (the minuend); the × / ÷ band is the largest product or dividend (10 x 10 or 12 x 12).",
+  "research": "From repo sources: PAGE_TYPES 4.1 (fact rows, PT-FRW-*) and 4.2 (fact probe), WORKSHEET_DESIGN_STANDARD §10 (VA-1..VA-5, VA-60..VA-66, VA-70, VA-71), TY-22 / TY-30 (the fact ladder), design/catalogue/{addition,subtraction,multiplication,division}.md and the div_facts forms rounds (critic R1 / R2). Reference sites (MathWorksheets4Kids timed fact drills, Math-Drills 100-fact pages, IXL fact fluency) deal 50-100 facts a page in vertical or horizontal form; our density is the fact-rows table, never theirs.",
+  "problemTypes": [
+    "vertical fact (+ − ×, and ÷ stacked): two numbers, the operator in its own track, the 1.5 pt rule, the open answer row — the core item",
+    "horizontal fact (\"8 + 7 = __\"): its own section, at most 4 columns (VA-71)",
+    "÷ fact in its written form (div_facts `divForm`): Standard across, Long division (the bracket, quotient above), Fraction (the dividend over the divisor, = __), Vertical (stacked), Mix (one third each of Standard, Long division and Fraction)",
+    "missing-number facts belong to the cloze / unknown skills, not these drills"
+  ],
+  "progression": [
+    "a single constant (\"Add 3\", \"Multiply by 4\") before a mixed set; 0 and 1 facts as their own constants",
+    "the band grows: + / − facts to 10, then to 20; × / ÷ to 10 x 10, then 12 x 12",
+    "the fact drills move from the Independent page (5 x 5 at S, 4 x 5 at M, 3 x 4 at L) to fact rows (10 / 6 / 5 columns at S / M / L) as recall becomes fluent",
+    "÷: one written form a page (Standard first, then the bracket and the fraction), Mix last"
+  ],
+  "drawing": {
+    "sizes": "Fact rows: the column ladder sets the digit (5: 28 pt, 6: 24, 8: 18, 10: 16; TY-30), Auto 10 / 6 / 5 columns at S / M / L (PT-FRW-2), tracks 0.72 em and T = 3 (TY-22), rows from the cell's need (table 4.1, stretch cap 1.3). Other page types: the fact template at the column count the page chose, its measured height (VA-70) with no extra dense room.",
+    "notes": [
+      "÷ on fact rows (owner ruling 2026-10-30, PT-FRW-9): the ÷ sign stacked with a 0.62 em operator track beside a 3-digit dividend (15.7 mm at 16 pt); the fraction with \"=\" beside its bar and the answer line under it (15.0 mm); the bracket on 0.54-1.0 em tracks, a 0.17-0.45 em gutter, centred on its ink (15.8 mm). Every form: ink + 1 mm clear each side (FIT_CLEAR_MM), never below 16 pt.",
+      "Standard (\"12 ÷ 3 = __\") prints stacked on fact rows: the across sentence of 144 ÷ 12 is 28 mm at 16 pt and cannot reach 5 columns at the rung (PT-FRW-7).",
+      "The key writes every answer in place, at the digit size, in the key ink (AK-1, AK-2, INK-31): under the rule (stacked), on the line (fraction), over the vinculum (bracket).",
+      "Screen: the practice card, online worksheet and quiz draw the item's own form (never the fact-rows narrowing), one answer input in the printed place (SCC-T15)."
+    ],
+    "capacity": []
+  },
+  "ruleGroups": [
+    {
+      "title": "Fact rows and ÷ facts at 10 columns (quoted)",
+      "core": true,
+      "chars": 420,
+      "rules": [
+        "PT-FRW-1",
+        "PT-FRW-2",
+        "PT-FRW-5",
+        "PT-FRW-9",
+        "VA-2",
+        "VA-2a",
+        "VA-60a",
+        "VA-65",
+        "CL-40",
+        "CL-4b"
+      ]
+    },
+    {
+      "title": "The fact cell, tracks, ladder and labels",
+      "chars": 120,
+      "rules": [
+        "VA-1",
+        "VA-3",
+        "VA-4",
+        "VA-5",
+        "VA-60",
+        "VA-61",
+        "VA-70",
+        "VA-71",
+        "TY-22",
+        "TY-30",
+        "PT-FRW-3",
+        "PT-FRW-4",
+        "PT-FRW-6",
+        "PT-FRW-7",
+        "PT-FRW-8",
+        "CL-4c",
+        "CL-11a",
+        "CL-21",
+        "CL-31",
+        "HD-5a",
+        "HD-13",
+        "PG-11",
+        "PG-14",
+        "PG-20"
+      ]
+    },
+    {
+      "title": "Keys, screen and the quality bar",
+      "chars": 100,
+      "rules": [
+        "AK-1",
+        "AK-2",
+        "AK-4",
+        "INK-31",
+        "SP-1",
+        "H13",
+        "L1",
+        "L2",
+        "L3"
+      ]
+    },
+    {
+      "title": "Cited by critics on this family's findings (ids only)",
+      "chars": 80,
+      "rules": [
+        "AX-4",
+        "BD-4",
+        "BD-7",
+        "BD-10",
+        "BD-11",
+        "CL-3",
+        "CL-8",
+        "DN-1a",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8",
+        "H9",
+        "H10",
+        "H11",
+        "H12",
+        "L5",
+        "L6",
+        "P-1",
+        "PG-12",
+        "PG-15",
+        "PT-ENG-3",
+        "PT-ENG-5",
+        "PT-FPR-6",
+        "PT-FRM-6",
+        "PT-GDP-1",
+        "PT-GDP-2",
+        "PT-REV-3",
+        "PT-SCR-1",
+        "RP-1",
+        "RP-20",
+        "RP-21",
+        "SL-1",
+        "SL-2",
+        "SL-3",
+        "SL-3a",
+        "SP-2",
+        "SP-10",
+        "SP-12",
+        "TY-10a",
+        "VA-62",
+        "VA-63",
+        "VA-66"
+      ]
+    }
+  ],
+  "ownerRulings": [
+    {
+      "date": "2026-10-31",
+      "ruling": "The long-division bracket prints at 10 columns on fact rows, drawn as in round 2 (after-r2-bracket-S-c10.png: arc 0.62 mm or more from the dividend, about 0.27 mm from the divisor) - an owner-accepted look, not a defect (critic r2 R2-1). Teachers can still pick 8 in Columns. The arc never touches ink and never gets closer than the round-2 drawing (ARC-INK regression guard, both sides). Owner, 2026-10-31 ~18:15: \"i like the long division even at 10 columns.\"",
+      "source": "owner decision 2026-10-31 ~18:15 via the lead session (reverses the ~18:00 8-column change)"
+    },
+    {
+      "date": "2026-10-31",
+      "ruling": "The long-division bracket prints at 10 columns on fact rows, drawn as in round 2 (after-r2-bracket-S-c10.png: arc 0.62 mm or more from the dividend, about 0.27 mm from the divisor) - an owner-accepted look, not a defect (critic r2 R2-1). Teachers can still pick 8 in Columns. The arc never touches ink and never gets closer than the round-2 drawing (ARC-INK regression guard, both sides). Owner, 2026-10-31 ~18:15: \"i like the long division even at 10 columns.\"",
+      "source": "owner decision 2026-10-31 ~18:15 via the lead session (reverses the ~18:00 8-column change)"
+    },
+    {
+      "date": "2026-10-31",
+      "ruling": "div_zero_in_quotient keeps its 1-in-4 zero-in-the-ones-place deal; dealer-uniform is pinned to it.",
+      "source": "owner answers 2026-10-31 via the lead session (AskUserQuestion)"
+    },
+    {
+      "date": "2026-10-31",
+      "ruling": "Shared page-type defects (Scripted model, lesson Steps, Mixed practice S < M, Pre-skill check, Reason It, guided H13, Opener cue) belong to their own page-types lane and do not gate the fact family.",
+      "source": "owner answers 2026-10-31 via the lead session (AskUserQuestion)"
+    },
+    {
+      "date": "2026-10-30",
+      "ruling": "÷ facts reach the full 10 columns on the fact-rows page in ALL THREE notations - the fraction a/b, the ÷ sign and the long-division bracket - at Size S Auto and whenever the teacher picks 10 columns at any size. Digits never shrink below the Size S fact digit (16 pt); the real-fit gate (ink + 1 mm clear each side) and VA-2's operator track still apply; 5 / 6 / 8 columns and Mix still work; the key renders every form.",
+      "source": "Lane D restart brief (work order item 3, design/IMPROVEMENT_PLAN.md); PAGE_TYPES PT-FRW-9"
+    },
+    {
+      "date": "2026-10-03",
+      "ruling": "How a division fact is written is one choice for the page (`divForm`): Standard, Long division, Fraction, Vertical, or Mix (one third each of the first three, blocks of three shuffled by seed). The same kit cell on paper and on every screen host.",
+      "source": "js/modules/skill-options.js divFormOption"
+    },
+    {
+      "date": "2026-10-24",
+      "ruling": "CL-4b on fact rows: a fact starts at the top of its box; a cell whose pupil writes ABOVE the problem (the division bracket) is centred down the box.",
+      "source": "owner decision 2026-10-24 (3); WORKSHEET_DESIGN_STANDARD CL-4b"
+    },
+    {
+      "date": "2026-09-19",
+      "ruling": "\"Within N\" / \"facts to N\" bounds the ANSWER (the sum, the minuend, the product, the dividend), never the operands alone.",
+      "source": "CLAUDE.md"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "M1",
+      "error": "subtracting the smaller digit from the larger whatever the order (13 − 5 read as 5 − 3 in the ones)",
+      "wrong": "12"
+    },
+    {
+      "id": "M2",
+      "error": "counting on / back from the wrong number (starting the count on the first number: 8 + 3 = 10)",
+      "wrong": "off by one"
+    },
+    {
+      "id": "M3",
+      "error": "a neighbouring multiple (7 x 8 = 54, 6 x 9 = 56) or the sum for the product",
+      "wrong": "56 for 6 x 9"
+    },
+    {
+      "id": "M4",
+      "error": "÷ written the other way round: the divisor divided by the dividend, or the bracket read as dividend outside (12 ) 3)",
+      "wrong": "0 or 4 for 3 ÷ 12 vs 12 ÷ 3"
+    }
+  ],
+  "options": [
+    "Declared today (skill-options.js): add_facts / sub_facts / mult_facts / div_facts each have the constant (fact set), the band, the support cue (touch dots, tiles, frame, line, skip strip, array, think box); + − × the notation (stacked / across); div_facts `divForm` (standard / long / fraction / vertical / mix) in place of the notation.",
+    "Fact rows' own controls live on the page, not the skill: Columns (Auto / 5 / 6 / 8 / 10), size, labels, Day bands.",
+    "Owner rule 2026-10-17 (a distinct option is also a findable skill): `divForm` long and fraction are candidate presets (\"Division facts: long division form\", \"Division facts as fractions\"); open question 3."
+  ],
+  "gates": [
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts --strict",
+      "note": "the one table every builder report pastes"
+    },
+    {
+      "cmd": "node tests/scripts/ws-layout-unit.mjs",
+      "note": "fact-rows capacity, R1 real-fit gate, the ÷ forms at 5 / 6 / 8 / 10 columns"
+    },
+    {
+      "cmd": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --opts '{\"divForm\":\"long\"}'",
+      "note": "per form and size: CL40-INK, OVERFLOW, H13; the lane's sweep runs every form x S / M / L x Auto / 5 / 6 / 8 / 10"
+    },
+    {
+      "cmd": "node tests/scripts/ws-div-facts-forms.cjs",
+      "note": "every form on every role, screen hosts, Mix thirds, codes"
+    },
+    {
+      "cmd": "node tests/scripts/ws-screen-answer.cjs --skills addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts",
+      "note": "practice card, online worksheet and quiz draw and score"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/facts/facts.md",
+      "note": "build-start gate"
+    }
+  ],
+  "openQuestions": [
+    {
+      "q": "On fact rows div_facts Standard (\"12 ÷ 3 = __\") prints as the stacked ÷ fact, the same drawing as Vertical: the across sentence of a 3-digit dividend cannot reach 5 columns at its rung. Keep it, or keep a 3-column across page for Standard when the teacher leaves Columns on Auto?",
+      "recommended": "Keep it stacked: fact rows are one vertical form (PT 4.1 purpose, PT-FRW-3), the owner asked for the ÷ sign in 10 columns, and the across form still prints on every other page type and on screen. **ANSWER — Owner 2026-10-31: YES - the ÷ sign prints stacked on fact rows.**"
+    },
+    {
+      "q": "div_facts Mix on fact rows puts the bracket (answer above) beside stacked ÷ and fraction facts (answer below) on one page, which VA-65 forbade for + − × stacks. Accept it for Mix only?",
+      "recommended": "Yes, for Mix only (the owner's own option deals the three notations on one page); every other section keeps the bracket in its own section (PT-FRW-6). **ANSWER — Owner 2026-10-31: YES - Mix may put the three ÷ forms on one page.**"
+    },
+    {
+      "q": "The 10-column bracket needs 0.54 em digit tracks (0.17 mm between the ink of two wide digits such as \"44\") and a near-straight arc (0.4 mm bow) to fit 12 ) 144 with 1 mm clear each side at 16 pt. Accept, or let the bracket page clamp to 8 columns when the band reaches 12 x 12?",
+      "recommended": "Accept for 10 columns (the ruling) and let the critic judge legibility at 100 %; the 8-column page keeps 0.58 em tracks. **ANSWER — Owner 2026-10-31 (final, ~18:15: \"i like the long division even at 10 columns\"): the bracket stays at 10 columns, drawn as in round 2 (design/status/laned-restart/after-r2-bracket-S-c10.png); teachers can still pick 8 in Columns. The earlier ~18:00 change to 8 columns is withdrawn.**"
+    },
+    {
+      "q": "Owner rule 2026-10-17: are `divForm` long and fraction distinct enough to be preset skills (\"Divide: long-division form\", \"Divide: fraction form\")?",
+      "recommended": "Yes for long division (4.NBT.6 / WRM Y4 short division uses the bracket); fraction form stays an option (6.NS / 5.NF.3 is taught by the fraction skills). **ANSWER — Owner 2026-10-31: YES - \"Divide: long-division form\" becomes a preset skill; the fraction form stays an option.**"
+    },
+    {
+      "q": "Independent page at L keeps 3 x 4 = 12 facts in 57 mm rows (33 % under the answer zone) because the L ceiling of standard problems is 12 (12.1). Raise the facts' class to \"short\" (L 16: 3 x 5) in print-sheet's footprintClass?",
+      "recommended": "Yes, in the layout lane (print-sheet.js / layout.js are not this lane's files): facts are one-symbol answers, which 12.1 lets reach 16. **ANSWER — Owner 2026-10-31: YES - facts take the \"short\" class (L 3 x 5 = 15) in the layout lane's files.**"
+    }
+  ],
+  "decisions": {
+    "options": [
+      {
+        "option": "constant",
+        "values": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13"
+        ],
+        "d": "offered",
+        "source": "skill-options.js constantOption; PT 4.1 teacher options",
+        "why": "the fact set: one constant a page or the mixed set; 0 is 0 ÷ n for division"
+      },
+      {
+        "option": "notation",
+        "values": [
+          "stacked",
+          "across"
+        ],
+        "d": "offered",
+        "source": "skill-options.js notationOption; VA-71",
+        "why": "stacked rows first, across as its own section (VA-71); fact rows draw every fact stacked",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts",
+          "multiplication:mult_facts"
+        ]
+      },
+      {
+        "option": "band",
+        "values": [
+          "5",
+          "10",
+          "12",
+          "15",
+          "20"
+        ],
+        "d": "offered",
+        "source": "skill-options.js _opsFactBand; CLAUDE.md within N",
+        "why": "facts to N bounds the sum / the minuend",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "band",
+        "values": [
+          "100",
+          "144"
+        ],
+        "d": "offered",
+        "source": "skill-options.js _opsTableBand",
+        "why": "tables to 10 x 10 or 12 x 12: the largest product or dividend",
+        "skills": [
+          "multiplication:mult_facts",
+          "division:div_facts"
+        ]
+      },
+      {
+        "option": "support",
+        "values": [
+          "touch",
+          "boxsign"
+        ],
+        "d": "offered",
+        "source": "skill-options.js _opsAddCue / _opsMulCue",
+        "why": "one hint cue under the fact, faded to none (P11)"
+      },
+      {
+        "option": "support",
+        "values": [
+          "touchall",
+          "tile",
+          "frame",
+          "line"
+        ],
+        "d": "offered",
+        "source": "skill-options.js _opsAddCue",
+        "why": "+ / − hint cues (P11)",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "support",
+        "values": [
+          "skip",
+          "array"
+        ],
+        "d": "offered",
+        "source": "skill-options.js _opsMulCue",
+        "why": "× / ÷ hint cues (P11)",
+        "skills": [
+          "multiplication:mult_facts",
+          "division:div_facts"
+        ]
+      },
+      {
+        "option": "support",
+        "values": [
+          "think"
+        ],
+        "d": "offered",
+        "source": "skill-options.js _opsMulCue(true)",
+        "why": "the ÷ think box b × [ ] = a (P11)",
+        "skills": [
+          "division:div_facts"
+        ]
+      },
+      {
+        "option": "cover",
+        "values": [
+          "whole",
+          "needed",
+          "fade"
+        ],
+        "d": "offered",
+        "source": "skill-options.js supportsOptions",
+        "why": "which problems carry the support (S2 supports model)"
+      },
+      {
+        "option": "mix",
+        "values": [
+          "section",
+          "problem"
+        ],
+        "d": "offered",
+        "source": "skill-options.js supportsOptions",
+        "why": "how clashing supports are shared (S2 supports model)"
+      },
+      {
+        "option": "divForm",
+        "values": [
+          "standard",
+          "long",
+          "fraction",
+          "vertical",
+          "mix"
+        ],
+        "d": "offered",
+        "source": "skill-options.js divFormOption; PAGE_TYPES PT-FRW-9",
+        "why": "how a division fact is written; on fact rows every notation reaches 10 columns (owner ruling 2026-10-30)",
+        "skills": [
+          "division:div_facts"
+        ]
+      },
+      {
+        "option": "nlOn",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js number-line controls; stack card precedent",
+        "why": "the universal number-line control group (_ap4 patch); graded on the number-line card. A fact's own number-line hint is support=line",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "nlFrom",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js number-line controls; stack card precedent",
+        "why": "the universal number-line control group (_ap4 patch); graded on the number-line card. A fact's own number-line hint is support=line",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "nlTo",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js number-line controls; stack card precedent",
+        "why": "the universal number-line control group (_ap4 patch); graded on the number-line card. A fact's own number-line hint is support=line",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "nlStep",
+        "values": [
+          "1",
+          "2",
+          "5",
+          "10",
+          "20",
+          "25",
+          "50",
+          "100",
+          "1000",
+          "auto",
+          "1/2",
+          "1/3",
+          "1/4",
+          "1/5",
+          "1/6",
+          "1/8",
+          "1/10",
+          "1/12",
+          "0.1",
+          "0.01"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js number-line controls; stack card precedent",
+        "why": "the universal number-line control group (_ap4 patch); graded on the number-line card. A fact's own number-line hint is support=line",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "nlLabels",
+        "values": [
+          "auto",
+          "all",
+          "2",
+          "5",
+          "10",
+          "ends",
+          "none"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js number-line controls; stack card precedent",
+        "why": "the universal number-line control group (_ap4 patch); graded on the number-line card. A fact's own number-line hint is support=line",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "nlMinor",
+        "values": [
+          "auto",
+          "0",
+          "2",
+          "4",
+          "5",
+          "10"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js number-line controls; stack card precedent",
+        "why": "the universal number-line control group (_ap4 patch); graded on the number-line card. A fact's own number-line hint is support=line",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "nlHops",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js number-line controls; stack card precedent",
+        "why": "the universal number-line control group (_ap4 patch); graded on the number-line card. A fact's own number-line hint is support=line",
+        "skills": [
+          "addition:add_facts",
+          "subtraction:sub_facts"
+        ]
+      },
+      {
+        "option": "calculator",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js universal play controls",
+        "why": "a universal play control (screen practice only), graded by the play / screen lanes"
+      },
+      {
+        "option": "skipAfter",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js universal play controls",
+        "why": "a universal play control (screen practice only), graded by the play / screen lanes"
+      }
+    ],
+    "roles": [
+      {
+        "key": "independent",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "the plain page"
+      },
+      {
+        "key": "more-practice",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "More Practice A-J"
+      },
+      {
+        "key": "opener",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "the lesson opener"
+      },
+      {
+        "key": "scripted-model",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "worked steps: real provider workedSteps"
+      },
+      {
+        "key": "guided",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "worked steps: real provider workedSteps"
+      },
+      {
+        "key": "error-analysis",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "real provider wrongAnswer and misconceptions"
+      },
+      {
+        "key": "review",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "earlier skills in data.js order"
+      },
+      {
+        "key": "test",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "Test A / B"
+      },
+      {
+        "key": "pre-skill-check",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "earlier skills in data.js order"
+      },
+      {
+        "key": "word-problems",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "real provider stories"
+      },
+      {
+        "key": "fact-rows",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "the 5-10 column fact layout; ÷ in every notation (PT-FRW-9)"
+      },
+      {
+        "key": "fact-probe",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "the fact probe (PT 4.2)"
+      },
+      {
+        "key": "mixed-practice",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "shelves of each skill; sub_facts now on the kit fact cell like add_facts"
+      },
+      {
+        "key": "true-false",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "real provider wrongAnswer"
+      },
+      {
+        "key": "reason-it",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "real provider workedSteps and wrongAnswer"
+      },
+      {
+        "key": "stretch",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "lesson",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "lesson data: prereqs.js covers 1 of 4 (FALLBACK warm-up for the rest; open)"
+      }
+    ],
+    "hosts": [
+      {
+        "key": "practice-card",
+        "d": "offered",
+        "source": "RUBRIC (every screen host); screen-cell.js",
+        "why": "the practice card"
+      },
+      {
+        "key": "online-worksheet",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "the online worksheet"
+      },
+      {
+        "key": "quiz",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "the quiz"
+      },
+      {
+        "key": "boss",
+        "d": "out of scope",
+        "source": "stack card precedent",
+        "why": "a game mode around the practice card; graded by ws-chromebook-fit"
+      },
+      {
+        "key": "race",
+        "d": "out of scope",
+        "source": "stack card precedent",
+        "why": "a game mode around the practice card; graded by ws-chromebook-fit"
+      },
+      {
+        "key": "map",
+        "d": "out of scope",
+        "source": "stack card precedent",
+        "why": "the skill map; graded by ws-screen-slots"
+      },
+      {
+        "key": "mode-dark",
+        "d": "out of scope",
+        "source": "STATUS 2026-10-24 (dark / big board out of scope)",
+        "why": "a display mode of the screen hosts"
+      },
+      {
+        "key": "mode-bigboard",
+        "d": "out of scope",
+        "source": "STATUS 2026-10-24 (dark / big board out of scope)",
+        "why": "a display mode of the screen hosts"
+      }
+    ]
+  }
+}

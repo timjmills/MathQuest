@@ -15,10 +15,10 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
-    instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm,
+    instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm, splitByWidth,
 } from './compose.js';
 import { FILL_CAP, rowShape, groupByHeight, fillLimit } from '../layout.js';
-import { itemInstructionKey, neutralForKinds, itemKindSig } from './practice.js';
+import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } from './practice.js';
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
 const rowLimit = (m) => fillLimit(m);
@@ -118,7 +118,21 @@ function geometry(pools, input) {
     // The earlier band may print fewer columns than it could, so a WHOLE row of it keeps the share
     // under 45% (a disks Review of three full-width charts takes a mixed row of 2, not 3).
     const eOpts = [];
-    for (let c = E.cols; c >= 1; c--) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx) });
+    // Wave 1 lane D r12c (RUBRIC H13): an earlier step whose problems come in two widths (area
+    // models of 1 x 2 and 1 x 3 parts at M) prints them in two groups under the band's one strip -
+    // the narrow ones in whole rows of their columns, the full-width ones one a row - so a narrow
+    // model never sits alone in a 185 mm cell (area_model_mult_hard Review M: "8 x 77", 31 % empty).
+    const eSplit = splitByWidth(earlier, ctx);
+    if (eSplit) {
+        const Fn = sectionFit(eSplit.narrow, ctx);
+        const hw = hMinAt(eSplit.wide, 1, ctx);
+        for (let c = Fn.cols; c >= 2 && Number.isFinite(hw); c--) {
+            const h = c === Fn.cols ? Fn.h : hMinAt(eSplit.narrow, c, ctx);
+            if (Number.isFinite(h) && h > 0) eOpts.push({ c, h, hw, nMax: eSplit.narrow.length, wMax: Math.min(3, eSplit.wide.length) });
+        }
+    }
+    const split = eOpts.length > 0;
+    if (!split) for (let c = E.cols; c >= 1; c--) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
     const availOf = (kindBands) => m.body - 2 - (bands + kindBands - 1) * m.strip - wrap;
     // What mr rows of the skill's own problems ARE: the bands allocate() prints (one per item
     // kind, whole rows), each row grouped by height and as tall as what it holds (H13). Heights
@@ -149,18 +163,23 @@ function geometry(pools, input) {
     // row, else no mixed row. The most items win; then the share nearest a third; then the
     // skill's own rows (main rows rank first).
     const search = (lo, needE) => {
-        let best = { mRows: 1, eRows: 0, eCols: E.cols, eh: E.h, n: -1, d: 9 };
-        for (const eo of (bands === 2 ? eOpts : [{ c: E.cols, h: E.h }])) {
+        let best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: -1, d: 9 };
+        for (const eo of (bands === 2 ? eOpts : [{ c: E.cols, h: E.h, hw: 0, nMax: Infinity, wMax: 0 }])) {
             for (let mr = 1; mr <= Math.min(20, maxMr); mr++) {
                 const a = mainAt(mr);
                 for (let er = 0; er <= (bands === 2 ? 10 : 0); er++) {
-                    const n = a.n + er * eo.c;
-                    if (n > ceil || a.h + er * eo.h > availOf(a.bands)) continue;
-                    const share = n ? (er * eo.c) / n : 0;
-                    if (share > 0.45 || (needE && (er < 1 || share < lo))) continue;
-                    const d = Math.abs(share - 1 / 3);
-                    const better = n > best.n || (n === best.n && (d < best.d - 1e-9 || (Math.abs(d - best.d) < 1e-9 && mr > best.mRows)));
-                    if (better) best = { mRows: mr, eRows: er, eCols: eo.c, eh: eo.h, n, d };
+                    if (er * eo.c > eo.nMax) break;
+                    for (let ew = 0; ew <= (bands === 2 ? eo.wMax : 0); ew++) {
+                        const nE = er * eo.c + ew;
+                        const n = a.n + nE;
+                        const hE = er * eo.h + ew * eo.hw + (er && ew ? GRID_BORDERS_MM : 0);
+                        if (n > ceil || a.h + hE > availOf(a.bands)) continue;
+                        const share = n ? nE / n : 0;
+                        if (share > 0.45 || (needE && (nE < 1 || share < lo))) continue;
+                        const d = Math.abs(share - 1 / 3);
+                        const better = n > best.n || (n === best.n && (d < best.d - 1e-9 || (Math.abs(d - best.d) < 1e-9 && mr > best.mRows)));
+                        if (better) best = { mRows: mr, eRows: er, eWide: ew, eCols: eo.c, eh: eo.h, ehw: eo.hw, n, d };
+                    }
                 }
             }
         }
@@ -169,10 +188,11 @@ function geometry(pools, input) {
     let best = bands === 2 ? search(0.2, true) : search(0, false);
     if (best.n < 0 && bands === 2) best = search(0, true);
     if (best.n < 0) best = search(0, false);
-    if (best.n < 0) best = { mRows: 1, eRows: 0, eCols: E.cols, eh: E.h, n: M.cols };
+    if (best.n < 0) best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: M.cols };
     const kb = mainAt(best.mRows).bands;
     const avail = availOf(kb);
-    return { cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, rows: best.mRows + best.eRows, avail, h: M.h, eh: best.eh, ctx, strip: m.strip, kindBands: kb };
+    return { cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, eWide: best.eWide || 0, eSplit: split ? eSplit : null,
+        rows: best.mRows + best.eRows + (best.eWide || 0), avail, h: M.h, eh: best.eh, ehw: best.ehw || 0, ctx, strip: m.strip, kindBands: kb };
 }
 
 /** Enough of each pool that the plan can fill its bands with whole rows of each kind. */
@@ -183,7 +203,10 @@ export function counts(pools, input) {
     const all = pools.main || [];
     // The main band is filled from a wider deal (the kinds are shared out in whole rows), the
     // plan printing only what it places.
-    return { main: Math.min(all.length, Math.max(g.mRows * g.cols, 3 * g.mRows * g.cols)), earlier: g.eRows * g.eCols };
+    // An earlier step of two widths (r12c) takes its narrow and its full-width problems from a wider
+    // deal, so each group can be filled; the plan prints only what it places.
+    const eN = g.eRows * g.eCols + g.eWide;
+    return { main: Math.min(all.length, Math.max(g.mRows * g.cols, 3 * g.mRows * g.cols)), earlier: g.eSplit ? Math.min(24, Math.max(eN, 3 * eN)) : eN };
 }
 
 export function plan(input = {}) {
@@ -201,10 +224,19 @@ export function plan(input = {}) {
     const useM = groups.flat();
     // The mixed band's columns never exceed what it was dealt (one earlier problem is one full
     // row, never a problem beside a ruled empty cell, PT-ENG-7).
-    const eCols = Math.max(1, Math.min(g.eCols, g.eRows ? Math.min(earlier.length, g.eRows * g.eCols) : g.eCols));
-    const eRowsN = g.eRows ? Math.floor(Math.min(earlier.length, g.eRows * g.eCols) / eCols) : 0;
-    const useE = eRowsN ? groupByHeight(earlier.slice(0, eRowsN * eCols), eCols) : [];
-    const n = useM.length + useE.length;
+    let eCols, eRowsN, useE, useEW = [];
+    if (g.eSplit) {
+        // r12c: the narrow group in whole rows of its columns, the full-width group under it
+        eCols = g.eCols;
+        eRowsN = g.eRows;
+        useE = eRowsN ? groupByHeight(g.eSplit.narrow.slice(0, eRowsN * eCols), eCols) : [];
+        useEW = g.eSplit.wide.slice(0, g.eWide);
+    } else {
+        eCols = Math.max(1, Math.min(g.eCols, g.eRows ? Math.min(earlier.length, g.eRows * g.eCols) : g.eCols));
+        eRowsN = g.eRows ? Math.floor(Math.min(earlier.length, g.eRows * g.eCols) / eCols) : 0;
+        useE = eRowsN ? groupByHeight(earlier.slice(0, eRowsN * eCols), eCols) : [];
+    }
+    const n = useM.length + useE.length + useEW.length;
     const n0 = Math.max(1, Number(input.lesson) || 1);
     const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: `Review: ${topic}`, score: n });
     const rowsOf = groups.map((gr) => Math.ceil(gr.length / g.cols));
@@ -230,7 +262,8 @@ export function plan(input = {}) {
     const sum = (a) => a.reduce((x, y) => x + y, 0);
     const hsM = groups.map((gr) => rowHs(gr, g.cols, hM));
     const hsE = useE.length ? rowHs(useE, eCols, hE) : [];
-    const used = hsM.reduce((t, a) => t + sum(a), 0) + sum(hsE);
+    const hsEW = useEW.length ? rowHs(useEW, 1, g.ehw || hE) : [];
+    const used = hsM.reduce((t, a) => t + sum(a), 0) + sum(hsE) + sum(hsEW) + (useE.length && useEW.length ? GRID_BORDERS_MM : 0);
     const k = Math.max(1, Math.min(FILL_CAP, avail / Math.max(1, used)));
     // The band's cell: its rows' mean height, grown by the page's share, never past its shortest
     // row's fill limit when the rows are one height (rowShape shares it out when they are not).
@@ -242,6 +275,7 @@ export function plan(input = {}) {
     const cellsM = hsM.map((hs) => cellOf(hs, hM));
     const cellM = cellsM[0] || hM;
     const cellE = cellOf(hsE, hE);
+    const cellEW = cellOf(hsEW, g.ehw || hE);
     const labels = labelStyleOf(ctx.look, input.labels);
     const shaped = (part, items, cols, rows, cellH) => {
         // Each row as tall as what IT holds (layout.rowShape).
@@ -256,13 +290,17 @@ export function plan(input = {}) {
             content: shaped(gridPart(gr.map((it) => planItem(it, { cols: g.cols })), { cols: g.cols, rows: rowsOf[gi], cellH: cellsM[gi], labels, start }), gr, g.cols, rowsOf[gi], cellsM[gi]) });
         start += gr.length;
     });
-    if (useE.length) {
-        sections.push({ kind: 'band', label: 'Mixed Review:', instr: instructionText(instructionKeyOf(useE, input.skills), useE),
-            content: shaped(gridPart(useE.map((it) => planItem(it, { cols: eCols })), { cols: eCols, rows: rowsE, cellH: cellE, labels, start: useM.length + 1 }), useE, eCols, rowsE, cellE) });
+    if (useE.length || useEW.length) {
+        const allE = useE.concat(useEW);
+        const parts = [];
+        if (useE.length) parts.push(shaped(gridPart(useE.map((it) => planItem(it, { cols: eCols })), { cols: eCols, rows: rowsE, cellH: cellE, labels, start: useM.length + 1 }), useE, eCols, rowsE, cellE));
+        if (useEW.length) parts.push(shaped(gridPart(useEW.map((it) => planItem(it, { cols: 1 })), { cols: 1, rows: useEW.length, cellH: cellEW, labels, start: useM.length + useE.length + 1 }), useEW, 1, useEW.length, cellEW));
+        sections.push({ kind: 'band', label: 'Mixed Review:', instr: instructionText(instructionKeyOf(allE, input.skills), allE),
+            ...(parts.length === 1 ? { content: parts[0] } : { contents: parts }) });
     }
     return assemble(ROLE_ID, input, frame, [{ sections }], {
-        meta: { items: n, scoreOutOf: n, earlierShare: n ? useE.length / n : 0,
-            fits: [{ cols: g.cols, rows: rowsM + rowsE, cellH: cellM, line: `Fits: ${g.cols} columns x ${rowsM} rows${rowsE ? ` + ${eCols} x ${rowsE} mixed` : ''}, ${n} per page.` }] },
+        meta: { items: n, scoreOutOf: n, earlierShare: n ? (useE.length + useEW.length) / n : 0,
+            fits: [{ cols: g.cols, rows: rowsM + rowsE + useEW.length, cellH: cellM, line: `Fits: ${g.cols} columns x ${rowsM} rows${rowsE ? ` + ${eCols} x ${rowsE} mixed` : ''}${useEW.length ? ` + 1 x ${useEW.length} mixed (full width)` : ''}, ${n} per page.` }] },
     });
 }
 
