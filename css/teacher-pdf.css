@@ -1,0 +1,59 @@
+/* ==========================================================================
+   teacher-pdf.css — "Preview every page" (pdf-preview lane, owner 2026-10-31: fast PDF previews of printouts)
+
+   A full-screen view over the Print sheet: one bar (the printout's name, its page count, Print, Save as PDF,
+   close) and the printout itself, every page as it will print, in a frame that fills the rest of the window.
+   Values from css/teacher-tokens.css only. Light only. ADDITIVE and scoped to #teacherApp (.tvpdf-*).
+   ========================================================================== */
+
+#teacherApp .tvpdf {
+  --tvpdf-action: var(--action, #3438C6);
+  --tvpdf-action-fg: var(--action-on, #FFFFFF);
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; flex-direction: column;   /* (not a grid: the hidden hint row would pull the frame into an auto row) */
+  background: var(--surface-2);
+  font-family: var(--font-ui); color: var(--text); line-height: var(--lh-body);
+}
+#teacherApp .tvpdf-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-16);
+  padding: var(--sp-8) var(--sp-24);
+  background: var(--surface); border-bottom: var(--line-1) solid var(--line); box-shadow: var(--shadow-1);
+}
+#teacherApp .tvpdf-name { min-width: 0; }
+#teacherApp .tvpdf-title {
+  margin: 0; font-size: var(--fs-20); font-weight: var(--fw-700); line-height: var(--lh-tight);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#teacherApp .tvpdf-meta { margin: 0; font-size: var(--fs-14); color: var(--text-2); }
+#teacherApp .tvpdf-acts { display: flex; align-items: center; gap: var(--sp-8); flex: none; }
+#teacherApp .tvpdf-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-8);
+  min-height: var(--control); min-width: var(--control); padding: 0 var(--sp-16);
+  border: var(--line-1) solid var(--line); border-radius: var(--r-8);
+  background: var(--surface); color: var(--text);
+  font: inherit; font-size: var(--fs-16); font-weight: var(--fw-700); cursor: pointer;
+}
+#teacherApp .tvpdf-btn:hover:not([disabled]) { border-color: var(--text); }
+#teacherApp .tvpdf-btn[disabled] { color: var(--text-3); cursor: default; }
+#teacherApp .tvpdf-btn[aria-busy="true"] { cursor: progress; }
+#teacherApp .tvpdf-primary { background: var(--tvpdf-action); color: var(--tvpdf-action-fg); border-color: var(--tvpdf-action); }
+#teacherApp .tvpdf-primary[disabled] { background: var(--surface-2); color: var(--text-2); border-color: var(--line); }
+#teacherApp .tvpdf-x { padding: 0; }
+#teacherApp .tvpdf :focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: var(--line-2); }
+#teacherApp .tvpdf-hint {
+  margin: 0; padding: var(--sp-8) var(--sp-24);
+  background: var(--action-soft, #E9EBFC); color: var(--text); font-size: var(--fs-16);
+  border-bottom: var(--line-1) solid var(--line);
+}
+#teacherApp .tvpdf-bar, #teacherApp .tvpdf-hint { flex: none; }
+#teacherApp .tvpdf-stage { flex: 1 1 auto; min-height: 0; }
+#teacherApp .tvpdf-frame { display: block; width: 100%; height: 100%; border: 0; background: var(--surface-2); }
+
+/* phone: the name over the buttons; the buttons keep their words except close */
+@media (max-width: 640px) {
+  #teacherApp .tvpdf-bar { flex-wrap: wrap; padding: var(--sp-8) var(--sp-16); gap: var(--sp-8); }
+  #teacherApp .tvpdf-name { flex: 1 1 calc(100% - var(--control) - var(--sp-8)); order: 0; }
+  #teacherApp .tvpdf-acts { order: 1; width: 100%; }
+  #teacherApp .tvpdf-acts .tvpdf-btn:not(.tvpdf-x) { flex: 1; padding: 0 var(--sp-8); }
+  #teacherApp .tvpdf-hint { padding: var(--sp-8) var(--sp-16); }
+}

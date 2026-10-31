@@ -35,6 +35,7 @@ import { planPages, planCounts, PER_PAGE, keyOf } from './teacher-plan.js';
 import { trayGroups, trayLocks, editShareInPlace, setShareFromText, shareHeldText, trayRecord, trayFromSetName } from './teacher-tray.js';
 import { encodeSetParam } from './teacher-ui.js';
 import { printHtml } from './teacher-print.js';
+import { openPdfPreview, warmPdfPreview } from './teacher-pdf-preview.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { mountSample } from './teacher-preview.js';
@@ -261,7 +262,7 @@ function versionFooter(html, label) {
  * Each version: its own seed (seed + v), the same plan (mix, per-skill counts, layout). Keys "after each version"
  * (default) or "all at the end" (S.opts.keyVersions).
  */
-async function buildAll(p, list, quiz, onProgress) {
+async function buildAll(p, list, quiz, onProgress, stop) {
     const versions = versionsOf(quiz);
     const keysAtEnd = versions > 1 && S.opts.keyVersions === 'end';
     const out = { pupil: [], key: [], doc: '', pages: 0, pagesAll: 0, keyPages: 0, byKey: {}, total: 0, printed: 0, errors: [], perVersion: [] };
@@ -275,6 +276,8 @@ async function buildAll(p, list, quiz, onProgress) {
         for (const part of requests(p, list, quiz, v)) {
             if (onProgress) onProgress(++done, parts0 * versions);
             await yieldNow();
+            if (stop && stop()) throw STOPPED;   // a background build whose settings changed: give the page back
+            if (stop && J.hold) await J.hold;    // the full preview is drawing page 1: wait for it
             const rq = versions > 1 ? Object.assign({}, part.req, { keySection: label }) : part.req;
             let res;
             try { res = await buildSheet(rq); } catch (e) {
@@ -321,6 +324,56 @@ async function buildAll(p, list, quiz, onProgress) {
     out.matchesPlan = Object.keys(p.byKey).every((k) => (p.byKey[k] || 0) === (out.byKey[k] || 0)) && Object.keys(out.byKey).every((k) => (p.byKey[k] || 0) === out.byKey[k]);
     out.versions = versions;
     return out;
+}
+const STOPPED = { stopped: true };
+/**
+ * The whole printout, built ONCE for the full preview and for Print (pdf-preview lane, 2026-10-31): the cached build
+ * when its settings are unchanged, the build already running for them, or a new one. A background build (prefetch)
+ * stops at the next page when the settings change; a build someone waits for (Preview, Print) never stops.
+ */
+const J = { sig: '', job: null, tok: 0, onProg: null, bg: false, hold: null };
+/** Pause the shared build between pages while the full preview paints page 1 (at most `ms`). */
+function holdBuild(ms) {
+    let done;
+    const p = new Promise((r) => { done = r; });
+    const t = setTimeout(() => release(), ms);
+    function release() { clearTimeout(t); if (J.hold === p) J.hold = null; done(); }
+    J.hold = p;
+    return release;
+}
+function ensureBuilt(p, list, quiz, onProgress, background = false) {
+    const sig = sigOf(p, list, quiz);
+    if (S.built && S.built.sig === sig) return Promise.resolve(S.built);
+    if (J.job && J.sig === sig) { if (onProgress) J.onProg = onProgress; if (!background) J.bg = false; return J.job; }
+    const my = ++J.tok;
+    J.sig = sig; J.onProg = onProgress || null; J.bg = background;
+    const stale = () => {
+        if (J.tok !== my) return true;
+        if (!J.bg) return false;
+        try { const l = items(); const q = S.sheet === 'quiz'; return !S.sheet || !l.length || sigOf(plan(l), l, q) !== sig; } catch (e) { return true; }
+    };
+    const job = buildAll(p, list, quiz, (i, n) => { if (J.tok === my && J.onProg) J.onProg(i, n); }, stale)
+        .then((b) => { b.sig = sig; if (J.tok === my) { S.built = b; J.job = null; } return b; },
+            (e) => { if (J.tok === my) J.job = null; throw e; });
+    J.job = job;
+    return job;
+}
+/** Background build of the whole printout once page 1 is drawn, so Preview and Print open at once (small sets only). */
+const PREFETCH_MAX_PAGES = 12;
+let prefetchTimer = null;
+function schedulePrefetch() {
+    clearTimeout(prefetchTimer);
+    prefetchTimer = setTimeout(() => {
+        if (!S.sheet || S.sheet === 'share' || S.sheet === 'quizshare' || batchActive() || S.printing) return;
+        const list = items();
+        if (!list.length) return;
+        const p = plan(list);
+        if (p.error) return;
+        const quiz = S.sheet === 'quiz';
+        const pages = (p.pagesBy ? Object.values(p.pagesBy).reduce((a, c) => a + c, 0) : p.pages) || 1;
+        if (pages * versionsOf(quiz) > PREFETCH_MAX_PAGES) return;
+        ensureBuilt(p, list, quiz, null, true).catch(() => null);
+    }, 400);
 }
 /** Versions: a quiz 1–6 (the quiz path), a worksheet 1–20 (owner 2026-10-24). */
 function versionsOf(quiz) { return quiz ? Math.max(1, Math.min(6, S.quiz.versions)) : setsSame() ? 1 : setsOf(); }
@@ -387,6 +440,8 @@ async function runPreview() {
         perChecked.add(perBase(list));
         S.preview = { sig, html: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml, fact: part.fact ? { cols: (res.fits && res.fits.cols) || 0, rows: (res.fits && res.fits.rows) || 0, onPage1: countOnPage1(res), pages: res.pageCount || 1 } : null };
         renderMain(); renderSide();
+        warmPdfPreview(S.opts.paper || 'A4');   // the full preview's frame, loaded while the teacher chooses
+        schedulePrefetch();
         return;
     }
     S.building = false;
@@ -520,7 +575,7 @@ function open(kind, ctx = {}) {
     render();
     // after the first paint: the code (Share) or the page-1 preview (Print / Quiz); the fact-layout probe last
     if (kind === 'share') setTimeout(() => requestAnimationFrame(() => setTimeout(() => { if (S.sheet === 'share') makeLink(); }, 0)), 0);
-    else scheduleBuild(0);
+    else { scheduleBuild(0); warmPdfPreview(S.opts.paper || 'A4'); }   // the full preview's frame loads while the teacher chooses
     const one = items();
     if (one.length === 1 && kind === 'print') setTimeout(() => { if (S.sheet === 'print') probeLayouts(one[0]).then(() => { if (S.sheet === 'print') { renderMain(); if (S.opts.layout !== 'standard') { S.preview = null; scheduleBuild(0); } } }); }, 300);
 }
@@ -559,6 +614,7 @@ function onKey(e) {
     if (!root) return;
     if (e.key === 'Escape') {
         if (document.getElementById('tvBoardOverlay')) return;
+        if (document.getElementById('tvPdfPreview')) return;   // the full preview closes first (its own Esc)
         if (e.target && e.target.classList && e.target.classList.contains('tv-share-in')) return;   // the share input cancels itself
         e.preventDefault();
         if (S.popup) { S.popup = null; renderPopup(); return; }
@@ -773,6 +829,7 @@ function renderSide() {
     side.querySelector('#tvsActBox').innerHTML = `${!quiz && has ? setsHTML() : ''}<button type="button" class="tvs-btn tvs-primary" data-act="print"${ready ? '' : ` aria-disabled="true" data-why="${esc(has ? sm.line : 'Tick skills first')}"`}>${icon('print', 20)}<span>${has ? 'Print' : 'Tick skills first'}</span></button>
     ${quiz ? `<button type="button" class="tvs-btn" data-act="quizshare"${ready ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('link', 18)}<span>Share with pupils</span></button>
     <button type="button" class="tvs-btn" data-act="quizsave"${ready ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('bookmark', 18)}<span>Save</span></button>` : ''}
+    <button type="button" class="tvs-btn" data-act="pdfprev"${ready ? '' : ` aria-disabled="true" data-why="${esc(has ? sm.line : 'Tick skills first')}"`}>${icon('eye', 18)}<span>Preview every page</span></button>
     <button type="button" class="tvs-btn" data-act="renew"${has ? '' : ' aria-disabled="true" data-why="Tick skills first"'}>${icon('shuffle', 18)}<span>New numbers</span></button>`;
     if (S.preview && S.preview.html) showPreview(S.preview.html);
 }
@@ -1027,19 +1084,51 @@ async function doPrint() {
     if (S.printing) return;
     S.printing = true;
     try {
-        let b = S.built && S.built.sig === sig ? S.built : null;
-        if (!b) {
-            b = await buildAll(p, list, quiz, (i, n) => { if (n > 2) toast(`Making the pages… ${i} of ${n}`); });
-            b.sig = sig;
-            S.built = b;
-            S.printed = { sig, pages: b.pages, matchesPlan: b.matchesPlan };
-            renderSide();
-        }
-        if (!b.doc) { toast('These pages could not be built'); return; }
-        const title = quiz ? (S.quiz.name || autoQuizName(list)) : list.length === 1 ? list[0].label : 'Worksheet';
-        S.lastDoc = sheetDocument(b.doc, title, { paper: S.opts.paper || 'A4' });
-        try { await printHtml(b.doc, title, S.opts.paper || 'A4'); } catch (e) { console.warn('[teacher-sheet] print failed', e); toast('Could not open the print dialog'); }
+        const fresh = !(S.built && S.built.sig === sig);
+        const b = await ensureBuilt(p, list, quiz, (i, n) => { if (n > 2) toast(`Making the pages… ${i} of ${n}`); });
+        S.printed = { sig, pages: b.pages, matchesPlan: b.matchesPlan };
+        if (fresh) renderSide();
+        await printBuilt(b, list, quiz);
     } finally { S.printing = false; }
+}
+function printTitle(list, quiz) { return quiz ? (S.quiz.name || autoQuizName(list)) : list.length === 1 ? list[0].label : 'Worksheet'; }
+async function printBuilt(b, list, quiz) {
+    if (!b || !b.doc) { toast('These pages could not be built'); return; }
+    const title = printTitle(list, quiz);
+    S.lastDoc = sheetDocument(b.doc, title, { paper: S.opts.paper || 'A4' });
+    try { await printHtml(b.doc, title, S.opts.paper || 'A4'); } catch (e) { console.warn('[teacher-sheet] print failed', e); toast('Could not open the print dialog'); }
+}
+/**
+ * Preview every page (pdf-preview lane, owner 2026-10-31): the full printout, page by page, exactly as Print sends it.
+ * Page 1 shows at once (the side preview already drew it); the rest is the shared build (often already made in the
+ * background). Print / Save as PDF in the preview print that same build.
+ */
+function openPreviewAll() {
+    const paper = S.opts.paper || 'A4';
+    if (batchActive()) {
+        const parts = EXTRA.parts();
+        const n = parts.length;
+        const first = B.res && B.sig === batchSig(parts) && B.res.parts[0] ? B.res.parts[0].first : '';
+        return openPdfPreview({ title: S.batchTitle || `${n} worksheet${n === 1 ? '' : 's'}`, paper, first,
+            load: (prog) => ensureBatch(prog),
+            print: () => (EXTRA && EXTRA.print ? EXTRA.print() : null) });
+    }
+    const list = items();
+    if (!list.length) { toast('Tick skills first'); return null; }
+    const p = plan(list);
+    if (p.error) { toast(p.error); return null; }
+    const quiz = S.sheet === 'quiz';
+    const sig = sigOf(p, list, quiz);
+    // page 1 as Print has it (one version: no "Form A" in the footer), so it is not swapped when the whole set lands
+    const first = S.preview && S.preview.html && versionsOf(quiz) === 1 && !setsSame() ? versionFooter(S.preview.html, '') : '';
+    const release = first ? holdBuild(1500) : () => {};
+    return openPdfPreview({ title: printTitle(list, quiz), paper, first, onFirst: release,
+        load: (prog) => ensureBuilt(p, list, quiz, prog).then((b) => { S.printed = { sig, pages: b.pages, matchesPlan: b.matchesPlan }; renderSide(); return b; }),
+        print: async () => {
+            if (S.printing) return;
+            S.printing = true;
+            try { await printBuilt(await ensureBuilt(p, list, quiz), list, quiz); } finally { S.printing = false; }
+        } });
 }
 /** For checks: build the whole paper now (as Print does) and return what it holds. */
 export async function buildNow() {
@@ -1047,6 +1136,7 @@ export async function buildNow() {
     if (p.error) return { error: p.error };
     const b = await buildAll(p, list, quiz);
     b.sig = sigOf(p, list, quiz); S.built = b; S.printed = { sig: b.sig, pages: b.pages, matchesPlan: b.matchesPlan };
+    J.tok++; J.job = null;   // a background build for older settings must not overwrite this one
     return { plan: { byKey: p.byKey, pages: p.pagesBy ? Object.values(p.pagesBy).reduce((a, c) => a + c, 0) : p.pages, total: p.total }, byKey: b.byKey, pages: b.pages, matchesPlan: b.matchesPlan, sameCounts: b.sameCounts, versions: b.versions,
         perVersion: b.perVersion.map((x) => ({ byKey: x.byKey, total: x.total, pages: x.pages, firstHash: hashStr(x.first) })), formA: /Form A\b/.test(b.doc), fits0: b.fits0, firstPage: (b.pupil[0] || '').split(/<section\b[^>]*class="ws-page/)[1] || '', doc: sheetDocument(b.doc, 'Worksheet', { paper: S.opts.paper || 'A4' }) };
 }
@@ -1107,6 +1197,7 @@ function onClick(e) {
         case 'paper': S.opts.paper = v; changed(); return;
         case 'renew': S.seed = freshSeed(); S.userSeed = true; S.built = null; S.preview = null; scheduleBuild(0); renderSide(); return;
         case 'print': doPrint(); return;
+        case 'pdfprev': openPreviewAll(); return;
         case 'popup': S.popup = v; renderPopup(); return;
         case 'popclose': { const k = S.popup; S.popup = null; renderPopup(); const back = root.querySelector(`[data-act="popup"][data-v="${CSS.escape(k || '')}"]`); if (back) back.focus(); return; }
         case 'tray': if (typeof window.tvOpenTray === 'function') { close(); window.tvOpenTray(); } return;
@@ -1308,6 +1399,7 @@ function renderBatchSide(side) {
         : `<p class="tvs-sum-line" data-tvs-summary>${esc(`${pl(parts.length, 'worksheet')} · counting the pages…`)}</p><p class="tvs-sum-more" data-tvs-progress>${esc(B.prog || 'Making the worksheets…')}</p>`;
     side.querySelector('#tvsPrevCap').textContent = fresh ? `First page of “${(B.res.parts[0] || {}).title || 'the first worksheet'}” · Print all makes every page` : 'Drawing the first page…';
     side.querySelector('#tvsActBox').innerHTML = `<button type="button" class="tvs-btn tvs-primary" data-act="x-lpprint">${icon('print', 20)}<span>Print all</span></button>
+    <button type="button" class="tvs-btn" data-act="pdfprev">${icon('eye', 18)}<span>Preview every page</span></button>
     <button type="button" class="tvs-btn" data-act="renew">${icon('shuffle', 18)}<span>New numbers</span></button>`;
     if (fresh && B.res.parts[0] && B.res.parts[0].first) showPreview(B.res.parts[0].first);
 }

@@ -1,0 +1,45 @@
+{
+  "timing": {
+    "throttle": 4,
+    "coldFirstMs": 124,
+    "coldAllMs": 4333,
+    "warmFirstMs": 194,
+    "warmAllMs": 347,
+    "backgroundBuildMsAfterPage1": 5062,
+    "pages": 8
+  },
+  "parity": [
+    {
+      "name": "A4 · 2 pages · key at the end",
+      "previewPages": 4,
+      "docPages": 4,
+      "pdfPages": 4,
+      "samePages": true,
+      "meta": "4 pages to print · 2 for pupils + 2 answer keys · A4"
+    },
+    {
+      "name": "Letter · 3 pages · key after each page",
+      "previewPages": 6,
+      "docPages": 6,
+      "pdfPages": 6,
+      "samePages": true,
+      "meta": "6 pages to print · 3 for pupils + 3 answer keys · Letter"
+    },
+    {
+      "name": "2 sets · different problems",
+      "previewPages": 9,
+      "docPages": 9,
+      "pdfPages": 9,
+      "samePages": true,
+      "meta": "9 pages to print · 5 for pupils + 4 answer keys · A4"
+    },
+    {
+      "name": "quiz · 2 versions",
+      "previewPages": 8,
+      "docPages": 8,
+      "pdfPages": 8,
+      "samePages": true,
+      "meta": "8 pages to print · 4 for pupils + 4 answer keys · A4"
+    }
+  ]
+}
