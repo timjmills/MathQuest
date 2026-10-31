@@ -768,6 +768,21 @@ function buildPlan(ctx) {
         if (fs.existsSync(baseS)) plS.push('--baseline', rel(baseS));
         const unpS = sample.filter((k) => !pinnedIds(baseS).has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        // Mixed practice (IMPROVEMENT_PLAN 3.4): the kit's own page checks - M1's one-size-class page (repeats, digits,
+        // ladder, fill, tabs, PG-15) and M2's mixed sizes (arranged, runs, exact counts, two of each, split, H13, fill,
+        // S > M > L on Mixed and Sections, key, alignment). They live beside the role in js/modules/sheet/.
+        if (ctx.role === 'mixed-practice') {
+            for (const [id, file, args, what] of [
+                ['mixed-m2', 'js/modules/sheet/mixed-m2.check.cjs', ['--quick'], 'mixed sizes, exact counts, ladder'],
+                ['mixed-page', 'js/modules/sheet/mixed-page.check.cjs', ['--seeds', '2'], 'one size class: repeats, digits, ladder, fill'],
+            ]) {
+                const g = gate(id, `${path.basename(file)} ${args.join(' ')}`, `Mixed practice: ${what}`, 'browser', id, args);
+                g.file = path.join(ROOT, file);
+                g.missing = fs.existsSync(g.file) ? null : `${file} is not in this tree`;
+                g.script = `${id} check`;   // (its verdict line: "mixed-m2 check: OK")
+                add(g);
+            }
+        }
     }
     if (ctx.teacher) {
         for (const n of ['shell', 'library', 'preview', 'quiz']) add(gate(`teacher-${n}`, `ws-teacher-${n}`, 'teacher site', 'browser', `ws-teacher-${n}`, []));

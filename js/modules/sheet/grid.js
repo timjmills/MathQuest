@@ -36,14 +36,25 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
  *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0 } = {}) {
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, trail = null } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     let k = start;
+    // `place` (the mixed packer, sheet/mixed-pack.js): a cell set on the page lattice - its first
+    // column and row and how many it spans (a 2 x 1 box, a 2 x 2 box beside a block of facts).
+    const placed = cells.some((c) => c && typeof c === 'object' && c.place);
     const out = cells.map((c, i) => {
         const item = typeof c === 'string' ? { html: c } : c;
         const lab = unlabelled.includes(i) || item.nolabel ? (item.model ? label('model') : '') : label(labels, k++);
-        return cell(item.html, { label: lab, cls: item.cls || '', style: item.style || '', keyAttr: item.keyAttr || '' });
+        const p = item.place;
+        const at = p ? `grid-column:${p.col} / span ${p.span || 1};grid-row:${p.row || 1} / span ${p.rows || 1};` : '';
+        return cell(item.html, { label: lab, cls: item.cls || '', style: at + (item.style || ''), keyAttr: item.keyAttr || '' });
     });
+    if (placed) {
+        // PG-15: a placed shelf that stops short ends in ONE unruled area to the frame, every row.
+        if (trail && trail.col) out.push(`<div class="ws-cell blankrun" style="--from:${trail.col};grid-row:1 / span ${trail.rows || 1}"></div>`);
+        const r0 = rows || 1;
+        return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r0},1fr)`};${height ? `height:${height};` : ''}">${out.join('')}</div>`;
+    }
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
     const used = cells.length + (spanFirst ? cols - 1 : 0);
     if (used < n) out.push(blankRun((used % cols) + 1));

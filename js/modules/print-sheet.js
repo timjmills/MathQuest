@@ -2439,6 +2439,13 @@ async function buildSheetCore(req = {}) {
         return firstQ.get(key);
     };
     if (n.role === 'lesson') return buildLesson(n, metaOf);
+    // M2: an Independent or More practice sheet of 2+ skills asked for 'mixed' is planned by the
+    // Mixed practice packer, in that role's look and tab ('sections' keeps the practice path).
+    const nSkills = new Set(n.sections.flatMap((s) => s.skills.map((k) => `${k.categoryId}:${k.skillId}`))).size;
+    if (PRACTICE_ROLES.has(n.role) && n.arrangement === 'mixed' && nSkills >= 2 && n.anchors === 'off') {
+        const res = await buildRoleSheet(Object.assign({}, n, { role: 'mixed-practice', mixAs: n.role }), metaOf);
+        return Object.assign(res, { role: n.role });
+    }
     if (!PRACTICE_ROLES.has(n.role)) return buildRoleSheet(n, metaOf);
 
     // DN-31 / DN-34: a section of several skills is GROUPED, never silently mixed - one
@@ -3142,6 +3149,65 @@ function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     return out;
 }
 
+/* ------------------------------------------------- Mixed practice M2: counts and cues */
+
+/** Instructions a computation cell's own sign already says (no cue on a "Solve." page). */
+const MIX_SIGN_KEYS = new Set(['add', 'subtract', 'multiply', 'divide', 'mixed-sign', 'mixed-ops', 'default-solve', 'default-write']);
+
+/**
+ * The library instruction shortened by rule into a cell's cue (IMPROVEMENT_PLAN 3.3, until a skill
+ * has its own `strings.cue`): its first sentence; a trailing "that / which / for / to show ..."
+ * phrase cut off when the words before it still say the task (3+ words); a sentence still over 8
+ * words keeps its first clause (before the comma). Never cut mid-phrase.
+ */
+export function shortCue(text) {
+    let t = String(text || '').trim().split(/(?<=[.!?])\s+/)[0] || '';
+    t = t.replace(/[.!?]+$/, '').trim();
+    const m = /\s(that|which|for|to show|so that|in each|in the|on the)\s/i.exec(t);
+    if (m && t.slice(0, m.index).trim().split(/\s+/).length >= 3) t = t.slice(0, m.index).trim();
+    if (t.split(/\s+/).length > 8 && t.includes(',')) t = t.slice(0, t.indexOf(',')).trim();
+    return t ? `${t}.` : '';
+}
+
+/** Put a cue line at the top of an item's cell (both states: the key is the same drawing). */
+function withCue(it, text) {
+    const r0 = it.render;
+    if (typeof r0 !== 'function' || !text) return it;
+    const esc = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    it.render = (c, o) => `<div class="ws-mixcue">${esc}</div>${r0(c, o)}`;
+    it.cue = text;
+    return it;
+}
+
+/**
+ * The exact counts of a Mixed practice request (the owner's "specified problem distribution"): every
+ * section carries `count` and there are 2+ sections -> {poolId: n} for the role's one-skill pools
+ * (a section of several skills shares its count by weight); else null.
+ */
+function mixedExactCounts(n, pools) {
+    if (n.role !== 'mixed-practice' || n.sections.length < 2 || !n.sections.every((s) => Number(s.count) > 0)) return null;
+    const bySkill = new Map();
+    for (const sec of n.sections) {
+        const sks = sec.skills;
+        const w = sks.map((k) => (Number(k.weight) > 0 ? Number(k.weight) : 1));
+        const W = w.reduce((a, b) => a + b, 0);
+        let left = sec.count;
+        sks.forEach((k, i) => {
+            const c = i === sks.length - 1 ? left : Math.round((sec.count * w[i]) / W);
+            left -= c;
+            const key = `${k.categoryId}:${k.skillId}`;
+            bySkill.set(key, (bySkill.get(key) || 0) + c);
+        });
+    }
+    const out = {};
+    for (const p of pools) {
+        const k = p.skills[0];
+        out[p.id] = bySkill.get(`${k.categoryId}:${k.skillId}`) || 0;
+        bySkill.set(`${k.categoryId}:${k.skillId}`, 0);
+    }
+    return out;
+}
+
 /** Roles whose cells show a finished answer in the skill's own slot (they need `canShow`). */
 const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 
@@ -3202,9 +3268,14 @@ async function buildRoleSheet(n, metaOf) {
         // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
         arrangement: 'sections',
     };
+    // M2: an Independent / More practice sheet planned as a mixed page keeps its role's tab.
+    if (n.mixAs === 'independent') input.mixTabId = n.tabId || `Lesson ${n.lesson || 1}`;
+    else if (n.mixAs === 'more-practice') input.mixTabId = n.tabId || 'Practice 1';
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
     // line is "Solve.", so a cell's "Add." / "Write the time." is not said twice.
     let keepPrompts = false;
+    // M2: a pool's short in-cell instruction (IMPROVEMENT_PLAN 3.3 "a short instruction in each cell")
+    const cueOf = {};
     let mixDigits = 0;
     let mixedCheck = null;
     let mixedRepeats = null;
@@ -3273,6 +3344,7 @@ async function buildRoleSheet(n, metaOf) {
                 : g0;
             const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
             if (keepPrompts) it.stripPrompt = false;
+            if (keepPrompts && cueOf[pool.id]) withCue(it, cueOf[pool.id]);
             // Error analysis never falls back to an "Answer:" line under the cell: the shown work
             // must sit in the cell's own slot, or the pupil sees two answer places (C1).
             if (needsShow && (pass < 3 || strictShow) && !it.canShow()) return false;
@@ -3394,11 +3466,17 @@ async function buildRoleSheet(n, metaOf) {
     // class (roles/mixed-practice.js `mixedClass`); the probe is dealt again with each cell's own
     // instruction kept and measured, and checked again. Otherwise the page prints in sections and
     // the notes say why.
+    // M2 (IMPROVEMENT_PLAN 3.3): the counts the teacher gave each skill (`sections[i].count`, one
+    // section per skill) print exactly; `pages` asks for that many full pages.
+    const exactCounts = mixedExactCounts(n, pools);
+    const mixPages = Math.max(1, ...n.sections.map((s) => Number(s.pages) || 1));
     if (n.role === 'mixed-practice' && n.arrangement === 'mixed' && pools.length >= 2 && typeof mod.mixedClass === 'function') {
         const first = mod.mixedClass(probe, input);
         let last = first;
         let ok = first.ok;
         let why = first.why;
+        // M1's one-size-class page stays as it was when no count or page count is asked
+        if (ok && (exactCounts || mixPages > 1)) ok = false;
         if (ok) {
             keepPrompts = true;
             mixDigits = widestTracks(pools.flatMap((p) => probe[p.id]));
@@ -3413,8 +3491,28 @@ async function buildRoleSheet(n, metaOf) {
             } else { keepPrompts = false; mixDigits = 0; }
         }
         if (ok) input.arrangement = 'mixed';
-        else if (why) arrangementNotes.push(why);
-        mixedCheck = { ok, per: (last.per || []).map((x) => ({ id: x.id, name: x.name, k: x.k, h: Math.round(x.h * 10) / 10, own: x.own })) };
+        else {
+            // M2: every 2+ skills mix - boxes of different sizes share the page (sheet/mixed-pack.js);
+            // a cell that does not say its own task gets the skill's instruction, shortened, in it.
+            keepPrompts = true;
+            mixDigits = widestTracks(pools.flatMap((p) => probe[p.id]));
+            pools.forEach((p) => {
+                const its = probe[p.id];
+                const key = composeInstrKeyOf(its, allSkills);
+                const own = MIX_SIGN_KEYS.has(key) || its.every((it) => !!it.cellPrompt);
+                if (!own) cueOf[p.id] = shortCue(composeInstrText(key, its));
+            });
+            pools.forEach((p, pi) => { probe[p.id] = dealPool(p, pi, PROBE); measureMixed(probe[p.id]); input.floors[p.id] = floorOf(probe[p.id]); });
+            input.arrangement = 'mixed';
+            input.mixM2 = true;
+            if (exactCounts) input.exactCounts = exactCounts;
+            input.mixPages = mixPages;
+            ok = true;
+            last = typeof mod.m2Classes === 'function' ? mod.m2Classes(probe, input) : last;
+            const cls = last.cls || {};
+            last.per = pools.map((p) => ({ id: p.id, name: metaOf(p.skills[0]).label, k: (cls[p.id] || {}).k, h: (cls[p.id] || {}).h || 0, own: !cueOf[p.id] }));
+        }
+        mixedCheck = { ok, m2: !!input.mixM2, per: (last.per || []).map((x) => ({ id: x.id, name: x.name, k: x.k, h: Math.round(x.h * 10) / 10, own: x.own })), cues: Object.assign({}, cueOf) };
     }
 
     // S6: Mixed practice's worked examples, one skill per pool, generated and measured before the
@@ -3442,6 +3540,28 @@ async function buildRoleSheet(n, metaOf) {
         input.anchors = anchorsIn;
     }
 
+    // (the owner's "mix by section, with specified amount of problems": a Sections page prints the
+    // counts asked too, each skill's shelves whole where a count across allows it)
+    if (exactCounts && input.arrangement !== 'mixed' && n.anchors === 'off') input.exactCounts = exactCounts;
+    // R1-7 (LESSONS L1): a Mixed practice page (M2 mixed, or Sections) prints more problems than the
+    // next size up. The same probe is measured at the bigger sizes (copies, so this page's
+    // measurements stand) and their pages worked out from L up, each beating the one above it; the
+    // role then gives the most compact skill more room where the weights alone would not.
+    if (n.role === 'mixed-practice' && pools.length >= 2 && !exactCounts && !n.leadHalf && !anchorsIn && (input.mixM2 || input.arrangement !== 'mixed')) {
+        const chain = { S: ['L', 'M'], M: ['L'], L: [] }[n.size] || [];
+        let must = 0;
+        for (const sz of chain) {
+            const other = {};
+            pools.forEach((p) => {
+                other[p.id] = probe[p.id].map((it) => Object.assign({}, it, { measured: undefined }));
+                measureItems(other[p.id], { size: sz, look: n.look, colsList: [...new Set([...colsList, 7, 8, 9, 10])] });
+            });
+            const c = mod.counts(other, Object.assign({}, input, { ctx: Object.assign({}, input.ctx, { size: sz }), mustBeat: must, mixPages: 1 })) || {};
+            must = Object.values(c).reduce((a, x) => a + (Number(x) || 0), 0);
+        }
+        input.mustBeat = must;
+        if (must && input.mixM2 && typeof mod.m2Counts === 'function') input.ladderNote = mod.m2Counts(probe, input).ladderNote;
+    }
     // 2. How many items the page needs, from the measured probe.
     let want = mod.counts(probe, input) || {};
 
