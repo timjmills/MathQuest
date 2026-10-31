@@ -1644,6 +1644,8 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     // ---- pages, parts, split, density, key
     if (mode !== 'legacy') lintKitGeometry(dom, pdf, info, F);
     else lintLegacyGeometry(dom, pdf, info, F, contentH);
+    // L-STEPS, L-KEY AK-3, H13-HINT (shared-roles builder A): one in-page pass (stepsKeyHintInPage)
+    if (mode !== 'legacy') findings.push(...await page.evaluate(stepsKeyHintInPage));
 
     // location & de-duplication
     for (const f of findings) { delete f.tag; }
@@ -2645,6 +2647,253 @@ async function selfTest() {
     if (bad.length) { console.error(`${TOOL}: FAIL - ${bad.length} self-test(s)`); bad.forEach(b => console.error('  - ' + b)); process.exit(1); }
     console.log(`${TOOL}: OK (self-test, ${asserts} assertions, ${SELF_TESTS.length + LEGACY_SELF_TESTS.length} planted defects, every lint covered)`);
 }
+
+// =============================================================================================
+// L-STEPS, L-KEY AK-3 (key header), L-DENSITY H13-HINT (shared-roles lane, builder A; critic laneD-restart r1
+// R1-3, R1-5, R1-13, R1-14). Self-contained: one in-page function, called once from lintDocument, and its self-tests.
+// =============================================================================================
+LINTS.push('L-STEPS');
+/**
+ * Runs IN the rendered document (kit / pack). Serialised by page.evaluate, so it uses nothing from this file.
+ *
+ *   L-STEPS STEPS-ITEM (R1-5, L6): a Steps panel follows the item it sits beside. A panel beside PRACTICE items (the
+ *     Guided page's Steps band, a lesson's We-do Steps zone, the practice pages' step strip) is generic: every numeral it
+ *     prints occurs in EVERY item it governs (in practice: none), rule constants aside (0, 1, 10, 100, 1,000, 1,000,000,
+ *     "5 or more", "4 or less", "past 9"). A panel beside the MODEL (the Scripted model's steps, the Opener's Steps)
+ *     shares at least one number with that model when it prints numerals: steps written for another problem ("Read 3 x 4
+ *     as 3 groups of 4." beside 9 x 8, "19 - 10: take away 10" beside 13 - 7) fail. A cell's numbers are read from its
+ *     glyphs on the page (digits on one line that touch join: a stack's tracks read "77", not "7 7") and from its twin
+ *     on the key (the answers).
+ *   L-STEPS STEPS-CUE (R1-14): a step that names a drawn cue ("Use the dots.", a ten frame, a number line) needs that
+ *     cue drawn on the pupil pages.
+ *   L-KEY AK-3 (R1-3): every key page says "Answer Key" in its header (on the Name rule or in the tab).
+ *   L-DENSITY H13 "H13-HINT" (R1-13): a cell that carries a grey hint (a caption, work lines, a dot tile, a think cue) is
+ *     measured WITHOUT it: the band left below (or above) the problem and its answer place is 30 % of the cell or more.
+ *     A grey caption is a hint, not content; it never fills the band (a traced answer in its slot stays content).
+ */
+function stepsKeyHintInPage() {
+    const MM = 96 / 25.4;
+    const out = [];
+    const r1 = (v) => Math.round(v * 10) / 10;
+    let pages = [...document.querySelectorAll('[data-ws-page]')];
+    if (!pages.length) pages = [...document.querySelectorAll('.ws-page')];
+    pages = pages.filter((p) => p.getBoundingClientRect().height > 0);
+    const isKey = (p) => !!(p.closest('[data-ws-mode="key"]') || p.matches('[data-ws-mode="key"]') || p.classList.contains('ws-key'));
+    const CELL = '[data-ws-cell], .ws-cell:not(.blankrun)';
+    const cellsOf = (p) => [...p.querySelectorAll(CELL)].filter((c) => !c.parentElement.closest(CELL) && c.getBoundingClientRect().height > 0);
+    const pupil = pages.filter((p) => !isKey(p));
+    const key = pages.filter(isKey);
+    const pageNo = (p) => pages.indexOf(p) + 1;
+    const PANEL = '.mq-steptext, .mq-stepszone, .mq-stepsband, .mq-lstepszone, .mq-lstrip';
+    const LABELS = '[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer';
+    /* the numbers a cell shows: digit glyphs on one line that touch (or a comma between digits) are one number */
+    const numsOfEl = (root, skip) => {
+        const glyphs = [];
+        const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        let n;
+        while ((n = w.nextNode())) {
+            const el = n.parentElement;
+            if (!el || el.closest(LABELS) || (skip && el.closest(skip))) continue;
+            const t = n.nodeValue;
+            for (let i = 0; i < t.length; i++) {
+                if (!/[\d,]/.test(t[i])) continue;
+                const rg = document.createRange(); rg.setStart(n, i); rg.setEnd(n, i + 1);
+                const r = rg.getBoundingClientRect();
+                if (r.width && r.height) glyphs.push({ ch: t[i], x: r.left, r: r.right, y: (r.top + r.bottom) / 2, h: r.height });
+            }
+        }
+        const found = new Set();
+        // SVG text (a hop's numbers, a number line's labels): each <text> is one number run
+        for (const tx of root.querySelectorAll('text')) if (!(skip && tx.closest(skip))) (tx.textContent.match(/\d[\d,]*/g) || []).forEach((m) => found.add(String(Number(m.replace(/,/g, '')))));
+        const gl = glyphs.sort((a, b) => a.y - b.y || a.x - b.x);
+        const rows = [];
+        for (const g of gl) { const row = rows.find((rw) => Math.abs(rw.y - g.y) < 0.35 * Math.max(rw.h, g.h)); if (row) row.g.push(g); else rows.push({ y: g.y, h: g.h, g: [g] }); }
+        for (const row of rows) {
+            row.g.sort((a, b) => a.x - b.x);
+            let cur = '', last = null;
+            const flush = () => { const v = cur.replace(/,/g, ''); if (/^\d+$/.test(v)) found.add(String(Number(v))); cur = ''; };
+            for (const g of row.g) {
+                if (last && g.x - last.r > 0.45 * Math.max(g.h, last.h)) flush();
+                cur += g.ch; last = g;
+            }
+            flush();
+        }
+        // the plain text too (a sentence "13 - 7 = __" reads the same either way)
+        const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        let tn, txt = '';
+        while ((tn = tw.nextNode())) if (!(tn.parentElement && (tn.parentElement.closest(LABELS) || (skip && tn.parentElement.closest(skip))))) txt += ` ${tn.nodeValue}`;
+        (txt.match(/\d[\d,]*\d|\d/g) || []).forEach((m) => found.add(String(Number(m.replace(/,/g, '')))));
+        return found;
+    };
+    const RULE_CONST = new Set(['0', '1', '10', '100', '1000', '1000000']);
+    const panelNums = (txt) => {
+        const t = String(txt).replace(/(\d),(?=\d{3}\b)/g, '$1');
+        const ruled = new Set();
+        for (const m of t.matchAll(/(\d+)\s+or\s+(more|less|fewer|greater)|\bpast\s+(\d+)/gi)) ruled.add(String(Number(m[1] || m[3])));
+        return [...new Set((t.match(/\d+/g) || []).map((v) => String(Number(v))))].filter((v) => !RULE_CONST.has(v) && !ruled.has(v));
+    };
+    const keyTwin = (cell) => {
+        const p = cell.closest('[data-ws-page], .ws-page');
+        const i = pupil.indexOf(p);
+        if (i < 0 || !key[i]) return null;
+        return cellsOf(key[i])[cellsOf(p).indexOf(cell)] || null;
+    };
+    const itemNums = (cell) => {
+        const s = numsOfEl(cell, PANEL);
+        const k = keyTwin(cell);
+        if (k) numsOfEl(k, PANEL).forEach((v) => s.add(v));
+        return s;
+    };
+    // a panel's words, without its step markers (the outlined "1", "2" ... are numbering, not numbers) and its label
+    const panelText = (panel) => {
+        const c = panel.cloneNode(true);
+        c.querySelectorAll('em, .mq-lnum, .mq-lstrip-l, b').forEach((x) => x.replaceWith(' '));
+        return (c.textContent || '').replace(/\s+/g, ' ').trim();
+    };
+    const topPanels = (p) => [...p.querySelectorAll(PANEL)].filter((x) => !x.parentElement.closest(PANEL));
+    /* ---- STEPS-ITEM */
+    for (const p of pupil) {
+        const cells = cellsOf(p);
+        for (const panel of topPanels(p)) {
+            const nums = panelNums(panelText(panel));
+            if (!nums.length) continue;
+            const own = panel.closest(CELL);
+            let model = false, governed = [];
+            if (panel.matches('.mq-steptext')) {
+                // the Scripted model: the state cell it is drawn in (grouped states), or the state cell before its text cell
+                model = true;
+                const drawn = own && numsOfEl(own, PANEL).size > 0;
+                governed = drawn ? [own] : own && cells.indexOf(own) > 0 ? [cells[cells.indexOf(own) - 1]] : [];
+            } else if (panel.matches('.mq-stepszone') && panel.closest('.mq-modelrow')) {
+                model = true;   // the Opener: the Model cell(s) in the same row
+                governed = cells.filter((c) => c.closest('.mq-modelrow') === panel.closest('.mq-modelrow'));
+            } else if (panel.matches('.mq-lstepszone')) {
+                const g = (own || panel).closest('.ws-grid');
+                governed = g ? cells.filter((c) => c !== own && c.closest('.ws-grid') === g) : [];
+            } else {
+                // a band or strip over the page's practice: every cell on the page but the panel's own and the anchors / chart
+                governed = cells.filter((c) => c !== own && !c.querySelector(PANEL) && !c.closest('.mq-anchorgrid') && !c.querySelector('[data-ws-anchor]'));
+            }
+            governed = governed.filter((c) => numsOfEl(c, PANEL).size);
+            if (!governed.length) continue;
+            const sets = governed.map(itemNums);
+            if (model) {
+                if (!nums.some((v) => sets.some((s) => s.has(v)))) out.push({ lint: 'L-STEPS', rule: 'STEPS-ITEM', sev: 'major', page: pageNo(p), msg: `the steps beside the model print ${nums.join(', ')}, none of them a number of the model (${[...sets[0]].slice(0, 6).join(', ')}): the steps are for another problem ("${panelText(panel).slice(0, 70)}") (L6, R1-5)`, key: 'steps for another problem' });
+            } else {
+                const stray = nums.filter((v) => !sets.every((s) => s.has(v)));
+                if (stray.length) out.push({ lint: 'L-STEPS', rule: 'STEPS-ITEM', sev: 'major', page: pageNo(p), msg: `a Steps panel beside ${governed.length} practice item(s) prints ${stray.join(', ')}, not in every item it sits beside: steps beside practice are generic ("${panelText(panel).slice(0, 70)}") (L6, R1-5)`, key: 'steps numerals not in the items' });
+            }
+        }
+    }
+    /* ---- STEPS-CUE */
+    const CUES = [
+        { re: /\bdots?\b/i, name: 'dots', sel: '.mq-dottile, [data-ws-support-on*="touch"], [class*="touch"], [data-ws-cell="counters"], [data-ws-cell="tenframe"], .ws-td-svg' },
+        { re: /\bten[ -]frames?\b/i, name: 'a ten frame', sel: '[data-ws-cell="tenframe"], [class*="tenframe"], [data-ws-support-on*="frame"]' },
+        { re: /\bnumber lines?\b/i, name: 'a number line', sel: '[data-ws-cell="number-line"], [data-ws-cell="hop-line"], [data-ws-cell="nl-place"], [class*="numline"], [data-ws-support-on*="line"], .mq-hops, .mq-lround-line' },
+    ];
+    const pupilHas = (sel) => pupil.some((p) => [...p.querySelectorAll(sel)].some((e) => !e.closest(PANEL) && e.getBoundingClientRect().width > 0));
+    for (const p of pupil) for (const panel of topPanels(p)) {
+        for (const c of CUES) {
+            if (!c.re.test(panelText(panel)) || pupilHas(c.sel)) continue;
+            const said = (panelText(panel).match(new RegExp(`[^.:]*${c.re.source}[^.]*`, 'i')) || [''])[0].trim().slice(0, 60);
+            out.push({ lint: 'L-STEPS', rule: 'STEPS-CUE', sev: 'major', page: pageNo(p), msg: `a step says "${said}" but no page of the sheet draws ${c.name} (L6, R1-14)`, key: `cue ${c.name} not drawn` });
+        }
+    }
+    /* ---- L-KEY AK-3: the key page says "Answer Key" in its header */
+    for (const p of key) {
+        const top = p.getBoundingClientRect().top;
+        const said = [...p.querySelectorAll('*')].some((e) => {
+            const own = [...e.childNodes].filter((x) => x.nodeType === 3).map((x) => x.nodeValue).join('');
+            return /Answer Key/i.test(own) && e.getBoundingClientRect().top - top < 45 * MM;
+        });
+        if (!said) out.push({ lint: 'L-KEY', rule: 'AK-3', sev: 'major', page: pageNo(p), msg: `key page ${pageNo(p)} does not say "Answer Key" in its header: a key cannot be told from the pupil page (AK-3, PT-KEY-3, R1-3)`, key: 'key header' });
+    }
+    /* ---- H13-HINT */
+    const GREY = /^rgb\(148, 148, 148\)$/;
+    const HINT = '.mq-cue, .mq-dottile, .mq-thinkcue, .mq-worklines, .mq-hint, .mq-hintline, [data-ws-hint]';
+    const ownText = (d) => [...d.childNodes].some((x) => x.nodeType === 3 && x.nodeValue.trim());
+    const isHint = (d) => {
+        if (d.closest('[data-ws-slot], [data-ws-aslot]')) return false;   // a traced answer (an anchor's too) is content
+        if (d.closest(HINT)) return true;
+        const tr = d.closest('[data-ws-ink="trace"], .ws-trace');
+        if (tr) return ownText(d) || d instanceof SVGElement;
+        return GREY.test(getComputedStyle(d).color) && ownText(d) && !d.children.length;
+    };
+    for (const p of pupil) {
+        const cells = cellsOf(p);
+        for (const c of cells) {
+            // (a Model's grey is its worked example, content: only the tries' hints are judged)
+            if (c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]') || c.querySelector(PANEL) || c.querySelector(':scope > .ws-modeltab') || c.classList.contains('mq-modelcell')) continue;
+            const cr = c.getBoundingClientRect();
+            if (cr.height < 12 * MM) continue;
+            const all = [...c.querySelectorAll('*')].filter((d) => !d.closest(LABELS) && getComputedStyle(d).position !== 'absolute' && getComputedStyle(d).visibility !== 'hidden');
+            const hints = all.filter(isHint).filter((h) => { const r = h.getBoundingClientRect(); return r.width && r.height; });
+            if (!hints.length) continue;
+            const cs = getComputedStyle(c);
+            const inner = { t: cr.top + parseFloat(cs.paddingTop), b: cr.bottom - parseFloat(cs.paddingBottom) };
+            let box = null;
+            for (const d of all) {
+                if (isHint(d) || hints.some((h) => h.contains(d))) continue;
+                const r = d.getBoundingClientRect();
+                if (!r.width || !r.height) continue;
+                const ds = getComputedStyle(d);
+                const ink = ownText(d) || /^(svg|img|canvas)$/i.test(d.tagName) || d.hasAttribute('data-ws-slot')
+                    || ['Top', 'Bottom', 'Left', 'Right'].some((k) => parseFloat(ds[`border${k}Width`]) > 0 && ds[`border${k}Style`] !== 'none');
+                if (!ink) continue;
+                box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom) } : { t: r.top, b: r.bottom };
+            }
+            if (!box) continue;
+            const H = cr.height;
+            // the hint's own lines are not empty (it is drawn there); the band is the room it neither fills nor leaves to the
+            // problem: a caption set low in a tall cell leaves the band above it empty, and that band is what is measured
+            const hintIn = (lo, hi) => {
+                const iv = hints.map((h) => h.getBoundingClientRect()).map((r) => [Math.max(lo, r.top), Math.min(hi, r.bottom)]).filter(([a, b]) => b > a).sort((x, y) => x[0] - y[0]);
+                let tot = 0, end = -Infinity;
+                for (const [a, b] of iv) { if (b <= end) continue; tot += b - Math.max(a, end); end = b; }
+                return tot;
+            };
+            const gapBelow = Math.max(0, inner.b - box.b), gapAbove = Math.max(0, box.t - inner.t);
+            const below = gapBelow - hintIn(box.b, inner.b), above = gapAbove - hintIn(inner.t, box.t);
+            const band = Math.max(below, above);
+            if (band >= 0.3 * H) out.push({ lint: 'L-DENSITY', rule: 'H13', sev: 'major', page: pageNo(p), cell: cells.indexOf(c) + 1, skill: c.getAttribute('data-ws-skill') || undefined,
+                msg: `one empty band ${r1(band / MM)} mm ${below >= above ? 'below' : 'above'} the problem in a ${r1(H / MM)} mm cell (${Math.round((band / H) * 100)}%) once its grey hint is not counted: a caption or cue is a hint, not content (RUBRIC H13, H13-HINT, R1-13)`, key: 'empty band under a hinted cell' });
+        }
+    }
+    return out;
+}
+
+/* the self-tests of the block (planted on the approved pack page 11-A and its key 11-I, as every other lint's) */
+SELF_TESTS.push(
+    { name: 'steps for another problem beside practice (L-STEPS STEPS-ITEM)', expect: ['L-STEPS', 'STEPS-ITEM'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.closest('.ws-grid').insertAdjacentHTML('beforebegin', '<div class="mq-stepsband"><ol class="ws-steps"><li><em>1</em><span>19 − 10: take away 10.</span></li><li><em>2</em><span>Write 9.</span></li></ol></div>');
+    } },
+    { name: 'generic steps beside practice (STEPS-ITEM control)', expect: [], absent: ['L-STEPS', 'STEPS-ITEM'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.closest('.ws-grid').insertAdjacentHTML('beforebegin', '<div class="mq-stepsband"><ol class="ws-steps"><li><em>1</em><span>Start with the first number.</span></li><li><em>2</em><span>5 or more: round up. Add 10.</span></li></ol></div>');
+    } },
+    { name: 'a step names dots the sheet never draws (L-STEPS STEPS-CUE)', expect: ['L-STEPS', 'STEPS-CUE'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.closest('.ws-grid').insertAdjacentHTML('beforebegin', '<div class="mq-stepsband"><ol class="ws-steps"><li><em>1</em><span>Count on the smaller number. Use the dots.</span></li></ol></div>');
+    } },
+    { name: 'key page without "Answer Key" (L-KEY AK-3)', expect: ['L-KEY', 'AK-3'], fn: () => {
+        const pages = [...document.querySelectorAll('.ws-page')];
+        const k = pages[pages.length - 1];
+        k.classList.add('ws-key');
+        const w = document.createTreeWalker(k, NodeFilter.SHOW_TEXT);
+        let n; while ((n = w.nextNode())) n.nodeValue = n.nodeValue.replace(/Answer Key/gi, 'Name');
+    } },
+    { name: 'grey caption filling a tall cell (H13-HINT)', expect: ['L-DENSITY', 'H13'], msg: /H13-HINT/, fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.style.justifyContent = 'flex-start';
+        c.insertAdjacentHTML('beforeend', '<div style="flex:1 1 auto"></div><div class="mq-hint" style="color:#949494" data-ws-ink="trace">Start at 11.</div>');
+        c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'hinted cell sized to its problem (H13-HINT control)', expect: [], absentMsg: [['L-DENSITY', 'H13'], /H13-HINT/], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.insertAdjacentHTML('beforeend', '<div class="mq-hint" style="color:#949494" data-ws-ink="trace">Start at 11.</div>');
+    } },
+);
 
 // =============================================================================================
 // MAIN
