@@ -3,8 +3,8 @@ Title: Operations family lane (work order item 4) — first family lane
 Session: session_013pHDnPm6jsqM66jkj7eD7L (lead session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-ops-family (base claude/sweet-newton-c8wrv1 fbeaa332)
 Scope: addition / subtraction / multiplication / division skills, EXCEPT fact skills (Lane D) and the 7 passed column-subtraction skills
-State: STOPPED (owner pause, 2026-10-30) after G1 critic r1 FAIL — hand-over below
-Updated: 2026-10-30
+State: PAUSED (owner, 2026-10-31 ~19:00, weekly usage) — see "PAUSE 2026-10-31"
+Updated: 2026-10-31
 Budget: lane cap ~$300
 
 ## Findings at lane start (2026-10-30)
@@ -24,6 +24,41 @@ Budget: lane cap ~$300
 | G1 one-line sentences | addition:add_sub_10s, addition:add_sub_100s, subtraction:missing_add_sub, division:missing_mult_div, division:div_zero_in_quotient | equation (fact look), equation, division | critic r1 FAIL (min 4); div_zero held out |
 | later | word problems (wait for the spec), box_division / area_model_div, number families, mult_properties … (BACKLOG ops list) | — | queued |
 
+
+## PAUSE 2026-10-31 (owner: weekly usage nearly used up; resume after Thursday 22:00 UTC)
+
+**Nothing passed; nothing added to redesign-passed.js.** Lane branch HEAD = presets + fix round 2 merged (all on origin).
+
+### Done this session
+- Merged main (899c147). **7 presets built** (0d58680, branch claude/ops-family-presets-r2): ten_more ZF, ten_less ZG,
+  hundred_more ZH, hundred_less ZJ (task presets of add_sub_10s / add_sub_100s), missing_mult_only ZK, missing_div_only ZL
+  (new `task` option on missing_mult_div), missing_add_sub_answer ZM. Gates OK: presets-unit, code-snapshot (738), search-terms,
+  standards, wrm --report-only, wrm-page-unit, boot-smoke, catalogue. WRM links are `partial` (each covers part of its step).
+- **Fix round 2** (builder mq-opus-medium, branch claude/ops-family-fix-r2, 19 commits, merged): F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F12
+  F13 F15 F16 F17 F18 F19 fixed with a check + backtest row each (table in "Fix round 2" above); F11 no repro (CELL-ONE guards it);
+  F14 fixed for Test / anchor chart, **Mixed practice page still 38 % empty: the mixed path is mixed-m2's**. div_zero HELD OUT
+  (not attempted). The builder was STOPPED by the pause while it ran `ws-precritic --role lesson`: the precritic table for
+  round 2 was NOT completed, and the byte-identical check of the redesign-passed default pages was NOT run on the merged tree.
+- Post-merge on lane HEAD: ws-boot-smoke OK, ws-presets-unit OK, ws-code-snapshot OK (738).
+- **Card ops-g1**: card.json now carries the 7 presets in skills.include and all **83** live lines decided `offered`
+  ("offered, as built", owner 2026-10-31; 83 not 81 because the presets and the new `task` option add lines). Regenerated with
+  --resign. **NOT signed**: `--check-signed` fails on rule coverage: 38 rule ids cited by past critics for equation/division
+  are missing from §4 (AK-1 BD-4 BD-7 BD-10 BD-11 CL-8 FPR-6 FRM-6 FRW-5 FRW-6 GDP-1 GDP-2 P-1 PG-14 RP-1 RP-20 RP-21 SCR-1 SL-2
+  SL-3 SP-2 SP-10 SP-12 VA-10 VA-62 VA-66 …; the full list is in the check's output). Signing would be meaningless until they are added.
+
+### Next steps on resume (in order)
+1. Card: add the missing rules to card.json (§4 rules / not-applicable with a reason), then
+   `node tests/scripts/ws-spec-card.mjs --family ops-g1 --resign`; set the line to `Signed: owner, 2026-10-31` (owner's
+   decision already given); `node tests/scripts/ws-spec-card.mjs --check-signed design/cards/ops-g1/ops-g1.md` must pass.
+2. `node tests/scripts/ws-options-pin*` / `ws-options-count` for the new missing_mult_div `task` option (timed out at 200 s in the presets build).
+3. Byte-identical check of every redesign-passed.js skill's default page vs merge-base 899c147.
+4. Merge current claude/sweet-newton-c8wrv1 (and run tests/scripts/ws-teacher-plan-match.cjs, per mixed-m2: F1 row heights feed their flowLayout).
+5. `node tests/scripts/ws-precritic.cjs --skill <each of the 4 + 7 presets> --strict` and `--role lesson --strict`; document rows red on main.
+6. Critic r2 (mq-opus-medium, independent). Open rulings for it: missing_mult_div "all three notations" H13-ROW (across beside a
+   two-line bracket in one row); Mixed practice PAGEFILL belongs to mixed-m2.
+7. div_zero_in_quotient lesson chart (engine item) — still open.
+
+Budget: this session ≈ $45–55 est. (≈ 2 % of the weekly limit; builders 226k + ~1.4M tokens est.); cap $150.
 
 ## HAND-OVER (2026-10-30, owner pause after the current pieces)
 

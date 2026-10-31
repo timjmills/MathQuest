@@ -1,10 +1,10 @@
 <!-- spec-card
-{"card":"ops-g1","kind":"family","template":"equation","families":["addition","subtraction","division"],"match":{"templates":["equation","division"]},"config":"design/cards/ops-g1/card.json","indexSha":"102112580fef3696b7c0d0eec27f441c4e4b949f","bodySha":"5192fc5eaaf39c49","format":2,"configSha":"249d4a75c218"}
-{"cited":"AK-1 AK-2 AX-4 BD-4 BD-7 BD-10 BD-11 CL-8 CL-40 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L2 L3 L5 L6 P-1 PG-14 PT-FPR-6 PT-FRM-6 PT-FRW-5 PT-FRW-6 PT-GDP-1 PT-GDP-2 PT-SCR-1 RP-1 RP-20 RP-21 SL-2 SL-3 SP-1 SP-2 SP-10 SP-12 VA-10 VA-60 VA-61 VA-62 VA-63 VA-66 WRM-rule-18","rules":"DN-22 9d3337 TY-25 b0a223 PG-11 2a95c0 SL-12 3cbafa AK-4 8d027b VA-60 acb280 61 841427 63 ab9c70 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 10 d2ca35 H13 36f579 SP-1 87c2cc 3 7b7bfb CL-4b 12a353 AK-2 d4709f AX-4 2eb6c1 CL-40 2a6dbb P-LC-9 bc47bd PG-20 9c7999 SCC-01 8aa70b TY-7 e3e1e1","entries":""}
+{"card":"ops-g1","kind":"family","template":"equation","families":["addition","subtraction","division"],"match":{"templates":["equation","division"]},"config":"design/cards/ops-g1/card.json","indexSha":"102112580fef3696b7c0d0eec27f441c4e4b949f","bodySha":"40c6f193fc6af3a4","format":2,"configSha":"44406e9728eb"}
+{"cited":"AK-1 AK-2 AX-4 BD-4 BD-7 BD-10 BD-11 CL-8 CL-40 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L2 L3 L5 L6 P-1 PG-14 PT-FPR-6 PT-FRM-6 PT-FRW-5 PT-FRW-6 PT-GDP-1 PT-GDP-2 PT-SCR-1 RP-1 RP-20 RP-21 SL-2 SL-3 SP-1 SP-2 SP-10 SP-12 VA-10 VA-60 VA-61 VA-62 VA-63 VA-66 WRM-rule-18","rules":"DN-22 9d3337 TY-25 b0a223 PG-11 2a95c0 SL-12 3cbafa AK-4 8d027b VA-60 acb280 61 841427 63 ab9c70 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 10 d2ca35 H13 36f579 SP-1 87c2cc 3 7b7bfb CL-4b 12a353 AK-2 d4709f AX-4 2eb6c1 CL-40 2a6dbb DN-1a 4fcc05 P-LC-9 bc47bd PG-20 9c7999 SCC-01 8aa70b TY-7 e3e1e1 VA-65 297498","entries":"D%3Atask%3D0 bcefeb D%3Atask%3D1 bcefeb D%3Aband%3Dnull bcefeb D%3Aband%3D500 bcefeb D%3Alevel%3D3 bcefeb D%3Alevel%3D1 bcefeb D%3AnlOn%3Dtrue bcefeb D%3AnlOn%3Dfalse bcefeb D%3AnlFrom%3D* bcefeb D%3AnlTo%3D* bcefeb D%3AnlStep%3D1 bcefeb D%3AnlStep%3D2 bcefeb D%3AnlStep%3D5 bcefeb D%3AnlStep%3D10 bcefeb D%3AnlStep%3D20 bcefeb D%3AnlStep%3D25 bcefeb D%3AnlStep%3D50 bcefeb D%3AnlStep%3D100 bcefeb D%3AnlStep%3D1000 bcefeb D%3AnlStep%3Dauto bcefeb D%3AnlStep%3D1%2F2 bcefeb D%3AnlStep%3D1%2F3 bcefeb D%3AnlStep%3D1%2F4 bcefeb D%3AnlStep%3D1%2F5 bcefeb D%3AnlStep%3D1%2F6 bcefeb D%3AnlStep%3D1%2F8 bcefeb D%3AnlStep%3D1%2F10 bcefeb D%3AnlStep%3D1%2F12 bcefeb D%3AnlStep%3D0.1 bcefeb D%3AnlStep%3D0.01 bcefeb D%3AnlLabels%3Dauto bcefeb D%3AnlLabels%3Dall bcefeb D%3AnlLabels%3D2 bcefeb D%3AnlLabels%3D5 bcefeb D%3AnlLabels%3D10 bcefeb D%3AnlLabels%3Dends bcefeb D%3AnlLabels%3Dnone bcefeb D%3AnlMinor%3Dauto bcefeb D%3AnlMinor%3D0 bcefeb D%3AnlMinor%3D2 bcefeb D%3AnlMinor%3D4 bcefeb D%3AnlMinor%3D5 bcefeb D%3AnlMinor%3D10 bcefeb D%3AnlHops%3Dtrue bcefeb D%3AnlHops%3Dfalse bcefeb D%3Acalculator%3Dtrue bcefeb D%3Acalculator%3Dfalse bcefeb D%3AskipAfter%3D* bcefeb D%3Aband%3D50 bcefeb D%3Arange%3Dnull bcefeb D%3Arange%3D100 bcefeb D%3Arange%3D1000 bcefeb D%3Anotation%3Dacross bcefeb D%3Anotation%3Dbracket bcefeb D%3Anotation%3Dfraction bcefeb D%3Aunknown%3D0 bcefeb D%3Aunknown%3D1 bcefeb D%3Arange%3D10 bcefeb D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Aword-problems bcefeb D%3Arole%3Afact-rows bcefeb D%3Arole%3Afact-probe bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Alesson bcefeb D%3Ahost%3Aboss bcefeb D%3Ahost%3Amap bcefeb D%3Ahost%3Amode-bigboard bcefeb D%3Ahost%3Amode-dark bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Arace bcefeb"}
 -->
 <!-- rulings
 {"v": 1, "card": "ops-g1",
-"skills": ["addition:add_sub_100s","addition:add_sub_10s","division:div_zero_in_quotient","division:missing_mult_div","subtraction:missing_add_sub"],
+"skills": ["addition:add_sub_100s","addition:add_sub_10s","addition:hundred_less","addition:hundred_more","addition:ten_less","addition:ten_more","division:div_zero_in_quotient","division:missing_div_only","division:missing_mult_div","division:missing_mult_only","subtraction:missing_add_sub","subtraction:missing_add_sub_answer"],
 "rulings": [
 ],
 "notOffered": [
@@ -28,17 +28,17 @@ Five same-shape skills moved off the legacy print path in one batch: four one-li
 
 add_sub_10s: 10 more / 10 less than any number to 100 (1.NBT.C.5, 1.NBT.C.6 partial). add_sub_100s: 100 more / 100 less than any number to 1,000 (2.NBT.B.8). missing_add_sub: the unknown in an addition or subtraction sentence, before the = sign (1.OA.D.8). missing_mult_div: the unknown factor, dividend or divisor in a × or ÷ sentence (3.OA.A.4). div_zero_in_quotient: write 0 in the quotient where the divisor does not go into a place (4.NBT.B.6, M-D2).
 
-**Skills on this family** (5; listed in card.json + 5 listed):
+**Skills on this family** (12; listed in card.json + 12 listed):
 
-- **addition** (2): `add_sub_10s`, `add_sub_100s`
-- **division** (2): `div_zero_in_quotient`, `missing_mult_div`
-- **subtraction** (1): `missing_add_sub`
+- **addition** (6): `add_sub_10s`, `add_sub_100s`, `hundred_less`, `hundred_more`, `ten_less`, `ten_more`
+- **division** (4): `div_zero_in_quotient`, `missing_div_only`, `missing_mult_div`, `missing_mult_only`
+- **subtraction** (2): `missing_add_sub`, `missing_add_sub_answer`
 
-**CCSS** (SKILL_STANDARDS of those skills): 1.NBT.C.4, 1.NBT.C.5, 1.NBT.C.6, 1.OA.B.4, 1.OA.D.8, 2.NBT.B.7, 2.NBT.B.8, 3.OA.A.4, 3.OA.B.6, 4.NBT.B.6, 5.NBT.B.6
+**CCSS** (SKILL_STANDARDS of those skills): 1.NBT.C.4, 1.NBT.C.5, 1.NBT.C.6, 1.OA.B.4, 1.OA.C.6, 1.OA.D.8, 2.NBT.B.7, 2.NBT.B.8, 3.OA.A.4, 3.OA.B.6, 3.OA.C.7, 4.NBT.B.6, 5.NBT.B.6
 
-**Essential Elements:** M.EE.1.NBT.4, M.EE.1.NBT.6, M.EE.2.NBT.7, M.EE.5.NBT.6
+**Essential Elements:** M.EE.1.NBT.4, M.EE.1.NBT.6, M.EE.1.OA.5, M.EE.1.OA.5.a, M.EE.1.OA.5.b, M.EE.2.NBT.7, M.EE.3.OA.1, M.EE.3.OA.6, M.EE.5.NBT.6
 
-**WRM small steps** (SKILL_WRM): Y1.B2 S12; Y1.B5 S10; Y2.B2 S4 (part), S14, S21; Y3.B2 S3, S4; Y3.B4 S6; Y4.B2 S1 (part); Y5.B2 S8; Y5.B5 S7; Y6.B2 S9
+**WRM small steps** (SKILL_WRM): Y1.B2 S12; Y1.B5 S10; Y2.B2 S4 (part), S13 (part), S14, S21, S21 (part); Y3.B1 S9 (part); Y3.B2 S3, S4, S4 (part); Y3.B4 S6, S6 (part); Y4.B2 S1 (part); Y5.B2 S8; Y5.B5 S7; Y6.B2 S9
 
 ## 2. Problem types and progression
 
@@ -152,7 +152,7 @@ From the rule-id index (`design/cards/rule-index.json`, sha `102112580fef`). An 
 - **VA-61** (WDS) The quotient row sits above the vinculum at 8 / 10 / 12 mm. With the digit grid off, the vinculum itself is the answer line: no boxes, nothing reveals the quotient's length. With the grid on (Model and Guided only), there is a 0.75 pt box over **every** dividend track.
 - **VA-63** (WDS) Work grid: two work rows per quotient digit at 6 / 8 / 10 mm; the subtract rule under each pair is 0.75 pt; the `−` is pre-printed in the gutter of each subtract row (structural). …
 
-### 4b. Also applies — ids only (18 rules)
+### 4b. Also applies — ids only (20 rules)
 
 Each id's full text is in `design/cards/rule-index.json` (look it up by id) and in the standard it names; open it when the rule is in play. Grouped by the heading that defines them:
 
@@ -160,6 +160,8 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - WDS · 3.1 Family — `TY-7`
 - WDS · 7.1 Cell construction — `CL-4b`
 - WDS · 7.4 Keep-out and label options — `CL-40`
+- WDS · 10.7 US long-division bracket and … — `VA-65`
+- WDS · 12.1 Ceilings by page role — `DN-1a`
 - WDS · 14. Answer key = facsimile — `AK-2`
 - WDS · 15.1 What must match — `SP-1` `SP-3`
 - WDS · 16. Accessibility — `AX-4`
@@ -200,7 +202,97 @@ What the repo offers today (every option value, role and screen host, each with 
 
 What the critic grades and the panel may show. Each live line in §7b needs one of: **offered** (shown and graded on every page type and host it reaches), **hidden** (must not be offered on these skills: becomes a notOffered entry of the rulings block, checked by ws-card-rulings --check offered), **out of scope** (offered by the app but not graded on this card; say where it is graded). PROPOSED = pre-filled for the lead from existing rulings and status; signing the card accepts it.
 
-(no decisions yet: every line in §7b is UNDECIDED, and --check-signed fails until card.json `decisions` decides each)
+**Option values (offeredOptionsFor)**
+
+- `task=0` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `task=1` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `band=null` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `band=500` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `level=3` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `level=1` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlOn=true` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlOn=false` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlFrom=*` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlTo=*` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=2` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=5` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=10` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=20` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=25` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=50` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=100` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1000` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=auto` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1/2` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1/3` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1/4` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1/5` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1/6` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1/8` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1/10` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=1/12` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=0.1` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlStep=0.01` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlLabels=auto` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlLabels=all` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlLabels=2` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlLabels=5` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlLabels=10` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlLabels=ends` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlLabels=none` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlMinor=auto` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlMinor=0` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlMinor=2` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlMinor=4` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlMinor=5` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlMinor=10` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlHops=true` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `nlHops=false` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `calculator=true` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `calculator=false` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `skipAfter=*` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `band=50` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `range=null` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `range=100` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `range=1000` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `notation=across` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `notation=bracket` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `notation=fraction` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `unknown=0` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `unknown=1` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `range=10` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+
+**Page roles (buildSheet)**
+
+- `role:independent` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:more-practice` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:opener` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:scripted-model` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:guided` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:error-analysis` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:review` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:test` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:pre-skill-check` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:word-problems` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:fact-rows` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:fact-probe` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:mixed-practice` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:true-false` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:reason-it` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:stretch` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `role:lesson` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+
+**Screen hosts**
+
+- `host:boss` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `host:map` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `host:mode-bigboard` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `host:mode-dark` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `host:online-worksheet` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `host:practice-card` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `host:quiz` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
+- `host:race` — **offered** — owner, 2026-10-31: offered, as built (owner 2026-10-31)
 
 ## 8. Gates
 
@@ -222,102 +314,105 @@ Signed: (not yet signed)
 
 Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
 
-**Option values (offeredOptionsFor)** (56 lines; 56 undecided)
+**Option values (offeredOptionsFor)** (58 lines; 0 undecided)
 
-- `task=0` Operation [difficulty], default (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `task=1` Operation [difficulty], default (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `band=null` Numbers to [difficulty], default (add_sub_100s, add_sub_10s) [UNDECIDED]
-- `band=500` Numbers to [difficulty] (add_sub_100s) [UNDECIDED]
-- `nlOn=true` Show the number line [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlOn=false` Show the number line [nline], default (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlFrom=*` Starts at [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlTo=*` Ends at [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=2` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=5` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=10` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=20` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=25` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=50` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=100` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1000` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=auto` Step between ticks [nline], default (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1/2` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1/3` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1/4` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1/5` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1/6` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1/8` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1/10` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=1/12` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=0.1` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlStep=0.01` Step between ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlLabels=auto` Numbers under the ticks [nline], default (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlLabels=all` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlLabels=2` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlLabels=5` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlLabels=10` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlLabels=ends` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlLabels=none` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlMinor=auto` Small ticks between [nline], default (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlMinor=0` Small ticks between [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlMinor=2` Small ticks between [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlMinor=4` Small ticks between [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlMinor=5` Small ticks between [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlMinor=10` Small ticks between [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlHops=true` Hop arrows over each step [nline] (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `nlHops=false` Hop arrows over each step [nline], default (add_sub_100s, add_sub_10s, missing_add_sub) [UNDECIDED]
-- `calculator=true` Calculator [play] (all 5) [UNDECIDED]
-- `calculator=false` Calculator [play], default (all 5) [UNDECIDED]
-- `skipAfter=*` Skip appears after [play] (all 5) [UNDECIDED]
-- `band=50` Numbers to [difficulty] (add_sub_10s) [UNDECIDED]
-- `range=null` Max Number, default (div_zero_in_quotient, missing_mult_div, missing_add_sub) [UNDECIDED]
-- `range=100` Max Number (div_zero_in_quotient, missing_mult_div, missing_add_sub) [UNDECIDED]
-- `range=1000` Max Number (div_zero_in_quotient, missing_mult_div) [UNDECIDED]
-- `notation=across` How it is written, default (missing_mult_div) [UNDECIDED]
-- `notation=bracket` How it is written (missing_mult_div) [UNDECIDED]
-- `notation=fraction` How it is written (missing_mult_div) [UNDECIDED]
-- `unknown=0` What is missing [difficulty] (missing_add_sub) [UNDECIDED]
-- `unknown=1` What is missing [difficulty], default (missing_add_sub) [UNDECIDED]
-- `range=10` Max Number (missing_add_sub) [UNDECIDED]
+- `task=0` Operation [difficulty], default on add_sub_100s, add_sub_10s, hundred_more, ten_more, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) [offered]
+- `task=1` Operation [difficulty], default on add_sub_100s, add_sub_10s, hundred_less, ten_less, missing_div_only, missing_mult_div, missing_add_sub, missing_add_sub_answer (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) [offered]
+- `band=null` Numbers to [difficulty], default (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more) [offered]
+- `band=500` Numbers to [difficulty] (add_sub_100s, hundred_less, hundred_more) [offered]
+- `level=3` Support level (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) [offered]
+- `level=1` Support level, default (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlOn=true` Show the number line [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlOn=false` Show the number line [nline], default (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlFrom=*` Starts at [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlTo=*` Ends at [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=2` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=5` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=10` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=20` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=25` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=50` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=100` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1000` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=auto` Step between ticks [nline], default (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1/2` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1/3` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1/4` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1/5` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1/6` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1/8` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1/10` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=1/12` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=0.1` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlStep=0.01` Step between ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlLabels=auto` Numbers under the ticks [nline], default (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlLabels=all` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlLabels=2` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlLabels=5` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlLabels=10` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlLabels=ends` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlLabels=none` Numbers under the ticks [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlMinor=auto` Small ticks between [nline], default (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlMinor=0` Small ticks between [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlMinor=2` Small ticks between [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlMinor=4` Small ticks between [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlMinor=5` Small ticks between [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlMinor=10` Small ticks between [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlHops=true` Hop arrows over each step [nline] (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `nlHops=false` Hop arrows over each step [nline], default (add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, missing_add_sub, missing_add_sub_answer) [offered]
+- `calculator=true` Calculator [play] (all 12) [offered]
+- `calculator=false` Calculator [play], default (all 12) [offered]
+- `skipAfter=*` Skip appears after [play] (all 12) [offered]
+- `band=50` Numbers to [difficulty] (add_sub_10s, ten_less, ten_more) [offered]
+- `range=null` Max Number, default (div_zero_in_quotient, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) [offered]
+- `range=100` Max Number (div_zero_in_quotient, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) [offered]
+- `range=1000` Max Number (div_zero_in_quotient, missing_div_only, missing_mult_div, missing_mult_only) [offered]
+- `notation=across` How it is written, default (missing_div_only, missing_mult_div, missing_mult_only) [offered]
+- `notation=bracket` How it is written (missing_div_only, missing_mult_div, missing_mult_only) [offered]
+- `notation=fraction` How it is written (missing_div_only, missing_mult_div, missing_mult_only) [offered]
+- `unknown=0` What is missing [difficulty], default on missing_add_sub_answer (missing_add_sub, missing_add_sub_answer) [offered]
+- `unknown=1` What is missing [difficulty], default on missing_add_sub (missing_add_sub, missing_add_sub_answer) [offered]
+- `range=10` Max Number (missing_add_sub, missing_add_sub_answer) [offered]
 
-**Page roles (buildSheet)** (17 lines; 17 undecided)
+**Page roles (buildSheet)** (17 lines; 0 undecided)
 
-- `role:independent` — the skill's own items (all 5) [UNDECIDED]
-- `role:more-practice` — the skill's own items (all 5) [UNDECIDED]
-- `role:opener` (also lesson-opener) — the skill's own items (all 5) [UNDECIDED]
-- `role:scripted-model` (also model) — provider workedSteps: real 5/5 (all 5) [UNDECIDED]
-- `role:guided` — provider workedSteps: real 5/5 (all 5) [UNDECIDED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 5/5; provider misconceptions: real 5/5 (all 5) [UNDECIDED]
-- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 5) [UNDECIDED]
-- `role:test` (also test-a, test-b) — the skill's own items (all 5) [UNDECIDED]
-- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 5) [UNDECIDED]
-- `role:word-problems` — provider stories: real 0/5 (default on add_sub_100s, add_sub_10s, div_zero_in_quotient, missing_mult_div, missing_add_sub) (all 5) [UNDECIDED]
-- `role:fact-rows` — provider stories: real 0/5 (default on add_sub_100s, add_sub_10s, div_zero_in_quotient, missing_mult_div, missing_add_sub) (all 5) [UNDECIDED]
-- `role:fact-probe` — the skill's own items (all 5) [UNDECIDED]
-- `role:mixed-practice` (also mixed) — provider stories: real 0/5 (default on add_sub_100s, add_sub_10s, div_zero_in_quotient, missing_mult_div, missing_add_sub) (all 5) [UNDECIDED]
-- `role:true-false` — provider wrongAnswer: real 5/5 (all 5) [UNDECIDED]
-- `role:reason-it` (also reason) — provider workedSteps: real 5/5; provider wrongAnswer: real 5/5 (all 5) [UNDECIDED]
-- `role:stretch` — the skill's own items (all 5) [UNDECIDED]
-- `role:lesson` — lesson data: prereqs.js 5/5 (all 5) [UNDECIDED]
+- `role:independent` — the skill's own items (all 12) [offered]
+- `role:more-practice` — the skill's own items (all 12) [offered]
+- `role:opener` (also lesson-opener) — the skill's own items (all 12) [offered]
+- `role:scripted-model` (also model) — provider workedSteps: real 12/12 (all 12) [offered]
+- `role:guided` — provider workedSteps: real 12/12 (all 12) [offered]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 12/12; provider misconceptions: real 12/12 (all 12) [offered]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 12) [offered]
+- `role:test` (also test-a, test-b) — the skill's own items (all 12) [offered]
+- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 12) [offered]
+- `role:word-problems` — provider stories: real 0/12 (default on add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, div_zero_in_quotient, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) (all 12) [offered]
+- `role:fact-rows` — provider stories: real 0/12 (default on add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, div_zero_in_quotient, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) (all 12) [offered]
+- `role:fact-probe` — the skill's own items (all 12) [offered]
+- `role:mixed-practice` (also mixed) — provider stories: real 0/12 (default on add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, div_zero_in_quotient, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) (all 12) [offered]
+- `role:true-false` — provider wrongAnswer: real 12/12 (all 12) [offered]
+- `role:reason-it` (also reason) — provider workedSteps: real 12/12; provider wrongAnswer: real 12/12 (all 12) [offered]
+- `role:stretch` — the skill's own items (all 12) [offered]
+- `role:lesson` — lesson data: prereqs.js 5/12 (FALLBACK, warm-up from the earlier skills in data.js order, on hundred_less, hundred_more, ten_less, ten_more, missing_div_only, missing_mult_only, missing_add_sub_answer); provider stories: real 0/12 (default on add_sub_100s, add_sub_10s, hundred_less, hundred_more, ten_less, ten_more, div_zero_in_quotient, missing_div_only, missing_mult_div, missing_mult_only, missing_add_sub, missing_add_sub_answer) (all 12) [offered]
 
-**Screen hosts** (8 lines; 8 undecided)
+**Screen hosts** (8 lines; 0 undecided)
 
-- `host:boss` — driven by ws-chromebook-fit (all 5) [UNDECIDED]
-- `host:map` — driven by ws-screen-slots (all 5) [UNDECIDED]
-- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 5) [UNDECIDED]
-- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 5) [UNDECIDED]
-- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 5) [UNDECIDED]
-- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 5) [UNDECIDED]
-- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 5) [UNDECIDED]
-- `host:race` — driven by ws-chromebook-fit (all 5) [UNDECIDED]
+- `host:boss` — driven by ws-chromebook-fit (all 12) [offered]
+- `host:map` — driven by ws-screen-slots (all 12) [offered]
+- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 12) [offered]
+- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 12) [offered]
+- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 12) [offered]
+- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 12) [offered]
+- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 12) [offered]
+- `host:race` — driven by ws-chromebook-fit (all 12) [offered]
 
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 
-- `task` Operation: 0 / 1 (3)
+- `level` Support level: 3 / 1 (4)
+- `task` Operation: 0 / 1 (4)
 - `band` Numbers to: (As dealt (to about 1,000)) / 500 (2)
 - `notation` How it is written: across / bracket / fraction (1)
 - `unknown` What is missing: 0 / 1 (1)
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): (none)
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): `addition:hundred_less` → `addition:add_sub_100s` {"task":[1]}; `addition:hundred_more` → `addition:add_sub_100s` {"task":[0]}; `addition:ten_less` → `addition:add_sub_10s` {"task":[1]}; `addition:ten_more` → `addition:add_sub_10s` {"task":[0]}; `division:missing_div_only` → `division:missing_mult_div` {"task":[1]}; `division:missing_mult_only` → `division:missing_mult_div` {"task":[0]}; `subtraction:missing_add_sub_answer` → `subtraction:missing_add_sub` {"unknown":[0]}
 <!-- /informational -->

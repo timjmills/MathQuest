@@ -24,7 +24,14 @@
    "addition:add_sub_100s",
    "subtraction:missing_add_sub",
    "division:missing_mult_div",
-   "division:div_zero_in_quotient"
+   "division:div_zero_in_quotient",
+   "addition:ten_more",
+   "addition:ten_less",
+   "addition:hundred_more",
+   "addition:hundred_less",
+   "division:missing_mult_only",
+   "division:missing_div_only",
+   "subtraction:missing_add_sub_answer"
   ]
  },
  "excerptChars": 140,
@@ -186,5 +193,511 @@
    "q": "Split add_sub_10s / add_sub_100s into add / sub skills (catalogue)?",
    "recommended": "Keep the ids (share codes); the task option gives one operation per page, and presets make each findable."
   }
- ]
+ ],
+ "decisions": {
+  "options": [
+   {
+    "key": "task=0",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "task=1",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "band=null",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "band=500",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "level=3",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "level=1",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlOn=true",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlOn=false",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlFrom=*",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlTo=*",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=2",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=5",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=10",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=20",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=25",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=50",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=100",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1000",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=auto",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1/2",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1/3",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1/4",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1/5",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1/6",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1/8",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1/10",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=1/12",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=0.1",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlStep=0.01",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlLabels=auto",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlLabels=all",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlLabels=2",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlLabels=5",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlLabels=10",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlLabels=ends",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlLabels=none",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlMinor=auto",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlMinor=0",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlMinor=2",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlMinor=4",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlMinor=5",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlMinor=10",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlHops=true",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "nlHops=false",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "calculator=true",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "calculator=false",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "skipAfter=*",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "band=50",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "range=null",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "range=100",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "range=1000",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "notation=across",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "notation=bracket",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "notation=fraction",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "unknown=0",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "unknown=1",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "range=10",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   }
+  ],
+  "roles": [
+   {
+    "key": "role:independent",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:more-practice",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:opener",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:scripted-model",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:guided",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:error-analysis",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:review",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:test",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:pre-skill-check",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:word-problems",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:fact-rows",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:fact-probe",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:mixed-practice",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:true-false",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:reason-it",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:stretch",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "role:lesson",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   }
+  ],
+  "hosts": [
+   {
+    "key": "host:boss",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "host:map",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "host:mode-bigboard",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "host:mode-dark",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "host:online-worksheet",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "host:practice-card",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "host:quiz",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   },
+   {
+    "key": "host:race",
+    "d": "offered",
+    "why": "owner, 2026-10-31: offered, as built",
+    "source": "owner 2026-10-31"
+   }
+  ]
+ }
 }
