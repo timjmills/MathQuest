@@ -158,3 +158,21 @@ the session scratchpad critic-r3/, dialog-check-r3/ — not committed).
 
 Next lane (Opus medium, fresh): make `mixed-m3` (all 9 checks incl. `h`), `mixed-m2`, `ws-teacher-plan-match` green
 without editing them, then one critic + dialog check. Expect ≈ $40 build + ≈ $20 grading.
+
+### Hand-over addendum (a151260, lane lead's own look, no critic round run)
+The last fixer turned the red checks green with no check edited: mixed-m3 --quick 13 → 0, full 0 / 63 scenarios;
+plan-match 1 → 0 (ten skills, 20 problems: 2 pages); mixed-m2 --quick, mixed-page, the ws-teacher gates, boot-smoke,
+code-snapshot green; one-section Independent / lesson pages byte-identical (5 samples).
+NOT graded: the lane lead looked at after/b-S (add_facts + mult_2by2_standard, S, seed 722369) and it would fail a critic:
+- the last row (15, 16) is narrower than the band: two unruled L-shaped areas left and right inside the frame (the
+  "wasted space" class for the 4th time, in a new shape: a shelf narrower than the page centred in a full-width frame);
+- the rule under the second row stops part-way (under 11–12, not to the frame) and cell 14 is open at the bottom
+  (broken cell borders);
+- the 2-digit × cells show one answer line far below the rule, not the partial-product rows of the r3 render (check
+  the kit stack `partials` still reach these cells).
+Checks to add before the next build (none catches these today): **frame-closed** (every cell's four borders drawn,
+every rule runs to the frame or to another rule); **shelf-width** (every shelf spans the band's full inner width, or
+its remainder is the ONE unruled trailing area at the row's right end); **partials** (a 2-digit × cell on a mixed
+page draws the same work rows as on its single-skill page). Also: the Independent h teacher note still says
+"Dense: 4 x 4" while the sheet prints 5 across.
+Next lane: build those three checks red, then a fresh Opus-medium builder, then critic + dialog check.
