@@ -31,6 +31,9 @@
 //                 that starts with another verb pasted after the verb, no doubled word (VQ-9).
 //   VQ-NOLEGACY   a skill with no kit cell on any sampled item is a legacy skill; the pinned list may only shrink: a skill
 //                 not on it that emits no kit cell fails (VQ-10).
+//   VQ-ONCE       a Reason It item (the kit's reason-it role `prepare`, drawn through the pure kit with the role's own
+//                 per-panel payload) prints a word-work story ONCE: the story's first sentence appears at most once in the
+//                 item's HTML (critic visual-quality r3 N12: each A / B panel repeated the whole story, one item a page at L).
 //
 // BASELINE  tests/fixtures/precritic/vq-baseline.json pins {rule: {cat:skill: [signature]}} at its `frozen` date, with
 // `frozenCounts` per rule. A pinned finding is reported "pinned" (not a failure); any other finding FAILS. The pin may
@@ -52,7 +55,7 @@ import { cpus } from 'node:os';
 const TOOL = 'ws-visual-quality';
 const SCRIPT = fileURLToPath(import.meta.url);
 const SCRIPT_ROOT = resolve(dirname(SCRIPT), '..', '..');
-export const RULES = ['VQ-REP', 'VQ-ONEANSWER', 'VQ-LIVE', 'VQ-TITLE', 'VQ-NOLEGACY'];
+export const RULES = ['VQ-REP', 'VQ-ONEANSWER', 'VQ-LIVE', 'VQ-TITLE', 'VQ-NOLEGACY', 'VQ-ONCE'];
 
 /** The lane's own targets (VISUAL_QUALITY §4.4): they fail on the base and must pass after the fix; never pinned. */
 export const IN_SCOPE = Object.freeze([
@@ -87,6 +90,13 @@ export function drawsRelation(it) {
     if (!it || it.kind !== 'kit') return false;
     if (DRAW_TEMPLATES.includes(it.template)) return true;
     return it.template === 'word-work' && !!(it.ww && it.ww.bar);
+}
+
+/** How many times a story's first sentence is printed in an item's HTML (VQ-ONCE). */
+export function storyRepeats(html, lines, escFn = (x) => String(x)) {
+    const first = Array.isArray(lines) && lines.length ? escFn(String(lines[0])) : '';
+    if (!first) return 0;
+    return String(html || '').split(first).length - 1;
 }
 
 /** The parts of a word-work cell as the kit RENDERED them (its slot attributes, not its look). */
@@ -196,6 +206,9 @@ export function judgeSkill(f, rules = RULES) {
         const fillers = [...new Set(ww.flatMap((it) => it.ww.bank.filter((w) => fill.has(w) && !new RegExp(`\\b${w}\\b`, 'i').test(it.ww.story))))].sort();
         if (fillers.length) add('VQ-LIVE', 'filler-bank', `unit bank holds filler word(s) the story never says: ${fillers.join(', ')}`);
     }
+    // VQ-ONCE (Reason It prints the story once)
+    const reps = kit.filter((it) => (it.riStory || 0) > 1);
+    if (reps.length) add('VQ-ONCE', 'reason-it-story-repeated', `a Reason It item prints its story ${Math.max(...reps.map((it) => it.riStory))} times (${reps.length} of ${kit.length} item(s)): print it once over the A and B panels`);
     // VQ-TITLE
     const tp = titleProblems(f.iCan, f.label);
     if (tp.length) add('VQ-TITLE', 'title', `"${f.iCan}": ${tp.join('; ')}`);
@@ -220,15 +233,16 @@ async function loadApp(root) {
     try { await import(M('print-sheet.js')); } catch (e) { /* providers register through it; skillWords still answers */ }
     const kit = await import(M('sheet/index.js'));
     const practice = await import(M('sheet/roles/practice.js'));
+    let reasonIt = null; try { reasonIt = await import(M('sheet/roles/reason-it.js')); } catch (e) { reasonIt = null; }
     let standards = null; try { standards = await import(M('standards.js')); } catch (e) { standards = null; }
     let fillers = DEFAULT_FILLERS;
     try { const m = /const FILLERS = \[([^\]]*)\]/.exec(readFileSync(join(root, 'js/modules/sheet/cells/word-work.js'), 'utf8')); if (m) fillers = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]); } catch (e) { /* default */ }
-    return { gq, data, pg, kit, practice, standards, fillers };
+    return { gq, data, pg, kit, practice, standards, fillers, reasonIt };
 }
 
 /** The facts of one skill (see judgeSkill). `items` given (a fixture) or generated. */
 function factsOf(app, s, n, given) {
-    const { gq, data, pg, kit, practice, standards, fillers } = app;
+    const { gq, data, pg, kit, practice, standards, fillers, reasonIt } = app;
     const key = `${s.cat}:${s.id}`;
     let grade = s.grade;
     if (grade === undefined) { try { grade = data.getSkillGrade(s.id, s.cat); } catch (e) { grade = ''; } }
@@ -255,6 +269,7 @@ function factsOf(app, s, n, given) {
                 it.ops = [...new Set(steps.map((st) => OPKEY[st.op]).filter(Boolean))];
                 it.maxAns = Math.max(Number(payload.ans) || 0, ...steps.map((st) => Math.max(Number(st.ans) || 0, Number(st.top) || 0, Number(st.a) || 0, Number(st.b) || 0)));
                 it.ww = wordWorkParts(html, payload);
+                it.riStory = reasonItStory(kit, reasonIt, spec.template, payload, Object.assign({ categoryId: s.cat, skillId: s.id }, q), i);
             }
             items.push(it);
         } else if (q.visual) items.push({ kind: 'legacy', resp: responseAreas(q.visual) });
@@ -265,6 +280,24 @@ function factsOf(app, s, n, given) {
         try { iCan = practice.skillWords({ categoryId: s.cat, skillId: s.id, label, answerType: first && first.answerType, printFormat: first && first.printFormat }).iCan; } catch (e) { iCan = ''; }
     }
     return { key, id: s.id, cat: s.cat, label, grade: String(grade ?? ''), ccss, iCan, fillers, items };
+}
+
+/** VQ-ONCE: the Reason It item of a word-work question, drawn through the role's own `prepare` and the pure kit; how many
+ *  times its story's first sentence prints (0 when the role cannot make an A / B pair of it). */
+function reasonItStory(kit, ri, template, payload, q, index) {
+    if (!ri || !Array.isArray(payload.lines) || !payload.lines.length) return 0;
+    const draw = (c, o = {}) => {
+        const shown = o.shown !== undefined && o.shown !== null && o.shown !== '' ? String(o.shown) : null;
+        const st = shown === null ? c.state : 'wrong';
+        return kit.renderCell({ cell: { template, payload: Object.assign({}, payload, o.payload || {}) } }, Object.assign({}, c, { state: st, wrong: shown === null ? c.wrong : { value: shown, slots: {} }, columns: o.cols || 2 }));
+    };
+    const it = { q, template, key: { value: q.ans }, footprint: {}, render: draw };
+    let p = null;
+    try { p = ri.prepare(it, { seed: 1, index }); } catch (e) { p = null; }
+    if (!p) return 0;
+    let html = '';
+    try { html = p.render({ mode: 'print', size: 'L', state: 'blank' }); } catch (e) { html = ''; }
+    return storyRepeats(html, payload.lines, kit.esc);
 }
 
 if (!isMainThread) {
@@ -313,6 +346,11 @@ function selfTest() {
     eq('ww grid', parts.grid, true);
     eq('ww bank', parts.bank, ['shells', 'boxes']);
     eq('frames: sign written, no grid', wordWorkParts('<span data-ws-slot="op0" data-ws-shape="circle" data-ws-graded="0"></span>', {}).signs, []);
+    // VQ-ONCE
+    eq('story printed twice', storyRepeats('<div>Ben has 9 shells.</div>x<div>Ben has 9 shells.</div>', ['Ben has 9 shells.']), 2);
+    eq('story printed once', storyRepeats('<div>Ben has 9 shells.</div>', ['Ben has 9 shells.']), 1);
+    eq('VQ-ONCE fails a repeated story', judgeSkill({ key: 'a:b', id: 'b', label: 'b', items: [{ kind: 'kit', template: 'word-work', riStory: 2 }] }, ['VQ-ONCE']).map((x) => x.sig), ['reason-it-story-repeated']);
+    eq('VQ-ONCE passes a story printed once', judgeSkill({ key: 'a:b', id: 'b', label: 'b', items: [{ kind: 'kit', template: 'word-work', riStory: 1 }] }, ['VQ-ONCE']), []);
     // rules
     const wwItem = (signs, grid, bank, ans = 12) => ({ kind: 'kit', template: 'word-work', ops: ['+'], maxAns: ans, ww: { signs, grid, bank, story: 'Ben has 9 shells. Lena has 3 shells.' }, resp: { choice: 0, answerLine: false, sayBlanks: false } });
     const base = { key: 'addition:add_wp_20', id: 'add_wp_20', label: 'Addition Word Problems (within 20)', grade: '1', ccss: ['1.OA.A.1'], iCan: 'I Can solve addition stories (sums to 20)' };

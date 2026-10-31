@@ -1,12 +1,13 @@
 {
- "about": "ws-visual-quality pin (design/audit/VISUAL_QUALITY.md §4.2): the visual-quality findings that existed on 2026-10-31, outside the lane's own targets (IN_SCOPE in the script: add_wp_10/20 (+_plain), sub_wp_10/20 (+_plain), fact_family_sort; never pinnable). It may only SHRINK: `node tests/scripts/ws-visual-quality.mjs --write-baseline` keeps only the pins still found and lowers frozenCounts; a rule whose pin holds more than its frozen count fails the gate. A skill that leaves the list (fixed) is fine; a skill added to it is a new defect.",
+ "about": "ws-visual-quality pin (design/audit/VISUAL_QUALITY.md §4.2): the visual-quality findings that existed on 2026-10-31, outside the lane's own targets (IN_SCOPE in the script: add_wp_10/20 (+_plain), sub_wp_10/20 (+_plain), fact_family_sort; never pinnable). It may only SHRINK: `node tests/scripts/ws-visual-quality.mjs --write-baseline` keeps only the pins still found and lowers frozenCounts; a rule whose pin holds more than its frozen count fails the gate. A skill that leaves the list (fixed) is fine; a skill added to it is a new defect. VQ-ONCE (added 2026-10-31, critic r3 N12) pins the word-work skills whose non-sentence layouts still repeat the story in each Reason It panel; the sentence layout prints it once.",
  "frozen": "2026-10-31",
  "frozenCounts": {
   "VQ-REP": 5,
   "VQ-ONEANSWER": 5,
   "VQ-LIVE": 112,
   "VQ-TITLE": 17,
-  "VQ-NOLEGACY": 392
+  "VQ-NOLEGACY": 392,
+  "VQ-ONCE": 61
  },
  "rules": {
   "VQ-REP": {
@@ -1504,6 +1505,191 @@
    ],
    "vocabulary:vocab_grade_K_operations": [
     "no-kit-cell"
+   ]
+  },
+  "VQ-ONCE": {
+   "addition:add_word_problems": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_word_problems_plain": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_100": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_100_plain": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_100k": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_100k_plain": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_10k": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_10k_plain": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_1k": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_1k_plain": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_1m": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_1m_plain": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_50": [
+    "reason-it-story-repeated"
+   ],
+   "addition:add_wp_50_plain": [
+    "reason-it-story-repeated"
+   ],
+   "addition:mixed_addition": [
+    "reason-it-story-repeated"
+   ],
+   "algebra_mixed:algebra_all": [
+    "reason-it-story-repeated"
+   ],
+   "algebra_mixed:algebraic_all": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:algebra_word_mixed": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:mixed_algebra": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:multi_step_word": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:multi_step_word_plain": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:two_step_add_then_div": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:two_step_add_then_mult": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:two_step_estimate_check": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:two_step_letter_equation": [
+    "reason-it-story-repeated"
+   ],
+   "algebra:two_step_mult_div_first": [
+    "reason-it-story-repeated"
+   ],
+   "all_mixed:all_domains_mixed": [
+    "reason-it-story-repeated"
+   ],
+   "all_mixed:custom_mixed": [
+    "reason-it-story-repeated"
+   ],
+   "all_mixed:grade_2_mixed": [
+    "reason-it-story-repeated"
+   ],
+   "all_mixed:grade_4_mixed": [
+    "reason-it-story-repeated"
+   ],
+   "division:div_grouping_word_problems": [
+    "reason-it-story-repeated"
+   ],
+   "division:div_sharing_word_problems": [
+    "reason-it-story-repeated"
+   ],
+   "division:div_word_problems": [
+    "reason-it-story-repeated"
+   ],
+   "division:div_word_problems_plain": [
+    "reason-it-story-repeated"
+   ],
+   "division:mixed_division": [
+    "reason-it-story-repeated"
+   ],
+   "division:remainder_contexts": [
+    "reason-it-story-repeated"
+   ],
+   "division:remainder_interpret": [
+    "reason-it-story-repeated"
+   ],
+   "multiplication:mixed_multiplication": [
+    "reason-it-story-repeated"
+   ],
+   "multiplication:mult_comparison": [
+    "reason-it-story-repeated"
+   ],
+   "multiplication:mult_comparison_plain": [
+    "reason-it-story-repeated"
+   ],
+   "multiplication:mult_word_problems": [
+    "reason-it-story-repeated"
+   ],
+   "multiplication:mult_word_problems_plain": [
+    "reason-it-story-repeated"
+   ],
+   "number_ops_mixed:word_problems_mixed": [
+    "reason-it-story-repeated"
+   ],
+   "number_ops_mixed:word_problems_mixed_plain": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:mixed_subtraction": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_word_problems": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_word_problems_plain": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_100": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_100_plain": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_100k": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_100k_plain": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_10k": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_10k_plain": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_1k": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_1k_plain": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_1m": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_1m_plain": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_50": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_50_plain": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_compare": [
+    "reason-it-story-repeated"
+   ],
+   "subtraction:sub_wp_start_unknown": [
+    "reason-it-story-repeated"
    ]
   }
  }

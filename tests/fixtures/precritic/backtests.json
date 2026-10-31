@@ -1131,6 +1131,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vq-once-reason-it-story",
+   "check": "A Reason It item prints a word-work story ONCE, over its A and B panels (visual-quality critic r3 N12: each panel repeated the whole story, so L held one item, an H5 lone item and a 33.6 % band)",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-ONCE",
+   "fail": {
+    "commit": "da9c98f",
+    "state": "critic r3: sub_wp_20 / add_wp_20_plain Reason It, the story printed in panel A and again in panel B"
+   },
+   "pass": {
+    "commit": "0b45e08",
+    "state": "N12 fix: the story once at the top of the item, the A and B number sentences (noStory) under it; L holds 2"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --skill subtraction:sub_wp_20,addition:add_wp_20_plain --rules VQ-ONCE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
