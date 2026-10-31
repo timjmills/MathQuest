@@ -386,6 +386,7 @@ function gridPart(part, ctx, report) {
         spanFirst: !!part.spanFirst,
         rowGap: Number(part.rowGap) || 0,
         trail: part.trail || null,
+        widthPct: Number(part.widthPct) || 0,
     });
 }
 

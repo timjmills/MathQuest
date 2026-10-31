@@ -701,7 +701,10 @@ const isWordLike = (its) => its.some((it) => it.fclass === 'word' || it.fclass =
 function m2Ks(its, N, ctx) {
     const floor = (SIZES[ctx.size] || SIZES.L).digitPt;
     const allFact = its.every((it) => it.template === 'fact');
-    const ks = divisorsDesc(N).filter((d) => d <= 6 || d === N);
+    // (critic r3 P2: every count across up to 6, not only the lattice's divisors - the shelves are
+    // laid by width (m2Layout), so a 2-digit stack that fits 3 across is 3 across, never a half-page
+    // cell 23 % filled because the lattice is 4)
+    const ks = [...new Set([...divisorsDesc(N).filter((d) => d > 6 && d === N), 6, 5, 4, 3, 2, 1])].sort((a, b) => b - a);
     // TY-30: a fact never prints under the size's working digits (the ladder sets them by k)
     return ks.filter((d) => !allFact || (FACT_LADDER[d] || 28) >= floor);
 }
@@ -760,6 +763,14 @@ export function m2Classes(poolsIn, input) {
             }
         }
     }
+    // (critic r3 P2: a fact column is as wide as its widest drawn fact over 0.6 of the band - so widened
+    // by up to WIDEN_MAX it still holds its drawing >= 45 % of its width - never the wider 1 / k share
+    // the size's digits leave it at a large size)
+    for (const id of ids) {
+        if (!poolsIn[id].every((it) => it.template === 'fact')) continue;
+        const wMm = widestFactMm(poolsIn[id], cls[id].kd || cls[id].k);
+        if (wMm > 0) cls[id].wFrac = Math.min(1, wMm / (0.6 * 186));
+    }
     // (the SHORTEST cell of each pool too: a page dealt short cells has more height left over, so
     // the counts are chosen for the blank band of the short deal - mixed-m3 spare)
     for (const id of ids) {
@@ -811,6 +822,9 @@ const GRID_EDGE_MM = 0.55;
 /** A filled page may leave this much of its budget the shelves cannot take as answer room (the
  * budget keeps 4 mm and the body estimate a few more: mixed-m3 spare holds the printed band <= 25 mm). */
 const SPARE_OK = 12;
+/** A cell widens to at most this many times the width it fits at (its count across): a drawing fills
+ * about 60 % or more of that width, so at 1.25 x it still fills >= 45 % (mixed-m3 width, critic r3 P2). */
+const WIDEN_MAX = 1.25;
 function stackPageFact(ctx) {
     const s = SIZES[ctx.size] || SIZES.L;
     const pt = s.digitPt;
@@ -844,8 +858,11 @@ function m2Layout(c, byPool, b, hOf, seed) {
     // (H13: a cell of a tall skill too short to fill two rows stands as a small box)
     const smallH = Math.min(...ids.filter((id) => !rp.tall[id]).map((id) => cls[id].h), Infinity);
     const tallOf = (x) => !!rp.tall[x.pool] && (rp.R < 2 || !Number.isFinite(smallH) || hOf(x) >= 1.45 * smallH);
+    const wPool = (id) => poolW(cls, N, id);
     const cols = columnsOf(seq, (x) => x.pool, tallOf, rp.R);
-    const wOf = (col) => (cls[col.pool].full ? 1 : Math.min(1, cls[col.pool].s / N));
+    // (a fact drawn at a stack page's digits (`kd`) is as wide as that count across draws it, not wider:
+    // critic r3 P2, each drawing >= 45 % of its cell)
+    const wOf = (col) => wPool(col.pool);
     const metrics = (cs) => {
         const rows = Math.max(...cs.map((col) => (col.tall ? rp.R : col.items.length)));
         let U = 0;
@@ -901,7 +918,7 @@ function m2Layout(c, byPool, b, hOf, seed) {
         // EVEN PAGES, FULL PAGES (critic r2 / mixed-m3 spare): the problems shared evenly over the
         // pages (whole columns), and each page's columns spread over as many full-width shelves as
         // its height holds - every page but the last as full as the first, no blank band.
-        const evenAt = (P) => {
+        const evenAt = (P, A = 0) => {
             const allCols = shelves.flatMap((sh) => sh.cols);
             const nOf = (cs) => cs.reduce((a, col) => a + col.items.length, 0);
             const total = nOf(allCols);
@@ -936,23 +953,66 @@ function m2Layout(c, byPool, b, hOf, seed) {
                 if (i < cs.length) return null;
                 return out.every((sh) => sh.reduce((a, col) => a + wOf(col), 0) <= 1 + 1e-6) ? out.map(metrics) : null;
             };
-            const laid = groups.map((cs, pi) => {
-                if (!cs.length) return null;
+            const layPage = (cs, pi) => {
                 // (the last page keeps its rows full and may end short; the others fill the height)
                 const order = Array.from({ length: Math.min(cs.length, b.maxRows) }, (_, i) => i + 1);
                 for (const sN of pi === P - 1 ? order : order.reverse()) {
                     const shs = split(cs, sN);
                     if (!shs) continue;
+                    // (`A`, PT-MIX-3: every shelf of the sheet A problems across)
+                    if (A && shs.some((sh) => sh.cols.length !== A)) continue;
                     if (shs.reduce((a, sh) => a + sh.H, 0) <= budgetOf(pi) + 1e-6 && shs.reduce((a, sh) => a + sh.rows, 0) <= b.maxRows) return shs;
                 }
                 return null;
+            };
+            const laid = groups.map((cs, pi) => {
+                if (!cs.length) return null;
+                const shs = layPage(cs, pi);
+                if (shs || A) return shs;
+                // (r3 D2: a lone small box of a two- or three-row shelf ends its shelf, so one in the middle of a
+                // page can cost the page a shelf over its rows: it moves to the end of its page, its hole the
+                // page's last trailing area - the page holds what its rows hold)
+                const tail = cs.filter((col) => short(col));
+                return tail.length === 1 && !short(cs[cs.length - 1]) ? layPage(cs.filter((col) => !short(col)).concat(tail), pi) : null;
             });
             return laid.every(Boolean) ? laid : null;
         };
         // r3 D2: one page fewer when the even pages lay (the real capacity of THIS mix, not the greedy shelves'):
         // 20 problems of ten skills on 2 full pages, not 10 / 9 / 1
         const fewer = P > 1 ? evenAt(P - 1) : null;
-        const laid = fewer || evenAt(P);
+        let laid = fewer || evenAt(P);
+        // critic r3 P3 (PT-MIX-3): one count across for every row of the sheet, at the mix's real capacity -
+        // the widest shelf the greedy shelves hold. Even pages at that count across where every page but
+        // the last stays full; else the pages at the capacity (full pages, the last one short).
+        const short = (col) => rp.R > 1 && !col.tall && col.items.length < rp.R;
+        const acrossOf = (pgs) => new Set(pgs.flat().map((sh) => sh.cols.length));
+        if (laid && acrossOf(laid).size > 1) {
+            const A0 = Math.max(...shelves.map((sh) => sh.cols.length));
+            const fullOk = (pgs) => pgs.slice(0, -1).every((pg, pi) => budgetOf(pi) - pg.reduce((a, sh) => a + sh.H + sh.room, 0) <= SPARE_OK);
+            const greedy = cut(null);
+            let pick = acrossOf(greedy).size === 1 && greedy.length <= laid.length ? greedy : null;
+            // (the most across first; a count that leaves no row short, every page but the last full)
+            for (let A = A0; !pick && A >= Math.max(2, A0 - 2); A--) {
+                const evenA = evenAt(laid.length, A);
+                if (evenA && fullOk(evenA)) { pick = evenA; break; }
+                // (else full pages of whole rows of A, the last page what is left - never a short row)
+                const allCols = shelves.flatMap((sh) => sh.cols);
+                if (allCols.length % A || allCols.some((col) => short(col) || col.tall)) continue;
+                const rowsA = [];
+                for (let i = 0; i < allCols.length; i += A) rowsA.push(allCols.slice(i, i + A));
+                if (rowsA.some((cs) => cs.reduce((a, col) => a + wOf(col), 0) > 1 + 1e-6)) continue;
+                const capA = [];
+                let pg = [];
+                let h = 0;
+                for (const sh of rowsA.map(metrics)) {
+                    if (pg.length && (h + sh.H > budgetOf(capA.length) + 1e-6 || pg.reduce((a, x) => a + x.rows, 0) + sh.rows > b.maxRows)) { capA.push(pg); pg = []; h = 0; }
+                    pg.push(sh); h += sh.H;
+                }
+                if (pg.length) capA.push(pg);
+                if (capA.length <= laid.length && fullOk(capA)) pick = capA;
+            }
+            if (pick) laid = pick;
+        }
         if (laid) pages = laid;
     }
     // the spare height into the shelves (PT-MIX-4: answer room, never a blank band), water-filled
@@ -970,6 +1030,16 @@ function m2Layout(c, byPool, b, hOf, seed) {
     });
     return { rp, pages, seq };
 }
+
+/** A pool's cell width share of the band (m2Layout): its count across, a fact column its drawing. */
+const poolW = (cls, N, id) => (cls[id].full ? 1 : Math.min(1, cls[id].s / N, cls[id].kd ? 1 / cls[id].kd : 1, cls[id].wFrac || 1));
+/** Does a laid page hold an empty ruled box (a short last column) or a column of boxes of unlike width
+ * (a fact under a fraction model prints in the model's wide cell, critic r3 P2)? */
+const holeIn = (c, L) => L.pages.some((pg) => pg.some((sh) => {
+    const lc = sh.cols[sh.cols.length - 1];
+    if (!lc.tall && lc.items.length < sh.rows) return true;
+    return sh.cols.some((col) => { const ws = col.items.map((x) => poolW(c.cls, c.N, x.pool)); return Math.max(...ws) > 1.6 * Math.min(...ws); });
+}));
 
 /** Placeholder items of the class heights, for the counts (the page is laid out before it is dealt). */
 const simLayout = (c, b, counts, input, lo = false) => m2Layout(c, Object.fromEntries(c.ids.map((id) => {
@@ -1030,7 +1100,9 @@ export function m2Counts(poolsIn, input) {
                     const Lo = simLayout(c, b, x, input);
                     // (the blank band of the page laid out with the cells the deal gives; the fit with the tallest)
                     const spare = Lo.pages.length <= P ? Math.max(...Lo.pages.map((pg) => pg.spare || 0)) : Infinity;
-                    cands.push({ x, n: a + bb, spare, within: withinShare(x, w0, c.ids) }); miss = 0; any = true;
+                    // (an empty box under a short last column: critic r3 P1)
+                    const hole = holeIn(c, Lo);
+                    cands.push({ x, n: a + bb, spare, hole, within: withinShare(x, w0, c.ids) }); miss = 0; any = true;
                 } else miss++;
             }
             emptyA = any ? 0 : emptyA + 1;
@@ -1058,11 +1130,22 @@ export function m2Counts(poolsIn, input) {
             const full = pool.filter((k) => k.spare <= SPARE_OK).sort((p, q2) => dev(p.x) - dev(q2.x) || q2.n - p.n)[0];
             const fewestPick = fewest ? pool.slice().sort((p, q2) => p.n - q2.n || dev(p.x) - dev(q2.x))[0] : null;
             const pick = fewestPick || (held && held.spare <= SPARE_OK) ? (fewestPick || held) : (full || pool.slice().sort((p, q2) => p.spare - q2.spare || dev(p.x) - dev(q2.x) || q2.n - p.n)[0]);
-            const cells = pick.x;
+            // FILLS THE REST (critic r3 P1): a page whose last column of small boxes stops short takes one more
+            // small problem in that column where it fits - never an empty ruled box (the notes say so)
+            let pick2 = pick;
+            if (pick.hole) {
+                const one = cands.filter((k) => !k.hole && k.n === pick.n + 1 && c.ids.every((id) => k.x[id] >= pick.x[id]));
+                // (else the nearest count pair with no empty box that still fills the page: more first)
+                const near = cands.filter((k) => !k.hole && k.spare <= SPARE_OK)
+                    .sort((p, q2) => (p.n < pick.n) - (q2.n < pick.n) || Math.abs(p.n - pick.n) - Math.abs(q2.n - pick.n) || dev(p.x) - dev(q2.x));
+                if (one.length) pick2 = one[0];
+                else if (near.length) pick2 = near[0];
+            }
+            const cells = pick2.x;
             const must = Number(input.mustBeat) || 0;
             const ladderNote = must && sum(cells) / P <= must
                 ? `Mixed practice: with the skills in the proportions asked, this size holds ${Math.round(sum(cells) / P)} problems a page, no more than the next size up (${must}).` : '';
-            return { counts: cells, perPage: Math.round(sum(cells) / P), classes: c, fill: { counts: cells, rest: !pick.within }, ladderNote };
+            return { counts: cells, perPage: Math.round(sum(cells) / P), classes: c, fill: { counts: cells, rest: !pick2.within }, ladderNote };
         }
     }
     let best = Object.fromEntries(c.ids.map((id) => [id, 2]));
@@ -1165,6 +1248,9 @@ function planMixedM2(input, pools) {
             const part = gridPart(items, { cols: sh.cols.length, rows: sh.rows, cellH: H / sh.rows, labels, start });
             const tot = sh.w.reduce((a, w) => a + w, 0);
             part.colsTpl = sh.w.map((w) => `${Math.round((w / tot) * 10000) / 100}fr`).join(' ');
+            // critic r3 P2: a shelf's cells widen to the frame by at most WIDEN_MAX of the width they fit
+            // at (each drawing >= 45 % of its cell); a shelf that would widen more is narrower, centred
+            if (tot * WIDEN_MAX < 1 - 1e-6) part.widthPct = tot * WIDEN_MAX * 100;
             part.trail = hole;
             band.contents.push(part);
             start += items.length;

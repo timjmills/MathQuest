@@ -732,6 +732,27 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
  * header grows by the title's line), so no page of the sheet is untitled.
  * `perPage` (fits) is then what one page of THIS mix holds: the problems on the fullest page.
  */
+/** The next count across past `cols` (one or two more) that divides the items' count, where every item is
+ * measured to fit at it; else `cols` (a count across is never forced past what the cells fit). */
+function dividingCols(its, cols) {
+    const n = its.length;
+    if (n <= cols || n % cols === 0) return cols;
+    // (past the counts measured: the slack the host measured at 1 and at `cols` across falls as
+    // 1 / count - the cell's width share - so the slack at `cols + 1` or `+ 2` is read off that line, with a
+    // 3 mm margin, and only for cells whose height did not change with the count: nothing reflows)
+    const fitsAt = (c) => its.every((it) => {
+        const m = it && it.measured;
+        if (!m) return false;
+        if (m[c]) return !!m[c].fits && Number.isFinite(m[c].hMm);
+        const a = m[1], z = m[cols];
+        if (cols < 2 || !a || !z || !a.fits || !z.fits || !Number.isFinite(a.slackMm) || !Number.isFinite(z.slackMm) || Math.abs(a.hMm - z.hMm) > 0.5) return false;
+        const w = (a.slackMm - z.slackMm) / (1 - 1 / cols);
+        return w / c - (w - a.slackMm) >= 3;
+    });
+    for (const c of [cols + 1, cols + 2]) if (c >= 2 && c <= 6 && n % c === 0 && fitsAt(c)) return c;
+    return cols;
+}
+
 function flowLayout(layouts0, chunks0, sectionsIn, itemsBySection, { body, instr, paper, headerFirst }) {
     const lines = Math.max(1, Number(headerFirst && headerFirst.titleLines) || 1);
     const titleMm = headerFirst && headerFirst.title ? HEADER_PARTS_MM.title + HEADER_PARTS_MM.titleWrap * (lines - 1) : 0;
@@ -740,12 +761,21 @@ function flowLayout(layouts0, chunks0, sectionsIn, itemsBySection, { body, instr
     // that saves a page - 20 facts at M on one page, not 12 + 8 over two.
     const build = (k) => {
         const layouts = layouts0.slice();
-        const specs = layouts0.map((L, si) => {
+        const specs = layouts0.map((L0, si) => {
+            let L = L0;
             const chunks = chunks0[si] || [];
             const G = Number(L.gridH) || (body - instr);
-            const full = chunks.length > 0 && chunks.every((c) => (Number(c.gridMm) > 0 ? Number(c.gridMm) : c.rows * L.cellH) >= 0.85 * G);
+            const its0 = itemsBySection[si] || [];
+            // (a part whose count across does not divide its count flows at the one that does - below)
+            const full = !(sectionsIn.length > 1 && dividingCols(its0, L.cols) !== L.cols) && chunks.length > 0 && chunks.every((c) => (Number(c.gridMm) > 0 ? Number(c.gridMm) : c.rows * L.cellH) >= 0.85 * G);
             if (full) return { layout: L, chunks, instrMm: instr, sharesWith: sectionsIn[si].splitOf };
             const its = itemsBySection[si] || [];
+            // critic r3 P1 (scenario h): a sheet of several parts with counts flows its parts, so a part
+            // whose count does not divide its count across ends in a short row and an empty ruled box
+            // (10 at 4 across: 4 + 4 + 2). It takes the next count across (one or two more) that divides its count where
+            // every cell measured fits at it (5 for 10). One-part sheets keep their layout.
+            const cols = sectionsIn.length > 1 ? dividingCols(its, L.cols) : L.cols;
+            if (cols !== L.cols) L = Object.assign({}, L, { cols, rows: Math.max(1, Math.ceil(its.length / cols)) });
             const cellH = Math.round(Math.min(L.cellH, (L.hMin || L.cellH) * k, (G - 1) / Math.max(1, L.rows)) * 1000) / 1000;
             layouts[si] = Object.assign({}, L, { cellH, fill: false });
             const rowsMm = [];

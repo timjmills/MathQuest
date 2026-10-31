@@ -33,10 +33,11 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.colsTpl]           a grid-template-columns value other than equal columns (a
  *                                          side-by-side anchor page: [twin | problem] sized to what
  *                                          each holds, RUBRIC H13)
+ * @param {number} [opts.widthPct]        a placed shelf narrower than the frame (percent), centred
  * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
  *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, trail = null } = {}) {
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, trail = null, widthPct = 0 } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     let k = start;
     // `place` (the mixed packer, sheet/mixed-pack.js): a cell set on the page lattice - its first
@@ -54,7 +55,10 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
         // (`trail.row`: the hole under a short last column of a two-row shelf starts on its row)
         if (trail && trail.col) out.push(`<div class="ws-cell blankrun" style="--from:${trail.col};grid-row:${trail.row || 1} / span ${trail.rows || 1}"></div>`);
         const r0 = rows || 1;
-        return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r0},1fr)`};${height ? `height:${height};` : ''}">${out.join('')}</div>`;
+        // (`widthPct`: a shelf narrower than the frame, centred - its cells never wider than their
+        // drawing / 0.45, critic r3 P2; additive inline style, old saved pages carry none)
+        const wd = widthPct > 0 && widthPct < 100 ? `width:${Math.round(widthPct * 100) / 100}%;margin-left:auto;margin-right:auto;` : '';
+        return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r0},1fr)`};${height ? `height:${height};` : ''}${wd}">${out.join('')}</div>`;
     }
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
     const used = cells.length + (spanFirst ? cols - 1 : 0);
