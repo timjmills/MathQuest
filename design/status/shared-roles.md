@@ -190,3 +190,44 @@ AK-4 1, DN-2 2 at S - the last a ROLE row) are gone. The new rows come from the 
 - The 7 redesign-passed skills are byte-identical on review and guided (42 / 42).
 - I accept the vocab_grade_K re-pin. Its rows come from the prerequisite cells: ten_frame_build H12 is pinned on 3 other documents. The count_objects H13 at S is flagged to the critic.
 - Critic r1 (independent, mq-opus-medium) launched at 315bff4e. Cost at launch: $134.5 (≈ 4.8 % of the weekly limit).
+
+## Critic r1 — FAIL (independent, mq-opus-medium, 315bff4e) — HAND-OVER
+
+Report: `design/audit/runs/shared-roles/critic-r1.md`; evidence: `design/audit/runs/shared-roles/r1/` (25 PNGs, lint outputs).
+
+| Defect | Verdict |
+|---|---|
+| R1-9 Reason It keep-out | FIXED |
+| R1-11 div Review strip + variety | FIXED |
+| R1-12 across keep-out | FIXED (but N4: across cells 50–60 % empty, S = L grid) |
+| R1-14 Opener "Use the dots" | FIXED |
+| R1-10 add_facts Review M H13 | H13 FIXED; page still red on L-KEY (16 key slots vs 12 pupil, pre-existing) and 5–9 mm Mixed Review slots at S |
+| R1-3 Scripted model | NOT FIXED: key, header and one page are done; panels still don't draw the strategy; 55–63 % blank (H5); div_facts has no state rule or `Say:` divider (N5) |
+| R1-5 Lesson | NOT FIXED: steps are generic now, but the mult/div anchor is still 11 × 11 / 110 ÷ 11, and the first guided item is the hardest |
+| R1-8 Pre-skill check | NOT FIXED: page full, but groups of 1–2 items; fractions:identify gets two quadrants of itself and odd prerequisites |
+| R1-13 Guided | NOT FIXED for add_facts (39 %) and sub_2d_1d (35 % at L): fixer F's byte-identity commit d3cb1f9 limited the fix to think-line Models |
+
+New, already at base: N1 fractions Reason It overflow; N2 fractions guided hint gives the answer; N3 stack-subtraction panel writes four places at once; N6 stray grey rules under the pre-skill grids.
+
+Screen hosts: no regression (all ≥ 8 except the fractions online worksheet at C3 7, as at base).
+
+### Why I stopped here (lead's call)
+Cost $144 (≈ 5.2 % of the weekly limit) against the $200 cap; the weekly rate limit also shows a warning. Round 2 needs:
+- a medium builder for the drawn strategy steps (R1-3), pre-skill grouping (R1-8), the anchor band (R1-5), guided rows (R1-13), across density (N4) and the add_facts Review key;
+- the six new checks with backtests;
+- a 1–3 h precritic run;
+- a second critic.
+
+That does not fit in the $56 left, and stopping at the cap with an unverified round is worse than a clean hand-over.
+
+### Round 2 plan (next session, Opus medium: rebuild of critic-failed work)
+1. **R1-3 scripted model:** each panel draws its step's state (make-ten split, think-addition frame, skip-count hops); fit the page (H5 ≥ 50 % fill); state rules and `Say:` divider (N5).
+2. **R1-5:** lesson anchor and the first guided item come from the middle band (not 0 / 1 / 10s / 11s / 12s), for every operation family.
+3. **R1-13:** remove the d3cb1f9 restriction, so every guided page gets the unstretched try rows. Show the redesign-passed diffs; that is the fix.
+4. **R1-8:** ≥ 4 items a group (fewer groups if needed); no prerequisite that is the page skill or shares its primary CCSS; fix N6.
+5. **N4:** across cells sized to content, and S fits more than L.
+6. **add_facts Review:** key slots = pupil slots; Mixed Review slots at least the PT minimum.
+7. **Checks:** the six new checks in `design/status/speed-audit.md`, with backtests on 315bff4e, on precritic's path.
+8. **Rule 0b reading:** ANY red row on a role this lane changes blocks the critic, not only rows above base.
+
+Not merged to claude/sweet-newton-c8wrv1; no draft PR, since the brief opens one only on PASS. Nothing in redesign-passed.js changed.

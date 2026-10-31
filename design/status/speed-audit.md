@@ -766,3 +766,23 @@ Details and the reflection: design/status/s1-checks.md.
 |---|---|---|---|
 | L6 fix-r4 + L7 build-r2 (parallel worktrees, 17:45–19:20Z) | gates green on both lessons (L6 49/49 incl. new E41; L7 all E rows); precritic --role lesson red only on main's `placevalue:more_less_10` L-OVERLAP | **E41** (built, backtest `e41-relation`): every relation a teacher page states is true of its numbers. **Proposed:** `ws-detailed-lesson` deals `checkQuestion.ref` and FAILS when the online choice count ≠ the board's A–D count (r2 D2 and the same gap in L7, both found by hand); E30-style scan for bare 4+ digit numbers on teacher pages (n3/n9). | **Gate drift after an owner ruling**: the 2026-10-23 kit rulings (CL-4b top cells, CL-11a number tabs) turned E9b/E11/E29 red in all 5 PASSED lessons and nobody saw it for 7 days. Rule: the change that lands a kit ruling runs `ws-detailed-lesson --check` on every passed lesson (proposed: add them to `ws-deploy-gates`). Parallel builders on disjoint file sets merged with 3 trivial conflicts (codes pinned in disjoint ranges ZA–ZE / Y7–Y9 by instruction) — keep doing it. Precritic `--role lesson --size S` waits on the 2-slot browser runner (796 s, 370 s queued): run it alone, not under a 580 s wall. |
 | Critic L6 r3 + L7 r1 (one critic, both lessons, 16 min) | **L6 PASS 8/8/8/8; L7 FAIL 8/7/7/7 (D1 chart zoom fallback, D2 family repeats, D3 script vs P5)** | chart-sizing FAIL when `chartPage` falls back (D1); E24 keyed on the unordered × / ÷ family + story frame, backtest `e24-family` (D2); "no X" script line vs page text (D3); T1 Flow word = Chunked when chunks; every pool place printed somewhere; bank grammatical number; Say frame without the operation word | L7's builder self-review missed all three blockers: each is a silent fallback or a gate whose rule text is wider than its key. Rule: a gate that names a rule gets a backtest row that fails on that rule; a layout fallback reports itself. One critic for two lessons cost one critic's wall time (16 min) — keep pairing. Owner paused the lane after this round: L7 fix round is the hand-over's first item. |
+
+## 2026-10-31 shared-roles lane, critic r1 (FAIL)
+
+**Per-round findings, automatic checks** (the full list is in `design/audit/runs/shared-roles/critic-r1.md`):
+
+| Finding | Check | Status |
+|---|---|---|
+| H13 misses the stacked answer zone and one-line across cells (R1-13, N4) | Extend L-DENSITY H13 to measure the answer zone and across cells | new |
+| Scripted model 55–63 % blank (H5) | PAGEFILL floor for scripted-model | new |
+| Pre-skill check groups of 1–2 items; a prerequisite shares the page skill's primary CCSS code | ws-columns pre-skill-check: ≥ 4 items a group, no shared primary CCSS | new |
+| A hint contains its item's answer (fractions guided) | L3 lint: no hint text holds the key value | new |
+| Lesson anchor is a 10s / 11s / 12s fact | Anchor-band check in providers or lesson unit | new |
+| div_facts scripted model has no state rule and no `Say:` divider | Frame check for state rules and the `Say:` divider | new |
+| add_facts Review key has 16 slots against the pupil page's 12 (AK) | Existing L-KEY. It was red and was handed off as "outside the lane", but it sits on a role the lane changed | process |
+
+**Speed-ups:**
+1. **Half-fixes.** Builders did the machine-checkable half of R1-3, R1-8 and R1-10 (key, page fill, keep-out) and left the teaching half (drawn steps, sensible prerequisites, items per group). Rule: a builder brief lists each defect's teaching acceptance test beside its lint.
+2. **A golden undid a fix.** The fixer's "keep goldens byte-identical" commit stopped the R1-13 fix from reaching pages without a think-line Model. Rule: when a fix and a golden conflict, the golden gives way, and the change is shown.
+3. **Precritic was too slow.** A both-trees precritic took 3 h 20 m and hit the 2 h background limit. Run each role in its own job of 1 h or less, and unshallow before backtests.
+4. **Red rows handed off.** Precritic red rows on a role the lane changes must not be handed off. "At or below base" let the add_facts Review key through. Rule 0b reading: any red on a role the lane changes blocks the critic.
