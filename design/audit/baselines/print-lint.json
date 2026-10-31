@@ -58994,357 +58994,65 @@
   },
   {
    "id": "vocabulary:vocab_grade_K#pre-skill-check",
-   "pages": 4,
-   "keyPages": 2,
+   "pages": 2,
+   "keyPages": 1,
    "error": null,
    "counts": {
     "L-INK": 0,
     "L-EMOJI": 0,
-    "L-FONT": 46,
+    "L-FONT": 0,
     "L-SIZE": 0,
     "L-OVERFLOW": 0,
     "L-SPLIT": 0,
     "L-DENSITY": 0,
-    "L-KEY": 1,
+    "L-KEY": 0,
     "L-VERBS": 0,
-    "L-ANSAREA": 0,
+    "L-ANSAREA": 4,
     "L-INPUT": 0,
     "L-CCSS": 0,
     "L-ANCHOR": 0,
     "L-SUPPORT": 0,
     "L-TOPSTART": 0,
     "L-OVERLAP": 0,
-    "L-WRAP": 0
+    "L-WRAP": 0,
+    "L-STEPS": 0
    },
    "findings": [
     {
-     "lint": "L-FONT",
-     "rule": "TY-1",
+     "lint": "L-ANSAREA",
+     "rule": "H12",
      "sev": "major",
-     "page": 2,
-     "msg": "printed page 2: 1 text run(s) embedded in \"LiberationSans-BoldItali\", not Andika (e.g. \"Write the matching letter on e\") (TY-1, TY-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "printed page 2: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"1.\") (TY-1, TY-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "printed page 2: 8 text run(s) embedded in \"DejaVuSansMono\", not Andika (e.g. \"The\") (TY-1, TY-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "printed page 2: 9 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"Match each word to its definit\") (TY-1, TY-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 2,
-     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "printed page 4: 1 text run(s) embedded in \"LiberationSans-BoldItali\", not Andika (e.g. \"Write the matching letter on e\") (TY-1, TY-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "printed page 4: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"1.\") (TY-1, TY-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "printed page 4: 8 text run(s) embedded in \"DejaVuSansMono\", not Andika (e.g. \"The\") (TY-1, TY-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "printed page 4: 9 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"Match each word to its definit\") (TY-1, TY-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-1",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-2",
-     "sev": "major",
+     "msg": "drawing grid of 10 cells, the smallest 6.8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)",
+     "el": "<table.k2-tenframe[data-ws-zone=\"ten frame\"]>",
      "page": 1,
-     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+     "cell": 5
     },
     {
-     "lint": "L-FONT",
-     "rule": "TY-2",
+     "lint": "L-ANSAREA",
+     "rule": "H12",
      "sev": "major",
+     "msg": "drawing grid of 10 cells, the smallest 6.8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)",
+     "el": "<table.k2-tenframe[data-ws-zone=\"ten frame\"]>",
+     "page": 1,
+     "cell": 6
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "msg": "drawing grid of 10 cells, the smallest 4.8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)",
+     "el": "<table.k2-tenframe[data-ws-zone=\"ten frame\"]>",
      "page": 2,
-     "msg": "printed page 2: 1 italic run(s), e.g. \"Write the matching letter on e\" (TY-2)"
+     "cell": 5
     },
     {
-     "lint": "L-FONT",
-     "rule": "TY-2",
+     "lint": "L-ANSAREA",
+     "rule": "H12",
      "sev": "major",
+     "msg": "drawing grid of 10 cells, the smallest 3.2 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)",
+     "el": "<table.k2-tenframe[data-ws-zone=\"ten frame\"]>",
      "page": 2,
-     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-2",
-     "sev": "major",
-     "page": 3,
-     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-2",
-     "sev": "major",
-     "page": 4,
-     "msg": "printed page 4: 1 italic run(s), e.g. \"Write the matching letter on e\" (TY-2)"
-    },
-    {
-     "lint": "L-FONT",
-     "rule": "TY-2",
-     "sev": "major",
-     "page": 4,
-     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
-    },
-    {
-     "lint": "L-KEY",
-     "rule": "AK-4",
-     "sev": "critical",
-     "page": 4,
-     "msg": "key page 4 has 1 answer slots, pupil page 2 has 0 (AK-4)"
+     "cell": 6
     }
    ]
   }

@@ -142,3 +142,41 @@ Every row is red on both trees, because skill-level reds were already there at l
 **Backtests:** 44 / 50 PASS. The 6 FAILs were a shallow clone ("invalid reference"); the fixer is rerunning them.
 
 **Speed-up noted:** a precritic run on both trees takes 3 h 20 m, and the first batch hit the 2 h background limit. Next time, run HEAD and base per role in separate jobs of 1 h or less, and unshallow the clone before backtests.
+
+## Fixer F (shared-roles-F, Opus medium, clean-before-critic follow-up, 2026-10-31)
+
+Root causes and fixes (role / host code, no exemption, no per-skill branch):
+- **review S (add_fractions_like TY-2 +4 / INK-5 +2, prime_composite H13 +2, add_decimal TY-7 +1):** builder C's `earlierSkills {hosts:true}`
+  swapped EVERY preset met in the fallback walk for its host. Two faults: it swapped `simplify_with_gcf` (grade 6, refused for a grade-4
+  skill) for its host `simplify` before the grade test, and it swapped lone presets that are their own lesson (`reasonable_quotients` ->
+  `estimate_quotient`, `whole_div_unit_frac` -> `div_unit_frac_nv`), so the Mixed Review dealt the host's other tasks and drawings. Fix
+  (`print-sheet.js` `isSeriesPreset`): the preset must pass the grade test itself, and it stands in for its host only when it is one value
+  of a SERIES (3+ presets of one host in the category on the same option keys: count by 2s ... 12s). R1-11 holds (div_facts Review: count
+  by 2, 3, 4, 5); the three skills' Review pages are back to base row for row.
+- **guided S div_facts H13 (H13-HINT, 0 -> 1):** the try beside a Model with a think line sat at the top of a row sized for the Model's tab
+  clearance + think line (17 mm), leaving a 10.3 mm (34 %) band under it. Fix (`guided.js`): that try steps down by the Model's tab clearance
+  (inline `padding-top`, the Model's own rule), so both problems stand level and the clearance is above them. Inline so no other guided page
+  changes a byte.
+- **pre-skill-check ws-columns vocab_grade_K (1 placeable prerequisite):** its 8 candidates were all vocabulary skills (no lesson, no WRM
+  `pre`), whose cells overflow every quadrant. Ruling applied (PAGE_TYPES PT-PRE-1 four quadrants, PT-PRE-3 prerequisites from the
+  pre-skill list): the host (`prereqSkills {wide}`) adds a WIDER list after the near 8 - 4 more earlier skills, then the skills the
+  curriculum already marks as a prerequisite (every `pre` list of `data/curriculum/links/<YEAR>.json`) at the skill's grade or below, own
+  domain first, nearest grade, most cited. The role (`pickPrereqs`) reads the wide pools (`w<n>`) ONLY when fewer than 3 near candidates
+  place, so every other page is unchanged (19 of 20 role samples byte-identical at S and L). vocab_grade_K now checks count objects,
+  compare groups, ten frame, number bonds: 4 groups, 1 page, fill 89-94 % at S / M / L.
+
+Redesign-passed 7 (subtraction): review and guided at S / M / L byte-identical to base 512542a and to 5e690c6 (42 of 42).
+Backtests rerun on the full clone: the 6 shallow-clone rows all PASS.
+
+### Fixer F baseline re-pin (vocab_grade_K#pre-skill-check only, S and L)
+
+The wider search changed what vocab_grade_K's Pre-skill check prints (K foundations in place of vocabulary cells that overflowed), so
+its two pinned documents were replaced with the new page's findings (`ws-print-lint --source kit --roles pre-skill-check [--size S]
+--skills vocabulary:vocab_grade_K --report-only --json`). No other document was touched. Builder B's vocab rows (TY-1 40, TY-2 6 / 8,
+AK-4 1, DN-2 2 at S - the last a ROLE row) are gone. The new rows come from the prerequisites' own cells:
+
+| size | lint rule | before (pin) | after | kind |
+|---|---|---|---|---|
+| L | L-ANSAREA H12 | 0 | 4 | prerequisite cell (ten_frame_build: the same rows are pinned on number_bonds, f_to_d, more_less_10) |
+| S | L-ANSAREA H12 | 0 | 8 | prerequisite cell (ten_frame_build, as above) |
+| S | L-DENSITY H13 | 0 | 1 | prerequisite cell (count_objects at band 5: a 1-object picture, 10 mm, centred in the 1fr column of a 92 mm counters cell; the counters cell sizes its picture column to the cell, not the picture) |
