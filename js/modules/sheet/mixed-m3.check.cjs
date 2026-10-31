@@ -46,10 +46,11 @@ const path = require('path');
 const fs = require('fs');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
-// (`boxes`, `width` and `across` are measured but run only when named (--checks boxes,width,across): critic r3 P1 / P2 / P3 are OPEN
-// (108 cells / e-M at 2026-10-31, design/status/mixed-pages.md); they join ALL_CHECKS when the engine passes them)
-const ALL_CHECKS = ['runs', 'rowfill', 'spread', 'align', 'digits', 'spare'];
-const KNOWN_CHECKS = [...ALL_CHECKS, 'width'];
+// (`boxes`, `width` and `across`, critic r3 P1 / P2 / P3, run by default as HARD FAILs - the lane lead's ruling at the
+// hand-over, 2026-10-31: a check may not be opt-in to keep a branch green; they are RED until the engine passes them,
+// see design/status/mixed-pages.md "Hand-over")
+const ALL_CHECKS = ['runs', 'rowfill', 'spread', 'align', 'digits', 'spare', 'boxes', 'width', 'across'];
+const KNOWN_CHECKS = [...ALL_CHECKS];
 const MM = 96 / 25.4;
 
 /* ================================================================ pure judges (node) */
@@ -338,8 +339,8 @@ function scenarios() {
     if (want('f') && (QUICK || !want('b'))) out.push({ id: `f mixed ican L seed ${SETS.b.seed}`, set: SETS.b.skills, arr: 'mixed', look: 'ican', size: 'L', seed: SETS.b.seed });
     if (want('g')) for (const seed of seeds(SETS.b.seed)) for (const size of QUICK ? ['M', 'S'] : ['S', 'M', 'L']) out.push({ id: `g sections daily ${size} seed ${seed}`, set: SETS.b.skills, arr: 'sections', look: 'daily', size, seed });
     // h (critic r3 P1): the Independent sheet of two parts with counts (add facts 10 + subtract facts 10)
-    // (OPEN, critic r3 P1 second half: run with --only h until practice.js flowLayout picks a count across that divides)
-    if (ONLY && ONLY.includes('h')) for (const size of QUICK ? ['M', 'S'] : ['S', 'M', 'L']) out.push({ id: `h independent 10+10 daily ${size} seed 4242`, set: ['addition:add_facts', 'subtraction:sub_facts'], counts: [10, 10], arr: 'sections', role: 'independent', look: 'daily', size, seed: 4242 });
+    // (critic r3 P1 second half: RED until practice.js flowLayout picks a count across that divides - runs by default)
+    if (want('h')) for (const size of QUICK ? ['M', 'S'] : ['S', 'M', 'L']) out.push({ id: `h independent 10+10 daily ${size} seed 4242`, set: ['addition:add_facts', 'subtraction:sub_facts'], counts: [10, 10], arr: 'sections', role: 'independent', look: 'daily', size, seed: 4242 });
     return out;
 }
 

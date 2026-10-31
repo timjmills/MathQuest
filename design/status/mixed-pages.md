@@ -3,10 +3,10 @@ Title: Truly mixed practice pages (M1–M5)
 Session: session_013pHDnLJxJB8jZan3tZDfNS (M2)
 Branch: claude/sweet-newton-c8wrv1-mixed-m2
 Owner of files (M2): sheet/roles/mixed-practice.js, sheet/mixed-pack.js (new), sheet/interleave.js, sheet/layout.js, sheet/paginate.js; the dialog: teacher-sheet.js, teacher-plan.js, teacher-tray.js, teacher-print.js
-State: M2 STOPPED at critic r2 (§1.7: three defect classes survived two medium rounds) — root cause below, report to the lead
+State: STOPPED with a hand-over (2026-10-31) — budget cap reached before a passing round; critic r3 FAIL (print), dialog check r3 FAIL; the r3 dialog defects fixed after it (73d2eb2), the print defects open
 Updated: 2026-10-31
 Builder profile: mq-opus-medium
-Critic rounds: M1 r1–r6 (PASS); M2 print r1 FAIL, r2 FAIL; M2 dialog check r1 FAIL (7/7/7/8), r2 FAIL (7/8/6/8)
+Critic rounds: M1 r1–r6 (PASS); M2 print r1, r2, r3 FAIL; M2 dialog check r1 (7/7/7/8), r2 (7/8/6/8), r3 (8/7/6/9) FAIL
 
 ## Owner (2026-10-31, verbatim)
 "This practice by section is good BUT we also need practice with mixed problem — so both need to be options, mix by section
@@ -127,3 +127,34 @@ OPEN (skipped for budget; checks written, opt-in until the engine passes them):
 - P3 one count across on every full row of a sheet: `mixed-m3 --checks across` (e-M: 4 then 5 across).
 - D2 ten skills: 20 on 3 pages (7 / 7 / 6 even, perPage 12): plan-match prints it as OPEN, not yet a FAIL.
 - P4 In sections without counts sharing shelves 50/50 with no note; D5 (12 + 5 with 3 empty boxes).
+
+## Critic r3 (print, 014957a): FAIL — and dialog check r3: FAIL (A 8 · B 7 · C 6 · D 9)
+PASS on print: owner's case a S/M/L (9/9/8/9), b-M, c-M/L, d-S, e-S, f-L (I Can) all ≥ 8; mixed one by one, runs > 2 only
+when forced and truly noted; exact 3:37; S > M > L (d under the lane ruling below); 2-digit × kit stack with partial
+products lines up with facts; every key answer right (7 keys incl. partial products).
+Lane ruling (lane lead, 2026-10-31, for the lead): at S a page whose every row height is set by a non-shrinking visual
+(fraction cell) may hold the same count as M when its facts are at the largest digits keeping H13 ≥ 70 % and the note
+says so (mixed-m2 `h13Exempt`, 1 mm tolerance; a facts-only S = M still FAILS).
+PASS on the dialog: exact counts in all 18 runs, every Mixed up page mixed, In sections parts titled, summary = printed,
+no false "engine changed" warning, 1 skill no choice, save / share Wm, quiz order, older print screen.
+
+## Hand-over (2026-10-31) — what is open, with the checks that are RED for it
+Fixed after r3 (73d2eb2, not yet graded): Mixed up is ONE flowed request with whole counts (k/N footers, numbering runs
+on across pages and keys, every page titled); no generic "I Can practise each skill in its own part" title (dialog and
+teacher-print.js). Checks: plan-match `numbered` / `titled` (FAIL on 014957a, PASS now).
+
+OPEN — each a HARD FAIL by default (the r3 fixer had made them opt-in / "OPEN"; reverted at the hand-over: a check may
+never be opt-in to keep a branch green). `node js/modules/sheet/mixed-m3.check.cjs --quick`: 13 failures —
+| Defect (critic r3) | Check (red now) | Where to fix |
+|---|---|---|
+| P1 empty box under the last cell (facts + word problems S, seed 722369); Independent 2 × 10 facts at M: rows of 2 + a 2-wide empty box, page 2 ≈ 45 % | `boxes` 3, `rowfill` 2, scenario `h` | mixed-pack.js shelvesOf (fill the column: one more fact on a fill page); practice.js flowLayout (a count across that divides the section, 5 for 10) — spanning the last cell broke H13, reverted |
+| P2 cells ≥ 30 % empty each side (b-S 15/16, b-L 1, d-L 9/10, d-M 15–17) | `width` 7 | mixed-pack.js: a cell no wider than ≈ content / 0.45; spare width → another problem or a narrower centred row |
+| P3 e-M: page 1 4 × 5, page 2 5 × 4 (PT-MIX-3) | `across` 1 | mixed-pack.js pages: one count across per sheet at the mix's capacity (30 at M) |
+| P4 Sections without counts 24 : 8 / 8 : 2 at 50/50, no note | not built (extend mixed-m2 `weights` to sections) | mixed-practice.js grouped packing: shelves by count, or a true note |
+| D2 ten skills Mixed up, 20 in all: 3 pages where 2 hold them | plan-match `filled` 1 | mixed-practice.js: lay the even pages at its own perPage |
+| D5 (minor) In sections, Pages 1, add typed 12: 12 + 5 with 3 empty boxes | none | teacher-plan.js / flowLayout |
+Not refreshed after 73d2eb2: design/status/mixed-m2/after/* renders and dialog screenshots (the r3 critic's fresh renders:
+the session scratchpad critic-r3/, dialog-check-r3/ — not committed).
+
+Next lane (Opus medium, fresh): make `mixed-m3` (all 9 checks incl. `h`), `mixed-m2`, `ws-teacher-plan-match` green
+without editing them, then one critic + dialog check. Expect ≈ $40 build + ≈ $20 grading.

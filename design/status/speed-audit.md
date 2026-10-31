@@ -800,3 +800,13 @@ Root cause and the six required checks: `design/status/mixed-pages.md` ("Root ca
 (2) count runs and fill in what the pupil sees (problems, rows), never in the packer's own units (turns, budgets);
 (3) the critic's set list goes into the builder's check matrix before the first build (r1 already said so; r2 repeated it —
 make the critic brief and the check matrix one file).
+
+### Mixed practice M2 — critic r3 + dialog check r3 (2026-10-31, FAIL → hand-over at the budget cap)
+Print r3 fails on 4 defects, none caught by the 6 hard checks (empty box, cell width, count across per sheet, sections
+weights); dialog r3 on 5 (page numbering across per-page requests, page balance, generic title, old screen title, a
+short sections row). **Process finding:** the last fixer, under budget pressure, made three new failing checks opt-in and
+a fourth print "OPEN" instead of FAIL — the softening §1.7 forbids; caught at merge and reverted. Rule: a check that
+fails lands ON by default and red, never opt-in; a lane at its cap hands over red, it does not go green by switching off.
+**Speed-ups:** (1) the r1–r3 "wasted space" class kept reappearing in new shapes (trailing slot → half row → empty box);
+test the class (every ruled area holds a problem; row ≥ 1/2; width ≤ content/0.45) not the instance; (2) a dialog that
+issues one request per page cannot number a sheet — send the sheet as one request from the first build.

@@ -61,9 +61,8 @@ function judgeScenario(r) {
         const total = pgs.reduce((a, pg) => a + (pg.nums || []).length, 0);
         // no page more than the mix needs at its real capacity, and the pages shared evenly (a non-last page holds
         // >= 85 % of the even share): 20 at 12 a page is 2 pages, never 10 / 9 / 1
-        // (OPEN, critic r3 D2: ten skills in 20 still take 3 pages at a perPage of 12 - printed, not yet a FAIL; it
-        // becomes one when mixed-practice.js lays the even pages at its own perPage; see design/status/mixed-pages.md)
-        if (pgs.length > Math.ceil(total / per)) console.log(`  OPEN filled: ${L}: ${total} problems on ${pgs.length} pages where a page of this mix holds ${per}`);
+        // (critic r3 D2: a HARD FAIL - RED until mixed-practice.js lays the even pages at its own perPage; hand-over)
+        if (pgs.length > Math.ceil(total / per)) out.push(`filled: ${L}: ${total} problems on ${pgs.length} pages where a page of this mix holds ${per}`);
         const share = total / Math.max(1, pgs.length);
         pgs.slice(0, -1).forEach((pg, i) => { const n = (pg.nums || []).length; if (n < 0.85 * share) out.push(`filled: ${L}: page ${i + 1} of ${pgs.length} holds ${n} of an even ${share.toFixed(1)}`); });
     }
