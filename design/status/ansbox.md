@@ -186,3 +186,32 @@ own box), byte- and pixel-identical to `git merge-base` (5c6063a). Parity is a g
 - f, 8: div_facts divForm=mix screen, mult_zeros stacked screen (per digit not honoured on screen).
 - g, 17: legacy columns 'one' on add/sub_10/20_no_regroup and equal_sign, multiply / missing_* 'digit': emptier band than Automatic.
 - e, 7: div_facts divForm=mix (long-division items keep their vinculum: 0 digit boxes), missing_mult_div notation=fraction 2/3.
+
+### r3 HAND-OVER (budget stop, 2026-10-31)
+**Done (committed):** slot model `js/modules/sheet/ans-slot.js`; Automatic = main everywhere (parity OK on all 70 answer-box
+skills, 2310 documents, HTML + pixels, card / worksheet / quiz); checks (shape cross product, f focus ring, c height, e worksheet,
+g H13, h render listing), `ws-ansbox-default-parity` (merge-base worktree, `--write` refused off main), `ws-render-delta`, both on
+`ws-precritic --skill`; backtests r3-1..7 all FAIL (9d5c221) -> PASS (34c960f); `ws-precritic-plan` OK; evidence PNGs in
+`design/status/ansbox/r3/`; ws-screen-slots back to main's (its "every slot a box" rule contradicted SL-3); content-audit and
+options-verify read the r3 markup.
+
+**Precritic r3 (`--strict --skill` the 7, started before the last three test fixes; logs /tmp/mq-precritic/20261031-163357-17001):**
+PASS providers, node-lint, code-snapshot, lessonfit, presets, ansbox-parity, print-lint kit L/S/M (baseline), screen-answer,
+boot-smoke, phone-card. FAIL on main too, with IDENTICAL finding lines (diffed against the lead's main run 20261031-132149-21153):
+print-lint-lesson-L/S, dealer-uniform, node-lint-s1. FAIL then fixed in a later commit (re-run each alone: OK): content-audit
+(could not load ans-slot.js), options-verify (one-box regex), screen-slots. FAIL, NOT FIXED: ansbox-shape g (3: div_facts
+divForm=fraction digit S 49 % vs 33 %; multiply digit L 34 % vs 29 %, default and stacked). options-render, coverage-matrix,
+sibling-compare: red as on main; the findings diff vs main was NOT done for these three (run the commands below). slot-clip and
+chromebook-fit had not reported when the budget stopped.
+
+**Not done / next steps (in order):**
+1. g on multiply / div_facts fraction: the legacy fact zone grows to 1.15 em (`print-generate.js` wsStackHTML 'digit') and the
+   fraction-form digit strip at S; keep Automatic's band. Check: `node tests/scripts/ws-ansbox-shape.cjs --skill multiplication:multiply,division:div_facts --check g --looks`.
+2. The full cross product (`node tests/scripts/ws-ansbox-shape.cjs --full`, about 1 h; 194 findings on 7c491cc, classes listed in
+   "Not fixed" above). The across look of column skills needs a LEAD DECISION (offer no "One box" on an across look, or a per-look panel);
+   the one-place (auto strip of one box = "One box") pair needs an exemption like (one, digit).
+3. LEAD DECISION: fact / equation now offer only "One box per digit" (One box = the screen's own box, Off = paper's line under SL-3).
+4. Findings ⊆ main for the remaining shared reds: `node tests/scripts/ws-render-delta.mjs --skill addition:add_100_regroup,addition:add_10_regroup,addition:add_facts,multiplication:mult_facts,addition:add_sub_10s,multiplication:multiply,division:div_facts --sizes S,L`
+   and diff coverage-matrix / sibling-compare / slot-clip logs against /tmp/mq-precritic/20261031-132149-21153.
+5. Then `node tests/scripts/ws-precritic.cjs --strict --skill addition:add_100_regroup --skill addition:add_10_regroup --skill addition:add_facts --skill multiplication:mult_facts --skill addition:add_sub_10s --skill multiplication:multiply --skill division:div_facts`
+   (now also runs render-delta) and `node tests/scripts/ws-ansbox-default-parity.mjs --skills ansbox`.
