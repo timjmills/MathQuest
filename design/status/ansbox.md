@@ -33,7 +33,7 @@ Critic rounds: 1, FAIL (lowest O6 = 3; print P = 5 on the fact template)
     25.6 px digit boxes on 27.7 px tracks. Checks c, d, e therefore run on the teacher's values only.
 
 ## Times
-Times: fix r2 (rebuild after critic r1), start 2026-10-31T10:40Z, end —, profile mq-opus-medium
+Times: fix r2 (rebuild after critic r1), start 2026-10-31T10:40Z, end 2026-10-31T14:10Z, profile mq-opus-medium
 
 ## r1 findings → what changed → the check that now catches it
 
@@ -59,6 +59,29 @@ Times: fix r2 (rebuild after critic r1), start 2026-10-31T10:40Z, end —, profi
   backtest rows `ansbox-a…f` in `tests/fixtures/precritic/backtests.json`; `ws-precritic-plan` OK (all on the path).
 - `tests/scripts/ws-ansbox-default-parity.mjs`: hashes the automatic pupil page + key (independent, more-practice,
   review × S, L) and the practice card of the passed skills; `--write` / `--check` a baseline.
+
+## Gates (Step 4, on the lane branch = main b63c075 merged + r2)
+
+- `ws-boot-smoke`: OK
+- `ws-code-snapshot`: OK (731 codes, 35 categories, no frozen code or position moved, 3200 option round trips)
+- `ws-content-audit`: FAIL - mc-all: 1 new pair `algebra_mixed:algebraic_all [make-a-ten/multiple-choice]`; **pre-existing**: the
+  same FAIL line on b63c075 (MQ_ROOT run), not touched by this lane
+- `ws-options-verify` (14-skill lane sample, every option): OK after r2 (595 values; the legacy fact's 1.15 em zone read fixed)
+- `ws-ansbox-shape` lane sample (14 skills): OK; full answer-box list (70): 63 clean, 7 pre-existing (Open questions)
+- `ws-ansbox-default-parity --check` (7 passed skills, 91 documents): OK; the 9 touched skills' automatic pages (117 documents): OK
+- `ws-stamp-assets` stamp, then `--check`: OK (297 modules and every stylesheet stamped)
+- `ws-backtest --row ansbox-a…f`: 6 PASS (fail on b63c075, pass on f83caa6); `ws-precritic-plan`: OK (every row on the path)
+- `node --input-type=module --check`: skill-options.js, print-sheet.js, print-generate.js OK
+- `ws-precritic --strict --skill` (add_10_regroup, add_100_regroup, add_facts, mult_facts, add_sub_10s, multiply, div_facts):
+  **FAIL: 8 FAIL, 16 PASS, 3 SKIPPED / INCOMPLETE**. Every ansBox row is green (options-verify 286 values 0 failing; ws-ansbox-shape
+  PASS; screen-slots, screen-answer, chromebook-fit, phone-card, print-lint L / S / M PASS). The 8 red rows are not this lane's:
+  coverage-matrix + sibling-compare + slot-clip (add_100_regroup ex-each / ex-group / layout-fact-rows: the SAME 4 red rows on
+  b63c075, re-run with MQ_ROOT), print-lint --roles lesson L / S (lesson pages), dealer-uniform (generation), node-lint-s1 (no
+  lesson data, Support help names "none"), options-verify --render (notation / support / divForm values; no ansBox value). The
+  automatic pages are byte-identical to b63c075 and the option never changes generation, so none of these can come from r2.
+  The spec cards (stack, fact, ...) are unsigned (INCOMPLETE).
+- `ws-precritic --strict --role lesson`: FAIL: 2 FAIL, 1 PASS. Both red rows are `placevalue:more_less_10#lesson L-OVERLAP CL40-INK:
+  0 -> 2` (L and S), the known main finding (speed-audit, lessons-6-7 row); grade-render PASS.
 
 ## Evidence (design/status/ansbox/, before = b63c075, after = r2)
 - legacy-stack-add_10_regroup-card-quiz-digit-vs-one-{before,after}.png (row 1 card, row 2 quiz; left digit, right one)
