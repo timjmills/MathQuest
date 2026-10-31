@@ -70,6 +70,7 @@ export function ansSlotEm(value, n = 2) {
 /** Digit-box proportions (em of the question's digit size): a box is never narrower than a digit track. */
 export const DIGIT_BOX_EM = 0.82;     // Andika's tabular digit advance is about 0.58 em; the box holds it with clear sides
 export const SLOT_H_EM = 1.15;        // the slot is never shorter than the printed operands
+export const BOX_HW = 0.75;           // and at least 0.75 x the writing height wide (at 0.95 add_sub_10s L lost page density: ws-render-delta)
 export const KEY_EM = 1;              // the key writes at the question's own digit size (AK-1)
 
 /**
@@ -84,7 +85,7 @@ export function ansSlot(value, { digits = 2, band = 0, hwMm = 8, blankMm = 0 } =
     const n = Math.max(1, Number(band) || 0, Number(digits) || 0);
     // hwMm / blankMm: a number of mm (the legacy formatter) or a CSS length (a kit cell: var(--ws-hw))
     const len = (v) => (typeof v === 'number' ? `${v.toFixed(2)}mm` : String(v || '0mm'));
-    const boxW = typeof hwMm === 'number' ? `max(${(hwMm * 0.95).toFixed(2)}mm, ${DIGIT_BOX_EM}em)` : `max(calc(${len(hwMm)} * 0.95), ${DIGIT_BOX_EM}em)`;
+    const boxW = typeof hwMm === 'number' ? `max(${(hwMm * BOX_HW).toFixed(2)}mm, ${DIGIT_BOX_EM}em)` : `max(calc(${len(hwMm)} * ${BOX_HW}), ${DIGIT_BOX_EM}em)`;
     const boxH = `max(${len(hwMm)}, ${SLOT_H_EM}em)`;
     const oneW = `max(${len(blankMm)}, ${(n * 0.62 + 0.8).toFixed(2)}em)`;
     return { value, n: value === 'digit' ? n : 1, boxW, boxH, oneW, keyEm: KEY_EM, place: 'after-equals', cls: `ws-ab ws-ab--${value}` };

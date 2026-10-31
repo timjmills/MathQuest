@@ -896,6 +896,166 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ansbox-r3-1-fact-across-S",
+   "check": "Digit box >= digit track and key digits >= 0.9 x question over EVERY appearance value (notation=across) at Size S (ansbox critic r2 #1: 4.8 mm boxes under 8 mm digits, key overflow)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape c, d over the cross product (looks)",
+   "browser": true,
+   "fail": {
+    "commit": "9d5c221",
+    "state": "r2: fact across S digit boxes sized from the S writing height"
+   },
+   "pass": {
+    "commit": "7c491cc",
+    "state": "r3: boxes from sheet/ans-slot.js (>= 0.82 em, >= 1.15 em tall)"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_facts --check c,d --sizes S --looks",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-r3-2-off-ring",
+   "check": "No two offered values alike on the practice card / quiz with a 4-sided focus ring counted as a box (ansbox critic r2 #2: 'Off' = Automatic's yellow box)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape f (outline / outer spread ring = box; shown, focused, at rest)",
+   "browser": true,
+   "fail": {
+    "commit": "9d5c221",
+    "state": "r2: fact / equation 'Off' draws the focus ring box on card and quiz"
+   },
+   "pass": {
+    "commit": "7c491cc",
+    "state": "r3: 'Off' is not offered where it draws what Automatic draws on any host"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill division:div_facts --check f --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-r3-3-worksheet-band",
+   "check": "One box count per set on the online worksheet (ansbox critic r2 #3: multiply 2 / 3 / 2 boxes)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape e on the worksheet host",
+   "browser": true,
+   "fail": {
+    "commit": "9d5c221",
+    "state": "r2: the worksheet sizes each card's strip from its own item"
+   },
+   "pass": {
+    "commit": "7c491cc",
+    "state": "r3: worksheet.js deals the set first and every card draws the set's widest strip"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill multiplication:multiply --check e --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-r3-4-h13",
+   "check": "A teacher's value leaves no more empty band than Automatic (ansbox critic r2 #4: legacy stack 'One box' jumps to the top, 43 % empty)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape g (H13 band vs Automatic)",
+   "browser": true,
+   "fail": {
+    "commit": "9d5c221",
+    "state": "r2: legacy stack one / off: the stack at the top of the cell"
+   },
+   "pass": {
+    "commit": "7c491cc",
+    "state": "r3: the box keeps the old zone's place and height"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_10_regroup --check g --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-r3-5-parity",
+   "check": "Automatic is byte- and pixel-identical to MAIN (git merge-base) on the passed skills (ansbox critic r2 #5: 28 of 91 review documents changed by lane commit 8c21ca1)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-default-parity vs merge-base (temp worktree)",
+   "browser": true,
+   "fail": {
+    "commit": "9d5c221",
+    "state": "r2: SL-3 'every slot a full box' moved the passed skills' review pages"
+   },
+   "pass": {
+    "commit": "7c491cc",
+    "state": "r3: Automatic = the old drawing everywhere"
+   },
+   "command": "node tests/scripts/ws-ansbox-default-parity.mjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-r3-6a-render-across",
+   "check": "options-render renders ansBox (or lists it SKIPPED) and finds nothing new on add_facts S (ansbox critic r2 #6: notation=across L-KEY AK-2 0 -> 16)",
+   "kind": "commit-pair",
+   "rule": "ws-render-delta (options-render findings of the tree within merge-base's)",
+   "browser": true,
+   "fail": {
+    "commit": "9d5c221",
+    "state": "r2: add_facts S notation=across key ink crosses the lane's box"
+   },
+   "pass": {
+    "commit": "7c491cc",
+    "state": "r3: across keeps the old line under Automatic; digit boxes from ans-slot.js"
+   },
+   "command": "node tests/scripts/ws-render-delta.mjs --skill addition:add_facts --sizes S",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-r3-6b-render-capacity",
+   "check": "options-render: no capacity loss on add_sub_10s L (ansbox critic r2 #6: task=1 capacity 16 where the default prints 18)",
+   "kind": "commit-pair",
+   "rule": "ws-render-delta (options-render findings of the tree within merge-base's)",
+   "browser": true,
+   "fail": {
+    "commit": "9d5c221",
+    "state": "r2: the '= ?' sentence box costs a row at L"
+   },
+   "pass": {
+    "commit": "7c491cc",
+    "state": "r3: Automatic keeps the old line; capacity as main"
+   },
+   "command": "node tests/scripts/ws-render-delta.mjs --skill addition:add_sub_10s --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-r3-7-no-wrap",
+   "check": "A sentence answered in digit boxes never wraps before '=' on the online worksheet (ansbox critic r2 #7)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape e (worksheet: '=' and the first box on one line)",
+   "browser": true,
+   "fail": {
+    "commit": "9d5c221",
+    "state": "r2: add_sub_10s / add_three per digit wraps on the worksheet card"
+   },
+   "pass": {
+    "commit": "7c491cc",
+    "state": "r3: nowrap on the digit-strip sentence"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_sub_10s --check e --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
