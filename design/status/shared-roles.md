@@ -180,3 +180,13 @@ AK-4 1, DN-2 2 at S - the last a ROLE row) are gone. The new rows come from the 
 | L | L-ANSAREA H12 | 0 | 4 | prerequisite cell (ten_frame_build: the same rows are pinned on number_bonds, f_to_d, more_less_10) |
 | S | L-ANSAREA H12 | 0 | 8 | prerequisite cell (ten_frame_build, as above) |
 | S | L-DENSITY H13 | 0 | 1 | prerequisite cell (count_objects at band 5: a 1-object picture, 10 mm, centred in the 1fr column of a 92 mm counters cell; the counters cell sizes its picture column to the cell, not the picture) |
+
+## Clean before critic (lead)
+
+- Fixer F (a1056e8, d3cb1f9, 315bff4) is merged as a fast-forward.
+- precritic guided / review S and L: every row is at or below base 512542a.
+- pre-skill-check: precritic OK, 4 of 4 gates.
+- backtests: the 6 shallow-clone rows rerun and PASS (50 / 50).
+- The 7 redesign-passed skills are byte-identical on review and guided (42 / 42).
+- I accept the vocab_grade_K re-pin. Its rows come from the prerequisite cells: ten_frame_build H12 is pinned on 3 other documents. The count_objects H13 at S is flagged to the critic.
+- Critic r1 (independent, mq-opus-medium) launched at 315bff4e. Cost at launch: $134.5 (≈ 4.8 % of the weekly limit).
