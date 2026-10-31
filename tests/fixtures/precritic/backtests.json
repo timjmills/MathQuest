@@ -908,7 +908,7 @@
     "state": "r2: fact across S digit boxes sized from the S writing height"
    },
    "pass": {
-    "commit": "7c491cc",
+    "commit": "34c960f",
     "state": "r3: boxes from sheet/ans-slot.js (>= 0.82 em, >= 1.15 em tall)"
    },
    "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_facts --check c,d --sizes S --looks",
@@ -928,7 +928,7 @@
     "state": "r2: fact / equation 'Off' draws the focus ring box on card and quiz"
    },
    "pass": {
-    "commit": "7c491cc",
+    "commit": "34c960f",
     "state": "r3: 'Off' is not offered where it draws what Automatic draws on any host"
    },
    "command": "node tests/scripts/ws-ansbox-shape.cjs --skill division:div_facts --check f --sizes L",
@@ -948,7 +948,7 @@
     "state": "r2: the worksheet sizes each card's strip from its own item"
    },
    "pass": {
-    "commit": "7c491cc",
+    "commit": "34c960f",
     "state": "r3: worksheet.js deals the set first and every card draws the set's widest strip"
    },
    "command": "node tests/scripts/ws-ansbox-shape.cjs --skill multiplication:multiply --check e --sizes L",
@@ -968,7 +968,7 @@
     "state": "r2: legacy stack one / off: the stack at the top of the cell"
    },
    "pass": {
-    "commit": "7c491cc",
+    "commit": "34c960f",
     "state": "r3: the box keeps the old zone's place and height"
    },
    "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_10_regroup --check g --sizes L",
@@ -988,7 +988,7 @@
     "state": "r2: SL-3 'every slot a full box' moved the passed skills' review pages"
    },
    "pass": {
-    "commit": "7c491cc",
+    "commit": "34c960f",
     "state": "r3: Automatic = the old drawing everywhere"
    },
    "command": "node tests/scripts/ws-ansbox-default-parity.mjs",
@@ -1008,7 +1008,7 @@
     "state": "r2: add_facts S notation=across key ink crosses the lane's box"
    },
    "pass": {
-    "commit": "7c491cc",
+    "commit": "34c960f",
     "state": "r3: across keeps the old line under Automatic; digit boxes from ans-slot.js"
    },
    "command": "node tests/scripts/ws-render-delta.mjs --skill addition:add_facts --sizes S",
@@ -1028,7 +1028,7 @@
     "state": "r2: the '= ?' sentence box costs a row at L"
    },
    "pass": {
-    "commit": "7c491cc",
+    "commit": "34c960f",
     "state": "r3: Automatic keeps the old line; capacity as main"
    },
    "command": "node tests/scripts/ws-render-delta.mjs --skill addition:add_sub_10s --sizes L",
@@ -1048,7 +1048,7 @@
     "state": "r2: add_sub_10s / add_three per digit wraps on the worksheet card"
    },
    "pass": {
-    "commit": "7c491cc",
+    "commit": "34c960f",
     "state": "r3: nowrap on the digit-strip sentence"
    },
    "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_sub_10s --check e --sizes L",
