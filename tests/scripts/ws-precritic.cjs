@@ -61,7 +61,7 @@
 //             + ws-grade-render --template --contact-sheet
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline. The sample is tests/fixtures/precritic/role-sample.json
-//   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows,
+//   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows, -plan-match,
 //             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-plain-words --check
 //
 // BASELINES (pinned; changed only with a STATUS note)
@@ -775,8 +775,11 @@ function buildPlan(ctx) {
             for (const [id, file, args, what] of [
                 ['mixed-m2', 'js/modules/sheet/mixed-m2.check.cjs', ['--quick'], 'mixed sizes, exact counts, ladder'],
                 ['mixed-page', 'js/modules/sheet/mixed-page.check.cjs', ['--seeds', '2'], 'one size class: repeats, digits, ladder, fill'],
+                // (§1.7 stop of M2: what the pupil SEES, hard FAILs - runs in problems, row fill, even spread, cross-template
+                // rule alignment, digit size, spare height - on the critics' sets at S / M / L, both looks, 2 seeds)
+                ['mixed-m3', 'js/modules/sheet/mixed-m3.check.cjs', [], 'runs / rows / spread / align / digits / spare, as printed'],
             ]) {
-                const g = gate(id, `${path.basename(file)} ${args.join(' ')}`, `Mixed practice: ${what}`, 'browser', id, args);
+                const g = gate(id, `${path.basename(file)} ${args.join(' ')}`.trim(), `Mixed practice: ${what}`, 'browser', id, args);
                 g.file = path.join(ROOT, file);
                 g.missing = fs.existsSync(g.file) ? null : `${file} is not in this tree`;
                 g.script = `${id} check`;   // (its verdict line: "mixed-m2 check: OK")
@@ -791,6 +794,8 @@ function buildPlan(ctx) {
         if (ctx.lesson) w.push('--lesson', ctx.lesson);
         add(gate('teacher-wrm', `ws-teacher-wrm${w.length ? ' ' + w.join(' ') : ''}`, ctx.grade || ctx.lesson ? `White Rose ${[ctx.grade && `grade ${ctx.grade}`, ctx.lesson && `lesson ${ctx.lesson}`].filter(Boolean).join(', ')}` : 'White Rose, every lesson', 'browser', 'ws-teacher-wrm', w, { needFlags: [ctx.grade && 'grade', ctx.lesson && 'lesson'].filter(Boolean) }));
         add(gate('teacher-flows', 'ws-teacher-flows', 'teacher flows (§2.9)', 'browser', 'ws-teacher-flows', []));
+        // (§1.7 stop of M2, dialog half: the Print sheet's plan === the built pages, titles, per-skill counts, summary line)
+        add(gate('teacher-plan-match', 'ws-teacher-plan-match', 'Print sheet plan = what prints (In sections, Mixed up, big cells)', 'browser', 'ws-teacher-plan-match', []));
         add(gate('teacher-tokens', 'ws-teacher-tokens', 'teacher tokens (§2.8)', 'node', 'ws-teacher-tokens', []));
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
     }
