@@ -30,8 +30,9 @@ const AUTO_COLS = { S: 4, M: 3, L: 3 };
 export const sources = (skills, { earlier }) => {
     const out = [{ id: 'main', skills }];
     // The earlier step, or (critic guided-r1) the host's fallback when the skill is the first of
-    // its category: a Review always rehearses something before this skill.
-    const prev = skills.length === 1 ? earlier(skills[0], 1, { fallback: true }) : [];
+    // its category: a Review always rehearses something before this skill. A preset stands in
+    // for its host skill (shared-roles R1-11), so the Mixed Review varies over the host's range.
+    const prev = skills.length === 1 ? earlier(skills[0], 1, { fallback: true, hosts: true }) : [];
     if (prev.length) out.push({ id: 'earlier', skills: prev });
     return out;
 };
