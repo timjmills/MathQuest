@@ -675,6 +675,16 @@ function buildPlan(ctx) {
                 add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
             }
         }
+        // The fact skills' pages WITH their supports at S (critic laned-restart R1-4, 2026-10-31: div_facts think / boxsign
+        // ran a row 10.8 mm off the page and split cells across sheets while every supports-off gate was green; the
+        // page-level PG-12 / PG-21 belongs in the table, not only ws-slot-clip's cell clip). Every support ticked
+        // (--supports all), no pin: a finding here is red.
+        const FACT_KEYS = new Set(['addition:add_facts', 'subtraction:sub_facts', 'multiplication:mult_facts', 'division:div_facts']);
+        const factKeys = keys.filter((k) => FACT_KEYS.has(k));
+        if (factKeys.length) {
+            add(gate('print-lint-supports-S', 'ws-print-lint --source kit --supports all --size S (fact skills with every support on: PG-12, PG-21, CL-40)', `${factKeys.join(', ')} × supports`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--supports', 'all', '--size', 'S', '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
+        }
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));

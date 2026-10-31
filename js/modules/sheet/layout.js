@@ -800,8 +800,13 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     // Column stacks keep 12.1's grid too: their cell height is the pupil's regrouping space.
     const stacked = infos.some((i) => i.fp.tracks && !i.fp.factLike);
     if (FILL_ROLES.has(role) && !clamped && !packed && !stacked && !gridOverride && hMin > 0 && cls !== 'word' && cls !== 'long') {
-        const used = rows * Math.min(G / rows, fillLimit(hMin));
-        const fit = Math.floor((G - SAFETY_H_MM) / roomed(atCols, DENSE_ROOM));
+        // (the heights at the columns the page now has: dense packing above may have moved to more
+        // columns, where a support box stacks under its problem - div_facts think at S measured 15 mm at
+        // 2 columns and 25.5 mm at 3, and 10 rows of 3 ran 10.8 mm past the page; critic laned-restart R1-4)
+        const atFill = probe(cols, false);
+        const hFill = atFill.hMin || hMin;
+        const used = rows * Math.min(G / rows, fillLimit(hFill));
+        const fit = Math.floor((G - SAFETY_H_MM) / roomed(atFill, DENSE_ROOM));
         if (used < PAGE_FILL * G && fit >= 5 / cols) {
             let want = Math.min(fit, Math.floor((DN1_AT[size] || DN1_MAX) / cols));
             if (cols === 2 && want > 1 && !section.freeRows) want = TWO_COL_ROWS.find((r) => r <= want) || want;

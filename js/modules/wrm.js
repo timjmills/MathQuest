@@ -1112,6 +1112,8 @@ export const SKILL_WRM = {
     'division:div_3by1_long': ['Y4.B5.S13'],
     'division:div_4by1_long': [{ step: 'Y5.B5.S7', partial: 'short division of up to 4 digits by 1 digit, no remainder by default' }],
     'division:div_3by2_long': ['Y6.B2.S11'],
+    // 2026-10-31 (owner, facts card Q4): division facts written in the long-division bracket.
+    'division:div_facts_long': [{ step: 'Y4.B5.S11', partial: 'division facts to 12 x 12 in the long-division bracket: the notation, with no exchange past a fact' }],
     'number_sense:near_doubles': ['Y1.B5.S5'],
     // PRESET skills, batch 2 (2026-10-17): the host's steps that the preset's values ARE.
     'multiplication:mult_break_apart': [{ step: 'Y4.B5.S15', partial: 'breaking a fact apart into two easier facts' }],

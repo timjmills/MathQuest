@@ -102,7 +102,7 @@ const unitYear = id => yearOf[id] || (siteOf[id] ? siteOf[id].wrmYear : null);
 
 const strip = s => String(s ?? '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&times;/g, '×').replace(/&divide;/g, '÷').replace(/&minus;/g, '−').replace(/&#?\w+;/g, ' ').replace(/\s+/g, ' ');
 const lab = x => x == null ? '' : typeof x === 'object' ? (x.label ?? x.text ?? x.html ?? JSON.stringify(x)) : String(x);
-const SKIPK = new Set(['slotDigits', 'level', 'frames', 'places', 'wrap', 'correct', 'blanks', 'tiles', 'seed', 'w', 'h', 'x', 'y', 'width', 'height', 'size', 'r', 'cx', 'cy', 'id', 'idx', 'index']);
+const SKIPK = new Set(['slotDigits', 'level', 'frames', 'places', 'wrap', 'correct', 'blanks', 'tiles', 'seed', 'w', 'h', 'x', 'y', 'width', 'height', 'size', 'r', 'cx', 'cy', 'id', 'idx', 'index', 'wholeMm']);   // wholeMm: a frac-model drawing's length in mm, not a dealt number (F2 2026-10-31)
 // maxdealt.mjs (R/Y1 lane): the content a PK / K link must not carry, and the rule-19 classes, read per item
 const FLAGS = { times: /×|÷|multipl|divid/i, parallel: /parallel|perpendicular|right angle|acute|obtuse/i, poly: /octagon|hexagon|pentagon|quadrilateral|trapez|rhomb|parallelogram|kite|heptagon|nonagon|decagon/i,
   vert: /vert(ex|ices)/i, column: /column|carry|regroup|borrow|exchange/i, units: /\b(cm|mm|km|kg|g|ml|mL|inch|inches|feet|foot|yard|pound|ounce|liters?|litres?|grams?|meters?|metres?)\b/,

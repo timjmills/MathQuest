@@ -519,6 +519,8 @@ export const SKILL_TERMS = {
         'long division', 'short division', 'bus stop method', 'divide a 3 digit number'],
     'division:div_4by1_long': ['4 digit by 1 digit division', 'divide 4 digit by 1 digit', 'four digit by one digit division',
         'long division', 'short division', 'bus stop method', 'divide a 4 digit number'],
+    'division:div_facts_long': ['division facts in the bracket', 'bus stop division facts', 'division bracket', 'division house',
+        'divide with the bracket', 'bracket division facts', 'short division facts', 'facts written with the division bracket'],
     'division:div_3by2_long': ['3 digit by 2 digit division', 'divide by 2 digit numbers', 'divide 3 digit by 2 digit',
         'long division', 'two digit divisor', 'long division with 2 digit divisors', 'divide by a 2 digit number'],
     'fractions:compare_to_half': ['compare to one half', 'compare fractions to 1/2', 'benchmark one half', 'more than half',
@@ -652,6 +654,9 @@ export const SKILL_TERMS = {
 export const PRIMARY_SKILLS = {
     // critic r4 R-D / R-E / C-F
     'shapes_early:shape_corners_count': ['corner', 'corners', 'count corners'],
+    // 2026-10-31 (F2): the long-division preset of division facts ("Divide: Long-Division Form") carries "long division" in its
+    // label; the written method (long_div_2digit, then the div_NbyM_long presets) still leads that query (ws-search-terms (b) / (e)).
+    'division:long_div_2digit': ['long division'],
     'conversions:d_to_f': ['decimals to fractions', 'decimal to fraction', 'decimal to fractions', 'decimals to fraction', 'convert decimals to fractions'],
     'conversions:f_to_d': ['fractions to decimals', 'fraction to decimal', 'fraction to decimals', 'fractions to decimal', 'convert fractions to decimals'],
     // critic r5: no skill deals the associative property, so 'associative' finds nothing (REAL_WORDS keeps it uncorrected);
