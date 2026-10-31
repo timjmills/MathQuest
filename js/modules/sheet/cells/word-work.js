@@ -1175,6 +1175,9 @@ function sentenceLayout(p, ctx) {
     const kb = p.kb ? `<div style="margin-top:${L(ctx, 2)};">${keywordBank(ctx, ['+', '-'])}</div>` : '';
     const cls = 'mq-ww mq-wwframes mq-wwsentence';
     const base = `box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;`;
+    // (`noStory`: Reason It prints the story ONCE over its A and B panels, so each panel draws the work only - critic
+    // visual-quality r3 N12: a panel that repeated the whole story held one item a page at L)
+    if (p.noStory) return `<div class="${cls}" data-ww-ops="${st.op}" data-ws-inplace data-read style="width:100%;${base}">${work}</div>`;
     if (!narrow) {
         // (a K picture story's counting picture takes the cell's whole width UNDER the story and the sentence: both groups
         // on one line on every item - beside the sentence they wrapped on some items and not others, so the rows of one
