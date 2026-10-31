@@ -767,6 +767,8 @@ function printAll() {
 export function lessonPrintParts() { return lpParts(); }
 const lpRadio = (act, cur, list, label) => `<div class="tvs-radios" role="radiogroup" aria-label="${esc(label)}">${list.map(([val, t]) => `<button type="button" class="tvs-radio" role="radio" data-act="${act}" data-v="${val}" aria-checked="${cur === val}"><span class="tvs-radio-dot" aria-hidden="true"></span><span>${esc(t)}</span></button>`).join('')}</div>`;
 setPrintExtra({
+    /** The name Print all gives the document (the full preview shows the same name). */
+    title() { const ls = trayLessons(); return ls.length ? (ls.length === 1 ? ls[0].name : `${ls.length} lessons`) : ''; },
     html() {
         const ls = trayLessons();
         if (!ls.length) return '';
