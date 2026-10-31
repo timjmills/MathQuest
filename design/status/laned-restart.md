@@ -67,6 +67,52 @@ whole_as_fraction `forms` matchers read the lane's item text, narrowed `denoms` 
 
 Syntax: every module under js/ passes `node --input-type=module --check`; ws-boot-smoke OK on the merge.
 
+### Fixes after the merge (each its own commit)
+
+- `cells/long-division.js`: `rowTrack` was used in `render` and `footprint` after builder B moved it into `trackOf`
+  (ReferenceError on EVERY division cell since 43e6fe35; ws-layout-unit 9 of 885 red). Defined again in both from `trackMm`.
+- `css/sheet-kit.css` CL-40 under wide tabs (the port's "grid numbered past 9" rule): a top pad of the keep-out + 2.6 mm
+  on every one-line equation / fact cell. The measuring cell carries no wide tab, so rows were never sized for it:
+  stacked facts (more-practice, test, mixed, lesson) and across facts (Fact Probe, div_facts Mixed / Lesson, add_facts
+  Review) ran 0.2-2.1 mm out of their cells (PG-12, 40-60 cells a page). Now: stacked facts take no pad (their ink
+  starts right of the keep-out already); one-line equations and across fact cells clear the keep-out SIDEWAYS (left
+  inset of the w2 keep-out + 0.3 mm), at the cell's own top pad. Fact rows (`.facts`) untouched.
+
+## Gates on the merge (fact family: add_facts, sub_facts, mult_facts, div_facts; main = worktree of 9d6f07b8)
+
+| Gate | Merged branch | Main 9d6f07b8 (same scope) | Verdict |
+|---|---|---|---|
+| syntax (every js/ module), ws-boot-smoke, ws-layout-unit (885), ws-code-snapshot (731 codes), ws-content-audit x4, ws-share-options, ws-screen-answer x4, ws-sheet-determinism x4 | OK | - | green |
+| ws-print-lint --roles fact-rows, S and L x Columns Auto / 5 / 6 / 8 / 10 | 0 findings (all 10 runs) | - | green |
+| ws-print-lint fact-rows, div_facts at 10 columns, divForm standard / long / fraction / mix, S and L | 0 findings (8 runs) | mix L red | green |
+| ws-div-facts-forms | FAIL 8 | FAIL 13 | pre-existing: every one of the 8 is in main's 13 (same check names) |
+| ws-print-lint kit, 4 skills x 17 roles, S / M / L | 57 / 61 / 51 findings | 44 / 64 / 108 | see "still red" |
+| ws-precritic --skill (the 4) --role fact-rows --strict | FAIL 6 of 28 | - | see below |
+
+Precritic gates red: ws-dealer-uniform, ws-node-lint S1 (LESSON-DATA / OPTION-HELP), ws-sibling-compare (no approved
+siblings) - all known pre-existing; spec card INCOMPLETE (unsigned) - known; ws-options-verify --render 16 value pages
+(main 25 on the same four skills: the lane's set is main's less 9, plus none new after the CL-40 fix); ws-slot-clip 3 rows
+(div_facts sections L and fade-page S - the boxsign / think supports on the equation cell, also red on the lane tip
+43e6fe35, green on main; mult_facts fade-page L - red on main too); ws-lessonfit (composing:fraction_number_line, a lane
+port skill, fails main's NEW lessonfit gate - not fact family).
+
+Still red on the fact family (none caused by the merge):
+- sub_facts scripted-model (AK-2 critical, H13 x8) and reason-it (CL40-INK): sub_facts moved onto the kit fact cell
+  (builder B) and now carries the same defects add_facts / mult_facts / div_facts have on main.
+- add_facts Review M: H13 x6 (an add_sub_10s-style across item pinned left in a full-width cell); present at the lane tip.
+- div_facts supports boxsign / think on equation cells (fade-page S, options-verify): overflow 2.6-5 mm and CL40-INK;
+  lane tip and main both red on think / boxsign, the fade-page row only on the lane.
+- notation "across" at 4 columns: S capacity 16 vs 25 (main too); mult_facts L CL40-INK x8 (main x18): a 38 mm across
+  fact does not fit beside a w2 tab in a 46 mm cell - needs fewer columns, not a smaller inset.
+- add_sub_10s (not fact family) Test S: H13 x40 once the top pad went (the row is sized for more than the one line).
+- missing_mult_div (not fact family) More practice L: CL40-INK x2 ("100" under tab 16: the item is wider than its cell less
+  the inset, so it spills left into the keep-out; at a w3-sized inset it was clear but the fact family's across facts ran
+  0.5 mm out of 46 mm cells instead).
+
+Evidence (design/status/laned-restart/, 150 dpi): fact rows Size S, 10 columns (mult_facts 8), pupil page -
+after-{add_facts,sub_facts,mult_facts}.png, after-div_facts-{standard,fraction,long}.png and the same from main as
+before-*.png; practice card card-div_facts-{standard,fraction,long}-{390,1280}.png, card-sub_facts-{390,1280}.png.
+
 ## Gates on the port (builder A, 2026-10-30; main = scratchpad worktree of fbeaa332)
 
 | Gate | Branch | Main (same scope) |
