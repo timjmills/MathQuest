@@ -48,6 +48,8 @@ import { esc } from '../cell.js';
 import { blankWidth } from '../tokens.js';
 import { L, P, B, INK, GREY, KEY_FEATURES, isTwin, sizeOf, digitPt, textPt, zonePt, shapeOf, n2, checkBox } from './k2kit.js';
 import { divisionSteps } from './long-division.js';
+import { partWholeBar } from '../graphics/part-whole-bar.js';
+import { sentenceFrame, sentenceFrameWidthMm } from '../graphics/sentence-frame.js';
 
 export const WW_TEMPLATE = 'word-work';
 
@@ -1002,25 +1004,14 @@ function barLayout(p, ctx) {
     const put = filled(ctx);
     const ink = put ? inkOf(ctx) : null;
     const st = p.steps[0];
-    // RP-70 / RP-72 (V22 XP-G-15): a SCHEMATIC part-whole bar - 14 mm tall at L, at least 42 mm
-    // long, never proportional: equal parts are drawn equal, else the bigger part from the longer
-    // stock length (60 / 40). Its writing boxes are slot size (Hw x B(2)), digits at working size.
-    const segH = { S: 11, M: 12.5, L: 14 }[size] || 14;
-    const hw = { S: 8, M: 9, L: 10 }[size] || 10;
-    const lw = Math.max(14, blankWidth(2, size));
+    // RP-70 / RP-72 (V22 XP-G-15): the SCHEMATIC part-whole bar, drawn by the graphic library
+    // (graphics/part-whole-bar.js): never proportional, equal parts equal, else 60 / 40.
     const W = Number(p.barW) > 0 ? Math.max(42, Number(p.barW)) : (cols >= 2 ? 52 : 70);
     const whole = st.op === '+' ? st.ans : st.top;
     const pa = st.op === '+' ? st.top : st.bottom;
     const pb = st.op === '+' ? st.bottom : st.ans;
-    // (the short stock length always holds its writing box: at least the box + 5 mm)
-    const small = Math.min(W / 2, Math.max(0.4 * W, lw + 5));
-    const wa = pa === pb ? W / 2 : (pa > pb ? W - small : small);
-    const fmt = (n) => Number(n).toLocaleString('en-US');
     // (`gradeParts`, lesson 2 r4 - critic r2 n9: the exit slip's sort reads the bar, so its boxes are graded there)
-    const lab = (v) => `<span${p.gradeParts ? '' : ' data-ws-graded="0"'} data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}"${put && ink ? ` data-ws-ink="${ink}"` : ''}>${put ? esc(fmt(v)) : ''}</span>`;
-    const seg = (w, v, left) => `<span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${L(ctx, segH)};border:${B(ctx, 1)} solid ${INK};${left ? '' : 'border-left:none;'}background:#fff;">${lab(v)}</span>`;
-    const bar = `<div class="mq-wwbar" aria-label="bar model" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 1.5)};">`
-        + `<div style="display:flex;">${seg(W, whole, true)}</div><div style="display:flex;">${seg(wa, pa, true)}${seg(W - wa, pb, false)}</div></div>`;
+    const bar = partWholeBar(ctx, { whole, a: pa, b: pb, wMm: W, show: put, ink, gradeParts: !!p.gradeParts });
     const bx = boxMm(ctx);
     const aw = Math.max(blankWidth(2, size), bx * 1.4);
     const shown = put ? String(p.ans) : '';
@@ -1119,6 +1110,51 @@ function framesLayout(p, ctx) {
         + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
 }
 
+/**
+ * `layout: 'sentence'` (visual-quality lane 2026-10-31, design/audit/VISUAL_QUALITY.md 4.4; VQ-1..VQ-3):
+ * a one-step + / − story whose skill's answers are all <= 20 (add_wp_10 / _20, sub_wp_10 / _20 and
+ * their _plain twins). Grade K-1 solves these by counting on or making ten, not in columns, so the
+ * cell draws only what the item uses - the story, then the library's number sentence
+ * `[ ] ◯ [ ] = [ ]` (the pupil writes both numbers and the sign in the circle) whose last box is the
+ * one scored place with the unit word PRINTED beside it. No sign row of four, no column grid, no
+ * regroup row, no word bank. The `bar` option draws the library part-whole bar above the sentence;
+ * the K picture story keeps its countable picture. A full-width cell puts the work beside the
+ * story (no empty band, H13); a column cell and the screen twin stack it.
+ */
+function sentenceLayout(p, ctx) {
+    const twin = isTwin(ctx);
+    const narrow = twin || Number(ctx.columns || 1) >= 2;
+    const sh = shownSteps(p, ctx);
+    const st = sh.steps[0];
+    const put = filled(ctx) && !twin;
+    const ink = put ? inkOf(ctx) : null;
+    const digits = Math.max(2, Number(p.digits) || 2);
+    const frame = sentenceFrame(ctx, { a: st.top, b: st.bottom, op: GLYPH[st.op], ans: put ? sh.ans : String(p.ans), unit: p.unit, digits, show: put, ink });
+    const whole = st.op === '+' ? st.ans : st.top;
+    const pa = st.op === '+' ? st.top : st.bottom;
+    const pb = st.op === '+' ? st.bottom : st.ans;
+    const bar = p.bar ? partWholeBar(ctx, { whole, a: pa, b: pb, wMm: narrow ? 52 : 64, show: put, ink }) : '';
+    const work = `<div class="mq-wwwork" style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 3)};">${bar}${frame}</div>`;
+    const cls = 'mq-ww mq-wwframes mq-wwsentence';
+    const base = `box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;`;
+    if (!narrow) {
+        return `<div class="${cls}" data-ww-ops="${st.op}" data-read style="width:100%;${base}padding-left:calc(var(--ws-tab, 5mm) + 1mm);display:flex;align-items:center;gap:${L(ctx, 6)};">`
+            + `<div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}</div>${work}</div>`;
+    }
+    // (a column cell whose sentence is wider than the column is a FULL-WIDTH item: the page's measurement
+    // reads its min-width as not fitting and prints it full width, beside its story - practice.js splitWide)
+    const fullW = !twin && !sentenceFits(p, ctx) ? `min-width:${L(ctx, 120)};` : '';
+    return `<div class="${cls}" data-ww-ops="${st.op}" data-read style="width:100%;${fullW}${base}padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">`
+        + `${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}<div style="margin-top:${L(ctx, 3)};display:flex;${twin ? 'justify-content:center;' : ''}">${work}</div></div>`;
+}
+
+/** Does a sentence layout's work fit a column of `cols` across at this size (else the cell is full width)? */
+export function sentenceFits(p, ctx) {
+    const cols = Math.max(1, Number(ctx.columns || 1));
+    const inner = 186 / cols - (cols > 1 ? 9 : 10);
+    return sentenceFrameWidthMm(ctx, { digits: Math.max(2, Number(p.digits) || 2), unitChars: String(p.unit || '').length }) <= inner;
+}
+
 /** The A-D labels of a `choose` cell, as printed and as the key names them. */
 export const chooseLabels = (p) => (p.choices || []).map((v, i) => `${'ABCD'[i]}  ${Number(v).toLocaleString('en-US')}`);
 
@@ -1149,6 +1185,7 @@ register(WW_TEMPLATE, {
         if (p.layout === 'choose' && Array.isArray(p.choices) && p.choices.length === 4) return chooseLayout(p, ctx);
         if (p.layout === 'bar' && p.bar && p.steps.length === 1 && !isTwin(ctx)) return barLayout(p, ctx);
         if (p.layout === 'frames') return framesLayout(p, ctx);
+        if (p.layout === 'sentence' && p.steps.length === 1 && (p.steps[0].op === '+' || p.steps[0].op === '-')) return sentenceLayout(p, ctx);
         const twin = isTwin(ctx);
         // A cell in a 2- or 3-column grid (and the screen twin) stacks its zones: story, sign
         // row, columns, answer. A full-width cell puts the answer beside the columns, so a page
@@ -1200,7 +1237,7 @@ register(WW_TEMPLATE, {
         }
         const slots = { answer: { value: String(p.ans), graded: true, accept: [Number(p.ans).toLocaleString('en-US')] } };
         // the answer row's digit boxes (the one answer place when the answer is the row's result)
-        if (p.inRow !== false && p.layout !== 'bar' && p.layout !== 'frames' && Array.isArray(p.steps) && p.steps.length) {
+        if (p.inRow !== false && p.layout !== 'bar' && p.layout !== 'frames' && p.layout !== 'sentence' && Array.isArray(p.steps) && p.steps.length) {
             const st = p.steps[p.steps.length - 1];
             const T = st.op === '/' ? digitsOf(st.top).length : columnRows(st, p.tracks).T;
             const d = String(p.ans).padStart(T, ' ');
@@ -1221,7 +1258,13 @@ register(WW_TEMPLATE, {
                 if (p.steps.length > 1) Object.assign(slots, { 'es-c': { value: String(c.c), graded: false }, 'es-op1': { value: GLYPH[p.steps[1].op], graded: false } });
             }
         }
-        if (p.unit && p.layout !== 'bar' && p.layout !== 'frames') slots['answer-label'] = { value: p.unit, graded: false };
+        // (`layout: 'sentence'`: the number sentence's two numbers; its last box is the answer, the unit printed)
+        if (p.layout === 'sentence' && Array.isArray(p.steps) && p.steps.length === 1) {
+            const st = p.steps[0];
+            slots['fr0-a'] = { value: String(st.top), graded: false };
+            slots['fr0-b'] = { value: String(st.bottom), graded: false };
+        }
+        if (p.unit && p.layout !== 'bar' && p.layout !== 'frames' && p.layout !== 'sentence') slots['answer-label'] = { value: p.unit, graded: false };
         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });
         return { value: p.ans, display: p.unit ? `${Number(p.ans).toLocaleString('en-US')} ${p.unit}` : String(p.ans), slots };
     },
@@ -1230,7 +1273,7 @@ register(WW_TEMPLATE, {
     footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, restacks: true }; },
     inputs(p) {
         const out = [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }];
-        if (p && p.unit) out.push({ id: 'answer-label', kind: 'unit', shape: 'line', graded: false, order: 1, scopes: ['full'] });
+        if (p && p.unit && p.layout !== 'sentence') out.push({ id: 'answer-label', kind: 'unit', shape: 'line', graded: false, order: 1, scopes: ['full'] });
         return out;
     },
     layout() { return { card: 'card-wide-visual', checker: 'value' }; },

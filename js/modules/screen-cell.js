@@ -1380,6 +1380,31 @@ const CHECK_SVG = '<svg class="mq-tickmark" viewBox="0 0 20 20" aria-hidden="tru
 export function wireTickBoxes(cellEl, q, input) {
     if (!cellEl || !q || !input || !q.selfAnswering || !q.printAnswer) return false;
     const norm = (s) => plainText(s).toLowerCase().replace(/\s+/g, ' ').trim();
+    // A kit cell that draws its choice as printed WORDS (family-check: "Yes" / "No", circled on
+    // paper) carries them as buttons `data-mq-choice` in its twin: one tap is the one graded answer,
+    // the same write-the-answer path as the tick rows below (visual-quality lane 2026-10-31).
+    const btns = Array.from(cellEl.querySelectorAll('button[data-mq-choice]'));
+    if (btns.length >= 2) {
+        const rightWord = norm(q.printAnswer);
+        if (!btns.some((b) => norm(b.getAttribute('data-mq-choice')) === rightWord)) return false;
+        const group = btns[0].parentElement;
+        if (group) { group.setAttribute('role', 'radiogroup'); group.setAttribute('aria-label', 'answer choices'); }
+        const choose = (btn) => {
+            btns.forEach((b) => { const on = b === btn; b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
+            const w = btn.getAttribute('data-mq-choice');
+            input.value = norm(w) === rightWord ? String(q.ans) : w;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        btns.forEach((b) => {
+            if (b.dataset.mqTick === '1') return;
+            b.dataset.mqTick = '1';
+            b.setAttribute('role', 'radio');
+            b.setAttribute('aria-checked', 'false');
+            b.addEventListener('click', (e) => { e.preventDefault(); if (!input.disabled) choose(b); });
+        });
+        cellEl.classList.add('mq-tick-mode');
+        return true;
+    }
     const rows = Array.from(cellEl.querySelectorAll('div')).filter((d) => {
         const kids = Array.from(d.children);
         if (kids.length !== 2 || kids[0].tagName !== 'SPAN' || kids[1].tagName !== 'SPAN') return false;

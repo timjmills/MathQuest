@@ -304,6 +304,60 @@ registerSkill('addition:add_sub_fact_family', {
     },
 });
 
+/* ======================================================================= fact_family_sort */
+// "Is it a fact family?" (visual-quality lane 2026-10-31): the `family-check` cell - the three numbers
+// in a fact triangle, the largest at the top; the pupil circles Yes or No. The Say frame lives HERE
+// (the Model), never inside the graded cell (VQ-2).
+
+function familyCheck(q) {
+    const p = q && q.cell && q.cell.template === 'family-check' ? q.cell.payload : null;
+    if (p && Array.isArray(p.parts) && p.parts.length === 2) return { whole: num(p.whole), parts: p.parts.map(num), isFamily: !!p.isFamily };
+    const m = /(\d+),\s*(\d+)\s*(?:,|and)\s*(\d+)/.exec(String((q && q.text) || ''));
+    if (!m) return null;
+    const ns = [m[1], m[2], m[3]].map(Number);
+    const whole = Math.max(...ns);
+    const wi = ns.indexOf(whole);
+    const parts = ns.filter((n, i) => i !== wi);
+    return { whole, parts, isFamily: parts[0] + parts[1] === whole };
+}
+
+registerSkill('addition:fact_family_sort', {
+    strings: strings({
+        iCan: 'I Can tell if three numbers make a fact family',
+        instructionKey: 'family-check',
+        steps: [
+            'Find the big number. It is at the top.',
+            'Add the two small numbers.',
+            'Do they make the big number? Circle yes or no.',
+        ],
+        say: '__ and __ make __.',
+        sayValues: (q) => { const f = familyCheck(q); return f ? [f.parts[0], f.parts[1], f.parts[0] + f.parts[1]] : null; },
+    }),
+    misconceptions: ['near-miss-family', 'missed-family'],
+    // a triangle and two words: about 60 mm tall at L, measured; two or three across (SCC 4.6)
+    footprint: { kind: 'family-check', factLike: false, maxCols: 3, measure: true },
+    workedSteps: (q) => {
+        const f = familyCheck(q);
+        if (!f) return [];
+        const [a, b] = f.parts, s = a + b;
+        return clampSteps([
+            step(`The big number is ${f.whole}. It is at the top.`),
+            step(`The small numbers are ${a} and ${b}. ${a} + ${b} = ${s}.`),
+            f.isFamily
+                ? step(`${a} and ${b} make ${f.whole}. Circle yes.`, [{ slot: 'answer', value: 'Yes' }])
+                : step(`${a} and ${b} make ${s}, not ${f.whole}. Circle no.`, [{ slot: 'answer', value: 'No' }]),
+        ]);
+    },
+    wrongAnswer: (q) => {
+        const f = familyCheck(q);
+        if (!f) return null;
+        const [a, b] = f.parts;
+        return chooseWrong(q, [f.isFamily
+            ? { value: 'no', display: 'No', misconception: 'missed-family', slots: { answer: 'No' }, explain: `Did not add ${a} and ${b}: they make ${f.whole}.` }
+            : { value: 'yes', display: 'Yes', misconception: 'near-miss-family', slots: { answer: 'Yes' }, explain: `${a} + ${b} = ${a + b}, close to ${f.whole} but not ${f.whole}.` }], { rotate: false });
+    },
+});
+
 /* ========================================================================= cloze_addition */
 
 registerSkill('addition:cloze_addition', {
@@ -460,9 +514,10 @@ for (const op of ['add', 'sub']) {
         // Every story is drawn by the word-work cell (owner ruling 2026-09-25): its strings, Model
         // steps and wrong-operation error come from the shared word-work provider; the story
         // templates stay (the word-problem role of a non-story page still asks for them).
+        // (stories within 20 are drawn as a number sentence - visual-quality lane 2026-10-31)
         const def = wordWorkProvider(isAdd ? `I Can solve addition stories (sums to ${band})` : `I Can solve subtraction stories (numbers to ${band})`, {
             stories: storiesFor(isAdd ? '+' : '-'),
-        });
+        }, { sentence: code === '10' || code === '20' });
         const cat = isAdd ? 'addition' : 'subtraction';
         registerSkill(`${cat}:${op}_wp_${code}`, def);
         registerSkill(`${cat}:${op}_wp_${code}_plain`, def);

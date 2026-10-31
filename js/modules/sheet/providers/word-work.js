@@ -62,6 +62,15 @@ export function wordWorkSteps(q) {
     }
     const cues = cuesOf(p);
     const out = [step('Read the story two times.')];
+    // the sentence form (stories within 20): the two numbers, the sign in the circle, the answer
+    if (p.layout === 'sentence' && p.steps.length === 1) {
+        const st = p.steps[0];
+        if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
+        out.push(step(`Write ${fmt(st.top)} and ${fmt(st.bottom)} in the boxes.`, [{ slot: 'fr0-a', value: String(st.top) }, { slot: 'fr0-b', value: String(st.bottom) }]));
+        out.push(step(`Write ${GLYPH[st.op]} in the circle. ${VERB[st.op]}.`, [{ slot: 'op0', value: GLYPH[st.op] }]));
+        out.push(step(`${workLine(st).replace(/\.$/, '')}. Write ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }]));
+        return clampSteps(out);
+    }
     if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
     p.steps.forEach((st, i) => {
         const pre = p.steps.length > 1 ? `Step ${i + 1}: ` : '';
@@ -131,13 +140,18 @@ export function wordWorkWrongs(q) {
 }
 export const barAnswerText = (q) => { const p = payloadOf(q); const st = p && p.steps[0]; return st ? `top ${fmt(st.ans)} · below ${fmt(st.a)} and ${fmt(st.b)}` : ''; };
 
-/** The provider members for one word-problem skill. */
-export function wordWorkProvider(iCan, extra = {}) {
+/** The provider members for one word-problem skill (`sentence`: the stories within 20, drawn as a number sentence). */
+export function wordWorkProvider(iCan, extra = {}, { sentence = false } = {}) {
     return Object.assign({
         strings: strings({
             iCan,
-            instructionKey: 'story-work',
-            steps: [
+            instructionKey: sentence ? 'story-sentence' : 'story-work',
+            steps: sentence ? [
+                'Read the story two times.',
+                'Write the two numbers in the boxes.',
+                'Write + or − in the circle.',
+                'Solve. Write the answer in the last box.',
+            ] : [
                 'Read the story two times.',
                 'Circle the sign that fits the story.',
                 'Write the numbers in the boxes. Solve.',

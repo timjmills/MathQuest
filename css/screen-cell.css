@@ -1835,3 +1835,11 @@ html body .mq-scell input.expanded-input-box.expanded-input-box:focus:not(.mq-ac
 html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-active-box):not(.box-correct):not(.box-wrong):not([style*="var(--"]) {
     box-shadow: inset 0 0 0 3px #000 !important;
 }
+
+/* Visual-quality lane (2026-10-31): the family-check cell's printed words Yes / No are tapped on
+   screen (button[data-mq-choice], wired by screen-cell.js wireTickBoxes). The chosen word is RINGED,
+   as the key rings it on paper (heavy black ring, no colour); focus shows the same ring, thinner. */
+.mq-choicebtn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.mq-choicebtn:hover { outline: 2px solid #000; outline-offset: 2px; }
+.mq-choicebtn:focus-visible { outline: 3px solid #000; outline-offset: 3px; }
+.mq-choicebtn[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 0 0 6px #000 !important; }

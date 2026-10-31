@@ -58,6 +58,15 @@ function skillTracks(skill, op) {
     return String(R).length;
 }
 
+/** The answer bound of a ranged story skill (its band, or the `band` option), else 0. */
+function sentenceBand(skill) {
+    const m = /_wp_(10|20|50|100|1k|10k|100k|1m)(_plain)?$/.exec(String(skill || ''));
+    if (!m) return 0;
+    const BAND = { 10: 10, 20: 20, 50: 50, 100: 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
+    const o = state.skillOptions;
+    return o && Number(o.band) > 0 ? Number(o.band) : BAND[m[1]];
+}
+
 /** The ranged stories' own "Bar model" support (`support: bar`, skill-options.js _opsBar). */
 function barSupport() {
     const o = state.skillOptions;
@@ -128,6 +137,16 @@ export function applyWordWork(q) {
             payload.correct = order.indexOf(Number(payload.ans));
         }
     }
+    // Visual-quality lane (2026-10-31, VQ-3): a one-step + / − story of a skill whose answers are all
+    // <= 20 (add_wp_10 / _20, sub_wp_10 / _20, with or without pictures) draws the number SENTENCE
+    // `[ ] ◯ [ ] = [ ] unit`, not columns, four signs and a word bank (K-1 counts on / makes ten). The
+    // bar option stays (drawn above the sentence); the lesson options (choose / letter / check) win.
+    const band = sentenceBand(skill === outer ? skill : (isWordWorkSkill(skill) ? skill : outer));
+    if (band && band <= 20 && !two && payload.steps.length === 1 && (payload.steps[0].op === '+' || payload.steps[0].op === '-')
+        && Number(payload.ans) <= 20 && !payload.letter && !payload.check && payload.layout !== 'choose') {
+        payload.layout = 'sentence';
+        payload.digits = 2;
+    }
     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
     const retold = q.text !== payload.lines.join(' ');
     q.text = payload.lines.join(' ');
@@ -148,6 +167,12 @@ export function applyWordWork(q) {
         q.printText = 'Read the story. Check the right answer.';
         q.screenInstr = 'Read the story. Tap the right answer.';
         q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit, choose: true };
+        return q;
+    }
+    if (payload.layout === 'sentence') {
+        q.printText = 'Read the story. Write the number sentence. Solve.';
+        q.screenInstr = 'Read the story. Type the number sentence. Solve.';
+        q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit, sentence: true };
         return q;
     }
     if (payload.letter) { q.printText = 'Read the story. Write the equation. Find n.'; }

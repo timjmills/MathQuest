@@ -9,7 +9,7 @@ import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
-import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
+import { renderCell as _kitRender, k2Twin as _k2Twin, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -1527,17 +1527,26 @@ function _generateLadderV2(q, skill, helpers, range) {
         }
         if (!trio) { trio = isFamily ? [3, 4, 7] : [3, 4, 9]; why = isFamily ? '3 and 4 make 7.' : '3 and 4 make 7, not 9.'; }
         const shown = shuffle(trio.slice());
-        q.text = `Is ${shown.join(', ')} a fact family? Write yes or no.`;
+        // Visual-quality lane (2026-10-31, VQ-1/VQ-2/VQ-10): the kit's `family-check` cell - the three
+        // numbers in the library's fact triangle, the largest (the whole) at the top, and the printed
+        // words Yes / No the pupil circles (taps on screen): ONE response area, on paper and screen.
+        const whole = Math.max(...shown);
+        const wi = shown.indexOf(whole);
+        const parts = shown.filter((n, i) => i !== wi);
+        q.text = `Look at ${shown[0]}, ${shown[1]} and ${shown[2]}. Do the two small numbers make the big number?`;
         q.ans = isFamily ? 'yes' : 'no';
         q.acceptedAnswers = isFamily ? ['yes', 'y'] : ['no', 'n'];
         q.answerType = 'text';
         q.skillLabel = 'Is It a Fact Family?';
         q.hint = `Two of the numbers must make the third. ${why}`;
-        q.visual = _wsCell(
-            _wsRuleBox('Two parts make the whole.')
-            + `<div style="font-size:2rem;font-weight:700;letter-spacing:0.15em;margin:6px 0;">${shown.join('&nbsp;&nbsp;')}</div>`
-            + _wsTickList(['Yes', 'No']),
-            `Say: ___ and ___ make ___ .`);
+        const payload = { nums: shown, whole, parts, isFamily, labels: ['Yes', 'No'], correct: isFamily ? 0 : 1, sum: parts[0] + parts[1] };
+        q.cell = { template: 'family-check', v: 1, payload };
+        try { q.visual = _k2Twin('family-check', payload); } catch (e) { q.visual = ''; }
+        // the two words are tapped on screen (screen-cell.js wireTickBoxes: one tap, one graded answer)
+        q.selfAnswering = true;
+        q.printAnswer = isFamily ? 'Yes' : 'No';
+        q.printText = 'Do the two small numbers make the big number? Circle yes or no.';
+        q.screenInstr = 'Do the two small numbers make the big number? Tap yes or no.';
         q.printFormat = 'fact-family-sort';
         return true;
     }
