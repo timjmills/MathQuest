@@ -6,13 +6,15 @@ Owner of files: js/modules/teacher-pdf-preview.js (new), css/teacher-pdf.css (ne
 State: critic
 Updated: 2026-10-31
 Builder profile: — (built and fixed by the lane session itself; see Log)
-Critic rounds: 1, FAIL (A 8 · B 6 · C 5 · D 6); fix round done, r2 next
+Critic rounds: 2, FAIL r2 on speed only (A 9 · B 7 · C 8 · D 8); fix round 2 done, r3 next
 
 ## Now
 - r1 fixes in: Esc regression, inert sheet + Tab trap (also inside the frame), page-1 reuse + prefetch at once, set
   covers counted apart, pixel parity, wall-clock timing from one real press, batch title, overlay removal, token
   fallbacks; plus the lead's ask (Print waits for Andika 400 + 700; gate asserts title / Name in Andika bold).
-- Next: checker r2 on the r1 defects + regressions; then report to the lead.
+- r2 fix in: the background build waits for 1.5 s without pointer/key input in the sheet before it starts, and between
+  pages waits again whenever the teacher moves or types (a press during the build no longer waits behind a page).
+- Next: checker r3 on r2 D1 + regressions; then report to the lead.
 
 ## Owner go
 
@@ -22,8 +24,9 @@ Critic rounds: 1, FAIL (A 8 · B 6 · C 5 · D 6); fix round done, r2 next
   file download would need a raster library (html2canvas is loaded; jsPDF would be new): pictures of pages, slower,
   larger, not faithful. Recommended: keep the print path. Owner to confirm.
 - **Speed waiver** (checker r1 D3): pressed the instant page 1 appears, the WHOLE set is bounded by the engine drawing
-  pages 2..N — 4.1–4.9 s at CPU 4× for 8–10 pages (0.78 s unthrottled). Page 1 is < 0.4 s on the wall clock in every
-  case, and after a pause of ~3–4 s at 4× (the background build) the whole set opens in 0.27–0.6 s. Meeting 3 s cold at
+  pages 2..N — 4.1–5.1 s at CPU 4× for 8–10 pages (0.78 s unthrottled). Page 1 is < 1 s on the wall clock in the
+  cases the gate presses (at once; +300, +900, +1500, +2500 ms after page 1 with a mouse move first; after a pause).
+  After a pause of ~5 s at 4× (1.5 s quiet + the background build) the whole set opens in 0.4–0.6 s. Meeting 3 s cold at
   4× needs a faster `buildSheet` (not this lane). The gate fails cold-whole over 3 s unthrottled and over 6 s at 4×.
   Owner / lead to accept or to queue an engine-speed lane.
 
@@ -43,11 +46,13 @@ Critic rounds: 1, FAIL (A 8 · B 6 · C 5 · D 6); fix round done, r2 next
 ## Timings (ws-pdf-preview, WALL clock from one real press; 4-page worksheet + key = 8–10 pages; 4 vCPU container)
 | CPU | Pressed at once: page 1 | Pressed at once: whole set | After a pause: page 1 | After a pause: whole set |
 |---|--:|--:|--:|--:|
-| 4× slow-down (Chromebook-class) | 0.37–0.39 s | 4.1 s (waiver above) | 0.37–0.60 s | 0.37–0.60 s |
+| 4× slow-down (Chromebook-class) | 0.39 s | 4.1–5.1 s (waiver above) | 0.15–0.55 s | 0.41–0.55 s |
 | 1× | 0.09 s | 0.78 s | 0.09 s | 0.09 s |
 Before this lane: no full preview; Print built everything (5.4 s at 4×) and then opened the dialog.
-Known limit (checker r1 D4): while the background build draws a page, the page is busy for up to ~0.9 s at 4× (one
-`buildSheet` call is one task), so a click in that window waits; measured inside the 0.37–0.60 s above.
+Pressed during the background build (+300 / +900 / +1500 / +2500 ms after page 1, mouse move ~150 ms before the press):
+page 1 in 153–281 ms (r2 measured 1.1–1.8 s in 4 of 10 presses before the quiet rule). Remaining limit: one page of
+the background build is one task (~1–1.5 s at 4×); a press that lands mid-page with NO pointer movement before it
+(keyboard only, or a touch tap) can still wait for that page to finish.
 
 ## For the lead: print defects seen through the preview
 - 2026-10-31 (lead query, item 7 of desktop-1366-preview.png): **not a clip** — that screenshot's 900 px window cut the
@@ -61,11 +66,19 @@ Known limit (checker r1 D4): while the background build draws a page, the page i
   (both faces loaded, title and Name label computed Andika 700) and makes its PDF from the app's origin (else FAIL).
 
 ## Times
+Times: fix r2, start 2026-10-31T13:05Z, end 2026-10-31T13:30Z, profile —
+Times: critic r2, start 2026-10-31T12:42Z, end 2026-10-31T12:55Z, profile mq-opus-medium
 Times: fix r1, start 2026-10-31T11:30Z, end 2026-10-31T12:40Z, profile —
 Times: critic r1, start 2026-10-31T10:50Z, end 2026-10-31T11:08Z, profile mq-opus-medium
 Times: builder build-1, start 2026-10-31T10:05Z, end 2026-10-31T11:05Z, profile —
 
 ## Log
+- 2026-10-31 fix r2 (checker r2 FAIL on speed only, A 9 · B 7 · C 8 · D 8). D1 page 1 took 1.1–1.8 s when pressed during
+  the background build → the build starts only after 1.5 s with no pointer/key/wheel in the sheet and pauses between
+  pages whenever the teacher moves (a waiting Preview / Print runs it straight on); check: presses at +300, +900,
+  +1500, +2500 ms after page 1 (mouse move first), page 1 < 1 s wall — 153–281 ms. Cost: cold whole set 4.1 → 5.1 s at
+  4× (under the 6 s ceiling). n2 page-1 reuse only with fonts loaded at build and reuse. n3 pixel parity also samples
+  the first key page. n4 (legacy `.container` not inert) is older than this lane; noted for the lead. n5 = D9.
 - 2026-10-31 fix r1 (checker r1 FAIL A 8 · B 6 · C 5 · D 6). Each defect → fix → check in `ws-pdf-preview`:
   D1 Esc no longer closed the sheet (the hidden overlay counted as open) → `isPdfPreviewOpen()`; check: Esc closes the
   sheet before any preview and after one is closed. D2 focus left the dialog from inside the frame; sheet not inert →

@@ -120,6 +120,9 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
   793.7 px at 96 dpi), and backtest the limit with a real difference (a serif title = 0.06 %; limit 0.02 %).
 - **Screenshot traps:** element screenshots past the window edge show what is behind; `clip` is document coordinates;
   `captureBeyondViewport` resizes the window (and any fixed overlay). Use a tall viewport, scroll, clip, beyond=false.
+- **Background engine work gives way to the teacher.** One engine call is one long task (~1 s on a Chromebook); start
+  background builds only after 1.5 s without input and pause between calls on any pointer/key. *Check:* presses at
+  several offsets inside the busy window (+300 … +2500 ms), wall clock, page 1 < 1 s.
 - **Count what the page IS, not what it is not:** "pupil pages = all − keys" counted set covers. Count pupil pages by
   their Name line.
 

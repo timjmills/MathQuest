@@ -181,7 +181,9 @@ const SKILLS = [
     if (!new RegExp(`^${pdf.n} pages? to print`).test(st.meta)) fail(`${name}: the bar says "${st.meta}", not ${pdf.n} pages`);
     const said = /(\d+) for pupils/.exec(st.meta);
     if (!said || +said[1] !== pdf.pupilPages) fail(`${name}: the bar says "${st.meta}" but ${pdf.pupilPages} pages carry a Name line`);
-    const px = await pixelDiff(lastPdf, [...new Set([0, st.pages - 1])]);
+    // first page, a middle page (the first key page when there is one), the last page
+    const keyAt = st.html.findIndex((h) => /Answer Key/.test(h));
+    const px = await pixelDiff(lastPdf, [...new Set([0, keyAt > 0 ? keyAt : Math.floor((st.pages - 1) / 2), st.pages - 1])].sort((a, b) => a - b));
     row.pixels = px;
     console.log(`    pixels differing (preview vs PDF): ${px.map((x) => `page ${x.page + 1} ${(x.frac * 100).toFixed(4)} %`).join(', ')}`);
     for (const x of px) if (!(x.frac <= PIX_MAX)) fail(`${name}: page ${x.page + 1} differs from the PDF in ${(x.frac * 100).toFixed(2)} % of pixels (max ${PIX_MAX * 100} %)`);
@@ -208,7 +210,9 @@ const SKILLS = [
       }
       throw new Error('side preview never ready');
     };
-    const timedPress = async (at) => {
+    const timedPress = async (at, moveFirst) => {
+      // a teacher moves to the button before pressing it: one move ~150 ms ahead (the sheet sees it; checker r2 D1)
+      if (moveFirst) { await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x - 40, y: at.y }); await sleep(150); }
       const t = Date.now(); let first = 0;
       await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: at.x, y: at.y, button: 'left', clickCount: 1 });
       await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: at.x, y: at.y, button: 'left', clickCount: 1 });
@@ -235,7 +239,19 @@ const SKILLS = [
     await sleep(300);
     const warmWall = await timedPress(await readyAndBtn());
     const warm = await page.evaluate(() => window.tvPdfPreview.state());
-    report.timing = { throttle: THROTTLE, coldFirstMs: Math.round(cold.tFirst), coldAllMs: Math.round(cold.tAll), warmFirstMs: Math.round(warm.tFirst), warmAllMs: Math.round(warm.tAll), coldWall, warmWall, backgroundBuildMsAfterPage1: bgMs, pages: warm.pages };
+    // pressed WHILE the background build may be drawing: 300, 900, 1500 and 2500 ms after page 1 (checker r2 D1)
+    const mid = [];
+    for (const after of [300, 900, 1500, 2500]) {
+      await page.evaluate(() => window.tvPdfPreview.close());
+      await page.evaluate(() => { const b = document.querySelector('#tvsSide [data-act="renew"]'); b.click(); });
+      const at = await readyAndBtn();
+      await sleep(Math.max(0, after - 150));
+      const w = await timedPress(at, true);
+      mid.push({ after, first: w.first, all: w.all });
+    }
+    console.log(`  timing, pressed during the background build: ${mid.map((m) => `+${m.after} ms → page 1 ${m.first} ms, all ${m.all} ms`).join(' · ')}`);
+    for (const m of mid) if (!(m.first < FIRST_MS)) fail(`timing: pressed ${m.after} ms after page 1, page 1 took ${m.first} ms on the wall clock (target < ${FIRST_MS})`);
+    report.timing = { mid, throttle: THROTTLE, coldFirstMs: Math.round(cold.tFirst), coldAllMs: Math.round(cold.tAll), warmFirstMs: Math.round(warm.tFirst), warmAllMs: Math.round(warm.tAll), coldWall, warmWall, backgroundBuildMsAfterPage1: bgMs, pages: warm.pages };
     console.log(`  timing (CPU ${THROTTLE}x, ${warm.pages} pages): cold page 1 ${report.timing.coldFirstMs} ms (wall ${coldWall.first}), all ${report.timing.coldAllMs} ms (wall ${coldWall.all}) · warm page 1 ${report.timing.warmFirstMs} ms (wall ${warmWall.first}), all ${report.timing.warmAllMs} ms (wall ${warmWall.all}) · background build ready ${bgMs} ms after page 1`);
     if (!(coldWall.first < FIRST_MS)) fail(`timing: cold page 1 took ${coldWall.first} ms on the wall clock (target < ${FIRST_MS})`);
     if (!(warmWall.all < ALL_MS)) fail(`timing: warm whole printout took ${warmWall.all} ms on the wall clock (target < ${ALL_MS})`);

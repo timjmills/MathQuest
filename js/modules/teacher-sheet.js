@@ -278,12 +278,15 @@ async function buildAll(p, list, quiz, onProgress, stop) {
             await yieldNow();
             if (stop && stop()) throw STOPPED;   // a background build whose settings changed: give the page back
             if (stop && J.hold) await J.hold;    // the full preview is drawing page 1: wait for it
+            // a background build draws a page as one long task (~1 s on a Chromebook): never start one while the teacher
+            // is moving towards a button or typing (a waiting Preview / Print clears J.bg and the build runs straight on)
+            if (stop && J.bg && performance.now() - lastInput < QUIET_PART_MS) { await quiet(QUIET_PART_MS, () => !J.bg || stop()); if (stop()) throw STOPPED; }
             const rq = versions > 1 ? Object.assign({}, part.req, { keySection: label }) : part.req;
             let res;
             // the side preview already built this very request (page 1): the engine is deterministic for a request and
             // its seed, so its result is used as it is (one page less to build; checker r1 D3)
             const rqKey = PAGE1.res ? JSON.stringify(rq) : '';
-            if (PAGE1.res && rqKey === PAGE1.key) res = PAGE1.res;
+            if (PAGE1.res && rqKey === PAGE1.key && (!document.fonts || document.fonts.status === 'loaded')) res = PAGE1.res;
             else try { res = await buildSheet(rq); } catch (e) {
                 out.errors.push((e && e.message) || 'This page could not be built.');
                 continue;
@@ -330,6 +333,17 @@ async function buildAll(p, list, quiz, onProgress, stop) {
     return out;
 }
 const STOPPED = { stopped: true };
+/** The last pointer / key / wheel in the sheet (performance.now()); the background build waits until it is quiet. */
+let lastInput = 0;
+function markInput() { lastInput = performance.now(); }
+const QUIET_START_MS = 1500, QUIET_PART_MS = 1000;
+/** Resolves once the sheet has had no input for `ms` (checked every 150 ms), or when `stop()` says to give up. */
+function quiet(ms, stop) {
+    return new Promise((resolve) => {
+        const tick = () => { if ((stop && stop()) || performance.now() - lastInput >= ms) resolve(); else setTimeout(tick, 150); };
+        tick();
+    });
+}
 /** The side preview's last build ({ key: its request as JSON, res }), reused by buildAll for the same request. */
 const PAGE1 = { key: '', res: null };
 /**
@@ -369,7 +383,8 @@ const PREFETCH_MAX_PAGES = 12;
 let prefetchTimer = null;
 function schedulePrefetch() {
     clearTimeout(prefetchTimer);
-    prefetchTimer = setTimeout(() => {
+    prefetchTimer = setTimeout(async () => {
+        await quiet(QUIET_START_MS, () => !S.sheet);   // after the teacher has been still for 1.5 s, not at once
         if (!S.sheet || S.sheet === 'share' || S.sheet === 'quizshare' || batchActive() || S.printing) return;
         const list = items();
         if (!list.length) return;
@@ -379,7 +394,7 @@ function schedulePrefetch() {
         const pages = (p.pagesBy ? Object.values(p.pagesBy).reduce((a, c) => a + c, 0) : p.pages) || 1;
         if (pages * versionsOf(quiz) > PREFETCH_MAX_PAGES) return;
         ensureBuilt(p, list, quiz, null, true).catch(() => null);
-    }, 0);   // at once: page 1 has painted (runPreview's renderSide ran before this was scheduled)
+    }, 0);
 }
 /** Versions: a quiz 1–6 (the quiz path), a worksheet 1–20 (owner 2026-10-24). */
 function versionsOf(quiz) { return quiz ? Math.max(1, Math.min(6, S.quiz.versions)) : setsSame() ? 1 : setsOf(); }
@@ -425,7 +440,8 @@ async function runPreview() {
         await yieldNow();
         let res = null;
         try { res = await buildSheet(part.req); } catch (e) { res = null; }
-        if (res) { PAGE1.key = JSON.stringify(part.req); PAGE1.res = res; }
+        // (only a build made with the fonts in: the engine measures some cells in the page's own fonts; checker r2 n2)
+        if (res) { const ok = !document.fonts || document.fonts.status === 'loaded'; PAGE1.key = ok ? JSON.stringify(part.req) : ''; PAGE1.res = ok ? res : null; }
         if (my !== token) return;
         S.building = false;
         if (!res) { perChecked.add(perBase(list)); S.preview = { sig, html: '', error: true }; renderSide(); return; }
@@ -613,6 +629,8 @@ function mount() {
     document.querySelectorAll('#teacherApp .tv2-nav').forEach((el) => el.setAttribute('inert', ''));
     document.body.classList.add('tvs-open');
     root.addEventListener('click', onClick);
+    // the background build gives way to the teacher: any pointer or key in the sheet marks it busy (checker r2 D1)
+    for (const t of ['pointermove', 'pointerdown', 'keydown', 'wheel']) root.addEventListener(t, markInput, { passive: true, capture: true });
     root.addEventListener('input', onInput);
     root.addEventListener('change', onChange);
     document.addEventListener('keydown', onKey, true);
