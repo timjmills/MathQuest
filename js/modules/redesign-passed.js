@@ -14,5 +14,15 @@ const IDS = [
   'subtraction:sub_1m_no_regroup',
   'subtraction:sub_2d_1d',
 ];
-export const REDESIGN_PASSED = new Set(IDS);
-export const REDESIGN_EVIDENCE = Object.fromEntries(IDS.map((id) => [id, S3]));
+// Visual-quality lane (2026-10-31): only the skills a critic graded on their OWN renders (RUBRIC: no inheritance across
+// variants or bands). The same-layout copies add_wp_10_plain, add_wp_20, sub_wp_10, sub_wp_10_plain, sub_wp_20_plain wait for
+// a render check of their own.
+const VQ = 'Lane visual-quality (family-check cell / word-work sentence layout, signed card design/cards/family-check), critics r1-r4: r2 every default page and host >= 8, r3 N1-N4 fixed, r4 N12 PASS lowest 8; design/audit/runs/visual-quality/critic-r2.md, critic-r3.md, critic-r4.md, 2026-10-31';
+const VQ_IDS = [
+  'addition:fact_family_sort',
+  'addition:add_wp_20_plain',
+  'addition:add_wp_10',
+  'subtraction:sub_wp_20',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...VQ_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ])]);

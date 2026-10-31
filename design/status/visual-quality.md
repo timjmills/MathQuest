@@ -6,7 +6,7 @@ Owner of files: design/audit/VISUAL_QUALITY.md, design/audit/runs/visual-quality
 State: critic r2 pending
 Updated: 2026-10-31
 Builder profile: mq-opus-medium
-Critic rounds: 3, FAIL (r3: one page below 8 — Reason-It at L, C3 5)
+Critic rounds: 4, PASS (r4 lowest 8)
 
 ## Now
 - Phase 1 done: `design/audit/VISUAL_QUALITY.md` (17 skills rendered, 9 root causes, census: 52 % of skills have no kit cell, 21 of 32 relation skills undrawn).
@@ -27,7 +27,9 @@ Critic rounds: 3, FAIL (r3: one page below 8 — Reason-It at L, C3 5)
 ## Owner go
 
 
-## Hand-over (2026-10-31, lead budget cap reached: one fix round + one final critic used)
+## Result (2026-10-31, after the owner's go for one more round): critic r4 PASS on N12 (story once, 2 items at L; VQ-ONCE check backtested). Spec card signed by the owner (c866019). Passed and recorded in `js/modules/redesign-passed.js`: fact_family_sort, add_wp_20_plain, add_wp_10, sub_wp_20 (graded on their own renders). Same-layout copies add_wp_10_plain, add_wp_20, sub_wp_10, sub_wp_10_plain, sub_wp_20_plain need a render check of their own before they are marked. 61 older word-work skills still repeat the story on Reason It (pinned in vq-baseline, shrink-only).
+
+## Earlier hand-over (2026-10-31, lead budget cap reached: one fix round + one final critic used)
 
 **Verdict: not passed.** Critic r3 (`design/audit/runs/visual-quality/critic-r3.md`): every pass-bar page and every screen host
 of the 9 skills is ≥ 8 (r2 grades + r3 spot checks; N1–N4 fixed; 56 key items checked by hand). ONE page fails:
