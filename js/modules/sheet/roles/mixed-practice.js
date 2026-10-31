@@ -49,7 +49,11 @@ const AUTO_N = { ican: { S: 10, M: 8, L: 6 }, daily: { S: 8, M: 6, L: 4 } };
 
 export const sources = (skills) => skills.map((s, i) => ({ id: `s${i}`, skills: [s], weight: Number(s.weight) > 0 ? Number(s.weight) : 1 }));
 // 5: a shelf of an I Can page at S (N = 10) holds 5 cells, so they are measured at 5 too.
-export const measureCols = () => [1, 2, 3, 4, 5, 6];
+// (and the lattice itself above 6 - 8 Daily / 10 I Can at S - where a shelf may run it, R1-7)
+export const measureCols = (ctx) => {
+    const n = ctx && AUTO_N[ctx.look] ? AUTO_N[ctx.look][ctx.size] : 0;
+    return n > 6 ? [1, 2, 3, 4, 5, 6, n] : [1, 2, 3, 4, 5, 6];
+};
 
 const divisorsDesc = (n) => Array.from({ length: n }, (_, i) => n - i).filter((d) => n % d === 0);
 
@@ -60,6 +64,18 @@ const divisorsDesc = (n) => Array.from({ length: n }, (_, i) => n - i).filter((d
  * under 30 %, H13) instead of a tenth - no blank band above the footer.
  */
 const stripMmOf = (input) => (input.stepStrip && Number(input.stepStripMm) > 0 ? Number(input.stepStripMm) : 0);
+
+/**
+ * The counts across a GROUPED shelf may take, widest first: the lattice N itself above 6 (8 Daily /
+ * 10 I Can at S; R1-7), then its divisors up to 6. A fact cell keeps TY-30's working digits for the
+ * size above 6 across (the fact ladder sets them by the count across).
+ */
+function sectionKs(its, N, ctx) {
+    const floor = (SIZES[ctx.size] || SIZES.L).digitPt;
+    const allFact = its.length && its.every((it) => it.template === 'fact');
+    const wide = N > 6 && (!allFact || (FACT_LADDER[N] || 0) >= floor) ? [N] : [];
+    return [...wide, ...divisorsDesc(N).filter((d) => d <= 6)];
+}
 
 /** Shelves: for each pool {id, k, h}, then how many shelves each gets. */
 function packing(poolsIn, input) {
@@ -74,17 +90,34 @@ function packing(poolsIn, input) {
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
     const shelf = {};
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
+    const exact = input.exactCounts || null;
     for (const id of ids) {
         const its = poolsIn[id];
         const a = A && A.byPool[id];
         const twins = a && A.mode === 'side' ? (a.side || []) : [];
         // SIDE: a shelf of [twin | problem] pairs needs an even count of cells the twins fit too.
         const pairK = twins.length ? divisorsDesc(N).find((d) => d <= 6 && d % 2 === 0 && fitsAt(its, d, ctx) && fitsAt(twins, d, ctx)) : 0;
-        const k = pairK || divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, Math.min(d, 6), ctx)) || 1;
-        const h = Math.max(hMinAt(its, Math.min(k, 6), ctx), pairK ? hMinAt(twins, k, ctx) : 0);
+        // R1-7 (LESSONS L1): the shelf may run the whole lattice (8 Daily / 10 I Can at S) where the
+        // cells were measured to fit it - a lattice of 8 has no 6, so S printed fewer than M
+        let k = pairK || sectionKs(its, N, ctx).find((d) => (d <= 6 ? fitsAt(its, d, ctx) : fitsMeasured(its, d, ctx))) || 1;
+        // exact counts (the owner's "mix by section, with specified amount"): a count that does not
+        // fill whole shelves takes the next count across (at least half) that does; else the last
+        // shelf ends in one unruled trailing area (PG-15) - never an empty box
+        const want = exact ? Math.max(0, Math.floor(Number(exact[id]) || 0)) : 0;
+        if (exact && !pairK && want % k) {
+            const whole = sectionKs(its, N, ctx).find((d) => d < k && d >= Math.max(2, k / 2) && want % d === 0 && fitsAt(its, d, ctx));
+            if (whole) k = whole;
+        }
+        const h = Math.max(hAtK(its, k, ctx), pairK ? hMinAt(twins, k, ctx) : 0);
         // The skill's anchor band (SECTIONS, or SIDE when no pair fits): measured by the host.
         const band = a && (A.mode === 'sections' || !pairK) && (a.band || []).length ? Math.max(0, ...a.band.map((x) => anchorHeightMm(x, 1))) : 0;
         shelf[id] = { k, h: Number.isFinite(h) ? h : 60, n: 0, pairs: !!pairK, band, per: pairK ? k / 2 : k };
+        if (exact) shelf[id].want = want;
+    }
+    if (exact) {
+        // every skill its own count: whole shelves of k, the last one short when it must be
+        for (const id of ids) shelf[id].n = Math.ceil(shelf[id].want / shelf[id].per);
+        return { ctx, m, mCont, N, ids, shelf, used: 0, pages: 1, exact: true };
     }
     const weights = Object.fromEntries((input.pools || []).map((p) => [p.id, p.weight || 1]));
     // A skill's strip opens its first shelf only: its further shelves join the same band (an
@@ -130,6 +163,30 @@ function packing(poolsIn, input) {
         shelf[next.id].n++;
         used += bandH(next.id, false);
     }
+    // R1-7 (LESSONS L1): this size prints more problems than the next size up (`input.mustBeat`, from
+    // the host): the skill with the most problems per mm of shelf takes shelves - first spare room,
+    // then a shelf of the least compact skill (each keeps one) - until it does; the notes say so.
+    let ladderNote = '';
+    const must = Number(input.mustBeat) || 0;
+    if (must && !A && !input.leadHalf && ids.length > 1 && total() <= must) {
+        const rate = (id) => shelf[id].per / shelf[id].h;
+        const best = ids.slice().sort((a, b) => rate(b) - rate(a))[0];
+        const before = total();
+        for (let g = 0; g < 40 && total() <= must; g++) {
+            const shelves = ids.reduce((a, id) => a + shelf[id].n, 0);
+            if (shelves < maxShelves * basePages && used + bandH(best, false) <= m.budget + 1e-6) { shelf[best].n++; used += bandH(best, false); continue; }
+            const drop = ids.filter((id) => id !== best && shelf[id].n > 1).sort((a, b) => rate(a) - rate(b))[0];
+            if (!drop) break;
+            shelf[drop].n--;
+            used -= bandH(drop, false);
+            if (!(used + bandH(best, false) <= m.budget + 1e-6)) { shelf[drop].n++; used += bandH(drop, false); break; }
+        }
+        const it0 = (poolsIn[best] || [])[0] || {};
+        const nm = STRAND_BY_CATEGORY[String(it0.skill || '').split(':')[0]] || poolName(input, poolsIn[best]);
+        ladderNote = total() > must
+            ? `Mixed practice: more ${nm.toLowerCase()} problems than the weights ask, so this size prints more problems than the next size up (${total()}, not ${must}).`
+            : (total() > before ? '' : 'Mixed practice: this size prints no more problems than the next size up.');
+    }
     // Lessons r3: a lesson's Mixed page (`leadHalf`) gives its first skill - the lesson's own - at
     // least half the placed items AFTER packing (weights alone lost to a taller lesson shelf):
     // a partner gives up an extra shelf, and the lesson takes a shelf where one fits.
@@ -163,7 +220,7 @@ function packing(poolsIn, input) {
             Object.assign(shelf[last], { k: k2, per: k2, h: Number.isFinite(h2) ? h2 : shelf[last].h });
         }
     }
-    return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
+    return { ctx, m, mCont, N, ids, shelf, used, pages: basePages, ladderNote };
 }
 
 /* ============================================================ the MIXED arrangement (M1) */
@@ -788,13 +845,14 @@ function planMixedM2(input, pools) {
             let r = 0;
             let run = 0;
             for (const k of turnKeys) { run = k === id ? run + 1 : 0; r = Math.max(r, run); }
-            if (r > 2) runMax[id] = Math.max(runMax[id] || 0, r);
+            if (r > 2 && new Set(turnKeys.filter((k) => k !== null)).size > 1) runMax[id] = Math.max(runMax[id] || 0, r);
             // the weights-win cap (IMPROVEMENT_PLAN 3.3): max(2, ceil(major / (minor + 1))) turns
             const t = turnKeys.filter((k) => k === id).length;
             pageRuns[id] = { run: r, turns: t, cap: Math.max(2, Math.ceil(t / (turnKeys.length - t + 1))) };
         }
         runsByPage.push(pageRuns);
-        for (const t of pg.mix.notes) if (!/come in a row|first comes after/.test(t)) notes.push(t);
+        // (exact counts are the teacher's own: no note that they differ from the weights)
+        for (const t of pg.mix.notes) if (!/come in a row|first comes after/.test(t) && !(input.exactCounts && / on a \d+-problem page gives /.test(t))) notes.push(t);
         pages.push({ sections });
     }
     for (const [id, r] of Object.entries(runMax)) notes.push(`${names[id].name} takes most of the page, so up to ${r} ${names[id].noun} come in a row`);
@@ -829,7 +887,7 @@ export function counts(pools, input) {
     if (input.arrangement === 'mixed') return Object.assign({}, mixedPacking(pools, input).deal.counts);
     const p = packing(pools, input);
     const out = {};
-    for (const id of p.ids) out[id] = p.shelf[id].n * p.shelf[id].per;
+    for (const id of p.ids) out[id] = p.exact ? p.shelf[id].want : p.shelf[id].n * p.shelf[id].per;
     return out;
 }
 
@@ -854,7 +912,7 @@ export function plan(input = {}) {
             const anchor = s === 0 && sh.band && A ? ((A.byPool[id] || {}).band || [])[0] : null;
             // H13 (owner 2026-09-25): a shelf is as tall as the tallest item IT holds, not the
             // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
-            const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) : sh.h;
+            const own = chunk.length ? hAtK(chunk.filter((it) => !it.anchor), sh.k, ctx) : sh.h;
             const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
             if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band });
         }
@@ -890,9 +948,10 @@ export function plan(input = {}) {
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
-        let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
+        let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget + 1e-6;
         if (joins) bandH -= m.strip;
-        if (!cur || cur.used + bandH > budget) {
+        // (+ 1e-6: shares that sum to the whole budget spilled a shelf to page 2 on rounding, R1-7)
+        if (!cur || cur.used + bandH > budget + 1e-6) {
             cur = { sections: pages.length === 0 && input.stepStrip ? [{ kind: 'html', html: input.stepStrip }] : [], used: 0 };
             pages.push(cur);
             joins = false;
@@ -907,7 +966,8 @@ export function plan(input = {}) {
         // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
         const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
-        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
+        // (above 6 across a fact draws at the ladder's digits for k, as on a mixed page: atColumns)
+        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(sh.k > 6 ? atColumns(it, sh.k) : it, { cols: sh.k }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
         if (joins) {
             // A further shelf of the same skill on the same page: its grid under the last one.
             const prev = cur.sections[cur.sections.length - 1];
@@ -936,7 +996,7 @@ export function plan(input = {}) {
     for (const sh of shelves) achieved[sh.id] = (achieved[sh.id] || 0) + sh.items.filter((it) => !it.anchor).length;
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
-        meta: { items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'sections',
+        meta: { items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'sections', ...(p.ladderNote ? { notes: [p.ladderNote] } : {}),
             fits: [{ cols: p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }

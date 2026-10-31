@@ -3185,7 +3185,7 @@ function withCue(it, text) {
  * (a section of several skills shares its count by weight); else null.
  */
 function mixedExactCounts(n, pools) {
-    if (n.arrangement !== 'mixed' || n.sections.length < 2 || !n.sections.every((s) => Number(s.count) > 0)) return null;
+    if (n.role !== 'mixed-practice' || n.sections.length < 2 || !n.sections.every((s) => Number(s.count) > 0)) return null;
     const bySkill = new Map();
     for (const sec of n.sections) {
         const sks = sec.skills;
@@ -3507,23 +3507,6 @@ async function buildRoleSheet(n, metaOf) {
             input.mixM2 = true;
             if (exactCounts) input.exactCounts = exactCounts;
             input.mixPages = mixPages;
-            // R1-7 (LESSONS L1): the page beats the next size up. The same probe is measured at the
-            // bigger sizes (copies, so this page's measurements stand) and their pages worked out
-            // from L up, each beating the one above it.
-            if (!exactCounts && typeof mod.m2Counts === 'function') {
-                const chain = { S: ['L', 'M'], M: ['L'], L: [] }[n.size] || [];
-                let must = 0;
-                for (const sz of chain) {
-                    const other = {};
-                    pools.forEach((p) => {
-                        other[p.id] = probe[p.id].map((it) => Object.assign({}, it, { measured: undefined }));
-                        measureItems(other[p.id], { size: sz, look: n.look, colsList: [...new Set([...colsList, 7, 8, 9, 10])] });
-                    });
-                    must = mod.m2Counts(other, Object.assign({}, input, { ctx: Object.assign({}, input.ctx, { size: sz }), mustBeat: must, mixPages: 1 })).perPage;
-                }
-                input.mustBeat = must;
-                input.ladderNote = must ? mod.m2Counts(probe, input).ladderNote : '';
-            }
             ok = true;
             last = typeof mod.m2Classes === 'function' ? mod.m2Classes(probe, input) : last;
             const cls = last.cls || {};
@@ -3557,6 +3540,28 @@ async function buildRoleSheet(n, metaOf) {
         input.anchors = anchorsIn;
     }
 
+    // (the owner's "mix by section, with specified amount of problems": a Sections page prints the
+    // counts asked too, each skill's shelves whole where a count across allows it)
+    if (exactCounts && input.arrangement !== 'mixed' && n.anchors === 'off') input.exactCounts = exactCounts;
+    // R1-7 (LESSONS L1): a Mixed practice page (M2 mixed, or Sections) prints more problems than the
+    // next size up. The same probe is measured at the bigger sizes (copies, so this page's
+    // measurements stand) and their pages worked out from L up, each beating the one above it; the
+    // role then gives the most compact skill more room where the weights alone would not.
+    if (n.role === 'mixed-practice' && pools.length >= 2 && !exactCounts && !n.leadHalf && !anchorsIn && (input.mixM2 || input.arrangement !== 'mixed')) {
+        const chain = { S: ['L', 'M'], M: ['L'], L: [] }[n.size] || [];
+        let must = 0;
+        for (const sz of chain) {
+            const other = {};
+            pools.forEach((p) => {
+                other[p.id] = probe[p.id].map((it) => Object.assign({}, it, { measured: undefined }));
+                measureItems(other[p.id], { size: sz, look: n.look, colsList: [...new Set([...colsList, 7, 8, 9, 10])] });
+            });
+            const c = mod.counts(other, Object.assign({}, input, { ctx: Object.assign({}, input.ctx, { size: sz }), mustBeat: must, mixPages: 1 })) || {};
+            must = Object.values(c).reduce((a, x) => a + (Number(x) || 0), 0);
+        }
+        input.mustBeat = must;
+        if (must && input.mixM2 && typeof mod.m2Counts === 'function') input.ladderNote = mod.m2Counts(probe, input).ladderNote;
+    }
     // 2. How many items the page needs, from the measured probe.
     let want = mod.counts(probe, input) || {};
 
