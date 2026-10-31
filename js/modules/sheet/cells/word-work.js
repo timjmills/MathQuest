@@ -1157,7 +1157,10 @@ function sentenceLayout(p, ctx) {
 /** Does a sentence layout's work fit a column of `cols` across at this size (else the cell is full width)? */
 export function sentenceFits(p, ctx) {
     const cols = Math.max(1, Number(ctx.columns || 1));
-    const inner = 186 / cols - (cols > 1 ? 9 : 10);
+    // (the cell's inner width less the story's tab gutter, var(--ws-tab) + 1 mm, and CL-8's 3 mm side keep: the
+    // word beside the box at S in two columns measured 1.4 mm from the cell edge, so the page refused two columns
+    // and printed four stories over a 90 mm empty strip - PAGEFILL)
+    const inner = 186 / cols - (cols > 1 ? 9 : 10) - 6 - 3;
     // (decided for the PAGE, not the item: the longest story noun is 8 letters - 'stickers', 'children' - so every
     // item of a page takes the same layout and its answer box stands in the same place, VQ-7)
     return sentenceFrameWidthMm(ctx, { digits: Math.max(2, Number(p.digits) || 2), unitChars: Math.max(8, String(p.unit || '').length) }) <= inner;
