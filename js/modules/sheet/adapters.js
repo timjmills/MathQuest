@@ -225,7 +225,8 @@ const LEGACY_TEMPLATE = register('legacy', {
         // tallest item (a 2 x 2 transform choice), so a centred short item left a blank band
         // above its question (teacher-site T1 r6).
         const readFig = legacyReadFig(p) ? ' ws-legacy--readfig' : '';
-        return `<div class="ws-legacy print-edition${readFig}">${stripLegacyHead(html)}${stamp(key, ctx)}</div>`;
+        // (TY-2: Andika has 400 and 700 only - an old drawing's 800 / 900 prints as 700; shared-roles r1)
+        return `<div class="ws-legacy print-edition${readFig}">${stripLegacyHead(html).replace(/font-weight:\s*[89]00\b/g, 'font-weight:700')}${stamp(key, ctx)}</div>`;
     },
 
     answerKey(p) {

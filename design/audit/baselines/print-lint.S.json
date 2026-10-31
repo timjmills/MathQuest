@@ -7,9 +7,9 @@
  },
  "size": "S",
  "totals": {
-  "documents": 735,
-  "findings": 8736,
-  "documentsWithFindings": 425
+  "documents": 755,
+  "findings": 8857,
+  "documentsWithFindings": 436
  },
  "documents": [
   {
@@ -70297,11 +70297,1393 @@
      "msg": "key page 9 has 1 answer slots, pupil page 4 has 0 (AK-4)"
     }
    ]
+  },
+  {
+   "id": "composing:number_bonds#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 8,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 7.6 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 4.8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 6.9 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    }
+   ]
+  },
+  {
+   "id": "addition:add_facts#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "subtraction:sub_facts#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "multiplication:mult_facts#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "division:div_facts#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "fractions:identify#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "fraction_operations:add_fractions_like#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "decimals:add_decimal#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "conversions:f_to_d#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 6,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 7.6 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 4.8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    }
+   ]
+  },
+  {
+   "id": "shapes_early:name_2d_shapes#pre-skill-check",
+   "pages": 4,
+   "keyPages": 2,
+   "error": null,
+   "counts": {
+    "L-INK": 2,
+    "L-EMOJI": 0,
+    "L-FONT": 4,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 2,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-INK",
+     "rule": "LS-4",
+     "sev": "major",
+     "page": 1,
+     "msg": "dashed SVG stroke (dasharray 6px, 4px): dashed is only a cut line or the missing-digit box (LS-2, LS-4)"
+    },
+    {
+     "lint": "L-INK",
+     "rule": "LS-4",
+     "sev": "major",
+     "page": 3,
+     "msg": "dashed SVG stroke (dasharray 6px, 4px): dashed is only a cut line or the missing-digit box (LS-2, LS-4)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 3,
+     "msg": "key page 3 has 2 answer slots, pupil page 1 has 0 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 4,
+     "msg": "key page 4 has 2 answer slots, pupil page 2 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "area_perimeter:perimeter_intro#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 2,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 9 answer slots, pupil page 1 has 7 (AK-4)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <circle> at 4.9 mm across, 3.5 mm down enters the label keep-out (5 x 5 mm at the cell's top-left corner): nothing but the label paints there (CL-40)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 2,
+     "msg": "ink of <circle> at 4.9 mm across, 3.5 mm down enters the label keep-out (5 x 5 mm at the cell's top-left corner): nothing but the label paints there (CL-40)"
+    }
+   ]
+  },
+  {
+   "id": "coordinates:coordinate_q1#pre-skill-check",
+   "pages": 4,
+   "keyPages": 2,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 1,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "LONE",
+     "sev": "major",
+     "page": 2,
+     "msg": "page 2 holds one cell alone (sheet pages 3 + 1): another page of the sheet holds 3: rebalance so no page holds one alone (H5, PG-23; L-LONE)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 3,
+     "msg": "key page 3 has 2 answer slots, pupil page 1 has 1 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "measurement:time_hour#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 6 answer slots, pupil page 1 has 5 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "patterns:seq_2#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 1,
+     "msg": "one empty band 20.8 mm tall under the item in a 44.8 mm cell, 20.2 mm (45%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 2,
+     "msg": "one empty band 20.8 mm tall under the item in a 44.8 mm cell, 20.2 mm (45%) more than its row's other cells keep: the row is sized for a taller item than this cell holds (RUBRIC H13, H13-ROW)"
+    }
+   ]
+  },
+  {
+   "id": "algebra:tape_diagram#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "order_of_operations:oop_easy#pre-skill-check",
+   "pages": 4,
+   "keyPages": 2,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 1,
+    "L-FONT": 8,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 2,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-EMOJI",
+     "rule": "TY-6",
+     "sev": "major",
+     "page": 4,
+     "msg": "\"24 - 15 = 9\": subtraction written with a hyphen; the operator is U+2212 (TY-6)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 3,
+     "msg": "key page 3 has 14 answer slots, pupil page 1 has 13 (AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 4,
+     "msg": "key page 4 has 3 answer slots, pupil page 2 has 0 (AK-4)"
+    }
+   ]
+  },
+  {
+   "id": "placevalue:more_less_10#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 8,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 1,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 7.6 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 6.1 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    },
+    {
+     "lint": "L-ANSAREA",
+     "rule": "H12",
+     "sev": "major",
+     "page": 2,
+     "msg": "drawing grid of 10 cells, the smallest 4.8 mm: a cell the pupil draws a counter in is >= 10 mm (11.2 ten frame, pupil draws counters; RP-5)"
+    }
+   ]
+  },
+  {
+   "id": "number_sense:rounding_visual#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": []
+  },
+  {
+   "id": "number_theory:prime_composite#pre-skill-check",
+   "pages": 2,
+   "keyPages": 1,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 16,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 3,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 2
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "printed page 1: 7 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"40\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 7 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"40\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-2",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2: 4 of 14 answer slot(s) carry no answer (AK-2, AK-4)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-2",
+     "sev": "minor",
+     "page": 2,
+     "msg": "key page 2: answers not in weight 700 (AK-2)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 2,
+     "msg": "key page 2 has 14 answer slots, pupil page 1 has 12 (AK-4)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 1,
+     "msg": "a wrapped line ends in \"=\": \"10x1=\" / \"?...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "page": 2,
+     "msg": "a wrapped line ends in \"=\": \"10x1=\" / \"?...\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)"
+    }
+   ]
+  },
+  {
+   "id": "vocabulary:vocab_grade_K#pre-skill-check",
+   "pages": 4,
+   "keyPages": 2,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 48,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 1,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 1 text run(s) embedded in \"LiberationSans-BoldItali\", not Andika (e.g. \"Write the matching letter on e\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"1.\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 8 text run(s) embedded in \"DejaVuSansMono\", not Andika (e.g. \"The\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 9 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"Match each word to its definit\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 1 text run(s) embedded in \"LiberationSans-BoldItali\", not Andika (e.g. \"Write the matching letter on e\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 6 text run(s) embedded in \"LiberationSans-Bold\", not Andika (e.g. \"1.\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 8 text run(s) embedded in \"DejaVuSansMono\", not Andika (e.g. \"The\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 9 text run(s) embedded in \"LiberationSans\", not Andika (e.g. \"Match each word to its definit\") (TY-1, TY-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"Arial, sans-serif\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-1",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-family \"monospace\": every character of question content is Andika (TY-1)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 1,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "printed page 2: 1 italic run(s), e.g. \"Write the matching letter on e\" (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "printed page 4: 1 italic run(s), e.g. \"Write the matching letter on e\" (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 4,
+     "msg": "font-style italic: no italic anywhere (TY-2, AX-3)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 1,
+     "msg": "page 1 holds 2 item(s) while page 2 of the same sheet follows and its fullest page holds 5: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "page 3 holds 2 item(s) while page 4 of the same sheet follows and its fullest page holds 5: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-KEY",
+     "rule": "AK-4",
+     "sev": "critical",
+     "page": 4,
+     "msg": "key page 4 has 1 answer slots, pupil page 2 has 0 (AK-4)"
+    }
+   ]
   }
  ],
  "runs": [
   {
    "file": "ws-print-lint --source kit --roles lesson --size S --skills <role-sample.json> --report-only --json (lane S1, 2026-10-24, on origin main 75a6a25: the lesson role pages, ids cat:skill#lesson)",
+   "documents": 20
+  },
+  {
+   "file": "ws-print-lint --source kit --roles pre-skill-check --size S --skills <role-sample.json> --report-only --json (shared-roles builder B, 2026-10-31: the R1-8 pre-skill check pages, ids cat:skill#pre-skill-check)",
    "documents": 20
   }
  ]

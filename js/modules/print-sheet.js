@@ -3214,7 +3214,7 @@ async function buildRoleSheet(n, metaOf) {
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
     // R1-8: a Pre-skill check of ONE skill tests its prerequisites (the detailed lesson's check names its own).
-    const prereqs = n.role === 'pre-skill-check' && !n.perQuestion && reqSkills.length === 1 ? await prereqSkills(reqSkills[0], 4) : null;
+    const prereqs = n.role === 'pre-skill-check' && !n.perQuestion && reqSkills.length === 1 ? await prereqSkills(reqSkills[0], 8) : null;
     const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, prereqs }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
     const allSkills = [];

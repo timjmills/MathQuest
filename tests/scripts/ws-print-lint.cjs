@@ -2717,11 +2717,15 @@ if (require.main === module) (async () => {
 
 // L-DENSITY PAGEFILL-PRE (shared-roles critic r1, R1-8; RUBRIC H5, PAGE_TYPES PT-PRE-1): a Pre-skill check is one page of
 // four quadrants. Its items run down at least half of the body: from the first item's top, the last item's foot is at least
-// 50 % of the way to the footer (the r1 page held 4 items in one band and was 80 % blank). Pupil pages only.
+// 50 % of the way to the footer (the r1 page held 4 items in one band and was 80 % blank). Page 1 of each pupil sheet.
 function lintPreSkillFill(dom, info, F) {
     if (!dom || !Array.isArray(dom.pages)) return;
+    const seen = new Set();
     for (const p of dom.pages) {
         if (p.key || p.role !== 'pre-skill-check' || !p.footRect) continue;
+        // (page 1 of each check: a second page's share is DN-2 / PG-23's)
+        if (seen.has(p.sheet || 'sheet')) continue;
+        seen.add(p.sheet || 'sheet');
         const its = (p.cells || []).filter((c) => c.item && c.rect && c.rect[3] > 0);
         if (!its.length) continue;
         const top = Math.min(...its.map((c) => c.rect[1]));
