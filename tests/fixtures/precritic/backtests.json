@@ -908,7 +908,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: print-sheet.js shareRows holds a section to the widest column count whose measured height fits its share"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --kind sections --skills addition:add_sub_10s,addition:add_facts,algebra:tape_diagram,area_perimeter:perimeter_intro --lints L-OVERFLOW",
@@ -928,7 +928,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: equation.js draws the quotient above the bar; a Bracket page deals ÷ only"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:missing_mult_div --opts '{\"notation\":[\"across\",\"bracket\",\"fraction\"]}' --lints L-NOTATION",
@@ -948,7 +948,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: slotShape box for every unknown on a mixed page"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:missing_add_sub --opts '{\"unknown\":[0,1]}' --lints L-ANSAREA",
@@ -968,7 +968,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: the chart shows the other sign whole under the panels (lesson data second.whole) and spreads its rows"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills division:missing_mult_div,subtraction:missing_add_sub --lints L-DENSITY",
@@ -988,7 +988,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: test.js takes a neighbouring column count that divides the ceiling"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles test --size S --skills subtraction:missing_add_sub,division:missing_mult_div --lints L-DENSITY",
@@ -1008,7 +1008,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: tight across tracks for missing-number sentences; Max 100 tables stop at 99 (2-digit boxes): M prints 3 x 8"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --skills subtraction:missing_add_sub,division:missing_mult_div --lints L-DENSITY",
@@ -1028,7 +1028,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: q.sectionLabel names the operations dealt"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --kind mixed --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div --lints L-NOTATION",
@@ -1048,7 +1048,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: narrow-screen sentence wraps its slot under, 12 px each side"
    },
    "command": "node tests/scripts/ws-phone-card.cjs --skills addition:add_sub_100s",
@@ -1068,7 +1068,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: bar / glyph pictures; facts to 10 x 10; grade-1 warm-ups"
    },
    "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules LESSON-DATA --no-baseline --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div",
@@ -1088,7 +1088,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: compose.js topicOf takes -ing on every joined verb"
    },
    "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules ROLE-TITLE --no-baseline --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div",
@@ -1108,7 +1108,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: hints name the item numbers"
    },
    "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules HINT --no-baseline --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div",
@@ -1128,7 +1128,7 @@
     "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
    },
    "pass": {
-    "commit": "3272a32",
+    "commit": "3d76918",
     "state": "fix round 2: pairs within Max; explicit Max honoured; level 3 traces; labels show dealt forms"
    },
    "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules OPT-VALUES --no-baseline --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div",
