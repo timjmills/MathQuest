@@ -942,7 +942,7 @@ function pictureRow(ctx, pic, stack = false) {
         return `<svg class="k2-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n2(w)} ${n2(h)}" aria-hidden="true"${stack ? ` data-ws-natural="${n2(w)}"` : ''} `
             + `style="display:block;width:${L(ctx, w)};height:auto;max-width:100%;overflow:visible;">${body}</svg>`;
     };
-    return `<div role="img" aria-label="${pic.a} and ${pic.b} ${esc(shapeOf(pic.shape).plural)}" style="display:flex;${stack ? 'flex-direction:column;align-items:flex-start;' : 'flex-wrap:wrap;'}gap:${L(ctx, stack ? 3 : 1.5)} ${L(ctx, 9)};margin-top:${L(ctx, stack ? 1.5 : 1)};">${group(pic.a)}${group(pic.b)}</div>`;
+    return `<div role="img" aria-label="${pic.a} and ${pic.b} ${esc(shapeOf(pic.shape).plural)}" style="display:flex;${stack ? 'flex-direction:column;align-items:flex-start;' : 'flex-wrap:wrap;'}gap:${L(ctx, stack ? 3 : 1)} ${L(ctx, 9)};margin-top:${L(ctx, stack ? 1.5 : 0.5)};">${group(pic.a)}${group(pic.b)}</div>`;
 }
 
 /** "Answer: [box] ______" and the unit-word bank under it. */

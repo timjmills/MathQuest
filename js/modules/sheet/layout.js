@@ -715,7 +715,8 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
             if (!pc.fits) continue;
             let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (pc.hMin * room)), Math.floor(dCeil / c)));
             if (c === 2) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
-            const tie = rr * c === best.perPage && best.cols !== c && sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols);
+            // (an in-place cell at the same count prefers MORE rows: one row of half-page cells is mostly empty paper)
+            const tie = rr * c === best.perPage && best.cols !== c && ((sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols)) || (c0 < cols && rr > (best.rows || 0)));
             if (rr * c > best.perPage || tie) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }
         if (best.perPage > rows * cols || (best.perPage === rows * cols && best.cols !== cols)) {
@@ -771,12 +772,14 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     if (capped && rows * cellH < 0.8 * G) cellH = r3(Math.min(even, hMin * FILL_CAP));
     // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
     const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
-    if (inPlace && hMin > 0) cellH = r3(Math.min(cellH, hMin * IN_PLACE_FILL));
     // (and to what THESE items measure: the skill's floor sized the page's rows for its tallest item - a K story with a
-    // five-frame - but a page that deals none of those keeps its cells to its own items; the rest stays under the grid)
-    if (inPlace) {
-        const own = Math.max(0, ...infos.map((i) => (i.measured && i.measured[cols] && Number(i.measured[cols].hMm)) || 0));
-        if (own > 0 && infos.every((i) => i.measured && i.measured[cols])) cellH = r3(Math.min(cellH, own * IN_PLACE_FILL));
+    // five-frame - but a page that deals none of those keeps its cells to its own items. Never so short that the rows
+    // leave more than a fifth of the grid under them (PAGEFILL): the band and the strip are both empty paper.)
+    if (inPlace && hMin > 0) {
+        const own = infos.every((i) => i.measured && i.measured[cols] && Number(i.measured[cols].hMm) > 0)
+            ? Math.max(...infos.map((i) => Number(i.measured[cols].hMm))) : hMin;
+        const fillFloor = (0.82 * G) / Math.max(1, rows);
+        cellH = r3(Math.min(cellH, Math.max(Math.min(hMin, own) * IN_PLACE_FILL, fillFloor)));
     }
     const fillsGrid = cellH >= even - 0.01;
     const perPage = rows * cols;
