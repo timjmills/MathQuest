@@ -56,6 +56,17 @@ const PAGE_FN = async (req) => {
     const o = await window.buildSheet(req);
     const mm = 96 / 25.4;
     const meta = (o.plan && o.plan.meta) || {};
+    // a drawn rule (an answer rule, a stack's double rule): a heavy top or bottom border on an
+    // element wider than a digit - its line's y in px, or null (regroup boxes are 1 px: not rules)
+    const ruleLineY = (el) => {
+        if (el.closest('.ws-tab,.ws-letter,.ws-mixcue')) return null;
+        const cs = getComputedStyle(el);
+        const b = el.getBoundingClientRect();
+        if (b.width <= 30) return null;
+        if (parseFloat(cs.borderBottomWidth) >= 1.5 && cs.borderBottomStyle !== 'none') return b.bottom;
+        if (parseFloat(cs.borderTopWidth) >= 1.5 && cs.borderTopStyle !== 'none') return b.top;
+        return null;
+    };
     const measure = (html) => {
         const host = document.createElement('div');
         host.style.cssText = 'position:absolute;left:-12000px;top:0;width:230mm;visibility:hidden';
@@ -66,19 +77,41 @@ const PAGE_FN = async (req) => {
             const body = pg.querySelector('.ws-body') || pg;
             const bb = body.getBoundingClientRect();
             const cells = [];
-            const out = { cells, split: 0, empty: 0, trails: [], h13: [], align: [], free: 0, shelves: [] };
+            const out = { cells, split: 0, empty: 0, trails: [], h13: [], align: [], free: 0, shelves: [], work: [], cues: [], tallOnly: 0, rowSmall: 0 };
             for (const g of pg.querySelectorAll('.ws-band .ws-grid')) {
                 const gr = g.getBoundingClientRect();
                 out.shelves.push(gr.height / mm);
                 const kids = [...g.children];
+                {
+                    // D3 stripes: a 2-row shelf of tall boxes alone, and a one-row shelf of small boxes
+                    const cs = kids.filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun'));
+                    const tall = cs.filter((c) => /span 2/.test(c.style.gridRow));
+                    const small = cs.filter((c) => !/span 2/.test(c.style.gridRow));
+                    const rowsUsed = new Set(cs.map((c) => Math.round(c.getBoundingClientRect().top))).size;
+                    if (tall.length >= 2 && !small.length) out.tallOnly++;
+                    const tw = tall.length ? tall[0].getBoundingClientRect().width : 0;
+                    if (!tall.length && rowsUsed === 1 && small.length >= 4 && cs.every((c) => !c.style.gridRow || /span 1/.test(c.style.gridRow))) out.rowSmall = Math.max(out.rowSmall, small.length);
+                    out.smallW = Math.max(out.smallW || 0, ...small.map((c) => c.getBoundingClientRect().width), 0);
+                    out.tallW = Math.max(out.tallW || 0, tw);
+                }
                 const trails = kids.filter((c) => c.classList.contains('blankrun'));
                 out.trails.push({ n: trails.length, last: !trails.length || kids[kids.length - 1] === trails[0], ruled: trails.some((t) => ['Top', 'Bottom', 'Left', 'Right'].some((e) => parseFloat(getComputedStyle(t)[`border${e}Width`]) > 0)), toFrame: trails.every((t) => Math.abs(t.getBoundingClientRect().right - gr.right) < 3) });
                 const rows = new Map();
+                const rowsAll = new Map();
                 for (const c of kids.filter((x) => x.classList.contains('ws-cell') && !x.classList.contains('blankrun'))) {
                     const r = c.getBoundingClientRect();
                     const lab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter');
                     const tpl = (c.querySelector('[data-ws-cell]') || c).getAttribute('data-ws-cell') || (c.className.match(/mqt--([\w-]+)/) || [])[1] || '';
                     cells.push({ label: lab ? lab.textContent.trim() : '', place: c.style.gridColumn + '|' + c.style.gridRow, tpl });
+                    // D6: the cue against the task the cell asks
+                    const cueEl = c.querySelector('.ws-mixcue');
+                    if (cueEl) {
+                        const cue = cueEl.textContent.trim();
+                        const rest = (c.textContent || '').replace(cue, '');
+                        // (choices: lettered models A-D, or a row of sign boxes to circle)
+                        const letters = new Set([...c.querySelectorAll('*')].filter((e) => e.children.length === 0 && /^([A-D]|[+\u2212\u00d7\u00f7<>=-])$/.test(e.textContent.trim())).map((e) => e.textContent.trim()));
+                        out.cues.push({ label: lab ? lab.textContent.trim() : '', cue, choices: letters.size >= 2, part: /numerator|denominator/i.test(rest) });
+                    }
                     if (r.bottom > bb.bottom + 1 || r.top < bb.top - 1) out.split++;
                     if (!c.textContent.trim() && !c.querySelector('svg,img,canvas')) out.empty++;
                     // H13: the drawing's natural height (the cell laid out on its own, height auto)
@@ -87,12 +120,27 @@ const PAGE_FN = async (req) => {
                     g.appendChild(clone);
                     const nat = clone.getBoundingClientRect().height;
                     clone.remove();
-                    out.h13.push({ label: lab ? lab.textContent.trim() : '', fill: nat / r.height, tpl, h: r.height / mm });
+                    // (a long procedure's work zone is its working space, not an empty band: its H13 is
+                    // the drawing above the rule, and the room under the rule is measured - D2)
+                    const workMm = parseFloat(getComputedStyle(c).getPropertyValue('--mq-work')) || 0;
+                    out.h13.push({ label: lab ? lab.textContent.trim() : '', fill: nat / r.height, tpl, h: r.height / mm, work: workMm > 0 });
+                    {
+                        // the space under the lowest ruled line of a column procedure (the double rule)
+                        let low = null;
+                        for (const el of c.querySelectorAll('*')) {
+                            const y = ruleLineY(el);
+                            if (y !== null) low = Math.max(low === null ? -1e9 : low, y);
+                        }
+                        const tx = (c.textContent || '').slice(lab ? lab.textContent.length : 0).replace(/\s+/g, '');
+                        const mm2 = /(\d+)×(\d+)/.exec(tx);
+                        const legacyMult = tpl === 'legacy' && !!mm2 && Number(mm2[1]) >= 13 && Number(mm2[2]) >= 10;
+                        if (low !== null && (workMm > 0 || legacyMult)) out.work.push({ label: lab ? lab.textContent.trim() : '', under: (r.bottom - low) / mm, need: workMm || 27 });
+                    }
                     // alignment: the first ruled element's y and the right edge of the widest text line
                     let ruleY = null;
                     for (const el of c.querySelectorAll('*')) {
-                        const cs = getComputedStyle(el);
-                        if (parseFloat(cs.borderBottomWidth) >= 1 && el.getBoundingClientRect().width > 8) { ruleY = (el.getBoundingClientRect().bottom - r.top) / mm; break; }
+                        const y = ruleLineY(el);
+                        if (y !== null) { ruleY = (y - r.top) / mm; break; }
                     }
                     let right = 0;
                     for (const el of c.querySelectorAll('span,div')) {
@@ -103,6 +151,19 @@ const PAGE_FN = async (req) => {
                     const key = `${Math.round(r.top)}|${tpl}|${Math.round(r.width)}`;
                     if (!rows.has(key)) rows.set(key, []);
                     rows.get(key).push({ ruleY, right: (r.width - right) / mm });
+                    // D4: ACROSS templates - every one-row stacked computation in a shelf row (a kit fact,
+                    // a kit stack, a legacy stack) puts its first rule at one height (1 mm)
+                    const stacked = /^(fact|stack|legacy)$/.test(tpl) && !/span 2/.test(c.style.gridRow) && ruleY !== null && /[+\u2212\u00d7\u00f7-]/.test(c.textContent || '');
+                    if (stacked) {
+                        const k2 = `${Math.round(r.top)}`;
+                        if (!rowsAll.has(k2)) rowsAll.set(k2, []);
+                        rowsAll.get(k2).push({ tpl, ruleY });
+                    }
+                }
+                for (const [, xs] of rowsAll) {
+                    if (new Set(xs.map((x) => x.tpl)).size < 2) continue;
+                    const ys = xs.map((x) => x.ruleY);
+                    if (Math.max(...ys) - Math.min(...ys) > 1) out.align.push(`rule y across templates ${[...new Set(xs.map((x) => x.tpl))].join(' / ')}: ${Math.min(...ys).toFixed(1)}-${Math.max(...ys).toFixed(1)} mm`);
                 }
                 for (const [key, xs] of rows) {
                     // (a computation drawn by one template: a fact, a stack - M1 r1 D2; a picture or a
@@ -216,12 +277,43 @@ async function main() {
                     // (no page more than the problems need: where every box is one size a page holds exactly
                     // `perPage`; with boxes of several sizes the counts change what a page holds - reported)
                     const tot = want.reduce((a, b) => a + b, 0);
-                    const oneSize = r.m2 && new Set(Object.values(r.m2.classes).map((c) => c.s)).size === 1;
-                    if (sc.arr === 'mixed' && r.perPage && r.pages > 1 && tot <= r.perPage * (r.pages - 1)) (oneSize ? fail : (t) => warns.push(`${id}: ${t}`))(`${r.pages} pages for ${tot} problems at ${r.perPage} a page`);
+                    // D7: fits.perPage is what a page holds for THIS mix; a sheet never takes a page more
+                    if (sc.arr === 'mixed' && r.perPage && r.pages > 1 && tot <= r.perPage * (r.pages - 1)) fail(`${r.pages} pages for ${tot} problems at ${r.perPage} a page`);
+                    if (sc.arr === 'mixed' && r.perPage && r.pages > 1 && tot > r.perPage * r.pages) fail(`${r.pages} pages for ${tot} problems, but fits.perPage says ${r.perPage} a page`);
+                    // D7: no avoidable trailing slot - a page before the last ends a shelf short only
+                    // where a skill too small for two a page is spread one a page
+                    const spread = Object.entries(r.per).some(([, k]) => k < 2 * r.pages);
+                    if (sc.arr === 'mixed' && !spread) r.pupil.slice(0, -1).forEach((pg, i) => { if (pg.trails.some((t) => t.n)) fail(`page ${i + 1} of ${r.pages}: a trailing slot before the last page`); });
                     if (r.pages > 1 && !(sc.pages >= r.pages) && !/pages? (was|were) added|need \d+ pages/.test(notes) && sc.arr === 'mixed') fail(`${r.pages} pages with no note`);
                 }
                 // two of each on every page a skill is on
-                if (r.arr === 'mixed') r.pagePools.forEach((c, i) => { for (const [p, k] of Object.entries(c)) if (k === 1) fail(`page ${i + 1}: ${p} has one problem`); });
+                // (D5: a skill with fewer problems than two a page is spread one a page - a lone
+                // problem beats a page without the skill when the teacher asked for Mixed up)
+                if (r.arr === 'mixed') r.pagePools.forEach((c, i) => { for (const [p, k] of Object.entries(c)) if (k === 1 && !((r.per[p] || 0) < 2 * r.pagePools.length)) fail(`page ${i + 1}: ${p} has one problem`); });
+                // D5: no page of one skill while another skill could be on it (it has a problem a page to give)
+                if (r.arr === 'mixed' && r.pagePools.length > 1) r.pagePools.forEach((c, i) => { for (const p of Object.keys(r.per)) if (!c[p] && r.per[p] >= r.pagePools.length && !/one on every page would need another page/.test(notes)) fail(`page ${i + 1}: no ${p}, though ${p} has ${r.per[p]} problems over ${r.pagePools.length} pages`); });
+                // D5: the run note's figure is the run in print order, across the page breaks
+                if (r.arr === 'mixed' && r.m2 && r.m2.pages) {
+                    const seq = r.m2.pages.flat();
+                    const runOf = (p) => { let b = 0; let run = 0; for (const k of seq) { run = k === p ? run + 1 : 0; b = Math.max(b, run); } return b; };
+                    const runs = Object.keys(r.per).map(runOf);
+                    for (const m of notes.matchAll(/up to (\d+) ([^|]*?) come in a row/g)) if (!runs.includes(Number(m[1]))) fail(`the note says "up to ${m[1]} ${m[2]} come in a row", the printed runs are ${runs.join(' / ')} (across the pages)`);
+                }
+                // D1: the teacher's distribution is held - every count within 1 of its weighted share
+                // (equal weights here), two of each the one exception
+                if (r.arr === 'mixed' && !sc.counts) {
+                    const ks = Object.values(r.per);
+                    const tot = ks.reduce((a, b) => a + b, 0);
+                    const share = tot / ks.length;
+                    for (const [p, k] of Object.entries(r.per)) if (Math.abs(k - share) > 1 + 1e-9 && !(k <= 2 && share < 2)) fail(`weights: ${p} has ${k} of ${tot} problems, Equal weights give ${share.toFixed(1)} (within 1)`);
+                }
+                // D3: no stripes - tall boxes alone on a shelf while a block of small boxes prints in a row of its own
+                if (r.arr === 'mixed') r.pupil.forEach((pg, i) => { if (pg.tallOnly && pg.smallW > 0 && pg.rowSmall >= 2 * Math.round(pg.tallW / pg.smallW) && pg.smallW <= pg.tallW / 2 + 1) fail(`page ${i + 1}: ${pg.tallOnly} shelf(s) of tall boxes alone while a row of ${pg.rowSmall} small boxes could have shared them (PT-MIX-5 stripes)`); });
+                // D6: the cue names the task the cell asks
+                r.pupil.forEach((pg, i) => { for (const c of pg.cues) {
+                    if (/\b(circle|choose)\b/i.test(c.cue) && !c.choices) fail(`page ${i + 1} cell ${c.label}: cue "${c.cue}" over a cell with no choices`);
+                    if (/\bfraction\b/i.test(c.cue) && c.part && !/numerator|denominator/i.test(c.cue)) fail(`page ${i + 1} cell ${c.label}: cue "${c.cue}" over a cell asking for a numerator / denominator`);
+                } });
                 // split / empty / trailing areas / H13 / alignment, pupil page and key
                 r.pupil.forEach((pg, i) => {
                     if (pg.split) fail(`page ${i + 1}: ${pg.split} cell(s) cross the page body`);
@@ -233,8 +325,10 @@ async function main() {
                         if (!t.toFrame) fail(`page ${i + 1}: a trailing area short of the frame`);
                     }
                     // (H13 is the mixed packer's to keep; a Sections page's grouped shelves are reported)
-                    for (const h of pg.h13) if (h.fill < 0.7 - 0.02 && r.arr !== 'mixed') warns.push(`${id}: page ${i + 1} cell ${h.label} (${h.tpl}) fills ${(h.fill * 100).toFixed(0)} % (Sections, pre-existing grouped shelf)`);
-                    for (const h of pg.h13) if (r.arr === 'mixed' && h.fill < 0.7 - 0.02) fail(`page ${i + 1} cell ${h.label} (${h.tpl}): drawing fills ${(h.fill * 100).toFixed(0)} % of a ${h.h.toFixed(1)} mm box (H13 70 %)`);
+                    for (const h of pg.h13) if (h.fill < 0.7 - 0.02 && r.arr !== 'mixed' && !h.work) warns.push(`${id}: page ${i + 1} cell ${h.label} (${h.tpl}) fills ${(h.fill * 100).toFixed(0)} % (Sections, pre-existing grouped shelf)`);
+                    // D2: a long procedure keeps its work zone under the rule, on Mixed AND Sections pages
+                    for (const w of pg.work) if (w.under < w.need - 0.5) fail(`page ${i + 1} cell ${w.label}: ${w.under.toFixed(1)} mm under the rule, the work zone needs ${w.need.toFixed(0)} mm (H9)`);
+                    for (const h of pg.h13) if (r.arr === 'mixed' && !h.work && h.fill < 0.7 - 0.02) fail(`page ${i + 1} cell ${h.label} (${h.tpl}): drawing fills ${(h.fill * 100).toFixed(0)} % of a ${h.h.toFixed(1)} mm box (H13 70 %)`);
                     for (const a of pg.align) fail(`page ${i + 1}: ${a}`);
                 });
                 // the page is full: a page other than the last has no room for another shelf; split pages within half of each other
@@ -245,7 +339,8 @@ async function main() {
                         // a fill page: no blank strip of 20 % of the body or more under the frame (L2,
                         // PRE-FLIGHT 2) - the counts were chosen to fill it
                         const pg = r.pupil[0];
-                        if (pg.free > 0.2 * pg.bodyMm) fail(`${pg.free.toFixed(0)} mm free under the frame on a fill page (${((pg.free / pg.bodyMm) * 100).toFixed(0)} % of the body)`);
+                        // (D1: the weights win - a page short of the frame says so; it is never refilled by changing the mix)
+                        if (pg.free > 0.2 * pg.bodyMm && !/the foot of the page is left open/.test(notes)) fail(`${pg.free.toFixed(0)} mm free under the frame on a fill page (${((pg.free / pg.bodyMm) * 100).toFixed(0)} % of the body)`);
                     }
                 }
                 // the key mirrors the pupil page
@@ -257,7 +352,12 @@ async function main() {
             // the size ladder: S > M > L problems a page
             if (sc.kind === 'ladder' && got.S && got.M && got.L) {
                 const pp = (x) => x.n / Math.max(1, x.pages);
-                const ok = sc.weak ? pp(got.S) >= pp(got.M) && pp(got.M) >= pp(got.L) : pp(got.S) > pp(got.M) && pp(got.M) > pp(got.L);
+                // (D1: on a Mixed page the weights are held first; where the strict ladder cannot be met
+                // with them held, S >= M >= L and the size that ties says so in its notes)
+                const tieNoted = (a, b, x) => pp(a) > pp(b) || (pp(a) === pp(b) && /no more than the next size up/.test(x.notes.join(' ')));
+                const ok = sc.weak ? pp(got.S) >= pp(got.M) && pp(got.M) >= pp(got.L)
+                    : sc.arr === 'mixed' ? tieNoted(got.S, got.M, got.S) && tieNoted(got.M, got.L, got.M)
+                        : pp(got.S) > pp(got.M) && pp(got.M) > pp(got.L);
                 if (!ok) fails.push(`ladder ${sc.arr} ${sc.set} ${sc.look} seed ${sc.seed}: problems a page S ${pp(got.S)} / M ${pp(got.M)} / L ${pp(got.L)} (S > M > L${sc.weak ? ', one skill: S >= M >= L' : ''})`);
                 if (got.S.pages > 1 || got.M.pages > 1 || got.L.pages > 1) fails.push(`ladder ${sc.arr} ${sc.set} ${sc.look} seed ${sc.seed}: a fill page spilled to ${Math.max(got.S.pages, got.M.pages, got.L.pages)} pages`);
             }
