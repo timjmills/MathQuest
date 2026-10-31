@@ -444,6 +444,179 @@ export function packPage(groups, byPool0, N, seed, { weights = null, labels = nu
     return { shelves: out, order, mix };
 }
 
+
+/* ================================================================ §1.7 re-brief: ORDER IN PROBLEMS, THEN ROWS */
+// (mixed-pages M2 after critic r2: the order is decided in PROBLEMS, over the whole print, before
+// any row is built; the rows then take the problems in that order and never reorder them.)
+//
+//   rowPlanOf   R (1-3 rows a shelf) and which pools are TALL (a box R rows high); the rest are
+//               small boxes stacked R high in a column beside them (H13: every box's drawing fills
+//               >= 70 % of it)
+//   orderOf     the problem sequence: two skills by the GAP rule (the minority skill separates the
+//               majority's groups, every group within one of the others, the longest group the
+//               forced minimum ceil(major / (minor + 1)) or 2); three or more by interleave()
+//   columnsOf   the sequence cut into columns: a tall problem is one column; consecutive small
+//               problems stack R to a column (numbered down the column, then across: PT-MIX-7)
+//   shelvesOf   columns into shelves (one grid each) by their minimum widths; every shelf is the
+//               full width (its columns widen in proportion), and a short last shelf takes columns
+//               from the one before it so neither is under half full
+// Pure (SCC-01).
+
+/** Rows a shelf and the tall pools: {R, tall: {id: bool}, U, worst}. */
+export function rowPlanOf(ids, cls) {
+    const hmin = Math.min(...ids.map((id) => cls[id].h));
+    const fill = (h, rows, U) => (h - NAT_MM) / (rows * U);
+    let best = null;
+    for (const R of [1, 2, 3]) {
+        const tall = Object.fromEntries(ids.map((id) => [id, R > 1 && !cls[id].full && cls[id].h >= TWO_ROW_AT * hmin]));
+        const nTall = ids.filter((id) => tall[id]).length;
+        if (R > 1 && (!nTall || nTall === ids.length)) continue;
+        const U = Math.max(...ids.map((id) => cls[id].h / (tall[id] ? R : 1)));
+        const worst = Math.min(...ids.map((id) => fill(cls[id].h, tall[id] ? R : 1, U)));
+        const x = { R, tall, U, worst };
+        if (worst >= H13_FILL - 1e-9) return x;
+        if (!best || worst > best.worst + 1e-9) best = x;
+    }
+    return best;
+}
+
+/** n split into g groups, sizes within one, the larger ones spread evenly. */
+export function splitEven(n, g) {
+    const out = [];
+    for (let i = 0; i < g; i++) out.push(Math.floor(((i + 1) * n) / g) - Math.floor((i * n) / g));
+    return out;
+}
+
+const clampI = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+
+/**
+ * THE ORDER, in problems: {counts: {id: n}} -> [id, ...] (one entry a problem).
+ * `small` (two skills, R > 1): the pool whose boxes stack R to a column - its groups are cut to
+ * whole columns where the runs allow. Never a run over max(2, the forced minimum).
+ */
+export function orderOf(counts, ids, { tall = {}, R = 1, seed = 1 } = {}) {
+    const live = ids.filter((id) => (counts[id] || 0) > 0);
+    if (live.length === 1) return Array(counts[live[0]]).fill(live[0]);
+    if (!live.length) return [];
+    if (live.length > 2) {
+        const ents = live.flatMap((id) => Array.from({ length: counts[id] }, () => ({ key: id })));
+        return interleave(ents, null, seed, { firstThird: false }).order.map((e) => e.key);
+    }
+    const [a, b] = live;
+    const [P, Q] = counts[a] <= counts[b] ? [a, b] : [b, a];
+    const p = counts[P];
+    const q = counts[Q];
+    const capQ = Math.max(2, Math.ceil(q / (p + 1)));
+    const capP = Math.max(2, Math.ceil(p / (q + 1)));
+    // (two-row shelves: the small skill's problems come in whole columns of R - a pair, a pair...
+    // - so no column is left with a hole; an odd one out goes last, where its hole is the shelf's
+    // trailing area)
+    const pairs = (id) => R > 1 && !tall[id];
+    const unit = (id) => (pairs(id) ? 2 : 1);
+    // segments: Q in g groups, P in s groups, |g - s| <= 1, every group within its cap
+    let best = null;
+    for (let g = 1; g <= q; g++) {
+        for (const sP of [g - 1, g, g + 1]) {
+            if (sP < 1 || sP > p) continue;
+            const fits = (n, k, cap, id) => {
+                if (unit(id) === 1) return Math.ceil(n / k) <= cap ? splitEven(n, k) : null;
+                const half = Math.floor(n / 2);
+                // (an odd count: the single joins the last pair, or stands alone as the last group)
+                for (const lone of n % 2 ? [false, true] : [false]) {
+                    const kp = lone ? k - 1 : k;
+                    if (kp < 0 || (kp === 0 && half > 0) || half < kp) continue;
+                    const xs = kp ? splitEven(half, kp).map((x) => 2 * x) : [];
+                    if (n % 2) { if (lone) xs.push(1); else xs[k - 1] += 1; }
+                    if (xs.length === k && xs.every((x) => x > 0 && x <= cap)) return xs;
+                }
+                return null;
+            };
+            const qs = fits(q, g, capQ, Q);
+            const ps = fits(p, sP, capP, P);
+            if (!qs || !ps) continue;
+            // the most alternation that keeps whole columns: the smallest groups, then pairs first
+            const score = Math.max(...qs) + Math.max(...ps);
+            if (!best || score < best.score) best = { g, sP, qs, ps, score };
+        }
+    }
+    if (!best) {
+        const ents = live.flatMap((id) => Array.from({ length: counts[id] }, () => ({ key: id })));
+        return interleave(ents, null, seed, { firstThird: false }).order.map((e) => e.key);
+    }
+    const { g, sP, qs, ps } = best;
+    // s = g + 1: P Q P ... P;  s = g - 1: Q P ... Q;  s = g: the small skill with an odd count last
+    // (its hole is then the trailing area), else by the seed
+    let turnP;
+    if (sP === g + 1) turnP = true;
+    else if (sP === g - 1) turnP = false;
+    else if (pairs(Q) && q % 2) turnP = true;
+    else if (pairs(P) && p % 2) turnP = false;
+    else turnP = (Number(seed) >>> 0) % 2 === 1;
+    const out = [];
+    const put = (id, k) => { for (let i = 0; i < k; i++) out.push(id); };
+    let qi = 0;
+    let pi = 0;
+    while (qi < g || pi < sP) {
+        if (turnP && pi < sP) put(P, ps[pi++]);
+        else if (!turnP && qi < g) put(Q, qs[qi++]);
+        else if (pi < sP) put(P, ps[pi++]);
+        else put(Q, qs[qi++]);
+        turnP = !turnP;
+    }
+    return out;
+}
+
+/** The longest run of each pool in an order: {id: n}. */
+export function runsIn(order) {
+    const best = {};
+    let run = 0;
+    let last = null;
+    for (const id of order) { run = id === last ? run + 1 : 1; last = id; best[id] = Math.max(best[id] || 0, run); }
+    return best;
+}
+
+/** The order cut into columns: [{items: [x], tall}] (x = whatever the sequence holds; `poolOf(x)`). */
+export function columnsOf(seq, poolOf, tall, R) {
+    const cols = [];
+    // (`tall` per pool, or a function of the entry: a short cell of a tall skill stacks as a small one)
+    const isTall = (x, id) => !!(typeof tall === 'function' ? tall(x) : tall[id]);
+    for (const x of seq) {
+        const id = poolOf(x);
+        const t = isTall(x, id);
+        const prev = cols[cols.length - 1];
+        if (!t && R > 1 && prev && !prev.tall && prev.items.length < R) { prev.items.push(x); continue; }
+        cols.push({ items: [x], tall: t, pool: id });
+    }
+    return cols;
+}
+
+/** Columns into shelves by minimum width (fraction of the page); a short last shelf is evened out. */
+export function shelvesOf(cols, wOf, R = 1) {
+    const shelves = [];
+    let cur = null;
+    let w = 0;
+    // (a column of fewer than R small boxes ends its shelf: its hole is then the shelf's ONE
+    // trailing area, to the frame - PG-15 - never a hole between two boxes)
+    const short = (c) => R > 1 && !c.tall && c.items.length < R;
+    for (const c of cols) {
+        const cw = wOf(c);
+        if (!cur || w + cw > 1 + 1e-6 || (cur.length && short(cur[cur.length - 1]))) { cur = []; shelves.push(cur); w = 0; }
+        cur.push(c);
+        w += cw;
+    }
+    const width = (sh) => sh.reduce((a, c) => a + wOf(c), 0);
+    if (shelves.length > 1) {
+        const last = shelves[shelves.length - 1];
+        const prev = shelves[shelves.length - 2];
+        while (prev.length > 1 && width(last) < 0.5 - 1e-6 && !short(prev[prev.length - 1])) {
+            const c = prev[prev.length - 1];
+            if (width(prev) - wOf(c) < width(last) + wOf(c) - 1e-6 || width(last) + wOf(c) > 1 + 1e-6) break;
+            last.unshift(prev.pop());
+        }
+    }
+    return shelves;
+}
+
 /* ================================================================ the sheet */
 /**
  * Split each pool's items over P pages (PT-MIX-9; critic M2 r1 D5, D7). Group by group: the
@@ -545,4 +718,4 @@ export function splitPages(groups, byPool, P, { spread = true } = {}) {
     });
 }
 
-export default { H13_FILL, classify, fillPage, packPage, splitPages, pageSize, withinShare };
+export default { H13_FILL, classify, fillPage, packPage, splitPages, pageSize, withinShare, rowPlanOf, orderOf, columnsOf, shelvesOf, runsIn, splitEven };

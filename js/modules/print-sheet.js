@@ -3667,6 +3667,28 @@ async function buildRoleSheet(n, metaOf) {
         const wEnd = widestTracks(items);
         if (wEnd && wEnd < mixDigits) { mixDigits = wEnd; tracksTried.push(wEnd); items = dealMixed(); }
         mixedTracks = { tried: tracksTried, final: mixDigits, k: input.mixK };
+        // (§1.7, mixed-m3 spare: a filled Mixed up page is planned again with the cells DEALT - their
+        // own heights, not the probe's - and dealt again while that changes the counts (three rounds at most), so the
+        // page the pupil gets is the one the counts were chosen for)
+        if (input.mixM2 && !input.exactCounts && typeof mod.m2Counts === 'function') {
+            const byPoolOf = (its) => { const o = {}; for (const it of its) (o[it.pool] = o[it.pool] || []).push(it); return o; };
+            const own = (its, w) => mod.m2Counts(byPoolOf(its), Object.assign({}, input, { exactCounts: w })).spare;
+            let best = { want, items, spare: own(items, want) };
+            const seen = new Set([JSON.stringify(want)]);
+            for (let round = 0; round < 3; round++) {
+                const want2 = mod.counts(byPoolOf(items), Object.assign({}, input, { mixTotal: pools.reduce((a, p) => a + (Number(want[p.id]) || 0), 0) })) || {};
+                const key2 = JSON.stringify(want2);
+                if (seen.has(key2)) break;
+                seen.add(key2);
+                want = want2;
+                items = dealMixed();
+                const sp = own(items, want);
+                if (sp < best.spare - 1e-6) best = { want, items, spare: sp };
+            }
+            // (the deal whose own page leaves the least blank band)
+            want = best.want;
+            items = best.items;
+        }
         // The page's machine check (critic M1 r3 D1, sheet/interleave.js pageRepeats; owner ruling
         // 2026-10-23): what the page's options do not allow - a repeat or a turnaround with `fill`
         // off, a related fact without `families: 'allow'` - never prints. The deal already keeps

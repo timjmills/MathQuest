@@ -2668,9 +2668,11 @@ function _generateSizedMultDiv(q, skill, helpers) {
             if (notationFor('×') === 'across') q.notationClampedFrom = 'across';
             const payload = { operands: [a, b], op: '*', ansDigits: String(hi(da) * hi(db)).length };
             q.visual = _kitStackTwin(payload);
-            // 2-digit × 2-digit needs its partial-product rows on paper: the column-mult cell.
-            if (db >= 2) q.printFormat = 'column-mult';
-            else { q.cell = { template: 'stack', v: 1, payload }; q.printFormat = 'column-mult'; }
+            // 2-digit × 2-digit needs its partial-product rows on paper: the kit stack draws them
+            // (`partials`, sheet/cells/stack.js MB-5) at the size's digits, on the same baseline as
+            // the kit facts and stacks beside it (mixed M2 §1.7: no legacy cell left on a mixed row).
+            q.cell = { template: 'stack', v: 1, payload: db >= 2 ? Object.assign({}, payload, { partials: true }) : payload };
+            q.printFormat = 'column-mult';
         }
         q.skillLabel = 'Multiply';
         return true;
