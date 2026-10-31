@@ -28,6 +28,8 @@ import { interleave } from './interleave.js';
 
 /** H13: a cell's drawing fills at least this share of its box's height. */
 export const H13_FILL = 0.7;
+/** What a cell's measured minimum height (hMinAt) holds beyond its drawing's natural height. */
+export const NAT_MM = 3;
 /** A pool whose cells are at least this many times the shortest pool's takes two rows. */
 const TWO_ROW_AT = 1.45;
 
@@ -52,7 +54,9 @@ function groupOf(ids, cls) {
         if (r[id] === R && s !== sB && R === 2) return { ok: false };
     }
     const U = Math.max(...ids.map((id) => cls[id].h / r[id]));
-    for (const id of ids) if (cls[id].h < H13_FILL * r[id] * U - 1e-6) return { ok: false };
+    // (H13 on the drawing: a cell's measured minimum carries ~NAT_MM of pads and safety the drawing
+    // itself does not fill - critic-style measure in the DOM, mixed-m2.check)
+    for (const id of ids) if (cls[id].h - NAT_MM < H13_FILL * r[id] * U - 1e-6) return { ok: false };
     const shape = Object.fromEntries(ids.map((id) => [id, { s: cls[id].s, r: r[id] }]));
     return { ok: true, R, U, sB, shape };
 }
@@ -83,7 +87,9 @@ export function classify(ids, cls, N) {
             const { s, r } = x.shape[id];
             shape[id] = { s, r, m: (sB / s) * (x.R / r) };
         }
-        return { pools: g.pools.slice(), R: x.R, U: x.U, sB, T: N / sB, shape };
+        // (a 2-row shelf of tall boxes only is as tall as they are, not two rows of the small ones)
+        const hTall = x.R === 2 ? Math.max(...g.pools.filter((id) => x.shape[id].r === 2).map((id) => cls[id].h)) : 0;
+        return { pools: g.pools.slice(), R: x.R, U: x.U, sB, T: N / sB, shape, hTall };
     });
 }
 
@@ -100,11 +106,13 @@ function groupSize(g, cells) {
         let room = sh2 * g.T - tall;
         let rows1 = 0;
         let open = false;
+        let blocks = 0;
         for (const id of g.pools.filter((x) => g.shape[x].r === 1)) {
             const m = g.shape[id].m;
             const c = cells[id] || 0;
             const inBlk = Math.min(room, Math.floor(c / m));
             room -= inBlk;
+            blocks += inBlk;
             const left = c - inBlk * m;
             const row = (g.sB * g.T) / g.shape[id].s;
             rows1 += Math.ceil(left / row);
@@ -113,7 +121,10 @@ function groupSize(g, cells) {
         const hasSmall = g.pools.some((x) => g.shape[x].r === 1);
         if (room > 0 && hasSmall) open = true;
         if (room > 0 && !hasSmall) open = true;
-        return { h: sh2 * 2 * g.U + rows1 * g.U, rows: sh2 * 2 + rows1, open };
+        // the shelves with a block of small boxes are two rows of U; the rest as tall as their boxes
+        const mixedSh = Math.min(sh2, Math.ceil(blocks / Math.max(1, g.T - 1)));
+        const tallH = Math.min(2 * g.U, g.hTall || 2 * g.U);
+        return { h: mixedSh * 2 * g.U + (sh2 - mixedSh) * tallH + rows1 * g.U, rows: sh2 * 2 + rows1, open };
     }
     const slots = g.pools.reduce((a, id) => a + Math.ceil((cells[id] || 0) / g.shape[id].m), 0);
     const sh = Math.ceil(slots / g.T);
@@ -235,7 +246,15 @@ function turnsOfPage(groups, byPool, seed) {
  * trail: {col, rows} | null}], order (pool ids, print order), interleave record}.
  * `col` / `row` are 1-based grid lines on the page lattice N.
  */
-export function packPage(groups, byPool, N, seed, { weights = null, labels = null } = {}) {
+export function packPage(groups, byPool0, N, seed, { weights = null, labels = null, hOf = null } = {}) {
+    // `hOf(item, k)` (mm): each cell's own height. A pool's cells are packed tallest first, so a
+    // shelf's cells are of like height and each shelf is only as tall as what it holds (H13).
+    const byPool = {};
+    for (const [id, its] of Object.entries(byPool0)) {
+        const g = groupOfPool(groups, id);
+        const k = g ? N / g.shape[id].s : 1;
+        byPool[id] = hOf ? its.map((it, i) => ({ it, i, h: hOf(it, k) })).sort((a, b) => b.h - a.h || a.i - b.i).map((x) => x.it) : its;
+    }
     const { full, tail } = turnsOfPage(groups, byPool, seed);
     // The order over the turns: every entry of a turn carries the turn's block id.
     // (a block of several skills belongs to none of them: interleave's turnsOf makes it a separator)
@@ -301,7 +320,11 @@ export function packPage(groups, byPool, N, seed, { weights = null, labels = nul
     for (const sh of shelves) {
         const used = sh.cells.reduce((a, c) => Math.max(a, c.col + c.span - 1), 0);
         sh.trail = used < N ? { col: used + 1, rows: sh.R } : null;
-        sh.U = groups[sh.g].U;
+        // the shelf's own height: its tallest cell (a 2-row cell over its rows), never the group's
+        // class height when it holds none so tall
+        const g = groups[sh.g];
+        const own = hOf ? Math.max(0, ...sh.cells.map((c) => hOf(c.it, c.k) / c.rows)) : 0;
+        sh.U = own > 0 ? Math.min(g.U, own) : g.U;
         sh.H = sh.R * sh.U;
     }
     // (numbering by shelf, then block, then inside the block - PT-MIX-7: the cells stay in the

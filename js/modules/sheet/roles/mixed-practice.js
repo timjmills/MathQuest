@@ -41,7 +41,7 @@ import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
 import { interleave, dealCounts } from '../interleave.js';
 import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
 import { factWidthMm, factDigitTracks } from '../cells/fact.js';
-import { classify, fillPage, packPage, splitPages, H13_FILL } from '../mixed-pack.js';
+import { classify, fillPage, packPage, splitPages, H13_FILL, NAT_MM } from '../mixed-pack.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -172,6 +172,8 @@ function packing(poolsIn, input) {
         const rate = (id) => shelf[id].per / shelf[id].h;
         const best = ids.slice().sort((a, b) => rate(b) - rate(a))[0];
         const before = total();
+        const snap = Object.fromEntries(ids.map((id) => [id, shelf[id].n]));
+        const used0 = used;
         for (let g = 0; g < 40 && total() <= must; g++) {
             const shelves = ids.reduce((a, id) => a + shelf[id].n, 0);
             if (shelves < maxShelves * basePages && used + bandH(best, false) <= m.budget + 1e-6) { shelf[best].n++; used += bandH(best, false); continue; }
@@ -183,9 +185,10 @@ function packing(poolsIn, input) {
         }
         const it0 = (poolsIn[best] || [])[0] || {};
         const nm = STRAND_BY_CATEGORY[String(it0.skill || '').split(':')[0]] || poolName(input, poolsIn[best]);
-        ladderNote = total() > must
-            ? `Mixed practice: more ${nm.toLowerCase()} problems than the weights ask, so this size prints more problems than the next size up (${total()}, not ${must}).`
-            : (total() > before ? '' : 'Mixed practice: this size prints no more problems than the next size up.');
+        // (nothing gained: the page stays as the weights made it - the next size's figure is a forecast)
+        if (total() <= must) { for (const id of ids) shelf[id].n = snap[id]; used = used0; }
+        ladderNote = total() > must && total() > before
+            ? `Mixed practice: more ${nm.toLowerCase()} problems than the weights ask, so this size prints more problems than the next size up (${total()}, not ${must}).` : '';
     }
     // Lessons r3: a lesson's Mixed page (`leadHalf`) gives its first skill - the lesson's own - at
     // least half the placed items AFTER packing (weights alone lost to a taller lesson shelf):
@@ -726,8 +729,7 @@ export function m2Counts(poolsIn, input) {
         const it0 = (poolsIn[small] || [])[0] || {};
         const nm = STRAND_BY_CATEGORY[String(it0.skill || '').split(':')[0]] || poolName(input, poolsIn[small]);
         ladderNote = done
-            ? `Mixed practice: more ${nm.toLowerCase()} problems than the weights ask, so this size prints more problems than the next size up (${sum(fill)}, not ${must}).`
-            : 'Mixed practice: this size prints no more problems than the next size up.';
+            ? `Mixed practice: more ${nm.toLowerCase()} problems than the weights ask, so this size prints more problems than the next size up (${sum(fill)}, not ${must}).` : '';
     }
     const exact = input.exactCounts || null;
     const P = Math.max(1, Number(input.mixPages) || 1);
@@ -766,14 +768,22 @@ function planMixedM2(input, pools) {
         const name = strands[i] && strands.filter((x) => x === strands[i]).length === 1 ? strands[i] : poolName(input, pools[id]);
         return [id, { name, noun: /problems?$/i.test(name) ? name.toLowerCase() : `${name.toLowerCase()} problems` }];
     }));
-    const asked = Math.max(1, Number(input.mixPages) || 1);
+    // (exact counts: as many pages as they need, from one; fill: the pages asked)
+    const asked = input.exactCounts ? 1 : Math.max(1, Number(input.mixPages) || 1);
     const total = ids.reduce((a, id) => a + pools[id].length, 0);
     const seed0 = deriveSeed('mixed-practice', input.seed || 0);
+    // each cell's own height at its count across (cached: the packer asks per page)
+    const hCache = new Map();
+    const cellH = (it, k) => {
+        const key = it;
+        if (!hCache.has(key)) { const v = hAtK([it], Math.min(k, 10), ctx); hCache.set(key, Number.isFinite(v) && v > 0 ? v : (cls[it.pool] || {}).h || 40); }
+        return hCache.get(key);
+    };
     // Pages: the fewest (from those asked) whose every page holds its share.
     let packed = null;
     for (let P = asked; P <= 12; P++) {
         const split = splitPages(groups, pools, P);
-        const pages = split.map((byPool, i) => packPage(groups, byPool, N, (seed0 + i * 104729) >>> 0, { weights, labels: names }));
+        const pages = split.map((byPool, i) => packPage(groups, byPool, N, (seed0 + i * 104729) >>> 0, { weights, labels: names, hOf: cellH }));
         const fits = pages.every((pg, i) => {
             const h = pg.shelves.reduce((a, s) => a + s.H, 0);
             const rows = pg.shelves.reduce((a, s) => a + s.R, 0);
@@ -810,7 +820,7 @@ function planMixedM2(input, pools) {
             const room = Math.min(...sh.cells.map((x) => {
                 const own = hAtK([x.it], Math.min(x.k, 10), ctx);
                 const h = Number.isFinite(own) && own > 0 ? own : cls[x.pool].h;
-                return (h * sh.R) / (H13_FILL * x.rows) - sh.H;
+                return ((h - NAT_MM) * sh.R) / (H13_FILL * x.rows) - sh.H;
             }));
             const grow = Math.max(0, Math.min(12, room, spare / pg.shelves.length));
             const H = sh.H + grow;
@@ -825,7 +835,7 @@ function planMixedM2(input, pools) {
             for (const x of sh.cells) {
                 const g = groups[sh.g];
                 const small = g.shape[x.pool].m > 1;
-                const blk = !small ? null : sh.row ? `row:${sh.g}:${start}` : sh.tail ? `tail:${x.col}:${start}` : `${sh.g}:${Math.floor((x.col - 1) / g.sB)}:${start}`;
+                const blk = !small ? null : sh.row ? `row:${sh.g}:${start}` : sh.tail ? `tail:${start}` : `${sh.g}:${Math.floor((x.col - 1) / g.sB)}:${start}`;
                 if (small && blk === lastBlock) {
                     if (turnKeys[turnKeys.length - 1] !== x.pool) turnKeys[turnKeys.length - 1] = null;
                     continue;
