@@ -122,7 +122,10 @@ export function plan(input = {}) {
     // Rows sized to what they hold (H13); else the layout's grid height is the page's (one
     // instruction) and a lone full grid fills by flex.
     // (a Test filled to its ceiling keeps one cell height, its rows taking the grid: fillToCeiling)
-    const shape = L.filledTest ? null : rowShape(items, L.cols, rows, L.cellH);
+    // (ops-family r2 F14: one-line sentences that start at the top of their cell - `topFill` - take the grid as the
+    // layout sized it; rows shrunk to what they hold left a 37 % strip under a full Test at S)
+    const topFill = items.length > 0 && items.every((it) => it && it.footprint && it.footprint.topFill);
+    const shape = L.filledTest || topFill ? null : rowShape(items, L.cols, rows, L.cellH);
     if (shape) { sections[1].rowsTpl = shape.rowsTpl; sections[1].height = `${shape.heightMm}mm`; }
     else if (rows === L.rows && L.fill !== false) { sections[1].cls = ''; sections[1].height = ''; }
     // A Test's count is fixed (12.1): spare page height goes between the rows, not into them.
