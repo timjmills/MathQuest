@@ -616,6 +616,14 @@ export const SKILL_TERMS = {
     'placevalue:ten_times_value': ['10 times the value', 'ten times as much', 'one tenth of the value', 'digit one place to the left', 'same digit two places', '10 times and one tenth', 'value of a digit 10 times'],
     'placevalue:one_tenth_value': ['one tenth of', 'a tenth of the value', 'one tenth as much', 'digit one place to the right', '10 times smaller value', 'one tenth of a digit'],
     'placevalue:ten_times_story': ['how many times as many', 'how many times more', '700 divided by 70', 'times as many word problem', 'ten times as many story', 'how many times bigger'],
+    // (2026-10-31 ops-family r2 presets)
+    'addition:ten_more': ['10 more', 'ten more than', 'add 10', 'plus 10', 'one more ten', 'find 10 more', '10 more than a number'],
+    'addition:ten_less': ['10 less', 'ten less than', 'subtract 10', 'minus 10', 'take away 10', 'find 10 less', '10 less than a number'],
+    'addition:hundred_more': ['100 more', 'one hundred more', 'add 100', 'plus 100', 'find 100 more', '100 more than a number'],
+    'addition:hundred_less': ['100 less', 'one hundred less', 'subtract 100', 'minus 100', 'take away 100', 'find 100 less', '100 less than a number'],
+    'division:missing_mult_only': ['missing factor', 'unknown factor', 'missing number multiplication', 'blank times 6 equals 42', 'find the missing factor', 'multiplication sentence missing number'],
+    'division:missing_div_only': ['missing number division', 'missing divisor', 'missing dividend', 'unknown in a division equation', 'division sentence missing number', 'find the missing number divide'],
+    'subtraction:missing_add_sub_answer': ['find the total', 'find the difference', 'write the answer', 'result unknown', 'sum after the equals', 'missing answer addition subtraction', 'what is 8 plus 5'],
     'placevalue:count_pv_disks': ['count place value disks', 'place value counters', 'how many hundreds disks', 'count the disks', 'place value chips', 'place value counters count'],
     'composing:write_numbers_in_words': ['write numbers in words', 'number words', 'numbers to words', 'spell numbers', 'write forty one', 'word form'],
     'measurement:count_notes': ['count notes', 'count bills', 'count dollar bills', 'counting banknotes', 'count paper money', 'count riyal notes'],
@@ -660,6 +668,8 @@ export const PRIMARY_SKILLS = {
         'commutative property of multiplication', 'distributive property of multiplication', 'zero property', 'zero property of multiplication',
         'identity property', 'identity property of multiplication', 'identity', 'property of zero', 'property of one'],
     'algebra:distributive_expr': ['distributive property', 'distributive property of expressions'],
+    // (2026-10-31: the bare word 'less' stays on 1 more / 1 less now that the 10 Less and 100 Less presets also carry it in their labels)
+    'placevalue:more_less_10': ['less'],
     'addition:add_sub_fact_family': ['commutative addition', 'commutative property of addition', 'commutative property addition',
         'turnaround facts addition', 'addition turnaround facts', 'turn around facts addition'],
     'multiplication:count_by_tables': ['skip counting', 'skip count', 'skipcounting', 'skip countin', 'count by', 'counting by',

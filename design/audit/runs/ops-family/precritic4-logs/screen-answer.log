@@ -1,0 +1,10 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-screen-answer.cjs --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient
+
+mq-browser-run: slot 1 after 107s
+addition:add_sub_10s               card ok | worksheet ok (3/3) | quiz ok (3/3)
+addition:add_sub_100s              card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:missing_add_sub        card ok | worksheet ok (3/3) | quiz ok (3/3)
+division:missing_mult_div          card ok | worksheet ok (3/3) | quiz ok (3/3)
+division:div_zero_in_quotient      card ok | worksheet ok (3/3) | quiz ok (3/3)
+live green (card, quiz)            ok
+ws-screen-answer: OK

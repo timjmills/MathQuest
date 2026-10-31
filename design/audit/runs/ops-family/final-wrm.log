@@ -1,0 +1,18 @@
+wrote design/WRM_COVERAGE.md
+wrm: 7 years, 97 blocks, 872 small steps; 393 skills tagged; 162 proposals
+coverage: covered 513/872 (59%), partial only 149, gap 210
+vocabulary: 872/872 steps (2857 words, data/curriculum/wrm-vocab.json)
+  by year: R 49%  Y1 62%  Y2 65%  Y3 58%  Y4 63%  Y5 60%  Y6 55%
+ws-wrm: FAIL (report only: exit 0)
+  359 small steps have no full-coverage skill (149 partial, 210 gap); the build list is in design/WRM_COVERAGE.md
+  R.B1.S1 Match objects: gap
+  R.B1.S2 Match pictures and objects: gap
+  R.B1.S3 Identify a set: gap
+  R.B1.S4 Sort objects to a type: partial
+  R.B1.S5 Explore sorting techniques: partial
+  R.B1.S6 Create sorting rules: gap
+  R.B2.S1 Compare size: partial
+  R.B2.S3 Compare capacity: gap
+  R.B2.S4 Explore simple patterns: partial
+  R.B2.S6 Create simple patterns: gap
+  ... and 349 more

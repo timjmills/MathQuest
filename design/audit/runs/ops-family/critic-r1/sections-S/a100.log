@@ -1,0 +1,13 @@
+ws-print-lint: source kit, 4 skill(s), kind sections
+  sections:addition:add_sub_100s+addition:add_facts+algebra:tape_diagram+area_perimeter:perimeter_intro: 4+2 pages, 18 finding(s)
+
+document                                                                                                 pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+sections:addition:add_sub_100s+addition:add_facts+algebra:tape_diagram+area_perimeter:perimeter_intro      4+2k    .     .    .    .       16     .       2    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                                                                                              .     .    .    .       16     .       2    .     .       .     .    .      .       .        .       .    .
+
+sections:addition:add_sub_100s+addition:add_facts+algebra:tape_diagram+area_perimeter:perimeter_intro (4 skills as sections)
+  [L-OVERFLOW PG-12 major] x16 (p1,3 cells 1,2,3,4,10,11,12,13...) sticks out of its cell by 3.7 mm (cell 46 x 12.4 mm) (PG-12, CL-1)
+      e.g. <div.ws-eq.ws-eq-below> "117 + 100 =" | <div.ws-eq.ws-eq-below> "202 − 100 ="
+  [L-DENSITY PG-23 major] x2 (p2,4) last page 2 holds 2 item(s), under a third of a full page (13): rows are rebalanced across the sheet's pages (PG-23)
+
+ws-print-lint: FAIL - 1 document(s), source kit; 18 finding(s) in 1 document(s)

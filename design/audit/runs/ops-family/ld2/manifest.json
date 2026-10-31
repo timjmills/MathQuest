@@ -1,0 +1,617 @@
+[
+  {
+    "skill": "division:long_div_2digit",
+    "category": "division",
+    "skillId": "long_div_2digit",
+    "label": "Divide by 2-Digit Numbers (Visual)",
+    "grade": "5",
+    "dir": "division__long_div_2digit",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 2,
+          "rows": 2,
+          "perPage": 4,
+          "pages": 1,
+          "trimmed": 0,
+          "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 2,
+              "perPage": 4,
+              "pages": 1,
+              "cellW": 93,
+              "cellH": 113.5,
+              "requested": "auto",
+              "clamped": false,
+              "note": "",
+              "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt.",
+              "cls": "long",
+              "digitPt": 28,
+              "hMin": 75.2,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 209220,
+        "title": "I Can divide by a two-digit number",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "division",
+            "fclass": "long",
+            "text": "880 ÷ 16 = ?",
+            "ans": "55",
+            "measured": {
+              "1": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 68
+              },
+              "2": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 21.7
+              },
+              "3": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 6.3
+              },
+              "4": {
+                "hMm": 75.2,
+                "fits": false,
+                "slackMm": -1.4
+              }
+            }
+          },
+          {
+            "template": "division",
+            "fclass": "long",
+            "text": "891 ÷ 11 = ?",
+            "ans": "81",
+            "measured": {
+              "1": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 68
+              },
+              "2": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 21.7
+              },
+              "3": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 6.3
+              },
+              "4": {
+                "hMm": 75.2,
+                "fits": false,
+                "slackMm": -1.4
+              }
+            }
+          },
+          {
+            "template": "division",
+            "fclass": "long",
+            "text": "4183 ÷ 47 = ?",
+            "ans": "89",
+            "measured": {
+              "1": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 64
+              },
+              "2": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 17.7
+              },
+              "3": {
+                "hMm": 75.2,
+                "fits": false,
+                "slackMm": 2.3
+              },
+              "4": {
+                "hMm": 75.2,
+                "fits": false,
+                "slackMm": -5.4
+              }
+            }
+          },
+          {
+            "template": "division",
+            "fclass": "long",
+            "text": "1988 ÷ 28 = ?",
+            "ans": "71",
+            "measured": {
+              "1": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 64
+              },
+              "2": {
+                "hMm": 75.2,
+                "fits": true,
+                "slackMm": 17.7
+              },
+              "3": {
+                "hMm": 75.2,
+                "fits": false,
+                "slackMm": 2.3
+              },
+              "4": {
+                "hMm": 75.2,
+                "fits": false,
+                "slackMm": -5.4
+              }
+            }
+          }
+        ],
+        "role": "independent",
+        "size": "L",
+        "opts": null,
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 66,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 105,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 45
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "6a493c701bfb62fa"
+          ],
+          "measured": [
+            {
+              "cells": 4,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 8,
+                "minMm": [
+                  8,
+                  12
+                ],
+                "sizes": [
+                  "8x12 mm ×8"
+                ]
+              },
+              "band": {
+                "hPct": 18.6,
+                "wPct": 23.6,
+                "cell": 4
+              },
+              "footPct": 3.7
+            }
+          ]
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 85
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "a83bb6f5ddb18a06"
+          ],
+          "measured": [
+            {
+              "cells": 4,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 8,
+                "minMm": [
+                  8,
+                  12
+                ],
+                "sizes": [
+                  "8x12 mm ×8"
+                ]
+              },
+              "band": {
+                "hPct": 18.6,
+                "wPct": 23.6,
+                "cell": 1
+              },
+              "footPct": 3.7
+            }
+          ]
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "long-div-kit",
+        "text": "2052 ÷ 27 = ?",
+        "ans": "76",
+        "seed": 868724108,
+        "contentHash": "c991a34e01885610",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              25
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "long-div-kit",
+        "text": "2052 ÷ 27 = ?",
+        "ans": "76",
+        "seed": 868724108,
+        "contentHash": "c991a34e01885610",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              25
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "long-div-kit",
+        "text": "2052 ÷ 27 = ?",
+        "ans": "76",
+        "seed": 868724108,
+        "contentHash": "fb7db4318dc8c93f",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              25
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              9
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "seed": 3370411590,
+        "contentHash": "29a80242cbe7440a",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              100
+            ],
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              18
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              18
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              18
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 243, 158)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              50
+            ],
+            [
+              "Nunito",
+              24
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "seed": 3999946203,
+        "contentHash": "1ecd84a480ea0f09",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              17
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              4
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              3
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "color:rgb(46, 42, 69)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 226, 80)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

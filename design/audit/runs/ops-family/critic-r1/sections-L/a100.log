@@ -1,0 +1,15 @@
+ws-print-lint: source kit, 4 skill(s), kind sections
+  sections:addition:add_sub_100s+addition:add_facts+algebra:tape_diagram+area_perimeter:perimeter_intro: 4+2 pages, 16 finding(s)
+
+document                                                                                                 pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+sections:addition:add_sub_100s+addition:add_facts+algebra:tape_diagram+area_perimeter:perimeter_intro      4+2k    .     .    .    .        8     .       2    .     .       .     .    .      .       .        .       6    .  FAIL
+TOTAL                                                                                                              .     .    .    .        8     .       2    .     .       .     .    .      .       .        .       6    .
+
+sections:addition:add_sub_100s+addition:add_facts+algebra:tape_diagram+area_perimeter:perimeter_intro (4 skills as sections)
+  [L-OVERFLOW PG-12 major] x8 (p1,3 cells 8,9,10,11,8,9,10,11) sticks out of its cell by 19.8 mm (cell 46 x 114.4 mm) (PG-12, CL-1)
+      e.g. <div.ws-legacy.print-edition> "Lily had 175 marbles. She us..." | <div.ws-legacy.print-edition> "Mia has 49 cards and gets 63..."
+  [L-DENSITY PG-23 major] x2 (p2,4) last page 2 holds 2 item(s), under a third of a full page (11): rows are rebalanced across the sheet's pages (PG-23)
+  [L-OVERLAP CL40-INK major] x6 (p1,3 cells 1,2,3,1,2,3) ink of "117" at 3.6 mm across, 5.4 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)
+      e.g. <span> "117" | <span> "202"
+
+ws-print-lint: FAIL - 1 document(s), source kit; 16 finding(s) in 1 document(s)

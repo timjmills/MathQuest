@@ -1,0 +1,850 @@
+note counting/count_objects  "Count Objects (1-20) (Visual)"
+       . [variety] 76 distinct items in 240; a page of 6 is likely to repeat one
+note counting/count_sequence  "Next/Before/After Number (Visual)"
+       . [variety] 51 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [not-checked] this skill's name is about counting, but NOT ONE of its 240 items was in a form whose answer could be checked against its picture. The picture check did not pass here; it never ran.
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+note counting/number_seq_fill  "Number Sequence: Fill Missing (Grid)"
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the counting category but its generator is the counting_cardinality one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note counting/mixed_counting  "Mixed Counting"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 3 sibling skills in counting, whose names together declare 
+       . [cell-shape] mixed practice, so 2 different cell shapes on one page: picture:number 65%, grid 35% ((none), seq-strip)
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+note comparing/compare_groups  "More/Fewer/Same Groups (Visual)"
+       . [variety] 101 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+note comparing/compare_objects  "Compare Attributes (Visual)"
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+note comparing/classify_count  "Sort & Count by Category (Visual)"
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [not-checked] this skill's name is about counting, but NOT ONE of its 240 items was in a form whose answer could be checked against its picture. The picture check did not pass here; it never ran.
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+note comparing/mixed_comparing  "Mixed Comparing"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 3 sibling skills in comparing, whose names together declare −
+       . [cell-shape] mixed practice, so 2 different cell shapes on one page: picture:text 67%, picture:number 33% ((none))
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+note composing/number_bonds  "Number Bonds within 10 (Visual)"
+       . [variety] 72 distinct items in 240; a page of 6 is likely to repeat one
+note composing/make_ten  "Make 10 (Visual)"
+       . [variety] 9 distinct items in 240; a page of 6 is likely to repeat one
+note composing/teen_compose  "Teen Numbers: 10 + Ones (Visual)"
+       . [variety] 18 distinct items in 240; a page of 6 is likely to repeat one
+note composing/tens_foundation_visual  "How Many Tens? (Visual)"
+       . [variety] 9 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+ ok  composing/hundreds_chart_fill  "Hundreds Chart - Find the Missing Number (Visual)"
+note composing/ten_frame_build  "Build a Number on a Ten Frame"
+       . [variety] 10 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+note composing/ten_frame_build_teen  "Build a Teen Number on Two Ten Frames"
+       . [variety] 9 distinct items in 240; a page of 6 is likely to repeat one
+note composing/base10_build  "Build a Number with Base-10 Blocks"
+       . [variety] 89 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+note composing/base10_regroup  "Regroup with Base-10 Blocks"
+       . [variety] 76 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+ ok  composing/base10_build_hundreds  "Build 3-Digit Numbers with Flats"
+note composing/odd_even  "Odd or Even? (Visual)"
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [mc-label] 94 of 240 items answer by picking a label from a bank rather than writing; allowed, but the printed cell must draw the same bank
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the composing category but its generator is the patterns one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note composing/select_even_odd  "Circle the Even or Odd Numbers (MAP)"
+       . [variety] 93 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the composing category but its generator is the patterns one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note composing/number_word_form  "Number Word Form"
+       . [variety] 87 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the composing category but its generator is the placevalue one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note composing/fraction_number_line  "Fractions on Number Line (Visual)"
+       . [variety] 105 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [mc-label] 44 of 240 items answer by picking a label from a bank rather than writing; allowed, but the printed cell must draw the same bank
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the composing category but its generator is the fractions one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note composing/whole_as_fraction  "Whole Numbers as Fractions (Visual)"
+       . [variety] 16 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the composing category but its generator is the fractions one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note composing/compose_whole  "Compose 1 Whole from Unit Fractions"
+       . [variety] 6 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+       . [misfiled] sits in the composing category but its generator is the fractions one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note composing/mixed_composing  "Mixed Number Sense"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 16 sibling skills in composing, whose names together declare +
+       . [cell-shape] mixed practice, so 10 different cell shapes on one page: base10 19%, picture:number 30%, chart 10%, tenframe 13%, picture:fraction-input 6%, select 6%, oddeven 7%, tiles 3%, rods 4%, numberline 2% (base10-build, (none), hundreds-chart-fill, ten-frame-build, multi-select, odd-even, compose-fraction-tiles, tens-foundation, fraction-number-line)
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [mc-label] 10 of 240 items answer by picking a label from a bank rather than writing; allowed, but the printed cell must draw the same bank
+note composing/number_chart_fill  "Number Chart - Find the Missing Number (to 1,000 and beyond)"
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+note composing/write_numbers_in_words  "Write Numbers in Words"
+       . [variety] 83 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+note counting_mixed/counting_all  "All Counting & Cardinality"
+       . [cell-shape] mixed practice, so 12 different cell shapes on one page: grid 8%, picture:number 30%, picture:text 15%, base10 11%, oddeven 4%, chart 8%, select 3%, tenframe 5%, numberline 5%, rods 6%, picture:fraction-input 3%, tiles 3% (seq-strip, (none), base10-build, odd-even, hundreds-chart-fill, multi-select, ten-frame-build, fraction-number-line, tens-foundation, compose-fraction-tiles)
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [mc-label] 4 of 240 items answer by picking a label from a bank rather than writing; allowed, but the printed cell must draw the same bank
+note addition/add_facts  "Addition Facts (within 20)"
+       . [variety] 81 distinct items in 240; a page of 6 is likely to repeat one
+note addition/add_sub_10s  "Add & Subtract by 10s"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_sub_100s  "Add & Subtract by 100s"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add  "Basic Addition"
+       . [variety] 63 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_word_problems  "Addition Word Problems"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_word_problems_plain  "Addition Word Problems (No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_sub_fact_family  "Addition Fact Families"
+       . [variety] 99 distinct items in 240; a page of 6 is likely to repeat one
+note addition/number_families_add  "Number Families (Add & Subtract)"
+       . [variety] 91 distinct items in 240; a page of 6 is likely to repeat one
+ ok  addition/number_families_add_med  "Number Families - Medium"
+ ok  addition/number_families_add_hard  "Number Families - Hard"
+note addition/add_three  "Add Three Numbers (≤20)"
+       . [variety] 104 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+ ok  addition/comparison_word  "How Many More/Fewer? (Visual)"
+note addition/equal_sign  "True/False Equations (Visual)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_5_pictures  "Add Within 5 with Pictures (Visual)"
+       . [variety] 8 distinct items in 240; a page of 6 is likely to repeat one
+       . [misfiled] sits in the addition category but its generator is the counting_cardinality one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note addition/add_10_no_regroup  "Add within 10 (No Regrouping)"
+       . [variety] 36 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_10_regroup  "Add — Bridging Ten (sums 11–18)"
+       . [variety] 36 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_10_mixed  "Add within 10"
+       . [variety] 45 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_20_no_regroup  "Add within 20 (No Regrouping)"
+       . [variety] 101 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_20_regroup  "Add within 20 (With Regrouping)"
+       . [variety] 53 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_20_mixed  "Add within 20"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_50_no_regroup  "Add within 50 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_50_regroup  "Add within 50 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_50_mixed  "Add within 50"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_100_no_regroup  "Add within 100 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_100_regroup  "Add within 100 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_100_mixed  "Add within 100"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_1k_no_regroup  "Add within 1,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_1k_regroup  "Add within 1,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_1k_mixed  "Add within 1,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_10k_no_regroup  "Add within 10,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_10k_regroup  "Add within 10,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_10k_mixed  "Add within 10,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_100k_no_regroup  "Add within 100,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_100k_regroup  "Add within 100,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_100k_mixed  "Add within 100,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_1m_no_regroup  "Add within 1,000,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_1m_regroup  "Add within 1,000,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_1m_mixed  "Add within 1,000,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_10  "Addition Word Problems (within 10)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 28 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [misfiled] sits in the addition category but its generator is the counting_cardinality one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note addition/add_wp_10_plain  "Addition Word Problems (within 10, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 28 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_20  "Addition Word Problems (within 20)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 119 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_20_plain  "Addition Word Problems (within 20, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_50  "Addition Word Problems (within 50)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_50_plain  "Addition Word Problems (within 50, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_100  "Addition Word Problems (within 100)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_100_plain  "Addition Word Problems (within 100, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_1k  "Addition Word Problems (within 1,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_1k_plain  "Addition Word Problems (within 1,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_10k  "Addition Word Problems (within 10,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_10k_plain  "Addition Word Problems (within 10,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_100k  "Addition Word Problems (within 100,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_100k_plain  "Addition Word Problems (within 100,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_1m  "Addition Word Problems (within 1,000,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_wp_1m_plain  "Addition Word Problems (within 1,000,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/nl_add  "Addition Number Line (Visual)"
+       . [variety] 101 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/number_line_add  "Number Line Addition (B&W)"
+       . [variety] 112 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/cloze_addition  "Pick the Missing Addends"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/mixed_addition  "Mixed Addition"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 60 sibling skills in addition, whose names together declare + −
+       . [cell-shape] mixed practice, so 4 different cell shapes on one page: column 48%, across 9%, numberline 4%, model 2%, family 7% (column-add, story-work, (none), number-line-visual, inline-cloze, add-5-pictures, fact-family-sort, number-family-add-sub, column-add-multi, fact-family-add-sub, add-facts-vertical)
+       . [notation-mix] writes the same item stacked AND across: column 48%, across 9%
+       . [unknown-format] print formats this audit has no cell shape for: story-work, fact-family-sort, column-add-multi (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 209 items (fine unless this step teaches the zero case)
+note addition/add_column_multi  "Add Three or Four Numbers in Columns"
+       . [unknown-format] print formats this audit has no cell shape for: column-add-multi (add them to SHAPE_OF)
+note addition/add_missing_digit  "Find the Missing Digit (Addition)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/fact_family_sort  "Is It a Fact Family? (+/−)"
+       . [unknown-format] print formats this audit has no cell shape for: fact-family-sort (add them to SHAPE_OF)
+note subtraction/sub_facts  "Subtraction Facts (within 20)"
+       . [variety] 79 distinct items in 240; a page of 6 is likely to repeat one
+note subtraction/subtract  "Basic Subtraction"
+       . [variety] 82 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_word_problems  "Subtraction Word Problems"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_word_problems_plain  "Subtraction Word Problems (No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/missing_add_sub  "Missing Numbers (+/−)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_5_pictures  "Subtract Within 5 with Pictures (Visual)"
+       . [variety] 15 distinct items in 240; a page of 6 is likely to repeat one
+       . [misfiled] sits in the subtraction category but its generator is the counting_cardinality one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note subtraction/unknown_start_wp  "Unknown Start Word Problems (Visual)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10_no_regroup  "Subtract within 10 (No Regrouping)"
+       . [variety] 36 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10_regroup  "Subtract — Bridging Ten (minuends 11–18)"
+       . [variety] 36 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10_mixed  "Subtract within 10"
+       . [variety] 45 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_20_no_regroup  "Subtract within 20 (No Regrouping)"
+       . [variety] 103 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_20_regroup  "Subtract within 20 (With Regrouping)"
+       . [variety] 56 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_20_mixed  "Subtract within 20"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_50_no_regroup  "Subtract within 50 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/subtraction/subtraction.md)
+note subtraction/sub_50_regroup  "Subtract within 50 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_50_mixed  "Subtract within 50"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_100_no_regroup  "Subtract within 100 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/subtraction/subtraction.md)
+note subtraction/sub_100_regroup  "Subtract within 100 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_100_mixed  "Subtract within 100"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_1k_no_regroup  "Subtract within 1,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/subtraction/subtraction.md)
+note subtraction/sub_1k_regroup  "Subtract within 1,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_1k_mixed  "Subtract within 1,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10k_no_regroup  "Subtract within 10,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/subtraction/subtraction.md)
+note subtraction/sub_10k_regroup  "Subtract within 10,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10k_mixed  "Subtract within 10,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_100k_no_regroup  "Subtract within 100,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/subtraction/subtraction.md)
+note subtraction/sub_100k_regroup  "Subtract within 100,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_100k_mixed  "Subtract within 100,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_1m_no_regroup  "Subtract within 1,000,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/subtraction/subtraction.md)
+note subtraction/sub_1m_regroup  "Subtract within 1,000,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_1m_mixed  "Subtract within 1,000,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_10  "Subtraction Word Problems (within 10)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 43 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_10_plain  "Subtraction Word Problems (within 10, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 39 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_20  "Subtraction Word Problems (within 20)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_20_plain  "Subtraction Word Problems (within 20, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_50  "Subtraction Word Problems (within 50)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_50_plain  "Subtraction Word Problems (within 50, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_100  "Subtraction Word Problems (within 100)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_100_plain  "Subtraction Word Problems (within 100, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_1k  "Subtraction Word Problems (within 1,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_1k_plain  "Subtraction Word Problems (within 1,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_10k  "Subtraction Word Problems (within 10,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_10k_plain  "Subtraction Word Problems (within 10,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_100k  "Subtraction Word Problems (within 100,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_100k_plain  "Subtraction Word Problems (within 100,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_1m  "Subtraction Word Problems (within 1,000,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_1m_plain  "Subtraction Word Problems (within 1,000,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/nl_sub  "Subtraction Number Line (Visual)"
+       . [variety] 111 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/number_line_sub  "Number Line Subtraction (B&W)"
+       . [variety] 112 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/mixed_add_sub  "Mixed Addition & Subtraction"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 53 sibling skills in subtraction, whose names together declare + −
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/mixed_subtraction  "Mixed Subtraction"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 52 sibling skills in subtraction, whose names together declare − +
+       . [cell-shape] mixed practice, so 4 different cell shapes on one page: column 53%, word 2%, model 2%, numberline 3%, across 1% (column-sub, story-work, unknown-start-wp, sub-5-pictures, sub-check-judge, sub-facts-vertical, number-line-visual, missing-number)
+       . [notation-mix] writes the same item stacked AND across: column 53%, across 1%
+       . [unknown-format] print formats this audit has no cell shape for: story-work, sub-check-judge (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_across_zeros  "Subtract Across Zeros"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_missing_digit  "Find the Missing Digit (Subtraction)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_check_by_adding  "Check a Subtraction by Adding"
+       . [unknown-format] print formats this audit has no cell shape for: sub-check-judge (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_compare  "Subtraction Word Problems: How Many More?"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_start_unknown  "Subtraction Word Problems: Find the Start"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_2d_1d  "Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/subtraction/subtraction.md)
+note multiplication/mult_facts  "Multiplication Facts (1-12)"
+       . [variety] 116 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/multiply  "Basic Multiplication"
+       . [variety] 115 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/arrays_groups  "Arrays & Equal Groups (Visual)"
+       . [variety] 20 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/dot_array_mult  "Dot Array Multiplication (B&W)"
+       . [variety] 78 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/mult_properties  "Multiplication Properties (Visual)"
+       . [variety] 103 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 57 items (fine unless this step teaches the zero case)
+note multiplication/mult_word_problems  "Multiplication Word Problems"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 48 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_word_problems_plain  "Multiplication Word Problems (No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 49 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_comparison  "Times as Many Word Problems (Visual)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+note multiplication/mult_comparison_plain  "Times as Many (No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+ ok  multiplication/area_model_mult  "Area Model Multiplication"
+ ok  multiplication/area_model_mult_hard  "Area Model (2×2 and 2×3)"
+note multiplication/mult_div_fact_family  "Multiplication Fact Families"
+       . [variety] 107 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/number_families_mult  "Number Families (Multiply & Divide)"
+       . [variety] 16 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/number_families_mult_med  "Number Families - Medium"
+       . [variety] 79 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/number_families_mult_hard  "Number Families - Hard"
+       . [variety] 108 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/mult_chart  "Multiplication Chart (Visual)"
+       . [variety] 97 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_chart_easy  "Multiplication Chart - Fill the Missing Cells"
+       . [variety] 42 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_chart_medium  "Multiplication Chart - Medium (6 missing)"
+       . [variety] 31 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_chart_hard  "Multiplication Chart - Hard (22 missing)"
+       . [variety] 18 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/nl_mult  "Multiplication Number Line (Visual)"
+       . [variety] 73 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mixed_multiplication  "Mixed Multiplication"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 26 sibling skills in multiplication, whose names together declare × ÷ +
+       . [cell-shape] mixed practice, so 3 different cell shapes on one page: across 5%, model 40%, family 12%, column 9% (mult-facts-horizontal, area-model-mult-hard, story-work, dot-array-visual, mult-placeholder-zero, mult-properties, number-family-mult-div, mult-grid, mult-facts-vertical, area-model-mult, repeated-add-mult, column-mult, count-row, hop-line, equal-groups-decide, fact-family-mult-div, arrays-groups)
+       . [notation-mix] writes the same item stacked AND across: column 9%, across 5%
+       . [unknown-format] print formats this audit has no cell shape for: story-work, mult-placeholder-zero, repeated-add-mult, column-mult, equal-groups-decide (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 130 items (fine unless this step teaches the zero case)
+note multiplication/repeated_add_to_mult  "Write Repeated Addition as Multiplication (Visual)"
+       . [unknown-format] print formats this audit has no cell shape for: repeated-add-mult (add them to SHAPE_OF)
+       . [variety] 25 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/equal_or_unequal_groups  "Equal Groups or Not? (Visual)"
+       . [unknown-format] print formats this audit has no cell shape for: equal-groups-decide (add them to SHAPE_OF)
+       . [variety] 20 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/mult_zeros  "Multiply by 10, 100 and Multiples of Ten"
+       . [variety] 74 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_placeholder_zero  "Write the Placeholder Zero"
+       . [unknown-format] print formats this audit has no cell shape for: mult-placeholder-zero (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_missing_digit  "Find the Missing Digit (Multiplication)"
+       . [unknown-format] print formats this audit has no cell shape for: column-mult (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_tables  "Skip counting: count by 1–12"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_2by1_column  "Multiply 2-Digit by 1-Digit Numbers (Column)"
+       . [unknown-format] print formats this audit has no cell shape for: column-mult (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_3by1_column  "Multiply 3-Digit by 1-Digit Numbers (Column)"
+       . [unknown-format] print formats this audit has no cell shape for: column-mult (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_2by2_standard  "Multiply 2-Digit by 2-Digit Numbers (Standard Algorithm)"
+       . [unknown-format] print formats this audit has no cell shape for: column-mult (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+ ok  multiplication/mult_chart_shade  "Multiplication Chart: Shade the Multiples"
+ ok  multiplication/mult_chart_pattern  "Multiplication Chart: Find the Pattern in a Row"
+ ok  multiplication/mult_chart_headers  "Multiplication Chart: Find the Missing Factors"
+note multiplication/mult_multiples_of_ten  "Multiply by Multiples of Ten (6 × 40)"
+       . [variety] 109 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+ ok  multiplication/mult_break_apart  "Break Apart a Fact (Distributive Property)"
+ ok  multiplication/area_model_2by1  "Area Model: Multiply 2-Digit by 1-Digit"
+ ok  multiplication/area_model_3by1  "Area Model: Multiply 3-Digit by 1-Digit"
+note multiplication/mult_arrays  "Arrays: Rows of Dots"
+       . [variety] 10 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/mult_equal_groups  "Equal Groups: Rings of Dots"
+       . [variety] 10 distinct items in 240; a page of 6 is likely to repeat one
+note multiplication/mult_by_ten  "Multiply by 10"
+       . [variety] 8 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/mult_by_hundred  "Multiply by 100"
+       . [variety] 8 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_2s  "Count by 2s"
+       . [variety] 87 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_3s  "Count by 3s"
+       . [variety] 92 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_4s  "Count by 4s"
+       . [variety] 91 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_5s  "Count by 5s"
+       . [variety] 96 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_6s  "Count by 6s"
+       . [variety] 91 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_7s  "Count by 7s"
+       . [variety] 87 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_8s  "Count by 8s"
+       . [variety] 95 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_9s  "Count by 9s"
+       . [variety] 85 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_10s  "Count by 10s"
+       . [variety] 95 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_11s  "Count by 11s"
+       . [variety] 89 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note multiplication/count_by_12s  "Count by 12s"
+       . [variety] 86 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_facts  "Division Facts (1-12)"
+       . [variety] 117 distinct items in 240; a page of 6 is likely to repeat one
+note division/divide  "Basic Division"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_remainders  "Division with Remainders (Visual)"
+       . [variety] 50 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_word_problems  "Division Word Problems"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 49 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_word_problems_plain  "Division Word Problems (No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 49 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/remainder_interpret  "Interpret the Remainder (Word Problems)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/remainder_contexts  "Remainder Contexts (Buses, Boxes, Cookies, Money, Cars)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/box_division_easy  "Box Method Division (2÷1 digit)"
+       . [variety] 111 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/box_division_hard  "Box Method Division (3÷1 digit)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/area_model_div_2by1  "Area Model Division (2÷1 digit)"
+       . [variety] 69 distinct items in 240; a page of 6 is likely to repeat one
+note division/area_model_div_3by1  "Area Model Division (3÷1 digit)"
+       . [variety] 64 distinct items in 240; a page of 6 is likely to repeat one
+note division/long_div_2digit  "Divide by 2-Digit Numbers (Visual)"
+       . [unknown-format] print formats this audit has no cell shape for: long-div-kit (add them to SHAPE_OF)
+note division/missing_mult_div  "Missing Factors (×/÷)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/nl_div  "Division Number Line (Visual)"
+       . [variety] 75 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/mixed_mult_div  "Mixed Multiplication & Division"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 21 sibling skills in division, whose names together declare × ÷
+       . [notation-mix] writes the same item stacked AND across: column 50%, across 50%
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/mixed_division  "Mixed Division"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 19 sibling skills in division, whose names together declare ÷ ×
+       . [cell-shape] mixed practice, so 2 different cell shapes on one page: model 33%, across 10% (box-division, div-remainders, remainder-judge, div-check-judge, div-fix-estimate, div-equation-parts, story-work, div-facts-horizontal, hop-line, area-model-div, long-div-kit, share-into-groups)
+       . [unknown-format] print formats this audit has no cell shape for: remainder-judge, div-check-judge, div-fix-estimate, div-equation-parts, story-work, long-div-kit, share-into-groups (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 206 items (fine unless this step teaches the zero case)
+note division/share_into_groups  "Make Equal Groups to Divide (Visual)"
+       . [unknown-format] print formats this audit has no cell shape for: share-into-groups (add them to SHAPE_OF)
+       . [variety] 21 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [misfiled] sits in the division category but its generator is the counting_cardinality one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note division/div_equation_parts  "Parts of a Division Equation (Visual)"
+       . [unknown-format] print formats this audit has no cell shape for: div-equation-parts (add them to SHAPE_OF)
+       . [variety] 62 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_zero_in_quotient  "Zero in the Quotient"
+       . [unknown-format] print formats this audit has no cell shape for: long-div-kit (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/remainder_too_big  "Is the Remainder Finished?"
+       . [unknown-format] print formats this audit has no cell shape for: remainder-judge (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_check_by_multiplying  "Check a Division by Multiplying"
+       . [unknown-format] print formats this audit has no cell shape for: div-check-judge (add them to SHAPE_OF)
+       . [variety] 75 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_fix_estimate  "Fix the Estimate (Long Division)"
+       . [unknown-format] print formats this audit has no cell shape for: div-fix-estimate (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_2by1_long  "Divide 2-Digit by 1-Digit Numbers (Long Division)"
+       . [unknown-format] print formats this audit has no cell shape for: long-div-kit (add them to SHAPE_OF)
+       . [variety] 113 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_3by1_long  "Divide 3-Digit by 1-Digit Numbers (Long Division)"
+       . [unknown-format] print formats this audit has no cell shape for: long-div-kit (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_4by1_long  "Divide 4-Digit by 1-Digit Numbers (Long Division)"
+       . [unknown-format] print formats this audit has no cell shape for: long-div-kit (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_3by2_long  "Divide 3-Digit by 2-Digit Numbers (Long Division)"
+       . [unknown-format] print formats this audit has no cell shape for: long-div-kit (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_sharing_word_problems  "Division Word Problems: Sharing"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 49 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note division/div_grouping_word_problems  "Division Word Problems: Grouping"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 48 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note measurement/time_hour  "Time to the Hour"
+       . [variety] 12 distinct items in 240; a page of 6 is likely to repeat one
+note measurement/time_half_hour  "Time to Half Hour"
+       . [variety] 12 distinct items in 240; a page of 6 is likely to repeat one
+note measurement/time_quarter  "Time to Quarter Hour"
+       . [variety] 24 distinct items in 240; a page of 6 is likely to repeat one
+note measurement/time_5min  "Time to 5 Minutes"
+       . [variety] 83 distinct items in 240; a page of 6 is likely to repeat one
+ ok  measurement/time_1min  "Time to the Minute"
+ ok  measurement/time_analog_digital  "Analog and Digital Time"
+ ok  measurement/time_match_clock  "Find the Clock for a Time"
+ ok  measurement/order_clocks_analog_asc  "Put Clocks in Order, Earliest First"
+ ok  measurement/order_clocks_analog_desc  "Put Clocks in Order, Latest First"
+ ok  measurement/order_clocks_digital_asc  "Put Digital Times in Order, Earliest First"
+ ok  measurement/order_clocks_digital_desc  "Put Digital Times in Order, Latest First"
+note measurement/elapsed_30min  "30 Minutes Later or Earlier"
+       . [variety] 70 distinct items in 240; a page of 6 is likely to repeat one
+note measurement/elapsed_hour  "Hours Later or Earlier"
+       . [variety] 88 distinct items in 240; a page of 6 is likely to repeat one
+ ok  measurement/elapsed_15min  "15, 30, 45 Minutes Later or Earlier"
+ ok  measurement/elapsed_mixed  "Hours and Minutes Later"
+ ok  measurement/elapsed_find_duration  "How Long From Start to End?"
+note measurement/elapsed_visual_easy  "Time Between Two Clocks (30 Minutes)"
+       . [variety] 97 distinct items in 240; a page of 6 is likely to repeat one
+ ok  measurement/elapsed_visual_medium  "Time Between Two Clocks (15 Minutes)"
+ ok  measurement/elapsed_visual_hard  "Time Between Two Clocks (5 Minutes)"
+note measurement/money_count  "Count Coins and Notes"
+       . [variety] 22 distinct items in 240; a page of 6 is likely to repeat one
+note measurement/money  "Add Money"
+       . [variety] 59 distinct items in 240; a page of 6 is likely to repeat one
+ ok  measurement/equiv_coin_sets  "Do the Coins Make the Amount?"
+ ok  measurement/enough_money  "Is There Enough Money?"
+note measurement/make_change_least_coins  "Make an Amount With the Fewest Coins"
+       . [variety] 35 distinct items in 240; a page of 6 is likely to repeat one
+note measurement/mixed_time  "Mixed Time Skills"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 45 sibling skills in measurement, whose names together declare × +
+ ok  measurement/clock_parts  "Parts of a Clock"
+ ok  measurement/time_fives_ring  "Count the Minutes by Fives"
+note measurement/time_sense  "a.m. or p.m.?"
+       . [variety] 16 distinct items in 240; a page of 6 is likely to repeat one
+ ok  measurement/elapsed_find_start  "Find the Start Time"
+ ok  measurement/coin_value  "Coins and Notes by Value"
+note measurement/money_notation  "Write an Amount of Money"
+       . [variety] 79 distinct items in 240; a page of 6 is likely to repeat one
+note measurement/money_change  "Find the Change"
+       . [variety] 19 distinct items in 240; a page of 6 is likely to repeat one
+ ok  measurement/money_compare  "Which Has More Money?"
+note patterns/number_patterns_rule  "Number Patterns: Count On, Count Back, Double"
+       . [not-checked] no count band: the name promises no range of numbers, so nothing bounds what this skill may deal
+       . [not-checked] this skill's name is about counting, but NOT ONE of its 240 items was in a form whose answer could be checked against its picture. The picture check did not pass here; it never ran.
+       . [unaudited] NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.
+note algebra/function_table_easy  "Function Tables - Easy (Visual)"
+       . [ft-sampled] 252 tables over tasks outputs, rule, inputs, mixed, make
+note algebra/function_table_hard  "Function Tables - Hard (Visual)"
+       . [ft-sampled] 252 tables over tasks outputs, rule, inputs, mixed, make
+ ok  placevalue/more_less_10  "1 More, 1 Less, 10 More, 10 Less"
+ ok  placevalue/more_less_100  "10 More, 10 Less, 100 More, 100 Less"
+ ok  placevalue/place_value_disks  "Read Place-Value Disks"
+ ok  placevalue/pv_disks_build  "Draw Place-Value Disks for a Number"
+ ok  placevalue/pv_digit_drag  "Write the Digits in a Place-Value Chart"
+note placevalue/number_word_names  "Choose the Word Name"
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+ ok  placevalue/place_value_10x  "Multiply and Divide by 10, 100, 1,000"
+ ok  placevalue/identify  "Name the Place"
+ ok  placevalue/value  "Value of a Digit"
+ ok  placevalue/compare  "Compare Numbers (>, <, =)"
+ ok  placevalue/expand  "Expanded Form"
+ ok  placevalue/combine  "Standard Form"
+ ok  placevalue/order_least_to_greatest  "Order: Least to Greatest"
+ ok  placevalue/order_greatest_to_least  "Order: Greatest to Least"
+note placevalue/mixed_placevalue  "Mixed Place Value"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 15 sibling skills in placevalue, whose names together declare × ÷
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+ ok  placevalue/unit_form  "Unit Form (4 hundreds 7 tens 6 ones)"
+note placevalue/expanded_notation  "Write Numbers in Expanded Notation"
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+note placevalue/digit_value_unit_form  "Value of a Digit in Unit Form (7 Hundreds)"
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+note placevalue/digit_value_notation  "Value of a Digit in Expanded Notation (7 × 100)"
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+note placevalue/count_pv_disks  "Count the Place-Value Disks in One Place"
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+note number_sense/rounding_visual  "Round on a Number Line"
+       . [variety] 99 distinct items in 240; a page of 6 is likely to repeat one
+note number_sense/nearest_10  "Round to Nearest 10"
+       . [variety] 98 distinct items in 240; a page of 6 is likely to repeat one
+ ok  number_sense/nearest_100  "Round to Nearest 100"
+ ok  number_sense/nearest_1000  "Round to Nearest 1,000"
+ ok  number_sense/nearest_10000  "Round to Nearest 10,000"
+ ok  number_sense/nearest_100000  "Round to Nearest 100,000"
+ ok  number_sense/nearest_million  "Round to Nearest 1,000,000"
+ ok  number_sense/round_sort_10  "Rounding Sort: Nearest 10"
+ ok  number_sense/round_sort_100  "Rounding Sort: Nearest 100"
+ ok  number_sense/round_sort_1000  "Rounding Sort: Nearest 1,000"
+ ok  number_sense/round_sort_10000  "Rounding Sort: Nearest 10,000"
+ ok  number_sense/round_sort_100000  "Rounding Sort: Nearest 100,000"
+ ok  number_sense/round_sort_million  "Rounding Sort: Nearest 1,000,000"
+ ok  number_sense/round_sort_tenths  "Rounding Sort: Nearest Tenth"
+ ok  number_sense/round_sort_hundredths  "Rounding Sort: Nearest Hundredth"
+note number_sense/estimate_sum  "Estimate Sums"
+       . [misfiled] sits in the number_sense category but its generator is the estimation one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note number_sense/estimate_diff  "Estimate Differences"
+       . [misfiled] sits in the number_sense category but its generator is the estimation one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note number_sense/estimate_sums_diffs  "Estimate Sums & Differences"
+       . [misfiled] sits in the number_sense category but its generator is the estimation one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note number_sense/estimate_products  "Estimate Products"
+       . [misfiled] sits in the number_sense category but its generator is the estimation one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note number_sense/estimate_quotient  "Estimate Quotients"
+       . [misfiled] sits in the number_sense category but its generator is the estimation one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+ ok  number_sense/rounding_table  "Rounding Table"
+note number_sense/mixed_number_sense  "Mixed Rounding & Estimation"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 29 sibling skills in number_sense, whose names together declare + ÷
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+note number_sense/between_tens  "Find the Two Tens a Number Is Between"
+       . [variety] 76 distinct items in 240; a page of 6 is likely to repeat one
+note number_sense/place_on_number_line  "Mark a Number on a Number Line"
+       . [variety] 75 distinct items in 240; a page of 6 is likely to repeat one
+ ok  number_sense/round_nl_thousands  "Round on a Number Line: Thousands"
+ ok  number_sense/round_nl_ten_thousands  "Round on a Number Line: Ten Thousands"
+ ok  number_sense/round_nl_hundred_thousands  "Round on a Number Line: Hundred Thousands"
+note number_sense/near_doubles  "Near Doubles (Doubles Plus One, Doubles Minus One)"
+       . [variety] 16 distinct items in 240; a page of 6 is likely to repeat one
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+note number_sense/reasonable_quotients  "Is the Quotient Reasonable?"
+       . [not-checked] no q.pv description (§19.4 step 8): pv-recompute and answer-in-item could not be applied; band, verbs, one-response and variety were
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+   163  zero-facts
+   112  variety
+    73  unknown-format
+    34  not-checked
+    16  misfiled
+    15  unaudited
+    12  mixed-pool
+     8  cell-shape
+     7  card-rulings
+     5  ragged
+     4  mc-label
+     4  notation-mix
+     2  ft-sampled
+
+By family:
+  operations  198 skills, 0 failing
+  k2           29 skills, 0 failing
+  pv           49 skills, 0 failing
+  ftable        2 skills, 0 failing
+  tm           33 skills, 0 failing
+
+Coverage: 15 skills where NOTHING could be checked against the name (counting/count_sequence, counting/number_seq_fill, comparing/compare_groups, comparing/compare_objects, comparing/classify_count, comparing/mixed_comparing, composing/odd_even, composing/select_even_odd, composing/number_word_form, composing/fraction_number_line, composing/whole_as_fraction, composing/compose_whole, composing/number_chart_fill, composing/write_numbers_in_words, patterns/number_patterns_rule); 31 more with at least one check that could not be applied.
+
+MC-ALL (P-29 / RM-P-01, every live skill): 716 skills, 60 items each
+PINNED fractions/simplify  "Simplify Fractions"
+       - pinned [mc-production] [fraction-simplify/text] 17 of 60 items offer a written answer as buttons (7/6 | 1/3 | 2/3 | 5/6); the paper cell prints no such choices (P-29, RM-P-01): "Simplify: 4 6 →"
+PINNED fractions/improper_mixed  "Improper ↔ Mixed Numbers"
+       - pinned [mc-production] [mixed-improper-visual/text] 13 of 60 items offer a written answer as buttons (3/4 | 12/4 | 14/4 | 13/4); the paper cell prints no such choices (P-29, RM-P-01): "Write as a mixed number and an improper fraction: Mixed: = Improper:"
+       - pinned [mc-production] [improper-to-mixed/text] 18 of 60 items offer a written answer as buttons (2 2/6 | 3 1/6 | 2 1/6 | 1 1/6); the paper cell prints no such choices (P-29, RM-P-01): "13 6 = 6"
+       - pinned [mc-production] [mixed-to-improper/text] 11 of 60 items offer a written answer as buttons (7/2 | 5/2 | 3/2); the paper cell prints no such choices (P-29, RM-P-01): "2 1 2 = 2"
+PINNED fractions/mixed_fractions  "Mixed Fractions"
+       - pinned [mc-production] [improper-to-mixed/text] 1 of 60 items offer a written answer as buttons (1 2/4 | 2 3/4 | 2 2/4 | 3 2/4); the paper cell prints no such choices (P-29, RM-P-01): "10 4 = 4"
+       - pinned [mc-production] [mixed-improper-visual/text] 2 of 60 items offer a written answer as buttons (28/8 | 3/8 | 27/8 | 26/8); the paper cell prints no such choices (P-29, RM-P-01): "Write as a mixed number and an improper fraction: Mixed: = Improper:"
+PINNED fraction_operations/estimate_frac_ops  "Estimate Fraction Sums/Differences"
+       - pinned [mc-production] [fraction-estimate/multiple-choice] 60 of 60 items offer a written answer as buttons (1 1/2 | 1/2 | 1 | 0); the paper cell prints no such choices (P-29, RM-P-01): "Estimate: 7/8 - 1/4 Round each fraction to a benchmark (0, 1/2, or 1): 7 8 close"
+PINNED conversions/d_to_f  "Decimal → Fraction"
+       - pinned [mc-production] [legacy/text] 39 of 60 items offer a written answer as buttons (4/5 | 1/5 | 7/10 | 3/10); the paper cell prints no such choices (P-29, RM-P-01): "Convert 0.2 to a fraction. 0.2 → ? ? Answer:"
+PINNED conversions/f_to_p  "Fraction → Percent"
+       - pinned [mc-production] [legacy/text] 50 of 60 items offer a written answer as buttons (25% | 10% | 75% | 15%); the paper cell prints no such choices (P-29, RM-P-01): "Convert to percent: 5/20 5 20 → ?% Percent = out of 100 Answer:"
+PINNED conversions/p_to_f  "Percent → Fraction"
+       - pinned [mc-production] [legacy/text] 40 of 60 items offer a written answer as buttons (2/5 | 4/5 | 1/10 | 3/5); the paper cell prints no such choices (P-29, RM-P-01): "Convert 10% to a fraction. → 10 100 → ? ? Answer:"
+PINNED conversions/mixed_conversions  "Mixed Conversions"
+       - pinned [mc-production] [legacy/text] 10 of 60 items offer a written answer as buttons (3/5 | 3/10 | 2/5 | 1/10); the paper cell prints no such choices (P-29, RM-P-01): "Convert 10% to a fraction. → 10 100 → ? ? Answer:"
+PINNED frac_dec_mixed/fractions_all  "All Fraction Skills"
+       - pinned [mc-production] [mixed-to-improper/text] 2 of 60 items offer a written answer as buttons (9/2 | 5/2 | 7/2 | 4/2); the paper cell prints no such choices (P-29, RM-P-01): "3 1 2 = 2"
+PINNED frac_dec_mixed/conversions_all  "All Conversion Skills"
+       - pinned [mc-production] [legacy/text] 6 of 60 items offer a written answer as buttons (50% | 5% | 70% | 25%); the paper cell prints no such choices (P-29, RM-P-01): "Convert to percent: 5/10 5 10 → ?% Percent = out of 100 Answer:"
+PINNED frac_dec_mixed/fdp_all  "All FDP Skills"
+       - pinned [mc-production] [legacy/text] 2 of 60 items offer a written answer as buttons (80% | 1% | 50% | 40%); the paper cell prints no such choices (P-29, RM-P-01): "Convert to percent: 1/2 1 2 → ?% Percent = out of 100 Answer:"
+PINNED shapes_early/partition_shapes  "Halves/Thirds/Fourths (Visual)"
+       - pinned [mc-production] [geometry-partitions/text] 30 of 60 items offer a written answer as buttons (1/4 | 4/1 | 3/4); the paper cell prints no such choices (P-29, RM-P-01): "What fraction of the shape is shaded? Shaded parts are colored Answer:"
+PINNED angles_lines/measure_angles  "Measure/Estimate Angles"
+       - pinned [mc-production] [geometry-measure-angle/choice] 60 of 60 items offer a written answer as buttons (30° | 60° | 90° | 180°); the paper cell prints no such choices (P-29, RM-P-01): "Estimate this angle (in degrees): ?° Angle measure: °"
+PINNED angles_lines/mixed_angles_lines  "Mixed Angles & Lines"
+       - pinned [mc-production] [geometry-measure-angle/choice] 16 of 60 items offer a written answer as buttons (45° | 60° | 90° | 150°); the paper cell prints no such choices (P-29, RM-P-01): "Estimate this angle (in degrees): ?° Angle measure: °"
+PINNED measurement/estimate_length  "Estimate Lengths (Visual)"
+       - pinned [mc-production] [measurement-estimate/multiple-choice] 39 of 60 items offer a written answer as buttons (1 cm | 12 cm | 36 cm | 4 cm); the paper cell prints no such choices (P-29, RM-P-01): "About how long is a crayon? Reference: A penny is about 2 cm wide How long is th"
+PINNED geo_mixed/geometry_all  "All Geometry Skills"
+       - pinned [mc-production] [geometry-measure-angle/choice] 3 of 60 items offer a written answer as buttons (30° | 45° | 60° | 120°); the paper cell prints no such choices (P-29, RM-P-01): "Estimate this angle (in degrees): ?° Angle measure: °"
+PINNED geo_mixed/measurement_all  "All Measurement Skills"
+       - pinned [mc-production] [measurement-estimate/multiple-choice] 1 of 60 items offer a written answer as buttons (25 cm | 8 cm | 75 cm | 3 cm); the paper cell prints no such choices (P-29, RM-P-01): "About how long is a shoe? Reference: A new pencil is about 19 cm long How long i"
+PINNED geo_mixed/geo_meas_all  "All Geometry & Measurement"
+       - pinned [mc-production] [geometry-partitions/text] 2 of 60 items offer a written answer as buttons (2/3 | 1/3 | 3/2); the paper cell prints no such choices (P-29, RM-P-01): "What fraction of the shape is shaded? Shaded parts are colored Answer:"
+PINNED number_sense/make_a_ten  "Make a Ten Strategy"
+       - pinned [mc-production] [make-a-ten/multiple-choice] 30 of 60 items offer a written answer as buttons (7 + 4 + 2 | 7 + 2 + 4 | 8 + 3 + 2 | 7 + 3 + 3); the paper cell prints no such choices (P-29, RM-P-01): "Make a Ten: 7 + 6 Step 1: 7 needs to make 10 Step 2: Split 6 = + Step 3: 10 + = "
+PINNED algebra_mixed/number_sense_all  "All Number Sense Skills"
+       - pinned [mc-production] [make-a-ten/multiple-choice] 2 of 60 items offer a written answer as buttons (9 + 1 + 4 | 10 + 1 + 3 | 9 + 1 + 5 | 9 + 2 + 3); the paper cell prints no such choices (P-29, RM-P-01): "Make a Ten: 9 + 5 Step 1: 9 needs to make 10 Step 2: Split 5 = + Step 3: 10 + = "
+PINNED all_mixed/all_domains_mixed  "All Skills from All Domains"
+       - pinned [mc-production] [geometry-measure-angle/choice] 1 of 60 items offer a written answer as buttons (30° | 60° | 120° | 150°); the paper cell prints no such choices (P-29, RM-P-01): "Estimate this angle (in degrees): ?° Angle measure: °"
+PINNED all_mixed/grade_1_mixed  "All Grade 1 Skills"
+       - pinned [mc-production] [make-a-ten/multiple-choice] 1 of 60 items offer a written answer as buttons (9 + 2 + 2 | 8 + 2 + 3 | 8 + 1 + 4 | 8 + 3 + 2); the paper cell prints no such choices (P-29, RM-P-01): "Make a Ten: 8 + 5 Step 1: 8 needs to make 10 Step 2: Split 5 = + Step 3: 10 + = "
+       - pinned [mc-production] [geometry-partitions/text] 1 of 60 items offer a written answer as buttons (4/2 | 2/4 | 1/4); the paper cell prints no such choices (P-29, RM-P-01): "What fraction of the shape is shaded? Shaded parts are colored Answer:"
+PINNED all_mixed/grade_5_mixed  "All Grade 5 Skills"
+       - pinned [mc-production] [fraction-estimate/multiple-choice] 2 of 60 items offer a written answer as buttons (1/2 | 1 | 0 | 1 1/2); the paper cell prints no such choices (P-29, RM-P-01): "Estimate: 3/10 - 1/6 Round each fraction to a benchmark (0, 1/2, or 1): 3 10 clo"
+note mc-label: 71 skill(s) answer on screen by picking a word the paper cell does not draw as a bank (allowed as chips, RM-22; the paper must draw the bank): shapes_early/name_2d_shapes, shapes_early/name_3d_shapes, shapes_early/shape_positions, shapes_early/compose_shapes, shapes_early/mixed_shapes_early, geo_mixed/geometry_all, geo_mixed/geo_meas_all, graphs/pie_chart, graphs/mixed_graphs, data_mixed/data_stats_all, patterns/pattern_relationship, patterns/mixed_patterns, algebra_mixed/patterns_all, all_mixed/all_domains_mixed, all_mixed/custom_mixed, all_mixed/grade_k_mixed, all_mixed/grade_1_mixed, all_mixed/grade_2_mixed, all_mixed/grade_3_mixed, all_mixed/grade_5_mixed, all_mixed/grade_6_mixed, vocabulary/vocab_grade_K, vocabulary/vocab_grade_1, vocabulary/vocab_grade_2, vocabulary/vocab_grade_3, vocabulary/vocab_grade_4, vocabulary/vocab_grade_5, vocabulary/vocab_grade_6, vocabulary/vocab_grade_K_operations, vocabulary/vocab_grade_K_counting, vocabulary/vocab_grade_K_geometry, vocabulary/vocab_grade_K_data, vocabulary/vocab_grade_K_algebra, vocabulary/vocab_grade_K_measurement, vocabulary/vocab_grade_1_operations, vocabulary/vocab_grade_1_counting, vocabulary/vocab_grade_1_geometry, vocabulary/vocab_grade_1_data, vocabulary/vocab_grade_1_algebra, vocabulary/vocab_grade_1_measurement, vocabulary/vocab_grade_2_operations, vocabulary/vocab_grade_2_counting, vocabulary/vocab_grade_2_fractions, vocabulary/vocab_grade_2_geometry, vocabulary/vocab_grade_2_data, vocabulary/vocab_grade_2_algebra, vocabulary/vocab_grade_2_measurement, vocabulary/vocab_grade_3_operations, vocabulary/vocab_grade_3_fractions, vocabulary/vocab_grade_3_geometry, vocabulary/vocab_grade_3_data, vocabulary/vocab_grade_3_algebra, vocabulary/vocab_grade_3_measurement, vocabulary/vocab_grade_4_operations, vocabulary/vocab_grade_4_fractions, vocabulary/vocab_grade_4_geometry, vocabulary/vocab_grade_4_data, vocabulary/vocab_grade_4_algebra, vocabulary/vocab_grade_4_measurement, vocabulary/vocab_grade_5_operations, vocabulary/vocab_grade_5_fractions, vocabulary/vocab_grade_5_geometry, vocabulary/vocab_grade_5_data, vocabulary/vocab_grade_5_algebra, vocabulary/vocab_grade_5_measurement, vocabulary/vocab_grade_6_operations, vocabulary/vocab_grade_6_fractions, vocabulary/vocab_grade_6_geometry, vocabulary/vocab_grade_6_data, vocabulary/vocab_grade_6_algebra, vocabulary/vocab_grade_6_measurement
+baseline: design/audit/baselines/content-audit-mc.json (27 pinned (skill, kind) pairs)
+ws-content-audit --mc-all: OK (716 skills, 60 items each: 23 with production items as buttons (23 pinned), 0 new, 71 label-bank notes)
+
+ws-content-audit: OK (311 K-2 + operations + time and money + function table + place value skills, 240 items each, Max Number 100 (a pv skill with a place floor also at its floor), 0 failing, 12 mixed pools held to their pool union, 455 notes)

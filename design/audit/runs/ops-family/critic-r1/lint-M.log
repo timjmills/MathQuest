@@ -1,0 +1,112 @@
+ws-print-lint: source kit, 4 skill(s)
+  addition:add_sub_10s: 2+1 pages, 0 finding(s)
+  addition:add_sub_10s#more-practice: 2+1 pages, 0 finding(s)
+  addition:add_sub_10s#test: 2+1 pages, 0 finding(s)
+  addition:add_sub_10s#lesson: 6+3 pages, 0 finding(s)
+  addition:add_sub_10s#opener: 2+1 pages, 0 finding(s)
+  addition:add_sub_10s#guided: 2+1 pages, 0 finding(s)
+  addition:add_sub_10s#review: 2+1 pages, 0 finding(s)
+  addition:add_sub_100s: 2+1 pages, 0 finding(s)
+  addition:add_sub_100s#more-practice: 2+1 pages, 0 finding(s)
+  addition:add_sub_100s#test: 2+1 pages, 0 finding(s)
+  addition:add_sub_100s#lesson: 6+3 pages, 0 finding(s)
+  addition:add_sub_100s#opener: 2+1 pages, 0 finding(s)
+  addition:add_sub_100s#guided: 2+1 pages, 0 finding(s)
+  addition:add_sub_100s#review: 2+1 pages, 0 finding(s)
+  subtraction:missing_add_sub: 2+1 pages, 0 finding(s)
+  subtraction:missing_add_sub#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:missing_add_sub#test: 2+1 pages, 0 finding(s)
+  subtraction:missing_add_sub#lesson: 6+3 pages, 2 finding(s)
+  subtraction:missing_add_sub#opener: 2+1 pages, 0 finding(s)
+  subtraction:missing_add_sub#guided: 2+1 pages, 0 finding(s)
+  subtraction:missing_add_sub#review: 2+1 pages, 8 finding(s)
+  division:missing_mult_div: 2+1 pages, 0 finding(s)
+  division:missing_mult_div#more-practice: 2+1 pages, 0 finding(s)
+  division:missing_mult_div#test: 2+1 pages, 0 finding(s)
+  division:missing_mult_div#lesson: 6+3 pages, 0 finding(s)
+  division:missing_mult_div#opener: 2+1 pages, 0 finding(s)
+  division:missing_mult_div#guided: 2+1 pages, 0 finding(s)
+  division:missing_mult_div#review: 2+1 pages, 1 finding(s)
+
+document                                     pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_sub_10s                           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_10s#more-practice             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_10s#test                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_10s#lesson                    6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_10s#opener                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_10s#guided                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_10s#review                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s                          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s#more-practice            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s#test                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s#lesson                   6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s#opener                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s#guided                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s#review                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub#more-practice      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub#test               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub#lesson             6+3k    .     .    .    .        .     .       2    .     .       .     .    .      .       .        .       .    .  FAIL
+subtraction:missing_add_sub#opener             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub#guided             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub#review             2+1k    .     .    .    .        .     .       8    .     .       .     .    .      .       .        .       .    .  FAIL
+division:missing_mult_div                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:missing_mult_div#more-practice        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:missing_mult_div#test                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:missing_mult_div#lesson               6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:missing_mult_div#opener               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:missing_mult_div#guided               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:missing_mult_div#review               2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                                  .     .    .    .        .     .      10    1     .       .     .    .      .       .        .       .    .
+
+addition:add_sub_10s#lesson (Add & Subtract by 10s (lesson))
+  note: page 1: role "lesson" has no ceiling in this gate
+  note: page 2: role "lesson" has no ceiling in this gate
+  note: page 4: role "lesson" has no ceiling in this gate
+  note: page 5: role "lesson" has no ceiling in this gate
+
+addition:add_sub_10s#opener (Add & Subtract by 10s (opener))
+  note: page 1: role "opener" has no ceiling in this gate
+  note: page 2: role "opener" has no ceiling in this gate
+
+addition:add_sub_100s#lesson (Add & Subtract by 100s (lesson))
+  note: page 1: role "lesson" has no ceiling in this gate
+  note: page 2: role "lesson" has no ceiling in this gate
+  note: page 4: role "lesson" has no ceiling in this gate
+  note: page 5: role "lesson" has no ceiling in this gate
+
+addition:add_sub_100s#opener (Add & Subtract by 100s (opener))
+  note: page 1: role "opener" has no ceiling in this gate
+  note: page 2: role "opener" has no ceiling in this gate
+
+subtraction:missing_add_sub#lesson (Missing Numbers (+/−) (lesson))
+  [L-DENSITY H13 major] x2 (p2,5 cells 2,2) one empty band 30.7 mm wide in a 91.4 mm cell (34%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.fact[data-ws-cell="fact"]> "1 2 + 9" | <div.ws-cell.fact[data-ws-cell="fact"]> "1 2 + 9 1 1"
+  note: page 1: role "lesson" has no ceiling in this gate
+  note: page 2: role "lesson" has no ceiling in this gate
+  note: page 4: role "lesson" has no ceiling in this gate
+  note: page 5: role "lesson" has no ceiling in this gate
+
+subtraction:missing_add_sub#opener (Missing Numbers (+/−) (opener))
+  note: page 1: role "opener" has no ceiling in this gate
+  note: page 2: role "opener" has no ceiling in this gate
+
+subtraction:missing_add_sub#review (Missing Numbers (+/−) (review))
+  [L-DENSITY H13 major] x8 (p1,2 cells 9,10,11,12,9,10,11,12) one empty band 31.1 mm wide in a 92.3 mm cell (34%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.fact[data-ws-cell="fact"]> "9 1 5 − 9" | <div.ws-cell.fact[data-ws-cell="fact"]> "10 1 5 − 3"
+
+division:missing_mult_div#lesson (Missing Factors (×/÷) (lesson))
+  note: page 1: role "lesson" has no ceiling in this gate
+  note: page 2: role "lesson" has no ceiling in this gate
+  note: page 4: role "lesson" has no ceiling in this gate
+  note: page 5: role "lesson" has no ceiling in this gate
+
+division:missing_mult_div#opener (Missing Factors (×/÷) (opener))
+  note: page 1: role "opener" has no ceiling in this gate
+  note: page 2: role "opener" has no ceiling in this gate
+
+division:missing_mult_div#review (Missing Factors (×/÷) (review))
+  [L-KEY AK-4 critical] (p2) key page 2 has 12 answer slots, pupil page 1 has 8 (AK-4)
+wrote design/audit/runs/ops-family/critic-r1/lint-M.json
+
+ws-print-lint: WOULD FAIL - 28 document(s), source kit; 11 finding(s) in 3 document(s) [report-only, exit 0]

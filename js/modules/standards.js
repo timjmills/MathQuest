@@ -812,6 +812,15 @@ export const SKILL_STANDARDS = {
     'placevalue:ten_times_value': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // 10 Times and One Tenth: the Same Digit One Place Apart
     'placevalue:one_tenth_value': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // One Tenth of a Digit's Value (One Place Right)
     'placevalue:ten_times_story': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // How Many Times as Many? (700 ÷ 70 = 10)
+    // (2026-10-31 ops-family r2 presets. No EE links 1.NBT.C.5, 2.NBT.B.8 or 3.OA.A.4: 10 more / less take the "one more /
+    // one less" EE it extends, 100 more / less their host's, the × / ÷ sentences none, like their host)
+    'addition:ten_more': { ccss: ['1.NBT.C.5', '1.NBT.C.4'], ee: ['M.EE.1.OA.5.a'] }, // 10 More Than a Number (34 + 10)
+    'addition:ten_less': { ccss: ['1.NBT.C.5', '1.NBT.C.6'], ee: ['M.EE.1.OA.5.b'] }, // 10 Less Than a Number (34 − 10)
+    'addition:hundred_more': { ccss: ['2.NBT.B.8', '2.NBT.B.7'], ee: ['M.EE.2.NBT.7'] }, // 100 More Than a Number (234 + 100)
+    'addition:hundred_less': { ccss: ['2.NBT.B.8', '2.NBT.B.7'], ee: ['M.EE.2.NBT.7'] }, // 100 Less Than a Number (234 − 100)
+    'division:missing_mult_only': { ccss: ['3.OA.A.4', '3.OA.C.7'], ee: [] }, // Missing Factor in a Multiplication Sentence (__ × 6 = 42)
+    'division:missing_div_only': { ccss: ['3.OA.A.4', '3.OA.B.6'], ee: [] }, // Missing Number in a Division Sentence (42 ÷ __ = 7)
+    'subtraction:missing_add_sub_answer': { ccss: ['1.OA.D.8', '1.OA.C.6'], ee: ['M.EE.3.OA.6'] }, // Missing Number: Find the Total or Difference (8 + 5 = __)
     'placevalue:count_pv_disks': { ccss: ['2.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Count the Place-Value Disks in One Place
     'composing:write_numbers_in_words': { ccss: ['2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Write Numbers in Words
     'measurement:count_notes': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Count Notes (Bills)

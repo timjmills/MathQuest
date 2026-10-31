@@ -254,3 +254,114 @@ registerSkill('division:share_into_groups', {
     // Critic round 2: the skill is GROUPING (how many groups), so its stories are too.
     stories: storiesFor('÷', { grouping: true }),
 });
+
+/* ===================================================================== missing_mult_div */
+// A missing factor in a × or ÷ sentence (3.OA.A.4): ___ × 6 = 42, 42 ÷ ___ = 7, the unknown always
+// before the = sign. The kit's `equation` cell (slot 'answer') in the notation the teacher ticked.
+
+function mmParts(q) {
+    const a = Number(q.a), b = Number(q.b);
+    if (!Number.isFinite(a) || !Number.isFinite(b) || !b) return null;
+    const div = q.op === '÷' || q.op === '/';
+    const d = obj(q.missingNumberData);
+    const c = d && Number.isFinite(Number(d.c)) ? Number(d.c) : (div ? a / b : a * b);
+    const unknown = q.missing === 'a' || q.missing === 'b' ? q.missing : 'result';
+    return { a, b, c, div, unknown, ans: unknown === 'a' ? a : unknown === 'b' ? b : c };
+}
+
+registerSkill('division:missing_mult_div', {
+    strings: strings({
+        iCan: 'I Can find the missing number in × and ÷',
+        instructionKey: 'missing',
+        steps: ['Read the sign.', 'Say the times fact with a gap.', 'Find the missing number.', 'Check: say the whole fact.'],
+        stepsFor: (q) => {
+            const m = mmParts(q);
+            if (!m) return null;
+            const fact = m.div ? (m.unknown === 'a' ? `${m.b} × ${m.c} = __` : `${m.c} × __ = ${m.a}`)
+                : (m.unknown === 'a' ? `__ × ${m.b} = ${m.c}` : `${m.a} × __ = ${m.c}`);
+            return [`Read the sign: ${m.div ? '÷' : '×'}.`, `Say the times fact: ${nb(fact)}.`, 'Find the missing number.', 'Check: say the whole fact.'];
+        },
+        say: '__ times __ equals __.',
+        sayValues: (q) => {
+            const m = mmParts(q);
+            if (!m) return null;
+            return m.div ? `${m.a} divided by ${m.b} equals ${m.c}.` : `${m.a} times ${m.b} equals ${m.c}.`;
+        },
+    }),
+    misconceptions: ['multiplied-the-numbers', 'off-by-one-group', 'divided-wrong-way'],
+    workedSteps: (q) => {
+        const m = mmParts(q);
+        if (!m) return [];
+        const { a, b, c, div, unknown, ans } = m;
+        const done = step(`Write ${ans}.`, [{ slot: 'answer', value: String(ans) }]);
+        if (!div) {
+            const known = unknown === 'a' ? b : a;
+            return [step(nb(`Think: what times ${known} is ${c}?`)), step(`Count by ${known}s to ${c}: ${ans} ${known}s.`),
+                step(`Check: ${nb(`${a} × ${b} = ${c}`)}.`), done];
+        }
+        if (unknown === 'a') {
+            return [step('The missing number is the total.'), step(`Multiply: ${nb(`${b} × ${c} = ${a}`)}.`),
+                step(`Check: ${nb(`${a} ÷ ${b} = ${c}`)}.`), done];
+        }
+        return [step(nb(`Think: ${c} times what is ${a}?`)), step(`Count by ${c}s to ${a}: ${b} ${c}s.`),
+            step(`Check: ${nb(`${a} ÷ ${b} = ${c}`)}.`), done];
+    },
+    wrongAnswer: (q) => {
+        const m = mmParts(q);
+        if (!m) return null;
+        const { a, b, c, div, unknown, ans } = m;
+        const cands = [];
+        if (!div) cands.push({ value: (unknown === 'a' ? b : a) * c, misconception: 'multiplied-the-numbers', slot: 'answer', explain: 'Multiplied the two numbers shown.' });
+        if (div && unknown === 'b') cands.push({ value: a * c, misconception: 'multiplied-the-numbers', slot: 'answer', explain: 'Multiplied the two numbers shown.' });
+        if (div && unknown === 'a' && c % b === 0 && c / b !== ans) cands.push({ value: c / b, misconception: 'divided-wrong-way', slot: 'answer', explain: 'Divided the two numbers shown; the missing number is the total.' });
+        cands.push({ value: unknown === 'a' && div ? ans + b : ans + 1, misconception: 'off-by-one-group', slot: 'answer', explain: 'Counted one group too many.' });
+        return chooseWrong(q, cands);
+    },
+});
+
+/* ================================================================= div_zero_in_quotient */
+// Long division where a place of the quotient is 0 (4.NBT.B.6, M-D2 "312 ÷ 3 = 14"): the kit's
+// `division` bracket with a box over every dividend digit. Steps are one place each, ≤ 10 words.
+
+registerSkill('division:div_zero_in_quotient', {
+    strings: strings({
+        iCan: 'I Can write a zero in the quotient',
+        instructionKey: 'divide',
+        steps: ['Divide one place at a time.', 'Does the divisor not fit? Write 0.', 'Multiply, subtract, bring down the next digit.', 'Write a digit in every place.'],
+        say: '__ divided by __ equals __.',
+    }),
+    misconceptions: ['left-out-zero', 'last-digit-off'],
+    workedSteps: (q) => {
+        const [a, b] = operands(q);
+        if (!Number.isFinite(a) || !Number.isFinite(b) || !b) return [];
+        const L = longDivision(a, b);
+        const digits = digitsOf(a).reverse();
+        const out = [];
+        let part = 0, started = false, k = 0;
+        for (let i = 0; i < digits.length; i++) {
+            part = part * 10 + digits[i];
+            if (!started && part < b && i < digits.length - 1) continue;
+            const brought = started;
+            started = true;
+            const d = Math.floor(part / b);
+            const text = d === 0
+                ? (brought ? `Bring down ${digits[i]}. ${b} does not fit: write 0.` : `${b} does not fit ${part}: write 0.`)
+                : `${brought ? `Bring down ${digits[i]}. ` : ''}${nb(`${part} ÷ ${b} = ${d}`)}. Subtract ${d * b}.`;
+            out.push(step(text, [{ slot: `q${k}`, value: String(d) }]));
+            k += 1;
+            part -= d * b;
+        }
+        out.push(step(`Write ${fmt(L.quotient)}.`, [{ slot: 'answer', value: String(L.quotient) }]));
+        return clampSteps(out);
+    },
+    wrongAnswer: (q) => {
+        const [a, b] = operands(q);
+        if (!Number.isFinite(a) || !Number.isFinite(b) || !b) return null;
+        const quo = Math.floor(a / b);
+        const qs = String(quo);
+        const c = [];
+        if (/0/.test(qs.slice(1))) c.push({ value: num(qs.replace(/(?!^)0/g, '')), misconception: 'left-out-zero', explain: 'Skipped the place the divisor did not fit: no 0 written.' });
+        c.push({ value: quo + 1, misconception: 'last-digit-off', explain: `The last digit is too big: ${quo + 1} × ${b} is more than ${fmt(a)}.` });
+        return chooseWrong(q, c, { rotate: false });
+    },
+});

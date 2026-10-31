@@ -1,0 +1,62 @@
+{
+ "root": "/home/user/MathQuest",
+ "n": 30,
+ "page": 12,
+ "rules": [
+  "NOTATION",
+  "L1",
+  "L3",
+  "L6",
+  "L10",
+  "REPEATS"
+ ],
+ "subjects": [
+  "addition:add_sub_10s",
+  "addition:add_sub_100s",
+  "subtraction:missing_add_sub",
+  "division:missing_mult_div",
+  "division:div_zero_in_quotient"
+ ],
+ "checked": {
+  "NOTATION": {
+   "skills": 5,
+   "items": 150
+  },
+  "L1": {
+   "skills": 5,
+   "items": 52
+  },
+  "L3": {
+   "skills": 5,
+   "items": 90
+  },
+  "L6": {
+   "skills": 5,
+   "items": 150
+  },
+  "L10": {
+   "skills": 5,
+   "items": 150
+  },
+  "REPEATS": {
+   "skills": 5,
+   "items": 60
+  }
+ },
+ "skipped": {
+  "L3": {
+   "answer equals a number the question gives (items)": 60
+  },
+  "L1": {
+   "measured footprint: grid check needs the browser (drawing-scale check run)": 1
+  }
+ },
+ "counts": {},
+ "findings": [],
+ "added": [],
+ "gone": [],
+ "ms": {
+  "load": 302,
+  "run": 180
+ }
+}

@@ -575,6 +575,16 @@
    ],
    "pre": [
     {
+     "key": "addition:hundred_less",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (Grade 2): 100 less on a 3-digit number",
+     "opts": {}
+    },
+    {
+     "key": "addition:hundred_more",
+     "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (Grade 2): 100 more on a 3-digit number",
+     "opts": {}
+    },
+    {
      "key": "placevalue:more_less_100",
      "why": "Y3.B1.S9 Find 1, 10 or 100 more or less (prior learning wk W11)",
      "opts": {
@@ -3367,6 +3377,16 @@
     {
      "key": "number_theory:factor_links_easy",
      "why": "factor pairs drawn as links"
+    },
+    {
+     "key": "division:missing_mult_only",
+     "why": "shares 3.OA.A.4: a missing factor (__ × 6 = 42) is one number of a factor pair",
+     "opts": {}
+    },
+    {
+     "key": "division:missing_div_only",
+     "why": "shares 3.OA.A.4: the unknown number in a division sentence (42 ÷ __ = 7)",
+     "opts": {}
     }
    ],
    "note": ""
@@ -3742,6 +3762,16 @@
     "scaled_fact_family"
    ],
    "pre": [
+    {
+     "key": "division:missing_div_only",
+     "why": "Y3.B4.S6 Link multiplication and division (Grade 2): find the missing number in 42 ÷ __ = 7",
+     "opts": {}
+    },
+    {
+     "key": "division:missing_mult_only",
+     "why": "Y3.B4.S6 Link multiplication and division (Grade 2): find the missing factor in __ × 6 = 42",
+     "opts": {}
+    },
     {
      "key": "multiplication:mult_zeros",
      "why": "Y4.B5.S4 Multiply by 100 (taught the same school week, W17)",

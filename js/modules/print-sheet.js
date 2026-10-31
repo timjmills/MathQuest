@@ -3621,6 +3621,8 @@ async function buildRoleSheet(n, metaOf) {
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,
+            // (a one-line sentence the generator marks `fact`: the lesson's practice page packs it like a fact)
+            fact: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.fact) ? true : undefined,
             text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, dealtAs: it.dealtAs, measured: it.measured, measureWhy: it.measureWhy,
             thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
         })),
@@ -3718,8 +3720,10 @@ async function buildLesson(n, metaOf) {
     // A rounding item ("27 -> ___") is a one-number answer on one line, like a fact.
     // A div_facts fact in any written form (across or fraction on the equation cell, the bracket)
     // is a one-number answer too (critic R1 D8: Long / Fraction practice pages printed 2 x 3).
+    // (ops-family G1: a one-line sentence the generator marks `fact` - 43 + 10 = __, __ + 5 = 12 - is one too)
     const oneLine = (it) => it.template === 'fact' || (it.template === 'pv' && it.kind === 'round')
-        || ((it.template === 'equation' || it.template === 'division') && /div_facts/.test(String(it.skill || '')));
+        || ((it.template === 'equation' || it.template === 'division') && /div_facts/.test(String(it.skill || '')))
+        || (it.template === 'equation' && (it.fact === true || !!(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.fact)));
     const facts = (teach.items || []).filter((it) => it.pool === 'main').every(oneLine);
     // The skill ref of the practice pages: a subtraction lesson gives step 5 ("Check: add back")
     // its room, a Check line under every problem.

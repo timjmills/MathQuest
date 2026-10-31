@@ -1,0 +1,190 @@
+{
+ "id": "ops-g1",
+ "kind": "family",
+ "title": "Operations family G1: one-line sentences (add / subtract 10 and 100, missing numbers + − × ÷) and zero in the quotient",
+ "template": {
+  "id": "equation",
+  "source": "js/modules/sheet/cells/equation.js",
+  "also": "div_zero_in_quotient is drawn on the `division` template (js/modules/sheet/cells/long-division.js). The brief named `fact` (notation horiz) for add_sub_10s / add_sub_100s; measured, the fact cell kept its 38 mm VA-70 height and its own digit ladder at every size (S printed the L page, 3 x 4; cells more than half empty), so G1 draws them on `equation` with unknown 'result' - RULED by the lead 2026-10-30: `equation` with `fact: true` ACCEPTED for add_sub_10s / add_sub_100s on this measurement (equation: L 16 / 15, M 24, S 30 / 28 a page, independent print-lint S/M/L clean). div_zero_in_quotient is HELD OUT of the G1 critic round (its lesson chart overflow is a lesson.js engine item)."
+ },
+ "families": [
+  "addition",
+  "subtraction",
+  "division"
+ ],
+ "findingsMatch": {
+  "templates": [
+   "equation",
+   "division"
+  ]
+ },
+ "skills": {
+  "include": [
+   "addition:add_sub_10s",
+   "addition:add_sub_100s",
+   "subtraction:missing_add_sub",
+   "division:missing_mult_div",
+   "division:div_zero_in_quotient"
+  ]
+ },
+ "excerptChars": 140,
+ "summary": "Five same-shape skills moved off the legacy print path in one batch: four one-line number sentences on the kit `equation` cell (the unknown's own slot: a box before =, the answer line after =) and one long division on the kit `division` bracket (a box over every dividend digit). Paper, key and screen draw one cell.",
+ "teaches": "add_sub_10s: 10 more / 10 less than any number to 100 (1.NBT.C.5, 1.NBT.C.6 partial). add_sub_100s: 100 more / 100 less than any number to 1,000 (2.NBT.B.8). missing_add_sub: the unknown in an addition or subtraction sentence, before the = sign (1.OA.D.8). missing_mult_div: the unknown factor, dividend or divisor in a × or ÷ sentence (3.OA.A.4). div_zero_in_quotient: write 0 in the quotient where the divisor does not go into a place (4.NBT.B.6, M-D2).",
+ "research": "From repo sources (design/catalogue/addition.md rows 61, 62, 79, 118-119, 188; subtraction.md 136, 194; mult-div-integers.md 118, 213, 279, 315; PEDAGOGY_STANDARD; PROBLEM_TYPES). MathWorksheets4Kids / IXL logins were not used in this batch (pending).",
+ "problemTypes": [
+  "10 more / 10 less across: 43 + 10 = __, 67 − 10 = __ (any start number, not only multiples of 10)",
+  "100 more / 100 less across: 367 + 100 = __, 905 − 100 = __",
+  "missing addend: __ + 5 = 12, 7 + __ = 15; missing whole: __ − 4 = 9; missing part: 13 − __ = 6",
+  "missing factor: __ × 6 = 42, 8 × __ = 56; missing dividend / divisor: __ ÷ 4 = 8, 42 ÷ __ = 7 (Across, Bracket or Fraction bar)",
+  "long division with a 0 in the quotient: middle place (7)721 = 103), last place (3)930 = 310), four-digit dividend at Max Number 1,000+ (4)4092 = 1023)"
+ ],
+ "progression": [
+  "add_sub_10s: adding only, then subtracting only (task option), then mixed with the sign read per item",
+  "add_sub_10s numbers to 50, then to 100 (band option)",
+  "add_sub_100s: the same steps to 500, then 1,000",
+  "missing_add_sub: + only, then − only, then mixed; the answer position is opt-in (unknown option)",
+  "missing_mult_div: × facts first (Across), then ÷ in the notation the class uses",
+  "div_zero_in_quotient: 3-digit ÷ 1-digit, then 4-digit dividends at Max Number 1,000"
+ ],
+ "drawing": {
+  "sizes": "digits 16 / 22 / 28 pt at S / M / L (tokens.js SIZES); the slot B(n) from the widest answer the page's band allows (L3). Equation rows stretch at most 2.0 x (PG-11). The division bracket: one box over every dividend digit, two work rows per dividend digit.",
+  "notes": [
+   "equation payload: {a, b, op, result, unknown: 'a'|'b'|'result', digits, notation?}; digits = widest possible answer on the page, never the item's own answer.",
+   "division payload: {dividend, divisor, quotient, workRows: 2 x dividend digits} so neither boxes nor rows tell the quotient's digit count.",
+   "Screen: the twin's one slot carries data-mq-blank (box before =, line after =); the division twin's quotient boxes are typed one digit each."
+  ],
+  "capacity": [
+   {
+    "file": "WORKSHEET_DESIGN_STANDARD.md",
+    "label": "Stacked arithmetic: rows and items"
+   }
+  ]
+ },
+ "ruleGroups": [
+  {
+   "title": "Equation frame and fit",
+   "core": true,
+   "chars": 300,
+   "rules": [
+    "DN-22",
+    "TY-25",
+    "PG-11",
+    "SL-12",
+    "AK-4"
+   ]
+  },
+  {
+   "title": "Long division bracket",
+   "core": true,
+   "chars": 300,
+   "rules": [
+    "VA-60",
+    "VA-61",
+    "VA-63"
+   ]
+  },
+  {
+   "title": "Lessons learned",
+   "chars": 120,
+   "rules": [
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "L6",
+    "L10"
+   ]
+  },
+  {
+   "title": "Rubric caps",
+   "chars": 100,
+   "rules": [
+    "H13",
+    "SP-1",
+    "SP-3",
+    "CL-4b"
+   ]
+  }
+ ],
+ "ownerRulings": [
+  {
+   "date": "2026-09-19",
+   "ruling": "\"Within N\" bounds the ANSWER (the sum, the number you take from, the product, the number shared), never the operands.",
+   "source": "CLAUDE.md"
+  },
+  {
+   "date": "2026-10-17",
+   "ruling": "A distinct option is ALSO a findable skill: 10 more / 10 less (and 100) and the answer-position step are listed as preset candidates for the lead, not built in G1.",
+   "source": "CLAUDE.md"
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "changed-ones",
+   "error": "changed the ones digit instead of the tens (43 + 10 = 44)",
+   "wrong": "a ± 1"
+  },
+  {
+   "id": "changed-tens",
+   "error": "changed the tens digit instead of the hundreds (367 + 100 = 377)",
+   "wrong": "a ± 10"
+  },
+  {
+   "id": "wrong-direction",
+   "error": "added when the sign says take away",
+   "wrong": "a ∓ step"
+  },
+  {
+   "id": "subtracted-for-whole",
+   "error": "SU-M7: subtracts when the unknown is the minuend (__ − 4 = 9 → 5)",
+   "wrong": "|c − b|"
+  },
+  {
+   "id": "added-the-numbers",
+   "error": "adds the two numbers shown (7 + __ = 15 → 22)",
+   "wrong": "known + c"
+  },
+  {
+   "id": "multiplied-the-numbers",
+   "error": "multiplies the two numbers shown (__ × 6 = 42 → 252)",
+   "wrong": "b × c"
+  },
+  {
+   "id": "left-out-zero",
+   "error": "M-D2: skips the place the divisor does not go into (721 ÷ 7 = 13)",
+   "wrong": "quotient with its inner / trailing 0 dropped"
+  }
+ ],
+ "options": [
+  "add_sub_10s / add_sub_100s: task (Adding / Subtracting; both = mixed, the instruction reads the sign), band (Numbers to 50 / 500, else 100 / 1,000).",
+  "missing_add_sub: unknown (default: a number before the = sign; the answer is opt-in), task (+ / −).",
+  "missing_mult_div: notation (Across default; Bracket / Fraction bar keep the equation's ÷ branch; several ticked mixes them by the teacher's choice).",
+  "div_zero_in_quotient: Max Number 1,000 adds four-digit dividends.",
+  "Preset candidates for the lead (not built): 10 more / 10 less, 100 more / 100 less (task presets), missing number with the answer position (unknown preset)."
+ ],
+ "gates": [
+  {
+   "cmd": "node tests/scripts/ws-precritic.cjs --skill <each of the 5> --strict",
+   "note": "the table every builder report pastes"
+  },
+  {
+   "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/ops-g1/ops-g1.md",
+   "note": "build-start gate (unsigned: owner signs)"
+  }
+ ],
+ "openQuestions": [
+  {
+   "q": "add_sub_10s / add_sub_100s on `fact` (horiz) or `equation`?",
+   "recommended": "Ruled 2026-10-30 (lead): `equation` with `fact: true`, from the measurement in section 3."
+  },
+  {
+   "q": "missing_mult_div: the plain product / quotient after =?",
+   "recommended": "Ruled 2026-10-30 (lead): dropped for a 'missing' skill; an `unknown` option or a preset is a candidate for later, not built now."
+  },
+  {
+   "q": "Split add_sub_10s / add_sub_100s into add / sub skills (catalogue)?",
+   "recommended": "Keep the ids (share codes); the task option gives one operation per page, and presets make each findable."
+  }
+ ]
+}

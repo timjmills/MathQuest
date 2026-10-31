@@ -1,0 +1,5956 @@
+{
+ "tool": "ws-slot-clip",
+ "root": "/home/user/MathQuest",
+ "skills": [
+  "addition:add_sub_10s",
+  "addition:add_sub_100s",
+  "subtraction:missing_add_sub",
+  "division:missing_mult_div",
+  "division:div_zero_in_quotient"
+ ],
+ "sizes": [
+  "S",
+  "M",
+  "L"
+ ],
+ "rows": [
+  {
+   "id": "addition:add_sub_100s|mixed/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×8, fact ×8, legacy ×8; HEADS N/A (equation ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|mixed/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×6, fact ×12, legacy ×6; HEADS N/A (equation ×6, fact ×12, legacy ×6, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|mixed/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×4, fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "S",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×8, fact ×10, legacy ×8; HEADS N/A (equation ×8, fact ×10, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 8: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "M",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 14,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×6, fact ×8, legacy ×8; HEADS N/A (equation ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 6: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/defaults",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×6, fact ×8, legacy ×8; HEADS N/A (equation ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-each",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 6,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 6,
+     "segs": 6,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 6 box segment(s); N/A on anchor ×12, equation ×2, fact ×4, legacy ×8; HEADS N/A (anchor ×12, equation ×2, fact ×4, legacy ×8, perimeter-shape ×6: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-each",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on anchor ×8, equation ×2, fact ×2, legacy ×8; HEADS N/A (anchor ×8, equation ×2, fact ×2, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-each",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 2,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 2,
+     "segs": 2,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 2 box segment(s); N/A on anchor ×8, equation ×2, fact ×4, legacy ×8; HEADS N/A (anchor ×8, equation ×2, fact ×4, legacy ×8, perimeter-shape ×2: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on anchor ×6, equation ×8, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on anchor ×6, equation ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/ex-group",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on anchor ×6, equation ×4, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "S",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 24,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 20,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 8 box segment(s); N/A on equation ×16, fact ×20, legacy ×16; HEADS N/A (equation ×16, fact ×20, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 8: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "M",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 22,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 8 box segment(s); N/A on equation ×12, fact ×16, legacy ×16; HEADS N/A (equation ×12, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 6: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_100s|sections/pages-2",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 8 box segment(s); N/A on equation ×12, fact ×16, legacy ×16; HEADS N/A (equation ×12, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 56,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×56: no box segment(s)); HEADS N/A (equation ×56: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 48,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×48: no box segment(s)); HEADS N/A (equation ×48: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 30,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×30: no box segment(s)); HEADS N/A (equation ×30: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/ex-each",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×10, equation ×10: no box segment(s)); HEADS N/A (anchor ×10, equation ×10: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/ex-each",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×8, equation ×8: no box segment(s)); HEADS N/A (anchor ×8, equation ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/ex-each",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×6, equation ×6: no box segment(s)); HEADS N/A (anchor ×6, equation ×6: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/ex-group",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 24,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×6, equation ×24: no box segment(s)); HEADS N/A (anchor ×6, equation ×24: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/ex-group",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 18,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×6, equation ×18: no box segment(s)); HEADS N/A (anchor ×6, equation ×18: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/ex-group",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×4, equation ×12: no box segment(s)); HEADS N/A (anchor ×4, equation ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/layout-todays-number",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 56,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×56: no box segment(s)); HEADS N/A (equation ×56: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/layout-todays-number",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 48,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×48: no box segment(s)); HEADS N/A (equation ×48: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/layout-todays-number",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 30,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×30: no box segment(s)); HEADS N/A (equation ×30: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+nline+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×32: no box segment(s)); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+nline+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×32: no box segment(s)); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+nline+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 20,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×20: no box segment(s)); HEADS N/A (equation ×20: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+nline+short",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+nline+short",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+nline+short",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×10: no box segment(s)); HEADS N/A (equation ×10: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+short+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+short+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-cols2+short+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×10: no box segment(s)); HEADS N/A (equation ×10: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-nline+short+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 28,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×28: no box segment(s)); HEADS N/A (equation ×28: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-nline+short+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 24,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×24: no box segment(s)); HEADS N/A (equation ×24: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/more-nline+short+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 15,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×15: no box segment(s)); HEADS N/A (equation ×15: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/pages-3",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 168,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×168: no box segment(s)); HEADS N/A (equation ×168: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/pages-3",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 144,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×144: no box segment(s)); HEADS N/A (equation ×144: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|single/pages-3",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 90,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×90: no box segment(s)); HEADS N/A (equation ×90: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|mixed/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×8, fact ×8, legacy ×8; HEADS N/A (equation ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|mixed/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×6, fact ×12, legacy ×6; HEADS N/A (equation ×6, fact ×12, legacy ×6, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|mixed/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×4, fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "S",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 18,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×10, fact ×10, legacy ×8; HEADS N/A (equation ×10, fact ×10, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 10: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "M",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×8, fact ×8, legacy ×8; HEADS N/A (equation ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 8: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/defaults",
+   "size": "L",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 14,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on equation ×6, fact ×8, legacy ×8; HEADS N/A (equation ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 6: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 6,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 6,
+     "segs": 6,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 6 box segment(s); N/A on anchor ×12, equation ×2, fact ×4, legacy ×8; HEADS N/A (anchor ×12, equation ×2, fact ×4, legacy ×8, perimeter-shape ×6: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on anchor ×10, equation ×2, fact ×4, legacy ×8; HEADS N/A (anchor ×10, equation ×2, fact ×4, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-each",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 2,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 2,
+     "segs": 2,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 2 box segment(s); N/A on anchor ×10, equation ×4, fact ×4, legacy ×8; HEADS N/A (anchor ×10, equation ×4, fact ×4, legacy ×8, perimeter-shape ×2: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on anchor ×6, equation ×8, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on anchor ×6, equation ×8, fact ×4, legacy ×8; HEADS N/A (anchor ×6, equation ×8, fact ×4, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/ex-group",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 4 box segment(s); N/A on anchor ×6, equation ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "S",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 26,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 20,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 20,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 8 box segment(s); N/A on equation ×20, fact ×20, legacy ×16; HEADS N/A (equation ×20, fact ×20, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 10: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "M",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 24,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 8 box segment(s); N/A on equation ×16, fact ×16, legacy ×16; HEADS N/A (equation ×16, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 8: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|sections/pages-2",
+   "size": "L",
+   "status": "FAIL",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 22,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured perimeter-shape 8 box segment(s); N/A on equation ×12, fact ×16, legacy ×16; HEADS N/A (equation ×12, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": [
+    "L-OVERFLOW PG-12 6: no sibling measured this row"
+   ]
+  },
+  {
+   "id": "addition:add_sub_10s|single/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×60: no box segment(s)); HEADS N/A (equation ×60: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 48,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×48: no box segment(s)); HEADS N/A (equation ×48: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×32: no box segment(s)); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/ex-each",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×12, equation ×12: no box segment(s)); HEADS N/A (anchor ×12, equation ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/ex-each",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×12, equation ×12: no box segment(s)); HEADS N/A (anchor ×12, equation ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/ex-each",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×8, equation ×8: no box segment(s)); HEADS N/A (anchor ×8, equation ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/ex-group",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 18,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×6, equation ×18: no box segment(s)); HEADS N/A (anchor ×6, equation ×18: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/ex-group",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 24,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×6, equation ×24: no box segment(s)); HEADS N/A (anchor ×6, equation ×24: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/ex-group",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (anchor ×4, equation ×16: no box segment(s)); HEADS N/A (anchor ×4, equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/layout-todays-number",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×60: no box segment(s)); HEADS N/A (equation ×60: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/layout-todays-number",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 48,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×48: no box segment(s)); HEADS N/A (equation ×48: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/layout-todays-number",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×32: no box segment(s)); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+nline+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×32: no box segment(s)); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+nline+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×32: no box segment(s)); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+nline+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×32: no box segment(s)); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+nline+short",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+nline+short",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+nline+short",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+short+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+short+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-cols2+short+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-nline+short+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 30,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×30: no box segment(s)); HEADS N/A (equation ×30: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-nline+short+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 24,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×24: no box segment(s)); HEADS N/A (equation ×24: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/more-nline+short+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×16: no box segment(s)); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/pages-3",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 180,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×180: no box segment(s)); HEADS N/A (equation ×180: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/pages-3",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 144,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×144: no box segment(s)); HEADS N/A (equation ×144: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|single/pages-3",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 96,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×96: no box segment(s)); HEADS N/A (equation ×96: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|mixed/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 28,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (division ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|mixed/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 22,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18, perimeter-shape 4 box segment(s); N/A on fact ×12, legacy ×6; HEADS N/A (division ×6, fact ×12, legacy ×6, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|mixed/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 4,
+     "segs": 12,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 12, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (division ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 34,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 10,
+     "segs": 30,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 30, perimeter-shape 4 box segment(s); N/A on fact ×10, legacy ×8; HEADS N/A (division ×10, fact ×10, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 28,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (division ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/defaults",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 22,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (division ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 2,
+     "segs": 6,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 2,
+     "segs": 2,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 6, perimeter-shape 2 box segment(s); N/A on anchor ×12, fact ×8, legacy ×8; HEADS N/A (anchor ×12, division ×2, fact ×8, legacy ×8, perimeter-shape ×2: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 2,
+     "segs": 6,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 2,
+     "segs": 2,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 6, perimeter-shape 2 box segment(s); N/A on anchor ×12, fact ×8, legacy ×8; HEADS N/A (anchor ×12, division ×2, fact ×8, legacy ×8, perimeter-shape ×2: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-each",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 22,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, division ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 28,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, division ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 28,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, division ×8, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/ex-group",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 22,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, division ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 68,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 20,
+     "segs": 60,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 20,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 60, perimeter-shape 8 box segment(s); N/A on fact ×20, legacy ×16; HEADS N/A (division ×20, fact ×20, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 56,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 16,
+     "segs": 48,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 48, perimeter-shape 8 box segment(s); N/A on fact ×16, legacy ×16; HEADS N/A (division ×16, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|sections/pages-2",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 44,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 12,
+     "segs": 36,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 36, perimeter-shape 8 box segment(s); N/A on fact ×16, legacy ×16; HEADS N/A (division ×12, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 36,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 12,
+     "segs": 36,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 36 box segment(s); HEADS N/A (division ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 36,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 12,
+     "segs": 36,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 36 box segment(s); HEADS N/A (division ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 24,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24 box segment(s); HEADS N/A (division ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/ex-each",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 18,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18 box segment(s); N/A on anchor ×6; HEADS N/A (anchor ×6, division ×6: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/ex-each",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 12,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 4,
+     "segs": 12,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 12 box segment(s); N/A on anchor ×4; HEADS N/A (anchor ×4, division ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/ex-each",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 12,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 4,
+     "segs": 12,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 12 box segment(s); N/A on anchor ×4; HEADS N/A (anchor ×4, division ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/ex-group",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 24,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24 box segment(s); N/A on anchor ×2; HEADS N/A (anchor ×2, division ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/ex-group",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 18,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18 box segment(s); N/A on anchor ×2; HEADS N/A (anchor ×2, division ×6: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/ex-group",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 12,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 2,
+     "segs": 0,
+     "heads": 0
+    },
+    "division": {
+     "cells": 4,
+     "segs": 12,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 12 box segment(s); N/A on anchor ×2; HEADS N/A (anchor ×2, division ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/layout-todays-number",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 36,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 12,
+     "segs": 36,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 36 box segment(s); HEADS N/A (division ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/layout-todays-number",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 36,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 12,
+     "segs": 36,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 36 box segment(s); HEADS N/A (division ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/layout-todays-number",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 24,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24 box segment(s); HEADS N/A (division ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-cols2+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 36,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 12,
+     "segs": 36,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 36 box segment(s); HEADS N/A (division ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-cols2+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 24,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24 box segment(s); HEADS N/A (division ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-cols2+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 24,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 8,
+     "segs": 24,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 24 box segment(s); HEADS N/A (division ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-cols2+short",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 18,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18 box segment(s); HEADS N/A (division ×6: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-cols2+short",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 12,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 4,
+     "segs": 12,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 12 box segment(s); HEADS N/A (division ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-cols2+short",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 12,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 4,
+     "segs": 12,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 12 box segment(s); HEADS N/A (division ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-short+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 18,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18 box segment(s); HEADS N/A (division ×6: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-short+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 18,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 6,
+     "segs": 18,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 18 box segment(s); HEADS N/A (division ×6: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/more-short+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 12,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 4,
+     "segs": 12,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 12 box segment(s); HEADS N/A (division ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/pages-3",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 108,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 36,
+     "segs": 108,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 108 box segment(s); HEADS N/A (division ×36: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/pages-3",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 108,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 36,
+     "segs": 108,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 108 box segment(s); HEADS N/A (division ×36: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|single/pages-3",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 72,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 24,
+     "segs": 72,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 72 box segment(s); HEADS N/A (division ×24: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|mixed/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|mixed/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×12, legacy ×6; HEADS N/A (equation ×4, fact ×12, legacy ×6, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|mixed/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 10,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 6,
+     "segs": 6,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 6, perimeter-shape 4 box segment(s); N/A on fact ×10, legacy ×8; HEADS N/A (equation ×6, fact ×10, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/defaults",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 6,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 2,
+     "segs": 2,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 2, perimeter-shape 4 box segment(s); N/A on anchor ×10, fact ×4, legacy ×8; HEADS N/A (anchor ×10, equation ×2, fact ×4, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×4, legacy ×8; HEADS N/A (anchor ×6, equation ×4, fact ×4, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-each",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 10,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 6,
+     "segs": 6,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 6, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×4, legacy ×8; HEADS N/A (anchor ×6, equation ×4, fact ×4, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/ex-group",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 20,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 12,
+     "segs": 12,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 20,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 12, perimeter-shape 8 box segment(s); N/A on fact ×20, legacy ×16; HEADS N/A (equation ×12, fact ×20, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 8, perimeter-shape 8 box segment(s); N/A on fact ×16, legacy ×16; HEADS N/A (equation ×8, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|sections/pages-2",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 8, perimeter-shape 8 box segment(s); N/A on fact ×16, legacy ×16; HEADS N/A (equation ×8, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 60,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 60,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 60 box segment(s); HEADS N/A (equation ×60: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/ex-each",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 12,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 12,
+     "segs": 12,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 12 box segment(s); N/A on anchor ×12; HEADS N/A (anchor ×12, equation ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/ex-each",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 12,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 12,
+     "segs": 12,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 12 box segment(s); N/A on anchor ×12; HEADS N/A (anchor ×12, equation ×12: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/ex-each",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 4,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4 box segment(s); N/A on anchor ×4; HEADS N/A (anchor ×4, equation ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/ex-group",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 24,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 24,
+     "segs": 24,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 24 box segment(s); N/A on anchor ×8; HEADS N/A (anchor ×8, equation ×24: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/ex-group",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 24,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 24,
+     "segs": 24,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 24 box segment(s); N/A on anchor ×6; HEADS N/A (anchor ×6, equation ×24: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/ex-group",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); N/A on anchor ×4; HEADS N/A (anchor ×4, equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/layout-todays-number",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 60,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 60,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 60 box segment(s); HEADS N/A (equation ×60: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/layout-todays-number",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/layout-todays-number",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-cols2+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-cols2+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-cols2+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-cols2+short",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-cols2+short",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-cols2+short",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-short+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 30,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 30,
+     "segs": 30,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 30 box segment(s); HEADS N/A (equation ×30: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-short+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/more-short+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/pages-3",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 180,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 180,
+     "segs": 180,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 180 box segment(s); HEADS N/A (equation ×180: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/pages-3",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 96,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 96,
+     "segs": 96,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 96 box segment(s); HEADS N/A (equation ×96: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|single/pages-3",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 96,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 96,
+     "segs": 96,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 96 box segment(s); HEADS N/A (equation ×96: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|mixed/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|mixed/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 10,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 6,
+     "segs": 6,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 12,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 6, perimeter-shape 4 box segment(s); N/A on fact ×12, legacy ×6; HEADS N/A (equation ×6, fact ×12, legacy ×6, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|mixed/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 10,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 6,
+     "segs": 6,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 6, perimeter-shape 4 box segment(s); N/A on fact ×10, legacy ×8; HEADS N/A (equation ×6, fact ×10, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/defaults",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on fact ×8, legacy ×8; HEADS N/A (equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 6,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 2,
+     "segs": 2,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 2, perimeter-shape 4 box segment(s); N/A on anchor ×10, fact ×4, legacy ×8; HEADS N/A (anchor ×10, equation ×2, fact ×4, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 6,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 2,
+     "segs": 2,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 2, perimeter-shape 4 box segment(s); N/A on anchor ×10, fact ×4, legacy ×8; HEADS N/A (anchor ×10, equation ×2, fact ×4, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-each",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 10,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 6,
+     "segs": 6,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 6, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×6, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/ex-group",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 8"
+   ],
+   "slot": 0,
+   "clip": 8,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 4,
+     "segs": 4,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 4, perimeter-shape 4 box segment(s); N/A on anchor ×6, fact ×8, legacy ×8; HEADS N/A (anchor ×6, equation ×4, fact ×8, legacy ×8, perimeter-shape ×4: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "S",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 20,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 12,
+     "segs": 12,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 20,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 12, perimeter-shape 8 box segment(s); N/A on fact ×20, legacy ×16; HEADS N/A (equation ×12, fact ×20, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "M",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 8, perimeter-shape 8 box segment(s); N/A on fact ×16, legacy ×16; HEADS N/A (equation ×8, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|sections/pages-2",
+   "size": "L",
+   "status": "ok",
+   "partner": [
+    "partner skill (non-blocking, D1): L-OVERFLOW PG-12 16"
+   ],
+   "slot": 0,
+   "clip": 16,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    },
+    "fact": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "legacy": {
+     "cells": 16,
+     "segs": 0,
+     "heads": 0
+    },
+    "perimeter-shape": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 8, perimeter-shape 8 box segment(s); N/A on fact ×16, legacy ×16; HEADS N/A (equation ×8, fact ×16, legacy ×16, perimeter-shape ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/defaults",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 60,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 60,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 60 box segment(s); HEADS N/A (equation ×60: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/defaults",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/defaults",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/ex-each",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 10,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 10,
+     "segs": 10,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 10 box segment(s); N/A on anchor ×10; HEADS N/A (anchor ×10, equation ×10: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/ex-each",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 10,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 10,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 10,
+     "segs": 10,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 10 box segment(s); N/A on anchor ×10; HEADS N/A (anchor ×10, equation ×10: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/ex-each",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 8,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 8,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 8,
+     "segs": 8,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 8 box segment(s); N/A on anchor ×8; HEADS N/A (anchor ×8, equation ×8: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/ex-group",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 18,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 6,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 18,
+     "segs": 18,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 18 box segment(s); N/A on anchor ×6; HEADS N/A (anchor ×6, equation ×18: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/ex-group",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); N/A on anchor ×4; HEADS N/A (anchor ×4, equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/ex-group",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "anchor": {
+     "cells": 4,
+     "segs": 0,
+     "heads": 0
+    },
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); N/A on anchor ×4; HEADS N/A (anchor ×4, equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/layout-todays-number",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 60,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 60,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 60 box segment(s); HEADS N/A (equation ×60: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/layout-todays-number",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/layout-todays-number",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+nline+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+nline+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+nline+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 32,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 32,
+     "segs": 32,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 32 box segment(s); HEADS N/A (equation ×32: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+nline+short",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+nline+short",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+nline+short",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+short+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+short+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-cols2+short+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-nline+short+afterpage",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 30,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 30,
+     "segs": 30,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 30 box segment(s); HEADS N/A (equation ×30: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-nline+short+afterpage",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/more-nline+short+afterpage",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 16,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 16,
+     "segs": 16,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 16 box segment(s); HEADS N/A (equation ×16: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/pages-3",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 180,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 180,
+     "segs": 180,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 180 box segment(s); HEADS N/A (equation ×180: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/pages-3",
+   "size": "M",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 96,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 96,
+     "segs": 96,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 96 box segment(s); HEADS N/A (equation ×96: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|single/pages-3",
+   "size": "L",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 96,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 96,
+     "segs": 96,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 96 box segment(s); HEADS N/A (equation ×96: no place head(s))",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|extra/role-test",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 40,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×40: no box segment(s)); HEADS N/A (equation ×40: no place head(s))",
+   "extra": "role-test",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_10s|extra/role-more-practice",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×60: no box segment(s)); HEADS N/A (equation ×60: no place head(s))",
+   "extra": "role-more-practice",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|extra/role-test",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 40,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×40: no box segment(s)); HEADS N/A (equation ×40: no place head(s))",
+   "extra": "role-test",
+   "findings": []
+  },
+  {
+   "id": "addition:add_sub_100s|extra/role-more-practice",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 0,
+   "heads": 0,
+   "slotW": "N/A",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 56,
+     "segs": 0,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W N/A (equation ×56: no box segment(s)); HEADS N/A (equation ×56: no place head(s))",
+   "extra": "role-more-practice",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|extra/role-test",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 40,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 40,
+     "segs": 40,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 40 box segment(s); HEADS N/A (equation ×40: no place head(s))",
+   "extra": "role-test",
+   "findings": []
+  },
+  {
+   "id": "subtraction:missing_add_sub|extra/role-more-practice",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 60,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 60,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 60 box segment(s); HEADS N/A (equation ×60: no place head(s))",
+   "extra": "role-more-practice",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|extra/role-test",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 40,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 40,
+     "segs": 40,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 40 box segment(s); HEADS N/A (equation ×40: no place head(s))",
+   "extra": "role-test",
+   "findings": []
+  },
+  {
+   "id": "division:missing_mult_div|extra/role-more-practice",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 60,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "equation": {
+     "cells": 60,
+     "segs": 60,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured equation 60 box segment(s); HEADS N/A (equation ×60: no place head(s))",
+   "extra": "role-more-practice",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|extra/role-test",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 36,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 12,
+     "segs": 36,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 36 box segment(s); HEADS N/A (division ×12: no place head(s))",
+   "extra": "role-test",
+   "findings": []
+  },
+  {
+   "id": "division:div_zero_in_quotient|extra/role-more-practice",
+   "size": "S",
+   "status": "ok",
+   "slot": 0,
+   "clip": 0,
+   "segs": 36,
+   "heads": 0,
+   "slotW": "measured",
+   "headsProbe": "N/A",
+   "templates": {
+    "division": {
+     "cells": 12,
+     "segs": 36,
+     "heads": 0
+    }
+   },
+   "measured": "SLOT-W measured division 36 box segment(s); HEADS N/A (division ×12: no place head(s))",
+   "extra": "role-more-practice",
+   "findings": []
+  }
+ ],
+ "siblings": {
+  "addition:add_sub_10s": [],
+  "addition:add_sub_100s": [],
+  "subtraction:missing_add_sub": [],
+  "division:missing_mult_div": [],
+  "division:div_zero_in_quotient": []
+ },
+ "sources": [
+  "pins (design/audit/matrix/baseline.json)"
+ ],
+ "fails": [
+  "addition:add_sub_100s|sections/defaults S: L-OVERFLOW PG-12 8: no sibling measured this row",
+  "addition:add_sub_100s|sections/defaults M: L-OVERFLOW PG-12 6: no sibling measured this row",
+  "addition:add_sub_100s|sections/pages-2 S: L-OVERFLOW PG-12 8: no sibling measured this row",
+  "addition:add_sub_100s|sections/pages-2 M: L-OVERFLOW PG-12 6: no sibling measured this row",
+  "addition:add_sub_10s|sections/defaults S: L-OVERFLOW PG-12 10: no sibling measured this row",
+  "addition:add_sub_10s|sections/defaults M: L-OVERFLOW PG-12 8: no sibling measured this row",
+  "addition:add_sub_10s|sections/defaults L: L-OVERFLOW PG-12 6: no sibling measured this row",
+  "addition:add_sub_10s|sections/pages-2 S: L-OVERFLOW PG-12 10: no sibling measured this row",
+  "addition:add_sub_10s|sections/pages-2 M: L-OVERFLOW PG-12 8: no sibling measured this row",
+  "addition:add_sub_10s|sections/pages-2 L: L-OVERFLOW PG-12 6: no sibling measured this row"
+ ],
+ "seconds": 1406.8
+}

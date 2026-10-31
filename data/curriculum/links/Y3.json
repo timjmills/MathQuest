@@ -763,6 +763,16 @@
      "opts": {
       "step": 0
      }
+    },
+    {
+     "key": "addition:hundred_more",
+     "missing": "1 and 10 more or less, and 100 less (it deals only 100 more: 234 + 100)",
+     "opts": {}
+    },
+    {
+     "key": "addition:hundred_less",
+     "missing": "1 and 10 more or less, and 100 more (it deals only 100 less: 234 − 100)",
+     "opts": {}
     }
    ],
    "verdict": "partial",
@@ -845,6 +855,16 @@
      "opts": {
       "band": 999
      }
+    },
+    {
+     "key": "addition:ten_more",
+     "why": "10 more on a 2-digit number: the same move one place to the right of 100 more",
+     "opts": {}
+    },
+    {
+     "key": "addition:ten_less",
+     "why": "10 less on a 2-digit number: the same move one place to the right of 100 less",
+     "opts": {}
     }
    ],
    "note": ""
@@ -1443,6 +1463,16 @@
      "key": "number_sense:make_a_ten",
      "why": "Y3.B2.S6 Add 1s across a 10 (a later step, W4: the same idea one step further)",
      "opts": {}
+    },
+    {
+     "key": "addition:hundred_more",
+     "why": "shares 2.NBT.B.8: 100 more is the hundreds digit going up by one",
+     "opts": {}
+    },
+    {
+     "key": "addition:hundred_less",
+     "why": "shares 2.NBT.B.8: 100 less is the hundreds digit going down by one",
+     "opts": {}
     }
    ],
    "note": ""
@@ -1461,6 +1491,16 @@
      "opts": {
       "step": 100
      }
+    },
+    {
+     "key": "addition:hundred_more",
+     "missing": "subtracting 100s, and adding more than one hundred (it deals only 234 + 100)",
+     "opts": {}
+    },
+    {
+     "key": "addition:hundred_less",
+     "missing": "adding 100s, and taking away more than one hundred (it deals only 234 − 100)",
+     "opts": {}
     }
    ],
    "verdict": "partial",
@@ -2730,6 +2770,11 @@
     "inverse_check_1000"
    ],
    "pre": [
+    {
+     "key": "subtraction:missing_add_sub_answer",
+     "why": "Y2.B2.S21 Missing number problems (Grade 1): work out the answer, 8 + 5 = __, before checking it the other way",
+     "opts": {}
+    },
     {
      "key": "addition:add_sub_fact_family",
      "why": "Y2.B2.S2 fact families: the inverse as a fact family",
@@ -4886,6 +4931,16 @@
     {
      "key": "multiplication:mult_div_fact_family",
      "missing": "fact families, but with ×6, ×7, ×9 and ×11 facts (6, 7, 42; 9, 11, 99) beyond the Grade 2 tables"
+    },
+    {
+     "key": "division:missing_mult_only",
+     "missing": "the division sentences (it deals only × sentences: __ × 6 = 42)",
+     "opts": {}
+    },
+    {
+     "key": "division:missing_div_only",
+     "missing": "the multiplication sentences (it deals only ÷ sentences: 42 ÷ __ = 7)",
+     "opts": {}
     }
    ],
    "verdict": "partial",

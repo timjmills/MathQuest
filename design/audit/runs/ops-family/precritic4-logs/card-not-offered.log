@@ -1,0 +1,10 @@
+$ node tests/scripts/ws-card-rulings.mjs --skill addition:add_sub_10s --skill addition:add_sub_100s --skill subtraction:missing_add_sub --skill division:missing_mult_div --skill division:div_zero_in_quotient --check offered
+
+ws-card-rulings: design/cards/ops-g1/ops-g1.md on this tree; 5 skill(s), 300 items per ruling
+  design/cards/ops-g1/ops-g1.md: rulings block present, 5 prose ruling(s) not machine-checked (§5.1, §5.2, §9.1, §9.2, §9.3)
+  no notOffered entry applies to addition:add_sub_10s (not checked)
+  no notOffered entry applies to addition:add_sub_100s (not checked)
+  no notOffered entry applies to subtraction:missing_add_sub (not checked)
+  no notOffered entry applies to division:missing_mult_div (not checked)
+  no notOffered entry applies to division:div_zero_in_quotient (not checked)
+ws-card-rulings: NO-RULINGS (the blocks hold no notOffered entries for the skills in scope; nothing checked)

@@ -1,0 +1,7 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-screen-slots.cjs --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --baseline design/audit/baselines/screen-slots.json --json /tmp/mq-precritic/20261030-194652-15083/screen-slots.json
+
+mq-browser-run: slot 2 after 103s
+
+5 skills, 20 host renders, 0 doubled answer area(s), 0 paper verb(s) on screen
+baseline design/audit/baselines/screen-slots.json: 0 pinned finding(s) seen, 0 NEW
+ws-screen-slots: OK

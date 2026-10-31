@@ -411,3 +411,80 @@ for (const [id, within] of [
         stories: storiesFor('-'),
     });
 }
+
+/* ======================================================================= missing_add_sub */
+// A missing number in an addition or subtraction sentence (1.OA.D.8): the unknown sits before the
+// = sign by default (___ + 5 = 12, 14 − ___ = 6); "the answer" is an opt-in value. The kit's
+// `equation` cell, slot 'answer'. Every step follows the item: which number is the whole, which
+// the parts, and where the unknown sits (L6).
+
+/** An expression kept on one line: its spaces made non-breaking (WRAP-OP). */
+const nbsp = (t) => String(t).replace(/ /g, '\u00a0');
+
+/** {a, b, c, op, unknown} of a missing-number item: a op b = c. */
+function missingParts(q) {
+    const d = obj(q.missingNumberData);
+    const a = Number(q.a), b = Number(q.b);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+    const op = q.op === '-' || q.op === '−' ? '-' : '+';
+    const c = d && Number.isFinite(Number(d.c)) ? Number(d.c) : (op === '+' ? a + b : a - b);
+    const unknown = q.missing === 'a' || q.missing === 'b' ? q.missing : 'result';
+    return { a, b, c, op, unknown };
+}
+
+registerSkill('subtraction:missing_add_sub', {
+    strings: strings({
+        iCan: 'I Can find the missing number',
+        instructionKey: 'missing',
+        steps: ['Read the sign.', 'Find the whole and the parts.', 'Count on from the part you know.', 'Write the missing number.'],
+        stepsFor: (q) => {
+            const m = missingParts(q);
+            if (!m) return null;
+            const { a, b, c, op, unknown } = m;
+            if (unknown === 'result') {
+                return op === '+' ? ['Start with the bigger number.', 'Count on the other number.', 'Write the sum.']
+                    : ['Start with the first number.', 'Count back the second number.', 'Write how many are left.'];
+            }
+            const whole = op === '+' ? c : a;
+            if (op === '-' && unknown === 'a') return [`Read the sign: ${'−'}.`, 'The missing number is the whole.', 'Add the two parts.', 'Write the missing number.'];
+            return [`Read the sign: ${op === '+' ? '+' : '−'}.`, `${whole} is the whole.`, 'Count on from the part you know.', 'Write the missing number.'];
+        },
+        say: '__ and __ make __.',
+        sayValues: (q) => {
+            const m = missingParts(q);
+            if (!m) return null;
+            return m.op === '+' ? `${m.a} and ${m.b} make ${m.c}.` : `${m.a} take away ${m.b} leaves ${m.c}.`;
+        },
+    }),
+    misconceptions: ['subtracted-for-whole', 'added-the-numbers', 'counted-start'],
+    workedSteps: (q) => {
+        const m = missingParts(q);
+        if (!m) return [];
+        const { a, b, c, op, unknown } = m;
+        const ans = unknown === 'a' ? a : unknown === 'b' ? b : c;
+        const done = step(`Write ${ans}.`, [{ slot: 'answer', value: String(ans) }]);
+        if (op === '+') {
+            if (unknown === 'result') return [step(`Start with ${Math.max(a, b)}.`), step(`Count on ${Math.min(a, b)}: ${c}.`), done];
+            const known = unknown === 'a' ? b : a;
+            return [step(`${c} is the whole. ${known} is one part.`), step(`Count on from ${known} to ${c}: ${ans}.`),
+                step(`Check: ${nbsp(`${a} + ${b} = ${c}`)}.`), done];
+        }
+        if (unknown === 'a') return [step('The missing number is the whole.'), step(`Add the parts: ${nbsp(`${b} + ${c} = ${a}`)}.`),
+            step(`Check: ${nbsp(`${a} − ${b} = ${c}`)}.`), done];
+        if (unknown === 'b') return [step(`${a} is the whole. ${c} is one part.`), step(`Count on from ${c} to ${a}: ${b}.`),
+            step(`Check: ${nbsp(`${a} − ${b} = ${c}`)}.`), done];
+        return [step(`Start at ${a}.`), step(`Count back ${b}: ${c}.`), done];
+    },
+    wrongAnswer: (q) => {
+        const m = missingParts(q);
+        if (!m) return null;
+        const { a, b, c, op, unknown } = m;
+        const ans = unknown === 'a' ? a : unknown === 'b' ? b : c;
+        const cands = [];
+        if (op === '-' && unknown === 'a') cands.push({ value: Math.abs(c - b), misconception: 'subtracted-for-whole', slot: 'answer', explain: 'Subtracted the two numbers; the missing number is the whole.' });
+        if (op === '+' && unknown !== 'result') cands.push({ value: (unknown === 'a' ? b : a) + c, misconception: 'added-the-numbers', slot: 'answer', explain: 'Added the two numbers shown.' });
+        if (op === '-' && unknown === 'b') cands.push({ value: a + c, misconception: 'added-the-numbers', slot: 'answer', explain: 'Added the two numbers shown.' });
+        cands.push({ value: ans + 1, misconception: 'counted-start', slot: 'answer', explain: 'Counted the start number when counting on.' });
+        return chooseWrong(q, cands);
+    },
+});

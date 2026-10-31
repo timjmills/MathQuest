@@ -155,7 +155,12 @@ export function readItem(q) {
         const m = /([\d,]+)\s*([−\-+])\s*([\d,]+)/.exec(String(q.text || ''));
         if (m) { a = +m[1].replace(/,/g, ''); b = +m[3].replace(/,/g, ''); op = m[2]; }
     }
-    const ans = Number(String(q.ans).replace(/,/g, ''));
+    // A missing-number sentence on the equation cell (`__ ÷ 4 = 8`, unknown 'a' or 'b'): the item is still
+    // a op b = c, so `ans` is the sentence's result c, never the hidden number; otherwise a ÷ sentence's
+    // quotient band (times tables, at most 12) could not be learned and its divisors read as over-dealt
+    // (ops-family G1, missing_mult_div). Every other item reads its answer as before.
+    const hidden = p && (p.unknown === 'a' || p.unknown === 'b') && Number.isFinite(Number(p.result));
+    const ans = hidden ? Number(p.result) : Number(String(q.ans).replace(/,/g, ''));
     if (!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(ans)) return null;
     return { a, b, ans, op, boxes: p && p.ansDigits != null ? +p.ansDigits : null };
 }

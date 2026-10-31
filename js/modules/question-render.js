@@ -1659,7 +1659,9 @@ function _applyScreenCell() {
         // repeats the equation drawn under the line
         // A word-work story prints its story inside the cell: the line above it is the task
         // (round-4 critic: the card had no instruction), in screen verbs.
-        const _wwInstr = q.cell && q.cell.template === 'word-work' && q.screenInstr ? screenInstruction(q.screenInstr) : '';
+        // (ops-family G1: a missing-number sentence and a zero-in-the-quotient bracket name their task the
+        // same way - "Type the missing number." - never the sentence again with its "____")
+        const _wwInstr = q.cell && ['word-work', 'equation', 'division'].includes(q.cell.template) && q.screenInstr ? screenInstruction(q.screenInstr) : '';
         if (qt && (isNumberLineItem(q) || _wwInstr)) {
             qt.classList.remove('mq-dup');
             qt.style.cssText = '';

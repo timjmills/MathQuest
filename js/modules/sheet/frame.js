@@ -121,7 +121,9 @@ export const BAND_LABELS = Object.freeze([
  * BD-2 label spec, BD-3 strip height. `grow` gives the band the body's spare height.
  */
 export const band = (labelText, instr, content, { grow = false, extra = '' } = {}) =>
-    `<div class="ws-band${grow ? ' grow' : ''}"><div class="ws-strip"><b>${esc(labelText)}</b><span>${esc(instr || '')}</span>${extra}</div>${content}</div>`;
+    // (a library `_word_` is an underlined word, as on the instruction line - the Guided strip
+    // printed "Look at the _sign_." raw; ops-family G1)
+    `<div class="ws-band${grow ? ' grow' : ''}"><div class="ws-strip"><b>${esc(labelText)}</b><span>${esc(instr || '').replace(/_([^_\s][^_]*)_/g, '<u>$1</u>')}</span>${extra}</div>${content}</div>`;
 
 /**
  * BD-8 - the `Say:` band. A full-width strip closing the Model band: bold `Say:` at cell-text

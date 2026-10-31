@@ -1,0 +1,38 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div,division:div_zero_in_quotient --baseline design/audit/baselines/print-lint.json
+
+mq-browser-run: slot 2 after 56s
+ws-print-lint: source kit, 5 skill(s)
+  addition:add_sub_10s#lesson: 6+3 pages, 0 finding(s)
+  addition:add_sub_100s#lesson: 6+3 pages, 0 finding(s)
+  subtraction:missing_add_sub#lesson: 6+3 pages, 2 finding(s)
+  division:missing_mult_div#lesson: 6+3 pages, 0 finding(s)
+  division:div_zero_in_quotient#lesson: 8+4 pages, 14 finding(s)
+
+document                                pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_sub_10s#lesson               6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s#lesson              6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub#lesson        6+3k    .     .    .    .        .     .       2    .     .       .     .    .      .       .        .       .    .  FAIL
+division:missing_mult_div#lesson          6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_zero_in_quotient#lesson      8+4k    6     .    .    .        8     .       .    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                             6     .    .    .        8     .       2    .     .       .     .    .      .       .        .       .    .
+
+addition:add_sub_10s#lesson (Add & Subtract by 10s (lesson))
+
+addition:add_sub_100s#lesson (Add & Subtract by 100s (lesson))
+
+subtraction:missing_add_sub#lesson (Missing Numbers (+/−) (lesson))
+  [L-DENSITY H13 major] x2 (p2,5 cells 2,2) one empty band 30.7 mm wide in a 91.4 mm cell (34%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.fact[data-ws-cell="fact"]> "1 2 + 9" | <div.ws-cell.fact[data-ws-cell="fact"]> "1 2 + 9 1 1"
+
+division:missing_mult_div#lesson (Missing Factors (×/÷) (lesson))
+
+division:div_zero_in_quotient#lesson (Zero in the Quotient (lesson))
+  [L-INK ILLEGIBLE critical] x6 (p1,5 cells 1,2,4,1,2,4) ILLEGIBLE: text "6 ÷ 3 = 2. Subtract " in #000000 on #000000 (contrast 1.00:1) - the pupil cannot read it (INK-5, AX-1)
+      e.g. <div> "6 ÷ 3 = 2. Subtract 6." | <div> "Bring down 2. 3 does not fit..."
+  [L-OVERFLOW PG-12 major] x8 (p1,5 cells 1,2,3,4,1,2,3,4) sticks out of its cell by 16 mm (cell 92.3 x 106.2 mm) (PG-12, CL-1)
+      e.g. <div.mq-cstate.mq-cstate-col> "1 Divide the first place. 2 ..." | <div.mq-cstate.mq-cstate-col> "2 Does not fit? Write 0. 2 0..."
+
+ws-print-lint: FAIL - ratchet: 3 count(s) rose above design/audit/baselines/print-lint.json
+  - subtraction:missing_add_sub#lesson L-DENSITY H13: 0 -> 2
+  - division:div_zero_in_quotient#lesson L-INK ILLEGIBLE: 0 -> 6
+  - division:div_zero_in_quotient#lesson L-OVERFLOW PG-12: 0 -> 8

@@ -1,0 +1,25 @@
+ws-print-lint: source kit, 4 skill(s)
+  addition:add_sub_10s#lesson: 6+3 pages, 0 finding(s)
+  addition:add_sub_100s#lesson: 6+3 pages, 0 finding(s)
+  subtraction:missing_add_sub#lesson: 6+3 pages, 2 finding(s)
+  division:missing_mult_div#lesson: 6+3 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_sub_10s#lesson             6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_sub_100s#lesson            6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:missing_add_sub#lesson      6+3k    .     .    .    .        .     .       2    .     .       .     .    .      .       .        .       .    .  FAIL
+division:missing_mult_div#lesson        6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       2    .     .       .     .    .      .       .        .       .    .
+
+addition:add_sub_10s#lesson (Add & Subtract by 10s (lesson))
+
+addition:add_sub_100s#lesson (Add & Subtract by 100s (lesson))
+
+subtraction:missing_add_sub#lesson (Missing Numbers (+/−) (lesson))
+  [L-DENSITY H13 major] x2 (p2,5 cells 2,2) one empty band 30.7 mm wide in a 91.4 mm cell (34%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.fact[data-ws-cell="fact"]> "1 2 + 9" | <div.ws-cell.fact[data-ws-cell="fact"]> "1 2 + 9 1 1"
+
+division:missing_mult_div#lesson (Missing Factors (×/÷) (lesson))
+
+ws-print-lint: FAIL - ratchet: 1 count(s) rose above design/audit/baselines/print-lint.json
+  - subtraction:missing_add_sub#lesson L-DENSITY H13: 0 -> 2

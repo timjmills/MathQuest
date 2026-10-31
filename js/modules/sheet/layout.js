@@ -753,7 +753,11 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     const even = G / rows;
     // Long procedures and word problems are exempt: their cell's spare height IS the pupil's
     // working space (PT 2.4's 93 x 114 long-division cell).
-    const capped = hMin > 0 && cls !== 'long' && cls !== 'word' && !section.noCap;
+    // (ops-family G1: a section of one-line sentences that start at the top of their cell - `topFill` -
+    // fills the grid: the band under each is writing room, CL-4b, not a sizing error, so the page never
+    // keeps a strip under its last row)
+    const topFill = infos.length > 0 && infos.every((i) => i.fp && i.fp.topFill);
+    const capped = hMin > 0 && cls !== 'long' && cls !== 'word' && !section.noCap && !topFill;
     // The fill limit first (H13, content-based); when that would leave more than a fifth of the
     // grid under the rows (a page of tiny problems held to DN-1's 20), the rows take up to
     // FILL_CAP x their measurement instead - the page is filled before a strip is left.

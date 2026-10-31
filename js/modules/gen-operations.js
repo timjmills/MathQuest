@@ -1368,6 +1368,73 @@ function _dealRung(n, tag = '') {
  * The nineteen appended ladder steps. Returns true when it handled the skill, false when the
  * caller should carry on down the per-category chain.
  */
+/**
+ * ops-family G1: deal ONE item of a skill's whole valid set (indices 0 .. total-1, `decode(i)` ->
+ * {a, b, ans, ...}) down a page, at random and reproducibly (the seeded rng at item 0), so that in
+ * any 20 consecutive items no first number prints more than twice, no answer more than three times
+ * and no pair (a, b) twice (ws-dealer-uniform's page caps; critic r2 N1 of the SU-C pilot). An item
+ * that would break a cap waits for a later slot. Live play (no item index) takes a plain draw.
+ */
+const _PAGE_DEALS = new Map();
+const _PAGE_WINDOW = 19;
+function _pageDeal(key, total, decode) {
+    total = Math.max(1, Math.floor(total));
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : null;
+    if (at === null) return decode(Math.floor(Math.random() * total));
+    // Item 0 opens a page: every deal starts again (as page-deal.js resetPageDeals), so a page never
+    // depends on what an earlier page dealt.
+    if (at === 0) _PAGE_DEALS.clear();
+    let d = _PAGE_DEALS.get(key);
+    if (!d) { d = { order: [], next: 0, seq: [], wait: [] }; _PAGE_DEALS.set(key, d); }
+    const fresh = () => {
+        const p = Array.from({ length: total }, (_, i) => i);
+        for (let i = total - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
+        d.order = p; d.next = 0;
+    };
+    while (d.seq.length <= at) {
+        const win = d.seq.slice(Math.max(0, d.seq.length - _PAGE_WINDOW));
+        // (`c`: a missing-number sentence's result, capped like an answer: it is the sentence's answer side)
+        const fits = (it) => win.filter((w) => w.a === it.a).length < 2 && win.filter((w) => w.ans === it.ans).length < 3
+            && (it.c === undefined || win.filter((w) => w.c === it.c).length < 3)
+            && !win.some((w) => w.a === it.a && w.b === it.b);
+        let pickIt = null;
+        for (let k = 0; k < d.wait.length; k++) if (fits(d.wait[k])) { pickIt = d.wait.splice(k, 1)[0]; break; }
+        for (let tries = 0; !pickIt && tries < Math.min(total, 400); tries++) {
+            if (d.next >= d.order.length) fresh();
+            const it = decode(d.order[d.next++]);
+            if (fits(it)) pickIt = it; else if (d.wait.length < 64) d.wait.push(it);
+        }
+        // (a set too small for the caps: the oldest waiting item, else the next one)
+        if (!pickIt) pickIt = d.wait.length ? d.wait.shift() : (d.next >= d.order.length ? (fresh(), decode(d.order[d.next++])) : decode(d.order[d.next++]));
+        d.seq.push(pickIt);
+    }
+    return d.seq[at];
+}
+
+/**
+ * div_zero_in_quotient's valid set, [dividend, divisor, quotient] by kind:
+ *   tens  h0o ÷ d (721 ÷ 7 = 103): the divisor does not go into the tens
+ *   ones  ht0 ÷ d (930 ÷ 3 = 310): the last place is 0, never dropped
+ *   four  a four-digit dividend whose quotient's hundreds place is 0 (4092 ÷ 4 = 1023)
+ */
+let _ZQ_SET = null;
+function _zeroQuotientSet() {
+    if (_ZQ_SET) return _ZQ_SET;
+    const tens = [], ones = [], four = [];
+    for (let d = 2; d <= 9; d++) {
+        for (let h = 1; h * d <= 9; h++) for (let o = 1; o <= 9; o++) { const q = h * 100 + o; tens.push([q * d, d, q]); }
+        for (let ht = 11; ht * d <= 99; ht++) { if (ht % 10 === 0) continue; const q = ht * 10; ones.push([q * d, d, q]); }
+    }
+    for (let d = 2; d <= 4; d++) {
+        for (let h = 1; h <= 9; h++) for (let t = 0; t <= 9; t++) for (let o = 1; o <= 9; o++) {
+            const q = h * 1000 + t * 10 + o;
+            if (q * d <= 9999) four.push([q * d, d, q]);
+        }
+    }
+    _ZQ_SET = { tens, ones, four };
+    return _ZQ_SET;
+}
+
 function _generateLadderV2(q, skill, helpers, range) {
     const { rng } = helpers;
 
@@ -1899,42 +1966,46 @@ function _generateLadderV2(q, skill, helpers, range) {
     // DL-6. A place the divisor does not go into still gets a digit — M-D2, `312 ÷ 3 = 14`. The
     // quotient is BUILT to carry an interior zero, and the item is checked for it below.
     if (skill === 'div_zero_in_quotient') {
-        let dividend = 0, divisor = 0, quotient = 0;
-        for (let t = 0; t < 40; t++) {
-            const fourDigit = range >= 1000 && rng(0, 2) === 0;
-            const d = fourDigit ? rng(2, 4) : rng(2, 9);
-            if (fourDigit) {
-                const h = rng(1, Math.max(1, Math.floor(9999 / d / 1000)));
-                const qq = h * 1000 + 0 * 100 + rng(0, 9) * 10 + rng(1, 9);
-                if (qq * d > 9999) continue;
-                if (!/^\d0/.test(String(qq))) continue;
-                dividend = qq * d; divisor = d; quotient = qq; break;
-            }
-            const maxQ = Math.floor(999 / d);
-            if (maxQ < 101) continue;
-            const h = rng(1, Math.min(9, Math.floor(maxQ / 100)));
-            const o = rng(1, Math.min(9, maxQ - h * 100));
-            const qq = h * 100 + o;                     // h, 0, o — the zero is the middle place
-            dividend = qq * d; divisor = d; quotient = qq; break;
+        // Three kinds, one seeded draw each (L10), every one carrying a 0 in the quotient:
+        //   tens  the middle place is 0 (h0o): 7)721 = 103, the divisor does not go into the 2
+        //   ones  the last place is 0 (ht0): 3)930 = 310, the pupil must not drop the trailing 0
+        //   four  (Max Number 1,000 and up) a four-digit dividend whose hundreds place is 0: 4)4092 = 1023
+        // The valid set is listed once (_zeroQuotientSet) and dealt down the page without repeats
+        // in a block (page-deal.js): every item of a kind equally likely, no dividend crowding a
+        // page (ws-dealer-uniform). At Max Number 1,000 the three kinds take a third each.
+        const _four = range >= 1000;
+        const _zs = _zeroQuotientSet();
+        let _zl;
+        if (_four) {
+            const kind = ['tens', 'ones', 'four'][dealIndex('zq-kind', 3)];
+            _zl = _zs[kind];
+        } else {
+            _zl = _zs.tens.concat(_zs.ones);
         }
-        if (!divisor) { divisor = 3; quotient = 104; dividend = 312; }
+        const _zd = _pageDeal(`zq:${_four ? 'k' : 'all'}:${_zl.length}`, _zl.length, (j) => {
+            const [A, B, Q] = _zl[j] || [312, 3, 104];
+            return { a: A, b: B, ans: Q };
+        });
+        const dividend = _zd.a, divisor = _zd.b, quotient = _zd.ans;
         q.text = `${dividend.toLocaleString()} ÷ ${divisor} = ?`;
         q.ans = quotient;
         q.a = dividend; q.b = divisor; q.op = '÷';
         q.answerType = 'number';
-        q.options = buildNumericOptions(quotient);
+        q.options = [];
         q.skillLabel = 'Zero in the Quotient';
-        const head = Math.floor(quotient / 100) * divisor;
-        q.hint = `${divisor} does not go into the next digit, so write 0 above it — do not skip the place. `
-            + `${divisor} goes into ${String(dividend)[0]}${String(dividend).length > 3 ? String(dividend)[1] : ''} `
-            + `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times, then 0, then finish.`;
-        q.visual = _wsCell(
-            `<div style="display:inline-flex;align-items:flex-end;font-size:1.9rem;font-weight:700;">`
-            + `<span style="padding-bottom:6px;">${divisor}</span>`
-            + `<div style="border-top:2.25px solid ${_WS_INK};border-left:2.25px solid ${_WS_INK};`
-            + `padding:6px 16px 6px 12px;border-top-left-radius:8px;">${dividend}</div></div>`
-            + `<div style="margin-top:8px;font-size:1rem;">Write a digit in <b>every</b> place of the answer.</div>`);
-        q.printFormat = 'long-division';
+        // The hint names the rule, never a digit of the answer.
+        q.hint = `Divide one place at a time. When ${divisor} does not go into a place, write 0 above it. `
+            + 'Then bring down the next digit.';
+        // The kit's `division` bracket (lint 2026-09-26: the legacy bracket was Arial and had no
+        // named slot): a quotient box over EVERY dividend digit, so the pupil sees the place the 0
+        // fills, and two work rows per dividend digit, so neither the boxes nor the rows tell how
+        // many digits the quotient has beyond what the bracket itself shows. Paper, key and the
+        // screen twin are the same drawing; the quotient boxes are typed one digit each.
+        const _zqPayload = { dividend, divisor, quotient, workRows: 2 * String(dividend).length };
+        q.cell = { template: 'division', v: 1, payload: _zqPayload };
+        q.visual = _kitTwin('division', _zqPayload, { join: '' });
+        q.screenInstr = 'Divide. Write a digit in every box of the answer.';
+        q.printFormat = 'long-div-kit';
         q.notation = 'bracket';
         return true;
     }
@@ -2208,6 +2279,17 @@ function _kitTwin(template, payload, { join = null } = {}) {
         html = _kitRender({ cell: { template, v: 1, payload } }, { mode: 'screen', static: true, size: 'L', look: 'ican', state: 'blank' });
     } catch (e) { html = ''; }
     return join === null ? html : `<div data-mq-join="${join}">${html}</div>`;
+}
+
+/**
+ * The screen twin of an `equation` cell: the same sentence, its ONE answer slot marked so the
+ * host's input takes its place (a box before =, the line after =), never a second answer row.
+ */
+function _eqTwin(payload) {
+    const html = _kitTwin('equation', payload);
+    const shape = (payload.unknown || 'result') === 'result' ? 'line' : 'box';
+    // In a `.ws-sheet` scope, so the sentence keeps the kit's tracks around its signs on screen.
+    return `<div class="ws-sheet mq-kit">${html.replace(/data-ws-slot="answer"/, `data-ws-slot="answer" data-mq-blank="${shape}"`)}</div>`;
 }
 
 /**
@@ -4579,67 +4661,92 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             }
 
             if (mappedSkill === "missing_add_sub") {
-                // Missing Numbers - Addition/Subtraction
-                const positions = ['first_add', 'second_add', 'sum', 'minuend', 'subtrahend', 'difference'];
-                const position = pick(positions);
+                // Missing Numbers - Addition/Subtraction (catalogue subtraction.md row 136).
+                // The DEFAULT deal is a missing-number item: the unknown sits BEFORE the = sign
+                // (___ + 5 = 12, 14 − ___ = 6). "The answer" (8 + 5 = ___) is an opt-in value of
+                // the `unknown` option; `task` picks + or − (both ticked mixes them, one sign read
+                // per item). Whole numbers only: the Decimals setting does not leak in (grade 1,
+                // 1.OA.D.8). "Within N" bounds the whole (the sum, the number you take from).
+                const _ticks = (id, all) => {
+                    let t = _opt(id);
+                    if (typeof t === 'number') t = [t];
+                    t = Array.isArray(t) ? all.filter(v => t.includes(v)) : [];
+                    return t.length ? t : all;
+                };
+                const _unk = _ticks('unknown', [0, 1]);
+                const _ops = _ticks('task', [0, 1]);
+                const _posFor = (isAdd) => [
+                    ...(_unk.includes(1) ? (isAdd ? ['first_add', 'second_add'] : ['minuend', 'subtrahend']) : []),
+                    ...(_unk.includes(0) ? [isAdd ? 'sum' : 'difference'] : []),
+                ];
                 const missingMax = Math.max(10, range);
-                const missingHalf = Math.max(5, Math.floor(range / 2));
-                const useDec = state.decimalPlaces > 0;
-                const dp = state.decimalPlaces;
+                // The page deals from the whole valid set (sign, position, whole, part) without
+                // repeats in a block (page-deal.js), so no number or answer crowds a page and the
+                // positions come evenly; a very large band deals the whole first (weighted by how
+                // many parts it has, so every item stays equally likely), then a part.
+                const _P = [..._ops.includes(0) ? _posFor(true) : [], ..._ops.includes(1) ? _posFor(false) : []];
+                const _T = ((missingMax - 1) * missingMax) / 2 - 3;          // sum of (w - 1), w = 4..max
+                let position, whole, part1;
+                if (_P.length * _T <= 20000) {
+                    const _dl = _pageDeal(`mas:${missingMax}:${_P.join(',')}`, _P.length * _T, (j) => {
+                        const pos = _P[Math.floor(j / _T)];
+                        let r = j % _T, w = 4;
+                        while (r >= w - 1) { r -= w - 1; w += 1; }
+                        const p1 = r + 1, add = pos === 'first_add' || pos === 'second_add' || pos === 'sum';
+                        // (a, b, ans as the item will carry them: a op b = c)
+                        const A = add ? p1 : w, B = add ? w - p1 : p1, C = add ? w : w - p1;
+                        const ans = pos === 'first_add' || pos === 'minuend' ? A : pos === 'second_add' || pos === 'subtrahend' ? B : C;
+                        return { pos, whole: w, part1: p1, a: A, b: B, ans, c: C };
+                    });
+                    position = _dl.pos; whole = _dl.whole; part1 = _dl.part1;
+                } else {
+                    position = dealPick(`mas-pos:${_P.join(',')}`, _P);
+                    whole = 4 + dealIndex(`mas-whole:${missingMax}`, missingMax - 3, Array.from({ length: missingMax - 3 }, (_, i) => i + 3));
+                    part1 = rng(1, whole - 1);
+                }
+                const isAdd = position === 'first_add' || position === 'second_add' || position === 'sum';
+                // One answer width for the page: the widest answer any allowed position can reach.
+                const _allPos = [..._ops.includes(0) ? _posFor(true) : [], ..._ops.includes(1) ? _posFor(false) : []];
+                const _widest = _allPos.some(p => p === 'sum' || p === 'minuend') ? missingMax : missingMax - 1;
 
-                let a, b, c, text, ans;
-
-                if (position === 'first_add') {
-                    b = rng(1, missingHalf);
-                    c = rng(b + 1, missingMax);
-                    if (useDec) { b = applyDecimals(b); c = applyDecimals(c); if (c <= b) c = parseFloat((b + 1).toFixed(dp)); }
-                    a = useDec ? parseFloat((c - b).toFixed(dp)) : c - b;
-                    text = `___ + ${b} = ${c}`;
-                    ans = a;
-                } else if (position === 'second_add') {
-                    a = rng(1, missingHalf);
-                    c = rng(a + 1, missingMax);
-                    if (useDec) { a = applyDecimals(a); c = applyDecimals(c); if (c <= a) c = parseFloat((a + 1).toFixed(dp)); }
-                    b = useDec ? parseFloat((c - a).toFixed(dp)) : c - a;
-                    text = `${a} + ___ = ${c}`;
-                    ans = b;
-                } else if (position === 'sum') {
-                    a = rng(1, missingHalf);
-                    b = rng(1, missingHalf);
-                    if (useDec) { a = applyDecimals(a); b = applyDecimals(b); }
-                    c = useDec ? parseFloat((a + b).toFixed(dp)) : a + b;
-                    text = `${a} + ${b} = ___`;
-                    ans = c;
-                } else if (position === 'minuend') {
-                    b = rng(1, missingHalf);
-                    c = rng(1, missingHalf);
-                    if (useDec) { b = applyDecimals(b); c = applyDecimals(c); }
-                    a = useDec ? parseFloat((b + c).toFixed(dp)) : b + c;
-                    text = `___ − ${b} = ${c}`;
-                    ans = a;
-                } else if (position === 'subtrahend') {
-                    a = rng(10, missingMax);
-                    c = rng(1, a - 1);
-                    if (useDec) { a = applyDecimals(a); c = applyDecimals(c); if (c >= a) c = parseFloat((a - 1).toFixed(dp)); }
-                    b = useDec ? parseFloat((a - c).toFixed(dp)) : a - c;
-                    text = `${a} − ___ = ${c}`;
-                    ans = b;
-                } else { // difference
-                    a = rng(10, missingMax);
-                    b = rng(1, a - 1);
-                    if (useDec) { a = applyDecimals(a); b = applyDecimals(b); if (b >= a) b = parseFloat((a - 1).toFixed(dp)); }
-                    c = useDec ? parseFloat((a - b).toFixed(dp)) : a - b;
-                    text = `${a} − ${b} = ___`;
-                    ans = c;
+                // whole = part + part, every part at least 1, the whole at most missingMax (and at
+                // least 4, so "1 + ___ = 2" is not dealt as a missing-number item)
+                const part2 = whole - part1;
+                let a, b, c, text, ans, unknown;
+                if (isAdd) {
+                    a = part1; b = part2; c = whole;
+                    if (position === 'first_add') { text = `___ + ${b} = ${c}`; ans = a; unknown = 'a'; }
+                    else if (position === 'second_add') { text = `${a} + ___ = ${c}`; ans = b; unknown = 'b'; }
+                    else { text = `${a} + ${b} = ___`; ans = c; unknown = 'result'; }
+                } else {
+                    a = whole; b = part1; c = part2;
+                    if (position === 'minuend') { text = `___ − ${b} = ${c}`; ans = a; unknown = 'a'; }
+                    else if (position === 'subtrahend') { text = `${a} − ___ = ${c}`; ans = b; unknown = 'b'; }
+                    else { text = `${a} − ${b} = ___`; ans = c; unknown = 'result'; }
                 }
 
                 q.text = text;
                 q.ans = ans;
-                q.hint = position.includes('add') || position === 'sum'
-                    ? `Think: What number makes this addition true?`
-                    : `Think: What number makes this subtraction true?`;
+                q.a = a; q.b = b; q.op = isAdd ? '+' : '-';
+                q.missing = unknown === 'result' ? null : unknown;
+                q.answerType = 'number';
+                q.hint = isAdd
+                    ? (unknown === 'result' ? 'Start with the bigger number. Count on the other.'
+                        : `Start at the number you know. Count on to ${c}. How many did you count?`)
+                    : (unknown === 'a' ? `The missing number is the whole. Put the parts together: ${b} and ${c}.`
+                        : unknown === 'b' ? `Start at ${c}. Count on to ${a}. How many did you count?`
+                            : 'Start at the bigger number. Count back.');
                 q.missingNumberData = { position, a, b, c };
+                q.opsDealt = [..._ops.includes(0) ? ['+'] : [], ..._ops.includes(1) ? ['-'] : []];
                 q.printFormat = "missing-number";
+                // The kit's `equation` cell: the unknown's own slot (a box before =, a line after),
+                // as wide as the widest answer the band allows on this page, never this answer (L3).
+                // (`fact: true`: a one-line sentence, packed by its measured height like the across facts,
+                // print-sheet.js; it draws exactly as before - the fact look is for an answer after =)
+                const _maPayload = { a, b, operands: [a, b], op: isAdd ? '+' : '-', result: c, unknown, digits: String(_widest).length, fact: true };
+                q.cell = { template: 'equation', v: 1, payload: _maPayload };
+                q.visual = _eqTwin(_maPayload);
+                q.screenInstr = 'Write the missing number.';
                 q.options = buildNumericOptions(ans);
                 return;
             }
@@ -4720,25 +4827,47 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const _mmDeal = !(_mmTicked.length === 1 && _mmTicked[0] === 'across');
                 // L10: ÷ or × per cell and the ÷ notation are two independent deals (page-deal.js),
                 // balanced but in a random order, never × ÷ × ÷.
-                const _mmDiv = _mmDeal && dealIndex(`mm-op:${state.skill}`, 2) === 0;
-                const position = !_mmDeal ? pick(positions)
-                    : (_mmDiv ? pick(['dividend', 'divisor', 'quotient']) : pick(['first_factor', 'second_factor', 'product']));
+                // ops-family G1: a page whose ticked ways are ALL ÷ forms (Bracket, Fraction bar - no Across)
+                // is a page of ÷ sentences: a × sentence cannot be written on a bracket or a bar, and a
+                // one-line × beside a two-line fraction left one band in every mixed row (H13).
+                // ops-family r2 (2026-10-31): `task` ticked to one sign (0 = ×, 1 = ÷; the presets missing_mult_only /
+                // missing_div_only) deals that sign's sentences only. Unticked or both: null, the deal below is unchanged.
+                const _mmT = _p12Narrowed('task');
+                const _mmOnly = _mmT && _mmT.length === 1 ? (_mmT[0] === 1 ? 'div' : 'mult') : null;
+                const _mmDiv = _mmOnly ? _mmOnly === 'div' : _mmDeal && (!_mmTicked.includes('across') || dealIndex(`mm-op:${state.skill}`, 2) === 0);
+                // ops-family G1 (2026-10-30): the skill is "Missing Factors", so every item hides a number
+                // BEFORE the = sign (___ × 6 = 42, 42 ÷ ___ = 7). The plain product / quotient after = is
+                // the fact drills' job (mult_facts, div_facts) and is no longer dealt here.
+                void positions;
+                const _mmPos = !_mmDeal && !_mmOnly ? ['first_factor', 'second_factor', 'dividend', 'divisor']
+                    : (_mmDiv ? ['dividend', 'divisor'] : ['first_factor', 'second_factor']);
                 const _mmNotation = _mmDeal ? dealPick(`mm-notation:${state.skill}`, _mmTicked) : null;
                 // Scale factor range: for range<=100 use 2-12 (times tables), for larger ranges scale up
                 const mmFactorMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 25);
+                // One draw from the whole valid set (position x factor pair, factors 2..max), dealt
+                // down the page without repeats in a block (page-deal.js, ws-dealer-uniform).
+                const _mmK = mmFactorMax - 1;
+                const _mmDl = _pageDeal(`mm-item:${mmFactorMax}:${_mmPos.join(',')}`, _mmPos.length * _mmK * _mmK, (j) => {
+                    const pos = _mmPos[Math.floor(j / (_mmK * _mmK))];
+                    const f1 = 2 + Math.floor((j % (_mmK * _mmK)) / _mmK), f2 = 2 + (j % _mmK);
+                    // (a, b, ans as the item will carry them: a × b = c, a ÷ b = c)
+                    const r = pos === 'first_factor' ? { a: f2, b: f1, ans: f2 } : pos === 'second_factor' ? { a: f1, b: f2, ans: f2 }
+                        : pos === 'dividend' ? { a: f1 * f2, b: f1, ans: f1 * f2 } : { a: f1 * f2, b: f2, ans: f2 };
+                    // (c: the sentence's result - the product, or the quotient)
+                    const cc = pos === 'first_factor' || pos === 'second_factor' ? f1 * f2 : pos === 'dividend' ? f2 : f1;
+                    return { pos, f1, f2, ...r, c: cc };
+                });
+                const position = _mmDl.pos;
+                const _mmF1 = _mmDl.f1, _mmF2 = _mmDl.f2;
 
                 let a, b, c, text, ans, displayText;
 
                 if (position === 'first_factor') {
-                    b = rng(2, mmFactorMax);
-                    c = rng(2, mmFactorMax) * b;
-                    a = c / b;
+                    b = _mmF1; a = _mmF2; c = a * b;
                     text = `___ × ${b} = ${c}`;
                     ans = a;
                 } else if (position === 'second_factor') {
-                    a = rng(2, mmFactorMax);
-                    c = a * rng(2, mmFactorMax);
-                    b = c / a;
+                    a = _mmF1; b = _mmF2; c = a * b;
                     text = `${a} × ___ = ${c}`;
                     ans = b;
                 } else if (position === 'product') {
@@ -4748,15 +4877,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     text = `${a} × ${b} = ___`;
                     ans = c;
                 } else if (position === 'dividend') {
-                    b = rng(2, mmFactorMax);
-                    c = rng(2, mmFactorMax);
-                    a = b * c;
+                    b = _mmF1; c = _mmF2; a = b * c;
                     text = `___ ÷ ${b} = ${c}`;
                     ans = a;
                 } else if (position === 'divisor') {
-                    c = rng(2, mmFactorMax);
-                    b = rng(2, mmFactorMax);
-                    a = b * c;
+                    c = _mmF1; b = _mmF2; a = b * c;
                     text = `${a} ÷ ___ = ${c}`;
                     ans = b;
                 } else { // quotient
@@ -4811,18 +4936,20 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     : `Think: What number completes this division?`;
                 q.missingNumberData = { position, a, b, c, displayText };
                 q.printFormat = "missing-factor";
-                // P11: a ÷ item written on a bracket or a fraction bar prints that way too (the kit's
-                // `equation` cell, its ÷ notation branch); Across keeps the one-line legacy cell.
-                if ((q.notation === 'bracket' || q.notation === 'fraction') && q.op === '÷') {
-                    q.cell = { template: 'equation', v: 1, payload: {
-                        a, b, op: '/', result: c, notation: q.notation, digits: String(ans).length,
-                        unknown: position === 'dividend' ? 'a' : position === 'divisor' ? 'b' : 'result',
-                    } };
-                }
-                
-                q.visual = `<div style="text-align:center;font-size:1.5rem;font-weight:600;margin:20px 0;">
-                    ${displayText || text}
-                </div>`;
+                // The kit's `equation` cell for EVERY notation (ops-family G1): Across is the one-line
+                // sentence, a ÷ item ticked Bracket or Fraction keeps the cell's ÷ notation branch. One
+                // box width for the page: the widest answer the band allows (a dividend up to
+                // mmFactorMax²), never this answer's own length (L3). Paper, key and screen: one drawing.
+                const _mmIsDiv = q.op === '÷';
+                const _mmPayload = {
+                    a, b, operands: [a, b], op: _mmIsDiv ? '/' : '*', result: c, digits: String(mmFactorMax * mmFactorMax).length, fact: true,
+                    ...(_mmIsDiv && (q.notation === 'bracket' || q.notation === 'fraction') ? { notation: q.notation } : {}),
+                    unknown: position === 'dividend' || position === 'first_factor' ? 'a' : position === 'divisor' || position === 'second_factor' ? 'b' : 'result',
+                };
+                q.cell = { template: 'equation', v: 1, payload: _mmPayload };
+                q.answerType = 'number';
+                q.visual = _eqTwin(_mmPayload);
+                q.screenInstr = 'Write the missing number.';
                 q.options = buildNumericOptions(ans);
                 return;
             }
@@ -6477,49 +6604,55 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             else ops = ["+"]; // Default to addition if skill not recognized
             const op = pick(ops);
             
-            // Handle Add/Subtract by 10s skill
-            if (addSub10s) {
-                const isAdd = Math.random() < 0.5;
-                if (isAdd) {
-                    const base = rng(0, 9) * 10; // 0, 10, 20, ..., 90
-                    q.text = `${base} + 10 = ?`;
-                    q.ans = base + 10;
-                    q.a = base; q.b = 10; q.op = '+';
-                    q.hint = `When adding 10, the tens digit goes up by 1. ${base} + 10 = ${base + 10}`;
-                    q.options = buildNumericOptions(q.ans, 10);
-                    q.skillLabel = '+/− 10s';
-                } else {
-                    const base = rng(1, 10) * 10; // 10, 20, ..., 100
-                    q.text = `${base} − 10 = ?`;
-                    q.ans = base - 10;
-                    q.a = base; q.b = 10; q.op = '-';
-                    q.hint = `When subtracting 10, the tens digit goes down by 1. ${base} − 10 = ${base - 10}`;
-                    q.options = buildNumericOptions(q.ans, 10);
-                    q.skillLabel = '+/− 10s';
-                }
-                return;
-            }
-            
-            // Handle Add/Subtract by 100s skill
-            if (addSub100s) {
-                const isAdd = Math.random() < 0.5;
-                if (isAdd) {
-                    const base = rng(0, 9) * 100; // 0, 100, 200, ..., 900
-                    q.text = `${base} + 100 = ?`;
-                    q.ans = base + 100;
-                    q.a = base; q.b = 100; q.op = '+';
-                    q.hint = `When adding 100, the hundreds digit goes up by 1. ${base} + 100 = ${base + 100}`;
-                    q.options = buildNumericOptions(q.ans, 100);
-                    q.skillLabel = '+/− 100s';
-                } else {
-                    const base = rng(1, 10) * 100; // 100, 200, ..., 1000
-                    q.text = `${base} − 100 = ?`;
-                    q.ans = base - 100;
-                    q.a = base; q.b = 100; q.op = '-';
-                    q.hint = `When subtracting 100, the hundreds digit goes down by 1. ${base} − 100 = ${base - 100}`;
-                    q.options = buildNumericOptions(q.ans, 100);
-                    q.skillLabel = '+/− 100s';
-                }
+            // Add / subtract 10 and 100 (1.NBT.C.5, 2.NBT.B.8): "10 more / 10 less than ANY number in
+            // the band" (43 + 10, 367 − 100), never only a multiple of ten ± 10 (catalogue addition.md
+            // row 118). The `task` option picks the operation (both ticked mixes them) and `band`
+            // ("Numbers to") bounds every number on the item, the answer included. A mental fact read
+            // across: the kit's `fact` template, notation 'horiz', its answer line as wide as the
+            // widest answer the page can reach (L3), never this item's own answer.
+            // Drawn on the kit's `equation` cell (one sentence, the answer line after =), not the
+            // `fact` cell: the fact cell keeps the vertical fact's 38 mm height and its own digit
+            // ladder at every size, so S printed the L page (3 x 4, 12 items, L1) and each cell was
+            // more than half empty (L2); the equation cell reads the S / M / L metrics (ops-family G1).
+            if (addSub10s || addSub100s) {
+                const _step = addSub10s ? 10 : 100;
+                const _M = Number(_opt('band')) || (addSub10s ? 100 : 1000);
+                const _t = _p12Narrowed('task');
+                const _canAdd = !_t || _t.includes(0), _canSub = !_t || _t.includes(1);
+                // + : the start number is at least one step (a 2-digit / 3-digit number) and the sum
+                //     stays inside the band; − : the start is inside the band and the answer above 0.
+                // The page deals from the WHOLE valid set without repeats (page-deal.js): every valid
+                // item equally likely, no item twice in a block, the sign and the number one draw
+                // (ws-dealer-uniform: no start number or answer crowds a page).
+                const _addN = _canAdd ? _M - 2 * _step + 1 : 0;
+                const _subN = _canSub ? _M - _step : 0;
+                const _dl = _pageDeal(`as:${_step}:${_M}:${_addN}:${_subN}`, _addN + _subN, (j) => {
+                    const add = j < _addN, st = add ? _step + j : _step + 1 + (j - _addN);
+                    return { add, a: st, b: _step, ans: add ? st + _step : st - _step };
+                });
+                const isAdd = _dl.add;
+                const base = _dl.a;
+                const ans = isAdd ? base + _step : base - _step;
+                const glyph = isAdd ? '+' : '−';
+                q.text = `${base} ${glyph} ${_step} = ?`;
+                q.ans = ans;
+                q.a = base; q.b = _step; q.op = isAdd ? '+' : '-';
+                q.answerType = 'number';
+                const _place = addSub10s ? 'tens' : 'hundreds';
+                const _keep = addSub10s ? 'The ones digit does not change.' : 'The tens and ones digits do not change.';
+                // The hint names the move, never the answer (catalogue: the old hint stated it).
+                q.hint = `${isAdd ? 'Count on' : 'Count back'} one ${addSub10s ? 'ten' : 'hundred'} from ${base}. `
+                    + `Only the ${_place} change. ${_keep}`;
+                q.options = buildNumericOptions(ans, _step);
+                q.skillLabel = addSub10s ? '+/− 10s' : '+/− 100s';
+                q.notation = 'across';
+                // The signs this page deals: the instruction reads "Add.", "Subtract." or "Look at the sign." from it (L6).
+                q.opsDealt = [...(_canAdd ? ['+'] : []), ...(_canSub ? ['-'] : [])];
+                const _digits = String(_canAdd ? _M : _M - _step).length;
+                // `fact: true`: the kit's ONE across-fact look (div_facts' Standard form): tight tracks,
+                // and the answer line under the sentence where the column is too narrow beside it.
+                q.cell = { template: 'equation', v: 1, payload: { a: base, b: _step, op: isAdd ? '+' : '-', result: ans, unknown: 'result', digits: _digits, fact: true } };
+                q.visual = '';
                 return;
             }
 

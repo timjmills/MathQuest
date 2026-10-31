@@ -3610,8 +3610,14 @@
     }
    ],
    "preBuild": [],
-   "related": [],
-   "note": "Max Number 20: missing_add_sub deals 12 − __ = 7 and 7 + 9; cloze_addition deals \"make 16\". Related: none; the candidate links are missing_add_sub (a direct skill here); cloze_addition (a direct skill here); number_bonds (a pre-skill here)."
+   "related": [
+    {
+     "key": "subtraction:missing_add_sub_answer",
+     "why": "shares 1.OA.D.8: the same sentence with the box after the = sign (8 + 5 = __)",
+     "opts": {}
+    }
+   ],
+   "note": "Max Number 20: missing_add_sub deals 12 − __ = 7 and 7 + 9; cloze_addition deals \"make 16\". Related: missing_add_sub_answer (the same sentence, the answer missing); the other candidate links are missing_add_sub (a direct skill here); cloze_addition (a direct skill here); number_bonds (a pre-skill here)."
   },
   "Y1.B6.S1": {
    "title": "Count from 20 to 50",

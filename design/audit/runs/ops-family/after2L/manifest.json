@@ -1,0 +1,3703 @@
+[
+  {
+    "skill": "addition:add_sub_10s",
+    "category": "addition",
+    "skillId": "add_sub_10s",
+    "label": "Add & Subtract by 10s",
+    "grade": "1",
+    "dir": "addition__add_sub_10s",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 2,
+          "rows": 5,
+          "perPage": 10,
+          "pages": 1,
+          "trimmed": 0,
+          "note": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 28 pt. Dense: 2 x 5, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 5,
+              "perPage": 10,
+              "pages": 1,
+              "cellW": 93,
+              "cellH": 45.4,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 2 x 5, cells sized to the problems.",
+              "line": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 28 pt. Dense: 2 x 5, cells sized to the problems.",
+              "cls": "short",
+              "digitPt": 28,
+              "hMin": 36,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 862246,
+        "title": "I Can add and subtract 10",
+        "notes": [
+          "Dense: 2 x 5, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "74 + 10 = ?",
+            "ans": "84",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "68 + 10 = ?",
+            "ans": "78",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "92 − 10 = ?",
+            "ans": "82",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "43 + 10 = ?",
+            "ans": "53",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "38 + 10 = ?",
+            "ans": "48",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "99 − 10 = ?",
+            "ans": "89",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "87 − 10 = ?",
+            "ans": "77",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "36 + 10 = ?",
+            "ans": "46",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "62 − 10 = ?",
+            "ans": "52",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "19 − 10 = ?",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 53.5
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 7.2
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.2
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -15.9
+              }
+            }
+          }
+        ],
+        "role": "independent",
+        "size": "L",
+        "opts": null,
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 81,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 94,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            10
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 62
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "a8ad1e4fa1700281"
+          ],
+          "measured": [
+            {
+              "cells": 10,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 10,
+                "minMm": [
+                  25,
+                  10
+                ],
+                "sizes": [
+                  "25x10 mm ×10"
+                ]
+              },
+              "band": {
+                "hPct": 56.1,
+                "wPct": 7.2,
+                "cell": 8
+              },
+              "footPct": 27.2
+            }
+          ]
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            10
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 72
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "aeb163afb7ed5775"
+          ],
+          "measured": [
+            {
+              "cells": 10,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 10,
+                "minMm": [
+                  25,
+                  10
+                ],
+                "sizes": [
+                  "25x10 mm ×10"
+                ]
+              },
+              "band": {
+                "hPct": 56.1,
+                "wPct": 7.2,
+                "cell": 8
+              },
+              "footPct": 27.2
+            }
+          ]
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "",
+        "text": "37 + 10 = ?",
+        "ans": "47",
+        "seed": 3091087958,
+        "contentHash": "410347cc4206fad9",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "",
+        "text": "37 + 10 = ?",
+        "ans": "47",
+        "seed": 3091087958,
+        "contentHash": "71029ce6a4b9f700",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "",
+        "text": "37 + 10 = ?",
+        "ans": "47",
+        "seed": 3091087958,
+        "contentHash": "71029ce6a4b9f700",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "seed": 3395772968,
+        "contentHash": "7993f93bbb245c48",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 239, 141)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              30
+            ],
+            [
+              "Nunito",
+              18
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "seed": 3266551625,
+        "contentHash": "55513dfdc4cc18eb",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              4
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              3
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "box-shadow",
+              2
+            ],
+            [
+              "color:rgb(46, 42, 69)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 226, 82)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "addition:add_sub_100s",
+    "category": "addition",
+    "skillId": "add_sub_100s",
+    "label": "Add & Subtract by 100s",
+    "grade": "2",
+    "dir": "addition__add_sub_100s",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 1,
+          "rows": 5,
+          "perPage": 5,
+          "pages": 1,
+          "trimmed": 0,
+          "note": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 1,
+              "rows": 5,
+              "perPage": 5,
+              "pages": 1,
+              "cellW": 186,
+              "cellH": 45.4,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 1 x 5, cells sized to the problems.",
+              "line": "Fits: 1 column x 5 rows, 5 per page, 1 page. Digits 28 pt. Dense: 1 x 5, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 28,
+              "hMin": 36,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 205040,
+        "title": "I Can add and subtract 100",
+        "notes": [
+          "Dense: 1 x 5, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "equation",
+            "fclass": "standard",
+            "text": "869 + 100 = ?",
+            "ans": "969",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 43.6
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -2.7
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -18.1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -25.8
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "standard",
+            "text": "386 + 100 = ?",
+            "ans": "486",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 43.6
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -2.7
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -18.1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -25.8
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "standard",
+            "text": "909 − 100 = ?",
+            "ans": "809",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 43.6
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -2.7
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -18.1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -25.8
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "standard",
+            "text": "224 + 100 = ?",
+            "ans": "324",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 43.6
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -2.7
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -18.1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -25.8
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "standard",
+            "text": "866 − 100 = ?",
+            "ans": "766",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 43.6
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -2.7
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -18.1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -25.8
+              }
+            }
+          }
+        ],
+        "role": "independent",
+        "size": "L",
+        "opts": null,
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 59,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 67,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            5
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 37
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "a858893d3fa408c1"
+          ],
+          "measured": [
+            {
+              "cells": 5,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 5,
+                "minMm": [
+                  32,
+                  10
+                ],
+                "sizes": [
+                  "32x10 mm ×5"
+                ]
+              },
+              "band": {
+                "hPct": 56.1,
+                "wPct": 23.6,
+                "cell": 4
+              },
+              "footPct": 27.2
+            }
+          ]
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            5
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 42
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "45116114aabb1432"
+          ],
+          "measured": [
+            {
+              "cells": 5,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 5,
+                "minMm": [
+                  32,
+                  10
+                ],
+                "sizes": [
+                  "32x10 mm ×5"
+                ]
+              },
+              "band": {
+                "hPct": 56.1,
+                "wPct": 23.6,
+                "cell": 4
+              },
+              "footPct": 27.2
+            }
+          ]
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "",
+        "text": "450 + 100 = ?",
+        "ans": "550",
+        "seed": 3775572304,
+        "contentHash": "78e20beea3b56a12",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "",
+        "text": "450 + 100 = ?",
+        "ans": "550",
+        "seed": 3775572304,
+        "contentHash": "283329b050603314",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "",
+        "text": "450 + 100 = ?",
+        "ans": "550",
+        "seed": 3775572304,
+        "contentHash": "283329b050603314",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              6
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "seed": 3202938338,
+        "contentHash": "4e47b391387e548c",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 240, 144)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              30
+            ],
+            [
+              "Nunito",
+              18
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "seed": 2553861919,
+        "contentHash": "d7789ba77d8bcbb5",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              4
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              3
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "box-shadow",
+              2
+            ],
+            [
+              "color:rgb(46, 42, 69)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 226, 80)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "subtraction:missing_add_sub",
+    "category": "subtraction",
+    "skillId": "missing_add_sub",
+    "label": "Missing Numbers (+/−)",
+    "grade": "1",
+    "dir": "subtraction__missing_add_sub",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 2,
+          "rows": 5,
+          "perPage": 10,
+          "pages": 1,
+          "trimmed": 0,
+          "note": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 28 pt. Dense: 2 x 5, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 5,
+              "perPage": 10,
+              "pages": 1,
+              "cellW": 93,
+              "cellH": 45.4,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 2 x 5, cells sized to the problems.",
+              "line": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 28 pt. Dense: 2 x 5, cells sized to the problems.",
+              "cls": "short",
+              "digitPt": 28,
+              "hMin": 36,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 503800,
+        "title": "I Can find the missing number",
+        "notes": [
+          "Dense: 2 x 5, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ + 5 = 11",
+            "ans": "6",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 59.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 13.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -1.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -9.6
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ − 2 = 2",
+            "ans": "4",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 62.7
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 16.4
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": 1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -6.7
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ + 2 = 15",
+            "ans": "13",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 59.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 13.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -1.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -9.6
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ + 7 = 12",
+            "ans": "5",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 59.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 13.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -1.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -9.6
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "9 − ___ = 8",
+            "ans": "1",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 62.7
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 16.4
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": 1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -6.7
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ + 2 = 7",
+            "ans": "5",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 62.7
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 16.4
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": 1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -6.7
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "20 − ___ = 9",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 59.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 13.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -1.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -9.6
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ − 1 = 8",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 62.7
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 16.4
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": 1
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -6.7
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "6 + ___ = 17",
+            "ans": "11",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 59.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 13.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -1.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -9.6
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "2 + ___ = 15",
+            "ans": "13",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 59.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 13.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -1.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -9.6
+              }
+            }
+          }
+        ],
+        "role": "independent",
+        "size": "L",
+        "opts": null,
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 82,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 93,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            10
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 61
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "dec92dd231a980ad"
+          ],
+          "measured": [
+            {
+              "cells": 10,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 10,
+                "minMm": [
+                  17,
+                  10
+                ],
+                "sizes": [
+                  "17x10 mm ×10"
+                ]
+              },
+              "band": {
+                "hPct": 56.1,
+                "wPct": 17.8,
+                "cell": 8
+              },
+              "footPct": 27.2
+            }
+          ]
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            10
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 71
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "4282c437ed25f797"
+          ],
+          "measured": [
+            {
+              "cells": 10,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 10,
+                "minMm": [
+                  17,
+                  10
+                ],
+                "sizes": [
+                  "17x10 mm ×10"
+                ]
+              },
+              "band": {
+                "hPct": 56.1,
+                "wPct": 17.8,
+                "cell": 8
+              },
+              "footPct": 27.2
+            }
+          ]
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "missing-number",
+        "text": "1 + ___ = 8",
+        "ans": "7",
+        "seed": 1107200328,
+        "contentHash": "655de81923df0b81",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "missing-number",
+        "text": "1 + ___ = 8",
+        "ans": "7",
+        "seed": 1107200328,
+        "contentHash": "04b2c481f92dca4b",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "missing-number",
+        "text": "1 + ___ = 8",
+        "ans": "7",
+        "seed": 1107200328,
+        "contentHash": "adb004afab454cfd",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "seed": 2992400794,
+        "contentHash": "05f7e26408ec5665",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 241, 149)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              30
+            ],
+            [
+              "Nunito",
+              18
+            ]
+          ],
+          "smallTargets": [
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            }
+          ],
+          "smallTargetCount": 6
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "seed": 608178455,
+        "contentHash": "8225c0f759a97715",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              4
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              3
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "box-shadow",
+              2
+            ],
+            [
+              "color:rgb(46, 42, 69)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 226, 80)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "division:missing_mult_div",
+    "category": "division",
+    "skillId": "missing_mult_div",
+    "label": "Missing Factors (×/÷)",
+    "grade": "3",
+    "dir": "division__missing_mult_div",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 2,
+          "rows": 5,
+          "perPage": 10,
+          "pages": 1,
+          "trimmed": 0,
+          "note": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 28 pt. Dense: 2 x 5, cells sized to the problems.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 5,
+              "perPage": 10,
+              "pages": 1,
+              "cellW": 93,
+              "cellH": 45.4,
+              "requested": "auto",
+              "clamped": false,
+              "note": "Dense: 2 x 5, cells sized to the problems.",
+              "line": "Fits: 2 columns x 5 rows, 10 per page, 1 page. Digits 28 pt. Dense: 2 x 5, cells sized to the problems.",
+              "cls": "standard",
+              "digitPt": 28,
+              "hMin": 36,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 495367,
+        "title": "I Can find the missing number in × and ÷",
+        "notes": [
+          "Dense: 2 x 5, cells sized to the problems."
+        ],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "12 × ___ = 96",
+            "ans": "8",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 52.9
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 6.6
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.8
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -16.5
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 6 = 2",
+            "ans": "12",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 58.7
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 12.4
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -3
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -10.7
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "8 × ___ = 16",
+            "ans": "2",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 55.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 9.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -5.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -13.6
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "standard",
+            "text": "___ ÷ 10 = 12",
+            "ans": "120",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 52.9
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 6.6
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.8
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -16.5
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "standard",
+            "text": "___ ÷ 11 = 12",
+            "ans": "132",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 52.9
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 6.6
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -8.8
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -16.5
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "6 ÷ ___ = 2",
+            "ans": "3",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 58.7
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 12.4
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -3
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -10.7
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "4 × ___ = 20",
+            "ans": "5",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 55.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 9.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -5.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -13.6
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "2 × ___ = 18",
+            "ans": "9",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 55.8
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 9.5
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -5.9
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -13.6
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 7 = 3",
+            "ans": "21",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 58.7
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 12.4
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -3
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -10.7
+              }
+            }
+          },
+          {
+            "template": "equation",
+            "fclass": "short",
+            "text": "___ ÷ 4 = 7",
+            "ans": "28",
+            "measured": {
+              "1": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 58.7
+              },
+              "2": {
+                "hMm": 17.4,
+                "fits": true,
+                "slackMm": 12.4
+              },
+              "3": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -3
+              },
+              "4": {
+                "hMm": 17.4,
+                "fits": false,
+                "slackMm": -10.7
+              }
+            }
+          }
+        ],
+        "role": "independent",
+        "size": "L",
+        "opts": null,
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 88,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 101,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            10
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 61
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "024fb04abb516eaa"
+          ],
+          "measured": [
+            {
+              "cells": 10,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 10,
+                "minMm": [
+                  25,
+                  10
+                ],
+                "sizes": [
+                  "25x10 mm ×10"
+                ]
+              },
+              "band": {
+                "hPct": 56.1,
+                "wPct": 13.5,
+                "cell": 8
+              },
+              "footPct": 27.2
+            }
+          ]
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            10
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 71
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "da0ec038b58e8fc0"
+          ],
+          "measured": [
+            {
+              "cells": 10,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 10,
+                "minMm": [
+                  25,
+                  10
+                ],
+                "sizes": [
+                  "25x10 mm ×10"
+                ]
+              },
+              "band": {
+                "hPct": 56.1,
+                "wPct": 13.5,
+                "cell": 8
+              },
+              "footPct": 27.2
+            }
+          ]
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "missing-factor",
+        "text": "___ ÷ 9 = 3",
+        "ans": "27",
+        "seed": 819059409,
+        "contentHash": "961e836117e3e6b7",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "missing-factor",
+        "text": "___ ÷ 9 = 3",
+        "ans": "27",
+        "seed": 819059409,
+        "contentHash": "aef501d70d725092",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "missing-factor",
+        "text": "___ ÷ 9 = 3",
+        "ans": "27",
+        "seed": 819059409,
+        "contentHash": "421a85f3ee95207f",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              6
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              7
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "seed": 2495608573,
+        "contentHash": "184ca5db035356c2",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              12
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              12
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              12
+            ],
+            [
+              "box-shadow",
+              7
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 239, 141)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              30
+            ],
+            [
+              "Nunito",
+              18
+            ]
+          ],
+          "smallTargets": [
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            },
+            {
+              "tag": "input",
+              "cls": "worksheet-input mq-slot mq-slot--invisua",
+              "w": 62,
+              "h": 42,
+              "text": ""
+            }
+          ],
+          "smallTargetCount": 6
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "seed": 4028906106,
+        "contentHash": "4d6659081e3f4525",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              4
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              3
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "box-shadow",
+              2
+            ],
+            [
+              "color:rgb(46, 42, 69)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 225, 79)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              5
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  },
+  {
+    "skill": "division:div_zero_in_quotient",
+    "category": "division",
+    "skillId": "div_zero_in_quotient",
+    "label": "Zero in the Quotient",
+    "grade": "4",
+    "dir": "division__div_zero_in_quotient",
+    "roles": {
+      "independent": {
+        "fits": {
+          "cols": 2,
+          "rows": 2,
+          "perPage": 4,
+          "pages": 1,
+          "trimmed": 0,
+          "note": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt.",
+          "sections": [
+            {
+              "cols": 2,
+              "rows": 2,
+              "perPage": 4,
+              "pages": 1,
+              "cellW": 93,
+              "cellH": 113.5,
+              "requested": "auto",
+              "clamped": false,
+              "note": "",
+              "line": "Fits: 2 columns x 2 rows, 4 per page, 1 page. Digits 28 pt.",
+              "cls": "long",
+              "digitPt": 28,
+              "hMin": 97.2,
+              "anchorMm": 0,
+              "blocks": null
+            }
+          ]
+        },
+        "pageCount": 1,
+        "keyPageCount": 1,
+        "seed": 699696,
+        "title": "I Can write a zero in the quotient",
+        "notes": [],
+        "gaps": [],
+        "anchors": {
+          "mode": "off",
+          "examples": [],
+          "notes": []
+        },
+        "items": [
+          {
+            "template": "division",
+            "fclass": "long",
+            "text": "654 ÷ 6 = ?",
+            "ans": "109",
+            "measured": {
+              "1": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 72
+              },
+              "2": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 25.7
+              },
+              "3": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 10.3
+              },
+              "4": {
+                "hMm": 97.2,
+                "fits": false,
+                "slackMm": 2.6
+              }
+            }
+          },
+          {
+            "template": "division",
+            "fclass": "long",
+            "text": "770 ÷ 7 = ?",
+            "ans": "110",
+            "measured": {
+              "1": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 72
+              },
+              "2": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 25.7
+              },
+              "3": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 10.3
+              },
+              "4": {
+                "hMm": 97.2,
+                "fits": false,
+                "slackMm": 2.6
+              }
+            }
+          },
+          {
+            "template": "division",
+            "fclass": "long",
+            "text": "920 ÷ 4 = ?",
+            "ans": "230",
+            "measured": {
+              "1": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 72
+              },
+              "2": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 25.7
+              },
+              "3": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 10.3
+              },
+              "4": {
+                "hMm": 97.2,
+                "fits": false,
+                "slackMm": 2.6
+              }
+            }
+          },
+          {
+            "template": "division",
+            "fclass": "long",
+            "text": "728 ÷ 7 = ?",
+            "ans": "104",
+            "measured": {
+              "1": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 72
+              },
+              "2": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 25.7
+              },
+              "3": {
+                "hMm": 97.2,
+                "fits": true,
+                "slackMm": 10.3
+              },
+              "4": {
+                "hMm": 97.2,
+                "fits": false,
+                "slackMm": 2.6
+              }
+            }
+          }
+        ],
+        "role": "independent",
+        "size": "L",
+        "opts": null,
+        "pages": [
+          {
+            "file": "independent-p1.png",
+            "words": 65,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "keyPages": [
+          {
+            "file": "independent-key-p1.png",
+            "words": 105,
+            "w_mm": 209.9,
+            "h_mm": 297
+          }
+        ],
+        "check": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 43
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "efa64d5740dc2d51"
+          ],
+          "measured": [
+            {
+              "cells": 4,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 12,
+                "minMm": [
+                  8,
+                  12
+                ],
+                "sizes": [
+                  "8x12 mm ×12"
+                ]
+              },
+              "band": {
+                "hPct": 10.2,
+                "wPct": 27.9,
+                "cell": 3
+              },
+              "footPct": 0.2
+            }
+          ]
+        },
+        "keyCheck": {
+          "pages": 1,
+          "cells": [
+            4
+          ],
+          "problems": [],
+          "fonts": {
+            "Andika": 85
+          },
+          "fontsReady": true,
+          "andika": true,
+          "pageHashes": [
+            "e6ece3cac7721787"
+          ],
+          "measured": [
+            {
+              "cells": 4,
+              "digitPt": {
+                "max": 28,
+                "median": 28,
+                "min": 11
+              },
+              "slots": {
+                "n": 12,
+                "minMm": [
+                  8,
+                  12
+                ],
+                "sizes": [
+                  "8x12 mm ×12"
+                ]
+              },
+              "band": {
+                "hPct": 10.1,
+                "wPct": 27.9,
+                "cell": 4
+              },
+              "footPct": 0.2
+            }
+          ]
+        }
+      }
+    },
+    "screen": {
+      "card-1280": {
+        "answerType": "number",
+        "printFormat": "long-div-kit",
+        "text": "740 ÷ 2 = ?",
+        "ans": "370",
+        "seed": 3469805008,
+        "contentHash": "8d4902e9aa0ecaf3",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              28
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              8
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-820": {
+        "answerType": "number",
+        "printFormat": "long-div-kit",
+        "text": "740 ÷ 2 = ?",
+        "ans": "370",
+        "seed": 3469805008,
+        "contentHash": "8d4902e9aa0ecaf3",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              28
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              8
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "card-390": {
+        "answerType": "number",
+        "printFormat": "long-div-kit",
+        "text": "740 ÷ 2 = ?",
+        "ans": "370",
+        "seed": 3469805008,
+        "contentHash": "8d4902e9aa0ecaf3",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              28
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              2
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 224, 242)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(255, 138, 61)",
+              2
+            ],
+            [
+              "borderTopColor:rgb(229, 114, 43)",
+              2
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              1
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(244, 239, 255)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(181, 165, 244)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              8
+            ],
+            [
+              "Nunito",
+              7
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "worksheet-1280": {
+        "cards": 6,
+        "seed": 942205794,
+        "contentHash": "83d96d9968f54fcc",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              134
+            ],
+            [
+              "borderTopColor:rgb(221, 214, 238)",
+              18
+            ],
+            [
+              "color:rgb(79, 75, 107)",
+              18
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              18
+            ],
+            [
+              "borderTopColor:rgb(79, 75, 107)",
+              6
+            ],
+            [
+              "color:rgb(229, 114, 43)",
+              6
+            ],
+            [
+              "borderTopColor:rgb(255, 138, 61)",
+              6
+            ],
+            [
+              "backgroundColor:rgb(255, 251, 224)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 242, 155)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Andika",
+              48
+            ],
+            [
+              "Nunito",
+              24
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      },
+      "quiz-1280": {
+        "questions": 3,
+        "seed": 2248094623,
+        "contentHash": "9c1b3ef305146359",
+        "measure": {
+          "hScroll": 0,
+          "colours": [
+            [
+              "box-shadow",
+              24
+            ],
+            [
+              "color:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(43, 40, 64)",
+              11
+            ],
+            [
+              "borderTopColor:rgb(139, 135, 159)",
+              4
+            ],
+            [
+              "color:rgb(139, 135, 159)",
+              3
+            ],
+            [
+              "backgroundColor:rgb(244, 240, 251)",
+              2
+            ],
+            [
+              "color:rgb(46, 42, 69)",
+              2
+            ],
+            [
+              "backgroundColor:rgb(220, 238, 238)",
+              2
+            ],
+            [
+              "color:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(124, 92, 230)",
+              1
+            ],
+            [
+              "borderTopColor:rgb(244, 240, 251)",
+              1
+            ],
+            [
+              "backgroundColor:rgb(255, 225, 78)",
+              1
+            ]
+          ],
+          "fonts": [
+            [
+              "Nunito",
+              11
+            ],
+            [
+              "Andika",
+              8
+            ]
+          ],
+          "smallTargets": [],
+          "smallTargetCount": 0
+        }
+      }
+    },
+    "consoleErrors": []
+  }
+]

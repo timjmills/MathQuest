@@ -2663,7 +2663,9 @@ Object.assign(P12_OPTIONS, {
     'composing:odd_even': [_p12Match([['Odd or even? (one number)', '^Is \\d+ odd or even'], ['Click all the even or odd numbers', '^Click all'],
         ['Which number is even or odd?', '^Which number']])],
     'subtraction:missing_add_sub': [
-        _p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']]),
+        // The default is a missing-number page (the skill's name); "the answer" is opt-in (ops-family G1, 2026-10-30).
+        { ..._p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']],
+            'A number before the = sign is the skill. Tick the answer too to mix in plain sums and differences.'), default: [1] },
         _p12Kinds('task', 'Operation', [['Adding', '\\+'], ['Subtracting', ' - ']]),
     ],
     // Read by gen-operations.js (_p12Form): 0 = arrays, 1 = equal groups.
@@ -3085,6 +3087,13 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
     ['measurement:bar_graph_intro', _ap2Bars()],
 ].forEach(([key, ...defs]) => _o2Add(key, ...defs));
 // ============================ end O6 · appearance: figures and data (AP2) ===================
+
+// ops-family r2 (owner, 2026-10-31): the × or ÷ sentences of missing_mult_div alone, for its two preset skills
+// (missing_mult_only, missing_div_only). Read by gen-operations.js (_p12Narrowed('task'): one sign ticked deals only its
+// sentences; a page deal cannot be redrawn by the accept layer). Appended after `notation`, so the default page (both
+// ticked) and every old share code are unchanged.
+_o2Add('division:missing_mult_div', _p12Kinds('task', 'Operation', [['Multiplying (__ × 6 = 42)', '×'], ['Dividing (42 ÷ __ = 7)', '÷']],
+    'One operation for a page of it alone; both mixed makes the pupil read the sign.'));
 
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
