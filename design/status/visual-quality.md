@@ -39,4 +39,5 @@ Critic rounds: 1, FAIL (min 5); fix r2 ready for critic r2
 - Phase 2: checks + guidance 11:09–12:15; library + fixes 11:10–13:00 (6.7 h agent wall incl. browser waits); precritic clean-up fixer 13:05–15:00; critic r1 15:18–15:37.
 
 ## Spend
+- $134.33 ≈ 4.8 % after fix r2.
 - $68.72 ≈ 2.5 % of the weekly limit at critic r1 start (cap $220 ≈ 8 %).
