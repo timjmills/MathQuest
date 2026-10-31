@@ -779,17 +779,17 @@
   },
   {
    "id": "arc-ink-laned",
-   "check": "The long-division bracket's arc keeps >= 0.5 mm of white on BOTH sides - the dividend's first digit and the divisor's last (Lane D restart critic r1 R1-1: \"4 ) 8\" read as \"48\"; critic r2 R2-1: 0.27 mm on the divisor side at 10 columns; owner revised Q3)",
+   "check": "The long-division bracket's arc keeps white on BOTH sides: >= 0.3 mm before the dividend's first digit (Lane D restart critic r1 R1-1: \"4 ) 8\" read as \"48\") and >= 0.25 mm after the divisor's last (critic r2 R2-1, a regression guard at r2's 0.27 mm: the owner keeps the 10-column bracket, 2026-10-31)",
    "kind": "commit-pair",
    "rule": "ws-print-lint L-OVERLAP ARC-INK",
    "browser": true,
    "fail": {
-    "commit": "616908b1",
-    "state": "critic r2 FAIL commit: div_facts Long fact rows at S, 10 columns, the arc 0.27 mm from the divisor's last digit (dividend side 0.62 mm)"
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Long fact rows at S, 10 columns, the arc 0.27 mm INTO the dividend's first digit"
    },
    "pass": {
-    "commit": "f7a27938",
-    "state": "fix r3: the bracket clamps to 8 columns, the arc placed from both neighbours' ink: divisor side 0.86 mm, dividend side 0.69 mm at 8 columns (S/M/L)"
+    "commit": "616908b1",
+    "state": "r2 bracket the owner keeps (2026-10-31): dividend side 0.62 mm, divisor side 0.27 mm at 10 columns"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --columns 10 --opts '{\"divForm\":[\"long\"]}' --lints L-OVERLAP",
    "expect": {

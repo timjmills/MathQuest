@@ -18,10 +18,8 @@
 //              fact ladder (PT-FRW-1)
 //   Rows       floor((G - 1) / h) with h from table 4.1 (`factRowsCapacity`), stretch cap 1.3;
 //              answers over 99 clamp to 8 columns (PT-FRW-5; a ÷ fact's answer never passes 12,
-//              so the ÷ sign and the fraction keep 10). The long-division BRACKET prints at most 8
-//              columns (owner 2026-10-31, revised Q3): >= 0.5 mm of white between the arc and the
-//              digits on both sides; a Mix or mixed page holding a bracket takes its 8-column grid.
-//              The count printed = columns x rows = Score /N on every seed (critic r2 R2-2, plan). The page is filled to the table. Every ÷ form passes the
+//              so division keeps 10 - the bracket too: owner 2026-10-31, "i like the long division
+//              even at 10 columns"). The count printed = columns x rows = Score /N on every seed (critic r2 R2-2, plan). The page is filled to the table. Every ÷ form passes the
 //              real-fit gate - drawn ink + 1 mm of white each side (FIT_CLEAR_MM) - at the
 //              column's ladder digit, never below the Size S fact digit (16 pt).
 //   Who        two numbers and one sign per cell: a sum of three or four addends is refused
@@ -358,9 +356,6 @@ function formRows(items, input, ctx, G, labels, forms) {
     const mixed = opsOf(items).size > 1;
     const notes = [];
     if (mixed && asked > 8 && (input.__clamp8 || items.some((it) => opOf(it.q || {}) !== 'divide' && Number(answerOf(it)) > 99))) { asked = 8; notes.push('Answers over 99: at most 8 columns (PT-FRW-5).'); }
-    // The long-division bracket prints at 8 columns at most (owner 2026-10-31, revised Q3; critic r2 R2-1): at 10 the
-    // arc keeps 0.5 mm of white on one side only. A Mix page or a mixed page with any bracket fact takes its grid.
-    if (forms.has('long') && asked > 8) { asked = 8; notes.push('Long division: at most 8 columns, so the bracket keeps white on both sides.'); }
     let geo = null;
     let cols = asked;
     for (; cols >= 2; cols--) {

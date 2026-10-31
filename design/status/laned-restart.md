@@ -287,3 +287,86 @@ division:div_facts_long (code ZF); + − × rows unchanged; screen hosts 9/9/8�
 6. Then precritic `--role all` at S/M/L + `--skill` for all five, merged with main, before critic r3.
 Not gating (owner ruling a): R1-3, R1-5, R1-7, R1-8, R1-9, R1-11, R1-13, R1-14 → page-types lane. Card Q5 (short class) → layout lane.
 
+
+## Round 3 (2026-10-31, fresh fix builder, Opus medium: stop-loop rebuild of critic-r2-failed work)
+
+Commits f7a27938, d3cfb17d, then the reversal commit (on 66420cca; the lead's card commit f2c597a8 lands between).
+
+### R2-1 the arc on the divisor - OWNER REVERSAL mid-round
+The round started on the revised Q3 (bracket at 8 columns, >= 0.5 mm both sides) and built it (f7a27938: 8-column clamp,
+divisor-side floor 0.58 mm; measured in the browser, every bracket of div_facts_long fact rows, 20x canvas ink: divisor side
+0.86 / 1.00 / 1.19 mm and dividend side 0.69 / 0.92 / 1.08 mm at 8 / 6 / 5 columns, identical at S, M and L). At ~18:15 the
+owner reversed it ("i like the long division even at 10 columns"): the bracket is back to r2's drawing at 10 columns
+(long-division.js ARC_SPACE and fact-rows.js formRows identical to 616908b1; PT-FRW-9 / PT-FRW-5 text restored to 66420cca;
+layout-unit expectations back to 10). **What stays is the check:** ws-print-lint L-OVERLAP ARC-INK now measures BOTH sides -
+dividend's first digit >= 0.3 mm (r1 R1-1), divisor's last digit >= 0.25 mm as a REGRESSION GUARD at r2's measured 0.27 mm
+(never closer, never touching). Self-test: a new planted defect (arc starting at the gutter's left edge, "divisor's last
+digit" message) + the control. Backtest row arc-ink-laned: FAIL on 31a856fd (arc into the dividend), OK on 616908b1 (the
+drawing the owner keeps). ws-layout-unit holds the model's whites per fact (>= 0.22 divisor, >= 0.3 dividend).
+**Card:** f2c597a8 (lead) was signed against f7a27938's 8-column PT-FRW-5 / PT-FRW-9 text; with the 10-column text restored
+`ws-spec-card --check-signed facts.md` reports those two rules changed - the lead re-signs (this lane does not edit the card).
+
+### R2-2 mixed fact-rows page: count = grid on every seed
+Root cause: the count is dealt from a PROBE deal's layout and the page laid from the FINAL deal; a product over 99 in one deal
+and not the other changed the columns (PT-FRW-5 clamp) or the digit rung (3 tracks), so 56 facts landed in a 70-cell grid (or
+48 in 56). Fix (fact-rows.js plan): when the deal is short of the page, lay it as the band's 3-digit page (`__clamp8`: the
+8-column clamp and 3 tracks) if that holds it, else in whole rows of what was dealt (cell height within the 1.3 stretch cap).
+Printed = cols x rows = Score /N. Checks: ws-layout-unit **COUNT-FITS** - probe deal then final deal, seeds 1-24, mixes
++ - x ÷Mix, + x ÷long, + x, + - x ÷, at S / M / L x Auto / 8 / 10: 0 mismatches (it found +x M 8 seed 7, 48 in 8 x 7, before
+the whole-rows step). ws-print-lint **L-DENSITY COUNT-FITS** (a fact-rows page with an unruled run, or Score /N != facts
+printed) + self-test.
+
+### R2-3 the probe keeps its lattice
+gridPart passes `relay: false`; every fact-probe grid keeps one cell width: the 20th across fact stays in column 1 and the 20
+form cells at L in 3 columns leave cells 19-20 at their width, the remainder unruled (PT 4.2's own drawing; L-DENSITY HOLE
+exempts the probe's remainder, PT-FPR-6 fixes the count at 20). Check: GRID-EVEN now reads EVERY kit grid (a full-width cell
+of a re-laid `.relaid` grid counts), self-test unchanged; precritic plans `print-lint-probe-S/M/L` for the fact skills (div_facts
+forms were already on the probe through the divForm gates). Backtest grid-even-probe-laned: FAIL on 616908b1, OK on f7a27938.
+
+### R2-4 think support
+The think cue is measured from its text (Andika advances; sized for a 2-digit factor and 3-digit product: 40 mm, 2 mm of white
+inside each end, one width on the page). Placement: a division fact's supports (boxsign "before", think beside/under) are
+decided from the widest fact of its set (144 ÷ 12, registry.js), so one placement per page. Check: ws-print-lint **L-OVERLAP
+TEXT-FRAME** (text starting inside a stroked rect / bordered box ends inside it) + self-test (the old 36 mm box fires).
+`--supports all --size S`: 0 findings.
+
+### R2-5 (add_facts Review M H13) - coordinator: not a pin; main vs branch, OPEN
+Same command, `ws-print-lint --source kit --skills addition:add_facts --roles review --size M`:
+- main (worktree of origin/claude/sweet-newton-c8wrv1 9a13b7a7, main's own lint): **not clean** - `L-KEY AK-4 critical`: key
+  page 2 has 12 answer slots, pupil page 1 has 9 (the 3 across Mixed Review cells 10-12 print no answer slot on the pupil page);
+  no L-DENSITY finding.
+- branch: AK-4 clean; `L-DENSITY H13 x6` cells 10-12 (p1, p2): one empty band 56.1 mm in a 184.9 mm cell (30 %).
+So it is the branch's (the merged CL-40 / review.js across-row work gives cells 10-12 their slot, and the full-width across
+cell then reads as pinned left), but main's page is worse (a missing answer slot). Not fixed this round (budget); left
+red / open, not pinned. Next: review.js across Mixed Review rows at M - narrower cells or the across fact centred.
+
+### Precritic (`--skill add_facts,sub_facts,mult_facts,div_facts,div_facts_long --role fact-rows --strict`, run once)
+Run /tmp/mq-precritic/20261031-182404-21025: 10 FAIL, 31 PASS (7 on the baseline), 2 SKIPPED (no rulings) of 43. It started
+on f7a27938 (8-column bracket); the owner's reversal landed mid-run, so the bracket gates that ran early saw the 8-column
+code. The reverted bracket is r2's drawing byte for byte (616908b1), which round 2's precritic and critic r2 already ran; the
+new ARC-INK guard passes it (backtest), and `--supports all --size S`, layout-unit, self-test and boot-smoke were re-run on the
+final tree.
+
+| Gate | Finding | Status |
+|---|---|---|
+| print-lint-probe S / M / L (new) | 0 | PASS |
+| print-lint --supports all S | 0 (TEXT-FRAME, CL40-INK) | PASS (re-run on the final tree: 0) |
+| print-lint divForm long L, mix L | Review CL40-INK x6 (R1-11), Reason It CL40-INK (R1-9), Mixed practice H13 x2 / x4 cell 8, 28.5 mm | pinned (owner ruling) / main-red (r2 table) |
+| print-lint lesson S | sub_facts WRAP-OP x4 (R1-5); div_facts_long Lesson SPREAD p3 43 % | pinned / main-red (r2 table) |
+| options-verify --skill | div_facts_long support=touch/skip/array/think/boxsign/all: no support drawn | main-red (r2 table) |
+| options-verify --render | value pages worse than default (array H13, divForm capacity ...) | main-red (r2 table) |
+| slot-clip | div_facts sections/defaults L CLIP 6 (`ws-eq-below`) | main-red (r2 table) |
+| dealer-uniform | add / sub / mult / div / div_facts_long | main-red (r2 table) |
+| node-lint s1 | LESSON-DATA (no lessons/prereqs.js entry) | main-red (r2 table) |
+| sibling-compare | no approved fact-family sibling | structural (r2 table) |
+| spec-card --check-signed | PT-FRW-5 / PT-FRW-9 changed | **lead**: f2c597a8 was signed against f7a27938's 8-column text; the 10-column text (66420cca) is restored as the reversal asks - re-sign the card |
+
+Unit / other gates on the final tree: ws-print-lint --self-test OK (86 assertions, 74 planted defects), ws-layout-unit OK
+(1758), ws-boot-smoke OK, ws-backtest arc-ink-laned PASS (31a856fd FAIL / 616908b1 OK), grid-even-probe-laned PASS
+(616908b1 FAIL / f7a27938 OK).
+
+### After-r3 PNGs (150 dpi, design/status/laned-restart/)
+after-r3-bracket-S-c10.png (100 / 100) and after-r3-bracket-L-c10.png (80 / 80) - r2's bracket at 10 columns;
+after-r3-mixed-facts-S-c10-s4242.png (+ - x ÷long, 56 printed = 8 x 7 = Score /56: the seed critic r2 caught at 56 of 70);
+after-r3-mixed-add-mult-S-auto-s4242.png (56 / 56); after-r3-probe-add-S.png (20th across fact in column 1, remainder
+unruled); after-r3-probe-div-mix-L.png (20 / 20); after-r3-think-boxsign-S.png (one placement, text inside the box).

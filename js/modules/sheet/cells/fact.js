@@ -202,7 +202,7 @@ export function factCue(p, { px = 0 } = {}) {
         const fs = 3.6, ADV = 0.59, SP = 0.26, SG = 0.6;
         const bd = Math.max(2, String(b).length), ad = Math.max(3, String(a).length);
         const leftW = (2.9 + SP + bd * ADV + SP + SG) * fs;
-        const bx = 2 + leftW + 1.2, bw = 5.4;
+        const bx = 2 + leftW + 1.8, bw = 5.4;
         const rx = bx + bw + 1.2;
         const rightW = (SG + SP + ad * ADV) * fs;
         const w = Math.ceil((rx + rightW + 2) * 10) / 10, h = 9;

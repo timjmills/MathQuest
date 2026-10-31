@@ -57,19 +57,18 @@ export const bracketLeadEm = (divisor, t) => t / 2 - DIGIT_ADV_EM / 2 + (DIGIT_I
 // Between the divisor's last digit and the dividend's first the gutter holds, from left to right:
 // white `a` (the divisor reads as its own number), the arc's 1.5 pt stroke and its bow, and white
 // `b` (the arc never touches or crowds the dividend's first digit: owner 2026-10-31). Each white is
-// measured on the glyphs' INK (DIGIT_INK_EM), never on the track edges. `b` aims at 0.7 mm and `a` at 0.65 mm;
-// neither is ever under 0.5 mm as printed (ws-print-lint L-OVERLAP ARC-INK measures both sides).
+// measured on the glyphs' INK (DIGIT_INK_EM), never on the track edges. `b` aims at 0.7 mm (at least 0.6 mm
+// as printed, the canvas ink less a 1/64 em rounding) and is
+// never under 0.3 mm (ws-print-lint L-OVERLAP ARC-INK). The owner keeps this bracket at 10 columns (2026-10-31,
+// "i like the long division even at 10 columns"); ARC-INK guards the divisor side at r2's clearance (>= 0.25 mm).
 
 /** The arc's stroke (HEAVY, 1.5 pt) in mm. */
 export const ARC_STROKE_MM = 1.5 * 25.4 / 72;
 /** The whites and the bow (mm): the floor, the aim, and the aim's share of the em at large digits. */
-// (critic r2 R2-1, owner 2026-10-31 revised Q3: BOTH whites >= 0.5 mm as printed - the divisor side was
-// 0.27 mm at 10 columns and the "1" of "11 )" joined the arc at 100 %. The floors carry 0.08 mm over the
-// 0.5 mm for the canvas ink rounding; the bracket's fact rows clamp to 8 columns, where both fit.)
 export const ARC_SPACE = Object.freeze({
-    a: Object.freeze({ min: 0.58, aim: 0.65, em: 0.08 }),
+    a: Object.freeze({ min: 0.22, aim: 0.4, em: 0.08 }),
     bow: Object.freeze({ min: 0.1, aim: 0.4, em: 0.07 }),
-    b: Object.freeze({ min: 0.58, aim: 0.7, em: 0.11 }),
+    b: Object.freeze({ min: 0.3, aim: 0.7, em: 0.11 }),
 });
 const inkL = (d) => (DIGIT_INK_EM[d] || [0.04, 0.55])[0];
 const inkR = (d) => (DIGIT_INK_EM[d] || [0.04, 0.55])[1];

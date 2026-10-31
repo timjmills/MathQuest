@@ -117,9 +117,9 @@
 //              CL40-INK (kit / pack) no ink - a glyph's ink box, an SVG shape, a painted border or fill - inside the
 //              label keep-out: the (label side + 1 mm) square at the cell's top-left corner, or the tab's own width
 //              when a 2-3 digit tab is wider (CL-40; critic 2026-10-24 D1, top-started across facts on the tab).
-//              ARC-INK (kit / pack) a long-division bracket's arc keeps >= 0.5 mm of white between its ink and BOTH
-//              neighbours' ink - the dividend's first digit and the divisor's last (VA-60a, owner 2026-10-31 revised Q3;
-//              Lane D restart critic r1 R1-1: "4 ) 8" read 48; critic r2 R2-1: 0.27 mm on the divisor side).
+//              ARC-INK (kit / pack) a long-division bracket's arc keeps white on BOTH sides: >= 0.3 mm before the
+//              dividend's first digit (VA-60a; critic r1 R1-1: "4 ) 8" read 48) and >= 0.25 mm after the divisor's last
+//              (critic r2 R2-1, a regression guard at r2's 0.27 mm: the owner keeps the 10-column bracket, 2026-10-31).
 //   (L-DENSITY COUNT-FITS, kit / pack: a fact-rows page fills whole rows and Score /N = facts printed; r2 R2-2.)
 //              TEXT-FRAME (kit / pack) a line of text that starts inside a bordered box ends inside it (CL-1; r2 R2-4).
 //   (L-DENSITY GRID-EVEN, kit / pack: every cell of a kit grid `.ws-grid` has one width within 0.2 mm (r2 R2-3: all grids);
@@ -1054,9 +1054,11 @@ function wsLintPage(cfg) {
            added); the digit's ink comes from canvas measureText at 20x the printed size (at print size canvas rounds
            the ink to whole pixels, 0.26 mm). */
         if (!isLegacy) {
-            // (critic r2 R2-1, owner 2026-10-31 revised Q3: >= 0.5 mm on BOTH sides - the divisor's last digit too;
-            // at 0.27 mm the "1" of "11 ) 121" joined the arc at 100 %)
-            const ARC_GAP_MM = (cfg && Number(cfg.arcGapMm)) || 0.5;   // (MQ_ARC_GAP_MM: a diagnostic floor, to print every gap)
+            // the dividend side: >= 0.3 mm (r1 R1-1). The divisor side (critic r2 R2-1) is a REGRESSION GUARD at r2's
+            // measured clearance - the owner keeps the 10-column bracket (2026-10-31, "i like the long division even at
+            // 10 columns"): never closer than r2's 0.27 mm, never touching ink.
+            const ARC_GAP_MM = (cfg && Number(cfg.arcGapMm)) || 0.3;   // (MQ_ARC_GAP_MM: a diagnostic floor, to print every gap)
+            const ARC_GAP_DV_MM = (cfg && Number(cfg.arcGapMm)) || 0.25;
             const ctxA = document.createElement('canvas').getContext('2d');
             const K = 20;
             const inkOfDigit = (sp) => {
@@ -1094,7 +1096,7 @@ function wsLintPage(cfg) {
                         }
                         return v;
                     };
-                    const say = (gap, what, d) => `the bracket's arc ${gap < 0 ? `runs ${(-gap).toFixed(2)} mm into` : `comes within ${gap.toFixed(2)} mm of`} the ${what} "${d.textContent.trim()}" (${grid.getAttribute('aria-label') || 'division'}): keep at least ${ARC_GAP_MM} mm of white between the arc's ink and the digit's ink on both sides, or "4 ) 8" reads as "48" and "11 )" as one run of ink (VA-60a, owner 2026-10-31)`;
+                    const say = (gap, what, d, floor = ARC_GAP_MM) => `the bracket's arc ${gap < 0 ? `runs ${(-gap).toFixed(2)} mm into` : `comes within ${gap.toFixed(2)} mm of`} the ${what} "${d.textContent.trim()}" (${grid.getAttribute('aria-label') || 'division'}): keep at least ${floor} mm of white between the arc's ink and the digit's ink, or "4 ) 8" reads as "48" and "11 )" as one run of ink (VA-60a, owner 2026-10-31)`;
                     if (dd) {
                         const di = inkOfDigit(dd);
                         const right = arcAt(di, 1);
@@ -1105,7 +1107,7 @@ function wsLintPage(cfg) {
                         const vi = inkOfDigit(dv);
                         const left = arcAt(vi, -1);
                         const gap = (left - vi.r) / PX;
-                        if (Number.isFinite(left) && gap < ARC_GAP_MM) F('L-OVERLAP', 'ARC-INK', 'major', grid, say(gap, "divisor's last digit", dv), 'arc on the divisor');
+                        if (Number.isFinite(left) && gap < ARC_GAP_DV_MM) F('L-OVERLAP', 'ARC-INK', 'major', grid, say(gap, "divisor's last digit", dv, ARC_GAP_DV_MM), 'arc on the divisor');
                     }
                 }
             }
@@ -2835,11 +2837,11 @@ const SELF_TESTS = [
         const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
         document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 4mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M3.5 0 H10 M3.5 0 Q6.5 20 3.5 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
     } },
-    // ARC-INK divisor side (critic r2 R2-1: the arc 0.27 mm from the divisor's last digit; owner revised Q3, >= 0.5 mm
-    // both sides): 7 ) 84 with the arc starting at the gutter's left edge (no white after the "7"), dividend side clear.
+    // ARC-INK divisor side (critic r2 R2-1; a regression guard at r2's 0.27 mm, floor 0.25 mm): 7 ) 84 with the arc
+    // starting at the gutter's left edge (no white after the "7"), dividend side clear.
     { name: 'bracket arc on the divisor\'s last digit (ARC-INK divisor side)', expect: ['L-OVERLAP', 'ARC-INK'], msg: /divisor's last digit/, fn: () => {
         const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
-        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 3mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M0.3 0 H10 M0.3 0 Q4 20 0.3 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 3mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M0.3 0 H10 M0.3 0 Q0.8 20 0.3 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
     } },
     // COUNT-FITS (critic r2 R2-2: 56 facts in a 10-column grid, the rest unruled): a fact-rows grid with an unruled run
     // after its last fact; the control is a full fact grid.

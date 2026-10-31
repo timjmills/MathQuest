@@ -843,9 +843,7 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     for (const form of ['standard', 'vertical', 'long', 'fraction', 'mix']) {
         for (const size of ['S', 'M', 'L']) {
             for (const columns of ['auto', 5, 6, 8, 10]) {
-                // (owner 2026-10-31 revised Q3: the bracket - Long and Mix - prints at 8 columns at most)
-                const want0 = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
-                const want = /^(long|mix)$/.test(form) ? Math.min(8, want0) : want0;
+                const want = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
                 const L = factRowsLayout(set(form), { skills: [], ctx: { size }, columns });
                 const tag = `PT-FRW-9 div_facts ${form} ${size} columns ${columns}`;
                 eq(L.cols, want, `${tag}: ${want} columns`);
@@ -857,12 +855,13 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 // (critic r1 R1-2: whole rows, no short last row - the dealer's blocks of three keep thirds within one)
                 eq(L.perPage, L.cols * L.rows, `${tag}: whole rows (${L.perPage} a page)`);
                 ok(!L.across, `${tag}: never the 3-column across page`);
-                // (critic r2 R2-1, owner revised Q3: >= 0.5 mm of white on BOTH sides of every arc, the model's whites)
+                // (critic r2 R2-1 as a regression guard - the owner keeps the bracket at 10 columns: the model's whites
+                // never under r2's, divisor side >= 0.22 mm (0.27 measured), dividend side >= 0.3 mm)
                 if (L.row && L.row.trackMm) {
                     const e = em(L.digitPt), t = L.row.trackMm / e, roomEm = L.row.roomMm / e;
                     for (const [a, b] of PAIRS) {
                         const A = compactArc(b, a, t, compactGutterEm(b, a, t, e, roomEm), e);
-                        ok(A.a * e >= 0.5 && A.b * e >= 0.5, `${tag}: ${b} ) ${a} arc whites ${(A.a * e).toFixed(2)} / ${(A.b * e).toFixed(2)} mm >= 0.5 both sides`);
+                        ok(A.a * e >= 0.22 - 1e-9 && A.b * e >= 0.3 - 1e-9, `${tag}: ${b} ) ${a} arc whites ${(A.a * e).toFixed(2)} / ${(A.b * e).toFixed(2)} mm (>= 0.22 divisor, >= 0.3 dividend)`);
                     }
                 }
             }
@@ -890,7 +889,7 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
         'mult+div(standard)': [...mult, ...divs.map((d) => fq(d.q.a, d.q.b, '÷', 'division', 'div_facts', d.q.ans, 'standard'))],
     };
     for (const [name, items] of Object.entries(SETS)) {
-        const big = items.some((it) => (it.q.op === '×' && it.q.ans > 99) || it.q.divForm === 'long');
+        const big = items.some((it) => it.q.op === '×' && it.q.ans > 99);
         for (const size of ['S', 'M', 'L']) {
             for (const columns of ['auto', 5, 6, 8, 10]) {
                 const asked = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
