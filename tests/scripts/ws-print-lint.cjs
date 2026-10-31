@@ -2490,6 +2490,12 @@ const SELF_TESTS = [
         const MM = 96 / 25.4;
         c.insertAdjacentHTML('beforeend', `<span style="position:absolute;left:${Math.max(t.height + MM, t.right - cr.left) - 1.2 * MM}px;top:${t.bottom - cr.top - 2.5 * MM}px;font-size:22pt;line-height:1;color:#000">4</span>`);
     } },
+    // L-NOTATION (ops-family critic r1 F5): a long-division bracket followed by "= 12"
+    { name: 'equals after a long-division bracket (L-NOTATION VA-61)', expect: ['L-NOTATION', 'VA-61'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'equation');
+        c.insertAdjacentHTML('beforeend', '<div class="ws-eq" data-ws-notation="bracket"><span>4</span><span style="border-top:1px solid #000;border-left:1px solid #000">48</span><span class="o">=</span><span>12</span></div>');
+    } },
     // H13-ROW (pilot-su-c critic r2 N2): a short top cell in a row sized for its taller neighbour; the control is a
     // uniform row (both cells hold the tall item), which keeps equal bands and never fires.
     { name: 'short cell in a row sized for a taller item (H13-ROW)', expect: ['L-DENSITY', 'H13'], msg: /H13-ROW/, fn: () => {

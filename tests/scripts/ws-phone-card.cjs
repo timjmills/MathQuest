@@ -158,7 +158,9 @@ function PROBE() {
     // GAP (ops-family critic r1 F15): the drawn problem keeps at least 3 mm (11 px) of white inside its cell's border on
     // each side - "835 + 100 =" 6 px from the border at 390 px read as crammed (C3)
     const box = paper && (paper.querySelector('.ws-cell') || paper);
-    if (box && vis(box)) {
+    const framed = (el) => { const s = getComputedStyle(el); return (parseFloat(s.borderLeftWidth) || 0) > 0 || (s.outlineStyle !== 'none' && (parseFloat(s.outlineWidth) || 0) > 0) || (s.boxShadow && s.boxShadow !== 'none'); };
+    // (the screen cell's frame: a bordered .ws-cell, or the B&W screen cell #questionPaper.mq-scell, whose frame is drawn round it)
+    if (box && vis(box) && (framed(box) || (box === paper && paper.classList.contains('mq-scell')))) {
         const cs = getComputedStyle(box);
         const br = box.getBoundingClientRect();
         const inL = br.left + (parseFloat(cs.borderLeftWidth) || 0), inR = br.right - (parseFloat(cs.borderRightWidth) || 0);
