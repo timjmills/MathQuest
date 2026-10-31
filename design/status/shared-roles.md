@@ -107,3 +107,11 @@ coordinate_q1 LONE at S, seq_2 H13-ROW at S, vocab_grade_K DN-2 at S.
 `ws-columns --roles pre-skill-check` stays red on vocabulary:vocab_grade_K (S / M / L). Of its 8 candidate prerequisites
 (all vocabulary skills), only one has a cell that fits any width: the vocabulary cells overflow at every column count.
 This is handed to the vocabulary skills' owner, and that ws-columns row is not pinned.
+
+## Merge and gates (lead, 2026-10-31)
+
+- Merged A (incl. f6d61e6 chart panels), B (3c19413, dd67e2e) and C into the lane branch at 344b754. Conflicts were in backtests.json (rows from all three kept) and this file.
+- Unit gates on the A+C merge: syntax, ws-boot-smoke, ws-layout-unit (542), ws-code-snapshot (731), ws-print-lint self-test (71) and ws-precritic-plan (29 rows) are all OK.
+- Builder B round 2 had a harness "credential materialization" warning. I checked its commits and worktree and found no credential or secret in either; the lane did not act on it further.
+- Builder B's baseline re-pin covers only the 20 role-sample `#pre-skill-check` documents. None was pinned before, because before this fix the page tested the skill's own items. Three role-level rows are open: coordinate_q1 LONE at S, seq_2 H13-ROW at S, vocab_grade_K DN-2 at S.
+- Cost at 344b754: $119.6 of session cost (≈ 4.3 % of the weekly limit).
