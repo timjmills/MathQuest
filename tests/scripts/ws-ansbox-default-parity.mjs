@@ -12,7 +12,8 @@
 //   ... --emit              (internal) print this root's hashes as JSON (MQ_ROOT picks the root)
 //
 // Documents: for each skill, option UNTOUCHED: pupil page + key of roles independent / more-practice / review at
-// sizes S / M / L (buildSheet, seed 777), plus the practice card's #visualAid HTML (seeded). sha256 each, of the HTML
+// sizes S / M / L (buildSheet, seed 777), plus the practice card's #visualAid HTML (seeded), the online worksheet's first card
+// and the quiz's question cell. sha256 each, of the HTML
 // AND of a screenshot of the rendered document / card (a stylesheet change moves no HTML byte).
 // Prints `ws-ansbox-default-parity: OK (...)` or `FAIL (...)` with every changed document.
 import { createRequire } from 'node:module';
@@ -29,8 +30,9 @@ const REPO = resolve(dirname(SELF), '..', '..');
 const ROOT = process.env.MQ_ROOT ? resolve(process.env.MQ_ROOT) : REPO;
 const args = process.argv.slice(2);
 const arg = (f, d) => { const i = args.indexOf(f); return i >= 0 && i + 1 < args.length ? args[i + 1] : d; };
-const git = (...a) => execFileSync('git', ['-C', REPO, ...a], { encoding: 'utf8' }).trim();
-const isAncestor = (a, b) => spawnSync('git', ['-C', REPO, 'merge-base', '--is-ancestor', a, b]).status === 0;
+// the tree under test: MQ_ROOT (a backtest's worktree) or this checkout; its git refs decide the merge-base
+const git = (...a) => execFileSync('git', ['-C', ROOT, ...a], { encoding: 'utf8' }).trim();
+const isAncestor = (a, b) => spawnSync('git', ['-C', ROOT, 'merge-base', '--is-ancestor', a, b]).status === 0;
 
 function ansboxIds(root) {
     const src = readFileSync(resolve(root, 'js/modules/skill-ansbox-skills.js'), 'utf8');
@@ -91,6 +93,35 @@ async function emit(skills) {
             if (DUMP) writeFileSync(join(DUMP, `${key.replace(/[^\w]+/g, '_')}-card.html`), card);
             if (PIXELS) { const el = await page.$('#questionCard'); if (el) out[`${key}|card|render`] = sha((await el.screenshot()).toString('base64')); }
             await page.evaluate(() => window.showView('homeView'));
+            // the online worksheet's first card and the quiz's question cell (the other two screen hosts)
+            for (const host of ['worksheet', 'quiz']) {
+                const html = await page.evaluate(async ({ categoryId: c, skillId: k, host }) => {
+                    const st = window.state; const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+                    try {
+                        if (window.clearSetOptions) window.clearSetOptions({ silent: true });
+                        let sel;
+                        if (host === 'worksheet') {
+                            window.__wsReseed && window.__wsReseed(7);
+                            st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 4; st.range = 100; st.skillOptions = null;
+                            window.initWorksheet(); await sleep(700); sel = '#ws_card_0';
+                        } else {
+                            const q = window.generateQuestionFor({ category: c, skill: k, seed: 905, itemIndex: 0, opts: {} });
+                            const test = { id: null, name: 'Parity', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions: [{ id: 0, skillId: k, points: 1, questionData: window.quizQuestionData(q) }] }],
+                                settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+                            window.handleQuizURL(window.compressTestForURL(test));
+                            const name = document.getElementById('qtStudentName'); if (name) { name.value = 'A'; name.dispatchEvent(new Event('input')); }
+                            window.startQuizTest(); await sleep(500); sel = '#quizTakeView .qt-cell';
+                        }
+                        try { document.getAnimations().forEach((a) => { const t = a.effect && a.effect.getComputedTiming(); if (t && t.endTime !== Infinity) a.finish(); else { a.pause(); a.currentTime = 0; } }); } catch (e) { /* */ }
+                        const el = document.querySelector(sel);
+                        if (el) el.setAttribute('data-parity', '1');
+                        return el ? el.innerHTML.replace(/\s(id|for)="[^"]*"/g, '') : '(none)';
+                    } catch (e) { return 'error ' + (e && e.message); }
+                }, { categoryId, skillId, host });
+                out[`${key}|${host}`] = sha(html);
+                if (PIXELS) { const el = await page.$('[data-parity="1"]'); if (el) out[`${key}|${host}|render`] = sha((await el.screenshot()).toString('base64')); }
+                await page.evaluate(() => { const el = document.querySelector('[data-parity="1"]'); if (el) el.removeAttribute('data-parity'); try { window.state.quizMode = false; window.state.gameMode = 'practice'; window.showView('homeView'); } catch (e) { /* */ } });
+            }
         }
     } finally { await close(); }
     return out;
@@ -104,7 +135,7 @@ function renderAt(root, skills) {
 }
 
 let skills = arg('--skills', '').split(',').map((s) => s.trim()).filter(Boolean);
-if (skills.length === 1 && skills[0] === 'ansbox') skills = ansboxIds(REPO);   // every skill that carries the option
+if (skills.length === 1 && skills[0] === 'ansbox') skills = ansboxIds(ROOT);   // every skill that carries the option
 
 if (args.includes('--emit')) {
     if (!skills.length) skills = passedIds(ROOT);
@@ -113,7 +144,7 @@ if (args.includes('--emit')) {
 }
 
 const MAIN = arg('--main', 'origin/claude/sweet-newton-c8wrv1');
-if (!skills.length) skills = passedIds(REPO);
+if (!skills.length) skills = passedIds(ROOT);
 
 if (arg('--write', null)) {
     const head = git('rev-parse', 'HEAD');
@@ -122,7 +153,7 @@ if (arg('--write', null)) {
         console.log(`ws-ansbox-default-parity: REFUSED --write: HEAD ${head.slice(0, 7)} is ${dirty ? 'dirty' : 'not on ' + MAIN + "'s line"}; a baseline is only recorded on main (L17)`);
         process.exit(2);
     }
-    const out = renderAt(REPO, skills);
+    const out = renderAt(ROOT, skills);
     writeFileSync(arg('--write'), JSON.stringify(out, null, 1));
     console.log(`wrote ${Object.keys(out).length} hashes (main ${head.slice(0, 7)}) to ${arg('--write')}`);
     process.exit(0);
@@ -136,14 +167,14 @@ if (!isAncestor(base, MAIN)) {
 const wt = mkdtempSync(join(tmpdir(), 'mq-parity-'));
 let baseOut;
 try {
-    execFileSync('git', ['-C', REPO, 'worktree', 'add', '--detach', wt, base], { stdio: 'ignore' });
+    execFileSync('git', ['-C', ROOT, 'worktree', 'add', '--detach', wt, base], { stdio: 'ignore' });
     baseOut = renderAt(wt, skills);
 } finally {
-    try { execFileSync('git', ['-C', REPO, 'worktree', 'remove', '--force', wt], { stdio: 'ignore' }); } catch (e) { /* removed below */ }
+    try { execFileSync('git', ['-C', ROOT, 'worktree', 'remove', '--force', wt], { stdio: 'ignore' }); } catch (e) { /* removed below */ }
     if (existsSync(wt)) rmSync(wt, { recursive: true, force: true });
-    try { execFileSync('git', ['-C', REPO, 'worktree', 'prune'], { stdio: 'ignore' }); } catch (e) { /* ignore */ }
+    try { execFileSync('git', ['-C', ROOT, 'worktree', 'prune'], { stdio: 'ignore' }); } catch (e) { /* ignore */ }
 }
-const headOut = renderAt(REPO, skills);
+const headOut = renderAt(ROOT, skills);
 const keys = [...new Set([...Object.keys(baseOut), ...Object.keys(headOut)])];
 const diff = keys.filter((k) => baseOut[k] !== headOut[k]);
 for (const k of diff) console.log(`  changed ${k}: ${baseOut[k]} -> ${headOut[k]}`);

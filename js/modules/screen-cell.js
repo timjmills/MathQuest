@@ -125,7 +125,7 @@ function _missingOperandStrip(q) {
     const a = blankA ? ans : Number(m[1]), b = blankB ? ans : Number(m[3]), c = Number(m[4]);
     if (computeOp(a, op, b) !== c) return null;
     const band = q.printFormat === 'missing-factor' ? 3 : 2;              // the paper slot's band (SL-2)
-    const strip = Math.max(String(ans).length, band);
+    const strip = Math.max(String(ans).length, band, Number(q.ansBand) || 0);
     return { kind: 'stack', layout: 'eq', missing: blankA ? 'a' : 'b', a, b, c, op, ans, strip, T: strip, regroup: false, ansBox: 'digit', ltr: true };
 }
 
@@ -155,7 +155,8 @@ function withAnsBox(q, k) {
         const A0 = String(k.a), B0 = String(k.b), d0 = Math.max(A0.length, B0.length);
         const band = Number(k.band) || Number(q && q.cell && q.cell.payload && q.cell.payload.digits)
             || (k.op === '+' ? d0 + 1 : k.op === '*' ? A0.length + B0.length : k.op === '/' ? Math.max(1, A0.length - B0.length + 1) : d0);
-        const strip = Math.max(ansLen, band, 1);
+        // the online worksheet's set band (worksheet.js _wsMarkAnsBand, SL-2): every card of the set draws it
+        const strip = Math.max(ansLen, band, 1, Number(q && q.ansBand) || 0);
         if (k.kind === 'fact') {
             const T = Math.max(String(k.a).length, String(k.b).length, strip) + 1;
             return { ...k, kind: 'stack', T, strip, regroup: false, ansBox: ab, fromFact: true, ltr: true };
@@ -174,7 +175,7 @@ function withAnsBox(q, k) {
         const ad = Number(q && q.cell && q.cell.payload && q.cell.payload.ansDigits) || legacyBand;
         if (ad > 0) {
             const ansLen = String(k.ans != null ? k.ans : '').length;
-            const strip = Math.max(ad, ansLen);
+            const strip = Math.max(ad, ansLen, Number(q && q.ansBand) || 0);
             return { ...k, strip, T: Math.max(k.T || 0, strip + 1), ansBox: ab };
         }
     }
@@ -603,8 +604,6 @@ export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answ
     let html = '';
     // ansBox 'off' (the plain look): the host's slot keeps a ruled writing line, no box.
     if (k.ansBox === 'off' && slotHtml && (kk.kind === 'eq' || kk.kind === 'fact')) slotHtml = `<span class="mq-ansoff">${slotHtml}</span>`;
-    // ansBox 'one' (r3): the paper's black box on screen too (Automatic is the game's yellow box)
-    if (k.ansBox === 'one' && slotHtml && (kk.kind === 'eq' || kk.kind === 'fact')) slotHtml = `<span class="mq-ansone">${slotHtml}</span>`;
     if (kk.kind === 'eq') html = equationHTML(kk, slotHtml);
     else if (kk.kind === 'fact') html = factHTML(kk, slotHtml);
     else if (kk.kind === 'division') html = divisionHTML(kk, slotHtml);

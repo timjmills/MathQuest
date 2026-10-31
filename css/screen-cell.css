@@ -1550,36 +1550,6 @@ html body .mq-scell [data-mq-swiperow][data-mq-end] .k2-swipe-cues > .k2-swipe-c
 html body .mq-scell [data-mq-swiperow]:not([data-mq-end]) .k2-swipe-cues > .k2-swipe-cue { display: inline-block; }
 html body .mq-scell [data-mq-swiperow][data-mq-scrolled] .k2-swipe-cues > .k2-swipe-back { display: inline-block; }
 
-/* ---- WAVE 1 / 1.1 (additive). Owner ruling 2026-10-02: every typed answer slot is a FULL black box,
-   as on paper, including the slot after "=". A light wash of the single grey (#949494 at 14%) stays
-   inside; the black outline is the cue. Compatible with Lane A2: a per-box live fill
-   (.mq-live-ok / .mq-live-wrong) overrides background-color, a wrong box may switch to a dashed
-   border. Focus / active highlight is Lane A's (above). */
-/* No specificity war with Lane A2 (`html body .mq-scell.mq-scell.mq-scell input.mq-live-correct /
-   .mq-live-wrong`, (0,4,3), !important): the colour, style and fill of the box are set at (0,3,2), below
-   A2, so a right box's green and a wrong box's dashed red always win. Only the WIDTHS and the radius,
-   which A2 never sets, are set by the host-specific selectors that must beat the older line-slot rules. */
-html .mq-scell input.mq-slot:not(.mq-slot--circle) {
-    border-style: solid !important; border-color: #000 !important;
-    background-color: rgba(148, 148, 148, 0.14) !important;
-}
-html .mq-scell input.mq-slot:not(.mq-slot--circle),
-html .online-edition .problem-card.mq-wscard .mq-scell input.mq-slot:not(.mq-slot--circle),
-html .qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:not(.mq-slot--circle) {
-    border-width: 1px !important; border-radius: var(--mq-slot-r, 6px) !important;
-}
-
-/* WAVE 1 / 1.1 (additive, critic B D2): a `___` blank inside question text (.answer-blank-inline) is a
-   full box too, never a bottom rule alone. Place-value / static line slots inside a screen cell
-   (.ws-line, not the Say band) draw as the same box; an input adopted into one keeps the only box. */
-:where(.mq-scell .answer-blank-inline) {
-    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important; display: inline-block; min-width: 2.4em; min-height: 1.2em; vertical-align: middle;
-}
-:where(.mq-scell .ws-line:not(.ws-line--say):not(:has(input))) {
-    border: 1px solid #000 !important; border-radius: var(--mq-slot-r, 6px) !important; box-sizing: border-box;
-}
-:where(.mq-scell .ws-line:has(> input.mq-slot)) { border: 0 !important; }
-
 /* WAVE 1 / 1.1: the + − × ÷ answer-box option on screen (owner ruling 2026-10-02, additive).
    'one' on a column stack: the digit inputs read as ONE box (outer edges only: top, bottom, the
    first box's left and the last box's right); 'off': no box, a ruled writing line under the inputs.
@@ -1659,12 +1629,6 @@ html .qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:not(.mq-slot--
 .mq-diskwin .k2-swipe-cue i { font-style: normal; font-size: 34px; vertical-align: middle; }
 .mq-diskwin[data-mq-end] .k2-swipe-cue { display: none; }
 @media print { .mq-diskwin .k2-swipe-cue { display: none !important; } }
-
-/* (critic B D2) a kit twin's in-drawing line slot (place-value disks, a value line ...) is the same
-   full box on screen: widths and radius only, so A2's per-box colours still decide the edge colour. */
-html body .mq-scell.mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
-    border-width: 1px !important; border-radius: var(--mq-slot-r, 6px) !important;
-}
 
 /* WAVE 1 / 1.1 r2 (critic B r2 #2, #6): the stack's digit boxes are DRAWN by inset box-shadows
    (the strip rule above), so the answer-box option restyles those shadows. 'one': top and bottom on
@@ -1926,3 +1890,8 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
     box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr, 0 0 0 0 transparent) !important; outline: none !important; }
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content, .mq-scell) .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit.mq-digit:is(:focus, .mq-active-box):not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
     box-shadow: none !important; outline: none !important; }
+
+/* ---- ansBox r3 (critic r2 #7; ADDITIVE): a sentence answered in one box per digit after "=" never wraps
+   before the "=" - the sentence and its digit strip stay on one line on every host (the online worksheet's
+   narrow card included). */
+html body .mq-kit .ws-eq.mq-eq:has(.mq-eqdigits) { flex-wrap: nowrap !important; white-space: nowrap !important; }

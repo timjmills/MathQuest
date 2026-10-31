@@ -55,6 +55,7 @@ const SIZES = (arg('sizes', FULL ? 'S,M,L' : 'S,L')).split(',').map((s) => s.tri
 // the options that change the same drawing as the answer slot (L18): crossed with every answer-box value
 const APPEARANCE = ['notation', 'divForm', 'layout', 'form', 'orient', 'orientation'];
 const LANE_LOOKS = 2;
+let ANS = { ansBoxApplies: () => true };   // sheet/ans-slot.js of the tree under test (loaded at start)
 const SHOTS = arg('shots', null);
 const VERBOSE = has('verbose');
 
@@ -187,7 +188,8 @@ function installHelpers() {
         for (const e of cell.querySelectorAll('*')) {
             if (e.closest('.ws-tab, [data-ws-label="tab"]')) continue;
             const cs = w.getComputedStyle(e);
-            if (e.tagName === 'svg' || ['Top', 'Right', 'Bottom', 'Left'].some((x) => visibleSide(cs, x))) add(e.getBoundingClientRect());
+            // the answer place itself is the pupil's writing space, never "empty" (an Off zone has no edge to see)
+            if (e.tagName === 'svg' || e.matches('.ansrow, .ws-fact-write, .ws-factans') || ['Top', 'Right', 'Bottom', 'Left'].some((x) => visibleSide(cs, x))) add(e.getBoundingClientRect());
         }
         if (top === Infinity || cb.height < 1) return 0;
         return Math.max(0, top - cb.top, cb.bottom - bot) / cb.height;
@@ -319,10 +321,12 @@ async function shot(page, key, opts, size, file) {
 }
 
 (async () => {
+    ANS = await import(require('url').pathToFileURL(path.join(require('../lib/ws-harness.cjs').ROOT, 'js/modules/sheet/ans-slot.js')).href).catch(() => ({ ansBoxApplies: () => true }));
+    if (!ANS.ansBoxApplies) ANS = { ansBoxApplies: () => true };
     const app = await open({ seed: 1, viewport: { width: 1280, height: 900, deviceScaleFactor: 1 } });
     const { page } = app;
     const fails = [];
-    const fail = (msg) => { fails.push(msg); };
+    const fail = (msg) => { fails.push(msg); if (!has('quiet')) console.log(`  FAIL ${msg}`); };
     try {
         await page.evaluate(installHelpers);
         await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}' });
@@ -371,6 +375,9 @@ async function shot(page, key, opts, size, file) {
             const looks = [{}, ...(FULL || has('looks') ? meta.looks : meta.looks.slice(0, LANE_LOOKS))];
             for (const look of looks) {
                 const lookName = Object.keys(look).length ? Object.entries(look).map(([a, b]) => `${a}=${b}`).join(',') : 'default';
+                // a look the option does not draw on (long division keeps its vinculum: sheet/ans-slot.js ansBoxApplies) is
+                // listed N/A, never silently skipped and never failed as "two values alike"
+                if (!ANS.ansBoxApplies(look, key)) { console.log(`  N/A ${key} [${lookName}]: the answer-box option does not draw on this look (long division keeps its vinculum; a stacked add_three already draws one box per digit)`); continue; }
                 const per = {};   // value -> host -> signature
                 const bands = {};   // size -> value -> worst H13 band
                 for (const { v, l } of values) {
@@ -410,7 +417,7 @@ async function shot(page, key, opts, size, file) {
                         for (const st of ['shown', 'rest', 'focused']) per[name][`${host}-${st}`] = s2[st];
                         per[name][`${host}-inputs`] = s2.inputs;
                         // e on the online worksheet (critic r2 #3): every card of the set draws the same number of answer boxes
-                        if (CHECKS.has('e') && v !== null && host === 'worksheet' && s2.cards && new Set(s2.cards).size > 1)
+                        if (CHECKS.has('e') && v === 'digit' && host === 'worksheet' && s2.cards && new Set(s2.cards).size > 1)
                             fail(`e ${key} [${lookName}] ${name} worksheet: the set's cards draw ${s2.cards.join(' / ')} answer boxes (SL-2)`);
                         if (CHECKS.has('e') && v !== null && host === 'worksheet' && s2.wraps) fail(`e ${key} [${lookName}] ${name} worksheet: the sentence wraps before "=" (critic r2 #7)`);
                         if (VERBOSE) console.log(`  ${key} ${name} ${host}: ${s2.inputs} input(s) cards ${s2.cards || '-'} shown ${s2.shown.slice(0, 160)}\n      focused ${s2.focused.slice(0, 160)}`);
@@ -438,7 +445,7 @@ async function shot(page, key, opts, size, file) {
         }
     } catch (e) { fail(`crashed: ${e && e.stack || e}`); }
     finally { await app.close(); }
-    for (const f of fails) console.log(`  FAIL ${f}`);
+    if (has('quiet')) for (const f of fails) console.log(`  FAIL ${f}`);
     console.log(fails.length ? `ws-ansbox-shape: FAIL (${fails.length})` : 'ws-ansbox-shape: OK');
     process.exit(fails.length ? 1 : 0);
 })();

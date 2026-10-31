@@ -1722,6 +1722,7 @@ export function newWorksheet() {
     if (grid) grid.scrollTop = 0;
 
     state.worksheetQs = [];
+    state.worksheetAnsBand = 0;
     worksheetConfettiTriggered.clear(); // Reset confetti tracking
     worksheetBannerRecorded.clear(); // Reset banner stats tracking
     worksheetMscState.clear(); // Reset multi-select-check per-card verdicts
@@ -1755,11 +1756,7 @@ export function newWorksheet() {
     // honoured, so a sheet is reproducible and a configured skill deals the same items here as
     // on paper. Mixed pools still mix: the mixed category / skill ids route inside the dispatcher.
     state.worksheetSeed = (Math.random() * 0x100000000) >>> 0;
-    for (let i = 0; i < total; i++) {
-        const q = _wsGenerate(i);
-        state.worksheetQs.push(q);
-        _wsRenderCard(grid, q, i);
-    }
+    _wsDealAndDraw(grid, 0, total);
     _wsScheduleLayout(grid);
     _wsHeaderPill();
     // Wave 5.2: the skill's number line above the sheet, covering every item on it.
@@ -1768,18 +1765,47 @@ export function newWorksheet() {
     document.getElementById("worksheetResult").innerText = "";
 }
 
+/**
+ * Deal items [from, from + n) and draw their cards. Automatic keeps the old deal-one-draw-one order (byte-identical
+ * sheets); when the items are answered in one box per digit (ansBox 'digit', ansBox r3, critic r2 #3) the whole set
+ * is dealt first, so every card draws the set's widest strip (SL-2: one box count per set).
+ */
+function _wsDealAndDraw(grid, from, n) {
+    if (n <= 0) return;
+    const q0 = _wsGenerate(from);
+    if (q0 && q0.ansBox === 'digit') {
+        const batch = [q0];
+        for (let j = 1; j < n; j++) batch.push(_wsGenerate(from + j));
+        _wsMarkAnsBand(batch);
+        batch.forEach((q, j) => { state.worksheetQs.push(q); _wsRenderCard(grid, q, from + j); });
+        return;
+    }
+    state.worksheetQs.push(q0);
+    _wsRenderCard(grid, q0, from);
+    for (let j = 1; j < n; j++) {
+        const q = _wsGenerate(from + j);
+        state.worksheetQs.push(q);
+        _wsRenderCard(grid, q, from + j);
+    }
+}
+
+/** SL-2 on screen (ansBox r3): the widest digit strip of a set's 'digit' items is every such item's strip. */
+function _wsMarkAnsBand(qs) {
+    const digit = (qs || []).filter((q) => q && q.ansBox === 'digit');
+    if (!digit.length) return;
+    let band = 0;
+    for (const q of digit) { try { const k = cellKindFor(q); if (k && Number(k.strip) > band) band = Number(k.strip); } catch (e) { /* legacy drawing */ } }
+    band = Math.max(band, Number(state.worksheetAnsBand) || 0);
+    if (band > 0) { state.worksheetAnsBand = band; digit.forEach((q) => { q.ansBand = band; }); }
+}
+
 // Add more problems for unlimited mode
 export function addMoreProblems() {
     const grid = document.getElementById("worksheetGrid");
     const startIndex = state.worksheetQs.length;
     if (!Number.isInteger(state.worksheetSeed)) state.worksheetSeed = (Math.random() * 0x100000000) >>> 0;
 
-    for (let j = 0; j < 10; j++) {
-        const i = startIndex + j;
-        const q = _wsGenerate(i);
-        state.worksheetQs.push(q);
-        _wsRenderCard(grid, q, i);
-    }
+    _wsDealAndDraw(grid, startIndex, 10);
     _wsScheduleLayout(grid);
     try { syncWorksheetRefLine(state.worksheetQs, { categoryId: state.category, skillId: state.skill, opts: state.skillOptions || null, pool: !state.isMixedMode }); } catch (e) { /* a hint */ }
 

@@ -6,12 +6,13 @@
 // Lead decision SL-3 (2026-10-31): an UNTOUCHED option (null) draws the OLD drawing, byte for byte - the
 // ruled line / open answer row of main. So a teacher value is offered only where it draws something the old
 // drawing does not, on every host:
-//   stack        (kit column)    auto = per-digit strip (paper and screen)  -> One box, Off
+//   stack        (kit column)    auto = the open row on paper (per-digit strip where the generator draws it), strip on
+//                                screen -> One box (+ Off where Automatic is the strip)
 //   legacy-stack (legacy column) auto = open row on paper, per-digit strip on screen -> One box
 //                                (per digit = the screen's strip, Off = the paper's open row)
-//   fact / legacy-eq / legacy-fact  auto = open zone or ruled line on paper, one yellow box on screen
-//                                -> One box (the paper's black box, on screen too), One box per digit
-//                                (Off = the paper's plain space)
+//   fact / legacy-eq / legacy-fact  auto = open zone or ruled line on paper, ONE box on screen
+//                                -> One box per digit (One box = the screen's own box, Off = the paper's plain
+//                                space: each would draw what Automatic draws on one host - ws-ansbox-shape f)
 //   add-three, missing-number sentences (auto = one box everywhere) -> One box per digit
 // A value that is not offered (an old share code) draws Automatic: effectiveAnsBox() returns null.
 //
@@ -19,15 +20,19 @@
 
 export const ANS_VALUES = ['digit', 'one', 'off'];
 const OFFER = {
-    stack: ['one', 'off'],
+    stack: ['one'],
     'legacy-stack': ['one'],
-    fact: ['one', 'digit'],
-    'legacy-eq': ['one', 'digit'],
-    'legacy-fact': ['one', 'digit'],
+    fact: ['digit'],
+    'legacy-eq': ['digit'],
+    'legacy-fact': ['digit'],
     'add-three': ['digit'],
 };
 // skills whose automatic answer place is already ONE box on paper (a missing-number sentence's box)
 const ONE_BOX_AUTO = new Set(['subtraction:missing_add_sub', 'division:missing_mult_div']);
+// kit columns whose generator draws the per-digit strip itself (answer: 'boxes'): their Automatic is already one box
+// per digit, so 'Off' (the plain open row) is a real choice there; every other kit column's Automatic IS the open row
+const STACK_BOXES_AUTO = new Set(['subtraction:sub_50_no_regroup', 'subtraction:sub_100_no_regroup', 'subtraction:sub_1k_no_regroup',
+    'subtraction:sub_10k_no_regroup', 'subtraction:sub_100k_no_regroup', 'subtraction:sub_1m_no_regroup', 'addition:add_column_multi']);
 // a pool whose members draw differently: no single value is honoured, so nothing is offered
 const MIXED = new Set(['division:mixed_division']);
 
@@ -35,13 +40,25 @@ const MIXED = new Set(['division:mixed_division']);
 export function offeredAnsValues(layout = '', key = '') {
     const parts = String(layout || '').split('+').filter(Boolean);
     if (parts.length !== 1 || MIXED.has(key)) return [];
-    const base = OFFER[parts[0]] || [];
+    const base = parts[0] === 'stack' && STACK_BOXES_AUTO.has(key) ? ['one', 'off'] : OFFER[parts[0]] || [];
     return ONE_BOX_AUTO.has(key) ? base.filter((v) => v !== 'one') : base;
 }
 
 /** The value a cell honours: the teacher's value when it is offered for this layout, else null (Automatic). */
 export function effectiveAnsBox(value, layout = '', key = '') {
     return ANS_VALUES.includes(value) && offeredAnsValues(layout, key).includes(value) ? value : null;
+}
+
+/**
+ * Does the option draw anything on this look? Long division keeps its vinculum and its quotient place whatever
+ * the value (owner ruling SL-3 exception): on a long-division look every value draws Automatic's answer place. A
+ * stacked add_three is a column that already draws one box per digit.
+ */
+export function ansBoxApplies(look = {}, key = '') {
+    const o = look || {};
+    // add_three drawn stacked is a column whose generator already draws one box per digit (its Automatic)
+    if (key === 'addition:add_three' && o.notation === 'stacked') return false;
+    return !(o.divForm === 'long' || o.notation === 'bracket' || o.notation === 'long');
 }
 
 /** The em width an answer slot of this value takes beside "=" (the across fact's fit, DN-22), or 0 = the old line. */
