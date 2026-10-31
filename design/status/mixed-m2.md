@@ -33,3 +33,15 @@ pre-existing H13 on Sections shelves of `fractions:identify` and I Can L facts.
   kit fact and its digits are the legacy size. Migrating it to the kit fact cell fixes both.
 - Sections H13 on grouped frac-model / I Can L fact shelves (pre-existing: a grouped shelf takes its skill's tallest cell).
 - `decimals:add_decimal` one-skill page prints the same count at S / M / L (its drawing does not shrink); S >= M >= L holds.
+
+## Gates (c951580)
+- `mixed-m2.check.cjs` full: OK (127 pages, 46 scenarios); `--quick` OK. Backtest on 5c6063a: FAIL (170).
+- `mixed-page.check.cjs --seeds 2` (M1): OK (72 pages). `interleave.test.mjs`: 13 pass, 1 pending.
+- `ws-boot-smoke` OK; `ws-code-snapshot` OK (731 codes, none moved).
+- `ws-print-lint --source kit`: 457 findings in 33 of 220 documents, per-document counts identical to 5c6063a.
+- `ws-print-lint --source kit --roles mixed-practice` (precritic sample): L 65 / 8 docs, S 92 / 9 docs - identical to 5c6063a;
+  red in `ws-precritic --strict` only because the role's pages were never pinned (pre-existing).
+- Byte-identical vs 5c6063a: 26 of 44 baseline requests (single-skill independent, grouped independent, more practice,
+  guided, review, lesson packets at S and L, Mixed practice Sections at M Daily / L Daily). Moved (R1-7, on purpose): every
+  Mixed practice Sections page at S, the I Can M / L pages of fact or word sets, the pages that spilled to page 2 on rounding
+  (a-S daily, a-S / a-M I Can, three-M daily), and the one-skill Mixed practice page at S (add_facts 20 -> 56).
