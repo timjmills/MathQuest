@@ -51,7 +51,8 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
     });
     if (placed) {
         // PG-15: a placed shelf that stops short ends in ONE unruled area to the frame, every row.
-        if (trail && trail.col) out.push(`<div class="ws-cell blankrun" style="--from:${trail.col};grid-row:1 / span ${trail.rows || 1}"></div>`);
+        // (`trail.row`: the hole under a short last column of a two-row shelf starts on its row)
+        if (trail && trail.col) out.push(`<div class="ws-cell blankrun" style="--from:${trail.col};grid-row:${trail.row || 1} / span ${trail.rows || 1}"></div>`);
         const r0 = rows || 1;
         return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r0},1fr)`};${height ? `height:${height};` : ''}">${out.join('')}</div>`;
     }
