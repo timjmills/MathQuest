@@ -636,7 +636,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 // kit cells, then the legacy print slots (print-generate.js wsStackHTML / wsAnswerLine)
                 digit: /ws-digitboxes|ws-factans--digit|<span class="ab[^"]*" data-ws-seg|ws-fact-write--digit|ws-slot--digits/,
                 one: /ansrow--box|class="ws-factans(?: ws-trace| ws-dotted)?"|class="ws-line"(?![^>]*ws-line--off)|class="ws-fact-write" style="[^"]*border:|class="ws-slot" data-ws-shape="line" style="[^"]*border:[^"]*border-radius|<span data-ws-shape="box" style="[^"]*;border:[^;]*solid[^;]*;border-radius/,   // ... and the add-three counters' box (ops-common.js box)
-                off: /ws-line--off|ws-factans--off|class="ansrow"|<span class="(?:ws-trace )?an"|class="ws-fact-write" style="grid-column:1 \/ -1;height:[\d.]+mm;(?:"|display:grid)|class="ws-slot" data-ws-shape="line" style="[^"]*border-bottom:[^"]*"|<span data-ws-shape="box" style="[^"]*;border:0;border-bottom:/,   // a key's open zone: plain digits, no box
+                off: /ws-line--off|ws-factans--off|class="ansrow"|<span class="(?:ws-trace )?an"|class="ws-fact-write" style="grid-column:1 \/ -1;height:(?:[\d.]+mm|max\([\d.]+mm, 1\.15em\));(?:"|display:grid)|class="ws-slot" data-ws-shape="line" style="[^"]*border-bottom:[^"]*"|<span data-ws-shape="box" style="[^"]*;border:0;border-bottom:/,   // a key's open zone: plain digits, no box
             };
             try {
                 const rs = await W.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }], count: 6, columns: 'auto' }], seed: baseSeed, key: true });
