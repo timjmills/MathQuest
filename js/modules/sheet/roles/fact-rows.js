@@ -667,11 +667,32 @@ function factCell(it, L) {
     });
 }
 
+/**
+ * The items a page keeps. A page mixing operations is dealt skill by skill, and its layout can come out
+ * smaller than the count it was dealt for (a 12 x 11 = 132 dealt after the probe brings PT-FRW-5's
+ * 8-column clamp): it then keeps each operation's share of the page, in dealt order, so the last skill
+ * (the ÷ facts) is never the one cut. Every other page keeps its first `perPage` items.
+ */
+function keepShares(all, L) {
+    if (!L.mixed || all.length <= L.perPage) return all.slice(0, L.perPage);
+    const key = (it) => `${(it.q || {}).categoryId}:${(it.q || {}).skillId}`;
+    const counts = new Map();
+    for (const it of all) counts.set(key(it), (counts.get(key(it)) || 0) + 1);
+    const keys = [...counts.keys()];
+    const quota = new Map(keys.map((k) => [k, Math.floor((L.perPage * counts.get(k)) / all.length)]));
+    let left = L.perPage - [...quota.values()].reduce((a, b) => a + b, 0);
+    // the remainder to the largest fractional shares, in dealt order on a tie
+    const rest = keys.map((k) => [k, (L.perPage * counts.get(k)) / all.length - quota.get(k)]).sort((a, b) => b[1] - a[1]);
+    for (const [k] of rest) { if (left <= 0) break; quota.set(k, quota.get(k) + 1); left--; }
+    const used = new Map();
+    return all.filter((it) => { const k = key(it); const u = used.get(k) || 0; if (u >= quota.get(k)) return false; used.set(k, u + 1); return true; });
+}
+
 export function plan(input = {}) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
     const all = poolItems(input, 'main');
     const L = Object.assign({}, factRowsLayout(all, input), { size: ctx.size, look: ctx.look });
-    const items = all.slice(0, L.perPage).map((it) => factCell(it, L));
+    const items = keepShares(all, L).map((it) => factCell(it, L));
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items), score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one cell width per section (critic r1 R1-2): a short last row keeps the lattice, the rest unruled (PG-15)

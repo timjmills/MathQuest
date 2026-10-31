@@ -164,3 +164,42 @@ Branch head: see `git log -1 claude/sweet-newton-c8wrv1-laneD-restart` (critic r
 - Sign `design/cards/facts/facts.md` (Q1–Q5; critic: Q3 not acceptable as drawn until R1-1 is fixed).
 - div_zero_in_quotient: keep the 1-in-4 ones-zero deal (pin dealer-uniform) or deal uniformly.
 - Whether shared-role defects (item 5) gate the fact family or move to their own lanes.
+
+## Round 2, fix builder F1 (2026-10-31, Opus medium: rebuild of critic-r1-failed work)
+
+Scope: R1-1, R1-2, R1-15, R1-16 and the owner ruling of 2026-10-31 (mixed fast-facts page). F2 holds the lesson role,
+the ÷ supports, fraction_number_line lessonfit, the long-division preset skill and the dealer-uniform pin.
+
+| Defect | Fix | New check (backtest row: fails on 31a856fd, passes on f9482c43) |
+|---|---|---|
+| R1-1 bracket arc on the dividend's first digit | `cells/long-division.js` `compactArc`: the arc placed from the glyphs' INK (white a, stroke, bow, white b; b aims 0.7 mm, floor 0.3 mm), each fact its own gutter within the column's room (`factRowRoom`), `DIGIT_INK_EM` re-measured at 1000 px; fact-rows `rowGeometry` refuses a track that keeps less than the floor or whose box leaves the cell | ws-print-lint **L-OVERLAP ARC-INK** (self-test pair); row `arc-ink-laned` |
+| R1-2 Mix last row widened | fact rows keep the lattice (`grid.js` `relay: false`, plumbed in `answer-key.js`) and deal whole rows (Mix thirds within one: 70 = 24/23/23) | ws-print-lint **L-DENSITY GRID-EVEN** on fact-rows grids (self-test pair); row `grid-even-laned` |
+| R1-15 fraction numerator in the L tab keep-out | `cells/equation.js`: a ÷ fact's fraction starts below the keep-out on every page type (paper) | ws-precritic plans `ws-print-lint --opts divForm=<each> x 12 fact-family roles x S/L` for div_facts; row `frac-keepout-laned` (Opener L) |
+| R1-16 Mix online worksheet | `worksheet.js`: one digit size per sheet (the touch-floor digit on every card), equal paper cells per row; `screen-cell.js`: Mix across slot inline | ws-screen-slots **--uniform** (`worksheet:digits`, `worksheet:rows`), planned by ws-precritic; row `screen-uniform-laned` |
+| Owner 2026-10-31: mix ÷ forms with + − × ÷ facts | `fact-rows.js` `mixedForms`: a fact-rows section mixing operations with div_facts forms is one grid, one cell width, each stacked fact on its own tracks, columns = the narrowest form's fit (10 when all fit; a × answer over 99 keeps PT-FRW-5's 8); title "Facts" | ws-layout-unit block (5 mixes x S/M/L x Auto/5/6/8/10); ws-print-lint `--kind sections` takes fact-rows |
+
+Arc white (arc ink to the dividend's first digit ink, measured in the browser at 20x canvas resolution): 10 columns 0.62-0.70 mm
+(S, M and L; worst 10 ) 110), 8 columns 0.69-0.78, 6 columns 0.92-1.05, 5 columns 1.08-1.54. Before (31a856fd, same 20x
+measure): 10 columns -0.09 (into the digit) to 0.26, 8 columns 0.14-0.41 (1x measure), 5 columns 0.57-1.09. Divisor ink to arc
+ink >= 0.27 mm.
+
+Mixed fast-facts page (fact rows, seed 11; cols x rows @ digit pt), one grid, one cell width, ws-print-lint clean at S/M/L x
+Auto/5/6/8/10 for add+sub+mult+div (Mix), add+sub+mult+div (Long), add+sub+div (Fraction), mult+div (Standard):
+
+| Mix of | S Auto | S 10 | M Auto | M 8 | M 10 | L Auto | L 8 | L 10 |
+|---|---|---|---|---|---|---|---|---|
+| + − × ÷(Mix) | 10x7 @16 | 10x7 @16 | 6x5 @24 | 8x6 @18 | 10x7 @16 | 5x5 @28 | 8x6 @18 | 8x6 @18 (a 12 x 11 = 132 dealt: PT-FRW-5) |
+| + − ÷(Mix) | 10x7 @16 | 10x7 @16 | 6x5 @24 | 8x6 @18 | 10x7 @16 | 5x5 @28 | 8x6 @18 | 10x6 @16 |
+| + ÷(Long) | 10x7 @16 | 10x7 @16 | 6x5 @24 | 8x6 @18 | 10x7 @16 | 5x5 @28 | 8x6 @18 | 10x6 @16 |
+
+5 and 6 columns: 5x5 @28 and 6x5 @24 at every size. When the dealt page comes out smaller than its count (the PT-FRW-5 clamp
+after the probe), each operation keeps its share (`keepShares`), so the ÷ facts are never the ones cut.
+
+Byte-identical (buildSheet pupil + key HTML, seed 11, vs 76bc3700): fact rows + − × and ÷ Standard / Vertical / Fraction at S/M/L x
+Auto/5/6/8/10. Changed by design: ÷ Long and Mix fact rows; the ÷ fraction off fact rows (R1-15).
+
+Evidence (150 dpi): `design/status/laned-restart/after-r2-*.png`, `before-r2-*.png`.
+
+Open (not F1's files): the instruction "Look at the _sign_. Solve." prints "thesign" (the `.ws-instrline` flex box drops the space
+before `<u>`; practice.js `instructionHtml`, pinned by ws-layout-unit BD-14); the fact probe (fact-probe.js) still re-lays its
+short last row in Mix / Long / Fraction (H13 31 % band at S and L, pre-existing on 76bc3700).
