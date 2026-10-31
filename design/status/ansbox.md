@@ -98,3 +98,30 @@ Times: fix r2 (rebuild after critic r1), start 2026-10-31T10:40Z, end 2026-10-31
 
 ## Log
 - 2026-10-31: r2 rebuilt at medium (critic r1 FAIL, O6 = 3). Checks first (c1bd60a), fixes (f83caa6), backtests 6/6 PASS.
+
+## Critic r2 (2026-10-31): FAIL. Loop STOPPED (same defect survived two rounds)
+
+Report: `design/audit/critic/2026-10-31/ansbox-r2.md`. PNGs: `design/status/ansbox/critic-r2/`. Lowest scores C2 = 3 and C1 = 4, both on the fact template with notation=across at Size S and "One box per digit".
+
+The r1 fixes held on the cells r1 sampled. Three of r1's defect classes reappeared on combinations r1 did not sample:
+
+| Defect | Where it survived | r1 | r2 |
+|---|---|---|---|
+| Digit box narrower than its digit; key overflows | fact, notation=across, S | #2 | #1 |
+| Box count varies within a section | legacy multiply, online worksheet | #4 | #3 |
+| Two values look alike on screen | fact and equation 'off' on card and quiz (4-sided focus ring) | #5 | #2 |
+
+r2 also found three new problems:
+- **#4:** legacy stack with One box / Off jumps to the top of the cell (H13: 43 % empty).
+- **#5, BLOCKING:** the default pages of the 7 passed skills are **not** byte-identical to main. 28 of 91 documents changed: review-role word-problem unit lines and legacy stack rows. The cause is lane commit 8c21ca1 (SL-3 "every slot a full box"), and r2's parity baseline was taken at b63c075, which already contains 8c21ca1.
+- **#6:** options-render has two red findings that main lacks: add_facts S across L-KEY, and add_sub_10s L capacity.
+
+### Root cause
+1. **There is no single answer-slot model.** ansBox is implemented as a separate patch for each template × notation × host: kit CSS, screen-cell CSS overrides, the legacy formatter and the key fill. Each critic round samples some of those combinations, and the builder fixes exactly those. The other combinations stay unfixed until a critic happens to sample them.
+2. **The checks enumerate the same sample the critic used.** They do not cover the option space. `ws-ansbox-shape` runs only the default notation, `ws-options-verify --render` skips ansBox without saying so, `ws-coverage-matrix` has no ansBox rows, and check e does not run on the worksheet host.
+3. **Parity and "pre-existing" were measured against a lane commit, not main**, so a regression on passed skills was invisible.
+
+### What must happen before r3 (a re-brief, not another fix round)
+- **Decide (owner or lead):** SL-3 on the review pages of passed skills. Either keep the old line/ansrow drawing when ansBox is untouched, or accept the change and re-grade those 7 skills.
+- **Checks first:** `ws-ansbox-shape` iterates every notation / divForm / layout value × every offered ansBox value × S/M/L × all four hosts (pupil, key, card+quiz, worksheet). Check f counts a 4-sided focus ring as a box. Add an H13 band check on teacher values. `ws-options-verify --render` lists ansBox, or reports it as SKIPPED. `ws-ansbox-default-parity` measures against `git merge-base HEAD origin/claude/sweet-newton-c8wrv1` and refuses `--write` on any other base.
+- **Then** one answer-slot function per template that takes (ansBox, notation, size, host) and returns the box geometry. Pupil, key and screen all render from it, replacing the per-host CSS overrides.
