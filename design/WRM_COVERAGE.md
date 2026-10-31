@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 396 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 403 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -1593,6 +1593,8 @@ whatever happens to the WRM gaps.
   Vocabulary: partition, bridge, cross a ten, exchange  
 - **Y2.B2.S13** 10 more, 10 less — covered. _1.NBT.C.5_  
   Skills: 1 More, 1 Less, 10 More, 10 Less (`placevalue:more_less_10`) {10 more and 10 less}  
+  Partial: 10 More Than a Number (34 + 10) (`addition:ten_more`), missing 10 less (it deals only 10 more: 34 + 10)  
+  Partial: 10 Less Than a Number (34 − 10) (`addition:ten_less`), missing 10 more (it deals only 10 less: 34 − 10)  
   Vocabulary: ten more, ten less, stays the same  
 - **Y2.B2.S14** Add and subtract 10s — covered. _1.NBT.C.4, 1.NBT.C.6, M.EE.1.NBT.4, M.EE.1.NBT.6_  
   Skills: Add & Subtract by 10s (`addition:add_sub_10s`)  
@@ -1618,6 +1620,7 @@ whatever happens to the WRM gaps.
   Vocabulary: greater than (>), less than (<), equal to (  
 - **Y2.B2.S21** Missing number problems — covered. _1.OA.D.8_  
   Skills: Pick the Missing Addends (`addition:cloze_addition`); Missing Numbers (+/−) (`subtraction:missing_add_sub`)  
+  Partial: Missing Number: Find the Total or Difference (8 + 5 = __) (`subtraction:missing_add_sub_answer`), missing a missing number before the = sign (it deals only the answer: 8 + 5 = __)  
   Vocabulary: is equal to, partition, missing number  
 
 #### Y2.B3 Autumn Block 3: Shape
@@ -1956,6 +1959,8 @@ whatever happens to the WRM gaps.
   Vocabulary: hundreds, tens, ones, place value counter, column  
 - **Y3.B1.S9** Find 1, 10 or 100 more or less — covered. _2.NBT.B.8_  
   Skills: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`) {1, 10 and 100}  
+  Partial: 100 More Than a Number (234 + 100) (`addition:hundred_more`), missing 1 and 10 more or less, and 100 less (it deals only 100 more)  
+  Partial: 100 Less Than a Number (234 − 100) (`addition:hundred_less`), missing 1 and 10 more or less, and 100 more (it deals only 100 less)  
   Vocabulary: more, less, column, exchange  
 - **Y3.B1.S10** Number line to 1,000 — PARTIAL. _2.MD.B.6, 2.NBT.A.1, M.EE.2.MD.6, M.EE.2.NBT.1_  
   Partial: Mark a Number on a Number Line (`number_sense:place_on_number_line`), missing a 0-1,000 line (the skill's lines are to 100)  
@@ -1988,6 +1993,8 @@ whatever happens to the WRM gaps.
   Vocabulary: tens, increase, decrease  
 - **Y3.B2.S4** Add and subtract 100s — covered. _2.NBT.B.7, 2.NBT.B.8, M.EE.2.NBT.7_  
   Skills: Add & Subtract by 100s (`addition:add_sub_100s`)  
+  Partial: 100 More Than a Number (234 + 100) (`addition:hundred_more`), missing subtracting 100s, and adding more than one hundred (it deals only 234 + 100)  
+  Partial: 100 Less Than a Number (234 − 100) (`addition:hundred_less`), missing adding 100s, and taking away more than one hundred (it deals only 234 − 100)  
   Vocabulary: hundred, column, multiple of 100  
 - **Y3.B2.S5** Spot the pattern — GAP. _2.NBT.B.5, 2.NBT.B.8, M.EE.2.NBT.5_  
   Proposal: Spot the Pattern (+/−)  
@@ -2121,6 +2128,8 @@ whatever happens to the WRM gaps.
   Vocabulary: partition, exchange, partial product  
 - **Y3.B4.S6** Link multiplication and division — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Fact Families (`multiplication:mult_div_fact_family`); Missing Factors (×/÷) (`division:missing_mult_div`)  
+  Partial: Missing Factor in a Multiplication Sentence (__ × 6 = 42) (`division:missing_mult_only`), missing the division sentences (it deals only × sentences: __ × 6 = 42)  
+  Partial: Missing Number in a Division Sentence (42 ÷ __ = 7) (`division:missing_div_only`), missing the multiplication sentences (it deals only ÷ sentences: 42 ÷ __ = 7)  
   Vocabulary: array, related fact, unitise  
 - **Y3.B4.S7** Divide a 2-digit number by a 1-digit number - no exchange — covered. _3.OA.A.2, 4.NBT.B.6, M.EE.3.OA.2_  
   Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`); Divide 2-Digit by 1-Digit Numbers (Long Division) (`division:div_2by1_long`)  

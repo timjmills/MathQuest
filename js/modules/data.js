@@ -313,6 +313,8 @@ export const SKILL_GRADES = {
     'clock_hands': 1, 'minutes_by_fives_all': 2, 'order_notes': 1, 'money_amount_in_words': 2, 'sort_prime_composite': 4,
     'list_multiples': 4, 'missing_multiples': 4, 'common_factors': 5, 'common_multiples': 5,
     'ten_times_value': 4, 'one_tenth_value': 4, 'ten_times_story': 4,   // 4.NBT.A.1 (2026-10-30 presets, detailed lesson 6)
+    'ten_more': 1, 'ten_less': 1, 'hundred_more': 2, 'hundred_less': 2,     // 1.NBT.C.5; 2.NBT.B.8 (2026-10-31 presets, ops-family r2)
+    'missing_mult_only': 3, 'missing_div_only': 3, 'missing_add_sub_answer': 1, // 3.OA.A.4; 1.OA.D.8
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -695,6 +697,11 @@ export const SKILLS = {
         { v: "add_column_multi", l: "Add Three or Four Numbers in Columns" },   // CM-3 … CM-8: the regroup box must hold a 2-digit carry
         { v: "add_missing_digit", l: "Find the Missing Digit (Addition)" },      // AC-19: a dashed digit box inside a finished column
         { v: "fact_family_sort", l: "Is It a Fact Family? (+/−)" },              // FF-6: needs NON-examples, which a fact-family skill must never emit
+        // APPENDED 2026-10-31 — PRESET skills (owner, ops-family r2): one sign of add_sub_10s / add_sub_100s.
+        { v: "ten_more", l: "10 More Than a Number (34 + 10)", presetOf: "add_sub_10s" },
+        { v: "ten_less", l: "10 Less Than a Number (34 − 10)", presetOf: "add_sub_10s" },
+        { v: "hundred_more", l: "100 More Than a Number (234 + 100)", presetOf: "add_sub_100s" },
+        { v: "hundred_less", l: "100 Less Than a Number (234 − 100)", presetOf: "add_sub_100s" },
     ],
     subtraction: [
         { v: "sub_facts", l: "Subtraction Facts (within 20)" },
@@ -760,6 +767,8 @@ export const SKILLS = {
         { v: "sub_wp_start_unknown", l: "Subtraction Word Problems: Find the Start", presetOf: "sub_word_problems" },
         // APPENDED 2026-10-23 — PRESET (SU-C pilot, catalogue C3): 2-digit − 1-digit, no regrouping.
         { v: "sub_2d_1d", l: "Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping)", presetOf: "sub_100_no_regroup" },
+        // APPENDED 2026-10-31 — PRESET (owner, ops-family r2): missing_add_sub with the box in the answer, after =.
+        { v: "missing_add_sub_answer", l: "Missing Number: Find the Total or Difference (8 + 5 = __)", presetOf: "missing_add_sub" },
     ],
     multiplication: [
         { v: "mult_facts", l: "Multiplication Facts (1-12)" },
@@ -858,6 +867,9 @@ export const SKILLS = {
         // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
         { v: "div_sharing_word_problems", l: "Division Word Problems: Sharing", presetOf: "div_word_problems" },
         { v: "div_grouping_word_problems", l: "Division Word Problems: Grouping", presetOf: "div_word_problems" },
+        // APPENDED 2026-10-31 — PRESET skills (owner, ops-family r2): one sign of missing_mult_div (its `task` option).
+        { v: "missing_mult_only", l: "Missing Factor in a Multiplication Sentence (__ × 6 = 42)", presetOf: "missing_mult_div" },
+        { v: "missing_div_only", l: "Missing Number in a Division Sentence (42 ÷ __ = 7)", presetOf: "missing_mult_div" },
     ],
     integers: [
         { v: "number_line_int", l: "Number Lines with Negatives" },

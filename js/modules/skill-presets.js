@@ -154,6 +154,17 @@ export const SKILL_PRESETS = Object.freeze({
     'number_theory:missing_multiples': { skill: 'multiples', opts: { forms: [3] } },
     'number_theory:common_factors': { skill: 'gcf_easy', opts: { forms: [1] } },
     'number_theory:common_multiples': { skill: 'lcm', opts: { forms: [1] } },
+    // --- 2026-10-31 (owner, ops-family r2): one sign or one box position of an ops host -------------------------
+    // add_sub_10s / add_sub_100s `task`: 0 = adding, 1 = subtracting (the items are always ± exactly 10 / 100).
+    'addition:ten_more': { skill: 'add_sub_10s', opts: { task: [0] } },
+    'addition:ten_less': { skill: 'add_sub_10s', opts: { task: [1] } },
+    'addition:hundred_more': { skill: 'add_sub_100s', opts: { task: [0] } },
+    'addition:hundred_less': { skill: 'add_sub_100s', opts: { task: [1] } },
+    // missing_mult_div `task` (added for these two, skill-options.js): 0 = × sentences, 1 = ÷ sentences.
+    'division:missing_mult_only': { skill: 'missing_mult_div', opts: { task: [0] } },
+    'division:missing_div_only': { skill: 'missing_mult_div', opts: { task: [1] } },
+    // missing_add_sub `unknown`: 0 = the answer after = (8 + 5 = __); the host's default is [1], before =.
+    'subtraction:missing_add_sub_answer': { skill: 'missing_add_sub', opts: { unknown: [0] } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

@@ -1127,8 +1127,7 @@ const P11_OPS_OPTIONS = {
     // unknown before the answer, never the dropped "48 ÷ 4 = __" - and the trace level really prints.
     'division:missing_mult_div': [{ ...notationOption('/'),
         values: [{ v: 'across', l: 'Across  (48 ÷ __ = 12)' }, { v: 'bracket', l: 'Long division bracket  (12 over 4⟌__)' }, { v: 'fraction', l: 'Fraction bar  (__ over 4 = 12)' }],
-        help: 'Tick one way for a single-notation page, or several to mix them on one page. A page with the bracket ticked is all ÷ sentences: a × sentence is never written in a bracket.' },
-    levelSubset([3, 1], 1, 'Level 3 writes each missing number in grey to trace; level 1 is the sentence alone.')],
+        help: 'Tick one way for a single-notation page, or several to mix them on one page. A page with the bracket ticked is all ÷ sentences: a × sentence is never written in a bracket.' }],
     'multiplication:mult_div_fact_family': [notationOption('/')],
 
     // --- word problems: pictures on the stories that have them ----------------------------------
@@ -3093,6 +3092,15 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
     ['measurement:bar_graph_intro', _ap2Bars()],
 ].forEach(([key, ...defs]) => _o2Add(key, ...defs));
 // ============================ end O6 · appearance: figures and data (AP2) ===================
+
+// ops-family r2 (owner, 2026-10-31): the × or ÷ sentences of missing_mult_div alone, for its two preset skills
+// (missing_mult_only, missing_div_only). Read by gen-operations.js (_p12Narrowed('task'): one sign ticked deals only its
+// sentences; a page deal cannot be redrawn by the accept layer). Appended after `notation`, so the default page (both
+// ticked) and every old share code are unchanged.
+_o2Add('division:missing_mult_div', _p12Kinds('task', 'Operation', [['Multiplying (__ × 6 = 42)', '×'], ['Dividing (42 ÷ __ = 7)', '÷']],
+    'One operation for a page of it alone; both mixed makes the pupil read the sign.'));
+// ops-family r2 (F8): the trace level, appended after `task` (critic r1: the universal level printed nothing).
+_o2Add('division:missing_mult_div', levelSubset([3, 1], 1, 'Level 3 writes each missing number in grey to trace; level 1 is the sentence alone.'));
 
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
