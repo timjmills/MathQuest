@@ -292,7 +292,7 @@ function _stampAnsBox(q) {
     if (!o || !Object.prototype.hasOwnProperty.call(o, 'ansBox')) return q;
     // ansBox r3: the EFFECTIVE value (sheet/ans-slot.js): a value not offered for this skill's layout draws
     // Automatic, the old drawing (lead decision SL-3)
-    const v = o.ansBox == null ? null : effectiveAnsBoxFor(o.ansBox, state.category, state.skill);
+    const v = o.ansBox == null ? null : effectiveAnsBoxFor(o.ansBox, state.category, state.skill, o);   // the look (notation ...) decides too (owner decision a)
     q.ansBox = v;
     if (v != null && q.cell && q.cell.payload && typeof q.cell.payload === 'object') q.cell.payload.ansBox = v;
     return q;

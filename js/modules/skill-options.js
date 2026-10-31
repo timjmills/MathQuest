@@ -3654,9 +3654,9 @@ export function offeredAnsBox(def, layout = '', key = '') {
     return { ...def, values: def.values.filter((x) => x.v === null || vals.includes(x.v)) };
 }
 /** The answer-box value a skill's items honour: the teacher's value if offered for its layout, else null (Automatic). */
-export function effectiveAnsBoxFor(value, categoryId, skillId) {
+export function effectiveAnsBoxFor(value, categoryId, skillId, look = null) {
     const key = `${categoryId}:${skillId}`;
-    return effectiveAnsBox(value, ANSBOX_SKILLS[key] || '', key);
+    return effectiveAnsBox(value, ANSBOX_SKILLS[key] || '', key, look);
 }
 /** The answer-box style a cell draws: the chosen value, else null (Automatic = the old drawing, SL-3 r3). */
 export function resolveAnsBox(value) {

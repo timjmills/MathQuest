@@ -3,6 +3,10 @@
 // box count, the box size (never narrower than a digit at the question's size), where the slot sits, and the
 // key's ink size. Print pupil, print key and the screen hosts all read it (LESSONS_LEARNED L18).
 //
+// OWNER DECISIONS 2026-10-31 (supersede the offer table below where they differ): (a) the panel fits each look - an across
+// look offers Automatic / One box / Off, a column look all four; (b) facts and equations keep all four values. Check f:
+// every offered value draws what its label says on every host; two values may coincide on a host only where both labels
+// stay true there (One box on a fact screen that already shows one box).
 // Lead decision SL-3 (2026-10-31): an UNTOUCHED option (null) draws the OLD drawing, byte for byte - the
 // ruled line / open answer row of main. So a teacher value is offered only where it draws something the old
 // drawing does not, on every host:
@@ -20,11 +24,13 @@
 
 export const ANS_VALUES = ['digit', 'one', 'off'];
 const OFFER = {
-    stack: ['one'],
-    'legacy-stack': ['one'],
-    fact: ['digit'],
-    'legacy-eq': ['digit'],
-    'legacy-fact': ['digit'],
+    // owner decision 2026-10-31 (a): a column look offers all four
+    stack: ['one', 'digit', 'off'],
+    'legacy-stack': ['one', 'digit', 'off'],
+    // owner decision 2026-10-31 (b): facts and equations keep all four values
+    fact: ['one', 'digit', 'off'],
+    'legacy-eq': ['one', 'digit', 'off'],
+    'legacy-fact': ['one', 'digit', 'off'],
     'add-three': ['digit'],
 };
 // skills whose automatic answer place is already ONE box on paper (a missing-number sentence's box)
@@ -37,16 +43,19 @@ const STACK_BOXES_AUTO = new Set(['subtraction:sub_50_no_regroup', 'subtraction:
 const MIXED = new Set(['division:mixed_division']);
 
 /** The teacher values offered for a skill's measured layout ('' or a 'a+b' pool = none). */
-export function offeredAnsValues(layout = '', key = '') {
+export function offeredAnsValues(layout = '', key = '', look = null) {
     const parts = String(layout || '').split('+').filter(Boolean);
     if (parts.length !== 1 || MIXED.has(key)) return [];
-    const base = parts[0] === 'stack' && STACK_BOXES_AUTO.has(key) ? ['one', 'off'] : OFFER[parts[0]] || [];
-    return ONE_BOX_AUTO.has(key) ? base.filter((v) => v !== 'one') : base;
+    if (look && !ansBoxApplies(look, key)) return [];
+    let base = OFFER[parts[0]] || [];
+    // owner decision (a): an ACROSS look offers Automatic / One box / Off - never a choice the look cannot draw
+    if (look && (look.notation === 'across' || look.notation === 'horiz' || look.notation === 'horizontal')) base = base.filter((v) => v !== 'digit');
+    return base;
 }
 
 /** The value a cell honours: the teacher's value when it is offered for this layout, else null (Automatic). */
-export function effectiveAnsBox(value, layout = '', key = '') {
-    return ANS_VALUES.includes(value) && offeredAnsValues(layout, key).includes(value) ? value : null;
+export function effectiveAnsBox(value, layout = '', key = '', look = null) {
+    return ANS_VALUES.includes(value) && offeredAnsValues(layout, key, look).includes(value) ? value : null;
 }
 
 /**

@@ -55,7 +55,8 @@ const SIZES = (arg('sizes', FULL ? 'S,M,L' : 'S,L')).split(',').map((s) => s.tri
 // the options that change the same drawing as the answer slot (L18): crossed with every answer-box value
 const APPEARANCE = ['notation', 'divForm', 'layout', 'form', 'orient', 'orientation'];
 const LANE_LOOKS = 2;
-let ANS = { ansBoxApplies: () => true };   // sheet/ans-slot.js of the tree under test (loaded at start)
+let ANS = { ansBoxApplies: () => true };
+let LAYOUT = {};   // cat:skill -> measured layout (skill-ansbox-skills.js of the tree under test)   // sheet/ans-slot.js of the tree under test (loaded at start)
 const SHOTS = arg('shots', null);
 const VERBOSE = has('verbose');
 
@@ -324,6 +325,7 @@ async function shot(page, key, opts, size, file) {
 (async () => {
     ANS = await import(require('url').pathToFileURL(path.join(require('../lib/ws-harness.cjs').ROOT, 'js/modules/sheet/ans-slot.js')).href).catch(() => ({ ansBoxApplies: () => true }));
     if (!ANS.ansBoxApplies) ANS = { ansBoxApplies: () => true };
+    try { for (const m of fs.readFileSync(path.join(require('../lib/ws-harness.cjs').ROOT, 'js/modules/skill-ansbox-skills.js'), 'utf8').matchAll(/'([a-z_]+:[a-z0-9_]+)':\s*'([^']*)'/g)) LAYOUT[m[1]] = m[2]; } catch (e) { /* older tree */ }
     const app = await open({ seed: 1, viewport: { width: 1280, height: 900, deviceScaleFactor: 1 } });
     const { page } = app;
     const fails = [];
@@ -375,13 +377,15 @@ async function shot(page, key, opts, size, file) {
             if (!values) { console.log(`${key} measured (not offered: nothing to check)`); continue; }
             const looks = [{}, ...(FULL || has('looks') ? meta.looks : meta.looks.slice(0, LANE_LOOKS))];
             for (const look of looks) {
+                // owner decision (a): the values offered on THIS look (sheet/ans-slot.js offeredAnsValues with the look)
+                const lookVals = ANS.offeredAnsValues ? (() => { const ok = ANS.offeredAnsValues(LAYOUT[key] || '', key, look); return values.filter((x) => x.v === null || ok.includes(x.v)); })() : values;
                 const lookName = Object.keys(look).length ? Object.entries(look).map(([a, b]) => `${a}=${b}`).join(',') : 'default';
                 // a look the option does not draw on (long division keeps its vinculum: sheet/ans-slot.js ansBoxApplies) is
                 // listed N/A, never silently skipped and never failed as "two values alike"
                 if (!ANS.ansBoxApplies(look, key)) { console.log(`  N/A ${key} [${lookName}]: the answer-box option does not draw on this look (long division keeps its vinculum; a stacked add_three already draws one box per digit)`); continue; }
                 const per = {};   // value -> host -> signature
                 const bands = {};   // size -> value -> worst H13 band
-                for (const { v, l } of values) {
+                for (const { v, l } of lookVals) {
                     const opts = v === null ? { ...look } : { ...look, ansBox: v };
                     const name = v === null ? 'auto' : v;
                     per[name] = { label: l };
@@ -433,15 +437,34 @@ async function shot(page, key, opts, size, file) {
                     if (band > bv.auto + 0.04 && band >= 0.25) fail(`g ${key} [${lookName}] ${name} ${size}: empty band ${(band * 100).toFixed(0)}% of the cell, Automatic ${(bv.auto * 100).toFixed(0)}% (H13)`);
                 }
                 if (CHECKS.has('f')) {
+                    // OWNER RULE (2026-10-31): every offered value draws what its LABEL says on every host; two values may
+                    // coincide on a host only where both labels stay true there (One box on a fact screen that already shows
+                    // one box). A drawing's class per host: 'digit' (>= 2 boxes in a run / >= 2 inputs), 'one' (one box), 'off' (none).
+                    const cls = (sig, inputs) => {
+                        const str = String(sig || '');
+                        const boxes = (str.match(/box:/g) || []).length;
+                        if (/^(card|worksheet|quiz)$/.test(arguments[0] || '')) return null;
+                        return boxes >= 2 || inputs >= 2 ? 'digit' : boxes === 1 || inputs === 1 ? 'one' : 'off';
+                    };
+                    const truthful = (name, h) => {
+                        if (name === 'auto') return true;
+                        const host = h.split('-')[0];
+                        const scr = /^(card|worksheet|quiz)$/.test(host);
+                        const inputs = scr ? per[name][`${host}-inputs`] : 0;
+                        const sig = String(per[name][h] || '').split(' | ')[0];   // one cell (paper sigs join every cell)
+                        const nb = (sig.split(' || ')[0].match(/box:/g) || []).length;
+                        const c = scr ? (inputs >= 2 ? 'digit' : 'one') : (nb >= 2 ? 'digit' : nb === 1 ? 'one' : 'off');
+                        if (name === 'digit') return c === 'digit' || (scr && inputs === 1);
+                        if (name === 'one') return scr ? (inputs <= 1 || /mq-ans-one/.test(sig)) : c === 'one';
+                        return scr ? true : c === 'off';   // 'off' on a screen keeps the host's typed input
+                    };
                     const names = Object.keys(per);
                     const hosts = [...new Set(names.flatMap((n) => Object.keys(per[n])))].filter((h) => h !== 'label' && !/-inputs$/.test(h));
                     for (const h of hosts) for (let i = 0; i < names.length; i++) for (let j = i + 1; j < names.length; j++) {
                         const a2 = names[i], b2 = names[j];
-                        // the one excused pair: "per digit" and "one box" on a screen answer of ONE input (a one-place answer is one box)
-                        const host = h.split('-')[0];
-                        const onePlace = /^(card|worksheet|quiz)$/.test(host) && per[a2][`${host}-inputs`] === 1 && per[b2][`${host}-inputs`] === 1
-                            && [a2, b2].includes('one') && [a2, b2].includes('digit');
-                        if (per[a2][h] !== undefined && per[a2][h] === per[b2][h] && !onePlace) fail(`f ${key} [${lookName}] ${h}: "${per[a2].label}" and "${per[b2].label}" draw the same answer place`);
+                        if (per[a2][h] === undefined || per[a2][h] !== per[b2][h]) continue;
+                        if (truthful(a2, h) && truthful(b2, h)) continue;   // a true coincidence: both labels hold on this host
+                        fail(`f ${key} [${lookName}] ${h}: "${per[a2].label}" and "${per[b2].label}" draw the same answer place`);
                     }
                 }
             }
