@@ -977,7 +977,23 @@ function generateResolvedQuestion() {
                 console.error("Error in all_mixed custom skill selection:", err);
             }
 
-            if (skillsWithCategories.length > 0) {
+            // A link that uses one skill more than once (a detailed lesson's Practice link) deals its
+            // USES, each with its own options, from a shuffled deck so every use comes up once in
+            // each round of uses.length items. Without `uses` (no repeats) the pick below is unchanged.
+            let pickedUse = null;
+            const _uses = state.skill === 'custom_mixed' && state.mixedModeSettings && Array.isArray(state.mixedModeSettings.uses)
+                ? state.mixedModeSettings.uses : null;
+            if (_uses && _uses.length) {
+                const deck = state._usesDeck && state._usesDeck.src === _uses ? state._usesDeck : (state._usesDeck = { src: _uses, order: [] });
+                if (!deck.order.length) {
+                    deck.order = _uses.map((u, i) => i);
+                    for (let i = deck.order.length - 1; i > 0; i -= 1) { const j = randInt(0, i); [deck.order[i], deck.order[j]] = [deck.order[j], deck.order[i]]; }
+                }
+                const at = deck.order.pop();
+                pickedUse = { index: at, ..._uses[at] };
+                targetSkill = pickedUse.skillId;
+                targetCategory = pickedUse.categoryId;
+            } else if (skillsWithCategories.length > 0) {
                 const picked = pick(skillsWithCategories);
                 targetSkill = picked.skill;
                 targetCategory = picked.category;
@@ -1008,10 +1024,19 @@ function generateResolvedQuestion() {
             // pool's: options normalised for all_mixed / custom_mixed say nothing about it.
             const poolOptions = state.skillOptions;
             // ... unless the review's own pitch / support moves them (option-panel round 3).
-            state.skillOptions = poolMemberOptions(poolOptions, targetCategory, targetSkill, lookupSetOptions(targetCategory, targetSkill)) || undefined;
+            // A dealt use brings its OWN options (never the store's, which holds the skill's first use),
+            // passed explicitly even at the defaults so the store cannot stand in for them.
+            const memberSet = pickedUse ? (pickedUse.opts || {}) : lookupSetOptions(targetCategory, targetSkill);
+            state.skillOptions = poolMemberOptions(poolOptions, targetCategory, targetSkill, memberSet)
+                || (pickedUse ? normalizeOptions(targetCategory, targetSkill, memberSet) : undefined);
+            const useOptions = pickedUse ? state.skillOptions : null;
             let recursiveQ;
             try { recursiveQ = generateQuestion(); } finally { state.skillOptions = poolOptions; }
             Object.assign(q, recursiveQ);
+            if (pickedUse) {
+                q.skillOptions = recursiveQ && recursiveQ.skillOptions ? recursiveQ.skillOptions : useOptions;
+                q.linkUse = pickedUse.index;   // which use of the link dealt it (screen hosts read q.skillOptions)
+            }
 
             state.category = savedCategory;
             state.skill = savedSkill;

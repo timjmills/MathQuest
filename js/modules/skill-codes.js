@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS, getSkillGrade, gradeCircleHTML, getPositionalSkills } from './data.js';
 import { mergedSkillFor } from './skill-aliases.js';
 import { optionSuffix, decodeOptionPayload, splitOptionSuffix } from './skill-option-codec.js';
-import { getSetOptions, setSetOptions, deleteSetOptions, restoreSetOptions } from './skill-option-store.js';
+import { getSetOptions, setSetOptions, deleteSetOptions, restoreSetOptions, setQueueUses } from './skill-option-store.js';
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, skillOptionsSummaryHTML } from './skill-options-ui.js';
 
 // The share panel's skill list is an options host: each row gets the ⚙ Options panel, and the
@@ -126,9 +126,15 @@ export function applySkillCode(inputId) {
     }
 
     // Apply weights to skillQueue (which was synced by UnifiedSkills)
-    for (let i = 0; i < loadedSkills.length && i < window.skillQueue.length; i++) {
-        window.skillQueue[i].weight = loadedSkills[i].weight || 0;
+    // (by skill, not by position: a code that repeats a skill holds more parts than the queue has rows)
+    for (const q of window.skillQueue) {
+        const hit = loadedSkills.find((sk) => sk.categoryId === q.categoryId && sk.skillId === q.skillId);
+        if (hit) q.weight = hit.weight || 0;
     }
+    // A code that uses one skill more than once (a detailed lesson's Practice link) keeps every use
+    // with its own options: the queue holds the skill once, the uses ride beside it
+    // (skill-option-store.js setQueueUses) and mixed play deals them use by use. No repeat: null.
+    setQueueUses(loadedSkills);
 
     // Expand the queue to show loaded skills
     UnifiedSkills.expanded = true;
