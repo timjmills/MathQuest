@@ -772,6 +772,12 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
     const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
     if (inPlace && hMin > 0) cellH = r3(Math.min(cellH, hMin * IN_PLACE_FILL));
+    // (and to what THESE items measure: the skill's floor sized the page's rows for its tallest item - a K story with a
+    // five-frame - but a page that deals none of those keeps its cells to its own items; the rest stays under the grid)
+    if (inPlace) {
+        const own = Math.max(0, ...infos.map((i) => (i.measured && i.measured[cols] && Number(i.measured[cols].hMm)) || 0));
+        if (own > 0 && infos.every((i) => i.measured && i.measured[cols])) cellH = r3(Math.min(cellH, own * IN_PLACE_FILL));
+    }
     const fillsGrid = cellH >= even - 0.01;
     const perPage = rows * cols;
     const count = Math.max(0, Math.floor(Number(section.count) || 0));

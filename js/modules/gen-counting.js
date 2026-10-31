@@ -32,7 +32,7 @@
 // band; how many blanks a hundreds chart carries) are dealt across the page instead of ticked.
 // The registrations wanted are named in the wave report.
 import { state } from './state.js';
-import { dealIndex, freshDeal } from './page-deal.js';
+import { dealIndex, freshDeal, pageConstant } from './page-deal.js';
 import { randInt, shuffle, pick } from './utils.js';
 import { MONO, MONO_STROKE } from './design-tokens.js';
 import { k2Twin, K2_SHAPES } from './sheet/index.js';
@@ -1370,7 +1370,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             [`${a} ${N} are ${scene.place}.`, `${b} ${N} are ${scene.place2}.`, `How many ${N} are there in all?`],
             [`I have ${a} ${N}.`, `I get ${b} more ${N}.`, `How many ${N} do I have now?`],
         ];
-        const lines = FRAMES[dealIndex('wp10:frame', FRAMES.length)];
+        // PEDAGOGY P-21 / P-WP-1 (visual-quality critic r1 F12): a set uses ONE schema - join ("more ... now", frames 0
+        // and 2, their wording dealt) or put together ("in all", frame 1) - drawn once a page from the seeded rng
+        const lines = pageConstant('wp10:schema', 2) === 0 ? FRAMES[[0, 2][dealIndex('wp10:frame', 2)]] : FRAMES[1];
         q.text = lines.join(' ');
         q.printText = 'Write the total in the box.';
         q.ans = sum;

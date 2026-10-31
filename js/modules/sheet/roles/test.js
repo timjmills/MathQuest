@@ -89,9 +89,9 @@ function layout(items, input, count) {
         const other = resolveSectionLayout(sec(L.cols === 1 ? 2 : 1), items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
         const [best, alt] = !other.clamped && other.perPage > L.perPage ? [other, L] : [L, other.clamped ? null : other];
         // P-23: a one-column test's total is 4, 8, 10, 12, 16 or 20 where that still holds more than the other grid
-        // (11 rows -> 10; 5 stays 5 when two columns hold 4)
+        // (11 rows -> 10; a page under 8 keeps what it holds: 5 stays 5 when two columns hold 4)
         const ok = [20, 16, 12, 10, 8, 4].find((t) => t <= best.perPage);
-        const rows = best.cols === 1 && ok && ok >= (alt ? alt.perPage : 0) ? ok : best.rows;
+        const rows = best.cols === 1 && ok >= 8 && ok >= (alt ? alt.perPage : 0) ? ok : best.rows;
         return Object.assign({}, best, { requested: 'auto', rows, perPage: rows * best.cols });
     }
     return L;
