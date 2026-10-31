@@ -15,7 +15,11 @@ import { INK, L, P, B, isTwin, sizeOf, digitPt, textPt, esc, blankWidth, tw, col
 /** The writing height of a library box (a 2-digit number at the working digit size fits it). */
 export const BOX_H = Object.freeze({ S: 11, M: 13, L: 15 });
 /** A number box's width for `digits` digits (never narrower than 1.2 x its height). */
-export const boxW = (ctx, digits = 2) => Math.max((BOX_H[sizeOf(ctx)] || 15) * 1.2, blankWidth(Math.max(1, digits), sizeOf(ctx)));
+export const boxW = (ctx, digits = 2) => (isTwin(ctx) ? TWIN_BOX : Math.max((BOX_H[sizeOf(ctx)] || 15) * 1.1, blankWidth(Math.max(1, digits), sizeOf(ctx))));
+/** The screen twin's box (paper mm at --mq-k2): 12 mm, never under 44 px (a phone card holds the whole sentence). */
+export const TWIN_BOX = 12;
+/** A box's height: the size's writing height, the twin's square box. */
+export const boxH = (ctx) => (isTwin(ctx) ? TWIN_BOX : (BOX_H[sizeOf(ctx)] || 15));
 
 /**
  * @param {Object} ctx
@@ -24,7 +28,7 @@ export const boxW = (ctx, digits = 2) => Math.max((BOX_H[sizeOf(ctx)] || 15) * 1
  */
 export function answerArea(ctx, o = {}) {
     const { id = 'answer', shown = '', expect = '', digits = 2, unit = '', ink = null, twinHook = 'cell', graded = true } = o;
-    const h = BOX_H[sizeOf(ctx)] || 15;
+    const h = boxH(ctx);
     const w = boxW(ctx, digits);
     const face = `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;width:${tw(ctx, w)};height:${tw(ctx, h)};`
         + `border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;${FONT}font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;`
@@ -38,7 +42,9 @@ export function answerArea(ctx, o = {}) {
         box = `<span class="mq-gl-answer" data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="${face}">${esc(shown)}</span>`;
     }
     const word = unit
-        ? `<span class="mq-gl-unit" style="flex:none;${FONT}font-size:${P(ctx, textPt(ctx) + 2)};font-weight:700;line-height:1.1;color:${INK};white-space:nowrap;">${esc(unit)}</span>`
+        ? `<span class="mq-gl-unit" style="flex:none;${FONT}font-size:${P(ctx, textPt(ctx) + (isTwin(ctx) ? 0 : 2))};font-weight:700;line-height:1.1;color:${INK};white-space:nowrap;">${esc(unit)}</span>`
         : '';
-    return `<span class="mq-gl-answerarea" style="display:inline-flex;align-items:center;gap:${L(ctx, 2)};flex:none;">${box}${word}</span>`;
+    // (on screen the unit word sits UNDER the box, so a 390 px card holds the whole sentence on one line)
+    const dir = isTwin(ctx) ? 'flex-direction:column;gap:2px;' : `gap:${L(ctx, 2)};`;
+    return `<span class="mq-gl-answerarea" style="display:inline-flex;align-items:center;${dir}flex:none;">${box}${word}</span>`;
 }

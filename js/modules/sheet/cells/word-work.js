@@ -1152,7 +1152,9 @@ function sentenceLayout(p, ctx) {
 export function sentenceFits(p, ctx) {
     const cols = Math.max(1, Number(ctx.columns || 1));
     const inner = 186 / cols - (cols > 1 ? 9 : 10);
-    return sentenceFrameWidthMm(ctx, { digits: Math.max(2, Number(p.digits) || 2), unitChars: String(p.unit || '').length }) <= inner;
+    // (decided for the PAGE, not the item: the longest story noun is 8 letters - 'stickers', 'children' - so every
+    // item of a page takes the same layout and its answer box stands in the same place, VQ-7)
+    return sentenceFrameWidthMm(ctx, { digits: Math.max(2, Number(p.digits) || 2), unitChars: Math.max(8, String(p.unit || '').length) }) <= inner;
 }
 
 /** The A-D labels of a `choose` cell, as printed and as the key names them. */

@@ -55,7 +55,7 @@ register(FAMILY_CHECK, {
                     + `background:#fff;color:${INK};${FONT}font-size:${P(ctx, pt)};font-weight:700;line-height:1;cursor:pointer;">${esc(w)}</button>`;
             }
             const ring = i === on
-                ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -2.2)};top:${L(ctx, -1.6)};right:${L(ctx, -2.2)};bottom:${L(ctx, -1.6)};border:${B(ctx, 1.5)} solid ${ink === 'trace' ? GREY : INK};border-radius:50%;"></span>`
+                ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -2.2)};top:${L(ctx, -1.6)};right:${L(ctx, -2.2)};bottom:${L(ctx, -1.6)};color:${ink === 'trace' ? GREY : INK};border:${B(ctx, 1.5)} solid currentColor;border-radius:50%;"></span>`
                 : '';
             return `<span class="mq-fc-word" style="position:relative;display:inline-flex;align-items:center;justify-content:center;padding:${L(ctx, 1)} ${L(ctx, 2.5)};${FONT}font-size:${P(ctx, pt)};font-weight:700;line-height:1.1;color:${INK};">${esc(w)}${ring}</span>`;
         }).join('');
