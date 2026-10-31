@@ -91,7 +91,7 @@ else {
         }
         return plans.get(key);
     };
-    const fails = []; const na = []; let checked = 0;
+    const fails = []; const na = []; const warns = []; let checked = 0;
     for (const row of table.rows || []) {
         const c0 = readCommand(row.command || '');
         if (!c0) { na.push(row.id); continue; }
@@ -110,14 +110,19 @@ else {
         const via = `ws-precritic --skill ${c.skills.join(',')}${role ? ` --role ${role}` : ''}`;
         if (!p.ok) { fails.push(`${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}`); continue; }
         let hit = planHas(p.text, c);
+        // An option row whose tool the plan runs on this skill (and role) but WITHOUT the row's --opts: kept on the path
+        // as before (rows written before options were read), with a warning naming the gap
+        let optsGap = false;
+        if (!hit.length && c.opts) { const { opts: _o, ...bare } = c; hit = planHas(p.text, bare); optsGap = hit.length > 0; if (optsGap) warns.push(row.id); }
         // deploy path only for a tool precritic never plans (e.g. ws-viewport-check), and never for a role check: a tool that
         // precritic DOES plan must be planned on this skill (and role), or the check is off the lane's path
         const onDeploy = !hit.length && !c.roles && !p.text.includes(`tests/scripts/${c.tool}.`) && deploy.includes(`${c.tool}.`);
         if (onDeploy) hit = ['deploy'];
-        console.log(`  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''}${c.opts ? ` --opts ${c.opts}` : ''} on ${c.skills.join(',')}${onDeploy ? ' (deploy path: ws-deploy-gates.sh)' : role ? ` (via --role ${role})` : c.roles && c.roles !== 'lesson' && c.roles !== 'independent' ? ' (on the --skill path)' : ''}${gone.length ? ` (not live here, dropped: ${gone.join(',')})` : ''}`);
+        console.log(`  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''}${c.opts ? ` --opts ${c.opts}` : ''} on ${c.skills.join(',')}${onDeploy ? ' (deploy path: ws-deploy-gates.sh)' : role ? ` (via --role ${role})` : c.roles && c.roles !== 'lesson' && c.roles !== 'independent' ? ' (on the --skill path)' : ''}${gone.length ? ` (not live here, dropped: ${gone.join(',')})` : ''}${optsGap ? ' (WARN: planned without these --opts)' : ''}`);
         if (!hit.length) fails.push(`${row.id}: ${via} plans no ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} gate on it (the check is backtested but not on the lane's path)`);
     }
     console.log(`  not applicable (no skill in the command): ${na.join(', ')}`);
+    if (warns.length) console.log(`  WARN option rows planned without their --opts (the option value itself is not on the lane's path): ${warns.join(', ')}`);
     if (!checked) { console.log(`${TOOL}: FAIL (no row names a skill: nothing checked)`); process.exit(1); }
     if (fails.length) { console.log(`${fails.map((f) => `  ${f}`).join('\n')}\n${TOOL}: FAIL (${fails.length} of ${checked} rows not on the lane's path)`); process.exit(1); }
     console.log(`${TOOL}: OK (${checked} rows on the lane's path, ${na.length} not applicable)`);
