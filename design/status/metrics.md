@@ -411,6 +411,7 @@ against this row.
 | 2026-10-24 | SU-C pilot | `stack` × Single skill, 6 skills + 1 preset | mq-opus-low, then mq-opus-medium ×2 | 2 | FAIL ×2, stopped before r3 (stop rule) | — (not passed) | 8.25 | r1: CONTENT, SCAFFOLD, SIZE, LESSON, SCREEN, OPTIONS, INK; r2: PATTERN, SPACE ×2, UNTRUE_TEXT, CLIP_OVERLAP ×2, VISUAL_DESIGN, STEPS_LAYOUT | 0 | 0.2 |
 | 2026-10-24 | W0-A second phase | pilot-lesson checks | mq-opus-medium | 2 | FAIL ×2 (r6, r7), stopped | — | ≈ 3.5 | COMPARE_SCOPE (multi-skill rows), signed-card hash | — | 0.1 |
 | 2026-10-24 | T1 teacher mock-up | screen (mock-up) | mq-opus-medium (fresh builders from r2) | 6 | FAIL ×6, stopped | — (not passed) | ≈ 16 | thumbnails ×4 rounds (CONTENT / VISUAL fidelity), VIEWPORT (1024/820), CLIP (chip text), weights logic | — | 0.4 |
+| 2026-10-31 | ops-family (G1 fix round 2) | `equation` × 4 skills (sections, lesson, test, mixed, options, card) | mq-opus-medium (rebuild after r1 FAIL) | 2 (fix) | awaiting critic r2 | — | r1 ≈ 4 h 50 min builder + 1 h 50 min critic; r2 builder ≈ 3 h 30 min | r1: LAYOUT (F1, F9, F10, F14), NOTATION (F5), OPTIONS (F6-F8, F19), LESSON (F2, F3, F11, F17, F18), TITLE (F4), SLOT (F12), HEADING (F13), SCREEN (F15), HINT (F16); 19 of 19 now have a machine check, 12 backtest rows | — | 0.3 |
 
 - **Builder profile** is the profile **name** (`mq-opus-low` / `mq-opus-medium`): an agent cannot see its own effort.
 - **Findings by class** come from the critic's class tags (`design/audit/RUBRIC.md` §6): one count per class, e.g.
