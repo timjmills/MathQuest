@@ -31,7 +31,8 @@ Critic rounds: 3, PASS r3 (A 9 · B 8 · C 8 · D 8)
   4× needs a faster `buildSheet` (not this lane). The gate fails cold-whole over 3 s unthrottled and over 6 s at 4×.
   Owner / lead to accept or to queue an engine-speed lane.
 - **Speed limit 2** (checker r3 D3): a touch tap or keyboard press with NO pointer move first, landing while the
-  background build draws a page, waits for that page — 1.2–2.6 s at 4× in 7 of 16 presses inside the window
+  background build draws a page (it starts 1.5 s or more after page 1, after the teacher has been still), waits for
+  that page — measured by the checker before the 1.5 s-after-page-1 rule: 1.2–2.6 s at 4× in 7 of 16 presses
   (≈ 0.35 s unthrottled); with a mouse, page 1 < 1 s in ~92 % (worst ≈ 1.2 s). The fix needs `buildSheet` faster or in a
   worker (not this lane). The gate prints a bare-press row every run.
 
@@ -54,9 +55,10 @@ Critic rounds: 3, PASS r3 (A 9 · B 8 · C 8 · D 8)
 | 4× slow-down (Chromebook-class) | 0.39 s | 4.1–5.1 s (waiver above) | 0.15–0.55 s | 0.41–0.55 s |
 | 1× | 0.09 s | 0.78 s | 0.09 s | 0.09 s |
 Before this lane: no full preview; Print built everything (5.4 s at 4×) and then opened the dialog.
-Pressed during the background build with a mouse move first (+300 … +2500 ms after page 1; clock from the move, the
-hand's 150 ms taken off): page 1 under 1 s (checker r3: 11 of 12 at 0.5–0.9 s, worst 1.56 s; before the quiet rule 4
-of 10 over 1 s). Bare press with no move (touch / keyboard): 0.17–2.6 s — speed limit 2 above. Remaining limit: one page of
+Pressed inside the busy window (gate, wall clock, a move every 50 ms for 300 ms before the press, hand travel taken
+off): +300 / +900 / +1500 / +2500 ms after page 1 → page 1 in 0.16–0.43 s; bare press with no move at +400 / +900 /
++1400 ms → 0.24–0.37 s (the build now never starts sooner than 1.5 s after page 1). Checker r3, before that last
+rule: mouse 11 of 12 under 1 s; bare press 7 of 16 over 1 s. Remaining limit: one page of
 the background build is one task (~1–1.5 s at 4×); a press that lands mid-page with NO pointer movement before it
 (keyboard only, or a touch tap) can still wait for that page to finish.
 
@@ -80,6 +82,12 @@ Times: critic r1, start 2026-10-31T10:50Z, end 2026-10-31T11:08Z, profile mq-opu
 Times: builder build-1, start 2026-10-31T10:05Z, end 2026-10-31T11:05Z, profile —
 
 ## Log
+- 2026-10-31 after r3: the gate's honest timing (clock from the move) found the build starting the instant page 1
+  drew (a sheet opened from the tray has no input in it, so the quiet rule saw "quiet") → page 1 drawing counts as
+  activity (`markInput()` in schedulePrefetch): the build never starts sooner than 1.5 s after page 1. Gate presses now
+  move like a hand (a move every 50 ms for 300 ms). ws-teacher-wrm FAILS on this branch AND on the base
+  (claude/sweet-newton-c8wrv1 5c6063a, same 4 "options lost in the link" lines on detailed lessons g4-nbt1-ten-times-value
+  and g3-oa8-two-step-wp): pre-existing, not this lane (for the lead / lessons lane).
 - 2026-10-31 checker r3 PASS (A 9 · B 8 · C 8 · D 8). Its should-fixes done: this wording; the gate times mouse-first
   presses from before the move (hand travel taken off) and prints a bare-press row (reported: the known limit).
 - 2026-10-31 fix r2 (checker r2 FAIL on speed only, A 9 · B 7 · C 8 · D 8). D1 page 1 took 1.1–1.8 s when pressed during

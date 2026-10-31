@@ -214,7 +214,8 @@ const SKILLS = [
       // a teacher moves to the button before pressing it: one move ~150 ms ahead (the sheet sees it; checker r2 D1)
       // the clock starts BEFORE the move (a move the page is too busy to take is the press's wait too; checker r3 D2)
       const t = Date.now(); let first = 0;
-      if (moveFirst) { cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x - 40, y: at.y }); await sleep(150); }
+      // a hand travelling to the button: a move every 50 ms for 300 ms (a mouse reports moves all the way)
+      if (moveFirst) for (let k = 6; k >= 1; k--) { cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x - k * 20, y: at.y }); await sleep(50); }
       await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: at.x, y: at.y, button: 'left', clickCount: 1 });
       await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: at.x, y: at.y, button: 'left', clickCount: 1 });
       for (;;) {
@@ -226,7 +227,7 @@ const SKILLS = [
       }
       // a hand's own travel (the 150 ms the test waits after the move) is not the page's wait: taken off; a move the busy
       // page could not take shows up as a longer wait
-      const hand = moveFirst ? 150 : 0;
+      const hand = moveFirst ? 300 : 0;
       return { first: Math.max(0, first - hand), all: Date.now() - t - hand };
     };
     await setup('print', { pages: 4 });
@@ -249,7 +250,7 @@ const SKILLS = [
       await page.evaluate(() => window.tvPdfPreview.close());
       await page.evaluate(() => { const b = document.querySelector('#tvsSide [data-act="renew"]'); b.click(); });
       const at = await readyAndBtn();
-      await sleep(Math.max(0, after - 150));
+      await sleep(Math.max(0, after - 300));
       const w = await timedPress(at, true);
       mid.push({ after, first: w.first, all: w.all });
     }

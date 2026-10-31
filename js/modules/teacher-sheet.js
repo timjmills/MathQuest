@@ -383,6 +383,9 @@ const PREFETCH_MAX_PAGES = 12;
 let prefetchTimer = null;
 function schedulePrefetch() {
     clearTimeout(prefetchTimer);
+    // page 1 just drew: the teacher is looking at it and may press Preview now — count it as activity, so the build
+    // never starts sooner than 1.5 s after page 1 (a sheet opened from the tray has had no input in it yet)
+    markInput();
     prefetchTimer = setTimeout(async () => {
         await quiet(QUIET_START_MS, () => !S.sheet);   // after the teacher has been still for 1.5 s, not at once
         if (!S.sheet || S.sheet === 'share' || S.sheet === 'quizshare' || batchActive() || S.printing) return;
