@@ -776,6 +776,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "arc-ink-laned",
+   "check": "The long-division bracket's arc keeps >= 0.3 mm of white before the dividend's first digit (Lane D restart critic r1 R1-1: \"4 ) 8\" read as \"48\" on 10-column fact rows)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP ARC-INK",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Long fact rows at S, 10 columns, the arc 0.27 mm INTO the first digit"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: arc placed from the glyphs' ink, 0.62-0.70 mm of white"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --columns 10 --opts '{\"divForm\":[\"long\"]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grid-even-laned",
+   "check": "One cell width per fact grid (Lane D restart critic r1 R1-2: div_facts Mix fact rows re-laid a 9-cell last row at 20.7 mm under 18.6 mm cells)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Mix fact rows at S, 69 facts, last row re-laid"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the lattice kept, whole rows dealt (70 facts)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --opts '{\"divForm\":[\"mix\"]}' --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "frac-keepout-laned",
+   "check": "A division fact's fraction numerator clears the number tab's keep-out off the fact-rows page (Lane D restart critic r1 R1-15: \"110\" in the L tab's keep-out on the Opener)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK with --opts divForm (ws-precritic plans every form x fact-family role x S/L)",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Fraction Opener at L, CL40-INK"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the fraction's line box starts below the keep-out"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles opener --size L --opts '{\"divForm\":[\"fraction\"]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-uniform-laned",
+   "check": "One digit size per online worksheet and equal paper cells per row of cards (Lane D restart critic r1 R1-16: div_facts Mix brackets at 29 px beside 40 px fractions)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --uniform (worksheet:digits, worksheet:rows)",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Mix online worksheet, two digit sizes, uneven paper cells"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the sheet's touch-floor digit on every card, rows even, Mix slot inline"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills division:div_facts --hosts worksheet --uniform --opts '{\"divForm\":\"mix\"}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

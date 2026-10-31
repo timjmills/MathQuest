@@ -1093,12 +1093,15 @@ function wsLintPage(cfg) {
         }
         /* L-DENSITY GRID-EVEN (RUBRIC C3 "cells are equal in size across a section, arranged in a regular grid";
            PT-FRW-3; Lane D restart critic r1 R1-2: div_facts Mix fact rows re-laid a 9-cell last row at 20.7 mm under
-           18.6 mm cells). On a fact grid (`.ws-grid.facts`: fact rows, probes) every cell of the section has one
+           18.6 mm cells). On a fact-rows grid (`.ws-grid.facts` on a fact-rows page) every cell of the section has one
            width (within 0.2 mm); the unruled blank run (PG-15) and a declared full-width cell are not cells of the
            lattice. */
         if (!isLegacy) {
             for (const g of ri.el.querySelectorAll('.ws-grid.facts')) {
                 if (!visible(g)) continue;
+                // (the fact-rows page only: a fact probe deals a fixed 20 (PT-FPR-6) and keeps its re-laid last row)
+                const role = (g.closest('[data-ws-role]') || { getAttribute: () => null }).getAttribute('data-ws-role');
+                if (role && role !== 'fact-rows') continue;
                 const gw = g.getBoundingClientRect().width;
                 const cs = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun') && visible(c));
                 const ws = cs.map((c) => c.getBoundingClientRect().width).filter((w) => w < gw - 2 * PX);
