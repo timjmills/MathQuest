@@ -172,8 +172,8 @@
     },
     {
       "date": "2026-10-31",
-      "ruling": "The 10-column long-division bracket stays at 10 columns, and its arc never touches or crowds a digit (critic r1 R1-1).",
-      "source": "owner answers 2026-10-31 via the lead session (AskUserQuestion)"
+      "ruling": "The long-division bracket prints at 8 columns on fact rows (revised 2026-10-31 ~18:00, after critic r2 R2-1): white of at least 0.5 mm between the arc and the digits on BOTH sides (dividend and divisor), 0.58 em digit tracks; the ÷ sign, Vertical and Fraction forms stay at 10 columns; a Mix page (or a mixed fact-rows page) containing bracket facts uses the bracket's 8-column grid. The arc never touches or crowds a digit.",
+      "source": "owner decision 2026-10-31 ~18:00 via the lead session"
     },
     {
       "date": "2026-10-31",
@@ -270,7 +270,7 @@
     },
     {
       "q": "The 10-column bracket needs 0.54 em digit tracks (0.17 mm between the ink of two wide digits such as \"44\") and a near-straight arc (0.4 mm bow) to fit 12 ) 144 with 1 mm clear each side at 16 pt. Accept, or let the bracket page clamp to 8 columns when the band reaches 12 x 12?",
-      "recommended": "Accept for 10 columns (the ruling) and let the critic judge legibility at 100 %; the 8-column page keeps 0.58 em tracks. **ANSWER — Owner 2026-10-31: keep 10 columns, but the bracket's arc must never touch or crowd a digit (critic r1 R1-1); the critic re-judges at 100 %.**"
+      "recommended": "Accept for 10 columns (the ruling) and let the critic judge legibility at 100 %; the 8-column page keeps 0.58 em tracks. **ANSWER — Owner 2026-10-31 (revised ~18:00, after critic r2): the long-division BRACKET prints at 8 columns with clear white around the arc (≥ 0.5 mm both sides, 0.58 em tracks); the ÷ sign, Vertical and Fraction stay at 10 columns; a Mix page containing bracket facts uses the bracket's 8-column grid.**"
     },
     {
       "q": "Owner rule 2026-10-17: are `divForm` long and fraction distinct enough to be preset skills (\"Divide: long-division form\", \"Divide: fraction form\")?",
