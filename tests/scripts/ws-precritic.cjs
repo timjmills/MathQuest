@@ -649,6 +649,8 @@ function buildPlan(ctx) {
         // ansBox r3 (lead decision SL-3, LESSONS L17): Automatic must stay byte- and pixel-identical to MAIN (git merge-base,
         // rendered in a temporary worktree) on the passed skills and on every scope skill that carries the option
         if (abKeys.length) add(gate('ansbox-parity', 'ws-ansbox-default-parity (Automatic = merge-base, byte and pixel)', `${abKeys.length} answer-box skill(s) + the passed skills`, 'browser', 'ws-ansbox-default-parity', ['--skills', [...new Set([...abKeys, ...passedKeys()])].join(',')], { expect: { mention: [] } }));
+        // ansBox r3 (LESSONS L21): the options-render findings of the tree are a subset of main's (merge-base worktree)
+        if (abKeys.length) add(gate('render-delta', 'ws-render-delta (options-render findings within merge-base\'s)', abKeys.length <= 3 ? abKeys.join(', ') : `${abKeys.length} answer-box skills`, 'browser', 'ws-render-delta', ['--skill', abKeys.join(','), '--sizes', 'S,L'], { expect: { mention: [] } }));
         if (abKeys.length) add(gate('ansbox-shape', 'ws-ansbox-shape (answer boxes: key = pupil, digit width, key digit size, one band, no two values alike)', abKeys.length <= 3 ? abKeys.join(', ') : `${abKeys.length} answer-box skills`, 'browser', 'ws-ansbox-shape', ['--skill', abKeys.join(',')], { expect: { mention: abKeys } }));
         const presetTouch = skills.filter((s) => s.preset || s.hosts);
         if (presetTouch.length) add(gate('presets', 'ws-presets-unit', `${presetTouch.length} preset / host skill(s)`, 'browser', 'ws-presets-unit', []));

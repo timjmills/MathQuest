@@ -991,7 +991,7 @@
     "commit": "34c960f",
     "state": "r3: Automatic = the old drawing everywhere"
    },
-   "command": "node tests/scripts/ws-ansbox-default-parity.mjs",
+   "command": "node tests/scripts/ws-ansbox-default-parity.mjs --skills subtraction:sub_2d_1d,subtraction:sub_100_no_regroup,addition:add_10_regroup",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
