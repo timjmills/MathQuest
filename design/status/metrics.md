@@ -469,3 +469,6 @@ Lane D restart (2026-10-30/31): 1 critic round, FAIL (4/4 fact skills), 16 findi
 
 Lane D restart r2 (2026-10-31): critic r2 FAIL (5/5 incl. the new preset div_facts_long), 5 findings (R2-1…R2-5), 4 builders + 1 critic,
 all mq-opus-medium; ~7 h wall; ~$118 (≈ 4.2 % of the weekly limit). Lane total ~$282 (≈ 10.1 %). Stopped: stop-loop on the arc + weekly-limit warning.
+
+Lane D restart r3 (2026-10-31): critic r3 PASS 4/5 (add_facts, sub_facts, mult_facts, div_facts_long), div_facts FAIL (R3-1 only);
+2 builders + 1 critic (mq-opus-medium); ~3.5 h wall; ~$30 (≈ 1.1 %). Lane total ~$312 (≈ 11 % of the weekly limit), 3 critic rounds.

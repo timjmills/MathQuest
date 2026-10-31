@@ -380,3 +380,24 @@ after-r3-bracket-S-c10.png (100 / 100) and after-r3-bracket-L-c10.png (80 / 80) 
 after-r3-mixed-facts-S-c10-s4242.png (+ - x ÷long, 56 printed = 8 x 7 = Score /56: the seed critic r2 caught at 56 of 70);
 after-r3-mixed-add-mult-S-auto-s4242.png (56 / 56); after-r3-probe-add-S.png (20th across fact in column 1, remainder
 unruled); after-r3-probe-div-mix-L.png (20 / 20); after-r3-think-boxsign-S.png (one placement, text inside the box).
+
+## HAND-OVER 3 (2026-10-31, after critic r3)
+
+**Critic r3 (design/audit/runs/laned-restart/critic-r3.md): PASS add_facts, sub_facts, mult_facts, div_facts_long (lowest 8);
+FAIL div_facts on R3-1 only.** The four are in js/modules/redesign-passed.js (ws-redesign-passed OK, 11 skills). Screen hosts:
+the critic carried r2's 9/9/8-9/9 (screen-cell.js unchanged); the lead re-ran ws-screen-answer and ws-screen-slots --uniform on
+the r3 tree for the four: OK. Card signed 2026-10-31 (final Q3: bracket at 10 columns as drawn in r2, owner-accepted).
+Cost: round 3 ~$30 (≈ 1.1 %) of the $60 cap; lane total ~$312 (≈ 11 % of the weekly limit). NOT deployed (the lead deploys).
+
+### Remaining
+1. R3-1 div_facts: with several supports on (`--supports all`, S) Test and Independent centre each row's sign box + fact + support
+   as a group, so the fact and its answer line shift between rows (SCC-T10 "answer zone moves 69.0 vs 86.4 mm"; C3 7). Fix: one fact x
+   per section from the widest sign box (as R2-4 did in registry.js), supports in a fixed zone. Check: precritic's
+   print-lint --supports all row runs More practice, Test and Review too (it ran Independent only).
+2. Observations (no score effect): mixed fact-rows column count follows each deal (+ × at S: 8×7 on 46/48 seeds, 10×7 on 2; PT-FRW-5
+   reads the clamp off the band); buildSheet().items returns the whole deal; the probe remainder is an empty boxed cell, not unruled.
+3. Shared page-type defects → page-types lane (session_013pHDnQ7fVtYNPKJ7J1MkMh); drop the R1-5/R1-9/R1-11/R1-13 pins in
+   design/audit/baselines/print-lint*.json when both branches are on main. Card Q5 (short class) → layout lane.
+4. Ported Lane D work outside the fact family (hand-over 1, item 6) is still not critic-ready.
+5. ws-stamp-assets before deploy.
+

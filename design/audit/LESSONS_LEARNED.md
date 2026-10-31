@@ -152,6 +152,12 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
 - **Pattern (r2):** three of five findings slipped through checks this lane had just written, each scoped too narrowly
   (one side, one role, one seed). When a lane writes a check, it writes it for the CLASS of defect, not the instance.
 
+- **A new gate covers every role the skill prints on, by default.** print-lint --supports all ran on Independent only; the
+  answer-zone shift with several supports showed on Test (R3-1, SCC-T10 already fires there). *Check:* the precritic supports row
+  runs every fact-family role.
+- **Prove a red is shared before pinning it.** add_facts Review M H13 was about to be pinned as a shared-role defect; the other
+  lane showed main was clean, and the cause was this branch's Review column choice (R2-5).
+
 ## PRE-FLIGHT checklist (every lane, before reporting)
 1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at
    1280/820/390, worksheet, quiz. Looked at every PNG.
