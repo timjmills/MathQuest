@@ -106,6 +106,31 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    runs `ws-stamp-assets`. The owner's go for a family is the line `Owner go: <family>, <YYYY-MM-DD>` in the lane file
    (§1.6.3 step 6).
    *Check:* the deploy is refused for a family with no go line.
+9. **A lane's gate set includes every gate that reads what it ships (lessons 6-7 merge, 2026-10-31).** Detailed lessons
+   6 and 7 merged with their own gates green (ws-detailed-lesson, precritic --role lesson), but ws-teacher-wrm, which
+   decodes each detailed lesson's teacher Practice link, was not on the lessons lane's path and went red: the link was
+   built from the de-duplicated skill queue, so a skill used twice with different options lost its second use and its
+   options. Root fix: the link encodes its own items (each (skill, options) use). The gate compares use by use.
+   *Check:* `ws-precritic --role lesson` now runs ws-teacher-wrm; backtest row `detailed-link-every-use`.
+
+### Teacher-site preview screens (pdf-preview lane, 2026-10-31)
+- **A hidden element is not an open dialog.** A guard that tests `getElementById(overlay)` breaks the moment the overlay
+  is pre-built hidden (Esc stopped closing the Print sheet). Test visibility (`!el.hidden` / an `isOpen()`), and gate
+  Esc on the screen BEFORE the dialog is ever opened and AFTER it closes. *Check:* `ws-pdf-preview` dialog steps.
+- **A dialog with an iframe needs the trap inside the frame too**, and everything behind it `inert`. *Check:* 10 × Tab
+  and 10 × Shift+Tab stay inside; the sheet is inert while open and not after.
+- **Time from the press, on the wall clock, with one real input event.** Handler-side `performance.now()` hides a press
+  queued behind a long task; `page.click` adds several round trips that each wait. *Check:* CDP press/release, Date.now().
+- **Parity by pixels, not only DOM.** The same HTML can print differently (fonts). Render the PDF from the app's ORIGIN
+  (a document on about:blank cannot load self-hosted fonts), compare at real size with a 1-px neighbourhood (A4 is
+  793.7 px at 96 dpi), and backtest the limit with a real difference (a serif title = 0.06 %; limit 0.02 %).
+- **Screenshot traps:** element screenshots past the window edge show what is behind; `clip` is document coordinates;
+  `captureBeyondViewport` resizes the window (and any fixed overlay). Use a tall viewport, scroll, clip, beyond=false.
+- **Background engine work gives way to the teacher.** One engine call is one long task (~1 s on a Chromebook); start
+  background builds only after 1.5 s without input and pause between calls on any pointer/key. *Check:* presses at
+  several offsets inside the busy window (+300 … +2500 ms), wall clock, page 1 < 1 s.
+- **Count what the page IS, not what it is not:** "pupil pages = all − keys" counted set covers. Count pupil pages by
+  their Name line.
 
 ## PRE-FLIGHT checklist (every lane, before reporting)
 1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at

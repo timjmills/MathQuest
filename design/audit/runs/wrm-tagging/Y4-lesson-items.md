@@ -485,7 +485,7 @@ print path, the link's own opts). Format: `question → answer {options} [answer
 
 `G3|-|measuretothehalfandquarterinch` · W27 · committee · partial — missing: measuring a drawn object with the inch ruler to the nearest half or quarter inch
 
-- **partial** `measurement:reading_ruler {"parts":[1,2]}` — clause: reads where an arrow points on a 6-inch ruler marked in halves or quarters (3 1/4, 4 1/2); never lays an object on the ruler
+- **partial** `measurement:reading_ruler {"parts":[1,2]}` — clause: reads where an arrow points on a 6-inch ruler marked in quarters, the arrow at a half or a quarter (3 1/4, 4 1/2); never lays an object on the ruler
   - max 5; types: text ruler, fraction-input ruler
   - What length does the arrow point to? → 4 1/2
   - What length does the arrow point to? → 3 3/4

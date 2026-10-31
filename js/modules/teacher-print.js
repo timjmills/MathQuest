@@ -1118,6 +1118,15 @@ export async function printHtml(html, title, paper) {
         };
         setTimeout(tick, 150);
     });
+    // pdf-preview lane (lead, 2026-10-31): never print before BOTH Andika faces are in — fonts.ready only covers faces
+    // already requested, so ask for the regular and the bold (titles, Name / Date) explicitly, then wait again.
+    try {
+        const f = w.document.fonts;
+        if (f && f.load) {
+            const left = Math.max(500, 6000 - (Date.now() - start));
+            await Promise.race([Promise.all([f.load('400 16px Andika'), f.load('700 16px Andika')]).then(() => f.ready), new Promise((r) => setTimeout(r, left))]);
+        }
+    } catch (e) { /* print with what is loaded */ }
     w.focus();
     w.print();
 }

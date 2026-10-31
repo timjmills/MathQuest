@@ -39,14 +39,14 @@
 #            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
 #            --self-test, ws-text-vs-gen (claims vs the generator), ws-backtest --kind fixture (the S2 checks still
-#            catch their fixtures) and ws-options-pin --gate design/audit/matrix (critic r4 D1: READ-ONLY, node only,
+#            catch their fixtures), ws-lessonfit (every year's WRM site-lesson gate) and ws-options-pin --gate design/audit/matrix (critic r4 D1: READ-ONLY, node only,
 #            no browser slot, seconds: it folds the nightly's options-pin-*.json by `finished`, newest result per skill;
 #            FAIL on a NEW failing pair of a live skill that no later check fixed, WARNING while fewer than 28 slices
 #            are checked or the newest is over 24 h old, FAIL on that age once all 28 are; it never runs the pin);
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
-#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-teacher-wrm, ws-teacher-wrm --fallback,
 #            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/.
 # Session 2  ws-screen-slots in MQ_SLOTS_SHARDS parts (default 4) with --baseline design/audit/baselines/screen-slots.json,
 #            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), the S9 regression (ws-screen-slots on measurement:reading_ruler_hard, card host, seeds 1-40,
@@ -809,6 +809,7 @@ build_list() {
   browser_gate 1 ws-teacher-library ws-teacher-library.cjs
   browser_gate 1 ws-teacher-preview ws-teacher-preview.cjs
   browser_gate 1 ws-teacher-quiz ws-teacher-quiz.cjs
+  browser_gate 1 ws-pdf-preview ws-pdf-preview.cjs
   browser_gate 1 ws-share-options ws-share-options.cjs
   # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)
   local lf lid
@@ -833,6 +834,7 @@ build_list() {
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
+  node_gate 1 ws-lessonfit ws-lessonfit.mjs   # WRM site lessons, every year (critic 2026-10-30 Y4 F1)
   # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no
   # browser slot, seconds); it never runs the pin itself (the whole pin is ≈ 1 h 52 min on the two slots). On a node
   # worker as nfn, so its exit 4 shows as WARNING.

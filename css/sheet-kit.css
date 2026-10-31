@@ -435,3 +435,7 @@
 .ws-sheet > .ws-cell:is(.mqt--word-work, .mqt--words, .mqt--counters, .mqt--seqstrip, .mqt--remainder):has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
 .ws-page .ws-grid > .ws-cell[data-ws-cell="remainder"]:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before,
 .ws-sheet > .ws-cell.mqt--remainder:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { height: max(0mm, calc(var(--ws-tab, 5mm) - 1.25mm)); }
+/* Lesson 7 r2 (additive): a two-step frames cell (cells/word-work.js framesLayout) sets its story in a gutter beside the
+   item tab, so it takes no tab spacer above the story - on the page and in the measuring cell alike. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell="word-work"]:has(.mq-wwframes)::before,
+.ws-sheet > .ws-cell.mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }

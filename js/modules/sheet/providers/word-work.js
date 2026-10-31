@@ -48,6 +48,18 @@ function workLine(st) {
 export function wordWorkSteps(q) {
     const p = payloadOf(q);
     if (!p) return [];
+    // A two-step story whose first step is × or ÷ (msOps, detailed lesson g3-oa8-two-step-wp): four moves, each one
+    // a chart panel - read, Step 1, Step 2 (with the Step 1 answer), the answer and its unit. No key words.
+    if (p.steps.length === 2 && (p.steps[0].op === '*' || p.steps[0].op === '/')) {
+        const [s1, s2] = p.steps;
+        return [
+            step('Read the story two times.', [{ slot: 'ms-read', value: '1' }]),
+            step(`Step 1: ${fmt(s1.a)} ${GLYPH[s1.op]} ${fmt(s1.b)} = ${fmt(s1.ans)}.`, [{ slot: 'op0', value: GLYPH[s1.op] }]),
+            step(`Step 2: ${fmt(s2.top)} ${GLYPH[s2.op]} ${fmt(s2.bottom)} = ${fmt(s2.ans)}.`, [{ slot: 'op1', value: GLYPH[s2.op] }]),
+            // (no marks: the unit word is written in the Step 2 panel - the chart's closing line, three panels)
+            step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`),
+        ];
+    }
     const cues = cuesOf(p);
     const out = [step('Read the story two times.')];
     if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
@@ -86,6 +98,24 @@ export function wordWorkWrong(q) {
  */
 export function wordWorkWrongs(q) {
     const p = payloadOf(q);
+    // A two-step story whose first step is × or ÷ (msOps, detailed lesson g3-oa8-two-step-wp): the three
+    // two-step errors, each a number (`display` the answer the pupil would write). Absent on every other story.
+    if (p && p.steps.length === 2 && (p.steps[0].op === '*' || p.steps[0].op === '/')) {
+        const [s1, s2] = p.steps;
+        const c = s2.bottom;
+        const sign = (x, y) => (s2.op === '+' ? x + y : x - y);
+        const small = s1.op === '*' ? s1.b : s1.b;
+        const m3 = s2.op === '+' ? small + c : Math.abs(small - c);
+        const m2 = s1.op === '*' ? sign(s1.a + s1.b, c) : sign(s1.a - s1.b, c);
+        const out = [
+            { value: s1.ans, display: fmt(s1.ans), misconception: 'ms-stop-step1', explain: 'Stopped after Step 1.' },
+            { value: m3, display: fmt(m3), misconception: 'ms-story-number', explain: 'Did Step 2 with a story number, not the Step 1 answer.' },
+            { value: m2, display: fmt(m2), misconception: 'ms-one-op', explain: s1.op === '*' ? 'Added the groups and the number in each.' : 'Took away the friends from the total.' },
+        ];
+        const seen = new Set([s2.ans]);
+        return out.filter((w) => Number.isFinite(w.value) && w.value >= 0 && !seen.has(w.value) && (seen.add(w.value), true))
+            .concat([{ value: s2.ans, display: fmt(s2.ans), correct: true }]);
+    }
     if (!p || p.steps.length !== 1) return [];
     const st = p.steps[0];
     if (st.op !== '+') { const w = wordWorkWrong(q); return w ? [w] : []; }
