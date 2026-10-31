@@ -229,7 +229,8 @@ const MARK = {
         for (const size of ['S', 'L']) for (const form of ['long', 'fraction', 'mix']) {
             const r = await one(form, 'fact-rows', size);
             const long = (r.pupil.match(/data-ws-ops="division"/g) || []).length, frac = (r.pupil.match(/data-ws-notation="fraction"/g) || []).length;
-            const ok = form === 'long' ? long === r.n : form === 'fraction' ? frac === r.n : (long === r.n / 3 && frac === r.n / 3);
+            // (Mix: thirds within one - fact rows deal whole rows, 70 = 24 / 23 / 23; Lane D restart critic r1 R1-2)
+            const ok = form === 'long' ? long === r.n : form === 'fraction' ? frac === r.n : (Math.abs(long - r.n / 3) < 1 && Math.abs(frac - r.n / 3) < 1);
             check(ok && r.pages === 1, `D5 fact rows ${form} ${size}: every fact in its form (${r.n} facts, ${long} bracket, ${frac} fraction)`);
         }
         // D6: a probe is ONE page in every form at every size

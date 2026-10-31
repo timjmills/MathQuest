@@ -1002,11 +1002,63 @@ export function layoutWorksheetGrid(grid) {
     cards.forEach(c => c.classList.toggle('mq-span-row', c.dataset.mqSpan === '1'));   // a pv mat keeps its row (round 3)
     const w = grid.clientWidth;
     const maxCols = w >= 960 ? 3 : w >= 620 ? 2 : 1;
+    _wsOneDigit(cards);
     for (let cols = maxCols; cols >= 1; cols--) {
         grid.style.setProperty('--mq-wscols', String(cols));
         let ok = true;
         for (const c of cards) { if (!_wsFitCard(c)) { ok = false; if (cols > 1) break; } }
         if (ok) break;
+    }
+    _wsEvenRows(cards);
+}
+
+/**
+ * One digit size per worksheet (Lane D restart critic r1 R1-16: a div_facts Mix sheet drew its
+ * brackets at 29 px beside 40 px fractions and sentences, because only the cards whose ladder can
+ * draw touch numerals take the 40 px touch floor, SF-34). When any card of the sheet holds the
+ * floor, every card takes its digit.
+ */
+function _wsOneDigit(cards) {
+    const cells = cards.map((c) => c.querySelector('.ws-card-visual.mq-scell')).filter(Boolean);
+    const floor = cells.find((c) => c.hasAttribute('data-mq-touch-floor'));
+    if (!floor) return;
+    const d = getComputedStyle(floor).getPropertyValue('--mq-digit').trim();
+    if (!d) return;
+    cells.forEach((c) => { if (c !== floor && !c.hasAttribute('data-mq-touch-floor')) c.style.setProperty('--mq-digit', d); });
+}
+
+/**
+ * Equal cells per row (RUBRIC C3 screen, critic r1 R1-16): the bordered paper cell of every card in
+ * one row of the sheet is as tall as the row's tallest, so a short sentence never sits in a smaller
+ * box beside a bracket.
+ */
+function _wsEvenRows(cards) {
+    const cells = cards.map((c) => [c, c.querySelector('.ws-card-visual')]).filter(([, v]) => v);
+    // The bordered cells fill their card (flex), so a card that also carries a touch-numeral count line
+    // (SF-34) has a shorter box than its neighbour: every box of the row takes the row's shortest box,
+    // or the tallest content when that needs more, and the card keeps the rest as white under the box.
+    cells.forEach(([, v]) => { v.style.minHeight = ''; v.style.maxHeight = ''; });
+    const rows = new Map();
+    for (const [c, v] of cells) {
+        if (c.classList.contains('mq-span-row')) continue;
+        const top = Math.round(c.offsetTop);
+        if (!rows.has(top)) rows.set(top, []);
+        rows.get(top).push(v);
+    }
+    const sideY = (v) => { const cs = getComputedStyle(v); return (parseFloat(cs.paddingBottom) || 0) + (parseFloat(cs.borderBottomWidth) || 0); };
+    for (const vs of rows.values()) {
+        if (vs.length < 2) continue;
+        const hs = vs.map((v) => v.getBoundingClientRect().height);
+        const need = vs.map((v) => {
+            const top = v.getBoundingClientRect().top;
+            const bottom = Math.max(top, ...Array.from(v.children).map((k) => k.getBoundingClientRect().bottom));
+            return bottom - top + sideY(v);
+        });
+        const tgt = Math.max(Math.min(...hs), ...need);
+        vs.forEach((v, i) => {
+            if (hs[i] > tgt + 0.5) v.style.maxHeight = `${tgt}px`;
+            else if (hs[i] < tgt - 0.5) v.style.minHeight = `${tgt}px`;
+        });
     }
 }
 

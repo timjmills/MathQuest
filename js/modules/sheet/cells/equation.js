@@ -160,7 +160,12 @@ register('equation', {
                 ? `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;">`
                     + `<span style="border-bottom:1.5pt solid #000;padding:0 0.2em;">${A}</span><span style="padding:0 0.2em;">${B}</span></span>`
                 : `${B}<span style="border-top:0.75pt solid #000;border-left:0.75pt solid #000;border-top-left-radius:0.4em;padding:0.05em 0.3em 0 0.3em;margin-left:0.15em;">${A}</span>`;
-            return `<div class="ws-eq"${p.notation === 'bracket' ? ` ${WRITE_ABOVE}` : ''} data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
+            // CL-40 / PT-FRW-9 (Lane D restart critic r1 R1-15: "110" over its bar in the L tab's keep-out on
+            // the Opener, Review and Reason It): a division FACT's numerator clears the number tab's keep-out
+            // on every page type, as on fact rows - its line box starts below (tab side - 1.7 mm - 0.2 em).
+            const eq = `<div class="ws-eq"${p.notation === 'bracket' ? ` ${WRITE_ABOVE}` : ''} data-ws-notation="${p.notation}"${p.notation === 'fraction' ? ' style="align-items:center"' : ''}>${body}<span class="o">=</span>${R}</div>`;
+            return p.notation === 'fraction' && p.fact && ctx.mode !== 'screen'
+                ? `<div data-ws-fractop="1" style="padding-top:max(0mm, calc(var(--ws-tab, 5mm) - 1.7mm - 0.2 * var(--ws-digit, 22pt)))">${eq}</div>` : eq;
         }
         if (p.fact && u === 'result') {
             // A division FACT across (div_facts Standard, alone or in Mix, critic R2 R-2): ONE across

@@ -36,7 +36,10 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
  *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0 } = {}) {
+// `relay` (default true): false keeps the lattice - a short last row stays on the full rows' columns
+// and the rest is the unruled blank run (PG-15). Fact rows: one cell width per section (Lane D restart
+// critic r1 R1-2: a re-laid 9-cell last row was 20.7 mm wide under 18.6 mm cells).
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, relay: relayOk = true } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
     // a cell that spans tracks (grid-column:span N in its style) fills them: no blank run for them
@@ -49,7 +52,7 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
     // equal (CL-3). Only a plain grid (no spanning cell, rows = the rows the cells need).
     const rem = used % cols;
     const rowStrips = rowGap > 0 && Math.ceil(used / cols) > 1 && Number.isFinite(parseFloat(height));
-    const relay = rem > 0 && cols > 1 && !spans && !spanFirst && !rowStrips && (!rows || rows === Math.ceil(used / cols));
+    const relay = relayOk && rem > 0 && cols > 1 && !spans && !spanFirst && !rowStrips && (!rows || rows === Math.ceil(used / cols));
     const gcd = (a, b) => (b ? gcd(b, a % b) : a);
     const tracks = relay ? (cols * rem) / gcd(cols, rem) : cols;
     let k = start;

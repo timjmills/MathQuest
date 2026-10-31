@@ -281,10 +281,9 @@ export function equationHTML(k, slotHtml) {
         const o = (g) => `<span class="o" style="width:0.8em">${g}</span>`;
         const sentence = `<span>${touchNumberHTML(k.a, tn.a, to)}</span>${o(opGlyph(k.op))}<span>${touchNumberHTML(k.b, tn.b, to)}</span>${o('=')}`;
         const label = attr(`${k.a} ${spokenOp(k.op)} ${k.b}`);
-        if (k.mix) {
-            return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq ws-eq-below" role="group" aria-label="${label}" style="flex-direction:column;flex-wrap:nowrap;gap:0.12em">`
-                + `<span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap">${sentence}</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
-        }
+        // A Mix item is the Standard sentence on screen too, its answer slot inline after the "="
+        // (Lane D restart critic r1 R1-16: Mix put the line under the "=", unlike Standard and the
+        // Independent page; the screen card has the width the paper column lacks).
         return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${label}" style="gap:0.18em">${sentence}<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
     }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`

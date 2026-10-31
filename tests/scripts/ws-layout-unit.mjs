@@ -828,7 +828,7 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
 }
 // Owner ruling 2026-10-30 (PAGE_TYPES PT-FRW-9): div_facts reaches the full 10 fact-row columns in
 // all three notations - the ÷ sign (Standard / Vertical, stacked), the fraction and the bracket -
-// at Size S Auto and at an explicit 10 at every size; 5 / 6 / 8 are honoured; Mix keeps thirds;
+// at Size S Auto and at an explicit 10 at every size; 5 / 6 / 8 are honoured; whole rows (Mix thirds within one);
 // digits never below 16 pt; every form's ink + FIT_CLEAR_MM fits its column (the real-fit gate).
 {
     const dq = (a, b, form) => ({ q: { a, b, op: '÷', ans: a / b, divForm: form, categoryId: 'division', skillId: 'div_facts', text: `${a} ÷ ${b} = ?`,
@@ -851,11 +851,54 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 // the stacked ÷: the rule spans the 0.62 em ÷ track and three 0.72 em digit tracks
                 const ink = L.row ? L.row.inkMm : (0.62 + L.tracks * KIT_FACT_TRACK_EM) * em(L.digitPt);
                 ok(ink + FIT_CLEAR_MM <= inner + 1e-6, `${tag}: ink ${ink.toFixed(2)} mm + ${FIT_CLEAR_MM} mm fits the ${inner.toFixed(2)} mm cell`);
-                if (form === 'mix') ok(L.perPage % 3 === 0, `${tag}: Mix keeps thirds (${L.perPage} a page)`);
+                // (critic r1 R1-2: whole rows, no short last row - the dealer's blocks of three keep thirds within one)
+                eq(L.perPage, L.cols * L.rows, `${tag}: whole rows (${L.perPage} a page)`);
                 ok(!L.across, `${tag}: never the 3-column across page`);
             }
         }
     }
+}
+// Owner ruling 2026-10-31 (facts card §5): a fact-rows page MIXES the ÷ forms (fraction, ÷ sign, bracket)
+// with the + - x ÷ fast facts in ONE grid, or shows any of them alone. One grid, one cell width, the columns
+// the narrowest form fits (10 when all fit; a x answer over 99 keeps PT-FRW-5's 8), every form drawn, the
+// real-fit gate on the widest ink, never the across page, never a Mix thirds trim.
+{
+    const fq = (a, b, op, cat, skill, ans, form) => ({ q: { a, b, op, ans, ...(form ? { divForm: form } : {}), categoryId: cat, skillId: skill, text: `${a} ${op} ${b} = ?`,
+        cell: form === 'long' ? { template: 'division', v: 1, payload: { dividend: a, divisor: b, fact: true } }
+            : { template: form === 'fraction' ? 'equation' : 'fact', v: 1, payload: { a, b, op: { '+': '+', '-': '-', '×': 'x', '÷': '/' }[op], ...(form === 'fraction' ? { notation: 'fraction', fact: true } : {}) } } } });
+    const FORMS = ['standard', 'long', 'fraction'];
+    const divs = [[144, 12], [132, 11], [120, 10], [7, 7], [0, 12], [81, 9]].map(([a, b], i) => fq(a, b, '÷', 'division', 'div_facts', a / b, FORMS[i % 3]));
+    const addSub = [fq(9, 8, '+', 'addition', 'add_facts', 17), fq(10, 10, '+', 'addition', 'add_facts', 20), fq(17, 9, '-', 'subtraction', 'sub_facts', 8), fq(20, 7, '-', 'subtraction', 'sub_facts', 13)];
+    const mult = [fq(12, 12, '×', 'multiplication', 'mult_facts', 144), fq(7, 8, '×', 'multiplication', 'mult_facts', 56)];
+    const em = (pt) => KIT_EM_MM[pt] || (pt / 72) * 25.4;
+    const SETS = {
+        'add+sub+div(Mix)': [...addSub, ...divs],
+        'add+sub+mult+div(Mix)': [...addSub, ...mult, ...divs],
+        'add+sub+mult+div(long)': [...addSub, ...mult, ...divs.map((d) => fq(d.q.a, d.q.b, '÷', 'division', 'div_facts', d.q.ans, 'long'))],
+        'add+div(fraction)': [...addSub.slice(0, 2), ...divs.map((d) => fq(d.q.a, d.q.b, '÷', 'division', 'div_facts', d.q.ans, 'fraction'))],
+        'mult+div(standard)': [...mult, ...divs.map((d) => fq(d.q.a, d.q.b, '÷', 'division', 'div_facts', d.q.ans, 'standard'))],
+    };
+    for (const [name, items] of Object.entries(SETS)) {
+        const big = items.some((it) => it.q.op === '×' && it.q.ans > 99);
+        for (const size of ['S', 'M', 'L']) {
+            for (const columns of ['auto', 5, 6, 8, 10]) {
+                const asked = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
+                const want = big ? Math.min(asked, 8) : asked;
+                const L = factRowsLayout(items, { skills: [], ctx: { size }, columns });
+                const tag = `owner 2026-10-31 mixed facts ${name} ${size} columns ${columns}`;
+                eq(L.cols, want, `${tag}: ${want} columns`);
+                ok(L.mixed === true && !L.across && L.forms, `${tag}: one mixed grid of forms, never across`);
+                ok(L.digitPt >= 16, `${tag}: digits ${L.digitPt} pt >= 16`);
+                const inner = cellWidthMm(L.cols, LIVE_W_MM, 'daily').inner;
+                ok(L.row.inkMm + FIT_CLEAR_MM <= inner + 1e-6, `${tag}: widest ink ${L.row.inkMm} mm + ${FIT_CLEAR_MM} mm fits the ${inner.toFixed(2)} mm cell`);
+                eq(L.perPage, L.cols * L.rows, `${tag}: the page is filled (no thirds trim)`);
+                ok(L.rows * L.hMin <= L.gridH, `${tag}: ${L.rows} rows of ${L.hMin} mm fit the ${L.gridH} mm grid`);
+            }
+        }
+    }
+    // alone: each fact skill keeps its own page (div_facts Mix still deals thirds)
+    eq(factRowsLayout(addSub.slice(0, 2), { skills: [], ctx: { size: 'S' }, columns: 'auto' }).mixed, undefined, 'owner 2026-10-31: addition alone is not a mixed page');
+    { const L = factRowsLayout(divs, { skills: [], ctx: { size: 'S' }, columns: 'auto' }); eq(L.perPage, L.cols * L.rows, 'owner 2026-10-31: div_facts Mix alone deals whole rows'); }
 }
 // PT-MIX-1..7: Mixed practice - a shelf per skill, each with its own instruction, numbered 1..N.
 {

@@ -13,6 +13,7 @@
 //   node tests/scripts/ws-screen-slots.cjs --category measurement --hosts card
 //   node tests/scripts/ws-screen-slots.cjs --from 200 --to 300   # a slice of the skill list
 //   node tests/scripts/ws-screen-slots.cjs --report-only         # print, never exit 1
+//   node tests/scripts/ws-screen-slots.cjs --skills division:div_facts --hosts worksheet --uniform   # + one digit size, even rows
 //
 // Deploy gates (IMPROVEMENT_PLAN §1.4 S5; tests/scripts/ws-deploy-gates.sh):
 //   --category c1,c2           only these categories (one or several)
@@ -80,6 +81,11 @@ const SAMPLE_FILE = arg('sample', path.join(__dirname, '..', 'fixtures', 'precri
 const HOSTS = (arg('hosts', BIGBOARD ? 'card' : DARK ? 'card,worksheet,quiz' : 'card,map,worksheet,quiz') || '').split(',');
 // --opts '{"times":"each"}' (wave 1 C2): the skill's options in the set's option store, which every host reads.
 const OPTS = arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null;
+// --uniform (Lane D restart critic r1 R1-16, RUBRIC C3 screen: "even cells, a consistent layout for every item of one
+// skill"): the worksheet host also deals a 6-item sheet and fails `worksheet:digits` when the kit cards' digit sizes
+// differ by more than 10 % (a div_facts Mix sheet drew brackets at 29 px beside 40 px fractions) and `worksheet:rows`
+// when the bordered paper cells of one row of cards differ in height by more than 1 px. Only kit cards are judged.
+const UNIFORM = has('uniform');
 const FROM = parseInt(arg('from', '0'), 10);
 const TO = parseInt(arg('to', '100000'), 10);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -460,6 +466,34 @@ async function prep(page, role) {
                             worst = worst || r;
                         }
                         note('worksheet', worst, leg);
+                        if (UNIFORM) {
+                            const u = await page.evaluate(async (c, k) => {
+                                const st = window.state; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 6;
+                                window.initWorksheet();
+                                await new Promise((r) => setTimeout(r, 1100));   // the worksheet's layout passes (80 / 320 / 900 ms)
+                                const cards = [...document.querySelectorAll('#worksheetGrid > .problem-card.mq-wscard')].filter((cd) => cd.querySelector('.ws-card-visual .mq-kit'));
+                                const digitPx = (cd) => {
+                                    let mx = 0;
+                                    const w = document.createTreeWalker(cd.querySelector('.ws-card-visual'), NodeFilter.SHOW_TEXT);
+                                    for (let n = w.nextNode(); n; n = w.nextNode()) {
+                                        const el = n.parentElement;
+                                        if (!/\d/.test(n.nodeValue) || !el || !el.offsetParent || el.closest('.mq-instr, .mq-tn-count, [data-mq-screen-only]')) continue;
+                                        mx = Math.max(mx, parseFloat(getComputedStyle(el).fontSize) || 0);
+                                    }
+                                    return mx;
+                                };
+                                const ds = cards.map(digitPx).filter((x) => x > 0);
+                                const out = { n: cards.length, digits: null, rows: null };
+                                if (ds.length > 1 && Math.max(...ds) > 1.1 * Math.min(...ds)) out.digits = `${Math.min(...ds)}-${Math.max(...ds)} px`;
+                                const rows = new Map();
+                                for (const cd of cards) { const t = Math.round(cd.getBoundingClientRect().top); if (!rows.has(t)) rows.set(t, []); rows.get(t).push(cd.querySelector('.ws-card-visual').getBoundingClientRect().height); }
+                                for (const hs of rows.values()) if (hs.length > 1 && Math.max(...hs) - Math.min(...hs) > 1) { out.rows = hs.map((h) => Math.round(h)).join('/') + ' px'; break; }
+                                return out;
+                            }, c, k);
+                            checked++;
+                            if (u.digits) { const l = `${key.padEnd(44)} worksheet  ${u.n} kit cards in different digit sizes: ${u.digits} (one digit size per worksheet)`; findings.push({ key, id: `${tagOf('worksheet')}:digits`, line: l }); console.log(l); }
+                            if (u.rows) { const l = `${key.padEnd(44)} worksheet  one row of cards holds paper cells of ${u.rows} (equal cells per row)`; findings.push({ key, id: `${tagOf('worksheet')}:rows`, line: l }); console.log(l); }
+                        }
                     }
                 }
                 if (pass.includes('quiz')) {

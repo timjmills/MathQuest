@@ -675,10 +675,27 @@ function buildPlan(ctx) {
                 add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
             }
         }
+        // Lane D restart critic r1 R1-15: div_facts' written forms (divForm) on every page type they print on, at S and L
+        // (the fraction's numerator sat in the L tab's keep-out on the Opener, Review and Reason It; the card's own gate
+        // line listed only fact rows). One run per form and size, every fact-family role, against the size's pin.
+        const divFormKeys = keys.filter((k) => /^division:div_facts/.test(k));
+        if (divFormKeys.length) {
+            const DF_ROLES = 'fact-rows,independent,more-practice,test,fact-probe,mixed-practice,opener,guided,review,reason-it,true-false,stretch';
+            for (const form of ['standard', 'long', 'fraction', 'vertical', 'mix']) {
+                for (const sz of ['S', 'L']) {
+                    const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+                    const a = ['--source', 'kit', '--skills', divFormKeys.join(','), '--roles', DF_ROLES, '--size', sz, '--opts', JSON.stringify({ divForm: [form] })];
+                    if (fs.existsSync(file)) a.push('--baseline', rel(file));
+                    add(gate(`print-lint-divform-${form}-${sz}`, `ws-print-lint --source kit --roles (fact family) --size ${sz} --opts divForm=${form} (critic r1 R1-15: each written form on every page type)`, `${divFormKeys.join(',')} × divForm ${form} × ${sz}`, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint }));
+                }
+            }
+        }
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));
         if (ssFile && srcHas(ssFile, 'json')) ss.push('--json', path.join(ctx.logs, 'screen-slots.json'));
+        // --uniform (Lane D restart critic r1 R1-16): one digit size per worksheet, equal paper cells per row of cards
+        if (ssFile && srcHas(ssFile, 'uniform')) ss.push('--uniform');
         add(gate('screen-slots', 'ws-screen-slots --skills', scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)

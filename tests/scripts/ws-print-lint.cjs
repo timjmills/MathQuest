@@ -117,6 +117,10 @@
 //              CL40-INK (kit / pack) no ink - a glyph's ink box, an SVG shape, a painted border or fill - inside the
 //              label keep-out: the (label side + 1 mm) square at the cell's top-left corner, or the tab's own width
 //              when a 2-3 digit tab is wider (CL-40; critic 2026-10-24 D1, top-started across facts on the tab).
+//              ARC-INK (kit / pack) a long-division bracket's arc keeps >= 0.3 mm of white between its ink and the
+//              dividend's first digit's ink (VA-60a, owner 2026-10-31; Lane D restart critic r1 R1-1: "4 ) 8" read 48).
+//   (L-DENSITY GRID-EVEN, kit / pack: every cell of a fact grid `.ws-grid.facts` has one width within 0.2 mm;
+//              RUBRIC C3, PT-FRW-3; Lane D restart critic r1 R1-2.)
 //   L-WRAP     WRAP-OP (kit / pack) no wrapped line of text ends in − + × ÷ = with its expression continued on the
 //              next line (critic r2 N6 vocabulary picture, N7 worked step). TY-21, H2 and WRAP-OP are measured by
 //              tests/lib/ws-geom-probe.cjs, the one definition ws-slot-clip's SLOT-W / HEADS read too.
@@ -1037,6 +1041,73 @@ function wsLintPage(cfg) {
                     if (b) { hit = { el: d, what: `<${d.tagName.toLowerCase()}>`, b }; break; }
                 }
                 if (hit) F('L-OVERLAP', 'CL40-INK', 'major', hit.el, `ink of ${hit.what} at ${mm(hit.b.l - cr.left)} mm across, ${mm(hit.b.t - cr.top)} mm down enters the label keep-out (${mm(K.r - K.l)} x ${mm(K.b - K.t)} mm at the cell's top-left corner): nothing but the label paints there (CL-40)`, 'ink in label keep-out');
+            }
+        }
+        /* L-OVERLAP ARC-INK (VA-60a, owner 2026-10-31; Lane D restart critic r1 R1-1: the compact fact-rows bracket's
+           arc ran into the dividend's first digit, so "4 ) 8" read as "48" and "3 ) 0" as "30"). For every
+           long-division bracket (the `division` template: an SVG arc in the gutter between the divisor and the
+           dividend), the white between the arc's INK and the first dividend digit's INK, measured at the height of
+           that digit's ink, must be at least ARC_GAP_MM. The arc is sampled along its path (stroke half-width
+           added); the digit's ink comes from canvas measureText at 20x the printed size (at print size canvas rounds
+           the ink to whole pixels, 0.26 mm). */
+        if (!isLegacy) {
+            const ARC_GAP_MM = 0.3;
+            const ctxA = document.createElement('canvas').getContext('2d');
+            const K = 20;
+            const inkOfDigit = (sp) => {
+                const rg = document.createRange(); rg.selectNodeContents(sp);
+                const r = rg.getBoundingClientRect(); const cs = getComputedStyle(sp);
+                ctxA.font = `${cs.fontStyle} ${cs.fontWeight} ${parseFloat(cs.fontSize) * K}px ${cs.fontFamily}`;
+                const m = ctxA.measureText(sp.textContent.trim());
+                const fa = m.fontBoundingBoxAscent / K, fd = m.fontBoundingBoxDescent / K;
+                const base = r.top + (r.height - (fa + fd)) / 2 + fa;
+                return { l: r.left - m.actualBoundingBoxLeft / K, t: base - m.actualBoundingBoxAscent / K, b: base + m.actualBoundingBoxDescent / K };
+            };
+            for (const c of ri.cells) {
+                for (const svg of c.querySelectorAll('[data-ws-ops="division"] [role="group"] svg')) {
+                    const path = svg.querySelector('path');
+                    if (!path || !/Q/.test(path.getAttribute('d') || '') || !visible(svg)) continue;
+                    const grid = svg.closest('[role="group"]');
+                    const kids = [...grid.children];
+                    const ai = kids.indexOf(svg.parentElement);
+                    if (ai < 0) continue;
+                    const row = svg.parentElement.style.gridRow;
+                    const dd = kids.slice(ai + 1).find((s) => s.style.gridRow === row && /^\d$/.test(s.textContent.trim()) && visible(s));
+                    if (!dd) continue;
+                    const di = inkOfDigit(dd);
+                    const sw = (parseFloat(path.getAttribute('stroke-width')) || 1.5) * 96 / 72 / 2;
+                    const M = path.getScreenCTM();
+                    const L = path.getTotalLength();
+                    let right = -Infinity;
+                    for (let i = 0; i <= 200; i++) {
+                        const p = path.getPointAtLength((L * i) / 200);
+                        const q = new DOMPoint(p.x, p.y).matrixTransform(M);
+                        if (q.y < di.t - sw || q.y > di.b + sw) continue;
+                        right = Math.max(right, q.x + sw);
+                    }
+                    if (!Number.isFinite(right)) continue;
+                    const gap = (di.l - right) / PX;
+                    if (gap < ARC_GAP_MM) F('L-OVERLAP', 'ARC-INK', 'major', grid, `the bracket's arc ${gap < 0 ? `runs ${(-gap).toFixed(2)} mm into` : `comes within ${gap.toFixed(2)} mm of`} the dividend's first digit "${dd.textContent.trim()}" (${grid.getAttribute('aria-label') || 'division'}): keep at least ${ARC_GAP_MM} mm of white between the arc's ink and the digit's ink, or "4 ) 8" reads as "48" (VA-60a, owner 2026-10-31)`, 'arc on the dividend');
+                }
+            }
+        }
+        /* L-DENSITY GRID-EVEN (RUBRIC C3 "cells are equal in size across a section, arranged in a regular grid";
+           PT-FRW-3; Lane D restart critic r1 R1-2: div_facts Mix fact rows re-laid a 9-cell last row at 20.7 mm under
+           18.6 mm cells). On a fact grid (`.ws-grid.facts`: fact rows, probes) every cell of the section has one
+           width (within 0.2 mm); the unruled blank run (PG-15) and a declared full-width cell are not cells of the
+           lattice. */
+        if (!isLegacy) {
+            for (const g of ri.el.querySelectorAll('.ws-grid.facts')) {
+                if (!visible(g)) continue;
+                const gw = g.getBoundingClientRect().width;
+                const cs = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun') && visible(c));
+                const ws = cs.map((c) => c.getBoundingClientRect().width).filter((w) => w < gw - 2 * PX);
+                if (ws.length < 2) continue;
+                const lo = Math.min(...ws), hi = Math.max(...ws);
+                if (hi - lo > 0.2 * PX) {
+                    const odd = cs.find((c) => Math.abs(c.getBoundingClientRect().width - lo) > 0.2 * PX) || g;
+                    F('L-DENSITY', 'GRID-EVEN', 'major', odd, `the cells of one fact grid are ${mm(lo)} to ${mm(hi)} mm wide: one cell width per section, a short last row keeps the lattice and leaves the rest unruled (RUBRIC C3, PT-FRW-3, PG-15)`, 'uneven grid');
+                }
             }
         }
         /* (Lane D port 2026-10-30: the lane's own L-OVERFLOW CL-40 keep-out check - text line boxes against a
@@ -2377,7 +2448,8 @@ function kitDocList(skills, flags, jobId) {
     }
     if (skills.length < 2) throw new Error(`--kind ${flags.kind} needs two or more --skills (the skill and its partners)`);
     const role = flags.kind === 'mixed' ? 'mixed-practice' : kitRoles[0];
-    if (flags.kind === 'sections' && !['independent', 'more-practice'].includes(role)) throw new Error(`--kind sections prints on a practice role (independent, more-practice), not ${role}`);
+    // (fact-rows: one grid of every skill's facts, owner ruling 2026-10-31 - the mixed fast-facts page)
+    if (flags.kind === 'sections' && !['independent', 'more-practice', 'fact-rows'].includes(role)) throw new Error(`--kind sections prints on a practice role (independent, more-practice) or fact-rows, not ${role}`);
     return [{ id: jobId || `${flags.kind}:${ids.join('+')}`, skills, role, seed: hash(`${flags.kind}:${ids.join(',')}:print`), label: `${skills.length} skills as ${flags.kind === 'mixed' ? 'Mixed practice' : 'sections'}` }];
 }
 
@@ -2610,6 +2682,26 @@ const SELF_TESTS = [
         const t = c.querySelector(LAB).getBoundingClientRect(), cr = c.getBoundingClientRect();
         const MM = 96 / 25.4;
         c.insertAdjacentHTML('beforeend', `<span style="position:absolute;left:${Math.max(t.height + MM, t.right - cr.left) - 1.2 * MM}px;top:${t.bottom - cr.top - 2.5 * MM}px;font-size:22pt;line-height:1;color:#000">4</span>`);
+    } },
+    // ARC-INK (VA-60a; Lane D restart critic r1 R1-1: the compact bracket's arc ran into the dividend's first digit,
+    // "4 ) 8" read as "48"): 7 ) 84 at 16 pt on 0.55 em tracks with r1's 1 mm gutter and its arc (x 4.7, bow to 12.7);
+    // the control is the same fact in a 3 mm gutter with a shallow arc (1.7 mm of white).
+    { name: 'bracket arc on the dividend\'s first digit (ARC-INK)', expect: ['L-OVERLAP', 'ARC-INK'], fn: () => {
+        const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 1mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M4.7 0 H10 M4.7 0 Q12.7 20 4.7 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+    } },
+    { name: 'bracket arc clear of the dividend (ARC-INK control)', expect: [], absent: ['L-OVERLAP', 'ARC-INK'], fn: () => {
+        const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 3mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M2 0 H10 M2 0 Q5 20 2 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+    } },
+    // GRID-EVEN (RUBRIC C3, PT-FRW-3; Lane D restart critic r1 R1-2: a re-laid last row of wider cells on fact rows):
+    // a fact grid whose first column is 30 mm and the rest share the width; the control is the same grid with equal cells.
+    { name: 'fact grid with a widened cell (GRID-EVEN)', expect: ['L-DENSITY', 'GRID-EVEN'], fn: () => {
+        const g = document.querySelector('.ws-page .ws-grid'); g.classList.add('facts');
+        g.style.gridTemplateColumns = '30mm 1fr 1fr';
+    } },
+    { name: 'fact grid of equal cells (GRID-EVEN control)', expect: [], absent: ['L-DENSITY', 'GRID-EVEN'], fn: () => {
+        document.querySelector('.ws-page .ws-grid').classList.add('facts');
     } },
     // H13-ROW (pilot-su-c critic r2 N2): a short top cell in a row sized for its taller neighbour; the control is a
     // uniform row (both cells hold the tall item), which keeps equal bands and never fires.
