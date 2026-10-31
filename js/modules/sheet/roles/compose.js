@@ -485,6 +485,18 @@ export function sharedNumbers(items) {
 export const nbExpr = (text) => String(text === undefined || text === null ? '' : text)
     .replace(/([\d?_)])\s+(?=[+\-−×÷=<>]\s*[\d?_(])/g, '$1\u00a0').replace(/([+\-−×÷=<>])\s+(?=[\d?_(])/g, '$1\u00a0');
 
+/**
+ * What a drawing SHOWS, ink-blind (shared-roles R1-3): its written characters in order, plus every mark that writes nothing
+ * and stays (a strike, an arrow, a hop, a dot tile, the lesson's ring round the start number; a column's ring only
+ * points at what its own step reads). Two step states that differ only in
+ * which marks are grey, in a pointing ring or in markup show the same thing, so they are one panel.
+ */
+export const drawingKey = (html) => {
+    const h = String(html);
+    const marks = (h.match(/class="[^"]*\b(strike|cross|hop|arrow|mq-dottile|mq-cue|mq-lring)[\w-]*/gi) || []).map((x) => x.replace(/^class="/, '').replace(/\b(ws-trace|mq-lring-t)\b/g, '').trim());
+    return `${h.replace(/<[^>]*>/g, ' ').replace(/&nbsp;|\u00a0/g, ' ').replace(/\s+/g, ' ').trim()}|${marks.join(',')}`;
+};
+
 /** The cue words a step may name, and the drawing that shows each (shared-roles R1-14). */
 const CUE_WORDS = [
     { re: /\bdots?\b/i, drawn: /<circle\b|mq-dottile|touch|class="[^"]*\bdot/i },
@@ -602,7 +614,7 @@ export const poolItems = (input, id) => (input.items || []).filter((it) => (it.p
 export default {
     ctxOf, labelStyleOf, topicOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem,
     gridPart, instructionPart, instructionKeyOf, instructionText, answerOf, wrongOf, workedStepsOf, stringsOf,
-    wrongPattern, opOf, opGlyphOf, operandsOf, oralFrameOf, generalSteps, genericSteps, exampleNumbers, sharedNumbers, drawnCueSteps, nbExpr, providerWorkedSteps, instructionVarsOf, checkLine, writeLine, stepsHtml,
+    wrongPattern, opOf, opGlyphOf, operandsOf, oralFrameOf, generalSteps, genericSteps, exampleNumbers, sharedNumbers, drawnCueSteps, nbExpr, drawingKey, providerWorkedSteps, instructionVarsOf, checkLine, writeLine, stepsHtml,
     slotKey, assemble, poolItems, isWhole, JUDGE_LABELS, STRAND_BY_CATEGORY,
 };
 export { isWhole, JUDGE_LABELS, STRAND_BY_CATEGORY };

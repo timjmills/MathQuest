@@ -19,7 +19,8 @@ registerSkill('multiplication:mult_facts', {
         iCan: 'I Can multiply facts to 12',
         instructionKey: 'multiply',
         steps: [
-            'Read 3 × 4 as 3 groups of 4.',
+            // shared-roles R1-5: a general step names no example's numbers (it sits beside every try)
+            'Read the first number as the number of groups.',
             'Skip count by the size of one group.',
             'Stop when you have counted every group.',
             'Write the product.',
