@@ -142,7 +142,8 @@ async function roleChecks(roles) {
                 if (g.pages > 2 + g.tallPools) why.push(`${g.pages} pages (a check is short, PT 2.10: one page, two when its pictures are tall, plus one a skill whose item is taller than half a page)`);
                 if (g.keyPages !== g.pages) why.push(`key ${g.keyPages} page(s) for ${g.pages}`);
                 if (g.pools < 3) why.push(`${g.pools} prerequisite skill(s) (PT-PRE-1: four)`);
-                if (g.groups !== g.pools) why.push(`${g.groups} scored group(s) for ${g.pools} skills (one quadrant or band a skill, P-25)`);
+                // (a dealt skill the pages cannot hold is left out - PG-23 - so the scored groups may be fewer than the skills dealt)
+                if (g.groups < 3 || g.groups > g.pools) why.push(`${g.groups} scored group(s) for ${g.pools} skills dealt (PT-PRE-1: one quadrant or band a prerequisite, at least 3)`);
                 const self = g.skills.filter((x) => g.own.includes(x));
                 if (self.length) why.push(`checks the page's own skill ${self.join(', ')} (PT-PRE-3: its prerequisites)`);
                 // (page 1's floor; a later page's share is print-lint's DN-2 / PG-23)
