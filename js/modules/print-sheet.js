@@ -42,8 +42,8 @@ import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { wrmFor } from './wrm.js';
-import { presetOf } from './skill-presets.js';
-import { loadYear } from './links-data.js';
+import { presetOf, presetsOfHost } from './skill-presets.js';
+import { loadYear, loadIndex } from './links-data.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
 import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups } from './sheet/index.js';
@@ -3097,6 +3097,17 @@ function settleMixedGrades(metas, items) {
     }
 }
 
+/** A preset that is one value of a series: its host has 3 or more presets in the category, all setting the same option keys. */
+function isSeriesPreset(cat, id) {
+    let p = null;
+    try { p = presetOf(cat, id); } catch (e) { p = null; }
+    if (!p) return false;
+    const keys = (o) => Object.keys(o || {}).sort().join(',');
+    let sibs = [];
+    try { sibs = presetsOfHost(cat, p.skillId); } catch (e) { sibs = []; }
+    return sibs.length >= 3 && sibs.every((x) => { const q = presetOf(cat, x); return q && keys(q.opts) === keys(p.opts); });
+}
+
 function earlierSkills(sk, count = 1, { fallback = false, hosts = false } = {}) {
     // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
     // columns, then word problems), so the skill just above a Level K word problem can be a
@@ -3121,7 +3132,13 @@ function earlierSkills(sk, count = 1, { fallback = false, hosts = false } = {}) 
             // PRESET skill (one option value of its host, data.js `presetOf`) stands in for its host, so the earlier
             // step rehearses the host's whole range (count_by_12s -> count_by_tables, seeded tables 1-12). The skill's
             // own category walk (step 1) is unchanged: a preset listed before it there is a real earlier step.
-            if (asHost && s && s.presetOf) s = list.find((h) => h && h.v === s.presetOf) || s;
+            // shared-roles F (review S regressions: add_fractions_like took `simplify` for a grade-6 preset it may not
+            // take; prime_composite and add_decimal lost their earlier lesson for its host's other tasks): the preset
+            // must itself be a step the skill may take (its grade), and it stands in for its host only when it is one
+            // value of a SERIES (3 or more presets of one host in the category, varying the same option: count by
+            // 2s ... 12s). A lone preset is its own lesson (CLAUDE.md: a distinct option is also a findable skill) and
+            // is rehearsed as itself.
+            if (asHost && s && s.presetOf && ok(s, cat) && isSeriesPreset(cat, s.v)) s = list.find((h) => h && h.v === s.presetOf) || s;
             if (ok(s, cat) && !out.some((o) => o.categoryId === cat && o.skillId === s.v)) out.push({ categoryId: cat, skillId: s.v });
         }
     };
@@ -3162,7 +3179,7 @@ function earlierSkills(sk, count = 1, { fallback = false, hosts = false } = {}) 
  *      (earlierSkills with its fallback).
  * Every skill is a live one (no tombstone, hidden or mixed pool) at the skill's grade or below.
  */
-async function prereqSkills(sk, count = 4) {
+async function prereqSkills(sk, count = 4, { wide = false } = {}) {
     // (a preset is its host with set options: a preset of the page's own host - or the host of the
     // page's own preset - is the page's own skill, never a prerequisite)
     const hostKey = (r) => { let p = null; try { p = presetOf(r.categoryId, r.skillId); } catch (e) { p = null; } return p ? `${p.categoryId}:${p.skillId}` : `${r.categoryId}:${r.skillId}`; };
@@ -3180,8 +3197,8 @@ async function prereqSkills(sk, count = 4) {
         try { g = GRADE_RANK(getSkillGrade(ref.skillId, ref.categoryId)); } catch (e) { g = null; }
         return !(ownG !== null && g !== null && g > ownG);
     };
-    const add = (ref) => {
-        if (out.length >= count || !ref || !ref.categoryId || !ref.skillId) return;
+    const add = (ref, cap = count) => {
+        if (out.length >= cap || !ref || !ref.categoryId || !ref.skillId) return;
         const k = hostKey(ref);
         if (seen.has(k) || !live(ref)) return;
         seen.add(k);
@@ -3199,8 +3216,46 @@ async function prereqSkills(sk, count = 4) {
         for (const p of (rec && Array.isArray(rec.pre) ? rec.pre : [])) add(skillRef(p));
     }
     if (out.length < count) for (const r of earlierSkills(sk, count + 4, { fallback: true })) add(r);
+    if (!wide) return out;
+    // shared-roles F (ws-columns: vocab_grade_K had 1 placeable prerequisite of its 8, all vocabulary skills whose cells
+    // overflow): the WIDER search, used by the role only when fewer than 3 of the near candidates place
+    // (pre-skill-check.js pickPrereqs). It holds (a) the next earlier skills (more than the 8), then (b) the skills the
+    // curriculum already marks as a prerequisite somewhere (every `pre` list of data/curriculum/links/<YEAR>.json) at the
+    // skill's grade or below: its own domain first, then the nearest grade, then the most cited (for a K skill outside the
+    // number domains: count objects, compare groups, name flat shapes, a ten frame).
+    const near = out.length;
+    const lim = near + WIDE_PREREQS;
+    for (const r of earlierSkills(sk, near + 12, { fallback: true })) add(r, near + WIDE_EARLIER);
+    const domainOf = (cat) => { for (const [id, d] of Object.entries(DOMAINS || {})) if ((d.categories || []).some((c) => c.id === cat)) return id; return ''; };
+    const ownD = domainOf(sk.categoryId);
+    const cited = new Map();
+    let idx = null;
+    try { idx = await loadIndex(); } catch (e) { idx = null; }
+    for (const y of (idx && idx.years) || []) {
+        let d = null;
+        try { d = await loadYear(y); } catch (e) { d = null; }
+        for (const rec of Object.values((d && d.steps) || {})) {
+            for (const p of (Array.isArray(rec.pre) ? rec.pre : [])) {
+                const ref = skillRef(p);
+                if (!ref.categoryId || !ref.skillId) continue;
+                const k = `${ref.categoryId}:${ref.skillId}`;
+                const e = cited.get(k) || { ref, n: 0 };
+                e.n += 1;
+                cited.set(k, e);
+            }
+        }
+    }
+    const gradeOf = (r) => { try { return GRADE_RANK(getSkillGrade(r.skillId, r.categoryId)); } catch (e) { return null; } };
+    const rank = [...cited.values()].map((e) => ({ ...e, sameD: domainOf(e.ref.categoryId) === ownD ? 0 : 1, g: gradeOf(e.ref) }))
+        .filter((e) => e.g !== null)
+        .sort((a, b) => a.sameD - b.sameD || b.g - a.g || b.n - a.n || `${a.ref.categoryId}:${a.ref.skillId}`.localeCompare(`${b.ref.categoryId}:${b.ref.skillId}`));
+    for (const e of rank) add(e.ref, lim);
+    out.near = near;
     return out;
 }
+// (the wider search: up to 4 more earlier skills, then curriculum prerequisites, 10 in all)
+const WIDE_EARLIER = 4;
+const WIDE_PREREQS = 10;
 
 /** Roles whose cells show a finished answer in the skill's own slot (they need `canShow`). */
 const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
@@ -3220,7 +3275,7 @@ async function buildRoleSheet(n, metaOf) {
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
     // R1-8: a Pre-skill check of ONE skill tests its prerequisites (the detailed lesson's check names its own).
-    const prereqs = n.role === 'pre-skill-check' && !n.perQuestion && reqSkills.length === 1 ? await prereqSkills(reqSkills[0], 8) : null;
+    const prereqs = n.role === 'pre-skill-check' && !n.perQuestion && reqSkills.length === 1 ? await prereqSkills(reqSkills[0], 8, { wide: true }) : null;
     const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, prereqs }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
     const allSkills = [];

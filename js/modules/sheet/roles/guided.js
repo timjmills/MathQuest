@@ -702,6 +702,7 @@ const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-modelspan .mq-workwrap{flex-direction:row;justify-content:center;align-items:center;column-gap:8mm}
 :is(.ws-page,.ws-sheet) .mq-modelspan .mq-workwrap>:first-child{flex:0 1 auto;max-width:55%}
 :is(.ws-page,.ws-sheet) .mq-modelspan .mq-worklines{width:auto;max-width:45%;margin:0;text-align:left}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-modelrow{padding-top:calc(var(--ws-tab,6mm) + 1.5mm)}
 :is(.ws-page,.ws-sheet) .mq-ring{display:inline-block;border:1pt solid #949494;border-radius:999px;padding:0 .2em;line-height:1.1}
 :is(.ws-page,.ws-sheet) .mq-uline{text-decoration:underline;text-decoration-color:#949494;text-decoration-thickness:1pt;text-underline-offset:.15em}
 :is(.ws-page,.ws-sheet) .mq-workeq{position:absolute;left:0;right:0;top:45%;text-align:center;font-size:var(--ws-text);font-weight:700;line-height:1.2}
@@ -944,7 +945,13 @@ export function plan(input = {}) {
         // tile row. Every model cell but a column stack (whose grid already starts below the tab)
         // steps its content down clear of the tab.
         const spanIt = fit.span && i === 0;
-        const cell = stage === 'model' && !OWN_TOP_BAND.has(it.template)
+        // shared-roles F (H13-HINT, div_facts guided S: a 10 mm band under the try beside a division Model): a try in
+        // the row of a Model with a think line stands LEVEL with the Model's problem - it steps down by the Model's tab
+        // clearance, as the Model does - so the row's tab clearance (part of its 17 mm, fitRows) is above both
+        // problems, not left empty under the try. Its think line still fits: the row was sized for the Model's.
+        const besideModel = stage !== 'model' && nModels === 1 && !fit.span && i < cols && !OWN_TOP_BAND.has(use[0].template) && !!thinkCueOf(use[0]);
+        const cell = besideModel ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-modelrow'].join(' ').trim() })
+            : stage === 'model' && !OWN_TOP_BAND.has(it.template)
             ? Object.assign({}, it, {
                 cellCls: [it.cellCls || '', 'mq-modelcell', spanIt ? 'mq-modelspan' : ''].join(' ').trim(),
                 cellStyle: spanIt ? [it.cellStyle || '', 'grid-column:1 / -1'].filter(Boolean).join(';') : it.cellStyle,

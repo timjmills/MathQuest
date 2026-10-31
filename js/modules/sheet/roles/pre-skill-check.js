@@ -25,6 +25,7 @@ import { SIZES } from '../index.js';
 export const ROLE_ID = 'pre-skill-check';
 const PER_QUAD = 4;
 const MAX_CANDIDATES = 8;
+const MIN_PLACED = 3;
 
 export function sources(skills, { earlier, prereqs } = {}) {
     let list;
@@ -33,7 +34,14 @@ export function sources(skills, { earlier, prereqs } = {}) {
     // (print-sheet.js prereqSkills: the lesson data, the White Rose steps' `pre` lists, then the
     // earlier skills) - never the skill itself.
     // (up to 8 candidates: counts() keeps the first four the page holds - pickPrereqs)
-    else if (Array.isArray(prereqs) && prereqs.length) return prereqs.slice(0, MAX_CANDIDATES).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
+    // (shared-roles F: the host's WIDER search follows as pools `w<n>`; pickPrereqs reads them only when fewer than
+    // MIN_PLACED of the near ones place - PT-PRE-1's four quadrants)
+    else if (Array.isArray(prereqs) && prereqs.length) {
+        const nNear = Math.min(MAX_CANDIDATES, Number.isFinite(prereqs.near) ? prereqs.near : prereqs.length);
+        const near = prereqs.slice(0, nNear).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
+        const wide = Number.isFinite(prereqs.near) ? prereqs.slice(prereqs.near).map((sk, i) => ({ id: `w${MAX_CANDIDATES + i}`, skills: [sk] })) : [];
+        return near.concat(wide);
+    }
     else {
         const prev = earlier(skills[0], 4);
         list = prev.length ? prev.slice().reverse() : [skills[0]];
@@ -193,13 +201,19 @@ export function pickPrereqs(pools, ids, input) {
     const head = layoutHeader(headOf(input).header);
     const m = bandMetrics(ctx, head);
     const mCont = bandMetrics(ctx, head, { cont: true });
-    const live = ids.filter((id) => (pools[id] || []).length);
     const room = m.body - 2;
     const placeable = (id) => {
         const q = pools[id];
         if (QUAD_GRIDS(ctx.size).some(([pc]) => fitsAt(q, pc, ctx) && Number.isFinite(hMinAt(q, pc, ctx)) && hMinAt(q, pc, ctx) * 1.15 * 2 + m.strip <= room)) return true;
         return [4, 3, 2, 1].some((c) => fitsAt(q, c, ctx) && Number.isFinite(hMinAt(q, c, ctx)) && m.strip + hMinAt(q, c, ctx) <= 0.6 * room);
     };
+    // shared-roles F (PT-PRE-1: four quadrants, ws-columns: at least 3): the near candidates first; only when fewer than
+    // MIN_PLACED of them place does the page reach into the host's wider search (`w<n>` pools: more earlier skills, then
+    // the curriculum's own prerequisites at the skill's grade or below), so a page whose near skills fill it is unchanged
+    const has = (id) => (pools[id] || []).length;
+    const nearIds = ids.filter((id) => !/^w/.test(id) && has(id));
+    const nearOk = nearIds.filter(placeable).length;
+    const live = nearOk >= MIN_PLACED ? nearIds : ids.filter(has);
     const legacy = (id) => pools[id].some((it) => !it.template || it.template === 'legacy');
     const order = [...live.filter((id) => !legacy(id)), ...live.filter((id) => legacy(id))].filter(placeable);
     if (!order.length) return null;
