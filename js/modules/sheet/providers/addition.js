@@ -342,7 +342,7 @@ registerSkill('addition:fact_family_sort', {
         const [a, b] = f.parts, s = a + b;
         return clampSteps([
             step(`The big number is ${f.whole}. It is at the top.`),
-            step(`The small numbers are ${a} and ${b}. ${a} + ${b} = ${s}.`),
+            step(`The small numbers are ${a} and ${b}. ${a}\u00a0+\u00a0${b}\u00a0=\u00a0${s}.`),
             f.isFamily
                 ? step(`${a} and ${b} make ${f.whole}. Circle yes.`, [{ slot: 'answer', value: 'Yes' }])
                 : step(`${a} and ${b} make ${s}, not ${f.whole}. Circle no.`, [{ slot: 'answer', value: 'No' }]),

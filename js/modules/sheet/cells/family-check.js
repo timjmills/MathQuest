@@ -9,6 +9,7 @@
 //                 slot (the pair, AK-2): on paper the pupil CIRCLES a word, the key rings the right
 //                 one (1.5 pt), Error analysis rings the wrong one. No Answer line, no tick boxes, no
 //                 Say frame in the graded cell (the Say line is the Model's, provider strings)
+//   paper         centred in the cell to the right of the item tab (CL-40: nothing paints in the tab's keep-out)
 //   screen twin   the same triangle, the two words are buttons (>= 44 px, `data-mq-choice`) which
 //                 screen-cell.js `wireTickBoxes` wires to the host's answer: one tap, one graded
 //                 response, on the card, the online worksheet and the quiz
@@ -64,7 +65,7 @@ register(FAMILY_CHECK, {
             ? `<div class="mq-fc-choice" role="group" aria-label="yes or no" style="display:flex;justify-content:center;gap:${L(ctx, 10)};">${words}</div>`
             : `<div class="mq-fc-choice" data-ws-slot="answer" data-ws-shape="choice"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:flex;justify-content:center;gap:${L(ctx, 12)};">${words}</div>`;
         const { wMm } = factTriangleSize(ctx);
-        return `<div class="mq-fc k2-cell" data-read${twin ? ' data-mq-k2="1"' : ''} style="color:${INK};${FONT}text-align:center;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 4)};padding:${L(ctx, 1)} 0;">`
+        return `<div class="mq-fc k2-cell" data-read${twin ? ' data-mq-k2="1"' : ''} style="color:${INK};${FONT}text-align:center;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 4)};padding:${L(ctx, 1)} 0 ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};box-sizing:border-box;width:100%;">`
             + `<div style="width:${L(ctx, wMm + 1)};max-width:100%;">${tri}</div>${choice}</div>`;
     },
     answerKey(p) {

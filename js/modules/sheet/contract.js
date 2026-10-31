@@ -164,7 +164,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // visual-quality lane (2026-10-31): the word-work cell's sentence form for stories within 20
     // (story, `[ ] ◯ [ ] = [ ] unit`), and the family-check cell (fact_family_sort)
     'story-sentence': 'Read the story. Write the number sentence. Solve.',
-    'family-check': 'Do the two small numbers make the big number? Circle yes or no.',
+    'family-check': 'Do the small numbers make the big number? Circle yes or no.',
     'pick-parts': 'Write one number from each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',

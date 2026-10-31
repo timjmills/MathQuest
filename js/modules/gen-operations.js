@@ -1533,7 +1533,7 @@ function _generateLadderV2(q, skill, helpers, range) {
         const whole = Math.max(...shown);
         const wi = shown.indexOf(whole);
         const parts = shown.filter((n, i) => i !== wi);
-        q.text = `Look at ${shown[0]}, ${shown[1]} and ${shown[2]}. Do the two small numbers make the big number?`;
+        q.text = `Look at ${shown[0]}, ${shown[1]} and ${shown[2]}. Do the small numbers make the big number?`;
         q.ans = isFamily ? 'yes' : 'no';
         q.acceptedAnswers = isFamily ? ['yes', 'y'] : ['no', 'n'];
         q.answerType = 'text';
@@ -1545,8 +1545,8 @@ function _generateLadderV2(q, skill, helpers, range) {
         // the two words are tapped on screen (screen-cell.js wireTickBoxes: one tap, one graded answer)
         q.selfAnswering = true;
         q.printAnswer = isFamily ? 'Yes' : 'No';
-        q.printText = 'Do the two small numbers make the big number? Circle yes or no.';
-        q.screenInstr = 'Do the two small numbers make the big number? Tap yes or no.';
+        q.printText = 'Do the small numbers make the big number? Circle yes or no.';
+        q.screenInstr = 'Do the small numbers make the big number? Tap yes or no.';
         q.printFormat = 'fact-family-sort';
         return true;
     }
