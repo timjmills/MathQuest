@@ -38,6 +38,7 @@ import { trayGroups, trayLocks, editShareInPlace, setShareFromText, shareHeldTex
 import { encodeSetParam } from './teacher-ui.js';
 import { printHtml } from './teacher-print.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
+import { skillWords } from './sheet/roles/practice.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { interleave } from './sheet/index.js';
 import { mountSample } from './teacher-preview.js';
@@ -123,7 +124,9 @@ const isBig = (list) => list.length > BIG;
 /** The kinds of worksheet (values kept: 'sections' | 'mixed' | 'single' are what saved sets and the sheet's state hold). */
 const KINDS = [['sections', 'In sections', 'Each skill in its own part'], ['mixed', 'Mixed up', 'Problems mixed one by one'], ['single', 'Single skill', 'One skill on a page']];
 function autoKind(list) { if (S.fromLesson) return 'sections'; return list.length >= 2 ? 'mixed' : 'single'; }
-function kindOf(list) { return S.kind || autoKind(list); }
+/** One skill to print: In sections and Mixed up change nothing, so the page is a Single skill page (dialog check r1 D3). */
+const oneSkill = (list) => list.filter((x) => !x.leftOut).length < 2;
+function kindOf(list) { if (oneSkill(list) && !S.fromLesson) return 'single'; return S.kind || autoKind(list); }
 
 /**
  * The page plan of the open sheet: the ONE source of every number the sheet shows (stepper, sub-lines, summary,
@@ -151,6 +154,8 @@ function amountOf(defaultPages) {
 const perLearned = new Map();
 // the sets of skills whose page 1 the engine has built: until then the page count is a first guess (check r2 bug 2)
 const perChecked = new Set();
+// the smallest page load that spilled onto a second page, per set: never learned up to again
+const perSpill = new Map();
 function perBase(list) { return [kindOf(list), S.opts.size, S.opts.examples, list.filter((x) => !x.leftOut).map((x) => keyOf(x) + JSON.stringify(x.opts || {})).join('|')].join('#'); }
 function perPageFor(list) { return perLearned.get(perBase(list)) || PER_PAGE[S.opts.size] || PER_PAGE.M; }
 
@@ -202,11 +207,26 @@ function requests(p, list, quiz, version = 0) {
         const secs = order.map((k) => ({ skills: [skillRef(byKey[k])], count: c[k] }));
         // Mixed up (owner 2026-10-31): the page's exact counts, mixed problem by problem by the engine
         if (p.kind === 'mixed' && order.length >= 2) out.push({ req: Object.assign(base(), { role: 'mixed-practice', arrangement: 'mixed', sections: secs }), copies: copy ? p.pages : 1, keys: order, pages: 1, mixed: true });
-        else out.push({ req: Object.assign(base(), { role: 'independent', sections: secs }), copies: copy ? p.pages : 1, keys: order, pages: 1 });
+        else {
+            const req = Object.assign(base(), { role: 'independent', sections: secs });
+            // In sections: a page of 2+ parts is titled by its skills, never "Mixed practice" (dialog check r1 D3;
+            // the engine's own fallback title for a page of several skills)
+            if (order.length >= 2 && !S.batchTitle && !quiz) req.header = Object.assign({}, req.header, { title: partsTitle(order.map((k) => byKey[k])) });
+            out.push({ req, copies: copy ? p.pages : 1, keys: order, pages: 1 });
+        }
     }
     return out;
 }
 
+/** "I Can add facts to 20 and subtract facts to 20": the title of an In sections page of several parts. */
+function partsTitle(its) {
+    const lines = [...new Set(its.filter(Boolean).map((it) => { try { return skillWords({ categoryId: it.categoryId, skillId: it.skillId, label: it.label, opts: it.opts }).iCan; } catch (e) { return ''; } }).filter(Boolean))];
+    if (!lines.length) return 'I Can practise each skill in its own part';
+    if (lines.length === 1) return lines[0];
+    const rest = lines.map((l, i) => (i ? l.replace(/^I Can\s+/i, '') : l));
+    const t = rest.length === 2 ? rest.join(' and ') : `${rest.slice(0, -1).join(', ')} and ${rest[rest.length - 1]}`;
+    return t.length <= 64 ? t : 'I Can practise each skill in its own part';
+}
 /** The plan key of each printed item: by its section (a preset prints under its host id). */
 function countParts(res, part, copies, into) {
     let n = 0;
@@ -372,7 +392,7 @@ async function runPreview() {
     if (!list.length) { S.preview = null; renderSide(); return; }
     const my = ++token;
     let last = null;   // the last page built: shown when the tries run out (never "Working out…" for good)
-    for (let tries = 0; tries < 3; tries++) {
+    for (let tries = 0; tries < 4; tries++) {
         const p = plan(list);
         if (p.error) { S.preview = null; renderSide(); return; }
         const quiz = S.sheet === 'quiz';
@@ -394,8 +414,19 @@ async function runPreview() {
         // Mixed up: when the plan's page spills, the engine says how many problems one page holds for this mix
         // (fits.perPage) and that is learned (absent until the M2 engine lands: then the cells of page 1, as for Sections)
         const fitsPer = part.mixed && res.fits && Number(res.fits.perPage) > 0 ? Math.round(Number(res.fits.perPage)) : 0;
+        const base = perBase(list);
+        if (got > planned) perSpill.set(base, Math.min(perSpill.get(base) || Infinity, onPage));
         if (got > planned && fitsPer && fitsPer < onPage) {
-            perLearned.set(perBase(list), fitsPer);
+            perLearned.set(base, fitsPer);
+            continue;
+        }
+        // dialog check r1 D4: what one page holds is learned from EVERY build, not only a spill, so the plan puts the
+        // problems on as few full pages as fit (20 facts on 1 page, not 3 pages of 8): the engine's fits.perPage for
+        // this mix. (In sections is not raised from fits: the engine reports ONE part's capacity, 16 facts at M, but
+        // starts a second part on a new page unless both are small, so 6 + 6 already takes 2 pages; a spill lowers it.)
+        const learn = got <= planned ? fitsPer : 0;
+        if (learn && learn !== perPageFor(list) && learn < (perSpill.get(base) || Infinity)) {
+            perLearned.set(base, learn);
             continue;
         }
         if (got > planned && onPage > 1 && p.kind !== 'single') {
@@ -457,7 +488,9 @@ function summaryCore() {
     const vals = active.map((x) => by[keyOf(x)] || 0).filter((c) => c > 0);
     const eachN = vals.length ? (vals.every((c) => c === vals[0]) ? `${vals[0]} of each` : (Math.max(...vals) - Math.min(...vals) <= 1 ? `about ${Math.round(total / vals.length)} of each` : '')) : '';
     const ofEach = eachN && active.length > 1 ? ` · ${eachN}` : '';
-    const names = isBig(list) ? byArea(active).map((a) => `${AREAS[a.area].short} ${a.list.reduce((t, x) => t + (by[keyOf(x)] || 0), 0)}`).join(', ')
+    // plain words (dialog check r1 D3): "Operations & algebra: 8 problems", never "No standard 8"
+    const areaWords = (a) => (a === 'NOSTD' ? 'Other skills' : AREAS[a].name);
+    const names = isBig(list) ? byArea(active).map((a) => { const c = a.list.reduce((t, x) => t + (by[keyOf(x)] || 0), 0); return `${areaWords(a.area)}: ${c} ${c === 1 ? noun.replace(/s$/, '') : noun}`; }).join(' · ')
         : list.map((x) => `${x.label} ${x.leftOut ? '(left out)' : (by[keyOf(x)] || 0) + (x.count > 0 ? ' (count)' : x.lockPct !== undefined ? ' (held)' : '')}`).join(', ');
     const pr = S.printed && S.printed.sig === sigOf(p, list, quiz) ? S.printed : null;
     const factLayout = p.kind === 'single' && S.opts.layout !== 'standard';
@@ -477,7 +510,7 @@ function summaryCore() {
         const areas = byArea(active);
         const hit = areas.filter((a) => a.list.some((x) => by[keyOf(x)] > 0)).length;
         const cover = shown >= active.length ? 'every skill at least once' : `a sample of ${shown} of ${active.length} skills, New numbers re-deals the sample`;
-        return { line: `${pg} · ${total} ${noun}${ofEach} · ${hit === areas.length ? `${areas.length} area${areas.length > 1 ? 's' : ''}` : `${hit} of ${areas.length} areas`} · ${cover}${left}${pts}${drift}`,
+        return { line: `${pg} · ${total} ${noun}${ofEach} · ${hit === areas.length ? `${areas.length} maths area${areas.length > 1 ? 's' : ''}` : `${hit} of ${areas.length} maths areas`} · ${cover}${left}${pts}${drift}`,
             more: names + ' · answer key at the end' };
     }
     const warn = p.warn.length ? ' · ' + p.warn.join(' ') : '';
@@ -485,7 +518,7 @@ function summaryCore() {
     if (each === 'copy') return { line: `${pages} copies of the same page · ${Math.round(total / Math.max(1, pages))} ${noun} on each · ${total} in all${ofEach} · one key: “Key for all ${pages} copies”${left}${drift}`, more: names + ' · New numbers re-deals the page' };
     if (each === 'same') return { line: `${pg} · the same ${noun} on each, new numbers · ${total} in all${ofEach} · answer key at the end${left}${drift}`, more: names + ' · New numbers re-deals every page' };
     return { line: `${pg} · ${total} ${noun}${ofEach}${pts} · answer key at the end${left}${drift}`,
-        more: names + (p.added === 'single' ? ` · pages raised to ${pages} so every skill keeps a page and the held % is met` : p.added ? ' · pages added so every skill comes up at least twice' : '') + warn };
+        more: names + (p.added === 'single' ? ` · pages raised to ${pages} so every skill keeps a page and the held % is met` : p.added === 'counts' ? ` · pages raised to ${pages} so the counts fit` : p.added ? ' · pages added so every skill comes up at least twice' : '') + warn };
 }
 function byArea(list) {
     const by = {};
@@ -663,8 +696,9 @@ function optionsHTML() {
     const k = p.kind;
     // owner 2026-10-31: both are options — In sections (each skill its own part) or Mixed up (problem by problem);
     // the amounts below (Problems of each skill: blank = even, a number = exact, a % = held) drive both
-    h += `<div class="tvs-kinds" role="radiogroup" aria-label="How the skills are arranged" data-tvs-arrange>${KINDS.map(([v, l, s]) => `<button type="button" class="tvs-kind" role="radio" data-act="kind" data-v="${v}" aria-checked="${k === v}">${k === v ? icon('check', 18) : ''}<span class="tvs-kind-name">${l}</span><span class="tvs-kind-sub">${s}</span></button>`).join('')}</div>`;
-    if (!S.kind) h += `<p class="tvs-muted tvs-chosen">Chosen for you: ${S.fromLesson ? 'practice from a lesson prints In sections' : list.length === 1 ? 'one skill makes a Single skill page' : `${list.length} skills print Mixed up`}.</p>`;
+    if (oneSkill(list)) h += `<p class="tvs-muted tvs-chosen" data-tvs-arrange-one>One skill: it prints on its own pages. In sections and Mixed up come with two or more skills.</p>`;
+    else h += `<div class="tvs-kinds" role="radiogroup" aria-label="How the skills are arranged" data-tvs-arrange>${KINDS.map(([v, l, s]) => `<button type="button" class="tvs-kind" role="radio" data-act="kind" data-v="${v}" aria-checked="${k === v}">${k === v ? icon('check', 18) : ''}<span class="tvs-kind-name">${l}</span><span class="tvs-kind-sub">${s}</span></button>`).join('')}</div>`;
+    if (!S.kind && !oneSkill(list)) h += `<p class="tvs-muted tvs-chosen">Chosen for you: ${S.fromLesson ? 'practice from a lesson prints In sections' : list.length === 1 ? 'one skill makes a Single skill page' : `${list.length} skills print Mixed up`}.</p>`;
     if (list.length >= 2 && (k === 'mixed' || k === 'sections')) h += `<p class="tvs-muted tvs-arrange-note" data-tvs-arrange-note="${k}">${k === 'mixed' ? 'The problems of every skill are mixed one by one, in the amounts below; every page is mixed.' : 'Each skill prints in its own part, with the amounts below.'}</p>`;
     // How much? Pages · Problems in all · Problems of each skill
     {
@@ -673,10 +707,11 @@ function optionsHTML() {
         const pg = p.pagesBy ? Math.max(1, Object.values(p.pagesBy).reduce((a, b) => a + b, 0)) : p.pages;
         const noun = quiz ? 'questions' : 'problems';
         let ctl;
-        if (mode === 'pages') ctl = `${stepper('pages', quiz ? q.pages : pg, 1, 30, 'Pages')}${seg('pages', quiz ? q.pages : pg, [['2', '2'], ['3', '3'], ['5', '5']], 'Pages')}`;
+        if (mode === 'pages') ctl = `${stepper('pages', quiz ? q.pages : pg, Math.max(1, p.minPages || 1), 30, 'Pages')}${seg('pages', quiz ? q.pages : pg, [['2', '2'], ['3', '3'], ['5', '5']], 'Pages')}`;
         else if (mode === 'total') ctl = `${stepper('ntotal', quiz ? q.n : S.opts.nTotal, 1, 300, noun + ' in all')}${seg('ntotal', quiz ? q.n : S.opts.nTotal, [['10', '10'], ['20', '20'], ['30', '30']], noun + ' in all')}`;
         else ctl = `${stepper('neach', quiz ? q.nEach : S.opts.nEach, 1, 50, noun + ' of each skill')}${seg('neach', quiz ? q.nEach : S.opts.nEach, [['2', '2'], ['4', '4'], ['6', '6']], noun + ' of each skill')}`;
-        const sub = mode === 'pages' ? (k === 'single' && list.length > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : isBig(list) ? `${p.total} ${noun}; fewer pages take a sample of the skills` : 'Pages of problems; the answer key is extra')
+        const sub = mode === 'pages' && p.added === 'counts' ? `Raised to ${pg} pages so the counts below fit; the answer key is extra`
+            : mode === 'pages' ? (k === 'single' && list.length > 1 ? 'Shared by how often each skill comes up; starts at one page per skill' : isBig(list) ? `${p.total} ${noun}; fewer pages take a sample of the skills` : 'Pages of problems; the answer key is extra')
             : mode === 'total' ? `Pages = ${noun} ÷ ${p.perPage} a page; the last page holds the rest` : 'A skill with its own count keeps it';
         h += row('How much?', sub, `${seg('mode', mode, [['pages', 'Pages'], ['total', quiz ? 'Questions in all' : 'Problems in all'], ['each', quiz ? 'Questions of each skill' : 'Problems of each skill']], 'How much')}<div class="tvs-pages">${ctl}</div>`);
     }

@@ -174,6 +174,16 @@ function curTotal(nAct) {
     return trayTotal(nAct);
 }
 
+/**
+ * planCounts against the sheet's total; in Pages mode there is no total to raise, so counts that need more problems
+ * raise the pages (the sheet's plan does the same, teacher-plan.js planPages) and are never refused for it.
+ */
+function countsAt(list, total) {
+    const r = PLAN.planCounts(list, total, planOpts());
+    const a = sheetAmount();
+    if (r && r.error && a && a.mode === 'pages' && isFinite(r.needTotal) && r.needTotal > total) return PLAN.planCounts(list, r.needTotal, planOpts());
+    return r;
+}
 /** { pct: key → %, byKey: key → n | null, total, error } for the tray as it stands. */
 function plan() {
     const list = trayItems();
@@ -181,8 +191,8 @@ function plan() {
     const total = curTotal(act.length);
     if (PLAN) {
         try {
-            const r = PLAN.planCounts(list, total, planOpts());
-            if (r && !r.error) return { pct: r.pct || {}, byKey: r.byKey || {}, total, error: '' };
+            const r = countsAt(list, total);
+            if (r && !r.error) return { pct: r.pct || {}, byKey: r.byKey || {}, total: r.total || total, error: '' };
             if (r && r.error) return { pct: fallbackPct(list), byKey: null, total, error: r.error, need: r.needTotal };
         } catch (e) { /* fall through */ }
     }
@@ -205,7 +215,7 @@ function fallbackPct(list) {
 function lockError() {
     const list = trayItems();
     const total = curTotal(list.filter((it) => it.leftOut !== true).length);
-    if (PLAN) { try { const r = PLAN.planCounts(list, total, planOpts()); return r && r.error ? r.error : ''; } catch (e) { return ''; } }
+    if (PLAN) { try { const r = countsAt(list, total); return r && r.error ? r.error : ''; } catch (e) { return ''; } }
     const counts = list.reduce((t, x) => t + (isNum(x.count) && x.leftOut !== true ? x.count : 0), 0);
     if (counts > total) return `Counts add up to ${counts}, more than the ${total} problems the page holds.`;
     const sum = list.reduce((t, x) => t + (isNum(x.lockPct) ? x.lockPct : 0), 0) + Object.values(T.locks).reduce((t, v) => t + v, 0);
