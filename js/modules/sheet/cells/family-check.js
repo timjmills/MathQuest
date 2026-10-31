@@ -14,20 +14,40 @@
 //                 screen-cell.js `wireTickBoxes` wires to the host's answer: one tap, one graded
 //                 response, on the card, the online worksheet and the quiz
 //
+//   support      option `familyChart` (skill-options.js, default off; owner 2026-10-31): payload `chart: true`
+//                draws the library's BLANK number-family chart beside the triangle (graphics/family-chart.js):
+//                the four sentences as empty boxes, signs printed. Working space only - every box is
+//                `data-ws-graded="0"`, the Yes / No pair stays the one graded slot. The key writes the four
+//                facts for a true family and leaves the chart blank for a false one (there is no family to
+//                write). On paper the chart sits UNDER the triangle at S (two across, 4 a page) and BESIDE it at
+//                M and L (one wide cell a row, 3 a page: under, those cells double in height and hold 2 a page);
+//                the triangle never shrinks.
+//
 // payload: {nums: [the three, as shown], whole: the largest, parts: [the other two, as shown],
-//           isFamily, labels: ['Yes', 'No'], correct: 0 | 1}
+//           isFamily, labels: ['Yes', 'No'], correct: 0 | 1, chart: false | true, op: '+' | '*'}
 //
 // Pure module (SCC-01).
 
 import { register } from '../registry.js';
 import { factTriangle, factTriangleSize } from '../graphics/fact-triangle.js';
-import { INK, GREY, L, P, B, isTwin, textPt, esc, FONT } from '../graphics/units.js';
+import { familyChart, familyChartSize, familyFacts } from '../graphics/family-chart.js';
+import { INK, GREY, L, P, B, isTwin, sizeOf, textPt, esc, FONT } from '../graphics/units.js';
 
 export const FAMILY_CHECK = 'family-check';
 const LABELS = ['Yes', 'No'];
 
 const labelsOf = (p) => (Array.isArray(p.labels) && p.labels.length === 2 ? p.labels.map(String) : LABELS);
 const correctOf = (p) => (Number(p.correct) === 1 ? 1 : 0);
+const chartOn = (p) => !!(p && (p.chart === true || p.chart === 'on'));
+/** Size S stacks the chart under the triangle (two cells across); M and L set it beside (one wide cell a row). */
+const underChart = (ctx) => sizeOf(ctx) === 'S';
+const opOf = (p) => (p && p.op === '*' ? '*' : '+');
+const digitsOf = (p) => Math.max(2, ...((p && p.nums) || []).map((n) => String(n).length));
+/** The four facts the key writes, or null when the three numbers are not a family. */
+function chartFacts(p, whole, parts) {
+    if (!p.isFamily || parts.length !== 2) return null;
+    return familyFacts(Number(parts[0]), Number(parts[1]), whole, opOf(p));
+}
 
 /** Which word a state rings: the key's, the finished-but-wrong work's, or none. */
 function ringedIndex(p, ctx) {
@@ -65,16 +85,51 @@ register(FAMILY_CHECK, {
             ? `<div class="mq-fc-choice" role="group" aria-label="yes or no" style="display:flex;justify-content:center;gap:${L(ctx, 10)};">${words}</div>`
             : `<div class="mq-fc-choice" data-ws-slot="answer" data-ws-shape="choice"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:flex;justify-content:center;gap:${L(ctx, 12)};">${words}</div>`;
         const { wMm } = factTriangleSize(ctx);
-        return `<div class="mq-fc k2-cell" data-ws-inplace data-read${twin ? ' data-mq-k2="1"' : ''} style="color:${INK};${FONT}text-align:center;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 4)};padding:${L(ctx, 1)} 0 ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};box-sizing:border-box;width:100%;">`
-            + `<div style="width:${L(ctx, wMm + 1)};max-width:100%;">${tri}</div>${choice}</div>`;
+        const pad = `padding:${L(ctx, 1)} 0 ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};box-sizing:border-box;width:100%;`;
+        const triBox = `<div style="width:${L(ctx, wMm + 1)};max-width:100%;">${tri}</div>`;
+        if (!chartOn(p)) {
+            return `<div class="mq-fc k2-cell" data-ws-inplace data-read${twin ? ' data-mq-k2="1"' : ''} style="color:${INK};${FONT}text-align:center;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 4)};${pad}">`
+                + `${triBox}${choice}</div>`;
+        }
+        // the support: a blank family chart, working space only (never graded). At M and L it sits BESIDE the triangle
+        // (the triangle and its Yes / No on the left, the four sentences on the right: look, work, decide): under it,
+        // the cell is 2.2x as tall and M / L hold 2 a page with a 24-36 % empty band; beside, the cell is the chart's
+        // height (3 a page). At S it fits UNDER the triangle two across (4 a page). On screen the two wrap.
+        const facts = chartFacts(p, whole, parts);
+        const show = !twin && !!facts && (ctx.state === 'answered' || ctx.state === 'traced');
+        const chart = familyChart(ctx, { op: opOf(p), facts, show, ink: show ? (ctx.state === 'traced' ? 'trace' : 'solid') : null, digits: digitsOf(p) });
+        if (!twin && underChart(ctx)) {
+            // Size S: the chart UNDER the triangle, then Yes / No (the cell is 61 mm wide: two across, S 4 a page)
+            return `<div class="mq-fc mq-fc--chart k2-cell" data-ws-inplace data-read data-mq-fchart="1" style="color:${INK};${FONT}text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;min-height:100%;gap:${L(ctx, 4)};${pad}">`
+                + `${triBox}${chart}${choice}</div>`;
+        }
+        const left = `<div class="mq-fc-main" style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 4)};flex:none;">${triBox}${choice}</div>`;
+        return `<div class="mq-fc mq-fc--chart k2-cell" data-ws-inplace data-read data-mq-fchart="1"${twin ? ' data-mq-k2="1"' : ''} style="color:${INK};${FONT}text-align:center;display:flex;flex-direction:row;flex-wrap:${twin ? 'wrap' : 'nowrap'};align-items:center;justify-content:space-evenly;gap:${twin ? '16px' : L(ctx, 6)};${pad}">`
+            + `${left}${chart}</div>`;
     },
     answerKey(p) {
         const lab = labelsOf(p)[correctOf(p)];
-        return { value: lab, display: lab, slots: { answer: { value: lab, graded: true, accept: [lab.toLowerCase(), lab.charAt(0).toLowerCase()] } } };
+        const slots = { answer: { value: lab, graded: true, accept: [lab.toLowerCase(), lab.charAt(0).toLowerCase()] } };
+        if (chartOn(p)) {
+            // the chart's boxes: working space, never graded; written on the key only for a true family
+            const whole = Number(p.whole);
+            const parts = Array.isArray(p.parts) ? p.parts : [];
+            const facts = chartFacts(p, whole, parts);
+            for (let i = 0; i < 4; i++) for (const k of ['a', 'b', 'c']) slots[`fc${i}-${k}`] = { value: facts ? String(facts[i][k]) : '', graded: false };
+        }
+        return { value: lab, display: lab, slots };
     },
     // answered in place (a ring round a printed word): rows packed to the measured height, never stretched far past
     // it (layout.js IN_PLACE_FILL; critic r1 F1: 9 triangles in 73 mm cells at S, 37.8 % empty)
-    footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true }; },
+    // with the family chart beside the triangle the cell is one wide row (tab + triangle + gap + chart: 101 mm at S,
+    // 160 mm at L): one across, its height the chart's (measured)
+    footprint(p, ctx) {
+        if (!chartOn(p)) return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true };
+        if (underChart(ctx)) return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, denseRoom: 1, inPlace: true };
+        const w = 7 + factTriangleSize(ctx).wMm + 6 + familyChartSize(ctx, { digits: digitsOf(p) }).wMm;
+        return { wMm: Math.ceil(w), hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true };
+    },
+    // the one graded slot; the chart's boxes are working space and are not inputs (word-work's scratch boxes)
     inputs() { return [{ id: 'answer', kind: 'choice', shape: 'choice', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout() { return { card: 'card-medium-visual', checker: 'choice' }; },
 });

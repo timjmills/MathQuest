@@ -1540,6 +1540,8 @@ function _generateLadderV2(q, skill, helpers, range) {
         q.skillLabel = 'Is It a Fact Family?';
         q.hint = `Two of the numbers must make the third. ${why}`;
         const payload = { nums: shown, whole, parts, isFamily, labels: ['Yes', 'No'], correct: isFamily ? 0 : 1, sum: parts[0] + parts[1] };
+        // support `familyChart` (owner, 2026-10-31): a blank number-family chart under the triangle, working space only
+        if (_opt('familyChart') === true) payload.chart = true;
         q.cell = { template: 'family-check', v: 1, payload };
         // a page never deals the same three numbers twice, in any order (print-sheet.js signature; critic r1 F9)
         q.dupKey = `family-check:${shown.slice().sort((x, y) => x - y).join(',')}`;

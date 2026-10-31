@@ -28,12 +28,15 @@ Critic rounds: 1, FAIL (min 5); fix r2 ready for critic r2
 
 ## Owner design list
 - 2026-10-31 (owner, via lead): "on these for extra help option have it show blank number family chart so students can fill it in to answer." → `familyChart: off | on` on family-check (default off): a blank 4-sentence family chart under the triangle, ungraded working boxes on paper and screen, key fills it for true families. Queued (rule 0); built after fix round 2, before critic r2. Also: draft the spec card (family-check + sentence + familyChart) for the owner to sign.
+  BUILT 2026-10-31 (Opus medium, new drawing): option `familyChart` (bool, default off, support group, share key 4K, codec pin added) on `addition:fact_family_sort`; library entry `familyChart` (`js/modules/sheet/graphics/family-chart.js`, GRAPHIC_LIBRARY.md); `family-check` draws it UNDER the triangle at S (two across, 4 a page) and BESIDE it at M / L (one wide cell a row, 3 a page; under, M / L held 2 a page with a 24-36 % band). Boxes 0.75 pt, `data-ws-graded="0"`; screen `input.mq-wwork` without `data-mq-expect` (typeable, never graded or marked). Key fills the chart for a true family only. After shots: `after/fact_family_sort-familychart-{print-L,card-390,key-L}.png`.
+  Spec card drafted (UNSIGNED, owner to sign): `design/cards/family-check/family-check.md` (card.json beside it): family-check + the word-work sentence layout + familyChart, the lead's interim rulings recorded, every option / role / host line decided (81 PROPOSED), `--check-coverage` OK; `--check-signed` lacks only the signature.
 
 ## Open questions
 - Lead ruling 2026-10-31 (F13), for the owner's batch look: the part-whole bar is drawn on teaching pages (model, guided, lesson) and is an option (default off) on practice pages, the No Pictures skills included.
 - Precritic exceptions taken for round 1 (lead): sibling-compare (no approved sibling for a new template — this round creates it) and card-rulings / card-not-offered (no signed spec card: owner action). Should a spec card be drafted for the owner to sign for `family-check` and the `sentence` layout?
 
 ## Times
+- familyChart option + spec card (Opus medium): 17:58-18:40.
 - Fix round 2 (Opus medium): 15:40-18:10 (renders 3 x 5 min a size, two precritic runs of ~30 min).
 - Phase 1 (3 explorers in parallel): 10:36–11:05. VISUAL_QUALITY.md 11:08.
 - Phase 2: checks + guidance 11:09–12:15; library + fixes 11:10–13:00 (6.7 h agent wall incl. browser waits); precritic clean-up fixer 13:05–15:00; critic r1 15:18–15:37.

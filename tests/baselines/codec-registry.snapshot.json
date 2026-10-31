@@ -122,7 +122,8 @@
     "msOps": "4P",
     "wpFrames": "4Q",
     "msLetter": "4R",
-    "msCheck": "4S"
+    "msCheck": "4S",
+    "familyChart": "4K"
   },
   "blocks": {
     "0": {
@@ -782,7 +783,8 @@
     },
     "wpFrames": {},
     "msLetter": {},
-    "msCheck": {}
+    "msCheck": {},
+    "familyChart": {}
   },
   "scalarOnly": {
     "range": "decimal",
@@ -829,7 +831,8 @@
     "tenPlain": "bool",
     "wpFrames": "bool",
     "msLetter": "bool",
-    "msCheck": "bool"
+    "msCheck": "bool",
+    "familyChart": "bool"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",

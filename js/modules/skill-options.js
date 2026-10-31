@@ -1132,6 +1132,14 @@ const P11_OPS_OPTIONS = {
     'addition:add_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same sums as numbers only.' }],
     'subtraction:sub_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same take-away as numbers only.' }],
     'addition:add_wp_10': [{ ...picturesOption(true), help: 'Off prints the same story with no picture row.' }],
+    // the owner's extra help (2026-10-31): a blank number-family chart to fill in, working space only (a plain support toggle,
+    // not a preset skill: it adds no new task, the graded answer stays the one Yes / No circle)
+    'addition:fact_family_sort': [{
+        id: 'familyChart', label: 'Family chart to fill in', type: 'bool', default: false, group: 'support',
+        help: 'Prints four empty number sentences under each triangle (two + and two −) for the pupil to fill in while deciding. '
+            + 'Working space only: the answer is still the circled Yes or No. The answer key fills the chart for a true family.',
+        helpShort: 'Four empty number sentences under the triangle to work in; the answer is still Yes or No.',
+    }],
 
     // --- across zeros: its own bound on the number you start from (OPTIONS-CRITIC-R2 §5 #18) ----
     // The measured "Up to 100" dealt 408 − 89: a borrow can only travel through a zero from 100

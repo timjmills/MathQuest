@@ -1,0 +1,654 @@
+{
+  "id": "family-check",
+  "kind": "template",
+  "title": "Is it a fact family? (`family-check`) and the word-work sentence layout",
+  "template": {
+    "id": "family-check",
+    "source": "js/modules/sheet/cells/family-check.js",
+    "also": "The same card covers the word-work `sentence` layout (`js/modules/sheet/cells/word-work.js` with payload `layout: 'sentence'`, set by `js/modules/word-work.js` for the eight within-10 / within-20 story skills) and the graphic-library entries both draw from (`js/modules/sheet/graphics/`: factTriangle, sentenceFrame, answerArea, partWholeBar, familyChart). `screen-cell.js` draws the same cells on the practice card, online worksheet and quiz"
+  },
+  "families": [
+    "addition",
+    "subtraction"
+  ],
+  "findingsMatch": {
+    "templates": [
+      "family-check",
+      "word-work"
+    ]
+  },
+  "skills": {
+    "include": [
+      "addition:fact_family_sort",
+      "addition:add_wp_10",
+      "addition:add_wp_10_plain",
+      "addition:add_wp_20",
+      "addition:add_wp_20_plain",
+      "subtraction:sub_wp_10",
+      "subtraction:sub_wp_10_plain",
+      "subtraction:sub_wp_20",
+      "subtraction:sub_wp_20_plain"
+    ]
+  },
+  "excerptChars": 140,
+  "summary": "Two K-2 cells rebuilt in the visual-quality lane (design/audit/VISUAL_QUALITY.md 4.4). `family-check`: the three numbers in the library's fact triangle, the whole on top, and the printed words Yes / No the pupil circles (one decision, one slot); option `familyChart` adds a blank number-family chart as working space. The word-work `sentence` layout: a story within 10 or 20 answered in one number sentence `[ ] (sign) [ ] = [ ] unit`, the part-whole bar on teaching pages. Paper, key and the three screen hosts are one drawing.",
+  "teaches": "Is it a fact family? (1.OA.B.4, 1.OA.B.3; WRM Y1.B2.S13, Y2.B2.S3): do the two small numbers make the big number? Non-examples dealt 1:1 (P-10). Addition and subtraction stories within 10 and within 20 (1.OA.A.1, K.OA.A.2; WRM Y1 / Y2 add and subtract): write the number sentence and the answer with its unit.",
+  "research": "From repo sources (design/audit/VISUAL_QUALITY.md c-research section 1-2: the US fact-triangle convention, the K-2 story number sentence; PEDAGOGY_STANDARD FF-6, P-10; design/PROBLEM_TYPES.md AS rows). MW4K / IXL logins not used this round (budget); the owner's sample workbooks outrank them.",
+  "problemTypes": [
+    "family-check: three numbers in a triangle, the largest at the top; circle Yes if the two small numbers make the big one, No if not (non-examples: a near miss by 1 or 2, a number bigger than the whole)",
+    "family-check + familyChart: the same item with a blank four-sentence family chart to fill in while deciding (working space; the key fills it for a true family)",
+    "sentence layout: an add or take-away story within 10 / 20; write the two numbers, the sign in the circle and the answer with its unit (the bar drawn on teaching pages)",
+    "_plain story skills: the same stories with no picture row; the sentence and the answer place unchanged"
+  ],
+  "progression": [
+    "family-check with the chart on (the pupil writes the facts, then decides) -> the chart off (decide by adding the two small numbers)",
+    "stories within 10 with pictures -> within 10 plain -> within 20 with pictures -> within 20 plain (one change a step, P-1)",
+    "the part-whole bar on the model, guided and lesson pages; on practice pages only when the teacher turns it on"
+  ],
+  "drawing": {
+    "sizes": "fact triangle side 34 / 42 / 50 mm (S / M / L), 1.5 pt outline, numbers at the working digit size 16 / 22 / 28 pt; Yes / No at text size + 6 pt, 12 mm apart, the key ring 1.5 pt; family chart boxes 14 x 11 / 14.3 x 13 / 17 x 15 mm (answer-area boxes, 2 digits), 0.75 pt, rows 1.6 mm apart; sentence boxes the same answer-area boxes, the sign circle 9 / 11 / 13 mm (`js/modules/sheet/graphics/*`).",
+    "notes": [
+      "family-check payload: `nums` (as shown), `whole`, `parts`, `isFamily`, `labels` ['Yes','No'], `correct` 0 | 1, `chart` (familyChart on), `op` ('+'; '*' reserved for a multiplication family, none dealt today).",
+      "One graded slot: the Yes / No pair (`data-ws-slot=answer`, shape choice). The chart's twelve boxes are `data-ws-graded=\"0\"` on paper and `input.mq-wwork` with no `data-mq-expect` on screen: typeable, never graded, never marked green (a green box would give the decision away).",
+      "Placement with the chart: S under the triangle (cell 61 mm wide, two across: 4 a page); M and L beside the triangle, the triangle and Yes / No on the left (one wide cell a row: 3 a page). The triangle never shrinks; without the chart S / M / L hold 12 / 9 / 6.",
+      "Key: Yes or No ringed; for a true family the chart's four facts written (a + b = w, b + a = w, w - a = b, w - b = a); a false family leaves the chart blank.",
+      "Screen twin: the triangle the same SVG, Yes / No buttons >= 44 px (`data-mq-choice`, screen-cell.js wireTickBoxes), the chart wraps under the triangle on a phone card."
+    ]
+  },
+  "ruleGroups": [
+    {
+      "title": "Visual quality bar (WORKSHEET_DESIGN_STANDARD section 18, quoted in full)",
+      "core": true,
+      "full": true,
+      "rules": [
+        "VQ-1",
+        "VQ-2",
+        "VQ-3",
+        "VQ-6",
+        "VQ-8"
+      ]
+    },
+    {
+      "title": "Key and the one answer place (quoted)",
+      "core": true,
+      "chars": 400,
+      "rules": [
+        "AK-1",
+        "AK-2",
+        "H13"
+      ]
+    },
+    {
+      "title": "Visual quality, the rest",
+      "chars": 120,
+      "rules": [
+        "VQ-4",
+        "VQ-5",
+        "VQ-7",
+        "VQ-9",
+        "VQ-10"
+      ]
+    },
+    {
+      "title": "Cell, slots, density and screen",
+      "chars": 120,
+      "rules": [
+        "CL-40",
+        "SL-11",
+        "SP-1",
+        "SCC-01",
+        "P-1",
+        "P-10"
+      ]
+    },
+    {
+      "title": "Cited by critics on these families (rubric, page, story and slot rules)",
+      "chars": 100,
+      "rules": [
+        "C1",
+        "C2",
+        "H1@RUBRIC",
+        "H2@RUBRIC",
+        "H3@RUBRIC",
+        "H4@RUBRIC",
+        "H5@RUBRIC",
+        "H6",
+        "H7",
+        "H8",
+        "H9",
+        "H10",
+        "H11",
+        "L1",
+        "L3",
+        "L6",
+        "AX-3",
+        "AX-4",
+        "BD-4",
+        "BD-7",
+        "BD-11",
+        "DN-1a",
+        "PT-FRM-6",
+        "PT-GDP-1",
+        "PT-GDP-2",
+        "PT-SCR-1",
+        "RP-1",
+        "RP-20",
+        "RP-70",
+        "RP-72",
+        "SF-50",
+        "SL-2",
+        "SL-3",
+        "SL-4",
+        "SP-2",
+        "VA-10@WDS"
+      ]
+    }
+  ],
+  "ownerRulings": [
+    {
+      "date": "2026-10-31",
+      "ruling": "\"on these for extra help option have it show blank number family chart so students can fill it in to answer.\" -> option `familyChart: off | on` on the family-check cell, default off; working space only, the graded answer stays the one Yes / No circle; a plain support toggle, not a preset skill.",
+      "source": "owner via lead, design/status/visual-quality.md"
+    },
+    {
+      "date": "2026-10-31",
+      "ruling": "INTERIM (lead, for the owner to confirm): familyChart default OFF.",
+      "source": "lead ruling, visual-quality lane"
+    },
+    {
+      "date": "2026-10-31",
+      "ruling": "INTERIM (lead, for the owner to confirm): the part-whole bar is DRAWN on teaching pages (model, guided, lesson) and is an OPTION, default off, on practice pages (independent, more practice, review, test), the _plain story skills included.",
+      "source": "lead ruling, visual-quality lane (critic r1 bar ruling)"
+    },
+    {
+      "date": "2026-10-31",
+      "ruling": "One answer place per answer (VQ-2); the Say frame belongs to the model, never inside the graded cell.",
+      "source": "WORKSHEET_DESIGN_STANDARD.md section 18"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "M-F1",
+      "error": "accepts a number bigger than the whole as a part",
+      "wrong": "5, 9, 12: Yes"
+    },
+    {
+      "id": "M-F2",
+      "error": "near miss: the parts make one more or less than the whole",
+      "wrong": "3, 4, 8: Yes"
+    },
+    {
+      "id": "M-F3",
+      "error": "misses a true family when the whole is not on top in the list",
+      "wrong": "13, 4, 17: No"
+    },
+    {
+      "id": "M-S1",
+      "error": "story: writes the sign of a keyword, not of the action",
+      "wrong": "\"how many left\" with +"
+    }
+  ],
+  "options": [
+    "familyChart (fact_family_sort): bool, default off, group support. On draws the blank family chart; share key 4K (skill-option-keys.js).",
+    "Part-whole bar on practice pages (word-work stories): an option default off, per the lead's interim ruling (design/status/visual-quality.md)."
+  ],
+  "gates": [
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --skill addition:fact_family_sort --strict",
+      "note": "and each story skill"
+    },
+    {
+      "cmd": "node tests/scripts/ws-visual-quality.mjs --skill addition:fact_family_sort",
+      "note": "VQ-REP / VQ-ONEANSWER / VQ-LIVE / VQ-TITLE / VQ-NOLEGACY"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/family-check/family-check.md",
+      "note": "build-start gate"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-coverage design/cards/family-check/family-check.md"
+    },
+    {
+      "cmd": "node tests/scripts/ws-options-verify.cjs --skill addition:fact_family_sort",
+      "note": "familyChart changes print AND screen, round-trips a share code"
+    },
+    {
+      "cmd": "node tests/scripts/ws-grade-render.cjs --skills addition:fact_family_sort --roles independent,test --opts '{\"familyChart\":true}' --gate"
+    },
+    {
+      "cmd": "node tests/scripts/ws-content-audit.cjs --category addition (and --category subtraction)"
+    }
+  ],
+  "openQuestions": [
+    {
+      "q": "familyChart default: off (lead's interim) or on for fact_family_sort?",
+      "recommended": "Off: the decision is the skill; the chart is extra help the teacher turns on."
+    },
+    {
+      "q": "With the chart on at M / L the chart sits beside the triangle (3 a page) rather than under it (2 a page with a 24-36 % empty band). Keep beside?",
+      "recommended": "Yes: beside reads look -> work -> decide left to right, and keeps H13 under 30 %."
+    },
+    {
+      "q": "Should the chart also appear on the model / lesson pages of fact_family_sort when the option is off?",
+      "recommended": "No: options live on the skill; a teaching page shows it only when the option is on (the Say band carries the oral frame)."
+    },
+    {
+      "q": "Part-whole bar on practice pages (interim: option, default off; drawn on teaching pages). Confirm?",
+      "recommended": "Confirm: the bar is the model's picture; on practice it is a support the teacher adds and fades."
+    }
+  ],
+  "sourceChars": 90,
+  "decisions": {
+    "options": [
+      {
+        "option": "familyChart",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "owner 2026-10-31 (via lead); lead interim: default off",
+        "why": "blank number-family chart, working space only; the graded answer stays the Yes / No circle"
+      },
+      {
+        "option": "range",
+        "values": [
+          "null",
+          "10",
+          "100"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options-derived.js (measured Max Number)",
+        "why": "Max Number 10 deals wholes to 10, 100 (and the default) to 20 (gen-operations.js band = max(10, min(range, 20)))"
+      },
+      {
+        "option": "pictures",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options.js picturesOption",
+        "why": "off gives the same stories with no picture row (the _plain skills are the preset of off)"
+      },
+      {
+        "option": "band",
+        "values": [
+          "5",
+          "7",
+          "10",
+          "20"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "skill-options.js _opsBand (answer-bounded)",
+        "why": "bounds the total / the start number (within N bounds the answer)"
+      },
+      {
+        "option": "wpBar",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "lead interim ruling 2026-10-31",
+        "why": "the part-whole bar: drawn on teaching pages, an option default off on practice pages, _plain skills included"
+      },
+      {
+        "option": "support",
+        "values": [
+          "none",
+          "bar"
+        ],
+        "d": "offered",
+        "proposed": true,
+        "source": "lead interim ruling 2026-10-31",
+        "why": "the same bar under the id `support` on add_wp_20, sub_wp_10, sub_wp_20 (default none)"
+      },
+      {
+        "option": "wpCues",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "hidden",
+        "proposed": true,
+        "source": "critic r1 F6; PEDAGOGY P-21",
+        "why": "bold key words teach the keyword strategy on K-2 stories; the operation is chosen from the story's structure (P-21). Owner to rule; if kept it is offered and graded"
+      },
+      {
+        "option": "wpBank",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "hidden",
+        "proposed": true,
+        "source": "critic r1 F6; PEDAGOGY P-21",
+        "why": "a keyword bank is the keyword strategy (P-21). Owner to rule; if kept it is offered and graded"
+      },
+      {
+        "option": "nlOn",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js numberLineOptions",
+        "why": "lead to rule; proposed out of scope here: the page number line is a page-level aid graded on its own (ws-options-verify nline group), not on this card's critic"
+      },
+      {
+        "option": "nlFrom",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlTo",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlStep",
+        "values": [
+          "1",
+          "2",
+          "5",
+          "10",
+          "20",
+          "25",
+          "50",
+          "100",
+          "1000",
+          "auto",
+          "1/2",
+          "1/3",
+          "1/4",
+          "1/5",
+          "1/6",
+          "1/8",
+          "1/10",
+          "1/12",
+          "0.1",
+          "0.01"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlLabels",
+        "values": [
+          "auto",
+          "all",
+          "2",
+          "5",
+          "10",
+          "ends",
+          "none"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlMinor",
+        "values": [
+          "auto",
+          "0",
+          "2",
+          "4",
+          "5",
+          "10"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "nlHops",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "numberLineOptions",
+        "why": "a sub-control of nlOn"
+      },
+      {
+        "option": "calculator",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js play controls",
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card"
+      },
+      {
+        "option": "skipAfter",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "proposed": true,
+        "source": "skill-options.js play controls",
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR"
+      }
+    ],
+    "roles": [
+      {
+        "key": "role:independent",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "the pass bar (RUBRIC scope)"
+      },
+      {
+        "key": "role:more-practice",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "the pass bar"
+      },
+      {
+        "key": "role:test",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "the pass bar"
+      },
+      {
+        "key": "role:lesson",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "the pass bar (lesson packet; the bar is drawn here)"
+      },
+      {
+        "key": "role:scripted-model",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "teaching page: the bar drawn (interim ruling); provider workedSteps real"
+      },
+      {
+        "key": "role:guided",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "teaching page: the bar drawn; advisory in the bar"
+      },
+      {
+        "key": "role:opener",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:error-analysis",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "advisory (RUBRIC scope); provider wrongAnswer real"
+      },
+      {
+        "key": "role:review",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:pre-skill-check",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:mixed-practice",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:true-false",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "provider wrongAnswer real"
+      },
+      {
+        "key": "role:reason-it",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "provider workedSteps and wrongAnswer real"
+      },
+      {
+        "key": "role:stretch",
+        "d": "offered",
+        "proposed": true,
+        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:word-problems",
+        "d": "offered",
+        "proposed": true,
+        "skills": [
+          "addition:add_wp_10",
+          "addition:add_wp_10_plain",
+          "addition:add_wp_20",
+          "addition:add_wp_20_plain",
+          "subtraction:sub_wp_10",
+          "subtraction:sub_wp_10_plain",
+          "subtraction:sub_wp_20",
+          "subtraction:sub_wp_20_plain"
+        ],
+        "source": "provider stories real 8/9",
+        "why": "the story skills' own page"
+      },
+      {
+        "key": "role:word-problems",
+        "d": "out of scope",
+        "proposed": true,
+        "skills": [
+          "addition:fact_family_sort"
+        ],
+        "source": "provider stories: default on fact_family_sort",
+        "why": "no stories for a yes / no family check; the role falls back"
+      },
+      {
+        "key": "role:fact-rows",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "CLAUDE.md: fact and operations skills additionally get the fact layouts",
+        "why": "not fact skills: the role reports unsupported"
+      },
+      {
+        "key": "role:fact-probe",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "CLAUDE.md: fact and operations skills additionally get the fact layouts",
+        "why": "not fact skills: the role reports unsupported"
+      }
+    ],
+    "hosts": [
+      {
+        "key": "host:practice-card",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:online-worksheet",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:quiz",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:boss",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic"
+      },
+      {
+        "key": "host:race",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic"
+      },
+      {
+        "key": "host:map",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-screen-slots",
+        "why": "game / display hosts draw the same card; graded by ws-screen-slots, not by this card's critic"
+      },
+      {
+        "key": "host:mode-dark",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit, ws-screen-slots",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic"
+      },
+      {
+        "key": "host:mode-bigboard",
+        "d": "out of scope",
+        "proposed": true,
+        "source": "ws-chromebook-fit, ws-screen-slots",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic"
+      }
+    ]
+  }
+}
