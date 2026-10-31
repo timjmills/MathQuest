@@ -1462,7 +1462,11 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         // S2: touch dots need 24 pt digits, so a forced section draws its problems at L inside a
         // smaller page (the preset's custom properties re-set on a wrapper; the page stays M / S).
         const html0 = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(qd, ctx);
-        const html = up && sizeFloor(c.size, floor) !== c.size ? `<div class="ws-${floor}" data-ws-force-size="${floor}">${html0}</div>` : html0;
+        // Critic r3 R3-1: a supported problem that stands full-width (its supports beside it, the fact
+        // left-anchored at one x, SCC-T10) keeps that width through the forced-size wrapper; a
+        // shrink-wrapped wrapper re-centred each row by its own content, so the fact moved row to row.
+        const wideSup = /class="ws-supported"[^>]*style="align-self:stretch;width:100%"/.test(html0);
+        const html = up && sizeFloor(c.size, floor) !== c.size ? `<div class="ws-${floor}" data-ws-force-size="${floor}"${wideSup ? ' style="align-self:stretch;width:100%;display:flex;flex-direction:column;align-items:center"' : ''}>${html0}</div>` : html0;
         if (legacy && hasShown) {
             const v = String(shown);
             // A wrong value is written as a pupil would have written it: a place-value mat draws

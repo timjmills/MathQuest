@@ -697,9 +697,25 @@ function buildPlan(ctx) {
         // (--supports all), no pin: a finding here is red.
         const FACT_KEYS = new Set(['addition:add_facts', 'subtraction:sub_facts', 'multiplication:mult_facts', 'division:div_facts']);
         const factKeys = keys.filter((k) => FACT_KEYS.has(k));
+        // Critic laned-restart r3 R3-1 (2026-10-31): the row ran Independent only, with every support on; div_facts' Test
+        // centred each row's sign box + fact + support and moved the answer zone (SCC-T10). Now every role that carries
+        // supports, and every support COMBINATION the fact skills offer: each single support and all of them.
+        const SUP_ROLES = 'independent,more-practice,test,review';
+        const FACT_SUPPORTS = {
+            'addition:add_facts': ['touch', 'touchall', 'tile', 'frame', 'line', 'boxsign'],
+            'subtraction:sub_facts': ['touch', 'touchall', 'tile', 'frame', 'line', 'boxsign'],
+            'multiplication:mult_facts': ['touch', 'skip', 'array', 'boxsign'],
+            'division:div_facts': ['touch', 'skip', 'array', 'think', 'boxsign'],
+        };
         if (factKeys.length) {
-            add(gate('print-lint-supports-S', 'ws-print-lint --source kit --supports all --size S (fact skills with every support on: PG-12, PG-21, CL-40)', `${factKeys.join(', ')} × supports`, 'browser', 'ws-print-lint',
-                ['--source', 'kit', '--supports', 'all', '--size', 'S', '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
+            add(gate('print-lint-supports-S', `ws-print-lint --source kit --supports all --size S --roles ${SUP_ROLES} (fact skills with every support on: PG-12, PG-21, CL-40, SCC-T10)`, `${factKeys.join(', ')} × supports × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--supports', 'all', '--size', 'S', '--roles', SUP_ROLES, '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
+            const singles = [...new Set(factKeys.flatMap((k) => FACT_SUPPORTS[k] || []))];
+            for (const sup of singles) {
+                const ks = factKeys.filter((k) => (FACT_SUPPORTS[k] || []).includes(sup));
+                add(gate(`print-lint-supports-${sup}-S`, `ws-print-lint --source kit --supports ${sup} --size S --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
+            }
         }
         // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
         // the across block, and the ÷ probes at L re-laid cells 19-20 at 1.5 columns; L-DENSITY GRID-EVEN now reads every
