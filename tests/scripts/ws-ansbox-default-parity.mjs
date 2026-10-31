@@ -128,10 +128,13 @@ async function emit(skills) {
 }
 
 function renderAt(root, skills) {
-    const r = spawnSync(process.execPath, [SELF, '--emit', '--skills', skills.join(','), ...(PIXELS ? [] : ['--no-render'])], { env: { ...process.env, MQ_ROOT: root }, encoding: 'utf8', maxBuffer: 64 << 20 });
-    const line = (r.stdout || '').split('\n').find((l) => l.startsWith('{'));
-    if (r.status !== 0 || !line) { console.error(r.stderr || r.stdout); throw new Error(`render failed at ${root}`); }
-    return JSON.parse(line);
+    const file = join(tmpdir(), `mq-parity-${process.pid}-${Math.random().toString(36).slice(2)}.json`);
+    const r = spawnSync(process.execPath, [SELF, '--emit', '--emit-out', file, '--skills', skills.join(','), ...(PIXELS ? [] : ['--no-render'])], { env: { ...process.env, MQ_ROOT: root }, encoding: 'utf8', maxBuffer: 64 << 20 });
+    let out = null;
+    try { out = JSON.parse(readFileSync(file, 'utf8')); } catch (e) { out = null; }
+    try { rmSync(file, { force: true }); } catch (e) { /* tmp */ }
+    if (r.status !== 0 || !out) { console.error(r.stderr || r.stdout); throw new Error(`render failed at ${root}`); }
+    return out;
 }
 
 let skills = arg('--skills', '').split(',').map((s) => s.trim()).filter(Boolean);
@@ -139,7 +142,9 @@ if (skills.length === 1 && skills[0] === 'ansbox') skills = ansboxIds(ROOT);   /
 
 if (args.includes('--emit')) {
     if (!skills.length) skills = passedIds(ROOT);
-    console.log(JSON.stringify(await emit(skills)));
+    // written to a file: a large JSON on a piped stdout is cut short when the process exits
+    const res = JSON.stringify(await emit(skills));
+    if (arg('--emit-out', null)) writeFileSync(arg('--emit-out'), res); else console.log(res);
     process.exit(0);
 }
 
