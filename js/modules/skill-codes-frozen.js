@@ -369,6 +369,10 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-10-30 detailed lesson 6 presets (placevalue:value form "times", 4.NBT.A.1). Y7-Y9, the next free codes
     // after Y6. APPEND ONLY. ----
     "placevalue:ten_times_value": "Y7", "placevalue:one_tenth_value": "Y8", "placevalue:ten_times_story": "Y9",
+    // ---- 2026-10-31 ops-family r2 presets (one sign / one box position of an ops host). ZF-ZM (no I or O in a code), the next free codes
+    // after ZE. APPEND ONLY. ----
+    "addition:ten_more": "ZF", "addition:ten_less": "ZG", "addition:hundred_more": "ZH", "addition:hundred_less": "ZJ",
+    "division:missing_mult_only": "ZK", "division:missing_div_only": "ZL", "subtraction:missing_add_sub_answer": "ZM",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

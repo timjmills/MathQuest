@@ -2531,7 +2531,18 @@
      }
     }
    ],
-   "partial": [],
+   "partial": [
+    {
+     "key": "addition:ten_more",
+     "missing": "10 less (it deals only 10 more: 34 + 10)",
+     "opts": {}
+    },
+    {
+     "key": "addition:ten_less",
+     "missing": "10 more (it deals only 10 less: 34 − 10)",
+     "opts": {}
+    }
+   ],
    "verdict": "full",
    "missing": "",
    "build": [],
@@ -2630,6 +2641,16 @@
     "tens_any"
    ],
    "pre": [
+    {
+     "key": "addition:ten_less",
+     "why": "Y2.B2.S13 10 more, 10 less (the step before): one ten taken from a 2-digit number",
+     "opts": {}
+    },
+    {
+     "key": "addition:ten_more",
+     "why": "Y2.B2.S13 10 more, 10 less (the step before): one ten added to a 2-digit number",
+     "opts": {}
+    },
     {
      "key": "placevalue:more_less_10",
      "why": "Y2.B2.S13 10 more, 10 less",
@@ -3198,7 +3219,13 @@
      "opts": {}
     }
    ],
-   "partial": [],
+   "partial": [
+    {
+     "key": "subtraction:missing_add_sub_answer",
+     "missing": "a missing number before the = sign (it deals only the answer: 8 + 5 = __)",
+     "opts": {}
+    }
+   ],
    "verdict": "full",
    "missing": "",
    "build": [],

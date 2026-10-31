@@ -4830,12 +4830,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // ops-family G1: a page whose ticked ways are ALL ÷ forms (Bracket, Fraction bar - no Across)
                 // is a page of ÷ sentences: a × sentence cannot be written on a bracket or a bar, and a
                 // one-line × beside a two-line fraction left one band in every mixed row (H13).
-                const _mmDiv = _mmDeal && (!_mmTicked.includes('across') || dealIndex(`mm-op:${state.skill}`, 2) === 0);
+                // ops-family r2 (2026-10-31): `task` ticked to one sign (0 = ×, 1 = ÷; the presets missing_mult_only /
+                // missing_div_only) deals that sign's sentences only. Unticked or both: null, the deal below is unchanged.
+                const _mmT = _p12Narrowed('task');
+                const _mmOnly = _mmT && _mmT.length === 1 ? (_mmT[0] === 1 ? 'div' : 'mult') : null;
+                const _mmDiv = _mmOnly ? _mmOnly === 'div' : _mmDeal && (!_mmTicked.includes('across') || dealIndex(`mm-op:${state.skill}`, 2) === 0);
                 // ops-family G1 (2026-10-30): the skill is "Missing Factors", so every item hides a number
                 // BEFORE the = sign (___ × 6 = 42, 42 ÷ ___ = 7). The plain product / quotient after = is
                 // the fact drills' job (mult_facts, div_facts) and is no longer dealt here.
                 void positions;
-                const _mmPos = !_mmDeal ? ['first_factor', 'second_factor', 'dividend', 'divisor']
+                const _mmPos = !_mmDeal && !_mmOnly ? ['first_factor', 'second_factor', 'dividend', 'divisor']
                     : (_mmDiv ? ['dividend', 'divisor'] : ['first_factor', 'second_factor']);
                 const _mmNotation = _mmDeal ? dealPick(`mm-notation:${state.skill}`, _mmTicked) : null;
                 // Scale factor range: for range<=100 use 2-12 (times tables), for larger ranges scale up

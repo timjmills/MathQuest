@@ -3088,6 +3088,13 @@ const _AP2_POINTS = { all: 'Points named with their coordinates: A(3, 2)', some:
 ].forEach(([key, ...defs]) => _o2Add(key, ...defs));
 // ============================ end O6 · appearance: figures and data (AP2) ===================
 
+// ops-family r2 (owner, 2026-10-31): the × or ÷ sentences of missing_mult_div alone, for its two preset skills
+// (missing_mult_only, missing_div_only). Read by gen-operations.js (_p12Narrowed('task'): one sign ticked deals only its
+// sentences; a page deal cannot be redrawn by the accept layer). Appended after `notation`, so the default page (both
+// ticked) and every old share code are unchanged.
+_o2Add('division:missing_mult_div', _p12Kinds('task', 'Operation', [['Multiplying (__ × 6 = 42)', '×'], ['Dividing (42 ÷ __ = 7)', '÷']],
+    'One operation for a page of it alone; both mixed makes the pupil read the sign.'));
+
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
 

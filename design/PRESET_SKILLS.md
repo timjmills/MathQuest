@@ -314,6 +314,25 @@ digit and zeros, `tenWrite` one worth box, `tenChoice` four words to choose from
 | placevalue:one_tenth_value | One Tenth of a Digit's Value (One Place Right) | value `form: 'times', band: 9999, tenDir: 'tenth'` | Y8 | 4 | 4.NBT.A.1 | M.EE.5.NBT.1 | Y4.B5.S5 (partial) |
 | placevalue:ten_times_story | How Many Times as Many? (700 ÷ 70 = 10) | value `form: 'times', band: 9999, tenTask: 'story'` | Y9 | 4 | 4.NBT.A.1 | M.EE.5.NBT.1 | Y5.B1.S6 (partial) |
 
+### Presets of the ops hosts: one sign or one box position (2026-10-31, owner order, ops-family fix round 2)
+
+The owner ordered seven presets: 10 / 100 more and less as their own lessons (WRM Y2.B2.S13, Y3.B1.S9), the × and
+the ÷ missing-number sentences apart, and `missing_add_sub` with the box in the answer. The last one overrides the
+"`unknown` position on a basic fact" line below for this one skill (its default is a box before the = sign; the
+answer after = is a different page). `missing_mult_div` had no sign control: `task` (0 = ×, 1 = ÷) was appended
+after `notation` (skill-options.js; read in gen-operations.js by `_p12Narrowed('task')`), so its default page and old
+share codes are unchanged.
+
+| Preset | Label | Host + values | Code | Grade | CCSS | EE | WRM |
+|---|---|---|---|---|---|---|---|
+| addition:ten_more | 10 More Than a Number (34 + 10) | add_sub_10s `task: [0]` | ZF | 1 | 1.NBT.C.5 | M.EE.1.OA.5.a | Y2.B2.S13 (partial) |
+| addition:ten_less | 10 Less Than a Number (34 − 10) | add_sub_10s `task: [1]` | ZG | 1 | 1.NBT.C.5 | M.EE.1.OA.5.b | Y2.B2.S13 (partial) |
+| addition:hundred_more | 100 More Than a Number (234 + 100) | add_sub_100s `task: [0]` | ZH | 2 | 2.NBT.B.8 | M.EE.2.NBT.7 | Y3.B1.S9, Y3.B2.S4 (partial) |
+| addition:hundred_less | 100 Less Than a Number (234 − 100) | add_sub_100s `task: [1]` | ZJ | 2 | 2.NBT.B.8 | M.EE.2.NBT.7 | Y3.B1.S9, Y3.B2.S4 (partial) |
+| division:missing_mult_only | Missing Factor in a Multiplication Sentence (__ × 6 = 42) | missing_mult_div `task: [0]` | ZK | 3 | 3.OA.A.4 | — | Y3.B4.S6 (partial) |
+| division:missing_div_only | Missing Number in a Division Sentence (42 ÷ __ = 7) | missing_mult_div `task: [1]` | ZL | 3 | 3.OA.A.4 | — | Y3.B4.S6 (partial) |
+| subtraction:missing_add_sub_answer | Missing Number: Find the Total or Difference (8 + 5 = __) | missing_add_sub `unknown: [0]` | ZM | 1 | 1.OA.D.8 | M.EE.3.OA.6 | Y2.B2.S21 (partial) |
+
 ### Plain options (no preset)
 
 Everything that changes size *within* a class (`band`, `range`, `decimals`, `constant`, `tables`),
