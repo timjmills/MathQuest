@@ -108,6 +108,9 @@ const slotShape = (p) => {
 
 register('equation', {
     render(p, ctx) {
+        // F8 (ops-family critic r1, OC1): support level 3 on a pupil page writes the answer in trace
+        // grey (`trace`, dealt by the generator's support fade); the key and a wrong answer keep theirs.
+        if (p.trace && (!ctx.state || ctx.state === 'blank')) ctx = Object.assign({}, ctx, { state: 'traced' });
         const u = p.unknown || 'result';
         const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
         const digits = p.digits || String(unknownValue(Object.assign({}, p, { result }))).replace('-', '').length || 2;
@@ -136,6 +139,16 @@ register('equation', {
             const A = u === 'a' ? slotHtml : `<span>${esc(p.a)}</span>`;
             const B = u === 'b' ? slotHtml : `<span>${esc(p.b)}</span>`;
             const R = u === 'result' ? slotHtml : `<span>${esc(result)}</span>`;
+            // F5 (ops-family critic r1, VA-61 / VA-65): a missing-number sentence (`fact`) in the bracket is
+            // written as long division is: the quotient ABOVE the bar, over the dividend, the divisor outside
+            // - never "= 7" after the bracket. One drawing for the pupil page, the key and the screen.
+            if (p.fact && p.notation === 'bracket') {
+                const bar = 'border-top:0.75pt solid #000;border-left:0.75pt solid #000;border-top-left-radius:0.4em;padding:0.05em 0.3em 0 0.3em';
+                return `<div class="ws-eq" ${WRITE_ABOVE} data-ws-notation="bracket" data-ws-bracket-above="1" style="align-items:flex-end">`
+                    + `<span class="ws-divbr" style="display:inline-grid;grid-template-columns:auto auto;align-items:end;justify-items:center;row-gap:0.08em">`
+                    + `<span></span><span style="padding:0 0.3em">${R}</span>`
+                    + `<span style="padding-right:0.1em">${B}</span><span style="${bar}">${A}</span></span></div>`;
+            }
             const body = p.notation === 'fraction'
                 // D3 (critic R1): the fraction bar is a Heavy stroke (1.5 pt, stroke table), and "=" and the
                 // answer line sit on the bar's axis (align-items:center below), on paper as on screen.
@@ -160,7 +173,11 @@ register('equation', {
             const o = (g) => `<span class="o" style="width:${ACROSS_OP_EM}em">${g}</span>`;
             const sentence = `<span>${num('a')}</span>${o(opGlyph(p.op))}<span>${num('b')}</span>${o('=')}`;
             if (acrossBelow(p, ctx)) {
-                return `<div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
+                // (ops-family r2 F1: a + / − across sentence as wide as its column - "823 − 100 =" at 3
+                // columns - starts 1.5 mm lower on paper, as the missing-number sentence does below, so
+                // its first digit never inks the label keep-out in a row sized to its content, CL-40)
+                const padB = ctx.mode !== 'screen' && (p.op === '+' || p.op === '-' || p.op === '−') ? ';padding-top:1.5mm' : '';
+                return `<div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em${padB}">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_GAP_EM}em;white-space:nowrap">${sentence}</span>${slotHtml}</div>`;
             }
             return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
@@ -206,7 +223,7 @@ register('equation', {
         return {
             // `fact` (div_facts' Fraction form): a one-line fact cell, packed like the other
             // fact forms of its page instead of measured as a visual.
-            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' ? 2 : 1), measure: p.notation === 'fraction' && !p.fact,
+            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4) * (p.notation === 'fraction' || (p.fact && p.notation === 'bracket') ? 2 : 1), measure: p.notation === 'fraction' && !p.fact,
             factLike: !!p.fact, maxCols: 4, stretchCap: STRETCH_CAP.equation,
             // ops-family G1's one-line sentences (+ − × facts, a missing number, never div_facts' own
             // ÷ fact) start at the top of their cell: the section fills the grid (layout.js topFill)

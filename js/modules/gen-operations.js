@@ -4679,7 +4679,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     ...(_unk.includes(1) ? (isAdd ? ['first_add', 'second_add'] : ['minuend', 'subtrahend']) : []),
                     ...(_unk.includes(0) ? [isAdd ? 'sum' : 'difference'] : []),
                 ];
-                const missingMax = Math.max(10, range);
+                // F7 (ops-family critic r1, OC1 / OC4): a Max Number the teacher picks FOR THIS SKILL is a promise -
+                // "Up to 100" deals past 20 - so the grade cap only bounds the app-wide setting (the default page).
+                const missingMax = Math.max(10, Number(_opt('range')) > 0 ? Number(_opt('range')) : range);
                 // The page deals from the whole valid set (sign, position, whole, part) without
                 // repeats in a block (page-deal.js), so no number or answer crowds a page and the
                 // positions come evenly; a very large band deals the whole first (weighted by how
@@ -4731,11 +4733,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.missing = unknown === 'result' ? null : unknown;
                 q.answerType = 'number';
                 q.hint = isAdd
-                    ? (unknown === 'result' ? 'Start with the bigger number. Count on the other.'
+                    ? (unknown === 'result' ? `Start at ${Math.max(a, b)}. Count on ${Math.min(a, b)}.`
                         : `Start at the number you know. Count on to ${c}. How many did you count?`)
                     : (unknown === 'a' ? `The missing number is the whole. Put the parts together: ${b} and ${c}.`
                         : unknown === 'b' ? `Start at ${c}. Count on to ${a}. How many did you count?`
-                            : 'Start at the bigger number. Count back.');
+                            : `Start at ${a}. Count back ${b}.`);
                 q.missingNumberData = { position, a, b, c };
                 q.opsDealt = [..._ops.includes(0) ? ['+'] : [], ..._ops.includes(1) ? ['-'] : []];
                 q.printFormat = "missing-number";
@@ -4743,7 +4745,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // as wide as the widest answer the band allows on this page, never this answer (L3).
                 // (`fact: true`: a one-line sentence, packed by its measured height like the across facts,
                 // print-sheet.js; it draws exactly as before - the fact look is for an answer after =)
-                const _maPayload = { a, b, operands: [a, b], op: isAdd ? '+' : '-', result: c, unknown, digits: String(_widest).length, fact: true };
+                const _maPayload = { a, b, operands: [a, b], op: isAdd ? '+' : '-', result: c, unknown, digits: String(_widest).length, fact: true, ...(_optDef('level') && supportLevelFor(1) >= 3 ? { trace: true } : {}) };
                 q.cell = { template: 'equation', v: 1, payload: _maPayload };
                 q.visual = _eqTwin(_maPayload);
                 q.screenInstr = 'Write the missing number.';
@@ -4830,7 +4832,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // ops-family G1: a page whose ticked ways are ALL ÷ forms (Bracket, Fraction bar - no Across)
                 // is a page of ÷ sentences: a × sentence cannot be written on a bracket or a bar, and a
                 // one-line × beside a two-line fraction left one band in every mixed row (H13).
-                const _mmDiv = _mmDeal && (!_mmTicked.includes('across') || dealIndex(`mm-op:${state.skill}`, 2) === 0);
+                // F5 (ops-family critic r1): a page with the Bracket ticked is a page of ÷ sentences too - a
+                // × sentence is never set beside a long-division bracket in one section (VA-65).
+                const _mmDiv = _mmDeal && (!_mmTicked.includes('across') || _mmTicked.includes('bracket') || dealIndex(`mm-op:${state.skill}`, 2) === 0);
                 // ops-family G1 (2026-10-30): the skill is "Missing Factors", so every item hides a number
                 // BEFORE the = sign (___ × 6 = 42, 42 ÷ ___ = 7). The plain product / quotient after = is
                 // the fact drills' job (mult_facts, div_facts) and is no longer dealt here.
@@ -4842,10 +4846,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const mmFactorMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 25);
                 // One draw from the whole valid set (position x factor pair, factors 2..max), dealt
                 // down the page without repeats in a block (page-deal.js, ws-dealer-uniform).
-                const _mmK = mmFactorMax - 1;
-                const _mmDl = _pageDeal(`mm-item:${mmFactorMax}:${_mmPos.join(',')}`, _mmPos.length * _mmK * _mmK, (j) => {
-                    const pos = _mmPos[Math.floor(j / (_mmK * _mmK))];
-                    const f1 = 2 + Math.floor((j % (_mmK * _mmK)) / _mmK), f2 = 2 + (j % _mmK);
+                // F6 (ops-family critic r1, OC4): the Max Number bounds every number the sentence prints
+                // (the product / dividend is the largest), so only factor pairs with f1 × f2 <= range are dealt.
+                const _mmPairs = [];
+                for (let x = 2; x <= mmFactorMax; x++) for (let y = 2; y <= mmFactorMax; y++) if (x * y <= range) _mmPairs.push([x, y]);
+                if (!_mmPairs.length) _mmPairs.push([2, 2]);
+                const _mmK = _mmPairs.length;
+                const _mmDl = _pageDeal(`mm-item:${mmFactorMax}:${range}:${_mmPos.join(',')}`, _mmPos.length * _mmK, (j) => {
+                    const pos = _mmPos[Math.floor(j / _mmK)];
+                    const [f1, f2] = _mmPairs[j % _mmK];
                     // (a, b, ans as the item will carry them: a × b = c, a ÷ b = c)
                     const r = pos === 'first_factor' ? { a: f2, b: f1, ans: f2 } : pos === 'second_factor' ? { a: f1, b: f2, ans: f2 }
                         : pos === 'dividend' ? { a: f1 * f2, b: f1, ans: f1 * f2 } : { a: f1 * f2, b: f2, ans: f2 };
@@ -4927,9 +4936,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.a = a; q.b = b; q.op = '÷';
                     q.missing = position === 'dividend' ? 'a' : (position === 'divisor' ? 'b' : null);
                 }
-                q.hint = position.includes('factor') || position === 'product'
-                    ? `Think: What number completes this multiplication?`
-                    : `Think: What number completes this division?`;
+                // F16 (ops-family critic r1, L6): the hint names this item's own numbers.
+                q.hint = position === 'first_factor' ? `Think: what times ${b} makes ${c}?`
+                    : position === 'second_factor' ? `Think: ${a} times what makes ${c}?`
+                        : position === 'dividend' ? `Think: ${b} × ${c} = what?`
+                            : position === 'divisor' ? `Think: ${c} times what makes ${a}?`
+                                : position === 'product' ? `Think: ${a} groups of ${b}.` : `Think: ${b} times what makes ${a}?`;
                 q.missingNumberData = { position, a, b, c, displayText };
                 q.printFormat = "missing-factor";
                 // The kit's `equation` cell for EVERY notation (ops-family G1): Across is the one-line
@@ -4938,8 +4950,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // mmFactorMax²), never this answer's own length (L3). Paper, key and screen: one drawing.
                 const _mmIsDiv = q.op === '÷';
                 const _mmPayload = {
-                    a, b, operands: [a, b], op: _mmIsDiv ? '/' : '*', result: c, digits: String(mmFactorMax * mmFactorMax).length, fact: true,
+                    a, b, operands: [a, b], op: _mmIsDiv ? '/' : '*', result: c, digits: String(Math.max(..._mmPairs.map(([x, y]) => x * y))).length, fact: true,
                     ...(_mmIsDiv && (q.notation === 'bracket' || q.notation === 'fraction') ? { notation: q.notation } : {}),
+                    ...(_optDef('level') && supportLevelFor(1) >= 3 ? { trace: true } : {}),
                     unknown: position === 'dividend' || position === 'first_factor' ? 'a' : position === 'divisor' || position === 'second_factor' ? 'b' : 'result',
                 };
                 q.cell = { template: 'equation', v: 1, payload: _mmPayload };
@@ -6647,7 +6660,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const _digits = String(_canAdd ? _M : _M - _step).length;
                 // `fact: true`: the kit's ONE across-fact look (div_facts' Standard form): tight tracks,
                 // and the answer line under the sentence where the column is too narrow beside it.
-                q.cell = { template: 'equation', v: 1, payload: { a: base, b: _step, op: isAdd ? '+' : '-', result: ans, unknown: 'result', digits: _digits, fact: true } };
+                q.cell = { template: 'equation', v: 1, payload: { a: base, b: _step, op: isAdd ? '+' : '-', result: ans, unknown: 'result', digits: _digits, fact: true, ...(_optDef('level') && supportLevelFor(1) >= 3 ? { trace: true } : {}) } };
                 q.visual = '';
                 return;
             }

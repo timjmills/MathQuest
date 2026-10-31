@@ -1123,7 +1123,12 @@ const P11_OPS_OPTIONS = {
     'division:nl_div': [_opsBand([20, 50, 100], 100, { help: 'The largest number shared along the line.' })],
 
     // --- ÷ notation: every ticked way really prints ---------------------------------------------
-    'division:missing_mult_div': [notationOption('/')],
+    // ops-family r2 (F19 OPTION-HELP dealable, F8 level): the labels show the forms this skill deals - the
+    // unknown before the answer, never the dropped "48 ÷ 4 = __" - and the trace level really prints.
+    'division:missing_mult_div': [{ ...notationOption('/'),
+        values: [{ v: 'across', l: 'Across  (48 ÷ __ = 12)' }, { v: 'bracket', l: 'Long division bracket  (12 over 4⟌__)' }, { v: 'fraction', l: 'Fraction bar  (__ over 4 = 12)' }],
+        help: 'Tick one way for a single-notation page, or several to mix them on one page. A page with the bracket ticked is all ÷ sentences: a × sentence is never written in a bracket.' },
+    levelSubset([3, 1], 1, 'Level 3 writes each missing number in grey to trace; level 1 is the sentence alone.')],
     'multiplication:mult_div_fact_family': [notationOption('/')],
 
     // --- word problems: pictures on the stories that have them ----------------------------------
@@ -2667,6 +2672,7 @@ Object.assign(P12_OPTIONS, {
         { ..._p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']],
             'A number before the = sign is the skill. Tick the answer too to mix in plain sums and differences.'), default: [1] },
         _p12Kinds('task', 'Operation', [['Adding', '\\+'], ['Subtracting', ' - ']]),
+        levelSubset([3, 1], 1, 'Level 3 writes each missing number in grey to trace; level 1 is the sentence alone.'),
     ],
     // Read by gen-operations.js (_p12Form): 0 = arrays, 1 = equal groups.
     'multiplication:arrays_groups': [formsOption([{ v: 0, l: 'Arrays (rows of dots)' }, { v: 1, l: 'Equal groups (rings of dots)' }], { label: 'The picture' })],
@@ -2696,8 +2702,8 @@ Object.assign(P12_OPTIONS, {
     'number_sense:make_a_ten': [formsOption([{ v: 0, l: 'Add using make a ten (8 + 5 = 8 + 2 + 3)' }, { v: 1, l: 'Which shows the make-a-ten way?' }])],
     'number_sense:doubles_near_doubles': [formsOption([{ v: 0, l: 'Doubles (6 + 6)' }, { v: 1, l: 'Doubles plus one (6 + 7)' }, { v: 2, l: 'Doubles minus one (6 + 5)' }],
         { help: 'Doubles come first; near doubles use a double the pupil knows.' })],
-    'addition:add_sub_10s': [_p12Kinds('task', 'Operation', [['Adding tens', ' \\+ '], ['Subtracting tens', ' - ']]), _p12Max([50], 100)],
-    'addition:add_sub_100s': [_p12Kinds('task', 'Operation', [['Adding hundreds', ' \\+ '], ['Subtracting hundreds', ' - ']]), _p12Max([500], 1000)],
+    'addition:add_sub_10s': [_p12Kinds('task', 'Operation', [['Adding tens', ' \\+ '], ['Subtracting tens', ' - ']]), _p12Max([50], 100), levelSubset([3, 1], 1, 'Level 3 writes each answer in grey to trace; level 1 is the sentence alone.')],
+    'addition:add_sub_100s': [_p12Kinds('task', 'Operation', [['Adding hundreds', ' \\+ '], ['Subtracting hundreds', ' - ']]), _p12Max([500], 1000), levelSubset([3, 1], 1, 'Level 3 writes each answer in grey to trace; level 1 is the sentence alone.')],
     // Read by gen-counting.js add_wp_10 (the plain twin is generated there too).
     'addition:add_wp_10_plain': [_opsBand([5, 7, 10], 10, { label: 'Total to', help: 'The largest total in a story.' })],
     'addition:add_wp_10': [...(SKILL_OPTIONS['addition:add_wp_10'] || []), _opsBand([5, 7, 10], 10, { label: 'Total to', help: 'The largest total in a story.' })],

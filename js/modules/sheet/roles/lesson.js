@@ -266,6 +266,12 @@ const arrTurnOf = (it) => { const c = it && it.q && it.q.cell; const p = c && c.
 export const CASE_TESTS = Object.freeze({
     bigFirst: (it) => { const o = operandsOf((it && it.q) || {}); return o.length >= 2 && Number(o[0]) > Number(o[1]); },
     bigSecond: (it) => { const o = operandsOf((it && it.q) || {}); return o.length >= 2 && Number(o[0]) < Number(o[1]); },
+    // ops-family r2 (F2, critic r1: the anchor chart 38-45 % empty): a one-line sentence skill dealing two signs
+    // models the other sign as its second example - the chart's row of "Another example" states.
+    signAdd: (it) => { const op = it && it.q && it.q.op; return op === '+'; },
+    signSub: (it) => { const op = it && it.q && it.q.op; return op === '-' || op === '−'; },
+    signTimes: (it) => { const op = it && it.q && it.q.op; return op === '×' || op === '*' || op === 'x'; },
+    signDiv: (it) => { const op = it && it.q && it.q.op; return op === '÷' || op === '/'; },
     zeroOnes: (it) => { const o = operandsOf((it && it.q) || {}); return o.length >= 2 && Number(o[0]) % 10 === 0; },
     roundDown: (it) => { const r = roundRest(it); return r !== null && r > 1 && r < 5; },
     // Lessons r2: the rounding Guided set and the chart's third example need the other two cases.
@@ -1542,17 +1548,23 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
     let hF = 0;
     // 1. row: the second example's states under the panels, the panels at zoom 1 or more.
     const wide = !!(data && data.chartWide);
-    if (k2 && !wide && lay.rows * H(1) + band2 <= avail) { mode = 'row'; z = solve((q) => lay.rows * H(q), avail - band2, 1, zMax); }
+    // (ops-family r2: the row only when each state fits its quarter of the width - a one-line sentence
+    // "19 − [ ] = 4" four across ran into its neighbour; it then shows whole, two across, below)
+    const rowFits = second.every((x) => !(x && x.measured && x.measured[Math.min(4, k2)] && x.measured[Math.min(4, k2)].fits === false));
+    if (k2 && !wide && rowFits && lay.rows * H(1) + band2 <= avail) { mode = 'row'; z = solve((q) => lay.rows * H(q), avail - band2, 1, zMax); }
     // 2. final: the other examples whole, side by side - three across where a third case fits
     //    (lessons r3: rounding's 90s -> 100), else two; the panels a little smaller.
     let finShown = fin;
     let finCols = 2;
     // `chartWide` (one drawing a row): the other examples whole, one under the other.
-    for (const [list, c] of wide ? [[fin, 1], [fin.slice(0, 1), 1]] : [[finals.slice(0, 3), 3], [fin, 2]]) {
-        if (mode !== 'one' || (!wide && (lay.cols !== 2 || list.length !== c || (c === 3 && !list.every(fits3)))) || !list.length) continue;
+    // (`second.whole`, lesson data - ops-family r2 F2: a lesson with ONE other case shows it whole, full width,
+    // under the panels, when its row of states does not fit four across)
+    const oneWhole = !wide && !!(data && data.second && data.second.whole) && fin.length === 1;
+    for (const [list, c] of wide ? [[fin, 1], [fin.slice(0, 1), 1]] : [[finals.slice(0, 3), 3], [fin, 2], ...(oneWhole ? [[fin, 1]] : [])]) {
+        if (mode !== 'one' || (!wide && (lay.cols !== 2 || (list.length !== c && !(oneWhole && c === 1)) || (c === 3 && !list.every(fits3)))) || !list.length) continue;
         const hF1 = wide ? list.reduce((a, x) => a + hOf(x, 1), 0) : Math.max(...list.map((x) => hOf(x, c)));
         const HF = (q) => hF1 - (1 - q) * dLast;
-        const zb = solve((q) => lay.rows * H(q) + HF(q), avail, 0.85, 1);
+        const zb = solve((q) => lay.rows * H(q) + HF(q), avail, 0.85, oneWhole && c === 1 ? zMax : 1);
         if (zb) { mode = 'final'; z = zb; hF = HF(zb); finShown = list; finCols = c; }
     }
     // 3. grid3: the panels, the closing step and the other examples share one 3-column grid.

@@ -2717,8 +2717,23 @@ async function buildSheetCore(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveBandedLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap }, sec.anchorMm || 0,
+                const resolveShare = () => resolveBandedLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap }, sec.anchorMm || 0,
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
+                let L = resolveShare();
+                // F1 (ops-family critic r1): rows are sized from measured[cols] at the column count the
+                // section is DRAWN at. The dense pass may take more columns than the share's height holds
+                // (an across sentence draws answer-below at 3 columns: 28.6 mm in an 18.4 mm row, 8 mm
+                // out of its cell), so the section is held to the widest count whose own height fits.
+                const tooTall = (Lx) => { const f = sec.floor && sec.floor[Lx.cols]; return !!(f && Number.isFinite(f.hMm) && f.hMm > Lx.cellH + 0.05); };
+                if (tooTall(L) && L.cols > 1) {
+                    const room = (sec.gridH || 0) - (sec.anchorMm || 0) - 1;
+                    let c = L.cols - 1;
+                    while (c > 1 && !(sec.floor[c] && Number.isFinite(sec.floor[c].hMm) && sec.floor[c].hMm <= room)) c--;
+                    const was = sec.maxCols;
+                    sec.maxCols = Math.min(Number(was) || 10, c);
+                    const L2 = resolveShare();
+                    if (tooTall(L2)) sec.maxCols = was; else L = L2;
+                }
                 out[si] = capFromL(sec, si, L);
             });
         }

@@ -298,7 +298,9 @@ export const LESSONS = Object.freeze({
         ],
         chant: '',
         format: { kind: 'numbered steps with icons', why: 'One move in one place; four short steps said in order. No decision to cue, so no chant.' },
-        example: { match: 'one ten' },
+        example: { match: 'one ten', test: 'signAdd' },
+        // ops-family r2 (F2): the chart models the other sign too, and fills its page with it.
+        second: { test: 'signSub', label: '\u2212 10? One ten back.', whole: true },
         mixWith: [{ key: 'placevalue:more_less_10' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
     },
     'addition:add_sub_100s': {
@@ -324,12 +326,14 @@ export const LESSONS = Object.freeze({
         ],
         chant: '',
         format: { kind: 'numbered steps with icons', why: 'The same four steps as tens, one place over. No decision to cue, so no chant.' },
-        example: { match: 'one hundred' },
+        example: { match: 'one hundred', test: 'signAdd' },
+        second: { test: 'signSub', label: '\u2212 100? One hundred back.', whole: true },
         mixWith: [{ key: 'placevalue:more_less_100' }, { key: 'addition:add_sub_10s' }],
     },
     'subtraction:missing_add_sub': {
         skills: [
-            { key: 'addition:add_facts', opts: { band: 20 }, why: 'Count on to find a part.' },
+            // (ops-family r2 F17: the warm-up fact across, as the lesson's own sentences are - a stack sat 34 % to one side)
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['across'] }, why: 'Count on to find a part.' },
             { key: 'composing:number_bonds', opts: { band: 10 }, why: 'Two parts make a whole.' },
         ],
         concepts: [
@@ -339,7 +343,8 @@ export const LESSONS = Object.freeze({
         ],
         vocab: [
             { word: 'missing', meaning: 'the number in the box', picture: { kind: 'text', text: '? + 5 = 12' } },
-            { word: 'whole', meaning: 'the parts together', picture: { kind: 'text', text: '7 + 5 = 12' } },
+            // (ops-family r2 F3, VOCAB-TYPE: the picture marks the whole itself, never a whole sentence)
+            { word: 'whole', meaning: 'the parts together', picture: { kind: 'bar', whole: 12, a: 7, b: 5, mark: 'whole' } },
             { word: 'equals', meaning: 'the = sign: is the same as', picture: { kind: 'glyph', text: '=' } },
         ],
         steps: [
@@ -350,13 +355,15 @@ export const LESSONS = Object.freeze({
         ],
         chant: '',
         format: { kind: 'numbered steps with icons', why: 'Find the whole, count on, check: three moves said in order, then write.' },
-        example: { match: 'Count on from' },
+        example: { match: 'Count on from', test: 'signAdd' },
+        second: { test: 'signSub', label: '\u2212 sign? The whole comes first.', whole: true },
         mixWith: [{ key: 'addition:add_facts', opts: { band: 20 } }, { key: 'composing:number_bonds', opts: { band: 10 } }],
     },
     'division:missing_mult_div': {
         skills: [
-            { key: 'multiplication:mult_facts', why: 'Know the times facts.' },
-            { key: 'division:div_facts', why: 'Division is the times fact turned round.' },
+            // (ops-family r2 F18: facts to 10 \u00d7 10, across - a stacked 12 \u00d7 11 reads as grade-4 long multiplication)
+            { key: 'multiplication:mult_facts', opts: { band: 100, notation: ['across'] }, why: 'Know the times facts.' },
+            { key: 'division:div_facts', opts: { band: 100 }, why: 'Division is the times fact turned round.' },
         ],
         concepts: [
             { id: 'fact', text: 'A times fact has two factors and a product.' },
@@ -364,7 +371,8 @@ export const LESSONS = Object.freeze({
             { id: 'check', text: 'Put the number in. Is the fact true?' },
         ],
         vocab: [
-            { word: 'factor', meaning: 'a number we multiply', picture: { kind: 'text', text: '6 \u00d7 7' } },
+            // (ops-family r2 F3, VOCAB-TYPE: "6 \u00d7 7" is a product, not a factor - the word the picture shows is the product, boxed)
+            { word: 'product', meaning: 'the answer when we multiply', picture: { kind: 'fact', a: 3, b: 4 } },
             { word: 'missing', meaning: 'the number in the box', picture: { kind: 'text', text: '? \u00d7 6 = 42' } },
             { word: 'divide', meaning: 'the \u00f7 sign: share equally', picture: { kind: 'glyph', text: '\u00f7' } },
         ],
@@ -376,8 +384,9 @@ export const LESSONS = Object.freeze({
         ],
         chant: '',
         format: { kind: 'numbered steps with icons', why: 'Count by the number you know until you reach the total; the check says the whole fact.' },
-        example: { match: 'Count by' },
-        mixWith: [{ key: 'multiplication:mult_facts' }, { key: 'division:div_facts' }],
+        example: { match: 'Count by', test: 'signTimes' },
+        second: { test: 'signDiv', label: '\u00f7 sign? Say the times fact.', whole: true },
+        mixWith: [{ key: 'multiplication:mult_facts', opts: { band: 100 } }, { key: 'division:div_facts', opts: { band: 100 } }],
     },
     'division:div_zero_in_quotient': {
         skills: [
