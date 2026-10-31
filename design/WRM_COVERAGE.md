@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 396 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 397 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -2597,6 +2597,7 @@ whatever happens to the WRM gaps.
   Vocabulary: exchange, place value, product  
 - **Y4.B5.S11** Divide a 2-digit number by a 1-digit number (1) — covered. _3.OA.B.5, 4.NBT.B.6_  
   Skills: Box Method Division (2÷1 digit) (`division:box_division_easy`); Area Model Division (2÷1 digit) (`division:area_model_div_2by1`); Divide 2-Digit by 1-Digit Numbers (Long Division) (`division:div_2by1_long`)  
+  Partial: Divide: Long-Division Form (`division:div_facts_long`), missing division facts to 12 x 12 in the long-division bracket: the notation, with no exchange past a fact  
   Vocabulary: share equally, exchange, partition  
 - **Y4.B5.S12** Divide a 2-digit number by a 1-digit number (2) — covered. _3.OA.B.5, 4.NBT.B.6_  
   Skills: Division with Remainders (Visual) (`division:div_remainders`); Box Method Division (2÷1 digit) (`division:box_division_easy`); Divide 2-Digit by 1-Digit Numbers (Long Division) (`division:div_2by1_long`)  

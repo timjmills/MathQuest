@@ -494,3 +494,14 @@
    item tab, so it takes no tab spacer above the story - on the page and in the measuring cell alike. */
 .ws-page .ws-grid > .ws-cell[data-ws-cell="word-work"]:has(.mq-wwframes)::before,
 .ws-sheet > .ws-cell.mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }
+
+/* 2026-10-31 (Lane D restart r2, critic R1-6; additive): the measuring cell of print-sheet.js measureFresh sits in
+   `.ws-page > .ws-grid` (Lane D r12c) and carries its template only as the `mqt--<template>` class - no data-ws-cell
+   attribute - so neither the page rule (`[data-ws-cell="counters"]`) nor main's measuring twin (`.ws-sheet > .ws-cell`)
+   gave it the CL-40 tab spacer above a counters / words / word-work / seqstrip / remainder picture. Those cells measured
+   3 mm short (add_facts lesson: 27.6 mm against 30.6 mm printed), the lesson's Warm-up packed two of them into a row
+   sized for the short figure, lost its 4th item and ran over the "Guided Practice" strip. The measuring cell now takes
+   the spacer it prints with. */
+.ws-page .ws-grid > .ws-cell:not([data-ws-cell]):is(.mqt--word-work, .mqt--words, .mqt--counters, .mqt--seqstrip, .mqt--remainder):has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
+.ws-page .ws-grid > .ws-cell:not([data-ws-cell]).mqt--remainder:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { height: max(0mm, calc(var(--ws-tab, 5mm) - 1.25mm)); }
+.ws-page .ws-grid > .ws-cell:not([data-ws-cell]).mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }

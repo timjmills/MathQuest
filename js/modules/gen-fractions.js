@@ -3651,7 +3651,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     const den = pick(denChoices);
                     const num = rng(1, den - 1);
                     const simple = simplifyFraction(num, den);
-                    q.text = _fnlKind === 0 ? 'What fraction does the dot show?' : 'What fraction of the line is shaded?';
+                    // ("number line" in the prompt: it names the representation the lesson links ask for -
+                    // ws-lessonfit "why names number line", F2 2026-10-31 - as the legacy prompts did)
+                    q.text = _fnlKind === 0 ? 'What fraction does the dot on the number line show?' : 'What fraction of the number line is shaded?';
                     q.ans = `${num}/${den}`;
                     q.acceptedAnswers = simple !== q.ans ? [q.ans, simple] : [q.ans];
                     q.answerType = 'text';
@@ -3667,7 +3669,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     do { num = rng(den + 1, maxW * den - 1); } while (num % den === 0);
                     const wholeP = Math.floor(num / den), remP = num % den;
                     const simple = simplifyFraction(num, den);
-                    q.text = 'What fraction does the dot show? The line goes past 1.';
+                    q.text = 'What fraction does the dot on the number line show? The line goes past 1.';
                     q.ans = `${num}/${den}`;
                     q.acceptedAnswers = [...new Set([q.ans, simple, `${wholeP} ${remP}/${den}`])];
                     q.answerType = 'text';

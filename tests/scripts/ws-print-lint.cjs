@@ -1762,6 +1762,7 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     const pdfPath = tmpFile(`${id.replace(/[^\w.-]+/g, '_')}.pdf`);
     await page.pdf({ path: pdfPath, format: 'A4', printBackground, preferCSSPageSize: true });
     const pdf = analysePdf(pdfPath, box);
+    const sectionHits = mode !== 'legacy' ? sectionOverlap(pdfPath, await page.evaluate(SECTION_LABELS_IN_PAGE)) : [];   // L-OVERLAP SECTION
     fs.unlinkSync(pdfPath);
     const findings = dom.findings.map(f => ({ ...f }));
     const F = (lint, rule, sev, loc, msg, key) => findings.push({ lint, rule, sev, msg, key: key || msg, ...loc });
@@ -1812,6 +1813,7 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
         info.geom = { segs: geo.segs, heads: geo.heads, tpl: geo.tpl };
         geomFindings(geo, F);
     }
+    sectionOverlapFindings(sectionHits, F);
 
     // ---- pages, parts, split, density, key
     if (mode !== 'legacy') lintKitGeometry(dom, pdf, info, F);
@@ -1831,6 +1833,62 @@ function geomFindings(geo, F) {
     for (const x of geo.narrow) F('L-ANSAREA', 'TY-21', 'major', at(x), `answer ${x.kind} ${x.w} mm wide as printed${x.key ? ' (key page)' : ''}: under ${MIN_SEG_MM} mm a pupil cannot write a digit in it (TY-21, VA-12)`, `narrow answer ${x.kind}`);
     for (const x of geo.overlaps) F('L-OVERLAP', 'H2', 'major', at(x), `head labels "${x.a}" / "${x.b}" ${x.gap < 0 ? `overlap by ${-x.gap} mm` : `sit ${x.gap} mm apart`}: neighbouring heads need ${HEAD_GAP_MM} mm between them or they read as one run (H2)`, 'heads too close');
     for (const x of geo.wraps) F('L-WRAP', 'WRAP-OP', 'major', at(x), `a wrapped line ends in "${x.op}": "${x.before}" / "${x.after}..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)`, `wrap after ${x.op}`);
+}
+
+// =============================================================================================
+// L-OVERLAP SECTION (Lane D restart r2, F2 2026-10-31; critic laned-restart R1-6). A section's ink never covers a
+// section heading: no paint printed AFTER a band's strip label ("Warm-up:", "Guided Practice:") may land on that
+// label. Read on the PRINTED PDF, not the DOM: the add_facts lesson's Warm-up cells measured 3 mm short, laid out
+// inside their grid rows on screen, but in print the rows grew to the cells' content and the second cell's white
+// fill (a positioned cell paints late) was drawn over the top of "Guided Practice:" - the DOM and ws-print-lint's
+// other checks read the page as clean. pymupdf gives every text span and drawing its paint order (seqno).
+// (Its own block, so the parallel F1 edits of this file merge cleanly.)
+// =============================================================================================
+/** In the page: the text of every band strip label (the bold run of `.ws-band > .ws-strip`). */
+const SECTION_LABELS_IN_PAGE = () => [...new Set([...document.querySelectorAll('.ws-page .ws-band > .ws-strip > b')]
+    .map((b) => b.textContent.replace(/\s+/g, ' ').trim()).filter((t) => t.length >= 2))];
+const SECTION_PY = String.raw`
+import sys, json, pymupdf
+pdf, labels = sys.argv[1], set(json.loads(sys.argv[2]))
+MM = 72 / 25.4
+out = []
+for pi, page in enumerate(pymupdf.open(pdf)):
+    pr = page.rect
+    spans = []
+    for s in page.get_texttrace():
+        t = ''.join(chr(c[0]) for c in s['chars']).replace('\xa0', ' ').strip()
+        if t in labels: spans.append((t, s['seqno'], pymupdf.Rect(s['bbox'])))
+    if not spans: continue
+    draws = [d for d in page.get_drawings() if not (d['rect'].width >= pr.width * 0.9 and d['rect'].height >= pr.height * 0.9)]
+    for t, seq, b in spans:
+        h = b.height
+        # the glyphs' ink band: the span box less its line gap (12 % above the cap line, 25 % under the baseline)
+        g = pymupdf.Rect(b.x0 + 0.2 * MM, b.y0 + 0.12 * h, b.x1 - 0.2 * MM, b.y1 - 0.25 * h)
+        for d in draws:
+            if d['seqno'] <= seq: continue
+            r = d['rect']
+            if r.is_empty and not (r.width or r.height): continue
+            if r.x1 <= g.x0 or r.x0 >= g.x1 or r.y1 <= g.y0 or r.y0 >= g.y1: continue
+            out.append({'page': pi + 1, 'label': t, 'kind': 'fill' if d.get('fill') is not None else 'stroke',
+                        'over': round((min(r.y1, g.y1) - g.y0) / MM, 2),
+                        'at': [round(r.x0 / MM, 1), round(r.y0 / MM, 1), round(r.width / MM, 1), round(r.height / MM, 1)],
+                        'label_at': [round(b.x0 / MM, 1), round(b.y0 / MM, 1)]})
+            break
+print(json.dumps(out))
+`;
+/** The labels each printed page paints something over (PDF paint order), or [] when nothing does. */
+function sectionOverlap(pdfPath, labels) {
+    if (!labels || !labels.length) return [];
+    try {
+        const out = execFileSync('python3', ['-c', SECTION_PY, pdfPath, JSON.stringify(labels)], { encoding: 'utf8', maxBuffer: 16 << 20 });
+        return JSON.parse(out.trim().split('\n').pop());
+    } catch (e) { return [{ page: 0, label: '?', error: String(e.message || e).slice(0, 120) }]; }
+}
+function sectionOverlapFindings(hits, F) {
+    for (const x of hits) {
+        if (x.error) { F('L-OVERLAP', 'SECTION', 'minor', {}, `L-OVERLAP SECTION could not read the PDF (${x.error})`, 'section probe error'); continue; }
+        F('L-OVERLAP', 'SECTION', 'major', { page: x.page, el: `strip "${x.label}"` }, `printed page ${x.page}: a ${x.kind} printed after the heading "${x.label}" (at ${x.label_at[0]}, ${x.label_at[1]} mm) covers it (${x.at[2]} x ${x.at[3]} mm at ${x.at[0]}, ${x.at[1]} mm): the section above runs into the next section's heading strip and clips it (H2, C3, PG-12)`, `section ink over "${x.label}"`);
+    }
 }
 
 // ---- kit / pack pages: every [data-ws-page] / .ws-page is one printed A4 sheet
@@ -2730,6 +2788,20 @@ const SELF_TESTS = [
     // over 3 mm pv zones; the control is the same heads on 12 mm tracks.
     { name: 'stack heads overlapping (L-OVERLAP)', expect: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="ws-stack" style="display:grid;grid-template-columns:repeat(3,4mm);font-size:11pt"><span class="head" style="white-space:nowrap;text-align:center">HTh</span><span class="head" style="white-space:nowrap;text-align:center">TTh</span><span class="head" style="white-space:nowrap;text-align:center">Th</span></div>'); } },
     { name: 'place letters crowding over a pv mat (L-OVERLAP)', expect: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<svg width="30mm" height="20mm" viewBox="0 0 30 20"><text x="5" y="4" text-anchor="middle" font-size="4" font-weight="700" fill="#000">Th</text><text x="8" y="4" text-anchor="middle" font-size="4" font-weight="700" fill="#000">H</text><rect x="2" y="6" width="3" height="12" fill="none" stroke="#000" stroke-width="0.2" data-pv-zone="1000"/><rect x="5" y="6" width="3" height="12" fill="none" stroke="#000" stroke-width="0.2" data-pv-zone="100"/></svg>'); } },
+    // L-OVERLAP SECTION (critic laned-restart R1-6): a Warm-up cell taller than its row (a positioned white cell) is
+    // printed over the next band's "Guided Practice:" heading; the control has the same two bands, clear of each other.
+    { name: 'section ink over the next heading (L-OVERLAP SECTION)', expect: ['L-OVERLAP', 'SECTION'], fn: () => {
+        const pg = document.querySelector('.ws-page');
+        (pg.firstElementChild || pg).insertAdjacentHTML('afterend', '<div class="ws-band" style="border:0.5mm solid #000"><div class="ws-strip"><b>Planted Warm-up:</b></div>'
+            + '<div style="position:relative;height:14mm;margin-bottom:-9mm;background:#fff;border:0.5mm solid #000;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div></div>'
+            + '<div class="ws-band" style="border:0.5mm solid #000"><div class="ws-strip" style="height:6mm;font-size:12pt"><b>Planted Guided:</b> Add.</div></div>');
+    } },
+    { name: 'section clear of the next heading (L-OVERLAP SECTION control)', expect: [], absent: ['L-OVERLAP', 'SECTION'], fn: () => {
+        const pg = document.querySelector('.ws-page');
+        (pg.firstElementChild || pg).insertAdjacentHTML('afterend', '<div class="ws-band" style="border:0.5mm solid #000"><div class="ws-strip"><b>Planted Warm-up:</b></div>'
+            + '<div style="position:relative;height:14mm;background:#fff;border:0.5mm solid #000;-webkit-print-color-adjust:exact;print-color-adjust:exact"></div></div>'
+            + '<div class="ws-band" style="border:0.5mm solid #000"><div class="ws-strip" style="height:6mm;font-size:12pt"><b>Planted Guided:</b> Add.</div></div>');
+    } },
     { name: 'stack heads on wide tracks (L-OVERLAP control)', expect: [], absent: ['L-OVERLAP', 'H2'], fn: () => { document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div class="ws-stack" style="display:grid;grid-template-columns:repeat(3,12mm);font-size:11pt"><span class="head" style="white-space:nowrap;text-align:center">HTh</span><span class="head" style="white-space:nowrap;text-align:center">TTh</span><span class="head" style="white-space:nowrap;text-align:center">Th</span></div>'); } },
     // L-WRAP (critic r2 N6 / N7): a line that wraps after its operator; the control is the same kind of text joined
     // with no-break spaces in a box wide enough for it.
