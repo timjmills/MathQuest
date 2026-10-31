@@ -62,6 +62,9 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    (under `--strict` a SKIPPED-NOT-BUILT, SKIPPED (no rulings) or INCOMPLETE row is not green) AND every red matrix row is at
    or below the approved siblings' counts (the sibling comparison), on the lane branch MERGED WITH the current main branch,
    with the unit gates green there too. A critic round started earlier counts only if that comparison later confirms it.
+   **Lead ruling 2026-10-31 (shared-roles r1):** "at or below base" never covers a page role, template or host the lane
+   CHANGED: any red row there blocks the critic, even when the same row is red on main. Main-red rows may pass only on
+   roles / templates / hosts the lane did not touch.
 0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
    goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
    is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and
