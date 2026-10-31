@@ -337,46 +337,50 @@ export function packPage(groups, byPool0, N, seed, { weights = null, labels = nu
 }
 
 /* ================================================================ the sheet */
-
 /**
- * Split each pool's items over P pages: at least 2 on any page a pool is on, whole blocks first,
- * each part to the least loaded page (load = the boxes' area). -> [{pool: [item]}] (P pages)
+ * Split each pool's items over P pages (PT-MIX-9): a pool too small for 2 on every page sits on
+ * fewer pages (2+ wherever it is), placed first; then every pool's items are water-filled, a block
+ * at a time, onto the least loaded page it may use (load = the boxes' area), so the pages carry
+ * even loads and the last page is never near-empty. -> [{pool: [item]}] (P pages)
  */
 export function splitPages(groups, byPool, P) {
-    const pages = Array.from({ length: P }, () => ({}));
-    const load = new Array(P).fill(0);
     const ids = groups.flatMap((g) => g.pools);
     const area = (id) => { const g = groupOfPool(groups, id); const sh = g.shape[id]; return sh.s * sh.r * g.U; };
-    // the biggest boxes first, so they spread before the small ones fill round them
-    const order = ids.slice().sort((a, b) => area(b) * (byPool[b] || []).length - area(a) * (byPool[a] || []).length);
+    const load = new Array(P).fill(0);
+    const take = Object.fromEntries(ids.map((id) => [id, new Array(P).fill(0)]));
+    const least = (cands) => cands.slice().sort((a, b) => load[a] - load[b] || a - b)[0];
+    // the pages each pool may use: all of them, or (too few problems) the least loaded few
+    const order = ids.slice().sort((a, b) => (byPool[a] || []).length - (byPool[b] || []).length);
+    const pagesOf = {};
     for (const id of order) {
-        const its = byPool[id] || [];
-        const n = its.length;
-        if (!n) continue;
-        const g = groupOfPool(groups, id);
-        const m = g.shape[id].m;
+        const n = (byPool[id] || []).length;
+        if (!n) { pagesOf[id] = []; continue; }
         const on = Math.max(1, Math.min(P, Math.floor(n / 2)));
-        // parts as equal as the blocks allow; the remainder (short of a block) on the last part
-        const unit = m > 1 && n >= on * m ? m : 1;
-        const units = Math.floor(n / unit);
-        const parts = Array.from({ length: on }, (_, i) => (Math.floor(units / on) + (i < units % on ? 1 : 0)) * unit);
-        parts[parts.length - 1] += n - units * unit;
-        // pages for the parts: the least loaded first
-        const pick = Array.from({ length: P }, (_, i) => i).sort((a, b) => load[a] - load[b] || a - b).slice(0, on).sort((a, b) => a - b);
-        let at = 0;
-        // the bigger parts to the emptier pages
-        const bySize = parts.map((c, i) => ({ c, i })).sort((a, b) => b.c - a.c);
-        const pagesBy = pick.slice().sort((a, b) => load[a] - load[b] || a - b);
-        const assign = new Map();
-        bySize.forEach((p, j) => assign.set(pagesBy[j], p.c));
-        for (const pg of pick) {
-            const c = assign.get(pg) || 0;
-            pages[pg][id] = its.slice(at, at + c);
-            at += c;
-            load[pg] += c * area(id) / Math.max(1, m);
+        const pick = Array.from({ length: P }, (_, i) => i).sort((a, b) => load[a] - load[b] || a - b).slice(0, on);
+        pagesOf[id] = pick;
+        // two of each first, on every page the pool is on
+        for (const pg of pick) { const c = Math.min(2, n - take[id].reduce((x, y) => x + y, 0)); take[id][pg] += c; load[pg] += c * area(id); }
+    }
+    // then water-fill, biggest boxes first, a block at a time (whole blocks keep shelves whole)
+    for (const id of ids.slice().sort((a, b) => area(b) - area(a))) {
+        const n = (byPool[id] || []).length;
+        const g = groupOfPool(groups, id);
+        const step = Math.max(1, g.shape[id].m);
+        let left = n - take[id].reduce((x, y) => x + y, 0);
+        while (left > 0) {
+            const pg = least(pagesOf[id]);
+            const c = Math.min(step, left);
+            take[id][pg] += c; load[pg] += c * area(id); left -= c;
         }
     }
-    return pages;
+    return Array.from({ length: P }, (_, pg) => {
+        const out = {};
+        for (const id of ids) {
+            const before = take[id].slice(0, pg).reduce((x, y) => x + y, 0);
+            if (take[id][pg]) out[id] = (byPool[id] || []).slice(before, before + take[id][pg]);
+        }
+        return out;
+    });
 }
 
 export default { H13_FILL, classify, fillPage, packPage, splitPages };

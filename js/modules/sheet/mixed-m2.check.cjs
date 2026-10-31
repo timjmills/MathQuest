@@ -213,6 +213,11 @@ async function main() {
                     if (JSON.stringify(have) !== JSON.stringify(want)) fail(`counts ${have.join(':')}, asked ${want.join(':')}`);
                     const printed = r.pagePools.reduce((a, c) => a + Object.values(c).reduce((x, y) => x + y, 0), 0);
                     if (printed !== want.reduce((a, b) => a + b, 0)) fail(`${printed} problems printed, ${want.reduce((a, b) => a + b, 0)} asked`);
+                    // (no page more than the problems need: where every box is one size a page holds exactly
+                    // `perPage`; with boxes of several sizes the counts change what a page holds - reported)
+                    const tot = want.reduce((a, b) => a + b, 0);
+                    const oneSize = r.m2 && new Set(Object.values(r.m2.classes).map((c) => c.s)).size === 1;
+                    if (sc.arr === 'mixed' && r.perPage && r.pages > 1 && tot <= r.perPage * (r.pages - 1)) (oneSize ? fail : (t) => warns.push(`${id}: ${t}`))(`${r.pages} pages for ${tot} problems at ${r.perPage} a page`);
                     if (r.pages > 1 && !(sc.pages >= r.pages) && !/pages? (was|were) added|need \d+ pages/.test(notes) && sc.arr === 'mixed') fail(`${r.pages} pages with no note`);
                 }
                 // two of each on every page a skill is on
