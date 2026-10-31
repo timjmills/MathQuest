@@ -73,7 +73,7 @@ export const SKILL_STANDARDS = {
 
     // ---- addition
     'addition:add_facts': { ccss: ['1.OA.C.6', '2.OA.B.2', 'K.OA.A.5'], ee: ['M.EE.2.NBT.7', 'M.EE.3.OA.6'] }, // Addition Facts (within 20)
-    'addition:add_sub_10s': { ccss: ['1.NBT.C.4', '1.NBT.C.6', '1.NBT.C.5'], ee: ['M.EE.1.NBT.4', 'M.EE.1.NBT.6'] }, // Add & Subtract by 10s
+    'addition:add_sub_10s': { ccss: ['1.NBT.C.5', '1.NBT.C.4', '1.NBT.C.6'], ee: ['M.EE.1.NBT.4', 'M.EE.1.NBT.6'] }, // Add & Subtract by 10s
     'addition:add_sub_100s': { ccss: ['2.NBT.B.8', '2.NBT.B.7'], ee: ['M.EE.2.NBT.7'] }, // Add & Subtract by 100s
     'addition:add': { ccss: ['1.OA.C.6', '2.NBT.B.5'], ee: ['M.EE.2.NBT.5', 'M.EE.2.NBT.7', 'M.EE.3.OA.6'] }, // Basic Addition
     'addition:add_word_problems': { ccss: ['2.OA.A.1', '1.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Addition Word Problems
@@ -137,7 +137,7 @@ export const SKILL_STANDARDS = {
     'subtraction:subtract': { ccss: ['1.OA.C.6', '2.NBT.B.5'], ee: ['M.EE.2.NBT.5', 'M.EE.2.NBT.7', 'M.EE.3.OA.6'] }, // Basic Subtraction
     'subtraction:sub_word_problems': { ccss: ['2.OA.A.1', '1.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Subtraction Word Problems
     'subtraction:sub_word_problems_plain': { ccss: ['2.OA.A.1', '1.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Subtraction Word Problems (No Pictures)
-    'subtraction:missing_add_sub': { ccss: ['1.OA.D.8', '1.OA.B.4'], ee: [] }, // Missing Numbers (+/−)
+    'subtraction:missing_add_sub': { ccss: ['1.OA.D.8', '1.OA.B.4'], ee: ['M.EE.1.OA.5'] }, // Missing Numbers (+/−)
     'subtraction:sub_5_pictures': { ccss: ['K.OA.A.5', 'K.OA.A.1'], ee: ['M.EE.K.OA.1', 'M.EE.1.OA.1', 'M.EE.2.NBT.7'] }, // Subtract Within 5 with Pictures (Visual)
     'subtraction:unknown_start_wp': { ccss: ['2.OA.A.1', '1.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Unknown Start Word Problems (Visual)
     'subtraction:sub_10_no_regroup': { ccss: ['K.OA.A.2', '1.OA.C.6'], ee: ['M.EE.2.NBT.7', 'M.EE.3.OA.6'] }, // Subtract within 10 (No Regrouping)
@@ -226,7 +226,7 @@ export const SKILL_STANDARDS = {
     'division:area_model_div_2by1': { ccss: ['4.NBT.B.6'], ee: [] }, // Area Model Division (2÷1 digit)
     'division:area_model_div_3by1': { ccss: ['4.NBT.B.6'], ee: [] }, // Area Model Division (3÷1 digit)
     'division:long_div_2digit': { ccss: ['5.NBT.B.6', '6.NS.B.2'], ee: ['M.EE.5.NBT.6', 'M.EE.6.NS.2'] }, // Divide by 2-Digit Numbers (Visual)
-    'division:missing_mult_div': { ccss: ['3.OA.A.4', '3.OA.B.6'], ee: [] }, // Missing Factors (×/÷)
+    'division:missing_mult_div': { ccss: ['3.OA.A.4', '3.OA.B.6'], ee: ['M.EE.3.OA.1'] }, // Missing Factors (×/÷)
     'division:nl_div': { ccss: ['3.OA.A.2', '3.OA.C.7'], ee: ['M.EE.3.OA.2', 'M.EE.3.OA.6'] }, // Division Number Line (Visual)
     'division:mixed_mult_div': { ccss: ['3.OA.C.7'], ee: ['M.EE.3.OA.6'] }, // Mixed Multiplication & Division
     'division:mixed_division': { ccss: [], ee: [], pool: true }, // Mixed Division
