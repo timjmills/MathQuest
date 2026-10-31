@@ -3372,6 +3372,14 @@ const WORD_WORK_OPTIONS = (bar) => [
         const hasBar = cur.some(o => o.id === 'support' && Array.isArray(o.values) && o.values.some(v => v.v === 'bar'));
         SKILL_OPTIONS[key] = [...cur, ...WORD_WORK_OPTIONS(!hasBar)];
     }
+    // The 8 sentence-layout story skills (within 10 and 20) do not offer the keyword supports (lead ruling 2026-10-31,
+    // critic visual-quality r2 N3, PEDAGOGY P-21): a keyword list teaches "in all means +" instead of the story's
+    // structure, and these stories are read for their parts and whole. `hidden` keeps both in the model, so a share
+    // code or saved page that carries them still decodes; the teacher is no longer shown them.
+    for (const op of ['add', 'sub']) for (const code of ['10', '20']) for (const tail of ['', '_plain']) {
+        const key = `${op === 'add' ? 'addition' : 'subtraction'}:${op}_wp_${code}${tail}`;
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map(o => (o.id === 'wpCues' || o.id === 'wpBank' ? { ...o, hidden: true } : o));
+    }
 }
 // `wpFrames` (detailed lesson 7, 2026-10-17): the compact form - one number sentence a step - on the × / ÷ and
 // two-step stories its lesson deals (the exit slip and the Prerequisite Check).

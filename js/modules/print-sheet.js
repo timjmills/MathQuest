@@ -3669,6 +3669,9 @@ async function buildRoleSheet(n, metaOf) {
 /** The note a lesson asked for at S carries (the print panel shows it as a warning). */
 export const LESSON_SIZE_NOTE = 'A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small.';
 
+/** Support options the lesson packet turns off (practice-page working space; critic visual-quality r2 N1). */
+const LESSON_OFF_OPTS = ['familyChart'];
+
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
     const data0 = n.lessonData || lessonFor(sk0.categoryId, sk0.skillId);
@@ -3683,7 +3686,13 @@ async function buildLesson(n, metaOf) {
     if (data0 && data0.distinctAnswer) flags.distinctAnswer = true;
     if (data0 && data0.maxSmall !== undefined) flags.maxSmall = data0.maxSmall;
     if (data0) flags.noTurnaround = true;
-    const sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    let sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    // Practice-page supports a lesson never draws (critic visual-quality r2 N1): the blank family chart is working
+    // space for the practice pages; on the lesson's model, steps and guided frames it crowds the step column off
+    // the sheet. The lesson draws the bare family-check cell; the option stays on the skill for every other role.
+    if (sk.opts && LESSON_OFF_OPTS.some((k) => sk.opts[k] === true)) {
+        sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(LESSON_OFF_OPTS.map((k) => [k, false]))) });
+    }
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = n.lessonData || lessonFor(sk.categoryId, sk.skillId);

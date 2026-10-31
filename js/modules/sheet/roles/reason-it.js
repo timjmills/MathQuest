@@ -37,11 +37,16 @@ export function prepare(it, info = {}) {
     const right = aRight ? 'A' : 'B';
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
-    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 3, shown: v, prompt: false }));
+    // (a sentence-layout story - word-work `layout: 'sentence'` - is a story over a number sentence 60+ mm wide: in a
+    // third of the row its frame ran over the A panel's border; critic visual-quality r2 N4. It takes the wide form
+    // below, B under A, drawn as a half-page column so its unit word still sits beside the box)
+    const pl = (it.q && it.q.cell && it.q.cell.payload) || {};
+    const sentence = it.template === 'word-work' && pl.layout === 'sentence';
+    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }));
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
     // box; the response column stays beside both.
-    const wide = it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2;
+    const wide = sentence || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     const render = (c, o = {}) => `<div class="mq-ab"${wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
         + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`

@@ -932,8 +932,12 @@ function pictureRow(ctx, pic, stack = false) {
     const d = 9, pitch = d + 2.2;
     // (in a column a group of 7 to 9 is drawn as a row of five over the rest - the five-frame - so it fits half the page
     // at every size instead of shrinking; visual-quality r2: an 8 at S overflowed two columns, and the Test fell to one)
+    // (a group goes on ONE line while it fits the column - the cell's width less the tab gutter and CL-8's side keep;
+    // visual-quality r2 N2: a 7 drawn 5 / 2 at L gave its row a picture line the other stories lacked, a 30 % band)
+    const inner = 186 / Math.max(1, Number(ctx.columns || 1)) - 6 - 3 - 1;
+    const fitN = Math.max(5, Math.floor((inner - d - 2) / pitch) + 1);
     const group = (n) => {
-        const per = stack && n > 6 ? 5 : n;
+        const per = stack && n > fitN ? 5 : n;
         const rowsN = Math.ceil(n / per);
         const w = (per - 1) * pitch + d + 2, h = rowsN * pitch - 2.2 + 2;
         let body = '';
@@ -1003,7 +1007,11 @@ function unitBlock(ctx, p, unitShown, top = false) {
 function shownSteps(p, ctx) {
     const w = ctx.state === 'wrong' ? (ctx.wrong || {}) : null;
     const wop = w && w.slots && opKey(w.slots.op);
-    if (!wop) return { steps: p.steps, picks: p.steps.map((s) => s.op), ans: String(p.ans) };
+    // (no sign change: the steps stand, and the value the role passes - the shown claim of True or False?, Reason
+    // It's A or B, Error analysis's wrong answer - is the one written in the answer box; critic visual-quality r2 N4:
+    // the sentence frame wrote p.ans, so every "False" claim printed the true answer)
+    const wv = w && w.value !== undefined && w.value !== null && w.value !== '' ? String(w.value) : null;
+    if (!wop) return { steps: p.steps, picks: p.steps.map((s) => s.op), ans: wv !== null ? wv : String(p.ans) };
     const out = p.steps.map((s, i) => {
         if (i !== p.steps.length - 1) return s;
         const x = Math.max(s.a, s.b), y = Math.min(s.a, s.b);

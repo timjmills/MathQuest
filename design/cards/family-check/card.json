@@ -230,7 +230,7 @@
     },
     {
       "q": "Should the chart also appear on the model / lesson pages of fact_family_sort when the option is off?",
-      "recommended": "No: options live on the skill; a teaching page shows it only when the option is on (the Say band carries the oral frame)."
+      "recommended": "No, and not when it is on either (built, critic r2 N1): the lesson packet draws the bare family-check cell on every frame - the chart is practice-page working space, and beside the model it pushed the step column off the sheet. Every other role honours the option."
     },
     {
       "q": "Part-whole bar on practice pages (interim: option, default off; drawn on teaching pages). Confirm?",
@@ -314,10 +314,10 @@
           "true",
           "false"
         ],
-        "d": "offered",
+        "d": "hidden",
         "proposed": true,
-        "source": "critic r1 F6; PEDAGOGY P-21",
-        "why": "OWNER TO RULE (lead keeps it offered until then): bold key words / a keyword bank teach the keyword strategy, which P-21 forbids on K-2 stories (critic r1 F6). Proposed: hide it on these skills. While offered it is graded like any other option."
+        "source": "lead ruling 2026-10-31, critic r2 N3, P-21",
+        "why": "Hidden on the 8 sentence-layout story skills (skill-options.js `hidden`, still in the model so share codes decode): bold key words / a keyword bank teach the keyword strategy P-21 forbids; the cued word was filed under the wrong sign and the bank words did not occur in the stories (critic r2 N3). OWNER TO CONFIRM."
       },
       {
         "option": "wpBank",
@@ -325,10 +325,10 @@
           "true",
           "false"
         ],
-        "d": "offered",
+        "d": "hidden",
         "proposed": true,
-        "source": "critic r1 F6; PEDAGOGY P-21",
-        "why": "OWNER TO RULE (lead keeps it offered until then): bold key words / a keyword bank teach the keyword strategy, which P-21 forbids on K-2 stories (critic r1 F6). Proposed: hide it on these skills. While offered it is graded like any other option."
+        "source": "lead ruling 2026-10-31, critic r2 N3, P-21",
+        "why": "Hidden on the 8 sentence-layout story skills (skill-options.js `hidden`, still in the model so share codes decode): bold key words / a keyword bank teach the keyword strategy P-21 forbids; the cued word was filed under the wrong sign and the bank words did not occur in the stories (critic r2 N3). OWNER TO CONFIRM."
       },
       {
         "option": "nlOn",
