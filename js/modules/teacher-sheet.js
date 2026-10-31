@@ -18,7 +18,9 @@
 //                   with letters A, B … (Same problems, new numbers), or one page repeated (Same page again);
 //                   Layout → the 'fact-rows' / 'fact-probe' roles, offered only when the skill's items fit them
 //   Sections        ONE 'independent' request, a section per skill with its count (the plan's counts)
-//   Mixed practice  one 'mixed-practice' request per page, the page's skills weighted by the plan
+//   Mixed up        (kind 'mixed', M2 2026-10-31) one 'mixed-practice' request per plan page, arrangement 'mixed', a
+//                   section per skill with its exact count on that page (teacher-plan.js mixedPages spreads each
+//                   skill's count over the pages); the engine mixes them problem by problem (sheet/interleave.js)
 //   Examples        anchors 'off' | 'sections' (an example to start each group) | 'side' (with each problem)
 //   Quiz            the same requests with Score in the header, once per version (its own seed: its own order,
 //                   numbers and key; no letters); online = generateQuestionFor → saveTest / compressTestForURL
@@ -37,6 +39,7 @@ import { encodeSetParam } from './teacher-ui.js';
 import { printHtml } from './teacher-print.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
+import { interleave } from './sheet/index.js';
 import { mountSample } from './teacher-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { quizQuestionData } from './quiz-take.js';
@@ -117,6 +120,8 @@ function items() {
 }
 const shortLabel = (l) => String(l || '').replace(/\s*\((?:Visual|MAP|black and white)\)/g, '').replace(/\s*\(No Pictures\)/, ' (no pictures)');
 const isBig = (list) => list.length > BIG;
+/** The kinds of worksheet (values kept: 'sections' | 'mixed' | 'single' are what saved sets and the sheet's state hold). */
+const KINDS = [['sections', 'In sections', 'Each skill in its own part'], ['mixed', 'Mixed up', 'Problems mixed one by one'], ['single', 'Single skill', 'One skill on a page']];
 function autoKind(list) { if (S.fromLesson) return 'sections'; return list.length >= 2 ? 'mixed' : 'single'; }
 function kindOf(list) { return S.kind || autoKind(list); }
 
@@ -194,7 +199,10 @@ function requests(p, list, quiz, version = 0) {
         const c = {}; const order = [];
         (pg || []).forEach((k) => { if (!c[k]) order.push(k); c[k] = (c[k] || 0) + 1; });
         if (!order.length) continue;
-        out.push({ req: Object.assign(base(), { role: 'independent', sections: order.map((k) => ({ skills: [skillRef(byKey[k])], count: c[k] })) }), copies: copy ? p.pages : 1, keys: order, pages: 1 });
+        const secs = order.map((k) => ({ skills: [skillRef(byKey[k])], count: c[k] }));
+        // Mixed up (owner 2026-10-31): the page's exact counts, mixed problem by problem by the engine
+        if (p.kind === 'mixed' && order.length >= 2) out.push({ req: Object.assign(base(), { role: 'mixed-practice', arrangement: 'mixed', sections: secs }), copies: copy ? p.pages : 1, keys: order, pages: 1, mixed: true });
+        else out.push({ req: Object.assign(base(), { role: 'independent', sections: secs }), copies: copy ? p.pages : 1, keys: order, pages: 1 });
     }
     return out;
 }
@@ -204,11 +212,21 @@ function countParts(res, part, copies, into) {
     let n = 0;
     for (const it of res.items || []) {
         if (!it) continue;
-        const k = part.keys.length === 1 ? part.keys[0] : (Number.isInteger(it.section) && part.keys[it.section]) || (part.keys.includes(it.skill) ? it.skill : null);
+        const k = part.keys.length === 1 ? part.keys[0] : part.mixed ? keyOfMixed(it, part) : (Number.isInteger(it.section) && part.keys[it.section]) || (part.keys.includes(it.skill) ? it.skill : null);
         if (!k) continue;
         into[k] = (into[k] || 0) + copies; n += copies;
     }
     return n;
+}
+/** A mixed page's item → its plan key: by skill ('cat:skill' or the skill id), else by pool / section index. */
+function keyOfMixed(it, part) {
+    const sk = String(it.skill || '');
+    if (part.keys.includes(sk)) return sk;
+    const bySkill = part.keys.filter((k) => k.split(':')[1] === sk || k.endsWith(':' + sk));
+    if (bySkill.length === 1) return bySkill[0];
+    const ix = Number.isInteger(it.pool) ? it.pool : Number.isInteger(Number(it.pool)) && it.pool !== '' && it.pool !== undefined ? Number(it.pool) : null;
+    if (ix !== null && part.keys[ix]) return part.keys[ix];
+    return bySkill[0] || null;
 }
 /** The problems the built page 1 holds (fact rows: its own count, from the built page). */
 function countOnPage1(res) {
@@ -373,6 +391,13 @@ async function runPreview() {
         const planned = part.pages || 1;
         const got = res.pageCount || 1;
         const onPage = (part.req.sections || []).reduce((t, x) => t + (x.count || 0), 0);
+        // Mixed up: when the plan's page spills, the engine says how many problems one page holds for this mix
+        // (fits.perPage) and that is learned (absent until the M2 engine lands: then the cells of page 1, as for Sections)
+        const fitsPer = part.mixed && res.fits && Number(res.fits.perPage) > 0 ? Math.round(Number(res.fits.perPage)) : 0;
+        if (got > planned && fitsPer && fitsPer < onPage) {
+            perLearned.set(perBase(list), fitsPer);
+            continue;
+        }
         if (got > planned && onPage > 1 && p.kind !== 'single') {
             // the engine's page holds fewer: learn it and deal the plan again
             // what the engine's own page 1 holds (its cells), not a share of the spill: the same set learns the same number
@@ -636,8 +661,11 @@ function optionsHTML() {
     if (!quiz && EXTRA && EXTRA.html) { try { h += EXTRA.html(list) || ''; } catch (e) { console.warn('[teacher-sheet] extra', e); } }
     const p = plan(list);
     const k = p.kind;
-    h += `<div class="tvs-kinds" role="radiogroup" aria-label="Kind of worksheet">${[['single', 'Single skill', 'One skill on a page'], ['sections', 'Sections', 'Each skill in its own part'], ['mixed', 'Mixed practice', 'Skills mixed together']].map(([v, l, s]) => `<button type="button" class="tvs-kind" role="radio" data-act="kind" data-v="${v}" aria-checked="${k === v}">${k === v ? icon('check', 18) : ''}<span class="tvs-kind-name">${l}</span><span class="tvs-kind-sub">${s}</span></button>`).join('')}</div>`;
-    if (!S.kind) h += `<p class="tvs-muted tvs-chosen">Chosen for you: ${S.fromLesson ? 'practice from a lesson prints in Sections' : list.length === 1 ? 'one skill makes a Single skill page' : `${list.length} skills make a Mixed practice page`}.</p>`;
+    // owner 2026-10-31: both are options — In sections (each skill its own part) or Mixed up (problem by problem);
+    // the amounts below (Problems of each skill: blank = even, a number = exact, a % = held) drive both
+    h += `<div class="tvs-kinds" role="radiogroup" aria-label="How the skills are arranged" data-tvs-arrange>${KINDS.map(([v, l, s]) => `<button type="button" class="tvs-kind" role="radio" data-act="kind" data-v="${v}" aria-checked="${k === v}">${k === v ? icon('check', 18) : ''}<span class="tvs-kind-name">${l}</span><span class="tvs-kind-sub">${s}</span></button>`).join('')}</div>`;
+    if (!S.kind) h += `<p class="tvs-muted tvs-chosen">Chosen for you: ${S.fromLesson ? 'practice from a lesson prints In sections' : list.length === 1 ? 'one skill makes a Single skill page' : `${list.length} skills print Mixed up`}.</p>`;
+    if (list.length >= 2 && (k === 'mixed' || k === 'sections')) h += `<p class="tvs-muted tvs-arrange-note" data-tvs-arrange-note="${k}">${k === 'mixed' ? 'The problems of every skill are mixed one by one, in the amounts below; every page is mixed.' : 'Each skill prints in its own part, with the amounts below.'}</p>`;
     // How much? Pages · Problems in all · Problems of each skill
     {
         const q = quiz ? S.quiz : null;
@@ -893,7 +921,8 @@ function pickFrom(id) {
 
 function makeLink() {
     const s = S.share;
-    S.shareRes = currentSet().length ? makeShareLink({ gameMode: s.gameMode, problemCount: s.problemCount, timer: s.timer }, 'direct', !!s.lock) : null;
+    // M2: the set's arrangement travels as the appended W token (Wm = Mixed up; In sections = no token, as before)
+    S.shareRes = currentSet().length ? makeShareLink({ gameMode: s.gameMode, problemCount: s.problemCount, timer: s.timer, arrangement: sheetArrangement() }, 'direct', !!s.lock) : null;
     // owner 2026-10-25: the link also carries the whole set (skills, options, amounts, print settings) as an optional
     // &set= suffix, so a teacher who opens it gets it in My sets. ?c= is unchanged, so old readers ignore it.
     if (S.shareRes) {
@@ -951,10 +980,9 @@ async function quizTest() {
     });
     let sections;
     if (k === 'mixed') {
-        const all = bySkill.flatMap((b) => b.qs);
-        let a = S.seed >>> 0 || 1;
-        const r = () => { a ^= a << 13; a ^= a >>> 17; a ^= a << 5; return ((a >>> 0) % 1e6) / 1e6; };
-        for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
+        // the paper's rule on screen too (sheet/interleave.js): no run > 2 of a skill where avoidable, every skill in
+        // the first third; the weights are the per-skill counts, the seed the sheet's
+        const all = mixedOrder(bySkill.map((b) => ({ key: keyOf(b.it), label: b.it.label, qs: b.qs })), S.seed);
         sections = [{ id: 0, label: 'Mixed practice', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions: all.map((q, i) => Object.assign({ id: i }, q)) }];
     } else {
         sections = bySkill.filter((b) => b.qs.length).map((b, si) => ({ id: si, label: b.it.label, layout: { columns: 2, spacing: 'normal' }, instructions: '', questions: b.qs.map((q, i) => Object.assign({ id: i }, q)) }));
@@ -964,6 +992,18 @@ async function quizTest() {
         createdAt: null, updatedAt: null, sections,
         settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: S.quiz.versions },
     };
+}
+/** The online quiz's mixed order: [{key, label, qs}] → the questions interleaved (falls back to skill order). */
+export function mixedOrder(groups, seed) {
+    const items = groups.flatMap((g) => g.qs.map((q) => ({ key: g.key, q })));
+    if (groups.filter((g) => g.qs.length).length < 2) return items.map((x) => x.q);
+    const weights = Object.fromEntries(groups.map((g) => [g.key, Math.max(1, g.qs.length)]));
+    const labels = Object.fromEntries(groups.map((g) => [g.key, { name: g.label || g.key, noun: 'questions' }]));
+    try {
+        const r = interleave(items, weights, (Number(seed) >>> 0) || 1, { labels });
+        if (r && Array.isArray(r.order) && r.order.length === items.length) return r.order.map((x) => x.q);
+    } catch (e) { console.warn('[teacher-sheet] interleave', e); }
+    return items.map((x) => x.q);
 }
 async function saveQuiz(silent) {
     const t = await quizTest();
@@ -1164,6 +1204,20 @@ export function sheetState() {
         share: S.shareRes, quizLink: S.quizLink, lastDoc: S.lastDoc || '' };
 }
 
+/** For checks: the buildSheet requests the open sheet would send (page 1 of each version 0), [{req, keys, copies}]. */
+export function sheetRequests() {
+    const list = items();
+    if (!list.length) return [];
+    const p = plan(list);
+    if (p.error) return [];
+    return requests(p, list, S.sheet === 'quiz', 0).map((x) => ({ req: x.req, keys: x.keys, copies: x.copies || 1 }));
+}
+/** The open set's arrangement for a share code: 'mixed' (Mixed up) or 'sections' (In sections, Single skill). */
+export function sheetArrangement(chosenOnly = false) {
+    const list = items().filter((x) => !x.leftOut);
+    if (chosenOnly && !(S.kind && touched('kind'))) return '';   // other share paths: only what the teacher chose
+    return list.length >= 2 && kindOf(list) === 'mixed' ? 'mixed' : 'sections';
+}
 /** The worksheet's How much, shared with the tray popup's "Total" (T3a): { mode: 'pages' | 'total' | 'each', n, pages, total }. */
 export function sheetAmount() {
     const list = items();
@@ -1180,13 +1234,17 @@ export function setSheetAmount(mode, n) {
 
 /** The print settings a saved set keeps (owner 2026-10-25): How much, sets, key, layout, size, examples, columns, paper, header, and the quiz's own amount. */
 export function printSettings() {
-    return { opts: JSON.parse(JSON.stringify(S.opts)), quiz: { mode: S.quiz.mode, n: S.quiz.n, nEach: S.quiz.nEach, pages: S.quiz.pages, versions: S.quiz.versions, points: S.quiz.points } };
+    const out = { opts: JSON.parse(JSON.stringify(S.opts)), quiz: { mode: S.quiz.mode, n: S.quiz.n, nEach: S.quiz.nEach, pages: S.quiz.pages, versions: S.quiz.versions, points: S.quiz.points } };
+    // M2 (appended): the arrangement the teacher chose ('sections' | 'mixed' | 'single'); a set without it reads as before
+    if (S.kind && touched('kind')) out.kind = S.kind;
+    return out;
 }
 /** Put a set's stored print settings back (a set saved before they were stored changes nothing). */
 export function applyPrintSettings(p) {
     if (!p || typeof p !== 'object') return;
     if (p.opts && typeof p.opts === 'object') Object.assign(S.opts, p.opts, { header: Object.assign({}, S.opts.header, p.opts.header || {}) });
     if (p.quiz && typeof p.quiz === 'object') for (const k of ['mode', 'n', 'nEach', 'pages', 'versions', 'points']) if (p.quiz[k] !== undefined) S.quiz[k] = p.quiz[k];
+    if (['sections', 'mixed', 'single'].includes(p.kind)) { S.kind = p.kind; touch('kind'); }
     S.preview = null;
     persist();
     if (root && S.sheet) changed(false);
@@ -1326,6 +1384,8 @@ if (typeof window !== 'undefined') {
     window.tvOpenSheet = openSheet;
     window.tvSheetAmount = { get: sheetAmount, set: setSheetAmount };
     window.tvSheetPrint = { get: printSettings, set: applyPrintSettings };
+    window.tvSheetArrangement = sheetArrangement;
+    window.tvSheetChecks = { requests: sheetRequests, quizTest: () => quizTest(), mixedOrder };
     window.tvCloseSheet = closeSheet;
     window.tvSheetState = sheetState;
     window.tvSheetBuildNow = buildNow;

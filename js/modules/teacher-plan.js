@@ -322,9 +322,16 @@ export function planPages(kind, items, opts = {}) {
         // each skill on its own pages: a page holds `per`, the skill's last page the rest
         for (const k of order) { let c = byKey[k] || 0; while (c > 0) { const t = Math.min(per, c); pageItems.push(Array(t).fill(k)); c -= t; } }
     } else {
-        const flat = []; order.forEach((k) => { for (let i = 0; i < (byKey[k] || 0); i++) flat.push(k); });
-        if (kind === 'mixed') { const r = rng('deal' + seed); for (let i = flat.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [flat[i], flat[j]] = [flat[j], flat[i]]; } }
-        for (let i = 0; i < flat.length; i += per) pageItems.push(flat.slice(i, i + per));
+        if (kind === 'mixed') {
+            // Mixed up (M2, PT-MIX-9): every skill's count spread over the pages by rotation, so every page is a mixed
+            // page, a skill on a page gets at least 2 there where its total allows, the totals are exactly the plan's
+            // and the pages are even (the last page is never near-empty). The engine orders each page (interleave).
+            const P = Math.max(1, Math.ceil(order.reduce((t, k) => t + (byKey[k] || 0), 0) / per));
+            pageItems = mixedPages(order.map((k) => [k, byKey[k] || 0]), P, per, seed);
+        } else {
+            const flat = []; order.forEach((k) => { for (let i = 0; i < (byKey[k] || 0); i++) flat.push(k); });
+            for (let i = 0; i < flat.length; i += per) pageItems.push(flat.slice(i, i + per));
+        }
     }
     // Each page: "same" (same problems, new numbers) / "copy" (same page again) repeat page 1's plan on every page
     // (Pages mode only); Single skill repeats each skill's first page through its pages. A quiz never prints copies.
@@ -346,4 +353,64 @@ export function planPages(kind, items, opts = {}) {
         counts: list.map((it) => byKey[keyOf(it)] || 0), byKey, pagesBy, pageItems, added, warn, big,
         shown, active: act.length, left: n - act.length, pct,
     };
+}
+
+/**
+ * Mixed up (M2): each skill's total dealt over P pages. [[key, total]] → [[key, key, …] per page] (keys grouped per
+ * page; the engine interleaves them problem by problem).
+ *   1. a skill with total t sits on m = min(P, floor(t / 2)) pages (at least 1), in chunks within 1 of each other,
+ *      so every chunk is ≥ 2 when t ≥ 2;
+ *   2. chunks, largest first, go to the page with the least on it that does not hold that skill yet (ties rotate
+ *      with the seed), so the pages stay even and the skills rotate;
+ *   3. a page holding one skill takes a chunk of 2 from a skill with ≥ 4 on another page (every page mixed where
+ *      the totals allow), and a page over `per` hands problems to the lightest page where that keeps chunks ≥ 2.
+ * Exported for the gates.
+ */
+export function mixedPages(totals, P, per, seed = 0) {
+    const keys = totals.filter(([, t]) => t > 0);
+    const pages = Array.from({ length: Math.max(1, P) }, () => ({}));
+    const load = (pg) => Object.values(pg).reduce((a, b) => a + b, 0);
+    const rot = hash('rot' + seed) % pages.length;
+    const chunks = [];
+    keys.forEach(([k, t], ki) => {
+        const m = Math.max(1, Math.min(pages.length, Math.floor(t / 2)));
+        for (let j = 0; j < m; j++) chunks.push({ k, n: Math.floor(t / m) + (j < t % m ? 1 : 0), ki });
+    });
+    chunks.sort((a, b) => b.n - a.n || a.ki - b.ki);
+    for (const c of chunks) {
+        let best = -1;
+        for (let x = 0; x < pages.length; x++) {
+            const i = (x + rot + c.ki) % pages.length;
+            if (pages[i][c.k]) continue;
+            if (best < 0 || load(pages[i]) < load(pages[best])) best = i;
+        }
+        if (best < 0) best = (rot + c.ki) % pages.length;
+        pages[best][c.k] = (pages[best][c.k] || 0) + c.n;
+    }
+    // every page mixed where the totals allow
+    for (const pg of pages) {
+        if (Object.keys(pg).length >= 2 || keys.length < 2) continue;
+        const own = Object.keys(pg)[0];
+        for (const src of pages) {
+            if (src === pg) continue;
+            const k = Object.keys(src).filter((y) => y !== own && src[y] >= 4).sort((a, b) => src[b] - src[a])[0];
+            if (!k) continue;
+            src[k] -= 2; pg[k] = 2;
+            // keep the page even: hand back problems of its own skill where that keeps ≥ 2
+            if (pg[own] >= 4 && load(pg) > load(src) + 1) { pg[own] -= 2; src[own] = (src[own] || 0) + 2; }
+            break;
+        }
+    }
+    // no page over what a page holds, where a move keeps every chunk ≥ 2 (or adds to a chunk already there)
+    for (let guard = 0; guard < 200; guard++) {
+        const heavy = pages.reduce((b, pg) => (load(pg) > load(b) ? pg : b), pages[0]);
+        const light = pages.reduce((b, pg) => (load(pg) < load(b) ? pg : b), pages[0]);
+        if (load(heavy) <= per || load(heavy) - load(light) < 2) break;
+        const k = Object.keys(heavy).filter((y) => heavy[y] >= 3 && light[y]).sort((a, b) => heavy[b] - heavy[a])[0]
+            || Object.keys(heavy).filter((y) => heavy[y] >= 4 && load(heavy) - load(light) >= 4).sort((a, b) => heavy[b] - heavy[a])[0];
+        if (!k) break;
+        const n = light[k] ? 1 : 2;
+        heavy[k] -= n; light[k] = (light[k] || 0) + n;
+    }
+    return pages.map((pg) => keys.flatMap(([k]) => Array(pg[k] || 0).fill(k))).filter((pg) => pg.length);
 }

@@ -293,3 +293,5 @@ body.teacher-mode.tvs-open { overflow: hidden; }
 #teacherApp .tvs-often-ctl { display: inline-flex; align-items: center; gap: var(--sp-8); flex-wrap: wrap; min-width: 0; }
 #teacherApp .tvs-share-btn { font-family: var(--font-mono); white-space: nowrap; }
 #teacherApp .tvs-share-of { color: var(--text-2); }
+/* M2 (2026-10-31): the line under In sections | Mixed up that says what the choice does */
+#teacherApp .tvs-arrange-note { margin: var(--sp-8) 0 var(--sp-16); }

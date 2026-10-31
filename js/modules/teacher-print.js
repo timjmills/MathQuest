@@ -316,6 +316,7 @@ function onClick(e) {
             else root.querySelector(`[data-act="types"][data-sec="${d.sec}"]`)?.focus();
             break;
         }
+        case 'arrange': { const s = sec(d.sec); if (arrangeOf(s) !== d.v) { s.arrangement = d.v; renderWhat(); root.querySelector(`[data-act="arrange"][data-sec="${d.sec}"][data-v="${d.v}"]`)?.focus(); scheduleBuild(); } break; }
         case 'classic-build': buildClassic(); break;
         case 'classic-forms': exportForms(); break;
         case 'classic-opt': pr.classic[d.v] = !pr.classic[d.v]; renderSetup(); break;
@@ -412,6 +413,14 @@ function stretchBlocked(skills) {
     return ok ? '' : NO_STRETCH_REASON;
 }
 
+/* M2 (owner 2026-10-31): roles that take several skills print them In sections or Mixed up (req.arrangement). */
+const ARRANGE_ROLES = ['independent', 'more-practice', 'mixed-practice'];
+function arrangeOf(s) { return s.arrangement === 'mixed' || s.arrangement === 'sections' ? s.arrangement : (s.role === 'mixed-practice' ? 'mixed' : 'sections'); }
+function arrangeHTML(s, i) {
+    if (!ARRANGE_ROLES.includes(s.role) || s.skills.length < 2) return '';
+    const cur = arrangeOf(s);
+    return `<div class="tv-divided" data-tv-arrange="${i}"><span class="tv-label" id="tvArrL${i}">The skills on the page</span><div class="tv-seg" role="radiogroup" aria-labelledby="tvArrL${i}">${[['sections', 'In sections', 'Each skill in its own part'], ['mixed', 'Mixed up', 'Problems mixed one by one']].map(([v, t, sub]) => `<button type="button" role="radio" data-act="arrange" data-sec="${i}" data-v="${v}" aria-checked="${cur === v}" aria-label="${t}: ${sub}">${t}</button>`).join('')}</div><p class="tv-cap">${cur === 'mixed' ? 'Problems mixed one by one' : 'Each skill in its own part'}</p></div>`;
+}
 function sectionHTML(s, i) {
     const name = `Section ${String.fromCharCode(65 + i)}`;
     const sub = `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : s.role === 'lesson' ? ` · ${s.pages} practice page${s.pages === 1 ? '' : 's'}${s.mixed ? ' + mixed' : ''}` : ''}`;
@@ -504,6 +513,7 @@ function sectionHTML(s, i) {
     ${s.types ? `<div class="tv-ptype-groups" id="tvTypes${i}" role="radiogroup" aria-labelledby="tvRoleL${i}">${typeCards}</div>` : ''}
     ${whyNote}
   </div>
+  ${arrangeHTML(s, i)}
   ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div>${colsField}</div></div>${pagesField}`
         : `<div class="tv-fields-cols"><div>${colsField}</div>${pagesField}</div>`}
 </div>`;
@@ -871,6 +881,8 @@ function requestFor(s, i) {
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
         testHints: !!pr.testHints,
+        // M2: In sections | Mixed up, for the roles that take several skills (the role's default when not chosen)
+        arrangement: ARRANGE_ROLES.includes(s.role) && skills.length >= 2 ? arrangeOf(s) : undefined,
         key: { on: !!pr.key, placement: pr.keyPlace || 'end', style: pr.keyStyle || 'copy', newSheet: !!pr.keyNewSheet },
         seed: (pr.seed + i * 7919) >>> 0,
     };
@@ -1181,3 +1193,6 @@ onSkillSearchReady(() => {
         root.querySelectorAll('input[data-pick]').forEach((inp) => { if (inp.value.trim()) renderPickResults(Number(inp.dataset.pick), inp.value); });
     } catch (e) { /* screen gone */ }
 });
+
+// For checks (ws-teacher-arrangement): the requests this screen would send now.
+if (typeof window !== 'undefined') window.tvPrintChecks = { req: () => (pr ? currentReq() : null) };

@@ -626,6 +626,11 @@ export function makeShareLink(send, type = 'direct', lock = false) {
         decimals: s.decimals === '?' ? '?' : Number(s.decimals),
         quickStartLocked: lock ? 'locked' : '?',
     };
+    // M2 (2026-10-31): the set's arrangement as the appended W token (skill-codes.js): 'mixed' writes Wm, 'sections'
+    // writes nothing (every older code means sections). From the caller, else the arrangement the teacher chose on the print sheet.
+    let arr = s.arrangement;
+    if (!arr) { try { arr = typeof window !== 'undefined' && typeof window.tvSheetArrangement === 'function' ? window.tvSheetArrangement(true) : ''; } catch (e) { arr = ''; } }
+    if (arr === 'mixed') state.shareSettings.arrangement = 'mixed';
     state.shareLinkType = type === 'qs' ? 'quickstart' : 'direct';
     let link = '';
     try { link = window.generateShareableLink ? window.generateShareableLink() : ''; } catch (e) { link = ''; }
