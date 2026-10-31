@@ -6,7 +6,7 @@ Owner of files (M2): sheet/roles/mixed-practice.js, sheet/mixed-pack.js (new), s
 State: M2 STOPPED at critic r2 (§1.7: three defect classes survived two medium rounds) — root cause below, report to the lead
 Updated: 2026-10-31
 Builder profile: mq-opus-medium
-Critic rounds: M1 r1–r6 (PASS); M2 print r1 FAIL, r2 FAIL; M2 dialog check r1 FAIL, r2 see below
+Critic rounds: M1 r1–r6 (PASS); M2 print r1 FAIL, r2 FAIL; M2 dialog check r1 FAIL (7/7/7/8), r2 FAIL (7/8/6/8)
 
 ## Owner (2026-10-31, verbatim)
 "This practice by section is good BUT we also need practice with mixed problem — so both need to be options, mix by section
@@ -29,6 +29,19 @@ PASS: the owner's case (multiply + add facts) mixed one by one at S / M / L (all
 FAIL: half-empty last rows (2-digit × + facts S/M/L, I Can L; 3:37 at M ends page 1 with 1 problem in a 6-slot row);
 long runs without a true note (fractions + subtract S: 4 / 8 / 4 stripes); uneven spread of a small skill across pages;
 2-digit × answer rule 8–15 mm below the fact rule beside it; 2-digit × digits ≈ 60 % of the L fact digits; c-M 33 mm blank.
+
+## Dialog check r2 (b8b6211): FAIL — A 7 · B 8 · C 6 · D 8
+PASS: the two-way choice (and none for 1 skill, also on Quiz); Mixed up with facts at 12/8, 3/17, 2/18, 50 %, ten skills —
+1 page each, exact counts, mixed one by one, summary = printed; Pages mode with held counts; saved / reload; share `Wm` /
+no W; quiz order (longest run 2), printed quiz mixed; older print screen; every ws-teacher gate.
+FAIL: (1) In sections plans 3 pages and prints 4–5 (a part starting part-way down a page spills one cell; a page with no
+title); the summary then says "3 pages … printed on 4 pages"; In sections plans 8 facts a page (page 1 half empty).
+(2) a big-cell mix (add_facts + mult_2by2_standard) prints 10 + 10 right, but the built counts miss the legacy × cells, so
+the summary warns "the engine changed some counts". (3) big cells are not mixed one by one in print (the engine's runs, above).
+Survived two rounds: "summary = what prints" (r1 #4 → r2 #1). Root cause: the dialog plans pages with its own per-page
+guess (PER_PAGE) and learns capacity only for Mixed up; In sections pages come from the Independent role's own part
+pagination, which the plan does not model. Check required: for every In sections and big-cell case, built pages ===
+plan.pages, every page titled, built byKey === plan byKey (ws-teacher-arrangement has neither).
 
 ## Root cause (§1.7 stop)
 Survived two medium rounds: runs (r1 #3 → r2 #2), cross-template alignment (r1 #4 → r2 #4), wasted space / short rows
