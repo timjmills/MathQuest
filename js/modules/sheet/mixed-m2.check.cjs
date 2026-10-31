@@ -21,6 +21,11 @@
 //   align      cells of one template in one shelf row line up (first rule y, right edge, 0.3 mm)
 //   sections   a Sections page with counts prints them, whole shelves where a count across allows
 //
+// NOTE (§1.7 stop after critic r2): this file's runs (in turns, WARN above the cap), fill (per page budget) and align
+// (one template / first rule) are the packer's units and were softer than the critic. The HARD rules measured in what
+// the pupil sees are js/modules/sheet/mixed-m3.check.cjs (runs in problems, row fill, spread, cross-template align,
+// digit size, spare height); both run on ws-precritic --role mixed-practice. Do not relax either to get green.
+//
 //   node js/modules/sheet/mixed-m2.check.cjs [--quick] [--seeds 2] [--only a,b]
 // Prints `mixed-m2 check: OK` / `FAIL` and exits non-zero on a failure. Needs the preinstalled
 // Chromium (tests/lib/ws-harness.cjs; MQ_ROOT serves another tree, for the backtest).

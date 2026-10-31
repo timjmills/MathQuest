@@ -776,6 +776,117 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mixed-m3-runs",
+   "check": "Longest run of one skill counted in PROBLEMS in print order across pages; > 2 FAILS unless the weights force it (ceil(major/(minor+1))) AND the notes state it (M2 critic r2: fractions + subtract S stripes 4 / 8 / 4)",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkRuns (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/b8b6211-d-mixed-daily-S-seed-250230.fail.html",
+    "state": "d fractions:identify + subtraction:subtract, Mixed up Daily S seed 250230 at b8b6211: 4 fractions then 8 subtract in a row, no note"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/good.pass.html",
+    "state": "hand-made 2-page Mixed up print: 40 problems A A B, full 5-across rows, page 1 15 mm spare, identical fact cells"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks runs"
+  },
+  {
+   "id": "mixed-m3-rowfill",
+   "check": "Every row holds problems across >= 1/2 its width, trailing area <= 1/2, a non-last page ends in a full row (M2 critic r2: 3:37 at M ends page 1 with 1 problem in a 6-slot row)",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkRowFill (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/b8b6211-e-exact-3-37-daily-M-seed-469182.fail.html",
+    "state": "e exact 3:37 multiply + add_facts, Daily M seed 469182 at b8b6211: page 1 last row 16 % used"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/good.pass.html",
+    "state": "hand-made 2-page Mixed up print: 40 problems A A B, full 5-across rows, page 1 15 mm spare, identical fact cells"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks rowfill"
+  },
+  {
+   "id": "mixed-m3-spread",
+   "check": "A skill with fewer problems: consecutive gaps (print order, across pages) <= 1.5 x the even gap + 1 (M2 critic r2: uneven spread of a small skill)",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkSpread (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/b8b6211-c-mixed-daily-M-seed-722369.fail.html",
+    "state": "c add_facts + add_word_problems, Daily M seed 722369 at b8b6211: word problems 1 and 8 of 9 are 7 apart (even 3)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/good.pass.html",
+    "state": "hand-made 2-page Mixed up print: 40 problems A A B, full 5-across rows, page 1 15 mm spare, identical fact cells"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks spread"
+  },
+  {
+   "id": "mixed-m3-align",
+   "check": "Every stacked computation cell starting in one row, any template: first answer rule y within 1 mm (M2 critic r2: 2-digit x rule 8-15 mm below the fact rule beside it)",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkAlign (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/b8b6211-f-mixed-ican-L-seed-722369.fail.html",
+    "state": "f add_facts + mult_2by2_standard, I Can L seed 722369 at b8b6211: legacy stack rule 7.5 mm from the fact rule"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/good.pass.html",
+    "state": "hand-made 2-page Mixed up print: 40 problems A A B, full 5-across rows, page 1 15 mm spare, identical fact cells"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks align"
+  },
+  {
+   "id": "mixed-m3-digits",
+   "check": "Computation digit cap height within 10 % across every stacked cell on a page (M2 critic r2: 2-digit x digits a fraction of the L fact digits)",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkDigits (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/b8b6211-f-mixed-ican-L-seed-722369.fail.html",
+    "state": "f at b8b6211: legacy digits 5.6 mm vs fact 7.1 mm cap height (78 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/good.pass.html",
+    "state": "hand-made 2-page Mixed up print: 40 problems A A B, full 5-across rows, page 1 15 mm spare, identical fact cells"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks digits"
+  },
+  {
+   "id": "mixed-m3-spare",
+   "check": "Pupil body >= 85 % used and <= 25 mm blank under the lowest cell on fill pages and non-last pages (M2 critic r2: c-M 33 mm blank)",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkSpare (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/b8b6211-c-mixed-daily-M-seed-722369.fail.html",
+    "state": "c Daily M seed 722369 at b8b6211: 41 mm blank, body 83 % used"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/good.pass.html",
+    "state": "hand-made 2-page Mixed up print: 40 problems A A B, full 5-across rows, page 1 15 mm spare, identical fact cells"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks spare"
+  },
+  {
+   "id": "teacher-plan-match",
+   "check": "The Print sheet plan is what prints: built pages === plan.pages, every page titled, built byKey === plan byKey, summary page count === built after the build settles (M2 dialog check r2: In sections plans 3 prints 4-5, an untitled page, big-cell counts missing, \"printed on N pages\")",
+   "kind": "fixture",
+   "rule": "tests/scripts/ws-teacher-plan-match.cjs judgeScenario",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/dialog-r2-b8b6211.fail.json",
+    "state": "the dialog check r2 results at b8b6211 (17 scenarios; In sections 3 vs 4-5 pages, untitled pages, mult_2by2 0 of 10 counted)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m3/dialog-good.pass.json",
+    "state": "the same scenarios hand-corrected: built = plan, titled pages, summary = built"
+   },
+   "command": "node tests/scripts/ws-teacher-plan-match.cjs --fixture {fixture}"
   }
  ]
 }
