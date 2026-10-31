@@ -3,10 +3,10 @@ Title: Answer boxes option (`ansBox`, 6Q) — rebuild after critic r1
 Session: https://claude.ai/code/session_013pHDnQH6J4KjmE36BoiAsM
 Branch: claude/sweet-newton-c8wrv1-ansbox-wip
 Owner of files: js/modules/screen-cell.js + css/screen-cell.css (answer-box rules), css/sheet-kit.css (answer-box rules), js/modules/print-sheet.js legacyKeyFill / markSectionAnsBand, js/modules/print-generate.js wsStackHTML / "= ?" slot, js/modules/skill-options.js offeredAnsBox, tests/scripts/ws-ansbox-*.{cjs,mjs}
-State: fix (r2 built, waiting for critic r2)
+State: fix r3 (re-brief after the r2 loop stop): built, NOT ready for critic (full cross product still red, see r3)
 Updated: 2026-10-31
 Builder profile: mq-opus-medium (rebuild after a failed critic round)
-Critic rounds: 1, FAIL (lowest O6 = 3; print P = 5 on the fact template)
+Critic rounds: 2, FAIL (r1 O6 = 3; r2 C2 = 3, loop stopped); r3 = fresh builder, mq-opus-medium
 
 ## Now
 - r2 fixes and the six new checks are committed; every check is backtested (fail on b63c075, pass on the fix).
@@ -125,3 +125,64 @@ r2 also found three new problems:
 - **Decide (owner or lead):** SL-3 on the review pages of passed skills. Either keep the old line/ansrow drawing when ansBox is untouched, or accept the change and re-grade those 7 skills.
 - **Checks first:** `ws-ansbox-shape` iterates every notation / divForm / layout value × every offered ansBox value × S/M/L × all four hosts (pupil, key, card+quiz, worksheet). Check f counts a 4-sided focus ring as a box. Add an H13 band check on teacher values. `ws-options-verify --render` lists ansBox, or reports it as SKIPPED. `ws-ansbox-default-parity` measures against `git merge-base HEAD origin/claude/sweet-newton-c8wrv1` and refuses `--write` on any other base.
 - **Then** one answer-slot function per template that takes (ansBox, notation, size, host) and returns the box geometry. Pupil, key and screen all render from it, replacing the per-host CSS overrides.
+
+## r3 (2026-10-31, fresh builder, mq-opus-medium, re-brief after the r2 loop stop)
+
+Lead decisions applied: **SL-3** - Automatic (option untouched) draws the OLD drawing (line / open answer row / the screen's
+own box), byte- and pixel-identical to `git merge-base` (5c6063a). Parity is a gate against merge-base, never a lane commit.
+
+### What changed
+- **One answer-slot model**: `js/modules/sheet/ans-slot.js` (pure). `offeredAnsValues(layout, key)` (a value is offered only
+  where it draws something Automatic does not, on every host), `effectiveAnsBox` (a value not offered draws Automatic; stamped
+  on the item in `generate-question.js`), `ansSlot(value, {digits, band, hwMm, blankMm})` (box count, box width >= 0.82 em and
+  >= 0.75 x writing height, height >= 1.15 em, key ink 1 em), `ansSlotEm` (the across fact's fit), `ansBoxApplies(look, key)`
+  (long division and a stacked add_three: the option draws nothing; checks print N/A). Print pupil (`print-generate.js`
+  wsStackHTML / wsAnswerLine, `cell.js` styledAnswerSlot, `fact.js`), print key (`print-sheet.js` legacyKeyFill one-box
+  branches) and screen (`screen-cell.js` withAnsBox: Automatic returns the old kind unchanged) read it.
+- **Offered now**: kit column = One box (+ Off on the 7 columns whose generator draws the strip itself); legacy column = One
+  box; fact / equation / legacy fact = One box per digit; add_three, missing_* = One box per digit; mixed pools none.
+  "One box" on a fact / equation equals the screen's own box and "Off" equals paper's plain line, so they are not offered
+  (this drops the owner's SL-3 paper box on facts / equations while Automatic stays the old drawing: **lead decision needed**).
+- Lane rules that restyled Automatic were scoped to a teacher value's class or removed (sheet-kit.css `.ws-line` box, fact
+  zone box, legacy horizontal box; screen-cell.css `.mq-scell input.mq-slot` box + grey wash, `.answer-blank-inline`,
+  `.ws-line`, kit-twin slot box). word-work.js, frame.js and layout.js are main's again. Main's rules untouched.
+- r2 #1 fact across S: boxes from ans-slot.js (1.15 em tall, >= 0.82 em wide); #2 Off ring: Off not offered where it equals
+  Automatic on a host; #3 worksheet band: `worksheet.js` `_wsDealAndDraw` deals a 'digit' set first, `_wsMarkAnsBand` gives
+  every card the set's widest strip (Automatic keeps the old deal-draw order); #4 H13: the legacy one-box keeps the zone's
+  place and height (gap taken from the zone); #5 parity: OK (below); #6 render findings: within main (below); #7 no wrap
+  before "=" (`.ws-eq.mq-eq:has(.mq-eqdigits)` nowrap).
+
+### Checks (step 1)
+- `ws-ansbox-shape`: cross product (every notation / divForm / layout value x every offered value + Automatic x size x
+  host); f reads AS SHOWN, FOCUSED (first box) and AT REST, a 4-sided outline or outer ring counts as a box; c also needs a
+  digit box >= 0.85 em tall (undersized boxes are read as boxes); e runs on the online worksheet (one count per set) and
+  flags a wrap before "="; new g = H13 band vs Automatic; N/A looks printed. `--full` = all 70 skills, S/M/L, screen hosts
+  on every look; default = the lane sample.
+- `ws-options-verify --render` now loads `skill-ansbox-skills.js` (ansBox was silently absent) and lists a non-offered
+  ansBox as skipped (rule h).
+- `ws-ansbox-default-parity`: renders merge-base in a temp worktree and this tree; HTML + screenshot of every page (roles
+  independent / more-practice / review x S/M/L, pupil + key), the practice card, the online worksheet card and the quiz cell;
+  `--write` refused unless HEAD is on main; on `ws-precritic --skill` as `ansbox-parity`.
+- `ws-render-delta` (new): options-render findings of the tree within merge-base's; on precritic as `render-delta`.
+- Backtests (`ws-backtest --row ansbox-r3-*`, fail 9d5c221 -> pass 34c960f): r3-1 fact across S FAIL->PASS (after the c
+  height rule), r3-2 off ring FAIL->PASS, r3-3 worksheet band FAIL->PASS, r3-4 H13 FAIL->PASS, r3-5 parity FAIL->PASS,
+  r3-6a render across FAIL->PASS, r3-6b render capacity FAIL->PASS, r3-7 no wrap FAIL->PASS. `ws-precritic-plan`: OK (34 rows
+  on the path).
+
+### Gates (step 3; main has not moved: merge-base = origin main 5c6063a)
+- `ws-ansbox-default-parity --skills ansbox` (70 skills): **OK (2310 documents byte-identical to merge-base 5c6063a)**;
+  default (7 passed skills): OK.
+- `ws-boot-smoke` OK; `ws-code-snapshot` OK (731 codes); `ws-stamp-assets` stamp + `--check` OK; `node --input-type=module
+  --check` on every changed module OK.
+- `ws-ansbox-shape` lane sample: OK (14 skills). **`--full`: FAIL (194)** on 7c491cc - NOT FIXED, see below.
+- `ws-render-delta` add_facts + add_sub_10s S/L: OK after the 0.75 box width (at 0.95: add_sub_10s L digit H13 rise).
+- precritic: see the r3 precritic line below.
+
+### Not fixed (the full cross product, `ws-ansbox-shape --full`, 194 findings on 7c491cc)
+- f, 144: notation=across on column skills - the across item's screen answer is already one box, so "One box" equals
+  Automatic there (and `addition:add` across: per digit not drawn on screen). Needs a decision: an across look offers no
+  "One box", or the panel is per look.
+- f, 18: one-place answers at rest (Automatic's strip of ONE box = "One box"); an exemption like the (one, digit) pair's.
+- f, 8: div_facts divForm=mix screen, mult_zeros stacked screen (per digit not honoured on screen).
+- g, 17: legacy columns 'one' on add/sub_10/20_no_regroup and equal_sign, multiply / missing_* 'digit': emptier band than Automatic.
+- e, 7: div_facts divForm=mix (long-division items keep their vinculum: 0 digit boxes), missing_mult_div notation=fraction 2/3.
