@@ -608,6 +608,11 @@ const PARSE = {
     },
 };
 
+/** The skills that offer the answer-box option (js/modules/skill-ansbox-skills.js, generated), as cat:skill keys. */
+function ansBoxKeys() {
+    try { return [...fs.readFileSync(path.join(ROOT, 'js/modules/skill-ansbox-skills.js'), 'utf8').matchAll(/^\s*'([a-z_]+:[a-z0-9_]+)':\s*'/gm)].map((m) => m[1]); } catch (e) { return []; }
+}
+
 /* ============================================================== plan */
 function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
@@ -632,6 +637,11 @@ function buildPlan(ctx) {
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(','), ...catArg], { parse: PARSE.contentAudit, note: extraNote, expect: { skills: keys.length } }));
         const ovJson = path.join(ctx.logs, 'options-verify.json');
         add(gate('options-verify', 'ws-options-verify --skill', scope, 'browser', 'ws-options-verify', ['--skill', ids.join(','), ...catArg, '--deadline', OV_DEADLINE, '--json', ovJson], { parse: PARSE.optionsVerify, jsonOut: ovJson, keys }));
+        // ansBox rebuild r2 (critic 2026-10-30 ansbox r1): the answer-box option is measured on the RENDERED page and
+        // screens - key = pupil boxes, digit box >= digit track, key digits >= 0.9 x question, one box count per
+        // section, no two offered values alike on any host - for every scope skill that offers it
+        const abKeys = ansBoxKeys().filter((k) => keys.includes(k));
+        if (abKeys.length) add(gate('ansbox-shape', 'ws-ansbox-shape (answer boxes: key = pupil, digit width, key digit size, one band, no two values alike)', abKeys.length <= 3 ? abKeys.join(', ') : `${abKeys.length} answer-box skills`, 'browser', 'ws-ansbox-shape', ['--skill', abKeys.join(',')], { expect: { mention: abKeys } }));
         const presetTouch = skills.filter((s) => s.preset || s.hosts);
         if (presetTouch.length) add(gate('presets', 'ws-presets-unit', `${presetTouch.length} preset / host skill(s)`, 'browser', 'ws-presets-unit', []));
         // critic 2026-10-30 (WRM Y4 lessons F1, GATE-DRIFT): a skill, option or preset change can turn a site-lesson claim false;

@@ -446,7 +446,13 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         if (BEHAVIOUR[def.id]) { for (const v of BEHAVIOUR[def.id]) tries.push({ def, value: v, behaviour: true }); continue; }
         // ANSWER BOXES (Wave 1 lane B, owner ruling 2026-10-02): `ansBox` restyles the answer place
         // only. Every value is tried (automatic already equals one of them on each layout).
-        if (def.id === 'ansBox') { for (const v of ['digit', 'one', 'off']) tries.push({ def, value: v, ansBox: true }); continue; }
+        // Only the OFFERED values (rebuild r2: a layout's duplicate of automatic is not offered); the last
+        // one tried compares every value's card drawing (abLast).
+        if (def.id === 'ansBox') {
+            const abVals = (def.values || []).map(x => x.v).filter(v => v === 'digit' || v === 'one' || v === 'off');
+            abVals.forEach((v, i) => tries.push({ def, value: v, ansBox: true, abLast: i === abVals.length - 1 }));
+            continue;
+        }
         if (supDef && (def.id === 'cover' || def.id === 'mix')) {
             const base = supportBase(def.id);
             for (const x of def.values) if (JSON.stringify(x.v) !== JSON.stringify(def.default)) tries.push({ def, value: x.v, vl: x.l, base, renderOnly: true });
@@ -650,6 +656,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                 W.clearSetOptions({ silent: true });
                 W.setSetOptions(categoryId, skillId, opts, { silent: true });
                 st.category = categoryId; st.skill = skillId; st.range = APP_RANGE; st.skillOptions = null; st.gameMode = 'practice'; st.quizMode = false; st.isMixedMode = false; st.hasAnswered = false;
+                if (W.__wsReseed) W.__wsReseed(baseSeed);   // the same item for every value, so only the drawing differs
                 const q = W.generateQuestion();
                 if (!q || q.ansBox !== value) fail('screen/practice', `the question does not carry ansBox=${value} from the store`);
                 else {
@@ -663,13 +670,31 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
                         if (value === 'digit' && !has('input.mq-digit')) fail('screen/practice', 'ansBox digit: the card has no digit boxes');
                         if (value === 'off' && !has('.mq-ansoff, .mq-ans-off')) fail('screen/practice', 'ansBox off: the card still boxes the answer');
                         if (value === 'one' && (has('.mq-ansoff, .mq-ans-off') || (kind.kind === 'stack' && !has('.mq-ans-one')))) fail('screen/practice', 'ansBox one: the card does not draw one box');
-                        // the three values must LOOK different: the computed edges of the answer places
-                        abSig[value] = Array.from(card.querySelectorAll('input')).filter(e => e.getBoundingClientRect().width > 0 && !e.classList.contains('mq-carry'))
-                            .map(e => { const cs = getComputedStyle(e); return [cs.borderTopWidth, cs.borderTopStyle, cs.borderTopColor, cs.borderLeftWidth, cs.borderBottomWidth, cs.borderBottomColor, cs.boxShadow].join(' '); }).join('|');
-                        if (value === 'off' && abSig.digit !== undefined && abSig.one !== undefined) {
-                            const kindName = kind.kind;
-                            if (abSig.off === abSig.one || abSig.off === abSig.digit || (kindName === 'stack' && abSig.one === abSig.digit))
-                                fail('screen/practice', `ansBox: the card draws the same answer place for two values (${['digit', 'one', 'off'].filter(v => Object.values(abSig).filter(x => x === abSig[v]).length > 1).join(' = ')})`);
+                        // the values must LOOK different: the computed edges of the answer places (rebuild r2,
+                        // critic r1: the old signature read the ANIMATED focus shadow, so two values never
+                        // compared equal and identical drawings passed). Read with animations and
+                        // transitions off, twice: AS SHOWN (the next box marked, frozen at rest) and AT REST
+                        // UNFOCUSED (no caret, no next-box pulse: active-box.js skips [data-mq-no-pulse]).
+                        if (!document.getElementById('__abNoAnim')) { const stl = document.createElement('style'); stl.id = '__abNoAnim'; stl.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}'; document.head.appendChild(stl); }
+                        // `animation: none !important` alone loses to the next-box glow's own `!important` rule (higher
+                        // specificity), so every running animation is also frozen at its start before a read
+                        const freeze = () => { try { document.getAnimations().forEach(a => { a.pause(); a.currentTime = 0; }); } catch (e) { /* no WAAPI */ } };
+                        const look = () => (freeze(), Array.from(card.querySelectorAll('input'))).filter(e => e.type !== 'hidden' && e.getBoundingClientRect().width > 0 && !e.classList.contains('mq-carry'))
+                            .map(e => { const cs = getComputedStyle(e); const b = e.getBoundingClientRect(); return [Math.round(b.width), Math.round(b.height), ...['Top', 'Right', 'Bottom', 'Left'].map(sd => `${cs[`border${sd}Width`]} ${cs[`border${sd}Style`]} ${cs[`border${sd}Color`]}`), cs.boxShadow, `${cs.outlineStyle} ${cs.outlineWidth} ${cs.outlineColor}`, cs.backgroundColor].join(' '); }).join('|')
+                            + ' #' + Array.from(card.querySelectorAll('.mq-ansoff, [data-ws-shape="line"]')).length;
+                        await new Promise(res => setTimeout(res, 40));
+                        const shownSig = look();
+                        card.setAttribute('data-mq-no-pulse', '1');
+                        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+                        card.querySelectorAll('.mq-active-box').forEach(e => e.classList.remove('mq-active-box'));
+                        await new Promise(res => setTimeout(res, 40));
+                        abSig[value] = { shown: shownSig, rest: look() };
+                        card.removeAttribute('data-mq-no-pulse');
+                        if (t.abLast) {
+                            const seen = Object.keys(abSig);
+                            const same = [];
+                            for (let i = 0; i < seen.length; i++) for (let j = i + 1; j < seen.length; j++) for (const st0 of ['shown', 'rest']) if (abSig[seen[i]][st0] === abSig[seen[j]][st0]) same.push(`${seen[i]} = ${seen[j]} (${st0 === 'shown' ? 'as shown' : 'at rest, unfocused'})`);
+                            if (same.length) fail('screen/practice', `ansBox: the card draws the same answer place for two values (${same.join(', ')})`);
                         }
                     }
                 }
