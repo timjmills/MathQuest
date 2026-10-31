@@ -6,7 +6,7 @@ Owner of files: design/audit/VISUAL_QUALITY.md, design/audit/runs/visual-quality
 State: critic r2 pending
 Updated: 2026-10-31
 Builder profile: mq-opus-medium
-Critic rounds: 1, FAIL (min 5); fix r2 ready for critic r2
+Critic rounds: 2, FAIL (r2 min 4: option-on lesson overflow); fix r2 ready for critic r2
 
 ## Now
 - Phase 1 done: `design/audit/VISUAL_QUALITY.md` (17 skills rendered, 9 root causes, census: 52 % of skills have no kit cell, 21 of 32 relation skills undrawn).
@@ -42,5 +42,6 @@ Critic rounds: 1, FAIL (min 5); fix r2 ready for critic r2
 - Phase 2: checks + guidance 11:09–12:15; library + fixes 11:10–13:00 (6.7 h agent wall incl. browser waits); precritic clean-up fixer 13:05–15:00; critic r1 15:18–15:37.
 
 ## Spend
+- $149.33 ≈ 5.3 % after critic r2; lead hard cap: $60 more from 18:57 (one fix round + one final critic).
 - $134.33 ≈ 4.8 % after fix r2.
 - $68.72 ≈ 2.5 % of the weekly limit at critic r1 start (cap $220 ≈ 8 %).
