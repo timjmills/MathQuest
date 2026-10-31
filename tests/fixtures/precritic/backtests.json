@@ -1016,6 +1016,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "support-fact-x-laned",
+   "check": "With several supports on, a ÷ fact section keeps one fact zone: the answer line and the supports at one x in every cell (Lane D restart critic r3 R3-1: Test S --supports all centred sign box + fact + support per row, the answer zone moved 69.0 vs 86.4 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-SUPPORT SCC-T10",
+   "browser": true,
+   "fail": {
+    "commit": "da684125",
+    "state": "critic r3 FAIL commit: div_facts Test S --supports all, each row's group centred, answer zone 69.0 vs 86.4 mm"
+   },
+   "pass": {
+    "commit": "a3fd6947",
+    "state": "R3-1 fix: widest-fact zone (144 ÷ 12) per section, answer right-aligned in it, supports left-aligned beside"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles test --supports all --size S",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

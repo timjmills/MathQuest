@@ -381,6 +381,34 @@ after-r3-mixed-facts-S-c10-s4242.png (+ - x ÷long, 56 printed = 8 x 7 = Score /
 after-r3-mixed-add-mult-S-auto-s4242.png (56 / 56); after-r3-probe-add-S.png (20th across fact in column 1, remainder
 unruled); after-r3-probe-div-mix-L.png (20 / 20); after-r3-think-boxsign-S.png (one placement, text inside the box).
 
+### R3-1 fix (2026-10-31, fix builder, Opus medium: rebuild of critic-r3-failed work)
+**Root cause:** two centrings. (1) At Size S the touch dots force the problem to L inside a `ws-L` wrapper (print-sheet.js);
+that wrapper was a shrink-wrapped flex item of the cell, so the full-width supported problem (`ws-supported` width 100 %)
+collapsed to its content and each row re-centred by its own sign box + fact + support width (fact left edge 157 / 212 / 233 px).
+(2) Even full-width, the support column started right after each fact and centred its rows, so the pictures and the think cue
+moved with the fact's width and the reserved (hidden) array of each fact.
+**Fix (a3fd6947):** print-sheet.js keeps a full-width supported problem full-width through the forced-size wrapper.
+registry.js hands support-draw.js the widest fact of the set (144 ÷ 12, the R2-4 reference) drawn as a ghost; support-draw.js,
+for a ÷ fact on paper with supports beside it, overlays the item on that unseen ghost (`ws-fact-zone`, answer right-aligned in
+it, so the answer line stands at one x), keeps the sign box before it left-anchored, left-aligns every support row beside it and
+puts the think cue's row first (a tall array no longer pushes it down). Digits unchanged (no shrink). The ghost has its
+`data-ws-*` attributes renamed (no second slot) and is `aria-hidden`.
+**Check:** precritic `print-lint-supports-S` now runs `--roles independent,more-practice,test,review`, and a row per single
+support (`print-lint-supports-<id>-S`, each fact skill that offers it). Backtest `support-fact-x-laned` (L-SUPPORT SCC-T10):
+FAIL on da684125, OK on a3fd6947.
+**Lint (div_facts, roles test, independent, more-practice, review):** SCC-T10 0 everywhere (was 1 at S all; 1 at S skip). Every
+remaining finding is on da684125 too (base runs in brackets), surfaced because the row now runs single supports and more roles:
+RP-1 "the skip support shows the answer" (a ÷ b with b = quotient or the quotient in b's skip strip: 12 ÷ 2 shows 6) on all /
+skip; GRID-EVEN skip S / M (cell 19 / 16); H13 array S / M / L (the row sized for the tallest array); CL40-INK skip L ("110"
+at 6.5 mm). add / sub / mult `--supports all` test + independent S: 0. These are not R3-1 and are left for the lead / critic.
+PNG: design/status/laned-restart/after-r3b-div_facts-test-supports-S.png (150 dpi, seed 805715, the critic's page).
+Gates: ws-layout-unit OK (1758), ws-print-lint --self-test OK (86 / 74), ws-boot-smoke OK, ws-screen-answer div_facts OK,
+ws-backtest support-fact-x-laned PASS. Precritic `--skill division:div_facts --strict` once (/tmp/mq-precritic/20261031-222943-19128):
+**10 FAIL, 33 PASS, 2 SKIPPED of 45.** Every FAIL is main-red / pinned per the Round 3 table (divForm long L: Mixed practice H13 cell 8
+28.5 mm + Review CL40-INK R1-11; slot-clip sections/defaults L CLIP 6; options-verify --render; dealer-uniform; node-lint LESSON-DATA;
+sibling-compare) or one of the three NEW supports rows (all / skip / array at S), whose findings are all on da684125 (RP-1 skip strip,
+GRID-EVEN skip, H13 array) and none SCC-T10; touch / think / boxsign rows PASS.
+
 ## HAND-OVER 3 (2026-10-31, after critic r3)
 
 **Critic r3 (design/audit/runs/laned-restart/critic-r3.md): PASS add_facts, sub_facts, mult_facts, div_facts_long (lowest 8);
