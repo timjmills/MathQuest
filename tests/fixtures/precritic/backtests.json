@@ -776,6 +776,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pre-skill-prereqs",
+   "check": "Pre-skill check tests the skill's prerequisites on a full page (shared-roles critic r1 R1-8: 4 items of the skill itself, page 80 % blank)",
+   "kind": "commit-pair",
+   "rule": "ws-columns --roles pre-skill-check: one scored group a prerequisite skill (>= 3), never the page's own skill or its host, page 1 >= 50 % used, <= 2 pages (+1 a skill taller than half a page), key pages = pupil pages",
+   "browser": true,
+   "fail": {
+    "commit": "512542a",
+    "state": "shared-roles lane start: div_facts checks itself, one band of 4"
+   },
+   "pass": {
+    "commit": "01ec9c2",
+    "state": "builder B: share_into_groups, count_by_tables, mult_facts, double"
+   },
+   "command": "node tests/scripts/ws-columns.cjs --roles pre-skill-check --skills division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pre-skill-pagefill",
+   "check": "Pre-skill check page fill floor (shared-roles critic r1 R1-8: page 80 % blank)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL-PRE: a pre-skill check's items run down >= 50 % of the body",
+   "browser": true,
+   "fail": {
+    "commit": "512542a",
+    "state": "shared-roles lane start: div_facts L, one band of 4 at the top"
+   },
+   "pass": {
+    "commit": "01ec9c2",
+    "state": "builder B: quadrants and bands fill the page"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles pre-skill-check --skills division:div_facts --size L --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
