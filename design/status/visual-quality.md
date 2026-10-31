@@ -6,7 +6,7 @@ Owner of files: design/audit/VISUAL_QUALITY.md, design/audit/runs/visual-quality
 State: critic r2 pending
 Updated: 2026-10-31
 Builder profile: mq-opus-medium
-Critic rounds: 2, FAIL (r2 min 4: option-on lesson overflow); fix r2 ready for critic r2
+Critic rounds: 3, FAIL (r3: one page below 8 — Reason-It at L, C3 5)
 
 ## Now
 - Phase 1 done: `design/audit/VISUAL_QUALITY.md` (17 skills rendered, 9 root causes, census: 52 % of skills have no kit cell, 21 of 32 relation skills undrawn).
@@ -25,6 +25,30 @@ Critic rounds: 2, FAIL (r2 min 4: option-on lesson overflow); fix r2 ready for c
   card-rulings / card-not-offered (no signed spec card: owner action).
 
 ## Owner go
+
+
+## Hand-over (2026-10-31, lead budget cap reached: one fix round + one final critic used)
+
+**Verdict: not passed.** Critic r3 (`design/audit/runs/visual-quality/critic-r3.md`): every pass-bar page and every screen host
+of the 9 skills is ≥ 8 (r2 grades + r3 spot checks; N1–N4 fixed; 56 key items checked by hand). ONE page fails:
+**Reason-It at L** for the sentence-layout stories (sub_wp_20, add_wp_20_plain …): C3 5 / C2 7 — after N4 drew B under A,
+each panel repeats the story and L holds one item (H5 lone item, 33.6 % band, finding N12).
+Nothing is added to `js/modules/redesign-passed.js`.
+
+**Next (one small fix round, Opus medium, then a narrow critic on Reason-It S/M/L + the key):**
+1. N12: in `js/modules/sheet/roles/reason-it.js` (the sentence-layout branch added in 11a6ced) print the story ONCE at the
+   top of the item and the A and B number sentences under it, so L holds ≥ 2 items; render reason-it at S, M and L.
+2. Then precritic `--strict` on add_wp_20_plain and fact_family_sort (only sibling-compare + unsigned card may stay non-green),
+   the critic, and on PASS add the 9 skills to `redesign-passed.js` with the evidence line.
+
+**Owner actions:**
+- Sign `design/cards/family-check/family-check.md` (family-check cell, sentence layout, familyChart) — 81 decisions marked
+  PROPOSED. Lead rulings on it to confirm: part-whole bar drawn on teaching pages and an option (default off) on practice
+  pages; familyChart default off and off on the lesson packet; `wpCues` / `wpBank` hidden on the 8 story skills (P-21).
+- Before deploy: `node tests/scripts/ws-stamp-assets.cjs` (screen-cell.css changed).
+
+**Advisory leftovers (not blocking):** r2 F14 half (scripted-model frames), F18, F20 (see critic-r2.md); groups of 8–9 in the
+add_wp_10 picture still use the row of five (taller row).
 
 ## Owner design list
 - 2026-10-31 (owner, via lead): "on these for extra help option have it show blank number family chart so students can fill it in to answer." → `familyChart: off | on` on family-check (default off): a blank 4-sentence family chart under the triangle, ungraded working boxes on paper and screen, key fills it for true families. Queued (rule 0); built after fix round 2, before critic r2. Also: draft the spec card (family-check + sentence + familyChart) for the owner to sign.
