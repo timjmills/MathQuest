@@ -1255,7 +1255,8 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
             const odl = await page.evaluate((link) => window.parseSkillCodeParts((new URL(link).searchParams.get('c') || '').split('|')[0]).map((s) => s.opts || {}), u);
             const lost = await page.evaluate(async (used, odl) => {
               const c = await import('./js/modules/skill-option-codec.js');
-              return used.map((x, i) => [x, i]).filter(([x]) => x.opts).filter(([x, i]) => { const [cat, id] = x.key.split(':'); return c.encodeOptionPayload(cat, id, x.opts) !== c.encodeOptionPayload(cat, id, odl[i] || {}); }).map(([x, i]) => `${x.key}#${i}`);
+              // every use, a use at its defaults against {} (checker D1: a default use took another use's options)
+              return used.map((x, i) => [x, i]).filter(([x, i]) => { const [cat, id] = x.key.split(':'); return c.encodeOptionPayload(cat, id, x.opts || {}) !== c.encodeOptionPayload(cat, id, odl[i] || {}); }).map(([x, i]) => `${x.key}#${i}`);
             }, r.used, odl);
             check(!lost.length, `${vw} detailed ${r.id}: options lost in the link: ${lost.join(', ')}`);
             // Make it: the Print worksheets screen, "Lesson: detailed", this lesson

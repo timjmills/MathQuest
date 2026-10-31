@@ -21,7 +21,8 @@ registerSkillOptionsHost('queue', {
 
 // `list` (optional): an explicit array of {categoryId, skillId, weight, opts} to encode instead of the
 // queue. The queue holds each skill once; a detailed lesson can use one skill twice with different
-// options, and each use must keep its own options (its `opts` wins over the set's option store).
+// options, and each use must keep its own options (its `opts`, or the defaults when it has none; the
+// set's option store is not read).
 export function generateSkillCode(list) {
     const src = Array.isArray(list) ? list : window.skillQueue;
     if (src.length === 0) return '---';
@@ -33,7 +34,9 @@ export function generateSkillCode(list) {
         if (code) {
             // Add weight if not 0
             const weight = skill.weight || 0;
-            const own = Array.isArray(list) && skill.opts && typeof skill.opts === 'object' ? skill.opts : null;
+            // An explicit list is the whole truth: a use with no `opts` is at its defaults, never the store's
+            // (which holds one option set per skill, so a repeated skill's other use would leak in).
+            const own = Array.isArray(list) ? (skill.opts && typeof skill.opts === 'object' ? skill.opts : {}) : null;
             const opts = optionSuffix(skill.categoryId, skill.skillId, own || getSetOptions(skill.categoryId, skill.skillId));
             if (weight > 0 && weight !== 1) {
                 parts.push(code + weight + opts);

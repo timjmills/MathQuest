@@ -162,6 +162,8 @@ export const UnifiedSkills = {
             // Sync to state.mixedModeSettings
             if (!state.mixedModeSettings) state.mixedModeSettings = {};
             state.mixedModeSettings.selectedSkills = this.getAsSelectedSkills();
+            // a link's repeated uses hold only while the queue is still the set the link loaded
+            if (state.mixedModeSettings.uses && !queueUsesInPlay(this.skills)) delete state.mixedModeSettings.uses;
             state.mixedModeSettings.name = `Custom Practice (${this.count} skills)`;
 
             // Sync to print settings

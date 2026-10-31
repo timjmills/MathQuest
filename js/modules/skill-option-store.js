@@ -102,22 +102,30 @@ export function describeSetOptions(categoryId, skillId) {
 // The set holds each skill once and the store above keys options by skill, so a link that uses one
 // skill several times with different options ("placevalue:value" six times in lesson 6) cannot live
 // in the queue alone. The decoded link's uses are kept here, in order, each with its own options;
-// mixed play deals them use by use (generate-question.js, custom_mixed). Only a code that REPEATS a
-// skill records uses: a link without repeats plays exactly as before.
+// mixed play deals them use by use (generate-question.js, custom_mixed). Only a code that repeats a
+// skill WITH DIFFERENT OPTIONS records uses: any other code plays exactly as before.
 //
 // The uses are honoured only while the queue is still the set the link loaded: the same skills in
 // the same order, and each skill's first use's options still the store's. Any later change to the
-// set (a skill added or removed, an option edited, another set loaded) leaves them stale; ignored.
+// set (a skill added or removed, an option edited, another set loaded) leaves them stale: the queue's
+// sync drops them from the mixed settings, and the dealer re-checks before every item.
 
 const _ukey = (u) => `${u.categoryId}:${u.skillId}`;
 
-/** Record the uses of a just-loaded code ([{categoryId, skillId, opts}]); null unless a skill repeats. */
+/** Record the uses of a just-loaded code ([{categoryId, skillId, opts}]); null unless a repeated skill's options differ. */
 export function setQueueUses(list) {
     const uses = Array.isArray(list) ? list.filter((u) => u && u.categoryId && u.skillId) : [];
-    const keys = uses.map(_ukey);
-    state.queueUses = new Set(keys).size < keys.length
-        ? uses.map((u) => ({ categoryId: u.categoryId, skillId: u.skillId, opts: packOptions(u.categoryId, u.skillId, u.opts && typeof u.opts === 'object' ? u.opts : {}) }))
-        : null;
+    const packed = uses.map((u) => ({ categoryId: u.categoryId, skillId: u.skillId, opts: packOptions(u.categoryId, u.skillId, u.opts && typeof u.opts === 'object' ? u.opts : {}) }));
+    // Only a skill used twice with DIFFERENT options needs its uses: identical repeats (XX2-XX4-YY)
+    // collapse into one queue row, as they always did.
+    const seen = new Map();
+    let differ = false;
+    for (const u of packed) {
+        const k = _ukey(u), o = JSON.stringify(u.opts);
+        if (seen.has(k) && seen.get(k) !== o) { differ = true; break; }
+        if (!seen.has(k)) seen.set(k, o);
+    }
+    state.queueUses = differ ? packed : null;
     return state.queueUses;
 }
 
