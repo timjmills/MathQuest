@@ -811,7 +811,87 @@
     "commit": "c072216d",
     "state": "decoded uses ride as mixedModeSettings.uses; custom_mixed deals them from a deck, each with its own options"
    },
-   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value",
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage play",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "link-default-use",
+   "check": "A Practice link that repeats a skill with one use at its defaults encodes that use as {} ([A{opts}, A] and [A, A{opts}] decode to two different parts); every lesson link decodes use by use, default uses included",
+   "kind": "commit-pair",
+   "rule": "sharelink checker D1: generateSkillCode(list) fell back to the option store for a use with no opts",
+   "browser": true,
+   "fail": {
+    "commit": "7666cb47",
+    "state": "both parts decode to {band:9999, form:times}"
+   },
+   "pass": {
+    "commit": "8a31e1e8",
+    "state": "an explicit list never reads the store: a use with no opts is {}"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage codec",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "link-stale-uses",
+   "check": "After a link session the pupil removes a skill or edits an option and plays with last settings: no item of the removed skill, the edit honoured, the link's uses dropped",
+   "kind": "commit-pair",
+   "rule": "sharelink checker D2: mixedModeSettings.uses survived the queue's sync and replayed",
+   "browser": true,
+   "fail": {
+    "commit": "7666cb47",
+    "state": "14 stale uses in play; the removed skill dealt; the edited options ignored"
+   },
+   "pass": {
+    "commit": "8a31e1e8",
+    "state": "syncAll drops stale uses; the dealer re-checks queueUsesInPlay before every item"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage stale",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "link-seeded-uses",
+   "check": "generateQuestionFor custom_mixed with a link's uses: two seeded runs of 15 are equal and each item's skillOptions are its dealt use's",
+   "kind": "commit-pair",
+   "rule": "sharelink checker D3: the uses deck sat outside the seed and generateQuestionFor overwrote the use's options with the pool's",
+   "browser": true,
+   "fail": {
+    "commit": "7666cb47",
+    "state": "runs differ; skillOptions {} where the use has options"
+   },
+   "pass": {
+    "commit": "8a31e1e8",
+    "state": "the use is dealt by the page dealer or the item seed; a dealt use keeps its skillOptions"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage seeded",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "link-identical-repeats",
+   "check": "A code that repeats a skill with the same options (XX2-XX4-YY, A{o}-A{o}-B) collapses as before: no uses recorded or in play, weights by skill",
+   "kind": "commit-pair",
+   "rule": "sharelink checker D4: every repeating code played from the uses deck",
+   "browser": true,
+   "fail": {
+    "commit": "7666cb47",
+    "state": "XX2-XX4-YY recorded 3 uses and played them"
+   },
+   "pass": {
+    "commit": "8a31e1e8",
+    "state": "uses recorded only when a repeated skill's options differ"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage weights",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
