@@ -837,9 +837,10 @@ function storyHTML(ctx, p, narrow = false) {
 }
 
 /** The keyword bank box: each sign with its cue phrases (a fixed panel, the same on every item). */
-function keywordBank(ctx) {
+function keywordBank(ctx, ops = null) {
     const z = zonePt(ctx);
-    const rows = KEYWORD_BANK.map((r) => `<div style="display:flex;gap:${L(ctx, 2)};align-items:baseline;"><b style="display:inline-block;width:${L(ctx, 4)};font-size:${P(ctx, z + 2)};">${GLYPH[r.op]}</b><span>${esc(r.words.join(', '))}</span></div>`).join('');
+    // (`ops`: only the signs the page can deal - the sentence form draws + and − only, VQ-3)
+    const rows = KEYWORD_BANK.filter((r) => !ops || ops.includes(r.op)).map((r) => `<div style="display:flex;gap:${L(ctx, 2)};align-items:baseline;"><b style="display:inline-block;width:${L(ctx, 4)};font-size:${P(ctx, z + 2)};">${GLYPH[r.op]}</b><span>${esc(r.words.join(', '))}</span></div>`).join('');
     return `<div class="mq-wwbank" aria-label="key words" style="flex:none;box-sizing:border-box;width:${L(ctx, 64)};border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 1.4)} ${L(ctx, 2)};font-size:${P(ctx, z)};line-height:1.35;text-align:left;">`
         + `<div style="font-weight:700;">Key words</div>${rows}</div>`;
 }
@@ -1129,23 +1130,24 @@ function sentenceLayout(p, ctx) {
     const put = filled(ctx) && !twin;
     const ink = put ? inkOf(ctx) : null;
     const digits = Math.max(2, Number(p.digits) || 2);
-    const frame = sentenceFrame(ctx, { a: st.top, b: st.bottom, op: GLYPH[st.op], ans: put ? sh.ans : String(p.ans), unit: p.unit, digits, show: put, ink, unitChars: Math.max(8, String(p.unit || '').length) });
+    const frame = sentenceFrame(ctx, { a: st.top, b: st.bottom, op: GLYPH[st.op], ans: put ? sh.ans : String(p.ans), unit: p.unit, digits, show: put, ink, unitChars: Math.max(8, String(p.unit || '').length), under: narrow && !twin && !sentenceFits(p, ctx) });
     const whole = st.op === '+' ? st.ans : st.top;
     const pa = st.op === '+' ? st.top : st.bottom;
     const pb = st.op === '+' ? st.bottom : st.ans;
     const bar = p.bar ? partWholeBar(ctx, { whole, a: pa, b: pb, wMm: narrow ? 52 : 64, show: put, ink }) : '';
     const work = `<div class="mq-wwwork" style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 3)};">${bar}${frame}</div>`;
+    // the keyword bank option (wpBank): the + and − rows only, under the story
+    const kb = p.kb ? `<div style="margin-top:${L(ctx, 2)};">${keywordBank(ctx, ['+', '-'])}</div>` : '';
     const cls = 'mq-ww mq-wwframes mq-wwsentence';
     const base = `box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;`;
     if (!narrow) {
         return `<div class="${cls}" data-ww-ops="${st.op}" data-read style="width:100%;${base}padding-left:calc(var(--ws-tab, 5mm) + 1mm);display:flex;align-items:center;gap:${L(ctx, 6)};">`
-            + `<div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}</div>${work}</div>`;
+            + `<div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}${kb}</div>${work}</div>`;
     }
-    // (a column cell whose sentence is wider than the column is a FULL-WIDTH item: the page's measurement
-    // reads its min-width as not fitting and prints it full width, beside its story - practice.js splitWide)
-    const fullW = !twin && !sentenceFits(p, ctx) ? `min-width:${L(ctx, 120)};` : '';
-    return `<div class="${cls}" data-ww-ops="${st.op}" data-read style="width:100%;${fullW}${base}padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">`
-        + `${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}<div style="margin-top:${L(ctx, 3)};display:flex;${twin ? 'justify-content:center;' : ''}">${work}</div></div>`;
+    // (a column too narrow for the word beside the box hangs the word UNDER the box: a lesson's two-across
+    // cells and the page grids both hold it, nothing sticks out - PG-12)
+    return `<div class="${cls}" data-ww-ops="${st.op}" data-read style="width:100%;${base}padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">`
+        + `${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}${kb}<div style="margin-top:${L(ctx, 3)};display:flex;${twin ? 'justify-content:center;' : ''}">${work}</div></div>`;
 }
 
 /** Does a sentence layout's work fit a column of `cols` across at this size (else the cell is full width)? */

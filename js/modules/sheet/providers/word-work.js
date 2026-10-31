@@ -150,7 +150,7 @@ export function wordWorkProvider(iCan, extra = {}, { sentence = false } = {}) {
                 'Read the story two times.',
                 'Write the two numbers in the boxes.',
                 'Write + or − in the circle.',
-                'Solve. Write the answer in the last box.',
+                'Solve. Write the answer by its label word.',
             ] : [
                 'Read the story two times.',
                 'Circle the sign that fits the story.',

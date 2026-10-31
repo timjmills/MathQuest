@@ -25,7 +25,7 @@ export const CIRCLE_D = Object.freeze({ S: 9, M: 11, L: 13 });
  *                    twinHook}
  */
 export function sentenceFrame(ctx, o = {}) {
-    const { a = '', b = '', op = '', ans = '', unit = '', digits = 2, show = false, ink = null, twinHook = 'cell', unitChars = 0 } = o;
+    const { a = '', b = '', op = '', ans = '', unit = '', digits = 2, show = false, ink = null, twinHook = 'cell', unitChars = 0, under = false } = o;
     const ids = Object.assign({ a: 'fr0-a', op: 'op0', b: 'fr0-b', answer: 'answer' }, o.ids || {});
     const twin = isTwin(ctx);
     const h = boxH(ctx);
@@ -44,8 +44,8 @@ export function sentenceFrame(ctx, o = {}) {
         ? `<input type="text" class="mq-wwork mq-gl-sign" data-mq-kind="sign" data-mq-expect="${esc(op)}" data-ws-graded="0" maxlength="1" autocomplete="off" spellcheck="false" aria-label="sign: plus or minus" style="${ring}padding:0;margin:0;">`
         : `<span data-ws-slot="${esc(ids.op)}" data-ws-shape="circle" data-ws-graded="0"${show && ink ? ` data-ws-ink="${ink}"` : ''} style="${ring}">${show ? esc(op) : ''}</span>`;
     const eq = `<span aria-hidden="true" style="flex:none;${FONT}font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;color:${INK};">=</span>`;
-    const answer = answerArea(ctx, { id: ids.answer, shown: show ? String(ans) : '', expect: String(ans), digits, unit, ink: show ? ink : null, twinHook, unitChars });
-    return `<div class="mq-gl-sentence" role="group" aria-label="number sentence" style="display:flex;align-items:center;flex-wrap:nowrap;gap:${twin ? '6px' : L(ctx, 1.6)};${twin && unit ? `padding-bottom:${P(ctx, 18)};` : ''}">`
+    const answer = answerArea(ctx, { id: ids.answer, shown: show ? String(ans) : '', expect: String(ans), digits, unit, ink: show ? ink : null, twinHook, unitChars, under });
+    return `<div class="mq-gl-sentence" role="group" aria-label="number sentence" style="display:flex;align-items:center;flex-wrap:nowrap;gap:${twin ? '6px' : L(ctx, 1.6)};${(twin || under) && unit ? `padding-bottom:${P(ctx, twin ? 18 : 20)};` : ''}">`
         + `${numBox(ids.a, a)}${circle}${numBox(ids.b, b)}${eq}${answer}</div>`;
 }
 

@@ -25,10 +25,11 @@ export const boxH = (ctx) => (isTwin(ctx) ? TWIN_BOX : (BOX_H[sizeOf(ctx)] || 15
  * @param {Object} ctx
  * @param {Object} o  {id = 'answer', shown = '', expect = '', digits = 2, unit = '', ink = null,
  *                     twinHook = 'cell', graded = true, unitChars: reserve room for a unit word this long, so
- *                     every answer box of a page stands in the same place (VQ-7)}
+ *                     every answer box of a page stands in the same place (VQ-7); under: the word hangs under
+ *                     the box - a narrow column, and always on screen}
  */
 export function answerArea(ctx, o = {}) {
-    const { id = 'answer', shown = '', expect = '', digits = 2, unit = '', ink = null, twinHook = 'cell', graded = true, unitChars = 0 } = o;
+    const { id = 'answer', shown = '', expect = '', digits = 2, unit = '', ink = null, twinHook = 'cell', graded = true, unitChars = 0, under = false } = o;
     const h = boxH(ctx);
     const w = boxW(ctx, digits);
     const face = `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;width:${tw(ctx, w)};height:${tw(ctx, h)};`
@@ -43,11 +44,11 @@ export function answerArea(ctx, o = {}) {
         box = `<span class="mq-gl-answer" data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="${face}">${esc(shown)}</span>`;
     }
     const word = unit
-        ? `<span class="mq-gl-unit" style="flex:none;${unitChars && !isTwin(ctx) ? `min-width:${L(ctx, unitChars * (textPt(ctx) + 2) * 0.62 * PT_MM)};text-align:left;` : ''}${FONT}font-size:${P(ctx, textPt(ctx) + (isTwin(ctx) ? 0 : 2))};font-weight:700;line-height:1.1;color:${INK};white-space:nowrap;">${esc(unit)}</span>`
+        ? `<span class="mq-gl-unit" style="flex:none;${unitChars && !isTwin(ctx) && !under ? `min-width:${L(ctx, unitChars * (textPt(ctx) + 2) * 0.62 * PT_MM)};text-align:left;` : ''}${FONT}font-size:${P(ctx, textPt(ctx) + (isTwin(ctx) ? 0 : 2))};font-weight:700;line-height:1.1;color:${INK};white-space:nowrap;">${esc(unit)}</span>`
         : '';
     // (on screen the unit word sits UNDER the box, so a 390 px card holds the whole sentence on one line)
     // (the word hangs under the box, out of the row's flow, so the box stays level with the sentence's boxes)
-    if (isTwin(ctx)) {
+    if (isTwin(ctx) || o.under) {
         const hung = word.replace('style="flex:none;', 'style="position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:2px;flex:none;');
         return `<span class="mq-gl-answerarea" style="position:relative;display:inline-flex;align-items:center;flex:none;">${box}${hung}</span>`;
     }
