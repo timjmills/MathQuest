@@ -1,0 +1,55 @@
+== divForm=standard S
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=standard L
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=vertical S
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=vertical L
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=fraction S
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=fraction L
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=long S
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=long L
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=mix S
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== divForm=mix L
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (2 document(s), source kit; 0 finding(s) in 0 document(s))
+== preset c10 S
+  division:div_facts_long#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (1 document(s), source kit; 0 finding(s) in 0 document(s))
+== preset c10 L
+  division:div_facts_long#fact-rows: 2+1 pages, 0 finding(s)
+ws-print-lint: OK (1 document(s), source kit; 0 finding(s) in 0 document(s))
+== supports S
+  division:div_facts: 2+1 pages, 0 finding(s)
+  division:div_facts#test: 2+1 pages, 1 finding(s)
+  multiplication:mult_facts: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#test: 2+1 pages, 0 finding(s)
+  addition:add_facts: 2+1 pages, 0 finding(s)
+  addition:add_facts#test: 2+1 pages, 0 finding(s)
+  [L-SUPPORT SCC-T10 major] section grid 1: the answer zone moves between cells of one shape (69.0,4.4 vs 86.4,4.4 mm, supports drawn / drawn)
+ws-print-lint: WOULD FAIL - 6 document(s), source kit; 1 finding(s) in 1 document(s) [report-only, exit 0]
