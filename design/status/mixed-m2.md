@@ -45,3 +45,32 @@ pre-existing H13 on Sections shelves of `fractions:identify` and I Can L facts.
   guided, review, lesson packets at S and L, Mixed practice Sections at M Daily / L Daily). Moved (R1-7, on purpose): every
   Mixed practice Sections page at S, the I Can M / L pages of fact or word sets, the pages that spilled to page 2 on rounding
   (a-S daily, a-S / a-M I Can, three-M daily), and the one-skill Mixed practice page at S (add_facts 20 -> 56).
+
+## Round 1 rebuild (engine fixer, Opus medium after the failed critic r1)
+Defects -> fix -> check in `mixed-m2.check.cjs` (backtest: the new check against faf80ae, `MQ_ROOT=<faf80ae copy>`: FAIL,
+437 failures; this branch OK). Per-defect backtest counts on faf80ae in brackets.
+1. Weights bent to force S > M (6:24, 4:18, 18:6). `fillPage` holds every count within 1 of its weighted share (two of each
+   the one exception, `withinShare`); among counts of the same total it prefers whole blocks. The size ladder is met only
+   with the weights held: a tie says so in the notes ("no more than the next size up"); a page the weights leave short says
+   "the foot of the page is left open". Check `weights` [28], ladder S >= M >= L with the note.
+2. 2-digit x cell had ~19 mm under the rule. A legacy long procedure keeps a work zone (partial products + sum, 9 mm a row:
+   27 mm for 2 x 2), on Mixed AND Sections shelves; a shelf of work cells alone takes the page's spare height. Check: space
+   under the lowest rule >= the zone (`--mq-work`, or 27 mm for a legacy n x nn) [192].
+3. Stripes. Every whole block of small boxes sits beside the tall boxes; a short tall box swaps into a shelf where both fill
+   (H13). Check `stripes`: tall-only shelves while a block's worth of small boxes prints in a row [12].
+4. multiply on the legacy stack. `multiplication:multiply` table facts (both factors <= 12) now draw on the kit fact cell
+   (gen-operations `_applyKitFactCell`). precritic --skill multiplication:multiply: 6 FAIL before, 4 FAIL after (lesson
+   print-lint S / L fixed; nothing new; options-render "across @S" still fails, now 12 vs 20 instead of 16 vs 20).
+   content-audit multiply OK. Check `align` across templates (first rule y, 1 mm) [117]; the rule finder now reads top
+   borders too (the kit fact's rule is a border-top - the old align check never saw it).
+5. Run note wrong across pages; 3 + 0 splits. Pages split by whole shelves; a skill with fewer than two a page is spread one
+   a page (or, where that costs a page, on fewer pages with a note); runs counted in print order across pages, the figure in
+   problems. Checks: note figure = printed run [2]; no page without a skill that has one a page to give [3].
+6. Cue named the wrong task. `itemCue`: the item's template task (frac-model write / pick / part / shade / sign), then its
+   printText, then the library line cut to the clause the cell asks. Check `cue` [80].
+7. 12:28 I Can L on 3 pages under "20 a page". fits.perPage = this mix's capacity (exact counts: their proportions, never
+   below a printed page); no trailing slot before the last page. Checks [2] + [1].
+
+Open: weights held cost problems on some fill pages (b-S 14 with the foot open, c-M 6: two word problems and four facts) -
+the owner's rule; the notes say so. e-L (3:37) prints runs of up to 16 addition across the break (noted, true).
+Renders: `design/status/mixed-m2/after/{a,b,c,d,e,g,sec-b}`.
