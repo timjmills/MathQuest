@@ -802,14 +802,12 @@
    "kind": "commit-pair",
    "rule": "ws-visual-quality VQ-REP",
    "browser": false,
-   "pending": true,
-   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
    "fail": {
     "commit": "5c6063a",
     "state": "the base: fact_family_sort (F1) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
    },
    "pass": {
-    "commit": "PENDING-FIX",
+    "commit": "3b99a3b",
     "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
    },
    "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-REP --skill addition:fact_family_sort",
@@ -843,14 +841,12 @@
    "kind": "commit-pair",
    "rule": "ws-visual-quality VQ-ONEANSWER",
    "browser": false,
-   "pending": true,
-   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
    "fail": {
     "commit": "5c6063a",
     "state": "the base: fact_family_sort (F2) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
    },
    "pass": {
-    "commit": "PENDING-FIX",
+    "commit": "3b99a3b",
     "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
    },
    "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-ONEANSWER --skill addition:fact_family_sort",
@@ -884,14 +880,12 @@
    "kind": "commit-pair",
    "rule": "ws-visual-quality VQ-LIVE",
    "browser": false,
-   "pending": true,
-   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
    "fail": {
     "commit": "5c6063a",
     "state": "the base: add_wp / sub_wp within 10 and 20 (W1-W3) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
    },
    "pass": {
-    "commit": "PENDING-FIX",
+    "commit": "3b99a3b",
     "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
    },
    "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-LIVE --skill addition:add_wp_10,addition:add_wp_10_plain,addition:add_wp_20,addition:add_wp_20_plain,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20,subtraction:sub_wp_20_plain",
@@ -925,14 +919,12 @@
    "kind": "commit-pair",
    "rule": "ws-visual-quality VQ-TITLE",
    "browser": false,
-   "pending": true,
-   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
    "fail": {
     "commit": "5c6063a",
     "state": "the base: fact_family_sort (F3) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
    },
    "pass": {
-    "commit": "PENDING-FIX",
+    "commit": "3b99a3b",
     "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
    },
    "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-TITLE --skill addition:fact_family_sort",
@@ -966,14 +958,12 @@
    "kind": "commit-pair",
    "rule": "ws-visual-quality VQ-NOLEGACY",
    "browser": false,
-   "pending": true,
-   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
    "fail": {
     "commit": "5c6063a",
     "state": "the base: fact_family_sort (RC5) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
    },
    "pass": {
-    "commit": "PENDING-FIX",
+    "commit": "3b99a3b",
     "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
    },
    "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-NOLEGACY --skill addition:fact_family_sort",
