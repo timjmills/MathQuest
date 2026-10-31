@@ -1,0 +1,18 @@
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_facts: 2+1 pages, 0 finding(s)
+  addition:add_facts#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#test: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#test: 2+1 pages, 0 finding(s)
+
+document                          pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP STEPS  result
+addition:add_facts                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+addition:add_facts#test             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+subtraction:sub_facts               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+subtraction:sub_facts#test          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+multiplication:mult_facts           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+multiplication:mult_facts#test      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+TOTAL                                       .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .
+
+ws-print-lint: OK (6 document(s), source kit; 0 finding(s) in 0 document(s))

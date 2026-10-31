@@ -1,0 +1,141 @@
+ws-print-lint: source kit, 5 skill(s)
+  subtraction:sub_2d_1d#scripted-model: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_2d_1d#guided: 2+1 pages, 16 finding(s)
+  subtraction:sub_2d_1d#opener: 2+1 pages, 10 finding(s)
+  subtraction:sub_2d_1d#pre-skill-check: 2+1 pages, 2 finding(s)
+  subtraction:sub_2d_1d#reason-it: 2+1 pages, 0 finding(s)
+  subtraction:sub_2d_1d#review: 2+1 pages, 0 finding(s)
+  addition:add_facts#scripted-model: 2+1 pages, 0 finding(s)
+  addition:add_facts#lesson: 6+3 pages, 0 finding(s)
+  addition:add_facts#guided: 2+1 pages, 0 finding(s)
+  addition:add_facts#opener: 2+1 pages, 0 finding(s)
+  addition:add_facts#pre-skill-check: 2+1 pages, 0 finding(s)
+  addition:add_facts#reason-it: 2+1 pages, 0 finding(s)
+  addition:add_facts#review: 2+1 pages, 1 finding(s)
+  multiplication:mult_facts#scripted-model: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#lesson: 6+3 pages, 0 finding(s)
+  multiplication:mult_facts#guided: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#opener: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#pre-skill-check: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#reason-it: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#review: 2+1 pages, 0 finding(s)
+  division:div_facts#scripted-model: 2+1 pages, 0 finding(s)
+  division:div_facts#lesson: 6+3 pages, 0 finding(s)
+  division:div_facts#guided: 2+1 pages, 0 finding(s)
+  division:div_facts#opener: 2+1 pages, 0 finding(s)
+  division:div_facts#pre-skill-check: 2+1 pages, 0 finding(s)
+  division:div_facts#reason-it: 2+1 pages, 0 finding(s)
+  division:div_facts#review: 2+1 pages, 0 finding(s)
+  fractions:identify#scripted-model: 2+1 pages, 2 finding(s)
+  fractions:identify#lesson: 6+3 pages, 2 finding(s)
+  fractions:identify#guided: 2+1 pages, 2 finding(s)
+  fractions:identify#opener: 2+1 pages, 0 finding(s)
+  fractions:identify#pre-skill-check: 2+1 pages, 0 finding(s)
+  fractions:identify#reason-it: 2+1 pages, 3 finding(s)
+  fractions:identify#review: 2+1 pages, 0 finding(s)
+
+document                                     pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP STEPS  result
+subtraction:sub_2d_1d#scripted-model           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+subtraction:sub_2d_1d#lesson                   6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+subtraction:sub_2d_1d#guided                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .       16       .    .     .  FAIL
+subtraction:sub_2d_1d#opener                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .       10       .    .     .  FAIL
+subtraction:sub_2d_1d#pre-skill-check          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       2    .     .  FAIL
+subtraction:sub_2d_1d#reason-it                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+subtraction:sub_2d_1d#review                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+addition:add_facts#scripted-model              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+addition:add_facts#lesson                      6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+addition:add_facts#guided                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+addition:add_facts#opener                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+addition:add_facts#pre-skill-check             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+addition:add_facts#reason-it                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+addition:add_facts#review                      2+1k    .     .    .    .        .     .       .    1     .       .     .    .      .       .        .       .    .     .  FAIL
+multiplication:mult_facts#scripted-model       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+multiplication:mult_facts#lesson               6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+multiplication:mult_facts#guided               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+multiplication:mult_facts#opener               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+multiplication:mult_facts#pre-skill-check      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+multiplication:mult_facts#reason-it            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+multiplication:mult_facts#review               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+division:div_facts#scripted-model              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+division:div_facts#lesson                      6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+division:div_facts#guided                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+division:div_facts#opener                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+division:div_facts#pre-skill-check             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+division:div_facts#reason-it                   2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+division:div_facts#review                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+fractions:identify#scripted-model              2+1k    .     .    2    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  FAIL
+fractions:identify#lesson                      6+3k    .     .    2    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  FAIL
+fractions:identify#guided                      2+1k    .     .    2    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  FAIL
+fractions:identify#opener                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+fractions:identify#pre-skill-check             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+fractions:identify#reason-it                   2+1k    .     .    1    .        2     .       .    .     .       .     .    .      .       .        .       .    .     .  FAIL
+fractions:identify#review                      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .     .  ok
+TOTAL                                                  .     .    7    .        2     .       .    1     .       .     .    .      .       .       26       2    .     .
+
+subtraction:sub_2d_1d#scripted-model (Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (scripted-model))
+
+subtraction:sub_2d_1d#lesson (Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (lesson))
+
+subtraction:sub_2d_1d#guided (Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (guided))
+  [L-TOPSTART CL-4b major] x16 (p1,2 cells 2,3,4,5,6,7,8,9...) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "T O 3 4 − 3 1" | <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "T O 9 7 − 1 6"
+
+subtraction:sub_2d_1d#opener (Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (opener))
+  [L-TOPSTART CL-4b major] x10 (p1,2 cells 1,2,3,4,5,1,2,3...) first printed row starts 4 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "T O 8 9 − 3 8 6" | <div.ws-cell.mqt--stack[data-ws-cell="stack"]> "T O 3 4 − 3"
+
+subtraction:sub_2d_1d#pre-skill-check (Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping) (pre-skill-check))
+  [L-OVERLAP CL40-INK major] x2 (p1,2 cells 10,10) ink of "1" at 6.7 mm across, 5.1 mm down enters the label keep-out (7 x 6 mm at the cell's top-left corner): nothing but the label paints there (CL-40)
+      e.g. <span> "1"
+
+addition:add_facts#scripted-model (Addition Facts (within 20) (scripted-model))
+
+addition:add_facts#lesson (Addition Facts (within 20) (lesson))
+
+addition:add_facts#opener (Addition Facts (within 20) (opener))
+
+addition:add_facts#pre-skill-check (Addition Facts (within 20) (pre-skill-check))
+
+addition:add_facts#review (Addition Facts (within 20) (review))
+  [L-KEY AK-4 critical] (p2) key page 2 has 12 answer slots, pupil page 1 has 9 (AK-4)
+
+multiplication:mult_facts#scripted-model (Multiplication Facts (1-12) (scripted-model))
+
+multiplication:mult_facts#lesson (Multiplication Facts (1-12) (lesson))
+
+multiplication:mult_facts#opener (Multiplication Facts (1-12) (opener))
+
+multiplication:mult_facts#pre-skill-check (Multiplication Facts (1-12) (pre-skill-check))
+
+division:div_facts#scripted-model (Division Facts (1-12) (scripted-model))
+
+division:div_facts#lesson (Division Facts (1-12) (lesson))
+
+division:div_facts#opener (Division Facts (1-12) (opener))
+
+division:div_facts#pre-skill-check (Division Facts (1-12) (pre-skill-check))
+
+fractions:identify#scripted-model (Identify Fractions (Visual) (scripted-model))
+  [L-FONT TY-7 major] x2 (p1,2 cells 2,2) slash fraction "5/8": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <span> "Write 5/8: 5 of 8 equal part..."
+
+fractions:identify#lesson (Identify Fractions (Visual) (lesson))
+  [L-FONT TY-7 major] x2 (p1,4 cells 2,2) slash fraction "1/4": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <b> "Write 1/4: 1 of 4 equal part..."
+
+fractions:identify#guided (Identify Fractions (Visual) (guided))
+  [L-FONT TY-7 major] x2 (p1,2 cells 3,3) slash fraction "1/4": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <div.mq-hintline.ws-trace> "The fraction is 1/4: 4 equal..."
+
+fractions:identify#opener (Identify Fractions (Visual) (opener))
+
+fractions:identify#pre-skill-check (Identify Fractions (Visual) (pre-skill-check))
+
+fractions:identify#reason-it (Identify Fractions (Visual) (reason-it))
+  [L-FONT TY-7 major] (p2 cells 1) slash fraction "5/8": fractions are always stacked over a bar, a slash fraction is a defect (TY-7)
+      e.g. <span.ws-line[data-ws-slot="ri-ans"][data-ws-shape="line"]> "5/8"
+  [L-OVERFLOW PG-12 major] x2 (p1,2 cells 3,3) sticks out of its cell by 2.2 mm (cell 184.9 x 76.5 mm) (PG-12, CL-1)
+      e.g. <span.fm-show> "1 4"
+
+ws-print-lint: WOULD FAIL - 35 document(s), source kit; 38 finding(s) in 8 document(s) [report-only, exit 0]
