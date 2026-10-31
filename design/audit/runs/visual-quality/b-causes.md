@@ -120,4 +120,24 @@ from the RC4 map; the check fails a card whose relation has a mapped drawing but
 
 ## Measurements
 
-See the census section below (filled from `census.txt`).
+Census: `generateQuestionFor` at range 20, 3 seeded items per skill, node with a DOM shim
+(`/tmp/claude-0/-home-user-MathQuest/cea1479a-7e02-5121-b21e-92a04002c02f/scratchpad/census.mjs`, rows in `rows.tsv`, per-family in
+`fam.txt`, relation skills in `rel.txt`). It reached 659 of ~732 skills: it hangs in node on `number_theory:divisibility_sort`
+(the categories after it are not counted), so the figures are a floor.
+
+1. **No `q.cell` on any sampled item: 342 of 659 (52 %).** A further 19 mix kit cells with legacy/text items; 298 are
+   kit cells throughout. Highest no-cell counts: fraction_operations 29, algebra 27, coordinates 23, fractions 21,
+   conversions 19, shapes_early 17, multiplication 17, measurement 16, area_perimeter 16, order_of_operations 14,
+   decimals 14, addition 14, patterns 13, subtraction 12, number_theory 12, division 12.
+2. **Relation skills (ids naming family / bond / compare / make ten / number families): 32 found; 21 have no kit
+   drawing at all** (legacy `q.visual` or text only): `addition:fact_family_sort`, `comparison_word`,
+   `number_families_add{,_med,_hard}`, `multiplication:mult_div_fact_family`, `number_families_mult{,_med,_hard}`,
+   `number_ops_mixed:number_families_mixed{,_med,_hard}`, `composing:make_ten`, `comparing:compare_objects`,
+   `decimals:compare_decimal`, `compare_thousandths`, `fractions:compare_frac_lcd`, `integers:compare_int`,
+   `order_of_operations:compare_expressions` (plus the 3 partly-text ones). The other 11 use a kit cell (frac-model, pv,
+   coins, word-work, family/bond for 5); the word-work compare stories (`sub_wp_compare`, `mult_comparison*`) draw the
+   bar only when the option is on. Not one family skill uses `sheet/cells/family.js` or `bond.js` by default outside
+   those 5.
+3. **Grading history of the two examples:** neither is in `redesign-passed.js` (7 ids, all subtraction). Neither id
+   appears in any redesign critic file; only the WRM tagging critics saw them and downgraded the links (section 0).
+   "Passed" meant: content gate + template critic on other skills + WRM tagging PASS.
