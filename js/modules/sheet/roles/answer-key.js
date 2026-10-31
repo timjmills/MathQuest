@@ -364,6 +364,8 @@ function gridPart(part, ctx, report) {
             nolabel: !!item.nolabel,
             model: !!item.model,
             keyAttr: keyModel && !/\sdata-ws-key-model\b/.test(html) ? 'data-ws-key-model' : '',
+            // (the mixed packer's lattice place, sheet/mixed-pack.js: the same on the pupil page and the key)
+            place: item.place || undefined,
         };
     });
     // CL-12: a label run continues across sections and across pages, so the counter lives on
@@ -383,6 +385,7 @@ function gridPart(part, ctx, report) {
         colsTpl: part.colsTpl || '',
         spanFirst: !!part.spanFirst,
         rowGap: Number(part.rowGap) || 0,
+        trail: part.trail || null,
     });
 }
 

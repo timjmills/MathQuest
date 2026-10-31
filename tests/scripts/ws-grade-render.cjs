@@ -213,6 +213,10 @@ async function applyRange(page) {
     }, RANGE);
 }
 const SET = (arg('set', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+// Mixed practice M2: --arrangement mixed|sections (absent: the role's default) and --counts 12,8
+// (one section per --set skill with that exact count, the owner's "specified problem distribution").
+const ARRANGEMENT = arg('arrangement', null);
+const COUNTS = (arg('counts', '') || '').split(',').map((x) => parseInt(x, 10)).filter((x) => x > 0);
 
 const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const slug = s => `${s.categoryId}__${s.skillId}`;
@@ -495,11 +499,12 @@ async function renderRole(page, skill, role, dir, { size = ROLE_SIZE, unitOpts =
     // an envelope unit's kind options (examples, pages, fade, key; loadEnvelopeSample) override the command line's
     const U = unitReq || {};
     const supOpts = (await page.evaluate(supportOptsInPage, { list: set.map((k) => [k.categoryId, k.skillId]), SUPPORTS: U.supports || SUPPORTS, COVER: null, MIX: null })).map((o) => withOpts(o, unitOpts));
-    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, supOpts, COVER, MIX, columns, LESSON, pages, key }) => {
+    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper, anchors, supOpts, COVER, MIX, columns, LESSON, pages, key, ARRANGEMENT, COUNTS }) => {
         try {
             const skills = set.map((k, i) => (supOpts[i] ? Object.assign({}, k, { opts: supOpts[i] }) : k));
             const r = await window.buildSheet({
-                role, sections: [{ skills, count, columns, ...(pages ? { pages } : {}) }],
+                role, sections: COUNTS.length ? skills.map((k, i) => ({ skills: [k], count: COUNTS[i] || COUNTS[COUNTS.length - 1] })) : [{ skills, count, columns, ...(pages ? { pages } : {}) }],
+                ...(ARRANGEMENT ? { arrangement: ARRANGEMENT } : {}),
                 size, look, paper, seed, form: 'A', key: key || true, anchors,
                 coverage: COVER || undefined, mix: MIX || undefined,
                 ...(role === 'lesson' ? LESSON : {}),
@@ -513,7 +518,7 @@ async function renderRole(page, skill, role, dir, { size = ROLE_SIZE, unitOpts =
                 items: r.items.map(it => ({ template: it.template, fclass: it.fclass, text: it.text.slice(0, 80), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans), letter: it.letter, measured: it.measured })),
             };
         } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: (e && e.stack) || String(e) }; }
-    }, { skill, set, role, seed, count: U.pages ? undefined : ROLE_COUNT, size, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: U.anchors || ROLE_ANCHORS, supOpts, COVER: U.coverage || COVER, MIX, columns: ROLE_COLUMNS, LESSON, pages: U.pages || null, key: U.key || null });
+    }, { skill, set, role, seed, count: U.pages ? undefined : ROLE_COUNT, size, look: ROLE_LOOK, paper: ROLE_PAPER, anchors: U.anchors || ROLE_ANCHORS, supOpts, COVER: U.coverage || COVER, MIX, columns: ROLE_COLUMNS, LESSON, pages: U.pages || null, key: U.key || null, ARRANGEMENT, COUNTS });
     if (built.error) return { error: built.error };
     if (built.unsupported) return { unsupported: built.unsupported };
     const pdfP = path.join(dir, `${prefix}.pdf`);
