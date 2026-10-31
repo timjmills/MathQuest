@@ -53,6 +53,6 @@ export function sentenceFrame(ctx, o = {}) {
 export function sentenceFrameWidthMm(ctx, { digits = 2, unitChars = 0 } = {}) {
     const w = boxW(ctx, digits), d = CIRCLE_D[sizeOf(ctx)] || 13;
     const eqW = digitPt(ctx) * 0.6 * PT_MM;
-    const unitW = unitChars ? unitChars * (textPt(ctx) + 2) * 0.62 * PT_MM + 2 : 0;
+    const unitW = unitChars ? unitChars * (textPt(ctx) + 2) * 0.55 * PT_MM + 2 : 0;
     return 3 * w + d + eqW + 4 * 1.6 + unitW;
 }

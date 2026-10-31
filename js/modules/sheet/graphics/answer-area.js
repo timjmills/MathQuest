@@ -44,7 +44,7 @@ export function answerArea(ctx, o = {}) {
         box = `<span class="mq-gl-answer" data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="${face}">${esc(shown)}</span>`;
     }
     const word = unit
-        ? `<span class="mq-gl-unit" style="flex:none;${unitChars && !isTwin(ctx) && !under ? `min-width:${L(ctx, unitChars * (textPt(ctx) + 2) * 0.62 * PT_MM)};text-align:left;` : ''}${FONT}font-size:${P(ctx, textPt(ctx) + (isTwin(ctx) ? 0 : 2))};font-weight:700;line-height:1.1;color:${INK};white-space:nowrap;">${esc(unit)}</span>`
+        ? `<span class="mq-gl-unit" style="flex:none;${unitChars && !isTwin(ctx) && !under ? `min-width:${L(ctx, unitChars * (textPt(ctx) + 2) * 0.55 * PT_MM)};text-align:left;` : ''}${FONT}font-size:${P(ctx, textPt(ctx) + (isTwin(ctx) ? 0 : 2))};font-weight:700;line-height:1.1;color:${INK};white-space:nowrap;">${esc(unit)}</span>`
         : '';
     // (on screen the unit word sits UNDER the box, so a 390 px card holds the whole sentence on one line)
     // (the word hangs under the box, out of the row's flow, so the box stays level with the sentence's boxes)
