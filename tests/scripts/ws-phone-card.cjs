@@ -155,6 +155,25 @@ function PROBE() {
     const groups = new Map();
     for (const x of cut) { const k = x.why.replace(/: \d+ px hidden$/, ''); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(x); }
     for (const [k, list] of groups) findings.push({ rule: 'CLIP-X', msg: `${list.length} element(s) ${/^cut by/.test(k) ? '' : 'each '}${list[0].why}; e.g. ${list.slice(0, 4).map((x) => name(x.el)).join(', ')}` });
+    // GAP (ops-family critic r1 F15): the drawn problem keeps at least 3 mm (11 px) of white inside its cell's border on
+    // each side - "835 + 100 =" 6 px from the border at 390 px read as crammed (C3)
+    const box = paper && (paper.querySelector('.ws-cell') || paper);
+    if (box && vis(box)) {
+        const cs = getComputedStyle(box);
+        const br = box.getBoundingClientRect();
+        const inL = br.left + (parseFloat(cs.borderLeftWidth) || 0), inR = br.right - (parseFloat(cs.borderRightWidth) || 0);
+        const ink = Array.from(box.querySelectorAll('*')).filter((e) => vis(e) && !e.closest('.ws-tab, .ws-letter, [data-ws-label], svg defs, [class*="instr"], [data-ws-instruction]')
+            && (e.matches('[data-ws-slot], input, svg') || Array.from(e.childNodes).some((n) => n.nodeType === 3 && n.nodeValue.trim())));
+        const GAP_PX = 11;
+        let worst = null;
+        for (const e of ink) {
+            const r = e.getBoundingClientRect();
+            if (r.width < 1) continue;
+            const g = Math.min(r.left - inL, inR - r.right);
+            if (!worst || g < worst.g) worst = { e, g };
+        }
+        if (worst && worst.g < GAP_PX && worst.g > -TOL) findings.push({ rule: 'GAP', msg: `${name(worst.e)} sits ${Math.round(worst.g)} px from its cell's border at ${W} px: keep 3 mm (${GAP_PX} px) of white inside the border (C3, critic r1 F15)` });
+    }
     // FOCUS / INVIEW
     const act = document.activeElement;
     let focus = 'n/a';

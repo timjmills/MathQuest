@@ -1835,3 +1835,7 @@ html body .mq-scell input.expanded-input-box.expanded-input-box:focus:not(.mq-ac
 html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-active-box):not(.box-correct):not(.box-wrong):not([style*="var(--"]) {
     box-shadow: inset 0 0 0 3px #000 !important;
 }
+
+/* ops-family r2 (critic r1 F15, ws-phone-card GAP): on a phone a one-line sentence ("656 + 100 = [ ]") keeps 3 mm of white
+   inside its cell's border - the answer slot goes under the sentence when the line would reach the border. Additive. */
+@media (max-width: 480px) { .mq-scell .mq-kittwin .ws-eq[data-ws-across], .mq-scell .mq-kit .ws-eq.mq-eq { flex-wrap: wrap; row-gap: 6px; max-width: calc(100% - 24px); margin-left: auto; margin-right: auto; } }
