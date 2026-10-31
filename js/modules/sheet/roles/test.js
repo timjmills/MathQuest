@@ -46,7 +46,8 @@ function fillToCeiling(L, size, columns) {
     // PG-14: the rows take the grid down to a strip of under a fifth of it - never past the even
     // share, and never shorter than the layout made them.
     const even = (G - SAFETY_H_MM) / rows;
-    const cellH = Math.round(Math.min(even, Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
+    // (an in-place cell - layout.js IN_PLACE_FILL - keeps its capped height: it holds no working space)
+    const cellH = Math.round(Math.min(even, L.inPlace ? Math.max(L.cellH, L.hMin) : Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
     if (rows === L.rows && cellH <= L.cellH + 0.01) return L;
     return Object.assign({}, L, { rows, perPage, cellH, fill: cellH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
 }

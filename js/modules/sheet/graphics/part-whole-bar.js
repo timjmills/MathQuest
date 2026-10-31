@@ -12,7 +12,7 @@
 //
 // Pure module (SCC-01).
 
-import { INK, GREY, L, P, B, isTwin, sizeOf, digitPt, esc, blankWidth, KEY_FEATURES } from './units.js';
+import { INK, GREY, L, P, B, isTwin, sizeOf, digitPt, esc, blankWidth, NUM_FEATURES } from './units.js';
 
 export const BAR_SEG_H = Object.freeze({ S: 11, M: 12.5, L: 14 });
 
@@ -22,7 +22,9 @@ export const BAR_SEG_H = Object.freeze({ S: 11, M: 12.5, L: 14 });
  *                    ink, gradeParts}
  */
 export function partWholeBar(ctx, o = {}) {
-    const { whole, a: pa, b: pb, show = false, ink = null, gradeParts = false } = o;
+    const { whole, a: pa, b: pb, show = false, ink = null, gradeParts = false, equal = false } = o;
+    // `ids` {whole, a, b}: each writing box's own slot id (a chart panel writes them one step at a time); default 'bar'
+    const ids = Object.assign({ whole: 'bar', a: 'bar', b: 'bar' }, o.ids || {});
     const size = sizeOf(ctx);
     const twin = isTwin(ctx);
     const segH = BAR_SEG_H[size] || 14;
@@ -31,12 +33,14 @@ export function partWholeBar(ctx, o = {}) {
     const W = Math.max(42, Number(o.wMm) || 70);
     // (the short stock length always holds its writing box: at least the box + 5 mm)
     const small = Math.min(W / 2, Math.max(0.4 * W, lw + 5));
-    const wa = pa === pb ? W / 2 : (pa > pb ? W - small : small);
+    // `equal` (a story whose unknown is a PART, critic r1 F17): both parts drawn equal, so the length never tells
+    // the pupil which part - the one to find or the one given - is the bigger
+    const wa = equal || pa === pb ? W / 2 : (pa > pb ? W - small : small);
     const fmt = (n) => Number(n).toLocaleString('en-US');
-    const lab = (v) => (twin
+    const lab = (v, id) => (twin
         ? `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(String(v))}" data-ws-graded="0" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="bar number" style="box-sizing:border-box;width:max(44px, ${L(ctx, lw)});height:max(44px, ${L(ctx, hw)});border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, digitPt(ctx))};font-weight:700;text-align:center;padding:0;margin:0;">`
-        : `<span${gradeParts ? '' : ' data-ws-graded="0"'} data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${KEY_FEATURES}"${show && ink ? ` data-ws-ink="${ink}"` : ''}>${show ? esc(fmt(v)) : ''}</span>`);
-    const seg = (w, v, left) => `<span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${twin ? `max(52px, ${L(ctx, segH)})` : L(ctx, segH)};border:${B(ctx, 1)} solid ${INK};${left ? '' : 'border-left:none;'}background:#fff;">${lab(v)}</span>`;
+        : `<span${gradeParts ? '' : ' data-ws-graded="0"'} data-ws-slot="${esc(id)}" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${NUM_FEATURES}"${show && ink ? ` data-ws-ink="${ink}"` : ''}>${show ? esc(fmt(v)) : ''}</span>`);
+    const seg = (w, v, left, id) => `<span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${twin ? `max(52px, ${L(ctx, segH)})` : L(ctx, segH)};border:${B(ctx, 1)} solid ${INK};${left ? '' : 'border-left:none;'}background:#fff;">${lab(v, id)}</span>`;
     return `<div class="mq-wwbar" aria-label="bar model" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 1.5)};">`
-        + `<div style="display:flex;">${seg(W, whole, true)}</div><div style="display:flex;">${seg(wa, pa, true)}${seg(W - wa, pb, false)}</div></div>`;
+        + `<div style="display:flex;">${seg(W, whole, true, ids.whole)}</div><div style="display:flex;">${seg(wa, pa, true, ids.a)}${seg(W - wa, pb, false, ids.b)}</div></div>`;
 }

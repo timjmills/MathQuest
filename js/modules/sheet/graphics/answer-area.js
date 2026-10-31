@@ -32,11 +32,13 @@ export function answerArea(ctx, o = {}) {
     const { id = 'answer', shown = '', expect = '', digits = 2, unit = '', ink = null, twinHook = 'cell', graded = true, unitChars = 0, under = false } = o;
     const h = boxH(ctx);
     const w = boxW(ctx, digits);
-    const face = `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;width:${tw(ctx, w)};height:${tw(ctx, h)};`
+    let face = `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;width:${tw(ctx, w)};height:${tw(ctx, h)};`
         + `border:${B(ctx, 1.5)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;${FONT}font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;`
         + `color:${colorOf(ink)};text-align:center;${NUM_FEATURES}`;
     let box;
     if (isTwin(ctx)) {
+        // (H6, critic r1 F3: the host's input sits INSIDE the 1.5 pt border, so the face is 48 px - the input 44 x 44 px)
+        face = face.replace(`width:${tw(ctx, w)};height:${tw(ctx, h)};`, `width:max(48px, ${L(ctx, w)});height:max(48px, ${L(ctx, h)});`);
         box = twinHook === 'blank'
             ? `<span class="mq-gl-answer" data-ws-slot="${esc(id)}" data-ws-shape="box" data-mq-blank="box" data-mq-expect="${esc(expect)}" style="${face}"></span>`
             : `<span class="mq-wwans mq-gl-answer" data-ws-slot="${esc(id)}" data-ws-shape="box" data-mq-cell="1" data-mq-w="${Math.max(1, digits)}" data-mq-label="answer" data-mq-expect="${esc(expect)}" style="${face}"></span>`;

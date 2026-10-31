@@ -1371,7 +1371,7 @@ The relation decides the drawing. A builder picks from this table before anythin
 |---|---|---|
 | Part-whole; fact family; number bond (+/−, ×/÷) | Number bond or fact triangle, the whole at the top | number bond, fact triangle (`bond`, `fact-family`, `family-check`) |
 | Make ten; bridge through ten | Ten frame (two for teen numbers) | ten frame (`tenframe`) |
-| Add / subtract story with answers ≤ 20 | Part-whole bar + number sentence `[ ] ◯ [ ] = [ ]`, answer box with the unit printed | part-whole bar, number sentence frame, labelled answer area |
+| Add / subtract story with answers ≤ 20 | Number sentence `[ ] ◯ [ ] = [ ]`, answer box with the PLURAL unit printed (never singular by the answer). The part-whole bar is DRAWN by default on the teaching pages - scripted model, guided, the lesson's anchor chart and model (lead ruling 2026-10-31, critic r1 F13); on the practice pages (independent, more practice, test, review) it stays the `bar` option (`support: bar`, or `wpBar` on the `_plain` and K skills), default off - a bar is not a picture, so the no-picture skills offer it too. A K picture story's countable picture is its teaching drawing; its bar is on the chart. When the unknown is a PART (take-away) the two part bars are drawn equal, so the length never tells which part is bigger (RP-72) | part-whole bar, number sentence frame, labelled answer area |
 | Compare ("how many more / fewer") | Comparison bar (two bars, the difference marked) | comparison bar |
 | Equal groups; multiplication | Groups in rings, or an array with its `× =` sentence | equal groups, array |
 | Place value | Base-10 blocks or place-value chart | base-10, place-value chart (`base10`, `pv`) |

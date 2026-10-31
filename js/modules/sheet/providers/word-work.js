@@ -60,17 +60,26 @@ export function wordWorkSteps(q) {
             step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`),
         ];
     }
-    const cues = cuesOf(p);
-    const out = [step('Read the story two times.')];
-    // the sentence form (stories within 20): the two numbers, the sign in the circle, the answer
+    // the sentence form (stories within 20): PART-WHOLE, never key words (PEDAGOGY P-21, P-WP-10; critic r1 F6) - read,
+    // find the parts and the whole on the bar (the structure decision: "I know both parts. I add." / "I know the whole
+    // and one part. I subtract."), write the number sentence, solve. Four steps: each is one panel of the lesson's chart
+    // and one frame of the scripted model, and each frame writes what its step says.
     if (p.layout === 'sentence' && p.steps.length === 1) {
         const st = p.steps[0];
-        if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
-        out.push(step(`Write ${fmt(st.top)} and ${fmt(st.bottom)} in the boxes.`, [{ slot: 'fr0-a', value: String(st.top) }, { slot: 'fr0-b', value: String(st.bottom) }]));
-        out.push(step(`Write ${GLYPH[st.op]} in the circle. ${VERB[st.op]}.`, [{ slot: 'op0', value: GLYPH[st.op] }]));
-        out.push(step(`${workLine(st).replace(/\.$/, '')}. Write ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }]));
-        return clampSteps(out);
+        const add = st.op === '+';
+        const whole = add ? st.ans : st.top, pa = add ? st.top : st.bottom, pb = add ? st.bottom : st.ans;
+        const unit = Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit;
+        return [
+            step(`The numbers are ${fmt(st.top)} and ${fmt(st.bottom)}.`),
+            add
+                ? step(`I know both parts: ${fmt(pa)} and ${fmt(pb)}. I add.`, [{ slot: 'bar-a', value: String(pa) }, { slot: 'bar-b', value: String(pb) }])
+                : step(`I know the whole, ${fmt(whole)}, and one part, ${fmt(pa)}. I subtract.`, [{ slot: 'bar-w', value: String(whole) }, { slot: 'bar-a', value: String(pa) }]),
+            step(`Write ${fmt(st.top)} ${GLYPH[st.op]} ${fmt(st.bottom)} in the boxes.`, [{ slot: 'fr0-a', value: String(st.top) }, { slot: 'op0', value: GLYPH[st.op] }, { slot: 'fr0-b', value: String(st.bottom) }]),
+            step(`${workLine(st).replace(/\.$/, '')}. The answer is ${fmt(p.ans)}${unit ? ` ${unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }, { slot: add ? 'bar-w' : 'bar-b', value: String(p.ans) }]),
+        ];
     }
+    const cues = cuesOf(p);
+    const out = [step('Read the story two times.')];
     if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
     p.steps.forEach((st, i) => {
         const pre = p.steps.length > 1 ? `Step ${i + 1}: ` : '';
@@ -148,9 +157,9 @@ export function wordWorkProvider(iCan, extra = {}, { sentence = false } = {}) {
             instructionKey: sentence ? 'story-sentence' : 'story-work',
             steps: sentence ? [
                 'Read the story two times.',
-                'Write the two numbers in the boxes.',
-                'Write + or − in the circle.',
-                'Solve. Write the answer by its label word.',
+                'Find the parts and the whole.',
+                'Write the number sentence.',
+                'Solve. Say the answer and its label.',
             ] : [
                 'Read the story two times.',
                 'Circle the sign that fits the story.',
@@ -158,7 +167,7 @@ export function wordWorkProvider(iCan, extra = {}, { sentence = false } = {}) {
                 'Write the answer and its label word.',
             ],
             say: 'The answer is __ __.',
-            sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), p.unit] : null; },
+            sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit] : null; },
         }),
         misconceptions: ['wrong-operation'],
         workedSteps: wordWorkSteps,

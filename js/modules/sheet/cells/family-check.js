@@ -65,14 +65,16 @@ register(FAMILY_CHECK, {
             ? `<div class="mq-fc-choice" role="group" aria-label="yes or no" style="display:flex;justify-content:center;gap:${L(ctx, 10)};">${words}</div>`
             : `<div class="mq-fc-choice" data-ws-slot="answer" data-ws-shape="choice"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:flex;justify-content:center;gap:${L(ctx, 12)};">${words}</div>`;
         const { wMm } = factTriangleSize(ctx);
-        return `<div class="mq-fc k2-cell" data-read${twin ? ' data-mq-k2="1"' : ''} style="color:${INK};${FONT}text-align:center;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 4)};padding:${L(ctx, 1)} 0 ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};box-sizing:border-box;width:100%;">`
+        return `<div class="mq-fc k2-cell" data-ws-inplace data-read${twin ? ' data-mq-k2="1"' : ''} style="color:${INK};${FONT}text-align:center;display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 4)};padding:${L(ctx, 1)} 0 ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};box-sizing:border-box;width:100%;">`
             + `<div style="width:${L(ctx, wMm + 1)};max-width:100%;">${tri}</div>${choice}</div>`;
     },
     answerKey(p) {
         const lab = labelsOf(p)[correctOf(p)];
         return { value: lab, display: lab, slots: { answer: { value: lab, graded: true, accept: [lab.toLowerCase(), lab.charAt(0).toLowerCase()] } } };
     },
-    footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 3 }; },
+    // answered in place (a ring round a printed word): rows packed to the measured height, never stretched far past
+    // it (layout.js IN_PLACE_FILL; critic r1 F1: 9 triangles in 73 mm cells at S, 37.8 % empty)
+    footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true }; },
     inputs() { return [{ id: 'answer', kind: 'choice', shape: 'choice', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout() { return { card: 'card-medium-visual', checker: 'choice' }; },
 });

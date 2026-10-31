@@ -130,53 +130,53 @@ function subNoRegroupLessons() {
 }
 
 /* ------------------------------ one-step word problems within 10 / 20 (K-1, the sentence layout) */
-// Visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md 4.4): the word-work cell's sentence layout -
-// the story, then `[ ] ◯ [ ] = [ ] unit`. The five steps are the provider's five worked steps
-// (sheet/providers/word-work.js: read two times, the key words, the two numbers, the sign, solve), so step n of the
-// list IS state n of the chart's example. The Warm-up deals the column facts the story is solved with (one row of
-// four: a bond row beside them pushed Guided Practice off page 2, DN-2); Mixed practice pairs the lesson with the bonds
-// strand and the other operation's facts (never a second word-problem section). The _plain twin (no picture row) is the same lesson.
+// Visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md 4.4; round 2, critic r1 F6 / F13): the word-work
+// cell's sentence layout - the story, the PART-WHOLE BAR (drawn on the teaching cells), then `[ ] ◯ [ ] = [ ] unit`.
+// The lesson teaches the structure, never key words (PEDAGOGY P-21, P-WP-10): two parts make the whole; I know both
+// parts, I add; I know the whole and one part, I subtract. The four steps are the provider's four worked steps
+// (sheet/providers/word-work.js: read, the parts and the whole on the bar, the number sentence, solve), so step n of
+// the list IS panel n of the chart. The Warm-up deals the facts the story is solved with (one row of four: a bond row
+// beside them pushed Guided Practice off page 2, DN-2); Mixed practice pairs the lesson with the bonds strand and the
+// other operation's facts (never a second word-problem section). The _plain twin (no picture row) is the same lesson.
 function storyLessons() {
     const FORMAT = {
-        kind: 'numbered steps with icons + a chant',
-        why: 'The one decision pupils get wrong is the sign; a short chant at the key-word step names where to look before they write.',
+        kind: 'numbered steps with icons + a rule',
+        why: 'The one decision pupils get wrong is the sign; the bar shows which number is missing - a part or the whole - and the rule names what to do.',
     };
-    const STEPS = (sign) => [
+    const STEPS = [
         { icon: 'look', text: 'Read the story two times.' },
-        { icon: 'decide', text: 'Find the key words.' },
-        { icon: 'write', text: 'Write the two numbers.' },
-        { icon: 'decide', text: `Write the sign. ${sign}.` },
-        { icon: 'check', text: 'Solve. Write the unit.' },
+        { icon: 'decide', text: 'Find the parts and the whole.' },
+        { icon: 'write', text: 'Write the number sentence.' },
+        { icon: 'check', text: 'Solve. Say the answer and its label.' },
+    ];
+    // the vocabulary pictures: the same small bar, each showing only what its word names (no pointer)
+    const VOCAB = (sentence) => [
+        { word: 'whole', meaning: 'all of them together', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'whole', only: true } },
+        { word: 'part', meaning: 'some of the whole', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'parts', only: true } },
+        { word: 'number sentence', meaning: 'the numbers and the sign', picture: { kind: 'text', text: sentence } },
     ];
     const ADD = {
         concepts: [
-            { id: 'story-numbers', text: 'The two story numbers are the parts.' },
-            { id: 'more-add', text: '"More" and "in all" mean put together: add.' },
+            { id: 'part-whole', text: 'Two parts make the whole.' },
+            { id: 'both-parts-add', text: 'I know both parts. I add to find the whole.' },
             { id: 'unit', text: 'The answer is a number of things: say the unit.' },
         ],
-        vocab: [
-            { word: 'add', meaning: 'the + sign: put together', picture: { kind: 'glyph', text: '+' } },
-            { word: 'in all', meaning: 'how many together', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'whole' } },
-            { word: 'more', meaning: 'some come or are given', picture: { kind: 'text', text: '5, then 2 come' } },
-        ],
-        steps: STEPS('Add'),
-        chant: 'More or in all? Put them together: add!',
+        vocab: VOCAB('3 + 4 = 7'),
+        steps: STEPS,
+        chant: 'Part + part = whole.',
     };
     const SUB = {
         concepts: [
-            { id: 'start-number', text: 'The first story number is how many at the start.' },
-            { id: 'left-sub', text: '"Left" and "gives away" mean take away: subtract.' },
+            { id: 'part-whole', text: 'Two parts make the whole.' },
+            { id: 'whole-part-sub', text: 'I know the whole and one part. I subtract to find the other part.' },
             { id: 'unit', text: 'The answer is a number of things: say the unit.' },
         ],
-        vocab: [
-            { word: 'take away', meaning: 'the − sign: some go', picture: { kind: 'glyph', text: '−' } },
-            { word: 'left', meaning: 'how many are still there', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'parts' } },
-            { word: 'gives', meaning: 'some go to someone else', picture: { kind: 'text', text: 'Tom → Sam' } },
-        ],
-        steps: STEPS('Subtract'),
-        chant: 'Left or gives away? Take them away: subtract!',
+        vocab: VOCAB('7 − 3 = 4'),
+        steps: STEPS,
+        chant: 'Whole − part = part.',
     };
-    const base = (o) => Object.assign({ format: FORMAT, example: { match: 'key words' } }, o);
+    // (the practice page: eight stories where they fit the page, else six - print-sheet.js practiceShapes)
+    const base = (o) => Object.assign({ format: FORMAT, example: { match: 'I know' }, practiceShapes: [[8, 2], [6, 2], [4, 2]] }, o);
     const addFacts = (band) => ({ key: 'addition:add_facts', opts: { band, notation: ['stacked'] }, why: `The story is solved with an addition fact within ${band}.` });
     const subFacts = (band) => ({ key: 'subtraction:subtract', opts: { band, notation: ['stacked'] }, why: `The story is solved with a take-away fact within ${band}.` });
     const add = (band) => base(Object.assign({}, ADD, {
@@ -318,19 +318,21 @@ export const LESSONS = Object.freeze({
         vocab: [
             { word: 'whole', meaning: 'the big number at the top', picture: { kind: 'text', text: '12 at the top' } },
             { word: 'parts', meaning: 'the two small numbers', picture: { kind: 'text', text: '8 and 4' } },
-            { word: 'fact family', meaning: 'parts that make the whole', picture: { kind: 'text', text: '8 + 4 = 12' } },
+            // (critic r1 F8: a family is the three numbers, never one number sentence - a sentence is one fact)
+            { word: 'fact family', meaning: 'three numbers: two parts and the whole', picture: { kind: 'text', text: '8, 4, 12' } },
         ],
         steps: [
             { icon: 'look', text: 'Find the big number.' },
             { icon: 'count', text: 'Add the small numbers.' },
             { icon: 'decide', text: 'The same? Circle yes. Not? Circle no.' },
         ],
-        chant: 'Parts make the whole? Yes!',
+        chant: 'Two parts make the whole.',
         format: {
             kind: 'numbered steps with icons + a chant',
             why: 'Three short steps; the decision at step 3 is the whole skill, and the four-word chant is the question pupils ask themselves.',
         },
         example: { match: 'Circle yes' },
+        practiceShapes: [[12, 3], [9, 3], [6, 2]],
         mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'subtraction:subtract', opts: { band: 20 } }],
     },
 

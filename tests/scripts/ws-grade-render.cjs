@@ -21,6 +21,10 @@
 //   node tests/scripts/ws-grade-render.cjs --roles independent,more-practice --skills addition:add_20_regroup
 //                                          # the PAGE ENGINE (P7.2): each role through window.buildSheet
 //
+// --gate         a GATE, not only a render: FAIL (exit 1) when any rendered role page or key overflows (a cell, the body or
+//                the page: check.problems) or a card-390 / card-820 touch target is under 44 x 44 px (RUBRIC H6); last line
+//                `ws-grade-render: OK|FAIL`. ws-precritic --skill runs it on the lane skills' lesson, test and independent
+//                pages at S, M and L (visual-quality critic r1: F3 and F4 were measured here and failed nothing)
 // --roles r1,r2  renders each page role through the sheet engine (js/modules/print-sheet.js
 //                `buildSheet` -> `sheetDocument`), prints the pupil sheet and its key as two A4
 //                PDFs and rasterises them to <role>-p1.png ... and <role>-key-p1.png ..., recording
@@ -146,6 +150,8 @@ const OUT = arg('out', null) ? path.resolve(ROOT, arg('out'))
 const DPI = parseInt(arg('dpi', GOLDEN_MODE ? '150' : '96'), 10);
 const NO_SCREEN = has('no-screen');
 const NO_PRINT = has('no-print');
+// --gate: end with `ws-grade-render: OK | FAIL` on the measured overflow and phone / tablet card targets (see the run's end)
+const GATE = has('gate');
 const RESUME = has('resume');
 const ROLES = (arg('roles', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 if (GOLDEN_MODE && !ROLES.length) ROLES.push('independent');
@@ -1081,6 +1087,30 @@ td{padding:3px 0;word-break:break-word}`;
     }
     console.log(`ws-grade-render: done, ${manifest.length} units, ${records.length} pages, ${((Date.now() - t0) / 1000).toFixed(0)}s`);
     for (const e of errs.slice(0, 12)) console.log('  ERROR ' + e);
+    if (GATE) {
+        // --gate (visual-quality critic r1, root cause of F3 / F4): what this renderer MEASURES but nothing failed on -
+        // a cell, the body or the page overflowing on any rendered role page or its key (`check.problems`: content in
+        // the cell's pad counts, scrollHeight > clientHeight), and a touch target under 44 x 44 px on the phone and
+        // tablet practice cards (card-390, card-820; RUBRIC H6). Precritic runs it on every --skill scope.
+        const bad = [];
+        for (const m of manifest) {
+            for (const [k, v] of Object.entries(m.roles || {})) {
+                if (!v || v.error || v.unsupported) continue;
+                for (const [side, ch] of [['pupil', v.check], ['key', v.keyCheck]]) for (const pr of ((ch && ch.problems) || [])) bad.push(`OVERFLOW ${m.skill} ${k} ${side}: ${pr}`);
+            }
+            for (const [k, v] of Object.entries(m.screen || {})) {
+                if (!/^card-(390|820)$/.test(k) || !v || !v.measure) continue;
+                for (const t of (v.measure.smallTargets || [])) bad.push(`TARGET ${m.skill} ${k}: <${t.tag} class="${t.cls}"> ${t.w} x ${t.h} px (under 44 px, H6)`);
+            }
+        }
+        const units0 = manifest.length;
+        for (const b of bad.slice(0, 30)) console.log('  FAIL ' + b);
+        if (errs.length) console.log(`ws-grade-render: FAIL - ${errs.length} render error(s)`);
+        else if (bad.length) console.log(`ws-grade-render: FAIL - ${bad.length} finding(s) (${bad.filter((b) => /^OVERFLOW/.test(b)).length} overflow, ${bad.filter((b) => /^TARGET/.test(b)).length} small target) in ${units0} unit(s)`);
+        else console.log(`ws-grade-render: OK (${units0} unit(s): no overflow on any role page, no phone / tablet card target under 44 px)`);
+        if ((errs.length || bad.length) && !REPORT_ONLY) process.exit(1);
+        return;
+    }
     if (GOLDEN_MODE) {
         if (errs.length) console.log(`ws-grade-render: FAIL - ${errs.length} render error(s)`);
         else if (fail) console.log(`ws-grade-render: FAIL - ${fail} page(s) changed, new or removed since the golden`);

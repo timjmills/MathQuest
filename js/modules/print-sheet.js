@@ -230,6 +230,8 @@ function normaliseRequest(req = {}) {
 
 /** A question's identity for de-duplication: what the pupil would see as "the same problem". */
 function signature(q) {
+    // a generator's own duplicate key (`q.dupKey`: the same numbers in another order are the same item, critic r1 F9)
+    if (q && typeof q.dupKey === 'string' && q.dupKey) return `dup:${q.dupKey}`;
     const payload = q.cell && q.cell.payload ? JSON.stringify(q.cell.payload) : '';
     const ans = typeof q.ans === 'object' ? JSON.stringify(q.ans) : String(q.ans);
     return `${String(q.text || '').replace(/\s+/g, ' ').trim()}|${ans}|${payload}`;
@@ -2565,7 +2567,13 @@ async function buildSheetCore(req = {}) {
                 // its worked example in a band ABOVE its problems, never beside them. The three the
                 // owner named do so at every size (at L their pairs fill just over half a row).
                 const key = `${sec.skills[0].categoryId}:${sec.skills[0].skillId}`;
-                if ((!s4.ok && s4.band >= SIDE4_BAND) || SIDE_BAND_ONLY.includes(key)) bandInstead.push(metaOf(sec.skills[0]).label);
+                // (and a twin too wide for half the page whose one-column pair - twin over problem - fills more than half the
+                // page: side by side would print the example and ONE problem a page, 47 % blank - visual-quality critic r1
+                // F21, the sentence stories at L; the band above the problems holds the page's capacity)
+                const wideTwin = set.items.every((a) => a.measured && a.measured[2] && a.measured[2].fits === false);
+                const onePair = 2 * (twinMm(set) + pr) > G;
+                const sentenceStory = set.items.every((a) => { const cl = a.source && a.source.q && a.source.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.layout === 'sentence'); });
+                if ((!s4.ok && s4.band >= SIDE4_BAND) || SIDE_BAND_ONLY.includes(key) || (wideTwin && (onePair || sentenceStory))) bandInstead.push(metaOf(sec.skills[0]).label);
             }
             return;
         }
@@ -3754,7 +3762,10 @@ async function buildLesson(n, metaOf) {
     // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
     // `practiceShape` (lesson data; the detailed lesson maker): a one-line item too wide for two
     // columns prints [count, cols] a page instead (expanded form: 8 x 1).
-    const stackShapes = data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]];
+    // (`practiceShapes`: the shapes to try, densest first - the first that prints on its pages wins; visual-quality r2:
+    // eight stories at M, six at L, never six over a 25 % strip)
+    const stackShapes = data && Array.isArray(data.practiceShapes) && data.practiceShapes.length ? data.practiceShapes
+        : data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]];
     // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a
     // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
     // same count either way, so the pupil gets the bigger digits.

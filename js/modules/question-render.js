@@ -1673,7 +1673,9 @@ function _applyScreenCell() {
         // repeats the equation drawn under the line
         // A word-work story prints its story inside the cell: the line above it is the task
         // (round-4 critic: the card had no instruction), in screen verbs.
-        const _wwInstr = q.cell && q.cell.template === 'word-work' && q.screenInstr ? screenInstruction(q.screenInstr) : '';
+        // (the fact-family check too: its three numbers are in the triangle, the line above it says "Tap yes or no" -
+        // visual-quality critic r1 F15)
+        const _wwInstr = q.cell && (q.cell.template === 'word-work' || q.cell.template === 'family-check') && q.screenInstr ? screenInstruction(q.screenInstr) : '';
         if (qt && (isNumberLineItem(q) || _wwInstr)) {
             qt.classList.remove('mq-dup');
             qt.style.cssText = '';

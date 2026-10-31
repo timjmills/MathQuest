@@ -63,7 +63,30 @@ function marksFor(it, steps) {
  * the plain Model do (same lines, boxes, digits and arrows), and the one-page option changes nothing on the Model of a wide row.
  * The item is wrapped here, before the host measures it, so the measured height and the drawing agree.
  */
+/**
+ * A one-step story in the word-work SENTENCE layout (visual-quality lane round 2, critic r1 F14): the story is printed
+ * ONCE over the frames, and each frame draws the part-whole bar and the number sentence with what its step writes - the
+ * places of steps 1..k written, the newest in trace grey (P-LC-9) - so four frames fit one page and none shows empty
+ * boxes beside "Write 4 and 13 in the boxes".
+ */
+const isSentenceStory = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.layout === 'sentence' && (cl.payload.steps || []).length === 1); };
+const SENTENCE_SLOTS = /(<span[^>]*data-ws-slot="(fr0-a|fr0-b|op0|answer|bar-w|bar-a|bar-b)"[^>]*>)([^<]*)(<\/span>)/g;
+function sentenceFrameAt(html, writtenAt, k) {
+    return html.replace(SENTENCE_SLOTS, (m, open, id, val, close) => {
+        const g = writtenAt.has(id) ? writtenAt.get(id) : Infinity;
+        const bare = open.replace(/ data-ws-ink="[a-z]+"/, '').replace(/color:#(?:000000|000|949494);?/g, '');
+        if (k < g) return bare + close;
+        const grey = k === g;
+        return bare.replace(/^<span /, `<span data-ws-ink="${grey ? 'trace' : 'solid'}" `).replace(/ style="/, ` style="color:${grey ? '#949494' : '#000'};`) + val + close;
+    });
+}
+
 export function prepare(it) {
+    // (a sentence story's frames draw no story: it is printed once over them - measured that way, so the rows fit)
+    if (isSentenceStory(it)) {
+        const render = (c, o = {}) => it.render(c, Object.assign({}, o, { payload: Object.assign({}, o.payload, { lines: [] }) }));
+        return Object.assign({}, it, { render, measured: null, storyLines: it.q.cell.payload.lines.slice() });
+    }
     const q = (it && it.q) || {};
     const p = q.cell && q.cell.template === 'count-row' ? q.cell.payload || {} : null;
     if (!p || !p.compact || !isWideRow(p)) return it;
@@ -129,8 +152,11 @@ export function plan(input = {}) {
     // full width, with its step text over it in the same row (PT-MOD-2 cannot hold it beside).
     const h1 = hMinAt([it], 1, ctx);
     let H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH2) : h1 + textH2;
-    const room1 = m.budget - m.strip - m.say;
-    const roomC = mCont.budget - m.strip - m.say;
+    // (a sentence story prints its story once over the frames: its lines come off the first page's room)
+    const story = isSentenceStory(it) && Array.isArray(it.storyLines) ? it.storyLines : null;
+    const storyMm = story ? story.length * (m.pitch + 1.6) + 5 : 0;
+    const room1 = m.budget - m.strip - m.say - storyMm;
+    const roomC = mCont.budget - m.strip - m.say - storyMm;
     // Every skill: the pages as they always were (a page holds what fits with the Say band's room kept), the states dealt so no
     // page holds a lone state where the same pages allow it ([3, 1] -> [2, 2], [3, 3, 1] -> [3, 2, 2]; critic r2 D8, r4 D12).
     let deal = dealOf(steps.length, Math.max(1, Math.floor(room1 / H)), Math.max(1, Math.floor(roomC / H)));
@@ -176,13 +202,16 @@ export function plan(input = {}) {
         if (best) { steps = best.v.steps; marks = best.v.marks; H = best.Hs; deal = best.d; }
     }
     const ans = answerOf(it);
+    // the sentence story: the step that first writes each place (the provider's worked-step marks)
+    const writtenAt = new Map();
+    if (story) providerWorkedSteps(it, 6).forEach((st, g) => (st.marks || []).forEach((mk) => { if (mk && mk.slot && !writtenAt.has(mk.slot)) writtenAt.set(mk.slot, g); }));
     const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
     const stateItem = (i) => planItem(it, {
         cols, level: 3, nolabel: true,
         render: (c, o) => (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
-            + it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
+            + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i] }) } : {})
-                    : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {})),
+                    : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
     });
     const textItem = (i) => ({
         render: () => stepText(i),
@@ -196,7 +225,9 @@ export function plan(input = {}) {
         const take = steps.slice(i, i + cap).map((_, k) => i + k);
         const cells = [];
         for (const k of take) { cells.push(stateItem(k)); if (cols === 2) cells.push(textItem(k)); }
-        const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' }) }];
+        const grid = gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
+        const storyHtml = story ? `<div class="mq-wwstory mq-modelstory" style="padding:1.5mm 4mm 2mm;font-size:${m.textPt + 2}pt;line-height:1.3;">${story.map((l) => `<div>${esc(l)}</div>`).join('')}</div>` : '';
+        const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), ...(story ? { contents: [{ kind: 'html', html: storyHtml }, grid] } : { content: grid }) }];
         i += take.length;
         if (i >= steps.length) sections.push({ kind: 'say', frame: oralFrameOf(it, { fill: true }) });
         pages.push({ sections });

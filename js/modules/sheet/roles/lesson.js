@@ -971,7 +971,14 @@ function twoState(it, k, c) {
  */
 const isWordSentence = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.layout === 'sentence' && (cl.payload.steps || []).length === 1); };
 function sentenceState(it, groups, k, c) {
-    const p = Object.assign({}, it.q.cell.payload, { pic: null, kb: false });
+    // (the part-whole bar is drawn on every panel - WDS 18.1, critic r1 F13 - its boxes written as their step comes)
+    const p = Object.assign({}, it.q.cell.payload, { pic: null, kb: false, bar: true });
+    // (the story is printed in the chart's first row of panels only: the second row draws the bar and the sentence, so
+    // the chart and its Say and Rule bands fit the page with the bar drawn - critic r1 F4, content never shrinks)
+    // (and the panels draw what their step uses: the story and the bar on the first row - read, then find the parts and
+    // the whole - the bar and the number sentence on the second; a 2 x 2 chart with the bar fits under the Rule band)
+    if (groups.length >= 4 && k >= 2) p.lines = [];
+    if (groups.length >= 4 && k < 2) p.noFrame = true;
     const st = p.steps[0];
     // (a half panel: the cell's column form - the story, then the sentence under it)
     const ctx = Object.assign(resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined })), { columns: 2 });
@@ -980,13 +987,13 @@ function sentenceState(it, groups, k, c) {
     try { html = t.render(p, ctx); } catch (e) { html = ''; }
     const at = new Map();
     groups.forEach((g, gi) => (g.marks || []).forEach((m) => { if (m && m.slot && !at.has(m.slot)) at.set(m.slot, gi); }));
-    html = html.replace(/(<span[^>]*data-ws-slot="(fr0-a|fr0-b|op0|answer)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
+    html = html.replace(/(<span[^>]*data-ws-slot="(fr0-a|fr0-b|op0|answer|bar-w|bar-a|bar-b)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
         const g = at.has(id) ? at.get(id) : groups.length - 1;
         const bare = open.replace(/ data-ws-ink="[a-z]+"/, '');
         if (k < g) return bare + close;
         return inkSpan(bare + val + close, k === g);
     });
-    let ringed = 0;
+    let ringed = p.lines.length ? 0 : 2;   // (the story's numbers are ringed where the story is printed, never the bar's)
     html = html.replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${st.a}|${st.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring${k === 0 ? ' mq-lring-t' : ''}">${n}</span>`) : n))}<`));
     return html;
 }
@@ -1285,7 +1292,7 @@ function vocabPicture(pic, c) {
     const mm = (v) => `${v.toFixed(2)}mm`;
     switch (pic && pic.kind) {
         // a small part-whole bar (detailed lesson 2): {whole, a, b, mark: 'whole' | 'parts'}
-        case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12 });
+        case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12, only: !!pic.only });
         // (one product, detailed lesson 4: the chart corner a × b with its product boxed)
         case 'fact': return factGridMini(Number(pic.a), Number(pic.b));
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;

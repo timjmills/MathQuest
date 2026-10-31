@@ -39,10 +39,18 @@ export function factTriangle(ctx, o = {}) {
     const signs = o.signs
         ? `<text x="${n2(m + s / 2)}" y="${n2(m + h * 0.66 + zonePt(ctx) * PT_MM * 0.35)}" text-anchor="middle" font-size="${n2(zonePt(ctx) * PT_MM)}" font-weight="700" font-family="Andika, 'Open Sans', sans-serif" fill="${INK}">${esc(o.signs)}</text>`
         : '';
+    // Each number is placed from its own width so its ink keeps >= 2 mm to the slant it faces (critic r1 F10: a
+    // two-digit part came within 0.8 mm of the side at S and on the quiz host). Widths are a generous 0.6 em a digit.
+    const half = 0.36 * fs;
+    const wOf = (v) => Math.max(1, String(v === undefined || v === null ? '' : v).length) * 0.6 * fs;
+    const gapH = 2 / Math.sin(Math.PI / 3) + sw / 2;           // 2 mm square to a 60 degree side, as a horizontal gap
+    const yb = Math.min(h * 0.82, h - 2.2 - half);               // the base row, 2.2 mm over the base line
+    const xb = (v) => Math.max(s * 0.29, (s / 2) * (1 - (yb - half) / h) + gapH + wOf(v) / 2);
+    const yt = Math.max(h * 0.43, (h * (wOf(o.top) / 2 + gapH)) / (s / 2) + half);
     const body = outline
-        + num(m + s / 2, m + h * 0.43, o.top)
-        + num(m + s * 0.29, m + h * 0.79, o.left)
-        + num(m + s * 0.71, m + h * 0.79, o.right)
+        + num(m + s / 2, m + yt, o.top)
+        + num(m + Math.min(s / 2 - 1, xb(o.left)), m + yb, o.left)
+        + num(m + Math.max(s / 2 + 1, s - xb(o.right)), m + yb, o.right)
         + signs;
     const W = s + 2 * m, H = h + 2 * m;
     const label = esc(o.label || `fact triangle: ${o.top} at the top, ${o.left} and ${o.right} below`);

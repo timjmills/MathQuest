@@ -1204,8 +1204,9 @@ for (const op of ['add', 'sub']) {
         }
     }
     // Word problems by band: one ladder too, bands at or below the id's own. The no-picture twins
-    // (_plain) keep the band only: generate-question.js strips their visual after generation, so a
-    // bar model could not reach them. Pictures exist on the stories to 100; the bar model on every band.
+    // (_plain) keep the band here; their bar model is WORD_WORK_OPTIONS' `wpBar` below (a bar is not a
+    // picture: word-work.js draws it from the cell payload, never from the stripped visual). Pictures
+    // exist on the stories to 100; the bar model on every band.
     for (const [code, max] of Object.entries(_OPS_BANDS)) {
         if (op === 'add' && max === 10) continue;      // add_wp_10 is the K picture story (gen-counting.js)
         const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b >= 20 || (op === 'sub' && b === 10)));

@@ -347,8 +347,13 @@ export function schemaOf(text, st, ans) {
  * The story's sentences for one schema, from the step's numbers. Returns
  * {lines: [...sentences, question], unit: {one, many} | null, ans}. `k` varies names and nouns.
  */
-export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, times = null } = {}) {
+export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, times = null, variant = null } = {}) {
     let k = k0;
+    // the schema's telling (join: put together / gets more; separate: gives / takes out): the SET's, drawn once from the
+    // seeded rng (`variant`, PEDAGOGY P-21 "a set uses one schema"), else - stories outside the sentence band, as
+    // before - from the walk (visual-quality critic r1 F12: by item position, the schema alternated down every page)
+    const alt = Number.isInteger(variant) ? variant % 2 : null;
+    const odd = () => (alt === null ? k % 2 : alt);
     const a = st.top, b = st.bottom;
     // Thousands of stickers in a child's hands is nonsense (round-4 critic): a + / − story with a
     // number of 1,000 or more is about a place and its money ("The shop has 57,938 dollars.").
@@ -362,7 +367,7 @@ export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, tim
     if ((big || money) && schema === 'separate') k = 1;      // money is given, not kept in a box
     switch (schema) {
         case 'join':
-            return (k % 2)
+            return odd()
                 ? S([`${n1} has ${countOf(a, T)}.`, `${n2} has ${countOf(b, T)}.`, `How many ${T.many} do they have in all?`], T)
                 : S([`${n1} has ${countOf(a, T)}.`, `${n1} gets ${countOf(b, T).replace(/^(\S+) /, '$1 more ')}.`, `How many ${T.many} does ${n1} have now?`], T);
         case 'compare-more':
@@ -370,7 +375,7 @@ export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, tim
         case 'start-sub':
             return S([`${n1} had some ${T.many}.`, `${n1} gave away ${countOf(b, T)}.`, `Now ${n1} has ${countOf(a, T)}.`, `How many ${T.many} did ${n1} have at first?`], T);
         case 'separate':
-            return (k % 2)
+            return odd()
                 ? S([`${n1} has ${countOf(a, T)}.`, `${n1} gives ${countOf(b, T)} to ${n2}.`, `How many ${T.many} does ${n1} have left?`], T)
                 : S([`There ${a === 1 ? 'is' : 'are'} ${countOf(a, T)} in a box.`, `${n1} takes ${countOf(b, T)} out.`, `How many ${T.many} are left in the box?`], T);
         case 'compare':
@@ -480,13 +485,13 @@ export function wordWorkPayload(q, o = {}) {
         const k = Number.isFinite(o.seed) ? o.seed : seed;
         const tm = /(\d[\d,]*)\s+times as many\b/i.exec(plain(q.text));
         const told = steps.length > 1 ? tellTwoStep(steps[0], steps[1], k)
-            : tellStory(schema, last, k, { ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some'].includes(schema), times: tm ? Number(tm[1].replace(/,/g, '')) : null });
+            : tellStory(schema, last, k, { variant: Number.isInteger(o.variant) ? o.variant : null, ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some'].includes(schema), times: tm ? Number(tm[1].replace(/,/g, '')) : null });
         if (told && told.ans === ans) {
             lines = told.lines;
             const u = told.unit;
             const others = [];
             for (const x of [...WW_CONTAINERS.map((c) => c.many), ...WW_THINGS.map((c) => c.many)]) if (lines.join(' ').includes(` ${x}`) && (!u || x !== u.many)) others.push(x);
-            unit = u ? { word: ans === 1 ? u.one : u.many, many: u.many, others } : { word: '', many: '', others };
+            unit = u ? { word: ans === 1 ? u.one : u.many, many: u.many, one: u.one, others } : { word: '', many: '', others };
         }
     }
     // The answer is written ONCE (round-4 critic, H8): in the bottom row of the columns (or the
@@ -497,6 +502,9 @@ export function wordWorkPayload(q, o = {}) {
     const barKind = last.op === '*' || last.op === '/' ? 'groups' : /compare/.test(schema) ? 'compare' : 'whole';
     return {
         lines, steps, ans, unit: unit.word, bank: unitBank(unit, unit.others, seed), schema, inRow,
+        // the label's two forms: a PRINTED label is always the plural (the sentence layout - critic r1 F5: "stamp" under
+        // the empty box told the pupil the answer was 1); the singular is for the spoken answer of 1
+        unitMany: unit.many || unit.word || '', unitOne: unit.one || (unit.many ? singular(unit.many) : unit.word || ''),
         tracks: Number(o.tracks) > 0 ? Number(o.tracks) : 0,
         hl: !!o.hl, kb: !!o.kb, bar: !!o.bar && steps.length === 1, barKind,
         ...(steps.length === 2 && steps[0].op === '/' && steps[0].top <= 100 && steps[0].bottom <= 10 && !steps[0].r ? { factDiv: true } : {}),
@@ -850,7 +858,7 @@ function keywordBank(ctx, ops = null) {
  * box on top, the two part boxes under it (widths in proportion), the labels written in; `mark`
  * ('whole' | 'parts') draws that box (or boxes) at 1.5 pt, the rest at 0.75 pt. Line art, black.
  */
-export function barMini({ whole, a, b, mark = '', wMm = 40, pt = 13 } = {}) {
+export function barMini({ whole, a, b, mark = '', wMm = 40, pt = 13, only = false } = {}) {
     const H = 7, W = wMm, PTMM = 25.4 / 72;
     // schematic (RP-72): equal parts equal, else the bigger part the longer stock length
     const wa = a === b ? W / 2 : (a > b ? 0.6 * W : 0.4 * W);
@@ -862,8 +870,11 @@ export function barMini({ whole, a, b, mark = '', wMm = 40, pt = 13 } = {}) {
     const L0 = 6, y2 = H + 1.5;
     const arrow = (y) => `<path d="M0 ${(y + H / 2 - 2.2).toFixed(2)} L4.2 ${(y + H / 2).toFixed(2)} L0 ${(y + H / 2 + 2.2).toFixed(2)} Z" fill="#000"/>`;
     const ring = mark ? '' : `<rect x="${(L0 - 1.6).toFixed(2)}" y="-0.4" width="${(W + 3.2).toFixed(2)}" height="${(2 * H + 1.5 + 0.8).toFixed(2)}" rx="1.5" fill="none" stroke="#000" stroke-width="${sw(false)}"/>`;
-    const point = mark === 'whole' ? arrow(0) : mark === 'parts' ? arrow(y2) : '';
-    const g = `<g transform="translate(${L0} 0)">` + box(0, 0, W, whole, mark === 'whole') + box(0, y2, wa, a, mark === 'parts') + box(wa, y2, W - wa, b, mark === 'parts') + '</g>';
+    // (`only`: the named row alone carries its numbers, the other row's boxes are empty - the picture shows what its
+    // word names without a pointer; visual-quality critic r1 F6 "a stray solid ▶")
+    const point = only ? '' : mark === 'whole' ? arrow(0) : mark === 'parts' ? arrow(y2) : '';
+    const lab = (v, row) => (only && mark && mark !== row ? '' : v);
+    const g = `<g transform="translate(${L0} 0)">` + box(0, 0, W, lab(whole, 'whole'), mark === 'whole') + box(0, y2, wa, lab(a, 'parts'), mark === 'parts') + box(wa, y2, W - wa, lab(b, 'parts'), mark === 'parts') + '</g>';
     const VW = W + L0 + 2.2, VH = 2 * H + 1.5 + 1;
     return `<svg class="mq-barmini" viewBox="-0.5 -0.5 ${VW.toFixed(2)} ${VH.toFixed(2)}" width="${VW.toFixed(1)}mm" height="${VH.toFixed(1)}mm" aria-label="bar model">`
         + ring + point + g + '</svg>';
@@ -1134,23 +1145,30 @@ function sentenceLayout(p, ctx) {
     const put = filled(ctx) && !twin;
     const ink = put ? inkOf(ctx) : null;
     const digits = Math.max(2, Number(p.digits) || 2);
-    const frame = sentenceFrame(ctx, { a: st.top, b: st.bottom, op: GLYPH[st.op], ans: put ? sh.ans : String(p.ans), unit: p.unit, digits, show: put, ink, unitChars: Math.max(8, String(p.unit || '').length), under: narrow && !twin && !sentenceFits(p, ctx) });
+    // (`noFrame`: a lesson chart panel before the sentence step draws the story and the bar only)
+    const frame = p.noFrame ? '' : sentenceFrame(ctx, { a: st.top, b: st.bottom, op: GLYPH[st.op], ans: put ? sh.ans : String(p.ans), unit: p.unit, digits, show: put, ink, unitChars: Math.max(8, String(p.unit || '').length), under: narrow && !twin && !sentenceFits(p, ctx) });
     const whole = st.op === '+' ? st.ans : st.top;
     const pa = st.op === '+' ? st.top : st.bottom;
     const pb = st.op === '+' ? st.bottom : st.ans;
-    const bar = p.bar ? partWholeBar(ctx, { whole, a: pa, b: pb, wMm: narrow ? 52 : 64, show: put, ink }) : '';
+    // The part-whole bar (WDS 18.1, lead ruling on critic r1 F13): DRAWN on the teaching cells - a Model, a Guided try,
+    // the lesson's chart (scaffold level 2-3) - and on a practice page only with the `bar` option (the fade). The parts
+    // are drawn equal when the unknown is a part (a take-away story), so the length never gives the answer away.
+    // (a K picture story's countable picture already draws the two parts on its teaching cells - the bar joins it on the
+    // lesson's chart and with the option, so a Guided page of picture stories is not two pictures tall)
+    const teach = !twin && Number(ctx.scaffoldLevel) >= 2 && !p.pic;
+    const bar = p.bar || teach ? partWholeBar(ctx, { whole, a: pa, b: pb, wMm: narrow ? 52 : 64, show: put, ink, equal: st.op === '-', ids: { whole: 'bar-w', a: 'bar-a', b: 'bar-b' } }) : '';
     const work = `<div class="mq-wwwork" style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 3)};">${bar}${frame}</div>`;
     // the keyword bank option (wpBank): the + and − rows only, under the story
     const kb = p.kb ? `<div style="margin-top:${L(ctx, 2)};">${keywordBank(ctx, ['+', '-'])}</div>` : '';
     const cls = 'mq-ww mq-wwframes mq-wwsentence';
     const base = `box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;`;
     if (!narrow) {
-        return `<div class="${cls}" data-ww-ops="${st.op}" data-read style="width:100%;${base}padding-left:calc(var(--ws-tab, 5mm) + 1mm);display:flex;align-items:center;gap:${L(ctx, 6)};">`
+        return `<div class="${cls}" data-ww-ops="${st.op}" data-ws-inplace data-read style="width:100%;${base}padding-left:calc(var(--ws-tab, 5mm) + 1mm);display:flex;align-items:center;gap:${L(ctx, 6)};">`
             + `<div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}${kb}</div>${work}</div>`;
     }
     // (a column too narrow for the word beside the box hangs the word UNDER the box: a lesson's two-across
     // cells and the page grids both hold it, nothing sticks out - PG-12)
-    return `<div class="${cls}" data-ww-ops="${st.op}" data-read style="width:100%;${base}padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">`
+    return `<div class="${cls}" data-ww-ops="${st.op}" data-ws-inplace data-read style="width:100%;${base}padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">`
         + `${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic, !twin)}${kb}<div style="margin-top:${L(ctx, 3)};display:flex;${twin ? 'justify-content:center;' : ''}">${work}</div></div>`;
 }
 
@@ -1277,11 +1295,19 @@ register(WW_TEMPLATE, {
         }
         if (p.unit && p.layout !== 'bar' && p.layout !== 'frames' && p.layout !== 'sentence') slots['answer-label'] = { value: p.unit, graded: false };
         (p.steps || []).forEach((s, i) => { slots[`op${i}`] = { value: GLYPH[s.op], graded: false }; });
-        return { value: p.ans, display: p.unit ? `${Number(p.ans).toLocaleString('en-US')} ${p.unit}` : String(p.ans), slots };
+        // (the printed label is the plural; the key's spoken line says "1 stamp")
+        const unitSaid = Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit;
+        return { value: p.ans, display: p.unit ? `${Number(p.ans).toLocaleString('en-US')} ${unitSaid}` : String(p.ans), slots };
     },
     // Measured: a story of small numbers stands in 2 columns; one whose columns are wider than a
     // 2-column cell is measured to one and goes in the full-width group (practice.js splitWide).
-    footprint() { return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, restacks: true }; },
+    // The sentence layout (stories within 20) is answered IN PLACE - the pupil writes in the boxes, the cell holds no
+    // working space - so its rows are packed to the measured height (`denseRoom` 1) and never stretched far past it
+    // (`inPlace`, layout.js IN_PLACE_FILL): critic r1 F1, a 41 mm story in a 57 mm cell (H13, 37 %).
+    footprint(p) {
+        const fp = { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, restacks: true };
+        return p && p.layout === 'sentence' ? Object.assign(fp, { denseRoom: 1, inPlace: true }) : fp;
+    },
     inputs(p) {
         const out = [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] }];
         if (p && p.unit && p.layout !== 'sentence') out.push({ id: 'answer-label', kind: 'unit', shape: 'line', graded: false, order: 1, scopes: ['full'] });

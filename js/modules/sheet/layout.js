@@ -138,6 +138,13 @@ export const CELL_PAD_MM = 7;
 export const fillLimit = (h) => (h > 0 ? Math.min(FILL_CAP * h, CONTENT_FILL * Math.max(1, h - CELL_PAD_MM) + CELL_PAD_MM) : h);
 /** Page fill: the practice roles take more rows when less than this share of the grid is used. */
 export const PAGE_FILL = 0.85;
+/**
+ * A cell answered IN PLACE (its footprint's `inPlace`: the sentence-layout story, the fact-family check) holds no
+ * working space - the pupil writes in its boxes or rings a word - so its row is never stretched past this multiple of
+ * the measured height (pads and tab keep-out included). The spare height stays under the grid (visual-quality critic
+ * r1 F1: 41 mm stories in 57 mm cells, a 37 % band in every cell at S).
+ */
+export const IN_PLACE_FILL = 1.12;
 /** DN-1: outside fact layouts no page holds more than 20 scored problems. */
 export const DN1_MAX = 20;
 /**
@@ -759,6 +766,9 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     // FILL_CAP x their measurement instead - the page is filled before a strip is left.
     let cellH = r3(capped ? Math.min(even, fillLimit(hMin)) : even);
     if (capped && rows * cellH < 0.8 * G) cellH = r3(Math.min(even, hMin * FILL_CAP));
+    // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
+    const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
+    if (inPlace && hMin > 0) cellH = r3(Math.min(cellH, hMin * IN_PLACE_FILL));
     const fillsGrid = cellH >= even - 0.01;
     const perPage = rows * cols;
     const count = Math.max(0, Math.floor(Number(section.count) || 0));
@@ -777,7 +787,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     return {
         role, cls, requested, cols, rows, perPage, pages, count,
         cellW: widths.nominal, innerW: widths.inner, cellH, hMin: r2(hMin), gridH: G, gridHCont: Gc,
-        fill: fillsGrid && !packed, packed, filled, ceiling, clamped, reason, note, notes,
+        fill: fillsGrid && !packed, packed, filled, ceiling, clamped, reason, note, notes, inPlace,
         digitPt, trackMm, size, look, availableWidthMm: W,
     };
 }

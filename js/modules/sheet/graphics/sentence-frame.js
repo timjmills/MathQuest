@@ -39,7 +39,7 @@ export function sentenceFrame(ctx, o = {}) {
         : `<span data-ws-slot="${esc(id)}" data-ws-shape="box" data-ws-graded="0"${show && ink ? ` data-ws-ink="${ink}"` : ''} style="${face}">${show ? esc(v) : ''}</span>`);
     const d = twin ? 11 : (CIRCLE_D[sizeOf(ctx)] || 13);
     const ring = `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;width:${tw(ctx, d)};height:${tw(ctx, d)};`
-        + `border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;${FONT}font-size:${P(ctx, digitPt(ctx) * 0.85)};font-weight:700;line-height:1;color:${col};text-align:center;`;
+        + `border:${B(ctx, 1)} solid ${INK};border-radius:50%;background:#fff;${FONT}font-size:${P(ctx, digitPt(ctx) * 1.2)};font-weight:700;line-height:1;color:${col};text-align:center;`;
     const circle = twin
         ? `<input type="text" class="mq-wwork mq-gl-sign" data-mq-kind="sign" data-mq-expect="${esc(op)}" data-ws-graded="0" maxlength="1" autocomplete="off" spellcheck="false" aria-label="sign: plus or minus" style="${ring}padding:0;margin:0;">`
         : `<span data-ws-slot="${esc(ids.op)}" data-ws-shape="circle" data-ws-graded="0"${show && ink ? ` data-ws-ink="${ink}"` : ''} style="${ring}">${show ? esc(op) : ''}</span>`;
