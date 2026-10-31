@@ -971,6 +971,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vq-r2-render-gate",
+   "check": "What ws-grade-render MEASURES is a verdict (visual-quality critic r1 root cause of F3 / F4): a lesson cell whose content runs into its pad (check.problems) and a card-390 answer input under 44 px (H6) fail the --skill path",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate (OVERFLOW, TARGET H6)",
+   "browser": true,
+   "fail": {
+    "commit": "1928be3",
+    "state": "critic r1: add_wp_20_plain lesson p1 cell 1 overflows its pad 0.8 mm; card-390 input 41 x 44 px"
+   },
+   "pass": {
+    "commit": "6f0c934",
+    "state": "visual-quality fix r2: four-panel chart that fits, 48 px answer face"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills addition:add_wp_20_plain --roles lesson --size S --gate --out /tmp/mq-backtest-render-gate",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-r2-inplace-h13",
+   "check": "H13 on a cell answered IN PLACE (the sentence story, the fact-family check): the band under its content counts to the drawn edge - the top-cell writing-room exemption hid 37 % bands (critic r1 F1)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (in-place cells)",
+   "browser": true,
+   "fail": {
+    "commit": "1928be3",
+    "state": "critic r1 F1: 41 mm stories in 57 mm cells, 9 triangles in 73 mm cells at S"
+   },
+   "pass": {
+    "commit": "6f0c934",
+    "state": "in-place footprints packed to their measured height (layout.js IN_PLACE_FILL)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size S --skills addition:fact_family_sort,addition:add_wp_20_plain",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
