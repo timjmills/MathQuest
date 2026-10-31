@@ -16,7 +16,10 @@
 //   H13        every cell's drawing (its natural height, measured in the DOM) fills >= 70 % of its box
 //   fill       no page under-filled while problems remain: a page other than the last has no room
 //              for another shelf; the pages of a split sheet are within half of each other
-//   ladder     problems a page, S > M > L, per look, on Mixed AND Sections pages (R1-7, LESSONS L1)
+//   ladder     problems a page, S > M > L, per look, on Mixed AND Sections pages (R1-7, LESSONS L1); on a
+//              Mixed page ONLY the ruled H13 case may tie (lane ruling 2026-10-31, h13Exempt: every row set by a
+//              picture that keeps its height at the next size, facts at the smallest digits that keep H13, the
+//              note) - `--self-test` backtests it (a page of facts at S = M still FAILS)
 //   key        the key's cells are the pupil page's, in the same order and the same places
 //   align      cells of one template in one shelf row line up (first rule y, right edge, 0.3 mm)
 //   sections   a Sections page with counts prints them, whole shelves where a count across allows
@@ -130,6 +133,42 @@ const PAGE_FN = async (req) => {
                     const workMm = parseFloat(getComputedStyle(c).getPropertyValue('--mq-work')) || 0;
                     out.h13.push({ label: lab ? lab.textContent.trim() : '', fill: nat / r.height, tpl, h: r.height / mm, work: workMm > 0 });
                     {
+                        // RULING 2026-10-31 (H13 over the ladder): per cell, its natural height laid out
+                        // with the NEXT SIZE UP's tokens (the page's size class swapped on a wrapper grid),
+                        // and a fact's natural height one fact-ladder step smaller (its --fd)
+                        const up = { S: 'M', M: 'L' }[req.size];
+                        let natUp = null;
+                        if (up) {
+                            const wrap = document.createElement('div');
+                            wrap.className = `ws-grid fixed ws-${up}`;
+                            wrap.style.cssText = `position:absolute;visibility:hidden;left:0;top:0;width:${gr.width}px;height:auto;display:block`;
+                            const c2 = c.cloneNode(true);
+                            c2.style.cssText = `${c.style.cssText};height:auto;min-height:0;max-height:none;width:${r.width}px`;
+                            wrap.appendChild(c2);
+                            g.parentElement.appendChild(wrap);
+                            natUp = c2.getBoundingClientRect().height;
+                            wrap.remove();
+                        }
+                        let natSmaller = null;
+                        let fd = 0;
+                        const fe = c.querySelector('.ws-fact');
+                        if (tpl === 'fact' && fe) {
+                            fd = parseFloat(getComputedStyle(fe).fontSize) * 0.75;
+                            const next = [28, 24, 20, 18, 16].find((p2) => p2 < fd - 0.1);
+                            if (next) {
+                                const c3 = c.cloneNode(true);
+                                c3.style.cssText = `${c.style.cssText};position:absolute;visibility:hidden;height:auto;min-height:0;max-height:none;width:${r.width}px;left:0;top:0`;
+                                const f3 = c3.querySelector('.ws-fact');
+                                f3.style.setProperty('--fd', `${next}pt`);
+                                c3.style.setProperty('--fd', `${next}pt`);
+                                g.appendChild(c3);
+                                natSmaller = c3.getBoundingClientRect().height;
+                                c3.remove();
+                            }
+                        }
+                        (out.rowCells = out.rowCells || []).push({ grid: out.shelves.length - 1, top: Math.round(r.top), rows: /span 2/.test(c.style.gridRow) ? 2 : 1, tpl, nat: nat / mm, natUp: natUp === null ? null : natUp / mm, box: r.height / mm, fd, natSmaller: natSmaller === null ? null : natSmaller / mm });
+                    }
+                    {
                         // the space under the lowest ruled line of a column procedure (the double rule)
                         let low = null;
                         for (const el of c.querySelectorAll('*')) {
@@ -209,6 +248,49 @@ const PAGE_FN = async (req) => {
         pupil, key, pagePools, maxRows: { S: 9, M: 7, L: 5 }[req.size],
     };
 };
+
+/**
+ * RULING 2026-10-31 - the exact test behind "H13 wins over the size ladder" for one build `r` (its
+ * pupil pages, measured by PAGE_FN): -> {ok, why}. Every grid row's height-setting cell (the cell with
+ * the tallest natural drawing per row it spans) is not a fact and keeps its natural height at the next
+ * size up (within 1 mm: the picture keeps its size, its one line of text follows the type size); the page has facts, and one fact-ladder step smaller at least one of them
+ * would fill under 70 % of its box; the notes say the facts print at larger digits.
+ */
+function h13Exempt(r) {
+    const notes = (r.notes || []).join(' | ');
+    if (!/prints at larger digits so each fills its box/.test(notes)) return { ok: false, why: 'no note' };
+    for (const pg of r.pupil) {
+        const cs = pg.rowCells || [];
+        const facts = cs.filter((c) => c.tpl === 'fact');
+        if (!facts.length) return { ok: false, why: 'no facts' };
+        const rows = new Map();
+        for (const c of cs) { const k = `${c.grid}|${c.top}`; if (!rows.has(k)) rows.set(k, []); rows.get(k).push(c); }
+        for (const [k, xs] of rows) {
+            const setter = xs.reduce((a, b) => (b.nat / b.rows > a.nat / a.rows ? b : a));
+            if (setter.tpl === 'fact') return { ok: false, why: `row ${k} set by a fact` };
+            if (setter.natUp === null || Math.abs(setter.natUp - setter.nat) > 1) return { ok: false, why: `row ${k} set by a ${setter.tpl} that changes at the next size (${setter.nat.toFixed(1)} vs ${setter.natUp === null ? '-' : setter.natUp.toFixed(1)} mm)` };
+        }
+        if (!facts.some((f) => f.natSmaller !== null && f.natSmaller / f.box < 0.7)) return { ok: false, why: 'facts could be drawn smaller and keep H13' };
+    }
+    return { ok: true, why: '' };
+}
+
+/** The exemption's own backtest (no browser): a page of facts only never passes; d's picture rows do. */
+function selfTest() {
+    const note = ['Mixed practice: Subtraction prints at larger digits so each fills its box beside the fractions problems, which stay the same size at S, M and L.'];
+    const f = (o) => Object.assign({ grid: 0, top: 0, rows: 1, tpl: 'fact', nat: 30, natUp: 36, box: 40, fd: 24, natSmaller: 26 }, o);
+    const cases = [
+        ['two fact skills, S = M', { notes: note, pupil: [{ rowCells: [f({}), f({ natSmaller: 27 }), f({ top: 50 }), f({ top: 50 })] }] }, false],
+        ['facts set the row, no note', { notes: [], pupil: [{ rowCells: [f({}), f({ tpl: 'frac-model', nat: 39, natUp: 39 })] }] }, false],
+        ['picture rows, facts at the H13 digits, noted', { notes: note, pupil: [{ rowCells: [f({}), f({ tpl: 'frac-model', nat: 39, natUp: 39 })] }] }, true],
+        ['picture rows, facts bigger than H13 needs', { notes: note, pupil: [{ rowCells: [f({ natSmaller: 35 }), f({ tpl: 'frac-model', nat: 39, natUp: 39 })] }] }, false],
+        ['a row set by a cell that grows at M', { notes: note, pupil: [{ rowCells: [f({}), f({ tpl: 'stack', nat: 39, natUp: 45 })] }] }, false],
+    ];
+    let bad = 0;
+    for (const [name, r, want] of cases) { const got = h13Exempt(r).ok; if (got !== want) bad++; console.log(`  ${got === want ? 'ok  ' : 'FAIL'} ${name}: ${got}`); }
+    console.log(`mixed-m2 self-test: ${bad ? 'FAIL' : 'OK'} (${cases.length} cases)`);
+    process.exit(bad ? 1 : 0);
+}
 
 function scenarios() {
     const out = [];
@@ -363,10 +445,17 @@ async function main() {
                 // (D1: on a Mixed page the weights are held first; where the strict ladder cannot be met
                 // with them held, S >= M >= L and the size that ties says so in its notes)
                 const tieNoted = (a, b, x) => pp(a) > pp(b) || (pp(a) === pp(b) && /no more than the next size up/.test(x.notes.join(' ')));
+                // RULING 2026-10-31 (lane lead; H13 over the size ladder, ONLY when verified): a size may hold
+                // no more than the next size up when EVERY row of its page has its height set by a cell whose
+                // drawing is the same height at the next size up (a picture that does not get smaller), the
+                // facts on it are at the smallest fact-ladder digits that keep H13 (one step smaller and a fact
+                // falls under 70 % of its box), and the notes say so. Measured per row; never a WARN.
+                const h13Wins = (x) => h13Exempt(x).ok;
+                const lad = (a, b, x) => tieNoted(a, b, x) || (pp(a) <= pp(b) && h13Wins(x));
                 const ok = sc.weak ? pp(got.S) >= pp(got.M) && pp(got.M) >= pp(got.L)
-                    : sc.arr === 'mixed' ? tieNoted(got.S, got.M, got.S) && tieNoted(got.M, got.L, got.M)
+                    : sc.arr === 'mixed' ? lad(got.S, got.M, got.S) && lad(got.M, got.L, got.M)
                         : pp(got.S) > pp(got.M) && pp(got.M) > pp(got.L);
-                if (!ok) fails.push(`ladder ${sc.arr} ${sc.set} ${sc.look} seed ${sc.seed}: problems a page S ${pp(got.S)} / M ${pp(got.M)} / L ${pp(got.L)} (S > M > L${sc.weak ? ', one skill: S >= M >= L' : ''})`);
+                if (!ok) fails.push(`ladder ${sc.arr} ${sc.set} ${sc.look} seed ${sc.seed}: problems a page S ${pp(got.S)} / M ${pp(got.M)} / L ${pp(got.L)} (S > M > L${sc.weak ? ', one skill: S >= M >= L' : ''}; H13-over-ladder test: S ${h13Exempt(got.S).why || 'holds'}, M ${h13Exempt(got.M).why || 'holds'})`);
                 if (got.S.pages > 1 || got.M.pages > 1 || got.L.pages > 1) fails.push(`ladder ${sc.arr} ${sc.set} ${sc.look} seed ${sc.seed}: a fill page spilled to ${Math.max(got.S.pages, got.M.pages, got.L.pages)} pages`);
             }
         }
@@ -381,4 +470,5 @@ async function main() {
     process.exit(fails.length ? 1 : 0);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+if (process.argv.includes('--self-test')) selfTest();
+else main().catch((e) => { console.error(e); process.exit(1); });

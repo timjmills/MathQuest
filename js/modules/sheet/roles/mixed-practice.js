@@ -755,7 +755,7 @@ export function m2Classes(poolsIn, input) {
             for (let k2 = c0.k - 1; k2 >= Math.max(1, c0.k - 4) && (c0.h - NAT_MM) < H13_FILL * hO(); k2--) {
                 const h2 = hAtK(poolsIn[id], k2, ctx);
                 if (!Number.isFinite(h2) || h2 <= c0.h) continue;
-                Object.assign(c0, { k: k2, s: N / k2, h: h2 });
+                Object.assign(c0, { k: k2, s: N / k2, h: h2, grown: true });
             }
         }
     }
@@ -982,7 +982,16 @@ export function m2Counts(poolsIn, input) {
         const loads = L.pages.map((pg) => pg.reduce((a, sh) => a + sh.cols.reduce((x, col) => x + col.items.length, 0), 0));
         // (`spare`: the blank band the page laid out with THESE cells leaves - the host compares deals)
         const spare = Math.max(0, ...simLayout(c, b, counts, input).pages.map((pg) => pg.spare || 0));
-        return { counts, perPage: Math.max(1, ...loads), classes: c, fill: { counts, rest: false }, ladderNote: '', spare };
+        // (`perPage` is the CAPACITY of one full page for this mix in the counts' own proportions -
+        // never the count asked: the dialog learns a page from it. The most problems at those
+        // proportions one page holds, and never less than a printed page of this print holds.)
+        let cap = 0;
+        let miss = 0;
+        for (let n = Math.max(2, c.ids.length); n <= 200 && miss < 6; n++) {
+            const x = dealCounts(counts, n, { min: 0 }).counts;
+            if (simLayout(c, b, x, input, true).pages.length <= 1) { cap = n; miss = 0; } else miss++;
+        }
+        return { counts, perPage: Math.max(1, cap, ...(loads.length > 1 ? loads : [])), classes: c, fill: { counts, rest: false }, ladderNote: '', spare };
     }
     const P = Math.max(1, Number(input.mixPages) || 1);
     const fits = (x) => simLayout(c, b, x, input, true).pages.length <= P;
@@ -1162,13 +1171,20 @@ function planMixedM2(input, pools) {
         const over = ids.slice().sort((a, c2) => total[c2] / (weights[c2] || 1) - total[a] / (weights[a] || 1))[0];
         notes.push(`${names[over].name} fills the rest of the page: ${ids.map((id) => `${total[id]} ${names[id].noun}`).join(', ')}.`);
     }
+    // (H13 over the size ladder, lane ruling 2026-10-31: facts drawn bigger beside cells that do not
+    // get smaller at a smaller size say so - mixed-m2.check reads this note with its per-row test)
+    for (const id of ids) {
+        if (!cls[id].grown || !total[id]) continue;
+        const beside = ids.filter((x) => x !== id && total[x]).map((x) => names[x].noun);
+        notes.push(`Mixed practice: ${names[id].name} prints at larger digits so each fills its box beside the ${beside.join(' and ')}, which stay the same size at S, M and L.`);
+    }
     if (input.ladderNote) notes.push(input.ladderNote);
     if (pages.length > asked) notes.push(`Mixed practice: the ${n} problems need ${pages.length} pages, so ${pages.length - asked === 1 ? 'a page was' : `${pages.length - asked} pages were`} added.`);
     const lone = [];
     for (const order of pageOrders) for (const id of ids) if (order.filter((x) => x === id).length === 1) lone.push(names[id].name);
     if (lone.length) notes.push(`Mixed practice: ${[...new Set(lone)].join(' and ')} has only one problem on a page.`);
     const loads = pageOrders.map((o) => o.length);
-    const perPage = input.exactCounts ? Math.max(...loads) : Math.max(m2Counts(pools, input).perPage, ...loads);
+    const perPage = Math.max(m2Counts(pools, input).perPage, ...(loads.length > 1 ? loads : []));
     // the runs page by page, in problems (the cap: max(2, the forced minimum over the whole print))
     const forced = (id) => Math.max(2, Math.ceil(total[id] / (n - total[id] + 1)));
     const runsByPage = pageOrders.map((o) => Object.fromEntries(ids.map((id) => [id, { run: runsIn(o)[id] || 0, turns: o.filter((x) => x === id).length, cap: forced(id) }])));
