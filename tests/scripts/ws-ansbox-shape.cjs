@@ -306,7 +306,8 @@ async function shot(page, key, opts, size, file) {
                 const def = window.offeredOptionsFor(c, k).find((d) => d.id === 'ansBox');
                 return def ? def.values.map((x) => ({ v: x.v, l: x.l })) : null;
             }, c, k);
-            if (!values) { fail(`${key}: the Answer boxes option is not offered`); continue; }
+            // a skill the panel offers no answer-box control on (a mixed pool, lead decision 2026-10-31) has nothing to measure
+            if (!values) { console.log(`${key} measured (not offered: nothing to check)`); continue; }
             const per = {};   // value -> host -> signature
             for (const { v, l } of values) {
                 const opts = v === null ? {} : { ansBox: v };

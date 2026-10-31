@@ -20,14 +20,13 @@ Critic rounds: 1, FAIL (lowest O6 = 3; print P = 5 on the fact template)
   review items, so changing them would move a passed page. Fixing them needs a decision (and a re-grade of the passed
   skills' review pages). The teacher's explicit values write at full size.
 
-- **Full 70-skill `ws-ansbox-shape` run (r2): 63 / 70 clean; 7 skills still FAIL, all outside r1's sample, pre-existing:**
-  - `addition:add_three`, `subtraction:missing_add_sub`, `division:missing_mult_div` (f): 'Off' draws the same as Automatic on
-    the screen hosts - the option does not reach the counters cell's box / the practice card's main answer input
-    (missing-number sentences render outside #visualAid). Print is correct.
-  - `addition:mixed_addition`, `subtraction:mixed_subtraction`, `division:mixed_division`, `division:mixed_mult_div` (b, d, e, f):
-    mixed pools draw different templates per item (stack / fact / counters / long division), so one section holds 0 / 2 / 4
-    digit boxes, some key cells differ from the pupil cell (long division items), and the screen hosts deal a different pool
-    member per value. Needs a decision: offer the option on mixed pools only for the members it restyles, or not at all.
+- **Lead decision 2026-10-31 (resolved): the 7 skills that still failed `ws-ansbox-shape` after r2 are this lane's.**
+  - `addition:add_three`, `subtraction:missing_add_sub`, `division:missing_mult_div`: their screen hosts cannot draw 'Off'
+    cleanly (the counters cell's box; the missing-number sentence answered in the practice card's main input), so
+    `offeredAnsBox` no longer offers "Off" on them (`ANSBOX_NO_OFF`); print still draws it and old codes still decode.
+  - `addition:mixed_addition`, `subtraction:mixed_subtraction`, `division:mixed_mult_div` (layouts with "+") and
+    `division:mixed_division` (its pool also deals long division): no single value is honoured uniformly across the pool's
+    drawings, so `offeredAnsBox` offers no answer-box control on them (Automatic); the option stays in the model.
   - Automatic (default) legacy pages, held byte-identical, carry their own pre-existing findings: the legacy stack band follows
     each item (add_20_*: 2 / 3 boxes; sub_20_*: 1-place items one box), key digits 0.8 em, and sub_1m_no_regroup at S draws
     25.6 px digit boxes on 27.7 px tracks. Checks c, d, e therefore run on the teacher's values only.
@@ -82,6 +81,14 @@ Times: fix r2 (rebuild after critic r1), start 2026-10-31T10:40Z, end 2026-10-31
   The spec cards (stack, fact, ...) are unsigned (INCOMPLETE).
 - `ws-precritic --strict --role lesson`: FAIL: 2 FAIL, 1 PASS. Both red rows are `placevalue:more_less_10#lesson L-OVERLAP CL40-INK:
   0 -> 2` (L and S), the known main finding (speed-audit, lessons-6-7 row); grade-render PASS.
+
+### After the lead decision (2026-10-31)
+- `ws-ansbox-shape` over all 70 answer-box skills: **OK** (70 measured; the 4 mixed pools report "not offered")
+- `ws-ansbox-default-parity --check` (7 passed skills): **OK (91 documents byte-identical)**
+- `ws-options-verify` (the 7 skills + the 7 touched): FAIL, 4 values, all on options other than ansBox and all already pinned
+  in design/audit/baselines/options-verify.json (mixed_addition nlOn=true; mixed_subtraction poolSize="harder", poolSupport=1,
+  nlOn=true); every ansBox value passes
+- `ws-code-snapshot`: OK (731 codes); `ws-boot-smoke`: OK
 
 ## Evidence (design/status/ansbox/, before = b63c075, after = r2)
 - legacy-stack-add_10_regroup-card-quiz-digit-vs-one-{before,after}.png (row 1 card, row 2 quiz; left digit, right one)

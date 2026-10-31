@@ -3638,9 +3638,21 @@ export const ansBoxOption = (layout = '') => {
  * box". A mixed pool keeps all four. The value stays in the model (optionsFor), so an old share
  * code that carries it still decodes, and it draws what Automatic draws.
  */
-export function offeredAnsBox(def, layout = '') {
+// Lead decision 2026-10-31 (ansBox r2): skills whose screen hosts cannot draw 'Off' (the add_three counters
+// cell's box, and the missing-number sentences answered in the practice card's main input) do not offer it;
+// print draws it, and an old code that carries it still decodes.
+export const ANSBOX_NO_OFF = new Set(['addition:add_three', 'subtraction:missing_add_sub', 'division:missing_mult_div']);
+export const ANSBOX_MIXED_POOLS = new Set(['division:mixed_division']);
+export function offeredAnsBox(def, layout = '', key = '') {
     const parts = String(layout || '').split('+').filter(Boolean);
     if (!parts.length || !def || !Array.isArray(def.values)) return def;
+    // Lead decision 2026-10-31: a mixed pool whose members draw differently (stack / fact / counters / long
+    // division) cannot honour one value uniformly, so it offers no answer-box control (Automatic); the option
+    // stays in the model (optionsFor), so a share code that carries it still decodes.
+    // (mixed_division measures as one layout, legacy-eq, but its pool also deals long division - a vinculum that keeps
+    // its own answer place - so it is a pool whose members draw differently too)
+    if (parts.length > 1 || ANSBOX_MIXED_POOLS.has(key)) return null;
+    if (ANSBOX_NO_OFF.has(key)) def = { ...def, values: def.values.filter((x) => x.v !== 'off') };
     const col = parts.every((x) => /stack/.test(x)), none = parts.every((x) => !/stack/.test(x));
     const drop = col ? 'digit' : none ? 'one' : null;
     return drop ? { ...def, values: def.values.filter((x) => x.v !== drop) } : def;
@@ -3889,7 +3901,11 @@ export function offeredOptionsFor(categoryId, skillId) {
         // The answer-box option is shown only where the skill's items are drawn by a kit template it
         // restyles (skill-ansbox-skills.js, measured); elsewhere it stays in the model, unshown.
         if (o.id === 'ansBox' && !ANSBOX_SKILLS[`${categoryId}:${skillId}`]) continue;
-        if (o.id === 'ansBox') { out.push(offeredAnsBox(o, ANSBOX_SKILLS[`${categoryId}:${skillId}`])); continue; }
+        if (o.id === 'ansBox') {
+            const ab = offeredAnsBox(o, ANSBOX_SKILLS[`${categoryId}:${skillId}`], `${categoryId}:${skillId}`);
+            if (ab) out.push(ab);
+            continue;
+        }
         if (sized && o.id === 'range' && !ownIds.has('range')) continue;
         if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
         // A review's own "Support, for the whole review" sets every member's level already.
