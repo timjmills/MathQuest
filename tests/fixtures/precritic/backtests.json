@@ -896,6 +896,246 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ops-f1-sections-clip",
+   "check": "F1 Sections: across sentences drawn answer-below in rows sized for answer-beside",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERFLOW --kind sections",
+   "browser": true,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: print-sheet.js shareRows holds a section to the widest column count whose measured height fits its share"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --kind sections --skills addition:add_sub_10s,addition:add_facts,algebra:tape_diagram,area_perimeter:perimeter_intro --lints L-OVERFLOW",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f5-bracket-notation",
+   "check": "F5 a long-division bracket followed by \"= 7\"; × beside a bracket",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-NOTATION VA-61 / VA-65",
+   "browser": true,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: equation.js draws the quotient above the bar; a Bracket page deals ÷ only"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:missing_mult_div --opts '{\"notation\":[\"across\",\"bracket\",\"fraction\"]}' --lints L-NOTATION",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f12-slot-shape",
+   "check": "F12 boxes and lines on one page (unknown: both)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-ANSAREA SHAPE",
+   "browser": true,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: slotShape box for every unknown on a mixed page"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:missing_add_sub --opts '{\"unknown\":[0,1]}' --lints L-ANSAREA",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f2-chart-pagefill",
+   "check": "F2 lesson anchor chart 38-45 % empty",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL (anchor chart)",
+   "browser": true,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: the chart shows the other sign whole under the panels (lesson data second.whole) and spreads its rows"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills division:missing_mult_div,subtraction:missing_add_sub --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f9-test-emptycell",
+   "check": "F9 Test S: 20 on 3 x 7 leaves a ruled empty cell",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY EMPTYCELL",
+   "browser": true,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: test.js takes a neighbouring column count that divides the ceiling"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles test --size S --skills subtraction:missing_add_sub,division:missing_mult_div --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f10-size-m",
+   "check": "F10 Size M holds 16 = L",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY SIZE-M",
+   "browser": true,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: tight across tracks for missing-number sentences; Max 100 tables stop at 99 (2-digit boxes): M prints 3 x 8"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --skills subtraction:missing_add_sub,division:missing_mult_div --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f13-mixed-heading",
+   "check": "F13 Mixed heading names the category, not the work",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-NOTATION HEADING",
+   "browser": true,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: q.sectionLabel names the operations dealt"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --kind mixed --skills addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div --lints L-NOTATION",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f15-phone-gap",
+   "check": "F15 card 390: content 0-6 px from the border",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card GAP",
+   "browser": true,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: narrow-screen sentence wraps its slot under, 12 px each side"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills addition:add_sub_100s",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f3-f18-lesson-data",
+   "check": "F3 vocabulary pictures of the wrong type; F18 grade-4 warm-up",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint LESSON-DATA vocab-type / warmup-grade",
+   "browser": false,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: bar / glyph pictures; facts to 10 x 10; grade-1 warm-ups"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules LESSON-DATA --no-baseline --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f4-role-title",
+   "check": "F4 \"adding and subtract 10\"",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint ROLE-TITLE",
+   "browser": false,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: compose.js topicOf takes -ing on every joined verb"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules ROLE-TITLE --no-baseline --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f16-hint",
+   "check": "F16 generic hint",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint HINT",
+   "browser": false,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: hints name the item numbers"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules HINT --no-baseline --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ops-f6-f7-f8-f19-opt-values",
+   "check": "F6 Max 100 deals 144; F7 Up to 100 within 20; F8 level dead; F19 example not dealt",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint OPT-VALUES",
+   "browser": false,
+   "fail": {
+    "commit": "899c147",
+    "state": "ops-family critic r1 (graded 7490407b; lane HEAD before fix round 2)"
+   },
+   "pass": {
+    "commit": "3272a32",
+    "state": "fix round 2: pairs within Max; explicit Max honoured; level 3 traces; labels show dealt forms"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules OPT-VALUES --no-baseline --skill addition:add_sub_10s,addition:add_sub_100s,subtraction:missing_add_sub,division:missing_mult_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
