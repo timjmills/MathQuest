@@ -2780,6 +2780,8 @@ function foldRulings(out, j) {
     fs.writeFileSync(mjs, fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-options.js')));
     fs.writeFileSync(path.join(tmp, 'count-rows.js'), fs.readFileSync(path.join(ROOT, 'js', 'modules', 'count-rows.js')));   // skill-options.js imports it (wave 1 C2)
     fs.writeFileSync(path.join(tmp, 'skill-presets.js'), fs.readFileSync(path.join(ROOT, 'js', 'modules', 'skill-presets.js')));   // and the preset table (2026-10-17)
+    // and the answer-slot model (ansBox r3): copied when the tree has it, so an older tree still loads
+    if (fs.existsSync(path.join(ROOT, 'js', 'modules', 'sheet', 'ans-slot.js'))) { fs.mkdirSync(path.join(tmp, 'sheet'), { recursive: true }); fs.writeFileSync(path.join(tmp, 'sheet', 'ans-slot.js'), fs.readFileSync(path.join(ROOT, 'js', 'modules', 'sheet', 'ans-slot.js'))); }
     const { optionsFor, pvBandFloor, pvBand } = await import(pathToFileURL(mjs).href);
     fs.rmSync(tmp, { recursive: true, force: true });
     const withNotation = new Set(skills
