@@ -10,7 +10,7 @@
 //
 // Pure module (SCC-01).
 
-import { INK, L, P, B, isTwin, sizeOf, digitPt, textPt, esc, blankWidth, tw, colorOf, NUM_FEATURES, FONT } from './units.js';
+import { INK, L, P, B, isTwin, sizeOf, digitPt, textPt, esc, blankWidth, tw, colorOf, NUM_FEATURES, FONT, PT_MM } from './units.js';
 
 /** The writing height of a library box (a 2-digit number at the working digit size fits it). */
 export const BOX_H = Object.freeze({ S: 11, M: 13, L: 15 });
@@ -24,10 +24,11 @@ export const boxH = (ctx) => (isTwin(ctx) ? TWIN_BOX : (BOX_H[sizeOf(ctx)] || 15
 /**
  * @param {Object} ctx
  * @param {Object} o  {id = 'answer', shown = '', expect = '', digits = 2, unit = '', ink = null,
- *                     twinHook = 'cell', graded = true}
+ *                     twinHook = 'cell', graded = true, unitChars: reserve room for a unit word this long, so
+ *                     every answer box of a page stands in the same place (VQ-7)}
  */
 export function answerArea(ctx, o = {}) {
-    const { id = 'answer', shown = '', expect = '', digits = 2, unit = '', ink = null, twinHook = 'cell', graded = true } = o;
+    const { id = 'answer', shown = '', expect = '', digits = 2, unit = '', ink = null, twinHook = 'cell', graded = true, unitChars = 0 } = o;
     const h = boxH(ctx);
     const w = boxW(ctx, digits);
     const face = `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:none;width:${tw(ctx, w)};height:${tw(ctx, h)};`
@@ -42,9 +43,13 @@ export function answerArea(ctx, o = {}) {
         box = `<span class="mq-gl-answer" data-ws-slot="${esc(id)}" data-ws-shape="box"${graded ? '' : ' data-ws-graded="0"'}${ink ? ` data-ws-ink="${ink}"` : ''} style="${face}">${esc(shown)}</span>`;
     }
     const word = unit
-        ? `<span class="mq-gl-unit" style="flex:none;${FONT}font-size:${P(ctx, textPt(ctx) + (isTwin(ctx) ? 0 : 2))};font-weight:700;line-height:1.1;color:${INK};white-space:nowrap;">${esc(unit)}</span>`
+        ? `<span class="mq-gl-unit" style="flex:none;${unitChars && !isTwin(ctx) ? `min-width:${L(ctx, unitChars * (textPt(ctx) + 2) * 0.62 * PT_MM)};text-align:left;` : ''}${FONT}font-size:${P(ctx, textPt(ctx) + (isTwin(ctx) ? 0 : 2))};font-weight:700;line-height:1.1;color:${INK};white-space:nowrap;">${esc(unit)}</span>`
         : '';
     // (on screen the unit word sits UNDER the box, so a 390 px card holds the whole sentence on one line)
-    const dir = isTwin(ctx) ? 'flex-direction:column;gap:2px;' : `gap:${L(ctx, 2)};`;
-    return `<span class="mq-gl-answerarea" style="display:inline-flex;align-items:center;${dir}flex:none;">${box}${word}</span>`;
+    // (the word hangs under the box, out of the row's flow, so the box stays level with the sentence's boxes)
+    if (isTwin(ctx)) {
+        const hung = word.replace('style="flex:none;', 'style="position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:2px;flex:none;');
+        return `<span class="mq-gl-answerarea" style="position:relative;display:inline-flex;align-items:center;flex:none;">${box}${hung}</span>`;
+    }
+    return `<span class="mq-gl-answerarea" style="display:inline-flex;align-items:center;gap:${L(ctx, 2)};flex:none;">${box}${word}</span>`;
 }

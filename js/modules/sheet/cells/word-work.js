@@ -1129,7 +1129,7 @@ function sentenceLayout(p, ctx) {
     const put = filled(ctx) && !twin;
     const ink = put ? inkOf(ctx) : null;
     const digits = Math.max(2, Number(p.digits) || 2);
-    const frame = sentenceFrame(ctx, { a: st.top, b: st.bottom, op: GLYPH[st.op], ans: put ? sh.ans : String(p.ans), unit: p.unit, digits, show: put, ink });
+    const frame = sentenceFrame(ctx, { a: st.top, b: st.bottom, op: GLYPH[st.op], ans: put ? sh.ans : String(p.ans), unit: p.unit, digits, show: put, ink, unitChars: Math.max(8, String(p.unit || '').length) });
     const whole = st.op === '+' ? st.ans : st.top;
     const pa = st.op === '+' ? st.top : st.bottom;
     const pb = st.op === '+' ? st.bottom : st.ans;
