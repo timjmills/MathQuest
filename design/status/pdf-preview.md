@@ -3,18 +3,19 @@ Title: Fast full print preview on the teacher Print sheet ("Preview every page")
 Session: session_013pHDnPwovfHJjBaZP2n3ZV (lead: session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-pdf-preview (from claude/sweet-newton-c8wrv1 5c6063a) · draft PR #26
 Owner of files: js/modules/teacher-pdf-preview.js (new), css/teacher-pdf.css (new), tests/scripts/ws-pdf-preview.cjs (new); edits in js/modules/teacher-sheet.js (preview/print path only), teacher-print.js (printHtml font wait), teacher-wrm.js (EXTRA.title), index.html (one stylesheet link), ws-precritic.cjs, ws-deploy-gates.sh
-State: critic
+State: passed
 Updated: 2026-10-31
 Builder profile: — (built and fixed by the lane session itself; see Log)
-Critic rounds: 2, FAIL r2 on speed only (A 9 · B 7 · C 8 · D 8); fix round 2 done, r3 next
+Critic rounds: 3, PASS r3 (A 9 · B 8 · C 8 · D 8)
 
 ## Now
 - r1 fixes in: Esc regression, inert sheet + Tab trap (also inside the frame), page-1 reuse + prefetch at once, set
   covers counted apart, pixel parity, wall-clock timing from one real press, batch title, overlay removal, token
   fallbacks; plus the lead's ask (Print waits for Andika 400 + 700; gate asserts title / Name in Andika bold).
 - r2 fix in: the background build waits for 1.5 s without pointer/key input in the sheet before it starts, and between
-  pages waits again whenever the teacher moves or types (a press during the build no longer waits behind a page).
-- Next: checker r3 on r2 D1 + regressions; then report to the lead.
+  pages waits again whenever the teacher moves or types (with a pointer move first a press rarely waits behind a page:
+  ~92 % under 1 s in the checker's probe; a touch tap or keyboard press with no move first still can — Open questions).
+- Checker r3 PASS. Next: the lead merges; the owner rules on the two speed limits and the PDF route.
 
 ## Owner go
 
@@ -29,6 +30,10 @@ Critic rounds: 2, FAIL r2 on speed only (A 9 · B 7 · C 8 · D 8); fix round 2 
   After a pause of ~5 s at 4× (1.5 s quiet + the background build) the whole set opens in 0.4–0.6 s. Meeting 3 s cold at
   4× needs a faster `buildSheet` (not this lane). The gate fails cold-whole over 3 s unthrottled and over 6 s at 4×.
   Owner / lead to accept or to queue an engine-speed lane.
+- **Speed limit 2** (checker r3 D3): a touch tap or keyboard press with NO pointer move first, landing while the
+  background build draws a page, waits for that page — 1.2–2.6 s at 4× in 7 of 16 presses inside the window
+  (≈ 0.35 s unthrottled); with a mouse, page 1 < 1 s in ~92 % (worst ≈ 1.2 s). The fix needs `buildSheet` faster or in a
+  worker (not this lane). The gate prints a bare-press row every run.
 
 ## Design (how it is fast and faithful)
 - **One document.** The preview frame holds `sheetDocument(…, { paper })` — the same call, stylesheets and paper as
@@ -49,8 +54,9 @@ Critic rounds: 2, FAIL r2 on speed only (A 9 · B 7 · C 8 · D 8); fix round 2 
 | 4× slow-down (Chromebook-class) | 0.39 s | 4.1–5.1 s (waiver above) | 0.15–0.55 s | 0.41–0.55 s |
 | 1× | 0.09 s | 0.78 s | 0.09 s | 0.09 s |
 Before this lane: no full preview; Print built everything (5.4 s at 4×) and then opened the dialog.
-Pressed during the background build (+300 / +900 / +1500 / +2500 ms after page 1, mouse move ~150 ms before the press):
-page 1 in 153–281 ms (r2 measured 1.1–1.8 s in 4 of 10 presses before the quiet rule). Remaining limit: one page of
+Pressed during the background build with a mouse move first (+300 … +2500 ms after page 1; clock from the move, the
+hand's 150 ms taken off): page 1 under 1 s (checker r3: 11 of 12 at 0.5–0.9 s, worst 1.56 s; before the quiet rule 4
+of 10 over 1 s). Bare press with no move (touch / keyboard): 0.17–2.6 s — speed limit 2 above. Remaining limit: one page of
 the background build is one task (~1–1.5 s at 4×); a press that lands mid-page with NO pointer movement before it
 (keyboard only, or a touch tap) can still wait for that page to finish.
 
@@ -66,6 +72,7 @@ the background build is one task (~1–1.5 s at 4×); a press that lands mid-pag
   (both faces loaded, title and Name label computed Andika 700) and makes its PDF from the app's origin (else FAIL).
 
 ## Times
+Times: critic r3, start 2026-10-31T13:32Z, end 2026-10-31T13:50Z, profile mq-opus-medium
 Times: fix r2, start 2026-10-31T13:05Z, end 2026-10-31T13:30Z, profile —
 Times: critic r2, start 2026-10-31T12:42Z, end 2026-10-31T12:55Z, profile mq-opus-medium
 Times: fix r1, start 2026-10-31T11:30Z, end 2026-10-31T12:40Z, profile —
@@ -73,6 +80,8 @@ Times: critic r1, start 2026-10-31T10:50Z, end 2026-10-31T11:08Z, profile mq-opu
 Times: builder build-1, start 2026-10-31T10:05Z, end 2026-10-31T11:05Z, profile —
 
 ## Log
+- 2026-10-31 checker r3 PASS (A 9 · B 8 · C 8 · D 8). Its should-fixes done: this wording; the gate times mouse-first
+  presses from before the move (hand travel taken off) and prints a bare-press row (reported: the known limit).
 - 2026-10-31 fix r2 (checker r2 FAIL on speed only, A 9 · B 7 · C 8 · D 8). D1 page 1 took 1.1–1.8 s when pressed during
   the background build → the build starts only after 1.5 s with no pointer/key/wheel in the sheet and pauses between
   pages whenever the teacher moves (a waiting Preview / Print runs it straight on); check: presses at +300, +900,

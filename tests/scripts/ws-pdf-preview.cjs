@@ -212,8 +212,9 @@ const SKILLS = [
     };
     const timedPress = async (at, moveFirst) => {
       // a teacher moves to the button before pressing it: one move ~150 ms ahead (the sheet sees it; checker r2 D1)
-      if (moveFirst) { await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x - 40, y: at.y }); await sleep(150); }
+      // the clock starts BEFORE the move (a move the page is too busy to take is the press's wait too; checker r3 D2)
       const t = Date.now(); let first = 0;
+      if (moveFirst) { cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x - 40, y: at.y }); await sleep(150); }
       await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: at.x, y: at.y, button: 'left', clickCount: 1 });
       await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: at.x, y: at.y, button: 'left', clickCount: 1 });
       for (;;) {
@@ -223,7 +224,10 @@ const SKILLS = [
         if (Date.now() - t > 90000) throw new Error('preview never ready');
         await sleep(15);
       }
-      return { first, all: Date.now() - t };
+      // a hand's own travel (the 150 ms the test waits after the move) is not the page's wait: taken off; a move the busy
+      // page could not take shows up as a longer wait
+      const hand = moveFirst ? 150 : 0;
+      return { first: Math.max(0, first - hand), all: Date.now() - t - hand };
     };
     await setup('print', { pages: 4 });
     await page.evaluate(() => { const b = document.querySelector('#tvsSide [data-act="renew"]'); b.click(); });   // fresh numbers: nothing built yet
@@ -249,7 +253,20 @@ const SKILLS = [
       const w = await timedPress(at, true);
       mid.push({ after, first: w.first, all: w.all });
     }
-    console.log(`  timing, pressed during the background build: ${mid.map((m) => `+${m.after} ms → page 1 ${m.first} ms, all ${m.all} ms`).join(' · ')}`);
+    console.log(`  timing, pressed during the background build (mouse move first, clock from the move): ${mid.map((m) => `+${m.after} ms → page 1 ${m.first} ms, all ${m.all} ms`).join(' · ')}`);
+    // REPORTED, not gated: a bare press with no movement first (a touch tap, a keyboard user) can land while the
+    // background build draws a page (one engine call, ~1–1.5 s at 4x) and wait for it — the known limit in the status file
+    const bare = [];
+    for (const after of [400, 900, 1400]) {
+      await page.evaluate(() => window.tvPdfPreview.close());
+      await page.evaluate(() => { const b = document.querySelector('#tvsSide [data-act="renew"]'); b.click(); });
+      const at = await readyAndBtn();
+      await sleep(after);
+      const w = await timedPress(at, false);
+      bare.push({ after, first: w.first });
+    }
+    console.log(`  timing, bare press with no move (reported; known limit): ${bare.map((m) => `+${m.after} ms → page 1 ${m.first} ms`).join(' · ')}`);
+    report.timingBare = bare;
     for (const m of mid) if (!(m.first < FIRST_MS)) fail(`timing: pressed ${m.after} ms after page 1, page 1 took ${m.first} ms on the wall clock (target < ${FIRST_MS})`);
     report.timing = { mid, throttle: THROTTLE, coldFirstMs: Math.round(cold.tFirst), coldAllMs: Math.round(cold.tAll), warmFirstMs: Math.round(warm.tFirst), warmAllMs: Math.round(warm.tAll), coldWall, warmWall, backgroundBuildMsAfterPage1: bgMs, pages: warm.pages };
     console.log(`  timing (CPU ${THROTTLE}x, ${warm.pages} pages): cold page 1 ${report.timing.coldFirstMs} ms (wall ${coldWall.first}), all ${report.timing.coldAllMs} ms (wall ${coldWall.all}) · warm page 1 ${report.timing.warmFirstMs} ms (wall ${warmWall.first}), all ${report.timing.warmAllMs} ms (wall ${warmWall.all}) · background build ready ${bgMs} ms after page 1`);
