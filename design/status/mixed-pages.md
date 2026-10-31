@@ -75,3 +75,19 @@ Each backtested (FAILS on b8b6211, PASSES on the fix), with the critic's six set
 - "In sections" page capacity: the Independent role starts a new page per part unless both are small, so the dialog learns
   Sections capacity only on spill (role composer owned by another lane).
 - `mixed-practice` role print-lint pages still unpinned (2 precritic rows red on base and here at the same counts).
+
+## M2 §1.7 rebuild — engine half (fresh builder, Opus medium, 2026-10-31)
+Design: the ORDER is decided in problems over the whole print before any row is built (`mixed-pack.js` `orderOf`:
+two skills by the gap rule — the minority separates the majority's groups, groups within one of each other, the longest
+group the forced minimum ceil(major/(minor+1)) or 2; small boxes in whole columns of R; three or more skills by
+`interleave()`), then cut into columns (a tall box; small boxes R to a column, numbered down then across), full-width
+shelves (`shelvesOf`, each its own grid with fr columns; a short column ends its shelf so its hole is the ONE trailing
+area), and pages (even problem shares, each page's columns spread over as many shelves as its height holds; a shelf
+of small boxes laid flat where one row is left). Spare height goes into the shelves up to every drawing's 70 %
+(H13); a kit long procedure takes the rest as working space (`--mq-work`). Fill counts: every count pair is laid out
+(probe heights, then the DEALT cells re-planned, best of up to 3 deals); weights held first, else the fill nearest
+the weights, with the note. 2-digit × is the kit `stack` with `partials` (MB-5): partial-product rows, a second
+rule, the key writes them; facts on a page with a kit stack print at the stack's digits with their rule on its line
+(pad from the tokens), and facts beside taller row-mates are drawn a count across bigger (H13).
+Checks: mixed-m3 116 → 0 (OK); mixed-m2 0 → 1 (`ladder mixed d daily seed 4074: S 17 / M 17` — open, see report);
+mixed-page OK; interleave self-test OK.
