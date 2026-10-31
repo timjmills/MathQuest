@@ -66,6 +66,9 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    (under `--strict` a SKIPPED-NOT-BUILT, SKIPPED (no rulings) or INCOMPLETE row is not green) AND every red matrix row is at
    or below the approved siblings' counts (the sibling comparison), on the lane branch MERGED WITH the current main branch,
    with the unit gates green there too. A critic round started earlier counts only if that comparison later confirms it.
+   **Lead ruling 2026-10-31 (shared-roles r1):** "at or below base" never covers a page role, template or host the lane
+   CHANGED: any red row there blocks the critic, even when the same row is red on main. Main-red rows may pass only on
+   roles / templates / hosts the lane did not touch.
 0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
    goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
    is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and
@@ -110,6 +113,12 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    runs `ws-stamp-assets`. The owner's go for a family is the line `Owner go: <family>, <YYYY-MM-DD>` in the lane file
    (§1.6.3 step 6).
    *Check:* the deploy is refused for a family with no go line.
+9. **A lane's gate set includes every gate that reads what it ships (lessons 6-7 merge, 2026-10-31).** Detailed lessons
+   6 and 7 merged with their own gates green (ws-detailed-lesson, precritic --role lesson), but ws-teacher-wrm, which
+   decodes each detailed lesson's teacher Practice link, was not on the lessons lane's path and went red: the link was
+   built from the de-duplicated skill queue, so a skill used twice with different options lost its second use and its
+   options. Root fix: the link encodes its own items (each (skill, options) use). The gate compares use by use.
+   *Check:* `ws-precritic --role lesson` now runs ws-teacher-wrm; backtest row `detailed-link-every-use`.
 
 ### Teacher-site preview screens (pdf-preview lane, 2026-10-31)
 - **A hidden element is not an open dialog.** A guard that tests `getElementById(overlay)` breaks the moment the overlay
