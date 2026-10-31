@@ -185,13 +185,18 @@ register('equation', {
             }
             return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
         }
+        // F10 (ops-family critic r1, DN-1a): a missing-number sentence (`fact`) on paper takes the kit's ONE across
+        // look - the fact template's tight tracks - so Size M fits three columns where L fits two.
+        const tight = p.fact && ctx.mode !== 'screen';
+        const oSpan = (g) => (tight ? `<span class="o" style="width:${ACROSS_OP_EM}em">${g}</span>` : `<span class="o">${g}</span>`);
         const pieces = [
             u === 'a' ? slotHtml : `<span>${num('a')}</span>`,
-            u === 'op' ? slotHtml : `<span class="o">${opGlyph(p.op)}</span>`,
+            u === 'op' ? slotHtml : oSpan(opGlyph(p.op)),
             u === 'b' ? slotHtml : `<span>${num('b')}</span>`,
-            `<span class="o">=</span>`,
+            oSpan('='),
             u === 'result' ? slotHtml : `<span>${esc(result)}</span>`,
         ];
+        if (tight) return `<div class="ws-eq" data-ws-across="1" style="padding-top:1.5mm;gap:${ACROSS_GAP_EM}em">${pieces.join('')}</div>`;
         // A one-line sentence packed like a fact (`fact`, ops-family G1's missing numbers) starts at
         // the top of its cell and clears the label keep-out the way the across fact does (CL-40).
         // (on paper it also starts 1.5 mm lower, so a sentence as wide as its cell never inks the
@@ -222,7 +227,10 @@ register('equation', {
             ? em * (0.56 * Math.max(A, B) + 0.4 + 2 * 0.28 + 1) + blankWidth(p.digits || 2, ctx.size) + 6
             : isDivFact && !p.notation
                 ? Math.max(em * (0.56 * (A + B) + 2 * ACROSS_OP_EM + 3 * ACROSS_GAP_EM), blankWidth(p.digits || 2, ctx.size)) + 6
-                : chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
+                // (F10: a missing-number `fact` sentence on paper is drawn on the tight across tracks)
+                : p.fact && !p.notation && ctx.mode !== 'screen'
+                    ? em * (0.56 * chars + 2 * ACROSS_OP_EM + 4 * ACROSS_GAP_EM) + blankWidth(p.digits || 2, ctx.size) + 6
+                    : chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
         return {
             // `fact` (div_facts' Fraction form): a one-line fact cell, packed like the other
             // fact forms of its page instead of measured as a visual.

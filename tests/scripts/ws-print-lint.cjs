@@ -1790,6 +1790,13 @@ function lintKitGeometry(dom, pdf, info, F) {
                 // (DN-1a, LESSONS_LEARNED L1: S no longer prints L's 3 x 4).
                 else if (info.mode === 'kit') c = { n: Math.max(c.n, { S: 30, M: 20, L: 12 }[p.size] || 12), name: `${c.name} (12.3 dense capacity)` };
             }
+            // L-DENSITY SIZE-M (ops-family critic r1 F10, DN-1a / LESSONS_LEARNED L1): at Size M a page of SHORT one-line
+            // problems holds more than L's two-column 2 x 8 = 16 - M is a size, never L's grid again. Auto count only.
+            if (info.mode === 'kit' && p.size === 'M' && arg('count', 'auto') === 'auto' && p.role === 'independent' && j === 0 && p.gridTop !== null && p.gridBottom !== null) {
+                const gh = p.gridBottom - p.gridTop;
+                const its = p.cells.filter(x => x.item);
+                if (its.length >= 8 && its.every(x => x.short && x.rect[3] <= gh / 6) && p.items <= 16) F('L-DENSITY', 'SIZE-M', 'major', { page: p.idx }, `page ${p.idx} at Size M holds ${p.items} short problems, no more than L's 2 x 8: Size M fits more items or more columns than L (DN-1a, critic r1 F10)`, 'M holds no more than L');
+            }
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
             const last = j === pt.pages.length - 1;

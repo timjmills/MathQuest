@@ -78,7 +78,7 @@ const argAll = (f) => args.flatMap((a, i) => (a === f && i + 1 < args.length ? S
 const ALL_RULES = ['NOTATION', 'L1', 'L3', 'L6', 'L10', 'REPEATS'];
 // Lane S1 rules: OPT-IN (run only when --rules names them), so the default sweep and its pinned baseline are unchanged;
 // ws-precritic runs them per skill against tests/fixtures/precritic/node-lint-s1.baseline.json.
-const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS', 'ROLE-TITLE', 'HINT', 'OPT-VALUES'];
+const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS', 'ROLE-TITLE', 'HINT', 'OPT-VALUES', 'L1-M'];
 const RULE_CITES = {
     NOTATION: 'C4; WORKSHEET_DESIGN_STANDARD TY-6, TY-7; PEDAGOGY_STANDARD 10.1 (P-14)',
     L1: 'LESSONS_LEARNED L1; WORKSHEET_DESIGN_STANDARD DN-1a',
@@ -90,6 +90,7 @@ const RULE_CITES = {
     'OPTION-HELP': 'critic pilot-su-c r2 N3 (OC3 family): the option help names only values the panel offers',
     'WRONG-FITS': 'SKILL_CELL_CONTRACT wrongAnswer (SCC 3.8); PT-ERR: the error-analysis key writes the wrong answer in the item slot',
     'ROLE-TITLE': 'ops-family critic r1 F4 (C4): a role title read as grammar - "adding and subtract 10" (sheet/roles/compose.js topicOf)',
+    'L1-M': 'ops-family critic r1 F10 (DN-1a, LESSONS_LEARNED L1): Size M fits more items or more columns than L, as S does',
     HINT: 'ops-family critic r1 F16 (L6): the hint names the item\'s own numbers, never "What number completes this?"',
     'OPT-VALUES': 'ops-family critic r1 F6 / F7 / F8 / F19 (OC1, OC4): Max Number bounds every number; each range value reaches past the one below; each support level prints something; a label\'s example is a form the skill deals',
 };
@@ -830,6 +831,22 @@ function ruleL1(key, cells) {
     if (same) find(key, 'L1', 0, 'scale', `footprint ${fps[0].S.wMm} x ${fps[0].S.hMm} mm at S and at L: the drawing does not scale with ctx.metrics`, 'footprint');
 }
 
+/**
+ * L1-M (opt-in; ops-family critic r1 F10, DN-1a): the middle size is a size - M fits more items or more columns than L
+ * on the Independent page (resolveSectionLayout, Auto, dense), the way L1 holds S to it. Kit cells with a node footprint.
+ */
+function ruleL1M(key, cells) {
+    const sample = cells.filter((c) => c.kit).slice(0, 12).map((c) => c.q);
+    if (cells.filter((c) => c.kit).length < cells.length / 2 || !sample.length) { skip('L1-M', 'legacy-drawn (skills)'); return; }
+    const fpAt = (q, size) => { try { return kit.cellFootprint(q, kit.resolveCtx({ mode: 'print', size, look: 'ican' })); } catch (e) { return null; } };
+    if (sample.some((q) => { const f = fpAt(q, 'M'); return !f || f.measure; })) { skip('L1-M', 'measured footprint (skills)'); return; }
+    const lay = (size) => { try { return layout.resolveSectionLayout({ role: 'independent', columns: 'auto', count: 30, dense: true }, sample.map((q) => ({ q })), 'A4', layout.LIVE_W_MM, { size, look: 'ican', header: layout.FULL_HEADER }); } catch (e) { return null; } };
+    const Mz = lay('M'), L = lay('L');
+    tick('L1-M', sample.length);
+    if (!Mz || !L) { find(key, 'L1-M', 0, 'layout', 'resolveSectionLayout threw'); return; }
+    if (!(Mz.perPage > L.perPage || Mz.cols > L.cols)) find(key, 'L1-M', 0, 'grid', `M fits ${Mz.cols} x ${Mz.rows} = ${Mz.perPage}, L fits ${L.cols} x ${L.rows} = ${L.perPage}: M must fit more items or more columns (DN-1a, critic r1 F10)`, 'M-not-more');
+}
+
 const JUDGE_WORDS = /^(yes|no|true|false|correct|not correct|fix it|always|sometimes|never|same|not the same|more|fewer|less|reasonable|not reasonable|even|odd|enough|not enough|a\.m\.|p\.m\.|am|pm)$/i;
 function answerToken(q) {
     const a = q.ans;
@@ -1277,6 +1294,7 @@ for (const subject of subjects) {
     if (rules.includes('WRONG-FITS')) ruleWrongFits(subject.key, cat, skill, cells);
     if (rules.includes('ROLE-TITLE')) { if (subject.fixture) skip('ROLE-TITLE', 'fixture (skills)'); else ruleRoleTitle(subject.key, cat, skill); }
     if (rules.includes('HINT')) ruleHint(subject.key, cells);
+    if (rules.includes('L1-M')) ruleL1M(subject.key, cells);
     if (rules.includes('OPT-VALUES')) { if (subject.fixture) skip('OPT-VALUES', 'fixture (skills)'); else ruleOptValues(subject.key, cat, skill); }
 }
 const RUN_MS = Date.now() - T1;

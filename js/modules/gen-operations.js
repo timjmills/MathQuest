@@ -4856,7 +4856,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // F6 (ops-family critic r1, OC4): the Max Number bounds every number the sentence prints
                 // (the product / dividend is the largest), so only factor pairs with f1 × f2 <= range are dealt.
                 const _mmPairs = [];
-                for (let x = 2; x <= mmFactorMax; x++) for (let y = 2; y <= mmFactorMax; y++) if (x * y <= range) _mmPairs.push([x, y]);
+                // (at Max 100 the tables stop at 99: one 3-digit total, 10 x 10, widened every answer box on the page
+                // by a digit and cost Size M its third column - F10)
+                for (let x = 2; x <= mmFactorMax; x++) for (let y = 2; y <= mmFactorMax; y++) if (x * y <= range && !(range <= 100 && x * y >= 100)) _mmPairs.push([x, y]);
                 if (!_mmPairs.length) _mmPairs.push([2, 2]);
                 const _mmK = _mmPairs.length;
                 const _mmDl = _pageDeal(`mm-item:${mmFactorMax}:${range}:${_mmPos.join(',')}`, _mmPos.length * _mmK, (j) => {
