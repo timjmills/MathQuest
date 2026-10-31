@@ -1168,8 +1168,12 @@ function sentenceLayout(p, ctx) {
     const cls = 'mq-ww mq-wwframes mq-wwsentence';
     const base = `box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;`;
     if (!narrow) {
-        return `<div class="${cls}" data-ww-ops="${st.op}" data-ws-inplace data-read style="width:100%;${base}padding-left:calc(var(--ws-tab, 5mm) + 1mm);display:flex;align-items:center;gap:${L(ctx, 6)};">`
-            + `<div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}${kb}</div>${work}</div>`;
+        // (a K picture story's counting picture takes the cell's whole width UNDER the story and the sentence: both groups
+        // on one line on every item - beside the sentence they wrapped on some items and not others, so the rows of one
+        // page differed by a picture line and the short ones kept a 30 % band; visual-quality r2)
+        const pics = p.pic ? `<div style="margin-top:${L(ctx, 0.5)};">${pictureRow(ctx, p.pic)}</div>` : '';
+        return `<div class="${cls}" data-ww-ops="${st.op}" data-ws-inplace data-read style="width:100%;${base}padding-left:calc(var(--ws-tab, 5mm) + 1mm);">`
+            + `<div style="display:flex;align-items:center;gap:${L(ctx, 6)};"><div style="flex:1 1 auto;min-width:0;">${storyHTML(ctx, p, true)}${kb}</div>${work}</div>${pics}</div>`;
     }
     // (a column too narrow for the word beside the box hangs the word UNDER the box: a lesson's two-across
     // cells and the page grids both hold it, nothing sticks out - PG-12)
