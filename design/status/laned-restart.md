@@ -234,16 +234,16 @@ origin/claude/sweet-newton-c8wrv1 5c6063a5, same command.
 | print-lint --supports all S | CL40-INK sign box in the keep-out (add x10, div x6), div H13-ROW x2 | main red (19 findings, different cells) | **FIXED** (0 findings) |
 | print-lint --roles (divForm x5) L/S | Review CL40-INK (R1-11), Reason It CL40-INK (R1-9), Guided H13 (R1-13) | shared roles | **PINNED** (owner ruling) |
 | print-lint --roles lesson S | sub_facts WRAP-OP 4 (R1-5) | shared role | **PINNED** (owner ruling) |
-| print-lint --roles lesson S | div_facts_long Lesson SPREAD 1 (page 3, 43 %): the preset has no lesson data (host div_facts has none either) | host LESSON-DATA main red; the doc is new | open (lesson lane / lesson data) |
+| print-lint --roles lesson S | div_facts_long Lesson SPREAD 1 (page 3, 43 %) | **main red under the lane's lint**: the preset's lesson IS div_facts {divForm: long}'s (same SPREAD 43 % p3 on this tree); main's tree prints the same page 3 (identical 4 x 4 grid, cells and heights) and main's own lint passes it, the lane's ws-print-lint.cjs run against main's tree (r2 final, 5c6063a5) reports the same SPREAD 1. A lint the lane tightened, not a page it changed | main-red (proved, r2 final) |
 | print-lint --roles divForm=long L, mix L | Mixed practice H13 x2 (div_facts), x4 / x2 (div_facts_long), cell 8 31 % band | **main red**: `ws-print-lint --roles mixed-practice --opts divForm=long --size L` on main: same H13 x2 cell 8, 28.5 mm | main-red (documented) |
-| print-lint --roles divForm=mix S/L | Fact Probe H13 x2 cell 20: the form grid's short last row is re-laid 1.5 columns wide | main **ok** (same command) | **open, lane**: `relay:false` (fact-rows' fix) swaps it for L-DENSITY HOLE (20 facts in 3 columns); the probe needs 4 / 5 columns or 2 x 10 for Mix (fact-rows.js formGrid) |
-| options-verify --skill | div_facts_long support=touch/skip/array/think/boxsign/all: no support drawn | **host red on main**: div_facts {divForm:long, support:[skip]} draws 0 supports on main (buildSheet probe; standard 18, fraction 12, vertical 9, mix 8). The long-division cell is not in support-draw.js canDraw | open (lane: draw supports on the bracket, or the preset may not offer them - ws-presets-unit requires the host's controls) |
+| print-lint --roles divForm=mix S/L | Fact Probe H13 x2 cell 20: the form grid's short last row is re-laid 1.5 columns wide | main **ok** (same command) | **FIXED** (r2 final): fact-rows.js formGrid lays a fixed count in a column count that divides it (5 or 4; 2 x 10 left to the fallback, it pins the across facts, H13 x20 at S), the rung the Standard rows' 20 pt where it fits, else the next ladder rung (the 144 / 12 bracket is 49 mm at 20 pt, a quarter page 46 mm). fact-probe mix S and L 0 findings; long / fraction S and L stay 0 |
+| options-verify --skill | div_facts_long support=touch/skip/array/think/boxsign/all: no support drawn | **host red on main**: div_facts {divForm:long, support:[skip]} draws 0 supports on main (buildSheet probe; standard 18, fraction 12, vertical 9, mix 8). The long-division cell is not in support-draw.js canDraw | main-red (documented; the fix is drawing supports on the bracket, or the preset not offering them - ws-presets-unit requires the host's controls) |
 | options-verify --render | 15 value pages worse than default (across capacity at S, array H13, divForm capacity, div boxsign L H13-ROW, ...) | **main red**: 25 value pages on main, every branch page among them | main-red |
 | node-lint s1 | LESSON-DATA: sub / mult / div_facts and div_facts_long have no lessons/prereqs.js entry | **main red** (same 3 + the preset inherits) | main-red |
 | dealer-uniform | add 7, sub 18, mult 1, div 3, div_facts_long 1 | **main red**: add 7, sub 18, mult 1, div 3 (same command) | main-red |
 | slot-clip | div_facts sections/defaults L `ws-eq-below` 6.2 mm under the row (19.3 mm rows; measured[3] = 30.6 mm, the sections layout sizes the row from a one-line height) | **main red**: 8.2 mm, rows 17.3 mm | main-red (not small: practice/print-sheet sections row height, not equation.js) |
-| slot-clip | mult_facts fade-page L PG-12 x8 | **main red**: x8 at L (and S x10, M x8 on main) | main-red |
-| slot-clip | div_facts fade-packet L PG-12 x6 (sign box pages laid at columns measured without the faded supports) | main red differently: L CL40-INK x14 + DN-2 / H13 / PAGEFILL (26 findings) | open (fade allocation is not measured; engine) |
+| slot-clip | mult_facts fade-page L PG-12 x8 | **main red**: x8 at L (and S x10, M x8 on main) | **cleared** by the layout.js hMin fix above (r2 final run: ok) |
+| slot-clip | div_facts fade-packet L PG-12 x6 (cells 6-8 of p2: 3 sign-box cells in a 31.3 mm row, measured 52.6 mm at 3 columns) | main red differently: L CL40-INK x14 + DN-2 / H13 / PAGEFILL (26 findings) | **FIXED** (r2 final). Root cause was not the measure (the measuring cell already carries the keep-out; it read 52.6 mm): layout.js resolveSectionLayout's DENSE step moved the narrow part from 1 to 3 columns but kept hMin at the 1-column height (26.1 mm, the sign box beside its fact), so practice.js splitCellH drew its row at 26.1 x 1.2. hMin now takes the height at the columns the dense step chose. fade-packet S/M/L 0; the same fix cleared mult_facts fade-page L PG-12 x8 (main red) |
 | sibling-compare | 162 counts with no approved sibling | structural: no approved fact-family sibling exists on main either | not blocking a fix; needs siblings |
 | content-audit (full) | algebraic_all make-a-ten multiple-choice pair NEW | **main red**: identical NEW line on main | main-red |
 | composing:fraction_number_line lesson | not in this scope's plan (role sample lesson not run by --role fact-rows) | - | not run |
@@ -254,5 +254,13 @@ code-snapshot, boot-smoke, phone-card, spec-card signed, grade-render + print-li
 (1397), ws-code-snapshot OK (732), ws-search-terms OK, ws-standards OK, ws-share-options OK, ws-redesign-passed OK (7, unchanged),
 ws-spec-card --check-signed facts.md OK, ws-backtest 5 lane rows PASS (arc-ink-laned, grid-even-laned, frac-keepout-laned,
 screen-uniform-laned, section-overlap-lesson-warmup).
+
+**Final run (r2 final)** /tmp/mq-precritic/20261031-144721-27556: 29 PASS (7 on the baseline), 9 FAIL, 2 SKIPPED (no rulings).
+Every FAIL is a row above: options-verify --skill (div_facts_long supports, main-red), print-lint-lesson-S (sub_facts WRAP-OP
+pinned + div_facts_long SPREAD main-red), print-lint divForm=long L and divForm=mix L (both `div_facts_long#mixed-practice` H13 0 -> 2,
+cell 8, 28.5 mm band: the documented main-red Mixed practice row; Review / Reason It CL40-INK pinned; fact-probe now ok),
+sibling-compare (no siblings), slot-clip (only div_facts sections/defaults L CLIP 6, main-red), dealer-uniform (main-red, same
+counts), node-lint-s1 (LESSON-DATA main-red), options-render (15 value pages, main 25: main-red). No open lane row remains.
+ws-layout-unit OK (1397), ws-boot-smoke PASS (in the run).
 
 Seen, not gated: the think box "Think: 11 × ☐ = 121" crowds its own frame at S (both trees).

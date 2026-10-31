@@ -562,6 +562,23 @@ export function factRowsLayout(items, input) {
 export function formGrid(items, ctx, G, forms, count, maxCols = 5) {
     // Mix: the rung of the Standard rows, in the most columns that hold it (pickMixRung).
     if (forms.size > 1) {
+        // A fixed count (the probe's 20) is laid in a column count that DIVIDES it, so every cell
+        // keeps one width and no hole is left in the last row (Lane D r2 precritic, H13: 20 Mix
+        // facts in 3 columns left cell 20 alone, re-laid 1.5 columns wide). The rung stays the
+        // Standard rows' 20 pt where a divisor holds it, else the next ladder rung down (the
+        // bracket "144 / 12" is 49 mm at 20 pt, a quarter of the page is 46 mm).
+        // (more columns first: 2 x 10 holds the 20 pt rung at S but pins every across fact to the
+        // left of a half-page cell, H13 - so 2 columns is left to the fallback below)
+        for (let cols = Math.min(maxCols, 5); cols >= 3; cols--) {
+            if (count % cols) continue;
+            for (const pt of LADDER_PTS.filter((p) => p <= MIX_RUNG_PT)) {
+                const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
+                const rows = count / cols;
+                const h = formHeightMm(forms, pt, ctx.size, cols);
+                if (formWidthMm(items, forms, pt, ctx.size) > inner || rows * h > G - SAFETY_H_MM) continue;
+                return { forms, cols, rows, perPage: cols * rows, cellH: (G - SAFETY_H_MM) / rows, hMin: h, digitPt: pt, size: ctx.size, look: ctx.look };
+            }
+        }
         for (let cols = Math.min(maxCols, 4); cols >= 2; cols--) {
             const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
             const rows = Math.ceil(count / cols);

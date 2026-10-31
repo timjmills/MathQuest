@@ -627,7 +627,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
 
     // PG-11: rows = min(target, floor((G - 1) / hMin)).
     const atCols = probe(cols, false);
-    const hMin = atCols.hMin;
+    let hMin = atCols.hMin;
     if (!atCols.fits) {
         clamped = true;
         notes.push('A problem is wider than its cell even in 1 column.');
@@ -766,6 +766,11 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
             if (rr * c > best.perPage || tie) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }
         if (best.perPage > rows * cols || (best.perPage === rows * cols && best.cols !== cols)) {
+            // (the tallest cell AT the columns the page now has: a support pane that stands beside its
+            // problem in one column stacks under it in three, div_facts boxsign L 26.1 -> 52.6 mm. The
+            // layout's hMin kept the one-column height, so a split part's rows (practice.js splitCellH,
+            // hMin x DENSE_ROOM) were drawn 31.3 mm for 52.6 mm cells - fade packet L PG-12 x6, Lane D r2)
+            if (best.cols !== cols && Number.isFinite(best.hMin)) hMin = Math.max(hMin, best.hMin);
             cols = best.cols;
             rows = best.rows;
             // The note says what the page prints: a practice ceiling the dense tables go past
