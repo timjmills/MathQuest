@@ -12,7 +12,15 @@
 //   e  SAME COUNT       every cell of one section draws the same number of digit boxes (SL-2)
 //   f  PANEL            no two OFFERED values of the option draw the same answer place, on the
 //                       pupil page, the key, the practice card, the online worksheet or the quiz
-//                       (screen boxes compared UNFOCUSED: no caret, no next-box pulse, no animation)
+//                       (screen boxes compared AS SHOWN, AT REST and with the first box FOCUSED, animations frozen;
+//                       a 4-sided outline or outer focus ring counts as a box, critic r2 #2)
+//   g  H13 BAND         a teacher's value leaves no more empty band in a cell than Automatic (critic r2 #4)
+//   e (screen)          the online worksheet's cards draw one box count per set, and no sentence wraps before "="
+//
+// ansBox r3 (L18): every check runs over the CROSS PRODUCT - each value of every option that changes the same drawing
+// (notation, divForm, layout ...) x every offered answer-box value (and Automatic) x size x host.
+//   --full     every skill in skill-ansbox-skills.js, every appearance value, sizes S/M/L, screen hosts at every look
+//   (default)  the lane sample below, S/L, the first two appearance values (--looks: all), screen hosts on the default look
 //
 //   node tests/scripts/ws-ansbox-shape.cjs                       # the sample below, every check
 //   node tests/scripts/ws-ansbox-shape.cjs --skill add_facts,addition:add_10_regroup --check b,f
@@ -39,8 +47,14 @@ const SAMPLE = [
     'division:div_facts', 'addition:add_sub_10s', 'division:divide',                                          // equation
     'multiplication:multiply', 'subtraction:sub_facts',                                                       // legacy fact
 ];
-const CHECKS = new Set((arg('check', 'b,c,d,e,f') || '').split(',').map((s) => s.trim()).filter(Boolean));
-const SIZES = (arg('sizes', 'S,L') || 'S,L').split(',').map((s) => s.trim().toUpperCase());
+const CHECKS = new Set((arg('check', 'b,c,d,e,f,g') || '').split(',').map((s) => s.trim()).filter(Boolean));
+// --full: every skill in skill-ansbox-skills.js, every appearance value, sizes S/M/L, the screen hosts at every look.
+// Default (the lane loop): the sample, sizes S/L, the first appearance value of each skill, screen hosts on the default look.
+const FULL = has('full');
+const SIZES = (arg('sizes', FULL ? 'S,M,L' : 'S,L')).split(',').map((s) => s.trim().toUpperCase());
+// the options that change the same drawing as the answer slot (L18): crossed with every answer-box value
+const APPEARANCE = ['notation', 'divForm', 'layout', 'form', 'orient', 'orientation'];
+const LANE_LOOKS = 2;
 const SHOTS = arg('shots', null);
 const VERBOSE = has('verbose');
 
@@ -88,6 +102,13 @@ function installHelpers() {
                     if (spread > 0 && !x && !y) sides = [1, 1, 1, 1];
                     if (y > 0) sides[0] = 1; if (y < 0) sides[2] = 1; if (x > 0) sides[3] = 1; if (x < 0) sides[1] = 1;
                 }
+            }
+            // r3 (critic r2 #2): a 4-sided focus ring - an outline, or an outer spread shadow (0 0 0 Npx) - IS a box to the
+            // pupil's eye, whatever its colour: it is never discounted as chrome
+            if (cs.outlineStyle && cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0.2 && !/rgba\(\d+, \d+, \d+, 0\)|transparent/.test(cs.outlineColor)) sides = [1, 1, 1, 1];
+            if (sh && sh !== 'none') for (const m of sh.matchAll(/rgba?\(([^)]*)\)\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+(-?[\d.]+)px(?!\s+inset)/g)) {
+                const alpha = m[1].split(',').length === 4 ? parseFloat(m[1].split(',')[3]) : 1;
+                if (alpha > 0.05 && parseFloat(m[5]) >= 1 && !parseFloat(m[2]) && !parseFloat(m[3])) sides = [1, 1, 1, 1];
             }
             const n = sides.reduce((a, c) => a + c, 0);
             if (!n) continue;
@@ -152,8 +173,27 @@ function installHelpers() {
         }
         return best;
     }
+    /** H13: the largest empty band above or below the cell's ink, as a fraction of the cell's height. */
+    function emptyBand(cell, w) {
+        const cb = cell.getBoundingClientRect();
+        let top = Infinity, bot = -Infinity;
+        const add = (r) => { if (r.width < 1 || r.height < 1) return; top = Math.min(top, r.top); bot = Math.max(bot, r.bottom); };
+        const tw = cell.ownerDocument.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+        let t;
+        while ((t = tw.nextNode())) {
+            if (!t.textContent.trim() || !t.parentElement || t.parentElement.closest('.ws-tab, [data-ws-label="tab"]')) continue;
+            const rg = cell.ownerDocument.createRange(); rg.selectNodeContents(t); for (const r of rg.getClientRects()) add(r);
+        }
+        for (const e of cell.querySelectorAll('*')) {
+            if (e.closest('.ws-tab, [data-ws-label="tab"]')) continue;
+            const cs = w.getComputedStyle(e);
+            if (e.tagName === 'svg' || ['Top', 'Right', 'Bottom', 'Left'].some((x) => visibleSide(cs, x))) add(e.getBoundingClientRect());
+        }
+        if (top === Infinity || cb.height < 1) return 0;
+        return Math.max(0, top - cb.top, cb.bottom - bot) / cb.height;
+    }
     const sig = (list) => list.map((s) => `${s.kind}:${Math.round(s.x / 2)}:${Math.round(s.y / 2)}:${Math.round(s.w / 2)}:${Math.round(s.h / 2)}`).sort().join(' ');
-    window.__ab = { shapes, digitBoxes, questionDigitPx, keyDigitPx, sig };
+    window.__ab = { shapes, digitBoxes, questionDigitPx, keyDigitPx, sig, emptyBand };
 }
 
 /** One sheet at one size: per-cell measures for pupil and key. */
@@ -178,7 +218,7 @@ async function measureSheet(page, key, opts, size, docHtml = null) {
             const sh = A.shapes(c, w);
             const q = A.questionDigitPx(c, w);
             const dig = A.digitBoxes(sh, Math.max(10, 0.8 * (q.px || 0)), q.top);
-            return { sig: A.sig(sh), n: sh.length, digits: dig.length, minDigitW: dig.length ? Math.min(...dig.map((s) => s.w)) : null, qpx: q.px, track: q.track, kpx: isKey ? A.keyDigitPx(c, w) : null };
+            return { sig: A.sig(sh), n: sh.length, digits: dig.length, minDigitW: dig.length ? Math.min(...dig.map((s) => s.w)) : null, qpx: q.px, track: q.track, kpx: isKey ? A.keyDigitPx(c, w) : null, band: A.emptyBand(c, w) };
         };
         return { pupil: pupilCells.map((c) => cell(c, false)), key: keyCells.map((c) => cell(c, true)) };
     }, key, opts, size, docHtml);
@@ -234,7 +274,20 @@ async function measureScreen(page, key, opts, host) {
             await sleep(60);
             const rest = read();
             el.removeAttribute('data-mq-no-pulse');
-            return { shown: shown.sig, rest: rest.sig, inputs: rest.inputs };
+            // FOCUSED: the first answer box focused (caret hidden), animations frozen - a focus ring is read as drawn
+            const first = [...el.querySelectorAll('input')].find((e) => e.type !== 'hidden' && e.getBoundingClientRect().width > 0 && !e.classList.contains('mq-carry'));
+            if (first) { first.focus(); if (window.refreshActiveBox) window.refreshActiveBox(); }
+            await sleep(60);
+            const focused = read();
+            if (first) first.blur();
+            // the online worksheet: the answer inputs of each of its cards (SL-2: one box count per set)
+            const cards = host === 'worksheet' ? [...document.querySelectorAll('[id^="ws_card_"]')].map((c) => [...c.querySelectorAll('input')]
+                .filter((e) => e.type !== 'hidden' && e.getBoundingClientRect().width > 0 && !e.classList.contains('mq-carry') && !e.closest('.rg, .ws-regroup, .mq-regroup')).length) : null;
+            // the add-three sentence must not wrap before "=" (critic r2 #7): the "=" and the first box on one line
+            let wraps = false;
+            const eq = [...el.querySelectorAll('.o, span')].find((x) => x.textContent.trim() === '=' && !x.children.length);
+            if (eq && first) { const a = eq.getBoundingClientRect(), b = first.getBoundingClientRect(); wraps = b.top > a.bottom - 2; }
+            return { shown: shown.sig, rest: rest.sig, focused: focused.sig, inputs: rest.inputs, cards, wraps };
         } catch (e) { return { error: String(e && e.message || e) }; }
         finally {
             try { window.clearSetOptions({ silent: true }); st.quizMode = false; window.showView('homeView'); } catch (e) { /* best effort */ }
@@ -298,66 +351,90 @@ async function shot(page, key, opts, size, file) {
             console.log(`${where}: ${m.pupil.length} pupil cell(s), ${m.key.length} key cell(s), digit boxes ${m.pupil.map((x) => x.digits).join(',')}`);
         }
         const tokens = (arg('skill', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
-        const skills = arg('fixture', null) ? [] : await resolveSkills(page, tokens.length ? tokens : SAMPLE);
+        // --full: every skill that carries the option (read from the served tree, MQ_ROOT aware)
+        const allAnsbox = () => [...fs.readFileSync(path.join(require('../lib/ws-harness.cjs').ROOT, 'js/modules/skill-ansbox-skills.js'), 'utf8').matchAll(/'([a-z_]+:[a-z0-9_]+)':/g)].map((m) => m[1]);
+        const skills = arg('fixture', null) ? [] : await resolveSkills(page, tokens.length ? tokens : FULL ? allAnsbox() : SAMPLE);
         if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
         for (const key of skills) {
             const [c, k] = key.split(':');
-            const values = await page.evaluate((c, k) => {
-                const def = window.offeredOptionsFor(c, k).find((d) => d.id === 'ansBox');
-                return def ? def.values.map((x) => ({ v: x.v, l: x.l })) : null;
-            }, c, k);
-            // a skill the panel offers no answer-box control on (a mixed pool, lead decision 2026-10-31) has nothing to measure
+            const meta = await page.evaluate((c, k, APPEARANCE) => {
+                const defs = window.offeredOptionsFor(c, k);
+                const def = defs.find((d) => d.id === 'ansBox');
+                // the options that change the SAME drawing (L18): every value of each is crossed with every answer-box value
+                const looks = defs.filter((d) => APPEARANCE.includes(d.id) && Array.isArray(d.values))
+                    .flatMap((d) => d.values.filter((x) => x.v !== null && x.v !== undefined && x.v !== d.default).map((x) => ({ [d.id]: x.v })));
+                return { values: def ? def.values.map((x) => ({ v: x.v, l: x.l })) : null, looks };
+            }, c, k, APPEARANCE);
+            const values = meta.values;
+            // a skill the panel offers no answer-box control on (a mixed pool) has nothing to measure
             if (!values) { console.log(`${key} measured (not offered: nothing to check)`); continue; }
-            const per = {};   // value -> host -> signature
-            for (const { v, l } of values) {
-                const opts = v === null ? {} : { ansBox: v };
-                const name = v === null ? 'auto' : v;
-                per[name] = { label: l };
-                for (const size of SIZES) {
-                    const m = await measureSheet(page, key, opts, size);
-                    per[name][`pupil-${size}`] = m.pupil.map((x) => x.sig).join(' | ');
-                    per[name][`key-${size}`] = m.key.map((x) => x.sig).join(' | ');
-                    const where = `${key} ${name} ${size}`;
-                    if (!m.pupil.length || !m.key.length) { fail(`${where}: no cells (pupil ${m.pupil.length}, key ${m.key.length})`); continue; }
-                    if (CHECKS.has('b')) m.key.forEach((kc, i) => {
-                        const pc = m.pupil[i]; if (!pc) return;
-                        if (kc.sig !== pc.sig) fail(`b ${where} cell ${i + 1}: the key's answer place is not the pupil's (pupil [${pc.sig}] key [${kc.sig}])`);
-                    });
-                    if (CHECKS.has('c') && v !== null) m.pupil.forEach((pc, i) => {
-                        if (pc.minDigitW != null && pc.track && pc.minDigitW < pc.track - 1) fail(`c ${where} cell ${i + 1}: a digit box is ${pc.minDigitW.toFixed(1)}px wide, narrower than the digit track ${pc.track.toFixed(1)}px`);
-                    });
-                    // d holds a teacher's value (critic r1 #4); the automatic page is guarded byte for byte by ws-ansbox-default-parity
-                    if (CHECKS.has('d') && v !== null) m.key.forEach((kc, i) => {
-                        if (kc.kpx && kc.qpx && kc.kpx < 0.9 * kc.qpx) fail(`d ${where} cell ${i + 1}: the key writes its answer at ${kc.kpx.toFixed(1)}px, under 0.9 x the question's ${kc.qpx.toFixed(1)}px digits`);
-                        if (!kc.kpx) fail(`d ${where} cell ${i + 1}: no answer digit written in key ink`);
-                    });
-                    if (CHECKS.has('e') && v !== null) {
-                        const counts = [...new Set(m.pupil.map((x) => x.digits))];
-                        if (counts.length > 1) fail(`e ${where}: the section's cells draw ${counts.join(' / ')} digit boxes (SL-2: one band per section)`);
+            const looks = [{}, ...(FULL || has('looks') ? meta.looks : meta.looks.slice(0, LANE_LOOKS))];
+            for (const look of looks) {
+                const lookName = Object.keys(look).length ? Object.entries(look).map(([a, b]) => `${a}=${b}`).join(',') : 'default';
+                const per = {};   // value -> host -> signature
+                const bands = {};   // size -> value -> worst H13 band
+                for (const { v, l } of values) {
+                    const opts = v === null ? { ...look } : { ...look, ansBox: v };
+                    const name = v === null ? 'auto' : v;
+                    per[name] = { label: l };
+                    for (const size of SIZES) {
+                        const m = await measureSheet(page, key, opts, size);
+                        per[name][`pupil-${size}`] = m.pupil.map((x) => x.sig).join(' | ');
+                        per[name][`key-${size}`] = m.key.map((x) => x.sig).join(' | ');
+                        const where = `${key} [${lookName}] ${name} ${size}`;
+                        if (!m.pupil.length || !m.key.length) { fail(`${where}: no cells (pupil ${m.pupil.length}, key ${m.key.length})`); continue; }
+                        (bands[size] = bands[size] || {})[name] = Math.max(...m.pupil.map((x) => x.band || 0));
+                        if (CHECKS.has('b')) m.key.forEach((kc, i) => {
+                            const pc = m.pupil[i]; if (!pc) return;
+                            if (kc.sig !== pc.sig) fail(`b ${where} cell ${i + 1}: the key's answer place is not the pupil's (pupil [${pc.sig}] key [${kc.sig}])`);
+                        });
+                        if (CHECKS.has('c') && v !== null) m.pupil.forEach((pc, i) => {
+                            if (pc.minDigitW != null && pc.track && pc.minDigitW < pc.track - 1) fail(`c ${where} cell ${i + 1}: a digit box is ${pc.minDigitW.toFixed(1)}px wide, narrower than the digit track ${pc.track.toFixed(1)}px`);
+                        });
+                        // d holds a teacher's value; the automatic page is guarded byte for byte by ws-ansbox-default-parity (vs merge-base)
+                        if (CHECKS.has('d') && v !== null) m.key.forEach((kc, i) => {
+                            if (kc.kpx && kc.qpx && kc.kpx < 0.9 * kc.qpx) fail(`d ${where} cell ${i + 1}: the key writes its answer at ${kc.kpx.toFixed(1)}px, under 0.9 x the question's ${kc.qpx.toFixed(1)}px digits`);
+                            if (!kc.kpx) fail(`d ${where} cell ${i + 1}: no answer digit written in key ink`);
+                        });
+                        if (CHECKS.has('e') && v !== null) {
+                            const counts = [...new Set(m.pupil.map((x) => x.digits))];
+                            if (counts.length > 1) fail(`e ${where}: the section's cells draw ${counts.join(' / ')} digit boxes (SL-2: one band per section)`);
+                        }
+                        if (VERBOSE) console.log(`  ${where}: cells ${m.pupil.length}, digit boxes ${m.pupil.map((x) => x.digits).join(',')}, q ${m.pupil[0].qpx}px track ${m.pupil[0].track && m.pupil[0].track.toFixed(1)}, key ${m.key.map((x) => x.kpx).join(',')}, band ${(bands[size][name] * 100).toFixed(0)}%`);
+                        if (SHOTS) await shot(page, key, opts, size, path.join(SHOTS, `${k}-${lookName.replace(/[=,]/g, '-')}-${name}-${size}.png`));
                     }
-                    if (VERBOSE) console.log(`  ${where}: cells ${m.pupil.length}, digit boxes ${m.pupil.map((x) => x.digits).join(',')}, q ${m.pupil[0].qpx}px track ${m.pupil[0].track && m.pupil[0].track.toFixed(1)}, key ${m.key.map((x) => x.kpx).join(',')}`);
-                    if (SHOTS) await shot(page, key, opts, size, path.join(SHOTS, `${k}-${name}-${size}.png`));
+                    const screenHere = lookName === 'default' || FULL;
+                    if (screenHere && (CHECKS.has('f') || CHECKS.has('e'))) for (const host of ['card', 'worksheet', 'quiz']) {
+                        const s2 = await measureScreen(page, key, opts, host);
+                        if (s2.error) { fail(`f ${key} ${name} ${host}: ${s2.error}`); continue; }
+                        for (const st of ['shown', 'rest', 'focused']) per[name][`${host}-${st}`] = s2[st];
+                        per[name][`${host}-inputs`] = s2.inputs;
+                        // e on the online worksheet (critic r2 #3): every card of the set draws the same number of answer boxes
+                        if (CHECKS.has('e') && v !== null && host === 'worksheet' && s2.cards && new Set(s2.cards).size > 1)
+                            fail(`e ${key} [${lookName}] ${name} worksheet: the set's cards draw ${s2.cards.join(' / ')} answer boxes (SL-2)`);
+                        if (CHECKS.has('e') && v !== null && host === 'worksheet' && s2.wraps) fail(`e ${key} [${lookName}] ${name} worksheet: the sentence wraps before "=" (critic r2 #7)`);
+                        if (VERBOSE) console.log(`  ${key} ${name} ${host}: ${s2.inputs} input(s) cards ${s2.cards || '-'} shown ${s2.shown.slice(0, 160)}\n      focused ${s2.focused.slice(0, 160)}`);
+                    }
                 }
-                if (CHECKS.has('f')) for (const host of ['card', 'worksheet', 'quiz']) {
-                    const s = await measureScreen(page, key, opts, host);
-                    if (s.error) { fail(`f ${key} ${name} ${host}: ${s.error}`); continue; }
-                    per[name][`${host}-shown`] = s.shown;
-                    per[name][`${host}-rest`] = s.rest;
-                    per[name][`${host}-inputs`] = s.inputs;
-                    if (VERBOSE) console.log(`  ${key} ${name} ${host}: ${s.inputs} input(s) shown ${s.shown.slice(0, 200)}\n      rest ${s.rest.slice(0, 200)}`);
+                // g (critic r2 #4, H13): a teacher's value may not leave more empty band than Automatic (no stack jumping to the top)
+                if (CHECKS.has('g')) for (const [size, bv] of Object.entries(bands)) for (const [name, band] of Object.entries(bv)) {
+                    if (name === 'auto' || bv.auto === undefined) continue;
+                    if (band > bv.auto + 0.04 && band >= 0.25) fail(`g ${key} [${lookName}] ${name} ${size}: empty band ${(band * 100).toFixed(0)}% of the cell, Automatic ${(bv.auto * 100).toFixed(0)}% (H13)`);
+                }
+                if (CHECKS.has('f')) {
+                    const names = Object.keys(per);
+                    const hosts = [...new Set(names.flatMap((n) => Object.keys(per[n])))].filter((h) => h !== 'label' && !/-inputs$/.test(h));
+                    for (const h of hosts) for (let i = 0; i < names.length; i++) for (let j = i + 1; j < names.length; j++) {
+                        const a2 = names[i], b2 = names[j];
+                        // the one excused pair: "per digit" and "one box" on a screen answer of ONE input (a one-place answer is one box)
+                        const host = h.split('-')[0];
+                        const onePlace = /^(card|worksheet|quiz)$/.test(host) && per[a2][`${host}-inputs`] === 1 && per[b2][`${host}-inputs`] === 1
+                            && [a2, b2].includes('one') && [a2, b2].includes('digit');
+                        if (per[a2][h] !== undefined && per[a2][h] === per[b2][h] && !onePlace) fail(`f ${key} [${lookName}] ${h}: "${per[a2].label}" and "${per[b2].label}" draw the same answer place`);
+                    }
                 }
             }
-            if (CHECKS.has('f')) {
-                const names = Object.keys(per);
-                const hosts = Object.keys(per[names[0]] || {}).filter((h) => h !== 'label' && !/-inputs$/.test(h));
-                for (const h of hosts) for (let i = 0; i < names.length; i++) for (let j = i + 1; j < names.length; j++) {
-                    const a = names[i], b = names[j];
-                    const onePlace = /^(card|worksheet|quiz)-/.test(h) && per[a][`${h.split('-')[0]}-inputs`] === 1 && per[b][`${h.split('-')[0]}-inputs`] === 1
-                        && [a, b].includes('one') && [a, b].some((x) => x === 'digit' || (x === 'auto' && /per digit/.test(per[x].label)));
-                    if (per[a][h] !== undefined && per[a][h] === per[b][h] && !onePlace) fail(`f ${key} ${h}: "${per[a].label}" and "${per[b].label}" draw the same answer place`);
-                }
-            }
-            console.log(`${key} measured (${values.map((x) => (x.v === null ? 'auto' : x.v)).join(' / ')})`);
+            console.log(`${key} measured (${values.map((x) => (x.v === null ? 'auto' : x.v)).join(' / ')}; looks ${looks.length})`);
         }
     } catch (e) { fail(`crashed: ${e && e.stack || e}`); }
     finally { await app.close(); }

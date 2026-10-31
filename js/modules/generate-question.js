@@ -15,7 +15,7 @@ import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
 import { presetOf } from './skill-presets.js';
-import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-options.js';
+import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor, effectiveAnsBoxFor } from './skill-options.js';
 import { registerVariantOverride } from './variant-cycler.js';
 // L10: the page dealer. Every choice dealt down a page goes through it; reset at item 0.
 import { dealIndex, resetPageDeals, setRedraw } from './page-deal.js';
@@ -285,12 +285,14 @@ export function generateQuestion() {
 
 // Wave 1 lane B (owner ruling 2026-10-02): a + − × ÷ skill's answer-box style travels on the item
 // (q.ansBox) and inside its kit payload, so print, the key and every screen host draw the same
-// boxes. null = automatic (resolveAnsBox in skill-options.js: stack per digit, otherwise one box).
+// boxes. null = Automatic: the skill's own (old) answer place.
 function _stampAnsBox(q) {
     if (!q || typeof q !== 'object') return q;
     const o = state.skillOptions;
     if (!o || !Object.prototype.hasOwnProperty.call(o, 'ansBox')) return q;
-    const v = o.ansBox == null ? null : o.ansBox;
+    // ansBox r3: the EFFECTIVE value (sheet/ans-slot.js): a value not offered for this skill's layout draws
+    // Automatic, the old drawing (lead decision SL-3)
+    const v = o.ansBox == null ? null : effectiveAnsBoxFor(o.ansBox, state.category, state.skill);
     q.ansBox = v;
     if (v != null && q.cell && q.cell.payload && typeof q.cell.payload === 'object') q.cell.payload.ansBox = v;
     return q;

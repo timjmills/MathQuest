@@ -613,6 +613,11 @@ function ansBoxKeys() {
     try { return [...fs.readFileSync(path.join(ROOT, 'js/modules/skill-ansbox-skills.js'), 'utf8').matchAll(/^\s*'([a-z_]+:[a-z0-9_]+)':\s*'/gm)].map((m) => m[1]); } catch (e) { return []; }
 }
 
+/** The skills that passed the 8/10 redesign (js/modules/redesign-passed.js), as cat:skill keys. */
+function passedKeys() {
+    try { const src = fs.readFileSync(path.join(ROOT, 'js/modules/redesign-passed.js'), 'utf8'); return [...src.slice(src.indexOf('const IDS')).split(']')[0].matchAll(/'([a-z_]+:[a-z0-9_]+)'/g)].map((m) => m[1]); } catch (e) { return []; }
+}
+
 /* ============================================================== plan */
 function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
@@ -641,6 +646,9 @@ function buildPlan(ctx) {
         // screens - key = pupil boxes, digit box >= digit track, key digits >= 0.9 x question, one box count per
         // section, no two offered values alike on any host - for every scope skill that offers it
         const abKeys = ansBoxKeys().filter((k) => keys.includes(k));
+        // ansBox r3 (lead decision SL-3, LESSONS L17): Automatic must stay byte- and pixel-identical to MAIN (git merge-base,
+        // rendered in a temporary worktree) on the passed skills and on every scope skill that carries the option
+        if (abKeys.length) add(gate('ansbox-parity', 'ws-ansbox-default-parity (Automatic = merge-base, byte and pixel)', `${abKeys.length} answer-box skill(s) + the passed skills`, 'browser', 'ws-ansbox-default-parity', ['--skills', [...new Set([...abKeys, ...passedKeys()])].join(',')], { expect: { mention: [] } }));
         if (abKeys.length) add(gate('ansbox-shape', 'ws-ansbox-shape (answer boxes: key = pupil, digit width, key digit size, one band, no two values alike)', abKeys.length <= 3 ? abKeys.join(', ') : `${abKeys.length} answer-box skills`, 'browser', 'ws-ansbox-shape', ['--skill', abKeys.join(',')], { expect: { mention: abKeys } }));
         const presetTouch = skills.filter((s) => s.preset || s.hosts);
         if (presetTouch.length) add(gate('presets', 'ws-presets-unit', `${presetTouch.length} preset / host skill(s)`, 'browser', 'ws-presets-unit', []));

@@ -398,7 +398,7 @@ register('stack', {
         // A missing-digit item (p.unknown, VA-7) GIVES its answer row: its answer place is the one
         // missing digit, so the answer row keeps its plain printed digits and the option does not
         // apply (critic B r5 D4: given digits never wear the answer-box shape).
-        const ansBox = p.unknown ? null : p.ansBox === 'one' || p.ansBox === 'off' ? p.ansBox : 'digit';
+        const ansBox = p.unknown ? null : p.ansBox === 'one' || p.ansBox === 'off' || p.ansBox === 'digit' ? p.ansBox : null;   // r3: null = Automatic, the old drawing
         let answer = p.answer || (level >= 2 ? 'boxes' : 'open');
         // a generator's own per-digit default (`answer: 'boxes'`, the column ruling) is the automatic
         // style: the teacher's 'one' / 'off' replaces it at the independent levels (a Guided cell's

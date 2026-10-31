@@ -114,7 +114,7 @@ function _missingOperandStrip(q) {
     if (Array.isArray(q.options) && q.options.length > 0) return null;
     if (q.answerType && q.answerType !== 'number') return null;
     const raw = q.ansBox != null ? q.ansBox : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox : null;
-    if (resolveAnsBox(raw, 'other') !== 'digit') return null;
+    if (resolveAnsBox(raw) !== 'digit') return null;
     const m = plainText(q.text).match(/^(\d{1,7}|\?|_+)\s*([+\-−–×xX*÷/])\s*(\d{1,7}|\?|_+)\s*=\s*(\d{1,7})\s*$/);
     if (!m) return null;
     const blankA = !/^\d/.test(m[1]), blankB = !/^\d/.test(m[3]);
@@ -136,11 +136,19 @@ function _missingOperandStrip(q) {
  * keeps its line and gets a digit strip after "=" (`layout: 'eq'`); both use the
  * stack's digit inputs, so every host checks them, and marks them, box by box.
  */
+/** The item's answer-box value (stamped effective by generateQuestion; null = Automatic). */
+function _rawAnsBox(q) {
+    return resolveAnsBox(q && (q.ansBox != null ? q.ansBox : q.cell && q.cell.payload && q.cell.payload.ansBox != null ? q.cell.payload.ansBox
+        : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox : null));
+}
+
 function withAnsBox(q, k) {
     if (!k || k.kind === 'division') return k;
     const raw = q && (q.ansBox != null ? q.ansBox : q.cell && q.cell.payload && q.cell.payload.ansBox != null ? q.cell.payload.ansBox
         : q.skillOptions && q.skillOptions.ansBox != null ? q.skillOptions.ansBox : null);
-    const ab = resolveAnsBox(raw, k.kind === 'stack' ? 'stack' : 'other');
+    const ab = resolveAnsBox(raw);
+    // ansBox r3 (lead decision SL-3): Automatic draws the old screen cell, unchanged
+    if (!ab) return k;
     if (ab === 'digit' && (k.kind === 'fact' || k.kind === 'eq') && Number.isFinite(Number(k.a)) && Number.isFinite(Number(k.b))) {
         const ansLen = String(k.ans != null ? k.ans : '').length;
         // the band's width (SL-2): the kit payload's digits, else the legacy band rule (as printed)
@@ -207,7 +215,8 @@ function _cellKindFor(q) {
     // A legacy column item that prints as a column (printFormat column-add / column-sub) but whose
     // screen visual is its own drawing (sub_across_zeros): drawn as the kit stack too, so the column
     // is the same on screen as on paper and honours the answer-box option (owner ruling 2026-10-02).
-    if (!q.cell && /^column-(add|sub)$/.test(String(q.printFormat || '')) && (p.op === '+' || p.op === '-') && !/column-answer-input/.test(v)) {
+    // (ansBox r3, SL-3: only with a teacher's value; Automatic keeps the old screen drawing)
+    if (!q.cell && _rawAnsBox(q) && /^column-(add|sub)$/.test(String(q.printFormat || '')) && (p.op === '+' || p.op === '-') && !/column-answer-input/.test(v)) {
         const T = Math.max(A.length, B.length) + 1;
         if (ANS.length <= T) return { kind: 'stack', T, ...p };
     }
@@ -245,11 +254,11 @@ function _cellKindFor(q) {
     // 0.29 em on paper; the Mix slot beside on screen, under on paper).
     if (cellT === 'equation' && pay.fact && !pay.notation && p.op === '/' && (pay.unknown || 'result') === 'result') return { kind: 'eq', ...p, divFact: true, mix: !!pay.mix };
     // a missing-number sentence's "= ___": the same band as its paper slot (print-generate.js, SL-2)
-    if (!v.trim()) return { kind: 'eq', ...p, ...(q.printFormat === 'missing-number' ? { band: 2 } : {}) };
+    if (!v.trim()) return { kind: 'eq', ...p, ...(q.printFormat === 'missing-number' && _rawAnsBox(q) ? { band: 2 } : {}) };
     // missing_mult_div's "a × b = ___" (its visual only repeats the sentence): the same equation as
     // missing_add_sub's, so the answer-box option reaches it (critic B r4 D3). A blank elsewhere in the
     // sentence is a missing-number box (SL-3 scope) and keeps its legacy drawing.
-    if (q.printFormat === 'missing-factor' && !q.cell) return { kind: 'eq', ...p, band: 3 };
+    if (q.printFormat === 'missing-factor' && !q.cell && _rawAnsBox(q)) return { kind: 'eq', ...p, band: 3 };
     return null;
 }
 
@@ -594,6 +603,8 @@ export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answ
     let html = '';
     // ansBox 'off' (the plain look): the host's slot keeps a ruled writing line, no box.
     if (k.ansBox === 'off' && slotHtml && (kk.kind === 'eq' || kk.kind === 'fact')) slotHtml = `<span class="mq-ansoff">${slotHtml}</span>`;
+    // ansBox 'one' (r3): the paper's black box on screen too (Automatic is the game's yellow box)
+    if (k.ansBox === 'one' && slotHtml && (kk.kind === 'eq' || kk.kind === 'fact')) slotHtml = `<span class="mq-ansone">${slotHtml}</span>`;
     if (kk.kind === 'eq') html = equationHTML(kk, slotHtml);
     else if (kk.kind === 'fact') html = factHTML(kk, slotHtml);
     else if (kk.kind === 'division') html = divisionHTML(kk, slotHtml);

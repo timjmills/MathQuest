@@ -1020,7 +1020,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
     // 1b. (ansBox 'digit', owner ruling 2026-10-02) ONE strip of digit boxes - a column's write row
     // (`ws-fact-write--digit`) or an equation's (`ws-slot--digits`): the key writes each digit in its
     // own box, right-aligned to the ones.
-    const digitStrips = html.match(/<span class="(?:ws-fact-write ws-fact-write--digit|ws-slot ws-slot--digits)"[^>]*>(?:<i [^>]*><\/i>)+<\/span>/g) || [];
+    const digitStrips = html.match(/<span class="(?:ws-fact-write ws-fact-write--digit|ws-slot ws-slot--digits)[^"]*"[^>]*>(?:<i [^>]*><\/i>)+<\/span>/g) || [];
     if (digitStrips.length === 1 && /^\d+$/.test(digits)) {
         const boxes = digitStrips[0].match(/<i [^>]*><\/i>/g) || [];
         if (digits.length <= boxes.length) {
@@ -1034,7 +1034,7 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
             });
             // a column's write row is a grid of fixed height: its one row keeps that height, so a full-size
             // key digit (its 1 em line box) never makes the key's boxes taller than the pupil's (key = facsimile)
-            return html.replace(digitStrips[0], fullKey ? filled.replace(/^(<span class="ws-fact-write ws-fact-write--digit" style="[^"]*)"/, '$1grid-template-rows:100%;"') : filled);
+            return html.replace(digitStrips[0], fullKey ? filled.replace(/^(<span class="ws-fact-write ws-fact-write--digit[^"]*" style="[^"]*)"/, '$1grid-template-rows:100%;"') : filled);
         }
     }
 
@@ -1049,23 +1049,31 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         const at = html.indexOf(factRows[0]);
         const tracks = [...html.slice(0, at).matchAll(/grid-template-columns:\s*repeat\((\d+),/g)].map((m) => Number(m[1])).pop() || 3;
         if (digits.length > tracks) return null;
-        // The answer digits sit INSIDE the same box the pupil page draws (owner ruling 2026-10-02):
-        // the box is the zone itself, a grid of the stack's own tracks.
-        // (critic B r3 D2) the digit is set at the box's writing size (never taller than the box), so it
-        // sits clear inside it with padding instead of crossing its bottom edge
-        // ansBox rebuild r2 (critic r1 #4): at the question's own digit size (AK-1); the digit's ink (about 0.7 em) still
-        // sits inside the box, centred, the line box overflowing it evenly
-        const fs = fullKey ? '1em' : `min(1em, calc(${h} * 0.82))`;
-        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:100%;line-height:1;font-size:${fs};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
-        return html.replace(factRows[0], `<span class="ws-fact-write" style="${style}display:grid;grid-template-columns:repeat(${tracks},1fr);${fullKey ? 'grid-template-rows:100%;' : ''}">${cells}</span>`);
+        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:${h};line-height:${h};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
+        return html.replace(factRows[0], cells);
+    }
+    // 2-one. (ansBox r3, the teacher's 'One box') a column's write row drawn as ONE box: the digits are written
+    // INSIDE it on the stack's own tracks, at the question's digit size (AK-1); the box keeps its height.
+    const oneRows = html.match(/<span class="ws-fact-write ws-ab ws-ab--one" style="([^"]*)"><\/span>/g) || [];
+    if (oneRows.length === 1 && /^\d+$/.test(digits)) {
+        const style = oneRows[0].match(/style="([^"]*)"/)[1];
+        const at = html.indexOf(oneRows[0]);
+        const tracks = [...html.slice(0, at).matchAll(/grid-template-columns:\s*repeat\((\d+),/g)].map((m) => Number(m[1])).pop() || 3;
+        if (digits.length > tracks) return null;
+        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:100%;line-height:1;font-size:1em;display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
+        return html.replace(oneRows[0], `<span class="ws-fact-write ws-ab ws-ab--one" style="${style}display:grid;grid-template-columns:repeat(${tracks},1fr);grid-template-rows:100%;">${cells}</span>`);
     }
 
     // 2b. A horizontal equation's own write slot ("36 ÷ 4 = ____"): one empty `.ws-slot` line or
     // box, the value written on it.
     const eqSlots = html.match(/<span class="ws-slot" data-ws-shape="(?:line|box)"[^>]*><\/span>/g) || [];
     if (eqSlots.length === 1 && display && /style="[^"]*"><\/span>$/.test(eqSlots[0])) {
-        // ansBox rebuild r2 (critic r1 #4): the key writes at the question's own digit size (AK-1), never 0.8 em
-        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:center;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:${fullKey ? '1em' : '0.8em'};">${escText(display)}</b></span>`));
+        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:flex-end;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;">${escText(display)}</b></span>`));
+    }
+    // 2b-one. (ansBox r3) the teacher's 'One box' after "=": the value centred inside it at the question's size
+    const oneSlots = html.match(/<span class="ws-slot ws-ab ws-ab--one" data-ws-shape="box"[^>]*><\/span>/g) || [];
+    if (oneSlots.length === 1 && display && /style="[^"]*"><\/span>$/.test(oneSlots[0])) {
+        return html.replace(oneSlots[0], oneSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:center;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:1em;">${escText(display)}</b></span>`));
     }
 
     // 3. One "Answer:" line: a label, then a ruled blank that stretches (28+ print branches).
@@ -1075,15 +1083,6 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         const fl = /^(\d+)\s*\/\s*(\d+)$/.exec(display.trim());
         const v = fl ? `<span class="mq-frac" style="font-size:1em;"><span>${fl[1]}</span><span>${fl[2]}</span></span>` : escText(display);
         return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${v}</b>${close}`);
-    }
-
-    // 3a. (owner ruling 2026-10-02, SL-3) A legacy horizontal question's ONE stretching answer place
-    // (`flex:1;border-bottom:2px solid #000`), drawn as a box on kit pages (sheet-kit.css): the key
-    // writes the value INSIDE that box, never in an "Answer:" stamp under it.
-    const hpRe = /(<span style="flex:1;border-bottom:2px solid #(?:000|333);?")>(?:&nbsp;|\s)*<\/span>/g;
-    const hps = html.match(hpRe) || [];
-    if (hps.length === 1 && display && !/Answer:/.test(html) && display.length <= 24) {
-        return html.replace(hpRe, (m, open) => `${open} data-ws-ink="${inkAttr}" class="ws-hp-ans"><b style="${INK_STYLE}">${escText(display)}</b></span>`);
     }
 
     // 3b. ONE empty inline write place with no "Answer:" label - a ruled underline ("Perimeter =

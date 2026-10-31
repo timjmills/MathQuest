@@ -1,6 +1,7 @@
 // skill-options.js — the options a skill carries with it.
 import { normalizeRows } from './count-rows.js';
-import { presetOf } from './skill-presets.js';   // pure table, imports nothing   // pure, imports nothing: node still loads this file bare
+import { presetOf } from './skill-presets.js';
+import { offeredAnsValues, effectiveAnsBox } from './sheet/ans-slot.js';   // pure, imports nothing   // pure table, imports nothing   // pure, imports nothing: node still loads this file bare
 //
 // Owner's rule (2026-09-19): options live ON THE SKILL, not on the page. A skill declares what
 // it can be configured with; the chosen values travel with it into ANY page role — lesson
@@ -3615,9 +3616,10 @@ let ANSBOX_SKILLS = {};
 export function registerAnsBoxSkills(map) { ANSBOX_SKILLS = map || {}; }
 export const ANSBOX_CATEGORIES = new Set(['addition', 'subtraction', 'multiplication', 'division']);
 export const ansBoxOption = (layout = '') => {
-    const col = /stack/.test(layout), fact = /fact|equation|eq/.test(layout);
-    const auto = col && fact ? 'Automatic: one box per digit in column sums, one box for facts'
-        : col ? 'Automatic: one box per digit (column work)' : 'Automatic: one box';
+    // ansBox r3 (lead decision SL-3): Automatic is the skill's own answer place, unchanged
+    const col = /stack/.test(layout), fact = /fact|eq/.test(layout);
+    const auto = col && !fact ? 'Automatic (the column\'s own answer row)'
+        : fact && !col ? 'Automatic (the answer line, or one box on screen)' : 'Automatic (the skill\'s own answer place)';
     return {
         id: 'ansBox', label: 'Answer boxes', type: 'enum', default: null, group: ANSBOX_GROUP,
         values: [
@@ -3644,23 +3646,21 @@ export const ansBoxOption = (layout = '') => {
 export const ANSBOX_NO_OFF = new Set(['addition:add_three', 'subtraction:missing_add_sub', 'division:missing_mult_div']);
 export const ANSBOX_MIXED_POOLS = new Set(['division:mixed_division']);
 export function offeredAnsBox(def, layout = '', key = '') {
-    const parts = String(layout || '').split('+').filter(Boolean);
-    if (!parts.length || !def || !Array.isArray(def.values)) return def;
-    // Lead decision 2026-10-31: a mixed pool whose members draw differently (stack / fact / counters / long
-    // division) cannot honour one value uniformly, so it offers no answer-box control (Automatic); the option
-    // stays in the model (optionsFor), so a share code that carries it still decodes.
-    // (mixed_division measures as one layout, legacy-eq, but its pool also deals long division - a vinculum that keeps
-    // its own answer place - so it is a pool whose members draw differently too)
-    if (parts.length > 1 || ANSBOX_MIXED_POOLS.has(key)) return null;
-    if (ANSBOX_NO_OFF.has(key)) def = { ...def, values: def.values.filter((x) => x.v !== 'off') };
-    const col = parts.every((x) => /stack/.test(x)), none = parts.every((x) => !/stack/.test(x));
-    const drop = col ? 'digit' : none ? 'one' : null;
-    return drop ? { ...def, values: def.values.filter((x) => x.v !== drop) } : def;
+    // ansBox r3: the ONE answer-slot model (sheet/ans-slot.js) decides what is offered: a value is shown only
+    // where it draws something Automatic (the old drawing) does not, on every host. None -> no control.
+    if (!def || !Array.isArray(def.values)) return def;
+    const vals = offeredAnsValues(layout, key);
+    if (!vals.length) return null;
+    return { ...def, values: def.values.filter((x) => x.v === null || vals.includes(x.v)) };
 }
-/** The answer-box style a cell draws: the chosen value, else the automatic one for its layout. */
-export function resolveAnsBox(value, layout) {
-    if (value === 'digit' || value === 'one' || value === 'off') return value;
-    return layout === 'stack' ? 'digit' : 'one';
+/** The answer-box value a skill's items honour: the teacher's value if offered for its layout, else null (Automatic). */
+export function effectiveAnsBoxFor(value, categoryId, skillId) {
+    const key = `${categoryId}:${skillId}`;
+    return effectiveAnsBox(value, ANSBOX_SKILLS[key] || '', key);
+}
+/** The answer-box style a cell draws: the chosen value, else null (Automatic = the old drawing, SL-3 r3). */
+export function resolveAnsBox(value) {
+    return value === 'digit' || value === 'one' || value === 'off' ? value : null;
 }
 
 // ---------------------------------------------------------------------------

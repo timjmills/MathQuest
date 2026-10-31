@@ -83,7 +83,8 @@ function appearanceValues(defs) {
 async function readOffered(root, keys) {
     const M = (f) => pathToFileURL(path.join(root, 'js/modules', f)).href;
     const so = await import(M('skill-options.js'));
-    for (const side of ['skill-options-derived.js', 'skill-options-pools.js', 'skill-presets.js']) {
+    // skill-ansbox-skills.js registers the answer-box option's skills: without it ansBox was SILENTLY absent (ansBox r3, rule h)
+    for (const side of ['skill-options-derived.js', 'skill-options-pools.js', 'skill-presets.js', 'skill-ansbox-skills.js']) {
         if (fs.existsSync(path.join(root, 'js/modules', side))) { try { await import(M(side)); } catch (e) { /* optional */ } }
     }
     let data = null;
@@ -98,7 +99,11 @@ async function readOffered(root, keys) {
             if (!cat) throw new Error(`skill "${k}": no category found (give cat:skill)`);
         }
         const defs = so.offeredOptionsFor(cat, id) || [];
-        out.push({ key: `${cat}:${id}`, ...appearanceValues(defs) });
+        const av = appearanceValues(defs);
+        // rule h (ansBox r3): an option in the model that the panel does not offer is LISTED as skipped, never silently absent
+        const offeredIds = new Set(defs.map((d) => d.id));
+        for (const d of (so.optionsFor ? so.optionsFor(cat, id) : []) || []) if (d.id === 'ansBox' && !offeredIds.has('ansBox')) av.skipped.push({ option: 'ansBox', why: 'not offered on this skill' });
+        out.push({ key: `${cat}:${id}`, ...av });
     }
     return out;
 }

@@ -12,6 +12,7 @@ import {
     FACT_AUTO_COLS, EM_MM, SIZES, blankWidth,
 } from '../tokens.js';
 import { blank, styledAnswerSlot } from '../cell.js';
+import { ansSlotEm } from '../ans-slot.js';
 import { register, getCell } from '../registry.js';
 import { stepMarks, placeDigits, singleSlotState } from '../steps.js';
 import { touchNumbers, touchNumberHTML, touchOpts, touchDigit, installCueDrawer } from '../support-draw.js';
@@ -235,13 +236,16 @@ const drawsAcross = (p, ctx) => isAcross(p) && !(ctx && ctx.mode !== 'screen' &&
 const besideMm = (p, pt, size) => {
     const em = EM_MM[pt] || (pt / 72) * 25.4;
     const glyphs = DIGIT_EM * (String(p.a).length + String(p.b).length) + 2 * 1 + 4 * 0.28;
-    return em * glyphs + blankWidth(Math.max(2, Number(p.digits) || 3), size);
+    const nd = Math.max(2, Number(p.digits) || 3);
+    // ansBox r3: a teacher's slot takes its own width (ans-slot.js), never less than the old line
+    return em * glyphs + Math.max(blankWidth(nd, size), em * ansSlotEm(p.ansBox, nd));
 };
 /** Width (mm) of the across fact with its answer line stacked below (DN-22). */
 const belowMm = (p, pt, size) => {
     const em = EM_MM[pt] || (pt / 72) * 25.4;
     const glyphs = DIGIT_EM * (String(p.a).length + String(p.b).length) + 2 * ACROSS_TIGHT_OP_EM + 3 * ACROSS_TIGHT_GAP_EM;
-    return Math.max(em * glyphs, blankWidth(Math.max(2, Number(p.digits) || 3), size));
+    const nd = Math.max(2, Number(p.digits) || 3);
+    return Math.max(em * glyphs, blankWidth(nd, size), em * ansSlotEm(p.ansBox, nd));
 };
 /** 'beside' when the answer fits beside the sentence at this column count, else 'below'. */
 const acrossForm = (p, ctx, pt) => {
@@ -344,7 +348,7 @@ register('fact', {
         // INK-3 / LS-1: a trace digit is grey, or a dotted outline when photocopy-safe.
         const cls = ink === 'trace' ? (ctx.photocopySafe ? 'ws-factans ws-dotted' : 'ws-factans ws-trace') : 'ws-factans';
         // The teacher's answer-box option (owner ruling 2026-10-02; automatic = one box for a fact).
-        const boxCls = p.ansBox === 'digit' ? ' ws-factans--digit' : p.ansBox === 'off' ? ' ws-factans--off' : '';
+        const boxCls = p.ansBox === 'digit' ? ' ws-factans--digit' : p.ansBox === 'one' ? ' ws-factans--one' : p.ansBox === 'off' ? ' ws-factans--off' : '';
         // S5 step state (steps.js): one {ch, ink} per answer track, the newest grey (P-LC-9).
         const st = Array.isArray(ctx.stepTracks) ? ctx.stepTracks : null;
         // One box per digit: the BAND's digit count on every item of the section (SL-2), never the

@@ -7,6 +7,7 @@
 //
 // Pure module (SCC-01): no `window`, no DOM, no `Math.random`.
 
+import { ansSlot } from './ans-slot.js';
 import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK, SLOT, blankWidth, resolveCtx, TAB_LADDER, factTab,
 } from './tokens.js';
@@ -322,18 +323,23 @@ export function gradeSlots(answerKey, values = {}) {
 export { SIZES, SLOT, blankWidth };
 
 /**
- * Owner ruling 2026-10-02 (the + − × ÷ `ansBox` option): an answer slot on paper drawn in the
- * teacher's chosen style. `slotHtml` is the slot `blank()` drew (a line id drawn as one box);
- * 'off' turns it back into the plain ruled line, 'digit' replaces it with one box per digit of the
- * band (`n`), the key's digits right-aligned, one per box. Any other value returns it unchanged.
+ * The + − × ÷ `ansBox` option on paper (ansBox r3): an answer slot drawn from the ONE answer-slot model
+ * (ans-slot.js). `slotHtml` is the slot `blank()` drew. null (Automatic) returns it unchanged - the old
+ * drawing (lead decision SL-3). 'one' draws one box at least the operands' height and the band's digits wide;
+ * 'digit' one box per digit of the band (`n`), each at least a digit wide (never the S writing height), the
+ * key's digits right-aligned at the question's size. 'off' is the plain ruled line.
  */
 export function styledAnswerSlot(slotHtml, ansBox, { n = 2, ctx = {}, value = '' } = {}) {
     if (ansBox === 'off') return String(slotHtml).replace('class="ws-line', 'class="ws-line ws-line--off').replace('class="ws-box', 'class="ws-box ws-box--off');
-    if (ansBox !== 'digit') return slotHtml;
+    const geo = ansSlot(ansBox === 'digit' || ansBox === 'one' ? ansBox : null, { digits: n, hwMm: 'var(--ws-hw)', blankMm: 'var(--ws-bw, 0mm)' });
+    if (!geo) return slotHtml;
+    if (geo.value === 'one') {
+        return String(slotHtml).replace(/<span class="ws-line([^"]*)" style="/, `<span class="ws-line$1 ${geo.cls}" style="min-width:${geo.oneW};height:${geo.boxH};align-items:center;`);
+    }
     const state = ctx.state || 'blank';
     const shown = state === 'blank' ? '' : String(value ?? '');
     const ink = state === 'blank' ? '' : state === 'traced' ? 'trace' : 'solid';
     const chars = shown.length > n ? shown.split('') : shown.padStart(n, ' ').split('');
-    return `<span class="ws-digitboxes" data-ws-slot="answer" data-ws-shape="box">`
-        + chars.map((c) => `<span class="ws-box ws-box--digit${ink === 'trace' ? ' ws-trace' : ''}"${c.trim() && ink ? ` data-ws-ink="${ink}"` : ''}>${esc(c.trim())}</span>`).join('') + '</span>';
+    return `<span class="ws-digitboxes ${geo.cls}" data-ws-slot="answer" data-ws-shape="box">`
+        + chars.map((c) => `<span class="ws-box ws-box--digit${ink === 'trace' ? ' ws-trace' : ''}"${c.trim() && ink ? ` data-ws-ink="${ink}"` : ''} style="width:${geo.boxW};height:${geo.boxH};font-size:${geo.keyEm}em">${esc(c.trim())}</span>`).join('') + '</span>';
 }

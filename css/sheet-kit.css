@@ -436,39 +436,25 @@
 .ws-page .ws-grid > .ws-cell[data-ws-cell="remainder"]:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before,
 .ws-sheet > .ws-cell.mqt--remainder:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { height: max(0mm, calc(var(--ws-tab, 5mm) - 1.25mm)); }
 
-/* ---------- WAVE 1 / 1.1: every answer slot is a full box (owner ruling 2026-10-02, additive) ----------
-   SL-3 changed: the slot after "=" is drawn as the same full black-outlined rounded box as every
-   other answer slot. The shape id stays data-ws-shape="line" (providers, key, lint unchanged); only
-   the drawing changes. Same width B(n) and height Hw as before, so geometry and pagination hold.
-   Ungraded write-ins (say-lines, data-ws-graded="0") are not answer slots and stay ruled lines. */
-:is(.ws-page, .ws-sheet) .ws-line:not([data-ws-graded="0"]),
-:is(.ws-page, .ws-sheet) .ws-line[data-ws-graded="0"]:not(.ws-line--say) {
+/* ---------- WAVE 1 / 1.1: a teacher's "One box" answer slot (ansBox r3, lead decision SL-3: Automatic keeps
+   the old ruled line / open zone; these rules apply only to the classes sheet/ans-slot.js gives a teacher value) ----------
+   'One box': the slot after "=" is a full black-outlined rounded box. The shape id stays data-ws-shape="line"
+   (providers, key, lint unchanged); only the drawing changes. */
+:is(.ws-page, .ws-sheet) .ws-line.ws-ab--one {
     border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm); box-sizing: border-box; height: calc(var(--ws-hw) + 2 * var(--ws-hair));
 }
 
-/* ---------- WAVE 1 / 1.1: the vertical fact's answer zone is a full box (owner ruling 2026-10-02, additive) ----------
+/* ---------- the vertical fact's answer zone with the teacher's 'One box' (ansBox r3) ----------
    PAPER ONLY (:not(:has(input))): on screen the typed input is itself the one box, so the zone draws
    nothing there (critic B D1: never a box inside a box). The box spans the whole rule (operator track
    included, like the stack), right edge = rule end; the digits stay right-aligned to the ones with
    0.16 em (>= 1.5 mm at L) clear inside the outline. The key writes its digits inside the same box. */
-:is(.ws-page, .ws-sheet) .ws-fact .ws-factans:not(:has(input)) {
+:is(.ws-page, .ws-sheet) .ws-fact .ws-factans.ws-factans--one:not(:has(input)) {
     grid-column: 1 / -1 !important; box-sizing: border-box; border: var(--ws-hair) solid var(--ws-ink); border-radius: var(--ws-slot-r, 1.25mm);
     margin: 1mm 0 0; padding: 0 0.16em; }
 
-/* ---------- WAVE 1 / 1.1 (cont.): legacy-wrapped cells (owner ruling 2026-10-02, additive) ----------
-   A legacy horizontal question ends in a stretching ruled answer place (`flex:1; border-bottom:2px`).
-   Inside a kit page that place is drawn as the same full black box, at least 24 mm wide and Hw tall;
-   when the question leaves too little room the box wraps to its own line instead of shrinking. */
-:is(.ws-page, .ws-sheet) .ws-legacy .horizontal-problem { flex-wrap: wrap; row-gap: 1mm; }
-/* critic B D9: one fixed width per size (SL-2: never the cell's width, never the answer's own size):
-   40 / 44 / 48 mm at S / M / L. The key writes the value centred inside (print-sheet.js 3a). */
-:is(.ws-page, .ws-sheet) .ws-legacy .horizontal-problem > span:is([style*="border-bottom:2px solid #000"], [style*="border-bottom:2px solid #333"]) {
-    flex: 0 0 var(--ws-legacy-slot, 44mm) !important; width: var(--ws-legacy-slot, 44mm); box-sizing: border-box; min-height: var(--ws-hw, 8mm);
-    border: var(--ws-hair, 0.75pt) solid var(--ws-ink, #000) !important; border-radius: var(--ws-slot-r, 1.25mm);
-    display: inline-flex; align-items: center; justify-content: center; }
-.ws-S { --ws-legacy-slot: 40mm; } .ws-M { --ws-legacy-slot: 44mm; } .ws-L { --ws-legacy-slot: 48mm; }
 /* the value a key writes into a boxed number slot sits centred inside it (Say lines excluded) */
-:is(.ws-page, .ws-sheet) .ws-line:not(.ws-line--say) { text-align: center; line-height: calc(var(--ws-hw) - 2 * var(--ws-hair)); }
+:is(.ws-page, .ws-sheet) .ws-line.ws-ab--one { text-align: center; justify-content: center; }
 
 /* ---------- WAVE 1 / 1.1: answer-box option (owner ruling 2026-10-02, additive) ----------
    ansBox 'one' on a column stack: the open answer row is ONE box across the tracks; a key's digits

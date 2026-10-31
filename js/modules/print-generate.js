@@ -12,7 +12,7 @@ import { generateQuestion } from './generate-question.js';
 import { blankWidth, SIZES, STROKE, INK, EM_MM, SLOT, slotRadiusMm, stripSegStyle, stripPos } from './sheet/tokens.js';
 // The ink pass every printed cell goes through (INK-1..INK-5). Pure, no imports of its own.
 import { inkHTML } from './print-ink.js';
-import { resolveAnsBox } from './skill-options.js';
+import { ansSlot } from './sheet/ans-slot.js';
 // The rest of the kit, for the STRANGLER HOOK at the top of formatProblemForPrint
 // (see "THE STRANGLER HOOK" below). `sheet/index.js` imports nothing outside
 // `sheet/`, so this direction stays acyclic: print-generate.js -> sheet/**, never
@@ -4114,35 +4114,33 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     html += A.padStart(T, ' ').split('').map(ch => cell(ch)).join('');
     html += cell(op, 'font-weight:700;') + B.padStart(T - 1, ' ').split('').map(ch => cell(ch)).join('');
     html += `<span class="rule" style="grid-column:1 / -1;height:1mm;border-top:${FACT_RULE_WEIGHT} solid #000;margin-top:1mm;"></span>`;
-    // Owner ruling 2026-10-02 (SL-3): the open answer zone is a full black-outlined box, one box
-    // across the stack's tracks (same height as the old zone, so the cell geometry holds).
-    // ansBox (owner ruling 2026-10-02): column work defaults to one box per digit, a fact to one box.
-    const ab = resolveAnsBox(_ANSBOX, o.cls === 'ws-fact' ? 'other' : 'stack');
-    // (critic B r3 D2) a drawn answer box stands at least 1.5 mm clear of the sum rule, so the rule and
-    // the box's top edge never read as one double rule
-    const FACT_BOX_GAP_MM = 1.5;
+    // ansBox r3 (lead decision SL-3, 2026-10-31): Automatic (no teacher value) draws the OLD open answer zone,
+    // byte for byte. A teacher's value is the EFFECTIVE one (sheet/ans-slot.js effectiveAnsBox, stamped on the
+    // item), so only an offered value reaches here: 'one' (one box) or 'digit' (one box per answer digit).
+    const ab = _ANSBOX;
     const zoneH = o.answerMm || size.answerMm;
-    // ansBox rebuild r2 (critic r1 #4): a vertical fact's zone is at least 1.15 em tall (the kit fact's
-    // zone), so the key can write its digits at the question's own size inside it (AK-1)
-    // (only with a teacher's value: the automatic page keeps today's 8 mm zone, byte for byte)
-    const zoneCss = o.cls === 'ws-fact' && _ANSBOX != null ? `max(${zoneH}mm, 1.15em)` : `${zoneH}mm`;
-    if (ab === 'digit') {
-        // one box per digit track (never the operator track): a strip of joined boxes; the key fills each
-        // the band's width on every item (SL-2): a sum can carry one place past the widest operand,
-        // a 1-digit product two; the strip may then reach under the operator's track
-        const d = Math.max(A.length, B.length);
-        const n0 = Math.min(T, Math.max(T - 1, op === '+' ? d + 1 : /[×x*]/.test(op) ? A.length + B.length : d));
-        // a legacy vertical fact (cls ws-fact): the SECTION's band (its widest answer), the same count on every item
-        const n = o.cls === 'ws-fact' && _ANSBAND > 0 ? Math.min(T, _ANSBAND) : n0;
-        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:${T - n + 1} / -1;height:${zoneCss};margin-top:${FACT_BOX_GAP_MM}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
-            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:flex;align-items:center;justify-content:center;font-style:normal;height:100%;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
-            + '</span>';
-    } else if (ab === 'off') {
-        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneCss};"></span>`;
+    if (ab !== 'digit' && ab !== 'one') {
+        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;"></span>`;
     } else {
-        // the open answer zone is ONE full black-outlined box across the stack's tracks
-        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneCss};margin-top:${FACT_BOX_GAP_MM}mm;box-sizing:border-box;`
-            + `border:${STROKE.hair}pt solid #000;border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
+        // the box keeps the old zone's place and height (the stack does not move: H13), at least 1.15 em tall
+        // so the key writes at the question's own size inside it (AK-1); it stands 1.5 mm clear of the rule
+        // and that gap is taken from the zone, so the cell is no taller than Automatic's
+        const FACT_BOX_GAP_MM = 1.5;
+        const geo = ansSlot(ab, { hwMm: zoneH });
+        const zoneCss = `max(${(zoneH - FACT_BOX_GAP_MM).toFixed(2)}mm, ${geo.boxH.replace(/^max\([^,]*, /, '').replace(/\)$/, '')})`;
+        if (ab === 'digit') {
+            // one box per digit track: the SECTION's band (its widest answer, SL-2) on every item; a sum can carry
+            // one place past the widest operand, a product reach A + B digits
+            const d = Math.max(A.length, B.length);
+            const n0 = Math.min(T, Math.max(T - 1, op === '+' ? d + 1 : /[×x*]/.test(op) ? A.length + B.length : d));
+            const n = _ANSBAND > 0 ? Math.min(T, Math.max(_ANSBAND, 1)) : n0;
+            html += `<span class="ws-fact-write ws-fact-write--digit ${geo.cls}" style="grid-column:${T - n + 1} / -1;height:${zoneCss};margin-top:${FACT_BOX_GAP_MM}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
+                + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:flex;align-items:center;justify-content:center;font-style:normal;height:100%;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
+                + '</span>';
+        } else {
+            html += `<span class="ws-fact-write ${geo.cls}" style="grid-column:1 / -1;height:${zoneCss};margin-top:${FACT_BOX_GAP_MM}mm;box-sizing:border-box;`
+                + `border:${STROKE.hair}pt solid #000;border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
+        }
     }
     return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
         + `grid-template-columns:repeat(${T},${trackEm}em);justify-content:center;`
@@ -4497,7 +4495,7 @@ function notationBlankDigits(problem, op) {
 }
 
 /**
- * The `line` slot of section 6 (drawn as a full box since owner ruling 2026-10-02, SL-3): B(n) wide, Hw of
+ * The `line` slot of section 6: a 0.75 pt baseline rule, B(n) wide, with Hw of
  * clear writing height above it. A ruled line means "write a number" (SL-3);
  * nothing else on the sheet may look like one.
  */
@@ -4505,28 +4503,24 @@ const wsBlankMm = (digits) =>
     blankWidth(digits, WS_SIZE, Math.max(0, Math.floor((digits - 1) / 3)));
 
 function wsAnswerLine(digits, shiftMm = 0) {
-    const ab = resolveAnsBox(_ANSBOX, 'other');
-    if (ab === 'digit') {
-        // one box per digit (owner ruling 2026-10-02): a joined strip the key fills digit by digit
-        const n = Math.max(1, digits);
-        const w = (wsWriteMm() * 0.95).toFixed(2);
-        return `<span class="ws-slot ws-slot--digits" data-ws-shape="box" style="display:inline-flex;vertical-align:middle;`
-            + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '') + `">`
-            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:inline-flex;align-items:center;justify-content:center;font-style:normal;width:max(${w}mm, 0.82em);height:max(${wsWriteMm()}mm, 1.15em);line-height:1;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
+    // ansBox r3: Automatic (no teacher value) is the old ruled line, byte for byte (lead decision SL-3)
+    const geo = ansSlot(_ANSBOX === 'digit' || _ANSBOX === 'one' ? _ANSBOX : null, { digits, hwMm: wsWriteMm(), blankMm: wsBlankMm(digits) });
+    const shift = shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '';
+    if (geo && geo.value === 'digit') {
+        // one box per digit (sheet/ans-slot.js): each box at least a digit wide and the operands' height
+        const n = geo.n;
+        return `<span class="ws-slot ws-slot--digits ${geo.cls}" data-ws-shape="box" style="display:inline-flex;vertical-align:middle;white-space:nowrap;flex:none;${shift}">`
+            + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:inline-flex;align-items:center;justify-content:center;font-style:normal;width:${geo.boxW};height:${geo.boxH};line-height:1;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
             + '</span>';
     }
-    // (critic B r3 D2) the slot is never shorter than the printed operands: at least 1.15 em tall (as the
-    // digit strip above), so the key's digit, set at the slot's writing size, sits clear inside it
-    const slotH = `max(${wsWriteMm()}mm, 1.15em)`;
-    const slotW = `max(${wsBlankMm(digits)}mm, ${(Math.max(1, digits) * 0.62 + 0.8).toFixed(2)}em)`;
-    if (ab === 'off') {
-        return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;width:${slotW};height:${slotH};`
-            + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '') + `border-bottom:${STROKE.hair}pt solid ${INK.ink};"></span>`;
+    if (geo && geo.value === 'one') {
+        return `<span class="ws-slot ${geo.cls}" data-ws-shape="box" style="display:inline-block;flex:none;width:${geo.oneW};height:${geo.boxH};${shift}`
+            + `box-sizing:border-box;border:${STROKE.hair}pt solid ${INK.ink};border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
     }
     return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;`
-        + `width:${slotW};height:${slotH};`
-        + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '')
-        + `box-sizing:border-box;border:${STROKE.hair}pt solid ${INK.ink};border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
+        + `width:${wsBlankMm(digits)}mm;height:${wsWriteMm()}mm;`
+        + shift
+        + `border-bottom:${STROKE.hair}pt solid ${INK.ink};"></span>`;
 }
 
 // TY-25: a horizontal equation keeps natural digit spacing, with a 1 em slot
@@ -11387,7 +11381,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         // writes its value INSIDE the box (legacyKeyFill), not on a separate "Answer:" line
         // one width per section (SL-2): the band the skill can reach (sums / differences to 99, products to 144)
         const band = Math.max(String(problem.ans).replace(/[^0-9]/g, '').length || 1, problem.printFormat === 'missing-factor' ? 3 : 2);
-        const emptyBox = wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"');
+        // ansBox r3: Automatic keeps the old 40 px box (lead decision SL-3); a teacher's value draws its slot
+        const emptyBox = _ANSBOX === 'digit' || _ANSBOX === 'one'
+            ? wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"')
+            : '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -11407,7 +11404,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         // writes its value INSIDE the box (legacyKeyFill), not on a separate "Answer:" line
         // one width per section (SL-2): the band the skill can reach (sums / differences to 99, products to 144)
         const band = Math.max(String(problem.ans).replace(/[^0-9]/g, '').length || 1, problem.printFormat === 'missing-factor' ? 3 : 2);
-        const emptyBox = wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"');
+        // ansBox r3: Automatic keeps the old 40 px box (lead decision SL-3); a teacher's value draws its slot
+        const emptyBox = _ANSBOX === 'digit' || _ANSBOX === 'one'
+            ? wsAnswerLine(band).replace(/^<span class="([^"]*)" data-ws-shape="([^"]*)"/, '<span class="$1" data-ws-shape="$2" data-ws-slot="answer"')
+            : '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -13230,7 +13230,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // The teacher's answer-box option (`ansBox`, re-land 2026-10-30): a "a ± b = ?" sentence that falls
     // through to the default (add_sub_10s, add_sub_100s) draws its answer place in the chosen style,
     // the same slot as missing-factor's, so the key writes inside it. Automatic keeps the stretching box.
-    if (_ANSBOX != null && _ANSBOX !== 'one' && /^[^<]*=\s*\?\s*$/.test(text) && /^\d+$/.test(String(problem.ans))) {
+    if ((_ANSBOX === 'digit' || _ANSBOX === 'one') && /^[^<]*=\s*\?\s*$/.test(text) && /^\d+$/.test(String(problem.ans))) {
         // one width per section (SL-2): the band the step reaches (± 10 -> to 100, ± 100 -> to 1000), never this answer's length
         const nums = (text.match(/\d+/g) || []).map(Number);
         const step = nums.length >= 2 ? nums[1] : 0;

@@ -612,7 +612,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
 
     // PG-11: rows = min(target, floor((G - 1) / hMin)).
     const atCols = probe(cols, false);
-    let hMin = atCols.hMin;
+    const hMin = atCols.hMin;
     if (!atCols.fits) {
         clamped = true;
         notes.push('A problem is wider than its cell even in 1 column.');
@@ -711,9 +711,6 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
         if (best.perPage > rows * cols || (best.perPage === rows * cols && best.cols !== cols)) {
             cols = best.cols;
             rows = best.rows;
-            // the page fill below sizes rows from THIS column count's measured height: a problem that
-            // wraps in a narrower cell is taller there (critic B r5 D5: add_sub_100s at S, 3 columns)
-            if (best.hMin > hMin) hMin = best.hMin;
             // The note says what the page prints: a practice ceiling the dense tables go past
             // (one-symbol answers up to 16, 12.1) is not reported as the page's limit.
             if (rows * cols > ceiling) {
