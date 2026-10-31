@@ -113,6 +113,30 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    options. Root fix: the link encodes its own items (each (skill, options) use). The gate compares use by use.
    *Check:* `ws-precritic --role lesson` now runs ws-teacher-wrm; backtest row `detailed-link-every-use`.
 
+### Operations family, fix round 2 (ops-family critic r1 F1–F19, 2026-10-31) — each finding and the check that now catches it
+Every check below FAILS on the r1 state (899c147) and PASSES on the fix; rows `ops-*` in `tests/fixtures/precritic/backtests.json`.
+| Finding | Design rule (do this first) | Automatic check (on precritic's path) |
+|---|---|---|
+| F1 sections rows sized for the beside form, drawn below | A shared section is held to the widest column count whose MEASURED height (+ the 1.5 mm label spacer for across sentences) fits its share | print-lint L-OVERFLOW `--kind sections` (slot-clip) |
+| F5 "▢⟌63 = 7"; × beside a bracket | The quotient sits above the bar; a Bracket page deals ÷ only | print-lint **L-NOTATION VA-61 / VA-65** |
+| F6 / F7 / F8 / F19 options lie | Max Number bounds every printed number and an explicit value is honoured past the grade cap; every model level draws something (else declare `levelSubset`); a label's example is a dealt form | node-lint **OPT-VALUES** (range-max, range-reach, level-dead, example-not-dealt) |
+| F2 anchor chart 40 % empty | A lesson with one other case shows it whole under the panels (`second.whole`) and the panels spread | print-lint **PAGEFILL on the anchor chart** (and Test, Mixed) |
+| F17 warm-up band / H13-ROW | Warm-up cells of one shape on a row (across fact beside across fact) | print-lint lesson H13 / H13-ROW |
+| F3 vocabulary picture of the wrong type | A word naming one number is shown by that number marked (bar mark, glyph), never a sentence | node-lint LESSON-DATA **vocab-type** |
+| F18 grade-4 warm-up | Warm-up skills at or below the lesson grade; no 2-digit × 2-digit past 10 × 10 below grade 4 | node-lint LESSON-DATA **warmup-grade** |
+| F4 "adding and subtract 10" | Every verb of a joined pair takes -ing (compose.js topicOf) | node-lint **ROLE-TITLE** |
+| F9 ruled empty cell on Test S | A Test grid divides its ceiling | print-lint **L-DENSITY EMPTYCELL** |
+| F10 M holds 16 = L | One-line sentences on the tight across tracks; answer boxes as wide as the page's widest answer, not a digit more | print-lint **L-DENSITY SIZE-M** (browser; node-lint L1-M is the node estimate) |
+| F11 several items in one box | One sentence per equation cell | print-lint **L-DENSITY CELL-ONE** |
+| F12 boxes beside lines | One slot shape a page (`slotShape: 'box'` when answers mix with missing numbers) | print-lint **L-ANSAREA SHAPE** |
+| F13 "Subtraction" over additions | The Mixed band names the work (`q.sectionLabel`) | print-lint **L-NOTATION HEADING** |
+| F15 card 390 content 0–6 px from the border | On a phone the sentence wraps its slot under, 12 px inside | ws-phone-card **GAP** (≥ 11 px) |
+| F16 generic hint | The hint names the item's numbers | node-lint **HINT** |
+- **Measure in the browser what the browser decides.** Node's footprint said missing_* fit three columns at M; the browser
+  measured them too wide. A capacity rule (F10) is checked on the printed page, the node estimate only as a pre-filter.
+- **A padding added to clear a keep-out changes the measured fit.** 1.5 mm on the answer-below form sent add_sub_100s from
+  3 × 5 to 1 × 10 at L. Clear a keep-out by sizing the ROW (the composer's margin), not by padding the drawing.
+
 ### Teacher-site preview screens (pdf-preview lane, 2026-10-31)
 - **A hidden element is not an open dialog.** A guard that tests `getElementById(overlay)` breaks the moment the overlay
   is pre-built hidden (Esc stopped closing the Print sheet). Test visibility (`!el.hidden` / an `isOpen()`), and gate

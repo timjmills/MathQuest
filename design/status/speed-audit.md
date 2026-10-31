@@ -799,3 +799,24 @@ Details and the reflection: design/status/s1-checks.md.
   4. Precritic slow (one browser slot; ~50 min of the critic's time was rendering). → Shard renders (S1 tools backlog).
   5. Lane brief scoped the builder to "the skills"; most failures were page roles (lesson, test, sections). → Brief names
      every role × size the critic will grade.
+
+### ops-family fix round 2 (2026-10-31, builder mq-opus-medium) — per-round findings (rule 00)
+- **Automatic checks** (each FAILS on 899c147, PASSES on the fix; backtest rows `ops-*`, all PASS):
+  F1 print-lint L-OVERFLOW --kind sections (existed, was red) · F5 L-NOTATION VA-61/VA-65 (new) · F12 L-ANSAREA SHAPE (new) ·
+  F2/F14 PAGEFILL on anchor chart, Test and Mixed pages (extended) · F9 L-DENSITY EMPTYCELL (new) · F10 L-DENSITY SIZE-M (new,
+  browser) + node-lint L1-M (node estimate; did NOT catch F10 - node footprints said 3 columns at M) · F11 L-DENSITY CELL-ONE (new)
+  · F13 L-NOTATION HEADING (new) · F15 ws-phone-card GAP (new) · F3/F18 node-lint LESSON-DATA vocab-type / warmup-grade (new) ·
+  F4 node-lint ROLE-TITLE (new) · F16 node-lint HINT (new) · F6/F7/F8/F19 node-lint OPT-VALUES (new; the brief named
+  options-verify, but the deal decides all four and node reads them in < 1 s, so they live in node-lint).
+  node-lint-s1 now runs ROLE-TITLE,HINT,OPT-VALUES,L1-M; today's debt of those rules on other skills (HINT 4,925 keys,
+  OPT-VALUES 2,077, L1-M 16) is pinned in tests/fixtures/precritic/node-lint-s1.baseline.json, the old rules stay zero-tolerance.
+- **Speed-ups found this round:**
+  1. A drawing change (1.5 mm padding to clear the CL-40 keep-out) silently moved add_sub_100s L from 3 × 5 to 1 × 10; found only
+     by eye on the after-PNGs. → A "capacity did not fall" diff (items per page per skill × size against merge-base) belongs in
+     precritic before a builder reports; here it cost a stopped precritic run (≈ 10 min).
+  2. Node footprints and browser measures disagree for one-line sentences (F10): a node pre-check passed while the page failed.
+     → Capacity rules are judged on the printed page only.
+  3. Worktree isolation refuses compound shell lines (python heredocs, loops with variables): ≈ 15 refused calls. → Patch
+     scripts in the scratchpad, one plain command per call.
+  4. Out of scope and still red, owned elsewhere: Mixed practice PAGEFILL 38 % (mixed-m2's flowSections path);
+     div_zero_in_quotient held out again (lesson.js chart vs a 6-row bracket, no time-box room this round).

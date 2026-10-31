@@ -2681,7 +2681,14 @@ async function buildSheetCore(req = {}) {
             // PAIR of rows (practice.js layoutSheet pages whole pairs), not one row.
             const pairOf = (si) => (anchorMode === 'side' && anchorSets[si] && anchorSets[si].items.length && layouts[si].cols === 1 ? 2 : 1);
             // (sideRowOf, S3: a side section's least is one row of pairs as it prints)
-            const needOf = (si) => Math.max(layouts[si].hMin * pairOf(si), sideRowOf(si, layouts)) + 1 + band(si);
+            // (F1, ops-family r2: a section of sentences keeps one row AT the column count its layout chose - its measured
+            // height there plus the 2.5 mm label spacer - not the narrowest form's height, so it is not squeezed to one item)
+            const eqRow = (si) => {
+                const its = probesOf(si) || [];
+                const f = n.sections[si].floor && n.sections[si].floor[layouts[si].cols];
+                return its.length && its.every((it) => it && it.template === 'equation') && f && Number.isFinite(f.hMm) && f.fits !== false ? f.hMm + 2.5 : 0;
+            };
+            const needOf = (si) => Math.max(layouts[si].hMin * pairOf(si), sideRowOf(si, layouts), eqRow(si)) + 1 + band(si);
             let need = members.map(needOf);
             // S6 sections: when the members' bands and one row each do not fit one page, every
             // member takes the COMPACT band (one state, steps beside; Mixed practice's), so a page of
@@ -2724,10 +2731,10 @@ async function buildSheetCore(req = {}) {
                 // section is DRAWN at. The dense pass may take more columns than the share's height holds
                 // (an across sentence draws answer-below at 3 columns: 28.6 mm in an 18.4 mm row, 8 mm
                 // out of its cell), so the section is held to the widest count whose own height fits.
-                // (+ KEEP_OUT: a top-started across sentence takes the label keep-out spacer above its ink - css/sheet-kit.css
+                // (+ KEEP_OUT 2.5 mm: a top-started across sentence takes the label keep-out spacer above its ink - css/sheet-kit.css
                 // CL-40 block - which shrinks to nothing in a row sized exactly to its content: "823 − 100 =" inked the
                 // number tab at 3 columns; the row holds the spacer too, or the section takes fewer columns)
-                const KEEP_OUT = (probesOf(si) || []).length && probesOf(si).every((it) => it && it.template === 'equation') ? 1.5 : 0;
+                const KEEP_OUT = (probesOf(si) || []).length && probesOf(si).every((it) => it && it.template === 'equation') ? 2.5 : 0;
                 const over = (Lx, m) => { const f = sec.floor && sec.floor[Lx.cols]; return !!(f && Number.isFinite(f.hMm) && f.hMm + m > Lx.cellH + 0.05); };
                 if (over(L, KEEP_OUT) && L.cols > 1) {
                     // the widest narrower count whose rows hold the content and the spacer; else the widest that holds the content
