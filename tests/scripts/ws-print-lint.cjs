@@ -1792,7 +1792,7 @@ function lintKitGeometry(dom, pdf, info, F) {
             }
             // L-DENSITY SIZE-M (ops-family critic r1 F10, DN-1a / LESSONS_LEARNED L1): at Size M a page of SHORT one-line
             // problems holds more than L's two-column 2 x 8 = 16 - M is a size, never L's grid again. Auto count only.
-            if (info.mode === 'kit' && p.size === 'M' && arg('count', 'auto') === 'auto' && p.role === 'independent' && j === 0 && p.gridTop !== null && p.gridBottom !== null) {
+            if (info.mode === 'kit' && p.size === 'M' && arg('count', 'auto') === 'auto' && p.role === 'independent' && j === 0 && p.idx === 1 && !(p.tab || []).some((t) => /lesson|anchor/i.test(String(t))) && p.gridTop !== null && p.gridBottom !== null) {
                 const gh = p.gridBottom - p.gridTop;
                 const its = p.cells.filter(x => x.item);
                 if (its.length >= 8 && its.every(x => x.short && x.rect[3] <= gh / 6) && p.items <= 16) F('L-DENSITY', 'SIZE-M', 'major', { page: p.idx }, `page ${p.idx} at Size M holds ${p.items} short problems, no more than L's 2 x 8: Size M fits more items or more columns than L (DN-1a, critic r1 F10)`, 'M holds no more than L');
