@@ -120,7 +120,7 @@ export const CCSS_AUDIT = {
     '3.OA.B.5': P(['multiplication:mult_properties'], ['the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0'], ['mult_three']),
     '3.OA.B.6': F(['multiplication:mult_div_fact_family', 'division:missing_mult_div']),
     '3.OA.C.7': F(['multiplication:mult_facts', 'division:div_facts']),
-    '3.OA.D.8': P(['algebra:multi_step_word', 'number_sense:estimate_sums_diffs'], ['two-step problems with × and ÷ (the skill\'s two steps are + and − only)', 'an equation with a letter for the unknown', 'one-step pools and tape diagrams were tagged here: tags moved to the one-step standards'], ['multi_step_four_ops', 'mental_estimate']),
+    '3.OA.D.8': F(['algebra:multi_step_word', 'algebra:multi_step_word_plain', 'algebra:two_step_mult_div_first', 'algebra:two_step_add_then_mult', 'algebra:two_step_add_then_div', 'algebra:two_step_letter_equation', 'algebra:two_step_estimate_check', 'number_sense:estimate_sums_diffs'], 'two steps, four operations: msOps addsub / mult / div / multdiv (× or ÷ first) and addmult / adddiv (+ or − first, brackets); the equation with a letter: msLetter; reasonableness by rounding to tens: msCheck (detailed lesson 7, 2026-10-17)'),
     '3.OA.D.9': P(['multiplication:mult_chart', 'patterns:number_patterns_rule', 'patterns:count_by_fill'], ['patterns in the addition table', 'explain a pattern with a property (4 × n is always even)'], ['patterns_notice']),
     '3.NBT.A.1': F(['number_sense:nearest_10', 'number_sense:nearest_100', 'number_sense:rounding_visual']),
     '3.NBT.A.2': F(['addition:add_1k_mixed', 'subtraction:sub_1k_mixed']),

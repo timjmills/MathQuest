@@ -113,6 +113,19 @@
     "winCols": "5R",
     "minFactor": "5S",
     "ftTrap": "5T",
+    "ftFactors": "5U",
+    "tenDir": "4E",
+    "tenValues": "4F",
+    "tenPlain": "4G",
+    "tenWrite": "4H",
+    "tenTask": "4I",
+    "msOps": "4P",
+    "wpFrames": "4Q",
+    "msLetter": "4R",
+    "msCheck": "4S",
+    "zeros": "3N",
+    "tenChoice": "4J",
+    "msChoose": "4T",
     "ansBox": "6Q"
   },
   "blocks": {
@@ -478,7 +491,8 @@
       "value": "V",
       "unit": "U",
       "notation": "N",
-      "sum": "S"
+      "sum": "S",
+      "times": "T"
     },
     "zeroDigit": {},
     "frame": {
@@ -513,7 +527,9 @@
     },
     "lengths": {
       "equal": "E",
-      "mixed": "M"
+      "mixed": "M",
+      "same": "S",
+      "shorter": "H"
     },
     "count": {},
     "source": {
@@ -742,6 +758,46 @@
     "winCols": {},
     "minFactor": {},
     "ftTrap": {},
+    "ftFactors": {
+      "any": "A",
+      "2-5-10": "T",
+      "2-3-5-10": "F"
+    },
+    "tenDir": {
+      "times": "T",
+      "tenth": "E",
+      "both": "B"
+    },
+    "tenValues": {},
+    "tenPlain": {},
+    "tenWrite": {
+      "both": "B",
+      "top": "T"
+    },
+    "tenTask": {
+      "compare": "C",
+      "story": "S"
+    },
+    "msOps": {
+      "addsub": "A",
+      "mult": "M",
+      "div": "D",
+      "multdiv": "B",
+      "addmult": "P",
+      "adddiv": "Q"
+    },
+    "wpFrames": {},
+    "msLetter": {},
+    "msCheck": {},
+    "zeros": {
+      "off": "F",
+      "on": "N"
+    },
+    "tenChoice": {
+      "two": "T",
+      "four": "F"
+    },
+    "msChoose": {},
     "ansBox": {
       "digit": "D",
       "one": "O",
@@ -788,7 +844,12 @@
     "winRows": "decimal",
     "winCols": "decimal",
     "minFactor": "decimal",
-    "ftTrap": "bool"
+    "ftTrap": "bool",
+    "tenValues": "bool",
+    "tenPlain": "bool",
+    "wpFrames": "bool",
+    "msLetter": "bool",
+    "msCheck": "bool"
   },
   "subranges": {
     "3B-3M": "build lane k2 (BUILD_LIST.md)",

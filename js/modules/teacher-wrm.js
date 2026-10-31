@@ -61,6 +61,7 @@ const narrow = () => typeof matchMedia === 'function' && matchMedia(NARROW).matc
 const v = {
     grade: '', sec: '', lesson: '',  // sec: the domain section the list is at ('D1' … or 'extra'); lesson key
     query: '',
+    legacy: null,                    // W1: the redirect a numbered link from before the reorder made { title, gone, for, alt }
 };
 let links = null;                    // linksFor(current lesson)
 let detailed = null;                 // data/curriculum/detailed-lessons.json, indexed (detailed-links.js), when the file exists
@@ -161,10 +162,19 @@ function setLesson(l) {
     v.grade = l.grade;
     v.lesson = l.key;
     v.sec = (placeOf(l) || { sec: { key: '' } }).sec.key;
+    if (v.legacy && v.legacy.for !== l.key) v.legacy = null;
     rememberGrade();
-    try { localStorage.setItem(LAST_KEY, l.key); } catch (e) { /* per-viewer convenience only */ }
+    // W1: remembered by its stable link, not its key (a key holds the list number, which a reorder moves)
+    try { localStorage.setItem(LAST_KEY, L.lessonHash(l)); } catch (e) { /* per-viewer convenience only */ }
 }
-function rememberedLesson() { try { return localStorage.getItem(LAST_KEY) || ''; } catch (e) { return ''; } }
+/** The key of the last lesson opened (stored as its link; a key stored before 2026-10-30 is read as it is). */
+function rememberedLesson() {
+    let s = '';
+    try { s = localStorage.getItem(LAST_KEY) || ''; } catch (e) { return ''; }
+    if (!/^#wrm\//.test(s)) return s;
+    const l = L.resolveLessonHash(s).lesson;
+    return l ? l.key : '';
+}
 /** Every lesson of the grade in list order (domains in the site's order, then Extra lessons). */
 function orderOf(gid = v.grade) { return gradeData(gid).secs.flatMap((s) => s.lessons); }
 /** The lesson after the open one (or after the last one opened): marked "Next", and the Next lesson ▸ arrow. */
@@ -192,21 +202,28 @@ function rememberedGrade() { try { return localStorage.getItem(GRADE_KEY) || '';
 
 export function wrmHashActive() { return /^#wrm(\/|$)/.test(location.hash || ''); }
 
-// #wrm/<grade>/<unit>/<n> opens a White Rose row; #wrm/<grade>/<unit>/<site slug> a lesson the school site names
-// (round 7: the site id is the bookmark, so it opens wherever the lesson is listed); #wrm/<grade>/<section> the list.
+// #wrm/<grade>/<unit>/<slug> opens a lesson (W1, critic 2026-10-30: the slug of its title or site id, never its list
+// number); #wrm/<grade>/<section> the list. A numbered link from before the 2026-10-17 reorder opens the lesson it was
+// made for (wrm-links resolveLessonHash and the frozen table), says so in the lesson head, and is rewritten to its slug.
 function readHash() {
-    const m = /^#wrm(?:\/([^/]*))?(?:\/([^/]*))?(?:\/([^/?#]+))?/.exec(location.hash || '');
-    if (!m) return;
-    const grade = decodeURIComponent(m[1] || '');
-    const seg2 = decodeURIComponent(m[2] || '');
-    const seg3 = decodeURIComponent(m[3] || '');
-    if (grade && SEQ.WRM_SEQUENCE.some((g) => g.id === grade)) v.grade = grade;
-    let l = null;
-    if (/^\d+$/.test(seg3)) l = L.lessonByKey(`${v.grade}:${seg2}:${seg3}`);
-    else if (seg3) l = L.lessonBySiteSlug(v.grade, seg3);
-    if (l) { setLesson(l); return; }
+    const r = L.resolveLessonHash(location.hash || '');
+    if (!/^#wrm/.test(location.hash || '')) return;
+    if (r.grade && SEQ.WRM_SEQUENCE.some((g) => g.id === r.grade)) v.grade = r.grade;
+    // the notice stays while the same lesson is re-read from its rewritten (slug) link, e.g. the screen re-opening
+    if (r.legacy) v.legacy = { ...r.legacy, for: r.lesson ? r.lesson.key : '', alt: r.legacy.alt ? r.legacy.alt.key : '' };
+    else if (!(v.legacy && r.lesson && v.legacy.for === r.lesson.key)) v.legacy = null;
+    if (r.lesson) { setLesson(r.lesson); return; }
     v.lesson = '';
-    v.sec = secKeyFor(seg2);
+    v.sec = secKeyFor(r.seg);
+    if (v.legacy && v.legacy.gone) toast(`This link was to "${v.legacy.title}", a lesson the school's list no longer has. Choose a lesson in the list.`);
+}
+/** The notice a redirected numbered link shows in the lesson head (W1): what it opens and why, and the other lesson. */
+function legacyNoteHTML(l) {
+    const x = v.legacy;
+    if (!x || x.gone || x.for !== l.key) return '';
+    const alt = x.alt ? L.lessonByKey(x.alt) : null;
+    const altLink = alt ? ` If you saved it after that, you may want <a href="${esc(L.lessonHash(alt))}">${esc(alt.title)}</a>.` : '';
+    return `<p class="tvw-legacy-note" role="status">${icon('info', 18)}<span>This link was made before the lesson list was reordered on 17 October 2026. It opens "${esc(l.title)}", the lesson it was made for.${altLink}</span></p>`;
 }
 
 function writeHash(replace) {
@@ -365,7 +382,8 @@ function drawMeta() {
 }
 function curSecKey() { const l = v.lesson ? L.lessonByKey(v.lesson) : null; return (l && (placeOf(l) || { sec: {} }).sec.key) || v.sec; }
 function domButtonsHTML() {
-    const cur = curSecKey();
+    // n3 (critic 2026-10-30): the area the subtitle names is marked, also before a lesson opens (the first section)
+    const cur = curSecKey() || (sections()[0] || {}).key;
     return sections().map((s) => `<button type="button" class="tvw-dombtn${s.extra ? ' is-extra' : ''}" data-w-sec="${esc(s.key)}" aria-controls="tvwSec-${esc(s.key)}" aria-pressed="${s.key === cur}"${s.key === cur ? ' aria-current="true"' : ''}>${esc(s.name)}</button>`).join('');
 }
 
@@ -559,7 +577,8 @@ function detailHTML(l) {
     const lead = assess ? 'Assessment' : core ? `Lesson ${p ? p.n : l.n}` : `Extra lesson ${p ? p.n : ''}`.trim();
     const group = !core ? (L.EXTRA_KINDS.find((k) => k[0] === L.extraKind(l)) || [])[1] : '';
     return `<div class="tv-card tvw-head">
-        <p class="tvw-kicker">${esc(gradeRec().label)} · ${esc(secNameOf(l))}${group ? ` · ${esc(group)}` : ''}${l.weeks.length ? ` · Week ${esc(l.weeks.map((w) => w.replace(/^W0?/, '')).join(', '))}` : ''}</p>
+        <p class="tvw-kicker">${esc(gradeRec().label)} · ${esc(secNameOf(l))}${group ? ` · ${esc(group)}` : ''}${l.weeks.length ? ` · <span class="tvw-week">Week ${esc(l.weeks.map((w) => w.replace(/^W0?/, '')).join(', '))}</span>` : ''}</p>
+        ${legacyNoteHTML(l)}
         <h2 class="tv-h2 tvw-title" tabindex="-1"><span class="tvw-title-n">${esc(lead)}</span> ${esc(l.title)}</h2>
         <div class="tvw-tags">
           ${flag ? `<span class="tvw-tag tvw-flag${assess ? ' is-assess' : ''}" data-w-flag="${esc(flag)}">${esc(flag)}</span>` : ''}
@@ -818,8 +837,11 @@ function scrollRowIntoList(row) {
     const list = root.querySelector('#tvwLessons');
     if (listScrolls(list)) {
         const top = row.offsetTop, h = row.offsetHeight;
+        // the part of the list the teacher can see: not under the tray bar at the foot of the window (W4 run 2026-10-30)
+        const lr = list.getBoundingClientRect();
+        const seen = Math.max(h + 56, Math.min(list.clientHeight, (typeof innerHeight === 'number' ? innerHeight : 1e5) - 96 - Math.max(0, lr.top)));
         if (top < list.scrollTop + 48) list.scrollTop = Math.max(0, top - 48);
-        else if (top + h > list.scrollTop + list.clientHeight - 8) list.scrollTop = top + h - list.clientHeight + 8;
+        else if (top + h > list.scrollTop + seen - 8) list.scrollTop = top + h - seen + 8;
     } else row.scrollIntoView({ block: 'nearest' });
 }
 

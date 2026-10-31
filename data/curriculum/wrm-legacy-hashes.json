@@ -1,0 +1,3083 @@
+{
+ "meta": {
+  "what": "White Rose lesson links by number from before the school-site reorder, and where each lesson is now",
+  "source": "git 85b40359^ js/modules/wrm-sequence-db.js",
+  "made": "2026-10-30"
+ },
+ "renumbered": "2026-10-17",
+ "hashes": {
+  "K/D1/1": [
+   "Count objects",
+   "K/D1/countobjects"
+  ],
+  "K/D1/2": [
+   "Count objects from a larger group",
+   "K/D1/countobjectsfromalargergroup"
+  ],
+  "K/D1/3": [
+   "Verbal counting patterns",
+   "K/D1/verbalcountingpatterns"
+  ],
+  "K/D1/6": [
+   "Count on from any number",
+   "K/D1/countonfromanynumber"
+  ],
+  "K/D1/7": [
+   "1 more",
+   "K/D1/1more"
+  ],
+  "K/D1/8": [
+   "Count backwards within 10",
+   "K/D1/countbackwardswithin10"
+  ],
+  "K/D1/9": [
+   "1 less",
+   "K/D1/1less"
+  ],
+  "K/D1/10": [
+   "Compare groups by matching",
+   "K/D1/comparegroupsbymatching"
+  ],
+  "K/D1/11": [
+   "Fewer, more, same",
+   "K/D1/fewermoresame"
+  ],
+  "K/D1/12": [
+   "Less than, greater than, equal to",
+   "K/D1/lessthangreaterthanequalto"
+  ],
+  "K/D1/13": [
+   "Compare numbers",
+   "K/D1/comparenumbers"
+  ],
+  "K/D1/14": [
+   "Order objects and numbers",
+   "K/D1/orderobjectsandnumbers"
+  ],
+  "K/D1/15": [
+   "The number line",
+   "K/D1/thenumberline"
+  ],
+  "K/D1/16": [
+   "Count within 20",
+   "K/D1/countwithin20"
+  ],
+  "K/D1/17": [
+   "1 more and 1 less",
+   "K/D1/1moreand1less"
+  ],
+  "K/D1/18": [
+   "The number line to 20",
+   "K/D1/thenumberlineto20"
+  ],
+  "K/D1/19": [
+   "Use a number line to 20",
+   "K/D1/useanumberlineto20"
+  ],
+  "K/D1/20": [
+   "Estimate on a number line to 20",
+   "K/D1/estimateonanumberlineto20"
+  ],
+  "K/D1/21": [
+   "Compare numbers to 20",
+   "K/D1/comparenumbersto20"
+  ],
+  "K/D1/22": [
+   "Order numbers to 20",
+   "K/D1/ordernumbersto20"
+  ],
+  "K/D1/23": [
+   "Count from 20 to 50",
+   "K/D3/countfrom20to50"
+  ],
+  "K/D1/24": [
+   "20, 30, 40 and 50",
+   "K/D3/203040and50"
+  ],
+  "K/D1/25": [
+   "The number line to 50",
+   "K/D3/thenumberlineto50"
+  ],
+  "K/D1/26": [
+   "Estimate on a number line to 50",
+   "K/D3/estimateonanumberlineto50"
+  ],
+  "K/D1/27": [
+   "1 more, 1 less",
+   "K/D3/1more1less"
+  ],
+  "K/D1/28": [
+   "Count in 10s",
+   "K/D2/countin10s"
+  ],
+  "K/D1/29": [
+   "Count from 50 to 100",
+   "K/D3/countfrom50to100"
+  ],
+  "K/D1/30": [
+   "Tens to 100",
+   "K/D3/tensto100"
+  ],
+  "K/D1/31": [
+   "The number line to 100",
+   "K/D3/thenumberlineto100"
+  ],
+  "K/D1/32": [
+   "Count in coins (US: dollars & cents)",
+   "K/D4/countincoinsusdollarscents"
+  ],
+  "K/D2/4": [
+   "Subtraction - find a part",
+   "K/D2/subtractionfindapart"
+  ],
+  "K/D2/5": [
+   "Find a part",
+   "K/D2/findapart"
+  ],
+  "K/D2/6": [
+   "Fact families - addition facts",
+   "K/D2/factfamiliesadditionfacts"
+  ],
+  "K/D2/7": [
+   "Number bonds within 10",
+   "K/D2/numberbondswithin10"
+  ],
+  "K/D2/8": [
+   "Systematic number bonds within 10",
+   "K/D2/systematicnumberbondswithin10"
+  ],
+  "K/D2/9": [
+   "Subtraction - take away cross out (How many left )",
+   "K/D2/subtractiontakeawaycrossouthowmanyleft"
+  ],
+  "K/D2/10": [
+   "Number bonds to 10",
+   "K/D2/numberbondsto10"
+  ],
+  "K/D2/11": [
+   "Addition - add together",
+   "K/D2/additionaddtogether"
+  ],
+  "K/D2/12": [
+   "Addition - add more",
+   "K/D2/additionaddmore"
+  ],
+  "K/D2/13": [
+   "Subtraction - take away (How many left )",
+   "K/D2/subtractiontakeawayhowmanyleft"
+  ],
+  "K/D2/14": [
+   "Addition problems",
+   "K/D2/additionproblems"
+  ],
+  "K/D2/15": [
+   "Fact families - the eight facts",
+   "K/D2/factfamiliestheeightfacts"
+  ],
+  "K/D2/28": [
+   "Recognise equal groups",
+   "K/D2/recogniseequalgroups"
+  ],
+  "K/D2/29": [
+   "Add equal groups",
+   "K/D2/addequalgroups"
+  ],
+  "K/D2/30": [
+   "Make arrays",
+   "K/D2/makearrays"
+  ],
+  "K/D2/31": [
+   "Make doubles",
+   "K/D2/makedoubles"
+  ],
+  "K/D3/1": [
+   "Understand 10",
+   "K/D1/understand10"
+  ],
+  "K/D3/2": [
+   "Understand 11, 12 and 13",
+   "K/D1/understand1112and13"
+  ],
+  "K/D3/3": [
+   "Understand 14, 15 and 16",
+   "K/D1/understand1415and16"
+  ],
+  "K/D3/4": [
+   "Understand 17, 18 and 19",
+   "K/D1/understand1718and19"
+  ],
+  "K/D3/5": [
+   "Understand 20",
+   "K/D1/understand20"
+  ],
+  "K/D3/6": [
+   "Count by making groups of tens",
+   "K/D3/countbymakinggroupsoftens"
+  ],
+  "K/D3/7": [
+   "Groups of tens and ones",
+   "K/D3/groupsoftensandones"
+  ],
+  "K/D3/8": [
+   "Partition into tens and ones",
+   "K/D3/partitionintotensandones"
+  ],
+  "K/D4/1": [
+   "Sort objects",
+   "K/D1/sortobjects"
+  ],
+  "K/D4/2": [
+   "Compare lengths and heights",
+   "K/D4/comparelengthsandheights"
+  ],
+  "K/D4/3": [
+   "Measure length using objects",
+   "K/D4/measurelengthusingobjects"
+  ],
+  "K/D4/4": [
+   "Measure length in centimetres",
+   "K/D4/measurelengthincentimetres"
+  ],
+  "K/D4/5": [
+   "Heavier and lighter",
+   "K/D4/heavierandlighter"
+  ],
+  "K/D4/6": [
+   "Measure mass",
+   "K/D4/measuremass"
+  ],
+  "K/D4/7": [
+   "Compare mass",
+   "K/D4/comparemass"
+  ],
+  "K/D4/8": [
+   "Full and empty",
+   "K/D4/fullandempty"
+  ],
+  "K/D4/9": [
+   "Compare volume",
+   "K/D4/comparevolume"
+  ],
+  "K/D4/10": [
+   "Measure capacity",
+   "K/D4/measurecapacity"
+  ],
+  "K/D4/11": [
+   "Compare capacity",
+   "K/D4/comparecapacity"
+  ],
+  "K/D4/12": [
+   "Days of the week",
+   "K/D4/daysoftheweek"
+  ],
+  "K/D4/13": [
+   "Months of the year",
+   "K/D4/monthsoftheyear"
+  ],
+  "K/D5/1": [
+   "Build and draw shapes",
+   "K/D5/buildanddrawshapes"
+  ],
+  "K/D5/2": [
+   "Compose shapes from smaller shapes",
+   "K/D5/composeshapesfromsmallershapes"
+  ],
+  "K/D5/3": [
+   "Describe turns",
+   "K/D5/describeturns"
+  ],
+  "K/D5/4": [
+   "Describe position - left and right",
+   "K/D5/describepositionleftandright"
+  ],
+  "K/D5/5": [
+   "Describe position - forwards and backwards",
+   "K/D5/describepositionforwardsandbackwards"
+  ],
+  "K/D5/6": [
+   "Describe position - above and below",
+   "K/D5/describepositionaboveandbelow"
+  ],
+  "K/D5/7": [
+   "Ordinal numbers",
+   "K/D5/ordinalnumbers"
+  ],
+  "K/D5/8": [
+   "Recognise and name 3D shapes",
+   "K/D5/recogniseandname3dshapes"
+  ],
+  "K/D5/9": [
+   "Sort 3D shapes",
+   "K/D5/sort3dshapes"
+  ],
+  "K/D5/10": [
+   "Recognise and name 2D shapes",
+   "K/D5/recogniseandname2dshapes"
+  ],
+  "K/D5/11": [
+   "Sort 2D shapes",
+   "K/D5/sort2dshapes"
+  ],
+  "K/D5/12": [
+   "Patterns with 2D and 3D shapes",
+   "K/D5/patternswith2dand3dshapes"
+  ],
+  "K/E/1": [
+   "Count in 2s",
+   "K/D2/countin2s"
+  ],
+  "K/E/2": [
+   "Make equal groups - grouping",
+   "K/D2/makeequalgroupsgrouping"
+  ],
+  "K/E/3": [
+   "Make equal groups - sharing",
+   "K/D2/makeequalgroupssharing"
+  ],
+  "K/E/4": [
+   "Count in 5s",
+   "K/D2/countin5s"
+  ],
+  "K/E/5": [
+   "Compare numbers with the same number of tens",
+   "K/D3/comparenumberswiththesamenumberoftens"
+  ],
+  "K/E/6": [
+   "Compare any two numbers",
+   "K/D3/compareanytwonumbers"
+  ],
+  "K/E/7": [
+   "Unitising",
+   "K/D4/unitising"
+  ],
+  "K/E/8": [
+   "Recognise coins (US: dollars & cents)",
+   "K/D4/recognisecoinsusdollarscents"
+  ],
+  "K/E/9": [
+   "Recognise notes (US: dollars & cents)",
+   "K/D4/recognisenotesusdollarscents"
+  ],
+  "K/E/10": [
+   "Before and after",
+   "K/D4/beforeandafter"
+  ],
+  "K/E/11": [
+   "Hours, minutes and seconds",
+   "K/D4/hoursminutesandseconds"
+  ],
+  "K/E/12": [
+   "Tell the time to the hour",
+   "K/D4/tellthetimetothehour"
+  ],
+  "K/E/13": [
+   "Tell the time to the half hour",
+   "K/D4/tellthetimetothehalfhour"
+  ],
+  "K/E/14": [
+   "Recognise a half of an object or a shape",
+   "K/D5/recogniseahalfofanobjectorashape"
+  ],
+  "K/E/15": [
+   "Find a half of an object or a shape",
+   "K/D5/findahalfofanobjectorashape"
+  ],
+  "K/E/16": [
+   "Recognise a half of a quantity",
+   "K/D5/recogniseahalfofaquantity"
+  ],
+  "K/E/17": [
+   "Recognise a quarter of an object or a shape",
+   "K/D5/recogniseaquarterofanobjectorashape"
+  ],
+  "K/E/18": [
+   "Find a half of a quantity",
+   "K/D5/findahalfofaquantity"
+  ],
+  "K/E/19": [
+   "Find a quarter of an object or a shape",
+   "K/D5/findaquarterofanobjectorashape"
+  ],
+  "K/E/20": [
+   "Recognise a quarter of a quantity",
+   "K/D5/recogniseaquarterofaquantity"
+  ],
+  "K/E/21": [
+   "Find a quarter of a quantity",
+   "K/D5/findaquarterofaquantity"
+  ],
+  "1/D1/1": [
+   "Numbers to 20",
+   "1/D2/numbersto20"
+  ],
+  "1/D1/2": [
+   "Count objects to 100 by making 10s",
+   "1/D2/countobjectsto100bymaking10s"
+  ],
+  "1/D1/3": [
+   "Recognise tens and ones",
+   "1/D2/recognisetensandones"
+  ],
+  "1/D1/4": [
+   "Use a place value chart",
+   "1/D2/useaplacevaluechart"
+  ],
+  "1/D1/5": [
+   "Partition numbers to 100",
+   "1/D2/partitionnumbersto100"
+  ],
+  "1/D1/6": [
+   "Write numbers to 100 in words",
+   "1/D2/writenumbersto100inwords"
+  ],
+  "1/D1/7": [
+   "Flexibly partition numbers to 100",
+   "1/D2/flexiblypartitionnumbersto100"
+  ],
+  "1/D1/8": [
+   "Write numbers to 100 in expanded form",
+   "1/D2/writenumbersto100inexpandedform"
+  ],
+  "1/D1/9": [
+   "10s on the number line to 100",
+   "1/D2/10sonthenumberlineto100"
+  ],
+  "1/D1/10": [
+   "10s and 1s on the number line to 100",
+   "1/D2/10sand1sonthenumberlineto100"
+  ],
+  "1/D1/11": [
+   "Estimate numbers on a number line",
+   "1/D2/estimatenumbersonanumberline"
+  ],
+  "1/D1/12": [
+   "Compare objects",
+   "1/D2/compareobjects"
+  ],
+  "1/D1/13": [
+   "Compare numbers",
+   "1/D2/comparenumbers"
+  ],
+  "1/D1/14": [
+   "Order objects and numbers",
+   "1/D2/orderobjectsandnumbers"
+  ],
+  "1/D1/15": [
+   "Count in 2s, 5s and 10s",
+   "1/D2/countin2s5sand10s"
+  ],
+  "1/D1/16": [
+   "Count in 3s",
+   "1/D2/countin3s"
+  ],
+  "1/D1/17": [
+   "Count on to 120",
+   "1/D2/countonto120"
+  ],
+  "1/D1/18": [
+   "Bonds to 100 (tens)",
+   "1/D1/bondsto100tens"
+  ],
+  "1/D1/19": [
+   "Add two 2-digit numbers (not across a 10)",
+   "1/D1/addtwo2digitnumbersnotacrossa10"
+  ],
+  "1/D1/20": [
+   "Subtract two 2-digit numbers (across a 10)",
+   "1/D1/subtracttwo2digitnumbersacrossa10"
+  ],
+  "1/D1/21": [
+   "Add to the next 10",
+   "1/D1/addtothenext10"
+  ],
+  "1/D1/22": [
+   "Subtract two 2-digit numbers (not across a 10)",
+   "1/D1/subtracttwo2digitnumbersnotacrossa10"
+  ],
+  "1/D1/23": [
+   "Add across a 10",
+   "1/D1/addacrossa10"
+  ],
+  "1/D1/24": [
+   "10 more, 10 less",
+   "1/D1/10more10less"
+  ],
+  "1/D1/25": [
+   "Add and subtract 10s",
+   "1/D1/addandsubtract10s"
+  ],
+  "1/D1/26": [
+   "Add two 2-digit numbers (across a 10)",
+   "1/D1/addtwo2digitnumbersacrossa10"
+  ],
+  "1/D1/27": [
+   "Mixed addition and subtraction",
+   "1/D1/mixedadditionandsubtraction"
+  ],
+  "1/D1/28": [
+   "Compare amounts of money",
+   "1/D3/compareamountsofmoney"
+  ],
+  "1/D1/29": [
+   "Find the total (US: dollars & cents)",
+   "1/D3/findthetotalusdollarscents"
+  ],
+  "1/D2/1": [
+   "Bonds to 10",
+   "1/D1/bondsto10"
+  ],
+  "1/D2/2": [
+   "Fact families - addition and subtraction bonds within 20",
+   "1/D1/factfamiliesadditionandsubtractionbondswithin20"
+  ],
+  "1/D2/3": [
+   "Subtract a 1-digit number from a 2-digit number (across a 10)",
+   "1/D1/subtracta1digitnumberfroma2digitnumberacrossa10"
+  ],
+  "1/D2/4": [
+   "Related facts",
+   "1/D1/relatedfacts"
+  ],
+  "1/D2/5": [
+   "Add and subtract 1s",
+   "1/D1/addandsubtract1s"
+  ],
+  "1/D2/6": [
+   "Add by making 10",
+   "1/D1/addbymaking10"
+  ],
+  "1/D2/7": [
+   "Add three 1-digit numbers",
+   "1/D1/addthree1digitnumbers"
+  ],
+  "1/D2/8": [
+   "Subtract across 10",
+   "1/D1/subtractacross10"
+  ],
+  "1/D2/9": [
+   "Subtract from a 10",
+   "1/D1/subtractfroma10"
+  ],
+  "1/D2/10": [
+   "Compare number sentences",
+   "1/D1/comparenumbersentences"
+  ],
+  "1/D2/11": [
+   "Missing number problems",
+   "1/D1/missingnumberproblems"
+  ],
+  "1/D2/12": [
+   "Find change (US: dollars & cents)",
+   "1/D3/findchangeusdollarscents"
+  ],
+  "1/D2/13": [
+   "Find the difference (US: dollars & cents)",
+   "1/D3/findthedifferenceusdollarscents"
+  ],
+  "1/D3/1": [
+   "Count sides on 2D shapes",
+   "1/D4/countsideson2dshapes"
+  ],
+  "1/D3/2": [
+   "Count vertices on 2D shapes",
+   "1/D4/countverticeson2dshapes"
+  ],
+  "1/D3/3": [
+   "Lines of symmetry on shapes",
+   "1/D4/linesofsymmetryonshapes"
+  ],
+  "1/D3/4": [
+   "Draw 2D shapes",
+   "1/D4/draw2dshapes"
+  ],
+  "1/D3/5": [
+   "Sort 2D shapes",
+   "1/D4/sort2dshapes"
+  ],
+  "1/D3/6": [
+   "Count faces on 3D shapes",
+   "1/D4/countfaceson3dshapes"
+  ],
+  "1/D3/7": [
+   "Count edges on 3D shapes",
+   "1/D4/countedgeson3dshapes"
+  ],
+  "1/D3/8": [
+   "Count vertices on 3D shapes",
+   "1/D4/countverticeson3dshapes"
+  ],
+  "1/D3/9": [
+   "Sort 3D shapes",
+   "1/D4/sort3dshapes"
+  ],
+  "1/D3/10": [
+   "Make patterns with 2D and 3D shapes",
+   "1/D4/makepatternswith2dand3dshapes"
+  ],
+  "1/D3/11": [
+   "Recognise 2D and 3D shapes",
+   "1/D4/recognise2dand3dshapes"
+  ],
+  "1/D3/12": [
+   "Compose and recompose shapes",
+   "1/D4/composeandrecomposeshapes"
+  ],
+  "1/D3/13": [
+   "Use lines of symmetry to complete shapes",
+   "1/D4/uselinesofsymmetrytocompleteshapes"
+  ],
+  "1/D3/14": [
+   "Introduction to parts and whole",
+   "1/D4/introductiontopartsandwhole"
+  ],
+  "1/D3/15": [
+   "Equal and unequal parts",
+   "1/D4/equalandunequalparts"
+  ],
+  "1/D3/16": [
+   "Recognise a half",
+   "1/D4/recogniseahalf"
+  ],
+  "1/D3/17": [
+   "Find a half",
+   "1/D4/findahalf"
+  ],
+  "1/D3/18": [
+   "Recognise the equivalence of a half and two quarters",
+   "1/D4/recognisetheequivalenceofahalfandtwoquarters"
+  ],
+  "1/D3/19": [
+   "Recognise three quarters",
+   "1/D4/recognisethreequarters"
+  ],
+  "1/D3/20": [
+   "Recognise a quarter",
+   "1/D4/recogniseaquarter"
+  ],
+  "1/D3/21": [
+   "Find a quarter",
+   "1/D4/findaquarter"
+  ],
+  "1/D3/22": [
+   "Find the whole",
+   "1/D4/findthewhole"
+  ],
+  "1/D3/23": [
+   "Unit fractions",
+   "1/D4/unitfractions"
+  ],
+  "1/D3/24": [
+   "Language of position",
+   "1/D4/languageofposition"
+  ],
+  "1/D3/25": [
+   "Describe movement",
+   "1/D4/describemovement"
+  ],
+  "1/D3/26": [
+   "Describe movement and turns",
+   "1/D4/describemovementandturns"
+  ],
+  "1/D3/27": [
+   "Describe turns",
+   "1/D4/describeturns"
+  ],
+  "1/D3/28": [
+   "Shape patterns with turns",
+   "1/D4/shapepatternswithturns"
+  ],
+  "1/D4/1": [
+   "Tables",
+   "1/D3/tables"
+  ],
+  "1/D4/2": [
+   "Measure length using objects",
+   ""
+  ],
+  "1/D4/3": [
+   "Measure in centimetres",
+   "1/D3/measureincentimetres"
+  ],
+  "1/D4/4": [
+   "Measure in metres",
+   "1/D3/measureinmetres"
+  ],
+  "1/D4/5": [
+   "Compare lengths and heights",
+   "1/D3/comparelengthsandheights"
+  ],
+  "1/D4/6": [
+   "Order lengths and heights",
+   "1/D3/orderlengthsandheights"
+  ],
+  "1/D4/7": [
+   "Temperature",
+   "1/D3/temperature"
+  ],
+  "1/D4/8": [
+   "Compare mass",
+   "1/D3/comparemass"
+  ],
+  "1/D4/9": [
+   "Compare volume and capacity",
+   "1/D3/comparevolumeandcapacity"
+  ],
+  "1/D4/10": [
+   "O'clock and half past",
+   "1/D3/oclockandhalfpast"
+  ],
+  "1/D4/11": [
+   "Hours in a day",
+   "1/D3/hoursinaday"
+  ],
+  "1/D4/12": [
+   "Minutes in an hour",
+   "1/D3/minutesinanhour"
+  ],
+  "1/D4/13": [
+   "Make tally charts",
+   "1/D3/maketallycharts"
+  ],
+  "1/D4/14": [
+   "Block diagrams",
+   "1/D3/blockdiagrams"
+  ],
+  "1/D4/15": [
+   "Draw pictograms (1-1)",
+   "1/D3/drawpictograms11"
+  ],
+  "1/D4/16": [
+   "Interpret pictograms (1-1)",
+   "1/D3/interpretpictograms11"
+  ],
+  "1/E/1": [
+   "The 10 times-table",
+   "1/D1/the10timestable"
+  ],
+  "1/E/2": [
+   "The 5 times-table",
+   "1/D1/the5timestable"
+  ],
+  "1/E/3": [
+   "The 5 and 10 times-tables",
+   "1/D1/the5and10timestables"
+  ],
+  "1/E/4": [
+   "Recognise equal groups",
+   "1/D1/recogniseequalgroups"
+  ],
+  "1/E/5": [
+   "Make equal groups",
+   "1/D1/makeequalgroups"
+  ],
+  "1/E/6": [
+   "Add equal groups",
+   "1/D1/addequalgroups"
+  ],
+  "1/E/7": [
+   "Introduce the multiplication symbol",
+   "1/D1/introducethemultiplicationsymbol"
+  ],
+  "1/E/8": [
+   "Multiplication sentences",
+   "1/D1/multiplicationsentences"
+  ],
+  "1/E/9": [
+   "Use arrays",
+   "1/D1/usearrays"
+  ],
+  "1/E/10": [
+   "Make equal groups – grouping",
+   "1/D1/makeequalgroupsgrouping"
+  ],
+  "1/E/11": [
+   "Make equal groups – sharing",
+   "1/D1/makeequalgroupssharing"
+  ],
+  "1/E/12": [
+   "The 2 times-table",
+   "1/D1/the2timestable"
+  ],
+  "1/E/13": [
+   "Divide by 2",
+   "1/D1/divideby2"
+  ],
+  "1/E/14": [
+   "Doubling and halving",
+   "1/D1/doublingandhalving"
+  ],
+  "1/E/15": [
+   "Odd and even numbers",
+   "1/D1/oddandevennumbers"
+  ],
+  "1/E/16": [
+   "Divide by 10",
+   "1/D1/divideby10"
+  ],
+  "1/E/17": [
+   "Divide by 5",
+   "1/D1/divideby5"
+  ],
+  "1/E/18": [
+   "Recognise a third",
+   "1/D4/recogniseathird"
+  ],
+  "1/E/19": [
+   "Find a third",
+   "1/D4/findathird"
+  ],
+  "1/E/20": [
+   "Count money - pence (US: dollars & cents)",
+   "1/D3/countmoneypenceusdollarscents"
+  ],
+  "1/E/21": [
+   "Count money - pounds (notes and coins) (US: dollars & cents)",
+   "1/D3/countmoneypoundsnotesandcoinsusdollarscents"
+  ],
+  "1/E/22": [
+   "Count money - pounds and pence",
+   "1/D3/countmoneypoundsandpence"
+  ],
+  "1/E/23": [
+   "Make the same amount (US: dollars & cents)",
+   "1/D3/makethesameamountusdollarscents"
+  ],
+  "1/E/24": [
+   "Choose notes and coins",
+   "1/D3/choosenotesandcoins"
+  ],
+  "1/E/25": [
+   "Calculate with money",
+   "1/D3/calculatewithmoney"
+  ],
+  "1/E/26": [
+   "Count money - notes and coins (US: dollars & cents)",
+   "1/D3/countmoneynotesandcoinsusdollarscents"
+  ],
+  "1/E/27": [
+   "Select money (US: dollars & cents)",
+   "1/D3/selectmoneyusdollarscents"
+  ],
+  "1/E/28": [
+   "Make a pound",
+   "1/D3/makeapound"
+  ],
+  "1/E/29": [
+   "Two-step problems (US: dollars & cents)",
+   "1/D3/twostepproblemsusdollarscents"
+  ],
+  "1/E/30": [
+   "Four operations with lengths and heights",
+   "1/D3/fouroperationswithlengthsandheights"
+  ],
+  "1/E/31": [
+   "Measure in grams",
+   "1/D3/measureingrams"
+  ],
+  "1/E/32": [
+   "Measure in kilograms",
+   "1/D3/measureinkilograms"
+  ],
+  "1/E/33": [
+   "Four operations with mass",
+   "1/D3/fouroperationswithmass"
+  ],
+  "1/E/34": [
+   "Measure in litres",
+   "1/D3/measureinlitres"
+  ],
+  "1/E/35": [
+   "Measure in millilitres",
+   "1/D3/measureinmillilitres"
+  ],
+  "1/E/36": [
+   "Four operations with volume and capacity",
+   "1/D3/fouroperationswithvolumeandcapacity"
+  ],
+  "1/E/37": [
+   "Quarter past and quarter to",
+   "1/D3/quarterpastandquarterto"
+  ],
+  "1/E/38": [
+   "Tell time past the hour",
+   "1/D3/telltimepastthehour"
+  ],
+  "1/E/39": [
+   "Tell time to the hour",
+   "1/D3/telltimetothehour"
+  ],
+  "1/E/40": [
+   "Tell the time to 5 minutes",
+   "1/D3/tellthetimeto5minutes"
+  ],
+  "1/E/41": [
+   "Hours and minutes - use start and end times",
+   "1/D3/hoursandminutesusestartandendtimes"
+  ],
+  "1/E/42": [
+   "Draw pictograms (2, 5 and 10)",
+   "1/D3/drawpictograms25and10"
+  ],
+  "1/E/43": [
+   "Interpret pictograms (2, 5 and 10)",
+   "1/D3/interpretpictograms25and10"
+  ],
+  "1/E/44": [
+   "Non-unit fractions",
+   "1/D4/nonunitfractions"
+  ],
+  "1/E/45": [
+   "Find three-quarters",
+   "1/D4/findthreequarters"
+  ],
+  "1/E/46": [
+   "Count in fractions up to a whole",
+   "1/D4/countinfractionsuptoawhole"
+  ],
+  "2/D1/1": [
+   "Represent numbers to 100",
+   "2/D2/representnumbersto100"
+  ],
+  "2/D1/2": [
+   "Partition numbers to 100",
+   "2/D2/partitionnumbersto100"
+  ],
+  "2/D1/3": [
+   "Hundreds",
+   "2/D2/hundreds"
+  ],
+  "2/D1/4": [
+   "Represent numbers to 1,000",
+   "2/D2/representnumbersto1000"
+  ],
+  "2/D1/5": [
+   "Partition numbers to 1,000",
+   "2/D2/partitionnumbersto1000"
+  ],
+  "2/D1/6": [
+   "Flexible partitioning of numbers to 1,000",
+   "2/D2/flexiblepartitioningofnumbersto1000"
+  ],
+  "2/D1/7": [
+   "Hundreds, tens and ones",
+   "2/D2/hundredstensandones"
+  ],
+  "2/D1/8": [
+   "Find 1, 10 or 100 more or less",
+   "2/D2/find110or100moreorless"
+  ],
+  "2/D1/9": [
+   "Compare numbers to 1,000",
+   "2/D2/comparenumbersto1000"
+  ],
+  "2/D1/10": [
+   "Order numbers to 1,000",
+   "2/D2/ordernumbersto1000"
+  ],
+  "2/D1/11": [
+   "Count in 50s",
+   "2/D2/countin50s"
+  ],
+  "2/D1/12": [
+   "Add and subtract 1s",
+   "2/D2/addandsubtract1s"
+  ],
+  "2/D1/13": [
+   "Add and subtract 10s",
+   "2/D2/addandsubtract10s"
+  ],
+  "2/D1/14": [
+   "Add and subtract 100s",
+   "2/D2/addandsubtract100s"
+  ],
+  "2/D1/15": [
+   "Spot the pattern",
+   "2/D2/spotthepattern"
+  ],
+  "2/D1/16": [
+   "Add 1s across a 10",
+   "2/D2/add1sacrossa10"
+  ],
+  "2/D1/17": [
+   "Add 10s across a 100",
+   "2/D2/add10sacrossa100"
+  ],
+  "2/D1/18": [
+   "Subtract 1s across a 10",
+   "2/D2/subtract1sacrossa10"
+  ],
+  "2/D1/19": [
+   "Subtract 10s across a 100",
+   "2/D2/subtract10sacrossa100"
+  ],
+  "2/D1/20": [
+   "Make connections",
+   "2/D2/makeconnections"
+  ],
+  "2/D1/21": [
+   "Add two numbers (no exchange)",
+   "2/D2/addtwonumbersnoexchange"
+  ],
+  "2/D1/22": [
+   "Subtract two numbers (no exchange)",
+   "2/D2/subtracttwonumbersnoexchange"
+  ],
+  "2/D1/23": [
+   "Add two numbers (across a 10)",
+   "2/D2/addtwonumbersacrossa10"
+  ],
+  "2/D1/24": [
+   "Add two numbers (across a 100)",
+   "2/D2/addtwonumbersacrossa100"
+  ],
+  "2/D1/25": [
+   "Subtract two numbers (across a 10)",
+   "2/D2/subtracttwonumbersacrossa10"
+  ],
+  "2/D1/26": [
+   "Subtract two numbers (across a 100)",
+   "2/D2/subtracttwonumbersacrossa100"
+  ],
+  "2/D1/27": [
+   "Add 2-digit and 3-digit numbers",
+   "2/D2/add2digitand3digitnumbers"
+  ],
+  "2/D1/28": [
+   "Subtract a 2-digit number from a 3-digit number",
+   "2/D2/subtracta2digitnumberfroma3digitnumber"
+  ],
+  "2/D1/29": [
+   "Complements to 100",
+   "2/D2/complementsto100"
+  ],
+  "2/D1/30": [
+   "Estimate answers",
+   "2/D2/estimateanswers"
+  ],
+  "2/D1/31": [
+   "Inverse operations",
+   "2/D2/inverseoperations"
+  ],
+  "2/D1/32": [
+   "Make decisions",
+   "2/D2/makedecisions"
+  ],
+  "2/D1/33": [
+   "Add up to four two-digit numbers",
+   "2/D2/adduptofourtwodigitnumbers"
+  ],
+  "2/D1/34": [
+   "Multiples of 5 and 10",
+   "2/D1/multiplesof5and10"
+  ],
+  "2/D1/35": [
+   "Multiples of 10",
+   "2/D1/multiplesof10"
+  ],
+  "2/D2/1": [
+   "Apply number bonds within 10",
+   "2/D2/applynumberbondswithin10"
+  ],
+  "2/D2/2": [
+   "Solve one-step word problems using bar models",
+   "2/D1/solveonestepwordproblemsusingbarmodels"
+  ],
+  "2/D2/3": [
+   "Solve two-step word problems identifying both operations",
+   "2/D1/solvetwostepwordproblemsidentifyingbothoperations"
+  ],
+  "2/D2/4": [
+   "Multiplication - equal groups",
+   "2/D1/multiplicationequalgroups"
+  ],
+  "2/D2/5": [
+   "Use arrays",
+   "2/D1/usearrays"
+  ],
+  "2/D2/6": [
+   "Multiples of 2",
+   "2/D1/multiplesof2"
+  ],
+  "2/D2/7": [
+   "Multiply by 3",
+   "2/D1/multiplyby3"
+  ],
+  "2/D2/8": [
+   "The 3 times-table",
+   "2/D1/the3timestable"
+  ],
+  "2/D2/9": [
+   "Multiply by 4",
+   "2/D1/multiplyby4"
+  ],
+  "2/D2/10": [
+   "The 4 times-table",
+   "2/D1/the4timestable"
+  ],
+  "2/D2/11": [
+   "Odd and even numbers",
+   "2/D1/oddandevennumbers"
+  ],
+  "2/D2/12": [
+   "Reasoning about multiplication",
+   "2/D1/reasoningaboutmultiplication"
+  ],
+  "2/D3/1": [
+   "Number line to 100",
+   "2/D2/numberlineto100"
+  ],
+  "2/D3/2": [
+   "Number line to 1,000",
+   "2/D2/numberlineto1000"
+  ],
+  "2/D3/3": [
+   "Estimate on a number line to 1,000",
+   "2/D2/estimateonanumberlineto1000"
+  ],
+  "2/D3/4": [
+   "Measure in metres and centimetres",
+   "2/D4/measureinmetresandcentimetres"
+  ],
+  "2/D3/5": [
+   "Measure in millimetres",
+   "2/D4/measureinmillimetres"
+  ],
+  "2/D3/6": [
+   "Measure in centimetres and millimetres",
+   "2/D4/measureincentimetresandmillimetres"
+  ],
+  "2/D3/7": [
+   "Metres, centimetres and millimetres",
+   "2/D4/metrescentimetresandmillimetres"
+  ],
+  "2/D3/8": [
+   "Equivalent lengths (metres and centimetres)",
+   "2/D4/equivalentlengthsmetresandcentimetres"
+  ],
+  "2/D3/9": [
+   "Equivalent lengths (centimetres and millimetres)",
+   "2/D4/equivalentlengthscentimetresandmillimetres"
+  ],
+  "2/D3/10": [
+   "Compare lengths",
+   "2/D4/comparelengths"
+  ],
+  "2/D3/11": [
+   "Add lengths",
+   "2/D4/addlengths"
+  ],
+  "2/D3/12": [
+   "Subtract lengths",
+   "2/D4/subtractlengths"
+  ],
+  "2/D3/13": [
+   "What is perimeter?",
+   "2/D4/whatisperimeter"
+  ],
+  "2/D3/14": [
+   "Measure perimeter",
+   "2/D4/measureperimeter"
+  ],
+  "2/D3/15": [
+   "Calculate perimeter",
+   "2/D4/calculateperimeter"
+  ],
+  "2/D3/16": [
+   "Measure and estimate in inches and feet",
+   "2/D4/measureandestimateininchesandfeet"
+  ],
+  "2/D3/17": [
+   "Compare units: inches, feet, yards and centimetres",
+   "2/D4/compareunitsinchesfeetyardsandcentimetres"
+  ],
+  "2/D3/18": [
+   "Measure lengths of a set of objects to the nearest whole unit",
+   "2/D4/measurelengthsofasetofobjectstothenearestwholeunit"
+  ],
+  "2/D3/19": [
+   "Record the measurement data in a table",
+   "2/D4/recordthemeasurementdatainatable"
+  ],
+  "2/D3/20": [
+   "Show measurement data on a line plot",
+   "2/D4/showmeasurementdataonalineplot"
+  ],
+  "2/D3/21": [
+   "Solve 'longer by' problems using bar models",
+   "2/D4/solvelongerbyproblemsusingbarmodels"
+  ],
+  "2/D3/22": [
+   "Solve 'shorter by' problems using bar models",
+   "2/D4/solveshorterbyproblemsusingbarmodels"
+  ],
+  "2/D3/23": [
+   "Fractions on a number line",
+   "2/D5/fractionsonanumberline"
+  ],
+  "2/D3/24": [
+   "Compare capacity and volume",
+   "2/D4/comparecapacityandvolume"
+  ],
+  "2/D3/25": [
+   "Compare mass",
+   "2/D4/comparemass"
+  ],
+  "2/D3/26": [
+   "Pounds and pence (US: dollars & cents)",
+   "2/D4/poundsandpenceusdollarscents"
+  ],
+  "2/D3/27": [
+   "Convert pounds and pence (US: dollars & cents)",
+   "2/D4/convertpoundsandpenceusdollarscents"
+  ],
+  "2/D3/28": [
+   "Add money (US: dollars & cents)",
+   "2/D4/addmoneyusdollarscents"
+  ],
+  "2/D3/29": [
+   "Subtract money (US: dollars & cents)",
+   "2/D4/subtractmoneyusdollarscents"
+  ],
+  "2/D3/30": [
+   "Find change (US: dollars & cents)",
+   "2/D4/findchangeusdollarscents"
+  ],
+  "2/D3/31": [
+   "Roman numerals to 12",
+   "2/D4/romannumeralsto12"
+  ],
+  "2/D3/32": [
+   "Tell the time to 5 minutes",
+   "2/D4/tellthetimeto5minutes"
+  ],
+  "2/D3/33": [
+   "Tell the time to the minute",
+   "2/D4/tellthetimetotheminute"
+  ],
+  "2/D3/34": [
+   "Read time on a digital clock",
+   "2/D4/readtimeonadigitalclock"
+  ],
+  "2/D3/35": [
+   "Use am and pm",
+   "2/D4/useamandpm"
+  ],
+  "2/D3/36": [
+   "Years, months and days",
+   "2/D4/yearsmonthsanddays"
+  ],
+  "2/D3/37": [
+   "Days and hours",
+   "2/D4/daysandhours"
+  ],
+  "2/D3/38": [
+   "Hours and minutes - use start and end times",
+   "2/D4/hoursandminutesusestartandendtimes"
+  ],
+  "2/D3/39": [
+   "Hours and minutes - use durations",
+   "2/D4/hoursandminutesusedurations"
+  ],
+  "2/D3/40": [
+   "Minutes and seconds",
+   "2/D4/minutesandseconds"
+  ],
+  "2/D3/41": [
+   "Units of time",
+   "2/D4/unitsoftime"
+  ],
+  "2/D3/42": [
+   "Solve problems with time",
+   "2/D4/solveproblemswithtime"
+  ],
+  "2/D3/43": [
+   "Measure and draw accurately",
+   "2/D5/measureanddrawaccurately"
+  ],
+  "2/D3/44": [
+   "Interpret pictograms",
+   "2/D4/interpretpictograms"
+  ],
+  "2/D3/45": [
+   "Draw pictograms",
+   "2/D4/drawpictograms"
+  ],
+  "2/D3/46": [
+   "Interpret bar charts",
+   "2/D4/interpretbarcharts"
+  ],
+  "2/D3/47": [
+   "Draw bar charts",
+   "2/D4/drawbarcharts"
+  ],
+  "2/D3/48": [
+   "Collect and represent data",
+   "2/D4/collectandrepresentdata"
+  ],
+  "2/D3/49": [
+   "Two-way tables",
+   "2/D4/twowaytables"
+  ],
+  "2/D4/1": [
+   "Count squares",
+   ""
+  ],
+  "2/D4/2": [
+   "Partition a rectangle into rows and columns of squares",
+   "2/D5/partitionarectangleintorowsandcolumnsofsquares"
+  ],
+  "2/D4/3": [
+   "Understand the denominators of unit fractions",
+   "2/D5/understandthedenominatorsofunitfractions"
+  ],
+  "2/D4/4": [
+   "Understand the numerators of non-unit fractions",
+   "2/D5/understandthenumeratorsofnonunitfractions"
+  ],
+  "2/D4/5": [
+   "Understand the whole",
+   "2/D5/understandthewhole"
+  ],
+  "2/D4/6": [
+   "Fractions and scales",
+   "2/D5/fractionsandscales"
+  ],
+  "2/D4/7": [
+   "Recognise and describe 2D shapes",
+   "2/D5/recogniseanddescribe2dshapes"
+  ],
+  "2/D4/8": [
+   "Recognise and describe 3D shapes",
+   "2/D5/recogniseanddescribe3dshapes"
+  ],
+  "2/D4/9": [
+   "Turns and angles",
+   "2/D5/turnsandangles"
+  ],
+  "2/D4/10": [
+   "Make 3D shapes",
+   "2/D5/make3dshapes"
+  ],
+  "2/D4/11": [
+   "Right angles",
+   "2/D5/rightangles"
+  ],
+  "2/D4/12": [
+   "Compare angles",
+   "2/D5/compareangles"
+  ],
+  "2/D4/13": [
+   "Horizontal and vertical",
+   "2/D5/horizontalandvertical"
+  ],
+  "2/D4/14": [
+   "Parallel and perpendicular",
+   "2/D5/parallelandperpendicular"
+  ],
+  "2/D4/15": [
+   "Draw polygons",
+   "2/D5/drawpolygons"
+  ],
+  "2/E/1": [
+   "Related calculations",
+   "2/D1/relatedcalculations"
+  ],
+  "2/E/2": [
+   "Sharing and grouping",
+   "2/D1/sharingandgrouping"
+  ],
+  "2/E/3": [
+   "Divide by 3",
+   "2/D1/divideby3"
+  ],
+  "2/E/4": [
+   "Divide by 4",
+   "2/D1/divideby4"
+  ],
+  "2/E/5": [
+   "Multiply by 8",
+   "2/D1/multiplyby8"
+  ],
+  "2/E/6": [
+   "Divide by 8",
+   "2/D1/divideby8"
+  ],
+  "2/E/7": [
+   "The 8 times-table",
+   "2/D1/the8timestable"
+  ],
+  "2/E/8": [
+   "The 2, 4 and 8 times-tables",
+   "2/D1/the24and8timestables"
+  ],
+  "2/E/9": [
+   "Divide a 2-digit number by a 1-digit number - no exchange",
+   "2/D1/dividea2digitnumberbya1digitnumbernoexchange"
+  ],
+  "2/E/10": [
+   "Divide a 2-digit number by a 1-digit number - flexible partitioning",
+   "2/D1/dividea2digitnumberbya1digitnumberflexiblepartitioning"
+  ],
+  "2/E/11": [
+   "Divide a 2-digit number by a 1-digit number - with remainders",
+   "2/D1/dividea2digitnumberbya1digitnumberwithremainders"
+  ],
+  "2/E/12": [
+   "Multiply a 2-digit number by a 1-digit number - no exchange",
+   "2/D1/multiplya2digitnumberbya1digitnumbernoexchange"
+  ],
+  "2/E/13": [
+   "Multiply a 2-digit number by a 1-digit number - with exchange",
+   "2/D1/multiplya2digitnumberbya1digitnumberwithexchange"
+  ],
+  "2/E/14": [
+   "Link multiplication and division",
+   "2/D1/linkmultiplicationanddivision"
+  ],
+  "2/E/15": [
+   "Scaling",
+   "2/D1/scaling"
+  ],
+  "2/E/16": [
+   "How many ways?",
+   "2/D1/howmanyways"
+  ],
+  "2/E/17": [
+   "Use scales",
+   "2/D4/usescales"
+  ],
+  "2/E/18": [
+   "Measure mass in grams",
+   "2/D4/measuremassingrams"
+  ],
+  "2/E/19": [
+   "Equivalent capacities and volumes (litres and millilitres)",
+   "2/D4/equivalentcapacitiesandvolumeslitresandmillilitres"
+  ],
+  "2/E/20": [
+   "Measure mass in kilograms and grams",
+   "2/D4/measuremassinkilogramsandgrams"
+  ],
+  "2/E/21": [
+   "Add and subtract capacity and volume",
+   "2/D4/addandsubtractcapacityandvolume"
+  ],
+  "2/E/22": [
+   "Equivalent masses (kilograms and grams)",
+   "2/D4/equivalentmasseskilogramsandgrams"
+  ],
+  "2/E/23": [
+   "Add and subtract mass",
+   "2/D4/addandsubtractmass"
+  ],
+  "2/E/24": [
+   "Measure capacity and volume in litres and millilitres",
+   "2/D4/measurecapacityandvolumeinlitresandmillilitres"
+  ],
+  "2/E/25": [
+   "Measure capacity and volume in millilitres",
+   "2/D4/measurecapacityandvolumeinmillilitres"
+  ],
+  "2/E/26": [
+   "Compare and order unit fractions",
+   "2/D5/compareandorderunitfractions"
+  ],
+  "2/E/27": [
+   "Compare and order non-unit fractions",
+   "2/D5/compareandordernonunitfractions"
+  ],
+  "2/E/28": [
+   "Count in fractions on a number line",
+   "2/D5/countinfractionsonanumberline"
+  ],
+  "2/E/29": [
+   "Equivalent fractions on a number line",
+   "2/D3/equivalentfractionsonanumberline"
+  ],
+  "2/E/30": [
+   "Equivalent fractions as bar models",
+   "2/D3/equivalentfractionsasbarmodels"
+  ],
+  "2/E/31": [
+   "Add fractions",
+   "2/D3/addfractions"
+  ],
+  "2/E/32": [
+   "Subtract fractions",
+   "2/D3/subtractfractions"
+  ],
+  "2/E/33": [
+   "Partition the whole",
+   "2/D3/partitionthewhole"
+  ],
+  "2/E/34": [
+   "Unit fractions of a set of objects",
+   "2/D3/unitfractionsofasetofobjects"
+  ],
+  "2/E/35": [
+   "Non-unit fractions of a set of objects",
+   "2/D3/nonunitfractionsofasetofobjects"
+  ],
+  "2/E/36": [
+   "Reasoning with fractions of an amount",
+   "2/D3/reasoningwithfractionsofanamount"
+  ],
+  "3/D1/1": [
+   "Multiplication - equal groups",
+   ""
+  ],
+  "3/D1/2": [
+   "Sharing and grouping",
+   ""
+  ],
+  "3/D1/3": [
+   "Multiples of 3",
+   "3/D1/multiplesof3"
+  ],
+  "3/D1/4": [
+   "Multiply and divide by 6",
+   "3/D1/multiplyanddivideby6"
+  ],
+  "3/D1/5": [
+   "6 times-table and division facts",
+   "3/D1/6timestableanddivisionfacts"
+  ],
+  "3/D1/6": [
+   "Multiply and divide by 9",
+   "3/D1/multiplyanddivideby9"
+  ],
+  "3/D1/7": [
+   "9 times-table and division facts",
+   "3/D1/9timestableanddivisionfacts"
+  ],
+  "3/D1/8": [
+   "The 3, 6 and 9 times-tables",
+   "3/D1/the36and9timestables"
+  ],
+  "3/D1/9": [
+   "Multiply and divide by 7",
+   "3/D1/multiplyanddivideby7"
+  ],
+  "3/D1/10": [
+   "7 times-table and division facts",
+   "3/D1/7timestableanddivisionfacts"
+  ],
+  "3/D1/11": [
+   "11 times-table and division facts",
+   "3/D1/11timestableanddivisionfacts"
+  ],
+  "3/D1/12": [
+   "12 times-table and division facts",
+   "3/D1/12timestableanddivisionfacts"
+  ],
+  "3/D1/14": [
+   "Divide a number by 1 and itself",
+   "3/D1/divideanumberby1anditself"
+  ],
+  "3/D1/15": [
+   "Multiply three numbers",
+   "3/D1/multiplythreenumbers"
+  ],
+  "3/D1/16": [
+   "Patterns on the multiplication table",
+   "3/D1/patternsonthemultiplicationtable"
+  ],
+  "3/D1/17": [
+   "Two-step word problems with the four operations",
+   "3/D1/twostepwordproblemswiththefouroperations"
+  ],
+  "3/D1/18": [
+   "Factor pairs",
+   "3/D1/factorpairs"
+  ],
+  "3/D1/19": [
+   "Use factor pairs",
+   "3/D1/usefactorpairs"
+  ],
+  "3/D1/20": [
+   "Informal written methods for multiplication",
+   "3/D1/informalwrittenmethodsformultiplication"
+  ],
+  "3/D1/21": [
+   "Divide a 2-digit number by a 1-digit number (1)",
+   "3/D1/dividea2digitnumberbya1digitnumber1"
+  ],
+  "3/D1/22": [
+   "Divide a 2-digit number by a 1-digit number (2)",
+   "3/D1/dividea2digitnumberbya1digitnumber2"
+  ],
+  "3/D1/23": [
+   "Correspondence problems",
+   "3/D1/correspondenceproblems"
+  ],
+  "3/D1/24": [
+   "Efficient multiplication",
+   "3/D1/efficientmultiplication"
+  ],
+  "3/D1/25": [
+   "Calculate with money (US: dollars & cents)",
+   "3/D4/calculatewithmoneyusdollarscents"
+  ],
+  "3/D2/1": [
+   "Partition shapes into equal areas",
+   "3/D4/partitionshapesintoequalareas"
+  ],
+  "3/D2/2": [
+   "Understand the whole",
+   "3/D3/understandthewhole"
+  ],
+  "3/D2/3": [
+   "Count beyond 1",
+   "3/D3/countbeyond1"
+  ],
+  "3/D2/4": [
+   "Partition a mixed number",
+   "3/D3/partitionamixednumber"
+  ],
+  "3/D2/5": [
+   "Number lines with mixed numbers",
+   "3/D3/numberlineswithmixednumbers"
+  ],
+  "3/D2/6": [
+   "Compare and order non-unit fractions",
+   ""
+  ],
+  "3/D2/7": [
+   "Compare and order mixed numbers",
+   "3/D3/compareandordermixednumbers"
+  ],
+  "3/D2/8": [
+   "Understand improper fractions",
+   "3/D3/understandimproperfractions"
+  ],
+  "3/D2/9": [
+   "Equivalent fractions on a number line",
+   "3/D3/equivalentfractionsonanumberline"
+  ],
+  "3/D2/10": [
+   "Fractions on a number line",
+   "3/D3/fractionsonanumberline"
+  ],
+  "3/D2/11": [
+   "Convert mixed numbers to improper fractions",
+   "3/D3/convertmixednumberstoimproperfractions"
+  ],
+  "3/D2/12": [
+   "Convert improper fractions to mixed numbers",
+   "3/D3/convertimproperfractionstomixednumbers"
+  ],
+  "3/D2/13": [
+   "Equivalent fraction families",
+   "3/D3/equivalentfractionfamilies"
+  ],
+  "3/D2/14": [
+   "Add two or more fractions",
+   "3/D3/addtwoormorefractions"
+  ],
+  "3/D2/15": [
+   "Add fractions and mixed numbers",
+   "3/D3/addfractionsandmixednumbers"
+  ],
+  "3/D2/16": [
+   "Subtract two fractions",
+   "3/D3/subtracttwofractions"
+  ],
+  "3/D2/17": [
+   "Subtract from whole amounts",
+   "3/D3/subtractfromwholeamounts"
+  ],
+  "3/D2/18": [
+   "Subtract from mixed numbers",
+   "3/D3/subtractfrommixednumbers"
+  ],
+  "3/D3/1": [
+   "Represent numbers to 1,000",
+   "3/D2/representnumbersto1000"
+  ],
+  "3/D3/2": [
+   "Partition numbers to 1,000",
+   "3/D2/partitionnumbersto1000"
+  ],
+  "3/D3/3": [
+   "Find 1, 10, 100, 1,000 more or less",
+   "3/D2/find1101001000moreorless"
+  ],
+  "3/D3/4": [
+   "Roman numerals",
+   "3/D2/romannumerals"
+  ],
+  "3/D3/5": [
+   "Number line to 10,000",
+   "3/D2/numberlineto10000"
+  ],
+  "3/D3/6": [
+   "Round to the nearest 10",
+   "3/D2/roundtothenearest10"
+  ],
+  "3/D3/7": [
+   "Estimate on a number line to 10,000",
+   "3/D2/estimateonanumberlineto10000"
+  ],
+  "3/D3/8": [
+   "Round to the nearest 100",
+   "3/D2/roundtothenearest100"
+  ],
+  "3/D3/9": [
+   "Round to the nearest 1,000",
+   "3/D2/roundtothenearest1000"
+  ],
+  "3/D3/10": [
+   "Round to the nearest 10, 100 or 1,000",
+   "3/D2/roundtothenearest10100or1000"
+  ],
+  "3/D3/11": [
+   "Add and subtract 1s, 10s, 100s and 1,000s",
+   "3/D2/addandsubtract1s10s100sand1000s"
+  ],
+  "3/D3/12": [
+   "Add up to two 4-digit numbers - no exchange",
+   "3/D2/adduptotwo4digitnumbersnoexchange"
+  ],
+  "3/D3/13": [
+   "Add two 4-digit numbers - one exchange",
+   "3/D2/addtwo4digitnumbersoneexchange"
+  ],
+  "3/D3/14": [
+   "Add two 4-digit numbers - more than one exchange",
+   "3/D2/addtwo4digitnumbersmorethanoneexchange"
+  ],
+  "3/D3/15": [
+   "Subtract two 4-digit numbers - no exchange",
+   "3/D2/subtracttwo4digitnumbersnoexchange"
+  ],
+  "3/D3/16": [
+   "Subtract two 4-digit numbers - one exchange",
+   "3/D2/subtracttwo4digitnumbersoneexchange"
+  ],
+  "3/D3/17": [
+   "Subtract two 4-digit numbers - more than one exchange",
+   "3/D2/subtracttwo4digitnumbersmorethanoneexchange"
+  ],
+  "3/D3/18": [
+   "Efficient subtraction",
+   "3/D2/efficientsubtraction"
+  ],
+  "3/D3/19": [
+   "Estimate answers",
+   "3/D2/estimateanswers"
+  ],
+  "3/D3/20": [
+   "Checking strategies",
+   "3/D2/checkingstrategies"
+  ],
+  "3/D3/21": [
+   "Multiply by 10",
+   "3/D1/multiplyby10"
+  ],
+  "3/D3/22": [
+   "Multiply by 100",
+   "3/D1/multiplyby100"
+  ],
+  "3/D3/23": [
+   "Related facts - multiplication and division",
+   "3/D1/relatedfactsmultiplicationanddivision"
+  ],
+  "3/D3/24": [
+   "Multiply a 2-digit number by a 1-digit number",
+   "3/D1/multiplya2digitnumberbya1digitnumber"
+  ],
+  "3/D3/25": [
+   "Estimate with money (US: dollars & cents)",
+   "3/D4/estimatewithmoneyusdollarscents"
+  ],
+  "3/D4/1": [
+   "Number line to 1,000",
+   "3/D2/numberlineto1000"
+  ],
+  "3/D4/2": [
+   "Count squares",
+   "3/D4/countsquares"
+  ],
+  "3/D4/3": [
+   "Make shapes",
+   "3/D4/makeshapes"
+  ],
+  "3/D4/4": [
+   "What is area?",
+   "3/D4/whatisarea"
+  ],
+  "3/D4/5": [
+   "Compare areas",
+   "3/D4/compareareas"
+  ],
+  "3/D4/6": [
+   "Area as multiplication",
+   "3/D4/areaasmultiplication"
+  ],
+  "3/D4/7": [
+   "Distributive and additive area",
+   "3/D4/distributiveandadditivearea"
+  ],
+  "3/D4/8": [
+   "Perimeter on a grid",
+   "3/D4/perimeteronagrid"
+  ],
+  "3/D4/9": [
+   "Perimeter of a rectangle",
+   "3/D4/perimeterofarectangle"
+  ],
+  "3/D4/10": [
+   "Perimeter of rectilinear shapes",
+   "3/D4/perimeterofrectilinearshapes"
+  ],
+  "3/D4/11": [
+   "Find missing lengths in rectilinear shapes",
+   "3/D4/findmissinglengthsinrectilinearshapes"
+  ],
+  "3/D4/12": [
+   "Calculate the perimeter of rectilinear shapes",
+   "3/D4/calculatetheperimeterofrectilinearshapes"
+  ],
+  "3/D4/13": [
+   "Perimeter of regular polygons",
+   "3/D4/perimeterofregularpolygons"
+  ],
+  "3/D4/14": [
+   "Perimeter of polygons",
+   "3/D4/perimeterofpolygons"
+  ],
+  "3/D4/15": [
+   "Measure and estimate mass and liquid volume (g, kg, ml, l)",
+   "3/D4/measureandestimatemassandliquidvolumegkgmll"
+  ],
+  "3/D4/17": [
+   "Convert between pounds and pence",
+   "3/D4/convertbetweenpoundsandpence"
+  ],
+  "3/D4/19": [
+   "Years, months, weeks and days",
+   "3/D4/yearsmonthsweeksanddays"
+  ],
+  "3/D4/20": [
+   "Pounds, tens, ones and pence (US: dollars & cents)",
+   "3/D4/poundstensonesandpenceusdollarscents"
+  ],
+  "3/D4/22": [
+   "Convert between analogue and digital times",
+   "3/D4/convertbetweenanalogueanddigitaltimes"
+  ],
+  "3/D4/23": [
+   "Convert to the 24 hour clock",
+   "3/D4/converttothe24hourclock"
+  ],
+  "3/D4/24": [
+   "Convert from the 24 hour clock",
+   "3/D4/convertfromthe24hourclock"
+  ],
+  "3/D4/25": [
+   "Solve problems with time",
+   "3/D4/solveproblemswithtime"
+  ],
+  "3/D4/26": [
+   "Interpret charts",
+   "3/D4/interpretcharts"
+  ],
+  "3/D4/27": [
+   "Comparison, sum and difference",
+   "3/D4/comparisonsumanddifference"
+  ],
+  "3/D4/28": [
+   "Draw bar charts",
+   "3/D4/drawbarcharts"
+  ],
+  "3/D4/29": [
+   "Draw pictograms",
+   "3/D4/drawpictograms"
+  ],
+  "3/D4/30": [
+   "Interpret pictograms",
+   "3/D4/interpretpictograms"
+  ],
+  "3/D4/31": [
+   "Measure to the half and quarter inch",
+   "3/D4/measuretothehalfandquarterinch"
+  ],
+  "3/D4/32": [
+   "Build a line plot from inch measurements",
+   "3/D4/buildalineplotfrominchmeasurements"
+  ],
+  "3/D5/1": [
+   "Polygons",
+   "3/D5/polygons"
+  ],
+  "3/D5/6": [
+   "Lines of symmetry",
+   "3/D5/linesofsymmetry"
+  ],
+  "3/D5/7": [
+   "Complete a symmetric figure",
+   "3/D5/completeasymmetricfigure"
+  ],
+  "3/D5/8": [
+   "Draw 2-D shapes on a grid",
+   "3/D5/draw2dshapesonagrid"
+  ],
+  "3/E/1": [
+   "Tenths as fractions",
+   "3/D3/tenthsasfractions"
+  ],
+  "3/E/2": [
+   "Tenths as decimals",
+   "3/D3/tenthsasdecimals"
+  ],
+  "3/E/3": [
+   "Tenths on a place value chart",
+   "3/D3/tenthsonaplacevaluechart"
+  ],
+  "3/E/4": [
+   "Tenths on a number line",
+   "3/D3/tenthsonanumberline"
+  ],
+  "3/E/5": [
+   "Divide a 1-digit number by 10",
+   "3/D3/dividea1digitnumberby10"
+  ],
+  "3/E/6": [
+   "Divide a 2-digit number by 10",
+   "3/D3/dividea2digitnumberby10"
+  ],
+  "3/E/7": [
+   "Hundredths as fractions",
+   "3/D3/hundredthsasfractions"
+  ],
+  "3/E/8": [
+   "Hundredths as decimals",
+   "3/D3/hundredthsasdecimals"
+  ],
+  "3/E/9": [
+   "Hundredths on a place value chart",
+   "3/D3/hundredthsonaplacevaluechart"
+  ],
+  "3/E/10": [
+   "Make a whole with tenths",
+   "3/D3/makeawholewithtenths"
+  ],
+  "3/E/11": [
+   "Divide a 1- or 2-digit number by 100",
+   "3/D3/dividea1or2digitnumberby100"
+  ],
+  "3/E/12": [
+   "Make a whole with hundredths",
+   "3/D3/makeawholewithhundredths"
+  ],
+  "3/E/13": [
+   "Partition decimals",
+   "3/D3/partitiondecimals"
+  ],
+  "3/E/14": [
+   "Compare decimals",
+   "3/D3/comparedecimals"
+  ],
+  "3/E/15": [
+   "Order decimals",
+   "3/D3/orderdecimals"
+  ],
+  "3/E/16": [
+   "Flexibly partition decimals",
+   "3/D3/flexiblypartitiondecimals"
+  ],
+  "3/E/17": [
+   "Halves and quarters as decimals",
+   "3/D3/halvesandquartersasdecimals"
+  ],
+  "3/E/18": [
+   "Round to the nearest whole number",
+   "3/D3/roundtothenearestwholenumber"
+  ],
+  "3/E/19": [
+   "Thousands",
+   "3/D2/thousands"
+  ],
+  "3/E/20": [
+   "Represent numbers to 10,000",
+   "3/D2/representnumbersto10000"
+  ],
+  "3/E/21": [
+   "Partition numbers to 10,000",
+   "3/D2/partitionnumbersto10000"
+  ],
+  "3/E/22": [
+   "Flexible partitioning of numbers to 10,000",
+   "3/D2/flexiblepartitioningofnumbersto10000"
+  ],
+  "3/E/23": [
+   "Compare numbers to 10,000",
+   "3/D2/comparenumbersto10000"
+  ],
+  "3/E/24": [
+   "Order numbers to 10,000",
+   "3/D2/ordernumbersto10000"
+  ],
+  "3/E/25": [
+   "Divide by 10",
+   "3/D1/divideby10"
+  ],
+  "3/E/26": [
+   "Divide by 100",
+   "3/D1/divideby100"
+  ],
+  "3/E/27": [
+   "Multiply a 3-digit number by a 1-digit number",
+   "3/D1/multiplya3digitnumberbya1digitnumber"
+  ],
+  "3/E/28": [
+   "Divide a 3-digit number by a 1-digit number",
+   "3/D1/dividea3digitnumberbya1digitnumber"
+  ],
+  "3/E/29": [
+   "Measure in kilometres and metres",
+   "3/D4/measureinkilometresandmetres"
+  ],
+  "3/E/30": [
+   "Equivalent lengths (kilometres and metres)",
+   "3/D4/equivalentlengthskilometresandmetres"
+  ],
+  "3/E/31": [
+   "Write money using decimals",
+   "3/D4/writemoneyusingdecimals"
+  ],
+  "3/E/32": [
+   "Understand angles as turns",
+   "3/D5/understandanglesasturns"
+  ],
+  "3/E/33": [
+   "Interpret line graphs",
+   "3/D4/interpretlinegraphs"
+  ],
+  "3/E/34": [
+   "Draw line graphs",
+   "3/D4/drawlinegraphs"
+  ],
+  "3/E/35": [
+   "Describe position using coordinates",
+   "3/D5/describepositionusingcoordinates"
+  ],
+  "3/E/36": [
+   "Plot coordinates",
+   "3/D5/plotcoordinates"
+  ],
+  "3/E/37": [
+   "Translate on a grid",
+   "3/D5/translateonagrid"
+  ],
+  "3/E/38": [
+   "Describe translation on a grid",
+   "3/D5/describetranslationonagrid"
+  ],
+  "3/E/39": [
+   "Negative numbers",
+   "3/D2/negativenumbers"
+  ],
+  "4/D1/1": [
+   "Roman numerals to 1,000",
+   "4/D2/romannumeralsto1000"
+  ],
+  "4/D1/2": [
+   "Find missing numbers",
+   "4/D2/findmissingnumbers"
+  ],
+  "4/D1/3": [
+   "Multiples",
+   "4/D1/multiples"
+  ],
+  "4/D1/4": [
+   "Common multiples",
+   "4/D1/commonmultiples"
+  ],
+  "4/D1/5": [
+   "Factors",
+   "4/D1/factors"
+  ],
+  "4/D1/6": [
+   "Common factors",
+   "4/D1/commonfactors"
+  ],
+  "4/D1/7": [
+   "Prime numbers",
+   "4/D1/primenumbers"
+  ],
+  "4/D1/9": [
+   "Find emergent features (e.g., units digit cycle)",
+   "4/D1/findemergentfeaturesegunitsdigitcycle"
+  ],
+  "4/D1/10": [
+   "Follow a given rule to extend a number pattern",
+   "4/D1/followagivenruletoextendanumberpattern"
+  ],
+  "4/D1/11": [
+   "Extend growing shape patterns",
+   "4/D1/extendgrowingshapepatterns"
+  ],
+  "4/D1/12": [
+   "Multiplicative comparison: times as many",
+   "4/D1/multiplicativecomparisontimesasmany"
+  ],
+  "4/D1/13": [
+   "Solve problems with multiplication",
+   "4/D2/solveproblemswithmultiplication"
+  ],
+  "4/D1/14": [
+   "Solve problems with multiplication and division",
+   "4/D2/solveproblemswithmultiplicationanddivision"
+  ],
+  "4/D1/15": [
+   "Multi-step word problems: divide and interpret the remainder",
+   "4/D1/multistepwordproblemsdivideandinterprettheremainder"
+  ],
+  "4/D1/16": [
+   "Read and interpret tables",
+   "4/D4/readandinterprettables"
+  ],
+  "4/D1/17": [
+   "Two-way tables",
+   "4/D4/twowaytables"
+  ],
+  "4/D1/18": [
+   "Decimal sequences",
+   "4/D2/decimalsequences"
+  ],
+  "4/D2/1": [
+   "Numbers to 10,000",
+   "4/D2/numbersto10000"
+  ],
+  "4/D2/2": [
+   "Numbers to 100,000",
+   "4/D2/numbersto100000"
+  ],
+  "4/D2/3": [
+   "Round to the nearest 10, 100 or 1,000",
+   "4/D2/roundtothenearest10100or1000"
+  ],
+  "4/D2/12": [
+   "Round within 100,000",
+   "4/D2/roundwithin100000"
+  ],
+  "4/D2/13": [
+   "Round within 1,000,000",
+   "4/D2/roundwithin1000000"
+  ],
+  "4/D2/14": [
+   "Mental strategies",
+   "4/D2/mentalstrategies"
+  ],
+  "4/D2/15": [
+   "Add whole numbers with more than four digits",
+   "4/D2/addwholenumberswithmorethanfourdigits"
+  ],
+  "4/D2/16": [
+   "Subtract whole numbers with more than four digits",
+   "4/D2/subtractwholenumberswithmorethanfourdigits"
+  ],
+  "4/D2/17": [
+   "Round to check answers",
+   "4/D2/roundtocheckanswers"
+  ],
+  "4/D2/18": [
+   "Inverse operations (addition and subtraction)",
+   "4/D2/inverseoperationsadditionandsubtraction"
+  ],
+  "4/D2/19": [
+   "Multi-step addition and subtraction problems",
+   "4/D2/multistepadditionandsubtractionproblems"
+  ],
+  "4/D2/20": [
+   "Compare calculations",
+   "4/D2/comparecalculations"
+  ],
+  "4/D2/21": [
+   "Place value: 10 times and one tenth of a digit's value",
+   "4/D2/placevalue10timesandonetenthofadigitsvalue"
+  ],
+  "4/D2/22": [
+   "Multiply by 10, 100 and 1,000",
+   "4/D2/multiplyby10100and1000"
+  ],
+  "4/D2/23": [
+   "Divide by 10, 100 and 1,000",
+   "4/D2/divideby10100and1000"
+  ],
+  "4/D2/25": [
+   "Multiply a 2-digit number by a 2-digit number (area model)",
+   "4/D2/multiplya2digitnumberbya2digitnumberareamodel"
+  ],
+  "4/D2/26": [
+   "Multiply a 2-digit number by a 2-digit number",
+   "4/D2/multiplya2digitnumberbya2digitnumber"
+  ],
+  "4/D2/27": [
+   "Short division",
+   "4/D2/shortdivision"
+  ],
+  "4/D2/28": [
+   "Divide a 4-digit number by a 1-digit number",
+   "4/D2/dividea4digitnumberbya1digitnumber"
+  ],
+  "4/D2/29": [
+   "Divide with remainders",
+   "4/D2/dividewithremainders"
+  ],
+  "4/D2/30": [
+   "Efficient division",
+   "4/D2/efficientdivision"
+  ],
+  "4/D2/31": [
+   "Thousandths as decimals",
+   "4/D3/thousandthsasdecimals"
+  ],
+  "4/D2/32": [
+   "Thousandths on a place value chart",
+   "4/D3/thousandthsonaplacevaluechart"
+  ],
+  "4/D2/33": [
+   "Use known facts to add and subtract decimals within 1",
+   "4/D2/useknownfactstoaddandsubtractdecimalswithin1"
+  ],
+  "4/D2/34": [
+   "Add and subtract decimals across 1",
+   "4/D2/addandsubtractdecimalsacross1"
+  ],
+  "4/D2/35": [
+   "Add decimals with the same number of decimal places",
+   "4/D2/adddecimalswiththesamenumberofdecimalplaces"
+  ],
+  "4/D2/36": [
+   "Subtract decimals with the same number of decimal places",
+   "4/D2/subtractdecimalswiththesamenumberofdecimalplaces"
+  ],
+  "4/D2/37": [
+   "Add decimals with different numbers of decimal places",
+   "4/D2/adddecimalswithdifferentnumbersofdecimalplaces"
+  ],
+  "4/D2/38": [
+   "Subtract decimals with different numbers of decimal places",
+   "4/D2/subtractdecimalswithdifferentnumbersofdecimalplaces"
+  ],
+  "4/D2/39": [
+   "Efficient strategies for adding and subtracting decimals",
+   "4/D2/efficientstrategiesforaddingandsubtractingdecimals"
+  ],
+  "4/D3/1": [
+   "Find fractions equivalent to a unit fraction",
+   "4/D3/findfractionsequivalenttoaunitfraction"
+  ],
+  "4/D3/2": [
+   "Find fractions equivalent to a non-unit fraction",
+   "4/D3/findfractionsequivalenttoanonunitfraction"
+  ],
+  "4/D3/3": [
+   "Recognise equivalent fractions",
+   "4/D3/recogniseequivalentfractions"
+  ],
+  "4/D3/5": [
+   "Add two or more fractions",
+   "4/D3/addtwoormorefractions"
+  ],
+  "4/D3/6": [
+   "Subtract two mixed numbers",
+   "4/D3/subtracttwomixednumbers"
+  ],
+  "4/D3/7": [
+   "Convert mixed numbers to improper fractions",
+   "4/D3/convertmixednumberstoimproperfractions"
+  ],
+  "4/D3/8": [
+   "Compare fractions less than 1",
+   "4/D3/comparefractionslessthan1"
+  ],
+  "4/D3/9": [
+   "Order fractions less than 1",
+   "4/D3/orderfractionslessthan1"
+  ],
+  "4/D3/10": [
+   "Compare and order fractions greater than 1",
+   "4/D3/compareandorderfractionsgreaterthan1"
+  ],
+  "4/D3/11": [
+   "Add and subtract fractions with the same denominator",
+   "4/D3/addandsubtractfractionswiththesamedenominator"
+  ],
+  "4/D3/12": [
+   "Add fractions within 1",
+   "4/D3/addfractionswithin1"
+  ],
+  "4/D3/13": [
+   "Add fractions with total greater than 1",
+   "4/D3/addfractionswithtotalgreaterthan1"
+  ],
+  "4/D3/14": [
+   "Add to a mixed number",
+   "4/D3/addtoamixednumber"
+  ],
+  "4/D3/15": [
+   "Add two mixed numbers",
+   "4/D3/addtwomixednumbers"
+  ],
+  "4/D3/16": [
+   "Subtract fractions",
+   "4/D3/subtractfractions"
+  ],
+  "4/D3/31": [
+   "Order and compare decimals (same number of decimal places)",
+   "4/D3/orderandcomparedecimalssamenumberofdecimalplaces"
+  ],
+  "4/D3/32": [
+   "Order and compare any decimals with up to 3 decimal places",
+   "4/D3/orderandcompareanydecimalswithupto3decimalplaces"
+  ],
+  "4/D3/33": [
+   "Understand percentages",
+   "4/D3/understandpercentages"
+  ],
+  "4/D3/34": [
+   "Percentages as fractions",
+   "4/D3/percentagesasfractions"
+  ],
+  "4/D3/35": [
+   "Percentages as decimals",
+   "4/D3/percentagesasdecimals"
+  ],
+  "4/D3/36": [
+   "Equivalent fractions, decimals and percentages",
+   "4/D3/equivalentfractionsdecimalsandpercentages"
+  ],
+  "4/D4/1": [
+   "Points, lines, line segments and rays",
+   "4/D5/pointslineslinesegmentsandrays"
+  ],
+  "4/D4/2": [
+   "Classify angles",
+   "4/D5/classifyangles"
+  ],
+  "4/D4/3": [
+   "Understand and use degrees",
+   "4/D5/understandandusedegrees"
+  ],
+  "4/D4/4": [
+   "Measure angles up to 180°",
+   "4/D5/measureanglesupto180"
+  ],
+  "4/D4/5": [
+   "Draw lines and angles accurately",
+   "4/D5/drawlinesandanglesaccurately"
+  ],
+  "4/D4/6": [
+   "Parallel and perpendicular",
+   ""
+  ],
+  "4/D4/7": [
+   "Lengths and angles in shapes",
+   "4/D5/lengthsandanglesinshapes"
+  ],
+  "4/D4/8": [
+   "Triangles",
+   ""
+  ],
+  "4/D4/9": [
+   "3D shapes",
+   "4/D5/3dshapes"
+  ],
+  "4/D4/10": [
+   "Regular and irregular polygons",
+   "4/D5/regularandirregularpolygons"
+  ],
+  "4/D4/11": [
+   "Read and plot coordinates",
+   "4/D5/readandplotcoordinates"
+  ],
+  "4/D4/12": [
+   "Problem solving with coordinates",
+   "4/D5/problemsolvingwithcoordinates"
+  ],
+  "4/D4/13": [
+   "Translation",
+   "4/D5/translation"
+  ],
+  "4/D4/14": [
+   "Translation with coordinates",
+   "4/D5/translationwithcoordinates"
+  ],
+  "4/D4/15": [
+   "Lines of symmetry",
+   "4/D5/linesofsymmetry"
+  ],
+  "4/D4/16": [
+   "Reflection in horizontal and vertical lines",
+   "4/D5/reflectioninhorizontalandverticallines"
+  ],
+  "4/D5/1": [
+   "Perimeter of rectangles",
+   "4/D4/perimeterofrectangles"
+  ],
+  "4/D5/2": [
+   "Area of rectangles",
+   "4/D4/areaofrectangles"
+  ],
+  "4/D5/3": [
+   "Perimeter of rectilinear shapes",
+   "4/D4/perimeterofrectilinearshapes"
+  ],
+  "4/D5/4": [
+   "Perimeter of polygons",
+   "4/D4/perimeterofpolygons"
+  ],
+  "4/D5/5": [
+   "Area of compound shapes",
+   "4/D4/areaofcompoundshapes"
+  ],
+  "4/D5/6": [
+   "Read and interpret timetables",
+   "4/D4/readandinterprettimetables"
+  ],
+  "4/D5/7": [
+   "Understand angles as turns",
+   ""
+  ],
+  "4/D5/8": [
+   "Estimate area",
+   "4/D4/estimatearea"
+  ],
+  "4/D5/9": [
+   "Identify angles",
+   ""
+  ],
+  "4/D5/10": [
+   "Line plots with fractions",
+   "4/D4/lineplotswithfractions"
+  ],
+  "4/D5/11": [
+   "Estimate angles",
+   "4/D5/estimateangles"
+  ],
+  "4/D5/12": [
+   "Calculate angles around a point",
+   "4/D5/calculateanglesaroundapoint"
+  ],
+  "4/D5/13": [
+   "Calculate angles on a straight line",
+   "4/D5/calculateanglesonastraightline"
+  ],
+  "4/D5/14": [
+   "Kilograms and kilometres",
+   "4/D4/kilogramsandkilometres"
+  ],
+  "4/D5/15": [
+   "Millimetres and millilitres",
+   "4/D4/millimetresandmillilitres"
+  ],
+  "4/D5/16": [
+   "Convert units of length",
+   "4/D4/convertunitsoflength"
+  ],
+  "4/D5/17": [
+   "Convert between metric and imperial units",
+   "4/D4/convertbetweenmetricandimperialunits"
+  ],
+  "4/D5/18": [
+   "Convert units of time",
+   "4/D4/convertunitsoftime"
+  ],
+  "4/D5/19": [
+   "Customary capacity: cups, pints, quarts and gallons",
+   "4/D4/customarycapacitycupspintsquartsandgallons"
+  ],
+  "4/D5/20": [
+   "Customary length and weight - inches, feet, yards, ounces and pounds",
+   "4/D4/customarylengthandweightinchesfeetyardsouncesandpounds"
+  ],
+  "4/D5/21": [
+   "Measurement word problems: distance, time, mass, money and capacity",
+   "4/D4/measurementwordproblemsdistancetimemassmoneyandcapacity"
+  ],
+  "4/D5/22": [
+   "Calculate with timetables",
+   "4/D4/calculatewithtimetables"
+  ],
+  "4/D5/23": [
+   "Metric measures",
+   "4/D4/metricmeasures"
+  ],
+  "4/D5/24": [
+   "Estimate capacity",
+   "4/D4/estimatecapacity"
+  ],
+  "4/E/1": [
+   "Multiply a 3-digit number by a 2-digit number",
+   "4/D2/multiplya3digitnumberbya2digitnumber"
+  ],
+  "4/E/2": [
+   "Multiply a 4-digit number by a 2-digit number",
+   "4/D2/multiplya4digitnumberbya2digitnumber"
+  ],
+  "4/E/3": [
+   "Round to the nearest whole number",
+   "4/D3/roundtothenearestwholenumber"
+  ],
+  "4/E/4": [
+   "Round to 1 decimal place",
+   "4/D3/roundto1decimalplace"
+  ],
+  "4/E/5": [
+   "Complements to 1",
+   "4/D2/complementsto1"
+  ],
+  "4/E/6": [
+   "Multiply and divide decimals - missing values",
+   "4/D2/multiplyanddividedecimalsmissingvalues"
+  ],
+  "4/E/7": [
+   "Draw line graphs",
+   "4/D4/drawlinegraphs"
+  ],
+  "4/E/8": [
+   "Read and interpret line graphs",
+   "4/D4/readandinterpretlinegraphs"
+  ],
+  "4/E/9": [
+   "Cubic centimetres",
+   "4/D4/cubiccentimetres"
+  ],
+  "4/E/10": [
+   "Compare volume",
+   "4/D4/comparevolume"
+  ],
+  "4/E/11": [
+   "Estimate volume",
+   "4/D4/estimatevolume"
+  ],
+  "4/E/12": [
+   "Negative numbers",
+   "4/D2/negativenumbers"
+  ],
+  "4/E/13": [
+   "Square numbers",
+   "4/D1/squarenumbers"
+  ],
+  "4/E/14": [
+   "Cube numbers",
+   "4/D1/cubenumbers"
+  ],
+  "4/E/15": [
+   "Understand negative numbers",
+   "4/D2/understandnegativenumbers"
+  ],
+  "4/E/16": [
+   "Count through zero in 1s",
+   "4/D2/countthroughzeroin1s"
+  ],
+  "4/E/17": [
+   "Count through zero in multiples",
+   "4/D2/countthroughzeroinmultiples"
+  ],
+  "4/E/18": [
+   "Compare and order negative numbers",
+   "4/D2/compareandordernegativenumbers"
+  ],
+  "4/E/19": [
+   "Find the difference",
+   "4/D2/findthedifference"
+  ],
+  "5/D1/1": [
+   "Numbers to 1,000,000",
+   "5/D2/numbersto1000000"
+  ],
+  "5/D1/2": [
+   "Numbers to 10,000,000",
+   "5/D2/numbersto10000000"
+  ],
+  "5/D1/3": [
+   "Read and write numbers to 10,000,000",
+   "5/D2/readandwritenumbersto10000000"
+  ],
+  "5/D1/4": [
+   "Powers of 10",
+   "5/D2/powersof10"
+  ],
+  "5/D1/5": [
+   "Number line to 10,000,000",
+   "5/D2/numberlineto10000000"
+  ],
+  "5/D1/6": [
+   "Compare and order any integers",
+   "5/D2/compareandorderanyintegers"
+  ],
+  "5/D1/7": [
+   "Round any integer",
+   "5/D2/roundanyinteger"
+  ],
+  "5/D1/8": [
+   "Add and subtract integers",
+   "5/D2/addandsubtractintegers"
+  ],
+  "5/D1/9": [
+   "Multiply up to a 4-digit number by a 2-digit number",
+   "5/D2/multiplyuptoa4digitnumberbya2digitnumber"
+  ],
+  "5/D1/10": [
+   "Solve problems with multiplication",
+   "5/D2/solveproblemswithmultiplication"
+  ],
+  "5/D1/11": [
+   "Short division",
+   "5/D2/shortdivision"
+  ],
+  "5/D1/12": [
+   "Division using factors",
+   "5/D2/divisionusingfactors"
+  ],
+  "5/D1/13": [
+   "Multiply up to a 4-digit number by a 1-digit number",
+   "5/D2/multiplyuptoa4digitnumberbya1digitnumber"
+  ],
+  "5/D1/14": [
+   "Introduction to long division",
+   "5/D2/introductiontolongdivision"
+  ],
+  "5/D1/15": [
+   "Long division with remainders",
+   "5/D2/longdivisionwithremainders"
+  ],
+  "5/D1/16": [
+   "Solve problems with division",
+   "5/D2/solveproblemswithdivision"
+  ],
+  "5/D1/17": [
+   "Reason from known facts",
+   "5/D2/reasonfromknownfacts"
+  ],
+  "5/D1/18": [
+   "Place value within 1",
+   "5/D2/placevaluewithin1"
+  ],
+  "5/D1/19": [
+   "Place value - integers and decimals",
+   "5/D2/placevalueintegersanddecimals"
+  ],
+  "5/D1/20": [
+   "Order and compare any decimals with up to 3 decimal places",
+   ""
+  ],
+  "5/D1/21": [
+   "Round decimals",
+   "5/D2/rounddecimals"
+  ],
+  "5/D1/22": [
+   "Add and subtract decimals",
+   "5/D2/addandsubtractdecimals"
+  ],
+  "5/D1/23": [
+   "Multiply by 10, 100 and 1,000",
+   "5/D2/multiplyby10100and1000"
+  ],
+  "5/D1/24": [
+   "Divide by 10, 100 and 1,000",
+   "5/D2/divideby10100and1000"
+  ],
+  "5/D1/25": [
+   "Multiply decimals by integers",
+   "5/D2/multiplydecimalsbyintegers"
+  ],
+  "5/D1/26": [
+   "Multiply decimals by decimals",
+   "5/D2/multiplydecimalsbydecimals"
+  ],
+  "5/D1/27": [
+   "Divide decimals by integers",
+   "5/D2/dividedecimalsbyintegers"
+  ],
+  "5/D1/28": [
+   "Divide by a decimal",
+   "5/D2/dividebyadecimal"
+  ],
+  "5/D1/29": [
+   "Multiply and divide decimals in context",
+   "5/D2/multiplyanddividedecimalsincontext"
+  ],
+  "5/D2/1": [
+   "Common factors",
+   "5/D2/commonfactors"
+  ],
+  "5/D2/2": [
+   "Factors",
+   "5/D2/factors"
+  ],
+  "5/D2/3": [
+   "Common multiples",
+   "5/D2/commonmultiples"
+  ],
+  "5/D2/4": [
+   "Mental calculations and estimation",
+   "5/D2/mentalcalculationsandestimation"
+  ],
+  "5/D2/5": [
+   "Rules of divisibility",
+   "5/D2/rulesofdivisibility"
+  ],
+  "5/D2/6": [
+   "Primes to 100",
+   "5/D2/primesto100"
+  ],
+  "5/D2/7": [
+   "Solve multi-step problems",
+   "5/D2/solvemultistepproblems"
+  ],
+  "5/D2/8": [
+   "Order of operations",
+   "5/D2/orderofoperations"
+  ],
+  "5/D2/9": [
+   "Form expressions",
+   "5/D1/formexpressions"
+  ],
+  "5/D2/10": [
+   "1-step function machines",
+   "5/D1/1stepfunctionmachines"
+  ],
+  "5/D2/11": [
+   "2-step function machines",
+   "5/D1/2stepfunctionmachines"
+  ],
+  "5/D2/12": [
+   "Formulae",
+   "5/D1/formulae"
+  ],
+  "5/D2/13": [
+   "Solve 2-step equations",
+   "5/D1/solve2stepequations"
+  ],
+  "5/D2/14": [
+   "Find pairs of values",
+   "5/D1/findpairsofvalues"
+  ],
+  "5/D2/15": [
+   "Solve problems with two unknowns",
+   "5/D1/solveproblemswithtwounknowns"
+  ],
+  "5/D2/16": [
+   "The first quadrant",
+   "5/D5/thefirstquadrant"
+  ],
+  "5/D2/17": [
+   "Form ordered pairs from corresponding terms",
+   "5/D1/formorderedpairsfromcorrespondingterms"
+  ],
+  "5/D2/18": [
+   "Generate two sequences using two different rules",
+   "5/D1/generatetwosequencesusingtwodifferentrules"
+  ],
+  "5/D3/5": [
+   "Add and subtract simple fractions",
+   "5/D3/addandsubtractsimplefractions"
+  ],
+  "5/D3/6": [
+   "Add and subtract any two fractions",
+   "5/D3/addandsubtractanytwofractions"
+  ],
+  "5/D3/7": [
+   "Add mixed numbers",
+   "5/D3/addmixednumbers"
+  ],
+  "5/D3/8": [
+   "Subtract mixed numbers",
+   "5/D3/subtractmixednumbers"
+  ],
+  "5/D3/10": [
+   "Multiplication as scaling",
+   "5/D3/multiplicationasscaling"
+  ],
+  "5/D3/11": [
+   "Multiply fractions by integers",
+   "5/D3/multiplyfractionsbyintegers"
+  ],
+  "5/D3/12": [
+   "Multiply fractions by fractions",
+   "5/D3/multiplyfractionsbyfractions"
+  ],
+  "5/D3/13": [
+   "Divide a fraction by an integer",
+   "5/D3/divideafractionbyaninteger"
+  ],
+  "5/D3/14": [
+   "Divide any fraction by an integer",
+   "5/D3/divideanyfractionbyaninteger"
+  ],
+  "5/D3/15": [
+   "Mixed questions with fractions",
+   "5/D3/mixedquestionswithfractions"
+  ],
+  "5/D3/16": [
+   "Fraction of an amount",
+   "5/D3/fractionofanamount"
+  ],
+  "5/D3/17": [
+   "Fraction of an amount - find the whole",
+   "5/D3/fractionofanamountfindthewhole"
+  ],
+  "5/D3/18": [
+   "Divide a whole number by a unit fraction",
+   "5/D3/divideawholenumberbyaunitfraction"
+  ],
+  "5/D3/19": [
+   "Add or multiply?",
+   "5/D1/addormultiply"
+  ],
+  "5/D3/20": [
+   "Use scale factors",
+   "5/D1/usescalefactors"
+  ],
+  "5/D3/21": [
+   "Decimal and fraction equivalents",
+   "5/D3/decimalandfractionequivalents"
+  ],
+  "5/D3/22": [
+   "Fractions as division",
+   "5/D3/fractionsasdivision"
+  ],
+  "5/D3/23": [
+   "Equivalent fractions, decimals and percentages",
+   "5/D3/equivalentfractionsdecimalsandpercentages"
+  ],
+  "5/D3/24": [
+   "Order fractions, decimals and percentages",
+   "5/D3/orderfractionsdecimalsandpercentages"
+  ],
+  "5/D4/1": [
+   "Metric measures",
+   "5/D4/metricmeasures"
+  ],
+  "5/D4/2": [
+   "Convert metric measures",
+   "5/D4/convertmetricmeasures"
+  ],
+  "5/D4/6": [
+   "Shapes - same area",
+   "5/D4/shapessamearea"
+  ],
+  "5/D4/7": [
+   "Area and perimeter",
+   "5/D4/areaandperimeter"
+  ],
+  "5/D4/8": [
+   "Area of a triangle (counting squares)",
+   "5/D4/areaofatrianglecountingsquares"
+  ],
+  "5/D4/9": [
+   "Area of a right-angled triangle",
+   "5/D4/areaofarightangledtriangle"
+  ],
+  "5/D4/10": [
+   "Area of any triangle",
+   "5/D4/areaofanytriangle"
+  ],
+  "5/D4/11": [
+   "Area of a parallelogram",
+   "5/D4/areaofaparallelogram"
+  ],
+  "5/D4/12": [
+   "Cubic centimetres",
+   ""
+  ],
+  "5/D4/13": [
+   "Volume - counting cubes",
+   "5/D4/volumecountingcubes"
+  ],
+  "5/D4/14": [
+   "Volume of a cuboid",
+   "5/D4/volumeofacuboid"
+  ],
+  "5/D4/15": [
+   "Volume of composite solids",
+   "5/D4/volumeofcompositesolids"
+  ],
+  "5/D4/16": [
+   "Dual bar charts",
+   "5/D4/dualbarcharts"
+  ],
+  "5/D4/17": [
+   "Draw pie charts",
+   "5/D4/drawpiecharts"
+  ],
+  "5/D4/18": [
+   "The mean",
+   "5/D4/themean"
+  ],
+  "5/D4/19": [
+   "Fraction line plots",
+   "5/D4/fractionlineplots"
+  ],
+  "5/D4/20": [
+   "Measure and classify angles",
+   "5/D5/measureandclassifyangles"
+  ],
+  "5/D4/21": [
+   "Angles in polygons",
+   "5/D5/anglesinpolygons"
+  ],
+  "5/D4/22": [
+   "Calculate angles",
+   "5/D5/calculateangles"
+  ],
+  "5/D4/23": [
+   "Vertically opposite angles",
+   "5/D5/verticallyoppositeangles"
+  ],
+  "5/D4/24": [
+   "Angles in a triangle",
+   "5/D5/anglesinatriangle"
+  ],
+  "5/D4/25": [
+   "Angles in a triangle - missing angles",
+   "5/D5/anglesinatrianglemissingangles"
+  ],
+  "5/D4/26": [
+   "Angles in quadrilaterals",
+   "5/D5/anglesinquadrilaterals"
+  ],
+  "5/D4/27": [
+   "Circles",
+   "5/D5/circles"
+  ],
+  "5/D5/1": [
+   "Line graphs",
+   "5/D4/linegraphs"
+  ],
+  "5/D5/2": [
+   "Angles in a triangle - special cases",
+   "5/D5/anglesinatrianglespecialcases"
+  ],
+  "5/D5/3": [
+   "Draw shapes accurately",
+   "5/D5/drawshapesaccurately"
+  ],
+  "5/D5/4": [
+   "Classify two-dimensional figures in a hierarchy",
+   "5/D5/classifytwodimensionalfiguresinahierarchy"
+  ],
+  "5/D5/5": [
+   "Read and plot points in four quadrants",
+   "5/D5/readandplotpointsinfourquadrants"
+  ],
+  "5/D5/6": [
+   "Solve problems with coordinates",
+   "5/D5/solveproblemswithcoordinates"
+  ],
+  "5/D5/7": [
+   "Translations",
+   "5/D5/translations"
+  ],
+  "5/D5/8": [
+   "Reflections",
+   "5/D5/reflections"
+  ],
+  "5/E/1": [
+   "Nets of 3D shapes",
+   "5/D5/netsof3dshapes"
+  ],
+  "5/E/2": [
+   "Negative numbers",
+   "5/D2/negativenumbers"
+  ],
+  "5/E/3": [
+   "Square and cube numbers",
+   "5/D2/squareandcubenumbers"
+  ],
+  "5/E/4": [
+   "Use ratio language",
+   "5/D1/useratiolanguage"
+  ],
+  "5/E/5": [
+   "Introduction to the ratio symbol",
+   "5/D1/introductiontotheratiosymbol"
+  ],
+  "5/E/6": [
+   "Ratio and fractions",
+   "5/D1/ratioandfractions"
+  ],
+  "5/E/7": [
+   "Scale drawing",
+   "5/D1/scaledrawing"
+  ],
+  "5/E/8": [
+   "Similar shapes",
+   "5/D1/similarshapes"
+  ],
+  "5/E/9": [
+   "Ratio problems",
+   "5/D1/ratioproblems"
+  ],
+  "5/E/10": [
+   "Proportion problems",
+   "5/D1/proportionproblems"
+  ],
+  "5/E/11": [
+   "Recipes",
+   "5/D1/recipes"
+  ],
+  "5/E/12": [
+   "Substitution",
+   "5/D1/substitution"
+  ],
+  "5/E/13": [
+   "Form equations",
+   "5/D1/formequations"
+  ],
+  "5/E/14": [
+   "Solve 1-step equations",
+   "5/D1/solve1stepequations"
+  ],
+  "5/E/15": [
+   "Percentage of an amount – one step",
+   "5/D3/percentageofanamountonestep"
+  ],
+  "5/E/16": [
+   "Percentage of an amount – multi-step",
+   "5/D3/percentageofanamountmultistep"
+  ],
+  "5/E/17": [
+   "Understand percentages",
+   "5/D3/understandpercentages"
+  ],
+  "5/E/18": [
+   "Fractions to percentages",
+   "5/D3/fractionstopercentages"
+  ],
+  "5/E/19": [
+   "Percentages - missing values",
+   "5/D3/percentagesmissingvalues"
+  ],
+  "5/E/20": [
+   "Read and interpret pie charts",
+   "5/D4/readandinterpretpiecharts"
+  ],
+  "5/E/21": [
+   "Pie charts with percentages",
+   "5/D4/piechartswithpercentages"
+  ],
+  "5/E/22": [
+   "Consolidation of arithmetic",
+   "5/D1/consolidationofarithmetic"
+  ],
+  "5/E/23": [
+   "Problem solving across strands",
+   "5/D1/problemsolvingacrossstrands"
+  ],
+  "5/E/24": [
+   "End-of-year investigation projects",
+   "5/D1/endofyearinvestigationprojects"
+  ],
+  "5/E/25": [
+   "Reasoning tasks",
+   "5/D1/reasoningtasks"
+  ]
+ },
+ "aliases": {}
+}

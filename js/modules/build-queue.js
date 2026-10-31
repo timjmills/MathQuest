@@ -15,7 +15,7 @@
 // pupils will do"), closes ("Gap it fills"), representation ("How it looks"), the standards, WRM steps
 // and MAP tasks it closes. `spec` keeps the fuller design fields when the source has them, for later.
 
-import { buildList } from './build-list.js';
+import { buildList, canonicalEntry } from './build-list.js';
 import { WRM_PROPOSALS, wrmStep } from './wrm.js';
 import { WRM_STEPS } from './wrm-db.js';
 import { CCSS_AUDIT, EE_AUDIT } from './standards-audit.js';
@@ -109,7 +109,8 @@ const sortGrades = (a) => uniq(a).filter((g) => GRADES.includes(g)).sort((x, y) 
  */
 export function buildQueue({ curated = [], map = null } = {}) {
     const byId = new Map();
-    const get = (id) => {
+    const get = (id0) => {
+        const id = canonicalEntry(id0);   // W3: a merged id joins the entry it was merged into
         if (!byId.has(id)) {
             byId.set(id, { id, name: '', kind: 'other', kindRaw: '', skill: '', option: '', sources: new Set(), grades: [], domain: '',
                 family: '', teaches: '', closes: [], gaps: [], representation: '', ccss: [], ee: [], wrmSteps: [], siteLessons: [], improves: [], map: [], spec: null, closedSteps: new Set() });
@@ -194,7 +195,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         }
         for (const [sid, st] of Object.entries(y.steps || {})) {
             for (const id of [...(st.build || [])]) {
-                const e = byId.get(id);
+                const e = byId.get(canonicalEntry(id));
                 if (!e) continue;
                 e.wrmSteps.push(sid);
                 if (st.missing && !e.closedSteps.has(sid)) e.gaps.push({ step: sid, text: st.missing });   // N16: one line per step
@@ -204,7 +205,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         // the school site's own lessons in the year file (round 7): the entries they need, one line per lesson
         for (const [lid, st] of Object.entries(y.lessons || {})) {
             for (const id of [...(st.build || [])]) {
-                const e = byId.get(id);
+                const e = byId.get(canonicalEntry(id));
                 if (!e) continue;
                 e.siteLessons.push(lid);
                 if (st.missing && !e.closedSteps.has(lid)) e.gaps.push({ lesson: lid, text: st.missing });
@@ -229,7 +230,7 @@ export function buildQueue({ curated = [], map = null } = {}) {
         }
         for (const r of map.rows || []) {
             if (!r.proposal) continue;
-            const e = byId.get(r.proposal);
+            const e = byId.get(canonicalEntry(r.proposal));
             if (!e) continue;
             e.sources.add('MAP');
             if (!e.map.some((f) => f.task === r.task)) e.map.push({ strand: r.strand || '', ritBand: r.ritBand || '', taskType: '', task: r.task || '' });

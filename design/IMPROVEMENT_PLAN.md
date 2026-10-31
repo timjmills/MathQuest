@@ -1340,6 +1340,11 @@ in step 1, through a critic, not trusted from the old record.
 | 12 | Anchors / worked examples (real-move stack examples, key-safe generators); guided W1, stretch ST1, error analysis EA1 | `wip-anchors` | vocabulary redesign | M |
 | 13 | Teacher site 2.0 follow-ups: whole-grade print speed, support ladder on worksheet/quiz hosts, double edge, option panels audit | — | — | M |
 
+**Owner decision 2026-10-30: lessons go to the END of the plan.** Item 2 finishes lessons 6–7 only (then a hand-over in
+`design/status/lessons-6-7.md`); lessons 8–10 wait. Item 5 (lessons engine phase 0 + LR-17) was paused and then RESUMED by the owner the same day (finish it now; less merge drift); hand-over in
+`design/status/lessons-phase0.md` (branch `claude/sweet-newton-c8wrv1-lessons-phase0`). Lesson-only parts of item 12 (anchors)
+move to the end too. The skill families (items 3, 4, 6–11) and the teacher follow-ups (13) come first.
+
 Superseded (nothing to take): `wip-laneD` (an ancestor of `wip-a3256…`), `wip-laneB` (an ancestor of `wip-af686…`),
 `wip-teacher-ui` (Teacher site 2.0 replaced it), `wip-aea16a31534a8fe34` (a note), `wip-wave0-process` (HEAD's
 ws-spec-card.mjs is the later version). Drop: `wip-countby-shrink` (renders only). Branches stay on GitHub as archives.

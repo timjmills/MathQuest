@@ -249,14 +249,17 @@ try {
 {
     const fsx = await import('node:fs');
     const PIN = join(dirname(fileURLToPath(import.meta.url)), '..', 'fixtures', 'precritic', 'presets-d8.baseline.json');
-    const d8 = failures.filter((f) => / \(pilot D8\)$/.test(f));
+    // (the 44 instruction-key findings were fixed 2026-10-30 at the root, practice.js skillWords: an instruction-key line
+    // is never pinnable again, so a preset whose page prints another line than its options call for always FAILS)
+    const pinnable = (f) => / \(pilot D8\)$/.test(f) && !/: instruction key "/.test(f);
+    const d8 = failures.filter(pinnable);
     if (process.argv.includes('--write-baseline')) {
         fsx.writeFileSync(PIN, JSON.stringify({ note: 'ws-presets-unit pilot-D8 findings pinned on the base (lane S1, 2026-10-24): a preset whose own page uses another instruction key than its host, or a narrow set. Lower when fixed; never add one without a STATUS note.', pinned: d8.sort() }, null, 1) + '\n');
         console.log(`ws-presets-unit: pinned ${d8.length} D8 finding(s) in ${PIN}`);
     }
     let pinned = new Set();
     // only "(pilot D8)" lines are ever held (S1 critic r2 N-r2-2: a hand-added check-6 line in the pin was silenced)
-    if (!process.argv.includes('--no-baseline')) { try { pinned = new Set((JSON.parse(fsx.readFileSync(PIN, 'utf8')).pinned || []).filter((f) => / \(pilot D8\)$/.test(f))); } catch (e) { /* no pin: judge all */ } }
+    if (!process.argv.includes('--no-baseline')) { try { pinned = new Set((JSON.parse(fsx.readFileSync(PIN, 'utf8')).pinned || []).filter(pinnable)); } catch (e) { /* no pin: judge all */ } }
     const held = failures.filter((f) => pinned.has(f));
     if (held.length) console.log(`ws-presets-unit: ${held.length} pinned D8 finding(s) still print (${PIN.split('/').slice(-1)[0]})`);
     for (let i = failures.length - 1; i >= 0; i--) if (pinned.has(failures[i])) failures.splice(i, 1);

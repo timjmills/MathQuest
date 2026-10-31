@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 393 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 396 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -233,7 +233,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Equivalent Fractions on a Number Line (option)** — option on `fractions:equiv_frac_visual`: number lines. Teaches equivalent fractions shown on stacked number lines. Representation: a double number-line representation option.  
   Closes (1): Y6.B3.S2 Equivalent fractions on a number line  
   _proposal id: frac_nl_equiv_
-- **Compare Fractions by Numerator (option)** — option on `fractions:compare`: same numerator. Teaches comparing and ordering fractions with the same numerator (3/5 > 3/7) and by denominators. Representation: a comparison-type option on compare/order.  
+- **Compare Fractions With the Same Numerator or Denominator (option)** — option on `fractions:compare`: pairs "same numerator" | "same denominator". Teaches comparing and ordering unit fractions (1/3 > 1/5) and two fractions that share a numerator (3/5 > 3/7) or a denominator (3/8 < 5/8), with bars of the same whole, and saying why. Representation: the existing compare cell with two bars of the same whole; the < > = answer box.  
   Closes (1): Y6.B3.S4 Compare and order (numerator)  
   _proposal id: compare_numerator_
 - **Multi-Step Fraction Problems** — new skill `fraction_operations:fraction_multi_step_problems`. Teaches multi-step word problems with adding and subtracting fractions, using a bar model. Representation: a bar model with the steps; write each step's answer.  
@@ -2568,12 +2568,14 @@ whatever happens to the WRM gaps.
   Vocabulary: split, any order, partition  
 - **Y4.B5.S3** Multiply by 10 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 10}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 10}; Multiply by 10 (`multiplication:mult_by_ten`)  
+  Partial: 10 Times and One Tenth: the Same Digit One Place Apart (`placevalue:ten_times_value`), missing the digit one place left is worth 10 times as much  
   Vocabulary: 10 times the size, place value, placeholder  
 - **Y4.B5.S4** Multiply by 100 — covered. _3.NBT.A.3, 4.NBT.A.1, M.EE.3.NBT.3_  
   Skills: Multiply by 10, 100 and Multiples of Ten (`multiplication:mult_zeros`) {× 100}; Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {× 100}; Multiply by 100 (`multiplication:mult_by_hundred`)  
   Vocabulary: 100 times the size, scaling, placeholder  
 - **Y4.B5.S5** Divide by 10 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 10}  
+  Partial: One Tenth of a Digit's Value (One Place Right) (`placevalue:one_tenth_value`), missing the digit one place right is worth one tenth as much  
   Vocabulary: divide, tenth, one-tenth the size  
 - **Y4.B5.S6** Divide by 100 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`) {÷ 100}  
@@ -2883,6 +2885,8 @@ whatever happens to the WRM gaps.
   Vocabulary: comma, placeholder zero, and  
 - **Y5.B1.S6** Powers of 10 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
   Skills: Multiply and Divide by 10, 100, 1,000 (`placevalue:place_value_10x`)  
+  Partial: 10 Times and One Tenth: the Same Digit One Place Apart (`placevalue:ten_times_value`), missing each place is 10 times the place to its right, read on the same digit in two numbers  
+  Partial: How Many Times as Many? (700 ÷ 70 = 10) (`placevalue:ten_times_story`), missing how many times as many: 700 ÷ 70 = 10  
   Vocabulary: column, row, ten times the size, one-tenth  
 - **Y5.B1.S7** 10 100 1,000 10,000 100,000 more or less — PARTIAL. _4.NBT.A.1_  
   Partial: 10 More, 10 Less, 100 More, 100 Less (`placevalue:more_less_100`), missing 10,000 and 100,000 more or less  
@@ -3456,7 +3460,7 @@ whatever happens to the WRM gaps.
   Skills: Order Fractions (`fractions:order_fractions`); Compare Fractions (LCD) (`fractions:compare_frac_lcd`)  
   Vocabulary: numerator, denominator, common denominator  
 - **Y6.B3.S4** Compare and order (numerator) — GAP. _4.NF.A.2, M.EE.4.NF.2_  
-  Proposal: Compare Fractions by Numerator (option)  
+  Proposal: Compare Fractions With the Same Numerator or Denominator (option)  
   Vocabulary: numerator, denominator, common numerator  
 - **Y6.B3.S5** Add and subtract simple fractions — covered. _5.NF.A.1, M.EE.5.NF.1_  
   Skills: Add Fractions (Unlike Denom) (Visual) (`fraction_operations:add_frac_unlike`); Subtract Fractions (Unlike Denom) (Visual) (`fraction_operations:sub_frac_unlike`)  

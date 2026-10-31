@@ -96,6 +96,7 @@ for pid, p in P.items():
         if pid not in KEYS.get('props', {}): bad.append(f'proposal {pid}: source {src!r}, but no live proposal has this id'); continue
         kp = {k: v for k, v in KEYS['props'][pid].items() if k != '_src'}; kp.setdefault('steps', [])
         for f in sorted((set(p) | set(kp)) - (LESSON_F - {'steps'})):
+            if f == 'preset' and not p.get(f) and not kp.get(f): continue   # the preset lanes (2026-10-17) added preset: false; absent = false
             if p.get(f) != kp.get(f): bad.append(f'proposal {pid}: field {f} differs from its live source {KEYS["props"][pid].get("_src")} ({p.get(f)!r} != {kp.get(f)!r})')
         if src != KEYS['props'][pid].get('_src'): bad.append(f'proposal {pid}: source {src!r} is not its live source {KEYS["props"][pid].get("_src")!r}')
         if p.get('reused') is not True: bad.append(f'proposal {pid}: a live copy must have reused true')

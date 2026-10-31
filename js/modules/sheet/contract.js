@@ -91,6 +91,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'skip-count': 'Count by {n}. Write the missing numbers.',
     expanded: 'Write the number in expanded form.',
     'digit-value': 'Write the value of the underlined digit.',
+    // value_ten_times (4.NBT.A.1, detailed lesson 6): the same digit one place apart.
+    'ten-times': 'Write what each digit is worth. Circle 10 times or one tenth.',
+    'ten-times-ring': 'Circle 10 times or one tenth.',
+    'ten-times-one': 'Write the top value. Circle 10 times or one tenth.',
     round: 'Round to the nearest {place}.',
     'more-less': 'Write 1 more and 1 less.',
     shade: 'Shade the fraction.',
@@ -153,6 +157,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-rcdws': 'Read the story. Draw it. Solve.',
     // detailed lesson 2 (2026-10-16): the word-work cell's compact bar form (story, bar, answer)
     'story-bar': 'Read the story. Fill in the bar. Solve.',
+    // detailed lesson 7 (2026-10-17): the word-work cell's compact frames form (one number sentence a step)
+    'story-steps': 'Read the story. Write each step. Solve.',
+    'story-letter': 'Read the story. Write the equation. Find n.',
+    'story-check': 'Solve. Estimate. Circle Yes or No.',
     'pick-parts': 'Write one number from each list to make the sum.',
     'fact-family': 'Use the three numbers. Fill in the fact family.',
     'chart-fill': 'Fill in the missing products.',

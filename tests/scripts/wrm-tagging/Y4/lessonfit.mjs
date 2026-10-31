@@ -49,6 +49,7 @@ const so = await import(R + 'js/modules/skill-options.js');
 const U = await import(R + 'js/modules/utils.js');
 console.log = _log; console.warn = _warn;
 const fs = await import('fs');
+const PHOST = await import('../presethost.mjs');
 const CL = await import('./claims.mjs');
 const TR = await import('./titlerep.mjs');
 const args = process.argv.slice(2);
@@ -506,6 +507,86 @@ export function claimLists(text, items, qs, e) {
   for (const f of layoutChecks(t, qs)) out.push(f);
   return out;
 }
+// G9 (lessons critic r4 §6 / 2026-10-30 finding 2): the claim classes that let F6 through four rounds. Read on the FIXED probe
+// (OWN_SEEDS x OWN_N), never on the --seeds sample. (1) a story's object list ("a story of a floor, patio or wall"): every item names a
+// listed object and every listed object is dealt; (2) lists and ranges of scale tops ("scales to 100, 200 or 500 mL"), a unit's top
+// ("(to 10 kg)"), counts ("three to six fractions", "8 to 12 counters", both ways), amounts ("to 50 cents") and a ruler's length
+// ("a 6-inch ruler"); (3) interval and direction lists on a time line ("1, 2 or 3 hours later or earlier", "30 minutes later", "in whole
+// hours", "in whole and half hours"); (4) a positive fraction family ("in halves, quarters or eighths", "marked in halves or quarters")
+// holds every dealt denominator; (5) a half-unit claim ("always a whole number") on items that show a half
+const FAMLIST = `(?:${FAMW.map(f => f[1]).join('|')})(?:(?:,\\s*|\\s+or\\s+|\\s+and\\s+)(?:${FAMW.map(f => f[1]).join('|')}))*`;
+const HEDGE = /\b(?:most|mostly|many|some|about|often|usually|a few)\b[^;.]*$/i;
+const numList = s => String(s).split(/,\s+|\s+or\s+|\s+and\s+/).map(x => +x.replace(/,/g, '')).filter(x => Number.isFinite(x) && x > 0);
+const G9UNIT = { ml: /\bmL\b|\bml\b|millilit/i, l: /\bL\b|\blit(?:re|er)s?\b/, g: /\bin g\b|\bgrams?\b|(?<![k\w])g\b/, kg: /\bkg\b|kilograms?/i };
+export function g9Checks(text, items, qs) {
+  const t = numify(String(text || '')), out = [], N = items.length; if (!N) return out;
+  const neg = idx => negBefore(t, idx);
+  // (1) object list
+  for (const m of t.matchAll(/\bstor(?:y|ies) (?:of|about) (?:a|an|the) ([a-z ]+?(?:,\s*[a-z ]+?)*,?\s+(?:or|and)\s+[a-z ]+?)(?=\s+(?:in|whose|that|with|to)\b|[;:(.]|$)/gi)) {
+    if (neg(m.index)) continue;
+    const heads = m[1].split(/,\s*|\s+or\s+|\s+and\s+/).map(x => x.trim().split(/\s+/).pop()).filter(Boolean);
+    if (heads.length < 2) continue;
+    const re = h => new RegExp(`\\b${h}s?\\b`, 'i');
+    const none = items.filter(i => !heads.some(h => re(h).test(i.text || '')));
+    if (none.length) out.push(`G9 objects: says "${m[0].trim()}", but ${none.length} of ${N} items tell of another object (${(none[0].text || '').trim().slice(0, 60)})`);
+    for (const h of heads) if (!items.some(i => re(h).test(i.text || ''))) out.push(`G9 objects: names a ${h}, but no item tells of one`); }
+  // (2) scale tops, a unit's top, counts, amounts, a ruler's length
+  const top = i => Math.max(0, ...NUMS(i.vis));
+  for (const m of t.matchAll(/\bscales? (?:to|of) ((?:[\d,]+,\s+)*[\d,]+(?:,?\s+(?:or|and)\s+[\d,]+)?)\s*(mL|ml|L|g|kg)\b/g)) { if (neg(m.index)) continue;
+    const L = numList(m[1]), u = G9UNIT[m[2].toLowerCase()], of = items.filter(i => u.test(`${i.text} ${i.vis}`));
+    const off = [...new Set(of.map(top))].filter(x => !L.includes(x));
+    if (off.length) out.push(`G9 scale: says "${m[0]}", but items have scales to ${off.sort((a, b) => a - b).join(', ')}`);
+    for (const x of L) if (of.length && !of.some(i => top(i) === x)) out.push(`G9 scale: says "${m[0]}", but no item has a scale to ${x}`); }
+  for (const m of t.matchAll(/\(to ([\d,]+) (mL|ml|L|g|kg)\)/g)) { if (neg(m.index)) continue;
+    const hi = +m[1].replace(/,/g, ''), unit = m[2], of = items.filter(i => new RegExp(`\\bin ${unit}\\b`).test(i.text || ''));
+    const over = of.filter(i => top(i) > hi); if (over.length) out.push(`G9 top: says "${m[0]}", but ${over.length} of ${of.length} items in ${unit} go to ${Math.max(...over.map(top))}`); }
+  const countOf = (noun, i) => { const p = payOf(i);
+    if (/counter/.test(noun)) return typeof p.n === 'number' ? p.n : (NUMS(i.text)[0] ?? null);
+    if (/fraction/.test(noun)) return String(i.a || '').split(/[,;]/).filter(x => /\d\/\d/.test(x)).length || null;
+    return null; };
+  for (const m of t.matchAll(/\b(\d+) to (\d+) (counters|fractions)\b/gi)) { if (neg(m.index)) continue;
+    const lo = +m[1], hi = +m[2], v = items.map(i => countOf(m[3], i)).filter(x => x != null); if (!v.length) continue;
+    const off = v.filter(x => x < lo || x > hi); if (off.length) out.push(`G9 count: says "${m[0]}", but items have ${[...new Set(off)].sort((a, b) => a - b).join(', ')}`);
+    for (const x of [lo, hi]) if (!v.includes(x)) out.push(`G9 count: says "${m[0]}", but no item has ${x}`); }
+  for (const m of t.matchAll(/\bto (\d+) cents\b/gi)) { if (neg(m.index)) continue;
+    const hi = +m[1], over = items.filter(i => { const p = payOf(i); return typeof p.target === 'number' && p.target > hi; });
+    if (over.length) out.push(`G9 amount: says "${m[0]}", but ${over.length} of ${N} items make up to ${Math.max(...over.map(i => payOf(i).target))} cents`); }
+  for (const m of t.matchAll(/\b(\d+)-inch ruler\b/gi)) { const n = +m[1], bad = items.filter(i => typeof payOf(i).len === 'number' && payOf(i).len !== n);
+    if (bad.length) out.push(`G9 ruler: says "${m[0]}", but ${bad.length} of ${N} rulers are ${[...new Set(bad.map(i => payOf(i).len))].join(' / ')} inches`); }
+  for (const m of t.matchAll(new RegExp(`\\bruler marked in (${FAMLIST})\\b`, 'gi'))) { const fam = famSet(m[1]); if (!fam.size) continue;
+    const bad = items.filter(i => typeof payOf(i).res === 'number' && !fam.has(payOf(i).res));
+    if (bad.length) out.push(`G9 ruler: says "${m[0].trim()}", but ${bad.length} of ${N} rulers are marked in /${[...new Set(bad.map(i => payOf(i).res))].join(', /')}`); }
+  // (3) intervals and directions on a time line
+  const tl = items.map(payOf).filter(p => p && typeof p.total === 'number' && p.mode);
+  if (tl.length) {
+    for (const m of t.matchAll(/\b((?:\d+,\s+)*\d+(?:,?\s+or\s+\d+)?)\s+(hours?|minutes?)\s+((?:later|earlier)(?:\s+or\s+(?:later|earlier))?)/gi)) { if (neg(m.index)) continue;
+      const mul = /hour/i.test(m[2]) ? 60 : 1, L = numList(m[1]).map(x => x * mul);
+      const off = [...new Set(tl.map(p => p.total))].filter(x => !L.includes(x));
+      if (off.length) out.push(`G9 interval: says "${m[0]}", but items move ${off.sort((a, b) => a - b).map(x => x + ' min').join(', ')}`);
+      for (const x of L) if (!tl.some(p => p.total === x)) out.push(`G9 interval: says "${m[0]}", but no item moves ${x} min`);
+      const dirs = new Set(m[3].toLowerCase().split(/\s+or\s+/)), modes = new Set(tl.map(p => p.mode).filter(x => /later|earlier/.test(x)));
+      for (const d of modes) if (!dirs.has(d)) out.push(`G9 direction: says "${m[0]}", but items also count ${d}`);
+      for (const d of dirs) if (!modes.has(d)) out.push(`G9 direction: says "${m[0]}", but no item counts ${d}`); }
+    const whole = /\bin whole hours\b/i.exec(t), half = /\bin whole and half hours\b|\bin hours and half hours\b/i.exec(t);
+    if (whole && !neg(whole.index)) { const b = tl.filter(p => p.total % 60); if (b.length) out.push(`G9 interval: says "in whole hours", but ${b.length} of ${tl.length} items are not`); }
+    if (half && !neg(half.index)) { const b = tl.filter(p => p.total % 30); if (b.length) out.push(`G9 interval: says "${half[0]}", but ${b.length} of ${tl.length} items are not`); } }
+  // (4) a positive fraction family
+  const dealt = new Set(); qs.forEach((q, j) => { for (const x of itemDens(q)) dealt.add(x); const i = items[j] || {};
+    for (const mm of `${i.text || ''} ${i.a || ''} ${i.vis || ''}`.matchAll(/(?<![\d.])\d+\/(\d+)\b/g)) dealt.add(+mm[1]); });
+  for (const m of t.matchAll(new RegExp(`\\b(?:in|into|marked in)\\s+(${FAMLIST})\\b(?!\\s+(?:only|among|too)\\b)`, 'gi'))) {
+    if (neg(m.index) || HEDGE.test(t.slice(Math.max(0, m.index - 40), m.index))) continue;
+    const fam = famSet(m[1]); if (!fam.size || !dealt.size) continue;
+    const off = [...dealt].filter(d => ![...fam].some(f => f % d === 0));   // a half sits on a quarter scale (2/4)
+    if (off.length) out.push(`G9 family: says "${m[0].trim()}", but items show /${off.sort((a, b) => a - b).join(', /')}`); }
+  // (5) a half-unit claim
+  const hm = /\b(?:always|every|each)\b[^;.]{0,50}\bwhole numbers?\b|\bnever (?:a )?half\b|\bno half[- ]units?\b/i.exec(t);
+  // a composite shape's unlabelled sides count too: a T's underside is (topWidth - stemWidth) / 2
+  const sideVals = q => { const gd = q && q.geometryData; if (!gd || !gd.dims) return []; const v = Object.values(gd.dims).filter(x => typeof x === 'number');
+    if (gd.shapeType === 'T' && typeof gd.dims.topWidth === 'number') v.push((gd.dims.topWidth - gd.dims.stemWidth) / 2); return v; };
+  if (hm && !neg(hm.index)) { const b = items.filter((i, j) => sideVals(qs[j]).some(x => !Number.isInteger(x)) || /(?<![\d.])\d*\.5\b|(?<!\d)1\/2\b|\bhalf\b/.test(`${i.text} ${i.a} ${i.pay} ${i.vis}`));
+    if (b.length) out.push(`G9 half: says "${hm[0]}", but ${b.length} of ${N} items show a half unit`); }
+  return out;
+}
 // a why that says the items ask how long something takes (a duration) needs items that ask for one
 export function durationClaim(pos, items) {
   if (!/\bhow long\b|\bdurations?\b|\bin minutes\b/i.test(pos)) return [];
@@ -679,6 +760,7 @@ function missedOptions(s) {
   const near = (p, ws) => { for (let j = 0; j + 1 < p.length; j++) for (let q = j + 1; q <= j + 3 && q < p.length; q++) if (p[j] === ws[0] && p[q] === ws[1]) return true; return false; };
   for (const k of pool) { const [c, sk] = k.split(':');
     if (isNamed(c, sk)) continue;
+    if (PHOST.presetCovered(k, isNamed, mine, pool)) continue;   // a preset is read through its host (critic 2026-10-30 Y4 F1)
     if (TIME.test(k) && !mine.some(e => TIME.test(e.key))) continue;   // G4: a coin denial ("never a quarter") is not a time option
     for (const def of so.optionsFor(c, sk) || []) { if (!def.values || def.group === 'support' || ['band', 'range', 'support', 'cover', 'mix'].includes(def.id)) continue;
       for (const v of def.values) { const L = String(v.l ?? '');
@@ -739,7 +821,8 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
     const c = Math.max(ownMax, cm ? citedCeil(cm[1]) : 0), limit = Math.max(1.5 * c, c + 2);
     if (!TIME.test(e.key) && r.max > limit) fails.push(`${tag}: size ${r.max} > ${limit} (the lesson deals to ${ownMax}${cm ? ', its cited unit to ' + citedCeil(cm[1]) : ''}) — ${r.ex}`);
     const wS = stripCited(e.why);
-    for (const f of [...boundBreaks(wS, r.items), ...claimLists(wS, r.items, r.qs, e), ...durationClaim(CL.positive(wS), r.items)]) fails.push(`${tag}: ${f}`);
+    const ro = PO(e.key, e.opts, rangeOf(e));   // G9: bounds and lists are read on the fixed probe, not the --seeds sample
+    for (const f of [...boundBreaks(wS, ro.items), ...claimLists(wS, ro.items, ro.qs, e), ...g9Checks(wS, ro.items, ro.qs), ...durationClaim(CL.positive(wS), r.items)]) fails.push(`${tag}: ${f}`);
     for (const f of [...content(id, e, r, role), ...whyCheck(e, r), ...y6Why(e, r), ...digitSymbolChecks(e.why, r.items), ...unitNegChecks(e.why, r.items), ...betweenChecks(e.why, r.items), ...(role === 'pre' ? citeCheck(id, e) : []), ...supportTables(id, e), ...denomsCheck(e, role, CL.claimText(e.why, titles))]) fails.push(`${tag}: ${f}`);
   }
   for (const role of ['direct', 'partial']) for (const e of s[role]) {
@@ -769,7 +852,8 @@ for (const [id, s] of Object.entries(d.lessons || {})) {
         const z = r.items.filter(i => String(i.a).trim() === '0').length;
         if (z) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause says "never ${p}", but ${z} of ${r.items.length} items have the answer 0`); }
       for (const f of boundTooBig(e.missing, r.items)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
-      for (const f of [...boundBreaks(e.missing, r.items), ...claimLists(e.missing, r.items, r.qs, e)]) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
+      const ro = PO(e.key, e.opts, rangeOf(e));
+      for (const f of [...boundBreaks(e.missing, ro.items), ...claimLists(e.missing, ro.items, ro.qs, e), ...g9Checks(e.missing, ro.items, ro.qs)]) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
       for (const f of whyCheck({ why: e.missing.replace(/\b(?:never|no|not|without)\b[^;.]*/gi, ' ') }, r)) fails.push(`partial ${e.key}${JSON.stringify(e.opts || {})} clause: ${f}`);
     }
   }

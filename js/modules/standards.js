@@ -579,7 +579,7 @@ export const SKILL_STANDARDS = {
     'placevalue:number_word_names': { ccss: ['4.NBT.A.2', '2.NBT.A.3'], ee: ['M.EE.4.NBT.2', 'M.EE.2.NBT.3'] }, // Choose the Word Name
     'placevalue:place_value_10x': { ccss: ['5.NBT.A.2', '5.NBT.A.1'], ee: ['M.EE.5.NBT.2', 'M.EE.5.NBT.1'] }, // Multiply and Divide by 10, 100, 1,000
     'placevalue:identify': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Name the Place
-    'placevalue:value': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Value of a Digit
+    'placevalue:value': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1', 'M.EE.5.NBT.1'] }, // Value of a Digit (M.EE.5.NBT.1: Wisconsin's EE for 4.NBT.A.1, form "times" - lesson 6)
     'placevalue:compare': { ccss: ['2.NBT.A.4', '4.NBT.A.2', '1.NBT.B.3', 'K.CC.C.7'], ee: ['M.EE.2.NBT.4', 'M.EE.4.NBT.2', 'M.EE.1.NBT.3', 'M.EE.5.NBT.3', 'M.EE.5.NBT.1'] }, // Compare Numbers (>, <, =)
     'placevalue:expand': { ccss: ['2.NBT.A.3', '4.NBT.A.2'], ee: ['M.EE.2.NBT.3', 'M.EE.4.NBT.2'] }, // Expanded Form
     'placevalue:unit_form': { ccss: ['2.NBT.A.1', '2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Unit Form
@@ -798,11 +798,20 @@ export const SKILL_STANDARDS = {
     'algebra:factor_out_gcf': { ccss: ['6.NS.B.4', '6.EE.A.3'], ee: ['M.EE.6.EE.3'] }, // Factor Out the Greatest Common Factor
     'algebra:function_table_find_rule': { ccss: ['4.OA.C.5', '5.OA.B.3'], ee: ['M.EE.4.OA.5'] }, // Function Tables: Find the Rule
     'algebra:function_table_find_inputs': { ccss: ['4.OA.C.5', '5.OA.B.3'], ee: ['M.EE.4.OA.5'] }, // Function Tables: Find the Missing In Numbers
+    'algebra:two_step_mult_div_first': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: Multiply or Divide First
+    'algebra:two_step_add_then_mult': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: Add or Take Away, Then Multiply
+    'algebra:two_step_add_then_div': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: Add or Take Away, Then Divide
+    'algebra:two_step_letter_equation': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: One Equation With a Letter
+    'algebra:two_step_estimate_check': { ccss: ['3.OA.D.8', '4.OA.A.3'], ee: ['M.EE.3.OA.7', 'M.EE.4.OA.3'] }, // Two-Step Word Problems: Estimate to Check
     'order_of_operations:square_numbers': { ccss: ['6.EE.A.1'], ee: ['M.EE.6.EE.1-2'] }, // Square Numbers (5²)
     'order_of_operations:cube_numbers': { ccss: ['6.EE.A.1'], ee: ['M.EE.6.EE.1-2'] }, // Cube Numbers (5³)
     'number_sense:reasonable_quotients': { ccss: ['4.OA.A.3', '4.NBT.B.6'], ee: ['M.EE.4.OA.3'] }, // Is the Quotient Reasonable?
     'placevalue:digit_value_unit_form': { ccss: ['2.NBT.A.1', '4.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Value of a Digit in Unit Form (7 Hundreds)
     'placevalue:digit_value_notation': { ccss: ['4.NBT.A.2', '2.NBT.A.1'], ee: ['M.EE.4.NBT.2'] }, // Value of a Digit in Expanded Notation (7 × 100)
+    // (2026-10-30 presets of value form "times", detailed lesson 6: Wisconsin files 4.NBT.1 as "use M.EE.5.NBT.1")
+    'placevalue:ten_times_value': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // 10 Times and One Tenth: the Same Digit One Place Apart
+    'placevalue:one_tenth_value': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // One Tenth of a Digit's Value (One Place Right)
+    'placevalue:ten_times_story': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // How Many Times as Many? (700 ÷ 70 = 10)
     'placevalue:count_pv_disks': { ccss: ['2.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Count the Place-Value Disks in One Place
     'composing:write_numbers_in_words': { ccss: ['2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Write Numbers in Words
     'measurement:count_notes': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Count Notes (Bills)

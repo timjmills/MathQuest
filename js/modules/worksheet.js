@@ -2154,10 +2154,14 @@ export function checkWorksheetOrderingAnswer(idx) {
 }
 
 // Check expanded form answer in worksheet mode
-export function checkWorksheetExpandedAnswer(idx) {
+export function checkWorksheetExpandedAnswer(idx, settled) {
     const q = state.worksheetQs[idx];
     const card = document.getElementById(`ws_card_${idx}`);
     if (!card) return;
+    if (worksheetWrongTimers.has(idx)) {
+        clearTimeout(worksheetWrongTimers.get(idx));
+        worksheetWrongTimers.delete(idx);
+    }
 
     const expandedInputs = card.querySelectorAll('.ws-expanded-input');
     if (!expandedInputs.length) return;
@@ -2215,6 +2219,29 @@ export function checkWorksheetExpandedAnswer(idx) {
             wsScheduleAdvance(idx, 400);
         }
     } else {
+        // A finished try only once the boxes are still (as the card's Check press): the support
+        // ladder then climbs one rung for all the place boxes together (teacher follow-ups 2026-10-30).
+        const neutral = () => {
+            card.style.background = "var(--bg-card)";
+            card.style.border = "";
+            expandedInputs.forEach((input) => { input.style.borderColor = ""; input.style.background = ""; });
+        };
+        if (settled !== true) {
+            neutral();
+            const typed = enteredValues.join('|');
+            worksheetWrongTimers.set(idx, setTimeout(() => {
+                worksheetWrongTimers.delete(idx);
+                const now = Array.from(card.querySelectorAll('.ws-expanded-input')).map((el) => el.value.trim().replace(/,/g, '').replace(/\s/g, '')).join('|');
+                if (now === typed) checkWorksheetExpandedAnswer(idx, true);
+            }, WS_SLOT_SETTLE_MS));
+            return;
+        }
+        const lad = worksheetLadderWrong(idx, q, enteredValues.join(' + '), { complete: true });
+        if (lad && (lad.wait || !lad.spent)) {
+            if (!lad.wait) { expandedInputs.forEach((el) => markTried(el)); wsRecordAnswer(idx, false); }
+            neutral();
+            return;
+        }
         // All filled but not all correct - show wrong styling
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
@@ -2371,7 +2398,13 @@ export function wsSkipCard(idx) {
     advanceToNextProblem(idx);
 }
 
-export function checkWorksheetAnswer(idx) {
+// A multi-slot item is checked as the pupil types in each box, so a wrong verdict on the last
+// keystroke of one box is not yet a finished try: the card's support ladder climbs once per Check
+// press, so here it climbs once the boxes have been still for a moment (teacher follow-ups, 2026-10-30:
+// the ladder ran through every rung, and went red, while the pupil was still typing one box).
+const WS_SLOT_SETTLE_MS = 1500;   // as the quiz: a slow typist pauses inside a number (checker 2026-10-30)
+
+export function checkWorksheetAnswer(idx, settled) {
     const q = state.worksheetQs[idx];
     const input = document.getElementById(`ws_input_${idx}`);
     const card = document.getElementById(`ws_card_${idx}`);
@@ -2441,6 +2474,20 @@ export function checkWorksheetAnswer(idx) {
         isCorrect = timeAnswersMatch(value, q.ans, state.skill);
     } else {
         isCorrect = normalizeText(value) === normalizeText(q.ans);
+    }
+
+    // (a time's hour and minute boxes feed one value without slots: the same wait, checker 2026-10-30)
+    if (!isCorrect && (slotVerdict === false || isTimeSkill(state.skill)) && settled !== true) {
+        // several boxes, all filled, not right yet: neutral while the pupil may still be typing
+        input.style.borderColor = "";
+        card.style.background = "var(--bg-card)";
+        card.style.border = "";
+        worksheetWrongTimers.set(idx, setTimeout(() => {
+            worksheetWrongTimers.delete(idx);
+            const now = document.getElementById(`ws_input_${idx}`);
+            if (now && now.value.trim() === value) checkWorksheetAnswer(idx, true);
+        }, WS_SLOT_SETTLE_MS));
+        return;
     }
 
     if (isCorrect) {

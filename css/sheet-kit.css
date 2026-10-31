@@ -492,3 +492,8 @@
 :is(.ws-page, .ws-sheet) .ws-digitboxes { display: inline-flex; vertical-align: bottom; }
 :is(.ws-page, .ws-sheet) .ws-digitboxes .ws-box--digit { width: calc(var(--ws-hw) * 0.95); height: var(--ws-hw); box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; line-height: 1; }
 :is(.ws-page, .ws-sheet) .ws-digitboxes .ws-box--digit + .ws-box--digit { margin-left: calc(-1 * var(--ws-hair)); }
+
+/* Lesson 7 r2 (additive): a two-step frames cell (cells/word-work.js framesLayout) sets its story in a gutter beside the
+   item tab, so it takes no tab spacer above the story - on the page and in the measuring cell alike. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell="word-work"]:has(.mq-wwframes)::before,
+.ws-sheet > .ws-cell.mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }
