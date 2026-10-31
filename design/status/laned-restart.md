@@ -203,3 +203,56 @@ Evidence (150 dpi): `design/status/laned-restart/after-r2-*.png`, `before-r2-*.p
 Open (not F1's files): the instruction "Look at the _sign_. Solve." prints "thesign" (the `.ws-instrline` flex box drops the space
 before `<u>`; practice.js `instructionHtml`, pinned by ws-layout-unit BD-14); the fact probe (fact-probe.js) still re-lays its
 short last row in Mix / Long / Fraction (H13 31 % band at S and L, pre-existing on 76bc3700).
+
+## Round 2 closing builder (2026-10-31, Opus medium)
+
+Fixes (on eee6dcbc):
+- **CL-40, supports pages** (`css/sheet-kit.css`, additive): a supported problem whose first ink is the sign box (`boxsign`,
+  the 'before' pane) starts at the label keep-out edge (`--ws-koin` + 0.3 mm), beside a picture or not, and never shrinks to
+  make room (min-width: max-content); a grid-past-9 cell already padded right of the w2 keep-out publishes `--ws-koin: 0`.
+  `ws-print-lint --supports all --size S` (4 fact skills): add_facts CL40-INK x10 (main x8), div_facts CL40-INK x6 + H13 x2
+  -> **0 findings** (main: 19 findings in 3 docs). boxsign at L (sub / mult / div): unchanged from HEAD (div boxsign L H13-ROW x2,
+  on main). div_facts fade-packet: L CL40-INK x14 + PAGEFILL -> PG-12 x6 (see open row: the fade allocation is not measured).
+- **"Look at thesign"** (`practice.js instructionHtml`): a line with an underlined word keeps its text in one inline span (the
+  flex line dropped the space before `<u>`); ws-layout-unit BD-14 pin updated with it (1397 assertions OK). Lines with no `<u>`
+  are byte-identical.
+- **OPTION-HELP** (`skill-options.js` supportsOption help / helpShort): "None ticked ..." named the value `none`, which no fact
+  skill offers -> "Leave every box unticked ...". node-lint s1 on the 5 skills: 14 -> 4 (the 4 left are LESSON-DATA, below).
+- **Pins** (owner 2026-10-31: shared-role defects -> page-types lane), `design/audit/baselines/print-lint.json` (L) and
+  `print-lint.S.json` (S), each finding carrying a `pin` note: div_facts Review L CL40-INK 6 (R1-11); div_facts / div_facts_long
+  Reason It CL40-INK 4 at L, 6 at S (R1-9); div_facts / div_facts_long Guided H13 14 / 16 at S (R1-13); sub_facts Lesson S
+  WRAP-OP 4 (R1-5). Max over the five written forms.
+
+### Round 2 precritic (`--skill add_facts,sub_facts,mult_facts,div_facts,div_facts_long --role fact-rows --strict`)
+
+Run /tmp/mq-precritic/20261031-125119-32542 (40 gates: 22 PASS, 1 PASS (baseline), 2 SKIPPED no rulings), then the role
+print-lint gates, supports-S, options-render and node-lint re-run on the final tree. Main = `git worktree` of
+origin/claude/sweet-newton-c8wrv1 5c6063a5, same command.
+
+| Gate | Finding | Same on main? (proved by) | Status |
+|---|---|---|---|
+| print-lint --supports all S | CL40-INK sign box in the keep-out (add x10, div x6), div H13-ROW x2 | main red (19 findings, different cells) | **FIXED** (0 findings) |
+| print-lint --roles (divForm x5) L/S | Review CL40-INK (R1-11), Reason It CL40-INK (R1-9), Guided H13 (R1-13) | shared roles | **PINNED** (owner ruling) |
+| print-lint --roles lesson S | sub_facts WRAP-OP 4 (R1-5) | shared role | **PINNED** (owner ruling) |
+| print-lint --roles lesson S | div_facts_long Lesson SPREAD 1 (page 3, 43 %): the preset has no lesson data (host div_facts has none either) | host LESSON-DATA main red; the doc is new | open (lesson lane / lesson data) |
+| print-lint --roles divForm=long L, mix L | Mixed practice H13 x2 (div_facts), x4 / x2 (div_facts_long), cell 8 31 % band | **main red**: `ws-print-lint --roles mixed-practice --opts divForm=long --size L` on main: same H13 x2 cell 8, 28.5 mm | main-red (documented) |
+| print-lint --roles divForm=mix S/L | Fact Probe H13 x2 cell 20: the form grid's short last row is re-laid 1.5 columns wide | main **ok** (same command) | **open, lane**: `relay:false` (fact-rows' fix) swaps it for L-DENSITY HOLE (20 facts in 3 columns); the probe needs 4 / 5 columns or 2 x 10 for Mix (fact-rows.js formGrid) |
+| options-verify --skill | div_facts_long support=touch/skip/array/think/boxsign/all: no support drawn | **host red on main**: div_facts {divForm:long, support:[skip]} draws 0 supports on main (buildSheet probe; standard 18, fraction 12, vertical 9, mix 8). The long-division cell is not in support-draw.js canDraw | open (lane: draw supports on the bracket, or the preset may not offer them - ws-presets-unit requires the host's controls) |
+| options-verify --render | 15 value pages worse than default (across capacity at S, array H13, divForm capacity, div boxsign L H13-ROW, ...) | **main red**: 25 value pages on main, every branch page among them | main-red |
+| node-lint s1 | LESSON-DATA: sub / mult / div_facts and div_facts_long have no lessons/prereqs.js entry | **main red** (same 3 + the preset inherits) | main-red |
+| dealer-uniform | add 7, sub 18, mult 1, div 3, div_facts_long 1 | **main red**: add 7, sub 18, mult 1, div 3 (same command) | main-red |
+| slot-clip | div_facts sections/defaults L `ws-eq-below` 6.2 mm under the row (19.3 mm rows; measured[3] = 30.6 mm, the sections layout sizes the row from a one-line height) | **main red**: 8.2 mm, rows 17.3 mm | main-red (not small: practice/print-sheet sections row height, not equation.js) |
+| slot-clip | mult_facts fade-page L PG-12 x8 | **main red**: x8 at L (and S x10, M x8 on main) | main-red |
+| slot-clip | div_facts fade-packet L PG-12 x6 (sign box pages laid at columns measured without the faded supports) | main red differently: L CL40-INK x14 + DN-2 / H13 / PAGEFILL (26 findings) | open (fade allocation is not measured; engine) |
+| sibling-compare | 162 counts with no approved sibling | structural: no approved fact-family sibling exists on main either | not blocking a fix; needs siblings |
+| content-audit (full) | algebraic_all make-a-ten multiple-choice pair NEW | **main red**: identical NEW line on main | main-red |
+| composing:fraction_number_line lesson | not in this scope's plan (role sample lesson not run by --role fact-rows) | - | not run |
+
+Not red: node-lint, providers, content-audit --skill, presets-unit, lessonfit, coverage-matrix (47 rows OK vs baseline),
+print-lint kit S/M/L, lesson L (baseline), divForm standard S, supports-S, screen-slots, screen-answer, chromebook-fit,
+code-snapshot, boot-smoke, phone-card, spec-card signed, grade-render + print-lint fact-rows S/L. Unit gates: ws-layout-unit OK
+(1397), ws-code-snapshot OK (732), ws-search-terms OK, ws-standards OK, ws-share-options OK, ws-redesign-passed OK (7, unchanged),
+ws-spec-card --check-signed facts.md OK, ws-backtest 5 lane rows PASS (arc-ink-laned, grid-even-laned, frac-keepout-laned,
+screen-uniform-laned, section-overlap-lesson-warmup).
+
+Seen, not gated: the think box "Think: 11 × ☐ = 121" crowds its own frame at S (both trees).

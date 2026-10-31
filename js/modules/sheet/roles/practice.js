@@ -489,7 +489,10 @@ export function sectionInstructionKey(keys) {
 /** A library instruction as printed: `_word_` is an underlined word (library convention). */
 export function instructionHtml(key, text) {
     const body = esc(text).replace(/_([^_]+)_/g, '<u>$1</u>');
-    return `<div class="ws-instrline" data-ws-instruction="${esc(key)}">${body}</div>`;
+    // The line is a flex box: bare text beside a <u> becomes anonymous flex items whose edge spaces collapse
+    // ("Look at the_sign_" printed "thesign"). A line with an underlined word keeps its text in one inline span.
+    const inner = body.includes('<u>') ? `<span>${body}</span>` : body;
+    return `<div class="ws-instrline" data-ws-instruction="${esc(key)}">${inner}</div>`;
 }
 
 /** HD-14: how many lines the title takes at the preset size (a width estimate, 0.55 em a character). */

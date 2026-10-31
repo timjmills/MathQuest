@@ -505,3 +505,17 @@
 .ws-page .ws-grid > .ws-cell:not([data-ws-cell]):is(.mqt--word-work, .mqt--words, .mqt--counters, .mqt--seqstrip, .mqt--remainder):has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
 .ws-page .ws-grid > .ws-cell:not([data-ws-cell]).mqt--remainder:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun)::before { height: max(0mm, calc(var(--ws-tab, 5mm) - 1.25mm)); }
 .ws-page .ws-grid > .ws-cell:not([data-ws-cell]).mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }
+
+/* 2026-10-31 (Lane D restart r2 closing; CL-40, ws-print-lint --supports all L-OVERLAP CL40-INK): the sign box support
+   (support-draw.js, the 'before' pane) is the first ink of a supported cell. Beside a picture the pair starts at the cell's
+   left plus 2 mm (SCC-T10), and a pair as wide as a narrow column starts at the cell's left pad: either way the sign box's
+   rect stood 3.7 - 4.6 mm across, inside the label keep-out (tab side + 1 mm). A supported problem in a labelled cell now
+   starts at the keep-out edge (--ws-koin, the edge from the content box) + 0.3 mm. The measuring cell carries a label too
+   (print-sheet.js measureFresh), so a pair that no longer fits its column is measured as not fitting; the pair never
+   shrinks to make room (min-width: max-content - a squeezed sign box printed its caption at 3.8 - 6.8 pt, TY-11). Additive. */
+:is(.ws-page, .ws-sheet) .ws-cell:has(> :is(.ws-tab, .ws-letter)) .ws-supported > .ws-with-pane[data-ws-pane-place="beside"] { padding-left: max(2mm, calc(var(--ws-koin, 2mm) + 0.3mm)) !important; min-width: max-content; }
+:is(.ws-page, .ws-sheet) .ws-cell:has(> :is(.ws-tab, .ws-letter)) .ws-supported:not(:has(> .ws-with-pane[data-ws-pane-place="beside"])):has([data-ws-pane-place="before"]) { padding-left: calc(var(--ws-koin, 2mm) + 0.3mm); min-width: max-content; }
+/* ... and a cell the grid-past-9 rule above already pads right of the w2 / w3 keep-out (its content box starts past
+   the keep-out) publishes a keep-out edge of 0 from its content box, so the rule above adds nothing there. Additive. */
+.ws-page .ws-grid:not(.facts):has(> .ws-cell > .ws-tab.w2, > .ws-cell > .ws-tab.w3) > .ws-cell:is([data-ws-cell="equation"], [data-ws-cell="fact"]):has(> .ws-tab):not(.mq-hfactcell):not(:has(> .ws-fact)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun),
+.ws-page .ws-grid:not(.facts) > .ws-cell.mq-hfactcell[data-ws-cell]:has(> .ws-tab, > .ws-letter):not(.blankrun) { --ws-koin: 0mm; }

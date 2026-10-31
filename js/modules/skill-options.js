@@ -108,8 +108,8 @@ export const supportsOption = (values, { help, labels = {}, render = null, dflt 
     values: values.map(v => ({ v, l: labels[v] || SUPPORT_LABELS[v] || v })),
     allLabel: 'Every support',
     help: help || 'Tick the help to draw on each problem, on paper and on screen. Supports that cannot '
-        + 'share a problem are shared out by section or problem by problem. None ticked is the fade.',
-    helpShort: 'Tick the help each problem carries. None ticked is no help.',
+        + 'share a problem are shared out by section or problem by problem. Leave every box unticked for the fade.',
+    helpShort: 'Tick the help each problem carries. Leave every box unticked for no help.',
 });
 export const supportCoverOption = (render = null) => ({
     id: 'cover', label: 'Which problems get it', type: 'enum', default: 'whole', group: 'support',

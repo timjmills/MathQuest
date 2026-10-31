@@ -1165,7 +1165,7 @@ eq(levelLine([2, '3']), 'Level 2-3', 'HD-5: a level range');
 eq(levelLine(['M']), 'All levels', 'HD-5: a multi-level skill');
 eq(sectionInstructionKey(['add', 'add']), 'add', 'BD-13: one key');
 eq(sectionInstructionKey(['multiply', 'divide']), 'mixed-ops', 'BD-13: x and / mixed');
-eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div class="ws-instrline" data-ws-instruction="mixed-sign">Add or subtract. Look at the <u>sign</u>.</div>', 'BD-14: the underlined word of a library string');
+eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div class="ws-instrline" data-ws-instruction="mixed-sign"><span>Add or subtract. Look at the <u>sign</u>.</span></div>', 'BD-14: the underlined word of a library string (in one inline span: the flex line kept no space before it)');
 
 /* ================================================ the lesson (roles/lesson.js, 2026-09-25) */
 {

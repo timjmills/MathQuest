@@ -58106,6 +58106,151 @@
      "msg": "key page 9 has 1 answer slots, pupil page 4 has 0 (AK-4)"
     }
    ]
+  },
+  {
+   "id": "division:div_facts#review",
+   "pages": null,
+   "keyPages": null,
+   "error": null,
+   "counts": {
+    "L-OVERLAP": 6
+   },
+   "findings": [
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-11 Review count-by strip in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-11 Review count-by strip in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-11 Review count-by strip in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-11 Review count-by strip in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-11 Review count-by strip in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-11 Review count-by strip in the keep-out)"
+    }
+   ]
+  },
+  {
+   "id": "division:div_facts#reason-it",
+   "pages": null,
+   "keyPages": null,
+   "error": null,
+   "counts": {
+    "L-OVERLAP": 4
+   },
+   "findings": [
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
+    }
+   ]
+  },
+  {
+   "id": "division:div_facts_long#reason-it",
+   "pages": null,
+   "keyPages": null,
+   "error": null,
+   "counts": {
+    "L-OVERLAP": 4
+   },
+   "findings": [
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "page": 1,
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
+    }
+   ]
   }
  ]
 }
