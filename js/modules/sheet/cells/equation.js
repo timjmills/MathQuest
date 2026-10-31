@@ -176,11 +176,7 @@ register('equation', {
             const o = (g) => `<span class="o" style="width:${ACROSS_OP_EM}em">${g}</span>`;
             const sentence = `<span>${num('a')}</span>${o(opGlyph(p.op))}<span>${num('b')}</span>${o('=')}`;
             if (acrossBelow(p, ctx)) {
-                // (ops-family r2 F1: a + / − across sentence as wide as its column - "823 − 100 =" at 3
-                // columns - starts 1.5 mm lower on paper, as the missing-number sentence does below, so
-                // its first digit never inks the label keep-out in a row sized to its content, CL-40)
-                const padB = ctx.mode !== 'screen' && (p.op === '+' || p.op === '-' || p.op === '−') ? ';padding-top:1.5mm' : '';
-                return `<div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em${padB}">`
+                return `<div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_GAP_EM}em;white-space:nowrap">${sentence}</span>${slotHtml}</div>`;
             }
             return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;

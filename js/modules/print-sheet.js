@@ -2724,15 +2724,23 @@ async function buildSheetCore(req = {}) {
                 // section is DRAWN at. The dense pass may take more columns than the share's height holds
                 // (an across sentence draws answer-below at 3 columns: 28.6 mm in an 18.4 mm row, 8 mm
                 // out of its cell), so the section is held to the widest count whose own height fits.
-                const tooTall = (Lx) => { const f = sec.floor && sec.floor[Lx.cols]; return !!(f && Number.isFinite(f.hMm) && f.hMm > Lx.cellH + 0.05); };
-                if (tooTall(L) && L.cols > 1) {
-                    const room = (sec.gridH || 0) - (sec.anchorMm || 0) - 1;
-                    let c = L.cols - 1;
-                    while (c > 1 && !(sec.floor[c] && Number.isFinite(sec.floor[c].hMm) && sec.floor[c].hMm <= room)) c--;
+                // (+ KEEP_OUT: a top-started across sentence takes the label keep-out spacer above its ink - css/sheet-kit.css
+                // CL-40 block - which shrinks to nothing in a row sized exactly to its content: "823 − 100 =" inked the
+                // number tab at 3 columns; the row holds the spacer too, or the section takes fewer columns)
+                const KEEP_OUT = (probesOf(si) || []).length && probesOf(si).every((it) => it && it.template === 'equation') ? 1.5 : 0;
+                const over = (Lx, m) => { const f = sec.floor && sec.floor[Lx.cols]; return !!(f && Number.isFinite(f.hMm) && f.hMm + m > Lx.cellH + 0.05); };
+                if (over(L, KEEP_OUT) && L.cols > 1) {
+                    // the widest narrower count whose rows hold the content and the spacer; else the widest that holds the content
                     const was = sec.maxCols;
-                    sec.maxCols = Math.min(Number(was) || 10, c);
-                    const L2 = resolveShare();
-                    if (tooTall(L2)) sec.maxCols = was; else L = L2;
+                    let pick = null, loose = null;
+                    for (let c = L.cols - 1; c >= 1 && !pick; c--) {
+                        sec.maxCols = Math.min(Number(was) || 10, c);
+                        const L2 = resolveShare();
+                        if (!over(L2, KEEP_OUT)) pick = { c: sec.maxCols, L: L2 };
+                        else if (!loose && !over(L2, 0)) loose = { c: sec.maxCols, L: L2 };
+                    }
+                    const best = pick || loose || (over(L, 0) ? null : { c: was, L });
+                    if (best) { sec.maxCols = best.c; L = best.L; } else sec.maxCols = was;
                 }
                 out[si] = capFromL(sec, si, L);
             });
