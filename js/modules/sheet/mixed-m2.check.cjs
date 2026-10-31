@@ -42,6 +42,11 @@ const SETS = {
     c: ['addition:add_facts', 'addition:add_word_problems'],              // facts + word problems
     d: ['fractions:identify', 'subtraction:subtract'],                    // a visual fraction cell + whole numbers
 };
+// R1-7 (the shared-roles lane's cases): one-skill and I Can Mixed practice pages whose size ladder broke
+const LADDER1 = [
+    { set: ['subtraction:sub_100k_regroup'], look: 'daily' }, { set: ['decimals:add_decimal'], look: 'ican' },
+    { set: ['subtraction:sub_facts'], look: 'ican' }, { set: ['addition:add_facts', 'fractions:identify'], look: 'ican', strict: true },
+];
 const SIZES_ = ['S', 'M', 'L'];
 const LOOKS_ = QUICK ? ['daily'] : ['daily', 'ican'];
 const TOL_MM = 0.3;
@@ -113,6 +118,8 @@ const PAGE_FN = async (req) => {
             const lastB = bands.length ? Math.max(...bands.map((b) => b.getBoundingClientRect().bottom)) : bb.top;
             out.free = (bb.bottom - lastB) / mm;
             out.bodyMm = bb.height / mm;
+            // cells across each shelf (one-row cells side by side at the grid's top)
+            out.across = [...pg.querySelectorAll('.ws-band .ws-grid')].map((g) => { const top = g.getBoundingClientRect().top; return [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun') && Math.abs(c.getBoundingClientRect().top - top) < 3).length; });
             pages.push(out);
         }
         host.remove();
@@ -132,7 +139,7 @@ const PAGE_FN = async (req) => {
     }
     return {
         arr: o.arrangement, role: o.role, n: o.items.length, per, pages: o.pageCount, keyPages: o.keyPageCount, notes: o.notes || [],
-        perPage: o.fits && o.fits.perPage, m2: meta.m2 || null, longest: meta.interleave ? meta.interleave.longest : null,
+        perPage: o.fits && o.fits.perPage, cols: o.fits && o.fits.cols, m2: meta.m2 || null, longest: meta.interleave ? meta.interleave.longest : null,
         pupil, key, pagePools, maxRows: { S: 9, M: 7, L: 5 }[req.size],
     };
 };
@@ -143,6 +150,7 @@ function scenarios() {
     for (const arr of ['mixed', 'sections']) for (const k of sets) for (let s = 1; s <= SEEDS; s++) for (const look of LOOKS_) {
         out.push({ kind: 'ladder', arr, set: k, look, seed: 4000 + s * 37, sizes: SIZES_ });
     }
+    for (const x of LADDER1) out.push({ kind: 'ladder', arr: 'sections', set: x.set.join('+'), skills: x.set, look: x.look, seed: 4111, sizes: SIZES_, weak: !x.strict });
     // exact counts, mixed problem by problem (the owner's "specified problem distribution")
     out.push({ kind: 'exact', arr: 'mixed', set: 'a', counts: [12, 8], size: 'M', look: 'daily', seed: 501 });
     out.push({ kind: 'exact', arr: 'mixed', set: 'a', counts: [3, 37], size: 'L', look: 'daily', seed: 502 });
@@ -167,12 +175,12 @@ async function main() {
     const table = [];
     try {
         for (const sc of scenarios()) {
-            const set = SETS[sc.set];
+            const set = sc.skills || SETS[sc.set];
             const sizes = sc.sizes || [sc.size];
             const got = {};
             for (const size of sizes) {
                 const sections = sc.counts ? set.map((id, i) => ({ skills: [sk(id)], count: sc.counts[i], ...(sc.pages ? { pages: sc.pages } : {}) })) : [{ skills: set.map(sk) }];
-                const req = { role: sc.role || 'mixed-practice', arrangement: sc.arr, sections, size, look: sc.look, seed: sc.seed, key: true };
+                const req = { role: sc.role || 'mixed-practice', ...(set.length > 1 ? { arrangement: sc.arr } : {}), sections, size, look: sc.look, seed: sc.seed, key: true };
                 const id = `${sc.kind} ${sc.role || ''}${sc.arr} ${sc.set}${sc.counts ? ` ${sc.counts.join(':')}` : ''} ${sc.look} ${size} seed ${sc.seed}`;
                 const fail = (why) => fails.push(`${id}: ${why}`);
                 let r;
@@ -183,6 +191,9 @@ async function main() {
                 // arranged
                 if (sc.arr === 'mixed' && r.arr !== 'mixed') fail(`arranged ${r.arr} (${notes.slice(0, 160)})`);
                 if (sc.arr === 'sections' && r.arr !== 'sections') fail(`arranged ${r.arr}`);
+                // fits.cols is the count across the page prints (its widest shelf), not the lattice
+                const across = Math.max(0, ...r.pupil.flatMap((pg) => pg.across));
+                if (r.arr === 'sections' && r.cols && across && r.cols !== across) fail(`fits.cols ${r.cols}, the page prints ${across} across`);
                 if (sc.role && r.role !== sc.role) fail(`role ${r.role}`);
                 // runs, in turns, against the weights-win cap; a run over 2 is in the notes
                 if (r.arr === 'mixed') {
@@ -241,7 +252,8 @@ async function main() {
             // the size ladder: S > M > L problems a page
             if (sc.kind === 'ladder' && got.S && got.M && got.L) {
                 const pp = (x) => x.n / Math.max(1, x.pages);
-                if (!(pp(got.S) > pp(got.M) && pp(got.M) > pp(got.L))) fails.push(`ladder ${sc.arr} ${sc.set} ${sc.look} seed ${sc.seed}: problems a page S ${pp(got.S)} / M ${pp(got.M)} / L ${pp(got.L)} (S > M > L)`);
+                const ok = sc.weak ? pp(got.S) >= pp(got.M) && pp(got.M) >= pp(got.L) : pp(got.S) > pp(got.M) && pp(got.M) > pp(got.L);
+                if (!ok) fails.push(`ladder ${sc.arr} ${sc.set} ${sc.look} seed ${sc.seed}: problems a page S ${pp(got.S)} / M ${pp(got.M)} / L ${pp(got.L)} (S > M > L${sc.weak ? ', one skill: S >= M >= L' : ''})`);
                 if (got.S.pages > 1 || got.M.pages > 1 || got.L.pages > 1) fails.push(`ladder ${sc.arr} ${sc.set} ${sc.look} seed ${sc.seed}: a fill page spilled to ${Math.max(got.S.pages, got.M.pages, got.L.pages)} pages`);
             }
         }
@@ -251,7 +263,7 @@ async function main() {
     }
     if (process.argv.includes('--table')) for (const t of table) console.log(`  ${t}`);
     for (const w of warns.slice(0, 20)) console.log(`  WARN ${w}`);
-    for (const f of fails.slice(0, 60)) console.log(`  FAIL ${f}`);
+    for (const f of fails.slice(0, process.argv.includes('--all') ? 1e6 : 60)) console.log(`  FAIL ${f}`);
     console.log(`mixed-m2 check: ${fails.length ? 'FAIL' : 'OK'} (${pages} pages, ${scenarios().length} scenarios${QUICK ? ', quick' : ''}; ${fails.length} failure(s))`);
     process.exit(fails.length ? 1 : 0);
 }

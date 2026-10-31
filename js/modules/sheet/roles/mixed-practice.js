@@ -70,11 +70,16 @@ const stripMmOf = (input) => (input.stepStrip && Number(input.stepStripMm) > 0 ?
  * 10 I Can at S; R1-7), then its divisors up to 6. A fact cell keeps TY-30's working digits for the
  * size above 6 across (the fact ladder sets them by the count across).
  */
-function sectionKs(its, N, ctx) {
+function sectionKs(its, N, ctx, single = false) {
     const floor = (SIZES[ctx.size] || SIZES.L).digitPt;
     const allFact = its.length && its.every((it) => it.template === 'fact');
-    const wide = N > 6 && (!allFact || (FACT_LADDER[N] || 0) >= floor) ? [N] : [];
-    return [...wide, ...divisorsDesc(N).filter((d) => d <= 6)];
+    // a page of ONE skill is its own lattice (PT-MIX-1 holds trivially): any count up to N, so a
+    // lattice of 8 does not hold S to 4 across where M prints 6 (R1-7)
+    const ks = single ? Array.from({ length: N }, (_, i) => N - i).filter((d) => d <= 6 || d === N)
+        : [...(N > 6 ? [N] : []), ...divisorsDesc(N).filter((d) => d <= 6)];
+    // TY-30: a fact cell never prints under the size's working digits (the ladder sets them by k) -
+    // at L a fact 6 across (24 pt) printed more than M's 4 (R1-7, sub_facts I Can)
+    return ks.filter((d) => !allFact || (FACT_LADDER[d] || 28) >= floor);
 }
 
 /** Shelves: for each pool {id, k, h}, then how many shelves each gets. */
@@ -99,13 +104,13 @@ function packing(poolsIn, input) {
         const pairK = twins.length ? divisorsDesc(N).find((d) => d <= 6 && d % 2 === 0 && fitsAt(its, d, ctx) && fitsAt(twins, d, ctx)) : 0;
         // R1-7 (LESSONS L1): the shelf may run the whole lattice (8 Daily / 10 I Can at S) where the
         // cells were measured to fit it - a lattice of 8 has no 6, so S printed fewer than M
-        let k = pairK || sectionKs(its, N, ctx).find((d) => (d <= 6 ? fitsAt(its, d, ctx) : fitsMeasured(its, d, ctx))) || 1;
+        let k = pairK || sectionKs(its, N, ctx, ids.length === 1).find((d) => (d <= 6 ? fitsAt(its, d, ctx) : fitsMeasured(its, d, ctx))) || 1;
         // exact counts (the owner's "mix by section, with specified amount"): a count that does not
         // fill whole shelves takes the next count across (at least half) that does; else the last
         // shelf ends in one unruled trailing area (PG-15) - never an empty box
         const want = exact ? Math.max(0, Math.floor(Number(exact[id]) || 0)) : 0;
         if (exact && !pairK && want % k) {
-            const whole = sectionKs(its, N, ctx).find((d) => d < k && d >= Math.max(2, k / 2) && want % d === 0 && fitsAt(its, d, ctx));
+            const whole = sectionKs(its, N, ctx, ids.length === 1).find((d) => d < k && d >= Math.max(2, k / 2) && want % d === 0 && fitsAt(its, d, ctx));
             if (whole) k = whole;
         }
         const h = Math.max(hAtK(its, k, ctx), pairK ? hMinAt(twins, k, ctx) : 0);
@@ -1007,7 +1012,8 @@ export function plan(input = {}) {
     return assemble(ROLE_ID, input, frame, pages.map((pg) => ({ sections: pg.sections })), {
         defaultLook: DEFAULT_LOOK,
         meta: { items: n, scoreOutOf: n, units: p.N, achieved, arrangement: 'sections', ...(p.ladderNote ? { notes: [p.ladderNote] } : {}),
-            fits: [{ cols: p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
+            // (cols: the count across the page prints - its widest shelf - not the lattice; R1-7)
+            fits: [{ cols: shelves.length ? Math.max(...shelves.map((x) => x.k)) : p.N, rows: shelves.length, line: `Fits: ${shelves.length} shelves on a ${p.N}-unit lattice, ${n} problems, ${pages.length} page${pages.length > 1 ? 's' : ''}.` }] },
     });
 }
 
