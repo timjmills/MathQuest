@@ -790,3 +790,13 @@ builder's choice; brief the critic's sets (incl. a 2-digit stack and a fraction 
 (2) the dialog and the engine were built blind to each other's capacity (8 a page planned vs 30 printed): give parallel
 builders a shared contract test (the dialog's request → the engine's result counts) before either reports.
 (3) WARN lines hid two defects; a lane's check has no WARN for anything the rubric grades.
+
+### Mixed practice M2 — print critic r2 (2026-10-31, FAIL → §1.7 stop)
+
+Owner's case, Sections and exact counts at S / L pass (8–9); 2-digit × + facts, fractions + subtract, facts + word problems at
+M, 3:37 at M and I Can L fail on half-empty rows, unnoted long runs, uneven spread, cross-template alignment and digit size.
+Root cause and the six required checks: `design/status/mixed-pages.md` ("Root cause", "Machine checks required").
+**Speed-ups:** (1) a lane check may not hold a WARN for anything the rubric grades — the runs WARN let r2 through;
+(2) count runs and fill in what the pupil sees (problems, rows), never in the packer's own units (turns, budgets);
+(3) the critic's set list goes into the builder's check matrix before the first build (r1 already said so; r2 repeated it —
+make the critic brief and the check matrix one file).
