@@ -52,6 +52,9 @@
 //               values; the provider's wrongAnswer fits the item's answer boxes; pins in
 //               tests/fixtures/precritic/node-lint-s1.baseline.json), and ws-presets-unit checks that every preset's
 //               items obey its preset values
+//             and the visual-quality lane check (2026-10-31): ws-visual-quality --skill (VQ-REP the relation is drawn,
+//               VQ-ONEANSWER one answer place, VQ-LIVE no dead sign / grid / bank part, VQ-TITLE the I Can title is a
+//               sentence, VQ-NOLEGACY a kit cell; shrink-only pins in tests/fixtures/precritic/vq-baseline.json)
 //   --template <id>   the --skill gates for every live skill whose kit cell template is <id> on ANY of its 8 seeded
 //             items (a "template skill scan" row names the skills that draw it, and FAILS naming any skill whose
 //             generation errored on every item, since whether it draws <id> is unknown), + ws-panes-unit, a
@@ -563,6 +566,15 @@ const PARSE = {
         if (v[1] !== 'OK') return { result: 'FAIL', findings: `${bad.length} row×size(s) failing; ${base}`, detail: bad.slice(0, 8).map((r) => `${r.id} ${r.size}: ${(r.findings || [r.status]).join('; ').slice(0, 180)}`), explainsExit: code === 1 };
         return { result: checked.some((r) => (r.slot || 0) + (r.clip || 0) > 0) ? 'PASS (baseline)' : 'PASS', findings: `${base}; every SLOT / CLIP count at or below the approved siblings`, detail: [], explainsExit: false };
     },
+    /** ws-visual-quality (visual-quality lane): pinned findings are PASS (baseline); a FAIL lists the new findings. */
+    visualQuality(g, out, code) {
+        const r = generic(g, out, code);
+        const pinned = (out.match(/^ {6}pinned /gm) || []).length;
+        const m = /^ws-visual-quality: (?:OK|FAIL)[^(]*\((.*)\)\s*(.*)$/m.exec(out);
+        if (r.result === 'PASS') { r.findings = m ? m[1] : r.findings; if (pinned) r.result = 'PASS (baseline)'; }
+        else if (r.result === 'FAIL' && /^ws-visual-quality: FAIL/m.test(out)) r.detail = out.split('\n').filter((l) => /^ {6}FAIL |^ {2}BASELINE /.test(l)).slice(0, 10).map((l) => l.trim());
+        return r;
+    },
     /** ws-dealer-uniform (lane S1): INCOMPLETE (exit 3: a skill's valid set unknown) is never PASS; pinned findings are PASS (baseline). */
     dealerUniform(g, out, code) {
         const inc = /^ws-dealer-uniform: INCOMPLETE - not fully checked: (.*?) \((.*)\)\s*$/m.exec(out);
@@ -707,6 +719,10 @@ function buildPlan(ctx) {
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
         // ---- lane S1 (2026-10-24): dealer uniformity, and the lesson-data / option-help / wrong-answer-fit node rules
         add(gate('dealer-uniform', 'ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)', scope, 'node', 'ws-dealer-uniform', ['--skill', keys.join(',')], { parse: PARSE.dealerUniform, keys }));
+        // ---- the visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md §4.2): the visual CHOICE rules VQ-REP,
+        // VQ-ONEANSWER, VQ-LIVE, VQ-TITLE, VQ-NOLEGACY (node, seeded); pins in tests/fixtures/precritic/vq-baseline.json
+        // (shrink-only). A pinned finding is PASS (baseline); any other finding, or a skill missing from the output, is FAIL.
+        add(gate('visual-quality', 'ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell)', scope, 'node', 'ws-visual-quality', ['--skill', keys.join(',')], { parse: PARSE.visualQuality, keys, expect: { mention: keys } }));
         const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
         add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
         // W0-B2 (lane S1): the spec card that covers these skills is signed, its rulings / notOffered / decisions are as

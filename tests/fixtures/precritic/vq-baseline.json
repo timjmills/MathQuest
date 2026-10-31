@@ -1,0 +1,1510 @@
+{
+ "about": "ws-visual-quality pin (design/audit/VISUAL_QUALITY.md §4.2): the visual-quality findings that existed on 2026-10-31, outside the lane's own targets (IN_SCOPE in the script: add_wp_10/20 (+_plain), sub_wp_10/20 (+_plain), fact_family_sort; never pinnable). It may only SHRINK: `node tests/scripts/ws-visual-quality.mjs --write-baseline` keeps only the pins still found and lowers frozenCounts; a rule whose pin holds more than its frozen count fails the gate. A skill that leaves the list (fixed) is fine; a skill added to it is a new defect.",
+ "frozen": "2026-10-31",
+ "frozenCounts": {
+  "VQ-REP": 5,
+  "VQ-ONEANSWER": 5,
+  "VQ-LIVE": 112,
+  "VQ-TITLE": 17,
+  "VQ-NOLEGACY": 392
+ },
+ "rules": {
+  "VQ-REP": {
+   "addition:number_families_add": [
+    "relation-not-drawn"
+   ],
+   "composing:make_ten": [
+    "relation-not-drawn"
+   ],
+   "multiplication:mult_div_fact_family": [
+    "relation-not-drawn"
+   ],
+   "multiplication:number_families_mult": [
+    "relation-not-drawn"
+   ],
+   "number_ops_mixed:number_families_mixed": [
+    "relation-not-drawn"
+   ]
+  },
+  "VQ-ONEANSWER": {
+   "division:div_check_by_multiplying": [
+    "say-blanks"
+   ],
+   "division:div_fix_estimate": [
+    "say-blanks"
+   ],
+   "division:mixed_division": [
+    "say-blanks"
+   ],
+   "multiplication:equal_or_unequal_groups": [
+    "say-blanks"
+   ],
+   "multiplication:repeated_add_to_mult": [
+    "say-blanks"
+   ]
+  },
+  "VQ-LIVE": {
+   "addition:add_word_problems": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_word_problems_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_100": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_100_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_100k": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_100k_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_10k": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_10k_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_1k": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_1k_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_1m": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_1m_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_50": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:add_wp_50_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "addition:mixed_addition": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "algebra_mixed:algebra_all": [
+    "filler-bank"
+   ],
+   "algebra_mixed:algebraic_all": [
+    "filler-bank",
+    "grid-within-20"
+   ],
+   "algebra:algebra_word_mixed": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "algebra:mixed_algebra": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "algebra:multi_step_word": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "algebra:multi_step_word_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "algebra:two_step_add_then_div": [
+    "filler-bank"
+   ],
+   "algebra:two_step_add_then_mult": [
+    "filler-bank"
+   ],
+   "algebra:two_step_mult_div_first": [
+    "filler-bank"
+   ],
+   "all_mixed:all_domains_mixed": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "all_mixed:custom_mixed": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "all_mixed:grade_2_mixed": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "all_mixed:grade_4_mixed": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "division:div_grouping_word_problems": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "division:div_sharing_word_problems": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "division:div_word_problems": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "division:div_word_problems_plain": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "division:mixed_division": [
+    "dead-signs:+-",
+    "filler-bank",
+    "grid-within-20"
+   ],
+   "division:remainder_contexts": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "division:remainder_interpret": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "multiplication:mixed_multiplication": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "multiplication:mult_comparison": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "multiplication:mult_comparison_plain": [
+    "filler-bank"
+   ],
+   "multiplication:mult_word_problems": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "multiplication:mult_word_problems_plain": [
+    "dead-signs:+-",
+    "filler-bank"
+   ],
+   "number_ops_mixed:word_problems_mixed": [
+    "filler-bank"
+   ],
+   "number_ops_mixed:word_problems_mixed_plain": [
+    "filler-bank"
+   ],
+   "subtraction:mixed_subtraction": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_word_problems": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_word_problems_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_100": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_100_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_100k": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_100k_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_10k": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_10k_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_1k": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_1k_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_1m": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_1m_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_50": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_50_plain": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_compare": [
+    "dead-signs:*/",
+    "filler-bank"
+   ],
+   "subtraction:sub_wp_start_unknown": [
+    "dead-signs:*/",
+    "filler-bank"
+   ]
+  },
+  "VQ-TITLE": {
+   "addition:comparison_word": [
+    "title"
+   ],
+   "algebra:build_expr_addsub": [
+    "title"
+   ],
+   "algebra:build_expr_multdiv": [
+    "title"
+   ],
+   "algebra:solve_eq_addsub": [
+    "title"
+   ],
+   "algebra:solve_eq_multdiv": [
+    "title"
+   ],
+   "composing:base10_regroup": [
+    "title"
+   ],
+   "composing:odd_even": [
+    "title"
+   ],
+   "conversions:ratio_equivalent_or_not": [
+    "title"
+   ],
+   "division:missing_mult_div": [
+    "title"
+   ],
+   "division:remainder_too_big": [
+    "title"
+   ],
+   "fraction_operations:frac_word_problems": [
+    "title"
+   ],
+   "fractions:equivalent_or_not": [
+    "title"
+   ],
+   "measurement:heavier_lighter_visual": [
+    "title"
+   ],
+   "multiplication:equal_or_unequal_groups": [
+    "title"
+   ],
+   "number_ops_mixed:missing_factor_or_addend": [
+    "title"
+   ],
+   "number_ops_mixed:which_sign": [
+    "title"
+   ],
+   "subtraction:missing_add_sub": [
+    "title"
+   ]
+  },
+  "VQ-NOLEGACY": {
+   "addition:add_10_mixed": [
+    "no-kit-cell"
+   ],
+   "addition:add_10_no_regroup": [
+    "no-kit-cell"
+   ],
+   "addition:add_10_regroup": [
+    "no-kit-cell"
+   ],
+   "addition:add_20_mixed": [
+    "no-kit-cell"
+   ],
+   "addition:add_20_no_regroup": [
+    "no-kit-cell"
+   ],
+   "addition:add_20_regroup": [
+    "no-kit-cell"
+   ],
+   "addition:add_sub_100s": [
+    "no-kit-cell"
+   ],
+   "addition:add_sub_10s": [
+    "no-kit-cell"
+   ],
+   "addition:comparison_word": [
+    "no-kit-cell"
+   ],
+   "addition:equal_sign": [
+    "no-kit-cell"
+   ],
+   "addition:number_families_add": [
+    "no-kit-cell"
+   ],
+   "algebra_mixed:number_theory_all": [
+    "no-kit-cell"
+   ],
+   "algebra_mixed:order_ops_all": [
+    "no-kit-cell"
+   ],
+   "algebra:algebra_word_mixed_plain": [
+    "no-kit-cell"
+   ],
+   "algebra:balance_addsub": [
+    "no-kit-cell"
+   ],
+   "algebra:build_expr_addsub": [
+    "no-kit-cell"
+   ],
+   "algebra:build_expr_multdiv": [
+    "no-kit-cell"
+   ],
+   "algebra:combine_like_terms": [
+    "no-kit-cell"
+   ],
+   "algebra:distributive_expr": [
+    "no-kit-cell"
+   ],
+   "algebra:evaluate_expression": [
+    "no-kit-cell"
+   ],
+   "algebra:evaluate_expression_hard": [
+    "no-kit-cell"
+   ],
+   "algebra:factor_out_gcf": [
+    "no-kit-cell"
+   ],
+   "algebra:inequalities": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_ax_eq_b": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_ax_minus_b": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_ax_plus_b": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_bracket_div": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_eq_addsub": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_eq_multdiv": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_eq_twostep": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_unknown": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_x_div_a": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_x_div_a_plus_b": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_x_minus_a": [
+    "no-kit-cell"
+   ],
+   "algebra:solve_x_plus_a": [
+    "no-kit-cell"
+   ],
+   "algebra:tape_diagram": [
+    "no-kit-cell"
+   ],
+   "algebra:tape_diagram_plain": [
+    "no-kit-cell"
+   ],
+   "algebra:write_equation": [
+    "no-kit-cell"
+   ],
+   "algebra:write_equation_story": [
+    "no-kit-cell"
+   ],
+   "algebra:write_expression": [
+    "no-kit-cell"
+   ],
+   "all_mixed:grade_6_mixed": [
+    "no-kit-cell"
+   ],
+   "angles_lines:additive_angles": [
+    "no-kit-cell"
+   ],
+   "angles_lines:angles_around_point": [
+    "no-kit-cell"
+   ],
+   "angles_lines:angles_in_right_angle": [
+    "no-kit-cell"
+   ],
+   "angles_lines:angles_on_straight_line": [
+    "no-kit-cell"
+   ],
+   "angles_lines:identify_angles": [
+    "no-kit-cell"
+   ],
+   "angles_lines:identify_lines": [
+    "no-kit-cell"
+   ],
+   "angles_lines:measure_angles": [
+    "no-kit-cell"
+   ],
+   "angles_lines:mixed_angles_lines": [
+    "no-kit-cell"
+   ],
+   "angles_lines:place_symmetry_lines": [
+    "no-kit-cell"
+   ],
+   "angles_lines:symmetry": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:area": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:area_distributive_visual": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:area_missing_side": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:area_perimeter": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:area_polygon_decompose": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:area_triangle": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:area_unit_squares": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:composite_area_perimeter": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:composite_shapes": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:mixed_area_perimeter": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:perimeter": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:perimeter_grid": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:perimeter_missing_side": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:volume": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:volume_composite": [
+    "no-kit-cell"
+   ],
+   "area_perimeter:volume_missing_edge": [
+    "no-kit-cell"
+   ],
+   "comparing:compare_objects": [
+    "no-kit-cell"
+   ],
+   "composing:base10_build_hundreds": [
+    "no-kit-cell"
+   ],
+   "composing:base10_regroup": [
+    "no-kit-cell"
+   ],
+   "composing:compose_whole": [
+    "no-kit-cell"
+   ],
+   "composing:fraction_number_line": [
+    "no-kit-cell"
+   ],
+   "composing:make_ten": [
+    "no-kit-cell"
+   ],
+   "composing:odd_even": [
+    "no-kit-cell"
+   ],
+   "composing:select_even_odd": [
+    "no-kit-cell"
+   ],
+   "composing:ten_frame_build_teen": [
+    "no-kit-cell"
+   ],
+   "composing:whole_as_fraction": [
+    "no-kit-cell"
+   ],
+   "conversions:d_to_f": [
+    "no-kit-cell"
+   ],
+   "conversions:d_to_p": [
+    "no-kit-cell"
+   ],
+   "conversions:double_num_line": [
+    "no-kit-cell"
+   ],
+   "conversions:equiv_ratios": [
+    "no-kit-cell"
+   ],
+   "conversions:f_to_d": [
+    "no-kit-cell"
+   ],
+   "conversions:f_to_p": [
+    "no-kit-cell"
+   ],
+   "conversions:find_whole_from_pct": [
+    "no-kit-cell"
+   ],
+   "conversions:mixed_conversions": [
+    "no-kit-cell"
+   ],
+   "conversions:order_fdp": [
+    "no-kit-cell"
+   ],
+   "conversions:p_to_d": [
+    "no-kit-cell"
+   ],
+   "conversions:p_to_f": [
+    "no-kit-cell"
+   ],
+   "conversions:percent_of_number": [
+    "no-kit-cell"
+   ],
+   "conversions:percent_visual": [
+    "no-kit-cell"
+   ],
+   "conversions:ratio_equivalent_or_not": [
+    "no-kit-cell"
+   ],
+   "conversions:ratio_intro": [
+    "no-kit-cell"
+   ],
+   "conversions:ratio_part_to_part": [
+    "no-kit-cell"
+   ],
+   "conversions:ratio_simplest_form": [
+    "no-kit-cell"
+   ],
+   "conversions:ratio_tables": [
+    "no-kit-cell"
+   ],
+   "conversions:unit_rate_intro": [
+    "no-kit-cell"
+   ],
+   "coordinates:coord_distance_q1": [
+    "no-kit-cell"
+   ],
+   "coordinates:coord_polygon": [
+    "no-kit-cell"
+   ],
+   "coordinates:coordinate_all": [
+    "no-kit-cell"
+   ],
+   "coordinates:coordinate_graph": [
+    "no-kit-cell"
+   ],
+   "coordinates:coordinate_q1": [
+    "no-kit-cell"
+   ],
+   "coordinates:coordinates_plot_all": [
+    "no-kit-cell"
+   ],
+   "coordinates:coordinates_plot_q1": [
+    "no-kit-cell"
+   ],
+   "coordinates:coordinates_read_all": [
+    "no-kit-cell"
+   ],
+   "coordinates:coordinates_read_q1": [
+    "no-kit-cell"
+   ],
+   "coordinates:geo_reflect": [
+    "no-kit-cell"
+   ],
+   "coordinates:geo_rotate": [
+    "no-kit-cell"
+   ],
+   "coordinates:geo_translate": [
+    "no-kit-cell"
+   ],
+   "coordinates:mixed_coordinates": [
+    "no-kit-cell"
+   ],
+   "coordinates:net_surface_area": [
+    "no-kit-cell"
+   ],
+   "coordinates:reflect_x_axis": [
+    "no-kit-cell"
+   ],
+   "coordinates:reflect_y_axis": [
+    "no-kit-cell"
+   ],
+   "coordinates:rotate_half_turn": [
+    "no-kit-cell"
+   ],
+   "coordinates:rotate_quarter_turn": [
+    "no-kit-cell"
+   ],
+   "coordinates:rotate_three_quarter_turn": [
+    "no-kit-cell"
+   ],
+   "coordinates:translate_left_down": [
+    "no-kit-cell"
+   ],
+   "coordinates:translate_left_up": [
+    "no-kit-cell"
+   ],
+   "coordinates:translate_right_down": [
+    "no-kit-cell"
+   ],
+   "coordinates:translate_right_up": [
+    "no-kit-cell"
+   ],
+   "counting:count_sequence": [
+    "no-kit-cell"
+   ],
+   "data_analysis:box_plot_intro": [
+    "no-kit-cell"
+   ],
+   "data_analysis:box_plot_quartiles": [
+    "no-kit-cell"
+   ],
+   "data_analysis:histogram_read": [
+    "no-kit-cell"
+   ],
+   "data_analysis:mad": [
+    "no-kit-cell"
+   ],
+   "data_analysis:mean": [
+    "no-kit-cell"
+   ],
+   "data_analysis:median": [
+    "no-kit-cell"
+   ],
+   "data_analysis:mixed_data_analysis": [
+    "no-kit-cell"
+   ],
+   "data_analysis:mode": [
+    "no-kit-cell"
+   ],
+   "data_analysis:range": [
+    "no-kit-cell"
+   ],
+   "data_analysis:statistical_question": [
+    "no-kit-cell"
+   ],
+   "decimals:add_decimal": [
+    "no-kit-cell"
+   ],
+   "decimals:compare_decimal": [
+    "no-kit-cell"
+   ],
+   "decimals:compare_thousandths": [
+    "no-kit-cell"
+   ],
+   "decimals:div_by_decimal": [
+    "no-kit-cell"
+   ],
+   "decimals:div_decimal": [
+    "no-kit-cell"
+   ],
+   "decimals:div_decimal_by_whole": [
+    "no-kit-cell"
+   ],
+   "decimals:mixed_decimals": [
+    "no-kit-cell"
+   ],
+   "decimals:mult_decimal": [
+    "no-kit-cell"
+   ],
+   "decimals:order_decimals": [
+    "no-kit-cell"
+   ],
+   "decimals:round_decimals": [
+    "no-kit-cell"
+   ],
+   "decimals:round_thousandths": [
+    "no-kit-cell"
+   ],
+   "decimals:round_to_hundredth": [
+    "no-kit-cell"
+   ],
+   "decimals:round_to_tenth": [
+    "no-kit-cell"
+   ],
+   "decimals:sub_decimal": [
+    "no-kit-cell"
+   ],
+   "division:area_model_div_2by1": [
+    "no-kit-cell"
+   ],
+   "division:area_model_div_3by1": [
+    "no-kit-cell"
+   ],
+   "division:box_division_easy": [
+    "no-kit-cell"
+   ],
+   "division:box_division_hard": [
+    "no-kit-cell"
+   ],
+   "division:div_check_by_multiplying": [
+    "no-kit-cell"
+   ],
+   "division:div_equation_parts": [
+    "no-kit-cell"
+   ],
+   "division:div_fix_estimate": [
+    "no-kit-cell"
+   ],
+   "division:div_zero_in_quotient": [
+    "no-kit-cell"
+   ],
+   "division:divide": [
+    "no-kit-cell"
+   ],
+   "division:missing_mult_div": [
+    "no-kit-cell"
+   ],
+   "division:mixed_mult_div": [
+    "no-kit-cell"
+   ],
+   "division:remainder_too_big": [
+    "no-kit-cell"
+   ],
+   "frac_dec_mixed:conversions_all": [
+    "no-kit-cell"
+   ],
+   "frac_dec_mixed:decimals_all": [
+    "no-kit-cell"
+   ],
+   "frac_dec_mixed:fdp_all": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:add_frac_like_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:add_frac_unlike_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:add_mixed_like_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:add_mixed_unlike_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:decompose_frac_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:decompose_fractions": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:div_unit_frac_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:estimate_frac_ops": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_10_100": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_10_100_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_as_div_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_as_div_word": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_as_division": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_mult_word": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_mult_word_plain": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_word_mixed": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_word_mixed_plain": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_word_problems": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:frac_word_problems_plain": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:mult_frac_frac_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:mult_frac_whole_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:mult_scaling": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:mult_scaling_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:sub_frac_like_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:sub_frac_unlike_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:sub_mixed_like_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:sub_mixed_unlike_nv": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:unit_frac_div_whole": [
+    "no-kit-cell"
+   ],
+   "fraction_operations:whole_div_unit_frac": [
+    "no-kit-cell"
+   ],
+   "fractions:benchmark_fractions": [
+    "no-kit-cell"
+   ],
+   "fractions:compare_frac_lcd": [
+    "no-kit-cell"
+   ],
+   "fractions:compose_target_frac": [
+    "no-kit-cell"
+   ],
+   "fractions:equiv_frac_nv": [
+    "no-kit-cell"
+   ],
+   "fractions:equivalent": [
+    "no-kit-cell"
+   ],
+   "fractions:equivalent_or_not": [
+    "no-kit-cell"
+   ],
+   "fractions:fraction_bar_ops": [
+    "no-kit-cell"
+   ],
+   "fractions:fraction_of_set": [
+    "no-kit-cell"
+   ],
+   "fractions:fraction_of_set_hard": [
+    "no-kit-cell"
+   ],
+   "fractions:fraction_of_set_hard_nv": [
+    "no-kit-cell"
+   ],
+   "fractions:fraction_of_set_nv": [
+    "no-kit-cell"
+   ],
+   "fractions:graph_fractions": [
+    "no-kit-cell"
+   ],
+   "fractions:identify_nv": [
+    "no-kit-cell"
+   ],
+   "fractions:improper_mixed": [
+    "no-kit-cell"
+   ],
+   "fractions:mixed_improper_visual": [
+    "no-kit-cell"
+   ],
+   "fractions:order_frac_numline": [
+    "no-kit-cell"
+   ],
+   "fractions:order_fractions": [
+    "no-kit-cell"
+   ],
+   "fractions:round_fractions": [
+    "no-kit-cell"
+   ],
+   "fractions:select_equiv_frac": [
+    "no-kit-cell"
+   ],
+   "fractions:simplify": [
+    "no-kit-cell"
+   ],
+   "fractions:simplify_with_gcf": [
+    "no-kit-cell"
+   ],
+   "geo_mixed:geometry_all": [
+    "no-kit-cell"
+   ],
+   "graphs:build_bar_graph": [
+    "no-kit-cell"
+   ],
+   "graphs:build_pictograph": [
+    "no-kit-cell"
+   ],
+   "graphs:line_plot": [
+    "no-kit-cell"
+   ],
+   "graphs:line_plot_fractions": [
+    "no-kit-cell"
+   ],
+   "graphs:line_plot_g2": [
+    "no-kit-cell"
+   ],
+   "graphs:mixed_graphs": [
+    "no-kit-cell"
+   ],
+   "graphs:pie_chart": [
+    "no-kit-cell"
+   ],
+   "integers:abs_value": [
+    "no-kit-cell"
+   ],
+   "integers:compare_int": [
+    "no-kit-cell"
+   ],
+   "integers:number_line_int": [
+    "no-kit-cell"
+   ],
+   "integers:opposite_numbers": [
+    "no-kit-cell"
+   ],
+   "integers:order_negatives": [
+    "no-kit-cell"
+   ],
+   "integers:ordering_rationals": [
+    "no-kit-cell"
+   ],
+   "measurement:capacity": [
+    "no-kit-cell"
+   ],
+   "measurement:convert_cm_to_mm": [
+    "no-kit-cell"
+   ],
+   "measurement:convert_feet_to_inches": [
+    "no-kit-cell"
+   ],
+   "measurement:convert_km_to_m": [
+    "no-kit-cell"
+   ],
+   "measurement:convert_m_to_cm": [
+    "no-kit-cell"
+   ],
+   "measurement:convert_m_to_mm": [
+    "no-kit-cell"
+   ],
+   "measurement:convert_miles_to_feet": [
+    "no-kit-cell"
+   ],
+   "measurement:convert_yards_to_feet": [
+    "no-kit-cell"
+   ],
+   "measurement:convert_yards_to_inches": [
+    "no-kit-cell"
+   ],
+   "measurement:estimate_length": [
+    "no-kit-cell"
+   ],
+   "measurement:heavier_lighter_visual": [
+    "no-kit-cell"
+   ],
+   "measurement:length_customary": [
+    "no-kit-cell"
+   ],
+   "measurement:length_metric": [
+    "no-kit-cell"
+   ],
+   "measurement:mass_volume_liquid": [
+    "no-kit-cell"
+   ],
+   "measurement:unit_conversion_word": [
+    "no-kit-cell"
+   ],
+   "measurement:unit_conversions": [
+    "no-kit-cell"
+   ],
+   "multiplication:area_model_mult_hard": [
+    "no-kit-cell"
+   ],
+   "multiplication:dot_array_mult": [
+    "no-kit-cell"
+   ],
+   "multiplication:equal_or_unequal_groups": [
+    "no-kit-cell"
+   ],
+   "multiplication:mult_2by2_standard": [
+    "no-kit-cell"
+   ],
+   "multiplication:mult_break_apart": [
+    "no-kit-cell"
+   ],
+   "multiplication:mult_by_hundred": [
+    "no-kit-cell"
+   ],
+   "multiplication:mult_by_ten": [
+    "no-kit-cell"
+   ],
+   "multiplication:mult_div_fact_family": [
+    "no-kit-cell"
+   ],
+   "multiplication:mult_multiples_of_ten": [
+    "no-kit-cell"
+   ],
+   "multiplication:mult_placeholder_zero": [
+    "no-kit-cell"
+   ],
+   "multiplication:mult_zeros": [
+    "no-kit-cell"
+   ],
+   "multiplication:multiply": [
+    "no-kit-cell"
+   ],
+   "multiplication:number_families_mult": [
+    "no-kit-cell"
+   ],
+   "multiplication:repeated_add_to_mult": [
+    "no-kit-cell"
+   ],
+   "number_ops_mixed:mixed": [
+    "no-kit-cell"
+   ],
+   "number_ops_mixed:number_families_mixed": [
+    "no-kit-cell"
+   ],
+   "number_sense:compensation": [
+    "no-kit-cell"
+   ],
+   "number_sense:doubles_near_doubles": [
+    "no-kit-cell"
+   ],
+   "number_sense:make_a_ten": [
+    "no-kit-cell"
+   ],
+   "number_sense:near_doubles": [
+    "no-kit-cell"
+   ],
+   "number_theory:common_factors": [
+    "no-kit-cell"
+   ],
+   "number_theory:common_multiples": [
+    "no-kit-cell"
+   ],
+   "number_theory:divisibility_sort": [
+    "no-kit-cell"
+   ],
+   "number_theory:factor_links_easy": [
+    "no-kit-cell"
+   ],
+   "number_theory:factor_links_hard": [
+    "no-kit-cell"
+   ],
+   "number_theory:factor_links_medium": [
+    "no-kit-cell"
+   ],
+   "number_theory:factor_tchart_easy": [
+    "no-kit-cell"
+   ],
+   "number_theory:factor_tchart_hard": [
+    "no-kit-cell"
+   ],
+   "number_theory:factor_tchart_medium": [
+    "no-kit-cell"
+   ],
+   "number_theory:factors_identify": [
+    "no-kit-cell"
+   ],
+   "number_theory:gcf_easy": [
+    "no-kit-cell"
+   ],
+   "number_theory:gcf_hard": [
+    "no-kit-cell"
+   ],
+   "number_theory:lcm": [
+    "no-kit-cell"
+   ],
+   "number_theory:list_multiples": [
+    "no-kit-cell"
+   ],
+   "number_theory:missing_multiples": [
+    "no-kit-cell"
+   ],
+   "number_theory:mixed_number_theory": [
+    "no-kit-cell"
+   ],
+   "number_theory:multiples": [
+    "no-kit-cell"
+   ],
+   "number_theory:prime_composite": [
+    "no-kit-cell"
+   ],
+   "number_theory:sort_prime_composite": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:compare_expressions": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:cube_numbers": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:exponents_simple": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:mixed_order_ops": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:multi_ops_no_paren": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:nested_complex": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:oop_easy": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:oop_hard": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:oop_medium": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:paren_multi": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:paren_simple": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:square_numbers": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:three_ops_no_paren": [
+    "no-kit-cell"
+   ],
+   "order_of_operations:two_ops_no_paren": [
+    "no-kit-cell"
+   ],
+   "patterns:count_by_fill": [
+    "no-kit-cell"
+   ],
+   "patterns:count_by_powers_of_10": [
+    "no-kit-cell"
+   ],
+   "patterns:count_by_step_down": [
+    "no-kit-cell"
+   ],
+   "patterns:count_by_step_up": [
+    "no-kit-cell"
+   ],
+   "patterns:double": [
+    "no-kit-cell"
+   ],
+   "patterns:halve": [
+    "no-kit-cell"
+   ],
+   "patterns:number_pattern": [
+    "no-kit-cell"
+   ],
+   "patterns:pattern_relationship": [
+    "no-kit-cell"
+   ],
+   "patterns:seq_10": [
+    "no-kit-cell"
+   ],
+   "patterns:seq_2": [
+    "no-kit-cell"
+   ],
+   "patterns:seq_5": [
+    "no-kit-cell"
+   ],
+   "patterns:shape_pattern": [
+    "no-kit-cell"
+   ],
+   "placevalue:ten_times_story": [
+    "no-kit-cell"
+   ],
+   "probability:mixed_probability": [
+    "no-kit-cell"
+   ],
+   "probability:probability_basic": [
+    "no-kit-cell"
+   ],
+   "shapes_classify:classify_quads": [
+    "no-kit-cell"
+   ],
+   "shapes_classify:classify_triangles": [
+    "no-kit-cell"
+   ],
+   "shapes_classify:cross_section_3d": [
+    "no-kit-cell"
+   ],
+   "shapes_classify:hotspot_quads": [
+    "no-kit-cell"
+   ],
+   "shapes_classify:mixed_shapes": [
+    "no-kit-cell"
+   ],
+   "shapes_classify:net_identify": [
+    "no-kit-cell"
+   ],
+   "shapes_early:compose_from_attributes": [
+    "no-kit-cell"
+   ],
+   "shapes_early:compose_hexagon": [
+    "no-kit-cell"
+   ],
+   "shapes_early:compose_rect_from_squares": [
+    "no-kit-cell"
+   ],
+   "shapes_early:compose_shapes": [
+    "no-kit-cell"
+   ],
+   "shapes_early:count_edges_faces_vertices": [
+    "no-kit-cell"
+   ],
+   "shapes_early:count_sides_vertices_2d": [
+    "no-kit-cell"
+   ],
+   "shapes_early:measure_nonstandard": [
+    "no-kit-cell"
+   ],
+   "shapes_early:mixed_shapes_early": [
+    "no-kit-cell"
+   ],
+   "shapes_early:name_2d_shapes": [
+    "no-kit-cell"
+   ],
+   "shapes_early:name_3d_shapes": [
+    "no-kit-cell"
+   ],
+   "shapes_early:order_objects_length": [
+    "no-kit-cell"
+   ],
+   "shapes_early:partition_shapes": [
+    "no-kit-cell"
+   ],
+   "shapes_early:shape_attributes": [
+    "no-kit-cell"
+   ],
+   "shapes_early:shape_corners_count": [
+    "no-kit-cell"
+   ],
+   "shapes_early:shape_name_match_2d": [
+    "no-kit-cell"
+   ],
+   "shapes_early:shape_name_match_3d": [
+    "no-kit-cell"
+   ],
+   "shapes_early:shape_positions": [
+    "no-kit-cell"
+   ],
+   "subtraction:missing_add_sub": [
+    "no-kit-cell"
+   ],
+   "subtraction:mixed_add_sub": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_10_mixed": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_10_no_regroup": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_10_regroup": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_20_mixed": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_20_no_regroup": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_20_regroup": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_across_zeros": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_check_by_adding": [
+    "no-kit-cell"
+   ],
+   "subtraction:sub_facts": [
+    "no-kit-cell"
+   ],
+   "subtraction:unknown_start_wp": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_1": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_1_algebra": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_1_counting": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_1_data": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_1_geometry": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_1_measurement": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_1_operations": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_2": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_2_algebra": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_2_counting": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_2_data": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_2_fractions": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_2_geometry": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_2_measurement": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_2_operations": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_3": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_3_algebra": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_3_data": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_3_fractions": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_3_geometry": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_3_measurement": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_3_operations": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_4": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_4_algebra": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_4_data": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_4_fractions": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_4_geometry": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_4_measurement": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_4_operations": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_5": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_5_algebra": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_5_data": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_5_fractions": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_5_geometry": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_5_measurement": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_5_operations": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_6": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_6_algebra": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_6_data": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_6_fractions": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_6_geometry": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_6_measurement": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_6_operations": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_K": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_K_algebra": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_K_counting": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_K_data": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_K_geometry": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_K_measurement": [
+    "no-kit-cell"
+   ],
+   "vocabulary:vocab_grade_K_operations": [
+    "no-kit-cell"
+   ]
+  }
+ }
+}
