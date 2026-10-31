@@ -98,3 +98,10 @@ Effort: S = under an hour, M = a lane round, L = a full lane.
   2. fast PDF previews of printouts.
 - Lane D (session_013pHDnLXQQUYhTy6YS4oDjX) is still merging main and running its critic. It goes live only once the
   owner signs `design/cards/facts/facts.md`.
+- **Lane D result (02:08 UTC):** critic r1 FAIL on all four fact skills. The fact rows passed: + − × at 9, ÷ sign at 9 (10 columns),
+  fraction form at 8. Blocking: R1-1 (the long-division arc touches the dividend, so "4)8" reads as 48), R1-6 (the add_facts lesson
+  warm-up overflows, a regression), R1-2/R1-16 (the Mix grid is uneven), R1-15 (fraction form L, "110" sits in the tab keep-out), plus
+  shared-role defects. Branch `claude/sweet-newton-c8wrv1-laneD-restart` @ d608126d, draft PR #25 (do not merge). Hand-over:
+  `design/status/laned-restart.md`; report: `design/audit/runs/laned-restart/critic-r1.md`. Owner decisions: the facts card Q1–5;
+  the div_zero_in_quotient deal; whether the shared-role defects gate the family.
+- **All lanes stopped.** Spend 2026-10-30 ≈ $606 ≈ 21.6 % of the weekly limit.
