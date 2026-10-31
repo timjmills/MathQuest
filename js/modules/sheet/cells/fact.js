@@ -195,11 +195,21 @@ export function factCue(p, { px = 0 } = {}) {
         return wrap(cols * pitch + 1, rows * pitch + 1, body, `${rows} rows of ${cols}`);
     }
     if (kind === 'think') {
-        const w = 36, h = 9;
-        const body = `<rect x="0.3" y="0.3" width="${w - 0.6}" height="${h - 0.6}" rx="1.5" fill="none" stroke="${INK}" stroke-width="0.35"/>`
-            + text(3, 6, `Think: ${b} ×`, 3.6, 'start')
-            + `<rect x="21.5" y="1.8" width="5.4" height="5.4" rx="0.8" fill="none" stroke="${INK}" stroke-width="0.35"/>`
-            + text(28.4, 6, `= ${a}`, 3.6, 'start');
+        // (critic r2 R2-4: "= 108" ran over the 36 mm box's border and the box touched the "x". The box is
+        // measured from its text - Andika advances, "Think:" 2.9 em, a digit 0.59 em, a space 0.26 em, a
+        // sign 0.6 em - and sized for a 2-digit factor and a 3-digit product, so every cell of a page draws
+        // one box of one width with 2 mm of white inside each end.)
+        const fs = 3.6, ADV = 0.59, SP = 0.26, SG = 0.6;
+        const bd = Math.max(2, String(b).length), ad = Math.max(3, String(a).length);
+        const leftW = (2.9 + SP + bd * ADV + SP + SG) * fs;
+        const bx = 2 + leftW + 1.2, bw = 5.4;
+        const rx = bx + bw + 1.2;
+        const rightW = (SG + SP + ad * ADV) * fs;
+        const w = Math.ceil((rx + rightW + 2) * 10) / 10, h = 9;
+        const body = `<rect x="0.3" y="0.3" width="${f2(w - 0.6)}" height="${h - 0.6}" rx="1.5" fill="none" stroke="${INK}" stroke-width="0.35"/>`
+            + text(2, 6, `Think: ${b} ×`, fs, 'start')
+            + `<rect x="${f2(bx)}" y="1.8" width="${bw}" height="5.4" rx="0.8" fill="none" stroke="${INK}" stroke-width="0.35"/>`
+            + text(rx, 6, `= ${a}`, fs, 'start');
         return wrap(w, h, body, `think ${b} times what is ${a}`);
     }
     return '';

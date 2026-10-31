@@ -117,9 +117,12 @@
 //              CL40-INK (kit / pack) no ink - a glyph's ink box, an SVG shape, a painted border or fill - inside the
 //              label keep-out: the (label side + 1 mm) square at the cell's top-left corner, or the tab's own width
 //              when a 2-3 digit tab is wider (CL-40; critic 2026-10-24 D1, top-started across facts on the tab).
-//              ARC-INK (kit / pack) a long-division bracket's arc keeps >= 0.3 mm of white between its ink and the
-//              dividend's first digit's ink (VA-60a, owner 2026-10-31; Lane D restart critic r1 R1-1: "4 ) 8" read 48).
-//   (L-DENSITY GRID-EVEN, kit / pack: every cell of a fact grid `.ws-grid.facts` has one width within 0.2 mm;
+//              ARC-INK (kit / pack) a long-division bracket's arc keeps >= 0.5 mm of white between its ink and BOTH
+//              neighbours' ink - the dividend's first digit and the divisor's last (VA-60a, owner 2026-10-31 revised Q3;
+//              Lane D restart critic r1 R1-1: "4 ) 8" read 48; critic r2 R2-1: 0.27 mm on the divisor side).
+//   (L-DENSITY COUNT-FITS, kit / pack: a fact-rows page fills whole rows and Score /N = facts printed; r2 R2-2.)
+//              TEXT-FRAME (kit / pack) a line of text that starts inside a bordered box ends inside it (CL-1; r2 R2-4).
+//   (L-DENSITY GRID-EVEN, kit / pack: every cell of a kit grid `.ws-grid` has one width within 0.2 mm (r2 R2-3: all grids);
 //              RUBRIC C3, PT-FRW-3; Lane D restart critic r1 R1-2.)
 //   L-WRAP     WRAP-OP (kit / pack) no wrapped line of text ends in − + × ÷ = with its expression continued on the
 //              next line (critic r2 N6 vocabulary picture, N7 worked step). TY-21, H2 and WRAP-OP are measured by
@@ -1051,7 +1054,9 @@ function wsLintPage(cfg) {
            added); the digit's ink comes from canvas measureText at 20x the printed size (at print size canvas rounds
            the ink to whole pixels, 0.26 mm). */
         if (!isLegacy) {
-            const ARC_GAP_MM = 0.3;
+            // (critic r2 R2-1, owner 2026-10-31 revised Q3: >= 0.5 mm on BOTH sides - the divisor's last digit too;
+            // at 0.27 mm the "1" of "11 ) 121" joined the arc at 100 %)
+            const ARC_GAP_MM = (cfg && Number(cfg.arcGapMm)) || 0.5;   // (MQ_ARC_GAP_MM: a diagnostic floor, to print every gap)
             const ctxA = document.createElement('canvas').getContext('2d');
             const K = 20;
             const inkOfDigit = (sp) => {
@@ -1061,7 +1066,7 @@ function wsLintPage(cfg) {
                 const m = ctxA.measureText(sp.textContent.trim());
                 const fa = m.fontBoundingBoxAscent / K, fd = m.fontBoundingBoxDescent / K;
                 const base = r.top + (r.height - (fa + fd)) / 2 + fa;
-                return { l: r.left - m.actualBoundingBoxLeft / K, t: base - m.actualBoundingBoxAscent / K, b: base + m.actualBoundingBoxDescent / K };
+                return { l: r.left - m.actualBoundingBoxLeft / K, r: r.left + m.actualBoundingBoxRight / K, t: base - m.actualBoundingBoxAscent / K, b: base + m.actualBoundingBoxDescent / K };
             };
             for (const c of ri.cells) {
                 for (const svg of c.querySelectorAll('[data-ws-ops="division"] [role="group"] svg')) {
@@ -1073,21 +1078,91 @@ function wsLintPage(cfg) {
                     if (ai < 0) continue;
                     const row = svg.parentElement.style.gridRow;
                     const dd = kids.slice(ai + 1).find((s) => s.style.gridRow === row && /^\d$/.test(s.textContent.trim()) && visible(s));
-                    if (!dd) continue;
-                    const di = inkOfDigit(dd);
+                    // the divisor's last digit: the last digit span before the arc on the arc's row
+                    const dv = kids.slice(0, ai).reverse().find((s) => s.style.gridRow === row && /^\d$/.test(s.textContent.trim()) && visible(s));
                     const sw = (parseFloat(path.getAttribute('stroke-width')) || 1.5) * 96 / 72 / 2;
                     const M = path.getScreenCTM();
                     const L = path.getTotalLength();
-                    let right = -Infinity;
-                    for (let i = 0; i <= 200; i++) {
-                        const p = path.getPointAtLength((L * i) / 200);
-                        const q = new DOMPoint(p.x, p.y).matrixTransform(M);
-                        if (q.y < di.t - sw || q.y > di.b + sw) continue;
-                        right = Math.max(right, q.x + sw);
+                    // the arc's ink extent (right edge, left edge) at the height of a digit's ink
+                    const arcAt = (ink, side) => {
+                        let v = side > 0 ? -Infinity : Infinity;
+                        for (let i = 0; i <= 200; i++) {
+                            const p = path.getPointAtLength((L * i) / 200);
+                            const q = new DOMPoint(p.x, p.y).matrixTransform(M);
+                            if (q.y < ink.t - sw || q.y > ink.b + sw) continue;
+                            v = side > 0 ? Math.max(v, q.x + sw) : Math.min(v, q.x - sw);
+                        }
+                        return v;
+                    };
+                    const say = (gap, what, d) => `the bracket's arc ${gap < 0 ? `runs ${(-gap).toFixed(2)} mm into` : `comes within ${gap.toFixed(2)} mm of`} the ${what} "${d.textContent.trim()}" (${grid.getAttribute('aria-label') || 'division'}): keep at least ${ARC_GAP_MM} mm of white between the arc's ink and the digit's ink on both sides, or "4 ) 8" reads as "48" and "11 )" as one run of ink (VA-60a, owner 2026-10-31)`;
+                    if (dd) {
+                        const di = inkOfDigit(dd);
+                        const right = arcAt(di, 1);
+                        const gap = (di.l - right) / PX;
+                        if (Number.isFinite(right) && gap < ARC_GAP_MM) F('L-OVERLAP', 'ARC-INK', 'major', grid, say(gap, "dividend's first digit", dd), 'arc on the dividend');
                     }
-                    if (!Number.isFinite(right)) continue;
-                    const gap = (di.l - right) / PX;
-                    if (gap < ARC_GAP_MM) F('L-OVERLAP', 'ARC-INK', 'major', grid, `the bracket's arc ${gap < 0 ? `runs ${(-gap).toFixed(2)} mm into` : `comes within ${gap.toFixed(2)} mm of`} the dividend's first digit "${dd.textContent.trim()}" (${grid.getAttribute('aria-label') || 'division'}): keep at least ${ARC_GAP_MM} mm of white between the arc's ink and the digit's ink, or "4 ) 8" reads as "48" (VA-60a, owner 2026-10-31)`, 'arc on the dividend');
+                    if (dv) {
+                        const vi = inkOfDigit(dv);
+                        const left = arcAt(vi, -1);
+                        const gap = (left - vi.r) / PX;
+                        if (Number.isFinite(left) && gap < ARC_GAP_MM) F('L-OVERLAP', 'ARC-INK', 'major', grid, say(gap, "divisor's last digit", dv), 'arc on the divisor');
+                    }
+                }
+            }
+        }
+        /* L-DENSITY COUNT-FITS (PT-FRW-2 / PT 4.1 capacity, PT-DLG fits line; Lane D restart critic r2 R2-2: a mixed
+           + - x ÷ page printed 56 facts in a 10-column grid said to hold 70, "Score /56"). On a fact-rows page the
+           facts printed fill the lattice - no unruled run after the last fact - and the Score's denominator is the
+           number of facts printed. */
+        // (a fact-rows page: its tab is "Facts", data-ws-tab; or a key page marked data-ws-role="fact-rows")
+        if (!isLegacy && (/(^|\|)Facts(\||$)/.test(ri.el.getAttribute('data-ws-tab') || '') || ri.el.getAttribute('data-ws-role') === 'fact-rows')) {
+            for (const g of ri.el.querySelectorAll('.ws-grid.facts')) {
+                if (!visible(g)) continue;
+                const cells = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun'));
+                const run = [...g.children].find((c) => c.classList.contains('blankrun'));
+                const sc = ri.el.querySelector('.ws-field.score b');
+                const n = sc ? Number((sc.textContent.match(/\/\s*(\d+)/) || [])[1]) : NaN;
+                if (run) F('L-DENSITY', 'COUNT-FITS', 'major', run, `the fact grid prints ${cells.length} facts and leaves the rest of its last row unruled: a fact-rows page deals whole rows - the count printed is the grid's columns x rows (PT-FRW-2, critic r2 R2-2)`, 'short fact page');
+                if (Number.isFinite(n) && n !== cells.length && ri.el.querySelectorAll('.ws-grid.facts').length === 1) F('L-DENSITY', 'COUNT-FITS', 'major', g, `the page prints ${cells.length} facts but its Score says /${n}: the Score's denominator is the facts printed (HD-2, critic r2 R2-2)`, 'score count');
+            }
+        }
+        /* L-OVERLAP TEXT-FRAME (CL-1 ink inside its own box, H2; Lane D restart critic r2 R2-4: "Think: 12 x [ ] = 108"
+           ran past the think box's right edge in 6 of 12 cells). A line of text that starts inside a bordered box -
+           an SVG <rect> with a stroke round a <text>, or an HTML element with a border on both sides round its own
+           text - ends inside that box's inner edge too. */
+        if (!isLegacy) {
+            let nTF = 0;
+            for (const svg of ri.el.querySelectorAll('svg')) {
+                if (nTF > 5 || !visible(svg)) continue;
+                const rects = [...svg.querySelectorAll('rect')].filter((r) => (r.getAttribute('stroke') || getComputedStyle(r).stroke || 'none') !== 'none').map((r) => {
+                    const b = r.getBoundingClientRect(); const sw = (parseFloat(r.getAttribute('stroke-width')) || 0) * (b.width / Math.max(1e-6, r.width.baseVal.value || 1)) / 2;
+                    return { el: r, l: b.left + sw, r: b.right - sw, t: b.top + sw, b: b.bottom - sw };
+                }).filter((r) => r.r - r.l > 4 * PX);
+                if (!rects.length) continue;
+                for (const t of svg.querySelectorAll('text')) {
+                    const tb = t.getBoundingClientRect();
+                    if (!tb.width) continue;
+                    const cy = (tb.top + tb.bottom) / 2;
+                    // the smallest box the text STARTS in (its left edge and its mid-height inside)
+                    const box = rects.filter((r) => tb.left >= r.l - 0.1 && tb.left < r.r && cy > r.t && cy < r.b).sort((x, y) => (x.r - x.l) - (y.r - y.l))[0];
+                    if (!box) continue;
+                    if (tb.right > box.r + 0.1 * PX) { nTF++; F('L-OVERLAP', 'TEXT-FRAME', 'major', t, `the text "${(t.textContent || '').trim().slice(0, 24)}" runs ${mm(tb.right - box.r)} mm past the right edge of the box it starts in: text inside a bordered box ends inside the border (CL-1, H2)`, 'text over its frame'); }
+                }
+            }
+            for (const d of ri.el.querySelectorAll('.ws-page *')) {
+                if (nTF > 5 || !visible(d) || d.closest('svg')) continue;
+                const cs = getComputedStyle(d);
+                const bl = parseFloat(cs.borderLeftWidth) || 0, br = parseFloat(cs.borderRightWidth) || 0;
+                if (bl < 0.5 || br < 0.5 || cs.borderLeftStyle === 'none' || cs.borderRightStyle === 'none') continue;
+                if (cs.overflow !== 'visible' && cs.overflowX !== 'visible') continue;
+                const own = [...d.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim());
+                if (!own.length) continue;
+                const b = d.getBoundingClientRect();
+                const inner = b.right - br;
+                for (const n of own) {
+                    const rg = document.createRange(); rg.selectNodeContents(n);
+                    const r = rg.getBoundingClientRect();
+                    if (r.width && r.right > inner + 0.3 * PX) { nTF++; F('L-OVERLAP', 'TEXT-FRAME', 'major', d, `the text "${n.textContent.trim().slice(0, 24)}" runs ${mm(r.right - inner)} mm past the right border of its own box: text inside a bordered box ends inside the border (CL-1, H2)`, 'text over its frame'); break; }
                 }
             }
         }
@@ -1097,11 +1172,10 @@ function wsLintPage(cfg) {
            width (within 0.2 mm); the unruled blank run (PG-15) and a declared full-width cell are not cells of the
            lattice. */
         if (!isLegacy) {
-            for (const g of ri.el.querySelectorAll('.ws-grid.facts')) {
+            // (critic r2 R2-3: every kit grid section, the fact probe first - not only fact rows; a declared full-width
+            // span (wider than the grid less 2 mm) is exempt below)
+            for (const g of ri.el.querySelectorAll('.ws-grid')) {
                 if (!visible(g)) continue;
-                // (the fact-rows page only: a fact probe deals a fixed 20 (PT-FPR-6) and keeps its re-laid last row)
-                const role = (g.closest('[data-ws-role]') || { getAttribute: () => null }).getAttribute('data-ws-role');
-                if (role && role !== 'fact-rows') continue;
                 const gw = g.getBoundingClientRect().width;
                 const cs = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun') && visible(c));
                 const ws = cs.map((c) => c.getBoundingClientRect().width).filter((w) => w < gw - 2 * PX);
@@ -1758,7 +1832,7 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     await page.setViewport({ width: Math.round((mode === 'legacy' ? contentW : Math.max(box.w, 210)) * PX_PER_MM), height: 1400, deviceScaleFactor: 1 });
     await sleep(120);
     await page.evaluate(() => document.fonts && document.fonts.ready);
-    const dom = await page.evaluate(wsLintPage, { mode, printBackground, contentWidthPx: contentW * PX_PER_MM });
+    const dom = await page.evaluate(wsLintPage, { mode, printBackground, contentWidthPx: contentW * PX_PER_MM, arcGapMm: Number(process.env.MQ_ARC_GAP_MM) || 0 });
     const pdfPath = tmpFile(`${id.replace(/[^\w.-]+/g, '_')}.pdf`);
     await page.pdf({ path: pdfPath, format: 'A4', printBackground, preferCSSPageSize: true });
     const pdf = analysePdf(pdfPath, box);
@@ -2753,7 +2827,32 @@ const SELF_TESTS = [
     } },
     { name: 'bracket arc clear of the dividend (ARC-INK control)', expect: [], absent: ['L-OVERLAP', 'ARC-INK'], fn: () => {
         const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
-        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 3mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M2 0 H10 M2 0 Q5 20 2 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 4mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M3.5 0 H10 M3.5 0 Q6.5 20 3.5 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+    } },
+    // ARC-INK divisor side (critic r2 R2-1: the arc 0.27 mm from the divisor's last digit; owner revised Q3, >= 0.5 mm
+    // both sides): 7 ) 84 with the arc starting at the gutter's left edge (no white after the "7"), dividend side clear.
+    { name: 'bracket arc on the divisor\'s last digit (ARC-INK divisor side)', expect: ['L-OVERLAP', 'ARC-INK'], msg: /divisor's last digit/, fn: () => {
+        const sp = (col, t) => `<span style="grid-column:${col};grid-row:2;display:flex;align-items:center;justify-content:center">${t}</span>`;
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<div data-ws-ops="division" style="font-family:Andika;font-size:16pt;line-height:1.15"><div role="group" aria-label="84 divided by 7" style="display:inline-grid;grid-template-columns:3.1mm 3mm 3.1mm 3.1mm;grid-template-rows:auto 8mm">${sp(1, '7')}<span style="grid-column:2;grid-row:2;display:block"><svg viewBox="0 0 10 40" preserveAspectRatio="none" style="display:block;width:100%;height:100%;overflow:visible"><path d="M0.3 0 H10 M0.3 0 Q4 20 0.3 40" fill="none" stroke="#000" stroke-width="1.5pt" vector-effect="non-scaling-stroke"/></svg></span>${sp(3, '8')}${sp(4, '4')}</div></div>`);
+    } },
+    // COUNT-FITS (critic r2 R2-2: 56 facts in a 10-column grid, the rest unruled): a fact-rows grid with an unruled run
+    // after its last fact; the control is a full fact grid.
+    { name: 'fact-rows page with a short last row (COUNT-FITS)', expect: ['L-DENSITY', 'COUNT-FITS'], fn: () => {
+        const g = document.querySelector('.ws-page .ws-grid'); g.classList.add('facts');
+        document.querySelector('.ws-page').setAttribute('data-ws-tab', 'Facts');
+        g.insertAdjacentHTML('beforeend', '<div class="ws-cell blankrun" style="--from:2"></div>');
+    } },
+    { name: 'full fact-rows grid (COUNT-FITS control)', expect: [], absent: ['L-DENSITY', 'COUNT-FITS'], fn: () => {
+        document.querySelector('.ws-page .ws-grid').classList.add('facts');
+        document.querySelector('.ws-page').setAttribute('data-ws-tab', 'Facts');
+    } },
+    // TEXT-FRAME (CL-1; Lane D restart critic r2 R2-4): the old 36 mm think box with "= 108" at x 28.4 runs past its
+    // border; the control is the same text in a box measured from it (40 mm).
+    { name: 'think text past its box (TEXT-FRAME)', expect: ['L-OVERLAP', 'TEXT-FRAME'], fn: () => {
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<svg viewBox="0 0 36 9" width="36mm" height="9mm" style="display:block;font-family:Andika"><rect x="0.3" y="0.3" width="35.4" height="8.4" rx="1.5" fill="none" stroke="#000" stroke-width="0.35"/><text x="3" y="6" font-size="3.6">Think: 12 ×</text><rect x="21.5" y="1.8" width="5.4" height="5.4" fill="none" stroke="#000" stroke-width="0.35"/><text x="28.4" y="6" font-size="3.6">= 108</text></svg>`);
+    } },
+    { name: 'think text inside its box (TEXT-FRAME control)', expect: [], absent: ['L-OVERLAP', 'TEXT-FRAME'], fn: () => {
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', `<svg viewBox="0 0 40 9" width="40mm" height="9mm" style="display:block;font-family:Andika"><rect x="0.3" y="0.3" width="39.4" height="8.4" rx="1.5" fill="none" stroke="#000" stroke-width="0.35"/><text x="2" y="6" font-size="3.6">Think: 12 ×</text><rect x="21.92" y="1.8" width="5.4" height="5.4" fill="none" stroke="#000" stroke-width="0.35"/><text x="28.52" y="6" font-size="3.6">= 108</text></svg>`);
     } },
     // GRID-EVEN (RUBRIC C3, PT-FRW-3; Lane D restart critic r1 R1-2: a re-laid last row of wider cells on fact rows):
     // a fact grid whose first column is 30 mm and the rest share the width; the control is the same grid with equal cells.

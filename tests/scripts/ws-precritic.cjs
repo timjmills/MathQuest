@@ -701,6 +701,15 @@ function buildPlan(ctx) {
             add(gate('print-lint-supports-S', 'ws-print-lint --source kit --supports all --size S (fact skills with every support on: PG-12, PG-21, CL-40)', `${factKeys.join(', ')} × supports`, 'browser', 'ws-print-lint',
                 ['--source', 'kit', '--supports', 'all', '--size', 'S', '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
         }
+        // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
+        // the across block, and the ÷ probes at L re-laid cells 19-20 at 1.5 columns; L-DENSITY GRID-EVEN now reads every
+        // kit grid). div_facts' forms run on the probe in the divForm gates above (fact-probe is in DF_ROLES).
+        if (factKeys.length) {
+            for (const sz of ['S', 'M', 'L']) {
+                add(gate(`print-lint-probe-${sz}`, `ws-print-lint --source kit --roles fact-probe --size ${sz} --lints L-DENSITY (critic r2 R2-3: one cell width per probe grid)`, `${factKeys.join(', ')} × fact-probe × ${sz}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--roles', 'fact-probe', '--size', sz, '--lints', 'L-DENSITY', '--skills', factKeys.join(',')], { parse: PARSE.printLint }));
+            }
+        }
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));

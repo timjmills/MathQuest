@@ -35,7 +35,8 @@ import { fineSplit } from '../../js/modules/sheet/roles/practice.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
-import { factRowsLayout, FIT_CLEAR_MM } from '../../js/modules/sheet/roles/fact-rows.js';
+import { factRowsLayout, FIT_CLEAR_MM, plan as factRowsPlan } from '../../js/modules/sheet/roles/fact-rows.js';
+import { compactArc, compactGutterEm } from '../../js/modules/sheet/cells/long-division.js';
 import { LIVE_W_MM } from '../../js/modules/sheet/roles/compose.js';
 import { EM_MM as KIT_EM_MM, FACT_TRACK_EM as KIT_FACT_TRACK_EM, FACT_OP_TRACK_EM as KIT_FACT_OP_TRACK_EM } from '../../js/modules/sheet/index.js';
 
@@ -842,7 +843,9 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     for (const form of ['standard', 'vertical', 'long', 'fraction', 'mix']) {
         for (const size of ['S', 'M', 'L']) {
             for (const columns of ['auto', 5, 6, 8, 10]) {
-                const want = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
+                // (owner 2026-10-31 revised Q3: the bracket - Long and Mix - prints at 8 columns at most)
+                const want0 = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
+                const want = /^(long|mix)$/.test(form) ? Math.min(8, want0) : want0;
                 const L = factRowsLayout(set(form), { skills: [], ctx: { size }, columns });
                 const tag = `PT-FRW-9 div_facts ${form} ${size} columns ${columns}`;
                 eq(L.cols, want, `${tag}: ${want} columns`);
@@ -854,6 +857,14 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 // (critic r1 R1-2: whole rows, no short last row - the dealer's blocks of three keep thirds within one)
                 eq(L.perPage, L.cols * L.rows, `${tag}: whole rows (${L.perPage} a page)`);
                 ok(!L.across, `${tag}: never the 3-column across page`);
+                // (critic r2 R2-1, owner revised Q3: >= 0.5 mm of white on BOTH sides of every arc, the model's whites)
+                if (L.row && L.row.trackMm) {
+                    const e = em(L.digitPt), t = L.row.trackMm / e, roomEm = L.row.roomMm / e;
+                    for (const [a, b] of PAIRS) {
+                        const A = compactArc(b, a, t, compactGutterEm(b, a, t, e, roomEm), e);
+                        ok(A.a * e >= 0.5 && A.b * e >= 0.5, `${tag}: ${b} ) ${a} arc whites ${(A.a * e).toFixed(2)} / ${(A.b * e).toFixed(2)} mm >= 0.5 both sides`);
+                    }
+                }
             }
         }
     }
@@ -879,7 +890,7 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
         'mult+div(standard)': [...mult, ...divs.map((d) => fq(d.q.a, d.q.b, '÷', 'division', 'div_facts', d.q.ans, 'standard'))],
     };
     for (const [name, items] of Object.entries(SETS)) {
-        const big = items.some((it) => it.q.op === '×' && it.q.ans > 99);
+        const big = items.some((it) => (it.q.op === '×' && it.q.ans > 99) || it.q.divForm === 'long');
         for (const size of ['S', 'M', 'L']) {
             for (const columns of ['auto', 5, 6, 8, 10]) {
                 const asked = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
@@ -895,6 +906,43 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 ok(L.rows * L.hMin <= L.gridH, `${tag}: ${L.rows} rows of ${L.hMin} mm fit the ${L.gridH} mm grid`);
             }
         }
+    }
+    // R2-2 COUNT-FITS (critic r2): the page is dealt from a PROBE deal's count and laid from the FINAL deal. Over
+    // seeds 1-24, a final deal of the probe's count prints exactly cols x rows = perPage = Score /N, whichever of the
+    // two deals carried a product over 99 (the 8-column clamp). Mixes with x, S / M / L x Auto / 8 / 10.
+    {
+        const rnd = (seed) => { let x = seed * 2654435761 >>> 0; return () => { x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; }; };
+        const deal = (kinds, n, seed) => {
+            const r = rnd(seed); const out = [];
+            for (let i = 0; i < n; i++) {
+                const k = kinds[i % kinds.length];
+                const a = Math.floor(r() * 13), b = Math.floor(r() * 13);
+                if (k === '+') out.push(fq(a, b, '+', 'addition', 'add_facts', a + b));
+                else if (k === '-') out.push(fq(a + b, b, '-', 'subtraction', 'sub_facts', a));
+                // (x facts mostly small: a probe or a final deal may hold no product over 99)
+                else if (k === '×') { const aa = r() < 0.9 ? a % 10 : a, bb = r() < 0.9 ? b % 10 : b; out.push(fq(aa, bb, '×', 'multiplication', 'mult_facts', aa * bb)); }
+                else { const bb = 1 + (b % 12), q = a; out.push(fq(bb * q, bb, '÷', 'division', 'div_facts', q, k.slice(1) || 'standard')); }
+            }
+            return out;
+        };
+        const MIXES = { '+-x÷Mix': ['+', '-', '×', '÷standard', '÷long', '÷fraction'], '+x÷long': ['+', '×', '÷long'], '+x': ['+', '×'], '+-x÷': ['+', '-', '×', '÷standard'] };
+        let worst = '';
+        for (const [name, kinds] of Object.entries(MIXES)) {
+            for (const size of ['S', 'M', 'L']) {
+                for (const columns of ['auto', 8, 10]) {
+                    for (let seed = 1; seed <= 24; seed++) {
+                        const input = { skills: [], ctx: { size }, columns };
+                        const want = factRowsLayout(deal(kinds, 90, seed), input).perPage;       // the probe's count
+                        const items = deal(kinds, want, seed + 1000);                              // the final deal
+                        const P = factRowsPlan(Object.assign({}, input, { items }));
+                        const f = P.meta.fits[0];
+                        const printed = P.meta.items;
+                        if (!(printed === f.perPage && printed === f.cols * f.rows && P.meta.scoreOutOf === printed)) worst = worst || `${name} ${size} ${columns} seed ${seed}: printed ${printed}, fits ${f.cols} x ${f.rows} = ${f.perPage}, Score /${P.meta.scoreOutOf}`;
+                    }
+                }
+            }
+        }
+        ok(!worst, `R2-2 COUNT-FITS: printed = cols x rows = Score /N on seeds 1-24 for every mix with x${worst ? ` (${worst})` : ''}`);
     }
     // alone: each fact skill keeps its own page (div_facts Mix still deals thirds)
     eq(factRowsLayout(addSub.slice(0, 2), { skills: [], ctx: { size: 'S' }, columns: 'auto' }).mixed, undefined, 'owner 2026-10-31: addition alone is not a mixed page');

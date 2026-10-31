@@ -245,14 +245,14 @@ export function planItem(it, { cols, level = 1, render, key, model = false, nola
 }
 
 /** A grid part with fixed height (PT-ENG-6: one cell height for the section). */
-export function gridPart(items, { cols, rows, cellH, labels = 'none', start = 1, cls = '', unlabelled } = {}) {
+export function gridPart(items, { cols, rows, cellH, labels = 'none', start = 1, cls = '', unlabelled, relay } = {}) {
     const r = rows || Math.max(1, Math.ceil(items.length / cols));
-    return {
+    return Object.assign({
         kind: 'grid', cols, rows: r, labels, start,
         cls: ['fixed', cls].filter(Boolean).join(' '),
         height: cellH ? `${Math.round(r * cellH * 100) / 100}mm` : '',
         items, unlabelled,
-    };
+    }, relay === false ? { relay: false } : {});
 }
 
 /** A library instruction line (BD-10). Unknown keys fall back to the neutral default. */

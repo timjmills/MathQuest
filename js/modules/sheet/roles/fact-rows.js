@@ -18,7 +18,10 @@
 //              fact ladder (PT-FRW-1)
 //   Rows       floor((G - 1) / h) with h from table 4.1 (`factRowsCapacity`), stretch cap 1.3;
 //              answers over 99 clamp to 8 columns (PT-FRW-5; a ÷ fact's answer never passes 12,
-//              so division keeps 10). The page is filled to the table. Every ÷ form passes the
+//              so the ÷ sign and the fraction keep 10). The long-division BRACKET prints at most 8
+//              columns (owner 2026-10-31, revised Q3): >= 0.5 mm of white between the arc and the
+//              digits on both sides; a Mix or mixed page holding a bracket takes its 8-column grid.
+//              The count printed = columns x rows = Score /N on every seed (critic r2 R2-2, plan). The page is filled to the table. Every ÷ form passes the
 //              real-fit gate - drawn ink + 1 mm of white each side (FIT_CLEAR_MM) - at the
 //              column's ladder digit, never below the Size S fact digit (16 pt).
 //   Who        two numbers and one sign per cell: a sum of three or four addends is refused
@@ -354,7 +357,10 @@ function formRows(items, input, ctx, G, labels, forms) {
     // fits; a + - x answer over 99 keeps its 8-column clamp (PT-FRW-5)
     const mixed = opsOf(items).size > 1;
     const notes = [];
-    if (mixed && asked > 8 && items.some((it) => opOf(it.q || {}) !== 'divide' && Number(answerOf(it)) > 99)) { asked = 8; notes.push('Answers over 99: at most 8 columns (PT-FRW-5).'); }
+    if (mixed && asked > 8 && (input.__clamp8 || items.some((it) => opOf(it.q || {}) !== 'divide' && Number(answerOf(it)) > 99))) { asked = 8; notes.push('Answers over 99: at most 8 columns (PT-FRW-5).'); }
+    // The long-division bracket prints at 8 columns at most (owner 2026-10-31, revised Q3; critic r2 R2-1): at 10 the
+    // arc keeps 0.5 mm of white on one side only. A Mix page or a mixed page with any bracket fact takes its grid.
+    if (forms.has('long') && asked > 8) { asked = 8; notes.push('Long division: at most 8 columns, so the bracket keeps white on both sides.'); }
     let geo = null;
     let cols = asked;
     for (; cols >= 2; cols--) {
@@ -462,7 +468,8 @@ export function factRowsLayout(items, input) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items), score: 1 });
     const header = layoutHeader(frame.header);
     const G = gridHeightMm(ctx.paper, ctx.size, header);
-    const n = tracksOf(items);
+    // (input.__clamp8: the page was dealt for the band's 3-digit answers - see plan, R2-2 COUNT-FITS)
+    const n = Math.max(tracksOf(items), input.__clamp8 && items.some((it) => opOf(it.q || {}) !== 'divide') ? 3 : 0);
     const labels = labelStyleOf(ctx.look, input.labels);
     const forms = divForms(items) || mixedForms(items);
     if (forms) return formRows(items, input, ctx, G, labels, forms);
@@ -489,7 +496,8 @@ export function factRowsLayout(items, input) {
     const big = items.some((it) => Number(answerOf(it)) > 99);
     let cols = input.columns && input.columns !== 'auto' ? Math.max(5, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     let note = '';
-    if (big && cols > 8) { cols = 8; note = 'Answers over 99: at most 8 columns (PT-FRW-5).'; }
+    // (input.__clamp8: the page was dealt for the 8-column clamp, see plan / R2-2)
+    if ((big || input.__clamp8) && cols > 8) { cols = 8; note = 'Answers over 99: at most 8 columns (PT-FRW-5).'; }
     // A 3-digit operand (a vertical division fact's dividend: 144 ÷ 12) needs a fourth track: the
     // page drops columns until the ladder's own digit size fits, rather than shrink the digits
     // (PG-20: content never shrinks to fit).
@@ -708,7 +716,24 @@ function keepShares(all, L) {
 export function plan(input = {}) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
     const all = poolItems(input, 'main');
-    const L = Object.assign({}, factRowsLayout(all, input), { size: ctx.size, look: ctx.look });
+    let L0 = factRowsLayout(all, input);
+    // COUNT-FITS (critic r2 R2-2): the count was dealt from the layout of a probe deal; when the probe brought
+    // PT-FRW-5's 8-column clamp (a product over 99) and this deal did not, the page would lay the 8-column count
+    // in 10 columns ("Score /56" in a grid said to hold 70), or 48 facts in a 56-cell grid (3 tracks set the
+    // digits, so the rows). The layout follows what was dealt for: a deal short of the page is laid as the
+    // band's 3-digit page when that holds it, so printed = cols x rows = Score /N on every seed.
+    if (all.length < L0.perPage && !input.__clamp8) {
+        const L8 = factRowsLayout(all, Object.assign({}, input, { __clamp8: true }));
+        if (L8.perPage <= all.length) L0 = L8;
+    }
+    // ... and the other way round (a probe without a product over 99 dealt 48 facts at 18 pt in 8 x 6; this deal
+    // has one, so 3 tracks at 16 pt hold 8 x 7): whole rows of what was dealt, each row as tall as the page lets
+    // it be (the 1.3 stretch cap), so the grid says what it prints.
+    if (all.length < L0.perPage && all.length >= L0.cols && all.length % L0.cols === 0 && all.length / L0.cols >= L0.rows - 2) {
+        const rows = all.length / L0.cols;
+        L0 = Object.assign({}, L0, { rows, perPage: all.length, cellH: Math.min(L0.gridH / rows, L0.hMin * 1.3) });
+    }
+    const L = Object.assign({}, L0, { size: ctx.size, look: ctx.look });
     const items = keepShares(all, L).map((it) => factCell(it, L));
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items), score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
