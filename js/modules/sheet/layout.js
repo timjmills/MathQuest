@@ -691,8 +691,11 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
         // "At most 12 problems" note).
         const dCeil0 = bySize(section.dense === true ? DENSE_CEILING[cls] || DENSE_CEILING.standard : section.dense)[size] || ceiling;
         const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil0, ceiling) : dCeil0;
+        // (an in-place cell - footprint `inPlace` - may also pack FEWER columns: a K picture story beside its story at full
+        // width is far shorter than stacked in a column, so one column can hold more; visual-quality r2, L1 at S)
+        const c0 = requested === 'auto' && infos.length && infos.every((i) => i.fp && i.fp.inPlace) ? 1 : cols;
         const colOpts = requested === 'auto'
-            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
+            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS, hardCap) - c0 + 1) }, (_, k) => c0 + k)
             : [cols];
         let best = { perPage: rows * cols, cols, rows };
         // The room each cell keeps over its content: the section's own (a Test), else the

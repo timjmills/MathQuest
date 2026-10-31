@@ -930,14 +930,19 @@ function pictureRow(ctx, pic, stack = false) {
     // two numbers gave the cells of one row different heights, so the row could only stretch as far as
     // its shorter cell allowed and the page kept a 60 mm empty strip (PAGEFILL at L).
     const d = 9, pitch = d + 2.2;
+    // (in a column a group of 7 to 9 is drawn as a row of five over the rest - the five-frame - so it fits half the page
+    // at every size instead of shrinking; visual-quality r2: an 8 at S overflowed two columns, and the Test fell to one)
     const group = (n) => {
-        const w = (n - 1) * pitch + d + 2, h = d + 2;
+        const per = stack && n > 6 ? 5 : n;
+        const rowsN = Math.ceil(n / per);
+        const w = (per - 1) * pitch + d + 2, h = rowsN * pitch - 2.2 + 2;
         let body = '';
-        for (let i = 0; i < n; i++) body += shapeOf(pic.shape).draw(1 + d / 2 + i * pitch, 1 + d / 2, d);
-        return `<svg class="k2-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n2(w)} ${n2(h)}" aria-hidden="true" `
+        for (let i = 0; i < n; i++) body += shapeOf(pic.shape).draw(1 + d / 2 + (i % per) * pitch, 1 + d / 2 + Math.floor(i / per) * pitch, d);
+        // (`data-ws-natural`: its own width - print-sheet's measure holds a redrawn group to it, never to the full-width row)
+        return `<svg class="k2-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n2(w)} ${n2(h)}" aria-hidden="true"${stack ? ` data-ws-natural="${n2(w)}"` : ''} `
             + `style="display:block;width:${L(ctx, w)};height:auto;max-width:100%;overflow:visible;">${body}</svg>`;
     };
-    return `<div role="img" aria-label="${pic.a} and ${pic.b} ${esc(shapeOf(pic.shape).plural)}" style="display:flex;${stack ? 'flex-direction:column;align-items:flex-start;' : 'flex-wrap:wrap;'}gap:${L(ctx, 3)} ${L(ctx, 9)};margin-top:${L(ctx, 1.5)};">${group(pic.a)}${group(pic.b)}</div>`;
+    return `<div role="img" aria-label="${pic.a} and ${pic.b} ${esc(shapeOf(pic.shape).plural)}" style="display:flex;${stack ? 'flex-direction:column;align-items:flex-start;' : 'flex-wrap:wrap;'}gap:${L(ctx, stack ? 3 : 1.5)} ${L(ctx, 9)};margin-top:${L(ctx, stack ? 1.5 : 1)};">${group(pic.a)}${group(pic.b)}</div>`;
 }
 
 /** "Answer: [box] ______" and the unit-word bank under it. */

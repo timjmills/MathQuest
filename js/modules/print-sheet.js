@@ -1813,7 +1813,11 @@ function measureItems(items, { size, look, colsList }) {
                         // A clip under 1 mm is a stroke or a line box, not hidden content.
                         if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) { fits = false; why(it, c, `ox ${el.tagName}.${el.className}`); }
                         if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + PX_PER_MM) { fits = false; why(it, c, `oy ${el.tagName}.${el.className}`); }
-                        if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
+                        // (a drawing that REDRAWS per column - `data-ws-natural`: its own width in mm, e.g. a K picture group
+                        // drawn as a five-frame in a column - is held to its own width, never to the 1-column drawing's)
+                        const nat = el.tagName === 'svg' ? Number(el.getAttribute('data-ws-natural')) : 0;
+                        if (nat > 0) { if (er.width < nat * PX_PER_MM * 0.98 - 0.5) { fits = false; why(it, c, 'shrunk picture'); } }
+                        else if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
                         // A chart or table squeezed into a narrow column: its numbers touch the
                         // cell walls and run together ("100110"). A leaf of a grid or table is
                         // cramped when it is narrower than it is at one column AND its text now

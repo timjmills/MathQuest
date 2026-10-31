@@ -1793,6 +1793,7 @@ function planOnce(input = {}) {
     }
 
     /* ---- Guided Practice ("we do") beside the Steps: the chart's names and icons */
+
     const rest = main.filter((it) => it !== example && it !== example2 && it !== example3 && it !== example4);
     // The width left of the Steps zone is two thirds of the page: 2 cells are a 3-column page's
     // cells, 3 cells are narrower (a 4-column page's measurement, plus the fact's cue beside it).
@@ -1853,6 +1854,9 @@ function planOnce(input = {}) {
         if (set.length && fitsWidth(set, tc)) top = { set, cols: tc, h: Math.max(20, hAt(set, tc) + lineExtra(set)) + (cue(set) ? 2 : 0) };
     }
     if (top) weDo = top.set;
+    // (cells answered IN PLACE - footprint `inPlace`: the sentence story, the fact-family check - hold no working space,
+    // so a page's spare height grows them by a tenth at most, never a third: visual-quality critic r1 F1, 33 % bands)
+    const weInPlace = weDo.length > 0 && weDo.every((it) => it && it.footprint && it.footprint.inPlace);
     // Cells taller than their problem (the Steps set the band's height) centre it (H13).
     // Every Guided problem sits in the middle of its cell (the cells may take spare height, H13).
     const centre = true;
@@ -1879,8 +1883,8 @@ function planOnce(input = {}) {
         const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
-        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
+        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
+    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
     const total = groups.reduce((a, g) => a + g.h, 0);

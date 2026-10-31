@@ -71,14 +71,30 @@ function layout(items, input, count) {
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
         }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns);
     }
-    return resolveSectionLayout({
-        role: 'test', columns: input.columns || 'auto', count: count || items.length,
+    const sec = (columns) => ({
+        role: 'test', columns, count: count || items.length,
         target: long ? { cols: 2, rows: { S: 3, M: 2, L: 2 } } : { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
         ceiling: long ? { S: 6, M: 4, L: 4 } : CEILING, floor: (input.floors || {}).main,
         // Cells sized to the problems (layout.js dense packing): a test of one-line facts in
         // 57 mm cells left ~70% of every cell empty. Never above 12.1's 20 / 16 / 12.
         dense: long ? false : DENSE,
-    }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+    });
+    const L = resolveSectionLayout(sec(input.columns || 'auto'), items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+    // L1 (size S ignored; visual-quality critic r1 F2): an in-place story the Auto margins held to one full-width column
+    // (the story beside its sentence, 4 at S against 6 at M) takes two columns when every item's own measurement fits
+    // them and they hold more - S never prints fewer than M.
+    // (and the other way: a K picture story is far shorter beside its story at full width than stacked in a column, so
+    // one column may hold more - 5 at S against 4 in two columns)
+    if (L.inPlace && L.cols <= 2 && (!input.columns || input.columns === 'auto')) {
+        const other = resolveSectionLayout(sec(L.cols === 1 ? 2 : 1), items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+        const [best, alt] = !other.clamped && other.perPage > L.perPage ? [other, L] : [L, other.clamped ? null : other];
+        // P-23: a one-column test's total is 4, 8, 10, 12, 16 or 20 where that still holds more than the other grid
+        // (11 rows -> 10; 5 stays 5 when two columns hold 4)
+        const ok = [20, 16, 12, 10, 8, 4].find((t) => t <= best.perPage);
+        const rows = best.cols === 1 && ok && ok >= (alt ? alt.perPage : 0) ? ok : best.rows;
+        return Object.assign({}, best, { requested: 'auto', rows, perPage: rows * best.cols });
+    }
+    return L;
 }
 
 export function counts(pools, input) {
