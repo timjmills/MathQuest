@@ -2778,7 +2778,8 @@ function stepsKeyHintInPage() {
             if (!governed.length) continue;
             const sets = governed.map(itemNums);
             if (model) {
-                if (!nums.some((v) => sets.some((s) => s.has(v)))) out.push({ lint: 'L-STEPS', rule: 'STEPS-ITEM', sev: 'major', page: pageNo(p), msg: `the steps beside the model print ${nums.join(', ')}, none of them a number of the model (${[...sets[0]].slice(0, 6).join(', ')}): the steps are for another problem ("${panelText(panel).slice(0, 70)}") (L6, R1-5)`, key: 'steps for another problem' });
+                // (a step may name a digit of the model's number: "The digit after the cut is 3" beside 33)
+                if (!nums.some((v) => sets.some((s) => s.has(v) || [...s].some((n) => n.length > v.length && n.includes(v))))) out.push({ lint: 'L-STEPS', rule: 'STEPS-ITEM', sev: 'major', page: pageNo(p), msg: `the steps beside the model print ${nums.join(', ')}, none of them a number of the model (${[...sets[0]].slice(0, 6).join(', ')}): the steps are for another problem ("${panelText(panel).slice(0, 70)}") (L6, R1-5)`, key: 'steps for another problem' });
             } else {
                 const stray = nums.filter((v) => !sets.every((s) => s.has(v)));
                 if (stray.length) out.push({ lint: 'L-STEPS', rule: 'STEPS-ITEM', sev: 'major', page: pageNo(p), msg: `a Steps panel beside ${governed.length} practice item(s) prints ${stray.join(', ')}, not in every item it sits beside: steps beside practice are generic ("${panelText(panel).slice(0, 70)}") (L6, R1-5)`, key: 'steps numerals not in the items' });

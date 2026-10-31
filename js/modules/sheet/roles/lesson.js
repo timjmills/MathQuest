@@ -539,7 +539,8 @@ export function pickExample(items, data) {
     // shared-roles R1-5: the chart's example shows the strategy, never an edge case ("19 − 10": the subtract-10 shortcut,
     // its steps repeating themselves); a lesson that names its case (`example.test`) keeps it. Re-picked by the same rule
     // from the ordinary candidates only when the pick is an edge case, so every other lesson keeps its example.
-    if (!caseTest && edgeCase(pick)) {
+    // (a skill whose every other item is "an edge" - add 10, multiply by 10 - teaches that case: it keeps its pick)
+    if (!caseTest && edgeCase(pick) && sorted.filter((x) => edgeCase(x.it)).length * 2 < sorted.length) {
         const ok = list.filter((x) => !edgeCase(x.it));
         const rest = ok.length ? ok : sorted.filter((x) => !edgeCase(x.it));
         if (rest.length) return rest[Math.min(rest.length - 1, Math.floor(rest.length / 3))].it;
@@ -549,10 +550,11 @@ export function pickExample(items, data) {
 
 /**
  * An operation example that teaches a shortcut, not the strategy: a 0 or 1 operand, a second operand that is a power of 10
- * (+, −, ×, ÷ 10 / 100), or a difference of 0. Items with no operation are never edge cases.
+ * (+, −, ×, ÷ 10 / 100), or a difference of 0. Only the four operation families; other items are never edge cases.
  */
 export function edgeCase(it) {
     const q = (it && it.q) || {};
+    if (!['addition', 'subtraction', 'multiplication', 'division'].includes(String(q.categoryId || ''))) return false;
     const op = opOf(q);
     const o = operandsOf(q).map(Number);
     if (!op || o.length < 2 || !o.every(Number.isFinite)) return false;
