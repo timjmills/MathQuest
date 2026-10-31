@@ -75,3 +75,17 @@ Each backtested (FAILS on b8b6211, PASSES on the fix), with the critic's six set
 - "In sections" page capacity: the Independent role starts a new page per part unless both are small, so the dialog learns
   Sections capacity only on spill (role composer owned by another lane).
 - `mixed-practice` role print-lint pages still unpinned (2 precritic rows red on base and here at the same counts).
+
+## Dialog fix r3 (In sections + dialog half; fresh builder, Opus medium, §1.7 re-brief)
+- In sections prints as ONE Independent sheet (a part per skill, whole counts); the engine flows the parts
+  (`practice.js` flowLayout → `paginate.js` flowSections): a part that does not fill whole pages is sized to its
+  rows (DENSE_ROOM, less when that saves a page; content never shrinks) and goes on in WHOLE rows, its instruction
+  again overleaf (PG-22); every page of such a sheet carries the title. Fits report `sheetPerPage` / `sheetPages`.
+- The dialog's In sections pages are the engine's pages for that plan (learned on every build); Pages mode also
+  learns the sheet's per-page capacity. Built counts map preset legacy cells (host id) and `s<n>` pools to the plan key.
+- ws-teacher-plan-match 11 → 0 fails. Single-section, lesson, more-practice and other roles byte-identical
+  (104 / 106 requests; the 2 that moved are Independent sheets of two parts, by design).
+- Screenshots: design/status/mixed-m2/dialog-r3-*.png.
+- Open: 3 + 17 facts at M is 2 pages In sections (4 columns × 42 mm rows; Mixed up's 6-column page holds it on 1).
+  Big-word page 2 holds 2 rows (the third does not fit at DENSE_ROOM); the title of a 2-skill sheet over 64 characters
+  falls back to "I Can practise each skill in its own part".

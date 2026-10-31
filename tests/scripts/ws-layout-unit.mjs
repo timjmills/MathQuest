@@ -24,7 +24,7 @@ import {
     stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit,
 } from '../../js/modules/sheet/layout.js';
 import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
-import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
+import { paginate, labelStarts, scoreDenominator, placeSections, flowSections } from '../../js/modules/sheet/paginate.js';
 import { plan as independentPlan } from '../../js/modules/sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from '../../js/modules/sheet/roles/more-practice.js';
 import {
@@ -291,6 +291,26 @@ eq(scoreDenominator([6, 6, 4, 4]), 20, 'PT-FRM-4: Score = every scored cell on t
         { layout: lay, chunks: [{ from: 0, count: 2, rows: 1 }], instrMm: 9 },
     ], { bodyFirstMm: 236, bodyContMm: 250 });
     eq(pages2.map((p) => [p.cont, p.parts.length]), [[false, 1], [true, 1]], 'PG-21: a section that does not fit starts the next page (a continuation page)');
+    // IN SECTIONS (mixed pages M2, dialog check r2 #1): parts flowed in whole rows, the instruction again overleaf
+    const fl = flowSections([
+        { rowsMm: [50, 50, 50], cols: 4, count: 12, instrMm: 8 },
+        { rowsMm: [50, 50], cols: 4, count: 8, instrMm: 8 },
+    ], { bodyFirstMm: 236, bodyContMm: 241, minRows: 1 });
+    eq(fl.map((p) => p.parts.map((x) => [x.section, x.chunk.count])), [[[0, 12], [1, 4]], [[1, 4]]], 'flow: a part that does not fit goes on in WHOLE rows on the next page');
+    ok(fl.every((p) => p.usedMm <= p.bodyMm - 1), 'flow: PG-12, every page within its body less 1 mm');
+    ok(fl[1].parts[0].heightMm === 58, 'flow: the continued part prints its instruction again (PG-22)');
+    const fl2 = flowSections([
+        { rowsMm: [42, 42, 42], cols: 4, count: 10, instrMm: 8 },
+        { rowsMm: [42, 42], cols: 4, count: 8, instrMm: 8 },
+    ], { bodyFirstMm: 236, bodyContMm: 241 });
+    eq(fl2.length, 1, 'flow: 18 facts in two parts share one page when their rows fit');
+    eq(fl2[0].parts.map((x) => x.chunk.count), [10, 8], 'flow: each part keeps its whole count');
+    const fl3 = flowSections([
+        { rowsMm: [200], cols: 1, count: 1, instrMm: 8 },
+        { rowsMm: [90, 90, 90], cols: 2, count: 6, instrMm: 8 },
+    ], { bodyFirstMm: 236, bodyContMm: 241, minRows: 2 });
+    eq(fl3.map((p) => p.parts.map((x) => x.chunk.count)), [[1], [4], [2]], 'flow: no part starts part-way down a page with fewer than minRows rows');
+    ok(fl3.every((p) => p.parts.every((x) => x.chunk.count > 0)), 'flow: no empty part');
 }
 
 /* ===================================================================== the two roles */

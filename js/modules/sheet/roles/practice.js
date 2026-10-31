@@ -26,9 +26,9 @@ import {
     SIZES, DEFAULT_SIZE, LOOKS, DEFAULT_LOOK,
 } from '../index.js';
 import {
-    resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM,
+    resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, HEADER_PARTS_MM, measuredH,
 } from '../layout.js';
-import { paginate, labelStarts, scoreDenominator, placeSections } from '../paginate.js';
+import { paginate, labelStarts, scoreDenominator, placeSections, flowSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
 import { presetOf } from '../../skill-presets.js';   // pure table, SCC-01 safe
@@ -648,7 +648,7 @@ export function splitPairH(hN, hMinN, rowsN, hW, hMinW, rowsW, budgetMm) {
     return { hN: fl(hN - Math.max(0, hN - hMinN) * t), hW: fl(hW - Math.max(0, hW - hMinW) * t), squeezed: true };
 }
 
-function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm, anchors }) {
+function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, headerFirst, availableWidthMm, anchors, flow = false }) {
     const instr = instructionMm(size);
     const body = bodyHeightMm(paper, headerFirst);
     const split = new Set(sectionsIn.map((s) => s.splitOf).filter((x) => x !== undefined && x !== null));
@@ -715,11 +715,61 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
                 // layout, was paged 15 + 12 with half of page 1 blank.
                 gridFirstMm: L.gridH, gridContMm: L.gridHCont, maxRows: Math.max(1, Math.floor(L.ceiling / L.cols), L.packed || L.rows * L.cols > L.ceiling ? L.rows : 0), cellH: L.cellH, force: !!L.packed || (itemsBySection[si].length > 0 && itemsBySection[si].every((it) => it && it.hClass)),
             })) || paginate(itemsBySection[si].length, L)));
+    if (flow) return flowLayout(layouts, chunksBySection, sectionsIn, itemsBySection, { body, instr, paper, headerFirst });
     const pages = placeSections(
         layouts.map((L, si) => ({ layout: L, chunks: chunksBySection[si], instrMm: instr, sharesWith: sectionsIn[si].splitOf })),
         { bodyFirstMm: body, bodyContMm: bodyHeightMm(paper, headerFirst, { cont: true }) },
     );
     return { layouts, chunksBySection, pages };
+}
+
+/**
+ * IN SECTIONS (lane mixed pages M2, dialog check r2 #1): an Independent sheet of several skills, a
+ * part per skill. A part that does not fill whole pages of its own is sized to what it holds (its
+ * rows as tall as their problems with DENSE_ROOM to spare, as a split section's: splitCellH) and
+ * flowed after the part before it, in whole rows, its instruction again on the next page
+ * (paginate.js flowSections). Every page carries the sheet's title (`flowTitle`: the continuation
+ * header grows by the title's line), so no page of the sheet is untitled.
+ * `perPage` (fits) is then what one page of THIS mix holds: the problems on the fullest page.
+ */
+function flowLayout(layouts0, chunks0, sectionsIn, itemsBySection, { body, instr, paper, headerFirst }) {
+    const lines = Math.max(1, Number(headerFirst && headerFirst.titleLines) || 1);
+    const titleMm = headerFirst && headerFirst.title ? HEADER_PARTS_MM.title + HEADER_PARTS_MM.titleWrap * (lines - 1) : 0;
+    const bodyCont = bodyHeightMm(paper, headerFirst, { cont: true }) - titleMm;
+    // The rows' spare room above their content: DENSE_ROOM, less (never under the content) when
+    // that saves a page - 20 facts at M on one page, not 12 + 8 over two.
+    const build = (k) => {
+        const layouts = layouts0.slice();
+        const specs = layouts0.map((L, si) => {
+            const chunks = chunks0[si] || [];
+            const G = Number(L.gridH) || (body - instr);
+            const full = chunks.length > 0 && chunks.every((c) => (Number(c.gridMm) > 0 ? Number(c.gridMm) : c.rows * L.cellH) >= 0.85 * G);
+            if (full) return { layout: L, chunks, instrMm: instr, sharesWith: sectionsIn[si].splitOf };
+            const its = itemsBySection[si] || [];
+            const cellH = Math.round(Math.min(L.cellH, (L.hMin || L.cellH) * k, (G - 1) / Math.max(1, L.rows)) * 1000) / 1000;
+            layouts[si] = Object.assign({}, L, { cellH, fill: false });
+            const rowsMm = [];
+            for (let i = 0; i < its.length; i += Math.max(1, L.cols)) {
+                const hs = its.slice(i, i + L.cols).map((it) => measuredH(it, L.cols));
+                const hi = hs.length && hs.every((h) => h > 0) ? Math.max(...hs) : 0;
+                rowsMm.push(Math.round((hi ? Math.max(hi, Math.min(hi * k, cellH)) : Math.max(cellH, L.hMin || 0)) * 1000) / 1000);
+            }
+            return { rowsMm, cols: Math.max(1, L.cols), count: its.length, instrMm: instr, sharesWith: sectionsIn[si].splitOf };
+        });
+        return { layouts, specs, pages: flowSections(specs, { bodyFirstMm: body, bodyContMm: bodyCont, minRows: 1 }) };
+    };
+    let best = null;
+    for (const k of [DENSE_ROOM, 1.15, 1.1, 1.05, 1]) {
+        const t = build(k);
+        if (!best || t.pages.length < best.pages.length) best = t;
+    }
+    const { layouts, pages } = best;
+    const chunksBySection = layouts.map((_, si) => pages.flatMap((pg) => pg.parts.filter((p) => p.section === si).map((p) => p.chunk)));
+    // what one page of this mix holds: the problems, over the pages' used height, times one page's body
+    const count = itemsBySection.reduce((t, its) => t + (its || []).length, 0);
+    const used = pages.reduce((t, pg) => t + pg.usedMm, 0);
+    const perPage = used > 0 ? Math.max(1, Math.floor(count * (body - 1) / used)) : count;
+    return { layouts, chunksBySection, pages, flow: { perPage, pages: pages.length, titleMm } };
 }
 
 /**
@@ -790,7 +840,12 @@ function sheetLayout(role, input, norm, sheetItems, tabId) {
     const W = Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM;
     const anchors = input.anchors || null;
     const aw = withAnchors(norm, sheetItems, anchors);
-    const laid = layoutSheet(role, aw.sections, aw.items, { size, look, paper, headerFirst: headerForLayout, availableWidthMm: W, anchors });
+    // IN SECTIONS (M2): an Independent sheet of two or more skills' parts flows them (flowLayout) -
+    // never a lesson's capped grid, a step strip, the number line band or examples.
+    const srcs = new Set(aw.sections.map((sec, si) => (Number.isInteger(sec.srcIndex) ? sec.srcIndex : si)));
+    const flow = role === 'independent' && !anchors && srcs.size >= 2 && !input.stepStrip && !headerForLayout.refBandMm
+        && aw.sections.every((sec) => !sec.gridH && !sec.capH && !sec.noCap);
+    const laid = layoutSheet(role, aw.sections, aw.items, { size, look, paper, headerFirst: headerForLayout, availableWidthMm: W, anchors, flow });
     return Object.assign({ skills, words, titleLines, sheetItems: aw.items, anchors }, laid);
 }
 
@@ -936,8 +991,10 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     const { starts, notes: labelNotes } = labelStarts(counts, { style: labelStyle, restartEachPage: false });
     // Every cell on these roles is scored (none is a Model or a Guided cell, CL-14).
     const score = scoreDenominator(counts);
-    const { first, cont } = sheetHeaders(input, { ...words }, score);
+    const { first, cont: cont0 } = sheetHeaders(input, { ...words }, score);
     first.titleLines = titleLines;
+    // IN SECTIONS (flowLayout): every page of the sheet carries its title (its body was counted for it).
+    const cont = laidOut.flow && first.title ? Object.assign({}, cont0, { title: first.title, titleLines }) : cont0;
 
     let partNo = 0;
     const planPages = pages.map((pg, pi) => {
@@ -1055,6 +1112,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             ? `${fitsLine(L)} ${sheetItems[si].length} full-width problem${sheetItems[si].length === 1 ? '' : 's'} at the bottom.` : fitsLine(L),
         cls: L.cls, digitPt: L.digitPt,
         hMin: L.hMin, anchorMm: L.anchorMm || 0, blocks: L.blocks || null,
+        // IN SECTIONS: what one page of this mix of parts holds, and the pages they print on
+        ...(laidOut.flow ? { sheetPerPage: laidOut.flow.perPage, sheetPages: laidOut.flow.pages } : {}),
     }));
     return {
         pages: planPages,

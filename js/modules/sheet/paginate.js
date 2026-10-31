@@ -138,4 +138,73 @@ export function placeSections(sections, { bodyFirstMm, bodyContMm }) {
     return pages;
 }
 
-export default { paginate, labelStarts, scoreDenominator, placeSections };
+/**
+ * IN SECTIONS (lane mixed pages M2, dialog check r2 #1): the sections of ONE sheet flowed onto pages
+ * row by row, so a part that starts part-way down a page fills what is left of it and goes on, in
+ * WHOLE rows, on the next page, its instruction printed again there (PG-22). Nothing is split
+ * inside a row (PG-21) and nothing shrinks (PG-20).
+ *
+ * A part starts part-way down a page only when it fits there whole, or when at least `minRows`
+ * of its rows do (a lone row of a long part never sits at the foot of a page, its rest overleaf).
+ * A section that is `fixed` (whole pages of its own, the ordinary chunks) keeps its chunks: its
+ * first chunk shares a page only when it fits whole, as `placeSections`.
+ *
+ * @param {{rowsMm?: number[], cols?: number, count?: number, chunks?: Object[], layout?: Object,
+ *          instrMm: number, sharesWith?: number}[]} sections
+ *   a flowed section gives `rowsMm` (each row's height), `cols` and `count`; a fixed one `chunks`
+ * @param {{bodyFirstMm: number, bodyContMm: number, minRows?: number}} bodies
+ * @returns {{cont: boolean, parts: {section: number, chunk: Object, heightMm: number}[], usedMm: number, bodyMm: number}[]}
+ */
+export function flowSections(sections, { bodyFirstMm, bodyContMm, minRows = 2 }) {
+    const pages = [];
+    let cur = null;
+    const SAFETY = 1;
+    const r2 = (x) => Math.round(x * 1000) / 1000;
+    const open = () => {
+        const cont = pages.length > 0;
+        cur = { cont, parts: [], usedMm: 0, bodyMm: cont ? bodyContMm : bodyFirstMm };
+        pages.push(cur);
+    };
+    const room = () => (cur ? cur.bodyMm - SAFETY - cur.usedMm : -Infinity);
+    sections.forEach((s, si) => {
+        const shares = () => s.sharesWith !== undefined && s.sharesWith !== null && cur
+            && cur.parts.length > 0 && cur.parts[cur.parts.length - 1].section === s.sharesWith;
+        if (!s.rowsMm) {
+            (s.chunks || []).forEach((chunk, ci) => {
+                const gridMm = Number(chunk.gridMm) > 0 ? Number(chunk.gridMm) : chunk.rows * s.layout.cellH;
+                let heightMm = (ci === 0 && shares() ? 0 : s.instrMm) + gridMm;
+                if (!(cur && ci === 0 && heightMm <= room())) { open(); heightMm = s.instrMm + gridMm; }
+                cur.parts.push({ section: si, chunk, heightMm });
+                cur.usedMm += heightMm;
+            });
+            return;
+        }
+        const rows = s.rowsMm;
+        let r = 0, idx = 0;
+        while (r < rows.length) {
+            const instr = shares() && r === 0 ? 0 : s.instrMm;
+            // the rows that fit under what is on this page already
+            const fitN = (avail) => { let n = 0, sum = 0; while (r + n < rows.length && sum + rows[r + n] <= avail) { sum += rows[r + n]; n++; } return n; };
+            let n = cur ? fitN(room() - instr) : 0;
+            const left = rows.length - r;
+            const fresh = cur && cur.parts.length === 0;
+            if (!(n >= left || (n >= Math.min(minRows, left) && n > 0) || (fresh && n > 0))) {
+                open();
+                n = Math.max(1, fitN(room() - s.instrMm));
+            }
+            const ins = cur.parts.length === 0 ? s.instrMm : instr;
+            const hs = rows.slice(r, r + n);
+            const gridMm = r2(hs.reduce((a, b) => a + b, 0));
+            const uniform = Math.max(...hs) - Math.min(...hs) < 0.05;
+            const from = r * s.cols;
+            const chunk = { index: idx++, from, count: Math.min(n * s.cols, s.count - from), rows: n, rebalanced: false, gridMm,
+                rowsTpl: uniform ? '' : hs.map((h) => `${Math.round(h * 10) / 10}fr`).join(' '), flowed: true };
+            cur.parts.push({ section: si, chunk, heightMm: ins + gridMm });
+            cur.usedMm += ins + gridMm;
+            r += n;
+        }
+    });
+    return pages;
+}
+
+export default { paginate, labelStarts, scoreDenominator, placeSections, flowSections };
