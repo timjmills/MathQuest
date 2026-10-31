@@ -97,96 +97,122 @@ const groupOfPool = (groups, id) => groups.find((g) => g.pools.includes(id));
 
 /* ================================================================ capacity */
 
-/** One group's shelves for `cells` per pool: {h, rows, open} (open: a shelf or row not full). */
+/**
+ * One group's shelves for `cells` per pool: {h, rows}. A two-row group puts EVERY whole block of
+ * its small boxes into its 2-row shelves, beside the tall boxes (PT-MIX-5: a shelf of [tall box |
+ * block of small facts] before a shelf of tall boxes alone - critic M2 r1 D3, the "stripes"); the
+ * small boxes short of a block take one-row shelves at the end.
+ */
 function groupSize(g, cells) {
     if (g.R === 2) {
-        // tall boxes: their 2-row shelves; small blocks fill those, the rest one-row shelves
         const tall = g.pools.filter((id) => g.shape[id].r === 2).reduce((a, id) => a + (cells[id] || 0), 0);
-        const sh2 = Math.ceil(tall / g.T);
-        let room = sh2 * g.T - tall;
-        let rows1 = 0;
-        let open = false;
         let blocks = 0;
+        let rows1 = 0;
         for (const id of g.pools.filter((x) => g.shape[x].r === 1)) {
             const m = g.shape[id].m;
             const c = cells[id] || 0;
-            const inBlk = Math.min(room, Math.floor(c / m));
-            room -= inBlk;
-            blocks += inBlk;
-            const left = c - inBlk * m;
+            blocks += Math.floor(c / m);
+            const left = c - Math.floor(c / m) * m;
             const row = (g.sB * g.T) / g.shape[id].s;
             rows1 += Math.ceil(left / row);
-            if (left % row) open = true;
         }
-        const hasSmall = g.pools.some((x) => g.shape[x].r === 1);
-        if (room > 0 && hasSmall) open = true;
-        if (room > 0 && !hasSmall) open = true;
-        // the shelves with a block of small boxes are two rows of U; the rest as tall as their boxes
-        const mixedSh = Math.min(sh2, Math.ceil(blocks / Math.max(1, g.T - 1)));
+        const sh2 = Math.ceil((tall + blocks) / g.T);
+        // a shelf with a block of small boxes is two rows of U; a shelf of tall boxes alone is as
+        // tall as they are
+        const mixedSh = Math.min(sh2, blocks);
         const tallH = Math.min(2 * g.U, g.hTall || 2 * g.U);
-        return { h: mixedSh * 2 * g.U + (sh2 - mixedSh) * tallH + rows1 * g.U, rows: sh2 * 2 + rows1, open };
+        return { h: mixedSh * 2 * g.U + (sh2 - mixedSh) * tallH + rows1 * g.U, rows: sh2 * 2 + rows1 };
     }
     const slots = g.pools.reduce((a, id) => a + Math.ceil((cells[id] || 0) / g.shape[id].m), 0);
     const sh = Math.ceil(slots / g.T);
-    const ragged = g.pools.some((id) => (cells[id] || 0) % g.shape[id].m);
-    return { h: sh * g.R * g.U, rows: sh * g.R, open: !!(slots % g.T) || ragged };
+    return { h: sh * g.R * g.U, rows: sh * g.R };
 }
 
 /** Rows and height (mm) of a page holding `cells` per pool. */
-function pageSize(groups, cells) {
+export function pageSize(groups, cells) {
     let h = 0;
     let rows = 0;
     for (const g of groups) { const x = groupSize(g, cells); h += x.h; rows += x.rows; }
     return { h, rows };
 }
 
-/** The step a pool's count moves in: a block (or a one-row shelf's worth in a 1-slot 2-row group). */
-function stepOf(g, id) {
-    const sh = g.shape[id];
-    if (g.R === 2 && sh.r === 1) return Math.min(sh.m, (g.sB * g.T) / sh.s);
-    return sh.m;
+/**
+ * Do these counts keep the teacher's distribution (IMPROVEMENT_PLAN 3.3, critic M2 r1 D1)? Every
+ * pool within 1 of its weighted share of the total; a pool held at 2 by "two of each" is the one
+ * exception. The weights are never clipped to fill a page or to meet the size ladder.
+ */
+export function withinShare(cells, weights, ids = Object.keys(cells)) {
+    const W = ids.reduce((a, id) => a + (weights[id] || 1), 0);
+    const T = ids.reduce((a, id) => a + (cells[id] || 0), 0);
+    // the pools "two of each" holds above their share step aside; the others share what is left
+    const held = ids.filter((id) => (cells[id] || 0) <= 2 && ((weights[id] || 1) / W) * T < 2);
+    const rest = ids.filter((id) => !held.includes(id));
+    const W2 = rest.reduce((a, id) => a + (weights[id] || 1), 0);
+    const T2 = rest.reduce((a, id) => a + (cells[id] || 0), 0);
+    return rest.every((id) => Math.abs((cells[id] || 0) - ((weights[id] || 1) / W2) * T2) <= 1 + 1e-9);
 }
 
 /**
  * FILL ONE PAGE by the weights (IMPROVEMENT_PLAN 3.3 capacity sum, two of each): each pool first
- * gets at least 2 problems; further steps (a box, or a block of small boxes) go to the pool furthest
- * below its weighted share of the problems while the page has room (height and the size's rows);
- * then every open shelf or row is completed from its own group (no extra height), so no shelf is
- * left short. -> {counts: {id: problems}, fits, size}
+ * gets 2 problems; then one problem at a time goes to the pool furthest below its weighted share,
+ * or to the next one, as long as the page has room (height and the size's rows) AND every pool
+ * stays within 1 of its share (withinShare). The weights are held first; the page holds what it
+ * holds with them held. -> {counts: {id: problems}, fits, size}
  */
 export function fillPage(groups, weights, budget, maxRows) {
     const ids = groups.flatMap((g) => g.pools);
-    const gOf = (id) => groupOfPool(groups, id);
-    const cells = Object.fromEntries(ids.map((id) => [id, 0]));
+    const cells = Object.fromEntries(ids.map((id) => [id, 2]));
     const ok = () => { const p = pageSize(groups, cells); return p.h <= budget + 1e-6 && p.rows <= maxRows; };
-    for (const id of ids) { const st = stepOf(gOf(id), id); cells[id] = Math.ceil(2 / st) * st; }
     const fits = ok();
     const W = ids.reduce((a, id) => a + (weights[id] || 1), 0);
     const gap = (id) => (weights[id] || 1) / W - cells[id] / Math.max(1, ids.reduce((a, x) => a + cells[x], 0));
-    for (let guard = 0; fits && guard < 600; guard++) {
+    for (let guard = 0; fits && guard < 2000; guard++) {
         let added = false;
-        for (const id of ids.slice().sort((a, b) => gap(b) - gap(a))) {
-            const st = stepOf(gOf(id), id);
-            cells[id] += st;
-            if (ok()) { added = true; break; }
-            cells[id] -= st;
+        for (const id of ids.slice().sort((a, b) => gap(b) - gap(a) || ids.indexOf(a) - ids.indexOf(b))) {
+            cells[id] += 1;
+            if (ok() && withinShare(cells, weights, ids)) { added = true; break; }
+            cells[id] -= 1;
         }
         if (!added) break;
     }
-    // complete every open shelf or row from its own group, one cell at a time (no extra height)
-    for (const g of groups) {
-        const h0 = groupSize(g, cells).h;
-        for (let guard = 0; guard < 80 && groupSize(g, cells).open; guard++) {
-            let done = false;
-            for (const id of g.pools.slice().sort((a, b) => gap(b) - gap(a))) {
-                cells[id]++;
-                if (groupSize(g, cells).h <= h0 + 1e-6) { done = true; break; }
-                cells[id]--;
+    // Among the counts of the same total (and one more) that keep the weights, the page whose small
+    // boxes make whole blocks beside the tall ones (PT-MIX-5: 7 models + a block of 8 facts beats 8
+    // models + 7 facts in a row of their own under shelves of models alone - critic M2 r1 D3).
+    if (fits && ids.length <= 4) {
+        const T0 = ids.reduce((a, id) => a + cells[id], 0);
+        let best = { T: T0, score: looseOf(groups, cells), cells: Object.assign({}, cells) };
+        for (const T of [T0 + 1, T0]) {
+            for (const v of vectorsOf(ids, weights, T)) {
+                if (!withinShare(v, weights, ids)) continue;
+                const p = pageSize(groups, v);
+                if (p.h > budget + 1e-6 || p.rows > maxRows) continue;
+                const sc = looseOf(groups, v);
+                if (T > best.T || (T === best.T && sc < best.score)) best = { T, score: sc, cells: v };
             }
-            if (!done) break;
         }
+        Object.assign(cells, best.cells);
     }
     return { counts: Object.assign({}, cells), fits, size: pageSize(groups, cells) };
+}
+
+/** Count vectors summing to T with every pool within 1 of its share (at least 2 each). */
+function vectorsOf(ids, weights, T) {
+    const W = ids.reduce((a, id) => a + (weights[id] || 1), 0);
+    const opts = ids.map((id) => { const sh = ((weights[id] || 1) / W) * T; const lo = Math.max(2, Math.ceil(sh - 1 - 1e-9)); const hi = Math.max(2, Math.floor(sh + 1 + 1e-9)); return Array.from({ length: hi - lo + 1 }, (_, i) => lo + i); });
+    const out = [];
+    const walk = (i, acc, sum) => {
+        if (i === ids.length) { if (sum === T) out.push(Object.assign({}, acc)); return; }
+        for (const c of opts[i]) { acc[ids[i]] = c; walk(i + 1, acc, sum + c); }
+    };
+    walk(0, {}, 0);
+    return out;
+}
+
+/** The small boxes left out of whole blocks (they print in a row of their own at the end). */
+function looseOf(groups, cells) {
+    let loose = 0;
+    for (const g of groups) for (const id of g.pools) { const m = g.shape[id].m; if (m > 1) loose += (cells[id] || 0) % m; }
+    return loose;
 }
 
 /* ================================================================ one page */
@@ -208,12 +234,11 @@ function turnsOfPage(groups, byPool, seed) {
             if (!shapes.has(k)) shapes.set(k, []);
             shapes.get(k).push(id);
         }
-        // A two-row group: its 2-row shelves are as many as its tall boxes need; small boxes fill
-        // the rest of those shelves in blocks, and the small boxes left over make one-row shelves
-        // (PT-MIX-5 "a leftover single row takes height-1 templates"), never a 2-row shelf of
-        // facts alone.
-        const tallN = g.R === 2 ? g.pools.filter((id) => g.shape[id].r === 2).reduce((a, id) => a + (byPool[id] || []).length, 0) : 0;
-        let blk2 = g.R === 2 ? Math.max(0, Math.ceil(tallN / g.T) * g.T - tallN) : Infinity;
+        // A two-row group: every whole block of small boxes goes into the 2-row shelves beside the
+        // tall boxes (PT-MIX-5; critic M2 r1 D3: a shelf of tall boxes alone above rows of facts
+        // printed "stripes" - runs of 4); the small boxes short of a block make one-row shelves at
+        // the end (PT-MIX-5 "a leftover single row takes height-1 templates").
+        let blk2 = Infinity;
         for (const ids of shapes.values()) {
             const sh0 = g.shape[ids[0]];
             const m = sh0.m;
@@ -260,7 +285,7 @@ export function packPage(groups, byPool0, N, seed, { weights = null, labels = nu
     // (a block of several skills belongs to none of them: interleave's turnsOf makes it a separator)
     const ents = [];
     full.forEach((t, ti) => {
-        for (const x of t.items) ents.push({ key: x.key, block: t.block || `t${ti}`, turn: ti });
+        for (const x of t.items) ents.push(t.items.length > 1 ? { key: x.key, block: t.block || `t${ti}`, turn: ti } : { key: x.key, turn: ti });
     });
     const mix = interleave(ents, weights, seed, { labels });
     const turnOrder = [];
@@ -270,7 +295,22 @@ export function packPage(groups, byPool0, N, seed, { weights = null, labels = nu
     // Shelves, group by group, in the order their first turn comes.
     const shelves = [];
     const open = {};
+    // (a one-row shelf met while its group's 2-row shelf is still open waits until that shelf is
+    // full, so the print order stays the order of the turns)
+    const waiting = [];
+    const seq = [];
     for (const t of ordered) {
+        const o = open[t.g];
+        if (t.kind === 'row' && o && o.slots < groups[t.g].T) { waiting.push(t); continue; }
+        seq.push(t);
+        if (t.kind === 'row') continue;
+        const now = (o && o.slots < groups[t.g].T ? o.slots : 0) + 1;
+        open[t.g] = { slots: now };
+        if (now >= groups[t.g].T) seq.push(...waiting.splice(0));
+    }
+    seq.push(...waiting);
+    for (const k of Object.keys(open)) delete open[k];
+    for (const t of seq) {
         const g = groups[t.g];
         if (t.kind === 'row') {
             // a one-row shelf of small boxes in a two-row group: one turn, the full width
@@ -291,6 +331,34 @@ export function packPage(groups, byPool0, N, seed, { weights = null, labels = nu
         };
         t.items.forEach((x, i) => sh.cells.push(cellsOf(x, i)));
         sh.slots++;
+    }
+    // H13 in a shared 2-row shelf: a tall box beside a block of small ones is two block rows tall,
+    // so a short one (a numerator item among fraction models) would float in it. Such a box swaps
+    // places with a taller box of the same span in another shelf, where both still fill theirs.
+    if (hOf) {
+        const twoRow = shelves.filter((sh) => sh.R === 2 && !sh.row);
+        const hC = (c) => hOf(c.it, c.k);
+        const shelfU = (sh) => Math.min(groups[sh.g].U, Math.max(...sh.cells.map((c) => hC(c) / c.rows)));
+        const valid = (sh) => { const u = shelfU(sh); return sh.cells.every((c) => hC(c) - NAT_MM >= H13_FILL * c.rows * u - 1e-6); };
+        for (const a of twoRow) {
+            for (let guard = 0; guard < 8 && !valid(a); guard++) {
+                let done = false;
+                const u = shelfU(a);
+                const bad = a.cells.filter((c) => c.rows === 2 && hC(c) - NAT_MM < H13_FILL * 2 * u - 1e-6);
+                for (const x of bad) {
+                    for (const b of twoRow) {
+                        if (b === a || done) continue;
+                        for (const y of b.cells.filter((c) => c.rows === 2 && c.span === x.span && hC(c) > hC(x))) {
+                            [x.it, y.it] = [y.it, x.it]; [x.pool, y.pool] = [y.pool, x.pool];
+                            if (valid(a) && valid(b)) { done = true; break; }
+                            [x.it, y.it] = [y.it, x.it]; [x.pool, y.pool] = [y.pool, x.pool];
+                        }
+                    }
+                    if (done) break;
+                }
+                if (!done) break;
+            }
+        }
     }
     // The tail: problems short of a whole block flow left to right in one-row shelves at the end
     // (after a short shelf of the same group when it is one row).
@@ -338,41 +406,95 @@ export function packPage(groups, byPool0, N, seed, { weights = null, labels = nu
 
 /* ================================================================ the sheet */
 /**
- * Split each pool's items over P pages (PT-MIX-9): a pool too small for 2 on every page sits on
- * fewer pages (2+ wherever it is), placed first; then every pool's items are water-filled, a block
- * at a time, onto the least loaded page it may use (load = the boxes' area), so the pages carry
- * even loads and the last page is never near-empty. -> [{pool: [item]}] (P pages)
+ * Split each pool's items over P pages (PT-MIX-9; critic M2 r1 D5, D7). Group by group: the
+ * group's shelves are shared evenly over the pages (earlier pages first), every page but the one
+ * holding the group's last shelf takes WHOLE shelves (no trailing slot a page could avoid), and the
+ * items are dealt into those quotas from one evenly spaced sequence of the group's pools, so every
+ * page carries each skill in proportion. A skill with fewer problems than two a page is spread one
+ * or two a page rather than left off a page (a lone problem beats a page of one skill when the
+ * teacher asked for Mixed up); otherwise "two of each" is kept by swapping like boxes between pages.
+ * -> [{pool: [item]}] (P pages)
  */
-export function splitPages(groups, byPool, P) {
-    const ids = groups.flatMap((g) => g.pools);
-    const area = (id) => { const g = groupOfPool(groups, id); const sh = g.shape[id]; return sh.s * sh.r * g.U; };
+export function splitPages(groups, byPool, P, { spread = true } = {}) {
+    const take = {};
     const load = new Array(P).fill(0);
-    const take = Object.fromEntries(ids.map((id) => [id, new Array(P).fill(0)]));
-    const least = (cands) => cands.slice().sort((a, b) => load[a] - load[b] || a - b)[0];
-    // the pages each pool may use: all of them, or (too few problems) the least loaded few
-    const order = ids.slice().sort((a, b) => (byPool[a] || []).length - (byPool[b] || []).length);
-    const pagesOf = {};
-    for (const id of order) {
-        const n = (byPool[id] || []).length;
-        if (!n) { pagesOf[id] = []; continue; }
-        const on = Math.max(1, Math.min(P, Math.floor(n / 2)));
-        const pick = Array.from({ length: P }, (_, i) => i).sort((a, b) => load[a] - load[b] || a - b).slice(0, on);
-        pagesOf[id] = pick;
-        // two of each first, on every page the pool is on
-        for (const pg of pick) { const c = Math.min(2, n - take[id].reduce((x, y) => x + y, 0)); take[id][pg] += c; load[pg] += c * area(id); }
-    }
-    // then water-fill, biggest boxes first, a block at a time (whole blocks keep shelves whole)
-    for (const id of ids.slice().sort((a, b) => area(b) - area(a))) {
-        const n = (byPool[id] || []).length;
-        const g = groupOfPool(groups, id);
-        const step = Math.max(1, g.shape[id].m);
-        let left = n - take[id].reduce((x, y) => x + y, 0);
-        while (left > 0) {
-            const pg = least(pagesOf[id]);
-            const c = Math.min(step, left);
-            take[id][pg] += c; load[pg] += c * area(id); left -= c;
+    const unitOf = (g, id) => (g.R === 2 && g.shape[id].r === 2 ? 1 : 1 / g.shape[id].m);
+    const shelvesOf = (g) => Math.ceil(g.pools.reduce((a, id) => a + (byPool[id] || []).length * unitOf(g, id), 0) / g.T - 1e-9);
+    // (the group with the most shelf height first: the smaller ones even the pages out)
+    const gs = groups.slice().sort((a, b) => shelvesOf(b) * b.R * b.U - shelvesOf(a) * a.R * a.U);
+    for (const g of gs) {
+        const ids = g.pools.filter((id) => (byPool[id] || []).length);
+        if (!ids.length) continue;
+        const unit = (id) => unitOf(g, id);
+        const n = Object.fromEntries(ids.map((id) => [id, byPool[id].length]));
+        const total = ids.reduce((a, id) => a + n[id], 0);
+        const shelves = shelvesOf(g);
+        const shH = g.R * g.U;
+        let quota;
+        if (shelves >= P) {
+            // whole shelves on every page; the extra shelves to the least loaded pages
+            const per = new Array(P).fill(Math.floor(shelves / P));
+            const order = Array.from({ length: P }, (_, i) => i).sort((a, b) => load[a] - load[b] || a - b);
+            for (let e = 0; e < shelves % P; e++) per[order[e]]++;
+            quota = per.map((x) => x * g.T);
+        } else {
+            // fewer shelves than pages: the group's problems spread over the pages one by one (a lone
+            // problem on a page rather than a page without the skill), least loaded pages first
+            const on = spread ? Math.min(P, total) : Math.max(1, Math.min(P, Math.floor(total / 2)));
+            const order = Array.from({ length: P }, (_, i) => i).sort((a, b) => load[a] - load[b] || a - b).slice(0, on).sort((a, b) => a - b);
+            quota = new Array(P).fill(0);
+            const avgU = ids.reduce((a, id) => a + n[id] * unit(id), 0) / total;
+            order.forEach((pg, i) => { quota[pg] = (Math.floor(total / on) + (i < total % on ? 1 : 0)) * avgU; });
         }
+        quota.forEach((q, i) => { load[i] += Math.ceil(q / g.T - 1e-9) * shH; });
+        const pageOf = new Array(P).fill(null).map(() => Object.fromEntries(ids.map((id) => [id, 0])));
+        // (`spread` off - when spreading would cost a page: a skill too small for two a page keeps two
+        // of each on fewer pages, the pages with the most room, and the others share what is left)
+        const minors = spread || ids.length < 2 ? [] : ids.filter((id) => n[id] >= 2 && n[id] < 2 * P);
+        for (const id of minors) {
+            const on = Math.max(1, Math.floor(n[id] / 2));
+            const pick = Array.from({ length: P }, (_, i) => i).sort((a, b) => quota[b] - quota[a] || a - b).slice(0, on).sort((a, b) => a - b);
+            pick.forEach((pg, i) => { const c = Math.floor(n[id] / on) + (i < n[id] % on ? 1 : 0); pageOf[pg][id] = c; quota[pg] = Math.max(0, quota[pg] - c * unit(id)); });
+        }
+        const rest = ids.filter((id) => !minors.includes(id));
+        const totalR = rest.reduce((a, id) => a + n[id], 0);
+        // one evenly spaced sequence of the group's items (largest lag first)
+        const seq = [];
+        const got = Object.fromEntries(rest.map((id) => [id, 0]));
+        for (let k = 0; k < totalR; k++) {
+            const id = rest.slice().sort((a, b) => (n[b] * (k + 1)) / totalR - got[b] - ((n[a] * (k + 1)) / totalR - got[a]) || rest.indexOf(a) - rest.indexOf(b))[0];
+            seq.push(id);
+            got[id]++;
+        }
+        const lastP = quota.reduce((a, q, i) => (q > 0 ? i : a), 0);
+        let pg = 0;
+        let used = 0;
+        for (const id of seq) {
+            while (pg < lastP && used + unit(id) > quota[pg] + 1e-9) { pg++; used = 0; }
+            pageOf[pg][id]++;
+            used += unit(id);
+        }
+        // two of each: a page with one problem of a skill that has 2+ a page to give takes one from
+        // a page with 3+, giving back a like box of another skill
+        const on = pageOf.map((c) => ids.some((id) => c[id] > 0));
+        const pagesOn = on.filter(Boolean).length;
+        for (let guard = 0; guard < 40; guard++) {
+            let moved = false;
+            for (const id of ids) {
+                if (n[id] < 2 * pagesOn) continue;
+                const i = pageOf.findIndex((c, x) => on[x] && c[id] === 1);
+                if (i < 0) continue;
+                const j = pageOf.findIndex((c) => c[id] >= 3);
+                const q = j < 0 ? null : ids.find((x) => x !== id && unit(x) === unit(id) && pageOf[i][x] > 2);
+                if (j < 0 || !q) continue;
+                pageOf[i][id]++; pageOf[j][id]--; pageOf[i][q]--; pageOf[j][q]++;
+                moved = true;
+            }
+            if (!moved) break;
+        }
+        for (const id of ids) take[id] = pageOf.map((c) => c[id]);
     }
+    const ids = Object.keys(take);
     return Array.from({ length: P }, (_, pg) => {
         const out = {};
         for (const id of ids) {
@@ -383,4 +505,4 @@ export function splitPages(groups, byPool, P) {
     });
 }
 
-export default { H13_FILL, classify, fillPage, packPage, splitPages };
+export default { H13_FILL, classify, fillPage, packPage, splitPages, pageSize, withinShare };

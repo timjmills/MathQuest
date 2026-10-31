@@ -3169,6 +3169,46 @@ export function shortCue(text) {
     return t ? `${t}.` : '';
 }
 
+/**
+ * The task line a cell's own drawing asks (critic M2 r1 D6), keyed by template and the payload's
+ * task: one skill deals several tasks (fractions:identify writes a fraction, circles a model,
+ * names a numerator), so the skill's one library line misnames most of its cells.
+ */
+const MIX_TASK_CUES = {
+    'frac-model': (p) => ({
+        write: 'Write the fraction.', pick: 'Circle the model.', shade: 'Shade the model.',
+        sign: 'Write <, > or =.', part: p.part === 'd' ? 'Write the denominator.' : p.part === 'n' ? 'Write the numerator.' : '',
+    })[p.task] || '',
+};
+/** A cue names a task the cell does not ask: "circle" over a cell with no choices. */
+const cueAsksChoice = (t) => /\b(circle|choose|tick)\b/i.test(t);
+const itemHasChoices = (q) => {
+    const p = (q && q.cell && q.cell.payload) || {};
+    return p.task === 'pick' || Array.isArray(p.choices) || Array.isArray(p.options);
+};
+
+/**
+ * THE CUE OF ONE ITEM (critic M2 r1 D6): the item's own task first - its template's task line, or
+ * its own printed instruction (`q.printText`, an imperative without numbers) - and only then the
+ * skill's library line, cut to the clause the cell really asks (a ", or circle ..." clause dropped
+ * over a cell with no choices). Never a cue naming a task the cell does not ask.
+ */
+export function itemCue(it, poolCue) {
+    const q = (it && it.q) || {};
+    if (it && it.cellPrompt) return '';
+    const p = (q.cell && q.cell.payload) || {};
+    const byTask = q.cell && MIX_TASK_CUES[q.cell.template] ? MIX_TASK_CUES[q.cell.template](p) : '';
+    if (byTask) return byTask;
+    const own = typeof q.printText === 'string' && !/\d/.test(q.printText) ? shortCue(q.printText) : '';
+    if (own) return own;
+    let t = String(poolCue || '');
+    if (t && cueAsksChoice(t) && !itemHasChoices(q)) {
+        const parts = t.replace(/[.!?]+$/, '').split(/,?\s+or\s+/i).filter((x) => !cueAsksChoice(x));
+        t = parts.length ? `${parts[0].trim()}.` : '';
+    }
+    return t;
+}
+
 /** Put a cue line at the top of an item's cell (both states: the key is the same drawing). */
 function withCue(it, text) {
     const r0 = it.render;
@@ -3344,7 +3384,7 @@ async function buildRoleSheet(n, metaOf) {
                 : g0;
             const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
             if (keepPrompts) it.stripPrompt = false;
-            if (keepPrompts && cueOf[pool.id]) withCue(it, cueOf[pool.id]);
+            if (keepPrompts && cueOf[pool.id]) withCue(it, itemCue(it, cueOf[pool.id]));
             // Error analysis never falls back to an "Answer:" line under the cell: the shown work
             // must sit in the cell's own slot, or the pupil sees two answer places (C1).
             if (needsShow && (pass < 3 || strictShow) && !it.canShow()) return false;
