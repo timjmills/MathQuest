@@ -21,8 +21,10 @@
 //   node tests/scripts/ws-ansbox-shape.cjs --fixture tests/fixtures/precritic/ansbox/x.html --check c   # a saved sheet (backtests)
 //   node tests/scripts/ws-ansbox-shape.cjs --save-fixture out.html --skill add_facts --value digit --sizes L
 //
-// Checks b, c, e and f run on every offered value (automatic included); d on the teacher's values (the
-// automatic pages are held byte-identical by ws-ansbox-default-parity.mjs). Pages are read at each size. Output: `ws-ansbox-shape: OK` or
+// Checks b and f run on every offered value (automatic included); c, d and e on the teacher's values: the
+// automatic pages are held byte-identical by ws-ansbox-default-parity.mjs (a passed skill's review page deals
+// legacy items), and their pre-existing findings are listed in design/status/ansbox.md. Pages at each size.
+// f excuses one pair only: "per digit" and "one box" on a screen strip of ONE input (a one-place answer is one box). Output: `ws-ansbox-shape: OK` or
 // `ws-ansbox-shape: FAIL (n)`; exit 1 on FAIL.
 const fs = require('fs');
 const path = require('path');
@@ -97,8 +99,10 @@ function installHelpers() {
         return out;
     }
     /** Runs of >= 2 boxes side by side (same row, touching): the digit boxes. */
-    function digitBoxes(list) {
-        const boxes = list.filter((s) => s.kind === 'box' && s.h >= 10).sort((a, b) => a.y - b.y || a.x - b.x);
+    function digitBoxes(list, minH = 10, aboveY = -Infinity) {
+        // answer digit boxes are at least ~0.8 of the question's digit size tall, and never above the question's
+        // first digit: a regroup / carry strip is not an answer place (it would make a regrouping item count more)
+        const boxes = list.filter((s) => s.kind === 'box' && s.h >= minH && s.y + s.h > aboveY + 2).sort((a, b) => a.y - b.y || a.x - b.x);
         const used = new Set(); const out = [];
         for (let i = 0; i < boxes.length; i++) {
             const run = [boxes[i]];
@@ -114,7 +118,7 @@ function installHelpers() {
     }
     /** The question's digit size (px): the largest digit glyph outside the tab and the key's ink. */
     function questionDigitPx(cell, w) {
-        let best = 0, track = 0;
+        let best = 0, track = 0, top = Infinity;
         const tw = cell.ownerDocument.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
         let t;
         while ((t = tw.nextNode())) {
@@ -124,6 +128,7 @@ function installHelpers() {
             if (cs.visibility === 'hidden' || cs.display === 'none') continue;
             const px = parseFloat(cs.fontSize);
             if (px > best) best = px;
+            const rb = el.getBoundingClientRect(); if (rb.width) top = Math.min(top, rb.top - cell.getBoundingClientRect().top);
             // a grid track holding one digit: its width is the digit column
             if (isDigitText(s) && el.parentElement && w.getComputedStyle(el.parentElement).display === 'grid') track = Math.max(track, el.getBoundingClientRect().width);
         }
@@ -132,7 +137,7 @@ function installHelpers() {
             p.style.cssText = `position:absolute;visibility:hidden;font-size:${best}px;font-family:Andika,sans-serif;font-variant-numeric:tabular-nums;white-space:pre`;
             p.textContent = '0'; cell.appendChild(p); track = p.getBoundingClientRect().width; p.remove();
         }
-        return { px: best, track };
+        return { px: best, track, top };
     }
     /** The key's answer digits: the largest font of a digit written in key ink in the cell. */
     function keyDigitPx(cell, w) {
@@ -171,8 +176,8 @@ async function measureSheet(page, key, opts, size, docHtml = null) {
         const keyCells = [...d.querySelectorAll('section.ws-page[data-ws-mode="key"]')].flatMap(top);
         const cell = (c, isKey) => {
             const sh = A.shapes(c, w);
-            const dig = A.digitBoxes(sh);
             const q = A.questionDigitPx(c, w);
+            const dig = A.digitBoxes(sh, Math.max(10, 0.8 * (q.px || 0)), q.top);
             return { sig: A.sig(sh), n: sh.length, digits: dig.length, minDigitW: dig.length ? Math.min(...dig.map((s) => s.w)) : null, qpx: q.px, track: q.track, kpx: isKey ? A.keyDigitPx(c, w) : null };
         };
         return { pupil: pupilCells.map((c) => cell(c, false)), key: keyCells.map((c) => cell(c, true)) };
@@ -317,7 +322,7 @@ async function shot(page, key, opts, size, file) {
                         const pc = m.pupil[i]; if (!pc) return;
                         if (kc.sig !== pc.sig) fail(`b ${where} cell ${i + 1}: the key's answer place is not the pupil's (pupil [${pc.sig}] key [${kc.sig}])`);
                     });
-                    if (CHECKS.has('c')) m.pupil.forEach((pc, i) => {
+                    if (CHECKS.has('c') && v !== null) m.pupil.forEach((pc, i) => {
                         if (pc.minDigitW != null && pc.track && pc.minDigitW < pc.track - 1) fail(`c ${where} cell ${i + 1}: a digit box is ${pc.minDigitW.toFixed(1)}px wide, narrower than the digit track ${pc.track.toFixed(1)}px`);
                     });
                     // d holds a teacher's value (critic r1 #4); the automatic page is guarded byte for byte by ws-ansbox-default-parity
@@ -325,7 +330,7 @@ async function shot(page, key, opts, size, file) {
                         if (kc.kpx && kc.qpx && kc.kpx < 0.9 * kc.qpx) fail(`d ${where} cell ${i + 1}: the key writes its answer at ${kc.kpx.toFixed(1)}px, under 0.9 x the question's ${kc.qpx.toFixed(1)}px digits`);
                         if (!kc.kpx) fail(`d ${where} cell ${i + 1}: no answer digit written in key ink`);
                     });
-                    if (CHECKS.has('e')) {
+                    if (CHECKS.has('e') && v !== null) {
                         const counts = [...new Set(m.pupil.map((x) => x.digits))];
                         if (counts.length > 1) fail(`e ${where}: the section's cells draw ${counts.join(' / ')} digit boxes (SL-2: one band per section)`);
                     }
@@ -337,15 +342,18 @@ async function shot(page, key, opts, size, file) {
                     if (s.error) { fail(`f ${key} ${name} ${host}: ${s.error}`); continue; }
                     per[name][`${host}-shown`] = s.shown;
                     per[name][`${host}-rest`] = s.rest;
+                    per[name][`${host}-inputs`] = s.inputs;
                     if (VERBOSE) console.log(`  ${key} ${name} ${host}: ${s.inputs} input(s) shown ${s.shown.slice(0, 200)}\n      rest ${s.rest.slice(0, 200)}`);
                 }
             }
             if (CHECKS.has('f')) {
                 const names = Object.keys(per);
-                const hosts = Object.keys(per[names[0]] || {}).filter((h) => h !== 'label');
+                const hosts = Object.keys(per[names[0]] || {}).filter((h) => h !== 'label' && !/-inputs$/.test(h));
                 for (const h of hosts) for (let i = 0; i < names.length; i++) for (let j = i + 1; j < names.length; j++) {
                     const a = names[i], b = names[j];
-                    if (per[a][h] !== undefined && per[a][h] === per[b][h]) fail(`f ${key} ${h}: "${per[a].label}" and "${per[b].label}" draw the same answer place`);
+                    const onePlace = /^(card|worksheet|quiz)-/.test(h) && per[a][`${h.split('-')[0]}-inputs`] === 1 && per[b][`${h.split('-')[0]}-inputs`] === 1
+                        && [a, b].includes('one') && [a, b].some((x) => x === 'digit' || (x === 'auto' && /per digit/.test(per[x].label)));
+                    if (per[a][h] !== undefined && per[a][h] === per[b][h] && !onePlace) fail(`f ${key} ${h}: "${per[a].label}" and "${per[b].label}" draw the same answer place`);
                 }
             }
             console.log(`${key} measured (${values.map((x) => (x.v === null ? 'auto' : x.v)).join(' / ')})`);

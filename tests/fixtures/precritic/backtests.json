@@ -776,6 +776,126 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ansbox-a-unfocused",
+   "check": "ws-options-verify compares the answer-box values with animations frozen (as shown + at rest, unfocused); the r1 signature read the animated next-box glow, so 'One box' = 'One box per digit' on the card passed (ansbox critic r1 #1)",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify ansBox abSig (frozen animations, data-mq-no-pulse, blur)",
+   "browser": true,
+   "fail": {
+    "commit": "b63c075",
+    "state": "ansbox r1 re-land: add_10_regroup card, One box draws as One box per digit (next-box ring)"
+   },
+   "pass": {
+    "commit": "f83caa6",
+    "state": "r2: the strip keeps one outline while a digit is the next box"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --skill add_10_regroup --category addition",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-b-key-pupil",
+   "check": "Key = pupil: per cell the key's answer-place boxes and lines equal the pupil page's (ansbox critic r1 #2, #3: orange full-width box over the fact's digit boxes, a box on the 'off' key)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape check b",
+   "browser": true,
+   "fail": {
+    "commit": "b63c075",
+    "state": "fact digit / off: the key repaints the hidden zone outline"
+   },
+   "pass": {
+    "commit": "f83caa6",
+    "state": "r2: the hidden outline stays hidden on the key"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_facts --check b --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-c-digit-width",
+   "check": "A digit box is at least as wide as its digit track (ansbox critic r1 #2)",
+   "kind": "fixture",
+   "rule": "ws-ansbox-shape check c",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ansbox/digit-width.fail.html",
+    "state": "add_facts digit L with the digit boxes drawn 0.5 em under 0.72 em tracks"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ansbox/digit-width.pass.html",
+    "state": "add_facts digit L as built (one 0.72 em box per FACT_TRACK)"
+   },
+   "browser": true,
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --fixture {fixture} --check c",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-d-key-digit-size",
+   "check": "Key answer digits >= 0.9 x the question's digits with a teacher's value (ansbox critic r1 #4: 0.8 em in a small slot)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape check d",
+   "browser": true,
+   "fail": {
+    "commit": "b63c075",
+    "state": "add_sub_10s / multiply explicit values: key digits 0.8 em"
+   },
+   "pass": {
+    "commit": "f83caa6",
+    "state": "r2: the key writes at the question's size"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_sub_10s,multiplication:multiply --check d --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-e-one-band",
+   "check": "One digit-box count per section (SL-2; ansbox critic r1 #4: multiply drew 3 boxes for 12 x 7 beside 2 for 2 x 5)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape check e",
+   "browser": true,
+   "fail": {
+    "commit": "b63c075",
+    "state": "multiply digit: 2 / 3 boxes in one section"
+   },
+   "pass": {
+    "commit": "f83caa6",
+    "state": "r2: the section's widest answer sets every item's count"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill multiplication:multiply --check e --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ansbox-f-panel",
+   "check": "No two offered answer-box values draw the same answer place on any host (ansbox critic r1 #5: Automatic = One box per digit on stacks, Automatic = One box on facts)",
+   "kind": "commit-pair",
+   "rule": "ws-ansbox-shape check f",
+   "browser": true,
+   "fail": {
+    "commit": "b63c075",
+    "state": "the panel offers duplicates of Automatic"
+   },
+   "pass": {
+    "commit": "f83caa6",
+    "state": "r2: offeredAnsBox leaves the duplicate off the panel"
+   },
+   "command": "node tests/scripts/ws-ansbox-shape.cjs --skill addition:add_10_regroup,addition:add_facts --check f --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
