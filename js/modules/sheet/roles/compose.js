@@ -66,8 +66,11 @@ export function topicOf(iCan) {
     const verbs = new Set(['add', 'subtract', 'multiply', 'divide', 'count', 'compare', 'order', 'round', 'estimate',
         'read', 'write', 'tell', 'measure', 'find', 'make', 'build', 'show', 'solve', 'name', 'use', 'draw', 'identify', 'sort']);
     if (!verbs.has(v) || GERUND_SKIP.has(v)) return t;
-    const ing = /e$/.test(v) && !/ee$/.test(v) ? `${v.slice(0, -1)}ing` : /^(?:[^aeiou]*[aeiou])[^aeiouwxy]$/.test(v) && v.length <= 3 ? `${v}${v.slice(-1)}ing` : `${v}ing`;
-    return `${ing}${m[2]}`;
+    const ingOf = (w) => (/e$/.test(w) && !/ee$/.test(w) ? `${w.slice(0, -1)}ing` : /^(?:[^aeiou]*[aeiou])[^aeiouwxy]$/.test(w) && w.length <= 3 ? `${w}${w.slice(-1)}ing` : `${w}ing`);
+    // ops-family r2 (critic r1 F4, ROLE-TITLE): every verb of a joined pair takes the -ing - "add and subtract 10" is
+    // "adding and subtracting 10", never "adding and subtract 10".
+    const rest = String(m[2]).replace(/^(\s*(?:,|and|or)\s+)([a-z]+)\b/i, (all, j, w) => (verbs.has(w.toLowerCase()) ? `${j}${ingOf(w.toLowerCase())}` : all));
+    return `${ingOf(v)}${rest}`;
 }
 
 /**

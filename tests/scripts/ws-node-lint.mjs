@@ -78,7 +78,7 @@ const argAll = (f) => args.flatMap((a, i) => (a === f && i + 1 < args.length ? S
 const ALL_RULES = ['NOTATION', 'L1', 'L3', 'L6', 'L10', 'REPEATS'];
 // Lane S1 rules: OPT-IN (run only when --rules names them), so the default sweep and its pinned baseline are unchanged;
 // ws-precritic runs them per skill against tests/fixtures/precritic/node-lint-s1.baseline.json.
-const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS'];
+const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS', 'ROLE-TITLE', 'HINT', 'OPT-VALUES'];
 const RULE_CITES = {
     NOTATION: 'C4; WORKSHEET_DESIGN_STANDARD TY-6, TY-7; PEDAGOGY_STANDARD 10.1 (P-14)',
     L1: 'LESSONS_LEARNED L1; WORKSHEET_DESIGN_STANDARD DN-1a',
@@ -89,6 +89,9 @@ const RULE_CITES = {
     'LESSON-DATA': 'critic pilot-su-c r1 D4 (H3): "No lesson data for this skill yet" - the lesson page falls back to earlierSkills',
     'OPTION-HELP': 'critic pilot-su-c r2 N3 (OC3 family): the option help names only values the panel offers',
     'WRONG-FITS': 'SKILL_CELL_CONTRACT wrongAnswer (SCC 3.8); PT-ERR: the error-analysis key writes the wrong answer in the item slot',
+    'ROLE-TITLE': 'ops-family critic r1 F4 (C4): a role title read as grammar - "adding and subtract 10" (sheet/roles/compose.js topicOf)',
+    HINT: 'ops-family critic r1 F16 (L6): the hint names the item\'s own numbers, never "What number completes this?"',
+    'OPT-VALUES': 'ops-family critic r1 F6 / F7 / F8 / F19 (OC1, OC4): Max Number bounds every number; each range value reaches past the one below; each support level prints something; a label\'s example is a form the skill deals',
 };
 const RETRIES = 12;                 // print-sheet.js generateRun: duplicate retries per item
 
@@ -660,7 +663,7 @@ const rules = wantRules.length ? wantRules : fixtures.length && subjects[0].fixt
 // Lane S1: the lesson data and the option panel, loaded only for the rules that read them (an old tree may lack one:
 // LESSON-DATA then finds every skill falling back, which is what that tree's lesson page does).
 let prereqs = null, skillOptions = null;
-if (rules.includes('LESSON-DATA') || rules.includes('OPTION-HELP')) {
+if (rules.includes('LESSON-DATA') || rules.includes('OPTION-HELP') || rules.includes('ROLE-TITLE') || rules.includes('OPT-VALUES')) {
     mute();
     try { prereqs = await import(M('lessons/prereqs.js')); } catch (e) { prereqs = { loadError: String(e && e.message || e) }; }
     try {
@@ -1033,6 +1036,136 @@ function ruleLessonData(key, cat, skill) {
             if (k && !LIVE_KEYS.has(k)) find(key, 'LESSON-DATA', 0, 'dead-ref', `LESSONS[${key}].${field} names ${k}, which is not a live skill`, `${field}:${k}`);
         }
     }
+    // VOCAB-TYPE (ops-family critic r1 F3): a word that names ONE number of a sentence (whole, factor, product ...) is
+    // pictured by that number marked - a part-whole bar with its mark, a product box - never by a whole sentence or a
+    // sum ("7 + 5 = 12" is not "whole"; "6 × 7" is not "factor").
+    const ONE_NUMBER = /^(whole|part|parts|factor|factors|product|sum|total|difference|quotient|dividend|divisor|addend|addends|minuend|subtrahend)$/i;
+    for (const v of Array.isArray(d.vocab) ? d.vocab : []) {
+        if (!v || !ONE_NUMBER.test(String(v.word || '').trim())) continue;
+        const pic = v.picture || {};
+        const w = String(v.word).toLowerCase();
+        const ok = pic.kind === 'bar' ? !!pic.mark && ((/whole|sum|total|minuend/.test(w) && pic.mark === 'whole') || (/part|addend|subtrahend|difference/.test(w) && pic.mark === 'parts'))
+            : pic.kind === 'fact' ? /product/.test(w)
+                : pic.kind === 'text' || pic.kind === 'glyph' ? !/[-+−×÷=*/]/.test(String(pic.text || '')) : true;
+        if (!ok) find(key, 'LESSON-DATA', 0, 'vocab-type', `vocabulary "${v.word}" is pictured by ${pic.kind === 'text' ? `"${pic.text}"` : `a ${pic.kind || 'missing'} picture`}: a word naming one number is shown by that number, marked (VOCAB-TYPE, critic r1 F3)`, `vocab:${w}`);
+    }
+    // WARMUP-GRADE (ops-family critic r1 F18): the Warm-up deals nothing above the lesson's grade - its skills' grades,
+    // and no two-digit × two-digit item past 10 × 10 (4.NBT.B.5) in a lesson below grade 4.
+    const gNum = (g) => (String(g).toUpperCase() === 'K' ? 0 : Number(g));
+    const gradeOf = (c0, s0) => { try { return gNum(data.getSkillGrade ? data.getSkillGrade(s0, c0) : NaN); } catch (e) { return NaN; } };
+    const own = gradeOf(cat, skill);
+    for (const ref of Array.isArray(d.skills) ? d.skills : []) {
+        if (!ref || !ref.key || !LIVE_KEYS.has(ref.key)) continue;
+        const [c2, s2] = ref.key.split(':');
+        const g = gradeOf(c2, s2);
+        if (Number.isFinite(own) && Number.isFinite(g) && g > own) find(key, 'LESSON-DATA', 0, 'warmup-grade', `the Warm-up skill ${ref.key} is grade ${g}, above the lesson's grade ${own} (critic r1 F18)`, `warmup:${ref.key}`);
+        if (Number.isFinite(own) && own < 4) {
+            for (let i = 0; i < 24; i++) {
+                const q = genO(c2, s2, ref.opts, hashSeed(`${key}:warm:${ref.key}`) + i, i, 24);
+                const o = (q && Array.isArray(q.operands) ? q.operands : [q && q.a, q && q.b]).map(Number);
+                if (q && /[×x*]/.test(String(q.op || '')) && o.length >= 2 && o[0] >= 10 && o[1] >= 10 && o[0] * o[1] > 100) { find(key, 'LESSON-DATA', 0, 'warmup-grade', `the Warm-up ${ref.key} deals ${o[0]} × ${o[1]} (two-digit by two-digit, grade 4) in a grade-${own} lesson (critic r1 F18)`, `warmup2d:${ref.key}`); break; }
+            }
+        }
+    }
+}
+
+/** Generate one item with option values, quietly (ops-family r2 rules). */
+function genO(cat, skill, opts, seed, itemIndex, itemCount, range) {
+    mute();
+    try { return gq.generateQuestionFor({ category: cat, skill, opts: opts || undefined, seed, itemIndex, itemCount, ...(range ? { range } : {}) }); } catch (e) { return null; } finally { unmute(); }
+}
+
+/**
+ * ROLE-TITLE (ops-family critic r1 F4): the title every role prints from the skill's "I Can" line (compose.js topicOf:
+ * "Test: adding and subtracting 10") reads as grammar - two verbs joined by and / or both take -ing.
+ */
+let composeMod = null;
+async function loadCompose() { try { composeMod = await import(M('sheet/roles/compose.js')); } catch (e) { composeMod = null; } }
+function ruleRoleTitle(key, cat, skill) {
+    let p = null;
+    try { p = kit.getProvider(cat, skill); } catch (e) { p = null; }
+    let iCan = '';
+    try { iCan = p && p.strings ? (typeof p.strings === 'function' ? p.strings({}).iCan : p.strings.iCan) : ''; } catch (e) { iCan = ''; }
+    if (!iCan || !composeMod || typeof composeMod.topicOf !== 'function') { skip('ROLE-TITLE', 'no provider iCan / topicOf (skills)'); return; }
+    tick('ROLE-TITLE', 1);
+    const t = composeMod.topicOf(iCan);
+    const m = /^([a-z]+ing)\b\s*(?:,|and|or)\s+([a-z]+)\b/i.exec(t);
+    const VERBS = /^(add|subtract|multiply|divide|count|compare|order|round|estimate|read|write|tell|measure|find|make|build|show|solve|name|use|draw|identify|sort)$/i;
+    if (m && VERBS.test(m[2])) find(key, 'ROLE-TITLE', 0, 'verb-not-ing', `role title "${t}" (from "${iCan}"): "${m[1]} and ${m[2]}" - both verbs take -ing (critic r1 F4)`, t);
+}
+
+/** HINT (ops-family critic r1 F16): a hint names at least one number of its own item (when the item prints numbers). */
+function ruleHint(key, cells) {
+    let judged = 0;
+    cells.forEach((c, i) => {
+        const q = c.q || {};
+        const hint = String(q.hint || '');
+        const nums = (String(q.text || '').match(/\d+/g) || []);
+        if (!hint || !nums.length) return;
+        judged++;
+        const hn = new Set(hint.match(/\d+/g) || []);
+        if (!nums.some((n) => hn.has(n)) && !hn.has(String(q.ans))) find(key, 'HINT', i, 'generic-hint', `hint "${clip(hint, 70)}" names none of the item's numbers (${nums.join(', ')}): the hint follows the item (L6, critic r1 F16)`, hint.replace(/\d+/g, 'N'));
+    });
+    if (judged) tick('HINT', judged); else skip('HINT', 'no item with a hint and numbers (skills)');
+}
+
+/**
+ * OPT-VALUES (ops-family critic r1 F6 / F7 / F8 / F19), over the panel offeredOptionsFor() shows plus the model's level:
+ *   range-max       at each Max Number value N, no number the item prints exceeds N (OC4: "Up to 100" dealt 144);
+ *   range-reach     each Max Number value deals past the next lower value and past half of itself (OC1: "Up to 100" dealt within 20, a dead value);
+ *   level-dead      each support level the model holds draws a different item than the default (OC1: level byte-identical);
+ *                   a skill declares its own levelSubset of the levels it can draw;
+ *   example-dealt   an option value's example ("Across  (48 ÷ 4 = __)") is a sentence shape the skill deals with that value.
+ * Node, not ws-options-verify: the deal decides all four, and node reads 24 items a value in well under a second.
+ */
+function ruleOptValues(key, cat, skill) {
+    if (!skillOptions || typeof skillOptions.offeredOptionsFor !== 'function') { skip('OPT-VALUES', 'no skill-options.js (skills)'); return; }
+    let offered = [], model = [];
+    mute();
+    try { offered = skillOptions.offeredOptionsFor(cat, skill) || []; model = skillOptions.optionsFor(cat, skill) || []; } catch (e) { offered = []; } finally { unmute(); }
+    const base = hashSeed(`${key}:optvalues`);
+    const run = (opts, n = 24) => Array.from({ length: n }, (_, i) => genO(cat, skill, opts, base + i, i, n)).filter(Boolean);
+    const numsOf = (q) => (String(q.text || '').replace(/,/g, '').match(/\d+/g) || []).map(Number).concat(Number.isFinite(Number(q.ans)) ? [Number(q.ans)] : []);
+    let judged = 0;
+    const rangeDef = offered.find((o) => o && o.id === 'range');
+    if (rangeDef) {
+        const vals = rangeDef.values.map((v) => v.v).filter((v) => v !== null && Number.isFinite(Number(v))).map(Number).sort((a, b) => a - b);
+        let lower = 0;
+        for (const N of vals) {
+            const items = run({ range: N }, 60);
+            judged += items.length;
+            const max = Math.max(0, ...items.flatMap(numsOf));
+            if (max > N) find(key, 'OPT-VALUES', 0, 'range-max', `Max Number "Up to ${N}" deals ${max} (OC4, critic r1 F6)`, `range-max:${N}`);
+            // (past the next lower value AND past half of N: "Up to 100" dealing 18 also passed "past 10")
+            const floorN = Math.max(lower, Math.floor(N / 2));
+            if (lower && max <= floorN) find(key, 'OPT-VALUES', 0, 'range-reach', `Max Number "Up to ${N}" never deals past ${floorN} (largest ${max} in 60 items): a dead value (OC1, critic r1 F7)`, `range-reach:${N}`);
+            lower = N;
+        }
+    }
+    const lv = model.find((o) => o && o.id === 'level');
+    const ownLevel = offered.some((o) => o && o.id === 'level');
+    if (lv && Array.isArray(lv.values)) {
+        const sig = (items) => items.map((q) => JSON.stringify((q.cell && q.cell.payload) || q.visual || q.text)).join('|');
+        const def = sig(run(undefined, 12));
+        for (const v of lv.values.map((x) => x.v)) {
+            if ([].concat(lv.default).includes(v)) continue;
+            judged++;
+            if (sig(run({ level: [v] }, 12)) === def) find(key, 'OPT-VALUES', 0, 'level-dead', `support level ${v} prints the same items as the default${ownLevel ? '' : ' (the universal level: declare a levelSubset of the levels this skill draws)'} (OC1, critic r1 F8)`, `level:${v}`);
+        }
+    }
+    const shape = (s) => String(s).replace(/,/g, '').replace(/\d+/g, 'N').replace(/_+/g, 'B').replace(/\?/g, 'B').replace(/[−-]/g, '-').replace(/\s+/g, '');
+    for (const o of offered) {
+        if (!o || !Array.isArray(o.values) || o.id === 'range' || o.id === 'level') continue;
+        for (const v of o.values) {
+            const ex = /\(([^()]*_{2,}[^()]*=[^()]*|[^()]*=[^()]*_{2,}[^()]*)\)/.exec(String(v.l || ''));
+            if (!ex) continue;
+            const want = shape(ex[1]);
+            const items = run({ [o.id]: o.type === 'set' ? [v.v] : v.v });
+            judged += items.length;
+            if (items.length && !items.some((q) => shape(q.text) === want)) find(key, 'OPT-VALUES', 0, 'example-not-dealt', `"${o.label || o.id}: ${clip(v.l, 50)}" shows "${ex[1].trim()}", a form the skill never deals with that value (e.g. "${clip(String(items[0].text), 30)}") (critic r1 F19)`, `example:${o.id}:${v.v}`);
+        }
+    }
+    if (judged) tick('OPT-VALUES', judged); else skip('OPT-VALUES', 'no range / level / example values (skills)');
 }
 
 /**
@@ -1125,6 +1258,7 @@ function ruleRepeats(key, cells) {
 
 /* ============================================================================== run */
 
+if (rules.includes('ROLE-TITLE')) await loadCompose();
 const T1 = Date.now();
 for (const subject of subjects) {
     const items = deal(subject);
@@ -1141,6 +1275,9 @@ for (const subject of subjects) {
     if (rules.includes('LESSON-DATA')) { if (subject.fixture) skip('LESSON-DATA', 'fixture (skills)'); else ruleLessonData(subject.key, cat, skill); }
     if (rules.includes('OPTION-HELP')) { if (subject.fixture) skip('OPTION-HELP', 'fixture (skills)'); else ruleOptionHelp(subject.key, cat, skill); }
     if (rules.includes('WRONG-FITS')) ruleWrongFits(subject.key, cat, skill, cells);
+    if (rules.includes('ROLE-TITLE')) { if (subject.fixture) skip('ROLE-TITLE', 'fixture (skills)'); else ruleRoleTitle(subject.key, cat, skill); }
+    if (rules.includes('HINT')) ruleHint(subject.key, cells);
+    if (rules.includes('OPT-VALUES')) { if (subject.fixture) skip('OPT-VALUES', 'fixture (skills)'); else ruleOptValues(subject.key, cat, skill); }
 }
 const RUN_MS = Date.now() - T1;
 

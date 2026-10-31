@@ -277,8 +277,9 @@ export const LESSONS = Object.freeze({
     // Each lesson's steps match its provider's worked steps for the example, one step a state.
     'addition:add_sub_10s': {
         skills: [
-            { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' },
-            { key: 'patterns:skip_count_line', opts: { step: [2] }, why: 'Counting on by tens.' },
+            // (ops-family r2 F18, WARMUP-GRADE: grade-1 and K warm-ups for a grade-1 lesson - identify and the skip-count line are grade 2)
+            { key: 'composing:base10_build', why: 'Tens and ones make the number.' },
+            { key: 'composing:tens_foundation_visual', why: 'Count the tens.' },
         ],
         concepts: [
             { id: 'ten-more', text: '10 more: the tens digit goes up by 1.' },

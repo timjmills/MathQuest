@@ -1126,7 +1126,7 @@ const P11_OPS_OPTIONS = {
     // ops-family r2 (F19 OPTION-HELP dealable, F8 level): the labels show the forms this skill deals - the
     // unknown before the answer, never the dropped "48 ÷ 4 = __" - and the trace level really prints.
     'division:missing_mult_div': [{ ...notationOption('/'),
-        values: [{ v: 'across', l: 'Across  (48 ÷ __ = 12)' }, { v: 'bracket', l: 'Long division bracket  (12 over 4⟌__)' }, { v: 'fraction', l: 'Fraction bar  (__ over 4 = 12)' }],
+        values: [{ v: 'across', l: 'Across  (48 ÷ __ = 12)' }, { v: 'bracket', l: 'Long division bracket  (12 over 4⟌__)' }, { v: 'fraction', l: 'Fraction bar  (the number shared over 4)' }],
         help: 'Tick one way for a single-notation page, or several to mix them on one page. A page with the bracket ticked is all ÷ sentences: a × sentence is never written in a bracket.' }],
     'multiplication:mult_div_fact_family': [notationOption('/')],
 
