@@ -46,12 +46,12 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, instructionPart, assemble, poolItems, answerOf, oralFrameOf, operandsOf, opOf, labelStyleOf,
-    esc, blank, stripExtraMm,
+    esc, blank, stripExtraMm, genericSteps, exampleNumbers, nbExpr,
 } from './compose.js';
 import { resolveCtx, numeralTracksHTML } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
 import { evenGridState, factGridMini } from '../cells/mult-grid.js';
-import { dotTile, countCueOf, countCueRow } from './guided.js';
+import { dotTile, countCueOf, countCueRow, generalStepsOf } from './guided.js';
 import { stepIcon, iconForText } from '../lesson-icons.js';
 import { numberWords } from '../cells/words.js';
 import { barMini, twoStepPart } from '../cells/word-work.js';
@@ -535,7 +535,33 @@ export function pickExample(items, data) {
     const widest = Math.max(...sorted.map((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0)));
     const wide = sorted.filter((x) => digitsOfOps(x.it).split(',').reduce((s, d) => s + Number(d || 0), 0) === widest);
     const list = wide.length ? wide : sorted;
-    return list[Math.min(list.length - 1, Math.floor(list.length / 3))].it;
+    const pick = list[Math.min(list.length - 1, Math.floor(list.length / 3))].it;
+    // shared-roles R1-5: the chart's example shows the strategy, never an edge case ("19 − 10": the subtract-10 shortcut,
+    // its steps repeating themselves); a lesson that names its case (`example.test`) keeps it. Re-picked by the same rule
+    // from the ordinary candidates only when the pick is an edge case, so every other lesson keeps its example.
+    // (a skill whose every other item is "an edge" - add 10, multiply by 10 - teaches that case: it keeps its pick)
+    if (!caseTest && edgeCase(pick) && sorted.filter((x) => edgeCase(x.it)).length * 2 < sorted.length) {
+        const ok = list.filter((x) => !edgeCase(x.it));
+        const rest = ok.length ? ok : sorted.filter((x) => !edgeCase(x.it));
+        if (rest.length) return rest[Math.min(rest.length - 1, Math.floor(rest.length / 3))].it;
+    }
+    return pick;
+}
+
+/**
+ * An operation example that teaches a shortcut, not the strategy: a 0 or 1 operand, a second operand that is a power of 10
+ * (+, −, ×, ÷ 10 / 100), or a difference of 0. Only the four operation families; other items are never edge cases.
+ */
+export function edgeCase(it) {
+    const q = (it && it.q) || {};
+    if (!['addition', 'subtraction', 'multiplication', 'division'].includes(String(q.categoryId || ''))) return false;
+    const op = opOf(q);
+    const o = operandsOf(q).map(Number);
+    if (!op || o.length < 2 || !o.every(Number.isFinite)) return false;
+    const [a, b] = o;
+    if (a === 0 || b === 0 || b === 1 || (op !== 'add' && a === 1)) return true;
+    if (op === 'subtract' && a === b) return true;
+    return [10, 100, 1000].includes(b) || (op === 'multiply' && [10, 100, 1000].includes(a));
 }
 
 /**
@@ -1018,15 +1044,28 @@ export function generalStep(text) {
     return t;
 }
 
-export function namedSteps(steps, data, { general = false } = {}) {
+export function namedSteps(steps, data, { general = false, it = null } = {}) {
     const own = data && Array.isArray(data.steps) && data.steps.length === steps.length ? data.steps : null;
+    // shared-roles R1-5 (L6): the Steps beside the Guided cells and the practice strip sit beside OTHER problems than the
+    // chart's, so they print no example's numbers ("17 − 10: take away 10 ... Write 7." beside 10 − 8). When the example's
+    // worked steps, said generally, still carry its numbers, the skill's own general steps stand in (the provider's steps
+    // with no question in hand), else the example clauses go (compose.genericSteps).
+    if (general && !own) {
+        const said = steps.map((s) => generalStep(s.text));
+        if (said.some((t) => exampleNumbers(t).length)) {
+            const gen = it ? genericSteps(generalStepsOf(it)) : [];
+            const list = gen.length >= 2 && !gen.some((t) => exampleNumbers(t).length) ? gen : genericSteps(said);
+            return list.map((t) => ({ name: nbExpr(t), icon: iconForText(t), words: '', note: '' }));
+        }
+    }
     // The provider's words in the lesson's own terms (`words`: [{from, to}] regex rewrites).
     const rules = data && Array.isArray(data.words) ? data.words : [];
     const say = (t) => rules.reduce((w, r) => w.replace(new RegExp(r.from), r.to), String(t || ''));
     return steps.map((s, i) => ({
-        name: own ? own[i].text : general ? generalStep(s.text) : s.text,
+        // (WRAP-OP: "Think addition: 9 + ? = 11." never breaks after an operator)
+        name: nbExpr(own ? own[i].text : general ? generalStep(s.text) : s.text),
         icon: own ? (own[i].icon || iconForText(own[i].text)) : iconForText(s.text),
-        words: own ? say(s.text) : '',
+        words: own ? nbExpr(say(s.text)) : '',
         // Lessons r3: a rule the step needs for another case ("0 tens? Leave it empty.").
         note: data && data.notes && data.notes[i] ? String(data.notes[i]) : '',
     }));
@@ -1232,16 +1271,16 @@ export function secondItems(example2) {
  * so every later problem points back to the anchor chart. Carries its own styles (a practice page
  * does not load the lesson stylesheet).
  */
-export function stripHtml(data, steps, size = 'L') {
-    const named = namedSteps(steps, data, { general: true });
+export function stripHtml(data, steps, size = 'L', it = null) {
+    const named = namedSteps(steps, data, { general: true, it });
     if (!named.length) return '';
     return `<div class="mq-lstrip" data-mq-lesson-strip><b class="mq-lstrip-l">Steps:</b><ol>${named.map((s, i) => `<li>${stepMarker(i + 1)}${stepIcon(s.icon, size)}<span>${esc(s.name)}</span></li>`).join('')}</ol></div>`;
 }
 
 /** The strip as a host-shaped item, so the host measures its height at the full width. */
-export function stripItem(data, steps) {
+export function stripItem(data, steps, it = null) {
     return {
-        q: null, render: (c) => stripHtml(data, steps, c.size), key: { value: '', display: '', slots: {} }, drawsAnswer: true, visual: false,
+        q: null, render: (c) => stripHtml(data, steps, c.size, it), key: { value: '', display: '', slots: {} }, drawsAnswer: true, visual: false,
         cellCls: 'mq-lstripcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 }, fclass: 'wide', measureLevel: 1,
         template: 'lesson-strip', skill: '', pool: 'extra', lessonStrip: true,
     };
@@ -1394,17 +1433,17 @@ export function vocabItem(vocab, seed) {
 /* ======================================================================== the We-do steps */
 
 /** The lesson's Steps zone beside the Guided cells: the chart's numerals, icons and step names. */
-function weDoStepsHtml(data, steps, size) {
-    const named = namedSteps(steps, data, { general: true });
+function weDoStepsHtml(data, steps, size, it = null) {
+    const named = namedSteps(steps, data, { general: true, it });
     const chant = data && data.chant ? `<p class="mq-lchant">${esc(data.chant)}</p>` : '';
     return `<div class="mq-lstepszone"><ol class="mq-lsteps">${named.map((s, i) => `<li>${stepMarker(i + 1)}${stepIcon(s.icon, size)}<span>${esc(s.name)}</span></li>`).join('')}</ol>${chant}</div>`;
 }
 
 /** The Steps zone as a host-shaped item, so its height is measured at the zone's width. */
-export function stepsItem(data, steps) {
+export function stepsItem(data, steps, it = null) {
     return {
         q: null,
-        render: (c) => weDoStepsHtml(data, steps, c.size),
+        render: (c) => weDoStepsHtml(data, steps, c.size, it),
         key: { value: '', display: '', slots: {} }, drawsAnswer: true, visual: false,
         cellCls: 'mq-lstepscell', footprint: { wMm: 60, hMm: null, measure: true, maxCols: 3 },
         fclass: 'standard', measureLevel: 1, template: 'lesson-steps', skill: '', pool: 'extra', lessonSteps: true,
@@ -1459,7 +1498,7 @@ export function extras(input = {}) {
     out.push(...finalItems(mixFinals.length ? mixFinals : [{ it: ex2, label: lab('second') }, { it: ex3, label: lab('third') }, { it: ex4, label: lab('fourth') }]));
     const v = vocabItem(data && data.vocab, input.seed);
     if (v) out.push(v);
-    if (steps.length) { out.push(stepsItem(data, steps)); out.push(stripItem(data, steps)); }
+    if (steps.length) { out.push(stepsItem(data, steps, ex)); out.push(stripItem(data, steps, ex)); }
     // The Independent rows are drawn at level 1, but the pool was measured at the Guided cells'
     // level 3 (heads, grey boxes): a level-1 twin of each item is measured for the rows' height.
     for (const it of main) if (it !== ex) out.push(Object.assign({}, it, { measured: null, measureLevel: 1, lessonIndepOf: it, pool: 'extra' }));
@@ -1774,7 +1813,8 @@ function planOnce(input = {}) {
     // (the widest of the pool: the Guided set is picked from it after this count is chosen)
     const factW = Math.max(26, ...main.filter((it) => it.template === 'fact').map(acrossW));
     const drawnW = (it) => (it.template === 'fact' ? factW : ((it.footprint && it.footprint.wMm) || 99));
-    while (gk > 2 && !(fitsWidth(rest.slice(0, gk), 4) && rest.slice(0, gk).every((it) => drawnW(it) + (cue([it]) ? 10 : 0) <= 124 / gk - 4))) gk--;
+    // (shared-roles R1-5: the cue is in the measure - the 9 mm tile, its 2 mm gap, and 1 mm clear of each rule)
+    while (gk > 2 && !(fitsWidth(rest.slice(0, gk), 4) && rest.slice(0, gk).every((it) => drawnW(it) + (cue([it]) ? 13 : 0) <= 124 / gk - 4))) gk--;
     if (gk === 2 && !fitsWidth(rest.slice(0, 2), 3)) gk = 1;
     const zH = hOf(stepsZone, 3);
     // Short cells beside a tall Steps list (a rounding strip beside four steps and a chant) stack
@@ -1841,7 +1881,7 @@ function planOnce(input = {}) {
         // (`noStripChant` - the detailed lesson maker, lesson 7: two Guided cells fill the page; the chant is on the chart)
         const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
-        const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
+        const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size, example) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
     } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
 

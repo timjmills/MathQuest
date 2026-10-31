@@ -122,8 +122,13 @@ export function keyFooterRight({ form, seed } = {}) {
  * simply shorten the rule inside the same box, exactly as a written name would.
  */
 const NAME_FIELD = '<div class="ws-field name">Name<i></i></div>';
-export const markKeyName = (html) =>
-    html.replace(NAME_FIELD, `<div class="ws-field name"><span data-ws-key="name">${KEY_ID_LINE}</span><i></i></div>`);
+export const markKeyName = (html) => {
+    if (html.includes(NAME_FIELD)) return html.replace(NAME_FIELD, `<div class="ws-field name"><span data-ws-key="name">${KEY_ID_LINE}</span><i></i></div>`);
+    // shared-roles R1-3 (AK-3): a page with no Name row (the lesson's anchor chart) still says "Answer Key" on its key - in
+    // the empty header row, where the Name field would stand, at the field's own size; the row's height does not change
+    return html.replace('<div class="ws-rowA notab"><div class="ws-spacer"></div></div>',
+        `<div class="ws-rowA notab"><div class="ws-spacer"><span data-ws-key="name" style="font-weight:700">${KEY_ID_LINE}</span></div></div>`);
+};
 
 /* ------------------------------------------------------------------------- slot filling */
 

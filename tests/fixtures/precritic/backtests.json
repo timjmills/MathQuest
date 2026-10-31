@@ -798,6 +798,26 @@
    }
   },
   {
+   "id": "steps-item-lesson-r1-5",
+   "check": "Steps beside practice follow the items: a lesson Steps zone / strip prints no example numbers (laneD-restart critic r1 R1-5: \"19 - 10: take away 10 ... Write 9\" beside 10 - 8)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-STEPS STEPS-ITEM",
+   "browser": true,
+   "fail": {
+    "commit": "512542a",
+    "state": "sub_facts lesson S: the practice strip reads \"17 - 10: take away 10 ...\" beside other facts"
+   },
+   "pass": {
+    "commit": "8a7ad06",
+    "state": "shared-roles A: generic steps beside practice, no edge-case example"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_facts --roles lesson --size S --lints L-STEPS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "r1-11-review-countrow-cl40",
    "check": "A Review's count-by strip clear of a two-digit tab (shared-roles critic r1 R1-11: div_facts review L, start-arrow polygon at 8 mm across, 3.5 mm down in the 8.4 x 7 mm keep-out)",
    "kind": "commit-pair",
@@ -812,6 +832,26 @@
     "state": "builder C: count-row cells with a w2 / w3 tab pad clear of it; the earlier step is count_by_tables"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles review --skills division:div_facts --size L --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "steps-cue-opener-r1-14",
+   "check": "A step names only a cue the sheet draws (critic r1 R1-14: \"Use the dots.\" on an Opener with no dots)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-STEPS STEPS-CUE",
+   "browser": true,
+   "fail": {
+    "commit": "512542a",
+    "state": "add_facts opener S: \"Count on the smaller number. Use the dots.\" and no dot tile"
+   },
+   "pass": {
+    "commit": "8a7ad06",
+    "state": "shared-roles A: the Opener drops cue sentences the page never draws"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_facts --roles opener --size S --lints L-STEPS",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -838,6 +878,26 @@
    }
   },
   {
+   "id": "key-header-model-r1-3",
+   "check": "The Scripted model key is a key: every slot answered and \"Answer Key\" on its header (critic r1 R1-3: AK-2 blank slots, no header)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-KEY AK-2 + AK-3",
+   "browser": true,
+   "fail": {
+    "commit": "512542a",
+    "state": "sub_2d_1d scripted-model S: 3 of 4 states blank on the key, no \"Answer Key\""
+   },
+   "pass": {
+    "commit": "8a7ad06",
+    "state": "shared-roles A: grouped states, earlier states unslotted, real key"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_2d_1d --roles scripted-model --size S --lints L-KEY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "r1-12-across-cl40-S",
    "check": "notation=across facts clear the label keep-out at S (shared-roles critic r1 R1-12: add_facts Test / Mixed, mult_facts Independent / Test / Mixed)",
    "kind": "commit-pair",
@@ -852,6 +912,26 @@
     "state": "builder C: data-ws-acrossfact top inset"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles test --opts '{\"notation\":[\"across\"]}' --skills addition:add_facts --size S --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "h13-hint-guided-r1-13",
+   "check": "H13 counts grey hints as hint, not content (critic r1 R1-13: guided cells 40-50 % empty under the fact, the caption filling the band)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (H13-HINT)",
+   "browser": true,
+   "fail": {
+    "commit": "512542a",
+    "state": "mult_facts guided S: hinted row stretched, 40-52 % bands under the facts"
+   },
+   "pass": {
+    "commit": "8a7ad06",
+    "state": "shared-roles A: the hinted row is not stretched; one work line spans the model row"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills multiplication:mult_facts --roles guided --size S --lints L-DENSITY",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

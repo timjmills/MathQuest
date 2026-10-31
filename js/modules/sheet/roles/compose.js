@@ -431,9 +431,77 @@ function stepList(raw) {
  * missing-part item).
  */
 export function generalSteps(it) {
-    const own = stepList(stringsOf(it).steps);
+    const own = genericSteps(stepList(stringsOf(it).steps));
     if (own.length) return own.slice(0, 6);
     return providerWorkedSteps(it, 6).map((s) => s.text);
+}
+
+/** Rule numbers a general step may print for any problem (shared-roles R1-5): 0, 1, 10, 100, 1,000, 1,000,000 and "5 or more". */
+const RULE_NUMS = new Set(['0', '1', '10', '100', '1000', '1000000']);
+/** The numbers of a step that belong to an EXAMPLE, not to the rule ("Read 3 × 4 as 3 groups of 4." -> 3, 4). */
+export function exampleNumbers(text) {
+    const t = String(text || '').replace(/(\d),(?=\d{3}\b)/g, '$1');
+    const ruled = new Set();
+    for (const m of t.matchAll(/(\d+)\s+or\s+(more|less|fewer|greater)|\bpast\s+(\d+)/gi)) ruled.add(String(Number(m[1] || m[3])));
+    return [...new Set((t.match(/\d+/g) || []).map((v) => String(Number(v))))].filter((v) => !RULE_NUMS.has(v) && !ruled.has(v));
+}
+
+/**
+ * General steps say no example's numbers (shared-roles R1-5, L6: a Steps panel beside practice items reads for every one of
+ * them). A step's example clause after its colon goes ("Multiply the digit by its place: 7 hundreds is 700." -> "Multiply
+ * the digit by its place."); a step that is all example ("Read 3 × 4 as 3 groups of 4.") goes, while two steps or more
+ * remain. Rule numbers stay ("5 or more: round up.", "Add 10."). A list with no example numbers is returned unchanged.
+ */
+export function genericSteps(list, items = null) {
+    const src = (list || []).map(String);
+    // a number every item on the page holds is that page's own (a page of "groups of 5"), not an example's
+    const shared = items && items.length ? sharedNumbers(items) : new Set();
+    const ex = (t) => exampleNumbers(t).filter((v) => !shared.has(v));
+    if (!src.some((t) => ex(t).length)) return src;
+    const cut = src.map((t) => {
+        if (!ex(t).length) return t;
+        const head = t.replace(/\s*:\s*[^:]*$/, '').trim();
+        return head !== t && head && !ex(head).length ? `${head.replace(/[.;,]$/, '')}.` : null;
+    });
+    const kept = cut.filter(Boolean);
+    return kept.length >= 2 ? kept : src;
+}
+
+/** The numbers every one of `items` holds (its operands, its answer and the numbers of its text). */
+export function sharedNumbers(items) {
+    const of = (it) => {
+        const q = (it && it.q) || {};
+        const t = `${String(q.text || '').replace(/<[^>]*>/g, ' ')} ${operandsOf(q).join(' ')} ${answerOf(it || {})}`.replace(/(\d),(?=\d{3}\b)/g, '$1');
+        return new Set((t.match(/\d+/g) || []).map((v) => String(Number(v))));
+    };
+    const sets = (items || []).map(of);
+    return sets.length ? new Set([...sets[0]].filter((v) => sets.every((x) => x.has(v)))) : new Set();
+}
+
+/**
+ * A number sentence never breaks after its operator (WRAP-OP, TY rules): the spaces round + − × ÷ = between two terms
+ * (numbers, ?, __) become no-break spaces. Text that already joins them is unchanged.
+ */
+export const nbExpr = (text) => String(text === undefined || text === null ? '' : text)
+    .replace(/([\d?_)])\s+(?=[+\-−×÷=<>]\s*[\d?_(])/g, '$1\u00a0').replace(/([+\-−×÷=<>])\s+(?=[\d?_(])/g, '$1\u00a0');
+
+/** The cue words a step may name, and the drawing that shows each (shared-roles R1-14). */
+const CUE_WORDS = [
+    { re: /\bdots?\b/i, drawn: /<circle\b|mq-dottile|touch|class="[^"]*\bdot/i },
+    { re: /\bten[ -]frames?\b/i, drawn: /tenframe|ten-frame/i },
+    { re: /\bnumber lines?\b/i, drawn: /number-line|hop-line|nl-place|numline|mq-hops|mq-lround-line/i },
+];
+
+/**
+ * A step names only a cue the page draws (shared-roles R1-14: "Count on the smaller number. Use the dots." on an Opener that
+ * draws no dots). `htmls` are the page's drawn cells; a sentence naming a cue none of them draws is dropped from its step
+ * (a step left empty goes). Steps that name no cue are unchanged.
+ */
+export function drawnCueSteps(list, htmls) {
+    const page = (htmls || []).join('\n');
+    const missing = CUE_WORDS.filter((c) => !c.drawn.test(page));
+    if (!missing.length) return list;
+    return list.map((t) => String(t).split(/(?<=\.)\s+/).filter((sen) => !missing.some((c) => c.re.test(sen))).join(' ').trim()).filter(Boolean);
 }
 
 /** The provider's authored `workedSteps(q)`; [] when the skill has none (the default adapter's are not used). */
@@ -534,7 +602,7 @@ export const poolItems = (input, id) => (input.items || []).filter((it) => (it.p
 export default {
     ctxOf, labelStyleOf, topicOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem,
     gridPart, instructionPart, instructionKeyOf, instructionText, answerOf, wrongOf, workedStepsOf, stringsOf,
-    wrongPattern, opOf, opGlyphOf, operandsOf, oralFrameOf, generalSteps, providerWorkedSteps, instructionVarsOf, checkLine, writeLine, stepsHtml,
+    wrongPattern, opOf, opGlyphOf, operandsOf, oralFrameOf, generalSteps, genericSteps, exampleNumbers, sharedNumbers, drawnCueSteps, nbExpr, providerWorkedSteps, instructionVarsOf, checkLine, writeLine, stepsHtml,
     slotKey, assemble, poolItems, isWhole, JUDGE_LABELS, STRAND_BY_CATEGORY,
 };
 export { isWhole, JUDGE_LABELS, STRAND_BY_CATEGORY };

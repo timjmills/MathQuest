@@ -17,8 +17,9 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart,
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
-    poolItems, answerOf, labelStyleOf, stripExtraMm,
+    poolItems, answerOf, labelStyleOf, stripExtraMm, drawnCueSteps,
 } from './compose.js';
+import { resolveCtx } from '../index.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -42,6 +43,13 @@ function stepLines(list, textPt, zoneMm = 93) {
     return list.reduce((a, s) => a + Math.max(1, Math.ceil(s.length / perLine)), 0);
 }
 
+/** The drawings of the page's cells (the Model at level 3, the rest at 2), to read which cues the page draws. */
+function cellHtmls(items, ctx) {
+    return items.slice(0, 12).map((it, i) => {
+        try { return typeof it.render === 'function' ? String(it.render(resolveCtx({ mode: 'print', size: ctx.size, look: ctx.look, state: 'blank', scaffoldLevel: i ? 2 : 3 }), { cols: 2 })) : ''; } catch (e) { return ''; }
+    });
+}
+
 /**
  * Every height decision of the page, from the probe (or final) items. `cap` ({gMax, iMax}) holds the Guided and Independent row
  * counts at most at those of a page already chosen (critic r5 N13: the placed rows are re-fitted, never re-counted).
@@ -53,7 +61,8 @@ function geometry(items, input, cap = {}) {
     const first = items[0];
     const str = first ? stringsOf(first) : {};
     const whatsNew = String(str.whatsNew || '').trim();
-    const steps = first ? generalSteps(first).slice(0, 6) : [];
+    // shared-roles R1-14: a step names only a cue this page draws ("Use the dots." on a page with no dots goes)
+    const steps = first ? drawnCueSteps(generalSteps(first).slice(0, 6), cellHtmls(items, ctx)) : [];
     const twoModels = items.length >= 2 && fitsAt(items.slice(0, 2), 4, ctx);
     // Item 7 (LESSONS_LEARNED L11): a count row too wide for the half-width Model cell even wrapped (1,000,000 by 100,000)
     // takes the whole width, with the Steps band underneath; every other Model keeps the Model | Steps row.

@@ -703,7 +703,8 @@ for (const id of ['opener', 'scripted-model', 'guided', 'error-analysis', 'revie
 // PT-MOD-1 / PT-MOD-4: one state per step, the Say band filled in, nothing to answer.
 {
     const { plan, r } = hostPlan('scripted-model', [PROV_SKILL], provMake);
-    ok(plan.nothingToAnswer === true, 'PT-KEY-7: the Scripted Model page is its own key');
+    // shared-roles R1-3 (AK-2 / AK-3): the Scripted Model prints a real key - "Answer Key" on its header, the last state answered
+    ok(!plan.nothingToAnswer && r.keyPages.every((pg) => pg.includes('Answer Key')), 'AK-3 (R1-3): the Scripted Model key says Answer Key');
     ok(plan.meta.states >= 3, 'PT-MOD-1: at least three states');
     ok(!/__/.test(r.pupilHtml.replace(/<style[\s\S]*?<\/style>/g, '').split('Say:')[1] || '__'), 'PT-MOD-4: the Say band is filled for this problem (provider sayFill)');
     ok(typeof hostPlan('scripted-model', [ADD_SKILL], addMake).unsupported === 'string', 'SCC 3.8: no provider steps -> no Scripted Model page (never generic steps)');

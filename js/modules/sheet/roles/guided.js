@@ -35,7 +35,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, fitsAt, planItem, gridPart, instructionKeyOf,
     instructionText, stepsHtml, assemble, poolItems, answerOf, stringsOf, labelStyleOf, opOf, operandsOf,
-    providerWorkedSteps, esc, stripExtraMm,
+    providerWorkedSteps, esc, stripExtraMm, genericSteps, nbExpr,
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
@@ -255,6 +255,10 @@ function splitSteps(raw) {
  * (split out of a hint) are not the skill's and are never used; none -> [] (no Steps band).
  */
 export function stepsOf(items) {
+    // shared-roles R1-5 (L6): the band sits over every try, so its steps say no example's numbers
+    return genericSteps(stepsOfRaw(items), items.slice(0, 12));
+}
+function stepsOfRaw(items) {
     const it = items[0];
     if (!it) return [];
     const own = splitSteps(stringsOf(it).steps);
@@ -278,7 +282,7 @@ export function stepsOf(items) {
 }
 
 /** The provider's steps with no question in hand: the steps that fit every item of the skill. */
-function generalStepsOf(it) {
+export function generalStepsOf(it) {
     const q = (it && it.q) || {};
     try {
         const p = getProvider(q.categoryId || '', q.skillId || '');
@@ -353,7 +357,8 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     // its lines BESIDE the drawing - under it, the lines made row 1 far taller than the tries
     // sharing that row (a 40% empty band in each). The row holds the model only.
     const lines = model && items.length > 1 && !thinkCueOf(model) && !noLines ? workLinesOf(model) : [];
-    const span = !noSpan && cols > 1 && lines.length > 1;
+    // (shared-roles R1-13: one work line too - beside the drawing in its own row, never a 40 % band under the tries beside it)
+    const span = !noSpan && cols > 1 && lines.length >= 1;
     const extra = !model || items.length < 2 ? 0
         : thinkCueOf(model) ? 17
         : span ? TAB_CLEAR_MM + Math.max(0, workLinesMm(lines, 2, m) - h0)
@@ -446,7 +451,9 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
                 const n = isFirst && first.span && rr === 0 ? 1 : cols;
                 sum += hOf(idx, n) + (isFirst && nM > 1
                     ? mixRowAdd(rr, cols, nM, mixPartialEnd(nM, cols, ceil), extra, first.hint) - (rr === 0 ? extra : 0)
-                    : (isFirst && rr === partialRowOf(cols, first.span, nM) ? first.hint : 0));
+                    // (shared-roles R1-13: in the Model's own row the tries' hint stands level with the Model's work lines, so
+                    // that row grows by the taller of the two, never by both)
+                    : (isFirst && rr === partialRowOf(cols, first.span, nM) ? (rr === 0 ? Math.max(0, first.hint - extra) : first.hint) : 0));
                 idx += n;
             }
             return sum;
@@ -684,7 +691,7 @@ function workLinesMm(lines, cols, m) {
 }
 
 const workHtml = (lines) => (lines.length
-    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
+    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${esc(nbExpr(t))}</li>`).join('')}</ul>` : '');
 
 const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-worklines{list-style:none;margin:2mm 0 0;padding:0;width:100%;font-size:var(--ws-text);line-height:1.25;text-align:center}
@@ -864,7 +871,7 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
     const hintLine = stage === 'partial' && hint && it.template !== 'stack' ? hintOf(it) : '';
     // A framed hint's gap ("The short hand has passed ___.") is a short grey rule, never
     // underscore characters (SL-6).
-    const hintHtml = esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
+    const hintHtml = esc(nbExpr(hintLine)).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
     const withHint = (html) => `<div class="mq-workwrap">${html}<div class="mq-hintline ws-trace" data-ws-ink="trace">${hintHtml}</div></div>`;
     return (c, o) => {
         if (c.state !== 'blank') {
@@ -969,14 +976,21 @@ export function plan(input = {}) {
         const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
         const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels) : -1;
         const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
-            : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? fit.hint : 0));
+            : r === 0 && hintRow === 0 ? Math.max(pg.extra || 0, fit.hint)   // R1-13: hint and work lines side by side
+                : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? fit.hint : 0));
         const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + add(r));
         const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + add(r));
         const sumW = w.reduce((x, y) => x + y, 0);
         // A row stretches no further than its shortest problem allows (layout.js rowShape).
         // Guided rows stretch at most GUIDED_STRETCH (H13); the rest of the page stays under the band.
         const kPage = Math.max(1, Math.min(GUIDED_STRETCH, (pg.avail * Math.min(1, rows / Math.max(rows, pg.rows))) / sumW));
-        const Hr = w.map((x, r) => Math.max(x, Math.min(kPage * x, rowLimit(mins[r]))));
+        // shared-roles R1-13 (H13): the row of hinted tries is as tall as its problems and their grey hint, never stretched -
+        // a hint is not content, so the stretch left a band of 40-50 % under each problem (critic: 32 mm of a 69 mm cell);
+        // the other rows share the page as before, the rest stays under the grid
+        const cueRow = pi === 0 ? partialRowOf(cols, spanHere, nModels) : -1;
+        const hinted = (r) => pi === 0 && nModels <= 1 && r === cueRow
+            && (fit.hint > 0 || rowItems(r).some((it) => countCueOf(it) || thinkCueOf(it)));
+        const Hr = w.map((x, r) => (hinted(r) ? x : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];
