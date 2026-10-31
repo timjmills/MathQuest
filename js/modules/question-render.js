@@ -1402,7 +1402,7 @@ function _syncRefLine() {
         const key = pool ? state.category + ':' + state.skill
             : q ? q.categoryId + ':' + (q.requestedSkillId || q.skillId) : '';
         syncPracticeRefLine(q, { categoryId: state.category, skillId: state.skill, pool: !!pool,
-            opts: (state.skillOptionsBySkill || {})[key] || state.skillOptions || null });
+            opts: (q && q.linkUse != null && q.skillOptions) || (state.skillOptionsBySkill || {})[key] || state.skillOptions || null });
     } catch (e) { /* the line is a hint: never block the card */ }
 }
 

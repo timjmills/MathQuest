@@ -29,6 +29,7 @@ import './skill-options-derived.js';
 // Side effect: registers the "Which skills" control of every mixed review (P12), and the review's
 // own pitch / support (option-panel round 3), which poolMemberOptions() hands to each member.
 import { poolMemberOptions } from './skill-options-pools.js';
+import { queueUsesInPlay } from './skill-option-store.js';
 
 // P12: "What the items ask" (`forms` with a `variantKey`, skill-options.js formsOption). When the
 // teacher has ticked some of a skill's item forms, pickVariant() for that key deals only those,
@@ -223,7 +224,8 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         // which configured skill produced it without consulting global state.
         q.categoryId = q.categoryId || category;
         q.skillId = q.skillId || skill;
-        q.skillOptions = state.skillOptions;
+        // (an item a link's use dealt keeps that use's own options, not the custom_mixed pool's)
+        if (q.linkUse == null) q.skillOptions = state.skillOptions;
         if (seed !== undefined) q.seed = seed;
         return q;
     } finally {
@@ -1023,7 +1025,36 @@ function generateResolvedQuestion() {
                 console.error("Error in all_mixed custom skill selection:", err);
             }
 
-            if (skillsWithCategories.length > 0) {
+            // A link that uses one skill more than once with different options (a detailed lesson's
+            // Practice link) deals its USES, each with its own options, so every use comes up once in
+            // each round of uses.length items. Without `uses` the pick below is unchanged. The uses
+            // hold only while the queue is still the set the link loaded (skill-option-store.js):
+            // once the pupil changes the set they are dropped here, before any item is dealt.
+            let pickedUse = null;
+            let _uses = state.skill === 'custom_mixed' && state.mixedModeSettings && Array.isArray(state.mixedModeSettings.uses)
+                ? state.mixedModeSettings.uses : null;
+            if (_uses && _uses.length && !queueUsesInPlay()) { delete state.mixedModeSettings.uses; _uses = null; }
+            if (_uses && _uses.length) {
+                let at;
+                if (Number.isFinite(state.itemIndex)) {
+                    // a page (generateQuestionFor with itemIndex): the page dealer, reset at item 0 and
+                    // driven by the item seeds, so a seeded page reproduces and every use is dealt
+                    at = dealIndex('link-uses', _uses.length);
+                } else if (state.itemSeed !== undefined) {
+                    at = randInt(0, _uses.length - 1);   // one seeded item: its seed alone decides
+                } else {
+                    // live play: a shuffled deck, so every use comes up once in each round
+                    const deck = state._usesDeck && state._usesDeck.src === _uses ? state._usesDeck : (state._usesDeck = { src: _uses, order: [] });
+                    if (!deck.order.length) {
+                        deck.order = _uses.map((u, i) => i);
+                        for (let i = deck.order.length - 1; i > 0; i -= 1) { const j = randInt(0, i); [deck.order[i], deck.order[j]] = [deck.order[j], deck.order[i]]; }
+                    }
+                    at = deck.order.pop();
+                }
+                pickedUse = { index: at, ..._uses[at] };
+                targetSkill = pickedUse.skillId;
+                targetCategory = pickedUse.categoryId;
+            } else if (skillsWithCategories.length > 0) {
                 const picked = pick(skillsWithCategories);
                 targetSkill = picked.skill;
                 targetCategory = picked.category;
@@ -1054,10 +1085,19 @@ function generateResolvedQuestion() {
             // pool's: options normalised for all_mixed / custom_mixed say nothing about it.
             const poolOptions = state.skillOptions;
             // ... unless the review's own pitch / support moves them (option-panel round 3).
-            state.skillOptions = poolMemberOptions(poolOptions, targetCategory, targetSkill, lookupSetOptions(targetCategory, targetSkill)) || undefined;
+            // A dealt use brings its OWN options (never the store's, which holds the skill's first use),
+            // passed explicitly even at the defaults so the store cannot stand in for them.
+            const memberSet = pickedUse ? (pickedUse.opts || {}) : lookupSetOptions(targetCategory, targetSkill);
+            state.skillOptions = poolMemberOptions(poolOptions, targetCategory, targetSkill, memberSet)
+                || (pickedUse ? normalizeOptions(targetCategory, targetSkill, memberSet) : undefined);
+            const useOptions = pickedUse ? state.skillOptions : null;
             let recursiveQ;
             try { recursiveQ = generateQuestion(); } finally { state.skillOptions = poolOptions; }
             Object.assign(q, recursiveQ);
+            if (pickedUse) {
+                q.skillOptions = recursiveQ && recursiveQ.skillOptions ? recursiveQ.skillOptions : useOptions;
+                q.linkUse = pickedUse.index;   // which use of the link dealt it (screen hosts read q.skillOptions)
+            }
 
             state.category = savedCategory;
             state.skill = savedSkill;

@@ -2,6 +2,7 @@ import { state } from './state.js';
 import { randInt } from './utils.js';
 import { setCookie, getCookie, savePersistentData } from './storage.js';
 import { SKILL_TIME_CATEGORY, CODE_TO_SKILL, DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML } from './data.js';
+import { queueUsesInPlay } from './skill-option-store.js';
 
 // ===== LEVEL SYSTEM =====
 const LEVEL_THRESHOLDS = [0, 100, 250, 450, 750, 1150, 1650, 2300, 3100, 4100, 5300, 6800, 8600, 10800, 13400];
@@ -1597,6 +1598,10 @@ export function startFromLanding() {
         totalProblemsEnabled: !infinityMode,
         totalProblems: infinityMode ? 0 : problemCount
     };
+    // A link that uses one skill more than once plays every use with its own options
+    // (skill-option-store.js setQueueUses); a link without repeats carries no `uses`.
+    const uses = queueUsesInPlay();
+    if (uses) state.mixedModeSettings.uses = uses;
 
     // Step 4: Set state so startGame sees isMixedMode = true and uses
     // mixedModeSettings instead of reading from HTML dropdowns

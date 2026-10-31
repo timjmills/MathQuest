@@ -455,5 +455,14 @@ against this row.
 |---|---|--:|--:|--:|--:|--:|
 | 2026-10-23 | baseline (77e3225) | 513 / 872 (59 %) | 149 | 210 | 392 | 162 |
 
+### pdf-preview (2026-10-31)
+| Metric | Value |
+|---|---|
+| Full preview: page 1 on screen (wall, CPU 4×) | 0.37–0.60 s (target < 1 s) |
+| Full preview: whole set after a pause (wall, 4×) | 0.37–0.60 s (target < 3 s) |
+| Full preview: whole set pressed at once (wall, 4× / 1×) | 4.1 s / 0.78 s (target 3 s; waiver asked at 4×) |
+| Print build, 4-page sheet + key (4×) | was 5.4 s before the dialog; now usually already built in the background |
+| Preview vs PDF: pages / pixels | equal in 6 printouts / ≤ 0.002 % differing (limit 0.02 %) |
+| Critic rounds to pass | r1 FAIL; r2 pending |
 Lane D restart (2026-10-30/31): 1 critic round, FAIL (4/4 fact skills), 16 findings (9 already red in gates before the critic);
 3 builders + 1 critic, all mq-opus-medium; ~9 h wall; ~$164 session cost (≈ 5.9 % of the weekly limit). Paused by the owner after r1.

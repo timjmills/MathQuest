@@ -62,7 +62,8 @@
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline. The sample is tests/fixtures/precritic/role-sample.json
 //   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows,
-//             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-plain-words --check
+//             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-pdf-preview (print preview parity + timing),
+//             ws-plain-words --check
 //
 // BASELINES (pinned; changed only with a STATUS note)
 //   design/audit/baselines/print-lint.json    ws-print-lint --json of `--source kit` (independent, size L) per skill:
@@ -795,6 +796,13 @@ function buildPlan(ctx) {
         if (fs.existsSync(baseS)) plS.push('--baseline', rel(baseS));
         const unpS = sample.filter((k) => !pinnedIds(baseS).has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        // lessons 6-7 merge (2026-10-31, GATE-MISSED): a detailed lesson's Practice link lost a skill's second use and its
+        // options, and only ws-teacher-wrm (detailed-lesson cards: link decodes to skills.used, use by use) saw it. The
+        // lesson role runs it too (every detailed lesson card), unless --teacher adds it already.
+        if (ctx.role === 'lesson' && !ctx.teacher) add(gate('teacher-wrm', 'ws-teacher-wrm (detailed-lesson cards: Practice link keeps every skill use and its options)', 'White Rose, every lesson + every detailed lesson', 'browser', 'ws-teacher-wrm', []));
+        // lessons-sharelink (2026-10-31): the link kept every use, but the PUPIL side keyed the queue and option store by
+        // skill, so a repeated skill played only its first use's options. ws-lesson-link-uses opens each such link as a pupil.
+        if (ctx.role === 'lesson' && !ctx.teacher) add(gate('lesson-link-uses', 'ws-lesson-link-uses (a pupil plays every use of a detailed lesson link, each with its own options)', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
     }
     if (ctx.teacher) {
         for (const n of ['shell', 'library', 'preview', 'quiz']) add(gate(`teacher-${n}`, `ws-teacher-${n}`, 'teacher site', 'browser', `ws-teacher-${n}`, []));
@@ -802,8 +810,11 @@ function buildPlan(ctx) {
         if (ctx.grade) w.push('--grade', ctx.grade);
         if (ctx.lesson) w.push('--lesson', ctx.lesson);
         add(gate('teacher-wrm', `ws-teacher-wrm${w.length ? ' ' + w.join(' ') : ''}`, ctx.grade || ctx.lesson ? `White Rose ${[ctx.grade && `grade ${ctx.grade}`, ctx.lesson && `lesson ${ctx.lesson}`].filter(Boolean).join(', ')}` : 'White Rose, every lesson', 'browser', 'ws-teacher-wrm', w, { needFlags: [ctx.grade && 'grade', ctx.lesson && 'lesson'].filter(Boolean) }));
+        add(gate('lesson-link-uses', 'ws-lesson-link-uses', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
         add(gate('teacher-flows', 'ws-teacher-flows', 'teacher flows (§2.9)', 'browser', 'ws-teacher-flows', []));
         add(gate('teacher-tokens', 'ws-teacher-tokens', 'teacher tokens (§2.8)', 'node', 'ws-teacher-tokens', []));
+        // pdf-preview lane 2026-10-31: the full print preview's pages === Chrome's PDF pages, and its timing
+        add(gate('pdf-preview', 'ws-pdf-preview', 'full print preview (parity + timing)', 'browser', 'ws-pdf-preview', []));
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
     }
     return rows;
