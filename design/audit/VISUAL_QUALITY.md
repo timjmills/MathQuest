@@ -110,7 +110,9 @@ are listed there and re-exported, never redrawn.
 ### 4.4 The two owner examples
 - `add_wp_10/20` (+ `_plain`) and `sub_wp_10/20` (+ `_plain`): a **sentence** layout for stories whose answers are ≤ 20 —
   story, the number sentence `[ ] ◯ [ ] = [ ]` (the pupil writes the sign in the circle), the answer box with the
-  unit word printed beside it; the part-whole bar stays an option. No column grid, no × ÷, no distractor bank.
+  unit word printed beside it (always the plural label). The part-whole bar is drawn on the teaching pages (model,
+  guided, the lesson chart) and is the practice pages' option (lead ruling on critic r1 F13; WDS §18.1). No column grid,
+  no × ÷, no distractor bank. The lessons teach part-whole (P-21), never key words.
 - `fact_family_sort`: a kit template **`family-check`** — the three numbers in a fact triangle (largest at the top, the
   whole), "Yes / No" printed words the pupil circles (tap on screen), and nothing else graded; the Say frame goes to the
   model, not the practice cell. Title "I Can tell if three numbers make a fact family".
