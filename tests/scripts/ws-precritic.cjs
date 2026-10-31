@@ -768,6 +768,12 @@ function buildPlan(ctx) {
         if (fs.existsSync(baseS)) plS.push('--baseline', rel(baseS));
         const unpS = sample.filter((k) => !pinnedIds(baseS).has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        // shared-roles critic r1 R1-8 (PT-PRE-1..3, H5): a Pre-skill check is a full page of four prerequisite skills, never
+        // its own. (ws-columns --roles mixed-practice, R1-7's S >= M >= L check, is not on this path yet: it is red until the
+        // mixed pages lane fixes R1-7.)
+        if (ctx.role === 'pre-skill-check') {
+            add(gate(`columns-role-${ctx.role}`, `ws-columns --roles ${ctx.role} (S / M / L size checks)`, sc, 'browser', 'ws-columns', ['--roles', ctx.role, '--skills', sample.join(',')], { needFlags: ['roles'] }));
+        }
     }
     if (ctx.teacher) {
         for (const n of ['shell', 'library', 'preview', 'quiz']) add(gate(`teacher-${n}`, `ws-teacher-${n}`, 'teacher site', 'browser', `ws-teacher-${n}`, []));

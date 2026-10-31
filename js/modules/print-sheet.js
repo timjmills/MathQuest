@@ -41,6 +41,9 @@ import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
+import { wrmFor } from './wrm.js';
+import { presetOf } from './skill-presets.js';
+import { loadYear } from './links-data.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
 import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups } from './sheet/index.js';
@@ -3142,6 +3145,57 @@ function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     return out;
 }
 
+/**
+ * R1-8 (shared-roles critic r1; PAGE_TYPES PT-PRE-3): the PREREQUISITE skills a Pre-skill check of
+ * `sk` tests, nearest first, never `sk` itself, up to `count`:
+ *   1. the lesson data's prerequisite skills (lessons/prereqs.js `skills`), with their options;
+ *   2. the `pre` lists of the White Rose steps the skill teaches (wrm.js SKILL_WRM, in its order:
+ *      the step it is first met at first), from the curated year files data/curriculum/links/<YEAR>.json
+ *      (links-data.js, loaded once a page), with their options;
+ *   3. the skills before it in its category, then the categories before it in its domain
+ *      (earlierSkills with its fallback).
+ * Every skill is a live one (no tombstone, hidden or mixed pool) at the skill's grade or below.
+ */
+async function prereqSkills(sk, count = 4) {
+    // (a preset is its host with set options: a preset of the page's own host - or the host of the
+    // page's own preset - is the page's own skill, never a prerequisite)
+    const hostKey = (r) => { let p = null; try { p = presetOf(r.categoryId, r.skillId); } catch (e) { p = null; } return p ? `${p.categoryId}:${p.skillId}` : `${r.categoryId}:${r.skillId}`; };
+    const own = hostKey(sk);
+    let ownG = null;
+    try { ownG = GRADE_RANK(getSkillGrade(sk.skillId, sk.categoryId)); } catch (e) { ownG = null; }
+    const out = [];
+    const seen = new Set([own]);
+    const live = (ref) => {
+        const list = Array.isArray(SKILLS[ref.categoryId]) ? SKILLS[ref.categoryId] : [];
+        const s = list.find((x) => x && x.v === ref.skillId);
+        if (!s || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) return false;
+        try { if (isMixedMetaSkill(s.v)) return false; } catch (e) { /* keep */ }
+        let g = null;
+        try { g = GRADE_RANK(getSkillGrade(ref.skillId, ref.categoryId)); } catch (e) { g = null; }
+        return !(ownG !== null && g !== null && g > ownG);
+    };
+    const add = (ref) => {
+        if (out.length >= count || !ref || !ref.categoryId || !ref.skillId) return;
+        const k = hostKey(ref);
+        if (seen.has(k) || !live(ref)) return;
+        seen.add(k);
+        out.push(ref);
+    };
+    const L = lessonFor(sk.categoryId, sk.skillId);
+    if (L && Array.isArray(L.skills)) for (const e of L.skills) add(skillRef(e));
+    let steps = [];
+    try { steps = wrmFor(sk.categoryId, sk.skillId) || []; } catch (e) { steps = []; }
+    for (const st of steps) {
+        if (out.length >= count) break;
+        let d = null;
+        try { d = await loadYear(String(st.id).split('.')[0]); } catch (e) { d = null; }
+        const rec = d && d.steps ? d.steps[st.id] : null;
+        for (const p of (rec && Array.isArray(rec.pre) ? rec.pre : [])) add(skillRef(p));
+    }
+    if (out.length < count) for (const r of earlierSkills(sk, count + 4, { fallback: true })) add(r);
+    return out;
+}
+
 /** Roles whose cells show a finished answer in the skill's own slot (they need `canShow`). */
 const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 
@@ -3159,7 +3213,9 @@ const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 async function buildRoleSheet(n, metaOf) {
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
-    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput }) || []).filter((p) => p && p.skills && p.skills.length);
+    // R1-8: a Pre-skill check of ONE skill tests its prerequisites (the detailed lesson's check names its own).
+    const prereqs = n.role === 'pre-skill-check' && !n.perQuestion && reqSkills.length === 1 ? await prereqSkills(reqSkills[0], 4) : null;
+    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, prereqs }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
     const allSkills = [];
     const seenSkill = new Set();

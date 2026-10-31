@@ -99,6 +99,9 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-col{display:flex;flex-direction:column;min-height:0}
 :is(.ws-page,.ws-sheet) .mq-quadrow+.mq-quadrow{margin-top:3mm}
 :is(.ws-page,.ws-sheet) .mq-quadrow .ws-band{margin-top:0}
+/* R1-8: a pre-skill check's quadrant keeps its own grid height; the rest of a quadrant shorter than its row is the
+   unruled trailing area (PT-ENG-7, H13) */
+:is(.ws-page,.ws-sheet) .mq-rowcol>.ws-band>.ws-grid.mq-quadgrid{flex:0 0 auto}
 :is(.ws-page,.ws-sheet) .mq-quadscore{margin-left:auto;font-weight:700;white-space:nowrap}
 /* BD-4: the Steps list. Two text columns on the Guided page (PT-GDP-2). */
 :is(.ws-page,.ws-sheet) .mq-stepsband{padding:1mm 3mm 3mm 4mm}
