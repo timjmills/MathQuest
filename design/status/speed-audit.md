@@ -766,3 +766,27 @@ Details and the reflection: design/status/s1-checks.md.
 |---|---|---|---|
 | L6 fix-r4 + L7 build-r2 (parallel worktrees, 17:45–19:20Z) | gates green on both lessons (L6 49/49 incl. new E41; L7 all E rows); precritic --role lesson red only on main's `placevalue:more_less_10` L-OVERLAP | **E41** (built, backtest `e41-relation`): every relation a teacher page states is true of its numbers. **Proposed:** `ws-detailed-lesson` deals `checkQuestion.ref` and FAILS when the online choice count ≠ the board's A–D count (r2 D2 and the same gap in L7, both found by hand); E30-style scan for bare 4+ digit numbers on teacher pages (n3/n9). | **Gate drift after an owner ruling**: the 2026-10-23 kit rulings (CL-4b top cells, CL-11a number tabs) turned E9b/E11/E29 red in all 5 PASSED lessons and nobody saw it for 7 days. Rule: the change that lands a kit ruling runs `ws-detailed-lesson --check` on every passed lesson (proposed: add them to `ws-deploy-gates`). Parallel builders on disjoint file sets merged with 3 trivial conflicts (codes pinned in disjoint ranges ZA–ZE / Y7–Y9 by instruction) — keep doing it. Precritic `--role lesson --size S` waits on the 2-slot browser runner (796 s, 370 s queued): run it alone, not under a 580 s wall. |
 | Critic L6 r3 + L7 r1 (one critic, both lessons, 16 min) | **L6 PASS 8/8/8/8; L7 FAIL 8/7/7/7 (D1 chart zoom fallback, D2 family repeats, D3 script vs P5)** | chart-sizing FAIL when `chartPage` falls back (D1); E24 keyed on the unordered × / ÷ family + story frame, backtest `e24-family` (D2); "no X" script line vs page text (D3); T1 Flow word = Chunked when chunks; every pool place printed somewhere; bank grammatical number; Say frame without the operation word | L7's builder self-review missed all three blockers: each is a silent fallback or a gate whose rule text is wider than its key. Rule: a gate that names a rule gets a backtest row that fails on that rule; a layout fallback reports itself. One critic for two lessons cost one critic's wall time (16 min) — keep pairing. Owner paused the lane after this round: L7 fix round is the hand-over's first item. |
+
+### Mixed practice M2 (lane mixed-m2) — critic r1 + dialog check r1 (2026-10-31, both FAIL)
+
+Print critic r1 (Opus medium, fresh renders from faf80ae): FAIL. Keys facsimile and correct, exact counts kept, S > M > L, no split
+cell, Sections with no empty rows, facts + word problems passes (8 / 8 / 8 / 8). Dialog check r1: FAIL (A 7, B 7, C 7, D 8).
+
+| Finding | Check that would have caught it (backtest in the r1 fix) | Existing check? |
+|---|---|---|
+| Equal weights printed 6:24 / 18:6 — the engine bent weights to force S > M | `weights` rule: each skill within 1 of its weighted share unless two-of-each forced it | No — the ladder rule existed, its partner (weights held) did not: a check pair, never one side alone |
+| 2-digit × cell got ~19 mm of working room vs ~40 mm on its own page (H9) | work zone under the rule ≥ the skill's single-skill work zone | No |
+| Avoidable runs of 4 (stripes of × then +) | runs > 2 fail where a tall-box + block shelf was possible | Partly — `runs` accepted the weights-win cap without asking if packing caused it |
+| Legacy × stack 4.5 mm lower than the kit fact beside it | `align` across every stacked template in a shelf row, 1 mm | Partly — `align` compared one template only (M1 r1 D2 again, a scoping gap) |
+| Run note wrong across a page break; a page of one skill on Mixed up | runs counted across pages = the note; a one-skill page while another skill has problems elsewhere fails | No |
+| Cue "circle the model" over numerator / denominator cells | cue ↔ task consistency lint (M3 owns real cues) | No |
+| 3 pages for 40 at "20 a page" | the capacity warning made a FAIL; fits.perPage = real capacity | Yes, as a WARN — warnings must not hold a defect |
+| Dialog: 3:17 over 3 pages prints single-skill pages 1 and 3 | every Mixed up request holds ≥ 2 skills (uneven cases 3/17, 2/18) | No — the gate tested even counts only |
+| Dialog: Pages mode + held counts → "Raise the total", stepper 0 | Pages mode with held counts: pages ≥ needed, no error, never 0 | No |
+| Dialog: 20 facts planned on 3 pages | plan perPage learned from fits.perPage on every mixed build; summary = printed pages | No |
+
+**Speed-ups:** (1) the builder's own check passed 127 pages yet the critic failed 6 of 7 sets — the check sets were the
+builder's choice; brief the critic's sets (incl. a 2-digit stack and a fraction visual) into the builder's check up front.
+(2) the dialog and the engine were built blind to each other's capacity (8 a page planned vs 30 printed): give parallel
+builders a shared contract test (the dialog's request → the engine's result counts) before either reports.
+(3) WARN lines hid two defects; a lane's check has no WARN for anything the rubric grades.
