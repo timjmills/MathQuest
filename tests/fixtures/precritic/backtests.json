@@ -776,6 +776,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "section-overlap-lesson-warmup",
+   "check": "L-OVERLAP SECTION: a section's ink never covers the next section's heading (critic laned-restart R1-6: the add_facts lesson Warm-up printed over \"Guided Practice:\")",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP SECTION (H2, C3, PG-12): read on the printed PDF, no paint after a band's strip label lands on it",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 commit: add_facts lesson at S, page 2: the Warm-up's second counters cell (measured 3 mm short) covers the top of \"Guided Practice:\""
+   },
+   "pass": {
+    "commit": "279f556d",
+    "state": "F2 r2 fix: the measuring cell takes the counters tab spacer; the Warm-up splits into two rows of 2 (main's layout) and clears the strip"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_facts --roles lesson --size S --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
