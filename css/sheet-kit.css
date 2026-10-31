@@ -439,3 +439,24 @@
    item tab, so it takes no tab spacer above the story - on the page and in the measuring cell alike. */
 .ws-page .ws-grid > .ws-cell[data-ws-cell="word-work"]:has(.mq-wwframes)::before,
 .ws-sheet > .ws-cell.mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }
+
+/* 2026-10-31 (shared-roles R1-9, CL-40; critic r1: L-OVERLAP CL40-INK x4-6 on every Reason It page, the A box's
+   border and its "A" at 2 mm across, 4 mm down, inside the 5-7 mm label keep-out). A Reason It cell (roles/reason-it.js,
+   `.mq-ab`) starts its A / B boxes at (label side + 2 mm) from the cell's left edge, on the page and in the measuring
+   cell alike, so its boxes clear the keep-out sideways and keep their full height. Additive. */
+:is(.ws-page, .ws-sheet) .ws-cell.mq-thinkcell:has(> .mq-ab) { padding-left: calc(var(--ws-tab, 5mm) + 2mm); }
+
+/* 2026-10-31 (shared-roles R1-12, CL-40; critic r1: notation=across put "12" and "8" at 4-7 mm across, 4.1 mm down,
+   inside the label keep-out on Independent, Test and Mixed practice at S and L). An across fact on paper
+   (cells/fact.js, `data-ws-acrossfact`) holds the vertical fact's height (VA-70) with spare below its answer line;
+   its sentence now starts below the keep-out: a top inset of (label side + 1.5 mm - the cell's top pad - the 0.15 em
+   of line box above a digit's ink), INSIDE that held height (border-box), so the cell, the row and the digits keep
+   their size: nothing grows and nothing shrinks. Additive. */
+:is(.ws-page, .ws-sheet) .ws-cell:has(> :is(.ws-tab, .ws-letter)) > [data-ws-acrossfact] { box-sizing: border-box; padding-top: max(0mm, calc(var(--ws-tab, 5mm) + 1.5mm - var(--fp, 2mm) - 0.15em)); }
+
+/* 2026-10-31 (shared-roles R1-11, CL-40; critic r1: a Review's count-by strips 10-12 put their start arrow at 8 mm
+   across, 3.5 mm down, inside the 8.4 x 7 mm keep-out of a two-digit tab). A count-row cell (k2 count-by strip)
+   whose tab is two or three digits wide sets its strip clear of the tab sideways: the left pad becomes the tab's
+   painted width + 1.5 mm, and the strip centres in the rest. One-digit tabs keep the 3 mm pad. Additive. */
+:is(.ws-page, .ws-sheet) .ws-cell[data-ws-cell="count-row"]:has(> .ws-tab.w2) { padding-left: calc(var(--ws-tab, 5mm) * 1.4 + 1.5mm); }
+:is(.ws-page, .ws-sheet) .ws-cell[data-ws-cell="count-row"]:has(> .ws-tab.w3) { padding-left: calc(var(--ws-tab, 5mm) * 1.5 + 1.5mm); }

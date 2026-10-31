@@ -41,7 +41,9 @@ export function prepare(it, info = {}) {
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
     // box; the response column stays beside both.
-    const wide = it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2;
+    // The A box starts at (label side + 2 mm) (CL-40, shared-roles R1-9: sheet-kit.css insets the cell), so the
+    // room is the live width less the response column, the gap, the pads and that inset (at most 6 mm, size L).
+    const wide = it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10 - 6) / 2;
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     const render = (c, o = {}) => `<div class="mq-ab"${wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
         + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`

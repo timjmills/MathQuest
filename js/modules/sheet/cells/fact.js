@@ -312,13 +312,15 @@ register('fact', {
                 // tracks, the same answer line under it, centred. Its width is the sentence
                 // alone, so "60 ÷ 12 =" fits a 3- or 4-column page where the answer beside it
                 // would not (the answer line itself is unchanged: SL-12, AK-4).
-                return `<div class="ws-eq ws-eq-below" style="--ws-digit:${pt}pt;${hold}flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
+                // `data-ws-acrossfact` (shared-roles R1-12, CL-40): on paper the sentence starts below the label's
+                // keep-out, inside the held VA-70 height (sheet-kit.css), so nothing grows and nothing shrinks.
+                return `<div class="ws-eq ws-eq-below"${hold ? ' data-ws-acrossfact="1"' : ''} style="--ws-digit:${pt}pt;${hold}flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_TIGHT_GAP_EM}em;white-space:nowrap">`
                     + `<span>${A0}</span>${o(opGlyph(p.op), ACROSS_TIGHT_OP_EM)}<span>${B0}</span>${o('=', ACROSS_TIGHT_OP_EM)}</span>${slot}</div>`;
             }
             const eq = `<div class="ws-eq" style="--ws-digit:${pt}pt">`
                 + `<span>${A0}</span>${o(opGlyph(p.op))}<span>${B0}</span>${o('=')}${slot}</div>`;
-            return hold ? `<div class="ws-eq-hold" style="font-size:${pt}pt;${hold}">${eq}</div>` : eq;
+            return hold ? `<div class="ws-eq-hold" data-ws-acrossfact="1" style="font-size:${pt}pt;${hold}">${eq}</div>` : eq;
         }
         const n = factDigitTracks(p.a, p.b, p.digits || String(value ?? '').length);
         const item = fact(p.a, p.b, p.op, { pt, digits: n, padTop: p.padTop !== undefined ? p.padTop : factPadTop(ctx.label && ctx.label.style, cols), touch: tn.a || tn.b ? { ...tn, o: to } : null });

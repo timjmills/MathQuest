@@ -3094,7 +3094,7 @@ function settleMixedGrades(metas, items) {
     }
 }
 
-function earlierSkills(sk, count = 1, { fallback = false } = {}) {
+function earlierSkills(sk, count = 1, { fallback = false, hosts = false } = {}) {
     // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
     // columns, then word problems), so the skill just above a Level K word problem can be a
     // 5-digit sum. Only skills at the same level or below count.
@@ -3108,11 +3108,17 @@ function earlierSkills(sk, count = 1, { fallback = false } = {}) {
         try { g = GRADE_RANK(getSkillGrade(s.v, cat)); } catch (e) { g = null; }
         return !(own !== null && (g === null || g > own));
     };
-    const take = (cat, idxs) => {
+    const take = (cat, idxs, asHost = false) => {
         const list = Array.isArray(SKILLS[cat]) ? SKILLS[cat] : [];
         for (const i of idxs) {
             if (out.length >= count) return;
-            const s = list[i];
+            let s = list[i];
+            // `hosts` (shared-roles R1-11: a div_facts Review whose Mixed Review was four "count by 12" strips): in the
+            // FALLBACK walk (another category's "hardest" skills read from its end, where the presets are appended) a
+            // PRESET skill (one option value of its host, data.js `presetOf`) stands in for its host, so the earlier
+            // step rehearses the host's whole range (count_by_12s -> count_by_tables, seeded tables 1-12). The skill's
+            // own category walk (step 1) is unchanged: a preset listed before it there is a real earlier step.
+            if (asHost && s && s.presetOf) s = list.find((h) => h && h.v === s.presetOf) || s;
             if (ok(s, cat) && !out.some((o) => o.categoryId === cat && o.skillId === s.v)) out.push({ categoryId: cat, skillId: s.v });
         }
     };
@@ -3136,9 +3142,9 @@ function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     })();
     const ci = cats.indexOf(sk.categoryId);
     const lenOf = (cat) => (Array.isArray(SKILLS[cat]) ? SKILLS[cat].length : 0);
-    for (let c = ci - 1; c >= 0 && out.length < count; c--) take(cats[c], range(lenOf(cats[c]) - 1, -1, -1));
-    if (out.length < count) take(sk.categoryId, range(at + 1, list.length, 1));
-    for (let c = ci + 1; c < cats.length && out.length < count; c++) take(cats[c], range(0, lenOf(cats[c]), 1));
+    for (let c = ci - 1; c >= 0 && out.length < count; c--) take(cats[c], range(lenOf(cats[c]) - 1, -1, -1), hosts);
+    if (out.length < count) take(sk.categoryId, range(at + 1, list.length, 1), hosts);
+    for (let c = ci + 1; c < cats.length && out.length < count; c++) take(cats[c], range(0, lenOf(cats[c]), 1), hosts);
     return out;
 }
 

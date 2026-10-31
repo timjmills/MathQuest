@@ -248,6 +248,17 @@ process.stdout.write('\\n' + JSON.stringify({ roles: ['independent', 'more-pract
     try { return JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { throw new Error(`cannot read the page roles from js/modules/sheet/roles/index.js: ${(r.stderr || '').slice(0, 400)}`); }
 }
 
+/** The skills of `keys` whose offered options include notation = across (js/modules/skill-options.js, read not copied). */
+function acrossSkills(keys) {
+    if (!keys.length) return [];
+    const code = `const m = await import(${JSON.stringify(require('url').pathToFileURL(path.join(ROOT, 'js', 'modules', 'skill-options.js')).href)});
+const keys = ${JSON.stringify(keys)};
+const out = keys.filter((k) => { const [c, s] = k.split(':'); try { const n = (m.offeredOptionsFor(c, s) || []).find((o) => o && o.id === 'notation'); return !!n && (n.values || []).some((v) => v && v.v === 'across'); } catch (e) { return false; } });
+process.stdout.write('\\n' + JSON.stringify(out) + '\\n');`;
+    const r = spawnSync(process.execPath, ['--no-warnings', '--input-type=module', '-e', code], { cwd: ROOT, encoding: 'utf8' });
+    try { return JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { return []; }
+}
+
 /* ============================================================== gate definitions */
 const scriptPath = (name) => ['.cjs', '.mjs', '.js', '.sh'].map((e) => path.join(SCRIPTS, name + e)).find((p) => fs.existsSync(p)) || null;
 const srcHas = (file, flag) => { try { const s = fs.readFileSync(file, 'utf8'); return s.includes(`arg('${flag}'`) || s.includes(`'--${flag}'`) || s.includes(`"--${flag}"`) || new RegExp(`--${flag}\\b`).test(s.split('\n').slice(0, 80).join('\n')); } catch (e) { return false; } };
@@ -673,6 +684,29 @@ function buildPlan(ctx) {
                 if (fs.existsSync(file)) a.push('--baseline', rel(file));
                 const unp = keys.filter((k) => !pinnedL.has(`${k}#lesson`));
                 add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
+            }
+        }
+        // shared-roles critic r1 R1-9 / R1-10 / R1-11 / R1-12: Reason It and Review CL40-INK / H13 and the notation=across
+        // CL40-INK were red in ws-print-lint but never on this path ("a check that is not on the lane's path is not
+        // wired"). Each touched skill's OWN reason-it and review pages at L and S, against the size's pin (an unpinned
+        // page must be clean), and every touched skill that OFFERS notation=across (js/modules/skill-options.js
+        // offeredOptionsFor) printed across on its independent, test and mixed-practice pages at L and S.
+        if (ctx.role !== 'reason-it' && ctx.role !== 'review') {
+            for (const sz of ['L', 'S']) {
+                const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+                const pinnedT = pinnedIds(file);
+                const ids = keys.flatMap((k) => [`${k}#reason-it`, `${k}#review`]);
+                const a = ['--source', 'kit', '--roles', 'reason-it,review', ...(sz === 'S' ? ['--size', 'S'] : []), '--skills', keys.join(',')];
+                if (fs.existsSync(file)) a.push('--baseline', rel(file));
+                const unp = ids.filter((d) => !pinnedT.has(d));
+                add(gate(`print-lint-think-${sz}`, `ws-print-lint --source kit --roles reason-it,review --size ${sz} (the lane skills' own Reason It and Review pages: CL40-INK, H13, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
+            }
+        }
+        const across = acrossSkills(keys);
+        if (across.length) {
+            for (const sz of ['L', 'S']) {
+                const a = ['--source', 'kit', '--roles', 'independent,test,mixed-practice', '--opts', '{"notation":["across"]}', ...(sz === 'S' ? ['--size', 'S'] : []), '--skills', across.join(',')];
+                add(gate(`print-lint-across-${sz}`, `ws-print-lint --source kit --opts notation=across --roles independent,test,mixed-practice --size ${sz} (option pages: CL40-INK, ...; must be clean)`, `${listShort(across)} (offer notation=across)`, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, needFlags: ['opts'], expect: { ids: across.flatMap((k) => [k, `${k}#test`, `${k}#mixed-practice`]) } }));
             }
         }
         const ssFile = scriptPath('ws-screen-slots');
