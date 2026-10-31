@@ -264,3 +264,26 @@ counts), node-lint-s1 (LESSON-DATA main-red), options-render (15 value pages, ma
 ws-layout-unit OK (1397), ws-boot-smoke PASS (in the run).
 
 Seen, not gated: the think box "Think: 11 × ☐ = 121" crowds its own frame at S (both trees).
+
+## HAND-OVER 2 (2026-10-31, after critic r2)
+
+Branch head: critic r2 at 66a6ef23 (on 616908b1, merged with main 784eeff8). Card SIGNED 2026-10-31. NOT deployed, NOT in
+redesign-passed.js. Cost: round 2 ~$118 (≈ 4.2 %); lane total ~$282 (≈ 10.1 % of the weekly limit). Report: design/audit/runs/laned-restart/critic-r2.md.
+
+### Fixed in round 2 (critic-verified)
+R1-1 dividend side (0.62–1.08 mm), R1-2 Mix fact rows even, R1-4 supports no longer break the page, R1-6 add_facts lesson,
+R1-15 fraction keep-out, R1-16 Mix online worksheet; mixed + − × ÷ fact-rows page (owner ruling) works; preset
+division:div_facts_long (code ZF); + − × rows unchanged; screen hosts 9/9/8–9/9 in every form; 5 new checks backtested.
+
+### Remaining (round 3, Opus medium; STOP-LOOP on the arc: fresh builder, root-cause brief, check first)
+1. R2-1 arc 0.27 mm from the divisor's last digit at 10 cols (no white pixel at 100 %). Root cause: the arc is placed from the
+   dividend's ink only. Fix: place it from BOTH neighbours' ink; if 10 columns cannot hold ≥ 0.5 mm both sides at 16 pt, ask the
+   owner (the ruling keeps 10 columns). Check first: ARC-INK both sides + 96-dpi raster separation, backtested on 616908b1.
+2. R2-2 mixed fact-rows page with × prints 56 in a 10-column grid on 3–7 of 24 seeds: choose columns from what is DEALT (or
+   deal within the column rule). Check: L-DENSITY COUNT-FITS over seeds 1–24.
+3. R2-3 fact probe widens its last row (+ − × cell 20; div long/fraction/mix at L, div_facts_long at L). Check: GRID-EVEN on every grid.
+4. R2-4 think support text overruns its box at S; sign box beside vs under inconsistent. Check: L-OVERLAP TEXT-FRAME.
+5. R2-5 add_facts Review M H13 ×6 (R1-10): fix, or the owner moves it to the page-types lane.
+6. Then precritic `--role all` at S/M/L + `--skill` for all five, merged with main, before critic r3.
+Not gating (owner ruling a): R1-3, R1-5, R1-7, R1-8, R1-9, R1-11, R1-13, R1-14 → page-types lane. Card Q5 (short class) → layout lane.
+
