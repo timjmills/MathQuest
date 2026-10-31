@@ -796,6 +796,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pupil-link-every-use",
+   "check": "A pupil who opens a detailed lesson's Practice link is dealt every (skill, options) use, each item with its own use's options (lessons-sharelink: the queue and option store keyed by skill, so a repeated skill played only its first use)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-link-uses: every item matches one of its skill's uses; every use deals at least once in 3 rounds",
+   "browser": true,
+   "fail": {
+    "commit": "39ecfb28",
+    "state": "lesson 6 link opened as a pupil: 7 of 14 uses never dealt (placevalue:value always played its first use's options)"
+   },
+   "pass": {
+    "commit": "c072216d",
+    "state": "decoded uses ride as mixedModeSettings.uses; custom_mixed deals them from a deck, each with its own options"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
