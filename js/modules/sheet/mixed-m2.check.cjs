@@ -280,6 +280,8 @@ async function main() {
                     // D7: fits.perPage is what a page holds for THIS mix; a sheet never takes a page more
                     if (sc.arr === 'mixed' && r.perPage && r.pages > 1 && tot <= r.perPage * (r.pages - 1)) fail(`${r.pages} pages for ${tot} problems at ${r.perPage} a page`);
                     if (sc.arr === 'mixed' && r.perPage && r.pages > 1 && tot > r.perPage * r.pages) fail(`${r.pages} pages for ${tot} problems, but fits.perPage says ${r.perPage} a page`);
+                    // (C2: every page of an exact-count print but the last is filled - body at least 85 % used)
+                    if (sc.arr === 'mixed') r.pupil.slice(0, -1).forEach((pg, i) => { if (pg.free > 0.15 * pg.bodyMm) fail(`page ${i + 1} of ${r.pages}: ${pg.free.toFixed(0)} mm free under the frame (${((pg.free / pg.bodyMm) * 100).toFixed(0)} % of the body)`); });
                     // D7: no avoidable trailing slot - a page before the last ends a shelf short only
                     // where a skill too small for two a page is spread one a page
                     const spread = Object.entries(r.per).some(([, k]) => k < 2 * r.pages);
@@ -305,7 +307,7 @@ async function main() {
                     const ks = Object.values(r.per);
                     const tot = ks.reduce((a, b) => a + b, 0);
                     const share = tot / ks.length;
-                    for (const [p, k] of Object.entries(r.per)) if (Math.abs(k - share) > 1 + 1e-9 && !(k <= 2 && share < 2)) fail(`weights: ${p} has ${k} of ${tot} problems, Equal weights give ${share.toFixed(1)} (within 1)`);
+                    for (const [p, k] of Object.entries(r.per)) if (Math.abs(k - share) > 1 + 1e-9 && !(k <= 2 && share < 2) && !/fills the rest of the page/.test(notes)) fail(`weights: ${p} has ${k} of ${tot} problems, Equal weights give ${share.toFixed(1)} (within 1)`);
                 }
                 // D3: no stripes - tall boxes alone on a shelf while a block of small boxes prints in a row of its own
                 if (r.arr === 'mixed') r.pupil.forEach((pg, i) => { if (pg.tallOnly && pg.smallW > 0 && pg.rowSmall >= 2 * Math.round(pg.tallW / pg.smallW) && pg.smallW <= pg.tallW / 2 + 1) fail(`page ${i + 1}: ${pg.tallOnly} shelf(s) of tall boxes alone while a row of ${pg.rowSmall} small boxes could have shared them (PT-MIX-5 stripes)`); });
@@ -339,8 +341,9 @@ async function main() {
                         // a fill page: no blank strip of 20 % of the body or more under the frame (L2,
                         // PRE-FLIGHT 2) - the counts were chosen to fill it
                         const pg = r.pupil[0];
-                        // (D1: the weights win - a page short of the frame says so; it is never refilled by changing the mix)
-                        if (pg.free > 0.2 * pg.bodyMm && !/the foot of the page is left open/.test(notes)) fail(`${pg.free.toFixed(0)} mm free under the frame on a fill page (${((pg.free / pg.bodyMm) * 100).toFixed(0)} % of the body)`);
+                        // (coordinator r2, C2: a fill page is FILLED - the weights as closely as that allows, the
+                        // rest by whichever skill fits, said in the notes; the body at least 85 % used)
+                        if (pg.free > 0.15 * pg.bodyMm) fail(`${pg.free.toFixed(0)} mm free under the frame on a fill page (${((pg.free / pg.bodyMm) * 100).toFixed(0)} % of the body)`);
                     }
                 }
                 // the key mirrors the pupil page

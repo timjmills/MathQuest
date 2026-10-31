@@ -159,7 +159,7 @@ export function withinShare(cells, weights, ids = Object.keys(cells)) {
  * stays within 1 of its share (withinShare). The weights are held first; the page holds what it
  * holds with them held. -> {counts: {id: problems}, fits, size}
  */
-export function fillPage(groups, weights, budget, maxRows) {
+export function fillPage(groups, weights, budget, maxRows, { fillRest = true } = {}) {
     const ids = groups.flatMap((g) => g.pools);
     const cells = Object.fromEntries(ids.map((id) => [id, 2]));
     const ok = () => { const p = pageSize(groups, cells); return p.h <= budget + 1e-6 && p.rows <= maxRows; };
@@ -192,7 +192,21 @@ export function fillPage(groups, weights, budget, maxRows) {
         }
         Object.assign(cells, best.cells);
     }
-    return { counts: Object.assign({}, cells), fits, size: pageSize(groups, cells) };
+    // FILL THE REST (IMPROVEMENT_PLAN 3.3: the weights are met as closely as the page allows, never
+    // by leaving it under-filled - coordinator r2): when no further problem fits at the weights, the
+    // room left takes whichever skill's cells still fit, the one furthest below its share first.
+    // The caller says so in the notes ("Addition fills the rest of the page: ...").
+    let rest = false;
+    for (let guard = 0; fits && fillRest && guard < 2000; guard++) {
+        let added = false;
+        for (const id of ids.slice().sort((a, b) => gap(b) - gap(a) || ids.indexOf(a) - ids.indexOf(b))) {
+            cells[id] += 1;
+            if (ok()) { added = true; rest = true; break; }
+            cells[id] -= 1;
+        }
+        if (!added) break;
+    }
+    return { counts: Object.assign({}, cells), fits, size: pageSize(groups, cells), rest: rest && !withinShare(cells, weights, ids) };
 }
 
 /** Count vectors summing to T with every pool within 1 of its share (at least 2 each). */
@@ -356,8 +370,34 @@ export function packPage(groups, byPool0, N, seed, { weights = null, labels = nu
                     }
                     if (done) break;
                 }
-                if (!done) break;
+                if (!done) {
+                    // else the block trades places with a tall box of a shelf that stays valid: the
+                    // short box then stands among tall boxes only, as tall as they are
+                    const g = groups[a.g];
+                    const slotOf = (c) => Math.floor((c.col - 1) / g.sB);
+                    const blkSlot = [...new Set(a.cells.filter((c) => c.rows === 1).map(slotOf))][0];
+                    if (blkSlot === undefined) break;
+                    for (const b of twoRow) {
+                        if (b === a || b.g !== a.g || done) continue;
+                        for (const y of b.cells.filter((c) => c.rows === 2)) {
+                            const ys = slotOf(y);
+                            const blk = a.cells.filter((c) => c.rows === 1 && slotOf(c) === blkSlot);
+                            const move = (c, from, to) => { c.col += (to - from) * g.sB; };
+                            // swap
+                            a.cells = a.cells.filter((c) => !blk.includes(c)).concat([y]);
+                            b.cells = b.cells.filter((c) => c !== y).concat(blk);
+                            move(y, ys, blkSlot); blk.forEach((c) => move(c, blkSlot, ys));
+                            if (valid(a) && valid(b)) { done = true; break; }
+                            move(y, blkSlot, ys); blk.forEach((c) => move(c, ys, blkSlot));
+                            b.cells = b.cells.filter((c) => !blk.includes(c)).concat([y]);
+                            a.cells = a.cells.filter((c) => c !== y).concat(blk);
+                        }
+                    }
+                    if (!done) break;
+                }
             }
+            // (cells in place order: shelf, block, inside the block - PT-MIX-7)
+            for (const sh of twoRow) sh.cells.sort((p1, p2) => Math.floor((p1.col - 1) / groups[sh.g].sB) - Math.floor((p2.col - 1) / groups[sh.g].sB) || p1.row - p2.row || p1.col - p2.col);
         }
     }
     // The tail: problems short of a whole block flow left to right in one-row shelves at the end

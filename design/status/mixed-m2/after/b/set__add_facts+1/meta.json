@@ -9,16 +9,16 @@
     "mixed-practice-S": {
       "fits": {
         "cols": 8,
-        "rows": 2,
-        "perPage": 14,
+        "rows": 3,
+        "perPage": 17,
         "pages": 1,
-        "note": "Fits: 14 problems mixed on a 8-unit lattice, 1 page (14 a page). Mixed practice: with the skills in the proportions asked, the page holds 14 problems; one more of any skill would need another shelf, so the foot of the page is left open.",
+        "note": "Fits: 17 problems mixed on a 8-unit lattice, 1 page (17 a page). Addition fills the rest of the page: 11 addition problems, 6 multiplying problems.",
         "sections": [
           {
             "cols": 8,
-            "rows": 2,
-            "perPage": 14,
-            "line": "Fits: 14 problems mixed on a 8-unit lattice, 1 page (14 a page)."
+            "rows": 3,
+            "perPage": 17,
+            "line": "Fits: 17 problems mixed on a 8-unit lattice, 1 page (17 a page)."
           }
         ]
       },
@@ -27,7 +27,7 @@
       "seed": 722369,
       "title": "Mixed practice",
       "notes": [
-        "Mixed practice: with the skills in the proportions asked, the page holds 14 problems; one more of any skill would need another shelf, so the foot of the page is left open."
+        "Addition fills the rest of the page: 11 addition problems, 6 multiplying problems."
       ],
       "gaps": [],
       "anchors": {
@@ -501,6 +501,180 @@
           }
         },
         {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "6 + 2 = ?",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.8
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 5.2
+            },
+            "6": {
+              "hMm": 37.2,
+              "fits": true,
+              "slackMm": 4
+            },
+            "7": {
+              "hMm": 32.4,
+              "fits": true,
+              "slackMm": 3.6
+            },
+            "8": {
+              "hMm": 29.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "9": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 2.5
+            },
+            "10": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 1.5
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "3 + 2 = ?",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.8
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 5.2
+            },
+            "6": {
+              "hMm": 37.2,
+              "fits": true,
+              "slackMm": 4
+            },
+            "7": {
+              "hMm": 32.4,
+              "fits": true,
+              "slackMm": 3.6
+            },
+            "8": {
+              "hMm": 29.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "9": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 2.5
+            },
+            "10": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 1.5
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "3 + 3 = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.8
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 5.2
+            },
+            "6": {
+              "hMm": 37.2,
+              "fits": true,
+              "slackMm": 4
+            },
+            "7": {
+              "hMm": 32.4,
+              "fits": true,
+              "slackMm": 3.6
+            },
+            "8": {
+              "hMm": 29.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "9": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 2.5
+            },
+            "10": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 1.5
+            }
+          }
+        },
+        {
           "template": "legacy",
           "fclass": "long",
           "text": "56 × 98 = ?",
@@ -855,7 +1029,7 @@
       "pages": [
         {
           "file": "mixed-practice-S-p1.png",
-          "words": 97,
+          "words": 109,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -863,7 +1037,7 @@
       "keyPages": [
         {
           "file": "mixed-practice-S-key-p1.png",
-          "words": 130,
+          "words": 145,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -871,33 +1045,33 @@
       "check": {
         "pages": 1,
         "cells": [
-          14
+          17
         ],
         "problems": [],
         "fonts": {
-          "Andika": 80
+          "Andika": 92
         },
         "fontsReady": true,
         "andika": true,
         "pageHashes": [
-          "f5916c2bb76ec885"
+          "2e699a0e6554d94f"
         ],
         "measured": [
           {
-            "cells": 14,
+            "cells": 17,
             "digitPt": {
               "max": 22,
               "median": 18,
               "min": 8
             },
             "slots": {
-              "n": 8,
+              "n": 11,
               "minMm": [
                 9.1,
                 7.3
               ],
               "sizes": [
-                "9x7 mm ×8"
+                "9x7 mm ×11"
               ]
             },
             "band": {
@@ -905,40 +1079,40 @@
               "wPct": 24,
               "cell": 14
             },
-            "footPct": 29.9
+            "footPct": 13.3
           }
         ]
       },
       "keyCheck": {
         "pages": 1,
         "cells": [
-          14
+          17
         ],
         "problems": [],
         "fonts": {
-          "Andika": 117
+          "Andika": 132
         },
         "fontsReady": true,
         "andika": true,
         "pageHashes": [
-          "fb484de04f167387"
+          "e428699e4a870dc3"
         ],
         "measured": [
           {
-            "cells": 14,
+            "cells": 17,
             "digitPt": {
               "max": 22,
-              "median": 22,
+              "median": 18,
               "min": 8
             },
             "slots": {
-              "n": 8,
+              "n": 11,
               "minMm": [
                 9.1,
                 7.3
               ],
               "sizes": [
-                "9x7 mm ×8"
+                "9x7 mm ×11"
               ]
             },
             "band": {
@@ -946,7 +1120,7 @@
               "wPct": 24,
               "cell": 14
             },
-            "footPct": 29.9
+            "footPct": 13.3
           }
         ]
       }
@@ -955,15 +1129,15 @@
       "fits": {
         "cols": 6,
         "rows": 3,
-        "perPage": 12,
+        "perPage": 15,
         "pages": 1,
-        "note": "Fits: 12 problems mixed on a 6-unit lattice, 1 page (12 a page). Multiplying takes most of the page, so up to 3 multiplying problems come in a row Mixed practice: with the skills in the proportions asked, this size holds 12 problems a page, no more than the next size up (12).",
+        "note": "Fits: 15 problems mixed on a 6-unit lattice, 1 page (15 a page). Addition fills the rest of the page: 11 addition problems, 4 multiplying problems.",
         "sections": [
           {
             "cols": 6,
             "rows": 3,
-            "perPage": 12,
-            "line": "Fits: 12 problems mixed on a 6-unit lattice, 1 page (12 a page)."
+            "perPage": 15,
+            "line": "Fits: 15 problems mixed on a 6-unit lattice, 1 page (15 a page)."
           }
         ]
       },
@@ -972,8 +1146,7 @@
       "seed": 722369,
       "title": "Mixed practice",
       "notes": [
-        "Multiplying takes most of the page, so up to 3 multiplying problems come in a row",
-        "Mixed practice: with the skills in the proportions asked, this size holds 12 problems a page, no more than the next size up (12)."
+        "Addition fills the rest of the page: 11 addition problems, 4 multiplying problems."
       ],
       "gaps": [],
       "anchors": {
@@ -1389,6 +1562,238 @@
           }
         },
         {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "8 + 7 = ?",
+          "ans": "15",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.8
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 5.2
+            },
+            "6": {
+              "hMm": 37.2,
+              "fits": true,
+              "slackMm": 4
+            },
+            "7": {
+              "hMm": 32.4,
+              "fits": true,
+              "slackMm": 3.6
+            },
+            "8": {
+              "hMm": 29.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "9": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 2.5
+            },
+            "10": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 1.5
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "6 + 2 = ?",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.8
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 5.2
+            },
+            "6": {
+              "hMm": 37.2,
+              "fits": true,
+              "slackMm": 4
+            },
+            "7": {
+              "hMm": 32.4,
+              "fits": true,
+              "slackMm": 3.6
+            },
+            "8": {
+              "hMm": 29.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "9": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 2.5
+            },
+            "10": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 1.5
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "3 + 2 = ?",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.8
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 5.2
+            },
+            "6": {
+              "hMm": 37.2,
+              "fits": true,
+              "slackMm": 4
+            },
+            "7": {
+              "hMm": 32.4,
+              "fits": true,
+              "slackMm": 3.6
+            },
+            "8": {
+              "hMm": 29.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "9": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 2.5
+            },
+            "10": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 1.5
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "3 + 3 = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.8
+            },
+            "5": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 5.2
+            },
+            "6": {
+              "hMm": 37.2,
+              "fits": true,
+              "slackMm": 4
+            },
+            "7": {
+              "hMm": 32.4,
+              "fits": true,
+              "slackMm": 3.6
+            },
+            "8": {
+              "hMm": 29.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "9": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 2.5
+            },
+            "10": {
+              "hMm": 27.5,
+              "fits": false,
+              "slackMm": 1.5
+            }
+          }
+        },
+        {
           "template": "legacy",
           "fclass": "long",
           "text": "56 × 98 = ?",
@@ -1619,64 +2024,6 @@
               "slackMm": -7.3
             }
           }
-        },
-        {
-          "template": "legacy",
-          "fclass": "long",
-          "text": "65 × 19 = ?",
-          "ans": "1235",
-          "measured": {
-            "1": {
-              "hMm": 49.8,
-              "fits": true,
-              "slackMm": 77.4
-            },
-            "2": {
-              "hMm": 49.8,
-              "fits": true,
-              "slackMm": 31.1
-            },
-            "3": {
-              "hMm": 49.8,
-              "fits": true,
-              "slackMm": 15.6
-            },
-            "4": {
-              "hMm": 49.8,
-              "fits": true,
-              "slackMm": 7.9
-            },
-            "5": {
-              "hMm": 49.8,
-              "fits": true,
-              "slackMm": 3.2
-            },
-            "6": {
-              "hMm": 49.8,
-              "fits": false,
-              "slackMm": -1.1
-            },
-            "7": {
-              "hMm": 49.8,
-              "fits": false,
-              "slackMm": -5.5
-            },
-            "8": {
-              "hMm": 49.8,
-              "fits": false,
-              "slackMm": -8.8
-            },
-            "9": {
-              "hMm": 49.8,
-              "fits": false,
-              "slackMm": -11.4
-            },
-            "10": {
-              "hMm": 49.8,
-              "fits": false,
-              "slackMm": -13.4
-            }
-          }
         }
       ],
       "role": "mixed-practice",
@@ -1685,7 +2032,7 @@
       "pages": [
         {
           "file": "mixed-practice-M-p1.png",
-          "words": 87,
+          "words": 97,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -1693,7 +2040,7 @@
       "keyPages": [
         {
           "file": "mixed-practice-M-key-p1.png",
-          "words": 115,
+          "words": 125,
           "w_mm": 209.9,
           "h_mm": 297
         }
@@ -1701,33 +2048,33 @@
       "check": {
         "pages": 1,
         "cells": [
-          12
+          15
         ],
         "problems": [],
         "fonts": {
-          "Andika": 70
+          "Andika": 80
         },
         "fontsReady": true,
         "andika": true,
         "pageHashes": [
-          "3ee8c7f169521b8e"
+          "5eb78f5004c5e411"
         ],
         "measured": [
           {
-            "cells": 12,
+            "cells": 15,
             "digitPt": {
               "max": 24,
               "median": 22,
               "min": 10
             },
             "slots": {
-              "n": 7,
+              "n": 11,
               "minMm": [
                 12.2,
                 9.7
               ],
               "sizes": [
-                "12x10 mm ×7"
+                "12x10 mm ×11"
               ]
             },
             "band": {
@@ -1742,33 +2089,33 @@
       "keyCheck": {
         "pages": 1,
         "cells": [
-          12
+          15
         ],
         "problems": [],
         "fonts": {
-          "Andika": 101
+          "Andika": 112
         },
         "fontsReady": true,
         "andika": true,
         "pageHashes": [
-          "9f2f3e00809dbb73"
+          "b7796a696b01ed32"
         ],
         "measured": [
           {
-            "cells": 12,
+            "cells": 15,
             "digitPt": {
               "max": 24,
               "median": 22,
               "min": 10
             },
             "slots": {
-              "n": 7,
+              "n": 11,
               "minMm": [
                 12.2,
                 9.7
               ],
               "sizes": [
-                "12x10 mm ×7"
+                "12x10 mm ×11"
               ]
             },
             "band": {

@@ -41,7 +41,7 @@ import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
 import { interleave, dealCounts } from '../interleave.js';
 import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
 import { factWidthMm, factDigitTracks } from '../cells/fact.js';
-import { classify, fillPage, packPage, splitPages, H13_FILL, NAT_MM } from '../mixed-pack.js';
+import { classify, fillPage, packPage, splitPages, withinShare, H13_FILL, NAT_MM } from '../mixed-pack.js';
 
 export const ROLE_ID = 'mixed-practice';
 export const DEFAULT_LOOK = 'daily';
@@ -756,10 +756,21 @@ export function m2Counts(poolsIn, input) {
     const counts0 = exact ? Object.fromEntries(c.ids.map((id) => [id, Math.max(0, Math.floor(Number(exact[id]) || 0))])) : null;
     // (exact counts: a page holds them in their own proportions)
     const wPage = counts0 && c.ids.every((id) => counts0[id] > 0) ? counts0 : w0;
-    const fill = fillPage(c.groups, wPage, b.first, b.maxRows);
+    // (exact counts: no fill-the-rest - the capacity is the page at THEIR proportions)
+    let fill = fillPage(c.groups, wPage, b.first, b.maxRows, { fillRest: !counts0 });
     const sum = (f) => c.ids.reduce((a, id) => a + f.counts[id], 0);
     let ladderNote = '';
     const must = Number(input.mustBeat) || 0;
+    // (the size ladder: where the page at the weights holds no more than the next size up, the most
+    // compact skill fills more of it - as "fill the rest" does - and the notes say so in plain words)
+    if (must && !exact && sum(fill) <= must) {
+        const area = (id) => { const g = c.groups.find((x) => x.pools.includes(id)); const sh = g.shape[id]; return sh.s * sh.r * g.U; };
+        const small = c.ids.slice().sort((a, b2) => area(a) - area(b2))[0];
+        for (const f of [1.5, 2, 3, 4, 6]) {
+            const f2 = fillPage(c.groups, Object.assign({}, w0, { [small]: w0[small] * f }), b.first, b.maxRows);
+            if (sum(f2) > must) { fill = f2; break; }
+        }
+    }
     if (must && !exact && sum(fill) <= must) {
         ladderNote = `Mixed practice: with the skills in the proportions asked, this size holds ${sum(fill)} problems a page, no more than the next size up (${must}).`;
     }
@@ -825,8 +836,55 @@ function planMixedM2(input, pools) {
             });
             packed = pages;
             packed.spread = spread;
+            packed.split = split;
             if (fits) { found = true; break; }
         }
+    }
+    // REBALANCE (coordinator r2, C2): a page before the last that is under 85 % full takes a problem
+    // from the page with the most of a skill, when both pages still fit (and the giver stays 85 %
+    // full, or is the last page). The counts stay the teacher's; only their pages change.
+    if (found && packed.split.length > 1) {
+        const split = packed.split.map((x) => Object.fromEntries(Object.entries(x).map(([k, v]) => [k, v.slice()])));
+        const pack = (byPool, i) => packPage(groups, byPool, N, (seed0 + i * 104729) >>> 0, { weights, labels: names, hOf: cellH });
+        const budgetOf = (i) => (i ? b.cont : b.first);
+        const hOfPg = (pg) => pg.shelves.reduce((a, s2) => a + s2.H, 0);
+        const fitsPg = (pg, i) => hOfPg(pg) <= budgetOf(i) + 1e-6 && pg.shelves.reduce((a, s2) => a + s2.R, 0) <= b.maxRows;
+        const pages = split.map(pack);
+        const last = pages.length - 1;
+        for (let guard = 0; guard < 24; guard++) {
+            const i = pages.findIndex((pg, x) => x < last && hOfPg(pg) < 0.85 * budgetOf(x));
+            if (i < 0) break;
+            let moved = false;
+            for (const id of ids) {
+                const donors = pages.map((_, j) => j).filter((j) => j !== i && (split[j][id] || []).length > 0)
+                    .sort((a, c2) => (split[c2][id] || []).length - (split[a][id] || []).length);
+                for (const j of donors) {
+                    const a2 = Object.assign({}, split[i], { [id]: [...(split[i][id] || []), split[j][id][split[j][id].length - 1]] });
+                    const b2 = Object.assign({}, split[j], { [id]: split[j][id].slice(0, -1) });
+                    if (!b2[id].length) delete b2[id];
+                    const pa = pack(a2, i);
+                    const pb = pack(b2, j);
+                    if (!fitsPg(pa, i) || !fitsPg(pb, j) || hOfPg(pa) <= hOfPg(pages[i]) + 1e-6) continue;
+                    if (j < last && hOfPg(pb) < 0.85 * budgetOf(j)) continue;
+                    // (never a trailing slot made on a page before the last - D7 - but by a skill spread one a page)
+                    const trails = (pg) => pg.shelves.filter((s2) => s2.trail).length;
+                    if (pools[id].length >= 2 * pages.length && (trails(pa) > trails(pages[i]) || (j < last && trails(pb) > trails(pages[j])))) continue;
+                    split[i] = a2; split[j] = b2; pages[i] = pa; pages[j] = pb;
+                    moved = true;
+                    break;
+                }
+                if (moved) break;
+            }
+            if (!moved) break;
+        }
+        // (the items keep their pool's order across the pages: re-slice each pool page by page)
+        const ordered = split.map(() => ({}));
+        for (const id of ids) {
+            let at = 0;
+            split.forEach((x, pi) => { const k = (x[id] || []).length; if (k) ordered[pi][id] = pools[id].slice(at, at + k); at += k; });
+        }
+        const repacked = ordered.map(pack);
+        if (repacked.every(fitsPg)) { const sp = packed.spread; packed = repacked; packed.spread = sp; packed.split = ordered; }
     }
     const used = packed.filter((pg) => pg.shelves.length);
     const n = used.reduce((a, pg) => a + pg.order.length, 0);
@@ -866,6 +924,13 @@ function planMixedM2(input, pools) {
         pg.shelves.forEach((sh, i) => { if (workOnly(sh)) grows[i] = Math.max(0, left / nWork); });
         // (D1: the weights held, a fill page may end short of the frame - the notes say why)
         const openMm = budget - hSum - grows.reduce((a, x) => a + x, 0);
+        if (!input.exactCounts && used.length === 1 && pi === 0) {
+            const got = Object.fromEntries(ids.map((id) => [id, pg.order.filter((x) => x === id).length]));
+            if (!withinShare(got, weights, ids)) {
+                const over = ids.slice().sort((a, c2) => got[c2] / (weights[c2] || 1) - got[a] / (weights[a] || 1))[0];
+                notes.push(`${names[over].name} fills the rest of the page: ${ids.map((id) => `${got[id]} ${names[id].noun}`).join(', ')}.`);
+            }
+        }
         if (!input.exactCounts && used.length === 1 && openMm > 0.2 * budget) {
             notes.push(`Mixed practice: with the skills in the proportions asked, the page holds ${pg.order.length} problems; one more of any skill would need another shelf, so the foot of the page is left open.`);
         }

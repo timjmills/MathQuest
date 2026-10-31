@@ -74,3 +74,15 @@ Defects -> fix -> check in `mixed-m2.check.cjs` (backtest: the new check against
 Open: weights held cost problems on some fill pages (b-S 14 with the foot open, c-M 6: two word problems and four facts) -
 the owner's rule; the notes say so. e-L (3:37) prints runs of up to 16 addition across the break (noted, true).
 Renders: `design/status/mixed-m2/after/{a,b,c,d,e,g,sec-b}`.
+
+## Round 2 (coordinator: under-filled pages, C2)
+- Fill pages (weights only): the weights first (within 1); when no further problem fits at the weights, the rest of the page
+  takes whichever skill still fits, closest to its share first, and the notes say so ("Addition fills the rest of the page:
+  11 addition problems, 6 multiplying problems."). The size ladder may lean on the most compact skill the same way.
+- Exact counts: the counts stay exact; a rebalance pass moves problems from the fullest page into a page before the last
+  that is under 85 % full (both pages must still fit; no trailing slot made, except by a skill spread one a page).
+- H13: a short tall box beside a block now trades places with the block across shelves when no taller box can swap in.
+- Check (partner to `weights`): the body is at least 85 % used on a fill page and on every page but the last of an
+  exact-count print. Backtest on a1254b8: FAIL (b-S fill pages 30 % free x2, c 5:14 page 3 of 4 19 % free); this head OK.
+- Left: b-S / b-M still end in a tail row of 3 facts + a trailing area (a 4th fact would make a block, and blocks go into
+  2-row shelves); the page body is above 85 %.
