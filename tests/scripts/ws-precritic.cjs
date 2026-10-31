@@ -779,6 +779,7 @@ function buildPlan(ctx) {
                 const g = gate(id, `${path.basename(file)} ${args.join(' ')}`, `Mixed practice: ${what}`, 'browser', id, args);
                 g.file = path.join(ROOT, file);
                 g.missing = fs.existsSync(g.file) ? null : `${file} is not in this tree`;
+                g.script = `${id} check`;   // (its verdict line: "mixed-m2 check: OK")
                 add(g);
             }
         }

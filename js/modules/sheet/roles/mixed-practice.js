@@ -75,7 +75,8 @@ function sectionKs(its, N, ctx, single = false, lesson = false) {
     const allFact = its.length && its.every((it) => it.template === 'fact');
     // a page of ONE skill is its own lattice (PT-MIX-1 holds trivially): any count up to N, so a
     // lattice of 8 does not hold S to 4 across where M prints 6 (R1-7)
-    const ks = single ? Array.from({ length: N }, (_, i) => N - i).filter((d) => d <= 6 || d === N)
+    // (a fact or a kit stack only: a legacy cell, a clock wraps or crowds its label at a count the measurement passes - print-lint WRAP-OP, CL-40)
+    const ks = single && its.length && its.every((it) => it.template === 'fact' || it.template === 'stack') ? Array.from({ length: N }, (_, i) => N - i).filter((d) => d <= 6 || d === N)
         : [...(N > 6 ? [N] : []), ...divisorsDesc(N).filter((d) => d <= 6)];
     // TY-30: a fact cell never prints under the size's working digits (the ladder sets them by k) -
     // at L a fact 6 across (24 pt) printed more than M's 4 (R1-7, sub_facts I Can)
