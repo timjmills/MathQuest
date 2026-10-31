@@ -1178,7 +1178,10 @@ function wsLintPage(cfg) {
                 if (!visible(g)) continue;
                 const gw = g.getBoundingClientRect().width;
                 const cs = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun') && visible(c));
-                const ws = cs.map((c) => c.getBoundingClientRect().width).filter((w) => w < gw - 2 * PX);
+                // (a cell as wide as the grid is a declared full-width span - unless the grid RE-LAID its short last
+                // row (`.relaid`, grid.js): then the widened cell is the defect, critic r2 R2-3's cell 20)
+                const relaid = g.classList.contains('relaid');
+                const ws = cs.map((c) => c.getBoundingClientRect().width).filter((w) => relaid || w < gw - 2 * PX);
                 if (ws.length < 2) continue;
                 const lo = Math.min(...ws), hi = Math.max(...ws);
                 if (hi - lo > 0.2 * PX) {
@@ -1485,7 +1488,10 @@ function wsLintPage(cfg) {
                 if (r.width < 4 || r.height < 4) return false;
                 // an empty run after the last problem is a hole inside PG-15's closed frame, always
                 // (critic r5 D5-5: no border trick hides it; the layout removes it)
-                if (e.classList.contains('blankrun')) return true;
+                // (... except on the fact probe: PT-FPR-6 deals a fixed 20 and PT 4.2 draws the remainder after the 20th
+                // fact unruled - Lane D restart critic r2 R2-3's own fix: "the 20th fact stays in column 1 with the
+                // remainder unruled", never a re-laid wider cell)
+                if (e.classList.contains('blankrun')) return !/(^|\|)Probe\b/.test(pg.getAttribute('data-ws-tab') || '');
                 const st = getComputedStyle(e);
                 const bordered = ['Top', 'Right', 'Bottom', 'Left'].some(k => parseFloat(st['border' + k + 'Width']) > 0 && st['border' + k + 'Style'] !== 'none');
                 return bordered && !(e.textContent || '').trim() && !e.querySelector('svg, img, canvas, [data-ws-slot], input');

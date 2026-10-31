@@ -779,19 +779,39 @@
   },
   {
    "id": "arc-ink-laned",
-   "check": "The long-division bracket's arc keeps >= 0.3 mm of white before the dividend's first digit (Lane D restart critic r1 R1-1: \"4 ) 8\" read as \"48\" on 10-column fact rows)",
+   "check": "The long-division bracket's arc keeps >= 0.5 mm of white on BOTH sides - the dividend's first digit and the divisor's last (Lane D restart critic r1 R1-1: \"4 ) 8\" read as \"48\"; critic r2 R2-1: 0.27 mm on the divisor side at 10 columns; owner revised Q3)",
    "kind": "commit-pair",
    "rule": "ws-print-lint L-OVERLAP ARC-INK",
    "browser": true,
    "fail": {
-    "commit": "31a856fd",
-    "state": "critic r1 FAIL commit: div_facts Long fact rows at S, 10 columns, the arc 0.27 mm INTO the first digit"
+    "commit": "616908b1",
+    "state": "critic r2 FAIL commit: div_facts Long fact rows at S, 10 columns, the arc 0.27 mm from the divisor's last digit (dividend side 0.62 mm)"
    },
    "pass": {
-    "commit": "f9482c43",
-    "state": "fix r2 F1: arc placed from the glyphs' ink, 0.62-0.70 mm of white"
+    "commit": "f7a27938",
+    "state": "fix r3: the bracket clamps to 8 columns, the arc placed from both neighbours' ink: divisor side 0.86 mm, dividend side 0.69 mm at 8 columns (S/M/L)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --columns 10 --opts '{\"divForm\":[\"long\"]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grid-even-probe-laned",
+   "check": "One cell width per fact-probe grid: the 20th across fact keeps its column, the rest unruled (Lane D restart critic r2 R2-3: cell 20 spanned the across block)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN (every kit grid)",
+   "browser": true,
+   "fail": {
+    "commit": "616908b1",
+    "state": "critic r2 FAIL commit: add_facts fact probe at S, the 20th across fact re-laid the width of the block"
+   },
+   "pass": {
+    "commit": "f7a27938",
+    "state": "fix r3: every probe grid keeps its lattice (relay false)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_facts --roles fact-probe --size S --lints L-DENSITY",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
