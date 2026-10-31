@@ -35,7 +35,7 @@ import { planPages, planCounts, PER_PAGE, keyOf } from './teacher-plan.js';
 import { trayGroups, trayLocks, editShareInPlace, setShareFromText, shareHeldText, trayRecord, trayFromSetName } from './teacher-tray.js';
 import { encodeSetParam } from './teacher-ui.js';
 import { printHtml } from './teacher-print.js';
-import { openPdfPreview, warmPdfPreview } from './teacher-pdf-preview.js';
+import { openPdfPreview, warmPdfPreview, isPdfPreviewOpen } from './teacher-pdf-preview.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { mountSample } from './teacher-preview.js';
@@ -280,7 +280,11 @@ async function buildAll(p, list, quiz, onProgress, stop) {
             if (stop && J.hold) await J.hold;    // the full preview is drawing page 1: wait for it
             const rq = versions > 1 ? Object.assign({}, part.req, { keySection: label }) : part.req;
             let res;
-            try { res = await buildSheet(rq); } catch (e) {
+            // the side preview already built this very request (page 1): the engine is deterministic for a request and
+            // its seed, so its result is used as it is (one page less to build; checker r1 D3)
+            const rqKey = PAGE1.res ? JSON.stringify(rq) : '';
+            if (PAGE1.res && rqKey === PAGE1.key) res = PAGE1.res;
+            else try { res = await buildSheet(rq); } catch (e) {
                 out.errors.push((e && e.message) || 'This page could not be built.');
                 continue;
             }
@@ -326,6 +330,8 @@ async function buildAll(p, list, quiz, onProgress, stop) {
     return out;
 }
 const STOPPED = { stopped: true };
+/** The side preview's last build ({ key: its request as JSON, res }), reused by buildAll for the same request. */
+const PAGE1 = { key: '', res: null };
 /**
  * The whole printout, built ONCE for the full preview and for Print (pdf-preview lane, 2026-10-31): the cached build
  * when its settings are unchanged, the build already running for them, or a new one. A background build (prefetch)
@@ -373,7 +379,7 @@ function schedulePrefetch() {
         const pages = (p.pagesBy ? Object.values(p.pagesBy).reduce((a, c) => a + c, 0) : p.pages) || 1;
         if (pages * versionsOf(quiz) > PREFETCH_MAX_PAGES) return;
         ensureBuilt(p, list, quiz, null, true).catch(() => null);
-    }, 400);
+    }, 0);   // at once: page 1 has painted (runPreview's renderSide ran before this was scheduled)
 }
 /** Versions: a quiz 1–6 (the quiz path), a worksheet 1–20 (owner 2026-10-24). */
 function versionsOf(quiz) { return quiz ? Math.max(1, Math.min(6, S.quiz.versions)) : setsSame() ? 1 : setsOf(); }
@@ -419,6 +425,7 @@ async function runPreview() {
         await yieldNow();
         let res = null;
         try { res = await buildSheet(part.req); } catch (e) { res = null; }
+        if (res) { PAGE1.key = JSON.stringify(part.req); PAGE1.res = res; }
         if (my !== token) return;
         S.building = false;
         if (!res) { perChecked.add(perBase(list)); S.preview = { sig, html: '', error: true }; renderSide(); return; }
@@ -614,7 +621,7 @@ function onKey(e) {
     if (!root) return;
     if (e.key === 'Escape') {
         if (document.getElementById('tvBoardOverlay')) return;
-        if (document.getElementById('tvPdfPreview')) return;   // the full preview closes first (its own Esc)
+        if (isPdfPreviewOpen()) return;   // the full preview closes first (its own Esc); hidden, it is not there
         if (e.target && e.target.classList && e.target.classList.contains('tv-share-in')) return;   // the share input cancels itself
         e.preventDefault();
         if (S.popup) { S.popup = null; renderPopup(); return; }
@@ -1103,13 +1110,15 @@ async function printBuilt(b, list, quiz) {
  * Page 1 shows at once (the side preview already drew it); the rest is the shared build (often already made in the
  * background). Print / Save as PDF in the preview print that same build.
  */
-function openPreviewAll() {
+function openPreviewAll(t0) {
     const paper = S.opts.paper || 'A4';
     if (batchActive()) {
         const parts = EXTRA.parts();
         const n = parts.length;
         const first = B.res && B.sig === batchSig(parts) && B.res.parts[0] ? B.res.parts[0].first : '';
-        return openPdfPreview({ title: S.batchTitle || `${n} worksheet${n === 1 ? '' : 's'}`, paper, first,
+        // the name Print all gives the document (teacher-wrm), so the bar and the saved PDF agree (checker r1 D7)
+        const title = (typeof EXTRA.title === 'function' && EXTRA.title()) || S.batchTitle || `${n} worksheet${n === 1 ? '' : 's'}`;
+        return openPdfPreview({ title, paper, first, t0,
             load: (prog) => ensureBatch(prog),
             print: () => (EXTRA && EXTRA.print ? EXTRA.print() : null) });
     }
@@ -1122,7 +1131,7 @@ function openPreviewAll() {
     // page 1 as Print has it (one version: no "Form A" in the footer), so it is not swapped when the whole set lands
     const first = S.preview && S.preview.html && versionsOf(quiz) === 1 && !setsSame() ? versionFooter(S.preview.html, '') : '';
     const release = first ? holdBuild(1500) : () => {};
-    return openPdfPreview({ title: printTitle(list, quiz), paper, first, onFirst: release,
+    return openPdfPreview({ title: printTitle(list, quiz), paper, first, onFirst: release, t0,
         load: (prog) => ensureBuilt(p, list, quiz, prog).then((b) => { S.printed = { sig, pages: b.pages, matchesPlan: b.matchesPlan }; renderSide(); return b; }),
         print: async () => {
             if (S.printing) return;
@@ -1197,7 +1206,7 @@ function onClick(e) {
         case 'paper': S.opts.paper = v; changed(); return;
         case 'renew': S.seed = freshSeed(); S.userSeed = true; S.built = null; S.preview = null; scheduleBuild(0); renderSide(); return;
         case 'print': doPrint(); return;
-        case 'pdfprev': openPreviewAll(); return;
+        case 'pdfprev': openPreviewAll(e.timeStamp); return;
         case 'popup': S.popup = v; renderPopup(); return;
         case 'popclose': { const k = S.popup; S.popup = null; renderPopup(); const back = root.querySelector(`[data-act="popup"][data-v="${CSS.escape(k || '')}"]`); if (back) back.focus(); return; }
         case 'tray': if (typeof window.tvOpenTray === 'function') { close(); window.tvOpenTray(); } return;

@@ -69,8 +69,9 @@ function ensureEl() {
     frame = el.querySelector('#tvPdfFrame');
     fr = { paper: '', ready: null, loaded: false };
     el.addEventListener('click', onClick);
-    window.addEventListener('resize', () => { if (cur) fit(); });
+    if (!resizeOn) { resizeOn = true; window.addEventListener('resize', () => { if (cur) fit(); }); }
 }
+let resizeOn = false;
 
 /** Load the frame's document for this paper (once; again only when the paper changes). Resolves when it is usable. */
 function loadFrame(paper) {
@@ -85,7 +86,17 @@ function loadFrame(paper) {
             mine.loaded = true;
             const d = frame.contentDocument;
             // Esc pressed while the pages have focus (a click on a page) closes the preview too
-            try { d.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePdfPreview(); }); } catch (e) { /* preview only */ }
+            // and Tab from the pages goes back to the bar (the parent's trap never sees keys typed in the frame)
+            try {
+                d.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') { closePdfPreview(); return; }
+                    if (e.key === 'Tab' && cur) {
+                        e.preventDefault();
+                        const f = [...el.querySelectorAll('button:not([disabled])')];
+                        if (f.length) (e.shiftKey ? f[f.length - 1] : f[0]).focus();
+                    }
+                });
+            } catch (e) { /* preview only */ }
             const fonts = (() => { try { return d.fonts && d.fonts.ready ? d.fonts.ready : null; } catch (e) { return null; } })();
             (fonts || Promise.resolve()).then(() => resolve(d), () => resolve(d));
         };
@@ -104,15 +115,25 @@ export function closePdfPreview() {
     if (!cur) return;
     const c = cur; cur = null;
     document.removeEventListener('keydown', c.keyDown, true);
+    (c.inerted || []).forEach((n) => n.removeAttribute('inert'));
+    if (!el) return;
     el.hidden = true;
     el.querySelector('#tvPdfHint').hidden = true;
     try { if (c.lastFocus && c.lastFocus.isConnected) c.lastFocus.focus(); } catch (e) { /* focus is a courtesy */ }
 }
 
+/** Is the preview on screen? (The overlay element itself stays in the page, hidden, between opens.) */
+export function isPdfPreviewOpen() {
+    if (cur && !(el && el.isConnected)) closePdfPreview();   // the overlay was taken out of the page while open
+    return !!cur && !el.hidden;
+}
+
 export function openPdfPreview(o) {
     closePdfPreview();
     ensureEl();
-    const c = { o, t0: performance.now(), tFirst: 0, tAll: 0, pages: 0, keyPages: 0, lastFocus: document.activeElement, full: false };
+    // t0 = the press itself (the event's time), so a press that waited behind other work is counted too
+    const t0 = Number.isFinite(o.t0) && o.t0 > 0 && o.t0 <= performance.now() ? o.t0 : performance.now();
+    const c = { o, t0, tFirst: 0, tAll: 0, pages: 0, keyPages: 0, lastFocus: document.activeElement, full: false };
     cur = c;
     el.querySelector('#tvPdfTitle').textContent = o.title || 'Worksheet';
     meta(c, 'Drawing the pages…');
@@ -133,6 +154,9 @@ export function openPdfPreview(o) {
     const ready = loadFrame(o.paper);
     // what the frame showed last time is not this printout: blank it before the overlay is seen
     if (fr.loaded) { try { frame.contentDocument.body.innerHTML = ''; } catch (e) { /* preview only */ } }
+    // everything behind the preview (the Print sheet, the site) is inert while it is open: no Tab, no clicks
+    c.inerted = [...(el.parentElement ? el.parentElement.children : [])].filter((n) => n !== el && !n.hasAttribute('inert'));
+    c.inerted.forEach((n) => n.setAttribute('inert', ''));
     el.hidden = false;
     el.querySelector('[data-pdf="close"]').focus();
 
@@ -201,7 +225,8 @@ function put(c, html, full) {
     if (c.o.onFirst) c.o.onFirst();
     const pages = [...d.querySelectorAll('.mq-sheet > .ws-page')];
     const key = pages.filter((p) => /Answer Key/.test(p.textContent || '')).length;
-    c.pages = pages.length; c.keyPages = key;
+    const covers = pages.filter((p) => p.classList.contains('mq-set-cover')).length;   // "Set 2 of 3" pages between sets
+    c.pages = pages.length; c.keyPages = key; c.covers = covers;
     const done = () => {
         if (cur !== c) return;
         c.tAll = performance.now() - c.t0;
@@ -209,8 +234,11 @@ function put(c, html, full) {
         el.dataset.tAll = String(Math.round(c.tAll));
         el.dataset.pages = String(pages.length);
         el.dataset.state = 'ready';
-        const pupil = pages.length - key;
-        meta(c, `${pages.length} page${pages.length === 1 ? '' : 's'} to print${key ? ` · ${pupil} for pupils + ${key} answer key${key === 1 ? '' : 's'}` : ''} · ${fr.paper}`);
+        const pupil = pages.length - key - covers;
+        const parts = [`${pupil} for pupils`];
+        if (covers) parts.push(`${covers} set cover${covers === 1 ? '' : 's'}`);
+        if (key) parts.push(`${key} answer key${key === 1 ? '' : 's'}`);
+        meta(c, `${pages.length} page${pages.length === 1 ? '' : 's'} to print${key || covers ? ` · ${parts.join(' + ')}` : ''} · ${fr.paper}`);
         setActs(true);
     };
     // ready = the pages laid out in their real fonts (the same wait Print makes before the dialog)
@@ -219,12 +247,12 @@ function put(c, html, full) {
 
 /** For checks: the open preview's state. */
 export function pdfPreviewState() {
-    if (!cur) return { open: false };
+    if (!isPdfPreviewOpen()) return { open: false };
     const d = frame.contentDocument;
     return {
         open: true, state: el.dataset.state || 'loading', paper: fr.paper,
         pages: d ? d.querySelectorAll('.mq-sheet > .ws-page').length : 0,
-        keyPages: cur.keyPages, tFirst: cur.tFirst || null, tAll: cur.tAll || null,
+        keyPages: cur.keyPages, covers: cur.covers || 0, tFirst: cur.tFirst || null, tAll: cur.tAll || null,
         // the instant page 1 is the printout's page 1 (no visible swap when the whole set lands)
         firstSame: cur.firstPage ? cur.firstPage === ((d && d.querySelector('.mq-sheet > .ws-page')) || {}).outerHTML : null,
         meta: el.querySelector('#tvPdfMeta').textContent || '',
@@ -232,5 +260,5 @@ export function pdfPreviewState() {
 }
 
 if (typeof window !== 'undefined') {
-    window.tvPdfPreview = { open: openPdfPreview, close: closePdfPreview, warm: warmPdfPreview, state: pdfPreviewState };
+    window.tvPdfPreview = { open: openPdfPreview, close: closePdfPreview, warm: warmPdfPreview, state: pdfPreviewState, isOpen: isPdfPreviewOpen };
 }

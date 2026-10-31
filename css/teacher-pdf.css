@@ -7,8 +7,8 @@
    ========================================================================== */
 
 #teacherApp .tvpdf {
-  --tvpdf-action: var(--action, #3438C6);
-  --tvpdf-action-fg: var(--action-on, #FFFFFF);
+  --tvpdf-action: var(--action);
+  --tvpdf-action-fg: var(--action-on);
   position: fixed; inset: 0; z-index: 90;
   display: flex; flex-direction: column;   /* (not a grid: the hidden hint row would pull the frame into an auto row) */
   background: var(--surface-2);
@@ -42,7 +42,7 @@
 #teacherApp .tvpdf :focus-visible { outline: var(--line-2) solid var(--ring); outline-offset: var(--line-2); }
 #teacherApp .tvpdf-hint {
   margin: 0; padding: var(--sp-8) var(--sp-24);
-  background: var(--action-soft, #E9EBFC); color: var(--text); font-size: var(--fs-16);
+  background: var(--action-soft); color: var(--text); font-size: var(--fs-16);
   border-bottom: var(--line-1) solid var(--line);
 }
 #teacherApp .tvpdf-bar, #teacherApp .tvpdf-hint { flex: none; }
