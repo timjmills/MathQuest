@@ -748,7 +748,9 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
 {
     const { plan, r } = hostPlan('pre-skill-check', [ADD_SKILL], addMake);
     eq((r.pupilHtml.match(/class="mq-quadscore"/g) || []).length, 4, 'PT-PRE-1: four quadrants, each with its own __/4');
-    eq(plan.meta.scoreOutOf, 16, 'PT-PRE-1: Score /16');
+    // (R1-8: each quadrant holds the items its grid fits - 5 in 3 x 2, 4 in 2 x 2, 2 in 1 x 2 - totals at most 20, PT-PRE-2)
+    const per = (r.pupilHtml.match(/class="mq-quadscore">__\/(\d+)</g) || []).map((x) => Number(x.replace(/\D+/g, ' ').trim().split(' ').pop()));
+    ok(per.length === 4 && per.every((x) => x >= 2 && x <= 5) && plan.meta.scoreOutOf === per.reduce((a, b) => a + b, 0) && plan.meta.scoreOutOf <= 20, `PT-PRE-2: 2-5 items a quadrant, Score = their sum <= 20 (got ${per.join('+')} = ${plan.meta.scoreOutOf})`);
     // A skill with one earlier skill checks one quadrant, never the same skill four times.
     const one = hostPlan('pre-skill-check', [SUB_SKILL], (pool, sk, i) => subQ(500 + i * 11, 123 + i));
     eq(one.plan.meta.scoreOutOf, 4, 'PT-PRE-3: a first skill checks itself once (4 items)');
