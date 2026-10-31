@@ -1306,6 +1306,7 @@ v1: one per page, fully scaffolded
 | **L-KEY** | Key page geometry equals pupil page geometry (cell boxes within 0.1 mm); slot count equal; every slot answered; answers weight 700; "Answer Key" in tab, Name position and footer; same seed | AK-1 to AK-5, AK-7 |
 | **L-CCSS** | No CCSS code pattern, the word "Grade", a skill id or a level-revealing string inside any cell, band, title or tab; ~~"Level N" present in tab line 1~~ (superseded 2026-10-23, HD-5a: no tab); grade and codes present only under `data-ws-teacher`; no clamp notes in page DOM | SC-5, HD-5, HD-6, HD-30, HD-31, DN-14, AX-12, CL-7 |
 | **L-DENSITY** | Items per page within the ceiling for role and size; computed capacity equals the section 12 tables; column count equals `resolveSectionLayout` output; fact fill 55-75% and rule gap >= 6 mm at each N; Auto values; solid-ink share of tabs < 5% | DN-1, DN-2, DN-12, DN-13, DN-15, DN-16, DN-20, DN-21, DN-22, DN-30, TY-31, CL-36 |
+| **ws-visual-quality** | (node, `tests/scripts/ws-visual-quality.mjs`, on precritic's `--skill` path) VQ-REP a relation skill emits a drawing template; VQ-ONEANSWER no Say blanks in the cell, no tick list + Answer: line; VQ-LIVE word-work sign choices / column grid / bank words live for the skill; VQ-TITLE the I Can title is a sentence; VQ-NOLEGACY a kit cell (shrink-only pin) | VQ-1, VQ-2, VQ-3, VQ-9, VQ-10 |
 
 ### 17.3 Manual checks
 
@@ -1323,5 +1324,61 @@ v1: one per page, fully scaffolded
 | **M-SCREEN** | Live browser QA at 375 / 768 / 1440 with console check: focus cell on phones, entry order, live vs on-Check feedback, wrong digits stay, regroup boxes unmarked, dark theme keeps the paper white, hint ladder order, 200% zoom | SP-1, SP-3, SP-12, SP-13, SP-30 to SP-32, SP-40, PG-25, AX-6, AX-9, AX-10 |
 | **M-A11Y** | Screen-reader pass on one cell per template; TTS reads instruction and story; routine consistency across a packet | AX-1 to AX-4, AX-7, AX-8, AX-11 |
 | **M-SCOPE** | Review any new page type or option against SC-3 (no skill excluded), SC-6 (no tracking artefacts), DN-34 (no silent mixing), and the owner's two-look table | SC-1 to SC-4, SC-6, SC-11, DN-31 to DN-34, AK-6 |
+| **M-VISUAL** | The critic's visual-quality questions (RUBRIC C2, H14-H17) on the skill's OWN renders: is the relation drawn with the map's drawing; is every part live; one labelled answer place in one position; stroke hierarchy; paper = screen | VQ-1 to VQ-10 (VQ-4 to VQ-8 manual only) |
 
 A rule with no row in 17.2 or 17.3 is a defect in this document; add the mapping when adding the rule.
+
+---
+
+## 18. Visual quality bar (VQ-1 … VQ-10, 2026-10-31)
+
+Added after the owner rated two "passed-looking" cells 4/10 and 3/10 (`design/audit/VISUAL_QUALITY.md`: the add-to-20 word
+problem drew × ÷ and a column grid on a Grade 1 story; "Is It a Fact Family?" printed bare numbers with three answer
+places). Sections 1-17 make a cell legible; this section makes it the RIGHT picture. Every cell meets all ten, on paper
+and on screen, at every size. `node tests/scripts/ws-visual-quality.mjs` checks VQ-1, -2, -3, -9 and -10 (on precritic's
+`--skill` path); the rest are the critic's questions (RUBRIC C2, hard caps H14-H17).
+
+- **VQ-1 The relation is drawn.** A skill whose name or standard is a relation (part-whole, fact family, number bond,
+  make ten, compare, equal groups) shows it with the drawing the representation map below names, at least through the
+  pictorial rung. A rule box that STATES the relation does not count. (`VQ-REP`)
+- **VQ-2 One answer place per answer.** One graded response area, with a defined slot shape (SL-1) and a label or unit
+  beside it. Never tick boxes AND an "Answer:" line; never a `Say:` frame with blanks inside a practice cell (the oral
+  frame belongs to the model and the Say band). (`VQ-ONEANSWER`)
+- **VQ-3 Every drawn part is live for THIS item and band.** A sign row offers only operations the skill deals (K-2: none,
+  or + and − only; from Grade 3 the dealt operations and their inverses); no column digit grid while every answer is
+  ≤ 20 (sums to 20 are solved by counting on and make ten, 1.OA.6); no regroup row on an item that cannot regroup; a
+  word bank holds story nouns only, never fillers. (`VQ-LIVE`)
+- **VQ-4 Drawings come from the graphic library** (`design/GRAPHIC_LIBRARY.md`, code in `js/modules/sheet/graphics/`).
+  A drawing not in it is built as a library entry, passes ≥ 8 there, then is used (EXTENSION_PLAYBOOK step 5a).
+- **VQ-5 Numbers are set in proportional Andika at the working digit size** (TY-10), never letter-spaced or spaced with
+  `&nbsp;` runs; three given numbers sit in their drawing, not in a bare row.
+- **VQ-6 Stroke hierarchy.** Structure (cell frame, bond circles, answer box) 1.5 pt; parts (division lines, tick marks,
+  inner boxes) 0.75-1 pt; never a hairline. The answer box is the heaviest writing place in the cell.
+- **VQ-7 The answer place is in the same position in every cell** of a section (CL-8), so the pupil's eye goes to one place.
+- **VQ-8 Paper = screen.** The screen twin draws the same picture (outlined boxes stay outlined; no solid bars, no
+  collapsed tick box, no typed input where paper circles). Only the response mechanics differ (section 15.2).
+- **VQ-9 Titles and instructions are sentences written for the skill.** "I Can tell if three numbers make a fact family",
+  never "I Can add is it a fact family? +/−": no "?", no sign pair ("+/−", "×/÷"), no "is it", no label pasted after
+  the verb. (`VQ-TITLE`)
+- **VQ-10 No new legacy HTML cell.** A new or rebuilt skill emits `q.cell` on a kit template; the pinned list of skills
+  with no kit cell (`tests/fixtures/precritic/vq-baseline.json`) only shrinks. (`VQ-NOLEGACY`)
+
+### 18.1 The representation map (VQ-1, VQ-4)
+
+The relation decides the drawing. A builder picks from this table before anything else; a critic checks against it.
+
+| Relation the skill teaches | Required drawing | Library entry (`design/GRAPHIC_LIBRARY.md`) |
+|---|---|---|
+| Part-whole; fact family; number bond (+/−, ×/÷) | Number bond or fact triangle, the whole at the top | number bond, fact triangle (`bond`, `fact-family`, `family-check`) |
+| Make ten; bridge through ten | Ten frame (two for teen numbers) | ten frame (`tenframe`) |
+| Add / subtract story with answers ≤ 20 | Part-whole bar + number sentence `[ ] ◯ [ ] = [ ]`, answer box with the unit printed | part-whole bar, number sentence frame, labelled answer area |
+| Compare ("how many more / fewer") | Comparison bar (two bars, the difference marked) | comparison bar |
+| Equal groups; multiplication | Groups in rings, or an array with its `× =` sentence | equal groups, array |
+| Place value | Base-10 blocks or place-value chart | base-10, place-value chart (`base10`, `pv`) |
+| Fractions | Fraction bar or circle, equal parts | fraction model (`frac-model`) |
+| Position, counting on, rounding | Number line | number line (`number-line`, `hop-line`) |
+| Measure | Ruler or scale | ruler, thermometer |
+| Time | Analogue clock | clock (`clock`) |
+| Money | Coins in a row that does not wrap 3 + 1 | coins (`coins`) |
+
+A relation not in the table is added here, with its library entry, before the skill is built.

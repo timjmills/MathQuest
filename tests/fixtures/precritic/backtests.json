@@ -776,6 +776,211 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vq-rep",
+   "check": "A relation skill (fact family, number family, bond, part-whole, make ten) draws the relation with a library drawing (VQ-1)",
+   "kind": "fixture",
+   "rule": "ws-visual-quality VQ-REP",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/vq-rep.fail.mjs",
+    "state": "fact_family_sort: bare numbers, no bond / family drawing (VISUAL_QUALITY F1)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/vq-rep.pass.mjs",
+    "state": "the three numbers drawn in a kit family cell"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --fixture {fixture} --rules VQ-REP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-rep-commit",
+   "check": "A relation skill (fact family, number family, bond, part-whole, make ten) draws the relation with a library drawing (VQ-1): the live skills, base vs the lane fix",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-REP",
+   "browser": false,
+   "pending": true,
+   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
+   "fail": {
+    "commit": "5c6063a",
+    "state": "the base: fact_family_sort (F1) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
+   },
+   "pass": {
+    "commit": "PENDING-FIX",
+    "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-REP --skill addition:fact_family_sort",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-oneanswer",
+   "check": "One graded response area: no Say frame with blanks in the cell, no tick list plus an Answer: line (VQ-2)",
+   "kind": "fixture",
+   "rule": "ws-visual-quality VQ-ONEANSWER",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/vq-oneanswer.fail.mjs",
+    "state": "fact_family_sort: Yes / No ticks AND a Say frame with three blanks (F2)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/vq-oneanswer.pass.mjs",
+    "state": "the Say frame moved to the model; the ticks are the one answer"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --fixture {fixture} --rules VQ-ONEANSWER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-oneanswer-commit",
+   "check": "One graded response area: no Say frame with blanks in the cell, no tick list plus an Answer: line (VQ-2): the live skills, base vs the lane fix",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-ONEANSWER",
+   "browser": false,
+   "pending": true,
+   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
+   "fail": {
+    "commit": "5c6063a",
+    "state": "the base: fact_family_sort (F2) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
+   },
+   "pass": {
+    "commit": "PENDING-FIX",
+    "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-ONEANSWER --skill addition:fact_family_sort",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-live",
+   "check": "Every drawn part is live: word-work sign choices only the dealt operations, no column grid within 20, no filler bank words (VQ-3)",
+   "kind": "fixture",
+   "rule": "ws-visual-quality VQ-LIVE",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/vq-live.fail.mjs",
+    "state": "add_wp_20_plain: + − × ÷ on a Grade 1 add page, a 2-track column grid on sums to 20, bank \"shells / boxes / days\" (W1-W3)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/vq-live.pass.mjs",
+    "state": "the story as a number sentence: the sign written in a circle, no grid, the unit printed"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --fixture {fixture} --rules VQ-LIVE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-live-commit",
+   "check": "Every drawn part is live: word-work sign choices only the dealt operations, no column grid within 20, no filler bank words (VQ-3): the live skills, base vs the lane fix",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-LIVE",
+   "browser": false,
+   "pending": true,
+   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
+   "fail": {
+    "commit": "5c6063a",
+    "state": "the base: add_wp / sub_wp within 10 and 20 (W1-W3) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
+   },
+   "pass": {
+    "commit": "PENDING-FIX",
+    "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-LIVE --skill addition:add_wp_10,addition:add_wp_10_plain,addition:add_wp_20,addition:add_wp_20_plain,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20,subtraction:sub_wp_20_plain",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-title",
+   "check": "The I Can title is a sentence written for the skill, never built from the label (VQ-9)",
+   "kind": "fixture",
+   "rule": "ws-visual-quality VQ-TITLE",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/vq-title.fail.mjs",
+    "state": "\"I Can add is it a fact family? +/−\" (F3)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/vq-title.pass.mjs",
+    "state": "\"I Can tell if three numbers make a fact family\""
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --fixture {fixture} --rules VQ-TITLE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-title-commit",
+   "check": "The I Can title is a sentence written for the skill, never built from the label (VQ-9): the live skills, base vs the lane fix",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-TITLE",
+   "browser": false,
+   "pending": true,
+   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
+   "fail": {
+    "commit": "5c6063a",
+    "state": "the base: fact_family_sort (F3) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
+   },
+   "pass": {
+    "commit": "PENDING-FIX",
+    "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-TITLE --skill addition:fact_family_sort",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-nolegacy",
+   "check": "No new legacy HTML cell: a skill off the pinned legacy list emits a kit cell (VQ-10)",
+   "kind": "fixture",
+   "rule": "ws-visual-quality VQ-NOLEGACY",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/vq-nolegacy.fail.mjs",
+    "state": "fact_family_sort built 2026-10-24 as a _wsCell with no q.cell (RC5)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/vq-nolegacy.pass.mjs",
+    "state": "the same skill as a kit cell"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --fixture {fixture} --rules VQ-NOLEGACY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-nolegacy-commit",
+   "check": "No new legacy HTML cell: a skill off the pinned legacy list emits a kit cell (VQ-10): the live skills, base vs the lane fix",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-NOLEGACY",
+   "browser": false,
+   "pending": true,
+   "note": "pass commit = the lane's fix commit (the lead fills it after the merge and drops pending)",
+   "fail": {
+    "commit": "5c6063a",
+    "state": "the base: fact_family_sort (RC5) fails, every other finding pinned in tests/fixtures/precritic/vq-baseline.json"
+   },
+   "pass": {
+    "commit": "PENDING-FIX",
+    "state": "the visual-quality lane fix (family-check cell, word-work sentence layout)"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --rules VQ-NOLEGACY --skill addition:fact_family_sort",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

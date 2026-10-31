@@ -87,6 +87,11 @@ Screen checks:
 - The representation fits the maths (ten frame for making ten, place-value chart for place value,
   a number line where the skill is about position) and is **drawn so it teaches**: parts visible,
   counts countable, the picture matches the answer.
+- **Is the relation drawn with the right representation?** (2026-10-31, `WORKSHEET_DESIGN_STANDARD.md` §18) Name the
+  relation the skill teaches, look it up in the representation map (§18.1), and check the cell DRAWS that picture from
+  the graphic library (a bond or fact triangle for a fact family, a part-whole bar and number sentence for a story to
+  20, a comparison bar for compare). A rule box that states the relation, or bare numbers in a row, is not a drawing
+  (H14). Then ask of every drawn part: is it live for THIS item and band (H15)? Is there one labelled answer place (H16)?
 - Items vary sensibly within the band (not six near-identical items; not one trivially easy item
   in a hard set), and include the edge cases the research names.
 - Scaffolds suit the page type: structural scaffolds persist, hint scaffolds fade (PEDAGOGY 4).
@@ -177,6 +182,10 @@ A cap sets the **maximum** for the criterion named, whatever else is right.
 | H11 | A page type the skill must support cannot be produced | all four = 1 for that version |
 | H13 | Wasted space inside cells (owner ruling 2026-09-25): a cell whose content leaves an empty band of ≥ 30 % of the cell's height (or width), or a row/section of a mixed sheet sized for a taller item than it holds. Measure it; do not eyeball it past. | C3 ≤ 6 |
 | H12 | The task does not make sense on paper: the space to draw or build the model is smaller than the hardest item needs, or the item only works with a mouse or finger | C1 ≤ 4, C2 ≤ 5 |
+| H14 | The relation is not drawn (VQ-1): the skill names a relation with a representation in the map (`WORKSHEET_DESIGN_STANDARD.md` §18.1) and no rung of the cell draws it (bare numbers, a rule box that states it) | C2 ≤ 6 |
+| H15 | A drawn part is dead for the item (VQ-3): × ÷ on an addition-only page, a column grid or regroup row on sums to 20, a bank word the story never says, a track no item uses | C3 ≤ 6 |
+| H16 | The answer area is undefined, unlabelled or doubled (VQ-2): tick boxes AND an "Answer:" line, a `Say:` frame with blanks in the practice cell, a bare write line with no unit or label, a bank detached from its slot | C1 ≤ 6 |
+| H17 | A garbled title or instruction (VQ-9): built from the label ("I Can add is it a fact family? +/−"), a "?" or a sign pair in the I Can title, a sentence that does not parse | C4 ≤ 6 |
 
 ---
 
@@ -215,6 +224,13 @@ graded in one of two ways:
 
 Limits:
 - There is no inheritance across pairs. A pair nobody certified gives nothing.
+- **A skill is graded only on its own renders (2026-10-31, VISUAL_QUALITY RC7).** A template's pass covers the (skill,
+  grade, band) pairs a critic actually graded. A skill on the same template at another grade or band (a Grade 1 story
+  on a template passed on Grade 3-4 stories, an alias, a `_plain` twin) inherits nothing: it is TEMPLATE-ONLY until its
+  own renders score ≥ 8. `ws-visual-quality` prints the PASSED / TEMPLATE-ONLY / NEVER-GRADED counts.
+- **A critic files the defect on the skill (VISUAL_QUALITY RC2).** Any critic (redesign, tagging, lesson, WRM) that sees
+  how a skill looks or is answered go wrong files it against the SKILL (its family's defect list, the lane's status
+  file) with the skill id and the hard cap. Downgrading a link to "partial", or routing around the skill, never closes it.
 - The **envelope check** sends any page outside what the pair certified to a full grade. Any new kind of page is
   graded in full.
 - A page below 8 **fails the batch**. That instance is graded in full on every page. If the cause is in the engine,
@@ -298,3 +314,21 @@ Rules for the critic:
 - **Do not grade the chrome's colours** on screen (SC-2), only whether the chrome crowds the cell.
 - A version passes when all four scores are ≥ 8 and no cap applies. A skill passes when every
   version passes.
+
+### 6.1 The visual-quality bar questions (every critic brief, 2026-10-31)
+
+Every critic brief — redesign, template, batch contact sheet, lesson, tagging — carries these questions, and the critic
+answers each for every skill it sees (`WORKSHEET_DESIGN_STANDARD.md` §18; the generated brief of
+`ws-grade-render --golden diff` prints them):
+1. **Representation (VQ-1, H14).** What relation does the skill teach? Which drawing does the representation map name
+   for it? Is that drawing in the cell, from the graphic library?
+2. **Live parts (VQ-3, H15).** List every part the cell draws (sign row, grid, regroup row, bank, ticks, Say frame).
+   Is each one live for THIS item and band?
+3. **One answer place (VQ-2, VQ-7, H16).** One graded response area, a defined shape, a unit or label beside it, in the
+   same place in every cell?
+4. **Type and stroke (VQ-5, VQ-6).** Numbers in proportional Andika at the working digit size, not letter-spaced?
+   Structure 1.5 pt, parts 0.75-1 pt, no hairline?
+5. **Paper = screen (VQ-8).** The same drawing on the practice card, the online worksheet and the quiz?
+6. **Title (VQ-9, H17).** Is the I Can title a sentence written for the skill?
+7. **Own renders (RC7).** Was THIS skill graded at THIS grade and band, or is it riding on a template pass? A visual
+   or response defect is filed on the skill, never closed by downgrading a link.

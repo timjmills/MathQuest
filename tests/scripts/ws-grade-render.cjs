@@ -810,6 +810,16 @@ function goldenDiff(records) {
         L.push('', `## 4. Removed pages (${removed.length}) — in the golden, not rendered now`, '', '| page | last score | source |', '|---|---|---|');
         for (const p of removed) L.push(`| ${pageLabel(p)} | ${fmtScores(p.scores)} | ${p.scoreSource ? `${p.scoreSource.run} r${p.scoreSource.round}` : '—'} |`);
     }
+    // The visual-quality bar (2026-10-31, RUBRIC §6.1, WORKSHEET_DESIGN_STANDARD §18): the critic answers these for every skill
+    L.push('', '## Visual quality bar (answer for every skill; RUBRIC §6.1, WORKSHEET_DESIGN_STANDARD §18)', '',
+        '1. Representation (VQ-1, H14): which relation does the skill teach, which drawing does the representation map (§18.1) name, and is it drawn from the graphic library?',
+        '2. Live parts (VQ-3, H15): is every drawn part (sign row, grid, regroup row, bank, ticks, Say frame) live for THIS item and band?',
+        '3. One answer place (VQ-2, VQ-7, H16): one graded response area, a defined shape, a unit or label beside it, the same place in every cell?',
+        '4. Type and stroke (VQ-5, VQ-6): proportional Andika at the working digit size, never letter-spaced; structure 1.5 pt, parts 0.75-1 pt, no hairline?',
+        '5. Paper = screen (VQ-8): the same drawing on the card, the online worksheet and the quiz?',
+        '6. Title (VQ-9, H17): is the I Can title a sentence written for the skill?',
+        '7. Own renders (RC7): graded at THIS grade and band, not riding on a template pass? File a visual defect on the skill; a link downgrade never closes it.',
+        '', 'Machine half: `node tests/scripts/ws-visual-quality.mjs --skill <cat:skill>` (VQ-REP, VQ-ONEANSWER, VQ-LIVE, VQ-TITLE, VQ-NOLEGACY) runs in `ws-precritic --skill`.');
     // The PASS table: every page, where its score comes from
     L.push('', '## PASS table', '', 'A page passes on four scores of 8 or more that still stand. Until the critic returns its grades (import them with `--scores`), the pages of sections 1 and 2 read NEEDS GRADE.', '', '| page | C1 / C2 / C3 / C4 | min | score from | result |', '|---|---|---|---|---|');
     const rows = [];
