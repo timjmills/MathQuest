@@ -923,6 +923,9 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
     const display = key && key.display !== undefined ? String(key.display) : raw;
     if (!raw && !display) return null;
     const digits = raw.replace(/,/g, '').trim();
+    // ansBox rebuild r2 (critic r1 #4): a cell drawn with the teacher's answer-box value writes its key digits at
+    // the question's own size (AK-1); the automatic page keeps today's markup, byte for byte
+    const fullKey = !!(q && (q.ansBox === 'digit' || q.ansBox === 'one' || q.ansBox === 'off'));
 
     // P8 0a. Boxed slots, one per blank (a fact family's four facts, the empty cells of a
     // number strip, a hundred-chart window's one gap): each box gets its own answer (AK-2). The
@@ -1025,9 +1028,13 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
             let k = 0;
             const filled = digitStrips[0].replace(/<i ([^>]*)><\/i>/g, (m, attrs) => {
                 const d = k >= pad ? digits[k - pad] : ''; k++;
-                return d ? `<i ${attrs} data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:0.8em;">${d}</b></i>` : m;
+                // ansBox rebuild r2 (critic r1 #4): with a teacher's value the key writes at the question's own digit
+                // size (AK-1), never 0.8 em; the automatic page keeps today's markup (byte-identical defaults)
+                return d ? `<i ${attrs} data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:${fullKey ? '1em' : '0.8em'};">${d}</b></i>` : m;
             });
-            return html.replace(digitStrips[0], filled);
+            // a column's write row is a grid of fixed height: its one row keeps that height, so a full-size
+            // key digit (its 1 em line box) never makes the key's boxes taller than the pupil's (key = facsimile)
+            return html.replace(digitStrips[0], fullKey ? filled.replace(/^(<span class="ws-fact-write ws-fact-write--digit" style="[^"]*)"/, '$1grid-template-rows:100%;"') : filled);
         }
     }
 
@@ -1046,15 +1053,19 @@ export function legacyKeyFill(html, q, key, { ink = 'solid', shown = false } = {
         // the box is the zone itself, a grid of the stack's own tracks.
         // (critic B r3 D2) the digit is set at the box's writing size (never taller than the box), so it
         // sits clear inside it with padding instead of crossing its bottom edge
-        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:100%;line-height:1;font-size:min(1em, calc(${h} * 0.82));display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
-        return html.replace(factRows[0], `<span class="ws-fact-write" style="${style}display:grid;grid-template-columns:repeat(${tracks},1fr);">${cells}</span>`);
+        // ansBox rebuild r2 (critic r1 #4): at the question's own digit size (AK-1); the digit's ink (about 0.7 em) still
+        // sits inside the box, centred, the line box overflowing it evenly
+        const fs = fullKey ? '1em' : `min(1em, calc(${h} * 0.82))`;
+        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:100%;line-height:1;font-size:${fs};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
+        return html.replace(factRows[0], `<span class="ws-fact-write" style="${style}display:grid;grid-template-columns:repeat(${tracks},1fr);${fullKey ? 'grid-template-rows:100%;' : ''}">${cells}</span>`);
     }
 
     // 2b. A horizontal equation's own write slot ("36 ÷ 4 = ____"): one empty `.ws-slot` line or
     // box, the value written on it.
     const eqSlots = html.match(/<span class="ws-slot" data-ws-shape="(?:line|box)"[^>]*><\/span>/g) || [];
     if (eqSlots.length === 1 && display && /style="[^"]*"><\/span>$/.test(eqSlots[0])) {
-        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:center;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:0.8em;">${escText(display)}</b></span>`));
+        // ansBox rebuild r2 (critic r1 #4): the key writes at the question's own digit size (AK-1), never 0.8 em
+        return html.replace(eqSlots[0], eqSlots[0].replace(/"><\/span>$/, `;display:inline-flex;align-items:center;justify-content:center;" data-ws-ink="${inkAttr}"><b style="${INK_STYLE}line-height:1;font-size:${fullKey ? '1em' : '0.8em'};">${escText(display)}</b></span>`));
     }
 
     // 3. One "Answer:" line: a label, then a ruled blank that stretches (28+ print branches).
@@ -1277,6 +1288,21 @@ export function markSectionWriteAbove(items) {
     const stacks = (items || []).filter((it) => it && it.q && it.q.cell && it.q.cell.template === 'stack' && it.q.cell.payload);
     const any = stacks.some((it) => stackRegroups(it.q.cell.payload));
     for (const it of stacks) it.q.cell.payload = Object.assign({}, it.q.cell.payload, { sectionWriteAbove: any || undefined });
+    return markSectionAnsBand(items);
+}
+
+/**
+ * SL-2 per SECTION for a legacy-drawn vertical fact in digit boxes (ansBox rebuild r2, critic r1 #4:
+ * multiply drew 3 boxes for 12 x 7 beside 2 for 2 x 5): every such item of a section is told the
+ * section's widest answer (`ansBand`, digits), and print-generate.js draws that many boxes on each, so a
+ * box count never gives an answer's length away. Only the explicit 'digit' value; the default and the
+ * kit templates (which carry their own band in the payload) are untouched.
+ */
+export function markSectionAnsBand(items) {
+    const facts = (items || []).filter((it) => it && it.legacy && it.q && it.q.ansBox === 'digit' && /^\d+$/.test(String(it.q.ans)));
+    if (facts.length < 1) return items;
+    const band = Math.max(...facts.map((it) => String(it.q.ans).length));
+    for (const it of facts) it.q.ansBand = band;
     return items;
 }
 

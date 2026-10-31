@@ -3630,6 +3630,21 @@ export const ansBoxOption = (layout = '') => {
         summary: (v) => ({ digit: 'One box per digit', one: 'One box', off: 'No box' }[v] || auto),
     };
 };
+/**
+ * The answer-box values a teacher is SHOWN (ansBox rebuild r2, critic r1 #5: "Automatic" and "One box
+ * per digit" drew the same stack, "Automatic: one box" and "One box" the same fact). A value that
+ * draws exactly what Automatic draws on EVERY layout of the skill is left off the panel: a skill
+ * whose items are all column work loses "One box per digit", one with no column work loses "One
+ * box". A mixed pool keeps all four. The value stays in the model (optionsFor), so an old share
+ * code that carries it still decodes, and it draws what Automatic draws.
+ */
+export function offeredAnsBox(def, layout = '') {
+    const parts = String(layout || '').split('+').filter(Boolean);
+    if (!parts.length || !def || !Array.isArray(def.values)) return def;
+    const col = parts.every((x) => /stack/.test(x)), none = parts.every((x) => !/stack/.test(x));
+    const drop = col ? 'digit' : none ? 'one' : null;
+    return drop ? { ...def, values: def.values.filter((x) => x.v !== drop) } : def;
+}
 /** The answer-box style a cell draws: the chosen value, else the automatic one for its layout. */
 export function resolveAnsBox(value, layout) {
     if (value === 'digit' || value === 'one' || value === 'off') return value;
@@ -3874,6 +3889,7 @@ export function offeredOptionsFor(categoryId, skillId) {
         // The answer-box option is shown only where the skill's items are drawn by a kit template it
         // restyles (skill-ansbox-skills.js, measured); elsewhere it stays in the model, unshown.
         if (o.id === 'ansBox' && !ANSBOX_SKILLS[`${categoryId}:${skillId}`]) continue;
+        if (o.id === 'ansBox') { out.push(offeredAnsBox(o, ANSBOX_SKILLS[`${categoryId}:${skillId}`])); continue; }
         if (sized && o.id === 'range' && !ownIds.has('range')) continue;
         if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
         // A review's own "Support, for the whole review" sets every member's level already.

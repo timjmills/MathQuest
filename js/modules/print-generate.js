@@ -4122,20 +4122,26 @@ function wsStackHTML(a, b, op, pt, o = {}) {
     // the box's top edge never read as one double rule
     const FACT_BOX_GAP_MM = 1.5;
     const zoneH = o.answerMm || size.answerMm;
+    // ansBox rebuild r2 (critic r1 #4): a vertical fact's zone is at least 1.15 em tall (the kit fact's
+    // zone), so the key can write its digits at the question's own size inside it (AK-1)
+    // (only with a teacher's value: the automatic page keeps today's 8 mm zone, byte for byte)
+    const zoneCss = o.cls === 'ws-fact' && _ANSBOX != null ? `max(${zoneH}mm, 1.15em)` : `${zoneH}mm`;
     if (ab === 'digit') {
         // one box per digit track (never the operator track): a strip of joined boxes; the key fills each
         // the band's width on every item (SL-2): a sum can carry one place past the widest operand,
         // a 1-digit product two; the strip may then reach under the operator's track
         const d = Math.max(A.length, B.length);
-        const n = Math.min(T, Math.max(T - 1, op === '+' ? d + 1 : /[×x*]/.test(op) ? A.length + B.length : d));
-        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:${T - n + 1} / -1;height:${zoneH}mm;margin-top:${FACT_BOX_GAP_MM}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
+        const n0 = Math.min(T, Math.max(T - 1, op === '+' ? d + 1 : /[×x*]/.test(op) ? A.length + B.length : d));
+        // a legacy vertical fact (cls ws-fact): the SECTION's band (its widest answer), the same count on every item
+        const n = o.cls === 'ws-fact' && _ANSBAND > 0 ? Math.min(T, _ANSBAND) : n0;
+        html += `<span class="ws-fact-write ws-fact-write--digit" style="grid-column:${T - n + 1} / -1;height:${zoneCss};margin-top:${FACT_BOX_GAP_MM}mm;display:grid;grid-template-columns:repeat(${n},1fr);">`
             + Array.from({ length: n }, (_, k) => `<i data-ws-seg="${stripPos(k, n)}" style="display:flex;align-items:center;justify-content:center;font-style:normal;height:100%;box-sizing:border-box;${stripSegStyle(stripPos(k, n), { r: slotRadiusMm(WS_SIZE) })}"></i>`).join('')
             + '</span>';
     } else if (ab === 'off') {
-        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;"></span>`;
+        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneCss};"></span>`;
     } else {
         // the open answer zone is ONE full black-outlined box across the stack's tracks
-        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneH}mm;margin-top:${FACT_BOX_GAP_MM}mm;box-sizing:border-box;`
+        html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${zoneCss};margin-top:${FACT_BOX_GAP_MM}mm;box-sizing:border-box;`
             + `border:${STROKE.hair}pt solid #000;border-radius:${slotRadiusMm(WS_SIZE)}mm;"></span>`;
     }
     return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
@@ -5218,11 +5224,15 @@ function problemHeadHTML(index, skillLabel, showSkillLabels, isCompact) {
 // the legacy stack / fact / equation slots below read it, so a legacy-printed skill honours the
 // teacher's choice exactly as the kit does (one box per digit / one box / off).
 let _ANSBOX = null;
+// The section's widest answer (digits) when a legacy vertical fact is drawn in digit boxes (print-sheet.js
+// markSectionAnsBand, SL-2): every item of the section draws that many boxes.
+let _ANSBAND = 0;
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
-    const prev = _ANSBOX;
+    const prev = _ANSBOX, prevBand = _ANSBAND;
     _ANSBOX = problem && problem.ansBox != null ? problem.ansBox : null;
+    _ANSBAND = problem && Number(problem.ansBand) > 0 ? Number(problem.ansBand) : 0;
     try { return inkHTML(formatProblemForPrintRouted(problem, index, columns, sizeCategory, showSkillLabels)); }
-    finally { _ANSBOX = prev; }
+    finally { _ANSBOX = prev; _ANSBAND = prevBand; }
 }
 
 function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
@@ -13220,7 +13230,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // The teacher's answer-box option (`ansBox`, re-land 2026-10-30): a "a ± b = ?" sentence that falls
     // through to the default (add_sub_10s, add_sub_100s) draws its answer place in the chosen style,
     // the same slot as missing-factor's, so the key writes inside it. Automatic keeps the stretching box.
-    if (_ANSBOX != null && /^[^<]*=\s*\?\s*$/.test(text) && /^\d+$/.test(String(problem.ans))) {
+    if (_ANSBOX != null && _ANSBOX !== 'one' && /^[^<]*=\s*\?\s*$/.test(text) && /^\d+$/.test(String(problem.ans))) {
         // one width per section (SL-2): the band the step reaches (± 10 -> to 100, ± 100 -> to 1000), never this answer's length
         const nums = (text.match(/\d+/g) || []).map(Number);
         const step = nums.length >= 2 ? nums[1] : 0;

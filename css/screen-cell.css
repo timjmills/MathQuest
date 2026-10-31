@@ -1913,3 +1913,16 @@ html body .mq-scell input.expanded-input-box.expanded-input-box:focus:not(.mq-ac
 html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-active-box):not(.box-correct):not(.box-wrong):not([style*="var(--"]) {
     box-shadow: inset 0 0 0 3px #000 !important;
 }
+
+/* ---- ansBox rebuild r2 (critic r1 #1, 2026-10-31; ADDITIVE): on EVERY screen host (practice card, online
+   worksheet, quiz) a 'one' strip stays ONE box and an 'off' strip stays boxless while one of its digits is
+   the next box or holds the caret. The next-box glow (.mq-active-box, an inset 3 px ring) used to outline
+   that one digit, so a two-digit 'one' strip read as two boxes - the same picture as 'digit'. Here the
+   next / focused digit keeps the strip's own edges and shows the yellow fill only. Unscoped from .mq-kit
+   (legacy column skills draw the same strip through stackHTML). Lane A2's right / wrong marks still win. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content, .mq-scell) .ws-stack.mq-ans-one .ab[data-ws-seg] > input.mq-digit.mq-digit:is(:focus, .mq-active-box):not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, var(--mq-segr, 0 0 0 0 transparent) !important; outline: none !important; }
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content, .mq-scell) .ws-stack.mq-ans-one .ab:is([data-ws-seg="first"], [data-ws-seg="only"]) > input.mq-digit.mq-digit:is(:focus, .mq-active-box):not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
+    box-shadow: inset 0 1px 0 0 #000, inset 0 -1px 0 0 #000, inset 1px 0 0 0 #000, var(--mq-segr, 0 0 0 0 transparent) !important; outline: none !important; }
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content, .mq-scell) .ws-stack.mq-ans-off .ab[data-ws-seg] > input.mq-digit.mq-digit:is(:focus, .mq-active-box):not([style*="var(--"]):not(.box-correct):not(.box-wrong):not(.mq-live-correct):not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
+    box-shadow: none !important; outline: none !important; }

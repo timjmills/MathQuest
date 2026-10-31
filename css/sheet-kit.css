@@ -497,3 +497,11 @@
    item tab, so it takes no tab spacer above the story - on the page and in the measuring cell alike. */
 .ws-page .ws-grid > .ws-cell[data-ws-cell="word-work"]:has(.mq-wwframes)::before,
 .ws-sheet > .ws-cell.mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }
+
+/* ansBox rebuild r2 (critic r1 #2, #3; 2026-10-31; ADDITIVE): the key is a facsimile of the pupil page.
+   The key ink rule `.ws-key [data-ws-key-mark] { border-color: key ink !important }` used to repaint the
+   vertical fact's zone outline that 'digit' and 'off' hide, so the key drew an orange full-width box the
+   pupil page does not have (over the digit boxes for 'digit', round the plain zone for 'off'). Here the
+   hidden outline stays hidden on the key; 'digit' keeps its own black digit boxes, 'off' none. */
+.ws-page.ws-key .ws-fact .ws-factans.ws-factans--off[data-ws-key-mark]:not(:has(input)),
+.ws-page.ws-key .ws-fact .ws-factans.ws-factans--digit[data-ws-key-mark]:not(:has(input)) { border-color: transparent !important; }
