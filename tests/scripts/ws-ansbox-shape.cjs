@@ -219,8 +219,9 @@ async function measureSheet(page, key, opts, size, docHtml = null) {
         const cell = (c, isKey) => {
             const sh = A.shapes(c, w);
             const q = A.questionDigitPx(c, w);
-            const dig = A.digitBoxes(sh, Math.max(10, 0.8 * (q.px || 0)), q.top);
-            return { sig: A.sig(sh), n: sh.length, digits: dig.length, minDigitW: dig.length ? Math.min(...dig.map((s) => s.w)) : null, qpx: q.px, track: q.track, kpx: isKey ? A.keyDigitPx(c, w) : null, band: A.emptyBand(c, w) };
+            // r3: 0.35 x the digit size (was 0.8): an UNDERSIZED digit box (critic r2 #1, 5 mm under 8 mm digits) must still be read as one; carry boxes are excluded by place (above the first digit)
+            const dig = A.digitBoxes(sh, Math.max(10, 0.35 * (q.px || 0)), q.top);
+            return { sig: A.sig(sh), n: sh.length, digits: dig.length, minDigitW: dig.length ? Math.min(...dig.map((s) => s.w)) : null, minDigitH: dig.length ? Math.min(...dig.map((s) => s.h)) : null, qpx: q.px, track: q.track, kpx: isKey ? A.keyDigitPx(c, w) : null, band: A.emptyBand(c, w) };
         };
         return { pupil: pupilCells.map((c) => cell(c, false)), key: keyCells.map((c) => cell(c, true)) };
     }, key, opts, size, docHtml);
@@ -397,6 +398,9 @@ async function shot(page, key, opts, size, file) {
                         });
                         if (CHECKS.has('c') && v !== null) m.pupil.forEach((pc, i) => {
                             if (pc.minDigitW != null && pc.track && pc.minDigitW < pc.track - 1) fail(`c ${where} cell ${i + 1}: a digit box is ${pc.minDigitW.toFixed(1)}px wide, narrower than the digit track ${pc.track.toFixed(1)}px`);
+                            // r3 (critic r2 #1: 5.3 mm tall boxes under 8 mm digits, the key spilling out): a digit box is at least
+                            // 0.85 em of the question's digit size tall, so a digit written at that size sits inside it
+                            if (pc.minDigitH != null && pc.qpx && pc.minDigitH < 0.85 * pc.qpx) fail(`c ${where} cell ${i + 1}: a digit box is ${pc.minDigitH.toFixed(1)}px tall, under 0.85 x the question's ${pc.qpx.toFixed(1)}px digits`);
                         });
                         // d holds a teacher's value; the automatic page is guarded byte for byte by ws-ansbox-default-parity (vs merge-base)
                         if (CHECKS.has('d') && v !== null) m.key.forEach((kc, i) => {
@@ -407,7 +411,7 @@ async function shot(page, key, opts, size, file) {
                             const counts = [...new Set(m.pupil.map((x) => x.digits))];
                             if (counts.length > 1) fail(`e ${where}: the section's cells draw ${counts.join(' / ')} digit boxes (SL-2: one band per section)`);
                         }
-                        if (VERBOSE) console.log(`  ${where}: cells ${m.pupil.length}, digit boxes ${m.pupil.map((x) => x.digits).join(',')}, q ${m.pupil[0].qpx}px track ${m.pupil[0].track && m.pupil[0].track.toFixed(1)}, key ${m.key.map((x) => x.kpx).join(',')}, band ${(bands[size][name] * 100).toFixed(0)}%`);
+                        if (VERBOSE) console.log(`  ${where}: cells ${m.pupil.length}, digit boxes ${m.pupil.map((x) => x.digits).join(",")} (min w ${m.pupil.map((x) => x.minDigitW == null ? "-" : x.minDigitW.toFixed(1)).join(",")}), q ${m.pupil[0].qpx}px track ${m.pupil[0].track && m.pupil[0].track.toFixed(1)}, key ${m.key.map((x) => x.kpx).join(',')}, band ${(bands[size][name] * 100).toFixed(0)}%`);
                         if (SHOTS) await shot(page, key, opts, size, path.join(SHOTS, `${k}-${lookName.replace(/[=,]/g, '-')}-${name}-${size}.png`));
                     }
                     const screenHere = lookName === 'default' || FULL;
