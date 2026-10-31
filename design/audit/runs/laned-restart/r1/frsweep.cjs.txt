@@ -1,0 +1,110 @@
+// Critic r1 sweep: fact rows, 4 skills (+ div forms) x S/M/L x columns x seeds.
+// Per cell: ink bbox (all descendants except label) vs cell box, label keep-out, min font size of digits.
+const path = require('path');
+const fs = require('fs');
+const ROOT = '/home/user/MathQuest';
+const { open } = require(path.join(ROOT, 'tests/lib/ws-harness.cjs'));
+const OUT = process.argv[2];
+const ONLY = process.argv[3] || '';
+const SHOTS = process.argv.includes('--shots');
+fs.mkdirSync(OUT, { recursive: true });
+const configs = [];
+const sk = [['addition', 'add_facts', {}], ['subtraction', 'sub_facts', {}], ['multiplication', 'mult_facts', {}],
+  ['division', 'div_facts', { divForm: 'standard' }], ['division', 'div_facts', { divForm: 'vertical' }],
+  ['division', 'div_facts', { divForm: 'fraction' }], ['division', 'div_facts', { divForm: 'long' }], ['division', 'div_facts', { divForm: 'mix' }]];
+for (const [c, s, o] of sk) for (const size of ['S', 'M', 'L']) for (const columns of ['auto', 5, 6, 8, 10]) for (const seed of [11, 4242, 90001]) {
+  configs.push({ c, s, o, size, columns, seed, role: 'fact-rows' });
+}
+(async () => {
+  const { page, close, problems } = await open();
+  const rows = [];
+  for (const cf of configs) {
+    const id = `${cf.s}${cf.o.divForm ? '-' + cf.o.divForm : ''}-${cf.size}-c${cf.columns}-s${cf.seed}`;
+    if (ONLY && !id.includes(ONLY)) continue;
+    const built = await page.evaluate(async (cf) => {
+      try {
+        const r = await window.buildSheet({ role: cf.role, sections: [{ skills: [{ categoryId: cf.c, skillId: cf.s, opts: cf.o }], columns: cf.columns }], size: cf.size, look: 'auto', paper: 'A4', seed: cf.seed, form: 'A', key: true });
+        return { pupil: window.sheetDocument(r.pupilHtml, 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 't key', { paper: 'A4' }), fits: r.fits, notes: r.notes, pageCount: r.pageCount, keyPageCount: r.keyPageCount, n: r.items.length, ans: r.items.map(i => [i.text, String(typeof i.ans === 'object' ? JSON.stringify(i.ans) : i.ans)]) };
+      } catch (e) { return { error: String(e && e.stack || e) }; }
+    }, cf);
+    if (built.error) { rows.push({ id, error: built.error }); continue; }
+    const res = {};
+    for (const which of ['pupil', 'key']) {
+      const sheet = await page.browser().newPage();
+      await sheet.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+      await sheet.goto(page.url(), { waitUntil: 'domcontentloaded' });
+      await sheet.setContent(built[which], { waitUntil: 'load', timeout: 60000 });
+      await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+      await sheet.evaluate(() => document.fonts && document.fonts.ready);
+      await new Promise(r => setTimeout(r, 150));
+      res[which] = await sheet.evaluate(() => {
+        const PX = 96 / 25.4;
+        const cells = [...document.querySelectorAll('.ws-cell')];
+        const out = { cells: cells.length, minFontPt: 99, minL: 99, minR: 99, minT: 99, minB: 99, ko: 0, worst: [], gridCols: 0, emptySlots: 0 };
+        const ink = (el, lab) => {
+          let b = null;
+          const walk = (n) => {
+            if (lab && (n === lab || lab.contains(n))) return;
+            if (n.nodeType === 3) {
+              if (!n.textContent.trim()) return;
+              const r = document.createRange(); r.selectNodeContents(n);
+              for (const q of r.getClientRects()) { if (q.width && q.height) b = b ? { l: Math.min(b.l, q.left), r: Math.max(b.r, q.right), t: Math.min(b.t, q.top), b: Math.max(b.b, q.bottom) } : { l: q.left, r: q.right, t: q.top, b: q.bottom }; }
+              const fs = parseFloat(getComputedStyle(n.parentElement).fontSize) * 0.75;
+              if (/\d/.test(n.textContent)) out.minFontPt = Math.min(out.minFontPt, fs);
+              return;
+            }
+            if (n.nodeType !== 1) return;
+            const cs = getComputedStyle(n);
+            if (cs.display === 'none' || cs.visibility === 'hidden') return;
+            const tag = n.tagName.toLowerCase();
+            const borders = ['Top', 'Right', 'Bottom', 'Left'].some(s => parseFloat(cs['border' + s + 'Width']) > 0 && cs['border' + s + 'Style'] !== 'none');
+            if (tag === 'svg' || tag === 'path' || tag === 'line' || borders) {
+              const q = n.getBoundingClientRect();
+              if (q.width || q.height) b = b ? { l: Math.min(b.l, q.left), r: Math.max(b.r, q.right), t: Math.min(b.t, q.top), b: Math.max(b.b, q.bottom) } : { l: q.left, r: q.right, t: q.top, b: q.bottom };
+              if (tag === 'svg') return;
+            }
+            for (const ch of n.childNodes) walk(ch);
+          };
+          for (const ch of el.childNodes) walk(ch);
+          return b;
+        };
+        for (const cell of cells) {
+          const cr = cell.getBoundingClientRect();
+          const lab = cell.querySelector('[data-ws-label]');
+          const b = ink(cell, lab);
+          if (!b) continue;
+          const L = (b.l - cr.left) / PX, R = (cr.right - b.r) / PX, T = (b.t - cr.top) / PX, B = (cr.bottom - b.b) / PX;
+          out.minL = Math.min(out.minL, L); out.minR = Math.min(out.minR, R); out.minT = Math.min(out.minT, T); out.minB = Math.min(out.minB, B);
+          if (lab) {
+            const lr = lab.getBoundingClientRect();
+            const ks = Math.max(lr.right - cr.left, lr.bottom - cr.top) / PX + 1;  // keep-out square side mm
+            if ((b.l - cr.left) / PX < ks && (b.t - cr.top) / PX < ks) {
+              // any ink rect inside the square? approximate with bbox corner: check text rects individually
+              let hit = false;
+              const rects = [];
+              cell.querySelectorAll('*').forEach(e => { if (lab.contains(e) || e === lab) return; for (const n of e.childNodes) if (n.nodeType === 3 && n.textContent.trim()) { const r = document.createRange(); r.selectNodeContents(n); for (const q of r.getClientRects()) rects.push(q); } });
+              cell.querySelectorAll('svg').forEach(s => rects.push(s.getBoundingClientRect()));
+              for (const q of rects) if ((q.left - cr.left) / PX < ks && (q.top - cr.top) / PX < ks && q.width > 0) hit = true;
+              if (hit) out.ko++;
+            }
+          }
+          if (L < 1 || R < 1) out.worst.push({ txt: cell.textContent.replace(/\s+/g, ' ').trim().slice(0, 24), L: +L.toFixed(2), R: +R.toFixed(2), wmm: +(cr.width / PX).toFixed(1) });
+        }
+        out.worst = out.worst.slice(0, 6);
+        for (const k of ['minL', 'minR', 'minT', 'minB']) out[k] = +out[k].toFixed(2);
+        return out;
+      });
+      if (SHOTS) {
+        const pdf = path.join(OUT, `${id}-${which}.pdf`);
+        await sheet.pdf({ path: pdf, printBackground: false, preferCSSPageSize: true });
+      }
+      await sheet.close();
+    }
+    const row = { id, fits: built.fits, notes: built.notes, pages: built.pageCount, keyPages: built.keyPageCount, n: built.n, pupil: res.pupil, key: res.key, ans: built.ans };
+    rows.push(row);
+    console.log(id, 'n', row.n, 'pg', row.pages, 'cells', res.pupil.cells, 'font', res.pupil.minFontPt.toFixed(1), 'L', res.pupil.minL, 'R', res.pupil.minR, 'ko', res.pupil.ko, 'keyL', res.key.minL, 'keyR', res.key.minR, 'keyko', res.key.ko, res.pupil.worst.length ? JSON.stringify(res.pupil.worst.slice(0, 2)) : '');
+  }
+  fs.writeFileSync(path.join(OUT, 'sweep.json'), JSON.stringify({ rows, problems }, null, 1));
+  console.log('problems', problems.length, JSON.stringify(problems.slice(0, 5)));
+  await close();
+})().catch(e => { console.error(e); process.exit(1); });
