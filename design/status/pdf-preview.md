@@ -25,10 +25,10 @@ Critic rounds: 3, PASS r3 (A 9 · B 8 · C 8 · D 8)
   file download would need a raster library (html2canvas is loaded; jsPDF would be new): pictures of pages, slower,
   larger, not faithful. Recommended: keep the print path. Owner to confirm.
 - **Speed waiver** (checker r1 D3): pressed the instant page 1 appears, the WHOLE set is bounded by the engine drawing
-  pages 2..N — 4.1–5.1 s at CPU 4× for 8–10 pages (0.78 s unthrottled). Page 1 is < 1 s on the wall clock in the
+  pages 2..N — 4.0–6.3 s at CPU 4× for 8–10 pages (0.78 s unthrottled). Page 1 is < 1 s on the wall clock in the
   cases the gate presses (at once; +300, +900, +1500, +2500 ms after page 1 with a mouse move first; after a pause).
   After a pause of ~5 s at 4× (1.5 s quiet + the background build) the whole set opens in 0.4–0.6 s. Meeting 3 s cold at
-  4× needs a faster `buildSheet` (not this lane). The gate fails cold-whole over 3 s unthrottled and over 6 s at 4×.
+  4× needs a faster `buildSheet` (not this lane). The gate fails cold-whole over 3 s unthrottled and over max(8 s, 1 s × pages) at 4× — a regression guard; cold runs vary 3.3–6.3 s (a fixed 6 s flaked at 6.26 s).
   Owner / lead to accept or to queue an engine-speed lane.
 - **Speed limit 2** (checker r3 D3): a touch tap or keyboard press with NO pointer move first, landing while the
   background build draws a page (it starts 1.5 s or more after page 1, after the teacher has been still), waits for
