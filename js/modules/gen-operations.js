@@ -4745,7 +4745,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // as wide as the widest answer the band allows on this page, never this answer (L3).
                 // (`fact: true`: a one-line sentence, packed by its measured height like the across facts,
                 // print-sheet.js; it draws exactly as before - the fact look is for an answer after =)
-                const _maPayload = { a, b, operands: [a, b], op: isAdd ? '+' : '-', result: c, unknown, digits: String(_widest).length, fact: true, ...(_optDef('level') && supportLevelFor(1) >= 3 ? { trace: true } : {}) };
+                const _maPayload = { a, b, operands: [a, b], op: isAdd ? '+' : '-', result: c, unknown, digits: String(_widest).length, fact: true, ...(_optDef('level') && supportLevelFor(1) >= 3 ? { trace: true } : {}), ...(_unk.length > 1 ? { slotShape: 'box' } : {}) };
                 q.cell = { template: 'equation', v: 1, payload: _maPayload };
                 q.visual = _eqTwin(_maPayload);
                 q.screenInstr = 'Write the missing number.';

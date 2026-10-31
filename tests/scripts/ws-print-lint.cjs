@@ -280,7 +280,7 @@ function kitRequestFlags() {
 const TOOL = 'ws-print-lint';
 // INK-31: the answer-key ink (WORKSHEET_DESIGN_STANDARD.md INK-31).
 const KEY_INK = '#c2410c';
-const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT', 'L-TOPSTART', 'L-OVERLAP', 'L-WRAP'];
+const LINTS = ['L-INK', 'L-EMOJI', 'L-FONT', 'L-SIZE', 'L-OVERFLOW', 'L-SPLIT', 'L-DENSITY', 'L-KEY', 'L-VERBS', 'L-ANSAREA', 'L-INPUT', 'L-CCSS', 'L-ANCHOR', 'L-SUPPORT', 'L-TOPSTART', 'L-OVERLAP', 'L-WRAP', 'L-NOTATION'];
 
 /**
  * L-SUPPORT (S2): runs IN the rendered sheet document (the page lintHtmlInSheetPage prints from).
@@ -1154,6 +1154,29 @@ function wsLintPage(cfg) {
             if (p && visible(p) && !p.closest(TEACHER_SEL) && /_{3,}/.test(n.nodeValue)) F('L-ANSAREA', 'SL-6', 'major', p, `blank drawn with underscore characters "${n.nodeValue.trim().slice(0, 24)}": blanks are ruled lines or boxes (SL-6)`, 'underscore blank');
         }
     }
+    // ops-family r2 (critic r1 F5 / F11 / F12), one sentence cell (`equation`) at a time:
+    //   L-NOTATION VA-61  a long-division bracket is never followed by "=" (the quotient goes above the bar), and a page
+    //                     with a bracket sentence holds no × sentence (VA-65: never mixed in one section)
+    //   L-DENSITY CELL-ONE an equation cell holds ONE sentence (one item per box)
+    //   L-ANSAREA SHAPE   the pupil page's sentence cells write in ONE slot shape (never boxes beside lines, SL-2)
+    for (const ri of rootInfo) {
+        const eqCells = [...ri.el.querySelectorAll('.ws-cell[data-ws-cell="equation"]')].filter(visible);
+        let bracket = null, times = null;
+        const shapes = new Map();
+        for (const c of eqCells) {
+            const eqs = [...c.querySelectorAll('.ws-eq')].filter(e => !e.parentElement.closest('.ws-eq'));
+            if (eqs.length > 1) F('L-DENSITY', 'CELL-ONE', 'major', c, `${eqs.length} sentences in one cell: one problem per boxed cell (CL-1)`, 'several sentences in a cell');
+            for (const e of eqs) {
+                if (e.getAttribute('data-ws-notation') === 'bracket') {
+                    bracket = bracket || e;
+                    if ([...e.children].some(k => k.classList.contains('o') && k.textContent.trim() === '=')) F('L-NOTATION', 'VA-61', 'major', e, `a long-division bracket followed by "=" ("${e.textContent.replace(/\s+/g, ' ').trim().slice(0, 20)}"): the quotient is written above the bar, never after an = (VA-61)`, 'equals after a bracket');
+                } else if (/×/.test(e.textContent)) times = times || e;
+            }
+            if (!ri.key) for (const s of c.querySelectorAll('[data-ws-slot][data-ws-shape]')) { const sh = s.getAttribute('data-ws-shape'); if (!shapes.has(sh)) shapes.set(sh, s); }
+        }
+        if (bracket && times) F('L-NOTATION', 'VA-65', 'major', times, 'a × sentence on a page of long-division brackets: a × fact is never set beside a bracket in one section (VA-65)', '× beside a bracket');
+        if (shapes.has('box') && shapes.has('line')) F('L-ANSAREA', 'SHAPE', 'major', shapes.get('line'), 'answer boxes and answer lines on one page of sentences: one slot shape a page (SL-2, ops-family critic r1 F12)', 'box and line on one page');
+    }
     // H12: an item that says draw / build / show needs room to draw the model
     const DRAW = /\b(draw|build|show)\b/i;
     for (const ri of rootInfo) {
@@ -1305,6 +1328,10 @@ function wsLintPage(cfg) {
             const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter(g => g.getBoundingClientRect().height > 0);
             const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
+            // (ops-family r2 F2 / F14: the anchor chart, a Test and a Mixed practice page end at their last BAND - the Say line, a
+            // section's grid - not only at a grid; PAGEFILL reads it on those pages)
+            const blocks = [...pg.querySelectorAll('.ws-grid, .ws-gridrows, .ws-band')].filter(g => g.getBoundingClientRect().height > 0 && !(foot && foot.contains(g)));
+            const contentBottom = blocks.length ? Math.max(...blocks.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             out.pages.push({
                 // Wave 4.4: a SHORT key page (labels + answers) and the items it lists, "page:cell"
                 short: pg.getAttribute('data-ws-key-style') === 'short',
@@ -1316,7 +1343,7 @@ function wsLintPage(cfg) {
                 accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length, gridBottom, gridTop,
+                footRect, cells, items: items.length, gridBottom, gridTop, contentBottom,
                 oneSymbol: (itemShapes.length > 0 && itemShapes.every(s => oneSymbolShapes.has(s)))
                     // a page of one-line facts is a page of one-number answers on the Independent
                     // page too (12.1: up to 16; the engine's dense packing calls them `short`)
@@ -1759,6 +1786,15 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const body = p.footRect[1] - (p.padT || 0);
                 const strip = p.footRect[1] - p.gridBottom;
                 if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the page): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+            }
+            // PAGEFILL on the pages that had no fill check (ops-family critic r1 F2 / F14): the lesson's anchor chart page (a
+            // poster: its panels and other examples fill the body), a Test page and a Mixed practice page (their problems
+            // fill the page; the last page of several may be short). Measured to the last band, the Say line included.
+            const chartPage = (p.tab || []).some(t => /^Anchor chart$/i.test(String(t).trim()));
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && (chartPage || /^(test|mixed-practice)$/.test(p.role)) && p.footRect && p.contentBottom !== null && !(last && pt.pages.length > 1 && !chartPage)) {
+                const body = p.footRect[1] - (p.padT || 0);
+                const strip = p.footRect[1] - p.contentBottom;
+                if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx} (${chartPage ? 'anchor chart' : p.role}): an empty strip ${Math.round(strip)} mm tall under the content (${Math.round((strip / body) * 100)}% of the page): fill the page (RUBRIC H13, ops-family critic r1 F2 / F14)`, 'empty strip under content');
             }
         });
     }

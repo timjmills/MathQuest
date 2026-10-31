@@ -1531,7 +1531,9 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         const panelW = lay.variant === 'row' ? 186 * 0.42 : 186 / cols - 8;
         return panelW / boundW;
     });
-    const zMax = Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, ...zW));
+    // (`chartZoomMax`, lesson data - ops-family r2 F2: a one-line sentence's drawing is far narrower than the column it was
+    // measured to fit, so the lesson states how far its panels may grow)
+    const zMax = data && Number(data.chartZoomMax) > 1 ? Number(data.chartZoomMax) : Math.max(1, Math.min(lay.variant === 'row' ? 2 : 1.6, ...zW));
     const H = (z) => Math.max(...states.map((st, k) => base[k] + (z - 1) * dH[k]));
     // The largest zoom in [lo, hi] at which `total(z)` fits `room`; 0 when not even `lo` does.
     const solve = (total, room, lo, hi) => {
@@ -1602,7 +1604,10 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         sections.push(sum(rowsMm) >= room - 2 ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
     } else {
         room = avail - (mode === 'row' ? band2 : mode === 'final' ? hF : 0);
-        rowH = Math.max(H(z), Math.min(room / lay.rows, H(z) * 1.25));
+        // (ops-family r2 F2: a chart with one other example shown whole spreads its one-line panels by up to 1.6, then the
+        // example takes what is left - the poster fills its page, PAGEFILL on the anchor chart)
+        const spread = mode === 'final' && oneWhole && finCols === 1 ? 1.6 : 1.25;
+        rowH = Math.max(H(z), Math.min(room / lay.rows, H(z) * spread));
         // The panels take the body left over (by flex: the header's real height is only known to
         // the page) whenever they already use all of it, or when they are rows (the side column
         // spreads).
@@ -1621,7 +1626,7 @@ function chartPage(input, ctx, data, example, states, draws, second, tailItem, f
         }
         if (mode === 'final') {
             const fr = Math.max(1, Math.ceil(finShown.length / finCols));
-            sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: fr, cellH: (hF + Math.min(spare, hF * 0.3)) / fr, labels: 'none', cls: 'mq-cfinalgrid' }));
+            sections.push(gridPart(finShown.map((x) => withZoom(x, finCols)), { cols: finCols, rows: fr, cellH: (hF + (spread > 1.25 ? spare : Math.min(spare, hF * 0.3))) / fr, labels: 'none', cls: 'mq-cfinalgrid' }));
         }
     }
     // `sayWords` (lesson data; the detailed lesson maker): the Say line reads the example's number

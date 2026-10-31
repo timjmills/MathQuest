@@ -102,6 +102,9 @@ const acrossBelow = (p, ctx) => {
     return acrossBesideMm(p, ctx) > 186 / cols - 6.6 - 1;
 };
 const slotShape = (p) => {
+    // (`slotShape: 'box'` - ops-family r2 F12: a page that mixes answers after = with numbers before it writes
+    // every one in a box, one slot shape a page)
+    if (p.slotShape === 'box' && (p.unknown || 'result') !== 'op') return 'box';
     const u = p.unknown || 'result';
     return u === 'op' ? 'circle' : u === 'result' ? 'line' : 'box';
 };

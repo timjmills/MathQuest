@@ -334,7 +334,8 @@ export const LESSONS = Object.freeze({
         skills: [
             // (ops-family r2 F17: the warm-up fact across, as the lesson's own sentences are - a stack sat 34 % to one side)
             { key: 'addition:add_facts', opts: { band: 20, notation: ['across'] }, why: 'Count on to find a part.' },
-            { key: 'composing:number_bonds', opts: { band: 10 }, why: 'Two parts make a whole.' },
+            // (ops-family r2: a one-line fact beside the across fact - a number bond beside it left the fact's cell 76 % empty, H13-ROW)
+            { key: 'subtraction:sub_facts', opts: { band: 20, notation: ['across'] }, why: 'The whole take away a part.' },
         ],
         concepts: [
             { id: 'whole-parts', text: 'Two parts make the whole.' },
@@ -361,8 +362,8 @@ export const LESSONS = Object.freeze({
     },
     'division:missing_mult_div': {
         skills: [
-            // (ops-family r2 F18: facts to 10 \u00d7 10, across - a stacked 12 \u00d7 11 reads as grade-4 long multiplication)
-            { key: 'multiplication:mult_facts', opts: { band: 100, notation: ['across'] }, why: 'Know the times facts.' },
+            // (ops-family r2 F18: facts to 10 \u00d7 10 - a stacked 12 \u00d7 11 reads as grade-4 long multiplication)
+            { key: 'multiplication:mult_facts', opts: { band: 100 }, why: 'Know the times facts.' },
             { key: 'division:div_facts', opts: { band: 100 }, why: 'Division is the times fact turned round.' },
         ],
         concepts: [
@@ -371,8 +372,8 @@ export const LESSONS = Object.freeze({
             { id: 'check', text: 'Put the number in. Is the fact true?' },
         ],
         vocab: [
-            // (ops-family r2 F3, VOCAB-TYPE: "6 \u00d7 7" is a product, not a factor - the word the picture shows is the product, boxed)
-            { word: 'product', meaning: 'the answer when we multiply', picture: { kind: 'fact', a: 3, b: 4 } },
+            // (ops-family r2 F3, VOCAB-TYPE: "6 \u00d7 7" is a product, not a factor - the word is now the sign it shows)
+            { word: 'times', meaning: 'the \u00d7 sign: groups of', picture: { kind: 'glyph', text: '\u00d7' } },
             { word: 'missing', meaning: 'the number in the box', picture: { kind: 'text', text: '? \u00d7 6 = 42' } },
             { word: 'divide', meaning: 'the \u00f7 sign: share equally', picture: { kind: 'glyph', text: '\u00f7' } },
         ],
