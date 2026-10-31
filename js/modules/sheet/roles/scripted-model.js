@@ -21,7 +21,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, providerWorkedSteps,
-    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc,
+    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc, drawingKey,
 } from './compose.js';
 import { isWideRow } from '../cells/count-row.js';
 import { stepTemplateOf, unslot } from '../anchors.js';
@@ -124,16 +124,8 @@ export function supports(items) {
 
 /* ============================================================== the grouped states (R1-3) */
 
-/**
- * What a drawing SHOWS, ink-blind: its written characters in order, plus every mark that writes nothing and stays (a strike,
- * an arrow, a hop; a ring only points at what its own step reads). Two states that differ only in which marks are grey,
- * in a pointing ring or in markup show the same thing.
- */
-const inkBlind = (html) => {
-    const h = String(html);
-    const marks = (h.match(/class="[^"]*\b(strike|cross|hop|arrow)[\w-]*/gi) || []).map((x) => x.replace(/^class="/, '').replace(/\b(ws-trace|mq-lring-t)\b/g, '').trim());
-    return `${h.replace(/<[^>]*>/g, ' ').replace(/&nbsp;|\u00a0/g, ' ').replace(/\s+/g, ' ').trim()}|${marks.join(',')}`;
-};
+/** What a drawing shows, ink-blind (compose.drawingKey, shared with the lesson's anchor chart). */
+const inkBlind = drawingKey;
 
 /**
  * shared-roles R1-3 (critic laneD-restart r1: "4-5 panels repeat the same unchanged fact while the steps describe a

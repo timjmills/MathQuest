@@ -46,7 +46,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, instructionPart, assemble, poolItems, answerOf, oralFrameOf, operandsOf, opOf, labelStyleOf,
-    esc, blank, stripExtraMm, genericSteps, exampleNumbers, nbExpr,
+    esc, blank, stripExtraMm, genericSteps, exampleNumbers, nbExpr, drawingKey,
 } from './compose.js';
 import { resolveCtx, numeralTracksHTML } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
@@ -713,6 +713,35 @@ export function stateGroups(steps) {
     return groups.map((g) => ({ steps: g, marks: g.flatMap((i) => (steps[i] && steps[i].marks) || []) }));
 }
 
+/**
+ * The anchor chart's panels (shared-roles R1-3, the lesson's half): `stateGroups`, then a panel only where the DRAWING changes.
+ * A group whose drawing shows the same as the one before it (every step of a fact before its answer: "11 x 11 is 11 groups of
+ * 11", "Count by 11 ...", "11 groups of 11 is 121") joins that panel, its step heads listed there. The answer keeps a panel
+ * of its own (two panels at least). A chart whose groups all draw something new is unchanged.
+ */
+export function chartGroups(it, steps) {
+    const groups = stateGroups(steps);
+    if (groups.length < 2) return groups;
+    const probe = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank', scaffoldLevel: 3 });
+    const keyAt = (gs, k) => { try { return drawingKey(stateDrawing(it, steps, gs, k, probe)); } catch (e) { return `#${k}`; } };
+    const keys = groups.map((_, k) => keyAt(groups, k));
+    const out = [];
+    groups.forEach((g, k) => {
+        if (out.length && keys[k] === keys[k - 1]) {
+            const p = out[out.length - 1];
+            out[out.length - 1] = { steps: p.steps.concat(g.steps), marks: p.marks.concat(g.marks) };
+        } else out.push({ steps: g.steps.slice(), marks: g.marks.slice() });
+    });
+    if (out.length === groups.length) return groups;
+    if (out.length === 1) {
+        // one drawing throughout: the problem with its strategy steps, then the answer
+        const last = groups[groups.length - 1];
+        const head = groups.slice(0, -1);
+        return [{ steps: head.flatMap((g) => g.steps), marks: head.flatMap((g) => g.marks) }, { steps: last.steps.slice(), marks: last.marks.slice() }];
+    }
+    return out;
+}
+
 /** A ring round a number (trace grey on its own step, black after it). No layout: an outline. */
 // The ring is the mark, not the digit: the digit keeps its ink (`data-ws-mark`, never `data-ws-ink`,
 // which would grey the digit inside it).
@@ -1093,7 +1122,7 @@ export function stateItems(example, data) {
     // writes nothing new - it is the line under the panels, not a panel of its own.
     const steps = data && data.tailLast ? ws.map((st, i) => (i === ws.length - 1 ? Object.assign({}, st, { marks: [] }) : st)) : ws;
     if (!steps.length) return [];
-    const groups = stateGroups(steps);
+    const groups = chartGroups(example, steps);
     const named = namedSteps(steps, data);
     const { variant } = chartLayout(groups.length, data);
     const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
@@ -1255,7 +1284,7 @@ function finalDrawing(it, c) {
 export function secondItems(example2) {
     const steps = workedStepsOf(example2);
     if (!steps.length) return [];
-    const groups = stateGroups(steps);
+    const groups = chartGroups(example2, steps);
     return groups.map((g, k) => ({
         q: null, key: { value: '', display: '', slots: {} }, drawsAnswer: true, visual: false,
         footprint: { wMm: 40, hMm: null, measure: true, maxCols: 4 }, fclass: 'standard', measureLevel: 3,
@@ -2187,6 +2216,6 @@ export function tagLine({ skillId, grade, ccss = [], ee = [] } = {}) {
 /* =========================================================================== the styles */
 
 export default {
-    ROLE_ID, PROBE, sources, measureCols, counts, extras, plan, pickExample, pickWeDo, pickSecond, CASE_TESTS, stateGroups, stateItems, namedSteps,
+    ROLE_ID, PROBE, sources, measureCols, counts, extras, plan, pickExample, pickWeDo, pickSecond, CASE_TESTS, stateGroups, chartGroups, stateItems, namedSteps,
     stripHtml, stripItem, vocabItem, packetParts, tagLine, chartLayout,
 };
