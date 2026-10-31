@@ -4740,6 +4740,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             : `Start at ${a}. Count back ${b}.`);
                 q.missingNumberData = { position, a, b, c };
                 q.opsDealt = [..._ops.includes(0) ? ['+'] : [], ..._ops.includes(1) ? ['-'] : []];
+                // F13 (ops-family critic r1): a Mixed practice band names the work it holds, never the category
+                // ("Subtraction" over additions) - mixed-practice.js reads q.sectionLabel.
+                q.sectionLabel = _ops.length > 1 ? 'Adding and subtracting' : _ops.includes(0) ? 'Adding' : 'Subtracting';
                 q.printFormat = "missing-number";
                 // The kit's `equation` cell: the unknown's own slot (a box before =, a line after),
                 // as wide as the widest answer the band allows on this page, never this answer (L3).
@@ -4962,6 +4965,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.cell = { template: 'equation', v: 1, payload: _mmPayload };
                 q.answerType = 'number';
                 q.visual = _eqTwin(_mmPayload);
+                // F13: the Mixed practice band names the work this page deals (mixed-practice.js q.sectionLabel)
+                const _mmDivPage = _mmOnly === 'div' || (_mmDeal && (!_mmTicked.includes('across') || _mmTicked.includes('bracket')));
+                q.sectionLabel = _mmOnly === 'mult' ? 'Multiplying' : _mmDivPage ? 'Dividing' : 'Multiplying and dividing';
                 q.screenInstr = 'Write the missing number.';
                 q.options = buildNumericOptions(ans);
                 return;
@@ -6661,6 +6667,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.notation = 'across';
                 // The signs this page deals: the instruction reads "Add.", "Subtract." or "Look at the sign." from it (L6).
                 q.opsDealt = [...(_canAdd ? ['+'] : []), ...(_canSub ? ['-'] : [])];
+                // F13: the Mixed practice band names the work (mixed-practice.js q.sectionLabel)
+                q.sectionLabel = _canAdd && _canSub ? 'Adding and subtracting' : _canAdd ? 'Adding' : 'Subtracting';
                 const _digits = String(_canAdd ? _M : _M - _step).length;
                 // `fact: true`: the kit's ONE across-fact look (div_facts' Standard form): tight tracks,
                 // and the answer line under the sentence where the column is too narrow beside it.

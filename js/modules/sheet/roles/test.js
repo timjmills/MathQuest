@@ -63,12 +63,24 @@ function layout(items, input, count) {
     const oneLine = items.length && items.every((it) => it.fclass === 'short' || it.template === 'fact' || it.template === 'equation'
         || (it.footprint && it.footprint.factLike));
     if (oneLine && !long) {
-        return fillToCeiling(resolveSectionLayout({
-            role: 'test', columns: input.columns || 'auto', count: count || items.length,
+        const at = (columns) => fillToCeiling(resolveSectionLayout({
+            role: 'test', columns, count: count || items.length,
             target: { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
             ceiling: CEILING, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
-        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns);
+        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, columns === 'auto' ? input.columns : undefined);
+        const L = at(input.columns || 'auto');
+        // ops-family r2 (critic r1 F9, EMPTYCELL): a Test of its full ceiling on a grid the ceiling does not divide (20 on
+        // 3 x 7) left one ruled empty cell; a neighbouring column count that divides it, and holds its rows, is taken.
+        const ceil = CEILING[ctx.size] || CEILING.L;
+        if ((!input.columns || input.columns === 'auto') && L && L.perPage === ceil && L.cols > 1 && ceil % L.cols) {
+            for (const c of [L.cols + 1, L.cols - 1]) {
+                if (c < 2 || ceil % c) continue;
+                const L2 = at(c);
+                if (L2 && L2.cols === c && L2.perPage === ceil && !L2.clamped && L2.rows * c === ceil) return Object.assign({}, L2, { requested: L.requested });
+            }
+        }
+        return L;
     }
     return resolveSectionLayout({
         role: 'test', columns: input.columns || 'auto', count: count || items.length,

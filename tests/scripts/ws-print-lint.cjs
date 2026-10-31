@@ -1175,7 +1175,24 @@ function wsLintPage(cfg) {
             if (!ri.key) for (const s of c.querySelectorAll('[data-ws-slot][data-ws-shape]')) { const sh = s.getAttribute('data-ws-shape'); if (!shapes.has(sh)) shapes.set(sh, s); }
         }
         if (bracket && times) F('L-NOTATION', 'VA-65', 'major', times, 'a × sentence on a page of long-division brackets: a × fact is never set beside a bracket in one section (VA-65)', '× beside a bracket');
-        if (shapes.has('box') && shapes.has('line')) F('L-ANSAREA', 'SHAPE', 'major', shapes.get('line'), 'answer boxes and answer lines on one page of sentences: one slot shape a page (SL-2, ops-family critic r1 F12)', 'box and line on one page');
+        // L-DENSITY EMPTYCELL (critic r1 F9): a Test holds its ceiling on a grid that divides it - never a ruled empty cell
+        // closing the grid (20 on 3 x 7)
+        const blank = /\bTest [AB]\b/.test(ri.el.getAttribute('data-ws-tab') || '') && !ri.key ? ri.el.querySelector('.ws-cell.blankrun') : null;
+        if (blank && blank.getBoundingClientRect().width > 1) F('L-DENSITY', 'EMPTYCELL', 'major', blank, 'a ruled empty cell closes the Test grid: the problems fill every cell (a column count that divides the count, PG-15, critic r1 F9)', 'empty cell on a test');
+        // L-NOTATION HEADING (critic r1 F13): a band heading that names an operation ("Subtraction", "Adding") names one
+        // its own sentences use - never the category over another sign's items
+        const OPW = [[/\badd/i, /\+/], [/\bsubtract/i, /[−-]/], [/\bmultipl|\btimes\b/i, /×/], [/\bdivi/i, /÷|data-ws-notation/]];
+        for (const band of ri.el.querySelectorAll('.ws-band')) {
+            const b = band.querySelector(':scope > .ws-strip > b');
+            const title = b ? b.textContent.trim() : '';
+            const named = OPW.filter(([w]) => w.test(title));
+            const eqs = [...band.querySelectorAll('.ws-cell[data-ws-cell="equation"] .ws-eq')];
+            if (!named.length || !eqs.length) continue;
+            const txt = eqs.map((e) => e.textContent + (e.getAttribute('data-ws-notation') ? ' data-ws-notation' : '')).join(' ');
+            if (!named.some(([, op]) => op.test(txt))) F('L-NOTATION', 'HEADING', 'major', b, `band heading "${title}" names an operation none of its sentences use: the heading names the work the band holds (critic r1 F13)`, 'heading names an absent operation');
+        }
+        // (a page of several skills' sections - Mixed practice, Sections - is judged per skill by its own single-skill pages)
+        if (shapes.has('box') && shapes.has('line') && new Set([...ri.el.querySelectorAll('.ws-band > .ws-strip > b')].map((x) => x.textContent.trim())).size <= 1) F('L-ANSAREA', 'SHAPE', 'major', shapes.get('line'), 'answer boxes and answer lines on one page of sentences: one slot shape a page (SL-2, ops-family critic r1 F12)', 'box and line on one page');
     }
     // H12: an item that says draw / build / show needs room to draw the model
     const DRAW = /\b(draw|build|show)\b/i;
