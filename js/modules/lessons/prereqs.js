@@ -129,6 +129,74 @@ function subNoRegroupLessons() {
     };
 }
 
+/* ------------------------------ one-step word problems within 10 / 20 (K-1, the sentence layout) */
+// Visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md 4.4): the word-work cell's sentence layout -
+// the story, then `[ ] ◯ [ ] = [ ] unit`. The five steps are the provider's five worked steps
+// (sheet/providers/word-work.js: read two times, the key words, the two numbers, the sign, solve), so step n of the
+// list IS state n of the chart's example. The Warm-up deals the column facts the story is solved with (one row of
+// four: a bond row beside them pushed Guided Practice off page 2, DN-2); Mixed practice pairs the lesson with the bonds
+// strand and the other operation's facts (never a second word-problem section). The _plain twin (no picture row) is the same lesson.
+function storyLessons() {
+    const FORMAT = {
+        kind: 'numbered steps with icons + a chant',
+        why: 'The one decision pupils get wrong is the sign; a short chant at the key-word step names where to look before they write.',
+    };
+    const STEPS = (sign) => [
+        { icon: 'look', text: 'Read the story two times.' },
+        { icon: 'decide', text: 'Find the key words.' },
+        { icon: 'write', text: 'Write the two numbers.' },
+        { icon: 'decide', text: `Write the sign. ${sign}.` },
+        { icon: 'check', text: 'Solve. Write the unit.' },
+    ];
+    const ADD = {
+        concepts: [
+            { id: 'story-numbers', text: 'The two story numbers are the parts.' },
+            { id: 'more-add', text: '"More" and "in all" mean put together: add.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: [
+            { word: 'add', meaning: 'the + sign: put together', picture: { kind: 'glyph', text: '+' } },
+            { word: 'in all', meaning: 'how many together', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'whole' } },
+            { word: 'more', meaning: 'some come or are given', picture: { kind: 'text', text: '5, then 2 come' } },
+        ],
+        steps: STEPS('Add'),
+        chant: 'More or in all? Put them together: add!',
+    };
+    const SUB = {
+        concepts: [
+            { id: 'start-number', text: 'The first story number is how many at the start.' },
+            { id: 'left-sub', text: '"Left" and "gives away" mean take away: subtract.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: [
+            { word: 'take away', meaning: 'the − sign: some go', picture: { kind: 'glyph', text: '−' } },
+            { word: 'left', meaning: 'how many are still there', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'parts' } },
+            { word: 'gives', meaning: 'some go to someone else', picture: { kind: 'text', text: 'Tom → Sam' } },
+        ],
+        steps: STEPS('Subtract'),
+        chant: 'Left or gives away? Take them away: subtract!',
+    };
+    const base = (o) => Object.assign({ format: FORMAT, example: { match: 'key words' } }, o);
+    const addFacts = (band) => ({ key: 'addition:add_facts', opts: { band, notation: ['stacked'] }, why: `The story is solved with an addition fact within ${band}.` });
+    const subFacts = (band) => ({ key: 'subtraction:subtract', opts: { band, notation: ['stacked'] }, why: `The story is solved with a take-away fact within ${band}.` });
+    const add = (band) => base(Object.assign({}, ADD, {
+        skills: [addFacts(band)],
+        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'subtraction:subtract', opts: { band } }],
+    }));
+    const sub = (band) => base(Object.assign({}, SUB, {
+        skills: [subFacts(band)],
+        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'addition:add_facts', opts: { band } }],
+    }));
+    const out = {};
+    for (const [id, band] of [['10', 10], ['20', 20]]) {
+        out[`addition:add_wp_${id}`] = add(band);
+        out[`addition:add_wp_${id}_plain`] = add(band);
+        out[`subtraction:sub_wp_${id}`] = sub(band);
+        out[`subtraction:sub_wp_${id}_plain`] = sub(band);
+    }
+    return out;
+}
+
 export const LESSONS = Object.freeze({
     // ---------------------------------------------------------------- Add within 10 (K-1)
     // The skill is addition:add_facts with its band option at 10 ("Within N" bounds the sum).
@@ -229,6 +297,42 @@ export const LESSONS = Object.freeze({
     // chart's example is never a zero case (`subNoZero`), and Mixed practice pairs the lesson with
     // other strands (addition, place value), never a second Subtraction section.
     ...subNoRegroupLessons(),
+
+    // --------------------------------- One-step word problems within 10 / 20 (K-1)
+    ...storyLessons(),
+
+    // ------------------------------------------- Is it a fact family? (+ / −, grade 1)
+    // Visual-quality lane (2026-10-31): the kit's `family-check` cell - the three numbers in the fact
+    // triangle, the whole at the top, and the printed Yes / No the pupil circles. The three steps are
+    // the provider's worked steps (sheet/providers/addition.js): the big number at the top, add the
+    // two small numbers, circle yes or no. The Warm-up deals the facts the check is made with.
+    'addition:fact_family_sort': {
+        skills: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'The check adds the two small numbers.' },
+        ],
+        concepts: [
+            { id: 'whole-top', text: 'The big number is the whole. It goes at the top.' },
+            { id: 'parts-add', text: 'The two small numbers are the parts. Add them.' },
+            { id: 'family', text: 'The parts make the whole: it is a fact family.' },
+        ],
+        vocab: [
+            { word: 'whole', meaning: 'the big number at the top', picture: { kind: 'text', text: '12 at the top' } },
+            { word: 'parts', meaning: 'the two small numbers', picture: { kind: 'text', text: '8 and 4' } },
+            { word: 'fact family', meaning: 'parts that make the whole', picture: { kind: 'text', text: '8 + 4 = 12' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the big number.' },
+            { icon: 'count', text: 'Add the small numbers.' },
+            { icon: 'decide', text: 'The same? Circle yes. Not? Circle no.' },
+        ],
+        chant: 'Parts make the whole? Yes!',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Three short steps; the decision at step 3 is the whole skill, and the four-word chant is the question pupils ask themselves.',
+        },
+        example: { match: 'Circle yes' },
+        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'subtraction:subtract', opts: { band: 20 } }],
+    },
 
     // ------------------------------------------------- Round to the nearest 10 / 100 (3)
     'number_sense:nearest_10': {

@@ -910,10 +910,14 @@ function barModel(ctx, p, W = 150) {
 }
 
 /** The K picture of the two groups (add_wp_10 with pictures on): line-art objects to count. */
-function pictureRow(ctx, pic) {
+function pictureRow(ctx, pic, stack = false) {
     if (!pic) return '';
     // Two groups, each its own drawing (9 mm objects, RP-20 >= 8 mm), a clear gap between them;
     // in a narrow column the second group wraps under the first instead of shrinking (DN-10).
+    // `stack` (the sentence layout in a column, visual-quality lane 2026-10-31): each group on its own
+    // line, one under each story sentence's count, on EVERY item - a wrap that came and went with the
+    // two numbers gave the cells of one row different heights, so the row could only stretch as far as
+    // its shorter cell allowed and the page kept a 60 mm empty strip (PAGEFILL at L).
     const d = 9, pitch = d + 2.2;
     const group = (n) => {
         const w = (n - 1) * pitch + d + 2, h = d + 2;
@@ -922,7 +926,7 @@ function pictureRow(ctx, pic) {
         return `<svg class="k2-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n2(w)} ${n2(h)}" aria-hidden="true" `
             + `style="display:block;width:${L(ctx, w)};height:auto;max-width:100%;overflow:visible;">${body}</svg>`;
     };
-    return `<div role="img" aria-label="${pic.a} and ${pic.b} ${esc(shapeOf(pic.shape).plural)}" style="display:flex;flex-wrap:wrap;gap:${L(ctx, 3)} ${L(ctx, 9)};margin-top:${L(ctx, 1.5)};">${group(pic.a)}${group(pic.b)}</div>`;
+    return `<div role="img" aria-label="${pic.a} and ${pic.b} ${esc(shapeOf(pic.shape).plural)}" style="display:flex;${stack ? 'flex-direction:column;align-items:flex-start;' : 'flex-wrap:wrap;'}gap:${L(ctx, 3)} ${L(ctx, 9)};margin-top:${L(ctx, 1.5)};">${group(pic.a)}${group(pic.b)}</div>`;
 }
 
 /** "Answer: [box] ______" and the unit-word bank under it. */
@@ -1147,7 +1151,7 @@ function sentenceLayout(p, ctx) {
     // (a column too narrow for the word beside the box hangs the word UNDER the box: a lesson's two-across
     // cells and the page grids both hold it, nothing sticks out - PG-12)
     return `<div class="${cls}" data-ww-ops="${st.op}" data-read style="width:100%;${base}padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">`
-        + `${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic)}${kb}<div style="margin-top:${L(ctx, 3)};display:flex;${twin ? 'justify-content:center;' : ''}">${work}</div></div>`;
+        + `${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic, !twin)}${kb}<div style="margin-top:${L(ctx, 3)};display:flex;${twin ? 'justify-content:center;' : ''}">${work}</div></div>`;
 }
 
 /** Does a sentence layout's work fit a column of `cols` across at this size (else the cell is full width)? */

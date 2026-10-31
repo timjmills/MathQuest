@@ -1,6 +1,6 @@
 // gen-operations.js - Number & Operations + Integers question generation
 import { state } from './state.js';
-import { dealIndex, dealPick } from './page-deal.js';
+import { dealIndex, dealPick, freshDeal } from './page-deal.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
@@ -3233,13 +3233,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const wpMinOperand = maxVal <= 20 ? 1 : Math.max(2, Math.floor(maxVal / 20));
 
                 let a, b, answer;
-                if (isAdd) {
-                    [a, b] = generateAddPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand });
-                    answer = a + b;
+                // Visual-quality lane (2026-10-31, ws-dealer-uniform PAGE): within 20 the valid set is small
+                // (a story within 10 has 45 pairs), so plain draws printed 2 − 1 five times on a page. The pair
+                // is still the generator's own seeded draw, but one the page already holds is drawn again
+                // (page-deal.js freshDeal: no pair twice, a first number at most twice, an answer at most 3 times).
+                const _wpDraw = () => (isAdd ? generateAddPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand }) : generateSubPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand }));
+                if (maxVal <= 20) {
+                    const ans = (p) => (isAdd ? p[0] + p[1] : p[0] - p[1]);
+                    [a, b] = freshDeal(`wp:${op}:${maxVal}`, _wpDraw, { sig: (p) => `${p[0]},${p[1]}`, tags: (p) => [String(p[0]), String(ans(p))], caps: [2, 3] });
                 } else {
-                    [a, b] = generateSubPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand });
-                    answer = a - b;
+                    [a, b] = _wpDraw();
                 }
+                answer = isAdd ? a + b : a - b;
 
                 if (isAdd) {
                     const tpl = maxVal <= 100 ? [

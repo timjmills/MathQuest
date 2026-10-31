@@ -32,6 +32,7 @@
 // band; how many blanks a hundreds chart carries) are dealt across the page instead of ticked.
 // The registrations wanted are named in the wave report.
 import { state } from './state.js';
+import { dealIndex, freshDeal } from './page-deal.js';
 import { randInt, shuffle, pick } from './utils.js';
 import { MONO, MONO_STROKE } from './design-tokens.js';
 import { k2Twin, K2_SHAPES } from './sheet/index.js';
@@ -1347,20 +1348,29 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             { shape: 'fish', many: 'fish', place: 'in a pond', place2: 'in a tank', arrive: 'swim in' },
             { shape: 'star', many: 'stars', place: 'on a card', place2: 'on a page', arrive: 'are added' },
         ];
-        const scene = SCENES[_kDeal(SCENES.length)];
+        // L10 (visual-quality lane 2026-10-31): the scene and the story frame are dealt at random,
+        // balanced (page-deal.js), never by the item's position.
+        const scene = SCENES[dealIndex('wp10:scene', SCENES.length)];
         // P12: `band` "Total to" 5 or 7 (read off the raw options: the plain twin is generated here
         // under the base id, whose own panel does not declare it). The default, 10, is the old deal.
         const _wpBand = state.skillOptions && typeof state.skillOptions === 'object' ? Number(state.skillOptions.band) : NaN;
-        const sum = 4 + (_wpBand === 5 ? _kDealShuffled(2) : _wpBand === 7 ? _kDealShuffled(4) : _kDealShuffled(7));   // 4..10
-        const a = rng(2, sum - 2);
-        const b = sum - a;
+        const _wpMax = _wpBand === 5 || _wpBand === 7 ? _wpBand : 10;
+        // The total is drawn first from the seeded rng (4.._wpMax: "within 10" bounds the total, and no
+        // total takes a quarter of the page as a pair-first draw gives 10), then the first part (both
+        // parts 2 or more); a pair the page already holds is drawn again (freshDeal), so a page of 20
+        // never prints 2 + 2 three times. (ws-dealer-uniform: the old deal took the total from a
+        // permutation shuffled once a page, so 4 = 2 + 2 came every seventh item and 10 at one fixed
+        // position in seven.)
+        const [a, b] = freshDeal(`wp10:${_wpMax}`, () => { const t = rng(4, _wpMax); const x = rng(2, t - 2); return [x, t - x]; },
+            { sig: (p) => `${p[0]},${p[1]}`, tags: (p) => [String(p[0]), String(p[0] + p[1])], caps: [3, 3] });
+        const sum = a + b;
         const N = scene.many;
         const FRAMES = [
             [`There are ${a} ${N} ${scene.place}.`, `${b} more ${N} ${scene.arrive}.`, `How many ${N} are there now?`],
             [`${a} ${N} are ${scene.place}.`, `${b} ${N} are ${scene.place2}.`, `How many ${N} are there in all?`],
             [`I have ${a} ${N}.`, `I get ${b} more ${N}.`, `How many ${N} do I have now?`],
         ];
-        const lines = FRAMES[_kDeal(FRAMES.length)];
+        const lines = FRAMES[dealIndex('wp10:frame', FRAMES.length)];
         q.text = lines.join(' ');
         q.printText = 'Write the total in the box.';
         q.ans = sum;

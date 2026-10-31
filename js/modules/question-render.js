@@ -1539,9 +1539,23 @@ function _applyMapSlots(q) {
         input.dataset.mqMapHidden = '1';
         input.style.setProperty('display', 'none', 'important');
         visualAid.classList.add('mq-map-cellslots');
-        const first = visualAid.querySelector('input.mq-cellslot');
+        const first = _firstWriteBox(visualAid);
         if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
     }
+}
+
+// The box the pupil writes in FIRST. A word-problem number sentence (`[ ] ◯ [ ] = [ ] unit`, the
+// word-work cell's sentence layout) is written left to right: its first number box (input.mq-wwork)
+// comes before the answer box, so it takes the focus (visual-quality lane 2026-10-31, ws-phone-card
+// FOCUS). Every other drawing keeps its first answer slot.
+function _firstWriteBox(visualAid) {
+    const sentence = visualAid.querySelector('.mq-wwsentence');
+    if (sentence) {
+        const box = [...sentence.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
+            .find((el) => !el.disabled && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
+        if (box) return box;
+    }
+    return visualAid.querySelector('input.mq-cellslot');
 }
 
 // The answer slot's shape and blank width (section 6, SL-2).
@@ -1686,7 +1700,7 @@ function _applyScreenCell() {
             // several blanks in one drawing (a chart's empty cells): one input in each
             paper.classList.add('mq-slot-moved');
             visualAid.dataset.mqNoZoom = '1';
-            const first = visualAid.querySelector('input.mq-cellslot');
+            const first = _firstWriteBox(visualAid);
             if (first && !state.hasAnswered) {
                 try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
             }

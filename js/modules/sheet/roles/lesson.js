@@ -48,7 +48,7 @@ import {
     instructionText, instructionPart, assemble, poolItems, answerOf, oralFrameOf, operandsOf, opOf, labelStyleOf,
     esc, blank, stripExtraMm,
 } from './compose.js';
-import { resolveCtx, numeralTracksHTML } from '../index.js';
+import { resolveCtx, numeralTracksHTML, getCell } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
 import { evenGridState, factGridMini } from '../cells/mult-grid.js';
 import { dotTile, countCueOf, countCueRow } from './guided.js';
@@ -962,8 +962,38 @@ function twoState(it, k, c) {
     return html;
 }
 
+/**
+ * A one-step story in the word-work SENTENCE layout (`[ ] ◯ [ ] = [ ] unit`, visual-quality lane 2026-10-31):
+ * panel k draws the story and its sentence with the places of panels 0..k written (the newest grey, P-LC-9),
+ * the two story numbers ringed on panel 0 - and no picture row or word bank, so each panel fits half the
+ * chart (the full cell in a half panel stuck out of it by 26 mm). The marks name the places (fr0-a, fr0-b,
+ * op0, answer), so the panel that writes each one is read from the worked steps, not assumed.
+ */
+const isWordSentence = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.layout === 'sentence' && (cl.payload.steps || []).length === 1); };
+function sentenceState(it, groups, k, c) {
+    const p = Object.assign({}, it.q.cell.payload, { pic: null, kb: false });
+    const st = p.steps[0];
+    // (a half panel: the cell's column form - the story, then the sentence under it)
+    const ctx = Object.assign(resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined })), { columns: 2 });
+    const t = getCell('word-work');
+    let html = '';
+    try { html = t.render(p, ctx); } catch (e) { html = ''; }
+    const at = new Map();
+    groups.forEach((g, gi) => (g.marks || []).forEach((m) => { if (m && m.slot && !at.has(m.slot)) at.set(m.slot, gi); }));
+    html = html.replace(/(<span[^>]*data-ws-slot="(fr0-a|fr0-b|op0|answer)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
+        const g = at.has(id) ? at.get(id) : groups.length - 1;
+        const bare = open.replace(/ data-ws-ink="[a-z]+"/, '');
+        if (k < g) return bare + close;
+        return inkSpan(bare + val + close, k === g);
+    });
+    let ringed = 0;
+    html = html.replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${st.a}|${st.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring${k === 0 ? ' mq-lring-t' : ''}">${n}</span>`) : n))}<`));
+    return html;
+}
+
 function stateDrawing(it, steps, groups, k, c) {
     if (msOf({ q: it.q }) && steps.length === 4 && groups.length === 3) return unslot(twoState(it, k, c));
+    if (isWordSentence(it) && groups.length >= 2) return unslot(sentenceState(it, groups, k, c));
     if (isWordBar(it) && steps.length && /^bar-step-/.test((((steps[0] || {}).marks || [])[0] || {}).slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
