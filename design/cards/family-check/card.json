@@ -314,10 +314,10 @@
           "true",
           "false"
         ],
-        "d": "hidden",
+        "d": "offered",
         "proposed": true,
         "source": "critic r1 F6; PEDAGOGY P-21",
-        "why": "bold key words teach the keyword strategy on K-2 stories; the operation is chosen from the story's structure (P-21). Owner to rule; if kept it is offered and graded"
+        "why": "OWNER TO RULE (lead keeps it offered until then): bold key words / a keyword bank teach the keyword strategy, which P-21 forbids on K-2 stories (critic r1 F6). Proposed: hide it on these skills. While offered it is graded like any other option."
       },
       {
         "option": "wpBank",
@@ -325,10 +325,10 @@
           "true",
           "false"
         ],
-        "d": "hidden",
+        "d": "offered",
         "proposed": true,
         "source": "critic r1 F6; PEDAGOGY P-21",
-        "why": "a keyword bank is the keyword strategy (P-21). Owner to rule; if kept it is offered and graded"
+        "why": "OWNER TO RULE (lead keeps it offered until then): bold key words / a keyword bank teach the keyword strategy, which P-21 forbids on K-2 stories (critic r1 F6). Proposed: hide it on these skills. While offered it is graded like any other option."
       },
       {
         "option": "nlOn",
