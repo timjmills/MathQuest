@@ -429,3 +429,20 @@ Cost: round 3 ~$30 (≈ 1.1 %) of the $60 cap; lane total ~$312 (≈ 11 % of the
 4. Ported Lane D work outside the fact family (hand-over 1, item 6) is still not critic-ready.
 5. ws-stamp-assets before deploy.
 
+## HAND-OVER 4 (2026-10-31 ~23:00, R3-1 fix; stopped at the round-3 cap)
+
+R3-1 (div_facts answer zone moves with several supports) is FIXED at 880c4b40: SCC-T10 = 0 on test / independent / more-practice /
+review at S, M, L; backtest `support-fact-x-laned` FAIL on da684125 → OK. The precritic supports rows were widened to every
+role that offers supports and to one row per single support, and they found findings ALREADY on da684125 (not caused by
+the fix, never gated before), so precritic `--skill division:div_facts --strict` is red on 3 rows that are neither main-red
+nor pinned. Per the rule (never a critic on red) the narrow div_facts critic did NOT run; div_facts is not in redesign-passed.js.
+
+Open on div_facts (supports on):
+1. RP-1 with the skip support (×9 at S and L, ×1 with all supports): the skip strip of "12 ÷ 2" shows 2 4 6 8 10 12 and RP-1
+   matches the quotient 6 literally. Probably a false positive of a literal match (the strip lists multiples of the divisor,
+   not the answer) — needs a ruling (lead/critic): narrow RP-1 for skip strips, or change the strip.
+2. GRID-EVEN ×2 (skip, S/M), H13 ×3 (array, S/M/L), CL40-INK ×2 (skip, L).
+3. add/sub/mult single-support rows (new) and touch/think/boxsign at M/L were not run (budget): run them before the four
+   passed skills' next deploy gate, since the new precritic rows now cover them.
+Cost: R3-1 fix ~$12; round 3 total ~$37 (≈ 1.3 %) of the $60 cap; lane total ~$319 (≈ 11.4 % of the weekly limit).
+

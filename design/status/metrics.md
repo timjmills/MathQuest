@@ -472,3 +472,4 @@ all mq-opus-medium; ~7 h wall; ~$118 (≈ 4.2 % of the weekly limit). Lane total
 
 Lane D restart r3 (2026-10-31): critic r3 PASS 4/5 (add_facts, sub_facts, mult_facts, div_facts_long), div_facts FAIL (R3-1 only);
 2 builders + 1 critic (mq-opus-medium); ~3.5 h wall; ~$30 (≈ 1.1 %). Lane total ~$312 (≈ 11 % of the weekly limit), 3 critic rounds.
+Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows exposed 3 pre-existing red rows on div_facts supports; critic not run (red). ~$12.
