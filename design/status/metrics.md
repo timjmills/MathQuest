@@ -454,3 +454,6 @@ against this row.
 | Date | Deploy commit | Covered | Partial only | Gap | Skills tagged | Proposals |
 |---|---|--:|--:|--:|--:|--:|
 | 2026-10-23 | baseline (77e3225) | 513 / 872 (59 %) | 149 | 210 | 392 | 162 |
+
+Lane D restart (2026-10-30/31): 1 critic round, FAIL (4/4 fact skills), 16 findings (9 already red in gates before the critic);
+3 builders + 1 critic, all mq-opus-medium; ~9 h wall; ~$164 session cost (≈ 5.9 % of the weekly limit). Paused by the owner after r1.

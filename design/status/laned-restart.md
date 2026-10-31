@@ -125,3 +125,42 @@ before-*.png; practice card card-div_facts-{standard,fraction,long}-{390,1280}.p
 | ws-print-lint fact-rows L / S (div_facts, add_facts, sub_facts, mult_facts, add_sub_10s) | 0 | 0 (add_sub_10s n/a on main) |
 | ws-sheet-timing --seeds 10 | FAIL 10 of 20 (p90 3-9 s, max up to 17.9 s; 0 pages kept without a passing deal); the lane tip measured here at median 0.7-1.5 s | lane tip OK on the same 2 pools; open |
 | ws-precritic --strict (lane skills + 4 fact skills + fact-rows) | FAIL (15 of 28); see the builder A report for each gate against main | many pre-existing |
+
+## HAND-OVER (2026-10-31, owner pause: "finish the piece you are on, one critic round, then stop")
+
+Branch head: see `git log -1 claude/sweet-newton-c8wrv1-laneD-restart` (critic r1 at ecb1a5c4, on 31a856fd). Merged with main
+9d6f07b8. NOT deployed, NOT in redesign-passed.js. Lane cost at stop: about $164 of session cost (≈ 5.9 % of the weekly limit at $28 ≈ 1 %).
+
+### Done
+- Lane D r3–r12d code ported onto today's kit (builder A; conflict table above). Today's behaviour kept where newer.
+- ÷ facts reach 10 columns on fact rows in all three notations (builder B): ÷ sign stacked like + − × (Standard and Vertical),
+  fraction a/b with the answer line under it, compact long-division bracket; digits ≥ 16 pt; ink ≥ 1 mm clear each side.
+  + − × fact rows byte-identical (10 / 10 / 8). New rule id VA-2a; PAGE_TYPES PT-FRW-9; layout-unit block PT-FRW-9.
+- sub_facts on the kit fact cell (H13 at S/M fixed; root causes: left out of `_KIT_FACT_SKILLS`, and a 1.2× dense-room double count).
+- Facts spec card `design/cards/facts/` written, UNSIGNED (5 open questions; the lead puts them to the owner).
+- Main merged; long-division `rowTrack` ReferenceError and a CL-40 pad overflow fixed; evidence PNGs in `design/status/laned-restart/`.
+- Critic r1 (independent, mq-opus-medium): `design/audit/runs/laned-restart/critic-r1.md` — **all four skills FAIL**.
+  Scoring ≥ 8: fact rows + − × 9/9/9/9, ÷ Standard/Vertical 9/9/9/9, ÷ fraction 8/8/8/8; Independent, More practice, Test, Fact probe,
+  Word problems, True or False?, Stretch 8–9; practice card (390/820/1280) and quiz 9 for every ÷ form.
+
+### Remaining, in order (next round runs at Opus medium: rebuild of critic-failed work)
+1. R1-1 bracket arc touches the first dividend digit ("4)8" reads 48) at 5–10 columns: open the gutter / draw the arc clear; add
+   L-OVERLAP ARC-INK (arc to first digit ink ≥ 0.3 mm; backtest fails on 31a856fd, passes on main 9d6f07b8). Card Q3 answer depends on it.
+2. R1-6 regression from the port: add_facts lesson page 2 warm-up overflows, loses its 4th item, covers "Guided Practice".
+3. R1-2 Mix fact rows last row widened (uneven grid); R1-16 Mix online worksheet (three digit sizes, uneven cards).
+4. R1-15 div fraction numerator "110" in the tab keep-out at L (Opener, Review, Reason It); R1-4 div supports think/boxsign break the page (main as bad).
+5. Shared-role defects, mostly pre-existing on main, that block every fact skill: R1-3 Scripted model (blank key, repeated fact, H13),
+   R1-5 lesson Steps panels vs guided items, R1-7 Mixed practice S < M, R1-8 Pre-skill check (own skill, 80 % blank), R1-9 Reason It
+   CL40-INK, R1-10 add Review M H13, R1-11 div Review L count-by strip, R1-12 across CL40-INK, R1-13 guided cells 46 % empty, R1-14 Opener "Use the dots".
+   These are role-engine work: decide with the lead whether the fact family waits for them or they go to the owning lanes.
+6. Ported Lane D work OUTSIDE the fact family is not critic-ready (builder A's open list): pool build time vs ws-sheet-timing
+   (10/20 fail), number_families L H13-ROW (doubles beside 4-sentence families under the top start), mult_comparison card focus and
+   wpBank/wpBar no-ops, div_zero_in_quotient / remainder_interpret 2–3 px clip at 390, odd_even range no-op, pool options no-ops,
+   div_zero_in_quotient dealer-uniform (ruling or pin), whole_as_fraction / number_families_mult REPEATS, composing:fraction_number_line lessonfit.
+   Plus after the merge CSS: add_sub_10s Test S H13 ×40, missing_mult_div More practice L CL40-INK ×2.
+7. `ws-stamp-assets` before any deploy.
+
+### Open decisions (owner)
+- Sign `design/cards/facts/facts.md` (Q1–Q5; critic: Q3 not acceptable as drawn until R1-1 is fixed).
+- div_zero_in_quotient: keep the 1-in-4 ones-zero deal (pin dealer-uniform) or deal uniformly.
+- Whether shared-role defects (item 5) gate the fact family or move to their own lanes.
