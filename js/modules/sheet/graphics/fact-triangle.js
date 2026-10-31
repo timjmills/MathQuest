@@ -41,8 +41,8 @@ export function factTriangle(ctx, o = {}) {
         : '';
     const body = outline
         + num(m + s / 2, m + h * 0.43, o.top)
-        + num(m + s * 0.26, m + h * 0.8, o.left)
-        + num(m + s * 0.74, m + h * 0.8, o.right)
+        + num(m + s * 0.29, m + h * 0.79, o.left)
+        + num(m + s * 0.71, m + h * 0.79, o.right)
         + signs;
     const W = s + 2 * m, H = h + 2 * m;
     const label = esc(o.label || `fact triangle: ${o.top} at the top, ${o.left} and ${o.right} below`);
