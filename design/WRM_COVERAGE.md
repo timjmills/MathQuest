@@ -233,7 +233,7 @@ existing skill instead of adding a new id ("a ladder step is a skill plus option
 - **Equivalent Fractions on a Number Line (option)** — option on `fractions:equiv_frac_visual`: number lines. Teaches equivalent fractions shown on stacked number lines. Representation: a double number-line representation option.  
   Closes (1): Y6.B3.S2 Equivalent fractions on a number line  
   _proposal id: frac_nl_equiv_
-- **Compare Fractions by Numerator (option)** — option on `fractions:compare`: same numerator. Teaches comparing and ordering fractions with the same numerator (3/5 > 3/7) and by denominators. Representation: a comparison-type option on compare/order.  
+- **Compare Fractions With the Same Numerator or Denominator (option)** — option on `fractions:compare`: pairs "same numerator" | "same denominator". Teaches comparing and ordering unit fractions (1/3 > 1/5) and two fractions that share a numerator (3/5 > 3/7) or a denominator (3/8 < 5/8), with bars of the same whole, and saying why. Representation: the existing compare cell with two bars of the same whole; the < > = answer box.  
   Closes (1): Y6.B3.S4 Compare and order (numerator)  
   _proposal id: compare_numerator_
 - **Multi-Step Fraction Problems** — new skill `fraction_operations:fraction_multi_step_problems`. Teaches multi-step word problems with adding and subtracting fractions, using a bar model. Representation: a bar model with the steps; write each step's answer.  
@@ -3461,7 +3461,7 @@ whatever happens to the WRM gaps.
   Skills: Order Fractions (`fractions:order_fractions`); Compare Fractions (LCD) (`fractions:compare_frac_lcd`)  
   Vocabulary: numerator, denominator, common denominator  
 - **Y6.B3.S4** Compare and order (numerator) — GAP. _4.NF.A.2, M.EE.4.NF.2_  
-  Proposal: Compare Fractions by Numerator (option)  
+  Proposal: Compare Fractions With the Same Numerator or Denominator (option)  
   Vocabulary: numerator, denominator, common numerator  
 - **Y6.B3.S5** Add and subtract simple fractions — covered. _5.NF.A.1, M.EE.5.NF.1_  
   Skills: Add Fractions (Unlike Denom) (Visual) (`fraction_operations:add_frac_unlike`); Subtract Fractions (Unlike Denom) (Visual) (`fraction_operations:sub_frac_unlike`)  
