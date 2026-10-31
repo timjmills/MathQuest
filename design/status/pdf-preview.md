@@ -46,6 +46,18 @@ after page 1 at 4×); pressed the instant page 1 appears, the whole set waits fo
 at 4×), which this lane does not change. Before this lane there was no full preview: Print built everything
 (5.4 s at 4×) and opened the dialog.
 
+## For the lead: print defects seen through the preview (not this lane's fix)
+- 2026-10-31 (lead query on desktop-1366-preview.png item 7): **not a clip.** That screenshot's window is 900 px tall
+  and cuts through the third row's cells; the cell is whole. Checked: 15 builds (≈ 120 pages) of the 3-skill mix, 0
+  cells with content past their border in the preview; whole-page side-by-side preview vs Chrome PDF
+  (`design/status/pdf-preview/parity-preview-vs-pdf-page1.png`, a missing-addend stack as item 1) lays out the same.
+- **Existing print defect (engine, mixed practice):** short sections leave empty cells (a 2-item section takes a
+  full row with one wide empty cell; same on paper and in the preview).
+- **To verify (print path, possible):** in the harness PDF (puppeteer `page.pdf` after `setContent` + `fonts.ready`)
+  the page title "Mixed practice" and the Name / Date labels render in a fallback sans, not Andika bold; the screen
+  shows Andika bold. If the real print dialog (`printHtml`, which waits for `data-ws-fonts=ready`) can also beat the
+  bold face, printed titles would change font. Not paginating differently (the parity gate holds).
+
 ## Times
 Times: builder build-1, start 2026-10-31T10:05Z, end 2026-10-31T11:05Z, profile —
 
