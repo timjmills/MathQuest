@@ -33,7 +33,7 @@ Critic rounds: 1, FAIL (lowest O6 = 3; print P = 5 on the fact template)
     25.6 px digit boxes on 27.7 px tracks. Checks c, d, e therefore run on the teacher's values only.
 
 ## Times
-Times: fix r2 (rebuild after critic r1), start 2026-10-31T10:40Z, end 2026-10-31T14:10Z, profile mq-opus-medium
+Times: fix r2 (rebuild after critic r1), start 2026-10-31T10:40Z, end 2026-10-31T12:55Z, profile mq-opus-medium
 
 ## r1 findings → what changed → the check that now catches it
 
