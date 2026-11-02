@@ -3,10 +3,10 @@ Title: Student Chromebook speed: lazy-load the teacher half, stress-test the pla
 Session: session_013pHDnKbPEj3tNpvzK4cQMa (lead session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-chromebook-speed
 Owner of files: js/globals.js (loader), js/modules/deferred.js (new), js/modules/init.js (deferred imports), index.html (two third-party scripts, ten data-mq-href stylesheets), js/modules/screen-cell.js (inkTrees, wireSwipeRows level), js/modules/question-render.js (_clearRefLineOfHeader), print-global-skills.js / print-weighted.js (no reset at import), tests/scripts/ws-chromebook-perf.cjs, tests/scripts/ws-ink-parity.cjs, tests/lib/perf-server.cjs, tests/lib/ws-harness.cjs (waits for the lazy parts)
-State: critic (r1 FAIL, fixed; r2 next)
+State: passed (checker r2)
 Updated: 2026-11-02
 Builder profile: lane session (first build of the loader)
-Critic rounds: 1, FAIL (6/8/6/7) - fixed, r2 pending
+Critic rounds: 2, PASS (r2: 8/8/8/8)
 
 ## Now
 - Built and measured; independent checker (mq-opus-medium) verifying teacher features, pupil paths and the budgets.
@@ -81,6 +81,12 @@ No memory leak and no timer pile-up was found: heap growth is ~4 MB over 50 ques
 Times: builder loader + gate + play-through fixes, start 2026-11-02T05:05Z, end 2026-11-02T07:45Z, profile lane session
 
 ## Log
+- 2026-11-02: checker r2 PASS (correctness 8, speed 8, gate 8, code 8). D1-D8 verified (drop + retry, double drop -> reload
+  toast, pupil exit loads nothing, MAP scaffold still released, D6 backtested). Open minor items for the lead: the loading
+  toast can time out before a very slow download ends and a click during the wait can be lost; after a permanent failure an
+  inline onclick on a stub logs an unhandled rejection (the reload toast is showing); the first-visit gain is -34.7 % to
+  -37 % across runs (target -35 %); the later-visit budget (2.3 s) is a ceiling above the base median, not a guard of the
+  gain; `--only load,play` (~4 min) is UNTIMED in session 3 (27.8 of 30 min) and shares the 2-slot runner.
 - 2026-11-02: checker r1 FAIL (correctness 6, speed 8, gate 6, code 7). Fixed: D1 a failed import() is cached by the browser
   for the page's life, so "retry on the next call" never refetched -> a retry imports a fresh URL (?retry=n) and a second
   failure tells the teacher to reload; D2 exitGame/goHome called the MAP release stub and pulled the teacher half into a
