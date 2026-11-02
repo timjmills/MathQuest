@@ -13,10 +13,32 @@ self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => {
     event.waitUntil((async () => {
         const keys = await caches.keys();
-        await Promise.all(keys.filter((k) => k.startsWith('mq-') && k !== CACHE).map((k) => caches.delete(k)));
+        await Promise.all(keys.filter((k) => k.startsWith('mq-') && k !== CACHE && k !== 'mq-page-v1').map((k) => caches.delete(k)));
         await self.clients.claim();
     })());
 });
+
+// The page itself (2026-11-02, owner: school Chromebooks got ERR_CONNECTION_RESET on the student link): network
+// first, always, so a deploy is seen at once; the last good copy is kept and served ONLY when the network fails
+// (reset, timeout, offline). The query string is ignored for the copy, so every ?c= link opens from it.
+const PAGE_CACHE = 'mq-page-v1';
+const PAGE_KEY = 'mq-page-index';
+async function pageFromNetworkOrCopy(req) {
+    try {
+        const res = await fetch(req);
+        if (res && res.ok && res.type === 'basic') {
+            try { const c = await caches.open(PAGE_CACHE); await c.put(PAGE_KEY, res.clone()); } catch (e) { /* ignore */ }
+        }
+        return res;
+    } catch (err) {
+        try {
+            const c = await caches.open(PAGE_CACHE);
+            const copy = await c.match(PAGE_KEY);
+            if (copy) return copy;
+        } catch (e) { /* fall through */ }
+        throw err;
+    }
+}
 
 self.addEventListener('fetch', (event) => {
     const req = event.request;
@@ -24,6 +46,10 @@ self.addEventListener('fetch', (event) => {
     let url;
     try { url = new URL(req.url); } catch (e) { return; }
     if (url.origin !== self.location.origin) return;
+    if (req.mode === 'navigate' && (url.pathname === '/' || url.pathname === '/index.html')) {
+        event.respondWith(pageFromNetworkOrCopy(req));
+        return;
+    }
     if (!/^[0-9a-f]{6,}$/.test(url.searchParams.get('v') || '')) return;
     if (!/\.(js|css)$/.test(url.pathname)) return;
     event.respondWith((async () => {
