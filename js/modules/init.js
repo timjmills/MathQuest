@@ -129,6 +129,12 @@ export function checkURLParameters() {
     if (mapParam) {
         const cleanUrl = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
+        if (window.parseMapShareLink && window.parseMapShareLink.__mqStub) {
+            // the MAP part did not load before init (globals.js awaited it): retry it, then open the link
+            window.parseMapShareLink(mapParam).then((p) => { if (p && p.tier && p.mode && p.bands && p.bands.length && p.domains && p.domains.length) window.loadMapShareLink(p); })
+                .catch((e) => console.warn('[MAP] the MAP part did not load:', e));
+            return;
+        }
         const parsed = window.parseMapShareLink(mapParam);
         if (parsed && parsed.tier && parsed.mode &&
             parsed.bands && parsed.bands.length &&
@@ -152,7 +158,7 @@ export function checkURLParameters() {
                 if (typeof window.handleQuizURL === 'function') {
                     window.handleQuizURL(quizParam);
                 }
-            });
+            }).catch((e) => console.warn('[quiz] the quiz part did not load:', e));
         }
         return;
     }

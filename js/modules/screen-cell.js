@@ -2718,7 +2718,6 @@ function inkTrees(roots) {
     });
 }
 
-function inkTree(root) { inkTrees([root]); }
 
 const OBSERVERS = new WeakMap();
 const AFTER_INK = new WeakMap();

@@ -3,10 +3,10 @@ Title: Student Chromebook speed: lazy-load the teacher half, stress-test the pla
 Session: session_013pHDnKbPEj3tNpvzK4cQMa (lead session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-chromebook-speed
 Owner of files: js/globals.js (loader), js/modules/deferred.js (new), js/modules/init.js (deferred imports), index.html (two third-party scripts, ten data-mq-href stylesheets), js/modules/screen-cell.js (inkTrees, wireSwipeRows level), js/modules/question-render.js (_clearRefLineOfHeader), print-global-skills.js / print-weighted.js (no reset at import), tests/scripts/ws-chromebook-perf.cjs, tests/scripts/ws-ink-parity.cjs, tests/lib/perf-server.cjs, tests/lib/ws-harness.cjs (waits for the lazy parts)
-State: critic
+State: critic (r1 FAIL, fixed; r2 next)
 Updated: 2026-11-02
 Builder profile: lane session (first build of the loader)
-Critic rounds: see Log
+Critic rounds: 1, FAIL (6/8/6/7) - fixed, r2 pending
 
 ## Now
 - Built and measured; independent checker (mq-opus-medium) verifying teacher features, pupil paths and the budgets.
@@ -62,8 +62,7 @@ Critic rounds: see Log
 | Stress, ~150 skills over 35 categories: max question / long tasks > 200 ms / longest | 1,853 ms / 55 / 5,642 ms | 802 ms / 32 / 487 ms |
 | Heap growth over 50 questions (after GC) | +3.6 MB / +5.2 MB | +3.4 MB / +4.0 MB |
 | Live intervals / window+document listeners | 3 -> 1 / 113 -> 115 | 3 -> 1 / 79 -> 90 |
-| Teacher view ready (switch from student view) | 7.4 s | 4.5 s (prefetched on idle) |
-| Teacher, 100 skills: tray / print preview / quiz sheet (CPU 4x) | 2.6 s / 88 s / 10.5 s | ~2.1 s / ~80 s / ~9.7 s |
+| Teacher, after the idle prefetch, 100 skills, CPU 4x, settled = 2.5 s quiet: view / tray / print preview / quiz sheet | 7.6 / 2.1 / 74-88 / 25 s | 7.7 / 2.4 / 74-83 / 26 s (unchanged within noise) |
 Live (the lead measured 1375b857b live at 17.1 s first / ~7 s later visit): to be re-measured live after the deploy.
 No memory leak and no timer pile-up was found: heap growth is ~4 MB over 50 questions, intervals and listeners are flat.
 
@@ -82,5 +81,16 @@ No memory leak and no timer pile-up was found: heap growth is ~4 MB over 50 ques
 Times: builder loader + gate + play-through fixes, start 2026-11-02T05:05Z, end 2026-11-02T07:45Z, profile lane session
 
 ## Log
+- 2026-11-02: checker r1 FAIL (correctness 6, speed 8, gate 6, code 7). Fixed: D1 a failed import() is cached by the browser
+  for the page's life, so "retry on the next call" never refetched -> a retry imports a fresh URL (?retry=n) and a second
+  failure tells the teacher to reload; D2 exitGame/goHome called the MAP release stub and pulled the teacher half into a
+  pupil's exit -> skipped while it is a stub, and the gate now leaves the game and checks again; D3 one-sample load and one
+  tray open flaked -> load median of 3, the cold tray open judged, the deploy list runs `--only load,play` (~4 min; the
+  sessions are at 27-28 of 30 min), the flake rule re-runs a FAIL alone; D4 a switch to teacher view while the half is
+  still downloading says "Loading the teacher tools"; D5 ?quiz= / ?map= after a failed boot load log the cause (and ?map=
+  retries) instead of an unhandled rejection / a false "invalid link"; D6 the gate checks DEFERRED_NAMES against
+  deferred.js's API and that no lazy name is still a stub; D7 the teacher figures: settle() ended early in the Skills
+  screen's thumbnail pauses -> 2.5 s quiet; like for like the teacher side equals the base (the earlier "7.4 -> 4.5 s" was
+  that artefact); D8 dead inkTree removed, stray comment fixed, heap budget 20 MB and listeners +40.
 - 2026-11-02: built (loader, deferred.js, worksheet part, deferred CSS, play-through fixes, ws-chromebook-perf, ws-ink-parity);
   measurements above; independent checker next.

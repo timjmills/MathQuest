@@ -156,6 +156,14 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
   changes; drop a measurement that the caller repeats straight after. *Check:* `ws-chromebook-perf --why` lists the callers
   of every forced layout of a slow question; `ws-ink-parity` (colours, `--geometry` boxes) proves a batched rewrite paints
   and lays out the same as the old tree.
+- **A failed `import()` is cached for the life of the page.** Retrying the same URL rejects at once with no request;
+  retry with a fresh URL and, if that fails, tell the user to reload. A stub on window is also a trap for code that "calls
+  it if it exists": guard with `!fn.__mqStub` where a call would only download a part to do nothing. *Check:* the checker's
+  drop-then-retry probe (route abort, `serviceWorkers: 'block'` - a page the service worker controls fetches through it,
+  out of Playwright's sight); `ws-chromebook-perf` leaves the game and asserts no deferred module loaded.
+- **"Settled" must outlast the app's own quiet rules.** A 600 ms quiet window ended inside the Skills screen's thumbnail
+  pauses and the Print screen's 1.5 s quiet-before-background rule, so one tree measured 3 s and the other 7 s for the same
+  work. Use a window longer than any deliberate pause (2.5-3 s) and compare like for like.
 - **Time a perf change against the base on the same machine.** Live and local differ (17.1 s live vs 10.85 s local for the
   same commit); the budget is a ratio of the base measured with the same harness, plus exact byte / module budgets that
   cannot flake. Never run two timing runs, or a timing run and another browser gate, at once.

@@ -521,13 +521,25 @@ function loadDeferredCss() {
 }
 // One lazy part: a thin async stub on window for each name until importer() resolves to { name: fn }, then the real
 // functions replace the stubs. A failed load (a Wi-Fi drop) is retried by the next call.
+// Chrome remembers a failed import() of a URL for the life of the page, so a retry imports a fresh URL (?retry=n; the
+// module's own imports keep their stamped URLs). If that fails too, the teacher is told to reload (checker r1 D1).
+let lazyNotice = 0;
+function lazyFailed(label) {
+    if (Date.now() - lazyNotice < 8000) return;
+    lazyNotice = Date.now();
+    const msg = `The ${label} tools did not load (the connection dropped). Reload the page to try again.`;
+    try { if (typeof window.showToast === 'function') window.showToast(msg, 'error'); else console.warn(msg); } catch (e) { /* no toast */ }
+}
 function makeLazy(label, importer, names) {
     let promise = null;
+    let tries = 0;
     const load = () => {
         if (!promise) {
-            promise = importer().then((api) => { Object.assign(window, api); return api; }).catch((err) => {
+            const n = tries++;
+            promise = importer(n).then((api) => { Object.assign(window, api); return api; }).catch((err) => {
                 promise = null;
                 console.warn(`[MathQuest] the ${label} part did not load:`, err);
+                if (n >= 1) lazyFailed(label);
                 throw err;
             });
         }
@@ -551,12 +563,15 @@ function makeLazy(label, importer, names) {
 // The shared arrays the print modules used to create at import: create them here so a late import never resets them.
 if (!Array.isArray(window.globalSkillsList)) window.globalSkillsList = [];
 if (!Array.isArray(window.weightedItems)) window.weightedItems = [];
-const loadDeferred = makeLazy('teacher / print', () => Promise.all([import('./modules/deferred.js'), loadDeferredCss()]).then(([m]) => {
+const loadDeferred = makeLazy('teacher / print', (n) => Promise.all([
+    n ? import(`./modules/deferred.js?retry=${n}`) : import('./modules/deferred.js'), loadDeferredCss(),
+]).then(([m]) => {
     window.__mqDeferredLoaded = true;
     try { document.dispatchEvent(new CustomEvent('mq:deferred-ready')); } catch (e) { /* old browser */ }
     return m.API;
 }), DEFERRED_NAMES);
 window.__mqLoadDeferred = loadDeferred;
+window.__mqLazyNames = { deferred: DEFERRED_NAMES };   // ws-chromebook-perf: every one must be real once loaded
 
 // The online worksheet mode (165 KB): only a worksheet game (initWorksheet) and the markup it draws call into it.
 const WORKSHEET_NAMES = [
@@ -567,9 +582,10 @@ const WORKSHEET_NAMES = [
     'checkAreaModelInput', 'checkWorksheetNumberFamily', 'checkWorksheetMC', 'showWorksheetScore', 'wsMagnifyCard',
     'wsSpeak', 'wsSkipCard', 'attachWorksheetZoom',
 ];
-const loadWorksheet = makeLazy('worksheet', () => import('./modules/worksheet.js')
+const loadWorksheet = makeLazy('worksheet', (n) => (n ? import(`./modules/worksheet.js?retry=${n}`) : import('./modules/worksheet.js'))
     .then((m) => Object.fromEntries(WORKSHEET_NAMES.map((n) => [n, m[n]]))), WORKSHEET_NAMES);
 window.__mqLoadWorksheet = loadWorksheet;
+window.__mqLazyNames.worksheet = WORKSHEET_NAMES;
 
 // Who needs the deferred half BEFORE init runs (so they see exactly what they saw before the split):
 //   a MAP or quiz link (?map= / ?quiz=), a Send link's &set=, the teacher board (?board=1 on a teacher device),
@@ -620,6 +636,8 @@ if (!window.__mqDeferredLoaded) {
     const roleWatch = new MutationObserver(() => {
         if (!document.body.classList.contains('teacher-mode')) return;
         roleWatch.disconnect();
+        // still downloading (a slow connection): say so, rather than a half-built screen (checker r1 D4)
+        if (!window.__mqDeferredLoaded) { try { window.showToast('Loading the teacher tools…', 'info'); } catch (e) { /* no toast */ } }
         prefetch();
     });
     if (document.body.classList.contains('teacher-mode')) prefetch();

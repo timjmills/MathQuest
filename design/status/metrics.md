@@ -473,5 +473,5 @@ against this row.
 | Pupil later visit | 2.00 s | 1.49 s |
 | 50-question play-through at CPU 6x: questions > 1 s / longest task | 6 / 4.8 s | skip-count only (pinned, F1) / ~1 s |
 | ~150-skill stress: max question / longest task | 1.85 s / 5.6 s | 0.81 s / 0.49 s |
-| Teacher, 100 skills: tray / print preview / quiz sheet (CPU 4x) | 2.6 / 88 / 10.5 s | 2.1 / ~80 / ~9.7 s |
+| Teacher, 100 skills, CPU 4x: view / tray / print preview / quiz sheet | 7.6 / 2.1 / 74-88 / 25 s | 7.7 / 2.4 / 74-83 / 26 s |
 
