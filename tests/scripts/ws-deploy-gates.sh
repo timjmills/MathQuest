@@ -53,7 +53,8 @@
 #            --need-ans 1/4,1/2,3/4: readings under an inch show one answer area), and the sweeps on the pinned sample
 #            (tests/fixtures/precritic/sweep-sample.json): ws-screen-slots --dark / --bigboard, ws-chromebook-fit
 #            --dark / --bigboard (chromebook-fit's standing failures are pinned per skill and host in the sample file).
-# Session 3  ws-viewport-check --baseline design/audit/baselines/viewport-check.json (a real session's scroll: the
+# Session 3  ws-chromebook-perf (the student-Chromebook load / play-through / teacher-tray budgets, 2026-11-02),
+#            ws-viewport-check --baseline design/audit/baselines/viewport-check.json (a real session's scroll: the
 #            R7-D1 class chromebook-fit cannot see; moved here from session 2 for time, MQ_VIEWPORT_SESSION=2 moves it
 #            back), and ws-coverage-matrix on the affected rows with a DOCUMENT BUDGET (§1.6.2): MQ_COVERAGE_ARGS, default
 #            `--all --affected <base>..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9`, plus
@@ -863,6 +864,9 @@ build_list() {
   # deployed tip reaches, capped at MQ_MATRIX_BUDGET documents; over it the newest nightly decides (matrix_gate).
   if [ -f "tests/scripts/$cm" ]; then add 3 nfn "ws-coverage-matrix --affected (budget $MATRIX_BUDGET)" "matrix_gate tests/scripts/$cm"
   else add 3 skip "ws-coverage-matrix --affected" "tests/scripts/$cm"; fi
+  # the student-Chromebook speed gate (speed lane 2026-11-02): load timings, the 46- and ~150-skill play-throughs at CPU 6x,
+  # the 100-skill teacher tray. Its timings want a quiet machine, so it runs here, after session 2's sweeps (~8 min).
+  browser_gate 3 ws-chromebook-perf ws-chromebook-perf.cjs
   add 3 notyet "digests hook (M4 record/replay)" "the tip's digests (§1.6.2, ≈ 8 min) need M4 record/replay, which is not built; before M4 the lead accepts this one item by name: --accept-notyet digests" digests
   add 3 fn "owner go (lane manifests)" "deploy_check design/lanes design/status"
 }

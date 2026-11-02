@@ -1440,7 +1440,16 @@ function _clearRefLineOfHeader() {
         // the header: every sticky / fixed bar pinned to the top of the window, outside the card
         // (toasts, modals and pop-ups are not bars)
         let hdr = 0;
-        for (const el of document.querySelectorAll('body *')) {
+        // Only rendered elements outside the card can be a bar: a display:none subtree (the hidden views, the teacher
+        // site) and the card are pruned whole, which the checks below would discard one by one (Chromebook speed lane,
+        // 2026-11-02: reading the style of all ~2,600 elements after every scroll cost ~60 ms a question at CPU 6x).
+        const card0 = document.getElementById('questionCard');
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT, {
+            acceptNode: (n) => (n === card0 || getComputedStyle(n).display === 'none') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+        });
+        const rendered = [];
+        while (walker.nextNode()) rendered.push(walker.currentNode);
+        for (const el of rendered) {
             const cs = getComputedStyle(el);
             if (cs.position !== 'sticky' && cs.position !== 'fixed') continue;
             if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) continue;

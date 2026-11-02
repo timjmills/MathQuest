@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, sortByGrade } from './data.js';
 import { searchSkillIndex } from './skill-search.js';
 
-window.weightedItems = [];
+window.weightedItems = window.weightedItems || [];   // globals.js creates it (this module loads late)
 
 export function togglePrintSource(row) {
     const radio = row.querySelector('input[type="radio"]');

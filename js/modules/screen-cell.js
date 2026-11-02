@@ -1676,13 +1676,21 @@ function wireSwipeRows(cellEl) {
             if (!col) return;
             const lines = w.querySelectorAll('.k2-countrow-line');
             const swipes = frame && (frame.hasAttribute('data-mq-swipes') || frame.hasAttribute('data-mq-tabtop'));
-            col.querySelectorAll('[data-mq-tabfor]').forEach((t) => {
+            // every line is measured first, then every tab written: measuring after each write re-laid the page once per
+            // tab, several times a question (Chromebook speed lane, 2026-11-02). A line's height never depends on its tab.
+            const wrapfit = w.hasAttribute('data-mq-wrapfit');
+            const tabs = [...col.querySelectorAll('[data-mq-tabfor]')].map((t) => {
                 const ln = lines[Number(t.getAttribute('data-mq-tabfor'))];
-                if (!ln) return;
-                t.style.height = swipes ? '' : `${ln.getBoundingClientRect().height}px`;
-                t.style.marginTop = swipes ? '' : getComputedStyle(ln).marginTop;
-                t.style.alignItems = w.hasAttribute('data-mq-wrapfit') ? 'flex-start' : '';
-            });
+                return ln ? [t, swipes ? null : ln.getBoundingClientRect().height, swipes ? null : getComputedStyle(ln).marginTop] : null;
+            }).filter(Boolean);
+            // ... and only a value that changes is written: level() runs many times a layout, and an unchanged write still
+            // makes the next measurement lay the page out again
+            const put = (t, prop, v) => { if (t.style[prop] !== v) t.style[prop] = v; };
+            for (const [t, h, mt] of tabs) {
+                put(t, 'height', swipes ? '' : `${h}px`);
+                put(t, 'marginTop', swipes ? '' : mt);
+                put(t, 'alignItems', wrapfit ? 'flex-start' : '');
+            }
         };
         // the row's end lands on a column start too (a little air after the last line), so scrolling to the end cuts no number
         const body = w.querySelector('.k2-countrow-body');
@@ -1860,13 +1868,14 @@ function wireSwipeRows(cellEl) {
                 c.style.flexWrap = 'wrap'; c.style.rowGap = '12px'; c.style.maxWidth = `${Math.ceil(k * pitch - gap + 1)}px`;
                 [...c.children].forEach((x, i) => { if (i && i % k === 0) x.setAttribute('data-mq-leadin', ''); });
             });
-            level();
-            return true;
+            return true;   // layout() returns at once and mode()'s upd() levels the tabs
         };
         // the cue's state, from the row as it stands (skip-count r3 D7: set at the end of every layout and late fit, never stale)
         const upd = () => { level(); lastSL = w.scrollLeft; w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', !moreRight()); };
         let laidInner = 0;
         const mode = () => { layout(); alignAxis(); upd(); };
+        // layout() is only ever run by mode(), whose upd() levels the step tabs straight after it: a level() just before
+        // a return of layout() measured the lines once more for nothing (Chromebook speed lane, 2026-11-02)
         const layout = () => {
             clearAll();
             // the phone draws ~29 px digits (fitTwinRows' phone rule reads the fonts only), then caps the gap
@@ -1885,11 +1894,11 @@ function wireSwipeRows(cellEl) {
             const tabTop = () => !!frame && (frame.hasAttribute('data-mq-tabtop') || frame.hasAttribute('data-mq-swipes'));
             const fits = () => { alignAxis(); return body.getBoundingClientRect().width + (tabTop() ? 0 : colW()) <= inner + 1; };
             // (4) choose: the row fits beside its step tab
-            if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+            if (fits()) { w.style.overflowX = 'visible'; return; }
             // a number line: the step tab goes above and the line is tried whole at its full size before anything shrinks (r1 order)
             if (isAxis && frame) {
                 frame.setAttribute('data-mq-tabtop', ''); level();
-                if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+                if (fits()) { w.style.overflowX = 'visible'; return; }
             }
             // ... or it fits once the drawing shrinks, never below a 44 px box (SP-10): a wider-than-phone window only
             if (twin && window.innerWidth > 480) {
@@ -1905,7 +1914,7 @@ function wireSwipeRows(cellEl) {
                 const k = Math.max(Math.min(cur, floorK), cur * (inner - (tabTop() ? 0 : colW())) / bw * 0.995);
                 if (k < cur - 0.01) {
                     twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`);
-                    if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+                    if (fits()) { w.style.overflowX = 'visible'; return; }
                     // still too wide: at Chromebook width the row wraps at its full size; narrower, it swipes at the floor
                     if (window.innerWidth >= 1024) { if (twin.dataset.mqK2Orig) twin.style.setProperty('--mq-k2', twin.dataset.mqK2Orig); else twin.style.removeProperty('--mq-k2'); }
                 }
@@ -1940,7 +1949,7 @@ function wireSwipeRows(cellEl) {
             const lead = Math.max(0, a.left - w.getBoundingClientRect().left);
             const n = Math.max(1, Math.floor((avail - lead + gap + 0.5) / pitch));
             // critic C2 r7: when every column of a line fits (the tab above), the window takes the full width and does not scroll
-            if (n >= its.length) { w.style.overflowX = 'visible'; level(); return; }
+            if (n >= its.length) { w.style.overflowX = 'visible'; return; }
             const win = Math.min(avail, lead + n * pitch - gap + 3);
             w.style.width = `${win}px`; w.style.maxWidth = `${Math.floor(avail)}px`;
             frame.style.minWidth = `${Math.ceil(win)}px`;     // the drawing around the window widens with it (it stays centred in the cell)
@@ -2554,86 +2563,6 @@ function restoreAuthor(el) {
 
 const HTML_BORDERS = ['top', 'right', 'bottom', 'left'];
 
-/**
- * Re-ink one element: every computed colour that is not ink, paper, grey or transparent is
- * mapped by luminance. Text is always ink or paper, whichever reads against its (re-inked)
- * background — never grey (INK-3, AX-1).
- */
-function inkOne(el) {
-    if (!el || el.nodeType !== 1) return;
-    if (el.matches && el.matches(SKIP_SELECTOR)) return;
-    if (isFeedbackEl(el)) return;
-    const tag = el.tagName.toLowerCase();
-    if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'option') return;   // CSS owns slots
-    restoreAuthor(el);
-    let rec = WROTE.get(el);
-    if (!rec) { rec = new Map(); WROTE.set(el, rec); }
-    const cs = getComputedStyle(el);
-    const isSvg = el instanceof SVGElement;
-    if (isSvg) {
-        if (tag === 'svg' || tag === 'g' || tag === 'defs' || tag === 'clippath' || tag === 'mask') return;
-        const fill = cs.fill;
-        if (fill && fill.startsWith('url(')) setMono(el, 'fill', GREY, rec);
-        else {
-            const c = parseColor(fill);
-            if (c && c.a > 0 && !isPalette(c)) {
-                // text drawn in SVG is read, so it is ink or paper, never grey
-                const v = (tag === 'text' || tag === 'tspan') ? (lum(c) >= 0.62 ? PAPER : INK) : monoFill(c);
-                setMono(el, 'fill', v, rec);
-            }
-        }
-        const stroke = cs.stroke;
-        if (stroke && stroke.startsWith('url(')) setMono(el, 'stroke', INK, rec);
-        else {
-            const s = parseColor(stroke);
-            if (s && s.a > 0 && !isPalette(s)) setMono(el, 'stroke', monoStroke(s), rec);
-        }
-        return;
-    }
-    // HTML
-    const bg = parseColor(cs.backgroundColor);
-    let bgInk = false;
-    if (bg && bg.a > 0.05) {
-        const v = isPalette(bg) ? null : monoFill(bg);
-        if (v) setMono(el, 'background-color', v, rec);
-        bgInk = (v || monoFill(bg)) === INK;
-    } else {
-        bgInk = inkBehind(el);
-    }
-    const col = parseColor(cs.color);
-    // Text is ink on paper, or paper on ink — whichever reads (INK-3: never grey, AX-1).
-    if (col && col.a > 0) {
-        const want = bgInk ? PAPER : INK;
-        const have = isInk(col) && col.a >= 1 ? INK : isPaper(col) && col.a >= 1 ? PAPER : null;
-        if (have !== want) setMono(el, 'color', want, rec);
-    }
-    // LS-2..LS-4: inside a cell a dashed line means CUT and a dotted line means TRACE. A widget's
-    // dashed drop zone or dotted guide is neither, so it is drawn solid. The missing-digit box
-    // (LS-8) and a tagged cut line keep their dash.
-    const keepDash = el.matches('[data-ws-cut], .ws-box--unknown, [data-ws-shape="box-unknown"]');
-    for (const side of HTML_BORDERS) {
-        const w = parseFloat(cs.getPropertyValue(`border-${side}-width`)) || 0;
-        if (!w) continue;
-        const style = cs.getPropertyValue(`border-${side}-style`);
-        if (!keepDash && (style === 'dashed' || style === 'dotted')) setMono(el, `border-${side}-style`, 'solid', rec);
-        const bc = parseColor(cs.getPropertyValue(`border-${side}-color`));
-        if (bc && bc.a > 0 && !isPalette(bc)) setMono(el, `border-${side}-color`, monoStroke(bc), rec);
-    }
-    const oc = parseColor(cs.outlineColor);
-    if (oc && parseFloat(cs.outlineWidth) > 0 && cs.outlineStyle !== 'none' && !isPalette(oc) && document.activeElement !== el) {
-        setMono(el, 'outline-color', INK, rec);
-    }
-}
-
-function inkBehind(el) {
-    for (let n = el.parentElement, d = 0; n && d < 6; n = n.parentElement, d++) {
-        if (n.classList && n.classList.contains('mq-scell')) return false;
-        const bg = parseColor(getComputedStyle(n).backgroundColor);
-        if (bg && bg.a > 0.05) return monoFill(bg) === INK;
-    }
-    return false;
-}
-
 // INK-7: pictographic code points are wrapped so the mono scope can take their colour away.
 const EMOJI_RE = /(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*)/u;
 function wrapEmoji(root) {
@@ -2664,12 +2593,132 @@ function wrapEmoji(root) {
     }
 }
 
-function inkTree(root) {
-    if (!root || root.nodeType !== 1) return;
-    wrapEmoji(root);
-    inkOne(root);
-    root.querySelectorAll('*').forEach(inkOne);
+// The old pass (inkOne, one element at a time) restyled the page once per element (restore, read, write, read ...): a cell of
+// a few hundred elements re-inked on every mutation cost seconds a question on a Chromebook (speed lane, 2026-11-02).
+// inkTrees() makes the SAME decisions in batches - every author value restored, every colour read, the colours and
+// fills decided and written in document order, then every border and outline read and written - so a pass restyles
+// twice, however big the cell. What inkOne read live it reads from the batch:
+//   - a parent's background (inkBehind) is the value the pass wrote for it, else the colour read before any write
+//     (a background is never inherited, so no write of the pass moves another element's);
+//   - text colour and SVG fill / stroke ARE inherited, but each element's decision depends on its own colour value
+//     only, so an element whose value came from a re-inked parent ends with the parent's decision either way;
+//   - borders and outlines default to currentColor, so they are read AFTER the colours are written, as inkOne did.
+const SVG_CONTAINER = new Set(['svg', 'g', 'defs', 'clippath', 'mask']);
+function inkEligible(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.matches && el.matches(SKIP_SELECTOR)) return false;
+    if (isFeedbackEl(el)) return false;
+    const tag = el.tagName.toLowerCase();
+    return !(tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'option');   // CSS owns slots
 }
+function inkTrees(roots) {
+    const els = [];
+    const seen = new Set();
+    for (const root of roots) {
+        if (!root || root.nodeType !== 1 || !root.isConnected) continue;
+        wrapEmoji(root);
+        for (const el of [root, ...root.querySelectorAll('*')]) if (!seen.has(el)) { seen.add(el); els.push(el); }
+    }
+    if (!els.length) return;
+    // A. put the author's values back (writes only)
+    const ok = els.map(inkEligible);
+    els.forEach((el, i) => { if (ok[i]) restoreAuthor(el); });
+    // B. read every colour once (one restyle). Backgrounds are read for every element and for the ancestors inkBehind
+    //    may reach, so no later read restyles the page.
+    const bgRead = new Map();
+    const readBg = (n) => { if (!bgRead.has(n)) bgRead.set(n, parseColor(getComputedStyle(n).backgroundColor)); return bgRead.get(n); };
+    const reads = els.map((el, i) => {
+        const cs = getComputedStyle(el);
+        const r = { svg: el instanceof SVGElement, tag: el.tagName.toLowerCase() };
+        if (r.svg) { r.fill = cs.fill; r.stroke = cs.stroke; } else { r.color = cs.color; }
+        bgRead.set(el, parseColor(cs.backgroundColor));
+        return ok[i] ? r : null;
+    });
+    for (const root of roots) {
+        if (!root || root.nodeType !== 1) continue;
+        for (let n = root.parentElement, d = 0; n && d < 6; n = n.parentElement, d++) readBg(n);
+    }
+    // C. decide and write colours, fills and backgrounds in document order
+    const bgNow = new Map();   // element -> its background after this pass's write (only those the pass wrote)
+    const bgOf = (n) => bgNow.has(n) ? bgNow.get(n) : (bgRead.has(n) ? bgRead.get(n) : parseColor(getComputedStyle(n).backgroundColor));
+    const behind = (el) => {
+        for (let n = el.parentElement, d = 0; n && d < 6; n = n.parentElement, d++) {
+            if (n.classList && n.classList.contains('mq-scell')) return false;
+            const bg = bgOf(n);
+            if (bg && bg.a > 0.05) return monoFill(bg) === INK;
+        }
+        return false;
+    };
+    const borderEls = [];
+    els.forEach((el, i) => {
+        const r = reads[i];
+        if (!r) return;
+        let rec = WROTE.get(el);
+        if (!rec) { rec = new Map(); WROTE.set(el, rec); }
+        if (r.svg) {
+            if (SVG_CONTAINER.has(r.tag)) return;
+            const fill = r.fill;
+            if (fill && fill.startsWith('url(')) setMono(el, 'fill', GREY, rec);
+            else {
+                const c = parseColor(fill);
+                if (c && c.a > 0 && !isPalette(c)) {
+                    const v = (r.tag === 'text' || r.tag === 'tspan') ? (lum(c) >= 0.62 ? PAPER : INK) : monoFill(c);
+                    setMono(el, 'fill', v, rec);
+                }
+            }
+            const stroke = r.stroke;
+            if (stroke && stroke.startsWith('url(')) setMono(el, 'stroke', INK, rec);
+            else {
+                const st = parseColor(stroke);
+                if (st && st.a > 0 && !isPalette(st)) setMono(el, 'stroke', monoStroke(st), rec);
+            }
+            return;
+        }
+        const bg = bgRead.get(el);
+        let bgInk = false;
+        if (bg && bg.a > 0.05) {
+            const v = isPalette(bg) ? null : monoFill(bg);
+            if (v) { setMono(el, 'background-color', v, rec); bgNow.set(el, parseColor(v === INK ? 'rgb(0,0,0)' : v === PAPER ? 'rgb(255,255,255)' : 'rgb(148,148,148)')); }
+            bgInk = (v || monoFill(bg)) === INK;
+        } else {
+            bgInk = behind(el);
+        }
+        const col = parseColor(r.color);
+        if (col && col.a > 0) {
+            const want = bgInk ? PAPER : INK;
+            const have = isInk(col) && col.a >= 1 ? INK : isPaper(col) && col.a >= 1 ? PAPER : null;
+            if (have !== want) setMono(el, 'color', want, rec);
+        }
+        borderEls.push([el, rec]);
+    });
+    // D. borders and outlines, read after the colours they may follow (currentColor), then written
+    const active = document.activeElement;
+    const bReads = borderEls.map(([el]) => {
+        const cs = getComputedStyle(el);
+        const sides = [];
+        for (const side of HTML_BORDERS) {
+            const w = parseFloat(cs.getPropertyValue(`border-${side}-width`)) || 0;
+            if (!w) continue;
+            sides.push([side, cs.getPropertyValue(`border-${side}-style`), cs.getPropertyValue(`border-${side}-color`)]);
+        }
+        return { sides, oc: cs.outlineColor, ow: cs.outlineWidth, os: cs.outlineStyle };
+    });
+    borderEls.forEach(([el, rec], i) => {
+        const b = bReads[i];
+        if (b.sides.length) {
+            const keepDash = el.matches('[data-ws-cut], .ws-box--unknown, [data-ws-shape="box-unknown"]');
+            for (const [side, style, color] of b.sides) {
+                if (!keepDash && (style === 'dashed' || style === 'dotted')) setMono(el, `border-${side}-style`, 'solid', rec);
+                const bc = parseColor(color);
+                if (bc && bc.a > 0 && !isPalette(bc)) setMono(el, `border-${side}-color`, monoStroke(bc), rec);
+            }
+        }
+        const oc = parseColor(b.oc);
+        if (oc && parseFloat(b.ow) > 0 && b.os !== 'none' && !isPalette(oc) && active !== el) setMono(el, 'outline-color', INK, rec);
+    });
+}
+
+function inkTree(root) { inkTrees([root]); }
 
 const OBSERVERS = new WeakMap();
 const AFTER_INK = new WeakMap();
@@ -2716,7 +2765,7 @@ export function monoCell(root, { afterInk = null } = {}) {
     const run = (targets) => {
         const obs = OBSERVERS.get(root);
         if (obs) obs.disconnect();
-        try { targets.forEach(inkTree); } catch (e) { /* never break a render */ }
+        try { inkTrees(targets); } catch (e) { /* never break a render */ }
         try { targets.forEach(screenCellVerbs); } catch (e) { /* never break a render */ }
         const after = AFTER_INK.get(root);
         if (after) { try { after(root); } catch (e) { /* never break a render */ } }
@@ -2740,9 +2789,22 @@ export function monoCell(root, { afterInk = null } = {}) {
     run([root]);
     // A widget may mount its markup first and its stylesheet a moment later; that changes the
     // computed colours without a mutation inside the cell, so the whole cell is re-read a few
-    // times while it settles.
-    [60, 250, 700].forEach((ms) => setTimeout(() => { if (root.isConnected) run([root]); }, ms));
+    // times while it settles - but only when a stylesheet did arrive since the last read
+    // (Chromebook speed lane, 2026-11-02: each full re-read restyles every element of the cell one
+    // by one, and three unconditional re-reads made a question take up to 3 s at CPU 6x).
+    let sheets = sheetCount();
+    [60, 250, 700].forEach((ms) => setTimeout(() => {
+        if (!root.isConnected) return;
+        const now = sheetCount();
+        if (now === sheets) return;
+        sheets = now;
+        run([root]);
+    }, ms));
 }
+
+const sheetCount = () => {
+    try { return document.styleSheets.length + ((document.adoptedStyleSheets && document.adoptedStyleSheets.length) || 0); } catch (e) { return -1; }
+};
 
 const OBS_OPTS = { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'fill', 'stroke'] };
 
