@@ -139,6 +139,27 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
 - **Count what the page IS, not what it is not:** "pupil pages = all − keys" counted set covers. Count pupil pages by
   their Name line.
 
+### Student Chromebook speed (chromebook-speed lane, 2026-11-02)
+- **A pupil downloads what core imports, not what a pupil uses.** 37 % of the startup bytes were teacher, print, quiz, MAP
+  and curriculum code a ?c= link never runs, and two third-party scripts only the Google export reads. Anything a pupil
+  does not need before the first question goes in `js/modules/deferred.js` (async stubs on window keep the inline handlers
+  working). *Check:* `ws-chromebook-perf` static budgets (startup gzip <= 1,900 KB, <= 200 modules) and "Start Playing
+  waited on no deferred module"; a pupil play-through may load no deferred module either.
+- **A module that sets shared state at import must not reset it.** `window.globalSkillsList = []` at the top of a module is
+  harmless only while that module loads first; loaded late it wipes the list. Create shared state in globals.js; modules
+  keep an existing value.
+- **An element id is a window property.** `typeof window.soSearchInput !== 'undefined'` is true for `<input id=soSearchInput>`:
+  test `typeof === 'function'` before skipping a name.
+- **Read everything, then write everything.** A loop that writes a style and then reads a box or a computed style restyles
+  the whole page every turn; on a page with 157 `:has()` rules one restyle is ~25 ms at CPU 6x. The live mono pass did it
+  per element on every mutation (21.6 s of CPU over 50 questions). Batch reads before writes; write only a value that
+  changes; drop a measurement that the caller repeats straight after. *Check:* `ws-chromebook-perf --why` lists the callers
+  of every forced layout of a slow question; `ws-ink-parity` (colours, `--geometry` boxes) proves a batched rewrite paints
+  and lays out the same as the old tree.
+- **Time a perf change against the base on the same machine.** Live and local differ (17.1 s live vs 10.85 s local for the
+  same commit); the budget is a ratio of the base measured with the same harness, plus exact byte / module budgets that
+  cannot flake. Never run two timing runs, or a timing run and another browser gate, at once.
+
 ## PRE-FLIGHT checklist (every lane, before reporting)
 1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at
    1280/820/390, worksheet, quiz. Looked at every PNG.

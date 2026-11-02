@@ -464,3 +464,14 @@ against this row.
 | Print build, 4-page sheet + key (4×) | was 5.4 s before the dialog; now usually already built in the background |
 | Preview vs PDF: pages / pixels | equal in 6 printouts / ≤ 0.002 % differing (limit 0.02 %) |
 | Critic rounds to pass | r1 FAIL; r2 pending |
+
+### chromebook-speed (2026-11-02)
+| Metric | 1375b857b | This lane |
+|---|--:|--:|
+| Startup modules / JS gzip | 269 / 2.90 MB | 185 / 1.73 MB |
+| Pupil first visit, 46-skill link, 3 Mbps / 150 ms / CPU 4x (local HTTP/2 + gzip, median of 3) | 10.85 s | 6.82 s (-37 %) |
+| Pupil later visit | 2.00 s | 1.49 s |
+| 50-question play-through at CPU 6x: questions > 1 s / longest task | 6 / 4.8 s | skip-count only (pinned, F1) / ~1 s |
+| ~150-skill stress: max question / longest task | 1.85 s / 5.6 s | 0.81 s / 0.49 s |
+| Teacher, 100 skills: tray / print preview / quiz sheet (CPU 4x) | 2.6 / 88 / 10.5 s | 2.1 / ~80 / ~9.7 s |
+
