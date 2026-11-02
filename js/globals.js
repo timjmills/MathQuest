@@ -569,3 +569,11 @@ bootstrap();
 installActiveBox();
 installTouchTap();
 installPlayCompact();
+// Chromebook load fix (2026-11-02): tell the inline loading indicator the app is ready, then cache the stamped
+// modules on the device (sw.js) so the next visit does not download them again over school Wi-Fi.
+window.__mqBooted = true;
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    const registerWorker = () => navigator.serviceWorker.register('sw.js').catch((err) => console.warn('service worker not registered:', err));
+    if (document.readyState === 'complete') registerWorker();
+    else window.addEventListener('load', registerWorker);
+}
