@@ -619,6 +619,8 @@ function scenarios() {
         // (owner 2026-11-03: all three Mixed up layouts are options - A rows (default, above), B grid, C even)
         for (const layout of ['grid', 'even']) for (const size of QUICK ? ['M'] : ['S', 'M', 'L']) out.push({ id: `o owner 41 ${layout} daily ${size} seed 4242`, set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size, seed: 4242, layout });
         if (!QUICK) for (const layout of ['grid', 'even']) out.push({ id: `b ${layout} daily M seed 722369`, set: SETS.b.skills, arr: 'mixed', look: 'daily', size: 'M', seed: 722369, layout });
+        // (owner 2026-11-03: Columns go down to 1 - each problem spans the page width)
+        out.push({ id: 'c columns 1 M seed 722369', set: SETS.c.skills, counts: [3, 3], arr: 'mixed', look: 'daily', size: 'M', seed: 722369, columns: 1 });
         out.push({ id: 'o owner fill ican M seed 4242', set: OWNER, arr: 'mixed', look: 'ican', size: 'M', seed: 4242 });
         out.push({ id: 'o owner 41 columns 4 M seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'M', seed: 4242, columns: 4 });
         out.push({ id: 'o owner 41 columns 6 S seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'S', seed: 4242, columns: 6, colsOn: 'sections' });
