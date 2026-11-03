@@ -172,16 +172,19 @@ function sectionsReq(list, counts, o, colsBy) {
 
 /** Build a sections request; an asked column count the engine clamped is asked again at the clamp (never 1 row a page). */
 async function buildSections(list, counts, o) {
-    let colsBy = list.map(() => colsAsked(o));
+    // Auto: a fast-fact part asks for the fact columns (10 / 6 / 5) and takes the most that fit (critic r1 D4: Auto
+    // printed 5 across where 6 fit); every other part keeps the engine's own Auto
+    let colsBy = list.map((s) => colsAsked(o) || (isFactSkill(s) ? FACT_AUTO[o.size] : undefined));
     let res = await buildSheet(sectionsReq(list, counts, o, colsBy));
     const live = list.map((_, i) => i).filter((i) => counts[i] > 0);
     const fs = (res.fits && res.fits.sections) || [];
-    let clamped = false;
-    if (colsAsked(o)) {
-        colsBy = colsBy.slice();
-        live.forEach((i, j) => { const f = fs[j]; if (f && (f.clamped || (f.cols && f.cols < colsAsked(o)))) { colsBy[i] = f.cols; clamped = true; } });
-        if (clamped) res = await buildSheet(sectionsReq(list, counts, o, colsBy));
-    }
+    let clamped = false, refit = false;
+    colsBy = colsBy.slice();
+    live.forEach((i, j) => {
+        const f = fs[j];
+        if (colsBy[i] && f && f.cols && (f.clamped || f.cols < colsBy[i])) { if (colsAsked(o)) clamped = true; colsBy[i] = f.cols; refit = true; }
+    });
+    if (refit) res = await buildSheet(sectionsReq(list, counts, o, colsBy));
     res.__clamped = clamped;
     return res;
 }
@@ -336,6 +339,9 @@ async function buildMixed(list, amounts, o) {
     return finish(res, { counts, arrangement: 'mixed', notes: [], list });
 }
 
+/** The problems the built page 1 really holds (never the grid's nominal capacity: the engine may cap a page). */
+const page1Cells = (res) => (((res.pupilPages && res.pupilPages[0]) || '').split('class="ws-cell ').length - 1) || (res.fits && res.fits.perPage) || 0;
+
 function finish(res, { counts, arrangement, notes, list }) {
     const fs = (res.fits && res.fits.sections) || [];
     const colsList = fs.map((f) => f.cols).filter(Boolean);
@@ -346,8 +352,8 @@ function finish(res, { counts, arrangement, notes, list }) {
     return {
         pupilHtml: res.pupilHtml || '', keyHtml: res.keyHtml || '', doc: (res.pupilHtml || '') + (res.keyHtml ? '\n' + res.keyHtml : ''),
         pages: res.pageCount || 1, keyPages: res.keyPageCount || 0, total: (res.items || []).filter(Boolean).length, counts: got.some(Boolean) ? got : counts,
-        arrangement: res.arrangement === 'mixed' || arrangement !== 'mixed' ? arrangement : 'sections',
-        cols: first.cols || 0, rows: first.rows || 0, perPage: (res.fits && res.fits.perPage) || 0, colsList,
+        arrangement: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t))) ? 'sections' : arrangement,
+        cols: first.cols || 0, rows: fs.length === 1 && first.cols ? Math.ceil(page1Cells(res) / first.cols) : first.rows || 0, perPage: page1Cells(res), colsList,
         notes: [...notes, ...engineNotes], firstHtml: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml || '',
     };
 }
@@ -388,9 +394,9 @@ export function summaryLine(b, o) {
     const sets = Math.max(1, Number(b.sets) || 1);
     const key = o.key ? (sets > 1 ? 'each set with its answer key' : 'answer key at the end') : 'no answer key';
     let grid;
-    if (b.arrangement === 'facts' || (cl.length === 1 && b.rows && b.perPage)) grid = `${b.cols} columns × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
-    else if (cl.length === 1) grid = `${cl[0]} columns`;
-    else grid = `${Math.min(...cl)}–${Math.max(...cl)} columns (each skill its own grid)`;
+    if (b.arrangement === 'facts' || (cl.length === 1 && b.rows && b.perPage && (b.colsList || []).length <= 1)) grid = `${b.cols} columns × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
+    else if (cl.length === 1) grid = `${cl[0]} columns · ${b.perPage} on page 1`;
+    else grid = `Each skill its own grid, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     return [grid, pages, probs, ...(sets > 1 ? [`${sets} sets, each with different problems`] : []), key].join(' · ');
 }
 
@@ -453,7 +459,9 @@ function stepHead(n, title, sub = '') {
 function render() {
     if (!S) return;
     const dlg = S.root.querySelector('.sp-dialog');
-    const focusId = document.activeElement && S.root.contains(document.activeElement) ? document.activeElement.id : '';
+    const ae = document.activeElement && S.root.contains(document.activeElement) ? document.activeElement : null;
+    const focusId = ae ? ae.id : '';
+    const focusSel = ae && !focusId && ae.dataset && ae.dataset.sp ? `[data-sp="${ae.dataset.sp}"]${ae.dataset.v !== undefined ? `[data-v="${ae.dataset.v}"]` : ''}` : '';
     const many = S.list.length > 1;
     const o = opts();
     const arr = arrangementOf(S.list, o);
@@ -512,7 +520,8 @@ function render() {
     dlg.innerHTML = h;
     showThumb();
     if (focusId) { const el = document.getElementById(focusId); if (el) { try { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.type === 'text') el.setSelectionRange(el.value.length, el.value.length); } catch (e) { /* */ } } }
-    else if (!S.focused) { S.focused = true; const p = dlg.querySelector('[data-sp="print"]'); if (p) try { p.focus({ preventScroll: true }); } catch (e) { /* */ } }
+    else if (focusSel && dlg.querySelector(focusSel)) { try { dlg.querySelector(focusSel).focus({ preventScroll: true }); } catch (e) { /* */ } }
+    else if (!S.focused || !ae) { S.focused = true; const p = dlg.querySelector('[data-sp="print"]'); if (p && !S.root.contains(document.activeElement)) try { p.focus({ preventScroll: true }); } catch (e) { /* */ } }
 }
 
 function showThumb() {

@@ -14,6 +14,8 @@
 //   FACTS    a fast-facts-only set in Pages mode prints fact rows: 10 / 6 / 5 columns at S / M / L (8 when an answer
 //            is over 99; division facts across in 3)
 //   NOT3     no default print is ever 3 or fewer problems a page (the reported bug)
+//   TARGETS  every dialog control and Quick Start Print button >= 44 x 44 at 1366 / 820 / 390 (critic r1 D7)
+//   SUMMARY  the summary's "n a page" / "n on page 1" is what page 1 holds (critic r1 D5, D9)
 //
 //   node tests/scripts/ws-simple-print.cjs              the gate (prints ws-simple-print: OK / FAIL)
 //   node tests/scripts/ws-simple-print.cjs --backtest   the same measure on the old dialog's page plan (one request
@@ -113,6 +115,26 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                 }
             }
         }
+    }
+    // TARGETS (critic r1 D7) and SUMMARY (critic r1 D5/D9): the dialog's controls are >= 44 x 44 at 1366 / 820 / 390,
+    // every Quick Start card's Print button too, and the summary's "n a page" is the problems page 1 really holds
+    if (!has('backtest')) {
+        await page.evaluate((six) => { localStorage.removeItem('mq_simple_print'); window.openSimplePrint(six, { from: 'tray', more() {} }); }, SETS.addsub);
+        for (let i = 0; i < 120; i++) { const ok = await page.evaluate(async () => { const m = await import('/js/modules/simple-print.js'); const st = m.simplePrintState(); return st && st.built && !st.busy; }); if (ok) break; await new Promise((r) => setTimeout(r, 250)); }
+        for (const w of [1366, 820, 390]) {
+            await page.setViewport({ width: w, height: w === 390 ? 844 : 900, deviceScaleFactor: 1 });
+            await new Promise((r) => setTimeout(r, 300));
+            const small = await page.evaluate(() => [...document.querySelectorAll('.sp-dialog button, .sp-dialog input, .sp-dialog select, .sp-dialog summary, #quickSkillsGrid .qs-print-btn')]
+                .filter((el) => el.offsetParent !== null).map((el) => { const r = el.getBoundingClientRect(); return { t: (el.dataset.sp || el.id || el.className || '').toString().slice(0, 20), w: Math.round(r.width), h: Math.round(r.height) }; })
+                .filter((x) => x.w < 44 || x.h < 44));
+            if (small.length) fails.push(`dialog @${w}: TARGETS ${small.length} under 44 x 44 (${small.slice(0, 4).map((x) => `${x.t} ${x.w}x${x.h}`).join(', ')})`);
+        }
+        const st = await page.evaluate(async () => { const m = await import('/js/modules/simple-print.js'); const s = m.simplePrintState(); window.closeSimplePrint(); return s; });
+        const said = /= (\d+) a page|(\d+) on page 1/.exec(st.built.line || '');
+        const n = said ? Number(said[1] || said[2]) : NaN;
+        if (!(n === st.built.perPage)) fails.push(`summary: SUMMARY "${st.built.line}" vs ${st.built.perPage} built on page 1`);
+        const qs = await page.evaluate(() => [...document.querySelectorAll('#quickSkillsGrid .qs-print-btn')].map((el) => el.getBoundingClientRect()).filter((r) => r.width < 44 || r.height < 44).length);
+        if (qs) fails.push(`quick cards: TARGETS ${qs} Print buttons under 44 x 44`);
     }
     console.log(rows.join('\n'));
     for (const f of fails) console.log('  FAIL ' + f);

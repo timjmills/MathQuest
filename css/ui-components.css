@@ -8453,6 +8453,6 @@ html.dark .mq-skill-pill {
 /* simple print (owner 2026-11-03): the Print buttons on the student side - Ready to Practice and each Quick Start card.
    Here, not in css/simple-print.css, because these buttons show before the deferred half (and its stylesheets) load. */
 .landing-print-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; min-height: 44px; padding: 0 18px; border: 2px solid currentColor; border-radius: 12px; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
-.qs-print-btn { position: absolute; bottom: 3px; right: 3px; width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(0, 0, 0, 0.25); background: rgba(255, 255, 255, 0.92); color: #1A1614; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 6; padding: 0; }
+.qs-print-btn { position: absolute; bottom: 2px; right: 2px; width: 44px; height: 44px; border-radius: 8px; border: 1px solid rgba(0, 0, 0, 0.25); background: rgba(255, 255, 255, 0.92); color: #1A1614; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 6; padding: 0; }
 .qs-print-btn:hover, .qs-print-btn:focus-visible { background: #fff; outline: 2px solid #1A1614; outline-offset: 1px; }
 .qs-print-btn svg { width: 16px; height: 16px; }
