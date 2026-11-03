@@ -622,3 +622,26 @@ Cost this session ≈ $60 (≈ 2.1 % of the week) of the $85 cap. Stopped per th
 - (2) WRAP-OP root cause: perimeter_intro's side anchor step "Add: 4 + 4 + 3 = 11." (providers/figures.js) wrapped after "+"
   at S; joined with no-break spaces (both "Add:" steps). Row sections/ex-each S: WRAP-OP 0 (GRID-EVEN 6 as before).
 - Backtest row `simple-print-exact-missing-add-sub` (commit-pair 33bf69bf FAIL → bcc3ab2d OK).
+
+## HAND-OVER 9 (2026-11-03, critic r4 FAIL — stopped)
+
+R4d (bcc3ab2d): missing_add_sub resultBox sentence on the kit's tight across tracks (Auto 3 x 8 at M as main; 6 across at M is
+unreachable without wrapping the sentence — DN-22 caps 2-digit horizontal equations at 3; main's 6 x 4 came from the legacy
+cell's 2-line wrap: needs a ruling if 6 must stay); perimeter "Add:" steps no-break (WRAP-OP). Precritic div_facts --strict
+45 PASS / 0 FAIL (card rows SKIPPED by ruling), ws-simple-print OK (DIVFACTS + EXACT).
+
+Narrow critic r4 (design/audit/runs/laned-restart/critic-r4.md, renders r4-critic/, on e2ab83ee): FAIL, lowest C3 5.
+PASS: think (all), touch Independent L + Test + Review, boxsign Independent M + Test S/M + Review; regression spot-check of the
+four passed fact skills clean. Every defect is invisible to the current lints (0 findings on all 15 support x size runs):
+- R4-1 H13: touch Independent S/M and boxsign Independent S/L cells ~1/3 empty (rows not sized to the cell's real height, as Test does).
+- R4-2 array (all 9 pages fail): counters only on some facts; mixed 2-col grid + full-width rows, slot moves; Test S/M ~28 % unused;
+  Review M draws no array; Review S 7 problems (< PT-REV-1's 8).
+- R4-3 skip strip stops at 5 x divisor (fact.js:178): 13 of 24 dividends beyond it — draw to 12 x divisor, unmarked.
+- R4-4 boxsign Test L: 132÷12 alone in a full-width last row; 10 printed where 12 fit.
+- R4-5 fade packet M (C3 5): space reserved for every support in every row (page 1 holds 3), supports do not fade monotonically,
+  slot moves. The R4c unsplit fix made this page; it needs a real fade-packet design.
+Checks to add (from the critic): ink-based H13 per single support; support-coverage lint; plainStrip max term >= dividend;
+lone-full-width-last-row lint; fade-order lint + reserved-empty-space H13. Ruling needed: Test fixed large cells 40-54 % empty
+under a horizontal fact (accepted in r3 by PAGE_TYPES Test geometry, conflicts with H13).
+Same defect class has now survived rounds on supports → per §1.7, make the checks above machine checks and re-brief a fresh builder.
+Cost this session ≈ $118 (≈ 4.2 % of the week) of the $130 cap.
