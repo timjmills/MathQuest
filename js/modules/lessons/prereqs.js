@@ -341,7 +341,7 @@ export const LESSONS = Object.freeze({
     'division:div_facts': {
         skills: [
             { key: 'multiplication:mult_facts', why: 'Each division fact is a times fact read backwards.' },
-            { key: 'division:share_into_groups', why: 'Dividing shares a number into equal groups.' },
+            { key: 'division:missing_mult_div', why: 'A missing factor is the answer of a division fact.' },
         ],
         concepts: [
             { id: 'groups', text: 'Dividing makes equal groups.' },
@@ -363,7 +363,7 @@ export const LESSONS = Object.freeze({
             kind: 'icons + very short steps',
             why: 'Three actions; the think-of-the-times-fact sentence is the Say band, so a chant would only add words.',
         },
-        mixWith: [{ key: 'multiplication:mult_facts' }, { key: 'division:share_into_groups' }],
+        mixWith: [{ key: 'multiplication:mult_facts' }, { key: 'division:missing_mult_div' }],
     },
 
     // ------------------------------------------------- Round to the nearest 10 / 100 (3)

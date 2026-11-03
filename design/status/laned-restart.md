@@ -496,3 +496,39 @@ counters rows) with ~30 % of the page empty below - the width split (test.js wid
 - Watch item: div_facts Test S with `array` prints 10 with ~30 % empty below (test.js widthSplit); no lint flags it.
 - Renders (untracked, 90 PNG) in design/audit/runs/laned-restart/r4-prep/ on the session container only.
 - Cost this session ≈ $27 (≈ 1.0 % of the week) of the $40 cap.
+
+## R4 (2026-11-03): lead rulings on the seven red div_facts precritic rows
+
+1. chromebook-fit (quiz host "Cannot set properties of null"): caused by the main merge - the quiz moved to the deferred
+   half (globals.js makeLazy), so `compressTestForURL` returned a promise and `#qtStudentName` did not exist yet. The gate
+   now loads the deferred part first (tests/scripts/ws-chromebook-fit.cjs startHost), as a quiz link's first call does. OK.
+2. slot-clip PG-12: fade packet L FIXED (support-draw.js: a picture stands beside a ÷ fact only when the sign box, the answer
+   line - counted under the fact by equation.js's footprint, beside it here - and the beside inset fit too; the 85 mm
+   counters ran 4.5 mm out). sections/defaults L (div_facts' first section of a 4-skill sheet: "25 ÷ 5 =" with its line
+   under it in a 20.4 mm grid; the fact footprint asks 26 mm at L) is red on the main tip cd81c8e7 too (PG-12 x14 there).
+3. node-lint-s1: LESSONS entry for division:div_facts (js/modules/lessons/prereqs.js).
+4. sibling-compare: add_facts, sub_facts, mult_facts, div_facts_long are div_facts' approved siblings (siblings.json,
+   templates fact / equation, lead ruling).
+5. options-render: divForm capacity PINNED as owner-ruled (tests/fixtures/precritic/options-render.pins.json, read by
+   tests/lib/options-render.cjs capacityPin; only the capacity comparison is pinned).
+6. dealer-uniform: MAIN-RED, pinned with its proof line (dealer-uniform.baseline.json; same three findings on cd81c8e7).
+7. print-lint-divform-long-L (Mixed practice H13 31 %, cell 8): MAIN-RED, pinned in design/audit/baselines/print-lint.json
+   with its proof (0 -> 2 on cd81c8e7 too). **For the mixed-m2 lane:** the mixed-practice role is theirs; the long-division
+   cell 8 at L leaves a 28.5 mm side band in a 92.2 mm cell.
+8. div_facts Test at S with array (10 facts, ~30 % empty): left as a WATCH ITEM - test.js widthSplit fills narrow rows and
+   one full-width counters row per wide fact; filling whole rows there is a role change, not a small one.
+9. **For the shared-roles lane (does not block):** Review H13 with support combos - sub_facts tile and frame (35 %, cells 4-5
+   at S) and mult_facts all / array / boxsign (32 % side bands, cells 9-14 at S; array H13-ROW cells 5-6). Same on 0fd0e50.
+
+R4 precritic rerun (`/tmp/mq-precritic/20261103-102846-32518`, before the Warm-up swap below): 42 PASS (9 on the baseline),
+3 FAIL, 2 SKIPPED (card-rulings / card-not-offered: the facts card has no rulings block). FAIL:
+- print-lint-lesson-L: the new lesson data's Warm-up put share_into_groups (tall) beside mult_facts (H13-ROW); FIXED after
+  the run by dealing missing_mult_div instead (lesson S / L lint OK, render-gate lesson S/M/L OK).
+- sibling-compare (now real, against the four passed fact skills): 8 counts above them in 5 rows - PG-23 last page under a
+  third (mixed/defaults L, sections/defaults L, fade-packet S/M/L), PG-12 x6 sections/defaults L, CL40-INK x2
+  sections/ex-group M, SPREAD sections/pages-2 L (2 vs 1). These are div_facts' own multi-page / multi-section
+  pagination defects; NOT fixed in this run (budget).
+- slot-clip: sections/defaults L PG-12 x6 (the same cells), now above the siblings' 0.
+Also: sub_facts Review L H13 30 % (cells 7-8, no supports) - same on 0fd0e50, for the shared-roles lane.
+ws-chromebook-perf OK (Start Playing 1233 ms; stress median 243 ms, p90 377 ms; teacher ready 5659 ms, tray 1512 ms,
+print preview 50506 ms, quiz sheet 14626 ms). Renders: design/audit/runs/laned-restart/r4/<support>-<S|M|L>/.
