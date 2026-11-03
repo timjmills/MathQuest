@@ -41,7 +41,7 @@ The existing per-section `sections[i].columns` (2–10). When the engine clamps 
 
 Engine faults handed to mixed-m2 (accepted: 1–4): (1) one outline for a row's cells, (2) a part never continues on the next page, (3) no row stretch, (4) equation wraps at S 5 columns. Not in mixed-m2's files, for the lead: (5) footer raw skill ids, the fact instruction read as "thesign" (likely a text-extraction artefact over a span), div_facts fact-rows paired row rules.
 
-Gates (this branch): ws-boot-smoke, ws-code-snapshot (731 codes, +159 appended, none moved), ws-teacher-shell, -library, -quiz, -tokens, ws-pdf-preview, ws-screen-answer, ws-share-options, ws-simple-print OK; ws-teacher-preview flaked once under load (OK on rerun and on base); ws-chromebook-perf full run FAILed teacher timings while a critic shared the CPU (pupil load,play re-run in the log); ws-print-lint (legacy source report) ran, no kit/legacy path changed.
+Gates (this branch): ws-boot-smoke, ws-code-snapshot (731 codes, +159 appended, none moved), ws-teacher-shell, -library, -quiz, -tokens, ws-pdf-preview, ws-screen-answer, ws-share-options, ws-simple-print OK; ws-teacher-preview flaked once under load (OK on rerun and on base); ws-chromebook-perf: full run FAILed teacher timings while a critic shared the CPU; `--only load,play` on a quiet machine: play OK, load first visit 7518 ms > 7300 ms, and BASE (origin/claude/sweet-newton-c8wrv1) on the same container 7302 ms > 7300 ms FAIL too, with identical static numbers (185 startup modules, 1734 KB gzip, 186 before Start Playing): container speed, not this PR; ws-print-lint (legacy source report) ran, no kit/legacy path changed.
 
 ## Times
 Times: builder build, start 2026-11-03T09:10Z, end 2026-11-03T10:40Z, profile lane session
@@ -49,6 +49,9 @@ Times: critic r1, start 2026-11-03T10:45Z, end 2026-11-03T11:00Z, profile mq-opu
 Times: fix r1, start 2026-11-03T11:00Z, end 2026-11-03T11:15Z, profile lane session
 Times: critic r2, start 2026-11-03T11:15Z, end 2026-11-03T11:35Z, profile mq-opus-medium
 Times: fix r2, start 2026-11-03T11:35Z, end 2026-11-03T11:45Z, profile lane session
+
+## Screenshots
+`design/status/simple-print/`: sp-six-1366 / -820 / -390 (owner's 6 skills, the new dialog), sp-sets-390, student-landing(-print), quick-cards, quick-card-print, six-M-p1 and after-six-M-pages1 (the default print's pages); before = the owner's screenshot (14 pages, 3 a page).
 
 ## Log
 - 2026-11-03: owner addition "how many sets" → Sets stepper in step 2 (each set its own seed and key, "Set k of N").
