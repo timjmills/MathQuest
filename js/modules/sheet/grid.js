@@ -48,7 +48,7 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
         const lab = unlabelled.includes(i) || item.nolabel ? (item.model ? label('model') : '') : label(labels, k++);
         const p = item.place;
         const at = p ? `grid-column:${p.col} / span ${p.span || 1};grid-row:${p.row || 1} / span ${p.rows || 1};` : '';
-        return cell(item.html, { label: lab, cls: item.cls || '', style: at + (item.style || ''), keyAttr: item.keyAttr || '' });
+        return cell(item.html, { label: lab, cls: item.cls || '', style: at + (item.style || ''), keyAttr: item.keyAttr || '', ...(item.kind ? { kind: item.kind } : {}) });
     });
     if (placed) {
         // PG-15: a placed shelf that stops short ends in ONE unruled area to the frame, every row.

@@ -661,7 +661,10 @@ function planMixed(input, pools) {
             cur.sections.push(cur.band);
             pages.push(cur);
         }
-        const cells = sh.items.map((it) => planItem(pick ? atColumns(it, k) : it, { cols: k }));
+        // (owner 2026-11-03, layout A: a page of ONE size class is rows of one kind - 'fact' where every box is a fact
+        // drawing, else 'large' - written on each cell)
+        const kindM1 = sh.items.every((x) => x.template === 'fact') ? 'fact' : 'large';
+        const cells = sh.items.map((it) => Object.assign(planItem(pick ? atColumns(it, k) : it, { cols: k }), mixLayoutOf(input) === 'rows' ? { kind: kindM1 } : {}));
         // A last shelf of fewer than k problems keeps the full grid (PG-15 / PT-ENG-7, owner
         // 2026-10-23): the frame stays a closed rectangle at the full width, and the places it does
         // not use are ONE unruled blank area inside it (grid.js blankRun) - no cell borders, no
@@ -1347,6 +1350,8 @@ function acrossFor(c, byPool, input, b, hAt) {
 }
 
 function planMixedM2(input, pools) {
+    if (mixLayoutOf(input) === 'rows') return planRowsA(input, pools);
+    if (mixLayoutOf(input) === 'even') return planEvenC(input, pools);
     const c = m2Classes(pools, input);
     const { ctx, N, ids, cls } = c;
     const b = m2Budgets(input, ctx);
@@ -1498,7 +1503,869 @@ function planMixedM2(input, pools) {
                 across: A.C, auto: !!A.auto, columnsMode: A.mode || (A.auto ? 'auto' : 'exact'), ...(A.clamped ? { clamped: true, asked: A.asked } : {}),
             },
             interleave: { keys: printAll, longest, notes: [] },
-            fits: [{ cols: A.C, across: A.C, auto: !!A.auto, columnsMode: A.mode || (A.auto ? 'auto' : 'exact'), ...(A.clamped ? { clamped: true, asked: A.asked } : {}), rows: G.rows, perPage, line: `Fits: ${n} problems mixed, ${A.C} across, ${pages.length} page${pages.length > 1 ? 's' : ''} (${perPage} a page).` }],
+            fits: [{ cols: A.C, across: A.C, mixLayout: 'grid', auto: !!A.auto, columnsMode: A.mode || (A.auto ? 'auto' : 'exact'), ...(A.clamped ? { clamped: true, asked: A.asked } : {}), rows: G.rows, perPage, line: `Fits: ${n} problems mixed, ${A.C} across, ${pages.length} page${pages.length > 1 ? 's' : ''} (${perPage} a page).` }],
+        },
+    });
+}
+
+/* ============================================== LAYOUT A: ROWS BY TYPE (owner ruling 2026-11-03, the default) */
+//
+// `input.mixLayout`: 'rows' (A, the default when absent), 'grid' (B, the one grid above, r5 unchanged), 'even' (C, one
+// count across and every box one height). A:
+//   - each row holds ONE kind of problem: 'fact' = the fast facts (skills *_facts and multiplication:multiply), and the
+//     other skills in a few size kinds by their measured boxes (one kind per skill);
+//   - each kind its OWN count across, the same for every full row of that kind over the whole print (facts 6-10 across
+//     at S, the larger kinds 2-4 and never 7 or more); boxes full size, a long procedure its full height in a row of
+//     its own kind (no two-row boxes);
+//   - kinds alternate row by row, a kind repeating rows only where the counts force it; within a kind the skills
+//     interleave one by one (runs and spread are judged within the kind);
+//   - pages take whole rows; a kind's last row may be short (never under half full: the last two rows share), and the
+//     short rows go to the last page, each closing its own grid with one unruled trailing area;
+//   - every page but the last of an exact count filled (the rows grow within H13, then evenly); limited problems print
+//     from the top, never stretched.
+
+const MIX_LAYOUTS = Object.freeze(['rows', 'grid', 'even']);
+/** The Mixed up layout a request asks for: 'rows' (A) when absent or unknown. */
+export const mixLayoutOf = (input) => (MIX_LAYOUTS.includes(input && input.mixLayout) ? input.mixLayout : 'rows');
+/** A fast-fact skill (owner 2026-11-03): its kind is 'fact'. */
+export const isFactSkill = (sk) => /_facts$/.test(String(sk || '').split(':')[1] || '') || sk === 'multiplication:multiply';
+/** Auto's widest count across for a kind that is not fast facts (owner: 2-4), and the hard cap (never 7). */
+const LARGE_AUTO = 4;
+/** The skill the teacher chose for an item: a preset's own id (q.presetId), not its host's (a 2-digit x preset of
+ *  multiplication:multiply is not a table fact). */
+const skillOfItem = (it) => {
+    const q = (it && it.q) || {};
+    if (q.presetId && q.categoryId) return `${q.categoryId}:${q.presetId}`;
+    return String((it && it.skill) || (q.categoryId && q.skillId ? `${q.categoryId}:${q.skillId}` : ''));
+};
+const skillOfPool = (its) => skillOfItem((its || [])[0] || {});
+/** The finest lattice a page grid takes (units): a unit stays wider than the grid's rule. */
+const U_MAX = 144;
+const lcm2 = (a, b) => { const g = (x, y) => (y ? g(y, x % y) : x); return (a / g(a, b)) * b; };
+
+/** The kinds, the boxes and the counts across of a print in layout A. */
+function rowsSetup(pools, input) {
+    const c = m2Classes(pools, input);
+    const { ctx, ids, cls } = c;
+    const look = ctx.look;
+    const b = m2Budgets(input, ctx);
+    const hAt = hCacheOf(c);
+    const kmax = new Map();
+    const kMaxOf = (it) => {
+        if (!kmax.has(it)) { let k = 0; for (let d = 10; d >= 1 && !k; d--) if (fitsMeasured([it], d, ctx)) k = d; kmax.set(it, k || 1); }
+        return kmax.get(it);
+    };
+    const track = (C) => spanMm(C, 1, look);
+    // (the facts' digits: the ladder's for the facts' Auto count across, kept when a print takes fewer across)
+    let kdF = 0;
+    // one problem's box in a row of C across; kdP the ladder count the page's facts are drawn at (a legacy stack keeps it)
+    const boxA = (x, C, kdP) => {
+        const id = x.pool;
+        const it = x.it;
+        if (it.template === 'fact') {
+            const kd = cls[id].kd || kdF || factKAt(C, ctx);
+            const fw = factWidthMm(kd, factTracksOf(it), payloadOf(it).b);
+            return { need: fw + 4, k: kd, h: hAt(it, kd) + (cls[id].padDelta || 0), fact: true, ink: fw, work: false };
+        }
+        const kM = kMaxOf(it);
+        const kFit = Math.min(kM, Math.min(10, C));
+        const kk = isStackLegacy(it) && kdP > kFit && fitsMeasured([it], kdP, ctx) ? kdP : kFit;
+        return { need: C === 1 ? 0 : factCellWMm(kM, look), k: kk, h: hAt(it, kk), fact: false, work: kitWork(it) || workRowsOf(it) > 0 };
+    };
+    // the kinds: fast facts by the skill's name; the others by their measured boxes (the count across they fit, up to
+    // LARGE_AUTO, and their height - within TALL_AT of the kind's shortest)
+    const kindOf = {};
+    for (const id of ids) if (isFactSkill(skillOfPool(pools[id]))) kindOf[id] = 'fact';
+    const prof = ids.filter((id) => !kindOf[id]).map((id) => {
+        const its = pools[id];
+        const k = Math.min(LARGE_AUTO, ...its.map(kMaxOf));
+        const hs = its.map((it) => hAt(it, k)).sort((p, q) => p - q);
+        return { id, k, h: hs[Math.floor(hs.length / 2)] || 40 };
+    }).sort((p, q) => p.h - q.h || q.k - p.k);
+    const groups = [];
+    for (const p of prof) {
+        const g = groups[groups.length - 1];
+        if (g && g.k === p.k && p.h <= g.h0 * TALL_AT) g.ids.push(p.id);
+        else groups.push({ ids: [p.id], k: p.k, h0: p.h });
+    }
+    const NAMES = ['mid', 'large', 'long', 'tall', 'big', 'wide'];
+    groups.forEach((g, i) => { for (const id of g.ids) kindOf[id] = groups.length === 1 ? 'large' : (NAMES[i] || `large${i}`); });
+    // (one sheet, one set of kinds and counts across: the probe's, remembered on the input for the dealt problems)
+    const cacheKey = `${ctx.size}|${look}|${Number(input.mixColumns) || 0}|${input.mixColumnsMode || ''}|${ids.join(',')}`;
+    const hit = input.mixRowsC && input.mixRowsC.key === cacheKey ? input.mixRowsC : null;
+    if (hit) Object.assign(kindOf, hit.kindOf);
+    const kinds = [...new Set(ids.map((id) => kindOf[id]))].sort((p, q) => (p === 'fact' ? -1 : q === 'fact' ? 1 : 0));
+    const idsOf = (k) => ids.filter((id) => kindOf[id] === k);
+    // the counts across: facts first (their digits are the page's), then every larger kind
+    const asked = Number(input.mixColumns) || 0;
+    const mode = asked ? (input.mixColumnsMode === 'aim' ? 'aim' : 'exact') : 'auto';
+    const items = (k) => idsOf(k).flatMap((id) => (pools[id] || []).map((it) => ({ pool: id, it })));
+    const why = [];
+    // (each box as wide as its drawing needs, the row's rest shared: a count fits where every row of the kind's
+    // problems, in their print order, holds its boxes' needs - and no box needs more than the whole row)
+    const seed0 = deriveSeed('mixed-practice', (input && input.seed) || 0);
+    const kindSeq = {};
+    const seqKind = (k) => {
+        if (!kindSeq[k]) kindSeq[k] = seqOf({ ids: idsOf(k) }, pools, Object.fromEntries(idsOf(k).map((id) => [id, (pools[id] || []).length])), seed0);
+        return kindSeq[k];
+    };
+    const fitsKind = (k, C, kdP) => {
+        if (C === 1) return true;
+        const bad = items(k).find((x) => fitsWhy(k, C, kdP, x));
+        if (bad) { why.push(`${k} ${C}: ${bad.it.skill} ${bad.it.template} ${fitsWhy(k, C, kdP, bad)}`); return false; }
+        const sq = seqKind(k);
+        const W = spanMm(C, C, look);
+        for (let i = 0; i < sq.length; i += C) {
+            const row = sq.slice(i, i + C).map((x) => boxA(x, C, kdP).need);
+            const sum = row.reduce((a, v) => a + v, 0) + (row.length - 1) * cellGapMm(look);
+            if (sum > W * (row.length / C) + 0.5 && row.length === C) { why.push(`${k} ${C}: row ${i / C + 1} needs ${sum.toFixed(1)} > ${W.toFixed(1)}`); return false; }
+        }
+        return true;
+    };
+    const fitsWhy = (k, C, kdP, x) => {
+        if (k !== 'fact' && (x.it.fclass === 'word' || x.it.fclass === 'wide')) return 'word';
+        const d = boxA(x, C, kdP);
+        if (d.need > spanMm(C, C, look) + 0.5) return `need ${d.need.toFixed(1)} > ${track(C).toFixed(1)} (kMax ${kMaxOf(x.it)})`;
+        // (a box no wider than its drawing / 0.47 - mixed-m3 width)
+        if (d.fact && d.ink / track(C) < 0.47) return `ink ${d.ink.toFixed(1)}`;
+        // (a larger box no wider than twice the narrowest box its drawing fits - mixed-m3 width)
+        if (!d.fact && !isStackLegacy(x.it) && C > 1 && d.need > 0 && d.need / track(C) < 0.5 && kMaxOf(x.it) > C) return `wide ${d.need.toFixed(1)}`;
+        if (isStackLegacy(x.it) && x.it.q) {
+            const nums = String(x.it.q.text || '').match(/\d+/g) || [];
+            const T = Math.max(String(x.it.q.a ?? '').length, String(x.it.q.b ?? '').length, ...nums.slice(0, 2).map((s) => s.length), 2) + 1;
+            const em = ((FACT_LADDER[d.k] || 28) / 72) * 25.4;
+            if (d.k >= C && T * 0.72 * em / track(C) < 0.46) return 'stack fill';
+        }
+        return '';
+    };
+    const defCols = input.mixDefaultCols || {};
+    const defOf = (k) => {
+        const xs = idsOf(k).map((id) => { const d = defCols[id]; return d && Number(d[ctx.size]) > 0 ? Math.round(Number(d[ctx.size])) : 0; }).filter(Boolean);
+        return xs.length ? Math.min(...xs) : 0;
+    };
+    const C = {};
+    let clamped = false;
+    let kdP = 0;
+    for (const k of (hit ? [] : kinds)) {
+        const cap = k === 'fact' ? C_MAX : LARGE_MAX;
+        let n;
+        if (mode === 'exact') { n = Math.min(asked, cap); if (n !== asked) clamped = true; }
+        else if (mode === 'aim') {
+            n = Math.min(asked, cap);
+            while (n > 1 && !fitsKind(k, n, kdP || factKAt(n, ctx))) n--;
+            if (n !== asked) clamped = true;
+        } else {
+            const def = defOf(k);
+            const hi = Math.min(cap, def || (k === 'fact' ? Math.min(C_MAX, FACT_AUTO_COLS[ctx.size] || C_MAX) : LARGE_AUTO));
+            n = hi;
+            while (n > 1 && !fitsKind(k, n, kdP || factKAt(n, ctx))) n--;
+            // (a larger kind whose widest box fills under half of its track at LARGE_AUTO: more across, never 7)
+            if (!def && k !== 'fact' && n > 1) {
+                const wide = (m) => Math.max(...items(k).map((x) => boxA(x, m, kdP || factKAt(m, ctx)).need));
+                while (n < LARGE_MAX && wide(n) / track(n) < 0.5 && fitsKind(k, n + 1, kdP || factKAt(n + 1, ctx))) n++;
+            }
+        }
+        C[k] = Math.max(1, n);
+        if (k === 'fact') {
+            kdP = Object.values(cls).find((x) => x.kd) ? Object.values(cls).find((x) => x.kd).kd : factKAt(C[k], ctx);
+            kdF = factKAt(C[k], ctx);
+        }
+    }
+    if (hit) { Object.assign(C, hit.C); kdP = hit.kdP; kdF = hit.kdF; }
+    else try { input.mixRowsC = { key: cacheKey, kindOf: Object.assign({}, kindOf), C: Object.assign({}, C), kdP, kdF }; } catch (e) { /* a frozen input re-chooses */ }
+    if (!kdP) kdP = factKAt(Math.max(...Object.values(C)), ctx);
+    // the counts across each kind may take below its own (its digits kept): an exact count of problems fills whole rows
+    // of every kind but the one whose short row ends the print (mixed-m3 boxes / shelfw: one short row, the last)
+    const okC = {};
+    for (const k of kinds) {
+        okC[k] = [C[k]];
+        // (within a third of its own count across, and never under 2: the page keeps its density)
+        if (mode !== 'exact') for (let m = C[k] - 1; m >= Math.max(2, Math.ceil((2 * C[k]) / 3)); m--) if (fitsKind(k, m, kdP)) okC[k].push(m);
+    }
+    const hK = Object.fromEntries(kinds.map((k) => [k, Math.max(8, ...items(k).map((x) => boxA(x, C[k], kdP).h))]));
+    /** The counts across for these problems {kind: n} -> {C: {kind: n}, last: the kind whose short row ends the print}. */
+    const chooseC = (nK) => {
+        let best = null;
+        const walk = (i, pick) => {
+            if (i === kinds.length) {
+                const rem = kinds.filter((k) => (nK[k] || 0) % pick[k]);
+                const cost = [rem.length, kinds.reduce((a, k) => a + Math.ceil((nK[k] || 0) / pick[k]) * hK[k], 0), kinds.reduce((a, k) => a + (C[k] - pick[k]), 0)];
+                const lt = (a, q) => { for (let j = 0; j < a.length; j++) { if (a[j] < q[j] - 1e-9) return true; if (a[j] > q[j] + 1e-9) return false; } return false; };
+                if (!best || lt(cost, best.cost)) best = { cost, C: Object.assign({}, pick), last: rem[0] || null, rem };
+                return;
+            }
+            for (const m of okC[kinds[i]]) { pick[kinds[i]] = m; walk(i + 1, pick); }
+        };
+        walk(0, {});
+        return best;
+    };
+    const Cauto = Object.assign({}, C);
+    const box = (x) => boxA(x, C[kindOf[x.pool]], kdP);
+    /** Set the print's counts across for these problems (an exact count); -> the kind whose short row ends it. */
+    const fix = (nK) => { const ch = chooseC(nK); Object.assign(C, ch.C); return ch; };
+    return { c, b, hAt, kindOf, kinds, idsOf, C, Cauto, kdP, box, mode, asked, clamped, fix };
+}
+
+/**
+ * A row's boxes on a lattice of U units: each as wide as its drawing needs, the rest of the row (A units) shared
+ * equally; a fast fact never wider than its drawing / 0.5 while a box beside it can take the rest (mixed-m3 width).
+ */
+function shareRow(ds, A, U, look) {
+    const pitch = factPitchMm(U, look);
+    const unitsOf = (mm) => Math.max(1, Math.ceil((mm + cellGapMm(look)) / pitch - 1e-6));
+    const n = ds.length;
+    let need = ds.map((d) => Math.min(A, d.need > 0 ? unitsOf(d.need) : 1));
+    // (the needs, rounded up to whole units, over the row: the row was measured to hold them - equal shares)
+    if (need.reduce((a, v) => a + v, 0) > A) need = need.map(() => 1);
+    const us = need.map(() => 0);
+    let left = A;
+    const fixed = new Set();
+    for (let round = 0; round <= n; round++) {
+        const open = ds.map((_, j) => j).filter((j) => !fixed.has(j));
+        if (!open.length) break;
+        const sh = Math.floor(left / open.length);
+        const over = open.filter((j) => need[j] > sh);
+        if (!over.length) {
+            let rem = left - sh * open.length;
+            for (const j of open) us[j] = sh;
+            const o2 = open.slice().sort((p, q) => (ds[p].fact - ds[q].fact) || p - q);
+            for (let k = 0; rem > 0; k = (k + 1) % o2.length) { us[o2[k]]++; rem--; }
+            break;
+        }
+        for (const j of over) { us[j] = need[j]; left -= need[j]; fixed.add(j); }
+    }
+    const capF = (j) => (ds[j].fact ? Math.max(need[j], unitsOf(ds[j].ink / 0.5)) : Infinity);
+    const others = ds.map((_, j) => j).filter((j) => !ds[j].fact);
+    if (others.length) {
+        let extra = 0;
+        ds.forEach((d, j) => { if (d.fact && us[j] > capF(j)) { extra += us[j] - capF(j); us[j] = capF(j); } });
+        for (let k = 0; extra > 0; k = (k + 1) % others.length) { us[others[k]]++; extra--; }
+    }
+    return us;
+}
+
+/** The row sizes of a kind's n problems at C across: full rows, then the rest (the print's short last row). */
+function rowSizes(n, C) {
+    if (n <= 0) return [];
+    const out = Array(Math.floor(n / C)).fill(C);
+    if (n % C) out.push(n % C);
+    return out;
+}
+
+/** The kinds' rows in print order: each kind's rows spread as evenly as the counts allow (runs <= the forced
+ *  minimum); `end`: the kind whose row ends the print (its short row is the print's last). */
+function scheduleKinds(R, kinds, end = null) {
+    const live = kinds.filter((k) => (R[k] || 0) > 0);
+    if (live.length <= 1) return live.length ? Array(R[live[0]]).fill(live[0]) : [];
+    const split = (M, g) => Array.from({ length: g }, (_, i) => Math.floor(((i + 1) * M) / g) - Math.floor((i * M) / g));
+    if (live.length === 2) {
+        const [X, Y] = R[live[0]] >= R[live[1]] ? live : [live[1], live[0]];
+        const M = R[X];
+        const m = R[Y];
+        const out = [];
+        if (M === m) { for (let i = 0; i < M; i++) out.push(...(end === Y ? [X, Y] : [Y, X])); return out; }
+        if (end === Y) {
+            // (the minor kind ends the print: the major's rows in m groups, each before a minor row)
+            split(M, m).forEach((nx) => { for (let j = 0; j < nx; j++) out.push(X); out.push(Y); });
+            return out;
+        }
+        split(M, m + 1).forEach((nx, i) => { for (let j = 0; j < nx; j++) out.push(X); if (i < m) out.push(Y); });
+        return out;
+    }
+    // (three kinds or more: the most rows left first, never the kind just placed; built from the END when a kind
+    // must end the print)
+    const left = Object.assign({}, R);
+    const out = [];
+    const total = live.reduce((a, k) => a + R[k], 0);
+    for (let i = 0; i < total; i++) {
+        const last = out[out.length - 1];
+        const cand = live.filter((k) => left[k] > 0 && k !== last).sort((p, q) => left[q] - left[p] || kinds.indexOf(p) - kinds.indexOf(q));
+        const k = i === 0 && end && left[end] > 0 ? end : (cand[0] || last);
+        out.push(k);
+        left[k]--;
+    }
+    return end ? out.reverse() : out;
+}
+
+/**
+ * Lay a print out in rows by type: counts {id: n} -> {rows: [{kind, C, cells: [{x, d}], short}], pages: [{rows, H, n,
+ * spare}], ...}. Each kind's problems in their own interleave (the skills one by one), the kinds' rows alternating.
+ */
+function rowsLay(S, pools, counts, seed, { exact = false, stretchLast = false } = {}) {
+    const { c, b, kindOf, kinds, idsOf, C, box } = S;
+    const look = c.ctx.look;
+    const g = rowGapMm(look);
+    // each kind's problems in order (its skills interleaved), then its rows
+    const seqK = {};
+    const sizesK = {};
+    for (const k of kinds) {
+        const kc = Object.fromEntries(idsOf(k).map((id) => [id, counts[id] || 0]));
+        seqK[k] = seqOf({ ids: idsOf(k) }, pools, kc, seed).map((x) => ({ x, d: box(x) }));
+        sizesK[k] = rowSizes(seqK[k].length, C[k]);
+    }
+    const R = Object.fromEntries(kinds.map((k) => [k, sizesK[k].length]));
+    // (the kind with a short row ends the print: its short row is the last row, its own grid - mixed-m3 shelfw / boxes)
+    const shortK = kinds.filter((k) => sizesK[k].length && sizesK[k][sizesK[k].length - 1] < C[k]);
+    let order;
+    if (shortK.length <= 1) order = scheduleKinds(R, kinds, shortK[0] || null);
+    else {
+        // (two kinds or more end short - the counts allow no other: the full rows first, then the short rows, the
+        // last full row's kind not the first short one's)
+        const Rf = Object.fromEntries(kinds.map((k) => [k, R[k] - (shortK.includes(k) ? 1 : 0)]));
+        const excess = (o) => {
+            const tot = {}; for (const k of o) tot[k] = (tot[k] || 0) + 1;
+            let worst = 0; let i = 0;
+            while (i < o.length) { let j = i; while (j + 1 < o.length && o[j + 1] === o[i]) j++; worst = Math.max(worst, j - i + 1 - Math.max(1, Math.ceil(tot[o[i]] / (o.length - tot[o[i]] + 1)))); i = j + 1; }
+            return worst;
+        };
+        for (const endF of [null, ...kinds.filter((k) => Rf[k] > 0)]) {
+            for (const tail of [shortK.slice(), shortK.slice().reverse()]) {
+                const o = scheduleKinds(Rf, kinds, endF).concat(tail);
+                if (!order || excess(o) < excess(order)) order = o;
+            }
+        }
+    }
+    // rows: each kind's sizes in its order; the short sizes are its last rows (they go to the last page)
+    const at = Object.fromEntries(kinds.map((k) => [k, { row: 0, item: 0 }]));
+    const rows = order.map((k) => {
+        const p = at[k];
+        const n = sizesK[k][p.row++];
+        const cells = seqK[k].slice(p.item, p.item + n);
+        p.item += n;
+        return { kind: k, C: C[k], cells, short: n < C[k] };
+    });
+    const natH = (r) => Math.max(0, ...r.cells.map((e) => e.d.h));
+    const H = rows.map(natH);
+    // a short row closes its own grid (one trailing area a grid): the rows of a page split after each short row
+    const heightOf = (rs) => rs.reduce((a, ri) => a + H[ri], 0) + Math.max(0, rs.length - 1) * g
+        + 2 * GRID_EDGE_MM * (1 + rs.filter((ri) => rows[ri].short).length);
+    const budgetOf = (pi) => (pi ? b.cont : b.first);
+    const pages = [];
+    let pg = null;
+    for (let ri = 0; ri < rows.length; ri++) {
+        const pi = pages.length - (pg ? 1 : 0);
+        if (!pg || heightOf(pg.rows.concat(ri)) > budgetOf(pi) + 1e-6) { pg = { rows: [] }; pages.push(pg); }
+        pg.rows.push(ri);
+    }
+    // (the last page under half the fullest: the pages share the rows evenly, as far as each page but the last can
+    // still be filled within its rows' H13 ceilings - mixed-m2 fill, mixed-m3 fill)
+    const nOf = (rs) => rs.reduce((a, ri) => a + rows[ri].cells.length, 0);
+    const capOf = (ri) => {
+        const hs = rows[ri].cells.filter((e) => !e.d.work).map((e) => e.d.h);
+        return hs.length ? Math.max(H[ri], (Math.min(...hs) - NAT_MM) / GROW_FILL) : Infinity;
+    };
+    const growTo = (rs) => rs.reduce((a, ri) => a + Math.min(capOf(ri), 1e4), 0) + Math.max(0, rs.length - 1) * g + 2 * GRID_EDGE_MM;
+    if (pages.length > 1) {
+        const ns0 = pages.map((p) => nOf(p.rows));
+        if (ns0[ns0.length - 1] * 2 < Math.max(...ns0)) {
+            const P = pages.length;
+            const out = [];
+            let ri = 0;
+            let left = rows.length ? nOf(rows.map((_, i) => i)) : 0;
+            for (let pi = 0; pi < P; pi++) {
+                const target = Math.ceil(left / (P - pi));
+                const rs = [];
+                let got = 0;
+                while (ri < rows.length) {
+                    // (a page before the last takes its share, and as many rows more as it needs to be filled within
+                    // its rows' H13 ceilings)
+                    if (pi < P - 1 && got >= target && rs.length && growTo(rs) >= budgetOf(pi) - BLANK_OK) break;
+                    if (heightOf(rs.concat(ri)) > budgetOf(pi) + 1e-6) break;
+                    rs.push(ri); got += rows[ri].cells.length; ri++;
+                }
+                out.push({ rows: rs });
+                left -= got;
+            }
+            const ns = out.map((p) => nOf(p.rows));
+            const ok = ri === rows.length && out.every((p) => p.rows.length) && ns[ns.length - 1] * 2 >= Math.max(...ns)
+                && out.slice(0, -1).every((p, i) => growTo(p.rows) >= budgetOf(i) - BLANK_OK);
+            if (ok) { pages.length = 0; pages.push(...out); }
+        }
+    }
+    // the short rows of the last page close its grids: they go to its end, kinds still alternating where they can
+    // (a short row in the middle of a page is the last row of its own grid - heightOf counts its border)
+    pages.forEach((p, pi) => {
+        p.H = p.rows.map((ri) => H[ri]);
+        const last = pi === pages.length - 1;
+        let spare = Math.max(0, budgetOf(pi) - heightOf(p.rows));
+        if (!(exact && last) || stretchLast) {
+            const caps = p.rows.map(capOf);
+            for (let it = 0; it < 10 && spare > 0.05; it++) {
+                const open = p.H.map((h, k) => k).filter((k) => caps[k] - p.H[k] > 0.05);
+                if (!open.length) break;
+                const each = spare / open.length;
+                for (const k of open) { const add = Math.min(each, caps[k] - p.H[k]); p.H[k] += add; spare -= add; }
+            }
+            p.spareCapped = spare;
+            if (spare > BLANK_OK) { const each = spare / p.H.length; p.H = p.H.map((h) => h + each); spare = 0; }
+        } else p.spareCapped = 0;
+        p.spare = spare;
+        p.n = nOf(p.rows);
+    });
+    return { rows, pages, order, R, sizesK, seqK, heightOf, budgetOf };
+}
+
+/** The kinds' problems by the weights: {kind: n} -> {id: n} (each skill two at least where the kind holds them). */
+function rowsDeal(S, w, nK) {
+    const out = {};
+    for (const k of S.kinds) {
+        const ids = S.idsOf(k);
+        const n = nK[k] || 0;
+        const ws = Object.fromEntries(ids.map((id) => [id, w[id] || 1]));
+        const d = dealCounts(ws, n, { min: Math.min(2, Math.floor(n / Math.max(1, ids.length))) }).counts;
+        for (const id of ids) out[id] = d[id] || 0;
+    }
+    return out;
+}
+
+/**
+ * Fill P pages with whole rows of every kind: the rows of each kind as near its weighted share as whole rows allow,
+ * every page filled within its rows' H13 ceilings, the most problems. -> {counts, L (the laid print)} or null.
+ */
+function rowsFill(S, pools, w, P, seed) {
+    const { kinds, idsOf, C, b } = S;
+    const W = kinds.reduce((a, k) => a + idsOf(k).reduce((x, id) => x + (w[id] || 1), 0), 0);
+    const wK = Object.fromEntries(kinds.map((k) => [k, idsOf(k).reduce((x, id) => x + (w[id] || 1), 0)]));
+    // each kind's row height (its tallest probe box): how many rows a page could take
+    const hK = Object.fromEntries(kinds.map((k) => [k, Math.max(8, ...idsOf(k).flatMap((id) => (pools[id] || []).map((it) => S.box({ pool: id, it }).h)))]));
+    const rMax = Object.fromEntries(kinds.map((k) => [k, Math.max(1, Math.ceil(((b.first + (P - 1) * b.cont) / hK[k])) + 1)]));
+    let best = null;
+    const all = [];
+    const saveC = Object.assign({}, C);
+    Object.assign(C, S.Cauto);
+    const combo = (i, R) => {
+        if (i === kinds.length) {
+            const nK = Object.fromEntries(kinds.map((k) => [k, R[k] * C[k]]));
+            if (kinds.some((k) => R[k] < 1 || nK[k] < Math.min(2 * idsOf(k).length, 2 * C[k]))) return;
+            const counts = rowsDeal(S, w, nK);
+            const L = rowsLay(S, pools, counts, seed, { exact: false });
+            if (L.pages.length > P) return;
+            const tight = L.pages.every((pg) => (pg.spareCapped || 0) <= BLANK_OK);
+            const N = kinds.reduce((a, k) => a + nK[k], 0);
+            const dev = Math.max(...kinds.map((k) => Math.abs(nK[k] - (wK[k] / W) * N) / C[k]));
+            all.push({ tight, full: L.pages.length === P, N, dev, counts, L });
+            return;
+        }
+        const k = kinds[i];
+        for (let r = 1; r <= rMax[k]; r++) { R[k] = r; combo(i + 1, R); }
+    };
+    combo(0, {});
+    Object.assign(C, saveC);
+    // (filled first, on the pages asked; then the weights as closely as a page within a tenth of the fullest allows -
+    // "fill the paper", owner 2026-11-03; the notes say which skill fills the rest)
+    const pool = all.filter((x) => x.tight && x.full).length ? all.filter((x) => x.tight && x.full) : all.filter((x) => x.tight).length ? all.filter((x) => x.tight) : all;
+    const top = Math.max(0, ...pool.map((x) => x.N));
+    for (const x of pool.filter((y) => y.N >= 0.9 * top - 1e-9)) if (!best || x.dev < best.dev - 1e-9 || (Math.abs(x.dev - best.dev) < 1e-9 && x.N > best.N)) best = x;
+    return best;
+}
+
+/** Counts for layout A: the exact counts, else the pages filled (rowsFill). Same shape as m2Counts. */
+const nKOf = (S, counts) => Object.fromEntries(S.kinds.map((k) => [k, S.idsOf(k).reduce((a, id) => a + (counts[id] || 0), 0)]));
+function rowsCounts(poolsIn, input) {
+    const S = rowsSetup(poolsIn, input);
+    const w0 = m2Weights(input, S.c.ids);
+    const seed = deriveSeed('mixed-practice', (input && input.seed) || 0);
+    const exact = input.exactCounts || null;
+    const sum = (x) => S.c.ids.reduce((a, id) => a + (x[id] || 0), 0);
+    // a full page of this mix (the dialog's figure): one page filled by the weights (an exact count's shape)
+    const shape = exact ? Object.fromEntries(S.c.ids.map((id) => [id, Math.max(1, Number(exact[id]) || 1)])) : w0;
+    if (exact) {
+        const counts = Object.fromEntries(S.c.ids.map((id) => [id, Math.max(0, Math.floor(Number(exact[id]) || 0))]));
+        S.fix(nKOf(S, counts));
+        const L = rowsLay(S, poolsIn, counts, seed, { exact: true });
+        const one = rowsFill(S, poolsIn, shape, 1, seed);
+        const spare = Math.max(0, ...L.pages.slice(0, -1).map((p) => p.spare || 0));
+        const perPage = L.pages.length > 1 ? Math.ceil(sum(counts) / L.pages.length) : Math.max(sum(counts), one ? sum(one.counts) : 0);
+        return { counts, perPage, across: Math.max(...Object.values(S.C)), acrossByKind: S.C, classes: S.c, fill: { counts, rest: false }, ladderNote: '', spare, S };
+    }
+    const P = Math.max(1, Number(input.mixPages) || 1);
+    const best = rowsFill(S, poolsIn, w0, P, seed);
+    const cells = best ? best.counts : Object.fromEntries(S.c.ids.map((id) => [id, 2]));
+    const rest = !withinShare(cells, w0, S.c.ids);
+    const must = Number(input.mustBeat) || 0;
+    const ladderNote = must && sum(cells) / P <= must
+        ? `Mixed practice: with the skills in the proportions asked, this size holds ${Math.round(sum(cells) / P)} problems a page, no more than the next size up (${must}).` : '';
+    const spare = best ? Math.max(0, ...best.L.pages.map((p) => p.spare || 0)) : 0;
+    return { counts: cells, perPage: Math.round(sum(cells) / P), across: Math.max(...Object.values(S.C)), acrossByKind: S.C, classes: S.c, fill: { counts: cells, rest }, ladderNote, spare, S };
+}
+
+function planRowsA(input, pools) {
+    const S = rowsSetup(pools, input);
+    const { c, b, kindOf, kinds, C } = S;
+    const { ctx, ids, cls } = c;
+    const weights = m2Weights(input, ids);
+    const labels0 = labelStyleOf(ctx.look, input.labels);
+    const strandOf = (id) => {
+        const it0 = pools[id][0] || {};
+        const cat = String(it0.skill || '').split(':')[0] || (it0.q && it0.q.categoryId) || '';
+        return STRAND_BY_CATEGORY[cat] || '';
+    };
+    const strands = ids.map(strandOf);
+    const names = Object.fromEntries(ids.map((id, i) => {
+        const name = strands[i] && strands.filter((x) => x === strands[i]).length === 1 ? strands[i] : poolName(input, pools[id]);
+        return [id, { name, noun: /problems?$/i.test(name) ? name.toLowerCase() : `${name.toLowerCase()} problems` }];
+    }));
+    const asked = input.exactCounts ? 1 : Math.max(1, Number(input.mixPages) || 1);
+    const seed0 = deriveSeed('mixed-practice', input.seed || 0);
+    const counts0 = Object.fromEntries(ids.map((id) => [id, (pools[id] || []).length]));
+    S.fix(nKOf(S, counts0));
+    let L = rowsLay(S, pools, counts0, seed0, { exact: !!input.exactCounts });
+    // (a fill print ends in whole rows: a short row the dealt problems leave is left off)
+    if (!input.exactCounts && L.rows.some((r) => r.short)) {
+        const cut = Object.assign({}, counts0);
+        for (const r of L.rows.filter((x) => x.short)) for (const e of r.cells) if (cut[e.x.pool] > 2) cut[e.x.pool]--;
+        const L2 = rowsLay(S, pools, cut, seed0, { exact: false });
+        if (!L2.rows.some((r) => r.short) && L2.pages.length <= L.pages.length) L = L2;
+    }
+    // (a fill print never takes a page more than asked: the dealt boxes, taller than the probe's, give up whole rows
+    // from the end - the kind of the last row, its skills from the most problems)
+    for (let guard = 0; guard < 40 && !input.exactCounts && L.pages.length > asked; guard++) {
+        const lastR = L.rows[L.rows.length - 1];
+        const cut = Object.fromEntries(ids.map((id) => [id, L.rows.reduce((a, r) => a + r.cells.filter((e) => e.x.pool === id).length, 0)]));
+        for (const e of lastR.cells) cut[e.x.pool]--;
+        if (ids.some((id) => cut[id] < 0) || ids.reduce((a, id) => a + cut[id], 0) < 2) break;
+        L = rowsLay(S, pools, cut, seed0, { exact: false });
+    }
+    const n = L.pages.reduce((a, p) => a + p.n, 0);
+    const labels = labels0 === 'letter' && n > 26 ? 'tab' : labels0;
+    const frame = titledCont(frameOf({ skills: input.skills || [], input, tabId: input.mixTabId || 'Mixed 1', title: input.mixTitle || 'Mixed practice', twoLine: true, score: n }));
+    const instr = instructionText('default-solve');
+    const notes = [];
+    const pages = [];
+    const pageOrders = [];
+    const turnsPages = [];
+    const achieved = {};
+    let start = 1;
+    let num = 1;
+    const drawAt = (it, id, k) => {
+        let x = it.template === 'fact' ? atColumns(it, k) : it;
+        const cq = x.q && x.q.cell;
+        if (cls[id].pt && cq && cq.template === 'fact') {
+            x = Object.assign({}, x, { q: Object.assign({}, x.q, { cell: Object.assign({}, cq, { payload: Object.assign({}, cq.payload, { pt: cls[id].pt, padTop: cls[id].padTop }) }) }) });
+        }
+        return x;
+    };
+    const gap = rowGapMm(ctx.look);
+    // (the short rows that end the print: each its own grid from the frame's left edge)
+    const tailShort = (ri) => { for (let j = ri; j < L.rows.length; j++) if (!L.rows[j].short) return false; return true; };
+    for (const [pi, pg] of L.pages.entries()) {
+        const sections = [];
+        if (pi === 0 && input.stepStrip) sections.push({ kind: 'html', html: input.stepStrip });
+        const band = { kind: 'band', label: '', instr, contents: [] };
+        sections.push(band);
+        const order = [];
+        const turns = [];
+        // the page's grids: a short row closes the grid it ends
+        const grids = [];
+        let cur = [];
+        pg.rows.forEach((ri, j) => {
+            // (rows whose counts across share no lattice of <= U_MAX units start a grid of their own)
+            if (cur.length && cur.reduce((a, jj) => lcm2(a, L.rows[pg.rows[jj]].C), L.rows[ri].C) > U_MAX) { grids.push(cur); cur = []; }
+            // (the print's last row, short: its own grid from the frame's left edge, closed on its right - r4)
+            const final = tailShort(ri);
+            if (final && cur.length) { grids.push(cur); cur = []; }
+            cur.push(j);
+            if (L.rows[ri].short || j === pg.rows.length - 1) { grids.push(cur); cur = []; }
+        });
+        for (const gj of grids) {
+            const finalShort = gj.length === 1 && tailShort(pg.rows[gj[0]]);
+            // (one lattice for the grid's rows: the counts across' common multiple, as fine as a unit wider than the
+            // grid's rule allows - <= U_MAX units)
+            const l0 = gj.reduce((a, j) => lcm2(a, L.rows[pg.rows[j]].C), 1);
+            const U = l0 * Math.max(1, Math.floor(U_MAX / l0));
+            const items = [];
+            let trail = null;
+            gj.forEach((j, rj) => {
+                const r = L.rows[pg.rows[j]];
+                const A0 = r.short ? Math.round((U * r.cells.length) / r.C) : U;
+                const us = shareRow(r.cells.map((e) => e.d), A0, U, ctx.look);
+                let u0 = 0;
+                let prev = null;
+                r.cells.forEach((e, ci) => {
+                    const span = us[ci];
+                    const col = u0 + 1;
+                    u0 += span;
+                    let it = drawAt(e.x.it, e.x.pool, e.d.k);
+                    const pad = input.rulePads && input.rulePads[num];
+                    num++;
+                    if (pad && pad.mm > 0) {
+                        const cq = it.q && it.q.cell;
+                        if (it.template === 'fact' && cq && cq.payload) {
+                            const pt0 = cq.payload.padTop !== undefined ? cq.payload.padTop : factPadTop(labels, e.d.k);
+                            it = Object.assign({}, it, { q: Object.assign({}, it.q, { cell: Object.assign({}, cq, { payload: Object.assign({}, cq.payload, { padTop: Math.round((pt0 + pad.mm) * 100) / 100 }) }) }) });
+                        } else it = Object.assign({}, it, { cellStyle: `${it.cellStyle || ''}padding-top:${Math.round((pad.padMm + pad.mm) * 100) / 100}mm;` });
+                    }
+                    order.push(e.x.pool);
+                    if (prev !== e.x.pool) turns.push(e.x.pool);
+                    prev = e.x.pool;
+                    achieved[e.x.pool] = (achieved[e.x.pool] || 0) + 1;
+                    items.push(Object.assign(planItem(markWork(it, ctx.size), { cols: e.d.k }), {
+                        kind: kindOf[e.x.pool], skill: skillOfItem(e.x.it),
+                        place: { col, row: rj + 1, span, rows: 1 },
+                    }));
+                });
+                if (r.short) trail = { col: u0 + 1, row: rj + 1, rows: 1 };
+            });
+            const H = gj.map((j) => pg.H[j]);
+            let cols = U;
+            if (finalShort) { cols = items.reduce((a, it) => a + it.place.span, 0); trail = null; }
+            const part = gridPart(items, { cols, rows: gj.length, labels, start });
+            part.height = `${Math.round((H.reduce((a, h) => a + h, 0) + (H.length - 1) * gap + 2 * GRID_EDGE_MM) * 100) / 100}mm`;
+            part.rowsTpl = H.map((h) => `${Math.round(h * 100) / 100}fr`).join(' ');
+            if (trail) part.trail = trail;
+            if (finalShort) {
+                part.widthPct = ((cols * factPitchMm(U, ctx.look) - gap + BAND_SIDE_MM) / (186 - 2 * BAND_SIDE_MM)) * 100;
+                part.left = true;
+                const prevPart = band.contents[band.contents.length - 1];
+                if (prevPart) prevPart.bottom = true;
+            }
+            band.contents.push(part);
+            start += items.length;
+        }
+        pageOrders.push(order);
+        turnsPages.push(turns);
+        pages.push({ sections });
+    }
+    // the notes, from the printed order WITHIN each kind (a row holds one kind; runs are judged within it)
+    const printAll = pageOrders.flat();
+    const total = Object.fromEntries(ids.map((id) => [id, printAll.filter((x) => x === id).length]));
+    const runNotes = {};
+    for (const k of kinds) {
+        const seqk = printAll.filter((id) => kindOf[id] === k);
+        const rk = runsIn(seqk);
+        const live = S.idsOf(k).filter((id) => total[id]);
+        for (const id of live) {
+            if ((rk[id] || 0) > 2 && live.length > 1) {
+                runNotes[id] = rk[id];
+                notes.push(`${names[id].name} takes most of its rows, so up to ${rk[id]} ${names[id].noun} come in a row`);
+            }
+        }
+    }
+    // (and across the whole print: a skill alone in its kind fills its rows, so its problems come in a row)
+    const runsAll = runsIn(printAll);
+    for (const id of ids) {
+        if ((runsAll[id] || 0) > 2 && ids.filter((x) => total[x]).length > 1 && runNotes[id] !== runsAll[id]) {
+            notes.push(`${names[id].name} has rows of its own, so up to ${runsAll[id]} ${names[id].noun} come in a row`);
+        }
+    }
+    if (!input.exactCounts && !withinShare(total, weights, ids)) {
+        const over = ids.slice().sort((a, c2) => total[c2] / (weights[c2] || 1) - total[a] / (weights[a] || 1))[0];
+        notes.push(`${names[over].name} fills the rest of the page: ${ids.map((id) => `${total[id]} ${names[id].noun}`).join(', ')}.`);
+    }
+    if (input.ladderNote) notes.push(input.ladderNote);
+    if (L.pages.length > asked) notes.push(`Mixed practice: the ${n} problems need ${L.pages.length} pages, so ${L.pages.length - asked === 1 ? 'a page was' : `${L.pages.length - asked} pages were`} added.`);
+    // (a kind's rows are whole rows of its own: a skill left off a page is said)
+    const off = ids.filter((id) => total[id] >= pageOrders.length && pageOrders.some((o) => !o.includes(id)));
+    if (off.length && pageOrders.length > 1) notes.push(`Mixed practice: each row holds one kind of problem, so ${off.map((id) => names[id].name).join(' and ')} ${off.length > 1 ? 'are' : 'is'} not on every page (one on every page would need another page of rows).`);
+    const lone = [];
+    for (const order of pageOrders) for (const id of ids) if (order.filter((x) => x === id).length === 1) lone.push(names[id].name);
+    if (lone.length) notes.push(`Mixed practice: ${[...new Set(lone)].join(' and ')} has only one problem on a page.`);
+    const loads = pageOrders.map((o) => o.length);
+    // (an exact count over several pages: the problems a page of THIS print holds, page by page - n over its pages,
+    // rounded up; rows of one kind make pages of different loads)
+    let perPage = input.exactCounts && loads.length > 1 ? Math.ceil(n / loads.length) : Math.max(0, ...loads);
+    if (!(input.exactCounts && loads.length > 1)) {
+        const one = rowsFill(S, pools, input.exactCounts ? Object.fromEntries(ids.map((id) => [id, Math.max(1, Number(input.exactCounts[id]) || 1)])) : weights, 1, seed0);
+        if (one) perPage = Math.max(perPage, one.L.pages[0] ? one.L.pages[0].n : 0);
+    }
+    const turnsAll = printAll;
+    const forcedOf = (id) => Math.max(2, Math.ceil(total[id] / Math.max(1, n - total[id] + 1)));
+    const runsByPage = pageOrders.map((o) => Object.fromEntries(ids.map((id) => [id, { run: runsIn(o)[id] || 0, turns: o.filter((x) => x === id).length, cap: forcedOf(id) }])));
+    const longest = Math.max(0, ...Object.values(runsAll));
+    const acrossTop = Math.max(...Object.values(C));
+    const columnsMode = S.mode;
+    const acrossByKind = Object.assign({}, C);
+    return assemble(ROLE_ID, input, frame, pages, {
+        defaultLook: DEFAULT_LOOK,
+        meta: {
+            items: n, scoreOutOf: n, units: acrossTop, achieved, arrangement: 'mixed', notes: [...new Set(notes)],
+            m2: {
+                groups: [{ pools: ids.slice(), R: 1, tall: [] }],
+                classes: Object.fromEntries(ids.map((id) => [id, { k: C[kindOf[id]], s: 1, h: Math.round(cls[id].h * 10) / 10, full: C[kindOf[id]] === 1, tall: false, kind: kindOf[id] }])),
+                budgets: { first: Math.round(b.first * 10) / 10, cont: Math.round(b.cont * 10) / 10 }, turns: pageOrders, longest, pages: pageOrders, asked, capNote: '', mustBeat: Number(input.mustBeat) || 0, perPage, runs: runsByPage, runNotes, turnsAll,
+                across: acrossTop, acrossByKind, mixLayout: 'rows', rowKinds: L.rows.map((r) => r.kind), auto: columnsMode === 'auto', columnsMode, ...(S.clamped ? { clamped: true, asked: S.asked } : {}),
+            },
+            interleave: { keys: printAll, longest, notes: [] },
+            fits: [{ cols: acrossTop, across: acrossTop, acrossByKind, mixLayout: 'rows', auto: columnsMode === 'auto', columnsMode, ...(S.clamped ? { clamped: true, asked: S.asked } : {}), rows: L.rows.length, perPage,
+                line: `Fits: ${n} problems mixed in rows by type (${kinds.map((k) => `${k} ${C[k]} across`).join(', ')}), ${pages.length} page${pages.length > 1 ? 's' : ''} (${perPage} a page).` }],
+        },
+    });
+}
+
+
+/* ============================================== LAYOUT C: EVEN GRID (owner ruling 2026-11-03) */
+// One count across for the print (B's choice, acrossFor), the problems in their interleaved order in rows of that count,
+// every box ONE height - the tallest drawing's (a long procedure keeps its drawing and gives up working room); digits
+// never shrink. Pages take whole rows; the print's short last row is its own grid from the left; every page but the
+// last of an exact count shares its spare height equally (one height a page).
+
+function evenSetup(pools, input) {
+    const c = m2Classes(pools, input);
+    const b = m2Budgets(input, c.ctx);
+    const hAt = hCacheOf(c);
+    const A = acrossFor(c, pools, input, b, hAt);
+    const C = A.C;
+    const box = (x) => {
+        const d = boxOf(x, C, c, hAt);
+        // (a long procedure's drawing without its working room: the even height takes the rest away)
+        const h = d.work ? Math.max(8, d.h - workRowsOf(x.it) * WORK_ROW_MM) : d.h;
+        return Object.assign({}, d, { need: d.full ? 0 : d.need, hDraw: h });
+    };
+    return { c, b, hAt, A, C, box };
+}
+function evenLay(E, pools, counts, seed, { exact = false } = {}) {
+    const { c, b, C, box } = E;
+    const g = rowGapMm(c.ctx.look);
+    const seq = seqOf(c, pools, counts, seed).map((x) => ({ x, d: box(x) }));
+    const H0 = Math.max(8, ...seq.map((e) => e.d.hDraw));
+    const rows = [];
+    for (let i = 0; i < seq.length; i += C) rows.push({ cells: seq.slice(i, i + C), short: seq.slice(i, i + C).length < C, C });
+    const fit = (budget, extra) => Math.max(1, Math.floor((budget - 2 * GRID_EDGE_MM * (1 + extra) + g) / (H0 + g) + 1e-9));
+    const pages = [];
+    let ri = 0;
+    while (ri < rows.length) {
+        const pi = pages.length;
+        const budget = pi ? b.cont : b.first;
+        let k = Math.min(rows.length - ri, fit(budget, 0));
+        if (ri + k === rows.length && rows[rows.length - 1].short) k = Math.min(k, fit(budget, 1));
+        pages.push({ rows: Array.from({ length: k }, (_, j) => ri + j) });
+        ri += k;
+    }
+    pages.forEach((p, pi) => {
+        const budget = pi ? b.cont : b.first;
+        const last = pi === pages.length - 1;
+        const used = p.rows.length * H0 + (p.rows.length - 1) * g + 2 * GRID_EDGE_MM * (1 + (rows[p.rows[p.rows.length - 1]].short ? 1 : 0));
+        const spare = Math.max(0, budget - used);
+        const each = exact && last ? 0 : spare / p.rows.length;
+        p.H = p.rows.map(() => H0 + each);
+        p.spare = exact && last ? spare : 0;
+        p.spareCapped = p.spare;
+        p.n = p.rows.reduce((a, r) => a + rows[r].cells.length, 0);
+    });
+    return { rows, pages, H0 };
+}
+function evenCounts(poolsIn, input) {
+    const E = evenSetup(poolsIn, input);
+    const ids = E.c.ids;
+    const w0 = m2Weights(input, ids);
+    const seed = deriveSeed('mixed-practice', (input && input.seed) || 0);
+    const sum = (x) => ids.reduce((a, id) => a + (x[id] || 0), 0);
+    const exact = input.exactCounts || null;
+    if (exact) {
+        const counts = Object.fromEntries(ids.map((id) => [id, Math.max(0, Math.floor(Number(exact[id]) || 0))]));
+        const L = evenLay(E, poolsIn, counts, seed, { exact: true });
+        return { counts, perPage: L.pages.length > 1 ? Math.ceil(sum(counts) / L.pages.length) : sum(counts), across: E.C, classes: E.c, fill: { counts, rest: false }, ladderNote: '', spare: 0 };
+    }
+    const P = Math.max(1, Number(input.mixPages) || 1);
+    // (the pages filled with whole rows: as many rows as P pages hold at the even height, the weights' deal)
+    let best = null;
+    for (let n = 2 * ids.length; n <= 400; n += 1) {
+        if (n % E.C) continue;
+        const x = dealCounts(w0, n, { min: 2 }).counts;
+        const L = evenLay(E, poolsIn, x, seed);
+        if (L.pages.length > P) break;
+        best = x;
+    }
+    const cells = best || Object.fromEntries(ids.map((id) => [id, 2]));
+    return { counts: cells, perPage: Math.round(sum(cells) / P), across: E.C, classes: E.c, fill: { counts: cells, rest: false }, ladderNote: '', spare: 0 };
+}
+function planEvenC(input, pools) {
+    const E = evenSetup(pools, input);
+    const { c, C, A } = E;
+    const { ctx, ids, cls } = c;
+    const labels0 = labelStyleOf(ctx.look, input.labels);
+    const seed0 = deriveSeed('mixed-practice', input.seed || 0);
+    const counts0 = Object.fromEntries(ids.map((id) => [id, (pools[id] || []).length]));
+    const L = evenLay(E, pools, counts0, seed0, { exact: !!input.exactCounts });
+    const n = L.pages.reduce((a, p) => a + p.n, 0);
+    const labels = labels0 === 'letter' && n > 26 ? 'tab' : labels0;
+    const frame = titledCont(frameOf({ skills: input.skills || [], input, tabId: input.mixTabId || 'Mixed 1', title: input.mixTitle || 'Mixed practice', twoLine: true, score: n }));
+    const instr = instructionText('default-solve');
+    const gap = rowGapMm(ctx.look);
+    const U = UNITS_PER * C;
+    const pages = [];
+    const pageOrders = [];
+    const achieved = {};
+    let start = 1;
+    let num = 1;
+    for (const [pi, pg] of L.pages.entries()) {
+        const sections = [];
+        if (pi === 0 && input.stepStrip) sections.push({ kind: 'html', html: input.stepStrip });
+        const band = { kind: 'band', label: '', instr, contents: [] };
+        sections.push(band);
+        const order = [];
+        const lastShort = L.rows[pg.rows[pg.rows.length - 1]].short;
+        const groups = lastShort && pg.rows.length > 1 ? [pg.rows.slice(0, -1), pg.rows.slice(-1)] : [pg.rows];
+        groups.forEach((gr, gi) => {
+            const items = [];
+            const short = lastShort && gi === groups.length - 1;
+            let cols = U;
+            gr.forEach((ri, rj) => {
+                const r = L.rows[ri];
+                const A0 = r.short ? Math.round((U * r.cells.length) / C) : U;
+                const us = shareRow(r.cells.map((e) => e.d), A0, U, ctx.look);
+                let u0 = 0;
+                r.cells.forEach((e, ci) => {
+                    let it = e.x.it.template === 'fact' ? atColumns(e.x.it, e.d.k) : e.x.it;
+                    const cq = it.q && it.q.cell;
+                    if (cls[e.x.pool].pt && cq && cq.template === 'fact') it = Object.assign({}, it, { q: Object.assign({}, it.q, { cell: Object.assign({}, cq, { payload: Object.assign({}, cq.payload, { pt: cls[e.x.pool].pt, padTop: cls[e.x.pool].padTop }) }) }) });
+                    const pad = input.rulePads && input.rulePads[num];
+                    num++;
+                    if (pad && pad.mm > 0) {
+                        if (it.template === 'fact' && it.q && it.q.cell && it.q.cell.payload) {
+                            const cq2 = it.q.cell;
+                            const pt0 = cq2.payload.padTop !== undefined ? cq2.payload.padTop : factPadTop(labels, e.d.k);
+                            it = Object.assign({}, it, { q: Object.assign({}, it.q, { cell: Object.assign({}, cq2, { payload: Object.assign({}, cq2.payload, { padTop: Math.round((pt0 + pad.mm) * 100) / 100 }) }) }) });
+                        } else it = Object.assign({}, it, { cellStyle: `${it.cellStyle || ''}padding-top:${Math.round((pad.padMm + pad.mm) * 100) / 100}mm;` });
+                    }
+                    order.push(e.x.pool);
+                    achieved[e.x.pool] = (achieved[e.x.pool] || 0) + 1;
+                    items.push(Object.assign(planItem(markWork(it, ctx.size), { cols: e.d.k }), { skill: skillOfItem(e.x.it), place: { col: u0 + 1, row: rj + 1, span: us[ci], rows: 1 } }));
+                    u0 += us[ci];
+                });
+                if (short) cols = u0;
+            });
+            const H = gr.map((ri) => pg.H[pg.rows.indexOf(ri)]);
+            const part = gridPart(items, { cols, rows: gr.length, labels, start });
+            part.height = `${Math.round((H.reduce((a, h) => a + h, 0) + (H.length - 1) * gap + 2 * GRID_EDGE_MM) * 100) / 100}mm`;
+            part.rowsTpl = H.map((h) => `${Math.round(h * 100) / 100}fr`).join(' ');
+            if (short) {
+                part.widthPct = ((cols * factPitchMm(U, ctx.look) - gap + BAND_SIDE_MM) / (186 - 2 * BAND_SIDE_MM)) * 100;
+                part.left = true;
+                const prev = band.contents[band.contents.length - 1];
+                if (prev) prev.bottom = true;
+            }
+            band.contents.push(part);
+            start += items.length;
+        });
+        pageOrders.push(order);
+        pages.push({ sections });
+    }
+    const printAll = pageOrders.flat();
+    const runs = runsIn(printAll);
+    const total = Object.fromEntries(ids.map((id) => [id, printAll.filter((x) => x === id).length]));
+    const notes = [];
+    const names = Object.fromEntries(ids.map((id) => [id, poolName(input, pools[id])]));
+    for (const id of ids) if ((runs[id] || 0) > 2 && ids.filter((x) => total[x]).length > 1) notes.push(`${names[id]} takes most of the page, so up to ${runs[id]} ${names[id].toLowerCase()} problems come in a row`);
+    const asked = input.exactCounts ? 1 : Math.max(1, Number(input.mixPages) || 1);
+    if (L.pages.length > asked) notes.push(`Mixed practice: the ${n} problems need ${L.pages.length} pages, so ${L.pages.length - asked === 1 ? 'a page was' : `${L.pages.length - asked} pages were`} added.`);
+    notes.push('Mixed practice (Even grid): every box is one height, so long problems have less working room.');
+    const loads = pageOrders.map((o) => o.length);
+    const perPage = input.exactCounts && loads.length > 1 ? Math.ceil(n / loads.length) : Math.max(0, ...loads);
+    const forced = (id) => Math.max(2, Math.ceil(total[id] / (n - total[id] + 1)));
+    const runsByPage = pageOrders.map((o) => Object.fromEntries(ids.map((id) => [id, { run: runsIn(o)[id] || 0, turns: o.filter((x) => x === id).length, cap: forced(id) }])));
+    const longest = Math.max(0, ...Object.values(runs));
+    const mode = A.mode || (A.auto ? 'auto' : 'exact');
+    return assemble(ROLE_ID, input, frame, pages, {
+        defaultLook: DEFAULT_LOOK,
+        meta: {
+            items: n, scoreOutOf: n, units: C, achieved, arrangement: 'mixed', notes: [...new Set(notes)],
+            m2: { groups: [{ pools: ids.slice(), R: 1, tall: [] }], classes: Object.fromEntries(ids.map((id) => [id, { k: C, s: 1, h: Math.round(L.H0 * 10) / 10, full: false, tall: false }])),
+                budgets: { first: Math.round(E.b.first * 10) / 10, cont: Math.round(E.b.cont * 10) / 10 }, turns: pageOrders, longest, pages: pageOrders, asked, capNote: '', mustBeat: Number(input.mustBeat) || 0, perPage, runs: runsByPage, runNotes: {}, turnsAll: printAll,
+                across: C, mixLayout: 'even', auto: !!A.auto, columnsMode: mode, ...(A.clamped ? { clamped: true, asked: A.asked } : {}) },
+            interleave: { keys: printAll, longest, notes: [] },
+            fits: [{ cols: C, across: C, mixLayout: 'even', auto: !!A.auto, columnsMode: mode, ...(A.clamped ? { clamped: true, asked: A.asked } : {}), rows: L.rows.length, perPage,
+                line: `Fits: ${n} problems mixed in an even grid, ${C} across, every box ${Math.round(L.H0)} mm, ${pages.length} page${pages.length > 1 ? 's' : ''} (${perPage} a page).` }],
         },
     });
 }
@@ -1509,6 +2376,8 @@ function planMixedM2(input, pools) {
  * went. `perPage` is a full page of this mix at this size (the dialog's figure), `across` the count across.
  */
 export function m2Counts(poolsIn, input) {
+    if (mixLayoutOf(input) === 'rows') return rowsCounts(poolsIn, input);
+    if (mixLayoutOf(input) === 'even') return evenCounts(poolsIn, input);
     const c = m2Classes(poolsIn, input);
     const b = m2Budgets(input, c.ctx);
     const w0 = m2Weights(input, c.ids);

@@ -135,3 +135,50 @@ backtests for frame / shelfw / fill not added.
   c 5:14 exact (word problem beside one fact a row: the fact at 40 % of its box) is the same class: a word problem
   needs a 3-row span beside facts (gridOf spans at most 2).
 - Not done: engine items 7a-7d (Independent clamp / per-cell outline / parts across pages / row stretch) - budget.
+
+## r6 builder (Opus medium, 2026-11-03) - layouts A / B / C built; A and C NOT green (check conflicts, see "Open")
+Engine (`roles/mixed-practice.js`): `req.mixLayout` -> `input.mixLayout` (print-sheet normalises 'rows' | 'grid' | 'even',
+absent = 'rows'); `planMixedM2` / `m2Counts` dispatch to `planRowsA` / `rowsCounts` (A), the r5 grid unchanged (B, now
+reports `fits.mixLayout: 'grid'`), `planEvenC` / `evenCounts` (C). M1's one-size-class page is kept for A and B (its
+cells carry `data-ws-kind` under A: 'fact' when every box is a fact drawing); C always takes the M2 engine.
+- A: kinds - 'fact' by skill name (`*_facts`, `multiplication:multiply`; a preset is judged by its own id, so
+  `mult_2by2_standard` is not a fact), the rest grouped by measured box (count they fit up to 4, height within 1.45 x).
+  Each kind its own count across (facts up to 10 / 6 / 5 at S / M / L, larger up to 4, more - never 7 - only where the
+  widest box fills under half its track), each box as wide as its drawing needs (the row's rest shared; `shareRow`),
+  page lattice lcm(C) x k <= 144 units (a unit stays wider than the rule). Exact counts: the counts across chosen so as
+  few kinds as possible end short (`chooseC`, within a third of each kind's own count, digits kept), the short row(s) at
+  the end of the print, each its own left grid. Rows alternate (`scheduleKinds`, runs <= the forced minimum); within a
+  kind the skills interleave (`seqOf`). Pages greedy by whole rows; evened where the last page holds under half and every
+  page before it can still be filled within H13; rows grow within H13, then evenly (> 18 mm); an exact count's last page
+  is not stretched. Fill pages: whole rows of every kind, the most problems within 10 % of the fullest page, then the
+  weights closest (notes say which skill fills the rest). `data-ws-kind` on every cell (additive: `cell.js` / `grid.js` /
+  `answer-key.js` pass `kind` only when set). `fits.mixLayout`, `fits.acrossByKind`; exact multi-page perPage = n / pages
+  rounded up. Kinds / counts across cached on the input (`mixRowsC`) so the probe and the dealt page agree.
+- C: B's count across, rows of C in the interleaved order, ONE box height (the tallest drawing; a long procedure's work
+  room taken away), spare shared equally on every page but an exact count's last; note says long problems have less room.
+- Columns: 1-10 now (print-sheet clamps 1, not 2). Owner addition: `defaultColumns: {S, M, L}` on a provider or its
+  footprint is READ (print-sheet -> `input.mixDefaultCols`) as a kind's Auto count; none is declared yet.
+- `export const MIX_LAYOUTS = ['grid']` in print-sheet.js (lead's request: only layouts whose checks pass).
+- `tests/scripts/ws-mixed-render.cjs --layout rows|grid|even` (and it prints page loads, layout, across by kind).
+Owner's 41 (7,7,7,7,7,6): A S 40 / 1 (fact 7, large 4), M 30 / 11 (fact 6, large 4), L 20 / 20 / 1 (fact 4, large 4);
+B S 30 / 11 (6), M 25 / 16 (5), L 16 / 16 / 9 (4); C S 30 / 11 (6), M 25 / 16 (5), L 20 / 20 / 1 (4).
+Gates: mixed-m3 full 17 FAIL (78 scenarios; every other scenario clean, B clean), --quick 15; mixed-m2 --quick 7 FAIL
+(was 40); ws-teacher-plan-match OK; ws-teacher-arrangement OK; ws-boot-smoke OK; ws-code-snapshot OK; mixed-page
+--seeds 2 OK; ws-simple-print OK; one-section Independent / lesson / more-practice md5 identical (5 samples).
+Open (each needs a ruling or a check fix - not an engine tweak; no check was edited):
+1. A short row is measured as a FULL row. mixed-m3 `fullRows` / `rows.usedFrac` compare a row's cells with ITS OWN
+   grid's width, so the print's short last row (its own left grid, r4) counts as full: "full rows of kind 'large' hold
+   4 / 1". A short row inside a full-width grid instead fails `boxes` (its trailing area is an empty enclosed area), and
+   a narrower grid anywhere but the very end fails `shelfw`. So with an exact count that no fitting count across
+   divides (the owner's 13 larger problems: prime; C Even 41: prime) every layout without two-row boxes fails `kinds` /
+   `columns` / `across`. Fix proposal: judge "full" against the frame's inner width.
+2. Two kinds that both end short (owner M: facts 28 at 6, larger 13 at 4; Columns 6 S) - the counts allow no count
+   across that divides both; the second short row is a second short grid (`shelfw`).
+3. Columns 1 (`c columns 1 M`): a fact box the page width holds a 26 mm drawing (14 %) - `width` (>= 45 %) cannot hold.
+4. mixed-m2: c 5:14 ican M (4 / 9 / 4 / 2) and d 6:9 S (14 / 1) - balance ("within half") vs C2 fill (85 %) vs H13: the
+   only balanced pages leave a page under-filled or its boxes stretched past H13. Sections d frac-model H13 (4, the
+   Sections packer, pre-existing) untouched.
+5. A one-size-class page (e.g. add_facts + subtraction:subtract, mixed-page check) keeps M1's shelves under A, its
+   cells all one kind - the owner's name rule would split subtract out; ruling needed (mixed-page check is M1's).
+6. The 41st problem alone on page 2 at S (and 1 at L) - the owner's set needs one row more than a page holds.
+7. Missing-number legacy cells wrap at 5-6 across (r5 item 6, unchanged); visible in C.

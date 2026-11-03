@@ -171,8 +171,10 @@ function normaliseRequest(req = {}) {
     return {
         role, size: onePage ? 'S' : size, look, paper, seed, sections, arrangement, arrangementNotes,
         // (the print dialog's Columns for a mixed page, r4; the sections' own `columns` otherwise)
-        mixColumns: Number.isFinite(Number(req.columns)) && Number(req.columns) > 0 ? clampInt(req.columns, 2, 10, 0) : 0,
+        mixColumns: Number.isFinite(Number(req.columns)) && Number(req.columns) > 0 ? clampInt(req.columns, 1, 10, 0) : 0,
         columnsMode: req.columnsMode,
+        // (owner 2026-11-03: the Mixed up layout - 'rows' A Rows by type (the default), 'grid' B One grid, 'even' C Even grid)
+        mixLayout: ['rows', 'grid', 'even'].includes(req.mixLayout) ? req.mixLayout : 'rows',
         // Mixed practice (owner ruling 2026-10-23): fill the page (default) or stop when the
         // unique facts run out; related facts only when allowed (off by default).
         fill: normaliseFill(req.fill), families: normaliseFamilies(req.families),
@@ -3009,6 +3011,13 @@ async function buildSheetCore(req = {}) {
  * The sheet is built exactly as before; the key pages are then restyled (short) and ordered.
  * Adds `docHtml` (pupil and key pages in print order) and `keyOptions` to the result.
  */
+/**
+ * The Mixed up layouts (req.mixLayout) whose machine checks pass at the end of the last engine round - the print
+ * dialog's feature detection (lead, 2026-11-03). 'rows' (A, the request's default) and 'even' (C) are built but still
+ * red on the owner's 41 (mixed-m3 kinds / across / shelfw: design/status/mixed-m2.md r6), so only 'grid' (B) is listed.
+ */
+export const MIX_LAYOUTS = Object.freeze(['grid']);
+
 export async function buildSheet(req = {}) {
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own.
     if (req && req.role === 'detailed-lesson') return buildDetailedLesson(req);
@@ -3575,7 +3584,9 @@ async function buildRoleSheet(n, metaOf) {
         let ok = first.ok;
         let why = first.why;
         // M1's one-size-class page stays as it was when no count or page count is asked
-        if (ok && (exactCounts || mixPages > 1)) ok = false;
+        // (owner 2026-11-03: layouts A Rows by type and C Even grid are the M2 engine's; B One grid keeps M1's page)
+        // (A keeps M1's page of ONE size class - every box the same size is one kind of row; C is the M2 engine's)
+        if (ok && (exactCounts || mixPages > 1 || n.mixLayout === 'even')) ok = false;
         if (ok) {
             keepPrompts = true;
             mixDigits = widestTracks(pools.flatMap((p) => probe[p.id]));
@@ -3604,6 +3615,18 @@ async function buildRoleSheet(n, metaOf) {
             pools.forEach((p, pi) => { probe[p.id] = dealPool(p, pi, PROBE); measureMixed(probe[p.id]); input.floors[p.id] = floorOf(probe[p.id]); });
             input.arrangement = 'mixed';
             input.mixM2 = true;
+            input.mixLayout = n.mixLayout || 'rows';
+            // (owner addition 2026-11-03: a skill's provider may declare its own Auto count across, `defaultColumns:
+            // {S, M, L}` on the provider or its footprint - read only; absent, the role fits its own count)
+            input.mixDefaultCols = {};
+            pools.forEach((p) => {
+                const s0 = p.skills[0] || {};
+                let pr = null;
+                try { pr = getProvider(s0.categoryId || '', s0.skillId || ''); } catch (e) { pr = null; }
+                const fp = pr && pr.footprint && typeof pr.footprint === 'object' ? pr.footprint : null;
+                const dc = (pr && pr.defaultColumns) || (fp && fp.defaultColumns) || null;
+                if (dc && typeof dc === 'object') input.mixDefaultCols[p.id] = dc;
+            });
             // (the print dialog's Columns override, r4: req.columns, else the sections' own columns - one count across
             // for the whole mixed print; absent = Auto, the role picks it and reports it as fits.across)
             {
@@ -3613,7 +3636,7 @@ async function buildRoleSheet(n, metaOf) {
                 const cAsk = Number(n.mixColumns) || Number(secAsk.columns) || 0;
                 const modeRaw = String(n.columnsMode || (n.sections.find((s) => s.columnsMode) || {}).columnsMode || '').toLowerCase();
                 const mode = modeRaw === 'aim' ? 'aim' : modeRaw === 'exact' ? 'exact' : (modeRaw && modeRaw !== 'fixed' ? 'auto' : (cAsk ? 'exact' : 'auto'));
-                if (cAsk && mode !== 'auto') { input.mixColumns = Math.max(2, Math.min(10, cAsk)); input.mixColumnsMode = mode; }
+                if (cAsk && mode !== 'auto') { input.mixColumns = Math.max(1, Math.min(10, cAsk)); input.mixColumnsMode = mode; }
             }
             if (exactCounts) input.exactCounts = exactCounts;
             input.mixPages = mixPages;
@@ -3887,7 +3910,9 @@ async function buildRoleSheet(n, metaOf) {
         numberLine,
         fits: Object.assign({ cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
             // (a mixed page's count across, r4: the dialog shows "Auto (n)")
-            f0.across ? Object.assign({ across: f0.across, acrossAuto: !!f0.auto, columnsMode: f0.columnsMode || (f0.auto ? 'auto' : 'exact') }, f0.clamped ? { clamped: true, asked: f0.asked } : {}) : {}),
+            f0.across ? Object.assign({ across: f0.across, acrossAuto: !!f0.auto, columnsMode: f0.columnsMode || (f0.auto ? 'auto' : 'exact') }, f0.clamped ? { clamped: true, asked: f0.asked } : {}) : {},
+            // (owner 2026-11-03: the Mixed up layout used, and in A each kind's count across)
+            n.role === 'mixed-practice' && input.arrangement === 'mixed' ? Object.assign({ mixLayout: f0.mixLayout || (input.mixM2 ? input.mixLayout || 'rows' : (n.mixLayout === 'rows' ? 'rows' : 'grid')) }, f0.acrossByKind ? { acrossByKind: Object.assign({}, f0.acrossByKind) } : {}) : {}),
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,

@@ -96,6 +96,8 @@ export function cell(inner, opts = {}) {
     let extra = /^data-ws-key-[a-z-]+$/.test(opts.keyAttr || '') ? ` ${opts.keyAttr}` : '';
     // CL-4b: after the style too, for the same reason
     if (opts.writeAbove || String(inner).includes(WRITE_ABOVE)) extra += ` ${WRITE_ABOVE}`;
+    // (owner 2026-11-03, Mixed up layout A: the kind of problem the cell's row holds; additive, only when passed)
+    if (opts.kind && /^[a-z][a-z0-9-]*$/.test(opts.kind)) extra += ` data-ws-kind="${opts.kind}"`;
     return `<div class="ws-cell ${cls}"${a} style="${style}"${extra}>${lab}${body}</div>`;
 }
 
