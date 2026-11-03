@@ -519,3 +519,18 @@
    the keep-out) publishes a keep-out edge of 0 from its content box, so the rule above adds nothing there. Additive. */
 .ws-page .ws-grid:not(.facts):has(> .ws-cell > .ws-tab.w2, > .ws-cell > .ws-tab.w3) > .ws-cell:is([data-ws-cell="equation"], [data-ws-cell="fact"]):has(> .ws-tab):not(.mq-hfactcell):not(:has(> .ws-fact)):not([data-ws-writeabove]):not(:has([data-ws-writeabove])):not(.blankrun),
 .ws-page .ws-grid:not(.facts) > .ws-cell.mq-hfactcell[data-ws-cell]:has(> .ws-tab, > .ws-letter):not(.blankrun) { --ws-koin: 0mm; }
+
+/* 2026-11-03 (Lane D R4 prep, CL-40; additive): a count-by row (cells/count-row.js) starts its step tab at the cell's
+   top-left pad, which clears a 1-digit number tab's keep-out but not a w2 / w3 tab's (div_facts Review at L, the Mixed
+   Review's count-by rows numbered 10-12: the tab's pentagon at 8 mm across inside the 8.4 mm keep-out, L-OVERLAP
+   CL40-INK). Under a w2 / w3 tab the row starts 0.3 mm right of that tab's keep-out, as the one-line equations above do;
+   the row's height is unchanged. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell="count-row"]:has(> .ws-tab.w2, > .ws-tab.w3):not(.blankrun) {
+    padding-left: max(var(--fp, 3mm), calc(var(--ws-ko, 6mm) + 0.3mm)); }
+
+/* 2026-11-03 (Lane D R4 prep, CL-40; additive): the top inset a top-started across fact takes under a number tab (the
+   `> .ws-eq[data-ws-across]` rule above) did not reach a fact that carries a support UNDER it - the fact sits inside
+   .ws-supported > .ws-with-pane, so "110 ÷ 10 =" / "132 ÷ 12 =" with the skip strip under it (div_facts Independent,
+   More practice and Review at M and L) put its first digit inside the tab's keep-out (L-OVERLAP CL40-INK). The same
+   shrinkable spacer now stands above such a supported fact. */
+.ws-page .ws-grid > .ws-cell:has(> :is(.ws-tab, .ws-letter)):has(> .ws-supported > .ws-with-pane[data-ws-pane-place="under"] > .ws-pane-problem > .ws-eq[data-ws-across]):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: 0 1 max(0mm, calc(var(--ws-tab, 5mm) - 2mm - 0.2 * var(--ws-digit, 22pt))); min-height: 0; }

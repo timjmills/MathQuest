@@ -40,10 +40,14 @@ function fillToCeiling(L, size, columns) {
     if (!L || (columns && columns !== 'auto') || !(L.hMin > 0) || L.cols < 2) return L;
     const G = L.gridH;
     let rows = L.rows, perPage = L.perPage, note = '';
-    if (perPage < ceil && Math.ceil(ceil / L.cols) * L.hMin * 1.05 <= G - SAFETY_H_MM) {
-        rows = Math.ceil(ceil / L.cols);
-        perPage = ceil;
-        note = `Test: ${ceil} problems, ${L.cols} x ${rows} (12.1).`;
+    // Lane D R4 prep (GRID-EVEN / HOLE, div_facts Test at S / M with the skip support: 20 facts in 3 columns re-laid
+    // the 2-cell last row at 1.5 cell widths and moved its answer zone, SCC-T10): the Test fills WHOLE rows - the
+    // most rows of `cols` up to the ceiling (3 columns: 18), never a short last row.
+    const whole = Math.floor(ceil / L.cols) * L.cols;
+    if (perPage < whole && (whole / L.cols) * L.hMin * 1.05 <= G - SAFETY_H_MM) {
+        rows = whole / L.cols;
+        perPage = whole;
+        note = `Test: ${whole} problems, ${L.cols} x ${rows} (12.1).`;
     }
     // PG-14: the rows take the grid down to a strip of under a fifth of it - never past the even
     // share, and never shorter than the layout made them.

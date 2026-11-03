@@ -1290,6 +1290,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "rp1-skipstrip-laned",
+   "check": "RP-1 (answer given away) reads a skip-count strip by its marks, not its digits: a plain count-by list of the divisor's multiples may hold the quotient (12 ÷ 2: 2 4 6 8 10 lists 6); a strip that marks the quotient's (or the dividend's) term out by weight, stroke, ring or fill still fails (lead ruling, Lane D R4 prep 2026-11-03)",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-SUPPORT RP-1 (supportCheckInPage plainStrip: [data-ws-skipstrip] terms step x 1..n, one signature per [data-ws-term] group, nothing else drawn)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/rp1-skipstrip.fail.html",
+    "state": "12 ÷ 2 with its skip strip's term 6 drawn bold on a 0.9 stroke"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/rp1-skipstrip.pass.html",
+    "state": "the plain strip 2 4 6 8 10 ... as cells/fact.js draws it"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --support-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

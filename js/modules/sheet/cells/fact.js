@@ -178,13 +178,16 @@ export function factCue(p, { px = 0 } = {}) {
         const step = div ? b : a;
         const n = 5, bw = 8, gap = 1.2, w = n * (bw + gap) + 6, h = 7;
         let body = '';
+        // Lane D R4 prep (RP-1 ruling): every term is drawn alike in its own group (`data-ws-term`), and the strip says
+        // what it counts by (`data-ws-skipstrip`), so the lint can tell a plain count-by list of the divisor's
+        // multiples - which may happen to hold the quotient - from a strip that marks one term out.
         for (let i = 0; i < n; i++) {
             const x = i * (bw + gap);
-            body += `<rect x="${f2(x + 0.2)}" y="0.2" width="${bw}" height="6" rx="1" fill="none" stroke="${INK}" stroke-width="0.35"/>`
-                + text(x + 0.2 + bw / 2, 4.4, step * (i + 1));
+            body += `<g data-ws-term="${step * (i + 1)}"><rect x="${f2(x + 0.2)}" y="0.2" width="${bw}" height="6" rx="1" fill="none" stroke="${INK}" stroke-width="0.35"/>`
+                + `${text(x + 0.2 + bw / 2, 4.4, step * (i + 1))}</g>`;
         }
         body += text(n * (bw + gap) + 1, 4.4, '…', 3.2, 'start');
-        return wrap(w, h, body, `count by ${step}`);
+        return wrap(w, h, body, `count by ${step}`).replace('<svg class="ws-factcue-svg"', `<svg class="ws-factcue-svg" data-ws-skipstrip="${step}"`);
     }
     if (kind === 'array') {
         const cols = div ? b : a, rows = div ? (b ? a / b : 0) : b;

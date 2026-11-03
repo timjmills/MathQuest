@@ -324,6 +324,27 @@ function supportCheckInPage() {
         c.querySelectorAll('[data-ws-ref], [aria-hidden="true"]').forEach((x) => x.remove());
         return words(c);
     };
+    // RP-1 ruling (Lane D R4 prep, lead 2026-11-03): a skip-count strip (`[data-ws-skipstrip]`) that lists the
+    // divisor's multiples in order, every term drawn alike, is a count-by list, not the answer - even when one of its
+    // terms equals the quotient (12 ÷ 2: 2 4 6 8 10 lists 6). It is read out of RP-1 ONLY while it is plain: the terms
+    // are step x 1, 2, 3 ..., each term group draws the same marks with the same attributes and computed style, and the
+    // strip draws nothing else (no ring, no fill, no bold, no underline on any term - the quotient's or the dividend's).
+    const plainStrip = (svg) => {
+        const step = Number(svg.getAttribute('data-ws-skipstrip'));
+        if (!(step > 0)) return false;
+        const terms = Array.from(svg.querySelectorAll('[data-ws-term]'));
+        if (terms.length < 2) return false;
+        const sig = (g) => Array.from(g.querySelectorAll('*')).map((e) => {
+            const cs = getComputedStyle(e);
+            const at = Array.from(e.attributes).filter((a) => !/^(x|y|cx|cy|x1|x2|y1|y2|points|d|transform)$/.test(a.name)).map((a) => `${a.name}=${a.value}`).sort().join(',');
+            return `${e.tagName}|${at}|${cs.fontWeight}|${cs.fontSize}|${cs.fill}|${cs.stroke}|${cs.strokeWidth}|${cs.textDecorationLine}|${cs.opacity}`;
+        }).join(';') + `|${getComputedStyle(g).opacity}`;
+        const s0 = sig(terms[0]);
+        if (!terms.every((g, k) => sig(g) === s0 && Number(g.getAttribute('data-ws-term')) === step * (k + 1) && (g.textContent || '').trim() === String(step * (k + 1)))) return false;
+        // nothing drawn outside the term groups but the trailing ellipsis
+        const loose = Array.from(svg.children).filter((e) => !e.hasAttribute('data-ws-term'));
+        return loose.every((e) => e.tagName.toLowerCase() === 'text' && /^[.…\s]*$/.test(e.textContent || ''));
+    };
     // 1. no answer inside a support
     P.forEach((cell, i) => {
         const sup = Array.from(cell.querySelectorAll('[data-ws-support-on]'));
@@ -336,7 +357,10 @@ function supportCheckInPage() {
         for (const n of kn) { const j = left.indexOf(n); if (j >= 0) left.splice(j, 1); else answers.push(n); }
         // a column answer written one digit per track reads as one number in the key's text
         for (const el of sup) {
-            const t = nums(textOf(el));
+            const c0 = el.cloneNode(true);
+            const live = Array.from(el.querySelectorAll('[data-ws-skipstrip]'));
+            Array.from(c0.querySelectorAll('[data-ws-skipstrip]')).forEach((x, k) => { if (live[k] && plainStrip(live[k])) x.remove(); });
+            const t = nums(textOf(c0));
             const hit = answers.find((a) => a.length && t.includes(a) && !nums(textOf(cell.querySelector('.ws-pane-problem') || document.createElement('i'))).includes(a));
             if (hit) out.push({ lint: 'L-SUPPORT', rule: 'RP-1', sev: 'critical', msg: `cell ${i + 1}: the ${el.getAttribute('data-ws-support-on')} support shows the answer ${hit}`, key: 'support answer' });
         }
@@ -3167,9 +3191,18 @@ async function selfTest() {
             const doc = (pupil, key) => `<html><body><section data-ws-mode="print"><div class="ws-grid">${pupil.join('')}</div></section><section data-ws-mode="key"><div class="ws-grid">${key.join('')}</div></section></body></html>`;
             const tile = '<div data-ws-support-on="tile">7 and 5</div>';
             const keyed = (c) => c.replace('&nbsp;', '12');
+            // a skip-count strip by 4 (4 8 12 16 20 ...) as cells/fact.js draws it; `bold` / `ring`: the term drawn heavier / ringed
+            const skipStrip = (bold = 0, ring = 0) => `<div data-ws-support-on="skip"><svg data-ws-skipstrip="4" viewBox="0 0 52 7" width="52mm" height="7mm">`
+                + [4, 8, 12, 16, 20].map((v, k) => `<g data-ws-term="${v}"><rect x="${k * 9.2}" y="0.2" width="8" height="6" fill="none" stroke="#000" stroke-width="0.35"/>`
+                    + `<text x="${k * 9.2 + 4}" y="4.4" font-size="3.2"${v === bold ? ' font-weight="700"' : ''}>${v}</text></g>`).join('')
+                + (ring ? `<circle cx="22.6" cy="3.2" r="4" fill="none" stroke="#000"/>` : '') + '<text x="47" y="4.4" font-size="3.2">…</text></svg></div>';
             const cases = [
                 ['support clean', doc([cell(tile), cell(tile)], [keyed(cell(tile)), keyed(cell(tile))]), null],
                 ['support showing the answer', doc([cell('<div data-ws-support-on="line">12</div>')], [keyed(cell('<div data-ws-support-on="line">12</div>'))]), ['L-SUPPORT', 'RP-1']],
+                // RP-1 ruling (Lane D R4 prep): a plain count-by strip may list the answer; one that marks it out may not
+                ['plain skip strip listing the answer', doc([cell(skipStrip())], [keyed(cell(skipStrip()))]), null],
+                ['skip strip with the answer in bold', doc([cell(skipStrip(12))], [keyed(cell(skipStrip(12)))]), ['L-SUPPORT', 'RP-1']],
+                ['skip strip with the answer ringed', doc([cell(skipStrip(0, 12))], [keyed(cell(skipStrip(0, 12)))]), ['L-SUPPORT', 'RP-1']],
                 ['tally rows of two lengths', doc([cell('<div data-ws-support-on="touch"><div class="ws-td-tallyrow" data-ws-tally="10"></div></div>'), cell('<div data-ws-support-on="touch"><div class="ws-td-tallyrow" data-ws-tally="12"></div></div>')], []), ['L-SUPPORT', 'S1.7']],
                 ['answer zone moves', doc([cell(tile), cell('<div data-ws-support-reserve="tile"></div>', '<div style="height:9mm"></div>')], []), ['L-SUPPORT', 'SCC-T10']],
                 ['key without the supports', doc([cell(tile)], [keyed(cell(''))]), ['L-SUPPORT', 'AK-1']],
@@ -3222,6 +3255,21 @@ async function selfTest() {
 module.exports = { wsLintPage, wsPageBox, lintDocument, lintHtmlInSheetPage, analysePdf, CEILINGS, PACK_WAIVERS };
 if (require.main === module) (async () => {
     if (has('self-test')) return selfTest();
+    // --support-fixture file.html: L-SUPPORT (supportCheckInPage) on a planted document - a backtest fixture (Lane D R4
+    // prep: the RP-1 skip-strip ruling, tests/fixtures/precritic/rp1-skipstrip.{fail,pass}.html). OK / FAIL as a gate.
+    if (arg('support-fixture', null)) {
+        const file = path.resolve(process.cwd(), arg('support-fixture', ''));
+        const browser = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox'] });
+        try {
+            const page = await browser.newPage();
+            await page.setContent(fs.readFileSync(file, 'utf8'));
+            const f = (await page.evaluate(supportCheckInPage)).findings;
+            f.forEach((x) => console.log(`  [${x.lint} ${x.rule} ${x.sev}] ${x.msg}`));
+            if (f.length) { console.error(`${TOOL}: FAIL - ${f.length} L-SUPPORT finding(s) in ${path.relative(process.cwd(), file)}`); process.exitCode = 1; }
+            else console.log(`${TOOL}: OK (L-SUPPORT, 0 findings in ${path.relative(process.cwd(), file)})`);
+        } finally { await browser.close(); }
+        return;
+    }
     if (has('capabilities')) {
         const caps = kitCapabilities();
         if (has('json')) { process.stdout.write(JSON.stringify(caps, null, 1) + '\n'); return; }

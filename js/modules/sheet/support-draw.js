@@ -419,6 +419,20 @@ export function supportFootprint(fp, p, template, ctx = {}) {
     const paneW = widestPaneMm(p, template, ctx.size) || 0;
     const w = Math.max(out.wMm || 0, paneW);
     const cap = Math.max(1, Math.floor(186 / (paneW + 6.6)));
+    // Lane D R4 prep (H13-ROW, div_facts array S/M/L): the ÷ counters to ring are the dividend in rows
+    // of ten, 1 to 6 rows tall with the fact, and none at all where the dividend passes 60. Stacked
+    // UNDER the fact in two columns they paired a 5-row cell with a 2-row or a picture-less one, and
+    // the row was sized for a taller item than its other cell held. They stand BESIDE the fact only:
+    // the cell is as wide as fact + gap + counters, so each such problem has a row of its own height
+    // (the practice roles split the picture-less facts into columns of their own).
+    const s = supportsOf(p);
+    const pp = panePayloadOf(p, template);
+    if (pp && pp.op === '/' && s && s.on.includes('array')) {
+        const piece = pieceOf('array', p, template, { size: ctx.size, mode: 'print', metrics: null });
+        // (hardCap: a measured cell's cap is otherwise the widest grid it measured as fitting - under the fact)
+        if (piece && piece.foot) return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, hardCap: true,
+            maxCols: Math.max(1, Math.min(out.maxCols || 10, cap, 4, Math.floor(186 / ((fp.wMm || 0) + PANE_GAP_MM + piece.foot.wMm + 6.6)))) });
+    }
     return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4) });
 }
 
