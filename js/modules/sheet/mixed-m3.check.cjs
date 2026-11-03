@@ -526,7 +526,7 @@ function scenarios() {
         for (const size of ['S', 'M', 'L']) out.push({ id: `o owner 41 daily ${size} seed 4242`, set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size, seed: 4242, sml: 'o owner 41' });
         out.push({ id: 'o owner fill ican M seed 4242', set: OWNER, arr: 'mixed', look: 'ican', size: 'M', seed: 4242 });
         out.push({ id: 'o owner 41 columns 4 M seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'M', seed: 4242, columns: 4 });
-        out.push({ id: 'o owner 41 columns 6 S seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'S', seed: 4242, columns: 6 });
+        out.push({ id: 'o owner 41 columns 6 S seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'S', seed: 4242, columns: 6, colsOn: 'sections' });
     }
     return out;
 }
@@ -574,7 +574,9 @@ async function main() {
                 const counts = !!sc.counts;
                 const sections = counts ? sc.set.map((id, i) => ({ skills: [sk(id)], count: sc.counts[i] })) : [{ skills: sc.set.map(sk) }];
                 const req = { role: sc.role || 'mixed-practice', arrangement: sc.arr, sections, size: sc.size, look: sc.look, seed: sc.seed, key: false };
-                if (sc.columns) req.columns = sc.columns;
+                // (the print dialog sends Columns as each section's `columns`, simple-print lane 2026-11-03; req.columns too)
+                if (sc.columns && sc.colsOn === 'sections') req.sections.forEach((x) => { x.columns = sc.columns; });
+                else if (sc.columns) req.columns = sc.columns;
                 let b;
                 try { b = await app.page.evaluate(BUILD_FN, req); } catch (e) { fails.push({ check: 'build', line: `${sc.id}: build failed: ${String(e.message || e).slice(0, 200)}` }); continue; }
                 const pages = await app.page.evaluate(MEASURE_FN, { html: b.html, perPage: b.perPage });
