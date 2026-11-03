@@ -24,6 +24,7 @@ import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, rele
 import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector, generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink } from './map-mode-ui.js';
 import { renderMapResults, printMapSession, restartMapSession, updateMapGradeContext } from './map-results.js';
 import { tvGo } from './teacher-shell.js';
+import { openSimplePrint, closeSimplePrint } from './simple-print.js';   // owner 2026-11-03: ONE simple print everywhere
 import './teacher-sheet.js';   // T3b: window.tvOpenSheet (the Worksheet, Quiz and Share sheets)
 
 // The Google Forms / Classroom export's third-party scripts (google-classroom.js reads window.google and
@@ -90,5 +91,5 @@ export const API = {
     mapNavBack, mapNavForward, openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand,
     toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector,
     generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink, renderMapResults, printMapSession,
-    restartMapSession, updateMapGradeContext, tvGo,
+    restartMapSession, updateMapGradeContext, tvGo, openSimplePrint, closeSimplePrint,
 };

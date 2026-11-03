@@ -1,0 +1,40 @@
+Lane: simple-print
+Title: ONE simple print everywhere (student page, Quick Start cards, teacher tray) that fills the paper
+Session: session_013pHDnMYhKMXmRkjhbcmxtp
+Branch: claude/sweet-newton-c8wrv1-simple-print
+Owner of files: js/modules/simple-print.js, css/simple-print.css, tests/scripts/ws-simple-print.cjs; the entry points in teacher-tray.js (openSheet 'print'), gamification.js (printFromLanding), quick-skills.js (printQuickSkill)
+State: critic
+Updated: 2026-11-03
+Builder profile: lane session (first build of a new screen)
+Critic rounds: 1 running
+
+## Now
+- Built the simple print and its gate. Gates are running, and the independent checker (teacher-site brief plus print critic, mq-opus-medium) is on r1.
+- The full dialog (teacher-sheet.js) stays behind "More options → All print options…". Its 8-a-page request mapping (the owner's "3 a page") belongs to the mixed-m2 lane's "one flowed request" rewrite, not to this lane (told by send_message, 2026-11-03).
+
+## Owner go
+
+## Open questions
+- Problems mode (a typed count) with several skills can still leave a gap on a middle page. A part never splits across pages, and the independent role caps short problems at 20 a page (DN-1). The default (Pages) fills. Page flow is the mixed-m2 engine lane's (paginate.js / layout.js).
+- Fact rows ignore a count (one full page a request), so fast facts use fact rows in Pages mode only. Problems mode prints them in sections (5–6 columns).
+
+## What the owner asked, and where it is
+| Ask (2026-11-03) | Where |
+|---|---|
+| "just showing a couple of problems … should populate the paper" | simple-print.js `buildSimple`: In sections = ONE independent request (full grids, the engine paginates); Pages mode probes each part's full-page capacity, deals the total, rounds to whole rows, then trims and grows a row at a time until the engine's page count is the pages asked (or the pages one row of every skill needs, said in a note) |
+| "see how many columns it is trying to use" | each size button shows its Auto columns; Columns "Auto (n)" or 2–10; the summary says "6 columns × 5 rows = 30 a page · 1 page · 30 problems · answer key at the end" |
+| skill → number OR %; Problems or Pages; size/columns; key | the four numbered steps; blank = even; a bad entry is outlined red and treated as blank |
+| fast facts up to 10 columns | a facts-only set in Pages mode prints fact rows 10 / 6 / 5 at S / M / L (8 when an answer is over 99); division facts get their own pages (across, 3), so they never pull the others to 3 columns |
+| student side Print (pupils too) | "Print" on Ready to Practice (shared ?c= link) and a print button on every Quick Start card; lazy (deferred.js), so nothing loads before the press |
+| everything else behind More options | More options: Arrange In sections / Mixed up (the mixed-m2 dialog's choice, as one toggle), New numbers, and (teacher) the full dialog |
+| a check: default prints of 2+ skills fill ≥ 60 %, no fewer a page than singly | `tests/scripts/ws-simple-print.cjs` (FILL, DENSITY, FACTS, NOT3); `--backtest` runs the same measure on the old dialog's page plan and fails it (fill 22–46 %); on deploy-gates session 1 |
+
+## Req field for the Columns override
+The existing per-section `sections[i].columns` (2–10). When the engine clamps (it cannot fit the asked count), the page is built again at the clamped count. On base, a clamped grid collapses to one row a page (add_facts S columns:10 gave "6 x 1, 6 per page"). That is reported to the engine lane.
+
+## Times
+Times: builder build, start 2026-11-03T09:10Z, end 2026-11-03T10:40Z, profile lane session
+Times: critic r1, start 2026-11-03T10:45Z, end —, profile mq-opus-medium
+
+## Log
+- 2026-11-03: built; ws-simple-print OK (defaults fill 69–92 % at S/M/L on the six, facts, add/sub and missing sets), backtest FAILs the old plan.

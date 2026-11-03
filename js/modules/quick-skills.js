@@ -227,6 +227,8 @@ function _renderQuickSkillsGridNow() {
         const gradeColor = grade !== null && GRADE_COLORS[grade] ? GRADE_COLORS[grade] : null;
         const gradeBadge = gradeColor ? `<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:${gradeColor.bg};color:${gradeColor.text};font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);z-index:5;">${grade}</span>` : '';
         const source = skill.source || 'teacher';
+        // owner 2026-11-03: every Quick Start card prints (pupils too); the print loads on the press only
+        const printBtn = `<button type="button" class="qs-print-btn" onclick="event.stopPropagation(); printQuickSkill(${index})" aria-label="Print ${escHTML(baseName.replace(/<[^>]*>/g, ''))}" title="Print">${QS_PRINT_ICON}</button>`;
         // Default skills use pastel colors; added skills (teacher/link/student) get blue tint
         const colorClass = source === 'default'
             ? (skill.color || PASTEL_COLORS[index % PASTEL_COLORS.length])
@@ -266,6 +268,7 @@ function _renderQuickSkillsGridNow() {
                     <span class="skill-icon">${skill.categoryIcon}</span>
                     <span class="skill-name">${displayName}</span>
                     <span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>
+                    ${printBtn}
                 </div>
             `;
         } else {
@@ -277,6 +280,7 @@ function _renderQuickSkillsGridNow() {
                     <span class="skill-icon">${skill.categoryIcon}</span>
                     <span class="skill-name">${displayName}</span>
                     ${source === 'student' ? '<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>' : ''}
+                    ${printBtn}
                 </div>
             `;
         }
@@ -306,6 +310,15 @@ function _renderQuickSkillsGridNow() {
 
     // Show/hide clear button
     updateClearButtonVisibility();
+}
+
+const QS_PRINT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>';
+
+/** A Quick Start card's Print button: that skill (with the card's options) in the simple print. */
+export function printQuickSkill(index) {
+    const s = (window.customQuickSkills || [])[index];
+    if (!s || typeof window.openSimplePrint !== 'function') return;
+    window.openSimplePrint([{ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts && Object.keys(s.opts).length ? s.opts : undefined }], { from: 'quick' });
 }
 
 export function toggleQuickSkillsEditMode() {

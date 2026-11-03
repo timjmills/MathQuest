@@ -15,7 +15,7 @@ import { getFactorPairs, createFactorLinksSVG } from './modules/svg-factors.js';
 import { linkVocabInText } from './modules/vocab-tooltip.js';
 
 // Layer 2: Gamification
-import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, dismissNudgePopup, showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress, openMyStats, closeMyStats, setupTabDetection, removeTabDetection, showIdleModal, dismissIdleModal } from './modules/gamification.js';
+import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, dismissNudgePopup, showStudentLandingModal, startFromLanding, printFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress, openMyStats, closeMyStats, setupTabDetection, removeTabDetection, showIdleModal, dismissIdleModal } from './modules/gamification.js';
 
 // Layer 2: Core Systems
 import { initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel, updateProgressDisplay, trackPerformance, adjustDifficulty, getAdaptiveRange, openProgressDashboard, closeProgressDashboard, renderProgressDashboard, clearAllProgress, showNotification } from './modules/progress.js';
@@ -32,7 +32,7 @@ import { buildSkillIndex, getSkillIndex, handleSkillSearch, selectSkillFromSearc
 // Layer 3: Skill Management
 import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue } from './modules/unified-skills.js';
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType, parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions } from './modules/skill-codes.js';
-import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts } from './modules/quick-skills.js';
+import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
 import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot, renderAdaptiveLevelChip, setAdaptiveModeEnabled, refreshAdaptiveUI } from './modules/adaptive-engine.js';
 import { selectMode, startMode } from "./modules/mode-selection.js";
@@ -174,7 +174,7 @@ Object.assign(window, {
     initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay,
     getStatsHistory, renderStatsHistory, toggleCelebrations,
     startQuestionTimer, clearQuestionTimer, dismissNudgePopup,
-    showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress,
+    showStudentLandingModal, startFromLanding, printFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress,
     openMyStats, closeMyStats, setupTabDetection, removeTabDetection,
     showIdleModal, dismissIdleModal,
 
@@ -241,7 +241,7 @@ Object.assign(window, {
     removeQuickSkill, removeStudentQuickSkill, addToQuickSkills,
     resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults,
     toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility,
-    toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts,
+    toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill,
 
     // Grade-Level Batch Assign Chips (research Feature 2)
     initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips,
@@ -507,7 +507,7 @@ const DEFERRED_NAMES = [
     'startMapFromUI', 'selectMapTier', 'toggleMapBand', 'toggleMapDomain', 'selectAllMapBands', 'clearMapBands',
     'setMapItemCount', 'setMapMode', 'printMapFromSelector', 'generateMapShareLink', 'copyMapShareLink',
     'parseMapShareLink', 'loadMapShareLink', 'renderMapResults', 'printMapSession', 'restartMapSession',
-    'updateMapGradeContext', 'tvGo', 'tvOpenSheet',
+    'updateMapGradeContext', 'tvGo', 'tvOpenSheet', 'openSimplePrint', 'closeSimplePrint',
 ];
 // The deferred half's stylesheets: <link data-mq-href> in index.html, in their cascade place, given their href now.
 function loadDeferredCss() {
