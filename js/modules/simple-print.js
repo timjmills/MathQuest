@@ -38,17 +38,21 @@ import { openPdfPreview } from './teacher-pdf-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { SKILLS } from './data.js';
+import { optionsFor } from './skill-options.js';
 
 const STORE_KEY = 'mq_simple_print';
 const SIZES = [['L', 'Big'], ['M', 'Medium'], ['S', 'Small']];
 const SIZE_NAME = Object.fromEntries(SIZES);
 const FACT_AUTO = { S: 10, M: 6, L: 5 };
+// Owner 2026-11-03 (item 4): "7, 8, 9, 10 should be just for small problems": a fast fact may go up to 10 across, every
+// larger cell at most 6 (and the engine clamps either to what really fits at the size).
+const FACT_MAX_COLS = 10, CELL_MAX_COLS = 6;
 const MAX_PROBLEMS = 400, MAX_PAGES = 30, MAX_SETS = 30;
 
 /* ================================================================= state */
 
 function loadPrefs() {
-    const d = { how: 'pages', n: 1, nProblems: 24, nPages: 1, sets: 1, size: 'M', cols: 'auto', key: true, arrange: 'sections' };
+    const d = { how: 'pages', n: 1, nProblems: 24, nPages: 1, sets: 1, size: 'M', cols: 'auto', colsMode: 'aim', key: true, arrange: 'sections' };
     try {
         const s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
         if (s && typeof s === 'object') {
@@ -58,6 +62,7 @@ function loadPrefs() {
             if (Number(s.sets) >= 1) d.sets = Math.min(MAX_SETS, Math.round(Number(s.sets)));
             if (SIZE_NAME[s.size]) d.size = s.size;
             if (s.cols === 'auto' || (Number(s.cols) >= 2 && Number(s.cols) <= 10)) d.cols = s.cols === 'auto' ? 'auto' : Number(s.cols);
+            if (s.colsMode === 'aim' || s.colsMode === 'exact') d.colsMode = s.colsMode;
             if (typeof s.key === 'boolean') d.key = s.key;
             if (s.arrange === 'mixed' || s.arrange === 'sections') d.arrange = s.arrange;
         }
@@ -65,7 +70,7 @@ function loadPrefs() {
     return d;
 }
 function savePrefs() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ how: P.how, nProblems: P.nProblems, nPages: P.nPages, sets: P.sets, size: P.size, cols: P.cols, key: P.key, arrange: P.arrange })); } catch (e) { /* not saved */ }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ how: P.how, nProblems: P.nProblems, nPages: P.nPages, sets: P.sets, size: P.size, cols: P.cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange })); } catch (e) { /* not saved */ }
 }
 
 const P = loadPrefs();
@@ -146,6 +151,11 @@ function baseReq(o) {
 }
 const skillRef = (s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts || {} });
 const colsAsked = (o) => (o.cols && o.cols !== 'auto' ? Number(o.cols) : undefined);
+/** The columns a part may be ASKED for: a fast fact up to 10, any larger cell up to 6 (never 7+ across). */
+export const capFor = (s) => (isFactSkill(s) ? FACT_MAX_COLS : CELL_MAX_COLS);
+/** Aim / Exactly: the columns this part asks for (the engine may still clamp it to what fits at the size). */
+const askFor = (s, o) => { const n = colsAsked(o); return n ? Math.min(n, capFor(s)) : undefined; };
+const modeOf = (o) => (colsAsked(o) ? (o.colsMode === 'exact' ? 'exact' : 'aim') : 'auto');
 
 /**
  * Which arrangement this print takes: 'facts' (fact rows), 'mixed' (Mixed up) or 'sections'.
@@ -163,8 +173,8 @@ function sectionsReq(list, counts, o, colsBy) {
         role: 'independent',
         sections: list.map((s, i) => {
             const sec = { skills: [skillRef(s)], count: counts[i] };
-            const c = colsBy ? colsBy[i] : colsAsked(o);
-            if (c) sec.columns = c;
+            const c = colsBy ? colsBy[i] : askFor(s, o);
+            if (c) { sec.columns = c; sec.columnsMode = modeOf(o); }
             return sec;
         }).filter((x) => x.count > 0),
     });
@@ -174,7 +184,7 @@ function sectionsReq(list, counts, o, colsBy) {
 async function buildSections(list, counts, o) {
     // Auto: a fast-fact part asks for the fact columns (10 / 6 / 5) and takes the most that fit (critic r1 D4: Auto
     // printed 5 across where 6 fit); every other part keeps the engine's own Auto
-    let colsBy = list.map((s) => colsAsked(o) || (isFactSkill(s) ? FACT_AUTO[o.size] : undefined));
+    let colsBy = list.map((s) => askFor(s, o) || (isFactSkill(s) ? FACT_AUTO[o.size] : undefined));
     let res = await buildSheet(sectionsReq(list, counts, o, colsBy));
     const live = list.map((_, i) => i).filter((i) => counts[i] > 0);
     const fs = (res.fits && res.fits.sections) || [];
@@ -186,6 +196,8 @@ async function buildSections(list, counts, o) {
     });
     if (refit) res = await buildSheet(sectionsReq(list, counts, o, colsBy));
     res.__clamped = clamped;
+    // each part's asked count and its own max: "(max)" where Exactly n is more than the part can take
+    res.__capped = list.map((s, i) => (colsAsked(o) && colsBy[i] && colsBy[i] < colsAsked(o) ? colsBy[i] : 0));
     return res;
 }
 
@@ -206,7 +218,16 @@ export async function buildSimple(list, o) {
     const notes = [];
     if (o.probe) return probeCols(list, arrangement, o);
     if (arrangement === 'facts') return buildFacts(list, amounts, o);
-    if (arrangement === 'mixed') return buildMixed(list, amounts, o);
+    if (arrangement === 'mixed') {
+        const r = await buildMixed(list, amounts, o);
+        // the engine fell back to sections on its own grid: an asked count, or 7+ across for larger problems (owner item 4:
+        // "7, 8, 9, 10 should be just for small problems"), is planned here instead, part by part
+        if (r.fellBack && (colsAsked(o) || (!list.every(isFactSkill) && (r.colsList || []).concat([r.cols]).some((c) => c > CELL_MAX_COLS)))) {
+            const r2 = await buildSimple(list, Object.assign({}, o, { arrange: 'sections' }));
+            return Object.assign(r2, { fellBack: true, notes: ['Mixed up does not fit these problems: they print in sections.', ...(r2.notes || [])] });
+        }
+        return r;
+    }
 
     let counts;
     let res;
@@ -260,8 +281,10 @@ export async function buildSimple(list, o) {
         }
         res = f.r; counts = f.c;
     }
-    if (res.__clamped) notes.push(`${o.cols} columns do not fit some of these problems at ${SIZE_NAME[o.size]}: they print at the most that fit.`);
-    return finish(res, { counts, arrangement, notes, list });
+    if (res.__clamped || (res.__capped || []).some(Boolean)) notes.push(o.colsMode === 'exact'
+        ? `Exactly ${o.cols}: problems that cannot take ${o.cols} across at ${SIZE_NAME[o.size]} print at their own max (marked "max").`
+        : `Aim for ${o.cols}: problems that cannot take ${o.cols} across at ${SIZE_NAME[o.size]} print at the most that fit.`);
+    return finish(res, { counts, arrangement, notes, list, capped: res.__capped, o });
 }
 
 /** The Auto columns at a size (the size buttons' "n columns"): one small build, no filling. */
@@ -297,7 +320,7 @@ async function buildFacts(list, amounts, o) {
         for (let p = 0; p < gPages[g]; p++) {
             const req = Object.assign(baseReq(Object.assign({}, o, { seed: o.seed + 7919 * (n++) })), {
                 role: 'fact-rows', look: 'auto',
-                sections: [{ skills: groups[g].map(skillRef), pages: 1, ...(colsAsked(o) ? { columns: colsAsked(o) } : {}) }],
+                sections: [{ skills: groups[g].map(skillRef), pages: 1, ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) }],
             });
             const res = await buildSheet(req);
             out.pupil.push(res.pupilHtml || '');
@@ -318,13 +341,17 @@ async function buildFacts(list, amounts, o) {
         // what page 1 really holds (critic r2: a 6 x 6 grid that printed 30 said "36 a page")
         ...(() => { const p1 = (out.first.split('class="ws-cell ').length - 1) || f.perPage || 0; return { cols: f.cols || 0, rows: f.cols ? Math.ceil(p1 / f.cols) : f.rows || 0, perPage: p1 }; })(),
         colsList: [f.cols || 0], notes: out.notes, firstHtml: out.first,
+        capped: colsAsked(o) && f.cols && f.cols < colsAsked(o) ? f.cols : 0, colsMode: modeOf(o),
     };
 }
 
 async function buildMixed(list, amounts, o) {
+    const cap = list.every(isFactSkill) ? FACT_MAX_COLS : CELL_MAX_COLS;
     const mk = (counts) => Object.assign(baseReq(o), {
         role: 'mixed-practice', arrangement: 'mixed',
-        sections: [{ skills: list.map((s, i) => Object.assign(skillRef(s), counts ? { weight: Math.max(1, counts[i]) } : {})), count: counts.reduce((t, c) => t + c, 0) }],
+        ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), cap), columnsMode: modeOf(o) } : {}),
+        sections: [{ skills: list.map((s, i) => Object.assign(skillRef(s), counts ? { weight: Math.max(1, counts[i]) } : {})), count: counts.reduce((t, c) => t + c, 0),
+            ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), cap), columnsMode: modeOf(o) } : {}) }],
     });
     let counts;
     let res;
@@ -345,13 +372,13 @@ async function buildMixed(list, amounts, o) {
             res = await buildSheet(mk(counts));
         }
     }
-    return finish(res, { counts, arrangement: 'mixed', notes: [], list });
+    return finish(res, { counts, arrangement: 'mixed', notes: [], list, o });
 }
 
 /** The problems the built page 1 really holds (never the grid's nominal capacity: the engine may cap a page). */
 const page1Cells = (res) => (((res.pupilPages && res.pupilPages[0]) || '').split('class="ws-cell ').length - 1) || (res.fits && res.fits.perPage) || 0;
 
-function finish(res, { counts, arrangement, notes, list }) {
+function finish(res, { counts, arrangement, notes, list, capped = [], o = {} }) {
     const fs = (res.fits && res.fits.sections) || [];
     const colsList = fs.map((f) => f.cols).filter(Boolean);
     const first = fs[0] || res.fits || {};
@@ -363,7 +390,8 @@ function finish(res, { counts, arrangement, notes, list }) {
         pages: res.pageCount || 1, keyPages: res.keyPageCount || 0, total: (res.items || []).filter(Boolean).length, counts: got.some(Boolean) ? got : counts,
         arrangement: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t))) ? 'sections' : arrangement,
         fellBack: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t))),
-        types: arrangement === 'sections' ? typesOf(list, counts, fs) : [],
+        types: arrangement === 'sections' ? typesOf(list, counts, fs, capped) : [],
+        capped: (capped || []).find(Boolean) || (colsAsked(o) && first.cols && first.cols < colsAsked(o) ? first.cols : 0), colsMode: modeOf(o),
         cols: first.cols || 0, rows: fs.length === 1 && first.cols ? Math.ceil(page1Cells(res) / first.cols) : first.rows || 0, perPage: page1Cells(res), colsList,
         notes: [...notes, ...engineNotes], firstHtml: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml || '',
     };
@@ -373,7 +401,7 @@ function finish(res, { counts, arrangement, notes, list }) {
  * The count across Auto chose for each problem type (owner 2026-11-03: "choosing big medium small … is intelligent
  * fitting"): fast facts are one type ("Facts"), every other skill is its own type by its short name.
  */
-function typesOf(list, counts, fs) {
+function typesOf(list, counts, fs, capped = []) {
     const live = list.map((_, i) => i).filter((i) => (counts || [])[i] > 0);
     const out = [];
     live.forEach((i, j) => {
@@ -381,7 +409,8 @@ function typesOf(list, counts, fs) {
         if (!c) return;
         const name = isFactSkill(list[i]) ? 'Facts' : String(list[i].label || labelOf(list[i])).replace(/\s*\([^)]*\)/g, '').trim();
         const t = out.find((x) => x.name === name);
-        if (t) { t.min = Math.min(t.min, c); t.max = Math.max(t.max, c); } else out.push({ name, min: c, max: c });
+        const atMax = !!(capped && capped[i]);
+        if (t) { t.min = Math.min(t.min, c); t.max = Math.max(t.max, c); t.atMax = t.atMax || atMax; } else out.push({ name, min: c, max: c, atMax });
     });
     return out;
 }
@@ -422,12 +451,192 @@ export function summaryLine(b, o) {
     const sets = Math.max(1, Number(b.sets) || 1);
     const key = o.key ? (sets > 1 ? 'each set with its answer key' : 'answer key at the end') : 'no answer key';
     let grid;
-    if (b.rows && b.cols && b.cols * b.rows === b.perPage && (b.arrangement === 'facts' || (cl.length === 1 && (b.colsList || []).length <= 1 && !b.fellBack))) grid = `${b.cols} columns × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
-    else if (b.types && b.types.length > 1) grid = `${b.types.map((t) => `${t.name} ${t.min === t.max ? t.min : `${t.min}–${t.max}`} across`).join(' · ')} · ${b.perPage} on page 1`;
-    else if (b.fellBack) grid = `In sections, ${cl.length > 1 ? `${Math.min(...cl)}–${Math.max(...cl)}` : cl[0]} columns · ${b.perPage} on page 1`;
-    else if (cl.length === 1) grid = `${cl[0]} columns · ${b.perPage} on page 1`;
+    // Exactly n (owner item 4): a part that cannot take n across prints at its own max, and the line says so
+    const mx = b.colsMode === 'exact' ? ' (max)' : '';
+    const one = b.capped && mx ? mx : '';
+    if (b.rows && b.cols && b.cols * b.rows === b.perPage && (b.arrangement === 'facts' || (cl.length === 1 && (b.colsList || []).length <= 1 && !b.fellBack))) grid = `${b.cols} columns${one} × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
+    else if (b.types && b.types.length > 1) grid = `${b.types.map((t) => `${t.name} ${t.min === t.max ? t.min : `${t.min}–${t.max}`} across${t.atMax ? mx : ''}`).join(' · ')} · ${b.perPage} on page 1`;
+    else if (b.fellBack) grid = `In sections, ${cl.length > 1 ? `${Math.min(...cl)}–${Math.max(...cl)}` : cl[0]} columns${one} · ${b.perPage} on page 1`;
+    else if (cl.length === 1) grid = `${cl[0]} columns${one} · ${b.perPage} on page 1`;
     else grid = `Each skill its own grid, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     return [grid, pages, probs, ...(sets > 1 ? [`${sets} sets, each with different problems`] : []), key].join(' · ');
+}
+
+/* ================================================================= number options (owner item 6) */
+// "Highest number" is each operation skill's own `band` option (skill-options.js; "within N" bounds the ANSWER: the sum,
+// the number you start from, the product, the number shared) and "Fact sets" its `constant` set (the *_facts ids).
+// Only the values the skill itself declares are offered, so print, practice, quiz and share codes all carry them.
+const OPS_CATS = new Set(['addition', 'subtraction', 'multiplication', 'division']);
+export function numberOptionsOf(s) {
+    if (!s || !OPS_CATS.has(s.categoryId)) return { band: null, sets: null };
+    let defs = [];
+    try { defs = optionsFor(s.categoryId, s.skillId) || []; } catch (e) { defs = []; }
+    const band = defs.find((d) => d.id === 'band' && d.type === 'enum' && !d.hidden);
+    // fact sets / tables on the fast-fact ids (*_facts); other skills' sets (tables with blanks …) stay in All print options
+    const sets = /_facts$/.test(s.skillId) ? defs.find((d) => d.id === 'constant' && d.type === 'set' && !d.hidden) : null;
+    const bandVals = band ? band.values.map((x) => x.v).filter((v) => typeof v === 'number') : [];
+    return { band: bandVals.length > 1 ? { def: band, values: bandVals } : null, sets: sets || null };
+}
+const optVal = (s, d) => (s.opts && s.opts[d.id] !== undefined && s.opts[d.id] !== null ? s.opts[d.id] : d.default);
+const setsOf = (s, d) => { const v = optVal(s, d); return Array.isArray(v) && v.length ? v.map(Number) : d.values.map((x) => x.v); };
+/** "0–12", "6–8", "2, 5, 10": a fact-set list in words. */
+function setWords(v, all) {
+    if (v.length === all.length) return 'all';
+    const a = [...v].sort((x, y) => x - y);
+    const runs = [];
+    for (const x of a) { const r = runs[runs.length - 1]; if (r && x === r[1] + 1) r[1] = x; else runs.push([x, x]); }
+    return runs.map(([x, y]) => (x === y ? String(x) : y === x + 1 ? `${x}, ${y}` : `${x}–${y}`)).join(', ');
+}
+/** The shared Highest number: the largest value of each skill's own at or below v (never above: "within N"). */
+function bandAtMost(values, v) { const ok = values.filter((x) => x <= v); return ok.length ? Math.max(...ok) : Math.min(...values); }
+
+/* ================================================================= quick prints (owner item 5) */
+// A quick print is a whole saved print setup: the skills with their options and amounts, and how many / sets / size /
+// columns + mode / key / arrange. Kept in localStorage like My sets (teacher-ui.js mq_teacher_sets) and carried by a
+// share code "QP1.<base64url JSON>" or a link ?qp=<code> (init.js imports it into the teacher's Quick prints).
+const QP_KEY = 'mq_quick_prints';
+const F = (c, k) => ({ categoryId: c, skillId: k });
+const FF_PRINT = { how: 'pages', n: 1, sets: 1, size: 'M', cols: 'auto', colsMode: 'aim', key: true, arrange: 'sections' };
+export const FAST_FACTS = [
+    { id: 'ff_add', name: '+ facts', skills: [F('addition', 'add_facts')] },
+    { id: 'ff_sub', name: '− facts', skills: [F('subtraction', 'sub_facts')] },
+    { id: 'ff_mul', name: '× facts', skills: [F('multiplication', 'mult_facts')] },
+    { id: 'ff_div', name: '÷ facts', skills: [F('division', 'div_facts')] },
+    { id: 'ff_mix', name: 'Mixed facts', skills: [F('addition', 'add_facts'), F('subtraction', 'sub_facts'), F('multiplication', 'mult_facts'), F('division', 'div_facts')] },
+].map((r) => Object.assign({ builtIn: true, print: FF_PRINT }, r));
+
+function cleanPrint(p) {
+    const o = Object.assign({}, FF_PRINT);
+    if (!p || typeof p !== 'object') return o;
+    if (p.how === 'problems' || p.how === 'pages') o.how = p.how;
+    if (Number(p.n) >= 1) o.n = Math.min(o.how === 'pages' ? MAX_PAGES : MAX_PROBLEMS, Math.round(Number(p.n)));
+    if (Number(p.sets) >= 1) o.sets = Math.min(MAX_SETS, Math.round(Number(p.sets)));
+    if (SIZE_NAME[p.size]) o.size = p.size;
+    if (p.cols === 'auto' || (Number(p.cols) >= 2 && Number(p.cols) <= 10)) o.cols = p.cols === 'auto' ? 'auto' : Number(p.cols);
+    if (p.colsMode === 'exact' || p.colsMode === 'aim') o.colsMode = p.colsMode;
+    if (typeof p.key === 'boolean') o.key = p.key;
+    if (p.arrange === 'mixed' || p.arrange === 'sections') o.arrange = p.arrange;
+    return o;
+}
+function cleanSkills(list) {
+    return (Array.isArray(list) ? list : []).filter((x) => x && typeof x.categoryId === 'string' && typeof x.skillId === 'string')
+        .map((x) => Object.assign({ categoryId: x.categoryId, skillId: x.skillId }, x.opts && typeof x.opts === 'object' && Object.keys(x.opts).length ? { opts: x.opts } : {}, x.amt ? { amt: String(x.amt).slice(0, 8) } : {}));
+}
+export function quickPrints() {
+    try { const l = JSON.parse(localStorage.getItem(QP_KEY) || '[]'); return Array.isArray(l) ? l.filter((r) => r && r.id && Array.isArray(r.skills) && r.skills.length) : []; } catch (e) { return []; }
+}
+function writeQuick(list) { try { localStorage.setItem(QP_KEY, JSON.stringify(list.slice(0, 40))); return true; } catch (e) { return false; } }
+export function saveQuickPrint(name, skills, print) {
+    const rec = { id: 'qp_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: String(name || 'Quick print').slice(0, 60), skills: cleanSkills(skills), print: cleanPrint(print), createdAt: Date.now() };
+    if (!rec.skills.length) return null;
+    writeQuick([rec, ...quickPrints()]);
+    return rec;
+}
+export function renameQuickPrint(id, name) { const nm = String(name || '').trim().slice(0, 60); if (!nm) return false; writeQuick(quickPrints().map((r) => (r.id === id ? Object.assign({}, r, { name: nm }) : r))); return true; }
+export function deleteQuickPrint(id) { writeQuick(quickPrints().filter((r) => r.id !== id)); }
+export function encodeQuickPrint(rec) {
+    const o = { v: 1, n: rec.name || '', s: cleanSkills(rec.skills).map((x) => Object.assign({ c: x.categoryId, k: x.skillId }, x.opts ? { o: x.opts } : {}, x.amt ? { a: x.amt } : {})), p: cleanPrint(rec.print) };
+    const bytes = new TextEncoder().encode(JSON.stringify(o));
+    let bin = '';
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return 'QP1.' + btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+export function decodeQuickPrint(code) {
+    try {
+        const t = String(code || '').trim().replace(/^.*[?&]qp=/, '').replace(/&.*$/, '');
+        if (!/^QP1\./.test(t)) return null;
+        const b = t.slice(4).replace(/-/g, '+').replace(/_/g, '/');
+        const bin = atob(b + '==='.slice((b.length + 3) % 4));
+        const o = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
+        if (!o || o.v !== 1 || !Array.isArray(o.s)) return null;
+        const skills = cleanSkills(o.s.map((x) => x && { categoryId: x.c, skillId: x.k, opts: x.o, amt: x.a }));
+        return skills.length ? { name: String(o.n || 'Shared quick print').slice(0, 60), skills, print: cleanPrint(o.p) } : null;
+    } catch (e) { return null; }
+}
+/** A shared code or link: kept in Quick prints (the same setup twice is kept once). Returns the record or null. */
+export function importQuickPrint(code) {
+    const rec = decodeQuickPrint(code);
+    if (!rec) return null;
+    const same = quickPrints().find((r) => JSON.stringify([r.skills, r.print]) === JSON.stringify([rec.skills, rec.print]));
+    return same || saveQuickPrint(rec.name, rec.skills, rec.print);
+}
+export const quickLink = (rec) => `${location.origin}${location.pathname}?qp=${encodeQuickPrint(rec)}`;
+const findQuick = (id) => FAST_FACTS.find((r) => r.id === id) || quickPrints().find((r) => r.id === id);
+/** Open the simple print filled in from a quick print (from the Skills page, or a card inside the dialog). */
+export function openQuickPrint(id, ctx = {}) {
+    const rec = typeof id === 'object' ? id : findQuick(id);
+    if (!rec) return;
+    const pr = cleanPrint(rec.print);
+    Object.assign(P, { how: pr.how, sets: pr.sets, size: pr.size, cols: pr.cols, colsMode: pr.colsMode, key: pr.key, arrange: pr.arrange });
+    if (pr.how === 'pages') P.nPages = pr.n; else P.nProblems = pr.n;
+    savePrefs();
+    const keep = S && S.ctx ? S.ctx : {};
+    openSimplePrint(rec.skills.map((x) => ({ categoryId: x.categoryId, skillId: x.skillId, opts: x.opts })), Object.assign({ from: 'quick' }, keep, ctx, { quick: rec.id }));
+    if (S) { rec.skills.forEach((x, i) => { if (S.list[i]) S.list[i].amt = x.amt || ''; }); render(); schedule(0); }
+}
+const isTeacher = () => typeof document !== 'undefined' && document.body && document.body.classList.contains('teacher-mode');
+let qpMenu = null, qpRename = null;
+/** The Quick prints row: the teacher's saved setups, then the built-in Fast facts group. */
+export function quickRowHTML(inDialog) {
+    const mine = quickPrints();
+    const card = (r) => {
+        const words = `${r.skills.length} skill${r.skills.length === 1 ? '' : 's'} · ${cleanPrint(r.print).n} ${cleanPrint(r.print).how === 'pages' ? 'page' : 'problem'}${cleanPrint(r.print).n === 1 ? '' : 's'} · ${SIZE_NAME[cleanPrint(r.print).size]}`;
+        const name = qpRename === r.id
+            ? `<input class="sp-qp-in" data-qp-rename="${esc(r.id)}" type="text" value="${esc(r.name)}" aria-label="New name" maxlength="60">`
+            : `<span class="sp-qp-name">${esc(r.name)}</span>`;
+        let h = `<div class="sp-qp${r.builtIn ? ' sp-qp-ff' : ''}" data-qp-id="${esc(r.id)}"><button type="button" class="sp-qp-open" data-sp="qpopen" data-v="${esc(r.id)}" aria-label="Quick print: ${esc(r.name)}">${qpRename === r.id ? '' : name}<span class="sp-qp-sub">${esc(words)}</span></button>`;
+        if (qpRename === r.id) h = `<div class="sp-qp" data-qp-id="${esc(r.id)}"><span class="sp-qp-open">${name}</span>`;
+        if (!r.builtIn) {
+            h += `<button type="button" class="sp-qp-more" data-sp="qpmenu" data-v="${esc(r.id)}" aria-haspopup="true" aria-expanded="${qpMenu === r.id}" aria-label="More for ${esc(r.name)}">⋯</button>`;
+            if (qpMenu === r.id) h += `<span class="sp-qp-menu" role="menu"><button type="button" role="menuitem" data-sp="qprename" data-v="${esc(r.id)}">Rename</button><button type="button" role="menuitem" data-sp="qplink" data-v="${esc(r.id)}">Copy link</button><button type="button" role="menuitem" class="is-danger" data-sp="qpdelete" data-v="${esc(r.id)}">Delete</button></span>`;
+        }
+        return h + '</div>';
+    };
+    return `<div class="sp-quick" role="region" aria-label="Quick prints"><div class="sp-qp-head"><h3 class="sp-h">Quick prints</h3>${inDialog ? '<button type="button" class="sp-link sp-qp-save" data-sp="qpsave">★ Save as quick print</button>' : ''}</div>`
+        + (mine.length ? `<div class="sp-qp-row">${mine.map(card).join('')}</div>` : `<p class="sp-hint">${inDialog ? 'Save this setup with ★ to print it again in one tap.' : 'Save a print setup with ★ in the Print dialog to print it again in one tap.'}</p>`)
+        + `<div class="sp-qp-group"><span class="sp-lbl">Fast facts</span><div class="sp-qp-row">${FAST_FACTS.map(card).join('')}</div></div></div>`;
+}
+/** Quick prints actions shared by the dialog and the Skills page row. Returns true when handled. */
+function quickAct(act, v, rerender) {
+    if (act === 'qpopen') { qpMenu = null; openQuickPrint(v); return true; }
+    if (act === 'qpmenu') { qpMenu = qpMenu === v ? null : v; qpRename = null; rerender(); return true; }
+    if (act === 'qprename') { qpMenu = null; qpRename = v; rerender(); const el = document.querySelector(`[data-qp-rename="${CSS.escape(v)}"]`); if (el) { el.focus(); el.select(); } return true; }
+    if (act === 'qpdelete') { qpMenu = null; deleteQuickPrint(v); rerender(); try { window.showToast?.('Quick print deleted', 'info'); } catch (e) { /* */ } return true; }
+    if (act === 'qplink') {
+        qpMenu = null; rerender();
+        const r = findQuick(v);
+        if (r) { const t = quickLink(r); try { navigator.clipboard.writeText(t).then(() => window.showToast?.('Link copied: it opens this quick print', 'success'), () => window.prompt('Copy this link', t)); } catch (e) { window.prompt('Copy this link', t); } }
+        return true;
+    }
+    return false;
+}
+function quickRenameKey(e, rerender) {
+    const t = e.target;
+    if (!t || !t.dataset || t.dataset.qpRename === undefined) return false;
+    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== 'Escape') return false;
+    if (e.type === 'keydown') { e.preventDefault(); e.stopPropagation(); }
+    if (!(e.type === 'keydown' && e.key === 'Escape')) renameQuickPrint(t.dataset.qpRename, t.value);
+    qpRename = null; rerender();
+    return true;
+}
+/** Close an open ⋯ menu in place (no re-render, so the press that closed it still lands on what it pressed). */
+function closeQpMenu(scope) {
+    qpMenu = null;
+    scope.querySelectorAll('.sp-qp-menu').forEach((m) => m.remove());
+    scope.querySelectorAll('[data-sp="qpmenu"][aria-expanded="true"]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+}
+/** The teacher Skills page row (teacher-library.js): the same cards, tap opens the simple print filled in. */
+export function mountQuickPrints(el) {
+    if (!el) return;
+    const draw = () => { el.innerHTML = quickRowHTML(false); };
+    draw();
+    if (el.dataset.qpWired) return;
+    el.dataset.qpWired = '1';
+    el.addEventListener('click', (e) => { const t = e.target.closest('[data-sp]'); if (t && el.contains(t)) quickAct(t.dataset.sp, t.dataset.v, draw); });
+    el.addEventListener('keydown', (e) => { if (e.key === 'Escape' && qpMenu) { qpMenu = null; draw(); return; } quickRenameKey(e, draw); });
+    // the ⋯ menu closes on a click outside it
+    document.addEventListener('pointerdown', (e) => { if (qpMenu && el.isConnected && !(e.target.closest && e.target.closest('.sp-qp-menu, [data-sp="qpmenu"]'))) closeQpMenu(el); }, true);
+    el.addEventListener('focusout', (e) => { if (e.target.dataset && e.target.dataset.qpRename !== undefined && qpRename) quickRenameKey({ type: 'blur', target: e.target }, draw); });
 }
 
 /* ================================================================= the dialog */
@@ -454,6 +663,7 @@ function seedOf(list) {
 }
 
 export function closeSimplePrint() {
+    qpMenu = null; qpRename = null;
     if (!S) return;
     savePrefs();
     if (S.root) S.root.remove();
@@ -464,8 +674,11 @@ export function closeSimplePrint() {
     if (f && f.isConnected) { try { f.focus({ preventScroll: true }); } catch (e) { /* */ } }
 }
 
+const hasFacts = () => !!(S && S.list.some(isFactSkill));
 function opts() {
-    return { how: P.how, n: P.how === 'pages' ? P.nPages : P.nProblems, sets: P.sets, size: P.size, cols: P.cols, key: P.key, arrange: P.arrange, seed: S.seed, title: S.ctx.title || true, paper: 'A4' };
+    // 7–10 across only with fast facts in the set (owner item 4): without them an asked 7+ is read as 6
+    const cols = P.cols !== 'auto' && Number(P.cols) > CELL_MAX_COLS && !hasFacts() ? CELL_MAX_COLS : P.cols;
+    return { how: P.how, n: P.how === 'pages' ? P.nPages : P.nProblems, sets: P.sets, size: P.size, cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange, seed: S.seed, title: S.ctx.title || true, paper: 'A4' };
 }
 
 function mount() {
@@ -478,12 +691,36 @@ function mount() {
     root.addEventListener('click', onClick);
     root.addEventListener('input', onInput);
     root.addEventListener('change', onChange);
+    root.addEventListener('pointerdown', (e) => { if (qpMenu && !(e.target.closest && e.target.closest('.sp-qp-menu, [data-sp="qpmenu"]'))) closeQpMenu(root); }, true);
+    root.addEventListener('focusout', (e) => { if (S && qpRename && e.target.dataset && e.target.dataset.qpRename !== undefined) quickRenameKey({ type: 'blur', target: e.target }, render); });
     document.addEventListener('keydown', onKey, true);
     S.root = root;
 }
 
 function stepHead(n, title, sub = '') {
     return `<div class="sp-step-head"><span class="sp-num" aria-hidden="true">${n}</span><h3 class="sp-h">${title}</h3>${sub ? `<span class="sp-sub">${sub}</span>` : ''}</div>`;
+}
+
+/** One skill's number options: Highest number (its own `band` values) and its fact sets (`constant`), owner item 6. */
+function skillOptsHTML(s, i, sharedBand) {
+    const { band, sets } = numberOptionsOf(s);
+    if (!band && !sets) return '';
+    const bv = band ? Number(optVal(s, band.def)) : null;
+    const sv = sets ? setsOf(s, sets) : null;
+    const allV = sets ? sets.values.map((x) => x.v) : [];
+    const what = [band ? `Highest number ${bv.toLocaleString('en-US')}` : '', sets ? `${s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'tables' : 'fact sets'}: ${setWords(sv, allV)}` : ''].filter(Boolean).join(' · ');
+    let h = `<details class="sp-skopt"${S.openOpts && S.openOpts.has(i) ? ' open' : ''}><summary data-sp="skopt" data-v="${i}">${esc(what)}</summary><div class="sp-skopt-body">`;
+    if (band) h += `<label class="sp-cols"><span>Highest number</span><select id="spBand${i}" data-band="${i}">${band.values.map((v) => `<option value="${v}"${v === bv ? ' selected' : ''}>${v.toLocaleString('en-US')}</option>`).join('')}</select></label>${sharedBand ? '' : ''}`;
+    if (sets) {
+        const lbl = s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'Tables' : 'Fact sets';
+        h += `<div class="sp-facts" role="group" aria-label="${lbl}"><span class="sp-lbl">${lbl}</span>${allV.map((v) => `<button type="button" class="sp-fact" data-sp="fact" data-i="${i}" data-v="${v}" aria-pressed="${sv.includes(Number(v))}">${v}</button>`).join('')}<button type="button" class="sp-link sp-fact-all" data-sp="factall" data-i="${i}">All</button></div>`;
+    }
+    return h + `</div></details>`;
+}
+function setOpt(i, id, v) {
+    const s = S.list[i];
+    s.opts = Object.assign({}, s.opts || {}, { [id]: v });
+    S.probes = {};
 }
 
 function render() {
@@ -498,14 +735,24 @@ function render() {
     const b = S.built;
     const autoCols = S.probes[P.size] ? S.probes[P.size] : (b && b.cols) || '';
     let h = `<header class="sp-top"><h2 id="spTitle" class="sp-title">Print</h2><button type="button" class="sp-x" data-sp="close" aria-label="Close">×</button></header><div class="sp-body">`;
+    if (isTeacher() && S.ctx.from !== 'student') h += quickRowHTML(true);
 
-    // 1 Skills
-    h += `<section class="sp-step">${stepHead(1, many ? 'Skills' : 'Skill', many ? 'Leave blank to share evenly, or type a number or a %' : '')}<ul class="sp-skills">`;
+    // 1 Skills (+ Highest number shared by several chosen skills, owner item 6)
+    const withBand = S.list.map((s) => numberOptionsOf(s).band).filter(Boolean);
+    const sharedBand = withBand.length >= 2;
+    h += `<section class="sp-step">${stepHead(1, many ? 'Skills' : 'Skill', many ? 'Leave blank to share evenly, or type a number or a %' : '')}`;
+    if (sharedBand) {
+        const all = [...new Set(withBand.flatMap((x) => x.values))].sort((x, y) => x - y);
+        const cur = [...new Set(S.list.map((s) => { const nb = numberOptionsOf(s).band; return nb ? Number(optVal(s, nb.def)) : null; }).filter((x) => x !== null))];
+        h += `<label class="sp-cols sp-shared"><span>Highest number (all)</span><select id="spBandAll" data-sp-band-all><option value=""${cur.length > 1 ? ' selected' : ''} disabled>${cur.length > 1 ? 'Different for each' : ''}</option>${all.map((v) => `<option value="${v}"${cur.length === 1 && cur[0] === v ? ' selected' : ''}>${v.toLocaleString('en-US')}</option>`).join('')}</select></label>`;
+    }
+    h += `<ul class="sp-skills">`;
     S.list.forEach((s, i) => {
         const a = parseAmount(s.amt);
         h += `<li class="sp-skill"><span class="sp-skill-name">${esc(s.label)}</span>`;
         if (many) h += `<input id="spAmt${i}" class="sp-amt${a && a.bad ? ' is-bad' : ''}" data-amt="${i}" type="text" inputmode="numeric" autocomplete="off" value="${esc(s.amt)}" placeholder="even" aria-label="${esc(s.label)}: number of problems or %" aria-invalid="${a && a.bad ? 'true' : 'false'}">`;
         if (b && b.counts && many) h += `<span class="sp-got" aria-label="prints">${b.counts[i] || 0}</span>`;
+        h += skillOptsHTML(s, i, sharedBand);
         h += `</li>`;
     });
     h += `</ul></section>`;
@@ -524,10 +771,15 @@ function render() {
         const c = S.probes[v];
         h += `<button type="button" role="radio" class="sp-size sp-size-${v}" data-sp="size" data-v="${v}" aria-checked="${P.size === v}"><span class="sp-size-glyph" aria-hidden="true">7</span><span class="sp-size-name">${l}</span><span class="sp-size-cols">${c ? `${c} columns` : '…'}</span></button>`;
     }
+    // Columns: Auto, or a number with Aim for n | Exactly n (owner item 4); 7–10 only when the set has fast facts
+    const colMax = hasFacts() ? FACT_MAX_COLS : CELL_MAX_COLS;
+    const colsNow = o.cols;
     h += `</div><label class="sp-cols"><span>Columns</span><select id="spCols" data-sp-cols>
-        <option value="auto"${P.cols === 'auto' ? ' selected' : ''}>Auto — fitted by size${autoCols ? ` (${autoCols})` : ''}</option>
-        ${[2, 3, 4, 5, 6, 7, 8, 9, 10].map((c) => `<option value="${c}"${Number(P.cols) === c ? ' selected' : ''}>${c}</option>`).join('')}
-    </select></label></section>`;
+        <option value="auto"${colsNow === 'auto' ? ' selected' : ''}>Auto — fitted by size${autoCols ? ` (${autoCols})` : ''}</option>
+        ${Array.from({ length: colMax - 1 }, (_, k) => k + 2).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c}</option>`).join('')}
+    </select></label>`;
+    if (colsNow !== 'auto') h += `<div class="sp-row sp-cmode"><div class="sp-seg" role="radiogroup" aria-label="Columns mode">${[['aim', `Aim for ${colsNow}`], ['exact', `Exactly ${colsNow}`]].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="cmode" data-v="${v}" aria-checked="${P.colsMode === v}">${l}</button>`).join('')}</div><span class="sp-hint">${P.colsMode === 'exact' ? `every part ${colsNow} across; bigger problems at their own max` : `${colsNow} across wherever it fits, else the most that fit`}</span></div>`;
+    h += `</section>`;
 
     // 4 Answer key
     h += `<section class="sp-step">${stepHead(4, 'Answer key')}<div class="sp-seg" role="radiogroup" aria-label="Answer key">${[[true, 'On'], [false, 'Off']].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="key" data-v="${v}" aria-checked="${P.key === v}">${l}</button>`).join('')}</div></section>`;
@@ -645,6 +897,25 @@ function onClick(e) {
     if (act === 'key') { P.key = v === 'true'; changed(false); return; }
     if (act === 'arrange') { if (P.arrange !== v) { P.arrange = v; changed(true); } return; }
     if (act === 'more') { S.moreOpen = !t.parentElement.open; return; }
+    if (act === 'cmode') { if (P.colsMode !== v) { P.colsMode = v; changed(false); } return; }
+    if (act === 'skopt') { S.openOpts = S.openOpts || new Set(); const i = Number(v); if (t.parentElement.open) S.openOpts.delete(i); else S.openOpts.add(i); return; }
+    if (act === 'fact' || act === 'factall') {
+        const i = Number(t.dataset.i);
+        const d = numberOptionsOf(S.list[i]).sets;
+        if (!d) return;
+        const all = d.values.map((x) => Number(x.v));
+        let cur = setsOf(S.list[i], d);
+        if (act === 'factall') cur = all;
+        else { const x = Number(v); cur = cur.includes(x) ? cur.filter((y) => y !== x) : [...cur, x].sort((a, b) => a - b); if (!cur.length) cur = [x]; }
+        setOpt(i, 'constant', cur);
+        changed(true); return;
+    }
+    if (act === 'qpsave') {
+        const rec = saveQuickPrint(footerOf(S.list).slice(0, 60), S.list, Object.assign({}, opts(), { n: P.how === 'pages' ? P.nPages : P.nProblems }));
+        if (rec) { qpRename = rec.id; render(); const el = S.root.querySelector(`[data-qp-rename="${CSS.escape(rec.id)}"]`); if (el) { el.focus(); el.select(); } try { window.showToast?.('Saved as a quick print: type a name', 'success'); } catch (e) { /* */ } }
+        return;
+    }
+    if (quickAct(act, v, render)) return;
     if (act === 'newnums') { S.seed = 100000 + Math.floor(Math.random() * 900000); schedule(0); return; }
     if (act === 'full') { const more = S.ctx.more; closeSimplePrint(); more(); return; }
     if (act === 'print') { doPrint(); return; }
@@ -677,10 +948,19 @@ function onInput(e) {
 }
 function onChange(e) {
     if (!S) return;
-    if (e.target.id === 'spCols') { const v = e.target.value; P.cols = v === 'auto' ? 'auto' : Number(v); changed(false); }
+    const t = e.target;
+    if (t.id === 'spCols') { const v = t.value; P.cols = v === 'auto' ? 'auto' : Number(v); changed(false); return; }
+    if (t.dataset.band !== undefined) { setOpt(Number(t.dataset.band), 'band', Number(t.value)); changed(true); return; }
+    if (t.id === 'spBandAll' && t.value) {
+        const v = Number(t.value);
+        S.list.forEach((s, i) => { const nb = numberOptionsOf(s).band; if (nb) setOpt(i, 'band', bandAtMost(nb.values, v)); });
+        changed(true);
+    }
 }
 function onKey(e) {
     if (!S) return;
+    if (S.root.contains(e.target) && quickRenameKey(e, render)) return;
+    if (e.key === 'Escape' && qpMenu) { e.preventDefault(); e.stopPropagation(); qpMenu = null; render(); return; }
     if (e.key === 'Escape') {
         if (document.getElementById('tvPdfPreview') && !document.getElementById('tvPdfPreview').hidden) return;
         e.preventDefault(); e.stopPropagation(); closeSimplePrint(); return;
@@ -726,5 +1006,5 @@ function doPreview(e) {
 
 /** For checks: the open dialog's state. */
 export function simplePrintState() {
-    return S ? { list: S.list.map((s) => ({ key: keyOf(s), amt: s.amt })), prefs: Object.assign({}, P), built: S.built ? { pages: S.built.pages, total: S.built.total, cols: S.built.cols, rows: S.built.rows, perPage: S.built.perPage, arrangement: S.built.arrangement, counts: S.built.counts, sets: S.built.sets, line: summaryLine(S.built, opts()) } : null, busy: !!S.busy, probes: Object.assign({}, S.probes) } : null;
+    return S ? { list: S.list.map((s) => ({ key: keyOf(s), amt: s.amt, opts: s.opts || null })), quick: S.ctx.quick || null, prefs: Object.assign({}, P), built: S.built ? { pages: S.built.pages, total: S.built.total, cols: S.built.cols, rows: S.built.rows, perPage: S.built.perPage, arrangement: S.built.arrangement, counts: S.built.counts, sets: S.built.sets, line: summaryLine(S.built, opts()) } : null, busy: !!S.busy, probes: Object.assign({}, S.probes) } : null;
 }
