@@ -208,6 +208,15 @@ export function checkURLParameters() {
         }).catch((e) => { console.warn('[init] could not read the set in the link', e); });
     }
 
+    // A quick print link ?qp=QP1.… (owner 2026-11-03 item 5): the whole print setup goes in the teacher's Quick prints.
+    const qpParam = urlParams.get('qp');
+    if (qpParam) {
+        import('./simple-print.js').then(({ importQuickPrint }) => {
+            const rec = importQuickPrint(qpParam);
+            if (rec && typeof window.showToast === 'function') window.showToast(`“${rec.name}” is in Print › Quick prints`, 'info');
+        }).catch((e) => { console.warn('[init] could not read the quick print in the link', e); });
+    }
+
     // Check ?c= or ?code= (Direct Play link)
     const code = urlParams.get('code') || urlParams.get('c');
     // An MX- mixed code (the Mixed Settings link) names each skill by category letter + position

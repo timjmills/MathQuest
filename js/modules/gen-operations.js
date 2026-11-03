@@ -108,6 +108,17 @@ let _constantCursor = 0;
 let _constantOffset = 0;   // where this page starts in the fact-set cycle; redrawn at item 0
 let _constantFresh = true; // a new page has not drawn its offset yet (page-deal.js onNewPage)
 onNewPage(() => { _constantFresh = true; });
+let _constantShuffle = 0;  // the page's seed for the order inside each cycle; redrawn at item 0
+// simple-print-2 critic r1 (#3): a FIXED stride cycle over a small ticked set (6, 7, 8) put the same table in every
+// cell of a column on a 6-across page (8, 7, 6, 8, 7, 6 …). Each value still comes up exactly once per cycle, but the
+// order inside each cycle is shuffled from the page's seed, so no column or diagonal repeats a table by construction.
+function _cyclePerm(len, cycle) {
+    let x = (_constantShuffle ^ Math.imul(cycle + 1, 0x9E3779B1)) >>> 0;
+    const next = () => { x = (x + 0x6D2B79F5) >>> 0; let t = Math.imul(x ^ (x >>> 15), 1 | x); t ^= t + Math.imul(t ^ (t >>> 7), 61 | t); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const p = Array.from({ length: len }, (_, i) => i);
+    for (let i = len - 1; i > 0; i--) { const j = Math.floor(next() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
+    return p;
+}
 function factConstantFor(narrowTo) {
     let def = null;
     try {
@@ -140,9 +151,17 @@ function factConstantFor(narrowTo) {
     // The offset is drawn once per page, from Math.random, so a seeded page still reproduces
     // exactly (the harness and generateQuestionFor both seed it) while successive live pages move
     // through the whole set.
-    if (at === 0 || (_constantFresh && Number.isFinite(state.itemIndex))) _constantOffset = Math.floor(Math.random() * len);
+    if (at === 0 || (_constantFresh && Number.isFinite(state.itemIndex))) { _constantOffset = Math.floor(Math.random() * len); _constantShuffle = Math.floor(Math.random() * 4294967296) >>> 0; }
     _constantFresh = false;
-    const step = (((at + _constantOffset) % len) + len) % len;
+    const k = Math.max(0, at + _constantOffset);
+    let step = k % len;
+    if (len >= 2 && len <= 6) {
+        // a small set: shuffle inside each cycle, and never open a cycle with the value that closed the last one
+        const cyc = Math.floor(k / len);
+        let perm = _cyclePerm(len, cyc);
+        if (cyc > 0) { const prev = _cyclePerm(len, cyc - 1); if (perm[0] === prev[len - 1]) perm = [...perm.slice(1), perm[0]]; }
+        step = perm[step];
+    }
     return ticked[(step * _dealStride(len)) % len];
 }
 
@@ -6692,6 +6711,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         a = multC;
                         b = _mixedM ? (_trivialM ? rng(0, 1) : rng(2, _tMax))
                             : rng(0, _tMax);     // from 0, so the zero facts are actually drilled
+                        // critic r1 (#3): a ticked table is a factor, not always the top number (7 × 4 and 4 × 7)
+                        if (factsMode && !_mixedM && rng(0, 1) === 1) [a, b] = [b, a];
                     } else {
                         a = pick(_tables);
                         b = rng(1, 12);

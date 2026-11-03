@@ -492,3 +492,4 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | Default page fill, all sets, S/M/L (min) | 22 % | 63 % |
 | Fast facts at S, columns | — | 10 (8 when answers > 99) |
 | Critic rounds | — | 2 (r2 min 6, engine-held) |
+| simple-print-2 critic rounds | — | r1 FAIL (A C2 6, C3 7; B C2 7): 6 findings, each now a ws-simple-print check |
