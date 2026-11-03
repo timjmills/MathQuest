@@ -584,3 +584,9 @@ Remaining:
 - card-rulings / card-not-offered: SKIPPED-owner — the facts card.json has no numeric rulings (owner rulings are prose), so the
   regenerate writes nothing; a rulings block would be new signed content. Needs the owner (or a lead ruling).
 Cost this session ≈ $60 (≈ 2.1 % of the week) of the $85 cap. Stopped per the lead's instruction (not green → hand-over).
+
+## R4c (2026-11-03): fade packet PG-23
+- Root cause: `splitBySupports` (print-sheet.js) split the 3-page faded packet into one part per support alternative, each sized as its share of ONE page x pages; the parts flowed on one after another, so the last part always left 2 problems alone on page 3 (at every count: 6+6+5, 6+6+6, ...), and 18+ overflowed to 5-6 pages, so the Auto fill stepped back down onto the tail.
+- FIXED (d0bc9803): a FADED sheet of more than one page is not split (`(n.coverage || o.cover) === 'fade' && pages > 1` returns the one section); the Auto fill deals it page by page in whole rows, alternatives in blocks as the supports fade. The shared-page path (shareRows / sharedPage) is untouched.
+- Lint: the fade packet for div_facts plus the four siblings at S/M/L shows 0 findings (no GRID-EVEN / H13 / PAGEFILL); div_facts --pages 2 fade and the defaults: 0. Trade-off for the critic: the unsplit packet holds 13 problems over 3 pages (was 17-19 with the tail), because the one section reserves room for every support it can carry.
+- Precritic `--strict` (`/tmp/mq-precritic/20261103-123541-30699`): 45 PASS (10 on the baseline), 0 FAIL, 2 SKIPPED-owner (card-rulings, card-not-offered, lead ruling). sibling-compare OK: 0 above the siblings. boot-smoke OK, assets stamped.
