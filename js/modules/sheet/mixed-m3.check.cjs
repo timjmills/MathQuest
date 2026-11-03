@@ -326,14 +326,18 @@ function checkKinds(pages, ctx) {
         const ordered = Object.values(groups).sort((a, b) => Math.min(...a.map((c) => c.n)) - Math.min(...b.map((c) => c.n)));
         for (const g of ordered) {
             const r = (pg.rows || []).find((x) => x.grid === g[0].grid && x.row === g[0].row);
-            rows.push({ page: pi + 1, kinds: [...new Set(g.map((c) => c.kind))], n: g.length, full: !!r && r.usedFrac >= 0.98, first: Math.min(...g.map((c) => c.n)) });
+            rows.push({ page: pi + 1, grid: g[0].grid, kinds: [...new Set(g.map((c) => c.kind))], n: g.length, full: !!r && r.usedFrac >= 0.98, first: Math.min(...g.map((c) => c.n)) });
         }
     });
     // (lane lead ruling r6b, 2026-11-03: a kind's trailing SHORT rows on the last page are the owner's "no row under half
     // full" rebalance of one remainder (4 + 1 -> 3 + 2); for the row-run rule they count as ONE row)
     for (let i = rows.length - 1; i > 0; i--) {
         const a = rows[i - 1]; const b = rows[i];
-        if (!a.full && !b.full && a.page === b.page && b.page === pages.length && a.kinds[0] === b.kinds[0] && a.kinds.length === 1 && b.kinds.length === 1) { a.n += b.n; rows.splice(i, 1); }
+        if (!a.full && !b.full && a.page === b.page && b.page === pages.length && a.kinds[0] === b.kinds[0] && a.kinds.length === 1 && b.kinds.length === 1) {
+            // (r6b render: 3 + 2 in two separate grids drew misaligned column lines and unruled L-areas - one grid, one lattice)
+            if (a.grid !== b.grid) out.push(`kinds: page ${b.page}: the rebalanced last rows of kind '${a.kinds[0]}' (from problems ${a.first} and ${b.first}) sit in separate grids (one grid, so their column lines line up)`);
+            a.n += b.n; rows.splice(i, 1);
+        }
     }
     for (const r of rows) if (r.kinds.length > 1) out.push(`kinds: page ${r.page} the row from problem ${r.first} mixes kinds ${r.kinds.join(' + ')} (one kind a row)`);
     const kindsAll = [...new Set(rows.map((r) => r.kinds[0]))];
