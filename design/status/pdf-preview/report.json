@@ -1,0 +1,189 @@
+{
+  "timing": {
+    "mid": [
+      {
+        "after": 300,
+        "first": 203,
+        "all": 5423
+      },
+      {
+        "after": 900,
+        "first": 253,
+        "all": 5552
+      },
+      {
+        "after": 1500,
+        "first": 415,
+        "all": 6373
+      },
+      {
+        "after": 2500,
+        "first": 318,
+        "all": 3521
+      }
+    ],
+    "throttle": 4,
+    "coldFirstMs": 131,
+    "coldAllMs": 6075,
+    "warmFirstMs": 179,
+    "warmAllMs": 457,
+    "coldWall": {
+      "first": 347,
+      "all": 6256
+    },
+    "warmWall": {
+      "first": 615,
+      "all": 615
+    },
+    "backgroundBuildMsAfterPage1": 6007,
+    "pages": 8
+  },
+  "parity": [
+    {
+      "name": "A4 · 2 pages · key at the end",
+      "previewPages": 4,
+      "docPages": 4,
+      "pdfPages": 4,
+      "samePages": true,
+      "meta": "4 pages to print · 2 for pupils + 2 answer keys · A4",
+      "pixels": [
+        {
+          "page": 0,
+          "frac": 0.00001794401914626843
+        },
+        {
+          "page": 2,
+          "frac": 0.00001794401914626843
+        },
+        {
+          "page": 3,
+          "frac": 0.000011225007520755039
+        }
+      ]
+    },
+    {
+      "name": "Letter · 3 pages · key after each page",
+      "previewPages": 6,
+      "docPages": 6,
+      "pdfPages": 6,
+      "samePages": true,
+      "meta": "6 pages to print · 3 for pupils + 3 answer keys · Letter",
+      "pixels": [
+        {
+          "page": 0,
+          "frac": 0
+        },
+        {
+          "page": 1,
+          "frac": 0
+        },
+        {
+          "page": 5,
+          "frac": 0
+        }
+      ]
+    },
+    {
+      "name": "2 sets · different problems",
+      "previewPages": 9,
+      "docPages": 9,
+      "pdfPages": 9,
+      "samePages": true,
+      "meta": "9 pages to print · 4 for pupils + 1 set cover + 4 answer keys · A4",
+      "pixels": [
+        {
+          "page": 0,
+          "frac": 0.000019065520342910206
+        },
+        {
+          "page": 2,
+          "frac": 0.000019065520342910206
+        },
+        {
+          "page": 8,
+          "frac": 0.000016822517949626652
+        }
+      ]
+    },
+    {
+      "name": "quiz · 2 versions",
+      "previewPages": 12,
+      "docPages": 12,
+      "pdfPages": 12,
+      "samePages": true,
+      "meta": "12 pages to print · 6 for pupils + 6 answer keys · A4",
+      "pixels": [
+        {
+          "page": 0,
+          "frac": 0.000020187021539551984
+        },
+        {
+          "page": 3,
+          "frac": 0.00001459250977698155
+        },
+        {
+          "page": 11,
+          "frac": 0.00001459250977698155
+        }
+      ]
+    },
+    {
+      "name": "3 sets · same problems (set covers)",
+      "previewPages": 10,
+      "docPages": 10,
+      "pdfPages": 10,
+      "samePages": true,
+      "meta": "10 pages to print · 6 for pupils + 2 set covers + 2 answer keys · A4",
+      "pixels": [
+        {
+          "page": 0,
+          "frac": 0.00001794401914626843
+        },
+        {
+          "page": 8,
+          "frac": 0.000015701016752984875
+        },
+        {
+          "page": 9,
+          "frac": 0.000011225007520755039
+        }
+      ]
+    },
+    {
+      "name": "one skill · short key after each page",
+      "previewPages": 4,
+      "docPages": 4,
+      "pdfPages": 4,
+      "samePages": true,
+      "meta": "4 pages to print · 2 for pupils + 2 answer keys · A4",
+      "pixels": [
+        {
+          "page": 0,
+          "frac": 0.00001794401914626843
+        },
+        {
+          "page": 1,
+          "frac": 0.000008980006016604031
+        },
+        {
+          "page": 3,
+          "frac": 0.000008980006016604031
+        }
+      ]
+    }
+  ],
+  "timingBare": [
+    {
+      "after": 400,
+      "first": 282
+    },
+    {
+      "after": 900,
+      "first": 342
+    },
+    {
+      "after": 1400,
+      "first": 284
+    }
+  ]
+}

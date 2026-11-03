@@ -129,6 +129,74 @@ function subNoRegroupLessons() {
     };
 }
 
+/* ------------------------------ one-step word problems within 10 / 20 (K-1, the sentence layout) */
+// Visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md 4.4; round 2, critic r1 F6 / F13): the word-work
+// cell's sentence layout - the story, the PART-WHOLE BAR (drawn on the teaching cells), then `[ ] ◯ [ ] = [ ] unit`.
+// The lesson teaches the structure, never key words (PEDAGOGY P-21, P-WP-10): two parts make the whole; I know both
+// parts, I add; I know the whole and one part, I subtract. The four steps are the provider's four worked steps
+// (sheet/providers/word-work.js: read, the parts and the whole on the bar, the number sentence, solve), so step n of
+// the list IS panel n of the chart. The Warm-up deals the facts the story is solved with (one row of four: a bond row
+// beside them pushed Guided Practice off page 2, DN-2); Mixed practice pairs the lesson with the bonds strand and the
+// other operation's facts (never a second word-problem section). The _plain twin (no picture row) is the same lesson.
+function storyLessons() {
+    const FORMAT = {
+        kind: 'numbered steps with icons + a rule',
+        why: 'The one decision pupils get wrong is the sign; the bar shows which number is missing - a part or the whole - and the rule names what to do.',
+    };
+    const STEPS = [
+        { icon: 'look', text: 'Read the story two times.' },
+        { icon: 'decide', text: 'Find the parts and the whole.' },
+        { icon: 'write', text: 'Write the number sentence.' },
+        { icon: 'check', text: 'Solve. Say the answer and its label.' },
+    ];
+    // the vocabulary pictures: the same small bar, each showing only what its word names (no pointer)
+    const VOCAB = (sentence) => [
+        { word: 'whole', meaning: 'all of them together', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'whole', only: true } },
+        { word: 'part', meaning: 'some of the whole', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'parts', only: true } },
+        { word: 'number sentence', meaning: 'the numbers and the sign', picture: { kind: 'text', text: sentence } },
+    ];
+    const ADD = {
+        concepts: [
+            { id: 'part-whole', text: 'Two parts make the whole.' },
+            { id: 'both-parts-add', text: 'I know both parts. I add to find the whole.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: VOCAB('3 + 4 = 7'),
+        steps: STEPS,
+        chant: 'Part + part = whole.',
+    };
+    const SUB = {
+        concepts: [
+            { id: 'part-whole', text: 'Two parts make the whole.' },
+            { id: 'whole-part-sub', text: 'I know the whole and one part. I subtract to find the other part.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: VOCAB('7 − 3 = 4'),
+        steps: STEPS,
+        chant: 'Whole − part = part.',
+    };
+    // (the practice page: eight stories where they fit the page, else six - print-sheet.js practiceShapes)
+    const base = (o) => Object.assign({ format: FORMAT, example: { match: 'I know' }, practiceShapes: [[8, 2], [6, 2], [4, 2]] }, o);
+    const addFacts = (band) => ({ key: 'addition:add_facts', opts: { band, notation: ['stacked'] }, why: `The story is solved with an addition fact within ${band}.` });
+    const subFacts = (band) => ({ key: 'subtraction:subtract', opts: { band, notation: ['stacked'] }, why: `The story is solved with a take-away fact within ${band}.` });
+    const add = (band) => base(Object.assign({}, ADD, {
+        skills: [addFacts(band)],
+        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'subtraction:subtract', opts: { band } }],
+    }));
+    const sub = (band) => base(Object.assign({}, SUB, {
+        skills: [subFacts(band)],
+        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'addition:add_facts', opts: { band } }],
+    }));
+    const out = {};
+    for (const [id, band] of [['10', 10], ['20', 20]]) {
+        out[`addition:add_wp_${id}`] = add(band);
+        out[`addition:add_wp_${id}_plain`] = add(band);
+        out[`subtraction:sub_wp_${id}`] = sub(band);
+        out[`subtraction:sub_wp_${id}_plain`] = sub(band);
+    }
+    return out;
+}
+
 export const LESSONS = Object.freeze({
     // ---------------------------------------------------------------- Add within 10 (K-1)
     // The skill is addition:add_facts with its band option at 10 ("Within N" bounds the sum).
@@ -229,6 +297,44 @@ export const LESSONS = Object.freeze({
     // chart's example is never a zero case (`subNoZero`), and Mixed practice pairs the lesson with
     // other strands (addition, place value), never a second Subtraction section.
     ...subNoRegroupLessons(),
+
+    // --------------------------------- One-step word problems within 10 / 20 (K-1)
+    ...storyLessons(),
+
+    // ------------------------------------------- Is it a fact family? (+ / −, grade 1)
+    // Visual-quality lane (2026-10-31): the kit's `family-check` cell - the three numbers in the fact
+    // triangle, the whole at the top, and the printed Yes / No the pupil circles. The three steps are
+    // the provider's worked steps (sheet/providers/addition.js): the big number at the top, add the
+    // two small numbers, circle yes or no. The Warm-up deals the facts the check is made with.
+    'addition:fact_family_sort': {
+        skills: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'The check adds the two small numbers.' },
+        ],
+        concepts: [
+            { id: 'whole-top', text: 'The big number is the whole. It goes at the top.' },
+            { id: 'parts-add', text: 'The two small numbers are the parts. Add them.' },
+            { id: 'family', text: 'The parts make the whole: it is a fact family.' },
+        ],
+        vocab: [
+            { word: 'whole', meaning: 'the big number at the top', picture: { kind: 'text', text: '12 at the top' } },
+            { word: 'parts', meaning: 'the two small numbers', picture: { kind: 'text', text: '8 and 4' } },
+            // (critic r1 F8: a family is the three numbers, never one number sentence - a sentence is one fact)
+            { word: 'fact family', meaning: 'three numbers: two parts and the whole', picture: { kind: 'text', text: '8, 4, 12' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the big number.' },
+            { icon: 'count', text: 'Add the small numbers.' },
+            { icon: 'decide', text: 'The same? Circle yes. Not? Circle no.' },
+        ],
+        chant: 'Two parts make the whole.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Three short steps; the decision at step 3 is the whole skill, and the four-word chant is the question pupils ask themselves.',
+        },
+        example: { match: 'Circle yes' },
+        practiceShapes: [[12, 3], [9, 3], [6, 2]],
+        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'subtraction:subtract', opts: { band: 20 } }],
+    },
 
     // ------------------------------------------------- Round to the nearest 10 / 100 (3)
     'number_sense:nearest_10': {

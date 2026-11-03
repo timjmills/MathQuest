@@ -22,7 +22,8 @@ const path = require('path');
 const fs = require('fs');
 const { open, waitFor } = require('../lib/ws-harness.cjs');
 
-const ROOT = path.join(__dirname, '..', '..');
+// MQ_ROOT (ws-backtest commit-pair rows): the tree under test; the check itself is always this script
+const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.join(__dirname, '..', '..');
 const SHOTS = process.argv.includes('--shots');
 const CUR_AT = process.argv.indexOf('--curated');
 const CUR_DIR = CUR_AT > 0 ? path.resolve(process.argv[CUR_AT + 1]) : '';
@@ -1249,12 +1250,14 @@ const sweepHas = (l) => !!l && (!ONLY_GRADE || String(l.grade).toUpperCase() ===
             const u = await page.$eval('#tvwLink', (i) => i.value);
             const got = (await decode(u)).map((k) => k.replace('|', ':'));
             const want = r.used.map((x) => x.key);
-            check(got.length === want.length && want.every((k) => got.includes(k)), `${vw} detailed ${r.id}: link decodes to ${JSON.stringify(got)}, not skills.used ${JSON.stringify(want)}`);
-            const od = await decodeOpts(u);
-            const lost = await page.evaluate(async (used, od) => {
+            check(got.length === want.length && want.every((k, i) => got[i] === k), `${vw} detailed ${r.id}: link decodes to ${JSON.stringify(got)}, not skills.used ${JSON.stringify(want)}`);
+            // compared USE BY USE, in order: a skill used twice with different options keeps both (lessons 6, 7)
+            const odl = await page.evaluate((link) => window.parseSkillCodeParts((new URL(link).searchParams.get('c') || '').split('|')[0]).map((s) => s.opts || {}), u);
+            const lost = await page.evaluate(async (used, odl) => {
               const c = await import('./js/modules/skill-option-codec.js');
-              return used.filter((x) => x.opts).filter((x) => { const [cat, id] = x.key.split(':'); return c.encodeOptionPayload(cat, id, x.opts) !== c.encodeOptionPayload(cat, id, od[x.key] || {}); }).map((x) => x.key);
-            }, r.used, od);
+              // every use, a use at its defaults against {} (checker D1: a default use took another use's options)
+              return used.map((x, i) => [x, i]).filter(([x, i]) => { const [cat, id] = x.key.split(':'); return c.encodeOptionPayload(cat, id, x.opts || {}) !== c.encodeOptionPayload(cat, id, odl[i] || {}); }).map(([x, i]) => `${x.key}#${i}`);
+            }, r.used, odl);
             check(!lost.length, `${vw} detailed ${r.id}: options lost in the link: ${lost.join(', ')}`);
             // Make it: the Print worksheets screen, "Lesson: detailed", this lesson
             const p0 = app.problems.length;

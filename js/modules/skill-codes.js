@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS, getSkillGrade, gradeCircleHTML, getPositionalSkills } from './data.js';
 import { mergedSkillFor } from './skill-aliases.js';
 import { optionSuffix, decodeOptionPayload, splitOptionSuffix } from './skill-option-codec.js';
-import { getSetOptions, setSetOptions, deleteSetOptions, restoreSetOptions } from './skill-option-store.js';
+import { getSetOptions, setSetOptions, deleteSetOptions, restoreSetOptions, setQueueUses } from './skill-option-store.js';
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, skillOptionsSummaryHTML } from './skill-options-ui.js';
 
 // The share panel's skill list is an options host: each row gets the ⚙ Options panel, and the
@@ -19,17 +19,25 @@ registerSkillOptionsHost('queue', {
 // A skill at its defaults writes no suffix, so every code a set made before this existed is
 // still produced (and still decoded) byte-for-byte.
 
-export function generateSkillCode() {
-    if (window.skillQueue.length === 0) return '---';
+// `list` (optional): an explicit array of {categoryId, skillId, weight, opts} to encode instead of the
+// queue. The queue holds each skill once; a detailed lesson can use one skill twice with different
+// options, and each use must keep its own options (its `opts`, or the defaults when it has none; the
+// set's option store is not read).
+export function generateSkillCode(list) {
+    const src = Array.isArray(list) ? list : window.skillQueue;
+    if (src.length === 0) return '---';
 
     const parts = [];
-    for (const skill of window.skillQueue) {
+    for (const skill of src) {
         const key = `${skill.categoryId}:${skill.skillId}`;
         const code = SKILL_CODES[key];
         if (code) {
             // Add weight if not 0
             const weight = skill.weight || 0;
-            const opts = optionSuffix(skill.categoryId, skill.skillId, getSetOptions(skill.categoryId, skill.skillId));
+            // An explicit list is the whole truth: a use with no `opts` is at its defaults, never the store's
+            // (which holds one option set per skill, so a repeated skill's other use would leak in).
+            const own = Array.isArray(list) ? (skill.opts && typeof skill.opts === 'object' ? skill.opts : {}) : null;
+            const opts = optionSuffix(skill.categoryId, skill.skillId, own || getSetOptions(skill.categoryId, skill.skillId));
             if (weight > 0 && weight !== 1) {
                 parts.push(code + weight + opts);
             } else {
@@ -121,9 +129,15 @@ export function applySkillCode(inputId) {
     }
 
     // Apply weights to skillQueue (which was synced by UnifiedSkills)
-    for (let i = 0; i < loadedSkills.length && i < window.skillQueue.length; i++) {
-        window.skillQueue[i].weight = loadedSkills[i].weight || 0;
+    // (by skill, not by position: a code that repeats a skill holds more parts than the queue has rows)
+    for (const q of window.skillQueue) {
+        const hit = loadedSkills.find((sk) => sk.categoryId === q.categoryId && sk.skillId === q.skillId);
+        if (hit) q.weight = hit.weight || 0;
     }
+    // A code that uses one skill more than once (a detailed lesson's Practice link) keeps every use
+    // with its own options: the queue holds the skill once, the uses ride beside it
+    // (skill-option-store.js setQueueUses) and mixed play deals them use by use. No repeat: null.
+    setQueueUses(loadedSkills);
 
     // Expand the queue to show loaded skills
     UnifiedSkills.expanded = true;
@@ -853,9 +867,9 @@ export function resetMixedMode() {
 
 // ===== ENHANCED SHARING SYSTEM =====
 
-export function generateEnhancedSkillCode() {
+export function generateEnhancedSkillCode(list) {
     // Reuse existing skill code generation for the skills part
-    const skillsPart = generateSkillCode();
+    const skillsPart = generateSkillCode(Array.isArray(list) ? list : undefined);
     if (!skillsPart || skillsPart === '---') return '';
 
     // Build settings part from share settings
@@ -1034,13 +1048,14 @@ export function setShareLinkType(type) {
     if (linkField) linkField.value = '';
 }
 
-export function generateShareableLink() {
+export function generateShareableLink(list) {
     // Check link type
     if (state.shareLinkType === 'quickstart') {
         return generateQuickStartLink();
     }
 
-    const code = generateEnhancedSkillCode();
+    // `list`: an explicit [{categoryId, skillId, weight, opts}] (each use kept); else the queue
+    const code = generateEnhancedSkillCode(Array.isArray(list) ? list : undefined);
     if (!code) {
         if (typeof window !== 'undefined' && window.showToast) {
             window.showToast('Add skills first!', 'warning');

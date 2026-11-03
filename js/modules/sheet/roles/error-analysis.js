@@ -52,7 +52,7 @@ const PUPILS = ['Sam', 'Ana', 'Leo', 'Mia', 'Omar', 'Zara'];
 /** Templates whose answer IS a drawing: the fix is to draw it again. */
 const DRAWN = new Set(['base10', 'tenframe']);
 /** Templates whose answer is a choice among the item's own labels. */
-const CHOICE = new Set(['compare']);
+const CHOICE = new Set(['compare', 'family-check']);
 /** Templates that draw one fix box beside each line of the work (a fact family's four facts;
  *  a function table's rows, its rule and its Check row). */
 const LINED = new Set(['fact-family', 'function-table']);

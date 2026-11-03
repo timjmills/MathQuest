@@ -2037,6 +2037,15 @@ Work top to bottom. Each line is a pass / fail check; the rule ids in brackets s
 **B. Choose the representation**
 
 5. Pick the representation from section 2 or from a domain table above before inventing one. A new representation needs: minimum size at L, line weights, what is grey, what is dotted, what is dashed, and a Photocopy-safe rendering [XP-D-01 to XP-D-03].
+5a. **Representation choice (2026-10-31, `design/audit/VISUAL_QUALITY.md`).** Name the relation the skill teaches and look
+    it up in the representation map (`WORKSHEET_DESIGN_STANDARD.md` §18.1): that row is the drawing. Pick the drawing
+    from `design/GRAPHIC_LIBRARY.md`; if it has none, build it as a library entry (`js/modules/sheet/graphics/`, tokens
+    only), pass it ≥ 8 with an independent critic, then use it. Never draw a relation ad hoc inside a skill's cell, and
+    never state it in a rule box instead of drawing it [VQ-1, VQ-4]. Write the representation id on the spec card's rung.
+5b. List every part the template draws (sign row, column grid, regroup row, word bank, tick list, Say frame) and strike
+    each that is dead for THIS skill and band: an operation it never deals, a column grid while every answer is ≤ 20, a
+    bank word the story never says, a second answer place [VQ-2, VQ-3]. A template's pass on other skills never covers
+    this one (RUBRIC "graded only on its own renders").
 6. Remove every cue that depends on colour, and check the figure in greyscale with a hard threshold [XP-G-07, XP-G-08].
 7. Check proportions: labelled lengths are drawn in the right order of size; from the second step on, orientation varies [XP-G-15, XP-G-16].
 8. Strip decoration: no emoji, no clip-art, no screen-only titles inside the visual. Art appears only when it is the thing being counted, measured or read.
@@ -2081,6 +2090,8 @@ Work top to bottom. Each line is a pass / fail check; the rule ids in brackets s
 
 27. Print at S, M and L, in grey and in Photocopy-safe, on A4 and on US Letter. Photocopy the grey version once and check that shaded parts and trace digits survive.
 28. Run the compliance lints: ink, emoji, font, label style for the look, slot shape, overflow, no cell split across pages, no CCSS inside cells, facsimile answer key count.
+28a. Run `node tests/scripts/ws-visual-quality.mjs --skill <cat:skill>` (VQ-REP, VQ-ONEANSWER, VQ-LIVE, VQ-TITLE,
+     VQ-NOLEGACY) and look at the drawing against VQ-1 … VQ-10 (`WORKSHEET_DESIGN_STANDARD.md` §18).
 29. Check the screen card at 375, 768 and 1440 px: the same black-and-white cell inside coloured game chrome; inputs where the blanks are; feedback behaviour per XP-G-21; browser console clean.
 30. Confirm that nothing on the page records, charts or gates pupil progress [XP-G-22].
 

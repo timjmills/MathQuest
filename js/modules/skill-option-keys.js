@@ -199,7 +199,8 @@ export const MULTI_KEYS = Object.freeze({
     tenWrite: '4H',      // value form times: both values / the top value only (lesson 6 r2)
     tenTask: '4I',       // value form times: compare / story (700 ÷ 70 = 10)
     tenChoice: '4J',     // value form times, ring only: two words / four (the Check Question's A-D: + the same as, 100 times) - lesson 6 r4 (critic r2 D2)
-    // NEXT FREE IN 4E-4O: 4K.
+    familyChart: '4K',   // fact_family_sort (visual-quality lane, owner 2026-10-31): a blank number-family chart to fill in (working space)
+    // NEXT FREE IN 4E-4O: 4L.
     // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
     msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
     wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
@@ -443,7 +444,7 @@ export const NUMERIC_SET_VALUES = Object.freeze({
 // that carry their own tokens on the def: they have no one-character union table of their own.
 export const SCALAR_ONLY = Object.freeze({
     range: 'decimal', decimals: 'decimal', band: 'decimal', tiles: 'decimal', place: 'decimal',
-    simplestForm: 'bool', pictures: 'bool',
+    simplestForm: 'bool', pictures: 'bool', familyChart: 'bool',
     // P9 step 8 (block 0)
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
     // block 2 (2026-09-25)

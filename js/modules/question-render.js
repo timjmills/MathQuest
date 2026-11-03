@@ -1401,7 +1401,7 @@ function _syncRefLine() {
         const key = pool ? state.category + ':' + state.skill
             : q ? q.categoryId + ':' + (q.requestedSkillId || q.skillId) : '';
         syncPracticeRefLine(q, { categoryId: state.category, skillId: state.skill, pool: !!pool,
-            opts: (state.skillOptionsBySkill || {})[key] || state.skillOptions || null });
+            opts: (q && q.linkUse != null && q.skillOptions) || (state.skillOptionsBySkill || {})[key] || state.skillOptions || null });
     } catch (e) { /* the line is a hint: never block the card */ }
 }
 
@@ -1440,7 +1440,16 @@ function _clearRefLineOfHeader() {
         // the header: every sticky / fixed bar pinned to the top of the window, outside the card
         // (toasts, modals and pop-ups are not bars)
         let hdr = 0;
-        for (const el of document.querySelectorAll('body *')) {
+        // Only rendered elements outside the card can be a bar: a display:none subtree (the hidden views, the teacher
+        // site) and the card are pruned whole, which the checks below would discard one by one (Chromebook speed lane,
+        // 2026-11-02: reading the style of all ~2,600 elements after every scroll cost ~60 ms a question at CPU 6x).
+        const card0 = document.getElementById('questionCard');
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT, {
+            acceptNode: (n) => (n === card0 || getComputedStyle(n).display === 'none') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+        });
+        const rendered = [];
+        while (walker.nextNode()) rendered.push(walker.currentNode);
+        for (const el of rendered) {
             const cs = getComputedStyle(el);
             if (cs.position !== 'sticky' && cs.position !== 'fixed') continue;
             if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) continue;
@@ -1539,9 +1548,23 @@ function _applyMapSlots(q) {
         input.dataset.mqMapHidden = '1';
         input.style.setProperty('display', 'none', 'important');
         visualAid.classList.add('mq-map-cellslots');
-        const first = visualAid.querySelector('input.mq-cellslot');
+        const first = _firstWriteBox(visualAid);
         if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
     }
+}
+
+// The box the pupil writes in FIRST. A word-problem number sentence (`[ ] ◯ [ ] = [ ] unit`, the
+// word-work cell's sentence layout) is written left to right: its first number box (input.mq-wwork)
+// comes before the answer box, so it takes the focus (visual-quality lane 2026-10-31, ws-phone-card
+// FOCUS). Every other drawing keeps its first answer slot.
+function _firstWriteBox(visualAid) {
+    const sentence = visualAid.querySelector('.mq-wwsentence');
+    if (sentence) {
+        const box = [...sentence.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
+            .find((el) => !el.disabled && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
+        if (box) return box;
+    }
+    return visualAid.querySelector('input.mq-cellslot');
 }
 
 // The answer slot's shape and blank width (section 6, SL-2).
@@ -1659,7 +1682,9 @@ function _applyScreenCell() {
         // repeats the equation drawn under the line
         // A word-work story prints its story inside the cell: the line above it is the task
         // (round-4 critic: the card had no instruction), in screen verbs.
-        const _wwInstr = q.cell && q.cell.template === 'word-work' && q.screenInstr ? screenInstruction(q.screenInstr) : '';
+        // (the fact-family check too: its three numbers are in the triangle, the line above it says "Tap yes or no" -
+        // visual-quality critic r1 F15)
+        const _wwInstr = q.cell && (q.cell.template === 'word-work' || q.cell.template === 'family-check') && q.screenInstr ? screenInstruction(q.screenInstr) : '';
         if (qt && (isNumberLineItem(q) || _wwInstr)) {
             qt.classList.remove('mq-dup');
             qt.style.cssText = '';
@@ -1686,7 +1711,7 @@ function _applyScreenCell() {
             // several blanks in one drawing (a chart's empty cells): one input in each
             paper.classList.add('mq-slot-moved');
             visualAid.dataset.mqNoZoom = '1';
-            const first = visualAid.querySelector('input.mq-cellslot');
+            const first = _firstWriteBox(visualAid);
             if (first && !state.hasAnswered) {
                 try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
             }

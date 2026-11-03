@@ -113,6 +113,9 @@
 //   L-WRAP     WRAP-OP (kit / pack) no wrapped line of text ends in − + × ÷ = with its expression continued on the
 //              next line (critic r2 N6 vocabulary picture, N7 worked step). TY-21, H2 and WRAP-OP are measured by
 //              tests/lib/ws-geom-probe.cjs, the one definition ws-slot-clip's SLOT-W / HEADS read too.
+//   (L-DENSITY H13 on a cell answered IN PLACE - data-ws-inplace, the sentence-layout story .mq-wwsentence, the fact-family
+//              check .mq-fc: no writing room under it, so the band below its content counts like any band; visual-quality
+//              critic r1 F1, 37 % bands that the top-cell exemption hid.)
 //   (L-DENSITY H13-ROW: a top cell whose band below exceeds its row's smallest by >= 30 % of its height: the row is
 //              sized for a taller item, critic r2 N2. Findings carry `skill` (data-ws-skill) for D1 attribution.)
 //   L-INPUT    no <input>, <button>, <select>, <textarea> or contenteditable on a printed sheet.
@@ -949,8 +952,14 @@ function wsLintPage(cfg) {
                     if (gap > 3 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `first printed row starts ${mm(gap)} mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)`, 'not at top of box');
                 }
                 // CL-4b: under a top cell the band below the problem is writing room, not a sizing error.
-                const topCell = judged && !wa && getComputedStyle(c).justifyContent === 'flex-start';
-                const vBand = topCell ? Math.max(box.t - inner.t, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
+                // (a cell answered IN PLACE - data-ws-inplace: the sentence-layout story, the fact-family check - holds no
+                // writing room, so the band under it IS a sizing error: visual-quality critic r1 F1, 37 % bands at S that
+                // this exemption hid from precritic)
+                const inPlace = !!c.querySelector('[data-ws-inplace], .mq-wwsentence, .mq-fc');
+                const topCell = judged && !wa && getComputedStyle(c).justifyContent === 'flex-start' && !inPlace;
+                // (an in-place cell's band is read to its drawn edge, the bottom pad included: the empty paper the pupil sees -
+                // the critic's pixel scan - not the padding box; a 41 mm story in a 57 mm cell read 28 % inside its pads)
+                const vBand = topCell ? Math.max(box.t - inner.t, 0) : inPlace ? Math.max(box.t - inner.t, cr.bottom - box.b, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
                 const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
                 if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
                 else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');

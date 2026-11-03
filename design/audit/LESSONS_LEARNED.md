@@ -22,6 +22,10 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
 | L9 | **Self-grades too generous** — lanes report 8, critics find 5–6 | Grade your own renders against the RUBRIC anchors with numbers measured (pixel-scan bands, count items, measure digit mm), not impressions; list every cap you checked | The ORCHESTRATOR runs an independent critic on a lane's renders BEFORE merge, not only after |
 | L10 | **Answers follow a pattern or never vary** — correct choice alternates A/B or cycles every 3–5 items; one task answers the same on 30 of 30 items because two things are dealt by one draw (k2-r1) | Deal the answer position and every task attribute from the seeded rng with repeats allowed; never from `itemIndex % n`; one draw per independent attribute | NEW providers-unit / content-audit check: over 30 items the correct position and the answer must vary and must not cycle |
 | L11 | **Steps squeezed beside the drawing** — a model / anchor cell's step list set in a strip one word per line, running out of its border, next to a tiny drawing in a huge cell (owner, count_by_tables anchor) | Steps go beside the drawing only when the column is ≥ 55 mm (≈ 18 characters); wide drawings (rows, lines, tables) always put steps underneath; the model cell is as tall as its content | print-lint: no text column < 18 characters per line, nothing outside its cell border |
+| L12 | **The relation is not drawn** — a fact-family skill as bare numbers in a row with a rule box saying "Two parts make the whole"; 21 of 32 relation skills draw nothing (visual-quality lane, owner 3/10 on `fact_family_sort`) | Name the relation first and take its drawing from the representation map (WORKSHEET_DESIGN_STANDARD §18.1, VQ-1) and the graphic library (VQ-4); a statement of the relation is not a drawing | `ws-visual-quality` VQ-REP (relation skill ⇒ a bond / family / family-check / ten frame / bar template on every item); RUBRIC H14 |
+| L13 | **Dead scaffold parts** — + − × ÷ on a Grade 1 add page, a 3-track carry grid on 13 + 2, "books / boxes / days" in the bank (owner 4/10 on `add_wp_20_plain`): one template tuned for its hardest client | Every part a template draws is live for THIS skill and band: signs it deals, tracks its largest answer needs, story nouns only; scale the template's parts by grade, or pick a lighter layout (VQ-3) | `ws-visual-quality` VQ-LIVE (sign choices vs dealt operations by grade, no column grid when every answer ≤ 20, no filler bank word); RUBRIC H15 |
+| L14 | **Undefined or doubled answer area** — Yes / No ticks AND a Say frame with three blanks in one cell; an unlabelled write line; a bank floating beside the grid | ONE graded response area per answer, a defined slot shape and a unit or label beside it; the Say frame belongs to the model (VQ-2) | `ws-visual-quality` VQ-ONEANSWER (no Say blanks in the cell, no tick list + "Answer:"); `ws-screen-slots` for the screen; RUBRIC H16 |
+| L15 | **Garbled title / legacy cell built new** — "I Can add is it a fact family? +/−" (title built from the label); `fact_family_sort` written as `_wsCell` HTML on 2026-10-24 though `family.js` existed, passing L7's ink / font check | Write the provider's `strings.iCan` as a sentence for the skill (VQ-9); a new or rebuilt skill emits `q.cell` on a kit template (VQ-10) — L7's ink check is not a kit check | `ws-visual-quality` VQ-TITLE (no "?", sign pair, "is it", pasted label) and VQ-NOLEGACY (the no-kit-cell pin only shrinks); RUBRIC H17 |
 
 > **2026-10-23:** the checks marked NEW above (L1 sizes, L3 key-in-drawing, L6 instruction-follows-item, L10 answer cycles) plus
 > lone item / lone state, repeats, text ≠ generator and the Chromebook viewport are built in Wave 0 (`design/IMPROVEMENT_PLAN.md`
@@ -62,6 +66,9 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    (under `--strict` a SKIPPED-NOT-BUILT, SKIPPED (no rulings) or INCOMPLETE row is not green) AND every red matrix row is at
    or below the approved siblings' counts (the sibling comparison), on the lane branch MERGED WITH the current main branch,
    with the unit gates green there too. A critic round started earlier counts only if that comparison later confirms it.
+   **Lead ruling 2026-10-31 (shared-roles r1):** "at or below base" never covers a page role, template or host the lane
+   CHANGED: any red row there blocks the critic, even when the same row is red on main. Main-red rows may pass only on
+   roles / templates / hosts the lane did not touch.
 0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
    goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
    is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and
@@ -106,6 +113,60 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    runs `ws-stamp-assets`. The owner's go for a family is the line `Owner go: <family>, <YYYY-MM-DD>` in the lane file
    (§1.6.3 step 6).
    *Check:* the deploy is refused for a family with no go line.
+9. **A lane's gate set includes every gate that reads what it ships (lessons 6-7 merge, 2026-10-31).** Detailed lessons
+   6 and 7 merged with their own gates green (ws-detailed-lesson, precritic --role lesson), but ws-teacher-wrm, which
+   decodes each detailed lesson's teacher Practice link, was not on the lessons lane's path and went red: the link was
+   built from the de-duplicated skill queue, so a skill used twice with different options lost its second use and its
+   options. Root fix: the link encodes its own items (each (skill, options) use). The gate compares use by use.
+   *Check:* `ws-precritic --role lesson` now runs ws-teacher-wrm; backtest row `detailed-link-every-use`.
+
+### Teacher-site preview screens (pdf-preview lane, 2026-10-31)
+- **A hidden element is not an open dialog.** A guard that tests `getElementById(overlay)` breaks the moment the overlay
+  is pre-built hidden (Esc stopped closing the Print sheet). Test visibility (`!el.hidden` / an `isOpen()`), and gate
+  Esc on the screen BEFORE the dialog is ever opened and AFTER it closes. *Check:* `ws-pdf-preview` dialog steps.
+- **A dialog with an iframe needs the trap inside the frame too**, and everything behind it `inert`. *Check:* 10 × Tab
+  and 10 × Shift+Tab stay inside; the sheet is inert while open and not after.
+- **Time from the press, on the wall clock, with one real input event.** Handler-side `performance.now()` hides a press
+  queued behind a long task; `page.click` adds several round trips that each wait. *Check:* CDP press/release, Date.now().
+- **Parity by pixels, not only DOM.** The same HTML can print differently (fonts). Render the PDF from the app's ORIGIN
+  (a document on about:blank cannot load self-hosted fonts), compare at real size with a 1-px neighbourhood (A4 is
+  793.7 px at 96 dpi), and backtest the limit with a real difference (a serif title = 0.06 %; limit 0.02 %).
+- **Screenshot traps:** element screenshots past the window edge show what is behind; `clip` is document coordinates;
+  `captureBeyondViewport` resizes the window (and any fixed overlay). Use a tall viewport, scroll, clip, beyond=false.
+- **Background engine work gives way to the teacher.** One engine call is one long task (~1 s on a Chromebook); start
+  background builds only after 1.5 s without input and pause between calls on any pointer/key. *Check:* presses at
+  several offsets inside the busy window (+300 … +2500 ms), wall clock, page 1 < 1 s.
+- **Count what the page IS, not what it is not:** "pupil pages = all − keys" counted set covers. Count pupil pages by
+  their Name line.
+
+### Student Chromebook speed (chromebook-speed lane, 2026-11-02)
+- **A pupil downloads what core imports, not what a pupil uses.** 37 % of the startup bytes were teacher, print, quiz, MAP
+  and curriculum code a ?c= link never runs, and two third-party scripts only the Google export reads. Anything a pupil
+  does not need before the first question goes in `js/modules/deferred.js` (async stubs on window keep the inline handlers
+  working). *Check:* `ws-chromebook-perf` static budgets (startup gzip <= 1,900 KB, <= 200 modules) and "Start Playing
+  waited on no deferred module"; a pupil play-through may load no deferred module either.
+- **A module that sets shared state at import must not reset it.** `window.globalSkillsList = []` at the top of a module is
+  harmless only while that module loads first; loaded late it wipes the list. Create shared state in globals.js; modules
+  keep an existing value.
+- **An element id is a window property.** `typeof window.soSearchInput !== 'undefined'` is true for `<input id=soSearchInput>`:
+  test `typeof === 'function'` before skipping a name.
+- **Read everything, then write everything.** A loop that writes a style and then reads a box or a computed style restyles
+  the whole page every turn; on a page with 157 `:has()` rules one restyle is ~25 ms at CPU 6x. The live mono pass did it
+  per element on every mutation (21.6 s of CPU over 50 questions). Batch reads before writes; write only a value that
+  changes; drop a measurement that the caller repeats straight after. *Check:* `ws-chromebook-perf --why` lists the callers
+  of every forced layout of a slow question; `ws-ink-parity` (colours, `--geometry` boxes) proves a batched rewrite paints
+  and lays out the same as the old tree.
+- **A failed `import()` is cached for the life of the page.** Retrying the same URL rejects at once with no request;
+  retry with a fresh URL and, if that fails, tell the user to reload. A stub on window is also a trap for code that "calls
+  it if it exists": guard with `!fn.__mqStub` where a call would only download a part to do nothing. *Check:* the checker's
+  drop-then-retry probe (route abort, `serviceWorkers: 'block'` - a page the service worker controls fetches through it,
+  out of Playwright's sight); `ws-chromebook-perf` leaves the game and asserts no deferred module loaded.
+- **"Settled" must outlast the app's own quiet rules.** A 600 ms quiet window ended inside the Skills screen's thumbnail
+  pauses and the Print screen's 1.5 s quiet-before-background rule, so one tree measured 3 s and the other 7 s for the same
+  work. Use a window longer than any deliberate pause (2.5-3 s) and compare like for like.
+- **Time a perf change against the base on the same machine.** Live and local differ (17.1 s live vs 10.85 s local for the
+  same commit); the budget is a ratio of the base measured with the same harness, plus exact byte / module budgets that
+  cannot flake. Never run two timing runs, or a timing run and another browser gate, at once.
 
 ## PRE-FLIGHT checklist (every lane, before reporting)
 1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at
@@ -120,5 +181,9 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
 7. Options: the panel has a size ladder, complexity control, fading support and an appearance choice (or a stated
    reason), all verified.
 8. Gates green: the lane's usual list + `ws-screen-slots` + `ws-story-lint` (word skills).
-9. Self-grade with numbers, and list which caps (H1–H13, OC1–OC15) you checked and why each does not apply.
+9. Self-grade with numbers, and list which caps (H1–H17, OC1–OC15) you checked and why each does not apply.
 10. Paste the `ws-precritic` table in the report (once S1 lands; until then, the lane's gate list with each result).
+11. **Visual quality bar (2026-10-31):** run `node tests/scripts/ws-visual-quality.mjs --skill <cat:skill>` (it is on
+    precritic's `--skill` path) and look at the drawing against VQ-1 … VQ-10 (`WORKSHEET_DESIGN_STANDARD.md` §18): the
+    relation drawn from the map, every part live, one labelled answer place, the title a sentence, a kit cell. Write which
+    of H14-H17 you checked and why each does not apply.

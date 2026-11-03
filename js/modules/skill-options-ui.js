@@ -265,10 +265,11 @@ export function optionControlHTML(def, cur, color, h) {
         const offBorder = dense ? color + '55' : 'var(--border)';
         const rows = vals.map((x, i) => {
             const on = chosen.includes(x.v);
-            return `<label style="display:flex;align-items:center;justify-content:space-between;gap:${dense ? '6px' : '10px'};
-                        padding:${pad};border:1px solid ${on ? color : offBorder};border-radius:7px;
-                        background:${on ? color + '1a' : 'transparent'};cursor:pointer;min-width:0;
-                        font-size:0.8rem;color:var(--text);font-weight:${on ? '600' : '400'};">
+            // Checked is shown by the box alone (owner 2026-11-02): every row has the same edge and no fill.
+            return `<label class="sko-set-row" style="display:flex;align-items:center;justify-content:space-between;gap:${dense ? '6px' : '10px'};
+                        padding:${pad};border:1px solid ${offBorder};border-radius:7px;
+                        background:transparent;cursor:pointer;min-width:0;
+                        font-size:0.8rem;color:var(--text);font-weight:400;">
                 <span style="min-width:0;overflow-wrap:anywhere;">${escHTML(x.l)}</span>
                 <input type="checkbox" ${on ? 'checked' : ''}
                     onchange="${h.toggle(id, i)}"
@@ -283,8 +284,8 @@ export function optionControlHTML(def, cur, color, h) {
             ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">None ticked — any of them may appear.</div>`
             : '';
         return `<div${tip} style="font-size:0.82rem;color:var(--text);">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
+            <div class="sko-set-head" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px;">
+                <span style="flex:1 1 8em;min-width:0;font-weight:600;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
                 <button type="button" onclick="${h.all(id, true)}"
                     style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">All</button>
                 <button type="button" onclick="${h.all(id, false)}"

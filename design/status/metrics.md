@@ -454,3 +454,24 @@ against this row.
 | Date | Deploy commit | Covered | Partial only | Gap | Skills tagged | Proposals |
 |---|---|--:|--:|--:|--:|--:|
 | 2026-10-23 | baseline (77e3225) | 513 / 872 (59 %) | 149 | 210 | 392 | 162 |
+
+### pdf-preview (2026-10-31)
+| Metric | Value |
+|---|---|
+| Full preview: page 1 on screen (wall, CPU 4×) | 0.37–0.60 s (target < 1 s) |
+| Full preview: whole set after a pause (wall, 4×) | 0.37–0.60 s (target < 3 s) |
+| Full preview: whole set pressed at once (wall, 4× / 1×) | 4.1 s / 0.78 s (target 3 s; waiver asked at 4×) |
+| Print build, 4-page sheet + key (4×) | was 5.4 s before the dialog; now usually already built in the background |
+| Preview vs PDF: pages / pixels | equal in 6 printouts / ≤ 0.002 % differing (limit 0.02 %) |
+| Critic rounds to pass | r1 FAIL; r2 pending |
+
+### chromebook-speed (2026-11-02)
+| Metric | 1375b857b | This lane |
+|---|--:|--:|
+| Startup modules / JS gzip | 269 / 2.90 MB | 185 / 1.73 MB |
+| Pupil first visit, 46-skill link, 3 Mbps / 150 ms / CPU 4x (local HTTP/2 + gzip, median of 3) | 10.85 s | 6.82 s (-37 %) |
+| Pupil later visit | 2.00 s | 1.49 s |
+| 50-question play-through at CPU 6x: questions > 1 s / longest task | 6 / 4.8 s | skip-count only (pinned, F1) / ~1 s |
+| ~150-skill stress: max question / longest task | 1.85 s / 5.6 s | 0.81 s / 0.49 s |
+| Teacher, 100 skills, CPU 4x: view / tray / print preview / quiz sheet | 7.6 / 2.1 / 74-88 / 25 s | 7.7 / 2.4 / 74-83 / 26 s |
+

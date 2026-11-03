@@ -1,5 +1,4 @@
 import { state } from './state.js';
-import { importSharedSet } from './teacher-ui.js';
 import { warmSkillSearch } from './skill-finder.js';
 import { installSearchNotice } from './search-notice.js';
 import { createBackgroundShapes, loadState } from './ui-core.js';
@@ -16,9 +15,8 @@ import { submitAnswer } from './answer-check.js';
 import { nextQuestion } from './game-control.js';
 import { applySettingsCode } from './skill-codes.js';
 import { showStudentLandingModal } from './gamification.js';
-import { closePrintSettings } from './print-settings.js';
-import { closePrintPreview } from './print-generate.js';
-import { parseMapShareLink, loadMapShareLink } from './map-mode-ui.js';
+// The print, MAP and teacher modules are DEFERRED (js/modules/deferred.js, Chromebook speed lane 2026-11-02): init reaches
+// them through window (globals.js loads them before init for a ?map= / ?quiz= / &set= link) or a dynamic import.
 
 export function init() {
     createBackgroundShapes();
@@ -131,11 +129,17 @@ export function checkURLParameters() {
     if (mapParam) {
         const cleanUrl = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
-        const parsed = parseMapShareLink(mapParam);
+        if (window.parseMapShareLink && window.parseMapShareLink.__mqStub) {
+            // the MAP part did not load before init (globals.js awaited it): retry it, then open the link
+            window.parseMapShareLink(mapParam).then((p) => { if (p && p.tier && p.mode && p.bands && p.bands.length && p.domains && p.domains.length) window.loadMapShareLink(p); })
+                .catch((e) => console.warn('[MAP] the MAP part did not load:', e));
+            return;
+        }
+        const parsed = window.parseMapShareLink(mapParam);
         if (parsed && parsed.tier && parsed.mode &&
             parsed.bands && parsed.bands.length &&
             parsed.domains && parsed.domains.length) {
-            loadMapShareLink(parsed);
+            window.loadMapShareLink(parsed);
         } else {
             console.warn('[MAP] Invalid ?map= share-link payload:', mapParam);
         }
@@ -154,7 +158,7 @@ export function checkURLParameters() {
                 if (typeof window.handleQuizURL === 'function') {
                     window.handleQuizURL(quizParam);
                 }
-            });
+            }).catch((e) => console.warn('[quiz] the quiz part did not load:', e));
         }
         return;
     }
@@ -198,10 +202,10 @@ export function checkURLParameters() {
     // A Send link's optional &set= (owner 2026-10-25): the whole set with its print settings goes in My sets.
     const setParam = urlParams.get('set');
     if (setParam) {
-        try {
+        import('./teacher-ui.js').then(({ importSharedSet }) => {
             const rec = importSharedSet(setParam);
             if (rec && typeof window.showToast === 'function' && document.body.classList.contains('teacher-mode')) window.showToast(`“${rec.name}” is in Skills › My sets`, 'info');
-        } catch (e) { console.warn('[init] could not read the set in the link', e); }
+        }).catch((e) => { console.warn('[init] could not read the set in the link', e); });
     }
 
     // Check ?c= or ?code= (Direct Play link)
@@ -250,14 +254,14 @@ export function setupModalListeners() {
     const printSettingsEl = document.getElementById('printSettingsModal');
     if (printSettingsEl) {
         printSettingsEl.addEventListener('click', function(e) {
-            if (e.target === this) closePrintSettings();
+            if (e.target === this) window.closePrintSettings();
         });
     }
 
     const printPreviewEl = document.getElementById('printPreviewContainer');
     if (printPreviewEl) {
         printPreviewEl.addEventListener('click', function(e) {
-            if (e.target === this) closePrintPreview();
+            if (e.target === this) window.closePrintPreview();
         });
     }
 }

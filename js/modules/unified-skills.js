@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { updateStartSkillName } from './category-dropdowns.js';
 import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
-import { getSetOptions, setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions } from './skill-option-store.js';
+import { getSetOptions, setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions, queueUsesInPlay } from './skill-option-store.js';
 
 // A queue item's `opts` IS the set's option store entry for that skill: reading it returns the
 // stored (packed) options, or undefined at the defaults; assigning it writes the store. So every
@@ -85,6 +85,7 @@ export const UnifiedSkills = {
         this.skills = [];
         this.expanded = false;
         clearSetOptions({ silent: true });
+        state.queueUses = null;   // a code's repeated uses belong to the set it loaded
         this.syncAll();
     },
 
@@ -161,6 +162,8 @@ export const UnifiedSkills = {
             // Sync to state.mixedModeSettings
             if (!state.mixedModeSettings) state.mixedModeSettings = {};
             state.mixedModeSettings.selectedSkills = this.getAsSelectedSkills();
+            // a link's repeated uses hold only while the queue is still the set the link loaded
+            if (state.mixedModeSettings.uses && !queueUsesInPlay(this.skills)) delete state.mixedModeSettings.uses;
             state.mixedModeSettings.name = `Custom Practice (${this.count} skills)`;
 
             // Sync to print settings
@@ -492,6 +495,10 @@ export function playSelectedSkills(mode = 'practice') {
         selectedSkills: selectedSkills,
         name: `Custom ${modeNames[mode] || 'Practice'} (${window.skillQueue.length} skills)`
     };
+    // A loaded code that uses one skill more than once plays every use with its own options, while
+    // the queue is still the set that code loaded (skill-option-store.js queueUsesInPlay).
+    const uses = queueUsesInPlay();
+    if (uses) state.mixedModeSettings.uses = uses;
 
     // CRITICAL: Set state.category and state.skill DIRECTLY so startGame and generateQuestion use them
     state.category = 'all_mixed';

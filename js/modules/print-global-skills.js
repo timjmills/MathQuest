@@ -13,7 +13,7 @@ registerSkillOptionsHost('global', {
     rerender: () => renderGlobalSkillsList(),
 });
 
-window.globalSkillsList = [];
+window.globalSkillsList = window.globalSkillsList || [];   // globals.js creates it (this module loads late)
 export let addSkillsSearchMouseDown = false;
 export let keepAddSkillsSearchOpen = false;
 

@@ -31,9 +31,10 @@ const MIN_BLOCK = 6;
 const MAX_RUN = 3;
 
 const _consts = new Map();    // key -> a number drawn once per page
+const _hist = new Map();      // key -> Map(page position -> {sig, tags}) (freshDeal)
 
 /** A new page: forget every deck, so the page is a function of its own seeds. */
-export function resetPageDeals() { _decks.clear(); _consts.clear(); }
+export function resetPageDeals() { _decks.clear(); _consts.clear(); _hist.clear(); }
 
 /**
  * A whole number in [0, n) drawn ONCE per page from the seeded rng (at its first use after the
@@ -162,4 +163,53 @@ export function blockPermutation(key, n, block = 0) {
 export function dealPick(key, list, weights = null) {
     if (!Array.isArray(list) || !list.length) return undefined;
     return list[dealIndex(key, list.length, weights)];
+}
+
+/**
+ * A value drawn from the seeded rng (`draw()`, the generator's own deal: its distribution is kept)
+ * that is FRESH on the page (visual-quality lane 2026-10-31, ws-dealer-uniform PAGE; L10): no value
+ * with the same `sig` among the last `window` items dealt under `key`, and no tag (`tags(v)`: e.g.
+ * the first number, the answer) printed more than its cap there. A small valid set (a story within
+ * 10 has 28 number pairs) dealt by plain draws repeats a pair on almost every page of 20; this keeps
+ * the draws random (never a position cycle) and only refuses a draw the page already holds. The caps
+ * are relaxed by one every 20 refused draws (no draw meets them: the first fresh draw is kept; none
+ * fresh: the last draw), so a domain too small for the caps still deals. A redraw (setRedraw) is a plain draw.
+ * @param {string} key  one key per independent deal
+ * @param {() => any} draw  one seeded draw
+ * @param {{sig: (v) => string, tags?: (v) => string[], caps?: number[], window?: number, tries?: number}} o
+ */
+const _freshCursors = new Map();
+export function freshDeal(key, draw, o = {}) {
+    if (_redraw) return draw();
+    const sigOf = o.sig || ((v) => JSON.stringify(v));
+    const tagsOf = o.tags || (() => []);
+    const caps = Array.isArray(o.caps) ? o.caps : [];
+    const win = Math.max(1, Math.floor(Number(o.window) || 19));
+    const tries = Math.max(1, Math.floor(Number(o.tries) || 60));
+    let at;
+    if (Number.isFinite(state.itemIndex)) at = state.itemIndex;
+    else { at = _freshCursors.get(key) || 0; _freshCursors.set(key, at + 1); }
+    let h = _hist.get(key);
+    if (!h) { h = new Map(); _hist.set(key, h); }
+    const recent = [];
+    for (let p = Math.max(0, at - win); p < at; p++) if (h.has(p)) recent.push(h.get(p));
+    let got = null, fresh = null, ok = false;
+    for (let t = 0; t < tries; t++) {
+        const v = draw();
+        got = v;
+        const sig = sigOf(v);
+        if (recent.some((r) => r.sig === sig)) continue;
+        if (fresh === null) fresh = v;
+        const relax = Math.floor(t / 20);
+        const tg = tagsOf(v);
+        if (tg.some((x, i) => caps[i] !== undefined && recent.filter((r) => r.tags[i] === x).length >= caps[i] + relax)) continue;
+        ok = true;
+        break;
+    }
+    // (no draw met the caps: the first draw the page does not hold yet, else the last draw)
+    if (!ok && fresh !== null) got = fresh;
+    h.set(at, { sig: sigOf(got), tags: tagsOf(got) });
+    // live play never resets: keep the window round the cursor only
+    if (h.size > 4 * win) for (const p of [...h.keys()]) if (p < at - win) h.delete(p);
+    return got;
 }

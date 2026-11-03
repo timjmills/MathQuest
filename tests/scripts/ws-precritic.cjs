@@ -52,6 +52,12 @@
 //               values; the provider's wrongAnswer fits the item's answer boxes; pins in
 //               tests/fixtures/precritic/node-lint-s1.baseline.json), and ws-presets-unit checks that every preset's
 //               items obey its preset values
+//             ws-grade-render --gate (visual-quality critic r1, 2026-10-31: the lane skills' lesson, test and independent
+//               pages at S / M / L must not overflow - content run into a cell's pad counts - and no card-390 / card-820
+//               touch target may be under 44 px, H6),
+//             and the visual-quality lane check (2026-10-31): ws-visual-quality --skill (VQ-REP the relation is drawn,
+//               VQ-ONEANSWER one answer place, VQ-LIVE no dead sign / grid / bank part, VQ-TITLE the I Can title is a
+//               sentence, VQ-NOLEGACY a kit cell; shrink-only pins in tests/fixtures/precritic/vq-baseline.json)
 //   --template <id>   the --skill gates for every live skill whose kit cell template is <id> on ANY of its 8 seeded
 //             items (a "template skill scan" row names the skills that draw it, and FAILS naming any skill whose
 //             generation errored on every item, since whether it draws <id> is unknown), + ws-panes-unit, a
@@ -62,7 +68,8 @@
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline. The sample is tests/fixtures/precritic/role-sample.json
 //   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows, -plan-match,
-//             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-plain-words --check
+//             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-pdf-preview (print preview parity + timing),
+//             ws-plain-words --check
 //
 // BASELINES (pinned; changed only with a STATUS note)
 //   design/audit/baselines/print-lint.json    ws-print-lint --json of `--source kit` (independent, size L) per skill:
@@ -563,6 +570,15 @@ const PARSE = {
         if (v[1] !== 'OK') return { result: 'FAIL', findings: `${bad.length} row×size(s) failing; ${base}`, detail: bad.slice(0, 8).map((r) => `${r.id} ${r.size}: ${(r.findings || [r.status]).join('; ').slice(0, 180)}`), explainsExit: code === 1 };
         return { result: checked.some((r) => (r.slot || 0) + (r.clip || 0) > 0) ? 'PASS (baseline)' : 'PASS', findings: `${base}; every SLOT / CLIP count at or below the approved siblings`, detail: [], explainsExit: false };
     },
+    /** ws-visual-quality (visual-quality lane): pinned findings are PASS (baseline); a FAIL lists the new findings. */
+    visualQuality(g, out, code) {
+        const r = generic(g, out, code);
+        const pinned = (out.match(/^ {6}pinned /gm) || []).length;
+        const m = /^ws-visual-quality: (?:OK|FAIL)[^(]*\((.*)\)\s*(.*)$/m.exec(out);
+        if (r.result === 'PASS') { r.findings = m ? m[1] : r.findings; if (pinned) r.result = 'PASS (baseline)'; }
+        else if (r.result === 'FAIL' && /^ws-visual-quality: FAIL/m.test(out)) r.detail = out.split('\n').filter((l) => /^ {6}FAIL |^ {2}BASELINE /.test(l)).slice(0, 10).map((l) => l.trim());
+        return r;
+    },
     /** ws-dealer-uniform (lane S1): INCOMPLETE (exit 3: a skill's valid set unknown) is never PASS; pinned findings are PASS (baseline). */
     dealerUniform(g, out, code) {
         const inc = /^ws-dealer-uniform: INCOMPLETE - not fully checked: (.*?) \((.*)\)\s*$/m.exec(out);
@@ -675,6 +691,13 @@ function buildPlan(ctx) {
                 add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
             }
         }
+        // Visual-quality critic r1 (root cause of F3 / F4): ws-grade-render MEASURED a lesson cell overflowing its pad and a
+        // 41 x 44 px phone-card input, but no --skill gate failed on either (print-lint's L-OVERFLOW reads rectangles past the
+        // cell edge, never content run into the pad; no screen gate measured target size). --gate makes those measurements a
+        // verdict: every overflow on the lane skills' lesson, test and independent pages at S, M and L, and every card-390 /
+        // card-820 target under 44 px (RUBRIC H6). The renders land in the log dir for the critic too.
+        add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
+            ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));
@@ -707,6 +730,10 @@ function buildPlan(ctx) {
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
         // ---- lane S1 (2026-10-24): dealer uniformity, and the lesson-data / option-help / wrong-answer-fit node rules
         add(gate('dealer-uniform', 'ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)', scope, 'node', 'ws-dealer-uniform', ['--skill', keys.join(',')], { parse: PARSE.dealerUniform, keys }));
+        // ---- the visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md §4.2): the visual CHOICE rules VQ-REP,
+        // VQ-ONEANSWER, VQ-LIVE, VQ-TITLE, VQ-NOLEGACY (node, seeded); pins in tests/fixtures/precritic/vq-baseline.json
+        // (shrink-only). A pinned finding is PASS (baseline); any other finding, or a skill missing from the output, is FAIL.
+        add(gate('visual-quality', 'ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell)', scope, 'node', 'ws-visual-quality', ['--skill', keys.join(',')], { parse: PARSE.visualQuality, keys, expect: { mention: keys } }));
         const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
         add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
         // W0-B2 (lane S1): the spec card that covers these skills is signed, its rulings / notOffered / decisions are as
@@ -786,6 +813,13 @@ function buildPlan(ctx) {
                 add(g);
             }
         }
+        // lessons 6-7 merge (2026-10-31, GATE-MISSED): a detailed lesson's Practice link lost a skill's second use and its
+        // options, and only ws-teacher-wrm (detailed-lesson cards: link decodes to skills.used, use by use) saw it. The
+        // lesson role runs it too (every detailed lesson card), unless --teacher adds it already.
+        if (ctx.role === 'lesson' && !ctx.teacher) add(gate('teacher-wrm', 'ws-teacher-wrm (detailed-lesson cards: Practice link keeps every skill use and its options)', 'White Rose, every lesson + every detailed lesson', 'browser', 'ws-teacher-wrm', []));
+        // lessons-sharelink (2026-10-31): the link kept every use, but the PUPIL side keyed the queue and option store by
+        // skill, so a repeated skill played only its first use's options. ws-lesson-link-uses opens each such link as a pupil.
+        if (ctx.role === 'lesson' && !ctx.teacher) add(gate('lesson-link-uses', 'ws-lesson-link-uses (a pupil plays every use of a detailed lesson link, each with its own options)', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
     }
     if (ctx.teacher) {
         for (const n of ['shell', 'library', 'preview', 'quiz']) add(gate(`teacher-${n}`, `ws-teacher-${n}`, 'teacher site', 'browser', `ws-teacher-${n}`, []));
@@ -793,10 +827,13 @@ function buildPlan(ctx) {
         if (ctx.grade) w.push('--grade', ctx.grade);
         if (ctx.lesson) w.push('--lesson', ctx.lesson);
         add(gate('teacher-wrm', `ws-teacher-wrm${w.length ? ' ' + w.join(' ') : ''}`, ctx.grade || ctx.lesson ? `White Rose ${[ctx.grade && `grade ${ctx.grade}`, ctx.lesson && `lesson ${ctx.lesson}`].filter(Boolean).join(', ')}` : 'White Rose, every lesson', 'browser', 'ws-teacher-wrm', w, { needFlags: [ctx.grade && 'grade', ctx.lesson && 'lesson'].filter(Boolean) }));
+        add(gate('lesson-link-uses', 'ws-lesson-link-uses', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
         add(gate('teacher-flows', 'ws-teacher-flows', 'teacher flows (§2.9)', 'browser', 'ws-teacher-flows', []));
         // (§1.7 stop of M2, dialog half: the Print sheet's plan === the built pages, titles, per-skill counts, summary line)
         add(gate('teacher-plan-match', 'ws-teacher-plan-match', 'Print sheet plan = what prints (In sections, Mixed up, big cells)', 'browser', 'ws-teacher-plan-match', []));
         add(gate('teacher-tokens', 'ws-teacher-tokens', 'teacher tokens (§2.8)', 'node', 'ws-teacher-tokens', []));
+        // pdf-preview lane 2026-10-31: the full print preview's pages === Chrome's PDF pages, and its timing
+        add(gate('pdf-preview', 'ws-pdf-preview', 'full print preview (parity + timing)', 'browser', 'ws-pdf-preview', []));
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
     }
     return rows;

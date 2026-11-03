@@ -60,6 +60,24 @@ export function wordWorkSteps(q) {
             step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`),
         ];
     }
+    // the sentence form (stories within 20): PART-WHOLE, never key words (PEDAGOGY P-21, P-WP-10; critic r1 F6) - read,
+    // find the parts and the whole on the bar (the structure decision: "I know both parts. I add." / "I know the whole
+    // and one part. I subtract."), write the number sentence, solve. Four steps: each is one panel of the lesson's chart
+    // and one frame of the scripted model, and each frame writes what its step says.
+    if (p.layout === 'sentence' && p.steps.length === 1) {
+        const st = p.steps[0];
+        const add = st.op === '+';
+        const whole = add ? st.ans : st.top, pa = add ? st.top : st.bottom, pb = add ? st.bottom : st.ans;
+        const unit = Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit;
+        return [
+            step(`The numbers are ${fmt(st.top)} and ${fmt(st.bottom)}.`),
+            add
+                ? step(`I know both parts: ${fmt(pa)} and ${fmt(pb)}. I add.`, [{ slot: 'bar-a', value: String(pa) }, { slot: 'bar-b', value: String(pb) }])
+                : step(`I know the whole, ${fmt(whole)}, and one part, ${fmt(pa)}. I subtract.`, [{ slot: 'bar-w', value: String(whole) }, { slot: 'bar-a', value: String(pa) }]),
+            step(`Write ${fmt(st.top)} ${GLYPH[st.op]} ${fmt(st.bottom)} in the boxes.`, [{ slot: 'fr0-a', value: String(st.top) }, { slot: 'op0', value: GLYPH[st.op] }, { slot: 'fr0-b', value: String(st.bottom) }]),
+            step(`${workLine(st).replace(/\.$/, '')}. The answer is ${fmt(p.ans)}${unit ? ` ${unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }, { slot: add ? 'bar-w' : 'bar-b', value: String(p.ans) }]),
+        ];
+    }
     const cues = cuesOf(p);
     const out = [step('Read the story two times.')];
     if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
@@ -131,20 +149,25 @@ export function wordWorkWrongs(q) {
 }
 export const barAnswerText = (q) => { const p = payloadOf(q); const st = p && p.steps[0]; return st ? `top ${fmt(st.ans)} · below ${fmt(st.a)} and ${fmt(st.b)}` : ''; };
 
-/** The provider members for one word-problem skill. */
-export function wordWorkProvider(iCan, extra = {}) {
+/** The provider members for one word-problem skill (`sentence`: the stories within 20, drawn as a number sentence). */
+export function wordWorkProvider(iCan, extra = {}, { sentence = false } = {}) {
     return Object.assign({
         strings: strings({
             iCan,
-            instructionKey: 'story-work',
-            steps: [
+            instructionKey: sentence ? 'story-sentence' : 'story-work',
+            steps: sentence ? [
+                'Read the story two times.',
+                'Find the parts and the whole.',
+                'Write the number sentence.',
+                'Solve. Say the answer and its label.',
+            ] : [
                 'Read the story two times.',
                 'Circle the sign that fits the story.',
                 'Write the numbers in the boxes. Solve.',
                 'Write the answer and its label word.',
             ],
             say: 'The answer is __ __.',
-            sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), p.unit] : null; },
+            sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit] : null; },
         }),
         misconceptions: ['wrong-operation'],
         workedSteps: wordWorkSteps,

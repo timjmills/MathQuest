@@ -932,7 +932,10 @@ export function plan(input = {}) {
         // takes level 3 on every try (the same grid, black; its hint is the partial trace).
         // A bracket keeps its quotient boxes on every Guided try (VA-61: the digit grid belongs to
         // Model and Guided; at level 1 the division template writes on the open vinculum).
-        const level = stage === 'model' || it.template === 'stack' ? 3 : stage === 'partial' || it.template === 'division' ? 2 : 1;
+        // A story in the sentence layout keeps its part-whole bar on every guided try (level 2; WDS 18.1, critic r1 F13 -
+        // the bar is the teaching pages' drawing, faded on the practice pages), so every row holds what it was sized for.
+        const sentence = it.template === 'word-work' && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.layout === 'sentence';
+        const level = stage === 'model' || it.template === 'stack' ? 3 : stage === 'partial' || it.template === 'division' || sentence ? 2 : 1;
         // Round-3 re-grade: the Model tab overprinted the first line of a story, a sentence or a
         // tile row. Every model cell but a column stack (whose grid already starts below the tab)
         // steps its content down clear of the tab.
