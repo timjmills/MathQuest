@@ -140,7 +140,7 @@ const isDivisionFact = (s) => s.categoryId === 'division';
 function baseReq(o) {
     return {
         size: o.size, look: 'auto', paper: o.paper || 'A4', seed: o.seed >>> 0,
-        header: { name: true, date: true, score: false, title: o.title || true },
+        header: Object.assign({ name: true, date: true, score: false, title: o.title || true }, o.footer ? { footerLeft: o.footer } : {}),
         key: o.key ? { on: true, placement: 'end', style: 'copy' } : { on: false },
     };
 }
@@ -193,7 +193,14 @@ async function buildSections(list, counts, o) {
  * Build the whole print for the chosen settings. Returns
  *   { pupilHtml, keyHtml, doc, pages, keyPages, total, counts, arrangement, cols, rows, perPage, notes, firstHtml }
  */
+/** The teacher footer in words (lead, 2026-11-03: never the raw ids "add_facts, sub_facts +4"): the skills' names. */
+export function footerOf(list) {
+    const names = [...new Set(list.map((s) => s.label || labelOf(s)))];
+    return names.length > 3 ? `${names.slice(0, 3).join(', ')} and ${names.length - 3} more` : names.join(', ');
+}
+
 export async function buildSimple(list, o) {
+    if (!o.footer) o = Object.assign({}, o, { footer: footerOf(list) });
     const amounts = list.map((s) => parseAmount(s.amt));
     const arrangement = arrangementOf(list, o);
     const notes = [];
