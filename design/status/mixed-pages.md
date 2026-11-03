@@ -1,10 +1,10 @@
 Lane: mixed-pages
 Title: Truly mixed practice pages (M1–M5)
-Session: session_013pHDnLJxJB8jZan3tZDfNS (M2)
+Session: session_013pHDnLJxJB8jZan3tZDfNS (M2); r4: session_013pHDnNtsn5c7Ap1EHFz9gU
 Branch: claude/sweet-newton-c8wrv1-mixed-m2
 Owner of files (M2): sheet/roles/mixed-practice.js, sheet/mixed-pack.js (new), sheet/interleave.js, sheet/layout.js, sheet/paginate.js; the dialog: teacher-sheet.js, teacher-plan.js, teacher-tray.js, teacher-print.js
-State: STOPPED with a hand-over (2026-10-31) — budget cap reached before a passing round; critic r3 FAIL (print), dialog check r3 FAIL; the r3 dialog defects fixed after it (73d2eb2), the print defects open
-Updated: 2026-10-31
+State: STOPPED with a hand-over (2026-11-03, r4) - budget cap; owner's set fixed by sight, gates RED, no critic round run (clean-before-critic)
+Updated: 2026-11-03
 Builder profile: mq-opus-medium
 Critic rounds: M1 r1–r6 (PASS); M2 print r1, r2, r3 FAIL; M2 dialog check r1 (7/7/7/8), r2 (7/8/6/8), r3 (8/7/6/9) FAIL
 
@@ -176,3 +176,34 @@ its remainder is the ONE unruled trailing area at the row's right end); **partia
 page draws the same work rows as on its single-skill page). Also: the Independent h teacher note still says
 "Dense: 4 x 4" while the sheet prints 5 across.
 Next lane: build those three checks red, then a fresh Opus-medium builder, then critic + dialog check.
+
+## r4 (2026-11-03) - the owner's 6-skill mix; hand-over
+Owner (2026-11-03): mixed practice of skills with different box sizes printed 3 problems a page (add/sub facts 20,
+mult/div facts 12, missing +/-, missing x/÷; 41 = 14 pages). He chose "Only the full mix": interleave one by one AND
+fill the paper. That 3-a-page came from the dialog's 8-a-page chunking on main; on this branch the same set printed
+S 20 / M 26 / L 21 a page in centred shelves narrower than the frame (before: `mixed-m2/r4/before-owner-*.png`).
+- Checks (lane lead, built red first, commit f8dbac5 / 8ca4109): mixed-m3 gains frame (every cell edge ink, no loose
+  rule), shelfw (every grid the frame's width), fill (>= 70 % of the frame; >= In sections' per-page count less a row),
+  partials (2-digit x work rows = its own page), columns (req.columns / sections[i].columns), sml (S > M > L) and set
+  `o` (owner's set S/M/L, fill page, Columns 4 at M, 6 at S via sections[i].columns). All hard FAILs; verified to PASS
+  on single-skill Independent pages. Fail fixtures: tests/fixtures/precritic/mixed-m4/{owner-S,b-S}.fail.html.
+  mixed-m2's Sections H13 WARN is now a FAIL. Tool: tests/scripts/ws-mixed-render.cjs (PNG per page, pupil + key).
+- Engine (fresh Opus-medium builder, 5dfc7d2): the shelf packer is replaced for Mixed up: one full-width grid a page,
+  ONE count across per print (req.columns, else sections' columns, else Auto: S 6 / M 5 / L 4 for the owner's set;
+  `fits.across`), rows of C in print order, two-row boxes for tall items, row rule alignment pass. Owner's set:
+  S 30 + 11, M 25 + 16, L 20 / 12 / 9; every box closed, rows full width, key answers right (`mixed-m2/r4/owner-*`).
+  One-section Independent / more-practice / lesson pages byte-identical (5 samples).
+- RED (why no critic): mixed-m3 full 9 of 69 scenarios (owner Columns 4 at M fill 20 < 23 - a fill / width / digits
+  conflict that needs a ruling; owner L page 2 holds 12 < 14 - page rebalance; g Sections frame 6 - the measure reads only
+  the first band as the frame, check bug to fix); mixed-m2 --quick 60 (REGRESSION from a151260's 0: 70 %-fill on b / c fill
+  pages - counts chosen on probe items, dealt items differ; 4 Sections frac-model; c 5:14 I Can M page 5 lacks a skill);
+  ws-teacher-plan-match 1 (add_facts + word problems 20 on 5 pages); precritic --role mixed-practice --strict FAIL.
+- Open, not started: backtest entries for frame / shelfw / fill (pass fixtures); `fits.sections[i].clamped`; layout.js
+  Columns-10 clamp collapse on Independent (add_facts S -> 6 a page, from the simple-print lane); Independent per-cell
+  outlines, parts splitting across pages, row stretch (simple-print checker r1 (1)-(3)); missing_add_sub /
+  missing_mult_div wrap ([box] on one line, "- 10 = 3" on the next) at 5-6 across.
+- Out of this lane (lead): missing_add_sub / missing_mult_div are LEGACY drawings (small text, "Answer: N" key line) -
+  a skill lane should move them to the kit equation cell; footer prints raw skill ids; "Look at thesign." instruction;
+  div_facts fact-rows paired row rules.
+- Next: fresh Opus-medium fixer on 5dfc7d2 to clear mixed-m2's regression and the m3 reds (lane lead rules first on
+  Columns-4-M fill vs width), then the print critic on owner's set + b, c, d at S/M/L with keys. Expect ~$30 + ~$15.
