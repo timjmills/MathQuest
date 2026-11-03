@@ -207,3 +207,25 @@ Open (needs a ruling; no check edited):
    options: the remainder's two rows count as one for the run rule, or a kind's tail pair may stand together.
 2. mixed-m2 c 5:14 ican M 4 / 9 / 4 / 2 (word problems 2 across, one fact row of 5): page 1 (I Can header) holds 2 word
    rows, the fact row only fits beside them on page 2 - untouched. Sections frac-model H13 (4, pre-existing) untouched.
+
+## r6c fixer (Opus medium, 2026-11-03) - mixed-m3 and mixed-m2 --quick green; A listed
+Engine (`roles/mixed-practice.js`):
+- A, the rebalanced last rows (4 + 1 -> 3 + 2) of one kind that end the print stand in ONE left grid of one width (the
+  widest row's, >= 52 % of the frame): each row shares that width (`shareRow`), so both rows end on the same rule and every
+  box is closed (no empty ruled area). Rows of different kinds that end short keep their own grids.
+- A, pages (`rowsLay`): where a page still holds under half the fullest after the greedy cut and the existing evening, the
+  rows are cut into the same number of pages so the least page holds the most (each page fits, every page but the last
+  fills within its rows' H13 ceilings, the print's short rows on the last page); when the rows' order allows no balanced
+  cut, ONE whole row moves past other kinds' rows to the place with the least run excess. c 5:14 I Can M: 4 / 9 / 4 / 2 ->
+  4 / 4 / 4 / 7 (the fact row moves to the last page beside the last word problems - the only balanced cut, since a page
+  holds 2 word rows and a page of 1 word row + facts fills under 85 % unless it is the last; the note says up to 12 word
+  problems come in a row).
+- Sections (`plan`): a skill whose drawings differ in height (fraction models 44 / 29 mm) is dealt tallest first, only when
+  a shelf of the dealt order holds drawings under 0.72 of each other and the sort makes fewer such shelves; and a shelf's
+  growth stops where its least drawing would fill under 70 % of its box (spare left as the page's trailing area).
+- `MIX_LAYOUTS = ['rows', 'grid', 'even']` (print-sheet.js).
+Owner's 41 under A: S 36 / 5 (fact 7, large 4), M 28 / 13 (fact 5, large 4), L 20 / 21 (4, 4).
+Gates: mixed-m3 full OK (78 scenarios, 96 pages, 0 failures); mixed-m2 --quick OK (55 pages, 22 scenarios, 0 failures);
+ws-teacher-plan-match, ws-teacher-arrangement, ws-boot-smoke, ws-code-snapshot (731 codes), mixed-page --seeds 2,
+ws-simple-print, ws-columns-one OK; one-section md5 identical (5 samples); ws-stamp-assets stamped.
+Renders: design/status/mixed-m2/r6c/ (owner 41, layout rows, S / M / L, pupil + key).

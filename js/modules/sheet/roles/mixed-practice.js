@@ -1903,6 +1903,85 @@ function rowsLay(S, pools, counts, seed, { exact = false, stretchLast = false } 
             if (ok) { pages.length = 0; pages.push(...out); }
         }
     }
+    // (r6c, mixed-m2 'not rebalanced': a page still under half the fullest - e.g. the I Can page 1 holds two large rows
+    // and the fact row fits only beside two on page 2 - the rows are cut into the same number of pages so the least page
+    // holds the most: every page fits, every page but the last fills within its rows' H13 ceilings, the print's short
+    // rows all on the last page)
+    // (when the rows' order allows no such cut, one whole row is moved to another place before the short tail - the
+    // move that keeps the kinds' runs shortest)
+    if (pages.length > 1) {
+        const ns1 = pages.map((p) => nOf(p.rows));
+        if (Math.min(...ns1) * 2 < Math.max(...ns1)) {
+            const P = pages.length;
+            const nR = rows.length;
+            let t0 = nR;
+            while (t0 > 0 && rows[t0 - 1].short) t0--;
+            const cutOf = (seq) => {
+                let best = null;
+                let steps = 0;
+                const cuts = [];
+                const walk = (from, pi) => {
+                    if (++steps > 50000) return;
+                    if (pi === P - 1) {
+                        const rs = seq.slice(from);
+                        if (!rs.length || from > t0 || heightOf(rs) > budgetOf(pi) + 1e-6) return;
+                        if (rs.length === 1 && rows[rs[0]].short) return;
+                        const parts = cuts.concat([rs]);
+                        const ns = parts.map(nOf);
+                        const lo = Math.min(...ns); const hi = Math.max(...ns);
+                        if (!best || lo > best.lo || (lo === best.lo && hi < best.hi)) best = { lo, hi, parts: parts.map((x) => x.slice()) };
+                        return;
+                    }
+                    const rs = [];
+                    for (let i = from; i < nR - (P - 1 - pi); i++) {
+                        rs.push(seq[i]);
+                        if (heightOf(rs) > budgetOf(pi) + 1e-6) break;
+                        if (growTo(rs) < budgetOf(pi) - BLANK_OK) continue;
+                        cuts.push(rs.slice()); walk(i + 1, pi + 1); cuts.pop();
+                    }
+                };
+                walk(0, 0);
+                return best && best.lo * 2 >= best.hi && best.lo > Math.min(...ns1) ? best : null;
+            };
+            // (the run excess of an order: each kind's longest run over its forced minimum)
+            const tot = {}; for (const r of rows) tot[r.kind] = (tot[r.kind] || 0) + 1;
+            const excessOf = (seq) => {
+                let ex = 0;
+                for (let i = 0; i < seq.length;) {
+                    let j = i; while (j + 1 < seq.length && rows[seq[j + 1]].kind === rows[seq[i]].kind) j++;
+                    const k = rows[seq[i]].kind;
+                    ex += Math.max(0, j - i + 1 - Math.max(1, Math.ceil(tot[k] / (nR - tot[k] + 1))));
+                    i = j + 1;
+                }
+                return ex;
+            };
+            const seq0 = rows.map((_, i) => i);
+            let pick = cutOf(seq0) ? { seq: seq0, cut: cutOf(seq0) } : null;
+            if (!pick) {
+                let bestEx = Infinity;
+                for (let from = 0; from < t0; from++) for (let to = 0; to < t0; to++) {
+                    if (to === from) continue;
+                    const seq = seq0.slice(); const [m] = seq.splice(from, 1); seq.splice(to, 0, m);
+                    // (rows of one kind keep their order: only a move past other kinds' rows)
+                    const lo = Math.min(from, to); const hi = Math.max(from, to);
+                    if (seq0.slice(lo, hi + 1).some((ri) => ri !== m && rows[ri].kind === rows[m].kind)) continue;
+                    const ex = excessOf(seq);
+                    if (ex >= bestEx) continue;
+                    const cut = cutOf(seq);
+                    if (cut) { pick = { seq, cut }; bestEx = ex; }
+                }
+            }
+            if (pick) {
+                const { seq, cut } = pick;
+                const where = new Map(seq.map((ri, i) => [ri, i]));
+                const rows0 = rows.slice(); const H0 = H.slice();
+                seq.forEach((ri, i) => { rows[i] = rows0[ri]; H[i] = H0[ri]; });
+                order.splice(0, order.length, ...rows.map((r) => r.kind));
+                pages.length = 0;
+                pages.push(...cut.parts.map((rs) => ({ rows: rs.map((ri) => where.get(ri)) })));
+            }
+        }
+    }
     // (owner 2026-11-03: the short rows that end the print all stand on the LAST page, and the last page is never one
     // short row alone - whole rows carried from the page before, as long as it is still filled within H13)
     if (pages.length > 1) {
@@ -2102,22 +2181,30 @@ function planRowsA(input, pools) {
             if (cur.length && cur.reduce((a, jj) => lcm2(a, L.rows[pg.rows[jj]].C), L.rows[ri].C) > U_MAX) { grids.push(cur); cur = []; }
             // (the print's last row, short: its own grid from the frame's left edge, closed on its right - r4)
             const final = tailShort(ri);
-            if (final && cur.length) { grids.push(cur); cur = []; }
+            // (r6c: a kind's rebalanced last rows - 4 + 1 -> 3 + 2, both short, both ending the print - stand in ONE left
+            // grid of one width, so its outer column lines line up and every box is closed)
+            const pairOf = (a, b2) => b2 !== undefined && tailShort(b2) && L.rows[b2].short && L.rows[a].short && L.rows[b2].kind === L.rows[a].kind;
+            const joins = cur.length && cur.every((jj) => tailShort(pg.rows[jj])) && pairOf(pg.rows[cur[cur.length - 1]], ri);
+            if (final && cur.length && !joins) { grids.push(cur); cur = []; }
             cur.push(j);
-            if (L.rows[ri].short || j === pg.rows.length - 1) { grids.push(cur); cur = []; }
+            const next = pg.rows[j + 1];
+            if ((L.rows[ri].short && !(final && pairOf(ri, next))) || j === pg.rows.length - 1) { grids.push(cur); cur = []; }
         });
         for (const gj of grids) {
-            const finalShort = gj.length === 1 && tailShort(pg.rows[gj[0]]);
+            const finalShort = gj.every((j) => tailShort(pg.rows[j]));
             // (one lattice for the grid's rows: the counts across' common multiple, as fine as a unit wider than the
             // grid's rule allows - <= U_MAX units)
             const l0 = gj.reduce((a, j) => lcm2(a, L.rows[pg.rows[j]].C), 1);
             const U = l0 * Math.max(1, Math.floor(U_MAX / l0));
             const items = [];
             let trail = null;
+            // (a short row of half its count across or more stands clear of half the frame - its gaps taken back)
+            const aOf = (r) => (r.short ? Math.max(Math.round((U * r.cells.length) / r.C), 2 * r.cells.length >= r.C ? Math.ceil(U * 0.52) : 0) : U);
+            // (r6c: the rows of one left grid share its width - the widest row's)
+            const Ajoint = finalShort && gj.length > 1 ? Math.max(...gj.map((j) => aOf(L.rows[pg.rows[j]]))) : 0;
             gj.forEach((j, rj) => {
                 const r = L.rows[pg.rows[j]];
-                // (a short row of half its count across or more stands clear of half the frame - its gaps taken back)
-                const A0 = r.short ? Math.max(Math.round((U * r.cells.length) / r.C), 2 * r.cells.length >= r.C ? Math.ceil(U * 0.52) : 0) : U;
+                const A0 = Ajoint || aOf(r);
                 const us = shareRow(r.cells.map((e) => e.d), A0, U, ctx.look);
                 let u0 = 0;
                 let prev = null;
@@ -2148,7 +2235,7 @@ function planRowsA(input, pools) {
             });
             const H = gj.map((j) => pg.H[j]);
             let cols = U;
-            if (finalShort) { cols = items.reduce((a, it) => a + it.place.span, 0); trail = null; }
+            if (finalShort) { cols = Ajoint || items.reduce((a, it) => a + it.place.span, 0); trail = null; }
             const part = gridPart(items, { cols, rows: gj.length, labels, start });
             part.height = `${Math.round((H.reduce((a, h) => a + h, 0) + (H.length - 1) * gap + 2 * GRID_EDGE_MM) * 100) / 100}mm`;
             part.rowsTpl = H.map((h) => `${Math.round(h * 100) / 100}fr`).join(' ');
@@ -2544,7 +2631,20 @@ export function plan(input = {}) {
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
     for (const id of p.ids) {
         const sh = p.shelf[id];
-        const its = pools[id].slice(0, sh.n * sh.per);
+        let its = pools[id].slice(0, sh.n * sh.per);
+        // (r6c, mixed-m2 H13 on Sections pages: a shelf of a skill whose drawings differ in height - a fraction model of
+        // 44 mm beside one of 29 mm - left the short one filling 60 % of its box; where a shelf of the dealt order holds
+        // drawings under 0.7 of each other, the skill's problems are dealt tallest first so each shelf holds like
+        // heights - only then, so a skill of one height keeps its order)
+        if (!sh.pairs && sh.k > 1 && its.length > sh.k && !its.some((it) => it.anchor || it.twin)) {
+            const hOf = its.map((it) => hAtK([it], sh.k, ctx));
+            const badOf = (ix) => { let bad = 0; for (let s = 0; s < ix.length; s += sh.per) { const hs = ix.slice(s, s + sh.per).map((j) => hOf[j]); if (Math.min(...hs) < 0.72 * Math.max(...hs)) bad++; } return bad; };
+            const ix0 = its.map((_, j) => j);
+            if (hOf.every((v) => Number.isFinite(v) && v > 0) && badOf(ix0)) {
+                const ix1 = ix0.slice().sort((a, c2) => (hOf[c2] - hOf[a]) || a - c2);
+                if (badOf(ix1) < badOf(ix0)) its = ix1.map((j) => its[j]);
+            }
+        }
         for (let s = 0; s < sh.n; s++) {
             let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
             // SIDE: [twin | problem] pairs, the twin first (example, then problem).
@@ -2554,7 +2654,10 @@ export function plan(input = {}) {
             // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
             const own = chunk.length ? hAtK(chunk.filter((it) => !it.anchor), sh.k, ctx) : sh.h;
             const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
-            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band });
+            // (the least drawing of the shelf: its growth stops where that drawing would fill under 70 % of its box)
+            const lows = chunk.filter((it) => !it.anchor && !kitWork(it)).map((it) => hAtK([it], sh.k, ctx)).filter((v) => Number.isFinite(v) && v > 0);
+            const growCap = lows.length ? Math.max(0, Math.min(...lows) / 0.7 - h) : Infinity;
+            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band, growCap });
         }
     }
     const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
@@ -2567,7 +2670,7 @@ export function plan(input = {}) {
     const spare = p.pages > 1 ? 0 : Math.max(0, m.budget - used - (input.fill ? 1 : 0));
     // The spare height is shared into the shelves only as far as a cell keeps its drawing filling
     // it (H13: never an empty band of 30% of a cell): a tenth of a shelf's own height at most.
-    const growOf = (sh) => (shelves.length ? ((input.fill || input.growLast) ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
+    const growOf = (sh) => (shelves.length ? Math.min(sh.growCap, (input.fill || input.growLast) ? Math.min(sh.h * 0.35, spare / shelves.length) : Math.min(12, sh.h * 0.1, spare / shelves.length)) : 0);
     // `growLast` (the detailed lesson maker): the spare is water-filled - a shelf that reaches its
     // 35 % cap passes the rest to the others - so no bordered empty strip is left under the
     // last row (critic r3 nit, P4m-1). Absent on every other Mixed page (equal shares, as before).
