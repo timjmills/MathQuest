@@ -133,6 +133,23 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
         const said = /= (\d+) a page|(\d+) on page 1/.exec(st.built.line || '');
         const n = said ? Number(said[1] || said[2]) : NaN;
         if (!(n === st.built.perPage)) fails.push(`summary: SUMMARY "${st.built.line}" vs ${st.built.perPage} built on page 1`);
+        // SUMMARY on Mixed up (it falls back for the six set) and a one-skill fact card (critic r2 D1, D2):
+        // a "c columns x r rows = n a page" line must multiply out, and n must be page 1's problems
+        const sums = await page.evaluate(async (six) => {
+            const m = await import('/js/modules/simple-print.js');
+            const out = [];
+            for (const [list, arrange] of [[six, 'mixed'], [[{ categoryId: 'multiplication', skillId: 'mult_facts' }], 'sections']]) {
+                const b = await m.buildSimple(list.map((s) => Object.assign({ amt: '' }, s)), { how: 'pages', n: 1, size: 'M', cols: 'auto', key: true, arrange, seed: 4242, title: true });
+                out.push({ arrange, line: m.summaryLine(b, { key: true }), perPage: b.perPage });
+            }
+            return out;
+        }, SETS.six);
+        for (const x of sums) {
+            const g = /(\d+) columns × (\d+) rows = (\d+) a page/.exec(x.line);
+            const on = /(\d+) on page 1/.exec(x.line);
+            if (g && (Number(g[1]) * Number(g[2]) !== Number(g[3]) || Number(g[3]) !== x.perPage)) fails.push(`summary ${x.arrange}: SUMMARY "${x.line}" does not multiply out to page 1's ${x.perPage}`);
+            if (!g && !(on && Number(on[1]) === x.perPage)) fails.push(`summary ${x.arrange}: SUMMARY "${x.line}" does not say page 1's ${x.perPage}`);
+        }
         const qs = await page.evaluate(() => [...document.querySelectorAll('#quickSkillsGrid .qs-print-btn')].map((el) => el.getBoundingClientRect()).filter((r) => r.width < 44 || r.height < 44).length);
         if (qs) fails.push(`quick cards: TARGETS ${qs} Print buttons under 44 x 44`);
     }

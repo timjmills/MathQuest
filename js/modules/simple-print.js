@@ -308,7 +308,9 @@ async function buildFacts(list, amounts, o) {
     return {
         pupilHtml: out.pupil.join('\n'), keyHtml, doc: out.pupil.join('\n') + (keyHtml ? '\n' + keyHtml : ''),
         pages: out.pages, keyPages: o.key ? out.keyPages : 0, total: out.items, counts: out.counts, arrangement: 'facts',
-        cols: f.cols || 0, rows: f.rows || 0, perPage: f.perPage || 0, colsList: [f.cols || 0], notes: out.notes, firstHtml: out.first,
+        // what page 1 really holds (critic r2: a 6 x 6 grid that printed 30 said "36 a page")
+        ...(() => { const p1 = (out.first.split('class="ws-cell ').length - 1) || f.perPage || 0; return { cols: f.cols || 0, rows: f.cols ? Math.ceil(p1 / f.cols) : f.rows || 0, perPage: p1 }; })(),
+        colsList: [f.cols || 0], notes: out.notes, firstHtml: out.first,
     };
 }
 
@@ -353,6 +355,7 @@ function finish(res, { counts, arrangement, notes, list }) {
         pupilHtml: res.pupilHtml || '', keyHtml: res.keyHtml || '', doc: (res.pupilHtml || '') + (res.keyHtml ? '\n' + res.keyHtml : ''),
         pages: res.pageCount || 1, keyPages: res.keyPageCount || 0, total: (res.items || []).filter(Boolean).length, counts: got.some(Boolean) ? got : counts,
         arrangement: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t))) ? 'sections' : arrangement,
+        fellBack: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t))),
         cols: first.cols || 0, rows: fs.length === 1 && first.cols ? Math.ceil(page1Cells(res) / first.cols) : first.rows || 0, perPage: page1Cells(res), colsList,
         notes: [...notes, ...engineNotes], firstHtml: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml || '',
     };
@@ -394,7 +397,7 @@ export function summaryLine(b, o) {
     const sets = Math.max(1, Number(b.sets) || 1);
     const key = o.key ? (sets > 1 ? 'each set with its answer key' : 'answer key at the end') : 'no answer key';
     let grid;
-    if (b.arrangement === 'facts' || (cl.length === 1 && b.rows && b.perPage && (b.colsList || []).length <= 1)) grid = `${b.cols} columns × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
+    if (b.rows && b.cols && b.cols * b.rows === b.perPage && (b.arrangement === 'facts' || (cl.length === 1 && (b.colsList || []).length <= 1 && !b.fellBack))) grid = `${b.cols} columns × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
     else if (cl.length === 1) grid = `${cl[0]} columns · ${b.perPage} on page 1`;
     else grid = `Each skill its own grid, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     return [grid, pages, probs, ...(sets > 1 ? [`${sets} sets, each with different problems`] : []), key].join(' · ');

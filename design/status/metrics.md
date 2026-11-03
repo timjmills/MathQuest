@@ -475,3 +475,11 @@ against this row.
 | ~150-skill stress: max question / longest task | 1.85 s / 5.6 s | 0.81 s / 0.49 s |
 | Teacher, 100 skills, CPU 4x: view / tray / print preview / quiz sheet | 7.6 / 2.1 / 74-88 / 25 s | 7.7 / 2.4 / 74-83 / 26 s |
 
+
+### simple-print (2026-11-03)
+| Metric | Old dialog | Simple print |
+|---|--:|--:|
+| Owner's 6-skill set, default, problems a page (M) | 3 (41 problems on 14 pages) | 20.5 (41 on 2 pages) |
+| Default page fill, all sets, S/M/L (min) | 22 % | 63 % |
+| Fast facts at S, columns | — | 10 (8 when answers > 99) |
+| Critic rounds | — | 2 (r2 min 6, engine-held) |
