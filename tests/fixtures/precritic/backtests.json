@@ -1310,6 +1310,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "simple-print-exact-missing-add-sub",
+   "check": "25 missing_add_sub at M, 6 asked: Aim and Exactly plan different pages, and Auto lays 3 columns (Lane D R4d: after the port 25f32bea the boxed missing-number sentence on 1 em operator tracks overran a third of the page by 0.5 mm, so every request fell to 2 columns)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print EXACT",
+   "browser": true,
+   "fail": {
+    "commit": "33bf69bf",
+    "state": "hand-over 8: missing_add_sub M max 2 columns, Aim 6 and Exactly 6 both plan 2 x 8"
+   },
+   "pass": {
+    "commit": "bcc3ab2d",
+    "state": "R4d: missing-number sentences on the kit's tight across tracks (ACROSS_OP_EM / ACROSS_GAP_EM): Auto 3 x 8, Exactly 6 -> 3 (max), Aim -> 2"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

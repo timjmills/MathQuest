@@ -610,3 +610,15 @@ Cost this session ≈ $60 (≈ 2.1 % of the week) of the $85 cap. Stopped per th
   Log: /tmp/mq-precritic/20261103-130155-4948 (43 PASS, 2 FAIL before the re-pin).
 - Next: one builder on (1) and (2), re-run precritic + ws-simple-print, then the narrow critic.
 - Cost this session ≈ $88 (≈ 3.1 % of the week) of the $95 cap.
+
+## R4d (2026-11-03, builder opus-medium: the two reds of hand-over 8)
+
+- (1) EXACT root cause: the port made missing_add_sub a kit `equation` cell (main: legacy text, which WRAPS the sentence at
+  5–6 columns). On the 1 em operator tracks + .28 em gaps "18 − 12 = [ ]" is 56.4 mm in a 55.5 mm third-page cell at M, so
+  every request fell to 2 columns. Fix (cells/equation.js render + footprint): a `resultBox` sentence takes the kit's tight
+  across tracks (ACROSS_OP_EM / ACROSS_GAP_EM, as a ÷ fact across). Now Auto 3 x 8 (= main), Columns 3 → 3, 4 / 6 → 3 (max).
+  6 across at M is NOT reachable without breaking the sentence (DN-22: horizontal equations clamp to 3 for 2-digit at M;
+  DN-13 clamps); main's 6 x 4 is the legacy wrap. ws-simple-print: OK (EXACT exact [[3],3,5,15,2] · aim [[2],2,8,16,2]).
+- (2) WRAP-OP root cause: perimeter_intro's side anchor step "Add: 4 + 4 + 3 = 11." (providers/figures.js) wrapped after "+"
+  at S; joined with no-break spaces (both "Add:" steps). Row sections/ex-each S: WRAP-OP 0 (GRID-EVEN 6 as before).
+- Backtest row `simple-print-exact-missing-add-sub` (commit-pair 33bf69bf FAIL → bcc3ab2d OK).
