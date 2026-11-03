@@ -211,8 +211,9 @@ function checkAcross(pages, ctx) {
 }
 
 /** 9 width: a cell no wider than its content / 0.45. */
-function checkWidth(pages) {
+function checkWidth(pages, ctx = {}) {
     const out = [];
+    if (ctx.columns) return out;   // (OWNER 2026-11-03: an explicit Columns count wins - white space in the box is allowed)
     pages.forEach((pg, i) => { for (const c of pg.wide || []) out.push(`width: page ${i + 1} cell ${c.label} (${c.tpl}) is ${c.cellMm.toFixed(0)} mm wide for ${c.inkMm.toFixed(0)} mm of problem (${Math.round((c.inkMm / c.cellMm) * 100)} %; >= 45 %)`); });
     return out;
 }
@@ -232,11 +233,13 @@ function checkFrame(pages) {
 
 /** 11 shelfw (2026-11-03): every problem grid spans the frame's inner width (within 2 mm each side); only the last grid of
  *  the last page may stop short, and only at its right end. */
-function checkShelfWidth(pages) {
+function checkShelfWidth(pages, ctx = {}) {
     const out = [];
     pages.forEach((pg, i) => {
         for (const s of pg.shelves || []) {
-            const endOk = s.rightMm <= 2 || (pg.last && s.last);
+            // (owner 2026-11-03, layout A: each kind's forced remainder is one short row at the end of the print, in its own
+            // left-aligned grid - allowed on the last page only, one per kind; rowfill still wants it >= half the frame)
+            const endOk = s.rightMm <= 2 || (pg.last && (s.last || (ctx.layout === 'rows' && (pg.shelves || []).slice(s.grid + 1).every((t) => t.rightMm > 2))));
             if (s.leftMm > 2 || !endOk) out.push(`shelfw: page ${i + 1} grid ${s.grid + 1}: ${s.leftMm.toFixed(0)} mm short at the left, ${s.rightMm.toFixed(0)} mm at the right of the frame (<= 2 mm)`);
         }
     });
@@ -291,7 +294,7 @@ function checkSml(perSize, id) {
 function checkColumns(pages, ctx) {
     const out = [];
     if (!ctx.columns) return out;
-    pages.forEach((pg, i) => { const bad = (pg.fullRows || []).filter((r) => r.n !== ctx.columns); if (bad.length || !(pg.fullRows || []).length) out.push(`columns: page ${i + 1}: full rows hold ${[...new Set((pg.fullRows || []).map((r) => r.n))].join('/') || 'none'} across, Columns asked ${ctx.columns}`); });
+    pages.forEach((pg, i) => { const bad = (pg.fullRows || []).filter((r) => r.n !== ctx.columns); if (bad.length || (!(pg.fullRows || []).length && !pg.last)) out.push(`columns: page ${i + 1}: full rows hold ${[...new Set((pg.fullRows || []).map((r) => r.n))].join('/') || 'none'} across, Columns asked ${ctx.columns}`); });
     return out;
 }
 
@@ -422,7 +425,7 @@ const MEASURE_FN = async ({ html, perPage }) => {
                 const mid = (y0 + y1) / 2;
                 const over = (c) => { const r = c.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid; };
                 const w = (xs) => xs.filter(over).reduce((a, c) => a + c.getBoundingClientRect().width, 0);
-                out.rows.push({ grid: gi, row: ti, usedFrac: Math.min(1, w(cells) / gr.width), trailFrac: w(trails) / gr.width, lastOnPage: gi === grids.length - 1 && ti === lastTrack });
+                out.rows.push({ grid: gi, row: ti, gridW: gr.width, usedFrac: Math.min(1, w(cells) / gr.width), trailFrac: w(trails) / gr.width, lastOnPage: gi === grids.length - 1 && ti === lastTrack });
             });
             // boxes: lattice points (3 mm) inside the grid covered by no problem cell (a blank run counts as empty)
             {
@@ -439,7 +442,7 @@ const MEASURE_FN = async ({ html, perPage }) => {
                 const mid = (y0 + y1) / 2;
                 const on = cells.filter((c) => { const r = c.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid && c.querySelector(':scope > .ws-tab, :scope > .ws-letter'); });
                 const w = on.reduce((a, c) => a + c.getBoundingClientRect().width, 0);
-                if (on.length && w >= gr.width * 0.98) out.fullRows.push({ n: on.length });
+                if (on.length && w >= gr.width * 0.98) out.fullRows.push({ n: on.length, grid: gi, wPx: w });
             });
             for (const c of cells) {
                 const r = c.getBoundingClientRect();
@@ -501,6 +504,11 @@ const MEASURE_FN = async ({ html, perPage }) => {
             const gFrames = grids.map(frameOf);
             const frames = gFrames.filter((f, i) => gFrames.findIndex((x) => x.el === f.el) === i);
             const { fr, fb, inner } = frames[0] || frameOf(null);
+            // (r6 check fix: a row is FULL against its frame's inner width, not its own grid's - a short last row laid in its
+            // own narrower grid is a short row; rowfill's use is measured against the frame the same way)
+            const frW = (gi) => { const I = gFrames[gi].inner; return I.right - I.left; };
+            out.fullRows = out.fullRows.filter((r) => r.wPx >= frW(r.grid) * 0.98);
+            for (const r of out.rows) r.usedFrac = Math.min(1, (r.usedFrac * r.gridW) / frW(r.grid));
             out.frame = { wMm: (inner.right - inner.left) / mm, hMm: (inner.bottom - inner.top) / mm, bordered: !!fr };
             // rule segments: every border side >= 0.5 px of the frame, the grids and every cell inside them (not inside a cell's drawing)
             const segs = [];   // {h: true|false, at, a, b, src}
