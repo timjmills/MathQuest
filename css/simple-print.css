@@ -161,3 +161,8 @@ body.sp-open { overflow: hidden; }
     .sp-root .sp-skill.has-band { grid-template-columns: minmax(0, 1fr) auto auto; }
     .sp-root .sp-skill.has-band .sp-band { grid-column: 1 / -1; grid-row: 2; }
 }
+
+/* owner 2026-11-03: each skill row's Options button (every option of the skill) and the summary of its choices */
+.sp-root .sp-optbtn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; min-width: 44px; padding: 6px 12px; border: 2px solid #D6D0C8; border-radius: 10px; background: #fff; color: #1A1614; font: inherit; font-weight: 800; cursor: pointer; }
+.sp-root .sp-optbtn:focus-visible { outline: 3px solid #1A1614; outline-offset: 2px; }
+.sp-root .sp-optsum { display: block; font-size: 0.82rem; font-weight: 600; color: #5A524C; margin-top: 2px; }

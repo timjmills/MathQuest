@@ -349,3 +349,15 @@ body.student-mode .start-game-container .btn-primary {
     }
 }
 /* ===== END GRADE-LEVEL BATCH ASSIGN CHIPS ===== */
+
+/* owner 2026-11-03: the pupil home's selected-skills bar (Play / Send / Print), sticky at the bottom of the page */
+.student-sel-bar { position: sticky; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: center; gap: 10px 16px; flex-wrap: wrap; margin: 24px 0 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--bg-card, #fff); border: 2px solid var(--mq-purple-l, #d9cffb); border-radius: 16px 16px 0 0; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); }
+.student-sel-count { font-weight: 900; color: var(--text-bright, #222); }
+.student-sel-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.student-sel-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; min-width: 88px; padding: 8px 18px; border-radius: 12px; border: 2px solid var(--mq-purple-d, #5b3fb8); background: var(--bg-card, #fff); color: var(--mq-purple-d, #5b3fb8); font: inherit; font-size: 1.05rem; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 0 var(--mq-purple-d, #5b3fb8); }
+.student-sel-btn.student-sel-play { background: var(--mq-purple, #7c5cff); color: #fff; }
+.student-sel-btn:disabled { background: var(--bg-card-light, #eee); border-color: var(--bg-card-light, #ccc); color: var(--text-dim, #666); box-shadow: none; cursor: not-allowed; }
+.student-sel-btn:focus-visible { outline: 3px solid var(--mq-orange, #ff9f1c); outline-offset: 2px; }
+.student-sel-send { display: flex; gap: 8px; width: 100%; max-width: 640px; }
+.student-sel-send[hidden] { display: none; }
+.student-sel-send input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 10px; border: 2px solid var(--bg-card-light, #ccc); border-radius: 10px; font: inherit; background: var(--bg-card, #fff); color: var(--text-bright, #222); }

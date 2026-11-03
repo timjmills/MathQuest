@@ -169,6 +169,7 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
     //   --backtest-options  the same COLS7 / WITHIN measures on the OLD behaviour (the asked 9 sent to every part as is; a
     //             generator that ignores Highest number, dealing at the skill's largest value): both must FAIL
     if (!has('backtest')) {
+        console.error('ws-simple-print: r2 …');
         const r2 = await page.evaluate(async ({ sets, bt }) => {
             const m = await import('/js/modules/simple-print.js');
             const out = { fails: [], info: [] };
@@ -336,6 +337,138 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
         }, { sets: SETS, bt: has('backtest-options') });
         rows.push(...r2.info);
         fails.push(...r2.fails);
+        page.on('dialog', (d) => { fails.push('a browser dialog opened: ' + d.message()); d.dismiss().catch(() => {}); });
+        console.error('ws-simple-print: MIXLAYOUT / COLS1 / SKOPTIONS …');
+        const r4 = await page.evaluate(async () => {
+            const FL = [], out = { info: [] }; const F = (t) => FL.push(t);
+            const m = await import('/js/modules/simple-print.js');
+            // MIXLAYOUT + COLS1 (owner 2026-11-03): the Mixed up layout choice shows only for Mixed up, each value
+            // reaches the request, survives save / share; Columns offers 1 and 1 reaches the request
+            {
+                const idle = async () => { for (let i = 0; i < 100; i++) { const st = m.simplePrintState(); if (st && st.built && !st.busy) return; await new Promise((r) => setTimeout(r, 150)); } };
+                const q = (sel) => document.querySelector(sel);
+                const click = async (sel) => { const el = q(sel); if (!el) return false; el.click(); await new Promise((r) => setTimeout(r, 20)); await idle(); return true; };
+                localStorage.removeItem('mq_simple_print');
+                m.openSimplePrint([{ categoryId: 'addition', skillId: 'add_facts' }, { categoryId: 'subtraction', skillId: 'missing_add_sub' }], {});
+                await idle();
+                await click('[data-sp="arrange"][data-v="sections"]');
+                if (q('[data-sp="mixlayout"]')) F('MIXLAYOUT the layout choice shows for In sections');
+                await click('[data-sp="arrange"][data-v="mixed"]');
+                const btns = [...document.querySelectorAll('[data-sp="mixlayout"]')].map((b) => b.dataset.v + ':' + b.getAttribute('aria-checked'));
+                if (JSON.stringify(btns) !== JSON.stringify(['rows:true', 'grid:false', 'even:false'])) F(`MIXLAYOUT Mixed up shows ${JSON.stringify(btns)}, not Rows by type (default) · One grid · Even grid`);
+                for (const v of ['grid', 'even', 'rows']) {
+                    if (!(await click(`[data-sp="mixlayout"][data-v="${v}"]`))) { F(`MIXLAYOUT no ${v} button`); continue; }
+                    const mixed = m.lastSimpleRequests().filter((r) => r.arrangement === 'mixed').slice(-1)[0];
+                    if (!mixed || mixed.mixLayout !== v) F(`MIXLAYOUT ${v} does not reach the request (${mixed && mixed.mixLayout})`);
+                    if (!q('.sp-mixl .sp-hint') || !q('.sp-mixl .sp-hint').textContent.trim()) F(`MIXLAYOUT ${v} has no hint`);
+                }
+                await click('[data-sp="mixlayout"][data-v="even"]');
+                const st3 = m.simplePrintState();
+                if (st3.prefs.mixLayout !== 'even') F('MIXLAYOUT not kept in the prefs');
+                const rec3 = m.saveQuickPrint('Mixed even', [{ categoryId: 'addition', skillId: 'add_facts' }, { categoryId: 'subtraction', skillId: 'missing_add_sub' }], Object.assign({}, st3.prefs, { n: 1 }));
+                const back3 = m.decodeQuickPrint(m.encodeQuickPrint(rec3));
+                if (!rec3 || rec3.print.mixLayout !== 'even' || !back3 || back3.print.mixLayout !== 'even') F(`MIXLAYOUT does not survive save / share: ${JSON.stringify(back3 && back3.print)}`);
+                const old = m.decodeQuickPrint(m.encodeQuickPrint({ name: 'old', skills: [{ categoryId: 'addition', skillId: 'add_facts' }], print: { arrange: 'mixed' } }));
+                if (!old || old.print.mixLayout !== undefined) F('MIXLAYOUT an old code without it does not decode unchanged');
+                // Columns 1
+                const opt1 = q('#spCols option[value="1"]');
+                if (!opt1 || !/each problem across the page/.test(opt1.textContent)) F('COLS1 Columns has no "1 — each problem across the page"');
+                if (q('#spCols option[value="7"]') && !m.simplePrintState().list.some((x) => /_facts$/.test(x.key))) F('COLS1 7+ offered without facts');
+                await click('[data-sp="arrange"][data-v="sections"]');
+                const sel = q('#spCols');
+                const before = m.lastSimpleRequests().length;
+                if (sel) { sel.value = '1'; sel.dispatchEvent(new Event('change', { bubbles: true })); await new Promise((r) => setTimeout(r, 20)); await idle(); }
+                const got = m.lastSimpleRequests().slice(Math.max(0, before - 40)).filter((r) => (r.sections || []).some((s) => s.columns === 1) || r.columns === 1);
+                if (!got.length) F('COLS1 Columns 1 does not reach the request');
+                if (m.simplePrintState().prefs.cols !== 1) F('COLS1 not kept');
+                const rec4 = m.decodeQuickPrint(m.encodeQuickPrint({ name: 'c1', skills: [{ categoryId: 'addition', skillId: 'add_facts' }], print: { cols: 1 } }));
+                if (!rec4 || rec4.print.cols !== 1) F('COLS1 does not survive a share code');
+                out.info.push('MIXLAYOUT / COLS1 checked');
+                window.closeSimplePrint();
+                // SKOPTIONS (owner 2026-11-03): div_facts → Options → How it is written: long / fraction reaches the
+                // request, the preview draws it, the row says it
+                for (const [form, mark] of [['long', /data-ws-ops="division"|data-ws-notation="bracket"/], ['fraction', /data-ws-notation="fraction"|ws-divfrac|ws-frac/]]) {
+                    m.openSimplePrint([{ categoryId: 'division', skillId: 'div_facts' }], {});
+                    await idle();
+                    const ob = q('[data-sp="skoptions"][data-v="0"]');
+                    if (!ob) { F('SKOPTIONS no Options button on the div_facts row'); break; }
+                    const r0 = ob.getBoundingClientRect();
+                    if (r0.width < 44 || r0.height < 44) F(`SKOPTIONS Options button ${Math.round(r0.width)}x${Math.round(r0.height)} < 44`);
+                    ob.click();
+                    await new Promise((r) => setTimeout(r, 100));
+                    const sel = q('#skillOptionsPopover [aria-label="How it is written"] select');
+                    if (!sel) { F('SKOPTIONS the options sheet has no "How it is written"'); window.closeSimplePrint(); break; }
+                    const idx = [...sel.options].findIndex((o) => /^\s*(Long division|Fraction)/.test(o.textContent) && o.textContent.toLowerCase().startsWith(form === 'long' ? 'long' : 'fraction'));
+                    sel.value = String(idx);
+                    sel.dispatchEvent(new Event('change', { bubbles: true }));
+                    await new Promise((r) => setTimeout(r, 50));
+                    if (window.closeSkillOptionsPanel) window.closeSkillOptionsPanel();
+                    await idle();
+                    const last = m.lastSimpleRequests().slice(-1)[0];
+                    const so = last && (last.sections || []).flatMap((x) => x.skills || []).find((x) => x.skillId === 'div_facts');
+                    if (!so || !so.opts || so.opts.divForm !== form) F(`SKOPTIONS ${form}: the request carries ${JSON.stringify(so && so.opts)}`);
+                    const st = m.simplePrintState();
+                    const html = (q('#spFrame') && q('#spFrame').srcdoc) || '';
+                    if (!mark.test(html)) F(`SKOPTIONS ${form}: the preview does not draw it`);
+                    const sum = q('.sp-optsum');
+                    if (!sum || !sum.textContent.trim()) F(`SKOPTIONS ${form}: the row shows no summary`);
+                    else out.info.push(`SKOPTIONS ${form}: "${sum.textContent.trim()}"`);
+                    void st;
+                    window.closeSimplePrint();
+                }
+                m.deleteQuickPrint(rec3 && rec3.id);
+            }
+            return { fails: FL, info: out.info };
+        });
+        fails.push(...r4.fails); rows.push(...r4.info);
+        // STUDENTBAR (owner 2026-11-03): pupil home, 3 skills selected → the bottom bar's Print lists those 3,
+        // Send's link decodes to those 3 with their options, Play deals only those 3; none selected → disabled
+        console.error('ws-simple-print: STUDENTBAR …');
+        const r3 = await page.evaluate(async () => {
+            const FL = []; const F = (t) => FL.push(t);
+            const W = window;
+            if (W.closeSimplePrint) W.closeSimplePrint();
+            document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode');
+            W.UnifiedSkills.clear ? W.UnifiedSkills.clear() : W.clearSkillQueue();
+            await new Promise((r) => setTimeout(r, 50));
+            const btn = (id) => document.getElementById(id);
+            if (!btn('studentSelPrintBtn') || !btn('studentSelPrintBtn').disabled || !btn('studentSelPlayBtn').disabled || !btn('studentSelSendBtn').disabled) F('STUDENTBAR buttons not disabled with nothing selected');
+            if (!/Pick skills/.test((btn('studentSelCount') || {}).textContent || '')) F('STUDENTBAR no "Pick skills" hint');
+            const want = [['addition', 'add_facts', {}], ['subtraction', 'sub_facts', {}], ['multiplication', 'mult_facts', { constant: [6, 7] }]];
+            for (const [c, k, o] of want) W.UnifiedSkills.add({ categoryId: c, skillId: k, skillLabel: k, opts: o });
+            await new Promise((r) => setTimeout(r, 300));
+            if (btn('studentSelPrintBtn').disabled) F('STUDENTBAR Print still disabled with 3 selected');
+            const bar = btn('studentSelBar').getBoundingClientRect();
+            for (const id of ['studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) { const r = btn(id).getBoundingClientRect(); if (r.width < 44 || r.height < 44) F(`STUDENTBAR ${id} ${Math.round(r.width)}x${Math.round(r.height)} < 44`); }
+            if (!bar.height) F('STUDENTBAR bar not visible');
+            const keys = want.map((x) => x[0] + ':' + x[1]).sort().join(',');
+            // Print
+            btn('studentSelPrintBtn').click();
+            let st = null;
+            for (let i = 0; i < 100; i++) { const m = await import('/js/modules/simple-print.js'); st = m.simplePrintState(); if (st) break; await new Promise((r) => setTimeout(r, 150)); }
+            if (!st || st.list.map((x) => x.key).sort().join(',') !== keys) F(`STUDENTBAR Print lists ${st && st.list.map((x) => x.key)}`);
+            else if (JSON.stringify((st.list.find((x) => x.key === 'multiplication:mult_facts') || {}).opts) !== JSON.stringify({ constant: [6, 7] })) F('STUDENTBAR Print drops the options');
+            W.closeSimplePrint();
+            // Send
+            const link = W.sendStudentSelection();
+            const code = decodeURIComponent((String(link).match(/[?&]c=([^&]+)/) || [])[1] || '');
+            const parts = code ? W.parseSkillCodeParts(code.split('|')[0]) : [];
+            if (parts.map((x) => x.categoryId + ':' + x.skillId).sort().join(',') !== keys) F(`STUDENTBAR Send link decodes to ${JSON.stringify(parts.map((x) => x.skillId))}`);
+            const mp = parts.find((x) => x.skillId === 'mult_facts');
+            if (!mp || !mp.opts || JSON.stringify(mp.opts.constant) !== '[6,7]') F(`STUDENTBAR Send drops the options: ${JSON.stringify(mp)}`);
+            if (btn('studentSendBox').hidden || btn('studentSendLink').value !== link) F('STUDENTBAR Send link not shown');
+            // Play
+            W.playStudentSelection();
+            await new Promise((r) => setTimeout(r, 400));
+            const sel = (W.state.mixedModeSettings || {}).selectedSkills || {};
+            const got = Object.entries(sel).flatMap(([c, l]) => l.map((k) => c + ':' + k)).sort().join(',');
+            if (got !== keys || !W.state.isMixedMode) F(`STUDENTBAR Play plays ${got}`);
+            W.state.isMixedMode = false;
+            W.clearSkillQueue && W.clearSkillQueue();
+            return FL;
+        });
+        fails.push(...r3);
+        rows.push('STUDENTBAR checked');
     }
     console.log(rows.join('\n'));
     for (const f of fails) console.log('  FAIL ' + f);

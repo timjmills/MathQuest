@@ -140,6 +140,7 @@ export const UnifiedSkills = {
 
         // Always sync the lightweight arrays immediately (so has() / count / getAll work)
         window.skillQueue = [...this.skills];
+        updateStudentSelBar();
 
         // Debounce the heavy work (global format conversions + UI updates)
         clearTimeout(this._syncTimer);
@@ -569,3 +570,52 @@ export function printFromQueue() {
     openSimplePrintDialog(skillsToUse);
 }
 
+
+// ---- owner 2026-11-03: the pupil home's bottom bar for the selected skills: "n skills selected · Play · Send · Print"
+const selItems = () => (window.skillQueue || []).map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts && Object.keys(s.opts).length ? s.opts : undefined }));
+
+/** Enable the bar's buttons when at least one skill is selected; say how many (else "Pick skills"). */
+export function updateStudentSelBar() {
+    if (typeof document === 'undefined') return;
+    const n = (window.skillQueue || []).length;
+    for (const id of ['studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) { const b = document.getElementById(id); if (b) b.disabled = n === 0; }
+    const c = document.getElementById('studentSelCount');
+    if (c) c.textContent = n === 0 ? 'Pick skills' : `${n} skill${n === 1 ? '' : 's'} selected`;
+    const box = document.getElementById('studentSendBox');
+    if (box && !box.hidden) box.hidden = true;   // a link made for an older selection is not kept
+}
+
+/** Play: practice with exactly the selected skills (the queue play path: mixed-mode state set before startGame). */
+export function playStudentSelection() {
+    if (!(window.skillQueue || []).length) return;
+    playSelectedSkills('practice');
+}
+
+/** Send: the share link for the selected skills (each with its options), shown with a Copy button. */
+export function sendStudentSelection() {
+    const list = selItems().map((x) => Object.assign({ weight: 1 }, x));
+    if (!list.length || typeof window.generateShareableLink !== 'function') return '';
+    const was = state.shareLinkType;
+    state.shareLinkType = 'direct';
+    let link = '';
+    try { link = window.generateShareableLink(list) || ''; } finally { state.shareLinkType = was; }
+    const box = document.getElementById('studentSendBox');
+    const f = document.getElementById('studentSendLink');
+    if (f) f.value = link;
+    if (box && link) { box.hidden = false; try { f.select(); } catch (e) { /* */ } }
+    return link;
+}
+export async function copyStudentSendLink() {
+    const f = document.getElementById('studentSendLink');
+    if (!f || !f.value) return;
+    let ok = false;
+    try { await navigator.clipboard.writeText(f.value); ok = true; } catch (e) { try { f.select(); ok = document.execCommand('copy'); } catch (e2) { ok = false; } }
+    if (window.showToast) window.showToast(ok ? 'Link copied' : 'Select the link and copy it', ok ? 'success' : 'info');
+}
+
+/** Print: every selected skill (with its options) in the simple print, loaded on the press only. */
+export function printStudentSelection() {
+    const list = selItems();
+    if (!list.length || typeof window.openSimplePrint !== 'function') return;
+    window.openSimplePrint(list, { from: 'student' });
+}

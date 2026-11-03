@@ -32,13 +32,17 @@
 // loads the deferred half on the first press). Styles: css/simple-print.css (.sp-*), self-contained tokens, so it
 // looks the same on the student page and the teacher site.
 
-import { buildSheet, sheetDocument } from './print-sheet.js';
+import { buildSheet as buildSheetRaw, sheetDocument } from './print-sheet.js';
+// every request this dialog sends, last few kept for the gate (ws-simple-print reads lastSimpleRequests)
+const REQS = [];
+const buildSheet = (req) => { REQS.push(req); if (REQS.length > 40) REQS.shift(); return buildSheetRaw(req); };
+export const lastSimpleRequests = () => REQS.slice();
 import { printHtml } from './teacher-print.js';
 import { openPdfPreview } from './teacher-pdf-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { SKILLS } from './data.js';
-import { optionsFor } from './skill-options.js';
+import { optionsFor, offeredOptionsFor, describeOptions } from './skill-options.js';
 
 const STORE_KEY = 'mq_simple_print';
 const SIZES = [['L', 'Big'], ['M', 'Medium'], ['S', 'Small']];
@@ -47,12 +51,14 @@ const FACT_AUTO = { S: 10, M: 6, L: 5 };
 // Owner 2026-11-03 (item 4): "7, 8, 9, 10 should be just for small problems": a fast fact may go up to 10 across, every
 // larger cell at most 6 (and the engine clamps either to what really fits at the size).
 const FACT_MAX_COLS = 10, CELL_MAX_COLS = 6;
+// Mixed up layouts (owner 2026-11-03): sent as req.mixLayout; absent = 'rows'
+const MIX_LAYOUTS = { rows: ['Rows by type', 'each row one kind, full-size boxes'], grid: ['One grid', 'one grid, bigger problems stand two rows tall'], even: ['Even grid', 'one even grid, bigger problems get less room'] };
 const MAX_PROBLEMS = 400, MAX_PAGES = 30, MAX_SETS = 30;
 
 /* ================================================================= state */
 
 function loadPrefs() {
-    const d = { how: 'pages', n: 1, nProblems: 24, nPages: 1, sets: 1, size: 'M', cols: 'auto', colsMode: 'aim', key: true, arrange: 'sections' };
+    const d = { how: 'pages', n: 1, nProblems: 24, nPages: 1, sets: 1, size: 'M', cols: 'auto', colsMode: 'aim', key: true, arrange: 'sections', mixLayout: 'rows' };
     try {
         const s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
         if (s && typeof s === 'object') {
@@ -61,16 +67,17 @@ function loadPrefs() {
             if (Number(s.nPages) > 0) d.nPages = Math.min(MAX_PAGES, Math.round(Number(s.nPages)));
             if (Number(s.sets) >= 1) d.sets = Math.min(MAX_SETS, Math.round(Number(s.sets)));
             if (SIZE_NAME[s.size]) d.size = s.size;
-            if (s.cols === 'auto' || (Number(s.cols) >= 2 && Number(s.cols) <= 10)) d.cols = s.cols === 'auto' ? 'auto' : Number(s.cols);
+            if (s.cols === 'auto' || (Number(s.cols) >= 1 && Number(s.cols) <= 10)) d.cols = s.cols === 'auto' ? 'auto' : Number(s.cols);
             if (s.colsMode === 'aim' || s.colsMode === 'exact') d.colsMode = s.colsMode;
             if (typeof s.key === 'boolean') d.key = s.key;
             if (s.arrange === 'mixed' || s.arrange === 'sections') d.arrange = s.arrange;
+            if (MIX_LAYOUTS[s.mixLayout]) d.mixLayout = s.mixLayout;
         }
     } catch (e) { /* defaults */ }
     return d;
 }
 function savePrefs() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ how: P.how, nProblems: P.nProblems, nPages: P.nPages, sets: P.sets, size: P.size, cols: P.cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange })); } catch (e) { /* not saved */ }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ how: P.how, nProblems: P.nProblems, nPages: P.nPages, sets: P.sets, size: P.size, cols: P.cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange, mixLayout: P.mixLayout })); } catch (e) { /* not saved */ }
 }
 
 const P = loadPrefs();
@@ -170,6 +177,7 @@ function baseReq(o) {
         size: o.size, look: 'auto', paper: o.paper || 'A4', seed: o.seed >>> 0,
         header: Object.assign({ name: true, date: true, score: false, title: o.title || true }, o.footer ? { footerLeft: o.footer } : {}),
         key: o.key ? { on: true, placement: 'end', style: 'copy' } : { on: false },
+        ...(o.arrange === 'mixed' ? { mixLayout: MIX_LAYOUTS[o.mixLayout] ? o.mixLayout : 'rows' } : {}),
     };
 }
 const skillRef = (s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts || {} });
@@ -558,10 +566,11 @@ function cleanPrint(p) {
     if (Number(p.n) >= 1) o.n = Math.min(o.how === 'pages' ? MAX_PAGES : MAX_PROBLEMS, Math.round(Number(p.n)));
     if (Number(p.sets) >= 1) o.sets = Math.min(MAX_SETS, Math.round(Number(p.sets)));
     if (SIZE_NAME[p.size]) o.size = p.size;
-    if (p.cols === 'auto' || (Number(p.cols) >= 2 && Number(p.cols) <= 10)) o.cols = p.cols === 'auto' ? 'auto' : Number(p.cols);
+    if (p.cols === 'auto' || (Number(p.cols) >= 1 && Number(p.cols) <= 10)) o.cols = p.cols === 'auto' ? 'auto' : Number(p.cols);
     if (p.colsMode === 'exact' || p.colsMode === 'aim') o.colsMode = p.colsMode;
     if (typeof p.key === 'boolean') o.key = p.key;
     if (p.arrange === 'mixed' || p.arrange === 'sections') o.arrange = p.arrange;
+    if (MIX_LAYOUTS[p.mixLayout]) o.mixLayout = p.mixLayout;
     return o;
 }
 function cleanSkills(list) {
@@ -613,7 +622,7 @@ export function openQuickPrint(id, ctx = {}) {
     const rec = typeof id === 'object' ? id : findQuick(id);
     if (!rec) return;
     const pr = cleanPrint(rec.print);
-    Object.assign(P, { how: pr.how, sets: pr.sets, size: pr.size, cols: pr.cols, colsMode: pr.colsMode, key: pr.key, arrange: pr.arrange });
+    Object.assign(P, { how: pr.how, sets: pr.sets, size: pr.size, cols: pr.cols, colsMode: pr.colsMode, key: pr.key, arrange: pr.arrange, mixLayout: pr.mixLayout || 'rows' });
     if (pr.how === 'pages') P.nPages = pr.n; else P.nProblems = pr.n;
     savePrefs();
     const keep = S && S.ctx ? S.ctx : {};
@@ -724,7 +733,7 @@ const hasFacts = () => !!(S && S.list.some(isFactSkill));
 function opts() {
     // 7–10 across only with fast facts in the set (owner item 4): without them an asked 7+ is read as 6
     const cols = P.cols !== 'auto' && Number(P.cols) > CELL_MAX_COLS && !hasFacts() ? CELL_MAX_COLS : P.cols;
-    return { how: P.how, n: P.how === 'pages' ? P.nPages : P.nProblems, sets: P.sets, size: P.size, cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange, seed: S.seed, title: S.ctx.title || true, paper: 'A4' };
+    return { how: P.how, n: P.how === 'pages' ? P.nPages : P.nProblems, sets: P.sets, size: P.size, cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange, mixLayout: P.mixLayout || 'rows', seed: S.seed, title: S.ctx.title || true, paper: 'A4' };
 }
 
 function mount() {
@@ -798,7 +807,14 @@ function render() {
     S.list.forEach((s, i) => {
         const a = parseAmount(s.amt);
         const so = skillOptsHTML(s, i);
-        h += `<li class="sp-skill${so.inline ? ' has-band' : ''}"><span class="sp-skill-name">${esc(s.label)}</span>${so.inline}`;
+        // owner 2026-11-03: every option of the skill (How it is written, supports …) behind its own Options button
+        let osum = '';
+        try { osum = s.opts && Object.keys(s.opts).length ? describeOptions(s.categoryId, s.skillId, s.opts) : ''; } catch (e) { osum = ''; }
+        // short: "Long division · Tables: 6, 7" (the long wording in brackets is for the options sheet)
+        osum = osum.split(' · ').map((x) => x.replace(/\s*\(.*$/, '').replace(/^How it is written:\s*/, '').trim()).filter(Boolean).join(' · ');
+        const hasOpts = (() => { try { return (offeredOptionsFor(s.categoryId, s.skillId) || []).length > 0; } catch (e) { return false; } })();
+        h += `<li class="sp-skill${so.inline ? ' has-band' : ''}"><span class="sp-skill-name">${esc(s.label)}${osum ? `<span class="sp-optsum">${esc(osum)}</span>` : ''}</span>${so.inline}`;
+        if (hasOpts) h += `<button type="button" class="sp-optbtn" data-sp="skoptions" data-v="${i}" aria-label="${esc(s.label)}: all options" aria-haspopup="dialog"><span aria-hidden="true">&#9881;</span><span>Options</span></button>`;
         if (many) h += `<input id="spAmt${i}" class="sp-amt${a && a.bad ? ' is-bad' : ''}" data-amt="${i}" type="text" inputmode="numeric" autocomplete="off" value="${esc(s.amt)}" placeholder="even" aria-label="${esc(s.label)}: number of problems or %" aria-invalid="${a && a.bad ? 'true' : 'false'}">`;
         if (b && b.counts && many) h += `<span class="sp-got" aria-label="prints">${b.counts[i] || 0}</span>`;
         h += so.below;
@@ -825,7 +841,7 @@ function render() {
     const colsNow = o.cols;
     h += `</div><label class="sp-cols"><span>Columns</span><select id="spCols" data-sp-cols>
         <option value="auto"${colsNow === 'auto' ? ' selected' : ''}>Auto — fitted by size${autoCols ? ` (${autoCols})` : ''}</option>
-        ${Array.from({ length: colMax - 1 }, (_, k) => k + 2).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c}</option>`).join('')}
+        ${Array.from({ length: colMax }, (_, k) => k + 1).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c === 1 ? '1 — each problem across the page' : c}</option>`).join('')}
     </select></label>`;
     if (colsNow !== 'auto') h += `<div class="sp-row sp-cmode"><div class="sp-seg" role="radiogroup" aria-label="Columns mode">${[['aim', `Aim for ${colsNow}`], ['exact', `Exactly ${colsNow}`]].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="cmode" data-v="${v}" aria-checked="${P.colsMode === v}">${l}</button>`).join('')}</div><span class="sp-hint">${P.colsMode === 'exact' ? `every part ${colsNow} across; bigger problems at their own max` : `${colsNow} across where it fits (one fewer when that ends a part on a full row), else the most that fit`}</span></div>`;
     h += `</section>`;
@@ -843,6 +859,7 @@ function render() {
     // More options
     h += `<details class="sp-more"${S.moreOpen ? ' open' : ''}><summary data-sp="more">More options</summary><div class="sp-more-body">`;
     if (many) h += `<div class="sp-row"><span class="sp-lbl">Arrange</span><div class="sp-seg" role="radiogroup" aria-label="Arrange">${[['sections', 'In sections'], ['mixed', 'Mixed up']].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="arrange" data-v="${v}" aria-checked="${P.arrange === v}">${l}</button>`).join('')}</div></div>`;
+    if (many && P.arrange === 'mixed') { const ml = MIX_LAYOUTS[P.mixLayout] ? P.mixLayout : 'rows'; h += `<div class="sp-row sp-mixl"><span class="sp-lbl">Layout</span><div class="sp-seg" role="radiogroup" aria-label="Mixed up layout">${Object.entries(MIX_LAYOUTS).map(([v, [l]]) => `<button type="button" role="radio" class="sp-segb" data-sp="mixlayout" data-v="${v}" aria-checked="${ml === v}">${l}</button>`).join('')}</div><span class="sp-hint">${MIX_LAYOUTS[ml][1]}</span></div>`; }
     h += `<button type="button" class="sp-link" data-sp="newnums">New numbers</button>`;
     if (typeof S.ctx.more === 'function') h += `<button type="button" class="sp-link" data-sp="full">All print options (page types, examples, key style, sets)…</button>`;
     h += `</div></details>`;
@@ -944,7 +961,20 @@ function onClick(e) {
     }
     if (act === 'size') { if (P.size !== v) { P.size = v; changed(false); } return; }
     if (act === 'key') { P.key = v === 'true'; changed(false); return; }
+    if (act === 'skoptions') {
+        const i = Number(v), s = S.list[i];
+        if (!s || typeof window.openSkillOptionsPanel !== 'function') return;
+        window.openSkillOptionsPanel(s.categoryId, s.skillId, t, { opts: s.opts || {}, onChange: (next) => {
+            if (!S || S.list[i] !== s) return;
+            s.opts = next && Object.keys(next).length ? next : {};
+            S.probes = {};
+            render();
+            schedule(0);
+        } });
+        return;
+    }
     if (act === 'arrange') { if (P.arrange !== v) { P.arrange = v; changed(true); } return; }
+    if (act === 'mixlayout') { if (MIX_LAYOUTS[v] && P.mixLayout !== v) { P.mixLayout = v; changed(true); } return; }
     if (act === 'more') { S.moreOpen = !t.parentElement.open; return; }
     if (act === 'cmode') { if (P.colsMode !== v) { P.colsMode = v; changed(false); } return; }
     if (act === 'skopt') { S.openOpts = S.openOpts || new Set(); const i = Number(v); if (t.parentElement.open) S.openOpts.delete(i); else S.openOpts.add(i); return; }
