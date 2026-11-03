@@ -1,0 +1,160 @@
+{
+ "tool": "ws-print-lint",
+ "source": "kit",
+ "lints": [
+  "L-INK",
+  "L-EMOJI",
+  "L-FONT",
+  "L-SIZE",
+  "L-OVERFLOW",
+  "L-SPLIT",
+  "L-DENSITY",
+  "L-KEY",
+  "L-VERBS",
+  "L-ANSAREA",
+  "L-INPUT",
+  "L-CCSS",
+  "L-ANCHOR",
+  "L-SUPPORT",
+  "L-TOPSTART",
+  "L-OVERLAP",
+  "L-WRAP"
+ ],
+ "documents": [
+  {
+   "id": "division:div_facts",
+   "label": "Division Facts (1-12)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#test",
+   "label": "Division Facts (1-12) (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#review",
+   "label": "Division Facts (1-12) (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  }
+ ]
+}
