@@ -182,3 +182,28 @@ Open (each needs a ruling or a check fix - not an engine tweak; no check was edi
    cells all one kind - the owner's name rule would split subtract out; ruling needed (mixed-page check is M1's).
 6. The 41st problem alone on page 2 at S (and 1 at L) - the owner's set needs one row more than a page holds.
 7. Missing-number legacy cells wrap at 5-6 across (r5 item 6, unchanged); visible in C.
+
+## r6b fixer (Opus medium, 2026-11-03) - remainder rebalance (owner: no row under half full)
+Engine (`roles/mixed-practice.js`):
+- A: `rowSizes` - a kind's remainder under ceil(C / 2) takes its last full row into two rows of at least half (4 + 1 ->
+  3 + 2, 6 + 1 -> 4 + 3); `orderKinds` - every kind's short rows form the tail (all distinct tail orders tried, least run
+  excess; one short row keeps the r6 schedule byte for byte); `chooseC` prefers counts across whose rows can alternate;
+  pages: the tail rows are carried onto the LAST page, and a last page of one short row takes a whole row from the page
+  before while that page still fills within H13; a short row of half its count or more is drawn >= 52 % of the frame.
+- C: `evenSizes` - a remainder under half takes full rows into EQUAL rows of at least half (5 + 1 -> 3 + 3, 4 + 4 + 1 ->
+  3 + 3 + 3) in one left grid (C allows only the last grid short); pages share the full rows evenly, the short rows with
+  the last.
+- `MIX_LAYOUTS = ['grid', 'even']` (B and C green in mixed-m3).
+Owner's 41: A S 36 / 5 (fact 7, large 4), M 28 / 13 (fact 5, large 4), L 20 / 21 (4, 4); B S 30 / 11, M 25 / 16,
+L 16 / 16 / 9; C S 30 / 11, M 25 / 16, L 16 / 16 / 9.
+Gates: mixed-m3 full 6 FAIL (was 7; 78 scenarios; rowfill 0; C, B, Columns 6 S and A M clean); mixed-m2 --quick 5 FAIL
+(was 7; d 6:9 S gone); ws-teacher-plan-match, ws-teacher-arrangement, ws-boot-smoke, ws-code-snapshot, mixed-page --seeds 2,
+ws-simple-print, ws-columns-one OK; one-section md5 identical (5 samples).
+Open (needs a ruling; no check edited):
+1. A at S, L and Columns 4 M: mixed-m3 `kinds` - the large kind's remainder (13 at 4) is two short rows that both end the
+   print (shelfw: short grids only at the end of the last page), so they stand together - a run of 2 where the forced
+   minimum is 1; facts take no short row to sit between them at the allowed counts across (S facts 7 / 6: 28 = 4 x 7 or
+   5 rows -> no alternating order exists; L facts 4 only; Columns 4 fixed). Proven by enumeration, not a tweak. Ruling
+   options: the remainder's two rows count as one for the run rule, or a kind's tail pair may stand together.
+2. mixed-m2 c 5:14 ican M 4 / 9 / 4 / 2 (word problems 2 across, one fact row of 5): page 1 (I Can header) holds 2 word
+   rows, the fact row only fits beside them on page 2 - untouched. Sections frac-model H13 (4, pre-existing) untouched.

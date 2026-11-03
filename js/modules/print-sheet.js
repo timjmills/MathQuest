@@ -3013,10 +3013,11 @@ async function buildSheetCore(req = {}) {
  */
 /**
  * The Mixed up layouts (req.mixLayout) whose machine checks pass at the end of the last engine round - the print
- * dialog's feature detection (lead, 2026-11-03). 'rows' (A, the request's default) and 'even' (C) are built but still
- * red on the owner's 41 (mixed-m3 kinds / across / shelfw: design/status/mixed-m2.md r6), so only 'grid' (B) is listed.
+ * dialog's feature detection (lead, 2026-11-03). 'grid' (B) and 'even' (C) are green in mixed-m3 (r6b); 'rows' (A, the
+ * request's default) is still red on the owner's 41 at S / L and Columns 4 M (mixed-m3 kinds: the remainder's two short
+ * rows stand together - design/status/mixed-m2.md r6b), so it is not listed.
  */
-export const MIX_LAYOUTS = Object.freeze(['grid']);
+export const MIX_LAYOUTS = Object.freeze(['grid', 'even']);
 
 export async function buildSheet(req = {}) {
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own.

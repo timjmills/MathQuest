@@ -1689,7 +1689,10 @@ function rowsSetup(pools, input) {
         const walk = (i, pick) => {
             if (i === kinds.length) {
                 const rem = kinds.filter((k) => (nK[k] || 0) % pick[k]);
-                const cost = [rem.length, kinds.reduce((a, k) => a + Math.ceil((nK[k] || 0) / pick[k]) * hK[k], 0), kinds.reduce((a, k) => a + (C[k] - pick[k]), 0)];
+                // (first: the kinds' rows can alternate - a kind's two short rows need another kind's row between them)
+                const sz = Object.fromEntries(kinds.map((k) => [k, rowSizes(nK[k] || 0, pick[k])]));
+                const ok = orderKinds(Object.fromEntries(kinds.map((k) => [k, sz[k].length])), Object.fromEntries(kinds.map((k) => [k, sz[k].filter((n) => n < pick[k]).length])), kinds).excess > 0 ? 1 : 0;
+                const cost = [ok, rem.length, kinds.reduce((a, k) => a + Math.ceil((nK[k] || 0) / pick[k]) * hK[k], 0), kinds.reduce((a, k) => a + (C[k] - pick[k]), 0)];
                 const lt = (a, q) => { for (let j = 0; j < a.length; j++) { if (a[j] < q[j] - 1e-9) return true; if (a[j] > q[j] + 1e-9) return false; } return false; };
                 if (!best || lt(cost, best.cost)) best = { cost, C: Object.assign({}, pick), last: rem[0] || null, rem };
                 return;
@@ -1748,8 +1751,43 @@ function shareRow(ds, A, U, look) {
 function rowSizes(n, C) {
     if (n <= 0) return [];
     const out = Array(Math.floor(n / C)).fill(C);
-    if (n % C) out.push(n % C);
+    const r = n % C;
+    // (owner 2026-11-03: no row under half full - a remainder under half its count across takes the last full row with
+    // it into two rows of at least half each: 4 + 1 -> 3 + 2, 6 + 1 -> 4 + 3)
+    if (r && out.length && r < Math.ceil(C / 2)) { out.pop(); out.push(Math.ceil((C + r) / 2), Math.floor((C + r) / 2)); }
+    else if (r) out.push(r);
     return out;
+}
+
+/** The kinds' rows in print order when the short rows close it: {order, excess} - the full rows scheduled, the short
+ *  rows (each kind's last ones) as the tail; the order whose longest same-kind run is least over the forced minimum. */
+function orderKinds(R, shortsK, kinds) {
+    const excess = (o) => {
+        const tot = {}; for (const k of o) tot[k] = (tot[k] || 0) + 1;
+        let worst = 0; let i = 0;
+        while (i < o.length) { let j = i; while (j + 1 < o.length && o[j + 1] === o[i]) j++; worst = Math.max(worst, j - i + 1 - Math.max(1, Math.ceil(tot[o[i]] / (o.length - tot[o[i]] + 1)))); i = j + 1; }
+        return worst;
+    };
+    const nS = kinds.reduce((a, k) => a + (shortsK[k] || 0), 0);
+    const shortKs = kinds.filter((k) => shortsK[k]);
+    if (nS <= 1) { const o = scheduleKinds(R, kinds, shortKs[0] || null); return { order: o, excess: excess(o) }; }
+    const Rf = Object.fromEntries(kinds.map((k) => [k, R[k] - (shortsK[k] || 0)]));
+    // (the tails: every distinct order of the short rows - at most a few)
+    const tails = [];
+    const perm = (left, acc) => {
+        if (acc.length === nS) { tails.push(acc.slice()); return; }
+        for (const k of shortKs) if (left[k]) { left[k]--; acc.push(k); perm(left, acc); acc.pop(); left[k]++; }
+    };
+    perm(Object.assign({}, shortsK), []);
+    let best = null;
+    for (const endF of [null, ...kinds.filter((k) => Rf[k] > 0)]) {
+        for (const tail of tails) {
+            const o = scheduleKinds(Rf, kinds, endF).concat(tail);
+            const e = excess(o);
+            if (!best || e < best.excess) best = { order: o, excess: e };
+        }
+    }
+    return best;
 }
 
 /** The kinds' rows in print order: each kind's rows spread as evenly as the counts allow (runs <= the forced
@@ -1804,27 +1842,10 @@ function rowsLay(S, pools, counts, seed, { exact = false, stretchLast = false } 
         sizesK[k] = rowSizes(seqK[k].length, C[k]);
     }
     const R = Object.fromEntries(kinds.map((k) => [k, sizesK[k].length]));
-    // (the kind with a short row ends the print: its short row is the last row, its own grid - mixed-m3 shelfw / boxes)
-    const shortK = kinds.filter((k) => sizesK[k].length && sizesK[k][sizesK[k].length - 1] < C[k]);
-    let order;
-    if (shortK.length <= 1) order = scheduleKinds(R, kinds, shortK[0] || null);
-    else {
-        // (two kinds or more end short - the counts allow no other: the full rows first, then the short rows, the
-        // last full row's kind not the first short one's)
-        const Rf = Object.fromEntries(kinds.map((k) => [k, R[k] - (shortK.includes(k) ? 1 : 0)]));
-        const excess = (o) => {
-            const tot = {}; for (const k of o) tot[k] = (tot[k] || 0) + 1;
-            let worst = 0; let i = 0;
-            while (i < o.length) { let j = i; while (j + 1 < o.length && o[j + 1] === o[i]) j++; worst = Math.max(worst, j - i + 1 - Math.max(1, Math.ceil(tot[o[i]] / (o.length - tot[o[i]] + 1)))); i = j + 1; }
-            return worst;
-        };
-        for (const endF of [null, ...kinds.filter((k) => Rf[k] > 0)]) {
-            for (const tail of [shortK.slice(), shortK.slice().reverse()]) {
-                const o = scheduleKinds(Rf, kinds, endF).concat(tail);
-                if (!order || excess(o) < excess(order)) order = o;
-            }
-        }
-    }
+    // (the short rows end the print: each its own grid on the last page - mixed-m3 shelfw / boxes; a kind's remainder
+    // under half its count across is two short rows - rowSizes)
+    const shortsK = Object.fromEntries(kinds.map((k) => [k, sizesK[k].filter((n) => n < C[k]).length]));
+    const { order } = orderKinds(R, shortsK, kinds);
     // rows: each kind's sizes in its order; the short sizes are its last rows (they go to the last page)
     const at = Object.fromEntries(kinds.map((k) => [k, { row: 0, item: 0 }]));
     const rows = order.map((k) => {
@@ -1880,6 +1901,24 @@ function rowsLay(S, pools, counts, seed, { exact = false, stretchLast = false } 
             const ok = ri === rows.length && out.every((p) => p.rows.length) && ns[ns.length - 1] * 2 >= Math.max(...ns)
                 && out.slice(0, -1).every((p, i) => growTo(p.rows) >= budgetOf(i) - BLANK_OK);
             if (ok) { pages.length = 0; pages.push(...out); }
+        }
+    }
+    // (owner 2026-11-03: the short rows that end the print all stand on the LAST page, and the last page is never one
+    // short row alone - whole rows carried from the page before, as long as it is still filled within H13)
+    if (pages.length > 1) {
+        let t0 = rows.length;
+        while (t0 > 0 && rows[t0 - 1].short) t0--;
+        const lastP = pages[pages.length - 1];
+        const prevP = pages[pages.length - 2];
+        const P1 = pages.length - 1;
+        const fitsLast = (rs) => heightOf(rs) <= budgetOf(P1) + 1e-6;
+        while (t0 < rows.length && lastP.rows[0] > t0 && prevP.rows.length > 1 && fitsLast([prevP.rows[prevP.rows.length - 1]].concat(lastP.rows))) {
+            lastP.rows.unshift(prevP.rows.pop());
+        }
+        if (lastP.rows.length === 1 && rows[lastP.rows[0]].short && prevP.rows.length > 1) {
+            const rest = prevP.rows.slice(0, -1);
+            const moved = [prevP.rows[prevP.rows.length - 1]].concat(lastP.rows);
+            if (fitsLast(moved) && growTo(rest) >= budgetOf(P1 - 1) - BLANK_OK) { prevP.rows = rest; lastP.rows = moved; }
         }
     }
     // the short rows of the last page close its grids: they go to its end, kinds still alternating where they can
@@ -2077,7 +2116,8 @@ function planRowsA(input, pools) {
             let trail = null;
             gj.forEach((j, rj) => {
                 const r = L.rows[pg.rows[j]];
-                const A0 = r.short ? Math.round((U * r.cells.length) / r.C) : U;
+                // (a short row of half its count across or more stands clear of half the frame - its gaps taken back)
+                const A0 = r.short ? Math.max(Math.round((U * r.cells.length) / r.C), 2 * r.cells.length >= r.C ? Math.ceil(U * 0.52) : 0) : U;
                 const us = shareRow(r.cells.map((e) => e.d), A0, U, ctx.look);
                 let u0 = 0;
                 let prev = null;
@@ -2213,16 +2253,34 @@ function evenSetup(pools, input) {
     };
     return { c, b, hAt, A, C, box };
 }
+/** Layout C's row sizes: rows of C; a remainder under half of C takes full rows with it into equal rows of at least
+ *  half (5 + 1 -> 3 + 3, 4 + 4 + 1 -> 3 + 3 + 3), one left grid at the end; else two rows of at least half each. */
+function evenSizes(n, C) {
+    if (n <= 0) return [];
+    const r = n % C;
+    const f = Math.floor(n / C);
+    if (!r || r >= Math.ceil(C / 2) || !f) return rowSizes(n, C);
+    for (let j = 1; j <= Math.min(3, f); j++) {
+        for (let m = C - 1; m >= Math.ceil(C / 2); m--) {
+            const t = j * C + r;
+            if (t % m === 0) return Array(f - j).fill(C).concat(Array(t / m).fill(m));
+        }
+    }
+    return rowSizes(n, C);
+}
 function evenLay(E, pools, counts, seed, { exact = false } = {}) {
     const { c, b, C, box } = E;
     const g = rowGapMm(c.ctx.look);
     const seq = seqOf(c, pools, counts, seed).map((x) => ({ x, d: box(x) }));
     const H0 = Math.max(8, ...seq.map((e) => e.d.hDraw));
     const rows = [];
-    for (let i = 0; i < seq.length; i += C) rows.push({ cells: seq.slice(i, i + C), short: seq.slice(i, i + C).length < C, C });
+    let i0 = 0;
+    for (const n of evenSizes(seq.length, C)) { rows.push({ cells: seq.slice(i0, i0 + n), short: n < C, C }); i0 += n; }
     const fit = (budget, extra) => Math.max(1, Math.floor((budget - 2 * GRID_EDGE_MM * (1 + extra) + g) / (H0 + g) + 1e-9));
     const pages = [];
     let ri = 0;
+    let nT = 0;
+    while (nT < rows.length && rows[rows.length - 1 - nT].short) nT++;
     while (ri < rows.length) {
         const pi = pages.length;
         const budget = pi ? b.cont : b.first;
@@ -2231,10 +2289,30 @@ function evenLay(E, pools, counts, seed, { exact = false } = {}) {
         pages.push({ rows: Array.from({ length: k }, (_, j) => ri + j) });
         ri += k;
     }
+    // (owner 2026-11-03: the rebalanced short rows all stand on the LAST page, and the last page is never one short row
+    // alone - the full rows shared out evenly over the pages, the short rows with the last)
+    if (pages.length > 1 && nT && (nT > 1 || pages[pages.length - 1].rows.length === 1)) {
+        const P = pages.length;
+        const nF = rows.length - nT;
+        const capOf = (pi, last) => fit(pi ? b.cont : b.first, last ? 1 : 0);
+        const per = Math.ceil(rows.length / P);
+        const takes = [];
+        let left = nF;
+        for (let pi = 0; pi < P - 1; pi++) { const t = Math.min(capOf(pi, false), per, left); takes.push(t); left -= t; }
+        // (the last page: what is left of the full rows and the short rows; earlier pages take more where it overflows)
+        for (let pi = P - 2; pi >= 0 && left + nT > capOf(P - 1, true); pi--) { const more = Math.min(capOf(pi, false) - takes[pi], left + nT - capOf(P - 1, true), left); takes[pi] += more; left -= more; }
+        if (left + nT <= capOf(P - 1, true) && takes.every((t) => t > 0)) {
+            pages.length = 0;
+            let at = 0;
+            for (const t of takes) { pages.push({ rows: Array.from({ length: t }, (_, j) => at + j) }); at += t; }
+            pages.push({ rows: Array.from({ length: rows.length - at }, (_, j) => at + j) });
+        }
+    }
     pages.forEach((p, pi) => {
         const budget = pi ? b.cont : b.first;
         const last = pi === pages.length - 1;
-        const used = p.rows.length * H0 + (p.rows.length - 1) * g + 2 * GRID_EDGE_MM * (1 + (rows[p.rows[p.rows.length - 1]].short ? 1 : 0));
+        const nSh = new Set(p.rows.filter((r) => rows[r].short).map((r) => rows[r].cells.length)).size;
+        const used = p.rows.length * H0 + (p.rows.length - 1) * g + 2 * GRID_EDGE_MM * (1 + (rows[p.rows[p.rows.length - 1]].short ? nSh : 0));
         const spare = Math.max(0, budget - used);
         const each = exact && last ? 0 : spare / p.rows.length;
         p.H = p.rows.map(() => H0 + each);
@@ -2295,14 +2373,21 @@ function planEvenC(input, pools) {
         sections.push(band);
         const order = [];
         const lastShort = L.rows[pg.rows[pg.rows.length - 1]].short;
-        const groups = lastShort && pg.rows.length > 1 ? [pg.rows.slice(0, -1), pg.rows.slice(-1)] : [pg.rows];
+        // (the full rows one grid; the short rows that end the print a left grid each count across - equal rows share one)
+        const groups = [];
+        for (const ri of pg.rows) {
+            const gr = groups[groups.length - 1];
+            const r = L.rows[ri];
+            if (gr && (r.short ? L.rows[gr[0]].short && L.rows[gr[0]].cells.length === r.cells.length : !L.rows[gr[0]].short)) gr.push(ri);
+            else groups.push([ri]);
+        }
         groups.forEach((gr, gi) => {
             const items = [];
-            const short = lastShort && gi === groups.length - 1;
+            const short = lastShort && L.rows[gr[0]].short;
             let cols = U;
             gr.forEach((ri, rj) => {
                 const r = L.rows[ri];
-                const A0 = r.short ? Math.round((U * r.cells.length) / C) : U;
+                const A0 = r.short ? Math.max(Math.round((U * r.cells.length) / C), 2 * r.cells.length >= C ? Math.ceil(U * 0.52) : 0) : U;
                 const us = shareRow(r.cells.map((e) => e.d), A0, U, ctx.look);
                 let u0 = 0;
                 r.cells.forEach((e, ci) => {
