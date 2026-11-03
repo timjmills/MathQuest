@@ -804,8 +804,22 @@ function _placeTeacherPopover(el) {
     el.style.top = Math.round(top) + 'px';
 }
 
+// The popover redraws its whole body on every change: keep a keyboard user on the same control (ui3 check D2).
+const _POP_FOCUSABLE = 'button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
+function _popFocusables(el) { return el ? [...el.querySelectorAll(_POP_FOCUSABLE)].filter((x) => !x.disabled && x.offsetParent !== null) : []; }
 function _renderPopover() {
     if (!_pop || typeof document === 'undefined') return;
+    const was = document.getElementById('skillOptionsPopover');
+    const ae = was && document.activeElement && was.contains(document.activeElement) ? document.activeElement : null;
+    const at = ae ? _popFocusables(was).indexOf(ae) : -1;
+    _renderPopoverBody();
+    if (at >= 0) {
+        const f = _popFocusables(document.getElementById('skillOptionsPopover'));
+        const t = f[Math.min(at, f.length - 1)];
+        if (t && t !== document.activeElement) { try { t.focus({ preventScroll: true }); } catch (e) { /* */ } }
+    }
+}
+function _renderPopoverBody() {
     let el = document.getElementById('skillOptionsPopover');
     if (!el) {
         el = document.createElement('div');
@@ -877,7 +891,39 @@ function _popOutside(e) {
     if (el.contains(e.target) || (_pop.anchor && _pop.anchor.contains && _pop.anchor.contains(e.target))) return;
     closeSkillOptionsPanel();
 }
-function _popKey(e) { if (e.key === 'Escape') closeSkillOptionsPanel(); }
+// On window, capture phase: it runs before any screen's own document handler, so Esc closes ONLY the panel (ui3 check
+// D3: the print dialog under it stays open) and Tab stays inside the panel while it is open.
+function _popKey(e) {
+    const el = document.getElementById('skillOptionsPopover');
+    if (!_pop || !el) return;
+    if (e.key === 'Escape') {
+        e.preventDefault(); e.stopPropagation();
+        const anchor = _pop.anchor;
+        const inside = el.contains(document.activeElement);
+        closeSkillOptionsPanel();
+        if (!inside && anchor && anchor.isConnected && typeof anchor.focus === 'function') { try { anchor.focus({ preventScroll: true }); } catch (x) { /* */ } }
+        return;
+    }
+    if (e.key === 'Tab') {
+        const f = _popFocusables(el);
+        if (!f.length) return;
+        const i = f.indexOf(document.activeElement);
+        e.stopPropagation();
+        if (i < 0) { e.preventDefault(); f[e.shiftKey ? f.length - 1 : 0].focus(); }
+        else if (e.shiftKey && i === 0) { e.preventDefault(); f[f.length - 1].focus(); }
+        else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+    }
+}
+/** The control a keyboard user lands on when the panel opens: the first option's control, else Done. */
+function _popFirstControl() {
+    const el = document.getElementById('skillOptionsPopover');
+    if (!el) return null;
+    const pick = (sel) => [...el.querySelectorAll(sel)].find((x) => !x.disabled && x.offsetParent !== null);
+    return pick('.tv-sko-body input, .tv-sko-body select, .tv-sko-body button')
+        || pick('[role="group"] select, [role="group"] input, [role="group"] button:not(.sko-tip)')
+        || pick('.tv-sko-foot .tv-btn-primary')
+        || _popFocusables(el).slice(-1)[0] || null;
+}
 
 /**
  * Open the option editor for one skill beside `anchorEl`.
@@ -895,14 +941,15 @@ export function openSkillOptionsPanel(categoryId, skillId, anchorEl, ctx = {}) {
     const rect = anchorEl && anchorEl.getBoundingClientRect ? anchorEl.getBoundingClientRect() : null;
     _pop = { categoryId, skillId, anchor: anchorEl || null, rect, onChange: ctx.onChange, opts: packOptions(categoryId, skillId, ctx.opts || {}) };
     _renderPopover();
-    if (_isTeacherView()) {
-        // Keyboard users land in the editor; Done / Esc hand focus back to the Options button.
-        const first = document.querySelector('#skillOptionsPopover .tv-sko-body input, #skillOptionsPopover .tv-sko-body select, #skillOptionsPopover .tv-sko-body button, #skillOptionsPopover .tv-sko-foot .tv-btn-primary');
-        if (first) { try { first.focus({ preventScroll: true }); } catch (e) { /* */ } }
-    }
+    // Keyboard users land in the editor in every view (ui3 check D2: the pupil's print dialog too); Done / Esc hand
+    // focus back to the Options button.
+    const first = _popFirstControl();
+    if (first) { try { first.focus({ preventScroll: true }); } catch (e) { /* */ } }
+    // Esc / Tab at once (the panel is open now); outside clicks from the next tick (the opening click is not one)
+    window.removeEventListener('keydown', _popKey, true);
+    window.addEventListener('keydown', _popKey, true);
     setTimeout(() => {
-        document.addEventListener('mousedown', _popOutside, true);
-        document.addEventListener('keydown', _popKey, true);
+        if (_pop) document.addEventListener('mousedown', _popOutside, true);
     }, 0);
 }
 
@@ -920,7 +967,7 @@ export function closeSkillOptionsPanel() {
     if (el) el.remove();
     if (typeof document !== 'undefined') {
         document.removeEventListener('mousedown', _popOutside, true);
-        document.removeEventListener('keydown', _popKey, true);
+        window.removeEventListener('keydown', _popKey, true);
     }
 }
 

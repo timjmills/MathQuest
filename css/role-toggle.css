@@ -361,3 +361,15 @@ body.student-mode .start-game-container .btn-primary {
 .student-sel-send { display: flex; gap: 8px; width: 100%; max-width: 640px; }
 .student-sel-send[hidden] { display: none; }
 .student-sel-send input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 10px; border: 2px solid var(--bg-card-light, #ccc); border-radius: 10px; font: inherit; background: var(--bg-card, #fff); color: var(--text-bright, #222); }
+
+/* ui3 check D4/D7/D8 (2026-11-03): the bar shows only with a skill selected; Send's link is a small pop-up ABOVE the bar
+   (dismissible), not a taller bar; toasts sit above the bar and never take a tap; a focused control scrolls clear of it.
+   --mq-selbar-h is set by unified-skills.js syncSelBarHeight (0 when the bar is not on screen). */
+.student-sel-bar[hidden] { display: none !important; }
+.student-sel-bar .student-sel-send { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); width: min(640px, calc(100% - 16px)); box-sizing: border-box; align-items: center; padding: 8px; background: var(--bg-card, #fff); border: 2px solid var(--mq-purple-l, #d9cffb); border-radius: 14px; box-shadow: 0 -4px 16px rgba(0,0,0,0.12); }
+.student-sel-bar .student-sel-send[hidden] { display: none; }
+.student-sel-x { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--bg-card-light, #ccc); background: transparent; color: var(--text-bright, #222); font: inherit; font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.student-sel-x:focus-visible { outline: 3px solid var(--mq-orange, #ff9f1c); outline-offset: 2px; }
+html { scroll-padding-bottom: var(--mq-selbar-h, 0px); }
+html.mq-selbar-on :is(.toast-notification, .mq-notify) { bottom: calc(var(--mq-selbar-h, 0px) + 12px) !important; pointer-events: none !important; }
+html.mq-selbar-on :is(.toast-notification, .mq-notify) :is(button, a) { pointer-events: auto !important; }

@@ -248,12 +248,15 @@ export function checkURLParameters() {
             if (parsed.settings && parsed.settings.help && typeof window.setHelpAfterWrong === 'function') {
                 window.setHelpAfterWrong(parsed.settings.help, { link: true });
             }
+            // ui3 check D9: a link a pupil sent from the home bar (?from=pupil) opens with neutral wording
+            if (urlParams.get('from') === 'pupil') parsed.fromPupil = true;
             showStudentLandingModal(parsed);
             return;
         }
 
         // Legacy code without pipe — treat as enhanced with empty settings → show landing modal
         const parsed = parseEnhancedSkillCode(code + '|');
+        if (urlParams.get('from') === 'pupil') parsed.fromPupil = true;
         showStudentLandingModal(parsed);
     }
 }

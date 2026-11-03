@@ -33,6 +33,7 @@
 // looks the same on the student page and the teacher site.
 
 import { buildSheet as buildSheetRaw, sheetDocument } from './print-sheet.js';
+import * as printSheetNS from './print-sheet.js';
 // every request this dialog sends, last few kept for the gate (ws-simple-print reads lastSimpleRequests)
 const REQS = [];
 const buildSheet = (req) => { REQS.push(req); if (REQS.length > 40) REQS.shift(); return buildSheetRaw(req); };
@@ -53,6 +54,17 @@ const FACT_AUTO = { S: 10, M: 6, L: 5 };
 const FACT_MAX_COLS = 10, CELL_MAX_COLS = 6;
 // Mixed up layouts (owner 2026-11-03): sent as req.mixLayout; absent = 'rows'
 const MIX_LAYOUTS = { rows: ['Rows by type', 'each row one kind, full-size boxes'], grid: ['One grid', 'one grid, bigger problems stand two rows tall'], even: ['Even grid', 'one even grid, bigger problems get less room'] };
+/**
+ * The layouts the print engine can really draw (ui3 check D1). The engine announces them as `MIX_LAYOUTS` exported from
+ * print-sheet.js (an array of ids, or an object keyed by id; the mixed-m2 lane adds it and reports fits.mixLayout).
+ * Absent today: the Layout choice stays hidden (the request field and the saved value are still carried).
+ */
+export function engineMixLayouts() {
+    const e = printSheetNS.MIX_LAYOUTS;
+    const ids = Array.isArray(e) ? e : e && typeof e === 'object' ? Object.keys(e) : [];
+    return ids.filter((v) => MIX_LAYOUTS[v]);
+}
+const FELL_BACK_NOTE = 'Mixed up isn’t possible for these skills yet — printing in sections.';
 const MAX_PROBLEMS = 400, MAX_PAGES = 30, MAX_SETS = 30;
 
 /* ================================================================= state */
@@ -272,7 +284,7 @@ export async function buildSimple(list, o) {
         // "7, 8, 9, 10 should be just for small problems"), is planned here instead, part by part
         if (r.fellBack && (colsAsked(o) || (!list.every(isFactSkill) && (r.colsList || []).concat([r.cols]).some((c) => c > CELL_MAX_COLS)))) {
             const r2 = await buildSimple(list, Object.assign({}, o, { arrange: 'sections' }));
-            return Object.assign(r2, { fellBack: true, notes: ['Mixed up does not fit these problems: they print in sections.', ...(r2.notes || [])] });
+            return Object.assign(r2, { fellBack: true, notes: [FELL_BACK_NOTE, ...(r2.notes || []).filter((t) => !/prints in sections/i.test(t))] });
         }
         return r;
     }
@@ -441,7 +453,10 @@ function finish(res, { counts, arrangement, notes, list, capped = [], o = {} }) 
         types: arrangement === 'sections' ? typesOf(list, counts, fs, capped) : [],
         capped: (capped || []).find(Boolean) || (colsAsked(o) && first.cols && first.cols < colsAsked(o) ? first.cols : 0), colsMode: modeOf(o),
         cols: first.cols || 0, rows: fs.length === 1 && first.cols ? Math.ceil(page1Cells(res) / first.cols) : first.rows || 0, perPage: page1Cells(res), colsList,
-        notes: [...notes, ...engineNotes], firstHtml: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml || '',
+        // Mixed up asked, the engine printed sections: ONE plain reason, not the engine's own wording (ui3 check D1)
+        notes: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t)))
+            ? [...notes, FELL_BACK_NOTE, ...engineNotes.filter((t) => !/prints in sections/i.test(t))] : [...notes, ...engineNotes],
+        firstHtml: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml || '',
     };
 }
 
@@ -506,7 +521,8 @@ export function summaryLine(b, o) {
     if (b.rows && b.cols && b.cols * b.rows === b.perPage && (b.arrangement === 'facts' || (cl.length === 1 && (b.colsList || []).length <= 1 && !b.fellBack))) grid = `${b.cols} columns${one} × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
     else if (b.types && b.types.length > 1) grid = `${b.types.map((t) => `${t.name} ${t.min === t.max ? t.min : `${t.min}–${t.max}`} across${t.atMax ? mx : ''}`).join(' · ')} · ${b.perPage} on page 1`;
     else if (b.fellBack) grid = `In sections, ${cl.length > 1 ? `${Math.min(...cl)}–${Math.max(...cl)}` : cl[0]} columns${one} · ${b.perPage} on page 1`;
-    else if (cl.length === 1) grid = `${cl[0]} columns${one} · ${b.perPage} on page 1`;
+    else if (cl.length === 1) grid = `${b.arrangement === 'mixed' ? 'Mixed up, ' : ''}${cl[0]} columns${one} · ${b.perPage} on page 1`;
+    else if (b.arrangement === 'mixed') grid = `Mixed up, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     else grid = `Each skill its own grid, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     return [grid, pages, probs, ...(sets > 1 ? [`${sets} sets, each with different problems`] : []), key].join(' · ');
 }
@@ -813,11 +829,14 @@ function render() {
         // short: "Long division · Tables: 6, 7" (the long wording in brackets is for the options sheet)
         osum = osum.split(' · ').map((x) => x.replace(/\s*\(.*$/, '').replace(/^How it is written:\s*/, '').trim()).filter(Boolean).join(' · ');
         const hasOpts = (() => { try { return (offeredOptionsFor(s.categoryId, s.skillId) || []).length > 0; } catch (e) { return false; } })();
-        h += `<li class="sp-skill${so.inline ? ' has-band' : ''}"><span class="sp-skill-name">${esc(s.label)}${osum ? `<span class="sp-optsum">${esc(osum)}</span>` : ''}</span>${so.inline}`;
-        if (hasOpts) h += `<button type="button" class="sp-optbtn" data-sp="skoptions" data-v="${i}" aria-label="${esc(s.label)}: all options" aria-haspopup="dialog"><span aria-hidden="true">&#9881;</span><span>Options</span></button>`;
+        // ui3 check D5: ONE place to change a skill's options: with an Options sheet, its Highest number and Tables live
+        // there (the sheet offers both), not again on the row; the row is name · ⚙ · how many
+        const inline = hasOpts ? '' : so.inline;
+        h += `<li class="sp-skill${inline ? ' has-band' : ''}${hasOpts ? ' has-optbtn' : ''}"><span class="sp-skill-name">${esc(s.label)}${osum ? `<span class="sp-optsum">${esc(osum)}</span>` : ''}</span>${inline}`;
+        if (hasOpts) h += `<button type="button" class="sp-optbtn" data-sp="skoptions" data-v="${i}" aria-label="Options for ${esc(s.label)}" aria-haspopup="dialog" title="Options"><span aria-hidden="true">&#9881;</span></button>`;
         if (many) h += `<input id="spAmt${i}" class="sp-amt${a && a.bad ? ' is-bad' : ''}" data-amt="${i}" type="text" inputmode="numeric" autocomplete="off" value="${esc(s.amt)}" placeholder="even" aria-label="${esc(s.label)}: number of problems or %" aria-invalid="${a && a.bad ? 'true' : 'false'}">`;
         if (b && b.counts && many) h += `<span class="sp-got" aria-label="prints">${b.counts[i] || 0}</span>`;
-        h += so.below;
+        if (!hasOpts) h += so.below;
         h += `</li>`;
     });
     h += `</ul></section>`;
@@ -841,7 +860,7 @@ function render() {
     const colsNow = o.cols;
     h += `</div><label class="sp-cols"><span>Columns</span><select id="spCols" data-sp-cols>
         <option value="auto"${colsNow === 'auto' ? ' selected' : ''}>Auto — fitted by size${autoCols ? ` (${autoCols})` : ''}</option>
-        ${Array.from({ length: colMax }, (_, k) => k + 1).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c === 1 ? '1 — each problem across the page' : c}</option>`).join('')}
+        ${Array.from({ length: colMax }, (_, k) => k + 1).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c === 1 ? '1 (across the page)' : c}</option>`).join('')}
     </select></label>`;
     if (colsNow !== 'auto') h += `<div class="sp-row sp-cmode"><div class="sp-seg" role="radiogroup" aria-label="Columns mode">${[['aim', `Aim for ${colsNow}`], ['exact', `Exactly ${colsNow}`]].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="cmode" data-v="${v}" aria-checked="${P.colsMode === v}">${l}</button>`).join('')}</div><span class="sp-hint">${P.colsMode === 'exact' ? `every part ${colsNow} across; bigger problems at their own max` : `${colsNow} across where it fits (one fewer when that ends a part on a full row), else the most that fit`}</span></div>`;
     h += `</section>`;
@@ -859,7 +878,8 @@ function render() {
     // More options
     h += `<details class="sp-more"${S.moreOpen ? ' open' : ''}><summary data-sp="more">More options</summary><div class="sp-more-body">`;
     if (many) h += `<div class="sp-row"><span class="sp-lbl">Arrange</span><div class="sp-seg" role="radiogroup" aria-label="Arrange">${[['sections', 'In sections'], ['mixed', 'Mixed up']].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="arrange" data-v="${v}" aria-checked="${P.arrange === v}">${l}</button>`).join('')}</div></div>`;
-    if (many && P.arrange === 'mixed') { const ml = MIX_LAYOUTS[P.mixLayout] ? P.mixLayout : 'rows'; h += `<div class="sp-row sp-mixl"><span class="sp-lbl">Layout</span><div class="sp-seg" role="radiogroup" aria-label="Mixed up layout">${Object.entries(MIX_LAYOUTS).map(([v, [l]]) => `<button type="button" role="radio" class="sp-segb" data-sp="mixlayout" data-v="${v}" aria-checked="${ml === v}">${l}</button>`).join('')}</div><span class="sp-hint">${MIX_LAYOUTS[ml][1]}</span></div>`; }
+    const mixIds = engineMixLayouts();
+    if (many && P.arrange === 'mixed' && mixIds.length > 1) { const ml = mixIds.includes(P.mixLayout) ? P.mixLayout : mixIds[0]; h += `<div class="sp-row sp-mixl"><span class="sp-lbl">Layout</span><div class="sp-seg" role="radiogroup" aria-label="Mixed up layout">${Object.entries(MIX_LAYOUTS).filter(([v]) => mixIds.includes(v)).map(([v, [l]]) => `<button type="button" role="radio" class="sp-segb" data-sp="mixlayout" data-v="${v}" aria-checked="${ml === v}">${l}</button>`).join('')}</div><span class="sp-hint">${MIX_LAYOUTS[ml][1]}</span></div>`; }
     h += `<button type="button" class="sp-link" data-sp="newnums">New numbers</button>`;
     if (typeof S.ctx.more === 'function') h += `<button type="button" class="sp-link" data-sp="full">All print options (page types, examples, key style, sets)…</button>`;
     h += `</div></details>`;
@@ -1085,5 +1105,5 @@ function doPreview(e) {
 
 /** For checks: the open dialog's state. */
 export function simplePrintState() {
-    return S ? { list: S.list.map((s) => ({ key: keyOf(s), amt: s.amt, opts: s.opts || null })), quick: S.ctx.quick || null, prefs: Object.assign({}, P), built: S.built ? { pages: S.built.pages, total: S.built.total, cols: S.built.cols, rows: S.built.rows, perPage: S.built.perPage, arrangement: S.built.arrangement, counts: S.built.counts, sets: S.built.sets, line: summaryLine(S.built, opts()) } : null, busy: !!S.busy, probes: Object.assign({}, S.probes) } : null;
+    return S ? { list: S.list.map((s) => ({ key: keyOf(s), amt: s.amt, opts: s.opts || null })), quick: S.ctx.quick || null, prefs: Object.assign({}, P), built: S.built ? { pages: S.built.pages, total: S.built.total, cols: S.built.cols, rows: S.built.rows, perPage: S.built.perPage, arrangement: S.built.arrangement, fellBack: !!S.built.fellBack, counts: S.built.counts, sets: S.built.sets, line: summaryLine(S.built, opts()) } : null, busy: !!S.busy, probes: Object.assign({}, S.probes) } : null;
 }

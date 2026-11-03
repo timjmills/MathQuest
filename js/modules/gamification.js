@@ -1455,7 +1455,10 @@ export function showStudentLandingModal(parsed) {
     overlay.id = 'studentLandingOverlay';
     overlay.className = 'landing-overlay';
     overlay.innerHTML = '<div class="landing-modal">' +
-        (manySkills
+        (parsed && parsed.fromPupil
+            // ui3 check D9: a link a pupil sent is not "your teacher": neutral wording only
+            ? '<h2>Practice set: ' + nSkills + ' skill' + (nSkills === 1 ? '' : 's') + '</h2>'
+            : manySkills
             ? '<h2>Ready to Practice ' + nSkills + ' Skills?</h2>' +
               '<p>Your teacher has set up a practice session for you. Click Start Playing!</p>'
             : '<h2>Ready to Practice!</h2>' +

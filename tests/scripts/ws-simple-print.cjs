@@ -45,6 +45,7 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
     await page.evaluate(() => window.__mqLoadDeferred());
     const fails = [];
     const rows = [];
+    const F2 = (t) => fails.push('UI3 ' + t);
     for (const name of ONLY) {
         const list = SETS[name];
         for (const size of SIZES) {
@@ -355,14 +356,40 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                 if (q('[data-sp="mixlayout"]')) F('MIXLAYOUT the layout choice shows for In sections');
                 await click('[data-sp="arrange"][data-v="mixed"]');
                 const btns = [...document.querySelectorAll('[data-sp="mixlayout"]')].map((b) => b.dataset.v + ':' + b.getAttribute('aria-checked'));
-                if (JSON.stringify(btns) !== JSON.stringify(['rows:true', 'grid:false', 'even:false'])) F(`MIXLAYOUT Mixed up shows ${JSON.stringify(btns)}, not Rows by type (default) · One grid · Even grid`);
-                for (const v of ['grid', 'even', 'rows']) {
-                    if (!(await click(`[data-sp="mixlayout"][data-v="${v}"]`))) { F(`MIXLAYOUT no ${v} button`); continue; }
-                    const mixed = m.lastSimpleRequests().filter((r) => r.arrangement === 'mixed').slice(-1)[0];
-                    if (!mixed || mixed.mixLayout !== v) F(`MIXLAYOUT ${v} does not reach the request (${mixed && mixed.mixLayout})`);
-                    if (!q('.sp-mixl .sp-hint') || !q('.sp-mixl .sp-hint').textContent.trim()) F(`MIXLAYOUT ${v} has no hint`);
+                // ui3 check D1: the Layout choice shows ONLY when the engine draws the layouts (print-sheet.js MIX_LAYOUTS);
+                // a choice that changes nothing on the page is not offered
+                const eng = m.engineMixLayouts ? m.engineMixLayouts() : null;
+                if (!eng || eng.length < 2) {
+                    if (btns.length) F(`MIXLAYOUT the Layout choice shows (${btns.join(' ')}) but the engine draws no layouts (print-sheet.js has no MIX_LAYOUTS)`);
+                } else {
+                    if (btns.length !== eng.length) F(`MIXLAYOUT Mixed up shows ${JSON.stringify(btns)}, the engine draws ${eng.join(', ')}`);
+                    const htmls = {};
+                    for (const v of eng) {
+                        if (!(await click(`[data-sp="mixlayout"][data-v="${v}"]`))) { F(`MIXLAYOUT no ${v} button`); continue; }
+                        const mixed = m.lastSimpleRequests().filter((r) => r.arrangement === 'mixed').slice(-1)[0];
+                        if (!mixed || mixed.mixLayout !== v) F(`MIXLAYOUT ${v} does not reach the request (${mixed && mixed.mixLayout})`);
+                        if (!q('.sp-mixl .sp-hint') || !q('.sp-mixl .sp-hint').textContent.trim()) F(`MIXLAYOUT ${v} has no hint`);
+                        htmls[v] = (q('#spFrame') && q('#spFrame').srcdoc) || '';
+                    }
+                    if (new Set(Object.values(htmls)).size < 2) F('MIXLAYOUT every layout prints the same page');
                 }
-                await click('[data-sp="mixlayout"][data-v="even"]');
+                // the request field is carried all the same (a saved / shared value reaches the engine once it draws it)
+                window.closeSimplePrint();
+                m.openQuickPrint({ name: 'kept even', skills: [{ categoryId: 'addition', skillId: 'add_facts' }, { categoryId: 'subtraction', skillId: 'missing_add_sub' }], print: { how: 'pages', n: 1, arrange: 'mixed', mixLayout: 'even' } });
+                await idle();
+                {
+                    const mixed = m.lastSimpleRequests().filter((r) => r.arrangement === 'mixed').slice(-1)[0];
+                    if (!mixed || mixed.mixLayout !== 'even') F(`MIXLAYOUT a kept 'even' does not reach the request (${mixed && mixed.mixLayout})`);
+                    // ui3 check D1: Mixed up asked, the engine printed sections: the dialog says why in plain words, and the
+                    // summary says "In sections" only then
+                    const b = m.simplePrintState().built || {};
+                    const note = (q('.sp-note') || {}).textContent || '';
+                    const line = String(b.line || '');
+                    if (b.fellBack && !/Mixed up isn.t possible for these skills yet/.test(note)) F(`MIXLAYOUT fell back to sections without saying why ("${note.slice(0, 120)}")`);
+                    if (b.fellBack && /until boxes of different sizes/.test(note)) F('MIXLAYOUT the fallback note is the engine\'s wording');
+                    if (!b.fellBack && /In sections/.test(line)) F(`MIXLAYOUT Mixed up printed mixed but the summary says "${line}"`);
+                    out.info.push(`MIXLAYOUT fallback: ${b.fellBack ? 'fell back' : 'mixed'} · "${note.slice(0, 80)}"`);
+                }
                 const st3 = m.simplePrintState();
                 if (st3.prefs.mixLayout !== 'even') F('MIXLAYOUT not kept in the prefs');
                 const rec3 = m.saveQuickPrint('Mixed even', [{ categoryId: 'addition', skillId: 'add_facts' }, { categoryId: 'subtraction', skillId: 'missing_add_sub' }], Object.assign({}, st3.prefs, { n: 1 }));
@@ -372,7 +399,8 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                 if (!old || old.print.mixLayout !== undefined) F('MIXLAYOUT an old code without it does not decode unchanged');
                 // Columns 1
                 const opt1 = q('#spCols option[value="1"]');
-                if (!opt1 || !/each problem across the page/.test(opt1.textContent)) F('COLS1 Columns has no "1 — each problem across the page"');
+                if (!opt1 || !/across the page/.test(opt1.textContent)) F('COLS1 Columns has no "1 (across the page)"');
+                if (opt1 && opt1.textContent.length > 22) F(`COLS1 the 1 option "${opt1.textContent}" is long enough to widen the select on a phone (ui3 check D6)`);
                 if (q('#spCols option[value="7"]') && !m.simplePrintState().list.some((x) => /_facts$/.test(x.key))) F('COLS1 7+ offered without facts');
                 await click('[data-sp="arrange"][data-v="sections"]');
                 const sel = q('#spCols');
@@ -433,7 +461,8 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
             await new Promise((r) => setTimeout(r, 50));
             const btn = (id) => document.getElementById(id);
             if (!btn('studentSelPrintBtn') || !btn('studentSelPrintBtn').disabled || !btn('studentSelPlayBtn').disabled || !btn('studentSelSendBtn').disabled) F('STUDENTBAR buttons not disabled with nothing selected');
-            if (!/Pick skills/.test((btn('studentSelCount') || {}).textContent || '')) F('STUDENTBAR no "Pick skills" hint');
+            // ui3 check D7: with nothing selected the bar is not shown at all (it covered the first Quick Start row)
+            if (btn('studentSelBar') && btn('studentSelBar').getBoundingClientRect().height > 0) F('STUDENTBAR the bar shows with nothing selected');
             const want = [['addition', 'add_facts', {}], ['subtraction', 'sub_facts', {}], ['multiplication', 'mult_facts', { constant: [6, 7] }]];
             for (const [c, k, o] of want) W.UnifiedSkills.add({ categoryId: c, skillId: k, skillLabel: k, opts: o });
             await new Promise((r) => setTimeout(r, 300));
@@ -469,6 +498,156 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
         });
         fails.push(...r3);
         rows.push('STUDENTBAR checked');
+
+        // UI3 (independent check of bf7b7656, 2026-11-03), each FAILS on that commit:
+        //   ROWS    D5  each print skill row: one 44 x 44 gear "Options for <skill>", no second place for the same options
+        //               (Highest number select / Tables link), the name on at most 2 lines, the row <= 110 px, at 1366 / 820
+        //   COLSFIT D6  the Columns select stays inside the dialog at 390
+        //   OPTKEY  D2  the Options panel takes keyboard focus on open (student view), Tab stays in it
+        //   OPTESC  D3  Esc on an open Options panel closes only the panel; focus goes back to the gear
+        //   TOAST   D4  with the bar shown, an "Added …" toast never covers Play / Send / Print
+        //   BAR     D7  Send's link is a pop-up above the bar, <= 25 % of a 390 x 844 screen, closable with Esc
+        //   FOCUS   D8  a control focused with Tab is never under the bar (scroll-padding-bottom = the bar's height)
+        //   PUPIL   D9  a link sent from the pupil bar opens "Practice set: n skills", never "Your teacher has set up …";
+        //               a teacher link is unchanged
+        console.error('ws-simple-print: UI3 …');
+        const mod = '/js/modules/simple-print.js';
+        const idleJs = `(async () => { const m = await import('${mod}'); for (let i = 0; i < 120; i++) { const st = m.simplePrintState(); if (st && st.built && !st.busy) return true; await new Promise((r) => setTimeout(r, 150)); } return false; })()`;
+        await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.closeSimplePrint) window.closeSimplePrint(); if (window.state) { window.state.isPlaying = false; window.state.isMixedMode = false; } if (window.showView) window.showView('homeView'); });
+        const three = [{ categoryId: 'addition', skillId: 'add_facts' }, { categoryId: 'division', skillId: 'div_facts' }, { categoryId: 'multiplication', skillId: 'mult_facts' }];
+        for (const w of [1366, 820]) {
+            await page.setViewport({ width: w, height: w === 1366 ? 768 : 1180, deviceScaleFactor: 1 });
+            await page.evaluate((three) => { window.openSimplePrint(three, { from: 'student' }); }, three);
+            await page.evaluate(idleJs);
+            const rr = await page.evaluate(() => [...document.querySelectorAll('.sp-skills .sp-skill')].map((li) => {
+                const nm = li.querySelector('.sp-skill-name');
+                const lab = nm ? (nm.firstChild && nm.firstChild.nodeType === 3 ? nm.firstChild : nm) : null;
+                let lines = 0;
+                if (lab) { const rg = document.createRange(); rg.selectNodeContents(lab); lines = new Set([...rg.getClientRects()].map((r) => Math.round(r.top))).size; }
+                const gears = [...li.querySelectorAll('.sp-optbtn')];
+                const g = gears[0] && gears[0].getBoundingClientRect();
+                return { name: nm ? nm.textContent.trim().slice(0, 30) : '?', h: Math.round(li.getBoundingClientRect().height), lines, gears: gears.length, gw: g ? Math.round(g.width) : 0, gh: g ? Math.round(g.height) : 0, label: gears[0] ? gears[0].getAttribute('aria-label') : '', dup: li.querySelectorAll('.sp-band, .sp-skopt').length };
+            }));
+            for (const x of rr) {
+                if (x.gears !== 1) F2(`ROWS @${w} ${x.name}: ${x.gears} Options buttons`);
+                else if (x.gw < 44 || x.gh < 44 || x.gw > 56) F2(`ROWS @${w} ${x.name}: Options ${x.gw}x${x.gh}, want a 44 px gear`);
+                if (x.gears && !/^Options for /.test(x.label)) F2(`ROWS @${w} ${x.name}: Options is labelled "${x.label}"`);
+                if (x.dup) F2(`ROWS @${w} ${x.name}: the row has a second place for the same options (Highest number / Tables)`);
+                if (x.lines > 2) F2(`ROWS @${w} ${x.name}: the name wraps to ${x.lines} lines`);
+                if (x.h > 110) F2(`ROWS @${w} ${x.name}: row ${x.h} px tall (> 110)`);
+            }
+            rows.push(`ROWS @${w}: ${rr.map((x) => `${x.name} ${x.h}px/${x.lines}l`).join(' · ')}`);
+            await page.evaluate(() => window.closeSimplePrint());
+        }
+        // COLSFIT + OPTKEY + OPTESC at 390 and 1366 (student view)
+        const two = [{ categoryId: 'division', skillId: 'div_facts' }, { categoryId: 'addition', skillId: 'add_facts' }];
+        for (const [w, tv] of [[390, false], [1366, false], [1366, true]]) {
+            await page.setViewport({ width: w, height: w === 390 ? 844 : 768, deviceScaleFactor: 1 });
+            await page.evaluate((tv) => { document.body.classList.toggle('teacher-mode', tv); document.body.classList.toggle('student-mode', !tv); }, tv);
+            await page.evaluate((two, tv) => window.openSimplePrint(two, { from: tv ? 'tray' : 'student' }), two, tv);
+            await page.evaluate(idleJs);
+            if (w === 390) {
+                const fit = await page.evaluate(() => { const s = document.querySelector('#spCols'), d = document.querySelector('.sp-dialog'); if (!s || !d) return null; const a = s.getBoundingClientRect(), b = d.getBoundingClientRect(); return { r: Math.round(a.right), dr: Math.round(b.right), vw: window.innerWidth }; });
+                if (!fit) F2('COLSFIT no Columns select');
+                else if (fit.r > fit.dr || fit.r > fit.vw) F2(`COLSFIT @390 the Columns select ends at ${fit.r}, past the dialog (${fit.dr})`);
+            }
+            await page.focus('[data-sp="skoptions"][data-v="0"]');
+            await page.keyboard.press('Enter');
+            await new Promise((r) => setTimeout(r, 250));
+            const k = await page.evaluate(() => { const p = document.getElementById('skillOptionsPopover'); return { open: !!p, inside: !!(p && p.contains(document.activeElement)) }; });
+            if (!k.open) { F2(`OPTKEY @${w}${tv ? ' teacher' : ''} Enter on Options opens no panel`); await page.evaluate(() => window.closeSimplePrint()); continue; }
+            if (!k.inside) F2(`OPTKEY @${w}${tv ? ' teacher' : ''} the Options panel opens without keyboard focus (student view)`);
+            let out = 0;
+            const where = [];
+            for (let i = 0; i < 30; i++) { await page.keyboard.press('Tab'); const d = await page.evaluate(() => { const p = document.getElementById('skillOptionsPopover'), a = document.activeElement; return p && p.contains(a) ? '' : `${a.tagName}.${String(a.className).slice(0, 20)} "${(a.getAttribute('aria-label') || a.textContent || '').trim().slice(0, 24)}" (panel ${p ? 'open' : 'gone'})`; }); if (d) { out++; where.push(d); } }
+            if (out) F2(`OPTKEY @${w}${tv ? ' teacher' : ''} Tab left the open Options panel ${out} times in 30 (${where.slice(0, 2).join('; ')})`);
+            await page.keyboard.press('Escape');
+            await new Promise((r) => setTimeout(r, 150));
+            const e = await page.evaluate(async (mod) => ({ pop: !!document.getElementById('skillOptionsPopover'), open: !!(await import(mod)).simplePrintState(), focus: (document.activeElement && document.activeElement.dataset && document.activeElement.dataset.sp) || (document.activeElement && document.activeElement.tagName) }), mod);
+            if (e.pop) F2(`OPTESC @${w}${tv ? ' teacher' : ''} Esc leaves the Options panel open`);
+            if (!e.open) F2(`OPTESC @${w}${tv ? ' teacher' : ''} one Esc closed the whole print dialog too`);
+            if (e.focus !== 'skoptions') F2(`OPTESC @${w}${tv ? ' teacher' : ''} focus went to ${e.focus}, not back to Options`);
+            await page.evaluate(() => window.closeSimplePrint && window.closeSimplePrint());
+        }
+        await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); });
+        // TOAST / BAR / FOCUS on the pupil home
+        for (const w of [1366, 820, 390]) {
+            await page.setViewport({ width: w, height: w === 1366 ? 768 : w === 820 ? 1180 : 844, deviceScaleFactor: 1 });
+            const t = await page.evaluate(async () => {
+                const W = window, out = [];
+                if (W.showView) W.showView('homeView');
+                W.clearSkillQueue && W.clearSkillQueue();
+                await new Promise((r) => setTimeout(r, 100));
+                W.UnifiedSkills.add({ categoryId: 'addition', skillId: 'add_facts', skillLabel: 'Addition Facts' });
+                W.UnifiedSkills.add({ categoryId: 'division', skillId: 'div_facts', skillLabel: 'Division Facts' });
+                await new Promise((r) => setTimeout(r, 300));
+                window.scrollTo(0, 0);
+                await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+                const bar = document.getElementById('studentSelBar');
+                const bh = Math.round(bar.getBoundingClientRect().height);
+                if (W.showNotification) W.showNotification('Added Addition Facts', 'success');
+                if (W.showToast) W.showToast('Added Division Facts', 'success');
+                await new Promise((r) => setTimeout(r, 400));
+                for (const id of ['studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) {
+                    const b = document.getElementById(id), r = b.getBoundingClientRect();
+                    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                    if (!hit || !b.contains(hit)) out.push(`TOAST ${id} is covered by ${hit ? (hit.className || hit.tagName) : 'nothing'}`);
+                }
+                document.querySelectorAll('.toast-notification, .mq-notify').forEach((x) => x.remove());
+                // FOCUS: focusables in homeView, focused one by one, end clear of the bar
+                await new Promise((r) => setTimeout(r, 100));
+                const spad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingBottom) || 0;
+                const brNow = bar.getBoundingClientRect();
+                const cover = brNow.bottom >= window.innerHeight - 2 ? Math.round(window.innerHeight - brNow.top) : 0;
+                if (Math.abs(spad - cover) > 4) out.push(`FOCUS scroll-padding-bottom ${spad}px, the bar covers ${cover}px (top ${Math.round(brNow.top)}, bottom ${Math.round(brNow.bottom)}, ${window.innerHeight}, scrollY ${Math.round(scrollY)})`);
+                const els = [...document.querySelectorAll('#homeView button, #homeView select, #homeView input, #homeView a[href]')].filter((x) => x.offsetParent !== null && !bar.contains(x) && !x.disabled).slice(0, 80);
+                const under = [];
+                for (const x of els) {
+                    x.focus();
+                    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+                    const r = x.getBoundingClientRect(), br = bar.getBoundingClientRect();
+                    if (br.height && br.bottom >= window.innerHeight - 2 && r.bottom > br.top + 2 && r.top < br.bottom) under.push(x.id || String(x.className).slice(0, 30) || x.tagName);
+                }
+                if (under.length) out.push(`FOCUS ${under.length} focused controls under the bar (${under.slice(0, 3).join(', ')})`);
+                if (document.activeElement) document.activeElement.blur();
+                window.scrollTo(0, 0);
+                await new Promise((r) => setTimeout(r, 100));
+                // BAR: Send pop-up
+                document.getElementById('studentSelSendBtn').click();
+                await new Promise((r) => setTimeout(r, 200));
+                const box = document.getElementById('studentSendBox');
+                const top = Math.min(bar.getBoundingClientRect().top, box.getBoundingClientRect().top);
+                const share = (window.innerHeight - top) / window.innerHeight;
+                if (box.hidden) out.push('BAR Send shows no link');
+                if (bar.getBoundingClientRect().height > bh + 2) out.push(`BAR Send makes the bar taller (${bh} → ${Math.round(bar.getBoundingClientRect().height)} px)`);
+                if (window.innerWidth <= 420 && share > 0.25) out.push(`BAR bar + link take ${Math.round(share * 100)} % of the screen (> 25 %)`);
+                const link = document.getElementById('studentSendLink').value;
+                return { out, link, bh, share: Math.round(share * 100) };
+            });
+            for (const x of t.out) F2(`${x} @${w}`);
+            await page.keyboard.press('Escape');
+            await new Promise((r) => setTimeout(r, 100));
+            if (!(await page.evaluate(() => document.getElementById('studentSendBox').hidden))) F2(`BAR @${w} Esc does not close the Send link`);
+            rows.push(`BAR @${w}: ${t.bh}px, with the link ${t.share} % of the screen`);
+            if (w === 390) {
+                if (!/[?&]from=pupil\b/.test(t.link)) F2(`PUPIL the pupil's Send link has no from=pupil (${t.link})`);
+                // open the pupil's link here, then the same link as a teacher sends it
+                const q = t.link.replace(/^[^?]*/, '');
+                const p2 = await app.browser.newPage();
+                await p2.goto(app.base + '/index.html' + q, { waitUntil: 'networkidle2', timeout: 60000 });
+                await p2.waitForSelector('#studentLandingOverlay', { timeout: 20000 }).catch(() => {});
+                const said = await p2.evaluate(() => (document.querySelector('#studentLandingOverlay .landing-modal') || {}).innerText || '');
+                if (/Your teacher/i.test(said) || !/Practice set: 2 skills/.test(said)) F2(`PUPIL a pupil's link opens with "${said.split('\n').slice(0, 2).join(' / ')}"`);
+                await p2.goto(app.base + '/index.html' + q.replace(/[?&]from=pupil/, ''), { waitUntil: 'networkidle2', timeout: 60000 });
+                await p2.waitForSelector('#studentLandingOverlay', { timeout: 20000 }).catch(() => {});
+                const said2 = await p2.evaluate(() => (document.querySelector('#studentLandingOverlay .landing-modal') || {}).innerText || '');
+                if (!/Your teacher has set up/.test(said2)) F2(`PUPIL a teacher link no longer opens with its wording ("${said2.split('\n')[0]}")`);
+                await p2.close();
+            }
+        }
+        await page.evaluate(() => { window.clearSkillQueue && window.clearSkillQueue(); });
+        rows.push('UI3 checked');
+
     }
     console.log(rows.join('\n'));
     for (const f of fails) console.log('  FAIL ' + f);

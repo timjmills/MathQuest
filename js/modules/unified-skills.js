@@ -574,7 +574,11 @@ export function printFromQueue() {
 // ---- owner 2026-11-03: the pupil home's bottom bar for the selected skills: "n skills selected · Play · Send · Print"
 const selItems = () => (window.skillQueue || []).map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts && Object.keys(s.opts).length ? s.opts : undefined }));
 
-/** Enable the bar's buttons when at least one skill is selected; say how many (else "Pick skills"). */
+/**
+ * The bar shows only while at least one skill is selected (ui3 check D7, owner: "when skills are selected … there should
+ * be a play/send/print"); it says how many. Its height is kept in --mq-selbar-h so toasts sit above it (D4) and a focused
+ * control scrolls clear of it (D8).
+ */
 export function updateStudentSelBar() {
     if (typeof document === 'undefined') return;
     const n = (window.skillQueue || []).length;
@@ -583,6 +587,60 @@ export function updateStudentSelBar() {
     if (c) c.textContent = n === 0 ? 'Pick skills' : `${n} skill${n === 1 ? '' : 's'} selected`;
     const box = document.getElementById('studentSendBox');
     if (box && !box.hidden) box.hidden = true;   // a link made for an older selection is not kept
+    const bar = document.getElementById('studentSelBar');
+    if (bar) bar.hidden = n === 0;
+    installSelBarWatch();
+    syncSelBarHeight();
+    // the queue's heavy UI work is debounced: measure again once the cards have settled
+    clearTimeout(_selLate); _selLate = setTimeout(() => { try { syncSelBarHeight(); } catch (e) { /* */ } }, 400);
+}
+
+/** --mq-selbar-h on <html>: the space the bar (and its Send pop-up) takes at the bottom of the screen, 0 when not shown. */
+export function syncSelBarHeight() {
+    if (typeof document === 'undefined') return 0;
+    const bar = document.getElementById('studentSelBar');
+    let h = 0;
+    if (bar && !bar.hidden && bar.offsetParent !== null) {
+        const r = bar.getBoundingClientRect();
+        const box = document.getElementById('studentSendBox');
+        const top = box && !box.hidden && box.offsetParent !== null ? Math.min(r.top, box.getBoundingClientRect().top) : r.top;
+        // only while the bar is pinned to the bottom edge (sticky); a bar sitting mid-page covers nothing
+        if (r.bottom >= window.innerHeight - 2) h = Math.max(0, Math.ceil(window.innerHeight - top));
+    }
+    const root = document.documentElement;
+    const was = root.style.getPropertyValue('--mq-selbar-h');
+    if (was !== h + 'px') root.style.setProperty('--mq-selbar-h', h + 'px');
+    root.classList.toggle('mq-selbar-on', h > 0);
+    return h;
+}
+
+let _selWatch = false, _selLate = 0;
+function installSelBarWatch() {
+    if (_selWatch || typeof window === 'undefined' || typeof document === 'undefined') return;
+    const bar = document.getElementById('studentSelBar');
+    if (!bar) return;
+    _selWatch = true;
+    let raf = 0;
+    const sync = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; try { syncSelBarHeight(); } catch (e) { /* */ } }); };
+    // the bar's own size, and the page under it (cards added after a pick move where the sticky bar sits)
+    if (typeof ResizeObserver === 'function') { try { const ro = new ResizeObserver(sync); ro.observe(bar); ro.observe(document.body); const home = document.getElementById('homeView'); if (home) ro.observe(home); } catch (e) { /* */ } }
+    window.addEventListener('resize', sync, { passive: true });
+    window.addEventListener('scroll', sync, { passive: true });
+    // the bar lives in homeView: switching views shows / hides it without a resize of its own
+    if (typeof MutationObserver === 'function') {
+        const home = document.getElementById('homeView');
+        if (home) { try { new MutationObserver(sync).observe(home, { attributes: true, attributeFilter: ['class', 'style', 'hidden'] }); } catch (e) { /* */ } }
+    }
+    // D8: a control reached with Tab never ends up under the bar (scroll-padding-bottom covers scrolling; this covers a
+    // control already on screen but behind it)
+    document.addEventListener('focusin', (e) => {
+        const h = syncSelBarHeight();
+        const t = e.target;
+        if (!h || !t || !t.getBoundingClientRect || bar.contains(t)) return;
+        const r = t.getBoundingClientRect();
+        const limit = window.innerHeight - h - 8;
+        if (r.bottom > limit && r.height < window.innerHeight - h) window.scrollBy({ top: r.bottom - limit, behavior: 'auto' });
+    });
 }
 
 /** Play: practice with exactly the selected skills (the queue play path: mixed-mode state set before startGame). */
@@ -599,11 +657,22 @@ export function sendStudentSelection() {
     state.shareLinkType = 'direct';
     let link = '';
     try { link = window.generateShareableLink(list) || ''; } finally { state.shareLinkType = was; }
+    // D9: a link a pupil sends says so (?from=pupil): it opens with neutral wording, not "Your teacher has set up …"
+    if (link) link += (link.includes('?') ? '&' : '?') + 'from=pupil';
     const box = document.getElementById('studentSendBox');
     const f = document.getElementById('studentSendLink');
     if (f) f.value = link;
-    if (box && link) { box.hidden = false; try { f.select(); } catch (e) { /* */ } }
+    if (box && link) { box.hidden = false; try { f.focus({ preventScroll: true }); f.select(); } catch (e) { /* */ } syncSelBarHeight(); }
     return link;
+}
+/** Close the Send pop-up (its × and Esc); focus goes back to Send. */
+export function closeStudentSend() {
+    const box = document.getElementById('studentSendBox');
+    if (!box || box.hidden) return;
+    box.hidden = true;
+    syncSelBarHeight();
+    const b = document.getElementById('studentSelSendBtn');
+    if (b) { try { b.focus({ preventScroll: true }); } catch (e) { /* */ } }
 }
 export async function copyStudentSendLink() {
     const f = document.getElementById('studentSendLink');

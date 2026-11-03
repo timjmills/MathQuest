@@ -166,3 +166,10 @@ body.sp-open { overflow: hidden; }
 .sp-root .sp-optbtn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; min-width: 44px; padding: 6px 12px; border: 2px solid #D6D0C8; border-radius: 10px; background: #fff; color: #1A1614; font: inherit; font-weight: 800; cursor: pointer; }
 .sp-root .sp-optbtn:focus-visible { outline: 3px solid #1A1614; outline-offset: 2px; }
 .sp-root .sp-optsum { display: block; font-size: 0.82rem; font-weight: 600; color: #5A524C; margin-top: 2px; }
+
+/* ui3 check D5/D6 (2026-11-03): the row's Options is one 44 px gear (name · gear · how many · = n on ONE line), and a
+   Columns select never runs past the dialog on a phone */
+.sp-root .sp-skill.has-optbtn { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+.sp-root .sp-optbtn.sp-optbtn { width: 44px; height: 44px; min-width: 44px; padding: 0; font-size: 20px; line-height: 1; }
+.sp-root .sp-cols { max-width: 100%; box-sizing: border-box; }
+.sp-root .sp-cols select { max-width: 100%; min-width: 0; flex: 0 1 auto; }
