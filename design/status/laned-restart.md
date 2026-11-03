@@ -532,3 +532,17 @@ R4 precritic rerun (`/tmp/mq-precritic/20261103-102846-32518`, before the Warm-u
 Also: sub_facts Review L H13 30 % (cells 7-8, no supports) - same on 0fd0e50, for the shared-roles lane.
 ws-chromebook-perf OK (Start Playing 1233 ms; stress median 243 ms, p90 377 ms; teacher ready 5659 ms, tray 1512 ms,
 print preview 50506 ms, quiz sheet 14626 ms). Renders: design/audit/runs/laned-restart/r4/<support>-<S|M|L>/.
+
+## HAND-OVER 6 (2026-11-03, rulings applied; critic still NOT run)
+
+Lead rulings applied (f26398cb, 939b4a9e, 52eca881): chromebook-fit fixed (merge regression: quiz now lazy-loaded, gate loads it
+first), fade-packet L PG-12 fixed, LESSONS entry for div_facts added (Warm-up missing_mult_div), options-render pinned
+owner-ruled, dealer-uniform + print-lint-divform-long-L pinned main-red with proof lines, sibling-compare pointed at the
+four passed fact skills. ws-chromebook-perf OK. Renders: design/audit/runs/laned-restart/r4/.
+
+Still red → no critic (rule 0b): sibling-compare now compares for real and finds div_facts worse than its siblings on 8 counts
+in 5 rows — PG-23 (mixed/defaults L, sections/defaults L, fade-packet S/M/L), PG-12 ×6 sections/defaults L ("25 ÷ 5 =" in a
+20.4 mm grid vs a 26 mm footprint; height from print-sheet.js multi-section allocation ~l.3030), CL40-INK ×2 sections/ex-group M,
+SPREAD sections/pages-2 L. Also card-rulings / card-not-offered SKIPPED (facts card has no rulings block) need a ruling.
+Next lane step: one builder (mq-opus-medium) on those multi-page / multi-section rows, then the narrow critic.
+Cost this session ≈ $42 (≈ 1.5 % of the week) of the $55 cap; stopped because a fix run plus the critic would not fit.
