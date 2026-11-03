@@ -1261,6 +1261,54 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "mixed-m4-frame",
+   "check": "Every problem cell's four edges drawn (>= 97 % ink) and no grid rule more than 3 mm past the cells of its row (owner's 6-skill mix, 2026-11-03)",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkFrame (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m4/owner-S.fail.html",
+    "state": "owner's set (add / sub facts, mult / div facts, missing +/-, missing x/÷; 7,7,7,7,7,6) Daily S on the shelf packer at f8dbac5: open cell edges, rules running past their rows"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m4/owner-S.pass.html",
+    "state": "the same set at d5af7e7+ (r5): one full-width grid a page, every box closed"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks frame"
+  },
+  {
+   "id": "mixed-m4-shelfw",
+   "check": "Every problem grid spans the frame's inner width; only the last grid of the last page may stop short (owner's 6-skill mix)",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkShelfWidth (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m4/owner-S.fail.html",
+    "state": "owner's set Daily S at f8dbac5: centred shelves narrower than the frame"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m4/owner-S.pass.html",
+    "state": "r5: every grid frame to frame"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks shelfw"
+  },
+  {
+   "id": "mixed-m4-fill",
+   "check": "A mixed page's problems cover >= 85 % of the frame on every Auto page but the last, and hold >= In sections' per-page count less one row (owner: 'fill the paper', 'fit them all and have no white space')",
+   "kind": "fixture",
+   "rule": "js/modules/sheet/mixed-m3.check.cjs checkFill (DOM-measured, hard FAIL)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/mixed-m4/b-S.fail.html",
+    "state": "b add_facts + mult_2by2_standard Mixed up Daily S at f8dbac5: 16 problems where In sections holds 32"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/mixed-m4/b-S.pass.html",
+    "state": "b at r5: one 6-across grid filling the page (seed 722369)"
+   },
+   "command": "node js/modules/sheet/mixed-m3.check.cjs --fixture {fixture} --checks fill"
   }
  ]
 }

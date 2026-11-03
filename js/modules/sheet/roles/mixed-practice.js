@@ -1479,7 +1479,10 @@ function planMixedM2(input, pools) {
     for (const order of pageOrders) for (const id of ids) if (order.filter((x) => x === id).length === 1) lone.push(names[id].name);
     if (lone.length) notes.push(`Mixed practice: ${[...new Set(lone)].join(' and ')} has only one problem on a page.`);
     const loads = pageOrders.map((o) => o.length);
-    const perPage = Math.max(A.cap || 0, ...(loads.length ? loads : [0]));
+    // (r5: an exact count over several pages - a page of THIS print holds what its fullest page holds; the probe's
+    // capacity (a long run of the same shape) may start on a luckier row and promise a problem more than any page of
+    // the print can take - ws-teacher-plan-match "filled")
+    const perPage = input.exactCounts && loads.length > 1 ? Math.max(...loads) : Math.max(A.cap || 0, ...(loads.length ? loads : [0]));
     const forced = (id) => Math.max(2, Math.ceil(total[id] / (n - total[id] + 1)));
     const runsByPage = pageOrders.map((o) => Object.fromEntries(ids.map((id) => [id, { run: runsIn(o)[id] || 0, turns: o.filter((x) => x === id).length, cap: forced(id) }])));
     const longest = Math.max(0, ...Object.values(runs));

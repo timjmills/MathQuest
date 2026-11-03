@@ -108,3 +108,30 @@ legacy stacks fail width at 46 mm: no layout satisfies fill + width + digits; o 
 (H13 on fill pages b / c where the dealt boxes differ from the probe's; Sections d frac-model H13 4 pre-existing;
 c 5:14 "no s0 on page 5"); ws-teacher-plan-match 1 (add_facts + word problems 20: 5 pages where a page holds 5);
 backtests for frame / shelfw / fill not added.
+
+## r5 fixer (Opus medium, 2026-11-03) - mixed-m3 green, mixed-m2 still red (root cause below)
+- Pages: where the last page of a print of 3+ pages holds under half the fullest, the same pages take the rows' blocks
+  EVENLY, earlier pages rounded up (owner L 41: 20 / 12 / 9 -> 16 / 16 / 9); else the old PT-MIX-9 pass.
+- Owner 2026-11-03 Columns modes: `columnsMode` 'exact' | 'aim' | 'auto' on the request or a section ('smart' / absent /
+  non-number = auto; a number with no mode = exact); 'aim' = the largest C <= n every problem's box fits; a page with any
+  cell that is not a fast fact is never 7+ across (LARGE_MAX 6, Auto too); fits.across, fits.columnsMode, and
+  fits.clamped + fits.asked when capped.
+- Exact prints over several pages report perPage = the fullest page of THAT print (ws-teacher-plan-match "filled": 20
+  add_facts + word problems = 5 pages of 4, not "a page holds 5").
+- Missing-number wrap (item 6) NOT fixed: a no-wrap floor from the measured heights (a box never narrower than the
+  count where its height grows) sent the owner's S set to 4 across, 16 a page, 3 pages - reverted. The measure reports
+  a wrapped line as "fits"; the fix belongs in the measure (a one-line flag) or in moving the skill to the kit equation
+  cell (lead's note).
+- Backtests: mixed-m4-frame / -shelfw / -fill (fail: mixed-m4/{owner-S,b-S}.fail.html; pass: r5 captures
+  mixed-m4/{owner-S,b-S}.pass.html).
+- Gates: mixed-m3 full OK (69 scenarios, 0); mixed-m2 --quick 40 FAIL (was 60; c S gone with the 6-across cap).
+- ROOT CAUSE of the mixed-m2 reds (two attempts, both reverted: a swap pass moving a long procedure along the order so
+  it stands two rows, and a fill-page tail of facts after it): on b (facts + 2-digit x) and c / d fill pages the facts
+  are ~50 mm and the long procedure 74-87 mm, so H13 holds only where every long procedure stands two rows tall; a
+  two-row box in a C-track grid skips the row under it, so the facts run ~2 (C - 2) in a row, longer than the forced
+  minimum run mixed-m3 `runs` allows (ceil(major / (minor + 1))); and a long procedure in a page's last row cannot
+  stand two rows. Every order that keeps runs <= forced leaves one H13 row; every order that clears H13 breaks runs or
+  fill. Needs a ruling (or a three-row span / a row of long procedures only, which also breaks runs), not a tweak.
+  c 5:14 exact (word problem beside one fact a row: the fact at 40 % of its box) is the same class: a word problem
+  needs a 3-row span beside facts (gridOf spans at most 2).
+- Not done: engine items 7a-7d (Independent clamp / per-cell outline / parts across pages / row stretch) - budget.
