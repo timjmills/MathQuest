@@ -803,3 +803,12 @@ Details and the reflection: design/status/s1-checks.md.
 |---|---|---|---|
 | build (lane session, ~2 h 40 m) | startup 269 -> 185 modules, 2.90 -> 1.73 MB gzip; pupil first visit 10.85 -> 6.82 s (-37 %), later 2.00 -> 1.49 s; play-through restyle storms fixed (ink 21.6 s -> 4.4 s CPU / 50 questions; longest task 4.8 -> ~1 s); two follow-ups pinned (F1 skip-count rows, F2 100-skill print preview) | **Built:** `ws-chromebook-perf` (load / play / stress / teacher scenarios, static byte + module budgets, deferred-before-Start check, --why forced-layout callers, --profile inclusive CPU), `ws-ink-parity` (colours + --geometry vs another checkout); deploy-gates session 3 | Lost time: (a) a baseline run served the live working tree while it was being edited (fix: baselines always from a `git worktree` of the base); (b) unseeded play-throughs could not be compared run to run (fix: the gate seeds Math.random); (c) the first profile was self-time only and blamed the wrong function (fix: inclusive time is printed too); (d) the 100-skill teacher scenario first added only 87 skills (fix: keys come from the tray's own catalogue) |
 
+
+### Lane simple-print (2026-11-03)
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| build | simple print + ws-simple-print (FILL / DENSITY / FACTS / NOT3), backtest fails the old dialog plan (fill 22–46 %) | L16 (the dialog plans the page, not the engine) | Probing buildSheet request shapes in one scratch script before writing the screen found the fact-rows count rule and the clamp collapse in minutes |
+| critic r1 FAIL (min 4) | summary not the built page, Auto under the max, targets, focus | TARGETS, SUMMARY built and backtested | gates and the critic shared the CPU: ws-teacher-preview flaked and chromebook-perf timings failed — never run timed gates while a critic renders |
+| critic r2 FAIL (min 6) | Mixed fallback summary, fact card summary; page-1 fill is engine pagination | SUMMARY over Mixed + fact card (backtest FAIL on r2 code) | a probe (one row more on each part) separated lane vs engine faults in one run — do it before a fix round |
+| critic r3 PASS (lane part) | footer ids fixed; per-type summary added after | FOOTER gate (backtest FAIL on the r2 head) | 9 owner additions arrived DURING r3: queuing them (process rule 0) kept the round valid; resuming the same critic for r2/r3 cost 144k → 162k → 192k tokens (its context grows): a fresh narrow critic with a short brief is cheaper after r2 |
