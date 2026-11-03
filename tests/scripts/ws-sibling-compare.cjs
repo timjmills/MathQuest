@@ -398,6 +398,16 @@ function main() {
     const sibSecs = S.sibSecs;
     const table = sibTable(sources);
     const c = compare(oursRows, (k) => sibOf[k] || [], table, cmpOpts);
+    // MAIN-RED (lead ruling 2026-11-03, Lane D R4): a (row, size, rule) listed in siblings.json `mainRed` with its proof
+    // line - the same count on the main tip, on a role the lane did not touch (LESSONS_LEARNED 0b) - is reported, not
+    // blocking. Only up to the listed count; a rise above it still blocks.
+    try {
+        const mr = (JSON.parse(fs.readFileSync(sf, 'utf8')).mainRed || []).filter((m) => m && m.proof);
+        const hit = (x) => mr.find((m) => m.row === x.id && m.size === x.size && m.rule === x.rule && x.n <= Number(m.n));
+        const keep = [];
+        for (const x of c.above) { const m = hit(x); if (m) say(`MAIN-RED   ${x.id} ${x.size} ${x.rule}: ours ${x.n} (non-blocking: ${m.proof})`); else keep.push(x); }
+        if (keep.length !== c.above.length) { c.above = keep; c.rowsAbove = new Set([...keep, ...c.noSibling].map((x) => x.id)); }
+    } catch (e) { /* no mainRed list */ }
     // ---- report
     const red = oursRows.filter((r) => r.status === 'RED').length;
     const noBase = oursRows.filter((r) => r.status === 'PENDING' && printed(r)).length;

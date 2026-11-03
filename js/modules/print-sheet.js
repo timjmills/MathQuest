@@ -2414,7 +2414,7 @@ function heightClassOf(sec, items, gridMm) {
     if (sec.heightClass) for (const it of items) if (it) it.hClass = true;
 }
 
-const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows });
+const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows });
 
 /**
  * The column-work group a practice page splits off (practice.js fineSplit), exactly as the role
@@ -3007,7 +3007,26 @@ async function buildSheetDeal(req = {}) {
         // overleaf and page 1 kept 2 problems over a 45 % empty strip: DN-2, PAGEFILL).
         const pageGroups = [];
         for (const all of groups.values()) {
-            if (anchorMode !== 'side') { pageGroups.push({ members: all, body }); continue; }
+            // Lane D R4 (L-DENSITY PG-23, div_facts with three partner sections at S / M / L): DIFFERENT skills sharing a page
+            // (not one skill's support split / fade parts), without side anchors too,
+            // members whose least rows do not all fit one page are packed onto pages in order and each page's body is
+            // shared among the members it holds. Before, the four shared ONE page's body, the last member ran overleaf
+            // with its single row (2 problems, under a third of a page) and nothing grew to fill that page.
+            if (anchorMode !== 'side') {
+                const least0 = (si) => layouts[si].hMin + 1 + instr + (anchorMode === 'sections' && anchorSets[si] ? n.sections[si].anchorMm || 0 : 0);
+                const kinds0 = new Set(all.map((j) => (n.sections[j].skills || []).map((x) => `${x.categoryId}:${x.skillId}`).join(',')));
+                if (kinds0.size < 2 || all.reduce((a, si) => a + least0(si), 0) <= body) { pageGroups.push({ members: all, body }); continue; }
+                const bodyCont0 = bodyHeightMm(paper, layoutHeader, { cont: true }) - 1;
+                let cur0 = [], used0 = 0, pb0 = body;
+                for (const si of all) {
+                    const nd = least0(si);
+                    if (cur0.length && used0 + nd > pb0) { pageGroups.push({ members: cur0, body: pb0 }); cur0 = []; used0 = 0; pb0 = bodyCont0; }
+                    cur0.push(si);
+                    used0 += nd;
+                }
+                if (cur0.length) pageGroups.push({ members: cur0, body: pb0 });
+                continue;
+            }
             const bodyCont = bodyHeightMm(paper, layoutHeader, { cont: true }) - 1;
             const least = (si) => Math.max(layouts[si].hMin * (anchorSets[si] && anchorSets[si].items.length && layouts[si].cols === 1 ? 2 : 1), sideRowOf(si, layouts)) + 1 + instr;
             let cur = [], used = 0, pageBody = body;
@@ -3063,7 +3082,11 @@ async function buildSheetDeal(req = {}) {
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
-                const L = resolveBandedLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows }, sec.anchorMm || 0,
+                // Lane D R4: layout.js keeps a shared grid's row inside it - for a page shared by DIFFERENT skills (a
+                // support split of one skill, the fade packet's parts, keeps its own column choice)
+                const skillSet = new Set(members.map((j) => (n.sections[j].skills || []).map((x) => `${x.categoryId}:${x.skillId}`).join(',')));
+                if (skillSet.size > 1) sec.sharedPage = true;
+                const L = resolveBandedLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage }, sec.anchorMm || 0,
                     withTwins(si, probesOf(si)), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
                 out[si] = capFromL(sec, si, L);
             });
@@ -3449,7 +3472,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,

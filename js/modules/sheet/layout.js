@@ -769,6 +769,11 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
         for (const c of colOpts) {
             const pc = probe(c, c > cols);
             if (!pc.fits) continue;
+            // Lane D R4 (L-OVERFLOW PG-12, div_facts as one of several sections at L): in a grid of a FIXED height (a
+            // shared page's share) a wider column count whose row is taller than the grid never wins ("25 ÷ 5 =" took
+            // 3 columns and its line under it, 30.6 mm, in the 20.4 mm share its 2-column row of 19.4 mm was given). Only a
+            // section sharing a page with others (`sharedPage`, print-sheet.js shareRows): a fade packet's own grids keep theirs.
+            if (gridOverride && section.sharedPage && c > cols && pc.hMin > 0 && pc.hMin + 1 > G && probe(cols, false).hMin + 1 <= G) continue;
             // (free rows: the rows take the problems' own measured height, buildSheet checks the page)
             let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (section.freeRows ? pc.hMin : roomed(pc, room))), Math.floor(dCeil / c)));
             if (c === 2 && !section.freeRows) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;

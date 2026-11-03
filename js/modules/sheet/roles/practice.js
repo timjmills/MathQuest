@@ -719,7 +719,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         // takes the band off the page; s3 precritic-2 ex-group H13).
         const aMm0 = anchorBandOf(anchors, si);
         const L0 = resolveBandedLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows }, aMm0,
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage }, aMm0,
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
@@ -932,7 +932,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const its = sheetItems[si] || [];
         const keep = () => { sections.push(Object.assign({}, sec, { srcIndex: si })); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
-        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows };
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
         const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
@@ -1053,7 +1053,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     if (!input.anchors) {
         sheetItems = sheetItems.map((its, si) => {
             const sec = norm.sections[si] || {};
-            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows },
+            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage },
                 its, norm.paper, Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM, { size, look });
             return groupByHeight(its, Lp.cols);
         });
