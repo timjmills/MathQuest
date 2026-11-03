@@ -23,6 +23,7 @@ import { touchNumeralHTML, touchTallySVG, touchDotsFits } from './touchdots.js';
 import { PANES, placePane, attachPane, PANE_GAP_MM } from './cells/panes/index.js';
 import { TOUCH_IDS, CUE_IDS, alternativesOf } from './supports.js';
 import { installSupportDrawer } from './registry.js';
+import { blankWidth } from './tokens.js';
 
 const OPN = { '+': '+', '-': '-', '−': '-', '*': '*', x: '*', '×': '*', '/': '/', '÷': '/' };
 export const opKey = (op) => OPN[op] || '';
@@ -325,6 +326,11 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
         return `f:${id}`;
     };
     const groups = { 'over-ones': new Map(), before: new Map(), beside: new Map(), under: new Map() };
+    // Lane D R4 prep (slot-clip PG-12, div_facts fade packet at L): the sign box stands BEFORE the problem and the beside
+    // group starts 2 mm in, so a picture fits beside only when the sign box, its gap and that inset fit too (the 85 mm
+    // ÷ counters beside "144 ÷ 12 =" with the sign box ran 4.5 mm out of a full-width cell).
+    let beforeW = 0;
+    for (const id of ids) { const pc = pieceOf(id, p, template, ctx); if (pc && pc.foot && (pc.place || placePane(pc.foot, { problemWMm, cellWMm, problemHMm })) === 'before') beforeW = Math.max(beforeW, pc.foot.wMm + PANE_GAP_MM); }
     for (const id of ids) {
         const piece = pieceOf(id, p, template, ctx);
         if (!piece) continue;
@@ -335,6 +341,10 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
             const pl = piece.foot.placements || ['beside', 'under'];
             place = placePane(piece.foot, { problemWMm, cellWMm, problemHMm });
             if (pl.includes('beside') && problemWMm + PANE_GAP_MM + piece.foot.wMm <= cellWMm) place = 'beside';
+            // (a ÷ fact's footprint counts its answer line UNDER it - equation.js - but beside a picture in a full-width
+            // cell the line stands beside the fact, so the line is counted too; the beside group's inset clears the tab)
+            const lineW = template === 'equation' && opKey(p.op) === '/' ? blankWidth(Number(p.digits) || 2, ctx.size) : 0;
+            if (place === 'beside' && (beforeW || lineW) && problemWMm + lineW + beforeW + 6 + PANE_GAP_MM + piece.foot.wMm > cellWMm) place = 'under';
             if (!place) place = 'under';
         }
         const shown = s.on.includes(id);

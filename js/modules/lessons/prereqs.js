@@ -336,6 +336,36 @@ export const LESSONS = Object.freeze({
         mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'subtraction:subtract', opts: { band: 20 } }],
     },
 
+    // ------------------------------------------------------------- Division facts (3)
+    // Lane D R4 prep (node-lint LESSON-DATA): div_facts divides by thinking of the times fact (3.OA.6, 3.OA.7).
+    'division:div_facts': {
+        skills: [
+            { key: 'multiplication:mult_facts', why: 'Each division fact is a times fact read backwards.' },
+            { key: 'division:share_into_groups', why: 'Dividing shares a number into equal groups.' },
+        ],
+        concepts: [
+            { id: 'groups', text: 'Dividing makes equal groups.' },
+            { id: 'think', text: 'Think of the times fact.' },
+            { id: 'missing', text: 'The answer is the missing factor.' },
+        ],
+        vocab: [
+            { word: 'divide', meaning: 'the ÷ sign: share into equal groups', picture: { kind: 'glyph', text: '÷' } },
+            { word: 'equals', meaning: 'the = sign: is the same as', picture: { kind: 'glyph', text: '=' } },
+            { word: 'times fact', meaning: 'a fact like 3 × 4 = 12', picture: { kind: 'text', text: '3 × 4 = 12' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the number you divide by.' },
+            { icon: 'count', text: 'Think: what times it makes the big number?' },
+            { icon: 'write', text: 'Write that number.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'icons + very short steps',
+            why: 'Three actions; the think-of-the-times-fact sentence is the Say band, so a chant would only add words.',
+        },
+        mixWith: [{ key: 'multiplication:mult_facts' }, { key: 'division:share_into_groups' }],
+    },
+
     // ------------------------------------------------- Round to the nearest 10 / 100 (3)
     'number_sense:nearest_10': {
         skills: [

@@ -58251,6 +58251,75 @@
      "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
     }
    ]
+  },
+  {
+   "id": "division:div_facts#mixed-practice",
+   "label": "Division Facts (1-12) (mixed-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 2,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "notes": [
+    "page 1: role \"mixed-practice\" has no ceiling in this gate",
+    "page 2: role \"mixed-practice\" has no ceiling in this gate"
+   ],
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 28.5 mm wide in a 92.2 mm cell (31%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--division[data-ws-cell=\"division\"]> \"8 5 0\"",
+     "page": 1,
+     "cell": 8,
+     "pin": "MAIN-RED (lead ruling 2026-11-03, Lane D R4 prep): red on the main tip cd81c8e7 with the same 2 findings (divForm long, size L, Mixed practice cell 8 band 31 %); the mixed-practice role belongs to the mixed-m2 lane"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 28.5 mm wide in a 92.2 mm cell (31%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--division[data-ws-cell=\"division\"]> \"8 0 5 0\"",
+     "page": 2,
+     "cell": 8,
+     "pin": "MAIN-RED (lead ruling 2026-11-03, Lane D R4 prep): red on the main tip cd81c8e7 with the same 2 findings (divForm long, size L, Mixed practice cell 8 band 31 %); the mixed-practice role belongs to the mixed-m2 lane"
+    }
+   ]
   }
  ]
 }
