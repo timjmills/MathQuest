@@ -254,3 +254,50 @@ registerSkill('division:share_into_groups', {
     // Critic round 2: the skill is GROUPING (how many groups), so its stories are too.
     stories: storiesFor('÷', { grouping: true }),
 });
+
+/* ======================================================================== area models (r12b) */
+// area_model_div_2by1 / _3by1: the kit `area-model-div` cell. The pupil finds the missing side
+// lengths (the quotient's parts), then adds them for the quotient.
+function areaDiv(q) {
+    const d = obj(q.areaModelDivData);
+    if (!d) return null;
+    const v = num(d.divisor);
+    const parts = (q.cell && q.cell.payload && Array.isArray(q.cell.payload.parts)) ? q.cell.payload.parts.map(num)
+        : (d.parts || []).map((p) => num(p && typeof p === 'object' ? p.value : p));
+    return { dividend: num(d.dividend), divisor: v, parts, qs: parts.map((p) => p / v), quotient: num(d.quotient) };
+}
+const AREA_DIV = {
+    iCan: 'I Can divide with an area model',
+    instructionKey: 'divide',
+    steps: [
+        'Read the parts inside the model: the number split into parts.',
+        'Divide each part by the number on the side.',
+        'Write each side length in its box on top.',
+        'Add the side lengths. Write the quotient.',
+    ],
+    say: '__ divided by __ equals __.',
+    sayValues: (q) => { const A = areaDiv(q); return A ? [A.dividend, A.divisor, A.quotient] : null; },
+};
+function areaDivWrong(q) {
+    const A = areaDiv(q);
+    if (!A || A.qs.length < 2) return null;
+    return chooseWrong(q, [
+        { value: A.qs[0], misconception: 'left-out-part', slot: 'total', explain: `Wrote only ${A.qs[0]}, the first side length. Add both parts.` },
+        { value: A.parts[0] + A.qs[1], misconception: 'part-not-divided', slot: 'total', explain: `Added ${A.parts[0]} itself. Divide each part by ${A.divisor} first.` },
+    ]);
+}
+function areaDivSteps(q) {
+    const A = areaDiv(q);
+    if (!A) return [];
+    return clampSteps(A.parts.map((p, i) => step(`${p} ÷ ${A.divisor} = ${A.qs[i]}. Write it on top of part ${i + 1}.`, [{ slot: `q${i}`, value: String(A.qs[i]) }]))
+        .concat([step(`Add the side lengths: ${A.qs.join(' + ')} = ${A.quotient}.`, [{ slot: 'total', value: String(A.quotient) }])]));
+}
+for (const id of ['division:area_model_div_2by1', 'division:area_model_div_3by1']) {
+    registerSkill(id, {
+        strings: strings(AREA_DIV),
+        misconceptions: ['left-out-part', 'part-not-divided'],
+        workedSteps: areaDivSteps,
+        wrongAnswer: areaDivWrong,
+        stories: storiesFor('/'),
+    });
+}

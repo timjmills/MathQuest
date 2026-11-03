@@ -23,6 +23,7 @@ import { touchNumeralHTML, touchTallySVG, touchDotsFits } from './touchdots.js';
 import { PANES, placePane, attachPane, PANE_GAP_MM } from './cells/panes/index.js';
 import { TOUCH_IDS, CUE_IDS, alternativesOf } from './supports.js';
 import { installSupportDrawer } from './registry.js';
+import { blankWidth } from './tokens.js';
 
 const OPN = { '+': '+', '-': '-', '−': '-', '*': '*', x: '*', '×': '*', '/': '/', '÷': '/' };
 export const opKey = (op) => OPN[op] || '';
@@ -299,6 +300,7 @@ function pieceOf(id, p, template, ctx) {
 // fact.js registers itself and imports this module, so the cue drawing is handed in at load
 // (installCueDrawer) rather than imported (no import cycle).
 let factCueOf = () => '';
+const twin0 = (ctx) => !!ctx && ctx.mode === 'screen';
 export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf = (p, twin) => fn(p, twin ? { px: 3.4 } : {}); }
 
 /**
@@ -306,7 +308,7 @@ export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf =
  * the problem's own footprint (for choosing beside or under). `ctx.columns` is the page's column
  * count when known.
  */
-export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 40, problemHMm = 30 } = {}) {
+export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 40, problemHMm = 30, ghostHtml = '' } = {}) {
     const s = supportsOf(p);
     if (!s) return problemHtml;
     const ids = order([...new Set([...s.on, ...s.reserve])]);
@@ -324,6 +326,11 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
         return `f:${id}`;
     };
     const groups = { 'over-ones': new Map(), before: new Map(), beside: new Map(), under: new Map() };
+    // Lane D R4 prep (slot-clip PG-12, div_facts fade packet at L): the sign box stands BEFORE the problem and the beside
+    // group starts 2 mm in, so a picture fits beside only when the sign box, its gap and that inset fit too (the 85 mm
+    // ÷ counters beside "144 ÷ 12 =" with the sign box ran 4.5 mm out of a full-width cell).
+    let beforeW = 0;
+    for (const id of ids) { const pc = pieceOf(id, p, template, ctx); if (pc && pc.foot && (pc.place || placePane(pc.foot, { problemWMm, cellWMm, problemHMm })) === 'before') beforeW = Math.max(beforeW, pc.foot.wMm + PANE_GAP_MM); }
     for (const id of ids) {
         const piece = pieceOf(id, p, template, ctx);
         if (!piece) continue;
@@ -334,6 +341,10 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
             const pl = piece.foot.placements || ['beside', 'under'];
             place = placePane(piece.foot, { problemWMm, cellWMm, problemHMm });
             if (pl.includes('beside') && problemWMm + PANE_GAP_MM + piece.foot.wMm <= cellWMm) place = 'beside';
+            // (a ÷ fact's footprint counts its answer line UNDER it - equation.js - but beside a picture in a full-width
+            // cell the line stands beside the fact, so the line is counted too; the beside group's inset clears the tab)
+            const lineW = template === 'equation' && opKey(p.op) === '/' ? blankWidth(Number(p.digits) || 2, ctx.size) : 0;
+            if (place === 'beside' && (beforeW || lineW) && problemWMm + lineW + beforeW + 6 + PANE_GAP_MM + piece.foot.wMm > cellWMm) place = 'under';
             if (!place) place = 'under';
         }
         const shown = s.on.includes(id);
@@ -344,16 +355,36 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
         if (!groups[place].has(row)) groups[place].set(row, []);
         groups[place].get(row).push(html);
     }
+    // Critic r3 R3-1: beside a ÷ fact, the row of one fixed height (the think cue) comes first and the
+    // overlaid pictures (tally / skip count / array, whose height follows the fact) after it, so the
+    // think cue stands at one place in every cell of the section, never pushed down by a tall array.
+    if (opKey(p.op) === '/' && !twin0(ctx)) {
+        const m = groups.beside;
+        const fixed = (e) => (e[1].some((h) => /data-ws-support-(on|reserve)="think"/.test(h)) ? 0 : 1);
+        groups.beside = new Map([...m.entries()].sort((x, y) => fixed(x) - fixed(y)));
+    }
     // One row: its pieces overlaid in one grid cell (only one of them is ever drawn).
-    const rows = (m) => [...m.values()].map((list) => `<div class="ws-support-row" style="display:grid;justify-items:center;align-items:start">${list.join('')}</div>`);
+    const rows = (m, j = 'center') => [...m.values()].map((list) => `<div class="ws-support-row" style="display:grid;justify-items:${j};align-items:start">${list.join('')}</div>`);
     groups['over-ones'] = rows(groups['over-ones']);
     groups.before = rows(groups.before);
-    groups.beside = rows(groups.beside);
+    // R3-1: beside a ÷ fact on paper, each support starts at the zone's left edge (one x per section).
+    const besideLeft = opKey(p.op) === '/' && !twin0(ctx) && groups.beside.size > 0;
+    groups.beside = rows(groups.beside, besideLeft ? 'start' : 'center');
     groups.under = rows(groups.under);
-    let html = problemHtml;
     const twin = ctx.mode === 'screen';
+    const fixedZone = !twin && opKey(p.op) === '/' && groups.beside.length > 0;
+    // Critic r3 R3-1: on paper, a ÷ fact with supports beside it holds ONE fact zone for the section:
+    // the widest fact of its set (144 ÷ 12, handed in by registry.js) drawn unseen under the item's own,
+    // which is left-anchored over it. With the sign box's zone before it, the fact, its answer line and
+    // the supports beside stand at one x in every cell, whichever supports a cell draws.
+    const ghost = fixedZone && ghostHtml
+        ? `<div class="ws-fact-zone" style="display:grid;justify-items:end;align-items:start"><div style="grid-area:1 / 1">${problemHtml}</div>`
+            + `<div class="ws-fact-zone-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden">${ghostHtml.replace(/data-ws-slot=/g, 'data-ws-ghost-slot=').replace(/data-ws-([a-z-]*)="/g, (m, k) => (k === 'ghost-slot' ? m : `data-ws-ghost-${k}="`))}</div></div>`
+        : '';
+    let html = ghost || problemHtml;
     if (groups['over-ones'].length) html = attachPane(html, groups['over-ones'].join(''), 'over-ones', { twin });
     if (groups.before.length) html = attachPane(html, `<div style="display:flex;flex-direction:column;gap:2mm">${groups.before.join('')}</div>`, 'before', { twin });
+    if (fixedZone && groups.before.length) html = html.replace(/(data-ws-pane-place="before" style="[^"]*?)justify-content:center;/, '$1justify-content:flex-start;');
     if (groups.beside.length) {
         html = attachPane(html, `<div style="display:flex;flex-direction:column;gap:${PANE_GAP_MM}mm">${groups.beside.join('')}</div>`, 'beside', { twin });
         // A picture beside the problem may differ in width from cell to cell (an array of 3 x 4 and
@@ -363,7 +394,7 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
     }
     if (groups.under.length) html = attachPane(html, `<div style="display:flex;flex-direction:column;align-items:center;gap:2mm">${groups.under.join('')}</div>`, 'under', { twin });
     const wide = !twin && groups.beside.length ? ' style="align-self:stretch;width:100%"' : '';
-    return html === problemHtml ? html : `<div class="ws-supported" data-ws-supports="${s.on.join(' ')}"${wide}>${html}</div>`;
+    return html === problemHtml || html === ghost ? problemHtml : `<div class="ws-supported" data-ws-supports="${s.on.join(' ')}"${wide}>${html}</div>`;
 }
 
 /** Does a supports spec add anything round the problem (so the cell must be measured)? */
@@ -398,6 +429,20 @@ export function supportFootprint(fp, p, template, ctx = {}) {
     const paneW = widestPaneMm(p, template, ctx.size) || 0;
     const w = Math.max(out.wMm || 0, paneW);
     const cap = Math.max(1, Math.floor(186 / (paneW + 6.6)));
+    // Lane D R4 prep (H13-ROW, div_facts array S/M/L): the ÷ counters to ring are the dividend in rows
+    // of ten, 1 to 6 rows tall with the fact, and none at all where the dividend passes 60. Stacked
+    // UNDER the fact in two columns they paired a 5-row cell with a 2-row or a picture-less one, and
+    // the row was sized for a taller item than its other cell held. They stand BESIDE the fact only:
+    // the cell is as wide as fact + gap + counters, so each such problem has a row of its own height
+    // (the practice roles split the picture-less facts into columns of their own).
+    const s = supportsOf(p);
+    const pp = panePayloadOf(p, template);
+    if (pp && pp.op === '/' && s && s.on.includes('array')) {
+        const piece = pieceOf('array', p, template, { size: ctx.size, mode: 'print', metrics: null });
+        // (hardCap: a measured cell's cap is otherwise the widest grid it measured as fitting - under the fact)
+        if (piece && piece.foot) return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, hardCap: true,
+            maxCols: Math.max(1, Math.min(out.maxCols || 10, cap, 4, Math.floor(186 / ((fp.wMm || 0) + PANE_GAP_MM + piece.foot.wMm + 6.6)))) });
+    }
     return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4) });
 }
 

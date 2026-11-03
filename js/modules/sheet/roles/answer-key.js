@@ -383,6 +383,7 @@ function gridPart(part, ctx, report) {
         colsTpl: part.colsTpl || '',
         spanFirst: !!part.spanFirst,
         rowGap: Number(part.rowGap) || 0,
+        relay: part.relay !== false,
     });
 }
 

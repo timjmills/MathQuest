@@ -4034,6 +4034,10 @@
     {
      "key": "division:box_division_easy",
      "missing": "generated items mix no-exchange (86 ÷ 2) and exchange (72 ÷ 4)"
+    },
+    {
+     "key": "division:div_facts_long",
+     "missing": "division facts to 12 x 12 in the long-division bracket: the notation, with no exchange past a fact (no 2-digit dividend split into tens and ones)"
     }
    ],
    "verdict": "partial",
@@ -4064,6 +4068,10 @@
      "key": "patterns:halve",
      "why": "Y2.B5.S11 Doubling and halving (prior learning wk W06)",
      "maxNumber": 100
+    },
+    {
+     "key": "division:div_facts_long",
+     "why": "the long-division bracket read and written on division facts before a 2-digit dividend is split"
     }
    ],
    "preBuild": [],
@@ -4141,6 +4149,10 @@
       "tiles": 21,
       "regroup": "always"
      }
+    },
+    {
+     "key": "division:div_facts_long",
+     "why": "the long-division bracket on division facts (the notation this step's written method uses)"
     }
    ],
    "note": "Generated: area_model_div_2by1, divide {tiles:21} and box_division_easy all mix exchange and no-exchange items; div_exchange is one shared option on the three.",
@@ -4205,6 +4217,10 @@
      "opts": {
       "band": 999
      }
+    },
+    {
+     "key": "division:div_facts_long",
+     "why": "the long-division bracket on division facts: each digit of the method is a fact"
     }
    ],
    "preBuild": [],

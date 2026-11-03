@@ -778,6 +778,266 @@
    }
   },
   {
+   "id": "arc-ink-laned",
+   "check": "The long-division bracket's arc keeps white on BOTH sides: >= 0.3 mm before the dividend's first digit (Lane D restart critic r1 R1-1: \"4 ) 8\" read as \"48\") and >= 0.25 mm after the divisor's last (critic r2 R2-1, a regression guard at r2's 0.27 mm: the owner keeps the 10-column bracket, 2026-10-31)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP ARC-INK",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Long fact rows at S, 10 columns, the arc 0.27 mm INTO the dividend's first digit"
+   },
+   "pass": {
+    "commit": "616908b1",
+    "state": "r2 bracket the owner keeps (2026-10-31): dividend side 0.62 mm, divisor side 0.27 mm at 10 columns"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --columns 10 --opts '{\"divForm\":[\"long\"]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grid-even-probe-laned",
+   "check": "One cell width per fact-probe grid: the 20th across fact keeps its column, the rest unruled (Lane D restart critic r2 R2-3: cell 20 spanned the across block)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN (every kit grid)",
+   "browser": true,
+   "fail": {
+    "commit": "616908b1",
+    "state": "critic r2 FAIL commit: add_facts fact probe at S, the 20th across fact re-laid the width of the block"
+   },
+   "pass": {
+    "commit": "f7a27938",
+    "state": "fix r3: every probe grid keeps its lattice (relay false)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_facts --roles fact-probe --size S --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "grid-even-laned",
+   "check": "One cell width per fact grid (Lane D restart critic r1 R1-2: div_facts Mix fact rows re-laid a 9-cell last row at 20.7 mm under 18.6 mm cells)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Mix fact rows at S, 69 facts, last row re-laid"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the lattice kept, whole rows dealt (70 facts)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles fact-rows --size S --opts '{\"divForm\":[\"mix\"]}' --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "frac-keepout-laned",
+   "check": "A division fact's fraction numerator clears the number tab's keep-out off the fact-rows page (Lane D restart critic r1 R1-15: \"110\" in the L tab's keep-out on the Opener)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK with --opts divForm (ws-precritic plans every form x fact-family role x S/L)",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Fraction Opener at L, CL40-INK"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the fraction's line box starts below the keep-out"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles opener --size L --opts '{\"divForm\":[\"fraction\"]}' --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-uniform-laned",
+   "check": "One digit size per online worksheet and equal paper cells per row of cards (Lane D restart critic r1 R1-16: div_facts Mix brackets at 29 px beside 40 px fractions)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --uniform (worksheet:digits, worksheet:rows)",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 FAIL commit: div_facts Mix online worksheet, two digit sizes, uneven paper cells"
+   },
+   "pass": {
+    "commit": "f9482c43",
+    "state": "fix r2 F1: the sheet's touch-floor digit on every card, rows even, Mix slot inline"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills division:div_facts --hosts worksheet --uniform --opts '{\"divForm\":\"mix\"}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "section-overlap-lesson-warmup",
+   "check": "L-OVERLAP SECTION: a section's ink never covers the next section's heading (critic laned-restart R1-6: the add_facts lesson Warm-up printed over \"Guided Practice:\")",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP SECTION (H2, C3, PG-12): read on the printed PDF, no paint after a band's strip label lands on it",
+   "browser": true,
+   "fail": {
+    "commit": "31a856fd",
+    "state": "critic r1 commit: add_facts lesson at S, page 2: the Warm-up's second counters cell (measured 3 mm short) covers the top of \"Guided Practice:\""
+   },
+   "pass": {
+    "commit": "279f556d",
+    "state": "F2 r2 fix: the measuring cell takes the counters tab spacer; the Warm-up splits into two rows of 2 (main's layout) and clears the strip"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills addition:add_facts --roles lesson --size S --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "detailed-link-every-use",
+   "check": "A detailed lesson's Practice link decodes to skills.used use by use, each with its own options (lessons 6-7 merge: the link de-duplicated by skill id)",
+   "kind": "commit-pair",
+   "rule": "ws-teacher-wrm round 9 detailed cards: link decodes to skills.used in order; options compared per use",
+   "browser": true,
+   "fail": {
+    "commit": "5c6063a5",
+    "state": "lessons 6-7 merged: lesson 6 link holds 7 of its 14 uses, 11 option sets lost"
+   },
+   "pass": {
+    "commit": "c5675779",
+    "state": "makePracticeLink encodes its items, not the de-duplicated queue"
+   },
+   "command": "node tests/scripts/ws-teacher-wrm.cjs --grade 4",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pupil-link-every-use",
+   "check": "A pupil who opens a detailed lesson's Practice link is dealt every (skill, options) use, each item with its own use's options (lessons-sharelink: the queue and option store keyed by skill, so a repeated skill played only its first use)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-link-uses: every item matches one of its skill's uses; every use deals at least once in 3 rounds",
+   "browser": true,
+   "fail": {
+    "commit": "39ecfb28",
+    "state": "lesson 6 link opened as a pupil: 7 of 14 uses never dealt (placevalue:value always played its first use's options)"
+   },
+   "pass": {
+    "commit": "c072216d",
+    "state": "decoded uses ride as mixedModeSettings.uses; custom_mixed deals them from a deck, each with its own options"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage play",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "link-default-use",
+   "check": "A Practice link that repeats a skill with one use at its defaults encodes that use as {} ([A{opts}, A] and [A, A{opts}] decode to two different parts); every lesson link decodes use by use, default uses included",
+   "kind": "commit-pair",
+   "rule": "sharelink checker D1: generateSkillCode(list) fell back to the option store for a use with no opts",
+   "browser": true,
+   "fail": {
+    "commit": "7666cb47",
+    "state": "both parts decode to {band:9999, form:times}"
+   },
+   "pass": {
+    "commit": "8a31e1e8",
+    "state": "an explicit list never reads the store: a use with no opts is {}"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage codec",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "link-stale-uses",
+   "check": "After a link session the pupil removes a skill or edits an option and plays with last settings: no item of the removed skill, the edit honoured, the link's uses dropped",
+   "kind": "commit-pair",
+   "rule": "sharelink checker D2: mixedModeSettings.uses survived the queue's sync and replayed",
+   "browser": true,
+   "fail": {
+    "commit": "7666cb47",
+    "state": "14 stale uses in play; the removed skill dealt; the edited options ignored"
+   },
+   "pass": {
+    "commit": "8a31e1e8",
+    "state": "syncAll drops stale uses; the dealer re-checks queueUsesInPlay before every item"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage stale",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "link-seeded-uses",
+   "check": "generateQuestionFor custom_mixed with a link's uses: two seeded runs of 15 are equal and each item's skillOptions are its dealt use's",
+   "kind": "commit-pair",
+   "rule": "sharelink checker D3: the uses deck sat outside the seed and generateQuestionFor overwrote the use's options with the pool's",
+   "browser": true,
+   "fail": {
+    "commit": "7666cb47",
+    "state": "runs differ; skillOptions {} where the use has options"
+   },
+   "pass": {
+    "commit": "8a31e1e8",
+    "state": "the use is dealt by the page dealer or the item seed; a dealt use keeps its skillOptions"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage seeded",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "link-identical-repeats",
+   "check": "A code that repeats a skill with the same options (XX2-XX4-YY, A{o}-A{o}-B) collapses as before: no uses recorded or in play, weights by skill",
+   "kind": "commit-pair",
+   "rule": "sharelink checker D4: every repeating code played from the uses deck",
+   "browser": true,
+   "fail": {
+    "commit": "7666cb47",
+    "state": "XX2-XX4-YY recorded 3 uses and played them"
+   },
+   "pass": {
+    "commit": "8a31e1e8",
+    "state": "uses recorded only when a repeated skill's options differ"
+   },
+   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage weights",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "support-fact-x-laned",
+   "check": "With several supports on, a ÷ fact section keeps one fact zone: the answer line and the supports at one x in every cell (Lane D restart critic r3 R3-1: Test S --supports all centred sign box + fact + support per row, the answer zone moved 69.0 vs 86.4 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-SUPPORT SCC-T10",
+   "browser": true,
+   "fail": {
+    "commit": "da684125",
+    "state": "critic r3 FAIL commit: div_facts Test S --supports all, each row's group centred, answer zone 69.0 vs 86.4 mm"
+   },
+   "pass": {
+    "commit": "a3fd6947",
+    "state": "R3-1 fix: widest-fact zone (144 ÷ 12) per section, answer right-aligned in it, supports left-aligned beside"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles test --supports all --size S",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "vq-rep",
    "check": "A relation skill (fact family, number family, bond, part-whole, make ten) draws the relation with a library drawing (VQ-1)",
    "kind": "fixture",
@@ -1013,126 +1273,6 @@
    }
   },
   {
-   "id": "detailed-link-every-use",
-   "check": "A detailed lesson's Practice link decodes to skills.used use by use, each with its own options (lessons 6-7 merge: the link de-duplicated by skill id)",
-   "kind": "commit-pair",
-   "rule": "ws-teacher-wrm round 9 detailed cards: link decodes to skills.used in order; options compared per use",
-   "browser": true,
-   "fail": {
-    "commit": "5c6063a5",
-    "state": "lessons 6-7 merged: lesson 6 link holds 7 of its 14 uses, 11 option sets lost"
-   },
-   "pass": {
-    "commit": "c5675779",
-    "state": "makePracticeLink encodes its items, not the de-duplicated queue"
-   },
-   "command": "node tests/scripts/ws-teacher-wrm.cjs --grade 4",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "pupil-link-every-use",
-   "check": "A pupil who opens a detailed lesson's Practice link is dealt every (skill, options) use, each item with its own use's options (lessons-sharelink: the queue and option store keyed by skill, so a repeated skill played only its first use)",
-   "kind": "commit-pair",
-   "rule": "ws-lesson-link-uses: every item matches one of its skill's uses; every use deals at least once in 3 rounds",
-   "browser": true,
-   "fail": {
-    "commit": "39ecfb28",
-    "state": "lesson 6 link opened as a pupil: 7 of 14 uses never dealt (placevalue:value always played its first use's options)"
-   },
-   "pass": {
-    "commit": "c072216d",
-    "state": "decoded uses ride as mixedModeSettings.uses; custom_mixed deals them from a deck, each with its own options"
-   },
-   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage play",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "link-default-use",
-   "check": "A Practice link that repeats a skill with one use at its defaults encodes that use as {} ([A{opts}, A] and [A, A{opts}] decode to two different parts); every lesson link decodes use by use, default uses included",
-   "kind": "commit-pair",
-   "rule": "sharelink checker D1: generateSkillCode(list) fell back to the option store for a use with no opts",
-   "browser": true,
-   "fail": {
-    "commit": "7666cb47",
-    "state": "both parts decode to {band:9999, form:times}"
-   },
-   "pass": {
-    "commit": "8a31e1e8",
-    "state": "an explicit list never reads the store: a use with no opts is {}"
-   },
-   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage codec",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "link-stale-uses",
-   "check": "After a link session the pupil removes a skill or edits an option and plays with last settings: no item of the removed skill, the edit honoured, the link's uses dropped",
-   "kind": "commit-pair",
-   "rule": "sharelink checker D2: mixedModeSettings.uses survived the queue's sync and replayed",
-   "browser": true,
-   "fail": {
-    "commit": "7666cb47",
-    "state": "14 stale uses in play; the removed skill dealt; the edited options ignored"
-   },
-   "pass": {
-    "commit": "8a31e1e8",
-    "state": "syncAll drops stale uses; the dealer re-checks queueUsesInPlay before every item"
-   },
-   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage stale",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "link-seeded-uses",
-   "check": "generateQuestionFor custom_mixed with a link's uses: two seeded runs of 15 are equal and each item's skillOptions are its dealt use's",
-   "kind": "commit-pair",
-   "rule": "sharelink checker D3: the uses deck sat outside the seed and generateQuestionFor overwrote the use's options with the pool's",
-   "browser": true,
-   "fail": {
-    "commit": "7666cb47",
-    "state": "runs differ; skillOptions {} where the use has options"
-   },
-   "pass": {
-    "commit": "8a31e1e8",
-    "state": "the use is dealt by the page dealer or the item seed; a dealt use keeps its skillOptions"
-   },
-   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage seeded",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "link-identical-repeats",
-   "check": "A code that repeats a skill with the same options (XX2-XX4-YY, A{o}-A{o}-B) collapses as before: no uses recorded or in play, weights by skill",
-   "kind": "commit-pair",
-   "rule": "sharelink checker D4: every repeating code played from the uses deck",
-   "browser": true,
-   "fail": {
-    "commit": "7666cb47",
-    "state": "XX2-XX4-YY recorded 3 uses and played them"
-   },
-   "pass": {
-    "commit": "8a31e1e8",
-    "state": "uses recorded only when a repeated skill's options differ"
-   },
-   "command": "node tests/scripts/ws-lesson-link-uses.cjs --lesson g4-nbt1-ten-times-value --stage weights",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
    "id": "vq-once-reason-it-story",
    "check": "A Reason It item prints a word-work story ONCE, over its A and B panels (visual-quality critic r3 N12: each panel repeated the whole story, so L held one item, an H5 lone item and a 33.6 % band)",
    "kind": "commit-pair",
@@ -1146,6 +1286,46 @@
     "state": "N12 fix: the story once at the top of the item, the A and B number sentences (noStory) under it; L holds 2"
    },
    "command": "node tests/scripts/ws-visual-quality.mjs --skill subtraction:sub_wp_20,addition:add_wp_20_plain --rules VQ-ONCE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "rp1-skipstrip-laned",
+   "check": "RP-1 (answer given away) reads a skip-count strip by its marks, not its digits: a plain count-by list of the divisor's multiples may hold the quotient (12 ÷ 2: 2 4 6 8 10 lists 6); a strip that marks the quotient's (or the dividend's) term out by weight, stroke, ring or fill still fails (lead ruling, Lane D R4 prep 2026-11-03)",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-SUPPORT RP-1 (supportCheckInPage plainStrip: [data-ws-skipstrip] terms step x 1..n, one signature per [data-ws-term] group, nothing else drawn)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/rp1-skipstrip.fail.html",
+    "state": "12 ÷ 2 with its skip strip's term 6 drawn bold on a 0.9 stroke"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/rp1-skipstrip.pass.html",
+    "state": "the plain strip 2 4 6 8 10 ... as cells/fact.js draws it"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --support-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "simple-print-exact-missing-add-sub",
+   "check": "25 missing_add_sub at M, 6 asked: Aim and Exactly plan different pages, and Auto lays 3 columns (Lane D R4d: after the port 25f32bea the boxed missing-number sentence on 1 em operator tracks overran a third of the page by 0.5 mm, so every request fell to 2 columns)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print EXACT",
+   "browser": true,
+   "fail": {
+    "commit": "33bf69bf",
+    "state": "hand-over 8: missing_add_sub M max 2 columns, Aim 6 and Exactly 6 both plan 2 x 8"
+   },
+   "pass": {
+    "commit": "bcc3ab2d",
+    "state": "R4d: missing-number sentences on the kit's tight across tracks (ACROSS_OP_EM / ACROSS_GAP_EM): Auto 3 x 8, Exactly 6 -> 3 (max), Aim -> 2"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

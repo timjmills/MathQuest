@@ -334,7 +334,7 @@ register('counters', {
             const slot = box(ctx, { value: slotValue(ctx, 'answer', kv), w: sq, h: sq, mark: 'blank' });
             return root(ctx, 'k2-sort', `<div style="display:flex;justify-content:center;margin-bottom:${L(ctx, 3)};">${keySpecimen(ctx, p.asked)}</div>`
                 + `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};">`
-                + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${bagPicture(ctx, p.bag || [])}</div></div>${slot}</div>`,
+                + `<div style="display:flex;justify-content:safe center;"><div style="flex:none;">${bagPicture(ctx, p.bag || [])}</div></div>${slot}</div>`,
             isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });
         }
         if (p.kind === 'teen') {
@@ -350,12 +350,15 @@ register('counters', {
         // P11 Support level 3: the answer written in grey to trace (the traced state of the slot).
         const tctx = p.traced && ctx.state === 'blank' ? Object.assign({}, ctx, { state: 'traced' }) : ctx;
         const slot = box(tctx, { value: slotValue(tctx, 'answer', kv), w: sq, h: sq, mark: 'blank' });
+        // (r11, CL-40) the picture is centred SAFELY: one a little wider than the room beside the
+        // box (the cell steps right of the tab's keep-out) starts at the room's left and runs into the
+        // gap before the box, never back into the keep-out; it never shrinks.
         // Round-3 re-grade: the answer box stands at ONE place in every cell (the cell's right),
         // the objects centred in the room left of it - a box that followed each picture's width
         // jumped about from cell to cell.
         const pp = ctx.state === 'traced' && !p.objects && p.layout !== 'scattered' ? Object.assign({}, p, { countMarks: true }) : p;
         return root(ctx, 'k2-count', `<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:${L(ctx, 4)};">`
-            + `<div style="display:flex;justify-content:center;"><div style="flex:none;">${countPicture(ctx, p.n, p.shape, pp)}</div></div>${slot}</div>`
+            + `<div style="display:flex;justify-content:safe center;"><div style="flex:none;">${countPicture(ctx, p.n, p.shape, pp)}</div></div>${slot}</div>`
             // P11 Support level 2: a number track under the picture to point along.
             + (p.track ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};">${trackStrip(ctx, p.track)}</div>` : ''),
         isTwin(ctx) ? {} : { style: 'width:100%;box-sizing:border-box;' });

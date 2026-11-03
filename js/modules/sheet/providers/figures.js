@@ -274,7 +274,7 @@ function barSteps(q) {
             const tot = sum(vals);
             return [
                 step(`Read every ${unit}: ${vals.join(', ')}.`),
-                step(`Add: ${vals.join(' + ')} = ${tot}.`),
+                step(`Add: ${vals.join('\u00a0+\u00a0')}\u00a0=\u00a0${tot}.`),
                 step(`Write ${tot}.`, mark(tot)),
             ];
         }
@@ -364,7 +364,9 @@ function perimeterSteps(q) {
     const out = [];
     if (show.some((v) => !v)) out.push(step('A side with no number is as long as the side opposite it.'));
     out.push(step(`Go all the way round: ${sides.length} sides, ${sides.join(', ')}.`));
-    out.push(step(`Add: ${sides.join(' + ')} = ${tot}.`));
+    // (Lane D R4d, WRAP-OP: the sum is joined with no-break spaces, so a narrow side anchor breaks
+    // after "Add:", never after a "+")
+    out.push(step(`Add: ${sides.join('\u00a0+\u00a0')}\u00a0=\u00a0${tot}.`));
     out.push(step(`Write ${tot} in the box.`, [{ slot: 'answer', value: String(tot) }]));
     return out;
 }

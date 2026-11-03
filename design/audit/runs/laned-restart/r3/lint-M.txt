@@ -1,0 +1,218 @@
+ws-print-lint: source kit, 5 skill(s)
+  addition:add_facts#fact-rows: 2+1 pages, 0 finding(s)
+  addition:add_facts#fact-probe: 2+1 pages, 0 finding(s)
+  addition:add_facts: 2+1 pages, 0 finding(s)
+  addition:add_facts#more-practice: 2+1 pages, 0 finding(s)
+  addition:add_facts#test: 2+1 pages, 0 finding(s)
+  addition:add_facts#true-false: 2+1 pages, 0 finding(s)
+  addition:add_facts#stretch: 2+1 pages, 0 finding(s)
+  addition:add_facts#word-problems: 2+1 pages, 0 finding(s)
+  addition:add_facts#review: 2+1 pages, 0 finding(s)
+  addition:add_facts#lesson: 6+3 pages, 0 finding(s)
+  addition:add_facts#opener: 2+1 pages, 0 finding(s)
+  addition:add_facts#guided: 2+1 pages, 0 finding(s)
+  addition:add_facts#mixed-practice: 2+1 pages, 0 finding(s)
+  addition:add_facts#reason-it: 2+1 pages, 6 finding(s)
+  subtraction:sub_facts#fact-rows: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#fact-probe: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#more-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#test: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#true-false: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#stretch: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#word-problems: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#review: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#lesson: 6+3 pages, 4 finding(s)
+  subtraction:sub_facts#opener: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#guided: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#mixed-practice: 2+1 pages, 0 finding(s)
+  subtraction:sub_facts#reason-it: 2+1 pages, 6 finding(s)
+  multiplication:mult_facts#fact-rows: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#fact-probe: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#more-practice: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#test: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#true-false: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#stretch: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#word-problems: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#review: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#lesson: 6+3 pages, 0 finding(s)
+  multiplication:mult_facts#opener: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#guided: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#mixed-practice: 2+1 pages, 0 finding(s)
+  multiplication:mult_facts#reason-it: 2+1 pages, 6 finding(s)
+  division:div_facts#fact-rows: 2+1 pages, 0 finding(s)
+  division:div_facts#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts: 2+1 pages, 0 finding(s)
+  division:div_facts#more-practice: 2+1 pages, 0 finding(s)
+  division:div_facts#test: 2+1 pages, 0 finding(s)
+  division:div_facts#true-false: 2+1 pages, 0 finding(s)
+  division:div_facts#stretch: 2+1 pages, 0 finding(s)
+  division:div_facts#word-problems: 2+1 pages, 0 finding(s)
+  division:div_facts#review: 2+1 pages, 0 finding(s)
+  division:div_facts#lesson: 6+3 pages, 0 finding(s)
+  division:div_facts#opener: 2+1 pages, 0 finding(s)
+  division:div_facts#guided: 2+1 pages, 0 finding(s)
+  division:div_facts#mixed-practice: 2+1 pages, 0 finding(s)
+  division:div_facts#reason-it: 2+1 pages, 6 finding(s)
+  division:div_facts_long#fact-rows: 2+1 pages, 0 finding(s)
+  division:div_facts_long#fact-probe: 2+1 pages, 0 finding(s)
+  division:div_facts_long: 2+1 pages, 0 finding(s)
+  division:div_facts_long#more-practice: 2+1 pages, 0 finding(s)
+  division:div_facts_long#test: 2+1 pages, 0 finding(s)
+  division:div_facts_long#true-false: 2+1 pages, 0 finding(s)
+  division:div_facts_long#stretch: 2+1 pages, 0 finding(s)
+  division:div_facts_long#word-problems: 2+1 pages, 0 finding(s)
+  division:div_facts_long#review: 2+1 pages, 0 finding(s)
+  division:div_facts_long#lesson: 6+3 pages, 1 finding(s)
+  division:div_facts_long#opener: 2+1 pages, 0 finding(s)
+  division:div_facts_long#guided: 2+1 pages, 0 finding(s)
+  division:div_facts_long#mixed-practice: 2+1 pages, 0 finding(s)
+  division:div_facts_long#reason-it: 2+1 pages, 0 finding(s)
+
+document                                    pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_facts#fact-rows                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#fact-probe                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts                            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#more-practice              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#test                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#true-false                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#stretch                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#word-problems              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#review                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#lesson                     6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#opener                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#guided                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#mixed-practice             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_facts#reason-it                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       6    .  FAIL
+subtraction:sub_facts#fact-rows               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#fact-probe              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts                         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#more-practice           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#test                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#true-false              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#stretch                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#word-problems           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#review                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#lesson                  6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    4  FAIL
+subtraction:sub_facts#opener                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#guided                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#mixed-practice          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_facts#reason-it               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       6    .  FAIL
+multiplication:mult_facts#fact-rows           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#fact-probe          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#more-practice       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#test                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#true-false          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#stretch             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#word-problems       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#review              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#lesson              6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#opener              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#guided              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#mixed-practice      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+multiplication:mult_facts#reason-it           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       6    .  FAIL
+division:div_facts#fact-rows                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#fact-probe                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts                            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#more-practice              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#test                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#true-false                 2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#stretch                    2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#word-problems              2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#review                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#lesson                     6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#opener                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#guided                     2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#mixed-practice             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#reason-it                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       6    .  FAIL
+division:div_facts_long#fact-rows             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#fact-probe            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long                       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#more-practice         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#test                  2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#true-false            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#stretch               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#word-problems         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#review                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#lesson                6+3k    .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .  FAIL
+division:div_facts_long#opener                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#guided                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#mixed-practice        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts_long#reason-it             2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                                 .     .    .    .        .     .       1    .     .       .     .    .      .       .        .      24    4
+
+addition:add_facts#fact-rows (Addition Facts (within 20) (fact-rows))
+
+addition:add_facts#fact-probe (Addition Facts (within 20) (fact-probe))
+
+addition:add_facts#lesson (Addition Facts (within 20) (lesson))
+
+addition:add_facts#opener (Addition Facts (within 20) (opener))
+
+addition:add_facts#mixed-practice (Addition Facts (within 20) (mixed-practice))
+
+addition:add_facts#reason-it (Addition Facts (within 20) (reason-it))
+  [L-OVERLAP CL40-INK major] x6 (p1,2 cells 1,2,3,1,2,3) ink of <div> at 2 mm across, 4 mm down enters the label keep-out (6 x 6 mm at the cell's top-left corner): nothing but the label paints there (CL-40)
+      e.g. <div.mq-abbox> "A 5 + 3 8" | <div.mq-abbox> "A 8 + 4 1 3"
+
+subtraction:sub_facts#fact-rows (Subtraction Facts (within 20) (fact-rows))
+
+subtraction:sub_facts#fact-probe (Subtraction Facts (within 20) (fact-probe))
+
+subtraction:sub_facts#lesson (Subtraction Facts (within 20) (lesson))
+  [L-WRAP WRAP-OP major] x2 (p1,4 cells 1,1) a wrapped line ends in "+": "addition:6+" / "?=12...." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)
+      e.g. <cell> "addition:6+"
+  [L-WRAP WRAP-OP major] x2 (p2,5) a wrapped line ends in "=": "dition:6+?=" / "12...." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)
+      e.g. <(no cell)> "dition:6+?="
+
+subtraction:sub_facts#opener (Subtraction Facts (within 20) (opener))
+
+subtraction:sub_facts#mixed-practice (Subtraction Facts (within 20) (mixed-practice))
+
+subtraction:sub_facts#reason-it (Subtraction Facts (within 20) (reason-it))
+  [L-OVERLAP CL40-INK major] x6 (p1,2 cells 1,2,3,1,2,3) ink of <div> at 2 mm across, 4 mm down enters the label keep-out (6 x 6 mm at the cell's top-left corner): nothing but the label paints there (CL-40)
+      e.g. <div.mq-abbox> "A 1 5 − 6 1 0" | <div.mq-abbox> "A 1 1 − 3 8"
+
+multiplication:mult_facts#fact-rows (Multiplication Facts (1-12) (fact-rows))
+
+multiplication:mult_facts#fact-probe (Multiplication Facts (1-12) (fact-probe))
+
+multiplication:mult_facts#lesson (Multiplication Facts (1-12) (lesson))
+
+multiplication:mult_facts#opener (Multiplication Facts (1-12) (opener))
+
+multiplication:mult_facts#mixed-practice (Multiplication Facts (1-12) (mixed-practice))
+
+multiplication:mult_facts#reason-it (Multiplication Facts (1-12) (reason-it))
+  [L-OVERLAP CL40-INK major] x6 (p1,2 cells 1,2,3,1,2,3) ink of <div> at 2 mm across, 4 mm down enters the label keep-out (6 x 6 mm at the cell's top-left corner): nothing but the label paints there (CL-40)
+      e.g. <div.mq-abbox> "A 2 × 2 2" | <div.mq-abbox> "A 9 × 7 6 3"
+
+division:div_facts#fact-rows (Division Facts (1-12) (fact-rows))
+
+division:div_facts#fact-probe (Division Facts (1-12) (fact-probe))
+
+division:div_facts#lesson (Division Facts (1-12) (lesson))
+
+division:div_facts#opener (Division Facts (1-12) (opener))
+
+division:div_facts#mixed-practice (Division Facts (1-12) (mixed-practice))
+
+division:div_facts#reason-it (Division Facts (1-12) (reason-it))
+  [L-OVERLAP CL40-INK major] x6 (p1,2 cells 1,2,3,1,2,3) ink of <div> at 3 mm across, 5 mm down enters the label keep-out (6 x 6 mm at the cell's top-left corner): nothing but the label paints there (CL-40)
+      e.g. <div.mq-abbox> "A 48 ÷ 4 = 12" | <div.mq-abbox> "A 55 ÷ 11 = 6"
+
+division:div_facts_long#fact-rows (Divide: Long-Division Form (fact-rows))
+
+division:div_facts_long#fact-probe (Divide: Long-Division Form (fact-probe))
+
+division:div_facts_long#lesson (Divide: Long-Division Form (lesson))
+  [L-DENSITY SPREAD major] (p3) page 3: the problems fill 43% of their cells' height (median of 4 rows): rows stretched to share the page read as padding; put more problems on the page before stretching rows (RUBRIC C3 / H13)
+
+division:div_facts_long#opener (Divide: Long-Division Form (opener))
+
+division:div_facts_long#mixed-practice (Divide: Long-Division Form (mixed-practice))
+wrote design/audit/runs/laned-restart/r3/lint-M.json
+
+ws-print-lint: WOULD FAIL - 70 document(s), source kit; 29 finding(s) in 6 document(s) [report-only, exit 0]

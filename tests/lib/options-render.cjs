@@ -35,6 +35,17 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { pathToFileURL } = require('url');
 
+// Capacity pins (Lane D R4 prep, lead ruling 2026-11-03): a value whose capacity cost the OWNER has ruled on is reported
+// as debt, never a FAIL. tests/fixtures/precritic/options-render.pins.json {capacity: {"cat:skill": {option: {values, why}}}}.
+// Only the capacity comparison is pinned; a value's per-cell finding rises still fail.
+const PIN_FILE = path.join(__dirname, '..', 'fixtures', 'precritic', 'options-render.pins.json');
+let PINS = null;
+function capacityPin(p) {
+    if (PINS === null) { try { PINS = JSON.parse(fs.readFileSync(PIN_FILE, 'utf8')).capacity || {}; } catch (e) { PINS = {}; } }
+    const o = PINS[p.skill] && PINS[p.skill][p.option];
+    return o && (o.values || []).map(String).includes(String(p.value)) ? o.why : null;
+}
+
 const NUMBER_IDS = new Set(['band', 'range', 'decimals', 'places', 'maxNumber', 'digits', 'constant', 'count', 'within', 'minuend', 'size']);
 const RUNNER = '/tmp/mq-browser-run.sh';
 const ADDS_DRAWING = /^(level|poolSupport|nlOn|pictures|support|supports|counters|dots|tiles|blocks|model|frame|grid)$/;
@@ -178,7 +189,9 @@ async function main({ root, here, keys, sizes, json, verbose, say }) {
         // changes how the item is written or supported may not cost the page items; one that adds a drawing may
         const mv = kv && kv.pupil.length ? Math.max(...kv.pupil) : null, mb = kb && kb.pupil.length ? Math.max(...kb.pupil) : null;
         if (mv !== null && mb !== null && mv < mb) {
+            const pin = capacityPin(p);
             if (p.adds) row.debt.push(`capacity ${mv} items a page vs ${mb} (a value that adds a drawing: allowed)`);
+            else if (pin) row.debt.push(`capacity ${mv} items a page vs ${mb} (PINNED, owner-ruled: ${pin})`);
             else row.rises.push(`capacity: ${mv} items on its fullest page where the default page prints ${mb} (the value costs the page items without adding a drawing; RUBRIC H13)`);
         }
         if (mv === null || mb === null) row.debt.push('capacity and per-cell rates not measured (no saved page)');

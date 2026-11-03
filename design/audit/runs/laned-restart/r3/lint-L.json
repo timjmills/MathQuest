@@ -1,0 +1,3639 @@
+{
+ "tool": "ws-print-lint",
+ "source": "kit",
+ "lints": [
+  "L-INK",
+  "L-EMOJI",
+  "L-FONT",
+  "L-SIZE",
+  "L-OVERFLOW",
+  "L-SPLIT",
+  "L-DENSITY",
+  "L-KEY",
+  "L-VERBS",
+  "L-ANSAREA",
+  "L-INPUT",
+  "L-CCSS",
+  "L-ANCHOR",
+  "L-SUPPORT",
+  "L-TOPSTART",
+  "L-OVERLAP",
+  "L-WRAP"
+ ],
+ "documents": [
+  {
+   "id": "addition:add_facts#fact-rows",
+   "label": "Addition Facts (within 20) (fact-rows)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-rows\" has no ceiling in this gate",
+    "page 2: role \"fact-rows\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_facts#fact-probe",
+   "label": "Addition Facts (within 20) (fact-probe)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-probe\" has no ceiling in this gate",
+    "page 2: role \"fact-probe\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_facts",
+   "label": "Addition Facts (within 20)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_facts#more-practice",
+   "label": "Addition Facts (within 20) (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_facts#test",
+   "label": "Addition Facts (within 20) (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_facts#true-false",
+   "label": "Addition Facts (within 20) (true-false)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_facts#stretch",
+   "label": "Addition Facts (within 20) (stretch)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_facts#word-problems",
+   "label": "Addition Facts (within 20) (word-problems)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_facts#review",
+   "label": "Addition Facts (within 20) (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_facts#lesson",
+   "label": "Addition Facts (within 20) (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_facts#opener",
+   "label": "Addition Facts (within 20) (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_facts#guided",
+   "label": "Addition Facts (within 20) (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "addition:add_facts#mixed-practice",
+   "label": "Addition Facts (within 20) (mixed-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"mixed-practice\" has no ceiling in this gate",
+    "page 2: role \"mixed-practice\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "addition:add_facts#reason-it",
+   "label": "Addition Facts (within 20) (reason-it)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 4,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 2,
+     "cell": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#fact-rows",
+   "label": "Subtraction Facts (within 20) (fact-rows)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-rows\" has no ceiling in this gate",
+    "page 2: role \"fact-rows\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "subtraction:sub_facts#fact-probe",
+   "label": "Subtraction Facts (within 20) (fact-probe)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-probe\" has no ceiling in this gate",
+    "page 2: role \"fact-probe\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "subtraction:sub_facts",
+   "label": "Subtraction Facts (within 20)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#more-practice",
+   "label": "Subtraction Facts (within 20) (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#test",
+   "label": "Subtraction Facts (within 20) (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#true-false",
+   "label": "Subtraction Facts (within 20) (true-false)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#stretch",
+   "label": "Subtraction Facts (within 20) (stretch)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#word-problems",
+   "label": "Subtraction Facts (within 20) (word-problems)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#review",
+   "label": "Subtraction Facts (within 20) (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#lesson",
+   "label": "Subtraction Facts (within 20) (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 2
+   },
+   "findings": [
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"addition:6+\" / \"?=12....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 1,
+     "el": "<cell> \"addition:6+\"",
+     "cell": 1
+    },
+    {
+     "lint": "L-WRAP",
+     "rule": "WRAP-OP",
+     "sev": "major",
+     "msg": "a wrapped line ends in \"+\": \"addition:6+\" / \"?=12....\" - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)",
+     "page": 4,
+     "el": "<cell> \"addition:6+\"",
+     "cell": 1
+    }
+   ],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "subtraction:sub_facts#opener",
+   "label": "Subtraction Facts (within 20) (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "subtraction:sub_facts#guided",
+   "label": "Subtraction Facts (within 20) (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "subtraction:sub_facts#mixed-practice",
+   "label": "Subtraction Facts (within 20) (mixed-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"mixed-practice\" has no ceiling in this gate",
+    "page 2: role \"mixed-practice\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "subtraction:sub_facts#reason-it",
+   "label": "Subtraction Facts (within 20) (reason-it)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 4,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 2,
+     "cell": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#fact-rows",
+   "label": "Multiplication Facts (1-12) (fact-rows)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-rows\" has no ceiling in this gate",
+    "page 2: role \"fact-rows\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "multiplication:mult_facts#fact-probe",
+   "label": "Multiplication Facts (1-12) (fact-probe)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-probe\" has no ceiling in this gate",
+    "page 2: role \"fact-probe\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "multiplication:mult_facts",
+   "label": "Multiplication Facts (1-12)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#more-practice",
+   "label": "Multiplication Facts (1-12) (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#test",
+   "label": "Multiplication Facts (1-12) (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#true-false",
+   "label": "Multiplication Facts (1-12) (true-false)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#stretch",
+   "label": "Multiplication Facts (1-12) (stretch)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#word-problems",
+   "label": "Multiplication Facts (1-12) (word-problems)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#review",
+   "label": "Multiplication Facts (1-12) (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#lesson",
+   "label": "Multiplication Facts (1-12) (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "multiplication:mult_facts#opener",
+   "label": "Multiplication Facts (1-12) (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "multiplication:mult_facts#guided",
+   "label": "Multiplication Facts (1-12) (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "multiplication:mult_facts#mixed-practice",
+   "label": "Multiplication Facts (1-12) (mixed-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"mixed-practice\" has no ceiling in this gate",
+    "page 2: role \"mixed-practice\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "multiplication:mult_facts#reason-it",
+   "label": "Multiplication Facts (1-12) (reason-it)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 4,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of \"A\" at 4.2 mm across, 6.3 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<span.mq-abtag> \"A\"",
+     "page": 2,
+     "cell": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#fact-rows",
+   "label": "Division Facts (1-12) (fact-rows)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-rows\" has no ceiling in this gate",
+    "page 2: role \"fact-rows\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts#fact-probe",
+   "label": "Division Facts (1-12) (fact-probe)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-probe\" has no ceiling in this gate",
+    "page 2: role \"fact-probe\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts",
+   "label": "Division Facts (1-12)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#more-practice",
+   "label": "Division Facts (1-12) (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#test",
+   "label": "Division Facts (1-12) (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#true-false",
+   "label": "Division Facts (1-12) (true-false)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#stretch",
+   "label": "Division Facts (1-12) (stretch)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#word-problems",
+   "label": "Division Facts (1-12) (word-problems)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#review",
+   "label": "Division Facts (1-12) (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 6,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<polygon>",
+     "page": 1,
+     "cell": 10
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<polygon>",
+     "page": 1,
+     "cell": 11
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<polygon>",
+     "page": 1,
+     "cell": 12
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<polygon>",
+     "page": 2,
+     "cell": 10
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<polygon>",
+     "page": 2,
+     "cell": 11
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <polygon> at 8 mm across, 3.5 mm down enters the label keep-out (8.4 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<polygon>",
+     "page": 2,
+     "cell": 12
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#lesson",
+   "label": "Division Facts (1-12) (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts#opener",
+   "label": "Division Facts (1-12) (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts#guided",
+   "label": "Division Facts (1-12) (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts#mixed-practice",
+   "label": "Division Facts (1-12) (mixed-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"mixed-practice\" has no ceiling in this gate",
+    "page 2: role \"mixed-practice\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts#reason-it",
+   "label": "Division Facts (1-12) (reason-it)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 4,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<div.mq-abbox> \"A 48 ÷ 4 = 12\"",
+     "page": 1,
+     "cell": 1
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<div.mq-abbox> \"A 55 ÷ 11 = 6\"",
+     "page": 1,
+     "cell": 2
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<div.mq-abbox> \"A 48 ÷ 4 = 12\"",
+     "page": 2,
+     "cell": 1
+    },
+    {
+     "lint": "L-OVERLAP",
+     "rule": "CL40-INK",
+     "sev": "major",
+     "msg": "ink of <div> at 3 mm across, 5 mm down enters the label keep-out (7 x 7 mm at the cell's top-left corner): nothing but the label paints there (CL-40)",
+     "el": "<div.mq-abbox> \"A 55 ÷ 11 = 6\"",
+     "page": 2,
+     "cell": 2
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#fact-rows",
+   "label": "Divide: Long-Division Form (fact-rows)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-rows\" has no ceiling in this gate",
+    "page 2: role \"fact-rows\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts_long#fact-probe",
+   "label": "Divide: Long-Division Form (fact-probe)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"fact-probe\" has no ceiling in this gate",
+    "page 2: role \"fact-probe\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts_long",
+   "label": "Divide: Long-Division Form",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#more-practice",
+   "label": "Divide: Long-Division Form (more-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#test",
+   "label": "Divide: Long-Division Form (test)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#true-false",
+   "label": "Divide: Long-Division Form (true-false)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#stretch",
+   "label": "Divide: Long-Division Form (stretch)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#word-problems",
+   "label": "Divide: Long-Division Form (word-problems)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#review",
+   "label": "Divide: Long-Division Form (review)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#lesson",
+   "label": "Divide: Long-Division Form (lesson)",
+   "mode": "kit",
+   "pages": 6,
+   "keyPages": 3,
+   "printedPages": 6,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      2
+     ]
+    },
+    {
+     "key": false,
+     "pages": [
+      3
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      4
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      5
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      6
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"lesson\" has no ceiling in this gate",
+    "page 2: role \"lesson\" has no ceiling in this gate",
+    "page 4: role \"lesson\" has no ceiling in this gate",
+    "page 5: role \"lesson\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts_long#opener",
+   "label": "Divide: Long-Division Form (opener)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": [
+    "page 1: role \"opener\" has no ceiling in this gate",
+    "page 2: role \"opener\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts_long#guided",
+   "label": "Divide: Long-Division Form (guided)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  },
+  {
+   "id": "division:div_facts_long#mixed-practice",
+   "label": "Divide: Long-Division Form (mixed-practice)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 4,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 28.5 mm wide in a 92.2 mm cell (31%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--division[data-ws-cell=\"division\"]> \"8 7 0\"",
+     "page": 1,
+     "cell": 8
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 28.5 mm wide in a 92.2 mm cell (31%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--division[data-ws-cell=\"division\"]> \"10 2 6\"",
+     "page": 1,
+     "cell": 10
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 28.5 mm wide in a 92.2 mm cell (31%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--division[data-ws-cell=\"division\"]> \"8 0 7 0\"",
+     "page": 2,
+     "cell": 8
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "msg": "one empty band 28.5 mm wide in a 92.2 mm cell (31%): the content is pinned to one side (RUBRIC H13)",
+     "el": "<div.ws-cell.mqt--division[data-ws-cell=\"division\"]> \"10 3 2 6\"",
+     "page": 2,
+     "cell": 10
+    }
+   ],
+   "notes": [
+    "page 1: role \"mixed-practice\" has no ceiling in this gate",
+    "page 2: role \"mixed-practice\" has no ceiling in this gate"
+   ]
+  },
+  {
+   "id": "division:div_facts_long#reason-it",
+   "label": "Divide: Long-Division Form (reason-it)",
+   "mode": "kit",
+   "pages": 2,
+   "keyPages": 1,
+   "printedPages": 2,
+   "itemsPerPage": null,
+   "parts": [
+    {
+     "key": false,
+     "pages": [
+      1
+     ]
+    },
+    {
+     "key": true,
+     "pages": [
+      2
+     ]
+    }
+   ],
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 0,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 0,
+    "L-KEY": 0,
+    "L-VERBS": 0,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [],
+   "notes": []
+  }
+ ]
+}

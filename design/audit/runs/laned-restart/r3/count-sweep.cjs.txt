@@ -1,0 +1,49 @@
+// Critic r3 (adapted from r2/sweep2.cjs.txt): R2-2 count = grid = Score /N on mixed fact-rows pages.
+// Build-only, then render the pupil page to count cells per row and read "Score /N" and the fits line.
+const path = require('path'); const fs = require('fs');
+const ROOT = '/home/user/MathQuest';
+const { open } = require(path.join(ROOT, 'tests/lib/ws-harness.cjs'));
+const OUT = process.argv[2];
+const A={categoryId:'addition',skillId:'add_facts',opts:{}}, Su={categoryId:'subtraction',skillId:'sub_facts',opts:{}}, Mu={categoryId:'multiplication',skillId:'mult_facts',opts:{}};
+const D=(f)=>({categoryId:'division',skillId:'div_facts',opts:{divForm:f}});
+const mixes=[['mix4-Mix',[A,Su,Mu,D('mix')]],['mix4-Long',[A,Su,Mu,D('long')]],['mix3-AxLong',[A,Mu,D('long')]],['mix2-Ax',[A,Mu]],['mix2-LongPreset',[A,{categoryId:'division',skillId:'div_facts_long',opts:{}}]]];
+const configs=[];
+for (const [tag,skills] of mixes) for (const size of ['S','M','L']) for (const columns of ['auto',8,10]) {
+  const seeds = size==='S' ? (tag==='mix2-LongPreset'?[1,2,3,4,5,6,7,8]:Array.from({length:24},(_,i)=>i+1)) : [4,7,4242];
+  for (const seed of seeds) if (!(tag==='mix4-Mix'&&size==='S')) configs.push({tag,skills,size,columns,seed});
+}
+(async () => {
+  const { page, close, problems } = await open();
+  const sheet = await page.browser().newPage();
+  await sheet.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+  await sheet.goto(page.url(), { waitUntil: 'domcontentloaded' });
+  const rows=[]; let bad=0;
+  for (const cf of configs) {
+    const id = `${cf.tag}-${cf.size}-c${cf.columns}-s${cf.seed}`;
+    const b = await page.evaluate(async (cf) => { try {
+      const r = await window.buildSheet({ role:'fact-rows', sections:[{skills:cf.skills, columns:cf.columns}], size:cf.size, look:'auto', paper:'A4', seed:cf.seed, form:'A', key:true });
+      return { html: window.sheetDocument(r.pupilHtml,'t',{paper:'A4'}), keyHtml: window.sheetDocument(r.keyHtml,'k',{paper:'A4'}), fits:r.fits, n:r.items.length, pages:r.pageCount };
+    } catch(e){ return {error:String(e&&e.stack||e)}; } }, cf);
+    if (b.error) { console.log(id,'ERROR',b.error.slice(0,200)); bad++; continue; }
+    const m = {};
+    for (const w of ['html','keyHtml']) {
+      await sheet.setContent(b[w], { waitUntil:'load' });
+      await sheet.evaluate(() => document.fonts && document.fonts.ready);
+      m[w] = await sheet.evaluate(() => {
+        const PX=96/25.4; const cells=[...document.querySelectorAll('.ws-grid.facts > .ws-cell')];
+        const tops={}; const ws=new Set(); for (const c of cells){const r=c.getBoundingClientRect(); const t=Math.round(r.top); tops[t]=(tops[t]||0)+1; ws.add((r.width/PX).toFixed(1));}
+        const perRow=Object.values(tops); const txt=document.body.innerText; const sm=txt.match(/Score\s*[_\s]*\/\s*(\d+)/);
+        return { cells:cells.length, cols:Math.max(0,...perRow), rows:perRow.length, last:perRow[perRow.length-1]||0, widths:[...ws], score: sm? +sm[1] : null };
+      });
+    }
+    const p=m.html, k=m.keyHtml; const fp = b.fits && (b.fits.perPage || (b.fits.cols && b.fits.rows ? b.fits.cols*b.fits.rows : null));
+    // printed = grid = Score /N = the dialog's fits line (cols x rows); key the same (r.items is the DEAL, which keepShares trims)
+    const ok = fp!=null && p.cells===fp && p.cols*p.rows===p.cells && p.score===p.cells && k.cells===p.cells && p.widths.length===1 && b.fits.cols===p.cols;
+    if (!ok) bad++;
+    const line = `${id} n ${b.n} pg ${b.pages} cells ${p.cells} grid ${p.cols}x${p.rows} last ${p.last} W ${p.widths.join('/')} score /${p.score} keycells ${k.cells} fits ${JSON.stringify(b.fits)} ${ok?'OK':'MISMATCH'}`;
+    rows.push(line); if(!ok || cf.seed===4242) console.log(line);
+  }
+  fs.writeFileSync(path.join(OUT,'count-sweep.txt'), rows.join('\n')+`\nmismatches ${bad} of ${configs.length}\nproblems ${problems.length}\n`);
+  console.log('mismatches', bad, 'of', configs.length, 'problems', problems.length);
+  await close();
+})().catch(e=>{console.error(e);process.exit(1);});

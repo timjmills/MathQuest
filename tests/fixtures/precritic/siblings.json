@@ -1,6 +1,23 @@
 {
  "about": "ws-sibling-compare: the APPROVED skills of each kit template (process rule 0b: a lane's red matrix row is engine debt only at or below these skills' counts on the same row and size). A skill is listed here when it passed its critic on that template; changed only with a STATUS note. Siblings must have the lane skill's SHAPE (template + digit tracks over 24 seeded items; lead ruling 2026-10-24); `peers` (optional) are same-shape comparison skills used, measured like siblings, when no approved sibling has that shape. `pairs` (optional) gives a lane skill the siblings of its own size band, as the pilot-su-c lead's comparison did (design/audit/runs/pilot-su-c/sibling-compare.cjs); without a pair every approved sibling of the template is used.",
+ "mainRed": [
+  { "row": "division:div_facts|mixed/defaults", "size": "L", "rule": "L-DENSITY PG-23", "n": 2, "proof": "lead ruling 2026-11-03 (Lane D R4): red on the main tip cd81c8e7 with the same 2 findings (ws-print-lint --source kit --kind mixed, div_facts + add_facts + tape_diagram + perimeter_intro, L: last page 2 holds 2 items); the mixed-practice role is the mixed-m2 lane's" }
+ ],
  "templates": {
+  "fact": {
+   "approved": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
+   "source": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",
+   "peers": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
+   "peersSource": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",
+   "pairs": { "division:div_facts": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"] }
+  },
+  "equation": {
+   "approved": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
+   "source": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",
+   "peers": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
+   "peersSource": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",
+   "pairs": { "division:div_facts": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"] }
+  },
   "stack": {
    "approved": [
     "addition:add_100_regroup", "subtraction:sub_100_regroup", "addition:add_1k_regroup", "subtraction:sub_1k_regroup",

@@ -140,6 +140,28 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
 - **Count what the page IS, not what it is not:** "pupil pages = all − keys" counted set covers. Count pupil pages by
   their Name line.
 
+### Fact layouts (Lane D restart, critic r1–r2, 2026-10-31)
+- **A clearance check measures every neighbour, not the one the last critic named.** r1 found the long-division arc
+  INTO the dividend; the fix measured only the dividend side and r2 found the arc 0.27 mm from the divisor (no white
+  pixel at 100 %). *Check:* L-OVERLAP ARC-INK measures both sides (floor 0.3 mm, aim 0.5 mm) plus a 96-dpi raster test
+  that the arc and each neighbouring digit are separate shapes (R2-1; to build).
+- **A seeded layout test needs many seeds when the layout depends on what is dealt.** The mixed + − × ÷ fact-rows page
+  drops to 8 columns only when a product over 99 is dealt; seed 11 never deals one, so 56 facts in a 10-column grid
+  passed. *Check:* L-DENSITY COUNT-FITS — printed items = dialog count = Score /N over seeds 1–24 for every mix (R2-2; to build).
+- **A grid rule belongs to every grid.** GRID-EVEN was scoped to fact rows; the fact probe widened its last row (R2-3).
+  *Check:* GRID-EVEN on every kit grid section + fact-probe × divForm × S/L on precritic's plan (to build).
+- **Text in a bordered box ends inside the border.** "Think: 12 × [ ] = 108" overran its box in 6 of 12 cells (R2-4).
+  *Check:* L-OVERLAP TEXT-FRAME (to build).
+- **A family round runs precritic on every role, not the role it changed.** `--role fact-rows` never saw the add_facts
+  Review M H13 that the existing L-DENSITY catches (R2-5). *Rule:* family rounds run precritic `--role all` at S, M, L.
+- **Pattern (r2):** three of five findings slipped through checks this lane had just written, each scoped too narrowly
+  (one side, one role, one seed). When a lane writes a check, it writes it for the CLASS of defect, not the instance.
+
+- **A new gate covers every role the skill prints on, by default.** print-lint --supports all ran on Independent only; the
+  answer-zone shift with several supports showed on Test (R3-1, SCC-T10 already fires there). *Check:* the precritic supports row
+  runs every fact-family role.
+- **Prove a red is shared before pinning it.** add_facts Review M H13 was about to be pinned as a shared-role defect; the other
+  lane showed main was clean, and the cause was this branch's Review column choice (R2-5).
 ### Student Chromebook speed (chromebook-speed lane, 2026-11-02)
 - **A pupil downloads what core imports, not what a pupil uses.** 37 % of the startup bytes were teacher, print, quiz, MAP
   and curriculum code a ?c= link never runs, and two third-party scripts only the Google export reads. Anything a pupil

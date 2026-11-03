@@ -114,13 +114,14 @@ export {
 export { divisionSteps } from './cells/long-division.js';
 import './cells/pv-times.js';
 import './cells/area-model.js';
+import './cells/area-model-div.js';
 import './cells/mult-chart.js';
 import './cells/ops-counters.js';
 import './cells/arrays-turn.js';
 import './cells/number-line.js';
 import './cells/family.js';
-export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
-export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'arrays-turn', 'remainder', 'number-line', 'fact-family', 'cloze-bank'];
+export { factDigitTracks, factGridStyle, factOpTrackEm, FACT_OP_TRACK_EM, FACT_DIV_OP_TRACK_TIGHT_EM } from './cells/fact.js';
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'arrays-turn', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'area-model-div'];
 
 
 // K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,
@@ -134,6 +135,10 @@ import './cells/chartwindow.js';
 import './cells/seqstrip.js';
 import './cells/compare.js';
 import './cells/wordpic.js';
+// 2026-09-26: odd and even (pairs, which, sort) and a whole from unit-fraction pieces.
+import './cells/long-multiplication.js';
+import './cells/parity.js';
+import './cells/frac-wall.js';
 // "Is it a fact family?" (visual-quality lane 2026-10-31): the fact triangle and a circled Yes / No.
 import './cells/family-check.js';
 export { FAMILY_CHECK } from './cells/family-check.js';

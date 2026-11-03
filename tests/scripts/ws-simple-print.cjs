@@ -218,6 +218,27 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                 const pe = await plan('exact'), pa = await plan('aim');
                 if (pe === pa) F(`EXACT Aim for 6 and Exactly 6 plan the same page for 25 problems: ${pe}`);
                 out.info.push(`EXACT 25 problems, 6 asked: exact ${pe} · aim ${pa}`);
+                // DIVFACTS (owner bug, 2026-11-03: Division Facts (1-12), Pages 1, Small, Columns 5 printed "3 columns x 11 rows" at
+                // every size - the across form capped at 3). ÷ facts print fact rows like the other facts: Auto gives a different
+                // count at S / M / L (10 / 6 / 5, 8 with a long answer), and an explicit Columns 5 prints 5.
+                {
+                    const dv = [{ categoryId: 'division', skillId: 'div_facts', amt: '' }];
+                    const want = { S: [10, 8], M: [6], L: [5] };
+                    const per = {};
+                    for (const size of ['S', 'M', 'L']) {
+                        const b = await m.buildSimple(dv, { how: 'pages', n: 1, size, cols: 'auto', key: false, arrange: 'sections', seed: 4242, title: true });
+                        const cl = (b.colsList && b.colsList.length ? b.colsList : [b.cols]).map(Number);
+                        per[size] = b.total / Math.max(1, b.pages);
+                        if (!cl.some((c) => want[size].includes(c))) F(`DIVFACTS div_facts @${size} Auto: ${cl.join('/')} columns, want ${want[size].join(' or ')}`);
+                        for (const mode of ['exact', 'aim']) {
+                            const b5 = await m.buildSimple(dv, { how: 'pages', n: 1, size, cols: 5, colsMode: mode, key: false, arrange: 'sections', seed: 4242, title: true });
+                            const c5 = (b5.colsList && b5.colsList.length ? b5.colsList : [b5.cols]).map(Number);
+                            if (!c5.includes(5)) F(`DIVFACTS div_facts @${size} Columns 5 (${mode}): printed ${c5.join('/')} columns`);
+                        }
+                    }
+                    if (per.S === per.M || per.M === per.L) F(`DIVFACTS div_facts a page S/M/L = ${per.S}/${per.M}/${per.L}: the size changes nothing`);
+                    out.info.push(`DIVFACTS div_facts a page S/M/L = ${per.S}/${per.M}/${per.L}`);
+                }
                 // SUMMARY (critic r1 #5): only the *_facts ids are named "Facts"
                 const cb = await m.buildSimple(L([{ categoryId: 'addition', skillId: 'add_100_mixed' }, sets.missing[0]]), { how: 'pages', n: 1, size: 'M', cols: 'auto', key: false, arrange: 'sections', seed: 4242, title: true });
                 if ((cb.types || []).some((t) => t.name === 'Facts')) F(`SUMMARY column addition named "Facts": ${m.summaryLine(cb, { key: false })}`);

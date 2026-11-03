@@ -1,0 +1,39 @@
+import sys
+from PIL import Image
+import numpy as np
+# usage: cell.py png  -> detect grid lines inside the outer frame using the column at x mid of grid
+p=sys.argv[1]
+a=np.array(Image.open(p).convert('L'))<140
+H,W=a.shape
+# outer frame: find vertical lines spanning >300px
+colsum=a[150:1050].sum(axis=0)
+vx=[x for x in range(W) if colsum[x]>300]
+g=[]
+for x in vx:
+    if g and x-g[-1][-1]<=2:g[-1].append(x)
+    else:g.append([x])
+vl=[(c[0],c[-1]) for c in g]
+x0,x1=vl[0][1]+1,vl[1][0]
+# horizontal lines: rows where ink covers >90% of first cell's width
+hy=[y for y in range(120,H) if a[y,x0:x1].mean()>0.9]
+g=[]
+for y in hy:
+    if g and y-g[-1][-1]<=2:g[-1].append(y)
+    else:g.append([y])
+hl=[(r[0],r[-1]) for r in g]
+res=[]
+for i in range(len(hl)-1):
+    ya,yb=hl[i][1]+1,hl[i+1][0]
+    h=yb-ya
+    if h<60: continue
+    for j in range(len(vl)-1):
+        xa,xb=vl[j][1]+1,vl[j+1][0]
+        if xb-xa<30: continue
+        sub=a[ya:yb,xa+20:xb-1]  # skip tab
+        rows=np.where(sub.any(axis=1))[0]
+        if len(rows)==0: res.append((i,j,h,'empty'));continue
+        gaps=np.diff(rows)-1
+        res.append((i,j,h,rows[0],h-1-rows[-1],int(gaps.max()) if len(gaps) else 0))
+worst=max(((r[4]/r[2]) if r[3]!='empty' else 1,r) for r in res)
+mid=max(((r[5]/r[2]) if r[3]!='empty' else 1,r) for r in res)
+print(p.split('/')[0],p.split('/')[-1],'cells',len(res),'cellH px',sorted(set(r[2] for r in res)),'worst bottom band %.2f'%worst[0],worst[1],'worst internal gap %.2f'%mid[0])

@@ -294,6 +294,7 @@ export const SKILL_GRADES = {
     'div_sharing_word_problems': 3, 'div_grouping_word_problems': 3, 
     'sub_wp_compare': 1, 'sub_wp_start_unknown': 2, 'add_negative': 6, 'sub_negative': 6,
     'sub_2d_1d': 2,                                                       // 2.NBT.B.5 (2026-10-23 preset, SU-C C3)
+    'div_facts_long': 3,                                                  // 3.OA.C.7 facts in the 4.NBT.B.6 bracket (2026-10-31 preset, facts card Q4)
     'identify_fraction_nl': 3, 'write_fraction_nl': 3, 'compare_fractions_nl': 3, 'equivalent_or_not': 4, 'simplify_with_gcf': 6,
     'unit_frac_div_whole': 5, 'whole_div_unit_frac': 5, 'div_decimal_by_whole': 5, 'div_by_decimal': 6, 'round_to_tenth': 5,
     'round_to_hundredth': 5, 'ratio_part_to_part': 6, 'ratio_simplest_form': 6, 'ratio_equivalent_or_not': 6,
@@ -858,6 +859,8 @@ export const SKILLS = {
         // APPENDED 2026-10-17 — PRESET skills, batch 2 (skill-presets.js; owner: every "ask owner" row is a preset).
         { v: "div_sharing_word_problems", l: "Division Word Problems: Sharing", presetOf: "div_word_problems" },
         { v: "div_grouping_word_problems", l: "Division Word Problems: Grouping", presetOf: "div_word_problems" },
+        // APPENDED 2026-10-31 — PRESET (owner, facts card Q4): division facts in the long-division bracket.
+        { v: "div_facts_long", l: "Divide: Long-Division Form", presetOf: "div_facts" },
     ],
     integers: [
         { v: "number_line_int", l: "Number Lines with Negatives" },
@@ -2022,6 +2025,7 @@ export const SKILL_PRINT_SIZE = {
     // === COMPACT (3 cols): one-line pure arithmetic facts, simple identification ===
     // Rules: ONLY for pure arithmetic with no visuals, one-line answers
     add_facts: "compact", sub_facts: "compact", mult_facts: "compact", div_facts: "compact",
+    div_facts_long: "compact",
     add: "compact", subtract: "compact", multiply: "compact", divide: "compact",
     compare: "compact", compare_int: "compact", compare_decimal: "compact",
     odd_even: "compact", prime_composite: "compact",

@@ -691,6 +691,56 @@ function buildPlan(ctx) {
                 add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
             }
         }
+        // Lane D restart critic r1 R1-15: div_facts' written forms (divForm) on every page type they print on, at S and L
+        // (the fraction's numerator sat in the L tab's keep-out on the Opener, Review and Reason It; the card's own gate
+        // line listed only fact rows). One run per form and size, every fact-family role, against the size's pin.
+        const divFormKeys = keys.filter((k) => /^division:div_facts/.test(k));
+        if (divFormKeys.length) {
+            const DF_ROLES = 'fact-rows,independent,more-practice,test,fact-probe,mixed-practice,opener,guided,review,reason-it,true-false,stretch';
+            for (const form of ['standard', 'long', 'fraction', 'vertical', 'mix']) {
+                for (const sz of ['S', 'L']) {
+                    const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+                    const a = ['--source', 'kit', '--skills', divFormKeys.join(','), '--roles', DF_ROLES, '--size', sz, '--opts', JSON.stringify({ divForm: [form] })];
+                    if (fs.existsSync(file)) a.push('--baseline', rel(file));
+                    add(gate(`print-lint-divform-${form}-${sz}`, `ws-print-lint --source kit --roles (fact family) --size ${sz} --opts divForm=${form} (critic r1 R1-15: each written form on every page type)`, `${divFormKeys.join(',')} × divForm ${form} × ${sz}`, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint }));
+                }
+            }
+        }
+        // The fact skills' pages WITH their supports at S (critic laned-restart R1-4, 2026-10-31: div_facts think / boxsign
+        // ran a row 10.8 mm off the page and split cells across sheets while every supports-off gate was green; the
+        // page-level PG-12 / PG-21 belongs in the table, not only ws-slot-clip's cell clip). Every support ticked
+        // (--supports all), no pin: a finding here is red.
+        const FACT_KEYS = new Set(['addition:add_facts', 'subtraction:sub_facts', 'multiplication:mult_facts', 'division:div_facts']);
+        const factKeys = keys.filter((k) => FACT_KEYS.has(k));
+        // Critic laned-restart r3 R3-1 (2026-10-31): the row ran Independent only, with every support on; div_facts' Test
+        // centred each row's sign box + fact + support and moved the answer zone (SCC-T10). Now every role that carries
+        // supports, and every support COMBINATION the fact skills offer: each single support and all of them.
+        const SUP_ROLES = 'independent,more-practice,test,review';
+        const FACT_SUPPORTS = {
+            'addition:add_facts': ['touch', 'touchall', 'tile', 'frame', 'line', 'boxsign'],
+            'subtraction:sub_facts': ['touch', 'touchall', 'tile', 'frame', 'line', 'boxsign'],
+            'multiplication:mult_facts': ['touch', 'skip', 'array', 'boxsign'],
+            'division:div_facts': ['touch', 'skip', 'array', 'think', 'boxsign'],
+        };
+        if (factKeys.length) {
+            add(gate('print-lint-supports-S', `ws-print-lint --source kit --supports all --size S --roles ${SUP_ROLES} (fact skills with every support on: PG-12, PG-21, CL-40, SCC-T10)`, `${factKeys.join(', ')} × supports × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--supports', 'all', '--size', 'S', '--roles', SUP_ROLES, '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
+            const singles = [...new Set(factKeys.flatMap((k) => FACT_SUPPORTS[k] || []))];
+            for (const sup of singles) {
+                const ks = factKeys.filter((k) => (FACT_SUPPORTS[k] || []).includes(sup));
+                add(gate(`print-lint-supports-${sup}-S`, `ws-print-lint --source kit --supports ${sup} --size S --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
+            }
+        }
+        // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
+        // the across block, and the ÷ probes at L re-laid cells 19-20 at 1.5 columns; L-DENSITY GRID-EVEN now reads every
+        // kit grid). div_facts' forms run on the probe in the divForm gates above (fact-probe is in DF_ROLES).
+        if (factKeys.length) {
+            for (const sz of ['S', 'M', 'L']) {
+                add(gate(`print-lint-probe-${sz}`, `ws-print-lint --source kit --roles fact-probe --size ${sz} --lints L-DENSITY (critic r2 R2-3: one cell width per probe grid)`, `${factKeys.join(', ')} × fact-probe × ${sz}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--roles', 'fact-probe', '--size', sz, '--lints', 'L-DENSITY', '--skills', factKeys.join(',')], { parse: PARSE.printLint }));
+            }
+        }
         // Visual-quality critic r1 (root cause of F3 / F4): ws-grade-render MEASURED a lesson cell overflowing its pad and a
         // 41 x 44 px phone-card input, but no --skill gate failed on either (print-lint's L-OVERFLOW reads rectangles past the
         // cell edge, never content run into the pad; no screen gate measured target size). --gate makes those measurements a
@@ -702,6 +752,8 @@ function buildPlan(ctx) {
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));
         if (ssFile && srcHas(ssFile, 'json')) ss.push('--json', path.join(ctx.logs, 'screen-slots.json'));
+        // --uniform (Lane D restart critic r1 R1-16): one digit size per worksheet, equal paper cells per row of cards
+        if (ssFile && srcHas(ssFile, 'uniform')) ss.push('--uniform');
         add(gate('screen-slots', 'ws-screen-slots --skills', scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)

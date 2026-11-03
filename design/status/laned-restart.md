@@ -1,0 +1,647 @@
+# Lane D restart (work order item 3, 2026-10-30)
+
+Branch `claude/sweet-newton-c8wrv1-laneD-restart`, cut from `claude/sweet-newton-c8wrv1` @ fbeaa332.
+Source of the old work: `claude/sweet-newton-c8wrv1-wip-a3256e8dfc9684535` @ 235d44b4 (Lane D r12d, 2026-10-17;
+merge base with today e53677e0; 118 lane commits vs 1272 on main since). Last critic: r8 FAIL (ffbe879f); r9–r12d unverified.
+The 4 WIP commits after 235d44b4 (16406407 73f504ab 414f743a a31555a6) are not taken.
+
+## Plan
+
+| Step | Who | What |
+|---|---|---|
+| A | builder mq-opus-medium (rebuild of critic-failed work) | Port Lane D r3–r12d code onto today's kit; resolve the 19 conflicting files; today's behaviour wins where newer |
+| B | builder mq-opus-medium (first build of a new drawing) | ÷ facts 10 columns in all three notations (fraction, ÷ sign, long-division bracket); sub_facts S H13; fact-family spec card draft |
+| C | lead | merge A + B, clean before critic (precritic --strict per skill + unit gates on branch merged with main) |
+| D | critic mq-opus-medium | one round, whole family, every page type and screen host |
+
+## Log
+
+- 2026-10-30: lane started; repo unshallowed (the conflict count needs the real merge base).
+- 2026-10-30 (builder A): port of 235d44b4 js/ css/ tests/ + WORKSHEET_DESIGN_STANDARD.md rule text (`git diff e53677e0 235d44b4 | git apply -3`); no render/run files taken.
+
+## Port: how each conflict was resolved
+
+| File | Resolution | Why |
+|---|---|---|
+| WORKSHEET_DESIGN_STANDARD.md | combined | the lane's CL-9a (numbers by default) added above today's CL-10 text, which keeps its "superseded by CL-11a" note; CL-2a / CL-2b came in clean |
+| css/sheet-kit.css | kept today | today's CL-4b top start and CL-40 / CL-41 spacers win; the lane's r11 rules (equation w2/w3 padding, seqstrip / counters / remainder step right or down, parity inset) and its clean-applied CL-40 "top band" (padding-top max(3 mm, keep-out) on every labelled cell) are dropped; its `--ws-ko` / `--ws-koin` variables, box clear height and fact-box rules are kept |
+| js/modules/gen-algebraic.js | combined | today's skip-count imports + the lane's `onNewPage` import |
+| js/modules/gen-fractions.js | took lane, then today's pools | the lane's kit drawings of fraction_number_line (5 kinds, `forms`) and whole_as_fraction; every denominator pick goes through today's `_fDenPool` (the `denoms` option), kind 3 never narrowed below 4 parts |
+| js/modules/gen-operations.js | combined | mult_properties commutative: today's `arrays-turn` kit cell (lane only shrank the old SVG); distributive keeps today's `printSlot`; lane's removal of the duplicate "Distributive Property" title and the giveaway "Any number × 1" caption taken |
+| js/modules/generate-question.js | combined | today's `setRedraw` import + the lane's `renderCell, wordWorkTwin` import |
+| js/modules/print-sheet.js | combined (15 hunks) | imports unioned; generateRun: today's lesson `pass()` with the lane's late-retry index shift, pool one-look and `want` checks inside it; measureItems: lane's batched / cached measure, its context keyed by today's `wrapToCell` / `tightRows`; today's side-by-side measure helpers and HEIGHT CLASSES kept beside the lane's `fineSplitOf`; layoutOf counts with the lane's three groups, today's number-line squeeze kept for a band page with no column-work group; capFromL takes today's sideFit + the lane's page cap; markSectionWriteAbove kept on the lane's pool deal; the lane's build queue (`buildSheet` -> keyedSheet), with today's detailed-lesson redirect outside the queue and today's nested lesson sheet built with `keyedSheet(..., buildSheetCounted)` (a queued nested build would wait for itself); today's `buildSheetCore` calls renamed to the lane's `buildSheetDeal`; result fields unioned (`numberLine`, `narrowCells`, `hClass`, `sig`) |
+| js/modules/sheet/cells/word-work.js | combined | today's `barLayout` (lesson bar form) kept and dispatched first inside the lane's `renderWork` (neutral frame, caption, KO inset) |
+| js/modules/sheet/contract.js | combined | both instruction strings kept (today's story-rcdws / story-bar, the lane's story-work-ring / story-work-div) |
+| js/modules/sheet/index.js | combined | OPS_TEMPLATE_IDS: today's `arrays-turn` + the lane's `area-model-div` |
+| js/modules/sheet/layout.js | combined | the lane's `legacyH` / `evenRows` with today's `fillRefH` (number-line band) argument |
+| js/modules/sheet/paginate.js | combined | today's default label `tab` (CL-11a) + the lane's `pageOf` (no restart inside a page) |
+| js/modules/sheet/roles/practice.js | combined (5 hunks) | today's `resolveBandedLayout` with the lane's `pageCap` / `freeRows`; label style forced to tab (CL-11a) but `let` for the lane's later reassignment; the lane's part cell height + `fillRefH`; the lane's SPREAD / widen-last / fill with today's side-by-side columns and number-line header; the lane's "mq-spread centres every cell" CSS dropped (CL-4b) |
+| js/modules/sheet/tokens.js | kept today | both set `label: 'tab'`; today's CL-11a comment |
+| tests/scripts/ws-content-audit.cjs | combined | the lane's times-as-many story sweep runs before today's MC sweep |
+| tests/scripts/ws-layout-unit.mjs | kept today | today's CL-11a assertions (same checks); the lane's CL-13 pageOf test now names the letter style |
+| tests/scripts/ws-print-lint.cjs | combined (9 hunks) | today's doc list / attribution / `absent` form; the lane's pool judge (`pool` flag), `--letters`, `--seeds` / `--seed-list` moved into `kitDocList` (kind single); the lane's DN-2 self-test written in today's `absent` form |
+| tests/scripts/ws-share-options.cjs | kept today | same change both sides (label stripped before reading a cell's text) |
+
+Also fixed after the port: `amEdges` / `amForm` option keys moved 5P / 5Q -> 5V / 5W (main had given 5P / 5Q to answerSlot / winRows; ws-code-snapshot caught the collision).
+
+Later port fixes (each its own commit): the pool dealer's page check (`pageCheck`) judges a top-started cell as
+today's lint does (CL-4b + H13-ROW), not as a centred one (it re-dealt almost every pool page); one-line equations /
+facts on a grid numbered past 9 start below the wide tab's keep-out (CSS, fact rows excepted); the lane's own
+L-OVERFLOW CL-40 lint is dropped for today's L-OVERLAP CL40-INK (same rule, ink measure; the lane's fired on
+div_facts fact rows that pass today's); an across fact hosted by a fact cell on fact rows (add_sub_10s) clears the tab;
+whole_as_fraction `forms` matchers read the lane's item text, narrowed `denoms` deal the den/den form.
+`js/modules/sheet/roles/fact-rows.js` is untouched.
+
+## Merge of main 9d6f07b8 (merge-and-gates builder, 2026-10-30)
+
+`git merge origin/claude/sweet-newton-c8wrv1` (9d6f07b8, 55 commits) onto 43e6fe35. Six files conflicted:
+
+| File | Resolution | Why |
+|---|---|---|
+| css/sheet-kit.css | both | additive blocks: the lane's CL-40 grid-past-9 top pad and fact-rows across-fact pad, then main's lesson 7 r2 `.mq-wwframes` no-spacer rule |
+| js/modules/print-sheet.js | combined | main's measuring frame (`MDOC` / `measureDocument()`, awaited in buildSheetDeal and the detailed lesson) with the lane's batched + cached `measureItems` / `measureFresh` / `MEASURE_CACHE`: both functions now take `document` = the frame document (app page as fallback), and `measureFresh` reads `getComputedStyle` through the frame's own window, as main's measureItems did. Main's own batching (one pass per column count and state) is dropped for the lane's, which batches the same way and also caches; main changed nothing else in the function |
+| js/modules/screen-cell.js | both | `kitCellTwin`: main's `pv-times` twin first, then the lane's `equationKitTwin` |
+| js/modules/sheet/cells/word-work.js | combined | lane's `renderWork` split kept; main's new `twoStepPart`, `framesLayout`, `chooseLabels`, `chooseLayout` placed before it; main's dispatch (choose, bar, frames) at the top of `renderWork`; main's `factDiv` margin in the full-width body; stepBlock: lane's `st.fact` (no working rows) AND main's `factDiv` skip of step 1's rows |
+| js/modules/sheet/contract.js | both | the lane's story-work-ring / story-work-div and main's story-steps / story-letter / story-check instruction strings |
+| js/modules/word-work.js | combined | the lane's sign-ring / no-sign print and screen instructions as the default; main's `choose` early return and its letter / check / frames overrides after them |
+
+Syntax: every module under js/ passes `node --input-type=module --check`; ws-boot-smoke OK on the merge.
+
+### Fixes after the merge (each its own commit)
+
+- `cells/long-division.js`: `rowTrack` was used in `render` and `footprint` after builder B moved it into `trackOf`
+  (ReferenceError on EVERY division cell since 43e6fe35; ws-layout-unit 9 of 885 red). Defined again in both from `trackMm`.
+- `css/sheet-kit.css` CL-40 under wide tabs (the port's "grid numbered past 9" rule): a top pad of the keep-out + 2.6 mm
+  on every one-line equation / fact cell. The measuring cell carries no wide tab, so rows were never sized for it:
+  stacked facts (more-practice, test, mixed, lesson) and across facts (Fact Probe, div_facts Mixed / Lesson, add_facts
+  Review) ran 0.2-2.1 mm out of their cells (PG-12, 40-60 cells a page). Now: stacked facts take no pad (their ink
+  starts right of the keep-out already); one-line equations and across fact cells clear the keep-out SIDEWAYS (left
+  inset of the w2 keep-out + 0.3 mm), at the cell's own top pad. Fact rows (`.facts`) untouched.
+
+## Gates on the merge (fact family: add_facts, sub_facts, mult_facts, div_facts; main = worktree of 9d6f07b8)
+
+| Gate | Merged branch | Main 9d6f07b8 (same scope) | Verdict |
+|---|---|---|---|
+| syntax (every js/ module), ws-boot-smoke, ws-layout-unit (885), ws-code-snapshot (731 codes), ws-content-audit x4, ws-share-options, ws-screen-answer x4, ws-sheet-determinism x4 | OK | - | green |
+| ws-print-lint --roles fact-rows, S and L x Columns Auto / 5 / 6 / 8 / 10 | 0 findings (all 10 runs) | - | green |
+| ws-print-lint fact-rows, div_facts at 10 columns, divForm standard / long / fraction / mix, S and L | 0 findings (8 runs) | mix L red | green |
+| ws-div-facts-forms | FAIL 8 | FAIL 13 | pre-existing: every one of the 8 is in main's 13 (same check names) |
+| ws-print-lint kit, 4 skills x 17 roles, S / M / L | 57 / 61 / 51 findings | 44 / 64 / 108 | see "still red" |
+| ws-precritic --skill (the 4) --role fact-rows --strict | FAIL 6 of 28 | - | see below |
+
+Precritic gates red: ws-dealer-uniform, ws-node-lint S1 (LESSON-DATA / OPTION-HELP), ws-sibling-compare (no approved
+siblings) - all known pre-existing; spec card INCOMPLETE (unsigned) - known; ws-options-verify --render 16 value pages
+(main 25 on the same four skills: the lane's set is main's less 9, plus none new after the CL-40 fix); ws-slot-clip 3 rows
+(div_facts sections L and fade-page S - the boxsign / think supports on the equation cell, also red on the lane tip
+43e6fe35, green on main; mult_facts fade-page L - red on main too); ws-lessonfit (composing:fraction_number_line, a lane
+port skill, fails main's NEW lessonfit gate - not fact family).
+
+Still red on the fact family (none caused by the merge):
+- sub_facts scripted-model (AK-2 critical, H13 x8) and reason-it (CL40-INK): sub_facts moved onto the kit fact cell
+  (builder B) and now carries the same defects add_facts / mult_facts / div_facts have on main.
+- add_facts Review M: H13 x6 (an add_sub_10s-style across item pinned left in a full-width cell); present at the lane tip.
+- div_facts supports boxsign / think on equation cells (fade-page S, options-verify): overflow 2.6-5 mm and CL40-INK;
+  lane tip and main both red on think / boxsign, the fade-page row only on the lane.
+- notation "across" at 4 columns: S capacity 16 vs 25 (main too); mult_facts L CL40-INK x8 (main x18): a 38 mm across
+  fact does not fit beside a w2 tab in a 46 mm cell - needs fewer columns, not a smaller inset.
+- add_sub_10s (not fact family) Test S: H13 x40 once the top pad went (the row is sized for more than the one line).
+- missing_mult_div (not fact family) More practice L: CL40-INK x2 ("100" under tab 16: the item is wider than its cell less
+  the inset, so it spills left into the keep-out; at a w3-sized inset it was clear but the fact family's across facts ran
+  0.5 mm out of 46 mm cells instead).
+
+Evidence (design/status/laned-restart/, 150 dpi): fact rows Size S, 10 columns (mult_facts 8), pupil page -
+after-{add_facts,sub_facts,mult_facts}.png, after-div_facts-{standard,fraction,long}.png and the same from main as
+before-*.png; practice card card-div_facts-{standard,fraction,long}-{390,1280}.png, card-sub_facts-{390,1280}.png.
+
+## Gates on the port (builder A, 2026-10-30; main = scratchpad worktree of fbeaa332)
+
+| Gate | Branch | Main (same scope) |
+|---|---|---|
+| syntax (every changed module), ws-boot-smoke, ws-layout-unit (570), ws-code-snapshot (723 codes), ws-share-options, ws-search-terms, ws-content-audit (full), ws-key-letters, ws-sheet-determinism S+L, ws-screen-answer (23 lane skills), ws-print-lint --self-test (75) | OK | - |
+| fact rows S/L (+, − at 10, × at 8, ÷ auto, Auto) | same grid, cells, pages and fit notes as main; HTML differs only in 3 dealt facts (page-deal) | - |
+| ws-print-lint kit, 23 lane skills, IND + MP, M | 0 findings | - |
+| ... S | 8 (TY-21 4.06 mm missing-digit box, mixed_multiplication) | pre-existing: same TY-21 on main |
+| ... L | 8 (number_families_add / _mult H13-ROW: a doubles family, 2 sentences, beside a 4-sentence one under CL-4b) | NEW, open |
+| ws-print-lint fact-rows L / S (div_facts, add_facts, sub_facts, mult_facts, add_sub_10s) | 0 | 0 (add_sub_10s n/a on main) |
+| ws-sheet-timing --seeds 10 | FAIL 10 of 20 (p90 3-9 s, max up to 17.9 s; 0 pages kept without a passing deal); the lane tip measured here at median 0.7-1.5 s | lane tip OK on the same 2 pools; open |
+| ws-precritic --strict (lane skills + 4 fact skills + fact-rows) | FAIL (15 of 28); see the builder A report for each gate against main | many pre-existing |
+
+## HAND-OVER (2026-10-31, owner pause: "finish the piece you are on, one critic round, then stop")
+
+Branch head: see `git log -1 claude/sweet-newton-c8wrv1-laneD-restart` (critic r1 at ecb1a5c4, on 31a856fd). Merged with main
+9d6f07b8. NOT deployed, NOT in redesign-passed.js. Lane cost at stop: about $164 of session cost (≈ 5.9 % of the weekly limit at $28 ≈ 1 %).
+
+### Done
+- Lane D r3–r12d code ported onto today's kit (builder A; conflict table above). Today's behaviour kept where newer.
+- ÷ facts reach 10 columns on fact rows in all three notations (builder B): ÷ sign stacked like + − × (Standard and Vertical),
+  fraction a/b with the answer line under it, compact long-division bracket; digits ≥ 16 pt; ink ≥ 1 mm clear each side.
+  + − × fact rows byte-identical (10 / 10 / 8). New rule id VA-2a; PAGE_TYPES PT-FRW-9; layout-unit block PT-FRW-9.
+- sub_facts on the kit fact cell (H13 at S/M fixed; root causes: left out of `_KIT_FACT_SKILLS`, and a 1.2× dense-room double count).
+- Facts spec card `design/cards/facts/` written, UNSIGNED (5 open questions; the lead puts them to the owner).
+- Main merged; long-division `rowTrack` ReferenceError and a CL-40 pad overflow fixed; evidence PNGs in `design/status/laned-restart/`.
+- Critic r1 (independent, mq-opus-medium): `design/audit/runs/laned-restart/critic-r1.md` — **all four skills FAIL**.
+  Scoring ≥ 8: fact rows + − × 9/9/9/9, ÷ Standard/Vertical 9/9/9/9, ÷ fraction 8/8/8/8; Independent, More practice, Test, Fact probe,
+  Word problems, True or False?, Stretch 8–9; practice card (390/820/1280) and quiz 9 for every ÷ form.
+
+### Remaining, in order (next round runs at Opus medium: rebuild of critic-failed work)
+1. R1-1 bracket arc touches the first dividend digit ("4)8" reads 48) at 5–10 columns: open the gutter / draw the arc clear; add
+   L-OVERLAP ARC-INK (arc to first digit ink ≥ 0.3 mm; backtest fails on 31a856fd, passes on main 9d6f07b8). Card Q3 answer depends on it.
+2. R1-6 regression from the port: add_facts lesson page 2 warm-up overflows, loses its 4th item, covers "Guided Practice".
+3. R1-2 Mix fact rows last row widened (uneven grid); R1-16 Mix online worksheet (three digit sizes, uneven cards).
+4. R1-15 div fraction numerator "110" in the tab keep-out at L (Opener, Review, Reason It); R1-4 div supports think/boxsign break the page (main as bad).
+5. Shared-role defects, mostly pre-existing on main, that block every fact skill: R1-3 Scripted model (blank key, repeated fact, H13),
+   R1-5 lesson Steps panels vs guided items, R1-7 Mixed practice S < M, R1-8 Pre-skill check (own skill, 80 % blank), R1-9 Reason It
+   CL40-INK, R1-10 add Review M H13, R1-11 div Review L count-by strip, R1-12 across CL40-INK, R1-13 guided cells 46 % empty, R1-14 Opener "Use the dots".
+   These are role-engine work: decide with the lead whether the fact family waits for them or they go to the owning lanes.
+6. Ported Lane D work OUTSIDE the fact family is not critic-ready (builder A's open list): pool build time vs ws-sheet-timing
+   (10/20 fail), number_families L H13-ROW (doubles beside 4-sentence families under the top start), mult_comparison card focus and
+   wpBank/wpBar no-ops, div_zero_in_quotient / remainder_interpret 2–3 px clip at 390, odd_even range no-op, pool options no-ops,
+   div_zero_in_quotient dealer-uniform (ruling or pin), whole_as_fraction / number_families_mult REPEATS, composing:fraction_number_line lessonfit.
+   Plus after the merge CSS: add_sub_10s Test S H13 ×40, missing_mult_div More practice L CL40-INK ×2.
+7. `ws-stamp-assets` before any deploy.
+
+### Open decisions (owner)
+- Sign `design/cards/facts/facts.md` (Q1–Q5; critic: Q3 not acceptable as drawn until R1-1 is fixed).
+- div_zero_in_quotient: keep the 1-in-4 ones-zero deal (pin dealer-uniform) or deal uniformly.
+- Whether shared-role defects (item 5) gate the fact family or move to their own lanes.
+
+## Round 2, fix builder F1 (2026-10-31, Opus medium: rebuild of critic-r1-failed work)
+
+Scope: R1-1, R1-2, R1-15, R1-16 and the owner ruling of 2026-10-31 (mixed fast-facts page). F2 holds the lesson role,
+the ÷ supports, fraction_number_line lessonfit, the long-division preset skill and the dealer-uniform pin.
+
+| Defect | Fix | New check (backtest row: fails on 31a856fd, passes on f9482c43) |
+|---|---|---|
+| R1-1 bracket arc on the dividend's first digit | `cells/long-division.js` `compactArc`: the arc placed from the glyphs' INK (white a, stroke, bow, white b; b aims 0.7 mm, floor 0.3 mm), each fact its own gutter within the column's room (`factRowRoom`), `DIGIT_INK_EM` re-measured at 1000 px; fact-rows `rowGeometry` refuses a track that keeps less than the floor or whose box leaves the cell | ws-print-lint **L-OVERLAP ARC-INK** (self-test pair); row `arc-ink-laned` |
+| R1-2 Mix last row widened | fact rows keep the lattice (`grid.js` `relay: false`, plumbed in `answer-key.js`) and deal whole rows (Mix thirds within one: 70 = 24/23/23) | ws-print-lint **L-DENSITY GRID-EVEN** on fact-rows grids (self-test pair); row `grid-even-laned` |
+| R1-15 fraction numerator in the L tab keep-out | `cells/equation.js`: a ÷ fact's fraction starts below the keep-out on every page type (paper) | ws-precritic plans `ws-print-lint --opts divForm=<each> x 12 fact-family roles x S/L` for div_facts; row `frac-keepout-laned` (Opener L) |
+| R1-16 Mix online worksheet | `worksheet.js`: one digit size per sheet (the touch-floor digit on every card), equal paper cells per row; `screen-cell.js`: Mix across slot inline | ws-screen-slots **--uniform** (`worksheet:digits`, `worksheet:rows`), planned by ws-precritic; row `screen-uniform-laned` |
+| Owner 2026-10-31: mix ÷ forms with + − × ÷ facts | `fact-rows.js` `mixedForms`: a fact-rows section mixing operations with div_facts forms is one grid, one cell width, each stacked fact on its own tracks, columns = the narrowest form's fit (10 when all fit; a × answer over 99 keeps PT-FRW-5's 8); title "Facts" | ws-layout-unit block (5 mixes x S/M/L x Auto/5/6/8/10); ws-print-lint `--kind sections` takes fact-rows |
+
+Arc white (arc ink to the dividend's first digit ink, measured in the browser at 20x canvas resolution): 10 columns 0.62-0.70 mm
+(S, M and L; worst 10 ) 110), 8 columns 0.69-0.78, 6 columns 0.92-1.05, 5 columns 1.08-1.54. Before (31a856fd, same 20x
+measure): 10 columns -0.09 (into the digit) to 0.26, 8 columns 0.14-0.41 (1x measure), 5 columns 0.57-1.09. Divisor ink to arc
+ink >= 0.27 mm.
+
+Mixed fast-facts page (fact rows, seed 11; cols x rows @ digit pt), one grid, one cell width, ws-print-lint clean at S/M/L x
+Auto/5/6/8/10 for add+sub+mult+div (Mix), add+sub+mult+div (Long), add+sub+div (Fraction), mult+div (Standard):
+
+| Mix of | S Auto | S 10 | M Auto | M 8 | M 10 | L Auto | L 8 | L 10 |
+|---|---|---|---|---|---|---|---|---|
+| + − × ÷(Mix) | 10x7 @16 | 10x7 @16 | 6x5 @24 | 8x6 @18 | 10x7 @16 | 5x5 @28 | 8x6 @18 | 8x6 @18 (a 12 x 11 = 132 dealt: PT-FRW-5) |
+| + − ÷(Mix) | 10x7 @16 | 10x7 @16 | 6x5 @24 | 8x6 @18 | 10x7 @16 | 5x5 @28 | 8x6 @18 | 10x6 @16 |
+| + ÷(Long) | 10x7 @16 | 10x7 @16 | 6x5 @24 | 8x6 @18 | 10x7 @16 | 5x5 @28 | 8x6 @18 | 10x6 @16 |
+
+5 and 6 columns: 5x5 @28 and 6x5 @24 at every size. When the dealt page comes out smaller than its count (the PT-FRW-5 clamp
+after the probe), each operation keeps its share (`keepShares`), so the ÷ facts are never the ones cut.
+
+Byte-identical (buildSheet pupil + key HTML, seed 11, vs 76bc3700): fact rows + − × and ÷ Standard / Vertical / Fraction at S/M/L x
+Auto/5/6/8/10. Changed by design: ÷ Long and Mix fact rows; the ÷ fraction off fact rows (R1-15).
+
+Evidence (150 dpi): `design/status/laned-restart/after-r2-*.png`, `before-r2-*.png`.
+
+Open (not F1's files): the instruction "Look at the _sign_. Solve." prints "thesign" (the `.ws-instrline` flex box drops the space
+before `<u>`; practice.js `instructionHtml`, pinned by ws-layout-unit BD-14); the fact probe (fact-probe.js) still re-lays its
+short last row in Mix / Long / Fraction (H13 31 % band at S and L, pre-existing on 76bc3700).
+
+## Round 2 closing builder (2026-10-31, Opus medium)
+
+Fixes (on eee6dcbc):
+- **CL-40, supports pages** (`css/sheet-kit.css`, additive): a supported problem whose first ink is the sign box (`boxsign`,
+  the 'before' pane) starts at the label keep-out edge (`--ws-koin` + 0.3 mm), beside a picture or not, and never shrinks to
+  make room (min-width: max-content); a grid-past-9 cell already padded right of the w2 keep-out publishes `--ws-koin: 0`.
+  `ws-print-lint --supports all --size S` (4 fact skills): add_facts CL40-INK x10 (main x8), div_facts CL40-INK x6 + H13 x2
+  -> **0 findings** (main: 19 findings in 3 docs). boxsign at L (sub / mult / div): unchanged from HEAD (div boxsign L H13-ROW x2,
+  on main). div_facts fade-packet: L CL40-INK x14 + PAGEFILL -> PG-12 x6 (see open row: the fade allocation is not measured).
+- **"Look at thesign"** (`practice.js instructionHtml`): a line with an underlined word keeps its text in one inline span (the
+  flex line dropped the space before `<u>`); ws-layout-unit BD-14 pin updated with it (1397 assertions OK). Lines with no `<u>`
+  are byte-identical.
+- **OPTION-HELP** (`skill-options.js` supportsOption help / helpShort): "None ticked ..." named the value `none`, which no fact
+  skill offers -> "Leave every box unticked ...". node-lint s1 on the 5 skills: 14 -> 4 (the 4 left are LESSON-DATA, below).
+- **Pins** (owner 2026-10-31: shared-role defects -> page-types lane), `design/audit/baselines/print-lint.json` (L) and
+  `print-lint.S.json` (S), each finding carrying a `pin` note: div_facts Review L CL40-INK 6 (R1-11); div_facts / div_facts_long
+  Reason It CL40-INK 4 at L, 6 at S (R1-9); div_facts / div_facts_long Guided H13 14 / 16 at S (R1-13); sub_facts Lesson S
+  WRAP-OP 4 (R1-5). Max over the five written forms.
+
+### Round 2 precritic (`--skill add_facts,sub_facts,mult_facts,div_facts,div_facts_long --role fact-rows --strict`)
+
+Run /tmp/mq-precritic/20261031-125119-32542 (40 gates: 22 PASS, 1 PASS (baseline), 2 SKIPPED no rulings), then the role
+print-lint gates, supports-S, options-render and node-lint re-run on the final tree. Main = `git worktree` of
+origin/claude/sweet-newton-c8wrv1 5c6063a5, same command.
+
+| Gate | Finding | Same on main? (proved by) | Status |
+|---|---|---|---|
+| print-lint --supports all S | CL40-INK sign box in the keep-out (add x10, div x6), div H13-ROW x2 | main red (19 findings, different cells) | **FIXED** (0 findings) |
+| print-lint --roles (divForm x5) L/S | Review CL40-INK (R1-11), Reason It CL40-INK (R1-9), Guided H13 (R1-13) | shared roles | **PINNED** (owner ruling) |
+| print-lint --roles lesson S | sub_facts WRAP-OP 4 (R1-5) | shared role | **PINNED** (owner ruling) |
+| print-lint --roles lesson S | div_facts_long Lesson SPREAD 1 (page 3, 43 %) | **main red under the lane's lint**: the preset's lesson IS div_facts {divForm: long}'s (same SPREAD 43 % p3 on this tree); main's tree prints the same page 3 (identical 4 x 4 grid, cells and heights) and main's own lint passes it, the lane's ws-print-lint.cjs run against main's tree (r2 final, 5c6063a5) reports the same SPREAD 1. A lint the lane tightened, not a page it changed | main-red (proved, r2 final) |
+| print-lint --roles divForm=long L, mix L | Mixed practice H13 x2 (div_facts), x4 / x2 (div_facts_long), cell 8 31 % band | **main red**: `ws-print-lint --roles mixed-practice --opts divForm=long --size L` on main: same H13 x2 cell 8, 28.5 mm | main-red (documented) |
+| print-lint --roles divForm=mix S/L | Fact Probe H13 x2 cell 20: the form grid's short last row is re-laid 1.5 columns wide | main **ok** (same command) | **FIXED** (r2 final): fact-rows.js formGrid lays a fixed count in a column count that divides it (5 or 4; 2 x 10 left to the fallback, it pins the across facts, H13 x20 at S), the rung the Standard rows' 20 pt where it fits, else the next ladder rung (the 144 / 12 bracket is 49 mm at 20 pt, a quarter page 46 mm). fact-probe mix S and L 0 findings; long / fraction S and L stay 0 |
+| options-verify --skill | div_facts_long support=touch/skip/array/think/boxsign/all: no support drawn | **host red on main**: div_facts {divForm:long, support:[skip]} draws 0 supports on main (buildSheet probe; standard 18, fraction 12, vertical 9, mix 8). The long-division cell is not in support-draw.js canDraw | main-red (documented; the fix is drawing supports on the bracket, or the preset not offering them - ws-presets-unit requires the host's controls) |
+| options-verify --render | 15 value pages worse than default (across capacity at S, array H13, divForm capacity, div boxsign L H13-ROW, ...) | **main red**: 25 value pages on main, every branch page among them | main-red |
+| node-lint s1 | LESSON-DATA: sub / mult / div_facts and div_facts_long have no lessons/prereqs.js entry | **main red** (same 3 + the preset inherits) | main-red |
+| dealer-uniform | add 7, sub 18, mult 1, div 3, div_facts_long 1 | **main red**: add 7, sub 18, mult 1, div 3 (same command) | main-red |
+| slot-clip | div_facts sections/defaults L `ws-eq-below` 6.2 mm under the row (19.3 mm rows; measured[3] = 30.6 mm, the sections layout sizes the row from a one-line height) | **main red**: 8.2 mm, rows 17.3 mm | main-red (not small: practice/print-sheet sections row height, not equation.js) |
+| slot-clip | mult_facts fade-page L PG-12 x8 | **main red**: x8 at L (and S x10, M x8 on main) | **cleared** by the layout.js hMin fix above (r2 final run: ok) |
+| slot-clip | div_facts fade-packet L PG-12 x6 (cells 6-8 of p2: 3 sign-box cells in a 31.3 mm row, measured 52.6 mm at 3 columns) | main red differently: L CL40-INK x14 + DN-2 / H13 / PAGEFILL (26 findings) | **FIXED** (r2 final). Root cause was not the measure (the measuring cell already carries the keep-out; it read 52.6 mm): layout.js resolveSectionLayout's DENSE step moved the narrow part from 1 to 3 columns but kept hMin at the 1-column height (26.1 mm, the sign box beside its fact), so practice.js splitCellH drew its row at 26.1 x 1.2. hMin now takes the height at the columns the dense step chose. fade-packet S/M/L 0; the same fix cleared mult_facts fade-page L PG-12 x8 (main red) |
+| sibling-compare | 162 counts with no approved sibling | structural: no approved fact-family sibling exists on main either | not blocking a fix; needs siblings |
+| content-audit (full) | algebraic_all make-a-ten multiple-choice pair NEW | **main red**: identical NEW line on main | main-red |
+| composing:fraction_number_line lesson | not in this scope's plan (role sample lesson not run by --role fact-rows) | - | not run |
+
+Not red: node-lint, providers, content-audit --skill, presets-unit, lessonfit, coverage-matrix (47 rows OK vs baseline),
+print-lint kit S/M/L, lesson L (baseline), divForm standard S, supports-S, screen-slots, screen-answer, chromebook-fit,
+code-snapshot, boot-smoke, phone-card, spec-card signed, grade-render + print-lint fact-rows S/L. Unit gates: ws-layout-unit OK
+(1397), ws-code-snapshot OK (732), ws-search-terms OK, ws-standards OK, ws-share-options OK, ws-redesign-passed OK (7, unchanged),
+ws-spec-card --check-signed facts.md OK, ws-backtest 5 lane rows PASS (arc-ink-laned, grid-even-laned, frac-keepout-laned,
+screen-uniform-laned, section-overlap-lesson-warmup).
+
+**Final run (r2 final)** /tmp/mq-precritic/20261031-144721-27556: 29 PASS (7 on the baseline), 9 FAIL, 2 SKIPPED (no rulings).
+Every FAIL is a row above: options-verify --skill (div_facts_long supports, main-red), print-lint-lesson-S (sub_facts WRAP-OP
+pinned + div_facts_long SPREAD main-red), print-lint divForm=long L and divForm=mix L (both `div_facts_long#mixed-practice` H13 0 -> 2,
+cell 8, 28.5 mm band: the documented main-red Mixed practice row; Review / Reason It CL40-INK pinned; fact-probe now ok),
+sibling-compare (no siblings), slot-clip (only div_facts sections/defaults L CLIP 6, main-red), dealer-uniform (main-red, same
+counts), node-lint-s1 (LESSON-DATA main-red), options-render (15 value pages, main 25: main-red). No open lane row remains.
+ws-layout-unit OK (1397), ws-boot-smoke PASS (in the run).
+
+Seen, not gated: the think box "Think: 11 × ☐ = 121" crowds its own frame at S (both trees).
+
+## HAND-OVER 2 (2026-10-31, after critic r2)
+
+Branch head: critic r2 at 66a6ef23 (on 616908b1, merged with main 784eeff8). Card SIGNED 2026-10-31. NOT deployed, NOT in
+redesign-passed.js. Cost: round 2 ~$118 (≈ 4.2 %); lane total ~$282 (≈ 10.1 % of the weekly limit). Report: design/audit/runs/laned-restart/critic-r2.md.
+
+### Fixed in round 2 (critic-verified)
+R1-1 dividend side (0.62–1.08 mm), R1-2 Mix fact rows even, R1-4 supports no longer break the page, R1-6 add_facts lesson,
+R1-15 fraction keep-out, R1-16 Mix online worksheet; mixed + − × ÷ fact-rows page (owner ruling) works; preset
+division:div_facts_long (code ZF); + − × rows unchanged; screen hosts 9/9/8–9/9 in every form; 5 new checks backtested.
+
+### Remaining (round 3, Opus medium; STOP-LOOP on the arc: fresh builder, root-cause brief, check first)
+1. R2-1 arc 0.27 mm from the divisor's last digit at 10 cols (no white pixel at 100 %). Root cause: the arc is placed from the
+   dividend's ink only. Fix: place it from BOTH neighbours' ink; if 10 columns cannot hold ≥ 0.5 mm both sides at 16 pt, ask the
+   owner (the ruling keeps 10 columns). Check first: ARC-INK both sides + 96-dpi raster separation, backtested on 616908b1.
+2. R2-2 mixed fact-rows page with × prints 56 in a 10-column grid on 3–7 of 24 seeds: choose columns from what is DEALT (or
+   deal within the column rule). Check: L-DENSITY COUNT-FITS over seeds 1–24.
+3. R2-3 fact probe widens its last row (+ − × cell 20; div long/fraction/mix at L, div_facts_long at L). Check: GRID-EVEN on every grid.
+4. R2-4 think support text overruns its box at S; sign box beside vs under inconsistent. Check: L-OVERLAP TEXT-FRAME.
+5. R2-5 add_facts Review M H13 ×6 (R1-10): fix, or the owner moves it to the page-types lane.
+6. Then precritic `--role all` at S/M/L + `--skill` for all five, merged with main, before critic r3.
+Not gating (owner ruling a): R1-3, R1-5, R1-7, R1-8, R1-9, R1-11, R1-13, R1-14 → page-types lane. Card Q5 (short class) → layout lane.
+
+
+## Round 3 (2026-10-31, fresh fix builder, Opus medium: stop-loop rebuild of critic-r2-failed work)
+
+Commits f7a27938, d3cfb17d, then the reversal commit (on 66420cca; the lead's card commit f2c597a8 lands between).
+
+### R2-1 the arc on the divisor - OWNER REVERSAL mid-round
+The round started on the revised Q3 (bracket at 8 columns, >= 0.5 mm both sides) and built it (f7a27938: 8-column clamp,
+divisor-side floor 0.58 mm; measured in the browser, every bracket of div_facts_long fact rows, 20x canvas ink: divisor side
+0.86 / 1.00 / 1.19 mm and dividend side 0.69 / 0.92 / 1.08 mm at 8 / 6 / 5 columns, identical at S, M and L). At ~18:15 the
+owner reversed it ("i like the long division even at 10 columns"): the bracket is back to r2's drawing at 10 columns
+(long-division.js ARC_SPACE and fact-rows.js formRows identical to 616908b1; PT-FRW-9 / PT-FRW-5 text restored to 66420cca;
+layout-unit expectations back to 10). **What stays is the check:** ws-print-lint L-OVERLAP ARC-INK now measures BOTH sides -
+dividend's first digit >= 0.3 mm (r1 R1-1), divisor's last digit >= 0.25 mm as a REGRESSION GUARD at r2's measured 0.27 mm
+(never closer, never touching). Self-test: a new planted defect (arc starting at the gutter's left edge, "divisor's last
+digit" message) + the control. Backtest row arc-ink-laned: FAIL on 31a856fd (arc into the dividend), OK on 616908b1 (the
+drawing the owner keeps). ws-layout-unit holds the model's whites per fact (>= 0.22 divisor, >= 0.3 dividend).
+**Card:** f2c597a8 (lead) was signed against f7a27938's 8-column PT-FRW-5 / PT-FRW-9 text; with the 10-column text restored
+`ws-spec-card --check-signed facts.md` reports those two rules changed - the lead re-signs (this lane does not edit the card).
+
+### R2-2 mixed fact-rows page: count = grid on every seed
+Root cause: the count is dealt from a PROBE deal's layout and the page laid from the FINAL deal; a product over 99 in one deal
+and not the other changed the columns (PT-FRW-5 clamp) or the digit rung (3 tracks), so 56 facts landed in a 70-cell grid (or
+48 in 56). Fix (fact-rows.js plan): when the deal is short of the page, lay it as the band's 3-digit page (`__clamp8`: the
+8-column clamp and 3 tracks) if that holds it, else in whole rows of what was dealt (cell height within the 1.3 stretch cap).
+Printed = cols x rows = Score /N. Checks: ws-layout-unit **COUNT-FITS** - probe deal then final deal, seeds 1-24, mixes
++ - x ÷Mix, + x ÷long, + x, + - x ÷, at S / M / L x Auto / 8 / 10: 0 mismatches (it found +x M 8 seed 7, 48 in 8 x 7, before
+the whole-rows step). ws-print-lint **L-DENSITY COUNT-FITS** (a fact-rows page with an unruled run, or Score /N != facts
+printed) + self-test.
+
+### R2-3 the probe keeps its lattice
+gridPart passes `relay: false`; every fact-probe grid keeps one cell width: the 20th across fact stays in column 1 and the 20
+form cells at L in 3 columns leave cells 19-20 at their width, the remainder unruled (PT 4.2's own drawing; L-DENSITY HOLE
+exempts the probe's remainder, PT-FPR-6 fixes the count at 20). Check: GRID-EVEN now reads EVERY kit grid (a full-width cell
+of a re-laid `.relaid` grid counts), self-test unchanged; precritic plans `print-lint-probe-S/M/L` for the fact skills (div_facts
+forms were already on the probe through the divForm gates). Backtest grid-even-probe-laned: FAIL on 616908b1, OK on f7a27938.
+
+### R2-4 think support
+The think cue is measured from its text (Andika advances; sized for a 2-digit factor and 3-digit product: 40 mm, 2 mm of white
+inside each end, one width on the page). Placement: a division fact's supports (boxsign "before", think beside/under) are
+decided from the widest fact of its set (144 ÷ 12, registry.js), so one placement per page. Check: ws-print-lint **L-OVERLAP
+TEXT-FRAME** (text starting inside a stroked rect / bordered box ends inside it) + self-test (the old 36 mm box fires).
+`--supports all --size S`: 0 findings.
+
+### R2-5 (add_facts Review M H13) - coordinator: not a pin; main vs branch, OPEN
+Same command, `ws-print-lint --source kit --skills addition:add_facts --roles review --size M`:
+- main (worktree of origin/claude/sweet-newton-c8wrv1 9a13b7a7, main's own lint): **not clean** - `L-KEY AK-4 critical`: key
+  page 2 has 12 answer slots, pupil page 1 has 9 (the 3 across Mixed Review cells 10-12 print no answer slot on the pupil page);
+  no L-DENSITY finding.
+- branch: AK-4 clean; `L-DENSITY H13 x6` cells 10-12 (p1, p2): one empty band 56.1 mm in a 184.9 mm cell (30 %).
+So it is the branch's (the merged CL-40 / review.js across-row work gives cells 10-12 their slot, and the full-width across
+cell then reads as pinned left), but main's page is worse (a missing answer slot).
+**FIXED (r3 closing).** Root cause: not the CL-40 pad and not the row height - the COLUMN COUNT. The 3 earlier items
+(add_sub_10s across facts, "30 − 10 =", 62.4 mm with its hold) measure `fits` at 2 columns (slack 14.9 mm), but review.js
+geometry() offered the Mixed Review band every column count down to 1, and at the M ceiling (12) 9 main + 3 x 1 column won
+(n = 12) over 2 columns (n = 11). Each fact sat centred in a 184.9 mm cell: 56.1 mm white each side (30 %, H13). Fix
+(review.js, the non-split eOpts): one column is offered only when the earlier pool cannot take two (E.cols < 2) or holds
+one problem. add_facts Review now prints the across facts 2 to a row (92.3 mm cells), each with its slot (AK-4 stays
+fixed). Lint `--roles review` add_facts S / M / L: 0 findings (no H13, no AK-4); sub_facts / mult_facts / div_facts M:
+0 findings; ws-layout-unit OK (1758); ws-boot-smoke OK. Automatic check that caught it: ws-print-lint L-DENSITY H13
+(already on precritic's path); speed-up: the probe that read `measured[2].fits` beside the chosen eCols found it in one
+step - a column choice narrower than the items' own measured fit is the first thing to read on a full-width H13.
+
+### Precritic (`--skill add_facts,sub_facts,mult_facts,div_facts,div_facts_long --role fact-rows --strict`, run once)
+Re-run once after the R2-5 fix (r3 closing, final tree): /tmp/mq-precritic/20261031-194447-17561: **9 FAIL, 32 PASS (7 on the
+baseline), 2 SKIPPED (no rulings) of 43**. spec-card --check-signed now PASSES (card re-signed, 4f39d005); every FAIL below is
+main-red or an owner pin; the fact-rows print-lint rows (M, S) and grade-render pass.
+
+| Gate | Finding | Status |
+|---|---|---|
+| print-lint-probe S / M / L | 0 | PASS |
+| print-lint fact-rows M / S | 0 | PASS |
+| print-lint --supports all S | 0 (TEXT-FRAME, CL40-INK) | PASS |
+| spec-card --check-signed | - | PASS (re-signed against the 10-column text) |
+| print-lint divForm long L, mix L | Mixed practice H13 x2 / x4 (long), x2 (mix), cell 8, 28.5 mm; Review CL40-INK x6 (R1-11) and Reason It CL40-INK (R1-9) filtered as pinned | main-red (r2 table) / pinned (owner ruling) |
+| print-lint lesson S | div_facts_long Lesson SPREAD p3 (sub_facts WRAP-OP x4 filtered as pinned, R1-5) | main-red (r2 table) / pinned |
+| options-verify --skill | div_facts_long support=touch/skip/array/think/boxsign/all: no support drawn | main-red (r2 table) |
+| options-verify --render | value pages worse than default (across capacity, array H13, CL40-INK across L, divForm capacity) | main-red (r2 table) |
+| slot-clip | div_facts sections/defaults L CLIP 6 (`ws-eq-below`) | main-red (r2 table) |
+| dealer-uniform | add / sub / mult / div / div_facts_long | main-red (r2 table) |
+| node-lint s1 | LESSON-DATA (no lessons/prereqs.js entry: div_facts, div_facts_long) | main-red (r2 table) |
+| sibling-compare | no approved fact-family sibling (sub_facts sections rows) | structural (r2 table) |
+
+Earlier run (r3 mid-round, /tmp/mq-precritic/20261031-182404-21025): 10 FAIL, 31 PASS - the 10th was spec-card (since re-signed).
+R2-5 (add_facts Review M H13) is not on precritic's fact-rows path; its own lint is 0 at S / M / L (above).
+
+Unit / other gates on the final tree: ws-layout-unit OK (1758), ws-boot-smoke OK; earlier this round ws-print-lint --self-test
+OK (86 assertions, 74 planted defects), ws-backtest arc-ink-laned PASS, grid-even-probe-laned PASS.
+
+### After-r3 PNGs (150 dpi, design/status/laned-restart/)
+after-r3-bracket-S-c10.png (100 / 100) and after-r3-bracket-L-c10.png (80 / 80) - r2's bracket at 10 columns;
+after-r3-mixed-facts-S-c10-s4242.png (+ - x ÷long, 56 printed = 8 x 7 = Score /56: the seed critic r2 caught at 56 of 70);
+after-r3-mixed-add-mult-S-auto-s4242.png (56 / 56); after-r3-probe-add-S.png (20th across fact in column 1, remainder
+unruled); after-r3-probe-div-mix-L.png (20 / 20); after-r3-think-boxsign-S.png (one placement, text inside the box).
+
+### R3-1 fix (2026-10-31, fix builder, Opus medium: rebuild of critic-r3-failed work)
+**Root cause:** two centrings. (1) At Size S the touch dots force the problem to L inside a `ws-L` wrapper (print-sheet.js);
+that wrapper was a shrink-wrapped flex item of the cell, so the full-width supported problem (`ws-supported` width 100 %)
+collapsed to its content and each row re-centred by its own sign box + fact + support width (fact left edge 157 / 212 / 233 px).
+(2) Even full-width, the support column started right after each fact and centred its rows, so the pictures and the think cue
+moved with the fact's width and the reserved (hidden) array of each fact.
+**Fix (a3fd6947):** print-sheet.js keeps a full-width supported problem full-width through the forced-size wrapper.
+registry.js hands support-draw.js the widest fact of the set (144 ÷ 12, the R2-4 reference) drawn as a ghost; support-draw.js,
+for a ÷ fact on paper with supports beside it, overlays the item on that unseen ghost (`ws-fact-zone`, answer right-aligned in
+it, so the answer line stands at one x), keeps the sign box before it left-anchored, left-aligns every support row beside it and
+puts the think cue's row first (a tall array no longer pushes it down). Digits unchanged (no shrink). The ghost has its
+`data-ws-*` attributes renamed (no second slot) and is `aria-hidden`.
+**Check:** precritic `print-lint-supports-S` now runs `--roles independent,more-practice,test,review`, and a row per single
+support (`print-lint-supports-<id>-S`, each fact skill that offers it). Backtest `support-fact-x-laned` (L-SUPPORT SCC-T10):
+FAIL on da684125, OK on a3fd6947.
+**Lint (div_facts, roles test, independent, more-practice, review):** SCC-T10 0 everywhere (was 1 at S all; 1 at S skip). Every
+remaining finding is on da684125 too (base runs in brackets), surfaced because the row now runs single supports and more roles:
+RP-1 "the skip support shows the answer" (a ÷ b with b = quotient or the quotient in b's skip strip: 12 ÷ 2 shows 6) on all /
+skip; GRID-EVEN skip S / M (cell 19 / 16); H13 array S / M / L (the row sized for the tallest array); CL40-INK skip L ("110"
+at 6.5 mm). add / sub / mult `--supports all` test + independent S: 0. These are not R3-1 and are left for the lead / critic.
+PNG: design/status/laned-restart/after-r3b-div_facts-test-supports-S.png (150 dpi, seed 805715, the critic's page).
+Gates: ws-layout-unit OK (1758), ws-print-lint --self-test OK (86 / 74), ws-boot-smoke OK, ws-screen-answer div_facts OK,
+ws-backtest support-fact-x-laned PASS. Precritic `--skill division:div_facts --strict` once (/tmp/mq-precritic/20261031-222943-19128):
+**10 FAIL, 33 PASS, 2 SKIPPED of 45.** Every FAIL is main-red / pinned per the Round 3 table (divForm long L: Mixed practice H13 cell 8
+28.5 mm + Review CL40-INK R1-11; slot-clip sections/defaults L CLIP 6; options-verify --render; dealer-uniform; node-lint LESSON-DATA;
+sibling-compare) or one of the three NEW supports rows (all / skip / array at S), whose findings are all on da684125 (RP-1 skip strip,
+GRID-EVEN skip, H13 array) and none SCC-T10; touch / think / boxsign rows PASS.
+
+## HAND-OVER 3 (2026-10-31, after critic r3)
+
+**Critic r3 (design/audit/runs/laned-restart/critic-r3.md): PASS add_facts, sub_facts, mult_facts, div_facts_long (lowest 8);
+FAIL div_facts on R3-1 only.** The four are in js/modules/redesign-passed.js (ws-redesign-passed OK, 11 skills). Screen hosts:
+the critic carried r2's 9/9/8-9/9 (screen-cell.js unchanged); the lead re-ran ws-screen-answer and ws-screen-slots --uniform on
+the r3 tree for the four: OK. Card signed 2026-10-31 (final Q3: bracket at 10 columns as drawn in r2, owner-accepted).
+Cost: round 3 ~$30 (≈ 1.1 %) of the $60 cap; lane total ~$312 (≈ 11 % of the weekly limit). NOT deployed (the lead deploys).
+
+### Remaining
+1. R3-1 div_facts: with several supports on (`--supports all`, S) Test and Independent centre each row's sign box + fact + support
+   as a group, so the fact and its answer line shift between rows (SCC-T10 "answer zone moves 69.0 vs 86.4 mm"; C3 7). Fix: one fact x
+   per section from the widest sign box (as R2-4 did in registry.js), supports in a fixed zone. Check: precritic's
+   print-lint --supports all row runs More practice, Test and Review too (it ran Independent only).
+2. Observations (no score effect): mixed fact-rows column count follows each deal (+ × at S: 8×7 on 46/48 seeds, 10×7 on 2; PT-FRW-5
+   reads the clamp off the band); buildSheet().items returns the whole deal; the probe remainder is an empty boxed cell, not unruled.
+3. Shared page-type defects → page-types lane (session_013pHDnQ7fVtYNPKJ7J1MkMh); drop the R1-5/R1-9/R1-11/R1-13 pins in
+   design/audit/baselines/print-lint*.json when both branches are on main. Card Q5 (short class) → layout lane.
+4. Ported Lane D work outside the fact family (hand-over 1, item 6) is still not critic-ready.
+5. ws-stamp-assets before deploy.
+
+## HAND-OVER 4 (2026-10-31 ~23:00, R3-1 fix; stopped at the round-3 cap)
+
+R3-1 (div_facts answer zone moves with several supports) is FIXED at 880c4b40: SCC-T10 = 0 on test / independent / more-practice /
+review at S, M, L; backtest `support-fact-x-laned` FAIL on da684125 → OK. The precritic supports rows were widened to every
+role that offers supports and to one row per single support, and they found findings ALREADY on da684125 (not caused by
+the fix, never gated before), so precritic `--skill division:div_facts --strict` is red on 3 rows that are neither main-red
+nor pinned. Per the rule (never a critic on red) the narrow div_facts critic did NOT run; div_facts is not in redesign-passed.js.
+
+Open on div_facts (supports on):
+1. RP-1 with the skip support (×9 at S and L, ×1 with all supports): the skip strip of "12 ÷ 2" shows 2 4 6 8 10 12 and RP-1
+   matches the quotient 6 literally. Probably a false positive of a literal match (the strip lists multiples of the divisor,
+   not the answer) — needs a ruling (lead/critic): narrow RP-1 for skip strips, or change the strip.
+2. GRID-EVEN ×2 (skip, S/M), H13 ×3 (array, S/M/L), CL40-INK ×2 (skip, L).
+3. add/sub/mult single-support rows (new) and touch/think/boxsign at M/L were not run (budget): run them before the four
+   passed skills' next deploy gate, since the new precritic rows now cover them.
+Cost: R3-1 fix ~$12; round 3 total ~$37 (≈ 1.3 %) of the $60 cap; lane total ~$319 (≈ 11.4 % of the weekly limit).
+
+
+## R4 prep (2026-11-03, builder Opus medium: rebuild after the round-3 cap; commit 95688ba)
+
+Goal: `ws-precritic --skill division:div_facts --strict` green on the supports rows, so the narrow div_facts critic can run
+with each support on. Each finding, its root cause, and the check that now catches it:
+
+| Finding | Root cause | Fix | Check |
+|---|---|---|---|
+| RP-1 ×9 (skip, S/M/L): "the skip support shows the answer 6" on 12 ÷ 2 | RP-1 matched digits: a count-by strip of the divisor's multiples lists the quotient by coincidence | LEAD RULING: a plain strip is not "answer given away". `cells/fact.js` skip cue tags the strip `data-ws-skipstrip=<step>` and each term `<g data-ws-term>`; `ws-print-lint` L-SUPPORT `plainStrip()` reads a strip out of RP-1 only when its terms are step × 1..n, every term group has one signature (attributes + computed weight / size / fill / stroke / decoration / opacity) and nothing else is drawn. A bold, heavier, ringed or filled term (the quotient's or the dividend's) still fails | `ws-print-lint --self-test` (3 new cases: plain passes, bold fails, ringed fails); backtest `rp1-skipstrip-laned` (fixture, `--support-fixture`): FAIL → OK |
+| H13-ROW ×3 (array, S/M/L) | the ÷ counters to ring (dividend in rows of ten, 1-6 rows, none past 60 or divisor > 10) were stacked UNDER the fact in 2 columns, so a 5-row cell sat beside a 2-row or picture-less one | `support-draw.js supportFootprint`: a ÷ fact carrying the array support caps its columns at what fits fact + gap + counters BESIDE (hardCap; 1 column). The practice roles split the picture-less facts into columns of their own | precritic `print-lint-supports-array-S` (and M/L by hand: 0) |
+| GRID-EVEN ×2 + SCC-T10 (skip, Test S/M) | `test.js fillToCeiling` filled to 20 in 3 columns, re-laying a 2-cell last row at 1.5 widths (the fact zone moved with it) | the Test fills whole rows: the most rows of its columns up to the ceiling (3 columns: 18) | precritic `print-lint-supports-skip-S` (Test M by hand: 0) |
+| CL40-INK ×2 (skip, M/L) | the across fact's tab spacer (`> .ws-eq[data-ws-across]`) did not reach a fact nested in `.ws-supported`, so "110 ÷ 10 =" / "132 ÷ 12 =" with the strip under it started in the keep-out | additive CSS: the same shrinkable spacer above a supported across fact whose pane is under it | `ws-print-lint --supports skip --size M/L` (0) |
+| CL40-INK (array, Review L; surfaced by the H13 fix) | the Review's count-by rows numbered 10-12 put the step tab's pentagon inside the w2 tab's keep-out | additive CSS: a count-row under a w2/w3 tab starts 0.3 mm right of the keep-out | `ws-print-lint --supports array --size L --roles review` (0) |
+
+Speed-ups the round revealed: (1) `ws-print-lint --save-html` pages need their `http://127.0.0.1:<port>/` links rewritten to
+`file://` to screenshot; a `--shot` flag would save a lost hour. (2) Lint and grade-render deal different seeds, so a lint
+finding's cell is not the grade-render cell: render from the lint's own HTML. (3) The supports rows ran S only; the M/L
+findings (CL40-INK) were found by hand - candidates for precritic rows at M/L once budget allows.
+
+R4 prep results: precritic `--skill division:div_facts --strict` (log `/tmp/mq-precritic/20261103-094750-17307`): every
+supports row PASS (all, touch, skip, array, think, boxsign at S), fact-probe S/M/L PASS. Still red, each red on 0fd0e50 too
+(checked in a worktree of it, same counts): print-lint-divform-long-L (Mixed practice H13 31 %), dealer-uniform (ans 6 / 10
+over the page cap), node-lint-s1 (no LESSONS entry for div_facts), options-render (divForm capacity at S/L; the
+support=array H13 and support=boxsign CL40 lines it had on 0fd0e50 are now gone), chromebook-fit (quiz host "Cannot set
+properties of null"), slot-clip (sections/defaults L, fade-packet L PG-12), sibling-compare (no approved siblings). So the
+supports findings are closed but `--strict` is NOT green: those seven rows need a ruling (pin / main-red) or their own fixes.
+add_facts / sub_facts / mult_facts single-support rows at S: all OK except sub_facts tile + frame (Review H13 35 %) and
+mult_facts all / array / boxsign (Review H13 32 %, array H13-ROW) - identical on 0fd0e50 (pre-existing); mult_facts `all`
+lost its RP-1 (the skip strip ruling). Test role S/M/L, no supports, all five fact skills: 0 findings.
+Renders for the critic (untracked, 90 PNG): `design/audit/runs/laned-restart/r4-prep/<support>-<S|M|L>/division__div_facts/`
+{independent,test,review}{,-key}-p1.png. Watch item for the critic: with `array` on, Test S prints 10 (8 narrow + 2 full-width
+counters rows) with ~30 % of the page empty below - the width split (test.js widthSplit) holds it there.
+
+## HAND-OVER 5 (2026-11-03, R4 prep done; critic NOT run — precritic red on pre-existing rows)
+
+- main (claude/sweet-newton-c8wrv1: deferred.js, simple-print.js, sw.js) merged at 0fd0e503: 15 conflicts resolved (print-sheet
+  measure kept the lane's batched place/readCell + main's `data-ws-natural` and `dupKey`; word-work `renderWork` + main's
+  sentence layout; layout.js free rows + in-place `c0`; redesign-passed union = 20 skills; backtests merged by id; rule index
+  regenerated; assets re-stamped). boot-smoke, code-snapshot (732), redesign-passed, ws-simple-print OK on the merge.
+- The div_facts supports findings are closed (R4 prep above, 95688ba8): every supports row PASS, RP-1 narrowed per the lead's
+  ruling with backtest `rp1-skipstrip-laned` FAIL → OK.
+- BLOCKED: `ws-precritic --skill division:div_facts --strict` still has 7 red rows, each red on 0fd0e503 as well (builder
+  checked in a worktree): print-lint-divform-long-L, dealer-uniform, node-lint-s1, options-render, chromebook-fit (quiz host
+  null deref — possibly from the merge), slot-clip (L), sibling-compare. Rule: never a critic on red, so the narrow critic did
+  not run and div_facts is NOT in redesign-passed.js. Needs a lead ruling per row (pin / main-red / fix in this lane).
+- Passed skills, supports at S (pre-existing, identical on 0fd0e503): sub_facts tile + frame Review H13 35 %; mult_facts all /
+  array / boxsign Review H13 32 % + array H13-ROW. These are on the new single-support rows; decide before the next deploy gate.
+- Watch item: div_facts Test S with `array` prints 10 with ~30 % empty below (test.js widthSplit); no lint flags it.
+- Renders (untracked, 90 PNG) in design/audit/runs/laned-restart/r4-prep/ on the session container only.
+- Cost this session ≈ $27 (≈ 1.0 % of the week) of the $40 cap.
+
+## R4 (2026-11-03): lead rulings on the seven red div_facts precritic rows
+
+1. chromebook-fit (quiz host "Cannot set properties of null"): caused by the main merge - the quiz moved to the deferred
+   half (globals.js makeLazy), so `compressTestForURL` returned a promise and `#qtStudentName` did not exist yet. The gate
+   now loads the deferred part first (tests/scripts/ws-chromebook-fit.cjs startHost), as a quiz link's first call does. OK.
+2. slot-clip PG-12: fade packet L FIXED (support-draw.js: a picture stands beside a ÷ fact only when the sign box, the answer
+   line - counted under the fact by equation.js's footprint, beside it here - and the beside inset fit too; the 85 mm
+   counters ran 4.5 mm out). sections/defaults L (div_facts' first section of a 4-skill sheet: "25 ÷ 5 =" with its line
+   under it in a 20.4 mm grid; the fact footprint asks 26 mm at L) is red on the main tip cd81c8e7 too (PG-12 x14 there).
+3. node-lint-s1: LESSONS entry for division:div_facts (js/modules/lessons/prereqs.js).
+4. sibling-compare: add_facts, sub_facts, mult_facts, div_facts_long are div_facts' approved siblings (siblings.json,
+   templates fact / equation, lead ruling).
+5. options-render: divForm capacity PINNED as owner-ruled (tests/fixtures/precritic/options-render.pins.json, read by
+   tests/lib/options-render.cjs capacityPin; only the capacity comparison is pinned).
+6. dealer-uniform: MAIN-RED, pinned with its proof line (dealer-uniform.baseline.json; same three findings on cd81c8e7).
+7. print-lint-divform-long-L (Mixed practice H13 31 %, cell 8): MAIN-RED, pinned in design/audit/baselines/print-lint.json
+   with its proof (0 -> 2 on cd81c8e7 too). **For the mixed-m2 lane:** the mixed-practice role is theirs; the long-division
+   cell 8 at L leaves a 28.5 mm side band in a 92.2 mm cell.
+8. div_facts Test at S with array (10 facts, ~30 % empty): left as a WATCH ITEM - test.js widthSplit fills narrow rows and
+   one full-width counters row per wide fact; filling whole rows there is a role change, not a small one.
+9. **For the shared-roles lane (does not block):** Review H13 with support combos - sub_facts tile and frame (35 %, cells 4-5
+   at S) and mult_facts all / array / boxsign (32 % side bands, cells 9-14 at S; array H13-ROW cells 5-6). Same on 0fd0e50.
+
+R4 precritic rerun (`/tmp/mq-precritic/20261103-102846-32518`, before the Warm-up swap below): 42 PASS (9 on the baseline),
+3 FAIL, 2 SKIPPED (card-rulings / card-not-offered: the facts card has no rulings block). FAIL:
+- print-lint-lesson-L: the new lesson data's Warm-up put share_into_groups (tall) beside mult_facts (H13-ROW); FIXED after
+  the run by dealing missing_mult_div instead (lesson S / L lint OK, render-gate lesson S/M/L OK).
+- sibling-compare (now real, against the four passed fact skills): 8 counts above them in 5 rows - PG-23 last page under a
+  third (mixed/defaults L, sections/defaults L, fade-packet S/M/L), PG-12 x6 sections/defaults L, CL40-INK x2
+  sections/ex-group M, SPREAD sections/pages-2 L (2 vs 1). These are div_facts' own multi-page / multi-section
+  pagination defects; NOT fixed in this run (budget).
+- slot-clip: sections/defaults L PG-12 x6 (the same cells), now above the siblings' 0.
+Also: sub_facts Review L H13 30 % (cells 7-8, no supports) - same on 0fd0e50, for the shared-roles lane.
+ws-chromebook-perf OK (Start Playing 1233 ms; stress median 243 ms, p90 377 ms; teacher ready 5659 ms, tray 1512 ms,
+print preview 50506 ms, quiz sheet 14626 ms). Renders: design/audit/runs/laned-restart/r4/<support>-<S|M|L>/.
+
+## HAND-OVER 6 (2026-11-03, rulings applied; critic still NOT run)
+
+Lead rulings applied (f26398cb, 939b4a9e, 52eca881): chromebook-fit fixed (merge regression: quiz now lazy-loaded, gate loads it
+first), fade-packet L PG-12 fixed, LESSONS entry for div_facts added (Warm-up missing_mult_div), options-render pinned
+owner-ruled, dealer-uniform + print-lint-divform-long-L pinned main-red with proof lines, sibling-compare pointed at the
+four passed fact skills. ws-chromebook-perf OK. Renders: design/audit/runs/laned-restart/r4/.
+
+Still red → no critic (rule 0b): sibling-compare now compares for real and finds div_facts worse than its siblings on 8 counts
+in 5 rows — PG-23 (mixed/defaults L, sections/defaults L, fade-packet S/M/L), PG-12 ×6 sections/defaults L ("25 ÷ 5 =" in a
+20.4 mm grid vs a 26 mm footprint; height from print-sheet.js multi-section allocation ~l.3030), CL40-INK ×2 sections/ex-group M,
+SPREAD sections/pages-2 L. Also card-rulings / card-not-offered SKIPPED (facts card has no rulings block) need a ruling.
+Next lane step: one builder (mq-opus-medium) on those multi-page / multi-section rows, then the narrow critic.
+Cost this session ≈ $42 (≈ 1.5 % of the week) of the $55 cap; stopped because a fix run plus the critic would not fit.
+
+## R4b (2026-11-03): div_facts sibling-compare rows
+
+- PG-12 x6 + slot-clip, sections/defaults L: root cause - the shared page's share was sized from div_facts' FREE layout
+  (2 columns, "25 ÷ 5 = ___" on one line, 19.4 mm), then the section's own layout's dense pass widened the 20.4 mm grid to
+  3 columns, where the line goes under the fact (30.6 mm). FIXED: on a page shared by different skills (`sharedPage`,
+  print-sheet.js shareRows -> layout.js), the dense pass never takes a wider column count whose row is taller than the
+  fixed grid. sections S / M / L lint 0.
+- PG-23 sections/defaults (S/M/L): the four members shared ONE page's body though they could not fit it; the last ran
+  overleaf alone with 2 problems. FIXED: different skills that do not fit one page are packed onto pages in order and
+  each page's body is shared among its members (shareRows). One skill's support split / fade parts keep the old share.
+- mixed/defaults L PG-23: MAIN-RED, listed in siblings.json `mainRed` with its proof (same 2 findings on cd81c8e7);
+  ws-sibling-compare now reports a listed (row, size, rule, count) as non-blocking.
+- card-rulings / card-not-offered: SKIPPED-owner. `ws-spec-card --family facts --rulings-only` writes nothing: card.json
+  has no numeric rulings (the owner rulings are prose), so a block needs new signed content. Not regenerated.
+- Still open (see the precritic table): fade-packet S/M/L PG-23 (the packet's last page holds 2 problems; one skill's
+  fade parts, not the shared-page path), and whatever sibling-compare still lists for sections/ex-group M (now DN-2 x2,
+  CL40 gone) and sections/pages-2 L (SPREAD gone; DN-2 / PAGEFILL there).
+R4b precritic (`/tmp/mq-precritic/20261103-114102-13594`): 44 PASS (9 on the baseline), 1 FAIL, 2 SKIPPED-owner (card-rulings,
+card-not-offered). The FAIL is sibling-compare on ONE row only: single/fade-packet PG-23 at S, M and L (ours 2, the four
+siblings 0) - the 3-page fade packet's last page holds 2 problems. sections/ex-group M and sections/pages-2 L are now at or
+below the siblings; mixed/defaults L is MAIN-RED (listed). Four passed fact skills, Independent / Test / Review S/M/L: unchanged
+(only sub_facts Review L H13, pre-existing). boot-smoke OK, assets stamped. r4 renders unchanged (single-skill pages; the
+layout change touches multi-skill shared pages only).
+
+## HAND-OVER 7 (2026-11-03, R4b; critic still NOT run)
+
+R4b (2854ff1c, 633e8a2c): sections/defaults L PG-12 ×6 + slot-clip fixed (layout.js dense pass: on a page shared by different
+skills a fixed-height grid never widens to a taller row; `sharedPage` from print-sheet.js shareRows), sections PG-23 fixed
+(shareRows places sections that cannot share one page onto pages in order), CL40-INK ex-group M and SPREAD pages-2 L gone.
+mixed/defaults L PG-23 marked main-red in siblings.json `mainRed` (same on cd81c8e7). Four passed skills: no regression.
+Precritic div_facts --strict (log /tmp/mq-precritic/20261103-114102-13594): 44 PASS, 1 FAIL, 2 SKIPPED.
+Remaining:
+- sibling-compare: fade packet (--fade packet --pages 3) PG-23 at S/M/L — the packet's last page holds 2 problems (siblings 0).
+  Applying the shareRows fixes to the packet path regressed GRID-EVEN / H13 / PAGEFILL, so it needs its own last-page deal fix.
+- card-rulings / card-not-offered: SKIPPED-owner — the facts card.json has no numeric rulings (owner rulings are prose), so the
+  regenerate writes nothing; a rulings block would be new signed content. Needs the owner (or a lead ruling).
+Cost this session ≈ $60 (≈ 2.1 % of the week) of the $85 cap. Stopped per the lead's instruction (not green → hand-over).
+
+## R4c (2026-11-03): fade packet PG-23
+- Root cause: `splitBySupports` (print-sheet.js) split the 3-page faded packet into one part per support alternative, each sized as its share of ONE page x pages; the parts flowed on one after another, so the last part always left 2 problems alone on page 3 (at every count: 6+6+5, 6+6+6, ...), and 18+ overflowed to 5-6 pages, so the Auto fill stepped back down onto the tail.
+- FIXED (d0bc9803): a FADED sheet of more than one page is not split (`(n.coverage || o.cover) === 'fade' && pages > 1` returns the one section); the Auto fill deals it page by page in whole rows, alternatives in blocks as the supports fade. The shared-page path (shareRows / sharedPage) is untouched.
+- Lint: the fade packet for div_facts plus the four siblings at S/M/L shows 0 findings (no GRID-EVEN / H13 / PAGEFILL); div_facts --pages 2 fade and the defaults: 0. Trade-off for the critic: the unsplit packet holds 13 problems over 3 pages (was 17-19 with the tail), because the one section reserves room for every support it can carry.
+- Precritic `--strict` (`/tmp/mq-precritic/20261103-123541-30699`): 45 PASS (10 on the baseline), 0 FAIL, 2 SKIPPED-owner (card-rulings, card-not-offered, lead ruling). sibling-compare OK: 0 above the siblings. boot-smoke OK, assets stamped.
+
+## HAND-OVER 8 (2026-11-03, main d62fe293 merged; critic still NOT run — stopped at the cap)
+
+- R4c (d0bc9803): a faded multi-page packet is no longer split by support → fade-packet PG-23 gone; precritic was 45 PASS / 0 FAIL
+  (card rows SKIPPED-owner by lead ruling) on that commit (log /tmp/mq-precritic/20261103-123541-30699). Trade-off for the critic:
+  the 3-page packet holds 13 problems (3 / 5 / 5, one column; blank room kept for every support).
+- Main d62fe293 merged at 04e25059 (conflicts: gen-operations constant deal = lane's per-page reset + main's in-cycle shuffle;
+  index.html re-stamped). ws-simple-print gained DIVFACTS (owner bug: div_facts printed 3 columns at every size and ignored
+  Columns 5): FAILS on d62fe293 (contains 844ecfaa1: 3 columns at S/M/L, Columns 5 → 3), PASSES here (70 / 30 / 25 a page,
+  Columns 5 → 5 in Aim and Exactly).
+- NEW RED after the merge:
+  1. ws-simple-print EXACT (25 missing_add_sub at M, 6 asked: Aim and Exactly both plan 2 columns; main plans 6 / 5). Bisected
+     to the lane's port commit 25f32bea ("port Lane D r3-r12d code"): buildSheet independent, missing_add_sub, columns 3-6 at M →
+     "max 2 columns" (main: Dense 6 x 4). A lane regression on a non-lane skill (equation cell / measure from the port); not fixed.
+  2. precritic sibling-compare: sections/ex-each S L-WRAP WRAP-OP ×2 (siblings 0) — new since d0bc9803, so from the merge.
+     Not investigated.
+  3. dealer-uniform: re-pinned (main-red, same two findings on d62fe293) — green now.
+  Log: /tmp/mq-precritic/20261103-130155-4948 (43 PASS, 2 FAIL before the re-pin).
+- Next: one builder on (1) and (2), re-run precritic + ws-simple-print, then the narrow critic.
+- Cost this session ≈ $88 (≈ 3.1 % of the week) of the $95 cap.
+
+## R4d (2026-11-03, builder opus-medium: the two reds of hand-over 8)
+
+- (1) EXACT root cause: the port made missing_add_sub a kit `equation` cell (main: legacy text, which WRAPS the sentence at
+  5–6 columns). On the 1 em operator tracks + .28 em gaps "18 − 12 = [ ]" is 56.4 mm in a 55.5 mm third-page cell at M, so
+  every request fell to 2 columns. Fix (cells/equation.js render + footprint): a `resultBox` sentence takes the kit's tight
+  across tracks (ACROSS_OP_EM / ACROSS_GAP_EM, as a ÷ fact across). Now Auto 3 x 8 (= main), Columns 3 → 3, 4 / 6 → 3 (max).
+  6 across at M is NOT reachable without breaking the sentence (DN-22: horizontal equations clamp to 3 for 2-digit at M;
+  DN-13 clamps); main's 6 x 4 is the legacy wrap. ws-simple-print: OK (EXACT exact [[3],3,5,15,2] · aim [[2],2,8,16,2]).
+- (2) WRAP-OP root cause: perimeter_intro's side anchor step "Add: 4 + 4 + 3 = 11." (providers/figures.js) wrapped after "+"
+  at S; joined with no-break spaces (both "Add:" steps). Row sections/ex-each S: WRAP-OP 0 (GRID-EVEN 6 as before).
+- Backtest row `simple-print-exact-missing-add-sub` (commit-pair 33bf69bf FAIL → bcc3ab2d OK).
+
+## HAND-OVER 9 (2026-11-03, critic r4 FAIL — stopped)
+
+R4d (bcc3ab2d): missing_add_sub resultBox sentence on the kit's tight across tracks (Auto 3 x 8 at M as main; 6 across at M is
+unreachable without wrapping the sentence — DN-22 caps 2-digit horizontal equations at 3; main's 6 x 4 came from the legacy
+cell's 2-line wrap: needs a ruling if 6 must stay); perimeter "Add:" steps no-break (WRAP-OP). Precritic div_facts --strict
+45 PASS / 0 FAIL (card rows SKIPPED by ruling), ws-simple-print OK (DIVFACTS + EXACT).
+
+Narrow critic r4 (design/audit/runs/laned-restart/critic-r4.md, renders r4-critic/, on e2ab83ee): FAIL, lowest C3 5.
+PASS: think (all), touch Independent L + Test + Review, boxsign Independent M + Test S/M + Review; regression spot-check of the
+four passed fact skills clean. Every defect is invisible to the current lints (0 findings on all 15 support x size runs):
+- R4-1 H13: touch Independent S/M and boxsign Independent S/L cells ~1/3 empty (rows not sized to the cell's real height, as Test does).
+- R4-2 array (all 9 pages fail): counters only on some facts; mixed 2-col grid + full-width rows, slot moves; Test S/M ~28 % unused;
+  Review M draws no array; Review S 7 problems (< PT-REV-1's 8).
+- R4-3 skip strip stops at 5 x divisor (fact.js:178): 13 of 24 dividends beyond it — draw to 12 x divisor, unmarked.
+- R4-4 boxsign Test L: 132÷12 alone in a full-width last row; 10 printed where 12 fit.
+- R4-5 fade packet M (C3 5): space reserved for every support in every row (page 1 holds 3), supports do not fade monotonically,
+  slot moves. The R4c unsplit fix made this page; it needs a real fade-packet design.
+Checks to add (from the critic): ink-based H13 per single support; support-coverage lint; plainStrip max term >= dividend;
+lone-full-width-last-row lint; fade-order lint + reserved-empty-space H13. Ruling needed: Test fixed large cells 40-54 % empty
+under a horizontal fact (accepted in r3 by PAGE_TYPES Test geometry, conflicts with H13).
+Same defect class has now survived rounds on supports → per §1.7, make the checks above machine checks and re-brief a fresh builder.
+Cost this session ≈ $118 (≈ 4.2 % of the week) of the $130 cap.

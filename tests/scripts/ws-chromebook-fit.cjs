@@ -285,6 +285,10 @@ async function startHost(page, host, c, k, seed) {
         // the teacher's Board display: teacher-shell.js startPractice plays 'practice', then sets the class
         if (host === 'card' && BIGBOARD) await page.evaluate(() => document.body.classList.add('tv-bigboard'));
     } else {
+        // The quiz is in the deferred half since the main merge (globals.js makeLazy): its functions are stubs that return a
+        // promise until that part loads, so compressTestForURL gave a promise ("r.replace is not a function") and the quiz
+        // view's #qtStudentName did not exist yet (Lane D R4 prep). Load the part first, as a quiz link's first call does.
+        await page.evaluate(async () => { if (typeof window.__mqLoadDeferred === 'function') await window.__mqLoadDeferred(); });
         await page.evaluate((c, k, seed) => {
             const questions = [];
             for (let i = 0; i < 3; i++) {

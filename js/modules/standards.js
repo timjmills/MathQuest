@@ -719,6 +719,7 @@ export const SKILL_STANDARDS = {
     'division:div_3by1_long': { ccss: ['4.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 3-Digit by 1-Digit Numbers (Long Division)
     'division:div_4by1_long': { ccss: ['4.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 4-Digit by 1-Digit Numbers (Long Division)
     'division:div_3by2_long': { ccss: ['5.NBT.B.6'], ee: ['M.EE.5.NBT.6'] }, // Divide 3-Digit by 2-Digit Numbers (Long Division)
+    'division:div_facts_long': { ccss: ['3.OA.C.7', '4.NBT.B.6'], ee: ['M.EE.3.OA.6', 'M.EE.5.NBT.6'] }, // Divide: Long-Division Form (preset 2026-10-31: div_facts, divForm long)
     'fractions:compare_to_half': { ccss: ['4.NF.A.2'], ee: ['M.EE.4.NF.2'] }, // Compare Fractions to One Half
     'placevalue:expanded_notation': { ccss: ['4.NBT.A.2', '2.NBT.A.3'], ee: ['M.EE.4.NBT.2'] }, // Write Numbers in Expanded Notation
     'number_sense:near_doubles': { ccss: ['1.OA.C.6'], ee: [] }, // Near Doubles (Doubles Plus One, Doubles Minus One)
