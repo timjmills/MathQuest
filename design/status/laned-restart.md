@@ -590,3 +590,23 @@ Cost this session ≈ $60 (≈ 2.1 % of the week) of the $85 cap. Stopped per th
 - FIXED (d0bc9803): a FADED sheet of more than one page is not split (`(n.coverage || o.cover) === 'fade' && pages > 1` returns the one section); the Auto fill deals it page by page in whole rows, alternatives in blocks as the supports fade. The shared-page path (shareRows / sharedPage) is untouched.
 - Lint: the fade packet for div_facts plus the four siblings at S/M/L shows 0 findings (no GRID-EVEN / H13 / PAGEFILL); div_facts --pages 2 fade and the defaults: 0. Trade-off for the critic: the unsplit packet holds 13 problems over 3 pages (was 17-19 with the tail), because the one section reserves room for every support it can carry.
 - Precritic `--strict` (`/tmp/mq-precritic/20261103-123541-30699`): 45 PASS (10 on the baseline), 0 FAIL, 2 SKIPPED-owner (card-rulings, card-not-offered, lead ruling). sibling-compare OK: 0 above the siblings. boot-smoke OK, assets stamped.
+
+## HAND-OVER 8 (2026-11-03, main d62fe293 merged; critic still NOT run — stopped at the cap)
+
+- R4c (d0bc9803): a faded multi-page packet is no longer split by support → fade-packet PG-23 gone; precritic was 45 PASS / 0 FAIL
+  (card rows SKIPPED-owner by lead ruling) on that commit (log /tmp/mq-precritic/20261103-123541-30699). Trade-off for the critic:
+  the 3-page packet holds 13 problems (3 / 5 / 5, one column; blank room kept for every support).
+- Main d62fe293 merged at 04e25059 (conflicts: gen-operations constant deal = lane's per-page reset + main's in-cycle shuffle;
+  index.html re-stamped). ws-simple-print gained DIVFACTS (owner bug: div_facts printed 3 columns at every size and ignored
+  Columns 5): FAILS on d62fe293 (contains 844ecfaa1: 3 columns at S/M/L, Columns 5 → 3), PASSES here (70 / 30 / 25 a page,
+  Columns 5 → 5 in Aim and Exactly).
+- NEW RED after the merge:
+  1. ws-simple-print EXACT (25 missing_add_sub at M, 6 asked: Aim and Exactly both plan 2 columns; main plans 6 / 5). Bisected
+     to the lane's port commit 25f32bea ("port Lane D r3-r12d code"): buildSheet independent, missing_add_sub, columns 3-6 at M →
+     "max 2 columns" (main: Dense 6 x 4). A lane regression on a non-lane skill (equation cell / measure from the port); not fixed.
+  2. precritic sibling-compare: sections/ex-each S L-WRAP WRAP-OP ×2 (siblings 0) — new since d0bc9803, so from the merge.
+     Not investigated.
+  3. dealer-uniform: re-pinned (main-red, same two findings on d62fe293) — green now.
+  Log: /tmp/mq-precritic/20261103-130155-4948 (43 PASS, 2 FAIL before the re-pin).
+- Next: one builder on (1) and (2), re-run precritic + ws-simple-print, then the narrow critic.
+- Cost this session ≈ $88 (≈ 3.1 % of the week) of the $95 cap.
