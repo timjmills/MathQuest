@@ -171,7 +171,8 @@ function normaliseRequest(req = {}) {
     return {
         role, size: onePage ? 'S' : size, look, paper, seed, sections, arrangement, arrangementNotes,
         // (the print dialog's Columns for a mixed page, r4; the sections' own `columns` otherwise)
-        mixColumns: req.columns && req.columns !== 'auto' ? clampInt(req.columns, 2, 10, 0) : 0,
+        mixColumns: Number.isFinite(Number(req.columns)) && Number(req.columns) > 0 ? clampInt(req.columns, 2, 10, 0) : 0,
+        columnsMode: req.columnsMode,
         // Mixed practice (owner ruling 2026-10-23): fill the page (default) or stop when the
         // unique facts run out; related facts only when allowed (off by default).
         fill: normaliseFill(req.fill), families: normaliseFamilies(req.families),
@@ -3606,8 +3607,13 @@ async function buildRoleSheet(n, metaOf) {
             // (the print dialog's Columns override, r4: req.columns, else the sections' own columns - one count across
             // for the whole mixed print; absent = Auto, the role picks it and reports it as fits.across)
             {
-                const cAsk = Number(n.mixColumns) || Number((n.sections.find((s) => s.columns && s.columns !== 'auto') || {}).columns) || 0;
-                if (cAsk) input.mixColumns = Math.max(2, Math.min(10, cAsk));
+                // (owner 2026-11-03: a count n and a mode - columnsMode 'exact' | 'aim' | 'auto', on the request or a
+                // section; 'smart', 'auto', absent or any non-number count is Auto; a number with no mode is exact)
+                const secAsk = n.sections.find((s) => Number.isFinite(Number(s.columns)) && Number(s.columns) > 0) || {};
+                const cAsk = Number(n.mixColumns) || Number(secAsk.columns) || 0;
+                const modeRaw = String(n.columnsMode || (n.sections.find((s) => s.columnsMode) || {}).columnsMode || '').toLowerCase();
+                const mode = modeRaw === 'aim' ? 'aim' : modeRaw === 'exact' ? 'exact' : (modeRaw && modeRaw !== 'fixed' ? 'auto' : (cAsk ? 'exact' : 'auto'));
+                if (cAsk && mode !== 'auto') { input.mixColumns = Math.max(2, Math.min(10, cAsk)); input.mixColumnsMode = mode; }
             }
             if (exactCounts) input.exactCounts = exactCounts;
             input.mixPages = mixPages;
@@ -3881,7 +3887,7 @@ async function buildRoleSheet(n, metaOf) {
         numberLine,
         fits: Object.assign({ cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
             // (a mixed page's count across, r4: the dialog shows "Auto (n)")
-            f0.across ? { across: f0.across, acrossAuto: !!f0.auto } : {}),
+            f0.across ? Object.assign({ across: f0.across, acrossAuto: !!f0.auto, columnsMode: f0.columnsMode || (f0.auto ? 'auto' : 'exact') }, f0.clamped ? { clamped: true, asked: f0.asked } : {}) : {}),
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,

@@ -863,6 +863,8 @@ const BLANK_OK = 18;
 const GROW_FILL = 0.72;
 /** The widest Auto count across tried. */
 const C_MAX = 10;
+/** The most across a page with a larger cell than a fast fact may print (owner, 2026-11-03). */
+const LARGE_MAX = 6;
 /** The grid's own frame (1.5 pt) and a row rule (the look's cell line), mm. */
 const rowGapMm = (look) => cellGapMm(look);
 const spanMm = (C, w, look) => w * factPitchMm(C, look) - cellGapMm(look);
@@ -1124,9 +1126,54 @@ function gridOf(seq, C, c, b, hAt, { exact = false } = {}) {
         pg.rows.push(...block);
         row = block[block.length - 1];
     }
+    // (r5, owner 2026-11-03: a print is full pages and then the remainder, or EVEN pages that each meet the floor -
+    // never a full page 1 and two thin pages after it. Where the last page holds under half the fullest, the same
+    // number of pages takes the rows' blocks evenly, by problems, as far as every page still fits its budget.)
+    let evened = false;
+    if (pages.length > 2) {
+        const nOf = (rs) => placed.filter((x) => rs.includes(x.row)).length;
+        const ns0 = pages.map((p) => nOf(p.rows));
+        if (ns0[ns0.length - 1] * 2 < Math.max(...ns0)) {
+            const blocks = [];
+            for (let row = 0; row < nRows; row++) {
+                const bl = [row];
+                while (rows[bl[bl.length - 1]].tall && bl[bl.length - 1] + 1 < nRows) bl.push(bl[bl.length - 1] + 1);
+                blocks.push(bl);
+                row = bl[bl.length - 1];
+            }
+            const P = pages.length;
+            const total = nOf(blocks.flat());
+            const out = [];
+            let bi = 0;
+            let left = total;
+            for (let pi = 0; pi < P; pi++) {
+                // (rounded up: the earlier pages take the extra row, so every page but the last is as full as it can be)
+                const target = Math.ceil(left / (P - pi));
+                const rs = [];
+                let got = 0;
+                while (bi < blocks.length) {
+                    const nb = nOf(blocks[bi]);
+                    const more = rs.concat(blocks[bi]);
+                    if (pi < P - 1 && got >= target) break;
+                    if (pi < P - 1 && (heightOf(more) > budgetOf(pi) + 1e-6 || more.length > b.maxRows)) break;
+                    rs.push(...blocks[bi]);
+                    got += nb;
+                    bi++;
+                }
+                out.push({ rows: rs });
+                left -= got;
+            }
+            const ns = out.map((p) => nOf(p.rows));
+            const ok = bi === blocks.length && out.every((p, i) => p.rows.length && heightOf(p.rows) <= budgetOf(i) + 1e-6 && p.rows.length <= b.maxRows)
+                && ns[ns.length - 1] * 2 >= Math.max(...ns);
+            if (ok) { pages.length = 0; pages.push(...out); evened = true; }
+        }
+    }
     // (PT-MIX-9: a split print's pages within half of each other - whole blocks of rows move from the pages
     // before the last to it, the latest first; page 1 keeps its rows: it is the page the dialog counts)
-    if (pages.length > 2) {
+    // (PT-MIX-9: a split print's pages within half of each other - whole blocks of rows move from the pages
+    // before the last to it, the latest first; page 1 keeps its rows: it is the page the dialog counts)
+    if (pages.length > 2 && !evened) {
         const nOf = (rs) => placed.filter((x) => rs.includes(x.row)).length;
         const given = new Set();
         for (let guard = 0; guard < 20; guard++) {
@@ -1250,19 +1297,36 @@ function acrossOf(c, byPool, input, b, hAt) {
     // (an exact count keeps C in every row where it can - one count across for the sheet, PT-MIX-3; a fill page
     // takes the count across that holds the most, a row of wide boxes holding fewer)
     const capAt = (C) => Math.max(...seqs.map((sq) => { const G = gridOf(sq, C, c, b, hAt, { exact: !!exact }); return G.overfull && exact ? -1 : (G.pages.length ? G.pages[0].n : 0); }));
-    const forced = Number(input.mixColumns) || 0;
-    if (forced) return { C: forced, cap: capAt(forced), auto: false };
+    // (owner 2026-11-03: 7-10 across is for small problems / fast facts only - a page with any larger cell (a missing
+    // number, a word problem, a stack with regrouping, a 2-digit x) is never 7 or more across, under any mode)
+    const large = c.ids.some((id) => (byPool[id] || []).some((it) => it.template !== 'fact'));
+    const hiC = Math.min(C_MAX, FACT_AUTO_COLS[c.ctx.size] || C_MAX, large ? LARGE_MAX : C_MAX);
+    const asked = Number(input.mixColumns) || 0;
+    const mode = asked ? (input.mixColumnsMode === 'aim' ? 'aim' : 'exact') : 'auto';
+    if (mode === 'exact') {
+        const C = large ? Math.min(asked, LARGE_MAX) : asked;
+        return { C, cap: capAt(C), auto: false, mode, asked, clamped: C !== asked };
+    }
+    if (mode === 'aim') {
+        // ('aim': the largest count <= the one asked that every problem type on the page fits at this size)
+        const top = large ? Math.min(asked, LARGE_MAX) : asked;
+        const tw = (C) => spanMm(C, 1, c.ctx.look);
+        const fitsAll = (C) => c.ids.every((id) => c.cls[id].full || (byPool[id] || []).every((it) => boxOf({ pool: id, it }, C, c, hAt).need <= tw(C) + 0.5));
+        let C = top;
+        while (C > 2 && !(fitsAll(C) && acrossOk(C, c, byPool))) C--;
+        return { C, cap: capAt(C), auto: false, mode, asked, clamped: C !== asked };
+    }
     let best = null;
     // (Auto runs up to the fact layouts' own count across for the size - 10 / 6 / 5 at S / M / L, TY-30 - so a
     // large print stays large and S > M > L)
-    for (let C = 2; C <= Math.min(C_MAX, FACT_AUTO_COLS[c.ctx.size] || C_MAX); C++) {
+    for (let C = 2; C <= hiC; C++) {
         if (!acrossOk(C, c, byPool)) continue;
         const cap = capAt(C);
         if (cap > 0 && (!best || cap > best.cap)) best = { C, cap };
     }
     // (no count across where every row holds C: the one whose rows hold the most, some fewer where a box is wide)
     if (!best) {
-        for (let C = 2; C <= Math.min(C_MAX, FACT_AUTO_COLS[c.ctx.size] || C_MAX); C++) {
+        for (let C = 2; C <= hiC; C++) {
             if (!acrossOk(C, c, byPool)) continue;
             const G = gridOf(seq, C, c, b, hAt, { exact: !!exact });
             const cap = G.pages.length ? G.pages[0].n : 0;
@@ -1270,12 +1334,12 @@ function acrossOf(c, byPool, input, b, hAt) {
         }
     }
     if (!best) best = { C: 4, cap: capAt(4) };
-    return Object.assign(best, { auto: true });
+    return Object.assign(best, { auto: true, mode: 'auto' });
 }
 
 /** The count across a print keeps, remembered on the input between its counts and its plan (one sheet, one C). */
 function acrossFor(c, byPool, input, b, hAt) {
-    const key = `${c.ctx.size}|${c.ctx.look}|${Number(input.mixColumns) || 0}|${c.ids.join(',')}`;
+    const key = `${c.ctx.size}|${c.ctx.look}|${Number(input.mixColumns) || 0}|${input.mixColumnsMode || ''}|${c.ids.join(',')}`;
     if (input.mixAcross && input.mixAcross.key === key) return input.mixAcross;
     const a = Object.assign(acrossOf(c, byPool, input, b, hAt), { key });
     try { input.mixAcross = a; } catch (e) { /* a frozen input re-chooses */ }
@@ -1428,10 +1492,10 @@ function planMixedM2(input, pools) {
                 groups: [{ pools: ids.slice(), R: tall.length ? 2 : 1, tall }],
                 classes: Object.fromEntries(ids.map((id) => [id, { k: A.C, s: 1, h: Math.round(cls[id].h * 10) / 10, full: !!cls[id].full, tall: tall.includes(id) }])),
                 budgets: { first: Math.round(b.first * 10) / 10, cont: Math.round(b.cont * 10) / 10 }, turns: pageOrders, longest, pages: pageOrders, asked, capNote: '', mustBeat: Number(input.mustBeat) || 0, perPage, runs: runsByPage, runNotes, turnsAll: printAll,
-                across: A.C, auto: !!A.auto,
+                across: A.C, auto: !!A.auto, columnsMode: A.mode || (A.auto ? 'auto' : 'exact'), ...(A.clamped ? { clamped: true, asked: A.asked } : {}),
             },
             interleave: { keys: printAll, longest, notes: [] },
-            fits: [{ cols: A.C, across: A.C, auto: !!A.auto, rows: G.rows, perPage, line: `Fits: ${n} problems mixed, ${A.C} across, ${pages.length} page${pages.length > 1 ? 's' : ''} (${perPage} a page).` }],
+            fits: [{ cols: A.C, across: A.C, auto: !!A.auto, columnsMode: A.mode || (A.auto ? 'auto' : 'exact'), ...(A.clamped ? { clamped: true, asked: A.asked } : {}), rows: G.rows, perPage, line: `Fits: ${n} problems mixed, ${A.C} across, ${pages.length} page${pages.length > 1 ? 's' : ''} (${perPage} a page).` }],
         },
     });
 }
