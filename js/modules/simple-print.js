@@ -363,9 +363,27 @@ function finish(res, { counts, arrangement, notes, list }) {
         pages: res.pageCount || 1, keyPages: res.keyPageCount || 0, total: (res.items || []).filter(Boolean).length, counts: got.some(Boolean) ? got : counts,
         arrangement: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t))) ? 'sections' : arrangement,
         fellBack: arrangement === 'mixed' && (res.arrangement !== 'mixed' || engineNotes.some((t) => /prints in sections/i.test(t))),
+        types: arrangement === 'sections' ? typesOf(list, counts, fs) : [],
         cols: first.cols || 0, rows: fs.length === 1 && first.cols ? Math.ceil(page1Cells(res) / first.cols) : first.rows || 0, perPage: page1Cells(res), colsList,
         notes: [...notes, ...engineNotes], firstHtml: (res.pupilPages && res.pupilPages[0]) || res.pupilHtml || '',
     };
+}
+
+/**
+ * The count across Auto chose for each problem type (owner 2026-11-03: "choosing big medium small … is intelligent
+ * fitting"): fast facts are one type ("Facts"), every other skill is its own type by its short name.
+ */
+function typesOf(list, counts, fs) {
+    const live = list.map((_, i) => i).filter((i) => (counts || [])[i] > 0);
+    const out = [];
+    live.forEach((i, j) => {
+        const c = fs[j] && fs[j].cols;
+        if (!c) return;
+        const name = isFactSkill(list[i]) ? 'Facts' : String(list[i].label || labelOf(list[i])).replace(/\s*\([^)]*\)/g, '').trim();
+        const t = out.find((x) => x.name === name);
+        if (t) { t.min = Math.min(t.min, c); t.max = Math.max(t.max, c); } else out.push({ name, min: c, max: c });
+    });
+    return out;
 }
 
 /** The set line on every pupil and key page ("Set 2 of 3") where the engine prints its form letter; one set: none. */
@@ -405,6 +423,8 @@ export function summaryLine(b, o) {
     const key = o.key ? (sets > 1 ? 'each set with its answer key' : 'answer key at the end') : 'no answer key';
     let grid;
     if (b.rows && b.cols && b.cols * b.rows === b.perPage && (b.arrangement === 'facts' || (cl.length === 1 && (b.colsList || []).length <= 1 && !b.fellBack))) grid = `${b.cols} columns × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
+    else if (b.types && b.types.length > 1) grid = `${b.types.map((t) => `${t.name} ${t.min === t.max ? t.min : `${t.min}–${t.max}`} across`).join(' · ')} · ${b.perPage} on page 1`;
+    else if (b.fellBack) grid = `In sections, ${cl.length > 1 ? `${Math.min(...cl)}–${Math.max(...cl)}` : cl[0]} columns · ${b.perPage} on page 1`;
     else if (cl.length === 1) grid = `${cl[0]} columns · ${b.perPage} on page 1`;
     else grid = `Each skill its own grid, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     return [grid, pages, probs, ...(sets > 1 ? [`${sets} sets, each with different problems`] : []), key].join(' · ');
@@ -505,7 +525,7 @@ function render() {
         h += `<button type="button" role="radio" class="sp-size sp-size-${v}" data-sp="size" data-v="${v}" aria-checked="${P.size === v}"><span class="sp-size-glyph" aria-hidden="true">7</span><span class="sp-size-name">${l}</span><span class="sp-size-cols">${c ? `${c} columns` : '…'}</span></button>`;
     }
     h += `</div><label class="sp-cols"><span>Columns</span><select id="spCols" data-sp-cols>
-        <option value="auto"${P.cols === 'auto' ? ' selected' : ''}>Auto${autoCols ? ` (${autoCols})` : ''}</option>
+        <option value="auto"${P.cols === 'auto' ? ' selected' : ''}>Auto — fitted by size${autoCols ? ` (${autoCols})` : ''}</option>
         ${[2, 3, 4, 5, 6, 7, 8, 9, 10].map((c) => `<option value="${c}"${Number(P.cols) === c ? ' selected' : ''}>${c}</option>`).join('')}
     </select></label></section>`;
 
@@ -589,7 +609,7 @@ async function probeSizes(my) {
         S.probes[v] = colsLabel(b);
         const el = S.root.querySelector(`.sp-size-${v} .sp-size-cols`);
         if (el) el.textContent = `${S.probes[v]} columns`;
-        if (v === P.size) { const opt = S.root.querySelector('#spCols option[value="auto"]'); if (opt) opt.textContent = `Auto (${S.probes[v]})`; }
+        if (v === P.size) { const opt = S.root.querySelector('#spCols option[value="auto"]'); if (opt) opt.textContent = `Auto — fitted by size (${S.probes[v]})`; }
     }
 }
 

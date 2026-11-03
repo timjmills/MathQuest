@@ -3,10 +3,10 @@ Title: ONE simple print everywhere (student page, Quick Start cards, teacher tra
 Session: session_013pHDnMYhKMXmRkjhbcmxtp
 Branch: claude/sweet-newton-c8wrv1-simple-print
 Owner of files: js/modules/simple-print.js, css/simple-print.css, tests/scripts/ws-simple-print.cjs; the entry points in teacher-tray.js (openSheet 'print'), gamification.js (printFromLanding), quick-skills.js (printQuickSkill)
-State: critic r2 FAIL on lane items fixed (r3 not run: budget cap); engine items handed to mixed-m2
+State: passed (critic r3 PASS on every lane-owned criterion; engine items with mixed-m2); hand-over
 Updated: 2026-11-03
 Builder profile: lane session (first build of a new screen)
-Critic rounds: 2, r1 FAIL (min 4), r2 FAIL (min 6, B3: page 1 fill = engine pagination)
+Critic rounds: 3, r1 FAIL (min 4), r2 FAIL (min 6), r3 PASS (A 8 9 8 9, B 8 8 8 8 on the lane's part)
 
 ## Now
 - Built; critic r1 and r2 lane-owned defects fixed and gated. r3 not run (budget). Page-1 fill of 6-part prints waits on the engine lane (paginate).
@@ -47,6 +47,7 @@ The existing per-section `sections[i].columns` (2–10). When the engine clamps 
 |---|---|---|---|
 | r1 | 7 7 6 8 / 6 8 4 5 | D4 Auto took fewer fact columns than fit → a fact part asks for the fact columns and keeps the clamp; D5/D9 summary not the built page → counts page 1; D6 Mixed fallback summary; D7 38 px segments, 28 px card buttons → 44; D8 focus lost on re-render → restored by data-sp | ws-simple-print TARGETS + SUMMARY (backtest: r1 code fails SUMMARY) |
 | r2 | 8 9 7 9 / 8 8 6 8 | D1 Mixed fallback still grid format (8 × 3 = 20) and D2 fact card "36 a page" for 30 → grid format only when cols × rows = page 1's count, fact rows count page 1 | SUMMARY over Mixed up + a one-skill fact card (backtest: r2 code FAILs "6 × 5 = 27") |
+| r3 | 8 9 8 9 / 8 8 8 8 (lane part) | PASS. Minor: "the sign" space looks thin under the underline; facts-set M title "Addition facts" on a mixed +/−/× page (kit title rule); fallback summary wording → now "In sections, …". After r3 (lead OK, small): Columns label "Auto — fitted by size (n)", summary per type ("Facts 4–6 across · Missing Numbers 3 across · …"); re-checked by the gate (SUMMARY, TARGETS) and a 390 overflow probe, no critic round | FOOTER (backtest FAIL on 675c7f8) |
 | r2 D3 | page 1 of the six set 63–74 % | NOT lane-owned: adding one row to ANY part (page 1 has ~30 % free) makes the engine paginate to 3 pages (probe scratch grow.cjs) | handed to mixed-m2 (paginate.js) with items 1–4 |
 
 Engine faults handed to mixed-m2 (accepted: 1–4): (1) one outline for a row's cells, (2) a part never continues on the next page, (3) no row stretch, (4) equation wraps at S 5 columns. Not in mixed-m2's files, for the lead: (5) footer raw skill ids, the fact instruction read as "thesign" (likely a text-extraction artefact over a span), div_facts fact-rows paired row rules.
@@ -64,6 +65,7 @@ Times: fix r2, start 2026-11-03T11:35Z, end 2026-11-03T11:45Z, profile lane sess
 `design/status/simple-print/`: sp-six-1366 / -820 / -390 (owner's 6 skills, the new dialog), sp-sets-390, student-landing(-print), quick-cards, quick-card-print, six-M-p1 and after-six-M-pages1 (the default print's pages); before = the owner's screenshot (14 pages, 3 a page).
 
 ## Log
+- 2026-11-03: critic r3 PASS (lane part); Auto label + per-type summary added after it; hand-over. Engine items wait on mixed-m2; after that lands, run a narrow critic on page-1 fill of the six set (target 85 %). Items 4–7 of the Owner design list: a fresh lane after the Thursday reset, combined with the all-skills number-options lane.
 - 2026-11-03: owner addition "how many sets" → Sets stepper in step 2 (each set its own seed and key, "Set k of N").
 - 2026-11-03: r1 and r2 fixes; r3 not run (hard cap $70).
 - 2026-11-03: built; ws-simple-print OK (defaults fill 69–92 % at S/M/L on the six, facts, add/sub and missing sets), backtest FAILs the old plan.
