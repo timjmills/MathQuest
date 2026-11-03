@@ -1,9 +1,9 @@
 # Lane simple-print-2 — Aim / Exactly columns, Quick prints, Highest number + fact sets (owner design list items 4–7)
 
 - **Lane:** simple-print-2 (builder, Opus medium: first build of a new screen area + new options)
-- **Branch:** `claude/sweet-newton-c8wrv1-simple-print-2` (from cd81c8e, live simple print 844ecfaa1). Not pushed.
+- **Branch:** `claude/sweet-newton-c8wrv1-simple-print-2` (from cd81c8e, live simple print 844ecfaa1). Pushed; draft PR to claude/sweet-newton-c8wrv1.
 - **Spec:** `design/status/simple-print.md` "Owner design list" items 4–7 (owner, 2026-11-03).
-- **State:** critic r1 FAIL (A: C2 6, C3 7; B × 6–8: C2 7) -> all six findings fixed with a check each (r1 fixes below); waiting for critic r2. Item 7 (decimals) NOT built: gap recorded below.
+- **State:** critic r1 FAIL (A: C2 6, C3 7; B × 6–8: C2 7) -> all six findings fixed with a check each (r1 fixes below); **critic r2 PASS** (A 8/8/8/8; B × 6–8 9/9/9/9, ÷ 6–8 8/9/8/8, add-within-50 9/9/9/9). Item 7 (decimals) NOT built: gap recorded below.
 
 ## Files owned
 `js/modules/simple-print.js`, `css/simple-print.css` (additive block at the end), `tests/scripts/ws-simple-print.cjs`
@@ -71,3 +71,12 @@ OK; ws-screen-answer OK; ws-chromebook-perf OK; ws-code-snapshot OK (731 codes, 
 ## Log
 - 2026-11-03: critic r1 FAIL; six findings fixed with checks (table above).
 - 2026-11-03: built items 4–6; item 7 recorded as a gap; screenshots for the critic in the session scratchpad `sp2/`.
+
+## Critic r2 (2026-11-03): PASS
+Independent critic (Opus medium) on 36af356: every criterion ≥ 8; all six r1 defects fixed; FACTPATTERN's looser form accepted
+(a fixed deal cannot avoid 3-runs for every column count 5–10; the seeded in-cycle shuffle removes the predictable structure).
+Open nits (not blocking): dialog label "Multiplication Facts (1-/12)" breaks at the hyphen (fix: non-breaking hyphen; check: label
+line may not end in "(" or "-"); ÷ facts equation cell at M has ~0 px between index tab and first digit (fix: top offset = tab
+height; check: print-lint overlap ≥ 2 px); Problems-mode Missing Numbers page 1 half used (mixed-m2 engine lane).
+Not run by this lane: ws-options-verify on the whole multiplication category (49 values on 25 other skills fail; not measured on
+the parent commit).
