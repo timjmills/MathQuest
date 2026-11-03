@@ -3,7 +3,7 @@ Title: Truly mixed practice pages (M1–M5)
 Session: session_013pHDnLJxJB8jZan3tZDfNS (M2); r4: session_013pHDnNtsn5c7Ap1EHFz9gU
 Branch: claude/sweet-newton-c8wrv1-mixed-m2
 Owner of files (M2): sheet/roles/mixed-practice.js, sheet/mixed-pack.js (new), sheet/interleave.js, sheet/layout.js, sheet/paginate.js; the dialog: teacher-sheet.js, teacher-plan.js, teacher-tray.js, teacher-print.js
-State: STOPPED (§1.7, 2026-11-03 r5) - mixed-m2 H13-vs-runs conflict survived r4 + r5 at medium; needs an owner ruling; no critic run (not clean)
+State: STOPPED at cap (2026-11-03, r6) - independent print critic r6 FAIL on A / B / C; every lane gate green at 6b6654a2
 Updated: 2026-11-03
 Builder profile: mq-opus-medium
 Critic rounds: M1 r1–r6 (PASS); M2 print r1, r2, r3 FAIL; M2 dialog check r1 (7/7/7/8), r2 (7/8/6/8), r3 (8/7/6/9) FAIL
@@ -233,3 +233,38 @@ Also open: missing-number wrap at 6 across on S (the measure records a wrapped l
 flag, or the skills moved to the kit equation cell); Independent clamp collapse / outlines / parts across pages / row
 stretch (simple-print lane's items) not started; L pages are 4 rows of 4 with tall hollow-looking boxes (16 a page)
 - check against a critic before calling L done.
+
+## r6 (2026-11-03) - three layouts (owner: "Can you have all three be options?"); critic r6 FAIL; hand-over
+Built (fresh Opus-medium builder + two bounded fixers): req.mixLayout 'rows' (A, default) | 'grid' (B) | 'even' (C);
+fits.mixLayout / acrossByKind; data-ws-kind; Columns 1-10 + columnsMode exact / aim / auto; fact-rows keeps an explicit
+1 or 2 (ws-columns-one); MIX_LAYOUTS = ['rows','grid','even'] exported from print-sheet.js. Gates green at 6b6654a2:
+mixed-m3 full 78/0, mixed-m2 --quick 0 (was 40), plan-match, arrangement, boot, code-snapshot 731, mixed-page,
+ws-simple-print, ws-columns-one; one-section pages byte-identical. Precritic strict: only the 2 print-lint rows of
+unpinned single-skill mixed-practice pages (skill drawings, red on base).
+CRITIC r6 (independent, Opus medium, 24 pages + keys, every answer checked right): FAIL on A, B, C and every mix.
+1. B / C: missing-number equations WRAP at S and M ("[ ] / - 10 = 3") - hard cap. C at S is byte-identical to B.
+2. Missing-number cells (legacy) ignore the size: same small digits at S / M / L, same count across.
+3. Missing-number keys: "Answer: 13" caption, box empty - not a facsimile.
+4. A last pages: ragged staircases (M p2: rows 5 / 3 / 3 / 2), a kind's cell width changes row to row, empty areas
+   inside the frame.
+5. A kinds do not alternate (L: fact, fact, large, fact, fact; c S: a run of 30 facts).
+6. Fill pages are not a mix: b S 40 facts : 4 long x; c S 50 : 2; d 16 : 2.
+7. d: S = M (18 = 18); subtraction digits the same at S / M / L.
+8. Stretched cells (b M a row short; grid L three pages, ordinary facts stretched two rows tall).
+9. B never uses its two-row span on pages 1-2.
+10. Minor: wrong run notes, word-problem widows, empty carry boxes on 2-digit x keys, double rule, key header name line.
+WHY THE GATES PASSED WHAT THE CRITIC FAILED (speed reflection - each becomes a check before any next build):
+- The lane lead's r6 check rulings were too lenient: the trailing-short-rows shelfw allowance, the merged tail row and
+  the "pinned" forced minimum let ragged last pages and non-alternating kinds through (4, 5). Revert to: a kind's last
+  page rows keep the kind's full count across and cell width; kinds alternate with runs <= ceil(rowsK / (other + 1)),
+  no pin relaxation.
+- No check reads an equation's line count (1: add `nowrap` - every [data-ws-eq] / legacy horizontal problem has ONE
+  line box), the missing-number digit size against ctx.metrics (2: extend `digits` to horizontal equations), a key's
+  slot ink (3: every slot box on a key holds its answer digits), the mix share on fill pages (6: each skill >= its
+  weight share - 1 row), S > M per KIND (7: extend sml to every scenario and per kind), B != C (9: B uses a 2-row span
+  where a long box exists; C != B bytes).
+- The engine / skill split: items 2 and 3 are the legacy missing_add_sub / missing_mult_div drawing - move them to the
+  kit equation cell (skill lane), which also fixes 1.
+NEXT: (1) skill lane: missing_add_sub / missing_mult_div to the kit equation cell (fixes 1-3); (2) lane lead: the six
+checks above red first, revert the lenient rulings; (3) fresh Opus-medium builder on A only (5, 6, 7, 8, 4); B / C
+after A passes. Seeding provider defaultColumns stays next too.
