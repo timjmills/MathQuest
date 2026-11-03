@@ -387,6 +387,8 @@ function gridPart(part, ctx, report) {
         rowGap: Number(part.rowGap) || 0,
         trail: part.trail || null,
         widthPct: Number(part.widthPct) || 0,
+        left: !!part.left,
+        bottom: !!part.bottom,
     });
 }
 

@@ -170,6 +170,8 @@ function normaliseRequest(req = {}) {
     }
     return {
         role, size: onePage ? 'S' : size, look, paper, seed, sections, arrangement, arrangementNotes,
+        // (the print dialog's Columns for a mixed page, r4; the sections' own `columns` otherwise)
+        mixColumns: req.columns && req.columns !== 'auto' ? clampInt(req.columns, 2, 10, 0) : 0,
         // Mixed practice (owner ruling 2026-10-23): fill the page (default) or stop when the
         // unique facts run out; related facts only when allowed (off by default).
         fill: normaliseFill(req.fill), families: normaliseFamilies(req.families),
@@ -1469,6 +1471,50 @@ function shownLine(value, ink) {
 }
 
 /* ======================================================================= measurement */
+
+/**
+ * The mixed grid's rule pads (r4): the pupil pages laid out in the measuring document; in every grid row, each
+ * computation box (a drawn answer rule under operands with a sign) and how far its first rule sits above the row's
+ * lowest -> {n: {mm, padMm}} (n the box's number, mm the pad to add, padMm its padding-top now), or null.
+ */
+function mixedRulePads(html) {
+    if (typeof globalThis.document === 'undefined' || !globalThis.document.body) return null;
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;
+    const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
+    ensureEngineStyle(document);
+    const host = document.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;left:-12000px;top:0;width:230mm;visibility:hidden;pointer-events:none;';
+    host.innerHTML = html;
+    document.body.appendChild(host);
+    const out = {};
+    try {
+        for (const g of host.querySelectorAll('.ws-page .ws-grid')) {
+            if (g.parentElement.closest('.ws-cell')) continue;
+            const rows = new Map();
+            for (const c of g.children) {
+                if (!c.classList.contains('ws-cell') || c.classList.contains('blankrun')) continue;
+                const tab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter');
+                if (!tab || !/[+\u2212\u00d7\u00f7-]/.test(c.textContent || '')) continue;
+                const rule = [...c.querySelectorAll('.rule, .stack-rule')].filter((e) => !e.closest('.ws-tab,.ws-letter,.ws-mixcue') && e.getBoundingClientRect().width > 0)
+                    .sort((p, q) => p.getBoundingClientRect().top - q.getBoundingClientRect().top)[0];
+                if (!rule) continue;
+                const top = Math.round(c.getBoundingClientRect().top);
+                const y = rule.getBoundingClientRect().top + (parseFloat(getComputedStyle(rule).borderTopWidth) || 0) / 2;
+                if (!rows.has(top)) rows.set(top, []);
+                rows.get(top).push({ n: Number(tab.textContent.replace(/\D/g, '')) || 0, y, pad: parseFloat(getComputedStyle(c).paddingTop) || 0 });
+            }
+            for (const xs of rows.values()) {
+                if (xs.length < 2) continue;
+                const lo = Math.max(...xs.map((x) => x.y));
+                for (const x of xs) if (lo - x.y > 0.2 * PX_PER_MM && x.n) out[x.n] = { mm: Math.round(((lo - x.y) / PX_PER_MM) * 100) / 100, padMm: Math.round((x.pad / PX_PER_MM) * 100) / 100 };
+            }
+        }
+    } finally {
+        host.remove();
+    }
+    return out;
+}
 
 function ensureEngineStyle(doc) {
     if (!doc || doc.querySelector('style[data-mq-sheet-engine-host]')) return;
@@ -3557,6 +3603,12 @@ async function buildRoleSheet(n, metaOf) {
             pools.forEach((p, pi) => { probe[p.id] = dealPool(p, pi, PROBE); measureMixed(probe[p.id]); input.floors[p.id] = floorOf(probe[p.id]); });
             input.arrangement = 'mixed';
             input.mixM2 = true;
+            // (the print dialog's Columns override, r4: req.columns, else the sections' own columns - one count across
+            // for the whole mixed print; absent = Auto, the role picks it and reports it as fits.across)
+            {
+                const cAsk = Number(n.mixColumns) || Number((n.sections.find((s) => s.columns && s.columns !== 'auto') || {}).columns) || 0;
+                if (cAsk) input.mixColumns = Math.max(2, Math.min(10, cAsk));
+            }
             if (exactCounts) input.exactCounts = exactCounts;
             input.mixPages = mixPages;
             ok = true;
@@ -3795,8 +3847,24 @@ async function buildRoleSheet(n, metaOf) {
         for (const list of bySec.values()) markSectionWriteAbove(list);
     }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
-    const plan = mod.plan(input);
-    const out = renderPlan(plan, { key: n.key });
+    let plan = mod.plan(input);
+    let out = renderPlan(plan, { key: n.key });
+    // (the mixed grid, r4: computation boxes of one row put their first answer rule on one line - a kit fact and a
+    // legacy stack start their drawings at different heights; the page is laid out once, each row's rules read,
+    // and every box padded down to the lowest rule of its row; then planned again with those pads)
+    if (input.mixM2 && input.arrangement === 'mixed') {
+        for (let round = 0; round < 3; round++) {
+            const pads = mixedRulePads(out.pupilHtml);
+            if (!pads || !Object.keys(pads).length) break;
+            // (a fact's pad adds to its own; a legacy box's padding is set outright: padMm + mm)
+            const old = input.rulePads || {};
+            const next = Object.assign({}, old);
+            for (const [k, v] of Object.entries(pads)) { const o = old[k] ? old[k].mm : 0; next[k] = { mm: o + v.mm, padMm: v.padMm - o }; }
+            input.rulePads = next;
+            plan = mod.plan(input);
+            out = renderPlan(plan, { key: n.key });
+        }
+    }
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t)), ...dealNotes];
@@ -3811,7 +3879,9 @@ async function buildRoleSheet(n, metaOf) {
         pageCount: out.pupilPages.length,
         keyPageCount: n.key ? out.keyPages.length : 0,
         numberLine,
-        fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
+        fits: Object.assign({ cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
+            // (a mixed page's count across, r4: the dialog shows "Auto (n)")
+            f0.across ? { across: f0.across, acrossAuto: !!f0.auto } : {}),
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,

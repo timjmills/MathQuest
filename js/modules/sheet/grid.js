@@ -37,7 +37,7 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
  *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, trail = null, widthPct = 0 } = {}) {
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, trail = null, widthPct = 0, left = false, bottom = false } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     let k = start;
     // `place` (the mixed packer, sheet/mixed-pack.js): a cell set on the page lattice - its first
@@ -57,8 +57,14 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
         const r0 = rows || 1;
         // (`widthPct`: a shelf narrower than the frame, centred - its cells never wider than their
         // drawing / 0.45, critic r3 P2; additive inline style, old saved pages carry none)
-        const wd = widthPct > 0 && widthPct < 100 ? `width:${Math.round(widthPct * 100) / 100}%;margin-left:auto;margin-right:auto;` : '';
-        return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r0},1fr)`};${height ? `height:${height};` : ''}${wd}">${out.join('')}</div>`;
+        // (`left`, the mixed grid's short last row (r4): the shelf starts at the frame's left edge and closes its own right
+        // side; the rest of the row is the ONE unruled trailing area, outside any grid)
+        const wd = widthPct > 0 && widthPct < 100 ? (left
+            ? `width:${Math.round(widthPct * 100) / 100}%;margin-left:0;margin-right:auto;border-right:var(--ws-heavy) solid var(--ws-ink);`
+            : `width:${Math.round(widthPct * 100) / 100}%;margin-left:auto;margin-right:auto;`) : '';
+        // (`bottom`: a grid over a narrower one closes its own last row - r4, the mixed grid's short last row)
+        const bt = bottom ? 'border-bottom:var(--ws-heavy) solid var(--ws-ink);' : '';
+        return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r0},1fr)`};${height ? `height:${height};` : ''}${wd}${bt}">${out.join('')}</div>`;
     }
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
     const used = cells.length + (spanFirst ? cols - 1 : 0);

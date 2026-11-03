@@ -86,3 +86,25 @@ Renders: `design/status/mixed-m2/after/{a,b,c,d,e,g,sec-b}`.
   exact-count print. Backtest on a1254b8: FAIL (b-S fill pages 30 % free x2, c 5:14 page 3 of 4 19 % free); this head OK.
 - Left: b-S / b-M still end in a tail row of 3 facts + a trailing area (a 4th fact would make a block, and blocks go into
   2-row shelves); the page body is above 85 %.
+
+## r4 engine rebuild (builder, Opus medium, 2026-11-03) - NOT clean, see "Open"
+Engine: the shelf / column block packer is gone from Mixed up pages (`roles/mixed-practice.js` planMixedM2 / m2Counts):
+ONE grid a page on a lattice of 12 x C units, ONE count across C for the print (`req.columns` or the sections'
+`columns` -> `input.mixColumns`; Auto = the C whose page holds the most of this mix, capped at FACT_AUTO_COLS
+10 / 6 / 5, reported as `fits.across`), the order over the whole print first (orderOf), then rows of C problems in
+that order; each box as wide as its measured drawing needs, the row's rest shared equally (a fact never wider than
+its drawing / 0.5 while another box can take it); a long procedure / word problem 1.45-1.6 x the small boxes stands
+two rows tall where it falls and counts in both rows; on an exact count of 2+ pages whose last row would be short,
+the last boxes of the row before stand two rows tall (every full row C problems); a short last row (one page, or a
+fill page) is its own left-aligned grid closed on its right (`grid.js` `left` / `bottom`, additive inline styles,
+`answer-key.js` passes them); row height = tallest box, spare shared up to each row's H13 ceiling, then (blank
+> 18 mm) evenly; facts and legacy stacks at the fact ladder's digits for C (never under the size's working digits);
+answer rules of one row aligned by a laid-out pass in print-sheet.js (`mixedRulePads`, up to 3 rounds).
+Owner's set (41 = 7,7,7,7,7,6, Daily): S 6 across 30 + 11; M 5 across 25 + 16; L 4 across 20 / 12 / 9.
+One-section Independent / lesson / more-practice pages byte-identical (5 samples, md5).
+Open (red): mixed-m3 full 9 (g Sections frame 6 - the measure takes only the first band as the frame, Sections
+plan untouched; o columns-4 M fill 2 - 28 pt facts / legacy stacks at 4 across are 42 mm, 5 rows = 20 < 23, and 24 pt
+legacy stacks fail width at 46 mm: no layout satisfies fill + width + digits; o L page 2 fill 1); mixed-m2 --quick 60
+(H13 on fill pages b / c where the dealt boxes differ from the probe's; Sections d frac-model H13 4 pre-existing;
+c 5:14 "no s0 on page 5"); ws-teacher-plan-match 1 (add_facts + word problems 20: 5 pages where a page holds 5);
+backtests for frame / shelfw / fill not added.
