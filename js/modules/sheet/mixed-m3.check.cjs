@@ -36,7 +36,7 @@
 //                            no grid rule runs more than 3 mm past the cells of the row it closes.
 //   shelfw   (checkShelfWidth) every problem grid spans the frame's inner width (<= 2 mm short each side); only the last
 //                            grid of the last page may stop short, at its right end.
-//   fill     (checkFill)     (owner: "fill the paper") a mixed page's problem cells cover >= 70 % of the frame, and the page
+//   fill     (checkFill)     (owner: "fill the paper") a mixed page's problem cells cover >= 85 % of the frame, and the page
 //                            holds >= In sections' per-page count for the same skills at that size, less one row.
 //   partials (checkPartials) a 2-digit x cell on a mixed page draws the work rows of its own single-skill page.
 //   columns  (checkColumns)  req.columns = N (the print dialog's Columns control): every full row holds N problems.
@@ -235,7 +235,9 @@ function checkFill(pages, ctx) {
         // (OWNER, 2026-11-03: an explicit Columns count WINS - the teacher's count and big digits are kept and white space is
         // allowed; the fill floor applies to Auto only. Every other check still runs on a Columns print.)
         if (ctx.columns) return;
-        if ((pg.fillFrac || 0) < 0.70 - 1e-6) out.push(`fill: page ${i + 1}: problems cover ${Math.round((pg.fillFrac || 0) * 100)} % of the frame (>= 70 %)`);
+        // (OWNER, 2026-11-03: "fit them all and have no white space" - >= 85 % of the frame on every page but the last; "unless
+        // there were limited problems" - the last page of an exact-count print, and a print shorter than a page, is exempt above)
+        if ((pg.fillFrac || 0) < 0.85 - 1e-6) out.push(`fill: page ${i + 1}: problems cover ${Math.round((pg.fillFrac || 0) * 100)} % of the frame (>= 85 %)`);
         if (ctx.sectionsPerPage) {
             const across = Math.max(1, ...(pg.fullRows || []).map((r) => r.n));
             const floor = ctx.sectionsPerPage - across;
