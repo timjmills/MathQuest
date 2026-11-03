@@ -703,6 +703,13 @@ function openSheet(kind) {
     if (kind !== 'quiz' && !items.length) { undoToast('Tick skills first: they wait in the tray.', null); return; }
     closePop();
     closeChipSheet();
+    // Owner 2026-11-03: Print opens the ONE simple print (skills · how many · size · key); the full dialog is its
+    // "More options" link. A lesson's paper keeps the full dialog (its groups print as a batch).
+    if (kind === 'print' && !T.lessons.length && typeof window.openSimplePrint === 'function') {
+        const live = items.filter((it) => it.leftOut !== true);
+        window.openSimplePrint(live, { from: 'tray', more: () => window.tvOpenSheet?.('print', { from: 'tray', empty: false, fromLesson: false, full: true }) });
+        return;
+    }
     if (typeof window.tvOpenSheet === 'function') { window.tvOpenSheet(kind, { from: 'tray', empty: !items.length, fromLesson: T.lessons.length > 0 }); return; }
     // T3b's sheets are not in yet: today's screens, with the tray's skills
     const skills = items.filter((it) => it.leftOut !== true).map((it) => ({ categoryId: it.categoryId, skillId: it.skillId, weight: it.weight, opts: it.opts }));

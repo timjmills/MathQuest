@@ -41,6 +41,7 @@ import {
 import { mountCropped, refitCropped, croppedReady, openChipSheet } from './teacher-chip.js';
 import { savedSets, writeSets } from './teacher-ui.js';
 import { REDESIGN_PASSED } from './redesign-passed.js';
+import { mountQuickPrints } from './simple-print.js';   // owner 2026-11-03 item 5: Quick prints on the Skills page
 
 // Standards (owner request 2026-09-25): the detail panel tags each skill with its CCSS standards
 // and Essential Elements, the search finds skills by a standard code (3.OA.7, EE.3.OA.6), and a
@@ -777,6 +778,7 @@ export function renderSkillsScreen(el) {
     }
     restoreTray();
     gSyncControls();
+    mountQuickPrints(el.querySelector('#tsQuick'));
     gRender();
     syncTray();
 }
@@ -789,6 +791,7 @@ function gShellHTML() {
   <div class="ts-head-text"><h1 class="tv-h1 ts-title">Skills</h1><p class="ts-sub">Select skills to build your tray.</p><p class="ts-meta" id="tsEyebrow"></p></div>
   <label class="ts-search"><span class="tv-sr">Search skills or standards</span>${icon('search', 20)}<input id="tsSearch" type="search" placeholder="Search skills or standards: “add within 20”, “2.NBT.5”" autocomplete="off"></label>
 </div>
+<div id="tsQuick" class="sp-qrow"></div>
 <div class="ts-filters">
   <div class="ts-frow"><span class="ts-flabel" id="tsGradeL">Grade</span><div class="ts-pills" role="group" aria-labelledby="tsGradeL" id="tsGrades"></div><span class="ts-note" id="tsSearchNote"></span></div>
   <div class="ts-fdiv" role="presentation"></div>

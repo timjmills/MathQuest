@@ -1463,11 +1463,31 @@ export function showStudentLandingModal(parsed) {
         skillsHTML +
         settingsHTML +
         '<button class="btn btn-primary landing-start-btn" onclick="startFromLanding()">Start Playing!</button>' +
+        // owner 2026-11-03: everyone (pupils too) can print the link's skills; the print loads on the press only
+        '<div><button type="button" class="landing-print-btn" onclick="printFromLanding()" aria-label="Print these skills as a worksheet">' + PRINT_ICON + ' Print</button></div>' +
         '</div>';
     document.body.appendChild(overlay);
     // the pupil can start straight away: Enter or Space presses Start Playing
     const startBtn = overlay.querySelector('.landing-start-btn');
     if (startBtn) try { startBtn.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+}
+
+/** A printer glyph (24 x 24, currentColor) for the student side's Print buttons. */
+export const PRINT_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>';
+
+/** Ready to Practice → Print: the link's skills (with their options) in the simple print, the pop-up left open. */
+export function printFromLanding() {
+    const parsed = state.landingSettings;
+    if (!parsed) return;
+    let skills = [];
+    try { skills = typeof window.parseSkillCodeParts === 'function' ? window.parseSkillCodeParts(parsed.skillsCode) : []; } catch (e) { skills = []; }
+    if (!skills.length) {
+        for (const part of String(parsed.skillsCode || '').split('-')) {
+            const info = CODE_TO_SKILL[part.substring(0, 2).toUpperCase()];
+            if (info) skills.push({ categoryId: info.categoryId, skillId: info.skillId });
+        }
+    }
+    if (typeof window.openSimplePrint === 'function') window.openSimplePrint(skills.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts })), { from: 'student' });
 }
 
 export function startFromLanding() {
