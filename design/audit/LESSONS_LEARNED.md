@@ -188,3 +188,11 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
     precritic's `--skill` path) and look at the drawing against VQ-1 … VQ-10 (`WORKSHEET_DESIGN_STANDARD.md` §18): the
     relation drawn from the map, every part live, one labelled answer place, the title a sentence, a kit cell. Write which
     of H14-H17 you checked and why each does not apply.
+
+## simple-print-2 critic r1 (2026-11-03): one line per finding, the check that now catches it
+- A mode whose request differs only by a field the engine ignores is a label, not a mode (Aim = Exactly) -> ws-simple-print EXACT builds one set in both modes and FAILS when the page plans are identical.
+- A band's values are not always answer bounds ("Tables to 12 × 12" shown as "Highest number 144") -> ws-simple-print WITHIN: a band shown as Highest number N on × / ÷ facts must deal a 12 when N >= 12; `numberOptionsOf().band.answer` decides the label.
+- A fixed stride over a small ticked set lines one table up every column (8, 7, 6 at 6 across) -> ws-simple-print FACTPATTERN (no column / diagonal one table all the way down; at most half the columns with a 3-row run) on × 6–8 at S/M/L.
+- Footers built from the bare label contradict the options ("(1-12)" on a 6–8 page) -> ws-simple-print FOOTER names "within 50" / "tables 6–8" from the options.
+- "Fact-sized" (the kit's isFact) is not "Facts" in words: column additions were called Facts -> ws-simple-print SUMMARY fails a non-*_facts type named "Facts".
+- Evidence screenshots of a page below the viewport captured the app -> the evidence script asserts the last page is .ws-key with "Answer Key" before saving it.

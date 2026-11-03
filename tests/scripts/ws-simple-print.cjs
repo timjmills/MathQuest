@@ -209,6 +209,45 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
             if (noF > 6) F(`COLS7 the missing set (no facts) offers ${noF} columns`);
             if (withF !== 10) F(`COLS7 the six set (with facts) offers up to ${withF} columns, want 10`);
             localStorage.removeItem('mq_simple_print');
+            if (!bt) {
+                // EXACT (critic r1 #1): Aim and Exactly must plan different pages where they should differ: 25 problems
+                // asked 6 across: Exactly prints 6 (a last row of 1), Aim takes 5 (5 full rows)
+                const plan = async (mode) => { const b = await m.buildSimple(L([sets.missing[0]]), { how: 'problems', n: 25, size: 'M', cols: 6, colsMode: mode, key: false, arrange: 'sections', seed: 4242, title: true }); return JSON.stringify([b.colsList, b.cols, b.rows, b.perPage, b.pages]); };
+                const pe = await plan('exact'), pa = await plan('aim');
+                if (pe === pa) F(`EXACT Aim for 6 and Exactly 6 plan the same page for 25 problems: ${pe}`);
+                out.info.push(`EXACT 25 problems, 6 asked: exact ${pe} · aim ${pa}`);
+                // SUMMARY (critic r1 #5): only the *_facts ids are named "Facts"
+                const cb = await m.buildSimple(L([{ categoryId: 'addition', skillId: 'add_100_mixed' }, sets.missing[0]]), { how: 'pages', n: 1, size: 'M', cols: 'auto', key: false, arrange: 'sections', seed: 4242, title: true });
+                if ((cb.types || []).some((t) => t.name === 'Facts')) F(`SUMMARY column addition named "Facts": ${m.summaryLine(cb, { key: false })}`);
+                // FOOTER (critic r1 #4): the footer names the chosen options like the title
+                for (const [sk, want, not] of [[{ categoryId: 'addition', skillId: 'add_100_mixed', opts: { band: 50 } }, /within 50\b/, /within 100\b/], [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [6, 7, 8] } }, /6–8/, /1-12/]]) {
+                    const b = await m.buildSimple(L([sk]), { how: 'pages', n: 1, size: 'M', cols: 'auto', key: true, arrange: 'sections', seed: 4242, title: true });
+                    const foots = (b.pupilHtml.match(/<footer[^>]*>[\s\S]*?<\/footer>/g) || []).map((f) => f.replace(/<[^>]+>/g, ' '));
+                    if (!foots.length || !foots.every((f) => want.test(f) && !not.test(f))) F(`FOOTER ${sk.skillId} ${JSON.stringify(sk.opts)}: footer "${(foots[0] || '').replace(/\s+/g, ' ').trim().slice(0, 80)}" does not name the options`);
+                }
+                // FACTPATTERN (critic r1 #3, L10): on a tables 6–8 fact page no column or diagonal is one table all the way
+                // down, and at most half the columns hold a run of 3 rows of one table (with 2–4 ticked tables some 3-runs
+                // are unavoidable: the generator cannot know the page's column count, and a run-free deal for every column
+                // count 5–10 and both diagonals does not exist for 3 values; a fixed cycle makes EVERY column one table)
+                for (const size of ['S', 'M', 'L']) {
+                    for (const seed of [4242, 77]) {
+                        const set = [6, 7, 8];
+                        const b = await m.buildSimple(L([{ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: set } }]), { how: 'pages', n: 1, size, cols: 'auto', key: false, arrange: 'sections', seed, title: true });
+                        const cells = (b.firstHtml.split('class="ws-cell ').slice(1)).map((h) => (h.slice(h.indexOf('>') + 1).replace(/<[^>]+>/g, ' ').match(/\d+/g) || []).map(Number).slice(1, 3)).map((ns) => ns.filter((x) => set.includes(x)));
+                        const c = b.cols, rows = Math.ceil(cells.length / c);
+                        const at = (r, j) => (r < rows && j >= 0 && j < c ? cells[r * c + j] : null);
+                        const share = (xs) => xs.every(Boolean) && set.some((v) => xs.every((x) => x.includes(v)));
+                        let runs = 0, whole = [];
+                        for (let j = 0; j < c; j++) {
+                            const col = Array.from({ length: rows }, (_, r) => at(r, j)).filter(Boolean);
+                            if (col.length >= 3 && share(col)) whole.push(`column ${j + 1}`);
+                            for (let r = 0; r + 2 < rows; r++) { if (share([at(r, j), at(r + 1, j), at(r + 2, j)])) { runs++; break; } }
+                            for (const dj of [1, -1]) { const dg = Array.from({ length: rows }, (_, r) => at(r, j + dj * r)).filter(Boolean); if (dg.length >= 4 && share(dg)) whole.push(`diagonal from column ${j + 1}`); }
+                        }
+                        if (whole.length || runs > Math.floor(c / 2)) F(`FACTPATTERN mult_facts 6–8 @${size} seed ${seed}: ${whole.slice(0, 3).join(', ') || ''} ${runs} of ${c} columns repeat one table 3 rows`);
+                    }
+                }
+            }
             // QUICK
             if (bt) return Object.assign(out, await within());
             localStorage.removeItem('mq_quick_prints');
@@ -255,6 +294,15 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                     const { band, sets: fs } = m.numberOptionsOf(s);
                     if (!band && !fs) continue;
                     skillsSeen++;
+                    // critic r1 #2: a band shown as "Highest number N" on × / ÷ facts must admit every fact with an answer
+                    // up to N: 1 × 12 = 12, so a factor of 12 must be dealt whenever N >= 12
+                    if (band && (bt || band.answer) && /_facts$/.test(id) && (cat === 'multiplication' || cat === 'division')) {
+                        for (const v of band.values.filter((x) => x >= 12)) {
+                            let top = 0;
+                            for (let i = 0; i < 120; i++) { const q = W.generateQuestionFor({ category: cat, skill: id, opts: { band: v }, seed: 500 + i }); if (!q) continue; const ns = nums(q); const f = cat === 'multiplication' ? ns.filter((x) => x !== Number(q.ans)) : ns.filter((x) => x !== Math.max(...ns)); top = Math.max(top, ...f, 0); }
+                            if (top < 12) F(`WITHIN ${cat}:${id} "Highest number ${v}" never deals a 12 (1 × 12 = 12 is within ${v}): the band is not an answer bound`);
+                        }
+                    }
                     for (const v of band ? band.values : []) {
                         for (let i = 0; i < 12; i++) {
                             const q = W.generateQuestionFor({ category: cat, skill: id, opts: { band: bt ? Math.max(...band.values) : v }, seed: 101 + i * 7 });

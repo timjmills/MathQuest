@@ -153,3 +153,11 @@ body.sp-open { overflow: hidden; }
 @media (max-width: 520px) {
     .sp-root .sp-cmode, .sp-root .sp-shared { margin-left: 0; }
 }
+/* critic r1 #5: the number option sits on the skill row (one compact row a skill) */
+.sp-root .sp-skill.has-band { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+.sp-root .sp-band { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #4A423B; }
+.sp-root .sp-band select { height: 44px; min-width: 96px; padding: 0 8px; border: 1px solid #D6D0C8; border-radius: 8px; font: inherit; font-size: 16px; font-weight: 500; color: #1A1614; background: #fff; }
+@media (max-width: 520px) {
+    .sp-root .sp-skill.has-band { grid-template-columns: minmax(0, 1fr) auto auto; }
+    .sp-root .sp-skill.has-band .sp-band { grid-column: 1 / -1; grid-row: 2; }
+}

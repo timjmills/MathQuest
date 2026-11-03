@@ -125,6 +125,29 @@ function sharesOf(amounts) {
     return r.counts.map((c) => c / t);
 }
 
+/**
+ * The skill's name with its chosen number options (critic r1 #4: the footer said "Multiplication Facts (1-12)" on a
+ * tables 6–8 page and "Add within 100" under "I Can add within 50"): "within N" follows Highest number, a band that
+ * is not an answer bound is said in its own words, and ticked fact sets / tables replace "(1-12)" / "(within 20)".
+ */
+export function footerName(s) {
+    let name = String(s.label || labelOf(s));
+    const { band, sets } = numberOptionsOf(s);
+    if (band) {
+        const v = Number(optVal(s, band.def));
+        if (v !== Number(band.def.default)) {
+            if (band.answer && /within [\d,]+/i.test(name)) name = name.replace(/within [\d,]+/i, `within ${v.toLocaleString('en-US')}`);
+            else name = `${name.replace(/\s*\([^)]*\)/g, '')}, ${band.def.label.toLowerCase()} ${band.labelOf(v)}`;
+        }
+    }
+    if (sets) {
+        const all = sets.values.map((x) => x.v);
+        const cur = setsOf(s, sets);
+        if (cur.length !== all.length) name = `${name.replace(/\s*\([^)]*\)/g, '')}: ${s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'tables' : 'fact sets'} ${setWords(cur, all)}`;
+    }
+    return name;
+}
+
 /** Is every skill of the set a fast fact (the fact-rows role takes it)? */
 const factCache = new Map();
 export function isFactSkill(s) {
@@ -195,6 +218,23 @@ async function buildSections(list, counts, o) {
         if (colsBy[i] && f && f.cols && (f.clamped || f.cols < colsBy[i])) { if (colsAsked(o)) clamped = true; colsBy[i] = f.cols; refit = true; }
     });
     if (refit) res = await buildSheet(sectionsReq(list, counts, o, colsBy));
+    // critic r1 #1: Aim for n may take ONE column fewer on a part when that ends the part on a full row (25 problems:
+    // 5 × 5, not 6 + 6 + 6 + 6 + 1), as long as the pages do not grow. Exactly n never does: every part that can take n
+    // prints n.
+    if (colsAsked(o) && o.colsMode !== 'exact') {
+        const gap = (k, c) => Math.ceil(k / c) * c - k;
+        const alt = colsBy.slice();
+        let better = false;
+        live.forEach((i) => {
+            const c = alt[i], k = counts[i];
+            if (!c || c < 3 || !k || gap(k, c) === 0) return;
+            if (gap(k, c - 1) < gap(k, c)) { alt[i] = c - 1; better = true; }
+        });
+        if (better) {
+            const r2 = await buildSheet(sectionsReq(list, counts, o, alt));
+            if ((r2.pageCount || 1) <= (res.pageCount || 1)) { res = r2; colsBy = alt; }
+        }
+    }
     res.__clamped = clamped;
     // each part's asked count and its own max: "(max)" where Exactly n is more than the part can take
     res.__capped = list.map((s, i) => (colsAsked(o) && colsBy[i] && colsBy[i] < colsAsked(o) ? colsBy[i] : 0));
@@ -207,7 +247,7 @@ async function buildSections(list, counts, o) {
  */
 /** The teacher footer in words (lead, 2026-11-03: never the raw ids "add_facts, sub_facts +4"): the skills' names. */
 export function footerOf(list) {
-    const names = [...new Set(list.map((s) => s.label || labelOf(s)))];
+    const names = [...new Set(list.map(footerName))];
     return names.length > 3 ? `${names.slice(0, 3).join(', ')} and ${names.length - 3} more` : names.join(', ');
 }
 
@@ -283,7 +323,7 @@ export async function buildSimple(list, o) {
     }
     if (res.__clamped || (res.__capped || []).some(Boolean)) notes.push(o.colsMode === 'exact'
         ? `Exactly ${o.cols}: problems that cannot take ${o.cols} across at ${SIZE_NAME[o.size]} print at their own max (marked "max").`
-        : `Aim for ${o.cols}: problems that cannot take ${o.cols} across at ${SIZE_NAME[o.size]} print at the most that fit.`);
+        : `Aim for ${o.cols}: some parts print fewer across at ${SIZE_NAME[o.size]}: the most that fit, or one fewer so a part ends on a full row.`);
     return finish(res, { counts, arrangement, notes, list, capped: res.__capped, o });
 }
 
@@ -407,7 +447,8 @@ function typesOf(list, counts, fs, capped = []) {
     live.forEach((i, j) => {
         const c = fs[j] && fs[j].cols;
         if (!c) return;
-        const name = isFactSkill(list[i]) ? 'Facts' : String(list[i].label || labelOf(list[i])).replace(/\s*\([^)]*\)/g, '').trim();
+        // critic r1 #5: only the fast-fact ids are "Facts"; a column addition is named by its own skill
+        const name = /_facts$/.test(list[i].skillId) ? 'Facts' : String(list[i].label || labelOf(list[i])).replace(/\s*\([^)]*\)/g, '').trim();
         const t = out.find((x) => x.name === name);
         const atMax = !!(capped && capped[i]);
         if (t) { t.min = Math.min(t.min, c); t.max = Math.max(t.max, c); t.atMax = t.atMax || atMax; } else out.push({ name, min: c, max: c, atMax });
@@ -475,7 +516,12 @@ export function numberOptionsOf(s) {
     // fact sets / tables on the fast-fact ids (*_facts); other skills' sets (tables with blanks …) stay in All print options
     const sets = /_facts$/.test(s.skillId) ? defs.find((d) => d.id === 'constant' && d.type === 'set' && !d.hidden) : null;
     const bandVals = band ? band.values.map((x) => x.v).filter((v) => typeof v === 'number') : [];
-    return { band: bandVals.length > 1 ? { def: band, values: bandVals } : null, sets: sets || null };
+    if (bandVals.length < 2) return { band: null, sets: sets || null };
+    // critic r1 #2: a band whose values are not answer bounds ("Tables to 10 × 10 / 12 × 12") keeps its own label and
+    // value words; only a band of plain numbers is "Highest number" (the largest sum / start / product / number shared)
+    const lbl = (v) => { const x = band.values.find((y) => y.v === v); return x ? x.l : String(v); };
+    const answer = bandVals.every((v) => lbl(v) === v.toLocaleString('en-US') || lbl(v) === String(v));
+    return { band: { def: band, values: bandVals, answer, title: answer ? 'Highest number' : band.label, labelOf: answer ? (v) => v.toLocaleString('en-US') : lbl }, sets: sets || null };
 }
 const optVal = (s, d) => (s.opts && s.opts[d.id] !== undefined && s.opts[d.id] !== null ? s.opts[d.id] : d.default);
 const setsOf = (s, d) => { const v = optVal(s, d); return Array.isArray(v) && v.length ? v.map(Number) : d.values.map((x) => x.v); };
@@ -702,20 +748,22 @@ function stepHead(n, title, sub = '') {
 }
 
 /** One skill's number options: Highest number (its own `band` values) and its fact sets (`constant`), owner item 6. */
-function skillOptsHTML(s, i, sharedBand) {
+function skillOptsHTML(s, i) {
+    // critic r1 #5: one compact row: the number option is a select ON the skill row; only fact sets / tables open below
     const { band, sets } = numberOptionsOf(s);
-    if (!band && !sets) return '';
-    const bv = band ? Number(optVal(s, band.def)) : null;
-    const sv = sets ? setsOf(s, sets) : null;
-    const allV = sets ? sets.values.map((x) => x.v) : [];
-    const what = [band ? `Highest number ${bv.toLocaleString('en-US')}` : '', sets ? `${s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'tables' : 'fact sets'}: ${setWords(sv, allV)}` : ''].filter(Boolean).join(' · ');
-    let h = `<details class="sp-skopt"${S.openOpts && S.openOpts.has(i) ? ' open' : ''}><summary data-sp="skopt" data-v="${i}">${esc(what)}</summary><div class="sp-skopt-body">`;
-    if (band) h += `<label class="sp-cols"><span>Highest number</span><select id="spBand${i}" data-band="${i}">${band.values.map((v) => `<option value="${v}"${v === bv ? ' selected' : ''}>${v.toLocaleString('en-US')}</option>`).join('')}</select></label>${sharedBand ? '' : ''}`;
-    if (sets) {
-        const lbl = s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'Tables' : 'Fact sets';
-        h += `<div class="sp-facts" role="group" aria-label="${lbl}"><span class="sp-lbl">${lbl}</span>${allV.map((v) => `<button type="button" class="sp-fact" data-sp="fact" data-i="${i}" data-v="${v}" aria-pressed="${sv.includes(Number(v))}">${v}</button>`).join('')}<button type="button" class="sp-link sp-fact-all" data-sp="factall" data-i="${i}">All</button></div>`;
+    const out = { inline: '', below: '' };
+    if (band) {
+        const bv = Number(optVal(s, band.def));
+        out.inline = `<label class="sp-band"><span>${esc(band.title)}</span><select id="spBand${i}" data-band="${i}" aria-label="${esc(s.label)}: ${esc(band.title)}">${band.values.map((v) => `<option value="${v}"${v === bv ? ' selected' : ''}>${esc(band.labelOf(v))}</option>`).join('')}</select></label>`;
     }
-    return h + `</div></details>`;
+    if (sets) {
+        const sv = setsOf(s, sets);
+        const allV = sets.values.map((x) => x.v);
+        const lbl = s.categoryId === 'multiplication' || s.categoryId === 'division' ? 'Tables' : 'Fact sets';
+        out.below = `<details class="sp-skopt"${S.openOpts && S.openOpts.has(i) ? ' open' : ''}><summary data-sp="skopt" data-v="${i}">${lbl}: ${esc(setWords(sv, allV))}</summary><div class="sp-skopt-body">`
+            + `<div class="sp-facts" role="group" aria-label="${lbl}">${allV.map((v) => `<button type="button" class="sp-fact" data-sp="fact" data-i="${i}" data-v="${v}" aria-pressed="${sv.includes(Number(v))}">${v}</button>`).join('')}<button type="button" class="sp-link sp-fact-all" data-sp="factall" data-i="${i}">All</button></div></div></details>`;
+    }
+    return out;
 }
 function setOpt(i, id, v) {
     const s = S.list[i];
@@ -738,21 +786,22 @@ function render() {
     if (isTeacher() && S.ctx.from !== 'student') h += quickRowHTML(true);
 
     // 1 Skills (+ Highest number shared by several chosen skills, owner item 6)
-    const withBand = S.list.map((s) => numberOptionsOf(s).band).filter(Boolean);
+    const withBand = S.list.map((s) => numberOptionsOf(s).band).filter((x) => x && x.answer);
     const sharedBand = withBand.length >= 2;
     h += `<section class="sp-step">${stepHead(1, many ? 'Skills' : 'Skill', many ? 'Leave blank to share evenly, or type a number or a %' : '')}`;
     if (sharedBand) {
         const all = [...new Set(withBand.flatMap((x) => x.values))].sort((x, y) => x - y);
-        const cur = [...new Set(S.list.map((s) => { const nb = numberOptionsOf(s).band; return nb ? Number(optVal(s, nb.def)) : null; }).filter((x) => x !== null))];
+        const cur = [...new Set(S.list.map((s) => { const nb = numberOptionsOf(s).band; return nb && nb.answer ? Number(optVal(s, nb.def)) : null; }).filter((x) => x !== null))];
         h += `<label class="sp-cols sp-shared"><span>Highest number (all)</span><select id="spBandAll" data-sp-band-all><option value=""${cur.length > 1 ? ' selected' : ''} disabled>${cur.length > 1 ? 'Different for each' : ''}</option>${all.map((v) => `<option value="${v}"${cur.length === 1 && cur[0] === v ? ' selected' : ''}>${v.toLocaleString('en-US')}</option>`).join('')}</select></label>`;
     }
     h += `<ul class="sp-skills">`;
     S.list.forEach((s, i) => {
         const a = parseAmount(s.amt);
-        h += `<li class="sp-skill"><span class="sp-skill-name">${esc(s.label)}</span>`;
+        const so = skillOptsHTML(s, i);
+        h += `<li class="sp-skill${so.inline ? ' has-band' : ''}"><span class="sp-skill-name">${esc(s.label)}</span>${so.inline}`;
         if (many) h += `<input id="spAmt${i}" class="sp-amt${a && a.bad ? ' is-bad' : ''}" data-amt="${i}" type="text" inputmode="numeric" autocomplete="off" value="${esc(s.amt)}" placeholder="even" aria-label="${esc(s.label)}: number of problems or %" aria-invalid="${a && a.bad ? 'true' : 'false'}">`;
         if (b && b.counts && many) h += `<span class="sp-got" aria-label="prints">${b.counts[i] || 0}</span>`;
-        h += skillOptsHTML(s, i, sharedBand);
+        h += so.below;
         h += `</li>`;
     });
     h += `</ul></section>`;
@@ -778,7 +827,7 @@ function render() {
         <option value="auto"${colsNow === 'auto' ? ' selected' : ''}>Auto — fitted by size${autoCols ? ` (${autoCols})` : ''}</option>
         ${Array.from({ length: colMax - 1 }, (_, k) => k + 2).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c}</option>`).join('')}
     </select></label>`;
-    if (colsNow !== 'auto') h += `<div class="sp-row sp-cmode"><div class="sp-seg" role="radiogroup" aria-label="Columns mode">${[['aim', `Aim for ${colsNow}`], ['exact', `Exactly ${colsNow}`]].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="cmode" data-v="${v}" aria-checked="${P.colsMode === v}">${l}</button>`).join('')}</div><span class="sp-hint">${P.colsMode === 'exact' ? `every part ${colsNow} across; bigger problems at their own max` : `${colsNow} across wherever it fits, else the most that fit`}</span></div>`;
+    if (colsNow !== 'auto') h += `<div class="sp-row sp-cmode"><div class="sp-seg" role="radiogroup" aria-label="Columns mode">${[['aim', `Aim for ${colsNow}`], ['exact', `Exactly ${colsNow}`]].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="cmode" data-v="${v}" aria-checked="${P.colsMode === v}">${l}</button>`).join('')}</div><span class="sp-hint">${P.colsMode === 'exact' ? `every part ${colsNow} across; bigger problems at their own max` : `${colsNow} across where it fits (one fewer when that ends a part on a full row), else the most that fit`}</span></div>`;
     h += `</section>`;
 
     // 4 Answer key
@@ -953,7 +1002,7 @@ function onChange(e) {
     if (t.dataset.band !== undefined) { setOpt(Number(t.dataset.band), 'band', Number(t.value)); changed(true); return; }
     if (t.id === 'spBandAll' && t.value) {
         const v = Number(t.value);
-        S.list.forEach((s, i) => { const nb = numberOptionsOf(s).band; if (nb) setOpt(i, 'band', bandAtMost(nb.values, v)); });
+        S.list.forEach((s, i) => { const nb = numberOptionsOf(s).band; if (nb && nb.answer) setOpt(i, 'band', bandAtMost(nb.values, v)); });
         changed(true);
     }
 }
