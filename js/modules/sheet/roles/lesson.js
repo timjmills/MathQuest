@@ -48,7 +48,7 @@ import {
     instructionText, instructionPart, assemble, poolItems, answerOf, oralFrameOf, operandsOf, opOf, labelStyleOf,
     esc, blank, stripExtraMm,
 } from './compose.js';
-import { resolveCtx, numeralTracksHTML } from '../index.js';
+import { resolveCtx, numeralTracksHTML, getCell } from '../index.js';
 import { workedStepsOf, stepTemplateOf, unslot, easeScore, stepLines } from '../anchors.js';
 import { evenGridState, factGridMini } from '../cells/mult-grid.js';
 import { dotTile, countCueOf, countCueRow } from './guided.js';
@@ -962,8 +962,45 @@ function twoState(it, k, c) {
     return html;
 }
 
+/**
+ * A one-step story in the word-work SENTENCE layout (`[ ] ◯ [ ] = [ ] unit`, visual-quality lane 2026-10-31):
+ * panel k draws the story and its sentence with the places of panels 0..k written (the newest grey, P-LC-9),
+ * the two story numbers ringed on panel 0 - and no picture row or word bank, so each panel fits half the
+ * chart (the full cell in a half panel stuck out of it by 26 mm). The marks name the places (fr0-a, fr0-b,
+ * op0, answer), so the panel that writes each one is read from the worked steps, not assumed.
+ */
+const isWordSentence = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.layout === 'sentence' && (cl.payload.steps || []).length === 1); };
+function sentenceState(it, groups, k, c) {
+    // (the part-whole bar is drawn on every panel - WDS 18.1, critic r1 F13 - its boxes written as their step comes)
+    const p = Object.assign({}, it.q.cell.payload, { pic: null, kb: false, bar: true });
+    // (the story is printed in the chart's first row of panels only: the second row draws the bar and the sentence, so
+    // the chart and its Say and Rule bands fit the page with the bar drawn - critic r1 F4, content never shrinks)
+    // (and the panels draw what their step uses: the story and the bar on the first row - read, then find the parts and
+    // the whole - the bar and the number sentence on the second; a 2 x 2 chart with the bar fits under the Rule band)
+    if (groups.length >= 4 && k >= 2) p.lines = [];
+    if (groups.length >= 4 && k < 2) p.noFrame = true;
+    const st = p.steps[0];
+    // (a half panel: the cell's column form - the story, then the sentence under it)
+    const ctx = Object.assign(resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined })), { columns: 2 });
+    const t = getCell('word-work');
+    let html = '';
+    try { html = t.render(p, ctx); } catch (e) { html = ''; }
+    const at = new Map();
+    groups.forEach((g, gi) => (g.marks || []).forEach((m) => { if (m && m.slot && !at.has(m.slot)) at.set(m.slot, gi); }));
+    html = html.replace(/(<span[^>]*data-ws-slot="(fr0-a|fr0-b|op0|answer|bar-w|bar-a|bar-b)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
+        const g = at.has(id) ? at.get(id) : groups.length - 1;
+        const bare = open.replace(/ data-ws-ink="[a-z]+"/, '');
+        if (k < g) return bare + close;
+        return inkSpan(bare + val + close, k === g);
+    });
+    let ringed = p.lines.length ? 0 : 2;   // (the story's numbers are ringed where the story is printed, never the bar's)
+    html = html.replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${st.a}|${st.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring${k === 0 ? ' mq-lring-t' : ''}">${n}</span>`) : n))}<`));
+    return html;
+}
+
 function stateDrawing(it, steps, groups, k, c) {
     if (msOf({ q: it.q }) && steps.length === 4 && groups.length === 3) return unslot(twoState(it, k, c));
+    if (isWordSentence(it) && groups.length >= 2) return unslot(sentenceState(it, groups, k, c));
     if (isWordBar(it) && steps.length && /^bar-step-/.test((((steps[0] || {}).marks || [])[0] || {}).slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
@@ -1255,7 +1292,7 @@ function vocabPicture(pic, c) {
     const mm = (v) => `${v.toFixed(2)}mm`;
     switch (pic && pic.kind) {
         // a small part-whole bar (detailed lesson 2): {whole, a, b, mark: 'whole' | 'parts'}
-        case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12 });
+        case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12, only: !!pic.only });
         // (one product, detailed lesson 4: the chart corner a × b with its product boxed)
         case 'fact': return factGridMini(Number(pic.a), Number(pic.b));
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;
@@ -1756,6 +1793,7 @@ function planOnce(input = {}) {
     }
 
     /* ---- Guided Practice ("we do") beside the Steps: the chart's names and icons */
+
     const rest = main.filter((it) => it !== example && it !== example2 && it !== example3 && it !== example4);
     // The width left of the Steps zone is two thirds of the page: 2 cells are a 3-column page's
     // cells, 3 cells are narrower (a 4-column page's measurement, plus the fact's cue beside it).
@@ -1816,6 +1854,9 @@ function planOnce(input = {}) {
         if (set.length && fitsWidth(set, tc)) top = { set, cols: tc, h: Math.max(20, hAt(set, tc) + lineExtra(set)) + (cue(set) ? 2 : 0) };
     }
     if (top) weDo = top.set;
+    // (cells answered IN PLACE - footprint `inPlace`: the sentence story, the fact-family check - hold no working space,
+    // so a page's spare height grows them by a tenth at most, never a third: visual-quality critic r1 F1, 33 % bands)
+    const weInPlace = weDo.length > 0 && weDo.every((it) => it && it.footprint && it.footprint.inPlace);
     // Cells taller than their problem (the Steps set the band's height) centre it (H13).
     // Every Guided problem sits in the middle of its cell (the cells may take spare height, H13).
     const centre = true;
@@ -1842,8 +1883,8 @@ function planOnce(input = {}) {
         const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
-        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
+        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
+    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
 
     /* ---- the Remember strip gives way when it alone pushes the Guided band overleaf */
     const total = groups.reduce((a, g) => a + g.h, 0);

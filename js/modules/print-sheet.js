@@ -267,6 +267,8 @@ function normaliseRequest(req = {}) {
  * `it.sig` rather than keeping a copy of this rule (the kit may not import the app, SCC-01).
  */
 export function signature(q) {
+    // a generator's own duplicate key (`q.dupKey`: the same numbers in another order are the same item, critic r1 F9)
+    if (q && typeof q.dupKey === 'string' && q.dupKey) return `dup:${q.dupKey}`;
     // A template that knows when two items are the same problem in another order (a number
     // family: 4, 5, 20 = 5, 4, 20; critic r5 D5-1) supplies an order-free `dedupeKey`.
     try {
@@ -2045,7 +2047,11 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
             // A clip under 1 mm is a stroke or a line box, not hidden content.
             if ((ecs.overflowX === 'hidden' || ecs.overflowX === 'clip') && el.scrollWidth > el.clientWidth + PX_PER_MM) { fits = false; why(it, c, `ox ${el.tagName}.${el.className}`); }
             if ((ecs.overflowY === 'hidden' || ecs.overflowY === 'clip') && el.scrollHeight > el.clientHeight + PX_PER_MM) { fits = false; why(it, c, `oy ${el.tagName}.${el.className}`); }
-            if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
+            // (a drawing that REDRAWS per column - `data-ws-natural`: its own width in mm, e.g. a K picture group
+            // drawn as a five-frame in a column - is held to its own width, never to the 1-column drawing's)
+            const nat = el.tagName === 'svg' ? Number(el.getAttribute('data-ws-natural')) : 0;
+            if (nat > 0) { if (er.width < nat * PX_PER_MM * 0.98 - 0.5) { fits = false; why(it, c, 'shrunk picture'); } }
+            else if (el.tagName === 'svg' || el.tagName === 'IMG' || el.tagName === 'CANVAS') pics.push(er.width);
             // A chart or table squeezed into a narrow column: its numbers touch the
             // cell walls and run together ("100110"). A leaf of a grid or table is
             // cramped when it is narrower than it is at one column AND its text now
@@ -2899,7 +2905,13 @@ async function buildSheetDeal(req = {}) {
                 // its worked example in a band ABOVE its problems, never beside them. The three the
                 // owner named do so at every size (at L their pairs fill just over half a row).
                 const key = `${sec.skills[0].categoryId}:${sec.skills[0].skillId}`;
-                if ((!s4.ok && s4.band >= SIDE4_BAND) || SIDE_BAND_ONLY.includes(key)) bandInstead.push(metaOf(sec.skills[0]).label);
+                // (and a twin too wide for half the page whose one-column pair - twin over problem - fills more than half the
+                // page: side by side would print the example and ONE problem a page, 47 % blank - visual-quality critic r1
+                // F21, the sentence stories at L; the band above the problems holds the page's capacity)
+                const wideTwin = set.items.every((a) => a.measured && a.measured[2] && a.measured[2].fits === false);
+                const onePair = 2 * (twinMm(set) + pr) > G;
+                const sentenceStory = set.items.every((a) => { const cl = a.source && a.source.q && a.source.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.layout === 'sentence'); });
+                if ((!s4.ok && s4.band >= SIDE4_BAND) || SIDE_BAND_ONLY.includes(key) || (wideTwin && (onePair || sentenceStory))) bandInstead.push(metaOf(sec.skills[0]).label);
             }
             return;
         }
@@ -4237,6 +4249,9 @@ async function buildRoleSheet(n, metaOf) {
 /** The note a lesson asked for at S carries (the print panel shows it as a warning). */
 export const LESSON_SIZE_NOTE = 'A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small.';
 
+/** Support options the lesson packet turns off (practice-page working space; critic visual-quality r2 N1). */
+const LESSON_OFF_OPTS = ['familyChart'];
+
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
     const data0 = n.lessonData || lessonFor(sk0.categoryId, sk0.skillId);
@@ -4251,7 +4266,13 @@ async function buildLesson(n, metaOf) {
     if (data0 && data0.distinctAnswer) flags.distinctAnswer = true;
     if (data0 && data0.maxSmall !== undefined) flags.maxSmall = data0.maxSmall;
     if (data0) flags.noTurnaround = true;
-    const sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    let sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    // Practice-page supports a lesson never draws (critic visual-quality r2 N1): the blank family chart is working
+    // space for the practice pages; on the lesson's model, steps and guided frames it crowds the step column off
+    // the sheet. The lesson draws the bare family-check cell; the option stays on the skill for every other role.
+    if (sk.opts && LESSON_OFF_OPTS.some((k) => sk.opts[k] === true)) {
+        sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(LESSON_OFF_OPTS.map((k) => [k, false]))) });
+    }
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = n.lessonData || lessonFor(sk.categoryId, sk.skillId);
@@ -4334,7 +4355,10 @@ async function buildLesson(n, metaOf) {
     // most, so M is the same six cells in smaller type (lessons r2: by design, not a missed gain).
     // `practiceShape` (lesson data; the detailed lesson maker): a one-line item too wide for two
     // columns prints [count, cols] a page instead (expanded form: 8 x 1).
-    const stackShapes = data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]];
+    // (`practiceShapes`: the shapes to try, densest first - the first that prints on its pages wins; visual-quality r2:
+    // eight stories at M, six at L, never six over a 25 % strip)
+    const stackShapes = data && Array.isArray(data.practiceShapes) && data.practiceShapes.length ? data.practiceShapes
+        : data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]];
     // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a
     // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
     // same count either way, so the pupil gets the bigger digits.

@@ -1132,6 +1132,14 @@ const P11_OPS_OPTIONS = {
     'addition:add_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same sums as numbers only.' }],
     'subtraction:sub_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same take-away as numbers only.' }],
     'addition:add_wp_10': [{ ...picturesOption(true), help: 'Off prints the same story with no picture row.' }],
+    // the owner's extra help (2026-10-31): a blank number-family chart to fill in, working space only (a plain support toggle,
+    // not a preset skill: it adds no new task, the graded answer stays the one Yes / No circle)
+    'addition:fact_family_sort': [{
+        id: 'familyChart', label: 'Family chart to fill in', type: 'bool', default: false, group: 'support',
+        help: 'Prints four empty number sentences under each triangle (two + and two −) for the pupil to fill in while deciding. '
+            + 'Working space only: the answer is still the circled Yes or No. The answer key fills the chart for a true family.',
+        helpShort: 'Four empty number sentences under the triangle to work in; the answer is still Yes or No.',
+    }],
 
     // --- across zeros: its own bound on the number you start from (OPTIONS-CRITIC-R2 §5 #18) ----
     // The measured "Up to 100" dealt 408 − 89: a borrow can only travel through a zero from 100
@@ -1204,8 +1212,9 @@ for (const op of ['add', 'sub']) {
         }
     }
     // Word problems by band: one ladder too, bands at or below the id's own. The no-picture twins
-    // (_plain) keep the band only: generate-question.js strips their visual after generation, so a
-    // bar model could not reach them. Pictures exist on the stories to 100; the bar model on every band.
+    // (_plain) keep the band here; their bar model is WORD_WORK_OPTIONS' `wpBar` below (a bar is not a
+    // picture: word-work.js draws it from the cell payload, never from the stripped visual). Pictures
+    // exist on the stories to 100; the bar model on every band.
     for (const [code, max] of Object.entries(_OPS_BANDS)) {
         if (op === 'add' && max === 10) continue;      // add_wp_10 is the K picture story (gen-counting.js)
         const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b >= 20 || (op === 'sub' && b === 10)));
@@ -3386,6 +3395,14 @@ const WORD_WORK_OPTIONS = (bar) => [
         const cur = SKILL_OPTIONS[key] || [];
         const hasBar = cur.some(o => o.id === 'support' && Array.isArray(o.values) && o.values.some(v => v.v === 'bar'));
         SKILL_OPTIONS[key] = [...cur, ...WORD_WORK_OPTIONS(!hasBar)];
+    }
+    // The 8 sentence-layout story skills (within 10 and 20) do not offer the keyword supports (lead ruling 2026-10-31,
+    // critic visual-quality r2 N3, PEDAGOGY P-21): a keyword list teaches "in all means +" instead of the story's
+    // structure, and these stories are read for their parts and whole. `hidden` keeps both in the model, so a share
+    // code or saved page that carries them still decodes; the teacher is no longer shown them.
+    for (const op of ['add', 'sub']) for (const code of ['10', '20']) for (const tail of ['', '_plain']) {
+        const key = `${op === 'add' ? 'addition' : 'subtraction'}:${op}_wp_${code}${tail}`;
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map(o => (o.id === 'wpCues' || o.id === 'wpBank' ? { ...o, hidden: true } : o));
     }
 }
 // `wpFrames` (detailed lesson 7, 2026-10-17): the compact form - one number sentence a step - on the × / ÷ and

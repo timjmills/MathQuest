@@ -22,6 +22,11 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
 | L9 | **Self-grades too generous** — lanes report 8, critics find 5–6 | Grade your own renders against the RUBRIC anchors with numbers measured (pixel-scan bands, count items, measure digit mm), not impressions; list every cap you checked | The ORCHESTRATOR runs an independent critic on a lane's renders BEFORE merge, not only after |
 | L10 | **Answers follow a pattern or never vary** — correct choice alternates A/B or cycles every 3–5 items; one task answers the same on 30 of 30 items because two things are dealt by one draw (k2-r1) | Deal the answer position and every task attribute from the seeded rng with repeats allowed; never from `itemIndex % n`; one draw per independent attribute | NEW providers-unit / content-audit check: over 30 items the correct position and the answer must vary and must not cycle |
 | L11 | **Steps squeezed beside the drawing** — a model / anchor cell's step list set in a strip one word per line, running out of its border, next to a tiny drawing in a huge cell (owner, count_by_tables anchor) | Steps go beside the drawing only when the column is ≥ 55 mm (≈ 18 characters); wide drawings (rows, lines, tables) always put steps underneath; the model cell is as tall as its content | print-lint: no text column < 18 characters per line, nothing outside its cell border |
+| L12 | **The relation is not drawn** — a fact-family skill as bare numbers in a row with a rule box saying "Two parts make the whole"; 21 of 32 relation skills draw nothing (visual-quality lane, owner 3/10 on `fact_family_sort`) | Name the relation first and take its drawing from the representation map (WORKSHEET_DESIGN_STANDARD §18.1, VQ-1) and the graphic library (VQ-4); a statement of the relation is not a drawing | `ws-visual-quality` VQ-REP (relation skill ⇒ a bond / family / family-check / ten frame / bar template on every item); RUBRIC H14 |
+| L13 | **Dead scaffold parts** — + − × ÷ on a Grade 1 add page, a 3-track carry grid on 13 + 2, "books / boxes / days" in the bank (owner 4/10 on `add_wp_20_plain`): one template tuned for its hardest client | Every part a template draws is live for THIS skill and band: signs it deals, tracks its largest answer needs, story nouns only; scale the template's parts by grade, or pick a lighter layout (VQ-3) | `ws-visual-quality` VQ-LIVE (sign choices vs dealt operations by grade, no column grid when every answer ≤ 20, no filler bank word); RUBRIC H15 |
+| L14 | **Undefined or doubled answer area** — Yes / No ticks AND a Say frame with three blanks in one cell; an unlabelled write line; a bank floating beside the grid | ONE graded response area per answer, a defined slot shape and a unit or label beside it; the Say frame belongs to the model (VQ-2) | `ws-visual-quality` VQ-ONEANSWER (no Say blanks in the cell, no tick list + "Answer:"); `ws-screen-slots` for the screen; RUBRIC H16 |
+| L15 | **Garbled title / legacy cell built new** — "I Can add is it a fact family? +/−" (title built from the label); `fact_family_sort` written as `_wsCell` HTML on 2026-10-24 though `family.js` existed, passing L7's ink / font check | Write the provider's `strings.iCan` as a sentence for the skill (VQ-9); a new or rebuilt skill emits `q.cell` on a kit template (VQ-10) — L7's ink check is not a kit check | `ws-visual-quality` VQ-TITLE (no "?", sign pair, "is it", pasted label) and VQ-NOLEGACY (the no-kit-cell pin only shrinks); RUBRIC H17 |
+| L16 | **The dialog plans the page, not the engine** — the print dialog dealt a fixed 8 problems a page and sent ONE small request a page with a section of 1–2 per skill; six parts' headings spilled each page, the dialog "learned" 3 a page and printed 41 problems on 14 pages (owner, 2026-11-03: "it is just showing a couple of problems") | A print screen never decides how many fit: it sends the whole set as ONE request (a section per skill with its count) and lets the engine paginate; Pages mode reads each part's full-page capacity from the engine (`fits.sections[i].perPage`) and trims / grows whole rows until the engine's page count is the pages asked | `ws-simple-print` FILL (every default page ≥ 60 % of its problem area), DENSITY (no fewer a page than the same counts printed singly), NOT3; `--backtest` fails the old dialog plan (fill 22–46 %) |
 
 > **2026-10-23:** the checks marked NEW above (L1 sizes, L3 key-in-drawing, L6 instruction-follows-item, L10 answer cycles) plus
 > lone item / lone state, repeats, text ≠ generator and the Chromebook viewport are built in Wave 0 (`design/IMPROVEMENT_PLAN.md`
@@ -157,6 +162,34 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
   runs every fact-family role.
 - **Prove a red is shared before pinning it.** add_facts Review M H13 was about to be pinned as a shared-role defect; the other
   lane showed main was clean, and the cause was this branch's Review column choice (R2-5).
+### Student Chromebook speed (chromebook-speed lane, 2026-11-02)
+- **A pupil downloads what core imports, not what a pupil uses.** 37 % of the startup bytes were teacher, print, quiz, MAP
+  and curriculum code a ?c= link never runs, and two third-party scripts only the Google export reads. Anything a pupil
+  does not need before the first question goes in `js/modules/deferred.js` (async stubs on window keep the inline handlers
+  working). *Check:* `ws-chromebook-perf` static budgets (startup gzip <= 1,900 KB, <= 200 modules) and "Start Playing
+  waited on no deferred module"; a pupil play-through may load no deferred module either.
+- **A module that sets shared state at import must not reset it.** `window.globalSkillsList = []` at the top of a module is
+  harmless only while that module loads first; loaded late it wipes the list. Create shared state in globals.js; modules
+  keep an existing value.
+- **An element id is a window property.** `typeof window.soSearchInput !== 'undefined'` is true for `<input id=soSearchInput>`:
+  test `typeof === 'function'` before skipping a name.
+- **Read everything, then write everything.** A loop that writes a style and then reads a box or a computed style restyles
+  the whole page every turn; on a page with 157 `:has()` rules one restyle is ~25 ms at CPU 6x. The live mono pass did it
+  per element on every mutation (21.6 s of CPU over 50 questions). Batch reads before writes; write only a value that
+  changes; drop a measurement that the caller repeats straight after. *Check:* `ws-chromebook-perf --why` lists the callers
+  of every forced layout of a slow question; `ws-ink-parity` (colours, `--geometry` boxes) proves a batched rewrite paints
+  and lays out the same as the old tree.
+- **A failed `import()` is cached for the life of the page.** Retrying the same URL rejects at once with no request;
+  retry with a fresh URL and, if that fails, tell the user to reload. A stub on window is also a trap for code that "calls
+  it if it exists": guard with `!fn.__mqStub` where a call would only download a part to do nothing. *Check:* the checker's
+  drop-then-retry probe (route abort, `serviceWorkers: 'block'` - a page the service worker controls fetches through it,
+  out of Playwright's sight); `ws-chromebook-perf` leaves the game and asserts no deferred module loaded.
+- **"Settled" must outlast the app's own quiet rules.** A 600 ms quiet window ended inside the Skills screen's thumbnail
+  pauses and the Print screen's 1.5 s quiet-before-background rule, so one tree measured 3 s and the other 7 s for the same
+  work. Use a window longer than any deliberate pause (2.5-3 s) and compare like for like.
+- **Time a perf change against the base on the same machine.** Live and local differ (17.1 s live vs 10.85 s local for the
+  same commit); the budget is a ratio of the base measured with the same harness, plus exact byte / module budgets that
+  cannot flake. Never run two timing runs, or a timing run and another browser gate, at once.
 
 ## PRE-FLIGHT checklist (every lane, before reporting)
 1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at
@@ -171,5 +204,9 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
 7. Options: the panel has a size ladder, complexity control, fading support and an appearance choice (or a stated
    reason), all verified.
 8. Gates green: the lane's usual list + `ws-screen-slots` + `ws-story-lint` (word skills).
-9. Self-grade with numbers, and list which caps (H1–H13, OC1–OC15) you checked and why each does not apply.
+9. Self-grade with numbers, and list which caps (H1–H17, OC1–OC15) you checked and why each does not apply.
 10. Paste the `ws-precritic` table in the report (once S1 lands; until then, the lane's gate list with each result).
+11. **Visual quality bar (2026-10-31):** run `node tests/scripts/ws-visual-quality.mjs --skill <cat:skill>` (it is on
+    precritic's `--skill` path) and look at the drawing against VQ-1 … VQ-10 (`WORKSHEET_DESIGN_STANDARD.md` §18): the
+    relation drawn from the map, every part live, one labelled answer place, the title a sentence, a kit cell. Write which
+    of H14-H17 you checked and why each does not apply.

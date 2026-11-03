@@ -77,6 +77,9 @@ async function open({ seed = null, viewport = { width: 1280, height: 900, device
   await page.evaluateOnNewDocument(() => { try { localStorage.setItem('mathquest_onboarded', '1'); } catch (e) {} });
   await page.goto(base + pagePath, { waitUntil: 'networkidle2', timeout: 60000 });
   await waitFor(page, () => typeof window.generateQuestion === 'function' && !!window.SKILLS, 30000, 'app boot');
+  // The print / quiz / teacher half loads after boot (js/modules/deferred.js, Chromebook speed lane 2026-11-02);
+  // the harness drives those features directly, so it waits for it as a teacher's idle prefetch would.
+  await page.evaluate(() => Promise.all([window.__mqLoadDeferred, window.__mqLoadWorksheet].filter(Boolean).map((f) => f().then(() => true, () => false))));
   await page.evaluate(() => document.fonts && document.fonts.ready);
   const close = async () => { await browser.close(); if (server) await new Promise(r => server.close(r)); };
   return { browser, page, base, problems, close };

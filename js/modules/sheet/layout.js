@@ -138,6 +138,13 @@ export const CELL_PAD_MM = 7;
 export const fillLimit = (h) => (h > 0 ? Math.min(FILL_CAP * h, CONTENT_FILL * Math.max(1, h - CELL_PAD_MM) + CELL_PAD_MM) : h);
 /** Page fill: the practice roles take more rows when less than this share of the grid is used. */
 export const PAGE_FILL = 0.85;
+/**
+ * A cell answered IN PLACE (its footprint's `inPlace`: the sentence-layout story, the fact-family check) holds no
+ * working space - the pupil writes in its boxes or rings a word - so its row is never stretched past this multiple of
+ * the measured height (pads and tab keep-out included). The spare height stays under the grid (visual-quality critic
+ * r1 F1: 41 mm stories in 57 mm cells, a 37 % band in every cell at S).
+ */
+export const IN_PLACE_FILL = 1.12;
 /** DN-1: outside fact layouts no page holds more than 20 scored problems. */
 export const DN1_MAX = 20;
 /**
@@ -740,8 +747,11 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
         // may take short problems up to DN-1's scored count (20 at L), as the fill below does.
         const dCeil1 = section.freeRows ? Math.max(dCeil0, DN1_AT[size] || DN1_MAX) : dCeil0;
         const dCeil = section.ceiling !== undefined && section.ceiling !== null ? Math.min(dCeil1, ceiling) : dCeil1;
+        // (an in-place cell - footprint `inPlace` - may also pack FEWER columns: a K picture story beside its story at full
+        // width is far shorter than stacked in a column, so one column can hold more; visual-quality r2, L1 at S)
+        const c0 = requested === 'auto' && infos.length && infos.every((i) => i.fp && i.fp.inPlace) ? 1 : cols;
         const colOpts = requested === 'auto'
-            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS, hardCap) - cols + 1) }, (_, k) => cols + k)
+            ? Array.from({ length: Math.max(0, Math.min(Number(section.denseMaxCols) > 0 ? Number(section.denseMaxCols) : DENSE_MAX_COLS_AT[size] || DENSE_MAX_COLS, hardCap) - c0 + 1) }, (_, k) => c0 + k)
             : [cols];
         let best = { perPage: rows * cols, cols, rows };
         // The room each cell keeps over its content: the section's own (a Test), else the
@@ -762,7 +772,8 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
             // (free rows: the rows take the problems' own measured height, buildSheet checks the page)
             let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (section.freeRows ? pc.hMin : roomed(pc, room))), Math.floor(dCeil / c)));
             if (c === 2 && !section.freeRows) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
-            const tie = rr * c === best.perPage && best.cols !== c && sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols);
+            // (an in-place cell at the same count prefers MORE rows: one row of half-page cells is mostly empty paper)
+            const tie = rr * c === best.perPage && best.cols !== c && ((sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols)) || (c0 < cols && rr > (best.rows || 0)));
             if (rr * c > best.perPage || tie) best = { perPage: rr * c, cols: c, rows: rr, hMin: pc.hMin };
         }
         if (best.perPage > rows * cols || (best.perPage === rows * cols && best.cols !== cols)) {
@@ -857,6 +868,17 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     // FILL_CAP x their measurement instead - the page is filled before a strip is left.
     let cellH = r3(capped ? Math.min(even, fillLimit(hMin)) : even);
     if (capped && rows * cellH < 0.8 * G) cellH = r3(Math.min(even, hMin * FILL_CAP));
+    // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
+    const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
+    // (and to what THESE items measure: the skill's floor sized the page's rows for its tallest item - a K story with a
+    // five-frame - but a page that deals none of those keeps its cells to its own items. Never so short that the rows
+    // leave more than a fifth of the grid under them (PAGEFILL): the band and the strip are both empty paper.)
+    if (inPlace && hMin > 0) {
+        const own = infos.every((i) => i.measured && i.measured[cols] && Number(i.measured[cols].hMm) > 0)
+            ? Math.max(...infos.map((i) => Number(i.measured[cols].hMm))) : hMin;
+        const fillFloor = (0.82 * G) / Math.max(1, rows);
+        cellH = r3(Math.min(cellH, Math.max(Math.min(hMin, own) * IN_PLACE_FILL, fillFloor)));
+    }
     const fillsGrid = cellH >= even - 0.01;
     const perPage = rows * cols;
     const count = Math.max(0, Math.floor(Number(section.count) || 0));
@@ -875,7 +897,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     return {
         role, cls, requested, cols, rows, perPage, pages, count,
         cellW: widths.nominal, innerW: widths.inner, cellH, hMin: r2(hMin), gridH: G, gridHCont: Gc,
-        fill: fillsGrid && !packed, packed, filled, ceiling, clamped, reason, note, notes,
+        fill: fillsGrid && !packed, packed, filled, ceiling, clamped, reason, note, notes, inPlace,
         digitPt, trackMm, size, look, availableWidthMm: W,
     };
 }

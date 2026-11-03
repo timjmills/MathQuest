@@ -183,7 +183,9 @@ export function goHome() {
     // If a MAP session was active, return the borrowed questionCard to gameView.
     // releaseMapSessionScaffold is idempotent — safe to call always.
     if (state.mapMode) state.mapMode = false;
-    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold) {
+    // (a stub means MAP practice never loaded, so there is nothing to release: calling it would download the whole
+    // teacher half on a pupil's exit, checker r1 D2)
+    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold && !window.releaseMapSessionScaffold.__mqStub) {
         try { window.releaseMapSessionScaffold(); } catch {}
     }
 
@@ -241,7 +243,9 @@ export function exitGame() {
     // If a MAP session was active, return the borrowed questionCard to gameView.
     // releaseMapSessionScaffold is idempotent — safe to call always.
     if (state.mapMode) state.mapMode = false;
-    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold) {
+    // (a stub means MAP practice never loaded, so there is nothing to release: calling it would download the whole
+    // teacher half on a pupil's exit, checker r1 D2)
+    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold && !window.releaseMapSessionScaffold.__mqStub) {
         try { window.releaseMapSessionScaffold(); } catch {}
     }
 

@@ -1,6 +1,6 @@
 // gen-operations.js - Number & Operations + Integers question generation
 import { state } from './state.js';
-import { dealIndex, dealPick, onNewPage, blockPermutation } from './page-deal.js';
+import { dealIndex, dealPick, onNewPage, blockPermutation, freshDeal } from './page-deal.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
@@ -9,7 +9,7 @@ import { optionsFor, normalizeOptions } from './skill-options.js';
 import { genCountByTables, genMultChart, genHopLine } from './gen-mult-patterns.js';
 const _MP_SKILLS = new Set(['count_by_tables', 'mult_chart', 'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard', 'nl_mult', 'nl_div']);
 import { stripSegStyle, stripPos } from './sheet/tokens.js';
-import { renderCell as _kitRender, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
+import { renderCell as _kitRender, k2Twin as _k2Twin, fadeRung, tickLabelSet, valueLineSVG, valueLineWindow, nlPlacePayload, nlPlaceAnswer, nlPlaceTwin } from './sheet/index.js';
 
 // ========================================
 // HOW IT IS WRITTEN — the `notation` option (skill-options.js)
@@ -1532,17 +1532,30 @@ function _generateLadderV2(q, skill, helpers, range) {
         }
         if (!trio) { trio = isFamily ? [3, 4, 7] : [3, 4, 9]; why = isFamily ? '3 and 4 make 7.' : '3 and 4 make 7, not 9.'; }
         const shown = shuffle(trio.slice());
-        q.text = `Is ${shown.join(', ')} a fact family? Write yes or no.`;
+        // Visual-quality lane (2026-10-31, VQ-1/VQ-2/VQ-10): the kit's `family-check` cell - the three
+        // numbers in the library's fact triangle, the largest (the whole) at the top, and the printed
+        // words Yes / No the pupil circles (taps on screen): ONE response area, on paper and screen.
+        const whole = Math.max(...shown);
+        const wi = shown.indexOf(whole);
+        const parts = shown.filter((n, i) => i !== wi);
+        q.text = `Look at ${shown[0]}, ${shown[1]} and ${shown[2]}. Do the small numbers make the big number?`;
         q.ans = isFamily ? 'yes' : 'no';
         q.acceptedAnswers = isFamily ? ['yes', 'y'] : ['no', 'n'];
         q.answerType = 'text';
         q.skillLabel = 'Is It a Fact Family?';
         q.hint = `Two of the numbers must make the third. ${why}`;
-        q.visual = _wsCell(
-            _wsRuleBox('Two parts make the whole.')
-            + `<div style="font-size:2rem;font-weight:700;letter-spacing:0.15em;margin:6px 0;">${shown.join('&nbsp;&nbsp;')}</div>`
-            + _wsTickList(['Yes', 'No']),
-            `Say: ___ and ___ make ___ .`);
+        const payload = { nums: shown, whole, parts, isFamily, labels: ['Yes', 'No'], correct: isFamily ? 0 : 1, sum: parts[0] + parts[1] };
+        // support `familyChart` (owner, 2026-10-31): a blank number-family chart under the triangle, working space only
+        if (_opt('familyChart') === true) payload.chart = true;
+        q.cell = { template: 'family-check', v: 1, payload };
+        // a page never deals the same three numbers twice, in any order (print-sheet.js signature; critic r1 F9)
+        q.dupKey = `family-check:${shown.slice().sort((x, y) => x - y).join(',')}`;
+        try { q.visual = _k2Twin('family-check', payload); } catch (e) { q.visual = ''; }
+        // the two words are tapped on screen (screen-cell.js wireTickBoxes: one tap, one graded answer)
+        q.selfAnswering = true;
+        q.printAnswer = isFamily ? 'Yes' : 'No';
+        q.printText = 'Do the small numbers make the big number? Circle yes or no.';
+        q.screenInstr = 'Do the small numbers make the big number? Tap yes or no.';
         q.printFormat = 'fact-family-sort';
         return true;
     }
@@ -3342,13 +3355,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const wpMinOperand = maxVal <= 20 ? 1 : Math.max(2, Math.floor(maxVal / 20));
 
                 let a, b, answer;
-                if (isAdd) {
-                    [a, b] = generateAddPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand });
-                    answer = a + b;
+                // Visual-quality lane (2026-10-31, ws-dealer-uniform PAGE): within 20 the valid set is small
+                // (a story within 10 has 45 pairs), so plain draws printed 2 − 1 five times on a page. The pair
+                // is still the generator's own seeded draw, but one the page already holds is drawn again
+                // (page-deal.js freshDeal: no pair twice, a first number at most twice, an answer at most 3 times).
+                const _wpDraw = () => (isAdd ? generateAddPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand }) : generateSubPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand }));
+                if (maxVal <= 20) {
+                    const ans = (p) => (isAdd ? p[0] + p[1] : p[0] - p[1]);
+                    [a, b] = freshDeal(`wp:${op}:${maxVal}`, _wpDraw, { sig: (p) => `${p[0]},${p[1]}`, tags: (p) => [String(p[0]), String(ans(p))], caps: [2, 3] });
                 } else {
-                    [a, b] = generateSubPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand });
-                    answer = a - b;
+                    [a, b] = _wpDraw();
                 }
+                answer = isAdd ? a + b : a - b;
 
                 if (isAdd) {
                     const tpl = maxVal <= 100 ? [

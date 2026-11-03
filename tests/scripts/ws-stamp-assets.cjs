@@ -55,11 +55,40 @@ const mapTag = `<script type="importmap" id="mq-asset-map">${JSON.stringify({ im
 html = html.replace(/(<script type="module" src=")js\/globals\.js(?:\?v=[0-9a-f]+)?(")/,
     `$1js/globals.js?v=${hashOf('js/globals.js')}$2`);
 
+// Modulepreload (Chromebook load fix, 2026-11-02): without it the browser discovers the module tree one import level
+// at a time, so on school Wi-Fi the ~270 startup modules arrive as a slow waterfall. One <link rel="modulepreload">
+// per module in the STATIC import closure of js/globals.js lets every fetch start at once. Dynamic import() targets
+// are left out (they load on demand). The links sit right after the import map, which must precede them.
+const STATIC_IMPORT = /\b(?:import|export)\s*(?:[^'"`;()]*?\s*from\s*)?['"](\.{1,2}\/[^'"]+\.js)['"]/g;
+function staticClosure(entry) {
+    const seen = new Set();
+    const stack = [entry];
+    while (stack.length) {
+        const rel = stack.pop();
+        if (seen.has(rel) || !fs.existsSync(path.join(ROOT, rel))) continue;
+        seen.add(rel);
+        const code = fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+        for (const m of code.matchAll(STATIC_IMPORT)) {
+            stack.push(path.posix.normalize(path.posix.join(path.posix.dirname(rel), m[1])));
+        }
+    }
+    seen.delete(entry);
+    return [...seen].sort();
+}
+const preloads = staticClosure('js/globals.js');
+const preloadTags = preloads.map((rel) => `<link rel="modulepreload" href="./${rel}?v=${hashOf(rel)}">`).join('');
+const preloadBlock = `<!-- mq-modulepreload:start (${preloads.length}) -->${preloadTags}<!-- mq-modulepreload:end -->`;
+
 if (/<script type="importmap" id="mq-asset-map">[\s\S]*?<\/script>/.test(html)) {
     html = html.replace(/<script type="importmap" id="mq-asset-map">[\s\S]*?<\/script>/, mapTag);
 } else {
     // An import map must come before the first module script; put it at the end of <head>.
     html = html.replace(/<\/head>/, `    ${mapTag}\n</head>`);
+}
+if (/<!-- mq-modulepreload:start[\s\S]*?mq-modulepreload:end -->/.test(html)) {
+    html = html.replace(/<!-- mq-modulepreload:start[\s\S]*?mq-modulepreload:end -->/, preloadBlock);
+} else {
+    html = html.replace(/(<script type="importmap" id="mq-asset-map">[\s\S]*?<\/script>)/, `$1\n    ${preloadBlock}`);
 }
 
 if (!/js\/globals\.js\?v=/.test(html) || !html.includes('id="mq-asset-map"')) {

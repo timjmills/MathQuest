@@ -304,6 +304,7 @@ MathQuest/
 │       ├── print-weighted.js           (weighted distribution, print search)
 │       ├── print-generate.js           (LEGACY problem formatting, worksheet HTML, PDF)
 │       ├── print-sheet.js              (buildSheet(req): the app bridge to the sheet kit)
+│       ├── simple-print.js             (the ONE simple print: skills · how many · size/columns · key; lazy, deferred.js)
 │       ├── screen-cell.js              (the on-screen B&W question cell, same drawing as print)
 │       ├── sheet/                      (the sheet kit: tokens, cell, frame, layout, cells/, roles/)
 │       └── init.js                     (init function, URL params, DOMContentLoaded)
