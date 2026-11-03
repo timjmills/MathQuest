@@ -232,6 +232,9 @@ function checkFill(pages, ctx) {
     if (ctx.arrangement !== 'mixed') return out;
     pages.forEach((pg, i) => {
         if (pg.last && ctx.counts) return;
+        // (OWNER, 2026-11-03: an explicit Columns count WINS - the teacher's count and big digits are kept and white space is
+        // allowed; the fill floor applies to Auto only. Every other check still runs on a Columns print.)
+        if (ctx.columns) return;
         if ((pg.fillFrac || 0) < 0.70 - 1e-6) out.push(`fill: page ${i + 1}: problems cover ${Math.round((pg.fillFrac || 0) * 100)} % of the frame (>= 70 %)`);
         if (ctx.sectionsPerPage) {
             const across = Math.max(1, ...(pg.fullRows || []).map((r) => r.n));
@@ -400,15 +403,19 @@ const MEASURE_FN = async ({ html, perPage }) => {
         // (2026-11-03, owner's 6-skill mix) frame / shelfw / fill / partials: the bordered frame round the problem grids,
         // every rule segment on the page, each cell's four edges, each grid's span, the cells' area, the 2-digit x work rows
         {
-            const g0 = grids[0];
-            let fr = null;
-            for (let e = g0 ? g0.parentElement : null; e && e !== pg; e = e.parentElement) {
-                const cs = getComputedStyle(e);
-                if ((parseFloat(cs.borderTopWidth) || 0) >= 1 && (parseFloat(cs.borderLeftWidth) || 0) >= 1 && cs.borderTopStyle !== 'none') { fr = e; break; }
-            }
-            const frEl = fr || body;
-            const fb = frEl.getBoundingClientRect(); const fcs = getComputedStyle(frEl);
-            const inner = { left: fb.left + (parseFloat(fcs.borderLeftWidth) || 0), right: fb.right - (parseFloat(fcs.borderRightWidth) || 0), top: fb.top + (parseFloat(fcs.borderTopWidth) || 0), bottom: fb.bottom - (parseFloat(fcs.borderBottomWidth) || 0) };
+            // (r4 fix: each grid's OWN frame - an In sections page has one bordered band per part, not one frame round all)
+            const frameOf = (g) => {
+                let fr = null;
+                for (let e = g ? g.parentElement : null; e && e !== pg; e = e.parentElement) {
+                    const cs = getComputedStyle(e);
+                    if ((parseFloat(cs.borderTopWidth) || 0) >= 1 && (parseFloat(cs.borderLeftWidth) || 0) >= 1 && cs.borderTopStyle !== 'none') { fr = e; break; }
+                }
+                const el = fr || body; const fb = el.getBoundingClientRect(); const fcs = getComputedStyle(el);
+                return { el, fr, fb, inner: { left: fb.left + (parseFloat(fcs.borderLeftWidth) || 0), right: fb.right - (parseFloat(fcs.borderRightWidth) || 0), top: fb.top + (parseFloat(fcs.borderTopWidth) || 0), bottom: fb.bottom - (parseFloat(fcs.borderBottomWidth) || 0) } };
+            };
+            const gFrames = grids.map(frameOf);
+            const frames = gFrames.filter((f, i) => gFrames.findIndex((x) => x.el === f.el) === i);
+            const { fr, fb, inner } = frames[0] || frameOf(null);
             out.frame = { wMm: (inner.right - inner.left) / mm, hMm: (inner.bottom - inner.top) / mm, bordered: !!fr };
             // rule segments: every border side >= 0.5 px of the frame, the grids and every cell inside them (not inside a cell's drawing)
             const segs = [];   // {h: true|false, at, a, b, src}
@@ -420,7 +427,7 @@ const MEASURE_FN = async ({ html, perPage }) => {
                 if (bw('Left') >= 0.5) segs.push({ h: false, at: r.left + bw('Left') / 2, a: r.top, b: r.bottom, src });
                 if (bw('Right') >= 0.5) segs.push({ h: false, at: r.right - bw('Right') / 2, a: r.top, b: r.bottom, src });
             };
-            if (fr) sides(fr, 'frame');
+            frames.forEach((F) => { if (F.fr) sides(F.fr, 'frame'); });
             const allCells = grids.flatMap((g) => [...g.children].filter((c) => c.classList.contains('ws-cell')));
             grids.forEach((g) => sides(g, 'grid'));
             allCells.forEach((c) => sides(c, 'cell'));
@@ -428,7 +435,7 @@ const MEASURE_FN = async ({ html, perPage }) => {
             // point just outside a cell edge is ink when it lies in a grid's border box but in none of that grid's cells,
             // in the frame's border ring, or on the cell's own border)
             const ink = (x, y) => {
-                if (fr) { const insideOuter = x >= fb.left && x <= fb.right && y >= fb.top && y <= fb.bottom; const insideInner = x > inner.left && x < inner.right && y > inner.top && y < inner.bottom; if (insideOuter && !insideInner) return true; }
+                for (const F of frames) { if (!F.fr) continue; const { fb, inner } = F; const insideOuter = x >= fb.left && x <= fb.right && y >= fb.top && y <= fb.bottom; const insideInner = x > inner.left && x < inner.right && y > inner.top && y < inner.bottom; if (insideOuter && !insideInner) return true; }
                 for (const g of grids) {
                     const r = g.getBoundingClientRect();
                     if (x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
@@ -476,10 +483,10 @@ const MEASURE_FN = async ({ html, perPage }) => {
                 }
             }
             // shelves: each problem grid's span against the frame's inner width
-            out.shelves = grids.map((g, gi) => { const r = g.getBoundingClientRect(); return { grid: gi, leftMm: (r.left - inner.left) / mm, rightMm: (inner.right - r.right) / mm, last: gi === grids.length - 1 }; });
+            out.shelves = grids.map((g, gi) => { const r = g.getBoundingClientRect(); const I = gFrames[gi].inner; return { grid: gi, leftMm: (r.left - I.left) / mm, rightMm: (I.right - r.right) / mm, last: gi === grids.length - 1 }; });
             // fill: the problem cells' area against the frame's inner area
             const area = probs.reduce((a, c) => { const r = c.getBoundingClientRect(); return a + r.width * r.height; }, 0);
-            out.fillFrac = area / Math.max(1, (inner.right - inner.left) * (inner.bottom - inner.top));
+            out.fillFrac = area / Math.max(1, frames.reduce((a, F) => a + (F.inner.right - F.inner.left) * (F.inner.bottom - F.inner.top), 0));
             // partials: the 2-digit x work rows of every mult_2by2_standard cell
             out.work = probs.filter((c) => /mult_2by2_standard/.test(c.getAttribute('data-ws-skill') || '')).map((c) => ({ label: c.querySelector(':scope > .ws-tab, :scope > .ws-letter').textContent.trim(), prows: c.querySelectorAll('.ws-prow').length, rule2: c.querySelectorAll('.ws-rule2').length }));
         }
