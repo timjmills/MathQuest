@@ -478,3 +478,21 @@ lost its RP-1 (the skip strip ruling). Test role S/M/L, no supports, all five fa
 Renders for the critic (untracked, 90 PNG): `design/audit/runs/laned-restart/r4-prep/<support>-<S|M|L>/division__div_facts/`
 {independent,test,review}{,-key}-p1.png. Watch item for the critic: with `array` on, Test S prints 10 (8 narrow + 2 full-width
 counters rows) with ~30 % of the page empty below - the width split (test.js widthSplit) holds it there.
+
+## HAND-OVER 5 (2026-11-03, R4 prep done; critic NOT run — precritic red on pre-existing rows)
+
+- main (claude/sweet-newton-c8wrv1: deferred.js, simple-print.js, sw.js) merged at 0fd0e503: 15 conflicts resolved (print-sheet
+  measure kept the lane's batched place/readCell + main's `data-ws-natural` and `dupKey`; word-work `renderWork` + main's
+  sentence layout; layout.js free rows + in-place `c0`; redesign-passed union = 20 skills; backtests merged by id; rule index
+  regenerated; assets re-stamped). boot-smoke, code-snapshot (732), redesign-passed, ws-simple-print OK on the merge.
+- The div_facts supports findings are closed (R4 prep above, 95688ba8): every supports row PASS, RP-1 narrowed per the lead's
+  ruling with backtest `rp1-skipstrip-laned` FAIL → OK.
+- BLOCKED: `ws-precritic --skill division:div_facts --strict` still has 7 red rows, each red on 0fd0e503 as well (builder
+  checked in a worktree): print-lint-divform-long-L, dealer-uniform, node-lint-s1, options-render, chromebook-fit (quiz host
+  null deref — possibly from the merge), slot-clip (L), sibling-compare. Rule: never a critic on red, so the narrow critic did
+  not run and div_facts is NOT in redesign-passed.js. Needs a lead ruling per row (pin / main-red / fix in this lane).
+- Passed skills, supports at S (pre-existing, identical on 0fd0e503): sub_facts tile + frame Review H13 35 %; mult_facts all /
+  array / boxsign Review H13 32 % + array H13-ROW. These are on the new single-support rows; decide before the next deploy gate.
+- Watch item: div_facts Test S with `array` prints 10 with ~30 % empty below (test.js widthSplit); no lint flags it.
+- Renders (untracked, 90 PNG) in design/audit/runs/laned-restart/r4-prep/ on the session container only.
+- Cost this session ≈ $27 (≈ 1.0 % of the week) of the $40 cap.
