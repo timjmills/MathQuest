@@ -329,6 +329,12 @@ function checkKinds(pages, ctx) {
             rows.push({ page: pi + 1, kinds: [...new Set(g.map((c) => c.kind))], n: g.length, full: !!r && r.usedFrac >= 0.98, first: Math.min(...g.map((c) => c.n)) });
         }
     });
+    // (lane lead ruling r6b, 2026-11-03: a kind's trailing SHORT rows on the last page are the owner's "no row under half
+    // full" rebalance of one remainder (4 + 1 -> 3 + 2); for the row-run rule they count as ONE row)
+    for (let i = rows.length - 1; i > 0; i--) {
+        const a = rows[i - 1]; const b = rows[i];
+        if (!a.full && !b.full && a.page === b.page && b.page === pages.length && a.kinds[0] === b.kinds[0] && a.kinds.length === 1 && b.kinds.length === 1) { a.n += b.n; rows.splice(i, 1); }
+    }
     for (const r of rows) if (r.kinds.length > 1) out.push(`kinds: page ${r.page} the row from problem ${r.first} mixes kinds ${r.kinds.join(' + ')} (one kind a row)`);
     const kindsAll = [...new Set(rows.map((r) => r.kinds[0]))];
     for (const k of kindsAll) {
@@ -341,7 +347,11 @@ function checkKinds(pages, ctx) {
         while (i < rows.length) {
             let j = i; while (j + 1 < rows.length && rows[j + 1].kinds[0] === rows[i].kinds[0]) j++;
             const k = rows[i].kinds[0]; const len = j - i + 1;
-            const forced = Math.max(1, Math.ceil(tot[k] / (rows.length - tot[k] + 1)));
+            // (the forced minimum: k's rows are split by the other rows; when the print must END in another kind's short
+            // row - shelfw puts short rows last - k has one gap fewer: ceil(rowsK / other rows))
+            const tail = rows[rows.length - 1];
+            const pinned = tail && !tail.full && tail.kinds[0] !== k;
+            const forced = Math.max(1, Math.ceil(tot[k] / (rows.length - tot[k] + (pinned ? 0 : 1))));
             if (len > forced) out.push(`kinds: ${len} rows of kind '${k}' in a row (page ${rows[i].page}, from problem ${rows[i].first}); ${tot[k]} of ${rows.length} rows alternate to runs of ${forced}`);
             i = j + 1;
         }
