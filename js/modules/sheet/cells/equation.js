@@ -184,14 +184,21 @@ register('equation', {
             }
             return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
         }
+        // Lane D R4d: a missing-number sentence (`resultBox`: every unknown boxed, missing_add_sub /
+        // missing_mult_div) takes the kit's ONE across look - the fact template's tight tracks
+        // (ACROSS_*), as a division fact across does - so a 2-digit sentence fits the 3 columns DN-22
+        // gives it at M (with the 1 em tracks and .28 em gaps "18 − 12 = [ ]" overran a third of
+        // the page by 0.5 mm and the page fell to 2 columns). Digits and box keep their size.
+        const tight = !!p.resultBox;
+        const oc = tight ? `<span class="o" style="width:${ACROSS_OP_EM}em">` : '<span class="o">';
         const pieces = [
             u === 'a' ? slotHtml : `<span>${num('a')}</span>`,
-            u === 'op' ? slotHtml : `<span class="o">${opGlyph(p.op)}</span>`,
+            u === 'op' ? slotHtml : `${oc}${opGlyph(p.op)}</span>`,
             u === 'b' ? slotHtml : `<span>${num('b')}</span>`,
-            `<span class="o">=</span>`,
+            `${oc}=</span>`,
             u === 'result' ? slotHtml : `<span>${esc(result)}</span>`,
         ];
-        return `<div class="ws-eq">${pieces.join('')}</div>`;
+        return `<div class="ws-eq"${tight ? ` style="gap:${ACROSS_GAP_EM}em"` : ''}>${pieces.join('')}</div>`;
     },
     answerKey(p) {
         const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
@@ -215,7 +222,10 @@ register('equation', {
             ? em * (0.56 * Math.max(A, B) + 0.4 + 2 * 0.28 + 1) + blankWidth(p.digits || 2, ctx.size) + 6
             : isDivFact && !p.notation
                 ? Math.max(em * (0.56 * (A + B) + 2 * ACROSS_OP_EM + 3 * ACROSS_GAP_EM), blankWidth(p.digits || 2, ctx.size)) + 6
-                : known.length * em * 0.58 + 2 * em + 4 * 0.28 * em + blankWidth(p.digits || 2, ctx.size) + 6;
+                : p.resultBox && !p.notation
+                    // (R4d) a missing-number sentence on the tight across tracks (render, `tight`)
+                    ? known.length * em * 0.58 + 2 * ACROSS_OP_EM * em + 4 * ACROSS_GAP_EM * em + blankWidth(p.digits || 2, ctx.size) + 6
+                    : known.length * em * 0.58 + 2 * em + 4 * 0.28 * em + blankWidth(p.digits || 2, ctx.size) + 6;
         // a one-line sentence is its digit line (+1.5 mm); a fraction-bar or a division fact (its
         // line under it) adds the writing line
         const tall = p.notation === 'fraction' || isDivFact;
