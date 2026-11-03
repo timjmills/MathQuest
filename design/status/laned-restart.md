@@ -446,3 +446,35 @@ Open on div_facts (supports on):
    passed skills' next deploy gate, since the new precritic rows now cover them.
 Cost: R3-1 fix ~$12; round 3 total ~$37 (≈ 1.3 %) of the $60 cap; lane total ~$319 (≈ 11.4 % of the weekly limit).
 
+
+## R4 prep (2026-11-03, builder Opus medium: rebuild after the round-3 cap; commit 95688ba)
+
+Goal: `ws-precritic --skill division:div_facts --strict` green on the supports rows, so the narrow div_facts critic can run
+with each support on. Each finding, its root cause, and the check that now catches it:
+
+| Finding | Root cause | Fix | Check |
+|---|---|---|---|
+| RP-1 ×9 (skip, S/M/L): "the skip support shows the answer 6" on 12 ÷ 2 | RP-1 matched digits: a count-by strip of the divisor's multiples lists the quotient by coincidence | LEAD RULING: a plain strip is not "answer given away". `cells/fact.js` skip cue tags the strip `data-ws-skipstrip=<step>` and each term `<g data-ws-term>`; `ws-print-lint` L-SUPPORT `plainStrip()` reads a strip out of RP-1 only when its terms are step × 1..n, every term group has one signature (attributes + computed weight / size / fill / stroke / decoration / opacity) and nothing else is drawn. A bold, heavier, ringed or filled term (the quotient's or the dividend's) still fails | `ws-print-lint --self-test` (3 new cases: plain passes, bold fails, ringed fails); backtest `rp1-skipstrip-laned` (fixture, `--support-fixture`): FAIL → OK |
+| H13-ROW ×3 (array, S/M/L) | the ÷ counters to ring (dividend in rows of ten, 1-6 rows, none past 60 or divisor > 10) were stacked UNDER the fact in 2 columns, so a 5-row cell sat beside a 2-row or picture-less one | `support-draw.js supportFootprint`: a ÷ fact carrying the array support caps its columns at what fits fact + gap + counters BESIDE (hardCap; 1 column). The practice roles split the picture-less facts into columns of their own | precritic `print-lint-supports-array-S` (and M/L by hand: 0) |
+| GRID-EVEN ×2 + SCC-T10 (skip, Test S/M) | `test.js fillToCeiling` filled to 20 in 3 columns, re-laying a 2-cell last row at 1.5 widths (the fact zone moved with it) | the Test fills whole rows: the most rows of its columns up to the ceiling (3 columns: 18) | precritic `print-lint-supports-skip-S` (Test M by hand: 0) |
+| CL40-INK ×2 (skip, M/L) | the across fact's tab spacer (`> .ws-eq[data-ws-across]`) did not reach a fact nested in `.ws-supported`, so "110 ÷ 10 =" / "132 ÷ 12 =" with the strip under it started in the keep-out | additive CSS: the same shrinkable spacer above a supported across fact whose pane is under it | `ws-print-lint --supports skip --size M/L` (0) |
+| CL40-INK (array, Review L; surfaced by the H13 fix) | the Review's count-by rows numbered 10-12 put the step tab's pentagon inside the w2 tab's keep-out | additive CSS: a count-row under a w2/w3 tab starts 0.3 mm right of the keep-out | `ws-print-lint --supports array --size L --roles review` (0) |
+
+Speed-ups the round revealed: (1) `ws-print-lint --save-html` pages need their `http://127.0.0.1:<port>/` links rewritten to
+`file://` to screenshot; a `--shot` flag would save a lost hour. (2) Lint and grade-render deal different seeds, so a lint
+finding's cell is not the grade-render cell: render from the lint's own HTML. (3) The supports rows ran S only; the M/L
+findings (CL40-INK) were found by hand - candidates for precritic rows at M/L once budget allows.
+
+R4 prep results: precritic `--skill division:div_facts --strict` (log `/tmp/mq-precritic/20261103-094750-17307`): every
+supports row PASS (all, touch, skip, array, think, boxsign at S), fact-probe S/M/L PASS. Still red, each red on 0fd0e50 too
+(checked in a worktree of it, same counts): print-lint-divform-long-L (Mixed practice H13 31 %), dealer-uniform (ans 6 / 10
+over the page cap), node-lint-s1 (no LESSONS entry for div_facts), options-render (divForm capacity at S/L; the
+support=array H13 and support=boxsign CL40 lines it had on 0fd0e50 are now gone), chromebook-fit (quiz host "Cannot set
+properties of null"), slot-clip (sections/defaults L, fade-packet L PG-12), sibling-compare (no approved siblings). So the
+supports findings are closed but `--strict` is NOT green: those seven rows need a ruling (pin / main-red) or their own fixes.
+add_facts / sub_facts / mult_facts single-support rows at S: all OK except sub_facts tile + frame (Review H13 35 %) and
+mult_facts all / array / boxsign (Review H13 32 %, array H13-ROW) - identical on 0fd0e50 (pre-existing); mult_facts `all`
+lost its RP-1 (the skip strip ruling). Test role S/M/L, no supports, all five fact skills: 0 findings.
+Renders for the critic (untracked, 90 PNG): `design/audit/runs/laned-restart/r4-prep/<support>-<S|M|L>/division__div_facts/`
+{independent,test,review}{,-key}-p1.png. Watch item for the critic: with `array` on, Test S prints 10 (8 narrow + 2 full-width
+counters rows) with ~30 % of the page empty below - the width split (test.js widthSplit) holds it there.
