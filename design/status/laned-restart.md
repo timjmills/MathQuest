@@ -570,3 +570,17 @@ siblings 0) - the 3-page fade packet's last page holds 2 problems. sections/ex-g
 below the siblings; mixed/defaults L is MAIN-RED (listed). Four passed fact skills, Independent / Test / Review S/M/L: unchanged
 (only sub_facts Review L H13, pre-existing). boot-smoke OK, assets stamped. r4 renders unchanged (single-skill pages; the
 layout change touches multi-skill shared pages only).
+
+## HAND-OVER 7 (2026-11-03, R4b; critic still NOT run)
+
+R4b (2854ff1c, 633e8a2c): sections/defaults L PG-12 ×6 + slot-clip fixed (layout.js dense pass: on a page shared by different
+skills a fixed-height grid never widens to a taller row; `sharedPage` from print-sheet.js shareRows), sections PG-23 fixed
+(shareRows places sections that cannot share one page onto pages in order), CL40-INK ex-group M and SPREAD pages-2 L gone.
+mixed/defaults L PG-23 marked main-red in siblings.json `mainRed` (same on cd81c8e7). Four passed skills: no regression.
+Precritic div_facts --strict (log /tmp/mq-precritic/20261103-114102-13594): 44 PASS, 1 FAIL, 2 SKIPPED.
+Remaining:
+- sibling-compare: fade packet (--fade packet --pages 3) PG-23 at S/M/L — the packet's last page holds 2 problems (siblings 0).
+  Applying the shareRows fixes to the packet path regressed GRID-EVEN / H13 / PAGEFILL, so it needs its own last-page deal fix.
+- card-rulings / card-not-offered: SKIPPED-owner — the facts card.json has no numeric rulings (owner rulings are prose), so the
+  regenerate writes nothing; a rulings block would be new signed content. Needs the owner (or a lead ruling).
+Cost this session ≈ $60 (≈ 2.1 % of the week) of the $85 cap. Stopped per the lead's instruction (not green → hand-over).
