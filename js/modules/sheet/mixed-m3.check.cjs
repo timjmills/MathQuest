@@ -41,6 +41,12 @@
 //   partials (checkPartials) a 2-digit x cell on a mixed page draws the work rows of its own single-skill page.
 //   columns  (checkColumns)  req.columns = N (the print dialog's Columns control): every full row holds N problems.
 //   sml      (checkSml)      S holds more problems a page than M, M more than L, for the owner's facts-only mix.
+//   kinds    (checkKinds)    (owner 2026-11-03, layout A "Rows by type", the DEFAULT) each cell names its kind
+//                            (data-ws-kind); fast facts are 'fact'; one kind a row; one count across per kind; kinds
+//                            alternate row by row (runs of rows <= the forced minimum). In A, runs / spread are judged
+//                            within each kind and the one-count `across` gives way to this.
+//   layout   (checkLayout)   req.mixLayout 'rows' | 'grid' | 'even' (absent = 'rows') is reported as fits.mixLayout; C
+//                            ("Even grid") boxes all one height. B ("One grid"): runs up to 2 x (across - 1) allowed.
 //   Set o = the owner's mix (add / sub facts 20, mult / div facts 12, missing +/-, missing x/÷; 41 = 7,7,7,7,7,6).
 //   node js/modules/sheet/mixed-m3.check.cjs [--quick] [--seeds 2] [--only a,b] [--checks runs,rowfill] [--all]
 //   node js/modules/sheet/mixed-m3.check.cjs --fixture <page.html> [--checks ...]   # a saved / hand-made page (backtest)
@@ -60,7 +66,7 @@ const ROOT = path.resolve(__dirname, '..', '..', '..');
 // (`boxes`, `width` and `across`, critic r3 P1 / P2 / P3, run by default as HARD FAILs - the lane lead's ruling at the
 // hand-over, 2026-10-31: a check may not be opt-in to keep a branch green; they are RED until the engine passes them,
 // see design/status/mixed-pages.md "Hand-over")
-const ALL_CHECKS = ['runs', 'rowfill', 'spread', 'align', 'digits', 'spare', 'boxes', 'width', 'across', 'frame', 'shelfw', 'fill', 'partials', 'columns', 'sml'];
+const ALL_CHECKS = ['runs', 'rowfill', 'spread', 'align', 'digits', 'spare', 'boxes', 'width', 'across', 'frame', 'shelfw', 'fill', 'partials', 'columns', 'sml', 'kinds', 'layout'];
 const KNOWN_CHECKS = [...ALL_CHECKS];
 const MM = 96 / 25.4;
 
@@ -69,7 +75,7 @@ const MM = 96 / 25.4;
 
 /** The problems in print order across pages: [{skill, page, n}]. */
 function printOrder(pages) {
-    return pages.flatMap((pg, i) => pg.cells.slice().sort((a, b) => a.n - b.n).map((c) => ({ skill: c.skill || '?', page: i + 1, n: c.n })));
+    return pages.flatMap((pg, i) => pg.cells.slice().sort((a, b) => a.n - b.n).map((c) => ({ skill: c.skill || '?', page: i + 1, n: c.n, kind: c.kind || '' })));
 }
 function countsOf(seq) { const c = {}; for (const x of seq) c[x.skill] = (c[x.skill] || 0) + 1; return c; }
 
@@ -77,6 +83,11 @@ function countsOf(seq) { const c = {}; for (const x of seq) c[x.skill] = (c[x.sk
 function checkRuns(pages, ctx) {
     const out = [];
     if (ctx.arrangement !== 'mixed') return out;
+    // (owner 2026-11-03, layout A "Rows by type": a row holds one kind, so runs are judged within each kind's own problems)
+    if (ctx.layout === 'rows') {
+        const kinds = [...new Set(printOrder(pages).map((x) => x.kind))];
+        if (kinds.length > 1) { for (const k of kinds) out.push(...checkRuns(pages.map((pg) => ({ ...pg, cells: pg.cells.filter((c) => c.kind === k) })), { ...ctx, layout: 'rows-kind' })); return out; }
+    }
     const seq = printOrder(pages);
     const cnt = countsOf(seq);
     if (Object.keys(cnt).length < 2) return out;
@@ -89,6 +100,9 @@ function checkRuns(pages, ctx) {
         if (best <= 2) continue;
         const forced = Math.ceil(cnt[sk] / (N - cnt[sk] + 1));
         const where = `from page ${at.page} problem ${at.n}`;
+        // (owner 2026-11-03, layout B "One grid": a long box stands two rows tall, and the facts beside it may run up to
+        // 2 x (count across - 1) - allowed without a note)
+        if (ctx.layout === 'grid' && ctx.across && best <= Math.max(forced, 2 * (ctx.across - 1))) continue;
         if (best > forced) out.push(`runs: ${best} ${sk} problems in a row (${where}); ${cnt[sk]} of ${N} can be spread to runs of ${Math.max(2, forced)}`);
         else if (!stated.includes(best)) out.push(`runs: ${best} ${sk} problems in a row (${where}), forced by the weights, but no note states "up to ${best} ... come in a row"${stated.length ? ` (the notes say ${stated.join(' / ')})` : ''}`);
     }
@@ -113,6 +127,10 @@ function checkRowFill(pages) {
 function checkSpread(pages, ctx) {
     const out = [];
     if (ctx.arrangement !== 'mixed') return out;
+    if (ctx.layout === 'rows') {
+        const kinds = [...new Set(printOrder(pages).map((x) => x.kind))];
+        if (kinds.length > 1) { for (const k of kinds) out.push(...checkSpread(pages.map((pg) => ({ ...pg, cells: pg.cells.filter((c) => c.kind === k) })), { ...ctx, layout: 'rows-kind' })); return out; }
+    }
     const seq = printOrder(pages);
     const cnt = countsOf(seq);
     const ks = Object.keys(cnt);
@@ -184,6 +202,7 @@ function checkBoxes(pages) {
 /** 8 across: every full row of a mixed exact-count print holds the same count of problems. */
 function checkAcross(pages, ctx) {
     const out = [];
+    if (ctx.layout === 'rows') return out;   // (A: one count per KIND, checkKinds)
     if (ctx.arrangement !== 'mixed' || !ctx.counts || pages.length < 2) return out;
     const per = pages.map((pg) => (pg.fullRows || []).map((r) => r.n));
     const all = [...new Set(per.flat())];
@@ -276,7 +295,71 @@ function checkColumns(pages, ctx) {
     return out;
 }
 
-const JUDGES = { sml: () => [], frame: checkFrame, shelfw: checkShelfWidth, fill: checkFill, partials: checkPartials, columns: checkColumns, boxes: checkBoxes, across: checkAcross, width: checkWidth, runs: checkRuns, rowfill: checkRowFill, spread: checkSpread, align: checkAlign, digits: checkDigits, spare: checkSpare };
+const FACT_SKILL = (sk) => /_facts$/.test(sk.split(':')[1] || '') || sk === 'multiplication:multiply';
+/** 16 kinds (owner 2026-11-03, layout A "Rows by type", the default): every problem cell names its kind (data-ws-kind);
+ *  one kind per skill; fast-fact skills (*_facts, multiply table facts) are the kind 'fact' and no other skill is; every
+ *  row holds ONE kind; each kind's full rows hold ONE count across over the whole print; rows of a kind come in runs no
+ *  longer than the forced ceil(rowsK / (other rows + 1)) (kinds alternate row by row). */
+function checkKinds(pages, ctx) {
+    const out = [];
+    if (ctx.arrangement !== 'mixed' || ctx.layout !== 'rows') return out;
+    const all = pages.flatMap((pg, pi) => pg.cells.map((c) => ({ ...c, page: pi })));
+    const none = all.filter((c) => !c.kind);
+    if (none.length) { out.push(`kinds: ${none.length} problem cell(s) carry no data-ws-kind (layout A names each row's kind)`); return out; }
+    const bySkill = {};
+    for (const c of all) (bySkill[c.skill] = bySkill[c.skill] || new Set()).add(c.kind);
+    for (const [sk, ks] of Object.entries(bySkill)) {
+        if (ks.size > 1) out.push(`kinds: ${sk} is dealt as ${[...ks].join(' and ')} (one kind per skill)`);
+        const k = [...ks][0];
+        if (FACT_SKILL(sk) && k !== 'fact') out.push(`kinds: ${sk} is a fast-fact skill, dealt as kind '${k}' (must be 'fact')`);
+        if (!FACT_SKILL(sk) && k === 'fact') out.push(`kinds: ${sk} is not a fast-fact skill, dealt as kind 'fact'`);
+    }
+    // rows in print order
+    const rows = [];
+    pages.forEach((pg, pi) => {
+        const key = (c) => `${c.grid}|${c.row}`;
+        const groups = {};
+        for (const c of pg.cells) (groups[key(c)] = groups[key(c)] || []).push(c);
+        const ordered = Object.values(groups).sort((a, b) => Math.min(...a.map((c) => c.n)) - Math.min(...b.map((c) => c.n)));
+        for (const g of ordered) {
+            const r = (pg.rows || []).find((x) => x.grid === g[0].grid && x.row === g[0].row);
+            rows.push({ page: pi + 1, kinds: [...new Set(g.map((c) => c.kind))], n: g.length, full: !!r && r.usedFrac >= 0.98, first: Math.min(...g.map((c) => c.n)) });
+        }
+    });
+    for (const r of rows) if (r.kinds.length > 1) out.push(`kinds: page ${r.page} the row from problem ${r.first} mixes kinds ${r.kinds.join(' + ')} (one kind a row)`);
+    const kindsAll = [...new Set(rows.map((r) => r.kinds[0]))];
+    for (const k of kindsAll) {
+        const counts = [...new Set(rows.filter((r) => r.kinds[0] === k && r.full).map((r) => r.n))];
+        if (counts.length > 1) out.push(`kinds: full rows of kind '${k}' hold ${counts.join(' / ')} across (one count per kind over the print)`);
+    }
+    if (kindsAll.length > 1) {
+        const tot = {}; for (const r of rows) tot[r.kinds[0]] = (tot[r.kinds[0]] || 0) + 1;
+        let i = 0;
+        while (i < rows.length) {
+            let j = i; while (j + 1 < rows.length && rows[j + 1].kinds[0] === rows[i].kinds[0]) j++;
+            const k = rows[i].kinds[0]; const len = j - i + 1;
+            const forced = Math.max(1, Math.ceil(tot[k] / (rows.length - tot[k] + 1)));
+            if (len > forced) out.push(`kinds: ${len} rows of kind '${k}' in a row (page ${rows[i].page}, from problem ${rows[i].first}); ${tot[k]} of ${rows.length} rows alternate to runs of ${forced}`);
+            i = j + 1;
+        }
+    }
+    return out;
+}
+
+/** 17 layout (owner 2026-11-03): the print is laid out in the layout asked (req.mixLayout; absent = 'rows'), reported
+ *  as fits.mixLayout; layout C "Even grid": every row track of a page's grid the same height (within 1 mm). */
+function checkLayout(pages, ctx) {
+    const out = [];
+    if (ctx.arrangement !== 'mixed') return out;
+    if (ctx.reported !== ctx.layout) out.push(`layout: asked '${ctx.layout}', the result reports fits.mixLayout '${ctx.reported || '-'}'`);
+    if (ctx.layout === 'even') pages.forEach((pg, i) => {
+        const hs = pg.cells.map((c) => c.hMm);
+        if (hs.length && Math.max(...hs) - Math.min(...hs) > 1) out.push(`layout: page ${i + 1}: Even grid boxes are ${Math.min(...hs).toFixed(0)}-${Math.max(...hs).toFixed(0)} mm tall (one height, within 1 mm)`);
+    });
+    return out;
+}
+
+const JUDGES = { kinds: checkKinds, layout: checkLayout, sml: () => [], frame: checkFrame, shelfw: checkShelfWidth, fill: checkFill, partials: checkPartials, columns: checkColumns, boxes: checkBoxes, across: checkAcross, width: checkWidth, runs: checkRuns, rowfill: checkRowFill, spread: checkSpread, align: checkAlign, digits: checkDigits, spare: checkSpare };
 function judge(pages, ctx, checks = ALL_CHECKS) {
     const out = {};
     for (const c of checks) out[c] = JUDGES[c](pages, ctx);
@@ -385,7 +468,7 @@ const MEASURE_FN = async ({ html, perPage }) => {
                 const tplName = (c.getAttribute('data-ws-cell') || (c.className.match(/mqt--([\w-]+)/) || [])[1] || '');
                 const skill = c.getAttribute('data-ws-skill') || '';
                 if (!skill) out.unattributed++;
-                out.cells.push({ n, skill, tpl: tplName });
+                out.cells.push({ n, skill, tpl: tplName, grid: gi, row: trackOf(r.top), kind: c.getAttribute('data-ws-kind') || '', hMm: r.height / mm });
                 // a stacked computation: a drawn answer rule (kit .rule, legacy .stack-rule) under operands with a sign
                 const rule = [...c.querySelectorAll('.rule, .stack-rule')].filter((e) => !e.closest('.ws-tab,.ws-letter,.ws-mixcue') && e.getBoundingClientRect().width > 0)
                     .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)[0];
@@ -533,6 +616,9 @@ function scenarios() {
     // print dialog's Columns control (req.columns 4 at M, 6 at S).
     if (want('o')) {
         for (const size of ['S', 'M', 'L']) out.push({ id: `o owner 41 daily ${size} seed 4242`, set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size, seed: 4242, sml: 'o owner 41' });
+        // (owner 2026-11-03: all three Mixed up layouts are options - A rows (default, above), B grid, C even)
+        for (const layout of ['grid', 'even']) for (const size of QUICK ? ['M'] : ['S', 'M', 'L']) out.push({ id: `o owner 41 ${layout} daily ${size} seed 4242`, set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size, seed: 4242, layout });
+        if (!QUICK) for (const layout of ['grid', 'even']) out.push({ id: `b ${layout} daily M seed 722369`, set: SETS.b.skills, arr: 'mixed', look: 'daily', size: 'M', seed: 722369, layout });
         out.push({ id: 'o owner fill ican M seed 4242', set: OWNER, arr: 'mixed', look: 'ican', size: 'M', seed: 4242 });
         out.push({ id: 'o owner 41 columns 4 M seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'M', seed: 4242, columns: 4 });
         out.push({ id: 'o owner 41 columns 6 S seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'S', seed: 4242, columns: 6, colsOn: 'sections' });
@@ -549,7 +635,7 @@ const BUILD_FN = async (req) => {
         (pg.sections || []).forEach(walk);
         return xs;
     });
-    return { html: o.pupilHtml, perPage, notes: o.notes || [], arrangement: o.arrangement, pages: o.pageCount };
+    return { html: o.pupilHtml, perPage, notes: o.notes || [], arrangement: o.arrangement, pages: o.pageCount, across: (o.fits && o.fits.across) || 0, layout: (o.fits && o.fits.mixLayout) || '' };
 };
 
 function report(id, res, fails) {
@@ -584,6 +670,7 @@ async function main() {
                 const sections = counts ? sc.set.map((id, i) => ({ skills: [sk(id)], count: sc.counts[i] })) : [{ skills: sc.set.map(sk) }];
                 const req = { role: sc.role || 'mixed-practice', arrangement: sc.arr, sections, size: sc.size, look: sc.look, seed: sc.seed, key: false };
                 // (the print dialog sends Columns as each section's `columns`, simple-print lane 2026-11-03; req.columns too)
+                if (sc.layout) req.mixLayout = sc.layout;
                 if (sc.columns && sc.colsOn === 'sections') req.sections.forEach((x) => { x.columns = sc.columns; });
                 else if (sc.columns) req.columns = sc.columns;
                 let b;
@@ -592,7 +679,7 @@ async function main() {
                 n++; pagesN += pages.length;
                 const un = pages.reduce((a, p) => a + p.unattributed, 0);
                 if (un && CHECKS.some((c) => c === 'runs' || c === 'spread')) fails.push({ check: 'measure', line: `${sc.id}: ${un} problem cell(s) could not be given their skill (plan items vs printed cells)` });
-                const ctx = { arrangement: b.arrangement || sc.arr, counts, notes: b.notes, columns: sc.columns || 0 };
+                const ctx = { arrangement: b.arrangement || sc.arr, counts, notes: b.notes, columns: sc.columns || 0, layout: sc.layout || 'rows', reported: b.layout, across: b.across };
                 // fill: In sections' per-page count for the same skills at this size (a fill page of each skill in its own part)
                 if (ctx.arrangement === 'mixed' && CHECKS.includes('fill')) {
                     const key = `${sc.set.join(',')}|${sc.size}|${sc.look}`;
