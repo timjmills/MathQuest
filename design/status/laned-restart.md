@@ -546,3 +546,27 @@ in 5 rows — PG-23 (mixed/defaults L, sections/defaults L, fade-packet S/M/L), 
 SPREAD sections/pages-2 L. Also card-rulings / card-not-offered SKIPPED (facts card has no rulings block) need a ruling.
 Next lane step: one builder (mq-opus-medium) on those multi-page / multi-section rows, then the narrow critic.
 Cost this session ≈ $42 (≈ 1.5 % of the week) of the $55 cap; stopped because a fix run plus the critic would not fit.
+
+## R4b (2026-11-03): div_facts sibling-compare rows
+
+- PG-12 x6 + slot-clip, sections/defaults L: root cause - the shared page's share was sized from div_facts' FREE layout
+  (2 columns, "25 ÷ 5 = ___" on one line, 19.4 mm), then the section's own layout's dense pass widened the 20.4 mm grid to
+  3 columns, where the line goes under the fact (30.6 mm). FIXED: on a page shared by different skills (`sharedPage`,
+  print-sheet.js shareRows -> layout.js), the dense pass never takes a wider column count whose row is taller than the
+  fixed grid. sections S / M / L lint 0.
+- PG-23 sections/defaults (S/M/L): the four members shared ONE page's body though they could not fit it; the last ran
+  overleaf alone with 2 problems. FIXED: different skills that do not fit one page are packed onto pages in order and
+  each page's body is shared among its members (shareRows). One skill's support split / fade parts keep the old share.
+- mixed/defaults L PG-23: MAIN-RED, listed in siblings.json `mainRed` with its proof (same 2 findings on cd81c8e7);
+  ws-sibling-compare now reports a listed (row, size, rule, count) as non-blocking.
+- card-rulings / card-not-offered: SKIPPED-owner. `ws-spec-card --family facts --rulings-only` writes nothing: card.json
+  has no numeric rulings (the owner rulings are prose), so a block needs new signed content. Not regenerated.
+- Still open (see the precritic table): fade-packet S/M/L PG-23 (the packet's last page holds 2 problems; one skill's
+  fade parts, not the shared-page path), and whatever sibling-compare still lists for sections/ex-group M (now DN-2 x2,
+  CL40 gone) and sections/pages-2 L (SPREAD gone; DN-2 / PAGEFILL there).
+R4b precritic (`/tmp/mq-precritic/20261103-114102-13594`): 44 PASS (9 on the baseline), 1 FAIL, 2 SKIPPED-owner (card-rulings,
+card-not-offered). The FAIL is sibling-compare on ONE row only: single/fade-packet PG-23 at S, M and L (ours 2, the four
+siblings 0) - the 3-page fade packet's last page holds 2 problems. sections/ex-group M and sections/pages-2 L are now at or
+below the siblings; mixed/defaults L is MAIN-RED (listed). Four passed fact skills, Independent / Test / Review S/M/L: unchanged
+(only sub_facts Review L H13, pre-existing). boot-smoke OK, assets stamped. r4 renders unchanged (single-skill pages; the
+layout change touches multi-skill shared pages only).
