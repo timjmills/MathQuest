@@ -414,7 +414,7 @@ async function main() {
                         if (!t.toFrame) fail(`page ${i + 1}: a trailing area short of the frame`);
                     }
                     // (H13 is the mixed packer's to keep; a Sections page's grouped shelves are reported)
-                    for (const h of pg.h13) if (h.fill < 0.7 - 0.02 && r.arr !== 'mixed' && !h.work) warns.push(`${id}: page ${i + 1} cell ${h.label} (${h.tpl}) fills ${(h.fill * 100).toFixed(0)} % (Sections, pre-existing grouped shelf)`);
+                    for (const h of pg.h13) if (h.fill < 0.7 - 0.02 && r.arr !== 'mixed' && !h.work) fails.push(`${id}: H13 page ${i + 1} cell ${h.label} (${h.tpl}) fills ${(h.fill * 100).toFixed(0)} % (Sections, pre-existing grouped shelf)`);
                     // D2: a long procedure keeps its work zone under the rule, on Mixed AND Sections pages
                     for (const w of pg.work) if (w.under < w.need - 0.5) fail(`page ${i + 1} cell ${w.label}: ${w.under.toFixed(1)} mm under the rule, the work zone needs ${w.need.toFixed(0)} mm (H9)`);
                     for (const h of pg.h13) if (r.arr === 'mixed' && !h.work && h.fill < 0.7 - 0.02) fail(`page ${i + 1} cell ${h.label} (${h.tpl}): drawing fills ${(h.fill * 100).toFixed(0)} % of a ${h.h.toFixed(1)} mm box (H13 70 %)`);

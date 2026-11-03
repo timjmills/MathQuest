@@ -31,6 +31,17 @@
 //                            every page of one print hold the same number of problems. Mixed up, exact counts.
 //   width    (checkWidth)    (critic r3 P2, H13 by width) no problem cell is wider than its content / 0.45 (>= 30 %
 //                            empty each side), measured on the drawing's own ink box.
+//   frame    (checkFrame)    (2026-11-03, the owner's 6-skill mix; hand-over addendum) every problem cell's four edges are
+//                            drawn (>= 97 % of each edge is ink: the grid's gap / border, the frame, or the cell's border) and
+//                            no grid rule runs more than 3 mm past the cells of the row it closes.
+//   shelfw   (checkShelfWidth) every problem grid spans the frame's inner width (<= 2 mm short each side); only the last
+//                            grid of the last page may stop short, at its right end.
+//   fill     (checkFill)     (owner: "fill the paper") a mixed page's problem cells cover >= 70 % of the frame, and the page
+//                            holds >= In sections' per-page count for the same skills at that size, less one row.
+//   partials (checkPartials) a 2-digit x cell on a mixed page draws the work rows of its own single-skill page.
+//   columns  (checkColumns)  req.columns = N (the print dialog's Columns control): every full row holds N problems.
+//   sml      (checkSml)      S holds more problems a page than M, M more than L, for the owner's facts-only mix.
+//   Set o = the owner's mix (add / sub facts 20, mult / div facts 12, missing +/-, missing x/÷; 41 = 7,7,7,7,7,6).
 //   node js/modules/sheet/mixed-m3.check.cjs [--quick] [--seeds 2] [--only a,b] [--checks runs,rowfill] [--all]
 //   node js/modules/sheet/mixed-m3.check.cjs --fixture <page.html> [--checks ...]   # a saved / hand-made page (backtest)
 //   node js/modules/sheet/mixed-m3.check.cjs --capture <dir>                         # save the matrix's pages as fixtures
@@ -49,7 +60,7 @@ const ROOT = path.resolve(__dirname, '..', '..', '..');
 // (`boxes`, `width` and `across`, critic r3 P1 / P2 / P3, run by default as HARD FAILs - the lane lead's ruling at the
 // hand-over, 2026-10-31: a check may not be opt-in to keep a branch green; they are RED until the engine passes them,
 // see design/status/mixed-pages.md "Hand-over")
-const ALL_CHECKS = ['runs', 'rowfill', 'spread', 'align', 'digits', 'spare', 'boxes', 'width', 'across'];
+const ALL_CHECKS = ['runs', 'rowfill', 'spread', 'align', 'digits', 'spare', 'boxes', 'width', 'across', 'frame', 'shelfw', 'fill', 'partials', 'columns', 'sml'];
 const KNOWN_CHECKS = [...ALL_CHECKS];
 const MM = 96 / 25.4;
 
@@ -187,7 +198,80 @@ function checkWidth(pages) {
     return out;
 }
 
-const JUDGES = { boxes: checkBoxes, across: checkAcross, width: checkWidth, runs: checkRuns, rowfill: checkRowFill, spread: checkSpread, align: checkAlign, digits: checkDigits, spare: checkSpare };
+/** 10 frame (2026-11-03): every problem cell's four edges drawn (>= 97 % of each by a rule), no rule runs loose past the
+ *  cells it closes by more than 2 mm (a rule ends at the frame or at another cell's edge). */
+function checkFrame(pages) {
+    const out = [];
+    pages.forEach((pg, i) => {
+        const open = pg.openEdges || [];
+        if (open.length) out.push(`frame: page ${i + 1}: ${open.length} cell edge(s) not closed by a rule - ${open.slice(0, 6).map((e) => `cell ${e.label} ${e.side} ${Math.round(e.frac * 100)} %`).join(', ')}`);
+        const dl = pg.dangling || [];
+        if (dl.length) out.push(`frame: page ${i + 1}: ${dl.length} rule(s) run loose past the cells - ${dl.slice(0, 4).map((d) => `${d.h ? 'horizontal' : 'vertical'} ${d.src} rule at ${d.atMm.toFixed(0)} mm, ${d.mm.toFixed(0)} mm loose`).join(', ')}`);
+    });
+    return out;
+}
+
+/** 11 shelfw (2026-11-03): every problem grid spans the frame's inner width (within 2 mm each side); only the last grid of
+ *  the last page may stop short, and only at its right end. */
+function checkShelfWidth(pages) {
+    const out = [];
+    pages.forEach((pg, i) => {
+        for (const s of pg.shelves || []) {
+            const endOk = s.rightMm <= 2 || (pg.last && s.last);
+            if (s.leftMm > 2 || !endOk) out.push(`shelfw: page ${i + 1} grid ${s.grid + 1}: ${s.leftMm.toFixed(0)} mm short at the left, ${s.rightMm.toFixed(0)} mm at the right of the frame (<= 2 mm)`);
+        }
+    });
+    return out;
+}
+
+/** 12 fill (2026-11-03, owner: "fill the paper"): on a mixed page (every page of a fill print, every page but the last of
+ *  an exact-count print) the problem cells cover >= 70 % of the frame's inner area, and the page holds no fewer problems
+ *  than In sections puts on a page for the same skills, less one row (its count across). */
+function checkFill(pages, ctx) {
+    const out = [];
+    if (ctx.arrangement !== 'mixed') return out;
+    pages.forEach((pg, i) => {
+        if (pg.last && ctx.counts) return;
+        if ((pg.fillFrac || 0) < 0.70 - 1e-6) out.push(`fill: page ${i + 1}: problems cover ${Math.round((pg.fillFrac || 0) * 100)} % of the frame (>= 70 %)`);
+        if (ctx.sectionsPerPage) {
+            const across = Math.max(1, ...(pg.fullRows || []).map((r) => r.n));
+            const floor = ctx.sectionsPerPage - across;
+            if (pg.cells.length < floor) out.push(`fill: page ${i + 1}: ${pg.cells.length} problems; In sections holds ${ctx.sectionsPerPage} a page for these skills at this size (>= ${floor}, one row of ${across} less)`);
+        }
+    });
+    return out;
+}
+
+/** 13 partials (2026-11-03): a 2-digit x cell on a mixed page draws the same work rows (partial-product rows, second rule)
+ *  as on its single-skill page. */
+function checkPartials(pages, ctx) {
+    const out = [];
+    if (!ctx.workRef) return out;
+    pages.forEach((pg, i) => {
+        for (const w of pg.work || []) if (w.prows !== ctx.workRef.prows || w.rule2 !== ctx.workRef.rule2) out.push(`partials: page ${i + 1} cell ${w.label}: ${w.prows} partial-product row(s), ${w.rule2} second rule(s); its own page draws ${ctx.workRef.prows} and ${ctx.workRef.rule2}`);
+    });
+    return out;
+}
+
+/** 14 sml (2026-11-03): S holds more problems a page than M, M more than L, for the same facts-only mix (no exemption:
+ *  S may equal M only when a non-shrinking visual sets every row - mixed-m2 h13Exempt - never on a facts-only mix). */
+function checkSml(perSize, id) {
+    const out = [];
+    const { S, M, L } = perSize;
+    if (S != null && M != null && !(S > M)) out.push(`sml: ${id}: S ${S} a page, M ${M} (S > M)`);
+    if (M != null && L != null && !(M > L)) out.push(`sml: ${id}: M ${M} a page, L ${L} (M > L)`);
+    return out;
+}
+
+/** 15 columns (2026-11-03, the print dialog's Columns control): with req.columns = N every full row holds N problems. */
+function checkColumns(pages, ctx) {
+    const out = [];
+    if (!ctx.columns) return out;
+    pages.forEach((pg, i) => { const bad = (pg.fullRows || []).filter((r) => r.n !== ctx.columns); if (bad.length || !(pg.fullRows || []).length) out.push(`columns: page ${i + 1}: full rows hold ${[...new Set((pg.fullRows || []).map((r) => r.n))].join('/') || 'none'} across, Columns asked ${ctx.columns}`); });
+    return out;
+}
+
+const JUDGES = { sml: () => [], frame: checkFrame, shelfw: checkShelfWidth, fill: checkFill, partials: checkPartials, columns: checkColumns, boxes: checkBoxes, across: checkAcross, width: checkWidth, runs: checkRuns, rowfill: checkRowFill, spread: checkSpread, align: checkAlign, digits: checkDigits, spare: checkSpare };
 function judge(pages, ctx, checks = ALL_CHECKS) {
     const out = {};
     for (const c of checks) out[c] = JUDGES[c](pages, ctx);
@@ -281,6 +365,13 @@ const MEASURE_FN = async ({ html, perPage }) => {
                         if (er.width <= 0 || er.height <= 0) continue;
                         lo = Math.min(lo, er.left); hi = Math.max(hi, er.right);
                     }
+                    // (2026-11-03) text that sits beside a child element (a legacy "[box] - 3 = 10") is ink too: its text nodes' boxes
+                    const tw = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
+                    for (let t = tw.nextNode(); t; t = tw.nextNode()) {
+                        if (!t.textContent.trim() || (t.parentElement && t.parentElement.closest('.ws-tab,.ws-letter'))) continue;
+                        const rg = document.createRange(); rg.selectNodeContents(t);
+                        for (const er of rg.getClientRects()) if (er.width > 0) { lo = Math.min(lo, er.left); hi = Math.max(hi, er.right); }
+                    }
                     if (hi > lo && (hi - lo) / r.width < 0.45) out.wide.push({ label: tab.textContent.trim(), tpl: c.getAttribute('data-ws-cell') || '', cellMm: r.width / mm, inkMm: (hi - lo) / mm });
                 }
                 const label = tab ? tab.textContent.trim() : '';
@@ -306,6 +397,92 @@ const MEASURE_FN = async ({ html, perPage }) => {
                 out.stacks.push({ grid: gi, row: trackOf(r.top), ruleMm: (ry - bb.top) / mm, capMm: cap, label, tpl: tplName });
             }
         });
+        // (2026-11-03, owner's 6-skill mix) frame / shelfw / fill / partials: the bordered frame round the problem grids,
+        // every rule segment on the page, each cell's four edges, each grid's span, the cells' area, the 2-digit x work rows
+        {
+            const g0 = grids[0];
+            let fr = null;
+            for (let e = g0 ? g0.parentElement : null; e && e !== pg; e = e.parentElement) {
+                const cs = getComputedStyle(e);
+                if ((parseFloat(cs.borderTopWidth) || 0) >= 1 && (parseFloat(cs.borderLeftWidth) || 0) >= 1 && cs.borderTopStyle !== 'none') { fr = e; break; }
+            }
+            const frEl = fr || body;
+            const fb = frEl.getBoundingClientRect(); const fcs = getComputedStyle(frEl);
+            const inner = { left: fb.left + (parseFloat(fcs.borderLeftWidth) || 0), right: fb.right - (parseFloat(fcs.borderRightWidth) || 0), top: fb.top + (parseFloat(fcs.borderTopWidth) || 0), bottom: fb.bottom - (parseFloat(fcs.borderBottomWidth) || 0) };
+            out.frame = { wMm: (inner.right - inner.left) / mm, hMm: (inner.bottom - inner.top) / mm, bordered: !!fr };
+            // rule segments: every border side >= 0.5 px of the frame, the grids and every cell inside them (not inside a cell's drawing)
+            const segs = [];   // {h: true|false, at, a, b, src}
+            const sides = (el, src) => {
+                const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
+                const bw = (s) => (cs[`border${s}Style`] !== 'none' && cs[`border${s}Style`] !== 'hidden' ? parseFloat(cs[`border${s}Width`]) || 0 : 0);
+                if (bw('Top') >= 0.5) segs.push({ h: true, at: r.top + bw('Top') / 2, a: r.left, b: r.right, src });
+                if (bw('Bottom') >= 0.5) segs.push({ h: true, at: r.bottom - bw('Bottom') / 2, a: r.left, b: r.right, src });
+                if (bw('Left') >= 0.5) segs.push({ h: false, at: r.left + bw('Left') / 2, a: r.top, b: r.bottom, src });
+                if (bw('Right') >= 0.5) segs.push({ h: false, at: r.right - bw('Right') / 2, a: r.top, b: r.bottom, src });
+            };
+            if (fr) sides(fr, 'frame');
+            const allCells = grids.flatMap((g) => [...g.children].filter((c) => c.classList.contains('ws-cell')));
+            grids.forEach((g) => sides(g, 'grid'));
+            allCells.forEach((c) => sides(c, 'cell'));
+            // (the kit draws a cell's rules as its grid's ink background showing through the gaps and the grid's border: a
+            // point just outside a cell edge is ink when it lies in a grid's border box but in none of that grid's cells,
+            // in the frame's border ring, or on the cell's own border)
+            const ink = (x, y) => {
+                if (fr) { const insideOuter = x >= fb.left && x <= fb.right && y >= fb.top && y <= fb.bottom; const insideInner = x > inner.left && x < inner.right && y > inner.top && y < inner.bottom; if (insideOuter && !insideInner) return true; }
+                for (const g of grids) {
+                    const r = g.getBoundingClientRect();
+                    if (x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
+                    const bg = getComputedStyle(g).backgroundColor;
+                    const dark = /rgb\((\d+), (\d+), (\d+)\)/.exec(bg);
+                    const isInk = dark && (Number(dark[1]) + Number(dark[2]) + Number(dark[3])) < 200;
+                    const kids = [...g.children].filter((c) => c.classList.contains('ws-cell'));
+                    const inKid = kids.some((c) => { const q = c.getBoundingClientRect(); return x > q.left && x < q.right && y > q.top && y < q.bottom; });
+                    if (inKid) return false;
+                    const gcs = getComputedStyle(g);
+                    const inBorder = x < r.left + (parseFloat(gcs.borderLeftWidth) || 0) || x > r.right - (parseFloat(gcs.borderRightWidth) || 0) || y < r.top + (parseFloat(gcs.borderTopWidth) || 0) || y > r.bottom - (parseFloat(gcs.borderBottomWidth) || 0);
+                    return inBorder || !!isInk;
+                }
+                return false;
+            };
+            out.openEdges = [];
+            const probs = allCells.filter((c) => !isTrail(c) && c.querySelector(':scope > .ws-tab, :scope > .ws-letter'));
+            const off = 0.75;
+            for (const c of probs) {
+                const r = c.getBoundingClientRect(); const cs = getComputedStyle(c);
+                const lab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter').textContent.trim();
+                for (const [side, pts] of [
+                    ['top', (t) => [r.left + t * r.width, r.top - off]], ['bottom', (t) => [r.left + t * r.width, r.bottom + off]],
+                    ['left', (t) => [r.left - off, r.top + t * r.height]], ['right', (t) => [r.right + off, r.top + t * r.height]]]) {
+                    const S = side[0].toUpperCase() + side.slice(1);
+                    if ((parseFloat(cs[`border${S}Width`]) || 0) >= 0.5 && cs[`border${S}Style`] !== 'none') continue;
+                    let hit = 0; const N = 40;
+                    for (let k = 0; k < N; k++) { const [x, y] = pts((k + 0.5) / N); if (ink(x, y)) hit++; }
+                    if (hit / N < 0.97) out.openEdges.push({ label: lab, side, frac: hit / N });
+                }
+            }
+            // loose rules: a grid's top / bottom border running past the cells of its first / last row by more than 3 mm
+            out.dangling = [];
+            for (const g of grids) {
+                const r = g.getBoundingClientRect(); const gcs = getComputedStyle(g);
+                const kids = [...g.children].filter((c) => c.classList.contains('ws-cell')).map((c) => c.getBoundingClientRect());
+                if (!kids.length) continue;
+                const x0 = r.left + (parseFloat(gcs.borderLeftWidth) || 0); const x1 = r.right - (parseFloat(gcs.borderRightWidth) || 0);
+                for (const [edge, yIn] of [['top', r.top + (parseFloat(gcs.borderTopWidth) || 0)], ['bottom', r.bottom - (parseFloat(gcs.borderBottomWidth) || 0)]]) {
+                    const row = kids.filter((q) => Math.abs((edge === 'top' ? q.top : q.bottom) - yIn) <= 4).map((q) => [q.left, q.right]).sort((p, q) => p[0] - q[0]);
+                    let cov = 0; let cur = x0;
+                    for (const [a0, a1] of row) { const s0 = Math.max(cur, a0); const s1 = Math.min(a1, x1); if (s1 > s0) { cov += s1 - s0; cur = s1; } }
+                    const loose = (x1 - x0 - cov) / mm - Math.max(0, row.length - 1) * ((parseFloat(gcs.columnGap) || 0) / mm);
+                    if (loose > 3) out.dangling.push({ h: true, src: 'grid', mm: loose, atMm: ((edge === 'top' ? r.top : r.bottom) - inner.top) / mm });
+                }
+            }
+            // shelves: each problem grid's span against the frame's inner width
+            out.shelves = grids.map((g, gi) => { const r = g.getBoundingClientRect(); return { grid: gi, leftMm: (r.left - inner.left) / mm, rightMm: (inner.right - r.right) / mm, last: gi === grids.length - 1 }; });
+            // fill: the problem cells' area against the frame's inner area
+            const area = probs.reduce((a, c) => { const r = c.getBoundingClientRect(); return a + r.width * r.height; }, 0);
+            out.fillFrac = area / Math.max(1, (inner.right - inner.left) * (inner.bottom - inner.top));
+            // partials: the 2-digit x work rows of every mult_2by2_standard cell
+            out.work = probs.filter((c) => /mult_2by2_standard/.test(c.getAttribute('data-ws-skill') || '')).map((c) => ({ label: c.querySelector(':scope > .ws-tab, :scope > .ws-letter').textContent.trim(), prows: c.querySelectorAll('.ws-prow').length, rule2: c.querySelectorAll('.ws-rule2').length }));
+        }
         out.freeMm = Math.max(0, (bb.bottom - lowest) / mm);
         pages.push(out);
     });
@@ -320,6 +497,7 @@ const SEEDS = Math.max(1, Number(arg('seeds', QUICK ? 1 : 2)) || 1);
 const ONLY = arg('only', '') ? arg('only', '').split(',') : null;
 const CHECKS = arg('checks', '') ? arg('checks', '').split(',') : ALL_CHECKS;
 const sk = (id) => { const [categoryId, skillId] = id.split(':'); return { categoryId, skillId, opts: {} }; };
+const OWNER = ['addition:add_facts', 'subtraction:sub_facts', 'multiplication:mult_facts', 'division:div_facts', 'subtraction:missing_add_sub', 'multiplication:missing_mult_div'];
 const SETS = {
     a: { skills: ['multiplication:multiply', 'addition:add_facts'], seed: 469182 },
     b: { skills: ['addition:add_facts', 'multiplication:mult_2by2_standard'], seed: 722369 },
@@ -341,6 +519,15 @@ function scenarios() {
     // h (critic r3 P1): the Independent sheet of two parts with counts (add facts 10 + subtract facts 10)
     // (critic r3 P1 second half: RED until practice.js flowLayout picks a count across that divides - runs by default)
     if (want('h')) for (const size of QUICK ? ['M', 'S'] : ['S', 'M', 'L']) out.push({ id: `h independent 10+10 daily ${size} seed 4242`, set: ['addition:add_facts', 'subtraction:sub_facts'], counts: [10, 10], arr: 'sections', role: 'independent', look: 'daily', size, seed: 4242 });
+    // o (owner, 2026-11-03): his 6-skill mix - add / sub facts within 20, mult / div facts 1-12, missing numbers +/-, missing
+    // factors x/÷ - 41 problems (7,7,7,7,7,6) printed 3 a page. Every size, every run (quick too); a fill page at M; the
+    // print dialog's Columns control (req.columns 4 at M, 6 at S).
+    if (want('o')) {
+        for (const size of ['S', 'M', 'L']) out.push({ id: `o owner 41 daily ${size} seed 4242`, set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size, seed: 4242, sml: 'o owner 41' });
+        out.push({ id: 'o owner fill ican M seed 4242', set: OWNER, arr: 'mixed', look: 'ican', size: 'M', seed: 4242 });
+        out.push({ id: 'o owner 41 columns 4 M seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'M', seed: 4242, columns: 4 });
+        out.push({ id: 'o owner 41 columns 6 S seed 4242', set: OWNER, counts: [7, 7, 7, 7, 7, 6], arr: 'mixed', look: 'daily', size: 'S', seed: 4242, columns: 6 });
+    }
     return out;
 }
 
@@ -366,6 +553,7 @@ async function main() {
     const capture = arg('capture', '');
     const app = await open({ seed: 12345 });
     const fails = [];
+    const SECT = {}; const WORK = {}; const SML = {};
     let n = 0; let pagesN = 0;
     try {
         if (fixture) {
@@ -386,14 +574,39 @@ async function main() {
                 const counts = !!sc.counts;
                 const sections = counts ? sc.set.map((id, i) => ({ skills: [sk(id)], count: sc.counts[i] })) : [{ skills: sc.set.map(sk) }];
                 const req = { role: sc.role || 'mixed-practice', arrangement: sc.arr, sections, size: sc.size, look: sc.look, seed: sc.seed, key: false };
+                if (sc.columns) req.columns = sc.columns;
                 let b;
                 try { b = await app.page.evaluate(BUILD_FN, req); } catch (e) { fails.push({ check: 'build', line: `${sc.id}: build failed: ${String(e.message || e).slice(0, 200)}` }); continue; }
                 const pages = await app.page.evaluate(MEASURE_FN, { html: b.html, perPage: b.perPage });
                 n++; pagesN += pages.length;
                 const un = pages.reduce((a, p) => a + p.unattributed, 0);
                 if (un && CHECKS.some((c) => c === 'runs' || c === 'spread')) fails.push({ check: 'measure', line: `${sc.id}: ${un} problem cell(s) could not be given their skill (plan items vs printed cells)` });
-                const ctx = { arrangement: b.arrangement || sc.arr, counts, notes: b.notes };
-                report(sc.id, judge(pages, ctx, CHECKS), fails);
+                const ctx = { arrangement: b.arrangement || sc.arr, counts, notes: b.notes, columns: sc.columns || 0 };
+                // fill: In sections' per-page count for the same skills at this size (a fill page of each skill in its own part)
+                if (ctx.arrangement === 'mixed' && CHECKS.includes('fill')) {
+                    const key = `${sc.set.join(',')}|${sc.size}|${sc.look}`;
+                    if (!(key in SECT)) {
+                        try {
+                            const sb = await app.page.evaluate(BUILD_FN, { role: 'mixed-practice', arrangement: 'sections', sections: [{ skills: sc.set.map(sk) }], size: sc.size, look: sc.look, seed: sc.seed, key: false });
+                            SECT[key] = Math.max(0, ...sb.perPage.map((xs) => xs.length));
+                        } catch (e) { SECT[key] = 0; fails.push({ check: 'build', line: `${sc.id}: the In sections reference failed: ${String(e.message || e).slice(0, 160)}` }); }
+                    }
+                    ctx.sectionsPerPage = SECT[key];
+                }
+                // partials: the 2-digit x cell's own single-skill page
+                if (CHECKS.includes('partials') && sc.set.includes('multiplication:mult_2by2_standard')) {
+                    const key = `2by2|${sc.size}|${sc.look}`;
+                    if (!(key in WORK)) {
+                        const wb = await app.page.evaluate(BUILD_FN, { role: 'independent', sections: [{ skills: [sk('multiplication:mult_2by2_standard')], count: 4 }], size: sc.size, look: sc.look, seed: sc.seed, key: false });
+                        const wp = await app.page.evaluate(MEASURE_FN, { html: wb.html, perPage: wb.perPage.map((xs) => xs.map(() => 'multiplication:mult_2by2_standard')) });
+                        const w0 = wp.flatMap((x) => x.work || [])[0];
+                        WORK[key] = w0 ? { prows: w0.prows, rule2: w0.rule2 } : null;
+                        if (!w0) fails.push({ check: 'partials', line: `${sc.id}: no 2-digit x cell measured on its own page` });
+                    }
+                    ctx.workRef = WORK[key];
+                }
+                if (sc.sml && CHECKS.includes('sml')) (SML[sc.sml] = SML[sc.sml] || {})[sc.size] = pages.length ? pages[0].cells.length : 0;
+                report(sc.id, judge(pages, ctx, CHECKS.filter((c) => c !== 'sml')), fails);
                 if (capture) {
                     fs.mkdirSync(capture, { recursive: true });
                     // the pupil html with each cell's skill written in, and the context the judges read
@@ -411,6 +624,7 @@ async function main() {
                 }
             }
         }
+        for (const id of Object.keys(SML)) for (const f of checkSml(SML[id], id)) fails.push({ check: 'sml', line: f });
     } finally {
         await app.close();
     }
@@ -426,5 +640,5 @@ async function main() {
     process.exit(fails.length ? 1 : 0);
 }
 
-module.exports = { judge, checkBoxes, checkAcross, checkWidth, checkRuns, checkRowFill, checkSpread, checkAlign, checkDigits, checkSpare, printOrder, ALL_CHECKS, MEASURE_FN };
+module.exports = { checkFrame, checkShelfWidth, checkFill, checkPartials, checkSml, checkColumns, judge, checkBoxes, checkAcross, checkWidth, checkRuns, checkRowFill, checkSpread, checkAlign, checkDigits, checkSpare, printOrder, ALL_CHECKS, MEASURE_FN };
 if (require.main === module) main().catch((e) => { console.error(e); process.exit(1); });
