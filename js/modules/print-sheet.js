@@ -1300,6 +1300,12 @@ function splitBySupports(sec, gi, n) {
     // undoes it when one row of each does not fit a page, or when it holds fewer problems than the
     // one section). Beyond four the alternatives are dealt in blocks inside the one section.
     if (alts.length < 2 || alts.length > 4) return [sec];
+    // Lane D R4c (L-DENSITY PG-23, the fade packet: div_facts --fade packet --pages 3, S / M / L): a FADED sheet of
+    // several pages is not split. The parts flow on one after another, so the first part filled page 1, the second
+    // took page 2 with one row of the third, and the third's last problems ran onto page 3 alone (1-2 problems, at
+    // every count: a part's capacity is its share of one page). Unsplit, the one section is dealt page by page in
+    // whole rows (the Auto fill), and its alternatives fall in blocks down the packet as the supports fade.
+    if ((n.coverage || o.cover) === 'fade' && (Number(sec.pages) || 1) > 1) return [sec];
     const k = alts.length;
     const counts = sec.count ? alts.map((_, i) => Math.floor(sec.count / k) + (i < sec.count % k ? 1 : 0)) : null;
     return alts.map((_, i) => Object.assign({}, sec, {
