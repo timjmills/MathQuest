@@ -561,6 +561,17 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
             const where = [];
             for (let i = 0; i < 30; i++) { await page.keyboard.press('Tab'); const d = await page.evaluate(() => { const p = document.getElementById('skillOptionsPopover'), a = document.activeElement; return p && p.contains(a) ? '' : `${a.tagName}.${String(a.className).slice(0, 20)} "${(a.getAttribute('aria-label') || a.textContent || '').trim().slice(0, 24)}" (panel ${p ? 'open' : 'gone'})`; }); if (d) { out++; where.push(d); } }
             if (out) F2(`OPTKEY @${w}${tv ? ' teacher' : ''} Tab left the open Options panel ${out} times in 30 (${where.slice(0, 2).join('; ')})`);
+            // OPTCHANGE (checker r2 N1): changing a control in the panel by keyboard keeps focus in the panel (the preview
+            // redraw used to move it to the dialog's Print button, so the next Enter printed).
+            const chg = await page.evaluate(async () => {
+                const p = document.getElementById('skillOptionsPopover'); if (!p) return 'no panel';
+                const sel = [...p.querySelectorAll('select')].find((x) => x.options.length > 1); if (!sel) return 'no select';
+                sel.focus(); sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length; sel.dispatchEvent(new Event('change', { bubbles: true }));
+                await new Promise((r) => setTimeout(r, 1200));
+                const q = document.getElementById('skillOptionsPopover'); const a = document.activeElement;
+                return q && q.contains(a) ? '' : `focus went to ${a.tagName}.${String(a.className).slice(0, 24)} "${(a.textContent || '').trim().slice(0, 16)}"`;
+            });
+            if (chg) F2(`OPTCHANGE @${w}${tv ? ' teacher' : ''} after changing an option: ${chg}`);
             await page.keyboard.press('Escape');
             await new Promise((r) => setTimeout(r, 150));
             const e = await page.evaluate(async (mod) => ({ pop: !!document.getElementById('skillOptionsPopover'), open: !!(await import(mod)).simplePrintState(), focus: (document.activeElement && document.activeElement.dataset && document.activeElement.dataset.sp) || (document.activeElement && document.activeElement.tagName) }), mod);

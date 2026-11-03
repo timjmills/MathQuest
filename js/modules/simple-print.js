@@ -763,6 +763,8 @@ function mount() {
     root.addEventListener('input', onInput);
     root.addEventListener('change', onChange);
     root.addEventListener('pointerdown', (e) => { if (qpMenu && !(e.target.closest && e.target.closest('.sp-qp-menu, [data-sp="qpmenu"]'))) closeQpMenu(root); }, true);
+    // Remember whether a skill's Options panel was open when this press began (the panel closes itself on mousedown).
+    root.addEventListener('pointerdown', () => { if (S) S.popAtPress = !!document.getElementById('skillOptionsPopover'); }, true);
     root.addEventListener('focusout', (e) => { if (S && qpRename && e.target.dataset && e.target.dataset.qpRename !== undefined) quickRenameKey({ type: 'blur', target: e.target }, render); });
     document.addEventListener('keydown', onKey, true);
     S.root = root;
@@ -889,6 +891,8 @@ function render() {
     showThumb();
     if (focusId) { const el = document.getElementById(focusId); if (el) { try { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.type === 'text') el.setSelectionRange(el.value.length, el.value.length); } catch (e) { /* */ } } }
     else if (focusSel && dlg.querySelector(focusSel)) { try { dlg.querySelector(focusSel).focus({ preventScroll: true }); } catch (e) { /* */ } }
+    // Focus inside a skill's Options panel (a popover outside the dialog) stays there while the preview redraws.
+    else if (document.activeElement && document.activeElement.closest && document.activeElement.closest('#skillOptionsPopover')) { /* keep */ }
     else if (!S.focused || !ae) { S.focused = true; const p = dlg.querySelector('[data-sp="print"]'); if (p && !S.root.contains(document.activeElement)) try { p.focus({ preventScroll: true }); } catch (e) { /* */ } }
 }
 
@@ -964,7 +968,15 @@ function onClick(e) {
     const t = e.target.closest('[data-sp]');
     if (!t || !S.root.contains(t)) return;
     const act = t.dataset.sp, v = t.dataset.v;
-    if (act === 'close') { closeSimplePrint(); return; }
+    if (act === 'close') {
+        // A click on the backdrop while a skill's Options panel is open closes only that panel.
+        if (t.classList && t.classList.contains('sp-scrim') && (S.popAtPress || document.getElementById('skillOptionsPopover'))) {
+            S.popAtPress = false;
+            if (document.getElementById('skillOptionsPopover') && typeof window.closeSkillOptionsPanel === 'function') window.closeSkillOptionsPanel();
+            return;
+        }
+        closeSimplePrint(); return;
+    }
     if (act === 'how') { if (P.how !== v) { P.how = v; changed(true); } return; }
     if (act === 'dec' || act === 'inc') {
         const d = act === 'inc' ? 1 : -1;

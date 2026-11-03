@@ -57,6 +57,9 @@ export function showView(id) {
 
     document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
     document.getElementById(id).classList.add("active");
+    // The pupil home's selection bar measures itself; re-measure when the home view comes back (it was hidden in play).
+    // (again after the home screen's late layout: its cards and the bar's wrapped text settle over a few frames)
+    if (id === 'homeView' && typeof window.syncSelBarHeight === 'function') { for (const ms of [0, 250, 700]) setTimeout(() => { try { window.syncSelBarHeight(); } catch (e) { /* */ } }, ms); }
 
     // When returning to home view, restore UI from state
     if (id === "homeView") {

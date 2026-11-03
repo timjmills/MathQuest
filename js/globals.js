@@ -30,7 +30,7 @@ import { updateCategoryOptions, updateBreadcrumb, updateSkillOptions, initInline
 import { buildSkillIndex, getSkillIndex, handleSkillSearch, selectSkillFromSearch, showSearchResults, hideSearchResults, clearSkillSearch } from './modules/skill-search.js';
 
 // Layer 3: Skill Management
-import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue, updateStudentSelBar, playStudentSelection, sendStudentSelection, copyStudentSendLink, printStudentSelection, closeStudentSend } from './modules/unified-skills.js';
+import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue, updateStudentSelBar, playStudentSelection, sendStudentSelection, copyStudentSendLink, printStudentSelection, closeStudentSend, syncSelBarHeight } from './modules/unified-skills.js';
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType, parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions } from './modules/skill-codes.js';
 import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
@@ -223,7 +223,7 @@ Object.assign(window, {
     UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue,
     toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems,
     handleSearchBlur, checkLinksInput, showQueueFeedback,
-    playSelectedSkills, printSelectedSkills, printFromQueue, updateStudentSelBar, playStudentSelection, sendStudentSelection, copyStudentSendLink, printStudentSelection, closeStudentSend,
+    playSelectedSkills, printSelectedSkills, printFromQueue, updateStudentSelBar, playStudentSelection, sendStudentSelection, copyStudentSendLink, printStudentSelection, closeStudentSend, syncSelBarHeight,
 
     // Skill Codes
     generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay,
