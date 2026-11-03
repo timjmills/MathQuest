@@ -12,6 +12,16 @@ Critic rounds: 2, r1 FAIL (min 4), r2 FAIL (min 6, B3: page 1 fill = engine pagi
 - Built; critic r1 and r2 lane-owned defects fixed and gated. r3 not run (budget). Page-1 fill of 6-part prints waits on the engine lane (paginate).
 - The full dialog (teacher-sheet.js) stays behind "More options → All print options…". Its 8-a-page request mapping (the owner's "3 a page") belongs to the mixed-m2 lane's "one flowed request" rewrite, not to this lane (told by send_message, 2026-11-03).
 
+## Owner design list (queued during critic r3, 2026-11-03; process rule 0: not folded into the running round)
+1. 2026-11-03 "turn column OR have intelligent mode … still with large, medium, small" + "if choosing big medium small this is intelligent fitting together": Columns reads "Auto — fitted by size" with the per-type counts it chose ("Facts 8 · Missing numbers 4"); a number is the only override. (Partly built: Auto already fits each part's count by type and size: fact parts take the most fact columns that fit; the summary does not yet list counts per type.)
+2. 2026-11-03 "multiple sizes of problems can fill the page … no white space": FILL floor toward 85 % on every page but the last; conflicts (big digits, an explicit count) win and are reported. Needs the mixed-m2 engine items (part continuation, row stretch): today the engine leaves page 1 30 % free with no row of any part able to go on.
+3. 2026-11-03 "unless there were limited problems": fewer problems than a page → full rows from the top, rest blank; the FILL check skips pages below one full page.
+4. 2026-11-03 "exact and intelligent mode … 7, 8, 9, 10 should be just for small problems": a picked number offers "Aim for n" (default) | "Exactly n"; 7–10 only when the set has fact-sized problems; req fields to agree with mixed-m2 (columns, columnsMode 'exact' | 'aim' | 'auto').
+5. 2026-11-03 "on the printing teacher mode I want to have a favorites/quick links area": Quick prints (saved whole setups) at the top in teacher mode and on the Skills page; ★ Save as quick print; ⋯ rename / delete; round-trips through share codes; a built-in Fast facts group.
+6. 2026-11-03 "fast fact options … change the denomination or limit the problem by highest number": per skill, or shared, Highest number (10 · 20 · 50 · 100 · 120 · 144 · 500 · 1000, only values the skill supports) and Fact sets / tables (1–12, 0, 13), through the skill option schema (skill-options.js), round-tripping in share codes, quick prints and play.
+7. 2026-11-03 "keep card size and that is its default … include decimals … 10ths 100ths 1000ths": Decimals none / tenths / hundredths / thousandths as a per-skill option on the + − × ÷ operation skills (not *_facts), carried through generateQuestionFor, answer-check and the kit stack; ws-share-options round trips.
+Items 4–7 are new options and a new screen area: their own build round (medium builder, first build), with a budget the owner approves.
+
 ## Owner go
 
 ## Open questions
