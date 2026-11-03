@@ -1,0 +1,431 @@
+[
+ {
+  "label": "total20 12/8 mixed",
+  "kind": "mixed",
+  "plan": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 12,
+    "subtraction:sub_facts": 8
+   }
+  },
+  "built": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 12,
+    "subtraction:sub_facts": 8
+   }
+  },
+  "titles": [
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "1 page \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "total20 12/8 sections",
+  "kind": "sections",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 12,
+    "subtraction:sub_facts": 8
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 12,
+    "subtraction:sub_facts": 8
+   }
+  },
+  "titles": [
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "total20 3/17 mixed",
+  "kind": "mixed",
+  "plan": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 3,
+    "subtraction:sub_facts": 17
+   }
+  },
+  "built": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 3,
+    "subtraction:sub_facts": 17
+   }
+  },
+  "titles": [
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "1 page \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "total20 3/17 sections",
+  "kind": "sections",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 3,
+    "subtraction:sub_facts": 17
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 3,
+    "subtraction:sub_facts": 17
+   }
+  },
+  "titles": [
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "total20 2/18 mixed",
+  "kind": "mixed",
+  "plan": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 2,
+    "subtraction:sub_facts": 18
+   }
+  },
+  "built": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 2,
+    "subtraction:sub_facts": 18
+   }
+  },
+  "titles": [
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "1 page \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "total20 2/18 sections",
+  "kind": "sections",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 2,
+    "subtraction:sub_facts": 18
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 2,
+    "subtraction:sub_facts": 18
+   }
+  },
+  "titles": [
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "pages1 held 3/17 mixed",
+  "kind": "mixed",
+  "plan": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 3,
+    "subtraction:sub_facts": 17
+   }
+  },
+  "built": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 3,
+    "subtraction:sub_facts": 17
+   }
+  },
+  "titles": [
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "1 page \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "pages1 held 3/17 sections",
+  "kind": "sections",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 3,
+    "subtraction:sub_facts": 17
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 3,
+    "subtraction:sub_facts": 17
+   }
+  },
+  "titles": [
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "pages1 typed 12 add mixed",
+  "kind": "mixed",
+  "plan": {
+   "pages": 1,
+   "byKey": {
+    "subtraction:sub_facts": 18,
+    "addition:add_facts": 12
+   }
+  },
+  "built": {
+   "pages": 1,
+   "byKey": {
+    "subtraction:sub_facts": 18,
+    "addition:add_facts": 12
+   }
+  },
+  "titles": [
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "1 page \u00b7 30 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "three skills 50% add in 20 mixed",
+  "kind": "mixed",
+  "plan": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 10,
+    "subtraction:sub_facts": 5,
+    "multiplication:mult_facts": 5
+   }
+  },
+  "built": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 10,
+    "subtraction:sub_facts": 5,
+    "multiplication:mult_facts": 5
+   }
+  },
+  "titles": [
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "1 page \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "three skills 50% add in 20 sections",
+  "kind": "sections",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 10,
+    "subtraction:sub_facts": 5,
+    "multiplication:mult_facts": 5
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 10,
+    "subtraction:sub_facts": 5,
+    "multiplication:mult_facts": 5
+   }
+  },
+  "titles": [
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 answer key at the end"
+ },
+ {
+  "label": "ten mixed default",
+  "kind": "mixed",
+  "plan": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 2,
+    "subtraction:sub_facts": 2,
+    "multiplication:mult_facts": 2,
+    "division:div_facts": 2,
+    "multiplication:multiply": 2,
+    "addition:add_within_100": 2,
+    "subtraction:sub_within_100": 2,
+    "addition:add_doubles": 2,
+    "subtraction:sub_within_10": 2,
+    "addition:add_within_10": 2
+   }
+  },
+  "built": {
+   "pages": 1,
+   "byKey": {
+    "addition:add_facts": 2,
+    "subtraction:sub_facts": 2,
+    "multiplication:mult_facts": 2,
+    "division:div_facts": 2,
+    "multiplication:multiply": 2,
+    "addition:add_within_100": 2,
+    "subtraction:sub_within_100": 2,
+    "addition:add_doubles": 2,
+    "subtraction:sub_within_10": 2,
+    "addition:add_within_10": 2
+   }
+  },
+  "titles": [
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "1 page \u00b7 20 problems \u00b7 2 of each \u00b7 2 maths areas \u00b7 every skill at least once"
+ },
+ {
+  "label": "ten sections default",
+  "kind": "sections",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 2,
+    "subtraction:sub_facts": 2,
+    "multiplication:mult_facts": 2,
+    "division:div_facts": 2,
+    "multiplication:multiply": 2,
+    "addition:add_within_100": 2,
+    "subtraction:sub_within_100": 2,
+    "addition:add_doubles": 2,
+    "subtraction:sub_within_10": 2,
+    "addition:add_within_10": 2
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 2,
+    "subtraction:sub_facts": 2,
+    "multiplication:mult_facts": 2,
+    "division:div_facts": 2,
+    "multiplication:multiply": 2,
+    "addition:add_within_100": 2,
+    "subtraction:sub_within_100": 2,
+    "addition:add_doubles": 2,
+    "subtraction:sub_within_10": 2,
+    "addition:add_within_10": 2
+   }
+  },
+  "titles": [
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 2 of each \u00b7 2 maths areas \u00b7 every skill at least once"
+ },
+ {
+  "label": "big add_word_problems+add_facts in 20 mixed",
+  "kind": "mixed",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 10,
+    "addition:add_word_problems": 10
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 10,
+    "addition:add_word_problems": 10
+   }
+  },
+  "titles": [
+   "Mixed practice",
+   "Mixed practice",
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 10 of each \u00b7 answer key at the end"
+ },
+ {
+  "label": "big add_word_problems+add_facts in 20 sections",
+  "kind": "sections",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 10,
+    "addition:add_word_problems": 10
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 10,
+    "addition:add_word_problems": 10
+   }
+  },
+  "titles": [
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 10 of each \u00b7 answer key at the end"
+ },
+ {
+  "label": "big mult_2by2_standard+add_facts in 20 mixed",
+  "kind": "mixed",
+  "plan": {
+   "pages": 2,
+   "byKey": {
+    "addition:add_facts": 10,
+    "multiplication:mult_2by2_standard": 10
+   }
+  },
+  "built": {
+   "pages": 2,
+   "byKey": {
+    "addition:add_facts": 10,
+    "multiplication:mult_2by2_standard": 10
+   }
+  },
+  "titles": [
+   "Mixed practice",
+   "Mixed practice"
+  ],
+  "lineAfterBuild": "2 pages \u00b7 20 problems \u00b7 10 of each \u00b7 answer key at the end"
+ },
+ {
+  "label": "big mult_2by2_standard+add_facts in 20 sections",
+  "kind": "sections",
+  "plan": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 10,
+    "multiplication:mult_2by2_standard": 10
+   }
+  },
+  "built": {
+   "pages": 3,
+   "byKey": {
+    "addition:add_facts": 10,
+    "multiplication:mult_2by2_standard": 10
+   }
+  },
+  "titles": [
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part",
+   "I Can practise each skill in its own part"
+  ],
+  "lineAfterBuild": "3 pages \u00b7 20 problems \u00b7 10 of each \u00b7 answer key at the end"
+ }
+]

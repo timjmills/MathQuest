@@ -67,7 +67,7 @@
 //             + ws-grade-render --template --contact-sheet
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline. The sample is tests/fixtures/precritic/role-sample.json
-//   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows,
+//   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows, -plan-match,
 //             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-pdf-preview (print preview parity + timing),
 //             ws-plain-words --check
 //
@@ -795,6 +795,24 @@ function buildPlan(ctx) {
         if (fs.existsSync(baseS)) plS.push('--baseline', rel(baseS));
         const unpS = sample.filter((k) => !pinnedIds(baseS).has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        // Mixed practice (IMPROVEMENT_PLAN 3.4): the kit's own page checks - M1's one-size-class page (repeats, digits,
+        // ladder, fill, tabs, PG-15) and M2's mixed sizes (arranged, runs, exact counts, two of each, split, H13, fill,
+        // S > M > L on Mixed and Sections, key, alignment). They live beside the role in js/modules/sheet/.
+        if (ctx.role === 'mixed-practice') {
+            for (const [id, file, args, what] of [
+                ['mixed-m2', 'js/modules/sheet/mixed-m2.check.cjs', ['--quick'], 'mixed sizes, exact counts, ladder'],
+                ['mixed-page', 'js/modules/sheet/mixed-page.check.cjs', ['--seeds', '2'], 'one size class: repeats, digits, ladder, fill'],
+                // (§1.7 stop of M2: what the pupil SEES, hard FAILs - runs in problems, row fill, even spread, cross-template
+                // rule alignment, digit size, spare height - on the critics' sets at S / M / L, both looks, 2 seeds)
+                ['mixed-m3', 'js/modules/sheet/mixed-m3.check.cjs', [], 'runs / rows / spread / align / digits / spare, as printed'],
+            ]) {
+                const g = gate(id, `${path.basename(file)} ${args.join(' ')}`.trim(), `Mixed practice: ${what}`, 'browser', id, args);
+                g.file = path.join(ROOT, file);
+                g.missing = fs.existsSync(g.file) ? null : `${file} is not in this tree`;
+                g.script = `${id} check`;   // (its verdict line: "mixed-m2 check: OK")
+                add(g);
+            }
+        }
         // lessons 6-7 merge (2026-10-31, GATE-MISSED): a detailed lesson's Practice link lost a skill's second use and its
         // options, and only ws-teacher-wrm (detailed-lesson cards: link decodes to skills.used, use by use) saw it. The
         // lesson role runs it too (every detailed lesson card), unless --teacher adds it already.
@@ -811,6 +829,8 @@ function buildPlan(ctx) {
         add(gate('teacher-wrm', `ws-teacher-wrm${w.length ? ' ' + w.join(' ') : ''}`, ctx.grade || ctx.lesson ? `White Rose ${[ctx.grade && `grade ${ctx.grade}`, ctx.lesson && `lesson ${ctx.lesson}`].filter(Boolean).join(', ')}` : 'White Rose, every lesson', 'browser', 'ws-teacher-wrm', w, { needFlags: [ctx.grade && 'grade', ctx.lesson && 'lesson'].filter(Boolean) }));
         add(gate('lesson-link-uses', 'ws-lesson-link-uses', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
         add(gate('teacher-flows', 'ws-teacher-flows', 'teacher flows (§2.9)', 'browser', 'ws-teacher-flows', []));
+        // (§1.7 stop of M2, dialog half: the Print sheet's plan === the built pages, titles, per-skill counts, summary line)
+        add(gate('teacher-plan-match', 'ws-teacher-plan-match', 'Print sheet plan = what prints (In sections, Mixed up, big cells)', 'browser', 'ws-teacher-plan-match', []));
         add(gate('teacher-tokens', 'ws-teacher-tokens', 'teacher tokens (§2.8)', 'node', 'ws-teacher-tokens', []));
         // pdf-preview lane 2026-10-31: the full print preview's pages === Chrome's PDF pages, and its timing
         add(gate('pdf-preview', 'ws-pdf-preview', 'full print preview (parity + timing)', 'browser', 'ws-pdf-preview', []));

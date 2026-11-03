@@ -33,17 +33,39 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
  * @param {string} [opts.colsTpl]           a grid-template-columns value other than equal columns (a
  *                                          side-by-side anchor page: [twin | problem] sized to what
  *                                          each holds, RUBRIC H13)
+ * @param {number} [opts.widthPct]        a placed shelf narrower than the frame (percent), centred
  * @param {string} [opts.rowsTpl]           a grid-template-rows value other than equal rows (the
  *                                          Guided page's model row, which carries its worked trace)
  */
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0 } = {}) {
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, trail = null, widthPct = 0, left = false, bottom = false } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     let k = start;
+    // `place` (the mixed packer, sheet/mixed-pack.js): a cell set on the page lattice - its first
+    // column and row and how many it spans (a 2 x 1 box, a 2 x 2 box beside a block of facts).
+    const placed = cells.some((c) => c && typeof c === 'object' && c.place);
     const out = cells.map((c, i) => {
         const item = typeof c === 'string' ? { html: c } : c;
         const lab = unlabelled.includes(i) || item.nolabel ? (item.model ? label('model') : '') : label(labels, k++);
-        return cell(item.html, { label: lab, cls: item.cls || '', style: item.style || '', keyAttr: item.keyAttr || '' });
+        const p = item.place;
+        const at = p ? `grid-column:${p.col} / span ${p.span || 1};grid-row:${p.row || 1} / span ${p.rows || 1};` : '';
+        return cell(item.html, { label: lab, cls: item.cls || '', style: at + (item.style || ''), keyAttr: item.keyAttr || '', ...(item.kind ? { kind: item.kind } : {}) });
     });
+    if (placed) {
+        // PG-15: a placed shelf that stops short ends in ONE unruled area to the frame, every row.
+        // (`trail.row`: the hole under a short last column of a two-row shelf starts on its row)
+        if (trail && trail.col) out.push(`<div class="ws-cell blankrun" style="--from:${trail.col};grid-row:${trail.row || 1} / span ${trail.rows || 1}"></div>`);
+        const r0 = rows || 1;
+        // (`widthPct`: a shelf narrower than the frame, centred - its cells never wider than their
+        // drawing / 0.45, critic r3 P2; additive inline style, old saved pages carry none)
+        // (`left`, the mixed grid's short last row (r4): the shelf starts at the frame's left edge and closes its own right
+        // side; the rest of the row is the ONE unruled trailing area, outside any grid)
+        const wd = widthPct > 0 && widthPct < 100 ? (left
+            ? `width:${Math.round(widthPct * 100) / 100}%;margin-left:0;margin-right:auto;border-right:var(--ws-heavy) solid var(--ws-ink);`
+            : `width:${Math.round(widthPct * 100) / 100}%;margin-left:auto;margin-right:auto;`) : '';
+        // (`bottom`: a grid over a narrower one closes its own last row - r4, the mixed grid's short last row)
+        const bt = bottom ? 'border-bottom:var(--ws-heavy) solid var(--ws-ink);' : '';
+        return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r0},1fr)`};${height ? `height:${height};` : ''}${wd}${bt}">${out.join('')}</div>`;
+    }
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
     const used = cells.length + (spanFirst ? cols - 1 : 0);
     if (used < n) out.push(blankRun((used % cols) + 1));

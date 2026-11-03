@@ -40,7 +40,7 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null, wide = false, trackEm = 0, headEms = null } = {}) {
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null, wide = false, trackEm = 0, headEms = null, partials = null } = {}) {
     // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
     // every one of them sits on the digit tracks with an empty operator track (VA-2).
     const tops = (Array.isArray(a) ? a : [a]).map(String);
@@ -147,6 +147,19 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     // Lessons r2 (VA-4, AK-1): the open answer zone is a REAL row, as tall as the answer strip
     // (12 mm at L, 10 mm at M), so the pupil page and its key - whose answer digits fill that
     // row - share one geometry: the key never redraws the problem higher or its Check lower.
+    // MB-5 (2-digit x 2-digit, standard algorithm): `partials` = {n, vals}: one written row per
+    // multiplier digit for the partial products under the first rule, then the second rule the
+    // pupil adds them under, then the answer row. The pupil page's rows are open writing rows,
+    // each as tall as the answer row; a key (`vals`, one string per row) writes each partial
+    // product right-aligned on the digit tracks, its placeholder zeros included (AK-2).
+    if (partials && partials.n > 0) {
+        for (let r = 0; r < partials.n; r++) {
+            const v = partials.vals ? partials.vals[r] : null;
+            if (v === null || v === undefined) html += `<span class="ansrow ws-prow" aria-hidden="true"></span>`;
+            else { const pv = pad(String(v)); html += J(pv.map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`), () => '<span class="an sep"></span>'); }
+        }
+        html += `<span class="rule ws-rule2"></span>`;
+    }
     if (answer === 'open') html += `<span class="ansrow" aria-hidden="true"></span>`;
     if (answer === 'traced' && ans !== null) { const pa = pad(String(ans)); html += J(pa.map((ch) => `<span class="ws-trace an">${ch === ' ' ? '' : ch}</span>`), (i) => `<span class="ws-trace an sep">${isDigit(pa[i]) ? ',' : ''}</span>`); }
     if (answer === 'solid' && ans !== null) { const pa = pad(String(ans)); html += J(pa.map((ch) => `<span class="an" data-ws-ink="solid" style="font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums">${ch === ' ' ? '' : ch}</span>`), (i) => `<span class="an sep" data-ws-ink="solid">${isDigit(pa[i]) ? ',' : ''}</span>`); }
@@ -199,6 +212,21 @@ function ansDigitsOf(p) {
     const v = p.ans !== undefined ? p.ans : compute(p);
     return v !== null && v !== undefined && /^\d+$/.test(String(v)) ? String(v).length : 0;
 }
+/**
+ * MB-5: the partial-product rows of a multi-digit multiplier (`partials: true` on a x payload):
+ * {n, vals} - n rows (one a multiplier digit), and the partial products a key writes. Paper only:
+ * the screen keeps its typed answer row (the rows are scratch, never graded).
+ */
+export function stackPartials(p, ctx, withVals) {
+    if (!p || !p.partials || !(p.op === '*' || p.op === 'x' || p.op === '\u00d7')) return null;
+    if (ctx && ctx.mode === 'screen') return null;
+    const ops = p.operands || [p.a, p.b];
+    const A = Number(ops[0]); const B = String(ops[1] ?? '').replace(/\D/g, '');
+    if (B.length < 2 || !Number.isFinite(A)) return null;
+    const vals = [...B].reverse().map((d, i) => String(A * Number(d) * 10 ** i));
+    return { n: B.length, vals: withVals ? vals : null };
+}
+
 /** The operand rows above the operator row, and the operator row itself. */
 const topsOf = (p) => { const ops = p.operands || [p.a, p.b]; return ops.length > 2 ? ops.slice(0, -1) : ops[0]; };
 const bottomOf = (p) => { const ops = p.operands || [p.a, p.b]; return ops[ops.length - 1]; };
@@ -435,7 +463,9 @@ register('stack', {
         }
         const tm = touchMode(p);
         const rowsTd = tm ? touchColumns([...(Array.isArray(a) ? a : [a]), b], t, p.op, tm) : null;
+        const parts = stackPartials(p, ctx, ctx.state === 'answered' || ctx.state === 'wrong');
         const drawn = stack(a, b, p.op, {
+            partials: parts,
             T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes, seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t), headEms: headEmsOf(p, ctx, heads, t),
             touch: rowsTd ? { rows: rowsTd, o: touchOpts(ctx.metrics ? ctx.metrics.digitPt : 28, ctx.mode === 'screen' ? 'px' : 'pt', 'solid', ctx.photocopySafe) } : null,
             grey: level === 2 && ctx.state === 'blank',
@@ -447,7 +477,9 @@ register('stack', {
         // Owner ruling 2026-10-24 (VA-10, AX-4): CL-4b is decided PER SECTION. When any stack of the
         // section regroups, the role sets `sectionWriteAbove` on every stack of it, and each one that
         // draws a regroup row is centred too - its position never tells which items regroup.
-        const top = needsRegroup(p, t) || (p.sectionWriteAbove && regroup) ? markWriteAbove(drawn) : drawn;
+        // (a stack with partial-product rows is written BELOW too - its work zone is the rows under
+        // the rule - so it starts at the top of its box like any long procedure, never centred)
+        const top = !parts && (needsRegroup(p, t) || (p.sectionWriteAbove && regroup)) ? markWriteAbove(drawn) : drawn;
         return withCheck ? top + checkRowHtml(p, ctx, key) : top;
     },
     answerKey(p) {
@@ -497,7 +529,8 @@ register('stack', {
         const hMm = (p.heads || ctx.scaffoldLevel >= 2 ? s.headsMm : 0)
             + (regroup ? (p.op === '-' ? s.headroomMm : s.regroupMm) : 0)
             + digitH * (p.operands ? Math.max(2, p.operands.length) : 2) + 3 + s.answerMm
-            + (p.check && isSub(p) ? (ctx.metrics.textPt / 72) * 25.4 * 1.6 + 4 : 0);
+            + (p.check && isSub(p) ? (ctx.metrics.textPt / 72) * 25.4 * 1.6 + 4 : 0)
+            + ((stackPartials(p, ctx) || { n: 0 }).n ? (stackPartials(p, ctx).n * s.answerMm + 3) : 0);
         // TY-24: each thousands separator is a 0.3 em track (commas from 5 digits up).
         const nSep = (stackSeps(p, t) || []).length;
         const sepMm = nSep * SEPARATOR_EM * (ctx.metrics.digitPt / 72) * 25.4;

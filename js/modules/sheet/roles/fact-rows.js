@@ -198,7 +198,10 @@ const factCellHMmSafe = (cols, size) => { try { return factRowsCapacity(cols, si
  * Mix keeps one third of each form: its count is a multiple of 3 where the grid allows.
  */
 function formRows(items, input, ctx, G, labels, forms) {
-    let cols = input.columns && input.columns !== 'auto' ? Math.max(2, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
+    // (owner 2026-11-03: Columns go down to one - an explicit 1 is kept; Auto never picks fewer than 2)
+    const explicit = !!(input.columns && input.columns !== 'auto');
+    const minCols = explicit && Number(input.columns) === 1 ? 1 : 2;
+    let cols = explicit ? Math.max(1, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     const notes = [];
     if (forms.has('long')) {
         const wide = items.some((it) => formOf(it) === 'long' && String(operandsOf(it.q || {})[0] || '').length >= 3);
@@ -211,12 +214,12 @@ function formRows(items, input, ctx, G, labels, forms) {
     // fourth column in. A page whose facts do not fit the rung in 2 columns falls back below.
     const mixPick = forms.size > 1 && !(input.columns && input.columns !== 'auto') ? pickMixRung(items, forms, ctx, Math.min(cols, 4)) : null;
     if (mixPick) ({ cols, pt } = mixPick);
-    for (; !mixPick && cols >= 2; cols--) {
+    for (; !mixPick && cols >= minCols; cols--) {
         const { inner } = cellWidthMm(cols, LIVE_W_MM, ctx.look);
         pt = LADDER_PTS.filter((p) => p <= factDigitPt(cols)).find((p) => formWidthMm(items, forms, p, ctx.size) <= inner) || 0;
         if (pt) break;
     }
-    cols = Math.max(2, cols);
+    cols = Math.max(minCols, cols);
     pt = pt || 16;
     const h = formHeightMm(forms, pt, ctx.size, cols) + (labels === 'tab' ? 2 : 0);
     let rows = Math.max(1, Math.floor((G - SAFETY_H_MM) / h));
@@ -307,7 +310,9 @@ export function factRowsLayout(items, input) {
     if (isAcross(items)) {
         let cols = 3;
         let pt = 24;
-        for (const c of [3, 2]) {
+        // (owner 2026-11-03: an explicit Columns count of 1 or 2 is kept; across facts never go past 3)
+        const ask = input.columns && input.columns !== 'auto' ? Math.max(1, Math.min(3, Number(input.columns) || 3)) : 3;
+        for (const c of ask === 3 ? [3, 2] : ask === 2 ? [2, 1] : [1]) {
             cols = c;
             const { inner } = cellWidthMm(c, LIVE_W_MM, ctx.look);
             pt = [24, 20, 18].find((p) => acrossWidthMm(items, p, ctx.size) <= inner) || 0;
@@ -321,7 +326,7 @@ export function factRowsLayout(items, input) {
             note: `Division facts print across: ${cols} columns x ${rows} rows.` };
     }
     const big = items.some((it) => Number(answerOf(it)) > 99);
-    let cols = input.columns && input.columns !== 'auto' ? Math.max(5, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
+    let cols = input.columns && input.columns !== 'auto' ? Math.max(1, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     let note = '';
     if (big && cols > 8) { cols = 8; note = 'Answers over 99: at most 8 columns (PT-FRW-5).'; }
     // A 3-digit operand (a vertical division fact's dividend: 144 ÷ 12) needs a fourth track: the

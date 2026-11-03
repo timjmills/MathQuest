@@ -439,3 +439,7 @@
    item tab, so it takes no tab spacer above the story - on the page and in the measuring cell alike. */
 .ws-page .ws-grid > .ws-cell[data-ws-cell="word-work"]:has(.mq-wwframes)::before,
 .ws-sheet > .ws-cell.mqt--word-work:has(.mq-wwframes)::before { height: 0 !important; }
+
+/* ---------- Mixed practice M2: a cell's own short instruction (IMPROVEMENT_PLAN 3.3, PT-MIX-5) ----------
+   beside the number tab, at cell-text size, never wider than the cell; the drawing follows under it */
+:is(.ws-page, .ws-sheet) .ws-cell .ws-mixcue { align-self: stretch; flex: none; margin: -2mm 0 1mm calc(var(--ws-tab, 5mm) * 1.5 - 2mm); font-size: var(--ws-text, 13pt); line-height: 1.15; text-align: left; overflow-wrap: anywhere; }

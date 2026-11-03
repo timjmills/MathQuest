@@ -170,6 +170,11 @@ function normaliseRequest(req = {}) {
     }
     return {
         role, size: onePage ? 'S' : size, look, paper, seed, sections, arrangement, arrangementNotes,
+        // (the print dialog's Columns for a mixed page, r4; the sections' own `columns` otherwise)
+        mixColumns: Number.isFinite(Number(req.columns)) && Number(req.columns) > 0 ? clampInt(req.columns, 1, 10, 0) : 0,
+        columnsMode: req.columnsMode,
+        // (owner 2026-11-03: the Mixed up layout - 'rows' A Rows by type (the default), 'grid' B One grid, 'even' C Even grid)
+        mixLayout: ['rows', 'grid', 'even'].includes(req.mixLayout) ? req.mixLayout : 'rows',
         // Mixed practice (owner ruling 2026-10-23): fill the page (default) or stop when the
         // unique facts run out; related facts only when allowed (off by default).
         fill: normaliseFill(req.fill), families: normaliseFamilies(req.families),
@@ -1470,6 +1475,50 @@ function shownLine(value, ink) {
 
 /* ======================================================================= measurement */
 
+/**
+ * The mixed grid's rule pads (r4): the pupil pages laid out in the measuring document; in every grid row, each
+ * computation box (a drawn answer rule under operands with a sign) and how far its first rule sits above the row's
+ * lowest -> {n: {mm, padMm}} (n the box's number, mm the pad to add, padMm its padding-top now), or null.
+ */
+function mixedRulePads(html) {
+    if (typeof globalThis.document === 'undefined' || !globalThis.document.body) return null;
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;
+    const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
+    ensureEngineStyle(document);
+    const host = document.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;left:-12000px;top:0;width:230mm;visibility:hidden;pointer-events:none;';
+    host.innerHTML = html;
+    document.body.appendChild(host);
+    const out = {};
+    try {
+        for (const g of host.querySelectorAll('.ws-page .ws-grid')) {
+            if (g.parentElement.closest('.ws-cell')) continue;
+            const rows = new Map();
+            for (const c of g.children) {
+                if (!c.classList.contains('ws-cell') || c.classList.contains('blankrun')) continue;
+                const tab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter');
+                if (!tab || !/[+\u2212\u00d7\u00f7-]/.test(c.textContent || '')) continue;
+                const rule = [...c.querySelectorAll('.rule, .stack-rule')].filter((e) => !e.closest('.ws-tab,.ws-letter,.ws-mixcue') && e.getBoundingClientRect().width > 0)
+                    .sort((p, q) => p.getBoundingClientRect().top - q.getBoundingClientRect().top)[0];
+                if (!rule) continue;
+                const top = Math.round(c.getBoundingClientRect().top);
+                const y = rule.getBoundingClientRect().top + (parseFloat(getComputedStyle(rule).borderTopWidth) || 0) / 2;
+                if (!rows.has(top)) rows.set(top, []);
+                rows.get(top).push({ n: Number(tab.textContent.replace(/\D/g, '')) || 0, y, pad: parseFloat(getComputedStyle(c).paddingTop) || 0 });
+            }
+            for (const xs of rows.values()) {
+                if (xs.length < 2) continue;
+                const lo = Math.max(...xs.map((x) => x.y));
+                for (const x of xs) if (lo - x.y > 0.2 * PX_PER_MM && x.n) out[x.n] = { mm: Math.round(((lo - x.y) / PX_PER_MM) * 100) / 100, padMm: Math.round((x.pad / PX_PER_MM) * 100) / 100 };
+            }
+        }
+    } finally {
+        host.remove();
+    }
+    return out;
+}
+
 function ensureEngineStyle(doc) {
     if (!doc || doc.querySelector('style[data-mq-sheet-engine-host]')) return;
     const st = doc.createElement('style');
@@ -2445,6 +2494,13 @@ async function buildSheetCore(req = {}) {
         return firstQ.get(key);
     };
     if (n.role === 'lesson') return buildLesson(n, metaOf);
+    // M2: an Independent or More practice sheet of 2+ skills asked for 'mixed' is planned by the
+    // Mixed practice packer, in that role's look and tab ('sections' keeps the practice path).
+    const nSkills = new Set(n.sections.flatMap((s) => s.skills.map((k) => `${k.categoryId}:${k.skillId}`))).size;
+    if (PRACTICE_ROLES.has(n.role) && n.arrangement === 'mixed' && nSkills >= 2 && n.anchors === 'off') {
+        const res = await buildRoleSheet(Object.assign({}, n, { role: 'mixed-practice', mixAs: n.role }), metaOf);
+        return Object.assign(res, { role: n.role });
+    }
     if (!PRACTICE_ROLES.has(n.role)) return buildRoleSheet(n, metaOf);
 
     // DN-31 / DN-34: a section of several skills is GROUPED, never silently mixed - one
@@ -2955,6 +3011,13 @@ async function buildSheetCore(req = {}) {
  * The sheet is built exactly as before; the key pages are then restyled (short) and ordered.
  * Adds `docHtml` (pupil and key pages in print order) and `keyOptions` to the result.
  */
+/**
+ * The Mixed up layouts (req.mixLayout) whose machine checks pass at the end of the last engine round - the print
+ * dialog's feature detection (lead, 2026-11-03). 'rows' (A, the request's default), 'grid' (B) and 'even' (C) are all
+ * green in mixed-m3 and mixed-m2 since r6c (design/status/mixed-m2.md).
+ */
+export const MIX_LAYOUTS = Object.freeze(['rows', 'grid', 'even']);
+
 export async function buildSheet(req = {}) {
     // The DETAILED lesson maker (V22, 2026-10-16): a whole teacher + pupil pack of its own.
     if (req && req.role === 'detailed-lesson') return buildDetailedLesson(req);
@@ -3154,6 +3217,105 @@ function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     return out;
 }
 
+/* ------------------------------------------------- Mixed practice M2: counts and cues */
+
+/** Instructions a computation cell's own sign already says (no cue on a "Solve." page). */
+const MIX_SIGN_KEYS = new Set(['add', 'subtract', 'multiply', 'divide', 'mixed-sign', 'mixed-ops', 'default-solve', 'default-write']);
+
+/**
+ * The library instruction shortened by rule into a cell's cue (IMPROVEMENT_PLAN 3.3, until a skill
+ * has its own `strings.cue`): its first sentence; a trailing "that / which / for / to show ..."
+ * phrase cut off when the words before it still say the task (3+ words); a sentence still over 8
+ * words keeps its first clause (before the comma). Never cut mid-phrase.
+ */
+export function shortCue(text) {
+    let t = String(text || '').trim().split(/(?<=[.!?])\s+/)[0] || '';
+    t = t.replace(/[.!?]+$/, '').trim();
+    const m = /\s(that|which|for|to show|so that|in each|in the|on the)\s/i.exec(t);
+    if (m && t.slice(0, m.index).trim().split(/\s+/).length >= 3) t = t.slice(0, m.index).trim();
+    if (t.split(/\s+/).length > 8 && t.includes(',')) t = t.slice(0, t.indexOf(',')).trim();
+    return t ? `${t}.` : '';
+}
+
+/**
+ * The task line a cell's own drawing asks (critic M2 r1 D6), keyed by template and the payload's
+ * task: one skill deals several tasks (fractions:identify writes a fraction, circles a model,
+ * names a numerator), so the skill's one library line misnames most of its cells.
+ */
+const MIX_TASK_CUES = {
+    'frac-model': (p) => ({
+        write: 'Write the fraction.', pick: 'Circle the model.', shade: 'Shade the model.',
+        sign: 'Write <, > or =.', part: p.part === 'd' ? 'Write the denominator.' : p.part === 'n' ? 'Write the numerator.' : '',
+    })[p.task] || '',
+};
+/** A cue names a task the cell does not ask: "circle" over a cell with no choices. */
+const cueAsksChoice = (t) => /\b(circle|choose|tick)\b/i.test(t);
+const itemHasChoices = (q) => {
+    const p = (q && q.cell && q.cell.payload) || {};
+    return p.task === 'pick' || Array.isArray(p.choices) || Array.isArray(p.options);
+};
+
+/**
+ * THE CUE OF ONE ITEM (critic M2 r1 D6): the item's own task first - its template's task line, or
+ * its own printed instruction (`q.printText`, an imperative without numbers) - and only then the
+ * skill's library line, cut to the clause the cell really asks (a ", or circle ..." clause dropped
+ * over a cell with no choices). Never a cue naming a task the cell does not ask.
+ */
+export function itemCue(it, poolCue) {
+    const q = (it && it.q) || {};
+    if (it && it.cellPrompt) return '';
+    const p = (q.cell && q.cell.payload) || {};
+    const byTask = q.cell && MIX_TASK_CUES[q.cell.template] ? MIX_TASK_CUES[q.cell.template](p) : '';
+    if (byTask) return byTask;
+    const own = typeof q.printText === 'string' && !/\d/.test(q.printText) ? shortCue(q.printText) : '';
+    if (own) return own;
+    let t = String(poolCue || '');
+    if (t && cueAsksChoice(t) && !itemHasChoices(q)) {
+        const parts = t.replace(/[.!?]+$/, '').split(/,?\s+or\s+/i).filter((x) => !cueAsksChoice(x));
+        t = parts.length ? `${parts[0].trim()}.` : '';
+    }
+    return t;
+}
+
+/** Put a cue line at the top of an item's cell (both states: the key is the same drawing). */
+function withCue(it, text) {
+    const r0 = it.render;
+    if (typeof r0 !== 'function' || !text) return it;
+    const esc = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    it.render = (c, o) => `<div class="ws-mixcue">${esc}</div>${r0(c, o)}`;
+    it.cue = text;
+    return it;
+}
+
+/**
+ * The exact counts of a Mixed practice request (the owner's "specified problem distribution"): every
+ * section carries `count` and there are 2+ sections -> {poolId: n} for the role's one-skill pools
+ * (a section of several skills shares its count by weight); else null.
+ */
+function mixedExactCounts(n, pools) {
+    if (n.role !== 'mixed-practice' || n.sections.length < 2 || !n.sections.every((s) => Number(s.count) > 0)) return null;
+    const bySkill = new Map();
+    for (const sec of n.sections) {
+        const sks = sec.skills;
+        const w = sks.map((k) => (Number(k.weight) > 0 ? Number(k.weight) : 1));
+        const W = w.reduce((a, b) => a + b, 0);
+        let left = sec.count;
+        sks.forEach((k, i) => {
+            const c = i === sks.length - 1 ? left : Math.round((sec.count * w[i]) / W);
+            left -= c;
+            const key = `${k.categoryId}:${k.skillId}`;
+            bySkill.set(key, (bySkill.get(key) || 0) + c);
+        });
+    }
+    const out = {};
+    for (const p of pools) {
+        const k = p.skills[0];
+        out[p.id] = bySkill.get(`${k.categoryId}:${k.skillId}`) || 0;
+        bySkill.set(`${k.categoryId}:${k.skillId}`, 0);
+    }
+    return out;
+}
+
 /** Roles whose cells show a finished answer in the skill's own slot (they need `canShow`). */
 const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 
@@ -3214,9 +3376,14 @@ async function buildRoleSheet(n, metaOf) {
         // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
         arrangement: 'sections',
     };
+    // M2: an Independent / More practice sheet planned as a mixed page keeps its role's tab.
+    if (n.mixAs === 'independent') input.mixTabId = n.tabId || `Lesson ${n.lesson || 1}`;
+    else if (n.mixAs === 'more-practice') input.mixTabId = n.tabId || 'Practice 1';
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
     // line is "Solve.", so a cell's "Add." / "Write the time." is not said twice.
     let keepPrompts = false;
+    // M2: a pool's short in-cell instruction (IMPROVEMENT_PLAN 3.3 "a short instruction in each cell")
+    const cueOf = {};
     let mixDigits = 0;
     let mixedCheck = null;
     let mixedRepeats = null;
@@ -3285,6 +3452,7 @@ async function buildRoleSheet(n, metaOf) {
                 : g0;
             const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
             if (keepPrompts) it.stripPrompt = false;
+            if (keepPrompts && cueOf[pool.id]) withCue(it, itemCue(it, cueOf[pool.id]));
             // Error analysis never falls back to an "Answer:" line under the cell: the shown work
             // must sit in the cell's own slot, or the pupil sees two answer places (C1).
             if (needsShow && (pass < 3 || strictShow) && !it.canShow()) return false;
@@ -3406,11 +3574,19 @@ async function buildRoleSheet(n, metaOf) {
     // class (roles/mixed-practice.js `mixedClass`); the probe is dealt again with each cell's own
     // instruction kept and measured, and checked again. Otherwise the page prints in sections and
     // the notes say why.
+    // M2 (IMPROVEMENT_PLAN 3.3): the counts the teacher gave each skill (`sections[i].count`, one
+    // section per skill) print exactly; `pages` asks for that many full pages.
+    const exactCounts = mixedExactCounts(n, pools);
+    const mixPages = Math.max(1, ...n.sections.map((s) => Number(s.pages) || 1));
     if (n.role === 'mixed-practice' && n.arrangement === 'mixed' && pools.length >= 2 && typeof mod.mixedClass === 'function') {
         const first = mod.mixedClass(probe, input);
         let last = first;
         let ok = first.ok;
         let why = first.why;
+        // M1's one-size-class page stays as it was when no count or page count is asked
+        // (owner 2026-11-03: layouts A Rows by type and C Even grid are the M2 engine's; B One grid keeps M1's page)
+        // (A keeps M1's page of ONE size class - every box the same size is one kind of row; C is the M2 engine's)
+        if (ok && (exactCounts || mixPages > 1 || n.mixLayout === 'even')) ok = false;
         if (ok) {
             keepPrompts = true;
             mixDigits = widestTracks(pools.flatMap((p) => probe[p.id]));
@@ -3425,8 +3601,51 @@ async function buildRoleSheet(n, metaOf) {
             } else { keepPrompts = false; mixDigits = 0; }
         }
         if (ok) input.arrangement = 'mixed';
-        else if (why) arrangementNotes.push(why);
-        mixedCheck = { ok, per: (last.per || []).map((x) => ({ id: x.id, name: x.name, k: x.k, h: Math.round(x.h * 10) / 10, own: x.own })) };
+        else {
+            // M2: every 2+ skills mix - boxes of different sizes share the page (sheet/mixed-pack.js);
+            // a cell that does not say its own task gets the skill's instruction, shortened, in it.
+            keepPrompts = true;
+            mixDigits = widestTracks(pools.flatMap((p) => probe[p.id]));
+            pools.forEach((p) => {
+                const its = probe[p.id];
+                const key = composeInstrKeyOf(its, allSkills);
+                const own = MIX_SIGN_KEYS.has(key) || its.every((it) => !!it.cellPrompt);
+                if (!own) cueOf[p.id] = shortCue(composeInstrText(key, its));
+            });
+            pools.forEach((p, pi) => { probe[p.id] = dealPool(p, pi, PROBE); measureMixed(probe[p.id]); input.floors[p.id] = floorOf(probe[p.id]); });
+            input.arrangement = 'mixed';
+            input.mixM2 = true;
+            input.mixLayout = n.mixLayout || 'rows';
+            // (owner addition 2026-11-03: a skill's provider may declare its own Auto count across, `defaultColumns:
+            // {S, M, L}` on the provider or its footprint - read only; absent, the role fits its own count)
+            input.mixDefaultCols = {};
+            pools.forEach((p) => {
+                const s0 = p.skills[0] || {};
+                let pr = null;
+                try { pr = getProvider(s0.categoryId || '', s0.skillId || ''); } catch (e) { pr = null; }
+                const fp = pr && pr.footprint && typeof pr.footprint === 'object' ? pr.footprint : null;
+                const dc = (pr && pr.defaultColumns) || (fp && fp.defaultColumns) || null;
+                if (dc && typeof dc === 'object') input.mixDefaultCols[p.id] = dc;
+            });
+            // (the print dialog's Columns override, r4: req.columns, else the sections' own columns - one count across
+            // for the whole mixed print; absent = Auto, the role picks it and reports it as fits.across)
+            {
+                // (owner 2026-11-03: a count n and a mode - columnsMode 'exact' | 'aim' | 'auto', on the request or a
+                // section; 'smart', 'auto', absent or any non-number count is Auto; a number with no mode is exact)
+                const secAsk = n.sections.find((s) => Number.isFinite(Number(s.columns)) && Number(s.columns) > 0) || {};
+                const cAsk = Number(n.mixColumns) || Number(secAsk.columns) || 0;
+                const modeRaw = String(n.columnsMode || (n.sections.find((s) => s.columnsMode) || {}).columnsMode || '').toLowerCase();
+                const mode = modeRaw === 'aim' ? 'aim' : modeRaw === 'exact' ? 'exact' : (modeRaw && modeRaw !== 'fixed' ? 'auto' : (cAsk ? 'exact' : 'auto'));
+                if (cAsk && mode !== 'auto') { input.mixColumns = Math.max(1, Math.min(10, cAsk)); input.mixColumnsMode = mode; }
+            }
+            if (exactCounts) input.exactCounts = exactCounts;
+            input.mixPages = mixPages;
+            ok = true;
+            last = typeof mod.m2Classes === 'function' ? mod.m2Classes(probe, input) : last;
+            const cls = last.cls || {};
+            last.per = pools.map((p) => ({ id: p.id, name: metaOf(p.skills[0]).label, k: (cls[p.id] || {}).k, h: (cls[p.id] || {}).h || 0, own: !cueOf[p.id] }));
+        }
+        mixedCheck = { ok, m2: !!input.mixM2, per: (last.per || []).map((x) => ({ id: x.id, name: x.name, k: x.k, h: Math.round(x.h * 10) / 10, own: x.own })), cues: Object.assign({}, cueOf) };
     }
 
     // S6: Mixed practice's worked examples, one skill per pool, generated and measured before the
@@ -3454,6 +3673,28 @@ async function buildRoleSheet(n, metaOf) {
         input.anchors = anchorsIn;
     }
 
+    // (the owner's "mix by section, with specified amount of problems": a Sections page prints the
+    // counts asked too, each skill's shelves whole where a count across allows it)
+    if (exactCounts && input.arrangement !== 'mixed' && n.anchors === 'off') input.exactCounts = exactCounts;
+    // R1-7 (LESSONS L1): a Mixed practice page (M2 mixed, or Sections) prints more problems than the
+    // next size up. The same probe is measured at the bigger sizes (copies, so this page's
+    // measurements stand) and their pages worked out from L up, each beating the one above it; the
+    // role then gives the most compact skill more room where the weights alone would not.
+    if (n.role === 'mixed-practice' && pools.length >= 2 && !exactCounts && !n.leadHalf && !anchorsIn && (input.mixM2 || input.arrangement !== 'mixed')) {
+        const chain = { S: ['L', 'M'], M: ['L'], L: [] }[n.size] || [];
+        let must = 0;
+        for (const sz of chain) {
+            const other = {};
+            pools.forEach((p) => {
+                other[p.id] = probe[p.id].map((it) => Object.assign({}, it, { measured: undefined }));
+                measureItems(other[p.id], { size: sz, look: n.look, colsList: [...new Set([...colsList, 7, 8, 9, 10])] });
+            });
+            const c = mod.counts(other, Object.assign({}, input, { ctx: Object.assign({}, input.ctx, { size: sz }), mustBeat: must, mixPages: 1 })) || {};
+            must = Object.values(c).reduce((a, x) => a + (Number(x) || 0), 0);
+        }
+        input.mustBeat = must;
+        if (must && input.mixM2 && typeof mod.m2Counts === 'function') input.ladderNote = mod.m2Counts(probe, input).ladderNote;
+    }
     // 2. How many items the page needs, from the measured probe.
     let want = mod.counts(probe, input) || {};
 
@@ -3519,6 +3760,28 @@ async function buildRoleSheet(n, metaOf) {
         const wEnd = widestTracks(items);
         if (wEnd && wEnd < mixDigits) { mixDigits = wEnd; tracksTried.push(wEnd); items = dealMixed(); }
         mixedTracks = { tried: tracksTried, final: mixDigits, k: input.mixK };
+        // (§1.7, mixed-m3 spare: a filled Mixed up page is planned again with the cells DEALT - their
+        // own heights, not the probe's - and dealt again while that changes the counts (three rounds at most), so the
+        // page the pupil gets is the one the counts were chosen for)
+        if (input.mixM2 && !input.exactCounts && typeof mod.m2Counts === 'function') {
+            const byPoolOf = (its) => { const o = {}; for (const it of its) (o[it.pool] = o[it.pool] || []).push(it); return o; };
+            const own = (its, w) => mod.m2Counts(byPoolOf(its), Object.assign({}, input, { exactCounts: w })).spare;
+            let best = { want, items, spare: own(items, want) };
+            const seen = new Set([JSON.stringify(want)]);
+            for (let round = 0; round < 3; round++) {
+                const want2 = mod.counts(byPoolOf(items), Object.assign({}, input, { mixTotal: pools.reduce((a, p) => a + (Number(want[p.id]) || 0), 0) })) || {};
+                const key2 = JSON.stringify(want2);
+                if (seen.has(key2)) break;
+                seen.add(key2);
+                want = want2;
+                items = dealMixed();
+                const sp = own(items, want);
+                if (sp < best.spare - 1e-6) best = { want, items, spare: sp };
+            }
+            // (the deal whose own page leaves the least blank band)
+            want = best.want;
+            items = best.items;
+        }
         // The page's machine check (critic M1 r3 D1, sheet/interleave.js pageRepeats; owner ruling
         // 2026-10-23): what the page's options do not allow - a repeat or a turnaround with `fill`
         // off, a related fact without `families: 'allow'` - never prints. The deal already keeps
@@ -3613,8 +3876,24 @@ async function buildRoleSheet(n, metaOf) {
         for (const list of bySec.values()) markSectionWriteAbove(list);
     }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
-    const plan = mod.plan(input);
-    const out = renderPlan(plan, { key: n.key });
+    let plan = mod.plan(input);
+    let out = renderPlan(plan, { key: n.key });
+    // (the mixed grid, r4: computation boxes of one row put their first answer rule on one line - a kit fact and a
+    // legacy stack start their drawings at different heights; the page is laid out once, each row's rules read,
+    // and every box padded down to the lowest rule of its row; then planned again with those pads)
+    if (input.mixM2 && input.arrangement === 'mixed') {
+        for (let round = 0; round < 3; round++) {
+            const pads = mixedRulePads(out.pupilHtml);
+            if (!pads || !Object.keys(pads).length) break;
+            // (a fact's pad adds to its own; a legacy box's padding is set outright: padMm + mm)
+            const old = input.rulePads || {};
+            const next = Object.assign({}, old);
+            for (const [k, v] of Object.entries(pads)) { const o = old[k] ? old[k].mm : 0; next[k] = { mm: o + v.mm, padMm: v.padMm - o }; }
+            input.rulePads = next;
+            plan = mod.plan(input);
+            out = renderPlan(plan, { key: n.key });
+        }
+    }
     const fitsList = (plan.meta && plan.meta.fits) || [];
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t)), ...dealNotes];
@@ -3629,7 +3908,11 @@ async function buildRoleSheet(n, metaOf) {
         pageCount: out.pupilPages.length,
         keyPageCount: n.key ? out.keyPages.length : 0,
         numberLine,
-        fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
+        fits: Object.assign({ cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
+            // (a mixed page's count across, r4: the dialog shows "Auto (n)")
+            f0.across ? Object.assign({ across: f0.across, acrossAuto: !!f0.auto, columnsMode: f0.columnsMode || (f0.auto ? 'auto' : 'exact') }, f0.clamped ? { clamped: true, asked: f0.asked } : {}) : {},
+            // (owner 2026-11-03: the Mixed up layout used, and in A each kind's count across)
+            n.role === 'mixed-practice' && input.arrangement === 'mixed' ? Object.assign({ mixLayout: f0.mixLayout || (input.mixM2 ? input.mixLayout || 'rows' : (n.mixLayout === 'rows' ? 'rows' : 'grid')) }, f0.acrossByKind ? { acrossByKind: Object.assign({}, f0.acrossByKind) } : {}) : {}),
         items: items.map((it) => ({
             skill: it.skill, section: 0, pool: it.pool, template: it.template,
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,
