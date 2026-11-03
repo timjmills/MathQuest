@@ -3,7 +3,7 @@ Title: Truly mixed practice pages (M1–M5)
 Session: session_013pHDnLJxJB8jZan3tZDfNS (M2); r4: session_013pHDnNtsn5c7Ap1EHFz9gU
 Branch: claude/sweet-newton-c8wrv1-mixed-m2
 Owner of files (M2): sheet/roles/mixed-practice.js, sheet/mixed-pack.js (new), sheet/interleave.js, sheet/layout.js, sheet/paginate.js; the dialog: teacher-sheet.js, teacher-plan.js, teacher-tray.js, teacher-print.js
-State: STOPPED with a hand-over (2026-11-03, r4) - budget cap; owner's set fixed by sight, gates RED, no critic round run (clean-before-critic)
+State: STOPPED (§1.7, 2026-11-03 r5) - mixed-m2 H13-vs-runs conflict survived r4 + r5 at medium; needs an owner ruling; no critic run (not clean)
 Updated: 2026-11-03
 Builder profile: mq-opus-medium
 Critic rounds: M1 r1–r6 (PASS); M2 print r1, r2, r3 FAIL; M2 dialog check r1 (7/7/7/8), r2 (7/8/6/8), r3 (8/7/6/9) FAIL
@@ -207,3 +207,29 @@ S 20 / M 26 / L 21 a page in centred shelves narrower than the frame (before: `m
   div_facts fact-rows paired row rules.
 - Next: fresh Opus-medium fixer on 5dfc7d2 to clear mixed-m2's regression and the m3 reds (lane lead rules first on
   Columns-4-M fill vs width), then the print critic on owner's set + b, c, d at S/M/L with keys. Expect ~$30 + ~$15.
+
+## r5 (2026-11-03) - fixer on 5dfc7d2; §1.7 STOP
+Owner rulings folded in (via the lead): explicit Columns WINS (big digits, white space allowed); Auto fills >= 85 % of
+the frame on every page but the last; limited problems print from the top, never stretched; Columns modes exact / aim /
+auto (fits.across, columnsMode, clamped, asked); larger cells never 7+ across. Check fix: each grid measured against its
+own frame (In sections bands).
+Engine (d5af7e7, 947fabcc): even pages when the last would hold under half (owner L 20/12/9 -> 16/16/9); LARGE_MAX 6;
+exact prints report the fullest page as perPage. Owner's set S 30+11, M 25+16, L 16/16/9 (`mixed-m2/r5/`).
+GREEN: mixed-m3 full (69 scenarios, 0) and quick; ws-teacher-plan-match; boot-smoke; code-snapshot (731); mixed-page;
+ws-teacher-arrangement; the three new backtest rows (mixed-m4-frame / -shelfw / -fill).
+RED: mixed-m2 --quick 40 (60 at r4, 0 at a151260); precritic --role mixed-practice --strict (mixed-m2 + print-lint
+role rows: 20 single-skill mixed-practice pages unpinned, findings are skill drawings L-FONT / L-KEY); ws-backtest 7
+(6 commit-pair rows need a full clone; dialog-good.pass.json fixture stale, fails 24 "titled" with or without r5).
+ROOT CAUSE (§1.7, the same defect r4 + r5): on fill pages of b / c / d, facts are about 50 mm tall and long procedures
+(2-digit x, word problems) 74-90 mm. A long procedure meets H13 only by standing two rows tall; its taken tracks push
+the facts beside it into runs of about 2 x (C - 2), past mixed-m3's forced minimum. In a page's last row it can't stand
+two rows at all. Every order that keeps the runs leaves an H13 row; every H13-clean order breaks runs, fill or S > M.
+c 5:14 needs a 3-row span. Two attempts reverted (scratchpad attempt-gridfix.patch, design/status/mixed-m2.md r5).
+OWNER RULING NEEDED, one of: (a) a run limit tied to the two-row box when a long procedure is in the mix; (b) rows of
+long procedures only (2-3 across) interleaved by row with fact rows - this is also the deferred per-type counts
+across; (c) H13 gives way on fill pages beside a long procedure.
+Recommendation: (b). It is the owner's "smart" per-type mode, and it removes the conflict instead of excusing it.
+Also open: missing-number wrap at 6 across on S (the measure records a wrapped line as fitting: needs a one-line
+flag, or the skills moved to the kit equation cell); Independent clamp collapse / outlines / parts across pages / row
+stretch (simple-print lane's items) not started; L pages are 4 rows of 4 with tall hollow-looking boxes (16 a page)
+- check against a critic before calling L done.
