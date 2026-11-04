@@ -582,13 +582,12 @@ const selItems = () => (window.skillQueue || []).map((s) => ({ categoryId: s.cat
 export function updateStudentSelBar() {
     if (typeof document === 'undefined') return;
     const n = (window.skillQueue || []).length;
-    for (const id of ['studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) { const b = document.getElementById(id); if (b) b.disabled = n === 0; }
+    for (const id of ['studentSelAddBtn', 'studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) { const b = document.getElementById(id); if (b) b.disabled = n === 0; }
     const c = document.getElementById('studentSelCount');
-    if (c) c.textContent = n === 0 ? 'Pick skills' : `${n} skill${n === 1 ? '' : 's'} selected`;
+    if (c) c.textContent = n === 0 ? 'Pick skills above' : `${n} skill${n === 1 ? '' : 's'} selected`;
     const box = document.getElementById('studentSendBox');
     if (box && !box.hidden) box.hidden = true;   // a link made for an older selection is not kept
-    const bar = document.getElementById('studentSelBar');
-    if (bar) bar.hidden = n === 0;
+    // owner 2026-11-04: no floating bar — the buttons sit in the bottom row next to MAP, always shown (disabled until a pick)
     installSelBarWatch();
     syncSelBarHeight();
     // the queue's heavy UI work is debounced: measure again once the cards have settled

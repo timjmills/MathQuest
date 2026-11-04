@@ -373,3 +373,8 @@ body.student-mode .start-game-container .btn-primary {
 html { scroll-padding-bottom: var(--mq-selbar-h, 0px); }
 html.mq-selbar-on :is(.toast-notification, .mq-notify) { bottom: calc(var(--mq-selbar-h, 0px) + 12px) !important; pointer-events: none !important; }
 html.mq-selbar-on :is(.toast-notification, .mq-notify) :is(button, a) { pointer-events: auto !important; }
+/* owner 2026-11-04: the selection buttons sit in the page next to the MAP buttons (no floating bar) */
+.student-sel-actions { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px 16px; flex-wrap: wrap; margin: 24px 0 0; }
+.student-sel-actions .student-sel-send { justify-content: center; margin: 0 auto; }
+.start-buttons-container #studentSelPrintBtn { min-height: 48px; align-self: center; }
+body:not(.student-mode) .start-buttons-container #studentSelPrintBtn.student-only { display: none; }

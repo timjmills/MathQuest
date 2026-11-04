@@ -481,16 +481,18 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
             W.UnifiedSkills.clear ? W.UnifiedSkills.clear() : W.clearSkillQueue();
             await new Promise((r) => setTimeout(r, 50));
             const btn = (id) => document.getElementById(id);
-            if (!btn('studentSelPrintBtn') || !btn('studentSelPrintBtn').disabled || !btn('studentSelPlayBtn').disabled || !btn('studentSelSendBtn').disabled) F('STUDENTBAR buttons not disabled with nothing selected');
-            // ui3 check D7: with nothing selected the bar is not shown at all (it covered the first Quick Start row)
-            if (btn('studentSelBar') && btn('studentSelBar').getBoundingClientRect().height > 0) F('STUDENTBAR the bar shows with nothing selected');
+            if (['studentSelAddBtn', 'studentSelPrintBtn', 'studentSelPlayBtn', 'studentSelSendBtn'].some((id) => !btn(id) || !btn(id).disabled)) F('STUDENTBAR buttons not disabled with nothing selected');
+            if (!/Pick skills above/.test((btn('studentSelCount') || {}).textContent || '')) F('STUDENTBAR no "Pick skills above" hint with nothing selected');
+            // owner 2026-11-04: no floating bar; no per-skill print button on the pupil Quick Start cards
+            if (btn('studentSelBar')) F('STUDENTBAR the floating bar #studentSelBar is still on the page');
+            W.renderQuickSkillsGrid && W.renderQuickSkillsGrid();
+            await new Promise((r) => setTimeout(r, 200));
+            if (document.querySelectorAll('#quickSkillsGrid .qs-print-btn').length) F('NOPRINT pupil Quick Start cards still carry a print button');
             const want = [['addition', 'add_facts', {}], ['subtraction', 'sub_facts', {}], ['multiplication', 'mult_facts', { constant: [6, 7] }]];
             for (const [c, k, o] of want) W.UnifiedSkills.add({ categoryId: c, skillId: k, skillLabel: k, opts: o });
             await new Promise((r) => setTimeout(r, 300));
             if (btn('studentSelPrintBtn').disabled) F('STUDENTBAR Print still disabled with 3 selected');
-            const bar = btn('studentSelBar').getBoundingClientRect();
-            for (const id of ['studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) { const r = btn(id).getBoundingClientRect(); if (r.width < 44 || r.height < 44) F(`STUDENTBAR ${id} ${Math.round(r.width)}x${Math.round(r.height)} < 44`); }
-            if (!bar.height) F('STUDENTBAR bar not visible');
+            for (const id of ['studentSelAddBtn', 'studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) { const r = btn(id).getBoundingClientRect(); if (r.width < 44 || r.height < 44) F(`STUDENTBAR ${id} ${Math.round(r.width)}x${Math.round(r.height)} < 44`); }
             const keys = want.map((x) => x[0] + ':' + x[1]).sort().join(',');
             // Print
             btn('studentSelPrintBtn').click();
@@ -507,6 +509,16 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
             const mp = parts.find((x) => x.skillId === 'mult_facts');
             if (!mp || !mp.opts || JSON.stringify(mp.opts.constant) !== '[6,7]') F(`STUDENTBAR Send drops the options: ${JSON.stringify(mp)}`);
             if (btn('studentSendBox').hidden || btn('studentSendLink').value !== link) F('STUDENTBAR Send link not shown');
+            // Add to Quick Start: 3 cards, with their options, no duplicates on a second press
+            const qsWas = JSON.stringify(W.customQuickSkills);
+            W.customQuickSkills.splice(0, W.customQuickSkills.length);
+            btn('studentSelAddBtn').click(); btn('studentSelAddBtn').click();
+            const qk = W.customQuickSkills.map((x) => x.categoryId + ':' + x.skillId).sort().join(',');
+            if (qk !== keys) F(`STUDENTBAR Add to Quick Start made ${qk}`);
+            const qm = W.customQuickSkills.find((x) => x.skillId === 'mult_facts');
+            if (!qm || JSON.stringify(qm.opts) !== JSON.stringify({ constant: [6, 7] })) F('STUDENTBAR Add to Quick Start drops the options');
+            W.customQuickSkills.splice(0, W.customQuickSkills.length, ...JSON.parse(qsWas));
+            W.saveQuickSkills && W.saveQuickSkills(); W.renderQuickSkillsGrid && W.renderQuickSkillsGrid();
             // Play
             W.playStudentSelection();
             await new Promise((r) => setTimeout(r, 400));
@@ -615,44 +627,38 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                 await new Promise((r) => setTimeout(r, 300));
                 window.scrollTo(0, 0);
                 await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-                const bar = document.getElementById('studentSelBar');
-                const bh = Math.round(bar.getBoundingClientRect().height);
+                // PLACE: Print sits in the MAP row, beside a MAP button; Add / Play / Send right above it; all >= 44 and on screen width
+                const pr = document.getElementById('studentSelPrintBtn');
+                const row = document.querySelector('.start-buttons-container');
+                const map = row && row.querySelector('.map-launch-btn');
+                if (!row || !row.contains(pr)) out.push('PLACE Print is not in the MAP button row');
+                else { const a = pr.getBoundingClientRect(), m = map.getBoundingClientRect(); if (a.bottom < m.top - 60 || a.top > m.bottom + 60) out.push('PLACE Print is not beside the MAP buttons'); }
+                const acts = document.getElementById('studentSelActions');
+                if (!acts || acts.compareDocumentPosition(row) !== Node.DOCUMENT_POSITION_FOLLOWING) out.push('PLACE Add / Play / Send are not right above the MAP row');
+                for (const id of ['studentSelAddBtn', 'studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) {
+                    const r = document.getElementById(id).getBoundingClientRect();
+                    if (r.width < 44 || r.height < 44 || r.right > window.innerWidth + 1 || r.left < -1) out.push(`PLACE ${id} ${Math.round(r.width)}x${Math.round(r.height)} at ${Math.round(r.left)}`);
+                }
+                if (document.documentElement.scrollWidth > window.innerWidth + 1) out.push('PLACE the page scrolls sideways');
+                // TOAST: a toast never covers the buttons once scrolled to them
+                acts.scrollIntoView({ block: 'center' });
                 if (W.showNotification) W.showNotification('Added Addition Facts', 'success');
-                if (W.showToast) W.showToast('Added Division Facts', 'success');
                 await new Promise((r) => setTimeout(r, 400));
-                for (const id of ['studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) {
+                for (const id of ['studentSelAddBtn', 'studentSelPlayBtn', 'studentSelSendBtn']) {
                     const b = document.getElementById(id), r = b.getBoundingClientRect();
                     const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
                     if (!hit || !b.contains(hit)) out.push(`TOAST ${id} is covered by ${hit ? (hit.className || hit.tagName) : 'nothing'}`);
                 }
                 document.querySelectorAll('.toast-notification, .mq-notify').forEach((x) => x.remove());
-                // FOCUS: focusables in homeView, focused one by one, end clear of the bar
-                await new Promise((r) => setTimeout(r, 100));
-                const spad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingBottom) || 0;
-                const brNow = bar.getBoundingClientRect();
-                const cover = brNow.bottom >= window.innerHeight - 2 ? Math.round(window.innerHeight - brNow.top) : 0;
-                if (Math.abs(spad - cover) > 4) out.push(`FOCUS scroll-padding-bottom ${spad}px, the bar covers ${cover}px (top ${Math.round(brNow.top)}, bottom ${Math.round(brNow.bottom)}, ${window.innerHeight}, scrollY ${Math.round(scrollY)})`);
-                const els = [...document.querySelectorAll('#homeView button, #homeView select, #homeView input, #homeView a[href]')].filter((x) => x.offsetParent !== null && !bar.contains(x) && !x.disabled).slice(0, 80);
-                const under = [];
-                for (const x of els) {
-                    x.focus();
-                    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-                    const r = x.getBoundingClientRect(), br = bar.getBoundingClientRect();
-                    if (br.height && br.bottom >= window.innerHeight - 2 && r.bottom > br.top + 2 && r.top < br.bottom) under.push(x.id || String(x.className).slice(0, 30) || x.tagName);
-                }
-                if (under.length) out.push(`FOCUS ${under.length} focused controls under the bar (${under.slice(0, 3).join(', ')})`);
-                if (document.activeElement) document.activeElement.blur();
-                window.scrollTo(0, 0);
-                await new Promise((r) => setTimeout(r, 100));
-                // BAR: Send pop-up
+                const bh = Math.round(acts.getBoundingClientRect().height);
+                // BAR: Send shows the link (Esc closes it)
                 document.getElementById('studentSelSendBtn').click();
                 await new Promise((r) => setTimeout(r, 200));
                 const box = document.getElementById('studentSendBox');
-                const top = Math.min(bar.getBoundingClientRect().top, box.getBoundingClientRect().top);
-                const share = (window.innerHeight - top) / window.innerHeight;
+                const share = 0;
                 if (box.hidden) out.push('BAR Send shows no link');
-                if (bar.getBoundingClientRect().height > bh + 2) out.push(`BAR Send makes the bar taller (${bh} → ${Math.round(bar.getBoundingClientRect().height)} px)`);
-                if (window.innerWidth <= 420 && share > 0.25) out.push(`BAR bar + link take ${Math.round(share * 100)} % of the screen (> 25 %)`);
+                const bx = box.getBoundingClientRect();
+                if (bx.right > window.innerWidth + 1) out.push('BAR the Send link runs off the screen');
                 const link = document.getElementById('studentSendLink').value;
                 return { out, link, bh, share: Math.round(share * 100) };
             });
@@ -660,7 +666,7 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
             await page.keyboard.press('Escape');
             await new Promise((r) => setTimeout(r, 100));
             if (!(await page.evaluate(() => document.getElementById('studentSendBox').hidden))) F2(`BAR @${w} Esc does not close the Send link`);
-            rows.push(`BAR @${w}: ${t.bh}px, with the link ${t.share} % of the screen`);
+            rows.push(`ACTIONS @${w}: ${t.bh}px tall, Print beside MAP`);
             if (w === 390) {
                 if (!/[?&]from=pupil\b/.test(t.link)) F2(`PUPIL the pupil's Send link has no from=pupil (${t.link})`);
                 // open the pupil's link here, then the same link as a teacher sends it

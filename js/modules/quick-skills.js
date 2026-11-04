@@ -228,7 +228,8 @@ function _renderQuickSkillsGridNow() {
         const gradeBadge = gradeColor ? `<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:${gradeColor.bg};color:${gradeColor.text};font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);z-index:5;">${grade}</span>` : '';
         const source = skill.source || 'teacher';
         // owner 2026-11-03: every Quick Start card prints (pupils too); the print loads on the press only
-        const printBtn = `<button type="button" class="qs-print-btn" onclick="event.stopPropagation(); printQuickSkill(${index})" aria-label="Print ${escHTML(baseName.replace(/<[^>]*>/g, ''))}" title="Print">${QS_PRINT_ICON}</button>`;
+        // owner 2026-11-04: no per-skill print on the pupil home (Print sits with the selection buttons by MAP)
+        const printBtn = isStudentMode ? '' : `<button type="button" class="qs-print-btn" onclick="event.stopPropagation(); printQuickSkill(${index})" aria-label="Print ${escHTML(baseName.replace(/<[^>]*>/g, ''))}" title="Print">${QS_PRINT_ICON}</button>`;
         // Default skills use pastel colors; added skills (teacher/link/student) get blue tint
         const colorClass = source === 'default'
             ? (skill.color || PASTEL_COLORS[index % PASTEL_COLORS.length])
@@ -454,6 +455,29 @@ export function addToQuickSkills(categoryId, skillId, skillLabel, categoryIcon, 
     const searchResults = document.getElementById('quickSkillSearchResults');
     if (searchInput) searchInput.value = '';
     if (searchResults) searchResults.style.display = 'none';
+}
+
+/** owner 2026-11-04: Add to Quick Start — every selected skill (with its options) becomes a Quick Start card; no duplicates. */
+export function addSelectionToQuickStart() {
+    const sel = window.skillQueue || [];
+    if (!sel.length) return 0;
+    let added = 0, full = false;
+    for (const q of sel) {
+        const card = (window.customQuickSkills || []).find(s => s.skillId === q.skillId && s.categoryId === q.categoryId);
+        const opts = q.opts && Object.keys(q.opts).length ? JSON.parse(JSON.stringify(q.opts)) : undefined;
+        if (card) { if (opts) card.opts = opts; continue; }
+        if (window.customQuickSkills.length >= 16) { full = true; break; }
+        const label = q.skillLabel || q.skillId;
+        const entry = { categoryId: q.categoryId, skillId: q.skillId, skillLabel: label, categoryIcon: q.categoryIcon || '', categoryName: q.categoryName || q.categoryId,
+            shortName: label.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 12), color: PASTEL_COLORS[window.customQuickSkills.length % PASTEL_COLORS.length], source: 'student' };
+        if (opts) entry.opts = opts;
+        window.customQuickSkills.push(entry);
+        added++;
+    }
+    saveQuickSkills();
+    renderQuickSkillsGrid();
+    showNotification(full ? 'Quick Start is full (max 16). Remove some first.' : added ? `Added ${added} to Quick Start` : 'Already in Quick Start!', full ? 'error' : added ? 'success' : 'info');
+    return added;
 }
 
 export function resetQuickSkillsToDefault() {

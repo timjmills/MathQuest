@@ -32,7 +32,7 @@ import { buildSkillIndex, getSkillIndex, handleSkillSearch, selectSkillFromSearc
 // Layer 3: Skill Management
 import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue, updateStudentSelBar, playStudentSelection, sendStudentSelection, copyStudentSendLink, printStudentSelection, closeStudentSend, syncSelBarHeight } from './modules/unified-skills.js';
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType, parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions } from './modules/skill-codes.js';
-import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill } from './modules/quick-skills.js';
+import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill, addSelectionToQuickStart } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
 import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot, renderAdaptiveLevelChip, setAdaptiveModeEnabled, refreshAdaptiveUI } from './modules/adaptive-engine.js';
 import { selectMode, startMode } from "./modules/mode-selection.js";
@@ -241,7 +241,7 @@ Object.assign(window, {
     removeQuickSkill, removeStudentQuickSkill, addToQuickSkills,
     resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults,
     toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility,
-    toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill,
+    toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill, addSelectionToQuickStart,
 
     // Grade-Level Batch Assign Chips (research Feature 2)
     initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips,
