@@ -16,6 +16,8 @@
 //   NOT3     no default print is ever 3 or fewer problems a page (the reported bug)
 //   FOOTER   the teacher footer names the skills in words, never a raw id (lead, 2026-11-03)
 //   TARGETS  every dialog control and Quick Start Print button >= 44 x 44 at 1366 / 820 / 390 (critic r1 D7)
+//   LARGER   the Larger preview pane: page 1 at once, later pages mount only when scrolled near; Esc order
+//   HOVERZOOM the hover zoom is >= 80 % of the viewport height at 1366x768 and hides on leave / Esc
 //   SUMMARY  the summary's "n a page" / "n on page 1" is what page 1 holds (critic r1 D5, D9)
 //
 //   node tests/scripts/ws-simple-print.cjs              the gate (prints ws-simple-print: OK / FAIL)
@@ -685,6 +687,106 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
         }
         await page.evaluate(() => { window.clearSkillQueue && window.clearSkillQueue(); });
         rows.push('UI3 checked');
+
+        // LARGER / HOVERZOOM (owner 2026-11-05): the Larger preview pane mounts pages as they scroll near; the hover zoom
+        // shows a very large page beside the pointer. --shots writes design/status/sp-preview/*.png
+        {
+            const SH = has('shots') ? require('path').join(__dirname, '../../design/status/sp-preview') : '';
+            if (SH) require('fs').mkdirSync(SH, { recursive: true });
+            const L = (t) => fails.push('LARGER ' + t);
+            const settle = (ms) => new Promise((r) => setTimeout(r, ms));
+            for (const w of [1366, 390]) {
+                const vh = w === 1366 ? 768 : 844;
+                await page.setViewport({ width: w, height: vh, deviceScaleFactor: 1 });
+                await page.evaluate(async () => {
+                    window.closeSimplePrint && window.closeSimplePrint();
+                    window.openSimplePrint([{ categoryId: 'addition', skillId: 'add_two_digit' }, { categoryId: 'subtraction', skillId: 'missing_add_sub' }], { from: 'tray' });
+                    const r = document.getElementById('spRoot');
+                    const pg = r.querySelector('[data-sp="how"][data-v="pages"]'); if (pg && pg.getAttribute('aria-checked') !== 'true') pg.click();
+                    await new Promise((x) => setTimeout(x, 50));
+                    const n = document.getElementById('spN'); n.value = '4'; n.dispatchEvent(new Event('input', { bubbles: true }));
+                    const k = r.querySelector('[data-sp="key"][data-v="true"]'); if (k && k.getAttribute('aria-checked') !== 'true') k.click();
+                });
+                await page.waitForFunction(async () => { const m = await import('/js/modules/simple-print.js'); const s = m.simplePrintState(); return s && !s.busy && s.built && s.built.pages >= 3; }, { timeout: 30000 }).catch(() => {});
+                await settle(800);
+                if (SH && w === 1366) await page.screenshot({ path: SH + '/normal-1366.png' });
+                const btn = await page.evaluate(() => { const b = document.querySelector('#spRoot .sp-larger'); if (!b) return null; const r = b.getBoundingClientRect(); return { w: r.width, h: r.height }; });
+                if (!btn) { L(`@${w} no Larger preview control`); continue; }
+                if (btn.w < 44 || btn.h < 44) L(`@${w} Larger preview ${Math.round(btn.w)}x${Math.round(btn.h)} < 44`);
+                await page.click('#spRoot .sp-larger');
+                await settle(600);
+                const a = await page.evaluate(() => {
+                    const r = document.getElementById('spRoot'), sc = r.querySelector('.sp-lg-scroll');
+                    const caps = [...r.querySelectorAll('.sp-lg-page figcaption')].map((x) => x.textContent);
+                    const small = r.querySelector('[data-sp="smaller"]').getBoundingClientRect();
+                    const pane = r.querySelector('.sp-large').getBoundingClientRect();
+                    return { slots: caps.length, frames: sc.querySelectorAll('iframe').length, cap0: caps[0] || '', div: !!r.querySelector('.sp-lg-div'), small: [small.width, small.height], over: pane.right > window.innerWidth + 1 || pane.left < -1 || document.documentElement.scrollWidth > window.innerWidth + 1 || sc.scrollWidth > sc.clientWidth + 1, focusIn: r.querySelector('.sp-large').contains(document.activeElement) };
+                });
+                rows.push(`LARGER @${w}: ${a.slots} pages, ${a.frames} mounted at open`);
+                if (a.slots < 4) L(`@${w} only ${a.slots} pages in the pane`);
+                if (!/^Page 1 of \d+/.test(a.cap0)) L(`@${w} caption "${a.cap0}"`);
+                if (!a.div) L(`@${w} no answer-key divider`);
+                if (a.frames < 1) L(`@${w} page 1 not shown at once`);
+                if (a.frames >= a.slots) L(`@${w} every page mounted at open (${a.frames}/${a.slots}): not lazy`);
+                if (a.small[0] < 44 || a.small[1] < 44) L(`@${w} Smaller ${a.small.map(Math.round).join('x')} < 44`);
+                if (a.over) L(`@${w} the pane overflows sideways`);
+                if (!a.focusIn) L(`@${w} focus is not in the pane`);
+                await settle(700);
+                await page.mouse.move(5, 5);
+                if (SH) await page.screenshot({ path: SH + `/larger-${w}.png` });
+                // keyboard scroll: End reaches the last page, which then mounts
+                await page.keyboard.press('End');
+                await settle(900);
+                const b = await page.evaluate(() => { const sc = document.querySelector('#spRoot .sp-lg-scroll'); return { top: sc.scrollTop, frames: sc.querySelectorAll('iframe').length, last: !!sc.querySelector('.sp-lg-page:last-child iframe') }; });
+                if (!(b.top > 0)) L(`@${w} End did not scroll the pages`);
+                if (!(b.frames > a.frames) || !b.last) L(`@${w} later pages did not mount after scrolling (${a.frames} -> ${b.frames})`);
+                rows.push(`LARGER @${w}: ${b.frames} mounted after scrolling to the end`);
+                if (w === 1366) {
+                    // HOVERZOOM on a page in the pane and on the thumbnail
+                    const box = await page.evaluate(() => { const all = document.querySelectorAll('#spRoot .sp-lg-sheet'); if (!all.length) return { x: 0, y: 0, none: (document.querySelector('#spRoot .sp-large') || {}).innerHTML || 'no pane' }; const s = all[all.length - 1].getBoundingClientRect(); return { x: s.left + s.width * 0.3, y: s.top + Math.min(s.height, window.innerHeight - s.top) / 2 }; });
+                    if (box.none) L('HOVERZOOM no pages in the pane after scrolling: ' + String(box.none).slice(0, 200));
+                    await page.mouse.move(box.x, box.y);
+                    await settle(900);
+                    const z = await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); if (!z || z.hidden) return null; const r = z.getBoundingClientRect(); return { h: r.height, l: r.left, r: r.right, frame: !!z.querySelector('iframe') }; });
+                    if (!z) L('HOVERZOOM no zoom on hovering a page');
+                    else {
+                        if (z.h < 0.8 * vh) L(`HOVERZOOM ${Math.round(z.h)} px < 80 % of ${vh}`);
+                        if (!(z.l > box.x || z.r < box.x)) L(`HOVERZOOM the zoom sits under the pointer (${Math.round(z.l)}-${Math.round(z.r)} vs ${Math.round(box.x)})`);
+                        rows.push(`HOVERZOOM @1366: ${Math.round(z.h)} px tall (${Math.round(z.h / vh * 100)} % of the viewport)`);
+                    }
+                    if (SH) await page.screenshot({ path: SH + '/hoverzoom-1366.png' });
+                    await page.mouse.move(5, 5);
+                    await settle(200);
+                    if (await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); return z && !z.hidden; })) L('HOVERZOOM does not hide on leave');
+                    // Esc order: zoom, then the pane, then the dialog
+                    await page.mouse.move(box.x, box.y);
+                    await settle(300);
+                    await page.keyboard.press('Escape');
+                    const e1 = await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); return { zoom: !!(z && !z.hidden), large: !!document.querySelector('#spRoot .sp-large') }; });
+                    if (e1.zoom) L('ESC Esc does not hide the zoom');
+                    if (!e1.large) L('ESC the first Esc (zoom showing) closed the pane too');
+                    await page.mouse.move(5, 5);
+                }
+                await page.keyboard.press('Escape');
+                await settle(150);
+                const e2 = await page.evaluate(async () => ({ large: !!document.querySelector('#spRoot .sp-large'), open: !!(await import('/js/modules/simple-print.js')).simplePrintState(), focus: document.activeElement && document.activeElement.classList.contains('sp-larger') }));
+                if (e2.large) L(`ESC @${w} Esc does not close the pane (focus ${await page.evaluate(() => { const a = document.activeElement; return a ? a.tagName + '.' + a.className : '-'; })})`);
+                if (!e2.open) L(`ESC @${w} Esc in the pane closed the whole dialog`);
+                if (!e2.focus) L(`ESC @${w} focus does not return to Larger preview`);
+                if (w === 1366) {
+                    const t = await page.evaluate(() => { const th = document.querySelector('#spRoot .sp-thumb'); if (!th) return { x: 5, y: 5 }; const s = th.getBoundingClientRect(); return { x: s.left + s.width / 2, y: s.top + s.height / 2 }; });
+                    await page.mouse.move(t.x, t.y);
+                    await settle(900);
+                    const z = await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); return z && !z.hidden ? z.getBoundingClientRect().height : 0; });
+                    if (z < 0.8 * vh) L(`HOVERZOOM the thumbnail zoom is ${Math.round(z)} px`);
+                    await page.mouse.move(5, 5);
+                    await settle(100);
+                }
+                await page.keyboard.press('Escape');
+                await settle(100);
+                if (await page.evaluate(async () => !!(await import('/js/modules/simple-print.js')).simplePrintState())) L(`ESC @${w} the next Esc does not close the dialog`);
+            }
+        }
 
     }
     console.log(rows.join('\n'));

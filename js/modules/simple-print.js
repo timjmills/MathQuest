@@ -737,6 +737,7 @@ export function closeSimplePrint() {
     qpMenu = null; qpRename = null;
     if (!S) return;
     savePrefs();
+    if (S.lgObs) S.lgObs.disconnect();
     if (S.root) S.root.remove();
     document.removeEventListener('keydown', onKey, true);
     document.body.classList.remove('sp-open');
@@ -767,6 +768,12 @@ function mount() {
     root.addEventListener('pointerdown', () => { if (S) S.popAtPress = !!document.getElementById('skillOptionsPopover'); }, true);
     root.addEventListener('focusout', (e) => { if (S && qpRename && e.target.dataset && e.target.dataset.qpRename !== undefined) quickRenameKey({ type: 'blur', target: e.target }, render); });
     document.addEventListener('keydown', onKey, true);
+    // hover zoom (owner 2026-11-05): a very large page beside the pointer, mouse and trackpad only
+    {
+        root.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse' || !S || !S.zoomOn) return; const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && root.contains(t)) showZoom(Number(t.dataset.zpage), e.clientX); });
+        root.addEventListener('pointerover', (e) => { if (e.pointerType !== 'mouse') return; if (window.innerWidth < 700) return; const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && root.contains(t)) showZoom(Number(t.dataset.zpage), e.clientX); });
+        root.addEventListener('pointerout', (e) => { const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && !(e.relatedTarget && t.contains(e.relatedTarget))) hideZoom(); });
+    }
     S.root = root;
 }
 
@@ -875,7 +882,8 @@ function render() {
     h += `<section class="sp-sum" aria-live="polite"><p class="sp-line" id="spLine">${esc(line)}</p>`;
     if (b && b.notes && b.notes.length && !S.busy) h += `<p class="sp-note">${esc(b.notes.join(' '))}</p>`;
     if (arr === 'facts') h += `<p class="sp-note">Fast facts in fact rows: every page is full.</p>`;
-    h += `<div class="sp-thumb"><iframe id="spFrame" title="Page 1 preview" tabindex="-1" aria-hidden="true"></iframe></div></section>`;
+    h += `<div class="sp-thumb" data-sp="larger" data-zpage="0"><iframe id="spFrame" title="Page 1 preview" tabindex="-1" aria-hidden="true"></iframe></div>`;
+    h += `<button type="button" class="sp-larger" data-sp="larger" aria-expanded="${!!S.large}">Larger preview</button></section>`;
 
     // More options
     h += `<details class="sp-more"${S.moreOpen ? ' open' : ''}><summary data-sp="more">More options</summary><div class="sp-more-body">`;
@@ -932,8 +940,10 @@ async function run() {
     S.busy = false;
     S.error = !b;
     S.built = b;
+    S.split = null;
     if (b && P.cols === 'auto' && b.cols) S.probes[P.size] = colsLabel(b);
     render();
+    if (S.large) drawLarge();
     probeSizes(my);
 }
 const colsLabel = (b) => { const cl = [...new Set(b.colsList && b.colsList.length ? b.colsList : [b.cols])].filter(Boolean); return cl.length > 1 ? `${Math.min(...cl)}–${Math.max(...cl)}` : String(cl[0] || b.cols); };
@@ -1029,6 +1039,8 @@ function onClick(e) {
     if (quickAct(act, v, render)) return;
     if (act === 'newnums') { S.seed = 100000 + Math.floor(Math.random() * 900000); schedule(0); return; }
     if (act === 'full') { const more = S.ctx.more; closeSimplePrint(); more(); return; }
+    if (act === 'larger') { openLarge(); return; }
+    if (act === 'smaller') { closeLarge(); return; }
     if (act === 'print') { doPrint(); return; }
     if (act === 'preview') { doPreview(e); return; }
 }
@@ -1072,12 +1084,25 @@ function onKey(e) {
     if (!S) return;
     if (S.root.contains(e.target) && quickRenameKey(e, render)) return;
     if (e.key === 'Escape' && qpMenu) { e.preventDefault(); e.stopPropagation(); qpMenu = null; render(); return; }
+    if (e.key === 'Escape' && S.zoomOn) { e.preventDefault(); e.stopPropagation(); hideZoom(); return; }
+    if (e.key === 'Escape' && S.large && !(document.getElementById('tvPdfPreview') && !document.getElementById('tvPdfPreview').hidden)) { e.preventDefault(); e.stopPropagation(); closeLarge(); return; }
+    if (S.large && /^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End)$/.test(e.key) && !/^(INPUT|SELECT|TEXTAREA)$/.test((e.target && e.target.tagName) || '')) {
+        const sc = S.root.querySelector('.sp-lg-scroll');
+        if (sc) {
+            e.preventDefault();
+            const step = /Page/.test(e.key) ? sc.clientHeight * 0.9 : 80;
+            const top = e.key === 'Home' ? 0 : e.key === 'End' ? sc.scrollHeight : sc.scrollTop + (/Down/.test(e.key) ? step : -step);
+            sc.scrollTo({ top });
+        }
+        return;
+    }
     if (e.key === 'Escape') {
         if (document.getElementById('tvPdfPreview') && !document.getElementById('tvPdfPreview').hidden) return;
         e.preventDefault(); e.stopPropagation(); closeSimplePrint(); return;
     }
     if (e.key === 'Tab') {
-        const f = [...S.root.querySelectorAll('button, input, select, summary')].filter((x) => !x.disabled && x.offsetParent !== null);
+        const scope = (S.large && S.root.querySelector('.sp-large')) || S.root;
+        const f = [...scope.querySelectorAll('button, input, select, summary, [tabindex="0"]')].filter((x) => !x.disabled && x.offsetParent !== null);
         if (!f.length) return;
         const i = f.indexOf(document.activeElement);
         if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
@@ -1115,7 +1140,117 @@ function doPreview(e) {
     });
 }
 
+/* ============================================ larger preview and hover zoom (owner 2026-11-05) */
+
+/** The one built document split into single pages (pupil, then key), each a printable page document's body. */
+function pagesOf() {
+    if (!S || !S.built) return [];
+    if (S.split) return S.split;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = S.built.doc || S.built.firstHtml || '';
+    const styles = [...tpl.content.querySelectorAll('style')].filter((x) => !x.closest('.ws-page')).map((x) => x.outerHTML).join('');
+    const pages = [...tpl.content.querySelectorAll('.ws-page')];
+    let keySeen = false;
+    S.split = pages.map((pg) => {
+        keySeen = keySeen || /Answer Key/i.test(pg.textContent || '');
+        // keep the page's wrappers (their classes carry the sheet's look), without the other pages
+        let html = pg.outerHTML;
+        for (let a = pg.parentElement; a; a = a.parentElement) { const c = a.cloneNode(false); c.innerHTML = '\u0001'; html = c.outerHTML.replace('\u0001', html); }
+        return { html: styles + html, key: keySeen };
+    });
+    return S.split;
+}
+const PAGE_EXTRA = '<style>html,body{background:#fff!important;margin:0!important;padding:0!important;overflow:hidden!important}.ws-page{margin:0!important;outline:0!important;box-shadow:none!important}</style>';
+function pageDoc(i) {
+    const p = pagesOf()[i];
+    if (!p) return '';
+    return sheetDocument(p.html, 'Preview', { paper: 'A4' }).replace('</head>', PAGE_EXTRA + '</head>');
+}
+function mountFrame(slot, i, title) {
+    if (!slot || slot.querySelector('iframe')) return;
+    const f = document.createElement('iframe');
+    f.title = title; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+    f.srcdoc = pageDoc(i);
+    slot.appendChild(f);
+}
+function openLarge() {
+    if (!S) return;
+    S.large = true;
+    S.root.classList.add('sp-is-large');
+    hideZoom();
+    drawLarge();
+    const sc = S.root.querySelector('.sp-lg-scroll');
+    if (sc) try { sc.focus({ preventScroll: true }); } catch (e) { /* */ }
+}
+function closeLarge() {
+    if (!S) return;
+    S.large = false;
+    hideZoom();
+    if (S.lgObs) { S.lgObs.disconnect(); S.lgObs = null; }
+    const el = S.root.querySelector('.sp-large');
+    if (el) el.remove();
+    S.root.classList.remove('sp-is-large');
+    const btn = S.root.querySelector('.sp-larger');
+    if (btn) { btn.setAttribute('aria-expanded', 'false'); try { btn.focus({ preventScroll: true }); } catch (e) { /* */ } }
+}
+function drawLarge() {
+    if (!S || !S.large) return;
+    if (S.lgObs) { S.lgObs.disconnect(); S.lgObs = null; }
+    let el = S.root.querySelector('.sp-large');
+    const keepTop = el ? (el.querySelector('.sp-lg-scroll') || {}).scrollTop || 0 : 0;
+    if (!el) { el = document.createElement('div'); el.className = 'sp-large'; el.setAttribute('role', 'region'); el.setAttribute('aria-label', 'Larger preview'); S.root.appendChild(el); }
+    const pages = S.built && !S.busy ? pagesOf() : [];
+    const n = pages.length;
+    let h = `<header class="sp-lg-top"><h3 class="sp-lg-title">Larger preview</h3><span class="sp-lg-meta">${n ? `${n} page${n === 1 ? '' : 's'}` : 'Working out the pages…'}</span><button type="button" class="sp-lg-small" data-sp="smaller">Smaller</button></header><div class="sp-lg-scroll" tabindex="0" aria-label="Pages">`;
+    let divided = false;
+    pages.forEach((p, i) => {
+        if (p.key && !divided) { divided = true; h += `<div class="sp-lg-div" role="separator"><span>Answer key</span></div>`; }
+        h += `<figure class="sp-lg-page" data-pg="${i}"><figcaption>Page ${i + 1} of ${n}${p.key ? ' · answer key' : ''}</figcaption><div class="sp-lg-sheet" data-zpage="${i}"></div></figure>`;
+    });
+    h += `</div>`;
+    el.innerHTML = h;
+    const btn = S.root.querySelector('.sp-larger');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    const sc = el.querySelector('.sp-lg-scroll');
+    const w = Math.min(820, Math.max(200, sc.clientWidth - 40));
+    sc.style.setProperty('--sp-lg-w', w + 'px');
+    sc.style.setProperty('--sp-lg-s', String(w / 794));
+    const slots = [...sc.querySelectorAll('.sp-lg-sheet')];
+    if (slots[0]) mountFrame(slots[0], 0, 'Page 1');
+    if (typeof IntersectionObserver === 'function') {
+        S.lgObs = new IntersectionObserver((ents) => {
+            for (const en of ents) if (en.isIntersecting) { const i = Number(en.target.dataset.zpage); mountFrame(en.target, i, `Page ${i + 1}`); S.lgObs && S.lgObs.unobserve(en.target); }
+        }, { root: sc, rootMargin: '200px 0px' });
+        slots.slice(1).forEach((x) => S.lgObs.observe(x));
+    } else slots.forEach((x, i) => mountFrame(x, i, `Page ${i + 1}`));
+    sc.scrollTop = keepTop;
+}
+function showZoom(i, x) {
+    if (!S || !S.built || S.busy || !pagesOf()[i]) return;
+    let z = S.root.querySelector('.sp-zoom');
+    if (!z) { z = document.createElement('div'); z.className = 'sp-zoom'; z.setAttribute('aria-hidden', 'true'); S.root.appendChild(z); }
+    const H = Math.round(window.innerHeight * 0.94), W = Math.round(H * 794 / 1123);
+    z.style.height = H + 'px'; z.style.width = W + 'px';
+    z.style.top = Math.round((window.innerHeight - H) / 2) + 'px';
+    // on the side away from the pointer
+    z.style.left = (x < window.innerWidth / 2 ? Math.max(8, window.innerWidth - W - 16) : 16) + 'px';
+    z.style.setProperty('--sp-z-s', String(W / 794));
+    if (z.dataset.pg !== String(i) || z.dataset.v !== String(S.token)) {
+        z.dataset.pg = String(i); z.dataset.v = String(S.token);
+        z.innerHTML = '';
+        mountFrame(z, i, `Page ${i + 1}, large`);
+    }
+    z.hidden = false;
+    S.zoomOn = true;
+}
+function hideZoom() {
+    if (!S) return;
+    const z = S.root && S.root.querySelector('.sp-zoom');
+    if (z) z.hidden = true;
+    S.zoomOn = false;
+}
+
 /** For checks: the open dialog's state. */
 export function simplePrintState() {
-    return S ? { list: S.list.map((s) => ({ key: keyOf(s), amt: s.amt, opts: s.opts || null })), quick: S.ctx.quick || null, prefs: Object.assign({}, P), built: S.built ? { pages: S.built.pages, total: S.built.total, cols: S.built.cols, rows: S.built.rows, perPage: S.built.perPage, arrangement: S.built.arrangement, fellBack: !!S.built.fellBack, counts: S.built.counts, sets: S.built.sets, line: summaryLine(S.built, opts()) } : null, busy: !!S.busy, probes: Object.assign({}, S.probes) } : null;
+    return S ? { list: S.list.map((s) => ({ key: keyOf(s), amt: s.amt, opts: s.opts || null })), quick: S.ctx.quick || null, prefs: Object.assign({}, P), built: S.built ? { pages: S.built.pages, total: S.built.total, cols: S.built.cols, rows: S.built.rows, perPage: S.built.perPage, arrangement: S.built.arrangement, fellBack: !!S.built.fellBack, counts: S.built.counts, sets: S.built.sets, line: summaryLine(S.built, opts()) } : null, busy: !!S.busy, probes: Object.assign({}, S.probes), large: !!S.large, zoom: !!S.zoomOn } : null;
 }
