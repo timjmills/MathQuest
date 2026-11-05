@@ -1370,6 +1370,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "facts-print-fix-r3",
+   "check": "the owner's fact set at S/M/L, Pages 1 and Problems 50/130, both arrangements, Columns Auto/5/9, Sets 2 and 3 (and three cases through the real dialog with Print pressed): every grid of every page of every set has the summary's columns and one digit size a group, per-skill totals equal the split of the request (SETPAGE); white under the grid in mm at most one row and the fewest pages with all groups planned together (FILL); Auto never above 9, 10 only when picked, never offered with division (AUTO9); PAGE_TYPES and the design standard never say division reaches 10 columns (DIVMAX9 docs) (print critic r3 2026-11-05, lowest 5)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print SETPAGE / FILL / AUTO9 / DIVMAX9 docs",
+   "browser": true,
+   "fail": {
+    "commit": "115302a69",
+    "state": "Problems 50 at S on 2 pages (72 + 169 mm white, ÷ alone); set 2 printed 10 columns beside set 1's 8; 35/32/31/32 at L for 33/33/32/32; 20 / 24 pt on pages of one print; Auto 10 at S; PT-FRW-9 said ÷ reaches 10"
+   },
+   "pass": {
+    "commit": "e023c34dc",
+    "state": "facts-print-fix r3: all groups planned together (÷ section shares the page), reach-based columns and digits, page-by-page counts, Auto 9, docs at most 9"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
