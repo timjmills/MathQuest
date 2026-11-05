@@ -148,7 +148,7 @@ Every pupil page as a PNG, in the scratchpad `facts-r4/` folder (`index.txt` the
   iterations against the mm FILL check. Each run printed the plan (rows per page, stretches) beside the white, which
   showed the infeasible cases at once (11 rows over 3 pages of 5; 27 rows over 6 pages at L).
 - Root cause of the two lost rounds: the checks compared the print with the dialog's own numbers for set 1 and allowed a
-  60 % page. The owner's rule ("no white space") was never written in mm. See LESSONS_LEARNED L17.
+  60 % page. The owner's rule ("no white space") was never written in mm. See LESSONS_LEARNED L19.
 - Known look, not fixed: when the + − × count is not a whole number of rows, the shared page can open with a short row
   (Problems 130 S page 3: 2 facts, then the ÷ section).
 - Pre-existing, not this lane: ws-print-lint L sub_facts#review H13 ×4 (identical on c2c0fe24f).

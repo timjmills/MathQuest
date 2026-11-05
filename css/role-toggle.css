@@ -378,3 +378,24 @@ html.mq-selbar-on :is(.toast-notification, .mq-notify) :is(button, a) { pointer-
 .student-sel-actions .student-sel-send { justify-content: center; margin: 0 auto; }
 .start-buttons-container #studentSelPrintBtn { min-height: 48px; align-self: center; }
 body:not(.student-mode) .start-buttons-container #studentSelPrintBtn.student-only { display: none; }
+/* owner 2026-11-05: the pupil's "Explore skills" button under the Quick Start cards (the explorer's own sheet is lazy) */
+.student-explore-row { display: flex; justify-content: center; margin-top: 12px; }
+.student-explore-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; padding: 8px 26px; border-radius: 14px; border: 2px solid var(--mq-purple-d, #5b3fb8); background: var(--mq-purple, #7c5cff); color: #fff; font: inherit; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 0 var(--mq-purple-d, #5b3fb8); }
+.student-explore-btn:focus-visible { outline: 3px solid var(--mq-orange, #ff9f1c); outline-offset: 2px; }
+/* explorer check D1 (2026-11-05): Quick Start cards and selection chips carry the FULL skill name; CSS clamps it
+   (2 lines on a card, one line with an ellipsis on a chip) and the full name is in the title. */
+.quick-skill-card .qs-name-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+#studentSkillsList .sel-chip { max-width: 100%; min-width: 0; }
+#studentSkillsList .sel-chip-text { min-width: 0; }
+#studentSkillsList .sel-chip-name { display: block; max-width: 26ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* explorer check r2 (2026-11-05). D2: a Quick Start name is at least 13 px and clamps at 3 lines (it carries the shorter
+   pupil name), so two long names can be told apart without a title tooltip. D5: a selection chip uses the width it has,
+   an ellipsis only when the row is truly too narrow, the full name in its title. Additive: overrides with more weight. */
+.quick-skill-card .skill-name .qs-name-text { font-size: max(13px, 0.8125rem); line-height: 1.2; -webkit-line-clamp: 3; }
+#studentSkillsList .sel-chip .sel-chip-name { max-width: none; }
+/* explorer check r3 R1 (2026-11-05): a pupil name that shares a long start with another skill's name is split
+   (pupil-names.js pupilCardParts): the shared start clamps at 3 lines, and the part that tells the two apart is a
+   sub-line of its own that is never clamped away. Additive: new classes only. */
+.quick-skill-card .skill-name .qs-name-text.qs-has-tail { -webkit-line-clamp: 3; }
+.quick-skill-card .skill-name .qs-name-tail { display: block; margin-top: 3px; font-size: max(13px, 0.8125rem); font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+.quick-skill-card:has(.qs-star) { padding-bottom: 18px; }   /* a pupil's own card: the star sits below the name, never on it */

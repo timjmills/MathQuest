@@ -3,6 +3,7 @@ import { randInt } from './utils.js';
 import { setCookie, getCookie, savePersistentData } from './storage.js';
 import { SKILL_TIME_CATEGORY, CODE_TO_SKILL, DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML } from './data.js';
 import { queueUsesInPlay } from './skill-option-store.js';
+import { pupilNameOf } from './pupil-names.js';
 
 // ===== LEVEL SYSTEM =====
 const LEVEL_THRESHOLDS = [0, 100, 250, 450, 750, 1150, 1650, 2300, 3100, 4100, 5300, 6800, 8600, 10800, 13400];
@@ -1367,6 +1368,7 @@ export function removeTabDetection() {
 }
 
 // ===== STUDENT LANDING MODAL =====
+const _escLanding = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export function showStudentLandingModal(parsed) {
     state.landingSettings = parsed;
 
@@ -1380,7 +1382,8 @@ export function showStudentLandingModal(parsed) {
         const weight = weightStr ? parseInt(weightStr, 10) : 0;
         const info = CODE_TO_SKILL[code];
         if (info) {
-            decodedSkills.push({ label: info.skillLabel, weight: isNaN(weight) ? 0 : weight, skillId: info.skillId, categoryId: info.categoryId });
+            // check r2 D1: a pupil's landing names each skill with its pupil name (no "(Visual)")
+            decodedSkills.push({ label: _escLanding(pupilNameOf(info.categoryId, info.skillId, info.skillLabel)), weight: isNaN(weight) ? 0 : weight, skillId: info.skillId, categoryId: info.categoryId });
         }
     }
 
@@ -1490,7 +1493,7 @@ export function printFromLanding() {
             if (info) skills.push({ categoryId: info.categoryId, skillId: info.skillId });
         }
     }
-    if (typeof window.openSimplePrint === 'function') window.openSimplePrint(skills.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts })), { from: 'student' });
+    if (typeof window.openSimplePrint === 'function') window.openSimplePrint(skills.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts, label: pupilNameOf(s.categoryId, s.skillId) })), { from: 'student' });
 }
 
 export function startFromLanding() {

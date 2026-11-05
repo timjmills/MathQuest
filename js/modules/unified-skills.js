@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { updateStartSkillName } from './category-dropdowns.js';
+import { pupilNameOf } from './pupil-names.js';
 import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
 import { getSetOptions, setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions, queueUsesInPlay } from './skill-option-store.js';
 
@@ -683,7 +684,8 @@ export async function copyStudentSendLink() {
 
 /** Print: every selected skill (with its options) in the simple print, loaded on the press only. */
 export function printStudentSelection() {
-    const list = selItems();
+    // check r2 D1: the Print list names each skill as the pupil saw it (the pupil name)
+    const list = selItems().map((x) => Object.assign(x, { label: pupilNameOf(x.categoryId, x.skillId) }));
     if (!list.length || typeof window.openSimplePrint !== 'function') return;
     window.openSimplePrint(list, { from: 'student' });
 }

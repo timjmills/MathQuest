@@ -8,6 +8,7 @@
 
 import { DOMAINS, visibleSkills, getSkillGrade } from './data.js';
 import { buildSearchIndex, searchIndex, queryCorrection } from './search-terms.js';
+import { pupilNameMap } from './pupil-names.js';
 
 let index = null;
 let curriculum = null;       // { standardsFor, wrmFor } once loaded
@@ -17,12 +18,16 @@ const listeners = new Set();
 /** One entry per live skill (tombstones excluded), mixed pools included. */
 export function skillSearchEntries() {
     const out = [];
+    // explorer check r3 R2: a skill is found by the name pupils see too ("Add Fractions (like denominators, numbers only)")
+    let pupil = null;
+    try { pupil = pupilNameMap(); } catch (e) { pupil = null; }
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         for (const cat of domain.categories) {
             for (const sk of visibleSkills(cat.id) || []) {
                 const e = {
                     key: `${cat.id}:${sk.v}`, domainId, domainName: domain.name, categoryId: cat.id, categoryName: cat.name,
                     skillId: sk.v, label: sk.l, grade: getSkillGrade(sk.v, cat.id), codes: [], wrm: [],
+                    pupil: (pupil && pupil.get(`${cat.id}:${sk.v}`)) || '',
                 };
                 if (curriculum) {
                     try {
