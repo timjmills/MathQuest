@@ -16,6 +16,11 @@
 //   NOT3     no default print is ever 3 or fewer problems a page (the reported bug)
 //   FOOTER   the teacher footer names the skills in words, never a raw id (lead, 2026-11-03)
 //   TARGETS  every dialog control and Quick Start Print button >= 44 x 44 at 1366 / 820 / 390 (critic r1 D7)
+//   LARGER   the Larger preview pane: page 1 at once, later pages mount only when scrolled near; Esc order
+//   HOVERZOOM the hover zoom is >= 80 % of the viewport height at 1366x768 and hides on leave / Esc
+//   ZOOMCOVER the zoom never covers the pointer and stays on screen (1366x768, 820x1180 portrait; critic D1)
+//   ZOOMGAIN  a zoom is >= 1.3x as wide as the page under the pointer, else none (critic D2); ZOOMSTALE hides on rebuild (D4)
+//   SETS2     2 sets: per-set captions, a divider at each set and each set's key (D3); PANEPRINT / FOCUSRING (D7, D5)
 //   SUMMARY  the summary's "n a page" / "n on page 1" is what page 1 holds (critic r1 D5, D9)
 //
 //   facts-print-fix (owner, 2026-11-05: "Mixed up isn't possible … printing in sections" printed 20 problems on 2 pages where
@@ -1015,6 +1020,188 @@ async function factsCounts(page) {
         }
         await page.evaluate(() => { window.clearSkillQueue && window.clearSkillQueue(); });
         rows.push('UI3 checked');
+
+        // LARGER / HOVERZOOM (owner 2026-11-05): the Larger preview pane mounts pages as they scroll near; the hover zoom
+        // shows a very large page beside the pointer. --shots writes design/status/sp-preview/*.png
+        {
+            const SH = has('shots') ? require('path').join(__dirname, '../../design/status/sp-preview') : '';
+            if (SH) require('fs').mkdirSync(SH, { recursive: true });
+            const L = (t) => fails.push('LARGER ' + t);
+            const settle = (ms) => new Promise((r) => setTimeout(r, ms));
+            for (const w of [1366, 820, 390]) {
+                const vh = w === 1366 ? 768 : w === 820 ? 1180 : 844;
+                await page.setViewport({ width: w, height: vh, deviceScaleFactor: 1 });
+                await page.evaluate(async () => {
+                    window.closeSimplePrint && window.closeSimplePrint();
+                    window.openSimplePrint([{ categoryId: 'addition', skillId: 'add_two_digit' }, { categoryId: 'subtraction', skillId: 'missing_add_sub' }], { from: 'tray' });
+                    const r = document.getElementById('spRoot');
+                    const pg = r.querySelector('[data-sp="how"][data-v="pages"]'); if (pg && pg.getAttribute('aria-checked') !== 'true') pg.click();
+                    await new Promise((x) => setTimeout(x, 50));
+                    const n = document.getElementById('spN'); n.value = '4'; n.dispatchEvent(new Event('input', { bubbles: true }));
+                    const k = r.querySelector('[data-sp="key"][data-v="true"]'); if (k && k.getAttribute('aria-checked') !== 'true') k.click();
+                });
+                await page.waitForFunction(async () => { const m = await import('/js/modules/simple-print.js'); const s = m.simplePrintState(); return s && !s.busy && s.built && s.built.pages >= 3; }, { timeout: 30000 }).catch(() => {});
+                await settle(800);
+                if (SH && w === 1366) await page.screenshot({ path: SH + '/normal-1366.png' });
+                const btn = await page.evaluate(() => { const b = document.querySelector('#spRoot .sp-larger'); if (!b) return null; const r = b.getBoundingClientRect(); return { w: r.width, h: r.height }; });
+                if (!btn) { L(`@${w} no Larger preview control`); continue; }
+                if (btn.w < 44 || btn.h < 44) L(`@${w} Larger preview ${Math.round(btn.w)}x${Math.round(btn.h)} < 44`);
+                await page.click('#spRoot .sp-larger');
+                await settle(600);
+                const a = await page.evaluate(() => {
+                    const r = document.getElementById('spRoot'), sc = r.querySelector('.sp-lg-scroll');
+                    const caps = [...r.querySelectorAll('.sp-lg-page figcaption')].map((x) => x.textContent);
+                    const small = r.querySelector('[data-sp="smaller"]').getBoundingClientRect();
+                    const pane = r.querySelector('.sp-large').getBoundingClientRect();
+                    return { slots: caps.length, frames: sc.querySelectorAll('iframe').length, cap0: caps[0] || '', div: !!r.querySelector('.sp-lg-div'), small: [small.width, small.height], over: pane.right > window.innerWidth + 1 || pane.left < -1 || document.documentElement.scrollWidth > window.innerWidth + 1 || sc.scrollWidth > sc.clientWidth + 1, focusIn: r.querySelector('.sp-large').contains(document.activeElement) };
+                });
+                rows.push(`LARGER @${w}: ${a.slots} pages, ${a.frames} mounted at open`);
+                if (a.slots < 4) L(`@${w} only ${a.slots} pages in the pane`);
+                if (!/^Page 1 of \d+/.test(a.cap0)) L(`@${w} caption "${a.cap0}"`);
+                if (!a.div) L(`@${w} no answer-key divider`);
+                if (a.frames < 1) L(`@${w} page 1 not shown at once`);
+                if (a.frames >= a.slots) L(`@${w} every page mounted at open (${a.frames}/${a.slots}): not lazy`);
+                if (a.small[0] < 44 || a.small[1] < 44) L(`@${w} Smaller ${a.small.map(Math.round).join('x')} < 44`);
+                if (a.over) L(`@${w} the pane overflows sideways`);
+                if (!a.focusIn) L(`@${w} focus is not in the pane`);
+                await settle(700);
+                await page.mouse.move(5, 5);
+                if (SH) await page.screenshot({ path: SH + `/larger-${w}.png` });
+                // keyboard scroll: End reaches the last page, which then mounts
+                await page.keyboard.press('End');
+                await settle(900);
+                const b = await page.evaluate(() => { const sc = document.querySelector('#spRoot .sp-lg-scroll'); return { top: sc.scrollTop, frames: sc.querySelectorAll('iframe').length, last: !!sc.querySelector('.sp-lg-page:last-child iframe') }; });
+                if (!(b.top > 0)) L(`@${w} End did not scroll the pages`);
+                if (!(b.frames > a.frames) || !b.last) L(`@${w} later pages did not mount after scrolling (${a.frames} -> ${b.frames})`);
+                rows.push(`LARGER @${w}: ${b.frames} mounted after scrolling to the end`);
+                // ZOOMGAIN (critic D2) / ZOOMCOVER (critic D1): over a page in the pane, a zoom shows only when it is clearly
+                // larger (>= 1.3x the sheet under the pointer) and never under the pointer
+                const zoomAt = () => page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); if (!z || z.hidden) return null; const r = z.getBoundingClientRect(); return { h: r.height, w: r.width, l: r.left, r: r.right, t: r.top, b: r.bottom, frame: !!z.querySelector('iframe') }; });
+                const hoverCheck = async (sel, tag, need) => {
+                    const sh = await page.evaluate((sel) => { const all = [...document.querySelectorAll(sel)].filter((x) => { const r = x.getBoundingClientRect(); return r.bottom > 40 && r.top < window.innerHeight - 40; }); if (!all.length) return null; const r = all[all.length - 1].getBoundingClientRect(); return { l: r.left, w: r.width, y: (Math.max(r.top, 0) + Math.min(r.bottom, window.innerHeight)) / 2 }; }, sel);
+                    if (!sh) { L(`${tag} @${w} nothing to hover (${sel})`); return []; }
+                    const out = [];
+                    for (const fx of [0.1, 0.5, 0.9]) {
+                        const x = sh.l + sh.w * fx;
+                        await page.mouse.move(2, 2); await settle(60);
+                        await page.mouse.move(x, sh.y, { steps: 3 }); await settle(700);
+                        const z = await zoomAt();
+                        out.push(z);
+                        if (!z) { if (need) L(`HOVERZOOM @${w} no zoom over ${tag} at x=${Math.round(x)}`); continue; }
+                        if (z.l <= x && x <= z.r) L(`ZOOMCOVER @${w} the zoom (${Math.round(z.l)}-${Math.round(z.r)}) covers the pointer at x=${Math.round(x)} over ${tag}`);
+                        if (z.w < 1.3 * sh.w) L(`ZOOMGAIN @${w} the zoom (${Math.round(z.w)} px) is not 1.3x the ${tag} under it (${Math.round(sh.w)} px)`);
+                        if (z.l < 0 || z.r > w + 1 || z.t < 0 || z.b > vh + 1) L(`ZOOMCOVER @${w} the zoom leaves the screen`);
+                        if (need && z.h < 0.6 * vh) L(`HOVERZOOM @${w} the ${tag} zoom is ${Math.round(z.h)} px (< 60 % of ${vh})`);
+                    }
+                    rows.push(`HOVERZOOM @${w} over ${tag}: ${out.map((z) => z ? `${Math.round(z.w)}x${Math.round(z.h)}` : 'none').join(' / ')}`);
+                    return out;
+                };
+                if (w !== 390) {
+                    await hoverCheck('#spRoot .sp-lg-sheet', 'a pane page', false);
+                    if (SH && w === 1366) await page.screenshot({ path: SH + '/pane-hover-1366.png' });
+                    await page.mouse.move(5, 5); await settle(150);
+                }
+                await page.keyboard.press('Escape');
+                await settle(150);
+                const e2 = await page.evaluate(async () => ({ large: !!document.querySelector('#spRoot .sp-large'), open: !!(await import('/js/modules/simple-print.js')).simplePrintState(), focus: document.activeElement && document.activeElement.classList.contains('sp-larger') }));
+                if (e2.large) L(`ESC @${w} Esc does not close the pane (focus ${await page.evaluate(() => { const a = document.activeElement; return a ? a.tagName + '.' + a.className : '-'; })})`);
+                if (!e2.open) L(`ESC @${w} Esc in the pane closed the whole dialog`);
+                if (!e2.focus) L(`ESC @${w} focus does not return to Larger preview`);
+                if (w !== 390) {
+                    // the thumbnail zoom: very large at 1366, beside the pointer at 820 portrait
+                    const zs = await hoverCheck('#spRoot .sp-thumb', 'the thumbnail', true);
+                    if (w === 1366 && zs[1] && zs[1].h < 0.8 * vh) L(`HOVERZOOM the thumbnail zoom is ${Math.round(zs[1].h)} px (< 80 % of ${vh})`);
+                    if (SH) await page.screenshot({ path: SH + `/hoverzoom-${w}.png` });
+                    await page.mouse.move(5, 5); await settle(200);
+                    if (await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); return z && !z.hidden; })) L('HOVERZOOM does not hide on leave');
+                    // ZOOMSTALE (critic D4): a rebuild while the zoom shows hides it
+                    const t = await page.evaluate(() => { const s = document.querySelector('#spRoot .sp-thumb').getBoundingClientRect(); return { x: s.left + s.width / 2, y: s.top + s.height / 2 }; });
+                    await page.mouse.move(t.x, t.y, { steps: 3 }); await settle(700);
+                    if (!(await zoomAt())) L(`ZOOMSTALE @${w} no zoom to test with`);
+                    await page.evaluate(() => { const n = document.getElementById('spN'); n.value = '3'; n.dispatchEvent(new Event('input', { bubbles: true })); });
+                    await settle(100);
+                    if (await zoomAt()) L(`ZOOMSTALE @${w} the zoom still shows the old pages after a change`);
+                    await page.waitForFunction(async () => { const m = await import('/js/modules/simple-print.js'); const s = m.simplePrintState(); return s && !s.busy && s.built; }, { timeout: 30000 }).catch(() => {});
+                    // Esc order on the dialog: the zoom first, then the dialog
+                    await page.mouse.move(2, 2); await settle(60);
+                    await page.mouse.move(t.x, t.y, { steps: 3 }); await settle(700);
+                    if (await zoomAt()) {
+                        await page.keyboard.press('Escape');
+                        const e1 = await page.evaluate(async () => ({ zoom: !!(document.querySelector('#spRoot .sp-zoom') && !document.querySelector('#spRoot .sp-zoom').hidden), open: !!(await import('/js/modules/simple-print.js')).simplePrintState() }));
+                        if (e1.zoom) L('ESC Esc does not hide the zoom');
+                        if (!e1.open) L('ESC the first Esc (zoom showing) closed the dialog too');
+                    }
+                    await page.mouse.move(5, 5);
+                    await settle(100);
+                }
+                await page.keyboard.press('Escape');
+                await settle(100)
+;
+                if (await page.evaluate(async () => !!(await import('/js/modules/simple-print.js')).simplePrintState())) L(`ESC @${w} the next Esc does not close the dialog`);
+            }
+            // SETS2 (critic D3): with 2 sets, each page's caption says its own set and whether it is that set's key; a
+            // divider at each set and at each set's key. PANEPRINT (D7): Print in the pane header, and the header counts
+            // pupil pages and key pages. FOCUSRING (D5): the page list's keyboard ring is the dialog's 3 px ring.
+            {
+                await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+                await page.evaluate(async () => {
+                    window.closeSimplePrint && window.closeSimplePrint();
+                    window.openSimplePrint([{ categoryId: 'addition', skillId: 'add_two_digit' }, { categoryId: 'subtraction', skillId: 'missing_add_sub' }], { from: 'tray' });
+                    const r = document.getElementById('spRoot');
+                    const pg = r.querySelector('[data-sp="how"][data-v="pages"]'); if (pg && pg.getAttribute('aria-checked') !== 'true') pg.click();
+                    await new Promise((x) => setTimeout(x, 50));
+                    const n = document.getElementById('spN'); n.value = '2'; n.dispatchEvent(new Event('input', { bubbles: true }));
+                    const k = r.querySelector('[data-sp="key"][data-v="true"]'); if (k && k.getAttribute('aria-checked') !== 'true') k.click();
+                    const st = document.getElementById('spSets'); st.value = '2'; st.dispatchEvent(new Event('input', { bubbles: true })); st.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                await page.waitForFunction(async () => { const m = await import('/js/modules/simple-print.js'); const s = m.simplePrintState(); return s && !s.busy && s.built && s.built.sets === 2; }, { timeout: 30000 }).catch(() => {});
+                await settle(300);
+                await page.focus('#spRoot .sp-larger');
+                await page.keyboard.press('Enter');
+                await settle(600);
+                const q = await page.evaluate(async () => {
+                    const m = await import('/js/modules/simple-print.js');
+                    const st = m.simplePrintState();
+                    const r = document.getElementById('spRoot'), sc = r.querySelector('.sp-lg-scroll');
+                    if (!sc) return null;
+                    const seq = [...sc.children].map((x) => x.classList.contains('sp-lg-div') ? `[${x.textContent.trim()}]` : (x.querySelector('figcaption') || {}).textContent || '?');
+                    const pr = r.querySelector('.sp-lg-top [data-sp="print"]');
+                    const pb = pr && pr.getBoundingClientRect();
+                    return { sets: st.built && st.built.sets, pupil: st.built && st.built.pages, seq, meta: (r.querySelector('.sp-lg-meta') || {}).textContent || '', print: pb ? [pb.width, pb.height] : null, ring: document.activeElement === sc ? getComputedStyle(sc).outlineWidth + ' ' + getComputedStyle(sc).outlineStyle : 'focus on ' + (document.activeElement && document.activeElement.className) };
+                });
+                if (!q) L('SETS2 the pane did not open');
+                else {
+                    rows.push(`SETS2: ${q.seq.join(' | ')}`);
+                    rows.push(`PANEPRINT: "${q.meta}"; FOCUSRING: ${q.ring}`);
+                    if (q.sets !== 2) L(`SETS2 built ${q.sets} sets, not 2`);
+                    const P = q.pupil || 0;
+                    // expected: [Set 1] Set 1 · page 1..P [Set 1 answer key] Set 1 · answer key page .. [Set 2] ...
+                    let cur = 0, inKey = false, nP = 0;
+                    const seen = { div: 0, key: 0 };
+                    for (const it of q.seq) {
+                        let mm;
+                        if ((mm = /^\[Set (\d+)\]$/.exec(it))) { if (Number(mm[1]) !== cur + 1) L(`SETS2 divider "${it}" out of order`); cur = Number(mm[1]); inKey = false; nP = 0; seen.div++; continue; }
+                        if ((mm = /^\[Set (\d+) answer key\]$/.exec(it))) { if (Number(mm[1]) !== cur) L(`SETS2 key divider "${it}" in set ${cur}`); if (nP !== P) L(`SETS2 set ${cur} has ${nP} pupil pages before its key, not ${P}`); inKey = true; seen.key++; continue; }
+                        if ((mm = /^Set (\d+) · (answer key )?page (\d+) of (\d+)$/.exec(it))) {
+                            if (Number(mm[1]) !== cur) L(`SETS2 caption "${it}" sits in set ${cur}`);
+                            if (!!mm[2] !== inKey) L(`SETS2 caption "${it}" ${inKey ? 'in a key part is not marked answer key' : 'marks a pupil page as the key'}`);
+                            if (!inKey) { nP++; if (Number(mm[4]) !== P) L(`SETS2 caption "${it}": a set has ${P} pupil pages`); }
+                            continue;
+                        }
+                        L(`SETS2 unexpected item "${it}"`);
+                    }
+                    if (seen.div !== 2 || seen.key !== 2) L(`SETS2 ${seen.div} set dividers and ${seen.key} key dividers (want 2 and 2)`);
+                    if (!/^2 sets · \d+ pupil pages? \+ \d+ answer key pages?$/.test(q.meta)) L(`PANEPRINT header says "${q.meta}"`);
+                    if (!q.print) L('PANEPRINT no Print button in the pane header');
+                    else if (q.print[0] < 44 || q.print[1] < 44) L(`PANEPRINT Print ${q.print.map(Math.round).join('x')} < 44`);
+                    if (!/^3px solid/.test(q.ring)) L(`FOCUSRING the focused page list shows "${q.ring}", not the 3 px ring`);
+                }
+                if (SH) await page.screenshot({ path: SH + '/larger-sets2-1366.png' });
+                await page.evaluate(() => { const st = document.getElementById('spSets'); window.closeSimplePrint && window.closeSimplePrint(); return !!st; });
+                // put Sets back to 1 so later runs start from the default
+                await page.evaluate(async () => { window.openSimplePrint([{ categoryId: 'addition', skillId: 'add_two_digit' }], { from: 'tray' }); const st = document.getElementById('spSets'); st.value = '1'; st.dispatchEvent(new Event('input', { bubbles: true })); st.dispatchEvent(new Event('change', { bubbles: true })); await new Promise((x) => setTimeout(x, 400)); window.closeSimplePrint(); });
+            }
+        }
 
     }
     console.log(rows.join('\n'));
