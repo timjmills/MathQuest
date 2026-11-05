@@ -1350,6 +1350,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "facts-print-fix-r2",
+   "check": "the owner's fact set at S/M/L, Pages 1 and Problems 50/130, both arrangements, Sets 2: printed signs per skill equal the dialog counts and are balanced within 1 on a page (COUNTS); Problems mode prints fact rows with the exact count, ÷ stacked alone at <= 9 columns, pages >= 60 % or even, no wide cell, S != L (PROBLEMS); page k of n reads k/n and names its own skills (FOOTER); a + − × page is titled by its operations (TITLE); the design standard never says ÷ reaches 10 columns (DIVMAX9 docs) (print critic 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print COUNTS / PROBLEMS / FOOTER / TITLE / DIVMAX9 docs",
+   "browser": true,
+   "fail": {
+    "commit": "c2c0fe24f",
+    "state": "S + − × page printed 24/23/9 while the chips said 23 for ×; Problems 50 printed each skill its own grid, ÷ across; footers 1/1; title Facts; standard said ÷ reaches 10"
+   },
+   "pass": {
+    "commit": "91bd40cbe",
+    "state": "facts-print-fix r2: balanced keepShares + printedSkills, Problems-mode fact rows, k/n footers per page, operation titles, docs at most 9"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
