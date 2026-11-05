@@ -256,6 +256,12 @@ function exampleFor(s) {
         const q = generateQuestionFor({ category: s.categoryId, skill: s.skillId, seed: 11 });
         const div = document.createElement('div');
         div.innerHTML = String((q && q.text) || '');
+        // check r4 D4: an exponent is a <sup>; textContent would flatten (4 + 5)<sup>2</sup> into "(4 + 5)2"
+        const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+        for (const el of div.querySelectorAll('sup')) {
+            const t = el.textContent.trim();
+            el.textContent = /^\d+$/.test(t) ? [...t].map((d) => SUP[d]).join('') : `^${t}`;
+        }
         text = (div.textContent || '').replace(/\s+/g, ' ').trim();
         // a bare instruction ("What is the perimeter?") or a long word problem is no example (a sweep of all 716: ~0.6 ms each)
         if (!/\d/.test(text) || text.length < 3) text = '';   // an example shows numbers; a bare question does not

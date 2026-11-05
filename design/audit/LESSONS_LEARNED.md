@@ -219,3 +219,8 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
 - Footers built from the bare label contradict the options ("(1-12)" on a 6–8 page) -> ws-simple-print FOOTER names "within 50" / "tables 6–8" from the options.
 - "Fact-sized" (the kit's isFact) is not "Facts" in words: column additions were called Facts -> ws-simple-print SUMMARY fails a non-*_facts type named "Facts".
 - Evidence screenshots of a page below the viewport captured the app -> the evidence script asserts the last page is .ws-key with "Answer Key" before saving it.
+
+### L18 (2026-11-05, explorer r4): "different text" is not "tells apart"
+A check that two clamped cards show different strings passed "Subtract within 1,000,000 (N…" beside "Subtract within 1,000,000…".
+Rule: the first word where two names differ must be visible WHOLE on both. Check: ws-student-explorer QSVISIBLE (diff word), at
+every common width including 1024x768 and 360x740.

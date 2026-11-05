@@ -173,6 +173,14 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
         const seenName = new Map();
         const dupes = [];
         for (const [k, n] of nameList) { if (seenName.has(n)) dupes.push(`"${n}" (${seenName.get(n)}, ${k})`); else seenName.set(n, k); }
+        // check r4 D2: two names that differ only by "a" / "an" / "the" read the same to a pupil
+        const loose = new Map();
+        const near = [];
+        for (const [k, n] of nameList) { const l = n.toLowerCase().replace(/\b(a|an|the)\b/g, ' ').replace(/[^a-z0-9÷×=/+−-]+/g, ' ').trim(); if (loose.has(l)) near.push(`"${n}" / "${g.names[loose.get(l)]}"`); else loose.set(l, k); }
+        if (near.length) F(`WORDS ${near.length} card names differ only by a/an/the or punctuation: ${near.slice(0, 3).join('; ')}`);
+        // check r4 D5: the last shorthand
+        const short = nameList.filter(([, n]) => /\bFDP\b|\bLCD\b|\bIQR\b/.test(n));
+        if (short.length) F(`WORDS ${short.length} cards keep FDP / LCD / IQR: ${short.slice(0, 3).map(([, n]) => n).join('; ')}`);
         if (dupes.length) F(`WORDS ${dupes.length} skills share a card name: ${dupes.slice(0, 3).join('; ')}`);
         if (!(g.minCap >= 15)) F(`WORDS the category caption is ${g.minCap} px (< 15)`);
         if ((g.topic || []).length) F(`TOPIC ${g.topic.length} fraction skills filed under Counting By grade: ${g.topic.slice(0, 3).join('; ')}`);
@@ -425,11 +433,25 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
             const rest = [...pairs].filter((k) => !first.includes(k));   // already in name order: siblings share a grid
             const batches = [first.slice(0, 16)];
             for (let i = 0; i < rest.length; i += 16) batches.push(rest.slice(i, i + 16));
-            return { named, nLongest: longest.length, nPairs: pairs.size, batches, names: Object.fromEntries(all) };
+            // the first word where each hard-set name parts from its nearest neighbour (check r4 D1)
+            const diffWord = {}, diffFrom = {};
+            for (const k of [...first, ...rest]) {
+                const n = map.get(k);
+                let best = 0, from = '';
+                for (const [k2, n2] of all) { if (k2 === k) continue; const c = cp(n, n2); if (c > best) { best = c; from = k2; } }
+                if (best < 16 || best >= n.length) continue;
+                let a = best, b = best;
+                const W = /[A-Za-z0-9,÷=/]/;
+                while (a > 0 && W.test(n[a - 1])) a--;
+                while (b < n.length && W.test(n[b])) b++;
+                const word = n.slice(a, b).replace(/,$/, '');
+                if (word) { diffWord[k] = word; diffFrom[k] = from; }
+            }
+            return { named, nLongest: longest.length, nPairs: pairs.size, batches, names: Object.fromEntries(all), diffWord, diffFrom };
         }, QS_PREFIX);
         if (hard.named.length !== 4) F(`QSVISIBLE the hard set found ${hard.named.length} of the 4 named skills (Add Fractions like denominators x2, Two-Step Then Multiply / Divide)`);
         const qsSaved = await page.evaluate(() => JSON.stringify(window.customQuickSkills || []));
-        for (const [w, h] of [[1366, 768], [820, 1180], [390, 844]]) {
+        for (const [w, h] of [[1366, 768], [1024, 768], [820, 1180], [390, 844], [360, 740]]) {
             await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
             await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.showView) window.showView('homeView'); window.UnifiedSkills.clear(); });
             await sleep(200);
@@ -492,6 +514,10 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
                     const prev = seen.get(v.shown);
                     if (prev) F(`QSVISIBLE @${w}x${h} two Quick Start cards SHOW the same text "${v.shown}": "${hard.names[prev]}" and "${hard.names[v.key]}"`);
                     else seen.set(v.shown, v.key);
+                    // check r4 D1: "(N…" and "…" count as different text, yet a pupil sees two alike cards. The first word
+                    // where a name parts from its nearest family member (>= 16 shared characters) must be SHOWN whole.
+                    const dw = hard.diffWord[v.key];
+                    if (dw && !(' ' + v.shown.replace(/ \| /g, ' ').replace(/…/g, ' … ') + ' ').includes(dw)) F(`QSVISIBLE @${w}x${h} the card "${hard.names[v.key]}" hides "${dw}", the word that tells it from "${hard.names[hard.diffFrom[v.key]]}" (shows "${v.shown}")`);
                     if (v.small.length) F(`QSVISIBLE @${w}x${h} the card "${hard.names[v.key]}" has text under 13 px (${v.small.join(', ')})`);
                     if (v.onStar) F(`QSVISIBLE @${w}x${h} the card "${hard.names[v.key]}": its name runs into the star`);
                     if (v.sideways || v.cardOver) F(`QSVISIBLE @${w}x${h} the card "${hard.names[v.key]}" overflows sideways (${v.sideways || 'past the page'})`);

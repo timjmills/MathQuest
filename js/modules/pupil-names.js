@@ -50,16 +50,25 @@ const PUPIL_WORDS = [
     [/^OoO Easy: Two Ops, No Parens$/, 'Order of Operations: 2 Steps, No Brackets'],
     [/^OoO Medium: Parentheses$/, 'Order of Operations: Brackets'],
     [/^OoO Hard: Brackets & Exponents$/, 'Order of Operations: Brackets and Exponents'],
-    [/^Level 1: Two Operations$/, 'Order of Operations: 2 Steps'],
-    [/^Level 2: Three Operations$/, 'Order of Operations: 3 Steps'],
-    [/^Level 3: Four to Six Operations$/, 'Order of Operations: 4 to 6 Steps'],
-    [/^Level 4: Simple Parentheses$/, 'Order of Operations: Simple Brackets'],
-    [/^Level 5: Multiple Ops with Parens$/, 'Order of Operations: Many Steps with Brackets'],
-    [/^Level 6: Complex Nested Brackets$/, 'Order of Operations: Brackets inside Brackets'],
-    [/^Level 7: Exponents$/, 'Order of Operations: Exponents'],
+    [/^Level 1: Two Operations$/, 'Order of Operations Level 1: 2 Steps'],
+    [/^Level 2: Three Operations$/, 'Order of Operations Level 2: 3 Steps'],
+    [/^Level 3: Four to Six Operations$/, 'Order of Operations Level 3: 4 to 6 Steps'],
+    [/^Level 4: Simple Parentheses$/, 'Order of Operations Level 4: Simple Brackets'],
+    [/^Level 5: Multiple Ops with Parens$/, 'Order of Operations Level 5: Many Steps with Brackets'],
+    [/^Level 6: Complex Nested Brackets$/, 'Order of Operations Level 6: Brackets inside Brackets'],
+    [/^Level 7: Exponents$/, 'Order of Operations Level 7: Exponents'],
     [/^Polygon on Coord Grid \(Side Lengths\/Perimeter\)$/, 'Shapes on a Coordinate Grid (side lengths and perimeter)'],
     [/^Fraction Mult\/Div Word(?: Problems)?$/, 'Fraction Word Problems: Multiply and Divide'],
     [/^Fractions \/10 as \/100$/, 'Tenths as Hundredths'],
+    // check r4 D2 / D5: names that differed only by "a", or by a word a pupil cannot see as a difference, and the last
+    // teacher shorthand
+    [/^Place Fractions on Number Line$/, 'Place Fractions on a Number Line (tap the mark)'],
+    [/^Place Fractions on a Number Line$/, 'Place Fractions on a Number Line (drag)'],
+    [/^Fraction as Division$/, 'Fraction as Division (numbers only)'],
+    [/^Fraction as Division \(a\/b = a÷b\)$/, 'Fraction as Division (a/b = a÷b, with pictures)'],
+    [/^All FDP Skills$/, 'All Fractions, Decimals and Percents'],
+    [/^Compare Fractions \(LCD\)$/, 'Compare Fractions (common denominator)'],
+    [/^Box Plot - Median, IQR, Range$/, 'Box Plot: Median, Interquartile Range, Range'],
     [/\bOoO\b/g, 'Order of Operations'],
     [/\bParens\b/g, 'Brackets'],
     [/\bOps\b/g, 'Operations'],
@@ -132,18 +141,17 @@ export function pupilNameMap() {
 // head (clamped), the rest, which holds every difference, is the tail, a sub-line of its own that is never clamped. Judged against EVERY pupil name, so any
 // two cards a pupil puts side by side read apart; the gate (QSVISIBLE) reads the text each card actually shows.
 const SPLIT_AT = 16;   // the head is clamped at 3 lines on the card, the tail is not
-const SPLIT_WORD_AT = 24;
 const SEP = /(\s\(|,\s|:\s|\s[–-]\s)/g;
 let PARTS = null;
 function splitName(name, c) {
+    // c = the start the whole family shares. The split falls at the last clause break inside it, else at its last word
+    // break, so EVERY difference sits in the (unclamped) tail (check r4 D1: r3 also tried "the first clause break after
+    // c, up to 24 characters", which put the difference in the clamped head, and returned null past 24, which left
+    // "Subtract within 1,000,000 (No / With Regrouping)" unsplit).
     if (c < SPLIT_AT || c >= name.length) return null;   // a name that is the start of another shows whole beside it
     let at = -1, len = 0;
     for (const m of name.matchAll(SEP)) { if (m.index <= c && m.index > 0) { at = m.index; len = m[0].length; } }
-    if (at < 0) {   // no clause break in the shared start: the first break after it, while the head stays short
-        for (const m of name.matchAll(SEP)) { if (m.index > c && m.index <= SPLIT_WORD_AT) { at = m.index; len = m[0].length; break; } }
-    }
-    if (at < 0) {   // else a long shared start splits at its last word break
-        if (c < SPLIT_WORD_AT) return null;
+    if (at < 0) {
         const sp = name.lastIndexOf(' ', c);
         if (sp <= 0) return null;
         at = sp; len = 1;
@@ -173,7 +181,7 @@ export function pupilCardParts(key) {
         for (const list of fam.values()) {
             if (list.length < 2) continue;
             const names = list.map((x) => x[1]).sort();
-            const c = cp(names[0], names[names.length - 1]);
+            const c = cp(names[0], names[names.length - 1]);   // the start the WHOLE family shares
             for (const [k, n] of list) { const p = splitName(n, c); if (p) PARTS.set(k, p); }
         }
     }

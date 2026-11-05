@@ -138,3 +138,19 @@ Speed reflection: the defect survived two rounds because each round fixed the wo
 DOM's text, which no CSS clamp changes. Rule taken (L17): a check of what a pupil can read measures the rendered,
 visible characters at the real widths, with a hard set chosen to break it (longest names, shared prefixes); and a fix
 round that leaves a defect open starts by making the check fail on the failed commit.
+
+## Fix round 4 (2026-11-05, lead, after critic r4 FAIL, clarity 7)
+
+- **D1** "Subtract within 1,000,000 (No / With Regrouping)" read alike: `splitName()` gave up when the first clause break sat
+  past a 24-character cap, and its other branch put the difference into the clamped head. Now the split is always at the last
+  clause (else word) break inside the start the whole family shares, so every difference is in the unclamped tail.
+  A per-name split was tried first and failed the new check on two-way families ("within N" x "numbers only").
+- **D2** curated names: number line "(tap the mark)" / "(drag)"; "Fraction as Division (numbers only)" / "(a/b = a÷b, with
+  pictures)"; Order of Operations Level 1-7 keep "Level N".
+- **D4** the explorer example shows exponents as superscripts ("(4 + 5)²").
+- **D5** "All Fractions, Decimals and Percents", "Compare Fractions (common denominator)", "Box Plot: Median, Interquartile Range, Range".
+- **Checks:** QSVISIBLE also runs at 1024x768 and 360x740, and the first word where a name parts from its nearest neighbour
+  (>= 16 shared characters) must be SHOWN whole; WORDS fails on names equal once a/an/the and punctuation go, and on FDP/LCD/IQR.
+  Backtest: FAIL (7) on f6b8d19f4, OK on this head.
+- Merged origin/master and restamped. Gates OK: ws-student-explorer, boot-smoke, search-terms, code-snapshot (732), teacher-shell,
+  simple-print, screen-answer, chromebook-perf --only load (first 6.7-7.1 s), stamp --check.
