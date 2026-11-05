@@ -1390,6 +1390,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "facts-print-fix-r4",
+   "check": "the owner's ÷ Mix page (seed 926447, Columns 9, Pages 1, S) and the ÷ Mix set at S/M/L in both arrangements, Problems 30/50/63/130 at S/M/L x Auto/5/9 x both arrangements, mult_facts alone at L: one baseline a row and centred items in a grid mixing forms (MIXBASE), one visible answer slot place (SLOTPOS), fraction '=' >= 0.25 em and centred (FRACEQ), bracket/fraction ink >= 2 mm from the border (CLEAR), brackets on the row geometry (BRKTRACK), rules counted on the pdfium raster (PDFIUM-RULES), footer names unbroken (FOOTWRAP), one section per ÷ form In sections (DIVSECTIONS), Size honoured with Mix (SIZEMIX), every page but the last within 8 mm and no row past 1.3 (FULLPAGE), one digit size a page (ONEDIGIT), one row height a section (ROWSAME) (print critic r4 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --r4 MIXBASE / SLOTPOS / FRACEQ / CLEAR / BRKTRACK / PDFIUM-RULES / FOOTWRAP / DIVSECTIONS / SIZEMIX / FULLPAGE / ONEDIGIT / ROWSAME",
+   "browser": true,
+   "fail": {
+    "commit": "7fab88a7e",
+    "state": "÷ Mix rows zig-zag 6.2 mm, slots in three places, '=' 0.15 em from the bar, brackets 0.98 mm from the border, footer 'Division Facts (1-' / '12)', In sections mixes the forms, Problems pages 50-105 mm white with 1.7 stretch, 20 / 24 pt on one page, rows 37.27 vs 36.38 mm"
+   },
+   "pass": {
+    "commit": "aa1377878",
+    "state": "facts-print-fix r4: one three-line frame for mixed forms, ÷ sections In sections, planFactRows (every page but the last full, <= 1.3), one digit size a page, frame in the grid height, nowrap footer names, background-clip seam fix"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --r4",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
