@@ -112,14 +112,23 @@ export function supports(items) {
  * own I Can title - and so does any section whose items are two-digit work (critic round 2: a page
  * of 17 + 16 titled "Addition facts"): undefined here, and the frame takes the skill's line.
  */
+const OP_NAME = { add: 'addition', subtract: 'subtraction', multiply: 'multiplication', divide: 'division' };
 export function factTitle(items) {
     if (items.length && !items.every((it) => isFact(it) && !isOperationOnly(it))) return undefined;
     const factSkill = items.every((it) => FACT_SKILL_RE.test(String((it.q || {}).skillId || '')));
     if (!factSkill && items.some((it) => operandsOf(it.q || {}).some((v) => Math.abs(v) >= 10))) return undefined;
     const q0 = (items[0] || {}).q || {};
     const op = opOf(q0);
-    // a page mixing operations (owner ruling 2026-10-31)
-    if (opsOf(items).size > 1) return 'Facts';
+    // a page mixing operations (owner ruling 2026-10-31) names them (facts-print-fix D5, critic 2026-11-05: a + - x page
+    // titled just "Facts"): "Addition and subtraction facts", "Addition, subtraction and multiplication facts"; all
+    // four operations on one page: "Mixed facts"
+    const ops = opsOf(items);
+    if (ops.size > 1) {
+        const names = ['add', 'subtract', 'multiply', 'divide'].filter((o) => ops.has(o)).map((o) => OP_NAME[o]);
+        if (names.length !== ops.size || names.length > 3) return 'Mixed facts';
+        const t = `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]} facts`;
+        return t.charAt(0).toUpperCase() + t.slice(1);
+    }
     const seconds = [...new Set(items.map((it) => operandsOf(it.q || {})[1]).filter((v) => v !== undefined))];
     const one = seconds.length === 1 ? seconds[0] : null;
     if (op === 'add') return one !== null ? `Add ${one}` : 'Addition facts';
@@ -492,11 +501,18 @@ export function factRowsLayout(items, input) {
         return { across: true, cols, rows, perPage: cols * rows, cellH: G / rows, hMin: h, digitPt: pt, tracks: n, gridH: G, labels, firstDigits,
             note: `Division facts print across: ${cols} columns x ${rows} rows.` };
     }
-    const big = items.some((it) => Number(answerOf(it)) > 99);
+    // PT-FRW-5 reads the clamp off what the facts CAN reach, not only what was dealt (facts-print-fix r2, critic
+    // 2026-11-05): x 1-12 facts can reach 144, so every page and every set of them takes the same 8 columns (a deal
+    // without a product over 99 laid 70 in 10 columns beside a 56-fact set 1); a x 3 table (at most 36) keeps its 10
+    const mults = items.filter((it) => opOf(it.q || {}) === 'multiply');
+    // (the largest factor dealt x the largest smaller factor: a x 3 table with turnarounds is 12 x 3, not 12 x 12)
+    const fac = mults.map((it) => (operandsOf(it.q || {}) || []).slice(0, 2).map((v) => Math.abs(Number(v) || 0)));
+    const reachMul = mults.length > 1 && Math.max(0, ...fac.map((f) => Math.max(...f, 0))) * Math.max(0, ...fac.map((f) => Math.min(...(f.length ? f : [0])))) > 99;
+    const big = reachMul || items.some((it) => Number(answerOf(it)) > 99);
     let cols = input.columns && input.columns !== 'auto' ? Math.max(5, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     let note = '';
     // (input.__clamp8: the page was dealt for the 8-column clamp, see plan / R2-2)
-    if ((big || input.__clamp8) && cols > 8) { cols = 8; note = 'Answers over 99: at most 8 columns (PT-FRW-5).'; }
+    if ((big || input.__clamp8 || input.__cols8) && cols > 8) { cols = 8; note = 'Answers over 99: at most 8 columns (PT-FRW-5).'; }
     // owner ruling 2026-11-05: "If division is included don't make 10 columns an option, just 9"
     if (cols > 9 && items.some((it) => opOf(it.q || {}) === 'divide')) { cols = 9; note = 'Division facts: at most 9 columns (max 9 with division).'; }
     // A 3-digit operand (a vertical division fact's dividend: 144 ÷ 12) needs a fourth track: the
@@ -626,7 +642,8 @@ export function formGrid(items, ctx, G, forms, count, maxCols = 5) {
 /** One item drawn in its own form at a form grid's size (see factCell). */
 export const formCell = (it, L) => factCell(it, L);
 
-export const counts = (pools, input) => ({ main: factRowsLayout(pools.main || [], input).perPage });
+// (facts-print-fix D2: a section's own count - Problems mode - deals at most a page; the page then prints that count)
+export const counts = (pools, input) => { const per = factRowsLayout(pools.main || [], input).perPage; return { main: input && Number(input.count) > 0 ? Math.min(per, Number(input.count)) : per }; };
 
 /**
  * Does a stacked ÷ fact's first dividend digit fall under the number tab's keep-out (tab side +
@@ -715,8 +732,11 @@ function factCell(it, L) {
  * (the ÷ facts) is never the one cut. Every other page keeps its first `perPage` items.
  */
 function keepShares(all, L) {
-    if (!L.mixed || all.length <= L.perPage) return all.slice(0, L.perPage);
-    const key = (it) => `${(it.q || {}).categoryId}:${(it.q || {}).skillId}`;
+    // facts-print-fix D1 (critic 2026-11-05): EVERY page of several skills keeps each skill's share, not only a page of
+    // division forms: a + - x page dealt 70 for 10 columns and laid at the 8-column clamp kept the first 56 (24 + 23 + 9,
+    // the x facts cut to 9); it now keeps 19 + 19 + 18
+    if (all.length <= L.perPage) return all;
+    const key = (it) => it.skill || `${(it.q || {}).categoryId}:${(it.q || {}).skillId}`;
     const counts = new Map();
     for (const it of all) counts.set(key(it), (counts.get(key(it)) || 0) + 1);
     const keys = [...counts.keys()];
@@ -752,8 +772,12 @@ export function plan(input = {}) {
     // digits, so the rows). The layout follows what was dealt for: a deal short of the page is laid as the
     // band's 3-digit page when that holds it, so printed = cols x rows = Score /N on every seed.
     if (all.length < L0.perPage && !input.__clamp8) {
+        // (two ways the probe reached the clamp: a dealt product over 99 - 3 tracks - or only the reach of its factors,
+        // facts-print-fix r2 - the dealt tracks at 8 columns; the one that holds exactly what was dealt wins)
         const L8 = factRowsLayout(all, Object.assign({}, input, { __clamp8: true }));
-        if (L8.perPage <= all.length) L0 = L8;
+        const L8b = factRowsLayout(all, Object.assign({}, input, { __cols8: true }));
+        const pick = [L8, L8b].find((x) => x.perPage === all.length) || [L8, L8b].find((x) => x.perPage <= all.length);
+        if (pick) L0 = pick;
     }
     // ... and the other way round (a probe without a product over 99 dealt 48 facts at 18 pt in 8 x 6; this deal
     // has one, so 3 tracks at 16 pt hold 8 x 7): whole rows of what was dealt, each row as tall as the page lets
@@ -763,7 +787,8 @@ export function plan(input = {}) {
         L0 = Object.assign({}, L0, { rows, perPage: all.length, cellH: Math.min(L0.gridH / rows, L0.hMin * 1.3) });
     }
     const L = Object.assign({}, L0, { size: ctx.size, look: ctx.look });
-    const items = mixOps(keepShares(all, L), input).map((it) => factCell(it, L));
+    const kept = mixOps(keepShares(all, L), input);
+    const items = kept.map((it) => factCell(it, L));
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items), score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one cell width per section (critic r1 R1-2): a short last row keeps the lattice, the rest unruled (PG-15)
@@ -773,6 +798,8 @@ export function plan(input = {}) {
         defaultLook: DEFAULT_LOOK,
         meta: {
             items: items.length, scoreOutOf: items.length,
+            // the skill of every PRINTED fact, in page order (the caller's per-skill counts are what prints, D1)
+            printedSkills: kept.map((it) => it.skill || `${(it.q || {}).categoryId}:${(it.q || {}).skillId}`),
             fits: [{ role: ROLE_ID, cols: L.cols, rows: L.rows, perPage: L.perPage, pages: 1, cellH: L.cellH, hMin: L.hMin, digitPt: L.digitPt, across: L.across, note: L.note, line }],
             notes: L.note ? [L.note] : [],
         },

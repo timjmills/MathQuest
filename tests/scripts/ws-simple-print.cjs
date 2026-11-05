@@ -24,7 +24,7 @@
 //   MIXFACTS  a facts-only set in Pages mode, Mixed up: fact rows (never the Mixed practice fallback), the same pages,
 //             problems and problems on every page as In sections, and the + − × page INTERLEAVED (at most 2 of one sign in
 //             a row; In sections keeps each sign's facts together)
-//   FALLBACK  whenever Mixed up falls back (the six set; the facts set in Problems mode), the print is EXACTLY the In
+//   FALLBACK  whenever Mixed up falls back (the six set; a facts-only set never does, in either mode), the print is EXACTLY the In
 //             sections print (pages, problems, counts, columns, page 1) and the summary says "In sections"
 //   ROWRULES  every fact-rows cell is closed on all four sides by a DRAWN rule (not the ink showing through a gap between
 //             white cells, which a PDF viewer or printer rasterises away or doubles), inner rules one weight
@@ -35,7 +35,11 @@
 //             control offers 1-9, never 10, for a set with division facts (+ - x only: 10); an explicit 10 prints 9 across
 //             on every division page (stacked, fraction, bracket) and 10 on the + - x page, the summary saying
 //             "(max 9 with division)"
-//   node tests/scripts/ws-simple-print.cjs --facts-print   these five only (ws-precritic runs it for the fact skills)
+//   COUNTS / PROBLEMS / FOOTER / TITLE / DIVMAX9 docs (facts-print-fix r2, critic 2026-11-05): see factsCounts below -
+//             the printed signs per skill equal the dialog's counts and are balanced on a page; Problems mode prints fact
+//             rows (exact count, ÷ stacked on its own page, pages >= 60 % full or shared evenly, S != L, no wide cell);
+//             page k of n reads "k/n" and names its own skills; a + − × page is titled by its operations
+//   node tests/scripts/ws-simple-print.cjs --facts-print   these checks only (ws-precritic runs it for the fact skills)
 //   node tests/scripts/ws-simple-print.cjs              the gate (prints ws-simple-print: OK / FAIL)
 //   node tests/scripts/ws-simple-print.cjs --backtest   the same measure on the old dialog's page plan (one request
 //                                                        per small page, a section of 1-2 per skill): must FAIL
@@ -205,6 +209,149 @@ async function factsPrint(page) {
     return { rows, fails };
 }
 
+/**
+ * facts-print-fix r2 (critic 2026-11-05, head c2c0fe24f): COUNTS, PROBLEMS, FOOTER-PAGES, TITLE, DIVMAX9-DOCS.
+ *   COUNTS    every page of the owner's set (Pages 1, S/M/L, both arrangements, Sets 2): the signs PRINTED per skill equal
+ *             the build's per-skill counts (the dialog's "prints" chips), and the skills of one page differ by at most 1
+ *             (S printed + 24, − 23, × 9 while the chips said 23 for ×)
+ *   PROBLEMS  Problems 50 / 130 of the owner's set, S/M/L, both arrangements: fact rows (never "each skill its own
+ *             grid"), exactly the asked count and per-skill split, ÷ stacked on its own page(s) at <= 9 columns, never
+ *             mixed with + − ×, every page >= 60 % of its group's full page unless the group asked for less than a page
+ *             or its pages are shared evenly (within one row); S and L differ in digit size and in a page's capacity; no
+ *             cell wider than its grid column
+ *   FOOTER    page k of n reads "k/n" on the pupil and the key pages; each page's footer names the skills on THAT page
+ *   TITLE     a + − × page is titled by its operations ("Addition, subtraction and multiplication facts"), never "Facts"
+ *   DIVMAX9   WORKSHEET_DESIGN_STANDARD.md never says division facts reach 10 columns (owner ruling 2026-11-05: at most 9)
+ */
+async function factsCounts(page) {
+    const rows = [], fails = [];
+    const SIGN = { '+': 'add_facts', '−': 'sub_facts', '-': 'sub_facts', '×': 'mult_facts', 'x': 'mult_facts', '÷': 'div_facts', '/': 'div_facts' };
+    const cases = [];
+    for (const size of SIZES) for (const arrange of ['sections', 'mixed']) {
+        cases.push({ size, arrange, how: 'pages', n: 1, sets: 1 });
+        cases.push({ size, arrange, how: 'problems', n: 50, sets: 1 });
+    }
+    cases.push({ size: 'S', arrange: 'mixed', how: 'pages', n: 1, sets: 2 }, { size: 'S', arrange: 'sections', how: 'problems', n: 130, sets: 1 }, { size: 'M', arrange: 'mixed', how: 'problems', n: 130, sets: 2 });
+    const res = await page.evaluate(async ({ list, cases }) => {
+        const m = await import('/js/modules/simple-print.js');
+        const out = [];
+        for (const c of cases) {
+            const o = { how: c.how, n: c.n, sets: c.sets, size: c.size, cols: 'auto', colsMode: 'aim', key: true, arrange: c.arrange, seed: 4242, title: true, paper: 'A4' };
+            const L = list.map((s) => Object.assign({ amt: '' }, s));
+            const b = await m.buildSets(L, o);
+            const f = document.createElement('iframe');
+            f.style.cssText = 'position:fixed;left:-3000px;top:0;width:900px;height:1200px;border:0';
+            document.body.appendChild(f);
+            await new Promise((r) => { f.onload = r; f.srcdoc = window.sheetDocument(b.doc, 'm', { paper: 'A4' }); });
+            for (let i = 0; i < 40; i++) { if (f.contentDocument.documentElement.getAttribute('data-ws-fonts') === 'ready') break; await new Promise((x) => setTimeout(x, 100)); }
+            const pages = [...f.contentDocument.querySelectorAll('.ws-page')].map((pg) => {
+                const grid = pg.querySelector('.ws-grid');
+                const cells = [...pg.querySelectorAll('.ws-grid > .ws-cell:not(.blankrun)')];
+                const cols = grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length : 0;
+                const colW = grid && cols ? grid.getBoundingClientRect().width / cols : 0;
+                const fact = pg.querySelector('.ws-fact');
+                const foot = pg.querySelector('footer.ws-foot');
+                return {
+                    key: /key/i.test(pg.className) || !!pg.querySelector('[data-ws-key-ans]'),
+                    facts: !!pg.querySelector('.ws-grid.facts'),
+                    ops: cells.map((x) => { const op = x.querySelector('.ws-fact .op'); return op ? op.textContent.trim() : '?'; }),
+                    stacked: cells.every((x) => !!x.querySelector('.ws-fact .op')),
+                    cols, wide: cells.filter((x) => colW && x.getBoundingClientRect().width > colW + 2).length,
+                    pt: fact ? parseFloat(getComputedStyle(fact).fontSize) : 0,
+                    title: ((pg.querySelector('.ws-title') || {}).textContent || '').trim(),
+                    footLeft: foot && foot.querySelector('span') ? foot.querySelector('span').textContent.trim() : '',
+                    footNo: foot && foot.querySelector('b') ? foot.querySelector('b').textContent.trim() : '',
+                    setNo: ((/Set (\d+) of/.exec(foot ? foot.textContent : '') || [])[1]) || '1',
+                };
+            });
+            f.remove();
+            // each group's full page (what Pages 1 lays at this size), for the fill rule
+            const full = c.how === 'problems' ? await m.buildSimple(L, Object.assign({}, o, { how: 'pages', n: 1, key: false })) : null;
+            out.push({ c, line: m.summaryLine(b, o), arrangement: b.arrangement, fellBack: !!b.fellBack, total: b.total, counts: b.counts, sets: b.sets || 1,
+                asked: c.how === 'problems' ? m.splitCounts(L.map((s) => m.parseAmount(s.amt)), c.n).counts : null,
+                full: full ? { grids: full.grids, pageCounts: full.pageCounts } : null, pages });
+        }
+        return out;
+    }, { list: OWNER, cases });
+    const ids = OWNER.map((s) => s.skillId);
+    const NAME = { add_facts: /Addition/, sub_facts: /Subtraction/, mult_facts: /Multiplication/, div_facts: /Division/ };
+    for (const r of res) {
+        const tag = `owner ${r.c.how} ${r.c.n} @${r.c.size} ${r.c.arrange}${r.sets > 1 ? ` sets ${r.sets}` : ''}`;
+        rows.push(`${tag}: ${r.line}`);
+        const pupil = r.pages.filter((p) => !p.key);
+        // COUNTS: set 1's pupil pages
+        const set1 = pupil.filter((p) => p.setNo === '1');
+        const got = ids.map((id) => set1.reduce((t, p) => t + p.ops.filter((op) => SIGN[op] === id).length, 0));
+        if (got.join() !== (r.counts || []).join()) fails.push(`${tag}: COUNTS printed ${got.join('/')} per skill, the build (the dialog chips) says ${(r.counts || []).join('/')}`);
+        pupil.forEach((p, i) => {
+            const per = ids.map((id) => p.ops.filter((op) => SIGN[op] === id).length).filter(Boolean);
+            if (per.length > 1 && Math.max(...per) - Math.min(...per) > 1) fails.push(`${tag}: COUNTS page ${i + 1} is unbalanced (${per.join('/')}, want within 1)`);
+        });
+        // FOOTER: k/n per set on pupil and key pages; the left names that page's own skills
+        for (const kind of [false, true]) {
+            const bySet = {};
+            r.pages.filter((p) => p.key === kind).forEach((p) => { (bySet[p.setNo] = bySet[p.setNo] || []).push(p); });
+            for (const [sn, ps] of Object.entries(bySet)) ps.forEach((p, k) => {
+                if (p.footNo !== `${k + 1}/${ps.length}`) fails.push(`${tag}: FOOTER ${kind ? 'key' : 'pupil'} page ${k + 1} of ${ps.length} (set ${sn}) reads "${p.footNo}"`);
+                const on = ids.filter((id) => p.ops.some((op) => SIGN[op] === id));
+                const miss = on.filter((id) => !NAME[id].test(p.footLeft));
+                const extra = ids.filter((id) => !on.includes(id) && NAME[id].test(p.footLeft));
+                if (miss.length || extra.length || /\band \d+ more\b/.test(p.footLeft)) fails.push(`${tag}: FOOTER ${kind ? 'key' : 'pupil'} page ${k + 1} footer "${p.footLeft}" does not name its own skills (${on.join(', ')})`);
+            });
+        }
+        // TITLE
+        pupil.forEach((p, i) => {
+            const ops = new Set(p.ops.map((op) => SIGN[op]));
+            if (ops.size > 1 && (/^Facts$/i.test(p.title) || !['add_facts', 'sub_facts', 'mult_facts'].filter((id) => ops.has(id)).every((id) => new RegExp(NAME[id].source, 'i').test(p.title)))) fails.push(`${tag}: TITLE page ${i + 1} (${[...ops].join(' ')}) is titled "${p.title}"`);
+        });
+        if (r.c.how !== 'problems') continue;
+        // PROBLEMS
+        if (r.arrangement !== 'facts' || r.fellBack) fails.push(`${tag}: PROBLEMS a facts-only set printed ${r.fellBack ? 'the fallback' : r.arrangement}, not fact rows ("${r.line}")`);
+        if (/each skill its own grid/i.test(r.line)) fails.push(`${tag}: PROBLEMS the summary says "${r.line}"`);
+        if (r.total !== r.c.n) fails.push(`${tag}: PROBLEMS ${r.total} printed for ${r.c.n} asked`);
+        if ((r.counts || []).join() !== (r.asked || []).join()) fails.push(`${tag}: PROBLEMS per skill ${(r.counts || []).join('/')} for ${(r.asked || []).join('/')} asked`);
+        const s1 = set1;
+        s1.forEach((p, i) => {
+            if (!p.facts) fails.push(`${tag}: PROBLEMS page ${i + 1} is not a fact-rows grid`);
+            if (p.wide) fails.push(`${tag}: PROBLEMS page ${i + 1} has ${p.wide} cell(s) wider than a grid column (NOORPHAN)`);
+            const div = p.ops.filter((op) => SIGN[op] === 'div_facts').length;
+            if (div && div !== p.ops.length) fails.push(`${tag}: PROBLEMS page ${i + 1} mixes ÷ with other signs`);
+            if (div && !p.stacked) fails.push(`${tag}: PROBLEMS page ${i + 1} prints division across, not stacked`);
+            if (div && p.cols > 9) fails.push(`${tag}: PROBLEMS division page ${i + 1} has ${p.cols} columns`);
+        });
+        // FILL per group: >= 60 % of the group's full page, unless the group asked < a page, or its pages are even
+        for (const isDiv of [false, true]) {
+            const ps = s1.filter((p) => p.ops.length && (SIGN[p.ops[0]] === 'div_facts') === isDiv);
+            if (!ps.length) continue;
+            const g = ((r.full && r.full.grids) || []).find((x) => !!x.div === isDiv);
+            if (!g) continue;
+            const askedG = ps.reduce((t, p) => t + p.ops.length, 0);
+            const ns = ps.map((p) => p.ops.length);
+            const even = Math.max(...ns) - Math.min(...ns) <= g.cols;
+            if (askedG >= g.perPage) ps.forEach((p, i) => { if (p.ops.length < 0.6 * g.perPage && !even) fails.push(`${tag}: PROBLEMS ${isDiv ? '÷' : '+ − ×'} page ${i + 1} holds ${p.ops.length} of ${g.perPage} (< 60 %, pages ${ns.join('/')})`); });
+            rows.push(`${tag}: ${isDiv ? '÷' : '+ − ×'} pages ${ns.join('/')} of a full ${g.perPage} (${g.cols} across)`);
+        }
+    }
+    // SIZE: Problems 50 at S and at L differ in digit size and capacity
+    for (const arrange of ['sections', 'mixed']) {
+        const at = (sz) => res.find((r) => r.c.how === 'problems' && r.c.n === 50 && r.c.size === sz && r.c.arrange === arrange && r.sets === 1);
+        const S = at('S'), Lg = at('L');
+        if (!S || !Lg) continue;
+        const pt = (r) => (r.pages.find((p) => !p.key && p.pt) || {}).pt || 0;
+        const cap = (r) => ((r.full && r.full.grids) || [])[0] ? r.full.grids[0].perPage : 0;
+        rows.push(`SIZE Problems 50 ${arrange}: S ${pt(S).toFixed(1)} px digits, ${cap(S)} a page; L ${pt(Lg).toFixed(1)} px, ${cap(Lg)} a page`);
+        if (!(pt(S) < pt(Lg)) || !(cap(S) > cap(Lg))) fails.push(`SIZE Problems 50 ${arrange}: S and L print the same (S ${pt(S)} px / ${cap(S)}, L ${pt(Lg)} px / ${cap(Lg)})`);
+    }
+    // DIVMAX9 docs (owner ruling 2026-11-05: at most 9 columns when division is included)
+    const fs = require('fs');
+    const path = require('path');
+    const std = fs.readFileSync(path.join(process.env.MQ_ROOT || path.join(__dirname, '..', '..'), 'WORKSHEET_DESIGN_STANDARD.md'), 'utf8').split('\n');
+    const bad = std.map((t, i) => [i + 1, t]).filter(([, t]) => /divi|÷/i.test(t) && /reach(es)? (the full )?10\b|10-column|\b(to|at) 10 columns|10 in every/i.test(t) && !/at most 9|max(imum)? 9|never 10|not 10/i.test(t));
+    rows.push(`DIVMAX9 docs: ${bad.length} line(s) of WORKSHEET_DESIGN_STANDARD.md say division reaches 10 columns`);
+    for (const [n, t] of bad) fails.push(`DIVMAX9 WORKSHEET_DESIGN_STANDARD.md:${n} says division reaches 10 columns: "${t.trim().slice(0, 140)}"`);
+    return { rows, fails };
+}
+
 (async () => {
     const app = await open({ seed: 7 });
     const page = app.page;
@@ -216,6 +363,9 @@ async function factsPrint(page) {
         const fp = await factsPrint(page);
         rows.push(...fp.rows);
         fails.push(...fp.fails);
+        const fc = await factsCounts(page);
+        rows.push(...fc.rows);
+        fails.push(...fc.fails);
         if (has('facts-print')) {
             console.log(rows.join('\n'));
             for (const f of fails) console.log('  FAIL ' + f);

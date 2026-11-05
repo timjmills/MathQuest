@@ -4254,6 +4254,8 @@ async function buildRoleSheet(n, metaOf) {
         seed: n.seed,
         role: n.role,
         title: plan.meta && plan.meta.title,
+        // fact rows: the skill of every printed fact (facts-print-fix D1: a page may keep fewer than it dealt)
+        printedSkills: (plan.meta && plan.meta.printedSkills) || undefined,
         notes,
         // IMPROVEMENT_PLAN 3.3: how the skills were arranged ('mixed' | 'sections'), and the mixed order's record.
         arrangement: (plan.meta && plan.meta.arrangement) || n.arrangement,

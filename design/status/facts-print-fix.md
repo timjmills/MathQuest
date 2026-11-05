@@ -40,3 +40,40 @@ FALLBACK 3, FOOTER 2 findings.
   (ws-fact-geom) settled it in one run. A PDF-raster check (pdftoppm at 72–100 dpi) would catch rasteriser artefacts that
   DOM checks cannot: proposed for the checks owner.
 - Lane runs one browser gate at a time; ws-print-lint for 4 skills × 7 roles × 3 sizes took about 6 minutes.
+
+## Round 2 (fixer, Opus medium: rebuild after the print critic FAIL, lowest 3, head c2c0fe24f)
+
+Critic: D1 × cut to 9 at S, D2 Problems mode sparse / fallback, D3 docs said ÷ reaches 10, D4 footers 1/1 and the ÷ page
+not named, D5 the + − × page titled "Facts".
+
+1. **D1** (`sheet/roles/fact-rows.js` keepShares, factRowsLayout, plan; `print-sheet.js` printedSkills; `simple-print.js`
+   buildFacts): every page of several skills keeps each skill's share when its layout holds fewer than were dealt (S: 19 +
+   19 + 18, was 24 + 23 + 9); the role reports the skill of every PRINTED fact (`meta.printedSkills` -> `res.printedSkills`)
+   and the dialog chips / `counts` read it. PT-FRW-5's clamp now reads what the × facts can REACH (largest factor × largest
+   smaller factor > 99), so every page and every set of × 1-12 takes the same 8 columns (set 2 laid 70 in 10 columns
+   beside set 1's 56); a ×3 table keeps 10. COUNT-FITS keeps printed = cols × rows = Score with a second clamp layout.
+2. **D2** (`simple-print.js` arrangementOf, buildFacts, summaryLine): a facts-only set prints fact rows in Problems mode too
+   (both arrangements): each group's exact count over the fewest pages of its own full grid; a last page under 60 % is
+   rebalanced (whole rows shared evenly, the extra rows to later pages); each skill's count apportioned over the pages
+   (balanced, exact totals); ÷ stacked on its own page, ≤ 9 across. Summary: "8 columns · division pages 9 columns ·
+   12–38 a page · 2 pages · 50 problems". PAGE_TYPES PT-FRW-12.
+3. **D3**: WORKSHEET_DESIGN_STANDARD VA-2a, VA-60a, VA-65 and 12.2, PAGE_TYPES PT-FRW-5 / PT-FRW-9 heading say at most 9
+   with division.
+4. **D4**: `renumberFooters` numbers the joined pages k/n (pupil and key, per set); each page's footer names its own
+   group's skills (the ÷ page "Division Facts (1-12)") when the caller gave no footer.
+5. **D5**: `factTitle` names the operations of a mixed page: "Addition, subtraction and multiplication facts"; all four
+   "Mixed facts".
+
+### Automatic checks added (FAIL on c2c0fe24f, PASS on the fix; backtest row `facts-print-fix-r2`)
+
+`ws-simple-print --facts-print` factsCounts: COUNTS (printed signs per skill == build counts; a page's skills within 1),
+PROBLEMS (fact rows, exact count and split, ÷ stacked alone ≤ 9, FILL ≥ 60 % or even pages, NOORPHAN, SIZE S ≠ L),
+FOOTER (k/n, own skills), TITLE, DIVMAX9 docs grep. On c2c0fe24f: COUNTS 15, PROBLEMS 40+, FOOTER 150+, TITLE 4,
+DIVMAX9 docs 4 lines.
+
+### Speed notes (round 2)
+
+- All five findings passed the green gate because it compared Mixed up with In sections, never the print with the
+  request (signs printed per skill vs the chips, pages vs the asked count) or with the doc. New rule for print checks:
+  every check compares the PRINTED page with the REQUEST (counts, k/n, names), not two builds with each other.
+- A role that silently drops dealt items must report what it kept (printedSkills): a caller counting the deal lies.
