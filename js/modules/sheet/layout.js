@@ -71,7 +71,7 @@ export const ROLE_COLUMNS = Object.freeze({
     'more-practice': Object.freeze({ auto: 2, cap: 6, capVisual: 4 }),
     'lesson': Object.freeze({ auto: Object.freeze({ S: 4, M: 3, L: 3 }), cap: 6, capVisual: 4 }),
     'computation-grid': Object.freeze({ auto: Object.freeze({ ican: 2, daily: 3 }), cap: 6, capVisual: 6 }),
-    'fact-rows': Object.freeze({ auto: Object.freeze({ S: 10, M: 6, L: 5 }), cap: 10, capVisual: 10 }),
+    'fact-rows': Object.freeze({ auto: Object.freeze({ S: 9, M: 6, L: 5 }), cap: 10, capVisual: 10 }),
     'fact-probe': Object.freeze({ auto: 5, cap: 10, capVisual: 10 }),
     'visual-grid': Object.freeze({ auto: 5, cap: 5, capVisual: 5 }),
     'word-problems': Object.freeze({ auto: 1, cap: 1, capVisual: 1 }),

@@ -816,11 +816,13 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     const many = (f) => Array.from({ length: 20 }, (_, i) => f(i));
     const S = (items, extra = {}) => factRowsLayout(items, Object.assign({ skills: [], ctx: { size: 'S' } }, extra));
     const addF = many((i) => fq(9, 2 + (i % 8), '+', 11 + (i % 8)));
-    eq(S(addF).cols, 10, 'R1 / PT-FRW-2: add_facts at S keep Auto 10 columns');
+    // (facts-print-fix r3, owner rule 2026-11-05: "Columns: Auto = 9; 10 only if the owner picks it" - PT-FRW-2 Auto 9 / 6 / 5)
+    eq(S(addF).cols, 9, 'R1 / PT-FRW-2: add_facts at S take Auto 9 columns (owner rule 2026-11-05)');
     eq(S(addF, { columns: 10 }).cols, 10, 'R1: an explicit 10 columns on add_facts at S is kept');
-    eq(S(many(() => fq(18, 9, '-', 9))).cols, 10, 'R1 / PT-FRW-2: sub_facts at S keep Auto 10 columns');
+    eq(S(many(() => fq(18, 9, '-', 9))).cols, 9, 'R1 / PT-FRW-2: sub_facts at S take Auto 9 columns (owner rule 2026-11-05)');
     eq(S(many(() => fq(12, 12, '×', 144))).cols, 8, 'R1 / PT-FRW-5: mult_facts at S print 8 columns');
-    eq(S(many(() => fq(87, 35, '-', 52))).cols, 10, 'R1: sub_100_no_regroup at S keeps 10 columns');
+    eq(S(many(() => fq(87, 35, '-', 52))).cols, 9, 'R1: sub_100_no_regroup at S keeps the Auto 9 columns');
+    eq(S(many(() => fq(87, 35, '-', 52)), { columns: 10 }).cols, 10, 'R1: sub_100_no_regroup at S keeps an explicit 10 columns');
     eq(S(many(() => fq(876, 345, '-', 531))).cols, 8, 'R1: sub_1k_no_regroup at S keeps 8 columns');
     const f1 = S(many(() => fq(8765, 4321, '-', 4444)));
     const inner = cellWidthMm(f1.cols, LIVE_W_MM, 'daily').inner;

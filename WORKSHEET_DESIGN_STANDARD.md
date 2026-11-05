@@ -199,7 +199,7 @@ For fact sections the chosen column count drives the digit size. S / M / L still
 | Fill of column | 57% | 59% | 57% | 59% | 59% | 66% |
 | Gap between neighbouring facts (mm) | 15.9 | 12.7 | 11.3 | 9.5 | 8.5 | 6.4 |
 
-- **TY-30** The ladder is independent of S / M / L ("columns win"). Auto columns are chosen so digits never fall below the preset: Auto = 10 / 6 / 5 columns at S / M / L for fact rows; the fact probe's Auto is always 5.
+- **TY-30** The ladder is independent of S / M / L ("columns win"). Auto columns are chosen so digits never fall below the preset: Auto = 9 / 6 / 5 columns at S / M / L for fact rows (owner rule 2026-11-05: "Auto = 9; 10 only if the owner picks it"; 9 and 10 columns share the 16 pt rung); the fact probe's Auto is always 5.
 - **TY-31** Fill of column stays between 55% and 75%. The gap between neighbouring sum rules is never below 6 mm, so rules never read as one line across the page.
 - **TY-32** A three-digit fact answer (tables of 10-12) is written with its hundreds digit under the operator; T stays 3. Addition and subtraction facts never reach three digits, because their band caps the sum or the minuend at 30 or less (`PEDAGOGY_STANDARD.md` P-FL-20).
 - **TY-33** Optional probe XL: 32 pt at 5 columns, fact families to 10 only.
@@ -979,7 +979,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 
 | Page type | Auto columns | Hard cap |
 |---|---|---|
-| Fact rows | 10 / 6 / 5 | 10; 8 when answers exceed 99; at most 9 when division is included, in every notation (owner ruling 2026-11-05, replacing 10 of 2026-10-30); at Auto a stacked ÷ page with 3-digit dividends takes 9 at S for 2 mm of white each side (owner 2026-11-05, PAGE_TYPES PT-FRW-9) |
+| Fact rows | 9 / 6 / 5 (owner rule 2026-11-05: 10 only when picked) | 10; 8 when answers exceed 99; at most 9 when division is included, in every notation (owner ruling 2026-11-05, replacing 10 of 2026-10-30); at Auto a stacked ÷ page with 3-digit dividends takes 9 at S for 2 mm of white each side (owner 2026-11-05, PAGE_TYPES PT-FRW-9) |
 | Fact probe | 5 | 5-10 (a choice of 1-4 becomes 5); division probes 2-3 |
 | Computation grid | 3 Daily, 2 I Can | 6 |
 | Long division | by table | 6, min cell width 30 mm |

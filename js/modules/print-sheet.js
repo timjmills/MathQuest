@@ -153,6 +153,12 @@ function normaliseRequest(req = {}) {
             // A single-skill page held short by its own pool, laid in fewer, longer columns
             // (buildSheet): two columns may take any row count, not only CL-2's 2/3/4/5/8.
             freeRows: !!(s && s.freeRows),
+            // fact rows (facts-print-fix r3): the digit tracks the section's skills can REACH and its + − × answers' digits,
+            // from the caller's probe - one column count and digit size on every page and set of the print
+            tracks: s && Number(s.tracks) > 0 ? clampInt(s.tracks, 1, 7, 0) : 0,
+            ansTracks: s && Number(s.ansTracks) > 0 ? clampInt(s.ansTracks, 1, 7, 0) : 0,
+            // ... and the section's one row stretch for the whole print (PG-11; 1.3, up to 1.7 so no page is left half empty)
+            stretch: s && Number(s.stretch) >= 1 ? Math.min(1.7, Number(s.stretch)) : 0,
         }))
         .filter((s) => s.skills.length);
     // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
@@ -256,6 +262,8 @@ function normaliseRequest(req = {}) {
         tagLine: typeof req.tagLine === 'string' && req.tagLine ? req.tagLine : '',
         packTab: Array.isArray(req.packTab) ? req.packTab.map(String) : null,
         edgeLast: req.edgeLast && Number(req.edgeLast.per) > 0 ? { per: Number(req.edgeLast.per), cols: Number(req.edgeLast.cols) || 1 } : null,
+        // fact rows (facts-print-fix r3 D1): each request section its own section on ONE page (÷ after + − ×)
+        factSections: role === 'fact-rows' && req.factSections === true && sections.length > 1,
     };
 }
 
@@ -3779,7 +3787,7 @@ const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 async function buildRoleSheet(n, metaOf) {
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
-    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput }) || []).filter((p) => p && p.skills && p.skills.length);
+    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
     const allSkills = [];
     const seenSkill = new Set();
@@ -3824,6 +3832,13 @@ async function buildRoleSheet(n, metaOf) {
         // facts-print-fix (owner 2026-11-05): a fact-rows page asked 'mixed' interleaves its operations in the one grid
         // (owner ruling 2026-10-31; sheet/interleave.js run rules), at the page's own count.
         interleave: n.role === 'fact-rows' && n.arrangement === 'mixed' ? true : undefined,
+        // fact rows (facts-print-fix r3): the reach tracks, each section's own count / columns / tracks, the one stretch
+        ...(n.role === 'fact-rows' ? {
+            factTracks: (n.sections[0] && n.sections[0].tracks) || 0,
+            factAnsTracks: (n.sections[0] && n.sections[0].ansTracks) || 0,
+            factStretch: (n.sections[0] && n.sections[0].stretch) || 0,
+            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch })) } : {}),
+        } : {}),
     };
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
     // line is "Solve.", so a cell's "Add." / "Write the time." is not said twice.

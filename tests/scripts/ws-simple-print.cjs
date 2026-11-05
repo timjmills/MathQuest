@@ -11,7 +11,8 @@
 //            engine lane owns page flow)
 //   DENSITY  a set of 2+ skills prints at least as many problems a page as the same skills, at the same counts,
 //            printed singly (each skill on its own pages, as many as its count needs at its own full page)
-//   FACTS    a fast-facts-only set in Pages mode prints fact rows: 10 / 6 / 5 columns at S / M / L (8 when an answer
+//   FACTS    a fast-facts-only set in Pages mode prints fact rows: 9 / 6 / 5 columns at S / M / L (owner rule 2026-11-05: Auto
+//            at most 9, 10 only when picked; 8 when an answer
 //            is over 99; division facts across in 3)
 //   NOT3     no default print is ever 3 or fewer problems a page (the reported bug)
 //   FOOTER   the teacher footer names the skills in words, never a raw id (lead, 2026-11-03)
@@ -64,7 +65,8 @@ const SETS = {
     missing: [sk('subtraction', 'missing_add_sub'), sk('division', 'missing_mult_div')],
 };
 const ONLY = arg('sets', '') ? arg('sets', '').split(',') : Object.keys(SETS);
-const FACT_COLS = { S: 10, M: 6, L: 5 };
+// (facts-print-fix r3, owner rule 2026-11-05: Auto at most 9 - "Auto = 9; 10 only if the owner picks it")
+const FACT_COLS = { S: 9, M: 6, L: 5 };
 const { factGeomSource, factGeomVerdict } = require('../lib/ws-fact-geom.cjs');
 const OWNER = [
     { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 } }, { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } },
@@ -260,6 +262,8 @@ async function factsCounts(page) {
                     key: /key/i.test(pg.className) || !!pg.querySelector('[data-ws-key-ans]'),
                     facts: !!pg.querySelector('.ws-grid.facts'),
                     ops: cells.map((x) => { const op = x.querySelector('.ws-fact .op'); return op ? op.textContent.trim() : '?'; }),
+                    // (r3: a page may hold a + − × grid AND a ÷ grid; each grid's own signs)
+                    gridOps: [...pg.querySelectorAll('.ws-grid')].map((g) => [...g.querySelectorAll(':scope > .ws-cell:not(.blankrun)')].map((x) => { const op = x.querySelector('.ws-fact .op'); return op ? op.textContent.trim() : '?'; })),
                     stacked: cells.every((x) => !!x.querySelector('.ws-fact .op')),
                     cols, wide: cells.filter((x) => colW && x.getBoundingClientRect().width > colW + 2).length,
                     pt: fact ? parseFloat(getComputedStyle(fact).fontSize) : 0,
@@ -288,8 +292,9 @@ async function factsCounts(page) {
         const set1 = pupil.filter((p) => p.setNo === '1');
         const got = ids.map((id) => set1.reduce((t, p) => t + p.ops.filter((op) => SIGN[op] === id).length, 0));
         if (got.join() !== (r.counts || []).join()) fails.push(`${tag}: COUNTS printed ${got.join('/')} per skill, the build (the dialog chips) says ${(r.counts || []).join('/')}`);
+        // (balanced within a group: the + − × skills of a page within 1; a shared page's ÷ section is its own count, r3)
         pupil.forEach((p, i) => {
-            const per = ids.map((id) => p.ops.filter((op) => SIGN[op] === id).length).filter(Boolean);
+            const per = ids.filter((id) => id !== 'div_facts').map((id) => p.ops.filter((op) => SIGN[op] === id).length).filter(Boolean);
             if (per.length > 1 && Math.max(...per) - Math.min(...per) > 1) fails.push(`${tag}: COUNTS page ${i + 1} is unbalanced (${per.join('/')}, want within 1)`);
         });
         // FOOTER: k/n per set on pupil and key pages; the left names that page's own skills
@@ -307,7 +312,8 @@ async function factsCounts(page) {
         // TITLE
         pupil.forEach((p, i) => {
             const ops = new Set(p.ops.map((op) => SIGN[op]));
-            if (ops.size > 1 && (/^Facts$/i.test(p.title) || !['add_facts', 'sub_facts', 'mult_facts'].filter((id) => ops.has(id)).every((id) => new RegExp(NAME[id].source, 'i').test(p.title)))) fails.push(`${tag}: TITLE page ${i + 1} (${[...ops].join(' ')}) is titled "${p.title}"`);
+            // (all four on one page - r3's shared page - is "Mixed facts", PT-FRW-12)
+            if (ops.size > 1 && !(ops.size === 4 && /^Mixed facts$/.test(p.title)) && (/^Facts$/i.test(p.title) || !['add_facts', 'sub_facts', 'mult_facts'].filter((id) => ops.has(id)).every((id) => new RegExp(NAME[id].source, 'i').test(p.title)))) fails.push(`${tag}: TITLE page ${i + 1} (${[...ops].join(' ')}) is titled "${p.title}"`);
         });
         if (r.c.how !== 'problems') continue;
         // PROBLEMS
@@ -320,22 +326,12 @@ async function factsCounts(page) {
             if (!p.facts) fails.push(`${tag}: PROBLEMS page ${i + 1} is not a fact-rows grid`);
             if (p.wide) fails.push(`${tag}: PROBLEMS page ${i + 1} has ${p.wide} cell(s) wider than a grid column (NOORPHAN)`);
             const div = p.ops.filter((op) => SIGN[op] === 'div_facts').length;
-            if (div && div !== p.ops.length) fails.push(`${tag}: PROBLEMS page ${i + 1} mixes ÷ with other signs`);
+            // (r3: ÷ is its own SECTION - its own grid - which may share the page with the + − × grid)
+            if (p.gridOps.some((g) => g.some((op) => SIGN[op] === 'div_facts') && g.some((op) => SIGN[op] !== 'div_facts'))) fails.push(`${tag}: PROBLEMS page ${i + 1} mixes ÷ with other signs in one grid`);
             if (div && !p.stacked) fails.push(`${tag}: PROBLEMS page ${i + 1} prints division across, not stacked`);
-            if (div && p.cols > 9) fails.push(`${tag}: PROBLEMS division page ${i + 1} has ${p.cols} columns`);
         });
-        // FILL per group: >= 60 % of the group's full page, unless the group asked < a page, or its pages are even
-        for (const isDiv of [false, true]) {
-            const ps = s1.filter((p) => p.ops.length && (SIGN[p.ops[0]] === 'div_facts') === isDiv);
-            if (!ps.length) continue;
-            const g = ((r.full && r.full.grids) || []).find((x) => !!x.div === isDiv);
-            if (!g) continue;
-            const askedG = ps.reduce((t, p) => t + p.ops.length, 0);
-            const ns = ps.map((p) => p.ops.length);
-            const even = Math.max(...ns) - Math.min(...ns) <= g.cols;
-            if (askedG >= g.perPage) ps.forEach((p, i) => { if (p.ops.length < 0.6 * g.perPage && !even) fails.push(`${tag}: PROBLEMS ${isDiv ? '÷' : '+ − ×'} page ${i + 1} holds ${p.ops.length} of ${g.perPage} (< 60 %, pages ${ns.join('/')})`); });
-            rows.push(`${tag}: ${isDiv ? '÷' : '+ − ×'} pages ${ns.join('/')} of a full ${g.perPage} (${g.cols} across)`);
-        }
+        // (r2's FILL - each group's pages >= 60 % of its full page - is replaced by r3's FILL in mm, factsSetPage: the ÷
+        // section shares a page with the + − × rows, and no page shows more than one row of white)
     }
     // SIZE: Problems 50 at S and at L differ in digit size and capacity
     for (const arrange of ['sections', 'mixed']) {
@@ -357,6 +353,220 @@ async function factsCounts(page) {
     return { rows, fails };
 }
 
+/**
+ * facts-print-fix r3 (critic 2026-11-05, head 115302a69): every page of EVERY set compared with the REQUEST, white measured
+ * in mm on the printed document (the r2 checks compared set 1 with the chips, so set 2 printing 10 columns, a page at
+ * 24 pt beside pages at 20 pt, 35/32/31/32 for 33/33/32/32 and pages 80 % empty all passed).
+ *   SETPAGE  every grid of every pupil page of every set: the summary's columns for its group (+ − × / ÷), ONE digit size
+ *            per group over the whole print (all sets), per-skill totals of each set = splitCounts(request) in Problems
+ *            mode (130 over 4 = 33/33/32/32 at S, M and L) and = the chips in Pages mode, the set's total = the summary's
+ *            "N problems", every set on the summary's page count, and the dialog's own line (UI cases) = what prints
+ *   FILL     white under the last grid of a page (footer top - grid bottom, mm) <= one of its rows on every page but the
+ *            last; the last page too unless the set prints on one page; fewest pages: a set's pages <= ceil(sum over
+ *            the groups of rows needed / rows a page) - all groups planned together (÷ shares a page with + − ×)
+ *   AUTO9    Columns Auto never prints more than 9 across, for any fact mix (+ − alone at S included); 10 only when picked;
+ *            the Columns list never offers 10 with ÷ in the set
+ *   DIVMAX9  (docs) WORKSHEET_DESIGN_STANDARD.md AND design/PAGE_TYPES.md never say division reaches 10 columns
+ * The UI cases drive the real dialog (scratchpad r3tools/ui.cjs): click the controls, press Print, take the document the
+ * print frame received.
+ */
+async function factsSetPage(page) {
+    const rows = [], fails = [];
+    const cases = [];
+    const C = (how, n, size, arrange, cols = 'auto', sets = 1, seed = 918528) => cases.push({ how, n, size, arrange, cols, sets, seed });
+    for (const size of SIZES) for (const arrange of ['sections', 'mixed']) { C('pages', 1, size, arrange); C('problems', 50, size, arrange); C('problems', 130, size, arrange); }
+    for (const size of ['S', 'L'].filter((s) => SIZES.includes(s))) for (const arrange of ['sections', 'mixed']) for (const cols of [5, 9]) { C('pages', 1, size, arrange, cols); C('problems', 50, size, arrange, cols); }
+    // Sets (critic D2: set 2 printed 10 columns / 48 in 8 columns beside set 1's 8 / 54 in 9)
+    C('problems', 130, 'S', 'sections', 'auto', 2, 7); C('problems', 130, 'S', 'mixed', 9, 2); C('pages', 1, 'L', 'mixed', 9, 3, 7);
+    C('pages', 1, 'L', 'sections', 9, 3); C('problems', 50, 'M', 'mixed', 'auto', 2, 7); C('pages', 1, 'S', 'sections', 'auto', 2); C('problems', 130, 'L', 'sections', 5, 3, 7);
+    const measureSrc = `(doc) => [...doc.querySelectorAll('.ws-page')].map((pg) => {
+        const mm = (px) => px * 25.4 / 96;
+        const foot = pg.querySelector('footer.ws-foot');
+        const grids = [...pg.querySelectorAll('.ws-grid')].map((g) => {
+            const cells = [...g.querySelectorAll(':scope > .ws-cell:not(.blankrun)')];
+            const fact = g.querySelector('.ws-fact');
+            const c0 = cells[0] ? cells[0].getBoundingClientRect() : null;
+            return { cols: getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length, facts: g.classList.contains('facts'),
+                ops: cells.map((x) => { const op = x.querySelector('.ws-fact .op'); return op ? op.textContent.trim() : '?'; }),
+                pt: fact ? Math.round(parseFloat(getComputedStyle(fact).fontSize) * 72 / 96 * 10) / 10 : 0,
+                rowMm: c0 ? mm(c0.height) : 0, bottom: g.getBoundingClientRect().bottom };
+        });
+        const last = grids.length ? Math.max(...grids.map((g) => g.bottom)) : 0;
+        return { key: /key/i.test(pg.className) || !!pg.querySelector('[data-ws-key-ans]'), grids,
+            // (white under the grid: to the footer's top, less the page's own fixed space above the footer - the body's foot to
+            // the footer, 6 mm on a full Pages-mode page - so a full page reads 0)
+            white: foot && grids.length ? mm(Math.min(foot.getBoundingClientRect().top, (pg.querySelector('.ws-body') || foot).getBoundingClientRect().bottom) - last) : null,
+            whiteFoot: foot && grids.length ? mm(foot.getBoundingClientRect().top - last) : null,
+            setNo: ((/Set (\\d+) of/.exec(foot ? foot.textContent : '') || [])[1]) || '1' };
+    })`;
+    const res = await page.evaluate(async ({ list, cases, measureSrc }) => {
+        const m = await import('/js/modules/simple-print.js');
+        const measure = new Function('return ' + measureSrc)();
+        const out = [];
+        for (const c of cases) {
+            const o = { how: c.how, n: c.n, sets: c.sets, size: c.size, cols: c.cols, colsMode: 'aim', key: true, arrange: c.arrange, seed: c.seed, title: true, paper: 'A4' };
+            const L = list.map((s) => Object.assign({ amt: '' }, s));
+            const b = await m.buildSets(L, o);
+            const f = document.createElement('iframe');
+            f.style.cssText = 'position:fixed;left:-3000px;top:0;width:900px;height:1200px;border:0';
+            document.body.appendChild(f);
+            await new Promise((r) => { f.onload = r; f.srcdoc = window.sheetDocument(b.doc, 'm', { paper: 'A4' }); });
+            for (let i = 0; i < 40; i++) { if (f.contentDocument.documentElement.getAttribute('data-ws-fonts') === 'ready') break; await new Promise((x) => setTimeout(x, 100)); }
+            const pages = measure(f.contentDocument);
+            f.remove();
+            // each group's full page (Pages 1 of that group alone): rows a page, for the fewest-pages bound
+            const full = {};
+            for (const div of [false, true]) {
+                const g = L.filter((s) => (s.skillId === 'div_facts') === div);
+                if (!g.length) continue;
+                const fb = await m.buildSimple(g, Object.assign({}, o, { how: 'pages', n: 1, sets: 1, key: false }));
+                full[div ? 'div' : 'main'] = { cols: fb.cols, rows: fb.rows };
+            }
+            out.push({ c, line: m.summaryLine(b, o), pages, counts: b.counts, factPlan: b.factPlan, total: b.total, pagesSet: b.pages, sets: b.sets || 1,
+                asked: c.how === 'problems' ? m.splitCounts(L.map((s) => m.parseAmount(s.amt)), c.n).counts : null, full });
+        }
+        return out;
+    }, { list: OWNER, cases, measureSrc });
+    const ids = OWNER.map((s) => s.skillId);
+    const SIGN = { '+': 'add_facts', '−': 'sub_facts', '-': 'sub_facts', '×': 'mult_facts', 'x': 'mult_facts', '÷': 'div_facts', '/': 'div_facts' };
+    const ptBy = { main: new Map(), div: new Map() };
+    // the white a FULL page shows under its grid (the body's own foot, ~3 mm): FILL allows one row more than that
+    const fullWhite = Math.max(0, Math.min(...res.filter((r) => r.c.how === 'pages').flatMap((r) => r.pages.filter((p) => !p.key && p.white !== null).map((p) => p.white))));
+    rows.push(`FILL a full Pages-mode page shows ${fullWhite.toFixed(1)} mm under its grid; a page may show one row more`);
+    const check = (r, tag) => {
+        const sumCols = (/(\d+) columns/.exec(r.line) || [])[1];
+        const divCols = (/division(?: pages| part)? (\d+) columns/.exec(r.line) || [])[1] || sumCols;
+        const sumTotal = Number((/(\d+) problems?/.exec(r.line) || [])[1]);
+        const sumPages = Number((/(\d+) pages?\b/.exec(r.line) || [])[1]);
+        const pupil = r.pages.filter((p) => !p.key);
+        const bySet = {};
+        pupil.forEach((p) => { (bySet[p.setNo] = bySet[p.setNo] || []).push(p); });
+        const pts = { main: new Set(), div: new Set() };
+        for (const [sn, ps] of Object.entries(bySet)) {
+            const per = ids.map(() => 0);
+            ps.forEach((p, k) => {
+                for (const g of p.grids.filter((x) => x.facts)) {
+                    const div = g.ops.length && g.ops.every((op) => SIGN[op] === 'div_facts');
+                    if (g.ops.some((op) => SIGN[op] === 'div_facts') && !div) fails.push(`${tag} set ${sn} page ${k + 1}: SETPAGE a grid mixes ÷ with + − ×`);
+                    const want = Number(div ? divCols : sumCols);
+                    if (g.cols !== want) fails.push(`${tag} set ${sn} page ${k + 1}: SETPAGE ${div ? '÷' : '+ − ×'} grid prints ${g.cols} columns, the summary says ${want} ("${r.line}")`);
+                    if (g.cols > 9 && (r.c.cols === 'auto' || div)) fails.push(`${tag} set ${sn} page ${k + 1}: AUTO9 ${g.cols} columns at ${r.c.cols === 'auto' ? 'Auto' : `Columns ${r.c.cols}`}${div ? ' on ÷' : ''}`);
+                    pts[div ? 'div' : 'main'].add(g.pt);
+                    for (const op of g.ops) { const i = ids.indexOf(SIGN[op]); if (i >= 0) per[i]++; }
+                }
+                // FILL: white <= one row (the last page of a set too, unless the set is one page)
+                const lastG = p.grids[p.grids.length - 1];
+                const isLast = k === ps.length - 1;
+                if (p.white !== null && lastG && p.white > lastG.rowMm + fullWhite + 1.5 && (!isLast || ps.length > 1)) fails.push(`${tag} set ${sn} page ${k + 1} of ${ps.length}: FILL ${p.white.toFixed(1)} mm of white under the grid, a row is ${lastG.rowMm.toFixed(1)} mm`);
+            });
+            const want = r.c.how === 'problems' ? r.asked : r.counts;
+            if (per.join() !== (want || []).join()) fails.push(`${tag} set ${sn}: SETPAGE printed ${per.join('/')} per skill, ${r.c.how === 'problems' ? 'the request splits to' : 'the chips say'} ${(want || []).join('/')}`);
+            const tot = per.reduce((t, x) => t + x, 0);
+            if (tot !== sumTotal) fails.push(`${tag} set ${sn}: SETPAGE printed ${tot}, the summary says ${sumTotal} problems`);
+            if (ps.length !== sumPages) fails.push(`${tag} set ${sn}: SETPAGE ${ps.length} pages, the summary says ${sumPages}`);
+            // FEWEST pages (Problems mode): all groups planned together
+            if (r.c.how === 'problems' && r.full.main) {
+                const nMain = per.filter((_, i) => ids[i] !== 'div_facts').reduce((t, x) => t + x, 0), nDiv = per[ids.indexOf('div_facts')];
+                const cm = Number(sumCols), cd = Number(divCols);
+                const units = (nMain ? Math.ceil(nMain / cm) / r.full.main.rows : 0) + (nDiv && r.full.div ? Math.ceil(nDiv / cd) / r.full.div.rows : 0);
+                const bound = Math.max(1, Math.ceil(units - 1e-9));
+                if (ps.length > bound) fails.push(`${tag} set ${sn}: FILL ${ps.length} pages where ${bound} hold the rows (${(units).toFixed(2)} pages of rows, all groups together)`);
+            }
+        }
+        for (const k of ['main', 'div']) {
+            if (pts[k].size > 1) fails.push(`${tag}: SETPAGE ${k === 'div' ? '÷' : '+ − ×'} digits change across the print: ${[...pts[k]].join(' / ')} pt`);
+            const key = `${r.c.size}|${r.c.cols}`;
+            for (const pt of pts[k]) { if (!ptBy[k].has(key)) ptBy[k].set(key, new Set()); ptBy[k].get(key).add(pt); }
+        }
+        if (r.factPlan) rows.push(`${tag}: plan ${JSON.stringify({ lay: r.factPlan.lay.map((l) => [l.cols, l.hMin, l.G]), G: r.factPlan.G, P: r.factPlan.P, s: r.factPlan.stretch, filled: r.factPlan.filled, rows: r.factPlan.rows })}`);
+        rows.push(`${tag}: ${r.line} · pages ${Object.values(bySet).map((ps) => ps.map((p) => p.grids.map((g) => g.ops.length).join('+')).join(' | ')).join(' || ')} · white ${pupil.map((p) => (p.white === null ? '-' : `${p.white.toFixed(0)}(${p.whiteFoot.toFixed(0)})`)).join('/')} mm · pt ${[...pts.main].join(',')}${pts.div.size ? ` ÷ ${[...pts.div].join(',')}` : ''}`);
+    };
+    for (const r of res) check(r, `owner ${r.c.how} ${r.c.n} @${r.c.size} ${r.c.arrange} cols ${r.c.cols}${r.c.sets > 1 ? ` sets ${r.c.sets}` : ''} seed ${r.c.seed}`);
+    // D4: one digit size per group at a size and column choice, whatever the count, mode or set
+    for (const k of ['main', 'div']) for (const [key, s] of ptBy[k]) if (s.size > 1) fails.push(`SETPAGE ${k === 'div' ? '÷' : '+ − ×'} @${key}: digits differ between prints of the same size and columns: ${[...s].join(' / ')} pt`);
+
+    // UI: the owner's path through the real dialog, Print pressed, the printed document measured
+    const ui = [
+        { how: 'problems', n: 50, size: 'S', arrange: 'sections', cols: 'auto', sets: 1 },
+        { how: 'problems', n: 130, size: 'S', arrange: 'sections', cols: 'auto', sets: 2 },
+        { how: 'pages', n: 1, size: 'L', arrange: 'mixed', cols: 9, sets: 3 },
+    ];
+    for (const c of ui) {
+        const r = await page.evaluate(async ({ list, c, measureSrc }) => {
+            const m = await import('/js/modules/simple-print.js');
+            const measure = new Function('return ' + measureSrc)();
+            const sleep = (t) => new Promise((x) => setTimeout(x, t));
+            const idle = async () => { await sleep(80); for (let i = 0; i < 1200; i++) { const s = m.simplePrintState(); if (s && s.built && !s.busy) return; await sleep(150); } throw new Error('never idle'); };
+            const $ = (q) => document.querySelector(q);
+            try { localStorage.removeItem('mq_simple_print'); } catch (e) { /* none */ }
+            try { window.closeSimplePrint(); } catch (e) { /* none */ }
+            window.openSimplePrint(list, { from: 'tray' });
+            await idle();
+            $(`[data-sp="how"][data-v="${c.how}"]`).click(); await idle();
+            const set = (q, v) => { const el = $(q); el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); };
+            set('#spN', c.n); await idle();
+            if (c.sets > 1) { set('#spSets', c.sets); await idle(); }
+            $(`[data-sp="size"][data-v="${c.size}"]`).click(); await idle();
+            const colOpts = [...document.querySelectorAll('#spCols option')].map((x) => x.value);
+            if (c.cols !== 'auto') { const el = $('#spCols'); el.value = String(c.cols); el.dispatchEvent(new Event('change', { bubbles: true })); await idle(); }
+            if (!$('.sp-more').open) { $('[data-sp="more"]').click(); await sleep(100); }
+            $(`[data-sp="arrange"][data-v="${c.arrange}"]`).click(); await idle();
+            const line = $('#spLine').textContent;
+            const chips = [...document.querySelectorAll('.sp-got')].map((x) => +x.textContent);
+            const old = document.getElementById('tvPrintFrame'); if (old) old.remove();
+            const fr = document.createElement('iframe'); fr.id = 'tvPrintFrame'; fr.style.cssText = 'position:fixed;left:-3000px;top:0;width:900px;height:1200px;border:0;'; document.body.appendChild(fr);
+            window.__printed = 0; fr.contentWindow.print = () => { window.__printed = 1; };
+            $('[data-sp="print"]').click();
+            for (let i = 0; i < 300 && !window.__printed; i++) await sleep(150);
+            const doc = document.getElementById('tvPrintFrame').contentDocument;
+            const pages = measure(doc);
+            window.closeSimplePrint();
+            return { line, chips, colOpts, pages, printed: !!window.__printed };
+        }, { list: OWNER.map((s) => Object.assign({ amt: '' }, s)), c, measureSrc });
+        const tag = `UI owner ${c.how} ${c.n} @${c.size} ${c.arrange} cols ${c.cols} sets ${c.sets}`;
+        if (!r.printed) { fails.push(`${tag}: Print never reached the print frame`); continue; }
+        if (r.colOpts.includes('10')) fails.push(`${tag}: AUTO9 the Columns list offers 10 with ÷ in the set`);
+        const asked = c.how === 'problems' ? (() => { const n = OWNER.length, e = Math.floor(c.n / n); return OWNER.map((_, i) => e + (i < c.n - e * n ? 1 : 0)); })() : null;
+        if (asked && r.chips.join() !== asked.join()) fails.push(`${tag}: SETPAGE the chips say ${r.chips.join('/')}, the request splits to ${asked.join('/')}`);
+        check({ c, line: r.line, pages: r.pages, counts: r.chips, asked, full: {} }, tag);
+    }
+
+    // AUTO9: Auto never more than 9 across for any fact mix; 10 only when picked
+    const a9 = await page.evaluate(async (owner) => {
+        const m = await import('/js/modules/simple-print.js');
+        const L = (l) => l.map((s) => Object.assign({ amt: '' }, s));
+        const mixes = [['+ −', owner.slice(0, 2)], ['+', owner.slice(0, 1)], ['−', owner.slice(1, 2)], ['×', owner.slice(2, 3)], ['+ − ×', owner.slice(0, 3)], ['÷', owner.slice(3)], ['owner', owner],
+            ['× 3', [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [3] } }]]];
+        const out = [];
+        for (const [nm, l] of mixes) for (const size of ['S', 'M', 'L']) for (const how of ['pages', 'problems']) {
+            const o = { how, n: how === 'pages' ? 1 : 40, size, cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
+            const b = await m.buildSimple(L(l), o);
+            const cols = (String(b.pupilHtml).match(/grid-template-columns:\s*repeat\((\d+)/g) || []).map((x) => Number(/(\d+)$/.exec(x)[1]));
+            out.push({ nm, size, how, cols: [...new Set([...(b.grids || []).map((g) => g.cols), b.cols, ...cols])].filter(Boolean), line: m.summaryLine(b, o) });
+        }
+        // picked 10 on + − prints 10
+        const o10 = { how: 'pages', n: 1, size: 'S', cols: 10, colsMode: 'aim', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
+        const b10 = await m.buildSimple(L(owner.slice(0, 2)), o10);
+        return { out, picked10: b10.cols };
+    }, OWNER);
+    for (const x of a9.out) if (Math.max(...x.cols) > 9) fails.push(`AUTO9 ${x.nm} @${x.size} ${x.how}: Auto printed ${Math.max(...x.cols)} columns ("${x.line}")`);
+    rows.push(`AUTO9 ${a9.out.length} Auto prints: most across ${Math.max(...a9.out.flatMap((x) => x.cols))}; + − picked 10 at S prints ${a9.picked10}`);
+    if (a9.picked10 !== 10) fails.push(`AUTO9 + − with 10 picked at S printed ${a9.picked10} columns, want 10`);
+
+    // DIVMAX9 docs: both the design standard and PAGE_TYPES
+    const fs = require('fs');
+    const path = require('path');
+    const root = process.env.MQ_ROOT || path.join(__dirname, '..', '..');
+    for (const doc of ['WORKSHEET_DESIGN_STANDARD.md', 'design/PAGE_TYPES.md']) {
+        const lines = fs.readFileSync(path.join(root, doc), 'utf8').split('\n');
+        // (sentence by sentence: a heading's "at most 9" does not excuse the next sentence's "reaches the full 10 columns")
+        const bad = lines.flatMap((t, i) => t.split(/(?<=[.;:])\s+(?=[A-Z*(])/).map((x) => [i + 1, x])).filter(([, t]) => /divi|÷/i.test(t) && /reach(es)? (the full )?10\b|10-column|\b(to|at) 10 columns|10 in every|\b10 x \d+ \((stacked ÷|fraction|bracket)|10 x 7 = 69/i.test(t) && !/at most 9|max(imum)? 9|never 10|not 10|no longer|replaced/i.test(t));
+        rows.push(`DIVMAX9 docs: ${bad.length} line(s) of ${doc} say division reaches 10 columns`);
+        for (const [n, t] of bad) fails.push(`DIVMAX9 ${doc}:${n} says division reaches 10 columns: "${t.trim().slice(0, 140)}"`);
+    }
+    return { rows, fails };
+}
+
 (async () => {
     const app = await open({ seed: 7 });
     const page = app.page;
@@ -364,6 +574,15 @@ async function factsCounts(page) {
     const fails = [];
     const rows = [];
     const F2 = (t) => fails.push('UI3 ' + t);
+    if (has('setpage')) {
+        // (dev focus: the r3 checks only)
+        const sp = await factsSetPage(page);
+        console.log(sp.rows.join('\n'));
+        for (const f of sp.fails) console.log('  FAIL ' + f);
+        await app.close();
+        console.log(sp.fails.length ? 'ws-simple-print: FAIL' : 'ws-simple-print: OK');
+        process.exit(sp.fails.length ? 1 : 0);
+    }
     if (!has('backtest') && !has('backtest-options')) {
         const fp = await factsPrint(page);
         rows.push(...fp.rows);
@@ -371,6 +590,9 @@ async function factsCounts(page) {
         const fc = await factsCounts(page);
         rows.push(...fc.rows);
         fails.push(...fc.fails);
+        const sp = await factsSetPage(page);
+        rows.push(...sp.rows);
+        fails.push(...sp.fails);
         if (has('facts-print')) {
             console.log(rows.join('\n'));
             for (const f of fails) console.log('  FAIL ' + f);
@@ -450,7 +672,7 @@ async function factsCounts(page) {
                     const want = FACT_COLS[size];
                     const cl = r.def.colsList && r.def.colsList.length ? r.def.colsList : [r.def.cols];
                     if (r.def.arrangement !== 'facts') fails.push(`${tag}: FACTS a fast-facts set printed as ${r.def.arrangement}, not fact rows`);
-                    else if (!cl.some((c) => c === want || (c === 8 && want === 10))) fails.push(`${tag}: FACTS ${cl.join('/')} columns, want ${want}`);
+                    else if (!cl.some((c) => c === want || (c === 8 && want === 9))) fails.push(`${tag}: FACTS ${cl.join('/')} columns, want ${want}`);
                 }
             }
         }

@@ -43,9 +43,20 @@ import { interleave } from '../interleave.js';
 
 export const ROLE_ID = 'fact-rows';
 export const DEFAULT_LOOK = 'daily';
-const AUTO = { S: 10, M: 6, L: 5 };
+// facts-print-fix r3 (owner rule 2026-11-05: "Columns: Auto = 9; 10 only if the owner picks it"): Auto is at most 9 at
+// Size S for every fact mix (+ − alone too); 9 and 10 columns share the 16 pt rung and the 24 mm cell (TY-30, VA-70)
+const AUTO = { S: 9, M: 6, L: 5 };
 
-export const sources = (skills) => [{ id: 'main', skills }];
+/**
+ * The item pools. One pool ('main') - except a fact-rows request with `factSections` (facts-print-fix r3, PT-FRW-6 /
+ * PT-FRW-12): one pool a request section ('main', 's1'), each its own section on the ONE page (its own instruction and
+ * grid), so a ÷ section follows the + − × rows on the same page when its rows fit.
+ */
+export const sources = (skills, opts = {}) => {
+    const secs = opts && Array.isArray(opts.factSections) ? opts.factSections.filter((x) => x && x.length) : null;
+    if (!secs || secs.length < 2) return [{ id: 'main', skills }];
+    return secs.map((sk, i) => ({ id: i ? `s${i}` : 'main', skills: sk }));
+};
 export const measureCols = (ctx) => [...new Set([5, 6, 8, 10, AUTO[(ctx && ctx.size) || 'L']])];
 
 const FACT_SKILL_RE = /^(add|sub|mult|div)_facts$/;
@@ -477,7 +488,10 @@ export function factRowsLayout(items, input) {
     const header = layoutHeader(frame.header);
     const G = gridHeightMm(ctx.paper, ctx.size, header);
     // (input.__clamp8: the page was dealt for the band's 3-digit answers - see plan, R2-2 COUNT-FITS)
-    const n = Math.max(tracksOf(items), input.__clamp8 && items.some((it) => opOf(it.q || {}) !== 'divide') ? 3 : 0);
+    // (input.factTracks, facts-print-fix r3 D2 / D4: the tracks the SKILLS can reach - x 1-12 reaches 144 - from the caller's
+    // probe, so every page and every set of the print takes one column count and one digit size, whatever was dealt)
+    const reachT = Number(input.factTracks) || 0;
+    const n = Math.max(tracksOf(items), reachT, input.__clamp8 && items.some((it) => opOf(it.q || {}) !== 'divide') ? 3 : 0);
     const labels = labelStyleOf(ctx.look, input.labels);
     const forms = divForms(items) || mixedForms(items);
     if (forms) return formRows(items, input, ctx, G, labels, forms);
@@ -508,7 +522,8 @@ export function factRowsLayout(items, input) {
     // (the largest factor dealt x the largest smaller factor: a x 3 table with turnarounds is 12 x 3, not 12 x 12)
     const fac = mults.map((it) => (operandsOf(it.q || {}) || []).slice(0, 2).map((v) => Math.abs(Number(v) || 0)));
     const reachMul = mults.length > 1 && Math.max(0, ...fac.map((f) => Math.max(...f, 0))) * Math.max(0, ...fac.map((f) => Math.min(...(f.length ? f : [0])))) > 99;
-    const big = reachMul || items.some((it) => Number(answerOf(it)) > 99);
+    // (input.factAnsTracks: the digits the + − × answers can reach, from the same probe - PT-FRW-5's clamp off the reach)
+    const big = (reachT ? (Number(input.factAnsTracks) || 0) >= 3 && items.some((it) => opOf(it.q || {}) !== 'divide') : reachMul) || items.some((it) => Number(answerOf(it)) > 99);
     let cols = input.columns && input.columns !== 'auto' ? Math.max(5, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     let note = '';
     // (input.__clamp8: the page was dealt for the 8-column clamp, see plan / R2-2)
@@ -643,7 +658,16 @@ export function formGrid(items, ctx, G, forms, count, maxCols = 5) {
 export const formCell = (it, L) => factCell(it, L);
 
 // (facts-print-fix D2: a section's own count - Problems mode - deals at most a page; the page then prints that count)
-export const counts = (pools, input) => { const per = factRowsLayout(pools.main || [], input).perPage; return { main: input && Number(input.count) > 0 ? Math.min(per, Number(input.count)) : per }; };
+export const counts = (pools, input) => {
+    // (factSections: each section's own count, the caller - simple-print.js buildFacts - has planned they fit one page)
+    if (input && Array.isArray(input.factCounts) && Object.keys(pools).length > 1) {
+        const out = {};
+        Object.keys(pools).forEach((id) => { const i = id === 'main' ? 0 : Number(id.slice(1)); out[id] = Math.max(0, Number(input.factCounts[i]) || 0); });
+        return out;
+    }
+    const per = factRowsLayout(pools.main || [], input).perPage;
+    return { main: input && Number(input.count) > 0 ? Math.min(per, Number(input.count)) : per };
+};
 
 /**
  * Does a stacked ÷ fact's first dividend digit fall under the number tab's keep-out (tab side +
@@ -762,8 +786,71 @@ export function mixOps(items, input = {}) {
     return r && Array.isArray(r.order) && r.order.length === items.length ? r.order.map((x) => x.it) : items;
 }
 
+/** The white between two sections of one fact-rows page (the second section's instruction line sits under it). */
+export const SECTION_GAP_MM = 2;
+
+/**
+ * A fact-rows page of several sections (facts-print-fix r3 D1: the ÷ section on the same page as the + − × rows when its
+ * rows fit, PT-FRW-6 asks only that ÷ be its own SECTION): each pool its own instruction and grid, at its own columns,
+ * digits and row height (`factRowsLayout` per section, with that section's reach tracks), stacked down the page. The
+ * rows of every section take one stretch, `input.factStretch` (the caller's one stretch for the whole print, PG-11), never
+ * more than the page holds; rows that do not fit are left off the LAST section (whole rows) and the meta says what printed.
+ */
+function planSections(input, ctx, ids) {
+    const secIn = Array.isArray(input.factSecs) ? input.factSecs : [];
+    const secs = ids.map((id, i) => {
+        const its = poolItems(input, id);
+        const own = secIn[i] || {};
+        const inp = Object.assign({}, input, { factTracks: own.tracks || 0, factAnsTracks: own.ansTracks || 0, columns: own.columns || 'auto', count: own.count || undefined, factStretch: own.stretch || 0 });
+        return { id, its, inp, L: its.length ? factRowsLayout(its, inp) : null };
+    }).filter((x) => x.its.length);
+    const allItems = secs.flatMap((x) => x.its);
+    const frame0 = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(allItems), score: allItems.length });
+    const G = gridHeightMm(ctx.paper, ctx.size, layoutHeader(frame0.header));
+    const instr = (SIZES[ctx.size] || SIZES.L).instrMm;
+    const avail = G - SAFETY_H_MM - (secs.length - 1) * (instr + SECTION_GAP_MM);
+    // whole rows of each section; rows that do not fit come off the last section
+    for (const x of secs) x.rows = Math.ceil(x.its.length / x.L.cols);
+    const need = () => secs.reduce((t, x) => t + x.rows * x.L.hMin, 0);
+    for (let k = secs.length - 1; k >= 0 && need() > avail; k--) {
+        while (secs[k].rows > 0 && need() > avail) secs[k].rows--;
+        secs[k].its = secs[k].its.slice(0, secs[k].rows * secs[k].L.cols);
+    }
+    const live = secs.filter((x) => x.rows > 0 && x.its.length);
+    // each section's own stretch (the caller's, one per section for the whole print), all scaled down together if the
+    // page cannot hold them; none given: the rows share the page's height, at most PG-11's 1.3
+    const want = (x) => (Number(x.inp.factStretch) > 0 ? Number(x.inp.factStretch) : 1.3);
+    const used = live.reduce((t, x) => t + x.rows * x.L.hMin * want(x), 0) || 1;
+    const scale = Math.min(1, avail / used);
+    const fOf = (x) => Math.max(1, want(x) * (Number(x.inp.factStretch) > 0 ? scale : Math.min(1, avail / used)));
+    const parts = [];
+    const printed = [];
+    const fits = [];
+    const notes = [];
+    let start = 1;
+    for (const x of live) {
+        const L = Object.assign({}, x.L, { size: ctx.size, look: ctx.look, cellH: x.L.hMin * fOf(x) });
+        const kept = x.id === 'main' ? mixOps(x.its, input) : x.its;
+        const items = kept.map((it) => factCell(it, L));
+        const grid = Object.assign(gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows: x.rows, cellH: L.cellH, labels: L.labels, start, cls: 'facts' }), { relay: false });
+        parts.push(instructionPart(instructionKeyOf(items, input.skills), items), grid);
+        start += items.length;
+        for (const it of kept) printed.push(it.skill || `${(it.q || {}).categoryId}:${(it.q || {}).skillId}`);
+        const line = `Fits: ${L.cols} columns x ${x.rows} rows (a full page ${L.cols} x ${L.rows}). Digits ${L.digitPt} pt.${L.note ? ` ${L.note}` : ''}`;
+        fits.push({ role: ROLE_ID, cols: L.cols, rows: L.rows, perPage: L.perPage, pages: 1, cellH: L.cellH, hMin: L.hMin, digitPt: L.digitPt, across: L.across, note: L.note, line, gridH: G, instrMm: instr, count: items.length, section: x.id });
+        if (L.note && !notes.includes(L.note)) notes.push(L.note);
+    }
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(allItems), score: printed.length });
+    return assemble(ROLE_ID, input, frame, [{ sections: parts }], {
+        defaultLook: DEFAULT_LOOK,
+        meta: { items: printed.length, scoreOutOf: printed.length, printedSkills: printed, fits, notes },
+    });
+}
+
 export function plan(input = {}) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
+    const ids = (input.pools || []).map((p) => p.id);
+    if (ids.length > 1) return planSections(input, ctx, ids);
     const all = poolItems(input, 'main');
     let L0 = factRowsLayout(all, input);
     // COUNT-FITS (critic r2 R2-2): the count was dealt from the layout of a probe deal; when the probe brought
@@ -771,7 +858,8 @@ export function plan(input = {}) {
     // in 10 columns ("Score /56" in a grid said to hold 70), or 48 facts in a 56-cell grid (3 tracks set the
     // digits, so the rows). The layout follows what was dealt for: a deal short of the page is laid as the
     // band's 3-digit page when that holds it, so printed = cols x rows = Score /N on every seed.
-    if (all.length < L0.perPage && !input.__clamp8) {
+    // (input.factTracks: the caller fixed the reach, so the layout is the same on every deal - no re-pick)
+    if (all.length < L0.perPage && !input.__clamp8 && !input.factTracks) {
         // (two ways the probe reached the clamp: a dealt product over 99 - 3 tracks - or only the reach of its factors,
         // facts-print-fix r2 - the dealt tracks at 8 columns; the one that holds exactly what was dealt wins)
         const L8 = factRowsLayout(all, Object.assign({}, input, { __clamp8: true }));
@@ -785,6 +873,11 @@ export function plan(input = {}) {
     if (all.length < L0.perPage && all.length >= L0.cols && all.length % L0.cols === 0 && all.length / L0.cols >= L0.rows - 2) {
         const rows = all.length / L0.cols;
         L0 = Object.assign({}, L0, { rows, perPage: all.length, cellH: Math.min(L0.gridH / rows, L0.hMin * 1.3) });
+    }
+    // facts-print-fix r3: the caller's one stretch for the whole print (PG-11: one row height a section on every page)
+    if (Number(input.factStretch) > 0) {
+        const r = Math.max(1, Math.ceil(Math.min(all.length, L0.perPage) / L0.cols));
+        L0 = Object.assign({}, L0, { cellH: Math.min(L0.hMin * Number(input.factStretch), (L0.gridH - SAFETY_H_MM) / r) });
     }
     const L = Object.assign({}, L0, { size: ctx.size, look: ctx.look });
     const kept = mixOps(keepShares(all, L), input);
@@ -800,7 +893,7 @@ export function plan(input = {}) {
             items: items.length, scoreOutOf: items.length,
             // the skill of every PRINTED fact, in page order (the caller's per-skill counts are what prints, D1)
             printedSkills: kept.map((it) => it.skill || `${(it.q || {}).categoryId}:${(it.q || {}).skillId}`),
-            fits: [{ role: ROLE_ID, cols: L.cols, rows: L.rows, perPage: L.perPage, pages: 1, cellH: L.cellH, hMin: L.hMin, digitPt: L.digitPt, across: L.across, note: L.note, line }],
+            fits: [{ role: ROLE_ID, cols: L.cols, rows: L.rows, perPage: L.perPage, pages: 1, cellH: L.cellH, hMin: L.hMin, digitPt: L.digitPt, across: L.across, note: L.note, line, gridH: L.gridH, instrMm: (SIZES[ctx.size] || SIZES.L).instrMm, count: items.length }],
             notes: L.note ? [L.note] : [],
         },
     });

@@ -49,7 +49,8 @@ import { optionsFor, offeredOptionsFor, describeOptions } from './skill-options.
 const STORE_KEY = 'mq_simple_print';
 const SIZES = [['L', 'Big'], ['M', 'Medium'], ['S', 'Small']];
 const SIZE_NAME = Object.fromEntries(SIZES);
-const FACT_AUTO = { S: 10, M: 6, L: 5 };
+// (facts-print-fix r3, owner rule 2026-11-05: "Columns: Auto = 9; 10 only if the owner picks it")
+const FACT_AUTO = { S: 9, M: 6, L: 5 };
 // Owner 2026-11-03 (item 4): "7, 8, 9, 10 should be just for small problems": a fast fact may go up to 10 across, every
 // larger cell at most 6 (and the engine clamps either to what really fits at the size).
 const FACT_MAX_COLS = 10, CELL_MAX_COLS = 6;
@@ -195,6 +196,31 @@ export function isFactSkill(s) {
     return ok;
 }
 const isDivisionFact = (s) => s.categoryId === 'division';
+/**
+ * What a fact skill can REACH (facts-print-fix r3 D2 / D4): the most digit tracks of its numbers and the digits of its
+ * answers over one seeded probe of 60 items (x 1-12: 3 tracks, 3-digit answers; + − within 20: 2; ÷ 1-12: 3 for 144).
+ * A fact-rows page takes its columns and digit size from this, never from the facts one page happens to deal.
+ */
+const reachCache = new Map();
+export function reachOf(s) {
+    const k = keyOf(s) + JSON.stringify(s.opts || {});
+    if (reachCache.has(k)) return reachCache.get(k);
+    const dg = (v) => String(v === undefined || v === null ? '' : v).replace(/[^0-9]/g, '').length;
+    let tracks = 2, ans = 1;
+    for (let i = 0; i < 60; i++) {
+        let q = null;
+        try { q = generateQuestionFor({ category: s.categoryId, skill: s.skillId, opts: s.opts, seed: 7001 + i * 131 }); } catch (e) { q = null; }
+        if (!q) continue;
+        const p = (q.cell && q.cell.payload) || {};
+        const nums = p.a !== undefined && p.b !== undefined ? [p.a, p.b] : (String(q.text || '').match(/\d+/g) || []).slice(0, 2);
+        const an = p.ans !== undefined ? p.ans : q.ans;
+        tracks = Math.max(tracks, ...nums.map(dg), dg(an));
+        ans = Math.max(ans, dg(an));
+    }
+    const r = { tracks: Math.min(7, tracks), ans };
+    reachCache.set(k, r);
+    return r;
+}
 
 function baseReq(o) {
     return {
@@ -282,9 +308,9 @@ async function buildSections(list, counts, o) {
  *   { pupilHtml, keyHtml, doc, pages, keyPages, total, counts, arrangement, cols, rows, perPage, notes, firstHtml }
  */
 /** The teacher footer in words (lead, 2026-11-03: never the raw ids "add_facts, sub_facts +4"): the skills' names. */
-export function footerOf(list) {
+export function footerOf(list, max = 3) {
     const names = [...new Set(list.map(footerName))];
-    return names.length > 3 ? `${names.slice(0, 3).join(', ')} and ${names.length - 3} more` : names.join(', ');
+    return names.length > max ? `${names.slice(0, max).join(', ')} and ${names.length - max} more` : names.join(', ');
 }
 
 export async function buildSimple(list, o) {
@@ -369,7 +395,10 @@ export async function buildSimple(list, o) {
 async function probeCols(list, arrangement, o) {
     if (arrangement === 'facts') {
         const g = list.filter((s) => !isDivisionFact(s));
-        const res = await buildSheet(Object.assign(baseReq(o), { role: 'fact-rows', look: 'auto', sections: [{ skills: (g.length ? g : list).map(skillRef), pages: 1 }] }));
+        // (the reach of the skills, as the print takes it: r3 D2 - the size button says what prints)
+        const gl = g.length ? g : list;
+        const rc = gl.reduce((r, s) => { const x = reachOf(s); return { tracks: Math.max(r.tracks, x.tracks), ans: Math.max(r.ans, isDivisionFact(s) ? 0 : x.ans) }; }, { tracks: 2, ans: 0 });
+        const res = await buildSheet(Object.assign(baseReq(o), { role: 'fact-rows', look: 'auto', sections: [{ skills: gl.map(skillRef), pages: 1, tracks: rc.tracks, ansTracks: rc.ans }] }));
         const f = res.fits || {};
         return { cols: f.cols || 0, colsList: [f.cols || 0] };
     }
@@ -421,71 +450,151 @@ export function renumberFooters(html) {
  */
 async function buildFacts(list, amounts, o) {
     // Mixed up (facts-print-fix): the same pages and counts as In sections, the operations of each page interleaved.
-    // Division keeps its own page(s) in both (PT-FRW-6: a mixed-operations vertical section excludes division).
+    // Division is its own SECTION in both (PT-FRW-6: a mixed-operations vertical section excludes division).
     const mixed = o.arrange === 'mixed' && list.length >= 2;
     const problems = o.how === 'problems';
     const asked = problems ? splitCounts(amounts, o.n).counts : null;
     const live = (s) => !problems || asked[list.indexOf(s)] > 0;
     const groups = [list.filter((s) => !isDivisionFact(s) && live(s)), list.filter((s) => isDivisionFact(s) && live(s))].filter((g) => g.length);
     const shares = sharesOf(amounts);
+    // r3 D2 / D4: what each group's skills can REACH (x 1-12 reaches 144: 3 tracks, answers over 99), from one probe of the
+    // skills - never from the facts dealt on a page - so every page and every set takes one column count and digit size
+    const reach = groups.map((g) => g.reduce((r, s) => { const x = reachOf(s); return { tracks: Math.max(r.tracks, x.tracks), ans: Math.max(r.ans, isDivisionFact(s) ? 0 : x.ans) }; }, { tracks: 2, ans: 0 }));
     let n = 0;
-    // one page of a group: `per` = how many of each of the group's skills (Problems), else the full page by the shares
-    const page = (g, per) => {
+    const secOf = (g, per) => {
         const grp = groups[g];
         const w = per || grp.map((s) => shares[list.indexOf(s)]);
         const count = per ? per.reduce((t, x) => t + x, 0) : 0;
-        const req = Object.assign(baseReq(Object.assign({}, o, { seed: o.seed + 7919 * (n++), ...(o.__footerAuto ? { footer: footerOf(grp) } : {}) })), {
+        return { skills: grp.map((s, i) => Object.assign(skillRef(s), { weight: w[i] })).filter((x) => x.weight > 0), pages: 1, ...(count ? { count } : {}),
+            tracks: reach[g].tracks, ansTracks: reach[g].ans,
+            ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), grp.some(isDivisionFact) ? DIV_MAX_COLS : FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) };
+    };
+    // one page: `parts` = [{g, per}] (per = how many of each of the group's skills; null: the full page by the shares)
+    const page = (parts, stretch = null) => {
+        const grps = parts.map((x) => groups[x.g]);
+        // (the footer names the skills ON this page: a skill with none left is not named)
+        const all = parts.flatMap((x) => groups[x.g].filter((_, i) => !x.per || x.per[i] > 0));
+        const req = Object.assign(baseReq(Object.assign({}, o, { seed: o.seed + 7919 * (n++), ...(o.__footerAuto ? { footer: footerOf(all, 4) } : {}) })), {
             role: 'fact-rows', look: 'auto',
-            // Mixed up: the page's operations interleaved in the one grid (owner ruling 2026-10-31, M1 run rules)
-            ...(mixed && grp.length > 1 ? { arrangement: 'mixed' } : {}),
-            sections: [{ skills: grp.map((s, i) => Object.assign(skillRef(s), { weight: w[i] })).filter((x) => x.weight > 0), pages: 1, ...(count ? { count } : {}),
-                ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), grp.some(isDivisionFact) ? DIV_MAX_COLS : FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) }],
+            // Mixed up: the + − × operations interleaved in their one grid (owner ruling 2026-10-31, M1 run rules)
+            ...(mixed && grps[0].length > 1 ? { arrangement: 'mixed' } : {}),
+            ...(parts.length > 1 ? { factSections: true } : {}),
+            sections: parts.map((x) => Object.assign(secOf(x.g, x.per), stretch ? { stretch: stretch[x.g] } : {})),
         });
         return buildSheet(req);
     };
-    // the pages of each group, built: [{pp: {g, per}, r}] (per = null: a full page)
+    // the pages, built: [{parts, r}]
     const plan = [];
+    let factPlan = null;
     if (problems) {
+        // r3 D1 (critic 2026-11-05: Problems 50 at S printed 2 pages, 72 and 169 mm of white, ÷ alone on page 2): ALL the
+        // groups planned together over the fewest pages - the ÷ section follows the + − × rows on the same page when its
+        // rows fit (PT-FRW-6 asks only for its own section) - the rows shared evenly over the pages, one row stretch for
+        // the whole print (PG-11), each skill's count dealt page by page from what is still left (D3: exact totals)
+        const lay = [];
         for (let g = 0; g < groups.length; g++) {
-            const want = groups[g].map((s) => asked[list.indexOf(s)]);
-            const total = want.reduce((t, x) => t + x, 0);
             const t0 = n;
-            const probe = await page(g, null);
-            n = t0; // (the probe takes the first page's seed)
-            let P = Math.max(1, cellsIn(probe.pupilHtml || '')), C = Math.max(1, (probe.fits && probe.fits.cols) || 1);
-            for (let round = 0; round < 3; round++) {
-                const pages = Math.max(1, Math.ceil(total / P));
-                let sizes = new Array(pages).fill(P);
-                sizes[pages - 1] = total - P * (pages - 1);
-                // a last page under 60 % full: the group's rows shared evenly over its pages (whole rows, the last page the rest)
-                if (pages > 1 && sizes[pages - 1] < 0.6 * P) {
-                    // (the extra rows to the later pages: 38 at 6 across = 18 + 20, never 24 + 14)
-                    const rows = apportion(new Array(pages).fill(1), Math.ceil(total / C)).reverse();
-                    sizes = rows.map((r) => Math.min(P, r * C));
-                    sizes[pages - 1] = total - sizes.slice(0, -1).reduce((t, x) => t + x, 0);
-                }
-                // each skill's facts shared over the pages in proportion to the pages' sizes (every page keeps the skills
-                // balanced), each page's own total kept exact
-                const perSkill = want.map((x) => apportion(sizes, x));
-                const pagePlan = sizes.map((sz, p) => {
-                    const raw = perSkill.map((c) => c[p]);
-                    return { g, per: raw.reduce((t, x) => t + x, 0) === sz ? raw : apportion(want, sz) };
-                });
-                // a page the engine laid smaller than asked (a 3-digit product brings the 8-column clamp): plan again at it
-                const t1 = n;
-                const built = [];
-                let short = 0;
-                for (const pp of pagePlan) {
-                    const r = await page(g, pp.per);
-                    built.push({ pp, r });
-                    const got = cellsIn(r.pupilHtml || '');
-                    if (got < pp.per.reduce((t, x) => t + x, 0)) short = short ? Math.min(short, got) : got;
-                }
-                if (!short || round === 2) { built.forEach((x) => plan.push(x)); break; }
-                n = t1;
-                P = Math.min(P - 1, short);
-                C = Math.max(1, (built[0].r.fits && built[0].r.fits.cols) || C);
+            const probe = await page([{ g, per: null }]);
+            n = t0;
+            const f = ((probe.fits && probe.fits.sections) || [])[0] || probe.fits || {};
+            lay.push({ cols: Math.max(1, f.cols || 1), hMin: f.hMin || f.cellH || 30, G: f.gridH || ((f.cellH || 30) * (f.rows || 1)), instr: f.instrMm || 8, rows: f.rows || 1 });
+        }
+        const want = groups.map((grp) => grp.map((s) => asked[list.indexOf(s)]));
+        const tot = want.map((w) => w.reduce((t, x) => t + x, 0));
+        const R = tot.map((t, g) => Math.ceil(t / lay[g].cols));
+        const G = Math.min(...lay.map((l) => l.G)) - 1;
+        const GAP = Math.max(...lay.map((l) => l.instr)) + 2;
+        const seq = [];
+        R.forEach((r, g) => { for (let k = 0; k < r; k++) seq.push(g); });
+        // pack the rows in order, at most T mm of rows (and a section's instruction) a page
+        const pack = (T) => {
+            const pages = [];
+            let cur = null;
+            for (const g of seq) {
+                const add = lay[g].hMin + (cur && !cur.rows[g] && cur.rows.some(Boolean) ? GAP : 0);
+                if (!cur || cur.h + add > T + 1e-6) { cur = { rows: groups.map(() => 0), h: lay[g].hMin }; pages.push(cur); } else cur.h += add;
+                cur.rows[g]++;
             }
+            return pages;
+        };
+        const P = pack(G).length;
+        // The split of the rows over the P pages and each group's ONE row stretch (PG-11: one row height a section, on
+        // every page of it) at which every page is full to within one row of white - the last page too (owner: "no white
+        // space unless only a few problems are asked for"); among those, the one with the least white. A feasibility walk
+        // over the rows (P contiguous pages) for each pair of stretches, 1.00 to the cap: PG-11's 1.3 first, then 1.4 and
+        // 1.7 only when the rows cannot fill the pages otherwise (5 + 2 rows over 2 pages of 6) - taller boxes, never a
+        // half-empty page.
+        const N = seq.length;
+        const pre = groups.map((_, g) => { const c = [0]; seq.forEach((x) => c.push(c[c.length - 1] + (x === g ? 1 : 0))); return c; });
+        const cnt = (g, i, j) => pre[g][j] - pre[g][i];
+        const content = (i, j, st) => { let h = 0, k = 0; groups.forEach((_, g) => { const c = cnt(g, i, j); if (c) { h += c * lay[g].hMin * st[g]; k++; } }); return h + Math.max(0, k - 1) * GAP; };
+        const okPage = (i, j, st) => { const c = content(i, j, st); return c <= G + 1e-6 && (P === 1 || G - c <= lay[seq[j - 1]].hMin * st[seq[j - 1]] + 0.4); };
+        const split = (st) => {
+            // from[p][j] = i: the first p pages end at row j, the p-th page starting at row i
+            const from = Array.from({ length: P + 1 }, () => new Array(N + 1).fill(-1));
+            from[0][0] = 0;
+            for (let p = 1; p <= P; p++) for (let j = 1; j <= N; j++) for (let i = j - 1; i >= 0; i--) {
+                if (from[p - 1][i] < 0) continue;
+                if (content(i, j, st) > G + 1e-6) break;
+                if (okPage(i, j, st)) { from[p][j] = i; break; }
+            }
+            if (from[P][N] < 0) return null;
+            const cuts = [];
+            for (let p = P, j = N; p > 0; p--) { const i = from[p][j]; cuts.unshift([i, j]); j = i; }
+            return cuts;
+        };
+        const steps = (cap) => { const v = []; for (let x = 1; x <= cap + 1e-9; x += 0.01) v.push(Math.round(x * 100) / 100); return v; };
+        let best = null;
+        if (P > 1) {
+            for (const cap of [1.3, 1.4, 1.7]) {
+                const vs = steps(cap);
+                const combos = groups.length > 1 ? vs.flatMap((x) => vs.map((y) => [x, y])) : vs.map((x) => [x]);
+                for (const st of combos) {
+                    const cuts = split(st);
+                    if (!cuts) continue;
+                    const white = Math.max(...cuts.map(([i, j]) => G - content(i, j, st)));
+                    const tall = Math.max(...st);
+                    if (!best || white < best.white - 0.5 || (white < best.white + 0.5 && tall < best.tall)) best = { st, cuts, white, tall };
+                }
+                if (best) break;
+            }
+        }
+        let pages;
+        let stretch;
+        const rowsAt = (i, j) => { const pg = { rows: groups.map(() => 0) }; for (let k = i; k < j; k++) pg.rows[seq[k]]++; return pg; };
+        if (P === 1) {
+            // one page: the rows stretched to the grid (PG-11's 1.3 at most; a short count keeps its white)
+            pages = [rowsAt(0, N)];
+            const g1 = (groups.filter((_, g) => cnt(g, 0, N)).length - 1) * GAP;
+            const one = Math.max(1, Math.min(1.3, (G - g1) / (content(0, N, groups.map(() => 1)) - g1)));
+            stretch = groups.map(() => one);
+        } else if (best) { pages = best.cuts.map(([i, j]) => rowsAt(i, j)); stretch = best.st; } else {
+            // (no split fills every page within a row: the rows shared evenly - the least tall fullest page - and the
+            // stretch the fullest page allows)
+            const H = seq.reduce((t, g) => t + lay[g].hMin, 0);
+            pages = pack(G);
+            for (let T = H / P; T < G; T += 0.5) { const pk = pack(T); if (pk.length <= P) { pages = pk; break; } }
+            const rowsH = (pg) => pg.rows.reduce((t, r, g) => t + r * lay[g].hMin, 0);
+            const gaps = (pg) => (pg.rows.filter(Boolean).length - 1) * GAP;
+            const one = Math.max(1, Math.min(1.3, ...pages.map((pg) => (G - gaps(pg)) / rowsH(pg))));
+            stretch = groups.map(() => one);
+        }
+        factPlan = { lay, G, GAP, P, stretch, filled: P === 1 || !!best, rows: pages.map((pg) => pg.rows) };
+        // each page's facts of each group (whole rows; a group's last page the rest), each skill's share from what is left
+        const left = want.map((w) => w.slice());
+        const placed = groups.map(() => 0);
+        const lastOf = groups.map((_, g) => { let k = -1; pages.forEach((pg, i) => { if (pg.rows[g]) k = i; }); return k; });
+        for (let i = 0; i < pages.length; i++) {
+            const parts = [];
+            pages[i].rows.forEach((r, g) => {
+                if (!r) return;
+                const k = i === lastOf[g] ? tot[g] - placed[g] : Math.min(tot[g] - placed[g], r * lay[g].cols);
+                const per = i === lastOf[g] ? left[g].slice() : apportion(left[g], k);
+                per.forEach((x, j) => { left[g][j] -= x; });
+                placed[g] += k;
+                parts.push({ g, per });
+            });
+            plan.push({ parts, r: await page(parts, stretch) });
         }
     } else {
         const pages = Math.max(1, Math.min(MAX_PAGES, o.n));
@@ -494,19 +603,25 @@ async function buildFacts(list, amounts, o) {
         const gPages = gShare.map((f) => Math.max(1, Math.round(f * pages)));
         while (gPages.reduce((t, x) => t + x, 0) > pages && gPages.some((x) => x > 1)) { const i = gPages.indexOf(Math.max(...gPages)); gPages[i]--; }
         while (gPages.reduce((t, x) => t + x, 0) < pages) { const i = gShare.indexOf(Math.max(...gShare)); gPages[i]++; }
-        for (let g = 0; g < groups.length; g++) for (let p = 0; p < gPages[g]; p++) plan.push({ pp: { g, per: null }, r: await page(g, null) });
+        for (let g = 0; g < groups.length; g++) for (let p = 0; p < gPages[g]; p++) { const parts = [{ g, per: null }]; plan.push({ parts, r: await page(parts) }); }
     }
     const out = { pupil: [], key: [], pages: 0, keyPages: 0, items: 0, fits: null, notes: [], first: '', counts: list.map(() => 0), grids: [], perPage: [] };
     const seen = new Set();
-    for (const { pp, r: res } of plan) {
+    for (const { parts, r: res } of plan) {
         out.pupil.push(res.pupilHtml || '');
         out.key.push(res.keyHtml || '');
         out.pages += res.pageCount || 1;
         out.keyPages += res.keyPageCount || 0;
         const c1 = cellsIn(res.pupilHtml || '');
         out.perPage.push(c1);
-        // each group's own grid (its first page): a ÷ page may take fewer columns than the + − × page
-        if (!seen.has(pp.g) && res.fits && res.fits.cols) { seen.add(pp.g); out.grids.push({ div: groups[pp.g].every(isDivisionFact), cols: res.fits.cols, rows: Math.ceil(c1 / res.fits.cols), perPage: c1 }); }
+        // each group's own grid (its first page): a ÷ part may take other columns than the + − × part
+        const fsec = (res.fits && res.fits.sections) || [];
+        parts.forEach((pp, j) => {
+            const fj = fsec[j] || (j === 0 ? res.fits : null);
+            if (seen.has(pp.g) || !fj || !fj.cols) return;
+            seen.add(pp.g);
+            out.grids.push({ div: groups[pp.g].every(isDivisionFact), cols: fj.cols, rows: problems ? fj.rows : Math.ceil(c1 / fj.cols), perPage: problems ? fj.perPage : c1, pt: fj.digitPt });
+        });
         if (!out.fits && res.fits) out.fits = res.fits;
         // the per-skill counts are what the page PRINTS (D1), from the role's own record of the kept facts
         const printed = res.printedSkills || (res.items || []).filter(Boolean).map((it) => it.skill);
@@ -529,6 +644,8 @@ async function buildFacts(list, amounts, o) {
         cols: f.cols || 0, rows: f.cols ? Math.ceil(p1 / f.cols) : f.rows || 0, perPage: p1, pageCounts: out.perPage,
         colsList: [f.cols || 0], notes: out.notes, divMax9: colsAsked(o) > DIV_MAX_COLS && list.some(isDivisionFact), firstHtml: first, grids: out.grids,
         capped: colsAsked(o) && f.cols && f.cols < colsAsked(o) ? f.cols : 0, colsMode: modeOf(o),
+        // (Problems mode: the page plan - each group's layout, the rows a page, the one stretch - for the gate)
+        factPlan,
     };
 }
 
@@ -649,8 +766,10 @@ export function summaryLine(b, o) {
     if (b.arrangement === 'facts' && b.how === 'problems') {
         const gs = b.grids && b.grids.length ? b.grids : [{ cols: b.cols }];
         const pc = b.pageCounts || [b.perPage];
-        const held = pc.length > 1 ? `${Math.min(...pc)}–${Math.max(...pc)} a page` : `${pc[0]} on the page`;
-        grid = `${b.mixedFacts ? 'Mixed up, ' : ''}${gs[0].cols} columns${one}${gs.slice(1).filter((x) => x.cols !== gs[0].cols).map((x) => ` · ${x.div ? 'division pages' : 'next pages'} ${x.cols} columns`).join('')} · ${held}`;
+        // (r3 D7: "20 a page" when every page holds the same, never "20–20")
+        const held = pc.length > 1 ? (Math.min(...pc) === Math.max(...pc) ? `${pc[0]} a page` : `${Math.min(...pc)}–${Math.max(...pc)} a page`) : `${pc[0]} on the page`;
+        // (r3 D1: the ÷ facts are their own section, on the + − × pages when their rows fit: "division 9 columns")
+        grid = `${b.mixedFacts ? 'Mixed up, ' : ''}${gs[0].cols} columns${one}${gs.slice(1).filter((x) => x.cols !== gs[0].cols).map((x) => ` · ${x.div ? 'division' : 'next part'} ${x.cols} columns`).join('')} · ${held}`;
     } else if (b.rows && b.cols && b.cols * b.rows === b.perPage && (b.arrangement === 'facts' || (cl.length === 1 && (b.colsList || []).length <= 1 && !b.fellBack))) grid = `${b.mixedFacts ? 'Mixed up, ' : ''}${b.cols} columns${one} × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
     // a ÷ page on its own grid (facts-print-fix: 9 across at S so 3-digit numbers have room): the line names both
     const g2 = b.arrangement === 'facts' && b.how !== 'problems' && (b.grids || []).length > 1 && b.grids.some((x) => x.cols !== b.grids[0].cols || x.perPage !== b.grids[0].perPage) ? b.grids.slice(1).filter((x) => x.cols !== b.grids[0].cols || x.perPage !== b.grids[0].perPage) : [];
@@ -660,7 +779,7 @@ export function summaryLine(b, o) {
     else if (b.arrangement === 'mixed') grid = `Mixed up, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     else grid = `Each skill its own grid, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     // an asked 10 prints 9 on the division parts (owner 2026-11-05)
-    if (b.divMax9 && grid) grid = / · division pages \d+ columns/.test(grid) ? grid.replace(/( · division pages \d+ columns)/, '$1 (max 9 with division)') : `${grid} (max 9 with division)`;
+    if (b.divMax9 && grid) grid = / · division(?: pages)? \d+ columns/.test(grid) ? grid.replace(/( · division(?: pages)? \d+ columns)/, '$1 (max 9 with division)') : `${grid} (max 9 with division)`;
     // a Mixed up that fell back says so on every kind of line (facts-print-fix FALLBACK)
     if (b.fellBack && !/^In sections/.test(grid)) grid = `In sections, ${grid}`;
     return [grid, pages, probs, ...(sets > 1 ? [`${sets} sets, each with different problems`] : []), key].join(' · ');
