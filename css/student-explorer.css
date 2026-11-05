@@ -70,3 +70,21 @@ html.mqx-open, html.mqx-open body { overflow: hidden; }
   .mqx-clear { padding: 8px 14px; }
 }
 @media (prefers-reduced-motion: reduce) { .mqx-card, .mqx-chip, .mqx-tab { transition: none; } }
+/* explorer check r2 D3 (2026-11-05): the list gets the room. The grade's area row is one sideways-scrolling line at every
+   width (it wrapped onto 2 lines at 1366); on a short laptop (1366x768) the search sits beside the title and the bands are
+   tighter, so the list keeps >= 60 % of the height; a tablet (820x1180) is no longer capped at 900 px. Additive overrides. */
+.mqx-body .mqx-chiprow.mqx-arearow { flex-wrap: nowrap; overflow-x: auto; }
+@media (min-width: 601px) and (max-width: 1024px) { .mqx-overlay .mqx-panel { max-height: none; } }
+@media (min-width: 601px) and (max-height: 800px) {
+  .mqx-overlay { padding: 8px; }
+  .mqx-overlay .mqx-panel { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto auto minmax(0, 1fr) auto; max-height: none; }
+  .mqx-panel > .mqx-head { display: contents; }
+  .mqx-panel > .mqx-head > .mqx-title { grid-column: 1; grid-row: 1; align-self: center; padding: 6px 8px 6px 20px; }
+  .mqx-panel > .mqx-search { grid-column: 2; grid-row: 1; align-self: center; margin: 8px 4px; }
+  .mqx-panel > .mqx-head > .mqx-x { grid-column: 3; grid-row: 1; align-self: center; margin: 8px 12px 8px 4px; }
+  .mqx-panel > .mqx-tabs { grid-column: 1 / -1; grid-row: 2; }
+  .mqx-panel > .mqx-chips { grid-column: 1 / -1; grid-row: 3; padding-top: 6px; padding-bottom: 0; }
+  .mqx-panel > .mqx-chips .mqx-chiprow { padding-bottom: 6px; }
+  .mqx-panel > .mqx-body { grid-column: 1 / -1; grid-row: 4; min-height: 0; }
+  .mqx-panel > .mqx-foot { grid-column: 1 / -1; grid-row: 5; padding-top: 6px; padding-bottom: 6px; }
+}

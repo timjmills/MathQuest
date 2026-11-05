@@ -5,6 +5,7 @@ import { splitOptionSuffix, decodeOptionPayload } from './skill-option-codec.js'
 import { describeOptions } from './skill-options.js';
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, escHTML } from './skill-options-ui.js';
 import { searchSkillIndex } from './skill-search.js';
+import { pupilNameOf } from './pupil-names.js';
 
 // Card and chip names (explorer check D1, 2026-11-05): the FULL label without its leading icons — never cut to
 // 12 or 20 characters ("Add within 2" for two different skills). CSS clamps it (2 lines on a card, an ellipsis on a
@@ -19,9 +20,21 @@ export function qsCardName(card) {
     const cut = sn.replace(/\s+$/, '');
     return full.startsWith(cut) && cut.length < full.length ? full : sn;   // an old 12-character cut: show it all
 }
+/**
+ * The name a pupil sees (explorer check r2 D1): the pupil name from pupil-names.js — no "(Visual)", "(MAP)", "Denom" —
+ * the same name the explorer shows, so a picked skill reads the same everywhere. A curated short name ("Mult Facts")
+ * is kept. Cards saved earlier carry the raw label; the name is read from the skill id, so they change too.
+ */
+export function qsPupilName(card) {
+    if (!card) return '';
+    const full = qsCleanName(card.skillLabel);
+    const sn = card.shortName ? String(card.shortName).replace(/\s+$/, '') : '';
+    if (sn && !(full.startsWith(sn) && sn.length <= full.length)) return sn;   // curated, not the label or an old cut of it
+    return pupilNameOf(card.categoryId, card.skillId, card.skillLabel) || full;
+}
 /** Names for a whole grid: two cards never read the same (the same label in two categories adds the category). */
-export function qsCardNames(cards) {
-    const names = (cards || []).map(qsCardName);
+export function qsCardNames(cards, pupil = false) {
+    const names = (cards || []).map(pupil ? qsPupilName : qsCardName);
     const count = new Map();
     for (const n of names) count.set(n, (count.get(n) || 0) + 1);
     return names.map((n, i) => (count.get(n) > 1 && cards[i].categoryName ? `${n} (${cards[i].categoryName})` : n));
@@ -47,6 +60,12 @@ registerSkillOptionsHost('qs', {
     rerender: () => renderQuickSkillsGrid(),
 });
 
+// a pupil's toast names the skill as the card does (check r2 D1); a teacher's keeps the label
+function _toastName(categoryId, skillId, skillLabel) {
+    if (document.body.classList.contains('student-mode')) return qsPupilName(_cardFor(categoryId, skillId) || { categoryId, skillId, skillLabel });
+    return String(skillLabel || '').replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/u, '');
+}
+
 export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, categoryName) {
     // Get domain ID from category
     const domainId = getDomainByCategory(categoryId) || 'number_operations';
@@ -57,7 +76,7 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
     if (UnifiedSkills.has(skillId, categoryId)) {
         // Remove the skill using UnifiedSkills
         UnifiedSkills.removeBySkillId(skillId);
-        showNotification(`✗ Removed ${skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '')}`, 'info');
+        showNotification(`✗ Removed ${_toastName(categoryId, skillId, skillLabel)}`, 'info');
         updateQuickSkillCards();
         return;
     }
@@ -76,7 +95,7 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
     });
 
     if (added) {
-        showNotification(`✓ Added ${skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '')}!`, 'success');
+        showNotification(`✓ Added ${_toastName(categoryId, skillId, skillLabel)}!`, 'success');
         // Update quick skill card visual
         updateQuickSkillCards();
     }
@@ -189,7 +208,7 @@ export function updateStudentSkillsDisplay() {
 
     let html = '';
     UnifiedSkills.skills.forEach((skill, index) => {
-        const fullName = qsCleanName(skill.skillLabel);
+        const fullName = qsPupilName(skill);   // check r2 D1: the pupil name, as in the explorer
         const icon = skill.categoryIcon || '📚';
         const gradeHTML = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
 
@@ -235,7 +254,7 @@ function _renderQuickSkillsGridNow() {
         return;
     }
 
-    const cardNames = qsCardNames(skills);
+    const cardNames = qsCardNames(skills, isStudentMode);   // check r2 D1: pupils see the pupil name
     grid.innerHTML = skills.map((skill, index) => {
         const isSelected = UnifiedSkills.has(skill.skillId, skill.categoryId);
         // The card's options, as a short line under its name ("Times: 7, 8").

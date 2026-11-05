@@ -1,8 +1,9 @@
 // ws-student-explorer — the pupil skill explorer (owner, 2026-11-05: "On the student side I also want a skill explorer by
 // grade or by domain … so kids can pick the skills as well to play/print/send/add to quick start").
 //
-//   LAZY     a request log (from a reload): student-explorer.js, pupil-names.js and the css are not requested until
-//            "Explore skills" is pressed, and are requested then (check D6: resource timing could not fail)
+//   LAZY     a request log (from a reload): student-explorer.js and its css are not requested until "Explore skills" is
+//            pressed, and are requested then (check D6: resource timing could not fail). pupil-names.js is NOT lazy since
+//            check r2 D1: the pupil home's Quick Start cards and chips read their names from it on the first paint
 //   OPEN     the pupil home has an "Explore skills" button; pressing it opens a dialog (aria-modal) with focus inside
 //   GRADE    "By grade": every grade chip (K, 1-6, Mixed) lists skills, and every card on a grade shows that grade only
 //   AREA     "By area": every area chip lists skills, grouped under that area's categories
@@ -11,14 +12,22 @@
 //            word its label does not contain ("take away" -> subtraction), never labels only
 //   PICK     tapping 3 cards ticks them (aria-pressed) and "3 skills picked"; Done closes the explorer, the bottom row
 //            reads "3 skills selected", Print lists exactly those 3, Play plays exactly those 3
-//   WORDS    pupil card names carry no teacher wording ("(Visual)", "(No Visuals)", "(B&W)"), no two cards share a name,
+//   WORDS    pupil card names carry no teacher wording ("(Visual)", "(No Visuals)", "(B&W)", "MC", and since r2 D4
+//            "(MAP)", "(Match)", "(Easy)", "Denom"), no two cards share a name,
 //            the category caption is >= 15 px, every area chip has its own picture                     (check D5)
 //   FILTER   grades 3 and 4 have an area row inside the grade tab; an area narrows the list, "All" restores it (check D5)
 //   CAP      a search with more than 60 hits says "Showing 60 of N" and "Show more" adds the next 60     (check D3)
 //   SEND     the Send link, opened in a fresh page, lands on "Practice set: 3 skills" with exactly those 3 (check D6)
 //   QUICKSTART  Add to Quick Start: every card shows the skill's full name (3 long names + both "Add within 20"),
 //            all card names distinct, title = full name; the selection chips carry the full name     (check D1)
-//   ROOM     at 390 x 844 the chips are one line and the list keeps >= 60 % of the height              (check D4)
+//   ROOM     at 390 x 844, 1366 x 768 and 820 x 1180 the chip rows (and a grade's area row) are one line and the list
+//            keeps >= 60 % of the height                                                     (check D4, r2 D3)
+//   PUPILNAME  pick "Subtract Within 5 with Pictures (Visual)" in the explorer: the selection chip, "Your skill:", the
+//            Quick Start card, a card saved earlier with the raw label, and the Print list all show the pupil name
+//            the explorer shows, and none says "(Visual)"                                       (check r2 D1)
+//   QSTYPE   a Quick Start name is >= 13 px and clamps at 3 lines                                (check r2 D2)
+//   CHIPWIDTH  at 1366 a selection chip shows its whole name when the row has room (no 26ch cut) (check r2 D5)
+//   TOPIC    no fraction skill is filed under Counting (By area, and inside Grade 3); they are under Fractions (r2 D6)
 //   KEYS     Esc closes; arrow keys move between the tabs
 //   TARGETS  every control in the explorer and the Explore button >= 44 x 44 at 1366 / 820 / 390
 //   NOSCROLL no horizontal scroll at 390 (the page and the explorer panel)
@@ -66,7 +75,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const lazy = await page.evaluate(() => ({ stub: !!(window.openStudentExplorer && window.openStudentExplorer.__mqStub) }));
         lazy.mod = asked(/student-explorer\.js/); lazy.css = asked(/student-explorer\.css/); lazy.names = asked(/pupil-names\.js/);
         if (!reqs.some((u) => /globals\.js/.test(u))) F('LAZY the request log missed the page load (it cannot judge laziness)');
-        if (lazy.mod || lazy.css || lazy.names) F(`LAZY the explorer loaded before it was opened (module ${lazy.mod}, css ${lazy.css}, names ${lazy.names})`);
+        if (lazy.mod || lazy.css) F(`LAZY the explorer loaded before it was opened (module ${lazy.mod}, css ${lazy.css})`);
         if (!lazy.stub) F('LAZY window.openStudentExplorer is not the lazy stub before first use');
 
         if (process.env.MQX_TRACE) console.log('step', '// OPEN');
@@ -111,10 +120,16 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                     await new Promise((r) => setTimeout(r, 30));
                     const narrowed = [...document.querySelectorAll('#mqxBody .mqx-card')];
                     const cats = new Set(window.DOMAINS[pickA.dataset.garea].categories.map((c) => c.id));
-                    out.areaRow[gr] = { n: narrowed.length, want, inArea: narrowed.every((c) => cats.has(c.dataset.key.split(':')[0])), checked: document.querySelector(`[data-garea="${pickA.dataset.garea}"]`).getAttribute('aria-checked') };
+                    const areaOf = (c) => c.dataset.area || ([...Object.entries(window.DOMAINS)].find(([, d]) => d.categories.some((x) => x.id === c.dataset.key.split(':')[0])) || [''])[0];
+                    out.areaRow[gr] = { n: narrowed.length, want, inArea: narrowed.every((c) => areaOf(c) === pickA.dataset.garea || (!c.dataset.area && cats.has(c.dataset.key.split(':')[0]))), checked: document.querySelector(`[data-garea="${pickA.dataset.garea}"]`).getAttribute('aria-checked') };
                     document.querySelector('#mqxBody [data-garea="all"]').click();
                     await new Promise((r) => setTimeout(r, 30));
                     out.areaRow[gr].back = document.querySelectorAll('#mqxBody .mqx-card').length === cards.length;
+                }
+                // TOPIC (check r2 D6): the Counting group inside a grade holds no fraction skill
+                out.topic = out.topic || [];
+                for (const c of document.querySelectorAll('#mqxBody #mqxHgcounting_cardinality ~ .mqx-grid .mqx-card')) {
+                    if (/fraction/i.test(c.dataset.key + ' ' + c.querySelector('.mqx-name').textContent)) out.topic.push(`grade ${gr} Counting: ${c.dataset.key}`);
                 }
                 for (const c of document.querySelectorAll('#mqxBody .mqx-card')) {   // re-read: the area row re-rendered the list
                     out.keys.push(c.dataset.key);
@@ -142,13 +157,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         if (g.missing.length) F(`LIVE ${g.missing.length} live skills not reachable By grade: ${g.missing.slice(0, 5).join(', ')}`);
         // WORDS (check D5): pupil names carry no teacher wording, every name is distinct, the caption is >= 15 px
         const nameList = Object.entries(g.names || {});
-        const teacherWords = nameList.filter(([, n]) => /\((?:[^)]*\b)?(visuals?|no visuals?|no pictures|b&w|mc)\b[^)]*\)/i.test(n));
+        const teacherWords = nameList.filter(([, n]) => /\((?:[^)]*\b)?(visuals?|no visuals?|no pictures|b&w|mc|map|match|easy)\b[^)]*\)/i.test(n) || /\bdenom\b/i.test(n));
         if (teacherWords.length) F(`WORDS ${teacherWords.length} cards show teacher wording: ${teacherWords.slice(0, 3).map(([k, n]) => `${k} "${n}"`).join('; ')}`);
         const seenName = new Map();
         const dupes = [];
         for (const [k, n] of nameList) { if (seenName.has(n)) dupes.push(`"${n}" (${seenName.get(n)}, ${k})`); else seenName.set(n, k); }
         if (dupes.length) F(`WORDS ${dupes.length} skills share a card name: ${dupes.slice(0, 3).join('; ')}`);
         if (!(g.minCap >= 15)) F(`WORDS the category caption is ${g.minCap} px (< 15)`);
+        if ((g.topic || []).length) F(`TOPIC ${g.topic.length} fraction skills filed under Counting By grade: ${g.topic.slice(0, 3).join('; ')}`);
         for (const gr of ['3', '4']) {
             const r = (g.areaRow || {})[gr];
             if (!r) { F(`FILTER grade ${gr} (${g.perGrade[gr]} skills) has no area filter row`); continue; }
@@ -167,7 +183,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                 await new Promise((r) => setTimeout(r, 30));
                 out.per[chip] = document.querySelectorAll('#mqxBody .mqx-card').length;
                 const cats = new Set(window.DOMAINS[chip].categories.map((c) => c.id));
-                for (const c of document.querySelectorAll('#mqxBody .mqx-card')) if (!cats.has(c.dataset.key.split(':')[0])) out.wrongCat.push(c.dataset.key + ' under ' + chip);
+                // a card is in the area the explorer files it under (data-area, check r2 D6), else its category's area
+                for (const c of document.querySelectorAll('#mqxBody .mqx-card')) if (c.dataset.area ? c.dataset.area !== chip : !cats.has(c.dataset.key.split(':')[0])) out.wrongCat.push(c.dataset.key + ' under ' + chip);
+                out.keysBy = out.keysBy || {};
+                out.keysBy[chip] = [...document.querySelectorAll('#mqxBody .mqx-card')].map((c) => ({ key: c.dataset.key, name: c.querySelector('.mqx-name').textContent }));
             }
             out.domains = Object.keys(window.DOMAINS);
             // check D5: every area chip has its own picture (Counting and Numbers both had 🔢)
@@ -177,6 +196,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         if (JSON.stringify(Object.keys(a.per)) !== JSON.stringify(a.domains)) F(`AREA chips ${Object.keys(a.per)} != DOMAINS ${a.domains}`);
         for (const [d, n] of Object.entries(a.per)) if (!n) F(`AREA ${d} lists no skills`);
         if (a.wrongCat.length) F(`AREA cards outside their area: ${a.wrongCat.slice(0, 3).join('; ')}`);
+        // TOPIC (check r2 D6): Counting holds no fraction skill; the three Number Sense fraction skills sit under Fractions
+        const fracUnderCounting = ((a.keysBy || {}).counting_cardinality || []).filter((c) => /fraction/i.test(c.key + ' ' + c.name));
+        if (fracUnderCounting.length) F(`TOPIC ${fracUnderCounting.length} fraction skills filed under Counting By area: ${fracUnderCounting.slice(0, 3).map((c) => c.key).join(', ')}`);
+        const fracKeys = new Set(((a.keysBy || {}).fractions_decimals || []).map((c) => c.key));
+        for (const k of ['composing:fraction_number_line', 'composing:whole_as_fraction', 'composing:compose_whole']) if (!fracKeys.has(k)) F(`TOPIC ${k} is not under Fractions By area`);
         if (new Set(a.icons).size !== a.icons.length) F(`WORDS two area chips share a picture: ${a.icons.join(' ')}`);
         if (SHOTS) {
             await page.evaluate(async () => { document.querySelector('.mqx-dchip[data-domain="number_operations"]').click(); });
@@ -351,8 +375,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             if (window.saveQuickSkills) window.saveQuickSkills();
             if (window.renderQuickSkillsGrid) window.renderQuickSkillsGrid();
             window.UnifiedSkills.clear();
-            return { n: chosen.length, a20: a20.length, before, mine, names: all.map((x) => x.text), chips, chipWant: chosen.map((x) => clean(x.s.l)) };
+            return { n: chosen.length, a20: a20.length, before, mine, names: all.map((x) => x.text), chips, chipKeys: chosen.map((x) => x.cat + ':' + x.s.v) };
         });
+        // check r2 D1: a pupil card and chip show the PUPIL name, the one the explorer card shows
+        for (const m of qs.mine) m.want = (g.names || {})[m.key] || m.want;
+        qs.chipWant = qs.chipKeys.map((k) => (g.names || {})[k]);
         if (qs.a20 !== 2) F(`QUICKSTART found ${qs.a20} "Add within 20 (No/With Regrouping)" skills, want 2`);
         for (const m of qs.mine) {
             if (m.got !== m.want) F(`QUICKSTART the card for ${m.key} reads "${m.got}", want the full name "${m.want}"`);
@@ -363,6 +390,120 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const chipTexts = qs.chips.map((c) => c.text).sort();
         if (JSON.stringify(chipTexts) !== JSON.stringify([...qs.chipWant].sort())) F(`QUICKSTART the selection chips read ${JSON.stringify(chipTexts)}, want the full names`);
         if (qs.chips.some((c) => c.title !== c.text)) F('QUICKSTART a selection chip has no title with its full name');
+
+        if (process.env.MQX_TRACE) console.log('step', '// PUPILNAME + QSTYPE + CHIPWIDTH');
+        // PUPILNAME (check r2 D1): a "(Visual)" skill picked in the explorer keeps its pupil name on every pupil surface
+        const VKEY = 'subtraction:sub_5_pictures';
+        const pn = await page.evaluate(async (vkey) => {
+            const out = {};
+            document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode');
+            if (window.showView) window.showView('homeView');
+            window.UnifiedSkills.clear();
+            const [cat, sk] = vkey.split(':');
+            out.raw = (window.SKILLS[cat].find((s) => s.v === sk) || {}).l || '';
+            await window.openStudentExplorer({ tab: 'grade', grade: '1' });
+            const input = document.getElementById('mqxSearch');
+            input.value = 'subtract within 5'; input.dispatchEvent(new Event('input', { bubbles: true }));
+            await new Promise((r) => setTimeout(r, 500));
+            const card = document.querySelector(`#mqxBody .mqx-card[data-key="${vkey}"]`);
+            if (!card) { out.err = 'no explorer card for ' + vkey; return out; }
+            out.explorer = card.querySelector('.mqx-name').firstChild.textContent.trim();
+            card.click();
+            document.querySelector('.mqx-done').click();
+            for (let i = 0; i < 3; i++) await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 50)));
+            const chip = document.querySelector('#studentSkillsList .sel-chip');
+            out.chip = chip ? (chip.querySelector('.sel-chip-name') || chip).textContent.trim() : null;
+            out.chipTitle = chip ? chip.getAttribute('title') : null;
+            out.chipRemove = chip ? (chip.querySelector('button[aria-label]') || {}).getAttribute?.('aria-label') : null;
+            out.yourSkill = (document.getElementById('studentStartSkillName') || {}).textContent || '';
+            // QSTYPE (check r2 D2) on the card this adds
+            const had = (window.customQuickSkills || []).some((q) => q.categoryId === cat && q.skillId === sk);
+            document.getElementById('studentSelAddBtn').click();
+            await new Promise((r) => setTimeout(r, 300));
+            const i = (window.customQuickSkills || []).findIndex((q) => q.categoryId === cat && q.skillId === sk);
+            const cards = [...document.querySelectorAll('#quickSkillsGrid .quick-skill-card')];
+            const nm = i > -1 && cards[i] ? cards[i].querySelector('.qs-name-text') : null;
+            out.card = nm ? nm.textContent.trim() : null;
+            out.cardTitle = nm ? nm.getAttribute('title') : null;
+            if (nm) { const cs = getComputedStyle(nm); out.cardPx = parseFloat(cs.fontSize); out.clamp = cs.webkitLineClamp || cs.getPropertyValue('-webkit-line-clamp'); }
+            // a card saved earlier (before r2): raw label and shortName = the cleaned raw label, reloaded from storage
+            if (i > -1) { const c = window.customQuickSkills[i]; c.skillLabel = out.raw; c.shortName = out.raw.replace(/^[\s\u{1F300}-\u{1FAFF}☀-➿⬀-⯿️‍½]+/u, '').trim(); }
+            if (window.saveQuickSkills) window.saveQuickSkills();
+            if (window.loadQuickSkills) window.loadQuickSkills();
+            if (window.renderQuickSkillsGrid) window.renderQuickSkillsGrid();
+            for (let k = 0; k < 3; k++) await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 50)));
+            const j = (window.customQuickSkills || []).findIndex((q) => q.categoryId === cat && q.skillId === sk);
+            const cards2 = [...document.querySelectorAll('#quickSkillsGrid .quick-skill-card')];
+            const nm2 = j > -1 && cards2[j] ? cards2[j].querySelector('.qs-name-text') : null;
+            out.saved = nm2 ? nm2.textContent.trim() : null;
+            // the Print list
+            document.getElementById('studentSelPrintBtn').click();
+            let li = null;
+            for (let k = 0; k < 100 && !li; k++) { li = document.querySelector('.sp-skill .sp-skill-name'); if (!li) await new Promise((r) => setTimeout(r, 150)); }
+            out.print = li ? li.firstChild.textContent.trim() : null;
+            if (window.closeSimplePrint) window.closeSimplePrint();
+            // tidy
+            if (!had) window.customQuickSkills = (window.customQuickSkills || []).filter((q) => !(q.categoryId === cat && q.skillId === sk));
+            if (window.saveQuickSkills) window.saveQuickSkills();
+            if (window.renderQuickSkillsGrid) window.renderQuickSkillsGrid();
+            window.UnifiedSkills.clear();
+            return out;
+        }, VKEY);
+        if (pn.err) F(`PUPILNAME ${pn.err}`);
+        else {
+            const want = pn.explorer;
+            if (/\(visual\)/i.test(want)) F(`PUPILNAME the explorer card itself reads "${want}"`);
+            for (const [where, got] of [['selection chip', pn.chip], ['chip title', pn.chipTitle], ['"Your skill:"', pn.yourSkill], ['Quick Start card', pn.card], ['card title', pn.cardTitle], ['card saved earlier', pn.saved], ['Print list', pn.print]]) {
+                if (got == null) F(`PUPILNAME no ${where} to read`);
+                else if (/\(visual\)/i.test(got) || got !== want) F(`PUPILNAME the ${where} reads "${got}", want the explorer's pupil name "${want}" (raw "${pn.raw}")`);
+            }
+            if (pn.chipRemove && /\(visual\)/i.test(pn.chipRemove)) F(`PUPILNAME the chip's remove button says "${pn.chipRemove}"`);
+            if (!(pn.cardPx >= 13)) F(`QSTYPE a Quick Start name is ${pn.cardPx} px (want >= 13)`);
+            if (String(pn.clamp) !== '3') F(`QSTYPE a Quick Start name clamps at ${pn.clamp} lines (want 3)`);
+        }
+        // CHIPWIDTH (check r2 D5): at 1366 a 34-character name fits its chip whole (it was cut at 26ch)
+        const cw = await page.evaluate(async () => {
+            window.UnifiedSkills.clear();
+            const key = Object.entries(window.SKILLS).flatMap(([c, l]) => (Array.isArray(l) ? l : []).filter((s) => !s.retired && /^Subtract within 20 \(No Regrouping\)$/i.test(String(s.l).replace(/^[^A-Za-z]+/, ''))).map((s) => [c, s]))[0];
+            if (!key) return { err: 'no "Subtract within 20 (No Regrouping)" skill' };
+            window.UnifiedSkills.add({ categoryId: key[0], skillId: key[1].v, skillLabel: key[1].l, categoryIcon: '', categoryName: key[0] });
+            for (let i = 0; i < 3; i++) await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 50)));
+            const n = document.querySelector('#studentSkillsList .sel-chip .sel-chip-name');
+            const row = document.getElementById('studentSkillsList');
+            const r = n ? { text: n.textContent, cut: n.scrollWidth > n.clientWidth + 1, rowW: Math.round(row.getBoundingClientRect().width), chipW: Math.round(n.closest('.sel-chip').getBoundingClientRect().width) } : { err: 'no chip' };
+            window.UnifiedSkills.clear();
+            return r;
+        });
+        if (cw.err) F(`CHIPWIDTH ${cw.err}`);
+        else if (cw.cut) F(`CHIPWIDTH at 1366 the chip "${cw.text}" is cut (${cw.chipW} px chip in a ${cw.rowW} px row)`);
+
+        if (process.env.MQX_TRACE) console.log('step', '// ROOM wide');
+        // ROOM (check r2 D3): a Chromebook (1366 x 768) and a tablet (820 x 1180) — one-line chip rows (the grade's area
+        // row too), and the list keeps >= 60 % of the height
+        for (const [w, h] of [[1366, 768], [820, 1180]]) {
+            await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+            await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.showView) window.showView('homeView'); });
+            await sleep(250);
+            for (const view of [{ tab: 'grade', grade: '3' }, { tab: 'area', domain: 'number_operations' }, { tab: 'grade', grade: 'K' }]) {
+                await page.evaluate((v) => window.openStudentExplorer(v), view);
+                await sleep(250);
+                const room = await page.evaluate(() => {
+                    const lines = (row) => (row ? new Set([...row.querySelectorAll('.mqx-chip')].map((c) => Math.round(c.getBoundingClientRect().top))).size : 0);
+                    const body = document.getElementById('mqxBody');
+                    const area = document.querySelector('#mqxBody .mqx-arearow');
+                    return { head: lines(document.querySelector('#mqxChips .mqx-chiprow')), area: area ? lines(area) : 0, body: Math.round(body.getBoundingClientRect().height), vh: window.innerHeight,
+                        x: document.documentElement.scrollWidth - window.innerWidth, bodyX: body.scrollWidth - body.clientWidth };
+                });
+                const what = view.tab === 'area' ? `By area ${view.domain}` : `By grade ${view.grade}`;
+                if (room.head > 1) F(`ROOM @${w}x${h} ${what}: the chips wrap onto ${room.head} lines`);
+                if (room.area > 1) F(`ROOM @${w}x${h} ${what}: the area row wraps onto ${room.area} lines`);
+                if (room.body < 0.6 * room.vh) F(`ROOM @${w}x${h} ${what}: the list gets ${room.body} of ${room.vh} px (${Math.round(100 * room.body / room.vh)} %, want >= 60 %)`);
+                if (room.x > 0 || room.bodyX > 0) F(`NOSCROLL @${w}x${h} ${what}: horizontal overflow (page ${room.x}, list ${room.bodyX})`);
+                if (SHOTS && view.grade === '3') await page.screenshot({ path: path.join(SHOTS, `explorer-grade3-${w}x${h}.png`) });
+            }
+            await page.evaluate(() => window.closeStudentExplorer && window.closeStudentExplorer());
+            await sleep(200);
+        }
 
         if (process.env.MQX_TRACE) console.log('step', '// KEYS + TARGETS');
         // KEYS + TARGETS + NOSCROLL at each width

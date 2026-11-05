@@ -15,7 +15,7 @@ import { DOMAINS, visibleSkills, getSkillGrade, GRADE_COLORS } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
 import { findSkills, onSkillSearchReady } from './skill-finder.js';
 import { generateQuestionFor } from './generate-question.js';
-import { pupilNames } from './pupil-names.js';
+import { pupilNameMap } from './pupil-names.js';
 
 const GRADES = ['K', '1', '2', '3', '4', '5', '6', 'M'];
 const GRADE_NAME = { K: 'Kindergarten', M: 'Mixed' };
@@ -26,6 +26,17 @@ const AREA_SHORT = { counting_cardinality: 'Counting', number_operations: 'Numbe
 // check D5: Counting and Numbers both carry 🔢 in DOMAINS; the explorer gives Counting its own picture
 const AREA_ICON = { counting_cardinality: '🧮' };
 const areaIcon = (id) => AREA_ICON[id] || (DOMAINS[id] && DOMAINS[id].icon) || '';
+// check r2 D6: the explorer files a skill under the area of its real topic. "Number Sense" (composing) sits in the
+// Counting area in DOMAINS, so Grade 3 -> Counting listed fraction skills. Only the explorer moves them (DOMAINS, the
+// category ids and every share code stay as they are): a skill in a Counting category whose id or label names a
+// fraction is filed under Fractions, in the Fractions category group.
+const TOPIC_MOVES = [
+    { from: 'counting_cardinality', test: /fraction/i, to: 'fractions_decimals', group: 'fractions' },
+];
+function topicArea(domainId, skillId, label) {
+    for (const m of TOPIC_MOVES) if (m.from === domainId && (m.test.test(skillId) || m.test.test(label))) return m;
+    return null;
+}
 // check D3: a search shows this many at a time, says how many there are, and offers "Show more"
 const SEARCH_PAGE = 60;
 // check D5: a grade with this many skills or more gets an area filter row inside the grade tab
@@ -46,16 +57,23 @@ function allSkills() {
         for (const c of d.categories) {
             for (const s of visibleSkills(c.id) || []) {
                 const g = getSkillGrade(s.v, c.id);
+                // check r2 D6: the area (and the group) of the skill's real topic; categoryId stays the real one
+                const mv = topicArea(domainId, s.v, s.l);
+                const aId = mv ? mv.to : domainId;
+                const ad = DOMAINS[aId];
+                const gc = mv ? ad.categories.find((x) => x.id === mv.group) || c : c;
                 ALL.push({
-                    key: `${c.id}:${s.v}`, domainId, domainName: d.name, domainIcon: areaIcon(domainId), color: d.color || '#7c5cff',
+                    key: `${c.id}:${s.v}`, domainId: aId, domainName: ad.name, domainIcon: areaIcon(aId), color: ad.color || '#7c5cff',
                     categoryId: c.id, categoryName: c.name, categoryIcon: c.icon || '', skillId: s.v, rawLabel: s.l,
+                    groupId: gc.id, groupName: gc.name, groupIcon: gc.icon || '',
                     label: '', grade: g == null ? 'M' : String(g),
                 });
             }
         }
     }
-    // check D5: pupil names — no "(Visual)" / "(No Visuals)" / "(B&W)"; two skills never share a name
-    const names = pupilNames(ALL.map((s) => ({ key: s.key, label: s.rawLabel, area: s.categoryName })));
+    // check D5 / r2 D1: pupil names from the ONE map every pupil surface reads — no "(Visual)" / "(MAP)" / "Denom";
+    // two skills never share a name
+    const names = pupilNameMap();
     for (const s of ALL) s.label = names.get(s.key) || s.rawLabel;
     return ALL;
 }
@@ -104,11 +122,11 @@ function cardHTML(s) {
     const on = isSelected(s);
     const gc = GRADE_COLORS[s.grade === 'M' ? 'M' : (s.grade === 'K' ? 'K' : Number(s.grade))] || GRADE_COLORS.M;
     const eg = exampleCache.get(s.key);
-    return `<button type="button" class="mqx-card${on ? ' is-on' : ''}" data-key="${esc(s.key)}" aria-pressed="${on}" style="--mqx-area:${esc(s.color)}">
+    return `<button type="button" class="mqx-card${on ? ' is-on' : ''}" data-key="${esc(s.key)}" data-area="${esc(s.domainId)}" aria-pressed="${on}" style="--mqx-area:${esc(s.color)}">
 <span class="mqx-grade" style="background:${gc.bg};color:${gc.text}" aria-hidden="true">${esc(gradeShort(s.grade))}</span>
 <span class="mqx-name" title="${esc(s.label)}">${esc(s.label)}<span class="mqx-sr">, ${esc(gradeName(s.grade))}</span></span>
 <span class="mqx-eg" aria-hidden="true">${eg ? esc(eg) : ''}</span>
-<span class="mqx-area"><span aria-hidden="true">${esc(s.categoryIcon)}</span> ${esc(s.categoryName)}</span>
+<span class="mqx-area"><span aria-hidden="true">${esc(s.groupIcon)}</span> ${esc(s.groupName)}</span>
 <span class="mqx-tick" aria-hidden="true"></span>
 </button>`;
 }
@@ -168,7 +186,7 @@ function bodyHTML() {
     }
     const d = DOMAINS[ui.domain];
     const list = all.filter((s) => s.domainId === ui.domain);
-    return d.categories.map((c) => groupHTML(c.name, c.icon, d.color, list.filter((s) => s.categoryId === c.id), `mqxHc${c.id}`)).join('')
+    return d.categories.map((c) => groupHTML(c.name, c.icon, d.color, list.filter((s) => s.groupId === c.id), `mqxHc${c.id}`)).join('')
         || `<p class="mqx-empty">No skills here yet.</p>`;
 }
 

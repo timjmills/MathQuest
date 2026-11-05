@@ -5,7 +5,15 @@
 // keeps a short pupil word instead ("with pictures" / "numbers only"); if that still collides, the full cleaned
 // label is kept, so two skills never show the same name.
 //
-// Pure: no DOM, no state. Lazy (only the pupil explorer imports it).
+// Fix round 2 (2026-11-05): the ONE source of a skill's pupil name on every pupil surface (the explorer, the selection
+// chips, the Quick Start cards, the Print list, "Your skill:", the Send landing). `pupilNameOf()` reads one map built
+// once from every live skill, so the clash rule holds everywhere. Also dropped: "(MAP)", "(Match)", "(Easy)"; and
+// "Like / Unlike Denom" is written out ("like denominators").
+//
+// No DOM, no state; it reads only the startup data (DOMAINS, visibleSkills). Small and loaded at startup, because the
+// pupil home's Quick Start cards need it on their first paint (the explorer itself stays lazy).
+
+import { DOMAINS, visibleSkills } from './data.js';
 
 const LEAD_ICONS = /^[\s\u{1F300}-\u{1FAFF}☀-➿⬀-⯿️‍½]+/u;
 
@@ -20,12 +28,13 @@ export function pupilBase(label) {
         for (let p of inner.split(/,\s+/).map((x) => x.trim())) {
             if (/^no (visuals?|pictures)$/i.test(p)) { kind = kind || 'plain'; continue; }
             if (/^(visuals?|b&w|black and white)$/i.test(p)) { kind = kind || 'pics'; continue; }
-            if (/^mc$/i.test(p)) continue;
+            if (/^(mc|map|match|easy)$/i.test(p)) continue;
+            p = p.replace(/\b(like|unlike) denom\b\.?/gi, (w, a) => `${a.toLowerCase()} denominators`);
             if (/^visual\s+/i.test(p)) { kind = kind || 'pics'; p = p.replace(/^visual\s+/i, ''); }
             if (p) keep.push(p);
         }
         return keep.length ? ` (${keep.join(', ')})` : '';
-    }).replace(/\s{2,}/g, ' ').trim();
+    }).replace(/\b(like|unlike) denom\b\.?/gi, (w, a) => `${a.toLowerCase()} denominators`).replace(/\s{2,}/g, ' ').trim();
     return { name: s || cleanLabel(label), kind };
 }
 
@@ -63,4 +72,35 @@ export function pupilNames(items) {
         for (const k of keys) { const it = items.find((x) => x.key === k); const area = (it && it.area) || k.split(':')[0]; out.set(k, /\)$/.test(n) ? `${n.slice(0, -1)}, ${area})` : `${n} (${area})`); }
     }
     return out;
+}
+
+// ---- the one map, built once from every live skill --------------------------------------------------------------
+let MAP = null;
+/** Every live skill's pupil name ('category:skill' -> name), all distinct. Built on first use. */
+export function pupilNameMap() {
+    if (MAP) return MAP;
+    const items = [];
+    const seen = new Set();
+    for (const d of Object.values(DOMAINS)) {
+        for (const c of d.categories || []) {
+            for (const s of visibleSkills(c.id) || []) {
+                const key = `${c.id}:${s.v}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                items.push({ key, label: s.l, area: c.name });
+            }
+        }
+    }
+    MAP = pupilNames(items);
+    return MAP;
+}
+
+/**
+ * The pupil name of one skill. A skill outside the live list (a retired id on an old saved card) keeps its own label
+ * without the teacher wording.
+ */
+export function pupilNameOf(categoryId, skillId, label = '') {
+    const n = pupilNameMap().get(`${categoryId}:${skillId}`);
+    if (n) return n;
+    return label ? pupilBase(label).name : String(skillId || '');
 }

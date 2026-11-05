@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade, isMixedMetaSkill, getMixedSkillCount } from './data.js';
+import { pupilNameOf } from './pupil-names.js';
 
 export function updateCategoryOptions() {
     const domainSelect = document.getElementById("domainSelect");
@@ -100,13 +101,15 @@ export function updateStartSkillName() {
     if (!el) return;
     const clean = (t) => String(t || '').replace(/^[\u2460-\u2466\u24C2🟢🟡🟠🔴🎲]+\s*/u, '').trim();
     const q = Array.isArray(window.skillQueue) ? window.skillQueue : [];
+    // check r2 D1: the pupil name (pupil-names.js), the same one the explorer, the chips and the cards show
     if (q.length) {
-        el.textContent = clean(q[0].skillLabel || q[0].label) + (q.length > 1 ? ` + ${q.length - 1} more` : '');
+        el.textContent = pupilNameOf(q[0].categoryId, q[0].skillId, clean(q[0].skillLabel || q[0].label)) + (q.length > 1 ? ` + ${q.length - 1} more` : '');
         return;
     }
     const sel = document.getElementById('skillSelect');
     const opt = sel && sel.options[sel.selectedIndex];
-    el.textContent = opt ? clean(opt.text) : '';
+    const cat = document.getElementById('categorySelect');
+    el.textContent = opt ? (cat && cat.value && opt.value ? pupilNameOf(cat.value, opt.value, clean(opt.text)) : clean(opt.text)) : '';
 }
 
 export function updateSkillOptions() {

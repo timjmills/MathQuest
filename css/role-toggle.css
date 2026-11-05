@@ -388,3 +388,8 @@ body:not(.student-mode) .start-buttons-container #studentSelPrintBtn.student-onl
 #studentSkillsList .sel-chip { max-width: 100%; min-width: 0; }
 #studentSkillsList .sel-chip-text { min-width: 0; }
 #studentSkillsList .sel-chip-name { display: block; max-width: 26ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* explorer check r2 (2026-11-05). D2: a Quick Start name is at least 13 px and clamps at 3 lines (it carries the shorter
+   pupil name), so two long names can be told apart without a title tooltip. D5: a selection chip uses the width it has,
+   an ellipsis only when the row is truly too narrow, the full name in its title. Additive: overrides with more weight. */
+.quick-skill-card .skill-name .qs-name-text { font-size: max(13px, 0.8125rem); line-height: 1.2; -webkit-line-clamp: 3; }
+#studentSkillsList .sel-chip .sel-chip-name { max-width: none; }
