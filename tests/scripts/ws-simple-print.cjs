@@ -18,6 +18,20 @@
 //   TARGETS  every dialog control and Quick Start Print button >= 44 x 44 at 1366 / 820 / 390 (critic r1 D7)
 //   SUMMARY  the summary's "n a page" / "n on page 1" is what page 1 holds (critic r1 D5, D9)
 //
+//   facts-print-fix (owner, 2026-11-05: "Mixed up isn't possible … printing in sections" printed 20 problems on 2 pages where
+//   In sections printed 140; "there are a lack of lines and the alignment is off"), on the owner's set (+ − within 20,
+//   × ÷ 1-12, Pages 1, Auto) at S / M / L, both Arrange choices:
+//   MIXFACTS  a facts-only set in Pages mode, Mixed up: fact rows (never the Mixed practice fallback), the same pages,
+//             problems and problems on every page as In sections, and the + − × page INTERLEAVED (at most 2 of one sign in
+//             a row; In sections keeps each sign's facts together)
+//   FALLBACK  whenever Mixed up falls back (the six set; the facts set in Problems mode), the print is EXACTLY the In
+//             sections print (pages, problems, counts, columns, page 1) and the summary says "In sections"
+//   ROWRULES  every fact-rows cell is closed on all four sides by a DRAWN rule (not the ink showing through a gap between
+//             white cells, which a PDF viewer or printer rasterises away or doubles), inner rules one weight
+//   SIGNGAP   the operator's ink ends >= 0.3 em before the bottom number's ink; the fact's digits stay >= 1.75 mm clear of
+//             the cell's edges (the 3-digit dividends "crowd the box" at 10 columns: 1.55 mm on 18fbc70c2); the ones
+//             digits of each grid column share one x  (tests/lib/ws-fact-geom.cjs)
+//   node tests/scripts/ws-simple-print.cjs --facts-print   these four only (ws-precritic runs it for the fact skills)
 //   node tests/scripts/ws-simple-print.cjs              the gate (prints ws-simple-print: OK / FAIL)
 //   node tests/scripts/ws-simple-print.cjs --backtest   the same measure on the old dialog's page plan (one request
 //                                                        per small page, a section of 1-2 per skill): must FAIL
@@ -38,6 +52,116 @@ const SETS = {
 };
 const ONLY = arg('sets', '') ? arg('sets', '').split(',') : Object.keys(SETS);
 const FACT_COLS = { S: 10, M: 6, L: 5 };
+const { factGeomSource, factGeomVerdict } = require('../lib/ws-fact-geom.cjs');
+const OWNER = [
+    { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 } }, { categoryId: 'subtraction', skillId: 'sub_facts', opts: { band: 20 } },
+    { categoryId: 'multiplication', skillId: 'mult_facts', opts: {} }, { categoryId: 'division', skillId: 'div_facts', opts: {} },
+];
+
+/** facts-print-fix: MIXFACTS, FALLBACK, ROWRULES, SIGNGAP (see the header). Returns {rows, fails}. */
+async function factsPrint(page) {
+    const rows = [], fails = [];
+    for (const size of SIZES) {
+        const r = await page.evaluate(async ({ list, size, src }) => {
+            const m = await import('/js/modules/simple-print.js');
+            const geom = new Function('return ' + src)();
+            const look = async (b) => {
+                const f = document.createElement('iframe');
+                f.style.cssText = 'position:fixed;left:-3000px;top:0;width:900px;height:1200px;border:0';
+                document.body.appendChild(f);
+                await new Promise((res) => { f.onload = res; f.srcdoc = window.sheetDocument(b.pupilHtml, 'm', { paper: 'A4' }); });
+                for (let i = 0; i < 40; i++) { if (f.contentDocument.documentElement.getAttribute('data-ws-fonts') === 'ready') break; await new Promise((x) => setTimeout(x, 100)); }
+                const g = geom(f.contentDocument);
+                const pages = [...f.contentDocument.querySelectorAll('.ws-page')].map((pg) => ({
+                    cells: pg.querySelectorAll('.ws-grid > .ws-cell:not(.blankrun)').length,
+                    ops: [...pg.querySelectorAll('.ws-grid.facts > .ws-cell')].map((c) => { const o = c.querySelector('.ws-fact .op'); return o ? o.textContent.trim() : (c.querySelector('[data-ws-cell]') || c).getAttribute('data-ws-cell') || '?'; }),
+                }));
+                f.remove();
+                return { geom: g, pages };
+            };
+            const out = {};
+            for (const arrange of ['sections', 'mixed']) {
+                const o = { how: 'pages', n: 1, sets: 1, size, cols: 'auto', colsMode: 'aim', key: true, arrange, seed: 4242, title: true, paper: 'A4' };
+                const b = await m.buildSets(list.map((s) => Object.assign({ amt: '' }, s)), o);
+                out[arrange] = { arrangement: b.arrangement, mixedFacts: !!b.mixedFacts, fellBack: !!b.fellBack, pages: b.pages, total: b.total, line: m.summaryLine(b, o), notes: b.notes, look: await look(b) };
+            }
+            return out;
+        }, { list: OWNER, size, src: factGeomSource });
+        const tag = `owner facts @${size}`;
+        const S = r.sections, M = r.mixed;
+        rows.push(`${tag} In sections: ${S.line}`);
+        rows.push(`${tag} Mixed up:    ${M.line}`);
+        // MIXFACTS
+        if (M.arrangement !== 'facts' || M.fellBack) fails.push(`${tag}: MIXFACTS Mixed up printed ${M.fellBack ? 'the fallback' : M.arrangement}, not fact rows ("${M.line}")`);
+        if (M.pages !== S.pages || M.total !== S.total) fails.push(`${tag}: MIXFACTS Mixed up ${M.total} on ${M.pages} pages, In sections ${S.total} on ${S.pages}`);
+        const per = (x) => x.look.pages.map((p) => p.cells).join('/');
+        if (per(M) !== per(S)) fails.push(`${tag}: MIXFACTS problems a page Mixed up ${per(M)} vs In sections ${per(S)}`);
+        const run = (ops) => { let best = 0, k = 0; ops.forEach((o, i) => { k = i && ops[i - 1] === o ? k + 1 : 1; best = Math.max(best, k); }); return best; };
+        M.look.pages.forEach((p, i) => {
+            const kinds = new Set(p.ops);
+            if (kinds.size > 1 && run(p.ops) > 2) fails.push(`${tag}: MIXFACTS Mixed up page ${i + 1} has ${run(p.ops)} of one sign in a row (${p.ops.slice(0, 20).join('')}…)`);
+        });
+        if (M.look.pages[0] && new Set(M.look.pages[0].ops).size < 2) fails.push(`${tag}: MIXFACTS Mixed up page 1 holds one sign only`);
+        rows.push(`${tag} Mixed up page 1 signs: ${(M.look.pages[0] || { ops: [] }).ops.join('')} (longest run ${run((M.look.pages[0] || { ops: [] }).ops)}); In sections longest run ${run((S.look.pages[0] || { ops: [] }).ops)}`);
+        // ROWRULES + SIGNGAP on both prints
+        for (const [nm, x] of [['In sections', S], ['Mixed up', M]]) {
+            for (const v of factGeomVerdict(x.look.geom)) fails.push(`${tag} ${nm}: ${v}`);
+            const g = x.look.geom.pages.filter((p) => p.grids);
+            rows.push(`${tag} ${nm}: rules ${g.map((p) => (p.rules.undrawn ? `${p.rules.undrawn} undrawn` : `drawn ${p.rules.weights.join('/')}px`)).join(', ')} · sign gap ${g.map((p) => (p.sign.min === null ? '-' : p.sign.min.toFixed(2) + ' em')).join(', ')} · digits clear ${g.map((p) => (p.sign.clearMin === null ? '-' : p.sign.clearMin.toFixed(2) + ' mm')).join(', ')}`);
+        }
+    }
+    // FOOTER (coordinator, 2026-11-05: a footer printed a raw id beside "Missing Numbers (+/−)"; the old FOOTER read only
+    // the listed ids of the fact sets): every footer of the pupil AND key pages, both Arrange choices, of a sample of mixed
+    // sets - the gate's sets, a skill queued under another category, a retired id, and one skill from every category -
+    // names skills in words: no snake_case id at all
+    const ft = await page.evaluate(async (sets) => {
+        const m = await import('/js/modules/simple-print.js');
+        const W = window;
+        const live = (cat) => (W.SKILLS[cat] || []).filter((x) => x && x.v && !x.retired && !x.tombstone && !x.hidden);
+        const cats = Object.keys(W.SKILLS).filter((c) => live(c).length);
+        const one = cats.map((c, i) => { const xs = live(c); return { categoryId: c, skillId: xs[(i * 7) % xs.length].v }; });
+        const samples = [['six', sets.six], ['missing', sets.missing], ['one per category A', one.filter((_, i) => i % 2 === 0).slice(0, 6)], ['one per category B', one.filter((_, i) => i % 2 === 1).slice(0, 6)],
+            ['cross-category', [{ categoryId: 'subtraction', skillId: 'missing_add_sub' }, { categoryId: 'addition', skillId: (live('subtraction')[0] || {}).v || 'sub_facts' }]],
+            ['retired id', [{ categoryId: 'subtraction', skillId: 'missing_add_sub' }, { categoryId: 'addition', skillId: 'number_families_add_med' }]]];
+        const out = [];
+        for (const [nm, list] of samples) {
+            for (const arrange of ['sections', 'mixed']) {
+                let b;
+                try { b = await m.buildSimple(list.map((s) => Object.assign({ amt: '' }, s)), { how: 'problems', n: 12, size: 'M', cols: 'auto', key: true, arrange, seed: 4242, title: true }); } catch (e) { out.push({ nm, arrange, err: String(e && e.message || e) }); continue; }
+                const foots = (String(b.pupilHtml) + String(b.keyHtml)).match(/<footer[^>]*>[\s\S]*?<\/footer>/g) || [];
+                const left = foots.map((f) => ((/<span>([\s\S]*?)<\/span>/.exec(f) || [])[1] || '')).filter(Boolean);
+                const ids = [...new Set(left.flatMap((t) => t.match(/\b[a-z0-9]+(?:_[a-z0-9]+)+\b/g) || []))];
+                out.push({ nm, arrange, ids, first: left[0] || '' });
+            }
+        }
+        return out;
+    }, SETS);
+    for (const x of ft) {
+        if (x.err) { fails.push(`FOOTER ${x.nm} ${x.arrange}: build failed (${x.err})`); continue; }
+        if (x.ids.length) fails.push(`FOOTER ${x.nm} ${x.arrange}: raw skill id(s) ${x.ids.join(', ')} in "${x.first}"`);
+    }
+    rows.push(`FOOTER ${ft.length} prints (pupil + key), ${ft.filter((x) => x.ids && !x.ids.length).length} in words only`);
+    // FALLBACK: a Mixed up that cannot be drawn prints EXACTLY the In sections plan
+    const fb = await page.evaluate(async ({ six, owner }) => {
+        const m = await import('/js/modules/simple-print.js');
+        const out = [];
+        for (const [nm, list, how, n, size] of [['six', six, 'pages', 1, 'M'], ['six', six, 'pages', 1, 'S'], ['facts problems', owner, 'problems', 40, 'S']]) {
+            const L = list.map((s) => Object.assign({ amt: '' }, s));
+            const plan = (b) => JSON.stringify({ pages: b.pages, total: b.total, counts: b.counts, cols: b.colsList || [b.cols], perPage: b.perPage, keyPages: b.keyPages });
+            const o = (arrange) => ({ how, n, size, cols: 'auto', colsMode: 'aim', key: true, arrange, seed: 4242, title: true, paper: 'A4' });
+            const bs = await m.buildSimple(L, o('sections'));
+            const bm = await m.buildSimple(L, o('mixed'));
+            out.push({ nm: `${nm} ${how} @${size}`, fellBack: !!bm.fellBack, same: plan(bs) === plan(bm), ps: plan(bs), pm: plan(bm), line: m.summaryLine(bm, o('mixed')), arrangement: bm.arrangement });
+        }
+        return out;
+    }, { six: SETS.six, owner: OWNER });
+    for (const x of fb) {
+        rows.push(`FALLBACK ${x.nm}: ${x.fellBack ? 'fell back' : `Mixed up drawn (${x.arrangement})`} · ${x.line}`);
+        if (x.fellBack && !x.same) fails.push(`FALLBACK ${x.nm}: the fallback is not the In sections print: ${x.pm} vs ${x.ps}`);
+        if (x.fellBack && !/In sections/.test(x.line)) fails.push(`FALLBACK ${x.nm}: the summary does not say it printed in sections: "${x.line}"`);
+    }
+    return { rows, fails };
+}
 
 (async () => {
     const app = await open({ seed: 7 });
@@ -46,6 +170,18 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
     const fails = [];
     const rows = [];
     const F2 = (t) => fails.push('UI3 ' + t);
+    if (!has('backtest') && !has('backtest-options')) {
+        const fp = await factsPrint(page);
+        rows.push(...fp.rows);
+        fails.push(...fp.fails);
+        if (has('facts-print')) {
+            console.log(rows.join('\n'));
+            for (const f of fails) console.log('  FAIL ' + f);
+            await app.close();
+            console.log(fails.length ? 'ws-simple-print: FAIL' : 'ws-simple-print: OK');
+            process.exit(fails.length ? 1 : 0);
+        }
+    }
     for (const name of ONLY) {
         const list = SETS[name];
         for (const size of SIZES) {
@@ -223,7 +359,8 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                 // count at S / M / L (10 / 6 / 5, 8 with a long answer), and an explicit Columns 5 prints 5.
                 {
                     const dv = [{ categoryId: 'division', skillId: 'div_facts', amt: '' }];
-                    const want = { S: [10, 8], M: [6], L: [5] };
+                    // (facts-print-fix 2026-11-05: Auto at S takes 9 when a dividend reaches 3 digits, 2 mm of white each side)
+                    const want = { S: [10, 9, 8], M: [6], L: [5] };
                     const per = {};
                     for (const size of ['S', 'M', 'L']) {
                         const b = await m.buildSimple(dv, { how: 'pages', n: 1, size, cols: 'auto', key: false, arrange: 'sections', seed: 4242, title: true });

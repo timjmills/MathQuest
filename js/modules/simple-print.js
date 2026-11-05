@@ -43,6 +43,7 @@ import { openPdfPreview } from './teacher-pdf-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
 import { SKILLS } from './data.js';
+import { mergedSkillFor } from './skill-aliases.js';
 import { optionsFor, offeredOptionsFor, describeOptions } from './skill-options.js';
 
 const STORE_KEY = 'mq_simple_print';
@@ -96,9 +97,18 @@ const P = loadPrefs();
 let S = null;   // the open dialog: { list, ctx, root, built, token, probes, lastFocus }
 
 export const keyOf = (s) => `${s.categoryId}:${s.skillId}`;
+/**
+ * A skill's name in words, never its id (coordinator, 2026-11-05: a footer printed a raw id beside "Missing Numbers
+ * (+/−)"): its own category's entry, else its live id through the alias table (a retired id), else the same id in any
+ * category (a skill queued under another category), else the id spelt as words ("add_two_digit" -> "Add two digit").
+ */
 function labelOf(s) {
-    const hit = (SKILLS[s.categoryId] || []).find((x) => x.v === s.skillId);
-    return String(hit ? hit.l : s.skillId).replace(/\s*\((?:Visual|MAP|black and white)\)/g, '');
+    const find = (cat, id) => (SKILLS[cat] || []).find((x) => x && x.v === id);
+    let hit = find(s.categoryId, s.skillId);
+    if (!hit) { try { const m = mergedSkillFor(s.categoryId, s.skillId); hit = find(m.categoryId, m.skillId); } catch (e) { hit = null; } }
+    if (!hit) for (const cat of Object.keys(SKILLS)) { hit = find(cat, s.skillId); if (hit) break; }
+    const words = (id) => { const t = String(id || '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim(); return t.charAt(0).toUpperCase() + t.slice(1); };
+    return String(hit && hit.l ? hit.l : words(s.skillId)).replace(/\s*\((?:Visual|MAP|black and white)\)/g, '');
 }
 const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -205,8 +215,11 @@ const modeOf = (o) => (colsAsked(o) ? (o.colsMode === 'exact' ? 'exact' : 'aim')
  * Fact rows fill whole pages, so they are used in Pages mode only (Problems mode keeps the exact count).
  */
 export function arrangementOf(list, o) {
-    if (o.arrange === 'mixed' && list.length >= 2) return 'mixed';
+    // facts-print-fix (owner 2026-11-05): a fast-facts-only set in Pages mode is ALWAYS fact rows, whichever Arrange is
+    // chosen: In sections deals each skill's facts together, Mixed up interleaves the operations in the same grid
+    // (buildFacts, o.arrange === 'mixed'), at the same count a page. It never falls back to the sparse Mixed practice plan.
     if (o.how === 'pages' && list.length && list.every(isFactSkill)) return 'facts';
+    if (o.arrange === 'mixed' && list.length >= 2) return 'mixed';
     return 'sections';
 }
 
@@ -280,9 +293,10 @@ export async function buildSimple(list, o) {
     if (arrangement === 'facts') return buildFacts(list, amounts, o);
     if (arrangement === 'mixed') {
         const r = await buildMixed(list, amounts, o);
-        // the engine fell back to sections on its own grid: an asked count, or 7+ across for larger problems (owner item 4:
-        // "7, 8, 9, 10 should be just for small problems"), is planned here instead, part by part
-        if (r.fellBack && (colsAsked(o) || (!list.every(isFactSkill) && (r.colsList || []).concat([r.cols]).some((c) => c > CELL_MAX_COLS)))) {
+        // the engine fell back to sections: the print is then EXACTLY the In sections print (facts-print-fix, owner
+        // 2026-11-05: Mixed up fell back to the engine's own sparse plan, "16 on page 1 · 2 pages · 20 problems", where
+        // In sections printed 70 a page) - same counts, same pages, same grids - and the summary says it fell back
+        if (r.fellBack) {
             const r2 = await buildSimple(list, Object.assign({}, o, { arrange: 'sections' }));
             return Object.assign(r2, { fellBack: true, notes: [FELL_BACK_NOTE, ...(r2.notes || []).filter((t) => !/prints in sections/i.test(t))] });
         }
@@ -367,6 +381,9 @@ async function probeCols(list, arrangement, o) {
 
 async function buildFacts(list, amounts, o) {
     const pages = Math.max(1, Math.min(MAX_PAGES, o.n));
+    // Mixed up (facts-print-fix): the same pages and counts as In sections, the operations of each page interleaved.
+    // Division keeps its own page(s) in both (PT-FRW-6: a mixed-operations vertical section excludes division).
+    const mixed = o.arrange === 'mixed' && list.length >= 2;
     const groups = [list.filter((s) => !isDivisionFact(s)), list.filter(isDivisionFact)].filter((g) => g.length);
     // pages per group by the groups' shares (each group at least one page when the pages allow)
     const shares = sharesOf(amounts);
@@ -374,12 +391,14 @@ async function buildFacts(list, amounts, o) {
     let gPages = gShare.map((f) => Math.max(1, Math.round(f * pages)));
     while (gPages.reduce((t, x) => t + x, 0) > pages && gPages.some((x) => x > 1)) { const i = gPages.indexOf(Math.max(...gPages)); gPages[i]--; }
     while (gPages.reduce((t, x) => t + x, 0) < pages) { const i = gShare.indexOf(Math.max(...gShare)); gPages[i]++; }
-    const out = { pupil: [], key: [], pages: 0, keyPages: 0, items: 0, fits: null, notes: [], first: '', counts: list.map(() => 0) };
+    const out = { pupil: [], key: [], pages: 0, keyPages: 0, items: 0, fits: null, notes: [], first: '', counts: list.map(() => 0), grids: [] };
     let n = 0;
     for (let g = 0; g < groups.length; g++) {
         for (let p = 0; p < gPages[g]; p++) {
             const req = Object.assign(baseReq(Object.assign({}, o, { seed: o.seed + 7919 * (n++) })), {
                 role: 'fact-rows', look: 'auto',
+                // Mixed up: the page's operations interleaved in the one grid (owner ruling 2026-10-31, M1 run rules)
+                ...(mixed && groups[g].length > 1 ? { arrangement: 'mixed' } : {}),
                 sections: [{ skills: groups[g].map(skillRef), pages: 1, ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) }],
             });
             const res = await buildSheet(req);
@@ -388,8 +407,13 @@ async function buildFacts(list, amounts, o) {
             out.pages += res.pageCount || 1;
             out.keyPages += res.keyPageCount || 0;
             if (!out.first) out.first = (res.pupilPages && res.pupilPages[0]) || res.pupilHtml;
+            // each group's own grid (its first page): a ÷ page may take fewer columns than the + − × page
+            if (p === 0 && res.fits && res.fits.cols) { const c1 = (((res.pupilPages && res.pupilPages[0]) || '').split('class="ws-cell ').length - 1) || res.fits.perPage || 0; out.grids.push({ div: groups[g].every(isDivisionFact), cols: res.fits.cols, rows: Math.ceil(c1 / res.fits.cols), perPage: c1 }); }
             if (!out.fits && res.fits) out.fits = res.fits;
-            for (const it of res.items || []) { if (!it) continue; out.items++; const i = list.findIndex((s) => keyOf(s) === it.skill); if (i >= 0) out.counts[i]++; }
+            // the problems the pages HOLD (a page dealt for 10 columns and laid at the 8-column clamp keeps 56 of 70: the
+            // summary said "140 problems" for 126 printed), the counts per skill from the dealt items
+            for (const it of res.items || []) { if (!it) continue; const i = list.findIndex((s) => keyOf(s) === it.skill); if (i >= 0) out.counts[i]++; }
+            out.items += (res.pupilPages || [res.pupilHtml || '']).reduce((t, h) => t + (String(h).split('class="ws-cell ').length - 1) - (String(h).split('blankrun').length - 1), 0);
             for (const t of res.notes || []) if (!out.notes.includes(t) && !/^Fits:/.test(t)) out.notes.push(t);
         }
     }
@@ -397,10 +421,10 @@ async function buildFacts(list, amounts, o) {
     const keyHtml = o.key ? out.key.join('\n') : '';
     return {
         pupilHtml: out.pupil.join('\n'), keyHtml, doc: out.pupil.join('\n') + (keyHtml ? '\n' + keyHtml : ''),
-        pages: out.pages, keyPages: o.key ? out.keyPages : 0, total: out.items, counts: out.counts, arrangement: 'facts',
+        pages: out.pages, keyPages: o.key ? out.keyPages : 0, total: out.items, counts: out.counts, arrangement: 'facts', mixedFacts: mixed,
         // what page 1 really holds (critic r2: a 6 x 6 grid that printed 30 said "36 a page")
         ...(() => { const p1 = (out.first.split('class="ws-cell ').length - 1) || f.perPage || 0; return { cols: f.cols || 0, rows: f.cols ? Math.ceil(p1 / f.cols) : f.rows || 0, perPage: p1 }; })(),
-        colsList: [f.cols || 0], notes: out.notes, firstHtml: out.first,
+        colsList: [f.cols || 0], notes: out.notes, firstHtml: out.first, grids: out.grids,
         capped: colsAsked(o) && f.cols && f.cols < colsAsked(o) ? f.cols : 0, colsMode: modeOf(o),
     };
 }
@@ -518,12 +542,16 @@ export function summaryLine(b, o) {
     // Exactly n (owner item 4): a part that cannot take n across prints at its own max, and the line says so
     const mx = b.colsMode === 'exact' ? ' (max)' : '';
     const one = b.capped && mx ? mx : '';
-    if (b.rows && b.cols && b.cols * b.rows === b.perPage && (b.arrangement === 'facts' || (cl.length === 1 && (b.colsList || []).length <= 1 && !b.fellBack))) grid = `${b.cols} columns${one} × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
-    else if (b.types && b.types.length > 1) grid = `${b.types.map((t) => `${t.name} ${t.min === t.max ? t.min : `${t.min}–${t.max}`} across${t.atMax ? mx : ''}`).join(' · ')} · ${b.perPage} on page 1`;
+    if (b.rows && b.cols && b.cols * b.rows === b.perPage && (b.arrangement === 'facts' || (cl.length === 1 && (b.colsList || []).length <= 1 && !b.fellBack))) grid = `${b.mixedFacts ? 'Mixed up, ' : ''}${b.cols} columns${one} × ${b.rows} rows = ${b.perPage || b.cols * b.rows} a page`;
+    // a ÷ page on its own grid (facts-print-fix: 9 across at S so 3-digit numbers have room): the line names both
+    const g2 = b.arrangement === 'facts' && (b.grids || []).length > 1 && b.grids.some((x) => x.cols !== b.grids[0].cols || x.perPage !== b.grids[0].perPage) ? b.grids.slice(1).filter((x) => x.cols !== b.grids[0].cols || x.perPage !== b.grids[0].perPage) : [];
+    if (grid) { if (g2.length) grid += g2.map((x) => ` · ${x.div ? 'division' : 'next'} pages ${x.cols} columns × ${x.rows} rows = ${x.perPage}`).join(''); } else if (b.types && b.types.length > 1) grid = `${b.types.map((t) => `${t.name} ${t.min === t.max ? t.min : `${t.min}–${t.max}`} across${t.atMax ? mx : ''}`).join(' · ')} · ${b.perPage} on page 1`;
     else if (b.fellBack) grid = `In sections, ${cl.length > 1 ? `${Math.min(...cl)}–${Math.max(...cl)}` : cl[0]} columns${one} · ${b.perPage} on page 1`;
     else if (cl.length === 1) grid = `${b.arrangement === 'mixed' ? 'Mixed up, ' : ''}${cl[0]} columns${one} · ${b.perPage} on page 1`;
     else if (b.arrangement === 'mixed') grid = `Mixed up, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     else grid = `Each skill its own grid, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
+    // a Mixed up that fell back says so on every kind of line (facts-print-fix FALLBACK)
+    if (b.fellBack && !/^In sections/.test(grid)) grid = `In sections, ${grid}`;
     return [grid, pages, probs, ...(sets > 1 ? [`${sets} sets, each with different problems`] : []), key].join(' · ');
 }
 
@@ -874,7 +902,7 @@ function render() {
     const line = S.error ? 'These pages could not be built.' : b && !S.busy ? summaryLine(b, o) : 'Working out the pages…';
     h += `<section class="sp-sum" aria-live="polite"><p class="sp-line" id="spLine">${esc(line)}</p>`;
     if (b && b.notes && b.notes.length && !S.busy) h += `<p class="sp-note">${esc(b.notes.join(' '))}</p>`;
-    if (arr === 'facts') h += `<p class="sp-note">Fast facts in fact rows: every page is full.</p>`;
+    if (arr === 'facts') h += `<p class="sp-note">${many && P.arrange === 'mixed' ? 'Fast facts in fact rows, the signs mixed on each page' : 'Fast facts in fact rows'}: every page is full.</p>`;
     h += `<div class="sp-thumb"><iframe id="spFrame" title="Page 1 preview" tabindex="-1" aria-hidden="true"></iframe></div></section>`;
 
     // More options

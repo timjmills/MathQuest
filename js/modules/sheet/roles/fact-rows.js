@@ -39,6 +39,7 @@ import {
 } from '../index.js';
 import { FRAC_ROW_PAD_EM, FRAC_ROW_GAP_EM, FRAC_ROW_EQ_EM } from '../cells/equation.js';
 import { DIGIT_ADV_EM, bracketLeadEm, compactFits, compactGutterEm, compactInkEm } from '../cells/long-division.js';
+import { interleave } from '../interleave.js';
 
 export const ROLE_ID = 'fact-rows';
 export const DEFAULT_LOOK = 'daily';
@@ -134,6 +135,8 @@ const OP_SIGN = { add: '+', subtract: '-', multiply: 'x', divide: '/' };
 const LADDER_PTS = [28, 24, 20, 18, 16];
 /** The real-fit clearance of the column gate: 1 mm of white either side of the fact's ink (R1). */
 export const FIT_CLEAR_MM = 2;
+/** The white each side of a 3-digit-dividend ÷ fact at AUTO columns (facts-print-fix, owner 2026-11-05). */
+export const AUTO_DIV_ROOM_MM = 2;
 const ACROSS_ROW = { S: 18, M: 21, L: 24 };      // PT-FPR's horizontal row, 16 / 20 / 24 + the tab clearance
 /**
  * A bracket's digit track on a fact-rows page, in em of the rung's digit: 1 em leaves 0.44 em
@@ -509,6 +512,21 @@ export function factRowsLayout(items, input) {
     const tightDiv = divide;
     while (tightDiv && cols > 2 && !fitsAt(cols)) cols--;
     if (cols < askedCols) note = [note, `${n}-digit numbers: ${cols} columns so the digits keep their size.`].filter(Boolean).join(' ');
+    // AUTO room for a 3-digit dividend (facts-print-fix, owner 2026-11-05: "132", "110" crowd the box at 10 columns,
+    // 1.3 mm of white beside the fact): at AUTO columns a ÷ page whose dividends reach 3 digits takes the most columns
+    // that leave AUTO_DIV_ROOM_MM of white each side of the drawn fact (rule included) - 9 at Size S, 16 pt kept. A column
+    // count the teacher picks keeps the real-fit gate above (owner ruling 2026-10-30: ÷ facts reach 10 columns).
+    const autoCols = !(input.columns && input.columns !== 'auto');
+    // (read from what the facts CAN reach, not only what was dealt - the largest divisor x the largest quotient - so a
+    // probe deal without a 3-digit dividend counts the same page as the final deal: printed = Score /N, R2-2)
+    const reach3 = n >= 3 || (Math.max(0, ...items.map((it) => Number(operandsOf(it.q || {})[1]) || 0))
+        * Math.max(0, ...items.map((it) => Number(answerOf(it)) || 0))) >= 100;
+    if (tightDiv && autoCols && reach3) {
+        const before = cols;
+        const ink3 = (c) => { const pt = factDigitPt(c); return stackedInkEm(Math.max(n, 3), '9'.repeat(bMax)) * (EM_MM[pt] || (pt / 72) * 25.4); };
+        while (cols > 5 && ink3(cols) + 2 * AUTO_DIV_ROOM_MM > cellWidthMm(cols, LIVE_W_MM, ctx.look).inner) cols--;
+        if (cols < before) note = [note, `Division facts: ${cols} columns so 3-digit numbers have room (pick ${before} columns to print ${before}).`].filter(Boolean).join(' ');
+    }
     // A long + - x fact (5-6 digits: sub_100k_regroup, sub_1m_regroup) that does not fit its cell
     // at the size's working digits drops columns until it does (PG-20: content never shrinks to
     // fit; print-lint ILLEGIBLE / PG-12 at 16 pt in 8 columns). Division keeps its own path above.
@@ -708,6 +726,19 @@ function keepShares(all, L) {
     return all.filter((it) => { const k = key(it); const u = used.get(k) || 0; if (u >= quota.get(k)) return false; used.set(k, u + 1); return true; });
 }
 
+/**
+ * Mixed up on fact rows (facts-print-fix, owner 2026-11-05; owner ruling 2026-10-31: a fact-rows grid can mix + - x / in
+ * any notation): `input.interleave` deals the page's operations through the Mixed practice order (sheet/interleave.js,
+ * M1: at most 2 of one operation in a row, every operation in the first third), keyed by the operation. The kept items
+ * and their count are unchanged - only the order. A page of one operation keeps its dealt order.
+ */
+export function mixOps(items, input = {}) {
+    if (!input.interleave || opsOf(items).size < 2) return items;
+    const seed = (Number(input.seed) >>> 0) || 1;
+    const r = interleave(items.map((it) => ({ key: opOf(it.q || {}), it })), null, seed, { maxRun: 2 });
+    return r && Array.isArray(r.order) && r.order.length === items.length ? r.order.map((x) => x.it) : items;
+}
+
 export function plan(input = {}) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
     const all = poolItems(input, 'main');
@@ -729,7 +760,7 @@ export function plan(input = {}) {
         L0 = Object.assign({}, L0, { rows, perPage: all.length, cellH: Math.min(L0.gridH / rows, L0.hMin * 1.3) });
     }
     const L = Object.assign({}, L0, { size: ctx.size, look: ctx.look });
-    const items = keepShares(all, L).map((it) => factCell(it, L));
+    const items = mixOps(keepShares(all, L), input).map((it) => factCell(it, L));
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items), score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one cell width per section (critic r1 R1-2): a short last row keeps the lattice, the rest unruled (PG-15)

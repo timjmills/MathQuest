@@ -3821,6 +3821,9 @@ async function buildRoleSheet(n, metaOf) {
         growLast: !!n.growLast || undefined,
         // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
         arrangement: 'sections',
+        // facts-print-fix (owner 2026-11-05): a fact-rows page asked 'mixed' interleaves its operations in the one grid
+        // (owner ruling 2026-10-31; sheet/interleave.js run rules), at the page's own count.
+        interleave: n.role === 'fact-rows' && n.arrangement === 'mixed' ? true : undefined,
     };
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
     // line is "Solve.", so a cell's "Add." / "Write the time." is not said twice.

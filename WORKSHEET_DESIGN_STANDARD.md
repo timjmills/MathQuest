@@ -979,7 +979,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 
 | Page type | Auto columns | Hard cap |
 |---|---|---|
-| Fact rows | 10 / 6 / 5 | 10; 8 when answers exceed 99; division facts 10 in every notation (owner ruling 2026-10-30) |
+| Fact rows | 10 / 6 / 5 | 10; 8 when answers exceed 99; division facts 10 in every notation (owner ruling 2026-10-30); at Auto a stacked ÷ page with 3-digit dividends takes 9 at S for 2 mm of white each side (owner 2026-11-05, PAGE_TYPES PT-FRW-9) |
 | Fact probe | 5 | 5-10 (a choice of 1-4 becomes 5); division probes 2-3 |
 | Computation grid | 3 Daily, 2 I Can | 6 |
 | Long division | by table | 6, min cell width 30 mm |

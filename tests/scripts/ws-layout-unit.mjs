@@ -35,7 +35,7 @@ import { fineSplit } from '../../js/modules/sheet/roles/practice.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
-import { factRowsLayout, FIT_CLEAR_MM, plan as factRowsPlan } from '../../js/modules/sheet/roles/fact-rows.js';
+import { factRowsLayout, FIT_CLEAR_MM, AUTO_DIV_ROOM_MM, plan as factRowsPlan } from '../../js/modules/sheet/roles/fact-rows.js';
 import { compactArc, compactGutterEm } from '../../js/modules/sheet/cells/long-division.js';
 import { LIVE_W_MM } from '../../js/modules/sheet/roles/compose.js';
 import { EM_MM as KIT_EM_MM, FACT_TRACK_EM as KIT_FACT_TRACK_EM, FACT_OP_TRACK_EM as KIT_FACT_OP_TRACK_EM } from '../../js/modules/sheet/index.js';
@@ -843,7 +843,11 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     for (const form of ['standard', 'vertical', 'long', 'fraction', 'mix']) {
         for (const size of ['S', 'M', 'L']) {
             for (const columns of ['auto', 5, 6, 8, 10]) {
-                const want = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
+                // facts-print-fix (owner 2026-11-05: 3-digit dividends "crowd the box" at 10): at AUTO a stacked ÷ page
+                // whose dividends reach 3 digits takes the most columns with 2 mm of white each side - 9 at S; an asked
+                // 10 still prints 10 (PT-FRW-9), and the bracket / fraction rows keep their own 10
+                const stackedAuto = columns === 'auto' && /^(standard|vertical)$/.test(form);
+                const want = columns === 'auto' ? { S: stackedAuto ? 9 : 10, M: 6, L: 5 }[size] : columns;
                 const L = factRowsLayout(set(form), { skills: [], ctx: { size }, columns });
                 const tag = `PT-FRW-9 div_facts ${form} ${size} columns ${columns}`;
                 eq(L.cols, want, `${tag}: ${want} columns`);
@@ -852,6 +856,7 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 // the stacked ÷: the rule spans the 0.62 em ÷ track and three 0.72 em digit tracks
                 const ink = L.row ? L.row.inkMm : (0.62 + L.tracks * KIT_FACT_TRACK_EM) * em(L.digitPt);
                 ok(ink + FIT_CLEAR_MM <= inner + 1e-6, `${tag}: ink ${ink.toFixed(2)} mm + ${FIT_CLEAR_MM} mm fits the ${inner.toFixed(2)} mm cell`);
+                if (stackedAuto) ok((inner - ink) / 2 >= AUTO_DIV_ROOM_MM - 1e-6, `${tag}: ${((inner - ink) / 2).toFixed(2)} mm of white each side >= ${AUTO_DIV_ROOM_MM} (AUTO room)`);
                 // (critic r1 R1-2: whole rows, no short last row - the dealer's blocks of three keep thirds within one)
                 eq(L.perPage, L.cols * L.rows, `${tag}: whole rows (${L.perPage} a page)`);
                 ok(!L.across, `${tag}: never the 3-column across page`);

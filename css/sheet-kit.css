@@ -156,6 +156,15 @@
 :is(.ws-page, .ws-sheet) .ws-grid.fixed { flex: none; }
 :is(.ws-page, .ws-sheet) .ws-grid.open { gap: 0; background: var(--ws-paper); }   /* tests / probes: open array */
 :is(.ws-page, .ws-sheet) .ws-grid.facts { gap: var(--ws-hair); }                  /* fact grids: hairline interiors in both looks */
+/* Fact rows (owner 2026-11-05, facts-print-fix ROWRULES): the hairline interiors are DRAWN rules, not the ink background
+   showing through a 0.75 pt gap between white cells. A PDF viewer or printer rasterises a gap between two white fills
+   with conflation (each white edge partly covers the gap's pixels), so some rules vanished and others doubled ("no lines
+   between the rows", "one vertical thicker"). Each cell draws its left and top rule in ink on top of its neighbours; the
+   cell is pulled one hairline left and up, so the first column's and first row's rules sit under the heavy frame and
+   every inner rule is one hairline, closed on every row. */
+:is(.ws-page, .ws-sheet) .ws-grid.facts { gap: 0; background: var(--ws-paper); }
+:is(.ws-page, .ws-sheet) .ws-grid.facts > .ws-cell { border-left: var(--ws-hair) solid var(--ws-ink); border-top: var(--ws-hair) solid var(--ws-ink);
+    margin: calc(-1 * var(--ws-hair)) 0 0 calc(-1 * var(--ws-hair)); }
 :is(.ws-page, .ws-sheet) .ws-cell { position: relative; background: var(--ws-paper); min-width: 0; min-height: 0; padding: 3mm; display: flex; flex-direction: column; align-items: center; }
 :is(.ws-page, .ws-sheet) .ws-cell.blankrun { grid-column: var(--from) / -1; }
 :is(.ws-page, .ws-sheet) .ws-letter { position: absolute; left: 1.5mm; top: 1mm; font-size: var(--ws-letter); line-height: 1; }
