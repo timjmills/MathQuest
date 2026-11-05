@@ -1410,6 +1410,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "facts-print-fix-r5",
+   "check": "a sweep of the owner's fact set - Problems 20-150 by 5 x S/M/L x Columns Auto/5/9 x both arrangements, ÷ Mix In sections by 10, Pages 1 and 2 default and ÷ Mix (684 prints, built path): each skill within one row of its share in Pages mode or a note (SHARES), no empty cell before the last page (BLANKMID), ÷ never before + − × (DIVORDER), a title names one number only when the option fixes it (TITLEONE), the last page holds a full row or a note (ORPHAN), every page but the last filled (FULLPLAN), Columns 5 digits follow the Size (COLSIZE) (print critic r5 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --r5 SHARES / BLANKMID / DIVORDER / TITLEONE / ORPHAN / FULLPLAN / COLSIZE",
+   "browser": true,
+   "fail": {
+    "commit": "128455ad3",
+    "state": "÷ Mix In sections Pages 1 Big 2 / 2 / 1 / 15; the '÷ first' reorder left a 1-fact row and 4 empty cells on page 1; Problems 30 at M a 1-fact last page titled 'Divide by 6'; Columns 5 28 pt at S, M and L (BLANKMID 712, DIVORDER 172, ORPHAN 77, SHARES 45, FULLPLAN 43, TITLEONE 15, COLSIZE 1)"
+   },
+   "pass": {
+    "commit": "21304044e",
+    "state": "facts-print-fix r5: teacher's order kept, every section but the last in whole rows, Pages mode planned to the shares (one mixed ÷ section when needed), titles from the options, Size caps the digits with Columns picked"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --r5",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
