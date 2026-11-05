@@ -15,6 +15,7 @@ import { DOMAINS, visibleSkills, getSkillGrade, GRADE_COLORS } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
 import { findSkills, onSkillSearchReady } from './skill-finder.js';
 import { generateQuestionFor } from './generate-question.js';
+import { pupilNames } from './pupil-names.js';
 
 const GRADES = ['K', '1', '2', '3', '4', '5', '6', 'M'];
 const GRADE_NAME = { K: 'Kindergarten', M: 'Mixed' };
@@ -22,10 +23,15 @@ const gradeName = (g) => GRADE_NAME[g] || `Grade ${g}`;
 const gradeShort = (g) => (g === 'M' ? 'Mix' : g);
 // a short chip word for each area (the full DOMAINS name is the chip's accessible name and the group heading)
 const AREA_SHORT = { counting_cardinality: 'Counting', number_operations: 'Numbers', fractions_decimals: 'Fractions', geometry_measurement: 'Shapes & measures', data_statistics: 'Data', algebraic_thinking: 'Algebra', vocabulary: 'Maths words' };
-const LEAD_ICONS = /^[\s\u{1F300}-\u{1FAFF}☀-➿⬀-⯿️‍½]+/u;
+// check D5: Counting and Numbers both carry 🔢 in DOMAINS; the explorer gives Counting its own picture
+const AREA_ICON = { counting_cardinality: '🧮' };
+const areaIcon = (id) => AREA_ICON[id] || (DOMAINS[id] && DOMAINS[id].icon) || '';
+// check D3: a search shows this many at a time, says how many there are, and offers "Show more"
+const SEARCH_PAGE = 60;
+// check D5: a grade with this many skills or more gets an area filter row inside the grade tab
+const GRADE_FILTER_MIN = 100;
 
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const cleanLabel = (l) => String(l || '').replace(LEAD_ICONS, '').trim() || String(l || '');
 const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* private window */ } },
@@ -41,13 +47,16 @@ function allSkills() {
             for (const s of visibleSkills(c.id) || []) {
                 const g = getSkillGrade(s.v, c.id);
                 ALL.push({
-                    key: `${c.id}:${s.v}`, domainId, domainName: d.name, domainIcon: d.icon, color: d.color || '#7c5cff',
+                    key: `${c.id}:${s.v}`, domainId, domainName: d.name, domainIcon: areaIcon(domainId), color: d.color || '#7c5cff',
                     categoryId: c.id, categoryName: c.name, categoryIcon: c.icon || '', skillId: s.v, rawLabel: s.l,
-                    label: cleanLabel(s.l), grade: g == null ? 'M' : String(g),
+                    label: '', grade: g == null ? 'M' : String(g),
                 });
             }
         }
     }
+    // check D5: pupil names — no "(Visual)" / "(No Visuals)" / "(B&W)"; two skills never share a name
+    const names = pupilNames(ALL.map((s) => ({ key: s.key, label: s.rawLabel, area: s.categoryName })));
+    for (const s of ALL) s.label = names.get(s.key) || s.rawLabel;
     return ALL;
 }
 const byKey = () => { if (!byKey.m) byKey.m = new Map(allSkills().map((s) => [s.key, s])); return byKey.m; };
@@ -58,6 +67,8 @@ const ui = {
     grade: GRADES.includes(store.get('mq_explore_grade')) ? store.get('mq_explore_grade') : 'K',
     domain: DOMAINS[store.get('mq_explore_domain')] ? store.get('mq_explore_domain') : Object.keys(DOMAINS)[0],
     query: '',
+    gradeArea: 'all',
+    limit: SEARCH_PAGE,
     root: null,
     opener: null,
     io: null,
@@ -95,17 +106,17 @@ function cardHTML(s) {
     const eg = exampleCache.get(s.key);
     return `<button type="button" class="mqx-card${on ? ' is-on' : ''}" data-key="${esc(s.key)}" aria-pressed="${on}" style="--mqx-area:${esc(s.color)}">
 <span class="mqx-grade" style="background:${gc.bg};color:${gc.text}" aria-hidden="true">${esc(gradeShort(s.grade))}</span>
-<span class="mqx-name">${esc(s.label)}<span class="mqx-sr">, ${esc(gradeName(s.grade))}</span></span>
+<span class="mqx-name" title="${esc(s.label)}">${esc(s.label)}<span class="mqx-sr">, ${esc(gradeName(s.grade))}</span></span>
 <span class="mqx-eg" aria-hidden="true">${eg ? esc(eg) : ''}</span>
 <span class="mqx-area"><span aria-hidden="true">${esc(s.categoryIcon)}</span> ${esc(s.categoryName)}</span>
 <span class="mqx-tick" aria-hidden="true"></span>
 </button>`;
 }
 
-function groupHTML(title, icon, color, list, id) {
+function groupHTML(title, icon, color, list, id, countText = '') {
     if (!list.length) return '';
     return `<section class="mqx-group" aria-labelledby="${id}" style="--mqx-area:${esc(color)}">
-<h3 class="mqx-h" id="${id}"><span aria-hidden="true">${esc(icon)}</span> ${esc(title)} <span class="mqx-n">${list.length}</span></h3>
+<h3 class="mqx-h" id="${id}"><span aria-hidden="true">${esc(icon)}</span> ${esc(title)} <span class="mqx-n">${esc(countText || String(list.length))}</span></h3>
 <div class="mqx-grid">${list.map(cardHTML).join('')}</div></section>`;
 }
 
@@ -120,22 +131,40 @@ function chipsHTML() {
     }
     return `<div class="mqx-chiprow" role="radiogroup" aria-label="Area">${Object.entries(DOMAINS).map(([id, d]) => {
         const on = id === ui.domain;
-        return `<button type="button" role="radio" class="mqx-chip mqx-dchip" data-domain="${id}" aria-checked="${on}" tabindex="${on ? 0 : -1}" aria-label="${esc(d.name)}" style="--mqx-chip:${esc(d.color)}"><span aria-hidden="true">${esc(d.icon)}</span> ${esc(AREA_SHORT[id] || d.name)}</button>`;
+        return `<button type="button" role="radio" class="mqx-chip mqx-dchip" data-domain="${id}" aria-checked="${on}" tabindex="${on ? 0 : -1}" aria-label="${esc(d.name)}" style="--mqx-chip:${esc(d.color)}"><span aria-hidden="true">${esc(areaIcon(id))}</span> ${esc(AREA_SHORT[id] || d.name)}</button>`;
     }).join('')}</div>`;
+}
+
+// check D5: inside a long grade, a second row narrows it to one area ("All" first); it scrolls away with the list
+function gradeAreaRowHTML(list) {
+    const ids = Object.keys(DOMAINS).filter((id) => list.some((s) => s.domainId === id));
+    const chip = (id, label, icon, color, n) => {
+        const on = ui.gradeArea === id;
+        const name = id === 'all' ? `All areas, ${n} skills` : `${DOMAINS[id].name}, ${n} skills`;
+        return `<button type="button" role="radio" class="mqx-chip mqx-achip" data-garea="${id}" aria-checked="${on}" tabindex="${on ? 0 : -1}" aria-label="${esc(name)}" style="--mqx-chip:${esc(color)}">${icon ? `<span aria-hidden="true">${esc(icon)}</span> ` : ''}${esc(label)} <span class="mqx-cn" aria-hidden="true">${n}</span></button>`;
+    };
+    return `<div class="mqx-chiprow mqx-arearow" role="radiogroup" aria-label="Area in ${esc(gradeName(ui.grade))}">${chip('all', 'All', '', '#7c5cff', list.length)}${ids.map((id) => chip(id, AREA_SHORT[id] || DOMAINS[id].name, areaIcon(id), DOMAINS[id].color, list.filter((s) => s.domainId === id).length)).join('')}</div>`;
 }
 
 function bodyHTML() {
     const q = ui.query.trim();
     if (q.length >= 2) {
-        const hits = findSkills(q).map((h) => byKey().get(h.key)).filter(Boolean).slice(0, 60);
-        if (!hits.length) return `<p class="mqx-empty">No skills match “${esc(q)}”. Try another word.</p>`;
-        return groupHTML(`Skills for “${q}”`, '', '#7c5cff', hits, 'mqxHq');
+        const found = findSkills(q).map((h) => byKey().get(h.key)).filter(Boolean);
+        if (!found.length) return `<p class="mqx-empty">No skills match “${esc(q)}”. Try another word, or look By grade or By area.</p>`;
+        const hits = found.slice(0, ui.limit);
+        const more = found.length > hits.length;
+        const note = more ? `<p class="mqx-more-note" id="mqxMoreNote">Showing ${hits.length} of ${found.length}. Type more words to narrow it.</p>` : '';
+        const btn = more ? `<button type="button" class="mqx-more" data-act="more" aria-describedby="mqxMoreNote">Show ${Math.min(SEARCH_PAGE, found.length - hits.length)} more</button>` : '';
+        return groupHTML(`Skills for “${q}”`, '', '#7c5cff', hits, 'mqxHq', more ? `${hits.length} of ${found.length}` : '') + note + btn;
     }
     const all = allSkills();
     if (ui.tab === 'grade') {
         const list = all.filter((s) => s.grade === ui.grade);
-        const groups = Object.entries(DOMAINS).map(([id, d]) => groupHTML(d.name, d.icon, d.color, list.filter((s) => s.domainId === id), `mqxHg${id}`)).join('');
-        return groups || `<p class="mqx-empty">No skills for ${esc(gradeName(ui.grade))} yet.</p>`;
+        const filter = list.length >= GRADE_FILTER_MIN;
+        if (!filter || (ui.gradeArea !== 'all' && !list.some((s) => s.domainId === ui.gradeArea))) ui.gradeArea = 'all';
+        const shown = ui.gradeArea === 'all' ? list : list.filter((s) => s.domainId === ui.gradeArea);
+        const groups = Object.entries(DOMAINS).map(([id, d]) => groupHTML(d.name, areaIcon(id), d.color, shown.filter((s) => s.domainId === id), `mqxHg${id}`)).join('');
+        return (filter ? gradeAreaRowHTML(list) : '') + (groups || `<p class="mqx-empty">No skills for ${esc(gradeName(ui.grade))} yet.</p>`);
     }
     const d = DOMAINS[ui.domain];
     const list = all.filter((s) => s.domainId === ui.domain);
@@ -158,6 +187,13 @@ function render({ keepScroll = false } = {}) {
     const top = body.scrollTop;
     body.innerHTML = bodyHTML();
     body.scrollTop = keepScroll ? top : 0;
+    // the chip rows are one scrollable line (check D4): keep the chosen chip in view
+    for (const on of r.querySelectorAll('.mqx-chiprow [aria-checked="true"]')) {
+        const row = on.parentElement;
+        if (row.scrollWidth <= row.clientWidth) continue;
+        const rb = row.getBoundingClientRect(), cb = on.getBoundingClientRect();
+        if (cb.left < rb.left || cb.right > rb.right) row.scrollLeft += (cb.left + cb.width / 2) - (rb.left + rb.width / 2);   // centre it
+    }
     updateCount();
     watchExamples();
 }
@@ -245,7 +281,12 @@ function moveRadio(group, dir) {
     const items = [...group.querySelectorAll('[role="radio"]')];
     const i = items.findIndex((x) => x.getAttribute('aria-checked') === 'true');
     const next = items[(i + dir + items.length) % items.length];
-    if (next) { next.click(); const again = ui.root.querySelector(`[role="radio"][data-${next.dataset.grade ? 'grade' : 'domain'}="${next.dataset.grade || next.dataset.domain}"]`); if (again) again.focus(); }
+    if (!next) return;
+    const attr = next.dataset.grade ? 'grade' : next.dataset.garea ? 'garea' : 'domain';
+    const val = next.dataset[attr];
+    next.click();
+    const again = ui.root.querySelector(`[role="radio"][data-${attr}="${val}"]`);
+    if (again) again.focus();
 }
 
 function onClick(e) {
@@ -256,7 +297,16 @@ function onClick(e) {
     }
     if (t.classList.contains('mqx-card')) { toggle(t); return; }
     if (t.dataset.tab) { setTab(t.dataset.tab); return; }
-    if (t.dataset.grade) { ui.grade = t.dataset.grade; store.set('mq_explore_grade', ui.grade); render(); return; }
+    if (t.dataset.grade) { ui.grade = t.dataset.grade; ui.gradeArea = 'all'; store.set('mq_explore_grade', ui.grade); render(); return; }
+    if (t.dataset.garea) { ui.gradeArea = t.dataset.garea; render(); const b = ui.root.querySelector(`[data-garea="${ui.gradeArea}"]`); if (b) { try { b.focus({ preventScroll: true }); } catch (e2) { /* */ } } return; }
+    if (t.dataset.act === 'more') {
+        const first = ui.limit;
+        ui.limit += SEARCH_PAGE;
+        render({ keepScroll: true });
+        const c = ui.root.querySelectorAll('#mqxBody .mqx-card')[first];   // focus the first new card
+        if (c) { try { c.focus(); } catch (e2) { /* */ } }
+        return;
+    }
     if (t.dataset.domain) { ui.domain = t.dataset.domain; store.set('mq_explore_domain', ui.domain); render(); return; }
     if (t.dataset.act === 'done') { close(); return; }
     if (t.dataset.act === 'clear') { UnifiedSkills.clear(); render({ keepScroll: true }); }
@@ -298,7 +348,7 @@ let searchTimer = 0;
 function onInput(e) {
     if (e.target.id !== 'mqxSearch') return;
     clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => { ui.query = e.target.value || ''; render(); }, 120);
+    searchTimer = setTimeout(() => { ui.query = e.target.value || ''; ui.limit = SEARCH_PAGE; render(); }, 120);
 }
 onSkillSearchReady(() => { if (ui.root && !ui.root.hidden && ui.query.trim().length >= 2) render({ keepScroll: true }); });
 
@@ -367,5 +417,5 @@ function close() {
 /** For tests: what the explorer is showing. */
 export function studentExplorerState() {
     if (!ui.root) return null;
-    return { open: !ui.root.hidden, tab: ui.tab, grade: ui.grade, domain: ui.domain, query: ui.query, cards: ui.root.querySelectorAll('.mqx-card').length, examples: exampleCache.size };
+    return { open: !ui.root.hidden, tab: ui.tab, grade: ui.grade, gradeArea: ui.gradeArea, domain: ui.domain, query: ui.query, cards: ui.root.querySelectorAll('.mqx-card').length, examples: exampleCache.size };
 }

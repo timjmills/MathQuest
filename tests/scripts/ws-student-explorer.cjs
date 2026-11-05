@@ -1,7 +1,8 @@
 // ws-student-explorer — the pupil skill explorer (owner, 2026-11-05: "On the student side I also want a skill explorer by
 // grade or by domain … so kids can pick the skills as well to play/print/send/add to quick start").
 //
-//   LAZY     js/modules/student-explorer.js and css/student-explorer.css are not loaded until "Explore skills" is pressed
+//   LAZY     a request log (from a reload): student-explorer.js, pupil-names.js and the css are not requested until
+//            "Explore skills" is pressed, and are requested then (check D6: resource timing could not fail)
 //   OPEN     the pupil home has an "Explore skills" button; pressing it opens a dialog (aria-modal) with focus inside
 //   GRADE    "By grade": every grade chip (K, 1-6, Mixed) lists skills, and every card on a grade shows that grade only
 //   AREA     "By area": every area chip lists skills, grouped under that area's categories
@@ -10,6 +11,14 @@
 //            word its label does not contain ("take away" -> subtraction), never labels only
 //   PICK     tapping 3 cards ticks them (aria-pressed) and "3 skills picked"; Done closes the explorer, the bottom row
 //            reads "3 skills selected", Print lists exactly those 3, Play plays exactly those 3
+//   WORDS    pupil card names carry no teacher wording ("(Visual)", "(No Visuals)", "(B&W)"), no two cards share a name,
+//            the category caption is >= 15 px, every area chip has its own picture                     (check D5)
+//   FILTER   grades 3 and 4 have an area row inside the grade tab; an area narrows the list, "All" restores it (check D5)
+//   CAP      a search with more than 60 hits says "Showing 60 of N" and "Show more" adds the next 60     (check D3)
+//   SEND     the Send link, opened in a fresh page, lands on "Practice set: 3 skills" with exactly those 3 (check D6)
+//   QUICKSTART  Add to Quick Start: every card shows the skill's full name (3 long names + both "Add within 20"),
+//            all card names distinct, title = full name; the selection chips carry the full name     (check D1)
+//   ROOM     at 390 x 844 the chips are one line and the list keeps >= 60 % of the height              (check D4)
 //   KEYS     Esc closes; arrow keys move between the tabs
 //   TARGETS  every control in the explorer and the Explore button >= 44 x 44 at 1366 / 820 / 390
 //   NOSCROLL no horizontal scroll at 390 (the page and the explorer panel)
@@ -34,6 +43,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const fails = [];
     const F = (t) => fails.push(t);
     try {
+        // LAZY reads a request log (check D6: resource timing never listed the module, so that half could not fail).
+        // The log starts before a reload, so a request made during boot is in it too.
+        const reqs = [];
+        page.on('request', (r) => reqs.push(r.url()));
+        await page.reload({ waitUntil: 'networkidle2', timeout: 60000 });
+        await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+        await page.evaluate(() => Promise.all([window.__mqLoadDeferred, window.__mqLoadWorksheet].filter(Boolean).map((f) => f().then(() => true, () => false))));
+        await sleep(300);
+        const asked = (re) => reqs.some((u) => re.test(u));
         // the pupil home, nothing selected
         await page.evaluate(() => {
             document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode');
@@ -45,12 +63,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
         if (process.env.MQX_TRACE) console.log('step', '// LAZY');
         // LAZY
-        const lazy = await page.evaluate(() => ({
-            mod: performance.getEntriesByType('resource').some((e) => /student-explorer\.js/.test(e.name)),
-            css: performance.getEntriesByType('resource').some((e) => /student-explorer\.css/.test(e.name)),
-            stub: !!(window.openStudentExplorer && window.openStudentExplorer.__mqStub),
-        }));
-        if (lazy.mod || lazy.css) F(`LAZY the explorer loaded before it was opened (module ${lazy.mod}, css ${lazy.css})`);
+        const lazy = await page.evaluate(() => ({ stub: !!(window.openStudentExplorer && window.openStudentExplorer.__mqStub) }));
+        lazy.mod = asked(/student-explorer\.js/); lazy.css = asked(/student-explorer\.css/); lazy.names = asked(/pupil-names\.js/);
+        if (!reqs.some((u) => /globals\.js/.test(u))) F('LAZY the request log missed the page load (it cannot judge laziness)');
+        if (lazy.mod || lazy.css || lazy.names) F(`LAZY the explorer loaded before it was opened (module ${lazy.mod}, css ${lazy.css}, names ${lazy.names})`);
         if (!lazy.stub) F('LAZY window.openStudentExplorer is not the lazy stub before first use');
 
         if (process.env.MQX_TRACE) console.log('step', '// OPEN');
@@ -69,6 +85,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         if (!o.modal || !o.label) F('OPEN the explorer is not a labelled aria-modal dialog');
         if (!o.focusIn) F('OPEN focus is not inside the explorer on open');
         if (!o.css) F('OPEN the explorer stylesheet did not apply');
+        if (!asked(/student-explorer\.js/) || !asked(/student-explorer\.css/)) F(`LAZY the first press did not request the explorer (module ${asked(/student-explorer\.js/)}, css ${asked(/student-explorer\.css/)})`);
 
         if (process.env.MQX_TRACE) console.log('step', '// GRADE + LIVE');
         // GRADE + LIVE
@@ -83,8 +100,28 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                 await new Promise((r) => setTimeout(r, 30));
                 const cards = [...document.querySelectorAll('#mqxBody .mqx-card')];
                 out.perGrade[gr] = cards.length;
-                for (const c of cards) {
+                // check D5: a long grade has an area row; "All" lists every card, an area lists only that area's cards
+                const row = document.querySelector('#mqxBody .mqx-arearow');
+                out.areaRow = out.areaRow || {};
+                if (row) {
+                    const aChips = [...row.querySelectorAll('[data-garea]')].filter((b) => b.dataset.garea !== 'all');
+                    const pickA = aChips[1] || aChips[0];
+                    const want = Number(pickA.querySelector('.mqx-cn').textContent);
+                    pickA.click();
+                    await new Promise((r) => setTimeout(r, 30));
+                    const narrowed = [...document.querySelectorAll('#mqxBody .mqx-card')];
+                    const cats = new Set(window.DOMAINS[pickA.dataset.garea].categories.map((c) => c.id));
+                    out.areaRow[gr] = { n: narrowed.length, want, inArea: narrowed.every((c) => cats.has(c.dataset.key.split(':')[0])), checked: document.querySelector(`[data-garea="${pickA.dataset.garea}"]`).getAttribute('aria-checked') };
+                    document.querySelector('#mqxBody [data-garea="all"]').click();
+                    await new Promise((r) => setTimeout(r, 30));
+                    out.areaRow[gr].back = document.querySelectorAll('#mqxBody .mqx-card').length === cards.length;
+                }
+                for (const c of document.querySelectorAll('#mqxBody .mqx-card')) {   // re-read: the area row re-rendered the list
                     out.keys.push(c.dataset.key);
+                    out.names = out.names || {};
+                    out.names[c.dataset.key] = c.querySelector('.mqx-name').firstChild.textContent;
+                    const cap = parseFloat(getComputedStyle(c.querySelector('.mqx-area')).fontSize);
+                    if (!(out.minCap <= cap)) out.minCap = cap;
                     const badge = c.querySelector('.mqx-grade').textContent.trim();
                     if (badge !== (gr === 'M' ? 'Mix' : gr)) out.wrong.push(`${c.dataset.key} shows ${badge} under ${gr}`);
                 }
@@ -103,6 +140,21 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         if (g.wrong.length) F(`GRADE ${g.wrong.length} cards under the wrong grade: ${g.wrong.slice(0, 3).join('; ')}`);
         if (g.retiredShown.length) F(`LIVE retired skills offered: ${g.retiredShown.slice(0, 5).join(', ')}`);
         if (g.missing.length) F(`LIVE ${g.missing.length} live skills not reachable By grade: ${g.missing.slice(0, 5).join(', ')}`);
+        // WORDS (check D5): pupil names carry no teacher wording, every name is distinct, the caption is >= 15 px
+        const nameList = Object.entries(g.names || {});
+        const teacherWords = nameList.filter(([, n]) => /\((?:[^)]*\b)?(visuals?|no visuals?|no pictures|b&w|mc)\b[^)]*\)/i.test(n));
+        if (teacherWords.length) F(`WORDS ${teacherWords.length} cards show teacher wording: ${teacherWords.slice(0, 3).map(([k, n]) => `${k} "${n}"`).join('; ')}`);
+        const seenName = new Map();
+        const dupes = [];
+        for (const [k, n] of nameList) { if (seenName.has(n)) dupes.push(`"${n}" (${seenName.get(n)}, ${k})`); else seenName.set(n, k); }
+        if (dupes.length) F(`WORDS ${dupes.length} skills share a card name: ${dupes.slice(0, 3).join('; ')}`);
+        if (!(g.minCap >= 15)) F(`WORDS the category caption is ${g.minCap} px (< 15)`);
+        for (const gr of ['3', '4']) {
+            const r = (g.areaRow || {})[gr];
+            if (!r) { F(`FILTER grade ${gr} (${g.perGrade[gr]} skills) has no area filter row`); continue; }
+            if (!r.n || r.n !== r.want || !r.inArea || r.checked !== 'true') F(`FILTER grade ${gr}: an area chip shows ${r.n} cards (chip says ${r.want}, all in area ${r.inArea}, checked ${r.checked})`);
+            if (!r.back) F(`FILTER grade ${gr}: "All" does not bring every card back`);
+        }
 
         if (process.env.MQX_TRACE) console.log('step', '// AREA');
         // AREA
@@ -118,11 +170,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                 for (const c of document.querySelectorAll('#mqxBody .mqx-card')) if (!cats.has(c.dataset.key.split(':')[0])) out.wrongCat.push(c.dataset.key + ' under ' + chip);
             }
             out.domains = Object.keys(window.DOMAINS);
+            // check D5: every area chip has its own picture (Counting and Numbers both had 🔢)
+            out.icons = [...document.querySelectorAll('.mqx-dchip')].map((c) => c.querySelector('[aria-hidden="true"]').textContent.trim());
             return out;
         });
         if (JSON.stringify(Object.keys(a.per)) !== JSON.stringify(a.domains)) F(`AREA chips ${Object.keys(a.per)} != DOMAINS ${a.domains}`);
         for (const [d, n] of Object.entries(a.per)) if (!n) F(`AREA ${d} lists no skills`);
         if (a.wrongCat.length) F(`AREA cards outside their area: ${a.wrongCat.slice(0, 3).join('; ')}`);
+        if (new Set(a.icons).size !== a.icons.length) F(`WORDS two area chips share a picture: ${a.icons.join(' ')}`);
         if (SHOTS) {
             await page.evaluate(async () => { document.querySelector('.mqx-dchip[data-domain="number_operations"]').click(); });
             await sleep(900);
@@ -138,9 +193,34 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const want = fin.findSkills('times tables').map((h) => h.key).slice(0, 5);
             const take = await type('take away');
             const labelOnly = take.filter((k) => !/take away/i.test(window.SKILLS[k.split(':')[0]].find((s) => s.v === k.split(':')[1]).l));
+            // CAP (check D3): a long result list says how many there are and offers "Show more"; it never stops silently
+            let cap = null;
+            for (const q of ['subtract', 'add', 'numbers', 'fractions']) {
+                const n = fin.findSkills(q).length;
+                if (n <= 60) continue;
+                const first = await type(q);
+                const note = (document.getElementById('mqxMoreNote') || {}).textContent || '';
+                const head = (document.querySelector('#mqxBody .mqx-h .mqx-n') || {}).textContent || '';
+                const more = document.querySelector('#mqxBody .mqx-more');
+                if (more) { more.click(); await new Promise((r) => setTimeout(r, 200)); }
+                const after = document.querySelectorAll('#mqxBody .mqx-card').length;
+                cap = { q, n, first: first.length, note, head, more: !!more, after, focusCard: !!(document.activeElement && document.activeElement.classList.contains('mqx-card')) };
+                break;
+            }
             await type('');
-            return { times: times.slice(0, 5), want, take: take.length, sub: take.some((k) => k.startsWith('subtraction:')), labelOnly: labelOnly.length };
+            return { times: times.slice(0, 5), want, take: take.length, sub: take.some((k) => k.startsWith('subtraction:')), labelOnly: labelOnly.length, cap };
         });
+        if (!sr.cap) F('CAP no search word finds more than 60 skills to test the cap with');
+        else {
+            const c = sr.cap;
+            // skill-finder may also rank skills the explorer does not offer; the note's total is what the pupil can reach
+            const m = /Showing (\d+) of (\d+)/.exec(c.note);
+            const total = m ? Number(m[2]) : c.first;
+            if (!m || Number(m[1]) !== c.first || total <= c.first) F(`CAP "${c.q}" (${c.n} finder hits) shows ${c.first} skills without saying how many there are (note "${c.note}", heading count "${c.head}")`);
+            if (!c.more) F(`CAP "${c.q}" offers no "Show more"`);
+            if (c.more && c.after !== Math.min(total, c.first + 60)) F(`CAP "Show more" on "${c.q}" lists ${c.after}, want ${Math.min(total, c.first + 60)}`);
+            if (c.more && !c.focusCard) F('CAP after "Show more" focus is not on a card');
+        }
         if (!sr.times.length || JSON.stringify(sr.times) !== JSON.stringify(sr.want)) F(`SEARCH "times tables" shows ${sr.times} but skill-finder ranks ${sr.want}`);
         if (!sr.sub || !sr.labelOnly) F(`SEARCH "take away" finds no subtraction skill by concept (${sr.take} hits) — label-only search`);
 
@@ -190,6 +270,37 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             return keys;
         });
         if (JSON.stringify(pr) !== JSON.stringify(pick.keys)) F(`PICK Print lists ${pr}, picked ${pick.keys}`);
+
+        if (process.env.MQX_TRACE) console.log('step', '// SEND');
+        // SEND (check D6): the Send link, opened in a fresh page, lands on "Practice set: 3 skills" with exactly those 3
+        const link = await page.evaluate(async () => {
+            document.getElementById('studentSelSendBtn').click();
+            await new Promise((r) => setTimeout(r, 300));
+            const v = (document.getElementById('studentSendLink') || {}).value || '';
+            if (window.closeStudentSend) window.closeStudentSend();
+            return v;
+        });
+        if (!/[?&]c(ode)?=/.test(link) || !/from=pupil/.test(link)) F(`SEND the link is "${link}"`);
+        else {
+            const p2 = await app.browser.newPage();
+            const pr2 = [];
+            p2.on('pageerror', (e) => pr2.push(e.message));
+            p2.on('console', (m) => { if (m.type() === 'error') pr2.push(m.text()); });
+            await p2.evaluateOnNewDocument(() => { try { localStorage.setItem('mathquest_onboarded', '1'); } catch (e) { /* */ } });
+            await p2.setViewport({ width: 1366, height: 900 });
+            await p2.goto(link.replace(/^https?:\/\/[^/]+(\/[^?]*)?/, app.base + '/index.html'), { waitUntil: 'networkidle2', timeout: 60000 });
+            await p2.waitForFunction(() => !!document.querySelector('#studentLandingOverlay h2'), { timeout: 20000 }).catch(() => {});
+            const land = await p2.evaluate(() => {
+                const h = document.querySelector('#studentLandingOverlay h2');
+                const code = (window.state && window.state.landingSettings && window.state.landingSettings.skillsCode) || '';
+                const keys = code.split('-').filter((p) => p.length >= 2).map((p) => { const s = window.CODE_TO_SKILL && window.CODE_TO_SKILL[p.substring(0, 2).toUpperCase()]; return s ? s.categoryId + ':' + s.skillId : '?' + p; }).sort();
+                return { h: h ? h.textContent.trim() : null, keys };
+            });
+            await p2.close();
+            if (land.h !== 'Practice set: 3 skills') F(`SEND the link opens with "${land.h}"`);
+            if (JSON.stringify(land.keys) !== JSON.stringify(pick.keys)) F(`SEND the link carries ${land.keys}, picked ${pick.keys}`);
+            if (pr2.length) F(`SEND the linked page logged ${pr2.length} errors: ${pr2.slice(0, 2).join(' | ')}`);
+        }
         if (process.env.MQX_TRACE) console.log('step', '// Play plays');
         // Play plays exactly those 3
         const pl = await page.evaluate(async () => {
@@ -206,6 +317,52 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         if (JSON.stringify(pl.got) !== JSON.stringify(pick.keys) || !pl.mixed) F(`PICK Play plays ${pl.got} (mixed ${pl.mixed})`);
         await sleep(300);
         await page.evaluate(() => { document.querySelectorAll('.modal-overlay, .modal').forEach((m) => { if (m.style) m.style.display = 'none'; }); if (window.showView) window.showView('homeView'); });
+
+        if (process.env.MQX_TRACE) console.log('step', '// QUICKSTART');
+        // QUICKSTART (check D1): Add to Quick Start makes one card per skill whose name is the skill's FULL cleaned label
+        // (it used to be cut to 12 characters: "Add within 2" twice), every card name distinct, the full name in a title;
+        // the selection chips carry the full name too (they were cut at 20). 3 long-named skills + the two Add within 20.
+        const qs = await page.evaluate(async () => {
+            document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode');
+            if (window.showView) window.showView('homeView');
+            window.UnifiedSkills.clear();
+            const clean = (l) => String(l).replace(/^[\s\u{1F300}-\u{1FAFF}☀-➿⬀-⯿️‍½]+/u, '').trim();
+            const inDomains = new Map(Object.values(window.DOMAINS).flatMap((d) => d.categories.map((c) => [c.id, c])));
+            const live = [];
+            for (const [cat, list] of Object.entries(window.SKILLS)) if (Array.isArray(list) && inDomains.has(cat)) for (const s of list) if (!s.retired) live.push({ cat, s });
+            const already = new Set((window.customQuickSkills || []).map((c) => c.categoryId + ':' + c.skillId));
+            const long = live.filter((x) => !already.has(x.cat + ':' + x.s.v)).sort((a, b) => clean(b.s.l).length - clean(a.s.l).length).slice(0, 3);
+            const a20 = live.filter((x) => /^Add within 20 \((No|With) Regrouping\)$/i.test(clean(x.s.l)));
+            const chosen = [...long, ...a20];
+            for (const x of chosen) { const c = inDomains.get(x.cat); window.UnifiedSkills.add({ categoryId: x.cat, skillId: x.s.v, skillLabel: x.s.l, categoryIcon: c.icon, categoryName: c.name }); }
+            for (let i = 0; i < 3; i++) await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 50)));   // the chips redraw on a frame
+            const chips = [...document.querySelectorAll('#studentSkillsList .sel-chip')].map((c) => ({ title: c.getAttribute('title'), text: (c.querySelector('.sel-chip-name') || c).textContent.trim() }));
+            const before = (window.customQuickSkills || []).length;
+            document.getElementById('studentSelAddBtn').click();
+            await new Promise((r) => setTimeout(r, 300));
+            const cards = [...document.querySelectorAll('#quickSkillsGrid .quick-skill-card')];
+            const all = cards.map((c) => { const n = c.querySelector('.qs-name-text') || c.querySelector('.skill-name'); return { text: n.textContent.trim(), title: n.getAttribute('title') }; });
+            const mine = chosen.map((x) => {
+                const i = (window.customQuickSkills || []).findIndex((q) => q.categoryId === x.cat && q.skillId === x.s.v);
+                return { key: x.cat + ':' + x.s.v, want: clean(x.s.l), got: i > -1 && all[i] ? all[i].text : null, title: i > -1 && all[i] ? all[i].title : null };
+            });
+            // tidy: take the test's cards back out
+            window.customQuickSkills = (window.customQuickSkills || []).filter((q) => !chosen.some((x) => x.cat === q.categoryId && x.s.v === q.skillId));
+            if (window.saveQuickSkills) window.saveQuickSkills();
+            if (window.renderQuickSkillsGrid) window.renderQuickSkillsGrid();
+            window.UnifiedSkills.clear();
+            return { n: chosen.length, a20: a20.length, before, mine, names: all.map((x) => x.text), chips, chipWant: chosen.map((x) => clean(x.s.l)) };
+        });
+        if (qs.a20 !== 2) F(`QUICKSTART found ${qs.a20} "Add within 20 (No/With Regrouping)" skills, want 2`);
+        for (const m of qs.mine) {
+            if (m.got !== m.want) F(`QUICKSTART the card for ${m.key} reads "${m.got}", want the full name "${m.want}"`);
+            else if (m.title !== m.want) F(`QUICKSTART the card for ${m.key} has title "${m.title}"`);
+        }
+        const qsDupes = qs.names.filter((n, i) => qs.names.indexOf(n) !== i);
+        if (qsDupes.length) F(`QUICKSTART two cards read the same: ${[...new Set(qsDupes)].join('; ')}`);
+        const chipTexts = qs.chips.map((c) => c.text).sort();
+        if (JSON.stringify(chipTexts) !== JSON.stringify([...qs.chipWant].sort())) F(`QUICKSTART the selection chips read ${JSON.stringify(chipTexts)}, want the full names`);
+        if (qs.chips.some((c) => c.title !== c.text)) F('QUICKSTART a selection chip has no title with its full name');
 
         if (process.env.MQX_TRACE) console.log('step', '// KEYS + TARGETS');
         // KEYS + TARGETS + NOSCROLL at each width
@@ -232,6 +389,25 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                     panelW: panel.getBoundingClientRect().width };
             });
             if (t.small.length) F(`TARGETS @${w} ${t.small.length} controls under 44 px: ${t.small.slice(0, 4).join('; ')}`);
+            if (w === 390) {
+                // ROOM (check D4): on a phone the chips are one sideways-scrolling line and the list keeps >= 60 % of the height
+                for (const view of [{ tab: 'area', domain: 'number_operations' }, { tab: 'area', domain: 'vocabulary' }, { tab: 'grade', grade: '3' }, { tab: 'grade', grade: 'M' }]) {
+                    await page.evaluate((v) => window.openStudentExplorer(v), view);
+                    await sleep(200);
+                    const room = await page.evaluate(() => {
+                        const row = document.querySelector('#mqxChips .mqx-chiprow');
+                        const body = document.getElementById('mqxBody');
+                        const chips = [...row.querySelectorAll('.mqx-chip')].map((c) => Math.round(c.getBoundingClientRect().top));
+                        return { rowH: Math.round(row.getBoundingClientRect().height), lines: new Set(chips).size, body: Math.round(body.getBoundingClientRect().height), vh: window.innerHeight, onSeen: (() => { const on = row.querySelector('[aria-checked="true"]'); const a = on.getBoundingClientRect(), b = row.getBoundingClientRect(); return a.left >= b.left - 1 && a.right <= b.right + 1; })() };
+                    });
+                    const what = view.tab === 'area' ? `By area ${view.domain}` : `By grade ${view.grade}`;
+                    if (room.lines > 1) F(`ROOM @390 ${what}: the chips wrap onto ${room.lines} lines (${room.rowH} px)`);
+                    if (!room.onSeen) F(`ROOM @390 ${what}: the chosen chip is scrolled out of sight`);
+                    if (room.body < 0.6 * room.vh) F(`ROOM @390 ${what}: the list gets ${room.body} of ${room.vh} px (${Math.round(100 * room.body / room.vh)} %, want >= 60 %)`);
+                }
+                await page.evaluate(() => window.openStudentExplorer({ tab: 'grade', grade: '2' }));
+                await sleep(200);
+            }
             if (t.docX > 0 || t.panelX > 0 || t.bodyX > 0) F(`NOSCROLL @${w} horizontal overflow (page ${t.docX}, panel ${t.panelX}, list ${t.bodyX})`);
             if (SHOTS && (w === 1366 || w === 390)) {
                 await sleep(900);

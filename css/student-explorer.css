@@ -16,7 +16,17 @@ html.mqx-open, html.mqx-open body { overflow: hidden; }
 .mqx-tab[aria-selected="true"] { color: var(--mq-purple-d, #5b3fb8); border-bottom-color: var(--mq-purple, #7c5cff); }
 .mqx-chips { padding: 10px 16px 4px; }
 .mqx-chips:empty { display: none; }
-.mqx-chiprow { display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 2px 8px; }
+/* check D4: one line that scrolls sideways (a phone used to wrap 7 area chips into 4 rows, 268 px) */
+.mqx-chiprow { display: flex; flex-wrap: nowrap; gap: 8px; padding: 2px 2px 8px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.mqx-chiprow > .mqx-chip { scroll-snap-align: start; }
+.mqx-arearow { margin: 6px 0 2px; }
+@media (min-width: 901px) { .mqx-arearow { flex-wrap: wrap; overflow-x: visible; } }   /* wide: room for every area chip; it scrolls away with the list */
+.mqx-achip { font-size: 1.05rem; }
+.mqx-more-note { margin: 16px 4px 8px; font-size: 1.05rem; font-weight: 800; color: var(--mq-ink, #1d1b2e); }
+.mqx-more { display: block; min-height: 56px; margin: 0 0 8px; padding: 8px 24px; border-radius: 14px; border: 2px solid var(--mq-purple, #7c5cff); background: var(--mq-paper, #fff); color: var(--mq-purple-d, #5b3fb8); font: inherit; font-size: 1.1rem; font-weight: 900; cursor: pointer; }
+.mqx-more:focus-visible { outline: 3px solid var(--mq-orange, #ff9f1c); outline-offset: 2px; }
+.mqx-achip[aria-checked="true"] { color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35); }
+.mqx-cn { font-size: 0.95rem; font-weight: 800; opacity: 0.85; }
 .mqx-chip { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 56px; min-width: 56px; padding: 6px 16px; border-radius: 28px; border: 3px solid var(--mqx-chip, #7c5cff); background: var(--mq-paper, #fff); color: var(--mq-ink, #1d1b2e); font: inherit; font-size: 1.1rem; font-weight: 900; cursor: pointer; white-space: nowrap; justify-content: center; }
 .mqx-chip[aria-checked="true"] { background: var(--mqx-chip, #7c5cff); color: var(--mqx-chip-ink, #fff); box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.25); }
 .mqx-dchip[aria-checked="true"] { color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35); }
@@ -33,7 +43,7 @@ html.mqx-open, html.mqx-open body { overflow: hidden; }
 .mqx-grade { position: absolute; left: 10px; top: 10px; min-width: 34px; height: 34px; padding: 0 4px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 900; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
 .mqx-name { font-size: 1.05rem; font-weight: 900; line-height: 1.25; }
 .mqx-eg { font-family: 'Andika', var(--font-body, sans-serif); font-size: 1rem; font-weight: 700; color: var(--mq-ink-2, #4a4560); min-height: 1.25em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.mqx-area { font-size: 0.85rem; font-weight: 700; color: var(--mq-ink-2, #4a4560); }
+.mqx-area { font-size: 0.95rem; font-weight: 700; color: var(--mq-ink-2, #4a4560); }
 .mqx-tick { position: absolute; right: 10px; top: 10px; width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--mq-rule, #c9c3df); background: var(--mq-paper, #fff); }
 .mqx-card.is-on .mqx-tick { border-color: var(--mq-purple, #7c5cff); background: var(--mq-purple, #7c5cff); }
 .mqx-card.is-on .mqx-tick::after { content: ''; position: absolute; left: 9px; top: 3px; width: 8px; height: 16px; border: solid #fff; border-width: 0 4px 4px 0; transform: rotate(45deg); }
@@ -48,9 +58,12 @@ html.mqx-open, html.mqx-open body { overflow: hidden; }
 @media (max-width: 600px) {
   .mqx-overlay { padding: 0; }
   .mqx-panel { max-height: none; border-radius: 0; border: 0; box-shadow: none; }
-  .mqx-head { padding: 10px 12px 4px 16px; }
+  .mqx-head { padding: 6px 8px 2px 16px; }
+  .mqx-title { font-size: 1.3rem; }
   .mqx-search, .mqx-tabs { margin-left: 12px; margin-right: 12px; }
-  .mqx-chips { padding: 8px 12px 2px; }
+  .mqx-search { margin-top: 2px; margin-bottom: 6px; }
+  .mqx-chips { padding: 6px 12px 0; }
+  .mqx-chiprow { padding-bottom: 6px; }
   .mqx-body { padding: 4px 12px 12px; }
   .mqx-grid { grid-template-columns: 1fr; }
   .mqx-foot { padding: 8px 12px; }

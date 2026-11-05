@@ -382,3 +382,9 @@ body:not(.student-mode) .start-buttons-container #studentSelPrintBtn.student-onl
 .student-explore-row { display: flex; justify-content: center; margin-top: 12px; }
 .student-explore-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; padding: 8px 26px; border-radius: 14px; border: 2px solid var(--mq-purple-d, #5b3fb8); background: var(--mq-purple, #7c5cff); color: #fff; font: inherit; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 0 var(--mq-purple-d, #5b3fb8); }
 .student-explore-btn:focus-visible { outline: 3px solid var(--mq-orange, #ff9f1c); outline-offset: 2px; }
+/* explorer check D1 (2026-11-05): Quick Start cards and selection chips carry the FULL skill name; CSS clamps it
+   (2 lines on a card, one line with an ellipsis on a chip) and the full name is in the title. */
+.quick-skill-card .qs-name-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+#studentSkillsList .sel-chip { max-width: 100%; min-width: 0; }
+#studentSkillsList .sel-chip-text { min-width: 0; }
+#studentSkillsList .sel-chip-name { display: block; max-width: 26ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
