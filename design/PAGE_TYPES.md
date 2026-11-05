@@ -1220,16 +1220,23 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
     one row, the last page too" and its 1.4 / 1.7 caps).** The rows are packed over the fewest pages; each section takes ONE
     row stretch for the whole print (PG-11: one row height a section on every page, the grid's frame included in its
     height), from 1.00 to 1.30, chosen so that every page but the last shows at most 6 mm of white under its rows (the gate
-    allows 8). Only the last page may run short. When no stretch fills the pages with the + − × rows first, the ÷
-    section(s) go first and the + − × rows follow (each is its own section with its own instruction; only the order
-    changes). A one-page print stretches to 1.3 at most and keeps its white at the foot when only a few are asked.
+    allows 8). Only the last page may run short. **The teacher's order is kept** (+ − × then ÷; r5 removed r4's "÷ first"
+    reorder, which put a short ÷ row mid-print). **Every section but the last prints whole rows** (r5, critic D-R5-2 / D-R5-4):
+    its count is rounded to its columns and the difference goes to the last section, so the print's only short row is its
+    very last and no empty cell stands mid-print; each skill stays within one row of the even split of the asked count (the
+    total is exact; Problems 30 at M prints 8 / 8 / 8 / 6 on one page, not a page plus a one-fact page). When the pages
+    still cannot all be filled, whole rows may move between + − × and the last section (never more than a row a skill), then
+    one page more is planned; a last page under one row says so in the dialog. A one-page print stretches to 1.3 at most
+    and keeps its white at the foot when only a few are asked.
   - **One digit size on a page.** Sections that share a page take the smallest of their digit sizes (+ − × at 20 pt beside
     ÷ at 24 pt on one page was a defect); the stacked facts' width is read with the operator track the fact template draws
     (the tight 0.72 em track over a shorter second number), so × 1–12 keeps 28 pt in 5 columns at L.
-  - **Pages n with fewer pages than parts.** Pages 1 of a set with ÷ prints ONE page: the + − × rows and the ÷ section(s)
-    share it, rows by the skills' shares (each part at least one row), the page filled; Pages 2 or 3 with the three ÷
-    sections below gives the + − × rows their own pages and the ÷ sections the last. The dialog's note says the division
-    shares the page.
+  - **Pages n with + − × and ÷ (r5, owner 2026-11-05: the shares come first).** The pages are planned as Problems mode is,
+    for the most problems that fill exactly the n pages: each skill within one row of its share, every page full, the ÷
+    section(s) after the + − × rows on the page they reach (Pages 1 is one page; Pages 2 no longer gives ÷ a whole page of
+    its own: 19 / 19 / 18 / 63 was a defect). With div_facts Mix In sections, each written form keeps its own section only
+    when each can have a full row AND the shares still hold; otherwise the ÷ forms share ONE section, mixed cell by cell, and
+    the dialog's note says so (Big, Pages 1 printed 2 / 2 / 1 / 15 before).
   - **div_facts Mix (owner ruling 2026-11-05).** Mixed up keeps the three written forms (÷ sign stacked, fraction,
     long-division bracket) mixed cell by cell in one grid, every cell alike in placement: each form drawn in the stacked
     fact's three lines (the dividend / numerator / quotient line, the divisor / denominator / dividend line, the answer
@@ -1237,7 +1244,15 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
     drawing centred across it; the answer lines of the stacked ÷ and the fraction in one place, the bracket's quotient on
     its vinculum, level with the dividends beside it (PT-FRW-6: the quotient is written over the vinculum); a fraction's
     "=" 0.3 em after the bar; a bracket or fraction 2 mm clear of the border each side. **In sections** gives each written
-    form its own section with its own instruction (÷ sign, then bracket, then fraction), one third of the ÷ count each.
+    form its own section with its own instruction (÷ sign, then bracket, then fraction), one third of the ÷ count each
+    (Pages mode: when the shares allow it, above). A bracket section is tall enough that the room over the vinculum, under
+    the tab, holds a written line of figures (1.15 em, the stacked fact's answer row), and its ink is centred.
+  - **Titles name one number only when the skill fixes it (r5 TITLEONE).** "Divide by 6", "Multiply by 3", "Add 5" print only
+    when the skill's own option sets that one value (a one-value `constant`); facts that happen to share a number (a short
+    last page) keep "Division facts".
+  - **Size with Columns picked (r5, owner decision 4; owner to confirm).** In the simple print a picked column count keeps its
+    columns and the Size still sets the digits as far as the column fits them: S at most 18 pt, M 24, L 28 (Columns 5: 18 /
+    24 / 28 pt; Columns 9 at L stays 16 pt, the column's own rung).
   - **One column count and one digit size a group, on every page of every set.** They come from what the group's skills
     can REACH (x 1-12 reaches 144: 3 tracks, answers over 99, so 8 columns at S - one probe of the skills, never the
     facts a page happens to deal), and the summary says what prints: "8 columns · division 9 columns · 34–48 a page".
@@ -1252,7 +1267,9 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
   - Gate: `ws-simple-print --facts-print` SETPAGE (every grid of every page of every set = the summary's columns, one digit
     size a group, per-skill totals = the split of the request), FILL (white in mm <= one row on every page but the last;
     fewest pages), AUTO9, COUNTS, PROBLEMS, FOOTER, TITLE, DIVMAX9 docs, and r4's MIXBASE, SLOTPOS, FRACEQ, CLEAR,
-    BRKTRACK, PDFIUM-RULES, FOOTWRAP, DIVSECTIONS, SIZEMIX, FULLPAGE, ONEDIGIT, ROWSAME (`--r4`).
+    BRKTRACK, PDFIUM-RULES, FOOTWRAP, DIVSECTIONS, SIZEMIX, FULLPAGE, ONEDIGIT, ROWSAME, QROOM (`--r4`), and r5's sweep
+    (Problems 20-150 by 5 × S/M/L × Auto/5/9 × both arrangements; Pages 1 and 2) SHARES, BLANKMID, DIVORDER, TITLEONE, ORPHAN,
+    FULLPLAN, COLSIZE (`--r5`).
 - **PT-FRW-8.** Day bands carry no timing by default; the "(1 minute)" tag, Time line and Goal are options (PT-DLG-13).
 
 **Teacher options.** Columns; size; label option; Day bands 1 to 5 and rows per band 1 to 3; "Day 5 repeats Day 1"; single-fact unmixed set (one constant in both positions, including 0 and 1), one family, a cumulative range, or "hard facts"; for + and − the constant 0 to 13 and the band (PT-DLG-30, PT-DLG-31); for × and ÷ the fact range (PT-DLG-28); both orientations; support strip (top form, 10 mm, only at 7 or more columns with a single table); Model cell or grey first row; division notation.

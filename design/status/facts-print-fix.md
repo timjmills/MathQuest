@@ -236,3 +236,57 @@ ws-screen-answer OK; ws-student-explorer OK; ws-chromebook-perf --only load OK; 
 - Matching the owner's screenshot to its seed and dumping every page's grids / columns / pt / white found every root cause
   in one pass. The two traps found on the way are now rules: a dialog check must set EVERY control (the dialog keeps the
   last print's choices), and a page model must model only space the page really draws (the 2 mm section gap did not exist).
+
+## Round 5 (fixer, Opus medium: three planner defects found by the r5 critic, lowest 3) — 128455ad3
+
+Critic r5: the owner's page passed (9 / 8 / 8 / 8) and Mixed up, keys and sizes held; FAIL on the planner: D-R5-1 ÷ Mix In
+sections, Pages 1, Big printed 2 / 2 / 1 / 15; D-R5-2 the "÷ first" reorder left a 1-fact row and 4 empty cells mid-print;
+D-R5-3 a 1-fact last page titled "Divide by 6"; D-R5-4 short rows mid-print; D-R5-5 the bracket section's room and centring;
+D-R5-6 Columns picked ignored the Size. origin/master had not moved (f08bd11b1 already merged).
+
+**Checks first** (`ws-simple-print --r5`, inside `--facts-print`; the built path over a SWEEP - Problems 20-150 by 5 × S/M/L ×
+Auto/5/9 × both arrangements, ÷ Mix In sections by 10, Pages 1 and 2 default and ÷ Mix: 684 prints, 49 s): SHARES, BLANKMID,
+DIVORDER, TITLEONE, ORPHAN, FULLPLAN, COLSIZE; `--r4` gained QROOM and bracket centring (CLEAR now covers the bracket
+section). On 128455ad3 (git archive via MQ_ROOT): BLANKMID 712, DIVORDER 172, ORPHAN 77, SHARES 45, FULLPLAN 43, TITLEONE
+15, COLSIZE 1 (Columns 5 printed 28 pt at S, M and L); `--r4` QROOM 11.
+
+### Fixes (`js/modules/simple-print.js` buildFacts / planFactRows, `sheet/roles/fact-rows.js`, `print-sheet.js`)
+1. **D-R5-2 / D-R5-4**: the "÷ first" reorder is gone; every section but the last prints whole rows (rounded to its columns,
+   the difference to the last section, added or taken one fact at a time from the skill with the fewest / most so a page stays
+   balanced); when the pages still cannot all be filled, whole rows move between + − × and the last section (never more than
+   a row a skill), then one page more is planned. Each skill stays within one row of the even split; the total is exact.
+2. **D-R5-1**: Pages mode with + − × and ÷ is planned as Problems mode, for the most problems that fill exactly the n pages,
+   each skill within a row of its share; with ÷ Mix In sections the forms keep a section each only when the shares hold,
+   else ONE mixed section and the note "the ÷ forms share one section, mixed, so every skill keeps its share of the page".
+   Big, Pages 1: 5 / 5 / 5 / 5 (was 2 / 2 / 1 / 15). Pages 2 no longer gives ÷ a whole page (was 19 / 19 / 18 / 63). Sets 2+
+   of such a print repeat set 1's counts through Problems mode.
+3. **D-R5-3**: `factTitle(items, skills)` names one number only when the skill's one-value `constant` option fixes it
+   (ws-layout-unit HD-13 now gives its ×3 skill that option, plus a TITLEONE assertion); Problems 30 at M prints 8 / 8 / 8 / 6
+   on ONE page; a last page under a row says so in the dialog.
+4. **D-R5-5**: a bracket section's row is tall enough for a written line (1.15 em) between the tab and the vinculum
+   (`rowFormHeightMm`); centring within 0.5 mm checked.
+5. **D-R5-6** (owner to confirm): in the simple print (sections carry `sizeCap`) a picked column count keeps its columns and
+   the Size caps the digits - S 18, M 24, L 28 pt - as far as the column fits (Columns 5: 18 / 24 / 28 pt; Columns 9 at L
+   stays 16 pt, its rung). The teacher-print path is unchanged (applied there it moved ws-pdf-preview's key page by 0.08 %).
+   **Owner question:** at Columns 9, Big still prints 16 pt digits (9 columns cannot hold 28 pt); should Big with Columns 9
+   drop to fewer columns instead?
+6. Checks moved to the owner's rules: SETPAGE / PROBLEMS compare the printed counts with the chips exactly and with the
+   request within one row (total exact); r3 FEWEST counts the ÷ section's instruction line; DIVSECTIONS accepts the one mixed
+   section when the note says so.
+
+### Gates (one at a time, foreground)
+ws-simple-print --facts-print OK (incl. --r4 and the --r5 sweep: no findings); full ws-simple-print OK; ws-layout-unit OK
+(1766); ws-print-lint --source kit 4 fact skills × 7 roles: S OK, M OK, L only the pre-existing sub_facts#review H13 ×4;
+ws-content-audit division:div_facts OK; ws-code-snapshot OK (732); ws-boot-smoke OK; ws-pdf-preview OK; ws-screen-answer OK;
+ws-student-explorer OK; ws-chromebook-perf --only load OK; ws-stamp-assets + --check OK.
+
+### Evidence (design/status/facts-print-fix/r5/)
+- D-R5-1: `d1-mix-sections-pages1-L-p1.png`, `d1-mix-sections-pages1-M-p1.png`, `d1-owner-mix-sections-pages1-S-c9-p1.png`.
+- D-R5-2: `d2-pr85-L-p1..4.png`, `d2-pr125-L-p1..6.png`, `d2-pr45-S-c5-p1..2.png`.
+- D-R5-3: `d3-pr30-M-p1.png`. D-R5-4: `d4-pr130-S-p1..3.png`, `d4-pr50-M-p1..2.png`.
+- D-R5-5: `d5-mix-sections-pr63-L-p*.png`. D-R5-6: `d6-pages1-c5-{S,M,L}-p1.png`.
+
+### Speed notes (round 5)
+- The sweep, not more named cases: every r5 defect class showed in one 49 s run on 128455ad3, and each fix was re-swept.
+- r4 traded one owner rule ("teacher's order") for another ("full pages") without saying so; the rule now is: move whole rows,
+  then add a page, then say so - never break a rule silently (LESSONS L21).

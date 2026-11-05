@@ -161,6 +161,8 @@ function normaliseRequest(req = {}) {
             stretch: s && Number(s.stretch) >= 1 ? Math.min(1.3, Number(s.stretch)) : 0,
             // ... and the largest digit size a section may take (facts-print-fix r4: sections sharing a page take one size)
             maxPt: s && Number(s.maxPt) > 0 ? Number(s.maxPt) : 0,
+            // ... and whether the Size caps the digits too (the simple print, facts-print-fix r5 D-R5-6)
+            sizeCap: !!(s && s.sizeCap),
         }))
         .filter((s) => s.skills.length);
     // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
@@ -3840,7 +3842,8 @@ async function buildRoleSheet(n, metaOf) {
             factAnsTracks: (n.sections[0] && n.sections[0].ansTracks) || 0,
             factStretch: (n.sections[0] && n.sections[0].stretch) || 0,
             factPt: (n.sections[0] && n.sections[0].maxPt) || 0,
-            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt })) } : {}),
+            factSizeCap: !!(n.sections[0] && n.sections[0].sizeCap),
+            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt, sizeCap: s.sizeCap })) } : {}),
         } : {}),
     };
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's

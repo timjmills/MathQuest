@@ -787,9 +787,12 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     const pic = (pool, sk, i) => Object.assign(stackQ(3 + i, 2), { skillId: 'number_line_add', printFormat: 'number-line-visual' });
     ok(typeof hostPlan('fact-rows', [ADD_SKILL], pic).unsupported === 'string', 'PT-CMP-2: Fact rows refuse a number-line skill, with a reason');
     ok(typeof hostPlan('fact-probe', [ADD_SKILL], storyMake).unsupported === 'string', 'PT-CMP-2: the Fact probe refuses a story skill');
-    const fr = hostPlan('fact-rows', [FACT_SKILL], (pool, sk, i) => factQ(2 + (i % 11), 3), { h: 30 });
+    // (facts-print-fix r5 TITLEONE: "Multiply by 3" only when the skill's option fixes the 3 - its constant set is [3])
+    const fr = hostPlan('fact-rows', [Object.assign({}, FACT_SKILL, { opts: { constant: [3] } })], (pool, sk, i) => factQ(2 + (i % 11), 3), { h: 30 });
     eq(fr.plan.pages[0].sections.find((s) => s.kind === 'grid').cols, 5, 'PT-FRW-2: Fact rows Auto 5 columns at L');
     eq(fr.plan.header.title, 'Multiply by 3', 'HD-13: the fact stub title');
+    const frAny = hostPlan('fact-rows', [FACT_SKILL], (pool, sk, i) => factQ(2 + (i % 11), 3), { h: 30 });
+    eq(frAny.plan.header.title, 'Multiplication facts', 'TITLEONE (r5): facts that only happen to share a 3 keep the generic title');
     eq(fr.plan.ctx.look, 'daily', 'PAGE_TYPES appendix 4: Fact rows default to the Daily look');
     // Critic round 2: a TRUE fact-row page - every cell the fact template, filled to table 4.1.
     ok(fr.plan.meta.items >= 25, `PT 4.1: Fact rows at L hold 25 facts (${fr.plan.meta.items})`);

@@ -46,6 +46,13 @@ export const DEFAULT_LOOK = 'daily';
 // facts-print-fix r3 (owner rule 2026-11-05: "Columns: Auto = 9; 10 only if the owner picks it"): Auto is at most 9 at
 // Size S for every fact mix (+ − alone too); 9 and 10 columns share the 16 pt rung and the 24 mm cell (TY-30, VA-70)
 const AUTO = { S: 9, M: 6, L: 5 };
+/**
+ * The largest fact digit a Size takes (facts-print-fix r5, critic D-R5-6, owner decision 4 "Big, Medium and Small must each
+ * be honoured"): in the simple print (its sections carry `sizeCap`) a picked column count keeps its columns, and the Size still sets the digits - S 18, M 24, L 28 pt - as far
+ * as the column fits them (the column's own ladder rung is the other bound). At Auto the two agree (S 9 columns 16 pt, M 6
+ * at 24, L 5 at 28).
+ */
+export const SIZE_FACT_PT = { S: 18, M: 24, L: 28 };
 
 /**
  * The item pools. One pool ('main') - except a fact-rows request with `factSections` (facts-print-fix r3, PT-FRW-6 /
@@ -124,7 +131,7 @@ export function supports(items) {
  * of 17 + 16 titled "Addition facts"): undefined here, and the frame takes the skill's line.
  */
 const OP_NAME = { add: 'addition', subtract: 'subtraction', multiply: 'multiplication', divide: 'division' };
-export function factTitle(items) {
+export function factTitle(items, skills = null) {
     if (items.length && !items.every((it) => isFact(it) && !isOperationOnly(it))) return undefined;
     const factSkill = items.every((it) => FACT_SKILL_RE.test(String((it.q || {}).skillId || '')));
     if (!factSkill && items.some((it) => operandsOf(it.q || {}).some((v) => Math.abs(v) >= 10))) return undefined;
@@ -141,7 +148,14 @@ export function factTitle(items) {
         return t.charAt(0).toUpperCase() + t.slice(1);
     }
     const seconds = [...new Set(items.map((it) => operandsOf(it.q || {})[1]).filter((v) => v !== undefined))];
-    const one = seconds.length === 1 ? seconds[0] : null;
+    // facts-print-fix r5 TITLEONE (critic D-R5-3: a 1-fact last page "18 ÷ 6" was titled "Divide by 6"): the page names ONE
+    // number only when the skill's own option fixes it (a one-value `constant` set: the table the teacher chose), never
+    // because the facts a page happened to deal share it. Without the request's skills (a probe page) the old reading stays.
+    const fixed = !Array.isArray(skills) || (skills.length > 0 && skills.every((k) => {
+        const cst = k && k.opts && k.opts.constant;
+        return Array.isArray(cst) ? cst.length === 1 && seconds.length === 1 && Number(cst[0]) === Number(seconds[0]) : cst !== undefined && cst !== null && !Array.isArray(cst) && seconds.length === 1 && Number(cst) === Number(seconds[0]);
+    }));
+    const one = seconds.length === 1 && fixed ? seconds[0] : null;
     if (op === 'add') return one !== null ? `Add ${one}` : 'Addition facts';
     if (op === 'subtract') return one !== null ? `Subtract ${one}` : 'Subtraction facts';
     if (op === 'multiply') return one !== null ? `Multiply by ${one}` : 'Multiplication facts';
@@ -375,7 +389,15 @@ function rowFormHeightMm(forms, geo, size, labels, cols, look) {
     // the fraction: two digit lines over and under the 1.5 pt bar, the 0.12 em gap, the answer line
     if (forms.has('fraction')) h = Math.max(h, padTop + 2.42 * em + 0.6 + sz.writeMm + 3);
     // the bracket (write-above, centred down the cell, CL-4b): the quotient zone and the bracket row
-    if (forms.has('long')) h = Math.max(h, 2 + ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 1.33 * em + 2 + 2);
+    if (forms.has('long')) {
+        h = Math.max(h, 2 + ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 1.33 * em + 2 + 2);
+        // QROOM (facts-print-fix r5, critic D-R5-5): the bracket is centred down its cell, so the cell is tall enough that the
+        // room over the vinculum, under the tab, holds a written line of figures (1.15 em) - the stacked fact's answer row
+        const qRow = ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 0.08 * em;
+        let tab = sz.tabMm;
+        try { tab = Math.max(tab, metricsFor(size, look || DEFAULT_LOOK, { factColumns: cols }).tabMm || 0); } catch (e) { /* the size's tab */ }
+        h = Math.max(h, 2 * (Math.max(6, 1.15 * em) + tab - qRow) + qRow + 1.25 * em + 1);
+    }
     return Math.ceil(h * 10) / 10;
 }
 
@@ -409,8 +431,8 @@ function formRows(items, input, ctx, G, labels, forms) {
     for (; cols >= 2; cols--) {
         const rung = factDigitPt(Math.max(cols, 5));
         // (input.factPt, facts-print-fix r4 ONEDIGIT: sections sharing a page take the smallest of their digit sizes)
-        const capPt = Number(input.factPt) || 0;
-        for (const pt of [...new Set([rung, ...LADDER_PTS])].filter((p) => p <= rung && p >= FLOOR_PT && (!capPt || p <= Math.max(capPt, FLOOR_PT))).sort((a, b) => b - a)) {
+        const capPt = Math.min(Number(input.factPt) || Infinity, input.factSizeCap ? SIZE_FACT_PT[ctx.size] || Infinity : Infinity);
+        for (const pt of [...new Set([rung, ...LADDER_PTS])].filter((p) => p <= rung && p >= FLOOR_PT && (!Number.isFinite(capPt) || p <= Math.max(capPt, FLOOR_PT))).sort((a, b) => b - a)) {
             geo = rowGeometry(items, forms, cols, pt, ctx.size, ctx.look);
             if (geo) break;
         }
@@ -512,7 +534,7 @@ function acrossWidthMm(items, pt, size) {
  */
 export function factRowsLayout(items, input) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items), score: 1 });
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items, input.skills || null), score: 1 });
     const header = layoutHeader(frame.header);
     const G = gridHeightMm(ctx.paper, ctx.size, header);
     // (input.__clamp8: the page was dealt for the band's 3-digit answers - see plan, R2-2 COUNT-FITS)
@@ -620,7 +642,8 @@ export function factRowsLayout(items, input) {
     const pt0 = tightDiv && fitsAt(cols) ? factDigitPt(cols)
         : (bigFact && verticalFitPt(cols, n, ctx.look, (SIZES[ctx.size] || SIZES.L).digitPt, ctx.size, 5, opEm)) || verticalPt(cols, n, ctx.look, opEm);
     // (input.factPt, facts-print-fix r4 ONEDIGIT: sections sharing a page take the smallest of their digit sizes)
-    const pt = Number(input.factPt) > 0 ? Math.min(pt0, Math.max(Number(input.factPt), LADDER_PTS[LADDER_PTS.length - 1])) : pt0;
+    const pt1 = input.factSizeCap ? Math.min(pt0, SIZE_FACT_PT[ctx.size] || pt0) : pt0;
+    const pt = Number(input.factPt) > 0 ? Math.min(pt1, Math.max(Number(input.factPt), LADDER_PTS[LADDER_PTS.length - 1])) : pt1;
     if (pt < factDigitPt(cols)) note = [note, `Digits ${pt} pt so ${n}-digit facts fit ${cols} columns.`].filter(Boolean).join(' ');
     const cap = factRowsCapacity(cols, ctx.size, ctx.paper, header);
     // The row height holds the WHOLE fact (critic s3-stack r1, lead item 6: VA-70's S heights left
@@ -853,11 +876,11 @@ function planSections(input, ctx, ids) {
     const secs = ids.map((id, i) => {
         const its = poolItems(input, id);
         const own = secIn[i] || {};
-        const inp = Object.assign({}, input, { factTracks: own.tracks || 0, factAnsTracks: own.ansTracks || 0, columns: own.columns || 'auto', count: own.count || undefined, factStretch: own.stretch || 0, factPt: own.maxPt || 0 });
+        const inp = Object.assign({}, input, { factTracks: own.tracks || 0, factAnsTracks: own.ansTracks || 0, columns: own.columns || 'auto', count: own.count || undefined, factStretch: own.stretch || 0, factPt: own.maxPt || 0, factSizeCap: !!own.sizeCap });
         return { id, its, inp, L: its.length ? factRowsLayout(its, inp) : null };
     }).filter((x) => x.its.length);
     const allItems = secs.flatMap((x) => x.its);
-    const frame0 = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(allItems), score: allItems.length });
+    const frame0 = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(allItems, input.skills || null), score: allItems.length });
     const G = gridHeightMm(ctx.paper, ctx.size, layoutHeader(frame0.header));
     const instr = (SIZES[ctx.size] || SIZES.L).instrMm;
     // (each grid's heavy frame is in the page's height - facts-print-fix r4 D-R4-5 - and stands for the 1 mm safety; a
@@ -897,7 +920,7 @@ function planSections(input, ctx, ids) {
         fits.push({ role: ROLE_ID, cols: L.cols, rows: L.rows, perPage: L.perPage, pages: 1, cellH: L.cellH, hMin: L.hMin, digitPt: L.digitPt, across: L.across, note: L.note, line, gridH: G, instrMm: instr, count: items.length, section: x.id });
         if (L.note && !notes.includes(L.note)) notes.push(L.note);
     }
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(allItems), score: printed.length });
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(allItems, input.skills || null), score: printed.length });
     return assemble(ROLE_ID, input, frame, [{ sections: parts }], {
         defaultLook: DEFAULT_LOOK,
         meta: { items: printed.length, scoreOutOf: printed.length, printedSkills: printed, fits, notes },
@@ -940,7 +963,7 @@ export function plan(input = {}) {
     const L = Object.assign({}, L0, { size: ctx.size, look: ctx.look, cellH: Math.min(L0.cellH, (L0.gridH - 2 * FRAME_MM) / Math.max(1, Math.ceil(Math.min(all.length, L0.perPage) / L0.cols))) });
     const kept = mixOps(keepShares(all, L), input);
     const items = kept.map((it) => factCell(it, L));
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items), score: items.length });
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Facts', title: factTitle(items, input.skills || null), score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one cell width per section (critic r1 R1-2): a short last row keeps the lattice, the rest unruled (PG-15)
     // (the grid's height holds its heavy frame too, so a row is L.cellH on every page whatever its row count: D-R4-5)
