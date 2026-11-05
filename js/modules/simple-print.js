@@ -737,6 +737,7 @@ export function closeSimplePrint() {
     qpMenu = null; qpRename = null;
     if (!S) return;
     savePrefs();
+    if (S.lgObs) S.lgObs.disconnect();
     if (S.root) S.root.remove();
     document.removeEventListener('keydown', onKey, true);
     document.body.classList.remove('sp-open');
@@ -767,6 +768,12 @@ function mount() {
     root.addEventListener('pointerdown', () => { if (S) S.popAtPress = !!document.getElementById('skillOptionsPopover'); }, true);
     root.addEventListener('focusout', (e) => { if (S && qpRename && e.target.dataset && e.target.dataset.qpRename !== undefined) quickRenameKey({ type: 'blur', target: e.target }, render); });
     document.addEventListener('keydown', onKey, true);
+    // hover zoom (owner 2026-11-05): a very large page beside the pointer, mouse and trackpad only
+    {
+        root.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse' || !S || !S.zoomOn) return; const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && root.contains(t)) showZoom(Number(t.dataset.zpage), e.clientX, t); });
+        root.addEventListener('pointerover', (e) => { if (e.pointerType !== 'mouse') return; if (window.innerWidth < 700) return; const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && root.contains(t)) showZoom(Number(t.dataset.zpage), e.clientX, t); });
+        root.addEventListener('pointerout', (e) => { const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && !(e.relatedTarget && t.contains(e.relatedTarget))) hideZoom(); });
+    }
     S.root = root;
 }
 
@@ -875,7 +882,8 @@ function render() {
     h += `<section class="sp-sum" aria-live="polite"><p class="sp-line" id="spLine">${esc(line)}</p>`;
     if (b && b.notes && b.notes.length && !S.busy) h += `<p class="sp-note">${esc(b.notes.join(' '))}</p>`;
     if (arr === 'facts') h += `<p class="sp-note">Fast facts in fact rows: every page is full.</p>`;
-    h += `<div class="sp-thumb"><iframe id="spFrame" title="Page 1 preview" tabindex="-1" aria-hidden="true"></iframe></div></section>`;
+    h += `<div class="sp-thumb" data-sp="larger" data-zpage="0"><iframe id="spFrame" title="Page 1 preview" tabindex="-1" aria-hidden="true"></iframe></div>`;
+    h += `<button type="button" class="sp-larger" data-sp="larger" aria-expanded="${!!S.large}">Larger preview</button></section>`;
 
     // More options
     h += `<details class="sp-more"${S.moreOpen ? ' open' : ''}><summary data-sp="more">More options</summary><div class="sp-more-body">`;
@@ -918,6 +926,7 @@ function schedule(delay = 300) {
     if (!S) return;
     clearTimeout(S.timer);
     S.busy = true;
+    hideZoom();
     updateLine();
     S.timer = setTimeout(run, delay);
 }
@@ -925,6 +934,7 @@ function schedule(delay = 300) {
 async function run() {
     if (!S) return;
     const my = ++S.token;
+    hideZoom();   // critic D4: never leave the old pages in the zoom while the new ones build
     const o = opts();
     let b = null;
     try { b = await buildSets(S.list, o); } catch (e) { console.warn('[simple-print] build failed', e); b = null; }
@@ -932,8 +942,11 @@ async function run() {
     S.busy = false;
     S.error = !b;
     S.built = b;
+    S.split = null;
+    hideZoom();
     if (b && P.cols === 'auto' && b.cols) S.probes[P.size] = colsLabel(b);
     render();
+    if (S.large) drawLarge();
     probeSizes(my);
 }
 const colsLabel = (b) => { const cl = [...new Set(b.colsList && b.colsList.length ? b.colsList : [b.cols])].filter(Boolean); return cl.length > 1 ? `${Math.min(...cl)}–${Math.max(...cl)}` : String(cl[0] || b.cols); };
@@ -1029,6 +1042,8 @@ function onClick(e) {
     if (quickAct(act, v, render)) return;
     if (act === 'newnums') { S.seed = 100000 + Math.floor(Math.random() * 900000); schedule(0); return; }
     if (act === 'full') { const more = S.ctx.more; closeSimplePrint(); more(); return; }
+    if (act === 'larger') { openLarge(); return; }
+    if (act === 'smaller') { closeLarge(); return; }
     if (act === 'print') { doPrint(); return; }
     if (act === 'preview') { doPreview(e); return; }
 }
@@ -1072,12 +1087,25 @@ function onKey(e) {
     if (!S) return;
     if (S.root.contains(e.target) && quickRenameKey(e, render)) return;
     if (e.key === 'Escape' && qpMenu) { e.preventDefault(); e.stopPropagation(); qpMenu = null; render(); return; }
+    if (e.key === 'Escape' && S.zoomOn) { e.preventDefault(); e.stopPropagation(); hideZoom(); return; }
+    if (e.key === 'Escape' && S.large && !(document.getElementById('tvPdfPreview') && !document.getElementById('tvPdfPreview').hidden)) { e.preventDefault(); e.stopPropagation(); closeLarge(); return; }
+    if (S.large && /^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End)$/.test(e.key) && !/^(INPUT|SELECT|TEXTAREA)$/.test((e.target && e.target.tagName) || '')) {
+        const sc = S.root.querySelector('.sp-lg-scroll');
+        if (sc) {
+            e.preventDefault();
+            const step = /Page/.test(e.key) ? sc.clientHeight * 0.9 : 80;
+            const top = e.key === 'Home' ? 0 : e.key === 'End' ? sc.scrollHeight : sc.scrollTop + (/Down/.test(e.key) ? step : -step);
+            sc.scrollTo({ top });
+        }
+        return;
+    }
     if (e.key === 'Escape') {
         if (document.getElementById('tvPdfPreview') && !document.getElementById('tvPdfPreview').hidden) return;
         e.preventDefault(); e.stopPropagation(); closeSimplePrint(); return;
     }
     if (e.key === 'Tab') {
-        const f = [...S.root.querySelectorAll('button, input, select, summary')].filter((x) => !x.disabled && x.offsetParent !== null);
+        const scope = (S.large && S.root.querySelector('.sp-large')) || S.root;
+        const f = [...scope.querySelectorAll('button, input, select, summary, [tabindex="0"]')].filter((x) => !x.disabled && x.offsetParent !== null);
         if (!f.length) return;
         const i = f.indexOf(document.activeElement);
         if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
@@ -1115,7 +1143,149 @@ function doPreview(e) {
     });
 }
 
+/* ============================================ larger preview and hover zoom (owner 2026-11-05) */
+
+/** The one built document split into single pages (pupil, then key), each a printable page document's body. */
+function pagesOf() {
+    if (!S || !S.built) return [];
+    if (S.split) return S.split;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = S.built.doc || S.built.firstHtml || '';
+    const styles = [...tpl.content.querySelectorAll('style')].filter((x) => !x.closest('.ws-page')).map((x) => x.outerHTML).join('');
+    const pages = [...tpl.content.querySelectorAll('.ws-page')];
+    // critic D3: key or not is read from each page itself (the kit's .ws-key page, its "Answer Key" name line), and the
+    // set from its own "Set n of N" footer, so set 2's pupil pages are never taken for set 1's key
+    let set = 1, prevKey = false;
+    S.split = pages.map((pg) => {
+        const key = pg.classList.contains('ws-key') || !!pg.querySelector('[data-ws-key="name"]');
+        const m = /Set (\d+) of \d+/.exec(pg.textContent || '');
+        if (m) set = Number(m[1]); else if (prevKey && !key) set += 1;
+        prevKey = key;
+        // keep the page's wrappers (their classes carry the sheet's look), without the other pages
+        let html = pg.outerHTML;
+        for (let a = pg.parentElement; a; a = a.parentElement) { const c = a.cloneNode(false); c.innerHTML = '\u0001'; html = c.outerHTML.replace('\u0001', html); }
+        return { html: styles + html, key, set };
+    });
+    // the page's place in its own set's pupil pages or key pages ("Set 2 · page 1 of 2")
+    const cnt = {};
+    S.split.forEach((p) => { const k = p.set + (p.key ? 'k' : 'p'); p.nth = (cnt[k] = (cnt[k] || 0) + 1); });
+    S.split.forEach((p) => { p.of = cnt[p.set + (p.key ? 'k' : 'p')]; });
+    return S.split;
+}
+const PAGE_EXTRA = '<style>html,body{background:#fff!important;margin:0!important;padding:0!important;overflow:hidden!important}.ws-page{margin:0!important;outline:0!important;box-shadow:none!important}</style>';
+function pageDoc(i) {
+    const p = pagesOf()[i];
+    if (!p) return '';
+    return sheetDocument(p.html, 'Preview', { paper: 'A4' }).replace('</head>', PAGE_EXTRA + '</head>');
+}
+function mountFrame(slot, i, title) {
+    if (!slot || slot.querySelector('iframe')) return;
+    const f = document.createElement('iframe');
+    f.title = title; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+    f.srcdoc = pageDoc(i);
+    slot.appendChild(f);
+}
+function openLarge() {
+    if (!S) return;
+    S.large = true;
+    S.root.classList.add('sp-is-large');
+    hideZoom();
+    drawLarge();
+    const sc = S.root.querySelector('.sp-lg-scroll');
+    if (sc) try { sc.focus({ preventScroll: true }); } catch (e) { /* */ }
+}
+function closeLarge() {
+    if (!S) return;
+    S.large = false;
+    hideZoom();
+    if (S.lgObs) { S.lgObs.disconnect(); S.lgObs = null; }
+    const el = S.root.querySelector('.sp-large');
+    if (el) el.remove();
+    S.root.classList.remove('sp-is-large');
+    const btn = S.root.querySelector('.sp-larger');
+    if (btn) { btn.setAttribute('aria-expanded', 'false'); try { btn.focus({ preventScroll: true }); } catch (e) { /* */ } }
+}
+function drawLarge() {
+    if (!S || !S.large) return;
+    if (S.lgObs) { S.lgObs.disconnect(); S.lgObs = null; }
+    let el = S.root.querySelector('.sp-large');
+    const keepTop = el ? (el.querySelector('.sp-lg-scroll') || {}).scrollTop || 0 : 0;
+    if (!el) { el = document.createElement('div'); el.className = 'sp-large'; el.setAttribute('role', 'region'); el.setAttribute('aria-label', 'Larger preview'); S.root.appendChild(el); }
+    const pages = S.built && !S.busy ? pagesOf() : [];
+    const n = pages.length;
+    const nSets = Math.max(1, ...pages.map((p) => p.set || 1));
+    const nKey = pages.filter((p) => p.key).length, nPupil = n - nKey;
+    const pl = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
+    // D7: what the print holds, in words, and Print right here (the dialog's Print sits under the pane)
+    const meta = n ? `${nSets > 1 ? `${nSets} sets · ` : ''}${pl(nPupil, 'pupil page')}${nKey ? ` + ${pl(nKey, 'answer key page')}` : ''}` : 'Working out the pages…';
+    let h = `<header class="sp-lg-top"><h3 class="sp-lg-title">Larger preview</h3><span class="sp-lg-meta">${meta}</span><button type="button" class="sp-lg-print" data-sp="print"${n ? '' : ' disabled'}>Print</button><button type="button" class="sp-lg-small" data-sp="smaller">Smaller</button></header><div class="sp-lg-scroll" tabindex="0" aria-label="Pages">`;
+    let prev = null;
+    pages.forEach((p, i) => {
+        // D3: a divider at each set (sets > 1) and at each set's answer key
+        if (nSets > 1 && (!prev || prev.set !== p.set)) h += `<div class="sp-lg-div sp-lg-set" role="separator" data-set="${p.set}"><span>Set ${p.set}</span></div>`;
+        if (p.key && (!prev || !prev.key || prev.set !== p.set)) h += `<div class="sp-lg-div" role="separator"><span>${nSets > 1 ? `Set ${p.set} answer key` : 'Answer key'}</span></div>`;
+        const cap = nSets > 1 ? `Set ${p.set} · ${p.key ? 'answer key ' : ''}page ${p.nth} of ${p.of}` : `Page ${i + 1} of ${n}${p.key ? ' · answer key' : ''}`;
+        h += `<figure class="sp-lg-page" data-pg="${i}"><figcaption>${cap}</figcaption><div class="sp-lg-sheet" data-zpage="${i}"></div></figure>`;
+        prev = p;
+    });
+    h += `</div>`;
+    el.innerHTML = h;
+    const btn = S.root.querySelector('.sp-larger');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    const sc = el.querySelector('.sp-lg-scroll');
+    const w = Math.min(820, Math.max(200, sc.clientWidth - 40));
+    sc.style.setProperty('--sp-lg-w', w + 'px');
+    sc.style.setProperty('--sp-lg-s', String(w / 794));
+    const slots = [...sc.querySelectorAll('.sp-lg-sheet')];
+    if (slots[0]) mountFrame(slots[0], 0, 'Page 1');
+    if (typeof IntersectionObserver === 'function') {
+        S.lgObs = new IntersectionObserver((ents) => {
+            for (const en of ents) if (en.isIntersecting) { const i = Number(en.target.dataset.zpage); mountFrame(en.target, i, `Page ${i + 1}`); S.lgObs && S.lgObs.unobserve(en.target); }
+        }, { root: sc, rootMargin: '200px 0px' });
+        slots.slice(1).forEach((x) => S.lgObs.observe(x));
+    } else slots.forEach((x, i) => mountFrame(x, i, `Page ${i + 1}`));
+    sc.scrollTop = keepTop;
+}
+/**
+ * Where the zoom goes: beside the pointer, never under it (critic D1), and only when it is clearly larger than the
+ * page under the pointer (critic D2: >= ZOOM_GAIN times as wide). Returns null when it cannot be both.
+ */
+const ZOOM_GAIN = 1.3, ZOOM_MIN_W = 320, ZOOM_EDGE = 16, ZOOM_GAP = 24;
+export function zoomBox(x, srcW, vw, vh) {
+    const left = x - ZOOM_GAP - ZOOM_EDGE, right = vw - x - ZOOM_GAP - ZOOM_EDGE;
+    const side = right >= left ? 'right' : 'left';
+    const H0 = Math.round(vh * 0.94);
+    const W = Math.floor(Math.min(H0 * 794 / 1123, Math.max(left, right)));
+    if (W < ZOOM_MIN_W || W < ZOOM_GAIN * (srcW || 0)) return null;
+    const H = Math.round(W * 1123 / 794);
+    return { w: W, h: H, top: Math.round((vh - H) / 2), left: side === 'right' ? vw - ZOOM_EDGE - W : ZOOM_EDGE };
+}
+function showZoom(i, x, src) {
+    if (!S || !S.built || S.busy || !pagesOf()[i]) return;
+    const srcW = src && src.getBoundingClientRect ? src.getBoundingClientRect().width : 0;
+    const box = zoomBox(x, srcW, window.innerWidth, window.innerHeight);
+    if (!box) { hideZoom(); return; }
+    let z = S.root.querySelector('.sp-zoom');
+    if (!z) { z = document.createElement('div'); z.className = 'sp-zoom'; z.setAttribute('aria-hidden', 'true'); S.root.appendChild(z); }
+    z.style.height = box.h + 'px'; z.style.width = box.w + 'px';
+    z.style.top = box.top + 'px'; z.style.left = box.left + 'px';
+    z.style.setProperty('--sp-z-s', String(box.w / 794));
+    if (z.dataset.pg !== String(i) || z.dataset.v !== String(S.token)) {
+        z.dataset.pg = String(i); z.dataset.v = String(S.token);
+        z.innerHTML = '';
+        mountFrame(z, i, `Page ${i + 1}, large`);
+    }
+    z.hidden = false;
+    S.zoomOn = true;
+}
+function hideZoom() {
+    if (!S) return;
+    const z = S.root && S.root.querySelector('.sp-zoom');
+    if (z) z.hidden = true;
+    S.zoomOn = false;
+}
+
 /** For checks: the open dialog's state. */
 export function simplePrintState() {
-    return S ? { list: S.list.map((s) => ({ key: keyOf(s), amt: s.amt, opts: s.opts || null })), quick: S.ctx.quick || null, prefs: Object.assign({}, P), built: S.built ? { pages: S.built.pages, total: S.built.total, cols: S.built.cols, rows: S.built.rows, perPage: S.built.perPage, arrangement: S.built.arrangement, fellBack: !!S.built.fellBack, counts: S.built.counts, sets: S.built.sets, line: summaryLine(S.built, opts()) } : null, busy: !!S.busy, probes: Object.assign({}, S.probes) } : null;
+    return S ? { list: S.list.map((s) => ({ key: keyOf(s), amt: s.amt, opts: s.opts || null })), quick: S.ctx.quick || null, prefs: Object.assign({}, P), built: S.built ? { pages: S.built.pages, total: S.built.total, cols: S.built.cols, rows: S.built.rows, perPage: S.built.perPage, arrangement: S.built.arrangement, fellBack: !!S.built.fellBack, counts: S.built.counts, sets: S.built.sets, line: summaryLine(S.built, opts()) } : null, busy: !!S.busy, probes: Object.assign({}, S.probes), large: !!S.large, zoom: !!S.zoomOn } : null;
 }
