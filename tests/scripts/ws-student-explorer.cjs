@@ -13,7 +13,8 @@
 //   PICK     tapping 3 cards ticks them (aria-pressed) and "3 skills picked"; Done closes the explorer, the bottom row
 //            reads "3 skills selected", Print lists exactly those 3, Play plays exactly those 3
 //   WORDS    pupil card names carry no teacher wording ("(Visual)", "(No Visuals)", "(B&W)", "MC", and since r2 D4
-//            "(MAP)", "(Match)", "(Easy)", "Denom"), no two cards share a name,
+//            "(MAP)", "(Match)", "(Easy)", "Denom", and since r3 R3 "OoO", "Parens", "Ops", "Coord", "Mult/Div", "- Easy", "Level N:",
+//            "/10 as /100"), no two cards share a name,
 //            the category caption is >= 15 px, every area chip has its own picture                     (check D5)
 //   FILTER   grades 3 and 4 have an area row inside the grade tab; an area narrows the list, "All" restores it (check D5)
 //   CAP      a search with more than 60 hits says "Showing 60 of N" and "Show more" adds the next 60     (check D3)
@@ -25,6 +26,12 @@
 //   PUPILNAME  pick "Subtract Within 5 with Pictures (Visual)" in the explorer: the selection chip, "Your skill:", the
 //            Quick Start card, a card saved earlier with the raw label, and the Print list all show the pupil name
 //            the explorer shows, and none says "(Visual)"                                       (check r2 D1)
+//   QSVISIBLE  the Quick Start hard set (both Add Fractions like-denominator variants, both Two-Step Then Multiply /
+//            Divide, the 10 longest pupil names, every pupil-name pair sharing a >= 20-character prefix): at 1366x768,
+//            820x1180 and 390x844 no two cards SHOW the same text inside their clamp; names >= 13 px; no sideways overflow
+//                                                                                                (check r3 R1)
+//   SEARCHNAME every pupil name finds its own skill in the top 3; "numbers only" / "with pictures" / "like denominators"
+//            find every skill whose pupil name carries them                                     (check r3 R2)
 //   QSTYPE   a Quick Start name is >= 13 px and clamps at 3 lines                                (check r2 D2)
 //   CHIPWIDTH  at 1366 a selection chip shows its whole name when the row has room (no 26ch cut) (check r2 D5)
 //   TOPIC    no fraction skill is filed under Counting (By area, and inside Grade 3); they are under Fractions (r2 D6)
@@ -44,6 +51,8 @@ const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
 const SHOTS = arg('shots', '');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// a card name split into head + tail (check r3 R1) reads the same words as the full name: compare the words only
+const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replace(/\s+/g, ' ').trim();
 
 (async () => {
     const app = await open({ seed: 7, viewport: { width: 1366, height: 900, deviceScaleFactor: 1 } });
@@ -157,7 +166,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         if (g.missing.length) F(`LIVE ${g.missing.length} live skills not reachable By grade: ${g.missing.slice(0, 5).join(', ')}`);
         // WORDS (check D5): pupil names carry no teacher wording, every name is distinct, the caption is >= 15 px
         const nameList = Object.entries(g.names || {});
-        const teacherWords = nameList.filter(([, n]) => /\((?:[^)]*\b)?(visuals?|no visuals?|no pictures|b&w|mc|map|match|easy)\b[^)]*\)/i.test(n) || /\bdenom\b/i.test(n));
+        const teacherWords = nameList.filter(([, n]) => /\((?:[^)]*\b)?(visuals?|no visuals?|no pictures|b&w|mc|map|match|easy)\b[^)]*\)/i.test(n) || /\bdenom\b/i.test(n)
+            // check r3 R3: OoO, Parens, Ops, Coord, Mult/Div, "- Easy", "Level N:", "/10 as /100"
+            || /\bOoO\b|\bParens?\b|\bOps\b|\bCoord\b|Mult\/Div|\s-\s+(Easy|Medium|Hard)\b|^Level \d|(^|\s)\/1?0?0\b/.test(n));
         if (teacherWords.length) F(`WORDS ${teacherWords.length} cards show teacher wording: ${teacherWords.slice(0, 3).map(([k, n]) => `${k} "${n}"`).join('; ')}`);
         const seenName = new Map();
         const dupes = [];
@@ -365,7 +376,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             document.getElementById('studentSelAddBtn').click();
             await new Promise((r) => setTimeout(r, 300));
             const cards = [...document.querySelectorAll('#quickSkillsGrid .quick-skill-card')];
-            const all = cards.map((c) => { const n = c.querySelector('.qs-name-text') || c.querySelector('.skill-name'); return { text: n.textContent.trim(), title: n.getAttribute('title') }; });
+            // check r3 R1: a split name is the head + its tail sub-line
+            const all = cards.map((c) => { const n = c.querySelector('.qs-name-text') || c.querySelector('.skill-name'); const t = c.querySelector('.qs-name-tail'); return { text: n.textContent.trim() + (t ? ' ' + t.textContent.trim() : ''), title: n.getAttribute('title') }; });
             const mine = chosen.map((x) => {
                 const i = (window.customQuickSkills || []).findIndex((q) => q.categoryId === x.cat && q.skillId === x.s.v);
                 return { key: x.cat + ':' + x.s.v, want: clean(x.s.l), got: i > -1 && all[i] ? all[i].text : null, title: i > -1 && all[i] ? all[i].title : null };
@@ -382,7 +394,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         qs.chipWant = qs.chipKeys.map((k) => (g.names || {})[k]);
         if (qs.a20 !== 2) F(`QUICKSTART found ${qs.a20} "Add within 20 (No/With Regrouping)" skills, want 2`);
         for (const m of qs.mine) {
-            if (m.got !== m.want) F(`QUICKSTART the card for ${m.key} reads "${m.got}", want the full name "${m.want}"`);
+            if (qsWords(m.got) !== qsWords(m.want)) F(`QUICKSTART the card for ${m.key} reads "${m.got}", want the full name "${m.want}"`);
             else if (m.title !== m.want) F(`QUICKSTART the card for ${m.key} has title "${m.title}"`);
         }
         const qsDupes = qs.names.filter((n, i) => qs.names.indexOf(n) !== i);
@@ -390,6 +402,132 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const chipTexts = qs.chips.map((c) => c.text).sort();
         if (JSON.stringify(chipTexts) !== JSON.stringify([...qs.chipWant].sort())) F(`QUICKSTART the selection chips read ${JSON.stringify(chipTexts)}, want the full names`);
         if (qs.chips.some((c) => c.title !== c.text)) F('QUICKSTART a selection chip has no title with its full name');
+
+        if (process.env.MQX_TRACE) console.log('step', '// QSVISIBLE');
+        // QSVISIBLE (check r3 R1, root cause: the gate compared the FULL text, a clamp showed the same text for two
+        // skills). The hard set goes onto Quick Start: both "Add Fractions (like denominators …)" variants, both Two-Step
+        // "Then Multiply" / "Then Divide", the 10 longest pupil names, and every pupil-name pair that shares a long prefix
+        // (>= 20 characters), 16 cards to a grid. At 1366x768, 820x1180 and 390x844 it reads the text each card SHOWS
+        // (a character counts only when its box sits inside the box that clips it) and fails when two cards show the
+        // same text. Names are >= 13 px and no card name overflows sideways.
+        const QS_PREFIX = 20;
+        const hard = await page.evaluate(async (P) => {
+            const pn = await import('/js/modules/pupil-names.js');
+            const map = pn.pupilNameMap();
+            const all = [...map.entries()];
+            const named = all.filter(([, n]) => /^Add Fractions \(like denominators\b/i.test(n) || /^Two-Step Word Problems: Add or Take Away, Then (Multiply|Divide)$/i.test(n)).map(([k]) => k);
+            const longest = [...all].sort((a, b) => b[1].length - a[1].length).slice(0, 10).map(([k]) => k);
+            const sorted = [...all].sort((a, b) => a[1].localeCompare(b[1]));
+            const cp = (a, b) => { let i = 0; while (i < a.length && a[i] === b[i]) i++; return i; };
+            const pairs = new Set();
+            for (let i = 1; i < sorted.length; i++) if (cp(sorted[i - 1][1], sorted[i][1]) >= P) { pairs.add(sorted[i - 1][0]); pairs.add(sorted[i][0]); }
+            const first = [...new Set([...named, ...longest])];
+            const rest = [...pairs].filter((k) => !first.includes(k));   // already in name order: siblings share a grid
+            const batches = [first.slice(0, 16)];
+            for (let i = 0; i < rest.length; i += 16) batches.push(rest.slice(i, i + 16));
+            return { named, nLongest: longest.length, nPairs: pairs.size, batches, names: Object.fromEntries(all) };
+        }, QS_PREFIX);
+        if (hard.named.length !== 4) F(`QSVISIBLE the hard set found ${hard.named.length} of the 4 named skills (Add Fractions like denominators x2, Two-Step Then Multiply / Divide)`);
+        const qsSaved = await page.evaluate(() => JSON.stringify(window.customQuickSkills || []));
+        for (const [w, h] of [[1366, 768], [820, 1180], [390, 844]]) {
+            await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+            await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.showView) window.showView('homeView'); window.UnifiedSkills.clear(); });
+            await sleep(200);
+            const seen = new Map();
+            for (let b = 0; b < hard.batches.length; b++) {
+                const vis = await page.evaluate(async (keys) => {
+                    const inDomains = new Map(Object.values(window.DOMAINS).flatMap((d) => d.categories.map((c) => [c.id, c])));
+                    window.customQuickSkills = keys.map((k) => {
+                        const [cat, sk] = k.split(':');
+                        const s = window.SKILLS[cat].find((x) => x.v === sk);
+                        const c = inDomains.get(cat);
+                        return { categoryId: cat, skillId: sk, skillLabel: s.l, categoryIcon: c.icon, categoryName: c.name, shortName: String(s.l).replace(/^[\s\u{1F300}-\u{1FAFF}☀-➿⬀-⯿️‍½]+/u, '').trim(), source: 'student' };
+                    });
+                    window.renderQuickSkillsGrid();
+                    for (let i = 0; i < 3; i++) await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 40)));
+                    const clipOf = (el, stop) => { for (let e = el; e && e !== stop.parentElement; e = e.parentElement) { const o = getComputedStyle(e).overflow; if (/hidden|clip/.test(o)) return e; } return stop; };
+                    const shown = (nameEl) => {
+                        let out = '';
+                        const walker = document.createTreeWalker(nameEl, NodeFilter.SHOW_TEXT);
+                        const range = document.createRange();
+                        for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+                            const box = clipOf(t.parentElement, nameEl).getBoundingClientRect();
+                            let cut = false;
+                            for (let i = 0; i < t.data.length; i++) {
+                                range.setStart(t, i); range.setEnd(t, i + 1);
+                                const rs = [...range.getClientRects()].filter((r) => r.width > 0 && r.height > 0);
+                                const ch = t.data[i];
+                                // a glyph box is taller than the line (Andika's ascent + descent), so a character counts when its centre is
+                                // inside the clip box and it is not cut by the box's right edge
+                                const inside = rs.length && rs.every((r) => { const cy = (r.top + r.bottom) / 2; return r.left >= box.left - 1 && r.right <= box.right + 1 && cy >= box.top && cy <= box.bottom; });
+                                if (inside) { if (cut) { out += '…'; cut = false; } out += ch; } else if (!/\s/.test(ch)) cut = true;
+                            }
+                            if (cut) out += '…';
+                            out += ' | ';
+                        }
+                        return out.replace(/\s+/g, ' ').replace(/( \| )+$/, '').trim();
+                    };
+                    const cards = [...document.querySelectorAll('#quickSkillsGrid .quick-skill-card')];
+                    return cards.map((c, i) => {
+                        const nameEl = c.querySelector('.skill-name');
+                        const small = [...nameEl.querySelectorAll('*')].concat(nameEl).filter((e) => e.textContent.trim() && e.children.length === 0 && parseFloat(getComputedStyle(e).fontSize) < 13).map((e) => e.className);
+                        // sideways: a line of the name runs past the card's text box (scrollWidth counts a clamp's ellipsis room, so the
+                        // line boxes are read instead)
+                        const nb = nameEl.getBoundingClientRect();
+                        const sideways = [...nameEl.children].concat(nameEl.children.length ? [] : [nameEl]).map((e) => { const r = document.createRange(); r.selectNodeContents(e); const over = [...r.getClientRects()].filter((x) => x.width > 0 && (x.left < nb.left - 1 || x.right > nb.right + 1)); return over.length ? `${e.className} ${over.map((x) => `${Math.round(x.left - nb.left)}..${Math.round(x.right - nb.left)}`).join(' ')} in ${Math.round(nb.width)}` : ''; }).filter(Boolean).join(', ');
+                        const cardOver = c.getBoundingClientRect().right > document.documentElement.clientWidth + 1;
+                        // the pupil's star sits under the name, never on its last line
+                        const star = c.querySelector('.qs-star');
+                        let onStar = false;
+                        if (star) { const sb = star.getBoundingClientRect(); const r = document.createRange(); r.selectNodeContents(nameEl); onStar = [...r.getClientRects()].some((x) => x.width > 0 && (x.top + x.bottom) / 2 <= nameEl.getBoundingClientRect().bottom && x.bottom - 3 > sb.top && x.left < sb.right && x.right > sb.left); }
+                        return { key: keys[i], shown: shown(nameEl), small, sideways, cardOver, onStar };
+                    });
+                }, hard.batches[b]);
+                if (SHOTS && b === 0) {
+                    await page.evaluate(() => document.getElementById('quickSkillsGrid').scrollIntoView({ block: 'start' }));
+                    await sleep(200);
+                    await page.screenshot({ path: path.join(SHOTS, `qs-hardset-${w}x${h}.png`) });
+                }
+                for (const v of vis) {
+                    const prev = seen.get(v.shown);
+                    if (prev) F(`QSVISIBLE @${w}x${h} two Quick Start cards SHOW the same text "${v.shown}": "${hard.names[prev]}" and "${hard.names[v.key]}"`);
+                    else seen.set(v.shown, v.key);
+                    if (v.small.length) F(`QSVISIBLE @${w}x${h} the card "${hard.names[v.key]}" has text under 13 px (${v.small.join(', ')})`);
+                    if (v.onStar) F(`QSVISIBLE @${w}x${h} the card "${hard.names[v.key]}": its name runs into the star`);
+                    if (v.sideways || v.cardOver) F(`QSVISIBLE @${w}x${h} the card "${hard.names[v.key]}" overflows sideways (${v.sideways || 'past the page'})`);
+                }
+            }
+            const docX = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            if (docX > 0) F(`QSVISIBLE @${w}x${h} the pupil home scrolls sideways by ${docX}px with the hard set on Quick Start`);
+        }
+        await page.evaluate((saved) => { window.customQuickSkills = JSON.parse(saved); window.renderQuickSkillsGrid(); }, qsSaved);
+        await page.setViewport({ width: 1366, height: 900, deviceScaleFactor: 1 });
+        await sleep(200);
+
+        if (process.env.MQX_TRACE) console.log('step', '// SEARCHNAME');
+        // SEARCHNAME (check r3 R2): every pupil name, typed into the search, finds its own skill in the top 3
+        const sn = await page.evaluate(async () => {
+            const pn = await import('/js/modules/pupil-names.js');
+            const fin = await import('/js/modules/skill-finder.js');
+            await fin.warmSkillSearch();
+            const miss = [];
+            let n = 0;
+            for (const [k, name] of pn.pupilNameMap()) {
+                n++;
+                const top = fin.findSkills(name).slice(0, 3).map((h) => h.key);
+                if (!top.includes(k)) miss.push(`"${name}" (${k}) -> ${top.join(', ') || 'nothing'}`);
+            }
+            // the words the renaming adds find the skills that carry them
+            const counts = {};
+            for (const phrase of ['numbers only', 'with pictures', 'like denominators']) {
+                const want = [...pn.pupilNameMap()].filter(([, nm]) => new RegExp(`(^|[^a-z])${phrase}`).test(nm.toLowerCase())).map(([k]) => k);
+                const got = new Set(fin.findSkills(phrase).map((h) => h.key));
+                counts[phrase] = { want: want.length, missing: want.filter((k) => !got.has(k)) };
+            }
+            return { n, miss, counts };
+        });
+        if (sn.miss.length) F(`SEARCHNAME ${sn.miss.length} of ${sn.n} pupil names do not find their own skill in the top 3: ${sn.miss.slice(0, 4).join('; ')}`);
+        for (const [phrase, c] of Object.entries(sn.counts)) if (c.missing.length) F(`SEARCHNAME "${phrase}" misses ${c.missing.length} of the ${c.want} skills whose pupil name carries it: ${c.missing.slice(0, 3).join(', ')}`);
 
         if (process.env.MQX_TRACE) console.log('step', '// PUPILNAME + QSTYPE + CHIPWIDTH');
         // PUPILNAME (check r2 D1): a "(Visual)" skill picked in the explorer keeps its pupil name on every pupil surface
@@ -423,7 +561,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const i = (window.customQuickSkills || []).findIndex((q) => q.categoryId === cat && q.skillId === sk);
             const cards = [...document.querySelectorAll('#quickSkillsGrid .quick-skill-card')];
             const nm = i > -1 && cards[i] ? cards[i].querySelector('.qs-name-text') : null;
-            out.card = nm ? nm.textContent.trim() : null;
+            const tl = nm && nm.parentElement.querySelector('.qs-name-tail');
+            out.card = nm ? nm.textContent.trim() + (tl ? ' ' + tl.textContent.trim() : '') : null;
             out.cardTitle = nm ? nm.getAttribute('title') : null;
             if (nm) { const cs = getComputedStyle(nm); out.cardPx = parseFloat(cs.fontSize); out.clamp = cs.webkitLineClamp || cs.getPropertyValue('-webkit-line-clamp'); }
             // a card saved earlier (before r2): raw label and shortName = the cleaned raw label, reloaded from storage
@@ -435,7 +574,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const j = (window.customQuickSkills || []).findIndex((q) => q.categoryId === cat && q.skillId === sk);
             const cards2 = [...document.querySelectorAll('#quickSkillsGrid .quick-skill-card')];
             const nm2 = j > -1 && cards2[j] ? cards2[j].querySelector('.qs-name-text') : null;
-            out.saved = nm2 ? nm2.textContent.trim() : null;
+            const tl2 = nm2 && nm2.parentElement.querySelector('.qs-name-tail');
+            out.saved = nm2 ? nm2.textContent.trim() + (tl2 ? ' ' + tl2.textContent.trim() : '') : null;
             // the Print list
             document.getElementById('studentSelPrintBtn').click();
             let li = null;
@@ -455,7 +595,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             if (/\(visual\)/i.test(want)) F(`PUPILNAME the explorer card itself reads "${want}"`);
             for (const [where, got] of [['selection chip', pn.chip], ['chip title', pn.chipTitle], ['"Your skill:"', pn.yourSkill], ['Quick Start card', pn.card], ['card title', pn.cardTitle], ['card saved earlier', pn.saved], ['Print list', pn.print]]) {
                 if (got == null) F(`PUPILNAME no ${where} to read`);
-                else if (/\(visual\)/i.test(got) || got !== want) F(`PUPILNAME the ${where} reads "${got}", want the explorer's pupil name "${want}" (raw "${pn.raw}")`);
+                else if (/\(visual\)/i.test(got) || qsWords(got) !== qsWords(want)) F(`PUPILNAME the ${where} reads "${got}", want the explorer's pupil name "${want}" (raw "${pn.raw}")`);
             }
             if (pn.chipRemove && /\(visual\)/i.test(pn.chipRemove)) F(`PUPILNAME the chip's remove button says "${pn.chipRemove}"`);
             if (!(pn.cardPx >= 13)) F(`QSTYPE a Quick Start name is ${pn.cardPx} px (want >= 13)`);

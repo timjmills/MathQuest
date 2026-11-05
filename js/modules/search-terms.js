@@ -919,9 +919,13 @@ export function buildSearchIndex(entries) {
         const labelBare = normalize(String(e.label || '').replace(/\([^)]*\)/g, ' '));
         // 'No Regrouping' in a label must not make the skill a label hit for 'regrouping'
         const labelPos = String(e.label || '').replace(/\b(no|without)\s+\w+/gi, ' ');
+        // the pupil name (explorer check r3 R2) is a name too: its words join the label tier, and typing it whole
+        // is an exact-name hit like the label's
+        const pupilPos = String(e.pupil || '').replace(/\b(no|without)\s+\w+/gi, ' ');
+        const pupilPhrase = e.pupil ? tokens(e.pupil).filter((w) => !HARD_STOP.has(w)).join(' ') : '';
         return {
-            entry: e, order, terms: t, labelBare,
-            sets: [tokSet([labelPos]), tokSet(t.extra), tokSet(t.grade), tokSet(t.concept), tokSet(t.code)],
+            entry: e, order, terms: t, labelBare, pupilPhrase,
+            sets: [tokSet([labelPos, pupilPos]), tokSet(t.extra), tokSet(t.grade), tokSet(t.concept), tokSet([...t.code, ...(e.pupil ? [e.pupil] : [])])],
             vocab: /^vocab/.test(e.skillId) || e.categoryId === 'vocabulary',
             wp: /word|_wp_|story/.test(`${e.label} ${e.skillId}`.toLowerCase()),
             phrases: { extra: t.extra, concept: t.concept },
@@ -1139,7 +1143,7 @@ export function searchIndex(index, query) {
         score -= divPen;
         // a vocabulary skill never leads a teaching query by matching its label (critic r2 R-B)
         if (it.vocab && !wantsVocab) score -= 3;
-        else if (it.labelBare === phrase || it.terms.label === phrase) score += 100;
+        else if (it.labelBare === phrase || it.terms.label === phrase || (it.pupilPhrase && it.pupilPhrase === phrase)) score += 100;
         else if (q.length > 1 && labelPhrase(it.labelBare, phrase)) score += 15;
         if (phrase.length >= 1) {
             if (it.primary.includes(phrase) || it.primary.includes(q.join(' '))) score += 60;

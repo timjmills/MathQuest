@@ -81,3 +81,60 @@ Screenshots (`design/status/student-explorer/`): new `pupil-names-{chips,quickst
 Speed reflection: the round-1 gate checked pupil wording only inside the explorer, so a name that changed after the pick
 could not fail. Rule taken: a wording check follows the item through every surface it reaches (chip, card, print, landing),
 and reads the expected value from the one source (the explorer's name), never a second copy of the cleaning rule.
+
+## Fix round 3 (2026-11-05, Opus medium, a fresh fixer: one defect survived two rounds, so the check came first)
+
+Check: scratchpad `explorer-check-r3.md` (FAIL, Clarity 7: R1 moderate, R2 and R3 minor).
+
+**Root cause of R1.** Two different skills showed the same name on a Quick Start card ("Add Fractions (like
+denominators…" twice, "Two-Step Word Problems: Ad…" twice). Cards are ~109 px wide with a 3-line clamp. The round-1 and
+round-2 QUICKSTART check compared the FULL text (`textContent`, always distinct), never the VISIBLE text, so it could not
+fail; the round-2 rename ("Denom" -> "denominators") made one pair longer. Failure class L17 in
+`design/audit/LESSONS_LEARNED.md`: a clamp or ellipsis can make distinct names look identical; compare the VISIBLE text.
+
+1. **Check first (QSVISIBLE, ws-student-explorer).** The hard set goes onto Quick Start, 16 cards a grid: both Add
+   Fractions like-denominator variants, both Two-Step "Then Multiply" / "Then Divide", the 10 longest pupil names, and every
+   pupil-name pair sharing a >= 20-character prefix (246 skills). At 1366x768, 820x1180 and 390x844 it reads the characters
+   each card SHOWS (a character counts when its Range rect's centre is inside the box that clips it and it is not cut at
+   the right edge) and fails when two cards show the same text, a name is under 13 px, a line runs out of the card, or
+   the name runs into the pupil's star. **Backtest:** 133 QSVISIBLE failures on 425f4fec6 (served with `MQ_ROOT` from a
+   `git archive` copy; 136 with WORDS and SEARCHNAME), 0 now.
+2. **R1 fix: a head and a tail, distinct by construction.** `pupilCardParts()` (pupil-names.js): names that share their
+   first 16 characters form a family; each splits at the last clause break ("(", ", ", ": ", " – ") inside the start the
+   whole family shares (or the first break after it while the head stays <= 24 characters; or, for a shared start >= 24
+   characters with no break, the last word break). The head is that shared start (an open bracket is closed: "Add
+   Fractions (like denominators)"), clamped at 3 lines; the tail ("with pictures", "numbers only", "Then Multiply",
+   "within 1,000, numbers only", "No Regrouping") is a sub-line of its own (`.qs-name-tail`, 13 px, weight 600) that is
+   never clamped. Every difference inside a family sits in the tail, so two cards can never show the same text. 235 of
+   716 names split; the rest show whole or differ inside their first 16 characters. Pupil cards only (teacher cards keep
+   the raw label); a curated short name ("Mult Facts") is not split. The pupil's star gets its own room (`.qs-star`,
+   padding-bottom 18 px). Font: the home page's own font (Nunito, `base.css`) as on every other home card; the brief's
+   "Andika as on the rest of the home page" does not match the page, where Andika is only the explorer's example line.
+3. **R2: search by the pupil name.** `skill-finder.js` gives every entry its `pupil` name (from `pupilNameMap()`, already a
+   startup module: no new request); `search-terms.js` adds the pupil name's words to the label tier ("numbers only",
+   "with pictures", "like denominators", "brackets" …; "no X" goes to the code tier as for labels), and typing a pupil
+   name whole is an exact-name hit (+100) like the label. Gate SEARCHNAME: all 716 pupil names find their own skill in
+   the top 3, and "numbers only" / "with pictures" / "like denominators" find every skill whose pupil name carries them
+   (was: 16 names missed, "numbers only" missed 14 of 42). ws-search-terms stays 239/239.
+4. **R3: teacher shorthand.** `PUPIL_WORDS` in `pupilBase()`: "OoO Easy: Two Ops, No Parens" -> "Order of Operations: 2
+   Steps, No Brackets"; "Level 1-7: …" -> "Order of Operations: 2 Steps / 3 Steps / 4 to 6 Steps / Simple Brackets /
+   Many Steps with Brackets / Brackets inside Brackets / Exponents"; "OoO Medium / Hard" -> "… Brackets" / "… Brackets
+   and Exponents"; "X - Easy / Medium / Hard" -> "X: Easy" (Function Tables, Factor T-Chart, Factor Links, Fraction of a
+   Set); "Polygon on Coord Grid (Side Lengths/Perimeter)" -> "Shapes on a Coordinate Grid (side lengths and perimeter)";
+   "Fraction Mult/Div Word (Problems)" -> "Fraction Word Problems: Multiply and Divide (with pictures / numbers only)";
+   "Fractions /10 as /100" -> "Tenths as Hundredths". All 716 names stay distinct. WORDS now also fails on OoO, Parens,
+   Ops, Coord, Mult/Div, "- Easy/Medium/Hard", "Level N:", "/10".
+
+Startup: nothing added (pupil-names.js and skill-finder.js were already startup modules; 191 startup modules as before).
+
+Gates (one at a time, foreground): ws-student-explorer OK, ws-boot-smoke OK, ws-simple-print OK, ws-teacher-shell OK,
+ws-screen-answer OK, ws-search-terms OK (716 skills, 239/239), ws-code-snapshot OK (732 codes, nothing moved),
+ws-chromebook-perf --only load OK (first 6770 / 6853 / 6716 ms, budget 7300), ws-stamp-assets then --check OK.
+
+Screenshots (`design/status/student-explorer/`): new `qs-hardset-{1366x768,820x1180,390x844}.png` (the hard set's first
+grid: both Add Fractions, both Two-Step, the 10 longest); re-shot `explorer-by-*`, `explorer-grade3-*`, `home-bottom-row-*`.
+
+Speed reflection: the defect survived two rounds because each round fixed the wording and re-ran a check that read the
+DOM's text, which no CSS clamp changes. Rule taken (L17): a check of what a pupil can read measures the rendered,
+visible characters at the real widths, with a hard set chosen to break it (longest names, shared prefixes); and a fix
+round that leaves a defect open starts by making the check fail on the failed commit.

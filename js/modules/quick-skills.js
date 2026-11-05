@@ -5,7 +5,7 @@ import { splitOptionSuffix, decodeOptionPayload } from './skill-option-codec.js'
 import { describeOptions } from './skill-options.js';
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, escHTML } from './skill-options-ui.js';
 import { searchSkillIndex } from './skill-search.js';
-import { pupilNameOf } from './pupil-names.js';
+import { pupilNameOf, pupilCardParts } from './pupil-names.js';
 
 // Card and chip names (explorer check D1, 2026-11-05): the FULL label without its leading icons — never cut to
 // 12 or 20 characters ("Add within 2" for two different skills). CSS clamps it (2 lines on a card, an ellipsis on a
@@ -260,7 +260,12 @@ function _renderQuickSkillsGridNow() {
         // The card's options, as a short line under its name ("Times: 7, 8").
         const optText = skill.opts && Object.keys(skill.opts).length ? describeOptions(skill.categoryId, skill.skillId, skill.opts) : '';
         const baseName = cardNames[index];
-        const nameHTML = `<span class="qs-name-text" title="${escHTML(baseName)}">${escHTML(baseName)}</span>`;
+        // check r3 R1: a pupil name that shares a long start with another shows that start as a clamped head and the
+        // part that tells them apart as a sub-line of its own (pupilCardParts), so a clamp never makes two cards read alike
+        const parts = isStudentMode && baseName === pupilNameOf(skill.categoryId, skill.skillId, skill.skillLabel) ? pupilCardParts(`${skill.categoryId}:${skill.skillId}`) : null;
+        const nameHTML = parts
+            ? `<span class="qs-name-text qs-has-tail" title="${escHTML(baseName)}">${escHTML(parts.head)}</span><span class="qs-name-tail" title="${escHTML(baseName)}">${escHTML(parts.tail)}</span>`
+            : `<span class="qs-name-text" title="${escHTML(baseName)}">${escHTML(baseName)}</span>`;
         const displayName = optText
             ? `${nameHTML}<span class="qs-opt-summary" style="display:block;font-size:0.62rem;font-weight:600;opacity:0.8;line-height:1.15;margin-top:2px;">${escHTML(optText)}</span>`
             : nameHTML;
@@ -310,7 +315,7 @@ function _renderQuickSkillsGridNow() {
                         style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ff6b6b;color:white;border:2px solid white;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,0.2);line-height:1;">×</button>
                     <span class="skill-icon">${skill.categoryIcon}</span>
                     <span class="skill-name">${displayName}</span>
-                    <span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>
+                    <span class="qs-star" style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>
                     ${printBtn}
                 </div>
             `;
@@ -322,7 +327,7 @@ function _renderQuickSkillsGridNow() {
                     ${gradeBadge}
                     <span class="skill-icon">${skill.categoryIcon}</span>
                     <span class="skill-name">${displayName}</span>
-                    ${source === 'student' ? '<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>' : ''}
+                    ${source === 'student' ? '<span class="qs-star" style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>' : ''}
                     ${printBtn}
                 </div>
             `;

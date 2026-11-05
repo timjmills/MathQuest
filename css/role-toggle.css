@@ -393,3 +393,9 @@ body:not(.student-mode) .start-buttons-container #studentSelPrintBtn.student-onl
    an ellipsis only when the row is truly too narrow, the full name in its title. Additive: overrides with more weight. */
 .quick-skill-card .skill-name .qs-name-text { font-size: max(13px, 0.8125rem); line-height: 1.2; -webkit-line-clamp: 3; }
 #studentSkillsList .sel-chip .sel-chip-name { max-width: none; }
+/* explorer check r3 R1 (2026-11-05): a pupil name that shares a long start with another skill's name is split
+   (pupil-names.js pupilCardParts): the shared start clamps at 3 lines, and the part that tells the two apart is a
+   sub-line of its own that is never clamped away. Additive: new classes only. */
+.quick-skill-card .skill-name .qs-name-text.qs-has-tail { -webkit-line-clamp: 3; }
+.quick-skill-card .skill-name .qs-name-tail { display: block; margin-top: 3px; font-size: max(13px, 0.8125rem); font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+.quick-skill-card:has(.qs-star) { padding-bottom: 18px; }   /* a pupil's own card: the star sits below the name, never on it */
