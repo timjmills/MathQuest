@@ -587,6 +587,12 @@ const loadWorksheet = makeLazy('worksheet', (n) => (n ? import(`./modules/worksh
 window.__mqLoadWorksheet = loadWorksheet;
 window.__mqLazyNames.worksheet = WORKSHEET_NAMES;
 
+// The pupil skill explorer (owner 2026-11-05): browse by grade / by area and pick skills. Loaded on the first press only.
+const EXPLORER_NAMES = ['openStudentExplorer', 'closeStudentExplorer', 'studentExplorerState'];
+window.__mqLoadExplorer = makeLazy('skill explorer', (n) => (n ? import(`./modules/student-explorer.js?retry=${n}`) : import('./modules/student-explorer.js'))
+    .then((m) => Object.fromEntries(EXPLORER_NAMES.map((k) => [k, m[k]]))), EXPLORER_NAMES);
+// (not in __mqLazyNames: that list is what the teacher prefetch must have made real; the explorer is pupil-only, on demand)
+
 // Who needs the deferred half BEFORE init runs (so they see exactly what they saw before the split):
 //   a MAP or quiz link (?map= / ?quiz=), a Send link's &set=, the teacher board (?board=1 on a teacher device),
 //   a teacher-site hash route, or a device that opens in teacher view ("Open the site in: Last view used").

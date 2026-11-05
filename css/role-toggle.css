@@ -378,3 +378,7 @@ html.mq-selbar-on :is(.toast-notification, .mq-notify) :is(button, a) { pointer-
 .student-sel-actions .student-sel-send { justify-content: center; margin: 0 auto; }
 .start-buttons-container #studentSelPrintBtn { min-height: 48px; align-self: center; }
 body:not(.student-mode) .start-buttons-container #studentSelPrintBtn.student-only { display: none; }
+/* owner 2026-11-05: the pupil's "Explore skills" button under the Quick Start cards (the explorer's own sheet is lazy) */
+.student-explore-row { display: flex; justify-content: center; margin-top: 12px; }
+.student-explore-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; padding: 8px 26px; border-radius: 14px; border: 2px solid var(--mq-purple-d, #5b3fb8); background: var(--mq-purple, #7c5cff); color: #fff; font: inherit; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 0 var(--mq-purple-d, #5b3fb8); }
+.student-explore-btn:focus-visible { outline: 3px solid var(--mq-orange, #ff9f1c); outline-offset: 2px; }
