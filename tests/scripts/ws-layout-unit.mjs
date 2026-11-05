@@ -847,7 +847,8 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 // whose dividends reach 3 digits takes the most columns with 2 mm of white each side - 9 at S; an asked
                 // 10 still prints 10 (PT-FRW-9), and the bracket / fraction rows keep their own 10
                 const stackedAuto = columns === 'auto' && /^(standard|vertical)$/.test(form);
-                const want = columns === 'auto' ? { S: stackedAuto ? 9 : 10, M: 6, L: 5 }[size] : columns;
+                // owner ruling 2026-11-05 ("If division is included don't make 10 columns an option, just 9"): every ÷ page at most 9
+                const want = Math.min(9, columns === 'auto' ? { S: stackedAuto ? 9 : 10, M: 6, L: 5 }[size] : columns);
                 const L = factRowsLayout(set(form), { skills: [], ctx: { size }, columns });
                 const tag = `PT-FRW-9 div_facts ${form} ${size} columns ${columns}`;
                 eq(L.cols, want, `${tag}: ${want} columns`);
@@ -898,7 +899,8 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
         for (const size of ['S', 'M', 'L']) {
             for (const columns of ['auto', 5, 6, 8, 10]) {
                 const asked = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
-                const want = big ? Math.min(asked, 8) : asked;
+                // (every set here holds ÷ facts: at most 9, owner ruling 2026-11-05)
+                const want = Math.min(big ? Math.min(asked, 8) : asked, 9);
                 const L = factRowsLayout(items, { skills: [], ctx: { size }, columns });
                 const tag = `owner 2026-10-31 mixed facts ${name} ${size} columns ${columns}`;
                 eq(L.cols, want, `${tag}: ${want} columns`);

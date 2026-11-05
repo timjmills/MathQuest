@@ -31,7 +31,11 @@
 //   SIGNGAP   the operator's ink ends >= 0.3 em before the bottom number's ink; the fact's digits stay >= 1.75 mm clear of
 //             the cell's edges (the 3-digit dividends "crowd the box" at 10 columns: 1.55 mm on 18fbc70c2); the ones
 //             digits of each grid column share one x  (tests/lib/ws-fact-geom.cjs)
-//   node tests/scripts/ws-simple-print.cjs --facts-print   these four only (ws-precritic runs it for the fact skills)
+//   DIVMAX9   (owner ruling 2026-11-05: "If division is included don't make 10 columns an option, just 9") the Columns
+//             control offers 1-9, never 10, for a set with division facts (+ - x only: 10); an explicit 10 prints 9 across
+//             on every division page (stacked, fraction, bracket) and 10 on the + - x page, the summary saying
+//             "(max 9 with division)"
+//   node tests/scripts/ws-simple-print.cjs --facts-print   these five only (ws-precritic runs it for the fact skills)
 //   node tests/scripts/ws-simple-print.cjs              the gate (prints ws-simple-print: OK / FAIL)
 //   node tests/scripts/ws-simple-print.cjs --backtest   the same measure on the old dialog's page plan (one request
 //                                                        per small page, a section of 1-2 per skill): must FAIL
@@ -141,6 +145,44 @@ async function factsPrint(page) {
         if (x.ids.length) fails.push(`FOOTER ${x.nm} ${x.arrange}: raw skill id(s) ${x.ids.join(', ')} in "${x.first}"`);
     }
     rows.push(`FOOTER ${ft.length} prints (pupil + key), ${ft.filter((x) => x.ids && !x.ids.length).length} in words only`);
+    // DIVMAX9 (owner ruling 2026-11-05)
+    const d9 = await page.evaluate(async (owner) => {
+        const m = await import('/js/modules/simple-print.js');
+        const L = (list) => list.map((s) => Object.assign({ amt: '' }, s));
+        const optsMax = async (list) => {
+            try { localStorage.removeItem('mq_simple_print'); } catch (e) { /* none */ }
+            window.openSimplePrint(L(list), { from: 'tray' });
+            for (let i = 0; i < 80; i++) { const st = m.simplePrintState(); if (st && st.built && !st.busy) break; await new Promise((r) => setTimeout(r, 200)); }
+            const v = [...document.querySelectorAll('#spCols option')].map((x) => x.value).filter((x) => x !== 'auto').map(Number);
+            window.closeSimplePrint();
+            return Math.max(...v);
+        };
+        const out = { withDiv: await optsMax(owner), noDiv: await optsMax(owner.slice(0, 3)), builds: [] };
+        const dv = (form) => [{ categoryId: 'division', skillId: 'div_facts', opts: form ? { divForm: form } : {} }];
+        for (const [nm, list] of [['owner', owner], ['div_facts', dv('')], ['div long', dv('long')], ['div fraction', dv('fraction')], ['+ -', owner.slice(0, 2)]]) {
+            for (const size of ['S', 'M']) {
+                const o = { how: 'pages', n: 2, size, cols: 10, colsMode: 'exact', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
+                const b = await m.buildSimple(L(list), o);
+                out.builds.push({ nm, size, grids: b.grids || [{ div: nm !== '+ - x', cols: b.cols }], cols: b.cols, line: m.summaryLine(b, o) });
+            }
+        }
+        return out;
+    }, OWNER);
+    rows.push(`DIVMAX9 dialog offers up to ${d9.withDiv} with division, ${d9.noDiv} for + - x only`);
+    if (d9.withDiv !== 9) fails.push(`DIVMAX9 the dialog offers up to ${d9.withDiv} columns for a set with division facts, want 9`);
+    if (d9.noDiv !== 10) fails.push(`DIVMAX9 the dialog offers up to ${d9.noDiv} columns for + - x facts, want 10`);
+    for (const x of d9.builds) {
+        rows.push(`DIVMAX9 ${x.nm} @${x.size} Exactly 10: ${x.line}`);
+        const gs = x.grids.length ? x.grids : [{ div: x.nm !== '+ -', cols: x.cols }];
+        for (const g of gs) {
+            if (g.div && g.cols > 9) fails.push(`DIVMAX9 ${x.nm} @${x.size}: a division page printed ${g.cols} columns`);
+            if (g.div && g.cols !== 9) fails.push(`DIVMAX9 ${x.nm} @${x.size}: a division page printed ${g.cols} columns for an asked 10, want 9`);
+            // (x 1-12 answers over 99 keep their own 8-column clamp, PT-FRW-5)
+            if (!g.div && g.cols !== (x.nm === 'owner' ? 8 : 10)) fails.push(`DIVMAX9 ${x.nm} @${x.size}: the + - x page printed ${g.cols} columns for an asked 10, want ${x.nm === 'owner' ? 8 : 10}`);
+        }
+        if (x.nm !== '+ -' && !/\(max 9 with division\)/.test(x.line)) fails.push(`DIVMAX9 ${x.nm} @${x.size}: the summary does not say "(max 9 with division)": "${x.line}"`);
+        if (x.nm === '+ -' && /max 9/.test(x.line)) fails.push(`DIVMAX9 + - @${x.size}: the summary says max 9: "${x.line}"`);
+    }
     // FALLBACK: a Mixed up that cannot be drawn prints EXACTLY the In sections plan
     const fb = await page.evaluate(async ({ six, owner }) => {
         const m = await import('/js/modules/simple-print.js');
@@ -345,7 +387,8 @@ async function factsPrint(page) {
             localStorage.setItem('mq_simple_print', JSON.stringify({ cols: 9, colsMode: 'exact' }));
             const noF = bt ? 6 : await optsIn(sets.missing), withF = bt ? 10 : await optsIn(sets.six);
             if (noF > 6) F(`COLS7 the missing set (no facts) offers ${noF} columns`);
-            if (withF !== 10) F(`COLS7 the six set (with facts) offers up to ${withF} columns, want 10`);
+            // (owner 2026-11-05: the six set holds div_facts, so it offers 9, DIVMAX9)
+            if (withF !== (bt ? 10 : 9)) F(`COLS7 the six set (with facts and division facts) offers up to ${withF} columns, want 9`);
             localStorage.removeItem('mq_simple_print');
             if (!bt) {
                 // EXACT (critic r1 #1): Aim and Exactly must plan different pages where they should differ: 25 problems

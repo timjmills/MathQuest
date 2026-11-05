@@ -358,6 +358,7 @@ function formRows(items, input, ctx, G, labels, forms) {
     // fits; a + - x answer over 99 keeps its 8-column clamp (PT-FRW-5)
     const mixed = opsOf(items).size > 1;
     const notes = [];
+    if (asked > 9 && items.some((it) => opOf(it.q || {}) === 'divide')) { asked = 9; notes.push('Division facts: at most 9 columns (max 9 with division, owner 2026-11-05).'); }
     if (mixed && asked > 8 && (input.__clamp8 || items.some((it) => opOf(it.q || {}) !== 'divide' && Number(answerOf(it)) > 99))) { asked = 8; notes.push('Answers over 99: at most 8 columns (PT-FRW-5).'); }
     let geo = null;
     let cols = asked;
@@ -496,6 +497,8 @@ export function factRowsLayout(items, input) {
     let note = '';
     // (input.__clamp8: the page was dealt for the 8-column clamp, see plan / R2-2)
     if ((big || input.__clamp8) && cols > 8) { cols = 8; note = 'Answers over 99: at most 8 columns (PT-FRW-5).'; }
+    // owner ruling 2026-11-05: "If division is included don't make 10 columns an option, just 9"
+    if (cols > 9 && items.some((it) => opOf(it.q || {}) === 'divide')) { cols = 9; note = 'Division facts: at most 9 columns (max 9 with division).'; }
     // A 3-digit operand (a vertical division fact's dividend: 144 ÷ 12) needs a fourth track: the
     // page drops columns until the ladder's own digit size fits, rather than shrink the digits
     // (PG-20: content never shrinks to fit).

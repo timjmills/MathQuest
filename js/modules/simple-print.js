@@ -53,6 +53,8 @@ const FACT_AUTO = { S: 10, M: 6, L: 5 };
 // Owner 2026-11-03 (item 4): "7, 8, 9, 10 should be just for small problems": a fast fact may go up to 10 across, every
 // larger cell at most 6 (and the engine clamps either to what really fits at the size).
 const FACT_MAX_COLS = 10, CELL_MAX_COLS = 6;
+// owner ruling 2026-11-05: "If division is included don't make 10 columns an option, just 9" (PT-FRW-9)
+const DIV_MAX_COLS = 9;
 // Mixed up layouts (owner 2026-11-03): sent as req.mixLayout; absent = 'rows'
 const MIX_LAYOUTS = { rows: ['Rows by type', 'each row one kind, full-size boxes'], grid: ['One grid', 'one grid, bigger problems stand two rows tall'], even: ['Even grid', 'one even grid, bigger problems get less room'] };
 /**
@@ -205,7 +207,7 @@ function baseReq(o) {
 const skillRef = (s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts || {} });
 const colsAsked = (o) => (o.cols && o.cols !== 'auto' ? Number(o.cols) : undefined);
 /** The columns a part may be ASKED for: a fast fact up to 10, any larger cell up to 6 (never 7+ across). */
-export const capFor = (s) => (isFactSkill(s) ? FACT_MAX_COLS : CELL_MAX_COLS);
+export const capFor = (s) => (isFactSkill(s) ? (isDivisionFact(s) ? DIV_MAX_COLS : FACT_MAX_COLS) : CELL_MAX_COLS);
 /** Aim / Exactly: the columns this part asks for (the engine may still clamp it to what fits at the size). */
 const askFor = (s, o) => { const n = colsAsked(o); return n ? Math.min(n, capFor(s)) : undefined; };
 const modeOf = (o) => (colsAsked(o) ? (o.colsMode === 'exact' ? 'exact' : 'aim') : 'auto');
@@ -399,7 +401,7 @@ async function buildFacts(list, amounts, o) {
                 role: 'fact-rows', look: 'auto',
                 // Mixed up: the page's operations interleaved in the one grid (owner ruling 2026-10-31, M1 run rules)
                 ...(mixed && groups[g].length > 1 ? { arrangement: 'mixed' } : {}),
-                sections: [{ skills: groups[g].map(skillRef), pages: 1, ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) }],
+                sections: [{ skills: groups[g].map(skillRef), pages: 1, ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), groups[g].some(isDivisionFact) ? DIV_MAX_COLS : FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) }],
             });
             const res = await buildSheet(req);
             out.pupil.push(res.pupilHtml || '');
@@ -424,13 +426,13 @@ async function buildFacts(list, amounts, o) {
         pages: out.pages, keyPages: o.key ? out.keyPages : 0, total: out.items, counts: out.counts, arrangement: 'facts', mixedFacts: mixed,
         // what page 1 really holds (critic r2: a 6 x 6 grid that printed 30 said "36 a page")
         ...(() => { const p1 = (out.first.split('class="ws-cell ').length - 1) || f.perPage || 0; return { cols: f.cols || 0, rows: f.cols ? Math.ceil(p1 / f.cols) : f.rows || 0, perPage: p1 }; })(),
-        colsList: [f.cols || 0], notes: out.notes, firstHtml: out.first, grids: out.grids,
+        colsList: [f.cols || 0], notes: out.notes, divMax9: colsAsked(o) > DIV_MAX_COLS && list.some(isDivisionFact), firstHtml: out.first, grids: out.grids,
         capped: colsAsked(o) && f.cols && f.cols < colsAsked(o) ? f.cols : 0, colsMode: modeOf(o),
     };
 }
 
 async function buildMixed(list, amounts, o) {
-    const cap = list.every(isFactSkill) ? FACT_MAX_COLS : CELL_MAX_COLS;
+    const cap = list.every(isFactSkill) ? (list.some(isDivisionFact) ? DIV_MAX_COLS : FACT_MAX_COLS) : CELL_MAX_COLS;
     const mk = (counts) => Object.assign(baseReq(o), {
         role: 'mixed-practice', arrangement: 'mixed',
         ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), cap), columnsMode: modeOf(o) } : {}),
@@ -550,6 +552,8 @@ export function summaryLine(b, o) {
     else if (cl.length === 1) grid = `${b.arrangement === 'mixed' ? 'Mixed up, ' : ''}${cl[0]} columns${one} · ${b.perPage} on page 1`;
     else if (b.arrangement === 'mixed') grid = `Mixed up, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
     else grid = `Each skill its own grid, ${Math.min(...cl)}–${Math.max(...cl)} columns · ${b.perPage} on page 1`;
+    // an asked 10 prints 9 on the division parts (owner 2026-11-05)
+    if (b.divMax9 && grid) grid = g2.some((x) => x.div) ? grid.replace(/( · division pages \d+ columns)/, '$1 (max 9 with division)') : `${grid} (max 9 with division)`;
     // a Mixed up that fell back says so on every kind of line (facts-print-fix FALLBACK)
     if (b.fellBack && !/^In sections/.test(grid)) grid = `In sections, ${grid}`;
     return [grid, pages, probs, ...(sets > 1 ? [`${sets} sets, each with different problems`] : []), key].join(' · ');
@@ -886,8 +890,10 @@ function render() {
         h += `<button type="button" role="radio" class="sp-size sp-size-${v}" data-sp="size" data-v="${v}" aria-checked="${P.size === v}"><span class="sp-size-glyph" aria-hidden="true">7</span><span class="sp-size-name">${l}</span><span class="sp-size-cols">${c ? `${c} columns` : '…'}</span></button>`;
     }
     // Columns: Auto, or a number with Aim for n | Exactly n (owner item 4); 7–10 only when the set has fast facts
-    const colMax = hasFacts() ? FACT_MAX_COLS : CELL_MAX_COLS;
-    const colsNow = o.cols;
+    // a set with division facts offers 1–9, never 10 (owner 2026-11-05); a saved 10 shows as 9 (+ − × parts keep 10)
+    const hasDiv = !!(S && S.list.some((s) => isFactSkill(s) && isDivisionFact(s)));
+    const colMax = hasFacts() ? (hasDiv ? DIV_MAX_COLS : FACT_MAX_COLS) : CELL_MAX_COLS;
+    const colsNow = o.cols !== 'auto' && Number(o.cols) > colMax ? colMax : o.cols;
     h += `</div><label class="sp-cols"><span>Columns</span><select id="spCols" data-sp-cols>
         <option value="auto"${colsNow === 'auto' ? ' selected' : ''}>Auto — fitted by size${autoCols ? ` (${autoCols})` : ''}</option>
         ${Array.from({ length: colMax }, (_, k) => k + 1).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c === 1 ? '1 (across the page)' : c}</option>`).join('')}
