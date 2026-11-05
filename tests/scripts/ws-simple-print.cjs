@@ -18,6 +18,9 @@
 //   TARGETS  every dialog control and Quick Start Print button >= 44 x 44 at 1366 / 820 / 390 (critic r1 D7)
 //   LARGER   the Larger preview pane: page 1 at once, later pages mount only when scrolled near; Esc order
 //   HOVERZOOM the hover zoom is >= 80 % of the viewport height at 1366x768 and hides on leave / Esc
+//   ZOOMCOVER the zoom never covers the pointer and stays on screen (1366x768, 820x1180 portrait; critic D1)
+//   ZOOMGAIN  a zoom is >= 1.3x as wide as the page under the pointer, else none (critic D2); ZOOMSTALE hides on rebuild (D4)
+//   SETS2     2 sets: per-set captions, a divider at each set and each set's key (D3); PANEPRINT / FOCUSRING (D7, D5)
 //   SUMMARY  the summary's "n a page" / "n on page 1" is what page 1 holds (critic r1 D5, D9)
 //
 //   node tests/scripts/ws-simple-print.cjs              the gate (prints ws-simple-print: OK / FAIL)
@@ -695,8 +698,8 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
             if (SH) require('fs').mkdirSync(SH, { recursive: true });
             const L = (t) => fails.push('LARGER ' + t);
             const settle = (ms) => new Promise((r) => setTimeout(r, ms));
-            for (const w of [1366, 390]) {
-                const vh = w === 1366 ? 768 : 844;
+            for (const w of [1366, 820, 390]) {
+                const vh = w === 1366 ? 768 : w === 820 ? 1180 : 844;
                 await page.setViewport({ width: w, height: vh, deviceScaleFactor: 1 });
                 await page.evaluate(async () => {
                     window.closeSimplePrint && window.closeSimplePrint();
@@ -741,31 +744,32 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                 if (!(b.top > 0)) L(`@${w} End did not scroll the pages`);
                 if (!(b.frames > a.frames) || !b.last) L(`@${w} later pages did not mount after scrolling (${a.frames} -> ${b.frames})`);
                 rows.push(`LARGER @${w}: ${b.frames} mounted after scrolling to the end`);
-                if (w === 1366) {
-                    // HOVERZOOM on a page in the pane and on the thumbnail
-                    const box = await page.evaluate(() => { const all = document.querySelectorAll('#spRoot .sp-lg-sheet'); if (!all.length) return { x: 0, y: 0, none: (document.querySelector('#spRoot .sp-large') || {}).innerHTML || 'no pane' }; const s = all[all.length - 1].getBoundingClientRect(); return { x: s.left + s.width * 0.3, y: s.top + Math.min(s.height, window.innerHeight - s.top) / 2 }; });
-                    if (box.none) L('HOVERZOOM no pages in the pane after scrolling: ' + String(box.none).slice(0, 200));
-                    await page.mouse.move(box.x, box.y);
-                    await settle(900);
-                    const z = await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); if (!z || z.hidden) return null; const r = z.getBoundingClientRect(); return { h: r.height, l: r.left, r: r.right, frame: !!z.querySelector('iframe') }; });
-                    if (!z) L('HOVERZOOM no zoom on hovering a page');
-                    else {
-                        if (z.h < 0.8 * vh) L(`HOVERZOOM ${Math.round(z.h)} px < 80 % of ${vh}`);
-                        if (!(z.l > box.x || z.r < box.x)) L(`HOVERZOOM the zoom sits under the pointer (${Math.round(z.l)}-${Math.round(z.r)} vs ${Math.round(box.x)})`);
-                        rows.push(`HOVERZOOM @1366: ${Math.round(z.h)} px tall (${Math.round(z.h / vh * 100)} % of the viewport)`);
+                // ZOOMGAIN (critic D2) / ZOOMCOVER (critic D1): over a page in the pane, a zoom shows only when it is clearly
+                // larger (>= 1.3x the sheet under the pointer) and never under the pointer
+                const zoomAt = () => page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); if (!z || z.hidden) return null; const r = z.getBoundingClientRect(); return { h: r.height, w: r.width, l: r.left, r: r.right, t: r.top, b: r.bottom, frame: !!z.querySelector('iframe') }; });
+                const hoverCheck = async (sel, tag, need) => {
+                    const sh = await page.evaluate((sel) => { const all = [...document.querySelectorAll(sel)].filter((x) => { const r = x.getBoundingClientRect(); return r.bottom > 40 && r.top < window.innerHeight - 40; }); if (!all.length) return null; const r = all[all.length - 1].getBoundingClientRect(); return { l: r.left, w: r.width, y: (Math.max(r.top, 0) + Math.min(r.bottom, window.innerHeight)) / 2 }; }, sel);
+                    if (!sh) { L(`${tag} @${w} nothing to hover (${sel})`); return []; }
+                    const out = [];
+                    for (const fx of [0.1, 0.5, 0.9]) {
+                        const x = sh.l + sh.w * fx;
+                        await page.mouse.move(2, 2); await settle(60);
+                        await page.mouse.move(x, sh.y, { steps: 3 }); await settle(700);
+                        const z = await zoomAt();
+                        out.push(z);
+                        if (!z) { if (need) L(`HOVERZOOM @${w} no zoom over ${tag} at x=${Math.round(x)}`); continue; }
+                        if (z.l <= x && x <= z.r) L(`ZOOMCOVER @${w} the zoom (${Math.round(z.l)}-${Math.round(z.r)}) covers the pointer at x=${Math.round(x)} over ${tag}`);
+                        if (z.w < 1.3 * sh.w) L(`ZOOMGAIN @${w} the zoom (${Math.round(z.w)} px) is not 1.3x the ${tag} under it (${Math.round(sh.w)} px)`);
+                        if (z.l < 0 || z.r > w + 1 || z.t < 0 || z.b > vh + 1) L(`ZOOMCOVER @${w} the zoom leaves the screen`);
+                        if (need && z.h < 0.6 * vh) L(`HOVERZOOM @${w} the ${tag} zoom is ${Math.round(z.h)} px (< 60 % of ${vh})`);
                     }
-                    if (SH) await page.screenshot({ path: SH + '/hoverzoom-1366.png' });
-                    await page.mouse.move(5, 5);
-                    await settle(200);
-                    if (await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); return z && !z.hidden; })) L('HOVERZOOM does not hide on leave');
-                    // Esc order: zoom, then the pane, then the dialog
-                    await page.mouse.move(box.x, box.y);
-                    await settle(300);
-                    await page.keyboard.press('Escape');
-                    const e1 = await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); return { zoom: !!(z && !z.hidden), large: !!document.querySelector('#spRoot .sp-large') }; });
-                    if (e1.zoom) L('ESC Esc does not hide the zoom');
-                    if (!e1.large) L('ESC the first Esc (zoom showing) closed the pane too');
-                    await page.mouse.move(5, 5);
+                    rows.push(`HOVERZOOM @${w} over ${tag}: ${out.map((z) => z ? `${Math.round(z.w)}x${Math.round(z.h)}` : 'none').join(' / ')}`);
+                    return out;
+                };
+                if (w !== 390) {
+                    await hoverCheck('#spRoot .sp-lg-sheet', 'a pane page', false);
+                    if (SH && w === 1366) await page.screenshot({ path: SH + '/pane-hover-1366.png' });
+                    await page.mouse.move(5, 5); await settle(150);
                 }
                 await page.keyboard.press('Escape');
                 await settle(150);
@@ -773,18 +777,99 @@ const FACT_COLS = { S: 10, M: 6, L: 5 };
                 if (e2.large) L(`ESC @${w} Esc does not close the pane (focus ${await page.evaluate(() => { const a = document.activeElement; return a ? a.tagName + '.' + a.className : '-'; })})`);
                 if (!e2.open) L(`ESC @${w} Esc in the pane closed the whole dialog`);
                 if (!e2.focus) L(`ESC @${w} focus does not return to Larger preview`);
-                if (w === 1366) {
-                    const t = await page.evaluate(() => { const th = document.querySelector('#spRoot .sp-thumb'); if (!th) return { x: 5, y: 5 }; const s = th.getBoundingClientRect(); return { x: s.left + s.width / 2, y: s.top + s.height / 2 }; });
-                    await page.mouse.move(t.x, t.y);
-                    await settle(900);
-                    const z = await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); return z && !z.hidden ? z.getBoundingClientRect().height : 0; });
-                    if (z < 0.8 * vh) L(`HOVERZOOM the thumbnail zoom is ${Math.round(z)} px`);
+                if (w !== 390) {
+                    // the thumbnail zoom: very large at 1366, beside the pointer at 820 portrait
+                    const zs = await hoverCheck('#spRoot .sp-thumb', 'the thumbnail', true);
+                    if (w === 1366 && zs[1] && zs[1].h < 0.8 * vh) L(`HOVERZOOM the thumbnail zoom is ${Math.round(zs[1].h)} px (< 80 % of ${vh})`);
+                    if (SH) await page.screenshot({ path: SH + `/hoverzoom-${w}.png` });
+                    await page.mouse.move(5, 5); await settle(200);
+                    if (await page.evaluate(() => { const z = document.querySelector('#spRoot .sp-zoom'); return z && !z.hidden; })) L('HOVERZOOM does not hide on leave');
+                    // ZOOMSTALE (critic D4): a rebuild while the zoom shows hides it
+                    const t = await page.evaluate(() => { const s = document.querySelector('#spRoot .sp-thumb').getBoundingClientRect(); return { x: s.left + s.width / 2, y: s.top + s.height / 2 }; });
+                    await page.mouse.move(t.x, t.y, { steps: 3 }); await settle(700);
+                    if (!(await zoomAt())) L(`ZOOMSTALE @${w} no zoom to test with`);
+                    await page.evaluate(() => { const n = document.getElementById('spN'); n.value = '3'; n.dispatchEvent(new Event('input', { bubbles: true })); });
+                    await settle(100);
+                    if (await zoomAt()) L(`ZOOMSTALE @${w} the zoom still shows the old pages after a change`);
+                    await page.waitForFunction(async () => { const m = await import('/js/modules/simple-print.js'); const s = m.simplePrintState(); return s && !s.busy && s.built; }, { timeout: 30000 }).catch(() => {});
+                    // Esc order on the dialog: the zoom first, then the dialog
+                    await page.mouse.move(2, 2); await settle(60);
+                    await page.mouse.move(t.x, t.y, { steps: 3 }); await settle(700);
+                    if (await zoomAt()) {
+                        await page.keyboard.press('Escape');
+                        const e1 = await page.evaluate(async () => ({ zoom: !!(document.querySelector('#spRoot .sp-zoom') && !document.querySelector('#spRoot .sp-zoom').hidden), open: !!(await import('/js/modules/simple-print.js')).simplePrintState() }));
+                        if (e1.zoom) L('ESC Esc does not hide the zoom');
+                        if (!e1.open) L('ESC the first Esc (zoom showing) closed the dialog too');
+                    }
                     await page.mouse.move(5, 5);
                     await settle(100);
                 }
                 await page.keyboard.press('Escape');
-                await settle(100);
+                await settle(100)
+;
                 if (await page.evaluate(async () => !!(await import('/js/modules/simple-print.js')).simplePrintState())) L(`ESC @${w} the next Esc does not close the dialog`);
+            }
+            // SETS2 (critic D3): with 2 sets, each page's caption says its own set and whether it is that set's key; a
+            // divider at each set and at each set's key. PANEPRINT (D7): Print in the pane header, and the header counts
+            // pupil pages and key pages. FOCUSRING (D5): the page list's keyboard ring is the dialog's 3 px ring.
+            {
+                await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+                await page.evaluate(async () => {
+                    window.closeSimplePrint && window.closeSimplePrint();
+                    window.openSimplePrint([{ categoryId: 'addition', skillId: 'add_two_digit' }, { categoryId: 'subtraction', skillId: 'missing_add_sub' }], { from: 'tray' });
+                    const r = document.getElementById('spRoot');
+                    const pg = r.querySelector('[data-sp="how"][data-v="pages"]'); if (pg && pg.getAttribute('aria-checked') !== 'true') pg.click();
+                    await new Promise((x) => setTimeout(x, 50));
+                    const n = document.getElementById('spN'); n.value = '2'; n.dispatchEvent(new Event('input', { bubbles: true }));
+                    const k = r.querySelector('[data-sp="key"][data-v="true"]'); if (k && k.getAttribute('aria-checked') !== 'true') k.click();
+                    const st = document.getElementById('spSets'); st.value = '2'; st.dispatchEvent(new Event('input', { bubbles: true })); st.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                await page.waitForFunction(async () => { const m = await import('/js/modules/simple-print.js'); const s = m.simplePrintState(); return s && !s.busy && s.built && s.built.sets === 2; }, { timeout: 30000 }).catch(() => {});
+                await settle(300);
+                await page.focus('#spRoot .sp-larger');
+                await page.keyboard.press('Enter');
+                await settle(600);
+                const q = await page.evaluate(async () => {
+                    const m = await import('/js/modules/simple-print.js');
+                    const st = m.simplePrintState();
+                    const r = document.getElementById('spRoot'), sc = r.querySelector('.sp-lg-scroll');
+                    if (!sc) return null;
+                    const seq = [...sc.children].map((x) => x.classList.contains('sp-lg-div') ? `[${x.textContent.trim()}]` : (x.querySelector('figcaption') || {}).textContent || '?');
+                    const pr = r.querySelector('.sp-lg-top [data-sp="print"]');
+                    const pb = pr && pr.getBoundingClientRect();
+                    return { sets: st.built && st.built.sets, pupil: st.built && st.built.pages, seq, meta: (r.querySelector('.sp-lg-meta') || {}).textContent || '', print: pb ? [pb.width, pb.height] : null, ring: document.activeElement === sc ? getComputedStyle(sc).outlineWidth + ' ' + getComputedStyle(sc).outlineStyle : 'focus on ' + (document.activeElement && document.activeElement.className) };
+                });
+                if (!q) L('SETS2 the pane did not open');
+                else {
+                    rows.push(`SETS2: ${q.seq.join(' | ')}`);
+                    rows.push(`PANEPRINT: "${q.meta}"; FOCUSRING: ${q.ring}`);
+                    if (q.sets !== 2) L(`SETS2 built ${q.sets} sets, not 2`);
+                    const P = q.pupil || 0;
+                    // expected: [Set 1] Set 1 · page 1..P [Set 1 answer key] Set 1 · answer key page .. [Set 2] ...
+                    let cur = 0, inKey = false, nP = 0;
+                    const seen = { div: 0, key: 0 };
+                    for (const it of q.seq) {
+                        let mm;
+                        if ((mm = /^\[Set (\d+)\]$/.exec(it))) { if (Number(mm[1]) !== cur + 1) L(`SETS2 divider "${it}" out of order`); cur = Number(mm[1]); inKey = false; nP = 0; seen.div++; continue; }
+                        if ((mm = /^\[Set (\d+) answer key\]$/.exec(it))) { if (Number(mm[1]) !== cur) L(`SETS2 key divider "${it}" in set ${cur}`); if (nP !== P) L(`SETS2 set ${cur} has ${nP} pupil pages before its key, not ${P}`); inKey = true; seen.key++; continue; }
+                        if ((mm = /^Set (\d+) · (answer key )?page (\d+) of (\d+)$/.exec(it))) {
+                            if (Number(mm[1]) !== cur) L(`SETS2 caption "${it}" sits in set ${cur}`);
+                            if (!!mm[2] !== inKey) L(`SETS2 caption "${it}" ${inKey ? 'in a key part is not marked answer key' : 'marks a pupil page as the key'}`);
+                            if (!inKey) { nP++; if (Number(mm[4]) !== P) L(`SETS2 caption "${it}": a set has ${P} pupil pages`); }
+                            continue;
+                        }
+                        L(`SETS2 unexpected item "${it}"`);
+                    }
+                    if (seen.div !== 2 || seen.key !== 2) L(`SETS2 ${seen.div} set dividers and ${seen.key} key dividers (want 2 and 2)`);
+                    if (!/^2 sets · \d+ pupil pages? \+ \d+ answer key pages?$/.test(q.meta)) L(`PANEPRINT header says "${q.meta}"`);
+                    if (!q.print) L('PANEPRINT no Print button in the pane header');
+                    else if (q.print[0] < 44 || q.print[1] < 44) L(`PANEPRINT Print ${q.print.map(Math.round).join('x')} < 44`);
+                    if (!/^3px solid/.test(q.ring)) L(`FOCUSRING the focused page list shows "${q.ring}", not the 3 px ring`);
+                }
+                if (SH) await page.screenshot({ path: SH + '/larger-sets2-1366.png' });
+                await page.evaluate(() => { const st = document.getElementById('spSets'); window.closeSimplePrint && window.closeSimplePrint(); return !!st; });
+                // put Sets back to 1 so later runs start from the default
+                await page.evaluate(async () => { window.openSimplePrint([{ categoryId: 'addition', skillId: 'add_two_digit' }], { from: 'tray' }); const st = document.getElementById('spSets'); st.value = '1'; st.dispatchEvent(new Event('input', { bubbles: true })); st.dispatchEvent(new Event('change', { bubbles: true })); await new Promise((x) => setTimeout(x, 400)); window.closeSimplePrint(); });
             }
         }
 

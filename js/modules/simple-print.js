@@ -770,8 +770,8 @@ function mount() {
     document.addEventListener('keydown', onKey, true);
     // hover zoom (owner 2026-11-05): a very large page beside the pointer, mouse and trackpad only
     {
-        root.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse' || !S || !S.zoomOn) return; const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && root.contains(t)) showZoom(Number(t.dataset.zpage), e.clientX); });
-        root.addEventListener('pointerover', (e) => { if (e.pointerType !== 'mouse') return; if (window.innerWidth < 700) return; const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && root.contains(t)) showZoom(Number(t.dataset.zpage), e.clientX); });
+        root.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse' || !S || !S.zoomOn) return; const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && root.contains(t)) showZoom(Number(t.dataset.zpage), e.clientX, t); });
+        root.addEventListener('pointerover', (e) => { if (e.pointerType !== 'mouse') return; if (window.innerWidth < 700) return; const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && root.contains(t)) showZoom(Number(t.dataset.zpage), e.clientX, t); });
         root.addEventListener('pointerout', (e) => { const t = e.target.closest && e.target.closest('[data-zpage]'); if (t && !(e.relatedTarget && t.contains(e.relatedTarget))) hideZoom(); });
     }
     S.root = root;
@@ -926,6 +926,7 @@ function schedule(delay = 300) {
     if (!S) return;
     clearTimeout(S.timer);
     S.busy = true;
+    hideZoom();
     updateLine();
     S.timer = setTimeout(run, delay);
 }
@@ -933,6 +934,7 @@ function schedule(delay = 300) {
 async function run() {
     if (!S) return;
     const my = ++S.token;
+    hideZoom();   // critic D4: never leave the old pages in the zoom while the new ones build
     const o = opts();
     let b = null;
     try { b = await buildSets(S.list, o); } catch (e) { console.warn('[simple-print] build failed', e); b = null; }
@@ -941,6 +943,7 @@ async function run() {
     S.error = !b;
     S.built = b;
     S.split = null;
+    hideZoom();
     if (b && P.cols === 'auto' && b.cols) S.probes[P.size] = colsLabel(b);
     render();
     if (S.large) drawLarge();
@@ -1150,14 +1153,23 @@ function pagesOf() {
     tpl.innerHTML = S.built.doc || S.built.firstHtml || '';
     const styles = [...tpl.content.querySelectorAll('style')].filter((x) => !x.closest('.ws-page')).map((x) => x.outerHTML).join('');
     const pages = [...tpl.content.querySelectorAll('.ws-page')];
-    let keySeen = false;
+    // critic D3: key or not is read from each page itself (the kit's .ws-key page, its "Answer Key" name line), and the
+    // set from its own "Set n of N" footer, so set 2's pupil pages are never taken for set 1's key
+    let set = 1, prevKey = false;
     S.split = pages.map((pg) => {
-        keySeen = keySeen || /Answer Key/i.test(pg.textContent || '');
+        const key = pg.classList.contains('ws-key') || !!pg.querySelector('[data-ws-key="name"]');
+        const m = /Set (\d+) of \d+/.exec(pg.textContent || '');
+        if (m) set = Number(m[1]); else if (prevKey && !key) set += 1;
+        prevKey = key;
         // keep the page's wrappers (their classes carry the sheet's look), without the other pages
         let html = pg.outerHTML;
         for (let a = pg.parentElement; a; a = a.parentElement) { const c = a.cloneNode(false); c.innerHTML = '\u0001'; html = c.outerHTML.replace('\u0001', html); }
-        return { html: styles + html, key: keySeen };
+        return { html: styles + html, key, set };
     });
+    // the page's place in its own set's pupil pages or key pages ("Set 2 · page 1 of 2")
+    const cnt = {};
+    S.split.forEach((p) => { const k = p.set + (p.key ? 'k' : 'p'); p.nth = (cnt[k] = (cnt[k] || 0) + 1); });
+    S.split.forEach((p) => { p.of = cnt[p.set + (p.key ? 'k' : 'p')]; });
     return S.split;
 }
 const PAGE_EXTRA = '<style>html,body{background:#fff!important;margin:0!important;padding:0!important;overflow:hidden!important}.ws-page{margin:0!important;outline:0!important;box-shadow:none!important}</style>';
@@ -1201,11 +1213,20 @@ function drawLarge() {
     if (!el) { el = document.createElement('div'); el.className = 'sp-large'; el.setAttribute('role', 'region'); el.setAttribute('aria-label', 'Larger preview'); S.root.appendChild(el); }
     const pages = S.built && !S.busy ? pagesOf() : [];
     const n = pages.length;
-    let h = `<header class="sp-lg-top"><h3 class="sp-lg-title">Larger preview</h3><span class="sp-lg-meta">${n ? `${n} page${n === 1 ? '' : 's'}` : 'Working out the pages…'}</span><button type="button" class="sp-lg-small" data-sp="smaller">Smaller</button></header><div class="sp-lg-scroll" tabindex="0" aria-label="Pages">`;
-    let divided = false;
+    const nSets = Math.max(1, ...pages.map((p) => p.set || 1));
+    const nKey = pages.filter((p) => p.key).length, nPupil = n - nKey;
+    const pl = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
+    // D7: what the print holds, in words, and Print right here (the dialog's Print sits under the pane)
+    const meta = n ? `${nSets > 1 ? `${nSets} sets · ` : ''}${pl(nPupil, 'pupil page')}${nKey ? ` + ${pl(nKey, 'answer key page')}` : ''}` : 'Working out the pages…';
+    let h = `<header class="sp-lg-top"><h3 class="sp-lg-title">Larger preview</h3><span class="sp-lg-meta">${meta}</span><button type="button" class="sp-lg-print" data-sp="print"${n ? '' : ' disabled'}>Print</button><button type="button" class="sp-lg-small" data-sp="smaller">Smaller</button></header><div class="sp-lg-scroll" tabindex="0" aria-label="Pages">`;
+    let prev = null;
     pages.forEach((p, i) => {
-        if (p.key && !divided) { divided = true; h += `<div class="sp-lg-div" role="separator"><span>Answer key</span></div>`; }
-        h += `<figure class="sp-lg-page" data-pg="${i}"><figcaption>Page ${i + 1} of ${n}${p.key ? ' · answer key' : ''}</figcaption><div class="sp-lg-sheet" data-zpage="${i}"></div></figure>`;
+        // D3: a divider at each set (sets > 1) and at each set's answer key
+        if (nSets > 1 && (!prev || prev.set !== p.set)) h += `<div class="sp-lg-div sp-lg-set" role="separator" data-set="${p.set}"><span>Set ${p.set}</span></div>`;
+        if (p.key && (!prev || !prev.key || prev.set !== p.set)) h += `<div class="sp-lg-div" role="separator"><span>${nSets > 1 ? `Set ${p.set} answer key` : 'Answer key'}</span></div>`;
+        const cap = nSets > 1 ? `Set ${p.set} · ${p.key ? 'answer key ' : ''}page ${p.nth} of ${p.of}` : `Page ${i + 1} of ${n}${p.key ? ' · answer key' : ''}`;
+        h += `<figure class="sp-lg-page" data-pg="${i}"><figcaption>${cap}</figcaption><div class="sp-lg-sheet" data-zpage="${i}"></div></figure>`;
+        prev = p;
     });
     h += `</div>`;
     el.innerHTML = h;
@@ -1225,16 +1246,30 @@ function drawLarge() {
     } else slots.forEach((x, i) => mountFrame(x, i, `Page ${i + 1}`));
     sc.scrollTop = keepTop;
 }
-function showZoom(i, x) {
+/**
+ * Where the zoom goes: beside the pointer, never under it (critic D1), and only when it is clearly larger than the
+ * page under the pointer (critic D2: >= ZOOM_GAIN times as wide). Returns null when it cannot be both.
+ */
+const ZOOM_GAIN = 1.3, ZOOM_MIN_W = 320, ZOOM_EDGE = 16, ZOOM_GAP = 24;
+export function zoomBox(x, srcW, vw, vh) {
+    const left = x - ZOOM_GAP - ZOOM_EDGE, right = vw - x - ZOOM_GAP - ZOOM_EDGE;
+    const side = right >= left ? 'right' : 'left';
+    const H0 = Math.round(vh * 0.94);
+    const W = Math.floor(Math.min(H0 * 794 / 1123, Math.max(left, right)));
+    if (W < ZOOM_MIN_W || W < ZOOM_GAIN * (srcW || 0)) return null;
+    const H = Math.round(W * 1123 / 794);
+    return { w: W, h: H, top: Math.round((vh - H) / 2), left: side === 'right' ? vw - ZOOM_EDGE - W : ZOOM_EDGE };
+}
+function showZoom(i, x, src) {
     if (!S || !S.built || S.busy || !pagesOf()[i]) return;
+    const srcW = src && src.getBoundingClientRect ? src.getBoundingClientRect().width : 0;
+    const box = zoomBox(x, srcW, window.innerWidth, window.innerHeight);
+    if (!box) { hideZoom(); return; }
     let z = S.root.querySelector('.sp-zoom');
     if (!z) { z = document.createElement('div'); z.className = 'sp-zoom'; z.setAttribute('aria-hidden', 'true'); S.root.appendChild(z); }
-    const H = Math.round(window.innerHeight * 0.94), W = Math.round(H * 794 / 1123);
-    z.style.height = H + 'px'; z.style.width = W + 'px';
-    z.style.top = Math.round((window.innerHeight - H) / 2) + 'px';
-    // on the side away from the pointer
-    z.style.left = (x < window.innerWidth / 2 ? Math.max(8, window.innerWidth - W - 16) : 16) + 'px';
-    z.style.setProperty('--sp-z-s', String(W / 794));
+    z.style.height = box.h + 'px'; z.style.width = box.w + 'px';
+    z.style.top = box.top + 'px'; z.style.left = box.left + 'px';
+    z.style.setProperty('--sp-z-s', String(box.w / 794));
     if (z.dataset.pg !== String(i) || z.dataset.v !== String(S.token)) {
         z.dataset.pg = String(i); z.dataset.v = String(S.token);
         z.innerHTML = '';

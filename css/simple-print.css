@@ -197,3 +197,15 @@ body.sp-open { overflow: hidden; }
     .sp-root .sp-large { inset: 0; border-radius: 0; }
     .sp-root .sp-lg-scroll { padding: 12px 16px 24px; }
 }
+
+/* sp-preview fix (critic 2026-11-05 D3, D5, D7). Additive. */
+.sp-root .sp-lg-scroll:focus-visible { outline: 3px solid var(--sp-ring); outline-offset: -3px; }
+.sp-root .sp-lg-print { min-height: 44px; min-width: 44px; padding: 0 18px; border: 1px solid var(--sp-primary); border-radius: 10px; background: var(--sp-primary); color: var(--sp-on-primary); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.sp-root .sp-lg-print:disabled { opacity: 0.5; cursor: default; }
+.sp-root .sp-lg-set { font-size: 17px; margin-top: 16px; }
+.sp-root .sp-lg-set::before, .sp-root .sp-lg-set::after { border-top-width: 3px; border-top-color: var(--sp-ink); }
+@media (max-width: 520px) {
+    .sp-root .sp-lg-top { flex-wrap: wrap; row-gap: 4px; }
+    .sp-root .sp-lg-title { flex: 1 1 auto; }
+    .sp-root .sp-lg-meta { order: 5; flex: 1 1 100%; }
+}
