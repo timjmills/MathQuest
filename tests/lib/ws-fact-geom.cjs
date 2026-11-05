@@ -65,6 +65,36 @@ const factGeomSource = String(function factGeom(doc) {
                     });
                 };
                 for (const s of ['l', 't', 'r', 'b']) if (!sideDrawn(s)) out.rules.undrawn++;
+                // CLEAR (facts-print-fix r4): a bracket or fraction fact's INK - glyph ink by canvas, the drawn bar / vinculum /
+                // answer line, the arc's path - stays >= 2 mm clear of its cell's inner edges (owner 2026-11-05: "nothing
+                // touching a border"; "12)108" kept 0.98 mm)
+                if (c.querySelector('[data-ws-ops="division"], [data-ws-notation="fraction"]')) {
+                    const inL = r.left + bw.l, inR = r.right - bw.r;
+                    const xs = [];
+                    const tw = doc.createTreeWalker(c, 4);
+                    let tn;
+                    while ((tn = tw.nextNode())) {
+                        if (!tn.textContent.trim() || tn.parentElement.closest('.ws-tab')) continue;
+                        const cs = win.getComputedStyle(tn.parentElement);
+                        cv.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+                        const mt = cv.measureText(tn.textContent);
+                        const rg = doc.createRange(); rg.selectNodeContents(tn);
+                        const b = rg.getBoundingClientRect();
+                        if (b.width) xs.push([b.left - mt.actualBoundingBoxLeft, b.left + mt.actualBoundingBoxRight]);
+                    }
+                    for (const e of c.querySelectorAll('*')) {
+                        if (e.closest('.ws-tab')) continue;
+                        const es = win.getComputedStyle(e);
+                        const ruled = ['Top', 'Bottom'].some((s) => parseFloat(es[`border${s}Width`]) > 0 && es[`border${s}Style`] !== 'none' && !/rgba\(0, 0, 0, 0\)|transparent/.test(es[`border${s}Color`]));
+                        if (ruled || e.tagName.toLowerCase() === 'path') { const b = e.getBoundingClientRect(); if (b.width) xs.push([b.left, b.right]); }
+                    }
+                    if (xs.length) {
+                        const cl = Math.min(Math.min(...xs.map((x) => x[0])) - inL, inR - Math.max(...xs.map((x) => x[1]))) / mmPx;
+                        out.forms = out.forms || { clearMin: Infinity, worst: '', n: 0 };
+                        out.forms.n++;
+                        if (cl < out.forms.clearMin) { out.forms.clearMin = cl; out.forms.worst = c.textContent.replace(/\s+/g, ' ').trim().slice(0, 30); }
+                    }
+                }
                 // the stacked fact
                 const f = c.querySelector(':scope > .ws-fact, :scope .ws-fact');
                 if (!f) return;
@@ -115,7 +145,7 @@ const factGeomSource = String(function factGeom(doc) {
  * `minGapEm` 0.3 (owner brief); `minClearMm` 1.75: the digits' ink clear of the cell's border (owner 2026-11-05: the 3-digit
  * dividends "crowd the box" at 10 columns with 1.55 mm; the + - x page he accepted keeps 1.9-2.1 mm).
  */
-function factGeomVerdict(rep, { minGapEm = 0.3, minClearMm = 1.75 } = {}) {
+function factGeomVerdict(rep, { minGapEm = 0.3, minClearMm = 1.75, minFormClearMm = 2 } = {}) {
     const fails = [];
     (rep.pages || []).forEach((p, i) => {
         if (!p.grids) return;
@@ -125,6 +155,8 @@ function factGeomVerdict(rep, { minGapEm = 0.3, minClearMm = 1.75 } = {}) {
         if (p.rules.weights.length > 1) fails.push(`ROWRULES ${pn}: inner rules of ${p.rules.weights.length} weights (${p.rules.weights.join(', ')} px)`);
         if (p.sign.min !== null && p.sign.min < minGapEm) fails.push(`SIGNGAP ${pn}: "${p.sign.worst}" sign-to-number gap ${p.sign.min.toFixed(2)} em < ${minGapEm}`);
         if (p.sign.clearMin !== null && p.sign.clearMin < minClearMm) fails.push(`SIGNGAP ${pn}: "${p.sign.clearWorst}" ink ${p.sign.clearMin.toFixed(2)} mm from its cell's edge < ${minClearMm}`);
+        // (0.05 mm: the canvas ink is read to the pixel)
+        if (p.forms && p.forms.clearMin < minFormClearMm - 0.05) fails.push(`CLEAR ${pn}: "${p.forms.worst}" ink ${p.forms.clearMin.toFixed(2)} mm from its cell's edge < ${minFormClearMm}`);
         if (p.grid.misaligned) fails.push(`SIGNGAP ${pn}: ${p.grid.misaligned} grid columns whose ones digits do not line up (spread ${p.grid.worst.toFixed(1)} px)`);
     });
     return fails;

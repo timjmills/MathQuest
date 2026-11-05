@@ -152,3 +152,87 @@ Every pupil page as a PNG, in the scratchpad `facts-r4/` folder (`index.txt` the
 - Known look, not fixed: when the + − × count is not a whole number of rows, the shared page can open with a short row
   (Problems 130 S page 3: 2 facts, then the ÷ section).
 - Pre-existing, not this lane: ws-print-lint L sub_facts#review H13 ×4 (identical on c2c0fe24f).
+
+## Round 4 (fresh fixer, Opus medium: the owner's ÷ Mix page and Problems-mode white space survived r3, §1.7) — 7fab88a7e + origin/master f08bd11b1
+
+Critic r4 (lowest 3): (a) mixed ÷ forms zig-zag, (b) answer slot in three places, (c) "=" crowds the fraction, (d) bracket
+on the border, (h) In sections did not split the ÷ forms, (i) Size ignored with Mix; D-R4-1/2 Problems-mode white and 1.7
+stretch, D-R4-3 the 1 em bracket track, D-R4-4 two digit sizes on a page, D-R4-5 row heights differ page to page, D-R4-6
+mult_facts alone at L, D-R4-7 PT-FRW-12 vs PG-11, D-R4-8 Pages 1 printed 2 pages. Owner decisions 2026-11-05 (direct).
+
+**STEP 1, checks first** (`ws-simple-print --r4`, inside `--facts-print`; the printed document measured, the PDF rasterised by
+pdfium): MIXBASE, SLOTPOS, FRACEQ, CLEAR (tests/lib/ws-fact-geom.cjs), BRKTRACK, PDFIUM-RULES (tests/lib/ws-pdfium-rules.py,
+skipped and said when pypdfium2 is missing), FOOTWRAP, DIVSECTIONS, SIZEMIX (built and through the real dialog), FULLPAGE
+(S/M/L × Auto/5/9 × Problems 30/50/63/130 × both arrangements, the owner's Pages 1, mult_facts alone at L), ONEDIGIT, and
+ROWSAME (added when the fix showed the frame cause of D-R4-5). The owner's page (seed 926447, ÷ Mix, Columns 9, Pages 1, S)
+is a required case in both arrangements. On 7fab88a7e (git archive via MQ_ROOT): FAIL - BRKTRACK 191, FOOTWRAP 179, FRACEQ
+185, FULLPAGE 121, MIXBASE 34, ROWSAME 28, CLEAR 25, SLOTPOS 24, ONEDIGIT 18, DIVSECTIONS 7, PDFIUM-RULES 4 (the frame's
+double edge at 93 dpi). On 66002ad46: PDFIUM-RULES 8 (3-7 of 9-11 verticals, 3-4 of 8 horizontals), plus the rest.
+SIZEMIX does not fail on 7fab88a7e once the dialog's Columns is set to Auto: the critic's (i) was the dialog keeping the
+previous print's Columns 9 (M and L then correctly print 9 at 16 pt); the check now sets every control.
+
+### Fixes
+
+1. **(a)/(b) one frame for every form** (`sheet/roles/fact-rows.js` mixWrap / mixFrameMm / mixKeepOutMm / rowFormHeightMm,
+   `cells/equation.js` the Mix fraction, `cells/long-division.js` mixRow, `css/sheet-kit.css` additive `.ws-mixform` rules):
+   in a grid mixing forms every item is drawn in the stacked fact's three lines (top digit line, bottom digit line, answer
+   line), the frame below the tab's keep-out and centred down the cell, each drawing centred across. Baselines within
+   0.37 mm (was 6.2), rows centred within 0 mm (was 2.0), answer lines within 0.53 mm (was 1.6), the bracket's quotient on
+   its vinculum level with the dividends (0.39 mm, was 6.1).
+2. **(c)** `FRAC_ROW_GAP_EM` 0.15 -> 0.3; the bar spans the wider number ("0" over "12" had a 1-digit bar).
+3. **(d)** `FORM_CLEAR_MM` = 4 (2 mm a side) for brackets and fractions in `rowGeometry`; `boxOk` at inner - 2.
+4. **(h) DIVSECTIONS** (`simple-print.js` buildFacts): In sections with div_facts Mix (a set of 2+ skills) splits the ÷ group
+   into three sections, ÷ sign / bracket / fraction, each with its own "Divide.", one third of the ÷ count each; Mixed up
+   (and div_facts alone) keeps them mixed cell by cell.
+5. **D-R4-1/2 planner** (`planFactRows`): rows packed over the fewest pages; one stretch per section for the whole print,
+   1.00-1.30 (1.4 / 1.7 removed; `print-sheet.js` clamps 1.3), chosen so every page but the last has <= 6 mm of white; when
+   + − × first cannot fill the pages, the ÷ section(s) go first. M Columns 9 Problems 50: one page (was 2, 73 + 105 mm).
+   The ÷ instruction's modelled 2 mm gap the page never drew is gone (SECTION_GAP_MM 0).
+6. **D-R4-3 BRKTRACK**: every bracket carries `data-ws-rowgeo` (drawn on its section's row geometry); a grid mixing forms
+   keeps bracket tracks <= 0.72 em (a deal that fitted 0.9 em drew "1 2)0").
+7. **D-R4-4 ONEDIGIT**: sections sharing a page take the smallest digit size (`maxPt` -> `factPt` cap in `factRowsLayout` /
+   `formRows`); the plan is redone at that size.
+8. **D-R4-5 ROWSAME**: the grid's heavy frame is added to its height (`cellH + 2 FRAME_MM / rows`), so a 2-row grid's rows
+   equal a 6-row grid's (37.27 vs 36.38 mm before).
+9. **D-R4-6**: `verticalPt` / `verticalFitPt` read the operator track the fact template draws (the tight 0.72 em over a
+   shorter second number), so mult_facts alone at L prints 28 pt (25 on page 1 full, 5 on page 2) and M + − × 24 pt.
+10. **D-R4-8**: Pages n with fewer pages than parts: the + − × rows and the ÷ section(s) share the page as sections, rows by
+    the shares, the page filled (Pages 1 = 1 page); the note says the division shares the page.
+11. **FOOTWRAP** (`nowrapFooterNames`): each skill name in a no-wrap span; **PDFIUM-RULES**: `background-clip: padding-box` on
+    fact cells (the frame and the first column's rule were two abutting anti-aliased edges).
+12. **Label** (owner decision 3): `data.js` "Division Facts (÷1 to ÷12)" (label only; SKILLS order untouched). The pupil name
+    reads the same. ws-content-audit --skill division:div_facts OK (the one note is the pre-existing variety note);
+    ws-code-snapshot OK.
+13. Docs: PAGE_TYPES PT-FRW-6, PT-FRW-9 (fraction, bracket), PT-FRW-12 (every page but the last full, 1.3 at most, one digit
+    size a page, Pages n sharing, div_facts Mix), WORKSHEET_DESIGN_STANDARD PG-11 agree.
+14. r1/r3 checks moved to the owner's rules: MIXFACTS reads sign runs per grid (the ÷ section on the page is its own grid);
+    r3 FILL exempts each set's last page (FULLPAGE holds the others to 8 mm).
+
+### Gates (one at a time, foreground)
+
+ws-simple-print --facts-print OK; full ws-simple-print OK; ws-layout-unit OK (1765); ws-print-lint --source kit (4 fact
+skills x 7 roles) S OK, M OK, L FAIL only on the pre-existing sub_facts#review H13 x4 (same set as r3 / the critic);
+ws-content-audit division:div_facts OK; ws-code-snapshot OK (732 codes); ws-boot-smoke OK; ws-pdf-preview OK;
+ws-screen-answer OK; ws-student-explorer OK; ws-chromebook-perf --only load OK; ws-stamp-assets + --check OK.
+
+### Evidence (design/status/facts-print-fix/r4/)
+
+- The owner's page: `owner-div-mix-S-c9-before-p2.png` (7fab88a7e), `owner-div-mix-S-c9-mixed-after-p1.png` (Mixed up: one
+  page, the ÷ Mix grid aligned), `owner-div-mix-S-c9-sections-after-p1.png` (In sections: three ÷ sections).
+- Problems 50: `pr50-S-p1.png`, `pr50-M-p1..2.png`, `pr50-L-p1..3.png`; Columns 9: `pr50-M-c9-p1.png`, `pr50-L-c9-p1..2.png`.
+- ÷ In sections at M: `div-sections-M-p1.png`; mult_facts alone at L: `mult-alone-pr30-L-p1..2.png`.
+
+### Open for the critic
+
+- The bracket's quotient slot is on the TOP line (its vinculum), not on the stacked / fraction answer line: the quotient is
+  written over the vinculum (PT-FRW-6), so "the same place" is held as "the same frame line in every bracket, level with the
+  dividends beside it" (SLOTPOS checks both). The bracket's frame keeps the third line empty under it.
+- When + − × first cannot fill every page, the ÷ section(s) print first (L Problems 50 / M 130 cases); a pure order change.
+- Each ÷ section's instruction is the library's "Divide." (three sections, three lines).
+
+### Speed notes (round 4)
+
+- Checks first again paid: one 31 s `--r4` run measured every defect class on 7fab88a7e, and each fix was measured at once.
+- Matching the owner's screenshot to its seed and dumping every page's grids / columns / pt / white found every root cause
+  in one pass. The two traps found on the way are now rules: a dialog check must set EVERY control (the dialog keeps the
+  last print's choices), and a page model must model only space the page really draws (the 2 mm section gap did not exist).

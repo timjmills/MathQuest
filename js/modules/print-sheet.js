@@ -157,8 +157,10 @@ function normaliseRequest(req = {}) {
             // from the caller's probe - one column count and digit size on every page and set of the print
             tracks: s && Number(s.tracks) > 0 ? clampInt(s.tracks, 1, 7, 0) : 0,
             ansTracks: s && Number(s.ansTracks) > 0 ? clampInt(s.ansTracks, 1, 7, 0) : 0,
-            // ... and the section's one row stretch for the whole print (PG-11; 1.3, up to 1.7 so no page is left half empty)
-            stretch: s && Number(s.stretch) >= 1 ? Math.min(1.7, Number(s.stretch)) : 0,
+            // ... and the section's one row stretch for the whole print (PG-11: at most 1.3, owner 2026-11-05)
+            stretch: s && Number(s.stretch) >= 1 ? Math.min(1.3, Number(s.stretch)) : 0,
+            // ... and the largest digit size a section may take (facts-print-fix r4: sections sharing a page take one size)
+            maxPt: s && Number(s.maxPt) > 0 ? Number(s.maxPt) : 0,
         }))
         .filter((s) => s.skills.length);
     // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
@@ -3837,7 +3839,8 @@ async function buildRoleSheet(n, metaOf) {
             factTracks: (n.sections[0] && n.sections[0].tracks) || 0,
             factAnsTracks: (n.sections[0] && n.sections[0].ansTracks) || 0,
             factStretch: (n.sections[0] && n.sections[0].stretch) || 0,
-            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch })) } : {}),
+            factPt: (n.sections[0] && n.sections[0].maxPt) || 0,
+            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt })) } : {}),
         } : {}),
     };
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's

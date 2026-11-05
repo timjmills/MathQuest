@@ -46,6 +46,7 @@
 //             rows (exact count, ÷ stacked on its own page, pages >= 60 % full or shared evenly, S != L, no wide cell);
 //             page k of n reads "k/n" and names its own skills; a + − × page is titled by its operations
 //   node tests/scripts/ws-simple-print.cjs --facts-print   these checks only (ws-precritic runs it for the fact skills)
+//   node tests/scripts/ws-simple-print.cjs --r4            the r4 checks alone (MIXBASE … ONEDIGIT, see factsR4)
 //   node tests/scripts/ws-simple-print.cjs              the gate (prints ws-simple-print: OK / FAIL)
 //   node tests/scripts/ws-simple-print.cjs --backtest   the same measure on the old dialog's page plan (one request
 //                                                        per small page, a section of 1-2 per skill): must FAIL
@@ -90,6 +91,8 @@ async function factsPrint(page) {
                 const pages = [...f.contentDocument.querySelectorAll('.ws-page')].map((pg) => ({
                     cells: pg.querySelectorAll('.ws-grid > .ws-cell:not(.blankrun)').length,
                     ops: [...pg.querySelectorAll('.ws-grid.facts > .ws-cell')].map((c) => { const o = c.querySelector('.ws-fact .op'); return o ? o.textContent.trim() : (c.querySelector('[data-ws-cell]') || c).getAttribute('data-ws-cell') || '?'; }),
+                    // (r4: each grid's signs - a Pages 1 page holds the + − × grid AND the ÷ section, which is its own grid)
+                    grids: [...pg.querySelectorAll('.ws-grid.facts')].map((g) => [...g.querySelectorAll(':scope > .ws-cell')].map((c) => { const o = c.querySelector('.ws-fact .op'); return o ? o.textContent.trim() : (c.querySelector('[data-ws-cell]') || c).getAttribute('data-ws-cell') || '?'; })),
                 }));
                 f.remove();
                 return { geom: g, pages };
@@ -112,10 +115,11 @@ async function factsPrint(page) {
         const per = (x) => x.look.pages.map((p) => p.cells).join('/');
         if (per(M) !== per(S)) fails.push(`${tag}: MIXFACTS problems a page Mixed up ${per(M)} vs In sections ${per(S)}`);
         const run = (ops) => { let best = 0, k = 0; ops.forEach((o, i) => { k = i && ops[i - 1] === o ? k + 1 : 1; best = Math.max(best, k); }); return best; };
-        M.look.pages.forEach((p, i) => {
-            const kinds = new Set(p.ops);
-            if (kinds.size > 1 && run(p.ops) > 2) fails.push(`${tag}: MIXFACTS Mixed up page ${i + 1} has ${run(p.ops)} of one sign in a row (${p.ops.slice(0, 20).join('')}…)`);
-        });
+        // (the run is read within each grid: the ÷ section after the + − × grid is its own section, PT-FRW-6)
+        M.look.pages.forEach((p, i) => (p.grids || [p.ops]).forEach((ops) => {
+            const kinds = new Set(ops);
+            if (kinds.size > 1 && run(ops) > 2) fails.push(`${tag}: MIXFACTS Mixed up page ${i + 1} has ${run(ops)} of one sign in a row (${ops.slice(0, 20).join('')}…)`);
+        }));
         if (M.look.pages[0] && new Set(M.look.pages[0].ops).size < 2) fails.push(`${tag}: MIXFACTS Mixed up page 1 holds one sign only`);
         rows.push(`${tag} Mixed up page 1 signs: ${(M.look.pages[0] || { ops: [] }).ops.join('')} (longest run ${run((M.look.pages[0] || { ops: [] }).ops)}); In sections longest run ${run((S.look.pages[0] || { ops: [] }).ops)}`);
         // ROWRULES + SIGNGAP on both prints
@@ -454,10 +458,11 @@ async function factsSetPage(page) {
                     pts[div ? 'div' : 'main'].add(g.pt);
                     for (const op of g.ops) { const i = ids.indexOf(SIGN[op]); if (i >= 0) per[i]++; }
                 }
-                // FILL: white <= one row (the last page of a set too, unless the set is one page)
+                // FILL: white <= one row on every page but the set's LAST (owner 2026-11-05: "only the last page may run
+                // short"; r4 FULLPAGE holds the other pages to 8 mm)
                 const lastG = p.grids[p.grids.length - 1];
                 const isLast = k === ps.length - 1;
-                if (p.white !== null && lastG && p.white > lastG.rowMm + fullWhite + 1.5 && (!isLast || ps.length > 1)) fails.push(`${tag} set ${sn} page ${k + 1} of ${ps.length}: FILL ${p.white.toFixed(1)} mm of white under the grid, a row is ${lastG.rowMm.toFixed(1)} mm`);
+                if (p.white !== null && lastG && p.white > lastG.rowMm + fullWhite + 1.5 && !isLast) fails.push(`${tag} set ${sn} page ${k + 1} of ${ps.length}: FILL ${p.white.toFixed(1)} mm of white under the grid, a row is ${lastG.rowMm.toFixed(1)} mm`);
             });
             const want = r.c.how === 'problems' ? r.asked : r.counts;
             if (per.join() !== (want || []).join()) fails.push(`${tag} set ${sn}: SETPAGE printed ${per.join('/')} per skill, ${r.c.how === 'problems' ? 'the request splits to' : 'the chips say'} ${(want || []).join('/')}`);
@@ -567,6 +572,401 @@ async function factsSetPage(page) {
     return { rows, fails };
 }
 
+/**
+ * facts-print-fix r4 (critic 2026-11-05 on 7fab88a7e; owner decisions 2026-11-05). Every check measures the PRINTED document
+ * (sheetDocument in a frame), and PDFIUM-RULES the PDF rasterised by pdfium:
+ *   MIXBASE   a grid mixing ÷ forms (stacked ÷, fraction, bracket; + − × stacked too): in every row the problem digits sit on
+ *             ONE baseline (the lowest digit line: divisor / denominator / dividend, ±1 mm), every item's ink is centred
+ *             across its cell (±1.5 mm), and the row's items are centred down the cell below the number tab (±1.5 mm)
+ *   SLOTPOS   every cell's answer slot is VISIBLE (a drawn rule of >= 0.75 pt along its top or bottom edge: the sum rule, the
+ *             answer line, the vinculum) and sits in one place in its section: the slots under a stacked fact and a fraction
+ *             end on one line (±1 mm), a bracket's quotient slot ends on the row's top digit line (±1.5 mm) - it is written
+ *             over the vinculum (PT-FRW-6)
+ *   FRACEQ    a fraction fact's "=" ink starts >= 0.25 em after the bar, and the fraction with its "=" is centred (±1 mm)
+ *   CLEAR     a bracket or fraction fact's ink keeps >= 2 mm from its cell's border (tests/lib/ws-fact-geom.cjs)
+ *   BRKTRACK  a bracket on a fact-rows grid takes its section's row geometry (data-ws-rowgeo), never the 1 em track
+ *             fallback ("12)0" printed as "1 2)0" on a shared Problems page), and its divisor's digits keep < 0.45 em apart
+ *             (< 0.3 em in a grid mixing forms: the stacked fact's 0.72 em tracks)
+ *   PDFIUM-RULES  the PDF of a fact print rasterised by pdfium at 72 and 93 dpi: every full grid shows cols + 1 vertical and
+ *             rows + 1 horizontal rules (gap-drawn rules conflate and vanish; tests/lib/ws-pdfium-rules.py); SKIPPED, and said,
+ *             when pypdfium2 is not installed
+ *   FOOTWRAP  no line break inside a skill's name in a footer ("Division Facts (1-" / "12)")
+ *   DIVSECTIONS  ÷ Mix In sections: one section per ÷ form, each with its own instruction; Mixed up: the forms in one grid
+ *   SIZEMIX   ÷ Mix, Columns Auto: at most 6 columns at M and 5 at L, and the digits grow S < M < L (the dialog too)
+ *   FULLPAGE  every pupil page but a set's LAST: white under the grid <= 8 mm beyond a full page's own; no row stretched past
+ *             1.3 x its minimum (PG-11); S / M / L × Auto / 5 / 9 × Problems 30 / 50 / 63 / 130 × both arrangements, the
+ *             owner's Pages 1, and mult_facts alone at L
+ *   ONEDIGIT  one digit size on a page (a shared page printed + − × at 20 pt beside ÷ at 24 pt)
+ *   ROWSAME   a section's rows are one height (±0.3 mm) on every page of a set (PG-11; 37.27 vs 36.38 mm: the frame came
+ *             out of a short grid's rows)
+ * The owner's page (images/17.png: seed 926447, ÷ Mix, Columns 9, Pages 1, Small) is a required case.
+ */
+const R4_MEASURE = `(doc) => {
+    const win = doc.defaultView;
+    const mmPx = 96 / 25.4;
+    const cv = doc.createElement('canvas').getContext('2d');
+    const glyph = (tn) => {
+        const cs = win.getComputedStyle(tn.parentElement);
+        cv.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+        const mt = cv.measureText(tn.textContent);
+        const rg = doc.createRange(); rg.selectNodeContents(tn);
+        const b = rg.getBoundingClientRect();
+        const base = b.top + mt.fontBoundingBoxAscent;
+        return { l: b.left - mt.actualBoundingBoxLeft, r: b.left + mt.actualBoundingBoxRight, t: base - mt.actualBoundingBoxAscent, b: base + mt.actualBoundingBoxDescent, base, em: parseFloat(cs.fontSize), txt: tn.textContent.trim() };
+    };
+    const lineOf = (e) => {
+        const es = win.getComputedStyle(e);
+        const out = [];
+        const seen = (s) => parseFloat(es['border' + s + 'Width']) >= 0.9 && es['border' + s + 'Style'] !== 'none' && !/rgba\\(0, 0, 0, 0\\)|transparent/.test(es['border' + s + 'Color']);
+        const b = e.getBoundingClientRect();
+        if (!b.width) return out;
+        if (seen('Top')) out.push({ y: b.top, l: b.left, r: b.right });
+        if (seen('Bottom')) out.push({ y: b.bottom, l: b.left, r: b.right });
+        return out;
+    };
+    return [...doc.querySelectorAll('.ws-page')].map((pg) => {
+        const pr = pg.getBoundingClientRect();
+        const foot = pg.querySelector('footer.ws-foot');
+        // FOOTWRAP: each name in the footer's left part on one line
+        const wraps = [];
+        const fl = foot && foot.querySelector('span');
+        if (fl) {
+            const nodes = []; const tw = doc.createTreeWalker(fl, 4); let tn; let all = '';
+            while ((tn = tw.nextNode())) { nodes.push([tn, all.length]); all += tn.textContent; }
+            let at = 0;
+            for (const label of all.split(', ')) {
+                const s = all.indexOf(label, at); at = s + label.length;
+                if (s < 0 || !label.trim()) continue;
+                const pos = (k) => { let n = nodes[0]; for (const x of nodes) if (x[1] <= k) n = x; return [n[0], k - n[1]]; };
+                const rg = doc.createRange(); const a = pos(s), z = pos(s + label.length);
+                try { rg.setStart(a[0], a[1]); rg.setEnd(z[0], Math.min(z[1], z[0].textContent.length)); } catch (e) { continue; }
+                const tops = [...new Set([...rg.getClientRects()].filter((q) => q.width > 0.5).map((q) => Math.round(q.top / 3)))];
+                if (tops.length > 1) wraps.push(label);
+            }
+        }
+        const grids = [...pg.querySelectorAll('.ws-grid')].map((g) => {
+            const gb = g.getBoundingClientRect();
+            const cells = [...g.querySelectorAll(':scope > .ws-cell')];
+            const prev = g.previousElementSibling;
+            const instr = prev && /instr/.test(prev.className) ? prev.textContent.trim() : (prev && prev.querySelector && prev.querySelector('.ws-instrline') ? prev.querySelector('.ws-instrline').textContent.trim() : '');
+            return {
+                cols: win.getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length, facts: g.classList.contains('facts'),
+                box: [(gb.left - pr.left) / mmPx, (gb.top - pr.top) / mmPx, (gb.right - pr.left) / mmPx, (gb.bottom - pr.top) / mmPx],
+                bottom: gb.bottom, instr, blanks: cells.filter((c) => c.classList.contains('blankrun')).length,
+                cells: cells.filter((c) => !c.classList.contains('blankrun')).map((c) => {
+                    const cr = c.getBoundingClientRect();
+                    const tab = c.querySelector('.ws-tab');
+                    const kind = c.querySelector('[data-ws-ops="division"]') ? 'bracket' : c.querySelector('[data-ws-notation="fraction"]') ? 'fraction' : c.querySelector('.ws-fact') ? 'stacked' : 'other';
+                    const op = (c.querySelector('.ws-fact .op') || {}).textContent;
+                    const texts = []; const tw = doc.createTreeWalker(c, 4); let tn;
+                    while ((tn = tw.nextNode())) { if (!tn.textContent.trim() || tn.parentElement.closest('.ws-tab, [data-ws-slot]')) continue; texts.push(glyph(tn)); }
+                    const lines = []; const slotLines = [];
+                    for (const e of c.querySelectorAll('*')) {
+                        if (e.closest('.ws-tab')) continue;
+                        (e.closest('[data-ws-slot]') ? slotLines : lines).push(...lineOf(e));
+                        if (e.tagName.toLowerCase() === 'path') { const b = e.getBoundingClientRect(); lines.push({ y: b.top, l: b.left, r: b.right, svg: 1, t: b.top, b: b.bottom }); }
+                    }
+                    const slots = [...c.querySelectorAll('[data-ws-slot]')].map((e) => e.getBoundingClientRect()).filter((b) => b.width);
+                    const slot = slots.length ? { t: Math.min(...slots.map((b) => b.top)), b: Math.max(...slots.map((b) => b.bottom)), l: Math.min(...slots.map((b) => b.left)), r: Math.max(...slots.map((b) => b.right)) } : null;
+                    if (slot) {
+                        const near = (y) => Math.min(Math.abs(y - slot.t), Math.abs(y - slot.b)) <= 1.5 * mmPx;
+                        slot.visible = [...lines, ...slotLines].some((ln) => !ln.svg && near(ln.y) && Math.min(ln.r, slot.r) - Math.max(ln.l, slot.l) >= 0.5 * (slot.r - slot.l));
+                    }
+                    const xs = [...texts.map((x) => [x.l, x.r]), ...lines.map((x) => [x.l, x.r])];
+                    const ys = [...texts.map((x) => [x.t, x.b]), ...lines.filter((x) => !x.svg).map((x) => [x.y, x.y]), ...lines.filter((x) => x.svg).map((x) => [x.t, x.b])];
+                    const ink = xs.length ? { l: Math.min(...xs.map((x) => x[0])), r: Math.max(...xs.map((x) => x[1])), t: Math.min(...ys.map((x) => x[0])), b: Math.max(...ys.map((x) => x[1])) } : null;
+                    const digits = texts.filter((x) => /\\d/.test(x.txt));
+                    const out = { kind, op, cell: { l: cr.left, r: cr.right, t: cr.top, b: cr.bottom }, tabB: tab ? tab.getBoundingClientRect().bottom : cr.top, ink, slot,
+                        base: digits.length ? Math.max(...digits.map((x) => x.base)) : null, top: digits.length ? Math.min(...digits.map((x) => x.base)) : null };
+                    const fe = c.querySelector('.ws-fact, .ws-ops, .ws-eq');
+                    out.pt = fe ? Math.round(parseFloat(win.getComputedStyle(fe).fontSize) * 72 / 96 * 10) / 10 : 0;
+                    if (kind === 'fraction') {
+                        const bar = [...c.querySelectorAll('.ws-divfrac span')].find((e) => parseFloat(win.getComputedStyle(e).borderBottomWidth) >= 1.5);
+                        const eqn = [...c.querySelectorAll('.o')].find((e) => e.textContent.trim() === '=');
+                        if (bar && eqn && eqn.firstChild) {
+                            const bb = bar.getBoundingClientRect(); const eg = glyph(eqn.firstChild);
+                            out.eqGapEm = (eg.l - bb.right) / eg.em;
+                            out.fracOff = ((Math.min(bb.left, eg.l) + Math.max(bb.right, eg.r)) / 2 - (cr.left + cr.right) / 2) / mmPx;
+                        }
+                    }
+                    if (kind === 'bracket') {
+                        const grp = c.querySelector('[role="group"]');
+                        const ops = c.querySelector('[data-ws-ops="division"]');
+                        out.rowgeo = !!(c.querySelector('[data-ws-rowgeo]'));
+                        if (grp) { const tr = win.getComputedStyle(grp).gridTemplateColumns.split(' ')[0]; out.trackEm = parseFloat(tr) / parseFloat(win.getComputedStyle(grp).fontSize); }
+                        // the divisor's digits (the spans before the arc on row 2)
+                        const dv = [...(grp ? grp.children : [])].filter((e) => /grid-row:\\s*2/.test(e.getAttribute('style') || '') && /^\\d$/.test(e.textContent.trim()));
+                        const lab = grp ? (grp.getAttribute('aria-label') || '') : '';
+                        const divisor = (/divided by (\\d+)/.exec(lab) || [])[1] || '';
+                        if (divisor.length > 1 && dv.length >= 2) { const a = glyph(dv[0].firstChild), z = glyph(dv[1].firstChild); out.divGapEm = (z.l - a.r) / a.em; }
+                        out.label = lab;
+                        if (ops) out.pt = Math.round(parseFloat(win.getComputedStyle(ops).fontSize) * 72 / 96 * 10) / 10;
+                    }
+                    return out;
+                }),
+            };
+        });
+        const last = grids.length ? Math.max(...grids.map((g) => g.bottom)) : 0;
+        return { key: /key/i.test(pg.className) || !!pg.querySelector('[data-ws-key-ans]'), grids, wraps,
+            foot: foot ? foot.textContent.replace(/\\s+/g, ' ').trim() : '',
+            white: foot && grids.length ? (Math.min(foot.getBoundingClientRect().top, (pg.querySelector('.ws-body') || foot).getBoundingClientRect().bottom) - last) / mmPx : null,
+            setNo: ((/Set (\\d+) of/.exec(foot ? foot.textContent : '') || [])[1]) || '1' };
+    });
+}`;
+
+async function factsR4(app) {
+    const page = app.page;
+    const rows = [], fails = [];
+    const fsx = require('fs');
+    const pathx = require('path');
+    const os = require('os');
+    const { spawnSync } = require('child_process');
+    const DIV_MIX = OWNER.map((s) => (s.skillId === 'div_facts' ? Object.assign({}, s, { opts: { divForm: 'mix' } }) : s));
+    const cases = [];
+    const C = (tag, list, o, extra = {}) => cases.push(Object.assign({ tag, list, o: Object.assign({ how: 'pages', n: 1, sets: 1, size: 'S', cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o) }, extra));
+    // the owner's page (images/17.png) and the ÷ Mix family
+    C('OWNER ÷ Mix p1 S c9 mixed', DIV_MIX, { size: 'S', cols: 9, seed: 926447, arrange: 'mixed' }, { mix: true, pdf: true, owner: true });
+    C('OWNER ÷ Mix p1 S c9 sections', DIV_MIX, { size: 'S', cols: 9, seed: 926447 }, { mix: true, divsec: true, owner: true });
+    for (const size of SIZES) {
+        for (const arrange of ['mixed', 'sections']) {
+            C(`÷ Mix set pages 1 @${size} ${arrange}`, DIV_MIX, { size, arrange, seed: 926447 }, { mix: true, divsec: arrange === 'sections', sizemix: true });
+            C(`÷ Mix set problems 63 @${size} ${arrange}`, DIV_MIX, { size, arrange, how: 'problems', n: 63, seed: 926447 }, { mix: true, divsec: arrange === 'sections', sizemix: true });
+        }
+        C(`÷ Mix alone pages 1 @${size}`, [DIV_MIX[3]], { size, seed: 926447 }, { mix: true, sizemix: true });
+    }
+    // FULLPAGE: Problems mode over sizes, columns, counts and both arrangements; the owner's Pages 1; mult_facts alone at L
+    for (const size of SIZES) for (const cols of ['auto', 5, 9]) for (const n of [30, 50, 63, 130]) for (const arrange of ['sections', 'mixed']) C(`owner problems ${n} @${size} cols ${cols} ${arrange}`, OWNER, { size, cols, how: 'problems', n, arrange });
+    for (const size of SIZES) C(`owner pages 1 @${size}`, OWNER, { size }, { pdf: size === 'S' });
+    C('mult_facts alone problems 30 @L', [OWNER[2]], { size: 'L', how: 'problems', n: 30 });
+    C('mult_facts alone pages 1 @L', [OWNER[2]], { size: 'L' });
+    const res = await page.evaluate(async ({ cases, src }) => {
+        const m = await import('/js/modules/simple-print.js');
+        const measure = new Function('return ' + src)();
+        const out = [];
+        for (const c of cases) {
+            const L = c.list.map((s) => Object.assign({ amt: '' }, s));
+            let b;
+            try { b = await m.buildSets(L, c.o); } catch (e) { out.push({ err: String(e && e.stack || e) }); continue; }
+            const html = window.sheetDocument(b.doc, 'm', { paper: 'A4' });
+            const f = document.createElement('iframe');
+            f.style.cssText = 'position:fixed;left:-3000px;top:0;width:900px;height:1200px;border:0';
+            document.body.appendChild(f);
+            await new Promise((r) => { f.onload = r; f.srcdoc = html; });
+            for (let i = 0; i < 40; i++) { if (f.contentDocument.documentElement.getAttribute('data-ws-fonts') === 'ready') break; await new Promise((x) => setTimeout(x, 100)); }
+            const pages = measure(f.contentDocument);
+            f.remove();
+            const plan = b.factPlan ? { lay: b.factPlan.lay.map((l) => ({ hMin: l.hMin, cols: l.cols })), rows: b.factPlan.rows } : null;
+            out.push({ line: m.summaryLine(b, c.o), pages, plan, factPages: b.factPages || null, html: c.pdf ? html : '' });
+        }
+        return out;
+    }, { cases, src: R4_MEASURE });
+    const mm = (px) => px * 25.4 / 96;
+    // a full Pages-mode page's own white under its grid
+    const fullWhite = Math.max(0, Math.min(...res.filter((r, i) => !r.err && cases[i].o.how === 'pages').flatMap((r) => r.pages.filter((p) => !p.key && p.white !== null).map((p) => p.white))));
+    rows.push(`R4 ${cases.length} prints; a full page shows ${fullWhite.toFixed(1)} mm under its grid`);
+    const sizePts = {};
+    const pdfJobs = [];
+    res.forEach((r, ci) => {
+        const c = cases[ci];
+        const tag = c.tag;
+        if (r.err) { fails.push(`${tag}: build failed ${r.err.slice(0, 200)}`); return; }
+        const pupil = r.pages.filter((p) => !p.key);
+        const fact = (g) => g.facts && g.cells.length;
+        // FOOTWRAP
+        for (const [k, p] of r.pages.entries()) if (p.wraps.length) fails.push(`${tag} page ${k + 1}: FOOTWRAP the footer breaks inside "${p.wraps.join('", "')}"`);
+        // ONEDIGIT
+        pupil.forEach((p, k) => {
+            const pts = [...new Set(p.grids.filter(fact).flatMap((g) => g.cells.map((x) => x.pt)).filter(Boolean))];
+            if (pts.length > 1) fails.push(`${tag} page ${k + 1}: ONEDIGIT ${pts.join(' / ')} pt on one page`);
+        });
+        // FULLPAGE: white on every page but a set's last; stretch <= 1.3 on every grid
+        const bySet = {};
+        pupil.forEach((p) => { (bySet[p.setNo] = bySet[p.setNo] || []).push(p); });
+        for (const ps of Object.values(bySet)) ps.forEach((p, k) => {
+            if (k < ps.length - 1 && p.white !== null && p.white > fullWhite + 8) fails.push(`${tag} page ${k + 1} of ${ps.length}: FULLPAGE ${p.white.toFixed(1)} mm of white under the grid (a full page shows ${fullWhite.toFixed(1)}; at most 8 more)`);
+            // the minimum row height of each grid: the engine's own record (factPages), else the plan's layout
+            const fp = r.factPages && r.factPages[k];
+            const gs = p.grids.filter(fact);
+            const live = r.plan && r.plan.rows[k] ? r.plan.rows[k].map((n, g) => (n ? g : -1)).filter((g) => g >= 0) : [];
+            gs.forEach((g, j) => {
+                const hMin = fp && fp[j] ? fp[j].hMin : r.plan && live[j] !== undefined ? r.plan.lay[live[j]].hMin : 0;
+                const h = mm(g.cells[0].cell.b - g.cells[0].cell.t);
+                if (hMin && h > hMin * 1.3 + 0.6) fails.push(`${tag} page ${k + 1}: FULLPAGE rows ${h.toFixed(1)} mm, ${(h / hMin).toFixed(2)} x their minimum ${hMin.toFixed(1)} mm (PG-11: at most 1.3)`);
+            });
+        });
+        // ROWSAME (D-R4-5, PG-11 "identical from page to page"): a section's rows are one height on every page of a set
+        for (const ps of Object.values(bySet)) {
+            const hs = {};
+            ps.forEach((p) => p.grids.filter(fact).forEach((g) => {
+                const key = g.cells.some((x) => x.kind === 'bracket' || x.kind === 'fraction' || x.op === '÷') ? [...new Set(g.cells.map((x) => x.kind))].sort().join('+') : 'main';
+                (hs[key] = hs[key] || []).push(mm(g.cells[0].cell.b - g.cells[0].cell.t));
+            }));
+            for (const [key, v] of Object.entries(hs)) if (Math.max(...v) - Math.min(...v) > 0.3) fails.push(`${tag}: ROWSAME the ${key === 'main' ? '+ − ×' : `÷ (${key})`} rows are ${v.map((x) => x.toFixed(2)).join(' / ')} mm on the pages of one set`);
+        }
+        if (/problems/.test(tag) && /owner|mult/.test(tag)) rows.push(`${tag}: ${r.line} · white ${pupil.map((p) => (p.white === null ? '-' : p.white.toFixed(0))).join('/')} mm · rows ${pupil.map((p) => p.grids.filter(fact).map((g) => mm(g.cells[0].cell.b - g.cells[0].cell.t).toFixed(1)).join('+')).join(' | ')}`);
+        // the ÷-form checks
+        if (c.mix) {
+            const forms = new Set(['stacked', 'fraction', 'bracket']);
+            const divGrids = [];
+            pupil.forEach((p, k) => p.grids.filter(fact).forEach((g, gi) => {
+                const kinds = new Set(g.cells.map((x) => x.kind));
+                const isDiv = g.cells.some((x) => x.kind === 'bracket' || x.kind === 'fraction' || x.op === '÷');
+                if (isDiv) divGrids.push({ g, k, kinds });
+                if ([...kinds].filter((x) => forms.has(x)).length > 1) {
+                    // rows: cells grouped by their top
+                    const byRow = new Map();
+                    g.cells.forEach((x) => { const key = Math.round(x.cell.t); if (!byRow.has(key)) byRow.set(key, []); byRow.get(key).push(x); });
+                    let worstBase = 0, worstH = 0, worstV = 0, worstSlot = 0, worstBr = 0, hidden = 0;
+                    for (const cs of byRow.values()) {
+                        const bases = cs.map((x) => x.base).filter((v) => v !== null);
+                        worstBase = Math.max(worstBase, mm(Math.max(...bases) - Math.min(...bases)));
+                        for (const x of cs) if (x.ink) worstH = Math.max(worstH, Math.abs(mm((x.ink.l + x.ink.r) / 2 - (x.cell.l + x.cell.r) / 2)));
+                        // the row's items (ink and slots) centred down the cell, below the number tab
+                        const top = Math.min(...cs.map((x) => Math.min(x.ink ? x.ink.t : Infinity, x.slot ? x.slot.t : Infinity)));
+                        const bot = Math.max(...cs.map((x) => Math.max(x.ink ? x.ink.b : -Infinity, x.slot ? x.slot.b : -Infinity)));
+                        const c0 = cs[0];
+                        const areaT = c0.tabB + 96 / 25.4, areaB = c0.cell.b - 2 * 96 / 25.4;
+                        worstV = Math.max(worstV, Math.abs(mm((top + bot) / 2 - (areaT + areaB) / 2)));
+                        // slots: under-slots end on one line; a bracket's slot ends on the row's top digit line
+                        const under = cs.filter((x) => x.kind !== 'bracket' && x.slot).map((x) => x.slot.b);
+                        if (under.length > 1) worstSlot = Math.max(worstSlot, mm(Math.max(...under) - Math.min(...under)));
+                        const line1 = cs.filter((x) => x.kind !== 'bracket' && x.top !== null).map((x) => x.top);
+                        // (the slot's foot sits on the vinculum, the top line's digits' baseline 0.2 em above it: 0.3 em or 1.5 mm)
+                        for (const x of cs.filter((y) => y.kind === 'bracket' && y.slot)) if (line1.length) worstBr = Math.max(worstBr, Math.abs(mm(x.slot.b - Math.max(...line1))) - Math.max(0, 0.3 * x.pt * 25.4 / 72 - 1.5));
+                        hidden += cs.filter((x) => !x.slot || !x.slot.visible).length;
+                    }
+                    const at = `${tag} page ${k + 1} grid ${gi + 1}`;
+                    if (worstBase > 1) fails.push(`${at}: MIXBASE the digits of a row sit on baselines ${worstBase.toFixed(1)} mm apart (one baseline: ±1 mm)`);
+                    if (worstH > 1.5) fails.push(`${at}: MIXBASE an item is ${worstH.toFixed(1)} mm off its cell's centre across (±1.5 mm)`);
+                    if (worstV > 1.5) fails.push(`${at}: MIXBASE a row's items are ${worstV.toFixed(1)} mm off the cell's centre down (±1.5 mm)`);
+                    if (worstSlot > 1) fails.push(`${at}: SLOTPOS the answer slots of a row end ${worstSlot.toFixed(1)} mm apart (±1 mm)`);
+                    if (worstBr > 1.5) fails.push(`${at}: SLOTPOS a bracket's quotient slot ends ${worstBr.toFixed(1)} mm off the row's top digit line (±1.5 mm)`);
+                    if (hidden) fails.push(`${at}: SLOTPOS ${hidden} cell(s) with no visible answer slot`);
+                    if (c.owner || /S c9|@S/.test(tag)) rows.push(`${at}: MIXBASE baseline spread ${worstBase.toFixed(2)} mm, across ${worstH.toFixed(2)}, down ${worstV.toFixed(2)}; SLOTPOS ${worstSlot.toFixed(2)} / bracket ${worstBr.toFixed(2)} mm, hidden ${hidden}`);
+                }
+                for (const x of g.cells) {
+                    if (x.kind === 'fraction' && x.eqGapEm !== undefined) {
+                        if (x.eqGapEm < 0.25) fails.push(`${tag} page ${k + 1}: FRACEQ "=" ${x.eqGapEm.toFixed(2)} em after the bar (>= 0.25 em)`);
+                        if (Math.abs(x.fracOff) > 1) fails.push(`${tag} page ${k + 1}: FRACEQ the fraction and its "=" ${x.fracOff.toFixed(1)} mm off centre (±1 mm)`);
+                    }
+                    if (x.kind === 'bracket' && g.cols >= 5) {
+                        if (!x.rowgeo) fails.push(`${tag} page ${k + 1}: BRKTRACK "${x.label}" is not drawn on its section's row geometry (track ${x.trackEm ? x.trackEm.toFixed(3) : '?'} em)`);
+                        // (in a grid mixing forms the digits keep the stacked fact's spacing: 0.3 em; else 0.45 em)
+                        const mixG = new Set(g.cells.map((y) => y.kind)).size > 1;
+                        if (x.divGapEm !== undefined && x.divGapEm > (mixG ? 0.3 : 0.45)) fails.push(`${tag} page ${k + 1}: BRKTRACK "${x.label}" divisor digits ${x.divGapEm.toFixed(2)} em apart (reads as two numbers)`);
+                    }
+                    if ((x.kind === 'bracket' || x.kind === 'fraction') && x.ink) {
+                        const cl = Math.min(mm(x.ink.l - x.cell.l), mm(x.cell.r - x.ink.r));
+                        if (cl < 1.95) fails.push(`${tag} page ${k + 1}: CLEAR "${x.label || x.kind}" ink ${cl.toFixed(2)} mm from its cell's border (>= 2 mm)`);
+                    }
+                }
+            }));
+            // DIVSECTIONS
+            if (c.divsec !== undefined && c.list.length > 1) {
+                const formGrids = divGrids.filter((d) => [...d.kinds].some((x) => forms.has(x)));
+                if (c.o.arrange === 'sections') {
+                    const mixedG = formGrids.filter((d) => [...d.kinds].filter((x) => forms.has(x)).length > 1);
+                    if (mixedG.length) fails.push(`${tag}: DIVSECTIONS In sections prints ${mixedG.length} grid(s) mixing ÷ forms (one section per form)`);
+                    const seen = new Set(formGrids.flatMap((d) => [...d.kinds]));
+                    for (const f of ['stacked', 'fraction', 'bracket']) if (!seen.has(f)) fails.push(`${tag}: DIVSECTIONS no ${f} section`);
+                    const noInstr = formGrids.filter((d) => !d.g.instr);
+                    if (noInstr.length) fails.push(`${tag}: DIVSECTIONS ${noInstr.length} ÷ section(s) without their own instruction`);
+                } else if (!formGrids.some((d) => [...d.kinds].filter((x) => forms.has(x)).length > 1)) fails.push(`${tag}: DIVSECTIONS Mixed up does not mix the ÷ forms in one grid`);
+                rows.push(`${tag}: ÷ grids ${formGrids.map((d) => `[${[...d.kinds].join('+')}${d.g.instr ? ` "${d.g.instr}"` : ''}]`).join(' ')}`);
+            }
+            // SIZEMIX
+            if (c.sizemix) {
+                const dg = divGrids.map((d) => d.g);
+                const cols = Math.max(0, ...dg.map((g) => g.cols));
+                const pt = Math.max(0, ...dg.flatMap((g) => g.cells.map((x) => x.pt)));
+                const cap = { S: 9, M: 6, L: 5 }[c.o.size];
+                if (cols > cap) fails.push(`${tag}: SIZEMIX ÷ prints ${cols} columns at ${c.o.size} Auto (at most ${cap})`);
+                const key = c.tag.replace(/@[SML]/, '@');
+                (sizePts[key] = sizePts[key] || {})[c.o.size] = pt;
+                rows.push(`${tag}: ÷ ${cols} columns at ${pt} pt · ${r.line}`);
+            }
+        }
+        if (c.pdf) pdfJobs.push({ tag, html: r.html, pages: r.pages });
+    });
+    for (const [key, by] of Object.entries(sizePts)) {
+        if (by.S && by.M && !(by.S < by.M)) fails.push(`${key}: SIZEMIX the ÷ digits do not grow from S to M (${by.S} / ${by.M} pt)`);
+        if (by.M && by.L && !(by.M < by.L)) fails.push(`${key}: SIZEMIX the ÷ digits do not grow from M to L (${by.M} / ${by.L} pt)`);
+    }
+    // SIZEMIX through the real dialog: the owner's set with ÷ Mix at Medium, Print pressed
+    const ui = await page.evaluate(async ({ list, src }) => {
+        const m = await import('/js/modules/simple-print.js');
+        const measure = new Function('return ' + src)();
+        const sleep = (t) => new Promise((x) => setTimeout(x, t));
+        const idle = async () => { await sleep(80); for (let i = 0; i < 1200; i++) { const s = m.simplePrintState(); if (s && s.built && !s.busy) return; await sleep(150); } throw new Error('never idle'); };
+        const $ = (q) => document.querySelector(q);
+        const out = {};
+        for (const size of ['M', 'L']) {
+            try { localStorage.removeItem('mq_simple_print'); } catch (e) { /* none */ }
+            try { window.closeSimplePrint(); } catch (e) { /* none */ }
+            window.openSimplePrint(list, { from: 'tray' });
+            await idle();
+            // every control set (the dialog keeps the last print's choices in memory): Pages 1, one set, Columns Auto
+            const set = (q, v, ev = 'input') => { const el = $(q); el.value = String(v); el.dispatchEvent(new Event(ev, { bubbles: true })); };
+            $('[data-sp="how"][data-v="pages"]').click(); await idle();
+            set('#spN', 1); await idle();
+            set('#spSets', 1); await idle();
+            set('#spCols', 'auto', 'change'); await idle();
+            if (!$('.sp-more').open) { $('[data-sp="more"]').click(); await sleep(100); }
+            $('[data-sp="arrange"][data-v="sections"]').click(); await idle();
+            $(`[data-sp="size"][data-v="${size}"]`).click(); await idle();
+            const old = document.getElementById('tvPrintFrame'); if (old) old.remove();
+            const fr = document.createElement('iframe'); fr.id = 'tvPrintFrame'; fr.style.cssText = 'position:fixed;left:-3000px;top:0;width:900px;height:1200px;border:0;'; document.body.appendChild(fr);
+            window.__printed = 0; fr.contentWindow.print = () => { window.__printed = 1; };
+            $('[data-sp="print"]').click();
+            for (let i = 0; i < 300 && !window.__printed; i++) await sleep(150);
+            const doc = document.getElementById('tvPrintFrame').contentDocument;
+            for (let i = 0; i < 40; i++) { if (doc.documentElement.getAttribute('data-ws-fonts') === 'ready') break; await sleep(100); }
+            out[size] = { printed: !!window.__printed, line: $('#spLine').textContent, pages: measure(doc) };
+            window.closeSimplePrint();
+        }
+        return out;
+    }, { list: DIV_MIX.map((s) => Object.assign({ amt: '' }, s)), src: R4_MEASURE });
+    for (const [size, u] of Object.entries(ui)) {
+        if (!u.printed) { fails.push(`UI ÷ Mix @${size}: Print never reached the print frame`); continue; }
+        const dg = u.pages.filter((p) => !p.key).flatMap((p) => p.grids.filter((g) => g.facts && g.cells.some((x) => x.kind === 'bracket' || x.kind === 'fraction')));
+        const cols = Math.max(0, ...dg.map((g) => g.cols));
+        const pt = Math.max(0, ...dg.flatMap((g) => g.cells.map((x) => x.pt)));
+        const cap = { M: 6, L: 5 }[size];
+        rows.push(`UI ÷ Mix @${size}: ÷ ${cols} columns at ${pt} pt · ${u.line}`);
+        if (!dg.length) fails.push(`UI ÷ Mix @${size}: SIZEMIX no ÷ form grid printed`);
+        if (cols > cap) fails.push(`UI ÷ Mix @${size}: SIZEMIX ÷ prints ${cols} columns (at most ${cap})`);
+        if (pt && pt < { M: 20, L: 24 }[size]) fails.push(`UI ÷ Mix @${size}: SIZEMIX ÷ digits ${pt} pt (the S rung at ${size})`);
+    }
+    // PDFIUM-RULES
+    const py = pathx.join(__dirname, '..', 'lib', 'ws-pdfium-rules.py');
+    const dir = fsx.mkdtempSync(pathx.join(os.tmpdir(), 'ws-pdfium-'));
+    const p2 = await app.browser.newPage();
+    let skipped = '';
+    for (const [j, job] of pdfJobs.entries()) {
+        if (skipped) break;
+        await p2.setViewport({ width: 900, height: 1200 });
+        await p2.goto(app.base + '/index.html', { waitUntil: 'domcontentloaded' });
+        await p2.evaluate((h) => { document.open(); document.write(h); document.close(); }, job.html);
+        for (let i = 0; i < 60; i++) { if (await p2.evaluate(() => document.readyState === 'complete')) break; await new Promise((x) => setTimeout(x, 100)); }
+        await p2.evaluate(async () => { await document.fonts.ready; });
+        const pdf = pathx.join(dir, `r4-${j}.pdf`);
+        await p2.pdf({ path: pdf, preferCSSPageSize: true, printBackground: true });
+        // full grids only (a short last row leaves its trailing area unruled, PG-15)
+        const pages = job.pages.map((p, i) => ({ page: i, grids: p.grids.filter((g) => g.facts && g.cells.length && !g.blanks && g.cells.length % g.cols === 0).map((g) => ({ box: g.box, cols: g.cols, rows: g.cells.length / g.cols })) })).filter((p) => p.grids.length);
+        const jf = pathx.join(dir, `r4-${j}.json`);
+        fsx.writeFileSync(jf, JSON.stringify({ pdf, dpis: [72, 93], pages }));
+        const run = spawnSync('python3', ['-I', py, jf], { encoding: 'utf8' });
+        if (run.error || run.status === 3 || /"skip"/.test(run.stdout || '')) { skipped = (run.stdout || String(run.error || '')).trim().slice(0, 160); break; }
+        const lines = String(run.stdout || '').split('\n').filter(Boolean).map((l) => JSON.parse(l));
+        let bad = 0;
+        for (const x of lines) if (x.v !== x.wantV || x.h !== x.wantH) { bad++; fails.push(`${job.tag} page ${x.page + 1} @${x.dpi} dpi: PDFIUM-RULES ${x.v} vertical / ${x.h} horizontal rules, want ${x.wantV} / ${x.wantH}`); }
+        rows.push(`${job.tag}: PDFIUM-RULES ${lines.length} grid rasters, ${bad} short of rules`);
+    }
+    await p2.close();
+    if (skipped) rows.push(`PDFIUM-RULES SKIPPED: ${skipped}`);
+    return { rows, fails };
+}
+
 (async () => {
     const app = await open({ seed: 7 });
     const page = app.page;
@@ -574,6 +974,15 @@ async function factsSetPage(page) {
     const fails = [];
     const rows = [];
     const F2 = (t) => fails.push('UI3 ' + t);
+    if (has('r4')) {
+        // (dev focus: the r4 checks only)
+        const r4 = await factsR4(app);
+        console.log(r4.rows.join('\n'));
+        for (const f of r4.fails) console.log('  FAIL ' + f);
+        await app.close();
+        console.log(r4.fails.length ? 'ws-simple-print: FAIL' : 'ws-simple-print: OK');
+        process.exit(r4.fails.length ? 1 : 0);
+    }
     if (has('setpage')) {
         // (dev focus: the r3 checks only)
         const sp = await factsSetPage(page);
@@ -593,6 +1002,9 @@ async function factsSetPage(page) {
         const sp = await factsSetPage(page);
         rows.push(...sp.rows);
         fails.push(...sp.fails);
+        const r4 = await factsR4(app);
+        rows.push(...r4.rows);
+        fails.push(...r4.fails);
         if (has('facts-print')) {
             console.log(rows.join('\n'));
             for (const f of fails) console.log('  FAIL ' + f);

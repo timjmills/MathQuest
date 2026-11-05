@@ -1197,12 +1197,12 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
   - `Every fact numbered`: the standard label in every cell. It fits at every N: the free corner is 7.3 mm at N = 10 and a 4 mm tab plus 1 mm clearance needs 5 (6.6 for a 2-digit tab).
   - A bare black numeral is never used as a label; it would read as part of the sum.
 - **PT-FRW-5.** Clamps: answers over 99 (x10 to x12 tables) clamp to 8 columns, because a handwritten 3-digit answer needs about 21 mm. The clamp is read off the **band**, which bounds the answer (`PEDAGOGY_STANDARD.md` P-35), so it never fires on a + or − fact section: those bands stop at 30. **Division facts do not clamp** (owner ruling 2026-10-30, replacing "bracket division clamps to 8, wide division to 6"): a ÷ fact's answer never passes 12, and every notation takes the page's columns, at most 9 when division is included (owner ruling 2026-11-05, PT-FRW-9). A section drops a column only if a form would not fit its column even at 16 pt, and the dialog says so.
-- **PT-FRW-6.** Bracket division is always its own section with its own instruction (div_facts Mix is the one exception: one third each of the three notations, one instruction "Divide.", owner ruling 2026-10-30); the write zone is the open space over the vinculum, right-aligned over the dividend, no boxes. A mixed-operations vertical section excludes division. A ÷ section is its own SECTION, not its own page: in Problems mode it follows the + − × rows on the same page when its rows fit (PT-FRW-12).
+- **PT-FRW-6.** Bracket division is always its own section with its own instruction (div_facts Mix is the one exception: one third each of the three notations, one instruction "Divide.", owner ruling 2026-10-30; under In sections even Mix gives each form its own section, owner ruling 2026-11-05, PT-FRW-12); the write zone is the open space over the vinculum, right-aligned over the dividend, no boxes. A mixed-operations vertical section excludes division. A ÷ section is its own SECTION, not its own page: in Problems mode it follows the + − × rows on the same page when its rows fit (PT-FRW-12).
 - **PT-FRW-7.** Horizontal facts are a separate section sized by the equation fit function (3.2): in practice at most 4 columns (3 for 2-digit by 2-digit). "Both orientations" prints vertical rows first, then a horizontal block. A div_facts Standard section ("12 ÷ 3 = __") is not a horizontal block on this page: it prints as the stacked ÷ fact (PT-FRW-9), because the across sentence of a 3-digit dividend is 28 mm at 16 pt and cannot reach even 5 columns at its rung.
 - **PT-FRW-9. Division facts in the fact columns, all three notations, at most 9 across** (owner ruling 2026-10-30; at most 9 columns since the owner ruling of 2026-11-05, below). A page or section of ÷ facts takes 9 columns at Size S Auto and whenever the teacher picks 9 (the Columns control offers 1–9 when the set includes division), in the ÷ sign, the fraction and the long-division bracket; 5, 6 and 8 columns and Mix work the same way. Each form takes the vertical-fact grammar in its column's width, at the column's ladder digit (PT-FRW-1), never below the Size S fact digit (16 pt), and passes the real-fit gate (drawn ink + 1 mm of white each side):
   - **÷ sign, stacked** (div_facts Standard and Vertical): the dividend, "÷ divisor" under it, the 1.5 pt rule, the answer row, as + − ×. With a 3-digit dividend over a shorter divisor the operator track is 0.62 em (the ÷ ink is 0.45 em; the divisor row's empty first track keeps it clear, VA-2 / VA-2a): (0.62 + 3 x 0.72) em = 15.7 mm at 16 pt in a 20.1 mm column (9 across). Where the narrow track puts the dividend's first digit under the number tab's keep-out (a picked 9 at M and L), the fact starts below the keep-out (CL-40).
-  - **Fraction**: the dividend over the divisor on a 1.5 pt bar (0.1 em side pads), "=" beside the bar in a 0.62 em track, and the answer line under them, centred; the line is the band's blank width B(n), capped at the column's room (14 mm at S, 16.2 mm at L in 10 columns). 144 over 12 with its "=" is 15.0 mm of ink at 16 pt. The numerator clears the tab's keep-out.
-  - **Long-division bracket**: the divisor, the arc and the vinculum over the dividend, the quotient written above it (no boxes). The digit track is the largest of 1.0, 0.9, 0.8, 0.72, 0.64, 0.58, 0.55, 0.54 em that fits; the gutter is 0.6 track less 0.15 em, 0.17 to 0.45 em, and the arc starts at 47 % of the gutter and bows into the dividend's first digit's side bearing. The bracket is centred on its ink. "12 ) 144" at 16 pt: 0.54 em tracks (3.0 mm), 0.17 em gutter, 15.8 mm of ink, 1.2 mm clear each side.
+  - **Fraction**: the dividend over the divisor on a 1.5 pt bar (0.1 em side pads) as wide as the wider number, "=" 0.3 em after the bar in a 0.62 em track, and the answer line under them, centred, 2 mm clear of the border each side; the line is the band's blank width B(n), capped at the column's room (14 mm at S, 16.2 mm at L in 10 columns). 144 over 12 with its "=" is 15.0 mm of ink at 16 pt. The numerator clears the tab's keep-out.
+  - **Long-division bracket**: the divisor, the arc and the vinculum over the dividend, the quotient written above it (no boxes). The digit track is the largest of 1.0, 0.9, 0.8, 0.72, 0.64, 0.58, 0.55, 0.54 em that fits with **2 mm of white each side of the ink** (facts-print-fix r4 CLEAR: 1 mm a side left "12)108" 0.98 mm from the border); the gutter is 0.6 track less 0.15 em, 0.17 to 0.45 em, and the arc starts at 47 % of the gutter and bows into the dividend's first digit's side bearing. The bracket is centred on its ink and always drawn on its section's row geometry (never a 1 em fallback track). "12 ) 144" at 16 pt: 0.54 em tracks (3.0 mm), 0.17 em gutter, 15.8 mm of ink.
   - **Rows**: the + − × need for the stacked ÷; for the fraction padTop + 2.42 em + 0.6 + Hw + 3; for the bracket (centred, CL-4b) 2 + the digit strip + 1.33 em + 4. A section takes its tallest form's need; Mix keeps one third of each form (the count a multiple of 3).
   - Capacity (A4, Auto, every fact numbered, at most 9 across): S 9 x 7 = 63 (stacked ÷), 9 x 8 (fraction), 9 x 10 (bracket), 9 x 7 = 63 (Mix); M 6 x 5, 6 x 6, 6 x 8, 6 x 5; L 5 x 5, 5 x 5, 5 x 7, 5 x 5 = 24.
   - **AUTO room for the stacked ÷ (owner, 2026-11-05, facts-print-fix):** a 3-digit dividend ("132", "110") needs room in its box (1.3 mm of white beside a 15.7 mm fact in the old 18 mm column). At **Auto**, a stacked ÷ page whose dividends can reach 3 digits takes the most columns, at most 9, that leave **2 mm of white each side** of the drawn fact: **9 x 7 = 63 at Size S** (16 pt kept), 6 at M, 5 at L. The bracket and the fraction take Auto 9 at S under the 9-column rule below.
@@ -1216,11 +1216,28 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
     is its own SECTION (its own instruction "Divide." and grid, at most 9 across, stacked), and it follows the + − × rows on
     the same page when its rows fit. The print takes the fewest pages those rows need at the size (Problems 50 of the
     owner's set at Small: 5 rows of 8 and 2 rows of 9 on ONE page).
-  - **Every page full to within one row,** the last page too unless the whole print is one page: the rows are split over
-    the pages so each page's white under its grid is at most one row, and each section takes ONE row stretch for the whole
-    print (PG-11: one row height a section on every page) - 1.3 at most, then 1.4, then 1.7 only where the rows cannot
-    fill the pages otherwise (5 + 2 rows over 2 pages of 6: taller boxes, never a half-empty page). A one-page print
-    stretches to 1.3 at most and keeps its white when only a few are asked.
+  - **Every page but the LAST is full; cells never stretch past 1.3 (owner ruling 2026-11-05, r4; replaces r3's "within
+    one row, the last page too" and its 1.4 / 1.7 caps).** The rows are packed over the fewest pages; each section takes ONE
+    row stretch for the whole print (PG-11: one row height a section on every page, the grid's frame included in its
+    height), from 1.00 to 1.30, chosen so that every page but the last shows at most 6 mm of white under its rows (the gate
+    allows 8). Only the last page may run short. When no stretch fills the pages with the + − × rows first, the ÷
+    section(s) go first and the + − × rows follow (each is its own section with its own instruction; only the order
+    changes). A one-page print stretches to 1.3 at most and keeps its white at the foot when only a few are asked.
+  - **One digit size on a page.** Sections that share a page take the smallest of their digit sizes (+ − × at 20 pt beside
+    ÷ at 24 pt on one page was a defect); the stacked facts' width is read with the operator track the fact template draws
+    (the tight 0.72 em track over a shorter second number), so × 1–12 keeps 28 pt in 5 columns at L.
+  - **Pages n with fewer pages than parts.** Pages 1 of a set with ÷ prints ONE page: the + − × rows and the ÷ section(s)
+    share it, rows by the skills' shares (each part at least one row), the page filled; Pages 2 or 3 with the three ÷
+    sections below gives the + − × rows their own pages and the ÷ sections the last. The dialog's note says the division
+    shares the page.
+  - **div_facts Mix (owner ruling 2026-11-05).** Mixed up keeps the three written forms (÷ sign stacked, fraction,
+    long-division bracket) mixed cell by cell in one grid, every cell alike in placement: each form drawn in the stacked
+    fact's three lines (the dividend / numerator / quotient line, the divisor / denominator / dividend line, the answer
+    line), so the digits of a row sit on ONE baseline; the frame centred down the cell under the tab's keep-out and each
+    drawing centred across it; the answer lines of the stacked ÷ and the fraction in one place, the bracket's quotient on
+    its vinculum, level with the dividends beside it (PT-FRW-6: the quotient is written over the vinculum); a fraction's
+    "=" 0.3 em after the bar; a bracket or fraction 2 mm clear of the border each side. **In sections** gives each written
+    form its own section with its own instruction (÷ sign, then bracket, then fraction), one third of the ÷ count each.
   - **One column count and one digit size a group, on every page of every set.** They come from what the group's skills
     can REACH (x 1-12 reaches 144: 3 tracks, answers over 99, so 8 columns at S - one probe of the skills, never the
     facts a page happens to deal), and the summary says what prints: "8 columns · division 9 columns · 34–48 a page".
@@ -1233,8 +1250,9 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
     subtraction and multiplication facts"; all four: "Mixed facts"), never "Facts". "20 a page" when every page holds the
     same, never "20–20".
   - Gate: `ws-simple-print --facts-print` SETPAGE (every grid of every page of every set = the summary's columns, one digit
-    size a group, per-skill totals = the split of the request), FILL (white in mm <= one row; fewest pages), AUTO9,
-    COUNTS, PROBLEMS, FOOTER, TITLE, DIVMAX9 docs.
+    size a group, per-skill totals = the split of the request), FILL (white in mm <= one row on every page but the last;
+    fewest pages), AUTO9, COUNTS, PROBLEMS, FOOTER, TITLE, DIVMAX9 docs, and r4's MIXBASE, SLOTPOS, FRACEQ, CLEAR,
+    BRKTRACK, PDFIUM-RULES, FOOTWRAP, DIVSECTIONS, SIZEMIX, FULLPAGE, ONEDIGIT, ROWSAME (`--r4`).
 - **PT-FRW-8.** Day bands carry no timing by default; the "(1 minute)" tag, Time line and Goal are options (PT-DLG-13).
 
 **Teacher options.** Columns; size; label option; Day bands 1 to 5 and rows per band 1 to 3; "Day 5 repeats Day 1"; single-fact unmixed set (one constant in both positions, including 0 and 1), one family, a cumulative range, or "hard facts"; for + and − the constant 0 to 13 and the band (PT-DLG-30, PT-DLG-31); for × and ÷ the fact range (PT-DLG-28); both orientations; support strip (top form, 10 mm, only at 7 or more columns with a single table); Model cell or grey first row; division notation.
