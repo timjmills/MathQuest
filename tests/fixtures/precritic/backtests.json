@@ -1330,6 +1330,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "facts-print-fix",
+   "check": "the owner's fact set (+ − within 20, × ÷ 1-12, Pages 1, Auto) at S/M/L: Mixed up prints interleaved fact rows at the In sections counts (MIXFACTS), any fallback is exactly the In sections print (FALLBACK), fact-rows rules are drawn and one weight (ROWRULES), sign gap >= 0.3 em and digits >= 1.75 mm from the box (SIGNGAP), footers name skills in words (FOOTER) (owner 2026-11-05: Mixed up printed 20 problems on 2 pages; no row lines in the PDF; 3-digit dividends crowd the box)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print MIXFACTS / FALLBACK / ROWRULES / SIGNGAP / FOOTER",
+   "browser": true,
+   "fail": {
+    "commit": "18fbc70c2",
+    "state": "live: Mixed up fell back to the sparse 4-each plan; fact-rows rules were the ink seen through 0.75 pt gaps; the ÷ page at 10 columns had 1.55 mm clearance; a cross-category footer printed sub_facts"
+   },
+   "pass": {
+    "commit": "b84a624a8",
+    "state": "facts-print-fix: interleaved fact rows, fallback = In sections, drawn rules, ÷ Auto 9 at S, footers in words"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
