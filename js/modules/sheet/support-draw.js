@@ -288,9 +288,11 @@ function pieceOf(id, p, template, ctx) {
             const pane = paneOf(pid, pp, ctx, twin);
             if (pane) return pane;
         }
-        const cue = factCueOf({ a: pp.a, b: pp.b, op: pp.op, cue: id }, twin);
+        // (facts card F3: a ÷ skip strip runs to the section's top multiple, the tally length - 10 or 12 - never the quotient)
+        const cp = { a: pp.a, b: pp.b, op: pp.op, cue: id, ...(id === 'skip' && pp.op === '/' ? { n: Number(p.supports && p.supports.tally) || 12 } : {}) };
+        const cue = factCueOf(cp, twin);
         if (!cue) return null;
-        const m = MM_RE.exec(factCueOf({ a: pp.a, b: pp.b, op: pp.op, cue: id }, false)) || [];
+        const m = MM_RE.exec(factCueOf(cp, false)) || [];
         const foot = { wMm: Number(m[1]) || 40, hMm: Number(m[2]) || 12, placements: ['beside', 'under'] };
         return { html: `<div class="ws-factcue">${cue}</div>`, foot, place: null };
     }
