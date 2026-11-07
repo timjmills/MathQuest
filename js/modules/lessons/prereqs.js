@@ -505,16 +505,18 @@ export const LESSONS = Object.freeze({
             { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
         ],
         steps: [
-            { icon: 'look', text: 'Hundreds: write the digit.' },
-            { icon: 'look', text: 'Tens: write the digit.' },
-            { icon: 'look', text: 'Ones: write the digit.' },
-            { icon: 'write', text: 'Read the number.' },
+            { icon: 'write', text: 'Hundreds: write the digit.' },
+            { icon: 'write', text: 'Tens: write the digit.' },
+            { icon: 'write', text: 'Ones: write the digit.' },
+            { icon: 'say', text: 'Read the number.' },
         ],
         chant: '',
         format: { kind: 'numbered steps with icons', why: 'One step per place, so an empty place gets its 0.' },
         example: { match: 'Write' },
         // The parts row (500 + 10 + 5 = ____) is wider than half the page: one panel a row.
         chartWide: true,
+        // The closing step ("Read it: 464.") writes nothing new: it is the line under the panels.
+        tailLast: true,
         mixWith: [{ key: 'placevalue:expand' }, { key: 'placevalue:more_less_10' }],
     },
     'placevalue:unit_form': {

@@ -301,7 +301,11 @@ function frameHTML(ctx, text, key, digits) {
             if (/^\d[\d,.]*$/.test(pre[i]) && pre[i + 1] && !/^\d|^[+−×÷=≈→<>-]$/.test(pre[i + 1])) { chunks.push(pre[i] + ' ' + pre[i + 1]); i++; }
             else chunks.push(pre[i]);
         }
-        let lastN = pre.length <= 2 ? chunks.length : Math.min(1, chunks.length);
+        // lf-placevalue (WRAP-OP, combine's lesson panels "400 + 60 + / 4 ="): an expression of numbers and
+        // signs only never breaks; the whole of it goes with the slot. A row too wide for its column is then
+        // measured as not fitting and the layout takes fewer columns (DN-10), never a broken expression.
+        const exprOnly = pre.length > 2 && pre.every((w) => /^\d[\d,.]*$|^[+−×÷=≈-]$/.test(w));
+        let lastN = exprOnly ? chunks.length : pre.length <= 2 ? chunks.length : Math.min(1, chunks.length);
         if (lastN < chunks.length && /^[=≈]$/.test(chunks[chunks.length - lastN] || '')) lastN++;
         const tail = chunks.splice(chunks.length - lastN).join(' ');
         const nb = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';

@@ -303,6 +303,21 @@ registerSkill('placevalue:combine', {
         const p = pvOf(q);
         if (!p.n) return [];
         const places = placesOf(p.n);
+        // lf-placevalue (lesson r0): every place step WRITES its digit into the answer (4 -> 46 -> 464), so each
+        // panel of the anchor chart shows one new digit; an empty place writes its 0. The read-back is the tail.
+        if (places.length <= 4) {
+            const s = String(p.n);
+            const out = places.map((pl, i) => {
+                const d = digitAt(p.n, pl);
+                const part = d * pl;
+                const sofar = i === places.length - 1 ? f(p.n) : s.slice(0, i + 1);
+                const word = d === 1 ? PLACE_WORD[pl].replace(/s$/, '') : PLACE_WORD[pl];
+                const said = d === 0 ? `No ${PLACE_WORD[pl]} part: write 0.` : `${f(part)} is ${d} ${word}: write ${d}.`;
+                return step(said, [{ slot: 'answer', value: sofar }]);
+            });
+            out.push(step(`Read it: ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]));
+            return clampSteps(out);
+        }
         const out = places.slice(0, 4).map((pl) => step(`${PLACE_WORD[pl]}: ${digitAt(p.n, pl)}${digitAt(p.n, pl) === 0 ? ' (no part, so 0)' : ''}.`));
         out.push(step(`Write ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }]));
         return clampSteps(out.length >= 3 ? out : [step(`The parts are ${arr(p.parts).map(f).join(' + ')}.`)].concat(out));
