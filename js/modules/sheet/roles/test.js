@@ -88,7 +88,7 @@ function layout(items, input, count) {
             ceiling: CEILING, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
         }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns,
-        { footprintRows: items.every((it) => /div_facts(?!_)/.test(String(it.skill || ''))) });
+        { footprintRows: items.every((it) => (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || '')))) });
     }
     const sec = (columns) => ({
         role: 'test', columns, count: count || items.length,
