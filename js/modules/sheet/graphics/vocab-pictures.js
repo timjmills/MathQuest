@@ -371,7 +371,9 @@ export function vocabPictureSVG(ctx, id, { wMm = 46 } = {}) {
     if (!hasVocabPicture(id)) return '';
     const w = Math.max(PIC_WIDTHS.min, Math.min(PIC_WIDTHS.max, Number(wMm) || 46));
     const body = PICS[id].draw();
-    const size = isTwin(ctx) ? `width:${L(ctx, w)};max-width:100%;height:auto;` : `width:${r2(w)}mm;height:${r2((w * PIC_CANVAS.h) / PIC_CANVAS.w)}mm;`;
+    // (never wider than its host: a Match 3 cell in a narrow anchor-chart panel scales its pictures to the panel rather
+    // than letting them spill over the letters - precritic print-lint lesson L, 2026-11-07: L-OVERFLOW / ILLEGIBLE)
+    const size = isTwin(ctx) ? `width:${L(ctx, w)};max-width:100%;height:auto;` : `width:${r2(w)}mm;max-width:100%;height:auto;aspect-ratio:${PIC_CANVAS.w} / ${PIC_CANVAS.h};`;
     return `<svg class="mq-vpic" data-vpic="${esc(id)}" viewBox="0 0 ${PIC_CANVAS.w} ${PIC_CANVAS.h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(PICS[id].alt)}"`
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }

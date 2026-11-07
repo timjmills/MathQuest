@@ -44,8 +44,8 @@ register(MATCH3_TEMPLATE, {
         const ink = ctx.state === 'traced' ? GREY : INK;
         // the letter at the picture's top left, beside it (not above: the cell stays a quarter of the page)
         const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:1 1 0;min-width:0;">`
-            + `<span class="mq-vm-let" style="font-size:${P(ctx, tp + 5)};font-weight:700;line-height:1;">${LET[i]}</span>`
-            + vocabPictureSVG(ctx, w, { wMm: picW }) + '</div>').join('');
+            + `<span class="mq-vm-let" style="font-size:${P(ctx, tp + 5)};font-weight:700;line-height:1;flex:none;">${LET[i]}</span>`
+            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: picW })}</span></div>`).join('');
         const side = (S(ctx).writeMm || 10) + 2;
         const letters = match3Letters({ order });
         const row = order.map((wi, n) => {
