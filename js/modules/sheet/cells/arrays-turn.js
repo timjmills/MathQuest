@@ -211,9 +211,9 @@ export function turnFootprint(p, ctx) {
     const geom = geometry(g, p);
     // (critic lf-ops r1 D-MP-3, GRID-EVEN: at L a 5 x 4 pair is wider than half the page, so the section printed a row of
     // 2 and then one full-width pair; at L every pictured pair takes the full width - one column count a section)
-    // (critic lf-ops r1 D-MP-1: the cell is answered in place - the pupil writes in its boxes - so its row is not stretched
-    // past its content: the page buys more rows instead, layout IN_PLACE_FILL)
-    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures && !geom.split && g.size === 'L' ? 1 : geom.pictures || p.type === 'split' ? 2 : 3, ...(geom.pictures && !geom.split && g.size === 'L' ? { hardCap: true } : {}), ...(g.twin ? {} : { inPlace: true }) };
+    // (not `inPlace`: held to its content the pair left a 18-22 % strip under the detailed lesson's practice grid - E9b - and
+    // the height grouping moved its edge case off the last row - E24b; D-MP-1's bands stay a known finding)
+    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures && !geom.split && g.size === 'L' ? 1 : geom.pictures || p.type === 'split' ? 2 : 3, ...(geom.pictures && !geom.split && g.size === 'L' ? { hardCap: true } : {}) };
 }
 
 export function turnInputs(p) {
