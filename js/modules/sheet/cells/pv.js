@@ -152,7 +152,7 @@ export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, si
     const heads = cols.map(c => c.comma ? td('', 'width:0.3em;')
         // (`tight`, lf-placevalue r1 F1: a cell answered in place - name the place, write the value - sets the letters and
         // the digits on their own line heights, so the cell is as tall as its ink and a page holds more rows)
-        : td(LETTER[c.place] || '', `width:2.2em;font-size:max(0.42em, 8pt);line-height:${tight ? 1.25 : 1.6};font-weight:${cutAt(c) ? 700 : 400};`
+        : td(LETTER[c.place] || '', `width:2.2em;font-size:max(0.42em, 8pt);line-height:${tight ? 1.1 : 1.6};font-weight:${cutAt(c) ? 700 : 400};`
             + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
     const digits = cols.map(c => c.comma ? td(',', 'width:0.3em;')
         : td(c.place === underline
@@ -608,8 +608,12 @@ export function pvSlotsFromWork(p, value) {
     return nums.length === n ? Object.fromEntries(nums.map((t, i) => [`b${i}`, t])) : null;
 }
 
-register('pv', {
-    render(p, ctx0) {
+function pvRender(p, ctx0) {
+    return pvRenderBody(p, ctx0);
+}
+
+function pvRenderBody(p, ctx0) {
+    {
         // Finished work that is RIGHT arrives as state `wrong` with the whole answer and no
         // per-slot values: draw it as the key does, so a multi-slot cell never writes the whole
         // answer into each of its boxes.
@@ -633,7 +637,7 @@ register('pv', {
         // numeral on its own line heights, 1 mm under it - so the rows hold more items, never smaller type.
         const tight = !!p.inPlace;
         const numeral = (opt) => numeralTracksHTML(p.n, { ...opt, size: pt(m.digitPt), tight });
-        const center = (h) => `<div style="text-align:center;margin:${tight ? '0 0 1mm' : '1mm 0 2mm'};">${h}</div>`;
+        const center = (h) => `<div style="text-align:center;margin:${tight ? '0 0 0.5mm' : '1mm 0 2mm'};">${h}</div>`;
         const big = (h) => `<span style="font-size:${pt(m.digitPt)};font-weight:700;">${h}</span>`;
         const kv = typeof p.keyValue === 'number' ? fmt(p.keyValue) : p.keyValue;
         // A slot's width never tells the answer (round-3 re-grade): at least the longest number the
@@ -808,7 +812,11 @@ register('pv', {
             default:
                 return `<div class="pv-cell">${esc(p.frame || '')}</div>`;
         }
-    },
+    }
+}
+
+register('pv', {
+    render: pvRender,
     answerKey(p) {
         const value = p.keyValue !== undefined ? p.keyValue : '';
         const display = typeof value === 'number' ? value.toLocaleString('en-US') : String(value);
