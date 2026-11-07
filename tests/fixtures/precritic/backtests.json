@@ -1430,6 +1430,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "precritic-offered-na",
+   "check": "ws-precritic: a card with a rulings block and no notOffered entry reads card-not-offered N/A (every option offered), not SKIPPED; a card with no block stays SKIPPED",
+   "kind": "commit-pair",
+   "rule": "ws-precritic PARSE.cardRulings (lead ruling R2)",
+   "browser": false,
+   "fail": {
+    "commit": "98351c32",
+    "state": "card-not-offered SKIPPED (no rulings) on the pv card, which offers every §7a option"
+   },
+   "pass": {
+    "commit": "809c55b7",
+    "state": "N/A 'every §7a option offered; no notOffered entry'"
+   },
+   "command": "node tests/scripts/ws-precritic-parse.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
