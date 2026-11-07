@@ -264,6 +264,8 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-07 14:32: lf-engine landed `guidedRows: 1` (commit 50c1eca6 on claude/sweet-newton-c8wrv1-lf-engine; we-do.js guidedRowsOf,
+  schema validateGuidedRows). Next round: once that branch merges, set guidedRows: 1 on our chartWide lessons in families/algebra.js.
 - 2026-11-07 12:45: lead: patterns card re-sign pending (M/L shrank in b0ca7395, see Now); no further work this week.
 - 2026-11-07 ~12:50: hand-over. Merged the integration tip (14 commits, clean); on the merged tree ws-code-snapshot (736 codes),
   ws-standards, ws-search-terms, ws-presets-unit (126), ws-redesign-passed, ws-wrm-page-unit, ws-lessons-first-queue --check and
