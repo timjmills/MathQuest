@@ -1664,6 +1664,45 @@
     "commit": "e13ef858",
     "state": "P0 2 x 6 to 2 x 10"
    }
+  },
+  {
+   "id": "e27-five-gap",
+   "check": "E27: counters in rows of at most 5, or 6 to 10 with the 5-group gap drawn",
+   "kind": "fixture",
+   "rule": "owner ruling 2026-11-07 lesson 3a arrays to 6 x 6; RP-21 (lf-engine P1d r2, lead-approved gate edit)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/e27-five-gap.fail.json",
+    "state": "a row of 6 evenly spaced (no gap)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/e27-five-gap.pass.json",
+    "state": "a row of 6 with 1.5 mm after the 5th"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --e27-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "e12-practice-pages",
+   "check": "E12: Practice cells one height across Practice 1's two pages (lesson 3a)",
+   "kind": "commit-pair",
+   "rule": "lf-engine P1d r2 (owner ruling 2026-11-07, full-width Practice 1 over two pages)",
+   "browser": true,
+   "fail": {
+    "commit": "e13ef858",
+    "state": "P4-2 cells 1.6 mm shorter than P4-1 (continuation page flex height)"
+   },
+   "pass": {
+    "commit": "57d53341",
+    "state": "equalPages: every page of the sheet the first page's grid height"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa5-mult-properties --check --out /tmp/mq-bt-e12",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
