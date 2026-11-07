@@ -5,9 +5,17 @@
 // `cellChecksInPage(opts)` runs IN the printed sheet document (page.evaluate) and returns
 //   { problems: [...overflow, as ws-grade-render sheetCheck], findings: [{rule, page, cell, msg}], cells: [{page, tmpl, inkH, h}] }
 // The finding rules (critic-r1.md "Automatic checks"):
+//   BAND      check 1  band-anywhere H13: the largest empty horizontal band ANYWHERE in a picture cell (over the first ink,
+//                      between two inks - the picture-to-slot gap - or under the last ink), measured on ink, >= 30 % of the
+//                      cell's height (RUBRIC H13; D-MP-1, D-AG-1, D-CB-3/4/5). Picture templates only (BAND_TEMPLATES).
+//   SLOT      check 3  a stand-alone answer box of a picture template narrower than 14 mm (SL-1; D-MP-2, D-AG-7, D-CB-7/8), and
+//                      on arrays / arrays-turn two box widths in one page's cells of one template (SL-2: a box's width gives the
+//                      answer's size away; D-MP-2).
 //   TAGINK    check 9  an item tag (A / B / C on an error-analysis fix, .mq-slottag) whose ink meets the slot's own content
 //                      (H2, CL-40; D-MP-5, D-AG-3).
 //   KEYJOIN   check 8  (keys) one answer slot written with two joined answers ("15, 15") (H1; D-MP-6).
+//   GRIDEVEN  check 6  a practice page (independent / more-practice / test) whose cells of one template stand at two widths
+//                      (a row of 2, then a full-width cell: GRID-EVEN, PG-12; D-MP-3).
 // Exempt everywhere: anchor / model cells ([data-ws-anchor], .mq-anchorgrid), the label tabs, hidden ink.
 // Pure in-page code: the function is serialised whole, so it uses nothing from outside its body.
 
@@ -16,6 +24,10 @@ function cellChecksInPage(opts) {
     opts = opts || {};
     var PX = 96 / 25.4;
     var mm = function (px) { return Math.round((px / PX) * 10) / 10; };
+    var BAND_T = ['arrays', 'arrays-turn', 'count-row'];
+    var SLOT_T = ['arrays', 'arrays-turn', 'count-row'];
+    var UNIFORM_T = ['arrays', 'arrays-turn'];
+    var bandFloor = Number(opts.bandFloor) || 0.3;
     var role = opts.role || '';
     var isKey = !!opts.key;
     var out = { problems: [], findings: [], cells: [] };
@@ -96,6 +108,7 @@ function cellChecksInPage(opts) {
             var inner = c.querySelector('[data-ws-cell]');
             return inner ? inner.getAttribute('data-ws-cell') || t : t;
         };
+        var uniform = {};
         problemCells.forEach(function (c) {
             var cr = c.getBoundingClientRect();
             var cs = getComputedStyle(c);
@@ -109,8 +122,33 @@ function cellChecksInPage(opts) {
             if (ink.length) {
                 var iv = ink.map(function (r) { return [Math.max(r.top, top), Math.min(r.bottom, bot)]; }).sort(function (a, b) { return a[0] - b[0]; });
                 inkH = iv[iv.length - 1][1] - iv[0][0];
+                var gap = 0, where = '';
+                if (iv[0][0] - top > gap) { gap = iv[0][0] - top; where = 'over the first ink'; }
+                var end = iv[0][1];
+                for (var j = 1; j < iv.length; j++) {
+                    if (iv[j][0] - end > gap) { gap = iv[j][0] - end; where = 'between two inks (picture and answer)'; }
+                    end = Math.max(end, iv[j][1]);
+                }
+                if (bot - end > gap) { gap = bot - end; where = 'under the last ink'; }
+                if (!isKey && BAND_T.indexOf(tmpl) >= 0 && H > 12 * PX && gap >= bandFloor * H) {
+                    out.findings.push({ rule: 'BAND', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ' (' + tmpl + '): an empty band ' + mm(gap) + ' mm ' + where + ' in a ' + mm(H) + ' mm cell (' + Math.round((gap / H) * 100) + ' %, band-anywhere H13, critic lf-ops r1 check 1)' });
+                }
             }
             out.cells.push({ page: P, tmpl: tmpl, inkH: mm(inkH), h: mm(H), w: mm(cr.width) });
+            // ---- SLOT: stand-alone answer boxes of the picture templates
+            if (!isKey && SLOT_T.indexOf(tmpl) >= 0) {
+                c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
+                    var ss = getComputedStyle(s);
+                    var boxed = ['Top', 'Bottom', 'Left', 'Right'].every(function (k2) { return parseFloat(ss['border' + k2 + 'Width']) > 0 && ss['border' + k2 + 'Style'] !== 'none'; });
+                    var shaped = s.closest('.k2-shape');
+                    if (!boxed && !shaped) return;
+                    if (!shownEl(s)) return;
+                    var r = (shaped || s).getBoundingClientRect();
+                    var w = r.width;
+                    if (w < 13.9 * PX) out.findings.push({ rule: 'SLOT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ' (' + tmpl + '): answer box ' + mm(w) + ' mm wide, under 14 mm (SL-1, critic lf-ops r1 check 3)' });
+                    if (UNIFORM_T.indexOf(tmpl) >= 0) (uniform[tmpl] = uniform[tmpl] || []).push({ w: w, no: no });
+                });
+            }
             // ---- TAGINK: an item tag over its slot's own content
             c.querySelectorAll('.mq-slottag, [data-ws-tag]').forEach(function (t) {
                 if (!shownEl(t)) return;
@@ -132,6 +170,21 @@ function cellChecksInPage(opts) {
                 });
             }
         });
+        // ---- SLOT uniform: one box width a page for each picture template (SL-2)
+        Object.keys(uniform).forEach(function (t) {
+            var ws = uniform[t].map(function (x) { return x.w; });
+            var lo = Math.min.apply(null, ws), hi = Math.max.apply(null, ws);
+            if (hi - lo > 0.6 * PX) out.findings.push({ rule: 'SLOT', page: P, cell: '*', msg: 'page ' + P + ' (' + t + '): answer boxes ' + mm(lo) + ' to ' + mm(hi) + ' mm wide on one page: one box width a section (SL-2: a width gives the answer size away, critic lf-ops r1 check 3)' });
+        });
+        // ---- GRIDEVEN on the practice pages
+        if (!isKey && /^(independent|more-practice|test)$/.test(role)) {
+            var byT = {};
+            problemCells.forEach(function (c) { var t = tmplOf(c); var w = Math.round(c.getBoundingClientRect().width / PX); (byT[t] = byT[t] || {})[w] = ((byT[t] || {})[w] || 0) + 1; });
+            Object.keys(byT).forEach(function (t) {
+                var ws = Object.keys(byT[t]).map(Number).sort(function (a, b) { return a - b; });
+                if (ws.length > 1 && ws[ws.length - 1] - ws[0] > 2) out.findings.push({ rule: 'GRIDEVEN', page: P, cell: '*', msg: 'page ' + P + ' (' + t + '): cells at ' + ws.map(function (w) { return w + ' mm (' + byT[t][w] + ')'; }).join(', ') + ': one column count a section (GRID-EVEN, PG-12, critic lf-ops r1 check 6)' });
+            });
+        }
     });
     return out;
 }

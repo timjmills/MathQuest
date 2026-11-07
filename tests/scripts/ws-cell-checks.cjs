@@ -4,14 +4,15 @@
 //   OVERFLOW  a cell, the body or the page overflowing; an element leaving its cell or the page (check 2: Reason It
 //             arrays and count rows ran out of the A / B boxes and off the page on all three skills, and precritic's
 //             ws-grade-render --gate ran lesson / test / independent only)
+//   BAND      band-anywhere H13 on picture cells (check 1)       SLOT      boxes >= 14 mm, one width a page (check 3)
 //   TAGINK    tag over the slot's answer (check 9)               KEYJOIN   one slot, two answers, on the key (check 8)
-//   SIZE-S    S = M layout with smaller drawings (check 4)
+//   GRIDEVEN  one cell width a template on practice pages (6)    SIZE-S    S = M layout with smaller drawings (check 4)
 //
 //   node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card            # card roles x S/M/L
 //   node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts # + every option value
 //                                          (option values on --opt-roles, default lesson,independent,guided,test,review)
 //   node tests/scripts/ws-cell-checks.cjs --skills k --roles reason-it,test --size S,L --opts '{"forms":[1]}'
-//   node tests/scripts/ws-cell-checks.cjs --rules OVERFLOW,TAGINK   # only these rules count
+//   node tests/scripts/ws-cell-checks.cjs --rules BAND,SLOT        # only these rules count
 //   node tests/scripts/ws-cell-checks.cjs --self-test              # planted pages, each rule must fire / stay quiet
 // MQ_ROOT=<tree> serves another checkout (ws-backtest commit-pair rows); the card plan is read from that tree.
 // Last line `ws-cell-checks: OK (...)` / `FAIL - n finding(s) ...`; exit 1 on FAIL (--report-only: 0).
@@ -26,7 +27,9 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S'));
+// BAND, SLOT and GRIDEVEN (critic checks 1, 3, 6) are lf-placevalue's checks (lead, 2026-11-07): this lane's interim
+// measure of the critic's numbers, off by default; --rules ...,BAND,SLOT,GRIDEVEN (or --interim) turns them on
+const RULES = list(arg('rules', has('interim') ? 'OVERFLOW,BAND,SLOT,TAGINK,KEYJOIN,GRIDEVEN,SIZE-S' : 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S'));
 const SIZES = list(arg('size', 'S,M,L'));
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -45,10 +48,17 @@ function selfTest() {
     const dots = '<svg width="30mm" height="20mm" viewBox="0 0 30 20"><circle cx="5" cy="5" r="2" fill="#000"/><circle cx="25" cy="15" r="2" fill="#000"/></svg>';
     const cell = ({ t = 'arrays', h = 60, gapMm = 2, w = 15, val = '', tag = '', width = 90 } = {}) => `<div class="c" data-ws-cell="${t}" style="height:${h}mm;width:${width}mm"><span class="ws-tab" data-ws-label="tab">1</span>${dots}<div style="height:${gapMm}mm"></div><div><span class="b" data-ws-slot="a" ${tag ? 'data-ws-tagged="1" ' : ''}style="width:${w}mm;position:relative">${tag ? `<i class="mq-slottag" style="position:absolute;left:0.5mm;top:0.5mm;font:bold 14pt sans-serif">${tag}</i>` : ''}${val}</span></div></div>`;
     return [
+        { name: 'picture-to-slot gap (BAND)', html: page(cell({ h: 70, gapMm: 30 })), want: 'BAND' },
+        { name: 'cell sized to its content (BAND control)', html: page(cell({ h: 36, gapMm: 2 })), want: null, rules: ['BAND'] },
+        { name: 'box under 14 mm (SLOT)', html: page(cell({ h: 36, w: 9 })), want: 'SLOT' },
+        { name: 'two box widths on a page (SLOT)', html: page(cell({ h: 36, w: 15 }) + cell({ h: 36, w: 19 })), want: 'SLOT' },
+        { name: 'one box width >= 14 mm (SLOT control)', html: page(cell({ h: 36, w: 15 }) + cell({ h: 36, w: 15 })), want: null, rules: ['SLOT'] },
         { name: 'tag over the grey answer (TAGINK)', html: page(cell({ h: 36, val: '<span style="color:#888">10</span>', tag: 'A', w: 15 })), want: 'TAGINK' },
         { name: 'tag outside the box (TAGINK control)', html: page(cell({ h: 36, val: '<span style="color:#888;padding-left:8mm">10</span>', tag: 'A', w: 22 })), want: null, rules: ['TAGINK'] },
         { name: 'two answers in one key slot (KEYJOIN)', html: page(cell({ h: 36, val: '15, 15' })), want: 'KEYJOIN', key: true },
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
+        { name: 'row of 2 then a full-width cell (GRIDEVEN)', html: page(cell({ h: 36, width: 90 }) + cell({ h: 36, width: 90 }) + cell({ h: 36, width: 186 })), want: 'GRIDEVEN', role: 'independent' },
+        { name: 'one cell width (GRIDEVEN control)', html: page(cell({ h: 36, width: 90 }) + cell({ h: 36, width: 90 })), want: null, role: 'independent', rules: ['GRIDEVEN'] },
         { name: 'off the page (OVERFLOW)', html: page(`<div class="c" data-ws-cell="arrays" style="height:30mm;width:90mm;margin-left:-20mm">${dots}</div>`), want: 'OVERFLOW' },
     ];
 }
