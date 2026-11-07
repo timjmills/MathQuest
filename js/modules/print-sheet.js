@@ -24,7 +24,7 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals } from './page-deal.js';
-import { repeatKeysOf as dlRepeatKeys } from './sheet/lesson-rules.js';
+import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
 import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
@@ -4708,7 +4708,7 @@ async function buildLesson(n, metaOf) {
         keyPages: n.key ? parts.flatMap((p) => tagPages(p.res.keyPages, p)) : [],
         keyPlans: parts.flatMap((p) => p.res.keyPlans || [p.res.plan]),
         // Each part's plans (the detailed lesson maker reads the printed items from them).
-        partPlans: parts.map((p) => ({ part: p.part, plans: p.res.keyPlans || [p.res.plan] })),
+        partPlans: parts.map((p) => Object.assign({ part: p.part, plans: p.res.keyPlans || [p.res.plan] }, p.sheet !== undefined ? { sheet: p.sheet } : {})),
         fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
         items: parts.flatMap((p) => (p.res.items || []).map((it) => Object.assign({ part: p.part }, it))),
         // The problems the pupil does (lessons r3: the print panel counted every dealt pool item,
@@ -5362,11 +5362,13 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
         const named = (q) => { for (const [t, w] of Object.entries(d.caseNames || {})) { const f = LESSON_CASE_TESTS[t]; if (f && f({ q })) return w; } return ''; };
         const parts = [];
         let k = 0;
-        for (const pl of partPlan('practice')) {
-            const cs = planCells(pl);
-            for (const pg of [...new Set(cs.map((c) => c.page))]) {
+        // (a `practiceSheets` sheet is ONE Practice k however many pages it prints: its last row is on its LAST page -
+        // lesson 3a P1d r3, critic: "Practice 3" named Practice 1's second page. Every other plan: one Practice k a page, as before)
+        const pEntries = ((lesson && lesson.partPlans) || []).filter((x) => x.part === 'practice');
+        const pUnits = dlPracticeUnits(pEntries, planCells);
+        {
+            for (const its of pUnits) {
                 k++;
-                const its = cs.filter((c) => c.page === pg);
                 const last = Math.max(...its.map((c) => c.row));
                 // (a function table - lesson 5: its rule as written, "n + 9", not its slot list)
                 // (`lastName(q)` on the description - lesson 4 r5, critic r2 n8: the lesson's own words for a last-row item,
@@ -5408,14 +5410,22 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
         if (V[ch.id].indep.length) glance.push({ page: `P3${ch.id} Independent`, answers: V[ch.id].indep.map((x) => x.ans).join(' · '), fade: '★★' });
     }
     let pNo = 0;
-    for (const pl of partPlan('practice')) {
+    // (a `practiceSheets` sheet over several pages - lesson 3a P1d r3, critic: its ★★★ row is on its LAST page only, and each
+    // of its pages is named "P4-n Practice k"; every single-page sheet and every other plan: as before)
+    const pSheets = ((lesson && lesson.partPlans) || []).filter((e) => e.part === 'practice');
+    const anyMulti = pSheets.some((x) => x.sheet !== undefined && x.plans.some((pl) => new Set(planCells(pl).map((c) => c.page)).size > 1));
+    for (const x of pSheets) for (const pl of x.plans) {
         const cs = planCells(pl);
-        for (const pg of [...new Set(cs.map((c) => c.page))]) {
+        const pgs = [...new Set(cs.map((c) => c.page))];
+        const multi = x.sheet !== undefined && pgs.length > 1;
+        for (const pg of pgs) {
             pNo++;
             const its = cs.filter((c) => c.page === pg);
             const last = Math.max(...its.map((c) => c.row));
-            glance.push({ page: `P4-${pNo} Practice, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
-            glance.push({ page: `P4-${pNo} Practice, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
+            const nm = anyMulti && x.sheet !== undefined ? `P4-${pNo} Practice ${x.sheet}` : `P4-${pNo} Practice`;
+            if (multi && pg !== pgs[pgs.length - 1]) { glance.push({ page: `${nm}, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.map((c) => dlAns(c.q)).join(' · '), fade: '★★' }); continue; }
+            glance.push({ page: `${nm}, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
+            glance.push({ page: `${nm}, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
         }
     }
     if (mixedNo) glance.push({ page: 'P4 Mixed', answers: cellsOf(partPlan('mixed')).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });

@@ -1209,7 +1209,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // (owner ruling A: the four-column side grid, [twin | problem | twin | problem])
                 ...(L.side4 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl4 } : {}),
                 rowGap: gap.gap || 0, availMm: lone ? avail : undefined,
-                items: its.map((it) => planItem(it, level, L.side4 ? L.drawCols : L.cols)),
+                // (`capFillCont`, lesson 3a P1d r3 - critic H13: cells stretched to the shared height hold their content in the MIDDLE)
+                items: its.map((it) => { const pi = planItem(it, level, L.side4 ? L.drawCols : L.cols); return capFill && sec.capFillCont ? Object.assign({}, pi, { style: `${pi.style || ''}justify-content:center;` }) : pi; }),
                 _its: its,
             });
         }

@@ -197,4 +197,18 @@ export function repeatKeysOf(q) {
     return [...new Set(out)];
 }
 
-export default { itemKey, opOfItem, nearTwins, CASE_FAMILIES, casesOf, packetViolations, repeatKeysOf };
+/**
+ * The Practice units {p4.last} names (lesson 3a P1d r3, critic: "Practice 3" named Practice 1's second page): a
+ * `practiceSheets` sheet (`sheet` set) is ONE unit however many pages it prints, its cells those of its LAST page; any other
+ * practice plan is one unit a page, as before. `entries`: the lesson's partPlans of part 'practice'; `cellsOf(plan)` the
+ * plan's cells, each with `page`. Returns arrays of cells, one a unit, in order. Pure.
+ */
+export function practiceUnits(entries, cellsOf) {
+    return (entries || []).flatMap((x) => (x.plans || []).flatMap((pl) => {
+        const cs = cellsOf(pl);
+        const pgs = [...new Set(cs.map((c) => c.page))];
+        return x.sheet !== undefined ? [cs.filter((c) => c.page === pgs[pgs.length - 1])] : pgs.map((pg) => cs.filter((c) => c.page === pg));
+    }));
+}
+
+export default { itemKey, opOfItem, nearTwins, CASE_FAMILIES, casesOf, packetViolations, repeatKeysOf, practiceUnits };

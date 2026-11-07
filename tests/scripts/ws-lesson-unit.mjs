@@ -34,6 +34,20 @@ const PRE = await imp('js/modules/lessons/prereqs.js');
 const BL = await imp('js/modules/build-list.js');
 const DET = await imp('js/modules/lessons/detailed/index.js');
 const LATE = {
+    // (P1d r3, lesson 3a critic: {p4.last} counted a Practice k a PAGE - "Practice 3" for Practice 1's second page. A
+    // practiceSheets sheet over two pages is ONE unit whose last row is on its last page; a plan without `sheet`, one a page)
+    async 'practice-units'() {
+        const f = LR.practiceUnits;
+        ok(typeof f === 'function', 'practice-units: lesson-rules exports practiceUnits');
+        if (typeof f !== 'function') return;
+        const plan = (pages) => ({ cells: pages.flatMap((n, pg) => Array.from({ length: n }, (_, r) => ({ page: pg, row: r + 1, id: `${pg}.${r}` }))) });
+        const cellsOf = (pl) => pl.cells;
+        const u = f([{ part: 'practice', sheet: 1, plans: [plan([2, 2])] }, { part: 'practice', sheet: 2, plans: [plan([10])] }], cellsOf);
+        eq(u.length, 2, 'practice-units: two sheets, one over two pages, are two Practice units (never "Practice 3")');
+        eq(u[0].map((c) => c.page), [1, 1], 'practice-units: a sheet over two pages names its LAST page');
+        const v = f([{ part: 'practice', plans: [plan([3, 3])] }], cellsOf);
+        eq(v.length, 2, 'practice-units: a plan without `sheet` stays one unit a page (every other lesson as before)');
+    },
     // (P1d, owner rulings 2026-11-07 - lesson 2 E24b, lesson 3a LP-FAMILY-REPEAT: the POOL CAPACITY a pack needs. A pack
     // whose places need more distinct facts than its rule holds - LR-5 one fact a pack, LR-6 no near twins on a page - deals
     // a repeat or a twin on its last try, at some seeds only. Read from the record, no browser.)
