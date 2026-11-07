@@ -40,12 +40,22 @@ Critic rounds: 2, FAIL min 7 (r1 FAIL min 1)
 | S4 grade-1 Match strips 11 pt (r1 #17, r2 #10) | V9: picture text at the width each cell draws it, every grade that deals the word, S/M/L: >= 16 pt K-1, >= 14 pt 2-5; boxes >= 4 mm; dots >= 2.5 mm | FAIL (241) | PASS | K-1 tracks 3 cells at 8.5 units; hundred chart 3 x 3; text 8-9 units library-wide; dots r 2 |
 | S5 score /4 (r1 #18) | V11: 4 Match 3 cells score 12; 6 pick3 cells score 6 | FAIL (/4) | PASS | Q-C, above |
 
-Other r2 defects: 1 look-alikes - round up / quotient and grow / sequence added to notWith (grow / pattern cannot be: the
-growing-patterns set would have no clash-free split, V7). 2 dead hints - V12; step 1 now names a cue (pick3: the word's first
+Other r2 defects: 1 look-alikes - round up / quotient added to notWith. grow / sequence and grow / pattern NOT added: pattern
+and sequence already clash, so set 7 kept one clash-free split and printed 2 Match 3 cells a page (precritic r4); open for the
+next round (redraw grow so it cannot read as a sequence, or an owner call on set 7's words). 2 dead hints - V12; step 1 now names a cue (pick3: the word's first
 letter; Match 3: one word's meaning). 3 screen pills - font max(20px, ...). 5 error-analysis wrong word - V13; a misspelling of the
 word (M-V4). 7 pictures below 8 - redrawn (ten, one, number name, round up, identity, step, left). NOT done: 4 (Match 3
 worksheet-1280 word wrap 2 + 1: a container-query attempt collapsed the tiles, reverted; the r2 tile layout is unchanged), 6
 (pilot lesson "Name the picture" cells: the pictures are larger now, the cell height is unchanged).
+
+## Precritic r4 / r5 (round 3; manifest applied in the working tree)
+- r4 (/tmp/mq-precritic/20261107-174230-8558): 4 FAIL - options-render and slot-clip (Match 3 pictures 2.4-2.6 mm out of the
+  cell at grades 1-2, pick3 grade 2 a "7" 0.4-1.7 mm out, set 7 37-41 % empty) fixed in cac85155; options-render re-run OK.
+- r5 (/tmp/mq-precritic/20261107-181426-9734): 3 FAIL / 21 PASS (2 baseline) / 3 N/A / 2 skipped of 29.
+  - ws-coverage-matrix and ws-slot-clip: ONLY the rows single/layout-fact-rows, ERROR "Cannot access 'opEm' before
+    initialization" in sheet/roles/fact-rows.js factRowsLayout (line ~641 uses opEm, declared at ~654). That is master's code
+    (facts print r8, cdaa80fc), not this lane's: every non-fact skill on the fact-rows layout hits it. For the lead / facts lane.
+  - ws-sibling-compare: structural (no approved sibling for a new family), as in r3.
 
 ## Rule 5 root causes (defects that survived r1 and r2) and the checks to write
 | Defect | Root cause | Machine check to write |
