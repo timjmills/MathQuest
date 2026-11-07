@@ -143,6 +143,8 @@ function cellChecksInPage(opts) {
                     var shaped = s.closest('.k2-shape');
                     if (!boxed && !shaped) return;
                     if (!shownEl(s)) return;
+                    // a finished solution shown to be judged (True or False?, Reason It, Error analysis) is not a writing place
+                    if (s.closest('.mq-judge-work, .mq-abbox, .mq-checkline, .mq-abchoice')) return;
                     var r = (shaped || s).getBoundingClientRect();
                     var w = r.width;
                     if (w < 13.9 * PX) out.findings.push({ rule: 'SLOT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ' (' + tmpl + '): answer box ' + mm(w) + ' mm wide, under 14 mm (SL-1, critic lf-ops r1 check 3)' });
