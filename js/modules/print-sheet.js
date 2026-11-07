@@ -5040,6 +5040,8 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
             practicePages: 0, mixed: false, header: { title: d.title, year }, tagLine, packTab: [`Level ${d.level}`, d.strand], lesson: `1${ch.id}`,
         });
         record(r);
+        // (lesson 7 D2: a chunk chart's examples - step panels, not plan cells - hold their family and frame too)
+        if (d.repeatKey) for (const q of ((r.lesson && r.lesson.chart && r.lesson.chart.exampleQs) || []).filter(Boolean)) for (const x of dlRepeatKeys(q)) used.add(x);
         chunkRes.push({ ch, r });
     }
     const chunkStrip = (id) => { const c = chunkRes.find((x) => x.ch.id === id); return c && c.r.strip ? c.r.strip : null; };
