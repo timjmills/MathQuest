@@ -198,6 +198,16 @@ export function factCue(p, { px = 0 } = {}) {
     }
     if (kind === 'array') {
         const cols = div ? b : a, rows = div ? (b ? a / b : 0) : b;
+        // Facts card F2 (owner 2026-11-07; critic laned-restart r4 R4-2): on a ÷ fact the support is a TRUE array - the
+        // quotient's rows of the divisor's dots - drawn top-left in ONE frame for the section (`p.frame`: the largest
+        // divisor's columns by the band's top rows), so every cell of the section has one geometry and one answer place.
+        if (div && p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
+            const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = 3, r = 1.05, pad = 1.2;
+            const w = fc * pitch + 2 * pad, h = fr * pitch + 2 * pad;
+            let body = `<rect x="0.2" y="0.2" width="${f2(w - 0.4)}" height="${f2(h - 0.4)}" rx="1.2" fill="none" stroke="${INK}" stroke-width="0.3"/>`;
+            if (Number.isInteger(rows) && rows > 0) for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(pad + x * pitch + pitch / 2, pad + y * pitch + pitch / 2, r, false);
+            return wrap(w, h, body, rows > 0 ? `array, ${rows} rows of ${cols}` : 'no dots');
+        }
         if (!cols || !rows) return '';
         const pitch = Math.min(3, 36 / Math.max(cols, rows)), r = pitch * 0.32;
         let body = '';

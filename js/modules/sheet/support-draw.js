@@ -183,6 +183,8 @@ export function canDraw(id, p, template) {
         if (template === 'stack' && Array.isArray(p.operands) && p.operands.length > 2) return false;
         const { a, b, op } = pp;
         if (id === 'think') return op === '/';
+        if (id === 'array' && op === '/' && p.supports && p.supports.arrayFrame) return true;
+        if (id === 'array' && op === '/' && p.arrayFrame) return true;
         if (id === 'array' && op === '/') return !!(PANES.array && PANES.array.accepts(pp));
         if (id === 'skip' || id === 'array') return op === '*' || op === '/';
         return (op === '+' || op === '-') && a <= 20 && b <= 20;
@@ -280,6 +282,15 @@ function pieceOf(id, p, template, ctx) {
         // ÷: the old array cue drew the quotient as its row count (it gave the answer away); the
         // S4 array pane draws the dividend's counters loose, to be ringed (answer-free, §S4.2).
         const panes = pp.op === '-' ? CUE_PANE[id] || [] : pp.op === '/' && id === 'array' ? ['array'] : [];
+        // (facts card F2: a ÷ fact whose section offers the array - every dividend 50 or less, print-sheet.js - draws the
+        // TRUE array, the quotient's rows of the divisor's dots, in the section's one frame `supports.arrayFrame`)
+        const af = pp.op === '/' && id === 'array' && p.supports && p.supports.arrayFrame;
+        if (af) {
+            const cp = { a: pp.a, b: pp.b, op: '/', cue: 'array', frame: af };
+            const html = factCueOf(cp, twin);
+            const m = MM_RE.exec(factCueOf(cp, false)) || [];
+            return html ? { html: `<div class="ws-factcue">${html}</div>`, foot: { wMm: Number(m[1]) || 16, hMm: Number(m[2]) || 38, placements: ['beside', 'under'] }, place: null } : null;
+        }
         if (pp.op === '/' && id === 'array') {
             const pane = paneOf('array', pp, ctx, twin);
             return pane;                                   // null: this ÷ fact has no answer-free array
@@ -331,8 +342,17 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
     // Lane D R4 prep (slot-clip PG-12, div_facts fade packet at L): the sign box stands BEFORE the problem and the beside
     // group starts 2 mm in, so a picture fits beside only when the sign box, its gap and that inset fit too (the 85 mm
     // ÷ counters beside "144 ÷ 12 =" with the sign box ran 4.5 mm out of a full-width cell).
+    // Critic laned-restart r4 R4-4 (boxsign Test L: 132 ÷ 12 alone in a full-width row): the sign box stands BEFORE a ÷
+    // fact only when the fact's answer line, which then stands beside the fact, fits the cell too; else it goes under, as
+    // in the narrower cells of the section. (Before, the box stood before "132 ÷ 12 = ____" in a two-column cell and ran
+    // 5 mm out of it, so the fact counted as full-width only and was split off the grid it fits at three columns.)
+    const divLineW = template === 'equation' && opKey(p.op) === '/' ? blankWidth(Number(p.digits) || 2, ctx.size) : 0;
+    const placeOf = (pc) => {
+        const pl = pc.place || placePane(pc.foot, { problemWMm, cellWMm, problemHMm });
+        return pl === 'before' && divLineW && problemWMm + divLineW + 6 + PANE_GAP_MM + pc.foot.wMm > cellWMm ? 'under' : pl;
+    };
     let beforeW = 0;
-    for (const id of ids) { const pc = pieceOf(id, p, template, ctx); if (pc && pc.foot && (pc.place || placePane(pc.foot, { problemWMm, cellWMm, problemHMm })) === 'before') beforeW = Math.max(beforeW, pc.foot.wMm + PANE_GAP_MM); }
+    for (const id of ids) { const pc = pieceOf(id, p, template, ctx); if (pc && pc.foot && placeOf(pc) === 'before') beforeW = Math.max(beforeW, pc.foot.wMm + PANE_GAP_MM); }
     for (const id of ids) {
         const piece = pieceOf(id, p, template, ctx);
         if (!piece) continue;
@@ -341,7 +361,7 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
         // two, never to their sum), else under it; the sign and the arrow have their own places.
         if (!place) {
             const pl = piece.foot.placements || ['beside', 'under'];
-            place = placePane(piece.foot, { problemWMm, cellWMm, problemHMm });
+            place = placeOf(piece);
             if (pl.includes('beside') && problemWMm + PANE_GAP_MM + piece.foot.wMm <= cellWMm) place = 'beside';
             // (a ÷ fact's footprint counts its answer line UNDER it - equation.js - but beside a picture in a full-width
             // cell the line stands beside the fact, so the line is counted too; the beside group's inset clears the tab)
@@ -445,7 +465,11 @@ export function supportFootprint(fp, p, template, ctx = {}) {
         if (piece && piece.foot) return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, hardCap: true,
             maxCols: Math.max(1, Math.min(out.maxCols || 10, cap, 4, Math.floor(186 / ((fp.wMm || 0) + PANE_GAP_MM + piece.foot.wMm + 6.6)))) });
     }
-    return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4) });
+    // Critic laned-restart r4 R4-1 (div_facts touch S / M, boxsign S / L Independent: cells a third empty, H13): a ÷ fact's
+    // measured height already holds its supports and pads, so its rows keep the Test's 1.05 room over it (test.js), not the
+    // practice 1.2 - touch S / M prints 3 x 5 = 15, as the Test of the same support does.
+    const room = pp && pp.op === '/' ? { denseRoom: 1.05 } : {};
+    return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4) }, room);
 }
 
 // Every template's render and footprint go through the registry, which draws the supports round

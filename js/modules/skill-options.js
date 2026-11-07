@@ -4124,3 +4124,23 @@ for (const key of ['multiplication:mult_word_problems_plain', 'division:div_word
     'multiplication:mult_comparison', 'division:remainder_interpret']) {
     if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map((o) => (o.id === 'wpCues' || o.id === 'wpBank' ? { ...o, hidden: true } : o));
 }
+
+// ============================ lane lf-ops (2026-11-07): div_facts' array support, facts card F2 ==================
+// The array support draws a TRUE array: the quotient rows of the divisor's dots (owner ruling F2, critic laned-restart
+// r4 R4-2). An array is countable while every dividend of the section is 50 or less, so it is offered only then: past
+// it the panel greys the Array box with the reason (`valueLock`, skill-options-ui.js) and the sheet's fits line names
+// the facts it did not draw it on (print-sheet.js). The largest dividend is read from the options: the largest ticked
+// table that is not 0, times the band's top quotient (10 on "Tables to 10 x 10", else 12) - the generator's own reach.
+export const DIV_ARRAY_MAX = 50;
+export function divFactsMaxDividend(opts = {}) {
+    const top = Number(opts && opts.band) === 100 ? 10 : 12;
+    let t = opts && opts.constant;
+    if (typeof t === 'number' || typeof t === 'string') t = [t];
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
+    return ticked.length ? Math.max(...ticked) * top : 0;
+}
+export const divArrayWhy = (opts) => `An array is drawn while every dividend is ${DIV_ARRAY_MAX} or less; these tables go to ${divFactsMaxDividend(opts)}. Tick the 2 to 4 tables (or 2 to 5 on "to 10 x 10") for it.`;
+{
+    const sup = (SKILL_OPTIONS['division:div_facts'] || []).find((o) => o.id === 'support');
+    if (sup) sup.valueLock = (cur) => (divFactsMaxDividend(cur || {}) > DIV_ARRAY_MAX ? { array: divArrayWhy(cur || {}) } : null);
+}

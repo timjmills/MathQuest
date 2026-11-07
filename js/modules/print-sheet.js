@@ -25,7 +25,7 @@
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
@@ -1250,7 +1250,14 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
     if (!chosen.length) return null;
     const p = q.cell.payload || {};
-    let worst = chosen.filter((id) => canDraw(id, p, template));
+    // Facts card F2 (owner 2026-11-07; critic laned-restart r4 R4-2): div_facts' array is a TRUE array, offered only
+    // while every dividend of the section is 50 or less (the options' reach, skill-options.js divFactsMaxDividend); past
+    // it the support is not drawn on any fact (arrayDropNote names them in the fits line). Kept, it is drawn on EVERY
+    // fact in one frame for the section: the largest divisor's columns by the band's top quotient's rows.
+    const divArr = sk.categoryId === 'division' && sk.skillId === 'div_facts' && opKey(p.op) === '/' && chosen.includes('array');
+    const arrayOff = divArr && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    const frameP = divArr && !arrayOff ? Object.assign({}, p, { arrayFrame: true }) : p;
+    let worst = chosen.filter((id) => !(arrayOff && id === 'array') && canDraw(id, frameP, template));
     if (!worst.length) return null;
     // Section by section across a page of several sections, a section only ever carries ITS
     // alternative (supports.js deals mixKey % alternatives), so that is all it keeps room for.
@@ -1276,6 +1283,7 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     }
     // ÷: the tally row is the same length for every item of the section: 12 on a 12s set.
     if (op === '/') extra.tally = Number(o.band) >= 144 ? 12 : 10;
+    if (divArr && !arrayOff && worst.includes('array')) extra.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(o) / extra.tally), rows: extra.tally };
     return {
         chosen, worst, need, forceL, extra,
         cover: o.cover || 'whole', mix: o.mix || 'section',
@@ -1313,6 +1321,31 @@ function splitBySupports(sec, gi, n) {
         group: { id: `sup${gi}`, share: 1 / k },
         supportAlt: i,
     })).filter((x) => !counts || x.count);
+}
+
+/** Facts card F2: is div_facts' array asked for this item's section and NOT drawn (a dividend past 50)? */
+function arrayDroppedFor(sk, q) {
+    if (!sk || sk.categoryId !== 'division' || sk.skillId !== 'div_facts' || !q || !q.cell) return false;
+    const p = q.cell.payload || {};
+    if (opKey(p.op) !== '/') return false;
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    return (Array.isArray(o.support) ? o.support : []).includes('array') && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+}
+/** The fits line's words for the facts that carry no array (facts card F2), each named as it prints. */
+function arrayDropNote(items) {
+    const facts = [];
+    let o = null;
+    for (const it of items || []) {
+        if (!it || !it.arrayDropped) continue;
+        const p = (it.q && it.q.cell && it.q.cell.payload) || {};
+        const a = p.a !== undefined ? p.a : p.dividend, b = p.b !== undefined ? p.b : p.divisor;
+        if (a === undefined || b === undefined) continue;
+        const t = `${a} ÷ ${b}`;
+        if (!facts.includes(t)) facts.push(t);
+        if (!o && it.skillRef) o = normalizeOptions('division', 'div_facts', it.skillRef.opts || {});
+    }
+    if (!facts.length) return '';
+    return `Array support not drawn: every dividend must be ${DIV_ARRAY_MAX} or less (these tables go to ${divFactsMaxDividend(o || {})}). No array on ${facts.join(', ')}.`;
 }
 
 /** The sheet-level mix, when the request sets one. */
@@ -1563,6 +1596,9 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         canShow,
         // S2: the supports box (shared by every clone a role makes of this item) and what it holds.
         supportsBox,
+        // facts card F2: div_facts' array asked but past dividends of 50, so not drawn (the fits line names the fact)
+        arrayDropped: withSupports && arrayDroppedFor(g.skill, q),
+        skillRef: g.skill,
     };
     return item;
 }
@@ -3528,6 +3564,7 @@ async function buildSheetDeal(req = {}) {
     const f0 = fitsList[0] || {};
     const pageCount = out.pupilPages.length;
     notes.push(...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes);
+    { const an = arrayDropNote(hostItems); if (an) notes.push(an); }
     // DN-21: the dialog's "Fits:" line (it already carries the layout's own clamp note, DN-14),
     // then any note the layout line does not already say.
     const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
@@ -4227,6 +4264,7 @@ async function buildRoleSheet(n, metaOf) {
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t)), ...dealNotes];
     if (numberLine && numberLine.warn) notes.push(numberLine.warn);
+    { const an = arrayDropNote(items); if (an) notes.push(an); }
     // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
     // are raised to L; the fit line says so instead of the page's own digit size alone.
     const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
