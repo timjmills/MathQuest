@@ -428,7 +428,10 @@ function libraryOf(card, parts, shape, notes) {
     const pre = (parts.prereqs || []).map((p) => {
         const lid = libraryIdOf(p.lesson && p.lesson.id);
         return Object.assign({ lesson: lid, title: (p.lesson && p.lesson.title) || '', key: keyOf(p.ref) }, p.ref.opts ? { opts: clone(p.ref.opts) } : {},
-            { why: p.why || (p.atom && p.atom.skill) || (p.lesson && p.lesson.title) || '' }, p.items !== undefined ? { items: p.items } : {}, floorsOf(p.ref));
+            // (`checks`, LR-17 D12: what the question asks, pupil-facing - the card's own line, else its atom; `why` is the
+            // design reason and must differ from it)
+            { checks: p.checks || (p.atom && p.atom.skill) || (p.lesson && p.lesson.title) || '' },
+            { why: p.why || `${(p.lesson && p.lesson.title) || 'This lesson'} comes before ${card.title || 'this lesson'}.` }, p.items !== undefined ? { items: p.items } : {}, floorsOf(p.ref));
     });
     const distinct = new Set(pre.map((p) => p.lesson));
     if (pre.length >= 3 && pre.length <= 4 && pre.every((p) => p.lesson) && distinct.size === pre.length) {
