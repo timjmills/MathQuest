@@ -1742,8 +1742,8 @@
     "state": "lf-ops head graded by div_facts critic r5: plain Test M 16 cells, 25.7 mm band in 48.0 mm cells (54 %)"
    },
    "pass": {
-    "commit": "TBD-next-week",
-    "state": "the next builder's fix of the div_facts Test / supports-off rows (test.js fillToCeiling; filled when it lands)"
+    "commit": "96e1b1c",
+    "state": "fix (fresh builder): div_facts Test rows sized to 1.15 x the footprint (test.js fillToCeiling footprintRows), 0 findings at S / M / L"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --h13-ink plain --roles test --size M --seed render --lints L-DENSITY",
    "expect": {
