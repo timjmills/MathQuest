@@ -2100,8 +2100,8 @@ function measureSide2(pairs, { size, look, tpl = '', mdoc = null }) {
     if (typeof document === 'undefined' || !document.body || !pairs.length) return '';
     const { root, done } = measureHost(size, look, mdoc);
     const PX_PER_MM = 96 / 25.4;
-    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
-    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: Number.isFinite(lvl) ? lvl : 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(Number.isFinite(x.measureLevel) ? x.measureLevel : 1), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
     try {
         if (!tpl) {
             // the pupil's column: the widest problem at its own width (a max-content column)
@@ -2146,8 +2146,8 @@ function measureSide4(pairs, { size, look, mdoc = null }) {
     const { root, done } = measureHost(size, look, mdoc);
     const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
     const PX_PER_MM = 96 / 25.4;
-    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
-    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: Number.isFinite(lvl) ? lvl : 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(Number.isFinite(x.measureLevel) ? x.measureLevel : 1), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
     // the content's ink extent in a cell, and whether it stays inside the cell's padding box
     const ink = (cell) => {
         const r = cell.getBoundingClientRect();
@@ -2255,7 +2255,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const bodies = new Map();
         for (const it of items) {
             bodies.set(it, cols.map((c) => MEASURE_STATES.map((state) => {
-                try { return it.render(ctxOf(state, (it.measureLevel ?? 1), it), { cols: c }); } catch (e) { return ''; }
+                try { return it.render(ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it), { cols: c }); } catch (e) { return ''; }
             })));
         }
         // a cell measured before Andika has loaded (fontsReady gives up after 3 s) is never
@@ -2265,7 +2265,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const dpr = typeof window !== 'undefined' && window.devicePixelRatio ? window.devicePixelRatio : 1;
         const keyOf = (it) => {
             if (noCache || !faceReady || Array.isArray(it.judgeModes) || it.colsLayout) return null;
-            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, (it.measureLevel ?? 1)].join('|');
+            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1)].join('|');
             const text = `${size}|${look}|${cols.join(',')}|${flags}|${bodies.get(it).map((b) => b.join('\u0001')).join('\u0002')}`;
             return `${hash53(text)}:${text.length}`;
         };
@@ -2484,13 +2484,13 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (cells && !cells.every((el) => el && el.nodeType === 1 && el.classList.contains('ws-cell') && el.parentNode === root)) cells = null;
                 if (cells) {
                     BUILD_STATS.layouts++;
-                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, (it.measureLevel ?? 1), it)));
+                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it)));
                     items.forEach((it, i) => fold(it, c, inner, readings[i]));
                 } else {
                     items.forEach((it, i) => {
                         root.innerHTML = list[i][1];
                         BUILD_STATS.layouts++;
-                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, (it.measureLevel ?? 1), it)));
+                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it)));
                     });
                 }
             });
@@ -2672,16 +2672,12 @@ function optionTitleBase(sk, baseICan) {
 
 /** The page title for the chosen options; a count-by row of 15 jumps says so; the tables stay 1 to 12 (wave 1 lane C). */
 function optionTitle(sk, baseICan) {
-    const t = optionTitleBase(sk, baseICan);
-    try {
-        if (sk.skillId === 'count_by_tables' && Number(normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}).jumps) === 15) {
-            const base = t || baseICan || '';
-            return /\(15 jumps\)/.test(base) ? base : `${base} (15 jumps)`;   // the tables stay 1 to 12; the row is 15 jumps long
-        }
-    } catch (e) { /* keep the base title */ }
-    return t;
+    // (lane lf-ops critic r1 D-CB-2, count-row card §9 Q6: the 15-jump row no longer adds "(15 jumps)" - an option value is
+    // never part of the I Can line)
+    return optionTitleBase(sk, baseICan);
 }
 
+const TITLE_FROM_OPTS = new Set(['count_by_tables', 'mult_properties', 'arrays_groups']);
 /** Skill metadata the frame prints: label, level, and the strings the role reads. */
 function skillMeta(sk, q) {
     // A ranged + / − id whose band (or regrouping, on a _mixed id) is set below its own name
@@ -2700,7 +2696,9 @@ function skillMeta(sk, q) {
     }
     // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
     let titleOpts = {};
-    if (sk.skillId === 'count_by_tables') {
+    // (lane lf-ops critic r1 D-MP-8: mult_properties' title, Rule and vocabulary follow the property dealt - its `forms` -
+    // so its strings read the options as count_by_tables' do; arrays_groups names arrays or equal groups the same way)
+    if (TITLE_FROM_OPTS.has(sk.skillId)) {
         try {
             const no = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
             // the one-page sheet prints only the rows that fit: the title names those, in the order they print
@@ -4334,7 +4332,7 @@ async function buildRoleSheet(n, metaOf) {
             if (!prepared) return false;
             prepared.pool = pool.id;
             // A role that draws Model / Guided cells measures them at their tallest level.
-            if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
+            if (mod.MEASURE_LEVEL !== undefined && mod.MEASURE_LEVEL !== null) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
             // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
             // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
             if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
@@ -4739,7 +4737,7 @@ async function buildLesson(n, metaOf) {
     // id, or the skill's default lesson (lessons/library.js - the same record prereqs.js lessonFor reads, plus its
     // `prereqs`); else lessonFor (a skill with no library lesson).
     const libId = n.lessonData ? '' : (n.lessonId || ((defaultLessonForSkill(sk0.categoryId, sk0.skillId) || {}).id || ''));
-    const recordOf = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId);
+    const recordOf = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId, s1.opts || null);
     const data0 = recordOf(sk0);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
