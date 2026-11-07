@@ -152,7 +152,7 @@ export default {
     exit: [
         // (two a half, full size: the story above its bar, so each sentence keeps its line - critic r2 D4. Both
         // situations are assessed: a. put together, b. add to.)
-        { case: 'put together, big part first, a whole of 14 or more', ref: WP({ minNum: 14, maxNum: 19 }, EXIT_BAR), want: ['wpBridgeHigh', 'wpBridgeBigFirst', 'wpPutTogether', 'wpClean'], detects: 'Copies a story number as the answer; count slip past 10.' },
+        { case: 'put together, big part first, a whole of 14 or more', ref: WP({ minNum: 14, maxNum: 19 }, EXIT_BAR), want: ['wpBridgeHigh', 'wpBridgeBigFirst', 'wpPutTogether', 'wpClean'], reserve: true, detects: 'Copies a story number as the answer; count slip past 10.' },
         { case: 'add to, small part first (Critical Atom)', ref: WP({ minNum: 11, maxNum: 19 }, EXIT_BAR), want: ['wpBridgeSmallFirst', 'wpAddToAny', 'wpClean'], detects: 'The whole written in a part box.' },
     ],
     exitCols: 1,

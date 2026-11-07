@@ -4808,7 +4808,7 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (grp) grp.set(ref.pageGroup, (grp.get(ref.pageGroup) || []).concat([key]));
         return { q, v, key };
     }
-    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')})${ref.gridFresh ? ' windows: ' + [...used].filter((u) => /^grid/.test(u)).join(' ') : ''} DBGUSED ${[...used].join(' ')}`);
+    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')})${ref.gridFresh ? ' windows: ' + [...used].filter((u) => /^grid/.test(u)).join(' ') : ''}`);
 }
 
 /**
@@ -4967,6 +4967,16 @@ async function buildDetailedLesson(req = {}) {
     const partPlan = (part) => ((lesson && lesson.partPlans) || []).filter((x) => x.part === part).flatMap((x) => x.plans);
     const record = (res) => { for (const pp of res.partPlans || []) for (const pl of pp.plans) recordPlan(pl); if (res.plan) recordPlan(res.plan); };
     const shape = (d.lessonData && d.lessonData.practiceShape) || [6, 2];
+    // (`exit[i].reserve`, lesson 2 R1: an exit case so rare the pack's other pages can spend all of its facts - a
+    // put-together story, big part first, a whole of 14 or more: six facts - is dealt FIRST, before any page, and its fact
+    // and turn-around go into `used`, so no page deals it; the slip prints it in its place. Absent: dealt in turn, as before.)
+    const reserved = new Map();
+    for (const [i, e] of (d.exit || []).entries()) {
+        if (!e || !e.reserve) continue;
+        const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, null, null, null, null);
+        if (plusTurn(x.key)) used.add(plusTurn(x.key));
+        reserved.set(i, x);
+    }
 
     // ---------------------------------------------------------------- Chunked Flow (V22): chunks 2..n
     // A description with `chunks` teaches its routine in paired I Do / We Do cycles. Chunk 1 is the
@@ -5052,7 +5062,9 @@ async function buildDetailedLesson(req = {}) {
     const cqFirst = !!(d.checkQuestion && d.checkQuestion.first);
     const cqDeal = () => dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
     const cqD0 = cqFirst ? cqDeal() : null;
-    const exitD = d.exit.map((e, i) => { const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys); exAns.add(dlAns(x.q)); return x; });
+    // (a reserved item - dealt before every page - holds its place on the slip: its answer, near twins and names first)
+    for (const [i, x] of reserved) { const sk = d.exit[i].ref.skillId; exAns.add(dlAns(x.q)); const nv = nearKeyOf(x.q); if (nv !== null) exNear.add(`${sk}:${nv}`); lr6Record(x.q, sk, exNear); for (const nm of lr6Of(x.q).names) storyNames.add(nm); }
+    const exitD = d.exit.map((e, i) => { if (reserved.has(i)) return reserved.get(i); const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys); exAns.add(dlAns(x.q)); return x; });
     // (`want` on a retrieval row - lesson 3a r2: no x 0 or x 1 fact, lesson 3b's content; absent = any, as before)
     const retD = (d.retrieval || []).map((r, i) => dealOne(bo(r.ref), (seed + 503 + 89 * i) >>> 0, used, r.want));
     // (`checkQuestion.ref`, lesson 3a: the Check Question's own form of the skill; absent = the lesson skill)
