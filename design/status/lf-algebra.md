@@ -2,22 +2,33 @@ Lane: lf-algebra
 Title: Lessons-first wave 1: the patterns and algebra skills of the CCSS BUILD lessons
 Session: session_013pHDnKpNaW4JzSJ8QNo1H7
 Branch: claude/sweet-newton-c8wrv1-lf-algebra
-Owner of files: gen-algebraic.js, gen-function-table.js, gen-patterns-notice.js (new), sheet/cells/{function-table,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, design/cards/{function-table,patterns}/
-State: building
-Updated: 2026-11-07 (fix r4)
+Owner of files: gen-algebraic.js (not the number_word_form blocks: lf-placevalue), gen-function-table.js, gen-patterns-notice.js, sheet/cells/{function-table,notice,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, genNumberPatterns + the number_patterns_rule provider block (released by lf-ops), design/cards/{function-table,patterns}/
+State: paused
+Updated: 2026-11-07 (hand-over)
 Builder profile: mq-opus-medium
 Critic rounds: 0, none
 
 ## Now
-- Re-aimed by the owner (2026-11-07, decision 1): only the 64 CCSS BUILD lessons, in the order of
-  `data/curriculum/ccss-build-lessons.json`. This lane's lessons, in order: #3 Patterns on the multiplication table
-  (3.OA.D.9; lf-ops owns the multiplication-chart drawing), #5 Find the rule in an input-output table (3.OA.D.9),
-  #19 Find emergent features (4.OA.C.5), #20 Follow a given rule to extend a number pattern (4.OA.C.5), #21 Extend growing
-  shape patterns (4.OA.C.5); then the later BUILD lessons in teach-week order (#7 two-step, #25/#26 expressions, #30/#31 …).
-- Skills these lessons need: `patterns:notice_patterns` (new, build entry patterns_notice: #3, #19),
-  `algebra:function_table_easy` (#5), `patterns:number_patterns_rule` (#19, #20, #21; files are lf-ops': asked),
-  `patterns:growing_shape_patterns` (new, links proposal: #21).
-- The brief's G3 lesson-7 two-step scope (two_step_*, multi_step_word) moves after these, by teach week.
+- HAND-OVER 2026-11-07 ~12:50 UTC (week stop at 70 % ~15:30): paused at a clean point, no critic round run. Rule 0b blocks
+  the critic: precritic is red on roles these skills print, and every remaining red but one belongs to lf-ops / lf-engine.
+- Six skills built or fixed for BUILD lessons #3 #5 #19 #20 #21: algebra:function_table_easy, patterns:number_patterns_rule,
+  patterns:follow_given_rule (preset, new), patterns:notice_patterns (new), patterns:pattern_features (preset, new),
+  patterns:growing_shape_patterns (new). Cards: function-table SIGNED (800dad86d); patterns RE-SIGN NEEDED (b0ca7395 resized
+  the growing unit to the standard's minimum, 2.5/2.5/2.6 mm, dots 0.8 u, box 7.8 u).
+- Next, in order: (1) lead re-signs patterns; (2) take lf-ops' count-row fix for the wrap root cause (we hold an interim
+  revert of 3d8bca1's wrap hunk, 2cfeb1d7) and lf-engine's `guidedRows: 1|2` key, then set guidedRows: 1 in our lesson data
+  (after lf-engine merges, our 6 lesson-data entries move from lessons/prereqs.js to lessons/families/algebra.js); (3) ours:
+  capitalise the parity answer (gen-patterns-notice.js:72 'even'/'odd' -> 'Even'/'Odd', then check the card rulings and the
+  screen check: the Error-analysis fix choices show "odd" beside "Even"), notice reason-it L H13 x4 / CL40-INK x4 (owner
+  unclear, not on precritic's plan); (4) clean precritic on the branch merged with the integration tip; (5) one family critic
+  of the 6 skills (every page type S/M/L, keys, 3 screen hosts, option panel; the 28 first-family pages named in "Precritic r3").
+- Remaining red, by owner: lf-ops count-row (follow_given_rule lesson p3 H13 one-sided track + PAGEFILL; shape=circle|hex|mixed
+  capacity; number_patterns_rule pattern=add|sub|grow S 8 vs 9 after the revert; reason-it narrow-cell overflow back after the
+  revert); lf-engine lesson.js chartWide packing (notice PAGEFILL p3; pattern_features DN-2 / LONE / PAGEFILL; growing PAGEFILL /
+  DN-2); section engine (pages-2, ex-each GRID-EVEN: same with a passed skill in our place); sibling-compare SKIPPED by the lead's
+  first-family rule.
+- COST: session cost_usd $113.21 at hand-over (≈ 5.7 % at $20 = 1 %; this session's counter includes its sub-agents), cap $200.
+  Builder r1 ≈ $50 + $55-60, fix r2 ≈ $40-45, r3 ≈ $25, r4 ≈ $10 (sub-agent estimates; overlap the session total).
 
 ## Owner go
 
@@ -252,6 +263,17 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-07 ~12:50: hand-over. Merged the integration tip (14 commits, clean); on the merged tree ws-code-snapshot (736 codes),
+  ws-standards, ws-search-terms, ws-presets-unit (126), ws-redesign-passed, ws-wrm-page-unit, ws-lessons-first-queue --check and
+  ws-spec-card --check-signed (before the patterns re-sign) all OK. No skill added to redesign-passed.js (no critic yet).
+  Speed reflection (rule 00) for the auditor: 4 builder/fixer runs, 0 critic rounds. Time lost to (a) a cross-lane regression
+  (count-row 3d8bca1 keyed the wrap on ctx.columns, found only by our lesson-page gates: automatic check proposal = a count-row
+  backtest row "full-width panel with columns > 1 must not wrap", owner lf-ops); (b) lesson-role packing of tall cells
+  (guidedRows min 2) found by precritic two rounds running (proposal: lf-checks adds a lesson-page fit check per new template
+  BEFORE the build, using the cell's footprint; owner lf-checks); (c) tools that read only numeric answers (dealer-uniform,
+  card-rulings) cost a round each on non-arithmetic skills: both now read declared sets / payload fields (done, backtest
+  dealer-declared-set); (d) parallel builders in worktrees cost one merge conflict each in prereqs.js (append-only blocks:
+  harmless). Speed-up: brief builders with the other lanes' file locks and pending cross-lane commits up front.
 - 2026-11-07 fix r4 (Opus medium; two machine-check reds). (1) notice_patterns error-analysis H13 S x12 / L x8 -> 0: in the
   finished-work state ('wrong') the parity cell reads "The product is [Even] Odd" as one sentence where the column is wide
   enough and marks that column data-ws-anscol, so the EA role puts Correct / Fix-it under it (intoAnswerColumn, AX-4 'incol'):
