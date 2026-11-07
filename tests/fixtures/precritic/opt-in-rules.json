@@ -3,7 +3,7 @@
  "lanes": [
   {
    "lane": "lf-placevalue",
-   "why": "critic r1 (design/audit/runs/lf-placevalue/critic-r1.md section 5): F1 H13-ABS, F3 WRONG-FITS per slot, F7 SCREEN-DIGIT, F9 GRID-EVEN-ALL, F10 SLOT-W-EQUAL, F15 DRAW-CAP, F19 / F20 options-render bands",
+   "why": "critic r1 (design/audit/runs/lf-placevalue/critic-r1.md section 5): F1 H13-ABS, F3 WRONG-FITS per slot, F7 SCREEN-DIGIT, F9 GRID-EVEN-ALL, F10 SLOT-W-EQUAL, F15 DRAW-CAP, F19 / F20 options-render bands; critic r2 (critic-r2.md): N1 WRONG-DIFFERS, N2 PRINTED-INSTRUCTION, N3 COMBINE-PARTS, N4 PLACE-WORD-LIVE (ws-providers-unit --pv-r2)",
    "skills": ["placevalue:identify", "placevalue:value", "placevalue:combine", "placevalue:expand", "placevalue:unit_form"],
    "gates": {
     "print-lint-kit": { "args": ["--rules", "H13-ABS,GRID-EVEN-ALL"] },
@@ -12,7 +12,8 @@
     "node-lint-s1": { "addRules": ["WRONG-FITS-SLOTS", "WRONG-FILL"] },
     "slot-clip": { "args": ["--slot-w-equal", "--draw-cap"] },
     "screen-slots": { "args": ["--screen-digit"] },
-    "options-render": { "args": ["--bands"] }
+    "options-render": { "args": ["--bands"] },
+    "providers": { "args": ["--pv-r2", "N1,N2,N3,N4"] }
    }
   }
  ]

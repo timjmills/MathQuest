@@ -41,7 +41,8 @@ import { topicOf } from '../../js/modules/sheet/roles/compose.js';
 import { state as APP_STATE } from '../../js/modules/state.js';
 import { generatePvPlaceValue } from '../../js/modules/gen-pv.js';
 import { resetPageDeals } from '../../js/modules/page-deal.js';
-import { normalizeOptions } from '../../js/modules/skill-options.js';
+import { normalizeOptions, offeredOptionsFor } from '../../js/modules/skill-options.js';
+import { skillWords } from '../../js/modules/sheet/roles/practice.js';
 import { renderCell, resolveCtx } from '../../js/modules/sheet/index.js';
 
 /** Skills whose items yield no Guided hint (reported; a stack or a fact draws its own cue). */
@@ -881,6 +882,90 @@ for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
         ok(!/\b\w+iping\b/i.test(t) && !/\b\w+iping\b/i.test(`Review: ${t}`), `D4: ${key} title "${t}" is misspelt`);
     }
     ok(n > 50, `D4: titles checked for ${n} providers`);
+}
+
+/* ===================================================== lf-placevalue critic r2 (2026-11-07) */
+// OPT-IN (lead ruling D1): --pv-r2 N1,N2,N3 turns these rules ON (default off, so the default run and every pinned
+// baseline read as before); --rule-skills <keys> (ws-precritic opt-in-rules.json) limits them to the lane's skills in
+// scope. design/audit/runs/lf-placevalue/critic-r2.md N1-N3; backtests pv-r2-* in tests/fixtures/precritic/backtests.json.
+const PV_R2 = new Set(ARGV.flatMap((a, i) => (a === '--pv-r2' && i + 1 < ARGV.length ? String(ARGV[i + 1]).split(',') : [])).map((x) => x.trim()).filter(Boolean));
+const PV_R2_SKILLS = ARGV.flatMap((a, i) => (a === '--rule-skills' && i + 1 < ARGV.length ? String(ARGV[i + 1]).split(',') : [])).map((x) => x.trim()).filter(Boolean);
+const pvR2On = (id, key) => PV_R2.has(id) && (!PV_R2_SKILLS.length || PV_R2_SKILLS.includes(key));
+// Every offered value of an option of a pv skill (read from skill-options.js, so a new value is covered when it lands).
+const pvOffered = (skill, id) => { const o = (offeredOptionsFor('placevalue', skill) || []).find((x) => x.id === id); if (!o) return []; return o.type === 'bool' ? [false, true] : (o.values || []).map((v) => v.v); };
+const pvCross = (skill, ids) => ids.reduce((acc, id) => { const vs = pvOffered(skill, id); return vs.length ? acc.flatMap((o) => vs.map((v) => ({ ...o, [id]: v }))) : acc; }, [{}]);
+// The key's per-slot values, from the worked steps' marks (the same values the facsimile key writes).
+const pvKeySlots = (q) => { const m = {}; for (const s of getProvider('placevalue', q.skillId).workedSteps(q) || []) for (const k of s.marks || []) if (k && k.slot) m[k.slot] = String(k.value); return m; };
+const pvNorm = (v) => String(v ?? '').replace(/,/g, '').trim().toLowerCase();
+if (pvR2On('N1', 'placevalue:identify')) {
+    // N1 WRONG-DIFFERS: the wrong work a True or False? / Reason It page states is wrong in at least one graded slot
+    // (compared slot by slot, never the joined string) and never equals the key (564, the 6: "tens, 60" is TRUE).
+    const sets = pvCross('identify', ['band', 'writeValue', 'response', 'repeatDigit']);
+    let n1 = 0; const bad = [];
+    for (const o of sets) {
+        for (let seed = 0; seed < 60; seed++) {
+            const q = pvReal('identify', o, seed % 12, 5101 + Math.floor(seed / 12) * 37);
+            const w = getProvider('placevalue', 'identify').wrongAnswer(q);
+            if (!w) continue;
+            n1++;
+            const key = pvKeySlots(q);
+            const ws = w.slots || { [w.slot || 'answer']: String(w.value) };
+            const graded = Object.keys(key).filter((s) => s in ws);
+            const differs = graded.some((s) => pvNorm(ws[s]) !== pvNorm(key[s]));
+            const same = sameAnswer(w.value, q.ans) || (graded.length > 0 && !differs);
+            if (same || !graded.length) bad.push(`${JSON.stringify(o)} n=${q.pv && q.pv.n} place ${q.pv && q.pv.place}: wrong ${JSON.stringify(ws)} = key ${JSON.stringify(key)}`);
+        }
+    }
+    ok(n1 > 0, 'N1 WRONG-DIFFERS placevalue:identify: no wrong work dealt at all');
+    ok(!bad.length, `N1 WRONG-DIFFERS placevalue:identify: ${bad.length} of ${n1} wrong answers are the key in every graded slot (${sets.length} option sets x 60 seeds), e.g. ${bad.slice(0, 4).join('; ')}`);
+}
+if (pvR2On('N3', 'placevalue:combine')) {
+    // N3 COMBINE-PARTS: a combine item always shows two or more parts ("60 = ___" is its own answer), every band x zeroPlace x order.
+    const sets = pvCross('combine', ['band', 'zeroPlace', 'order']);
+    const bad = []; let n3 = 0;
+    for (const o of sets) for (let seed = 0; seed < 60; seed++) {
+        const q = pvReal('combine', o, seed % 12, 6203 + Math.floor(seed / 12) * 41);
+        n3++;
+        const parts = (q.pv && q.pv.parts) || [];
+        if (parts.length < 2) bad.push(`${JSON.stringify(o)} n=${q.pv && q.pv.n}: ${parts.length} part(s) [${parts.join(' + ')}]`);
+    }
+    ok(!bad.length, `N3 COMBINE-PARTS placevalue:combine: ${bad.length} of ${n3} items show fewer than 2 parts (${sets.length} option sets x 60 seeds), e.g. ${bad.slice(0, 4).join('; ')}`);
+}
+if (pvR2On('N2', 'placevalue:identify')) {
+    // N2 PRINTED-INSTRUCTION: the instruction line a PRINTED page uses is the provider's per-item key. print-sheet.js
+    // metaOf -> skillMeta reads it as instructionKeyFor(q, skillWords({...meta, answerType, printFormat})): q.instructionKey
+    // when the item names a library key, else skillWords' key, which calls strings() WITH NO ITEM (stringsBy falls back
+    // to PLACE_CIRCLE_3). This replays that precedence on item 0 of real pages (the item metaOf generates).
+    const lib = (k) => typeof k === 'string' && !!INSTRUCTION_LIBRARY[k];
+    ok(lib('place-circle-value') && lib('place-write-value'), 'N2 PRINTED-INSTRUCTION: the library has no place-circle-value / place-write-value');
+    const bad = []; let n2 = 0;
+    for (const o of pvCross('identify', ['band', 'writeValue', 'response'])) for (let seed = 0; seed < 8; seed++) {
+        const q = Object.assign(pvReal('identify', o, 0, 7411 + seed * 53), { categoryId: 'placevalue', skillId: 'identify' });
+        const words = skillWords({ categoryId: 'placevalue', skillId: 'identify', answerType: q.answerType, printFormat: q.printFormat, opts: o });
+        const printed = lib(q.instructionKey) ? q.instructionKey : (words.instructionKey && !/^default-/.test(words.instructionKey) ? words.instructionKey : 'default-write');
+        const want = getProvider('placevalue', 'identify').strings({ categoryId: 'placevalue', skillId: 'identify', q }).instructionKey;
+        n2++;
+        if (printed !== want) bad.push(`${JSON.stringify(o)}: prints "${printed}", the item's key is "${want}"`);
+    }
+    ok(!bad.length, `N2 PRINTED-INSTRUCTION placevalue:identify: ${bad.length} of ${n2} pages print another instruction than the item's library key, e.g. ${[...new Set(bad)].slice(0, 4).join('; ')}`);
+}
+if (pvR2On('N4', 'placevalue:identify')) {
+    // N4 PLACE-WORD-LIVE (VQ-LIVE for pv, critic r2 N4 / r1 band=99): the drawn cell (print, size L, as the kit renders it)
+    // offers no place word above the number's highest place ("hundreds" on 48), every band x response x writeValue.
+    const PW = [['hundred thousands', 1e5], ['ten thousands', 1e4], ['thousands', 1e3], ['hundreds', 100], ['tens', 10], ['ones', 1]];
+    const wordsIn = (txt) => { let t = ` ${txt.toLowerCase()} `; const got = []; for (const [w, v] of PW) { const re = new RegExp(`\\b${w}\\b`, 'g'); if (re.test(t)) { got.push([w, v]); t = t.replace(re, ' '); } } return got; };
+    const bad = []; let n4 = 0;
+    for (const o of pvCross('identify', ['band', 'response', 'writeValue'])) for (let seed = 0; seed < 24; seed++) {
+        const q = pvReal('identify', o, seed % 12, 8101 + Math.floor(seed / 12) * 29);
+        if (!q.pv || !Number.isFinite(Number(q.pv.n))) continue;
+        n4++;
+        const top = 10 ** (String(Math.abs(Math.trunc(Number(q.pv.n)))).length - 1);
+        const html = renderCell(q, resolveCtx({ mode: 'print', size: 'L', look: 'ican' }));
+        const txt = String(html).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ');
+        const over = wordsIn(txt).filter(([, v]) => v > top).map(([w]) => w);
+        if (over.length) bad.push(`${JSON.stringify(o)} n=${q.pv.n}: offers ${over.join(', ')}`);
+    }
+    ok(!bad.length, `N4 PLACE-WORD-LIVE placevalue:identify: ${bad.length} of ${n4} cells offer a place word the number does not have, e.g. ${bad.slice(0, 4).join('; ')}`);
 }
 
 // --pv-r1 F3,F11 (backtests, lf-placevalue r1): judge only these critic-finding rules (the other checks still run).
