@@ -9,7 +9,7 @@
 //                 boxes (hint off, never graded); under Term 4 the ANSWER box (1.5 pt, the heaviest place, VQ-6) -
 //                 or, on task `far`, a working box, the answer then on its own line "Term 10 has [ ] dots".
 //   task `rule`   one more line: "Rule: + [ ]", a second graded box (the step), so two answers have two places.
-//   sizes         one unit u = 2.0 / 2.8 / 3.3 mm (S / M / L), dots 0.8 u across, squares u; strokes 0.75 pt (parts),
+//   sizes         one unit u = 2.0 / 2.4 / 2.6 mm (S / M / L), dots 0.8 u across, squares u; strokes 0.75 pt (parts),
 //                 the box 0.75 pt, the answer 1.5 pt. S fits two cells across (82 mm), M and L one.
 //   screen twin   the same three drawings; the Term 4 box is a 7 x 7 grid of tap targets (>= 44 px on a card): a tap
 //                 puts a dot / square there, a second tap takes it away (working, never graded); the count and rule
@@ -27,8 +27,8 @@ import { answerArea } from '../graphics/answer-area.js';
 
 export const GROW_TEMPLATE = 'growing-pattern';
 const GRID = 7;                                   // every term fits 7 x 7 units at Term 4
-const UNIT = { S: 2.0, M: 2.8, L: 3.3 };
-const PAD = 0.9;                                  // units of white round the drawing inside its box
+const UNIT = { S: 2.0, M: 2.4, L: 2.6 };   // (r2: M 2.8 / L 3.3 -> 2.4 / 2.6 and the pad 0.9 -> 0.4, so two Guided rows fit under a lesson's Warm-up)
+const PAD = 0.4;                                  // units of white round the drawing inside its box
 
 /** How many objects Term t has (start + (t - 1) × step); NaN for an unknown family. */
 export function growCount(fam, e, t) {
@@ -109,8 +109,8 @@ function tapGrid(ctx, shape) {
 function countBox(ctx, { value = '', kind = 'given', id = '', expect = '', ink = null, unit = '' }) {
     if (kind === 'answer') return answerArea(ctx, { id, shown: value, expect, digits: 2, ink, unit });
     const sz = sizeOf(ctx);
-    const w = isTwin(ctx) ? 12 : sz === 'S' ? 10 : sz === 'M' ? 11.5 : 13;
-    const h = isTwin(ctx) ? 12 : sz === 'S' ? 9 : sz === 'M' ? 10.5 : 12;
+    const w = isTwin(ctx) ? 12 : sz === 'S' ? 10 : sz === 'M' ? 11.5 : 12.5;
+    const h = isTwin(ctx) ? 12 : sz === 'S' ? 9 : sz === 'M' ? 9.5 : 9.5;
     const pt = Math.min(digitPt(ctx) * 0.75, 20);
     const base = `box-sizing:border-box;flex:none;display:inline-flex;align-items:center;justify-content:center;border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, pt)};font-weight:700;line-height:1;${KEY_FEATURES}`;
     if (kind === 'given') return `<span class="mq-gp-count" style="${base}width:${L(ctx, w)};height:${L(ctx, h)};color:${INK};">${esc(value)}</span>`;
@@ -138,7 +138,7 @@ register(GROW_TEMPLATE, {
         // (the anchor chart's step states, stepState below: Term 4 drawn on its own step before its count is written)
         const drawInk = ctx.gpDraw || (keyed ? (state === 'traced' ? 'trace' : 'solid') : null);
         const term = (t) => {
-            const head = `<div class="mq-gp-label" style="font-size:${P(ctx, tp)};font-weight:700;line-height:1.2;margin-bottom:${L(ctx, 1)};">Term ${t}</div>`;
+            const head = `<div class="mq-gp-label" style="font-size:${P(ctx, Math.max(10, tp - 2))};font-weight:700;line-height:1.1;margin-bottom:${L(ctx, 0.3)};">Term ${t}</div>`;
             let pic;
             if (t < 4) pic = termSVG(ctx, growthCells(p.fam, p.e, t) || [], shape, { label: `Term ${t}: ${counts[t - 1]} ${unitWord}` });
             else if (twin) pic = '';
@@ -158,7 +158,7 @@ register(GROW_TEMPLATE, {
                 const v = keyed ? String(counts[3]) : wrong ? (wrongSlot('answer') || String(wrong.value || '').split(/\s*,\s*/)[0] || '') : '';
                 cnt = countBox(ctx, { value: v, kind: 'answer', id: 'answer', expect: String(counts[3]), ink: v ? (wrong ? 'solid' : ink) : null });
             }
-            return `<div class="mq-gp-term" style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};flex:none;">${head}${frame}${cnt}</div>`;
+            return `<div class="mq-gp-term" style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 0.9)};flex:none;">${head}${frame}${cnt}</div>`;
         };
         const gap = L(ctx, ctx.gpRow ? 1.2 : sizeOf(ctx) === 'S' ? 1.6 : 2.5);
         const row = ctx.gpRow
@@ -181,7 +181,7 @@ register(GROW_TEMPLATE, {
             const v = keyed ? String(p.count10) : wrong ? (wrongSlot('answer') || String(wrong.value || '')) : '';
             extra = line(`<span>Term 10 has</span>${answerArea(ctx, { id: 'answer', shown: v, expect: String(p.count10), digits: 2, ink: v ? (wrong ? 'solid' : ink) : null, unit: unitWord })}`);
         }
-        const pad = twin || ctx.gpRow ? 'padding:0;' : `padding:${L(ctx, 1)} 0 ${L(ctx, 1)} calc(var(--ws-tab, 5mm) + 1mm);box-sizing:border-box;width:100%;`;
+        const pad = twin || ctx.gpRow ? 'padding:0;' : `padding:0 0 0 calc(var(--ws-tab, 5mm) + 1mm);box-sizing:border-box;width:100%;`;
         const join = ask === 'rule' ? ' data-mq-join=", "' : '';
         return root(ctx, 'mq-gp', `${row}${extra}`, { attrs: ` data-read${join}`, style: `display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};${pad}` });
     },

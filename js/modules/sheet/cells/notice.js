@@ -235,5 +235,9 @@ register(NOTICE_TEMPLATE, {
 function noticeStepState(p, steps, k, ctx) {
     const n = Array.isArray(steps) && steps.length ? steps.length : 4;
     // (ntTight: the anchor's spacing - rows 0.4 mm apart, no item-tab pad: an anchor carries no tab)
-    return this.render(p, Object.assign({}, ctx, { size: 'S', metrics: undefined, ntTight: true, state: k >= n - 1 ? 'traced' : 'blank' }));
+    const state = k >= n - 1 ? 'traced' : 'blank';
+    // (only the sentence task needs the S-size state: the parity fact and the true / false sentence fill a 2 x 2 chart
+    // panel at the chart's own size - drawn at S they left a third of each panel empty, H13)
+    if (p.task !== 'feature') return this.render(p, Object.assign({}, ctx, { state }));
+    return this.render(p, Object.assign({}, ctx, { size: 'S', metrics: undefined, ntTight: true, state }));
 }

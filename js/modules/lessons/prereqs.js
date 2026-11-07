@@ -487,7 +487,8 @@ export const LESSONS = Object.freeze({
     // Patterns (4.OA.C.5). Four steps each, as many as the provider's worked steps of the example (patterns.js).
     'patterns:notice_patterns': {
         skills: [
-            { key: 'composing:odd_even', why: 'Tell if a number is odd or even: pairs with none left over.' },
+            // (r2: numbers to 10, so the two dot cards are one height - a 20 beside a 10 left a 22 mm band, H13)
+            { key: 'composing:odd_even', opts: { range: 10 }, why: 'Tell if a number is odd or even: pairs with none left over.' },
             { key: 'multiplication:mult_facts', why: 'The facts whose products we test.' },
         ],
         concepts: [
@@ -501,10 +502,12 @@ export const LESSONS = Object.freeze({
             { word: 'odd', meaning: 'one left over: ends in 1, 3, 5, 7 or 9', picture: { kind: 'text', text: '1, 3, 5, 7' } },
         ],
         steps: [
-            { icon: 'look', text: 'Look at the first number.' },
-            { icon: 'look', text: 'Look at the second number.' },
-            { icon: 'decide', text: 'One even number? Even.' },
-            { icon: 'check', text: 'Circle Even or Odd.' },
+            // (r2: one short line each - the wrapped Steps list set the Guided band's height and left a 22 mm band
+            // under each Guided cell, H13)
+            { icon: 'look', text: 'Check the first.' },
+            { icon: 'look', text: 'Check the second.' },
+            { icon: 'decide', text: 'An even one? Even.' },
+            { icon: 'check', text: 'Circle the word.' },
         ],
         chant: 'One even factor: even. Odd\u00a0×\u00a0odd: odd.',
         format: {
@@ -516,10 +519,10 @@ export const LESSONS = Object.freeze({
     },
     'patterns:pattern_features': {
         skills: [
-            // (r2: two short rows, so the Guided Practice starts on the Warm-up page - the odd / even dot cards took
+            // (r2: one row of four facts, so the Guided Practice starts on the Warm-up page - the odd / even dot cards took
             // 75 mm and pushed it to the next page, DN-2)
-            { key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] }, why: 'Continue a pattern from its rule.' },
             { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each number of the pattern is the one before plus the step.' },
+            { key: 'multiplication:mult_facts', why: 'Counting on by 5 or 10 lands on the 5 or 10 times-table: its ones digits repeat.' },
         ],
         concepts: [
             { id: 'rule', text: 'The rule makes every number of the pattern.' },
@@ -567,10 +570,11 @@ export const LESSONS = Object.freeze({
             { word: 'grow', meaning: 'get bigger by the rule', picture: { kind: 'text', text: '3, 5, 7' } },
         ],
         steps: [
-            { icon: 'count', text: 'Count each term.' },
-            { icon: 'look', text: 'Find how many more.' },
+            // (r2: short names, so the Guided strip holds the four steps on one line)
+            { icon: 'count', text: 'Count.' },
+            { icon: 'look', text: 'Find the more.' },
             { icon: 'start', text: 'Draw Term 4.' },
-            { icon: 'write', text: 'Write how many.' },
+            { icon: 'write', text: 'Write it.' },
         ],
         chant: 'Count, find the more, draw, write.',
         // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout), the
