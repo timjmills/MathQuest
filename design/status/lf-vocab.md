@@ -3,10 +3,32 @@ Title: Vocabulary redesign (Match 3 pictures, 1 picture 3 words, lesson vocabula
 Session: session_013pHDnPdbZEh2qA1Sgch4GR
 Branch: claude/sweet-newton-c8wrv1-lf-vocab
 Owner of files: sheet/graphics/vocab-pictures.js, sheet/cells/vocab-*.js, sheet/lesson-pages/vocab-*.js, sheet/providers/vocabulary.js, gen-vocabulary.js picture branch, design/cards/vocabulary/, design/lanes/lf-vocab/, tests/scripts/ws-vocab-unit.mjs
-State: fix
+State: stopped (rule 5, critic r3 FAIL min 6); hand-over to the lead
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 2, FAIL min 7 (r1 FAIL min 1); r3 not run (a red page, below)
+Critic rounds: 3: r3 FAIL min 6, r2 FAIL min 7, r1 FAIL min 1 (report design/lanes/lf-vocab/critic-r3.md)
+
+## Round 4 (2026-11-07, cap $35): critic r3 FAIL, min 6
+- Done:
+  - Match 3 guided overflow at S fixed with MATCH3_H / measure:false. Check first: the vocab-roles-render gate (guided,
+    more-practice, error-analysis at S/M/L) is on precritic's path; it FAILed before the fix.
+  - Master merged (47047a83, at 5cbe360d2 or later).
+  - Precritic r6 --strict: sibling-compare FAIL (structural: first family) and one node-lint S-not-more. The node-lint
+    finding is pinned because card Q2 rules Match 3 at 4 a page at every size (commit after ee2d33e7).
+- Critic r3 (fresh, Opus medium; renders scratchpad critic4): FAIL, min 6.
+  - At 8 or above: independent, more-practice and test on both skills at S/M/L with keys; card-390/820/1280 and quiz-1280;
+    pick3 error analysis at S/M; grades 1 and 3; the pilot lesson at M/L.
+  - Below 8: Match 3 guided at S/L (H13, 34-37 %); error-analysis pages (35-40 %); both worksheet-1280 hosts; the guided
+    Score is not per word; the pick3 hint is ambiguous; pick3 guided rows at L; grade 4 lines too short; base-ten scales;
+    grow/sequence; and the grade 1 and grade 4 lesson renders carry the pilot's frame (my render harness).
+- Rule 5, survivors of 3 rounds:
+  - the worksheet-1280 tile layout (r1 #10, r2 #7, r3 #4);
+  - pick3 guided row equality (r1 #6, r2 #4, r3 #6).
+- Root cause: the footprints are not the drawn heights per role, and no machine check measures H13 empty bands on guided,
+  error-analysis or the worksheet hosts. So every critic is the first to measure them. The next builder writes those two
+  checks first (LESSONS_LEARNED "lf-vocab critic r3").
+- NOT added to redesign-passed.js. The manifest is restored (not applied) on the branch.
+- Owner question: on Letter, Match 3 prints 3 a page (ctx.paper is not visible to footprint), against 4 on A4.
 
 ## Now
 - Round 3 (fresh builder, rule 5; commits da010953 merge of master, 3d9939d8, cac85155, 43da709a): the five survivors each have
