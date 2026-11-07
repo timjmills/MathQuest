@@ -8,7 +8,7 @@
 //                  one line when they fit the cell, else wrapped to two (never cut, TY-12)
 //   the line       a writing line under the bank: the pupil COPIES the right word onto it
 //
-// Larger for lower grades (owner): the picture is 74 / 40 / 38 mm wide for grades K-1 / 2-3 / 4-5 at
+// Larger for lower grades (owner): the picture is 74 / 40 / 36 mm wide for grades K-1 / 2-3 / 4-5 at
 // every size, and the cell's height is a half, a third or a quarter of the page body: 4, 6 or 8 a page in
 // two columns. Grades 4-5 draw the bank BESIDE the picture (the words one a line, the writing line under).
 //
@@ -33,7 +33,7 @@ export const gradeClass = (g) => (Number(g) <= 1 ? 0 : Number(g) <= 3 ? 1 : 2);
 /** Per page (owner): K-1 4, grades 2-3 6, grades 4-6 8. */
 export const PICK3_PER_PAGE = Object.freeze([4, 6, 8]);
 /** The picture's width (mm) by grade class, the same at S, M and L (the page count is the owner's: 4 / 6 / 8). */
-const PIC_W = [74, 40, 38];
+const PIC_W = [74, 40, 36];
 /**
  * The cell's minimum body height (mm) by grade class: with the cell's own 6 mm it shares the grid (A4 227 mm, Letter
  * 209 mm) by exactly 2 / 3 / 4 rows; the content is drawn to about this height (no empty band, RUBRIC H13).
@@ -46,14 +46,17 @@ register(PICK3_TEMPLATE, {
     render(p, ctx) {
         const twin = isTwin(ctx);
         const gc = gradeClass(p.grade);
-        const tp = textPt(ctx) + (gc === 0 ? 5 : gc === 1 ? 2 : 1);
         const bank = (p.bank || []).slice(0, 3);
+        // grades 4-5 beside: a phrase over 10 letters ("times as many") one point smaller, so the bank and a 34 mm picture share
+        // a half-width cell (r2: one column at L)
+        const longW = Math.max(...bank.map((w) => String(w).length), 0) > 10;
+        const tp = textPt(ctx) + (gc === 0 ? 5 : gc === 1 ? 2 : longW && !twin ? -1 : 0);
         const show = !twin && (ctx.state === 'answered' || ctx.state === 'traced' || ctx.state === 'wrong');
         const ink = ctx.state === 'traced' ? 'trace' : 'solid';
         const longest = Math.max(...bank.map((w) => String(w).length), 4);
         // grades 4-5: the picture beside the bank (eight a page); else the bank under it, on one line or wrapped to two
         const beside = !twin && gc === 2;
-        const lineW = beside ? Math.max(30, longest * tp * 0.3528 * 0.56 + 6) : Math.min(80, Math.max(34, longest * tp * 0.36 + 10));
+        const lineW = beside ? Math.min(40, Math.max(28, longest * tp * 0.3528 * 0.52 + 4)) : Math.min(80, Math.max(34, longest * tp * 0.36 + 10));
         const words = bank.map((w) => (twin
             ? `<button type="button" class="mq-choicebtn mq-vp-btn" data-mq-choice="${esc(w)}" aria-pressed="false" style="min-height:max(48px, ${L(ctx, 11)});min-width:max(64px, ${L(ctx, 18)});padding:0 ${L(ctx, 2.5)};`
                 + `border:${B(ctx, 1)} solid ${INK};border-radius:999px;background:#fff;color:${INK};${FONT}font-size:${P(ctx, tp)};font-weight:700;line-height:1;cursor:pointer;"><span>${esc(w)}</span></button>`
@@ -74,7 +77,11 @@ register(PICK3_TEMPLATE, {
         const inChart = (ctx.chartZoom !== undefined && ctx.chartZoom !== null) || Number(ctx.scaffoldLevel) >= 2;
         // (and fills its row: a row taller than the cell - a rebalanced last page - shares the spare above and below, H13)
         const minH = twin || inChart ? '' : `min-height:${PICK3_MIN_H[gc]}mm;height:100%;`;
-        const pic = vocabPictureSVG(ctx, p.word, { wMm: pick3PicW(p) });
+        // beside: the picture takes the room the bank leaves in a half-width cell (80 mm inside), so it is drawn at its own
+        // width and never shrunk by the browser (DN-10 counts a shrunk drawing as not fitting - r2: one column at L)
+        const bankMm = longest * tp * 0.3528 * 0.56 + 6.5;
+        const picW = beside ? Math.max(34, Math.min(pick3PicW(p), 80 - 3 - Math.max(bankMm, lineW))) : pick3PicW(p);
+        const pic = vocabPictureSVG(ctx, p.word, { wMm: picW });
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
         const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}`;
         if (beside) {
