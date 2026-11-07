@@ -1450,6 +1450,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-parts-plugin",
+   "check": "D18: a dummy lesson part with its own build hook registers and is built through the registry dispatch; buildLesson names no core part list",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only parts-plugin (lf-engine P1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: buildLesson skips a hard-coded list of the five core ids; only lesson-role parts plug in"
+   },
+   "pass": {
+    "commit": "9d1b793f",
+    "state": "core flag + build hooks + buildPluggedParts"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only parts-plugin",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-chart-sizing-fails",
+   "check": "Lesson 7 D1: chartPage reports sizing.mode / zoom / fallback / ok; a fallback zoom under 1 is a failure the build result carries (chartSizing, chartsOk)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only chart-sizing (lf-engine P1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the 0.7 fallback zoom is silent"
+   },
+   "pass": {
+    "commit": "9d1b793f",
+    "state": "sizing.ok false on a fallback under 1, surfaced by buildLesson / buildDetailedLesson"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only chart-sizing",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
