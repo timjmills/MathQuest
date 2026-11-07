@@ -54,6 +54,8 @@ Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-1
 - card-rulings SKIPPED / spec-card N/A: no card yet
 
 ## Log
+- 2026-11-07: owner approved both cards in the lead session, "All as suggested" (F1-F4, P1-P7 and all 50 PROPOSED
+  decisions). The r2 fixer records them on the cards, adds the P7 preset "Follow a given rule" and every ruling; then the lead signs.
 - 2026-11-07: r1 build merged (e59e2bf3). New: patterns:notice_patterns (patTask parity / feature / truefalse, band, patShow),
   preset patterns:pattern_features (patTask feature, lesson #19), patterns:growing_shape_patterns (patTask next / rule / far,
   growShape, band); files gen-patterns-notice.js, cells/notice.js, cells/growing-pattern.js, providers/patterns.js; card
