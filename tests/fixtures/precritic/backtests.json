@@ -1723,6 +1723,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "solve-story-e24b",
+   "check": "a Practice sheet with `solve` deals stories SOLVED before the page (no near twins, first addends and wholes all different) through a generator deal pin; only lesson 2 sets it",
+   "kind": "commit-pair",
+   "rule": "lesson 2 E24b (Practice 1 near twins 7 + 4 / 8 + 5 at 4242: greedy deal order), lf-engine P1d attempt 2",
+   "browser": false,
+   "fail": {
+    "commit": "33d91021",
+    "state": "greedy deal: Practice 1 dealt 7 + 4 / 8 + 5 (no solver)"
+   },
+   "pass": {
+    "commit": "7ca55459",
+    "state": "solveStoryFacts + setDealPin: Practice 1 deals 4 + 9, 8 + 6 / 9 + 3, 5 + 6 / 9 + 9, 8 + 12"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only solve-story",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
