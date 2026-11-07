@@ -37,6 +37,12 @@ import { sameAnswer, chooseWrong } from '../../js/modules/sheet/providers/util.j
 import { applyRule, ftSlots } from '../../js/modules/sheet/index.js';
 import { hintOf, hintGivesAnswer } from '../../js/modules/sheet/roles/guided.js';
 import { topicOf } from '../../js/modules/sheet/roles/compose.js';
+// lf-placevalue r1 (2026-11-07): the real generator's items for the pv rules below (F3, F11-F13)
+import { state as APP_STATE } from '../../js/modules/state.js';
+import { generatePvPlaceValue } from '../../js/modules/gen-pv.js';
+import { resetPageDeals } from '../../js/modules/page-deal.js';
+import { normalizeOptions } from '../../js/modules/skill-options.js';
+import { renderCell, resolveCtx } from '../../js/modules/sheet/index.js';
 
 /** Skills whose items yield no Guided hint (reported; a stack or a fact draws its own cue). */
 const NO_HINT = [];
@@ -660,6 +666,91 @@ ok(pvRoundingErrors(348, 100).some((e) => e.misconception === 'M-R5' && e.value 
     ok(full.instruction === 'Round to the nearest 100.', `a rounding item's instruction is "${full.instruction}"`);
 }
 
+
+/* ===================================================== lf-placevalue critic r1 (2026-11-07) */
+// The pv rules the critic proposed (design/audit/runs/lf-placevalue/critic-r1.md F3, F11, F12, F13), on the REAL
+// generator's items (gen-pv.js through the same state generateQuestionFor sets), so they read what a page prints.
+const PV_R1_SKILLS = ['identify', 'value', 'expand', 'combine', 'unit_form'];
+function pvReal(skill, opts, idx, seed) {
+    const saved = { skill: APP_STATE.skill, itemIndex: APP_STATE.itemIndex, itemSeed: APP_STATE.itemSeed, skillOptions: APP_STATE.skillOptions, range: APP_STATE.range };
+    const rnd = Math.random;
+    let a = (seed * 7919 + idx * 104729 + 17) >>> 0;
+    Math.random = () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    try {
+        APP_STATE.skill = skill; APP_STATE.itemIndex = idx; APP_STATE.itemSeed = seed; APP_STATE.range = 100;
+        APP_STATE.skillOptions = normalizeOptions('placevalue', skill, opts || {});
+        if (idx === 0) resetPageDeals();
+        const q = { categoryId: 'placevalue', skillId: skill };
+        generatePvPlaceValue(q, skill);
+        return q;
+    } finally { Object.assign(APP_STATE, saved); Math.random = rnd; }
+}
+const PV_R1_OPTS = {
+    identify: [{}, { response: 'bank' }, { repeatDigit: true }, { band: 9999 }],
+    value: [{}, { form: 'unit' }, { form: 'notation' }, { zeroDigit: true }, { band: 9999 }, { band: 99 }],
+    expand: [{}, { form: 'notation' }, { frame: 'line' }, { zeroPlace: 'always' }, { band: 9999 }],
+    combine: [{}, { order: 'scrambled' }, { zeroPlace: 'always' }, { band: 9999 }],
+    unit_form: [{}, { rename: 'more' }, { band: 99 }, { band: 9999 }],
+};
+const pvR1Items = (skill, per = 12) => {
+    const out = [];
+    for (const o of PV_R1_OPTS[skill]) for (let pg = 0; pg < 4; pg++) for (let i = 0; i < per; i++) out.push({ o, q: pvReal(skill, o, i, 4001 + pg * 31) });
+    return out;
+};
+// Every string a pupil reads about an item: worked steps, the Steps band, the filled Say line, the wrong work.
+function pvTexts(q) {
+    const p = getProvider('placevalue', q.skillId);
+    const out = [];
+    for (const s of p.workedSteps(q) || []) out.push(String(s.text || ''));
+    const st = p.strings({ categoryId: 'placevalue', skillId: q.skillId, q });
+    for (const s of st.steps || []) out.push(String(s));
+    const sv = typeof st.sayValues === 'function' ? st.sayValues(q) : null;
+    if (sv && st.say) { let k = 0; out.push(String(st.say).replace(/__/g, () => String(sv[k++] ?? ''))); }
+    const w = p.wrongAnswer(q);
+    if (w) out.push(String(w.display ?? w.value), String(w.explain || ''));
+    return out;
+}
+{
+    // F11 PLURAL: no "1 ones", "1 tens", "1 hundreds" ... in any string about any item.
+    const ONE_PLURAL = /(^|[^\d,.])1 (?:ten |hundred )?(ones|tens|hundreds|thousands)\b/;
+    for (const sk of PV_R1_SKILLS) {
+        let bad = '';
+        for (const { o, q } of pvR1Items(sk)) for (const t of pvTexts(q)) if (!bad && ONE_PLURAL.test(t)) bad = `${JSON.stringify(o)} n=${q.pv && q.pv.n}: "${t}"`;
+        ok(!bad, `F11 PLURAL placevalue:${sk}: ${bad}`);
+    }
+    // F12: a value item teaches "3 tens is 30": no × in its steps or Say line unless its form IS notation (or times).
+    let bad12 = '';
+    for (const { o, q } of pvR1Items('value')) {
+        if (!q.pv || q.pv.form === 'notation' || q.pv.kind === 'times') continue;
+        for (const t of pvTexts(q).slice(0, -2)) if (!bad12 && /[×]/.test(t)) bad12 = `${JSON.stringify(o)}: "${t}"`;
+    }
+    ok(!bad12, `F12 placevalue:value steps use × on a non-notation item: ${bad12}`);
+    // F13: the Model's item (item 0 of its page) never asks the ones place: there the value is the digit itself.
+    for (const sk of ['identify', 'value']) {
+        const ones = [];
+        for (let seed = 1; seed <= 40; seed++) { const q = pvReal(sk, {}, 0, seed * 977); if (q.pv && q.pv.place === 1) ones.push(seed); }
+        ok(!ones.length, `F13 placevalue:${sk}: item 0 asks the ones place at ${ones.length} of 40 seeds (${ones.slice(0, 5).join(', ')})`);
+    }
+    // F3: finished work given as ONE string (True or False?, Reason It pass wrong.value only) is written slot by slot:
+    // each box of a multi-slot frame shows the provider's value for THAT slot, never the whole statement.
+    const slotTexts = (html) => { const m = {}; for (const x of String(html).matchAll(/data-ws-slot="([a-z]+\d+)"[^>]*>([^<]*)</g)) m[x[1]] = x[2]; return m; };
+    for (const [sk, o] of [['expand', {}], ['expand', { form: 'notation' }], ['unit_form', {}], ['value', { form: 'unit' }], ['value', { form: 'notation' }], ['expand', { band: 9999 }]]) {
+        let bad3 = '';
+        for (let i = 0; i < 12 && !bad3; i++) {
+            const q = pvReal(sk, o, i, 7300);
+            const w = getProvider('placevalue', sk).wrongAnswer(q);
+            if (!w || !w.slots) { bad3 = `item ${i}: wrongAnswer has no per-slot values`; break; }
+            const cell = q.cell && q.cell.template === 'pv-support' ? { template: 'pv', payload: q.cell.payload.base } : q.cell;
+            const html = renderCell(Object.assign({}, q, { cell }), resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'wrong', wrong: { value: String(w.value), slots: {} } }));
+            const got = slotTexts(html);
+            for (const [id, v] of Object.entries(w.slots)) {
+                if (String(got[id] ?? '').replace(/,/g, '') !== String(v).replace(/,/g, '')) { bad3 = `item ${i} (${q.pv.n}) slot ${id}: drew "${got[id]}", the wrong work says "${v}"`; break; }
+            }
+        }
+        ok(!bad3, `F3 placevalue:${sk} ${JSON.stringify(o)}: ${bad3}`);
+    }
+}
+
 /* ============================================================ function tables (2026-09-25) */
 // Items in the generator's shape: q.cell = {template: 'function-table', payload}, q.ans the slots
 // joined ", ". Every task is dealt, with one- and two-step rules, frame and line supports.
@@ -786,6 +877,9 @@ for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
     ok(n > 50, `D4: titles checked for ${n} providers`);
 }
 
+// --pv-r1 F3,F11 (backtests, lf-placevalue r1): judge only these critic-finding rules (the other checks still run).
+const PV_R1_ONLY = ARGV.flatMap((a, i) => (a === '--pv-r1' && i + 1 < ARGV.length ? String(ARGV[i + 1]).split(',') : [])).map((x) => x.trim()).filter(Boolean);
+if (PV_R1_ONLY.length) { const keep = failures.filter((f) => PV_R1_ONLY.some((id) => f.startsWith(`${id} `))); failures.length = 0; failures.push(...keep); }
 const notCovered = ONLY_SKILLS.filter((o) => !CHECKED_ONLY.has(o));
 if (ONLY_SKILLS.length) console.log(`  --skill: ${CHECKED_ONLY.size} of ${ONLY_SKILLS.length} skill(s) checked${notCovered.length ? `; not covered (no item maker in this test): ${notCovered.join(', ')}` : ''}`);
 if (failures.length) {
