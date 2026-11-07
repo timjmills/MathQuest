@@ -274,3 +274,11 @@ every common width including 1024x768 and 360x740.
 - Columns 1-4 with facts printed 5 across silently and the ÷ forms 2 -> COLNOTE; the dialog offers 5 and up for an all-fact list, the ÷ forms floor at 5, and a saved 1-4 says "prints 5 columns".
 - Notes showed "(PT-FRW-5)" and ran to 5-6 sentences -> NOTEPLAIN; each note one plain sentence, the engine's bookkeeping dropped.
 - Bracket clearance 1.72 mm in mixed sections, measured on the text BOXES -> BRKCLEAR on the glyph INK (>= 2 mm holds); the boxes are INFO: 2 mm on boxes at 9 columns, 16 pt, would cost the owner's 0.3 mm arc whites (ws-layout-unit PT-FRW-9) or the 9 columns.
+
+### Process rule (lead, 2026-11-07, lessons-first): a template's FIRST family has no sibling to compare
+`ws-sibling-compare` cannot pass for the first family on a template (no approved sibling in
+`tests/fixtures/precritic/siblings.json`). Rule: its NO-SIBLING matrix rows are recorded SKIPPED with the reason
+"first family on template; critic grades the named pages", the lane lists those pages in the critic brief and the critic
+grades them by eye; when the critic passes the family, its skills are added to `siblings.json` as approved siblings, so the
+second family on the template is machine-compared. Applied to pv (lf-placevalue) and arrays / arrays-turn (lf-ops).
+A card that offers every §7a option and has no `notOffered` entry reads card-not-offered as N/A, not a failure.

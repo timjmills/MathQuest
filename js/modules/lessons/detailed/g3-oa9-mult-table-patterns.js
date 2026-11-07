@@ -149,8 +149,10 @@ export default {
         instruction: 'Read the story. Draw it. Solve.',
         lines: ['There are {wp.a} bags.', 'Each bag has {wp.b} apples.', 'How many apples? Is it even or odd?'],
         answerLine: 'There are __ apples.',
-        // (r5, critic r2 n10: a frame that fits an odd item as well as an even one; the numbers are the story's own)
-        say: 'Is {wp.a} or {wp.b} even? The product is __.',
+        // (r5, critic r2 n10: a frame that fits an odd item as well as an even one)
+        // (lf-checks LP-GIVEAWAY, seeds 7 / 10 / 22: the Say line never names a number - "Is 6 or 10 even?" named the 10
+        // the pupil writes in the equation; the frame asks about the story's numbers without saying them)
+        say: 'Is one of the numbers even? The product is __.',
         sayAns: '{wp.parity}',
     },
 
