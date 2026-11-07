@@ -7,7 +7,7 @@
 // One page, the lesson's six words (vocab-words.js VOCAB_SETS, the set the lesson record names in
 // `vocabSet`), drawn from the SAME library pictures as the vocabulary practice skills:
 //   band 1  "Match the pictures."   two Match 3 pictures cells: words 1-3, then words 4-6
-//   band 2  "Name the picture."     1 picture, 3 words cells for the lesson's core words, the
+//   band 2  "Name the picture."     1 picture, 3 words cells for the set's later words (the Match band's last), the
 //                                   grade's count for half a page (K-1 2, grades 2-3 2, grades 4-5 4)
 // Every item has its answer key (AK-1): the key page is the same plan in the answered state.
 //
@@ -58,7 +58,8 @@ export function planVocabPage(input, ctx, frame) {
     const match = [t1, t2].map((words) => cellItem('vocab-match3', { words, order: r() < 0.5 ? [1, 2, 0] : [2, 0, 1], grade: set.grade }));
     const gc = gradeClass(set.grade);
     const nPick = gc === 2 ? 4 : 2;
-    const pickWords = set.words.slice(0, nPick);
+    // the set's LATER words (the first are the Match band's first trio; critic r1 D16: even / odd matched, then named again)
+    const pickWords = set.words.slice(-nPick).reverse();
     const pick = pickWords.map((w) => {
         const others = shuffle(r, set.words.filter((x) => x !== w && compatible([w, x])));
         let bank = [w, ...others.slice(0, 2)];

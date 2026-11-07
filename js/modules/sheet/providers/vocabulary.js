@@ -73,8 +73,13 @@ registerSkill('vocabulary:vocab_grade_pictures', {
         }
         const order = (p.order || [0, 1, 2]).slice();
         const letters = order.map((i) => LET[i]);
+        // M-V1: two letters swapped; M-V3: A, B, C written in order (matched by position, not by reading the pictures)
         const swapped = [letters[1], letters[0], letters[2]];
-        return chooseWrong(q, [{ value: swapped.join(', '), misconception: 'look-alike-swap', explain: `Swapped the letters of "${p.words[order[0]]}" and "${p.words[order[1]]}".` }], { rotate: false });
+        const slotsOf = (ls) => Object.fromEntries(ls.map((l, n) => [`letter-${n}`, l]));
+        return chooseWrong(q, [
+            { value: swapped.join(', '), slots: slotsOf(swapped), slot: 'letter-0', misconception: 'look-alike-swap', explain: `Swapped the letters of "${p.words[order[0]]}" and "${p.words[order[1]]}".` },
+            { value: 'A, B, C', slots: slotsOf(['A', 'B', 'C']), slot: 'letter-0', misconception: 'by-position', explain: 'Wrote A, B, C in order without reading the pictures.' },
+        ]);
     },
 });
 

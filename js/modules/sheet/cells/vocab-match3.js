@@ -22,7 +22,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, isTwin, sizeOf, textPt, KEY_FEATURES, S } from './k2kit.js';
+import { L, P, B, INK, GREY, isTwin, sizeOf, textPt, KEY_FEATURES, S, slotValue } from './k2kit.js';
 import { vocabPictureSVG } from '../graphics/vocab-pictures.js';
 
 export const MATCH3_TEMPLATE = 'vocab-match3';
@@ -43,24 +43,26 @@ register(MATCH3_TEMPLATE, {
         const show = ctx.state === 'answered' || ctx.state === 'traced' || ctx.state === 'wrong';
         const ink = ctx.state === 'traced' ? GREY : INK;
         // the letter at the picture's top left, beside it (not above: the cell stays a quarter of the page)
-        const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:1 1 0;min-width:0;">`
+        const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : '1 1 0'};min-width:0;">`
             + `<span class="mq-vm-let" style="font-size:${P(ctx, tp + 5)};font-weight:700;line-height:1;flex:none;">${LET[i]}</span>`
-            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: picW })}</span></div>`).join('');
+            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: picW, minPx: twin ? 160 : 0 })}</span></div>`).join('');
         const side = (S(ctx).writeMm || 10) + 2;
         const letters = match3Letters({ order });
         const row = order.map((wi, n) => {
-            const val = show ? letters[n] : '';
+            // (Error analysis: the wrong work's letter in this box - ctx.wrong.slots - never the key's; critic r1 D1)
+            const val = show ? slotValue(ctx, `letter-${n}`, letters[n]) : '';
             // (data-mq-kind="word": the screen slot keeps a letter; a plain slot keeps digits only - precritic ws-screen-answer r1)
             const hook = twin ? ' data-mq-cell="1" data-mq-w="1" data-mq-kind="word"' : '';
             const boxHtml = `<span class="mq-vm-box" data-ws-slot="letter-${n}" data-ws-shape="box"${show ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : ''}${hook}`
                 + ` style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${twin ? `max(48px, ${L(ctx, side)})` : L(ctx, side)};height:${twin ? `max(48px, ${L(ctx, side)})` : L(ctx, side)};`
                 + `border:${B(ctx, 1.5)} solid ${INK};background:#fff;font-size:${P(ctx, tp + 6)};font-weight:700;line-height:1;color:${ink};flex:none;${KEY_FEATURES}">${esc(val)}</span>`;
-            return `<span class="mq-vm-word" style="display:inline-flex;align-items:center;gap:${L(ctx, 2.5)};flex:1 1 0;justify-content:center;min-width:0;">`
+            // (screen: a word and its box never part - critic r1 D10: the box jumped under its word)
+            return `<span class="mq-vm-word" style="display:inline-flex;align-items:center;gap:${L(ctx, 2.5)};flex:${twin ? '0 0 auto' : '1 1 0'};white-space:nowrap;justify-content:center;min-width:0;">`
                 + `<b style="font-size:${P(ctx, tp + 3)};line-height:1.15;text-align:right;">${esc(words[wi])}</b>${boxHtml}</span>`;
         }).join('');
         return `<div class="mq-vm k2-cell" data-ws-vocab="match3"${twin ? ' data-mq-k2="1" data-mq-join=", "' : ''} style="color:${INK};${FONT}width:100%;box-sizing:border-box;`
             + `display:flex;flex-direction:column;gap:${L(ctx, 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">`
-            + `<div class="mq-vm-pics" style="display:flex;justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};">${pics}</div>`
+            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};">${pics}</div>`
             + `<div class="mq-vm-words" style="display:flex;justify-content:space-around;align-items:center;gap:${L(ctx, 4)};flex-wrap:${twin ? 'wrap' : 'nowrap'};">${row}</div></div>`;
     },
     answerKey(p) {

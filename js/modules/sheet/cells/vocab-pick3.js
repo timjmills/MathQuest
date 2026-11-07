@@ -8,9 +8,10 @@
 //                  one line when they fit the cell, else wrapped to two (never cut, TY-12)
 //   the line       a writing line under the bank: the pupil COPIES the right word onto it
 //
-// Larger for lower grades (owner): the picture is 74 / 40 / 36 mm wide for grades K-1 / 2-3 / 4-5 at
+// Larger for lower grades (owner): the picture is 70 / 38 / 36 mm wide for grades K-1 / 2-3 / 4-5 at
 // every size, and the cell's height is a half, a third or a quarter of the page body: 4, 6 or 8 a page in
-// two columns. Grades 4-5 draw the bank BESIDE the picture (the words one a line, the writing line under).
+// two columns. Grades 4-5 draw the bank BESIDE the picture (the words one a line, the writing line under); K-3
+// the bank under the picture, one word a line too.
 //
 // Key (AK-1): the right word written on the line. Screen twin (SP-3, P-29: a copied word on paper is
 // a tapped word on screen): the bank words are buttons `data-mq-choice` (screen-cell.js
@@ -23,7 +24,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, isTwin, sizeOf, textPt } from './k2kit.js';
+import { L, P, B, INK, GREY, isTwin, textPt, slotValue } from './k2kit.js';
 import { vocabPictureSVG } from '../graphics/vocab-pictures.js';
 
 export const PICK3_TEMPLATE = 'vocab-pick3';
@@ -33,7 +34,7 @@ export const gradeClass = (g) => (Number(g) <= 1 ? 0 : Number(g) <= 3 ? 1 : 2);
 /** Per page (owner): K-1 4, grades 2-3 6, grades 4-6 8. */
 export const PICK3_PER_PAGE = Object.freeze([4, 6, 8]);
 /** The picture's width (mm) by grade class, the same at S, M and L (the page count is the owner's: 4 / 6 / 8). */
-const PIC_W = [74, 40, 36];
+const PIC_W = [70, 38, 36];
 /**
  * The cell's minimum body height (mm) by grade class: with the cell's own 6 mm it shares the grid (A4 227 mm, Letter
  * 209 mm) by exactly 2 / 3 / 4 rows; the content is drawn to about this height (no empty band, RUBRIC H13).
@@ -50,13 +51,16 @@ register(PICK3_TEMPLATE, {
         // grades 4-5 beside: a phrase over 10 letters ("times as many") one point smaller, so the bank and a 34 mm picture share
         // a half-width cell (r2: one column at L)
         const longW = Math.max(...bank.map((w) => String(w).length), 0) > 10;
-        const tp = textPt(ctx) + (gc === 0 ? 5 : gc === 1 ? 2 : longW && !twin ? -1 : 0);
+        const tp = textPt(ctx) + (gc === 0 ? 5 : gc === 1 ? 1 : longW && !twin ? -1 : 0);
         const show = !twin && (ctx.state === 'answered' || ctx.state === 'traced' || ctx.state === 'wrong');
         const ink = ctx.state === 'traced' ? 'trace' : 'solid';
         const longest = Math.max(...bank.map((w) => String(w).length), 4);
         // grades 4-5: the picture beside the bank (eight a page); else the bank under it, on one line or wrapped to two
+        // grades 4-5: the picture beside the bank; K-3 the bank under the picture. The bank is ALWAYS one word a line
+        // (critic r1 D4: "equal groups step odd" on one line - a pupil cannot tell three words from five)
         const beside = !twin && gc === 2;
-        const lineW = beside ? Math.min(40, Math.max(28, longest * tp * 0.3528 * 0.52 + 4)) : Math.min(80, Math.max(34, longest * tp * 0.36 + 10));
+        // one line width a grade band, so the answer place stands in the same place in every cell (critic r1 D5, VQ-7)
+        const lineW = beside ? 36 : 64;
         const words = bank.map((w) => (twin
             ? `<button type="button" class="mq-choicebtn mq-vp-btn" data-mq-choice="${esc(w)}" aria-pressed="false" style="min-height:max(48px, ${L(ctx, 11)});min-width:max(64px, ${L(ctx, 18)});padding:0 ${L(ctx, 2.5)};`
                 + `border:${B(ctx, 1)} solid ${INK};border-radius:999px;background:#fff;color:${INK};${FONT}font-size:${P(ctx, tp)};font-weight:700;line-height:1;cursor:pointer;"><span>${esc(w)}</span></button>`
@@ -64,7 +68,7 @@ register(PICK3_TEMPLATE, {
         // the line: the key's word on paper; on screen the tapped word appears there (CSS :has, no script)
         const onLine = twin
             ? bank.map((w) => `<span class="mq-vp-fill" data-w="${esc(w)}" style="display:none;">${esc(w)}</span>`).join('')
-            : show ? esc(p.word) : '';
+            : show ? esc(ctx.state === 'wrong' ? slotValue(ctx, 'answer', p.word) : p.word) : '';
         const line = `<span class="mq-vp-line" data-ws-slot="answer" data-ws-shape="line"${show ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:flex-end;justify-content:center;box-sizing:border-box;`
             + `width:${L(ctx, lineW)};max-width:100%;height:${L(ctx, tp * 0.3528 * 1.4 + 1.5)};border-bottom:${B(ctx, 1.5)} solid ${INK};font-size:${P(ctx, tp + 1)};font-weight:700;line-height:1.1;white-space:nowrap;`
             + `color:${ink === 'trace' && show ? GREY : INK};padding-bottom:${L(ctx, 0.8)};">${onLine}</span>`;
@@ -80,8 +84,8 @@ register(PICK3_TEMPLATE, {
         // beside: the picture takes the room the bank leaves in a half-width cell (80 mm inside), so it is drawn at its own
         // width and never shrunk by the browser (DN-10 counts a shrunk drawing as not fitting - r2: one column at L)
         const bankMm = longest * tp * 0.3528 * 0.56 + 6.5;
-        const picW = beside ? Math.max(34, Math.min(pick3PicW(p), 80 - 3 - Math.max(bankMm, lineW))) : pick3PicW(p);
-        const pic = vocabPictureSVG(ctx, p.word, { wMm: picW });
+        const picW = beside ? Math.max(34, Math.min(pick3PicW(p), 76 - 3 - Math.max(bankMm, lineW))) : pick3PicW(p);
+        const pic = vocabPictureSVG(ctx, p.word, { wMm: picW, minPx: twin ? 220 : 0 });
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
         const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}`;
         if (beside) {
@@ -96,7 +100,7 @@ register(PICK3_TEMPLATE, {
             + `display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;gap:${L(ctx, 2.5)};${pad}">`
             + `${style}${pic}`
             // (a bank too long for one line wraps to two balanced-looking lines, never one word a line: critic-ready r2)
-            + `<div class="mq-vp-bank" role="group" aria-label="word bank" style="display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center;column-gap:${L(ctx, 4)};row-gap:${L(ctx, 1)};box-sizing:border-box;max-width:100%;`
+            + `<div class="mq-vp-bank" role="group" aria-label="word bank" style="display:flex;flex-direction:${twin ? 'row' : 'column'};flex-wrap:${twin ? 'wrap' : 'nowrap'};align-items:center;justify-content:center;column-gap:${L(ctx, 4)};row-gap:${L(ctx, 1)};box-sizing:border-box;max-width:100%;`
             + `${twin ? '' : `border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 1)} ${L(ctx, 2.5)};`}">${words}</div>${line}</div>`;
     },
     answerKey(p) {
@@ -106,7 +110,9 @@ register(PICK3_TEMPLATE, {
     // two across at every grade; the height is the grade's share of the page body (4 / 6 / 8 a page)
     // (hardCap: two across even where a narrow grade-3 cell measures as fitting three at S - r2 render, 9 a page)
     footprint(p) { return { wMm: 88, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, inPlace: true }; },
-    inputs() { return [{ id: 'answer', kind: 'choice', shape: 'choice', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
+    // the paper response is a WORD WRITTEN ON A LINE (the screen taps a bank word into it): a text slot, so Error analysis
+    // can write a wrong word in as finished work (critic r1 D3: the role declined a 'choice' slot)
+    inputs() { return [{ id: 'answer', kind: 'text', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     layout() { return { card: 'card-wide-visual', checker: 'value' }; },
 });
 

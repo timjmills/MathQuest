@@ -269,6 +269,9 @@ function partLabels(it, parts, c) {
     if (it.template === 'coins' && every(/^n\d+$/) && Array.isArray(p.values) && p.values.length === n) {
         return p.values.map((v) => { try { return c ? { html: coinSVG(c, v, { compact: true }) } : { text: String(v) }; } catch (e) { return { text: String(v) }; } });
     }
+    // Match 3 pictures (lane lf-vocab, critic r1 D1): each fix box is named by its WORD, never A / B / C (those are the
+    // pictures' letters, so a lettered fix box read as the answer)
+    if (it.template === 'vocab-match3' && every(/^letter-\d+$/) && Array.isArray(p.words)) return (p.order || [0, 1, 2]).map((i) => ({ text: String(p.words[i]) }));
     if ((it.template === 'clock' || it.template === 'coins') && every(/^o\d+$/)) return parts.map((_, i) => ({ text: place(i) }));
     if (it.template === 'clock' && every(/^r\d+$/) && Array.isArray(p.given)) {
         const given = new Set(p.given.map(Number));

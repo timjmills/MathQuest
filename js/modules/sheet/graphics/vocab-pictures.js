@@ -137,7 +137,8 @@ const PICS = {
         draw: () => {
             const X = (v) => 6 + v * 4;
             let b = axis(X(0), X(12), 26, Array.from({ length: 13 }, (_, i) => X(i)));
-            for (const v of [3, 6, 9, 12]) b += hop(X(v - 3), X(v), 24, 5) + dot(X(v), 26, 1.5) + tx(X(v), 33.5, 0, String(v), { size: 6.4 });
+            // (hops end just above the line, the landing dot on it: the arrow heads never sit on the dots - critic r1)
+            for (const v of [3, 6, 9, 12]) b += hop(X(v - 3) + 0.6, X(v) - 0.6, 22.5, 6) + dot(X(v), 26, 1.3) + tx(X(v), 33.5, 0, String(v), { size: 6.4 });
             return b + tx(X(0), 33.5, 0, '0', { size: 6.4, weight: 400 });
         },
     },
@@ -200,7 +201,7 @@ const PICS = {
         alt: 'seven circles, three of them crossed out',
         draw: () => {
             let b = '';
-            for (let i = 0; i < 7; i++) { const x = 6 + i * 8; b += ring(x, 20, 2.6, W.part); if (i >= 4) b += cross(x, 20, 2.7); }
+            for (let i = 0; i < 7; i++) { const x = 6 + i * 8; b += ring(x, 20, 3.3, W.part); if (i >= 4) b += cross(x, 20, 3.4); }
             return b;
         },
     },
@@ -235,8 +236,9 @@ const PICS = {
         draw: () => track([104, 105, 106], { x0: 7, y: 18, cw: 15.3, ch: 12, mark: 2, size: 7 }) + hop(29.95, 45.25, 16, 4.5),
     },
     'hundred chart': {
-        alt: 'two rows of a number chart: 101 to 104 and 111 to 114, each number ten more than the one above',
-        draw: () => table([[101, 102, 103, 104], [111, 112, 113, 114]], { x0: 3, y0: 8, cw: 13.5, ch: 12, size: 6.2 }),
+        // (three rows, so it reads as a chart of rows of ten, not a two-row table - critic r1)
+        alt: 'three rows of a number chart: 93 to 96, 103 to 106, 113 to 116, each number ten more than the one above',
+        draw: () => table([[93, 94, 95, 96], [103, 104, 105, 106], [113, 114, 115, 116]], { x0: 3, y0: 3.5, cw: 13.5, ch: 11, size: 6.4 }),
     },
     /* ---- Grade 2: read and write numbers to 1,000 (2.NBT.A.3) */
     hundred: {
@@ -245,11 +247,12 @@ const PICS = {
     },
     ten: {
         alt: 'a rod of 10 small squares in a line',
-        draw: () => rod(28, 3.5, 3.3),
+        // (lying across the canvas, 5 mm squares at 60 mm: big enough to count - critic r1 D13)
+        draw: () => { const u = 5.2, x = 4, y = 16; let b = rect(x, y, u * 10, u, W.part); for (let j = 1; j < 10; j++) b += ln(x + u * j, y, x + u * j, y + u, W.fine); return b; },
     },
     one: {
         alt: 'a single small square',
-        draw: () => cube(24, 14, 12),
+        draw: () => cube(21, 11, 18),
     },
     digit: {
         alt: 'one large figure seven',
@@ -334,8 +337,10 @@ const PICS = {
         draw: () => [0, 1, 2].map((i) => { const x = 10 + i * 15; return ring(x, 20, 6.3, W.part) + dots(2, 2, x - 2.4, 17.6, 4.8, 1.4); }).join('') + dot(52, 20, 1.5) + ring(52, 20, 3.6, W.heavy),
     },
     quotient: {
-        alt: 'thirteen divided by four equals three remainder one, the three in a heavy box',
-        draw: () => tx(15, 20, 0, '13 ÷ 4 =', { size: 6.6 }) + rect(31.5, 12.5, 10, 15, W.heavy) + tx(36.5, 20, 0, '3', { size: 6.6 }) + tx(49, 20, 0, 'R 1', { size: 6.6 }),
+        // (no "R 1": with it, the picture also showed the remainder - critic r1 D12)
+        alt: 'twelve divided by four equals three, the three in a heavy box',
+        draw: () => tx(10, 20, 0, '12', { size: 8 }) + tx(20, 20, 0, '÷', { size: 8 }) + tx(28, 20, 0, '4', { size: 8 }) + tx(36, 20, 0, '=', { size: 8 })
+            + rect(41.5, 12, 13, 16, W.heavy) + tx(48, 20, 0, '3', { size: 8 }),
     },
     divisor: {
         alt: 'thirteen divided by four, the four in a heavy box',
@@ -346,10 +351,12 @@ const PICS = {
         draw: () => rect(7, 12, 18, 16, W.heavy) + tx(16, 20, 0, '13', { size: 8 }) + tx(31, 20, 0, '÷', { size: 8 }) + tx(41, 20, 0, '4', { size: 8 }),
     },
     'round up': {
-        alt: 'four boxes: three full with four dots each, the last with one dot',
+        // (the one left over needs a whole box: the brace counts every box, 4 - critic r1)
+        alt: 'four boxes: three full with four dots each, the last with one dot; a brace under all four boxes says 4',
         draw: () => {
             let b = '';
-            for (let i = 0; i < 4; i++) { const x = 4 + i * 13.5; b += rect(x, 12, 11, 16, i === 3 ? W.heavy : W.part); if (i < 3) b += dots(2, 2, x + 3.2, 16.8, 4.6, 1.4); else b += dot(x + 5.5, 20, 1.4); }
+            for (let i = 0; i < 4; i++) { const x = 4 + i * 13.5; b += rect(x, 5, 11, 16, i === 3 ? W.heavy : W.part); if (i < 3) b += dots(2, 2, x + 3.2, 9.8, 4.6, 1.4); else b += dot(x + 5.5, 13, 1.4); }
+            b += `<path d="M4 25 V28 H55 V25" fill="none" stroke="#000" stroke-width="${W.part}" ${NS}/>` + tx(29.5, 34, 0, '4', { size: 7 });
             return b;
         },
     },
@@ -367,13 +374,14 @@ export const vocabPictureAlt = (id) => (hasVocabPicture(id) ? PICS[id].alt : '')
  * the host's --mq-k2 scale (one drawing, two scales, SP-1).
  * @returns {string} an inline SVG ('' for a word the library has no picture of)
  */
-export function vocabPictureSVG(ctx, id, { wMm = 46 } = {}) {
+export function vocabPictureSVG(ctx, id, { wMm = 46, minPx = 0 } = {}) {
     if (!hasVocabPicture(id)) return '';
     const w = Math.max(PIC_WIDTHS.min, Math.min(PIC_WIDTHS.max, Number(wMm) || 46));
     const body = PICS[id].draw();
     // (never wider than its host: a Match 3 cell in a narrow anchor-chart panel scales its pictures to the panel rather
     // than letting them spill over the letters - precritic print-lint lesson L, 2026-11-07: L-OVERFLOW / ILLEGIBLE)
-    const size = isTwin(ctx) ? `width:${L(ctx, w)};max-width:100%;height:auto;` : `width:${r2(w)}mm;max-width:100%;height:auto;aspect-ratio:${PIC_CANVAS.w} / ${PIC_CANVAS.h};`;
+    // (screen: `minPx` keeps the picture's text >= 14 px on a phone - critic r1 D8: 6-9 px digits at 390 px)
+    const size = isTwin(ctx) ? `width:${minPx ? `max(${minPx}px, ${L(ctx, w)})` : L(ctx, w)};max-width:100%;height:auto;` : `width:${r2(w)}mm;max-width:100%;height:auto;aspect-ratio:${PIC_CANVAS.w} / ${PIC_CANVAS.h};`;
     return `<svg class="mq-vpic" data-vpic="${esc(id)}" viewBox="0 0 ${PIC_CANVAS.w} ${PIC_CANVAS.h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(PICS[id].alt)}"`
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }

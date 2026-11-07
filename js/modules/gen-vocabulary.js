@@ -673,8 +673,9 @@ function _genPictureTask(q) {
     const payload = { word: target, bank, grade };
     q.cell = { template: 'vocab-pick3', v: 1, payload };
     try { q.visual = _vk2Twin('vocab-pick3', payload); } catch (e) { q.visual = ''; }
-    q.text = 'Look at the picture. Write its word on the line.';
-    q.printText = q.text;
+    // (q.text is what the practice card shows: the screen verb, as the worksheet and quiz say it - critic r1 D11)
+    q.text = 'Look at the picture. Tap its word.';
+    q.printText = 'Look at the picture. Write its word on the line.';
     q.screenInstr = 'Look at the picture. Tap its word.';
     q.ans = target;
     q.acceptedAnswers = [target, target.toLowerCase()];
