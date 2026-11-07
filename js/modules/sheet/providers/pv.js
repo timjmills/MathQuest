@@ -16,6 +16,8 @@ import { num, fmt, obj, arr, chooseWrong, strings, step, clampSteps } from './ut
 const PLACE_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
 const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
 const f = (v) => fmt(Number(v));
+/** lf-placevalue r1 F11: "1 hundred", "1 one", never "1 hundreds" / "1 ones" (the count decides the noun). */
+const placeWord = (place, count) => { const w = PLACE_WORD[place] || ''; return Number(count) === 1 ? w.replace(/s$/, '') : w; };
 const pvOf = (q) => obj(q && q.pv) || {};
 const digitAt = (n, place) => Math.floor(Math.abs(n) / place) % 10;
 const roundTo = (n, P) => Math.floor((n + P / 2) / P) * P;          // halfway rounds up (owner ruling 6)
@@ -105,6 +107,8 @@ registerSkill('placevalue:identify', {
             step(`The letter above it is ${LETTER[p.place]}.`),
             step(`${LETTER[p.place]} means ${PLACE_WORD[p.place]}.`),
             step(`The ${p.digit} is in the ${PLACE_WORD[p.place]} place.`, [{ slot: 'answer', value: PLACE_WORD[p.place] }]),
+            // F4 (writeValue): the value line, said the grade-2 way (no ×, F12)
+            ...(p.writeValue ? [step(`It is worth ${p.digit} ${placeWord(p.place, p.digit)}: ${f(p.digit * p.place)}.`, [{ slot: 'value', value: f(p.digit * p.place) }])] : []),
         ];
     },
     wrongAnswer: (q) => {
@@ -123,6 +127,12 @@ registerSkill('placevalue:identify', {
         // the wrong answers differ from child to child (round-3: every child circled "hundreds").
         for (const nb of [p.place * 10, p.place / 10]) {
             if (places.includes(nb)) c.push({ value: PLACE_WORD[nb], misconception: 'M-V14', explain: 'Named the place next to it.' });
+        }
+        // F4 / F3: with the value line, the wrong work is the place AND the value that place gives ("ones, 3"),
+        // one value a slot, so a True or False? statement writes each where it belongs.
+        if (p.writeValue) {
+            const byWord = Object.fromEntries(Object.entries(PLACE_WORD).map(([k, v]) => [v, Number(k)]));
+            return choose(q, c.map((x) => { const v = f(p.digit * (byWord[x.value] || 1)); return { ...x, value: `${x.value}, ${v}`, slots: { answer: x.value, value: v } }; }));
         }
         return choose(q, c);
     },
@@ -147,7 +157,8 @@ const TIMES_RING = { ...TIMES_VALUES, instructionKey: 'ten-times-ring' };
 const VALUE_PLAIN = {
         iCan: 'I Can write the value of a digit',
         instructionKey: 'digit-value',
-        steps: ['Find the underlined digit and its place.', 'The place says what one of it is worth.', 'Multiply the digit by its place: 7 hundreds is 700.'],
+        // lf-placevalue r1 F12 / L6: Grade-2 steps say the value with its place, never ×, and name no number of their own.
+        steps: ['Find the underlined digit and its place.', 'The place says what one of it is worth.', 'Say the digit with its place, then write the value.'],
         say: 'The __ is worth __.',
         sayValues: (q) => { const v = valueParts(q); return v ? [v.digit, v.value] : null; },
 };
@@ -195,13 +206,19 @@ registerSkill('placevalue:value', {
         if (pvOf(q).kind === 'times') return timesSteps(q);
         const v = valueParts(q);
         if (!v) return [];
-        const last = v.form === 'unit' ? step(`Write ${v.digit} ${v.word}.`, [{ slot: 'b0', value: String(v.digit) }, { slot: 'b1', value: v.word }])
+        // F11: the count decides the noun ("1 hundred", "4 hundreds"); F12: × only where the form IS notation.
+        const unit = `${v.digit} ${placeWord(v.place, v.digit)}`;
+        const last = v.form === 'unit' ? step(`Write ${unit}.`, [{ slot: 'b0', value: String(v.digit) }, { slot: 'b1', value: placeWord(v.place, v.digit) }])
             : v.form === 'notation' ? step(`Write ${v.digit} × ${f(v.place)}.`, [{ slot: 'b0', value: String(v.digit) }, { slot: 'b1', value: f(v.place) }])
                 : step(`Write ${f(v.value)}.`, [{ slot: 'answer', value: f(v.value) }]);
+        const worth = v.digit === 0 ? step('A zero is worth nothing. It holds the place.')
+            /* WRAP-OP (lf-placevalue): the expression never breaks after its operator */
+            : v.form === 'notation' ? step(`${unit} is ${v.digit}\u00a0×\u00a0${f(v.place)}\u00a0=\u00a0${f(v.value)}.`)
+                : step(`${unit} is ${f(v.value)}.`);
         return [
             step(`The underlined digit is ${v.digit}.`),
             step(`It is in the ${v.word} place.`),
-            v.digit === 0 ? step('A zero is worth nothing. It holds the place.') : /* WRAP-OP (lf-placevalue): the expression never breaks after its operator */ step(`${v.digit} ${v.word} is ${v.digit}\u00a0×\u00a0${f(v.place)}\u00a0=\u00a0${f(v.value)}.`),
+            worth,
             last,
         ];
     },
@@ -211,9 +228,9 @@ registerSkill('placevalue:value', {
         if (!v) return null;
         if (v.form === 'unit' || v.form === 'notation') {
             const nextP = v.place >= 10 ? v.place / 10 : v.place * 10;
-            const wrong = v.form === 'unit' ? `${v.digit} ${PLACE_WORD[nextP]}` : `${v.digit} × ${f(nextP)}`;
+            const wrong = v.form === 'unit' ? `${v.digit} ${placeWord(nextP, v.digit)}` : `${v.digit} × ${f(nextP)}`;
             return choose(q, [{ value: wrong, misconception: 'M-V14', explain: 'Used the place next to it.',
-                slots: { b0: String(v.digit), b1: v.form === 'unit' ? PLACE_WORD[nextP] : f(nextP) } }]);
+                slots: { b0: String(v.digit), b1: v.form === 'unit' ? placeWord(nextP, v.digit) : f(nextP) } }]);
         }
         return choose(q, [
             { value: v.digit, misconception: 'M-V2', explain: 'Wrote the digit, not what it is worth.' },
@@ -354,14 +371,14 @@ registerSkill('placevalue:unit_form', {
         if (p.rename) {
             const hiP = keys[0], loP = keys[1];
             if (counts[1] !== undefined && keys.length === 2 && hiP === 10) {
-                return [step(`Every hundred is 10 tens.`), step(`${f(p.n)} has ${counts[10]} tens in all.`), step(`${counts[1]} ones are left.`),
+                return [step(`Every hundred is 10 tens.`), step(`${f(p.n)} has ${counts[10]} tens in all.`), step(counts[1] === 1 ? '1 one is left.' : `${counts[1]} ones are left.`),
                     step(`Write ${counts[10]}.`, [{ slot: 'answer', value: String(counts[10]) }])];
             }
-            return [step(`${counts[loP]} ${PLACE_WORD[loP]} is 1 ${PLACE_WORD[hiP].replace(/s$/, '')} and ${counts[loP] - 10} ${PLACE_WORD[loP]}.`),
-                step(`So there are ${counts[hiP] + 1} ${PLACE_WORD[hiP]} and ${counts[loP] - 10} ${PLACE_WORD[loP]}.`),
+            return [step(`${counts[loP]} ${PLACE_WORD[loP]} is 1 ${PLACE_WORD[hiP].replace(/s$/, '')} and ${counts[loP] - 10} ${placeWord(loP, counts[loP] - 10)}.`),
+                step(`So there are ${counts[hiP] + 1} ${PLACE_WORD[hiP]} and ${counts[loP] - 10} ${placeWord(loP, counts[loP] - 10)}.`),
                 step(`That is ${f(p.n)}.`), step(`Write ${f(p.n)}.`, [{ slot: 'answer', value: f(p.n) }])];
         }
-        const out = keys.map((pl, i) => step(`${digitAt(p.n, pl)} ${PLACE_WORD[pl]}.`, [{ slot: `b${i}`, value: String(digitAt(p.n, pl)) }]));
+        const out = keys.map((pl, i) => step(`${digitAt(p.n, pl)} ${placeWord(pl, digitAt(p.n, pl))}.`, [{ slot: `b${i}`, value: String(digitAt(p.n, pl)) }]));
         return clampSteps([step(`Read ${f(p.n)}.`)].concat(out));
     },
     wrongAnswer: (q) => {
@@ -385,8 +402,8 @@ registerSkill('placevalue:unit_form', {
         const rev = ds.slice().reverse();
         const vals = keys.map((pl, i) => ds[i] * pl);
         return choose(q, [
-            { value: rev.map((d, i) => `${d} ${words[i]}`).join(' '), misconception: 'M-V1', explain: 'Read the digits from the right.', slots: Object.fromEntries(rev.map((d, i) => [`b${i}`, String(d)])) },
-            { value: vals.map((v, i) => `${f(v)} ${words[i]}`).join(' '), misconception: 'M-V4', explain: 'Wrote the value, not how many.', slots: Object.fromEntries(vals.map((v, i) => [`b${i}`, f(v)])) },
+            { value: rev.map((d, i) => `${d} ${placeWord(keys[i], d)}`).join(' '), misconception: 'M-V1', explain: 'Read the digits from the right.', slots: Object.fromEntries(rev.map((d, i) => [`b${i}`, String(d)])) },
+            { value: vals.map((v, i) => `${f(v)} ${placeWord(keys[i], v)}`).join(' '), misconception: 'M-V4', explain: 'Wrote the value, not how many.', slots: Object.fromEntries(vals.map((v, i) => [`b${i}`, f(v)])) },
         ]);
     },
 });

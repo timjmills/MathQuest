@@ -542,3 +542,9 @@
    rows are sized with it. Cells that start with the numeral (identify, value) are unchanged. Additive. */
 .ws-page .ws-grid > .ws-cell:is([data-ws-cell="pv"], .mqt--pv, [data-ws-cell="pv-support"], .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not([data-ws-writeabove]):not(.blankrun)::before,
 .ws-sheet > .ws-cell:is(.mqt--pv, .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
+
+/* 2026-11-07 (lf-placevalue r1 F8, L1; additive): the frame boxes of the five read-and-write skills (unit form, value in
+   unit form / notation, expanded notation - class pv-hw) are the WRITING HEIGHT of the size (Hw + stroke: 6 / 8 / 10 mm),
+   not a fixed 14 mm at every size, so a page at S draws smaller boxes and holds more rows than L. Other frames keep the
+   14 mm rule above. */
+:is(.ws-page, .ws-sheet) .pv-cell .pv-blanks.pv-hw .ws-box { height: calc(var(--ws-hw) + 2 * var(--ws-hair)); line-height: var(--ws-hw); min-width: 0; }

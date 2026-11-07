@@ -429,10 +429,12 @@ export const LESSONS = Object.freeze({
             { icon: 'look', text: 'Find the underlined digit.' },
             { icon: 'look', text: 'Read the letter above it.' },
             { icon: 'decide', text: 'Say the place name.' },
-            { icon: 'write', text: 'Write the place.' },
+            { icon: 'write', text: 'Circle the place.' },
+            // lf-placevalue r1 F4 (writeValue, owner 2026-10-10): the value line is the last step
+            { icon: 'write', text: 'Write its value.' },
         ],
         chant: '',
-        format: { kind: 'numbered steps with icons', why: 'Four actions, the same on every item: find, read, say, write.' },
+        format: { kind: 'numbered steps with icons', why: 'Five actions, the same on every item: find, read, say, circle, write the value.' },
         example: { match: 'place' },
         // The ring row of place names wraps in half the page: one panel a row, its step beside the drawing.
         chartWide: true, chartRow: true,
@@ -457,7 +459,8 @@ export const LESSONS = Object.freeze({
         steps: [
             { icon: 'look', text: 'Find the underlined digit.' },
             { icon: 'look', text: 'Name its place.' },
-            { icon: 'count', text: 'Digit times the place.' },
+            // lf-placevalue r1 F12: Grade 2 says the value with its place ("3 tens is 30"), never ×
+            { icon: 'say', text: 'Say the digit with its place.' },
             { icon: 'write', text: 'Write the value.' },
         ],
         chant: '',
@@ -493,7 +496,9 @@ export const LESSONS = Object.freeze({
         // The expanded-form row (288 = [ ] + [ ] + [ ]) is wider than half the page: one panel a row.
         chartWide: true,
         // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
-        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
+        // lf-placevalue r1 F18: at M and L the row takes the full width, so the one-column shapes fill ONE page
+        // (the two-column shapes spilled six items over two pages, 4 + 2).
+        practiceShapes: [[12, 2], [10, 2], [12, 1], [10, 1], [8, 1], [6, 1]],
         mixWith: [{ key: 'placevalue:value' }, { key: 'placevalue:more_less_10' }],
     },
     'placevalue:combine': {
@@ -553,7 +558,8 @@ export const LESSONS = Object.freeze({
         // The unit-form frame (__ hundreds __ tens __ ones) is wider than half the page: one panel a row.
         chartWide: true,
         // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
-        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
+        // lf-placevalue r1 F18: one-column shapes, so the page is filled on ONE page where two columns do not fit.
+        practiceShapes: [[12, 2], [10, 2], [12, 1], [10, 1], [8, 1], [6, 1]],
         mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
     },
 });

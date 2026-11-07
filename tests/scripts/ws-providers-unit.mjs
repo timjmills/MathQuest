@@ -731,6 +731,12 @@ function pvTexts(q) {
         for (let seed = 1; seed <= 40; seed++) { const q = pvReal(sk, {}, 0, seed * 977); if (q.pv && q.pv.place === 1) ones.push(seed); }
         ok(!ones.length, `F13 placevalue:${sk}: item 0 asks the ones place at ${ones.length} of 40 seeds (${ones.slice(0, 5).join(', ')})`);
     }
+    // F22: a combine page with a zero place deals the zero in the tens AND in the ones (page dealer), never one place only.
+    for (let pg = 0; pg < 12; pg++) {
+        const at = new Set();
+        for (let i = 0; i < 8; i++) { const q = pvReal('combine', { zeroPlace: 'always' }, i, 9100 + pg * 13); const s3 = String(q.pv.n); at.add(s3.indexOf('0', 1)); }
+        ok(at.size >= 2, `F22 placevalue:combine page ${pg}: every zero sits in one place (${[...at].join(', ')})`);
+    }
     // F3: finished work given as ONE string (True or False?, Reason It pass wrong.value only) is written slot by slot:
     // each box of a multi-slot frame shows the provider's value for THAT slot, never the whole statement.
     const slotTexts = (html) => { const m = {}; for (const x of String(html).matchAll(/data-ws-slot="([a-z]+\d+)"[^>]*>([^<]*)</g)) m[x[1]] = x[2]; return m; };

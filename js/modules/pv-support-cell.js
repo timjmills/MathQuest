@@ -238,6 +238,9 @@ register('pv-support', {
         // because `pv` only draws it under its own lettered numeral).
         if (p.picture === 'chart' || p.picture === 'plain') {
             if (p.base && p.base.kind === 'place') {
+                // lf-placevalue r1 F4: with its "Value ____" line (writeValue) the place row is the `pv` cell's own, under
+                // the support picture, so the ring, the value line and finished work read alike on every support.
+                if (p.base.writeValue) return `<div class="pv-cell">${pic}${renderCell({ template: 'pv', v: 1, payload: { ...p.base, hideNumeral: true } }, ctx)}</div>`;
                 return `<div class="pv-cell">${pic}${ringRow(ctx, p.base.words || [], p.base.keyValue)}</div>`;
             }
             // value (and its unit-form / notation frames, and the word-bank line): the `pv` cell
