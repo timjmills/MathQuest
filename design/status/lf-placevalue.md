@@ -6,7 +6,7 @@ Owner of files: gen-pv.js, sheet/cells/{pv,value-line,line-labels,gattegno}.js, 
 State: building
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 0, none
+Critic rounds: 1, FAIL (all five; min 1 stretch, core 4-6)
 
 ## Now
 - pv spec card drafted (`design/cards/pv/pv.md`): green except the owner signature; questions sent to the lead 2026-11-07.
@@ -43,6 +43,10 @@ Critic rounds: 0, none
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-07 critic r1 (design/audit/runs/lf-placevalue/critic-r1.md): FAIL on identify, value, expand, combine, unit_form; 23 findings
+  (F1 H13 empty bands, F3 wrongAnswer per slot, F4 writeValue missing, F5-F7 paper / screen parity and screen digits, F8 Size S on
+  unit_form, F9 two geometries, F10 slot width, F11-F14 worked-step text, F2 / F17 / F18 / F21 engine roles). Rule-00 lists in
+  design/status/speed-audit.md "lf-placevalue critic r1".
 - 2026-11-07 precritic r2 (9888bad1 = integration tip + lane): 25 PASS, 2 FAIL (sibling-compare, options-render combine zeroPlace=none L),
   1 SKIPPED (card-not-offered); lead rulings R1-R3 (owner pin "Yes, accept 10"); critic r1 launched.
 - 2026-11-07 r0 → fixes (4193f4b, a73304fd): combine dealer (dealIndex + freshDeal), CL-40 spacer for pv / pv-support equation rows
