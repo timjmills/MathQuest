@@ -212,7 +212,7 @@ function dims(p, g) {
     const signW = boxH;
     const frameW = 0.6 * g.E + (p.rule || []).length * (signW + ruleBoxW + 2.3);
     const machineH = Math.max(7, textMm * 1.5);
-    return { rowH, headH, boxW, boxH, colW, exprW, textMm, ruleBoxW, signW, frameW, machineH, digitMm, maxDigits };
+    return { mslot: g.screen ? boxH : g.writeMm, rowH, headH, boxW, boxH, colW, exprW, textMm, ruleBoxW, signW, frameW, machineH, digitMm, maxDigits };
 }
 
 const hasExprCol = (p) => p.task === 'outputs' && p.support !== 'line' && !p._noExpr;
@@ -229,7 +229,8 @@ const withFade = (p, ctx) => {
 /* The find-the-rule machine with the frame inside (lf-algebra r1). Decided from the cell alone (never the column count), so
  * the footprint and every render agree: only where the whole machine row fits a third of the page's width. */
 const MERGE_ARROW_MM = 4.5, MERGE_GAP_MM = 1, MERGE_PAD_MM = 1.5, MERGE_MAX_MM = 52;
-const mergedH = (d) => d.signW + 1.2;
+// the machine's slots are the writing height Hw on paper (a box no taller than the default machine's), boxH on screen
+const mergedH = (d) => d.mslot + 0.6;
 const mergedW = (g, d) => 5 * 0.55 * d.textMm + 2 * MERGE_ARROW_MM + 4 * MERGE_GAP_MM + 2 * MERGE_PAD_MM + d.frameW - 0.6 * g.E + 1;
 function ruleInMachine(p, g, d, ctx) {
     if (!p.machine || p.task !== 'rule' || p.support === 'line' || p._noMerge || p.ruleBelow || p.machineText || p.machineTried) return false;
@@ -266,7 +267,7 @@ function machine(p, g, d, wMm, merged = null) {
         // lf-algebra r1: find-the-rule writes the rule IN the machine's box ("In -> [ n (o) [ ] ] -> Out"), so the page
         // has one rule place, not a box saying "rule" over a second frame (the frame row cost a sixth of the cell)
         return `<div class="ft-machine" data-ft-machine="1" style="display:flex;align-items:center;justify-content:center;gap:${g.em(MERGE_GAP_MM)};`
-            + `margin:0 auto ${g.em(0.8)};white-space:nowrap">`
+            + `margin:0 auto ${g.em(0.4)};white-space:nowrap">`
             + `${txt(g, 'In', { bold: true })}${arrow(g, MERGE_ARROW_MM)}`
             + `<span class="ft-rule" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;height:${g.em(mergedH(d))};`
             + `padding:0 ${g.em(MERGE_PAD_MM)};border:${HEAVY} solid ${INK.ink};background:#fff">${merged}</span>`
@@ -294,7 +295,7 @@ function machine(p, g, d, wMm, merged = null) {
 function slotBox(g, s, d, vals, ink, extra = {}) {
     const shape = s.kind === 'sign' ? 'circle' : s.kind === 'rule' ? 'line' : 'box';
     const o = { wMm: d.boxW, hMm: d.boxH, value: vals[s.id] || '', ink, mark: 'cell', shape, ...extra };
-    if (s.kind === 'sign') { o.wMm = d.signW; o.hMm = d.signW; o.extra = 'border-radius:50%;'; }
+    if (s.kind === 'sign') { o.wMm = extra.hMm || d.signW; o.hMm = extra.hMm || d.signW; o.extra = 'border-radius:50%;'; }
     let html = box(g, s.id, o);
     if (s.kind === 'rule') {
         // a writing LINE, not a box: the bottom rule only (the design standard's line slot)
@@ -460,7 +461,7 @@ function ruleAnswer(p, g, d, vals, ink, slots, ctx, fx = { on: false }, fixBelow
     if (fx.on && !fixBelow) frame += `<span style="display:inline-block;width:${g.em(3)}"></span>${fixHtml}`;
     // in the machine's box the In is the arrow's: the frame starts at its sign (no n)
     if (fixBelow === 'merged') return own.map((s, k) => (k ? gap(s.kind === 'sign' ? 1.5 : 0.8) : '')
-        + slotBox(g, s, d, vals, ink, s.kind === 'sign' ? {} : { wMm: d.ruleBoxW })).join('');
+        + slotBox(g, s, d, vals, ink, s.kind === 'sign' ? { hMm: d.mslot } : { wMm: d.ruleBoxW, hMm: d.mslot })).join('');
     const row = (inner) => `<div style="display:inline-flex;align-items:center;white-space:nowrap">${inner}</div>`;
     const body = ruleInline(p, g, d, ctx, fx)
         ? row(`${txt(g, 'Rule:', { bold: true })}${gap(2)}${frame}`)
@@ -611,7 +612,7 @@ register('function-table', {
         const merged = ruleInMachine(p, g, d, ctx);
         const w = Math.max(tableWidth(p, d) + (checkSide(p, g, d, ctx) ? 7 + sideW(d) : 0), p.machine ? (merged ? mergedW(g, d) : 52) : 0, p.task === 'rule' && !merged ? (p.support === 'line' ? lineW(d) + 6 : d.frameW + 2) : 0);
         let h = d.headH + (p.rows || []).length * d.rowH + 2;
-        if (merged) h += mergedH(d) + 0.8;
+        if (merged) h += mergedH(d) + 0.4;
         else if (p.machine || p.task !== 'rule') h += d.machineH + 0.8;
         if (p.task === 'rule' && !merged) h += 1.2 + d.signW + (ruleInline(p, g, d, ctx) ? 0 : Math.max(11, g.pt * g.zoneEm) * PT_MM + 0.6);
         if (p.check && !checkSide(p, g, d, ctx)) h += 1 + d.boxH + 2.5 + (checkInline(d, ctx) ? 0 : d.textMm * 1.4);

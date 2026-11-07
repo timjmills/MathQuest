@@ -266,7 +266,7 @@ registerSkill('patterns:number_patterns_rule', {
             const v = d.blanks.map((i) => d.values[0] + i * jump);
             const k = d.blanks.findIndex((i, n) => v[n] !== d.values[i]);
             if (k >= 0) {
-                c.push({ value: joinLike(q, [...v, ...(rule !== null ? [String(jump)] : [])]), misconception: 'added-not-doubled', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
+                c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'added-not-doubled', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
                     explain: `Added ${fmt(jump)} each time instead of ${d.kind === 'double' ? 'doubling' : 'multiplying by 10'}.` });
             }
         }
