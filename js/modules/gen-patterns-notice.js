@@ -24,7 +24,7 @@
 // page-deal.js (L10: never from the item's position), so a seeded page reproduces and answers never cycle.
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
-import { dealIndex, dealPick } from './page-deal.js';
+import { dealIndex, dealPick, freshDeal } from './page-deal.js';
 import { optionsFor, normalizeOptions } from './skill-options.js';
 import { k2Twin, noticeStatements, NOTICE_TEMPLATE, growthCells, growCount, GROW_TEMPLATE } from './sheet/index.js';
 
@@ -212,12 +212,14 @@ function generateNotice(q) {
 /** The pattern families: count(t) = start + (t - 1) × step, every one drawn inside 7 × 7 units at Term 4. */
 const FAMILIES = ['line', 'rows2', 'rows2p', 'rows3', 'rows3p', 'rows4', 'rows4p', 'rows5', 'L', 'T', 'plus'];
 
-function generateGrowing(q) {
-    const o = optsOf('growing_shape_patterns');
-    const ask = ['next', 'rule', 'far'].includes(o.patTask) ? o.patTask : 'next';
-    const band = [10, 20, 50].includes(Number(o.band)) ? Number(o.band) : (ask === 'far' ? 50 : 20);
+/**
+ * Every family and shift a page of the task may draw: the answer (Term 4's count, or Term 10's) inside the band and
+ * Term 4 inside its box. The ONE source of the valid set: the dealer below draws from it, and the item declares the
+ * distinct (start, step) pairs it makes (`q.dealSet`, read by ws-dealer-uniform: the page caps and the uniform check
+ * are judged against the real set, not against an arithmetic one).
+ */
+export function growingCandidates(ask, band) {
     const at = ask === 'far' ? 10 : 4;
-    // every family and shift whose answer (Term 4's count, or Term 10's) fits the band and whose Term 4 fits its box
     const cands = [];
     for (const fam of FAMILIES) {
         for (let e = 0; e <= 3; e++) {
@@ -227,15 +229,21 @@ function generateGrowing(q) {
             cands.push({ fam, e, start: growCount(fam, e, 1), step: growCount(fam, e, 2) - growCount(fam, e, 1), ans });
         }
     }
-    // the (start, step) pair is DEALT over every distinct pair the band allows (page-deal.js: a shuffled block, each pair
-    // once a block, so a page repeats no pattern while the band has enough and the rule and the first count both vary,
-    // L10); the family and shift that draw it are then picked from those that make that pair
+    return cands;
+}
+
+function generateGrowing(q) {
+    const o = optsOf('growing_shape_patterns');
+    const ask = ['next', 'rule', 'far'].includes(o.patTask) ? o.patTask : 'next';
+    const band = [10, 20, 50].includes(Number(o.band)) ? Number(o.band) : (ask === 'far' ? 50 : 20);
+    const cands = growingCandidates(ask, band);
+    // the (start, step) pair is drawn UNIFORMLY over every distinct pair the band allows, FRESH on the page
+    // (page-deal.js freshDeal: no pair twice in the last 19 items while the band has 24 or more; a smaller band keeps
+    // only half its pairs out, since a window of size - 1 would force one fixed cycle, L10); the family and shift that draw it are then picked from those that make that pair
     const sigs = [...new Set(cands.map((c) => `${c.start}+${c.step}`))];
-    const drawSig = (k) => {
-        const mine = cands.filter((c) => `${c.start}+${c.step}` === sigs[k]);
-        return mine[randInt(0, mine.length - 1)];
-    };
-    const pick = drawSig(dealIndex('grow:sig', sigs.length)) || cands[0];
+    const k = freshDeal(`grow:sig:${ask}:${band}`, () => randInt(0, sigs.length - 1), { sig: (v) => String(v), window: sigs.length >= 24 ? 19 : Math.max(1, Math.floor(sigs.length / 2)) });
+    const mine = cands.filter((c) => `${c.start}+${c.step}` === sigs[k]);
+    const pick = mine[randInt(0, mine.length - 1)] || cands[0];
     const shapeOpt = ['dots', 'squares', 'mixed'].includes(o.growShape) ? o.growShape : 'dots';
     const shape = shapeOpt === 'mixed' ? (dealIndex('grow:shape', 2) === 0 ? 'dots' : 'squares') : shapeOpt;
     const counts = [1, 2, 3, 4].map((t) => growCount(pick.fam, pick.e, t));
@@ -268,6 +276,11 @@ function generateGrowing(q) {
     q.skillLabel = 'Growing Shape Patterns';
     q.hint = `Each term has ${pick.step} more ${unit} than the one before.`;
     q.dupKey = `grow:${pick.fam}:${pick.e}:${ask}`;
+    // the declared valid set (not enumerable: a saved quiz never stores it): every (start, step) pair equally likely
+    const seen = new Set();
+    const set = [];
+    for (const c of cands) { const s = `${c.start}+${c.step}`; if (!seen.has(s)) { seen.add(s); set.push([c.start, c.step, c.ans]); } }
+    Object.defineProperty(q, 'dealSet', { value: { of: 'start, step', items: set }, enumerable: false, configurable: true, writable: true });
     try { q.visual = k2Twin(GROW_TEMPLATE, payload); } catch (e) { q.visual = ''; }
     q.printFormat = 'growing-pattern';
 }
