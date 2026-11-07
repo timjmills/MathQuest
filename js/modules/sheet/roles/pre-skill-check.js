@@ -140,7 +140,7 @@ export function routePlan(input, rows) {
     // half-blank teacher page)
     const m = bandMetrics(ctx, layoutHeader(header));
     const em = ((ctx.s && ctx.s.textPt) || 14) * PT_MM;
-    const rowMm = Math.max(12, (m.budget - m.strip - 10 * em - 12) / rows.length);
+    const rowMm = Math.max(12, (m.budget - m.strip - 10 * em - 24) / rows.length);
     const section = { kind: 'band', label: '', instr: '', html: routingTableHtml(rows, { rowMm }) };
     return assemble(ROLE_ID, input, Object.assign({}, f, { header }), [{ header, sections: [section] }], { scaffoldLevel: 1, meta: { items: 0, part: 'prereq-route' } });
 }
