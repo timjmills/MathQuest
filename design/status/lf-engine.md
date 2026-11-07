@@ -9,10 +9,10 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
-- Critic r2 FAIL min 6 (design/audit/runs/lf-engine-p1-r2/): add + round sheets PASS 8 at L and S; every check / key / routing page 7 (near-miss); sub L sheet 6 (N1, D10 regressed); engine 6. N1-N8 handed to P1b (round 3 on these pages; rule 7 applies).
-- P1b running: live lesson defects R1 R2 R4 R5 R10 (lf-checks bisects), lesson 7 D2 enforcement, the samples' Practice / Mixed H13 and LR-5.
-- P2 compiler merged (feea00b2): 7 proof cards compile; node gates green; SHAPES.md classifies all 843 queue lessons.
-- P2b proof (render diff of lessons 1-5, hold-outs 6 and 7, critic) waits on P1b.
+- Live fixes R1 R2 R4 R5 verified on master-shaped branch `claude/sweet-newton-c8wrv1-lf-engine-live` (517b8a39, cbd58203, 0ae3ded2; boot-smoke, teacher-wrm, detailed-lesson 1/3a/4/5/6 OK) — sent to the lead for deploy.
+- Critic r2 FAIL min 6; P1b fixed N1 (sub L Independent row back), N2 floor, N3, N4, D16, lesson 7 D2 (repeatKey), R1 R2 R4, R5 in part (rule 7: 3a turned-array repeats need a content/check ruling).
+- P1c running (stops 15:00 UTC): practiceBlocks (lf-ops), guidedRows (lf-algebra), R6 R8 R9, lesson 2 gate findings, N5-N8 + layout switches, samples' Practice/Mixed fill, re-render for critic r3.
+- P2 compiler merged; P2b proof (render diff 1-5, hold-outs 6, 7) not started — next after critic r3, next week's budget.
 - Pilot command ready: `node tests/scripts/ws-lesson-card.mjs --draft --unit G3-Y4.B4`.
 
 ## Owner go
@@ -71,5 +71,11 @@ Speed-ups: seed cards from passed lessons (`--from-detailed`); item readers per 
 Automatic checks: a lesson sheet holds ≥ 1 Independent row + Score at every size, blank foot ≤ 20 % blocking (N1); pre-skill-check plan() unit test — every question ≥ its items, no two-choice item alone (N2); routing page states the miss threshold, routed bands carry __/n (N3); LR-6 over the prereq part (N4); tab-to-content padding and paired-band alignment lints (N5, N6); routed titles carry a topic (N7); Guided and Independent cells of one sheet share structural parts (N8).
 Speed-ups: r1 and r2 page side by side for every finding marked fixed; a fix scoped to "some sheets" lists every changed sheet's Independent rows before / after; rule text and code held together by a unit test (ROUTE_ITEMS as a floor); ws-backtest in the background with the maximum timeout; the critic graded PNGs without a browser while P1b held it (parallel, no wait).
 
+### P1b (08:20-11:15 UTC)
+Automatic checks: a source-level unit + backtest for every dealer flag (pageFresh, reserve, pageCap, repeatKey, chartKeys); the 25-seed sweep as a deploy gate (R4, R5 only showed past seed 4242); a unit check that a dealer never reads a page constant once and reuses it for every try; a lesson sheet ≥ 1 Independent row + Score at L and S; a routed question ≥ 2 items.
+Speed-ups: a small build harness (one build, page hashes, console capture) found R1, R2, N1 in minutes each (move to tests/lib); page-by-page hashing against a known-good older tree proved R2 restored; chain long browser gates in one background job; per-page CSS inline (shared LESSON_CSS edits change every page's hash).
+For lf-checks: ws-detailed-lesson protocolTimeout 0 + polling; LP-FAMILY-REPEAT vs factKeyOf on turned arrays (3a ruling); precritic --lesson builds the compiled description (req.description).
+
 ## Cost
 - 08:20 UTC: session cost_usd $39.56 (≈ 2.0 % of the weekly limit at $20 ≈ 1 %).
+- 11:00 UTC: session cost_usd $80.04 (≈ 4.0 %). Cap $470 (23.5 %).
