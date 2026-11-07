@@ -1,0 +1,343 @@
+// THE LESSON LIBRARY UNIT GATE (design/LESSON_LIBRARY_PLAN.md phase 0, design/LESSON_RULES.md): the
+// lesson rules (sheet/lesson-rules.js), the library (lessons/library.js, schema.js), the back-compat
+// view (lessons/prereqs.js), the prerequisite fallback (prereq-db.js) and the build-list NEEDS merge.
+// Node only, no browser; prints `ws-lesson-unit: OK (n checks)` / `FAIL`.
+//
+//   node tests/scripts/ws-lesson-unit.mjs
+//   node tests/scripts/ws-lesson-unit.mjs --only title,routing-export   # the engine checks alone (lf-engine P1, critic
+//                                                                        # lessons-phase0 r1): title (D13), routing-export
+//                                                                        # (D14), route-styles (D15), routed-plan (D16),
+//                                                                        # checks-field (D12), parts-plugin (D18),
+//                                                                        # chart-sizing (lesson 7 D1)
+//   MQ_ROOT=<checkout> node tests/scripts/ws-lesson-unit.mjs --only ... # run them on another tree (ws-backtest commit-pair)
+// The engine checks also run in the full gate.
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
+
+const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const ONLY = (() => { const i = process.argv.indexOf('--only'); return i > -1 ? String(process.argv[i + 1] || '').split(',').map((x) => x.trim()).filter(Boolean) : null; })();
+const imp = (p) => import(pathToFileURL(path.join(ROOT, p)).href);
+const mem = {};
+globalThis.localStorage = globalThis.localStorage || { getItem: (k) => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); }, removeItem: (k) => { delete mem[k]; } };
+let pass = 0;
+const fails = [];
+const eq = (got, want, what) => { if (JSON.stringify(got) === JSON.stringify(want)) pass++; else fails.push(`${what}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
+const ok = (cond, what) => { if (cond) pass++; else fails.push(what); };
+const log = console.log;
+console.log = () => {};
+const data = await imp('js/modules/data.js').finally(() => { console.log = log; });
+const LR = await imp('js/modules/sheet/lesson-rules.js');
+const LIB = await imp('js/modules/lessons/library.js');
+const SCHEMA = await imp('js/modules/lessons/schema.js');
+const PRE = await imp('js/modules/lessons/prereqs.js');
+const BL = await imp('js/modules/build-list.js');
+const DET = await imp('js/modules/lessons/detailed/index.js');
+const LATE = {
+    // R1 (lf-engine P1b): lesson 2 did not build since 944afb79 - a story within 20 tells ONE schema a page (word-work.js
+    // pageConstant 'word-work-schema'), and an `itemSpread` ref never re-opens its page, so every try told the first try's
+    // schema and the exit slip's put-together case was never met. `pageFresh` re-opens the page per try (both dealers), and
+    // `reserve` deals the late items whose cases a 15-fact pool can run out of before any page.
+    // R2 (lf-engine P1b): lessons 1 and 6 Practice sheets 17-19 % blank since 6bc3cbd8 (layout.js r12c nearPack laid 5 rows for
+    // a 4 x 1 sheet's 4 items). A detailed Practice sheet's shape is its page: pageCap = its count, passed through normaliseRequest.
+    async 'r2-practice-cap'() {
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/sections: \[\{ skills: \[sk1\], count: shape\[0\], columns: shape\[1\], noCap: true, pageCap: shape\[0\] \}\]/.test(ps), 'R2: a detailed Practice sheet is capped at its shape count');
+        ok(/pageCap: s && Number\(s\.pageCap\) > 0 \? Number\(s\.pageCap\) : undefined/.test(ps), 'R2: normaliseRequest keeps a section pageCap');
+        const L = await tryImp('js/modules/sheet/layout.js');
+        ok(L && /Number\(section\.pageCap\) > 0 && rows \* cols > Number\(section\.pageCap\)/.test(readSrc('js/modules/sheet/layout.js')), 'R2: layout.js applies the cap after the near-height pack');
+    },
+    // Lesson 7 D2 (lf-engine P1b): the compiled card's `repeatKey: 'family+frame'` is read by both dealers - an item's
+    // unordered x / ÷ family and its story frames are held once across the pack.
+    async 'd2-repeat-key'() {
+        ok(typeof LR.repeatKeysOf === 'function', 'D2: lesson-rules.js exports repeatKeysOf');
+        if (typeof LR.repeatKeysOf !== 'function') return;
+        const ws = { cell: { template: 'word-work', payload: { steps: [{ op: '*', a: 4, b: 6, ans: 24 }, { op: '+', a: 24, b: 3 }], lines: ['Ravi has 4 bags.', 'Each bag has 6 marbles.', 'How many marbles in all?'] } } };
+        eq(LR.repeatKeysOf(ws), ['rk:fam:4,6,24', 'rk:frame:4 bag', 'rk:frame:6 marble'], 'D2: a two-step story keys its x step family and its frames');
+        eq(LR.repeatKeysOf({ cell: { payload: { op: '/', a: 24, b: 6 } } }), ['rk:fam:4,6,24'], 'D2: 24 ÷ 6 is the family of 4 x 6');
+        eq(LR.repeatKeysOf({ cell: { payload: { op: '+', a: 7, b: 5 } } }), [], 'D2: a + item has no x / ÷ family');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/if \(sk\.repeatKey && dlRepeatKeys\(cand\)\.some/.test(ps) && /if \(sk\.repeatKey\) for \(const k of dlRepeatKeys\(q\)\) seen\.add\(k\)/.test(ps), 'D2: refAccepts / refRecord read repeatKey (the role dealer)');
+        ok(/const rks = ref\.repeatKey \? dlRepeatKeys\(q\) : \[\];/.test(ps) && /if \(d\.repeatKey\) for \(const x of dlRepeatKeys\(c\.q\)\) used\.add\(x\)/.test(ps), 'D2: the detailed dealer and the pack record read repeatKey');
+        const U = await tryImp('js/modules/lessons/units/G3-Y4.B4.js');
+        const l7 = U && Object.values(U.DETAILED || {}).find((x) => x && x.id === 'g3-oa8-two-step-wp');
+        ok(l7 && l7.repeatKey && l7.skill.repeatKey === 'family+frame', 'D2: the compiled lesson 7 carries repeatKey on the description and its refs');
+        ok(!DET.DETAILED_LESSONS['g3-oa8-two-step-wp'] || !DET.DETAILED_LESSONS['g3-oa8-two-step-wp'].repeatKey, 'D2: the hand-written lesson 7 has none (its render is unchanged)');
+    },
+    // critic r2 N2 / N3 / N4 (lf-engine P1b): a routed question never prints one item; the routing table says when a
+    // question is missed and each routed question prints its __/n; the check holds LR-6.
+    async 'route-floor'() {
+        const R = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        if (!R) { ok(false, 'N2: pre-skill-check.js import'); return; }
+        eq(R.ROUTE_ITEMS, 2, 'N2: ROUTE_ITEMS is 2');
+        const html = R.routingTableHtml([{ letters: '1-2', checks: 'x', lesson: 'Y1', title: 't' }]);
+        ok(typeof R.ROUTE_MISSED_RULE === 'string' && html.includes(R.ROUTE_MISSED_RULE), 'N3: the routing table states when a question is missed');
+        const src = readSrc('js/modules/sheet/roles/pre-skill-check.js');
+        ok(/const floor = \(i\) => Math\.max\(1, Math\.min\(ROUTE_ITEMS,/.test(src) && /return floor\(i\); \};/.test(src) && /filter\(\(\[v, i\]\) => v > floor\(i\)\)/.test(src), 'N2: plan() gives items up only above the floor of 2');
+        ok(/extra: input\.perQuestion && !routed \? '' : scoreTag\(its\.length\)/.test(src), 'N3: a routed band carries its __/n score');
+        ok(/Object\.assign\(\{ lr6: true, distinctAnswer: true \}, p\.ref\)/.test(readSrc('js/modules/print-sheet.js')), 'N4: the lesson check refs hold LR-6');
+        ok(!/10 \* em - 24\)/.test(src) && /ROUTE_TABLE_FIXED_MM/.test(src), 'D16: routePlan names its fixed margins');
+    },
+    // R4 / R5 (lf-engine P1b): a detailed pack builds at every seed (a late item that finds its case spent is reserved and the
+    // pack rebuilt); a spent pool never deals a chart example, its turn, or an item already on the page, while another is left.
+    async 'r4-r5-dealer'() {
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/async function buildDetailedLesson\(req = \{\}\) \{\n    const late = new Set\(\);/.test(ps) && /late\.add\(e\.dlLate\)/.test(ps), 'R4: buildDetailedLesson rebuilds with the failing late item reserved');
+        ok((ps.match(/lateTag\('(wp|cq)'|lateTag\(`exit\$\{i\}`/g) || []).length === 3, 'R4: the word problem, the Check Question and every exit item name themselves when they fail');
+        ok(/if \(!strict && Array\.isArray\(sk\.chartKeys\) && k < tries\)/.test(ps) && /lr6: true, chartKeys \}/.test(ps), 'R5: the relaxed pass keeps chart examples and page repeats last');
+    },
+    async 'r1-page-fresh'() {
+        globalThis.window = globalThis.window || globalThis;
+        const G = await tryImp('js/modules/generate-question.js'), PD = await tryImp('js/modules/page-deal.js');
+        if (!G || !PD) { ok(false, 'R1: generate-question.js / page-deal.js import'); return; }
+        const opts = { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false };
+        const kinds = (fresh) => { const out = new Set(); for (let k = 0; k < 40; k++) { if (fresh && k > 0) PD.resetPageDeals(); const q = G.generateQuestionFor({ category: 'addition', skill: 'add_wp_20', opts, seed: (4242 + 7919 * k) >>> 0, itemIndex: k }); const t = String((q && q.text) || ''); out.add(/\bin all\b/.test(t) ? 'put-together' : /\bmore\b/.test(t) ? 'add-to' : 'other'); } return [...out].sort(); };
+        eq(kinds(false).length, 1, 'R1: the trap - an item-spread deal without a fresh page tells one schema on every try');
+        eq(kinds(true), ['add-to', 'put-together'], 'R1: pageFresh - a fresh page per try deals both schemas');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok((ps.match(/if \((ref|sk)\.pageFresh && k > 0\) resetPageDeals\(\);/g) || []).length === 2, 'R1: both dealers (dealOne1, generateRun) re-open the page per try on a pageFresh ref');
+        const l2 = DET.DETAILED_LESSONS['g1-oa1-bar-model-wp-20'] || Object.values(DET.DETAILED_LESSONS).find((x) => x.id === 'g1-oa1-bar-model-wp-20');
+        ok(l2 && l2.skill.pageFresh && l2.wordProblem.ref.pageFresh && l2.exit.every((e) => e.ref.pageFresh), 'R1: lesson 2 story refs are pageFresh');
+        ok(l2 && l2.exit[0].reserve && l2.checkQuestion.reserve, 'R1: lesson 2 reserves the exit put-together item and the Check Question');
+    },
+    // D18: the parts registry is fully plug-in - a dummy part registers with its own build hook and the host's dispatch
+    // builds it, with no edit of roles/lesson.js or print-sheet.js buildLesson (which names no core part list).
+    async 'parts-plugin'() {
+        const R = await tryImp('js/modules/sheet/lesson-pages/index.js');
+        ok(R && typeof R.buildPluggedParts === 'function', 'D18: lesson-pages/index.js exports buildPluggedParts (the host dispatch)');
+        if (!R || typeof R.buildPluggedParts !== 'function') return;
+        eq(['prereq', 'chart', 'sheet', 'practice', 'mixed'].map((x) => !!(R.lessonPart(x) || {}).core), [true, true, true, true, true], 'D18: the five core parts are marked core in the registry');
+        const seen = [];
+        R.registerLessonPart({ id: 'zz-dummy', order: 50, role: 'lesson', name: 'Dummy', build: async (api) => { seen.push([api.part.id, api.seed]); return { pageCount: 1, pupilHtml: '<section class="ws-page">dummy</section>' }; } });
+        R.registerLessonPart({ id: 'zz-plan', order: 60, role: 'lesson', name: 'Planned', plan: () => [] });
+        try {
+            const ids = R.lessonPartIds();
+            eq(ids.slice(-2), ['zz-dummy', 'zz-plan'], 'D18: a registered part takes its place in packet order');
+            const rolled = [];
+            const out = await R.buildPluggedParts(ids, { seedOf: (x) => (x === 'zz-dummy' ? 77 : 88), lessonRolePart: async (x, seed) => { rolled.push([x, seed]); return { pageCount: 2 }; } });
+            eq(out.map((p) => [p.part, p.role, p.res.pageCount]), [['zz-dummy', 'lesson', 1], ['zz-plan', 'lesson', 2]], 'D18: the dispatch builds each plugged part (own hook, else the lesson role) and no core part');
+            eq([seen, rolled], [[['zz-dummy', 77]], [['zz-plan', 88]]], 'D18: each with its own seed');
+            R.registerLessonPart({ id: 'zz-vocab', order: 7, role: 'lesson', name: 'Vocabulary', plan: () => [] });
+            ok(typeof R.orderParts === 'function', 'D18: lesson-pages/index.js exports orderParts');
+            if (typeof R.orderParts === 'function') {
+                const built = ['prereq', 'chart', 'teach', 'practice', 'practice', 'mixed', 'zz-dummy', 'zz-vocab'].map((part, i) => ({ part, i }));
+                const got = R.orderParts(built, (e) => (e.part === 'teach' ? 'sheet' : e.part)).map((e) => `${e.part}${e.part === 'practice' ? e.i : ''}`);
+                eq(got, ['prereq', 'zz-vocab', 'chart', 'teach', 'practice3', 'practice4', 'mixed', 'zz-dummy'], 'D18: parts come out in registry order - a part at order 7 lands second; a part\'s sheets keep their order');
+                eq(R.orderParts(built.slice(0, 6), (e) => (e.part === 'teach' ? 'sheet' : e.part)).map((e) => e.i), [0, 1, 2, 3, 4, 5], 'D18: the default packet\'s order is unchanged');
+            }
+        } finally { R.unregisterLessonPart('zz-dummy'); R.unregisterLessonPart('zz-plan'); R.unregisterLessonPart('zz-vocab'); }
+        eq(R.lessonPartIds().filter((x) => /^zz-/.test(x)), [], 'D18: a test part unregisters');
+        const ps = readSrc('js/modules/print-sheet.js');
+        const body = ps.slice(ps.indexOf('async function buildLesson('), ps.indexOf('async function buildDetailedLesson('));
+        ok(!/\[\s*'prereq',\s*'chart',\s*'sheet',\s*'practice',\s*'mixed'\s*\]/.test(code(body)) && /buildPluggedParts\(/.test(body) && /orderParts\(/.test(body), 'D18: buildLesson names no list of the core parts, builds the rest through the registry and prints them in registry order');
+    },
+    // Lesson 7 D1 (brief step 2.4): the anchor chart reports its sizing; a fallback zoom under 1 is a failure.
+    async 'chart-sizing'() {
+        const CH = await tryImp('js/modules/sheet/lesson-pages/chart.js');
+        const C = await tryImp('js/modules/sheet/roles/compose.js');
+        ok(CH && typeof CH.chartSizingOf === 'function', 'lesson 7 D1: chart.js exports chartSizingOf');
+        if (!CH || !C || typeof CH.chartSizingOf !== 'function') return;
+        const fake = (h) => ({ measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: h, fits: true }])), render: () => '<i></i>', cellCls: '', q: { text: '1 + 1', ans: 2 } });
+        const input = { ctx: { size: 'L', paper: 'A4' }, skills: [{ categoryId: 'addition', skillId: 'add', iCan: 'I Can add' }] };
+        const ctx = C.ctxOf(input);
+        const run = (h, n, tail) => { const st = Array.from({ length: n }, () => fake(h)); return CH.chartPage(input, ctx, null, st[0], st, st, [], tail ? fake(20) : null, [], null).sizing; };
+        const a = run(40, 4, false), b = run(150, 3, true);
+        eq([a.mode, a.fallback, a.ok, a.zoom >= 1], ['one', false, true, true], 'lesson 7 D1: a chart that fits reports mode, zoom >= 1, ok');
+        eq([b.fallback, b.ok, b.zoom < 1], [true, false, true], 'lesson 7 D1: a fallback zoom under 1 is reported as a failure (ok false)');
+        eq(CH.chartSizingOf({ plan: { meta: { chartSizing: b } } }), { mode: b.mode, zoom: b.zoom, fallback: true, ok: false }, 'lesson 7 D1: the build result carries it (chartSizing)');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/chartSizing: chartSizingOf\(chart\)/.test(ps) && /chartsOk:/.test(ps), 'lesson 7 D1: buildLesson and buildDetailedLesson surface the chart sizing');
+    },
+};
+
+/* ============================================================ the ENGINE checks (lf-engine P1, critic r1) */
+const readSrc = (rel) => { try { return fs.readFileSync(path.join(ROOT, rel), 'utf8'); } catch (e) { return ''; } };
+const listJs = (rel) => { const out = []; const walk = (d) => { let ents = []; try { ents = fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }); } catch (e) { return; } for (const e of ents) { const r = `${d}/${e.name}`; if (e.isDirectory()) walk(r); else if (/\.js$/.test(e.name)) out.push(r); } }; walk(rel); return out; };
+/** Source without comments (block comments, and // comments that start a line or follow code after whitespace). */
+const code = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').map((l) => l.replace(/(^|\s)\/\/.*$/, '$1')).join('\n');
+const tryImp = async (rel) => { try { return await imp(rel); } catch (e) { return null; } };
+const ENGINE = {
+    // D13: one title spelling - "Prerequisite Check" written once (PREREQ_CHECK_TITLE) and used by every page and table.
+    async title() {
+        const PSC = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        eq(PSC && PSC.PREREQ_CHECK_TITLE, 'Prerequisite Check', 'D13: pre-skill-check.js exports PREREQ_CHECK_TITLE');
+        const files = [...listJs('js/modules/sheet'), 'js/modules/print-sheet.js', ...listJs('js/modules/lessons').filter((f) => !/\/(detailed|units)\/|\/compile\.js$/.test(f))];
+        const lower = [], lit = [];
+        for (const f of files) {
+            const c = code(readSrc(f));
+            if (/Prerequisite check/.test(c)) lower.push(f);
+            const n = (c.match(/(['"`])Prerequisite Check(?::[^'"`]*)?\1/g) || []).length;
+            if (n && !(f.endsWith('roles/pre-skill-check.js') && n === 1)) lit.push(`${f} (${n})`);
+        }
+        eq(lower, [], 'D13: no "Prerequisite check" spelling in the lesson modules');
+        eq(lit, [], 'D13: the title is a literal only in PREREQ_CHECK_TITLE (every other use reads the constant)');
+    },
+    // D14: one routing-table builder (routingTableHtml); the detailed T6 is its own teacher table and nothing claims otherwise.
+    async 'routing-export'() {
+        const files = [...listJs('js/modules'), ...listJs('js/modules/sheet')];
+        const defs = [...new Set(files)].filter((f) => /function\s+routingTableHtml\b|const\s+routingTableHtml\s*=/.test(code(readSrc(f))));
+        eq(defs, ['js/modules/sheet/roles/pre-skill-check.js'], 'D14: routingTableHtml is defined once');
+        const twins = [...new Set(files)].filter((f) => !f.endsWith('roles/pre-skill-check.js') && /If missed, teach first|Two or more missed/.test(code(readSrc(f))));
+        eq(twins, [], 'D14: no second routing table (its head and rules live in routingTableHtml only)');
+        ok(!/T6 prints the same/.test(readSrc('js/modules/sheet/roles/pre-skill-check.js')), 'D14: no claim that the detailed T6 prints the same table (it does not)');
+        ok(/routingTableHtml\(/.test(code(readSrc('js/modules/sheet/roles/pre-skill-check.js')).replace(/function routingTableHtml/, '')), 'D14: the routing page calls the one builder');
+    },
+    // D15: the routed outputs carry classes, never literal type sizes, colours, borders or paddings; their CSS travels only
+    // with a routed page (not in the engine stylesheet every page embeds).
+    async 'route-styles'() {
+        const PSC = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        const CSS = await tryImp('js/modules/sheet/lesson-css.js');
+        ok(PSC && typeof PSC.routeTagHtml === 'function' && typeof PSC.routingTableHtml === 'function', 'D15: the route builders exist');
+        if (!PSC) return;
+        const html = PSC.routeTagHtml({ lesson: 'Y1.B1.S2', title: 'Count objects' }, 2) + PSC.routingTableHtml([{ letters: '1-2', checks: 'Count the objects.', answers: '6; 7', lesson: 'Y1.B1.S2', title: 'Count objects' }]);
+        const bare = html.replace(/<style[\s\S]*?<\/style>/g, '');
+        const styles = [...bare.matchAll(/style="([^"]*)"/g)].map((x) => x[1]);
+        eq(styles.filter((st) => /\d(pt|px)\b|#[0-9a-f]{3,6}\b|border|padding|font|color|margin/i.test(st)), [], 'D15: no literal type, colour, border, padding or margin in the routed outputs');
+        ok(/class="mq-lpretag"/.test(html) && /class="mq-lroute"/.test(html), 'D15: the routed outputs carry their classes');
+        ok(CSS && typeof CSS.LESSON_ROUTE_CSS === 'string' && /\.mq-lpretag\{/.test(CSS.LESSON_ROUTE_CSS) && /\.mq-lroute/.test(CSS.LESSON_ROUTE_CSS), 'D15: lesson-css.js holds the route classes (LESSON_ROUTE_CSS)');
+        ok(CSS && !/mq-lpretag|mq-lroute/.test(CSS.LESSON_CSS || ''), 'D15: the route classes are not in the engine stylesheet (pages without routes stay byte-identical)');
+        ok(/data-mq-route-css/.test(html), 'D15: a routed output carries its own stylesheet');
+    },
+    // D16: the routed plan's numbers are named, and routes / routePlan / routeTagLines / routedLayout are unit-tested.
+    async 'routed-plan'() {
+        const PSC = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        const C = await tryImp('js/modules/sheet/roles/compose.js');
+        const names = ['ROUTE_TAG_PT', 'ROUTE_TAG_LEADING', 'ROUTE_TAG_PAD_MM', 'ROUTE_CHAR_MM', 'ROUTE_TAG_INSET_MM', 'INSTR_CHAR_EM', 'FULL_W_MM', 'HALF_W_MM', 'ROUTE_GROW', 'PAIR_ALIKE', 'ROUTE_ITEMS'];
+        eq(names.filter((k) => !(PSC && Number.isFinite(PSC[k]))), [], 'D16: the routed plan\'s numbers are named constants');
+        if (!PSC || !names.every((k) => Number.isFinite(PSC[k])) || typeof PSC.routedLayout !== 'function') { fails.push('D16: routedLayout is exported'); return; }
+        const src = code(readSrc('js/modules/sheet/roles/pre-skill-check.js'));
+        ok(!/\b1\.6\b|\b0\.75\b|\b0\.7\b|Math\.min\(40,/.test(src.slice(src.indexOf('export function routedLayout'))), 'D16: no magic 1.6 / 0.7 / 0.75 / 40 mm left in the routed layout');
+        const PT = 25.4 / 72;
+        ok(Math.abs(PSC.routeTagMm(1) - (PSC.ROUTE_TAG_PT * PT * PSC.ROUTE_TAG_LEADING + PSC.ROUTE_TAG_PAD_MM)) < 1e-9 && Math.abs(PSC.ROUTE_TAG_MM - PSC.routeTagMm(1)) < 1e-9, 'D16: a one-line tag is 9 pt at 1.3 plus its pad');
+        ok(PSC.routeTagMm(2) > PSC.routeTagMm(1) && PSC.routeTagMm(0) === PSC.routeTagMm(1), 'D16: a two-line tag is taller; never under one line');
+        const r = { lesson: 'Y2.B2.S17', title: 'Subtract two 2-digit numbers (not across a 10)' };
+        eq(PSC.routeText(r), 'If missed \u2192 Lesson Y2.B2.S17 Subtract two 2-digit numbers (not across a 10)', 'D16: the tag words');
+        eq([PSC.routeTagLines(null, 93), PSC.routeTagLines(r, PSC.FULL_W_MM), PSC.routeTagLines(r, PSC.HALF_W_MM)], [1, 1, 2], 'D16: a long tag wraps at half width, not at full width (TY-12: never clipped)');
+        if (!C) return;
+        const fake = (h, w = 40) => ({ q: { text: 'x', ans: 1, categoryId: 'a', skillId: 'b' }, template: 'fact', footprint: { wMm: w, hMm: h, measure: true, maxCols: 4 }, measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: h, fits: w * c <= 186 }])) });
+        const input = { ctx: { size: 'L', paper: 'A4' }, skills: [], perQuestion: 2, routes: [{ lesson: 'Y1.B1.S1', title: 'A' }, { lesson: 'Y1.B1.S2', title: 'B' }, { lesson: 'Y1.B1.S3', title: 'C' }, { lesson: 'Y1.B1.S4', title: 'D' }] };
+        const ctx = C.ctxOf(input);
+        const m = C.bandMetrics(ctx, C.layoutHeader({ title: 'Prerequisite Check', name: true }));
+        const L1 = PSC.routedLayout([[fake(30), fake(30)], [fake(30), fake(30)], [fake(30, 100)], [fake(60)]], [0, 1, 2, 3], input, ctx, m);
+        eq(L1.units.map((u) => [u.qs.map((q) => q.length), u.cols, u.rows]), [[[2, 2], 4, 1], [[1], 1, 1], [[1], 1, 1]], 'D16: two narrow 2-item questions share a row of 4; a wide item and an unlike one stand alone');
+        ok(L1.units.every((u) => u.h <= u.h0 * PSC.ROUTE_GROW + 1e-6 && u.h >= u.h0), 'D16: rows grow, each to at most ROUTE_GROW x its measured height (H13)');
+        ok(L1.fits && L1.foot >= 0 && L1.foot < 1, 'D16: the layout reports its fit and the foot it leaves');
+        const L2 = PSC.routedLayout([[fake(120)], [fake(120)], [fake(120)]], [0, 1, 2], input, ctx, m);
+        ok(!L2.fits, 'D16: a check taller than the page says so (the role then drops items)');
+        const rp = PSC.routePlan(Object.assign({}, input, { checkFor: { categoryId: 'a', skillId: 'b', iCan: 'I Can add' } }), [{ letters: '1\u20132', checks: 'Count.', answers: '6; 7', lesson: 'Y1.B1.S2', title: 'Count objects' }]);
+        ok(rp && rp.pages.length === 1 && rp.meta.part === 'prereq-route', 'D16: routePlan is one teacher page');
+        ok(rp && rp.header && rp.header.title === PSC.ROUTE_PAGE_TITLE && rp.header.name === false && !/^I Can/.test(rp.header.title), 'D12/D16: the routing page is titled "Prerequisite Check: where next", no Name, never "I Can"');
+        eq(PSC.routePlan(input, []), null, 'D16: no routes, no routing page');
+    },
+    // D12: every library prerequisite says what its question asks (`checks`), in words other than the design `why`.
+    async 'checks-field'() {
+        const L = await tryImp('js/modules/lessons/library.js');
+        const S = await tryImp('js/modules/lessons/schema.js');
+        const bad = [];
+        for (const [id, l] of Object.entries((L && L.LESSONS) || {})) for (const [i, p] of (l.prereqs || []).entries()) {
+            if (!String(p.checks || '').trim()) bad.push(`${id} Q${i + 1}: no checks`);
+            else if (String(p.checks).trim() === String(p.why || '').trim()) bad.push(`${id} Q${i + 1}: checks = why`);
+        }
+        eq(bad, [], 'D12: every library prerequisite has its own `checks` line');
+        const lsn = L && L.lessonById && L.lessonById('Y2.B2.S18');
+        ok(!!(S && lsn && S.validateLesson('Y2.B2.S18', Object.assign({}, lsn, { prereqs: lsn.prereqs.map((p, i) => (i ? p : Object.assign({}, p, { checks: '' }))) })).some((x) => /no checks/.test(x))), 'D12: the schema refuses a prerequisite with no checks');
+        ok(!!(L && L.lessonData && (L.lessonData('Y2.B2.S18').prereqs || []).every((p) => p.checks)), 'D12: lessonData hands `checks` to the engine');
+    },
+};
+if (ONLY) {
+    const unknown = ONLY.filter((g) => !ENGINE[g] && !LATE[g]);
+    if (unknown.length) { log(`ws-lesson-unit: unknown --only group(s) ${unknown.join(', ')} (${[...Object.keys(ENGINE), ...Object.keys(LATE)].join(', ')})`); process.exit(2); }
+}
+
+const skillExists = (key) => { const [c, s] = String(key).split(':'); return !!(data.SKILLS[c] && data.SKILLS[c].some((x) => x && x.v === s)); };
+
+if (!ONLY) {
+// ---- THE LESSON RULES (sheet/lesson-rules.js)
+eq(LR.itemKey('9 + 1 = ?', '10'), LR.itemKey('1 + 9 = ?', '10'), 'LR-5: a turnaround is the same item');
+ok(LR.itemKey('Which place?', 'tens', 78) !== LR.itemKey('Which place?', 'tens', 42), 'LR-5: a place-value item is keyed by its number');
+ok(LR.nearTwins([51, 44], [53, 45]) && LR.nearTwins([27, 19], [77, 19]) && !LR.nearTwins([52, 39], [70, 23]), 'LR-6: near twins');
+eq(LR.casesOf({ text: '36 − 29 = ?', ops: [36, 29] }).join(','), 'twoPlace,underTen', 'LR-1: 36 - 29 is a two-place take-away with an answer under 10');
+eq(LR.casesOf({ text: '60 − 3 = ?', ops: [60, 3] }).join(','), 'onePlace,zeroOnes', 'LR-1: 60 - 3 is one-place, 0 in the ones');
+eq(LR.casesOf({ kind: 'round', n: 98, place: 10, text: 'Round 98' }).join(','), 'roundUp,toHundred', 'LR-1: 98 rounds up to 100');
+const pk = (part, text, ops, ans) => ({ part, skill: 'subtraction:sub_100_regroup', text, ops, ans });
+const V = LR.packetViolations({
+    lesson: { skill: 'subtraction:sub_100_regroup', cases: ['twoPlace', 'onePlace', 'zeroOnes', 'underTen'], caps: { onePlace: 1, underTen: 2 } },
+    placed: [pk('chart', '52 − 39 = ?', [52, 39], '13'), pk('practice', '52 − 39 = ?', [52, 39], '13'), pk('practice', '62 − 59 = ?', [62, 59], '3'),
+        pk('practice', '64 − 59 = ?', [64, 59], '5'), pk('practice', '31 − 25 = ?', [31, 25], '6'), pk('practice', '100 − 47 = ?', [100, 47], '53')],
+    chartCases: ['twoPlace'],
+}).map((v) => v.rule);
+ok(['LR-1', 'LR-2', 'LR-5', 'LR-6', 'LR-7'].every((r) => V.includes(r)), `LR: a packet breaking five rules is caught (${[...new Set(V)].join(', ')})`);
+eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'M', packetSize: 'L' }).map((v) => v.rule).join(','), 'LR-10', 'LR-10: a packet printed off its one size fails');
+eq(LR.packetViolations({ lesson: { cases: [] }, placed: [], sizePrinted: 'L', packetSize: 'L' }).length, 0, 'LR-10: a packet at its size passes');
+
+// ---- THE LESSON LIBRARY
+const caseNames = Object.values(LR.CASE_FAMILIES).flatMap((f) => Object.keys(f));
+eq(LIB.validateLibrary({ stepIcons: PRE.STEP_ICONS, caseNames, skillExists }).join('; '), '', 'library: no structural problem');
+eq(LIB.lessonById('add-within-10') && LIB.lessonById('add-within-10').id, 'Y1.B2.S9', 'library: an older slug finds its lesson');
+eq(LIB.lessonIdOf('round-nearest-10'), 'Y4.B1.S14', 'library: lessonIdOf reads a slug');
+eq(LIB.lessonIdOf('nope'), null, 'library: an unknown id is null');
+eq(LIB.practiceRef('Y1.B2.S9'), { categoryId: 'addition', skillId: 'add_facts', opts: { band: 10, constant: [1, 2, 3] } }, 'library: the practice options live in the lesson record');
+eq((LIB.defaultLessonForSkill('subtraction', 'sub_100_regroup') || {}).id, 'Y2.B2.S18', 'library: a skill finds its default lesson');
+eq(LIB.defaultLessonForSkill('multiplication', 'mult_facts'), null, 'library: a skill with no lesson has none');
+eq([SCHEMA.kindOf('Y2.B2.S18'), SCHEMA.kindOf('ccss:6.NS.A.1'), SCHEMA.kindOf('ee:M.EE.6.SP.1'), SCHEMA.kindOf('skill:addition:add_facts'), SCHEMA.kindOf('Y9.B1')].join(','), 'wrm,ccss,ee,skill,', 'library: lesson id kinds');
+
+// lessonData = lessonFor (the engine record, unchanged) + prereqs
+for (const id of Object.keys(LIB.LESSONS)) {
+    const ref = LIB.practiceRef(id);
+    const d = LIB.lessonData(id);
+    const f = PRE.lessonFor(ref.categoryId, ref.skillId);
+    const { prereqs, ...rest } = d;
+    eq(rest, JSON.parse(JSON.stringify(f)), `library: lessonData(${id}) is lessonFor(${ref.categoryId}, ${ref.skillId}) plus prereqs`);
+    ok(!('archetype' in d) && !('cases' in d) && !('caps' in d) && !('casesPending' in d), `library: lessonData(${id}) hands no library-only field to the engine`);
+    ok(!('prereqs' in f), `prereqs.js: lessonFor(${ref.categoryId}, ${ref.skillId}) carries no prereqs (byte-identical packets)`);
+}
+const yp = LIB.lessonData('Y2.B2.S18').prereqs;
+eq(yp.map((p) => Object.keys(p).sort().join(',')), ['checks,lesson,ref,title,why', 'checks,lesson,ref,title,why', 'checks,lesson,ref,title,why', 'checks,lesson,ref,title,why'], 'LR-17: each question {lesson, title, why, checks, ref}');
+eq(yp[0], { lesson: 'Y2.B1.S4', title: 'Use a place value chart', why: 'Regrouping reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.', ref: { categoryId: 'placevalue', skillId: 'identify', opts: { band: 99, places: [1, 10] } } }, 'LR-17: question 1 of Y2.B2.S18');
+eq(yp[2].ref, { categoryId: 'subtraction', skillId: 'subtract', opts: { band: 20, regroup: 'always', notation: ['stacked'] }, minTop: 11, maxTop: 18, maxBottom: 9 }, 'LR-17: a question ref carries its floors (critic r1 D8: a kit fact, no exchange box, no Check line)');
+yp[0].ref.opts.band = 1;
+eq(LIB.lessonData('Y2.B2.S18').prereqs[0].ref.opts.band, 99, 'library: lessonData hands out fresh objects');
+eq(LIB.lessonData('Y2.B2.S17').prereqs, undefined, 'LR-17: a lesson whose check is pending has no prereqs (keeps its Warm-up)');
+eq(LIB.lessonRules('Y4.B1.S14').cases, ['roundUp', 'roundDown', 'endsFive', 'toHundred'], 'library: lessonRules gives the gates the cases');
+eq(LIB.lessonRules('Y2.B2.S18').caps, { onePlace: 1, underTen: 2 }, 'library: lessonRules gives the gates the caps');
+eq(LIB.lessonRules('Y3.B2.S12').cases, null, 'library: a routine with casesPending declares none');
+eq(PRE.lessonDataById('subtract-2-digit-regroup').prereqs.length, 4, 'prereqs.js: lessonDataById reads a slug');
+eq(PRE.lessonFor('subtraction', 'sub_1m_no_regroup').warmRows, ['S', 'M'], 'prereqs.js: a lesson\'s teach fields reach the engine record');
+eq(PRE.lessonFor('subtraction', 'sub_10k_no_regroup').steps[2].text, 'Each place to the left.', 'prereqs.js: a shared routine with the lesson\'s own steps');
+eq(PRE.lessonFor('addition', 'add_10_regroup'), null, 'prereqs.js: a skill with no lesson is null');
+
+// The prerequisite skills (plan §8e): a lesson's own check, else its Warm-up, else the seed's fallback.
+eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup').map((p) => p.skillId).join(','), 'identify,expand,subtract,sub_100_no_regroup', 'library: a skill with a lesson lists its Prerequisite Check skills');
+eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup')[0].lesson, 'Y2.B1.S4', 'library: each with the lesson it routes to');
+eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_1k_no_regroup').map((p) => p.skillId).join(','), 'sub_100_no_regroup,subtract', 'library: a lesson with no check lists its Warm-up');
+const mf = LIB.prerequisiteSkillsFor('multiplication', 'mult_facts');
+ok(mf.length > 0 && mf.every((p) => p.categoryId && p.skillId && p.why && skillExists(`${p.categoryId}:${p.skillId}`) && `${p.categoryId}:${p.skillId}` !== 'multiplication:mult_facts'), 'library: a skill with no lesson takes the seed fallback, live, each with its reason, never itself');
+
+// LR-17: the Prerequisite Check - 3 or 4 questions, routed earliest-missed first; both shapes.
+const lsn = LIB.lessonById('Y2.B2.S18');
+const two = Object.assign({}, lsn, { prereqs: lsn.prereqs.slice(0, 2) });
+ok(SCHEMA.validateLesson('Y2.B2.S18', two).some((m) => /LR-17/.test(m)) && !SCHEMA.validateLesson('Y2.B2.S18', lsn, { skillExists }).length, 'LR-17: a check of 2 questions fails, the sample passes');
+ok(SCHEMA.validateLesson('Y2.B2.S18', Object.assign({}, lsn, { prereqs: lsn.prereqs.concat([{ lesson: 'Y2.B2.S18', title: 'x', key: 'addition:add_facts', why: 'x' }]) })).some((m) => /own prerequisite/.test(m)), 'LR-17: 5 questions or a self-prerequisite fails');
+ok(SCHEMA.validateLesson('Y2.B2.S18', Object.assign({}, lsn, { prereqs: lsn.prereqs.map((p, i) => (i ? p : Object.assign({}, p, { key: 'placevalue:zz_gone' }))) }), { skillExists }).some((m) => /not live/.test(m)), 'LR-17: a dead skill fails');
+ok(SCHEMA.validateLesson('Y2.B2.S18', Object.assign({}, lsn, { prereqs: undefined, prereqsPending: '' })).some((m) => /no Prerequisite Check/.test(m)), 'LR-17: a lesson with neither a check nor a reason fails');
+for (const d of Object.values(DET.DETAILED_LESSONS)) eq(SCHEMA.validatePrereqs(d.id, d.prerequisites, { skillExists }), [], `LR-17: detailed lesson ${d.id} keeps the rules`);
+const det = Object.values(DET.DETAILED_LESSONS)[0];
+ok(SCHEMA.validatePrereqs(det.id, det.prerequisites.slice(0, 2), { skillExists }).some((m) => /2 question/.test(m)), 'LR-17: a detailed check of 2 questions fails');
+eq(SCHEMA.prereqOf(det.prerequisites[0]).key, `${det.prerequisites[0].ref.categoryId}:${det.prerequisites[0].ref.skillId}`, 'LR-17: prereqOf reads the detailed shape');
+eq(LIB.prereqRoute('Y2.B2.S18', [4, 2]).map((r) => r.lesson).join(','), 'Y2.B1.S5,Y2.B2.S17,Y2.B2.S18', 'LR-17: two misses go earliest first, then back to the lesson');
+eq(LIB.prereqRoute('Y2.B2.S18', ['Y2.B2.S17']).map((r) => [r.lesson, !!r.built, !!r.back]), [['Y2.B2.S17', true, false], ['Y2.B2.S18', false, true]], 'LR-17: a route names whether its lesson is built');
+eq(LIB.prereqRoute('Y2.B2.S18', []).length, 0, 'LR-17: nothing missed - straight to the anchor chart');
+
+// ---- Lesson NEEDS reach the build list (plan §2): a match blocks the entry, a new need is an entry.
+const blOpt = BL.buildList(null, []).find((e) => e.kind === 'option');
+const blMerged = BL.buildList(null, [{ lesson: 'Y2.B2.S18', kind: 'option', skill: blOpt.skill, option: blOpt.option, name: 'x' },
+    { lesson: 'Y3.B2.S1', kind: 'skill', skill: 'addition:zz_unit', name: 'n' }, { lesson: 'Y1.B2.S9', kind: 'lesson', prereq: 'Y1.B1.S2', name: 'p' }]);
+ok(blMerged.find((e) => e.id === blOpt.id).lessonsBlocked.includes('Y2.B2.S18') && blMerged.some((e) => e.source === 'lesson' && e.skill === 'addition:zz_unit')
+    && !blMerged.some((e) => e.lessonsBlocked.includes('Y1.B2.S9')), 'build list: a lesson need blocks its entry or adds one; a missing lesson stays off the skill list');
+eq(BL.buildList().map((e) => e.id), BL.buildList(null, []).map((e) => e.id), 'build list: today\'s NEEDS (prerequisite lessons only) leave the list unchanged');
+
+}
+for (const [g, fn] of Object.entries(Object.assign({}, ENGINE, LATE))) if (!ONLY || ONLY.includes(g)) await fn();
+for (const f of fails) console.log(`  FAIL ${f}`);
+console.log(fails.length ? `ws-lesson-unit: FAIL (${fails.length} of ${pass + fails.length})` : `ws-lesson-unit: OK (${pass} checks)`);
+process.exit(fails.length ? 1 : 0);

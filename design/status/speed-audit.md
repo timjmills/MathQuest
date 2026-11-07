@@ -760,6 +760,11 @@ under CL-4b (owner), band instruction for presets.
 
 Details and the reflection: design/status/s1-checks.md.
 
+## 2026-10-30 · lessons-phase0 r1 (FAIL, min 3) — per-round findings
+Automatic checks and speed-ups: `design/status/lessons-phase0.md` "Per-round findings". Headline: 5 of 13 content defects
+(D2 D3 D5 D7 D8) are prerequisite-item choices no gate deals and reads; 2 (D6 AK-4, D9 H13) were measured by existing tools
+that are not blocking on the lesson path. Lane paused by the owner after r1; fixes assigned to the r2 builder when resumed.
+
 ### Lane lessons-6-7 (detailed lessons 6 + 7) — builder rounds before critic r3 / r1 (2026-10-30)
 
 | Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
@@ -817,3 +822,12 @@ Details and the reflection: design/status/s1-checks.md.
 | critic r2 FAIL (min 6) | Mixed fallback summary, fact card summary; page-1 fill is engine pagination | SUMMARY over Mixed + fact card (backtest FAIL on r2 code) | a probe (one row more on each part) separated lane vs engine faults in one run — do it before a fix round |
 | critic r3 PASS (lane part) | footer ids fixed; per-type summary added after | FOOTER gate (backtest FAIL on the r2 head) | 9 owner additions arrived DURING r3: queuing them (process rule 0) kept the round valid; resuming the same critic for r2/r3 cost 144k → 162k → 192k tokens (its context grows): a fresh narrow critic with a short brief is cheaper after r2 |
 | simple-print-2 critic r1 FAIL (C2 6, C3 7) | Aim = Exactly; Tables-to band shown as Highest number; × 6–8 column cycle; footer label; "Facts" for column work; key PNG captured the app | EXACT (differs), WITHIN 12-admitted, FACTPATTERN (backtest: old gen FAILs whole columns at M), FOOTER options, SUMMARY Facts naming, evidence asserts Answer Key | the builder's own render pass looked at page 1 only: read every PNG incl. the key, and run each mode pair through a "plans differ" check before the critic |
+
+### Lane lf-engine (lessons phase 0 fix round, compiler E4) — 2026-11-07
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| P1 fix round (06:41-08:18) | D1-D18, D20, L7 D1 fixed; 8 backtests; precritic red only on other families' pins + lesson 2 (master too) | check-page H13 blocking in precritic; measured-vs-drawn height probe; LR-5 keyed by picture; precritic lesson scope runs ws-lesson-unit / coverage (lf-checks did it, 84bcf080) | single-part render harness (~45 s a layout loop); deal every prereq ref before choosing; maximum timeout on background gates |
+| P2 compiler (06:33-06:58, parallel, node only) | 7 proof cards compile; node gates green | script-vs-page "no X" refusal built; reseed drift check; NEEDS per lane; wrongAnswers ids declared | seed cards from passed lessons; readers per template |
+| critic r2 (≈14 min, PNG + code, no browser) | FAIL min 6: N1 sub L sheet lost its Independent row (the D10 fix regressed it); N2 one-item check questions; N3 no miss threshold; add / round sheets PASS | lesson sheet ≥ 1 Independent row + Score, foot ≤ 20 %; plan() item floor unit test; routing threshold; LR-6 on the check | r1/r2 side by side per "fixed" finding; scoped fixes list every changed sheet before/after; critic grades PNGs while the builder holds the browser |
+
