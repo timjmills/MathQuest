@@ -185,8 +185,8 @@ export function turnRender(p, ctx) {
     // only when that array is the taller one (rows >= its row length) and the pair spans the column; then, on paper,
     // the drawing starts below the keep-out (--ws-koin, the kit's CL-40 edge). A split array is one array: always.)
     const colW = Number(ctx.columns) > 0 ? 186 / Number(ctx.columns) - 6 : 0;
-    const firstTall = p.type === 'split' || N(p.rows) >= N(p.cols);
-    if (geom.pictures && !g.twin && colW && colW - geom.wMm < 7 && firstTall) inner = `<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>${inner}`;
+    const firstTall = N(p.rows) >= N(p.cols);
+    if (geom.pictures && !g.twin && (p.type === 'split' || (colW && colW - geom.wMm < 7 && firstTall))) inner = `<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>${inner}`;
     return root(g, 'arrays-turn', inner, 'text-align:center;width:100%;', turnFootprint(p, ctx).wMm);
 }
 

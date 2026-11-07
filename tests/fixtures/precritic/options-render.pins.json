@@ -3,8 +3,21 @@
  "capacity": {
   "division:div_facts": {
    "divForm": {
-    "values": ["long", "fraction", "vertical", "mix"],
+    "values": [
+     "long",
+     "fraction",
+     "vertical",
+     "mix"
+    ],
     "why": "owner ruling (Lane D restart, 2026-10-31; lead ruling 2026-11-03, Lane D R4 prep): the written form is the owner's notation choice and he accepted notation-driven capacity changes; the long-division bracket stays at 10 columns (owner). Measured: S vertical 25 vs 30; L long / fraction / mix 15 vs 16, vertical 12 vs 16"
+   }
+  },
+  "multiplication:count_by_tables": {
+   "jumps": {
+    "values": [
+     "15"
+    ],
+    "why": "count-row card §9 Q2(b) and §7a jumps (signed 2026-11-07, lane decision under owner rule 2026-11-07): 15 numbers (three lines of 5) fit fewer rows a page - an accepted cost while H13 holds. Measured (lf-ops 2026-11-07): S 6 vs 8, L 4 vs 6. The shape pages hold the default's rows since the shaped tiles keep the box pitch (lf-ops count-row fix)"
    }
   }
  }

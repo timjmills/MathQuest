@@ -163,7 +163,8 @@ function arraysPicture(g, p) {
 /**
  * arrays_groups (lane lf-ops 2026-11-07, print-lint H13-ROW at L / M): on a page that MIXES arrays and ringed groups
  * (payload `picBox`, set by the generator when both kinds are dealt) the pictures stand in ONE picture box per size - as tall as the tallest picture the skill deals (5 rows / 5 groups of 5, the 2.OA.4
- * band) - each picture centred in it, so a short array beside five rings never leaves a row sized for the other.
+ * band) - each picture at the top of it (CL-4b: top of the box), the sentence at one place in every cell, so a short
+ * array beside five rings never leaves a row sized for the other.
  */
 const SENTENCE_KINDS = ['write_mult', 'equal_groups'];
 const _picBoxH = {};
@@ -215,7 +216,7 @@ register('arrays', {
         const boxed = !g.twin && SENTENCE_KINDS.includes(p.kind) && Number(p.rows) <= 5 && Number(p.cols) <= 5;
         const spacer = boxed ? '<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>' : '';
         const picHtml = boxed && p.picBox
-            ? `${spacer}<div style="height:${g.em(pictureBoxH(g))};display:flex;align-items:center;justify-content:center">${pic.svg}</div>`
+            ? `${spacer}<div style="height:${g.em(pictureBoxH(g))};display:flex;align-items:flex-start;justify-content:center">${pic.svg}</div>`
             : `${spacer}${pic.svg}`;
         return root(g, 'arrays', `${picHtml}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
