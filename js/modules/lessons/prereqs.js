@@ -506,7 +506,7 @@ export const LESSONS = Object.freeze({
             { icon: 'decide', text: 'One even number? Even.' },
             { icon: 'check', text: 'Circle Even or Odd.' },
         ],
-        chant: 'Even times any number is even. Odd times odd is odd.',
+        chant: 'One even factor: even. Odd\u00a0×\u00a0odd: odd.',
         format: {
             kind: 'numbered steps with icons + a rule chant',
             why: 'The whole lesson is one rule about the factors; saying it as a rhythm is what pupils keep when the hint words are gone.',
@@ -516,8 +516,10 @@ export const LESSONS = Object.freeze({
     },
     'patterns:pattern_features': {
         skills: [
+            // (r2: two short rows, so the Guided Practice starts on the Warm-up page - the odd / even dot cards took
+            // 75 mm and pushed it to the next page, DN-2)
             { key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] }, why: 'Continue a pattern from its rule.' },
-            { key: 'composing:odd_even', why: 'Tell if a number is odd or even.' },
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each number of the pattern is the one before plus the step.' },
         ],
         concepts: [
             { id: 'rule', text: 'The rule makes every number of the pattern.' },
@@ -536,8 +538,10 @@ export const LESSONS = Object.freeze({
             { icon: 'decide', text: 'Check the true one.' },
         ],
         chant: 'True for every number, not just the first.',
-        // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout)
+        // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout), the
+        // step's name and words BESIDE the drawing (chartRow: four ~50 mm panels hold the S-size drawing, r2)
         chartWide: true,
+        chartRow: true,
         format: {
             kind: 'numbered steps with icons + a chant',
             why: 'The error the lesson fights is reading a pattern off the first numbers; the chant names it.',
@@ -547,8 +551,10 @@ export const LESSONS = Object.freeze({
     },
     'patterns:growing_shape_patterns': {
         skills: [
-            { key: 'patterns:shape_pattern', why: 'Continue a pattern of shapes.' },
-            { key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] }, why: 'The counts grow by the same number each time.' },
+            // (r2: column facts, one short row - the shape-pattern card was a legacy cell ("Type ..." on paper, BD-12) and
+            // with the pattern track it pushed the Guided Practice to the next page, DN-2)
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each term is the one before plus the same number.' },
+            { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'How many more: the next count take away this one.' },
         ],
         concepts: [
             { id: 'term', text: 'Each picture in the pattern is a term.' },
@@ -567,8 +573,10 @@ export const LESSONS = Object.freeze({
             { icon: 'write', text: 'Write how many.' },
         ],
         chant: 'Count, find the more, draw, write.',
-        // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout)
+        // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout), the
+        // step's name and words BESIDE the drawing (chartRow: four ~50 mm panels hold the S-size drawing, r2)
         chartWide: true,
+        chartRow: true,
         format: {
             kind: 'numbered steps with icons + a chant',
             why: 'Four actions in a fixed order; the chant is the order.',

@@ -149,7 +149,7 @@ function sentenceList(ctx, choices, on) {
     const pt = textPt(ctx);
     const rows = choices.map((c, i) => {
         const box = checkBox(ctx, { id: `c${i}`, on: on === i, slot: false });
-        return `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.2)} 0;">`
+        return `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, ctx.ntTight ? 0.4 : 1.2)} 0;">`
             + `<span style="flex:1 1 auto;min-width:0;white-space:normal;text-align:left;font-size:${P(ctx, pt)};font-weight:700;line-height:1.25;">${esc(c)}</span>${box}</div>`;
     }).join('');
     const ink = on >= 0 && ctx.state === 'answered' ? ' data-ws-ink="solid"' : '';
@@ -167,8 +167,11 @@ function featureCell(p, ctx) {
     const track = `<div class="mq-nt-track" style="display:flex;justify-content:center;flex-wrap:wrap;gap:${g};">${triple(tiles.slice(0, 3))}${triple(tiles.slice(3))}</div>`;
     const list = sentenceList(ctx, choices, on);
     // the list sits under the track, left-aligned in a centred block, so every box lines up (VQ-7)
-    const body = `${rule}${track}${list}`;
-    return root(ctx, 'mq-nt mq-nt--feature', body, { attrs: ' data-ws-inplace data-read', style: `display:flex;flex-direction:column;align-items:stretch;gap:${L(ctx, 2.5)};${pad(ctx)}` });
+    // the rule and the track share one line where the cell is wide enough (a full-width row: 12 mm, not 22), else the
+    // track wraps under the rule
+    const head = `<div class="mq-nt-head" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:${L(ctx, 4)};row-gap:${L(ctx, 1.5)};">${rule}${track}</div>`;
+    const body = `${head}${list}`;
+    return root(ctx, 'mq-nt mq-nt--feature', body, { attrs: ' data-ws-inplace data-read', style: `display:flex;flex-direction:column;align-items:stretch;gap:${L(ctx, ctx.ntTight ? 1.2 : 2.5)};${pad(ctx)}` });
 }
 
 function trueFalseCell(p, ctx) {
@@ -190,7 +193,7 @@ function trueFalseCell(p, ctx) {
 }
 
 /** Paper: clear of the item tab (CL-40); the twin needs no pad. */
-const pad = (ctx) => (isTwin(ctx) ? 'padding:0;' : `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} calc(var(--ws-tab, 5mm) + 1mm);box-sizing:border-box;width:100%;`);
+const pad = (ctx) => (isTwin(ctx) || ctx.ntTight ? 'padding:0;' : `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} calc(var(--ws-tab, 5mm) + 1mm);box-sizing:border-box;width:100%;`);
 
 register(NOTICE_TEMPLATE, {
     render(p, ctx) {
@@ -221,4 +224,16 @@ register(NOTICE_TEMPLATE, {
         return [{ id: 'answer', kind: 'choice', shape: p.task === 'feature' ? 'check' : 'choice', graded: true, order: 0, scopes: ['full', 'answer-only'] }];
     },
     layout() { return { card: 'card-medium-visual', checker: 'choice' }; },
+    stepState: noticeStepState,
 });
+
+/**
+ * The anchor chart's step states (roles/lesson.js stateDrawing, anchors.js): the item blank on every step, its answer
+ * ringed / checked in grey on the last. Drawn at the standard's S size, so a chart panel (about 50 mm) holds the rule,
+ * the track and the three sentences with the step's words (the host zooms the chart up when there is room).
+ */
+function noticeStepState(p, steps, k, ctx) {
+    const n = Array.isArray(steps) && steps.length ? steps.length : 4;
+    // (ntTight: the anchor's spacing - rows 0.4 mm apart, no item-tab pad: an anchor carries no tab)
+    return this.render(p, Object.assign({}, ctx, { size: 'S', metrics: undefined, ntTight: true, state: k >= n - 1 ? 'traced' : 'blank' }));
+}

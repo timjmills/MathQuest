@@ -135,16 +135,18 @@ register(GROW_TEMPLATE, {
         const wrongSlot = (id) => (wrong && wrong.slots && wrong.slots[id] !== undefined ? String(wrong.slots[id]) : '');
         const box = boxMm(ctx);
         const tp = textPt(ctx);
+        // (the anchor chart's step states, stepState below: Term 4 drawn on its own step before its count is written)
+        const drawInk = ctx.gpDraw || (keyed ? (state === 'traced' ? 'trace' : 'solid') : null);
         const term = (t) => {
             const head = `<div class="mq-gp-label" style="font-size:${P(ctx, tp)};font-weight:700;line-height:1.2;margin-bottom:${L(ctx, 1)};">Term ${t}</div>`;
             let pic;
             if (t < 4) pic = termSVG(ctx, growthCells(p.fam, p.e, t) || [], shape, { label: `Term ${t}: ${counts[t - 1]} ${unitWord}` });
             else if (twin) pic = '';
-            else if (keyed) pic = termSVG(ctx, growthCells(p.fam, p.e, 4) || [], shape, { ink: state === 'traced' ? GREY : INK, label: `Term 4: ${counts[3]} ${unitWord}` });
+            else if (drawInk) pic = termSVG(ctx, growthCells(p.fam, p.e, 4) || [], shape, { ink: drawInk === 'trace' ? GREY : INK, label: `Term 4: ${counts[3]} ${unitWord}` });
             else pic = '';
             const frame = twin && t === 4
                 ? tapGrid(ctx, shape)
-                : `<div class="mq-gp-box"${t === 4 ? ' data-ws-slot="draw" data-ws-shape="draw" data-ws-graded="0"' : ''}${t === 4 && keyed ? ` data-ws-ink="${state === 'traced' ? 'trace' : 'solid'}"` : ''} style="box-sizing:border-box;width:${L(ctx, box)};height:${L(ctx, box)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;">${pic}</div>`;
+                : `<div class="mq-gp-box"${t === 4 ? ' data-ws-slot="draw" data-ws-shape="draw" data-ws-graded="0"' : ''}${t === 4 && drawInk ? ` data-ws-ink="${drawInk}"` : ''} style="box-sizing:border-box;width:${L(ctx, box)};height:${L(ctx, box)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;">${pic}</div>`;
             // the count under the box
             let cnt;
             if (t < 4) {
@@ -158,8 +160,11 @@ register(GROW_TEMPLATE, {
             }
             return `<div class="mq-gp-term" style="display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 1.5)};flex:none;">${head}${frame}${cnt}</div>`;
         };
-        const gap = L(ctx, sizeOf(ctx) === 'S' ? 1.6 : 2.5);
-        const row = twin
+        const gap = L(ctx, ctx.gpRow ? 1.2 : sizeOf(ctx) === 'S' ? 1.6 : 2.5);
+        const row = ctx.gpRow
+            // (an anchor state: the four terms in one row, never wrapped - the chart's drawing column is about 78 mm)
+            ? `<div class="mq-gp-row" style="display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;gap:${gap};">${[1, 2, 3, 4].map(term).join('')}</div>`
+            : twin
             ? `<div class="mq-gp-row" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:12px;">${[1, 2, 3].map(term).join('')}</div>`
                 + `<div class="mq-gp-row4" style="display:flex;justify-content:center;margin-top:12px;">${term(4)}</div>`
             // two pairs side by side: one row of four where the cell is wide enough (an independent page), Terms 1-2 over
@@ -176,7 +181,7 @@ register(GROW_TEMPLATE, {
             const v = keyed ? String(p.count10) : wrong ? (wrongSlot('answer') || String(wrong.value || '')) : '';
             extra = line(`<span>Term 10 has</span>${answerArea(ctx, { id: 'answer', shown: v, expect: String(p.count10), digits: 2, ink: v ? (wrong ? 'solid' : ink) : null, unit: unitWord })}`);
         }
-        const pad = twin ? 'padding:0;' : `padding:${L(ctx, 1)} 0 ${L(ctx, 1)} calc(var(--ws-tab, 5mm) + 1mm);box-sizing:border-box;width:100%;`;
+        const pad = twin || ctx.gpRow ? 'padding:0;' : `padding:${L(ctx, 1)} 0 ${L(ctx, 1)} calc(var(--ws-tab, 5mm) + 1mm);box-sizing:border-box;width:100%;`;
         const join = ask === 'rule' ? ' data-mq-join=", "' : '';
         return root(ctx, 'mq-gp', `${row}${extra}`, { attrs: ` data-read${join}`, style: `display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};${pad}` });
     },
@@ -209,4 +214,22 @@ register(GROW_TEMPLATE, {
         return out;
     },
     layout(p) { return { card: 'card-medium-visual', checker: p && p.ask === 'rule' ? 'list' : 'number' }; },
+    stepState: growStepState,
 });
+
+/**
+ * The lesson's anchor chart and the practice pages' anchors (roles/lesson.js stateDrawing, anchors.js): one state per
+ * worked step (sheet/providers/patterns.js growSteps: count, the rule, draw Term 4, write how many), drawn at the
+ * standard's S size so a chart panel (about 50 mm) holds the four terms in ONE row with their counts (the chart is a
+ * poster: the host zooms it up when there is room). Term 4 appears grey on its own step, black after it; the answer is
+ * written (grey) on the last step only.
+ */
+function growStepState(p, steps, k, ctx) {
+    const n = Array.isArray(steps) && steps.length ? steps.length : 4;
+    const c = Object.assign({}, ctx, { size: 'S', metrics: undefined, gpRow: true });
+    const last = k >= n - 1;
+    if (p.ask === 'far' || n < 4) return this.render(p, Object.assign(c, { state: last ? 'traced' : 'blank' }));
+    if (k < 2) return this.render(p, Object.assign(c, { state: 'blank' }));
+    if (!last) return this.render(p, Object.assign(c, { state: 'blank', gpDraw: 'trace' }));
+    return this.render(p, Object.assign(c, { state: 'traced', gpDraw: 'solid' }));
+}
