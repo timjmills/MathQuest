@@ -6,66 +6,70 @@ Owner of files: sheet/graphics/vocab-pictures.js, sheet/cells/vocab-*.js, sheet/
 State: fix
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 0, none (precritic red: no critic run, rule 0b)
+Critic rounds: 2, FAIL min 7 (r1 FAIL min 1)
 
 ## Now
-- Built: 47 library pictures, 11 lesson word sets (round 1, pilot unit G3-Y4.B4 first), cells vocab-match3 / vocab-pick3, lesson part vocab-page, host skill + 1 preset, card (all lines decided), links, lesson data.
-- Precritic r1: 7 FAIL / 15 PASS of 28. After 3 fixes, ws-screen-answer is now OK. Still red: the skill's OWN lesson packet (anchor chart), grade-4 picture items (6 a page, not 8), and two gates with no sibling or with an environment-side cause (below).
-- Stopped at the budget stop point (README rule 11) before any critic round. Next: fix round r2 (list below), then precritic, then the critic.
+- Stopped under rule 5: five defects survived two critic rounds at medium (r1 #6, #13, #14, #17, #18). Their root causes and the checks to write are listed below. The lead decides the next builder.
+- Critic r2: FAIL, min 7, no hard cap; every failed score is a 7, so a Q-S2 near-miss re-check is allowed. These groups score >= 8: Match 3 independent, more-practice, test, error analysis, card-390/820/1280, quiz-1280; picture task independent, more-practice, test, all three cards; the grade-3 page.
+- Precritic r3 --strict: 1 FAIL / 23 PASS (2 on the baseline) / 3 N/A / 2 skipped of 29. The one FAIL is ws-sibling-compare: a new family has no approved sibling, so its 28 page-balance counts (mixed-section rows) read "unproven".
+- Card signed by the owner on 2026-11-07 (commit 7293673d); --check-signed OK.
 
 ## Owner go
 
 ## Open questions
-- Q1. A vocabulary skill's OWN lesson packet (anchor chart, guided, practice) fights the chart engine: a full-width picture cell in step panels. Should the two vocabulary skills take role:lesson = "out of scope" (their lesson IS the vocab-page part inside the BUILD lesson)? Suggested: yes; record it on the card and pin LESSON-DATA / lesson print-lint for these two skills only.
-- Q2. ws-options-verify --render counts the owner's K-1 page (4 a page) as items lost against the default of 6 (H13 "capacity"). Suggested: a card ruling that the 4 / 6 / 8 counts are the owner's, then a rulings-aware exemption in that gate.
-- Q3. The lesson part prints LAST in the packet: print-sheet.js pushes registered lesson-role parts after Mixed. The part is registered with order 7 (an opening page). Suggested: lf-engine sorts `parts` by registry order (one line in buildLesson).
-- Q4. Screen Match 3: the pupil types the letter (the paper response). A tap row A / B / C under each word could come later. Suggested: keep typing.
+- Q-A. Footer grade (r1 #14, r2 #1): the footer prints the SKILL's tags (grade-3 pool: 3.OA.D.9) on grade 1, 2 and 4 pages. Suggested: the page footer reads the dealt word set's grade and CCSS (vocab-words.js VOCAB_SETS[i].ccss). This needs a hook in print-sheet's footer (shared) or per-option standards. Lead's call: which lane builds it?
+- Q-B. Letter paper at L: grades 2-3 print 4 a page, not 6 (A4 gives 6 at S/M/L). Suggested: accept for Letter (the school prints A4), or let the picture shrink to 34 mm on Letter only.
+- Q-C. Match 3 score "/4" on a page of 12 letter boxes (r1 #18): the score counts items. Suggested: keep items as the score unit (owner's sample pages score problems, not boxes), or have the engine score boxes for this template.
+
+## Rule 5 root causes (defects that survived r1 and r2) and the checks to write
+| Defect | Root cause | Machine check to write |
+|---|---|---|
+| Footer grade wrong on grades 1, 2, 4 (r1 #14) | the footer reads SKILL_STANDARDS of the skill, not the dealt option's word set | page-lint: the footer's CCSS grade equals the dealt items' grade (q.vocabWords -> VOCAB_SETS grade) |
+| Grade 2 pictures too small (r1 #13): ten rod 3.4 mm tall, "one" a lone 12 mm square, text pictures 10-12 pt | pictures are designed on a fixed 60 x 40 canvas; thin or text-only pictures use a small share of it, and grades 2-3 draw them at 38 mm | ws-vocab-unit V8: every picture's drawn extent covers >= 50 % of the canvas in BOTH directions, or the picture declares a minimum width; every text >= 7 canvas units (16 pt at 40 mm) |
+| Guided rows unequal / 38 % band (r1 #6) | the guided role's grey hint line exists in one cell only, so its row is taller | role lint: rows of one section within 2 mm; hint slot reserved in every cell (role guided, shared) |
+| Grade 1 lesson Match strips small (r1 #17) | Match 3 pictures are 38-40 mm at every grade; K-1 three-digit strips print at 11 pt | ws-vocab-unit V9: Match 3 picture width by grade class (K-1 >= 52 mm) and a K-1 Match 3 page of 3 a page (owner count question) |
+| Score /4 vs 12 boxes (r1 #18) | the page scores items | owner question Q-C |
+
+## Other r2 defects (one round old; for the next builder)
+1. Look-alikes: grow/sequence, round up/quotient (redraw round up without the "4", or add notWith).
+2. Guided hints repeat the instruction ("Look at the picture."): name the cue (provider workedSteps step 1 text).
+3. Screen bank pills about 13 px on worksheet / quiz 1280: pill text >= 20 px.
+4. Match 3 worksheet-1280: words wrap 2 + 1 in some cells, one a row in others: a fixed word column.
+5. Picture-task error-analysis wrong words are not real mistakes ("left" for equal groups): take the wrong word from notWith look-alikes, a same-first-letter word or a misspelling.
+6. Pilot lesson "Name the picture" cells about 95 x 105 mm for a 30 mm picture: size cells to content or use the grade's page-fill picture.
+7. Pictures below 8 in the library: ten, one, number name, round up, grow, identity (ringed dot shared with odd / one more / remainder), step, left.
 
 ## Times
+Times: critic r2, start 2026-11-07T09:47Z, end 2026-11-07T09:52Z, profile mq-opus-medium
+Times: builder fix r2 (critic r1 fixes), start 2026-11-07T09:10Z, end 2026-11-07T09:46Z, profile mq-opus-medium
+Times: critic r1, start 2026-11-07T08:58Z, end 2026-11-07T09:04Z, profile mq-opus-medium
+Times: builder r2 (precritic r1 fix list, owner rulings, Q4), start 2026-11-07T07:58Z, end 2026-11-07T08:56Z, profile mq-opus-medium
 Times: builder build 1, start 2026-11-07T06:48Z, end 2026-11-07T07:37Z, profile mq-opus-medium
 
-## Precritic r1 (vocabulary:vocab_grade_pictures, vocabulary:vocab_pick3_words; on the branch with the manifest applied in the tree; logs /tmp/mq-precritic/20261107-071928-24670)
-
-| Gate | Result | Note |
-|---|---|---|
-| ws-node-lint, ws-code-snapshot, ws-visual-quality, ws-node-lint LESSON-DATA/OPTION-HELP/WRONG-FITS, ws-lessonfit, ws-options-verify, ws-presets-unit, ws-print-lint kit S / M / L, ws-screen-slots, ws-coverage-matrix, ws-boot-smoke, ws-phone-card, ws-slot-clip | PASS (15) | LESSON-DATA was red in a first run; fixed by lesson data (lessons/families/multdiv.js) |
-| ws-providers-unit, ws-content-audit, ws-dealer-uniform | N/A | nothing to check for these skills |
-| ws-card-rulings x2, ws-spec-card --check-signed | SKIPPED / INCOMPLETE | the card is fully decided; only the owner's signature is missing (owner waived sign-off on 2026-11-07) |
-| ws-screen-answer | FAIL, then OK on re-run | the Match 3 letter boxes kept digits only; fixed (data-mq-kind="word") |
-| ws-print-lint --roles lesson L / S | FAIL (still red after the fix) | the skills' OWN lesson packet: the Match 3 / picture cell in anchor-chart step panels overflows (15-30 mm), text overprinted; warm-up mult_facts cells font-weight 900 (engine); page density on the lesson practice pages. See Q1 |
-| ws-grade-render --gate | FAIL | the same lesson-packet overflow (60 findings) + 3 small targets |
-| ws-sibling-compare | FAIL | 40 counts "unproven": a new family has no approved sibling |
-| ws-chromebook-fit | FAIL | every host FITS at 1366x650 and 1280x600; the FAIL is aborted module loads on navigation (requestfailed lessons/*.js), not a fit finding |
-| ws-options-verify --render | FAIL | grade 4 (vocabSet 6-10, vocabGrade 4): the bank stacks two-word phrases, cells grow, 6 a page not 8, 35 % band (H13); K-1 4 a page counted as lost capacity (Q2) |
-
-Other gates run: ws-standards OK, ws-search-terms OK, ws-code-snapshot OK (+2 codes VS VZ), ws-redesign-passed OK, ws-wrm-page-unit OK, ws-wrm --report-only (FAIL by design), ws-lesson-coverage OK, ws-lesson-unit OK, ws-vocab-unit OK (new; it FAILED on the earlier states: 7, 5, 2 findings), ws-spec-card --check-signed (only the signature missing), ws-integrate --apply --preview OK. Not run: ws-detailed-lesson --check --repeats (budget; no passed lesson names a vocabSet, so the vocab-page part does not print in lessons 1-6), ws-precritic --role lesson, ws-backtest. ws-spec-card --index --check reads stale on the base tree: not this lane.
-
-## Fix list for round r2 (Opus medium; a failed round's rebuild)
-1. Grade 4-5 picture cell: the bank goes to two balanced lines (never three); picture 30 mm; check 8 a page at S / M / L on A4 and Letter.
-2. Pick cell sizing: drop the min-height and size by content. The fixed min-heights gave H13 bands wherever the engine rows were taller.
-3. Decide Q1. If role:lesson stays offered, the chart needs a single-panel mode for a full-width drawing (lf-engine).
-4. Register ws-vocab-unit on precritic's path with a backtest row (ws-precritic-plan is a shared file: through the lead).
-5. Then precritic --strict green, then the independent critic (brief: scratchpad design/lanes/lf-vocab/critic-brief.md).
+## Precritic r3 (final; manifest applied in the working tree; logs /tmp/mq-precritic/20261107-092904-29458)
+| Gate | Result |
+|---|---|
+| ws-node-lint, ws-code-snapshot, ws-visual-quality, ws-vocab-unit (new, on precritic's path), ws-node-lint LESSON-DATA/OPTION-HELP/WRONG-FITS, ws-spec-card --check-signed, ws-lessonfit, ws-options-verify, ws-presets-unit, ws-print-lint kit S/M/L, ws-screen-slots, ws-grade-render --gate, ws-screen-answer, ws-coverage-matrix, ws-boot-smoke, ws-chromebook-fit, ws-phone-card, ws-options-verify --render, ws-slot-clip | PASS (21) |
+| ws-print-lint --roles lesson L / S | PASS (baseline): the two skills' own lesson packets pinned, role:lesson out of scope by the owner's ruling Q1 |
+| ws-sibling-compare | FAIL: 28 counts unproven (no approved sibling for a new family) |
+| ws-providers-unit, ws-content-audit, ws-dealer-uniform | N/A |
+| ws-card-rulings x2 | SKIPPED (no rulings) |
+Also run: ws-standards, ws-search-terms, ws-redesign-passed, ws-wrm-page-unit, ws-lesson-coverage, ws-lesson-unit OK; ws-backtest --row vocab-sets-split OK.
 
 ## Registry and shared-file edits (for the lead's merge)
-- Manifest design/lanes/lf-vocab/manifest.json (mergeOrder 70): vocabulary:vocab_grade_pictures (code VS) and the preset vocabulary:vocab_pick3_words (code VZ, vocabTask pick3), standards 3.OA.D.9 / 3.OA.B.5 / 3.OA.D.8 + M.EE.3.OA.8, search terms, provider ./vocabulary.js. Not applied on the branch. NOTE: lessons/families/multdiv.js and links reference these skills, so ws-lesson-coverage needs the manifest applied.
-- Append-only edits: sheet/index.js (2 exports + 2 template ids), graphics/index.js (1 export), contract.js (2 instruction keys + 1 screen-verb phrase), lesson-pages/index.js (1 import + registerLessonPart(VOCAB_PAGE_PART)), skill-options.js (the picture options + 1 line in ownOptionsFor), skill-option-keys.js (6C 6D 6E, tokens), lessons/families/multdiv.js (2 routines, 2 lessons), GRAPHIC_LIBRARY.md (new section).
-- data/curriculum/links: Y2 G1|-|countonto120; Y3 G2|-|readandwritenumbersto1000...; Y4 the four G3 BUILD lessons; Y5 the five G4 BUILD lessons. In each, `related` gets vocab_grade_pictures and vocab_pick3_words with {vocabSet: n}.
-- Retired idea: a preset vocab_match3_pictures (code VY) was dropped before merge. ws-presets-unit fails a preset whose values equal the host default, so the host IS the Match 3 skill. VY was never applied anywhere.
+- Manifest design/lanes/lf-vocab/manifest.json (mergeOrder 70): vocabulary:vocab_grade_pictures (code VS, the Match 3 skill) and the preset vocabulary:vocab_pick3_words (code VZ, vocabTask pick3), CCSS 3.OA.D.9 / 3.OA.B.5 / 3.OA.D.8 + M.EE.3.OA.8, terms, provider ./vocabulary.js. NOT applied on the branch: apply it before ws-lesson-coverage (lessons/families/multdiv.js and links name the two skills).
+- Append-only / small shared edits: sheet/index.js (exports + 2 template ids), graphics/index.js, contract.js (2 instruction keys + 1 screen-verb phrase), lesson-pages/index.js (registerLessonPart(VOCAB_PAGE_PART)), skill-options.js, skill-option-keys.js (6C 6D 6E), lessons/families/multdiv.js (2 routines, 2 lessons), roles/error-analysis.js (1 partLabels rule for vocab-match3), ws-precritic.cjs (the vocab-unit gate, own block), backtests.json (1 row), options-render.pins.json (owner-ruled capacity Q2), print-lint baselines L / S (the two lesson documents, Q1), GRAPHIC_LIBRARY.md (new section), speed-audit.md (per-round rows).
+- data/curriculum/links: the 11 round-1 BUILD lessons get `related` vocab_grade_pictures and vocab_pick3_words with {vocabSet: n} (Y2, Y3, Y4, Y5).
+- Q3 (part order: vocab-page should open the packet) is with lf-engine.
 
-## Rule 00 lists (precritic r1; no critic round)
-Automatic checks that caught or would catch each finding:
-- Letter boxes kept digits only: ws-screen-answer (caught).
-- Words repeated on one page, look-alike words together, a set that cannot split into two trios: ws-vocab-unit V3-V7 (new, caught on build).
-- Picture overlapping letters in a narrow panel: print-lint ILLEGIBLE / OVERFLOW (caught).
-- Grade-dependent page counts: ws-options-verify --render (caught grade 4). A per-grade count check in ws-vocab-unit would catch it in node.
-Speed-ups:
-- Render the skill's OWN lesson role on the first local render, not only the practice pages. The lesson packet was the most expensive surprise.
-- Run ws-options-verify --render (every option value) before precritic. The per-grade layouts are option-driven.
-- For a new cell, decide role:lesson on the card BEFORE building the lesson data.
+## Rule 00 lists
+In design/status/speed-audit.md "Lane lf-vocab" (precritic r1, r2, critic r1). Critic r2: (1) checks: V8 picture extent and text floor, footer-grade lint, guided row-equality lint, a screen bank-text floor (>= 18 px), V-EA wrong word from notWith / misspelling; (2) speed-ups: grade every grade band on one page per round (one seed), and run the guided role in the local loop (it hid two survivors).
 
 ## Cost
-This container does not expose session cost_usd. Estimated from the work done, ≈ $110-125 (≈ 5.5-6 % of the weekly limit at $20 ≈ 1 %). Cap $150; stopped at the 80 % point. The lead should read the real figure from the session record.
+The lead reported $24.95 (~1.25 %) at 07:58Z. This container shows no cost_usd. Estimated since then from the work (two fix rounds, two critics of about 200k tokens each, three precritic runs): about $70-90 in total (~3.5-4.5 % of the weekly limit). Cap $150. The lead should read the session record for the real figure.
 
 ## Log
-- 2026-11-07: build 1 (pictures, word sets, cells, lesson part, skills, card, links, lesson data); precritic r1 7 FAIL; fixes: screen letters (now OK), one-column chart + routine-aligned worked steps, picture scales to its host; stopped at the budget point before the critic.
+- 2026-11-07: critic r2 FAIL min 7 (from min 1). Stopped under rule 5 (five survivors). Hand-over to the lead.
+- 2026-11-07: critic r1 fixes: error analysis on both tasks, one-word-a-line bank, fixed answer place, screen picture floor, look-alike pairs, redrawn pictures. Precritic r3: 1 FAIL (sibling-compare).
+- 2026-11-07: owner signed the card (Q1, Q2 rulings); r2: per-grade picture cell (4 / 6 / 8 a page measured on A4), 3-step charts, ws-vocab-unit on precritic's path with a backtest row. Precritic r2: 1 FAIL.
+- 2026-11-07: build 1; precritic r1 7 FAIL.
