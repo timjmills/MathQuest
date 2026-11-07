@@ -7,7 +7,7 @@
 // from it - and fails on the rules of standard section 17.2 it can measure.
 //
 //   node tests/scripts/ws-print-lint.cjs --self-test                  # every lint proven by mutation
-//   node tests/scripts/ws-print-lint.cjs --self-test --only 'H13-ABS'   # a subset (debugging; not the gate)
+//   node tests/scripts/ws-print-lint.cjs --self-test --only 'H13-ABS|GRID-EVEN-ALL'   # a subset (debugging; not the gate)
 //   node tests/scripts/ws-print-lint.cjs --source pack                # the approved mock-up pack (must be OK)
 //   node tests/scripts/ws-print-lint.cjs --source pack --files 01,11  # only pages/01-*.mjs, pages/11-*.mjs
 //   node tests/scripts/ws-print-lint.cjs --family redone              # the app, legacy print path (default source)
@@ -49,7 +49,7 @@
 //   --key-place end|after-page  kit: where the key prints (Wave 4.4; default end = today)
 //   --key-style copy|short    kit: the facsimile key (default) or the short answers-only key
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
-//   --rules H13-ABS            OPT-IN rules (lf-placevalue critic r1, lead ruling D1 2026-11-07; default OFF, so every
+//   --rules H13-ABS,GRID-EVEN-ALL   OPT-IN rules (lf-placevalue critic r1, lead ruling D1 2026-11-07; default OFF, so every
 //                             pinned baseline and deploy gate reads as before). See "OPT-IN RULES" below.
 //   --rule-skills cat:skill,...   judge the --rules only on documents of these skills (ws-precritic passes the lane's
 //                             own skills, so another lane's --skill run is never judged by a rule it did not opt into)
@@ -146,6 +146,10 @@
 //              the cell height less the answer's own writing room Hw (--ws-hw: 6 / 8 / 10 mm at S / M / L):
 //              band >= 0.3 x (H - Hw) is a finding. H13 / H13-ROW judge a top cell only against its row; this judges
 //              it absolutely (value L 34 %, every row alike, passed H13-ROW).
+//   GRID-EVEN-ALL (critic lf-placevalue r1 F9, lf-ops r1) one cell geometry per SECTION: every cell of the grids of one
+//              section (consecutive .ws-grid siblings with no instruction, strip or other text between them, on one
+//              pupil page) has one width within 0.2 mm - a full-width cell included (GRID-EVEN exempts it): combine L
+//              printed 2 half-width cells over 8 full-width rows under one instruction.
 //   L-INPUT    no <input>, <button>, <select>, <textarea> or contenteditable on a printed sheet.
 //   L-CCSS     SC-5 / HD-6 no CCSS code, "Grade N" or snake_case skill id outside the teacher footer.
 //   L-ANCHOR   S6 / PT-LBL-6 (kit, with --anchors side|sections): every step-by-step anchor cell carries
@@ -185,7 +189,7 @@ const has = k => curArgv().includes('--' + k);
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
-const OPT_RULES_KNOWN = ['H13-ABS'];
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL'];
 const optRules = () => {
     const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
@@ -1272,6 +1276,31 @@ function wsLintPage(cfg) {
                     const odd = cs.find((c) => Math.abs(c.getBoundingClientRect().width - lo) > 0.2 * PX) || g;
                     F('L-DENSITY', 'GRID-EVEN', 'major', odd, `the cells of one fact grid are ${mm(lo)} to ${mm(hi)} mm wide: one cell width per section, a short last row keeps the lattice and leaves the rest unruled (RUBRIC C3, PT-FRW-3, PG-15)`, 'uneven grid');
                 }
+            }
+        }
+        /* L-DENSITY GRID-EVEN-ALL (OPT-IN, --rules GRID-EVEN-ALL; critic lf-placevalue r1 F9, AX-4: combine L printed 2
+           half-width cells over 8 full-width rows under one instruction - two grids, so GRID-EVEN saw two even grids). A
+           SECTION is a run of consecutive .ws-grid siblings with no visible text between them; every cell of it (a
+           full-width cell included; the blank run and model / anchor cells not) has one width within 0.2 mm. */
+        if (!isLegacy && optOn('GRID-EVEN-ALL') && !ri.key) {
+            const seen = new Set();
+            for (const g of ri.el.querySelectorAll('.ws-grid')) {
+                if (seen.has(g) || !visible(g) || g.closest('.ws-cell')) continue;
+                const run = [g]; seen.add(g);
+                for (let n = g.nextElementSibling; n; n = n.nextElementSibling) {
+                    if (n.classList.contains('ws-grid')) { seen.add(n); if (visible(n)) run.push(n); continue; }
+                    if (visible(n) && (textOf(n).trim() || n.querySelector('[data-ws-cell], svg'))) break;
+                }
+                const cs = run.flatMap(gr => [...gr.children].filter(c => c.classList.contains('ws-cell') && !c.classList.contains('blankrun') && !c.classList.contains('mq-anchorcell') && !c.querySelector('[data-ws-anchor]') && visible(c)));
+                if (cs.length < 2) continue;
+                const ws = cs.map(c => c.getBoundingClientRect().width);
+                const lo = Math.min(...ws), hi = Math.max(...ws);
+                if (hi - lo <= 0.2 * PX) continue;
+                const tally = new Map();
+                ws.forEach(w => { const k = mm(w); tally.set(k, (tally.get(k) || 0) + 1); });
+                const common = [...tally.entries()].sort((a, b) => b[1] - a[1])[0][0];
+                const odd = cs.find((c, i) => Math.abs(mm(ws[i]) - common) > 0.2) || cs[0];
+                F('L-DENSITY', 'GRID-EVEN-ALL', 'major', odd, `one section mixes cell geometries: ${[...tally.entries()].map(([w, n]) => `${n} cell(s) ${w} mm wide`).join(', ')}${run.length > 1 ? ` in ${run.length} grids` : ''}: one cell width per section, sized for the widest item (RUBRIC C3, AX-4, GRID-EVEN-ALL)`, 'mixed cell geometry in a section');
             }
         }
         /* (Lane D port 2026-10-30: the lane's own L-OVERFLOW CL-40 keep-out check - text line boxes against a
@@ -2954,15 +2983,30 @@ const SELF_TESTS = [
     { name: 'fact grid of equal cells (GRID-EVEN control)', expect: [], absent: ['L-DENSITY', 'GRID-EVEN'], fn: () => {
         document.querySelector('.ws-page .ws-grid').classList.add('facts');
     } },
-    // OPT-IN rules (--rules; lf-placevalue critic r1 F1): each fires on its planted defect only when named, and the
+    // OPT-IN rules (--rules; lf-placevalue critic r1 F1 / F9): each fires on its planted defect only when named, and the
     // approved page stays clean with it on
-    { name: 'clean page with the opt-in rule on (H13-ABS control)', rules: ['H13-ABS'], expect: [], absent: ['L-DENSITY', 'H13-ABS'], fn: () => {} },
+    { name: 'clean page with the opt-in rules on (H13-ABS / GRID-EVEN-ALL control)', rules: ['H13-ABS', 'GRID-EVEN-ALL'], expect: [], absent: ['L-DENSITY', 'H13-ABS'], absentMsg: [['L-DENSITY', 'GRID-EVEN-ALL'], /./], fn: () => {} },
     // (an empty 40 mm block under the drawing: the cell holds 40 mm of paper under its lowest ink)
     { name: 'empty room under the lowest ink of a cell (H13-ABS)', rules: ['H13-ABS'], expect: ['L-DENSITY', 'H13-ABS'], fn: () => {
         document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="height:40mm;flex:none"></div>');
     } },
     { name: 'the same room with the rule off (H13-ABS opt-in control)', expect: [], absent: ['L-DENSITY', 'H13-ABS'], fn: () => {
         document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="height:40mm;flex:none"></div>');
+    } },
+    { name: 'half-width cells over a full-width row in one section (GRID-EVEN-ALL)', rules: ['GRID-EVEN-ALL'], expect: ['L-DENSITY', 'GRID-EVEN-ALL'], fn: () => {
+        const g = document.querySelector('.ws-page [data-ws-cell]').closest('.ws-grid');
+        const g2 = document.createElement('div');
+        g2.className = g.className; g2.style.cssText = 'display:grid;grid-template-columns:1fr';
+        const c = g.querySelector('.ws-cell').cloneNode(true);
+        g2.appendChild(c); g.after(g2);
+    } },
+    { name: 'a second section under its own instruction (GRID-EVEN-ALL control)', rules: ['GRID-EVEN-ALL'], expect: [], absent: ['L-DENSITY', 'GRID-EVEN-ALL'], fn: () => {
+        const g = document.querySelector('.ws-page [data-ws-cell]').closest('.ws-grid');
+        const g2 = document.createElement('div');
+        g2.className = g.className; g2.style.cssText = 'display:grid;grid-template-columns:1fr';
+        g2.appendChild(g.querySelector('.ws-cell').cloneNode(true));
+        const ins = document.createElement('div'); ins.className = 'ws-instrline'; ins.textContent = 'Write the number.';
+        g.after(ins); ins.after(g2);
     } },
     // H13-ROW (pilot-su-c critic r2 N2): a short top cell in a row sized for its taller neighbour; the control is a
     // uniform row (both cells hold the tall item), which keeps equal bands and never fires.

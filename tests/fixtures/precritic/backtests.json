@@ -1550,6 +1550,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "optin-grid-even-all",
+   "check": "ws-print-lint --rules GRID-EVEN-ALL (opt-in): one cell geometry per section, a full-width cell included, across consecutive grids under one instruction",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN-ALL (critic lf-placevalue r1 F9; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/grid-even-all/fail.html",
+    "state": "placevalue:combine independent L at 24b0c88a: 4 half-width cells (92.3 mm) over 7 full-width rows (184.9 mm) under one instruction"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/grid-even-all/pass.html",
+    "state": "the same items, every cell full width (one geometry per section)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --rules GRID-EVEN-ALL --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
