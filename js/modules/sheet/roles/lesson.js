@@ -231,6 +231,7 @@ function planOnce(input = {}) {
     }
 
     /* ---- Independent Practice: whole rows filling the last page (PT-OPN-7, H5; lesson-pages/practice.js) */
+    if (vocab) vocab.zoom = 0;   // (a plan starts at full size: N1 below)
     let indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });
     // (critic r2 N1: a lesson sheet never drops its Independent Practice row - the Score and the pupil's own work - for a
     // few millimetres: the Vocabulary match on that page is drawn smaller, down to VOCAB_ZOOM_MIN, to make room for one
@@ -243,7 +244,7 @@ function planOnce(input = {}) {
             const save = vocabG.grow.h - (content * z + VOCAB_PAD_MM);
             const vg = vocabG.grow.grid[0];
             vg.height = `${Math.round((vocabG.grow.h - save) * 100) / 100}mm`;
-            vg.cls = `${vg.cls || ''} mq-lvz${Math.round(z * 100)}`.trim();
+            vocab.zoom = z;
             vocabG.grow.h -= save;
             cur.used -= save;
             indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });

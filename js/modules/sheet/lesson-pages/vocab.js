@@ -139,11 +139,12 @@ export function vocabItem(vocab, seed) {
             const j = order.indexOf(i);
             return `<line x1="${((i + 0.5) * 100) / n}" y1="0" x2="${((j + 0.5) * 100) / n}" y2="100" stroke="#000" stroke-width="1pt" vector-effect="non-scaling-stroke" data-ws-ink="solid"/>`;
         }).join('') : '';
-        return `<div class="mq-lvocab" style="--n:${n}"><div class="mq-lvrow">${pics}</div>`
+        // (`item.zoom`, critic r2 N1: roles/lesson.js draws the match smaller so one Independent row fits; absent = 1)
+        return `<div class="mq-lvocab" style="--n:${n}${item.zoom ? `;zoom:${item.zoom}` : ''}"><div class="mq-lvrow">${pics}</div>`
             + `<div class="mq-lvgap" data-ws-slot="match" data-ws-shape="draw">${lines ? `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>` : ''}</div>`
             + `<div class="mq-lvrow">${words}</div></div>`;
     };
-    return {
+    const item = {
         q: null, render,
         key: { value: '', display: '', slots: {} },
         drawsAnswer: true, visual: false,
@@ -151,6 +152,7 @@ export function vocabItem(vocab, seed) {
         footprint: { wMm: 180, hMm: null, measure: true, maxCols: 1 },
         fclass: 'wide', measureLevel: 1, template: 'lesson-vocab', skill: '', pool: 'extra', lessonVocab: true,
     };
+    return item;
 }
 
 /**
