@@ -42,7 +42,8 @@ export const CASES = Object.freeze({
     // (Practice 1, critic D1: row 1 two non-squares - one with no 5, and 2 rows of 5 -, the last row the one square,
     // 4 x 4, and 5 rows of 3: the 5s spent where they teach)
     // (r4, critic r2 m1: row 1 2 x 4 and 3 x 5 - no first factor twice in a row -, the last row 4 x 4 and 5 rows of 2)
-    arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASES.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 3 && p.cols === 5) || (p.rows === 5 && p.cols === 2) || CASES.arrBigSquare(it)); },
+    // (owner ruling 2026-11-07, ported from master 9e7a3060: full-width cells, arrays to 6 x 6 - any non-square, or a square of 4 or more; the square on the last row only; never 2 x 6 - the Prerequisite Check's x 2 facts are 2 x 6 to 2 x 9)
+    arrP1: (it) => { const p = arrTurnOf(it); return !!p && (CASES.arrNonSq(it) || CASES.arrBigSquare(it)) && !(Math.min(p.rows, p.cols) === 2 && Math.max(p.rows, p.cols) === 6); },
     // (Practice 2, lesson 3a r2, critic D6: no factor 2 - the Prerequisite Check's x 2 facts)
     arrP2: (it) => { const p = arrTurnOf(it); return !!p && p.rows >= 3 && p.cols >= 3; },
     // (exit c, lesson 3a r2, critic D4: the missing factor of a non-square fact with no factor 2)

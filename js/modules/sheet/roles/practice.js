@@ -1157,8 +1157,9 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             const pcH = partCellH((sec.splitOf !== undefined && sec.splitOf !== null) || norm.sections.some((x) => x && x.splitOf === part.section), its, L);
             // (a lone first page of a skill held to its owner page ceiling - print-sheet.js PAGE_CAP,
             // critic r8 D8-2 - fills its page by size: its rows keep their proportions, scaled to the grid)
-            const capFill = noCapSec && Number(sec.pageCap) > 0 && lone && !pg.cont && part.chunk.gridMm && part.chunk.rowsTpl;
-            const shape0 = capFill ? { heightMm: Math.max(part.chunk.gridMm, L.gridH - 1), rowsTpl: part.chunk.rowsTpl }
+            // (`capFillCont`, lesson 3a P1d - E12: every page of the sheet, the continuation page too, takes the first page's grid height)
+            const capFill = noCapSec && Number(sec.pageCap) > 0 && lone && (sec.capFillCont || (!pg.cont && part.chunk.gridMm && part.chunk.rowsTpl));
+            const shape0 = capFill ? { heightMm: Math.max(Number(part.chunk.gridMm) || 0, L.gridH - 1), rowsTpl: part.chunk.rowsTpl || '' }
                 : part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
                 : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, pcH, L.fillRefH);
             // a split part's uniform rows take what the part holds, never the section's tallest cell
@@ -1209,7 +1210,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // (owner ruling A: the four-column side grid, [twin | problem | twin | problem])
                 ...(L.side4 && its.some((it) => it.anchor) ? { colsTpl: L.colsTpl4 } : {}),
                 rowGap: gap.gap || 0, availMm: lone ? avail : undefined,
-                items: its.map((it) => planItem(it, level, L.side4 ? L.drawCols : L.cols)),
+                // (`capFillCont`, lesson 3a P1d r3 - critic H13: cells stretched to the shared height hold their content in the MIDDLE)
+                items: its.map((it) => { const pi = planItem(it, level, L.side4 ? L.drawCols : L.cols); return capFill && sec.capFillCont ? Object.assign({}, pi, { style: `${pi.style || ''}justify-content:center;` }) : pi; }),
                 _its: its,
             });
         }

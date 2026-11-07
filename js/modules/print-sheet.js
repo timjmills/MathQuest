@@ -159,6 +159,9 @@ function normaliseRequest(req = {}) {
             // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
             // gaps) - the caller has chosen a count whose cells stay under H13's band.
             noCap: !!(s && s.noCap),
+            // (`capFillCont`, lesson 3a P1d - E12: a page-capped sheet over two pages fills its continuation page to the FIRST
+            // page's grid height too, so every cell keeps one height; absent: unchanged)
+            capFillCont: !!(s && s.capFillCont),
             // A single-skill page held short by its own pool, laid in fewer, longer columns
             // (buildSheet): two columns may take any row count, not only CL-2's 2/3/4/5/8.
             freeRows: !!(s && s.freeRows),
@@ -3535,7 +3538,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}) })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -4553,7 +4556,10 @@ async function buildLesson(n, metaOf) {
                 size: practiceSize, role: 'independent', tabId: `Practice ${k}`,
                 // (the pack's own tab: every Practice sheet names the lesson's strand)
                 header: Object.assign({}, common.header, Array.isArray(n.packTab) ? { tab: [...n.packTab, `Practice ${k}`] } : {}),
-                sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true, pageCap: shape[0] }],
+                // (`pageCap`, R2 - since 6bc3cbd8 layout.js packs rows of NEARLY one height by their own heights (r12c
+                // nearPack): a 4 x 1 sheet laid 5 rows for its 4 items left a fifth of the page blank. The sheet's shape is its
+                // page: at most its count, and the rows it keeps share the whole grid.)
+                sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true, pageCap: shape[0], ...(ps.equalPages ? { capFillCont: true } : {}) }],
                 seed: (seeds.practice + 7919 * (k - 1)) >>> 0,
                 // (`strip`: another chunk's step strip - the words sheet carries the words steps.)
                 stepStrip: ps.strip && ps.strip.html ? ps.strip : withStrip ? { html: stripHtml, hMm: stripH } : undefined,
@@ -4674,7 +4680,7 @@ async function buildLesson(n, metaOf) {
         keyPages: n.key ? parts.flatMap((p) => tagPages(p.res.keyPages, p)) : [],
         keyPlans: parts.flatMap((p) => p.res.keyPlans || [p.res.plan]),
         // Each part's plans (the detailed lesson maker reads the printed items from them).
-        partPlans: parts.map((p) => ({ part: p.part, plans: p.res.keyPlans || [p.res.plan] })),
+        partPlans: parts.map((p) => Object.assign({ part: p.part, plans: p.res.keyPlans || [p.res.plan] }, p.sheet !== undefined ? { sheet: p.sheet } : {})),
         fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
         items: parts.flatMap((p) => (p.res.items || []).map((it) => Object.assign({ part: p.part }, it))),
         // The problems the pupil does (lessons r3: the print panel counted every dealt pool item,
@@ -5319,11 +5325,14 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
         const named = (q) => { for (const [t, w] of Object.entries(d.caseNames || {})) { const f = LESSON_CASE_TESTS[t]; if (f && f({ q })) return w; } return ''; };
         const parts = [];
         let k = 0;
-        for (const pl of partPlan('practice')) {
-            const cs = planCells(pl);
-            for (const pg of [...new Set(cs.map((c) => c.page))]) {
+        // (a `practiceSheets` sheet is ONE Practice k however many pages it prints: its last row is on its LAST page -
+        // lesson 3a P1d r3, critic: "Practice 3" named Practice 1's second page. Every other plan: one Practice k a page, as before)
+        const pEntries = ((lesson && lesson.partPlans) || []).filter((x) => x.part === 'practice');
+        const pUnits = pEntries.flatMap((x) => x.plans.flatMap((pl) => { const cs = planCells(pl); const pgs = [...new Set(cs.map((c) => c.page))];
+            return x.sheet !== undefined ? [cs.filter((c) => c.page === pgs[pgs.length - 1])] : pgs.map((pg) => cs.filter((c) => c.page === pg)); }));
+        {
+            for (const its of pUnits) {
                 k++;
-                const its = cs.filter((c) => c.page === pg);
                 const last = Math.max(...its.map((c) => c.row));
                 // (a function table - lesson 5: its rule as written, "n + 9", not its slot list)
                 // (`lastName(q)` on the description - lesson 4 r5, critic r2 n8: the lesson's own words for a last-row item,
@@ -5365,14 +5374,22 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
         if (V[ch.id].indep.length) glance.push({ page: `P3${ch.id} Independent`, answers: V[ch.id].indep.map((x) => x.ans).join(' · '), fade: '★★' });
     }
     let pNo = 0;
-    for (const pl of partPlan('practice')) {
+    // (a `practiceSheets` sheet over several pages - lesson 3a P1d r3, critic: its ★★★ row is on its LAST page only, and each
+    // of its pages is named "P4-n Practice k"; every single-page sheet and every other plan: as before)
+    const pSheets = ((lesson && lesson.partPlans) || []).filter((e) => e.part === 'practice');
+    const anyMulti = pSheets.some((x) => x.sheet !== undefined && x.plans.some((pl) => new Set(planCells(pl).map((c) => c.page)).size > 1));
+    for (const x of pSheets) for (const pl of x.plans) {
         const cs = planCells(pl);
-        for (const pg of [...new Set(cs.map((c) => c.page))]) {
+        const pgs = [...new Set(cs.map((c) => c.page))];
+        const multi = x.sheet !== undefined && pgs.length > 1;
+        for (const pg of pgs) {
             pNo++;
             const its = cs.filter((c) => c.page === pg);
             const last = Math.max(...its.map((c) => c.row));
-            glance.push({ page: `P4-${pNo} Practice, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
-            glance.push({ page: `P4-${pNo} Practice, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
+            const nm = anyMulti && x.sheet !== undefined ? `P4-${pNo} Practice ${x.sheet}` : `P4-${pNo} Practice`;
+            if (multi && pg !== pgs[pgs.length - 1]) { glance.push({ page: `${nm}, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.map((c) => dlAns(c.q)).join(' · '), fade: '★★' }); continue; }
+            glance.push({ page: `${nm}, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
+            glance.push({ page: `${nm}, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
         }
     }
     if (mixedNo) glance.push({ page: 'P4 Mixed', answers: cellsOf(partPlan('mixed')).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
