@@ -144,7 +144,6 @@ export function weDoBand(env) {
     // (critic lessons-phase0 r1 D10 / D11: a lesson whose Prerequisite Check replaced its Warm-up - LR-17, `prereqs` - grows
     // its Guided cells by a tenth at most when no Independent row fits: a third more left the Guided cells 40 % empty under
     // their stacks (H13); every other lesson keeps its third)
-    const lr17Sheet = !!(data && Array.isArray(data.prereqs) && data.prereqs.length);
     // The width left of the Steps zone is two thirds of the page: 2 cells are a 3-column page's
     // cells, 3 cells are narrower (a 4-column page's measurement, plus the fact's cue beside it).
     const colsFor = (k) => (k >= 3 ? 4 : k === 2 ? 3 : 2);
@@ -235,8 +234,8 @@ export function weDoBand(env) {
         const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
-        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace || lr17Sheet ? 0.1 : 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace || lr17Sheet ? 0.1 : 0.35 }));
+        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
+    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
     env.weDo = weDo;
     return env;
 }
