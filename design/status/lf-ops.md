@@ -61,6 +61,10 @@ Red rows, with cause where known:
 - New check: ws-visual-quality VQ-NOLEGACY some-legacy (backtest vq-some-legacy-lf). sibling-compare `ownerSkipped` (count-row
   card 9 Q2(a)). options-render pin: count_by_tables jumps=15 (card 9 Q2(b)); shape pages no longer need a pin.
 
+## Hand-offs with other lanes
+- lf-engine (session_013pHDnLTpMERUWs7oNEgzJ3): (1) adds lesson key `practiceBlocks: [{shape:[count,cols], opts?}]` (1-3 blocks); when it lands, set mult_properties' lesson data to `practiceBlocks: [{shape:[4,2]}, {shape:[4,2], opts:{task:[2], pictures:false}}]` (the properties lesson does not pass before this). (2) Its branch moves lesson records to js/modules/lessons/families/*.js: after the lead merges lf-engine into the integration branch, re-apply this lane's prereqs.js entries (arrays_groups, mult_properties, div_facts, mult/div_word_problems_plain, count_by_tables) as ROUTINE + LESSON records in families/multdiv.js (patterns:* in families/algebra.js; schema lessons/schema.js; gates ws-lesson-coverage, ws-lesson-unit), and stop editing prereqs.js.
+- lf-algebra: owns genNumberPatterns + the number_patterns_rule provider block; count-row.js changes through this lane (3d8bca1 delivered).
+
 ## Owner go
 
 ## Open questions
