@@ -99,6 +99,17 @@ export async function buildPluggedParts(ids, api) {
     return out;
 }
 
+/**
+ * A packet's built parts in REGISTRY ORDER (lf-vocab PR #36 via the lead: a part registered at order 7 prints between the
+ * Prerequisite Check, 5, and the anchor chart, 10). Stable: a part's several sheets (Practice 1, 2 ...) keep their order.
+ * `idOf(entry)` gives an entry's part id (the host names the lesson sheet 'teach'). The core parts are already in order,
+ * so the default packet is unchanged.
+ */
+export function orderParts(list, idOf = (e) => e.part) {
+    const ord = (e) => { const d = lessonPart(idOf(e)); return d ? d.order : 1000; };
+    return list.map((e, i) => [e, i]).sort((a, b) => ord(a[0]) - ord(b[0]) || a[1] - b[1]).map(([e]) => e);
+}
+
 /** Unregister a part (tests only: a dummy part must not leak into later packets). */
 export function unregisterLessonPart(id) { const d = PARTS.get(String(id)); if (d && !d.core) PARTS.delete(String(id)); return !!d; }
 
@@ -128,4 +139,4 @@ registerSheetBand({ id: 'vocab', order: 10, build: (env) => { env.groups.push(..
 registerSheetBand({ id: 'warm-up', order: 20, build: (env) => warmUp.warmUpBand(env) });
 registerSheetBand({ id: 'guided', order: 30, build: (env) => weDo.weDoBand(env) });
 
-export default { chart, vocab, warmUp, weDo, practice, mixed, common, registerLessonPart, lessonPart, lessonParts, lessonPartIds, registerSheetBand, sheetBands, buildPluggedParts, unregisterLessonPart };
+export default { chart, vocab, warmUp, weDo, practice, mixed, common, registerLessonPart, lessonPart, lessonParts, lessonPartIds, registerSheetBand, sheetBands, buildPluggedParts, orderParts, unregisterLessonPart };

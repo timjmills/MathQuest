@@ -42,7 +42,7 @@ import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
 import { practiceSection, practiceStackShapes, practiceRequest } from './sheet/lesson-pages/practice.js';
 import { mixedRequest } from './sheet/lesson-pages/mixed.js';
-import { lessonPart, lessonPartIds, buildPluggedParts } from './sheet/lesson-pages/index.js';
+import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './sheet/lesson-pages/index.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
@@ -4609,6 +4609,8 @@ async function buildLesson(n, metaOf) {
         if (n.key) e.key.push(tagSheets(p.res.keyHtml || '', ...sheetIds(p)));
     }
     for (const e of Object.values(partHtml)) { e.pupil = e.pupil.join('\n'); e.key = e.key.join('\n'); }
+    // (every part in registry order - a plugged part registered between two core parts prints between them)
+    parts = orderParts(parts, idOfPart);
     const allParts = parts;
     parts = partsMode ? allParts.filter((p) => printed.includes(idOfPart(p))) : allParts;
     const pupilHtml = parts.map((p) => tagSheets(p.res.pupilHtml, ...sheetIds(p))).join('\n');

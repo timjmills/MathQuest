@@ -51,11 +51,19 @@ const LATE = {
             const out = await R.buildPluggedParts(ids, { seedOf: (x) => (x === 'zz-dummy' ? 77 : 88), lessonRolePart: async (x, seed) => { rolled.push([x, seed]); return { pageCount: 2 }; } });
             eq(out.map((p) => [p.part, p.role, p.res.pageCount]), [['zz-dummy', 'lesson', 1], ['zz-plan', 'lesson', 2]], 'D18: the dispatch builds each plugged part (own hook, else the lesson role) and no core part');
             eq([seen, rolled], [[['zz-dummy', 77]], [['zz-plan', 88]]], 'D18: each with its own seed');
-        } finally { R.unregisterLessonPart('zz-dummy'); R.unregisterLessonPart('zz-plan'); }
+            R.registerLessonPart({ id: 'zz-vocab', order: 7, role: 'lesson', name: 'Vocabulary', plan: () => [] });
+            ok(typeof R.orderParts === 'function', 'D18: lesson-pages/index.js exports orderParts');
+            if (typeof R.orderParts === 'function') {
+                const built = ['prereq', 'chart', 'teach', 'practice', 'practice', 'mixed', 'zz-dummy', 'zz-vocab'].map((part, i) => ({ part, i }));
+                const got = R.orderParts(built, (e) => (e.part === 'teach' ? 'sheet' : e.part)).map((e) => `${e.part}${e.part === 'practice' ? e.i : ''}`);
+                eq(got, ['prereq', 'zz-vocab', 'chart', 'teach', 'practice3', 'practice4', 'mixed', 'zz-dummy'], 'D18: parts come out in registry order - a part at order 7 lands second; a part\'s sheets keep their order');
+                eq(R.orderParts(built.slice(0, 6), (e) => (e.part === 'teach' ? 'sheet' : e.part)).map((e) => e.i), [0, 1, 2, 3, 4, 5], 'D18: the default packet\'s order is unchanged');
+            }
+        } finally { R.unregisterLessonPart('zz-dummy'); R.unregisterLessonPart('zz-plan'); R.unregisterLessonPart('zz-vocab'); }
         eq(R.lessonPartIds().filter((x) => /^zz-/.test(x)), [], 'D18: a test part unregisters');
         const ps = readSrc('js/modules/print-sheet.js');
         const body = ps.slice(ps.indexOf('async function buildLesson('), ps.indexOf('async function buildDetailedLesson('));
-        ok(!/\[\s*'prereq',\s*'chart',\s*'sheet',\s*'practice',\s*'mixed'\s*\]/.test(code(body)) && /buildPluggedParts\(/.test(body), 'D18: buildLesson names no list of the core parts and builds the rest through the registry');
+        ok(!/\[\s*'prereq',\s*'chart',\s*'sheet',\s*'practice',\s*'mixed'\s*\]/.test(code(body)) && /buildPluggedParts\(/.test(body) && /orderParts\(/.test(body), 'D18: buildLesson names no list of the core parts, builds the rest through the registry and prints them in registry order');
     },
     // Lesson 7 D1 (brief step 2.4): the anchor chart reports its sizing; a fallback zoom under 1 is a failure.
     async 'chart-sizing'() {
