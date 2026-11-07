@@ -4544,7 +4544,10 @@ async function buildLesson(n, metaOf) {
         }));
     };
     if (built.includes('mixed')) {
-        const res = await buildMixed(lessonPartSeed(n.seed, 'mixed'));
+        // (LR-5: the Mixed page never repeats a Prerequisite Check item - its partners are the same earlier skills; a lesson
+        // without a check avoids exactly what it did before)
+        const preTexts = (((parts.find((p) => p.part === 'prereq') || {}).res || {}).items || []).map(refText).filter(Boolean);
+        const res = await buildMixed(lessonPartSeed(n.seed, 'mixed'), undefined, preTexts.length ? practiceTexts.concat(preTexts) : practiceTexts);
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
     }
     // A part the registry adds (lesson-pages/index.js registerLessonPart, role 'lesson'): drawn by the lesson role.
