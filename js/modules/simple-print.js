@@ -732,7 +732,21 @@ async function buildFacts(list, amounts, o) {
         if (best && !(best.filled && best.ok) && firstFull) best = firstFull;
         return best;
     };
-    if (problems || pagesFill) {
+    const reuse = o.__reuse || null;
+    if (reuse) {
+        // facts-print-fix r8 (critic D-R8-1): set 2..n of a print reuse set 1's PLAN - its groups (the ÷-form merge decision
+        // included), each part's count, the pages and their rows, the stretch, the digit cap - and only the numbers are dealt
+        // anew (sets 2 used to re-decide the merge and printed ÷ 15 where set 1 printed 20)
+        groups.splice(0, groups.length, ...reuse.groups.map((g) => ({ div: g.div, ...(g.form ? { form: g.form } : {}), parts: g.parts.map((p) => ({ s: list[p.i] && p.form ? Object.assign({}, list[p.i], { opts: Object.assign({}, list[p.i].opts, { divForm: p.form }) }) : list[p.i], i: p.i, w: p.w })) })));
+        reach.splice(0, reach.length, ...groups.map((grp) => grp.parts.reduce((r, p) => { const x = reachOf(p.s); return { tracks: Math.max(r.tracks, x.tracks), ans: Math.max(r.ans, isDivisionFact(p.s) ? 0 : x.ans) }; }, { tracks: 2, ans: 0 })));
+        cap = reuse.cap || 0;
+        await probeAll();
+        want = reuse.want ? reuse.want.map((w) => w.slice()) : null;
+        pages = reuse.pages ? reuse.pages.map((pg) => Object.assign({}, pg, { rows: pg.rows.slice(), ...(pg.order ? { order: pg.order.slice() } : {}) })) : null;
+        stretch = reuse.stretch ? reuse.stretch.slice() : null;
+        filled = reuse.filled;
+        planNotes.push(...(reuse.planNotes || []));
+    } else if (problems || pagesFill) {
         let best = await settle();
         // (r6 D-R6-1: in Problems mode too - a form under one row, a total off the request, or a skill off its share)
         const formsShort = (b) => groups.some((g, k) => g.form && b.w[k] && b.w[k].reduce((t, x) => t + x, 0) < lay[k].cols);
@@ -872,6 +886,8 @@ async function buildFacts(list, amounts, o) {
         factPlan, factPages: out.factPages,
         // (Pages mode with the groups sharing a page: the line names each part's columns, as in Problems mode)
         factShared: !problems && !!pages,
+        // (r8: set 1's plan, for sets 2..n - buildSets passes it back as o.__reuse)
+        factReuse: { groups: groups.map((g) => ({ div: g.div, form: g.form, parts: g.parts.map((p) => ({ i: p.i, w: p.w, form: g.form || null })) })), want, pages, stretch, filled, cap, planNotes: planNotes.slice() },
     };
 }
 
@@ -968,7 +984,10 @@ export async function buildSets(list, o) {
     let pagesAll = 0;
     for (let k = 0; k < n; k++) {
         // set 1 is the build already made; sets 2..n keep set 1's counts (amounts as numbers) with a new seed
-        const b = k === 0 ? first : await buildSimple(list.map((s, i) => Object.assign({}, s, { amt: String(first.counts[i] || 0) })), Object.assign({}, o, { seed: (o.seed + k * 104729) >>> 0, how: o.how === 'pages' && first.arrangement === 'facts' && !first.factShared ? 'pages' : 'problems', n: o.how === 'pages' && first.arrangement === 'facts' && !first.factShared ? o.n : first.total, __fillLast: o.how === 'pages' && !!first.factShared }));
+        // (r8 D-R8-1: a fact print's sets 2..n reuse set 1's plan - only the numbers change)
+        const b = k === 0 ? first : first.arrangement === 'facts' && first.factReuse
+            ? await buildSimple(list, Object.assign({}, o, { seed: (o.seed + k * 104729) >>> 0, __reuse: first.factReuse }))
+            : await buildSimple(list.map((s, i) => Object.assign({}, s, { amt: String(first.counts[i] || 0) })), Object.assign({}, o, { seed: (o.seed + k * 104729) >>> 0, how: o.how === 'pages' && first.arrangement === 'facts' && !first.factShared ? 'pages' : 'problems', n: o.how === 'pages' && first.arrangement === 'facts' && !first.factShared ? o.n : first.total, __fillLast: o.how === 'pages' && !!first.factShared }));
         const label = `Set ${k + 1} of ${n}`;
         docs.push(setFooter(b.pupilHtml, label) + (o.key && b.keyHtml ? '\n' + setFooter(b.keyHtml, label) : ''));
         pagesAll += b.pages + (o.key ? b.keyPages : 0);
@@ -1369,7 +1388,7 @@ function render() {
     // summary + page 1
     const line = S.error ? 'These pages could not be built.' : b && !S.busy ? summaryLine(b, o) : 'Working out the pages…';
     h += `<section class="sp-sum" aria-live="polite"><p class="sp-line" id="spLine">${esc(line)}</p>`;
-    if (b && b.notes && b.notes.length && !S.busy) h += `<p class="sp-note">${esc(b.notes.join(' '))}</p>`;
+    if (b && b.notes && b.notes.length && !S.busy) h += `<p class="sp-note">${b.notes.map((t) => esc(t)).join('<br>')}</p>`;
     if (arr === 'facts') h += `<p class="sp-note">${many && P.arrange === 'mixed' ? 'Fast facts in fact rows, the signs mixed on each page' : 'Fast facts in fact rows'}: ${P.how === 'pages' && !(b && (b.notes || []).some((t) => /cannot fill every page/.test(t))) ? 'every page is full' : P.how === 'pages' ? 'every page as full as whole rows allow' : 'each page as full as the count allows'}.</p>`;
     h += `<div class="sp-thumb" data-sp="larger" data-zpage="0"><iframe id="spFrame" title="Page 1 preview" tabindex="-1" aria-hidden="true"></iframe></div>`;
     h += `<button type="button" class="sp-larger" data-sp="larger" aria-expanded="${!!S.large}">Larger preview</button></section>`;

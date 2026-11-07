@@ -317,6 +317,12 @@ const stackedInkEm = (n, b) => factOpTrackEm(n, b, '/') + n * FACT_TRACK_EM;
  * the section does not fit its column with FIT_CLEAR_MM of white: the bracket's track and gutter
  * (em), the fraction's answer line (mm), the widest ink (mm).
  */
+/**
+ * Room a bracket in a grid MIXING forms keeps beyond FORM_CLEAR_MM (r8 D-R8-2: the vinculum's right end printed 1.86 mm from
+ * the border at 9 columns on the raster; 0.32 mm more room moves each side 0.16 mm and keeps the owner's 9 columns and the
+ * arc's 0.3 mm whites).
+ */
+const MIX_BRACKET_EXTRA_MM = 0.32;
 /** Every 3-digit ÷ fact of the 12 x 12 tables (dividend, divisor): the widest a page of ÷ 1-12 can deal (rowGeometry worst). */
 const WORST_DIV = (() => { const o = []; for (let a = 1; a <= 12; a++) for (let b = 1; b <= 12; b++) if (a * b >= 100) o.push([a * b, b]); return o; })();
 export function rowGeometry(items, forms, cols, pt, size, look, worst = false) {
@@ -349,7 +355,9 @@ export function rowGeometry(items, forms, cols, pt, size, look, worst = false) {
         ink = Math.max(ink, w);
         const ansDigits = Math.max(2, ...items.filter((it) => formOf(it) === 'fraction').map((it) => String(answerOf(it)).length));
         // the band's blank width (SL-6), capped at the column's room so the line keeps 1 mm each side
-        out.lineMm = Math.floor(Math.min(blankWidth(ansDigits, size), roomF) * 10) / 10;
+        // (r8 D-R8-2: the answer line capped 0.5 mm inside the room - at Big in 9 columns it reached the room exactly and its
+        // raster ends printed 1.78 mm from the border)
+        out.lineMm = Math.floor(Math.min(blankWidth(ansDigits, size), roomF - 0.5) * 10) / 10;
     }
     if (forms.has('long')) {
         // Each bracket takes the gutter its arc aims at (0.6 mm of white before the dividend's first
@@ -359,7 +367,7 @@ export function rowGeometry(items, forms, cols, pt, size, look, worst = false) {
         // (0.01 mm under the room: the ink is reported to 0.01 mm and must still fit when rounded up)
         // (r6 D-R6-5, a bracket section of its own: 0.6 mm more for the bracket - the arc's stroke and the first digit measured up to 0.3 mm wider than the
         // ink model each side, which left "12)132" 1.72 mm from the border)
-        const roomL = roomF - (forms.size === 1 ? 0.6 : 0) - 0.01;
+        const roomL = roomF - (forms.size === 1 ? 0.6 : MIX_BRACKET_EXTRA_MM) - 0.01;
         const roomEm = roomL / em;
         // ... and its drawn box (the tracks and the gutter, wider than the ink by the divisor's lead) inside
         // the cell too (PG-12: "10 ) 110" on 1 em tracks at 5 columns stood 0.5 mm out of its cell)

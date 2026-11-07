@@ -384,3 +384,33 @@ ws-chromebook-perf --only load OK; ws-stamp-assets + --check OK.
 `d1-divAdd-pr40-S-sections-p1.png`, `d1-divAdd-pr40-S-mixed-p1.png`, `d1-subDivMixAdd-pr50-S-sections-p1.png` (order);
 `d2-ownerMix-c2-pr20-S-p1.png` (Columns 2 prints 5, noted); `d3-divMix-alone-pr63-S-p1.png`, `d3-ownerMix-L-c9-pages1-p1.png`
 (bracket clearance).
+
+## Round 8 (fixer, Opus medium: a sets regression and the bracket's printed ink, critic lowest 6) — e0d7d1b09
+
+Critic r8: every r7 fix held (owner's page, order, columns, notes, keys at 8+). FAIL on D-R8-1: Sets 2+ re-decided the
+plan (the ÷-form merge, the remainder) and printed other per-skill counts and section shapes than set 1 when ÷ was not last;
+D-R8-2: on the printed raster the vinculum's / answer line's end stood 1.78-1.86 mm from the border at 9 columns.
+
+**Checks first** (in `--sweep`; on e0d7d1b09 via MQ_ROOT: SETSHAPE 8, SETSKILLDIFF 6, SHARES 4, BRKINK 1 - FAIL):
+SETSKILLDIFF (every set prints set 1's per-skill counts), SETSHAPE (every set has set 1's sections a page), SHARES on every set
+(lists ÷Mix −, − ÷Mix +, ÷Mix × − +, owner ÷ Mix at Sets 2/3, Problems and Pages), BRKINK (the ÷ cells' INK on a 300 dpi
+raster of the printed page, tests/lib/ws-inkclear.py after the critic's inkclear.py, >= 2.0 mm at 9 columns, Small and Big;
+skipped and said when numpy / PIL are missing); BRKCLEAR's DOM threshold raised to 2.0 mm.
+
+### Fixes
+1. **D-R8-1** (`simple-print.js` buildSets / buildFacts `o.__reuse`, `factReuse`): sets 2..n reuse set 1's PLAN - the groups
+   (the ÷-form merge decision included), each part's count, the pages and their rows, the stretch, the digit cap, the plan
+   notes - and only the numbers are dealt anew.
+2. **D-R8-2** (`sheet/roles/fact-rows.js`): the fraction's answer line is capped 0.5 mm inside the room (at Big in 9 columns
+   it filled the room exactly and printed 1.78 mm from the border); a bracket in a grid mixing forms keeps 0.32 mm more room
+   (MIX_BRACKET_EXTRA_MM). Printed ink now >= 2.03 mm at 9 columns, Small and Big; 9 columns kept (columns win).
+3. The dialog shows its notes one per line.
+
+### Gates (one at a time)
+ws-simple-print --facts-print OK (r4, r5, the measured sweep 789 prints, BRKINK 2.03 / 2.03 mm); ws-layout-unit OK (1766);
+ws-print-lint --source kit S OK; ws-boot-smoke OK; ws-stamp-assets + --check OK. (Not re-run this round, per the time limit:
+M / L print-lint, pdf-preview, screen-answer, student-explorer, chromebook-perf, --sweep-full.)
+
+### Hand-over
+- The bracket TEXT-box clearance (INFO, 1.73 mm at the closest) stays an owner question from r7; the printed ink holds 2 mm.
+- `node tests/scripts/ws-simple-print.cjs --sweep-full` (~45 min) was last run clean in r7; re-run it before deploy.

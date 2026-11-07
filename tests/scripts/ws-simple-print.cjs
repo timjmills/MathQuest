@@ -1137,6 +1137,11 @@ function sweepCases(full) {
     for (const list of ['addDiv', 'multDiv']) for (const size of sizes) for (const cols of ['auto', 9]) for (let n = 4; n <= 130; n += full ? 3 : 9) C(list, { size, cols, n, arrange: 'mixed' });
     // Sets 2
     for (const size of sizes) { C('owner', { size, n: 63, sets: 2 }); C('ownerMix', { size, how: 'pages', n: 2, sets: 2 }); }
+    // SETSKILLDIFF / SETSHAPE (r8 D-R8-1): Sets 2 and 3 over ÷-first and ÷-between lists, Problems and Pages
+    for (const list of ['divMixSub', 'subDivMixAdd', 'divMixMSA', 'ownerMix']) for (const size of sizes) {
+        for (const n of full ? [13, 40, 63, 97] : [40, 97]) C(list, { size, n, sets: 2 });
+        C(list, { size, how: 'pages', n: list === 'divMixMSA' ? 3 : 1, sets: full ? 3 : 2 });
+    }
     // ORDER (r7 D-R7-1): lists in unusual orders, both arrangements, Problems and Pages
     for (const list of ['divAdd', 'divMixSub', 'divMixMSA', 'subDivMixAdd']) for (const size of sizes) for (const arrange of ['sections', 'mixed']) {
         for (const n of full ? [5, 23, 40, 50, 97, 150] : [23, 97]) C(list, { size, n, arrange });
@@ -1187,7 +1192,11 @@ async function factsSweep(app, full) {
                         for (const x of cells) {
                             if (!x.querySelector('[data-ws-ops="division"]')) continue;
                             const cr = x.getBoundingClientRect(); const cs = fd.defaultView.getComputedStyle(x);
-                            const L0 = cr.left + parseFloat(cs.borderLeftWidth), R0 = cr.right - parseFloat(cs.borderRightWidth);
+                            // (r8 BRKINK: the right edge is the NEXT cell's drawn rule, which is pulled one hairline over this cell
+                            // - fact rows draw left + top rules, PT-FRW-11 - so the ink is measured to that rule's inner edge)
+                            const nx = x.nextElementSibling;
+                            const nxr = nx && nx.classList.contains('ws-cell') && Math.abs(nx.getBoundingClientRect().top - cr.top) < 2 ? nx.getBoundingClientRect().left + parseFloat(fd.defaultView.getComputedStyle(nx).borderLeftWidth) : null;
+                            const L0 = cr.left + parseFloat(cs.borderLeftWidth), R0 = nxr !== null ? Math.min(cr.right - parseFloat(cs.borderRightWidth), nxr) : cr.right - parseFloat(cs.borderRightWidth);
                             const xs = [];
                             const tw = fd.createTreeWalker(x, 4); let tn;
                             const bx = [];
@@ -1233,6 +1242,7 @@ async function factsSweep(app, full) {
         const sets = r.sets;
         const ids = SW_LISTS[c.list].map((s) => s.skillId);
         let off = 0;
+        const perSetCnt = [], perSetShape = [];
         for (let sn = 0; sn < sets; sn++) {
             const ps = r.pages.filter((p) => p.setNo === sn + 1);
             const perSet = ps.length;
@@ -1240,6 +1250,11 @@ async function factsSweep(app, full) {
             off += perSet;
             const total = ps.reduce((t, p) => t + p.grids.reduce((u, g) => u + g.n, 0), 0);
             if (o.how === 'problems' && total !== o.n) F('TOTAL', `${tag}: TOTAL printed ${total} for ${o.n} asked`);
+            // (r8: each set's per-skill counts and its sections a page, for SETSKILLDIFF / SETSHAPE)
+            const cs = {};
+            ps.forEach((p) => p.grids.forEach((g) => Object.entries(g.ops).forEach(([op, v]) => { const k2 = KEY[op] || op; cs[k2] = (cs[k2] || 0) + v; })));
+            perSetCnt.push(ids.map((id) => cs[id] || 0).join('/'));
+            perSetShape.push(ps.map((p) => p.grids.length).join(','));
             // SHARES
             if (ids.length > 1) {
                 const cnt = {}, colOf = {};
@@ -1275,7 +1290,8 @@ async function factsSweep(app, full) {
                     // BRKCLEAR (r7 D-R7-3): 2 mm each side of a bracket, in its own section and in a grid mixing forms
                     // (measured on the glyph INK and the drawn arc and bar - what prints; the text BOXES, with a "1"'s empty side
                     // bearing, are tallied as INFO: 2 mm on the boxes at 9 columns would cost the owner's 0.3 mm arc whites)
-                    if (g.brk !== null && g.brk < 1.95) F('BRKCLEAR', `${tag} page ${k + 1}: BRKCLEAR a bracket's ink ${g.brk.toFixed(2)} mm from its cell's border (${g.mixed ? 'mixed' : 'bracket'} section, ${g.cols} columns)`);
+                    // (r8 BRKINK: 2.0 mm, the owner's figure, not 1.95)
+                    if (g.brk !== null && g.brk < Number(process.env.BRK_MIN || 2.0)) F('BRKCLEAR', `${tag} page ${k + 1}: BRKCLEAR a bracket's ink ${g.brk.toFixed(2)} mm from its cell's border (${g.mixed ? 'mixed' : 'bracket'} section, ${g.cols} columns)`);
                     if (g.brkBox !== null) brkBoxMin = Math.min(brkBoxMin, g.brkBox);
                     // COLNOTE (r7 D-R7-2): a section printing other columns than the ones picked says why
                     const pick = o.cols === 'auto' ? 0 : Number(o.cols);
@@ -1288,6 +1304,11 @@ async function factsSweep(app, full) {
                 const fp = r.factPages && sn === 0 ? r.factPages[base + k] : null;
                 p.grids.forEach((g, j) => { const h = fp && fp[j] && fp[j].hMin; if (h && g.rowH > h * 1.3 + 0.6) F('STRETCH', `${tag} page ${k + 1}: STRETCH rows ${g.rowH.toFixed(1)} mm, ${(g.rowH / h).toFixed(2)} x their minimum`); });
             });
+        }
+        // SETSKILLDIFF / SETSHAPE (r8 D-R8-1): every set prints set 1's per-skill counts and set 1's sections a page
+        for (let sn = 1; sn < perSetCnt.length; sn++) {
+            if (perSetCnt[sn] !== perSetCnt[0]) F('SETSKILLDIFF', `${tag}: SETSKILLDIFF set ${sn + 1} prints ${perSetCnt[sn]} per skill, set 1 ${perSetCnt[0]}`);
+            if (perSetShape[sn] !== perSetShape[0]) F('SETSHAPE', `${tag}: SETSHAPE set ${sn + 1} has ${perSetShape[sn]} sections a page, set 1 ${perSetShape[0]}`);
         }
         // NOTEPLAIN (r7): a dialog note never shows an internal code ("(PT-FRW-5)") and keeps to two sentences
         for (const t of r.notes) {
@@ -1340,6 +1361,42 @@ async function factsSweep(app, full) {
         if (u.colOpts.some((v) => /^[1-4]$/.test(v))) F('COLNOTE', `COLNOTE the dialog offers Columns ${u.colOpts.filter((v) => /^[1-4]$/.test(v)).join(', ')} for an all-fact list (fact rows print 5 to 10 across)`);
         if (!new RegExp(`\\b${u.pt} pt\\b`).test(u.btn)) F('SIZEBTN', `SIZEBTN @${size} Columns 9: the ${nm} button reads "${u.btn}" but the print is ${u.pt} pt`);
         if (u.pt < { L: 28, M: 24 }[size] && !new RegExp(`${nm}\\b[^.]*\\b${u.pt} pt`).test(u.notes)) F('SIZEBTN', `SIZEBTN @${size} Columns 9: the dialog's notes do not say ${nm} prints at ${u.pt} pt ("${u.notes.slice(0, 120)}")`);
+    }
+    // BRKINK (r8 D-R8-2): the printed INK of the ÷ cells, rasterised at 300 dpi (tests/lib/ws-inkclear.py), >= 2.0 mm from
+    // the cell's drawn rules, at 9 columns, Small and Big - the DOM measure missed the vinculum's and the answer line's ends
+    {
+        const pathx = require('path'), fsx = require('fs'), os = require('os');
+        const { spawnSync } = require('child_process');
+        const py = pathx.join(__dirname, '..', 'lib', 'ws-inkclear.py');
+        const dir = fsx.mkdtempSync(pathx.join(os.tmpdir(), 'ws-inkclear-'));
+        const jobs = [['÷ Mix alone problems 63 @S cols 9', SW_LISTS.divMix, { how: 'problems', n: 63, size: 'S', cols: 9 }], ['ownerMix pages 1 @L cols 9', SW_LISTS.ownerMix, { how: 'pages', n: 1, size: 'L', cols: 9 }]];
+        const p2 = await app.browser.newPage();
+        await p2.setViewport({ width: 900, height: 1200, deviceScaleFactor: 300 / 96 });
+        let skipped = '';
+        for (const [j, [tag, list, o0]] of jobs.entries()) {
+            const html = await page.evaluate(async ({ list, o }) => {
+                const m = await import('/js/modules/simple-print.js');
+                const b = await m.buildSets(list.map((s) => Object.assign({ amt: '' }, s)), Object.assign({ sets: 1, colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o));
+                return window.sheetDocument(b.pupilHtml, 'x', { paper: 'A4' });
+            }, { list, o: o0 });
+            await p2.goto(app.base + '/index.html', { waitUntil: 'domcontentloaded' });
+            await p2.evaluate((h) => { document.open(); document.write(h); document.close(); }, html);
+            for (let i = 0; i < 60; i++) { if (await p2.evaluate(() => document.readyState === 'complete')) break; await new Promise((x) => setTimeout(x, 100)); }
+            await p2.evaluate(async () => { await document.fonts.ready; });
+            const pages = await p2.$$('.ws-page');
+            let shot = null;
+            for (const pg of pages) if (await pg.evaluate((e) => !!e.querySelector('[data-ws-ops="division"]'))) { shot = pg; break; }
+            if (!shot) { F('BRKINK', `${tag}: BRKINK no bracket printed`); continue; }
+            const png = pathx.join(dir, `ink-${j}.png`);
+            await shot.screenshot({ path: png });
+            const run = spawnSync('python3', ['-I', py, png], { encoding: 'utf8' });
+            if (run.error || run.status === 3) { skipped = String(run.stdout || run.error).slice(0, 120); break; }
+            const r = JSON.parse(String(run.stdout).trim().split('\n').pop());
+            rows.push(`SWEEP BRKINK ${tag}: printed ink ${r.min} mm from the cell rules at the closest (${r.rows.length} rows)`);
+            if (r.min === null || r.min < 2.0) F('BRKINK', `${tag}: BRKINK printed ink ${r.min} mm from a cell's rule (>= 2.0 mm)`);
+        }
+        await p2.close();
+        if (skipped) rows.push(`SWEEP BRKINK SKIPPED: ${skipped}`);
     }
     rows.push(`SWEEP BRKCLEAR info: the closest bracket text BOX to a border ${Number.isFinite(brkBoxMin) ? brkBoxMin.toFixed(2) : '-'} mm (the ink is held to 2 mm)`);
     rows.push(`SWEEP ${full ? 'full ' : ''}${out.length} prints measured in ${((Date.now() - T0) / 1000).toFixed(0)} s (a full page ${fullWhite.toFixed(1)} mm under its grid); ${Object.keys(tally).length ? Object.entries(tally).map(([k, v]) => `${k} ${v}`).join(', ') : 'no findings'}`);
