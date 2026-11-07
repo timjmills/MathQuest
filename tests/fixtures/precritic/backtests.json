@@ -1330,6 +1330,126 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-title-constant",
+   "check": "D13: the Prerequisite Check title is one constant (PREREQ_CHECK_TITLE), no 'Prerequisite check' spelling, no second literal in the lesson modules",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only title (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 'Prerequisite check' on the page, 'Prerequisite Check' in the registry and the part names"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "one exported constant used by the role, the registry, print-sheet and the detailed T-pages"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only title",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-routing-one-builder",
+   "check": "D14: one routing-table builder (routingTableHtml), no second table, no claim that the detailed T6 prints it",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only routing-export (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the role's comment claims T6 prints the same table"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "T6 kept (passed lessons byte-identical), the claim corrected; one builder"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only routing-export",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-route-no-literal-styles",
+   "check": "D15: routeTagHtml / routingTableHtml carry classes (LESSON_ROUTE_CSS travels only with a routed page), no literal pt / #949494 / border / padding",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only route-styles (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 9pt, #949494, borders and paddings inline"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "classes + a routed-page-only stylesheet"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only route-styles",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-routed-plan-units",
+   "check": "D16: the routed plan's numbers are named constants; routeTagMm / routeTagLines / routePlan / routedLayout unit-tested",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only routed-plan (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 1.6 mm/char, 0.7 / 0.75, 40 mm gaps as literals, no unit tests"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "named constants, routedLayout exported and tested"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only routed-plan",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-prereq-checks-field",
+   "check": "D12: every library prerequisite carries `checks` (what the question asks) distinct from its design `why`; the schema refuses one without",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only checks-field (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the routing table printed the design why"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "checks on every prerequisite, validated, printed"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only checks-field",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-bind-stamps-refuses",
+   "check": "D17: ws-lesson-coverage --bind-stamps refuses to bind a pass to a render that changed since the grade (or whose graded render is unknown)",
+   "kind": "fixture",
+   "rule": "ws-lesson-coverage --bind-stamps (lf-engine P1, critic lessons-phase0 r1 D17)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/bind-stamps/fail",
+    "state": "an unstamped pass graded on render aaaa.bbbb, the current render cccc.dddd (the phase 0 re-bind of the samples to their LR-17 renders)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/bind-stamps/pass",
+    "state": "an unstamped pass graded on the current render"
+   },
+   "command": "node tests/scripts/ws-lesson-coverage.cjs --bind-stamps --dry-run --data-root {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
