@@ -1390,6 +1390,146 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "h13-ink-supports-lf",
+   "check": "H13 on INK in supported cells: the band from the last ink to the bottom rule, tab column excluded, a reserved support counted as empty (critic laned-restart r4 R4-1: touch Independent S/M 32 %, boxsign Independent S 32 % / L 35 %; R4-5 fade packet page 1 ~75 %)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (H13-INK, supportCheckInPage)",
+   "browser": true,
+   "fail": {
+    "commit": "e2ab83ee",
+    "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; touch Independent S: 12 cells, a 18.0 mm band in 57.3 mm cells (31 %)"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix",
+    "state": "the lf-ops fix commit (filled when the fix lands)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles independent --supports touch --size S --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "support-cover-lf",
+   "check": "A support asked for the whole sheet is drawn on every problem of its section, or the fits note names the skipped facts (critic r4 R4-2 / R4-2b: array on half the facts, none on Review M)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-SUPPORT COVER",
+   "browser": true,
+   "fail": {
+    "commit": "e2ab83ee",
+    "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; array Review M at the critic's seed 62975: the array on none of the 6 facts (R4-2b)"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix",
+    "state": "the lf-ops fix commit (filled when the fix lands)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles review --supports array --size M --seed render --lints L-SUPPORT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "support-one-geometry-lf",
+   "check": "One cell geometry per page across sections: the skill's cells share one width and put the slot at one place (critic r4 R4-2 two geometries, R4-4 boxsign Test L lone row, R4-5 fact x moves)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-SUPPORT SCC-T10 (one geometry)",
+   "browser": true,
+   "fail": {
+    "commit": "e2ab83ee",
+    "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; boxsign Test L at the critic's seed 805715: grid cells and a full-width row, two geometries"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix",
+    "state": "the lf-ops fix commit (filled when the fix lands)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles test --supports boxsign --size L --seed render --lints L-SUPPORT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "review-count-lf",
+   "check": "A Review sheet holds 8 to 20 problems (critic r4 R4-2c: array Review S printed 7)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PT-REV-1",
+   "browser": true,
+   "fail": {
+    "commit": "e2ab83ee",
+    "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; array Review S at the critic's seed 62975: 7 problems"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix",
+    "state": "the lf-ops fix commit (filled when the fix lands)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles review --supports array --size S --seed render --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "skip-strip-reach-lf",
+   "check": "A drawn skip-count strip on a division fact reaches the dividend (critic r4 R4-3: the strip stops at 5 x the divisor)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-SUPPORT DV-02",
+   "browser": true,
+   "fail": {
+    "commit": "e2ab83ee",
+    "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; skip Independent S: 13 strips short (70 ÷ 7 stops at 35)"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix",
+    "state": "the lf-ops fix commit (filled when the fix lands)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles independent --supports skip --size S --lints L-SUPPORT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lone-wide-row-lf",
+   "check": "No full-width row under a grid of 2+ columns when the problem fits a grid column (critic r4 R4-4: boxsign Test L, 132 ÷ 12 alone in a full-width row)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PG-12 (lone wide row)",
+   "browser": true,
+   "fail": {
+    "commit": "e2ab83ee",
+    "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; boxsign Test L at the critic's seed 805715: 132 ÷ 12 alone in a full-width row that fits a grid column"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix",
+    "state": "the lf-ops fix commit (filled when the fix lands)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles test --supports boxsign --size L --seed render --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fade-order-lf",
+   "check": "A faded packet never adds support back: supports per problem non-increasing in reading order (critic r4 R4-5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-SUPPORT FADE-ORDER",
+   "browser": true,
+   "fail": {
+    "commit": "e2ab83ee",
+    "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; fade packet M: 1 0 3 3 1 1 3 3 3 1 0 0 0"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix",
+    "state": "the lf-ops fix commit (filled when the fix lands)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --supports all --fade packet --pages 3 --size M --lints L-SUPPORT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

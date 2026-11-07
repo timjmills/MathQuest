@@ -731,6 +731,24 @@ function buildPlan(ctx) {
                 add(gate(`print-lint-supports-${sup}-S`, `ws-print-lint --source kit --supports ${sup} --size S --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
                     ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
             }
+            // Critic laned-restart r4 (2026-11-03; lane lf-ops checks H13-INK, COVER, SCC-T10 one geometry, DV-02, PG-12 lone wide
+            // row, PT-REV-1, FADE-ORDER): the critic graded each support alone at S / M / L on the pages ws-grade-render deals
+            // (`--seed render`: hash(cat__skill:role) % 1e6), and a 3-page faded packet at M; precritic ran S at its own seeds only.
+            // Each support alone at M and L on those pages, the Review at S on its page (PT-REV-1 is seed-dependent: r4's Review S
+            // printed 7), and the faded packet.
+            const fnv = (t) => { let h = 2166136261; for (const c of String(t)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+            const renderId = (k, role) => `${k}${role !== 'independent' ? '#' + role : ''}@${fnv(`${k.replace(':', '__')}:${role}`) % 1000000}`;
+            for (const sup of singles) {
+                const ks = factKeys.filter((k) => (FACT_SUPPORTS[k] || []).includes(sup));
+                for (const sz of ['M', 'L']) {
+                    add(gate(`print-lint-supports-${sup}-${sz}`, `ws-print-lint --source kit --supports ${sup} --size ${sz} --roles ${SUP_ROLES} --seed render (critic r4: each support alone at M / L on the critic's pages)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES} × ${sz}`, 'browser', 'ws-print-lint',
+                        ['--source', 'kit', '--supports', sup, '--size', sz, '--roles', SUP_ROLES, '--seed', 'render', '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks.flatMap((k) => SUP_ROLES.split(',').map((r) => renderId(k, r))) } }));
+                }
+                add(gate(`print-lint-supports-${sup}-S-review`, `ws-print-lint --source kit --supports ${sup} --size S --roles review --seed render (critic r4 R4-2c: PT-REV-1 on the critic's Review page)`, `${ks.join(', ')} × ${sup} × review × S`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', 'review', '--seed', 'render', '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks.map((k) => renderId(k, 'review')) } }));
+            }
+            add(gate('print-lint-fade-packet-M', 'ws-print-lint --source kit --supports all --fade packet --pages 3 --size M (critic r4 R4-5: a faded packet withdraws help in order; H13-INK on reserved zones)', `${factKeys.join(', ')} × faded packet × M`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--supports', 'all', '--fade', 'packet', '--pages', '3', '--size', 'M', '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
         }
         // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
         // the across block, and the ÷ probes at L re-laid cells 19-20 at 1.5 columns; L-DENSITY GRID-EVEN now reads every
