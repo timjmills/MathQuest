@@ -1330,6 +1330,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-combine-dealer",
+   "check": "placevalue:combine, 120 seeded items: the zero place is never pinned to odd positions (itemIndex % 2) and no item or leading pair repeats on a page of 20",
+   "kind": "commit-pair",
+   "rule": "ws-dealer-uniform PERIOD / PAGE",
+   "browser": false,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: zeroCase 60 of 60 at position 1 mod 2; 7 PAGE repeats"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "wantZero by dealIndex, the number by freshDeal (leading part cap 3, leading pair cap 1)"
+   },
+   "command": "node tests/scripts/ws-dealer-uniform.mjs --skill placevalue:combine",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-equation-row-cl40",
+   "check": "placevalue:expand at S and combine at L: the one-line equation row's ink stays out of the number tab's keep-out",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK",
+   "browser": true,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: combine L 8, expand S 40 CL40-INK"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "sheet-kit.css: pv equation-row cells take the tab spacer on the page and the measuring cell"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size S --skills placevalue:expand,placevalue:combine --baseline design/audit/baselines/print-lint.S.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-lesson-data",
+   "check": "the lesson page of placevalue identify / value / expand / combine / unit_form has lesson data (no fallback warm-up)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint LESSON-DATA",
+   "browser": false,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: 5 pv skills no-lesson-data"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "lessons/prereqs.js lf-placevalue block"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --skill placevalue:expand,placevalue:combine,placevalue:identify,placevalue:unit_form,placevalue:value --rules LESSON-DATA",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
