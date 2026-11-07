@@ -290,3 +290,57 @@ ws-student-explorer OK; ws-chromebook-perf --only load OK; ws-stamp-assets + --c
 - The sweep, not more named cases: every r5 defect class showed in one 49 s run on 128455ad3, and each fix was re-swept.
 - r4 traded one owner rule ("teacher's order") for another ("full pages") without saying so; the rule now is: move whole rows,
   then add a page, then say so - never break a rule silently (LESSONS L21).
+
+## Round 6 (fixer, Opus medium: the r6 critic found every defect OUTSIDE the r5 sweep, lowest 3) — 1d4c97a5c
+
+Critic r6: all r5 fixes held (owner's page 9 / 8 / 8 / 8; 5,649 key cells right); FAIL on D-R6-1 ÷ Mix In sections Problems
+10 printed 26, D-R6-2 Medium / Big digits dropped under a picked Columns with no word, D-R6-3 Pages-mode last pages 20-50 mm
+short beside "every page is full", D-R6-4 Problems pages 16.8 mm short, D-R6-5 bracket clearance 1.72 mm, D-R6-6 a doubled
+note. Root cause of the loop: the gate read the planner's own numbers (`factPlan.filled`) over a narrow grid of cases.
+
+**STEP 1, the measured sweep** (`ws-simple-print --sweep`, inside `--facts-print`; `--sweep-full` for the critic and the
+deploy run; from the critic's r6tools/sweep.cjs): every print built, drawn print-emulated in a reused frame (sheetDocument)
+and its PRINTED page measured - TOTAL against the request, SHARES (one row), SIZENOTE, PAGESFULL (measured white; the last
+page too in Pages mode), BLANKMID, DIVORDER, STRETCH, and SIZEBTN through the real dialog. Default: 702 prints, ~3 min
+(÷ Mix In sections Problems 10-60 by 3, the owner's set 1-150 by 7 at Auto / 7 / 9, Pages 1-3 at Columns Auto / 6 / 7 / 9 /
+10 on five lists, two-skill lists, Sets 2). Full: 8,229 prints, ~30 min (every count 1-150, Columns Auto and 1-10, Pages
+1-4, eight lists, both arrangements). On 1d4c97a5c the default sweep FAILS: TOTAL 59, SHARES 115, SIZENOTE 286, PAGESFULL 55.
+On the fix: default and FULL sweeps clean. The r5 FULLPLAN (it read `filled`) is retired for the measured PAGESFULL.
+
+### Fixes (`js/modules/simple-print.js`, `js/modules/sheet/roles/fact-rows.js`)
+1. **D-R6-1**: a group under one row keeps its exact count (no rounding up to a row); the ÷ forms share ONE mixed section in
+   Problems mode too whenever a form has less than a row, the total would miss the request, or a skill would leave its share
+   (note "N problems at Size: the ÷ forms share one section, mixed, so every skill keeps its share."). Problems 10 at S:
+   3 / 3 / 2 / 2 on one page. Every ÷ form section is laid for the widest 3-digit facts its skills reach (a page without one
+   kept 9 columns, the next dropped to 8 and lost two facts).
+2. **D-R6-2** (owner ruling: columns win): the dialog says "Big digits don't fit 9 columns; printing at 16 pt." (Medium the
+   same) whenever the printed digits are under the Size's; with Columns picked the size buttons read what prints at that size
+   ("8 columns · 16 pt"), and a Columns change re-probes them.
+3. **D-R6-3**: Pages mode plans the most problems whose pages are ALL full, the last included (`planFactRows(..., fillLast)`),
+   and each skill within a row of its share; Sets 2+ of a Pages print fill their last page too. Where whole rows cannot fill
+   every page (Columns 1-2 of ÷ forms), the dialog says so and no longer claims "every page is full".
+4. **D-R6-4**: where one row height a section cannot fill both a page the ÷ section shares and a page of one group, each page
+   but a Problems print's last stretches its own rows to fill it (never past 1.3; factPlan.perPage). **Owner note:** PG-11's
+   "identical rows page to page" then differs by a few percent between such pages - chosen over 13 mm of white.
+5. **D-R6-5**: a bracket section keeps 0.6 mm more room than the ink model, so "12)144" keeps 2 mm a side; at Small the
+   bracket alone then takes 8 columns (the note says "8 columns so every fact fits its cell"; ws-layout-unit PT-FRW-9 and
+   DIVMAX9 now expect that). Its row holds the stacked answer room over the vinculum (a written line + 2 mm; QROOM).
+6. **D-R6-6**: the form names in one fixed order, so a print's notes no longer repeat.
+7. SHARES in the planner is measured against the EVEN share (a row shift that leaves a skill more than a row off is refused).
+
+### Gates (one at a time, foreground or waited on)
+ws-simple-print --facts-print OK (r4, r5 and the measured sweep: no findings); full ws-simple-print OK; --sweep-full OK
+(8,229 prints); ws-layout-unit OK (1766); ws-print-lint --source kit S OK, M OK, L only the pre-existing sub_facts#review
+H13 ×4; ws-content-audit division:div_facts OK; ws-code-snapshot OK (732); ws-boot-smoke OK; ws-pdf-preview OK;
+ws-screen-answer OK; ws-student-explorer OK; ws-chromebook-perf --only load OK; ws-stamp-assets + --check OK.
+
+### Evidence (design/status/facts-print-fix/r6/)
+- D-R6-1: `d1-mix-sections-pr10-S-p1.png`, `d1-mix-sections-pr22-M-p1.png`.
+- D-R6-2: `d2-pages1-L-c9-p1.png`, `d2-pages1-M-c7-p1.png`.
+- D-R6-3: `d3-pages2-L-p1..2.png`, `d3-mix-pages2-S-p1..2.png`. D-R6-4: `d4-addDiv-pr91-M-p1..4.png`.
+- D-R6-5: `d5-div-long-pr30-S-p1.png`, `d5-div-mix-alone-pr63-S-p1.png`. Owner's page: `owner-page-S-c9-mixed-p1.png`.
+
+### Speed notes (round 6)
+- Measuring costs what trusting the plan costs: a reused print-emulated frame draws a build in ~0.2 s. The full sweep found
+  the last slices (Columns 1-4 of ÷ forms) that the default sweep does not reach; `SWEEP_GREP=<regex>` re-runs a slice in
+  minutes. The dialog check needed `bringToFront` and setting every control.

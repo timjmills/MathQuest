@@ -316,14 +316,18 @@ const stackedInkEm = (n, b) => factOpTrackEm(n, b, '/') + n * FACT_TRACK_EM;
  * the section does not fit its column with FIT_CLEAR_MM of white: the bracket's track and gutter
  * (em), the fraction's answer line (mm), the widest ink (mm).
  */
-export function rowGeometry(items, forms, cols, pt, size, look) {
+/** Every 3-digit ÷ fact of the 12 x 12 tables (dividend, divisor): the widest a page of ÷ 1-12 can deal (rowGeometry worst). */
+const WORST_DIV = (() => { const o = []; for (let a = 1; a <= 12; a++) for (let b = 1; b <= 12; b++) if (a * b >= 100) o.push([a * b, b]); return o; })();
+export function rowGeometry(items, forms, cols, pt, size, look, worst = false) {
     const em = EM_MM[pt] || (pt / 72) * 25.4;
     const { inner } = cellWidthMm(cols, LIVE_W_MM, look);
     // (stacked facts keep the fit gate's 1 mm a side; a bracket or a fraction 2 mm a side, FORM_CLEAR_MM)
     const room = inner - FIT_CLEAR_MM;
     const roomF = inner - FORM_CLEAR_MM;
     const n = tracksOf(items);
-    const ops = (f) => items.filter((it) => formOf(it) === f).map((it) => operandsOf(it.q || {}));
+    // (worst, facts-print-fix r6: the section's skills REACH 3-digit dividends - 144 / 12 - so every page is laid for that
+    // fact whatever it dealt: a page without one kept 9 columns, the next with one dropped to 8 and lost two facts)
+    const ops = (f) => [...items.filter((it) => formOf(it) === f).map((it) => operandsOf(it.q || {})), ...(worst && forms.has(f) ? WORST_DIV : [])];
     let ink = 0;
     const out = { pt, cols, inner, tracks: n };
     if ((forms.has('standard') || forms.has('vertical')) && opsOf(items).size > 1) {
@@ -352,7 +356,9 @@ export function rowGeometry(items, forms, cols, pt, size, look) {
         // floor (0.3 mm) there (critic r1 R1-1, owner 2026-10-31: the arc never touches or crowds a digit).
         const os = ops('long');
         // (0.01 mm under the room: the ink is reported to 0.01 mm and must still fit when rounded up)
-        const roomL = roomF - 0.01;
+        // (r6 D-R6-5, a bracket section of its own: 0.6 mm more for the bracket - the arc's stroke and the first digit measured up to 0.3 mm wider than the
+        // ink model each side, which left "12)132" 1.72 mm from the border)
+        const roomL = roomF - (forms.size === 1 ? 0.6 : 0) - 0.01;
         const roomEm = roomL / em;
         // ... and its drawn box (the tracks and the gutter, wider than the ink by the divisor's lead) inside
         // the cell too (PG-12: "10 ) 110" on 1 em tracks at 5 columns stood 0.5 mm out of its cell)
@@ -396,7 +402,8 @@ function rowFormHeightMm(forms, geo, size, labels, cols, look) {
         const qRow = ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 0.08 * em;
         let tab = sz.tabMm;
         try { tab = Math.max(tab, metricsFor(size, look || DEFAULT_LOOK, { factColumns: cols }).tabMm || 0); } catch (e) { /* the size's tab */ }
-        h = Math.max(h, 2 * (Math.max(6, 1.15 * em) + tab - qRow) + qRow + 1.25 * em + 1);
+        // (r6 D-R6-5: the stacked fact's answer room - a written line plus the 2 mm under the rule - not just one line)
+        h = Math.max(h, 2 * (Math.max(1.15 * em, sz.writeMm) + 2 + tab - qRow) + qRow + 1.25 * em + 1);
     }
     return Math.ceil(h * 10) / 10;
 }
@@ -433,7 +440,7 @@ function formRows(items, input, ctx, G, labels, forms) {
         // (input.factPt, facts-print-fix r4 ONEDIGIT: sections sharing a page take the smallest of their digit sizes)
         const capPt = Math.min(Number(input.factPt) || Infinity, input.factSizeCap ? SIZE_FACT_PT[ctx.size] || Infinity : Infinity);
         for (const pt of [...new Set([rung, ...LADDER_PTS])].filter((p) => p <= rung && p >= FLOOR_PT && (!Number.isFinite(capPt) || p <= Math.max(capPt, FLOOR_PT))).sort((a, b) => b - a)) {
-            geo = rowGeometry(items, forms, cols, pt, ctx.size, ctx.look);
+            geo = rowGeometry(items, forms, cols, pt, ctx.size, ctx.look, Number(input.factTracks) >= 3);
             if (geo) break;
         }
         if (geo) break;
@@ -450,7 +457,8 @@ function formRows(items, input, ctx, G, labels, forms) {
     // Whole rows, every cell of the lattice dealt (critic r1 R1-2 / RUBRIC C3: no re-laid short last row, no
     // blank run, L-DENSITY GRID-EVEN and HOLE): a Mix page deals its forms in blocks of three, so its thirds
     // agree within one (70 facts: 24 / 23 / 23).
-    const names = [...forms].map((f) => ({ long: 'bracket', fraction: 'fraction', standard: mixed ? 'stacked' : 'stacked ÷', vertical: 'stacked ÷' }[f] || f)).join(' + ');
+    // (r6 D-R6-6: one fixed order, so the pages of one print say the same note)
+    const names = [...forms].sort((a, b) => ['standard', 'vertical', 'long', 'fraction'].indexOf(a) - ['standard', 'vertical', 'long', 'fraction'].indexOf(b)).map((f) => ({ long: 'bracket', fraction: 'fraction', standard: mixed ? 'stacked' : 'stacked ÷', vertical: 'stacked ÷' }[f] || f)).join(' + ');
     notes.unshift(`${mixed ? 'Facts' : 'Division facts'} as written (${names}): ${cols} columns x ${rows} rows.`);
     const row = {
         trackMm: geo.trackEm ? Math.round(geo.trackEm * em * 1000) / 1000 : 0,

@@ -853,7 +853,10 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 // 10 still prints 10 (PT-FRW-9), and the bracket / fraction rows keep their own 10
                 const stackedAuto = columns === 'auto' && /^(standard|vertical)$/.test(form);
                 // owner ruling 2026-11-05 ("If division is included don't make 10 columns an option, just 9"): every ÷ page at most 9
-                const want = Math.min(9, columns === 'auto' ? { S: stackedAuto ? 9 : 10, M: 6, L: 5 }[size] : columns);
+                // (facts-print-fix r6 D-R6-5: a bracket section of its own keeps 2 mm a side for "12)144" - 8 columns where 9 cannot,
+                // the layout's note saying so)
+                const want0 = Math.min(9, columns === 'auto' ? { S: stackedAuto ? 9 : 10, M: 6, L: 5 }[size] : columns);
+                const want = form === 'long' && want0 === 9 ? 8 : want0;
                 const L = factRowsLayout(set(form), { skills: [], ctx: { size }, columns });
                 const tag = `PT-FRW-9 div_facts ${form} ${size} columns ${columns}`;
                 eq(L.cols, want, `${tag}: ${want} columns`);
