@@ -1690,6 +1690,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "cc-card-overflow",
+   "check": "Every page role and option value the signed card offers is rendered and checked for overflow (critic lf-ops r1 check 2: Reason It arrays / count rows out of the A / B boxes and off the page; forms 1 lesson model overflow)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --card --card-opts OVERFLOW",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties,multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-tagink",
+   "check": "An error-analysis tag never prints over the grey made-up answer in its box (critic lf-ops r1 check 9, D-MP-5 / D-AG-3)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TAGINK",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups,multiplication:mult_properties --roles error-analysis --rules TAGINK --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-keyjoin",
+   "check": "A key writes one answer into one slot, never a joined '15, 15' (critic lf-ops r1 check 8, D-MP-6)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks KEYJOIN",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --rules KEYJOIN --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-size-s",
+   "check": "Size S is not M's layout with smaller drawings (critic lf-ops r1 check 4, D-AG-2, L1)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks SIZE-S",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules SIZE-S --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
