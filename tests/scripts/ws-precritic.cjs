@@ -784,6 +784,12 @@ function buildPlan(ctx) {
         const plain = keys.filter((k) => !carded.includes(k));
         if (plain.length) add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${plain.length <= 3 ? plain.join(', ') : plain.length + ' skills'} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
             ['--skills', plain.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: plain.length }));
+        // (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: two lane skills on one card print together as a SECTIONS sheet of 2
+        // pages - page 1 held 2 items, 64 % empty - at S and L, every page filled, the last one at least half)
+        if (carded.length >= 2) for (const sz of ['S', 'L']) {
+            add(gate(`print-lint-sections-${sz}`, `ws-print-lint --source kit --kind sections --pages 2 --size ${sz} --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet)`, `${carded.join(' + ')} × sections × 2 pages × ${sz}`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--kind', 'sections', '--pages', '2', '--size', sz, '--lints', 'L-DENSITY', '--skills', carded.join(',')], { parse: PARSE.printLint }));
+        }
         for (const k of carded) {
             const pl = plans[k], sid = k.split(':')[1];
             add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${pl.roles.length} roles × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
