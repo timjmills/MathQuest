@@ -333,7 +333,8 @@ export const CASE_TESTS = Object.freeze({
     // (Practice 1, critic D1: row 1 two non-squares - one with no 5, and 2 rows of 5 -, the last row the one square,
     // 4 x 4, and 5 rows of 3: the 5s spent where they teach)
     // (r4, critic r2 m1: row 1 2 x 4 and 3 x 5 - no first factor twice in a row -, the last row 4 x 4 and 5 rows of 2)
-    arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASE_TESTS.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 3 && p.cols === 5) || (p.rows === 5 && p.cols === 2) || CASE_TESTS.arrBigSquare(it)); },
+    // (owner ruling 2026-11-07: full-width cells, arrays to 6 x 6 - any non-square, or a square of 4 or more; the square on the last row only; never 2 x 6 - the Prerequisite Check's x 2 facts are 2 x 6 to 2 x 9)
+    arrP1: (it) => { const p = arrTurnOf(it); return !!p && (CASE_TESTS.arrNonSq(it) || CASE_TESTS.arrBigSquare(it)) && !(Math.min(p.rows, p.cols) === 2 && Math.max(p.rows, p.cols) === 6); },
     // The detailed lesson maker, lesson 4 (even products, 3.OA.D.9): a mult-grid shading window.
     // chartMixed: even and odd rows AND even and odd columns (every case on one window).
     // (lesson 4 r3: the chart example stays on the 2-9 chart; the Check Question shows the 11 / 12 rows first, critic r1 D3)
@@ -575,7 +576,7 @@ export function otherExamples(input, example, data) {
 }
 
 /** The Guided ("we do") items: the example's kind first (same strategy, same digit shape). */
-export function pickWeDo(items, example, data, n) {
+export function pickWeDo(items, example, data, n, others = []) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const ex = sigOf(example);
     const shape = digitsOfOps(example);
@@ -613,7 +614,7 @@ export function pickWeDo(items, example, data, n) {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
             if (!t) return pickLead(k + 1, chosen, nm);
-            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !msTwin(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !others.some((e) => sameFact(x, e)) && !msTwin(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
             return null;
         };
         const fit = pickLead(0, [], true) || pickLead(0, [], false);
@@ -1850,7 +1851,8 @@ function planOnce(input = {}) {
     const stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
     if (stackRows) gk = stackRows;
     const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4);
-    let weDo = example ? pickWeDo(weDoPool, example, data, gk) : rest.slice(0, gk);
+    const exOthers = [example2, example3, example4].filter(Boolean);   // (lesson 2 E24: the chart's other examples' facts too)
+    let weDo = example ? pickWeDo(weDoPool, example, data, gk, exOthers) : rest.slice(0, gk);
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);
     const gH = stackRows ? Math.max(20, hAt(weDo, 2) + lineExtra(weDo)) * stackRows : Math.max(hAt(weDo, gcols) + lineExtra(weDo), 20) + (cue(weDo) ? 2 : 0);
     const weH = Math.max(gH, zH);
@@ -1866,10 +1868,10 @@ function planOnce(input = {}) {
     const wideG = !!(data && data.chartWide);
     if (wideG && stepsZone && stripX && example) {
         const gw = Math.max(2, Math.min(4, Number(data.guidedRows) || 2));
-        const set = pickWeDo(weDoPool, example, data, gw).slice(0, gw);
+        const set = pickWeDo(weDoPool, example, data, gw, exOthers).slice(0, gw);
         if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
     } else if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
-        const w3 = example ? pickWeDo(weDoPool, example, data, 3) : rest.slice(0, 3);
+        const w3 = example ? pickWeDo(weDoPool, example, data, 3, exOthers) : rest.slice(0, 3);
         const k = w3.length >= 3 && fitsWidth(w3.slice(0, 3), 3) ? 3 : Math.min(2, w3.length);
         const set = w3.slice(0, k);
         const tc = k === 3 ? 3 : 2;

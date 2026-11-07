@@ -774,6 +774,13 @@ function buildPlan(ctx) {
                     ['--source', 'kit', '--roles', 'fact-probe', '--size', sz, '--lints', 'L-DENSITY', '--skills', factKeys.join(',')], { parse: PARSE.printLint }));
             }
         }
+        // facts-print-fix (owner, 2026-11-05): the simple print of the owner's fact set - Mixed up as interleaved fact rows at
+        // the In sections counts (MIXFACTS), a fallback that is exactly the In sections print (FALLBACK), drawn row rules of
+        // one weight (ROWRULES), the sign-to-number gap and the digits' room in the cell (SIGNGAP), footers in words (FOOTER)
+        if (factKeys.length) {
+            add(gate('simple-print-facts', 'ws-simple-print --facts-print (MIXFACTS, FALLBACK, ROWRULES, SIGNGAP, FOOTER on the owner fact set at S/M/L)', `${factKeys.join(', ')} × simple print × S/M/L`, 'browser', 'ws-simple-print',
+                ['--facts-print'], { needFlags: ['facts-print'] }));
+        }
         // Visual-quality critic r1 (root cause of F3 / F4): ws-grade-render MEASURED a lesson cell overflowing its pad and a
         // 41 x 44 px phone-card input, but no --skill gate failed on either (print-lint's L-OVERFLOW reads rectangles past the
         // cell edge, never content run into the pad; no screen gate measured target size). --gate makes those measurements a

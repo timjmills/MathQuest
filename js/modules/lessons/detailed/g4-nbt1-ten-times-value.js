@@ -46,9 +46,10 @@ export default {
     edgeTest: 'tenEdge',
     practicePages: 2,
     practiceSheets: [
-        { steps: true, skill: TEN({}, { allTest: 'tenNoOnes' }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['tenThouTenth'] } },
+        // (`nearLook`, R8 lf-checks LP-NUMBERS: no two look-alike numbers on a sheet - 92,163 and 92,715)
+        { steps: true, skill: TEN({}, { allTest: 'tenNoOnes', nearLook: true }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['tenThouTenth'] } },
         // Practice 2: the same steps, numbers to 99,999 (the one new thing: bigger numbers).
-        { steps: true, skill: TEN({ band: 99999 }, { allTest: 'tenMixed' }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['tenOnesTimes'] } },
+        { steps: true, skill: TEN({ band: 99999 }, { allTest: 'tenMixed', nearLook: true }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['tenOnesTimes'] } },
     ],
 
     vars: (q) => {

@@ -228,16 +228,19 @@ export function mountSample(frame, cat, sk, opts, index = 0) {
  * Draw a GIVEN generated question (not a seeded sample) as the same paper cell: the quiz
  * builder's question cards show the exact item the quiz holds.
  */
-export function mountQuestion(frame, q, sk) {
+export function mountQuestion(frame, q, sk, opts = {}) {
     if (!frame) return false;
     let s = { ok: false };
     try {
         if (q && (q.text || q.visual)) s = { ok: true, html: cellHTML(q, sk), text: plainText(q.text || '').slice(0, 160) };
     } catch (e) { s = { ok: false }; }
-    return mountBuilt(frame, s, 'this question', 'Question');
+    return mountBuilt(frame, s, 'this question', 'Question', opts);
 }
 
-function mountBuilt(frame, s, name, what = 'Sample question') {
+// opts (the pupil explorer's thumbnails, 2026-11-07): `fit: false` leaves the scaling to the caller, and `onSettled(cell)`
+// runs once the mono pass has let go (~0.9 s). Every teacher caller passes no opts and keeps the behaviour it had.
+function mountBuilt(frame, s, name, what = 'Sample question', opts = {}) {
+    const doFit = opts.fit !== false;
     frame.classList.remove('is-unavailable');
     if (!s.ok) {
         frame.classList.add('is-unavailable');
@@ -262,9 +265,13 @@ function mountBuilt(frame, s, name, what = 'Sample question') {
         monoCell(cell);
         // The mono pass re-reads the cell for ~0.7 s while styles settle; a static sample then
         // needs no observer.
-        setTimeout(() => { unmonoCell(cell); if (frame.isConnected) fit(frame); }, 900);
+        setTimeout(() => {
+            unmonoCell(cell);
+            if (frame.isConnected && doFit) fit(frame);
+            if (typeof opts.onSettled === 'function') { try { opts.onSettled(cell); } catch (e) { /* the caller's own */ } }
+        }, 900);
     } catch (e) { /* a preview never breaks the screen */ }
-    fit(frame);
+    if (doFit) fit(frame);
     return true;
 }
 

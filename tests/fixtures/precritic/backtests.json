@@ -1750,6 +1750,166 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "facts-print-fix",
+   "check": "the owner's fact set (+ − within 20, × ÷ 1-12, Pages 1, Auto) at S/M/L: Mixed up prints interleaved fact rows at the In sections counts (MIXFACTS), any fallback is exactly the In sections print (FALLBACK), fact-rows rules are drawn and one weight (ROWRULES), sign gap >= 0.3 em and digits >= 1.75 mm from the box (SIGNGAP), footers name skills in words (FOOTER) (owner 2026-11-05: Mixed up printed 20 problems on 2 pages; no row lines in the PDF; 3-digit dividends crowd the box)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print MIXFACTS / FALLBACK / ROWRULES / SIGNGAP / FOOTER",
+   "browser": true,
+   "fail": {
+    "commit": "18fbc70c2",
+    "state": "live: Mixed up fell back to the sparse 4-each plan; fact-rows rules were the ink seen through 0.75 pt gaps; the ÷ page at 10 columns had 1.55 mm clearance; a cross-category footer printed sub_facts"
+   },
+   "pass": {
+    "commit": "b84a624a8",
+    "state": "facts-print-fix: interleaved fact rows, fallback = In sections, drawn rules, ÷ Auto 9 at S, footers in words"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r2",
+   "check": "the owner's fact set at S/M/L, Pages 1 and Problems 50/130, both arrangements, Sets 2: printed signs per skill equal the dialog counts and are balanced within 1 on a page (COUNTS); Problems mode prints fact rows with the exact count, ÷ stacked alone at <= 9 columns, pages >= 60 % or even, no wide cell, S != L (PROBLEMS); page k of n reads k/n and names its own skills (FOOTER); a + − × page is titled by its operations (TITLE); the design standard never says ÷ reaches 10 columns (DIVMAX9 docs) (print critic 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print COUNTS / PROBLEMS / FOOTER / TITLE / DIVMAX9 docs",
+   "browser": true,
+   "fail": {
+    "commit": "c2c0fe24f",
+    "state": "S + − × page printed 24/23/9 while the chips said 23 for ×; Problems 50 printed each skill its own grid, ÷ across; footers 1/1; title Facts; standard said ÷ reaches 10"
+   },
+   "pass": {
+    "commit": "91bd40cbe",
+    "state": "facts-print-fix r2: balanced keepShares + printedSkills, Problems-mode fact rows, k/n footers per page, operation titles, docs at most 9"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r3",
+   "check": "the owner's fact set at S/M/L, Pages 1 and Problems 50/130, both arrangements, Columns Auto/5/9, Sets 2 and 3 (and three cases through the real dialog with Print pressed): every grid of every page of every set has the summary's columns and one digit size a group, per-skill totals equal the split of the request (SETPAGE); white under the grid in mm at most one row and the fewest pages with all groups planned together (FILL); Auto never above 9, 10 only when picked, never offered with division (AUTO9); PAGE_TYPES and the design standard never say division reaches 10 columns (DIVMAX9 docs) (print critic r3 2026-11-05, lowest 5)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print SETPAGE / FILL / AUTO9 / DIVMAX9 docs",
+   "browser": true,
+   "fail": {
+    "commit": "115302a69",
+    "state": "Problems 50 at S on 2 pages (72 + 169 mm white, ÷ alone); set 2 printed 10 columns beside set 1's 8; 35/32/31/32 at L for 33/33/32/32; 20 / 24 pt on pages of one print; Auto 10 at S; PT-FRW-9 said ÷ reaches 10"
+   },
+   "pass": {
+    "commit": "e023c34dc",
+    "state": "facts-print-fix r3: all groups planned together (÷ section shares the page), reach-based columns and digits, page-by-page counts, Auto 9, docs at most 9"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r4",
+   "check": "the owner's ÷ Mix page (seed 926447, Columns 9, Pages 1, S) and the ÷ Mix set at S/M/L in both arrangements, Problems 30/50/63/130 at S/M/L x Auto/5/9 x both arrangements, mult_facts alone at L: one baseline a row and centred items in a grid mixing forms (MIXBASE), one visible answer slot place (SLOTPOS), fraction '=' >= 0.25 em and centred (FRACEQ), bracket/fraction ink >= 2 mm from the border (CLEAR), brackets on the row geometry (BRKTRACK), rules counted on the pdfium raster (PDFIUM-RULES), footer names unbroken (FOOTWRAP), one section per ÷ form In sections (DIVSECTIONS), Size honoured with Mix (SIZEMIX), every page but the last within 8 mm and no row past 1.3 (FULLPAGE), one digit size a page (ONEDIGIT), one row height a section (ROWSAME) (print critic r4 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --r4 MIXBASE / SLOTPOS / FRACEQ / CLEAR / BRKTRACK / PDFIUM-RULES / FOOTWRAP / DIVSECTIONS / SIZEMIX / FULLPAGE / ONEDIGIT / ROWSAME",
+   "browser": true,
+   "fail": {
+    "commit": "7fab88a7e",
+    "state": "÷ Mix rows zig-zag 6.2 mm, slots in three places, '=' 0.15 em from the bar, brackets 0.98 mm from the border, footer 'Division Facts (1-' / '12)', In sections mixes the forms, Problems pages 50-105 mm white with 1.7 stretch, 20 / 24 pt on one page, rows 37.27 vs 36.38 mm"
+   },
+   "pass": {
+    "commit": "aa1377878",
+    "state": "facts-print-fix r4: one three-line frame for mixed forms, ÷ sections In sections, planFactRows (every page but the last full, <= 1.3), one digit size a page, frame in the grid height, nowrap footer names, background-clip seam fix"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --r4",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r5",
+   "check": "a sweep of the owner's fact set - Problems 20-150 by 5 x S/M/L x Columns Auto/5/9 x both arrangements, ÷ Mix In sections by 10, Pages 1 and 2 default and ÷ Mix (684 prints, built path): each skill within one row of its share in Pages mode or a note (SHARES), no empty cell before the last page (BLANKMID), ÷ never before + − × (DIVORDER), a title names one number only when the option fixes it (TITLEONE), the last page holds a full row or a note (ORPHAN), every page but the last filled (FULLPLAN), Columns 5 digits follow the Size (COLSIZE) (print critic r5 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --r5 SHARES / BLANKMID / DIVORDER / TITLEONE / ORPHAN / FULLPLAN / COLSIZE",
+   "browser": true,
+   "fail": {
+    "commit": "128455ad3",
+    "state": "÷ Mix In sections Pages 1 Big 2 / 2 / 1 / 15; the '÷ first' reorder left a 1-fact row and 4 empty cells on page 1; Problems 30 at M a 1-fact last page titled 'Divide by 6'; Columns 5 28 pt at S, M and L (BLANKMID 712, DIVORDER 172, ORPHAN 77, SHARES 45, FULLPLAN 43, TITLEONE 15, COLSIZE 1)"
+   },
+   "pass": {
+    "commit": "21304044e",
+    "state": "facts-print-fix r5: teacher's order kept, every section but the last in whole rows, Pages mode planned to the shares (one mixed ÷ section when needed), titles from the options, Size caps the digits with Columns picked"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --r5",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r6",
+   "check": "the MEASURED sweep (702 prints drawn print-emulated: ÷ Mix In sections Problems 10-60, the owner's set Problems 1-150 at Auto/7/9, Pages 1-3 at Columns Auto/6/7/9/10 on five skill lists, two-skill lists, Sets 2, and the real dialog at Big Columns 9): the total equals the request (TOTAL), each skill within one row of its share (SHARES), digits under the Size named in a note (SIZENOTE) and on the size button (SIZEBTN), measured white <= 8 mm beyond a full page on every page but the last and on the last in Pages mode (PAGESFULL), no empty cell mid-print, teacher's order, rows <= 1.3 (print critic r6 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --sweep TOTAL / SHARES / SIZENOTE / PAGESFULL / BLANKMID / DIVORDER / STRETCH / SIZEBTN",
+   "browser": true,
+   "fail": {
+    "commit": "1d4c97a5c",
+    "state": "÷ Mix In sections Problems 10 printed 26; Pages 2 last page 41.6 mm short beside 'every page is full'; Problems pages 16.8 mm short; Big / Medium digits dropped under a picked Columns with no note (TOTAL 59, SHARES 115, SIZENOTE 286, PAGESFULL 55)"
+   },
+   "pass": {
+    "commit": "bb4ca1fa9",
+    "state": "facts-print-fix r6: exact counts for groups under a row and merged ÷ forms in Problems mode, Pages mode fills the last page, per-page stretch where one height cannot fill all, size notes and buttons, bracket clearance"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r7",
+   "check": "the measured sweep with lists in the teacher's unusual orders (÷ +, ÷Mix −, ÷Mix × − +, − ÷Mix +; both arrangements, Problems and Pages) and every picked Columns: the sections print in the list's order (ORDER; DIVORDER no longer exempts a ÷-first list), a section printing other columns than picked says why and the dialog offers facts Columns 5 and up (COLNOTE), a bracket's ink 2 mm from its border in bracket and mixed sections (BRKCLEAR), notes plain - no internal codes, at most two sentences (NOTEPLAIN) (print critic r7 2026-11-07, lowest 5)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --sweep ORDER / COLNOTE / BRKCLEAR / NOTEPLAIN",
+   "browser": true,
+   "fail": {
+    "commit": "2bebf4f94",
+    "state": "÷ printed last whatever the list's order; Columns 1-4 printed 5 across silently; notes showed '(PT-FRW-5)' in 3-6 sentences (ORDER 84, NOTEPLAIN 272, COLNOTE 8)"
+   },
+   "pass": {
+    "commit": "313a81983",
+    "state": "facts-print-fix r7: groups in list order, Columns 5+ for facts with a note for a saved 1-4, one plain sentence a note"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r8",
+   "check": "the measured sweep with Sets 2/3 over ÷-first and ÷-between lists (÷Mix −, − ÷Mix +, ÷Mix × − +, owner ÷ Mix; Problems and Pages): every set prints set 1's per-skill counts (SETSKILLDIFF) and sections a page (SETSHAPE) and keeps the shares; the ÷ cells' printed ink, rasterised at 300 dpi, >= 2.0 mm from the cell rules at 9 columns, Small and Big (BRKINK) (print critic r8 2026-11-07, lowest 6)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --sweep SETSKILLDIFF / SETSHAPE / SHARES / BRKINK",
+   "browser": true,
+   "fail": {
+    "commit": "e0d7d1b09",
+    "state": "Sets 2 re-decided the ÷-form merge (÷ 15 against set 1's 20); the answer line printed 1.78 mm from the rule at Big, 9 columns (SETSHAPE 8, SETSKILLDIFF 6, SHARES 4, BRKINK 1)"
+   },
+   "pass": {
+    "commit": "cdaa80fc2",
+    "state": "facts-print-fix r8: sets reuse set 1's plan; the answer line and the mixed bracket room keep the printed ink >= 2.03 mm"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

@@ -4569,11 +4569,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // with no arrays when the known task is ticked; nothing else changes)
                     if (_opt('pictures') === false) _tSet = _tSet.filter(v => v === 1 || v === 2).length ? _tSet.filter(v => v === 1 || v === 2) : [2];
                     const type = _tTypes[_tSet[_dealRung(_tSet.length, 'turn')]];
-                    const _band = Number(_opt('band')) === 81 ? 9 : 5;
+                    // (band 36 - owner ruling 2026-11-07, lesson 3a: pictured arrays up to 6 x 6)
+                    const _band = Number(_opt('band')) === 81 ? 9 : Number(_opt('band')) === 36 ? 6 : 5;
                     // (pictures off on a 'known' item, lesson 3a exit a: no arrays - the fact turned
                     // from the fact alone - takes the abstract task's factors)
                     const _noDraw = type === 'known' && _opt('pictures') === false;
-                    const hi = type === 'missing' || _noDraw ? _band : 5;
+                    const hi = type === 'missing' || _noDraw ? _band : Math.min(_band, 6);
                     let a = rng(2, hi), b = rng(2, hi);
                     // A square turns into itself: one item in five at most, the ★★★ edge case.
                     if (a === b && rng(1, 5) > 1) b = b === hi ? b - 1 : b + 1;
