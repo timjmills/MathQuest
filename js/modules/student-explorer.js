@@ -397,18 +397,34 @@ function scheduleThumb(card, byFocus) {
     th.timer = setTimeout(() => { th.timer = 0; showThumb(card, byFocus); }, delay);
 }
 
-// ---- critic r1 (2026-11-07): legible or nothing. The plate is as large as the room beside the card allows (up to
-// 480 x 400 where the window has the room); the drawing is tidied for pupils (no CCSS code, no Hint / Check buttons, no second
-// copy of the question, no extra answer line), fitted by its real painted box (so nothing is cut off), and then judged:
-// a drawing whose question line would render under 14 px, any text under 10 px, or a scale under 0.6 is not shown;
-// the plate shows the question in large print instead.
-// L is taller than the brief's 480 x 320 (W): with the height, 613 of 716 skills draw legibly instead of 561 (critic r1 D1).
-const SIZES = { L: { w: 480, h: 400 }, W: { w: 480, h: 320 }, M: { w: 400, h: 260 }, S: { w: 340, h: 210 } };
+// ---- critic r1 / r2 (2026-11-07): a picture whenever the skill has one, and never text a pupil cannot read.
+// The plate is as large as the room beside (or above / below) the card allows. The drawing is tidied for pupils (no CCSS
+// code, no Hint / Check buttons, no screen-only wording, no second copy of the question, no extra answer line) and then:
+//   1. 'cell'  the whole drawing, fitted by its real painted box, when the question line renders >= 14 px, the scale is
+//              >= 0.6 and every text renders >= 10 px (the practice card draws a number line's ticks at 17-24 px, so a
+//              plate showing them at 9.6 px would be smaller than the card: measured, r2 PARITY);
+//   2. 'crop'  otherwise, when the item has a figure: the question line over a window on the figure, scaled (up to
+//              CROP_MAX, so a tick label drawn at 7 px reaches 10 px) until every text is legible, the figure's start
+//              shown and the cut edges faded — never words alone for a skill whose task needs its picture;
+//   3. 'text'  only for an item with no figure at all: its question in large print.
+// L is taller than the brief's 480 x 320 (W): with the height, 613 of 716 skills draw whole (critic r1 D1). B (480 x 228)
+// fits above or below a card in the middle column of a 1024 x 768 grid, where no wide plate fits beside it (r2 fix 4).
+const SIZES = { L: { w: 480, h: 400 }, W: { w: 480, h: 320 }, B: { w: 480, h: 228 }, M: { w: 400, h: 260 }, S: { w: 340, h: 210 } };
 const CAP_H = 76;                 // plate padding + gap + a two-line caption
-const LEGIBLE = { q: 14.1, min: 10.1, scale: 0.605 };   // a hair over the gate's 14 / 10 / 0.6
+const LEGIBLE = { q: 14.1, min: 10.05, scale: 0.605 };   // a hair over the gate's 14 / 10 / 0.6
+const CROP_MAX = 3;               // a crop may draw a figure up to this much larger than its own layout
 const CONTROL_RE = /\b(hint|check|submit|reset|clear|undo|try again|show me|listen|read aloud|speak|zoom)\b|🔊/i;
+// screen-only or colour wording (critic r2 R2-D2): the clause goes, the rest of the sentence stays
+const SCREEN_WORDS = [
+    /\s*[—–-]\s*both cells turn green when a pair is correct\.?/gi,
+    /\s*\(harder: green cells are blank\)/gi,
+    /\s*After each number, press Space\.?/gi,
+    /\s*[^.!?]*\b(turns? green|press (Space|Enter)|green cells?)\b[^.!?]*[.!?]?/gi,
+];
+const screenClean = (t) => SCREEN_WORDS.reduce((acc, re) => acc.replace(re, ''), String(t || '')).replace(/\s+([.,!?])/g, '$1').replace(/\s{2,}/g, ' ');
 const normText = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
 const isVisible = (n) => (typeof n.checkVisibility === 'function' ? n.checkVisibility({ visibilityProperty: true }) : n.offsetParent !== null);
+const FIGURE_SEL = 'svg, img, canvas, table, .k2-twin, [data-mq-blank], [data-mq-cell], .ws-fact, .ws-stack, .ws-eq';
 
 /** Hide what is not for a pupil's first look: teacher codes, screen controls, a repeated question, the answer row. */
 function tidyThumb(frame) {
@@ -417,6 +433,13 @@ function tidyThumb(frame) {
     for (const n of cell.querySelectorAll('*')) {
         const own = [...n.childNodes].filter((c) => c.nodeType === 3).map((c) => c.textContent).join(' ').trim();
         if (own && /^CCSS\b/.test(own)) n.style.display = 'none';   // "CCSS: 5.MD.B.2 | Line Plot" (gen-data-stats) is teacher text
+        if (own && /^Drag the ruler\b/i.test(own)) n.style.display = 'none';   // a widget's label, not the question (r2 R2-D2)
+    }
+    // screen-only or colour wording inside the drawing's text (r2 R2-D2)
+    const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+    for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+        const v = t.textContent;
+        if (v && /green|press (Space|Enter)/i.test(v)) t.textContent = screenClean(v);
     }
     for (const b of cell.querySelectorAll('button, [role="button"]')) {
         if (CONTROL_RE.test(`${b.textContent || ''} ${b.getAttribute('aria-label') || ''} ${b.className && b.className.baseVal == null ? b.className : ''}`)) b.style.display = 'none';
@@ -444,81 +467,217 @@ function tidyThumb(frame) {
     }
 }
 
-/** Scale the drawing to fit the frame by everything it paints (an overhanging child included); returns the scale. */
-function fitStage(frame) {
-    const stage = frame.querySelector(':scope > .tvp-stage');
-    if (!stage) return 1;
+/** The painted box of `root` and everything in it (an overhanging child included), at the root's current transform. */
+function paintedBox(root) {
+    const sr = root.getBoundingClientRect();
+    let x0 = sr.left, y0 = sr.top, x1 = sr.right, y1 = sr.bottom;
+    const add = (b) => {
+        if (b.width < 0.5 || b.height < 0.5) return;
+        x0 = Math.min(x0, b.left); y0 = Math.min(y0, b.top); x1 = Math.max(x1, b.right); y1 = Math.max(y1, b.bottom);
+    };
+    for (const n of root.querySelectorAll('*')) {
+        if (n.ownerSVGElement) continue;                 // inside a picture: its svg's content box below covers it
+        add(n.getBoundingClientRect());
+        if (n.tagName.toLowerCase() === 'svg') {
+            // what the picture paints, overflowing labels included: its content box, mapped to the screen
+            try {
+                const bb = n.getBBox();
+                const m = n.getScreenCTM();
+                if (m && bb.width + bb.height > 0) {
+                    const pts = [[bb.x, bb.y], [bb.x + bb.width, bb.y], [bb.x, bb.y + bb.height], [bb.x + bb.width, bb.y + bb.height]]
+                        .map(([x, y]) => new DOMPoint(x, y).matrixTransform(m));
+                    const xs = pts.map((q) => q.x), ys = pts.map((q) => q.y);
+                    add({ left: Math.min(...xs), top: Math.min(...ys), right: Math.max(...xs), bottom: Math.max(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) });
+                }
+            } catch (e) { /* an svg that cannot be measured counts by its own box */ }
+        }
+    }
+    // a word that is a bare text node in an overflowing row ("Start" before a time box) paints outside every element box
+    const range = document.createRange();
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+        const pe = t.parentElement;
+        if (!pe || pe.ownerSVGElement || pe.tagName.toLowerCase() === 'svg' || !t.textContent.trim() || !isVisible(pe)) continue;
+        range.selectNodeContents(t);
+        add(range.getBoundingClientRect());
+    }
+    return { x0, y0, x1, y1, w: Math.max(1, x1 - x0), h: Math.max(1, y1 - y0), sr };
+}
+
+function resetStage(stage) {
     stage.style.left = '0px';
     stage.style.top = '0px';
     stage.style.transformOrigin = '0 0';
     stage.style.transform = 'none';
-    const sr = stage.getBoundingClientRect();
-    let x0 = sr.left, y0 = sr.top, x1 = sr.right, y1 = sr.bottom;
-    for (const n of stage.querySelectorAll('*')) {
-        const b = n.getBoundingClientRect();
-        if (b.width < 0.5 || b.height < 0.5) continue;
-        x0 = Math.min(x0, b.left); y0 = Math.min(y0, b.top); x1 = Math.max(x1, b.right); y1 = Math.max(y1, b.bottom);
-    }
-    const W = Math.max(1, x1 - x0), H = Math.max(1, y1 - y0);
-    const fw = frame.clientWidth, fh = frame.clientHeight;
-    const s = Math.min(1, (fw - 12) / W, (fh - 12) / H);
-    const tx = (fw - W * s) / 2 - (x0 - sr.left) * s;
-    const ty = (fh - H * s) / 2 - (y0 - sr.top) * s;
-    stage.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${s.toFixed(4)})`;
-    frame.dataset.scale = s.toFixed(3);
-    return s;
 }
 
-/** Rendered text sizes in the frame: { q: the question line, min: the smallest text } in px. */
-function textSizes(frame) {
-    const pxOf = (n, cs) => {
-        const fs = parseFloat(cs.fontSize) || 0;
-        if (n instanceof SVGElement) {
-            const svg = n.ownerSVGElement;
-            if (!svg) return fs;
-            const sb = svg.getBoundingClientRect();
-            const vb = svg.viewBox && svg.viewBox.baseVal;
-            const w = vb && vb.width ? vb.width : (svg.width && svg.width.baseVal && svg.width.baseVal.value) || sb.width;
-            const h = vb && vb.height ? vb.height : (svg.height && svg.height.baseVal && svg.height.baseVal.value) || sb.height;
-            return fs * Math.min(sb.width / (w || 1), sb.height / (h || 1));
-        }
-        const b = n.getBoundingClientRect();
-        return fs * (n.offsetWidth > 0 ? b.width / n.offsetWidth : 1);
-    };
-    let q = null, min = Infinity;
-    for (const n of frame.querySelectorAll('*')) {
+/** Every visible text in `root` with its rendered px: [{ n, px, q }] (q: it is the question line). */
+function textList(root) {
+    const out = [];
+    for (const n of root.querySelectorAll('*')) {
         const tag = n.tagName.toLowerCase();
         if (n.closest('svg') && tag !== 'text' && tag !== 'tspan') continue;
         if (![...n.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim())) continue;
         if (!isVisible(n)) continue;
         const b = n.getBoundingClientRect();
         if (!b.width || !b.height) continue;
-        const px = pxOf(n, getComputedStyle(n));
-        if (q == null) q = px;                     // the first text the pupil reads
-        if (n.closest('.tvp-q, .tvp-instr')) q = Math.min(q, px) === px ? px : q;
-        min = Math.min(min, px);
+        const fs = parseFloat(getComputedStyle(n).fontSize) || 0;
+        let px;
+        if (n instanceof SVGElement) {
+            const svg = n.ownerSVGElement;
+            if (!svg) px = fs;
+            else {
+                const sb = svg.getBoundingClientRect();
+                const vb = svg.viewBox && svg.viewBox.baseVal;
+                const w = vb && vb.width ? vb.width : (svg.width && svg.width.baseVal && svg.width.baseVal.value) || sb.width;
+                const h = vb && vb.height ? vb.height : (svg.height && svg.height.baseVal && svg.height.baseVal.value) || sb.height;
+                px = fs * Math.min(sb.width / (w || 1), sb.height / (h || 1));
+            }
+        } else px = fs * (n.offsetWidth > 0 ? b.width / n.offsetWidth : 1);
+        out.push({ n, px, q: !!n.closest('.tvp-q, .tvp-instr, .mqx-thumb-crophead') });
     }
-    return { q: q == null ? Infinity : q, min };
+    return out;
 }
 
-function legible(frame, scale) {
-    const t = textSizes(frame);
-    const ok = scale >= LEGIBLE.scale && t.q >= LEGIBLE.q && t.min >= LEGIBLE.min;
-    // why a drawing was (not) shown, for the sweep's notes: scale / question line px / smallest text px
-    if (frame.parentElement) frame.parentElement.dataset.judge = `${scale.toFixed(2)} ${t.q === Infinity ? '-' : t.q.toFixed(1)} ${t.min === Infinity ? '-' : t.min.toFixed(1)}`;
-    return ok;
+/** The smallest scale at which every text renders >= 10 px and the question line >= 14 px (may be over 1). */
+function minLegibleScale(list, s) {
+    let need = LEGIBLE.scale;
+    for (const t of list) {
+        const nat = t.px / (s || 1);                 // its size with the drawing at scale 1
+        if (!(nat > 0)) continue;
+        need = Math.max(need, LEGIBLE.min / nat);
+        if (t.q) need = Math.max(need, LEGIBLE.q / nat);
+    }
+    return need;
 }
 
-/** The large-print fallback: the question itself (never the answer), as big as fits, 16 px at the least. */
+/** Does the drawing hold a figure (a picture, a model, boxes to fill), or only words? */
+function hasFigure(frame, q) {
+    const vis = String((q && q.visual) || '');
+    // any drawing on the practice card counts (a T-chart, a tile row drawn in boxes): the pupil sees it there
+    if (/<(svg|img|canvas|table)\b/i.test(vis) || vis.replace(/<[^>]*>/g, ' ').trim()) return true;
+    const stage = frame.querySelector('.tvp-stage');
+    return !!(stage && [...stage.querySelectorAll(FIGURE_SEL)].some((n) => isVisible(n) && n.getBoundingClientRect().width > 8));
+}
+
+/** The figure a crop centres on: the largest picture / model in the stage. */
+function mainFigure(stage) {
+    let best = null, area = 0;
+    for (const n of stage.querySelectorAll(FIGURE_SEL)) {
+        if (!isVisible(n) || n.closest('.tvp-q, .tvp-instr')) continue;
+        const b = n.getBoundingClientRect();
+        const a = b.width * b.height;
+        if (a > area) { area = a; best = n; }
+    }
+    return best;
+}
+
+/**
+ * The crop (r2 fix 2): the question line, in large type, over a window on the main figure, at the smallest scale (>= 0.6,
+ * <= CROP_MAX) at which the figure's own labels render >= 10 px. The window shows the whole drawing when it fits, else the
+ * whole figure, else the figure from its top-left (where a row, a grid or an axis begins), and fades the edges it cuts.
+ * Returns false when no crop can be made.
+ */
+function cropStage(frame, s, q) {
+    const stage = frame.querySelector('.tvp-stage');
+    if (!stage) return false;
+    let head = frame.querySelector(':scope > .mqx-thumb-crophead');
+    let win = frame.querySelector(':scope > .mqx-thumb-window');
+    if (!head) {
+        const line = [...stage.querySelectorAll('.tvp-q, .tvp-instr')].find((n) => isVisible(n));
+        const said = screenClean(line ? line.textContent : questionText(q)).replace(/\s+/g, ' ').trim();
+        for (const n of stage.querySelectorAll('.tvp-q, .tvp-instr')) n.style.display = 'none';
+        // the head says the question: a line of the drawing that restates it ("Tap ALL the quadrilaterals." under
+        // "Click ALL the quadrilaterals.") goes, so the window shows the figure (NODUP)
+        if (said) {
+            const have = new Set(normText(said).split(' '));
+            for (const n of stage.querySelectorAll('*')) {
+                if (n.closest('svg') || !isVisible(n)) continue;
+                const own = [...n.childNodes].filter((c) => c.nodeType === 3).map((c) => c.textContent).join(' ');
+                const words = normText(own).split(' ').filter((w) => w.length > 1);
+                if (words.length >= 3 && words.filter((w) => have.has(w)).length / words.length >= 0.75) n.style.display = 'none';
+            }
+        }
+        head = document.createElement('p');
+        head.className = 'mqx-thumb-crophead';
+        head.textContent = said || s.label;
+        win = document.createElement('div');
+        win.className = 'mqx-thumb-window';
+        frame.insertBefore(head, stage);
+        frame.appendChild(win);
+        win.appendChild(stage);
+        frame.classList.add('mqx-thumb-cropframe');
+    }
+    // the question line: 20 px, down to 16 px to keep it to four lines and under 40 % of the frame
+    let hs = 20;
+    head.style.fontSize = `${hs}px`;
+    while (hs > 16 && head.offsetHeight > Math.max(60, frame.clientHeight * 0.4)) { hs -= 1; head.style.fontSize = `${hs}px`; }
+    const top = head.offsetTop + head.offsetHeight + 6;
+    win.style.top = `${top}px`;
+    const ww = win.clientWidth, wh = win.clientHeight;
+    if (wh < 40) return false;
+    resetStage(stage);
+    for (const n of stage.querySelectorAll('[data-mqx-cropped]')) { n.style.visibility = ''; n.removeAttribute('data-mqx-cropped'); }
+    const list = textList(stage);
+    const fig = mainFigure(stage) || stage;
+    const all = paintedBox(stage);
+    const fb = fig === stage ? all : (() => { const b = fig.getBoundingClientRect(); return { x0: b.left, y0: b.top, w: b.width, h: b.height }; })();
+    // the scale is set by the FIGURE's own labels (a tick, an axis number), not by a stray caption elsewhere: one 4 px
+    // note no longer zooms the whole drawing three times over and leaves the window on a fragment (r2 S plates)
+    const inFig = (t) => fig === stage || fig.contains(t.n) || (t.n.ownerSVGElement && fig.contains(t.n.ownerSVGElement));
+    const figTexts = list.filter(inFig);
+    const need = minLegibleScale(figTexts.length ? figTexts : list, 1);
+    const fit = Math.min(1, (ww - 12) / fb.w, (wh - 12) / fb.h);
+    const sc = Math.min(CROP_MAX, Math.max(need, fit));
+    const ox = all.sr.left, oy = all.sr.top;
+    const fx = (fb.x0 - ox) * sc, fy = (fb.y0 - oy) * sc, fW = fb.w * sc, fH = fb.h * sc;
+    const aW = all.w * sc, aH = all.h * sc, ax = (all.x0 - ox) * sc, ay = (all.y0 - oy) * sc;
+    // across: the whole drawing centred when it fits; else the figure whole with as much to its left as fits; else from the figure's left
+    // edge (where a row, a time line or an axis starts; the cut falls on the right, faded)
+    let tx;
+    if (aW <= ww - 12) tx = (ww - aW) / 2 - ax;
+    else if (fW <= ww - 12) tx = Math.min(6 - ax, ww - 6 - (fx + fW));   // the figure whole, read from the left ("Start 6:45 …")
+    else tx = 6 - fx;
+    // down: the whole drawing centred when it fits; else from the figure's top, so the window shows the picture
+    let ty;
+    if (aH <= wh - 12) ty = (wh - aH) / 2 - ay;
+    else if (fH <= wh - 12) ty = Math.min(6 - ay, Math.max(wh - 6 - (ay + aH), (wh - fH) / 2 - fy));   // the figure whole, as much around it as fits
+    else ty = 6 - fy;
+    stage.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${sc.toFixed(4)})`;
+    frame.dataset.scale = sc.toFixed(3);
+    const wr = win.getBoundingClientRect();
+    // words the window cuts across, or that stay too small to read at this scale, are left out (a half word, "2/4 o",
+    // or a 6 px caption, is no help); the figure's own labels are what the scale was chosen for
+    for (const t of list) {
+        const b = t.n.getBoundingClientRect();
+        if (b.bottom <= wr.top || b.top >= wr.bottom || b.right <= wr.left || b.left >= wr.right) continue;
+        const px = t.px * sc;
+        const cutV = b.top < wr.top - 1 || b.bottom > wr.bottom + 1;
+        const cutH = (b.left < wr.left - 1 || b.right > wr.right + 1) && b.width < ww * 0.9;
+        if (px < LEGIBLE.min - 0.05 || ((cutV || cutH) && !inFig(t))) {
+            t.n.style.visibility = 'hidden';
+            t.n.setAttribute('data-mqx-cropped', '');
+        }
+    }
+    // fade the edges the window cuts
+    const p = paintedBox(stage);
+    win.classList.toggle('is-cut-r', p.x1 > wr.right + 1);
+    win.classList.toggle('is-cut-b', p.y1 > wr.bottom + 1);
+    win.classList.toggle('is-cut-l', p.x0 < wr.left - 1);
+    if (frame.parentElement) frame.parentElement.dataset.judge = `crop ${sc.toFixed(2)} need ${need.toFixed(2)} head ${hs}`;
+    return true;
+}
+
+/** The large-print plate, for an item with no figure: the question itself (never the answer), 16 px at the least. */
 function textPlate(frame, s, q) {
     // a question that ends on a colon pointed at its picture; the plate shows the words alone, so it ends as a sentence
-    const full = (questionText(q) || exampleFor(s)).replace(/\s*:\s*$/, '.');
+    const full = screenClean(questionText(q) || exampleFor(s)).replace(/\s*:\s*$/, '.').trim();
     frame.className = 'mqx-thumb-frame mqx-thumb-textframe';
     frame.removeAttribute('role');
     frame.removeAttribute('aria-label');
     frame.innerHTML = `<p class="mqx-thumb-text"></p>`;
     const p = frame.firstChild;
-    let words = (full || 'A sample is not ready for this skill yet.').split(' ');
+    let words = (full || s.label).split(' ');
     let size = 26;
     p.textContent = words.join(' ');
     const over = () => frame.scrollHeight > frame.clientHeight + 1 || frame.scrollWidth > frame.clientWidth + 1;
@@ -527,14 +686,42 @@ function textPlate(frame, s, q) {
     while (over() && words.length > 4) { words = words.slice(0, -1); p.textContent = `${words.join(' ')} …`; }
 }
 
+/** Lay a mounted drawing out as a whole cell, or a crop, or (no figure) words; returns the mode. */
+function layoutPlate(frame, s, q) {
+    const stage = frame.querySelector('.tvp-stage');
+    if (!stage) return 'text';
+    if (!frame.classList.contains('mqx-thumb-cropframe')) {
+        // measured once, at scale 1: the scale that fits and the scale every text needs come from the same layout
+        resetStage(stage);
+        const box = paintedBox(stage);
+        const texts = textList(stage);
+        if (!texts.some((t) => t.q) && texts.length) texts[0].q = true;   // no question line: the first text the pupil reads
+        const fw = frame.clientWidth, fh = frame.clientHeight;
+        const sc = Math.min(1, (fw - 12) / box.w, (fh - 12) / box.h);
+        const need = minLegibleScale(texts, 1);
+        if (frame.parentElement) frame.parentElement.dataset.judge = `${sc.toFixed(2)} need ${need.toFixed(2)}`;
+        if (sc >= need - 1e-3) {
+            const tx = (fw - box.w * sc) / 2 - (box.x0 - box.sr.left) * sc;
+            const ty = (fh - box.h * sc) / 2 - (box.y0 - box.sr.top) * sc;
+            stage.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${sc.toFixed(4)})`;
+            frame.dataset.scale = sc.toFixed(3);
+            return 'cell';
+        }
+        if (!hasFigure(frame, q)) { textPlate(frame, s, q); return 'text'; }
+    }
+    if (cropStage(frame, s, q)) return 'crop';
+    textPlate(frame, s, q);
+    return 'text';
+}
+
 /**
- * Fill a plate (`el`, a .mqx-thumb) for skill `s` at size `size`. Resolves to 'cell' or 'text'. `onSettled(mode)` runs
- * once the drawing has settled (refit, judged again): a drawing that grew past legible then turns into the text plate.
+ * Fill a plate (`el`, a .mqx-thumb) for skill `s` at size `size`. Returns 'cell', 'crop' or 'text'. `onSettled(mode)`
+ * runs once the drawing has settled (the mono pass let go; laid out again, so late fonts or images are allowed for).
  */
 function fillPlate(el, s, size, mod, onSettled) {
     const data = sampleOf(s);
     const z = SIZES[size] || SIZES.S;
-    el.classList.remove('mqx-thumb--L', 'mqx-thumb--W', 'mqx-thumb--M', 'mqx-thumb--S');
+    el.classList.remove('mqx-thumb--L', 'mqx-thumb--W', 'mqx-thumb--B', 'mqx-thumb--M', 'mqx-thumb--S');
     el.classList.add(`mqx-thumb--${size}`);
     el.style.setProperty('--mqx-thumb-w', `${z.w}px`);
     el.style.setProperty('--mqx-thumb-h', `${z.h}px`);
@@ -544,22 +731,22 @@ function fillPlate(el, s, size, mod, onSettled) {
     let mode = 'text';
     const drawable = mod && data.q && !data.err && data.ms <= THUMB_SLOW_MS;
     const settle = () => {
-        if (!frame.isConnected || el.dataset.mode !== 'cell' || !frame.querySelector('.tvp-stage')) { if (onSettled) onSettled(el.dataset.mode); return; }
-        const sc = fitStage(frame);
-        if (!legible(frame, sc)) { textPlate(frame, s, data.q); el.dataset.mode = 'text'; }
+        if (frame.isConnected && (el.dataset.mode === 'cell' || el.dataset.mode === 'crop') && frame.querySelector('.tvp-stage')) {
+            el.dataset.mode = layoutPlate(frame, s, data.q);
+        }
         if (onSettled) onSettled(el.dataset.mode);
     };
     if (drawable) {
-        try { if (mod.mountQuestion(frame, data.q, s.skillId, { fit: false, onSettled: settle })) mode = 'cell'; } catch (e) { mode = 'text'; }
+        let mounted = false;
+        try { mounted = !!mod.mountQuestion(frame, data.q, s.skillId, { fit: false, onSettled: settle }); } catch (e) { mounted = false; }
         // a cell that drew nothing readable (no text, no drawing) is no picture of the skill
-        if (mode === 'cell' && !frame.querySelector('.tvp-cell svg, .tvp-cell img, .tvp-cell canvas') && !(frame.querySelector('.tvp-cell') || {}).textContent) mode = 'text';
-        if (mode === 'cell') {
+        if (mounted && !frame.querySelector('.tvp-cell svg, .tvp-cell img, .tvp-cell canvas') && !(frame.querySelector('.tvp-cell') || {}).textContent) mounted = false;
+        if (mounted) {
             tidyThumb(frame);
-            const sc = fitStage(frame);
-            if (!legible(frame, sc)) mode = 'text';
+            mode = layoutPlate(frame, s, data.q);
         }
     }
-    if (mode === 'text') textPlate(frame, s, data.q);
+    if (mode === 'text' && !frame.classList.contains('mqx-thumb-textframe')) textPlate(frame, s, data.q);
     el.dataset.mode = mode;
     if (mode === 'text' && onSettled) setTimeout(() => onSettled('text'), 0);
     return mode;
@@ -599,7 +786,7 @@ function placement(card, pw, ph) {
  */
 function sizeFor(card) {
     const vw = document.documentElement.clientWidth || window.innerWidth;
-    const order = ['L', 'W', 'M', 'S'];
+    const order = ['L', 'W', 'B', 'M', 'S'];
     for (const k of order) {
         const z = SIZES[k];
         if (z.w > vw - 16) continue;

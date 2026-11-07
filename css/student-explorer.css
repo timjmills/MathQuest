@@ -103,7 +103,7 @@ html.mqx-open, html.mqx-open body { overflow: hidden; }
    line under it in the thumbnail: one place to answer, as on the practice card. */
 .mqx-thumb .tvp-visual:has([data-mq-blank], [data-mq-cell], [data-ws-slot], .mq-cellbox, .mq-kblank, input, select) ~ .tvp-answerrow { display: none; }
 /* Hover thumbnails, critic r1 (2026-11-07): the plate takes the size the room beside the card allows (student-explorer.js
-   sizeFor: L 480 x 400, W 480 x 320, M 400 x 260, S 340 x 210, the largest that sits clean beside the card). The drawing may lay out as wide as its frame; the
+   sizeFor: L 480 x 400, W 480 x 320, B 480 x 228, M 400 x 260, S 340 x 210, the largest that sits clean beside the card). The drawing may lay out as wide as its frame; the
    question line is set at the practice card's size; the module scales by the painted box and judges legibility. */
 .mqx-thumb { width: var(--mqx-thumb-w, 340px); }
 .mqx-thumb .mqx-thumb-frame { height: var(--mqx-thumb-h, 210px); }
@@ -111,3 +111,14 @@ html.mqx-open, html.mqx-open body { overflow: hidden; }
 .mqx-thumb .mq-scell.mq-grid-cell { --mq-text: 22px; }
 .mqx-thumb .tvp-stage .tvp-instr, .mqx-thumb .tvp-stage .tvp-q { max-width: calc(var(--mqx-thumb-w, 340px) - 40px); }
 .mqx-thumb .mqx-thumb-text { font-size: 26px; }
+/* Hover thumbnails, critic r2 (2026-11-07): the CROP plate. The question line sits on top in the practice card's type; under
+   it a window shows the figure at a legible scale, starting where a row, grid or axis begins, with the edges it cuts faded
+   so the pupil sees there is more. Additive. */
+.mqx-thumb .mqx-thumb-crophead { position: absolute; left: 12px; right: 12px; top: 8px; margin: 0; font-family: 'Andika', var(--font-body, sans-serif); font-size: 20px; line-height: 1.3; font-weight: 400; color: #000; text-align: center; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.mqx-thumb .mqx-thumb-window { position: absolute; left: 0; right: 0; bottom: 0; overflow: hidden; }
+.mqx-thumb .mqx-thumb-window::before, .mqx-thumb .mqx-thumb-window::after { content: ''; position: absolute; z-index: 2; pointer-events: none; opacity: 0; }
+.mqx-thumb .mqx-thumb-window.is-cut-r::after { opacity: 1; top: 0; bottom: 0; right: 0; width: 44px; background: linear-gradient(to right, rgba(255, 255, 255, 0), #fff); }
+.mqx-thumb .mqx-thumb-window.is-cut-b::before { opacity: 1; left: 0; right: 0; bottom: 0; height: 36px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff); }
+/* The plate lays out on its own (its frame has a fixed size): measuring and fitting a drawing never re-lays-out the page. */
+.mqx-thumb { contain: layout style; }
+.mqx-thumb .mqx-thumb-frame { contain: strict; }

@@ -66,7 +66,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // a card name split into head + tail (check r3 R1) reads the same words as the full name: compare the words only
 const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replace(/\s+/g, ' ').trim();
 
-const { installThumbMeasure, thumbFaults } = require('../lib/ws-thumb-measure.cjs');
+const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-measure.cjs');
 
 (async () => {
     const app = await open({ seed: 7, viewport: { width: 1366, height: 900, deviceScaleFactor: 1 } });
@@ -892,7 +892,7 @@ const { installThumbMeasure, thumbFaults } = require('../lib/ws-thumb-measure.cj
                 let pr;
                 try { pr = await probe(key); } catch (e) { pr = { err: String(e && e.message || e) }; }
                 if (!pr || typeof pr.err === 'string') { bad.push(`${key} threw: ${pr && pr.err}`); continue; }
-                if (pr.mode === 'cell') { tally.cell++; if (!pr.cell) bad.push(`${key} cell mode without a .ws-cell`); } else if (pr.mode === 'text') tally.text++; else bad.push(`${key} drew nothing (${pr.mode})`);
+                if (pr.mode === 'cell' || pr.mode === 'crop') { tally[pr.mode] = (tally[pr.mode] || 0) + 1; if (!pr.cell) bad.push(`${key} ${pr.mode} mode without a .ws-cell`); } else if (pr.mode === 'text') tally.text++; else bad.push(`${key} drew nothing (${pr.mode})`);
                 if (pr.err) tally.err++;
                 if (pr.ms > 50) tally.slow++;
                 if (pr.filled) bad.push(`${key} ${pr.filled} answer boxes filled`);
@@ -903,22 +903,41 @@ const { installThumbMeasure, thumbFaults } = require('../lib/ws-thumb-measure.cj
             if (keys.length < 700) F(`THUMB sweep reached only ${keys.length} skills`);
             if (bad.length) F(`THUMB sweep ${bad.length} of ${keys.length} skills fail: ${bad.slice(0, 6).join(' | ')}`);
             for (const b of bad.slice(6, 40)) console.error(`    THUMB sweep: ${b}`);
-            console.log(`  THUMB sweep: ${keys.length} skills — ${tally.cell} cells, ${tally.text} text (${tally.slow} slow, ${tally.err} generator errors)`);
+            console.log(`  THUMB sweep: ${keys.length} skills — ${tally.cell} cells, ${tally.crop || 0} crops, ${tally.text} text (${tally.slow} slow, ${tally.err} generator errors)`);
 
             if (process.env.MQX_TRACE) console.log('step', '// THUMB legible (hard set, real hover)');
-            // THUMB legibility (critic r1 D1-D6). Measured on what a pupil sees after the thumbnail settles:
-            //   TEXTSIZE  the question line renders >= 14 px and no visible text renders under 10 px
-            //   SCALE     a drawn cell is scaled >= 0.6 (a smaller one takes the large-print fallback)
-            //   INFRAME   every visible part of the drawing stays inside the frame after the refit (nothing cut off)
+            // THUMB legibility (critic r1 D1-D6, r2 R2-D1). Measured on what a pupil sees after the thumbnail settles
+            // (tests/lib/ws-thumb-measure.cjs):
+            //   TEXTSIZE  the question line renders >= 14 px
+            //   PARITY    a text renders under 10 px only where the skill's own practice card (1366) shows it that small,
+            //             and never smaller than there (r2: an axis tick the card shows at 7 px may stay 7 px)
+            //   SCALE     a drawn cell or crop is scaled >= 0.6
+            //   INFRAME   a fitted cell paints nothing outside the frame; a crop keeps its question line whole and a figure
+            //             in its window
             //   NODUP     the question is not shown twice (normalised text compare, so a story split over lines counts)
             //   NOTEACHER no "CCSS:" code, no Hint / Check button, no screen-only control
             //   NOEXTRA   no extra answer line under an item that already has its own blank ("___", "= ?", a box)
-            // First a REAL HOVER on the skills the critic found worst (this half runs on any build, so it fails on edd6b298b),
-            // then every live skill at the large (480 x 320) and the small (340 x 210) plate.
-            await page.evaluate(installThumbMeasure);
+            //   NOPICLESS a skill whose question needs its drawing (a practice-card visual, or words that point at a picture)
+            //             is never words-only at the L, W, B or M plates, and words-only text never points at a picture
+            //   WORDSONLY the count of words-only plates per size stays under its ceiling (WORDS_CEILING, below)
+            // First a REAL HOVER on the skills the critics found worst (this half runs on any build), then every live skill
+            // at every plate size. 1024 x 768: the middle grid column gets an L, W or B plate, never S (r2 fix 4).
+            await page.evaluate(installThumbMeasure, POINTING.source);
+            const cardCache = new Map();
+            const cardSizes = async (key) => {
+                if (!cardCache.has(key)) {
+                    const sizes = await page.evaluate((k) => window.__mqxCardSizes(k), key);
+                    await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.state) { window.state.isPlaying = false; } });
+                    cardCache.set(key, sizes);
+                }
+                return cardCache.get(key);
+            };
             const HARD = ['graphs:bar_graph', 'coordinates:coordinate_all', 'fractions:mixed_improper_visual', 'addition:add_word_problems',
                 'subtraction:sub_wp_20', 'graphs:line_plot', 'graphs:pie_chart', 'coordinates:geo_reflect', 'area_perimeter:area',
-                'area_perimeter:area_perimeter', 'probability:probability_basic', 'multiplication:mult_chart_easy', 'counting:count_objects'];
+                'area_perimeter:area_perimeter', 'probability:probability_basic', 'multiplication:mult_chart_easy', 'counting:count_objects',
+                'coordinates:coordinate_q1', 'data_analysis:box_plot_intro', 'fractions:fraction_of_set', 'measurement:elapsed_hour',
+                'addition:nl_add', 'area_perimeter:perimeter_grid', 'number_theory:factor_tchart_easy'];
+            const hovered = [];
             for (const [w, h] of [[1366, 768], [820, 1180]]) {
                 await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
                 await sleep(200);
@@ -933,28 +952,69 @@ const { installThumbMeasure, thumbFaults } = require('../lib/ws-thumb-measure.cj
                     }, key);
                     if (!g) { F(`THUMB legible: ${key} is not in the explorer`); continue; }
                     await mouseHome(); await sleep(450);
-                    const pt = await page.evaluate((k) => { const b = document.querySelector(`#mqxBody .mqx-card[data-key="${k}"]`).getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height / 2) }; }, key);
+                    const pt = await page.evaluate((k) => { const b = document.querySelector(`#mqxBody .mqx-card[data-key="${k}"]`).getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height * 0.35) }; }, key);
                     await page.mouse.move(pt.x, pt.y, { steps: 3 });
                     if ((await waitThumb(true, 1000)).timeout) { F(`THUMB legible @${w}: hovering ${key} shows no thumbnail`); continue; }
                     await sleep(1200);   // settled: the mono pass let go and the refit ran
                     const m = await page.evaluate((k) => window.__mqxMeasure(document.getElementById('mqxThumb'), k), key);
-                    for (const f of thumbFaults(m)) F(`THUMB legible @${w} hover ${key}: ${f}`);
-                    if (SHOTS && w === 1366) await page.screenshot({ path: path.join(SHOTS, `thumb-hard-${key.replace(/\W+/g, '_')}.png`), clip: m.rect, captureBeyondViewport: false }).catch(() => {});
+                    if (SHOTS && w === 1366) await page.screenshot({ path: path.join(SHOTS, `thumb-hard-${key.replace(/\W+/g, '_')}.png`) }).catch(() => {});   // no clip: a clipped shot resizes the page, which hides the thumbnail
+                    hovered.push({ w, key, m });
                 }
             }
             await mouseHome();
-            await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
-            await sleep(200);
+            for (const { w, key, m } of hovered) {
+                const card = m.small && m.small.length ? await cardSizes(key) : null;
+                for (const f of thumbFaults(m, { card })) F(`THUMB legible @${w} hover ${key}: ${f}`);
+            }
+            // 1024 x 768: the middle column of the grid (no room beside it for a large plate) gets L, W or B above / below
+            {
+                await page.setViewport({ width: 1024, height: 768, deviceScaleFactor: 1 });
+                await sleep(200);
+                const small1024 = [];
+                for (const gr of ['K', '3']) {
+                    await page.evaluate((g) => window.openStudentExplorer({ tab: 'grade', grade: g }), gr);
+                    await sleep(300);
+                    const mids = await page.evaluate(() => {
+                        const cards = [...document.querySelectorAll('#mqxBody .mqx-card')];
+                        const lefts = [...new Set(cards.map((c) => Math.round(c.getBoundingClientRect().left)))].sort((a, b) => a - b);
+                        if (lefts.length < 3) return [];
+                        const body = document.getElementById('mqxBody').getBoundingClientRect();
+                        return cards.filter((c) => Math.round(c.getBoundingClientRect().left) === lefts[1]).map((c) => c.getBoundingClientRect()).filter((b) => b.top > body.top && b.bottom < body.bottom - 60)
+                            .slice(0, 3).map((b) => ({ x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height * 0.35) }));
+                    });
+                    if (!mids.length) F(`THUMB @1024 grade ${gr}: no middle grid column to test`);
+                    for (const pt of mids) {
+                        await mouseHome(); await sleep(450);
+                        await page.mouse.move(pt.x, pt.y, { steps: 3 });
+                        if ((await waitThumb(true, 1000)).timeout) { F(`THUMB @1024 grade ${gr}: a middle-column card shows no thumbnail`); continue; }
+                        const sz = await page.evaluate(() => ((document.getElementById('mqxThumb').className || '').match(/mqx-thumb--(\w)/) || [])[1] || '?');
+                        if (!['L', 'W', 'B'].includes(sz)) small1024.push(`${gr}@${pt.x},${pt.y}=${sz}`);
+                    }
+                }
+                if (small1024.length) F(`THUMB @1024x768 middle-column cards get a small plate (want L / W / B): ${small1024.join(', ')}`);
+                await mouseHome();
+                await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+                await sleep(200);
+            }
 
             if (process.env.MQX_TRACE) console.log('step', '// THUMB legible sweep');
+            // WORDS_CEILING: words-only plates per size (the full sweeps, L and S). Words-only is allowed only for an item
+            // with no drawing on its practice card: a build widget ("Build a bar graph showing: Mon=7 ...") or a text-only
+            // item too long to fit. On 2026-11-07 that is 2 at L (both build widgets) and 25 at S; the ceilings add room for
+            // a seeded item changing (+2 / +5) and no more, so a figure skill falling back to words shows up at once. At
+            // L, W, B and M no figure skill may be words-only at all (NOPICLESS). W, B and M are each swept on a third of
+            // the skills (a different third each, so together they cover all 716) to keep the gate under 10 minutes.
+            const WORDS_CEILING = { L: 4, S: 30 };
             const hasBatch = await page.evaluate(async () => typeof (await import('./js/modules/student-explorer.js')).studentExplorerThumbBatch === 'function');
             if (!hasBatch) F('THUMB legible sweep: student-explorer.js has no studentExplorerThumbBatch (the sweep cannot draw the plates)');
             else {
-                for (const size of ['L', 'S']) {
-                    const faults = [];
-                    const tl = { cell: 0, text: 0 };
-                    for (let i = 0; i < keys.length; i += 24) {
-                        const batch = keys.slice(i, i + 24);
+                const all = [];
+                for (const size of ['L', 'W', 'B', 'M', 'S']) {
+                    const tl = { cell: 0, crop: 0, text: 0 };
+                    const third = { W: 0, B: 1, M: 2 }[size];
+                    const sk = third == null ? keys : keys.filter((_, k) => k % 3 === third);
+                    for (let i = 0; i < sk.length; i += 60) {
+                        const batch = sk.slice(i, i + 60);
                         const before = app.problems.length;
                         const ms = await page.evaluate(async (b, sz) => {
                             const m = await import('./js/modules/student-explorer.js');
@@ -962,16 +1022,23 @@ const { installThumbMeasure, thumbFaults } = require('../lib/ws-thumb-measure.cj
                             return [...document.querySelectorAll('.mqx-thumb-probe')].map((el) => window.__mqxMeasure(el, el.dataset.key));
                         }, batch, size);
                         await page.evaluate(async () => (await import('./js/modules/student-explorer.js')).studentExplorerThumbBatch([]));
-                        for (const m of ms) {
-                            if (m.mode === 'cell') tl.cell++; else if (m.mode === 'text') tl.text++;
-                            for (const f of thumbFaults(m)) faults.push(`${m.key}: ${f}`);
-                        }
+                        for (const m of ms) { tl[m.mode] = (tl[m.mode] || 0) + 1; all.push({ size, m }); }
                         const errs = app.problems.slice(before).filter((p) => !/favicon/.test(p.text));
-                        if (errs.length) faults.push(`batch ${i}: console ${errs[0].text.slice(0, 120)}`);
+                        if (errs.length) F(`THUMB legible sweep (${size}) batch ${i}: console ${errs[0].text.slice(0, 120)}`);
                     }
-                    if (faults.length) F(`THUMB legible sweep (${size}): ${faults.length} faults: ${faults.slice(0, 6).join(' | ')}`);
-                    for (const f of faults.slice(6, 30)) console.error(`    THUMB legible ${size}: ${f}`);
-                    console.log(`  THUMB legible sweep (${size}): ${tl.cell} cells, ${tl.text} large-print text`);
+                    console.log(`  THUMB legible sweep (${size}${third == null ? '' : ', a third'}): ${tl.cell} cells, ${tl.crop || 0} crops, ${tl.text} words-only`);
+                    if (WORDS_CEILING[size] != null && tl.text > WORDS_CEILING[size]) F(`THUMB WORDSONLY (${size}): ${tl.text} words-only plates (ceiling ${WORDS_CEILING[size]})`);
+                }
+                // PARITY needs the practice card of every skill that has a text under 10 px in any plate
+                const faults = {};
+                for (const { size, m } of all) {
+                    const card = m.small && m.small.length ? await cardSizes(m.key) : null;
+                    for (const f of thumbFaults(m, { size, card })) (faults[size] = faults[size] || []).push(`${m.key}: ${f}`);
+                }
+                await page.evaluate(() => { if (window.showView) window.showView('homeView'); });
+                for (const [size, list] of Object.entries(faults)) {
+                    F(`THUMB legible sweep (${size}): ${list.length} faults: ${list.slice(0, 5).join(' | ')}`);
+                    for (const f of list.slice(5, 25)) console.error(`    THUMB legible ${size}: ${f}`);
                 }
             }
             await page.evaluate(() => window.closeStudentExplorer && window.closeStudentExplorer());
