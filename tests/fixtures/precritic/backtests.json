@@ -1730,6 +1730,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "h13-ink-test-plain-lf",
+   "check": "H13-INK on Test pages (facts card F1: H13 wins over the PT-TST fixed cells) and on the supports-off page (--h13-ink plain): div_facts critic r5 - Test rows stretched by test.js fillToCeiling, skip Test M 34 %, think Test S 36 % / M 40 %, plain Test S/M/L 56/54/50 %, supports-off Independent S/M 54/52 %, reported 0 before",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (H13-INK, Test pages and --h13-ink plain)",
+   "browser": true,
+   "fail": {
+    "commit": "c41a48c",
+    "state": "lf-ops head graded by div_facts critic r5: plain Test M 16 cells, 25.7 mm band in 48.0 mm cells (54 %)"
+   },
+   "pass": {
+    "commit": "TBD-next-week",
+    "state": "the next builder's fix of the div_facts Test / supports-off rows (test.js fillToCeiling; filled when it lands)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --h13-ink plain --roles test --size M --seed render --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

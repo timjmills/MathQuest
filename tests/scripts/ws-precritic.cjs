@@ -756,6 +756,12 @@ function buildPlan(ctx) {
                 add(gate(`print-lint-supports-${sup}-S-review`, `ws-print-lint --source kit --supports ${sup} --size S --roles review --seed render (critic r4 R4-2c: PT-REV-1 on the critic's Review page)`, `${ks.join(', ')} × ${sup} × review × S`, 'browser', 'ws-print-lint',
                     ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', 'review', '--seed', 'render', '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks.map((k) => renderId(k, 'review')) } }));
             }
+            // div_facts critic r5 (facts card F1: H13 wins over the PT-TST fixed cells): H13-INK now measures Test pages, and
+            // `--h13-ink plain` measures the supports-off page too - Independent and Test at S / M / L on the critic's seeds.
+            for (const sz of ['S', 'M', 'L']) {
+                add(gate(`print-lint-h13-plain-${sz}`, `ws-print-lint --source kit --h13-ink plain --size ${sz} --roles independent,test --seed render --lints L-DENSITY (critic r5 / F1: H13-INK on Test and supports-off pages)`, `${factKeys.join(', ')} × independent,test × ${sz}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--h13-ink', 'plain', '--size', sz, '--roles', 'independent,test', '--seed', 'render', '--lints', 'L-DENSITY', '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys.flatMap((k) => ['independent', 'test'].map((r) => renderId(k, r))) } }));
+            }
             add(gate('print-lint-fade-packet-M', 'ws-print-lint --source kit --supports all --fade packet --pages 3 --size M (critic r4 R4-5: a faded packet withdraws help in order; H13-INK on reserved zones)', `${factKeys.join(', ')} × faded packet × M`, 'browser', 'ws-print-lint',
                 ['--source', 'kit', '--supports', 'all', '--fade', 'packet', '--pages', '3', '--size', 'M', '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
         }

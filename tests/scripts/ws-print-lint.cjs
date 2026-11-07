@@ -54,6 +54,7 @@
 //   --report-only             print everything, exit 0 (never prints OK when something failed)
 //   --verbose                 print every finding group, not just the first 12 per document
 //   --save-html dir           app sources: also write each linted document's HTML there (for the critic / debugging)
+//   --h13-ink plain           kit: H13-INK also measures cells with no support (facts card F1; div_facts critic r5)
 //   --seeds N                 kit: lint every POOL skill (mixed_*, *_all) at N seeds - its usual one plus N - 1
 //                             derived (hash(cat__skill:print:k)) - each page its own document `cat:skill@seed`
 //                             (a pool deals different members at every seed: critic r6 D6-6)
@@ -509,10 +510,12 @@ function supportCheckInPage(opts) {
     // column is not paper the pupil can use). A reserved-but-empty support zone is empty paper. The Test role's fixed
     // cell geometry is out (PT-TST table; critic r4 ruling, a lead question).
     const H13F = Number(opts.h13Floor) || 0.3;   // (opts.h13Floor: a diagnostic floor, to print every band)
+    // Facts card F1 (owner 2026-11-07, replacing the r4 Test exemption): H13 wins over the PT-TST fixed cells, so Test pages
+    // are measured too (div_facts critic r5: Test rows stretched by test.js fillToCeiling, 34-56 % empty, reported 0 here).
+    // `opts.h13Plain` (--h13-ink plain): cells with NO support are measured as well (the supports-off div_facts page, r5).
     for (const pg of pageList) {
-        if (roleOf(pg) === 'test') continue;
         for (const c of problemCells(pg)) {
-            if (!c.querySelector('[data-ws-support-on], [data-ws-support-reserve]')) continue;
+            if (!opts.h13Plain && !c.querySelector('[data-ws-support-on], [data-ws-support-reserve]')) continue;
             const ink = inkOf(c);
             if (!ink) continue;
             const cr = c.getBoundingClientRect(), cs = getComputedStyle(c);
@@ -524,7 +527,7 @@ function supportCheckInPage(opts) {
             const below = Math.max(bot - ink.b, 0), above = Math.max(ink.t - top, 0);
             const lb = Math.max(ink.l - left, 0), rb = Math.max(right - ink.r, 0);
             const v = Math.max(below, above), h = Math.max(lb, rb);
-            const what = `page ${pageNo(c) || '?'} cell ${cellNo(c)} (supports ${supportsOn(c).join('+') || 'reserved only'})`;
+            const what = `page ${pageNo(c) || '?'} cell ${cellNo(c)} (supports ${supportsOn(c).join('+') || (c.querySelector('[data-ws-support-reserve]') ? 'reserved only' : 'none')})`;
             if (v >= H13F * H) out.push({ lint: 'L-DENSITY', rule: 'H13', sev: 'major', page: pageNo(c), msg: `${what}: one empty band ${fmm(v)} mm ${below >= above ? 'under the last ink' : 'over the first ink'} in a ${fmm(H)} mm cell (${Math.round((v / H) * 100)}%), measured on ink, a reserved support counted as empty (RUBRIC H13, H13-INK; critic r4 R4-1 / R4-5)`, key: 'H13-INK band in a supported cell' });
             else if (h >= H13F * W) out.push({ lint: 'L-DENSITY', rule: 'H13', sev: 'major', page: pageNo(c), msg: `${what}: one empty band ${fmm(h)} mm wide ${rb >= lb ? 'right of the last ink' : 'between the tab column and the first ink'} in a ${fmm(W)} mm cell (${Math.round((h / W) * 100)}%), measured on ink (RUBRIC H13, H13-INK)`, key: 'H13-INK band in a supported cell' });
         }
@@ -2713,7 +2716,7 @@ async function lintHtmlInSheetPage(app, html, id, mode, items = null, { pool = f
         }
         const res = await lintDocument(sheet, { id, mode, pool });
         if (attribution) res.info.attribution = attribution;
-        if (mode === 'kit' && arg('supports', null)) {
+        if (mode === 'kit' && (arg('supports', null) || arg('h13-ink', null) === 'plain')) {
             const sr = await sheet.evaluate(supportCheckInPage, support);
             res.findings.push(...sr.findings);
             res.info.supported = sr.supported;
@@ -2800,7 +2803,7 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                     continue;
                 }
                 r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit', kitHalves && d.skills.length > 1 ? { items: kitHalves.items, anchors: kitHalves.anchorItems || [] } : null, { pool: source === 'kit' && d.skills.length === 1 && poolSkill(s),
-                    support: kitHalves ? { asked: kitHalves.asked || [], cover: flags && flags.coverage, fade: arg('fade', null), fitsNote: kitHalves.fitsNote || '' } : {} });
+                    support: kitHalves ? { asked: kitHalves.asked || [], cover: flags && flags.coverage, fade: arg('fade', null), fitsNote: kitHalves.fitsNote || '', h13Plain: arg('h13-ink', null) === 'plain' } : {} });
                 if (kitHalves) r.findings.push(...anchorFindings(kitHalves.pupilHtml, kitHalves.keyHtml));
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
