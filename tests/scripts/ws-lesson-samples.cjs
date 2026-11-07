@@ -23,8 +23,9 @@
 //     PC-H13     (D4, D9, D11) at every size: the check page has no cell band >= 30 % and no gap > 15 mm between its
 //                cells; the check page and the lesson sheet have a blank foot <= 8 % (sheetCheck, now blocking; the sheet's
 //                cell bands stay print-lint's L-DENSITY H13 / H13-ROW)
-//     PC-CLIP    (D10) no strip heading covered by an element painted after it, and every band heading at the same
-//                place on a pupil page and its key twin (+/- 1 mm)
+//     PC-CLIP    every band heading at the same place on a pupil page and its key twin (+/- 1 mm), and no heading
+//                clipped by an overflow-hiding ancestor. D10 itself (a fill painted over a heading) is NOT seen by the DOM:
+//                ws-print-lint L-OVERLAP SECTION reads it on the PDF (precritic lesson-samples-key-L / -S; critic r2 D1)
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
 //   4242 build at every size. A tree with no Prerequisite Check (no lesson.prereqCheck) prints the rules N/A.
@@ -70,10 +71,9 @@ function nameCheck(item, pre) {
     if (!('checks' in pre)) out.push(`no \`checks\` text: the table prints the design why ("${String(pre.why || '').slice(0, 50)}")`);
     else {
         const ch = String(pre.checks).toLowerCase();
-        const miss = WORDS.filter((w) => new RegExp(`\\b${w}\\b`).test(ch) && !new RegExp(`\\b${w}\\b`).test(said));
-        const nm = nums(ch).filter((n) => !nums(said).includes(n) && n !== 1 && n !== 10);
-        if (miss.length) out.push(`checks "${pre.checks}" names ${miss.join(', ')}; the item ("${item.text}") does not`);
-        void nm;
+        // the item must use at least ONE of the operation words its checks text names ("10 more, 10 less": either; critic r2 D4)
+        const named = WORDS.filter((w) => new RegExp(`\\b${w}\\b`).test(ch));
+        if (named.length && !named.some((w) => new RegExp(`\\b${w}\\b`).test(said))) out.push(`checks "${pre.checks}" names ${named.join(' / ')}; the item ("${item.text}") uses none of them`);
     }
     return out;
 }
@@ -276,6 +276,7 @@ async function checkMain() {
     const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     for (const r of rules) { const fs2 = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(12)} ${fs2.length ? `FAIL ${fs2.length}` : na === LESSONS.length && /RANGE|NAME|SLOTS|SCAFFOLD/.test(r) ? 'N/A (no Prerequisite Check in this tree)' : 'PASS'}`); for (const x of fs2.slice(0, 8)) console.log(`   ${x.where}: ${x.msg}`); if (fs2.length > 8) console.log(`   ... ${fs2.length - 8} more`); }
+    if (na < LESSONS.length && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });
     console.log(`(${LESSONS.length} lessons, ${NSEEDS} seeds, sizes ${SIZES.join(',')}; ${read} prerequisite items read)`);
     console.log(`ws-lesson-samples --check: ${findings.length ? `FAIL (${findings.length})` : 'OK'}`);
     process.exit(findings.length ? 1 : 0);

@@ -837,3 +837,20 @@ Full report: design/status/lf-checks/critic-r1.md.
 sample; `ws-backtest --kind fixture` spends 21 min in older browser fixture rows: a `--fast` filter (rows without
 `browser: true`) gives the lesson rows' proof in under 5 s; other lanes' browser runs held both slots for ~4 of 9 minutes
 of the critic's live runs.
+
+### lf-checks · critic r2 (2026-11-07, FAIL 7 / 7 / 8 / 8; lane stopped by rule 7)
+
+Full report: design/status/lf-checks/critic-r2.md.
+
+**Automatic checks:** one backtest row per rule a tool header names, FAILing on that rule alone (ws-precritic-plan parses the
+header) - PC-CLIP had none and could not see its D10; a fixture-consistency lint over every `*.pass.json` (story = pool, key
+working = story, place-value digit present, one right answer) - the surviving defect; a new blocking gate is run once on head
+before commit and its red rows recorded (R-n) in the status file; a known-true corpus self-test for PC-NAME / PC-RANGE; a
+"read nothing" guard in ws-lesson-samples (built).
+
+**Speed-ups:** save fail-side packets of the phase-0 rows so a critic re-judges offline; run the content seeds of
+ws-lesson-samples --check in parallel pages (about 1 min, not 3.5); freeze or tag the graded head before the critic starts
+(two pushes landed mid-round).
+
+**Root cause of the stop:** hand-edited pass fixtures. Rule for every checks lane: a pass state is a commit (or a fixture
+re-rendered from a commit), never a packet edited by hand; where no fix commit exists yet, the row's pass side is pending.

@@ -3,16 +3,17 @@ Title: Lessons-first wave 1: the lesson precritic checks, backtests and gate hyg
 Session: session_013pHDnLVzZVKhyoyiPRYBZA (launched by the lead session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-lf-checks
 Owner of files: tests/lib/ws-lesson-lp.cjs (new), tests/scripts/ws-detailed-lesson.cjs, ws-precritic.cjs (lesson scope), ws-precritic-plan.mjs (lesson rows), ws-deploy-gates.sh (lesson rows, perf slots), tests/fixtures/precritic/backtests.json (rows appended) + lesson-* fixtures, design/lessons-first/units/_TEMPLATE.md, design/lessons-first/patches/lf-checks-to-lf-engine.md
-State: critic
+State: paused
 Updated: 2026-11-07
 Builder profile: — (the lane session builds; Opus 5.5, effort medium per the brief)
-Critic rounds: 1, pending
+Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
-- The LP checks run on every detailed lesson: `ws-detailed-lesson --lp` (8 checks + LP-RASTER) and `--sweep` (LP-SWEEP, seeds 1-25).
-- `ws-precritic --lesson <id>` and `--unit <unit-id>` exist; 10 backtest rows, all PASS; all on precritic's path.
-- The integration head is RED for every lesson lane, for reasons outside this lane (see "Real defects found"): clean-before-critic is not possible until they are fixed.
-- Critic r1 (independent, Opus medium) running on the checks.
+- STOPPED after critic r2 (rule 7): the hand-edited pass fixtures (r1 D4 -> r2 D2) survived two rounds. Root cause and check below.
+- Built and wired: LP checks (`ws-detailed-lesson --lp / --sweep`), PC checks (`ws-lesson-samples --check`, phase 0), `ws-precritic --lesson / --unit`,
+  `ws-lessons-first-queue --build-only` (BUILD_QUEUE.md), deploy-gate lesson rows, perf run alone; 10 backtest rows PASS + 9 phase-0 rows pending lf-engine.
+- The integration head is RED for every lesson lane on app defects (R1-R11 below), not on these tools.
+- PR: https://github.com/timjmills/MathQuest/pull/37 (draft, into claude/sweet-newton-c8wrv1).
 
 ## Owner go
 (none: tools, no owner picture sheet)
@@ -35,6 +36,7 @@ Critic rounds: 1, pending
 | R7 | Lesson 7 (g3-oa8, critic r1 FAIL): D1, D2, D3 are all caught; LP-MODELLED adds "share then take away" practised on P4-2, never modelled (the critic's n3) | `--lp` on head | lf-ops / lesson 7 owner |
 | R8 | Lesson 6 n1 / n2 (critic r3 minors) still open: T3 "4000", T6 "7000", P4-2 92,163 / 92,715 | LP-NUMBERS | lesson 6 owner |
 | R9 | Lesson 1 exit item "combine" never modelled on the chart (Q1 above) | LP-MODELLED, every seed | lesson 1 owner |
+| R11 | `subtraction:sub_100_regroup#lesson` / `number_sense:nearest_10#lesson`: 30 L-OVERLAP CL40-INK findings (ink in the label keep-out) on the integration head; the new blocking precritic row lesson-samples-key-L / -S is red on them | ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP on the three samples | ops / placevalue lanes (the cells), lf-engine |
 | R10 | `ws-precritic --role lesson` red on the integration head: 13 (document, lint, rule) counts over the pin at L and 13 at S (role sample) | at 56cf789c already 11 over (L-OVERLAP SECTION add_fractions_like / perimeter_intro, L-DENSITY SPREAD, L-ANSAREA H8); 6bc3cbd8 adds L-OVERFLOW PG-12 (coordinate_q1 0->10, seq_2 0->6, vocab_grade_K 0->6, f_to_d 2->4, prime_composite 1->2). Real lints (overflow, overlap), not pin drift: NOT re-pinned | the families' lanes; the fact-family merge for the PG-12 rows |
 
 ## Step 1 — gate hygiene
@@ -92,8 +94,27 @@ green until R1 / R2 / R4 / R8 / R10 are fixed by their owners.
 - `ws-precritic-plan --self-test` OK (11); `ws-detailed-lesson --lp-self-test` OK (25); `ws-deploy-gates --self-test` OK; `--list` shows the new rows.
 - `node --check` on every touched .cjs; `node --input-type=module --check` on ws-precritic-plan.mjs; `bash -n` ws-deploy-gates.sh.
 
+## Critic rounds
+| Round | Commit | Verdict | Defects | Fixed |
+|---|---|---|---|---|
+| r1 | 6ecddbba | FAIL 7/7/8/8 | D1 Guided=Independent missed (level counted as hint); D2 "(7000 or 7,000)" false alarm; D3 seeded D8 not the real D8, range clause missing; D4 pass fixtures not reachable states; D5 empty read passes | D1, D2, D3, D5 in fbff1a13 (r2 confirmed); D4 half |
+| r2 | fbff1a13 (+5629a7f4) | FAIL 7/7/8/8 | D1 PC-CLIP cannot see D10 (DOM order); D2 = r1 D4: lesson 7 keys keep old working, lesson 6 "9 in 49,715" has no right answer; D3 lesson-samples-key gate red on head on CL40 (now R11); D4 PC-NAME checks clause needs every word, no self-test | D1 scope corrected (PC-CLIP = twin geometry + overflow clip; D10 is print-lint SECTION's), D3 recorded as R11, D4 any-word rule + dead code removed, 0-items guard - after r2, NOT re-graded |
+
+**Stop (rule 7) - root cause of the surviving defect:** the fixture rows' pass states are packets edited by hand, and a hand edit cannot
+keep every derived page (keys, charts, T6 working) consistent with the edited item. The machine check: a fixture-consistency lint run by
+`--lp-self-test` over every `*.pass.json` (story numbers = pool item, key equation = story, a place-value sentence's digit occurs in its
+number and the comparison has one right answer) - NOT built. The real fix: re-point `e24-family`, `lp-text-no-x`, `lp-fallback`,
+`lp-numbers` to commit-pairs as soon as lesson 7 and lesson 6 are fixed (the fail sides are already the critic-graded commits).
+Until then those four rows prove the FAIL side only; their pass side is hand-made.
+
+Remaining (next checks session): the fixture-consistency lint or the commit-pair re-pointing above; PC-NAME known-true corpus
+self-test; a backtest row per PC rule that FAILs only that rule (PC-CLIP has none); lf-engine's LR-5 picture key in ws-lesson-check
+(after its merge); Step 3 (ws-integrate links). The 9 phase-0 rows in backtests-phase0.json move to backtests.json with lf-engine's fix.
+
 ## Cost
-Lane session cost_usd ≈ $55 at 08:05Z (estimated from the session's token usage; ≈ 2.0 % of the weekly limit at $28 ≈ 1 %); cap $100.
+Lane session cost_usd $20.33 at 07:56Z (the lead's reading of the session record); ≈ $32 at 08:45Z by scaling my token estimate to that reading, plus two critic sub-agents (~390k tokens) - about $40 in all, ≈ 1.4 % of the weekly limit ($28 ≈ 1 %); cap $100.
 
 ## Log
+- 2026-11-07 — critic r2 FAIL; small fixes after it (not re-graded); stopped per rule 7; hand-over to the lead.
+- 2026-11-07 — lead's asks: --build-only BUILD_QUEUE.md (owner order), phase-0 checks D1-D10 (ws-lesson-samples --check, print-lint blocking rows, backtests-phase0.json), lf-engine's (a) ws-lesson-unit / ws-lesson-coverage on the lesson scope, chartSizing[] read by LP-FALLBACK.
 - 2026-11-07 — build: LP checks, --lp / --sweep / --packet / --raster, precritic --lesson / --unit, 10 backtests, deploy-gate rows, units template, lf-engine patch; bisected R1 / R2; critic r1 launched.
