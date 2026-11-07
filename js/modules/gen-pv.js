@@ -263,7 +263,7 @@ function genPlace(q, skill, o) {
         if (o.response === 'bank') {
             // PN-4: the words move to a bank; the pupil copies one onto the line (a production
             // item on paper stays a typed word on screen, never a choice).
-            q.text = 'Write the place of the underlined digit.';
+            q.text = writeValue ? 'Write the place. Write the value of the underlined digit.' : 'Write the place of the underlined digit.';
             q.printText = q.text;
             q.answerType = 'text';
             q.options = [];
@@ -276,7 +276,7 @@ function genPlace(q, skill, o) {
             return;
         }
         q.text = 'Which place is the underlined digit in?';
-        q.printText = 'Circle the place of the underlined digit.';
+        q.printText = writeValue ? 'Circle the place. Write the value of the underlined digit.' : 'Circle the place of the underlined digit.';
         q.answerType = 'multiple-choice';
         q.options = words;
         q.pv = { kind: 'place', n, place, digit, support, response: 'circle', repeat, writeValue };

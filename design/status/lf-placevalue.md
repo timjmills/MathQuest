@@ -43,6 +43,12 @@ Critic rounds: 1, FAIL (all five; min 1 stretch, core 4-6)
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-07 lead D4 / D5: (D4) writeValue: false added to the identify Warm-up / mixWith refs OUTSIDE the lane block in
+  js/modules/lessons/prereqs.js — the addition no-regroup lessons (the `pv` ref ~line 91 and the three mixWith refs ~96 / 101 / 107)
+  and number_sense:nearest_10 (skills ~373, mixWith ~409); they practise the place, not the value. MERGE TRAIN: lf-engine moves
+  prereqs.js records to lessons/families/*.js — port these six opts and the lf-placevalue block. (D5) sheet/contract.js
+  INSTRUCTION_LIBRARY + 'place-circle-value' (lead's text) and 'place-write-value' (the bank form, same pattern); identify uses
+  them when writeValue is on (gen-pv printText, provider instructionKey).
 - 2026-11-07 lead rulings T1 / T2 on the opt-in checks: H13-ABS limit 35 % of (cell − Hw), not 30 % (evidence: approved
   sub_50_no_regroup / sub_2d_1d L 27 % raw, add_facts L 30 % fire at 30 %; pv value L 34 %, the critic's pv bands 34–55 %; backtest
   optin-h13-abs still FAIL 14.6 mm ≥ 14.5 mm limit / OK); SCREEN-DIGIT keeps the size floor for every skill, weight ≥ 700 only for

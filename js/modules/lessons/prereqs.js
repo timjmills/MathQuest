@@ -88,23 +88,23 @@ function subNoRegroupLessons() {
     // the facts a row of their own, four across, on the S and M lesson sheets: in a half-page cell a
     // one-digit column left 34 % of the width empty. At L the extra row does not fit the sheet.)
     const facts10 = { key: 'subtraction:subtract', opts: { band: 10, notation: ['stacked'] }, why: 'Each column is a take-away fact within 10.' };
-    const pv = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' };
+    const pv = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Name the tens digit and the ones digit.' };
     const rung = (key, why) => ({ key, why });
     return {
         'subtraction:sub_50_no_regroup': base({
             skills: [facts10, pv], warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1,
-            mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+            mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
         }),
         'subtraction:sub_100_no_regroup': base({
             skills: [rung('subtraction:sub_50_no_regroup', 'The same column steps with smaller numbers.'), facts10],
             vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1,
-            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
         }),
         // The preset (host sub_100_no_regroup, lengths: shorter): every bottom number is one digit,
         // so `maxSmall` (one one-place take-away a page) does not apply; its tens step writes the tens.
         'subtraction:sub_2d_1d': base({
             skills: [facts10, pv], warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2('Write the tens.'), checkRow: true,
-            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
         }),
         'subtraction:sub_1k_no_regroup': base({
             skills: [rung('subtraction:sub_100_no_regroup', 'The same column steps with two places.'), facts10],
@@ -370,7 +370,7 @@ export const LESSONS = Object.freeze({
     'number_sense:nearest_10': {
         skills: [
             { key: 'number_sense:between_tens', why: 'Rounding starts by naming the two tens.' },
-            { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Rounding reads the tens digit and the ones digit.' },
+            { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Rounding reads the tens digit and the ones digit.' },
         ],
         concepts: [
             { id: 'between', text: 'A number sits between two tens.' },
@@ -406,7 +406,7 @@ export const LESSONS = Object.freeze({
         words: [{ from: '^The digit after the cut is (\\d+):.*$', to: 'The ones digit is $1.' }],
         // Mixed practice: EARLIER skills only, each from its own strand (lessons r1: never nearest
         // 100, which comes after, and never two "Number Sense" sections).
-        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
+        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
     },
 
     /* ---------------------------------------------------------- lf-placevalue (2026-11-07): read and write to 1,000

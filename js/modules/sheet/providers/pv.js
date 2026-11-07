@@ -94,10 +94,12 @@ const PLACE_CIRCLE = {
 };
 const PLACE_CIRCLE_3 = { ...PLACE_CIRCLE, steps: PLACE_STEPS_3.concat('Circle the place word.') };
 
+// D5 (lead 2026-11-07): with writeValue on, the instruction names both tasks (the place and the value).
+const withValue = (set, q) => (pvOf(q).writeValue ? { ...set, instructionKey: `${set.instructionKey}-value`, steps: set.steps.concat('Write what the digit is worth.') } : set);
 registerSkill('placevalue:identify', {
-    strings: stringsBy((q) => (pvOf(q).response === 'bank'
+    strings: stringsBy((q) => withValue(pvOf(q).response === 'bank'
         ? (placeSteps(q) === PLACE_STEPS ? PLACE_BANK : PLACE_BANK_3)
-        : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3)), PLACE_CIRCLE_3),
+        : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3), q), PLACE_CIRCLE_3),
     misconceptions: ['M-V1', 'M-V3', 'M-V14'],
     workedSteps: (q) => {
         const p = pvOf(q);
