@@ -153,6 +153,9 @@ function normaliseRequest(req = {}) {
             dense: s && s.dense && typeof s.dense === 'object' ? Object.assign({}, s.dense) : req.dense !== false && !(s && s.dense === false),
             // A grid height the caller caps (the lesson's practice page); the page's body otherwise.
             gridH: s && Number(s.gridH) > 0 ? Number(s.gridH) : undefined,
+            // (a caller's own page ceiling - a detailed lesson's Practice sheet holds its shape's count, R2; a skill's
+            // owner PAGE_CAP below still wins)
+            pageCap: s && Number(s.pageCap) > 0 ? Number(s.pageCap) : undefined,
             capH: !!(s && Number(s.gridH) > 0),
             // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
             // gaps) - the caller has chosen a count whose cells stay under H13's band.
@@ -4505,7 +4508,10 @@ async function buildLesson(n, metaOf) {
                 size: practiceSize, role: 'independent', tabId: `Practice ${k}`,
                 // (the pack's own tab: every Practice sheet names the lesson's strand)
                 header: Object.assign({}, common.header, Array.isArray(n.packTab) ? { tab: [...n.packTab, `Practice ${k}`] } : {}),
-                sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true }],
+                // (`pageCap`, R2 - since 6bc3cbd8 layout.js packs rows of NEARLY one height by their own heights (r12c
+                // nearPack): a 4 x 1 sheet laid 5 rows for its 4 items left a fifth of the page blank. The sheet's shape is its
+                // page: at most its count, and the rows it keeps share the whole grid.)
+                sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true, pageCap: shape[0] }],
                 seed: (seeds.practice + 7919 * (k - 1)) >>> 0,
                 // (`strip`: another chunk's step strip - the words sheet carries the words steps.)
                 stepStrip: ps.strip && ps.strip.html ? ps.strip : withStrip ? { html: stripHtml, hMm: stripH } : undefined,

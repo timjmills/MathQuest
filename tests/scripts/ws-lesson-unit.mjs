@@ -38,6 +38,15 @@ const LATE = {
     // pageConstant 'word-work-schema'), and an `itemSpread` ref never re-opens its page, so every try told the first try's
     // schema and the exit slip's put-together case was never met. `pageFresh` re-opens the page per try (both dealers), and
     // `reserve` deals the late items whose cases a 15-fact pool can run out of before any page.
+    // R2 (lf-engine P1b): lessons 1 and 6 Practice sheets 17-19 % blank since 6bc3cbd8 (layout.js r12c nearPack laid 5 rows for
+    // a 4 x 1 sheet's 4 items). A detailed Practice sheet's shape is its page: pageCap = its count, passed through normaliseRequest.
+    async 'r2-practice-cap'() {
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/sections: \[\{ skills: \[sk1\], count: shape\[0\], columns: shape\[1\], noCap: true, pageCap: shape\[0\] \}\]/.test(ps), 'R2: a detailed Practice sheet is capped at its shape count');
+        ok(/pageCap: s && Number\(s\.pageCap\) > 0 \? Number\(s\.pageCap\) : undefined/.test(ps), 'R2: normaliseRequest keeps a section pageCap');
+        const L = await tryImp('js/modules/sheet/layout.js');
+        ok(L && /Number\(section\.pageCap\) > 0 && rows \* cols > Number\(section\.pageCap\)/.test(readSrc('js/modules/sheet/layout.js')), 'R2: layout.js applies the cap after the near-height pack');
+    },
     async 'r1-page-fresh'() {
         globalThis.window = globalThis.window || globalThis;
         const G = await tryImp('js/modules/generate-question.js'), PD = await tryImp('js/modules/page-deal.js');
