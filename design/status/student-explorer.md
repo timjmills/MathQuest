@@ -252,3 +252,83 @@ Speed reflection (this round):
 - Every finding was measurable, and none had a check. The r0 gate measured placement and answer leaks, never rendered type size or clipping.
 - Rule for any future preview or thumbnail lane: a "drawn the way pupils see it" claim is gated on rendered px (font size x on-screen scale) and on painted bounds inside the frame. A class name present is not enough.
 - `ws-thumb-measure.cjs` is reusable for the teacher previews, which share this drawing and these defects.
+
+### Hover thumbnails — fix round 2 (2026-11-07, Opus medium: rebuild after critic r2 FAILED, job 7 / clarity 6)
+
+Critic report: scratchpad `thumbs-check-r2.md`. R2-D1 was the fallback: 103 skills at L (391 at S) showed words only, and many
+of those words pointed at a picture that wasn't there.
+
+New checks, written first, in `tests/lib/ws-thumb-measure.cjs` and the THUMB legible block of `ws-student-explorer.cjs`:
+
+| Check | What it holds |
+|---|---|
+| NOPICLESS | A skill whose question needs its drawing (its practice-card `q.visual`, or words that point at a picture) is never words-only at the L, W, B or M plates. Words-only text never contains a pointing phrase (`POINTING`). |
+| PARITY | A text may render under 10 px only where the skill's own practice card (1366, `__mqxCardSizes`) shows it that small, and never smaller than there. The question line stays >= 14 px. |
+| WORDSONLY | The words-only plates are counted at L and S, with ceilings L 4 and S 30: today's 2 and 22 (build widgets and long text-only items), plus room for a seeded item changing. |
+| 1024 placement | At 1024x768 the middle grid column gets an L, W or B plate, never S. |
+
+Sweep coverage:
+- L and S are swept on all 716 skills.
+- W, B and M are each swept on a different third of the skills, so the gate stays under 10 minutes; it ran in about 8.
+- INFRAME now also counts bare text nodes, and a crop is read through its window.
+
+Backtest on 754b4f918 (served with MQ_ROOT): 52 failures.
+- NOPICLESS fires on the hard set at 1366 and 820, and in every size sweep.
+- WORDSONLY: L 103 > 4, S 390 > 30.
+- The 1024 middle column gets S.
+- Log: scratchpad `backtest-754.log`.
+- PARITY does not fire there, because that build never draws text under 10 px. It loosens r1's rule and is guarded by the crop.
+
+Fixes (`js/modules/student-explorer.js`, `css/student-explorer.css`, additive):
+
+1. **Judge.**
+   - A whole cell is shown when the question line is >= 14 px, the scale is >= 0.6, and every text is >= 10 px.
+   - Measuring the practice card showed that it draws number-line and time-line ticks at 17-24 px, not at the 6-10 px they have in the thumbnail stage. So "as small as the card" could not justify 9.6 px; the crop (2) brings those labels to 10 px or more instead.
+   - Layout cost: one measurement per layout at scale 1. The fit scale and the scale every text needs both come from it.
+   - Each picture's own content box is read through `getBBox` and `getScreenCTM`.
+   - A batch of 60 plates fell from 8.5 s to 5.6 s.
+2. **Crop.**
+   - The question line (20 px, down to 16) sits on top. Under it, a window shows the main figure at the smallest scale (0.6 up to 3) at which the figure's own labels render >= 10 px.
+   - The window shows the whole drawing if it fits. Otherwise it shows the whole figure with as much to its left as fits. Otherwise it shows the figure from its top-left.
+   - Words cut by the window edge, or still under 10 px, are hidden. The cut edges fade.
+   - A drawing line that restates the head is hidden (NODUP).
+3. **Words only** are used only for an item with no drawing on its practice card: 2 skills at L, both build widgets ("Build a bar graph showing: Mon=7 …").
+4. **Placement.**
+   - New B plate, 480 x 228, fits above or below a middle-column card at 1024x768.
+   - The size order is now L, W, B, M, S.
+5. **R2-D2:** screen and colour wording is dropped inside the thumbnail ("both cells turn green …", "After each number, press Space", "(harder: green cells are blank)", "Drag the ruler"). The words-only and crop-head text is cleaned the same way.
+
+Not done:
+- R2-D3: Decompose to Unit Fractions shows its answer tiles in its own visual. That is a generator defect, also on the practice card, and is left for its own task.
+- R2-D2 "Remember: 1 kg = 1000 g" and the duplicated angle choices are left as they are.
+
+Results now:
+
+| Plate | Cells | Crops | Words-only |
+|---|---|---|---|
+| L | 615 | 99 | 2 |
+| W (a third) | 188 | 48 | 3 |
+| B (a third) | 136 | 98 | 5 |
+| M (a third) | 160 | 74 | 4 |
+| S | 328 | 366 | 22 |
+
+Every former large-print figure skill now shows its picture: coordinates, transformations, time lines, number lines, box plots, pie charts, line plots, count-by tracks, Area AND Perimeter, Fraction of a Set and the quadrilaterals.
+
+Gates, one at a time after merging origin/master a200431f5:
+- ws-student-explorer OK (about 8 min)
+- ws-boot-smoke OK
+- ws-simple-print OK
+- ws-teacher-shell OK
+- ws-teacher-preview OK
+- ws-screen-answer OK
+- ws-chromebook-perf --only load OK (6883 / 6953 / 6953 ms)
+- ws-stamp-assets and --check OK
+
+Screenshots:
+- `explorer-thumb-1366.png`, `explorer-thumb-820.png` and `explorer-thumb-none-390.png`.
+- `thumb-r2-former103-{before,after}-{L,S}.png`: the 103 skills that were words-only at L on 754b4f918, as they drew there and as they draw now, at L and at S.
+
+Speed reflection (this round):
+- The r1 gate had a strict pass rule ("never under 10 px") but no check on what failing it cost. That let the fallback silently drop the pictures.
+- Rule: every "legible or else" threshold gets a coverage check on its else-branch (here NOPICLESS + WORDSONLY), and a fallback is graded as strictly as the main path.
+- Measuring the practice card (`__mqxCardSizes`) before choosing the judge would have saved a loop. The critic's assumption that labels are 6-10 px on the card did not hold.
