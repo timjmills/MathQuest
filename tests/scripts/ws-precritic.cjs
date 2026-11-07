@@ -798,6 +798,11 @@ function buildPlan(ctx) {
         // vocabulary skill is in scope. Default parse: its last "ws-vocab-unit: OK|FAIL" line and its exit code.
         if (keys.some((k) => /^vocabulary:vocab_(grade_pictures|pick3_words)$/.test(k))) {
             add(gate('vocab-unit', 'ws-vocab-unit (picture vocabulary: every word drawn, one right answer, no word twice on a page, sets split into trios)', scope, 'node', 'ws-vocab-unit', []));
+            // the card's OTHER offered roles at S / M / L (lf-vocab critic-r3 render: Match 3 GUIDED at S overflowed while the
+            // render gate above drew only lesson / test / independent; LESSONS_LEARNED lf-vocab last row)
+            const vk = keys.filter((k) => /^vocabulary:vocab_(grade_pictures|pick3_words)$/.test(k));
+            add(gate('vocab-roles-render', 'ws-grade-render --gate on the card\'s other offered roles (guided, more-practice, error-analysis) at S, M, L', scope, 'browser', 'ws-grade-render',
+                ['--skills', vk.join(','), '--roles', 'guided,more-practice,error-analysis', '--size', 'S,M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, 'vocab-roles-render')]));
         }
         const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
         add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));

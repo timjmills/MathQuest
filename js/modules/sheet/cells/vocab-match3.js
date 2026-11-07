@@ -36,6 +36,9 @@ export const MATCH3_PIC_W = Object.freeze({ S: 38, M: 40, L: 40 });
  */
 export const MATCH3_PIC_BOX = Object.freeze({ S: [43, 25.4], M: [45, 26.7], L: [45, 26.7] });   // (46 / 48 stuck out of the cell by 2.4-2.6 mm: precritic r4 slot-clip)
 
+/** The height a cell draws (mm) by size: the picture box, the letter-box row, the gaps and padding. */
+export const MATCH3_H = Object.freeze({ S: 47, M: 46, L: 46 });
+
 /** The letters, in word-row order: the key. */
 export const match3Letters = (p) => (p.order || [0, 1, 2]).map((i) => LET[i]);
 
@@ -84,7 +87,9 @@ register(MATCH3_TEMPLATE, {
     },
     // one full-width row (three pictures across); its height is measured (about 48 / 53 / 58 mm)
     // (`points`: one point a word - owner ruling Q-C, 2026-11-07: a page of 4 cells scores /12; paginate.js scorePoints)
-    footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1, points: 3 }; },
+    // (`hMm`: the height the cell really draws - picture box + letter-box row + gaps - not a measurement: the Guided role planned
+    // 4 rows at S from a 40.4 mm measurement while the cells drew ~45 mm, so rows 3-4 overflowed; lf-vocab r4, gate vocab-roles-render)
+    footprint(p, ctx) { return { wMm: 186, hMm: MATCH3_H[sizeOf(ctx)] || MATCH3_H.L, measure: false, factLike: false, maxCols: 1, points: 3 }; },
     inputs(p) {
         return (p && p.words ? p.words : [0, 1, 2]).map((_, n) => ({ id: `letter-${n}`, kind: 'text', shape: 'box', graded: true, order: n, maxLength: 1, scopes: ['full'] }));
     },
