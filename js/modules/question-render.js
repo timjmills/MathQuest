@@ -1565,6 +1565,13 @@ function _firstWriteBox(visualAid) {
             .find((el) => !el.disabled && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
         if (box) return box;
     }
+    // (lane lf-ops 2026-11-07, ws-phone-card FOCUS on the plain x / ÷ stories: a story worked in COLUMN boxes is written
+    // from its first box in reading order - the sign and the story's numbers come before the answer - so it takes the focus)
+    if (visualAid.querySelector('.mq-scell input.mq-wwork, input.mq-wwork')) {
+        const box = [...visualAid.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
+            .find((el) => !el.disabled && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
+        if (box) return box;
+    }
     return visualAid.querySelector('input.mq-cellslot');
 }
 
