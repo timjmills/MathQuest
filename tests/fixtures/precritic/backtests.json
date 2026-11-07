@@ -1510,6 +1510,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-practice-cap",
+   "check": "R2: a detailed Practice sheet holds its shape count (pageCap): the near-height pack does not lay 5 rows for 4 items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r2-practice-cap (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "lessons 1 and 6 Practice 17-19 % blank foot"
+   },
+   "pass": {
+    "commit": "f81be943",
+    "state": "pageCap = shape count"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r2-practice-cap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-dealer-seeds",
+   "check": "R4 / R5: a detailed pack builds at every seed (late item reserved and rebuilt); a spent pool keeps chart examples off Practice",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r4-r5-dealer (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "lessons 4 / 6 fail at 9 of 25 seeds; lesson 3a re-deals 2 x 3"
+   },
+   "pass": {
+    "commit": "8f2c89b6",
+    "state": "rebuild with the late item reserved; chartKeys last"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r4-r5-dealer",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-repeat-key",
+   "check": "Lesson 7 D2: repeatKey family+frame read by both dealers",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only d2-repeat-key (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "repeatKey compiled but unread"
+   },
+   "pass": {
+    "commit": "abcd6ab1",
+    "state": "refAccepts / dealOne1 / pack record read it"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only d2-repeat-key",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-route-floor",
+   "check": "critic r2 N2 / N3 / N4: a routed check question keeps 2 items, the table states the miss rule, bands print __/n, LR-6 on the check",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only route-floor (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "1-item questions, no miss rule, no __/n"
+   },
+   "pass": {
+    "commit": "eddc51fd",
+    "state": "floor 2, ROUTE_MISSED_RULE, scoreTag, lr6"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only route-floor",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

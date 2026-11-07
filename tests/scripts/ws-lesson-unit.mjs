@@ -50,6 +50,8 @@ const LATE = {
     // Lesson 7 D2 (lf-engine P1b): the compiled card's `repeatKey: 'family+frame'` is read by both dealers - an item's
     // unordered x / ÷ family and its story frames are held once across the pack.
     async 'd2-repeat-key'() {
+        ok(typeof LR.repeatKeysOf === 'function', 'D2: lesson-rules.js exports repeatKeysOf');
+        if (typeof LR.repeatKeysOf !== 'function') return;
         const ws = { cell: { template: 'word-work', payload: { steps: [{ op: '*', a: 4, b: 6, ans: 24 }, { op: '+', a: 24, b: 3 }], lines: ['Ravi has 4 bags.', 'Each bag has 6 marbles.', 'How many marbles in all?'] } } };
         eq(LR.repeatKeysOf(ws), ['rk:fam:4,6,24', 'rk:frame:4 bag', 'rk:frame:6 marble'], 'D2: a two-step story keys its x step family and its frames');
         eq(LR.repeatKeysOf({ cell: { payload: { op: '/', a: 24, b: 6 } } }), ['rk:fam:4,6,24'], 'D2: 24 ÷ 6 is the family of 4 x 6');
