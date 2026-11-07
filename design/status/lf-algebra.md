@@ -25,6 +25,16 @@ Critic rounds: 0, none
 - (cards' undecided lines are listed here as they are drafted)
 
 ## Times
+Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end —, profile mq-opus-medium
+Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end —, profile mq-opus-medium
+
+## Baseline precritic (head 9398c3a, --skill function_table_easy,number_patterns_rule --strict): 6 FAIL
+- print-lint lesson L/S: function_table_easy L-TOPSTART CL-4b, L-ANSAREA SL-6, L-DENSITY DN-2; number_patterns_rule L-OVERFLOW PG-12 (x8)
+- grade-render gate: 60 overflow (number_patterns_rule lesson-S count-row train leaves its cell) + 8 small screen targets
+- sibling-compare: function_table_easy DN-2 / PAGEFILL / PG-23 at S/M/L, no approved sibling
+- node-lint LESSON-DATA: no prereqs.js lesson data for either skill
+- options-verify --render: 22 values worse than default (ftTask values / ftTable 51-52 lose capacity, H13; ftTask=rule L CL40-INK)
+- card-rulings SKIPPED / spec-card N/A: no card yet
 
 ## Log
 - 2026-11-07: lf-ops agreed (session_013pHDnQ7sfFBg45rrEDgLdJ): lf-algebra owns ONLY genNumberPatterns + its dispatch line in
