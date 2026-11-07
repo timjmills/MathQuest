@@ -9,6 +9,7 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
+- Lesson 2 E24b attempt 2: fixed at seed 4242 (solveStoryFacts + setDealPin, lesson 2 only), on `claude/sweet-newton-c8wrv1-lf-engine-live-l2` 444c50d4 (from master 5cbe360d2) - sent to the lead. Seeds 1-3 still infeasible (no valid Practice 1 after the chart, Guided, exit and Check Question deal): next step solve Practice FIRST and add its set to `used`; node count of valid pages per seed before any render. Session $184.88 ≈ 9.2 %.
 - LIVE: master 5cbe360d2 (lesson 3a owner rulings + lesson 2 parts 2-9; lead's gates green). Stopped for the week; next week starts with lesson 2 attempt 2 (pin the generator's case - sum and parts - not the exact fact).
 - PAUSED (evening rounds done). Deploy list sent: -live 538c2b58, 0b8ffb14, a0cca381 (lesson 3a owner rulings PASS narrow critic r2 min 8; lesson 2 parts 2-9).
 - Open: lesson 2 E24b (deal order; attempt 1 patch in design/lessons/proof/live-2026-11-07/), E9, E35 (lf-checks gate); phase 0 critic r3; P2b proof; pv chartPage defects (item 8).
