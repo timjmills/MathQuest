@@ -332,6 +332,13 @@ function judge(g, run, p) {
 const PARSE = {
     // ws-detailed-lesson prints `ws-detailed-lesson: OK|FAIL` (--check), `ws-detailed-lesson --repeats|--lp|--sweep: OK|FAIL (n)`;
     // the last such line is the verdict, and the FAIL rows (E.. / LP-.. / seed ..) are the findings
+    lessonSamples(g, out, code) {
+        const m = [...out.matchAll(/^ws-lesson-samples --check: (OK|FAIL)\b.*$/gm)];
+        if (!m.length) return unparsed('no "ws-lesson-samples --check: OK|FAIL" line', out);
+        if (m[m.length - 1][1] === 'OK') return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
+        const rows = out.split('\n').filter((l) => /^PC-\w+\s+FAIL/.test(l)).map((l) => l.trim().replace(/\s+/g, ' '));
+        return { result: 'FAIL', findings: rows.join(', ') || m[m.length - 1][0], detail: out.split('\n').filter((l) => /^ {3}\S/.test(l)).slice(0, 12).map((l) => l.trim()), explainsExit: true };
+    },
     detailedLesson(g, out, code) {
         const m = [...out.matchAll(/^ws-detailed-lesson(?: --[\w-]+)?: (OK|FAIL)\b.*$/gm)];
         if (!m.length) return unparsed('no "ws-detailed-lesson[ --mode]: OK|FAIL" line', out);
@@ -646,7 +653,7 @@ const PARSE = {
 };
 
 /* ============================================================== plan */
-function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
+function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
 function buildPlan(ctx) {
     const rows = [];
@@ -874,6 +881,15 @@ function buildPlan(ctx) {
         if (ctx.role === 'lesson' && !ctx.teacher) add(gate('teacher-wrm', 'ws-teacher-wrm (detailed-lesson cards: Practice link keeps every skill use and its options)', 'White Rose, every lesson + every detailed lesson', 'browser', 'ws-teacher-wrm', []));
         // lessons-sharelink (2026-10-31): the link kept every use, but the PUPIL side keyed the queue and option store by
         // skill, so a repeated skill played only its first use's options. ws-lesson-link-uses opens each such link as a pupil.
+        // lessons-phase0 critic r1 (lf-checks 2026-11-07, through the lead): the SHORT lesson's machine checks on the three
+        // pinned samples (add_facts, sub_100_regroup, nearest_10): ws-lesson-samples --check (PC-RANGE D3/D7, PC-NAME D2/D5/D12,
+        // PC-SLOTS D1/D6, PC-SCAFFOLD D8, PC-H13 D4/D9/D11 - sheetCheck now blocking, PC-CLIP D10) and ws-print-lint L-KEY
+        // (AK-1..AK-4, D6) + L-OVERLAP (SECTION, D10) on their lesson pages at L and S with NO baseline (blocking)
+        if (ctx.role === 'lesson') {
+            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S', 'browser', 'ws-lesson-samples', ['--check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            const SAMPLES = 'addition:add_facts,subtraction:sub_100_regroup,number_sense:nearest_10';
+            for (const sz of ['L', 'S']) add(gate(`lesson-samples-key-${sz}`, `ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP --size ${sz} (the three lesson samples, no baseline: AK-4 and SECTION blocking)`, `3 sample lessons at ${sz}`, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'lesson', '--size', sz, '--lints', 'L-KEY,L-OVERLAP', '--skills', SAMPLES], { parse: PARSE.printLint, expect: { ids: SAMPLES.split(',').map((k) => `${k}#lesson`) } }));
+        }
         if (ctx.role === 'lesson' && !ctx.teacher) add(gate('lesson-link-uses', 'ws-lesson-link-uses (a pupil plays every use of a detailed lesson link, each with its own options)', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
     }
     // the lesson scope: per detailed lesson, the E-checks + repeats, the LP checks on the rendered pack, the 25-seed sweep

@@ -69,10 +69,23 @@ function lpMeasure(opt) {
             const keyEmpty = writing.filter((e) => !filled(e)).length;
             const cl = c.cloneNode(true); cl.querySelectorAll('[data-ws-key-ans], [data-ws-label], .ws-letter').forEach((x) => x.remove());
             const traces = c.querySelectorAll('.ws-trace, [data-ws-trace], .ws-ghost').length;
+            // a grey RING or outline (the hint marks of a Guided cell: lesson 4 r1 D6 fix rings the even headers in grey)
+            const greyLine = [...c.querySelectorAll('*')].filter((e) => !e.closest('[data-ws-label], .ws-letter, [data-ws-key-ans]') && (layout
+                ? (() => { const cs = getComputedStyle(e); return (parseFloat(cs.borderTopWidth) > 0 && /148,\s*148,\s*148/.test(cs.borderTopColor)) || (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0 && /148,\s*148,\s*148/.test(cs.outlineColor)) || /148,\s*148,\s*148|#949494/i.test(String(e.getAttribute('stroke') || cs.stroke || '')); })()
+                : /(?:border|outline)[^;]*#949494|stroke[:=]"?\s*#949494/i.test((e.getAttribute('style') || '') + ' ' + (e.getAttribute('stroke') ? `stroke=${e.getAttribute('stroke')}` : '')))).length;
             const greyInk = [...c.querySelectorAll('*')].filter((e) => !e.closest('[data-ws-label], .ws-letter, [data-ws-key-ans]') && e.childNodes.length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && grey(e)).length;
-            const o = { letter: lab ? norm(lab.textContent).replace(/\.$/, '') : '', text: norm(cl.textContent), slots: slots.length, writing: writing.length, keyEmpty, keyAns, traces, greyInk,
+            const o = { letter: lab ? norm(lab.textContent).replace(/\.$/, '') : '', text: norm(cl.textContent), slots: slots.length, writing: writing.length, keyEmpty, keyAns, traces, greyInk, greyLine,
                 level: Number(c.getAttribute('data-ws-level') || c.querySelector('[data-ws-level]')?.getAttribute('data-ws-level') || 0),
-                say: c.querySelectorAll('.ws-band--say').length, steps: c.querySelectorAll('[data-mq-lesson-strip]').length };
+                say: c.querySelectorAll('.ws-band--say').length, steps: c.querySelectorAll('[data-mq-lesson-strip]').length,
+                // a regroup / exchange box over the digits (the kit's segment boxes) and a second task in the cell (a Check row)
+                regroup: c.querySelectorAll('[data-ws-seg], .ws-regroup, [data-ws-regroup]').length,
+                // a drawn answer box with nothing in it (an SVG rect no text sits in) beside an "Answer:" line: two places
+                // to write for one answer (phase 0 r1 D1, add Q2: "12 13 [ ] 15 16" plus "Answer: ___")
+                emptyBox: [...c.querySelectorAll('svg rect')].filter((r) => { const x = +r.getAttribute('x'), y = +r.getAttribute('y'), w = +r.getAttribute('width'), h = +r.getAttribute('height');
+                    if (!(w > 10 && h > 10) || (r.getAttribute('fill') && !/none|transparent|#fff/i.test(r.getAttribute('fill')))) return false;
+                    return ![...r.ownerSVGElement.querySelectorAll('text')].some((t) => { const tx = +t.getAttribute('x'), ty = +t.getAttribute('y'); return tx >= x && tx <= x + w && ty >= y && ty <= y + h; }); }).length,
+                answerLine: /\bAnswer:/.test(c.textContent),
+                responses: 1 + (all.some((e) => /^check/.test(e.getAttribute('data-ws-slot') || '')) ? 1 : 0) };
             if (layout) o.slotMm = slots.filter((e) => /^(box|line|open)$/.test(e.getAttribute('data-ws-shape') || 'box')).map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.width / MM * 10) / 10, Math.round(r.height / MM * 10) / 10]; });
             return o;
         };
@@ -217,12 +230,14 @@ function giveaway(pk) {
         // Guided vs Independent
         const g = p.bands.filter((b) => /^Guided/i.test(b.label)), ind = p.bands.filter((b) => /^Independent/i.test(b.label));
         if (g.length && ind.length) {
-            const hint = (c) => c.traces + c.greyInk + c.level;
+            // a hint is something drawn to help: a trace, grey ink, a grey ring (data-ws-level is the scaffold LEVEL the
+            // builder asked for, not a drawn hint: critic r1 D1, lesson 4 r1 had level 2 vs 1 and nothing drawn)
+            const hint = (c) => c.traces + c.greyInk + (c.greyLine || 0);
             const gH = Math.max(0, ...g.flatMap((b) => b.cells.map(hint))), iH = Math.max(0, ...ind.flatMap((b) => b.cells.map(hint)));
             n++;
             const gT = g.flatMap((b) => b.cells).some((c) => c.traces > 0), iT = ind.flatMap((b) => b.cells).some((c) => c.traces > 0);
-            if (gH === 0) probs.push(`${p.id}: Guided cells carry no hint (trace / grey ink), so Guided = Independent`);
-            else if (!gT && iH >= gH) probs.push(`${p.id}: Independent carries as much hint as Guided (${iH} vs ${gH}) and Guided traces nothing`);
+            if (gH === 0) probs.push(`${p.id}: Guided cells carry no hint (trace / grey ink / grey ring), so Guided = Independent`);
+            else if (iH >= gH) probs.push(`${p.id}: Independent carries as much hint as Guided (${iH} vs ${gH}): nothing fades`);
             else if (gT && iT) probs.push(`${p.id}: Independent cells keep the Guided trace (nothing fades)`);
         }
     }
@@ -282,7 +297,10 @@ function numbers(pk) {
             // a wrong answer quoted on purpose ("80039 for 839") and digits written into a place-value chart ("Write 1000 on
             // the board under Th H T O") are bare by design
             const after = text.slice(m.index + m[1].length, m.index + m[1].length + 60);
-            if (/^ for /.test(after) || /\b(?:Th )?H T O\b/.test(after.split(/[.|]/)[0])) continue; if (/^20[2-3]\d$/.test(m[1]) && /\b(19|20)\d\d\b/.test(m[1]) && /year|©/i.test(text.slice(Math.max(0, m.index - 12), m.index))) continue; probs.push(`${t.id}: bare "${m[1]}" (write ${Number(m[1]).toLocaleString('en-US')})`); }
+            if (/^ for /.test(after) || /\b(?:Th )?H T O\b/.test(after.split(/[.|]/)[0])) continue;
+            // both forms quoted side by side ("(7000 or 7,000) is right": accepted answers, critic r1 D2)
+            const comma = Number(m[1]).toLocaleString('en-US');
+            if (text.slice(Math.max(0, m.index - 24), m.index + m[1].length + 24).includes(comma)) continue; if (/^20[2-3]\d$/.test(m[1]) && /\b(19|20)\d\d\b/.test(m[1]) && /year|©/i.test(text.slice(Math.max(0, m.index - 12), m.index))) continue; probs.push(`${t.id}: bare "${m[1]}" (write ${Number(m[1]).toLocaleString('en-US')})`); }
     }
     for (const p of pupilPages(pk)) {
         const nums = [...new Set([...String(p.text).matchAll(/(?<![\d.])\d{1,3}(?:,\d{3})+(?![\d,])|(?<![\d,.])\d{4,}(?![\d,])/g)].map((m) => digits(m[0])))];
@@ -314,11 +332,14 @@ function fallback(pk) {
 
 function prereq(pk) {
     const p = pk.pages.find((x) => x.id === 'P0'), k = keyOf(pk, 'P0'); const probs = [];
-    if (!p || !k) return { id: 'LP-PREREQ', pass: true, msg: 'no Prerequisite Check page (N/A)', detail: [] };
+    // (the range clause, "items inside the route step's range", needs each item's route step: the detailed pack's P0 does
+    // not carry it; the short lesson's check page does, and ws-lesson-samples --check PC-RANGE judges it there)
+    if (!p || !k) return { id: 'LP-PREREQ', pass: true, na: true, msg: 'N/A: no Prerequisite Check page in this pack', detail: [] };
     p.cells.forEach((c, i) => {
         const kc = k.cells[i]; const lab = c.letter || String(i + 1);
         if (kc && kc.keyEmpty) probs.push(`P0 ${lab}: ${kc.keyEmpty} of ${kc.writing} writing slot(s) left empty on the key (one slot per key answer)`);
-        if (c.traces || c.greyInk || c.say || c.steps) probs.push(`P0 ${lab}: scaffold on a check cell (${[c.traces && 'trace', c.greyInk && 'grey ink', c.say && 'Say band', c.steps && 'Steps'].filter(Boolean).join(', ')})`);
+        if (c.traces || c.greyInk || c.say || c.steps || c.regroup) probs.push(`P0 ${lab}: scaffold on a check cell (${[c.traces && 'trace', c.greyInk && 'grey ink', c.regroup && 'regroup / exchange box', c.say && 'Say band', c.steps && 'Steps'].filter(Boolean).join(', ')})`);
+        if ((c.responses || 1) > 1) probs.push(`P0 ${lab}: ${c.responses} tasks in one check cell (a Check row: one point, two answers)`);
     });
     if (p.say.length || p.steps.length) probs.push(`P0 prints ${p.say.length ? 'a Say band' : ''}${p.steps.length ? ' a Steps band' : ''}`);
     return { id: 'LP-PREREQ', pass: !probs.length, msg: probs.length ? probs.slice(0, 6).join('; ') : `P0: ${p.cells.length} cells, every writing slot filled on the key, no scaffold`, detail: probs };
@@ -341,7 +362,12 @@ const CHECKS = { 'LP-FAMILY-REPEAT': familyRepeat, 'LP-TEXT': textCheck, 'LP-GIV
 /** The pure checks on a packet; `only` limits them. LP-RASTER is run by lpRaster (it needs the PDF). */
 function lpChecks(pk, only) {
     const ids = (only && only.length ? only : Object.keys(CHECKS)).filter((id) => CHECKS[id]);
-    return ids.map((id) => CHECKS[id](pk));
+    // an empty read is a failure, never a pass (critic r1 D5: a DOM rename would make every check vacuous)
+    const pupil = ((pk && pk.pages) || []).filter((p) => p.kind === 'pupil');
+    const empty = !pupil.length ? 'no pupil page read (markup changed? data-dl-page / data-dl-kind)' : !pupil.some((p) => (p.cells || []).length) ? 'no item cell read on any pupil page' : null;
+    if (empty) return ids.map((id) => ({ id, pass: false, msg: `nothing read: ${empty}`, detail: [] }));
+    const noPool = !pk.pool || !Array.isArray(pk.pool.places) || !pk.pool.places.length;
+    return ids.map((id) => (noPool && ['LP-FAMILY-REPEAT', 'LP-MODELLED'].includes(id) ? { id, pass: false, msg: 'nothing read: no pool JSON (#v21-pool) or no places in it', detail: [] } : CHECKS[id](pk)));
 }
 
 /* ------------------------------------------------------------------ LP-RASTER (PyMuPDF) */
@@ -399,7 +425,10 @@ print(json.dumps(out))
 `;
 /** pages: the 1-based PDF pages to read (the pupil pages and keys; a teacher page's thumbnails are scaled-down pupil pages,
  *  whose rules no pupil sees) - null for every page. */
-function lpRaster(pdf, execFileSync, dpis = [72, 93], pages = null) {
+function lpRaster(pdf, execFileSync, dpis = [72, 93], pages = null, expectPages = null) {
+    // the packet's pages and the PDF's must be the same pages, or the page filter reads the wrong ones (critic r1 n8)
+    if (expectPages != null) { const n = Number(execFileSync('python3', ['-c', 'import sys, pymupdf; print(len(pymupdf.open(sys.argv[1])))', pdf], { encoding: 'utf8' }).trim());
+        if (n !== expectPages) return { id: 'LP-RASTER', pass: false, msg: `the PDF has ${n} pages, the packet ${expectPages}: page filter would read the wrong pages`, detail: [] }; }
     const res = JSON.parse(execFileSync('python3', ['-c', RASTER_LP_PY, pdf, dpis.join(','), pages ? pages.join(',') : ''].filter((x, i) => i < 4 || x), { encoding: 'utf8', maxBuffer: 64 << 20 }).trim().split('\n').pop());
     const bad = res.filter((r) => r.lost > 0);
     const rules = res.filter((r) => r.dpi === dpis[0]).reduce((a, r) => a + r.rules, 0);
@@ -430,6 +459,11 @@ function selfTest() {
     eq('numbers bare', numbers({ pages: [pg('T3', 'teacher', { text: '4. 4000 · 5. 50 · seed 4242 © 2026' })] }).pass, false);
     eq('numbers comma', numbers({ pages: [pg('T3', 'teacher', { text: '4. 4,000 · 5. 50 · seed 4242 © 2026' })] }).pass, true);
     eq('near look', numbers({ pages: [pg('P4-2', 'pupil', { text: '92,163 | 92,715' })] }).pass, false);
+    eq('empty read fails', lpChecks({ pages: [], pool: null }).every((r) => !r.pass), true);
+    eq('bare with comma twin', numbers({ pages: [pg('T6', 'teacher', { text: '(7000 or 7,000) is right' })] }).pass, true);
+    eq('level is not a hint', giveaway({ pages: [pg('P3', 'pupil', { bands: [{ label: 'Guided Practice:', cells: [cell({ level: 2 })] }, { label: 'Independent Practice:', cells: [cell({ level: 1 })] }] })] }).pass, false);
+    eq('grey ring is a hint', giveaway({ pages: [pg('P3', 'pupil', { bands: [{ label: 'Guided Practice:', cells: [cell({ greyLine: 2 })] }, { label: 'Independent Practice:', cells: [cell({})] }] })] }).pass, true);
+    eq('exchange box on a check cell', prereq({ pages: [pg('P0', 'pupil', { cells: [cell({ regroup: 2 })] }), pg('P0-key', 'key', { cells: [cell({ keyAns: ['8'] })] })] }).pass, false);
     eq('fallback', fallback({ pages: [pg('P2', 'pupil', { zooms: [0.77] })] }).pass, false);
     eq('prereq slots', prereq({ pages: [pg('P0', 'pupil', { cells: [cell({ slots: 2 })] }), pg('P0-key', 'key', { cells: [cell({ keyAns: ['14'], writing: 2, keyEmpty: 1 })] })] }).pass, false);
     eq('modelled', modelled({ pool: { places: [{ page: 'P2', item: '1', rep: 'a' }, { page: 'P4-1', item: '2', rep: 'b' }] }, pages: [] }).pass, false);

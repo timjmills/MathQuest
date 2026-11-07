@@ -778,7 +778,7 @@ function selfCheckMd(rows, pages, info) {
 /* ------------------------------------------------------------------ --lp / --sweep (lane lf-checks) */
 const ONLY = (arg('only', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
 function lpReport(rows, label) {
-    for (const r of rows) console.log(`${r.id.padEnd(17)} ${r.pass ? 'PASS' : 'FAIL'} ${String(r.msg).slice(0, 400)}`);
+    for (const r of rows) console.log(`${r.id.padEnd(17)} ${r.na ? 'N/A ' : r.pass ? 'PASS' : 'FAIL'} ${String(r.msg).slice(0, 400)}`);
     const bad = rows.filter((r) => !r.pass).length;
     console.log(`ws-detailed-lesson --${label}: ${bad ? `FAIL (${bad})` : 'OK'}`);
     return bad;
@@ -908,7 +908,7 @@ else (async () => {
             try { lpPk.commit = execFileSync('git', ['-C', ROOT, 'rev-parse', '--short=8', 'HEAD'], { encoding: 'utf8' }).trim(); } catch (e) { /* not a checkout */ }
             if (arg('packet-out', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('packet-out')), JSON.stringify(lpPk));
             const rows = LP.lpChecks(lpPk, ONLY.filter((x) => x !== 'LP-RASTER'));
-            if (!ONLY.length || ONLY.includes('LP-RASTER')) rows.push(LP.lpRaster(pdf, execFileSync, [72, 93], lpPk.pages.map((p, i) => (p.kind === 'teacher' ? 0 : i + 1)).filter(Boolean)));
+            if (!ONLY.length || ONLY.includes('LP-RASTER')) rows.push(LP.lpRaster(pdf, execFileSync, [72, 93], lpPk.pages.map((p, i) => (p.kind === 'teacher' ? 0 : i + 1)).filter(Boolean), lpPk.pages.length));
             console.log(`${LESSON}: ${lpPk.pages.length} pages read (seed ${SEED})`);
             const lpBad = lpReport(rows, 'lp');
             if (!has('check')) { await app.close(); process.exit(lpBad ? 1 : 0); }
