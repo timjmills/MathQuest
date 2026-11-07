@@ -80,6 +80,25 @@ const PAGE_CAP = Object.freeze({
     'addition:number_families_add': { S: 12, M: 9, L: 6 },
     'multiplication:number_families_mult': { S: 8, M: 9, L: 6 },
 });
+/**
+ * A div_facts across fact printed over its answer line (equation.js acrossBelow reads the payload's `mix`: paper only,
+ * the screen keeps the line beside) - critic r5 R5-2 / R5-6.
+ */
+function factUnder(g) {
+    const c = g && g.q && g.q.cell;
+    if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact) return g;
+    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { mix: true }) }) }) });
+}
+/** Is this section div_facts alone, in its Standard (across) form, with no support drawn on any fact? */
+function divFactsPlainSection(sec) {
+    const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
+    if (!sk || sk.categoryId !== 'division' || sk.skillId !== 'div_facts') return false;
+    let o;
+    try { o = normalizeOptions('division', 'div_facts', sk.opts || {}); } catch (e) { return false; }
+    if (o.divForm !== 'standard') return false;
+    const sup = (Array.isArray(o.support) ? o.support : []).filter((v) => !(v === 'array' && divFactsMaxDividend(o) > DIV_ARRAY_MAX));
+    return sup.length === 0;
+}
 /** The page ceiling of a section (Infinity when its skill has none). */
 function pageCapOf(sec, size) {
     const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
@@ -181,6 +200,19 @@ function normaliseRequest(req = {}) {
         sec.noCap = true;
         sec.pageCap = pageCapOf(sec, size);
         if (sec.dense) sec.dense = { S: pageCapOf(sec, 'S'), M: pageCapOf(sec, 'M'), L: pageCapOf(sec, 'L') };
+    }
+    // div_facts critic r5 R5-2 (facts card F1 / RUBRIC H13, ink-measured): a section of BARE div_facts facts (no support
+    // drawn: none ticked, or the array past 50) prints each fact over its answer line (the Test's form, DN-22), so the
+    // one-line fact no longer sits in a row of 22-28 mm with half of it empty (54 % at S). div_facts only: the passed
+    // add / sub / mult fact pages keep their layout.
+    if (role === 'independent' || role === 'review') {
+        // (the rows then take what the page holds of the two-line cell, up to DN-1's 30 / 24 / 20: at L 15 in 42 mm rows
+        // left 34 % under the line, 18 in 37 mm rows leave 25 %)
+        for (const sec of sections) {
+            if (!divFactsPlainSection(sec)) continue;
+            sec.divUnder = true;
+            if (sec.dense === true && sec.columns === 'auto') sec.dense = { S: 30, M: 24, L: 20 };
+        }
     }
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
     // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
@@ -3048,7 +3080,7 @@ async function buildSheetDeal(req = {}) {
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
-        const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
+        const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra)).map((g) => (sec.divUnder ? factUnder(g) : g));
         const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt, stage: sec.fadeStage };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
@@ -4087,7 +4119,9 @@ async function buildRoleSheet(n, metaOf) {
             const g = pl && Number(pl.digits) !== mixDigits
                 ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
                 : g0;
-            const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
+            // (critic r5 R5-2: a Review's bare div_facts facts print over their answer line, as on the Independent page)
+            const gU = n.sections.some((sec) => sec.divUnder) && g.skill && g.skill.categoryId === 'division' && g.skill.skillId === 'div_facts' ? factUnder(g) : g;
+            const it = settlePrompts([hostItem(gU, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
             if (keepPrompts) it.stripPrompt = false;
             // Error analysis never falls back to an "Answer:" line under the cell: the shown work
             // must sit in the cell's own slot, or the pupil sees two answer places (C1).
