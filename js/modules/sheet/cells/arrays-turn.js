@@ -48,12 +48,15 @@ const slotIds = (p) => SLOT_ORDER[p.type] || SLOT_ORDER.known;
 function dotsSvg(g, rows, cols, ink, label) {
     const pitch = PITCH[g.size] || PITCH.L;
     const r = Math.min(DOT[g.size] || DOT.L, pitch - 2.5) / 2;
-    const W = cols * pitch, H = rows * pitch;
+    // (owner ruling 2026-11-07, lesson 3a: arrays up to 6 x 6 - past 5 dots a line takes RP-21's subitising gap after the 5th)
+    const FIVE_GAP = 1.5;
+    const at = (k, n) => k * pitch + (n > 5 && k >= 5 ? FIVE_GAP : 0);
+    const W = cols * pitch + (cols > 5 ? FIVE_GAP : 0), H = rows * pitch + (rows > 5 ? FIVE_GAP : 0);
     const fill = ink === 'trace' ? INK.grey : INK.ink;
     let body = '';
     if (ink !== 'none') {
         for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
-            body += `<circle cx="${(pitch / 2 + j * pitch).toFixed(2)}" cy="${(pitch / 2 + i * pitch).toFixed(2)}" r="${r.toFixed(2)}" fill="${fill}"/>`;
+            body += `<circle cx="${(pitch / 2 + at(j, cols)).toFixed(2)}" cy="${(pitch / 2 + at(i, rows)).toFixed(2)}" r="${r.toFixed(2)}" fill="${fill}"/>`;
         }
     }
     const svg = `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" data-per-row="${cols}" role="img" aria-label="${esc(label)}" `
