@@ -9,8 +9,8 @@
 //                 boxes (hint off, never graded); under Term 4 the ANSWER box (1.5 pt, the heaviest place, VQ-6) -
 //                 or, on task `far`, a working box, the answer then on its own line "Term 10 has [ ] dots".
 //   task `rule`   one more line: "Rule: + [ ]", a second graded box (the step), so two answers have two places.
-//   sizes         one unit u = 2.4 / 3.0 / 3.6 mm (S / M / L), dots 0.72 u across, squares u; strokes 0.75 pt (parts),
-//                 the box 0.75 pt, the answer 1.5 pt. S fits two cells across (88 mm), M and L one.
+//   sizes         one unit u = 2.0 / 2.8 / 3.3 mm (S / M / L), dots 0.8 u across, squares u; strokes 0.75 pt (parts),
+//                 the box 0.75 pt, the answer 1.5 pt. S fits two cells across (82 mm), M and L one.
 //   screen twin   the same three drawings; the Term 4 box is a 7 x 7 grid of tap targets (>= 44 px on a card): a tap
 //                 puts a dot / square there, a second tap takes it away (working, never graded); the count and rule
 //                 boxes are the host's inputs (`data-mq-cell`), the working boxes `input.mq-wwork`.
@@ -27,7 +27,7 @@ import { answerArea } from '../graphics/answer-area.js';
 
 export const GROW_TEMPLATE = 'growing-pattern';
 const GRID = 7;                                   // every term fits 7 x 7 units at Term 4
-const UNIT = { S: 2.2, M: 3.0, L: 3.6 };
+const UNIT = { S: 2.0, M: 2.8, L: 3.3 };
 const PAD = 0.9;                                  // units of white round the drawing inside its box
 
 /** How many objects Term t has (start + (t - 1) × step); NaN for an unknown family. */
@@ -200,7 +200,8 @@ register(GROW_TEMPLATE, {
         const box = boxMm(ctx);
         const gap = sizeOf(ctx) === 'S' ? 1.6 : 2.5;
         const w = 4 * box + 3 * gap + 7;
-        return { wMm: Math.ceil(w), hMm: null, measure: true, factLike: false, maxCols: w <= 93 ? 2 : 1, denseRoom: 1 };
+        // answered in place (boxes in the drawing): rows packed to the measured height, never stretched
+        return { wMm: Math.ceil(w), hMm: null, measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1, inPlace: true };
     },
     inputs(p) {
         const out = [{ id: 'answer', kind: 'number', shape: 'box', graded: true, order: 0, scopes: ['full', 'answer-only'] }];

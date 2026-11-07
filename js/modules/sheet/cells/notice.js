@@ -130,8 +130,8 @@ function trackTiles(p, ctx) {
     const terms = p.terms || [];
     const digits = Math.max(2, ...terms.map((v) => String(v).length));
     const sz = sizeOf(ctx);
-    const w = (sz === 'S' ? 10 : sz === 'M' ? 11.5 : 13) + (digits > 2 ? 2.5 : 0);
-    const h = sz === 'S' ? 10 : sz === 'M' ? 11.5 : 13;
+    const w = (sz === 'S' ? 9 : sz === 'M' ? 10 : 11) + (digits > 2 ? 2.5 : 0);
+    const h = sz === 'S' ? 8.5 : sz === 'M' ? 9.5 : 10.5;
     const pt = Math.min(digitPt(ctx) * 0.7, 18);
     const filled = !!ctx.state && ctx.state !== 'blank' && ctx.state !== 'wrong';
     return terms.map((v, i) => {
@@ -146,11 +146,11 @@ function trackTiles(p, ctx) {
  * screen-cell.js wireTickBoxes turns into one tap target a row. The whole list is ONE slot (shape check, AK-2).
  */
 function sentenceList(ctx, choices, on) {
-    const pt = textPt(ctx) + 1;
+    const pt = textPt(ctx);
     const rows = choices.map((c, i) => {
         const box = checkBox(ctx, { id: `c${i}`, on: on === i, slot: false });
         return `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.2)} 0;">`
-            + `<span style="flex:1 1 auto;min-width:0;white-space:normal;text-align:left;font-size:${P(ctx, pt)};font-weight:400;line-height:1.25;">${esc(c)}</span>${box}</div>`;
+            + `<span style="flex:1 1 auto;min-width:0;white-space:normal;text-align:left;font-size:${P(ctx, pt)};font-weight:700;line-height:1.25;">${esc(c)}</span>${box}</div>`;
     }).join('');
     const ink = on >= 0 && ctx.state === 'answered' ? ' data-ws-ink="solid"' : '';
     return `<div class="k2-choices mq-nt-list" data-ws-slot="answer" data-ws-shape="check"${ink} style="display:block;text-align:left;">${rows}</div>`;
@@ -159,7 +159,7 @@ function sentenceList(ctx, choices, on) {
 function featureCell(p, ctx) {
     const choices = (p.choices || []).map(String);
     const on = isTwin(ctx) ? -1 : checkedChoice(p, ctx, choices);
-    const rule = `<div class="mq-nt-rule" style="font-size:${P(ctx, textPt(ctx) + 2)};font-weight:700;line-height:1.2;">Start at ${esc(p.start)}. Add ${esc(p.step)} each time.</div>`;
+    const rule = `<div class="mq-nt-rule" style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.2;">Start at ${esc(p.start)}. Add ${esc(p.step)} each time.</div>`;
     const tiles = trackTiles(p, ctx);
     // two threes side by side: one row of six where it fits, else three over three (never 5 + 1)
     const g = L(ctx, 1.5);
@@ -212,10 +212,9 @@ register(NOTICE_TEMPLATE, {
     // answered in place (a ring or a check): rows packed to the measured height. The fact is narrow (three a row);
     // the sentences need a wide cell (two a row at S, where the text is smallest; one at M and L).
     footprint(p, ctx) {
-        if (p.task === 'feature' || p.task === 'truefalse') {
-            const s = sizeOf(ctx) === 'S';
-            return { wMm: s ? 92 : 130, hMm: null, measure: true, factLike: false, maxCols: s ? 2 : 1, denseRoom: 1, inPlace: true };
-        }
+        // (one wide cell a row at every size: two across at S left a 37 % band beside a cell whose sentences wrap
+        // to more lines, H13; S still fits more rows than L, its text being smaller)
+        if (p.task === 'feature' || p.task === 'truefalse') return { wMm: 130, hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true };
         return { wMm: 60, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true };
     },
     inputs(p) {

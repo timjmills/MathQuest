@@ -99,7 +99,11 @@ function noticeStrings(ref = {}) {
 noticeStrings.def = NOTICE_STRINGS.parity.def;
 
 /** A preset page with no item yet (the title of the pattern_features preset). */
-const presetTask = (ref) => (ref && ref.skillId === 'pattern_features' ? 'feature' : null);
+const presetTask = (ref) => {
+    const t = ref && ref.opts && ref.opts.patTask;
+    if (t && NOTICE_BY_TASK[t]) return t;
+    return ref && ref.skillId === 'pattern_features' ? 'feature' : null;
+};
 
 /** The first product a false times-table sentence does not fit (the counterexample a pupil names). */
 function counterExample(p) {
@@ -136,12 +140,12 @@ function noticeSteps(q) {
     }
     if (p.task === 'feature') {
         const marks = p.show === false ? p.terms.slice(1).map((v, i) => ({ slot: `w${i + 1}`, value: String(v) })) : [];
-        const out = [step(`Start at ${p.start}. Add ${p.step} each time: ${p.terms.join(', ')}.`, marks)];
+        const out = [step(`Add ${p.step} each time: ${p.terms.slice(0, 4).join(', ')} …`, marks)];
         (p.choices || []).forEach((c, i) => {
             if (i === p.correct) return;
-            out.push(step(`"${c}" No: test every number.`));
+            out.push(step(`Sentence ${i + 1}: not true for every number.`));
         });
-        out.push(step(`"${p.choices[p.correct]}" Yes, every number fits. Check it.`, ans));
+        out.push(step(`Sentence ${p.correct + 1} fits every number. Check it.`, ans));
         return clampSteps(out);
     }
     const bad = counterExample(p);
@@ -212,7 +216,8 @@ const growStepsFor = (q) => {
 const GROW_STRINGS = Object.fromEntries(Object.entries(GROW_BY_TASK).map(([k, d]) => [k, strings({ ...d, say: GROW_SAY, sayValues: growSayValues, stepsFor: nbSteps(growStepsFor), vocabulary: ['term', 'pattern', 'rule'] })]));
 function growStrings(ref = {}) {
     const p = growOf(ref && ref.q);
-    return GROW_STRINGS[p && GROW_STRINGS[p.ask] ? p.ask : 'next'](ref);
+    const t = p && GROW_STRINGS[p.ask] ? p.ask : (ref && ref.opts && GROW_STRINGS[ref.opts.patTask] ? ref.opts.patTask : 'next');
+    return GROW_STRINGS[t](ref);
 }
 growStrings.def = GROW_STRINGS.next.def;
 

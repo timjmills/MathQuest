@@ -462,6 +462,8 @@ export const LESSONS = Object.freeze({
             { icon: 'decide', text: 'Check the true one.' },
         ],
         chant: 'True for every number, not just the first.',
+        // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout)
+        chartWide: true,
         format: {
             kind: 'numbered steps with icons + a chant',
             why: 'The error the lesson fights is reading a pattern off the first numbers; the chant names it.',
@@ -491,6 +493,8 @@ export const LESSONS = Object.freeze({
             { icon: 'write', text: 'Write how many.' },
         ],
         chant: 'Count, find the more, draw, write.',
+        // the drawing is too wide for half the page: every anchor panel a full-width row (lesson.js chartLayout)
+        chartWide: true,
         format: {
             kind: 'numbered steps with icons + a chant',
             why: 'Four actions in a fixed order; the chant is the order.',
