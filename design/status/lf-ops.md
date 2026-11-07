@@ -21,6 +21,15 @@ Operations skills used by BUILD lessons that are not at 8/10 (design/lessons-fir
 - Round 2 (after round 1): addition:add_column_multi, add_wp_100, subtraction:sub_wp_100, sub_wp_20, multiplication:mult_zeros (+ facts_times_tens).
 - Round 4: addition:number_line_add, subtraction:number_line_sub (+ nl_tens_ones_jumps).
 - Dropped (serve only non-BUILD lessons): build entries tables_links (S6), div_by_itself (S12), mult_three (S13); recorded as DEFERRED on the ops-tables card.
+Priority order (lead, 2026-11-07, from data/curriculum/ccss-build-lessons.json, overdue and due-now first):
+1. #4 Properties of multiplication (3.OA.B.5): mult_properties, arrays_groups, count_by_tables
+2. #7 Two-step word problems (3.OA.D.8): div_facts (R4 aids), mult_word_problems_plain, div_word_problems_plain
+3. #8 Multiples of 10 with basic facts (4.NBT.B.5/B.6): mult_zeros (+ facts_times_tens)
+4. #2 One-step bar-model word problems within 20 (1.OA.A.1): add_wp_20 / sub_wp_20 bar-model stories
+5. #16-17 Grade 2 one- and two-step bar-model word problems (2.OA.A.1): add_wp_100, sub_wp_100
+6. #18 Add up to four two-digit numbers (2.NBT.B.6): add_column_multi
+7. #3 Patterns on the multiplication table (3.OA.D.9 / C.7): mult_chart (count_by_tables shared with #4)
+Then: mult_comparison + comparison_statements (#22), remainder_interpret.
 - Already at 8/10 and left alone: mult_facts, add_facts, sub_facts (and add_wp_20 as marked in the queue).
 
 ## Owner go
