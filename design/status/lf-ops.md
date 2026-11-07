@@ -146,3 +146,11 @@ Times: builder day-1 cards + merge, start 2026-11-07T00:00Z, end —, profile mq
   40 x 44 px at card-390 (shared word-work twin, also on mult_word_problems); (4) phone-card FOCUS on mult stories - the checker
   wants the first copy box even when it must stay blank (expect ''), active-box D6 keeps it blank: a checker vs D6 conflict for
   the lead. card-rulings offered INCOMPLETE: the facts card has no notOffered entry for div_facts (card data).
+
+## Hand-over findings (not this lane's files)
+Neither one holds the plain story skills (lead ruling 2026-11-07).
+- ENGINE (roles/practice.js, the shared-roles lane): `ws-print-lint --kind sections --pages 2` at S and L. A sub-section continues into
+  the previous page's leftover space and then breaks, so the next page holds one row (the 3-skill div_facts + mult / div story
+  sheet at L: page 3 has 2 stories, a 136 mm empty strip). Findings: DN-2, PG-23, PAGEFILL.
+- HOSTS (the shared word-work screen: cells/word-work.js twin and css/screen-cell.css): the word-work answer-digit inputs are 40 x 44 px
+  on the 390 px practice card (ws-grade-render --gate TARGET, H6). The same twin is used by mult_word_problems and the other column stories.
