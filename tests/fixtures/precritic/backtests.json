@@ -1610,6 +1610,60 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pool-capacity-3a",
+   "check": "An arrays-turn Practice sheet's allTest admits at least as many x families as its places plus the chart and Guided arrays (LR-5 one family a pack)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 3a LP-FAMILY-REPEAT (lf-engine P1d)",
+   "browser": false,
+   "fail": {
+    "commit": "96f0728f",
+    "state": "arrP1 (half-width cells, no 5s) admits 6 families for 4 places + 3 chart/Guided"
+   },
+   "pass": {
+    "commit": "e13ef858",
+    "state": "full-width cells, arrays to 6 x 6: 12 families"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pool-capacity",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "e24b-lesson2-near-twins",
+   "check": "E24b: no near twins on a page (lesson 2 P0 6+6 / 7+8, P4-1 7+4 / 8+5) on every seed",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 2 E24b (lf-engine P1d)",
+   "browser": true,
+   "pending": true,
+   "note": "The check lives in lf-checks' ws-detailed-lesson (E24b, --sweep); --sweep on lesson 2 times out (Runtime.callFunctionOn protocolTimeout) so no command yet. P0 passes at e13ef858; P4-1 still fails (greedy deal order).",
+   "fail": {
+    "commit": "96f0728f",
+    "state": "P0 6+6 / 7+8 and P4-1 7+4 / 8+5 near twins"
+   },
+   "pass": {
+    "commit": "",
+    "state": "not yet: P4-1 open"
+   }
+  },
+  {
+   "id": "lp-family-repeat-3a-p0",
+   "check": "LP-FAMILY-REPEAT on the 25-seed sweep: the x 2 Prerequisite Check facts once each (seed 3: 2 x 7 twice)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 3a (lf-engine P1d)",
+   "browser": true,
+   "pending": true,
+   "note": "The check lives in lf-checks' ws-detailed-lesson --sweep (LP-FAMILY-REPEAT); fail = the 2 x 6 exclusion state before P0 went to 2 x 10 (live tree, sweep seed 3), pass = e13ef858 (sweep 25/25 OK on the live tree 538c2b58).",
+   "fail": {
+    "commit": "",
+    "state": "P0 2 x 6 to 2 x 9 for four items: seed 3 2 x 7 twice"
+   },
+   "pass": {
+    "commit": "e13ef858",
+    "state": "P0 2 x 6 to 2 x 10"
+   }
   }
  ]
 }
