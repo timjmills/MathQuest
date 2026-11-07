@@ -1570,6 +1570,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "optin-wrong-fits-slots",
+   "check": "ws-node-lint --rules WRONG-FITS-SLOTS (opt-in): a multi-slot cell's wrongAnswer gives one value per graded write-in slot, each fitting its slot",
+   "kind": "fixture",
+   "rule": "ws-node-lint WRONG-FITS-SLOTS (critic lf-placevalue r1 F3; lead ruling D1)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/wrong-slots.fail.mjs",
+    "state": "a three-box expanded-form item whose wrongAnswer is one string ('4 + 0 + 3') with no per-slot values"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/wrong-slots.pass.mjs",
+    "state": "the same item; wrongAnswer gives slots {part0: '4', part1: '0', part2: '3'}"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-wrong-fill",
+   "check": "ws-node-lint --rules WRONG-FILL (opt-in): what the True or False? and Reason It roles PRINT in each write-in slot of a false statement (their real prepare(), print-sheet's draw), never the whole statement in every box",
+   "kind": "fixture",
+   "rule": "ws-node-lint WRONG-FILL (critic lf-placevalue r1 F3: expand true-false '5 + 0 + 3' in each box; lead ruling D1)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/wrong-fill.fail.mjs",
+    "state": "a three-box cell that writes the role's one false value into every box (the r1 defect: the whole statement three times)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/wrong-fill.pass.mjs",
+    "state": "the same cell writing its own part of the false statement into each box (as cells/pv.js does at b1094401)"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
