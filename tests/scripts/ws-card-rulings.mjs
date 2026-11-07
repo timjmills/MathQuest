@@ -39,6 +39,12 @@
 //                   width, is 0) — card "zero cases" (n − n, 40 − 20, 47 − 42)
 //     "columnZero"  an answer digit inside the answer's own length is 0      "ansShorter"  fewer answer digits than a
 //     {"eq": ["b", 1]}   a field equals a number (or another field: ["a", "b"])
+//     {"is": ["ans", "even"]}  a field equals a word (or one of a list of words), case-insensitive (lf-algebra r2:
+//                   word answers - "even" / "odd", "true" / "false" - and payload tags such as payload.about)
+//   FIELDS: "a", "b", "ans", or "payload.<path>" (lf-algebra r2): the item's q.cell.payload read by its dotted path
+//     ("payload.a", "payload.about", "payload.terms.length"). A ruling that names a payload field or an "is" test reads
+//     every item WITH its payload and its answer as written (a word answer stays a word), so items that are not
+//     "a op b" (a parity fact, a feature sentence) are checked, never skipped.
 //   The operands come from q.cell.payload.operands, else q.a / q.b, else the first "a − b" / "a + b" of q.text; ans
 //   is q.ans. An item none of these read is a FAIL (the ruling cannot be checked), never a skip.
 //   NOT OFFERED: offeredOptionsFor(category, skill) (js/modules/skill-options.js: what the panel shows) must not carry
@@ -77,6 +83,7 @@ export function parseRulings(text, file = '') {
     if (!Array.isArray(j.skills) || !j.skills.length) throw new Error(`${file}: the rulings block has no "skills"`);
     for (const k of j.skills) if (!/^[a-z0-9_]+:[a-z0-9_]+$/i.test(k)) throw new Error(`${file}: "${k}" is not category:skill`);
     const KINDS = new Set(['range', 'digits', 'noRegroup', 'boxes', 'maxShare', 'minShare']);
+    // (a "when" must be a known predicate: a typo'd one would throw only at check time)
     (j.rulings || []).forEach((r, i) => {
         if (!r.id) r.id = `R${i + 1}`;
         if (!KINDS.has(r.assert)) throw new Error(`${file}: ruling ${r.id}: unknown assert "${r.assert}" (${[...KINDS].join(', ')})`);
@@ -120,17 +127,30 @@ export const PRED = {
     columnZero: (x) => String(x.ans).includes('0'),
     ansShorter: (x) => digitsOf(x.ans) < digitsOf(x.a),
 };
+/** A field of an item: "a" / "b" / "ans", or "payload.<dotted path>" read from the item's payload. */
+export function fieldOf(x, f) {
+    if (!x) return undefined;
+    if (typeof f === 'string' && f.startsWith('payload.')) return f.slice(8).split('.').reduce((o, k) => (o == null ? undefined : o[k]), x.payload);
+    return x[f];
+}
+/** Does the ruling read a payload field or a word (then items are read whole: rawItem)? */
+export const needsRaw = (r) => /"payload\./.test(JSON.stringify(r || {})) || !!(r && r.when && r.when.is);
 export function predicate(when) {
     if (typeof when === 'string') { if (!PRED[when]) throw new Error(`unknown predicate "${when}"`); return PRED[when]; }
-    if (when && Array.isArray(when.eq)) { const [f, v] = when.eq; return (x) => x[f] === (typeof v === 'string' ? x[v] : v); }
+    if (when && Array.isArray(when.eq)) { const [f, v] = when.eq; return (x) => fieldOf(x, f) === (typeof v === 'string' ? fieldOf(x, v) : v); }
+    if (when && Array.isArray(when.is)) {
+        const [f, v] = when.is;
+        const words = (Array.isArray(v) ? v : [v]).map((w) => String(w).trim().toLowerCase());
+        return (x) => words.includes(String(fieldOf(x, f) == null ? '' : fieldOf(x, f)).trim().toLowerCase());
+    }
     throw new Error(`unknown predicate ${JSON.stringify(when)}`);
 }
 export function itemPasses(r, x) {
     switch (r.assert) {
-        case 'range': return x[r.of] >= r.min && x[r.of] <= r.max;
+        case 'range': { const v = fieldOf(x, r.of); return typeof v === 'number' && v >= r.min && v <= r.max; }
         case 'digits': {
-            const d = digitsOf(x[r.of]);
-            const eq = typeof r.eq === 'string' ? digitsOf(x[r.eq]) : r.eq;
+            const d = digitsOf(fieldOf(x, r.of));
+            const eq = typeof r.eq === 'string' ? digitsOf(fieldOf(x, r.eq)) : r.eq;
             return (eq == null || d === eq) && (r.min == null || d >= r.min) && (r.max == null || d <= r.max);
         }
         case 'noRegroup': {
@@ -142,7 +162,19 @@ export function itemPasses(r, x) {
         default: return true;
     }
 }
-const fmtItem = (x) => `${x.a} ${x.op || '−'} ${x.b} = ${x.ans}${x.boxes != null ? ` [${x.boxes} boxes]` : ''}`;
+const fmtItem = (x) => (x && x.payload
+    ? `[${x.payload.task || ''}${Array.isArray(x.payload.operands) ? ` ${x.payload.operands.join(', ')}` : ''}] → ${x.ans}`
+    : `${x.a} ${x.op || '−'} ${x.b} = ${x.ans}${x.boxes != null ? ` [${x.boxes} boxes]` : ''}`);
+
+/** An item read whole (a ruling on a payload field or a word): its operands where it has them, its payload, its answer
+ *  as written (a number when it is one, else the word); null only when there is no item. */
+export function rawItem(q) {
+    if (!q) return null;
+    const base = readItem(q, { listAns: true }) || {};
+    const one = String(q.ans).replace(/(\d),(\d{3})(?!\d)/g, '$1$2');
+    const ans = /^\s*-?\d+(\.\d+)?\s*$/.test(one) ? Number(one) : String(q.ans);
+    return Object.assign({}, base, { ans, payload: (q.cell && q.cell.payload) || {} });
+}
 
 /** {a, b, ans, boxes, op} from a generated question, or null. */
 export function readItem(q, { listAns = false } = {}) {
@@ -188,6 +220,14 @@ function selfTest() {
     t(readItem({ a: 20, b: 4, ans: '8, 12, 16' }) === null, 'readItem list answer without listAns: unreadable (dealer-uniform)');
     t(readItem({ text: 'Find the rule.', ans: '8, 12' }) === null, 'readItem list answer, no operands: unreadable');
     t(readItem({ text: '4,367 − 2,244 = ?', ans: '2,123' }).ans === 2123, 'readItem thousands-comma answer');
+    // (lf-algebra r2) payload fields and word answers
+    const par = rawItem({ ans: 'even', cell: { payload: { task: 'parity', a: 6, b: 7, about: 'parity', terms: [1, 2, 3] } } });
+    t(par && par.ans === 'even' && fieldOf(par, 'payload.a') === 6 && fieldOf(par, 'payload.terms.length') === 3, 'rawItem keeps a word answer and reads payload paths');
+    t(itemPasses({ assert: 'range', of: 'payload.a', min: 2, max: 10 }, par) && !itemPasses({ assert: 'range', of: 'payload.a', min: 7, max: 10 }, par), 'range on a payload field');
+    t(!itemPasses({ assert: 'range', of: 'payload.missing', min: 0, max: 10 }, par), 'range on a missing payload field fails (never a silent pass)');
+    t(predicate({ is: ['ans', 'Even'] })(par) && !predicate({ is: ['ans', 'odd'] })(par) && predicate({ is: ['payload.about', ['ones', 'parity']] })(par), 'is: case-insensitive word / word list');
+    t(needsRaw({ assert: 'range', of: 'payload.a' }) && needsRaw({ assert: 'maxShare', when: { is: ['ans', 'odd'] } }) && !needsRaw({ assert: 'range', of: 'a' }), 'needsRaw: payload fields and is-tests read items whole');
+    t(rawItem({ ans: '42', a: 6, b: 7 }).ans === 42, 'rawItem: a numeric answer stays a number');
     const blk = parseRulings('x\n<!-- rulings\n{"v":1,"skills":["a:b"],"rulings":[{"assert":"range","of":"a","min":1,"max":9}],"notOffered":[{"option":"band"}]}\n-->\n', 'card.md');
     t(blk && blk.rulings[0].id === 'R1' && blk.notOffered[0].id === 'N1', 'parse block');
     t(parseRulings('no block', 'x.md') === null, 'no block -> null');
@@ -205,7 +245,7 @@ function selfTest() {
     t(both.code === 1 && /not checked: add:b/.test(both.line), 'a broken ruling is FAIL and still names the unchecked skill');
     t(finalVerdict({ results: [okR('s:a'), okR('add:b')], keys: ['s:a', 'add:b'], check: 'rulings' }).code === 0, 'every skill checked is OK');
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 22 cases)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 28 cases)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -279,7 +319,7 @@ async function main() {
                 for (let i = 0; i < N; i++) {
                     let q = null;
                     try { q = app.gq.generateQuestionFor({ category, skill, opts: r.opts || undefined, seed: (fnv(`${key}:${JSON.stringify(r.opts || {})}`) + i) >>> 0, itemIndex: i, itemCount: N }); } catch (e) { errors++; firstErr = firstErr || e.message; continue; }
-                    const x = readItem(q, { listAns: true });
+                    const x = needsRaw(r) ? rawItem(q) : readItem(q, { listAns: true });
                     if (!x) { unread++; continue; }
                     items.push(x);
                 }

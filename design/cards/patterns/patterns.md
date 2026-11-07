@@ -1,17 +1,38 @@
 <!-- spec-card
-{"card":"patterns","kind":"family","template":"notice","families":["patterns"],"match":{"templates":["notice","growing-pattern"]},"config":"design/cards/patterns/card.json","indexSha":"9ad4eb57ab31f4193fcb2c0f8ffd3adbc6a4cc76","bodySha":"b6905ea89b703a58","format":2,"configSha":"0aff4d9532ec"}
-{"cited":"H7","rules":"VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 AK-1 a0cc12 2 d4709f H13 36f579 VQ-4 b89965 5 1fa595 7 2253df 9 0b5532 10 2ed85c CL-40 2a6dbb SL-11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 10 256ad3 C1 66f8a9 2 a51365 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 10 d2ca35 P-TH-11 f4379f","entries":"R%3AR-GROW-ANS 5fd993 R%3AR-GROW-FAR 7a4aa1 R%3AR-GROW-TEN 5b795e R%3AR-GROW-STEP 710344 R%3AR-GROW-START 131598 R%3AR-GROW-STEP1-SHARE 237695 N%3AN-NUMBERLINE 995146 N%3AN-PICTURES 500e65 D%3ApatTask%3Dparity%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3ApatTask%3Dfeature%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3ApatTask%3Dtruefalse%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3ApatTask%3Dnext%40patterns%3Agrowing_shape_patterns bcefeb D%3ApatTask%3Drule%40patterns%3Agrowing_shape_patterns bcefeb D%3ApatTask%3Dfar%40patterns%3Agrowing_shape_patterns bcefeb D%3Aband%3D25%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Aband%3D50%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Aband%3D100%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Aband%3D144%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Aband%3D10%40patterns%3Agrowing_shape_patterns bcefeb D%3Aband%3D20%40patterns%3Agrowing_shape_patterns bcefeb D%3Aband%3D50%40patterns%3Agrowing_shape_patterns bcefeb D%3ApatShow%3Dtrue%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3ApatShow%3Dfalse%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3AgrowShape%3Ddots%40patterns%3Agrowing_shape_patterns bcefeb D%3AgrowShape%3Dsquares%40patterns%3Agrowing_shape_patterns bcefeb D%3AgrowShape%3Dmixed%40patterns%3Agrowing_shape_patterns bcefeb D%3Acalculator%3Dtrue%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Acalculator%3Dfalse%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3AskipAfter%3D*%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Arole%3Aindependent%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Amore-practice%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Aopener%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Ascripted-model%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Aguided%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Aerror-analysis%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Areview%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Arole%3Atest%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Apre-skill-check%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Arole%3Afact-probe%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Arole%3Atrue-false%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Areason-it%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Astretch%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Alesson%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Arole%3Aword-problems%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Arole%3Afact-rows%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Arole%3Amixed-practice%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Ahost%3Apractice-card%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Ahost%3Aonline-worksheet%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Ahost%3Aquiz%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Ahost%3Amode-dark%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Ahost%3Amode-bigboard%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Ahost%3Aboss%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Ahost%3Arace%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Ahost%3Amap%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8"}
+{"card":"patterns","kind":"family","template":"notice","families":["patterns"],"match":{"templates":["notice","growing-pattern"]},"config":"design/cards/patterns/card.json","indexSha":"9ad4eb57ab31f4193fcb2c0f8ffd3adbc6a4cc76","bodySha":"0bdf419c49033106","format":2,"configSha":"bf011f965920"}
+{"cited":"H7","rules":"VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 AK-1 a0cc12 2 d4709f H13 36f579 VQ-4 b89965 5 1fa595 7 2253df 9 0b5532 10 2ed85c CL-40 2a6dbb SL-11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 10 256ad3 C1 66f8a9 2 a51365 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 L1 799b66 2 fecb99 3 901e56 4 6538d6 5 4d48a8 6 6e19d8 10 d2ca35 P-TH-11 f4379f","entries":"R%3AR-GROW-ANS 5fd993 R%3AR-GROW-FAR 7a4aa1 R%3AR-GROW-TEN 5b795e R%3AR-GROW-STEP 710344 R%3AR-GROW-START 131598 R%3AR-GROW-STEP1-SHARE 237695 R%3AR-PAR-FACTOR 6944a9 R%3AR-PAR-FACTOR-B 098a0c R%3AR-PAR-PRODUCT ca0439 R%3AR-PAR-25 08a9b0 R%3AR-PAR-25-B 90cef1 R%3AR-PAR-144 04feb5 R%3AR-PAR-ODD-MAX cba421 R%3AR-PAR-ODD-MIN 34a6b6 R%3AR-TF-TRUE-MAX 39cded R%3AR-TF-TRUE-MIN a1fca9 R%3AR-FEAT-START f7b5b3 R%3AR-FEAT-STEP d738af R%3AR-FEAT-PARITY 239b0f R%3AR-FEAT-ONES dffd13 R%3AR-FEAT-AT-0 6cf934 R%3AR-FEAT-AT-2 aa3195 R%3AR-NPR-START ca426e R%3AR-NPR-LEN a5193b R%3AR-NPR-DOUBLE b6ca54 R%3AR-NPR-ADD 221fe6 R%3AR-NPR-SUB bf5023 N%3AN-NUMBERLINE 995146 N%3AN-PICTURES 500e65 D%3ApatTask%3Dparity%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3ApatTask%3Dfeature%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3ApatTask%3Dtruefalse%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3ApatTask%3Dnext%40patterns%3Agrowing_shape_patterns bcefeb D%3ApatTask%3Drule%40patterns%3Agrowing_shape_patterns bcefeb D%3ApatTask%3Dfar%40patterns%3Agrowing_shape_patterns bcefeb D%3Aband%3D25%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Aband%3D50%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Aband%3D100%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Aband%3D144%40patterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Aband%3D10%40patterns%3Agrowing_shape_patterns bcefeb D%3Aband%3D20%40patterns%3Agrowing_shape_patterns bcefeb D%3Aband%3D50%40patterns%3Agrowing_shape_patterns bcefeb D%3ApatShow%3Dtrue%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3ApatShow%3Dfalse%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3AgrowShape%3Ddots%40patterns%3Agrowing_shape_patterns bcefeb D%3AgrowShape%3Dsquares%40patterns%3Agrowing_shape_patterns bcefeb D%3AgrowShape%3Dmixed%40patterns%3Agrowing_shape_patterns bcefeb D%3Acalculator%3Dtrue%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Anumber_patterns_rule%2Cpatterns%3Apattern_features 11baa8 D%3Acalculator%3Dfalse%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Anumber_patterns_rule%2Cpatterns%3Apattern_features 11baa8 D%3AskipAfter%3D*%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Anumber_patterns_rule%2Cpatterns%3Apattern_features 11baa8 D%3Apattern%3Dadd%40patterns%3Anumber_patterns_rule 972948 D%3Apattern%3Dsub%40patterns%3Anumber_patterns_rule 972948 D%3Apattern%3Ddouble%40patterns%3Anumber_patterns_rule 972948 D%3Apattern%3Dtimes10%40patterns%3Anumber_patterns_rule 972948 D%3Apattern%3Dgrow%40patterns%3Anumber_patterns_rule 972948 D%3Aplaces%3D1%40patterns%3Anumber_patterns_rule 972948 D%3Aplaces%3D10%40patterns%3Anumber_patterns_rule 972948 D%3Aplaces%3D100%40patterns%3Anumber_patterns_rule 972948 D%3Aplaces%3D1000%40patterns%3Anumber_patterns_rule 972948 D%3Amissing%3Dnull%40patterns%3Anumber_patterns_rule 972948 D%3Amissing%3D20%40patterns%3Anumber_patterns_rule 972948 D%3Amissing%3D50%40patterns%3Anumber_patterns_rule 972948 D%3Amissing%3D70%40patterns%3Anumber_patterns_rule 972948 D%3Amissing%3D80%40patterns%3Anumber_patterns_rule 972948 D%3Amissing%3D90%40patterns%3Anumber_patterns_rule 972948 D%3Amissing%3D100%40patterns%3Anumber_patterns_rule 972948 D%3Arule%3Dtrue%40patterns%3Anumber_patterns_rule 972948 D%3Arule%3Dfalse%40patterns%3Anumber_patterns_rule 972948 D%3Ashape%3Dbox%40patterns%3Anumber_patterns_rule 972948 D%3Ashape%3Dcircle%40patterns%3Anumber_patterns_rule 972948 D%3Ashape%3Dhex%40patterns%3Anumber_patterns_rule 972948 D%3Ashape%3Dmixed%40patterns%3Anumber_patterns_rule 972948 D%3AnlOn%3Dtrue%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlOn%3Dfalse%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlFrom%3D*%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlTo%3D*%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D2%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D5%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D10%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D20%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D25%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D50%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D100%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1000%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3Dauto%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%2F2%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%2F3%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%2F4%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%2F5%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%2F6%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%2F8%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%2F10%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D1%2F12%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D0.1%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlStep%3D0.01%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlLabels%3Dauto%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlLabels%3Dall%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlLabels%3D2%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlLabels%3D5%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlLabels%3D10%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlLabels%3Dends%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlLabels%3Dnone%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlMinor%3Dauto%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlMinor%3D0%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlMinor%3D2%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlMinor%3D4%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlMinor%3D5%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlMinor%3D10%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlHops%3Dtrue%40patterns%3Anumber_patterns_rule 11baa8 D%3AnlHops%3Dfalse%40patterns%3Anumber_patterns_rule 11baa8 D%3Arole%3Aindependent%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Amore-practice%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Aopener%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Ascripted-model%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Aguided%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Aerror-analysis%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Areview%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Arole%3Atest%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Apre-skill-check%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Arole%3Afact-probe%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Arole%3Atrue-false%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Areason-it%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Astretch%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Arole%3Alesson%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Arole%3Aword-problems%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Arole%3Afact-rows%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Arole%3Amixed-practice%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Arole%3Aindependent%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Amore-practice%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Aopener%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Ascripted-model%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Aguided%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Aerror-analysis%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Areview%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Atest%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Apre-skill-check%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Afact-probe%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Atrue-false%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Areason-it%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Astretch%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Alesson%40patterns%3Anumber_patterns_rule 972948 D%3Arole%3Aword-problems%40patterns%3Anumber_patterns_rule 11baa8 D%3Arole%3Afact-rows%40patterns%3Anumber_patterns_rule 11baa8 D%3Arole%3Amixed-practice%40patterns%3Anumber_patterns_rule 11baa8 D%3Ahost%3Apractice-card%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Ahost%3Aonline-worksheet%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Ahost%3Aquiz%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features bcefeb D%3Ahost%3Amode-dark%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Ahost%3Amode-bigboard%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 972948 D%3Ahost%3Aboss%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Ahost%3Arace%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Ahost%3Amap%40patterns%3Agrowing_shape_patterns%2Cpatterns%3Anotice_patterns%2Cpatterns%3Apattern_features 11baa8 D%3Ahost%3Apractice-card%40patterns%3Anumber_patterns_rule 972948 D%3Ahost%3Aonline-worksheet%40patterns%3Anumber_patterns_rule 972948 D%3Ahost%3Aquiz%40patterns%3Anumber_patterns_rule 972948 D%3Ahost%3Amode-dark%40patterns%3Anumber_patterns_rule 972948 D%3Ahost%3Amode-bigboard%40patterns%3Anumber_patterns_rule 972948 D%3Ahost%3Aboss%40patterns%3Anumber_patterns_rule 11baa8 D%3Ahost%3Arace%40patterns%3Anumber_patterns_rule 11baa8 D%3Ahost%3Amap%40patterns%3Anumber_patterns_rule 11baa8"}
 -->
 <!-- rulings
 {"v": 1, "card": "patterns",
-"skills": ["patterns:growing_shape_patterns","patterns:notice_patterns","patterns:pattern_features"],
+"skills": ["patterns:growing_shape_patterns","patterns:notice_patterns","patterns:number_patterns_rule","patterns:pattern_features"],
 "rulings": [
  {"id":"R-GROW-ANS","source":"§1; §7 (band 20 bounds Term 4's count)","skills":["patterns:growing_shape_patterns"],"assert":"range","of":"ans","min":2,"max":20},
  {"id":"R-GROW-FAR","source":"§1; §7 (far: band 50 bounds Term 10's count)","skills":["patterns:growing_shape_patterns"],"opts":{"patTask":"far"},"assert":"range","of":"ans","min":10,"max":50},
  {"id":"R-GROW-TEN","source":"§7 (band 10: Term 4 has at most 10)","skills":["patterns:growing_shape_patterns"],"opts":{"band":10},"assert":"range","of":"ans","min":2,"max":10},
  {"id":"R-GROW-STEP","source":"§2 (grows by 1 to 5)","skills":["patterns:growing_shape_patterns"],"assert":"range","of":"b","min":1,"max":5},
  {"id":"R-GROW-START","source":"§2 (Term 1 has 1 to 10)","skills":["patterns:growing_shape_patterns"],"assert":"range","of":"a","min":1,"max":10},
- {"id":"R-GROW-STEP1-SHARE","source":"§2 (the rule varies: + 1 on at most a third of the items)","skills":["patterns:growing_shape_patterns"],"assert":"maxShare","when":{"eq":["b",1]},"max":0.34}
+ {"id":"R-GROW-STEP1-SHARE","source":"§2 (the rule varies: + 1 on at most a third of the items)","skills":["patterns:growing_shape_patterns"],"assert":"maxShare","when":{"eq":["b",1]},"max":0.34},
+ {"id":"R-PAR-FACTOR","source":"§2; §7 (band 100: factors 2 to 10)","skills":["patterns:notice_patterns"],"assert":"range","of":"payload.a","min":2,"max":10},
+ {"id":"R-PAR-FACTOR-B","source":"§2; §7 (band 100: factors 2 to 10)","skills":["patterns:notice_patterns"],"assert":"range","of":"payload.b","min":2,"max":10},
+ {"id":"R-PAR-PRODUCT","source":"§5.3 (within N bounds the answer: the product to 100)","skills":["patterns:notice_patterns"],"assert":"range","of":"payload.product","min":4,"max":100},
+ {"id":"R-PAR-25","source":"§7 (band 25: factors 2 to 5)","skills":["patterns:notice_patterns"],"opts":{"band":25},"assert":"range","of":"payload.a","min":2,"max":5},
+ {"id":"R-PAR-25-B","source":"§7 (band 25: factors 2 to 5)","skills":["patterns:notice_patterns"],"opts":{"band":25},"assert":"range","of":"payload.b","min":2,"max":5},
+ {"id":"R-PAR-144","source":"§7 (band 144: factors 2 to 12)","skills":["patterns:notice_patterns"],"opts":{"band":144},"assert":"range","of":"payload.a","min":2,"max":12},
+ {"id":"R-PAR-ODD-MAX","source":"§2 (odd products dealt 1 : 1, P-10)","skills":["patterns:notice_patterns"],"assert":"maxShare","when":{"is":["ans","odd"]},"max":0.6},
+ {"id":"R-PAR-ODD-MIN","source":"§2 (odd products dealt 1 : 1, P-10)","skills":["patterns:notice_patterns"],"assert":"minShare","when":{"is":["ans","odd"]},"min":0.4},
+ {"id":"R-TF-TRUE-MAX","source":"§2 (true and false dealt 1 : 1)","skills":["patterns:notice_patterns"],"opts":{"patTask":"truefalse"},"assert":"maxShare","when":{"is":["ans","true"]},"max":0.6},
+ {"id":"R-TF-TRUE-MIN","source":"§2 (true and false dealt 1 : 1)","skills":["patterns:notice_patterns"],"opts":{"patTask":"truefalse"},"assert":"minShare","when":{"is":["ans","true"]},"min":0.4},
+ {"id":"R-FEAT-START","source":"§2 (feature: start 1 to 12)","skills":["patterns:pattern_features"],"assert":"range","of":"payload.start","min":1,"max":12},
+ {"id":"R-FEAT-STEP","source":"§2 (feature: add 1 to 5, 10 or 20)","skills":["patterns:pattern_features"],"assert":"range","of":"payload.step","min":1,"max":20},
+ {"id":"R-FEAT-PARITY","source":"§2 (the true sentence is about odd / even or the ones digits, dealt 1 : 1)","skills":["patterns:pattern_features"],"assert":"minShare","when":{"is":["payload.about","parity"]},"min":0.4},
+ {"id":"R-FEAT-ONES","source":"§2 (the true sentence is about odd / even or the ones digits, dealt 1 : 1)","skills":["patterns:pattern_features"],"assert":"minShare","when":{"is":["payload.about","ones"]},"min":0.4},
+ {"id":"R-FEAT-AT-0","source":"L10 (the true sentence's place is dealt: first on a fifth or more)","skills":["patterns:pattern_features"],"assert":"minShare","when":{"eq":["payload.correct",0]},"min":0.2},
+ {"id":"R-FEAT-AT-2","source":"L10 (the true sentence's place is dealt: last on a fifth or more)","skills":["patterns:pattern_features"],"assert":"minShare","when":{"eq":["payload.correct",2]},"min":0.2},
+ {"id":"R-NPR-START","source":"§2 number_patterns_rule (start in the ones or the tens: places 1, 10)","skills":["patterns:number_patterns_rule"],"assert":"range","of":"payload.values.0","min":1,"max":99},
+ {"id":"R-NPR-LEN","source":"§2 number_patterns_rule (a track of 4 to 8 numbers)","skills":["patterns:number_patterns_rule"],"assert":"range","of":"payload.values.length","min":4,"max":8},
+ {"id":"R-NPR-DOUBLE","source":"§2 number_patterns_rule (R3: doubling dealt by default)","skills":["patterns:number_patterns_rule"],"assert":"minShare","when":{"is":["payload.ruleBox.pre",["Rule: multiply by","Rule: divide by"]]},"min":0.2},
+ {"id":"R-NPR-ADD","source":"§2 number_patterns_rule (count on dealt by default)","skills":["patterns:number_patterns_rule"],"assert":"minShare","when":{"is":["payload.ruleBox.pre","Rule: add"]},"min":0.2},
+ {"id":"R-NPR-SUB","source":"§2 number_patterns_rule (count back dealt by default)","skills":["patterns:number_patterns_rule"],"assert":"minShare","when":{"is":["payload.ruleBox.pre","Rule: subtract"]},"min":0.2}
 ],
 "notOffered": [
  {"id":"N-NUMBERLINE","source":"§3 (no number line on these cells)","skills":["patterns:notice_patterns","patterns:pattern_features","patterns:growing_shape_patterns"],"option":"nlOn"},
@@ -20,13 +41,13 @@
 "todo": [
  {"id":"T-5.1","source":"§5.1","text":"Skill cards need owner approval; build the decided parts meanwhile (lead brief, lane lf..."},
  {"id":"T-5.2","source":"§5.2","text":"A distinct option is ALSO a findable skill: each task kind that is its own lesson is a ..."},
- {"id":"T-5.3","source":"§5.3","text":"\"Within N\" bounds the answer: notice band = the biggest product / pattern number (25, 5..."},
  {"id":"T-9.1","source":"§9.1","text":"Should 'True or false about a times-table' (patTask truefalse) also be its own preset s..."},
  {"id":"T-9.2","source":"§9.2","text":"Parity items: print the product (6 x 7 = 42, 'is 42 even or odd?') or keep it hidden (d..."},
  {"id":"T-9.3","source":"§9.3","text":"Growing patterns: is a 7 x 7 tap grid an acceptable screen twin for 'draw Term 4' (work..."},
  {"id":"T-9.4","source":"§9.4","text":"WRM tags: notice_patterns -> Y4.B4.S6 (partial), pattern_features -> Y5.B12.S9 (partial..."},
  {"id":"T-9.5","source":"§9.5","text":"Default of the hint (patShow): on for both skills?"},
- {"id":"T-9.6","source":"§9.6","text":"The notice task's numeric promises (factors 2-10 at band 100, 2-12 at 144, 2-5 at 25; f..."}
+ {"id":"T-9.6","source":"§9.6","text":"Word answers and payload numbers in the card rulings: built in lf-algebra r2 (ws-card-r..."},
+ {"id":"T-9.7","source":"§9.7","text":"patterns:number_patterns_rule joins this card (lf-algebra owns its generator and provid..."}
 ]
 }
 -->
@@ -40,9 +61,9 @@ Two new kit cells for the lessons-first wave (lane lf-algebra). `notice`: one de
 
 3.OA.D.9 (identify arithmetic patterns in the multiplication table and explain them: an even factor makes an even product, odd x odd is odd; the 5s end in 0 or 5, the 9s' ones digits go down by 1) and 4.OA.C.5 (generate a number or shape pattern that follows a given rule; identify features of the pattern not explicit in the rule: the numbers alternate odd and even, the ones digits repeat; extend a growing shape pattern and count its terms). EE M.EE.3.OA.8, M.EE.4.OA.5.
 
-**Skills on this family** (3; listed in card.json + 3 listed):
+**Skills on this family** (4; listed in card.json + 4 listed):
 
-- **patterns** (3): `growing_shape_patterns`, `notice_patterns`, `pattern_features`
+- **patterns** (4): `growing_shape_patterns`, `notice_patterns`, `number_patterns_rule`, `pattern_features`
 
 **CCSS** (SKILL_STANDARDS of those skills): 3.OA.D.9, 4.OA.C.5
 
@@ -169,8 +190,20 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 - `band=10 | 20 | 50` — **offered** on `growing_shape_patterns` — the biggest answer count (Term 4, or Term 10 on far) (§5.3)
 - `patShow=true | false` — **offered** on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — the hint that fades: factor labels / the numbers / the row / the counts of Terms 1-3 (§2 progression; L8 fading support)
 - `growShape=dots | squares | mixed` — **offered** on `growing_shape_patterns` — what each term is made of, black outline only (§3 (appearance, O6))
-- `calculator=true | false` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — a pupil play control, not part of the item; graded with the play controls, not on this card (Wave 1 lane A universal play control)
-- `skipAfter=*` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — a pupil play control (when Skip appears), not part of the item (Wave 1 lane A universal play control)
+- `calculator=true | false` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns`, `number_patterns_rule` — a pupil play control, not part of the item; graded with the play controls, not on this card (Wave 1 lane A universal play control)
+- `skipAfter=*` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns`, `number_patterns_rule` — a pupil play control (when Skip appears), not part of the item (Wave 1 lane A universal play control)
+- `pattern=add | sub | double | times10 | grow` — **offered** (PROPOSED) on `number_patterns_rule` — the rule kinds dealt (§2 number_patterns_rule (count on, count back, double; x 10 and growing steps for the later lessons))
+- `places=1 | 10 | 100 | 1000` — **offered** (PROPOSED) on `number_patterns_rule` — where the pattern starts: ones, tens, hundreds, thousands (§2 number_patterns_rule (the size ladder))
+- `missing=null | 20 | 50 | 70 | 80 | 90 | 100` — **offered** (PROPOSED) on `number_patterns_rule` — how many numbers are left blank (L8 fading support)
+- `rule=true | false` — **offered** (PROPOSED) on `number_patterns_rule` — on: find and write the rule; off: the rule is given (status open question (lesson #20 Follow a given rule = rule off))
+- `shape=box | circle | hex | mixed` — **offered** (PROPOSED) on `number_patterns_rule` — the box shape of the track, black outline only (§3 (appearance, O6))
+- `nlOn=true | false` — **out of scope** (PROPOSED) on `number_patterns_rule` — the optional number-line pane under the track: graded on the number-line pane, not on this card (number-line pane (universal nline options))
+- `nlFrom=*` — **out of scope** (PROPOSED) on `number_patterns_rule` — the optional number-line pane under the track: graded on the number-line pane, not on this card (number-line pane (universal nline options))
+- `nlTo=*` — **out of scope** (PROPOSED) on `number_patterns_rule` — the optional number-line pane under the track: graded on the number-line pane, not on this card (number-line pane (universal nline options))
+- `nlStep=1 | 2 | 5 | 10 | 20 | 25 | 50 | 100 | 1000 | auto | 1/2 | 1/3 | 1/4 | 1/5 | 1/6 | 1/8 | 1/10 | 1/12 | 0.1 | 0.01` — **out of scope** (PROPOSED) on `number_patterns_rule` — the optional number-line pane under the track: graded on the number-line pane, not on this card (number-line pane (universal nline options))
+- `nlLabels=auto | all | 2 | 5 | 10 | ends | none` — **out of scope** (PROPOSED) on `number_patterns_rule` — the optional number-line pane under the track: graded on the number-line pane, not on this card (number-line pane (universal nline options))
+- `nlMinor=auto | 0 | 2 | 4 | 5 | 10` — **out of scope** (PROPOSED) on `number_patterns_rule` — the optional number-line pane under the track: graded on the number-line pane, not on this card (number-line pane (universal nline options))
+- `nlHops=true | false` — **out of scope** (PROPOSED) on `number_patterns_rule` — the optional number-line pane under the track: graded on the number-line pane, not on this card (number-line pane (universal nline options))
 
 **Page roles (buildSheet)**
 
@@ -191,6 +224,23 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 - `role:word-problems` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — no stories: these skills are not word problems (default provider) (CLAUDE.md (fact layouts are for fact skills); mixed-pages lane)
 - `role:fact-rows` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — not a fact skill: the 5-10 column fact layouts are for fact and operations skills (CLAUDE.md (fact layouts are for fact skills); mixed-pages lane)
 - `role:mixed-practice` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — graded on the mixed-pages card, not here (CLAUDE.md (fact layouts are for fact skills); mixed-pages lane)
+- `role:independent` — **offered** (PROPOSED) on `number_patterns_rule` — the skill's own items, one task a page (brief: every page role builds and prints a key)
+- `role:more-practice` — **offered** (PROPOSED) on `number_patterns_rule` — the skill's own items (brief: every page role builds and prints a key)
+- `role:opener` — **offered** (PROPOSED) on `number_patterns_rule` — the skill's own items (brief: every page role builds and prints a key)
+- `role:scripted-model` — **offered** (PROPOSED) on `number_patterns_rule` — provider workedSteps derived from the item (the reason bank lives here) (brief: every page role builds and prints a key)
+- `role:guided` — **offered** (PROPOSED) on `number_patterns_rule` — provider workedSteps derived from the item (brief: every page role builds and prints a key)
+- `role:error-analysis` — **offered** (PROPOSED) on `number_patterns_rule` — provider wrongAnswer from the named misconceptions (brief: every page role builds and prints a key)
+- `role:review` — **offered** (PROPOSED) on `number_patterns_rule` — earlier skills in data.js order plus this one (brief: every page role builds and prints a key)
+- `role:test` — **offered** (PROPOSED) on `number_patterns_rule` — the skill's own items (brief: every page role builds and prints a key)
+- `role:pre-skill-check` — **offered** (PROPOSED) on `number_patterns_rule` — earlier skills (brief: every page role builds and prints a key)
+- `role:fact-probe` — **offered** (PROPOSED) on `number_patterns_rule` — the skill's own items (brief: every page role builds and prints a key)
+- `role:true-false` — **offered** (PROPOSED) on `number_patterns_rule` — provider wrongAnswer (brief: every page role builds and prints a key)
+- `role:reason-it` — **offered** (PROPOSED) on `number_patterns_rule` — provider workedSteps + wrongAnswer (brief: every page role builds and prints a key)
+- `role:stretch` — **offered** (PROPOSED) on `number_patterns_rule` — the skill's own items, harder option values (brief: every page role builds and prints a key)
+- `role:lesson` — **offered** (PROPOSED) on `number_patterns_rule` — prereqs.js lesson data (lf-algebra block; chartWide) (brief: every page role builds and prints a key)
+- `role:word-problems` — **out of scope** (PROPOSED) on `number_patterns_rule` — no stories: these skills are not word problems (default provider) (CLAUDE.md (fact layouts are for fact skills); mixed-pages lane)
+- `role:fact-rows` — **out of scope** (PROPOSED) on `number_patterns_rule` — not a fact skill: the 5-10 column fact layouts are for fact and operations skills (CLAUDE.md (fact layouts are for fact skills); mixed-pages lane)
+- `role:mixed-practice` — **out of scope** (PROPOSED) on `number_patterns_rule` — graded on the mixed-pages card, not here (CLAUDE.md (fact layouts are for fact skills); mixed-pages lane)
 
 **Screen hosts**
 
@@ -202,6 +252,14 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 - `host:boss` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — game modes draw the practice card's cell; graded on the practice card (brief: the three screen hosts)
 - `host:race` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — as boss (brief: the three screen hosts)
 - `host:map` — **out of scope** (PROPOSED) on `notice_patterns`, `pattern_features`, `growing_shape_patterns` — MAP-style host graded on the MAP cards (brief: the three screen hosts)
+- `host:practice-card` — **offered** (PROPOSED) on `number_patterns_rule` — the same kit cell, buttons / inputs >= 44 px (brief: the three screen hosts)
+- `host:online-worksheet` — **offered** (PROPOSED) on `number_patterns_rule` — the same kit cell (brief: the three screen hosts)
+- `host:quiz` — **offered** (PROPOSED) on `number_patterns_rule` — the same kit cell (brief: the three screen hosts)
+- `host:mode-dark` — **offered** (PROPOSED) on `number_patterns_rule` — the cell stays black on white inside its card (brief: the three screen hosts)
+- `host:mode-bigboard` — **offered** (PROPOSED) on `number_patterns_rule` — the same cell, scaled (brief: the three screen hosts)
+- `host:boss` — **out of scope** (PROPOSED) on `number_patterns_rule` — game modes draw the practice card's cell; graded on the practice card (brief: the three screen hosts)
+- `host:race` — **out of scope** (PROPOSED) on `number_patterns_rule` — as boss (brief: the three screen hosts)
+- `host:map` — **out of scope** (PROPOSED) on `number_patterns_rule` — MAP-style host graded on the MAP cards (brief: the three screen hosts)
 
 ## 8. Gates
 
@@ -221,7 +279,8 @@ Each runs as `node tests/scripts/<script> …`.
 3. **Growing patterns: is a 7 x 7 tap grid an acceptable screen twin for 'draw Term 4' (working space, never graded)?** Recommended: Yes: the drawing stays working space on paper and screen; the graded answer is the number on both.
 4. **WRM tags: notice_patterns -> Y4.B4.S6 (partial), pattern_features -> Y5.B12.S9 (partial: whole numbers, not decimals), growing_shape_patterns -> Y6.B7.S1 (partial). The build list named Y3.B3.S13 and Y4.B4.S15, which are 'Divide by 8' and not a step. Accept these tags?** Recommended: Accept; the build-list wrmSteps of patterns_notice are wrong and the entry is deleted on build.
 5. **Default of the hint (patShow): on for both skills?** Recommended: On: the lesson pages and the first practice page show the working; the teacher turns it off for the next page (the fade).
-6. **The notice task's numeric promises (factors 2-10 at band 100, 2-12 at 144, 2-5 at 25; feature start 1-12, add 1-5, 10 or 20) cannot be machine-ruled today: ws-card-rulings and ws-dealer-uniform read only items with a numeric answer and 'a op b' operands, and these answers are words. Extend the reader to payload fields and word answers (checks lane)?** Recommended: Yes: add an `of: "payload.<field>"` reader and a word-answer share predicate (`{"eq": ["ans", "odd"]}`) to ws-card-rulings; the lane then adds the notice rulings.
+6. **Word answers and payload numbers in the card rulings: built in lf-algebra r2 (ws-card-rulings reads `of: "payload.<path>"` and the word test `{"is": ["ans", "odd"]}`; the notice, feature and number_patterns_rule rulings are in the block). Keep them as written?** Recommended: Yes: factors 2-10 / 2-5 / 2-12 by band, odd products and true sentences 40-60 %, the feature's true sentence about odd / even and about the ones digits at least 40 % each and in each place at least a fifth of the time.
+7. **patterns:number_patterns_rule joins this card (lf-algebra owns its generator and provider block; the count-row drawing stays lf-ops'). Its option, role and host lines are PROPOSED here. Also add a preset skill 'Follow a given rule' = rule off (BUILD lesson #20)?** Recommended: Yes to both: the card holds its rulings (start in the ones / tens, 4-8 numbers, count on / count back / doubling each dealt a fifth or more); the preset is a distinct lesson (CLAUDE.md: a distinct option is also a findable skill).
 
 Signed: (not yet signed)
 
@@ -230,59 +289,120 @@ Signed: (not yet signed)
 
 Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
 
-**Option values (offeredOptionsFor)** (20 lines; 0 undecided)
+**Option values (offeredOptionsFor)** (81 lines; 0 undecided)
 
 - `patTask=next` Task [difficulty], default (growing_shape_patterns) [offered]
 - `patTask=rule` Task [difficulty] (growing_shape_patterns) [offered]
 - `patTask=far` Task [difficulty] (growing_shape_patterns) [offered]
 - `band=10` Answers to [difficulty] (growing_shape_patterns) [offered]
 - `band=20` Answers to [difficulty], default (growing_shape_patterns) [offered]
-- `band=50` Answers to [difficulty] (all 3) [offered]
-- `patShow=true` Counts of Terms 1 to 3 [support], default (all 3) [offered]
-- `patShow=false` Counts of Terms 1 to 3 [support] (all 3) [offered]
+- `band=50` Answers to [difficulty] (growing_shape_patterns, notice_patterns, pattern_features) [offered]
+- `patShow=true` Counts of Terms 1 to 3 [support], default (growing_shape_patterns, notice_patterns, pattern_features) [offered]
+- `patShow=false` Counts of Terms 1 to 3 [support] (growing_shape_patterns, notice_patterns, pattern_features) [offered]
 - `growShape=dots` Picture [appearance], default (growing_shape_patterns) [offered]
 - `growShape=squares` Picture [appearance] (growing_shape_patterns) [offered]
 - `growShape=mixed` Picture [appearance] (growing_shape_patterns) [offered]
-- `calculator=true` Calculator [play] (all 3) [out of scope, PROPOSED]
-- `calculator=false` Calculator [play], default (all 3) [out of scope, PROPOSED]
-- `skipAfter=*` Skip appears after [play] (all 3) [out of scope, PROPOSED]
+- `calculator=true` Calculator [play] (all 4) [out of scope, PROPOSED]
+- `calculator=false` Calculator [play], default (all 4) [out of scope, PROPOSED]
+- `skipAfter=*` Skip appears after [play] (all 4) [out of scope, PROPOSED]
 - `patTask=parity` Task [difficulty], default on notice_patterns (notice_patterns, pattern_features) [offered]
 - `patTask=feature` Task [difficulty], default on pattern_features (notice_patterns, pattern_features) [offered]
 - `patTask=truefalse` Task [difficulty] (notice_patterns, pattern_features) [offered]
 - `band=25` Numbers to [difficulty] (notice_patterns, pattern_features) [offered]
 - `band=100` Numbers to [difficulty], default (notice_patterns, pattern_features) [offered]
 - `band=144` Numbers to [difficulty] (notice_patterns, pattern_features) [offered]
+- `pattern=add` Pattern [difficulty], default (number_patterns_rule) [offered, PROPOSED]
+- `pattern=sub` Pattern [difficulty], default (number_patterns_rule) [offered, PROPOSED]
+- `pattern=double` Pattern [difficulty], default (number_patterns_rule) [offered, PROPOSED]
+- `pattern=times10` Pattern [difficulty] (number_patterns_rule) [offered, PROPOSED]
+- `pattern=grow` Pattern [difficulty] (number_patterns_rule) [offered, PROPOSED]
+- `places=1` Start in the [difficulty], default (number_patterns_rule) [offered, PROPOSED]
+- `places=10` Start in the [difficulty], default (number_patterns_rule) [offered, PROPOSED]
+- `places=100` Start in the [difficulty] (number_patterns_rule) [offered, PROPOSED]
+- `places=1000` Start in the [difficulty] (number_patterns_rule) [offered, PROPOSED]
+- `missing=null` Numbers left blank [support], default (number_patterns_rule) [offered, PROPOSED]
+- `missing=20` Numbers left blank [support] (number_patterns_rule) [offered, PROPOSED]
+- `missing=50` Numbers left blank [support] (number_patterns_rule) [offered, PROPOSED]
+- `missing=70` Numbers left blank [support] (number_patterns_rule) [offered, PROPOSED]
+- `missing=80` Numbers left blank [support] (number_patterns_rule) [offered, PROPOSED]
+- `missing=90` Numbers left blank [support] (number_patterns_rule) [offered, PROPOSED]
+- `missing=100` Numbers left blank [support] (number_patterns_rule) [offered, PROPOSED]
+- `rule=true` Write the rule [support], default (number_patterns_rule) [offered, PROPOSED]
+- `rule=false` Write the rule [support] (number_patterns_rule) [offered, PROPOSED]
+- `shape=box` Box shape [layout], default (number_patterns_rule) [offered, PROPOSED]
+- `shape=circle` Box shape [layout] (number_patterns_rule) [offered, PROPOSED]
+- `shape=hex` Box shape [layout] (number_patterns_rule) [offered, PROPOSED]
+- `shape=mixed` Box shape [layout] (number_patterns_rule) [offered, PROPOSED]
+- `nlOn=true` Show the number line [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlOn=false` Show the number line [nline], default (number_patterns_rule) [out of scope, PROPOSED]
+- `nlFrom=*` Starts at [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlTo=*` Ends at [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=2` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=5` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=10` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=20` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=25` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=50` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=100` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1000` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=auto` Step between ticks [nline], default (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1/2` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1/3` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1/4` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1/5` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1/6` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1/8` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1/10` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=1/12` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=0.1` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlStep=0.01` Step between ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlLabels=auto` Numbers under the ticks [nline], default (number_patterns_rule) [out of scope, PROPOSED]
+- `nlLabels=all` Numbers under the ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlLabels=2` Numbers under the ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlLabels=5` Numbers under the ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlLabels=10` Numbers under the ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlLabels=ends` Numbers under the ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlLabels=none` Numbers under the ticks [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlMinor=auto` Small ticks between [nline], default (number_patterns_rule) [out of scope, PROPOSED]
+- `nlMinor=0` Small ticks between [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlMinor=2` Small ticks between [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlMinor=4` Small ticks between [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlMinor=5` Small ticks between [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlMinor=10` Small ticks between [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlHops=true` Hop arrows over each step [nline] (number_patterns_rule) [out of scope, PROPOSED]
+- `nlHops=false` Hop arrows over each step [nline], default (number_patterns_rule) [out of scope, PROPOSED]
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
-- `role:independent` — the skill's own items (all 3) [offered]
-- `role:more-practice` — the skill's own items (all 3) [offered]
-- `role:opener` (also lesson-opener) — the skill's own items (all 3) [offered]
-- `role:scripted-model` (also model) — provider workedSteps: real 3/3 (all 3) [offered]
-- `role:guided` — provider workedSteps: real 3/3 (all 3) [offered]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 3/3; provider misconceptions: real 3/3 (all 3) [offered]
-- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 3) [offered, PROPOSED]
-- `role:test` (also test-a, test-b) — the skill's own items (all 3) [offered]
-- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 3) [offered, PROPOSED]
-- `role:word-problems` — provider stories: real 0/3 (default on growing_shape_patterns, notice_patterns, pattern_features) (all 3) [out of scope, PROPOSED]
-- `role:fact-rows` — provider stories: real 0/3 (default on growing_shape_patterns, notice_patterns, pattern_features) (all 3) [out of scope, PROPOSED]
-- `role:fact-probe` — the skill's own items (all 3) [offered, PROPOSED]
-- `role:mixed-practice` (also mixed) — provider stories: real 0/3 (default on growing_shape_patterns, notice_patterns, pattern_features) (all 3) [out of scope, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 3/3 (all 3) [offered]
-- `role:reason-it` (also reason) — provider workedSteps: real 3/3; provider wrongAnswer: real 3/3 (all 3) [offered]
-- `role:stretch` — the skill's own items (all 3) [offered]
-- `role:lesson` — lesson data: prereqs.js 3/3; provider stories: real 0/3 (default on growing_shape_patterns, notice_patterns, pattern_features) (all 3) [offered, PROPOSED]
+- `role:independent` — the skill's own items (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:more-practice` — the skill's own items (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:opener` (also lesson-opener) — the skill's own items (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:scripted-model` (also model) — provider workedSteps: real 4/4 (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:guided` — provider workedSteps: real 4/4 (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 4/4; provider misconceptions: real 4/4 (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 4) [offered, PROPOSED]
+- `role:test` (also test-a, test-b) — the skill's own items (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 4) [offered, PROPOSED]
+- `role:word-problems` — provider stories: real 0/4 (default on growing_shape_patterns, notice_patterns, number_patterns_rule, pattern_features) (all 4) [out of scope, PROPOSED]
+- `role:fact-rows` — provider stories: real 0/4 (default on growing_shape_patterns, notice_patterns, number_patterns_rule, pattern_features) (all 4) [out of scope, PROPOSED]
+- `role:fact-probe` — the skill's own items (all 4) [offered, PROPOSED]
+- `role:mixed-practice` (also mixed) — provider stories: real 0/4 (default on growing_shape_patterns, notice_patterns, number_patterns_rule, pattern_features) (all 4) [out of scope, PROPOSED]
+- `role:true-false` — provider wrongAnswer: real 4/4 (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:reason-it` (also reason) — provider workedSteps: real 4/4; provider wrongAnswer: real 4/4 (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:stretch` — the skill's own items (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `role:lesson` — lesson data: prereqs.js 4/4; provider stories: real 0/4 (default on growing_shape_patterns, notice_patterns, number_patterns_rule, pattern_features) (all 4) [offered, PROPOSED]
 
 **Screen hosts** (8 lines; 0 undecided)
 
-- `host:boss` — driven by ws-chromebook-fit (all 3) [out of scope, PROPOSED]
-- `host:map` — driven by ws-screen-slots (all 3) [out of scope, PROPOSED]
-- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 3) [offered, PROPOSED]
-- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 3) [offered, PROPOSED]
-- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered]
-- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered]
-- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered]
-- `host:race` — driven by ws-chromebook-fit (all 3) [out of scope, PROPOSED]
+- `host:boss` — driven by ws-chromebook-fit (all 4) [out of scope, PROPOSED]
+- `host:map` — driven by ws-screen-slots (all 4) [out of scope, PROPOSED]
+- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 4) [offered, PROPOSED]
+- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 4) [offered, PROPOSED]
+- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 4) [offered: growing_shape_patterns, notice_patterns, pattern_features; offered, PROPOSED: number_patterns_rule]
+- `host:race` — driven by ws-chromebook-fit (all 4) [out of scope, PROPOSED]
 
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 
@@ -290,8 +410,13 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `band` Answers to: 10 / 20 / 50 (1)
 - `band` Numbers to: 25 / 50 / 100 / 144 (1)
 - `growShape` Picture: dots / squares / mixed (1)
+- `missing` Numbers left blank: (None: continue it (the first 3 shown, the rest to write)) / 20 / 50 / 70 / 80 / 90 / 100 (1)
 - `patShow` Counts of Terms 1 to 3: free (1)
 - `patShow` Show the working: free (1)
+- `pattern` Pattern: add / sub / double / times10 / grow (1)
+- `places` Start in the: 1 / 10 / 100 / 1000 (1)
+- `rule` Write the rule: free (1)
+- `shape` Box shape: box / circle / hex / mixed (1)
 
 **Preset skills on these hosts** (`js/modules/skill-presets.js`): `patterns:pattern_features` → `patterns:notice_patterns` {"patTask":"feature"}
 <!-- /informational -->
