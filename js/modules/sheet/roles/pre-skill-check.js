@@ -89,8 +89,10 @@ export const HALF_W_MM = 93;
 export const ROUTE_GROW = 1.05;
 /** Two single-item questions pair two-up when the shorter is at least this share of the taller. */
 export const PAIR_ALIKE = 0.6;
-/** The default items a routed question deals (LESSON_RULES LR-17: two, so one slip is not a route). */
+/** The default items a routed question deals, and its FLOOR (LESSON_RULES LR-17a (2): two, so one slip is not a route). */
 export const ROUTE_ITEMS = 2;
+/** When a question counts as missed (LR-17a (2), P-25; critic r2 N3): printed under the routing table. */
+export const ROUTE_MISSED_RULE = 'A question is missed when any one of its items is wrong (its score is under full marks).';
 
 /** The teacher tag's height (mm) at one line. */
 export const ROUTE_TAG_MM = ROUTE_TAG_PT * PT_MM * ROUTE_TAG_LEADING + ROUTE_TAG_PAD_MM;
@@ -123,10 +125,14 @@ export function routingTableHtml(rows, { rowMm = 0 } = {}) {
         + `<td><b>Lesson ${escT(r.lesson || '')}</b>${r.title ? ` ${escT(r.title)}` : ''}</td><td class="mq-lroute-names"></td></tr>`).join('');
     return `<div class="mq-lroute">${routeCssHtml()}`
         + `<table><thead><tr><th>Question</th><th>What it asks</th><th>Answers</th><th>If missed, teach first</th><th>Pupils who missed it</th></tr></thead><tbody>${body}</tbody></table>`
+        + `<p class="mq-lroute-rule"><b>${ROUTE_MISSED_RULE}</b></p>`
         + '<ul><li><b>All correct:</b> start this lesson with its anchor chart.</li>'
         + '<li><b>One question missed:</b> teach that lesson first, then come back to this lesson.</li>'
         + '<li><b>Two or more missed:</b> start with the earliest one missed (the lowest number), then the next, then come back to this lesson.</li></ul></div>';
 }
+
+/** The routing table's fixed margins (mm): the table's top and bottom rules and padding and the list's margins. */
+export const ROUTE_TABLE_FIXED_MM = 24;
 
 /** The key's routing page (a teacher page: no Name, Date or Score, never an "I Can" title), or null without routes. */
 export function routePlan(input, rows) {
@@ -140,7 +146,9 @@ export function routePlan(input, rows) {
     // half-blank teacher page)
     const m = bandMetrics(ctx, layoutHeader(header));
     const em = ((ctx.s && ctx.s.textPt) || 14) * PT_MM;
-    const rowMm = Math.max(12, (m.budget - m.strip - 10 * em - 24) / rows.length);
+    // (the rest of the body: the table head (2 lines), the miss rule and the three rule lines (about 8 lines with their
+    // leading, 10 em in all) and the table and list margins, ROUTE_TABLE_FIXED_MM - critic r1 D16)
+    const rowMm = Math.max(12, (m.budget - m.strip - 10 * em - ROUTE_TABLE_FIXED_MM - em) / rows.length);
     const section = { kind: 'band', label: '', instr: '', html: routingTableHtml(rows, { rowMm }) };
     return assemble(ROLE_ID, input, Object.assign({}, f, { header }), [{ header, sections: [section] }], { scaffoldLevel: 1, meta: { items: 0, part: 'prereq-route' } });
 }
@@ -152,11 +160,11 @@ export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).ma
 export function plan(input = {}) {
     if (!(Array.isArray(input.routes) && input.routes.some(Boolean))) return planCheck(input, 1);
     // A lesson's routed check (perQuestion): each question deals its items (2 by default, LR-17); while the page cannot
-    // hold them, the last question still at 2 or more drops to one item (the check is one page, PT 2.10).
+    // hold them, the last question above its floor (2, ROUTE_ITEMS) gives one up (the check is one page, PT 2.10).
     if (input.perQuestion) {
         // A lesson's routed check: each question deals a ROW of items - as many as lie side by side (at most PER_QUAD),
         // never fewer than it asks (`perQuestion`, 2 by default, LR-17) - so a narrow item never sits alone in a wide
-        // cell (critic r1 D9); while the page cannot hold them, the last question with more than one item gives one up
+        // cell (critic r1 D9); while the page cannot hold them, the last question above its floor of 2 gives one up
         // (the check is one page, PT 2.10).
         const ctx = ctxOf(input);
         const n = input.routes.length;
@@ -169,11 +177,14 @@ export function plan(input = {}) {
         // (a count is whole rows only: k items at the most columns they lie at, every row full - never a lone item
         // stretched across a row its neighbours share)
         const whole = (i, k) => { const its = poolItems(input, `q${i}`).slice(0, k); const c = [4, 3, 2, 1].filter((x) => x <= k).find((x) => fitsAt(its, x, ctx)) || 1; return k === 1 || k % c === 0; };
-        const down = (i) => { for (let k = per[i] - 1; k >= 1; k--) if (whole(i, k)) return k; return 1; };
+        // (critic r2 N2: a question NEVER prints one item - one item is a coin flip, LR-17a (2), P-25: the floor is
+        // ROUTE_ITEMS, or the question's own pool when it holds fewer; the page holds the floor by its rows, ROUTE_GROW)
+        const floor = (i) => Math.max(1, Math.min(ROUTE_ITEMS, poolItems(input, `q${i}`).length || 1));
+        const down = (i) => { for (let k = per[i] - 1; k >= floor(i); k--) if (whole(i, k)) return k; return floor(i); };
         for (let i = 0; i < n; i++) if (!whole(i, per[i])) per[i] = down(i);
         let p = planCheck(Object.assign({}, input, { perQuestion: per.slice() }), 1);
         for (let guard = 0; guard < 4 * n && (p.pages.length > 1 || !p.meta.fitsPage); guard++) {
-            const k = per.map((v, i) => [v, i]).filter(([v]) => v > 1).sort((a, b) => b[0] - a[0] || b[1] - a[1]).map(([, i]) => i)[0];
+            const k = per.map((v, i) => [v, i]).filter(([v, i]) => v > floor(i)).sort((a, b) => b[0] - a[0] || b[1] - a[1]).map(([, i]) => i)[0];
             if (k === undefined) break;
             per[k] = down(k);
             p = planCheck(Object.assign({}, input, { perQuestion: per.slice() }), 1);
@@ -248,7 +259,8 @@ function planCheck(input, cut) {
         const grid = gridPart(its.map((it) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start });
         const r = routed ? routeOf(input, qi) : null;
         const b = {
-            kind: 'band', label: '', instr, extra: input.perQuestion ? '' : scoreTag(its.length),
+            // (a routed question carries its own score, __/n - P-25, critic r2 N3: the routing table reads it)
+            kind: 'band', label: '', instr, extra: input.perQuestion && !routed ? '' : scoreTag(its.length),
             // (the detailed lesson's check centres each item in its grown cell, H13)
             content: routed ? { kind: 'col', cls: 'mq-lprecol', parts: [grid, { kind: 'html', html: (bandNo === 1 ? routeCssHtml() : '') + routeTagHtml(r, tagLines) }] } : grid,
         };

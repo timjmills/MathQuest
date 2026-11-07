@@ -62,6 +62,20 @@ const LATE = {
         ok(l7 && l7.repeatKey && l7.skill.repeatKey === 'family+frame', 'D2: the compiled lesson 7 carries repeatKey on the description and its refs');
         ok(!DET.DETAILED_LESSONS['g3-oa8-two-step-wp'] || !DET.DETAILED_LESSONS['g3-oa8-two-step-wp'].repeatKey, 'D2: the hand-written lesson 7 has none (its render is unchanged)');
     },
+    // critic r2 N2 / N3 / N4 (lf-engine P1b): a routed question never prints one item; the routing table says when a
+    // question is missed and each routed question prints its __/n; the check holds LR-6.
+    async 'route-floor'() {
+        const R = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        if (!R) { ok(false, 'N2: pre-skill-check.js import'); return; }
+        eq(R.ROUTE_ITEMS, 2, 'N2: ROUTE_ITEMS is 2');
+        const html = R.routingTableHtml([{ letters: '1-2', checks: 'x', lesson: 'Y1', title: 't' }]);
+        ok(typeof R.ROUTE_MISSED_RULE === 'string' && html.includes(R.ROUTE_MISSED_RULE), 'N3: the routing table states when a question is missed');
+        const src = readSrc('js/modules/sheet/roles/pre-skill-check.js');
+        ok(/const floor = \(i\) => Math\.max\(1, Math\.min\(ROUTE_ITEMS,/.test(src) && /return floor\(i\); \};/.test(src) && /filter\(\(\[v, i\]\) => v > floor\(i\)\)/.test(src), 'N2: plan() gives items up only above the floor of 2');
+        ok(/extra: input\.perQuestion && !routed \? '' : scoreTag\(its\.length\)/.test(src), 'N3: a routed band carries its __/n score');
+        ok(/Object\.assign\(\{ lr6: true, distinctAnswer: true \}, p\.ref\)/.test(readSrc('js/modules/print-sheet.js')), 'N4: the lesson check refs hold LR-6');
+        ok(!/10 \* em - 24\)/.test(src) && /ROUTE_TABLE_FIXED_MM/.test(src), 'D16: routePlan names its fixed margins');
+    },
     async 'r1-page-fresh'() {
         globalThis.window = globalThis.window || globalThis;
         const G = await tryImp('js/modules/generate-question.js'), PD = await tryImp('js/modules/page-deal.js');

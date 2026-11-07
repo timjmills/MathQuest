@@ -118,6 +118,7 @@ export const LESSON_ROUTE_CSS = [
     ':is(.ws-page,.ws-sheet) .mq-lroute td.mq-lroute-names{width:42mm}',
     ':is(.ws-page,.ws-sheet) .mq-lroute ul{margin:0;padding-left:5mm}',
     ':is(.ws-page,.ws-sheet) .mq-lroute li+li{margin-top:1.5mm}',
+    ':is(.ws-page,.ws-sheet) .mq-lroute p.mq-lroute-rule{margin:0 0 2mm}',
 ].join('');
 
 export default { LESSON_CSS, LESSON_ROUTE_CSS };

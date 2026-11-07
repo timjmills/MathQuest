@@ -4428,10 +4428,11 @@ async function buildLesson(n, metaOf) {
     let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
     // The Prerequisite Check (LR-17): first in the packet; its key ends with the routing table.
     const buildPrereq = (seed, avoid = (r) => r) => buildRoleSheet(Object.assign({}, nz, {
-        // (LR-17: each question deals its `items`, ROUTE_ITEMS = 2 by default - the role drops a question to one item
+        // (LR-17: each question deals its `items`, ROUTE_ITEMS = 2 by default and its floor - the role gives a question's extra items up, never below 2,
         // when the page would not hold it; `checks` is what the question asks, the routing table's words - critic r1 D12)
         seed, role: 'pre-skill-check', header, look: 'ican', perQuestion: prereqs.map((p) => Number(p.items) || 2), checkFor: meta,
-        sections: [{ skills: prereqs.map((p) => avoid(Object.assign({}, p.ref))) }],
+        // (critic r2 N4: the check holds LR-6 on its page - no answer twice, no near twins, no subtrahend or first addend twice)
+        sections: [{ skills: prereqs.map((p) => avoid(Object.assign({ lr6: true, distinctAnswer: true }, p.ref))) }],
         routes: prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', checks: p.checks || '' })),
         lessonInput: undefined,
     }), metaOf);
