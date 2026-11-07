@@ -1590,6 +1590,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-sheet-indep",
+   "check": "Every lesson sheet holds an Independent row, a Score and a blank foot <= 20 %",
+   "kind": "commit-pair",
+   "rule": "critic lf-engine r2 N1 (LR-18, LR-13, H13)",
+   "browser": true,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "sub L sheet lost its Independent row (critic r2 N1)"
+   },
+   "pass": {
+    "commit": "08ee129e",
+    "state": "fixed (P1b N1, checked P1c)"
+   },
+   "command": "node tests/scripts/ws-lesson-hash.cjs --sheets --only subtract-2-digit-regroup --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
