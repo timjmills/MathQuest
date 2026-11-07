@@ -27,10 +27,22 @@ Critic rounds: 0, none
   2. x 6 on a 3-row table at band 20 for lesson #5? Suggested: yes (rows are table facts; ftFactors restricts).
   3. Check rows and 5-row tables count as "adds a drawing" (capacity)? Suggested: yes.
   4. Two-step rules stay offered on easy, off by default? Suggested: yes.
+- patterns card (design/cards/patterns/patterns.md, unsigned; 15 PROPOSED decisions, accepted by signing):
+  1. "True or false about a times-table" (patTask truefalse) its own preset skill too? Suggested: no for now (same 3.OA.D.9
+     lesson as parity); a preset only if a lesson page deals it alone.
+  2. Parity items: print the product (6 x 7 = 42, "is 42 even or odd?") or keep it hidden (decide from the factors)?
+     Suggested: hidden (with the product printed it is 2.OA.C.3, not 3.OA.D.9's "explain why").
+  3. Growing patterns on screen: a 7 x 7 tap grid as the "draw Term 4" working space (never graded)? Suggested: yes; the
+     graded answer is the number on paper and screen.
+  4. WRM tags notice_patterns -> Y4.B4.S6 (partial), pattern_features -> Y5.B12.S9 (partial), growing_shape_patterns ->
+     Y6.B7.S1 (partial); the build list's Y3.B3.S13 / Y4.B4.S15 were wrong. Suggested: accept.
+  5. The fading hint (patShow) on by default for both skills? Suggested: on (teacher turns it off for the next page).
+  6. Word answers in card rulings: extend ws-card-rulings with a payload reader so notice rulings are machine-checked?
+     Suggested: yes (this lane does it).
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
-Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end —, profile mq-opus-medium
+Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end 2026-11-07T08:31Z, profile mq-opus-medium
 Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end 2026-11-07T08:27Z, profile mq-opus-medium
 
 ## Baseline precritic (head 9398c3a, --skill function_table_easy,number_patterns_rule --strict): 6 FAIL
@@ -42,6 +54,18 @@ Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-1
 - card-rulings SKIPPED / spec-card N/A: no card yet
 
 ## Log
+- 2026-11-07: r1 build merged (e59e2bf3). New: patterns:notice_patterns (patTask parity / feature / truefalse, band, patShow),
+  preset patterns:pattern_features (patTask feature, lesson #19), patterns:growing_shape_patterns (patTask next / rule / far,
+  growShape, band); files gen-patterns-notice.js, cells/notice.js, cells/growing-pattern.js, providers/patterns.js; card
+  design/cards/patterns (unsigned); manifest design/lanes/lf-algebra/manifest.json (ws-integrate applied); share codes ZW ZX ZY
+  (lead: check against other lanes). build-list patterns_notice deleted as built, new entry addition_table_patterns (3.OA.D.9
+  addition-table clause); standards-audit 4.OA.C.5 -> full. Links edits: Y4 lesson G3|-|patternsonthemultiplicationtable
+  (direct += notice_patterns parity, verdict direct, pre += composing:odd_even), Y4 step Y4.B4.S6 (partial += notice_patterns),
+  Y4 proposals.patterns_notice deleted; Y5 lessons G4|-|findemergentfeaturesegunitsdigitcycle (direct += pattern_features) and
+  G4|-|extendgrowingshapepatterns (direct += growing_shape_patterns), step Y5.B12.S9 (partial += pattern_features), Y5 proposals
+  patterns_notice / growing_shape_patterns deleted. Proposal: Y6.B7.S1 should list growing_shape_patterns as partial (Y6.json not
+  edited). r1 precritic still red: lesson anchor overflow (new cells taller than the ~50 mm anchor), dealer-uniform (growing read
+  as op '?'), sibling-compare (new templates), options-verify --render (task values), card-rulings INCOMPLETE (word answers).
 - 2026-11-07: lf-ops accepted count-row requests 1-3 (train wraps to cell, shaped tiles at box pitch, >= 44 px screen boxes);
   they land on claude/sweet-newton-c8wrv1-lf-ops, lf-ops sends the commit.
 - 2026-11-07: composing:number_word_form (BUILD lesson #1) handed to lf-placevalue (session_013pHDnMCXcY6kXV15KHf4Yp): they own only
