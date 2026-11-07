@@ -34,6 +34,35 @@ const PRE = await imp('js/modules/lessons/prereqs.js');
 const BL = await imp('js/modules/build-list.js');
 const DET = await imp('js/modules/lessons/detailed/index.js');
 const LATE = {
+    // P1c item 1 (lf-ops): `practiceBlocks` [{shape: [count, cols], opts?}] (1-3) on a short lesson - the Practice page prints
+    // one section per block, the block's opts over the lesson's practice opts, its own grid, the step strip once.
+    async 'practice-blocks'() {
+        const PR = await tryImp('js/modules/sheet/lesson-pages/practice.js');
+        const v = SCHEMA.validatePracticeBlocks;
+        ok(typeof v === 'function' && !v(undefined).length && !v([{ shape: [4, 2] }, { shape: [4, 2], opts: { task: [2] } }]).length, 'blocks: the lf-ops case validates');
+        ok(typeof v === 'function' && v([]).length && v([{ shape: [4, 2] }, { shape: [4, 2] }, { shape: [2, 2] }, { shape: [2, 2] }]).length && v([{ shape: [5, 2] }]).length
+            && v([{ shape: [4, 2], opts: [1] }]).length && v([{ shape: [4, 2], pages: 2 }]).length && v([{ shape: [4] }]).length, 'blocks: 0 or 4 blocks, a part row, bad opts, an unknown key, a bad shape fail');
+        ok(SCHEMA.validateLesson('Y2.B2.S18', Object.assign({}, LIB.LESSONS['Y2.B2.S18'], { practiceBlocks: [{ shape: [3, 2] }] })).some((m) => /practiceBlocks/.test(m)), 'blocks: validateLesson checks the lesson\'s blocks');
+        ok(!!PR && PR.practiceBlocksOf({}) === null && PR.practiceBlocksOf({ practiceBlocks: [] }) === null, 'blocks: absent or empty -> null (the page prints as before)');
+        const secs = PR ? PR.practiceBlockSections(PR.practiceBlocksOf({ practiceBlocks: [{ shape: [4, 2] }, { shape: [4, 2], opts: { task: [2], pictures: false } }] }),
+            { categoryId: 'multiplication', skillId: 'mult_properties', opts: { forms: [0], task: [1], band: 81 }, lr6: true }) : [];
+        eq(secs.map((x) => [x.count, x.columns, x.pageCap, x.blockShare, x.noCap, x.skills[0].opts, x.skills[0].lr6]), [
+            [4, 2, 4, 2, true, { forms: [0], task: [1], band: 81 }, true],
+            [4, 2, 4, 2, true, { forms: [0], task: [2], band: 81, pictures: false }, true]], 'blocks: one section per block, opts merged over the lesson\'s, floors kept');
+        const req = PR ? PR.practiceRequest({ common: {}, size: 'L', practiceSize: 'L', lessonNo: 1, section: { skills: [] }, facts: false, pages: 1, withStrip: true, shape: [6, 2], seed: 1, strip: null, stripH: 9, stripHtml: '<i>s</i>', blocks: secs }) : {};
+        ok(req.sections === secs && req.stepStrip && req.stepStrip.html === '<i>s</i>', 'blocks: the request carries the blocks and the strip once');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/blockShare: Number\(s\.blockShare\)/.test(ps) && /sec\.blockShare > 0/.test(ps), 'blocks: buildSheet keeps blockShare and shares the body by it');
+        const libSrc = readSrc('js/modules/lessons/library.js');
+        ok(/out\.practiceBlocks = clone\(l\.practiceBlocks\)/.test(libSrc), 'blocks: engineRecord carries the lesson\'s practiceBlocks');
+        const CMP = await tryImp('js/modules/lessons/compile.js');
+        const U = await tryImp('js/modules/lessons/units/G3-Y4.B4.js');
+        const card = U && JSON.parse(JSON.stringify(U.CARDS['g3-oa5-mult-properties']));
+        let lib = null, lib0 = null;
+        try { lib0 = CMP.compileLesson(card).library; card.parts.weDo = Object.assign({}, card.parts.weDo, { practiceBlocks: [{ shape: [4, 2] }] }); lib = CMP.compileLesson(card).library; } catch (e) { lib = null; }
+        const one = (l) => (l ? Object.values(l.lessons)[0] : {});
+        ok(!!lib && JSON.stringify(one(lib).practiceBlocks) === '[{"shape":[4,2]}]' && one(lib0).practiceBlocks === undefined, 'blocks: compile.js passes a card\'s weDo.practiceBlocks to the short lesson (absent: none)');
+    },
     // R1 (lf-engine P1b): lesson 2 did not build since 944afb79 - a story within 20 tells ONE schema a page (word-work.js
     // pageConstant 'word-work-schema'), and an `itemSpread` ref never re-opens its page, so every try told the first try's
     // schema and the exit slip's put-together case was never met. `pageFresh` re-opens the page per try (both dealers), and

@@ -109,6 +109,8 @@ export function engineRecord(idOrSlug) {
     const r = l && routineOf(l);
     if (!l || !r) return null;
     const out = Object.assign({}, r, { skills: (l.warmup || []).slice() }, l.teach || {}, { mixWith: (l.mixWith || []).slice() });
+    // (`practiceBlocks` on the lesson record: the Practice page's blocks - schema.js; the lesson's own wins)
+    if (Array.isArray(l.practiceBlocks)) out.practiceBlocks = clone(l.practiceBlocks);
     for (const k of LIBRARY_ONLY) delete out[k];
     return out;
 }

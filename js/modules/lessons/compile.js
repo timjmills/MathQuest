@@ -286,7 +286,7 @@ function wrongAnswersOf(card) {
     return out.concat(clone((card.teach && card.teach.wrongAnswers) || []));
 }
 
-const WEDO_KEYS = /^(guided|guidedWants|guidedRows|guidedStack|independent|practiceShape|growAll|tailLast|tailRead)$/;
+const WEDO_KEYS = /^(guided|guidedWants|guidedRows|guidedStack|independent|practiceShape|practiceBlocks|growAll|tailLast|tailRead)$/;
 
 /** The engine's lessonData: the chart part and the We Do part, with its hooks. */
 function lessonDataOf(chart, weDo, fns) {
@@ -448,6 +448,8 @@ function libraryOf(card, parts, shape, notes) {
     const seen = new Set();
     lesson.mixWith = mixSrc.filter((r) => r && r.categoryId && !seen.has(keyOf(r)) && keyOf(r) !== keyOf(ref) && seen.add(keyOf(r)))
         .map((r) => Object.assign({ key: keyOf(r) }, r.opts ? { opts: clone(r.opts) } : {}));
+    // (`practiceBlocks`, parts.weDo: the short lesson's Practice page blocks - schema.js validatePracticeBlocks)
+    if (Array.isArray(weDo.practiceBlocks) && weDo.practiceBlocks.length) lesson.practiceBlocks = clone(weDo.practiceBlocks);
     lesson.note = `Compiled from design/lessons/cards/${card.unit}/${card.id}.md (shape ${card.shape}).`;
     return { routines: { [routineId]: routine }, lessons: { [id]: lesson } };
 }

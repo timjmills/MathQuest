@@ -42,7 +42,7 @@ import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, body
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
-import { practiceSection, practiceStackShapes, practiceRequest } from './sheet/lesson-pages/practice.js';
+import { practiceSection, practiceStackShapes, practiceRequest, practiceBlocksOf, practiceBlockSections } from './sheet/lesson-pages/practice.js';
 import { mixedRequest } from './sheet/lesson-pages/mixed.js';
 import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './sheet/lesson-pages/index.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
@@ -164,6 +164,9 @@ function normaliseRequest(req = {}) {
             // A single-skill page held short by its own pool, laid in fewer, longer columns
             // (buildSheet): two columns may take any row count, not only CL-2's 2/3/4/5/8.
             freeRows: !!(s && s.freeRows),
+            // (`blockShare`, a lesson's `practiceBlocks`: the section's weight when several sections share one page under a
+            // step strip - the strip's body is split by these weights; absent everywhere else)
+            ...(s && Number(s.blockShare) > 0 ? { blockShare: Number(s.blockShare) } : {}),
         }))
         .filter((s) => s.skills.length);
     // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
@@ -2864,6 +2867,14 @@ async function buildSheetDeal(req = {}) {
     }
     // A lesson's step reminder strip sits above the grid on every page: the grid is that much
     // shorter (the strip's height comes off the body, never off a cell).
+    // (a lesson's `practiceBlocks`: two or three sections on ONE page, under the strip when it prints, share its body by
+    // their `blockShare` weights, each under its own instruction line)
+    const blk = n.sections.filter((sec) => !sec.gridH && sec.blockShare > 0);
+    if (blk.length > 1) {
+        const room = bodyHeightMm(paper, layoutHeader) - blk.length * instructionMm(n.size) - (n.stepStrip ? n.stepStrip.hMm : 0) - 1;
+        const tw = blk.reduce((a, sec) => a + sec.blockShare, 0);
+        for (const sec of blk) sec.gridH = Math.floor(room * sec.blockShare / tw * 1000) / 1000;
+    }
     if (n.stepStrip) {
         for (const sec of n.sections) if (!sec.gridH) sec.gridH = Math.floor((bodyHeightMm(paper, layoutHeader) - instructionMm(n.size) - n.stepStrip.hMm) * 1000) / 1000;
     }
@@ -3505,6 +3516,27 @@ async function buildSheetDeal(req = {}) {
     allocateHostSupports(hostItems, n);
 
     settleMixedGrades(skills, hostItems);
+    // (a lesson's `practiceBlocks`: the blocks' shared body re-split by what each block's rows MEASURE - its rows times
+    // its tallest cell - the spare shared in proportion, so a block of tall arrays over a block of short sentences keeps
+    // both on the one page; absent everywhere else)
+    const blkSi = n.sections.map((sec, si) => (sec.blockShare > 0 ? si : -1)).filter((si) => si >= 0);
+    if (blkSi.length > 1) {
+        const room = blkSi.reduce((a, si) => a + (Number(n.sections[si].gridH) || 0), 0);
+        const need = blkSi.map((si) => {
+            const its = hostItems.filter((it) => (Number(it.section) || 0) === si);
+            const cols = Number(n.sections[si].columns) || 1;
+            const h = Math.max(0, ...its.map((it) => (it.measured && it.measured[cols] && Number(it.measured[cols].hMm)) || 0));
+            return its.length && h > 0 ? Math.ceil(its.length / cols) * h + 1 : NaN;
+        });
+        const tot = need.reduce((a, v) => a + v, 0);
+        if (Number.isFinite(tot) && tot > 0 && tot <= room) blkSi.forEach((si, k) => { n.sections[si].gridH = Math.floor((need[k] + (room - tot) * need[k] / tot) * 1000) / 1000; });
+        // (the blocks do not fit one page: each block takes a page of its own, whole, rather than a row a page)
+        else if (Number.isFinite(tot)) {
+            const full = Math.floor((bodyHeightMm(paper, layoutHeader) - instructionMm(n.size) - (n.stepStrip ? n.stepStrip.hMm : 0)) * 1000) / 1000;
+            for (const si of blkSi) n.sections[si].gridH = full;
+            notes.push(`The practice blocks need ${tot.toFixed(0)} mm and the page holds ${room.toFixed(0)} mm: each block prints on a page of its own.`);
+        }
+    }
     // Wave 5.2: draw the line from the page's own numbers, in the band reserved above.
     let numberLine = null;
     if (nline) {
@@ -4498,9 +4530,14 @@ async function buildLesson(n, metaOf) {
     // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
     // same count either way, so the pupil gets the bigger digits.
     const practiceSize = rounding ? 'L' : size;
+    // `practiceBlocks` (lesson data, 1-3 blocks [{shape: [count, cols], opts?}]): the Practice page prints one section per
+    // block, in order - the lesson's practice skill with the block's opts merged over its own, the block's own grid
+    // shape, the step strip once at the top (sheet/lesson-pages/practice.js practiceBlockSections). Absent: as before.
+    const blocks = practiceBlocksOf(data);
     const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1], seed = (n.seed + 7919) >>> 0, sec = section) => practiceRequest({
         common, size, practiceSize, lessonNo, section: sec, facts, pages, withStrip, shape,
         seed, strip, stripH, stripHtml,
+        ...(blocks ? { blocks: practiceBlockSections(blocks, sec.skills[0]) } : {}),
     });
     const practiceTried = [];
     const practiceTexts = [];
@@ -4539,7 +4576,7 @@ async function buildLesson(n, metaOf) {
     }
     const buildPractice = async (seed, sec) => {
         let res = null;
-        for (const shape of facts ? [null] : stackShapes) {
+        for (const shape of facts || blocks ? [null] : stackShapes) {
             const r = await buildSheetInner(practiceReq(practicePages, true, shape || undefined, seed, sec));
             const f0 = r.fits && r.fits.sections && r.fits.sections[0];
             const whole = f0 ? f0.clamped !== true : true;

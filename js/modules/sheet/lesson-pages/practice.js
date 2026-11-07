@@ -146,14 +146,40 @@ export const practiceStackShapes = (data) => (data && Array.isArray(data.practic
     : data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]]);
 
 /**
+ * `practiceBlocks` (lesson data): 1-3 blocks [{shape: [count, cols], opts?}] - the Practice page prints one section per
+ * block, in order. The well-formed blocks of `data`, or null (absent, empty or malformed: the page prints as before).
+ */
+export function practiceBlocksOf(data) {
+    const list = data && Array.isArray(data.practiceBlocks) ? data.practiceBlocks : null;
+    if (!list || !list.length) return null;
+    const ok = list.slice(0, 3).filter((b) => b && Array.isArray(b.shape) && b.shape.length === 2 && b.shape.every((v) => Number.isInteger(v) && v > 0));
+    return ok.length ? ok : null;
+}
+
+/**
+ * The sections of a block Practice page: each the lesson's practice skill ref `sk` with the block's `opts` merged over its
+ * own, the block's grid [count, cols] as its own page ceiling, and `blockShare` (its rows) - the body under the strip is
+ * shared by rows (print-sheet.js buildSheet).
+ */
+export function practiceBlockSections(blocks, sk) {
+    return blocks.map((b) => {
+        const skill = b.opts ? Object.assign({}, sk, { opts: Object.assign({}, (sk && sk.opts) || {}, b.opts) }) : sk;
+        const [count, cols] = b.shape;
+        return Object.assign({ skills: [skill], count, columns: cols, noCap: true, pageCap: count, blockShare: Math.ceil(count / cols) },
+            skill && skill.instructionKey ? { instructionKey: skill.instructionKey } : {});
+    });
+}
+
+/**
  * The buildSheet request of a lesson practice page: the Independent role, the packet's frame (`common`), the step strip
  * when `withStrip` (at L type the strip's words are a point bigger: 2 mm more for it).
  */
-export function practiceRequest({ common, size, practiceSize, lessonNo, section, facts, pages, withStrip, shape, seed, strip, stripH, stripHtml }) {
+export function practiceRequest({ common, size, practiceSize, lessonNo, section, facts, pages, withStrip, shape, seed, strip, stripH, stripHtml, blocks }) {
     return Object.assign({}, common, {
         size: practiceSize,
         role: 'independent', tabId: `Practice ${lessonNo}`,
-        sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
+        // (`blocks`: practiceBlockSections - one section per block, in order, on the one page)
+        sections: blocks ? blocks : [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
         seed,
         // (At L type the strip's words are a point bigger: 2 mm more for it.)
         stepStrip: withStrip && stripHtml ? (practiceSize === size ? { html: stripHtml, hMm: stripH }
@@ -161,4 +187,4 @@ export function practiceRequest({ common, size, practiceSize, lessonNo, section,
     });
 }
 
-export default { AUTO_COLS, stripHtml, stripItem, independentBand, practiceSection, practiceStackShapes, practiceRequest };
+export default { AUTO_COLS, stripHtml, stripItem, independentBand, practiceSection, practiceStackShapes, practiceBlocksOf, practiceBlockSections, practiceRequest };

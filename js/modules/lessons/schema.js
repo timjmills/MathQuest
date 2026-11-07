@@ -27,6 +27,12 @@
 //     words?, notes?, checkRow?, warmRows?             the provider's words in the lesson's terms,
 //                                                      step notes, a Check line under each problem,
 //                                                      the Warm-up's own row at these sizes
+//     guidedRows?: 1 | 2 | 3 | 4                       the Guided cells of a `chartWide` lesson (full-width
+//                                                      rows; 2 when absent - 1 only when asked)
+//     practiceBlocks?: [{shape: [count, cols], opts?}] (also on the LESSON) 1-3 blocks: the Practice page
+//                                                      prints one section per block, in order - the
+//                                                      practice skill with the block's opts merged over
+//                                                      the lesson's, its own grid, the step strip once
 //   }
 //
 // A LESSON is thin (its title, grade, block, CCSS / EE come from its WRM step - seed-db.js):
@@ -60,6 +66,8 @@
 //     mixWith:  [{key, opts?, title?, ...floors}]      Mixed practice partners (EARLIER skills, LR-9)
 //     steps?:   ['Y1.B2.S9', ...]                      further WRM steps it teaches (aliases)
 //     note?:    '...'                                  why this step / this skill (a reviewer's note)
+//     practiceBlocks?: [{shape: [count, cols], opts?}] the Practice page's blocks (see the routine's field;
+//                                                      the lesson's own wins over its routine's)
 //   }
 //
 // The DETAILED lessons (lessons/detailed/*.js, the V22 maker) carry the same concept in their own
@@ -119,6 +127,32 @@ export const PREREQ_MAX = 4;
 const isSkillKey = (k) => /^[a-z0-9_]+:[a-z0-9_]+$/.test(String(k || ''));
 
 /**
+ * The problems of a `practiceBlocks` list (1-3 blocks {shape: [count, cols], opts?}; count 1-24, cols 1-5, count a
+ * whole number of rows), [] when it is sound or absent.
+ */
+export function validatePracticeBlocks(v) {
+    if (v === undefined) return [];
+    if (!Array.isArray(v) || v.length < 1 || v.length > 3) return ['practiceBlocks: 1-3 blocks'];
+    const bad = [];
+    v.forEach((b, i) => {
+        const at = `practiceBlocks[${i}]`;
+        if (!b || typeof b !== 'object') { bad.push(`${at}: not an object`); return; }
+        const sh = b.shape;
+        if (!Array.isArray(sh) || sh.length !== 2 || !sh.every((x) => Number.isInteger(x) && x > 0)) bad.push(`${at}: shape [count, cols], whole numbers`);
+        else if (sh[0] > 24 || sh[1] > 5) bad.push(`${at}: shape at most [24, 5]`);
+        else if (sh[0] % sh[1]) bad.push(`${at}: ${sh[0]} items are not whole rows of ${sh[1]}`);
+        if (b.opts !== undefined && (!b.opts || typeof b.opts !== 'object' || Array.isArray(b.opts))) bad.push(`${at}: opts is an object`);
+        for (const k of Object.keys(b)) if (!['shape', 'opts'].includes(k)) bad.push(`${at}: unknown key "${k}"`);
+    });
+    return bad;
+}
+
+/** The problems of a `guidedRows` value (1-4 Guided rows), [] when it is sound or absent. */
+export function validateGuidedRows(v) {
+    return v === undefined || (Number.isInteger(v) && v >= 1 && v <= 4) ? [] : [`guidedRows: 1-4 (got ${JSON.stringify(v)})`];
+}
+
+/**
  * The problems of one routine, [] when it is well formed.
  * @param {string} id
  * @param {object} r
@@ -146,6 +180,7 @@ export function validateRoutine(id, r, known = {}) {
         if (known.caseNames) for (const c of r.cases) if (!known.caseNames.includes(c)) e(`LR-1: unknown case "${c}"`);
     } else if (!String(r.casesPending || '').trim()) e('LR-1: declare the cases (or casesPending: why not yet)');
     for (const k of ['second', 'third', 'fourth']) if (r[k] && (!r[k].test || !r[k].label)) e(`${k}: {test, label}`);
+    for (const m of validatePracticeBlocks(r.practiceBlocks).concat(validateGuidedRows(r.guidedRows))) e(m);
     return bad;
 }
 
@@ -234,6 +269,7 @@ export function validateLesson(id, l, known = {}) {
         else if (known.skillExists && !known.skillExists(m.key)) e(`Mixed partner ${m.key} is not live`);
     }
     if (l.steps) for (const s of l.steps) if (kindOf(s) !== 'wrm') e(`steps: "${s}" is not a WRM step id`);
+    for (const m of validatePracticeBlocks(l.practiceBlocks)) e(m);
     return bad;
 }
 
@@ -251,5 +287,5 @@ export function validateNeed(n) {
 
 export default {
     LESSON_KINDS, kindOf, ARCHETYPES, ARCHETYPE_IDS, FAMILY_IDS, NEED_KINDS, LIBRARY_ONLY, PREREQ_MIN, PREREQ_MAX,
-    validateRoutine, validatePrereqs, prereqOf, validateLesson, validateNeed,
+    validateRoutine, validatePrereqs, prereqOf, validateLesson, validateNeed, validatePracticeBlocks, validateGuidedRows,
 };
