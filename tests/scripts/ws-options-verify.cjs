@@ -494,7 +494,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     // checked by print-lint (L-SUPPORT COVER: the fits line names every fact it is not drawn on).
     for (const t of tries) {
         const vb = t.def.valueBase, one = Array.isArray(t.value) && t.value.length === 1 ? t.value[0] : undefined;
-        if (vb && one !== undefined && vb[one] && typeof vb[one] === 'object') t.base = Object.assign({}, vb[one], t.base || {});
+        if (vb && one !== undefined && vb[one] && typeof vb[one] === 'object') { t.base = Object.assign({}, vb[one], t.base || {}); t.valueBased = true; }
     }
 
     // ---------- static (definition) checks ----------
@@ -725,7 +725,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         r.base = { range, decimals: DP };
         let items = gen(opts, range);
         // (a conditional control - `appliesBase`, lesson 6 r4 - is compared with its own base, not the bare default)
-        const baseAt = (rr) => (t.def.appliesBase ? gen(t.base, rr) : dfltAt(rr));
+        const baseAt = (rr) => (t.def.appliesBase || t.valueBased ? gen(t.base, rr) : dfltAt(rr));
         let base = baseAt(range);
         let diff = differs(items, base);
         const errs = items.filter(q => q.__error);
