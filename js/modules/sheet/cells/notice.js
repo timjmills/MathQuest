@@ -122,6 +122,18 @@ function parityCell(p, ctx) {
     const fact = `<div class="mq-nt-fact" role="img" aria-label="${esc(`${p.a} times ${p.b}`)}" style="display:flex;justify-content:center;align-items:flex-start;gap:${L(ctx, 3)};">`
         + `${num(p.a)}<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;">×</span>${num(p.b)}</div>`;
     const ask = `<div style="font-size:${P(ctx, textPt(ctx) + 1)};line-height:1.2;">The product is</div>`;
+    // Finished work (state 'wrong': Error analysis and the other thinking pages show a pupil's choice; lf-algebra r4,
+    // H13): "The product is" and the circled word read as ONE sentence on one line where the column is wide enough
+    // (wrapping as before where it is not), and the column is marked data-ws-anscol, so Error analysis puts its
+    // Correct / Fix-it block under the sentence, in the column (roles/error-analysis.js intoAnswerColumn). The block
+    // beside the whole 39 mm fact left a 31 mm empty band under both at S (45 mm at L). Every other state draws as before.
+    if (ctx.state === 'wrong' && !isTwin(ctx)) {
+        const g3 = L(ctx, 3);
+        const line = `<div class="mq-nt-sentence" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:${L(ctx, 4)};row-gap:${g3};">${ask}${wordChoice(ctx, labels, p)}</div>`;
+        const col = `<div class="mq-nt-answer" data-ws-anscol style="display:flex;flex-direction:column;align-items:center;gap:${g3};">${line}</div>`;
+        return root(ctx, 'mq-nt mq-nt--parity', `${fact}${col}`,
+            { attrs: ' data-ws-inplace data-read', style: `display:flex;flex-direction:column;align-items:center;gap:${g3};${pad(ctx)}` });
+    }
     return root(ctx, 'mq-nt mq-nt--parity', `${fact}${ask}${wordChoice(ctx, labels, p)}`,
         { attrs: ' data-ws-inplace data-read', style: `display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};${pad(ctx)}` });
 }

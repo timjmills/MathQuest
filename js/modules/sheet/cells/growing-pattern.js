@@ -9,7 +9,7 @@
 //                 boxes (hint off, never graded); under Term 4 the ANSWER box (1.5 pt, the heaviest place, VQ-6) -
 //                 or, on task `far`, a working box, the answer then on its own line "Term 10 has [ ] dots".
 //   task `rule`   one more line: "Rule: + [ ]", a second graded box (the step), so two answers have two places.
-//   sizes         one unit u = 2.0 / 2.4 / 2.6 mm (S / M / L), dots 0.8 u across, squares u; strokes 0.75 pt (parts),
+//   sizes         one unit u = 2.5 / 2.5 / 2.6 mm (S / M / L; UNIT below), dots 0.8 u across, squares u; strokes 0.75 pt (parts),
 //                 the box 0.75 pt, the answer 1.5 pt. S fits two cells across (82 mm), M and L one.
 //   screen twin   the same three drawings; the Term 4 box is a 7 x 7 grid of tap targets (>= 44 px on a card): a tap
 //                 puts a dot / square there, a second tap takes it away (working, never graded); the count and rule
