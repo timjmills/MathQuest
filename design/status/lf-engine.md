@@ -44,6 +44,13 @@ lf-ops keeps or re-applies them when its branch merges:
 P1d round 2 adds two more, both gated on a flag only lesson 3a sets (every other sheet byte-identical): `print-sheet.js` section `capFillCont`
 (from a practiceSheets entry's `equalPages`) and `sheet/roles/practice.js` capFill on every page of such a sheet (E12).
 
+- P1d r2 (2), lesson 2 deal order - NOT landed (stopped at the round's budget). Attempt 1 (patch, against -live 0b8ffb14:
+  `design/lessons/proof/live-2026-11-07/lesson2-solve-attempt1.patch`): `solveStoryFacts` picks Practice 1's four facts + its
+  equal-parts fact from what the pack left (feasible at seed 4242: 5+6, 8+6 / 8+3, 3+9, square 9+9), and the dealer pins each
+  non-edge place to its fact (`onlyKeysAt`, a hard bound). The build then timed out (Runtime.callFunctionOn): add_wp_20 deals
+  its sum by case per item index, so a pinned fact is rarely reachable in the tries - pin the generator's case (sum / parts)
+  instead of filtering its output, or let the place accept any fact of the solved set that keeps LR-6 (not one fixed key).
+
 ## Log
 - 2026-11-07 — Merge: phase 0 + integration tip 623fdd6 (744aa9e5); 5 conflicts; master's lesson 6/7 + visual-quality hunks ported into lesson-pages/* and lesson-arch/*; master's new lesson records ported into families/addsub.js, multdiv.js. Oracle ws-lesson-baseline vs master: 183/183 detailed hashes identical, 120 sample hashes differ (LR-17, intended). Lesson 2 errors on master too (R1).
 - 2026-11-07 — P2 compiler (fbdd7a08, 33c12857, merged feea00b2): card format (design/lessons/cards/README.md), ws-lesson-card (--draft, --check, --check-decided), compileLesson, shapes/, units/, SHAPES.md, queue reads SHAPES.md; DIFF.md structural diff of 1-7.
