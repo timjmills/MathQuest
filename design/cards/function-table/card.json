@@ -299,7 +299,16 @@
     "max": 100
    }
   ],
-  "notOffered": []
+  "notOffered": [
+   {
+    "id": "N-PICTURES-FUNCTION-TABLE-EASY",
+    "source": "§3 (one black-and-white look: no picture themes)",
+    "skills": [
+     "algebra:function_table_easy"
+    ],
+    "option": "pictures"
+   }
+  ]
  },
  "decisions": {
   "options": [

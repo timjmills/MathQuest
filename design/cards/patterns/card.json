@@ -582,6 +582,14 @@
           "patterns:growing_shape_patterns"
         ],
         "option": "pictures"
+      },
+      {
+        "id": "N-PICTURES-NUMBER-PATTERNS-RULE",
+        "source": "§3 (one black-and-white look: no picture themes)",
+        "skills": [
+          "patterns:number_patterns_rule"
+        ],
+        "option": "pictures"
       }
     ]
   },
