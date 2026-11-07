@@ -1462,8 +1462,8 @@
     "state": "phase 0 head: buildLesson skips a hard-coded list of the five core ids; only lesson-role parts plug in"
    },
    "pass": {
-    "commit": "9d1b793f",
-    "state": "core flag + build hooks + buildPluggedParts"
+    "commit": "88235078",
+    "state": "core flag + build hooks + buildPluggedParts; parts in registry order (orderParts, lf-vocab PR #36)"
    },
    "command": "node tests/scripts/ws-lesson-unit.mjs --only parts-plugin",
    "expect": {
