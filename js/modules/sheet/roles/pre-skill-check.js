@@ -133,6 +133,8 @@ export function routingTableHtml(rows, { rowMm = 0 } = {}) {
 
 /** The routing table's fixed margins (mm): the table's top and bottom rules and padding and the list's margins. */
 export const ROUTE_TABLE_FIXED_MM = 24;
+/** The text under the routing table, in em: the table head, the miss rule and the three rule lines with their leading. */
+export const ROUTE_TEXT_EM = 16;
 
 /** The key's routing page (a teacher page: no Name, Date or Score, never an "I Can" title), or null without routes. */
 export function routePlan(input, rows) {
@@ -146,9 +148,11 @@ export function routePlan(input, rows) {
     // half-blank teacher page)
     const m = bandMetrics(ctx, layoutHeader(header));
     const em = ((ctx.s && ctx.s.textPt) || 14) * PT_MM;
-    // (the rest of the body: the table head (2 lines), the miss rule and the three rule lines (about 8 lines with their
-    // leading, 10 em in all) and the table and list margins, ROUTE_TABLE_FIXED_MM - critic r1 D16)
-    const rowMm = Math.max(12, (m.budget - m.strip - 10 * em - ROUTE_TABLE_FIXED_MM - em) / rows.length);
+    // (the rest of the body: the table head (2 lines), the miss rule (2 lines, critic r2 N3) and the three rule lines -
+    // about 10 lines with their leading, 13 em - plus 3 em for rows whose words wrap past their share, 16 em in all, and
+    // the table and list margins, ROUTE_TABLE_FIXED_MM - critic r1 D16; P1c: at 10 em the sub L routing page ran 14 mm
+    // into its footer once the miss rule printed)
+    const rowMm = Math.max(12, (m.budget - m.strip - ROUTE_TEXT_EM * em - ROUTE_TABLE_FIXED_MM - em) / rows.length);
     const section = { kind: 'band', label: '', instr: '', html: routingTableHtml(rows, { rowMm }) };
     return assemble(ROLE_ID, input, Object.assign({}, f, { header }), [{ header, sections: [section] }], { scaffoldLevel: 1, meta: { items: 0, part: 'prereq-route' } });
 }

@@ -119,6 +119,9 @@ export const LESSON_ROUTE_CSS = [
     ':is(.ws-page,.ws-sheet) .mq-lroute ul{margin:0;padding-left:5mm}',
     ':is(.ws-page,.ws-sheet) .mq-lroute li+li{margin-top:1.5mm}',
     ':is(.ws-page,.ws-sheet) .mq-lroute p.mq-lroute-rule{margin:0 0 2mm}',
+    // (P1c: the names column gives 16 mm to the words columns - the sub L routing page's four long rows ran 11 mm into
+    // its footer; 26 mm still holds three names a row)
+    ':is(.ws-page,.ws-sheet) .mq-lroute td.mq-lroute-names{width:26mm}',
 ].join('');
 
 export default { LESSON_CSS, LESSON_ROUTE_CSS };
