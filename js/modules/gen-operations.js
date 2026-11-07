@@ -182,6 +182,21 @@ function _factsAllTicked() {
     ticked = Array.isArray(ticked) ? ticked.map(Number).filter(v => legal.includes(v)) : [];
     return !ticked.length || legal.every(v => ticked.includes(v));
 }
+// lane lf-ops (2026-11-07, ws-dealer-uniform PAGE on the plain x / ÷ stories): the story numbers are still the
+// generator's own seeded draws, but a draw the page already holds is drawn again (page-deal.js freshDeal, as the
+// + / − stories within 20): no fact twice on a page, a dividend at most twice, an answer at most three times (a
+// factor 2..8 is a 7-value set, so it is not capped: 20 stories print each about three times). One key a
+// skill, so the caps hold across the story kinds the page mixes. `[groups, perGroup]` in, `[groups, perGroup]` out.
+function _wpFreshMul(draw) {
+    return freshDeal('wp:x', draw, { sig: (p) => `${p[0]},${p[1]}`, tags: (p) => [String(p[0] * p[1])], caps: [3] });
+}
+/** ÷ stories: kind 0 divides by the groups (answer = per group), kind 1 by the group size (answer = groups). */
+function _wpFreshDiv(draw, kind) {
+    // (the item reads as total ÷ groups on every host: q.a = total, q.b = groups)
+    const an = (p) => (kind ? p[0] : p[1]);
+    return freshDeal('wp:/', draw, { sig: (p) => `${p[0] * p[1]},${p[0]}`, tags: (p) => [String(p[0] * p[1]), String(an(p))], caps: [2, 3] });
+}
+
 function _factTrivialSlot() {
     const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor;
     return ((at % 10) + 10) % 10 === 7;
@@ -5961,8 +5976,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 if (roll === 'equal_groups') {
                     // Type 1: Equal groups — "X bags with Y items each"
-                    groups = rng(2, Math.min(wpMultMax, 10));
-                    perGroup = rng(2, wpMultMax);
+                    [groups, perGroup] = _wpFreshMul(() => [rng(2, Math.min(wpMultMax, 10)), rng(2, wpMultMax)]);
                     answer = groups * perGroup;
                     let groupTemplates;
                     if (scenario.category === 'money') {
@@ -5994,8 +6008,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = `Multiply: ${groups} groups x ${perGroup} in each = ?`;
                 } else if (roll === 'arrays') {
                     // Type 2: Array — "X rows of Y"
-                    groups = rng(2, Math.min(wpMultMax, 8));
-                    perGroup = rng(2, Math.min(wpMultMax, 8));
+                    [groups, perGroup] = _wpFreshMul(() => [rng(2, Math.min(wpMultMax, 8)), rng(2, Math.min(wpMultMax, 8))]);
                     answer = groups * perGroup;
                     const arrayContexts = [
                         { place: 'garden', thing: scenario.unit },
@@ -6051,8 +6064,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 } else {
                     // Type 5: Rate/measurement — distance / time / per-unit context.
                     // Pulls in distance & time domains naturally for multiplication.
-                    const rate = rng(2, Math.min(wpMultMax, 10));
-                    const units = rng(2, Math.min(wpMultMax, 10));
+                    const [units, rate] = _wpFreshMul(() => [rng(2, Math.min(wpMultMax, 10)), rng(2, Math.min(wpMultMax, 10))]);
                     groups = units;
                     perGroup = rate;
                     answer = rate * units;
@@ -6355,8 +6367,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 if (roll === 'equal_share') {
                     // Type 1: Equal sharing — "X items among Y friends, how many each?"
-                    groups = rng(2, Math.min(wpDivMax, 10));
-                    perGroup = rng(2, wpDivMax);
+                    [groups, perGroup] = _wpFreshDiv(() => [rng(2, Math.min(wpDivMax, 10)), rng(2, wpDivMax)], 0);
                     total = groups * perGroup;
                     answer = perGroup;
                     let shareTemplates;
@@ -6388,8 +6399,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = `Divide to find how many in each group: ${total} / ${groups} = ?`;
                 } else if (roll === 'grouping') {
                     // Type 2: Equal grouping — "X items, Y per group, how many groups?"
-                    groups = rng(2, Math.min(wpDivMax, 10));
-                    perGroup = rng(2, wpDivMax);
+                    [groups, perGroup] = _wpFreshDiv(() => [rng(2, Math.min(wpDivMax, 10)), rng(2, wpDivMax)], 1);
                     total = groups * perGroup;
                     answer = groups;
                     const containers = ['bags', 'boxes', 'packs', 'bundles', 'groups'];
@@ -6438,8 +6448,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = `Find items per row: ${total} / ${groups} = ?`;
                 } else {
                     // Type 5: Rate / unit-rate — distance / time / per-unit division.
-                    groups = rng(2, Math.min(wpDivMax, 10));
-                    perGroup = rng(2, Math.min(wpDivMax, 10));
+                    [groups, perGroup] = _wpFreshDiv(() => [rng(2, Math.min(wpDivMax, 10)), rng(2, Math.min(wpDivMax, 10))], 0);
                     total = groups * perGroup;
                     answer = perGroup;
                     const rateTemplates = [

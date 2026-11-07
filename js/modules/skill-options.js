@@ -4114,3 +4114,13 @@ export function describeOptions(categoryId, skillId, opts) {
     const _mpTask = _mp.find((o) => o.id === 'task');
     if (_mpTask) _mpTask.help = 'Order items only. One kind is one page instruction; tick more to mix them. The pictured arrays are at most 5 rows of 5.';
 }
+
+// ============================ lane lf-ops (2026-11-07): the plain × / ÷ stories, ops-tables card §7a ========
+// The signed ops-tables card hides the key-word cues and the keyword bank on the plain × / ÷ stories, the
+// comparison stories and the remainder stories (family-check card precedent, PEDAGOGY P-21: a keyword list teaches
+// "each means ×" instead of the story's structure; misconception M-S1). `hidden` keeps both in the model, so an
+// old share code or saved page that carries them still decodes; the teacher is no longer offered them.
+for (const key of ['multiplication:mult_word_problems_plain', 'division:div_word_problems_plain',
+    'multiplication:mult_comparison', 'division:remainder_interpret']) {
+    if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map((o) => (o.id === 'wpCues' || o.id === 'wpBank' ? { ...o, hidden: true } : o));
+}
