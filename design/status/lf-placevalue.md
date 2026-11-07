@@ -70,6 +70,13 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-07 ~20:00 FINAL HAND-OVER of the resumed round. Checks from critic r2 (62b1bdcd): ws-providers-unit `--pv-r2 N1,N2,N3,N4`
+  (WRONG-DIFFERS per slot 23/2400, PRINTED-INSTRUCTION 120/160, COMBINE-PARTS 180/1800, PLACE-WORD-LIVE 96/480 — all FAIL on HEAD),
+  wired via opt-in-rules.json `providers`; default run unchanged (105431 OK); four PENDING backtest rows (arm with the fix commit).
+  PROPOSED (not built): N5 options-verify --bands no H13 exemption; N6 H13-ABS in ws-cell-checks; N7 opt-in rules on lesson / review rows;
+  N8 lane-own PENDING(no-baseline) rows with PAGEFILL / H5 count RED. NEXT ROUND (fresh builder, rule 7): fix N1-N4 in providers/pv.js
+  and gen-pv.js (per-slot wrong answers; option-aware instruction for the item-less path; combine >= 2 parts on band 99; place words
+  only up to the number's highest place), then N5-N8 cells, precritic, critic r3.
 - 2026-11-07 resumed round (lead, $80): merged integration; builder r2 (9f483f78, 9b67cd84): every pv cell fits every offered option on
   its own pages (cell-checks combine 196→0, value 48→0, expand 32→24 lesson.js, unit_form 22→10 reason-it.js); precritic r4 12 FAIL, all
   owned elsewhere or process; fact-rows opEm crash = master hotfix 1000d1ad9 cherry-picked (38be3ad1). Critic r2 (critic-r2.md): FAIL all
