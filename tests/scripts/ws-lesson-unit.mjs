@@ -4,13 +4,26 @@
 // Node only, no browser; prints `ws-lesson-unit: OK (n checks)` / `FAIL`.
 //
 //   node tests/scripts/ws-lesson-unit.mjs
+//   node tests/scripts/ws-lesson-unit.mjs --only title,routing-export   # the engine checks alone (lf-engine P1, critic
+//                                                                        # lessons-phase0 r1): title (D13), routing-export
+//                                                                        # (D14), route-styles (D15), routed-plan (D16),
+//                                                                        # checks-field (D12), parts-plugin (D18),
+//                                                                        # chart-sizing (lesson 7 D1)
+//   MQ_ROOT=<checkout> node tests/scripts/ws-lesson-unit.mjs --only ... # run them on another tree (ws-backtest commit-pair)
+// The engine checks also run in the full gate.
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const ONLY = (() => { const i = process.argv.indexOf('--only'); return i > -1 ? String(process.argv[i + 1] || '').split(',').map((x) => x.trim()).filter(Boolean) : null; })();
 const imp = (p) => import(pathToFileURL(path.join(ROOT, p)).href);
 const mem = {};
 globalThis.localStorage = globalThis.localStorage || { getItem: (k) => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); }, removeItem: (k) => { delete mem[k]; } };
+let pass = 0;
+const fails = [];
+const eq = (got, want, what) => { if (JSON.stringify(got) === JSON.stringify(want)) pass++; else fails.push(`${what}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
+const ok = (cond, what) => { if (cond) pass++; else fails.push(what); };
 const log = console.log;
 console.log = () => {};
 const data = await imp('js/modules/data.js').finally(() => { console.log = log; });
@@ -20,13 +33,110 @@ const SCHEMA = await imp('js/modules/lessons/schema.js');
 const PRE = await imp('js/modules/lessons/prereqs.js');
 const BL = await imp('js/modules/build-list.js');
 const DET = await imp('js/modules/lessons/detailed/index.js');
+const LATE = {};   // (engine groups defined further down: parts-plugin, chart-sizing)
 
-let pass = 0;
-const fails = [];
-const eq = (got, want, what) => { if (JSON.stringify(got) === JSON.stringify(want)) pass++; else fails.push(`${what}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
-const ok = (cond, what) => { if (cond) pass++; else fails.push(what); };
+/* ============================================================ the ENGINE checks (lf-engine P1, critic r1) */
+const readSrc = (rel) => { try { return fs.readFileSync(path.join(ROOT, rel), 'utf8'); } catch (e) { return ''; } };
+const listJs = (rel) => { const out = []; const walk = (d) => { let ents = []; try { ents = fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }); } catch (e) { return; } for (const e of ents) { const r = `${d}/${e.name}`; if (e.isDirectory()) walk(r); else if (/\.js$/.test(e.name)) out.push(r); } }; walk(rel); return out; };
+/** Source without comments (block comments, and // comments that start a line or follow code after whitespace). */
+const code = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').map((l) => l.replace(/(^|\s)\/\/.*$/, '$1')).join('\n');
+const tryImp = async (rel) => { try { return await imp(rel); } catch (e) { return null; } };
+const ENGINE = {
+    // D13: one title spelling - "Prerequisite Check" written once (PREREQ_CHECK_TITLE) and used by every page and table.
+    async title() {
+        const PSC = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        eq(PSC && PSC.PREREQ_CHECK_TITLE, 'Prerequisite Check', 'D13: pre-skill-check.js exports PREREQ_CHECK_TITLE');
+        const files = [...listJs('js/modules/sheet'), 'js/modules/print-sheet.js', ...listJs('js/modules/lessons').filter((f) => !/\/(detailed|units)\/|\/compile\.js$/.test(f))];
+        const lower = [], lit = [];
+        for (const f of files) {
+            const c = code(readSrc(f));
+            if (/Prerequisite check/.test(c)) lower.push(f);
+            const n = (c.match(/(['"`])Prerequisite Check(?::[^'"`]*)?\1/g) || []).length;
+            if (n && !(f.endsWith('roles/pre-skill-check.js') && n === 1)) lit.push(`${f} (${n})`);
+        }
+        eq(lower, [], 'D13: no "Prerequisite check" spelling in the lesson modules');
+        eq(lit, [], 'D13: the title is a literal only in PREREQ_CHECK_TITLE (every other use reads the constant)');
+    },
+    // D14: one routing-table builder (routingTableHtml); the detailed T6 is its own teacher table and nothing claims otherwise.
+    async 'routing-export'() {
+        const files = [...listJs('js/modules'), ...listJs('js/modules/sheet')];
+        const defs = [...new Set(files)].filter((f) => /function\s+routingTableHtml\b|const\s+routingTableHtml\s*=/.test(code(readSrc(f))));
+        eq(defs, ['js/modules/sheet/roles/pre-skill-check.js'], 'D14: routingTableHtml is defined once');
+        const twins = [...new Set(files)].filter((f) => !f.endsWith('roles/pre-skill-check.js') && /If missed, teach first|Two or more missed/.test(code(readSrc(f))));
+        eq(twins, [], 'D14: no second routing table (its head and rules live in routingTableHtml only)');
+        ok(!/T6 prints the same/.test(readSrc('js/modules/sheet/roles/pre-skill-check.js')), 'D14: no claim that the detailed T6 prints the same table (it does not)');
+        ok(/routingTableHtml\(/.test(code(readSrc('js/modules/sheet/roles/pre-skill-check.js')).replace(/function routingTableHtml/, '')), 'D14: the routing page calls the one builder');
+    },
+    // D15: the routed outputs carry classes, never literal type sizes, colours, borders or paddings; their CSS travels only
+    // with a routed page (not in the engine stylesheet every page embeds).
+    async 'route-styles'() {
+        const PSC = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        const CSS = await tryImp('js/modules/sheet/lesson-css.js');
+        ok(PSC && typeof PSC.routeTagHtml === 'function' && typeof PSC.routingTableHtml === 'function', 'D15: the route builders exist');
+        if (!PSC) return;
+        const html = PSC.routeTagHtml({ lesson: 'Y1.B1.S2', title: 'Count objects' }, 2) + PSC.routingTableHtml([{ letters: '1-2', checks: 'Count the objects.', answers: '6; 7', lesson: 'Y1.B1.S2', title: 'Count objects' }]);
+        const bare = html.replace(/<style[\s\S]*?<\/style>/g, '');
+        const styles = [...bare.matchAll(/style="([^"]*)"/g)].map((x) => x[1]);
+        eq(styles.filter((st) => /\d(pt|px)\b|#[0-9a-f]{3,6}\b|border|padding|font|color|margin/i.test(st)), [], 'D15: no literal type, colour, border, padding or margin in the routed outputs');
+        ok(/class="mq-lpretag"/.test(html) && /class="mq-lroute"/.test(html), 'D15: the routed outputs carry their classes');
+        ok(CSS && typeof CSS.LESSON_ROUTE_CSS === 'string' && /\.mq-lpretag\{/.test(CSS.LESSON_ROUTE_CSS) && /\.mq-lroute/.test(CSS.LESSON_ROUTE_CSS), 'D15: lesson-css.js holds the route classes (LESSON_ROUTE_CSS)');
+        ok(CSS && !/mq-lpretag|mq-lroute/.test(CSS.LESSON_CSS || ''), 'D15: the route classes are not in the engine stylesheet (pages without routes stay byte-identical)');
+        ok(/data-mq-route-css/.test(html), 'D15: a routed output carries its own stylesheet');
+    },
+    // D16: the routed plan's numbers are named, and routes / routePlan / routeTagLines / routedLayout are unit-tested.
+    async 'routed-plan'() {
+        const PSC = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        const C = await tryImp('js/modules/sheet/roles/compose.js');
+        const names = ['ROUTE_TAG_PT', 'ROUTE_TAG_LEADING', 'ROUTE_TAG_PAD_MM', 'ROUTE_CHAR_MM', 'ROUTE_TAG_INSET_MM', 'INSTR_CHAR_EM', 'FULL_W_MM', 'HALF_W_MM', 'ROUTE_GROW', 'PAIR_ALIKE', 'ROUTE_ITEMS'];
+        eq(names.filter((k) => !(PSC && Number.isFinite(PSC[k]))), [], 'D16: the routed plan\'s numbers are named constants');
+        if (!PSC || !names.every((k) => Number.isFinite(PSC[k])) || typeof PSC.routedLayout !== 'function') { fails.push('D16: routedLayout is exported'); return; }
+        const src = code(readSrc('js/modules/sheet/roles/pre-skill-check.js'));
+        ok(!/\b1\.6\b|\b0\.75\b|\b0\.7\b|Math\.min\(40,/.test(src.slice(src.indexOf('export function routedLayout'))), 'D16: no magic 1.6 / 0.7 / 0.75 / 40 mm left in the routed layout');
+        const PT = 25.4 / 72;
+        ok(Math.abs(PSC.routeTagMm(1) - (PSC.ROUTE_TAG_PT * PT * PSC.ROUTE_TAG_LEADING + PSC.ROUTE_TAG_PAD_MM)) < 1e-9 && Math.abs(PSC.ROUTE_TAG_MM - PSC.routeTagMm(1)) < 1e-9, 'D16: a one-line tag is 9 pt at 1.3 plus its pad');
+        ok(PSC.routeTagMm(2) > PSC.routeTagMm(1) && PSC.routeTagMm(0) === PSC.routeTagMm(1), 'D16: a two-line tag is taller; never under one line');
+        const r = { lesson: 'Y2.B2.S17', title: 'Subtract two 2-digit numbers (not across a 10)' };
+        eq(PSC.routeText(r), 'If missed \u2192 Lesson Y2.B2.S17 Subtract two 2-digit numbers (not across a 10)', 'D16: the tag words');
+        eq([PSC.routeTagLines(null, 93), PSC.routeTagLines(r, PSC.FULL_W_MM), PSC.routeTagLines(r, PSC.HALF_W_MM)], [1, 1, 2], 'D16: a long tag wraps at half width, not at full width (TY-12: never clipped)');
+        if (!C) return;
+        const fake = (h, w = 40) => ({ q: { text: 'x', ans: 1, categoryId: 'a', skillId: 'b' }, template: 'fact', footprint: { wMm: w, hMm: h, measure: true, maxCols: 4 }, measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: h, fits: w * c <= 186 }])) });
+        const input = { ctx: { size: 'L', paper: 'A4' }, skills: [], perQuestion: 2, routes: [{ lesson: 'Y1.B1.S1', title: 'A' }, { lesson: 'Y1.B1.S2', title: 'B' }, { lesson: 'Y1.B1.S3', title: 'C' }, { lesson: 'Y1.B1.S4', title: 'D' }] };
+        const ctx = C.ctxOf(input);
+        const m = C.bandMetrics(ctx, C.layoutHeader({ title: 'Prerequisite Check', name: true }));
+        const L1 = PSC.routedLayout([[fake(30), fake(30)], [fake(30), fake(30)], [fake(30, 100)], [fake(60)]], [0, 1, 2, 3], input, ctx, m);
+        eq(L1.units.map((u) => [u.qs.map((q) => q.length), u.cols, u.rows]), [[[2, 2], 4, 1], [[1], 1, 1], [[1], 1, 1]], 'D16: two narrow 2-item questions share a row of 4; a wide item and an unlike one stand alone');
+        ok(L1.units.every((u) => u.h <= u.h0 * PSC.ROUTE_GROW + 1e-6 && u.h >= u.h0), 'D16: rows grow, each to at most ROUTE_GROW x its measured height (H13)');
+        ok(L1.fits && L1.foot >= 0 && L1.foot < 1, 'D16: the layout reports its fit and the foot it leaves');
+        const L2 = PSC.routedLayout([[fake(120)], [fake(120)], [fake(120)]], [0, 1, 2], input, ctx, m);
+        ok(!L2.fits, 'D16: a check taller than the page says so (the role then drops items)');
+        const rp = PSC.routePlan(Object.assign({}, input, { checkFor: { categoryId: 'a', skillId: 'b', iCan: 'I Can add' } }), [{ letters: '1\u20132', checks: 'Count.', answers: '6; 7', lesson: 'Y1.B1.S2', title: 'Count objects' }]);
+        ok(rp && rp.pages.length === 1 && rp.meta.part === 'prereq-route', 'D16: routePlan is one teacher page');
+        ok(rp && rp.header && rp.header.title === PSC.ROUTE_PAGE_TITLE && rp.header.name === false && !/^I Can/.test(rp.header.title), 'D12/D16: the routing page is titled "Prerequisite Check: where next", no Name, never "I Can"');
+        eq(PSC.routePlan(input, []), null, 'D16: no routes, no routing page');
+    },
+    // D12: every library prerequisite says what its question asks (`checks`), in words other than the design `why`.
+    async 'checks-field'() {
+        const L = await tryImp('js/modules/lessons/library.js');
+        const S = await tryImp('js/modules/lessons/schema.js');
+        const bad = [];
+        for (const [id, l] of Object.entries((L && L.LESSONS) || {})) for (const [i, p] of (l.prereqs || []).entries()) {
+            if (!String(p.checks || '').trim()) bad.push(`${id} Q${i + 1}: no checks`);
+            else if (String(p.checks).trim() === String(p.why || '').trim()) bad.push(`${id} Q${i + 1}: checks = why`);
+        }
+        eq(bad, [], 'D12: every library prerequisite has its own `checks` line');
+        const lsn = L && L.lessonById && L.lessonById('Y2.B2.S18');
+        ok(!!(S && lsn && S.validateLesson('Y2.B2.S18', Object.assign({}, lsn, { prereqs: lsn.prereqs.map((p, i) => (i ? p : Object.assign({}, p, { checks: '' }))) })).some((x) => /no checks/.test(x))), 'D12: the schema refuses a prerequisite with no checks');
+        ok(!!(L && L.lessonData && (L.lessonData('Y2.B2.S18').prereqs || []).every((p) => p.checks)), 'D12: lessonData hands `checks` to the engine');
+    },
+};
+if (ONLY) {
+    const unknown = ONLY.filter((g) => !ENGINE[g] && !LATE[g]);
+    if (unknown.length) { log(`ws-lesson-unit: unknown --only group(s) ${unknown.join(', ')} (${[...Object.keys(ENGINE), ...Object.keys(LATE)].join(', ')})`); process.exit(2); }
+}
+
 const skillExists = (key) => { const [c, s] = String(key).split(':'); return !!(data.SKILLS[c] && data.SKILLS[c].some((x) => x && x.v === s)); };
 
+if (!ONLY) {
 // ---- THE LESSON RULES (sheet/lesson-rules.js)
 eq(LR.itemKey('9 + 1 = ?', '10'), LR.itemKey('1 + 9 = ?', '10'), 'LR-5: a turnaround is the same item');
 ok(LR.itemKey('Which place?', 'tens', 78) !== LR.itemKey('Which place?', 'tens', 42), 'LR-5: a place-value item is keyed by its number');
@@ -111,6 +221,8 @@ ok(blMerged.find((e) => e.id === blOpt.id).lessonsBlocked.includes('Y2.B2.S18') 
     && !blMerged.some((e) => e.lessonsBlocked.includes('Y1.B2.S9')), 'build list: a lesson need blocks its entry or adds one; a missing lesson stays off the skill list');
 eq(BL.buildList().map((e) => e.id), BL.buildList(null, []).map((e) => e.id), 'build list: today\'s NEEDS (prerequisite lessons only) leave the list unchanged');
 
+}
+for (const [g, fn] of Object.entries(Object.assign({}, ENGINE, LATE))) if (!ONLY || ONLY.includes(g)) await fn();
 for (const f of fails) console.log(`  FAIL ${f}`);
 console.log(fails.length ? `ws-lesson-unit: FAIL (${fails.length} of ${pass + fails.length})` : `ws-lesson-unit: OK (${pass} checks)`);
 process.exit(fails.length ? 1 : 0);

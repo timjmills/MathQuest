@@ -37,11 +37,13 @@ const has = (k) => process.argv.includes('--' + k);
 const FAMILY = arg('family', '');
 const CERT_SEED = 4242;
 const imp = (p) => import(pathToFileURL(path.join(ROOT, p)).href);
-const readJson = (p, d) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8')); } catch (e) { return d; } };
+// (--data-root DIR: read the stamps and the grades from DIR instead of the tree - the bind-stamps backtest fixtures)
+const DATA = arg('data-root', '') ? path.resolve(arg('data-root')) : ROOT;
+const readJson = (p, d) => { try { return JSON.parse(fs.readFileSync(path.join(DATA, p), 'utf8')); } catch (e) { return d; } };
 
 /** Every critic round's rows, by round (lessons-r1 ... in order), each row with its round. */
 function gradeRounds() {
-    const dir = path.join(ROOT, 'design/audit/runs');
+    const dir = path.join(DATA, 'design/audit/runs');
     if (!fs.existsSync(dir)) return [];
     const runs = fs.readdirSync(dir).filter((d) => /^lessons-/.test(d) && fs.existsSync(path.join(dir, d, 'grades.jsonl')));
     const num = (d) => { const m = /-r(\d+)/.exec(d); return m ? Number(m[1]) : 0; };
@@ -254,16 +256,37 @@ function seedOfRow(r) {
     // ---- bind passes to the render they were graded on (--bind-stamps): a passed lesson whose pass
     // has no stamp yet takes the current render stamp (design/lessons/render-stamps.json, written by
     // ws-lesson-hash.cjs on the tree the pass is read on). Run once, right after the baseline.
+    // REFUSES (critic lessons-phase0 r1 D17) to bind a pass to a render it was not graded on: the graded render's stamp
+    // must be known - the grades row's `renderHash`, the pass's own `gradedStamp` (recorded with the grade), or the
+    // graded tree's render stamps given as `--graded <render-stamps.json>` - and equal to the current one. A pass whose
+    // render has changed since, or whose graded render is unknown, is not bound: the run says so and FAILs (re-grade it).
+    // `--dry-run`: decide, write nothing.
+    const bindRefused = [];
     if (has('bind-stamps')) {
         let n = 0;
+        const graded = arg('graded', '') ? readJson(path.relative(DATA, path.resolve(arg('graded'))), {}) : null;
+        const gradedOf = (l) => {
+            const cur = passedStamps[l.id] || {};
+            if (cur.gradedStamp) return cur.gradedStamp;
+            if (!graded) return '';
+            const lib0 = lib.lessonById(l.id) || {};
+            for (const k of [lib0.slug, l.id].filter(Boolean)) { const st = graded[`${k}|${CERT_SEED}|L`]; if (st) return `${st.pupil}.${st.key}`; }
+            return '';
+        };
         for (const l of out.lessons) {
             if (l.status !== 'passed' || (status[l.id] && status[l.id].hash)) continue;
             const cur = passedStamps[l.id] || {};
             const now = stampOf(l.id);
-            if (!cur.stamp && now) { passedStamps[l.id] = Object.assign({}, cur, { round: status[l.id].round, stamp: now }); n++; }
+            if (cur.stamp || !now) continue;
+            const was = gradedOf(l);
+            if (!was) { bindRefused.push(`${l.id}: the render ${status[l.id].round} graded is unknown (no renderHash, gradedStamp or --graded) - not bound, re-grade`); continue; }
+            if (was !== now) { bindRefused.push(`${l.id}: the render changed since ${status[l.id].round} graded it (${was} -> ${now}) - not bound, re-grade`); continue; }
+            passedStamps[l.id] = Object.assign({}, cur, { round: status[l.id].round, stamp: now });
+            n++;
         }
-        fs.writeFileSync(path.join(ROOT, 'design/lessons/passed-stamps.json'), JSON.stringify(passedStamps, null, 1) + '\n');
-        console.log(`  bound ${n} pass(es) to the current render stamps (design/lessons/passed-stamps.json)`);
+        if (!has('dry-run')) fs.writeFileSync(path.join(DATA, 'design/lessons/passed-stamps.json'), JSON.stringify(passedStamps, null, 1) + '\n');
+        console.log(`  bound ${n} pass(es) to the current render stamps${has('dry-run') ? ' (dry run: nothing written)' : ' (design/lessons/passed-stamps.json)'}`);
+        for (const x of bindRefused) console.log(`  REFUSED ${x}`);
     }
 
     // ---- print
@@ -405,6 +428,7 @@ export default { LESSON_STATUS };
         console.log('  wrote js/modules/lessons/status-db.js');
     }
     for (const x of problems) console.log(`  FAIL ${x}`);
+    if (bindRefused.length) { console.log(`ws-lesson-coverage: FAIL (--bind-stamps refused ${bindRefused.length} pass(es): the graded render is not the current one)`); process.exit(1); }
     if (problems.length && !has('report-only')) { console.log(`ws-lesson-coverage: FAIL (${problems.length} structural problem(s))`); process.exit(1); }
     // --strict: every lesson complete - a Prerequisite Check whose lessons are all written, declared
     // cases. (It fails today by design, like ws-standards --strict: the samples' prerequisite lessons
