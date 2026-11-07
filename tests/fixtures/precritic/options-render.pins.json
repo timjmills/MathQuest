@@ -6,6 +6,24 @@
     "values": ["long", "fraction", "vertical", "mix"],
     "why": "owner ruling (Lane D restart, 2026-10-31; lead ruling 2026-11-03, Lane D R4 prep): the written form is the owner's notation choice and he accepted notation-driven capacity changes; the long-division bracket stays at 10 columns (owner). Measured: S vertical 25 vs 30; L long / fraction / mix 15 vs 16, vertical 12 vs 16"
    }
+  },
+  "placevalue:expand": {
+   "form": {
+    "values": ["notation"],
+    "why": "owner ruling 2026-11-07 (lf-placevalue Q4, \"Yes, accept all four\", via the lead): the longer written answer is the form being taught; the page stays full at its own column count. Measured r0: S 10 vs 20, L 4 vs 12"
+   }
+  },
+  "placevalue:value": {
+   "form": {
+    "values": ["unit", "notation"],
+    "why": "owner ruling 2026-11-07 (lf-placevalue Q4, \"Yes, accept all four\", via the lead): the longer written answer is the form being taught; the page stays full at its own column count. Measured r0: unit S 12 vs 30, L 6 vs 12; notation S 16 vs 30, L 10 vs 12"
+   }
+  },
+  "placevalue:identify": {
+   "response": {
+    "values": ["bank"],
+    "why": "owner ruling 2026-11-07 (lf-placevalue Q4, \"Yes, accept all four\", via the lead): the longer written answer is the form being taught; the page stays full at its own column count. Measured r0: bank L 8 vs 10 (the word bank is a drawn box)"
+   }
   }
  }
 }

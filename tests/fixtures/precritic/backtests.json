@@ -1390,6 +1390,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "card-rulings-value-reader",
+   "check": "ws-card-rulings reads place value items (no 'a op b') for a range ruling that opts in with read: value, so the pv card's band rulings are checked instead of unreadable",
+   "kind": "fixture",
+   "rule": "ws-card-rulings read: value",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/pv-value-rulings.operands-only.json",
+    "state": "the pv band rulings read as operand items: every pv item unreadable (no operands), the ruling cannot be checked"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/pv-value-rulings.json",
+    "state": "the same rulings with read: value: q.ans and q.pv.{n, digit, place} read"
+   },
+   "command": "node tests/scripts/ws-card-rulings.mjs --rulings {fixture} --check rulings",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

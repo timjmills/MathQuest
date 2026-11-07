@@ -690,9 +690,116 @@
         "of": "ans",
         "min": 101,
         "max": 999
+      },
+      {
+        "id": "R-VALUE-999",
+        "source": "§7a band=999 (default), zeroDigit=false",
+        "skills": [
+          "placevalue:value"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "ans",
+        "min": 1,
+        "max": 900
+      },
+      {
+        "id": "R-VALUE-N",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:value"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 100,
+        "max": 999
+      },
+      {
+        "id": "R-IDENTIFY-N",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:identify"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 100,
+        "max": 999
+      },
+      {
+        "id": "R-EXPAND-N",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:expand"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 100,
+        "max": 999
+      },
+      {
+        "id": "R-UNIT-N",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:unit_form"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 100,
+        "max": 999
+      },
+      {
+        "id": "R-PV10-BAND",
+        "source": "§7a band=100000 (default)",
+        "skills": [
+          "placevalue:place_value_10x"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "ans",
+        "min": 1,
+        "max": 100000
+      },
+      {
+        "id": "R-TEN-N",
+        "source": "§7a ten-times presets: band=9999",
+        "skills": [
+          "placevalue:ten_times_value"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 1,
+        "max": 9999
+      },
+      {
+        "id": "R-TENTH-N",
+        "source": "§7a ten-times presets: band=9999",
+        "skills": [
+          "placevalue:one_tenth_value"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 1,
+        "max": 9999
+      },
+      {
+        "id": "R-TENSTORY-N",
+        "source": "§7a ten-times presets: band=9999",
+        "skills": [
+          "placevalue:ten_times_story"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 1,
+        "max": 9999
       }
     ],
-    "notOffered": [],
-    "todo_note": "R-VALUE-999 (ans 1..900), R-PV10-BAND (ans <= 100000), R-COMBINE-99 wait for a pv reader in ws-card-rulings (q.pv.n / q.ans without operands): asked of lf-checks 2026-11-07"
+    "notOffered": []
   }
 }

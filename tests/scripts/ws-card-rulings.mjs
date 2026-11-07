@@ -160,11 +160,33 @@ export function readItem(q) {
     return { a, b, ans, op, boxes: p && p.ansDigits != null ? +p.ansDigits : null };
 }
 
+/**
+ * A VALUE item (lf-placevalue, 2026-11-07; lead ruling): skills with no "a op b" (place value: "What is the underlined
+ * digit worth?" -> 600) are read for a range ruling that opts in with "read": "value". {ans: Number(q.ans) without commas
+ * (null when not a number), n / digit / place from q.pv (gen-pv.js), else null}. Rulings without "read" use readItem only.
+ */
+export function readValueItem(q) {
+    if (!q) return null;
+    const num = (v) => { const n = Number(String(v === undefined || v === null ? '' : v).replace(/,/g, '')); return String(v === undefined || v === null ? '' : v).trim() !== '' && Number.isFinite(n) ? n : null; };
+    const pv = q.pv || {};
+    const x = { ans: num(q.ans), n: num(pv.n), digit: num(pv.digit), place: num(pv.place) };
+    return Object.values(x).some((v) => v !== null) ? x : null;
+}
+const fmtValue = (x) => `n ${x.n} -> ${x.ans}`;
+
 /* ------------------------------------------------------------------ self-test */
 function selfTest() {
     const fails = [];
     const t = (c, m) => { if (!c) fails.push(m); };
     t(PRED.zeroCase({ a: 33, b: 32, ans: 1 }), 'zeroCase 33-32');
+    // value items (read: "value", lf-placevalue): q.ans and q.pv without operands
+    const vx = readValueItem({ text: 'What is the underlined digit worth?', ans: '1,600', pv: { n: 4623, digit: 6, place: 100 } });
+    t(vx && vx.ans === 1600 && vx.n === 4623 && vx.digit === 6 && vx.place === 100, 'readValueItem reads q.ans and q.pv');
+    t(readItem({ text: 'What is the underlined digit worth?', ans: 600 }) === null, 'readItem still needs operands');
+    t(itemPasses({ assert: 'range', of: 'ans', min: 1, max: 900 }, { ans: 600 }), 'value range 600 in 1..900');
+    t(!itemPasses({ assert: 'range', of: 'ans', min: 1, max: 900 }, { ans: 1600 }), 'value range 1600 not in 1..900');
+    t(!itemPasses({ assert: 'range', of: 'ans', min: 1, max: 900 }, { ans: null }), 'a non-number answer breaks a range');
+    t(readValueItem({ text: 'Which place?', ans: 'hundreds', pv: {} }) === null, 'nothing numeric: unreadable');
     t(PRED.zeroCase({ a: 40, b: 20, ans: 20 }), 'zeroCase 40-20');
     t(!PRED.zeroCase({ a: 47, b: 21, ans: 26 }), 'not zeroCase 47-21');
     t(PRED.zeroCase({ a: 4567, b: 4321, ans: 246 }), 'zeroCase shorter answer');
@@ -270,7 +292,7 @@ async function main() {
                 for (let i = 0; i < N; i++) {
                     let q = null;
                     try { q = app.gq.generateQuestionFor({ category, skill, opts: r.opts || undefined, seed: (fnv(`${key}:${JSON.stringify(r.opts || {})}`) + i) >>> 0, itemIndex: i, itemCount: N }); } catch (e) { errors++; firstErr = firstErr || e.message; continue; }
-                    const x = readItem(q);
+                    const x = r.read === 'value' ? readValueItem(q) : readItem(q);
                     if (!x) { unread++; continue; }
                     items.push(x);
                 }
@@ -286,7 +308,7 @@ async function main() {
                 } else {
                     const bad = items.filter((x) => !itemPasses(r, x));
                     const what = r.assert === 'range' ? `${r.of} in ${r.min}..${r.max}` : r.assert === 'digits' ? `${r.of} has ${r.eq != null ? `${r.eq} digit(s)` : `${r.min || 1}..${r.max || '∞'} digits`}` : r.assert === 'boxes' ? `${r.eq} answer box(es)` : `no regrouping (${r.op || '-'})`;
-                    const msg = bad.length ? `${what}: ${bad.length} of ${items.length} items break it, e.g. ${bad.slice(0, 4).map(fmtItem).join(', ')}` : `${what}: all ${items.length} items`;
+                    const msg = bad.length ? `${what}: ${bad.length} of ${items.length} items break it, e.g. ${bad.slice(0, 4).map(r.read === 'value' ? fmtValue : fmtItem).join(', ')}` : `${what}: all ${items.length} items`;
                     (bad.length ? fail : pass)(Object.assign(head, { msg, n: items.length, hits: bad.length }));
                 }
             }
