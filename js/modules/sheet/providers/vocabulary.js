@@ -34,6 +34,19 @@ const PICK = strings({
     vocabulary: ['picture', 'word', 'line'],
 });
 
+/** Plausible misspellings of a word, most likely first (its first word of a phrase is the one changed). */
+export function misspellings(word) {
+    const w = String(word), out = [];
+    const sp = w.indexOf(' '), head = sp > 0 ? w.slice(0, sp) : w, tail = sp > 0 ? w.slice(sp) : '';
+    const dbl = /([a-z])\1/.exec(head);
+    if (dbl) out.push(head.slice(0, dbl.index) + head.slice(dbl.index + 1) + tail);
+    const v = head.slice(1, -1).search(/[aeiou][^aeiou]/);
+    if (v >= 0 && head.length > 4) out.push(head.slice(0, v + 1) + head.slice(v + 2) + tail);
+    if (head.length > 2) { const i = Math.max(1, Math.floor(head.length / 2) - 1); out.push(head.slice(0, i) + head[i + 1] + head[i] + head.slice(i + 2) + tail); }
+    out.push(head.slice(0, -1) + tail);
+    return [...new Set(out)].filter((x) => x && x !== w);
+}
+
 const templateOf = (q) => (q && q.cell && q.cell.template) || '';
 const isPick = (ref = {}) => templateOf(ref.q) === 'vocab-pick3' || ref.skillId === 'vocab_pick3_words'
     || (ref.opts && ref.opts.vocabTask === 'pick3');
@@ -51,15 +64,18 @@ registerSkill('vocabulary:vocab_grade_pictures', {
         if (!p) return [];
         // three steps of at most 10 words (SCC-P4), one per step of the routine (lessons/families/multdiv.js)
         if (templateOf(q) === 'vocab-pick3') {
+            // (step 1 is the Guided page's grey hint, guided.js hintOf: it names a cue - the word's first letter - never the
+            // instruction again: critic r2 #5; ws-vocab-unit V12)
             return clampSteps([
-                step('Look at the picture.'),
+                step(`Look at the picture. Its word starts with "${String(p.word).charAt(0)}".`),
                 step('Read the three words in the box.'),
                 step(`Write "${p.word}" on the line.`, [{ slot: 'answer', value: p.word }]),
             ]);
         }
         const order = p.order || [0, 1, 2];
         return clampSteps([
-            step('Look at pictures A, B and C.'),
+            // (step 1 names one word's meaning: the cue the Guided page's grey hint gives - critic r2 #5; V12)
+            step(`${p.words[order[0]]} means ${meaningOf(p.words[order[0]])}.`),
             step('Say what each picture shows.'),
             step('Write each letter next to its word.', order.map((wi, n) => ({ slot: `letter-${n}`, value: LET[wi] }))),
         ]);
@@ -68,8 +84,10 @@ registerSkill('vocabulary:vocab_grade_pictures', {
         const p = q && q.cell && q.cell.payload;
         if (!p) return null;
         if (templateOf(q) === 'vocab-pick3') {
-            const others = (p.bank || []).filter((w) => w !== p.word);
-            return chooseWrong(q, others.map((w) => ({ value: w, misconception: 'sound-not-meaning', explain: `Chose "${w}", a word from the bank, without checking it against the picture.` })));
+            // a REAL mistake (critic r2 #8): the right word misspelt (M-V4: a double letter written once, two letters
+            // swapped, a vowel dropped) - ELL pupils copy the word from the bank and miss a letter; never a bank word that
+            // no pupil would read into the picture (ws-vocab-unit V13)
+            return chooseWrong(q, misspellings(p.word).map((w) => ({ value: w, misconception: 'misspelt', explain: `Wrote "${w}": copied the word with a letter wrong.` })), { rotate: false });
         }
         const order = (p.order || [0, 1, 2]).slice();
         const letters = order.map((i) => LET[i]);

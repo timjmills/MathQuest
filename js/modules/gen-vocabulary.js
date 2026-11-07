@@ -609,9 +609,10 @@ function _freshFirst(pool, need) {
 function _pictureWords() {
     const o = (state.skillOptions || {});
     const set = o.vocabSet !== null && o.vocabSet !== undefined ? vocabSetAt(o.vocabSet) : null;
-    if (set) return { words: set.words.slice(), grade: set.grade };
+    if (set) return { words: set.words.slice(), grade: set.grade, ccss: set.ccss.slice() };
     const g = VOCAB_GRADES.includes(Number(o.vocabGrade)) ? Number(o.vocabGrade) : 3;
-    return { words: gradeWords(g), grade: g };
+    const ccss = [...new Set(VOCAB_SETS.filter((s) => s.grade === g).flatMap((s) => s.ccss))];
+    return { words: gradeWords(g), grade: g, ccss };
 }
 /** `n` words from `pool` that may sit together, starting with `first` when given; this page's unused words first. */
 function _compatiblePick(pool, n, first) {
@@ -629,7 +630,10 @@ function _compatiblePick(pool, n, first) {
 function _genPictureTask(q) {
     const o = (state.skillOptions || {});
     const task = o.vocabTask === 'pick3' ? 'pick3' : 'match3';
-    const { words, grade } = _pictureWords();
+    const { words, grade, ccss } = _pictureWords();
+    // the page's footer names the dealt words' grade and standards, not the skill's grade-3 tags (owner ruling Q-A;
+    // sheet/sheet-tags.js applySheetTags, read by print-sheet skillMeta)
+    q.sheetTags = { grade, ccss };
     q.answerType = 'text';
     q.options = [];
     q.printFormat = 'vocab-match';

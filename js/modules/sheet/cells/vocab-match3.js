@@ -29,6 +29,12 @@ export const MATCH3_TEMPLATE = 'vocab-match3';
 const LET = ['A', 'B', 'C'];
 const FONT = "font-family:'Andika','Open Sans',sans-serif;letter-spacing:0;";
 export const MATCH3_PIC_W = Object.freeze({ S: 38, M: 40, L: 40 });
+/**
+ * The box each picture is fitted to (mm, w x h), by size: as tall as a 38 / 40 mm picture (so the cell is still a quarter
+ * of the page) and wider, so a flat picture (the ten rod, a number track, one line of digits) is drawn larger (r3, rule 5:
+ * grade 1 strips at 11 pt, the ten rod's 3.5 mm units - critic r1 #13 / #17, r2 #2 / #10; ws-vocab-unit V9).
+ */
+export const MATCH3_PIC_BOX = Object.freeze({ S: [46, 25.4], M: [48, 26.7], L: [48, 26.7] });
 
 /** The letters, in word-row order: the key. */
 export const match3Letters = (p) => (p.order || [0, 1, 2]).map((i) => LET[i]);
@@ -39,13 +45,13 @@ register(MATCH3_TEMPLATE, {
         const words = (p.words || []).slice(0, 3);
         const order = Array.isArray(p.order) && p.order.length === words.length ? p.order : words.map((_, i) => i);
         const tp = textPt(ctx);
-        const picW = MATCH3_PIC_W[sizeOf(ctx)] || 48;
+        const [picW, picH] = MATCH3_PIC_BOX[sizeOf(ctx)] || MATCH3_PIC_BOX.L;
         const show = ctx.state === 'answered' || ctx.state === 'traced' || ctx.state === 'wrong';
         const ink = ctx.state === 'traced' ? GREY : INK;
         // the letter at the picture's top left, beside it (not above: the cell stays a quarter of the page)
         const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : '1 1 0'};min-width:0;">`
             + `<span class="mq-vm-let" style="font-size:${P(ctx, tp + 5)};font-weight:700;line-height:1;flex:none;">${LET[i]}</span>`
-            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: picW, minPx: twin ? 160 : 0 })}</span></div>`).join('');
+            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: picW, hMm: picH, minPx: twin ? 160 : 0 })}</span></div>`).join('');
         const side = (S(ctx).writeMm || 10) + 2;
         const letters = match3Letters({ order });
         const row = order.map((wi, n) => {
@@ -72,11 +78,12 @@ register(MATCH3_TEMPLATE, {
         return { value: letters.join(', '), display: letters.join(', '), slots };
     },
     // one full-width row (three pictures across); its height is measured (about 48 / 53 / 58 mm)
-    footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 }; },
+    // (`points`: one point a word - owner ruling Q-C, 2026-11-07: a page of 4 cells scores /12; paginate.js scorePoints)
+    footprint() { return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1, points: 3 }; },
     inputs(p) {
         return (p && p.words ? p.words : [0, 1, 2]).map((_, n) => ({ id: `letter-${n}`, kind: 'text', shape: 'box', graded: true, order: n, maxLength: 1, scopes: ['full'] }));
     },
     layout() { return { card: 'card-wide-visual', checker: 'value' }; },
 });
 
-export default { MATCH3_TEMPLATE, MATCH3_PIC_W, match3Letters };
+export default { MATCH3_TEMPLATE, MATCH3_PIC_W, MATCH3_PIC_BOX, match3Letters };

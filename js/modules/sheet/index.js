@@ -208,3 +208,6 @@ export {
     REGRADED_SKILLS, storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor,
     columnAdd, lineSteps, longDivision,
 } from './providers/index.js';
+
+/* ------------------------------------------------------------------------ the footer hook (lane lf-vocab r3, Q-A) */
+export { applySheetTags, shortCcss } from './sheet-tags.js';

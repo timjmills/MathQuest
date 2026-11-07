@@ -979,7 +979,14 @@ export function plan(input = {}) {
         // A row stretches no further than its shortest problem allows (layout.js rowShape).
         // Guided rows stretch at most GUIDED_STRETCH (H13); the rest of the page stays under the band.
         const kPage = Math.max(1, Math.min(GUIDED_STRETCH, (pg.avail * Math.min(1, rows / Math.max(rows, pg.rows))) / sumW));
-        const Hr = w.map((x, r) => Math.max(x, Math.min(kPage * x, rowLimit(mins[r]))));
+        let Hr = w.map((x, r) => Math.max(x, Math.min(kPage * x, rowLimit(mins[r]))));
+        // (`evenRows` on a template's footprint - its cell spreads its content over its own height, so the Model's trace and the
+        // first try's hint line fit in a row as tall as the others: every row takes the same share, when that share holds the
+        // tallest row's content. Opt-in, so no other template's page changes - lane lf-vocab r3, critic r2 #4: 405 / 340 px)
+        if (rows > 1 && host.length && host.every((it) => it.footprint && it.footprint.evenRows)) {
+            const even = Hr.reduce((a, b) => a + b, 0) / rows;
+            if (even >= Math.max(...w)) Hr = Hr.map(() => even);
+        }
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];

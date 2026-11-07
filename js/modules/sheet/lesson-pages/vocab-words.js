@@ -53,19 +53,21 @@ export const VOCAB_WORDS = Object.freeze({
     'number name': { meaning: 'the number written in words', notWith: [] },
     'ones digit': { meaning: 'the digit in the ones place', notWith: ['digit'] },
     repeat: { meaning: 'the same part comes again', notWith: ['pattern', 'cycle'] },
-    sequence: { meaning: 'numbers in order, one after another', notWith: ['pattern', 'multiple', 'term', 'first term'] },
+    sequence: { meaning: 'numbers in order, one after another', notWith: ['pattern', 'multiple', 'term', 'first term', 'grow'] },
     cycle: { meaning: 'goes round and back to the start', notWith: ['repeat'] },
-    grow: { meaning: 'gets bigger each time', notWith: [] },
+    // (grow / sequence: critic r2 #3. grow / pattern would leave the growing-patterns set no clash-free split (V7): pattern
+    // and sequence already clash, so grow must share a trio with one of them)
+    grow: { meaning: 'gets bigger each time', notWith: ['sequence'] },
     term: { meaning: 'one number in a sequence', notWith: ['first term', 'sequence'] },
     'first term': { meaning: 'the number a sequence starts with', notWith: ['term', 'sequence'] },
     'times as many': { meaning: 'the same amount, again and again', notWith: ['compare'] },
     compare: { meaning: 'find which is more, and by how much', notWith: ['times as many'] },
     equation: { meaning: 'two sides that are equal', notWith: [] },
     remainder: { meaning: 'what is left after equal groups', notWith: ['odd', 'equal groups', 'round up'] },
-    quotient: { meaning: 'the answer when you divide', notWith: [] },
+    quotient: { meaning: 'the answer when you divide', notWith: ['round up'] },
     divisor: { meaning: 'the number you divide by', notWith: [] },
     dividend: { meaning: 'the number you divide up', notWith: [] },
-    'round up': { meaning: 'use one more group for what is left', notWith: ['remainder', 'equal groups'] },
+    'round up': { meaning: 'use one more group for what is left', notWith: ['remainder', 'equal groups', 'quotient'] },
 });
 
 /**

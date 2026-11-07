@@ -31,6 +31,7 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
+import { applySheetTags } from './sheet/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
@@ -2413,6 +2414,8 @@ function skillMeta(sk, q) {
         const span = spanGrades(sk);
         if (span.length) { meta.grades = span; meta.grade = span[0]; }
     }
+    // (Q-A: an item that carries its own standards - a vocabulary page dealt from one lesson's word set - prints them)
+    applySheetTags(meta, q);
     // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
     let titleOpts = {};
     if (sk.skillId === 'count_by_tables') {

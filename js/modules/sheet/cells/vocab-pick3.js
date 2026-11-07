@@ -63,7 +63,7 @@ register(PICK3_TEMPLATE, {
         const lineW = beside ? 36 : 64;
         const words = bank.map((w) => (twin
             ? `<button type="button" class="mq-choicebtn mq-vp-btn" data-mq-choice="${esc(w)}" aria-pressed="false" style="min-height:max(48px, ${L(ctx, 11)});min-width:max(64px, ${L(ctx, 18)});padding:0 ${L(ctx, 2.5)};`
-                + `border:${B(ctx, 1)} solid ${INK};border-radius:999px;background:#fff;color:${INK};${FONT}font-size:${P(ctx, tp)};font-weight:700;line-height:1;cursor:pointer;"><span>${esc(w)}</span></button>`
+                + `border:${B(ctx, 1)} solid ${INK};border-radius:999px;background:#fff;color:${INK};${FONT}font-size:max(20px, ${P(ctx, tp)});font-weight:700;line-height:1;cursor:pointer;"><span>${esc(w)}</span></button>`
             : `<span class="mq-vp-w" style="font-size:${P(ctx, tp)};font-weight:700;line-height:1.2;white-space:nowrap;">${esc(w)}</span>`)).join('');
         // the line: the key's word on paper; on screen the tapped word appears there (CSS :has, no script)
         const onLine = twin
@@ -74,18 +74,26 @@ register(PICK3_TEMPLATE, {
             + `color:${ink === 'trace' && show ? GREY : INK};padding-bottom:${L(ctx, 0.8)};">${onLine}</span>`;
         const style = twin
             ? `<style>${bank.map((w) => `.mq-vp:has(button[data-mq-choice="${esc(w)}"][aria-pressed="true"]) .mq-vp-fill[data-w="${esc(w)}"]{display:inline!important}`).join('')}</style>`
+            // (a Guided try wrapped with its grey hint line - guided.js fadeRender: the wrap and the cell take the row's
+            // height, so the hinted cell is spread like the others, never top-heavy: critic r2 #4)
+            : Number(ctx.scaffoldLevel) >= 2 ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vp){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vp{flex:1 1 auto;height:auto!important}</style>'
             : '';
         // (the page-fill height is a practice page's; an anchor-chart panel draws the cell at its own height - r2 lint:
         // 7.7 mm over the panel)
         // (a teaching state - the anchor chart's panels and guided cells draw at scaffold level 2-3 - has no page share)
         const inChart = (ctx.chartZoom !== undefined && ctx.chartZoom !== null) || Number(ctx.scaffoldLevel) >= 2;
         // (and fills its row: a row taller than the cell - a rebalanced last page - shares the spare above and below, H13)
-        const minH = twin || inChart ? '' : `min-height:${PICK3_MIN_H[gc]}mm;height:100%;`;
+        // (a Guided page cell - scaffold 2-3, not a chart panel - fills its row too, so the Model and the hinted try leave no
+        // empty band under their line: critic r2 #4, 38 % empty)
+        const minH = twin ? '' : inChart ? (ctx.chartZoom !== undefined && ctx.chartZoom !== null ? '' : 'height:100%;') : `min-height:${PICK3_MIN_H[gc]}mm;height:100%;`;
         // beside: the picture takes the room the bank leaves in a half-width cell (80 mm inside), so it is drawn at its own
         // width and never shrunk by the browser (DN-10 counts a shrunk drawing as not fitting - r2: one column at L)
         const bankMm = longest * tp * 0.3528 * 0.56 + 6.5;
         const picW = beside ? Math.max(34, Math.min(pick3PicW(p), 76 - 3 - Math.max(bankMm, lineW))) : pick3PicW(p);
-        const pic = vocabPictureSVG(ctx, p.word, { wMm: picW, minPx: twin ? 220 : 0 });
+        // the picture fills a box as tall as before and as wide as the cell allows, so a flat picture (the ten rod, a line of
+        // digits) prints large (r3, rule 5: critic r2 #2 - the ten rod 3.4 mm tall in a 90 mm cell; ws-vocab-unit V9)
+        const box = twin ? { wMm: picW } : beside ? { wMm: Math.max(picW, 76 - 3 - Math.max(bankMm, lineW)), hMm: 24 } : { wMm: 76, hMm: picW * 2 / 3 };
+        const pic = vocabPictureSVG(ctx, p.word, Object.assign(box, { minPx: twin ? 220 : 0 }));
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
         const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}`;
         if (beside) {
@@ -93,7 +101,7 @@ register(PICK3_TEMPLATE, {
             const bankHtml = `<div class="mq-vp-bank" role="group" aria-label="word bank" style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 0.8)};box-sizing:border-box;`
                 + `border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 1)} ${L(ctx, 2.5)};">${words}</div>`;
             return `<div ${root} style="color:${INK};${FONT}width:100%;box-sizing:border-box;${minH}display:flex;flex-direction:row;align-items:center;justify-content:space-evenly;gap:${L(ctx, 3)};${pad}">`
-                + `<span style="display:block;flex:0 1 auto;min-width:0;">${pic}</span>`
+                + `${style}<span style="display:block;flex:0 1 auto;min-width:0;">${pic}</span>`
                 + `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 2.5)};flex:none;">${bankHtml}${line}</div></div>`;
         }
         return `<div ${root} style="color:${INK};${FONT}width:100%;box-sizing:border-box;${minH}`
@@ -109,7 +117,9 @@ register(PICK3_TEMPLATE, {
     },
     // two across at every grade; the height is the grade's share of the page body (4 / 6 / 8 a page)
     // (hardCap: two across even where a narrow grade-3 cell measures as fitting three at S - r2 render, 9 a page)
-    footprint(p) { return { wMm: 88, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, inPlace: true }; },
+    // (`evenRows`: on the Guided page every row takes the same share - the cell spreads its picture, bank and line over its
+    // height, so the Model row and the hinted row need no extra height of their own; critic r2 #4, guided.js)
+    footprint(p) { return { wMm: 88, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, inPlace: true, evenRows: true }; },
     // the paper response is a WORD WRITTEN ON A LINE (the screen taps a bank word into it): a text slot, so Error analysis
     // can write a wrong word in as finished work (critic r1 D3: the role declined a 'choice' slot)
     inputs() { return [{ id: 'answer', kind: 'text', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },

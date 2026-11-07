@@ -60,7 +60,7 @@ for (const w of P.VOCAB_PICTURE_IDS) if (new RegExp(`\\b${w}\\b`, 'i').test(P.vo
 
 if (FIXTURE) {
     console.log(`ws-vocab-unit: fixture ${path.basename(FIXTURE)}, ${W.VOCAB_SETS.length} lesson sets (data rules V1, V6, V7)`);
-    for (const f of fails.slice(0, 40)) console.log(`  - ${f}`);
+    for (const f of fails.slice(0, Number(process.env.VOCAB_SHOW) || 40)) console.log(`  - ${f}`);
     console.log(`ws-vocab-unit: ${fails.length ? `FAIL (${fails.length})` : 'OK'}`);
     process.exit(fails.length ? 1 : 0);
 }
@@ -110,7 +110,132 @@ for (const r of runs) {
         }
     }
 }
+// ---- round 3 (rule 5): the checks of the five defects that survived critic rounds 1 and 2 ----------------------------
+const K = await imp('js/modules/sheet/index.js');
+const PG = await imp('js/modules/sheet/paginate.js');
+// An independent reading of a drawn picture: its viewBox, its printed width (mm) and the extent and sizes of its marks.
+function readSvg(svg) {
+    const vb = /viewBox="([-\d.]+) ([-\d.]+) ([-\d.]+) ([-\d.]+)"/.exec(svg).slice(1).map(Number);
+    const wm = /width:([\d.]+)mm/.exec(svg);
+    const box = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+    const add = (x, y) => { box.x0 = Math.min(box.x0, x); box.x1 = Math.max(box.x1, x); box.y0 = Math.min(box.y0, y); box.y1 = Math.max(box.y1, y); };
+    const num = (s, k) => Number((new RegExp(`\\b${k}="([-\\d.]+)"`).exec(s) || [])[1] || 0);
+    const texts = [], rects = [], circles = [];
+    for (const [t] of svg.matchAll(/<rect [^>]*>/g)) { const x = num(t, 'x'), y = num(t, 'y'), w = num(t, 'width'), h = num(t, 'height'); add(x, y); add(x + w, y + h); rects.push(Math.min(w, h)); }
+    for (const [t] of svg.matchAll(/<line [^>]*>/g)) { add(num(t, 'x1'), num(t, 'y1')); add(num(t, 'x2'), num(t, 'y2')); }
+    for (const [t] of svg.matchAll(/<circle [^>]*>/g)) { const x = num(t, 'cx'), y = num(t, 'cy'), r = num(t, 'r'); add(x - r, y - r); add(x + r, y + r); circles.push(2 * r); }
+    for (const [, d] of svg.matchAll(/<path d="([^"]+)"/g)) {
+        let cx = 0, cy = 0;
+        for (const [, c, args] of d.matchAll(/([MLQHVAZmlhvz])([^MLQHVAZmlhvz]*)/g)) {
+            const a = (args.match(/-?[\d.]+/g) || []).map(Number);
+            if (c === 'M' || c === 'L') { cx = a[0]; cy = a[1]; } else if (c === 'Q') { add(a[0], a[1]); cx = a[2]; cy = a[3]; } else if (c === 'A') { cx = a[5]; cy = a[6]; }
+            else if (c === 'H') cx = a[0]; else if (c === 'V') cy = a[0]; else if (c === 'h') cx += a[0]; else if (c === 'v') cy += a[0]; else if (c === 'l' || c === 'm') { cx += a[0]; cy += a[1]; }
+            if (c !== 'Z' && c !== 'z') add(cx, cy);
+        }
+    }
+    for (const [, t, body] of svg.matchAll(/<text ([^>]*)>([^<]*)<\/text>/g)) {
+        const x = num(t, 'x'), y = num(t, 'y'), s = num(t, 'font-size'), len = body.replace(/&[a-z#0-9]+;/g, 'x').length;
+        const w = len * 0.56 * s, anchor = /text-anchor="start"/.test(t) ? 0 : /text-anchor="end"/.test(t) ? 1 : 0.5;
+        add(x - anchor * w, y - s / 2); add(x + (1 - anchor) * w, y + s / 2); texts.push(s);
+    }
+    return { vb, wMm: wm ? Number(wm[1]) : null, box, texts, rects, circles };
+}
+const picsIn = (html) => [...html.matchAll(/<svg class="mq-vpic"[^]*?<\/svg>/g)].map((m) => ({ id: /data-vpic="([^"]+)"/.exec(m[0])[1], ...readSvg(m[0]) }));
+const gradesOf = (w) => [...new Set(W.VOCAB_SETS.filter((s) => s.words.includes(w)).map((s) => s.grade))];
+const classOf = (g) => (g <= 1 ? 0 : g <= 3 ? 1 : 2);
+const PT = 0.3528;
+// V8: every picture uses its drawing area (its marks span >= 50 % of the viewBox in BOTH directions) and no text in it is
+// under 7 canvas units (r1 #13 / r2 #2: the ten rod 3.4 mm tall, "one" a lone square, number name at 10 pt)
+for (const id of P.VOCAB_PICTURE_IDS) {
+    const r = picsIn(P.vocabPictureSVG(K.resolveCtx({ size: 'L' }), id, { wMm: 40 }))[0];
+    const fx = (r.box.x1 - r.box.x0) / r.vb[2], fy = (r.box.y1 - r.box.y0) / r.vb[3];
+    if (fx < 0.5 || fy < 0.5) fail(`V8 "${id}": its marks span ${Math.round(fx * 100)} % x ${Math.round(fy * 100)} % of its drawing area (need 50 % both ways)`);
+    for (const s of r.texts) if (s < 7) { fail(`V8 "${id}": text at ${s} canvas units (need 7)`); break; }
+}
+// V9: every picture, drawn as each cell draws it for the grades that deal its word (every size S/M/L), keeps its text
+// >= 16 pt for K-1 and >= 14 pt for grades 2-5, and its smallest box >= 4 mm and ring / dot >= 2.5 mm
+// (r1 #17 / r2 #10: grade 1 Match strips at 11 pt; r2 #2: the ten rod's 3.4 mm units)
+for (const id of P.VOCAB_PICTURE_IDS) {
+    for (const g of gradesOf(id)) {
+        const floor = classOf(g) === 0 ? 16 : 14;
+        for (const size of ['S', 'M', 'L']) {
+            const ctx = K.resolveCtx({ size, mode: 'print' });
+            const other = W.VOCAB_SETS.find((s) => s.grade === g && s.words.includes(id)).words.filter((w) => w !== id && W.compatible([w, id]));
+            const hosts = [['vocab-match3', { words: [id, ...other.filter((w, i, a) => W.compatible([id, w, ...a.slice(0, i)])).slice(0, 2)], order: [1, 2, 0], grade: g }],
+                ['vocab-pick3', { word: id, bank: [id, ...other.slice().sort((a, b) => b.length - a.length).slice(0, 2)], grade: g }]];   // (the bank's two longest words: the narrowest picture)
+            for (const [tpl, payload] of hosts) {
+                const pic = picsIn(K.renderCell({ cell: { template: tpl, v: 1, payload } }, ctx)).find((x) => x.id === id);
+                if (!pic || !pic.wMm) { fail(`V9 ${tpl} "${id}": no printed width`); continue; }
+                const sc = pic.wMm / pic.vb[2];
+                const minT = Math.min(...pic.texts) * sc / PT, minR = Math.min(...pic.rects) * sc, minC = Math.min(...pic.circles) * sc;
+                if (pic.texts.length && minT < floor - 0.05) fail(`V9 ${tpl} ${size} grade ${g} "${id}": text ${minT.toFixed(1)} pt (need ${floor})`);
+                if (pic.rects.length && minR < 4 - 0.05) fail(`V9 ${tpl} ${size} grade ${g} "${id}": a box ${minR.toFixed(1)} mm (need 4)`);
+                if (pic.circles.length && minC < 2.5 - 0.05) fail(`V9 ${tpl} ${size} grade ${g} "${id}": a ring or dot ${minC.toFixed(1)} mm (need 2.5)`);
+            }
+        }
+    }
+}
+// V10: a page dealt from one word set (vocabSet) or one grade (vocabGrade) carries that set's / grade's grade and CCSS for
+// its footer (owner ruling Q-A; r1 #14 / r2 #1: "Grade 3 · 3.OA.9" on the grade 1, 2 and 4 pages)
+const shortCode = (c) => String(c).replace(/\.([A-Z])\.(\d+[a-z]?)$/, '.$2');
+if (typeof K.applySheetTags !== 'function') fail('V10: no applySheetTags (the footer hook) in the sheet kit');
+else {
+    const base = { categoryId: 'vocabulary', skillId: 'vocab_grade_pictures', grade: '3', ccss: '3.OA.9' };
+    const runsT = W.VOCAB_SETS.map((s, i) => [{ vocabSet: i }, s.grade, s.ccss]).concat(W.VOCAB_GRADES.map((g) => [{ vocabGrade: g }, g, [...new Set(W.VOCAB_SETS.filter((s) => s.grade === g).flatMap((s) => s.ccss))]]));
+    for (const [opts, g, codes] of runsT) for (const skill of ['vocab_grade_pictures', 'vocab_pick3_words']) {
+        const qs = deal(skill, opts, 4, 7100);
+        const metas = qs.map((q) => K.applySheetTags(Object.assign({}, base), q));
+        for (const m of metas) {
+            if (String(m.grade) !== String(g) || m.grades) fail(`V10 ${skill} ${JSON.stringify(opts)}: footer grade ${m.grade}${m.grades ? ` (${m.grades})` : ''}, the words are grade ${g}`);
+            const want = codes.map(shortCode).join(', ');
+            if (m.ccss !== want) fail(`V10 ${skill} ${JSON.stringify(opts)}: footer CCSS "${m.ccss}", the words teach "${want}"`);
+        }
+    }
+    // additive: an item with no tags leaves the meta alone
+    const plain = K.applySheetTags(Object.assign({}, base), { text: '2 + 3' });
+    if (plain.grade !== '3' || plain.ccss !== '3.OA.9') fail('V10: an item without sheet tags changed the footer');
+}
+// V11: a Match 3 cell scores one point a word (owner ruling Q-C, r1 #18): 4 cells score 12; a 1 picture, 3 words cell 1
+{
+    const m3 = deal('vocab_grade_pictures', { vocabGrade: 3 }, 4, 7300).map((q) => ({ q, footprint: K.cellFootprint ? K.cellFootprint(q.cell) : K.getCell('vocab-match3').footprint(q.cell.payload) }));
+    const p3 = deal('vocab_pick3_words', { vocabGrade: 3 }, 6, 7300).map((q) => ({ q, footprint: K.getCell('vocab-pick3').footprint(q.cell.payload) }));
+    if (typeof PG.scorePoints !== 'function') fail('V11: no scorePoints in paginate.js (the page Score counts items)');
+    else {
+        if (PG.scorePoints(m3) !== 12) fail(`V11: a Match 3 page of 4 cells scores /${PG.scorePoints(m3)} (owner Q-C: /12)`);
+        if (PG.scorePoints(p3) !== 6) fail(`V11: a 1 picture, 3 words page of 6 scores /${PG.scorePoints(p3)} (one point an item)`);
+    }
+}
+
+// V12: the Guided page's grey hint (the first worked step that holds no answer, guided.js hintOf) names a CUE, never
+// repeats the instruction (critic r2 #5: "Look at the picture." under "Look at the picture. Write its word on the line.")
+{
+    await imp('js/modules/sheet/providers/vocabulary.js');
+    const prov = K.getProvider('vocabulary', 'vocab_grade_pictures');
+    for (const [skill, n] of [['vocab_grade_pictures', 4], ['vocab_pick3_words', 6]]) for (const q of deal(skill, { vocabGrade: 3 }, n, 7500)) {
+        const st = (prov.workedSteps(q) || [])[0];
+        const t = String((st && st.text) || '').trim();
+        const instr = `${q.printText || ''} ${q.text || ''} ${K.instructionFor ? '' : ''}`.toLowerCase();
+        if (!t || instr.includes(t.toLowerCase().replace(/[.]$/, '')) || /^look at (the )?pictures?( [A-C](, [A-C])*( and [A-C])?)?\.?$/i.test(t)) fail(`V12 ${skill}: the first step "${t}" repeats the instruction (no cue)`);
+        const ansWord = q.cell.template === 'vocab-pick3' ? q.cell.payload.word : null;
+        if (ansWord && t.toLowerCase().includes(ansWord.toLowerCase())) fail(`V12 ${skill}: the first step "${t}" gives the answer`);
+    }
+}
+// V13: the picture task's Error analysis wrong word is a real mistake: a misspelling of the word (1-2 letters off, M-V4)
+// or a look-alike (notWith, M-V1) - never a bank word no pupil would pick (critic r2 #8: "left" for equal groups)
+{
+    const prov = K.getProvider('vocabulary', 'vocab_grade_pictures');
+    const dist = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]); for (let j = 1; j <= b.length; j++) d[0][j] = j;
+        for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
+    for (const g of W.VOCAB_GRADES) for (const q of deal('vocab_pick3_words', { vocabGrade: g }, 8, 7700)) {
+        const w = q.cell.payload.word, r = prov.wrongAnswer(q);
+        const v = r && String(r.value);
+        if (!v || v === w) { fail(`V13 grade ${g} "${w}": no wrong word`); continue; }
+        const ok = (dist(v, w) >= 1 && dist(v, w) <= 2) || (W.VOCAB_WORDS[w].notWith || []).includes(v);
+        if (!ok) fail(`V13 grade ${g} "${w}": the wrong word "${v}" is neither a misspelling nor a look-alike`);
+    }
+}
+
 console.log(`ws-vocab-unit: ${W.VOCAB_SETS.length} lesson sets, ${P.VOCAB_PICTURE_IDS.length} pictures, ${items} items dealt`);
-for (const f of fails.slice(0, 40)) console.log(`  - ${f}`);
+for (const f of fails.slice(0, Number(process.env.VOCAB_SHOW) || 40)) console.log(`  - ${f}`);
 console.log(`ws-vocab-unit: ${fails.length ? `FAIL (${fails.length})` : 'OK'}`);
 process.exit(fails.length ? 1 : 0);
