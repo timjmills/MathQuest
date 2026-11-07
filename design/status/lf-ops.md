@@ -9,15 +9,26 @@ Builder profile: mq-opus-medium
 Critic rounds: 0, none
 
 ## Now
-- Day 1: skip-count fix (skipcount-fix @ 3bbbed3f) merged into the lane branch (conflicts resolved: print-sheet.js comment, screen-cell.js reveal(), lesson.js import, backtests.json union, deploy-gates comment); boot-smoke OK.
-- Cards drafted for the owner's one sitting: design/cards/count-row/count-row.md (count_by_tables, skip_count_line, skip_count_grid) and design/cards/ops-tables/ops-tables.md (mult_chart, mult_properties, arrays_groups, the two plain story skills, the three build entries). Both `--check-signed`: "needs owner signature (everything else green)".
-- div_facts support-aid questions (facts card is signed; these become rulings via `--rulings-only`, no re-sign): below, F1-F4.
-- Meanwhile step 2 (checks first): R4-1..R4-5 and SC1..SC6 checks, precritic on every scope skill.
+- 2026-11-07 owner scope (via lead): BUILD lessons only, no owner sign-off of cards. Re-aimed below ("Scope after the 2026-11-07 decision").
+- Cards: count-row and ops-tables have every 7a line and every 9 question DECIDED by the lane (recorded as "lane decision 2026-11-07"). `--check-signed` reports "needs owner signature (everything else green)". The lane did NOT write "Signed: owner" (it would misstate who signed); the lead decides how the card gate reads a lane decision (question to the lead below).
+- div_facts F1-F4 are lane decisions recorded here, NOT written into the owner-signed facts card (that card stays as the owner signed it on 2026-10-31).
+- Step 2 running: R4 machine checks (builder sub-agent); precritic on the scope skills.
+
+## Scope after the 2026-11-07 decision (BUILD lessons, earliest rounds first)
+Operations skills used by BUILD lessons that are not at 8/10 (design/lessons-first/queue.json, kind "build"):
+- Round 1, G3-Y4.B4: division:div_facts, div_word_problems_plain, multiplication:mult_word_problems_plain (two-step word problems BUILD); count_by_tables, mult_chart (patterns on the multiplication table BUILD); mult_properties, arrays_groups, count_by_tables (properties BUILD). number_ops_mixed:word_problems_mixed is partial only (supports the lesson, not blocking, plan section 3).
+- Round 1, G4-Y5.B3: multiplication:mult_comparison + build entry comparison_statements (times as many BUILD); division:remainder_interpret (divide and interpret the remainder BUILD; its build entry multi_step_four_ops is algebra's).
+- Round 2 (after round 1): addition:add_column_multi, add_wp_100, subtraction:sub_wp_100, sub_wp_20, multiplication:mult_zeros (+ facts_times_tens).
+- Round 4: addition:number_line_add, subtraction:number_line_sub (+ nl_tens_ones_jumps).
+- Dropped (serve only non-BUILD lessons): build entries tables_links (S6), div_by_itself (S12), mult_three (S13); recorded as DEFERRED on the ops-tables card.
+- Already at 8/10 and left alone: mult_facts, add_facts, sub_facts (and add_wp_20 as marked in the queue).
 
 ## Owner go
 
 ## Open questions
-Owner sheet (one sitting; "all as suggested" accepted). Card sections 9 hold the same questions with their full wording.
+Lane decisions under the owner rule of 2026-11-07 (no owner sign-off): every item below is decided AS SUGGESTED, ops-tables 4-6 DEFERRED (non-BUILD), plus ops-tables 8 comparison_statements = option task=statement + preset skill. Question to the lead: how does `ws-spec-card --check-signed` (precritic's card row) accept a lane-decided card? Suggested: the lead (or lf-checks) adds a recognised `Signed: lane <id> under owner rule 2026-11-07, YYYY-MM-DD` form, or rules the card row SKIPPED-owner for this program.
+
+Original sheet (one sitting; "all as suggested" accepted). Card sections 9 hold the same questions with their full wording.
 
 count-row card (design/cards/count-row/count-row.md §9):
 1. Sign the 7a decisions as proposed? Suggested: yes.
@@ -47,4 +58,5 @@ F4. Fade packet: dealt in support order (all -> fewer -> none, a block per stage
 Times: builder day-1 cards + merge, start 2026-11-07T00:00Z, end —, profile mq-opus-medium (lane session)
 
 ## Log
+- 2026-11-07: owner scope decision received (BUILD only, no sign-off); re-aimed to round-1 BUILD skills (adds mult_comparison, remainder_interpret; drops tables_links, div_by_itself, mult_three); cards decided by the lane, left unsigned pending the lead's gate ruling.
 - 2026-11-07: lane started; skip-count fix merged; count-row and ops-tables cards drafted; owner sheet sent to the lead.

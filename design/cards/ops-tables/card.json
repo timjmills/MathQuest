@@ -22,11 +22,13 @@
       "multiplication:mult_properties",
       "multiplication:arrays_groups",
       "multiplication:mult_word_problems_plain",
-      "division:div_word_problems_plain"
+      "division:div_word_problems_plain",
+      "multiplication:mult_comparison",
+      "division:remainder_interpret"
     ]
   },
   "excerptChars": 140,
-  "summary": "Family card for the pilot unit's multiplication skills that are not the fact drill. mult_chart: a black-and-white 12 x 12 (or 10 x 10) chart, one product looked up or a few cells filled (never the factor pairs printed in the prompt). mult_properties: the order property drawn as an array and the same array turned, identity (x 1) and zero (x 0) facts, and the distributive split. arrays_groups: an array or ringed equal groups, '__ rows of __ (groups of __). __ in all.' (three slots, one frame every item). The plain stories: one x or ÷ story per cell with no picture row, answered with a number and its unit. Paper, key and the three screen hosts are one drawing.",
+  "summary": "Family card for the pilot unit's multiplication skills that are not the fact drill. mult_chart: a black-and-white 12 x 12 (or 10 x 10) chart, one product looked up or a few cells filled (never the factor pairs printed in the prompt). mult_properties: the order property drawn as an array and the same array turned, identity (x 1) and zero (x 0) facts, and the distributive split. arrays_groups: an array or ringed equal groups, '__ rows of __ (groups of __). __ in all.' (three slots, one frame every item). The plain stories: one x or ÷ story per cell with no picture row, answered with a number and its unit. Paper, key and the three screen hosts are one drawing. mult_comparison (4.OA.A.1 / 4.OA.A.2, 'times as many') and remainder_interpret (4.OA.A.3, divide and say what the remainder means) are the main skills of two round-1 BUILD lessons of G4-Y5.B3 and join the story skills here.",
   "teaches": "3.OA.A.1 (products as equal groups), 3.OA.A.2 (division as sharing / grouping), 3.OA.A.3 (x / ÷ word problems within 100), 3.OA.B.5 (properties: commutative, identity, zero, distributive), 3.OA.C.7 (know the products), 3.OA.D.9 (patterns in the multiplication table), 2.OA.C.4 (arrays to 5 x 5). WRM Y4.B4 S1 (multiples of 3), S6 (3, 6, 9 tables), S11 (x 1 and x 0), S12 (÷ 1 and itself), S13 (multiply three numbers); Y3.B4 arrays and equal groups.",
   "research": "From repo sources: design/catalogue/mult-div-integers.md (verdicts, MU-A2/A3/A7/A27/A28, MU-M1..M7), the passed detailed lessons 3a (g3-oa5-mult-properties) and 4 (g3-oa9-mult-table-patterns) and their RESEARCH.md, PROBLEM_TYPES MU rows. Reference grammar (MathWorksheets4Kids 'multiplication chart: find the missing', 'properties of multiplication', 'arrays: write the multiplication sentence'; IXL 3rd grade 'multiplication tables up to 12: find the missing factor', 'properties of multiplication', 'write multiplication sentences for arrays'): ours keeps one product or one property per boxed cell, black and white, big digits.",
   "problemTypes": [
@@ -160,6 +162,11 @@
       "date": "2026-10-31",
       "ruling": "Part-whole bar: drawn on teaching pages, an option (default off) on practice pages.",
       "source": "owner, STATUS 2026-10-31"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "No owner sign-off of skill or lesson cards for the lessons-first program: lanes decide the card lines from the standards and record them; the owner reviews finished work only. Scope: the CCSS BUILD lessons only. (The Signed line below records the lane's decision under this rule.)",
+      "source": "owner via lead session_01HVwpAE3g6EZH8idgErP6LP, 2026-11-07"
     }
   ],
   "misconceptions": [
@@ -217,32 +224,36 @@
   ],
   "openQuestions": [
     {
-      "q": "Sign the decisions in 7a as proposed (every difficulty / support / layout option offered; key-word cues and the keyword bank hidden on the two plain story skills as on the signed family-check card; number-line and play controls, boss / race / map / display modes out of scope)?",
+      "q": "Sign the decisions in 7a as proposed (every difficulty / support / layout option offered; key-word cues and the keyword bank hidden on the two plain story skills as on the signed family-check card; number-line and play controls, boss / race / map / display modes out of scope)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes, all as proposed."
     },
     {
-      "q": "Hide the fact-rows and fact-probe page types on all five skills, and the word-problems page type on mult_chart, mult_properties and arrays_groups (no story of their own)?",
+      "q": "Hide the fact-rows and fact-probe page types on all five skills, and the word-problems page type on mult_chart, mult_properties and arrays_groups (no story of their own)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes: none of them is a fact drill, and the page-type list every skill must reach (CLAUDE.md) does not include these three."
     },
     {
-      "q": "Lesson pages: write real lesson data (prereqs.js warm-up, practice shapes) for the five skills instead of the fallback warm-up from the earlier skills?",
+      "q": "Lesson pages: write real lesson data (prereqs.js warm-up, practice shapes) for the five skills instead of the fallback warm-up from the earlier skills? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes, in this lane, before the critic."
     },
     {
-      "q": "Build entry tables_links (S6, 3.OA.C.7 / 3.OA.D.9): a NEW skill multiplication:related_tables 'Use the 3, 6 and 9 times-tables' - a known fact and the double of it ('3 x 4 = 12, so 6 x 4 = [ ]'), drawn on the equation cell with a three-row link (3s, 6s, 9s) on teaching pages. Its option `pair` (3-6, 3-6-9, 2-4-8, 5-10) is a plain option?",
+      "q": "Build entry tables_links (S6, 3.OA.C.7 / 3.OA.D.9): a NEW skill multiplication:related_tables 'Use the 3, 6 and 9 times-tables' - a known fact and the double of it ('3 x 4 = 12, so 6 x 4 = [ ]'), drawn on the equation cell with a three-row link (3s, 6s, 9s) on teaching pages. Its option `pair` (3-6, 3-6-9, 2-4-8, 5-10) is a plain option? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off in this program; scope = the BUILD lessons only): DEFERRED. The build entry serves only a non-BUILD lesson (Y4.B4.S6 / S12 / S13), so it is not built in this program; the recommendation stands for when it is.**",
       "recommended": "Yes: one new skill, `pair` a plain option (default 3-6-9 for the Y4 lesson)."
     },
     {
-      "q": "Build entry mult_three (S13, 3.OA.B.5 associative): a NEW skill multiplication:multiply_three_numbers 'Multiply three numbers' - 'a x b x c = [ ]' with a bracket choice row on teaching pages ('(2 x 3) x 4' / '2 x (3 x 4)'), factors 1-5 (products within 100); an option `order` (left to right / pick a pair) as a plain option?",
+      "q": "Build entry mult_three (S13, 3.OA.B.5 associative): a NEW skill multiplication:multiply_three_numbers 'Multiply three numbers' - 'a x b x c = [ ]' with a bracket choice row on teaching pages ('(2 x 3) x 4' / '2 x (3 x 4)'), factors 1-5 (products within 100); an option `order` (left to right / pick a pair) as a plain option? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off in this program; scope = the BUILD lessons only): DEFERRED. The build entry serves only a non-BUILD lesson (Y4.B4.S6 / S12 / S13), so it is not built in this program; the recommendation stands for when it is.**",
       "recommended": "Yes: one new skill, factors to 5 by default, a plain `order` option."
     },
     {
-      "q": "Build entry div_by_itself (S12): an option on division:div_facts `facts: ones-and-self` that deals only n ÷ 1 and n ÷ n (and 0 ÷ n, never n ÷ 0). Is it also a preset skill 'Divide by 1 and by itself' (owner rule 2026-10-17: a distinct new skill)?",
+      "q": "Build entry div_by_itself (S12): an option on division:div_facts `facts: ones-and-self` that deals only n ÷ 1 and n ÷ n (and 0 ÷ n, never n ÷ 0). Is it also a preset skill 'Divide by 1 and by itself' (owner rule 2026-10-17: a distinct new skill)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off in this program; scope = the BUILD lessons only): DEFERRED. The build entry serves only a non-BUILD lesson (Y4.B4.S6 / S12 / S13), so it is not built in this program; the recommendation stands for when it is.**",
       "recommended": "Yes: option on div_facts AND a preset skill 'Divide a number by 1 and by itself' (WRM Y4.B4.S12), tagged 3.OA.B.5 / 3.OA.B.6."
     },
     {
-      "q": "mult_chart look-up: drop the factor pairs from the prompt (the old 'Fill in the missing products: 1x11, 3x7' leak) and shade the row and the column in the single grey on every task?",
+      "q": "mult_chart look-up: drop the factor pairs from the prompt (the old 'Fill in the missing products: 1x11, 3x7' leak) and shade the row and the column in the single grey on every task? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes (no answer given away; black and white)."
+    },
+    {
+      "q": "Build entry comparison_statements (G4-Y5.B3 BUILD 'Multiplicative comparison: times as many', option on mult_comparison): the pupil writes the comparison statement and the equation ('18 is 3 times as many as 6'; '18 = 3 x 6') from a bar pair. A distinct new task, so an option `task: statement` AND a preset skill 'Write multiplicative comparison statements' (owner rule 2026-10-17)? **ANSWER — lane decision 2026-11-07: as recommended.**",
+      "recommended": "Yes: option task=statement plus a preset skill, tagged 4.OA.A.1, WRM Y5.B3."
     }
   ],
   "decisions": {
@@ -255,8 +266,7 @@
           "2"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js P12 forms",
+        "source": "skill-options.js P12 forms; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the story kinds (equal groups, arrays, comparison / sharing, grouping); untouched deals them in turn",
         "skills": [
           "multiplication:mult_word_problems_plain",
@@ -270,8 +280,7 @@
           "1"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js P12 forms",
+        "source": "skill-options.js P12 forms; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "arrays only, equal groups only, or both in turn",
         "skills": [
           "multiplication:arrays_groups"
@@ -286,8 +295,7 @@
           "3"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js P12 forms",
+        "source": "skill-options.js P12 forms; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "which property: order, distributive, identity (x 1), zero (x 0)",
         "skills": [
           "multiplication:mult_properties"
@@ -300,12 +308,13 @@
           "false"
         ],
         "d": "hidden",
-        "proposed": true,
-        "source": "family-check card precedent (signed 2026-10-31: wpCues / wpBank hidden on the story skills)",
+        "source": "family-check card precedent (signed 2026-10-31: wpCues / wpBank hidden on the story skills); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "key-word cues teach the key-word misconception (M-S1); the plain stories are read whole",
         "skills": [
           "multiplication:mult_word_problems_plain",
-          "division:div_word_problems_plain"
+          "division:div_word_problems_plain",
+          "multiplication:mult_comparison",
+          "division:remainder_interpret"
         ]
       },
       {
@@ -315,12 +324,13 @@
           "false"
         ],
         "d": "hidden",
-        "proposed": true,
-        "source": "family-check card precedent",
+        "source": "family-check card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "as wpCues",
         "skills": [
           "multiplication:mult_word_problems_plain",
-          "division:div_word_problems_plain"
+          "division:div_word_problems_plain",
+          "multiplication:mult_comparison",
+          "division:remainder_interpret"
         ]
       },
       {
@@ -330,12 +340,13 @@
           "false"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "owner 2026-10-31 (bar: option, default off on practice pages)",
+        "source": "owner 2026-10-31 (bar: option, default off on practice pages); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the bar model on practice pages, default off; drawn on teaching pages",
         "skills": [
           "multiplication:mult_word_problems_plain",
-          "division:div_word_problems_plain"
+          "division:div_word_problems_plain",
+          "multiplication:mult_comparison",
+          "division:remainder_interpret"
         ]
       },
       {
@@ -345,8 +356,7 @@
           "false"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "lesson 7 (msOps + wpFrames)",
+        "source": "lesson 7 (msOps + wpFrames); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "number sentences instead of column boxes",
         "skills": [
           "multiplication:mult_word_problems_plain",
@@ -361,12 +371,13 @@
           "1000"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options-derived.js (measured Max Number)",
+        "source": "skill-options-derived.js (measured Max Number); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "Max Number bounds the product / dividend (within N bounds the answer)",
         "skills": [
           "multiplication:mult_word_problems_plain",
-          "division:div_word_problems_plain"
+          "division:div_word_problems_plain",
+          "multiplication:mult_comparison",
+          "division:remainder_interpret"
         ]
       },
       {
@@ -377,8 +388,7 @@
           "100"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options-derived.js",
+        "source": "skill-options-derived.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "Max Number 10 deals totals to 10; arrays stay at most 5 x 5 (2.OA.4, RP-21)",
         "skills": [
           "multiplication:arrays_groups"
@@ -391,8 +401,7 @@
           "whole"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a window of the chart (default) or the whole chart",
         "skills": [
           "multiplication:mult_chart"
@@ -407,8 +416,7 @@
           "144"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the chart size: 5 x 5, 6 x 6, 10 x 10, 12 x 12",
         "skills": [
           "multiplication:mult_chart"
@@ -421,8 +429,7 @@
           "81"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "order facts: factors to 5 (pictured) or to 9 (facts alone)",
         "skills": [
           "multiplication:mult_properties"
@@ -440,8 +447,7 @@
           "100"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "how many chart cells are blank (a few by default)",
         "skills": [
           "multiplication:mult_chart"
@@ -464,8 +470,7 @@
           "12"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "which tables carry the blanks (S1 the 3s, S6 the 3, 6, 9 tables)",
         "skills": [
           "multiplication:mult_chart"
@@ -481,8 +486,7 @@
           "even"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "fill products, find missing factors (headers), shade the multiples, find the pattern in a row, even products (lesson 4, S6)",
         "skills": [
           "multiplication:mult_chart"
@@ -496,8 +500,7 @@
           "4"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "window height",
         "skills": [
           "multiplication:mult_chart"
@@ -511,8 +514,7 @@
           "5"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "window width",
         "skills": [
           "multiplication:mult_chart"
@@ -525,8 +527,7 @@
           "2"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "start the chart at 1 or 2",
         "skills": [
           "multiplication:mult_chart"
@@ -539,8 +540,7 @@
           "false"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js picturesOption",
+        "source": "skill-options.js picturesOption; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "off: the facts-only order items (no arrays)",
         "skills": [
           "multiplication:mult_properties"
@@ -554,8 +554,7 @@
           "2"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "lesson 3a (P-A)",
+        "source": "lesson 3a (P-A); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "order items: both facts from two arrays, the turned fact from a known one, or facts alone",
         "skills": [
           "multiplication:mult_properties"
@@ -568,8 +567,7 @@
           "false"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js universal play controls",
+        "source": "skill-options.js universal play controls; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a universal play control, graded by the play / screen lanes"
       },
       {
@@ -578,8 +576,7 @@
           "*"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js universal play controls",
+        "source": "skill-options.js universal play controls; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a universal play control, graded by the play / screen lanes"
       },
       {
@@ -589,8 +586,7 @@
           "false"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line, graded by its own lane"
       },
       {
@@ -599,8 +595,7 @@
           "*"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line, graded by its own lane"
       },
       {
@@ -609,8 +604,7 @@
           "*"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line, graded by its own lane"
       },
       {
@@ -638,8 +632,7 @@
           "0.01"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line, graded by its own lane"
       },
       {
@@ -654,8 +647,7 @@
           "none"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line, graded by its own lane"
       },
       {
@@ -669,8 +661,7 @@
           "10"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line, graded by its own lane"
       },
       {
@@ -680,91 +671,108 @@
           "false"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line, graded by its own lane"
+      },
+      {
+        "option": "range",
+        "values": [
+          "10",
+          "20",
+          "50"
+        ],
+        "d": "offered",
+        "source": "skill-options-derived.js (measured Max Number); lane decision 2026-11-07 (owner: no sign-off)",
+        "why": "Max Number bounds the larger quantity (within N bounds the answer)",
+        "skills": [
+          "multiplication:mult_comparison"
+        ]
+      },
+      {
+        "option": "response",
+        "values": [
+          "standard",
+          "which-numbers"
+        ],
+        "d": "offered",
+        "source": "skill-options.js responseOption (P-13 low writing load); lane decision 2026-11-07 (owner: no sign-off)",
+        "why": "write the answer, or circle which numbers the story uses (a lower writing load)",
+        "skills": [
+          "multiplication:mult_comparison"
+        ]
       }
     ],
     "roles": [
       {
         "key": "independent",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the plain page"
       },
       {
         "key": "more-practice",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "More Practice A-J"
       },
       {
         "key": "opener",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the lesson opener"
       },
       {
         "key": "scripted-model",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "real provider workedSteps 5/5"
       },
       {
         "key": "guided",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "real provider workedSteps"
       },
       {
         "key": "error-analysis",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "real provider wrongAnswer and misconceptions (MU-M1..M7)"
       },
       {
         "key": "review",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "earlier skills in data.js order"
       },
       {
         "key": "test",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "Test A / B"
       },
       {
         "key": "pre-skill-check",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "earlier skills in data.js order"
       },
       {
         "key": "word-problems",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md",
+        "source": "CLAUDE.md; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the story skills ARE the word-problems page",
         "skills": [
           "multiplication:mult_word_problems_plain",
-          "division:div_word_problems_plain"
+          "division:div_word_problems_plain",
+          "multiplication:mult_comparison",
+          "division:remainder_interpret"
         ]
       },
       {
         "key": "word-problems",
         "d": "hidden",
-        "proposed": true,
-        "source": "lane proposal (Q2)",
+        "source": "lane proposal (Q2); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "no story of their own (provider stories 0/5, the default would deal another skill): the page type is not in the every-skill list (CLAUDE.md) (Q2)",
         "skills": [
           "multiplication:mult_chart",
@@ -775,50 +783,43 @@
       {
         "key": "fact-rows",
         "d": "hidden",
-        "proposed": true,
-        "source": "lane proposal (Q2)",
+        "source": "lane proposal (Q2); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "not a fact drill: a chart, an array or a story does not fit a 5-10 column fact row (Q2)"
       },
       {
         "key": "fact-probe",
         "d": "hidden",
-        "proposed": true,
-        "source": "lane proposal (Q2)",
+        "source": "lane proposal (Q2); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "as fact-rows (Q2)"
       },
       {
         "key": "mixed-practice",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "daily / mixed review: one shelf among the earlier skills"
       },
       {
         "key": "true-false",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "real provider wrongAnswer"
       },
       {
         "key": "reason-it",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "real provider workedSteps and wrongAnswer"
       },
       {
         "key": "stretch",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the skill own items"
       },
       {
         "key": "lesson",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "lesson data to be written in prereqs.js for all five (today the FALLBACK warm-up) (Q3)"
       }
     ],
@@ -826,57 +827,49 @@
       {
         "key": "practice-card",
         "d": "offered",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the practice card"
       },
       {
         "key": "online-worksheet",
         "d": "offered",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the online worksheet"
       },
       {
         "key": "quiz",
         "d": "offered",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the quiz"
       },
       {
         "key": "boss",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a game mode around the practice card; graded by ws-chromebook-fit"
       },
       {
         "key": "race",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a game mode around the practice card; graded by ws-chromebook-fit"
       },
       {
         "key": "map",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the skill map; graded by ws-screen-slots"
       },
       {
         "key": "mode-dark",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a display mode of the screen hosts"
       },
       {
         "key": "mode-bigboard",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a display mode of the screen hosts"
       }
     ]

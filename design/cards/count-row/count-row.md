@@ -1,6 +1,6 @@
 <!-- spec-card
-{"card":"count-row","kind":"template","template":"count-row","families":[],"match":{"templates":["count-row"]},"config":"design/cards/count-row/card.json","indexSha":"ec440546cb1811ff671c6f526cc5ece764765f2f","bodySha":"15c3557ce8babec6","format":2,"configSha":"7f03a46eac2d"}
-{"cited":"AK-2 AX-4 C2 H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 L10 L11 PG-12 PT-ENG-3 PT-FRM-6 PT-OPN-6 PT-OPN-7 PT-REV-3 RP-1 SL-1 SL-3a SP-11a TY-10a TY-10b WRM-rule-19","rules":"VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 AK-1 a0cc12 2 d4709f SL-11 183e7a H13 36f579 VQ-4 b89965 5 1fa595 7 2253df 9 0b5532 10 2ed85c CL-40 2a6dbb SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 7 aa3040 AX-4 2eb6c1 C2 a51365 H1@RUBRIC bf4b29 H10 fbd802 11 bef034 12 2de4f7 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 L1 799b66 10 d2ca35 11 9ebe19 6 6e19d8 PG-12 8e75fd PT-ENG-3 6349a1 PT-FRM-6 daac17 PT-OPN-6 9b13d5 7 f810c5 PT-REV-3 d5e0d9 RP-1 d529bd SP-11a 9ce3fb P-LC-9 bc47bd SL-1 e3b064 3 468d78 3a d38939 TY-10a 5e59f3 10b 97f6c5 11 78dd96","entries":"D%3Arows%3D*%40multiplication%3Acount_by_tables 972948 D%3Afill%3Dtwo%40multiplication%3Acount_by_tables 972948 D%3Afill%3Done%40multiplication%3Acount_by_tables 972948 D%3Afill%3Dhalf%40multiplication%3Acount_by_tables 972948 D%3Amissing%3D20%40multiplication%3Acount_by_tables 972948 D%3Amissing%3D50%40multiplication%3Acount_by_tables 972948 D%3Amissing%3D70%40multiplication%3Acount_by_tables 972948 D%3Amissing%3D80%40multiplication%3Acount_by_tables 972948 D%3Amissing%3D90%40multiplication%3Acount_by_tables 972948 D%3Amissing%3D100%40multiplication%3Acount_by_tables 972948 D%3Atimes%3Dnone%40multiplication%3Acount_by_tables 972948 D%3Atimes%3Deach%40multiplication%3Acount_by_tables 972948 D%3Atimes%3Dgiven%40multiplication%3Acount_by_tables 972948 D%3AonePage%3Dtrue%40multiplication%3Acount_by_tables 972948 D%3AonePage%3Dfalse%40multiplication%3Acount_by_tables 972948 D%3Ajumps%3D12%40multiplication%3Acount_by_tables 972948 D%3Ajumps%3D15%40multiplication%3Acount_by_tables 972948 D%3Aorder%3Dinorder%40multiplication%3Acount_by_tables 972948 D%3Aorder%3Dmixed%40multiplication%3Acount_by_tables 972948 D%3Ashape%3Dbox%40multiplication%3Acount_by_tables 972948 D%3Ashape%3Dcircle%40multiplication%3Acount_by_tables 972948 D%3Ashape%3Dhex%40multiplication%3Acount_by_tables 972948 D%3Ashape%3Dmixed%40multiplication%3Acount_by_tables 972948 D%3Aspaces%3Dbox%40multiplication%3Acount_by_tables 972948 D%3Aspaces%3Dline%40multiplication%3Acount_by_tables 972948 D%3Astep%3D0%40patterns%3Askip_count_grid%2Cpatterns%3Askip_count_line 972948 D%3Astep%3D1%40patterns%3Askip_count_grid%2Cpatterns%3Askip_count_line 972948 D%3Astep%3D2%40patterns%3Askip_count_grid%2Cpatterns%3Askip_count_line 972948 D%3Aband%3Dnull%40patterns%3Askip_count_line 972948 D%3Aband%3D50%40patterns%3Askip_count_line 972948 D%3Aband%3D1000%40patterns%3Askip_count_line 972948 D%3AnlOn%3Dtrue 11baa8 D%3AnlOn%3Dfalse 11baa8 D%3AnlFrom%3D* 11baa8 D%3AnlTo%3D* 11baa8 D%3AnlStep%3D1 11baa8 D%3AnlStep%3D2 11baa8 D%3AnlStep%3D5 11baa8 D%3AnlStep%3D10 11baa8 D%3AnlStep%3D20 11baa8 D%3AnlStep%3D25 11baa8 D%3AnlStep%3D50 11baa8 D%3AnlStep%3D100 11baa8 D%3AnlStep%3D1000 11baa8 D%3AnlStep%3Dauto 11baa8 D%3AnlStep%3D1%2F2 11baa8 D%3AnlStep%3D1%2F3 11baa8 D%3AnlStep%3D1%2F4 11baa8 D%3AnlStep%3D1%2F5 11baa8 D%3AnlStep%3D1%2F6 11baa8 D%3AnlStep%3D1%2F8 11baa8 D%3AnlStep%3D1%2F10 11baa8 D%3AnlStep%3D1%2F12 11baa8 D%3AnlStep%3D0.1 11baa8 D%3AnlStep%3D0.01 11baa8 D%3AnlLabels%3Dauto 11baa8 D%3AnlLabels%3Dall 11baa8 D%3AnlLabels%3D2 11baa8 D%3AnlLabels%3D5 11baa8 D%3AnlLabels%3D10 11baa8 D%3AnlLabels%3Dends 11baa8 D%3AnlLabels%3Dnone 11baa8 D%3AnlMinor%3Dauto 11baa8 D%3AnlMinor%3D0 11baa8 D%3AnlMinor%3D2 11baa8 D%3AnlMinor%3D4 11baa8 D%3AnlMinor%3D5 11baa8 D%3AnlMinor%3D10 11baa8 D%3AnlHops%3Dtrue 11baa8 D%3AnlHops%3Dfalse 11baa8 D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Atest 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Aword-problems d55128 D%3Arole%3Afact-rows d55128 D%3Arole%3Afact-probe d55128 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Alesson 972948 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
+{"card":"count-row","kind":"template","template":"count-row","families":[],"match":{"templates":["count-row"]},"config":"design/cards/count-row/card.json","indexSha":"ec440546cb1811ff671c6f526cc5ece764765f2f","bodySha":"829db9e31af0fc82","format":2,"configSha":"5991683d7994"}
+{"cited":"AK-2 AX-4 C2 H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 L1 L6 L10 L11 PG-12 PT-ENG-3 PT-FRM-6 PT-OPN-6 PT-OPN-7 PT-REV-3 RP-1 SL-1 SL-3a SP-11a TY-10a TY-10b WRM-rule-19","rules":"VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 AK-1 a0cc12 2 d4709f SL-11 183e7a H13 36f579 VQ-4 b89965 5 1fa595 7 2253df 9 0b5532 10 2ed85c CL-40 2a6dbb SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 7 aa3040 AX-4 2eb6c1 C2 a51365 H1@RUBRIC bf4b29 H10 fbd802 11 bef034 12 2de4f7 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 L1 799b66 10 d2ca35 11 9ebe19 6 6e19d8 PG-12 8e75fd PT-ENG-3 6349a1 PT-FRM-6 daac17 PT-OPN-6 9b13d5 7 f810c5 PT-REV-3 d5e0d9 RP-1 d529bd SP-11a 9ce3fb P-LC-9 bc47bd SL-1 e3b064 3 468d78 3a d38939 TY-10a 5e59f3 10b 97f6c5 11 78dd96","entries":"D%3Arows%3D*%40multiplication%3Acount_by_tables bcefeb D%3Afill%3Dtwo%40multiplication%3Acount_by_tables bcefeb D%3Afill%3Done%40multiplication%3Acount_by_tables bcefeb D%3Afill%3Dhalf%40multiplication%3Acount_by_tables bcefeb D%3Amissing%3D20%40multiplication%3Acount_by_tables bcefeb D%3Amissing%3D50%40multiplication%3Acount_by_tables bcefeb D%3Amissing%3D70%40multiplication%3Acount_by_tables bcefeb D%3Amissing%3D80%40multiplication%3Acount_by_tables bcefeb D%3Amissing%3D90%40multiplication%3Acount_by_tables bcefeb D%3Amissing%3D100%40multiplication%3Acount_by_tables bcefeb D%3Atimes%3Dnone%40multiplication%3Acount_by_tables bcefeb D%3Atimes%3Deach%40multiplication%3Acount_by_tables bcefeb D%3Atimes%3Dgiven%40multiplication%3Acount_by_tables bcefeb D%3AonePage%3Dtrue%40multiplication%3Acount_by_tables bcefeb D%3AonePage%3Dfalse%40multiplication%3Acount_by_tables bcefeb D%3Ajumps%3D12%40multiplication%3Acount_by_tables bcefeb D%3Ajumps%3D15%40multiplication%3Acount_by_tables bcefeb D%3Aorder%3Dinorder%40multiplication%3Acount_by_tables bcefeb D%3Aorder%3Dmixed%40multiplication%3Acount_by_tables bcefeb D%3Ashape%3Dbox%40multiplication%3Acount_by_tables bcefeb D%3Ashape%3Dcircle%40multiplication%3Acount_by_tables bcefeb D%3Ashape%3Dhex%40multiplication%3Acount_by_tables bcefeb D%3Ashape%3Dmixed%40multiplication%3Acount_by_tables bcefeb D%3Aspaces%3Dbox%40multiplication%3Acount_by_tables bcefeb D%3Aspaces%3Dline%40multiplication%3Acount_by_tables bcefeb D%3Astep%3D0%40patterns%3Askip_count_grid%2Cpatterns%3Askip_count_line bcefeb D%3Astep%3D1%40patterns%3Askip_count_grid%2Cpatterns%3Askip_count_line bcefeb D%3Astep%3D2%40patterns%3Askip_count_grid%2Cpatterns%3Askip_count_line bcefeb D%3Aband%3Dnull%40patterns%3Askip_count_line bcefeb D%3Aband%3D50%40patterns%3Askip_count_line bcefeb D%3Aband%3D1000%40patterns%3Askip_count_line bcefeb D%3AnlOn%3Dtrue 04b8b3 D%3AnlOn%3Dfalse 04b8b3 D%3AnlFrom%3D* 04b8b3 D%3AnlTo%3D* 04b8b3 D%3AnlStep%3D1 04b8b3 D%3AnlStep%3D2 04b8b3 D%3AnlStep%3D5 04b8b3 D%3AnlStep%3D10 04b8b3 D%3AnlStep%3D20 04b8b3 D%3AnlStep%3D25 04b8b3 D%3AnlStep%3D50 04b8b3 D%3AnlStep%3D100 04b8b3 D%3AnlStep%3D1000 04b8b3 D%3AnlStep%3Dauto 04b8b3 D%3AnlStep%3D1%2F2 04b8b3 D%3AnlStep%3D1%2F3 04b8b3 D%3AnlStep%3D1%2F4 04b8b3 D%3AnlStep%3D1%2F5 04b8b3 D%3AnlStep%3D1%2F6 04b8b3 D%3AnlStep%3D1%2F8 04b8b3 D%3AnlStep%3D1%2F10 04b8b3 D%3AnlStep%3D1%2F12 04b8b3 D%3AnlStep%3D0.1 04b8b3 D%3AnlStep%3D0.01 04b8b3 D%3AnlLabels%3Dauto 04b8b3 D%3AnlLabels%3Dall 04b8b3 D%3AnlLabels%3D2 04b8b3 D%3AnlLabels%3D5 04b8b3 D%3AnlLabels%3D10 04b8b3 D%3AnlLabels%3Dends 04b8b3 D%3AnlLabels%3Dnone 04b8b3 D%3AnlMinor%3Dauto 04b8b3 D%3AnlMinor%3D0 04b8b3 D%3AnlMinor%3D2 04b8b3 D%3AnlMinor%3D4 04b8b3 D%3AnlMinor%3D5 04b8b3 D%3AnlMinor%3D10 04b8b3 D%3AnlHops%3Dtrue 04b8b3 D%3AnlHops%3Dfalse 04b8b3 D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Aword-problems f9f1d8 D%3Arole%3Afact-rows f9f1d8 D%3Arole%3Afact-probe f9f1d8 D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Alesson bcefeb D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 04b8b3 D%3Ahost%3Arace 04b8b3 D%3Ahost%3Amap 04b8b3 D%3Ahost%3Amode-dark 04b8b3 D%3Ahost%3Amode-bigboard 04b8b3"}
 -->
 <!-- rulings
 {"v": 1, "card": "count-row",
@@ -12,6 +12,7 @@
 "todo": [
  {"id":"T-5.1","source":"§5.1","text":"The teacher builds the page's rows (Count-bys on the page): any of the tables 1-12 or a..."},
  {"id":"T-5.2","source":"§5.2","text":"(3) On a phone a count row stands on one line and swipes; it opens at the first answer ..."},
+ {"id":"T-5.3","source":"§5.3","text":"No owner sign-off of skill or lesson cards for the lessons-first program: lanes decide ..."},
  {"id":"T-9.1","source":"§9.1","text":"Sign the decisions in 7a as proposed (every count-row option offered, the number-line a..."},
  {"id":"T-9.2","source":"§9.2","text":"Precritic held critic r6 on three reds that are not count-row defects: (a) sibling-comp..."},
  {"id":"T-9.3","source":"§9.3","text":"Hide the word-problems, fact-rows and fact-probe page types for the three count-row ski..."},
@@ -134,6 +135,7 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 
 - **2026-10-02** — The teacher builds the page's rows (Count-bys on the page): any of the tables 1-12 or any typed step, each row with its own start and direction; it replaces the old Tables tick list (kept hidden so old links decode). (`owner via wave 1 lane C2 (skill-options.js CB_CHART_LINE_OPTIONS)`)
 - **2026-10-17** — (3) On a phone a count row stands on one line and swipes; it opens at the first answer box, focused. (`owner; WORKSHEET_DESIGN_STANDARD TY-10b`)
+- **2026-11-07** — No owner sign-off of skill or lesson cards for the lessons-first program: lanes decide the card lines from the standards and record them; the owner reviews finished work only. Scope: the CCSS BUILD lessons only. (The Signed line below records the lane's decision under this rule.) (`owner via lead session_01HVwpAE3g6EZH8idgErP6LP, 2026-11-07`)
 
 ## 6. Misconceptions
 
@@ -158,57 +160,57 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 
 **Option values (offeredOptionsFor)**
 
-- `rows=*` — **offered** (PROPOSED) on `count_by_tables` — the teacher builds the rows: any table 1-12 or typed step, own start and direction (owner 2026-10-02 (wave 1 C2))
-- `fill=two | one | half` — **offered** (PROPOSED) on `count_by_tables` — two shows the step (default); one is the older harder row; half prints half the numbers (owner (wave 1 lane C))
-- `missing=20 | 50 | 70 | 80 | 90 | 100` — **offered** (PROPOSED) on `count_by_tables` — how many of the rest are left blank (at least one always) (skill-options.js _cbPercent)
-- `times=none | each | given` — **offered** (PROPOSED) on `count_by_tables` — the fact under each number is a HINT: fades each -> given -> none; grey on Guided, dropped on Test / Review (skill-options.js; PEDAGOGY P-7)
-- `onePage=true | false` — **offered** (PROPOSED) on `count_by_tables` — every row once on one compact sheet at the smallest size (Independent, More practice, Test) (owner 2026-10-02 ("fit all 12 on one page"))
-- `jumps=12 | 15` — **offered** (PROPOSED) on `count_by_tables` — 12 numbers (two lines of 6) or 15 (three lines of 5); 15 fits fewer rows a page (Q2) (skill-options.js)
-- `order=inorder | mixed` — **offered** (PROPOSED) on `count_by_tables` — rows as listed or shuffled (skill-options.js)
-- `shape=box | circle | hex | mixed` — **offered** (PROPOSED) on `count_by_tables` — outline shapes of the writing places; shaped tracks wrap to two even rows (Q2) (owner (shapes.js))
-- `spaces=box | line` — **offered** (PROPOSED) on `count_by_tables` — lines fit more on a page; boxes show where to write (default) (owner 2026-10-03, an exception to SL-3 for count rows only)
-- `step=0 | 1 | 2` — **offered** (PROPOSED) on `skip_count_grid`, `skip_count_line` — which count: by 2s / 5s / 10s (skill-options.js _skipBy (Grade 2: 2s, 5s, 10s))
-- `band=null | 50 | 1000` — **offered** (PROPOSED) on `skip_count_line` — every number on the line, the answer too, is at most this (skill-options.js _o2RangeBand)
-- `nlOn=true | false` — **out of scope** (PROPOSED) — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent)
-- `nlFrom=*` — **out of scope** (PROPOSED) — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent)
-- `nlTo=*` — **out of scope** (PROPOSED) — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent)
-- `nlStep=1 | 2 | 5 | 10 | 20 | 25 | 50 | 100 | 1000 | auto | 1/2 | 1/3 | 1/4 | 1/5 | 1/6 | 1/8 | 1/10 | 1/12 | 0.1 | 0.01` — **out of scope** (PROPOSED) — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent)
-- `nlLabels=auto | all | 2 | 5 | 10 | ends | none` — **out of scope** (PROPOSED) — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent)
-- `nlMinor=auto | 0 | 2 | 4 | 5 | 10` — **out of scope** (PROPOSED) — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent)
-- `nlHops=true | false` — **out of scope** (PROPOSED) — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent)
-- `calculator=true | false` — **out of scope** (PROPOSED) — a universal play control (screen practice only), graded by the play / screen lanes (skill-options.js universal play controls)
-- `skipAfter=*` — **out of scope** (PROPOSED) — a universal play control (screen practice only), graded by the play / screen lanes (skill-options.js universal play controls)
+- `rows=*` — **offered** on `count_by_tables` — the teacher builds the rows: any table 1-12 or typed step, own start and direction (owner 2026-10-02 (wave 1 C2); lane decision 2026-11-07 (owner: no sign-off))
+- `fill=two | one | half` — **offered** on `count_by_tables` — two shows the step (default); one is the older harder row; half prints half the numbers (owner (wave 1 lane C); lane decision 2026-11-07 (owner: no sign-off))
+- `missing=20 | 50 | 70 | 80 | 90 | 100` — **offered** on `count_by_tables` — how many of the rest are left blank (at least one always) (skill-options.js _cbPercent; lane decision 2026-11-07 (owner: no sign-off))
+- `times=none | each | given` — **offered** on `count_by_tables` — the fact under each number is a HINT: fades each -> given -> none; grey on Guided, dropped on Test / Review (skill-options.js; PEDAGOGY P-7; lane decision 2026-11-07 (owner: no sign-off))
+- `onePage=true | false` — **offered** on `count_by_tables` — every row once on one compact sheet at the smallest size (Independent, More practice, Test) (owner 2026-10-02 ("fit all 12 on one page"); lane decision 2026-11-07 (owner: no sign-off))
+- `jumps=12 | 15` — **offered** on `count_by_tables` — 12 numbers (two lines of 6) or 15 (three lines of 5); 15 fits fewer rows a page (Q2) (skill-options.js; lane decision 2026-11-07 (owner: no sign-off))
+- `order=inorder | mixed` — **offered** on `count_by_tables` — rows as listed or shuffled (skill-options.js; lane decision 2026-11-07 (owner: no sign-off))
+- `shape=box | circle | hex | mixed` — **offered** on `count_by_tables` — outline shapes of the writing places; shaped tracks wrap to two even rows (Q2) (owner (shapes.js); lane decision 2026-11-07 (owner: no sign-off))
+- `spaces=box | line` — **offered** on `count_by_tables` — lines fit more on a page; boxes show where to write (default) (owner 2026-10-03, an exception to SL-3 for count rows only; lane decision 2026-11-07 (owner: no sign-off))
+- `step=0 | 1 | 2` — **offered** on `skip_count_grid`, `skip_count_line` — which count: by 2s / 5s / 10s (skill-options.js _skipBy (Grade 2: 2s, 5s, 10s); lane decision 2026-11-07 (owner: no sign-off))
+- `band=null | 50 | 1000` — **offered** on `skip_count_line` — every number on the line, the answer too, is at most this (skill-options.js _o2RangeBand; lane decision 2026-11-07 (owner: no sign-off))
+- `nlOn=true | false` — **out of scope** — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off))
+- `nlFrom=*` — **out of scope** — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off))
+- `nlTo=*` — **out of scope** — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off))
+- `nlStep=1 | 2 | 5 | 10 | 20 | 25 | 50 | 100 | 1000 | auto | 1/2 | 1/3 | 1/4 | 1/5 | 1/6 | 1/8 | 1/10 | 1/12 | 0.1 | 0.01` — **out of scope** — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off))
+- `nlLabels=auto | all | 2 | 5 | 10 | ends | none` — **out of scope** — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off))
+- `nlMinor=auto | 0 | 2 | 4 | 5 | 10` — **out of scope** — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off))
+- `nlHops=true | false` — **out of scope** — the universal reference number line beside a problem, graded by its own lane, not this card (skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off))
+- `calculator=true | false` — **out of scope** — a universal play control (screen practice only), graded by the play / screen lanes (skill-options.js universal play controls; lane decision 2026-11-07 (owner: no sign-off))
+- `skipAfter=*` — **out of scope** — a universal play control (screen practice only), graded by the play / screen lanes (skill-options.js universal play controls; lane decision 2026-11-07 (owner: no sign-off))
 
 **Page roles (buildSheet)**
 
-- `independent` — **offered** (PROPOSED) — the plain page (CLAUDE.md (any skill on any page type, every page with a key))
-- `more-practice` — **offered** (PROPOSED) — More Practice A-J (CLAUDE.md (any skill on any page type, every page with a key))
-- `opener` — **offered** (PROPOSED) — the lesson opener (CLAUDE.md (any skill on any page type, every page with a key))
-- `scripted-model` — **offered** (PROPOSED) — worked steps: real provider workedSteps (CLAUDE.md (any skill on any page type, every page with a key))
-- `guided` — **offered** (PROPOSED) — worked steps; the times hint grey (level 2) (CLAUDE.md (any skill on any page type, every page with a key))
-- `error-analysis` — **offered** (PROPOSED) — real provider wrongAnswer and misconceptions (M-C1..M-C4) (CLAUDE.md (any skill on any page type, every page with a key))
-- `review` — **offered** (PROPOSED) — earlier skills in data.js order; hints dropped (CLAUDE.md (any skill on any page type, every page with a key))
-- `test` — **offered** (PROPOSED) — Test A / B; hints dropped (P-7) (CLAUDE.md (any skill on any page type, every page with a key))
-- `pre-skill-check` — **offered** (PROPOSED) — earlier skills in data.js order (CLAUDE.md (any skill on any page type, every page with a key))
-- `word-problems` — **hidden** (PROPOSED) — a count row has no story; the word-problems page is not one of the page types CLAUDE.md lists for every skill (Q3) (lane proposal (Q3))
-- `fact-rows` — **hidden** (PROPOSED) — a count row is not a fact: the 5-10 column fact layouts are for fact and operations skills (CLAUDE.md) (Q3) (lane proposal (Q3))
-- `fact-probe` — **hidden** (PROPOSED) — as fact-rows: the fact probe is a fact layout (Q3) (lane proposal (Q3))
-- `mixed-practice` — **offered** (PROPOSED) — daily / mixed review: the count row as one shelf among the earlier skills (CLAUDE.md (any skill on any page type, every page with a key))
-- `true-false` — **offered** (PROPOSED) — real provider wrongAnswer (CLAUDE.md (any skill on any page type, every page with a key))
-- `reason-it` — **offered** (PROPOSED) — real provider workedSteps and wrongAnswer (CLAUDE.md (any skill on any page type, every page with a key))
-- `stretch` — **offered** (PROPOSED) — the skill own items (wide steps, counting back) (CLAUDE.md (any skill on any page type, every page with a key))
-- `lesson` — **offered** (PROPOSED) — lesson data: prereqs.js 3/3 (skip-count fix SC1/SC3: rows fit, key slots = pupil slots) (CLAUDE.md (any skill on any page type, every page with a key))
+- `independent` — **offered** — the plain page (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `more-practice` — **offered** — More Practice A-J (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `opener` — **offered** — the lesson opener (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `scripted-model` — **offered** — worked steps: real provider workedSteps (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `guided` — **offered** — worked steps; the times hint grey (level 2) (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `error-analysis` — **offered** — real provider wrongAnswer and misconceptions (M-C1..M-C4) (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `review` — **offered** — earlier skills in data.js order; hints dropped (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `test` — **offered** — Test A / B; hints dropped (P-7) (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `pre-skill-check` — **offered** — earlier skills in data.js order (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `word-problems` — **hidden** — a count row has no story; the word-problems page is not one of the page types CLAUDE.md lists for every skill (Q3) (lane proposal (Q3); lane decision 2026-11-07 (owner: no sign-off))
+- `fact-rows` — **hidden** — a count row is not a fact: the 5-10 column fact layouts are for fact and operations skills (CLAUDE.md) (Q3) (lane proposal (Q3); lane decision 2026-11-07 (owner: no sign-off))
+- `fact-probe` — **hidden** — as fact-rows: the fact probe is a fact layout (Q3) (lane proposal (Q3); lane decision 2026-11-07 (owner: no sign-off))
+- `mixed-practice` — **offered** — daily / mixed review: the count row as one shelf among the earlier skills (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `true-false` — **offered** — real provider wrongAnswer (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `reason-it` — **offered** — real provider workedSteps and wrongAnswer (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `stretch` — **offered** — the skill own items (wide steps, counting back) (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
+- `lesson` — **offered** — lesson data: prereqs.js 3/3 (skip-count fix SC1/SC3: rows fit, key slots = pupil slots) (CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off))
 
 **Screen hosts**
 
-- `practice-card` — **offered** (PROPOSED) — the practice card; on a phone the row swipes on one line and opens at the first box (TY-10b) (RUBRIC (every screen host); screen-cell.js)
-- `online-worksheet` — **offered** (PROPOSED) — the online worksheet (RUBRIC (every screen host); screen-cell.js)
-- `quiz` — **offered** (PROPOSED) — the quiz (RUBRIC (every screen host); screen-cell.js)
-- `boss` — **out of scope** (PROPOSED) — a game mode around the practice card; graded by ws-chromebook-fit (RUBRIC (every screen host); screen-cell.js)
-- `race` — **out of scope** (PROPOSED) — a game mode around the practice card; graded by ws-chromebook-fit (RUBRIC (every screen host); screen-cell.js)
-- `map` — **out of scope** (PROPOSED) — the skill map; graded by ws-screen-slots (RUBRIC (every screen host); screen-cell.js)
-- `mode-dark` — **out of scope** (PROPOSED) — a display mode of the screen hosts (RUBRIC (every screen host); screen-cell.js)
-- `mode-bigboard` — **out of scope** (PROPOSED) — a display mode of the screen hosts (RUBRIC (every screen host); screen-cell.js)
+- `practice-card` — **offered** — the practice card; on a phone the row swipes on one line and opens at the first box (TY-10b) (RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off))
+- `online-worksheet` — **offered** — the online worksheet (RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off))
+- `quiz` — **offered** — the quiz (RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off))
+- `boss` — **out of scope** — a game mode around the practice card; graded by ws-chromebook-fit (RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off))
+- `race` — **out of scope** — a game mode around the practice card; graded by ws-chromebook-fit (RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off))
+- `map` — **out of scope** — the skill map; graded by ws-screen-slots (RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off))
+- `mode-dark` — **out of scope** — a display mode of the screen hosts (RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off))
+- `mode-bigboard` — **out of scope** — a display mode of the screen hosts (RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off))
 
 ## 8. Gates
 
@@ -222,13 +224,13 @@ Each runs as `node tests/scripts/<script> …`.
 
 ## 9. Open questions (recommended answers)
 
-1. **Sign the decisions in 7a as proposed (every count-row option offered, the number-line and play controls out of scope, the boss / race / map / display modes out of scope)?** Recommended: Yes, all as proposed.
-2. **Precritic held critic r6 on three reds that are not count-row defects: (a) sibling-compare finds no approved count-row sibling (77 unproven counts); (b) options-verify --render: shape and 15-jump pages hold fewer rows than the default page; (c) --role lesson ratchet on placevalue:more_less_10 CL40-INK (also red on the integration branch). Rule: (a) this card is the first count-row drawing, so sibling-compare is SKIPPED-owner until it passes; (b) fewer rows is the expected cost of shaped tiles (two even lines) and of 15 numbers (three lines of 5), not a capacity defect, provided H13 holds on those pages; (c) not this lane's skill: the placevalue lane fixes it, the row is pinned meanwhile?** Recommended: Yes to (a), (b) and (c).
-3. **Hide the word-problems, fact-rows and fact-probe page types for the three count-row skills (a count row has no story and is not a fact)?** Recommended: Yes: the page-type list every skill must reach (CLAUDE.md) does not include them; daily / mixed review keeps the count row.
-4. **Answer spaces = Lines (owner 2026-10-03, an exception to SL-3) stays offered on count_by_tables only, default Boxes?** Recommended: Yes, as the owner asked.
-5. **Times labels (the multiplication fact under each number): a hint that fades each -> given -> none, grey on Guided, dropped on Test, Review and the pre-skill check. Keep?** Recommended: Yes (PEDAGOGY P-7).
-6. **I Can line: count_by_tables titles itself from its rows ("I can count by 3s", "I can count back by 5s from 60"); with the default rows (tables 2 to 12) it reads "I can count by 2s to 12s" (critic r5 SC6 flagged "count by 1 to 12"). Accept?** Recommended: Yes.
-7. **G1-Y2.B1 build entry count_row_end (an option on count_by_tables, links proposal only): the row ENDS at a given number (count by 2s to 20, 5s to 50, 10s to 100), as WRM Y2.B1.S15. Make it an option `endAt` (a number), a plain option (not a preset skill: it is a range tweak)?** Recommended: Yes: plain option, built in this lane after signing.
+1. **Sign the decisions in 7a as proposed (every count-row option offered, the number-line and play controls out of scope, the boss / race / map / display modes out of scope)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes, all as proposed.
+2. **Precritic held critic r6 on three reds that are not count-row defects: (a) sibling-compare finds no approved count-row sibling (77 unproven counts); (b) options-verify --render: shape and 15-jump pages hold fewer rows than the default page; (c) --role lesson ratchet on placevalue:more_less_10 CL40-INK (also red on the integration branch). Rule: (a) this card is the first count-row drawing, so sibling-compare is SKIPPED-owner until it passes; (b) fewer rows is the expected cost of shaped tiles (two even lines) and of 15 numbers (three lines of 5), not a capacity defect, provided H13 holds on those pages; (c) not this lane's skill: the placevalue lane fixes it, the row is pinned meanwhile? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes to (a), (b) and (c).
+3. **Hide the word-problems, fact-rows and fact-probe page types for the three count-row skills (a count row has no story and is not a fact)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes: the page-type list every skill must reach (CLAUDE.md) does not include them; daily / mixed review keeps the count row.
+4. **Answer spaces = Lines (owner 2026-10-03, an exception to SL-3) stays offered on count_by_tables only, default Boxes? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes, as the owner asked.
+5. **Times labels (the multiplication fact under each number): a hint that fades each -> given -> none, grey on Guided, dropped on Test, Review and the pre-skill check. Keep? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes (PEDAGOGY P-7).
+6. **I Can line: count_by_tables titles itself from its rows ("I can count by 3s", "I can count back by 5s from 60"); with the default rows (tables 2 to 12) it reads "I can count by 2s to 12s" (critic r5 SC6 flagged "count by 1 to 12"). Accept? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes.
+7. **G1-Y2.B1 build entry count_row_end (an option on count_by_tables, links proposal only): the row ENDS at a given number (count by 2s to 20, 5s to 50, 10s to 100), as WRM Y2.B1.S15. Make it an option `endAt` (a number), a plain option (not a preset skill: it is a range tweak)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes: plain option, built in this lane after signing.
 
 Signed: (not yet signed)
 
@@ -239,110 +241,110 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 
 **Option values (offeredOptionsFor)** (73 lines; 0 undecided)
 
-- `rows=*` Count-bys on the page [difficulty] (count_by_tables) [offered, PROPOSED]
-- `fill=two` Numbers printed to start [support], default (count_by_tables) [offered, PROPOSED]
-- `fill=one` Numbers printed to start [support] (count_by_tables) [offered, PROPOSED]
-- `fill=half` Numbers printed to start [support] (count_by_tables) [offered, PROPOSED]
-- `missing=20` Numbers left blank [support] (count_by_tables) [offered, PROPOSED]
-- `missing=50` Numbers left blank [support], default (count_by_tables) [offered, PROPOSED]
-- `missing=70` Numbers left blank [support] (count_by_tables) [offered, PROPOSED]
-- `missing=80` Numbers left blank [support] (count_by_tables) [offered, PROPOSED]
-- `missing=90` Numbers left blank [support] (count_by_tables) [offered, PROPOSED]
-- `missing=100` Numbers left blank [support] (count_by_tables) [offered, PROPOSED]
-- `times=none` Multiplication under each number [support], default (count_by_tables) [offered, PROPOSED]
-- `times=each` Multiplication under each number [support] (count_by_tables) [offered, PROPOSED]
-- `times=given` Multiplication under each number [support] (count_by_tables) [offered, PROPOSED]
-- `onePage=true` All rows on one page [layout] (count_by_tables) [offered, PROPOSED]
-- `onePage=false` All rows on one page [layout], default (count_by_tables) [offered, PROPOSED]
-- `jumps=12` Line runs to [more], default (count_by_tables) [offered, PROPOSED]
-- `jumps=15` Line runs to [more] (count_by_tables) [offered, PROPOSED]
-- `order=inorder` Order of the rows [more], default (count_by_tables) [offered, PROPOSED]
-- `order=mixed` Order of the rows [more] (count_by_tables) [offered, PROPOSED]
-- `shape=box` Box shape [more], default (count_by_tables) [offered, PROPOSED]
-- `shape=circle` Box shape [more] (count_by_tables) [offered, PROPOSED]
-- `shape=hex` Box shape [more] (count_by_tables) [offered, PROPOSED]
-- `shape=mixed` Box shape [more] (count_by_tables) [offered, PROPOSED]
-- `spaces=box` Answer spaces [more], default (count_by_tables) [offered, PROPOSED]
-- `spaces=line` Answer spaces [more] (count_by_tables) [offered, PROPOSED]
-- `nlOn=true` Show the number line [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlOn=false` Show the number line [nline], default (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlFrom=*` Starts at [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlTo=*` Ends at [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=2` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=5` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=10` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=20` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=25` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=50` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=100` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1000` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=auto` Step between ticks [nline], default (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1/2` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1/3` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1/4` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1/5` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1/6` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1/8` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1/10` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=1/12` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=0.1` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlStep=0.01` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlLabels=auto` Numbers under the ticks [nline], default (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlLabels=all` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlLabels=2` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlLabels=5` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlLabels=10` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlLabels=ends` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlLabels=none` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlMinor=auto` Small ticks between [nline], default (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlMinor=0` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlMinor=2` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlMinor=4` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlMinor=5` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlMinor=10` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlHops=true` Hop arrows over each step [nline] (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `nlHops=false` Hop arrows over each step [nline], default (count_by_tables, skip_count_line) [out of scope, PROPOSED]
-- `calculator=true` Calculator [play] (all 3) [out of scope, PROPOSED]
-- `calculator=false` Calculator [play], default (all 3) [out of scope, PROPOSED]
-- `skipAfter=*` Skip appears after [play] (all 3) [out of scope, PROPOSED]
-- `step=0` Count by [difficulty], default (skip_count_grid, skip_count_line) [offered, PROPOSED]
-- `step=1` Count by [difficulty], default (skip_count_grid, skip_count_line) [offered, PROPOSED]
-- `step=2` Count by [difficulty], default (skip_count_grid, skip_count_line) [offered, PROPOSED]
-- `band=null` Numbers to [difficulty], default (skip_count_line) [offered, PROPOSED]
-- `band=50` Numbers to [difficulty] (skip_count_line) [offered, PROPOSED]
-- `band=1000` Numbers to [difficulty] (skip_count_line) [offered, PROPOSED]
+- `rows=*` Count-bys on the page [difficulty] (count_by_tables) [offered]
+- `fill=two` Numbers printed to start [support], default (count_by_tables) [offered]
+- `fill=one` Numbers printed to start [support] (count_by_tables) [offered]
+- `fill=half` Numbers printed to start [support] (count_by_tables) [offered]
+- `missing=20` Numbers left blank [support] (count_by_tables) [offered]
+- `missing=50` Numbers left blank [support], default (count_by_tables) [offered]
+- `missing=70` Numbers left blank [support] (count_by_tables) [offered]
+- `missing=80` Numbers left blank [support] (count_by_tables) [offered]
+- `missing=90` Numbers left blank [support] (count_by_tables) [offered]
+- `missing=100` Numbers left blank [support] (count_by_tables) [offered]
+- `times=none` Multiplication under each number [support], default (count_by_tables) [offered]
+- `times=each` Multiplication under each number [support] (count_by_tables) [offered]
+- `times=given` Multiplication under each number [support] (count_by_tables) [offered]
+- `onePage=true` All rows on one page [layout] (count_by_tables) [offered]
+- `onePage=false` All rows on one page [layout], default (count_by_tables) [offered]
+- `jumps=12` Line runs to [more], default (count_by_tables) [offered]
+- `jumps=15` Line runs to [more] (count_by_tables) [offered]
+- `order=inorder` Order of the rows [more], default (count_by_tables) [offered]
+- `order=mixed` Order of the rows [more] (count_by_tables) [offered]
+- `shape=box` Box shape [more], default (count_by_tables) [offered]
+- `shape=circle` Box shape [more] (count_by_tables) [offered]
+- `shape=hex` Box shape [more] (count_by_tables) [offered]
+- `shape=mixed` Box shape [more] (count_by_tables) [offered]
+- `spaces=box` Answer spaces [more], default (count_by_tables) [offered]
+- `spaces=line` Answer spaces [more] (count_by_tables) [offered]
+- `nlOn=true` Show the number line [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlOn=false` Show the number line [nline], default (count_by_tables, skip_count_line) [out of scope]
+- `nlFrom=*` Starts at [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlTo=*` Ends at [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=2` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=5` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=10` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=20` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=25` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=50` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=100` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1000` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=auto` Step between ticks [nline], default (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1/2` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1/3` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1/4` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1/5` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1/6` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1/8` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1/10` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=1/12` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=0.1` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlStep=0.01` Step between ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlLabels=auto` Numbers under the ticks [nline], default (count_by_tables, skip_count_line) [out of scope]
+- `nlLabels=all` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlLabels=2` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlLabels=5` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlLabels=10` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlLabels=ends` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlLabels=none` Numbers under the ticks [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlMinor=auto` Small ticks between [nline], default (count_by_tables, skip_count_line) [out of scope]
+- `nlMinor=0` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlMinor=2` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlMinor=4` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlMinor=5` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlMinor=10` Small ticks between [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlHops=true` Hop arrows over each step [nline] (count_by_tables, skip_count_line) [out of scope]
+- `nlHops=false` Hop arrows over each step [nline], default (count_by_tables, skip_count_line) [out of scope]
+- `calculator=true` Calculator [play] (all 3) [out of scope]
+- `calculator=false` Calculator [play], default (all 3) [out of scope]
+- `skipAfter=*` Skip appears after [play] (all 3) [out of scope]
+- `step=0` Count by [difficulty], default (skip_count_grid, skip_count_line) [offered]
+- `step=1` Count by [difficulty], default (skip_count_grid, skip_count_line) [offered]
+- `step=2` Count by [difficulty], default (skip_count_grid, skip_count_line) [offered]
+- `band=null` Numbers to [difficulty], default (skip_count_line) [offered]
+- `band=50` Numbers to [difficulty] (skip_count_line) [offered]
+- `band=1000` Numbers to [difficulty] (skip_count_line) [offered]
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
-- `role:independent` — the skill's own items (all 3) [offered, PROPOSED]
-- `role:more-practice` — the skill's own items (all 3) [offered, PROPOSED]
-- `role:opener` (also lesson-opener) — the skill's own items (all 3) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 3/3 (all 3) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 3/3 (all 3) [offered, PROPOSED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 3/3; provider misconceptions: real 3/3 (all 3) [offered, PROPOSED]
-- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 3) [offered, PROPOSED]
-- `role:test` (also test-a, test-b) — the skill's own items (all 3) [offered, PROPOSED]
-- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 3) [offered, PROPOSED]
-- `role:word-problems` — provider stories: real 0/3 (default on count_by_tables, skip_count_grid, skip_count_line) (all 3) [hidden, PROPOSED]
-- `role:fact-rows` — provider stories: real 0/3 (default on count_by_tables, skip_count_grid, skip_count_line) (all 3) [hidden, PROPOSED]
-- `role:fact-probe` — the skill's own items (all 3) [hidden, PROPOSED]
-- `role:mixed-practice` (also mixed) — provider stories: real 0/3 (default on count_by_tables, skip_count_grid, skip_count_line) (all 3) [offered, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 3/3 (all 3) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 3/3; provider wrongAnswer: real 3/3 (all 3) [offered, PROPOSED]
-- `role:stretch` — the skill's own items (all 3) [offered, PROPOSED]
-- `role:lesson` — lesson data: prereqs.js 3/3; provider stories: real 0/3 (default on count_by_tables, skip_count_grid, skip_count_line) (all 3) [offered, PROPOSED]
+- `role:independent` — the skill's own items (all 3) [offered]
+- `role:more-practice` — the skill's own items (all 3) [offered]
+- `role:opener` (also lesson-opener) — the skill's own items (all 3) [offered]
+- `role:scripted-model` (also model) — provider workedSteps: real 3/3 (all 3) [offered]
+- `role:guided` — provider workedSteps: real 3/3 (all 3) [offered]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 3/3; provider misconceptions: real 3/3 (all 3) [offered]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 3) [offered]
+- `role:test` (also test-a, test-b) — the skill's own items (all 3) [offered]
+- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 3) [offered]
+- `role:word-problems` — provider stories: real 0/3 (default on count_by_tables, skip_count_grid, skip_count_line) (all 3) [hidden]
+- `role:fact-rows` — provider stories: real 0/3 (default on count_by_tables, skip_count_grid, skip_count_line) (all 3) [hidden]
+- `role:fact-probe` — the skill's own items (all 3) [hidden]
+- `role:mixed-practice` (also mixed) — provider stories: real 0/3 (default on count_by_tables, skip_count_grid, skip_count_line) (all 3) [offered]
+- `role:true-false` — provider wrongAnswer: real 3/3 (all 3) [offered]
+- `role:reason-it` (also reason) — provider workedSteps: real 3/3; provider wrongAnswer: real 3/3 (all 3) [offered]
+- `role:stretch` — the skill's own items (all 3) [offered]
+- `role:lesson` — lesson data: prereqs.js 3/3; provider stories: real 0/3 (default on count_by_tables, skip_count_grid, skip_count_line) (all 3) [offered]
 
 **Screen hosts** (8 lines; 0 undecided)
 
-- `host:boss` — driven by ws-chromebook-fit (all 3) [out of scope, PROPOSED]
-- `host:map` — driven by ws-screen-slots (all 3) [out of scope, PROPOSED]
-- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 3) [out of scope, PROPOSED]
-- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 3) [out of scope, PROPOSED]
-- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered, PROPOSED]
-- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered, PROPOSED]
-- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered, PROPOSED]
-- `host:race` — driven by ws-chromebook-fit (all 3) [out of scope, PROPOSED]
+- `host:boss` — driven by ws-chromebook-fit (all 3) [out of scope]
+- `host:map` — driven by ws-screen-slots (all 3) [out of scope]
+- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 3) [out of scope]
+- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 3) [out of scope]
+- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered]
+- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered]
+- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 3) [offered]
+- `host:race` — driven by ws-chromebook-fit (all 3) [out of scope]
 
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 

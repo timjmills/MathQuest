@@ -136,6 +136,11 @@
       "date": "2026-10-17",
       "ruling": "(3) On a phone a count row stands on one line and swipes; it opens at the first answer box, focused.",
       "source": "owner; WORKSHEET_DESIGN_STANDARD TY-10b"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "No owner sign-off of skill or lesson cards for the lessons-first program: lanes decide the card lines from the standards and record them; the owner reviews finished work only. Scope: the CCSS BUILD lessons only. (The Signed line below records the lane's decision under this rule.)",
+      "source": "owner via lead session_01HVwpAE3g6EZH8idgErP6LP, 2026-11-07"
     }
   ],
   "misconceptions": [
@@ -188,31 +193,31 @@
   ],
   "openQuestions": [
     {
-      "q": "Sign the decisions in 7a as proposed (every count-row option offered, the number-line and play controls out of scope, the boss / race / map / display modes out of scope)?",
+      "q": "Sign the decisions in 7a as proposed (every count-row option offered, the number-line and play controls out of scope, the boss / race / map / display modes out of scope)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes, all as proposed."
     },
     {
-      "q": "Precritic held critic r6 on three reds that are not count-row defects: (a) sibling-compare finds no approved count-row sibling (77 unproven counts); (b) options-verify --render: shape and 15-jump pages hold fewer rows than the default page; (c) --role lesson ratchet on placevalue:more_less_10 CL40-INK (also red on the integration branch). Rule: (a) this card is the first count-row drawing, so sibling-compare is SKIPPED-owner until it passes; (b) fewer rows is the expected cost of shaped tiles (two even lines) and of 15 numbers (three lines of 5), not a capacity defect, provided H13 holds on those pages; (c) not this lane's skill: the placevalue lane fixes it, the row is pinned meanwhile?",
+      "q": "Precritic held critic r6 on three reds that are not count-row defects: (a) sibling-compare finds no approved count-row sibling (77 unproven counts); (b) options-verify --render: shape and 15-jump pages hold fewer rows than the default page; (c) --role lesson ratchet on placevalue:more_less_10 CL40-INK (also red on the integration branch). Rule: (a) this card is the first count-row drawing, so sibling-compare is SKIPPED-owner until it passes; (b) fewer rows is the expected cost of shaped tiles (two even lines) and of 15 numbers (three lines of 5), not a capacity defect, provided H13 holds on those pages; (c) not this lane's skill: the placevalue lane fixes it, the row is pinned meanwhile? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes to (a), (b) and (c)."
     },
     {
-      "q": "Hide the word-problems, fact-rows and fact-probe page types for the three count-row skills (a count row has no story and is not a fact)?",
+      "q": "Hide the word-problems, fact-rows and fact-probe page types for the three count-row skills (a count row has no story and is not a fact)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes: the page-type list every skill must reach (CLAUDE.md) does not include them; daily / mixed review keeps the count row."
     },
     {
-      "q": "Answer spaces = Lines (owner 2026-10-03, an exception to SL-3) stays offered on count_by_tables only, default Boxes?",
+      "q": "Answer spaces = Lines (owner 2026-10-03, an exception to SL-3) stays offered on count_by_tables only, default Boxes? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes, as the owner asked."
     },
     {
-      "q": "Times labels (the multiplication fact under each number): a hint that fades each -> given -> none, grey on Guided, dropped on Test, Review and the pre-skill check. Keep?",
+      "q": "Times labels (the multiplication fact under each number): a hint that fades each -> given -> none, grey on Guided, dropped on Test, Review and the pre-skill check. Keep? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes (PEDAGOGY P-7)."
     },
     {
-      "q": "I Can line: count_by_tables titles itself from its rows (\"I can count by 3s\", \"I can count back by 5s from 60\"); with the default rows (tables 2 to 12) it reads \"I can count by 2s to 12s\" (critic r5 SC6 flagged \"count by 1 to 12\"). Accept?",
+      "q": "I Can line: count_by_tables titles itself from its rows (\"I can count by 3s\", \"I can count back by 5s from 60\"); with the default rows (tables 2 to 12) it reads \"I can count by 2s to 12s\" (critic r5 SC6 flagged \"count by 1 to 12\"). Accept? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes."
     },
     {
-      "q": "G1-Y2.B1 build entry count_row_end (an option on count_by_tables, links proposal only): the row ENDS at a given number (count by 2s to 20, 5s to 50, 10s to 100), as WRM Y2.B1.S15. Make it an option `endAt` (a number), a plain option (not a preset skill: it is a range tweak)?",
+      "q": "G1-Y2.B1 build entry count_row_end (an option on count_by_tables, links proposal only): the row ENDS at a given number (count by 2s to 20, 5s to 50, 10s to 100), as WRM Y2.B1.S15. Make it an option `endAt` (a number), a plain option (not a preset skill: it is a range tweak)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**",
       "recommended": "Yes: plain option, built in this lane after signing."
     }
   ],
@@ -224,8 +229,7 @@
           "*"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "owner 2026-10-02 (wave 1 C2)",
+        "source": "owner 2026-10-02 (wave 1 C2); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the teacher builds the rows: any table 1-12 or typed step, own start and direction",
         "skills": [
           "multiplication:count_by_tables"
@@ -239,8 +243,7 @@
           "half"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "owner (wave 1 lane C)",
+        "source": "owner (wave 1 lane C); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "two shows the step (default); one is the older harder row; half prints half the numbers",
         "skills": [
           "multiplication:count_by_tables"
@@ -257,8 +260,7 @@
           "100"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js _cbPercent",
+        "source": "skill-options.js _cbPercent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "how many of the rest are left blank (at least one always)",
         "skills": [
           "multiplication:count_by_tables"
@@ -272,8 +274,7 @@
           "given"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js; PEDAGOGY P-7",
+        "source": "skill-options.js; PEDAGOGY P-7; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the fact under each number is a HINT: fades each -> given -> none; grey on Guided, dropped on Test / Review",
         "skills": [
           "multiplication:count_by_tables"
@@ -286,8 +287,7 @@
           "false"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "owner 2026-10-02 (\"fit all 12 on one page\")",
+        "source": "owner 2026-10-02 (\"fit all 12 on one page\"); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "every row once on one compact sheet at the smallest size (Independent, More practice, Test)",
         "skills": [
           "multiplication:count_by_tables"
@@ -300,8 +300,7 @@
           "15"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "12 numbers (two lines of 6) or 15 (three lines of 5); 15 fits fewer rows a page (Q2)",
         "skills": [
           "multiplication:count_by_tables"
@@ -314,8 +313,7 @@
           "mixed"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "rows as listed or shuffled",
         "skills": [
           "multiplication:count_by_tables"
@@ -330,8 +328,7 @@
           "mixed"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "owner (shapes.js)",
+        "source": "owner (shapes.js); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "outline shapes of the writing places; shaped tracks wrap to two even rows (Q2)",
         "skills": [
           "multiplication:count_by_tables"
@@ -344,8 +341,7 @@
           "line"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "owner 2026-10-03, an exception to SL-3 for count rows only",
+        "source": "owner 2026-10-03, an exception to SL-3 for count rows only; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "lines fit more on a page; boxes show where to write (default)",
         "skills": [
           "multiplication:count_by_tables"
@@ -359,8 +355,7 @@
           "2"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js _skipBy (Grade 2: 2s, 5s, 10s)",
+        "source": "skill-options.js _skipBy (Grade 2: 2s, 5s, 10s); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "which count: by 2s / 5s / 10s",
         "skills": [
           "patterns:skip_count_grid",
@@ -375,8 +370,7 @@
           "1000"
         ],
         "d": "offered",
-        "proposed": true,
-        "source": "skill-options.js _o2RangeBand",
+        "source": "skill-options.js _o2RangeBand; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "every number on the line, the answer too, is at most this",
         "skills": [
           "patterns:skip_count_line"
@@ -389,8 +383,7 @@
           "false"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line beside a problem, graded by its own lane, not this card"
       },
       {
@@ -399,8 +392,7 @@
           "*"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line beside a problem, graded by its own lane, not this card"
       },
       {
@@ -409,8 +401,7 @@
           "*"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line beside a problem, graded by its own lane, not this card"
       },
       {
@@ -438,8 +429,7 @@
           "0.01"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line beside a problem, graded by its own lane, not this card"
       },
       {
@@ -454,8 +444,7 @@
           "none"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line beside a problem, graded by its own lane, not this card"
       },
       {
@@ -469,8 +458,7 @@
           "10"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line beside a problem, graded by its own lane, not this card"
       },
       {
@@ -480,8 +468,7 @@
           "false"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js number-line controls; facts / subtraction card precedent",
+        "source": "skill-options.js number-line controls; facts / subtraction card precedent; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the universal reference number line beside a problem, graded by its own lane, not this card"
       },
       {
@@ -491,8 +478,7 @@
           "false"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js universal play controls",
+        "source": "skill-options.js universal play controls; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a universal play control (screen practice only), graded by the play / screen lanes"
       },
       {
@@ -501,8 +487,7 @@
           "*"
         ],
         "d": "out of scope",
-        "proposed": true,
-        "source": "skill-options.js universal play controls",
+        "source": "skill-options.js universal play controls; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a universal play control (screen practice only), graded by the play / screen lanes"
       }
     ],
@@ -510,120 +495,103 @@
       {
         "key": "independent",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the plain page"
       },
       {
         "key": "more-practice",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "More Practice A-J"
       },
       {
         "key": "opener",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the lesson opener"
       },
       {
         "key": "scripted-model",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "worked steps: real provider workedSteps"
       },
       {
         "key": "guided",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "worked steps; the times hint grey (level 2)"
       },
       {
         "key": "error-analysis",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "real provider wrongAnswer and misconceptions (M-C1..M-C4)"
       },
       {
         "key": "review",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "earlier skills in data.js order; hints dropped"
       },
       {
         "key": "test",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "Test A / B; hints dropped (P-7)"
       },
       {
         "key": "pre-skill-check",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "earlier skills in data.js order"
       },
       {
         "key": "word-problems",
         "d": "hidden",
-        "proposed": true,
-        "source": "lane proposal (Q3)",
+        "source": "lane proposal (Q3); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a count row has no story; the word-problems page is not one of the page types CLAUDE.md lists for every skill (Q3)"
       },
       {
         "key": "fact-rows",
         "d": "hidden",
-        "proposed": true,
-        "source": "lane proposal (Q3)",
+        "source": "lane proposal (Q3); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a count row is not a fact: the 5-10 column fact layouts are for fact and operations skills (CLAUDE.md) (Q3)"
       },
       {
         "key": "fact-probe",
         "d": "hidden",
-        "proposed": true,
-        "source": "lane proposal (Q3)",
+        "source": "lane proposal (Q3); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "as fact-rows: the fact probe is a fact layout (Q3)"
       },
       {
         "key": "mixed-practice",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "daily / mixed review: the count row as one shelf among the earlier skills"
       },
       {
         "key": "true-false",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "real provider wrongAnswer"
       },
       {
         "key": "reason-it",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "real provider workedSteps and wrongAnswer"
       },
       {
         "key": "stretch",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the skill own items (wide steps, counting back)"
       },
       {
         "key": "lesson",
         "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
         "why": "lesson data: prereqs.js 3/3 (skip-count fix SC1/SC3: rows fit, key slots = pupil slots)"
       }
     ],
@@ -631,57 +599,49 @@
       {
         "key": "practice-card",
         "d": "offered",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the practice card; on a phone the row swipes on one line and opens at the first box (TY-10b)"
       },
       {
         "key": "online-worksheet",
         "d": "offered",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the online worksheet"
       },
       {
         "key": "quiz",
         "d": "offered",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the quiz"
       },
       {
         "key": "boss",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a game mode around the practice card; graded by ws-chromebook-fit"
       },
       {
         "key": "race",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a game mode around the practice card; graded by ws-chromebook-fit"
       },
       {
         "key": "map",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "the skill map; graded by ws-screen-slots"
       },
       {
         "key": "mode-dark",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a display mode of the screen hosts"
       },
       {
         "key": "mode-bigboard",
         "d": "out of scope",
-        "proposed": true,
-        "source": "RUBRIC (every screen host); screen-cell.js",
+        "source": "RUBRIC (every screen host); screen-cell.js; lane decision 2026-11-07 (owner: no sign-off)",
         "why": "a display mode of the screen hosts"
       }
     ]
