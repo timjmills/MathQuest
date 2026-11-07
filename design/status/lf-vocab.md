@@ -3,33 +3,37 @@ Title: Vocabulary redesign (Match 3 pictures, 1 picture 3 words, lesson vocabula
 Session: session_013pHDnPdbZEh2qA1Sgch4GR
 Branch: claude/sweet-newton-c8wrv1-lf-vocab
 Owner of files: sheet/graphics/vocab-pictures.js, sheet/cells/vocab-*.js, sheet/lesson-pages/vocab-*.js, sheet/providers/vocabulary.js, gen-vocabulary.js picture branch, design/cards/vocabulary/, design/lanes/lf-vocab/, tests/scripts/ws-vocab-unit.mjs
-State: fix (round 3 builder done; precritic r4 below)
+State: fix
 Updated: 2026-11-07
-Builder profile: mq-opus-medium (round 3: a fresh builder, rule 5 rebrief)
-Critic rounds: 2, FAIL min 7 (r1 FAIL min 1)
+Builder profile: mq-opus-medium
+Critic rounds: 2, FAIL min 7 (r1 FAIL min 1); r3 not run (a red page, below)
 
 ## Now
-- Round 3 (fresh builder, rule 5): the five survivors each have a machine check in ws-vocab-unit that FAILED on the r2 tree and
-  passes now (V8 picture extent and text floor, V9 printed text / box / dot floors by grade and host, V10 footer tags, V11
-  score per word, plus the guided-row equality measured on the render); three of the other r2 defects got checks too (V12 hint
-  names a cue, V13 error-analysis wrong word is a misspelling / look-alike). See "Round 3" below.
-- Stopped under rule 5: five defects survived two critic rounds at medium (r1 #6, #13, #14, #17, #18). Their root causes and the checks to write are listed below. The lead decides the next builder.
-- Critic r2: FAIL, min 7, no hard cap; every failed score is a 7, so a Q-S2 near-miss re-check is allowed. These groups score >= 8: Match 3 independent, more-practice, test, error analysis, card-390/820/1280, quiz-1280; picture task independent, more-practice, test, all three cards; the grade-3 page.
-- Precritic r3 --strict: 1 FAIL / 23 PASS (2 on the baseline) / 3 N/A / 2 skipped of 29. The one FAIL is ws-sibling-compare: a new family has no approved sibling, so its 28 page-balance counts (mixed-section rows) read "unproven".
-- Card signed by the owner on 2026-11-07 (commit 7293673d); --check-signed OK.
+- Round 3 (fresh builder, rule 5; commits da010953 merge of master, 3d9939d8, cac85155, 43da709a): the five survivors each have
+  a ws-vocab-unit check that FAILED on the r2 tree and passes now (V8 picture extent and text floor, V9 printed text / box / dot
+  floors by grade and host, V10 footer tags, V11 score per word; guided rows equal on the render: 374 / 375 px), plus V12 / V13.
+- Precritic r5 --strict: 3 FAIL / 21 PASS (2 baseline). coverage-matrix and slot-clip fail ONLY on single/layout-fact-rows rows:
+  "Cannot access 'opEm' before initialization" - master's js/modules/sheet/roles/fact-rows.js (facts print r8, cdaa80fc) uses
+  `opEm` at line 641 before its `const` at 654; every non-fact skill routed through fact-rows hits it (facts lane to fix).
+  sibling-compare: first family on the template (lead's process rule: SKIPPED, critic grades the pages).
+- BLOCKER found by the lane's r3 render (not on precritic's path): vocab_grade_pictures (Match 3) GUIDED at S overflows (4 rows,
+  cells 3-4 a few mm over; the guided cells measure 40.4 mm but draw taller). A smaller guided picture did not fix it (reverted).
+  So no critic r3 (rule 0b). The round's $60 cap is about spent.
+- Still open from r2: Match 3 worksheet-1280 words wrap 2 + 1 (#7); pilot lesson Name-the-picture cells oversize (#6);
+  grow / sequence look-alike (#3: set 7 needs grow redrawn or an owner call on its words).
+
+## Owner rulings (2026-11-07, via the lead)
+- Q-A additive footer hook: built (sheet/sheet-tags.js; items carry q.sheetTags; an item without it changes nothing).
+- Q-B Letter at L, grades 2-3: 4 a page (A4 stays 6). Recorded; no gate measures Letter capacity, so no pin.
+- Q-C score per word: Match 3 page /12 (template footprint `points`, paginate.js scorePoints).
+- Q1 role:lesson out of scope for the two skills; Q2 4 / 6 / 8 a page (pinned in options-render.pins.json).
 
 ## Owner go
-- 2026-11-07 (via the lead) Q-A: an ADDITIVE footer hook may print the dealt word set's grade and CCSS. Built:
-  sheet/sheet-tags.js applySheetTags (items carry q.sheetTags; print-sheet skillMeta reads it; an item without it changes nothing).
-- 2026-11-07 Q-B: on US Letter at size L, grades 2-3 print 4 picture items a page (A4 stays 6). RECORDED here: no gate measures
-  Letter capacity (ws-options-verify --render measures A4 only), so there is no pin to add.
-- 2026-11-07 Q-C: score per WORD: a Match 3 page of 4 cells scores /12. Built: template footprint `points` (vocab-match3: 3),
-  paginate.js scorePoints, read by the practice roles and test.js (every other template scores 1, as before).
 
 ## Open questions
-- Q-A. Footer grade (r1 #14, r2 #1): the footer prints the SKILL's tags (grade-3 pool: 3.OA.D.9) on grade 1, 2 and 4 pages. Suggested: the page footer reads the dealt word set's grade and CCSS (vocab-words.js VOCAB_SETS[i].ccss). This needs a hook in print-sheet's footer (shared) or per-option standards. Lead's call: which lane builds it?
-- Q-B. Letter paper at L: grades 2-3 print 4 a page, not 6 (A4 gives 6 at S/M/L). Suggested: accept for Letter (the school prints A4), or let the picture shrink to 34 mm on Letter only.
-- Q-C. Match 3 score "/4" on a page of 12 letter boxes (r1 #18): the score counts items. Suggested: keep items as the score unit (owner's sample pages score problems, not boxes), or have the engine score boxes for this template.
+- Lead: who fixes master's fact-rows.js `opEm` order (facts lane)? Suggested: the facts lane, one line (move the `const opEm` above line 641).
+- Lead: add guided / more-practice / error-analysis to precritic's render gate (LESSONS_LEARNED lf-vocab, last row)? Suggested: yes, the roles the card offers.
+- Owner: set 7 (Extend growing shape patterns) keeps grow with sequence, or grow is redrawn so it cannot read as a sequence? Suggested: redraw grow.
 
 ## Round 3 (fresh builder, 2026-11-07)
 | Survivor | Check (ws-vocab-unit) | Before (r2 tree) | After | Fix |
