@@ -31,7 +31,8 @@ export function readDecisions(md) {
         const m = /^- `([^`]+)` — \*\*(offered|hidden|out of scope)\*\*(?: on ((?:`[^`]+`(?:, )?)+))?/.exec(line);
         if (!m || !group) continue;
         const on = m[3] ? [...m[3].matchAll(/`([^`]+)`/g)].map((x) => x[1]) : null;
-        out.push({ group, key: m[1], decision: m[2], on });
+        // (some cards write their role and host keys `role:independent`, `host:quiz`)
+        out.push({ group, key: group === 'roles' ? m[1].replace(/^role:/, '') : group === 'hosts' ? m[1].replace(/^host:/, '') : m[1], decision: m[2], on });
     }
     return out;
 }
