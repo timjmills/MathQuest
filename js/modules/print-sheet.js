@@ -4808,7 +4808,7 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (grp) grp.set(ref.pageGroup, (grp.get(ref.pageGroup) || []).concat([key]));
         return { q, v, key };
     }
-    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')})${ref.gridFresh ? ' windows: ' + [...used].filter((u) => /^grid/.test(u)).join(' ') : ''}`);
+    throw new Error(`detailed lesson: no ${ref.skillId} item for "${want || 'any'}" (turned away: ${Object.entries(why).filter((e) => e[1]).map((e) => e.join(' ')).join(', ')})${ref.gridFresh ? ' windows: ' + [...used].filter((u) => /^grid/.test(u)).join(' ') : ''} DBGUSED ${[...used].join(' ')}`);
 }
 
 /**
