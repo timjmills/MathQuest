@@ -834,6 +834,9 @@ export const SKILL_STANDARDS = {
     'number_theory:missing_multiples': { ccss: ['4.OA.B.4'], ee: ['M.EE.4.OA.4'] }, // Fill In the Missing Multiples
     'number_theory:common_factors': { ccss: ['6.NS.B.4', '4.OA.B.4'], ee: [] }, // Find Every Common Factor
     'number_theory:common_multiples': { ccss: ['6.NS.B.4', '4.OA.B.4'], ee: [] }, // Find Every Common Multiple
+    'patterns:notice_patterns': { ccss: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'] }, // What Do You Notice? Even and Odd Products, Pattern Features
+    'patterns:growing_shape_patterns': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Growing Shape Patterns: Draw and Count the Next Term
+    'patterns:pattern_features': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Features of a Number Pattern: Odd, Even and Ones Digits
 };
 
 /* ================================================================= lookup */

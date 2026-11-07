@@ -613,14 +613,17 @@ export const STANDARD_PROPOSALS = {
     }),
 
     // ------------------------------------------------------------------ algebra / patterns
-    patterns_notice: P({
-        kind: 'new', skill: 'patterns:notice_patterns', name: 'What Do You Notice?', grade: '3-4', family: 'algebra',
-        standards: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'],
-        teaches: 'identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)',
-        problemTypes: ['shade the pattern in the table, tick what you notice', 'true or false: every product in the 5 row ends in 0 or 5', 'generate the terms, then say what alternates', 'why is 4 × n always even? (reason bank)', 'predict the 10th term'],
-        templates: ['mult-grid', 'count-row'], newTemplates: [], answer: 'tick statements from a bank; write terms',
-        ladder: 'O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track',
-        misconceptions: ['a pattern seen in three terms always continues', 'odd × odd is even'], wrmSteps: ['Y3.B3.S13', 'Y4.B4.S15'], after: [],
+    // patterns_notice: BUILT by lane lf-algebra 2026-11-07 (patterns:notice_patterns, preset patterns:pattern_features)
+    // lf-algebra 2026-11-07: the clause of 3.OA.D.9 notice_patterns leaves (patterns in the ADDITION table)
+    addition_table_patterns: P({
+        kind: 'option', preset: true, skill: 'patterns:notice_patterns', option: "patTask 'addtable': a window of the addition table; circle what you notice (each row goes up by 1; the sums on a diagonal are equal; even + even is even)",
+        name: 'Patterns in the Addition Table', grade: '3', family: 'algebra',
+        standards: ['3.OA.D.9'], ee: ['M.EE.3.OA.8'],
+        teaches: 'identifying arithmetic patterns in the addition table and explaining them with properties (the turn-around: the table is the same on both sides of its diagonal; odd + odd is even)',
+        problemTypes: ['a window of the addition table: true or false about it', 'odd + odd: even or odd?', 'which sums on the diagonal are equal?'],
+        templates: ['notice'], newTemplates: [], answer: 'circle a word; check one sentence',
+        ladder: 'O2 sums to 10 -> to 20 · O3 window shaded -> none · O6 table / plain',
+        misconceptions: ['odd + odd is odd', 'a row pattern read off two cells'], wrmSteps: [], after: [],
     }),
     multi_step_four_ops: P({
         kind: 'option', preset: false, skill: 'algebra:multi_step_word', also: ['algebra:multi_step_word_plain'], option: 'two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate',

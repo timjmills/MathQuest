@@ -142,6 +142,12 @@ import './cells/frac-wall.js';
 // "Is it a fact family?" (visual-quality lane 2026-10-31): the fact triangle and a circled Yes / No.
 import './cells/family-check.js';
 export { FAMILY_CHECK } from './cells/family-check.js';
+// ---- lane lf-algebra (2026-11-07), APPEND ONLY: patterns:notice_patterns and patterns:growing_shape_patterns.
+import './cells/notice.js';
+import './cells/growing-pattern.js';
+export { noticeStatements, NOTICE_TEMPLATE } from './cells/notice.js';
+export { growthCells, growCount, GROW_TEMPLATE } from './cells/growing-pattern.js';
+// ---- end lf-algebra
 // The graphic library (design/GRAPHIC_LIBRARY.md): one drawing per representation, paper and screen.
 export * as graphics from './graphics/index.js';
 // Every whole-number word problem (owner ruling 2026-09-25): story, sign row, column boxes, answer + unit bank.

@@ -408,6 +408,97 @@ export const LESSONS = Object.freeze({
         // 100, which comes after, and never two "Number Sense" sections).
         mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
     },
+
+    // ---- lane lf-algebra (2026-11-07), APPEND ONLY: What Do You Notice? (3.OA.D.9) and its pattern preset, Growing Shape
+    // Patterns (4.OA.C.5). Four steps each, as many as the provider's worked steps of the example (patterns.js).
+    'patterns:notice_patterns': {
+        skills: [
+            { key: 'composing:odd_even', why: 'Tell if a number is odd or even: pairs with none left over.' },
+            { key: 'multiplication:mult_facts', why: 'The facts whose products we test.' },
+        ],
+        concepts: [
+            { id: 'even-groups', text: 'An even number is two equal groups.' },
+            { id: 'even-factor', text: 'One even number in the fact makes the product even.' },
+            { id: 'odd-odd', text: 'Odd times odd is odd.' },
+        ],
+        vocab: [
+            { word: 'product', meaning: 'the answer to a times fact', picture: { kind: 'text', text: '6 × 7 = 42' } },
+            { word: 'even', meaning: 'two equal groups: ends in 0, 2, 4, 6 or 8', picture: { kind: 'text', text: '2, 4, 6, 8' } },
+            { word: 'odd', meaning: 'one left over: ends in 1, 3, 5, 7 or 9', picture: { kind: 'text', text: '1, 3, 5, 7' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Look at the first number.' },
+            { icon: 'look', text: 'Look at the second number.' },
+            { icon: 'decide', text: 'One even number? Even.' },
+            { icon: 'check', text: 'Circle Even or Odd.' },
+        ],
+        chant: 'Even times any number is even. Odd times odd is odd.',
+        format: {
+            kind: 'numbered steps with icons + a rule chant',
+            why: 'The whole lesson is one rule about the factors; saying it as a rhythm is what pupils keep when the hint words are gone.',
+        },
+        example: { match: 'Circle' },
+        mixWith: [{ key: 'composing:odd_even' }, { key: 'multiplication:mult_facts' }],
+    },
+    'patterns:pattern_features': {
+        skills: [
+            { key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] }, why: 'Continue a pattern from its rule.' },
+            { key: 'composing:odd_even', why: 'Tell if a number is odd or even.' },
+        ],
+        concepts: [
+            { id: 'rule', text: 'The rule makes every number of the pattern.' },
+            { id: 'every', text: 'A sentence about a pattern must be true for every number.' },
+            { id: 'ones', text: 'The ones digit can repeat.' },
+        ],
+        vocab: [
+            { word: 'pattern', meaning: 'numbers made by a rule', picture: { kind: 'text', text: '5, 10, 15, 20' } },
+            { word: 'rule', meaning: 'what to do each time', picture: { kind: 'text', text: 'add 5' } },
+            { word: 'ones digit', meaning: 'the last digit', picture: { kind: 'text', text: '1(5)' } },
+        ],
+        steps: [
+            { icon: 'start', text: 'Read the rule. Write the numbers.' },
+            { icon: 'check', text: 'Test a sentence.' },
+            { icon: 'check', text: 'Test the next one.' },
+            { icon: 'decide', text: 'Check the true one.' },
+        ],
+        chant: 'True for every number, not just the first.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'The error the lesson fights is reading a pattern off the first numbers; the chant names it.',
+        },
+        example: { match: 'Check it' },
+        mixWith: [{ key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] } }, { key: 'composing:odd_even' }],
+    },
+    'patterns:growing_shape_patterns': {
+        skills: [
+            { key: 'patterns:shape_pattern', why: 'Continue a pattern of shapes.' },
+            { key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] }, why: 'The counts grow by the same number each time.' },
+        ],
+        concepts: [
+            { id: 'term', text: 'Each picture in the pattern is a term.' },
+            { id: 'more', text: 'Each term has the same number more than the one before.' },
+            { id: 'count', text: 'Count each term and write the number.' },
+        ],
+        vocab: [
+            { word: 'term', meaning: 'one picture of the pattern', picture: { kind: 'text', text: 'Term 1, Term 2' } },
+            { word: 'rule', meaning: 'how many more each time', picture: { kind: 'text', text: '+ 2' } },
+            { word: 'grow', meaning: 'get bigger by the rule', picture: { kind: 'text', text: '3, 5, 7' } },
+        ],
+        steps: [
+            { icon: 'count', text: 'Count each term.' },
+            { icon: 'look', text: 'Find how many more.' },
+            { icon: 'start', text: 'Draw Term 4.' },
+            { icon: 'write', text: 'Write how many.' },
+        ],
+        chant: 'Count, find the more, draw, write.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Four actions in a fixed order; the chant is the order.',
+        },
+        example: { match: 'Write' },
+        mixWith: [{ key: 'patterns:shape_pattern' }, { key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] } }],
+    },
+    // ---- end lf-algebra
 });
 
 /** The lesson data of a skill, or null (a skill with no authored lesson yet). */

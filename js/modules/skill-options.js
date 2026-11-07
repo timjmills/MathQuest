@@ -3843,6 +3843,72 @@ export function numberLineSummary(cur = {}, spec = null) {
     return `On · ${ends} · steps ${st}`;
 }
 
+// ===========================================================================
+// lane lf-algebra (2026-11-07) · APPEND ONLY · patterns:notice_patterns, patterns:growing_shape_patterns
+// ===========================================================================
+// Read by js/modules/gen-patterns-notice.js. Keys (skill-option-keys.js, sub-range 4P-4Z): patTask 4U, patShow 4V,
+// growShape 4W; `band` is the shared one-letter B. The preset patterns:pattern_features opens notice_patterns with
+// patTask 'feature' (skill-presets.js). Card: design/cards/patterns/patterns.md.
+const LF_ALGEBRA_OPTIONS = {
+    'patterns:notice_patterns': [
+        {
+            id: 'patTask', label: 'Task', type: 'enum', default: 'parity', group: 'difficulty',
+            values: [
+                { v: 'parity', l: 'Even or odd product (6 × 7: circle Even or Odd)' },
+                { v: 'feature', l: 'What a number pattern shows (start 5, add 5: check the true sentence)' },
+                { v: 'truefalse', l: 'True or false about a times-table (every product in the 5s ends in 0 or 5)' },
+            ],
+            helpShort: 'One task a page. Each has one answer: a circled word or one checked sentence.',
+            help: 'One task a page, so the instruction says one thing. Even or odd: a multiplication fact, the pupil circles whether the product is even or odd '
+                + '(half the products are odd). Pattern: a rule and its first numbers; three sentences, exactly one true. True or false: one sentence about one times-table.',
+        },
+        {
+            id: 'band', label: 'Numbers to', type: 'enum', default: 100, group: 'difficulty',
+            values: [
+                { v: 25, l: '25 (tables to 5 × 5)' }, { v: 50, l: '50 (the 2 to 5 tables)' },
+                { v: 100, l: '100 (tables to 10 × 10)' }, { v: 144, l: '144 (tables to 12 × 12)' },
+            ],
+            help: 'The biggest product, or the biggest number in a pattern. Even or odd at 25 uses factors 2 to 5; at 100 factors 2 to 10; at 144 factors 2 to 12.',
+        },
+        {
+            id: 'patShow', label: 'Show the working', type: 'bool', default: true, group: 'support',
+            helpShort: 'On: even / odd under each factor, the pattern\'s numbers, the times-table row. Off: the pupil works them out.',
+            help: 'A hint that fades. Even or odd: the word even or odd under each number of the fact. Pattern: the first six numbers printed '
+                + '(off: the first number only and five boxes to fill). True or false: the row of products printed under the sentence (off: the sentence alone).',
+        },
+    ],
+    'patterns:growing_shape_patterns': [
+        {
+            id: 'patTask', label: 'Task', type: 'enum', default: 'next', group: 'difficulty',
+            values: [
+                { v: 'next', l: 'Draw Term 4 and write how many it has' },
+                { v: 'rule', l: 'Term 4 and the rule (+ 2)' },
+                { v: 'far', l: 'How many Term 10 has (find the rule first)' },
+            ],
+            helpShort: 'Draw the next term and count it; then also write the rule; then jump to Term 10.',
+            help: 'Terms 1, 2 and 3 are drawn; the box for Term 4 is empty for the pupil to draw in (working, not marked). '
+                + 'The answer is a number: how many Term 4 has, plus the rule on the second task, or how many Term 10 has on the third.',
+        },
+        {
+            id: 'band', label: 'Answers to', type: 'enum', default: 20, group: 'difficulty',
+            values: [{ v: 10, l: '10 (grows by 1, 2 or 3)' }, { v: 20, l: '20' }, { v: 50, l: '50 (for Term 10)' }],
+            help: 'The biggest answer: the number in Term 4, or in Term 10 on the Term 10 task.',
+        },
+        {
+            id: 'patShow', label: 'Counts of Terms 1 to 3', type: 'bool', default: true, group: 'support',
+            helpShort: 'On: the number under Terms 1, 2 and 3 is printed. Off: the pupil counts and writes them.',
+            help: 'A hint that fades. On, the count under each drawn term is printed, so the pupil sees the numbers grow. Off, those boxes are empty for the pupil to count and fill (working, not marked).',
+        },
+        {
+            id: 'growShape', label: 'Picture', type: 'enum', default: 'dots', group: 'appearance',
+            values: [{ v: 'dots', l: 'Dots' }, { v: 'squares', l: 'Squares' }, { v: 'mixed', l: 'Dots and squares, mixed' }],
+            help: 'What each term is made of. Black outlines only.',
+        },
+    ],
+};
+Object.assign(SKILL_OPTIONS, LF_ALGEBRA_OPTIONS);
+// ---- end lf-algebra
+
 /** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
     const pre = _presetDefs(categoryId, skillId, optionsFor);

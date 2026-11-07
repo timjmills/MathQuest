@@ -372,6 +372,9 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-10-31 facts card Q4 preset (division facts, long-division form). ZF, the next free code after ZE (NOT the
     // auto assigner's VH, a dropped draft). APPEND ONLY. ----
     "division:div_facts_long": "ZF",
+    "patterns:notice_patterns": "ZW",
+    "patterns:growing_shape_patterns": "ZX",
+    "patterns:pattern_features": "ZY",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
