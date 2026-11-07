@@ -123,6 +123,18 @@
    "template": "arrays",
    "proof": "lead ruling 2026-11-07 (session_01HVwpAE3g6EZH8idgErP6LP): first family on template; critic grades the named pages",
    "until": "arrays_groups in js/modules/redesign-passed.js, then added here as an approved sibling"
+  },
+  {
+   "skill": "multiplication:mult_word_problems_plain",
+   "template": "word-work",
+   "proof": "lead ruling 2026-11-07 (session_01HVwpAE3g6EZH8idgErP6LP): first family on template (word-work column layout); critic grades the named pages",
+   "until": "mult_word_problems_plain in js/modules/redesign-passed.js, then added here as an approved sibling"
+  },
+  {
+   "skill": "division:div_word_problems_plain",
+   "template": "word-work",
+   "proof": "lead ruling 2026-11-07 (session_01HVwpAE3g6EZH8idgErP6LP): first family on template (word-work column layout); critic grades the named pages",
+   "until": "div_word_problems_plain in js/modules/redesign-passed.js, then added here as an approved sibling"
   }
  ]
 }
