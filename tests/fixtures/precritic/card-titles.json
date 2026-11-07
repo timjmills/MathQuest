@@ -1,0 +1,7 @@
+{
+ "about": "Titles a signed spec card DECIDED, held exactly by ws-cell-checks TITLE (lane lf-ops critic r1 check 7). The card text is the authority; this is its machine copy. A card's title question answered later is added here in the same change.",
+ "titles": [
+  {"skill": "multiplication:count_by_tables", "opts": null, "iCan": "I Can count by 2s to 12s", "source": "count-row card §9 Q6 (signed 2026-11-07)"},
+  {"skill": "multiplication:count_by_tables", "opts": {"jumps": 15}, "iCan": "I Can count by 2s to 12s", "source": "count-row card §9 Q6 (the I Can line from the rows; the row length is not a row)"}
+ ]
+}

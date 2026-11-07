@@ -29,8 +29,10 @@ const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
 // BAND, SLOT and GRIDEVEN (critic checks 1, 3, 6) are lf-placevalue's checks (lead, 2026-11-07): this lane's interim
 // measure of the critic's numbers, off by default; --rules ...,BAND,SLOT,GRIDEVEN (or --interim) turns them on
-const RULES = list(arg('rules', has('interim') ? 'OVERFLOW,BAND,SLOT,TAGINK,KEYJOIN,GRIDEVEN,SIZE-S' : 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S'));
+const RULES = list(arg('rules', has('interim') ? 'OVERFLOW,BAND,SLOT,TAGINK,KEYJOIN,GRIDEVEN,SIZE-S,TITLE,LESSON-OPT' : 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,TITLE,LESSON-OPT'));
 const SIZES = list(arg('size', 'S,M,L'));
+// the titles a signed card decided ({skill, opts, iCan, source}); the TITLE rule holds the page to them
+const DECIDED = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e) { try { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e2) { return []; } } })();
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const optsKey = (o) => (o ? JSON.stringify(o) : '');
@@ -114,6 +116,7 @@ function selfTest() {
     await sheet.goto(page.url(), { waitUntil: 'domcontentloaded' });
     const findings = [];
     const runs = [];
+    const lessons = [];
     const t0 = Date.now();
     for (const j of jobs) {
         const [cat, id] = j.k.split(':');
@@ -122,12 +125,26 @@ function selfTest() {
             try {
                 const r = await window.buildSheet({ role, sections: [{ skills: [Object.assign({ categoryId: cat, skillId: id }, opts ? { opts } : {})], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true, anchors: 'off' });
                 const f = Array.isArray(r.fits) ? r.fits[0] : (r.fits && r.fits.sections ? r.fits.sections[0] : r.fits);
-                return { pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, cols: f && f.cols, pages: r.pageCount };
+                // TITLE (check 7): the provider's own I Can line for THESE options - the print path must print it
+                let want = '';
+                try { const pr = await import('./js/modules/sheet/roles/practice.js'); want = pr.skillWords({ categoryId: cat, skillId: id, opts: opts || undefined }).iCan; } catch (e) { want = ''; }
+                const rule = (() => { const d = document.createElement('div'); d.innerHTML = r.pupilHtml; const el = d.querySelector('.mq-cchant span, .mq-lstripchant span, .mq-lchant'); return el ? el.textContent.trim() : ''; })();
+                return { want, rule, pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, cols: f && f.cols, pages: r.pageCount };
             } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: String((e && e.stack) || e).slice(0, 300) }; }
         }, { cat, id, role: j.role, size: j.size, seed, opts: j.opts });
         const tag = `${j.k} ${j.role} ${j.size}${j.opts ? ' ' + optsKey(j.opts) : ''}`;
         if (built.unsupported) { console.log(`  n/a  ${tag}: ${built.unsupported.slice(0, 100)}`); continue; }
         if (built.error) { findings.push({ rule: 'ERROR', msg: `${tag}: ${built.error}` }); continue; }
+        // TITLE (check 7, D-MP-8, D-CB-2): the page prints the provider's title for its options, a title a signed card
+        // decided (tests/fixtures/precritic/card-titles.json) exactly, and never an option value ("(15 jumps)")
+        if (RULES.includes('TITLE')) {
+            const got = String(built.title || '').replace(/^(Test [AB]|More Practice [A-J]|Reason It|Review|Guided Practice)[:\s-]*/i, '');
+            const dec = DECIDED.find((d) => d.skill === j.k && optsKey(d.opts || null) === optsKey(j.opts));
+            if (/^I Can /.test(built.title || '') && built.want && built.title !== built.want && !(dec && built.title === dec.iCan)) findings.push({ rule: 'TITLE', msg: `${tag}: the page is titled "${built.title}" but the skill's strings for these options say "${built.want}": the title follows the options dealt (VQ-9, H17)` });
+            if (dec && /^I Can /.test(built.title || '') && built.title !== dec.iCan) findings.push({ rule: 'TITLE', msg: `${tag}: the page is titled "${built.title}"; ${dec.source} decided "${dec.iCan}"` });
+            if (/\(\d+ jumps\)|\(\w+=/.test(got)) findings.push({ rule: 'TITLE', msg: `${tag}: an option value in the title "${built.title}" (H17)` });
+        }
+        if (j.role === 'lesson') lessons.push({ k: j.k, size: j.size, opts: j.opts, want: built.want, rule: built.rule });
         const p = await checkDoc(sheet, built.pupil, { role: j.role, key: false });
         const kk = await checkDoc(sheet, built.key, { role: j.role, key: true });
         const here = [
@@ -139,6 +156,14 @@ function selfTest() {
         console.log(`  ${here.length ? 'FAIL' : 'ok  '} ${tag}: ${built.pages}p ${built.cols}x? per ${built.perPage}${here.length ? ` - ${[...new Set(here.map((f) => f.rule))].join(', ')} (${here.length})` : ''}`);
     }
     if (RULES.includes('SIZE-S')) findings.push(...sizeSFindings(runs));
+    // LESSON-OPT (check 7 + speed-up 5): a lesson printed for an option value whose title differs from the default's
+    // (another property, another kind) carries its own Rule - never the default lesson's (D-MP-7 / D-MP-8)
+    if (RULES.includes('LESSON-OPT')) {
+        for (const l of lessons.filter((x) => x.opts)) {
+            const d = lessons.find((x) => x.k === l.k && x.size === l.size && !x.opts);
+            if (d && l.want && d.want && l.want !== d.want && l.rule && l.rule === d.rule) findings.push({ rule: 'LESSON-OPT', msg: `${l.k} lesson ${l.size} ${optsKey(l.opts)}: titled "${l.want}" but its Rule is the default lesson's ("${l.rule}"): no lesson data for this option value (lessons/prereqs.js byOption)` });
+        }
+    }
     await app.close();
     const by = {};
     for (const f of findings) by[f.rule] = (by[f.rule] || 0) + 1;
