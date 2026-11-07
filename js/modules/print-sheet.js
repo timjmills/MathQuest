@@ -157,6 +157,16 @@ function normaliseRequest(req = {}) {
             // A single-skill page held short by its own pool, laid in fewer, longer columns
             // (buildSheet): two columns may take any row count, not only CL-2's 2/3/4/5/8.
             freeRows: !!(s && s.freeRows),
+            // fact rows (facts-print-fix r3): the digit tracks the section's skills can REACH and its + − × answers' digits,
+            // from the caller's probe - one column count and digit size on every page and set of the print
+            tracks: s && Number(s.tracks) > 0 ? clampInt(s.tracks, 1, 7, 0) : 0,
+            ansTracks: s && Number(s.ansTracks) > 0 ? clampInt(s.ansTracks, 1, 7, 0) : 0,
+            // ... and the section's one row stretch for the whole print (PG-11: at most 1.3, owner 2026-11-05)
+            stretch: s && Number(s.stretch) >= 1 ? Math.min(1.3, Number(s.stretch)) : 0,
+            // ... and the largest digit size a section may take (facts-print-fix r4: sections sharing a page take one size)
+            maxPt: s && Number(s.maxPt) > 0 ? Number(s.maxPt) : 0,
+            // ... and whether the Size caps the digits too (the simple print, facts-print-fix r5 D-R5-6)
+            sizeCap: !!(s && s.sizeCap),
         }))
         .filter((s) => s.skills.length);
     // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
@@ -260,6 +270,8 @@ function normaliseRequest(req = {}) {
         tagLine: typeof req.tagLine === 'string' && req.tagLine ? req.tagLine : '',
         packTab: Array.isArray(req.packTab) ? req.packTab.map(String) : null,
         edgeLast: req.edgeLast && Number(req.edgeLast.per) > 0 ? { per: Number(req.edgeLast.per), cols: Number(req.edgeLast.cols) || 1 } : null,
+        // fact rows (facts-print-fix r3 D1): each request section its own section on ONE page (÷ after + − ×)
+        factSections: role === 'fact-rows' && req.factSections === true && sections.length > 1,
     };
 }
 
@@ -406,6 +418,13 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
     // (`factorCap` n, lesson 3a: no factor on more than n items of a page - a facts page that leans on 7s)
     if (sk.factorCap !== undefined && [...new Set(ops)].some((f) => (kept.get(`fac:${key}:${f}`) || 0) >= Number(sk.factorCap))) return false;
     if (Array.isArray(sk.avoidTexts) && sk.avoidTexts.includes(refText(cand))) return false;
+    // (`nearLook`, R8 lf-checks LP-NUMBERS - lesson 6: no two numbers of 4+ digits on a page with the same length and first
+    // two digits unless one is a digit turn of the other - 92,163 and 92,715 look alike to a pupil; absent on every other ref)
+    if (sk.nearLook) {
+        const mine = nearLookKeys(cand);
+        if (mine.some((a, i) => mine.some((b, j) => j > i && a.head === b.head && a.digits !== b.digits))) return false;
+        if (mine.some((a) => [...seen].some((x) => typeof x === 'string' && x.startsWith(`nl:${a.head}:`) && x !== `nl:${a.head}:${a.digits}`))) return false;
+    }
     // The detailed lesson maker (LR-5, V22 §9.5): `avoidKeys` - never an item (its fact key) another
     // page of the pack dealt; `minNum` / `maxNum` - the item's number (or answer) in range; `edge`
     // with `edgeTest` - only the lesson's edge cases (roles/lesson.js CASE_TESTS). Absent on every
@@ -708,11 +727,15 @@ function refRecord(sk, q, key, seen, kept, pg = '', row = '') {
     if (sk.avoidKeys) seen.add(`ansAll${pg}:${dlAns(q).replace(/[^0-9a-z<>=]/gi, '')}`);
     if (sk.avoidKeys && nearKeyOf(q) !== null) seen.add(`near:${key}:${nearKeyOf(q)}`);
     if (sk.lr6) lr6Record(q, key, seen, pg, row);
+    if (sk.nearLook) for (const a of nearLookKeys(q)) seen.add(`nl:${a.head}:${a.digits}`);
     if (sk.noTurnaround && ops.length >= 2) seen.add(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`);
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10) kept.set(`small:${key}`, (kept.get(`small:${key}`) || 0) + 1);
     if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge || sk.boardOnly || sk.gridApart) { const k = factKeyOf(q); if (k !== null) seen.add(`key:${k}`); }
 }
 
+/** The numbers of 4+ digits an item prints: {head: length + first two digits, digits: its digits sorted} (`nearLook`). */
+const nearLookKeys = (q) => (refText(q).match(/\d[\d,]*\d/g) || []).map((t) => t.replace(/,/g, '')).filter((t) => t.length >= 4)
+    .map((t) => ({ head: `${t.length}:${t.slice(0, 2)}`, digits: t.split('').sort().join('') }));
 const refAnswer = (q) => String(q && q.ans !== undefined ? (typeof q.ans === 'object' ? JSON.stringify(q.ans) : q.ans) : '');
 /** An item's text as a packet compares it ("67 − 9 = ?"), tags and spaces removed. */
 export const refText = (q) => String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -3793,7 +3816,7 @@ const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
 async function buildRoleSheet(n, metaOf) {
     const mod = ROLE_MODULES[n.role];
     const reqSkills = n.sections.flatMap((s) => s.skills);
-    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput }) || []).filter((p) => p && p.skills && p.skills.length);
+    const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
     const allSkills = [];
     const seenSkill = new Set();
@@ -3835,6 +3858,18 @@ async function buildRoleSheet(n, metaOf) {
         growLast: !!n.growLast || undefined,
         // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
         arrangement: 'sections',
+        // facts-print-fix (owner 2026-11-05): a fact-rows page asked 'mixed' interleaves its operations in the one grid
+        // (owner ruling 2026-10-31; sheet/interleave.js run rules), at the page's own count.
+        interleave: n.role === 'fact-rows' && n.arrangement === 'mixed' ? true : undefined,
+        // fact rows (facts-print-fix r3): the reach tracks, each section's own count / columns / tracks, the one stretch
+        ...(n.role === 'fact-rows' ? {
+            factTracks: (n.sections[0] && n.sections[0].tracks) || 0,
+            factAnsTracks: (n.sections[0] && n.sections[0].ansTracks) || 0,
+            factStretch: (n.sections[0] && n.sections[0].stretch) || 0,
+            factPt: (n.sections[0] && n.sections[0].maxPt) || 0,
+            factSizeCap: !!(n.sections[0] && n.sections[0].sizeCap),
+            ...(n.factSections ? { factCounts: n.sections.map((s) => s.count || 0), factSecs: n.sections.map((s) => ({ count: s.count || 0, columns: s.columns, tracks: s.tracks, ansTracks: s.ansTracks, stretch: s.stretch, maxPt: s.maxPt, sizeCap: s.sizeCap })) } : {}),
+        } : {}),
     };
     // A Mixed practice page arranged 'mixed' keeps each cell's own instruction (B3): the page's
     // line is "Solve.", so a cell's "Add." / "Write the time." is not said twice.
@@ -4265,6 +4300,8 @@ async function buildRoleSheet(n, metaOf) {
         seed: n.seed,
         role: n.role,
         title: plan.meta && plan.meta.title,
+        // fact rows: the skill of every printed fact (facts-print-fix D1: a page may keep fewer than it dealt)
+        printedSkills: (plan.meta && plan.meta.printedSkills) || undefined,
         notes,
         // IMPROVEMENT_PLAN 3.3: how the skills were arranged ('mixed' | 'sections'), and the mixed order's record.
         arrangement: (plan.meta && plan.meta.arrangement) || n.arrangement,
@@ -5137,7 +5174,8 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
             const L = mine.map((x) => x.letter);
             return Object.assign(v, { letters: L.length > 1 ? `${L[0]}–${L[L.length - 1]}` : (L[0] || ''), list: mine.map((x) => `${x.letter}. ${dlAns(x.q)}`).join(' · ') });
         }),
-        p0: { list: p0Cells.map((c, j) => `${j + 1}. ${dlAns(c.q)}`).join(' · ') },
+        // (R8, lf-checks LP-NUMBERS: the P0 answers as the key prints them - the description's `answerShow`, lesson 6's 4,000)
+        p0: { list: ((t) => { try { return typeof d.answerShow === 'function' ? String(d.answerShow(t)) : t; } catch (e) { return t; } })(p0Cells.map((c, j) => `${j + 1}. ${dlAns(c.q)}`).join(' · ')) },
         ns: { A: nsBands[0].its.map((it) => dlItemVars(it.q, d)), B: nsBands[1].its.map((it) => dlItemVars(it.q, d)) },
         // ({panel.second} / {panel.third} - lesson 5 r4, critic r2 D8: the printed panel numbers of the chart's other examples,
         // after its step panels, so a script never names an example by its order)

@@ -81,7 +81,8 @@ const ACROSS_GAP_EM = 0.18;
  * whole; the fraction 144 over 12 with its "=" is then 2.66 em of ink, 15.0 mm at 16 pt.
  */
 export const FRAC_ROW_PAD_EM = 0.1;
-export const FRAC_ROW_GAP_EM = 0.15;
+// facts-print-fix r4 FRACEQ (critic 2026-11-05: "=" 0.85 mm from the bar end, read against the frame): 0.3 em of white
+export const FRAC_ROW_GAP_EM = 0.3;
 export const FRAC_ROW_EQ_EM = 0.62;
 /**
  * Width (mm) of a division fact across with its answer line beside it, for the band's WIDEST
@@ -146,6 +147,20 @@ register('equation', {
                 // width, capped at the column's room (`factRowLineMm`), the same on every item (L3).
                 const lineMm = Number(ctx.metrics.factRowLineMm);
                 const slot = slotHtml.replace(/--w:[\d.]+mm/, `--w:${lineMm.toFixed(1)}mm`);
+                if (Number(ctx.metrics.factRowMix) > 0) {
+                    // A grid MIXING the ÷ forms (facts-print-fix r4, owner 2026-11-05: "every cell must look alike in
+                    // placement ... one common baseline ... the answer slot in the same place"): the three lines of the
+                    // stacked fact - the dividend's line (the bar at its foot), the divisor's line, the sum rule's room
+                    // (2 mm + the heavy stroke) and the answer line - each as tall as the stacked fact's, so the digits of a
+                    // row share two lines and the answer lines one place. The fraction and its "=" are centred together.
+                    const ln = (x, bar) => `<span style="box-sizing:border-box;align-self:stretch;height:1.15em;display:flex;align-items:center;justify-content:center;padding:0 ${FRAC_ROW_PAD_EM}em;${bar ? 'border-bottom:1.5pt solid #000;' : ''}">${x}</span>`;
+                    return `<div class="ws-eq ws-eq-mix" data-ws-notation="fraction" data-ws-fracrow="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0;line-height:1.15">`
+                        + `<span style="display:flex;align-items:center;gap:${FRAC_ROW_GAP_EM}em;white-space:nowrap;height:2.3em">`
+                        + `<span class="ws-divfrac" style="display:inline-flex;flex-direction:column;align-items:center;">${ln(A, true)}${ln(B, false)}</span>`
+                        + `<span class="o" style="width:${FRAC_ROW_EQ_EM}em">=</span></span>`
+                        + `<span aria-hidden="true" style="flex:none;height:calc(2mm + var(--ws-heavy, 1.5pt))"></span>`
+                        + `<span style="flex:none;height:1.15em;display:flex;align-items:flex-end;justify-content:center">${slot}</span></div>`;
+                }
                 // CL-40: the numerator's ink clears the number tab's keep-out (tab side + 1 mm) below the
                 // cell's 3 mm pad - the digit's line box starts 0.2 em above its ink, plus 0.3 mm.
                 return `<div class="ws-eq ws-eq-below" data-ws-notation="fraction" data-ws-fracrow="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em;margin-top:max(0mm, calc(var(--ws-tab, 5mm) - 1.7mm - 0.2em))">`

@@ -202,7 +202,8 @@ export const SEPARATOR_EM = 0.3;
 export const FACT_LADDER = Object.freeze({ 1: 28, 2: 28, 3: 28, 4: 28, 5: 28, 6: 24, 7: 20, 8: 18, 9: 16, 10: 16 });
 
 // TY-30: Auto columns per preset for fact rows (the fact probe's Auto is always 5).
-export const FACT_AUTO_COLS = Object.freeze({ S: 10, M: 6, L: 5 });
+// (facts-print-fix r3, owner rule 2026-11-05: Auto at most 9 at S; 9 and 10 share the 16 pt rung)
+export const FACT_AUTO_COLS = Object.freeze({ S: 9, M: 6, L: 5 });
 export const FACT_PROBE_COLS = 5;
 export const FACT_PROBE_XL_PT = 32;   // TY-33
 

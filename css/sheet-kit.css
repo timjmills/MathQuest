@@ -156,6 +156,15 @@
 :is(.ws-page, .ws-sheet) .ws-grid.fixed { flex: none; }
 :is(.ws-page, .ws-sheet) .ws-grid.open { gap: 0; background: var(--ws-paper); }   /* tests / probes: open array */
 :is(.ws-page, .ws-sheet) .ws-grid.facts { gap: var(--ws-hair); }                  /* fact grids: hairline interiors in both looks */
+/* Fact rows (owner 2026-11-05, facts-print-fix ROWRULES): the hairline interiors are DRAWN rules, not the ink background
+   showing through a 0.75 pt gap between white cells. A PDF viewer or printer rasterises a gap between two white fills
+   with conflation (each white edge partly covers the gap's pixels), so some rules vanished and others doubled ("no lines
+   between the rows", "one vertical thicker"). Each cell draws its left and top rule in ink on top of its neighbours; the
+   cell is pulled one hairline left and up, so the first column's and first row's rules sit under the heavy frame and
+   every inner rule is one hairline, closed on every row. */
+:is(.ws-page, .ws-sheet) .ws-grid.facts { gap: 0; background: var(--ws-paper); }
+:is(.ws-page, .ws-sheet) .ws-grid.facts > .ws-cell { border-left: var(--ws-hair) solid var(--ws-ink); border-top: var(--ws-hair) solid var(--ws-ink);
+    margin: calc(-1 * var(--ws-hair)) 0 0 calc(-1 * var(--ws-hair)); }
 :is(.ws-page, .ws-sheet) .ws-cell { position: relative; background: var(--ws-paper); min-width: 0; min-height: 0; padding: 3mm; display: flex; flex-direction: column; align-items: center; }
 :is(.ws-page, .ws-sheet) .ws-cell.blankrun { grid-column: var(--from) / -1; }
 :is(.ws-page, .ws-sheet) .ws-letter { position: absolute; left: 1.5mm; top: 1mm; font-size: var(--ws-letter); line-height: 1; }
@@ -551,3 +560,19 @@
 /* 2026-11-07 (lf-placevalue r1; additive): on a screen card (.mq-kittwin) the read-and-write frame (pv-hw) wraps between
    its "[ ] hundreds" units at any width, as the paper's 4-place frames do, so a phone never cuts the row off. */
 .mq-kittwin .pv-cell .pv-blanks.pv-hw { flex-wrap: wrap !important; white-space: normal !important; max-width: 100%; }
+/* facts-print-fix r4 (owner 2026-11-05: "Mixed ÷ forms stay mixed cell by cell, but every cell must look alike in
+   placement: each item centred, horizontally and vertically; one common baseline across the row; the answer slot in the
+   same place and visible in every cell; nothing touching a border"). A fact-rows grid that MIXES forms (stacked ÷,
+   fraction, bracket, and + − × beside them) draws every item in one frame of the stacked fact's three lines
+   (.ws-mixform: sheet/roles/fact-rows.js mixWrap): the dividend / numerator / quotient line, the divisor / denominator /
+   dividend line, the answer line. The frame clears the tab's keep-out (its margin) and is centred down the cell; each
+   drawing is centred across it. Additive: older saved sheets carry no .ws-mixform. */
+.ws-page .ws-grid.facts > .ws-cell:has(> .ws-mixform):not(.blankrun) { padding: 2mm 1mm 2mm !important; justify-content: center !important; }
+.ws-page .ws-grid.facts > .ws-cell > .ws-mixform { flex: none; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; line-height: 1.15; }
+.ws-page .ws-grid.facts > .ws-cell > .ws-mixform > div:not(.ws-fact) { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.ws-page .ws-grid.facts > .ws-cell > .ws-mixform .ws-ops { display: flex; justify-content: center; line-height: 1.15; }
+.ws-page .ws-grid.facts > .ws-cell > .ws-mixform > .ws-fact { flex: none; }
+/* facts-print-fix r4 PDFIUM-RULES: a fact-rows cell's white is painted inside its border only, so the first column's rule
+   and the frame are one solid stroke when a PDF is rasterised (two abutting anti-aliased edges left a light seam: the frame
+   read as a double line at 93 dpi). Additive. */
+.ws-page .ws-grid.facts > .ws-cell { background-clip: padding-box; }
