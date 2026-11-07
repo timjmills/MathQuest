@@ -36,13 +36,17 @@
 //   CHIPWIDTH  at 1366 a selection chip shows its whole name when the row has room (no 26ch cut) (check r2 D5)
 //   TOPIC    no fraction skill is filed under Counting (By area, and inside Grade 3); they are under Fractions (r2 D6)
 //   THUMB    hover thumbnails (owner 2026-11-05): at 1366x768 and 820x1180 a mouse on a card shows, within 1 s, a
-//            role="tooltip" thumbnail holding the paper cell (.ws-cell / .mq-scell) and the pupil name, never the answer
-//            (no filled box; no answer token the question itself does not carry), 260-360 px wide, inside the viewport,
-//            off the pointer and off the card (its tick), no sideways scroll, aria-describedby on the card; mouse leave,
+//            role="tooltip" thumbnail holding the paper cell or the large-print question, and the pupil name, never the answer
+//            (no filled box; no answer token the question itself does not carry), 260-490 px wide, inside the viewport,
+//            off the pointer and off the card (its tick), no sideways scroll, aria-describedby on the card; 340-480 px wide (r1 D1); mouse leave,
 //            Esc (the dialog stays; the next Esc closes it), a scroll of the list and a re-render each hide it.
 //            Keyboard: Tab onto a card shows it without moving focus; the first Esc hides it, blur hides it.
 //            Touch (390x844, hasTouch): a tap picks and no thumbnail appears, even on a mouse event.
 //            Sweep: every live skill (716) draws a cell or the text fallback, no throw, no console error, no answer.
+//            Legible (critic r1): TEXTSIZE (question line >= 14 px, no text < 10 px), SCALE (a drawn cell >= 0.6), INFRAME
+//            (nothing painted outside the frame), NODUP (the question once, normalised compare), NOTEACHER (no CCSS code, no
+//            Hint / Check control), NOEXTRA (no second answer line under an item's own blank): by real hover on the 13 skills
+//            the critic found worst (1366x768, 820x1180), then every live skill at the L and S plates (studentExplorerThumbBatch).
 //   KEYS     Esc closes; arrow keys move between the tabs
 //   TARGETS  every control in the explorer and the Explore button >= 44 x 44 at 1366 / 820 / 390
 //   NOSCROLL no horizontal scroll at 390 (the page and the explorer panel)
@@ -61,6 +65,8 @@ const SHOTS = arg('shots', '');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // a card name split into head + tail (check r3 R1) reads the same words as the full name: compare the words only
 const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replace(/\s+/g, ' ').trim();
+
+const { installThumbMeasure, thumbFaults } = require('../lib/ws-thumb-measure.cjs');
 
 (async () => {
     const app = await open({ seed: 7, viewport: { width: 1366, height: 900, deviceScaleFactor: 1 } });
@@ -728,6 +734,7 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
                 return [...new Set([0, cards.indexOf(row[row.length - 1])])];
             });
             let shot = false;
+            let cellsSeen = 0;
             for (const idx of targets) {
                 await mouseHome();
                 await sleep(500);
@@ -746,16 +753,19 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
                         onPointer: p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom, onTick: over(r, tick), onCard: over(r, cr),
                         x: document.documentElement.scrollWidth - window.innerWidth, described: (card.getAttribute('aria-describedby') || '').includes('mqxThumb'),
                         cap: (el.querySelector('.mqx-thumb-cap') || {}).textContent || '', name: card.querySelector('.mqx-name').firstChild.textContent,
-                        filled: [...el.querySelectorAll('input, textarea')].filter((x) => (x.type === 'checkbox' || x.type === 'radio' ? x.checked : x.value)).length };
+                        filled: [...el.querySelectorAll('input, textarea')].filter((x) => (x.type === 'checkbox' || x.type === 'radio' ? x.checked : x.value)).length,
+                        bigText: (() => { const t = el.querySelector('.mqx-thumb-text'); return !!t && parseFloat(getComputedStyle(t).fontSize) >= 16 && !!t.textContent.trim(); })() };
                 }, idx, pt);
                 const what = `@${w}x${h} card ${pt.key}`;
                 if (g2.role !== 'tooltip') F(`THUMB ${what}: the thumbnail is not role="tooltip"`);
-                if (!g2.cell) F(`THUMB ${what}: the thumbnail holds no paper cell (.ws-cell / .mq-scell; mode ${g2.mode})`);
+                // the paper cell, or (critic r1 D1) the large-print question when the drawing would be too small to read
+                if (g2.cell) cellsSeen++;
+                else if (g2.mode !== 'text' || !g2.bigText) F(`THUMB ${what}: the thumbnail holds neither a paper cell (.ws-cell / .mq-scell) nor the large-print question (mode ${g2.mode})`);
                 if (!g2.inside) F(`THUMB ${what}: the thumbnail leaves the viewport`);
                 if (g2.onPointer) F(`THUMB ${what}: the thumbnail covers the pointer`);
                 if (g2.onTick || g2.onCard) F(`THUMB ${what}: the thumbnail covers the card${g2.onTick ? "'s tick" : ''}`);
                 if (g2.x > 0) F(`THUMB ${what}: the page scrolls sideways by ${g2.x}px`);
-                if (g2.w < 260 || g2.w > 360) F(`THUMB ${what}: the thumbnail is ${g2.w}px wide (want 260-360)`);
+                if (g2.w < 260 || g2.w > 490) F(`THUMB ${what}: the thumbnail is ${g2.w}px wide (want 260-490: S 340 up to L 480, critic r1 D1)`);
                 if (!g2.described) F(`THUMB ${what}: the card has no aria-describedby to the thumbnail`);
                 if (g2.cap.trim() !== g2.name.trim()) F(`THUMB ${what}: the caption "${g2.cap}" is not the pupil name "${g2.name}"`);
                 if (g2.filled) F(`THUMB ${what}: ${g2.filled} answer boxes are filled`);
@@ -770,6 +780,7 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
                 const pr = await probe(pt.key);
                 if (leaks(pr)) F(`THUMB ${what}: the thumbnail shows the answer ${pr.ans}`);
             }
+            if (!cellsSeen) F(`THUMB @${w}x${h} no hovered card drew its paper cell (every one fell back to text)`);
             // Esc: the first hides the thumbnail and the dialog stays; the next closes the dialog
             await mouseHome(); await sleep(500);
             let pt = await page.evaluate(() => { const b = document.querySelector('#mqxBody .mqx-card').getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height / 2) }; });
@@ -893,6 +904,76 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
             if (bad.length) F(`THUMB sweep ${bad.length} of ${keys.length} skills fail: ${bad.slice(0, 6).join(' | ')}`);
             for (const b of bad.slice(6, 40)) console.error(`    THUMB sweep: ${b}`);
             console.log(`  THUMB sweep: ${keys.length} skills — ${tally.cell} cells, ${tally.text} text (${tally.slow} slow, ${tally.err} generator errors)`);
+
+            if (process.env.MQX_TRACE) console.log('step', '// THUMB legible (hard set, real hover)');
+            // THUMB legibility (critic r1 D1-D6). Measured on what a pupil sees after the thumbnail settles:
+            //   TEXTSIZE  the question line renders >= 14 px and no visible text renders under 10 px
+            //   SCALE     a drawn cell is scaled >= 0.6 (a smaller one takes the large-print fallback)
+            //   INFRAME   every visible part of the drawing stays inside the frame after the refit (nothing cut off)
+            //   NODUP     the question is not shown twice (normalised text compare, so a story split over lines counts)
+            //   NOTEACHER no "CCSS:" code, no Hint / Check button, no screen-only control
+            //   NOEXTRA   no extra answer line under an item that already has its own blank ("___", "= ?", a box)
+            // First a REAL HOVER on the skills the critic found worst (this half runs on any build, so it fails on edd6b298b),
+            // then every live skill at the large (480 x 320) and the small (340 x 210) plate.
+            await page.evaluate(installThumbMeasure);
+            const HARD = ['graphs:bar_graph', 'coordinates:coordinate_all', 'fractions:mixed_improper_visual', 'addition:add_word_problems',
+                'subtraction:sub_wp_20', 'graphs:line_plot', 'graphs:pie_chart', 'coordinates:geo_reflect', 'area_perimeter:area',
+                'area_perimeter:area_perimeter', 'probability:probability_basic', 'multiplication:mult_chart_easy', 'counting:count_objects'];
+            for (const [w, h] of [[1366, 768], [820, 1180]]) {
+                await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+                await sleep(200);
+                for (const key of HARD) {
+                    const g = await page.evaluate(async (k) => {
+                        for (const gr of ['K', '1', '2', '3', '4', '5', '6', 'M']) {
+                            await window.openStudentExplorer({ tab: 'grade', grade: gr });
+                            const c = document.querySelector(`#mqxBody .mqx-card[data-key="${k}"]`);
+                            if (c) { c.scrollIntoView({ block: 'center' }); return gr; }
+                        }
+                        return null;
+                    }, key);
+                    if (!g) { F(`THUMB legible: ${key} is not in the explorer`); continue; }
+                    await mouseHome(); await sleep(450);
+                    const pt = await page.evaluate((k) => { const b = document.querySelector(`#mqxBody .mqx-card[data-key="${k}"]`).getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height / 2) }; }, key);
+                    await page.mouse.move(pt.x, pt.y, { steps: 3 });
+                    if ((await waitThumb(true, 1000)).timeout) { F(`THUMB legible @${w}: hovering ${key} shows no thumbnail`); continue; }
+                    await sleep(1200);   // settled: the mono pass let go and the refit ran
+                    const m = await page.evaluate((k) => window.__mqxMeasure(document.getElementById('mqxThumb'), k), key);
+                    for (const f of thumbFaults(m)) F(`THUMB legible @${w} hover ${key}: ${f}`);
+                    if (SHOTS && w === 1366) await page.screenshot({ path: path.join(SHOTS, `thumb-hard-${key.replace(/\W+/g, '_')}.png`), clip: m.rect, captureBeyondViewport: false }).catch(() => {});
+                }
+            }
+            await mouseHome();
+            await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+            await sleep(200);
+
+            if (process.env.MQX_TRACE) console.log('step', '// THUMB legible sweep');
+            const hasBatch = await page.evaluate(async () => typeof (await import('./js/modules/student-explorer.js')).studentExplorerThumbBatch === 'function');
+            if (!hasBatch) F('THUMB legible sweep: student-explorer.js has no studentExplorerThumbBatch (the sweep cannot draw the plates)');
+            else {
+                for (const size of ['L', 'S']) {
+                    const faults = [];
+                    const tl = { cell: 0, text: 0 };
+                    for (let i = 0; i < keys.length; i += 24) {
+                        const batch = keys.slice(i, i + 24);
+                        const before = app.problems.length;
+                        const ms = await page.evaluate(async (b, sz) => {
+                            const m = await import('./js/modules/student-explorer.js');
+                            await m.studentExplorerThumbBatch(b, { size: sz });
+                            return [...document.querySelectorAll('.mqx-thumb-probe')].map((el) => window.__mqxMeasure(el, el.dataset.key));
+                        }, batch, size);
+                        await page.evaluate(async () => (await import('./js/modules/student-explorer.js')).studentExplorerThumbBatch([]));
+                        for (const m of ms) {
+                            if (m.mode === 'cell') tl.cell++; else if (m.mode === 'text') tl.text++;
+                            for (const f of thumbFaults(m)) faults.push(`${m.key}: ${f}`);
+                        }
+                        const errs = app.problems.slice(before).filter((p) => !/favicon/.test(p.text));
+                        if (errs.length) faults.push(`batch ${i}: console ${errs[0].text.slice(0, 120)}`);
+                    }
+                    if (faults.length) F(`THUMB legible sweep (${size}): ${faults.length} faults: ${faults.slice(0, 6).join(' | ')}`);
+                    for (const f of faults.slice(6, 30)) console.error(`    THUMB legible ${size}: ${f}`);
+                    console.log(`  THUMB legible sweep (${size}): ${tl.cell} cells, ${tl.text} large-print text`);
+                }
+            }
             await page.evaluate(() => window.closeStudentExplorer && window.closeStudentExplorer());
             await sleep(200);
         }

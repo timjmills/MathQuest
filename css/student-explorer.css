@@ -102,3 +102,12 @@ html.mqx-open, html.mqx-open body { overflow: hidden; }
 /* A drawing that already carries its own answer boxes (a clock's hh:mm, "= ?" on a bar, "Area = __") gets no second answer
    line under it in the thumbnail: one place to answer, as on the practice card. */
 .mqx-thumb .tvp-visual:has([data-mq-blank], [data-mq-cell], [data-ws-slot], .mq-cellbox, .mq-kblank, input, select) ~ .tvp-answerrow { display: none; }
+/* Hover thumbnails, critic r1 (2026-11-07): the plate takes the size the room beside the card allows (student-explorer.js
+   sizeFor: L 480 x 400, W 480 x 320, M 400 x 260, S 340 x 210, the largest that sits clean beside the card). The drawing may lay out as wide as its frame; the
+   question line is set at the practice card's size; the module scales by the painted box and judges legibility. */
+.mqx-thumb { width: var(--mqx-thumb-w, 340px); }
+.mqx-thumb .mqx-thumb-frame { height: var(--mqx-thumb-h, 210px); }
+.mqx-thumb .tvp-stage { max-width: calc(var(--mqx-thumb-w, 340px) - 36px); }
+.mqx-thumb .mq-scell.mq-grid-cell { --mq-text: 22px; }
+.mqx-thumb .tvp-stage .tvp-instr, .mqx-thumb .tvp-stage .tvp-q { max-width: calc(var(--mqx-thumb-w, 340px) - 40px); }
+.mqx-thumb .mqx-thumb-text { font-size: 26px; }

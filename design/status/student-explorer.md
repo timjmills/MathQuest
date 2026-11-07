@@ -197,3 +197,58 @@ fraction bars, number line, bar graph, area, rounding, coins, angle, pictograph,
 
 Not yet graded by an independent critic. Known limits: small text in dense legacy visuals (bar graph, angle) is scaled to
 fit the 340 px frame; a few legacy items keep teacher-preview's extra answer line under a "= ?" written in text.
+
+### Hover thumbnails — fix round 1 (2026-11-07, Opus medium: rebuild after critic r1 FAILED, job 7 / clarity 5 / layout 8 / eng 8)
+
+Critic report: scratchpad `thumbs-check-r1.md`. Its D1-D6 are now gate checks (written first) in `ws-student-explorer.cjs`
+via `tests/lib/ws-thumb-measure.cjs`, which measures the plate as a pupil sees it:
+
+| Check | What it would have caught | On edd6b298b (backtest, served with MQ_ROOT) | Now |
+|---|---|---|---|
+| TEXTSIZE (question line >= 14 px, no text < 10 px) | D1 | 46 faults on the 13-skill hard set | 0 |
+| SCALE (a drawn cell >= 0.6) | D1 | 22 | 0 |
+| INFRAME (nothing painted outside the frame) | D2 | 6 | 0 |
+| NODUP (the question once, normalised compare) | D3 | 1 | 0 |
+| NOTEACHER (no CCSS code, no Hint / Check control) | D4 | 8 | 0 |
+| NOEXTRA (no second answer line under an item's own blank) | D6 | 2 | 0 |
+
+The hard set is hovered for real (1366x768, 820x1180), so the backtest runs on the old build: 86 failures there. The
+legible sweep then draws every live skill at the L and the S plate (`studentExplorerThumbBatch`): 0 faults at either.
+
+Fixes:
+- **D1:**
+  - The plate takes the largest size that sits cleanly beside, above or below the card, off the pointer: L 480 x 400, W 480 x 320, M 400 x 260 or S 340 x 210 (`sizeFor`).
+  - **Deviation from the brief:** L is taller than the brief's "about 480 x 320". With that height, 613 of 716 skills draw legibly, against 561 at 480 x 320.
+  - On a portrait tablet (820 x 1180) the L plate goes above or below the card.
+  - The question line takes the practice card's 22 px.
+  - A drawing that would still render its question under 14 px, any text under 10 px, or a scale under 0.6 is never shown. The plate shows the question itself in large print (26 px, 16 px at the least) instead.
+  - Today that is 103 of 716 at L, mostly legacy graphs, coordinates and transformations, whose own labels are 7-8 px even at full size on the practice card. At S it is 391.
+- **D2:** `fitStage` scales by everything the drawing paints, overhanging children included. It ignores the stage's own box.
+  - teacher-preview `mountQuestion` takes `{ fit: false, onSettled }`, so its 0.9 s refit no longer overrides this. Every teacher caller passes no options and is unchanged.
+  - The plate is refit and judged again once the drawing settles. A drawing that grew past legible then becomes the text plate.
+- **D3:** the question line above a drawing is hidden when the drawing restates it, whether word for word, split over lines, or with at least 80 % of its words.
+- **D4:** inside the thumbnail only, "CCSS:" lines and Hint / Check / Reset / Listen controls are hidden.
+  - gen-data-stats.js is unchanged. Its `CCSS: ${q.ccss}` lines are still in `q.visual` for the practice card and the teacher views.
+  - Taking them out at the generator is left for its own lane, because the same visual feeds the print path.
+- **D5:** design-tokens `softFill` now returns `color-mix(in srgb, <colour> 18%, transparent)` for a non-hex colour.
+  - Before, svg-geometry's `var(--mq-purple, #1e88e5)2E` was an invalid fill that painted black.
+  - Screen now gets the intended 18 % wash; the mono cell shows it as the single grey.
+  - Print draws these shapes without a fill, so it is unchanged: no filled shape in `formatProblemForPrint` output before or after.
+- **D6 and D7:**
+  - The play answer row (`.tvp-answerrow`) is left out of thumbnails.
+  - A K counting row's answer square, which sits beside the counted squares, is hidden in the thumbnail.
+- **Minor:** a pick (a click, or Space / Enter) hides the thumbnail (`toggle`).
+- A text plate whose question ended on a colon, pointing at its picture, now ends with a full stop.
+
+Gates (one at a time, after the fixes): ws-student-explorer OK · ws-boot-smoke OK · ws-simple-print OK · ws-teacher-shell OK ·
+ws-screen-answer OK · ws-chromebook-perf --only load OK (7060 / 6960 / 6750 ms; 191 startup modules) · ws-stamp-assets +
+--check OK.
+
+Screenshots: `explorer-thumb-1366.png`, `explorer-thumb-820.png` (hover, L plate), `explorer-thumb-none-390.png` (touch);
+`thumb-r1-worst20-before.png` / `-after.png` (the 20 worst skills of the critic's sweep, one per family, as edd6b298b drew
+them and as they draw now); `thumb-r1-hardset-before.png` / `-after.png` (the critic's named skills).
+
+Speed reflection (this round):
+- Every finding was measurable, and none had a check. The r0 gate measured placement and answer leaks, never rendered type size or clipping.
+- Rule for any future preview or thumbnail lane: a "drawn the way pupils see it" claim is gated on rendered px (font size x on-screen scale) and on painted bounds inside the frame. A class name present is not enough.
+- `ws-thumb-measure.cjs` is reusable for the teacher previews, which share this drawing and these defects.
