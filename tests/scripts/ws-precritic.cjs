@@ -65,6 +65,11 @@
 //             "template fixtures" row per tests/fixtures/precritic/<id>*.mjs through ws-node-lint --fixture (a
 //             *.fail.mjs fixture must FAIL, a *.pass.mjs one must pass; N/A "no fixtures" when there are none),
 //             + ws-grade-render --template --contact-sheet
+//             OPT-IN lane rules (lead ruling D1, 2026-11-07): tests/fixtures/precritic/opt-in-rules.json names, per lane, its
+//               skills and the extra args its critic's checks add to these --skill rows (lf-placevalue: print-lint --rules
+//               H13-ABS,GRID-EVEN-ALL at L / S / M, node-lint-s1 + WRONG-FITS-SLOTS,WRONG-FILL, slot-clip --slot-w-equal
+//               --draw-cap, screen-slots --screen-digit, options-render --bands); they are added with --rule-skills <the
+//               scope's skills of that lane>, only when the scope holds them, so no other lane's run changes
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline. The sample is tests/fixtures/precritic/role-sample.json
 //   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows,
@@ -462,10 +467,11 @@ const PARSE = {
     screenSlots(g, out, code) {
         const v = lastVerdict(out, g.script);
         // "[<mode> sweep (...), ][shard i/n, ]N skills, R host renders, D doubled answer area(s), P paper verb(s) on screen[, C low-contrast host(s)]"
-        const sm = /(\d+) skills, (\d+) host renders, (\d+) doubled answer area\(s\), (\d+) paper verb\(s\) on screen(?:, (\d+) low-contrast host\(s\))?$/m.exec(out);
+        // (", K screen-digit miss(es)": the opt-in SCREEN-DIGIT, opt-in-rules.json; its "host@width:digit" findings count with the rest)
+        const sm = /(\d+) skills, (\d+) host renders, (\d+) doubled answer area\(s\), (\d+) paper verb\(s\) on screen(?:, (\d+) low-contrast host\(s\))?(?:, (\d+) screen-digit miss\(es\))?$/m.exec(out);
         if (!v) return unparsed(`no "${g.script}: OK|FAIL" line`, out);
         if (!sm) return unparsed('no "N skills, R host renders, ..." summary', out);
-        const nSk = +sm[1], renders = +sm[2], dbl = +sm[3], pv = +sm[4], lc = +(sm[5] || 0);
+        const nSk = +sm[1], renders = +sm[2], dbl = +sm[3], pv = +sm[4], lc = +(sm[5] || 0) + +(sm[6] || 0);
         const want = (g.expect && g.expect.skills) || 0, hosts = (g.expect && g.expect.hosts) || 4;
         const errs = out.split('\n').filter((l) => /^\S+:\S+\s+ERR /.test(l));
         if (nSk < want) return { result: 'FAIL', findings: `only ${nSk} of ${want} skill(s) in scope found by the script`, detail: tailLines(out), explainsExit: false };
@@ -484,8 +490,8 @@ const PARSE = {
         const found = [];
         for (const l of out.split('\n')) {
             // the pin's entries are "host:kind" (kinds doubled, paper, contrast), as ws-screen-slots --baseline reads them
-            const m = /^(\S+:\S+)\s+(\S+)\s+(host field \+|paper verb on screen|\d+ low-contrast text)/.exec(l);
-            if (m) found.push({ key: m[1], id: `${m[2]}:${m[3].startsWith('host') ? 'doubled' : m[3].startsWith('paper') ? 'paper' : 'contrast'}`, line: l.replace(/\s+/g, ' ') });
+            const m = /^(\S+:\S+)\s+(\S+)\s+(host field \+|paper verb on screen|\d+ low-contrast text|SCREEN-DIGIT )/.exec(l);
+            if (m) found.push({ key: m[1], id: `${m[2]}:${m[3].startsWith('host') ? 'doubled' : m[3].startsWith('paper') ? 'paper' : m[3].startsWith('SCREEN') ? 'digit' : 'contrast'}`, line: l.replace(/\s+/g, ' ') });
         }
         if (found.length !== dbl + pv + lc) return unparsed(`${found.length} finding line(s) for a summary of ${dbl + pv + lc}`, out);
         const explainsExit = code === 0 || found.length > 0; // the script exits 1 on any doubled area or paper verb
@@ -633,6 +639,33 @@ const PARSE = {
 
 /* ============================================================== plan */
 function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
+
+const OPT_IN_FILE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'opt-in-rules.json');
+/** Add each opted-in lane's args to its gate rows (opt-in-rules.json), judged only on the scope's skills of that lane. */
+function applyOptIn(rows, keys) {
+    let spec = null;
+    try { spec = JSON.parse(fs.readFileSync(OPT_IN_FILE, 'utf8')); } catch (e) { return; }
+    for (const lane of (spec && spec.lanes) || []) {
+        const mine = keys.filter((k) => (lane.skills || []).includes(k));
+        if (!mine.length) continue;
+        for (const [id, g] of Object.entries(lane.gates || {})) {
+            const r = rows.find((x) => x.id === id);
+            if (!r || r.missing || !r.file) continue;
+            const flags = [...(g.args || []).filter((a) => /^--/.test(a)).map((a) => a.slice(2)), 'rule-skills'];
+            if (!flags.every((f) => srcHas(r.file, f))) continue;
+            const add = [];
+            if (g.addRules && g.addRules.length) {
+                const i = r.args.indexOf('--rules');
+                if (i < 0 || !g.addRules.every((x) => fs.readFileSync(r.file, 'utf8').includes(`'${x}'`))) continue;
+                r.args[i + 1] = [...new Set([...String(r.args[i + 1]).split(','), ...g.addRules])].join(',');
+            }
+            add.push(...(g.args || []), '--rule-skills', mine.join(','));
+            // before a trailing --json <file> is fine anywhere: the tools read flags by name
+            r.args.push(...add);
+            r.name = `${r.name} + opt-in ${lane.lane}: ${[...(g.addRules || []), ...(g.args || []).filter((a) => /^--/.test(a) || /[A-Z]/.test(a))].join(' ')}`;
+        }
+    }
+}
 
 function buildPlan(ctx) {
     const rows = [];
@@ -822,6 +855,10 @@ function buildPlan(ctx) {
             return { result: 'FAIL', findings: m[2].slice(0, 220), detail: out.split('\n').filter((l) => /^ {2}FAIL /.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: code === 1 };
         } }));
     }
+    // OPT-IN lane rules (lead ruling D1 2026-11-07; tests/fixtures/precritic/opt-in-rules.json): a lane's critic-proposed
+    // checks join ITS OWN --skill gate rows only, as additive args plus --rule-skills <the scope's skills of that lane>,
+    // so another lane's run, and every pinned baseline, reads as before. A tree whose script lacks the flag gets nothing.
+    if (skills.length) applyOptIn(rows, skills.map((s) => s.key));
     if (ctx.template) {
         const t = ctx.template;
         add(gate('panes-unit', 'ws-panes-unit', 'support panes', 'node', 'ws-panes-unit', []));
