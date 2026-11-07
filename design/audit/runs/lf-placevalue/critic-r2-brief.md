@@ -58,3 +58,6 @@ combine 196 → 0, value 48 → 0, expand 32 → 24, unit_form 22 → 10; combin
 - unit_form Reason It key overflow S/M/L — `sheet/roles/reason-it.js` `prepare` sizes "The answer is ___" by digit count: shared roles.
 - SCREEN-DIGIT (identify / expand screen numerals): host files, hosts lane next week.
 - the two-skill sections sheet PAGEFILL / PG-23: engine sections pagination (r1 F21).
+- precritic r4 (design/audit/runs/lf-placevalue/precritic-r4.md): every remaining red is one of the rows above, sibling-compare (first
+  family, lead R1: you grade the rows), or the fact-rows layout crash "Cannot access 'opEm' before initialization" in
+  `sheet/roles/fact-rows.js` (integration-branch code; fact-rows is OUT OF SCOPE on the pv card - do not grade it).
