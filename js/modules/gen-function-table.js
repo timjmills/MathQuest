@@ -25,6 +25,7 @@
 // a page; the ticked operations and step counts are dealt round-robin by state.itemIndex.
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
+import { freshDeal } from './page-deal.js';
 import { optionsFor, normalizeOptions, pvCap } from './skill-options.js';
 import { renderCell, applyRule, ruleText, ftSlots } from './sheet/index.js';
 
@@ -164,7 +165,17 @@ export function generateFunctionTable(q, skillId) {
             if (p.length >= need) { rule = r; pool = p; }
         }
     };
-    attempt(kind, steps);
+    if (task === 'make') {
+        // (lf-algebra r3, options-render REPEAT at S: a "make" table prints only its rule and its In range, so two tables
+        // with one rule on a page look identical) the rule is dealt fresh on the page (page-deal.js freshDeal: no rule twice
+        // in the page window; a band with too few rules falls back to the first new draw)
+        const got = freshDeal(`ft:make:${cap}:${need}`, () => {
+            rule = null; pool = [];
+            attempt(kind, steps);
+            return rule ? { rule, pool } : null;
+        }, { sig: (v) => (v ? ruleText(v.rule) : '-'), window: 11 });
+        rule = got ? got.rule : null; pool = got ? got.pool : [];
+    } else attempt(kind, steps);
     // A band too small for the ask (two steps inside 10): one step of the same kind, then + 1.
     if (!rule && steps === 2) { steps = 1; kind = kind[0]; attempt(kind, 1); }
     if (!rule) { steps = 1; rule = [{ op: '+', n: 1 }]; pool = inputPool(rule, cap); }

@@ -517,6 +517,13 @@ function checkRow(p, g, d, vals, ink, slotsById, ctx, side = false, fx = { on: f
  * while the whole row stays inside 125 mm (the judgement column keeps the rest).
  */
 const SIDE_MACHINE_MM = 54;
+/**
+ * CL-40 (lf-algebra r3, CL40-INK at L in a side pair's narrow cell: the machine's "In" at 6.1 mm across, 5 mm down,
+ * inside the 7 x 7 mm label keep-out): on paper the drawing starts right of the keep-out edge (--ws-koin, css/sheet-kit.css
+ * CL-40 block); a wide cell still centres it. The footprint keeps KO_MM for it.
+ */
+const KO_MM = 4;
+const koPad = (g) => (g.screen ? '' : ';padding-left:var(--ws-koin, 0mm)');
 const WIDE_GAP_MM = 8;
 const WIDE_MAX_MM = 132;
 function sideWidth(p, g, d, ctx) {
@@ -571,7 +578,7 @@ register('function-table', {
             inner = `<div style="display:flex;align-items:center;justify-content:center;gap:${g.em(WIDE_GAP_MM)}">`
                 + `<div>${tableHtml(p, g, d, vals, ink, slotsById, ctx, fx)}</div>`
                 + `<div style="display:flex;flex-direction:column;align-items:center">${sideHtml}</div></div>`;
-            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
         }
         const merged = ruleInMachine(p, g, d, ctx);
         if (merged) inner += machine(p, g, d, wMm, ruleAnswer(p, g, d, vals, ink, slots, ctx, fx, 'merged'));
@@ -593,7 +600,7 @@ register('function-table', {
             if (p.check && slotsById.chk) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
         }
         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(1.2)};text-align:center;line-height:1.2">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
-        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
         const slots = ftSlots(p);
@@ -609,7 +616,7 @@ register('function-table', {
         if (wideLayout(p, g, d, ctx)) {
             const tableH = d.headH + (p.rows || []).length * d.rowH + 2;
             const sideH = (p.machine ? d.machineH + 1 : 0) + (p.task === 'rule' ? 1.2 + d.signW : 0) + (p.check ? 1 + d.boxH + 2.5 : 0);
-            return { wMm: Math.ceil(tableWidth(p, d) + fixColW(p, d, ctx) + WIDE_GAP_MM + sideWidth(p, g, d, ctx) + 4), hMm: Math.ceil(Math.max(tableH, sideH) + 4),
+            return { wMm: Math.ceil(tableWidth(p, d) + fixColW(p, d, ctx) + WIDE_GAP_MM + sideWidth(p, g, d, ctx) + 4 + KO_MM), hMm: Math.ceil(Math.max(tableH, sideH) + 4),
                 measure: true, factLike: false, maxCols: 3 };
         }
         const merged = ruleInMachine(p, g, d, ctx);
@@ -620,7 +627,7 @@ register('function-table', {
         if (p.task === 'rule' && !merged) h += 1.2 + d.signW + (ruleInline(p, g, d, ctx) ? 0 : Math.max(11, g.pt * g.zoneEm) * PT_MM + 0.6);
         if (p.check && !checkSide(p, g, d, ctx)) h += 1 + d.boxH + 2.5 + (checkInline(d, ctx) ? 0 : d.textMm * 1.4);
         if (p.note) h += 1.7 + d.textMm * 1.3;
-        return { wMm: Math.ceil(w + 4), hMm: Math.ceil(h + 4), measure: true, factLike: false, maxCols: 3 };
+        return { wMm: Math.ceil(w + 4 + (g.screen ? 0 : KO_MM)), hMm: Math.ceil(h + 4), measure: true, factLike: false, maxCols: 3 };
     },
     inputs(p) {
         return ftSlots(p).map((s, n) => ({
