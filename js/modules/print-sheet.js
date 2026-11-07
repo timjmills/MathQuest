@@ -1247,7 +1247,7 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def) return null;
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    let chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
     if (!chosen.length) return null;
     const p = q.cell.payload || {};
     // Facts card F2 (owner 2026-11-07; critic laned-restart r4 R4-2): div_facts' array is a TRUE array, offered only
@@ -1256,6 +1256,9 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     // fact in one frame for the section: the largest divisor's columns by the band's top quotient's rows.
     const divArr = sk.categoryId === 'division' && sk.skillId === 'div_facts' && opKey(p.op) === '/' && chosen.includes('array');
     const arrayOff = divArr && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    // (dropped, it is no alternative either: the clashing supports are dealt as if it had not been ticked)
+    if (arrayOff) chosen = chosen.filter((x) => x !== 'array');
+    if (!chosen.length) return null;
     const frameP = divArr && !arrayOff ? Object.assign({}, p, { arrayFrame: true }) : p;
     let worst = chosen.filter((id) => !(arrayOff && id === 'array') && canDraw(id, frameP, template));
     if (!worst.length) return null;
@@ -1274,7 +1277,10 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     const touch = worst.some((x) => TOUCH_IDS.includes(x));
     // Touch dots need 24 pt digits: a stack or a sentence at M / S is drawn at L (owner ruling); a
     // fact takes the fact ladder, capped at 6 columns (24 pt) by its footprint.
-    const forceL = touch && template !== 'fact' && (SIZES[size] || SIZES.L).digitPt < TOUCH_MIN_PT;
+    // (critic laned-restart r4 SCC-T10, one geometry a page: the sub-sections of a support split share the page, so when
+    // ANY of its alternatives carries touch dots every sub-section is drawn at that size - one digit size, one answer place)
+    const splitTouch = mix && Number.isFinite(mix.alt) && chosen.some((x) => TOUCH_IDS.includes(x) && canDraw(x, p, template));
+    const forceL = (touch || splitTouch) && template !== 'fact' && (SIZES[size] || SIZES.L).digitPt < TOUCH_MIN_PT;
     const extra = {};
     const op = opKey(p.op);
     if (op === '*' && Array.isArray(o.constant)) {
@@ -1302,7 +1308,9 @@ function splitBySupports(sec, gi, n) {
     if (!def) return [sec];
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
     if ((n.mix || o.mix || 'section') !== 'section') return [sec];
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    // (facts card F2: div_facts' array past dividends of 50 is drawn nowhere, so it makes no sub-section of its own)
+    const arrOff = sk.categoryId === 'division' && sk.skillId === 'div_facts' && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v) && !(arrOff && v === 'array'));
     const alts = alternativesOf(chosen);
     // Up to four alternatives. A page-driven split is checked once its parts are measured (buildSheet
     // undoes it when one row of each does not fit a page, or when it holds fewer problems than the

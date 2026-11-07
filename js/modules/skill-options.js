@@ -4143,4 +4143,6 @@ export const divArrayWhy = (opts) => `An array is drawn while every dividend is 
 {
     const sup = (SKILL_OPTIONS['division:div_facts'] || []).find((o) => o.id === 'support');
     if (sup) sup.valueLock = (cur) => (divFactsMaxDividend(cur || {}) > DIV_ARRAY_MAX ? { array: divArrayWhy(cur || {}) } : null);
+    // (where the array IS offered - the 2 to 4 tables - ws-options-verify tries it)
+    if (sup) sup.valueBase = { array: { constant: [2, 3, 4] } };
 }

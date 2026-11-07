@@ -488,6 +488,14 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     // CONDITIONAL CONTROLS (lesson 6 r4): a def with `appliesBase` only works in that context (the ten* controls of value
     // form "times"); it is tried on top of it, and the default it is compared with is that same base.
     for (const t of tries) if (t.def.appliesBase && typeof t.def.appliesBase === 'object') t.base = Object.assign({}, t.def.appliesBase, t.base || {});
+    // LOCKED VALUES (lane lf-ops, facts card F2, 2026-11-07): a set value the panel greys in the default context
+    // (`valueLock`: div_facts' array past dividends of 50) is tried where it IS offered (`valueBase[v]`, e.g. the 2-4
+    // tables), against that base's own default - it must still change the page there. The locked context itself is
+    // checked by print-lint (L-SUPPORT COVER: the fits line names every fact it is not drawn on).
+    for (const t of tries) {
+        const vb = t.def.valueBase, one = Array.isArray(t.value) && t.value.length === 1 ? t.value[0] : undefined;
+        if (vb && one !== undefined && vb[one] && typeof vb[one] === 'object') t.base = Object.assign({}, vb[one], t.base || {});
+    }
 
     // ---------- static (definition) checks ----------
     const statics = [];
