@@ -233,6 +233,16 @@ function shapesMarkdown(queue, keep) {
     L.push('Lessons 6 (g4-nbt1-ten-times-value) and 7 (g3-oa8-two-step-wp) are the compiler\'s hold-outs: they take the nearest passed shape');
     L.push('(`forms`, `bar-story`) and `design/lessons/proof/DIFF.md` records what compiled.');
     L.push('');
+    // (lf-engine P1d, 2026-11-07: what the next lesson of a shape checks first - kept here so --shapes keeps it)
+    L.push('## What the next lesson of a shape checks first (lf-engine P1d, 2026-11-07)');
+    L.push('');
+    L.push('- `bar-story` (from lesson 2, E24b): before the card is signed, count the distinct facts the story rule holds against every place');
+    L.push('  that deals one - Prerequisite Check facts included - with LR-6 (no near twins on a page) per page: `ws-lesson-unit --only');
+    L.push('  pool-capacity`, then the 25-seed `ws-detailed-lesson --sweep`. A pack that needs every fact of its pool fails at some seed.');
+    L.push('- `property` (from lesson 3a, LP-FAMILY-REPEAT): size the Practice cell from the families the pack needs (owner ruling: full-width');
+    L.push('  cells, one item a row, arrays up to 6 x 6), never the families from the cell; every dealt ref keeps one spare fact family');
+    L.push('  (the x 2 check: 2 x 6 to 2 x 10 for four items). Note: arrays past 5 a row fail gate E27 (rows of at most 5) until lf-checks reads the ruling.');
+    L.push('');
     L.push('## Every lesson');
     L.push('');
     L.push('| Lesson | Unit | Title | Archetype | Shape | Templates |');

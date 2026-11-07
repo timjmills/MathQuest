@@ -224,3 +224,10 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
 A check that two clamped cards show different strings passed "Subtract within 1,000,000 (N…" beside "Subtract within 1,000,000…".
 Rule: the first word where two names differ must be visible WHOLE on both. Check: ws-student-explorer QSVISIBLE (diff word), at
 every common width including 1024x768 and 360x740.
+
+### Detailed lessons: pool capacity (lf-engine P1d, owner rulings 2026-11-07)
+One line per finding: the rule, then the check.
+- **E24b, lesson 2 (near twins on Practice 1 at the last try).** Rule: before building, count the distinct facts the pack's rule holds against the places that deal them (LR-5 once a pack, LR-6 no near twins on a page, either order); a pack that needs every fact has no room for the greedy deal. Check: `ws-lesson-unit --only pool-capacity` (necessary condition, + pools); the deal itself only by the 25-seed `ws-detailed-lesson --sweep` (E24b on every seed).
+- **E24b, lesson 2 P0 (6 + 6 / 7 + 8).** Rule: a Prerequisite Check deals from the SAME fact pool as the stories, so its items count against the pool; narrowing its sums concentrates near twins on its own page (sums 11-13 made P0 worse: twin answers and four near twins). Check: E24b on P0, per seed.
+- **LP-FAMILY-REPEAT, lesson 3a (Practice 1 vs Guided).** Rule: a half-width cell caps an array's size, and the size cap caps the families; size the Practice cell from the families the pack needs (full width, one a row, arrays to 6 x 6), never the families from the cell. Check: `ws-lesson-unit --only pool-capacity` (arrays: families the allTest admits >= Practice places + chart + Guided); backtest row `pool-capacity-3a`.
+- **LP-FAMILY-REPEAT, lesson 3a P0 (2 x 7 twice).** Rule: a check question with exactly as many facts as items (x 2: 2 x 6 to 2 x 9 for four items) repeats as soon as any other place (spaced retrieval) takes one; give every dealt ref at least one spare fact. Check: the sweep (seed 3).

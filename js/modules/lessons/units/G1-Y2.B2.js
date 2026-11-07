@@ -33,7 +33,7 @@ export const CARDS = Object.freeze({
         "categoryId": "addition",
         "skillId": "add_wp_20",
         "opts": {"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},
-        "partMin": 3,
+        "partMin": 2,
         "noPart": [10],
         "crossTen": true,
         "crossTenExcept": [],
@@ -108,7 +108,7 @@ export const CARDS = Object.freeze({
               "categoryId": "addition",
               "skillId": "add_wp_20",
               "opts": {"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},
-              "partMin": 3,
+              "partMin": 2,
               "noPart": [10],
               "crossTen": true,
               "crossTenExcept": [20],
@@ -159,7 +159,7 @@ export const CARDS = Object.freeze({
           "opts": {"band":20,"pictures":false,"support":"none","wpCues":false,"wpBank":false},
           "minNum": 11,
           "maxNum": 19,
-          "partMin": 3,
+          "partMin": 2,
           "noPart": [10],
           "crossTen": true,
           "shortQuestion": true,
@@ -180,7 +180,7 @@ export const CARDS = Object.freeze({
               "categoryId": "addition",
               "skillId": "add_wp_20",
               "opts": {"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},
-              "partMin": 3,
+              "partMin": 2,
               "noPart": [10],
               "crossTen": true,
               "crossTenExcept": [20],
@@ -205,7 +205,7 @@ export const CARDS = Object.freeze({
               "categoryId": "addition",
               "skillId": "add_wp_20",
               "opts": {"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},
-              "partMin": 3,
+              "partMin": 2,
               "noPart": [10],
               "crossTen": true,
               "crossTenExcept": [20],
@@ -244,11 +244,17 @@ export const CARDS = Object.freeze({
     },
     "timing": {"1":5,"2":5,"3":3,"4":2,"5":10,"6":8,"7":3,"8":10,"9":5,"10":5,"transitions":4},
     "ranges": {
-      "pool": {"kind":"plus","skill":"add_wp_20","partMin":3,"noPart":[10],"crossTen":true,"sums":[20],"maxSum":20},
+      "pool": {"kind":"plus","skill":"add_wp_20","partMin":2,"noPart":[10],"crossTen":true,"sums":[20],"maxSum":20},
       "lesson": {"minNum":11,"maxNum":18,"band":20}
     },
     "edgeCases": {"edgeTest":"wpEdge","caseNames":{}},
-    "rulings": [],
+    "rulings": [
+      {
+        "id": "owner-2026-11-07-parts-2-9",
+        "text": "Owner ruling 2026-11-07 (E24b): story parts 2 to 9, so the pack has enough distinct crossing-ten facts; never near twins (e.g. 7 + 5 and 8 + 5) on one page.",
+        "field": "ranges.partMin"
+      }
+    ],
     "misconceptions": [
       {
         "id": "bar-whole-in-part",

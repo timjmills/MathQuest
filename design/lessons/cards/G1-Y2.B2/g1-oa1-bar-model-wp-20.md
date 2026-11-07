@@ -13,8 +13,8 @@ lane decides every open question (its `answer` and the `rule` it rests on) and c
 | P0 question 1 → K CC 5 Count to 20 | `counting:count_objects` | {"opts":{"band":20,"objects":"frame"},"minNum":17,"maxNum":20} |
 | P0 question 2 → Y1 B2 S2 Part-whole model | `composing:number_bonds` | {"opts":{"band":10,"unknown":"answer","orientation":"horizontal"},"minOperand":3,"partMin":3,"minNum":6,"distinctFirst":true} |
 | P0 question 3 → G1 OA 6 Add within 20 | `addition:add_facts` | {"opts":{"band":20,"notation":["stacked"]},"minNum":11,"maxNum":16,"noPart":[10]} |
-| P2-P4 lesson skill | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":3,"noPart":[10],"crossTen":true,"crossTenExcept":[],"cellPayload":{ |
-| P4 Practice 1 | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":3,"noPart":[10],"crossTen":true,"crossTenExcept":[20],"cellPayload" |
+| P2-P4 lesson skill | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":2,"noPart":[10],"crossTen":true,"crossTenExcept":[],"cellPayload":{ |
+| P4 Practice 1 | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":2,"noPart":[10],"crossTen":true,"crossTenExcept":[20],"cellPayload" |
 | P1 band A row 1 | `placevalue:more_less_10` | {"opts":{"step":1,"dir":"more","band":20}} |
 | P1 band A row 2 | `placevalue:compare` | {"opts":{"band":99,"closeness":"far"}} |
 | P1 band A row 3 | `placevalue:unit_form` | {"opts":{"band":99},"maxNum":50} |
@@ -25,12 +25,12 @@ lane decides every open question (its `answer` and the `rule` it rests on) and c
 | P1 band B row 3 | `placevalue:unit_form` | {"opts":{"band":99},"minNum":50} |
 | P1 band B row 4 | `placevalue:more_less_10` | {"opts":{"step":10,"dir":"more","band":100},"minNum":61} |
 | P1 band B row 5 | `placevalue:more_less_10` | {"opts":{"step":1,"dir":"less","band":100},"minNum":30} |
-| P5 word problem | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"none","wpCues":false,"wpBank":false},"minNum":11,"maxNum":19,"partMin":3,"noPart":[10],"crossTen":true,"shortQues |
-| P6 exit 1: put together, big part first, a whole of 14 or more | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":3,"noPart":[10],"crossTen":true,"crossTenExcept":[20],"cellPayload" |
-| P6 exit 2: add to, small part first (Critical Atom) | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":3,"noPart":[10],"crossTen":true,"crossTenExcept":[20],"cellPayload" |
+| P5 word problem | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"none","wpCues":false,"wpBank":false},"minNum":11,"maxNum":19,"partMin":2,"noPart":[10],"crossTen":true,"shortQues |
+| P6 exit 1: put together, big part first, a whole of 14 or more | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":2,"noPart":[10],"crossTen":true,"crossTenExcept":[20],"cellPayload" |
+| P6 exit 2: add to, small part first (Critical Atom) | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":2,"noPart":[10],"crossTen":true,"crossTenExcept":[20],"cellPayload" |
 | Spaced retrieval 1 | `composing:number_bonds` | {"opts":{"band":10,"unknown":"answer"},"partMin":3} |
 | Spaced retrieval 2 | `addition:add_facts` | {"opts":{"band":20,"notation":["across"]},"minNum":11,"maxNum":19} |
-| Check Question (wpBridgeBigFirst,wpClean, right D) | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":3,"noPart":[10],"crossTen":true,"crossTenExcept":[],"cellPayload":{ |
+| Check Question (wpBridgeBigFirst,wpClean, right D) | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":2,"noPart":[10],"crossTen":true,"crossTenExcept":[],"cellPayload":{ |
 
 Hand-written lines (story, hook, teaching notes, mistakes' words): **91**.
 
@@ -62,7 +62,7 @@ None.
       "categoryId": "addition",
       "skillId": "add_wp_20",
       "opts": {"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},
-      "partMin": 3,
+      "partMin": 2,
       "noPart": [10],
       "crossTen": true,
       "crossTenExcept": [],
@@ -137,7 +137,7 @@ None.
             "categoryId": "addition",
             "skillId": "add_wp_20",
             "opts": {"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},
-            "partMin": 3,
+            "partMin": 2,
             "noPart": [10],
             "crossTen": true,
             "crossTenExcept": [20],
@@ -188,7 +188,7 @@ None.
         "opts": {"band":20,"pictures":false,"support":"none","wpCues":false,"wpBank":false},
         "minNum": 11,
         "maxNum": 19,
-        "partMin": 3,
+        "partMin": 2,
         "noPart": [10],
         "crossTen": true,
         "shortQuestion": true,
@@ -209,7 +209,7 @@ None.
             "categoryId": "addition",
             "skillId": "add_wp_20",
             "opts": {"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},
-            "partMin": 3,
+            "partMin": 2,
             "noPart": [10],
             "crossTen": true,
             "crossTenExcept": [20],
@@ -234,7 +234,7 @@ None.
             "categoryId": "addition",
             "skillId": "add_wp_20",
             "opts": {"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},
-            "partMin": 3,
+            "partMin": 2,
             "noPart": [10],
             "crossTen": true,
             "crossTenExcept": [20],
@@ -273,11 +273,13 @@ None.
   },
   "timing": {"1":5,"2":5,"3":3,"4":2,"5":10,"6":8,"7":3,"8":10,"9":5,"10":5,"transitions":4},
   "ranges": {
-    "pool": {"kind":"plus","skill":"add_wp_20","partMin":3,"noPart":[10],"crossTen":true,"sums":[20],"maxSum":20},
+    "pool": {"kind":"plus","skill":"add_wp_20","partMin":2,"noPart":[10],"crossTen":true,"sums":[20],"maxSum":20},
     "lesson": {"minNum":11,"maxNum":18,"band":20}
   },
   "edgeCases": {"edgeTest":"wpEdge","caseNames":{}},
-  "rulings": [],
+  "rulings": [
+    {"id": "owner-2026-11-07-parts-2-9", "text": "Owner ruling 2026-11-07 (E24b): story parts 2 to 9, so the pack has enough distinct crossing-ten facts; never near twins (e.g. 7 + 5 and 8 + 5) on one page.", "field": "ranges.partMin"}
+  ],
   "misconceptions": [
     {
       "id": "bar-whole-in-part",

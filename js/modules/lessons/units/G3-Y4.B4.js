@@ -66,7 +66,7 @@ export const CARDS = Object.freeze({
           "atom": {"n":1,"type":"Fact","skill":"Count by 5"}
         },
         {
-          "ref": {"categoryId":"multiplication","skillId":"mult_facts","opts":{"constant":[2],"notation":["stacked"],"band":100},"minNum":12,"maxNum":18},
+          "ref": {"categoryId":"multiplication","skillId":"mult_facts","opts":{"constant":[2],"notation":["stacked"],"band":100},"minNum":12,"maxNum":20},
           "items": 4,
           "lesson": {"id":"3.OA.C.7","title":"Multiply by 2"},
           "atom": {"n":2,"type":"Fact","skill":"Recall × 2 facts"}
@@ -114,14 +114,14 @@ export const CARDS = Object.freeze({
             "skill": {
               "categoryId": "multiplication",
               "skillId": "mult_properties",
-              "opts": {"forms":[0],"task":[1],"band":25},
+              "opts": {"forms":[0],"task":[1],"band":36},
               "minNum": 6,
-              "maxNum": 16,
+              "maxNum": 36,
               "allTest": "arrP1",
               "instructionKey": "turn-look"
             },
-            "shape": [4,2],
-            "edgeLast": {"per":4,"cols":2,"wants":["arrBigSquare","arrFiveRows"]}
+            "shape": [4,1],
+            "edgeLast": {"per":4,"cols":1,"wants":["arrBigSquare"]}
           },
           {
             "skill": {
@@ -214,7 +214,13 @@ export const CARDS = Object.freeze({
     "timing": {"1":6,"2":5,"3":4,"4":2,"5":10,"6":8,"7":3,"8":9,"9":5,"10":4,"transitions":4},
     "ranges": {"lesson":{"minNum":6,"maxNum":20,"band":25}},
     "edgeCases": {"edgeTest":"arrEdge","caseNames":{"arrSquare":"a square","arrFive":"a 5","arrTurn":"non-square"}},
-    "rulings": [],
+    "rulings": [
+      {
+        "id": "owner-2026-11-07-p1-full-width",
+        "text": "Owner ruling 2026-11-07 (LP-FAMILY-REPEAT): Practice 1 is full-width taller cells, one item a row; arrays up to 6 x 6, each with its turn; every fact family once in the pack (never 2 x 6 on Practice 1: the Prerequisite Check's x 2 facts).",
+        "field": "practice.sheets"
+      }
+    ],
     "misconceptions": [
       {
         "id": "turn-recount",

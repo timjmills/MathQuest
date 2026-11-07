@@ -33,6 +33,15 @@ its row), a new queue lesson is added with the proposal. `--shapes --check` fail
 Lessons 6 (g4-nbt1-ten-times-value) and 7 (g3-oa8-two-step-wp) are the compiler's hold-outs: they take the nearest passed shape
 (`forms`, `bar-story`) and `design/lessons/proof/DIFF.md` records what compiled.
 
+## What the next lesson of a shape checks first (lf-engine P1d, 2026-11-07)
+
+- `bar-story` (from lesson 2, E24b): before the card is signed, count the distinct facts the story rule holds against every place
+  that deals one - Prerequisite Check facts included - with LR-6 (no near twins on a page) per page: `ws-lesson-unit --only
+  pool-capacity`, then the 25-seed `ws-detailed-lesson --sweep`. A pack that needs every fact of its pool fails at some seed.
+- `property` (from lesson 3a, LP-FAMILY-REPEAT): size the Practice cell from the families the pack needs (owner ruling: full-width
+  cells, one item a row, arrays up to 6 x 6), never the families from the cell; every dealt ref keeps one spare fact family
+  (the x 2 check: 2 x 6 to 2 x 10 for four items). Note: arrays past 5 a row fail gate E27 (rows of at most 5) until lf-checks reads the ruling.
+
 ## Every lesson
 
 | Lesson | Unit | Title | Archetype | Shape | Templates |

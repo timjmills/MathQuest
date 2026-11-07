@@ -11,10 +11,10 @@ lane decides every open question (its `answer` and the `rule` it rests on) and c
 | Part | Skill | Options and floors |
 |---|---|---|
 | P0 question 1 → 2.NBT.A.2 Count by 5s | `multiplication:count_by_tables` | {"opts":{"rows":[{"step":5,"start":"step","dir":"up"}],"fill":"two","times":"none"}} |
-| P0 question 2 → 3.OA.C.7 Multiply by 2 | `multiplication:mult_facts` | {"opts":{"constant":[2],"notation":["stacked"],"band":100},"minNum":12,"maxNum":18} |
+| P0 question 2 → 3.OA.C.7 Multiply by 2 | `multiplication:mult_facts` | {"opts":{"constant":[2],"notation":["stacked"],"band":100},"minNum":12,"maxNum":20} |
 | P0 question 3 → 2.OA.C.4 Use arrays | `multiplication:arrays_groups` | {"opts":{"forms":[0]},"minNum":4,"maxNum":25,"allTest":"arrGridSquare","instructionKey":"array-total"} |
 | P2-P4 lesson skill | `multiplication:mult_properties` | {"opts":{"forms":[0],"task":[0,1],"band":25},"minNum":6,"maxNum":20,"instructionKey":"missing-many"} |
-| P4 Practice 1 | `multiplication:mult_properties` | {"opts":{"forms":[0],"task":[1],"band":25},"minNum":6,"maxNum":16,"allTest":"arrP1","instructionKey":"turn-look"} |
+| P4 Practice 1 | `multiplication:mult_properties` | {"opts":{"forms":[0],"task":[1],"band":36},"minNum":6,"maxNum":36,"allTest":"arrP1","instructionKey":"turn-look"} |
 | P4 Practice 2 | `multiplication:mult_properties` | {"opts":{"forms":[0],"task":[2],"band":81},"minNum":12,"factorCap":4,"allTest":"arrP2"} |
 | P1 band A row 1 | `placevalue:more_less_10` | {"opts":{"step":10,"dir":"more","band":100},"minNum":10,"maxNum":60} |
 | P1 band A row 2 | `placevalue:more_less_10` | {"opts":{"step":10,"dir":"less","band":100},"minNum":20,"maxNum":60} |
@@ -98,7 +98,7 @@ Hand-written lines (story, hook, teaching notes, mistakes' words): **105**.
         "atom": {"n":1,"type":"Fact","skill":"Count by 5"}
       },
       {
-        "ref": {"categoryId":"multiplication","skillId":"mult_facts","opts":{"constant":[2],"notation":["stacked"],"band":100},"minNum":12,"maxNum":18},
+        "ref": {"categoryId":"multiplication","skillId":"mult_facts","opts":{"constant":[2],"notation":["stacked"],"band":100},"minNum":12,"maxNum":20},
         "items": 4,
         "lesson": {"id":"3.OA.C.7","title":"Multiply by 2"},
         "atom": {"n":2,"type":"Fact","skill":"Recall × 2 facts"}
@@ -146,14 +146,14 @@ Hand-written lines (story, hook, teaching notes, mistakes' words): **105**.
           "skill": {
             "categoryId": "multiplication",
             "skillId": "mult_properties",
-            "opts": {"forms":[0],"task":[1],"band":25},
+            "opts": {"forms":[0],"task":[1],"band":36},
             "minNum": 6,
-            "maxNum": 16,
+            "maxNum": 36,
             "allTest": "arrP1",
             "instructionKey": "turn-look"
           },
-          "shape": [4,2],
-          "edgeLast": {"per":4,"cols":2,"wants":["arrBigSquare","arrFiveRows"]}
+          "shape": [4,1],
+          "edgeLast": {"per":4,"cols":1,"wants":["arrBigSquare"]}
         },
         {
           "skill": {"categoryId":"multiplication","skillId":"mult_properties","opts":{"forms":[0],"task":[2],"band":81},"minNum":12,"factorCap":4,"allTest":"arrP2"},
@@ -239,7 +239,9 @@ Hand-written lines (story, hook, teaching notes, mistakes' words): **105**.
   "timing": {"1":6,"2":5,"3":4,"4":2,"5":10,"6":8,"7":3,"8":9,"9":5,"10":4,"transitions":4},
   "ranges": {"lesson":{"minNum":6,"maxNum":20,"band":25}},
   "edgeCases": {"edgeTest":"arrEdge","caseNames":{"arrSquare":"a square","arrFive":"a 5","arrTurn":"non-square"}},
-  "rulings": [],
+  "rulings": [
+    {"id": "owner-2026-11-07-p1-full-width", "text": "Owner ruling 2026-11-07 (LP-FAMILY-REPEAT): Practice 1 is full-width taller cells, one item a row; arrays up to 6 x 6, each with its turn; every fact family once in the pack (never 2 x 6 on Practice 1: the Prerequisite Check's x 2 facts).", "field": "practice.sheets"}
+  ],
   "misconceptions": [
     {
       "id": "turn-recount",

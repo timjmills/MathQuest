@@ -34,6 +34,55 @@ const PRE = await imp('js/modules/lessons/prereqs.js');
 const BL = await imp('js/modules/build-list.js');
 const DET = await imp('js/modules/lessons/detailed/index.js');
 const LATE = {
+    // (P1d, owner rulings 2026-11-07 - lesson 2 E24b, lesson 3a LP-FAMILY-REPEAT: the POOL CAPACITY a pack needs. A pack
+    // whose places need more distinct facts than its rule holds - LR-5 one fact a pack, LR-6 no near twins on a page - deals
+    // a repeat or a twin on its last try, at some seeds only. Read from the record, no browser.)
+    async 'pool-capacity'() {
+        const L = Object.values(DET.DETAILED_LESSONS);
+        // (a) a + story pool (`pool.kind: 'plus'`, crossing ten): every page's places dealt from unordered facts, each fact
+        // once in the pack, no two on a page near twins (both numbers within 2, either order of a fact chosen to dodge).
+        const twin = (x, y) => Math.abs(x[0] - y[0]) <= 2 && Math.abs(x[1] - y[1]) <= 2;
+        const pageOk = (fs) => { for (let m = 0; m < 1 << fs.length; m++) { const o = fs.map((f, i) => ((m >> i) & 1 ? [f[1], f[0]] : f)); let good = true; for (let i = 0; i < o.length && good; i++) for (let j = i + 1; j < o.length; j++) if (twin(o[i], o[j])) { good = false; break; } if (good) return true; } return false; };
+        const plusFeasible = (d) => {
+            const pd = d.pool, pm = Number(pd.partMin) || 1, no = pd.noPart || [];
+            const facts = []; for (let a = pm; a <= 9; a++) for (let b = a; b <= 9; b++) if (a + b >= 11 && !no.includes(a) && !no.includes(b)) facts.push([a, b]);
+            const sq = (f) => f[0] === f[1];
+            const ld = d.lessonData || {};
+            const pages = [];
+            const pre = (d.prerequisites || []).filter((p) => p.ref && p.ref.categoryId === 'addition' && p.ref.skillId === 'add_facts');
+            for (const p of pre) pages.push({ n: Number(p.items) || 2, s: 0, cap: Number(p.ref.maxNum) || 20, lo: Number(p.ref.minNum) || 0, anySq: true });
+            pages.push({ n: 1 + (ld.second ? 1 : 0), s: ld.third && /Equal/.test(ld.third.test) ? 1 : 0, cap: 20 });
+            pages.push({ n: Number(ld.guidedRows) || 2, s: 0, cap: 20 });
+            for (const ps of d.practiceSheets || []) { const e = ps.edgeLast || {}; pages.push({ n: (Number(e.per) || 0) - (Number(e.cols) || 0), s: (e.wants || []).includes('wpEqual') ? 1 : 0, cap: 20 }); }
+            pages.push({ n: 1, s: 0, cap: 20 }, { n: (d.exit || []).length, s: 0, cap: 20 }, { n: d.checkQuestion ? 1 : 0, s: 0, cap: 20 });
+            const rec = (i, used) => {
+                if (i === pages.length) return true;
+                const pg = pages[i];
+                const cand = facts.filter((f) => !used.has(f.join()) && f[0] + f[1] <= pg.cap && f[0] + f[1] >= (pg.lo || 0) && (pg.anySq || !sq(f)));
+                const sqs = facts.filter((f) => !used.has(f.join()) && sq(f));
+                const pick = (from, k, start, acc, then) => { if (acc.length === k) return then(acc); for (let j = start; j < from.length; j++) if (pick(from, k, j + 1, acc.concat([from[j]]), then)) return true; return false; };
+                return pick(cand, pg.n, 0, [], (ns) => pick(sqs.filter((f) => !ns.includes(f)), pg.s, 0, [], (ss) => { const fs = ns.concat(ss); return pageOk(fs) && rec(i + 1, new Set([...used, ...fs.map((f) => f.join())])); }));
+            };
+            return { facts: facts.length, need: pages.reduce((t, p) => t + p.n + p.s, 0), ok: rec(0, new Set()) };
+        };
+        for (const d of L.filter((x) => x.pool && x.pool.kind === 'plus' && x.pool.crossTen)) {
+            const r = plusFeasible(d);
+            ok(r.ok, `pool-capacity: ${d.id} - ${r.facts} crossing-ten facts cannot fill ${r.need} places once each with no near twins on a page (LR-5 / LR-6)`);
+        }
+        // (b) an arrays-turn Practice sheet: the x families its allTest admits (factors 2 to the band's side) must cover its
+        // places plus the chart and Guided arrays that share them (LR-5 one family a pack - lesson 3a r5: 4-5 families for 8)
+        const ARR = await tryImp('js/modules/sheet/lesson-arch/array.js');
+        if (ARR && ARR.CASES) for (const d of L) for (const ps of d.practiceSheets || []) {
+            const sk = ps.skill || {}; if (sk.skillId !== 'mult_properties' || !sk.allTest || !ARR.CASES[sk.allTest]) continue;
+            const t = (sk.opts && sk.opts.task || [0])[0], type = ['both', 'known', 'missing'][t] || 'known';
+            const side = { 25: 5, 36: 6, 81: 9 }[Number(sk.opts && sk.opts.band)] || 5;
+            const fam = new Set();
+            for (let r = 2; r <= side; r++) for (let c = 2; c <= side; c++) if (r * c >= (Number(sk.minNum) || 0) && r * c <= (Number(sk.maxNum) || 999) && ARR.CASES[sk.allTest]({ q: { cell: { template: 'arrays-turn', payload: { rows: r, cols: c, type } } } })) fam.add([Math.min(r, c), Math.max(r, c)].join());
+            const shape = Array.isArray(ps.shape) ? ps.shape : [0, 1];
+            const need = Number(shape[0]) + 1 + (Number((d.lessonData || {}).guidedRows) || 2);
+            ok(fam.size >= need, `pool-capacity: ${d.id} ${sk.allTest} admits ${fam.size} x families for ${shape[0]} Practice places + the chart and Guided arrays (${need}) - LR-5 one family a pack`);
+        }
+    },
     // (P1c, lesson 3a owner ruling 2026-11-07: an array is the x family of its two sides - its own group, so the D2 backtest
     // row keeps reading only what D2 fixed)
     async 'array-family'() {

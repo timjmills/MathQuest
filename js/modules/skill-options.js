@@ -2157,8 +2157,8 @@ const P12_OPTIONS = {
                 { v: 2, l: 'Facts only, no pictures: the missing number' }],
             allLabel: 'All three, mixed',
             help: 'Order (3 × 4 = 4 × 3) items only. One kind is one page instruction; tick more to mix them. The pictured arrays are at most 5 rows of 5.' },
-        _opsBand([25, 81], 25, { label: 'Order factors to', labels: { 25: '5 (5 × 5)', 81: '9 (9 × 9, facts only)' },
-            help: 'The largest factor of an Order item: the product is at most 25 or 81. The arrays stay at 5 × 5; 9 reaches the facts-only items.' }),
+        _opsBand([25, 36, 81], 25, { label: 'Order factors to', labels: { 25: '5 (5 × 5)', 36: '6 (6 × 6)', 81: '9 (9 × 9, facts only)' },
+            help: 'The largest factor of an Order item: the product is at most 25, 36 or 81. The arrays stay at 5 × 5 (6 × 6 at 6); 9 reaches the facts-only items.' }),
     ],
     'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
         { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],
