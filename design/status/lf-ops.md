@@ -6,7 +6,7 @@ Owner of files: LANES.operations (gen-operations.js, gen-mult-patterns.js, the o
 State: building
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 1, FAIL (r1 build #4: lowest 2)
+Critic rounds: 2, FAIL (r1 build #4: lowest 2; div_facts r5: lowest 6)
 
 ## Now
 - 2026-11-07 owner scope (via lead): BUILD lessons only, no owner sign-off of cards. Re-aimed below ("Scope after the 2026-11-07 decision").
@@ -73,6 +73,20 @@ Lane root cause: the builder's precritic was green on roles it ran, but precriti
 - Fixed: titles / Rule / vocab from the options (54bcf16), one corrected number on True or False? / Reason It and wide items on Reason It (0fac67e), error-analysis tags outside the arrays (8faaef1), boxes >= 14 mm one width a section, no shared picture box, three columns at S, screen frame words (e2a7e9e), phone tap wording (b499e33), count-row wrap on live width (a3e4929, the 3d8bca1 regression).
 - STILL OPEN (two medium rounds, same class): empty bands 30-43 % (D-MP-1, D-CB-4/5) on mult_properties S/M and lesson / guided pages; GRID-EVEN at L (D-MP-3, reverted: full width broke detailed lesson g3-oa5 E12 / E24b); forms-1 and mixed lessons overflow; count_by_tables lesson overflow with times=each/given and jumps=15; Reason It one row a page; test S mixed-forms 4 mm body overflow; pre-skill-check L key overflow; D-AG-4, D-CB-7/8, D-MP-9/14/15; number_patterns_rule lesson overflow (lf-algebra; root cause not found).
 - Root cause of the band class (rule 7): the cell heights come from the tallest item a row can hold (footprint per template, not per dealt item), and the lesson / guided roles reserve the same; a fresh builder needs a per-dealt-item footprint in arrays / arrays-turn / count-row (the interim BAND measure is the check). Not run: full precritic --strict, every-role grade-render, ws-backtest.
+
+## Critic div_facts r5 (narrow, c41a48c) - FAIL, lowest 6 (C3); rule 7: STOPPED (same H13 class survived Lane D r3, r4 and r5)
+Report design/audit/runs/lf-ops/critic-divfacts-r5.md. All five r4 defects fixed (touch / boxsign full, a true array, skip strip to 12 x, no lone row on boxsign Test L, the packet fades in order). New:
+- R5-1 (critical): Test rows stretched to fill the page, not sized to the problems (F1 not met): skip Test M 34 %, think Test S 36 % / M 40 %, plain-fact Test S/M/L 50-56 % empty a cell. ROOT CAUSE: `fillToCeiling` in js/modules/sheet/roles/test.js stretches the rows; ws-print-lint's H13-INK EXCLUDES Test pages (the old r4 ruling that F1 replaced), so it reported 0 on a 40 % page.
+- R5-2 (critical, pre-existing): the supports-off div_facts page (the array's fallback above 50) is stretched the same way: Independent S/M 54 / 53 %, L 36 %, Review S/M 35 / 40 %.
+- R5-3 (major): the array has no 1.5 mm gap after the 5th row (WDS RP-81); C2 7.
+- R5-4 (minor): tables 2-4 Test S prints 12 like M and L; Independent S rows 76 mm where 57 suffice.
+- R5-5 (minor): think boxes shrink to fit (two sizes on Test M, 97 % / 85 %).
+- R5-6 (critical): fade packet page 3 is 54 % empty a cell, 49 % of the page used; facts centred, not at one x (F4); the answer place moves beside / under / beside.
+- R5-7 (nit): touch fits line says 16 / 22 pt, touch facts print ~28 pt.
+Regression (add / mult facts, div_facts_long, supports off, M): pixel-identical to r4. Keys correct.
+Automatic checks: 1 ink-based H13 on EVERY role (Test included, per F1) and every support alone plus the supports-off page; 2 an RP-81 array-gap check; 3 per-support S > M count; 4 a shrink-to-fit check on support SVGs; 5 fact left-x spread per section / packet + answer form constant across fade stages; 6 fits-line digit size vs measured.
+Speed-ups: the lane's own H13-INK carried a ruling F1 had already replaced: when a card ruling changes, re-read every check that cites the old ruling (grep the rule id in tests/).
+Next (fresh builder, after the reset): remove the Test stretch (fillToCeiling) for fact pages, size rows to the dealt problems; the supports-off page the same; RP-81 gap; S > M; no shrink; one x per section and one answer form in the packet.
 
 ## Brief for the FRESH #4 builder (lead ruling 2026-11-07: after the Thursday 22:00 UTC reset; Opus medium, a rebuild after two failed rounds)
 Skills: multiplication:mult_properties, multiplication:arrays_groups, multiplication:count_by_tables (BUILD lesson #4, Properties of multiplication, 3.OA.B.5). Cards: design/cards/ops-tables/ops-tables.md, design/cards/count-row/count-row.md (signed). Defects: design/audit/runs/lf-ops/critic-r1.md; what fix4 already fixed: section "Fix round after critic r1" above.
