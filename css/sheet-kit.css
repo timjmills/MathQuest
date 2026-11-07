@@ -548,3 +548,6 @@
    not a fixed 14 mm at every size, so a page at S draws smaller boxes and holds more rows than L. Other frames keep the
    14 mm rule above. */
 :is(.ws-page, .ws-sheet) .pv-cell .pv-blanks.pv-hw .ws-box { height: calc(var(--ws-hw) + 2 * var(--ws-hair)); line-height: var(--ws-hw); min-width: 0; }
+/* 2026-11-07 (lf-placevalue r1; additive): on a screen card (.mq-kittwin) the read-and-write frame (pv-hw) wraps between
+   its "[ ] hundreds" units at any width, as the paper's 4-place frames do, so a phone never cuts the row off. */
+.mq-kittwin .pv-cell .pv-blanks.pv-hw { flex-wrap: wrap !important; white-space: normal !important; max-width: 100%; }

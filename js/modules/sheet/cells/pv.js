@@ -375,7 +375,9 @@ function unitBlanksHTML(ctx, p, keys, floor) {
     }
     // (`oneLine`: a short frame of slots and no place words - "worth [ ] [ ]", "worth [ ] × [ ]" - is one unit: its two
     // answers never sit on two lines)
-    const wrap = p.oneLine ? 'nowrap;white-space:nowrap' : 'wrap';
+    // (a frame of four or more places, or expanded notation, may wrap between its units - one line is wider than the
+    // page at L; a 3-place unit-form frame is one line, so a lesson anchor that scales its drawing to the panel scales it whole)
+    const wrap = p.oneLine || (parts.length - 1 < 4 && !/×/.test(String(p.frame || ''))) ? 'nowrap;white-space:nowrap' : 'wrap';
     return `<div class="ws-eq pv-frame pv-blanks pv-hw" style="font-weight:700;flex-wrap:${wrap};justify-content:center;row-gap:2mm;column-gap:0.3em;">${units.join('')}</div>`;
 }
 
