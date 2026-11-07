@@ -142,8 +142,23 @@
     },
     {
       "date": "2026-11-07",
-      "ruling": "Scope: only the 64 CCSS BUILD lessons, their vocabulary first, earliest rounds first. Grade map K = Y1 ... G5 = Y6. No owner sign-off of cards: decide card lines from the standards and record them; the owner reviews finished work.",
+      "ruling": "Scope: only the 64 CCSS BUILD lessons, their vocabulary first, earliest rounds first. Grade map K = Y1 ... G5 = Y6.",
       "source": "lead's launch message (owner decisions 2026-11-07, design/STATUS.md:713)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "\"All as suggested\": the card approved as the lane decided it (section 9 answered as recommended).",
+      "source": "owner in the lead session, relayed by the lead 2026-11-07"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Q1: role:lesson is OUT OF SCOPE for vocabulary:vocab_grade_pictures and vocabulary:vocab_pick3_words: their lesson is the lesson part vocab-page inside each BUILD lesson.",
+      "source": "owner in the lead session, relayed by the lead 2026-11-07"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Q2: the page counts 4 / 6 / 8 (1 picture, 3 words at K-1 / grades 2-3 / grades 4-5) and 4 (Match 3) are the owner's: a value that prints fewer items than the default page for that reason is owner-ruled capacity (tests/fixtures/precritic/options-render.pins.json), not an H13 cost.",
+      "source": "owner in the lead session, relayed by the lead 2026-11-07"
     }
   ],
   "misconceptions": [
@@ -206,15 +221,11 @@
   "openQuestions": [
     {
       "q": "Screen response for Match 3: type the letter in each box (built), or tap A / B / C under each word?",
-      "recommended": "Type the letter (built): it is the paper response itself and needs no new screen widget; a tap row can be added later without changing paper."
-    },
-    {
-      "q": "The lesson vocabulary page prints only for a lesson whose record names its vocabSet. Should the passed long lessons (1-6) gain it?",
-      "recommended": "Not now: their vocabulary band stays as it is (no re-grade); the BUILD lessons made by the lesson compiler name their set and get the page."
+      "recommended": "Type the letter (built): it is the paper response itself; a tap row can come later without changing paper. (Owner: as suggested, 2026-11-07.)"
     },
     {
       "q": "Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in round order?",
-      "recommended": "Yes, round 2's BUILD lessons next (7 lessons), the same picture rules."
+      "recommended": "Yes, round 2's BUILD lessons next (7 lessons), the same picture rules. (Owner: as suggested, 2026-11-07.)"
     }
   ],
   "decisions": {
@@ -302,9 +313,9 @@
       },
       {
         "key": "role:lesson",
-        "d": "offered",
-        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
-        "why": "the lesson packet; the vocabulary page is the lesson part vocab-page"
+        "d": "out of scope",
+        "source": "owner 2026-11-07 (Q1, via the lead)",
+        "why": "a vocabulary skill's lesson is the lesson part vocab-page inside each BUILD lesson; its own standard packet is not printed for it"
       },
       {
         "key": "role:scripted-model",

@@ -1,6 +1,6 @@
 <!-- spec-card
-{"card":"vocabulary","kind":"template","template":"vocab-match3","families":["vocabulary"],"match":{"templates":["vocab-match3","vocab-pick3","lesson-vocab"]},"config":"design/cards/vocabulary/card.json","indexSha":"9ad4eb57ab31f4193fcb2c0f8ffd3adbc6a4cc76","bodySha":"1bd963e19fa26e5a","format":2,"configSha":"76494cb73e3a"}
-{"cited":"","rules":"VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 AK-1 a0cc12 2 d4709f H13 36f579 VQ-4 b89965 5 1fa595 7 2253df 9 0b5532 10 2ed85c CL-40 2a6dbb SL-11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 10 256ad3 C1 66f8a9 2 a51365 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 L1 799b66 3 901e56 6 6e19d8 BD-4 b3947b 11 29d891 RP-1 d529bd 20 8888b0 SL-2 f404d5 3 468d78 SP-2 1f2df0 3 7b7bfb","entries":"D%3AvocabTask%3Dmatch3 bcefeb D%3AvocabTask%3Dpick3 bcefeb D%3AvocabGrade%3D1 bcefeb D%3AvocabGrade%3D2 bcefeb D%3AvocabGrade%3D3 bcefeb D%3AvocabGrade%3D4 bcefeb D%3AvocabSet%3Dnull bcefeb D%3AvocabSet%3D0 bcefeb D%3AvocabSet%3D1 bcefeb D%3AvocabSet%3D2 bcefeb D%3AvocabSet%3D3 bcefeb D%3AvocabSet%3D4 bcefeb D%3AvocabSet%3D5 bcefeb D%3AvocabSet%3D6 bcefeb D%3AvocabSet%3D7 bcefeb D%3AvocabSet%3D8 bcefeb D%3AvocabSet%3D9 bcefeb D%3AvocabSet%3D10 bcefeb D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Alesson bcefeb D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Aword-problems 04b8b3 D%3Arole%3Afact-rows 04b8b3 D%3Arole%3Afact-probe 04b8b3 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 04b8b3 D%3Ahost%3Arace 04b8b3 D%3Ahost%3Amap 04b8b3 D%3Ahost%3Amode-dark 04b8b3 D%3Ahost%3Amode-bigboard 04b8b3"}
+{"card":"vocabulary","kind":"template","template":"vocab-match3","families":["vocabulary"],"match":{"templates":["vocab-match3","vocab-pick3","lesson-vocab"]},"config":"design/cards/vocabulary/card.json","indexSha":"9ad4eb57ab31f4193fcb2c0f8ffd3adbc6a4cc76","bodySha":"9ba3eb2414109b14","format":2,"configSha":"ecfd9e8dd604"}
+{"cited":"","rules":"VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 AK-1 a0cc12 2 d4709f H13 36f579 VQ-4 b89965 5 1fa595 7 2253df 9 0b5532 10 2ed85c CL-40 2a6dbb SL-11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 10 256ad3 C1 66f8a9 2 a51365 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 L1 799b66 3 901e56 6 6e19d8 BD-4 b3947b 11 29d891 RP-1 d529bd 20 8888b0 SL-2 f404d5 3 468d78 SP-2 1f2df0 3 7b7bfb","entries":"D%3AvocabTask%3Dmatch3 bcefeb D%3AvocabTask%3Dpick3 bcefeb D%3AvocabGrade%3D1 bcefeb D%3AvocabGrade%3D2 bcefeb D%3AvocabGrade%3D3 bcefeb D%3AvocabGrade%3D4 bcefeb D%3AvocabSet%3Dnull bcefeb D%3AvocabSet%3D0 bcefeb D%3AvocabSet%3D1 bcefeb D%3AvocabSet%3D2 bcefeb D%3AvocabSet%3D3 bcefeb D%3AvocabSet%3D4 bcefeb D%3AvocabSet%3D5 bcefeb D%3AvocabSet%3D6 bcefeb D%3AvocabSet%3D7 bcefeb D%3AvocabSet%3D8 bcefeb D%3AvocabSet%3D9 bcefeb D%3AvocabSet%3D10 bcefeb D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Alesson 04b8b3 D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Aword-problems 04b8b3 D%3Arole%3Afact-rows 04b8b3 D%3Arole%3Afact-probe 04b8b3 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 04b8b3 D%3Ahost%3Arace 04b8b3 D%3Ahost%3Amap 04b8b3 D%3Ahost%3Amode-dark 04b8b3 D%3Ahost%3Amode-bigboard 04b8b3"}
 -->
 <!-- rulings
 {"v": 1, "card": "vocabulary",
@@ -15,9 +15,11 @@
  {"id":"T-5.3","source":"§5.3","text":"Pictures very high quality, black and white, drawn by the app; ONE shared set serves th..."},
  {"id":"T-5.4","source":"§5.4","text":"Each problem type is a distinct task kind, so it is ALSO a findable preset skill with s..."},
  {"id":"T-5.5","source":"§5.5","text":"Scope: only the 64 CCSS BUILD lessons, their vocabulary first, earliest rounds first. G..."},
+ {"id":"T-5.6","source":"§5.6","text":"\"All as suggested\": the card approved as the lane decided it (section 9 answered as rec..."},
+ {"id":"T-5.7","source":"§5.7","text":"Q1: role:lesson is OUT OF SCOPE for vocabulary:vocab_grade_pictures and vocabulary:voca..."},
+ {"id":"T-5.8","source":"§5.8","text":"Q2: the page counts 4 / 6 / 8 (1 picture, 3 words at K-1 / grades 2-3 / grades 4-5) and..."},
  {"id":"T-9.1","source":"§9.1","text":"Screen response for Match 3: type the letter in each box (built), or tap A / B / C unde..."},
- {"id":"T-9.2","source":"§9.2","text":"The lesson vocabulary page prints only for a lesson whose record names its vocabSet. Sh..."},
- {"id":"T-9.3","source":"§9.3","text":"Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in r..."}
+ {"id":"T-9.2","source":"§9.2","text":"Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in r..."}
 ]
 }
 -->
@@ -35,9 +37,9 @@ The language of the lessons, not one standard: each word set is the vocabulary o
 
 - **vocabulary** (2): `vocab_grade_pictures`, `vocab_pick3_words`
 
-**CCSS** (SKILL_STANDARDS of those skills): 3.OA.B.5, 3.OA.D.8, 3.OA.D.9
+**CCSS** (SKILL_STANDARDS of those skills): (none)
 
-**Essential Elements:** M.EE.3.OA.8
+**Essential Elements:** (none)
 
 **WRM small steps** (SKILL_WRM): (none)
 
@@ -565,7 +567,10 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - **2026-10-25** — Per page: Match 3 pictures = 4; 1 picture, 3 words: K-1 4, grades 2-3 6, grades 4-6 8. (`IMPROVEMENT_PLAN item 2`)
 - **2026-10-25** — Pictures very high quality, black and white, drawn by the app; ONE shared set serves the lesson's vocabulary page and the vocabulary practice; every approved drawing joins the graphic library. (`IMPROVEMENT_PLAN items 3-4`)
 - **2026-10-25** — Each problem type is a distinct task kind, so it is ALSO a findable preset skill with standards, WRM, search terms and share codes. (`IMPROVEMENT_PLAN item 5; CLAUDE.md owner rule 2026-10-17`)
-- **2026-11-07** — Scope: only the 64 CCSS BUILD lessons, their vocabulary first, earliest rounds first. Grade map K = Y1 ... G5 = Y6. No owner sign-off of cards: decide card lines from the standards and record them; the owner reviews finished work. (`lead's launch message (owner decisions 2026-11-07, design/STATUS.md:713)`)
+- **2026-11-07** — Scope: only the 64 CCSS BUILD lessons, their vocabulary first, earliest rounds first. Grade map K = Y1 ... G5 = Y6. (`lead's launch message (owner decisions 2026-11-07, design/STATUS.md:713)`)
+- **2026-11-07** — "All as suggested": the card approved as the lane decided it (section 9 answered as recommended). (`owner in the lead session, relayed by the lead 2026-11-07`)
+- **2026-11-07** — Q1: role:lesson is OUT OF SCOPE for vocabulary:vocab_grade_pictures and vocabulary:vocab_pick3_words: their lesson is the lesson part vocab-page inside each BUILD lesson. (`owner in the lead session, relayed by the lead 2026-11-07`)
+- **2026-11-07** — Q2: the page counts 4 / 6 / 8 (1 picture, 3 words at K-1 / grades 2-3 / grades 4-5) and 4 (Match 3) are the owner's: a value that prints fewer items than the default page for that reason is owner-ruled capacity (tests/fixtures/precritic/options-render.pins.json), not an H13 cost. (`owner in the lead session, relayed by the lead 2026-11-07`)
 
 ## 6. Misconceptions
 
@@ -601,7 +606,7 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 - `role:independent` — **offered** — the pass bar (RUBRIC scope) (CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record))
 - `role:more-practice` — **offered** — the pass bar (CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record))
 - `role:test` — **offered** — the pass bar (CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record))
-- `role:lesson` — **offered** — the lesson packet; the vocabulary page is the lesson part vocab-page (CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record))
+- `role:lesson` — **out of scope** — a vocabulary skill's lesson is the lesson part vocab-page inside each BUILD lesson; its own standard packet is not printed for it (owner 2026-11-07 (Q1, via the lead))
 - `role:scripted-model` — **offered** — provider workedSteps real: look, say what each picture shows, write (CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record))
 - `role:guided` — **offered** — provider workedSteps real (CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record))
 - `role:opener` — **offered** — any skill on any page type (CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record))
@@ -641,9 +646,8 @@ Each runs as `node tests/scripts/<script> …`.
 
 ## 9. Open questions (recommended answers)
 
-1. **Screen response for Match 3: type the letter in each box (built), or tap A / B / C under each word?** Recommended: Type the letter (built): it is the paper response itself and needs no new screen widget; a tap row can be added later without changing paper.
-2. **The lesson vocabulary page prints only for a lesson whose record names its vocabSet. Should the passed long lessons (1-6) gain it?** Recommended: Not now: their vocabulary band stays as it is (no re-grade); the BUILD lessons made by the lesson compiler name their set and get the page.
-3. **Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in round order?** Recommended: Yes, round 2's BUILD lessons next (7 lessons), the same picture rules.
+1. **Screen response for Match 3: type the letter in each box (built), or tap A / B / C under each word?** Recommended: Type the letter (built): it is the paper response itself; a tap row can come later without changing paper. (Owner: as suggested, 2026-11-07.)
+2. **Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in round order?** Recommended: Yes, round 2's BUILD lessons next (7 lessons), the same picture rules. (Owner: as suggested, 2026-11-07.)
 
 Signed: (not yet signed)
 
@@ -654,24 +658,24 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 
 **Option values (offeredOptionsFor)** (21 lines; 0 undecided)
 
-- `vocabTask=match3` Task [difficulty], default on vocab_grade_pictures (all 2) [offered]
-- `vocabTask=pick3` Task [difficulty], default on vocab_pick3_words (all 2) [offered]
-- `vocabGrade=1` Grade of the words [range] (all 2) [offered]
-- `vocabGrade=2` Grade of the words [range] (all 2) [offered]
-- `vocabGrade=3` Grade of the words [range], default (all 2) [offered]
-- `vocabGrade=4` Grade of the words [range] (all 2) [offered]
-- `vocabSet=null` Words of one lesson [range], default (all 2) [offered]
-- `vocabSet=0` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=1` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=2` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=3` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=4` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=5` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=6` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=7` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=8` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=9` Words of one lesson [range] (all 2) [offered]
-- `vocabSet=10` Words of one lesson [range] (all 2) [offered]
+- `vocabTask=match3` Task [difficulty], default (vocab_grade_pictures) [offered]
+- `vocabTask=pick3` Task [difficulty] (vocab_grade_pictures) [offered]
+- `vocabGrade=1` Grade of the words [range] (vocab_grade_pictures) [offered]
+- `vocabGrade=2` Grade of the words [range] (vocab_grade_pictures) [offered]
+- `vocabGrade=3` Grade of the words [range], default (vocab_grade_pictures) [offered]
+- `vocabGrade=4` Grade of the words [range] (vocab_grade_pictures) [offered]
+- `vocabSet=null` Words of one lesson [range], default (vocab_grade_pictures) [offered]
+- `vocabSet=0` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=1` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=2` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=3` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=4` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=5` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=6` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=7` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=8` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=9` Words of one lesson [range] (vocab_grade_pictures) [offered]
+- `vocabSet=10` Words of one lesson [range] (vocab_grade_pictures) [offered]
 - `calculator=true` Calculator [play] (all 2) [out of scope]
 - `calculator=false` Calculator [play], default (all 2) [out of scope]
 - `skipAfter=*` Skip appears after [play] (all 2) [out of scope]
@@ -681,9 +685,9 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:independent` — the skill's own items (all 2) [offered]
 - `role:more-practice` — the skill's own items (all 2) [offered]
 - `role:opener` (also lesson-opener) — the skill's own items (all 2) [offered]
-- `role:scripted-model` (also model) — provider workedSteps: real 2/2 (all 2) [offered]
-- `role:guided` — provider workedSteps: real 2/2 (all 2) [offered]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 2/2; provider misconceptions: real 2/2 (all 2) [offered]
+- `role:scripted-model` (also model) — provider workedSteps: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words) (all 2) [offered]
+- `role:guided` — provider workedSteps: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words) (all 2) [offered]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words); provider misconceptions: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words) (all 2) [offered]
 - `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 2) [offered]
 - `role:test` (also test-a, test-b) — the skill's own items (all 2) [offered]
 - `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 2) [offered]
@@ -691,10 +695,10 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:fact-rows` — provider stories: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words) (all 2) [out of scope]
 - `role:fact-probe` — the skill's own items (all 2) [out of scope]
 - `role:mixed-practice` (also mixed) — provider stories: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words) (all 2) [offered]
-- `role:true-false` — provider wrongAnswer: real 2/2 (all 2) [offered]
-- `role:reason-it` (also reason) — provider workedSteps: real 2/2; provider wrongAnswer: real 2/2 (all 2) [offered]
+- `role:true-false` — provider wrongAnswer: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words) (all 2) [offered]
+- `role:reason-it` (also reason) — provider workedSteps: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words); provider wrongAnswer: real 0/2 (default on vocab_grade_pictures, vocab_pick3_words) (all 2) [offered]
 - `role:stretch` — the skill's own items (all 2) [offered]
-- `role:lesson` — lesson data: prereqs.js 0/2 (FALLBACK, warm-up from the earlier skills in data.js order, on vocab_grade_pictures, vocab_pick3_words) (all 2) [offered]
+- `role:lesson` — lesson data: prereqs.js 2/2 (all 2) [out of scope]
 
 **Screen hosts** (8 lines; 0 undecided)
 
@@ -707,5 +711,5 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 2) [offered]
 - `host:race` — driven by ws-chromebook-fit (all 2) [out of scope]
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): `vocabulary:vocab_pick3_words` → `vocabulary:vocab_grade_pictures` {"vocabTask":"pick3"}
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): (none)
 <!-- /informational -->
