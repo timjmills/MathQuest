@@ -1402,8 +1402,8 @@
     "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; touch Independent S: 12 cells, a 18.0 mm band in 57.3 mm cells (31 %)"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix",
-    "state": "the lf-ops fix commit (filled when the fix lands)"
+    "commit": "f2d1e8d",
+    "state": "lf-ops #7 fix (dc67f40 strip to the band top; d08bcc7 supported ÷ rows at 1.05 room, framed true array offered to dividends <= 50, sign box under a ÷ fact whose line does not fit; 5342758 array beside, supported Review columns; f2d1e8d faded packet dealt in stages)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles independent --supports touch --size S --lints L-DENSITY",
    "expect": {
@@ -1422,8 +1422,8 @@
     "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; array Review M at the critic's seed 62975: the array on none of the 6 facts (R4-2b)"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix",
-    "state": "the lf-ops fix commit (filled when the fix lands)"
+    "commit": "f2d1e8d",
+    "state": "lf-ops #7 fix (dc67f40 strip to the band top; d08bcc7 supported ÷ rows at 1.05 room, framed true array offered to dividends <= 50, sign box under a ÷ fact whose line does not fit; 5342758 array beside, supported Review columns; f2d1e8d faded packet dealt in stages)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles review --supports array --size M --seed render --lints L-SUPPORT",
    "expect": {
@@ -1442,8 +1442,8 @@
     "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; boxsign Test L at the critic's seed 805715: grid cells and a full-width row, two geometries"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix",
-    "state": "the lf-ops fix commit (filled when the fix lands)"
+    "commit": "f2d1e8d",
+    "state": "lf-ops #7 fix (dc67f40 strip to the band top; d08bcc7 supported ÷ rows at 1.05 room, framed true array offered to dividends <= 50, sign box under a ÷ fact whose line does not fit; 5342758 array beside, supported Review columns; f2d1e8d faded packet dealt in stages)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles test --supports boxsign --size L --seed render --lints L-SUPPORT",
    "expect": {
@@ -1462,8 +1462,8 @@
     "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; array Review S at the critic's seed 62975: 7 problems"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix",
-    "state": "the lf-ops fix commit (filled when the fix lands)"
+    "commit": "f2d1e8d",
+    "state": "lf-ops #7 fix (dc67f40 strip to the band top; d08bcc7 supported ÷ rows at 1.05 room, framed true array offered to dividends <= 50, sign box under a ÷ fact whose line does not fit; 5342758 array beside, supported Review columns; f2d1e8d faded packet dealt in stages)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles review --supports array --size S --seed render --lints L-DENSITY",
    "expect": {
@@ -1482,8 +1482,8 @@
     "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; skip Independent S: 13 strips short (70 ÷ 7 stops at 35)"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix",
-    "state": "the lf-ops fix commit (filled when the fix lands)"
+    "commit": "f2d1e8d",
+    "state": "lf-ops #7 fix (dc67f40 strip to the band top; d08bcc7 supported ÷ rows at 1.05 room, framed true array offered to dividends <= 50, sign box under a ÷ fact whose line does not fit; 5342758 array beside, supported Review columns; f2d1e8d faded packet dealt in stages)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles independent --supports skip --size S --lints L-SUPPORT",
    "expect": {
@@ -1502,8 +1502,8 @@
     "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; boxsign Test L at the critic's seed 805715: 132 ÷ 12 alone in a full-width row that fits a grid column"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix",
-    "state": "the lf-ops fix commit (filled when the fix lands)"
+    "commit": "f2d1e8d",
+    "state": "lf-ops #7 fix (dc67f40 strip to the band top; d08bcc7 supported ÷ rows at 1.05 room, framed true array offered to dividends <= 50, sign box under a ÷ fact whose line does not fit; 5342758 array beside, supported Review columns; f2d1e8d faded packet dealt in stages)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --roles test --supports boxsign --size L --seed render --lints L-DENSITY",
    "expect": {
@@ -1522,8 +1522,8 @@
     "state": "critic laned-restart r4 FAIL commit (lane D restart head): div_facts supports graded each alone at S / M / L; fade packet M: 1 0 3 3 1 1 3 3 3 1 0 0 0"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix",
-    "state": "the lf-ops fix commit (filled when the fix lands)"
+    "commit": "f2d1e8d",
+    "state": "lf-ops #7 fix (dc67f40 strip to the band top; d08bcc7 supported ÷ rows at 1.05 room, framed true array offered to dividends <= 50, sign box under a ÷ fact whose line does not fit; 5342758 array beside, supported Review columns; f2d1e8d faded packet dealt in stages)"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --supports all --fade packet --pages 3 --size M --lints L-SUPPORT",
    "expect": {
