@@ -171,7 +171,13 @@ function PROBE(arrowSrc) {
     const act = document.activeElement;
     let focus = 'n/a';
     if (graded.length) {
-        const want = graded[0];
+        let want = graded[0];
+        // WORD-WORK COPY BOXES (lane lf-ops, lead ruling 2026-11-07): a story's column copy box whose place holds no digit
+        // (data-mq-expect="") stays BLANK (active-box D6: pulsing it would invite a wrong digit), so the item marks the box
+        // it writes first (data-mq-first-write, question-render _firstWriteBox). Focus there is right when every box before
+        // it in entry order is such a blank copy box.
+        const fw = card.querySelector('[data-mq-first-write]');
+        if (fw && graded.includes(fw) && graded.slice(0, graded.indexOf(fw)).every((el) => el.matches('input.mq-wwork') && el.getAttribute('data-mq-expect') === '')) want = fw;
         if (act === want) focus = 'ok';
         else {
             focus = 'FAIL';
@@ -225,6 +231,15 @@ const BARE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{marg
 input{width:40px;height:40px}</style><div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"><div><span>4,367</span><span>- 2,244</span></div>
 <div><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"></div></div><button id="qcCheckBtn">Check</button></div>
 <script>window.state = { currentQ: { printFormat: 'column-sub', cell: { template: 'stack' } } }; (() => { const b = document.querySelectorAll('input.mq-cellslot')[${variant === 'bare-right' ? 3 : 0}]; b.classList.add('mq-active-box'); b.focus(); })();</script>`;
+// lane lf-ops (lead ruling 2026-11-07, D6): a story's column copy boxes - the first holds no digit (expect "") and stays
+// blank; the item marks its first write box. 'ww-marked' focuses the marked box (ok); 'ww-unmarked' the same box with no
+// mark (FOCUS, the old reading); 'ww-late' marks and focuses a box after a copy box that DOES expect a digit (FOCUS).
+const WWORK = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px}
+input{width:44px;height:44px}</style><div id="questionCard"><div id="questionText">Circle the sign. Write the numbers. Solve.</div><div id="questionPaper">
+<div><input class="mq-wwork" data-mq-expect="${variant === 'ww-late' ? '1' : ''}"><input class="mq-wwork" data-mq-expect="8"></div>
+<div><input class="mq-wwork" data-mq-expect=""><input class="mq-wwork" data-mq-expect="2"></div>
+<div><input class="mq-cellslot"><input class="mq-cellslot"></div></div><button id="qcCheckBtn">Check</button></div>
+<script>window.state = null; (() => { const b = document.querySelectorAll('input.mq-wwork')[1]; if (${variant !== 'ww-unmarked'}) b.setAttribute('data-mq-first-write', '1'); b.focus(); })();</script>`;
 // critic skip-count r5 SC4: a count row's swipe window ([data-mq-swiperow], overflow-x auto) holds a row wider than the card.
 // 'swipe' scrolls it to its first box (focused, in view): no CLIP-X, no INVIEW. 'swipe-wide' makes the WINDOW itself wider than
 // the card (CLIP-X on the window). 'swipe-hidden' leaves the focused box scrolled out of the window (INVIEW).
@@ -273,11 +288,18 @@ async function selfTest() {
         if (sw.findings.length || sw.focus !== 'ok') fails.push(`swipe window at its first box: no finding (SC4: its content is clipped by design) (${JSON.stringify(sw.findings)})`);
         const sww = await runS('swipe-wide');
         if (!sww.findings.some((x) => x.rule === 'CLIP-X')) fails.push('swipe window wider than the card: a CLIP-X finding on the window');
+        const runW = async (v) => { await page.setContent(WWORK(v)); await page.waitForFunction(() => document.readyState === 'complete'); return page.evaluate(PROBE); };
+        const wm = await runW('ww-marked');
+        if (wm.focus !== 'ok') fails.push(`story copy boxes, the marked first write box after a blank copy box focused: must be ok (${JSON.stringify(wm.findings)})`);
+        const wu = await runW('ww-unmarked');
+        if (!wu.findings.some((x) => x.rule === 'FOCUS')) fails.push('story copy boxes, the same box focused with no first-write mark: a FOCUS finding');
+        const wl = await runW('ww-late');
+        if (!wl.findings.some((x) => x.rule === 'FOCUS')) fails.push('story copy boxes, marked box after a copy box that expects a digit: a FOCUS finding');
         const swh = await runS('swipe-hidden');
         if (!swh.findings.some((x) => x.rule === 'INVIEW')) fails.push('focused box scrolled out of its swipe window: an INVIEW finding');
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 10 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 13 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 

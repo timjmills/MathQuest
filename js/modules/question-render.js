@@ -1550,6 +1550,8 @@ function _applyMapSlots(q) {
         input.style.setProperty('display', 'none', 'important');
         visualAid.classList.add('mq-map-cellslots');
         const first = _firstWriteBox(visualAid);
+        // (the box the pupil writes first, named for the checks: a blank story copy box before it stays blank, D6)
+        if (first) first.setAttribute('data-mq-first-write', '1');
         if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
     }
 }
@@ -1724,6 +1726,7 @@ function _applyScreenCell() {
             paper.classList.add('mq-slot-moved');
             visualAid.dataset.mqNoZoom = '1';
             const first = _firstWriteBox(visualAid);
+            if (first) first.setAttribute('data-mq-first-write', '1');
             if (first && !state.hasAnswered) {
                 try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
             }
