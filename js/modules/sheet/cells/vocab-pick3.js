@@ -72,7 +72,8 @@ register(PICK3_TEMPLATE, {
         // 7.7 mm over the panel)
         // (a teaching state - the anchor chart's panels and guided cells draw at scaffold level 2-3 - has no page share)
         const inChart = (ctx.chartZoom !== undefined && ctx.chartZoom !== null) || Number(ctx.scaffoldLevel) >= 2;
-        const minH = twin || inChart ? '' : `min-height:${PICK3_MIN_H[gc]}mm;`;
+        // (and fills its row: a row taller than the cell - a rebalanced last page - shares the spare above and below, H13)
+        const minH = twin || inChart ? '' : `min-height:${PICK3_MIN_H[gc]}mm;height:100%;`;
         const pic = vocabPictureSVG(ctx, p.word, { wMm: pick3PicW(p) });
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
         const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}`;

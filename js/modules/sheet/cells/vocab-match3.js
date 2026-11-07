@@ -53,7 +53,7 @@ register(MATCH3_TEMPLATE, {
             // (data-mq-kind="word": the screen slot keeps a letter; a plain slot keeps digits only - precritic ws-screen-answer r1)
             const hook = twin ? ' data-mq-cell="1" data-mq-w="1" data-mq-kind="word"' : '';
             const boxHtml = `<span class="mq-vm-box" data-ws-slot="letter-${n}" data-ws-shape="box"${show ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : ''}${hook}`
-                + ` style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, side)};height:${L(ctx, side)};`
+                + ` style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${twin ? `max(44px, ${L(ctx, side)})` : L(ctx, side)};height:${twin ? `max(44px, ${L(ctx, side)})` : L(ctx, side)};`
                 + `border:${B(ctx, 1.5)} solid ${INK};background:#fff;font-size:${P(ctx, tp + 6)};font-weight:700;line-height:1;color:${ink};flex:none;${KEY_FEATURES}">${esc(val)}</span>`;
             return `<span class="mq-vm-word" style="display:inline-flex;align-items:center;gap:${L(ctx, 2.5)};flex:1 1 0;justify-content:center;min-width:0;">`
                 + `<b style="font-size:${P(ctx, tp + 3)};line-height:1.15;text-align:right;">${esc(words[wi])}</b>${boxHtml}</span>`;
