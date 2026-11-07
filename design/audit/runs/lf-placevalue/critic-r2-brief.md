@@ -47,3 +47,14 @@ in r1 (first family, lead ruling R1) at one size each.
 
 Write `design/audit/runs/lf-placevalue/critic-r2.md`; end with `VERDICT: PASS` / `VERDICT: FAIL` per skill (engine findings listed
 separately, not counted).
+
+**Round 2 builder (2026-11-07, 9f483f78 / 9b67cd84):** every pv cell fits every §7a option value on its own pages (ws-cell-checks:
+combine 196 → 0, value 48 → 0, expand 32 → 24, unit_form 22 → 10; combine band=999999 at L clean). Grade the option values too.
+
+**Red rows that are NOT pv's (lead ruling D3; named here, graded, recorded as findings, not holding pv):**
+- identify lesson S/M/L at band 99999 / 999999, places [10000] / [100000] and writeValue=false; expand lesson band=999999 —
+  `sheet/roles/lesson.js` `chartPage` (zoom never below 1 without a tail item; dH measured at 2 columns): lf-engine.
+- identify#lesson DN-2 at L / H13 at S (the value line's taller cells, lesson pagination): lf-engine.
+- unit_form Reason It key overflow S/M/L — `sheet/roles/reason-it.js` `prepare` sizes "The answer is ___" by digit count: shared roles.
+- SCREEN-DIGIT (identify / expand screen numerals): host files, hosts lane next week.
+- the two-skill sections sheet PAGEFILL / PG-23: engine sections pagination (r1 F21).
