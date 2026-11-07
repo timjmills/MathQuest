@@ -634,6 +634,11 @@ export function factRowsLayout(items, input) {
     // fit; print-lint ILLEGIBLE / PG-12 at 16 pt in 8 columns). Division keeps its own path above.
     // Only 5-6-digit facts (owner, 2026-10-24: "big sums only"); x12 and other short facts keep
     // their columns and step the digits down the ladder (ws-layout-unit VA-2).
+    // The operator track the fact template DRAWS (cells/fact.js factOpTrackEm): a band of 3+ tracks over a shorter second
+    // number takes the tight 0.72 em track (x 1-12: "x _12" over "144"), so its facts are 2.88 em, not 3.36 em, wide
+    // (facts-print-fix r4 D-R4-6: mult_facts alone at L dropped to 24 pt on the 1.2 em estimate; 28 pt fits with 4 mm a side)
+    // hoisted above its first use (bigFact branch) - 2026-11-07 hotfix: TDZ ReferenceError on 5-6-digit facts
+    const opEm = items.length ? Math.max(...items.map((it) => { const o = operandsOf(it.q || {}); return o.length >= 2 ? factOpTrackEm(n, o[1], OP_SIGN[opOf(it.q || {})]) : FACT_OP_TRACK_EM; })) : FACT_OP_TRACK_EM;
     const bigFact = !divide && n >= 5;
     if (bigFact) {
         const floor = (SIZES[ctx.size] || SIZES.L).digitPt;
@@ -648,10 +653,6 @@ export function factRowsLayout(items, input) {
     // budget used as a column gate cost add_facts / sub_facts their Auto 10 at S, and overrode an
     // explicit teacher choice, though the facts fit with 1.7-4.4 mm to spare).
     const lastRung = LADDER_PTS[LADDER_PTS.length - 1];
-    // The operator track the fact template DRAWS (cells/fact.js factOpTrackEm): a band of 3+ tracks over a shorter second
-    // number takes the tight 0.72 em track (x 1-12: "x _12" over "144"), so its facts are 2.88 em, not 3.36 em, wide
-    // (facts-print-fix r4 D-R4-6: mult_facts alone at L dropped to 24 pt on the 1.2 em estimate; 28 pt fits with 4 mm a side)
-    const opEm = items.length ? Math.max(...items.map((it) => { const o = operandsOf(it.q || {}); return o.length >= 2 ? factOpTrackEm(n, o[1], OP_SIGN[opOf(it.q || {})]) : FACT_OP_TRACK_EM; })) : FACT_OP_TRACK_EM;
     if (!divide && !bigFact) {
         const before = cols;
         while (cols > 2 && verticalFitPt(cols, n, ctx.look, lastRung, ctx.size, FIT_CLEAR_MM, opEm) === 0) cols--;
