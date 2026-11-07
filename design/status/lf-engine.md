@@ -9,10 +9,9 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
-- PAUSED at the week's budget stop (14:35 UTC, session $132.31 ≈ 6.6 %). Hand-over below ("Hand-over 2026-11-07").
-- Live: R1 R2 R4 R5 on master (ef532943). Ready for the next deploy on `claude/sweet-newton-c8wrv1-lf-engine-live` (from ef532943): 804b7e7d R9, b6c02e4e R8, 9988cce1 R6, 76fd396d lesson 2 E24, 39244416 lesson 4 LP-GIVEAWAY - each `ws-detailed-lesson --check --repeats` on that tree.
-- Phase 0 pages: critic r2 FAIL min 6; N1 N3 N4 fixed, N2 floor fixed; samples re-rendered (7744c2b4); critic r3 not run.
-- Compiler (P2) merged; proof P2b not started.
+- PAUSED (evening rounds done). Deploy list sent: -live 538c2b58, 0b8ffb14, a0cca381 (lesson 3a owner rulings PASS narrow critic r2 min 8; lesson 2 parts 2-9).
+- Open: lesson 2 E24b (deal order; attempt 1 patch in design/lessons/proof/live-2026-11-07/), E9, E35 (lf-checks gate); phase 0 critic r3; P2b proof; pv chartPage defects (item 8).
+- Next-week order: see "Hand-over 2026-11-07" (items 2 and 3 updated).
 
 ## Owner go
 
@@ -115,5 +114,6 @@ Speed-ups: lf-checks `--lp` / `--sweep` with MQ_ROOT on any tree gives a 1-5 min
 ## Cost
 - 08:20 UTC: session cost_usd $39.56 (≈ 2.0 % of the weekly limit at $20 ≈ 1 %).
 - 11:00 UTC: session cost_usd $80.04 (≈ 4.0 %). Cap $470 (23.5 %).
+- 19:50 UTC (3a live fix PASS, narrow critic r2 min 8; deploy list a0cca381 to the lead): session cost_usd $174.23 ≈ 8.7 %.
 - 18:52 UTC (P1d live round, lead's $60 cap): session cost_usd $156.04 ≈ 7.8 % (round ≈ $24).
 - 14:31 UTC (hand-over): session cost_usd $132.31 ≈ 6.6 % of the weekly limit ($20 ≈ 1 %), sub-agents included. P1 ≈ $85, P2 ≈ $25, coordination ≈ $20 (estimates from the running total).
