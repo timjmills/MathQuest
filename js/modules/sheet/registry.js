@@ -167,7 +167,12 @@ export function renderCell(q, ctx = {}) {
         let ghostHtml = '';
         if (fp && /^(\/|÷|divide)$/.test(String(payload.op || '')) && Number(payload.a) <= 144 && Number(payload.b) <= 12) {
             try {
-                const widePayload = Object.assign(withoutSupports(payload), { a: 144, b: 12, ans: 12 });
+                // (facts card F2: a section that draws the framed array holds dividends of 50 or less; its widest fact is
+                // the frame's own - the largest divisor times the band's top - not 144 ÷ 12)
+                const af = payload.supports && payload.supports.arrayFrame;
+                const widePayload = af && Number(af.cols) > 0 && Number(af.rows) > 0
+                    ? Object.assign(withoutSupports(payload), { a: af.cols * af.rows, b: af.cols, ans: af.rows })
+                    : Object.assign(withoutSupports(payload), { a: 144, b: 12, ans: 12 });
                 const wide = tpl.footprint.call(tpl, widePayload, c);
                 if (wide && wide.wMm > fp.wMm) fp = Object.assign({}, fp, { wMm: wide.wMm });
                 // Critic r3 R3-1: the widest fact of the set, drawn unseen under the item's own, holds ONE
