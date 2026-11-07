@@ -36,5 +36,6 @@
     "subtraction:sub_1m_no_regroup": ["subtraction:sub_1m_regroup"]
    }
   }
- }
+ },
+ "ownerSkipped": [{"skill": "multiplication:count_by_tables", "template": "count-row", "proof": "count-row card §9 Q2(a) (signed 2026-11-07, lane decision under owner rule 2026-11-07): the first count-row drawing has no approved sibling; sibling-compare is SKIPPED-owner until the card's skills pass", "until": "count_by_tables in js/modules/redesign-passed.js"}]
 }

@@ -408,6 +408,17 @@ function main() {
         for (const x of c.above) { const m = hit(x); if (m) say(`MAIN-RED   ${x.id} ${x.size} ${x.rule}: ours ${x.n} (non-blocking: ${m.proof})`); else keep.push(x); }
         if (keep.length !== c.above.length) { c.above = keep; c.rowsAbove = new Set([...keep, ...c.noSibling].map((x) => x.id)); }
     } catch (e) { /* no mainRed list */ }
+    // OWNER-SKIPPED (lane lf-ops 2026-11-07, count-row card §9 Q2(a)): a skill listed in siblings.json `ownerSkipped`
+    // with its proof (the signed card ruling that its template has no approved model yet, so sibling-compare is
+    // SKIPPED-owner until the card's skills pass) has its NO-SIBLING rows reported, not blocking. An ABOVE or ERROR row
+    // still blocks; the entry comes off when the skill passes (js/modules/redesign-passed.js).
+    try {
+        const os2 = (JSON.parse(fs.readFileSync(sf, 'utf8')).ownerSkipped || []).filter((m) => m && m.skill && m.proof);
+        const skip = (x) => os2.find((m) => String(x.id).split('|')[0] === m.skill);
+        const keep = [];
+        for (const x of c.noSibling) { const m = skip(x); if (m) say(`SKIPPED-OWNER ${x.id} ${x.size} ${x.rule}: ours ${x.n} (non-blocking: ${m.proof})`); else keep.push(x); }
+        if (keep.length !== c.noSibling.length) { c.noSibling = keep; c.rowsAbove = new Set([...c.above, ...keep].map((x) => x.id)); }
+    } catch (e) { /* no ownerSkipped list */ }
     // ---- report
     const red = oursRows.filter((r) => r.status === 'RED').length;
     const noBase = oursRows.filter((r) => r.status === 'PENDING' && printed(r)).length;
