@@ -5,6 +5,40 @@ import { splitOptionSuffix, decodeOptionPayload } from './skill-option-codec.js'
 import { describeOptions } from './skill-options.js';
 import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, escHTML } from './skill-options-ui.js';
 import { searchSkillIndex } from './skill-search.js';
+import { pupilNameOf, pupilCardParts } from './pupil-names.js';
+
+// Card and chip names (explorer check D1, 2026-11-05): the FULL label without its leading icons — never cut to
+// 12 or 20 characters ("Add within 2" for two different skills). CSS clamps it (2 lines on a card, an ellipsis on a
+// chip) and the full name stays in title / aria-label. Cards saved with an old cut name show the full label again.
+const QS_LEAD_ICONS = /^[\s\u{1F300}-\u{1FAFF}☀-➿⬀-⯿️‍½]+/u;
+export const qsCleanName = (label) => String(label || '').replace(QS_LEAD_ICONS, '').trim() || String(label || '');
+/** The name a Quick Start card shows: a curated short name ("Mult Facts"), else the full cleaned label. */
+export function qsCardName(card) {
+    const full = qsCleanName(card && card.skillLabel);
+    const sn = card && card.shortName ? String(card.shortName) : '';
+    if (!sn) return full;
+    const cut = sn.replace(/\s+$/, '');
+    return full.startsWith(cut) && cut.length < full.length ? full : sn;   // an old 12-character cut: show it all
+}
+/**
+ * The name a pupil sees (explorer check r2 D1): the pupil name from pupil-names.js — no "(Visual)", "(MAP)", "Denom" —
+ * the same name the explorer shows, so a picked skill reads the same everywhere. A curated short name ("Mult Facts")
+ * is kept. Cards saved earlier carry the raw label; the name is read from the skill id, so they change too.
+ */
+export function qsPupilName(card) {
+    if (!card) return '';
+    const full = qsCleanName(card.skillLabel);
+    const sn = card.shortName ? String(card.shortName).replace(/\s+$/, '') : '';
+    if (sn && !(full.startsWith(sn) && sn.length <= full.length)) return sn;   // curated, not the label or an old cut of it
+    return pupilNameOf(card.categoryId, card.skillId, card.skillLabel) || full;
+}
+/** Names for a whole grid: two cards never read the same (the same label in two categories adds the category). */
+export function qsCardNames(cards, pupil = false) {
+    const names = (cards || []).map(pupil ? qsPupilName : qsCardName);
+    const count = new Map();
+    for (const n of names) count.set(n, (count.get(n) || 0) + 1);
+    return names.map((n, i) => (count.get(n) > 1 && cards[i].categoryName ? `${n} (${cards[i].categoryName})` : n));
+}
 
 // A Quick Start card may carry the skill's options (`card.opts`, packed): a teacher link
 // "EA~C78" makes a "Mult Facts" card that drills only the 7s and 8s, and a teacher can set them
@@ -26,6 +60,12 @@ registerSkillOptionsHost('qs', {
     rerender: () => renderQuickSkillsGrid(),
 });
 
+// a pupil's toast names the skill as the card does (check r2 D1); a teacher's keeps the label
+function _toastName(categoryId, skillId, skillLabel) {
+    if (document.body.classList.contains('student-mode')) return qsPupilName(_cardFor(categoryId, skillId) || { categoryId, skillId, skillLabel });
+    return String(skillLabel || '').replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/u, '');
+}
+
 export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, categoryName) {
     // Get domain ID from category
     const domainId = getDomainByCategory(categoryId) || 'number_operations';
@@ -36,7 +76,7 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
     if (UnifiedSkills.has(skillId, categoryId)) {
         // Remove the skill using UnifiedSkills
         UnifiedSkills.removeBySkillId(skillId);
-        showNotification(`✗ Removed ${skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '')}`, 'info');
+        showNotification(`✗ Removed ${_toastName(categoryId, skillId, skillLabel)}`, 'info');
         updateQuickSkillCards();
         return;
     }
@@ -55,7 +95,7 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
     });
 
     if (added) {
-        showNotification(`✓ Added ${skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '')}!`, 'success');
+        showNotification(`✓ Added ${_toastName(categoryId, skillId, skillLabel)}!`, 'success');
         // Update quick skill card visual
         updateQuickSkillCards();
     }
@@ -168,18 +208,18 @@ export function updateStudentSkillsDisplay() {
 
     let html = '';
     UnifiedSkills.skills.forEach((skill, index) => {
-        const shortName = skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 20);
+        const fullName = qsPupilName(skill);   // check r2 D1: the pupil name, as in the explorer
         const icon = skill.categoryIcon || '📚';
         const gradeHTML = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
 
         html += `
-            <div style="display:inline-flex;align-items:center;gap:4px;padding:5px 8px;background:var(--accent-purple);color:white;border-radius:6px;font-size:0.8rem;font-weight:600;">
+            <div class="sel-chip" title="${escHTML(fullName)}" style="display:inline-flex;align-items:center;gap:4px;padding:5px 8px;background:var(--accent-purple);color:white;border-radius:6px;font-size:0.8rem;font-weight:600;">
                 ${gradeHTML}
-                <span>${icon}</span>
-                <span>${shortName}${describeOptions && skill && window.describeSetOptions && window.describeSetOptions(skill.categoryId, skill.skillId) ? `<span class="sko-chip-summary" style="display:block;font-size:0.68rem;font-weight:600;opacity:0.9;">${escHTML(window.describeSetOptions(skill.categoryId, skill.skillId))}</span>` : ''}</span>
+                <span aria-hidden="true">${icon}</span>
+                <span class="sel-chip-text"><span class="sel-chip-name">${escHTML(fullName)}</span>${describeOptions && skill && window.describeSetOptions && window.describeSetOptions(skill.categoryId, skill.skillId) ? `<span class="sko-chip-summary" style="display:block;font-size:0.68rem;font-weight:600;opacity:0.9;">${escHTML(window.describeSetOptions(skill.categoryId, skill.skillId))}</span>` : ''}</span>
                 <button onclick="event.stopPropagation(); UnifiedSkills.removeByIndex(${index})"
                     style="background:rgba(255,255,255,0.3);border:none;color:white;width:18px;height:18px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;margin-left:2px;"
-                    title="Remove">×</button>
+                    title="Remove" aria-label="Remove ${escHTML(fullName)}">×</button>
             </div>
         `;
     });
@@ -214,19 +254,29 @@ function _renderQuickSkillsGridNow() {
         return;
     }
 
+    const cardNames = qsCardNames(skills, isStudentMode);   // check r2 D1: pupils see the pupil name
     grid.innerHTML = skills.map((skill, index) => {
         const isSelected = UnifiedSkills.has(skill.skillId, skill.categoryId);
         // The card's options, as a short line under its name ("Times: 7, 8").
         const optText = skill.opts && Object.keys(skill.opts).length ? describeOptions(skill.categoryId, skill.skillId, skill.opts) : '';
-        const baseName = skill.shortName || skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '');
+        const baseName = cardNames[index];
+        // check r3 R1: a pupil name that shares a long start with another shows that start as a clamped head and the
+        // part that tells them apart as a sub-line of its own (pupilCardParts), so a clamp never makes two cards read alike
+        const parts = isStudentMode && baseName === pupilNameOf(skill.categoryId, skill.skillId, skill.skillLabel) ? pupilCardParts(`${skill.categoryId}:${skill.skillId}`) : null;
+        const nameHTML = parts
+            ? `<span class="qs-name-text qs-has-tail" title="${escHTML(baseName)}">${escHTML(parts.head)}</span><span class="qs-name-tail" title="${escHTML(baseName)}">${escHTML(parts.tail)}</span>`
+            : `<span class="qs-name-text" title="${escHTML(baseName)}">${escHTML(baseName)}</span>`;
         const displayName = optText
-            ? `${baseName}<span class="qs-opt-summary" style="display:block;font-size:0.62rem;font-weight:600;opacity:0.8;line-height:1.15;margin-top:2px;">${escHTML(optText)}</span>`
-            : baseName;
+            ? `${nameHTML}<span class="qs-opt-summary" style="display:block;font-size:0.62rem;font-weight:600;opacity:0.8;line-height:1.15;margin-top:2px;">${escHTML(optText)}</span>`
+            : nameHTML;
         const gear = quickSkillsEditMode ? `<span style="position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);z-index:6;">${skillOptionsGearHTML('qs', index, skill.categoryId, skill.skillId)}</span>` : '';
         const grade = getSkillGrade(skill.skillId, skill.categoryId);
         const gradeColor = grade !== null && GRADE_COLORS[grade] ? GRADE_COLORS[grade] : null;
         const gradeBadge = gradeColor ? `<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:${gradeColor.bg};color:${gradeColor.text};font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);z-index:5;">${grade}</span>` : '';
         const source = skill.source || 'teacher';
+        // owner 2026-11-03: every Quick Start card prints (pupils too); the print loads on the press only
+        // owner 2026-11-04: no per-skill print on the pupil home (Print sits with the selection buttons by MAP)
+        const printBtn = isStudentMode ? '' : `<button type="button" class="qs-print-btn" onclick="event.stopPropagation(); printQuickSkill(${index})" aria-label="Print ${escHTML(baseName.replace(/<[^>]*>/g, ''))}" title="Print">${QS_PRINT_ICON}</button>`;
         // Default skills use pastel colors; added skills (teacher/link/student) get blue tint
         const colorClass = source === 'default'
             ? (skill.color || PASTEL_COLORS[index % PASTEL_COLORS.length])
@@ -265,7 +315,8 @@ function _renderQuickSkillsGridNow() {
                         style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ff6b6b;color:white;border:2px solid white;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,0.2);line-height:1;">×</button>
                     <span class="skill-icon">${skill.categoryIcon}</span>
                     <span class="skill-name">${displayName}</span>
-                    <span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>
+                    <span class="qs-star" style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>
+                    ${printBtn}
                 </div>
             `;
         } else {
@@ -276,7 +327,8 @@ function _renderQuickSkillsGridNow() {
                     ${gradeBadge}
                     <span class="skill-icon">${skill.categoryIcon}</span>
                     <span class="skill-name">${displayName}</span>
-                    ${source === 'student' ? '<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>' : ''}
+                    ${source === 'student' ? '<span class="qs-star" style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>' : ''}
+                    ${printBtn}
                 </div>
             `;
         }
@@ -306,6 +358,15 @@ function _renderQuickSkillsGridNow() {
 
     // Show/hide clear button
     updateClearButtonVisibility();
+}
+
+const QS_PRINT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>';
+
+/** A Quick Start card's Print button: that skill (with the card's options) in the simple print. */
+export function printQuickSkill(index) {
+    const s = (window.customQuickSkills || [])[index];
+    if (!s || typeof window.openSimplePrint !== 'function') return;
+    window.openSimplePrint([{ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts && Object.keys(s.opts).length ? s.opts : undefined }], { from: 'quick' });
 }
 
 export function toggleQuickSkillsEditMode() {
@@ -416,7 +477,7 @@ export function addToQuickSkills(categoryId, skillId, skillLabel, categoryIcon, 
         return;
     }
 
-    const shortName = skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 12);
+    const shortName = qsCleanName(skillLabel);
 
     // Assign a pastel color based on position
     const colorIndex = window.customQuickSkills.length % PASTEL_COLORS.length;
@@ -441,6 +502,29 @@ export function addToQuickSkills(categoryId, skillId, skillLabel, categoryIcon, 
     const searchResults = document.getElementById('quickSkillSearchResults');
     if (searchInput) searchInput.value = '';
     if (searchResults) searchResults.style.display = 'none';
+}
+
+/** owner 2026-11-04: Add to Quick Start — every selected skill (with its options) becomes a Quick Start card; no duplicates. */
+export function addSelectionToQuickStart() {
+    const sel = window.skillQueue || [];
+    if (!sel.length) return 0;
+    let added = 0, full = false;
+    for (const q of sel) {
+        const card = (window.customQuickSkills || []).find(s => s.skillId === q.skillId && s.categoryId === q.categoryId);
+        const opts = q.opts && Object.keys(q.opts).length ? JSON.parse(JSON.stringify(q.opts)) : undefined;
+        if (card) { if (opts) card.opts = opts; continue; }
+        if (window.customQuickSkills.length >= 16) { full = true; break; }
+        const label = q.skillLabel || q.skillId;
+        const entry = { categoryId: q.categoryId, skillId: q.skillId, skillLabel: label, categoryIcon: q.categoryIcon || '', categoryName: q.categoryName || q.categoryId,
+            shortName: qsCleanName(label), color: PASTEL_COLORS[window.customQuickSkills.length % PASTEL_COLORS.length], source: 'student' };
+        if (opts) entry.opts = opts;
+        window.customQuickSkills.push(entry);
+        added++;
+    }
+    saveQuickSkills();
+    renderQuickSkillsGrid();
+    showNotification(full ? 'Quick Start is full (max 16). Remove some first.' : added ? `Added ${added} to Quick Start` : 'Already in Quick Start!', full ? 'error' : added ? 'success' : 'info');
+    return added;
 }
 
 export function resetQuickSkillsToDefault() {
@@ -569,7 +653,7 @@ export function setQuickSkillsFromCode(codeString) {
         const domainId = getDomainByCategory(skillInfo.categoryId);
         const domain = DOMAINS[domainId];
         const categoryInfo = domain?.categories?.find(c => c.id === skillInfo.categoryId);
-        const shortName = skillInfo.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 12);
+        const shortName = qsCleanName(skillInfo.skillLabel);
 
         const opts = payload ? decodeOptionPayload(skillInfo.categoryId, skillInfo.skillId, payload) : {};
         newSkills.push({

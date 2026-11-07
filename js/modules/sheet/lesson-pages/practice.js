@@ -135,7 +135,10 @@ export function practiceSection({ skill, facts, rounding, divFactsOnly, besideCa
  * (lesson data; the detailed lesson maker): a one-line item too wide for two columns prints [count, cols] a page
  * instead (expanded form: 8 x 1).
  */
-export const practiceStackShapes = (data) => (data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]]);
+// (`practiceShapes`: the shapes to try, densest first - the first that prints on its pages wins; visual-quality r2:
+// eight stories at M, six at L, never six over a 25 % strip - ported from master 2026-11-07)
+export const practiceStackShapes = (data) => (data && Array.isArray(data.practiceShapes) && data.practiceShapes.length ? data.practiceShapes
+    : data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]]);
 
 /**
  * The buildSheet request of a lesson practice page: the Independent role, the packet's frame (`common`), the step strip

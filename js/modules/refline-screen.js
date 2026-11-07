@@ -139,6 +139,8 @@ export function mergedLine(requests, items = []) {
 
 /** Where the app keeps a skill's options: the set's per-skill store, else the session's, else the item's. */
 export function optionsInUse(categoryId, skillId, fallback = null, q = null) {
+    // An item a link's repeated use dealt (q.linkUse) carries that use's own options: they win.
+    if (q && q.linkUse != null && q.skillOptions && typeof q.skillOptions === 'object') return q.skillOptions;
     let o = null;
     try { const s = getSetOptions(categoryId, skillId); if (s && Object.keys(s).length) o = s; } catch (e) { o = null; }
     if (!o && fallback && Object.keys(fallback).length) o = fallback;

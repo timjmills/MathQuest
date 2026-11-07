@@ -1,0 +1,11 @@
+{
+ "about": "ws-options-verify --render capacity pins (tests/lib/options-render.cjs capacityPin). A value listed here may print fewer items on its fullest page than the default page because the OWNER has ruled on that cost; it is reported as debt, not a FAIL. Only the capacity comparison is pinned. Each entry cites its ruling. Remove an entry when the ruling changes.",
+ "capacity": {
+  "division:div_facts": {
+   "divForm": {
+    "values": ["long", "fraction", "vertical", "mix"],
+    "why": "owner ruling (Lane D restart, 2026-10-31; lead ruling 2026-11-03, Lane D R4 prep): the written form is the owner's notation choice and he accepted notation-driven capacity changes; the long-division bracket stays at 10 columns (owner). Measured: S vertical 25 vs 30; L long / fraction / mix 15 vs 16, vertical 12 vs 16"
+   }
+  }
+ }
+}

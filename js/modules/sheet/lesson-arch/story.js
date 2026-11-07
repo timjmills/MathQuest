@@ -5,7 +5,8 @@
 // the detailed lessons render byte-identical). Pure module (SCC-01): no window, no DOM, no Math.random, no app import.
 
 import { operandsOf } from '../roles/compose.js';
-import { resolveCtx } from '../index.js';
+import { resolveCtx, getCell } from '../index.js';
+import { twoStepPart } from '../cells/word-work.js';
 
 /** A two-part story's parts [a, b] as numbers, or null. */
 export function wpParts(it) {
@@ -36,7 +37,36 @@ export const CASES = Object.freeze({
     wpBridgePT: (it) => CASES.wpBridge(it) && CASES.wpPutTogether(it) && !CASES.wpEqual(it),
     wpBridgeSmallFirstAT: (it) => CASES.wpBridgeSmallFirst(it) && CASES.wpAddToAny(it),
     wpBridgeBigFirstPT: (it) => CASES.wpBridgeBigFirst(it) && CASES.wpPutTogether(it),
+    // The detailed lesson maker, lesson 7 (two-step stories, 3.OA.D.8; multi_step_word msOps): a × or ÷ step that
+    // feeds a + or − step, read from the word-work payload's two steps. (Ported from master, 2026-11-07.)
+    msAny: (it) => !!msOf(it),
+    msMult: (it) => { const s = msOf(it); return !!s && s[0].op === '*'; },
+    msDiv: (it) => { const s = msOf(it); return !!s && s[0].op === '/'; },
+    msAdd: (it) => { const s = msOf(it); return !!s && s[1].op === '+'; },
+    msSub: (it) => { const s = msOf(it); return !!s && s[1].op === '-'; },
+    // (★★★, the M3 trap: the Step 2 number is bigger than both small Step 1 numbers - groups and each, or friends and
+    // each share - so "Step 2 with a story number" gives a believable answer)
+    msEdge: (it) => { const s = msOf(it); if (!s) return false; const sm = s[0].op === '*' ? [s[0].a, s[0].b] : [s[0].b, s[0].ans]; return s[1].bottom > Math.max(...sm); },
+    msMid: (it) => !!msOf(it) && !CASES.msEdge(it),
+    // (the three two-step errors give three different numbers, none the answer: a Check Question / exit item)
+    msClean: (it) => { const s = msOf(it); if (!s) return false; const [s1, s2] = s; const c = s2.bottom;
+        const f = (x) => (s2.op === '+' ? x + c : x - c); const m3 = s2.op === '+' ? s1.b + c : Math.abs(s1.b - c);
+        const m2 = s1.op === '*' ? f(s1.a + s1.b) : f(s1.a - s1.b); const v = [s1.ans, m3, m2, s2.ans];
+        return v.every((x) => x >= 0) && new Set(v).size === 4; },
+    msMultAdd: (it) => CASES.msMult(it) && CASES.msAdd(it),
+    msMultSub: (it) => CASES.msMult(it) && CASES.msSub(it),
+    msDivAdd: (it) => CASES.msDiv(it) && CASES.msAdd(it),
+    msDivSub: (it) => CASES.msDiv(it) && CASES.msSub(it),
+    msMultMid: (it) => CASES.msMult(it) && CASES.msMid(it),
+    msDivMid: (it) => CASES.msDiv(it) && CASES.msMid(it),
 });
+
+/** A two-step story's steps whose first step is × or ÷ (msOps, lesson 7), or null. */
+export function msOf(it) {
+    const c = it && it.q && it.q.cell;
+    const st = c && c.template === 'word-work' && c.payload && c.payload.steps;
+    return Array.isArray(st) && st.length === 2 && (st[0].op === '*' || st[0].op === '/') ? st : null;
+}
 
 /* ---------------------------------------------- a one-step story with its part-whole bar */
 
@@ -90,4 +120,57 @@ export function barState(it, k, c, { keepSlots = false } = {}) {
     return keepSlots ? html : html;
 }
 
-export default { CASES, wpParts, isWordBar, barNums, chartStepsOf, inkSpan, barState };
+/**
+ * A two-step story whose first step is x or / (msOps, the detailed lesson maker, lesson 7): panel k draws only its own
+ * part (sheet/cells/word-work.js twoStepPart) - 0 the story with the Step 1 numbers ringed grey, 1 Step 1, 2 Step 2 and
+ * its unit word - so three panels and the closing line fit one chart. (Ported from master's roles/lesson.js, 2026-11-07.)
+ */
+export function twoState(it, k, c) {
+    const p = it.q.cell.payload;
+    const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 1, metrics: undefined }));
+    let html = twoStepPart(p, k, ctx);
+    if (k === 0) {
+        const s1 = p.steps[0];
+        let ringed = 0;
+        html = html.replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${s1.a}|${s1.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring mq-lring-t">${n}</span>`) : n))}<`));
+    }
+    return html;
+}
+
+/**
+ * A one-step story in the word-work SENTENCE layout (`[ ] ◯ [ ] = [ ] unit`, visual-quality lane 2026-10-31):
+ * panel k draws the story and its sentence with the places of panels 0..k written (the newest grey, P-LC-9),
+ * the two story numbers ringed on panel 0 - and no picture row or word bank, so each panel fits half the
+ * chart (the full cell in a half panel stuck out of it by 26 mm). The marks name the places (fr0-a, fr0-b,
+ * op0, answer), so the panel that writes each one is read from the worked steps, not assumed. (Ported from master.)
+ */
+export const isWordSentence = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.layout === 'sentence' && (cl.payload.steps || []).length === 1); };
+export function sentenceState(it, groups, k, c) {
+    // (the part-whole bar is drawn on every panel - WDS 18.1, critic r1 F13 - its boxes written as their step comes)
+    const p = Object.assign({}, it.q.cell.payload, { pic: null, kb: false, bar: true });
+    // (the story is printed in the chart's first row of panels only: the second row draws the bar and the sentence, so
+    // the chart and its Say and Rule bands fit the page with the bar drawn - critic r1 F4, content never shrinks)
+    // (and the panels draw what their step uses: the story and the bar on the first row - read, then find the parts and
+    // the whole - the bar and the number sentence on the second; a 2 x 2 chart with the bar fits under the Rule band)
+    if (groups.length >= 4 && k >= 2) p.lines = [];
+    if (groups.length >= 4 && k < 2) p.noFrame = true;
+    const st = p.steps[0];
+    // (a half panel: the cell's column form - the story, then the sentence under it)
+    const ctx = Object.assign(resolveCtx(Object.assign({}, c, { state: 'answered', scaffoldLevel: 1, metrics: undefined })), { columns: 2 });
+    const t = getCell('word-work');
+    let html = '';
+    try { html = t.render(p, ctx); } catch (e) { html = ''; }
+    const at = new Map();
+    groups.forEach((g, gi) => (g.marks || []).forEach((m) => { if (m && m.slot && !at.has(m.slot)) at.set(m.slot, gi); }));
+    html = html.replace(/(<span[^>]*data-ws-slot="(fr0-a|fr0-b|op0|answer|bar-w|bar-a|bar-b)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
+        const g = at.has(id) ? at.get(id) : groups.length - 1;
+        const bare = open.replace(/ data-ws-ink="[a-z]+"/, '');
+        if (k < g) return bare + close;
+        return inkSpan(bare + val + close, k === g);
+    });
+    let ringed = p.lines.length ? 0 : 2;   // (the story's numbers are ringed where the story is printed, never the bar's)
+    html = html.replace(/>([^<>]*)</g, (m, text) => (ringed >= 2 ? m : `>${text.replace(new RegExp(`\\b(${st.a}|${st.b})\\b`, 'g'), (n) => (ringed < 2 ? (ringed++, `<span class="mq-lring${k === 0 ? ' mq-lring-t' : ''}">${n}</span>`) : n))}<`));
+    return html;
+}
+
+export default { CASES, wpParts, msOf, twoState, isWordSentence, sentenceState, isWordBar, barNums, chartStepsOf, inkSpan, barState };

@@ -454,3 +454,42 @@ against this row.
 | Date | Deploy commit | Covered | Partial only | Gap | Skills tagged | Proposals |
 |---|---|--:|--:|--:|--:|--:|
 | 2026-10-23 | baseline (77e3225) | 513 / 872 (59 %) | 149 | 210 | 392 | 162 |
+
+### pdf-preview (2026-10-31)
+| Metric | Value |
+|---|---|
+| Full preview: page 1 on screen (wall, CPU 4×) | 0.37–0.60 s (target < 1 s) |
+| Full preview: whole set after a pause (wall, 4×) | 0.37–0.60 s (target < 3 s) |
+| Full preview: whole set pressed at once (wall, 4× / 1×) | 4.1 s / 0.78 s (target 3 s; waiver asked at 4×) |
+| Print build, 4-page sheet + key (4×) | was 5.4 s before the dialog; now usually already built in the background |
+| Preview vs PDF: pages / pixels | equal in 6 printouts / ≤ 0.002 % differing (limit 0.02 %) |
+| Critic rounds to pass | r1 FAIL; r2 pending |
+Lane D restart (2026-10-30/31): 1 critic round, FAIL (4/4 fact skills), 16 findings (9 already red in gates before the critic);
+3 builders + 1 critic, all mq-opus-medium; ~9 h wall; ~$164 session cost (≈ 5.9 % of the weekly limit). Paused by the owner after r1.
+
+Lane D restart r2 (2026-10-31): critic r2 FAIL (5/5 incl. the new preset div_facts_long), 5 findings (R2-1…R2-5), 4 builders + 1 critic,
+all mq-opus-medium; ~7 h wall; ~$118 (≈ 4.2 % of the weekly limit). Lane total ~$282 (≈ 10.1 %). Stopped: stop-loop on the arc + weekly-limit warning.
+
+Lane D restart r3 (2026-10-31): critic r3 PASS 4/5 (add_facts, sub_facts, mult_facts, div_facts_long), div_facts FAIL (R3-1 only);
+2 builders + 1 critic (mq-opus-medium); ~3.5 h wall; ~$30 (≈ 1.1 %). Lane total ~$312 (≈ 11 % of the weekly limit), 3 critic rounds.
+Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows exposed 3 pre-existing red rows on div_facts supports; critic not run (red). ~$12.
+
+### chromebook-speed (2026-11-02)
+| Metric | 1375b857b | This lane |
+|---|--:|--:|
+| Startup modules / JS gzip | 269 / 2.90 MB | 185 / 1.73 MB |
+| Pupil first visit, 46-skill link, 3 Mbps / 150 ms / CPU 4x (local HTTP/2 + gzip, median of 3) | 10.85 s | 6.82 s (-37 %) |
+| Pupil later visit | 2.00 s | 1.49 s |
+| 50-question play-through at CPU 6x: questions > 1 s / longest task | 6 / 4.8 s | skip-count only (pinned, F1) / ~1 s |
+| ~150-skill stress: max question / longest task | 1.85 s / 5.6 s | 0.81 s / 0.49 s |
+| Teacher, 100 skills, CPU 4x: view / tray / print preview / quiz sheet | 7.6 / 2.1 / 74-88 / 25 s | 7.7 / 2.4 / 74-83 / 26 s |
+
+
+### simple-print (2026-11-03)
+| Metric | Old dialog | Simple print |
+|---|--:|--:|
+| Owner's 6-skill set, default, problems a page (M) | 3 (41 problems on 14 pages) | 20.5 (41 on 2 pages) |
+| Default page fill, all sets, S/M/L (min) | 22 % | 63 % |
+| Fast facts at S, columns | — | 10 (8 when answers > 99) |
+| Critic rounds | — | 2 (r2 min 6, engine-held) |
+| simple-print-2 critic rounds | — | r1 FAIL (A C2 6, C3 7; B C2 7): 6 findings, each now a ws-simple-print check |

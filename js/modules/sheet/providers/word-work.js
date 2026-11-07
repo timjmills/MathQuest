@@ -48,12 +48,43 @@ function workLine(st) {
 export function wordWorkSteps(q) {
     const p = payloadOf(q);
     if (!p) return [];
+    // A two-step story whose first step is × or ÷ (msOps, detailed lesson g3-oa8-two-step-wp): four moves, each one
+    // a chart panel - read, Step 1, Step 2 (with the Step 1 answer), the answer and its unit. No key words.
+    if (p.steps.length === 2 && (p.steps[0].op === '*' || p.steps[0].op === '/')) {
+        const [s1, s2] = p.steps;
+        return [
+            step('Read the story two times.', [{ slot: 'ms-read', value: '1' }]),
+            step(`Step 1: ${fmt(s1.a)} ${GLYPH[s1.op]} ${fmt(s1.b)} = ${fmt(s1.ans)}.`, [{ slot: 'op0', value: GLYPH[s1.op] }]),
+            step(`Step 2: ${fmt(s2.top)} ${GLYPH[s2.op]} ${fmt(s2.bottom)} = ${fmt(s2.ans)}.`, [{ slot: 'op1', value: GLYPH[s2.op] }]),
+            // (no marks: the unit word is written in the Step 2 panel - the chart's closing line, three panels)
+            step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`),
+        ];
+    }
+    // the sentence form (stories within 20): PART-WHOLE, never key words (PEDAGOGY P-21, P-WP-10; critic r1 F6) - read,
+    // find the parts and the whole on the bar (the structure decision: "I know both parts. I add." / "I know the whole
+    // and one part. I subtract."), write the number sentence, solve. Four steps: each is one panel of the lesson's chart
+    // and one frame of the scripted model, and each frame writes what its step says.
+    if (p.layout === 'sentence' && p.steps.length === 1) {
+        const st = p.steps[0];
+        const add = st.op === '+';
+        const whole = add ? st.ans : st.top, pa = add ? st.top : st.bottom, pb = add ? st.bottom : st.ans;
+        const unit = Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit;
+        return [
+            step(`The numbers are ${fmt(st.top)} and ${fmt(st.bottom)}.`),
+            add
+                ? step(`I know both parts: ${fmt(pa)} and ${fmt(pb)}. I add.`, [{ slot: 'bar-a', value: String(pa) }, { slot: 'bar-b', value: String(pb) }])
+                : step(`I know the whole, ${fmt(whole)}, and one part, ${fmt(pa)}. I subtract.`, [{ slot: 'bar-w', value: String(whole) }, { slot: 'bar-a', value: String(pa) }]),
+            step(`Write ${fmt(st.top)} ${GLYPH[st.op]} ${fmt(st.bottom)} in the boxes.`, [{ slot: 'fr0-a', value: String(st.top) }, { slot: 'op0', value: GLYPH[st.op] }, { slot: 'fr0-b', value: String(st.bottom) }]),
+            step(`${workLine(st).replace(/\.$/, '')}. The answer is ${fmt(p.ans)}${unit ? ` ${unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }, { slot: add ? 'bar-w' : 'bar-b', value: String(p.ans) }]),
+        ];
+    }
     const cues = cuesOf(p);
     const out = [step('Read the story two times.')];
     if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
     p.steps.forEach((st, i) => {
         const pre = p.steps.length > 1 ? `Step ${i + 1}: ` : '';
-        out.push(step(`${pre}Circle ${GLYPH[st.op]}. ${VERB[st.op]}.`, [{ slot: `op${i}`, value: GLYPH[st.op] }]));
+        const mv = p.neutral && p.signRow === false ? `Write ${GLYPH[st.op]} in the circle.` : `Circle ${GLYPH[st.op]}.`;
+        out.push(p.signs === false ? step(`${pre}${VERB[st.op]}.`) : step(`${pre}${mv} ${VERB[st.op]}.`, [{ slot: `op${i}`, value: GLYPH[st.op] }]));
         out.push(step(`Write ${fmt(st.top)} and ${fmt(st.bottom)} in the boxes.`));
         out.push(step(workLine(st)));
     });
@@ -86,6 +117,24 @@ export function wordWorkWrong(q) {
  */
 export function wordWorkWrongs(q) {
     const p = payloadOf(q);
+    // A two-step story whose first step is × or ÷ (msOps, detailed lesson g3-oa8-two-step-wp): the three
+    // two-step errors, each a number (`display` the answer the pupil would write). Absent on every other story.
+    if (p && p.steps.length === 2 && (p.steps[0].op === '*' || p.steps[0].op === '/')) {
+        const [s1, s2] = p.steps;
+        const c = s2.bottom;
+        const sign = (x, y) => (s2.op === '+' ? x + y : x - y);
+        const small = s1.op === '*' ? s1.b : s1.b;
+        const m3 = s2.op === '+' ? small + c : Math.abs(small - c);
+        const m2 = s1.op === '*' ? sign(s1.a + s1.b, c) : sign(s1.a - s1.b, c);
+        const out = [
+            { value: s1.ans, display: fmt(s1.ans), misconception: 'ms-stop-step1', explain: 'Stopped after Step 1.' },
+            { value: m3, display: fmt(m3), misconception: 'ms-story-number', explain: 'Did Step 2 with a story number, not the Step 1 answer.' },
+            { value: m2, display: fmt(m2), misconception: 'ms-one-op', explain: s1.op === '*' ? 'Added the groups and the number in each.' : 'Took away the friends from the total.' },
+        ];
+        const seen = new Set([s2.ans]);
+        return out.filter((w) => Number.isFinite(w.value) && w.value >= 0 && !seen.has(w.value) && (seen.add(w.value), true))
+            .concat([{ value: s2.ans, display: fmt(s2.ans), correct: true }]);
+    }
     if (!p || p.steps.length !== 1) return [];
     const st = p.steps[0];
     if (st.op !== '+') { const w = wordWorkWrong(q); return w ? [w] : []; }
@@ -101,20 +150,25 @@ export function wordWorkWrongs(q) {
 }
 export const barAnswerText = (q) => { const p = payloadOf(q); const st = p && p.steps[0]; return st ? `top ${fmt(st.ans)} · below ${fmt(st.a)} and ${fmt(st.b)}` : ''; };
 
-/** The provider members for one word-problem skill. */
-export function wordWorkProvider(iCan, extra = {}) {
+/** The provider members for one word-problem skill (`sentence`: the stories within 20, drawn as a number sentence). */
+export function wordWorkProvider(iCan, extra = {}, { sentence = false } = {}) {
     return Object.assign({
         strings: strings({
             iCan,
-            instructionKey: 'story-work',
-            steps: [
+            instructionKey: sentence ? 'story-sentence' : 'story-work',
+            steps: sentence ? [
+                'Read the story two times.',
+                'Find the parts and the whole.',
+                'Write the number sentence.',
+                'Solve. Say the answer and its label.',
+            ] : [
                 'Read the story two times.',
                 'Circle the sign that fits the story.',
                 'Write the numbers in the boxes. Solve.',
                 'Write the answer and its label word.',
             ],
             say: 'The answer is __ __.',
-            sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), p.unit] : null; },
+            sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit] : null; },
         }),
         misconceptions: ['wrong-operation'],
         workedSteps: wordWorkSteps,
@@ -135,7 +189,29 @@ const OWN = {
     'division:remainder_contexts': 'I Can solve division stories with remainders',
 };
 for (const [key, iCan] of Object.entries(OWN)) {
-    const def = wordWorkProvider(iCan);
+    // a remainder story is division by its name: its page never asks for a sign (no sign row)
+    // a times-as-many story writes its sign in the neutral sentence's ring: one sign place
+    const def = /mult_comparison/.test(key)
+        ? wordWorkProvider(iCan, {
+            strings: strings({
+                iCan,
+                instructionKey: 'story-work-ring',
+                steps: ['Read the story two times.', 'Write the sign that fits the story in the circle.', 'Write the numbers in the boxes. Solve.', 'Write the answer and its label word.'],
+                say: 'The answer is __ __.',
+                sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), p.unit] : null; },
+            }),
+        })
+        : /remainder_/.test(key)
+        ? wordWorkProvider(iCan, {
+            strings: strings({
+                iCan,
+                instructionKey: 'story-work-div',
+                steps: ['Read the story two times.', 'Write the numbers in the boxes. Divide.', 'Read the question again: what does the remainder mean?', 'Write the answer and its label word.'],
+                say: 'The answer is __ __.',
+                sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), p.unit] : null; },
+            }),
+        })
+        : wordWorkProvider(iCan);
     registerSkill(key, def);
     if (!/remainder_/.test(key)) registerSkill(`${key}_plain`, def);
 }

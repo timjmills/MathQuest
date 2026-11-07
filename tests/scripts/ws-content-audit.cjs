@@ -1515,7 +1515,9 @@ const PV_OP_GLYPH = { '+': /\+/, '−': /[−–]|\s-\s/, '×': /×/, '÷': /÷/
 
 /** The place a pv NAME rounds to, or 0. The id is read first: it is the permanent declaration. */
 function pvNamePlace(id, label) {
-    const hay = `${String(id).replace(/_/g, ' ')} ${label}`.toLowerCase();
+    // ("one tenth of" / "a tenth of" is a RELATION - 4.NBT.A.1, the 7 in 70 is one tenth of the 7 in 700 - not the tenths
+    // place; lesson 6 r4. A place reads "tenths", "the tenth(s) place" or "nearest tenth".)
+    const hay = `${String(id).replace(/_/g, ' ')} ${label}`.toLowerCase().replace(/\b(one|a) tenth\b(?! place)/g, 'onetenthrelation');
     if (/\bhundredths?\b/.test(hay)) return 0.01;
     if (/\btenths?\b/.test(hay)) return 0.1;
     const m = hay.match(/nearest\s+(million|1,000,000|100,000|100000|10,000|10000|1,000|1000|100|10)\b/);
@@ -1623,6 +1625,14 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     const want = pv.form === 'unit' ? `${pv.digit} ${pv.digit === 1 ? PV_WORD[pv.place].replace(/s$/, '') : PV_WORD[pv.place]}`
                         : pv.form === 'notation' ? `${pv.digit} × ${pv.place.toLocaleString('en-US')}` : pv.digit * pv.place;
                     if (pvDigitAt(pv.n, pv.place) !== pv.digit || (typeof want === 'number' ? Number(ans) !== want : String(ans) !== want)) add('pv-recompute', `the ${pv.digit} of ${pv.n} is worth ${want}, keyed ${ans}`);
+                    break;
+                }
+                case 'times': {
+                    // value_ten_times: the same digit, one place apart; "10 times" when the first is the higher place.
+                    const okD = pvDigitAt(pv.n, pv.place) === pv.digit && pvDigitAt(pv.m, pv.placeM) === pv.digit;
+                    const ratio = pv.place / pv.placeM;
+                    const rel = ratio === 10 ? '10 times' : ratio === 0.1 ? 'one tenth of' : '?';
+                    if (!okD || rel !== pv.rel || pv.v0 !== pv.digit * pv.place || pv.v1 !== pv.digit * pv.placeM) add('pv-recompute', `the ${pv.digit} in ${pv.n} vs ${pv.m}: ${rel}, keyed ${pv.rel}`);
                     break;
                 }
                 case 'expand': {
@@ -2135,6 +2145,25 @@ function audit(skill, items) {
     // because that is how a quotient-and-remainder cell reads. Today every such cell ships the
     // remainder in the answer itself ("59 R 5"), so this never fires; if it starts firing, a
     // generator has begun dropping remainders silently and the owner should see it.
+    // A name that promises a MISSING number (Missing Factors, Missing Addends) holds every item to
+    // it: a bare `4 × 5 = ___` or `3 + 4 = ___` is the plain operation, not a missing factor or
+    // addend (critic wave 1 lane D r3 D9: 9 of 30 Missing Factors items asked for the product).
+    // Read off the item's own printed equation, so it reports only what it can prove. The result
+    // of − or ÷ is itself a missing part (12 − 5 = ? is 5 + ? = 12), so only + and × are held.
+    // Only a name that says WHICH number is missing (a factor, an addend) is read: "Missing
+    // Numbers (+/−)" promises any number of the fact, the sum included.
+    if (isOps && !skill.pool && /\bmissing\s+(?:factors?|addends?)\b/i.test(label)) {
+        const plain = [];
+        for (const it of items) {
+            if (it.error || it.empty) continue;
+            const m = String(it.text || '').trim().match(EQUATION);
+            if (!m) continue;
+            const blanks = [m[1], m[3], m[4]].map(x => BLANK_SLOT.test(x));
+            const o = norm(m[2]);
+            if (blanks[2] && !blanks[0] && !blanks[1] && (o === '+' || o === '×')) plain.push(String(it.text).trim());
+        }
+        if (plain.length) F('missing-unknown', `its name promises a missing factor or addend, but ${plain.length} items ask only for the ${plain[0].includes('+') ? 'sum' : 'product'}: ${plain.slice(0, 4).join('; ')}`);
+    }
     p8Rules(items, F);
     if (id === 'number_bonds') bondRules(items, F);
     if (K2_PICTURE_SKILLS.has(id)) pictureRules(items, F);
@@ -2933,6 +2962,25 @@ function foldRulings(out, j) {
             for (const f of sub.fails) res.fails.push({ cls: f.cls, msg: `[${JSON.stringify(combo)}] ${f.msg}` });
         }
         out.push({ ...skill, ...res });
+    }
+    // TIMES-AS-MANY STORIES (wave 1 lane D critic r4 D-A): a mult_comparison story is retold by the
+    // word-work cell from the step it is SOLVED with. 200 seeds; any + or - step is a take-away or
+    // join story on a times-as-many page, which contradicts the name.
+    for (const s of out) {
+        if (!/^mult_comparison/.test(s.skillId)) continue;
+        const r = await app.page.evaluate(async ({ categoryId, skillId, baseSeed }) => {
+            const ww = await import('/js/modules/sheet/cells/word-work.js');
+            const badItems = [];
+            for (let i = 0; i < 200; i++) {
+                try {
+                    const q = window.generateQuestionFor({ category: categoryId, skill: skillId, range: 100, decimals: 0, seed: baseSeed + 5000 + i, itemIndex: i });
+                    const p = ww.wordWorkPayload(q, {});
+                    if (p && p.steps.some(st => st.op === '+' || st.op === '-')) badItems.push(`${p.steps.map(st => `${st.a}${st.op}${st.b}`).join(';')} "${String(q.text).slice(0, 50)}"`);
+                } catch (e) { /* not a story */ }
+            }
+            return badItems;
+        }, { categoryId: s.categoryId, skillId: s.skillId, baseSeed: seedFor(`${s.categoryId}:${s.skillId}`) });
+        if (r.length) s.fails.push({ cls: 'times-story-addsub', msg: `${r.length}/200 times-as-many stories solve by + or -: ${r.slice(0, 2).join(' | ')}` });
     }
     const mcRows = RUN_MC ? await mcSweep() : null;
     await app.close();

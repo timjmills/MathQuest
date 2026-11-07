@@ -485,6 +485,10 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         if (t.def.id !== 'nlOn') t.base = Object.assign({}, t.base || {}, { nlOn: true });
     }
 
+    // CONDITIONAL CONTROLS (lesson 6 r4): a def with `appliesBase` only works in that context (the ten* controls of value
+    // form "times"); it is tried on top of it, and the default it is compared with is that same base.
+    for (const t of tries) if (t.def.appliesBase && typeof t.def.appliesBase === 'object') t.base = Object.assign({}, t.def.appliesBase, t.base || {});
+
     // ---------- static (definition) checks ----------
     const statics = [];
     const { OPTION_KEYS } = await import('/js/modules/skill-option-codec.js');
@@ -712,7 +716,9 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         if (def.id === 'decimals' && value === APP_DP) DP = other(def.values.map(x => x.v), value) ?? 1;
         r.base = { range, decimals: DP };
         let items = gen(opts, range);
-        let base = dfltAt(range);
+        // (a conditional control - `appliesBase`, lesson 6 r4 - is compared with its own base, not the bare default)
+        const baseAt = (rr) => (t.def.appliesBase ? gen(t.base, rr) : dfltAt(rr));
+        let base = baseAt(range);
         let diff = differs(items, base);
         const errs = items.filter(q => q.__error);
         if (errs.length) fail('gen', `${errs.length} item(s) threw: ${errs[0].__error}`);
@@ -723,11 +729,11 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             r.checks.gen = r.fails.some(f => f.startsWith('gen:')) ? 'fail' : 'ok';
         } else if (!ownSetting && (!items.length || diff === false)) {
             const bigItems = gen(opts, bigRange);
-            const bigDiff = bigItems.length ? differs(bigItems, dfltAt(bigRange)) : false;
+            const bigDiff = bigItems.length ? differs(bigItems, baseAt(bigRange)) : false;
             if (bigItems.length && bigDiff) {
                 r.gated = true;
                 fail('gen', items.length ? `does nothing at Max Number ${APP_RANGE}; only works once Max Number is raised (gated)` : `refused at Max Number ${APP_RANGE} (no items); works at ${bigRange} (gated)`);
-                range = bigRange; items = bigItems; base = dfltAt(bigRange); diff = true;
+                range = bigRange; items = bigItems; base = baseAt(bigRange); diff = true;
             }
         }
         if (t.renderOnly) { /* checked above */ }

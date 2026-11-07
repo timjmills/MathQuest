@@ -1,0 +1,1711 @@
+{
+  "skill": "division:div_facts",
+  "category": "division",
+  "skillId": "div_facts",
+  "label": "Division Facts (1-12)",
+  "grade": "3",
+  "dir": "division__div_facts",
+  "roles": {
+    "independent": {
+      "fits": {
+        "cols": 3,
+        "rows": 7,
+        "perPage": 21,
+        "pages": 1,
+        "trimmed": 0,
+        "note": "Fits: 3 columns x 7 rows, 21 per page, 1 page. Digits 22 pt. Dense: 3 x 7, cells sized to the problems. 5 problems are too wide for 3 columns: full width, at the bottom. Rows sized to the problems they hold.",
+        "sections": [
+          {
+            "cols": 3,
+            "rows": 7,
+            "perPage": 21,
+            "pages": 1,
+            "cellW": 62,
+            "cellH": 32.429,
+            "requested": "auto",
+            "clamped": false,
+            "note": "Dense: 3 x 7, cells sized to the problems.",
+            "line": "Fits: 3 columns x 7 rows, 21 per page, 1 page. Digits 22 pt. Dense: 3 x 7, cells sized to the problems.",
+            "cls": "short",
+            "digitPt": 22,
+            "hMin": 27.6,
+            "anchorMm": 0,
+            "blocks": null
+          },
+          {
+            "cols": 1,
+            "rows": 11,
+            "perPage": 11,
+            "pages": 1,
+            "cellW": 186,
+            "cellH": 20.636,
+            "requested": 1,
+            "clamped": false,
+            "note": "5 problems are too wide for 3 columns: full width, at the bottom. Rows sized to the problems they hold.",
+            "line": "Fits: 1 column x 11 rows, 11 per page, 1 page. Digits 22 pt. Rows sized to the problems they hold. 5 full-width problems at the bottom.",
+            "cls": "short",
+            "digitPt": 22,
+            "hMin": 30.2,
+            "anchorMm": 0,
+            "blocks": null
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 69559,
+      "title": "I Can divide using times facts",
+      "notes": [
+        "Dense: 3 x 7, cells sized to the problems.",
+        "5 problems are too wide for 3 columns: full width, at the bottom. Rows sized to the problems they hold."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "84 ÷ 12 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 67.3
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 21
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 5.6
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 5.6
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "96 ÷ 8 = ?",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 69.6
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 23.3
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 7.9
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 7.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "8 ÷ 4 = ?",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 11.3
+            },
+            "3": {
+              "hMm": 26.4,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 35.3,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "110 ÷ 11 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 65.1
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 18.8
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 3.3
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 3.3
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "21 ÷ 7 = ?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 30.2,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 44.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 35.9,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 40.5,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "6 ÷ 3 = ?",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 19.8
+            },
+            "3": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 4.3
+            },
+            "4": {
+              "hMm": 35.3,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "80 ÷ 10 = ?",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 67.3
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 21
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 5.6
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 5.6
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "2 ÷ 2 = ?",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "3": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 10.1
+            },
+            "4": {
+              "hMm": 36.5,
+              "fits": true,
+              "slackMm": 10.1
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "10 ÷ 2 = ?",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 26.4,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 35.3,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "72 ÷ 9 = ?",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 69.6
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 23.3
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 7.9
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 7.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "15 ÷ 5 = ?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 21.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 36,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 30.5,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 36.6,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        }
+      ],
+      "role": "independent",
+      "size": "M",
+      "opts": {
+        "support": [
+          "array"
+        ]
+      },
+      "pages": [
+        {
+          "file": "independent-p1.png",
+          "words": 86,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "independent-key-p1.png",
+          "words": 100,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          11
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 86
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "fb4cbda13d8e0456"
+        ],
+        "measured": [
+          {
+            "cells": 11,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 11,
+              "minMm": [
+                14,
+                8
+              ],
+              "sizes": [
+                "14x8 mm ×11"
+              ]
+            },
+            "band": {
+              "hPct": 53.7,
+              "wPct": 34.2,
+              "cell": 3
+            },
+            "footPct": 12.8
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          11
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 97
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "fad7fc0c880b552d"
+        ],
+        "measured": [
+          {
+            "cells": 11,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 11,
+              "minMm": [
+                14,
+                8
+              ],
+              "sizes": [
+                "14x8 mm ×11"
+              ]
+            },
+            "band": {
+              "hPct": 53.7,
+              "wPct": 34.2,
+              "cell": 3
+            },
+            "footPct": 12.8
+          }
+        ]
+      }
+    },
+    "test": {
+      "fits": {
+        "cols": 2,
+        "rows": 5,
+        "perPage": 9,
+        "pages": 1,
+        "note": "Fits: 2 columns x 4 rows + 1 column x 1 rows (full width), 9 per page. 8 problems in 2 columns, 1 full width.",
+        "sections": [
+          {
+            "role": "test",
+            "cls": "short",
+            "requested": "auto",
+            "cols": 2,
+            "rows": 5,
+            "perPage": 9,
+            "pages": 1,
+            "count": 9,
+            "cellW": 93,
+            "innerW": 92.339,
+            "cellH": 28.5,
+            "hMin": 27.6,
+            "gridH": 228,
+            "gridHCont": 242,
+            "fill": false,
+            "packed": true,
+            "filled": false,
+            "ceiling": 16,
+            "clamped": false,
+            "reason": "",
+            "note": "Rows sized to the problems they hold.",
+            "notes": [
+              "Rows sized to the problems they hold."
+            ],
+            "inPlace": false,
+            "digitPt": 22,
+            "trackMm": null,
+            "size": "M",
+            "look": "ican",
+            "availableWidthMm": 186,
+            "split": true,
+            "line": "Fits: 2 columns x 4 rows + 1 column x 1 rows (full width), 9 per page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 805715,
+      "title": "Test A: dividing using times facts",
+      "notes": [
+        "8 problems in 2 columns, 1 full width."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "24 ÷ 3 = ?",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 30.2,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 44.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 35.9,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 40.5,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "90 ÷ 10 = ?",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 67.3
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 21
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 5.6
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 5.6
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "24 ÷ 6 = ?",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 30.2,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 44.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 35.9,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 40.5,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "4 ÷ 2 = ?",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 25.6
+            },
+            "3": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 10.1
+            },
+            "4": {
+              "hMm": 36.5,
+              "fits": true,
+              "slackMm": 6.6
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "81 ÷ 9 = ?",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 69.6
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 23.3
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 7.9
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 7.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "60 ÷ 5 = ?",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 55.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 69.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 52.2,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 52.3,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "132 ÷ 12 = ?",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 65.1
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 18.8
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 3.3
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 3.3
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "3 ÷ 3 = ?",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 25.6
+            },
+            "3": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 10.1
+            },
+            "4": {
+              "hMm": 36.5,
+              "fits": true,
+              "slackMm": 10.1
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "20 ÷ 4 = ?",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 21.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 36,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 30.5,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 36.6,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "66 ÷ 11 = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 67.3
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 21
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 5.6
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 5.6
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "42 ÷ 7 = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 47.2,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 61.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 46.8,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 48.4,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "30 ÷ 3 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 30.2,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 44.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 35.9,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 40.5,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "60 ÷ 10 = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 55.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 69.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 52.2,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 52.3,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "54 ÷ 6 = ?",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 55.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 69.9,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 52.2,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 52.3,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "8 ÷ 2 = ?",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 11.3
+            },
+            "3": {
+              "hMm": 26.4,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 35.3,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "99 ÷ 9 = ?",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 69.6
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 23.3
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 7.9
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 7.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "30 ÷ 5 = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 30.2,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 44.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 35.9,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 40.5,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "5 ÷ 5 = ?",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 15,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 25.5
+            },
+            "3": {
+              "hMm": 27.6,
+              "fits": true,
+              "slackMm": 10.1
+            },
+            "4": {
+              "hMm": 36.3,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        }
+      ],
+      "role": "test",
+      "size": "M",
+      "opts": {
+        "support": [
+          "array"
+        ]
+      },
+      "pages": [
+        {
+          "file": "test-p1.png",
+          "words": 76,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "test-key-p1.png",
+          "words": 88,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          9
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 60
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "5074331217fc3250"
+        ],
+        "measured": [
+          {
+            "cells": 9,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 9,
+              "minMm": [
+                14,
+                8
+              ],
+              "sizes": [
+                "14x8 mm ×9"
+              ]
+            },
+            "band": {
+              "hPct": 65.6,
+              "wPct": 27.8,
+              "cell": 4
+            },
+            "footPct": 26.9
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          9
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 69
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "500b35950a28e59e"
+        ],
+        "measured": [
+          {
+            "cells": 9,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 9,
+              "minMm": [
+                14,
+                8
+              ],
+              "sizes": [
+                "14x8 mm ×9"
+              ]
+            },
+            "band": {
+              "hPct": 65.6,
+              "wPct": 27.8,
+              "cell": 4
+            },
+            "footPct": 26.9
+          }
+        ]
+      }
+    },
+    "review": {
+      "fits": {
+        "cols": 3,
+        "rows": 5,
+        "pages": 1,
+        "note": "Fits: 3 columns x 2 rows + 1 x 3 mixed, 9 per page.",
+        "sections": [
+          {
+            "cols": 3,
+            "rows": 5,
+            "cellH": 22.599999999999998,
+            "line": "Fits: 3 columns x 2 rows + 1 x 3 mixed, 9 per page."
+          }
+        ]
+      },
+      "pageCount": 1,
+      "keyPageCount": 1,
+      "seed": 62975,
+      "title": "Review: dividing using times facts",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "36 ÷ 12 = ?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 67.3
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 21
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 5.6
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 5.6
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "40 ÷ 8 = ?",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 38.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 53,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 41.3,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 44.4,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "44 ÷ 4 = ?",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 47.2,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 61.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 46.8,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 48.4,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "77 ÷ 11 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 67.3
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 21
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 5.6
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 5.6
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "35 ÷ 7 = ?",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 38.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 53,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 41.3,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 44.4,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "12 ÷ 3 = ?",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 21.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 36,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 30.5,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 36.6,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "100 ÷ 10 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 65.1
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 18.8
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 3.3
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 3.3
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "0 ÷ 2 = ?",
+          "ans": "0",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 71.9
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 25.6
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 10.1
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 10.1
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "12 ÷ 2 = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 21.7,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 36,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 30.5,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 36.6,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "81 ÷ 9 = ?",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 69.6
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 23.3
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 7.9
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 7.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "50 ÷ 5 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 47.2,
+              "fits": true,
+              "slackMm": 6.2
+            },
+            "2": {
+              "hMm": 61.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 46.8,
+              "fits": false,
+              "slackMm": 2.9
+            },
+            "4": {
+              "hMm": 48.4,
+              "fits": false,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "equation",
+          "fclass": "short",
+          "text": "72 ÷ 12 = ?",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 67.3
+            },
+            "2": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 21
+            },
+            "3": {
+              "hMm": 16.4,
+              "fits": true,
+              "slackMm": 5.6
+            },
+            "4": {
+              "hMm": 25.3,
+              "fits": true,
+              "slackMm": 5.6
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 12. Write the missing numbers.",
+          "ans": "48, 60, 108, 132, 144",
+          "measured": {
+            "1": {
+              "hMm": 30.7,
+              "fits": true,
+              "slackMm": 8.2
+            },
+            "2": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -38.1
+            },
+            "3": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -53.5
+            },
+            "4": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -61.2
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 12. Write the missing numbers.",
+          "ans": "36, 48, 60, 108, 132",
+          "measured": {
+            "1": {
+              "hMm": 30.7,
+              "fits": true,
+              "slackMm": 8.2
+            },
+            "2": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -38.1
+            },
+            "3": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -53.5
+            },
+            "4": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -61.2
+            }
+          }
+        },
+        {
+          "template": "count-row",
+          "fclass": "standard",
+          "text": "Count by 12. Write the missing numbers.",
+          "ans": "48, 60, 72, 96, 120",
+          "measured": {
+            "1": {
+              "hMm": 30.7,
+              "fits": true,
+              "slackMm": 8.2
+            },
+            "2": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -38.1
+            },
+            "3": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -53.5
+            },
+            "4": {
+              "hMm": 30.7,
+              "fits": false,
+              "slackMm": -61.2
+            }
+          }
+        }
+      ],
+      "role": "review",
+      "size": "M",
+      "opts": {
+        "support": [
+          "array"
+        ]
+      },
+      "pages": [
+        {
+          "file": "review-p1.png",
+          "words": 100,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "review-key-p1.png",
+          "words": 124,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 1,
+        "cells": [
+          9
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 70
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "ea357606f234a756"
+        ],
+        "measured": [
+          {
+            "cells": 9,
+            "digitPt": {
+              "max": 22,
+              "median": 14.1,
+              "min": 10
+            },
+            "slots": {
+              "n": 21,
+              "minMm": [
+                14,
+                8
+              ],
+              "sizes": [
+                "16x11 mm ×15",
+                "14x8 mm ×6"
+              ]
+            },
+            "band": {
+              "hPct": 39.8,
+              "wPct": 16.6,
+              "cell": 6
+            },
+            "footPct": 19.6
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 1,
+        "cells": [
+          9
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 91
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "b2c5e3c69eaecc30"
+        ],
+        "measured": [
+          {
+            "cells": 9,
+            "digitPt": {
+              "max": 22,
+              "median": 14.1,
+              "min": 10
+            },
+            "slots": {
+              "n": 21,
+              "minMm": [
+                14,
+                8
+              ],
+              "sizes": [
+                "16x11 mm ×15",
+                "14x8 mm ×6"
+              ]
+            },
+            "band": {
+              "hPct": 39.8,
+              "wPct": 16.6,
+              "cell": 6
+            },
+            "footPct": 19.6
+          }
+        ]
+      }
+    }
+  },
+  "consoleErrors": []
+}

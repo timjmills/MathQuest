@@ -97,3 +97,50 @@ export function describeSetOptions(categoryId, skillId) {
     const o = getSetOptions(categoryId, skillId);
     return Object.keys(o).length ? describeOptions(categoryId, skillId, o) : '';
 }
+
+// ===== REPEATED USES (a detailed lesson's Practice link, 2026-10-31) =====
+// The set holds each skill once and the store above keys options by skill, so a link that uses one
+// skill several times with different options ("placevalue:value" six times in lesson 6) cannot live
+// in the queue alone. The decoded link's uses are kept here, in order, each with its own options;
+// mixed play deals them use by use (generate-question.js, custom_mixed). Only a code that repeats a
+// skill WITH DIFFERENT OPTIONS records uses: any other code plays exactly as before.
+//
+// The uses are honoured only while the queue is still the set the link loaded: the same skills in
+// the same order, and each skill's first use's options still the store's. Any later change to the
+// set (a skill added or removed, an option edited, another set loaded) leaves them stale: the queue's
+// sync drops them from the mixed settings, and the dealer re-checks before every item.
+
+const _ukey = (u) => `${u.categoryId}:${u.skillId}`;
+
+/** Record the uses of a just-loaded code ([{categoryId, skillId, opts}]); null unless a repeated skill's options differ. */
+export function setQueueUses(list) {
+    const uses = Array.isArray(list) ? list.filter((u) => u && u.categoryId && u.skillId) : [];
+    const packed = uses.map((u) => ({ categoryId: u.categoryId, skillId: u.skillId, opts: packOptions(u.categoryId, u.skillId, u.opts && typeof u.opts === 'object' ? u.opts : {}) }));
+    // Only a skill used twice with DIFFERENT options needs its uses: identical repeats (XX2-XX4-YY)
+    // collapse into one queue row, as they always did.
+    const seen = new Map();
+    let differ = false;
+    for (const u of packed) {
+        const k = _ukey(u), o = JSON.stringify(u.opts);
+        if (seen.has(k) && seen.get(k) !== o) { differ = true; break; }
+        if (!seen.has(k)) seen.set(k, o);
+    }
+    state.queueUses = differ ? packed : null;
+    return state.queueUses;
+}
+
+/** The recorded uses (a copy) while they still describe `queue` (default window.skillQueue), else null. */
+export function queueUsesInPlay(queue) {
+    const uses = state.queueUses;
+    if (!Array.isArray(uses) || !uses.length) return null;
+    const q = Array.isArray(queue) ? queue : (typeof window !== 'undefined' && Array.isArray(window.skillQueue) ? window.skillQueue : []);
+    const firstOf = new Map();
+    for (const u of uses) if (!firstOf.has(_ukey(u))) firstOf.set(_ukey(u), u);
+    const order = [...firstOf.keys()];
+    const qkeys = q.map(_ukey);
+    if (qkeys.length !== order.length || qkeys.some((k, i) => k !== order[i])) return null;
+    for (const u of firstOf.values()) {
+        if (JSON.stringify(getSetOptions(u.categoryId, u.skillId)) !== JSON.stringify(u.opts || {})) return null;
+    }
+    return uses.map((u) => ({ categoryId: u.categoryId, skillId: u.skillId, opts: { ...(u.opts || {}) } }));
+}

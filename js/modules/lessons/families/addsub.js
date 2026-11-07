@@ -11,6 +11,68 @@
 // here unchanged (lead decision D3: every packet byte-identical); prereqs.js is now a view of this
 // library. `archetype`, `cases`, `caps` are the library's own (schema.js LIBRARY_ONLY).
 
+
+// ---- the one-step word-problem routines (ported from master's prereqs.js storyLessons, 2026-11-07)
+const STORY_CASES_PENDING = 'Ported from the visual-quality lane unchanged; its cases are declared when the lesson is carded (lessons-first).';
+const STORY_STEPS = [
+    { icon: 'look', text: 'Read the story two times.' },
+    { icon: 'decide', text: 'Find the parts and the whole.' },
+    { icon: 'write', text: 'Write the number sentence.' },
+    { icon: 'check', text: 'Solve. Say the answer and its label.' },
+];
+// the vocabulary pictures: the same small bar, each showing only what its word names (no pointer)
+const STORY_VOCAB = (sentence) => [
+    { word: 'whole', meaning: 'all of them together', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'whole', only: true } },
+    { word: 'part', meaning: 'some of the whole', picture: { kind: 'bar', whole: 7, a: 3, b: 4, mark: 'parts', only: true } },
+    { word: 'number sentence', meaning: 'the numbers and the sign', picture: { kind: 'text', text: sentence } },
+];
+// (the practice page: eight stories where they fit the page, else six - print-sheet.js practiceShapes)
+const STORY_BASE = {
+    format: {
+        kind: 'numbered steps with icons + a rule',
+        why: 'The one decision pupils get wrong is the sign; the bar shows which number is missing - a part or the whole - and the rule names what to do.',
+    },
+    example: { match: 'I know' },
+    practiceShapes: [[8, 2], [6, 2], [4, 2]],
+};
+const STORY_ADD = {
+    concepts: [
+        { id: 'part-whole', text: 'Two parts make the whole.' },
+        { id: 'both-parts-add', text: 'I know both parts. I add to find the whole.' },
+        { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+    ],
+    vocab: STORY_VOCAB('3 + 4 = 7'),
+    steps: STORY_STEPS,
+    chant: 'Part + part = whole.',
+};
+const STORY_SUB = {
+    concepts: [
+        { id: 'part-whole', text: 'Two parts make the whole.' },
+        { id: 'whole-part-sub', text: 'I know the whole and one part. I subtract to find the other part.' },
+        { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+    ],
+    vocab: STORY_VOCAB('7 − 3 = 4'),
+    steps: STORY_STEPS,
+    chant: 'Whole − part = part.',
+};
+const STORY_PENDING = 'Ported from the visual-quality lane with its Warm-up (the facts the story is solved with) until its Prerequisite Check is written (LR-17).';
+const storyLessons = () => {
+    const addFacts = (band) => ({ key: 'addition:add_facts', opts: { band, notation: ['stacked'] }, why: `The story is solved with an addition fact within ${band}.` });
+    const subFacts = (band) => ({ key: 'subtraction:subtract', opts: { band, notation: ['stacked'] }, why: `The story is solved with a take-away fact within ${band}.` });
+    const out = {};
+    for (const [id, band] of [['10', 10], ['20', 20]]) {
+        const add = (skill) => ({ routine: 'story-add-part-whole', practice: { skill }, prereqsPending: STORY_PENDING, warmup: [addFacts(band)],
+            mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'subtraction:subtract', opts: { band } }] });
+        const sub = (skill) => ({ routine: 'story-sub-part-whole', practice: { skill }, prereqsPending: STORY_PENDING, warmup: [subFacts(band)],
+            mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'addition:add_facts', opts: { band } }] });
+        out[`skill:addition:add_wp_${id}`] = add(`addition:add_wp_${id}`);
+        out[`skill:addition:add_wp_${id}_plain`] = add(`addition:add_wp_${id}_plain`);
+        out[`skill:subtraction:sub_wp_${id}`] = sub(`subtraction:sub_wp_${id}`);
+        out[`skill:subtraction:sub_wp_${id}_plain`] = sub(`subtraction:sub_wp_${id}_plain`);
+    }
+    return out;
+};
+
 export const ROUTINES = Object.freeze({
     // ------------------------------------------------ Count on from the bigger number (A2 fact)
     // Certified by the sample lesson add-within-10 (critic lessons r1-r4).
@@ -124,6 +186,47 @@ export const ROUTINES = Object.freeze({
         distinctFirst: true,
         distinctAnswer: true,
         casesPending: 'The SU-C pilot routine was graded before LR-1 cases were declared; its cases are declared when the no-regrouping ladder is next re-graded.',
+    },
+
+    // ------------------------------ One-step word problems within 10 / 20 (K-1, the sentence layout)
+    // Ported from master's lessons/prereqs.js storyLessons() (visual-quality lane 2026-10-31, design/audit/
+    // VISUAL_QUALITY.md 4.4; round 2, critic r1 F6 / F13) into the library unchanged: the word-work cell's sentence
+    // layout - the story, the PART-WHOLE BAR, then `[ ] ◯ [ ] = [ ] unit`. The lesson teaches the structure, never key
+    // words (PEDAGOGY P-21, P-WP-10). The four steps are the provider's four worked steps (sheet/providers/word-work.js),
+    // so step n of the list IS panel n of the chart. The _plain twin (no picture row) is the same lesson.
+    'story-add-part-whole': Object.assign({ archetype: 'story', casesPending: STORY_CASES_PENDING }, STORY_BASE, STORY_ADD),
+    'story-sub-part-whole': Object.assign({ archetype: 'story', casesPending: STORY_CASES_PENDING }, STORY_BASE, STORY_SUB),
+
+    // ------------------------------------------- Is it a fact family? (+ / −, grade 1)
+    // Ported from master's prereqs.js (visual-quality lane 2026-10-31): the kit's `family-check` cell - the three
+    // numbers in the fact triangle, the whole at the top, and the printed Yes / No the pupil circles. The three steps
+    // are the provider's worked steps (sheet/providers/addition.js).
+    'family-check': {
+        archetype: 'partwhole',
+        casesPending: 'Ported from the visual-quality lane unchanged; its cases are declared when the lesson is carded (lessons-first).',
+        concepts: [
+            { id: 'whole-top', text: 'The big number is the whole. It goes at the top.' },
+            { id: 'parts-add', text: 'The two small numbers are the parts. Add them.' },
+            { id: 'family', text: 'The parts make the whole: it is a fact family.' },
+        ],
+        vocab: [
+            { word: 'whole', meaning: 'the big number at the top', picture: { kind: 'text', text: '12 at the top' } },
+            { word: 'parts', meaning: 'the two small numbers', picture: { kind: 'text', text: '8 and 4' } },
+            // (critic r1 F8: a family is the three numbers, never one number sentence - a sentence is one fact)
+            { word: 'fact family', meaning: 'three numbers: two parts and the whole', picture: { kind: 'text', text: '8, 4, 12' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the big number.' },
+            { icon: 'count', text: 'Add the small numbers.' },
+            { icon: 'decide', text: 'The same? Circle yes. Not? Circle no.' },
+        ],
+        chant: 'Two parts make the whole.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Three short steps; the decision at step 3 is the whole skill, and the four-word chant is the question pupils ask themselves.',
+        },
+        example: { match: 'Circle yes' },
+        practiceShapes: [[12, 3], [9, 3], [6, 2]],
     },
 });
 
@@ -268,6 +371,19 @@ export const LESSONS = Object.freeze({
         teach: { warmRows: ['S', 'M'], vocab: NR_VOCAB_BIG('486,759', '35,247', 'HTh TTh Th H T O'), steps: NR_STEPS_BIG, maxSmall: 1 },
         mixWith: [{ key: 'addition:add_1m_no_regroup' }],
     }),
+
+    // --------------------------------- One-step word problems within 10 / 20 (K-1), ported from master
+    ...storyLessons(),
+
+    // ------------------------------------------- Is it a fact family? (+ / −, grade 1), ported from master
+    // The Warm-up deals the facts the check is made with.
+    'skill:addition:fact_family_sort': {
+        routine: 'family-check',
+        practice: { skill: 'addition:fact_family_sort' },
+        prereqsPending: 'Ported from the visual-quality lane with its Warm-up until its Prerequisite Check is written (LR-17).',
+        warmup: [{ key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'The check adds the two small numbers.' }],
+        mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'subtraction:subtract', opts: { band: 20 } }],
+    },
 });
 
 // LR-17: the Prerequisite Check's lessons that are not written yet (Phase 1 pilots, first in line).

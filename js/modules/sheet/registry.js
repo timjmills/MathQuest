@@ -161,7 +161,21 @@ export function renderCell(q, ctx = {}) {
         // or under.
         let fp = null;
         try { fp = tpl.footprint ? tpl.footprint.call(tpl, withoutSupports(payload), c) : null; } catch (e) { fp = null; }
-        return SUPPORTS.withSupports(html, payload, spec.template, c, { problemWMm: fp && fp.wMm ? Math.max(10, fp.wMm - 5) : 40, problemHMm: (fp && fp.hMm) || 30 });
+        // ONE placement per page (critic r2 R2-4: the boxed sign stood before "12 ÷ 3" and under "108 ÷ 12" on
+        // one page): a division fact decides beside / before / under from the widest fact of its set (144 ÷ 12),
+        // so every cell of a section places its supports alike.
+        let ghostHtml = '';
+        if (fp && /^(\/|÷|divide)$/.test(String(payload.op || '')) && Number(payload.a) <= 144 && Number(payload.b) <= 12) {
+            try {
+                const widePayload = Object.assign(withoutSupports(payload), { a: 144, b: 12, ans: 12 });
+                const wide = tpl.footprint.call(tpl, widePayload, c);
+                if (wide && wide.wMm > fp.wMm) fp = Object.assign({}, fp, { wMm: wide.wMm });
+                // Critic r3 R3-1: the widest fact of the set, drawn unseen under the item's own, holds ONE
+                // fact zone for the section (support-draw.js), at whatever size the cell draws.
+                if (c.mode !== 'screen') ghostHtml = tpl.render(widePayload, Object.assign({}, c, { state: 'blank', wrong: null }));
+            } catch (e) { /* keep the item's own */ }
+        }
+        return SUPPORTS.withSupports(html, payload, spec.template, c, { problemWMm: fp && fp.wMm ? Math.max(10, fp.wMm - 5) : 40, problemHMm: (fp && fp.hMm) || 30, ghostHtml });
     } catch (e) {
         return FALLBACK.render({ text: (q && q.text) || '' }, c);
     }

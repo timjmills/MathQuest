@@ -17,7 +17,7 @@ export function vocabPicture(pic, c) {
     const mm = (v) => `${v.toFixed(2)}mm`;
     switch (pic && pic.kind) {
         // a small part-whole bar (detailed lesson 2): {whole, a, b, mark: 'whole' | 'parts'}
-        case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12 });
+        case 'bar': return barMini({ whole: pic.whole, a: pic.a, b: pic.b, mark: pic.mark || '', wMm: 36, pt: 12, only: !!pic.only });
         // (one product, detailed lesson 4: the chart corner a × b with its product boxed)
         case 'fact': return factGridMini(Number(pic.a), Number(pic.b));
         case 'glyph': return `<span class="mq-lvpic-glyph" style="font-size:${Math.round(m.digitPt * 1.3)}pt">${esc(pic.text)}</span>`;

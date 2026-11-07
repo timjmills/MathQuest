@@ -302,6 +302,18 @@ pairs, `placevalue:value` ten times / one tenth, `number_theory:gcf_easy` sum as
 `algebra:inequalities` write it / show it. Make the preset in the change that builds the option. Every
 other option entry is `preset: false`.
 
+### Presets of `placevalue:value` form "times" (2026-10-30, detailed lesson 6 fix round 4)
+
+Build-list `value_ten_times` is `preset: true`. The form and the two values that teach something of their own are
+presets; the supports and the response set stay plain options (`tenValues` write both values first, `tenPlain` the
+digit and zeros, `tenWrite` one worth box, `tenChoice` four words to choose from).
+
+| Preset | Label | Host + values | Code | Grade | CCSS | EE | WRM |
+|---|---|---|---|---|---|---|---|
+| placevalue:ten_times_value | 10 Times and One Tenth: the Same Digit One Place Apart | value `form: 'times', band: 9999` | Y7 | 4 | 4.NBT.A.1 | M.EE.5.NBT.1 | Y5.B1.S6, Y4.B5.S3 (partial) |
+| placevalue:one_tenth_value | One Tenth of a Digit's Value (One Place Right) | value `form: 'times', band: 9999, tenDir: 'tenth'` | Y8 | 4 | 4.NBT.A.1 | M.EE.5.NBT.1 | Y4.B5.S5 (partial) |
+| placevalue:ten_times_story | How Many Times as Many? (700 ÷ 70 = 10) | value `form: 'times', band: 9999, tenTask: 'story'` | Y9 | 4 | 4.NBT.A.1 | M.EE.5.NBT.1 | Y5.B1.S6 (partial) |
+
 ### Plain options (no preset)
 
 Everything that changes size *within* a class (`band`, `range`, `decimals`, `constant`, `tables`),

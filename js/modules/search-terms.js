@@ -417,6 +417,8 @@ export const SKILL_TERMS = {
     'shapes_early:partition_shapes': ['half', 'fractions', 'halves', 'quarters', 'fourths', 'thirds', 'equal parts', 'fractions of shapes'],
     'fractions:identify': ['what fraction', 'name the fraction', 'fraction pictures', 'shaded part'],
     'conversions:percent_of_number': ['percent of', 'percentage of an amount', 'percent of a quantity'],
+    'algebra:multi_step_word': ['two step word problems', 'two-step problems', 'multi-step', 'equation with a letter', 'letter for the unknown', 'estimate to check', 'is the answer reasonable', 'multiply then subtract', 'divide then add', 'add then divide'],
+    'algebra:multi_step_word_plain': ['two step word problems', 'two-step problems', 'equation with a letter', 'estimate to check', 'reasonable answer', 'four operations word problems'],
     'algebra:solve_unknown': ['solve for x', 'find x', 'missing number'],
     'algebra:balance_addsub': ['balance', 'equal sign', 'balancing equations', 'equals means same as'],
     'addition:equal_sign': ['equal sign', 'equals', 'true or false', 'balance'],
@@ -517,6 +519,8 @@ export const SKILL_TERMS = {
         'long division', 'short division', 'bus stop method', 'divide a 3 digit number'],
     'division:div_4by1_long': ['4 digit by 1 digit division', 'divide 4 digit by 1 digit', 'four digit by one digit division',
         'long division', 'short division', 'bus stop method', 'divide a 4 digit number'],
+    'division:div_facts_long': ['division facts in the bracket', 'bus stop division facts', 'division bracket', 'division house',
+        'divide with the bracket', 'bracket division facts', 'short division facts', 'facts written with the division bracket'],
     'division:div_3by2_long': ['3 digit by 2 digit division', 'divide by 2 digit numbers', 'divide 3 digit by 2 digit',
         'long division', 'two digit divisor', 'long division with 2 digit divisors', 'divide by a 2 digit number'],
     'fractions:compare_to_half': ['compare to one half', 'compare fractions to 1/2', 'benchmark one half', 'more than half',
@@ -600,12 +604,20 @@ export const SKILL_TERMS = {
     'algebra:write_equation_story': ['write an equation for a story', 'equation from a word problem', 'write an equation word problem', 'story to equation', 'translate a story into an equation', 'model a story with an equation'],
     'algebra:factor_out_gcf': ['factor out the gcf', 'factor out the greatest common factor', 'factoring expressions', '12 + 18 = 6(2 + 3)', 'factorise', 'factor an expression'],
     'algebra:function_table_find_rule': ['find the rule', 'function table find the rule', 'in and out table rule', 'input output rule', 'what is the rule', 'function machine rule'],
+    'algebra:two_step_mult_div_first': ['two step word problems multiply first', 'multiply then add', 'multiply then subtract', 'divide then add', 'divide then subtract', 'two-step four operations', 'groups then a change', 'share then a change'],
+    'algebra:two_step_add_then_mult': ['add then multiply', 'subtract then multiply', 'two step word problems brackets', 'parentheses word problem', 'add first then multiply', 'each bag has red and blue'],
+    'algebra:two_step_add_then_div': ['add then divide', 'subtract then divide', 'add first then share', 'two step division word problem', 'brackets then divide', 'share the total equally'],
+    'algebra:two_step_letter_equation': ['equation with a letter', 'letter for the unknown', 'write one equation two step', 'two-step equation word problem', 'n for the unknown', 'represent with an equation'],
+    'algebra:two_step_estimate_check': ['estimate to check', 'is the answer reasonable', 'reasonableness', 'round to check', 'estimate two step problem', 'check with rounding'],
     'algebra:function_table_find_inputs': ['find the input', 'function table missing inputs', 'in and out table missing in', 'work the rule backward', 'missing input', 'function machine inverse'],
     'order_of_operations:square_numbers': ['square numbers', 'squared', 'squares', '5 squared', 'square of a number', 'exponent 2'],
     'order_of_operations:cube_numbers': ['cube numbers', 'cubed', 'cubes', '5 cubed', 'cube of a number', 'exponent 3'],
     'number_sense:reasonable_quotients': ['is the quotient reasonable', 'reasonableness division', 'check a quotient with an estimate', 'reasonable quotient', 'estimate to check division', 'is the answer reasonable'],
     'placevalue:digit_value_unit_form': ['value of a digit unit form', 'digit value in words', '7 hundreds', 'how many tens', 'unit form value', 'place value unit form'],
     'placevalue:digit_value_notation': ['value of a digit expanded notation', '7 x 100', 'digit times place value', 'value as a multiplication', 'expanded notation digit', 'place value times'],
+    'placevalue:ten_times_value': ['10 times the value', 'ten times as much', 'one tenth of the value', 'digit one place to the left', 'same digit two places', '10 times and one tenth', 'value of a digit 10 times'],
+    'placevalue:one_tenth_value': ['one tenth of', 'a tenth of the value', 'one tenth as much', 'digit one place to the right', '10 times smaller value', 'one tenth of a digit'],
+    'placevalue:ten_times_story': ['how many times as many', 'how many times more', '700 divided by 70', 'times as many word problem', 'ten times as many story', 'how many times bigger'],
     'placevalue:count_pv_disks': ['count place value disks', 'place value counters', 'how many hundreds disks', 'count the disks', 'place value chips', 'place value counters count'],
     'composing:write_numbers_in_words': ['write numbers in words', 'number words', 'numbers to words', 'spell numbers', 'write forty one', 'word form'],
     'measurement:count_notes': ['count notes', 'count bills', 'count dollar bills', 'counting banknotes', 'count paper money', 'count riyal notes'],
@@ -642,6 +654,9 @@ export const SKILL_TERMS = {
 export const PRIMARY_SKILLS = {
     // critic r4 R-D / R-E / C-F
     'shapes_early:shape_corners_count': ['corner', 'corners', 'count corners'],
+    // 2026-10-31 (F2): the long-division preset of division facts ("Divide: Long-Division Form") carries "long division" in its
+    // label; the written method (long_div_2digit, then the div_NbyM_long presets) still leads that query (ws-search-terms (b) / (e)).
+    'division:long_div_2digit': ['long division'],
     'conversions:d_to_f': ['decimals to fractions', 'decimal to fraction', 'decimal to fractions', 'decimals to fraction', 'convert decimals to fractions'],
     'conversions:f_to_d': ['fractions to decimals', 'fraction to decimal', 'fraction to decimals', 'fractions to decimal', 'convert fractions to decimals'],
     // critic r5: no skill deals the associative property, so 'associative' finds nothing (REAL_WORDS keeps it uncorrected);
@@ -904,9 +919,13 @@ export function buildSearchIndex(entries) {
         const labelBare = normalize(String(e.label || '').replace(/\([^)]*\)/g, ' '));
         // 'No Regrouping' in a label must not make the skill a label hit for 'regrouping'
         const labelPos = String(e.label || '').replace(/\b(no|without)\s+\w+/gi, ' ');
+        // the pupil name (explorer check r3 R2) is a name too: its words join the label tier, and typing it whole
+        // is an exact-name hit like the label's
+        const pupilPos = String(e.pupil || '').replace(/\b(no|without)\s+\w+/gi, ' ');
+        const pupilPhrase = e.pupil ? tokens(e.pupil).filter((w) => !HARD_STOP.has(w)).join(' ') : '';
         return {
-            entry: e, order, terms: t, labelBare,
-            sets: [tokSet([labelPos]), tokSet(t.extra), tokSet(t.grade), tokSet(t.concept), tokSet(t.code)],
+            entry: e, order, terms: t, labelBare, pupilPhrase,
+            sets: [tokSet([labelPos, pupilPos]), tokSet(t.extra), tokSet(t.grade), tokSet(t.concept), tokSet([...t.code, ...(e.pupil ? [e.pupil] : [])])],
             vocab: /^vocab/.test(e.skillId) || e.categoryId === 'vocabulary',
             wp: /word|_wp_|story/.test(`${e.label} ${e.skillId}`.toLowerCase()),
             phrases: { extra: t.extra, concept: t.concept },
@@ -1124,7 +1143,7 @@ export function searchIndex(index, query) {
         score -= divPen;
         // a vocabulary skill never leads a teaching query by matching its label (critic r2 R-B)
         if (it.vocab && !wantsVocab) score -= 3;
-        else if (it.labelBare === phrase || it.terms.label === phrase) score += 100;
+        else if (it.labelBare === phrase || it.terms.label === phrase || (it.pupilPhrase && it.pupilPhrase === phrase)) score += 100;
         else if (q.length > 1 && labelPhrase(it.labelBare, phrase)) score += 15;
         if (phrase.length >= 1) {
             if (it.primary.includes(phrase) || it.primary.includes(q.join(' '))) score += 60;

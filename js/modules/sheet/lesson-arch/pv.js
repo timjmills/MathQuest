@@ -15,8 +15,39 @@ export function pvNumberOf(it) {
     return Number.isFinite(Number(v)) && v !== undefined && v !== null ? Number(v) : null;
 }
 
+/** A value form "times" item's description (gen-pv.js), else null. */
+export const tenOf = (it) => { const p = it && it.q && it.q.pv; return p && p.kind === 'times' ? p : null; };
+
 /** The named cases of a place-value lesson. */
 export const CASES = Object.freeze({
+    // The detailed lesson maker, lesson 6 (the same digit one place apart, 4.NBT.A.1; value form "times"): read
+    // from q.pv (gen-pv.js genTimesValue), so lesson 9 (decimals, 5.NBT.A.1) reuses them. (Ported from master, 2026-11-07.)
+    tenAny: (it) => !!tenOf(it),
+    tenTimes: (it) => { const p = tenOf(it); return !!p && p.dir === 'times'; },
+    tenTenth: (it) => { const p = tenOf(it); return !!p && p.dir === 'tenth'; },
+    tenPlain: (it) => { const p = tenOf(it); return !!p && !!p.plain; },
+    tenMixed: (it) => { const p = tenOf(it); return !!p && !p.plain; },
+    // (the two numbers of different lengths: the digits do not line up by position from the left)
+    tenLengths: (it) => { const p = tenOf(it); return !!p && String(p.n).length !== String(p.m).length; },
+    // (the pair reaches the thousands: Th and H)
+    tenThou: (it) => { const p = tenOf(it); return !!p && Math.max(p.place, p.placeM) >= 1000; },
+    // (the pair is tens and ones: 7 and 70)
+    tenOnes: (it) => { const p = tenOf(it); return !!p && Math.min(p.place, p.placeM) === 1; },
+    // (★★★: the thousands, or the ones, with numbers of different lengths)
+    tenEdge: (it) => (CASES.tenThou(it) || CASES.tenOnes(it)) && CASES.tenMixed(it),
+    // (the chart model: hundreds and tens, other digits round them, 10 times)
+    tenChart: (it) => { const p = tenOf(it); return !!p && p.dir === 'times' && !p.plain && Math.min(p.place, p.placeM) === 10 && Math.max(p.place, p.placeM) === 100; },
+    tenThouTimes: (it) => CASES.tenThou(it) && CASES.tenTimes(it),
+    tenThouTenth: (it) => CASES.tenThou(it) && CASES.tenTenth(it) && CASES.tenMixed(it),
+    tenOnesTimes: (it) => CASES.tenOnes(it) && CASES.tenTimes(it) && CASES.tenMixed(it),
+    // (the chart's other example, lesson 6 r2 n7: one tenth on another place pair than the main example's H / T)
+    tenTenthOther: (it) => { const p = tenOf(it); return !!p && p.dir === 'tenth' && !p.plain && !(Math.min(p.place, p.placeM) === 10 && Math.max(p.place, p.placeM) === 100); },
+    // (a Guided 10 times cell, lesson 6 r3: H / T or Th / H, other digits round it - not the ones edge)
+    tenTimesGuided: (it) => CASES.tenTimes(it) && CASES.tenMixed(it) && !CASES.tenOnes(it),
+    tenTenthGuided: (it) => CASES.tenTenth(it) && CASES.tenMixed(it) && !CASES.tenOnes(it),
+    tenNoOnes: (it) => CASES.tenMixed(it) && !CASES.tenOnes(it),
+    tenTimesMid: (it) => CASES.tenTimes(it) && !CASES.tenEdge(it),
+    tenTenthMid: (it) => CASES.tenTenth(it) && !CASES.tenEdge(it),
     // The detailed lesson maker (numbers to 1,000, 2026-10-16): a 3-digit place-value item with no
     // 0 place, a 0 in the tens, a 0 in the ones (lessons/detailed/g2-nbt3-read-write-1000.js).
     // (no 0 place and no teen ending: the plain case - critic D14)

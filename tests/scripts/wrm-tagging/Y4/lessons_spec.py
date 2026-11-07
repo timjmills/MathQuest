@@ -217,7 +217,7 @@ lesson(G + 'measureandestimatemassandliquidvolumegkgmll',
            'scale, estimates a mass or volume, or tells a same-unit story; mass_scales and mass_ops (WRM_PROPOSALS) and the new estimate_mass_volume.')
 
 lesson(G + 'measuretothehalfandquarterinch',
-    partial=[('measurement:reading_ruler', {'parts': [1, 2]}, 'reads where an arrow points on a 6-inch ruler marked in halves or quarters (3 1/4, 4 1/2); never lays an object on the ruler')],
+    partial=[('measurement:reading_ruler', {'parts': [1, 2]}, 'reads where an arrow points on a 6-inch ruler marked in quarters, the arrow at a half or a quarter (3 1/4, 4 1/2); never lays an object on the ruler')],
     verdict='partial',
     missing='measuring a drawn object with the inch ruler to the nearest half or quarter inch',
     build=['ruler_object_inch'],

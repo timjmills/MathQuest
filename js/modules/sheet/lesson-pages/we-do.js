@@ -15,7 +15,7 @@ import { CASE_TESTS } from '../lesson-arch/index.js';
 import { ringFactRow } from '../lesson-arch/fact.js';
 import { roundLineSvg, roundLineMm, roundLinePad, GUIDED_BOX_MM, isRound } from '../lesson-arch/line.js';
 import { isExpand } from '../lesson-arch/pv.js';
-import { isWordBar, barNums } from '../lesson-arch/story.js';
+import { isWordBar, barNums, msOf } from '../lesson-arch/story.js';
 import { arrTurnOf } from '../lesson-arch/array.js';
 import { winShare } from '../lesson-arch/grid.js';
 import { sigOf, digitsOfOps, kindOf, opKindOf, namedSteps, stepMarker, band, hAt, fitsWidth, hOf } from './common.js';
@@ -52,12 +52,15 @@ export function pickWeDo(items, example, data, n) {
         // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
         // (lesson 2 r5, critic r3 m3: no story person twice on the sheet while the deal can - "Lena has 7 cards" and "Lena has 6")
         const people = (x) => { const ls = (x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.lines) || []; return ls.slice(0, -1).map((l) => (String(l).match(/^([A-Z][a-z]+)\b/) || [])[1]).filter(Boolean); };
-        const meets = (x, y, nm) => twin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        // (lesson 7 r2: two two-step stories never share a Step 1 number or a Step 1 answer - "30 shared by 6", "30 shared by 5")
+        const ms1 = (x) => { const s = x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.steps; return Array.isArray(s) && s.length === 2 && s[0] ? [s[0].a, s[0].b, s[0].ans] : null; };
+        const msTwin = (x, y) => { const a = ms1(x), b = ms1(y); return !!a && !!b && (a[0] === b[0] || a[2] === b[2] || (a[0] === b[1] && a[1] === b[0])); };
+        const meets = (x, y, nm) => twin(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
         const pickLead = (k, chosen, nm) => {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
             if (!t) return pickLead(k + 1, chosen, nm);
-            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !msTwin(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
             return null;
         };
         const fit = pickLead(0, [], true) || pickLead(0, [], false);
@@ -193,6 +196,9 @@ export function weDoBand(env) {
         if (set.length && fitsWidth(set, tc)) top = { set, cols: tc, h: Math.max(20, hAt(set, tc) + lineExtra(set)) + (cue(set) ? 2 : 0) };
     }
     if (top) weDo = top.set;
+    // (cells answered IN PLACE - footprint `inPlace`: the sentence story, the fact-family check - hold no working space,
+    // so a page's spare height grows them by a tenth at most, never a third: visual-quality critic r1 F1, 33 % bands)
+    const weInPlace = weDo.length > 0 && weDo.every((it) => it && it.footprint && it.footprint.inPlace);
     // Cells taller than their problem (the Steps set the band's height) centre it (H13).
     // Every Guided problem sits in the middle of its cell (the cells may take spare height, H13).
     const centre = true;
@@ -215,11 +221,12 @@ export function weDoBand(env) {
         // rule is what the pupil needs beside the Guided cells), else under the strip.
         const rem = groups.find((g) => g.sections[0] && g.sections[0].label === 'Remember:');
         if (rem && data && data.chant) Object.assign(rem.sections[0], { label: 'Rule:', instr: data.chant });
-        const chantH = data && data.chant && !rem ? m.instr : 0;
+        // (`noStripChant` - the detailed lesson maker, lesson 7: two Guided cells fill the page; the chant is on the chart)
+        const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
-        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: 0.35 }));
+        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
+    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
     env.weDo = weDo;
     return env;
 }
@@ -290,6 +297,16 @@ export function weDoRender(it, i) {
             const steps = workedStepsOf(it);
             // (the key: every box answered, the prompt drawn exactly as on the pupil page - INK-31, critic r2 R9)
             if (t && steps.length > 1) return answered ? t.render(Object.assign({}, it.q.cell.payload, { under: 0 }), c) : t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
+        }
+        // (a two-step story whose first step is x or / - lesson 7: Guided cell 1 has its Step 1 sign ringed grey; the key too,
+        // a facsimile of the pupil page)
+        if (i === 0 && msOf(it)) return it.render(c, Object.assign({}, o, { payload: { traceOp0: true } }));
+        // (a template that opts in with `guidedStepOne` - pv-times, lesson 6: Guided cell 1 drawn at its first
+        // step, that step's marks traced grey; generic for any template with a stepState)
+        if (!answered && i === 0) {
+            const t = stepTemplateOf(it);
+            const steps = workedStepsOf(it);
+            if (t && t.guidedStepOne && steps.length > 1) return t.stepState(Object.assign({}, it.q.cell.payload), steps.map((s) => ({ marks: s.marks || [] })), 0, c);
         }
         // An array-and-turn Guided cell 1 (the detailed lesson maker, lesson 3a): step 2 done in grey - the
         // first product traced; the turned fact stays the pupil's (the Critical Atom).

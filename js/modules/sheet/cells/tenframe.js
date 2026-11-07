@@ -57,7 +57,7 @@ export function frameHTML(ctx, { frames = 1, filled = 0 } = {}) {
             rows += `<tr>${tds}</tr>`;
         }
         out += `<table class="k2-tenframe" data-ws-zone="ten frame"${ink ? ` data-ws-ink="${ink}"` : ''} style="border-collapse:collapse;`
-            + `border:${B(ctx, 1.5)} solid ${INK};background:#fff;margin:0 auto;table-layout:fixed;">${rows}</table>`;
+            + `border:${B(ctx, 1.5)} solid ${INK};background:#fff;margin:0 auto;table-layout:fixed;min-width:${L(ctx, 5 * c)};flex:none;">${rows}</table>`;
     }
     return `<div style="display:flex;flex-direction:column;gap:${L(ctx, 3)};">${out}</div>`;
 }

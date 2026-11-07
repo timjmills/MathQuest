@@ -1,7 +1,8 @@
 import { state } from './state.js';
 import { updateStartSkillName } from './category-dropdowns.js';
+import { pupilNameOf } from './pupil-names.js';
 import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
-import { getSetOptions, setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions } from './skill-option-store.js';
+import { getSetOptions, setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions, queueUsesInPlay } from './skill-option-store.js';
 
 // A queue item's `opts` IS the set's option store entry for that skill: reading it returns the
 // stored (packed) options, or undefined at the defaults; assigning it writes the store. So every
@@ -85,6 +86,7 @@ export const UnifiedSkills = {
         this.skills = [];
         this.expanded = false;
         clearSetOptions({ silent: true });
+        state.queueUses = null;   // a code's repeated uses belong to the set it loaded
         this.syncAll();
     },
 
@@ -139,6 +141,7 @@ export const UnifiedSkills = {
 
         // Always sync the lightweight arrays immediately (so has() / count / getAll work)
         window.skillQueue = [...this.skills];
+        updateStudentSelBar();
 
         // Debounce the heavy work (global format conversions + UI updates)
         clearTimeout(this._syncTimer);
@@ -161,6 +164,8 @@ export const UnifiedSkills = {
             // Sync to state.mixedModeSettings
             if (!state.mixedModeSettings) state.mixedModeSettings = {};
             state.mixedModeSettings.selectedSkills = this.getAsSelectedSkills();
+            // a link's repeated uses hold only while the queue is still the set the link loaded
+            if (state.mixedModeSettings.uses && !queueUsesInPlay(this.skills)) delete state.mixedModeSettings.uses;
             state.mixedModeSettings.name = `Custom Practice (${this.count} skills)`;
 
             // Sync to print settings
@@ -492,6 +497,10 @@ export function playSelectedSkills(mode = 'practice') {
         selectedSkills: selectedSkills,
         name: `Custom ${modeNames[mode] || 'Practice'} (${window.skillQueue.length} skills)`
     };
+    // A loaded code that uses one skill more than once plays every use with its own options, while
+    // the queue is still the set that code loaded (skill-option-store.js queueUsesInPlay).
+    const uses = queueUsesInPlay();
+    if (uses) state.mixedModeSettings.uses = uses;
 
     // CRITICAL: Set state.category and state.skill DIRECTLY so startGame and generateQuestion use them
     state.category = 'all_mixed';
@@ -562,3 +571,121 @@ export function printFromQueue() {
     openSimplePrintDialog(skillsToUse);
 }
 
+
+// ---- owner 2026-11-03: the pupil home's bottom bar for the selected skills: "n skills selected · Play · Send · Print"
+const selItems = () => (window.skillQueue || []).map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts && Object.keys(s.opts).length ? s.opts : undefined }));
+
+/**
+ * The bar shows only while at least one skill is selected (ui3 check D7, owner: "when skills are selected … there should
+ * be a play/send/print"); it says how many. Its height is kept in --mq-selbar-h so toasts sit above it (D4) and a focused
+ * control scrolls clear of it (D8).
+ */
+export function updateStudentSelBar() {
+    if (typeof document === 'undefined') return;
+    const n = (window.skillQueue || []).length;
+    for (const id of ['studentSelAddBtn', 'studentSelPlayBtn', 'studentSelSendBtn', 'studentSelPrintBtn']) { const b = document.getElementById(id); if (b) b.disabled = n === 0; }
+    const c = document.getElementById('studentSelCount');
+    if (c) c.textContent = n === 0 ? 'Pick skills above' : `${n} skill${n === 1 ? '' : 's'} selected`;
+    const box = document.getElementById('studentSendBox');
+    if (box && !box.hidden) box.hidden = true;   // a link made for an older selection is not kept
+    // owner 2026-11-04: no floating bar — the buttons sit in the bottom row next to MAP, always shown (disabled until a pick)
+    installSelBarWatch();
+    syncSelBarHeight();
+    // the queue's heavy UI work is debounced: measure again once the cards have settled
+    clearTimeout(_selLate); _selLate = setTimeout(() => { try { syncSelBarHeight(); } catch (e) { /* */ } }, 400);
+}
+
+/** --mq-selbar-h on <html>: the space the bar (and its Send pop-up) takes at the bottom of the screen, 0 when not shown. */
+export function syncSelBarHeight() {
+    if (typeof document === 'undefined') return 0;
+    const bar = document.getElementById('studentSelBar');
+    let h = 0;
+    if (bar && !bar.hidden && bar.offsetParent !== null) {
+        const r = bar.getBoundingClientRect();
+        const box = document.getElementById('studentSendBox');
+        const top = box && !box.hidden && box.offsetParent !== null ? Math.min(r.top, box.getBoundingClientRect().top) : r.top;
+        // only while the bar is pinned to the bottom edge (sticky); a bar sitting mid-page covers nothing
+        if (r.bottom >= window.innerHeight - 2) h = Math.max(0, Math.ceil(window.innerHeight - top));
+    }
+    const root = document.documentElement;
+    const was = root.style.getPropertyValue('--mq-selbar-h');
+    if (was !== h + 'px') root.style.setProperty('--mq-selbar-h', h + 'px');
+    root.classList.toggle('mq-selbar-on', h > 0);
+    return h;
+}
+
+let _selWatch = false, _selLate = 0;
+function installSelBarWatch() {
+    if (_selWatch || typeof window === 'undefined' || typeof document === 'undefined') return;
+    const bar = document.getElementById('studentSelBar');
+    if (!bar) return;
+    _selWatch = true;
+    let raf = 0;
+    const sync = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; try { syncSelBarHeight(); } catch (e) { /* */ } }); };
+    // the bar's own size, and the page under it (cards added after a pick move where the sticky bar sits)
+    if (typeof ResizeObserver === 'function') { try { const ro = new ResizeObserver(sync); ro.observe(bar); ro.observe(document.body); const home = document.getElementById('homeView'); if (home) ro.observe(home); } catch (e) { /* */ } }
+    window.addEventListener('resize', sync, { passive: true });
+    window.addEventListener('scroll', sync, { passive: true });
+    // the bar lives in homeView: switching views shows / hides it without a resize of its own
+    if (typeof MutationObserver === 'function') {
+        const home = document.getElementById('homeView');
+        if (home) { try { new MutationObserver(sync).observe(home, { attributes: true, attributeFilter: ['class', 'style', 'hidden'] }); } catch (e) { /* */ } }
+    }
+    // D8: a control reached with Tab never ends up under the bar (scroll-padding-bottom covers scrolling; this covers a
+    // control already on screen but behind it)
+    document.addEventListener('focusin', (e) => {
+        const h = syncSelBarHeight();
+        const t = e.target;
+        if (!h || !t || !t.getBoundingClientRect || bar.contains(t)) return;
+        const r = t.getBoundingClientRect();
+        const limit = window.innerHeight - h - 8;
+        if (r.bottom > limit && r.height < window.innerHeight - h) window.scrollBy({ top: r.bottom - limit, behavior: 'auto' });
+    });
+}
+
+/** Play: practice with exactly the selected skills (the queue play path: mixed-mode state set before startGame). */
+export function playStudentSelection() {
+    if (!(window.skillQueue || []).length) return;
+    playSelectedSkills('practice');
+}
+
+/** Send: the share link for the selected skills (each with its options), shown with a Copy button. */
+export function sendStudentSelection() {
+    const list = selItems().map((x) => Object.assign({ weight: 1 }, x));
+    if (!list.length || typeof window.generateShareableLink !== 'function') return '';
+    const was = state.shareLinkType;
+    state.shareLinkType = 'direct';
+    let link = '';
+    try { link = window.generateShareableLink(list) || ''; } finally { state.shareLinkType = was; }
+    // D9: a link a pupil sends says so (?from=pupil): it opens with neutral wording, not "Your teacher has set up …"
+    if (link) link += (link.includes('?') ? '&' : '?') + 'from=pupil';
+    const box = document.getElementById('studentSendBox');
+    const f = document.getElementById('studentSendLink');
+    if (f) f.value = link;
+    if (box && link) { box.hidden = false; try { f.focus({ preventScroll: true }); f.select(); } catch (e) { /* */ } syncSelBarHeight(); }
+    return link;
+}
+/** Close the Send pop-up (its × and Esc); focus goes back to Send. */
+export function closeStudentSend() {
+    const box = document.getElementById('studentSendBox');
+    if (!box || box.hidden) return;
+    box.hidden = true;
+    syncSelBarHeight();
+    const b = document.getElementById('studentSelSendBtn');
+    if (b) { try { b.focus({ preventScroll: true }); } catch (e) { /* */ } }
+}
+export async function copyStudentSendLink() {
+    const f = document.getElementById('studentSendLink');
+    if (!f || !f.value) return;
+    let ok = false;
+    try { await navigator.clipboard.writeText(f.value); ok = true; } catch (e) { try { f.select(); ok = document.execCommand('copy'); } catch (e2) { ok = false; } }
+    if (window.showToast) window.showToast(ok ? 'Link copied' : 'Select the link and copy it', ok ? 'success' : 'info');
+}
+
+/** Print: every selected skill (with its options) in the simple print, loaded on the press only. */
+export function printStudentSelection() {
+    // check r2 D1: the Print list names each skill as the pupil saw it (the pupil name)
+    const list = selItems().map((x) => Object.assign(x, { label: pupilNameOf(x.categoryId, x.skillId) }));
+    if (!list.length || typeof window.openSimplePrint !== 'function') return;
+    window.openSimplePrint(list, { from: 'student' });
+}

@@ -6,7 +6,7 @@
   "gate": "node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --check",
   "source": "data/curriculum/source/Lessons_To_Build_K-5_2026-27.xlsx, sheet 'Build order (all grades)', rows 1-5 (owner 2026-10-16)",
   "joins": "siteLessonId = data/curriculum/site-lessons.json lessons[].id; skills keys = 'category:skill' as in data/curriculum/links/*.json",
-  "updated": "2026-10-17"
+  "updated": "2026-10-30"
  },
  "lessons": [
   {
@@ -394,6 +394,641 @@
    "rulings": [
     "x rules x2, x3, x5, x10 (x10 alone ran out of fresh pairs; P0 has a x3 band)"
    ]
+  },
+  {
+   "id": "g4-nbt1-ten-times-value",
+   "order": 6,
+   "grade": "4",
+   "level": 4,
+   "title": "I Can find 10 times and one tenth",
+   "ownerTitle": "Place value: 10 times and one tenth of a digit's value",
+   "siteLessonId": "G4|-|placevalue10timesandonetenthofadigitsvalue",
+   "wrmYear": "Y5",
+   "wrmSteps": [],
+   "wrmNear": [
+    "Y5.B1.S6",
+    "Y4.B5.S3",
+    "Y4.B5.S5"
+   ],
+   "ccss": [
+    "4.NBT.A.1"
+   ],
+   "ee": [
+    "M.EE.5.NBT.1"
+   ],
+   "ccssOwnerList": [
+    "4.NBT.A.1",
+    "5.NBT.A.1"
+   ],
+   "eeNote": "Wisconsin files 4.NBT.1 as \"use M.EE.5.NBT.1\"; 5.NBT.A.1 (decimals) is lesson 9",
+   "flow": "Standard (one chunk: 10 times first, then one tenth; the same chart every time)",
+   "skills": {
+    "used": [
+     {
+      "key": "placevalue:identify",
+      "opts": {
+       "band": 999,
+       "response": "circle"
+      },
+      "role": "P0"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "band": 9999,
+       "form": "value"
+      },
+      "role": "P0"
+     },
+     {
+      "key": "placevalue:place_value_10x",
+      "opts": {
+       "op": "x",
+       "power": [
+        10
+       ],
+       "band": 1000
+      },
+      "role": "P0"
+     },
+     {
+      "key": "placevalue:place_value_10x",
+      "opts": {
+       "op": "/",
+       "power": [
+        10
+       ],
+       "band": 1000
+      },
+      "role": "P0"
+     },
+     {
+      "key": "placevalue:more_less_100",
+      "opts": {
+       "step": [
+        10,
+        100
+       ],
+       "dir": [
+        "more",
+        "less"
+       ]
+      },
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:compare",
+      "opts": {
+       "band": 999,
+       "closeness": [
+        "far",
+        "close"
+       ]
+      },
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenDir": "both",
+       "tenValues": true
+      },
+      "role": "P2 chart, P3 Guided + Independent, P4-1",
+      "preset": "placevalue:ten_times_value"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 99999,
+       "tenDir": "both",
+       "tenValues": true
+      },
+      "role": "P4-2"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenTask": "story",
+       "tenDir": "times"
+      },
+      "role": "P5",
+      "preset": "placevalue:ten_times_story"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenWrite": "top",
+       "tenDir": [
+        "times",
+        "tenth"
+       ]
+      },
+      "role": "P6"
+     },
+     {
+      "key": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenValues": false,
+       "tenChoice": "four"
+      },
+      "role": "Check Question (board A-D)"
+     },
+     {
+      "key": "multiplication:mult_facts",
+      "opts": {
+       "constant": [
+        10
+       ]
+      },
+      "role": "retrieval"
+     },
+     {
+      "key": "placevalue:unit_form",
+      "opts": {
+       "band": 9999
+      },
+      "role": "retrieval"
+     },
+     {
+      "key": "placevalue:compare",
+      "opts": {
+       "band": 999,
+       "closeness": "close"
+      },
+      "role": "retrieval"
+     }
+    ],
+    "built": [
+     "placevalue:value form \"times\" (gen-pv.js genTimesValue) with options tenDir 4E, tenValues 4F, tenPlain 4G, tenWrite 4H, tenTask 4I, tenChoice 4J (r4, critic r2 D2: the Check Question's four words)",
+     "kit template pv-times (two-row place chart, worth boxes, the ring sentence; stepState for the chart) + its screen twin (screen-cell.js pvTimesTwin)",
+     "provider branch (sheet/providers/pv.js): worked steps, wrong answers M-T1 / M-V2 / M-V14"
+    ],
+    "presets": [
+     {
+      "key": "placevalue:ten_times_value",
+      "opts": {
+       "form": "times",
+       "band": 9999
+      },
+      "code": "Y7"
+     },
+     {
+      "key": "placevalue:one_tenth_value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenDir": "tenth"
+      },
+      "code": "Y8"
+     },
+     {
+      "key": "placevalue:ten_times_story",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenTask": "story"
+      },
+      "code": "Y9"
+     }
+    ],
+    "plainOptions": "tenValues (a scaffold on/off), tenPlain (the digit and zeros: a range tweak), tenWrite (one worth box: a short check), tenChoice (four words to choose from: the response set), tenDir both (the mixed default of ten_times_value)",
+    "coverage": [
+     {
+      "item": "4.NBT.A.1 \"a digit in one place represents ten times what it represents in the place to its right\"",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenDir": "times"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "4.NBT.A.1 \"multi-digit whole number\"",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": [
+        9999,
+        99999,
+        999999
+       ]
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "4.NBT.A.1 \"recognize that 700 ÷ 70 = 10 by applying concepts of place value and division\"",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenTask": "story"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "one tenth, whole numbers (the site lesson title; 5.NBT.A.1's clause in words)",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenDir": "tenth"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "5.NBT.A.1 with decimals; 1/10 written as a fraction or 0.1",
+      "skill": "",
+      "opts": {},
+      "verdict": "elsewhere: lesson 9 (5.NBT.A.1), the same pv-times template with decimal rows"
+     },
+     {
+      "item": "Atoms 1-4 (places, value, x 10, / 10) - P0",
+      "skill": "placevalue:identify · placevalue:value · placevalue:place_value_10x",
+      "opts": {
+       "form": "value",
+       "op": [
+        "x",
+        "/"
+       ],
+       "power": [
+        10
+       ]
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "Atoms 5-8 (one place left, left or right, any place, one tenth) - P2, P3, P4",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": [
+        9999,
+        99999
+       ],
+       "tenDir": "both"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "Routine step 3 (bigger value: 10 times; smaller: one tenth) - P6 exit slip, one worth box then the ring",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenWrite": "top"
+      },
+      "verdict": "full"
+     },
+     {
+      "item": "Check Question (board A-D: one tenth of · the same as · 100 times · 10 times)",
+      "skill": "placevalue:value",
+      "opts": {
+       "form": "times",
+       "band": 9999,
+       "tenValues": false,
+       "tenChoice": "four"
+      },
+      "verdict": "full"
+     }
+    ]
+   },
+   "critic": {
+    "verdict": "PASS",
+    "round": 3,
+    "min": [
+     8,
+     8,
+     8,
+     8
+    ],
+    "reports": "design/lesson-planner/lessons/g4-nbt1-ten-times-value/critic-r1..r3.md",
+    "fixes": "fix-r4.md",
+    "note": "r3 2026-10-30, 8 minors (n1 near-look 92,163 / 92,715 on P4-2; n2 T3 '4000' comma) none below 8"
+   },
+   "status": "passed",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/",
+    "pdf": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/pack.pdf",
+    "html": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g4-nbt1-ten-times-value/SELF-CHECK.md"
+   }
+  },
+  {
+   "id": "g3-oa8-two-step-wp",
+   "order": 7,
+   "grade": "3",
+   "level": 3,
+   "title": "I Can solve two-step stories",
+   "ownerTitle": "Two-step word problems with the four operations",
+   "siteLessonId": "G3|-|twostepwordproblemswiththefouroperations",
+   "wrmYear": "Y4",
+   "wrmBlock": "Y4.B4",
+   "wrmSteps": [],
+   "wrmNear": [
+    "Y2.B4.S10",
+    "Y4.B10.S5"
+   ],
+   "ccss": [
+    "3.OA.D.8"
+   ],
+   "ee": [
+    "M.EE.3.OA.7"
+   ],
+   "eeOwnerList": [
+    "M.EE.3.OA.8"
+   ],
+   "eeNote": "Sheet code M.EE.3.OA.8 quotes the M.EE.3.OA.7 text; the repo tag is M.EE.3.OA.7.",
+   "flow": "Chunked (a: × first, then + or −; b: ÷ first, then + or −)",
+   "skills": {
+    "used": [
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "msOps": "mult"
+      },
+      "role": "main chunk a: P2, P3, P4-1, P5, Check Question (preset algebra:two_step_mult_div_first)"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "msOps": "div"
+      },
+      "role": "main chunk b: P2b, P3b, P4-2 (preset algebra:two_step_mult_div_first)"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "msOps": "mult",
+       "wpFrames": true
+      },
+      "role": "P6 exit 1"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "msOps": "div",
+       "wpFrames": true
+      },
+      "role": "P6 exit 2"
+     },
+     {
+      "key": "multiplication:mult_word_problems_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "forms": [
+        0
+       ],
+       "wpFrames": true
+      },
+      "role": "P0 1"
+     },
+     {
+      "key": "division:div_word_problems_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "forms": [
+        0
+       ],
+       "wpFrames": true
+      },
+      "role": "P0 2-3"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false,
+       "forms": [
+        0
+       ],
+       "band": 30,
+       "wpFrames": true
+      },
+      "role": "P0 4"
+     },
+     {
+      "key": "placevalue:more_less_10",
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:more_less_100",
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:compare",
+      "role": "P1"
+     },
+     {
+      "key": "placevalue:unit_form",
+      "role": "P1"
+     },
+     {
+      "key": "algebra:multi_step_word_plain",
+      "opts": {
+       "msOps": "mult",
+       "msChoose": true,
+       "pictures": false,
+       "wpCues": false,
+       "wpBank": false
+      },
+      "role": "Check Question (board A-D)"
+     },
+     {
+      "key": "multiplication:mult_facts",
+      "opts": {
+       "constant": [
+        3,
+        4
+       ],
+       "notation": [
+        "across"
+       ],
+       "band": 100
+      },
+      "role": "retrieval (Section 3)"
+     },
+     {
+      "key": "division:div_facts",
+      "opts": {
+       "constant": [
+        3,
+        4
+       ],
+       "notation": [
+        "across"
+       ]
+      },
+      "role": "retrieval (Section 3)"
+     },
+     {
+      "key": "subtraction:sub_facts",
+      "opts": {
+       "band": 100,
+       "notation": [
+        "across"
+       ]
+      },
+      "role": "retrieval (Section 3)"
+     }
+    ],
+    "coverage": [
+     {
+      "clause": "3.OA.D.8: two-step word problems using the four operations (× or ÷ step, then + or −)",
+      "skill": "algebra:two_step_mult_div_first",
+      "opts": {
+       "msOps": "multdiv"
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "3.OA.D.8: two-step problems whose + or − step comes first (brackets)",
+      "skill": "algebra:two_step_add_then_mult / algebra:two_step_add_then_div",
+      "opts": {
+       "msOps": "addmult | adddiv"
+      },
+      "verdict": "elsewhere: follow-on lesson (presets two_step_add_then_mult, two_step_add_then_div)"
+     },
+     {
+      "clause": "3.OA.D.8: represent the problem using an equation with a letter for the unknown",
+      "skill": "algebra:two_step_letter_equation",
+      "opts": {
+       "msOps": "multdiv",
+       "msLetter": true
+      },
+      "verdict": "elsewhere: follow-on lesson (preset two_step_letter_equation)"
+     },
+     {
+      "clause": "3.OA.D.8: assess the reasonableness of answers using mental computation and estimation strategies including rounding",
+      "skill": "algebra:two_step_estimate_check",
+      "opts": {
+       "msCheck": true
+      },
+      "verdict": "elsewhere: follow-on lesson (preset two_step_estimate_check)"
+     },
+     {
+      "clause": "atom 1: × facts to 10 × 10",
+      "skill": "multiplication:mult_facts",
+      "opts": {
+       "constant": [
+        3,
+        4
+       ]
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "atom 2: equal groups: multiply",
+      "skill": "multiplication:mult_word_problems_plain",
+      "opts": {
+       "forms": [
+        0
+       ],
+       "wpFrames": true
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "atom 3: share equally: divide",
+      "skill": "division:div_word_problems_plain",
+      "opts": {
+       "forms": [
+        0
+       ],
+       "wpFrames": true
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "atom 4: two steps with + and −",
+      "skill": "algebra:multi_step_word_plain",
+      "opts": {
+       "forms": [
+        0
+       ],
+       "band": 30,
+       "wpFrames": true
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "atoms 5-8: \"each\" names Step 1; the Step 1 answer is a Step 2 number (Critical Atom); two steps or one; gives away − / gets more +",
+      "skill": "algebra:two_step_mult_div_first",
+      "opts": {
+       "msOps": "multdiv"
+      },
+      "verdict": "full"
+     },
+     {
+      "clause": "Check Question: the board's A-D choice (the answer and the three two-step errors) practised online",
+      "skill": "algebra:multi_step_word_plain",
+      "opts": {
+       "msOps": "mult",
+       "msChoose": true
+      },
+      "verdict": "full"
+     }
+    ],
+    "built": [
+     "algebra:multi_step_word(_plain) options msOps (4P: mult / div / multdiv / addmult / adddiv), msLetter (4R), msCheck (4S), msChoose (4T, r3: the Check Question's A-D - the answer and ms-stop-step1 / ms-story-number / ms-one-op); every word-work skill wpFrames (4Q); kit two-step grammar, frames layout and its screen twin; provider two-step steps and wrong answers",
+     "presets algebra:two_step_mult_div_first, two_step_add_then_mult, two_step_add_then_div, two_step_letter_equation, two_step_estimate_check (codes ZA-ZE)"
+    ],
+    "proposed": [],
+    "plainOptions": "msChoose (choose the answer A-D: a response mode of the same lesson, not a new lesson - option only, no preset skill)"
+   },
+   "followOn": [
+    "two_step_add_then_mult / two_step_add_then_div (brackets)",
+    "two_step_letter_equation",
+    "two_step_estimate_check"
+   ],
+   "rulings": [
+    "wpFrames is a scaffold fade (an option only, no preset); msOps mult / div are the two chunks of one lesson (options; the preset is multdiv)"
+   ],
+   "critic": {
+    "verdict": "FAIL",
+    "round": 1,
+    "min": [
+     8,
+     7,
+     7,
+     7
+    ],
+    "reports": "design/lesson-planner/lessons/g3-oa8-two-step-wp/critic-r1.md",
+    "note": "D1 chart zoom fallback (P2/P2b), D2 fact-family repeats, D3 T5 script vs P5; paused by the owner 2026-10-30"
+   },
+   "status": "critic r1 FAIL, paused",
+   "pack": {
+    "dir": "design/lesson-samples/detailed/g3-oa8-two-step-wp/",
+    "pdf": "design/lesson-samples/detailed/g3-oa8-two-step-wp/pack.pdf",
+    "html": "design/lesson-samples/detailed/g3-oa8-two-step-wp/pack.html",
+    "selfCheck": "design/lesson-samples/detailed/g3-oa8-two-step-wp/SELF-CHECK.md"
+   }
   }
  ]
 }

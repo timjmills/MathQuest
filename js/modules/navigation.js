@@ -57,6 +57,9 @@ export function showView(id) {
 
     document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
     document.getElementById(id).classList.add("active");
+    // The pupil home's selection bar measures itself; re-measure when the home view comes back (it was hidden in play).
+    // (again after the home screen's late layout: its cards and the bar's wrapped text settle over a few frames)
+    if (id === 'homeView' && typeof window.syncSelBarHeight === 'function') { for (const ms of [0, 250, 700]) setTimeout(() => { try { window.syncSelBarHeight(); } catch (e) { /* */ } }, ms); }
 
     // When returning to home view, restore UI from state
     if (id === "homeView") {
@@ -183,7 +186,9 @@ export function goHome() {
     // If a MAP session was active, return the borrowed questionCard to gameView.
     // releaseMapSessionScaffold is idempotent — safe to call always.
     if (state.mapMode) state.mapMode = false;
-    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold) {
+    // (a stub means MAP practice never loaded, so there is nothing to release: calling it would download the whole
+    // teacher half on a pupil's exit, checker r1 D2)
+    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold && !window.releaseMapSessionScaffold.__mqStub) {
         try { window.releaseMapSessionScaffold(); } catch {}
     }
 
@@ -241,7 +246,9 @@ export function exitGame() {
     // If a MAP session was active, return the borrowed questionCard to gameView.
     // releaseMapSessionScaffold is idempotent — safe to call always.
     if (state.mapMode) state.mapMode = false;
-    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold) {
+    // (a stub means MAP practice never loaded, so there is nothing to release: calling it would download the whole
+    // teacher half on a pupil's exit, checker r1 D2)
+    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold && !window.releaseMapSessionScaffold.__mqStub) {
         try { window.releaseMapSessionScaffold(); } catch {}
     }
 

@@ -751,6 +751,13 @@ function answerTokens(q, steps) {
         if (t) { out.add(String(Number(t[1]))); out.add(t[2]); out.add(String(Number(t[2]))); }
     };
     if (q && (typeof q.ans === 'string' || typeof q.ans === 'number')) add(q.ans);
+    // a several-box answer joined in one string ("730; 130; 150; 980"): the whole row is never
+    // printed by the worked steps, however long (teacher follow-ups 2026-10-30)
+    if (q && typeof q.ans === 'string' && /;/.test(q.ans) && q.ans.trim().length > 12) out.add(q.ans.trim());
+    // ... nor any one box of it: each row's value, each expanded-form part (checker 2026-10-30: the
+    // worksheet's first rung printed "The 9 is in the tens place: 90" for every place box)
+    if (q && typeof q.ans === 'string' && /;/.test(q.ans)) q.ans.split(';').forEach(add);
+    if (q && Array.isArray(q.expandedValues)) q.expandedValues.forEach(add);
     // a set of chosen option ids ("Click ALL ..."): the steps print it joined ("Answer: opt0,opt2")
     if (q && q.answerType === 'multi-select-check' && Array.isArray(q.ans) && q.ans.length) {
         q.ans.forEach(add);
@@ -938,7 +945,7 @@ export function practiceLadderWrong(q, userAns) {
  * A worksheet card (worksheet.js): the next rung in card `idx`'s cell. `{wait: true}`: the entry
  * is still being typed (the card stays neutral); null: the ladder is off; `spent`: the card's red.
  */
-export function worksheetLadderWrong(idx, q, value) {
+export function worksheetLadderWrong(idx, q, value, opts = {}) {
     if (typeof document === 'undefined') return null;
     if (modeFor(q, { categoryId: state.category, skillId: state.skill }) === 'none') return null;
     // The card checks as the pupil types: a word or a fraction still shorter than its answer is
@@ -947,7 +954,8 @@ export function worksheetLadderWrong(idx, q, value) {
     const v = String(value == null ? '' : value).replace(/\s+/g, '');
     const a = String(q && q.ans != null ? q.ans : '').replace(/\s+/g, '');
     const numeric = q && (q.answerType === 'number' || typeof q.ans === 'number');
-    if (!numeric && !(q && q._mqSlots) && v.length < a.length) return { wait: true };
+    // (`opts.complete`: the host's own boxes are all filled, e.g. expanded form's place boxes)
+    if (!numeric && !(q && q._mqSlots) && !opts.complete && v.length < a.length) return { wait: true };
     const ctx = { categoryId: state.category, skillId: state.skill, dedupe: true };
     const r = ladderWrong(q, value, ctx);
     if (!r || r.spent) return r;

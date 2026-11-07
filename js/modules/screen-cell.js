@@ -104,6 +104,9 @@ export function cellKindFor(q) {
     if (multi) return multi;
     const p = binaryParts(q);
     if (!p) return null;
+    // critic r5 D5-2: a kit equation that boxes every unknown (`resultBox`, missing_add_sub) is
+    // drawn by its kit twin (a box), never the plain fact kind (a line beside its boxed neighbours)
+    if (q.cell && q.cell.template === 'equation' && q.cell.payload && q.cell.payload.resultBox) return null;
     const v = String(q.visual || '');
     const A = String(p.a), B = String(p.b), ANS = String(p.ans);
     if (/Long Division/.test(v) || q.printFormat === 'long-division') {
@@ -278,10 +281,9 @@ export function equationHTML(k, slotHtml) {
         const o = (g) => `<span class="o" style="width:0.8em">${g}</span>`;
         const sentence = `<span>${touchNumberHTML(k.a, tn.a, to)}</span>${o(opGlyph(k.op))}<span>${touchNumberHTML(k.b, tn.b, to)}</span>${o('=')}`;
         const label = attr(`${k.a} ${spokenOp(k.op)} ${k.b}`);
-        if (k.mix) {
-            return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq ws-eq-below" role="group" aria-label="${label}" style="flex-direction:column;flex-wrap:nowrap;gap:0.12em">`
-                + `<span style="display:flex;align-items:flex-end;gap:0.18em;white-space:nowrap">${sentence}</span><span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
-        }
+        // A Mix item is the Standard sentence on screen too, its answer slot inline after the "="
+        // (Lane D restart critic r1 R1-16: Mix put the line under the "=", unlike Standard and the
+        // Independent page; the screen card has the width the paper column lacks).
         return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${label}" style="gap:0.18em">${sentence}<span class="mq-eqslot">${slotHtml || ''}</span></div></div>`;
     }
     return `<div class="ws-sheet mq-kit"><div class="ws-eq mq-eq" role="group" aria-label="${attr(`${k.a} ${spokenOp(k.op)} ${k.b}`)}">`
@@ -1380,6 +1382,33 @@ const CHECK_SVG = '<svg class="mq-tickmark" viewBox="0 0 20 20" aria-hidden="tru
 export function wireTickBoxes(cellEl, q, input) {
     if (!cellEl || !q || !input || !q.selfAnswering || !q.printAnswer) return false;
     const norm = (s) => plainText(s).toLowerCase().replace(/\s+/g, ' ').trim();
+    // A kit cell that draws its choice as printed WORDS (family-check: "Yes" / "No", circled on
+    // paper) carries them as buttons `data-mq-choice` in its twin: one tap is the one graded answer,
+    // the same write-the-answer path as the tick rows below (visual-quality lane 2026-10-31).
+    const btns = Array.from(cellEl.querySelectorAll('button[data-mq-choice]'));
+    if (btns.length >= 2) {
+        const rightWord = norm(q.printAnswer);
+        if (!btns.some((b) => norm(b.getAttribute('data-mq-choice')) === rightWord)) return false;
+        const group = btns[0].parentElement;
+        if (group) { group.setAttribute('role', 'radiogroup'); group.setAttribute('aria-label', 'answer choices'); }
+        const choose = (btn) => {
+            btns.forEach((b) => { const on = b === btn; b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
+            const w = btn.getAttribute('data-mq-choice');
+            input.value = norm(w) === rightWord ? String(q.ans) : w;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        btns.forEach((b) => {
+            if (b.dataset.mqTick === '1') return;
+            b.dataset.mqTick = '1';
+            // (a tick row like the label + box rows below: the label is its first child, hosts and gates read it)
+            b.classList.add('mq-tickrow');
+            b.setAttribute('role', 'radio');
+            b.setAttribute('aria-checked', 'false');
+            b.addEventListener('click', (e) => { e.preventDefault(); if (!input.disabled) choose(b); });
+        });
+        cellEl.classList.add('mq-tick-mode');
+        return true;
+    }
     const rows = Array.from(cellEl.querySelectorAll('div')).filter((d) => {
         const kids = Array.from(d.children);
         if (kids.length !== 2 || kids[0].tagName !== 'SPAN' || kids[1].tagName !== 'SPAN') return false;
@@ -1590,6 +1619,8 @@ function _slotChars(v, kind) {
     const glyph = (t) => t.replace(/[*xX]/g, '×').replace(/[/:]/g, '÷').replace(/-/g, '−');
     if (kind === 'sign') { const m = glyph(String(v)).match(/[+−×÷]/g); return m ? m[m.length - 1] : ''; }
     if (kind === 'rule') return glyph(String(v)).replace(/[^0-9+−×÷ ]/g, '');
+    // (a word box - the pv-times ring on screen, lesson 6: letters, digits, spaces and /)
+    if (kind === 'word') return String(v).replace(/[^0-9a-zA-Z /]/g, '').slice(0, 16);
     return String(v).replace(/[^0-9]/g, '');
 }
 
@@ -1647,13 +1678,21 @@ function wireSwipeRows(cellEl) {
             if (!col) return;
             const lines = w.querySelectorAll('.k2-countrow-line');
             const swipes = frame && (frame.hasAttribute('data-mq-swipes') || frame.hasAttribute('data-mq-tabtop'));
-            col.querySelectorAll('[data-mq-tabfor]').forEach((t) => {
+            // every line is measured first, then every tab written: measuring after each write re-laid the page once per
+            // tab, several times a question (Chromebook speed lane, 2026-11-02). A line's height never depends on its tab.
+            const wrapfit = w.hasAttribute('data-mq-wrapfit');
+            const tabs = [...col.querySelectorAll('[data-mq-tabfor]')].map((t) => {
                 const ln = lines[Number(t.getAttribute('data-mq-tabfor'))];
-                if (!ln) return;
-                t.style.height = swipes ? '' : `${ln.getBoundingClientRect().height}px`;
-                t.style.marginTop = swipes ? '' : getComputedStyle(ln).marginTop;
-                t.style.alignItems = w.hasAttribute('data-mq-wrapfit') ? 'flex-start' : '';
-            });
+                return ln ? [t, swipes ? null : ln.getBoundingClientRect().height, swipes ? null : getComputedStyle(ln).marginTop] : null;
+            }).filter(Boolean);
+            // ... and only a value that changes is written: level() runs many times a layout, and an unchanged write still
+            // makes the next measurement lay the page out again
+            const put = (t, prop, v) => { if (t.style[prop] !== v) t.style[prop] = v; };
+            for (const [t, h, mt] of tabs) {
+                put(t, 'height', swipes ? '' : `${h}px`);
+                put(t, 'marginTop', swipes ? '' : mt);
+                put(t, 'alignItems', wrapfit ? 'flex-start' : '');
+            }
         };
         // the row's end lands on a column start too (a little air after the last line), so scrolling to the end cuts no number
         const body = w.querySelector('.k2-countrow-body');
@@ -1831,13 +1870,14 @@ function wireSwipeRows(cellEl) {
                 c.style.flexWrap = 'wrap'; c.style.rowGap = '12px'; c.style.maxWidth = `${Math.ceil(k * pitch - gap + 1)}px`;
                 [...c.children].forEach((x, i) => { if (i && i % k === 0) x.setAttribute('data-mq-leadin', ''); });
             });
-            level();
-            return true;
+            return true;   // layout() returns at once and mode()'s upd() levels the tabs
         };
         // the cue's state, from the row as it stands (skip-count r3 D7: set at the end of every layout and late fit, never stale)
         const upd = () => { level(); lastSL = w.scrollLeft; w.toggleAttribute('data-mq-scrolled', w.scrollLeft > 1); w.toggleAttribute('data-mq-end', !moreRight()); };
         let laidInner = 0;
         const mode = () => { layout(); alignAxis(); upd(); };
+        // layout() is only ever run by mode(), whose upd() levels the step tabs straight after it: a level() just before
+        // a return of layout() measured the lines once more for nothing (Chromebook speed lane, 2026-11-02)
         const layout = () => {
             clearAll();
             // the phone draws ~29 px digits (fitTwinRows' phone rule reads the fonts only), then caps the gap
@@ -1856,11 +1896,11 @@ function wireSwipeRows(cellEl) {
             const tabTop = () => !!frame && (frame.hasAttribute('data-mq-tabtop') || frame.hasAttribute('data-mq-swipes'));
             const fits = () => { alignAxis(); return body.getBoundingClientRect().width + (tabTop() ? 0 : colW()) <= inner + 1; };
             // (4) choose: the row fits beside its step tab
-            if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+            if (fits()) { w.style.overflowX = 'visible'; return; }
             // a number line: the step tab goes above and the line is tried whole at its full size before anything shrinks (r1 order)
             if (isAxis && frame) {
                 frame.setAttribute('data-mq-tabtop', ''); level();
-                if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+                if (fits()) { w.style.overflowX = 'visible'; return; }
             }
             // ... or it fits once the drawing shrinks, never below a 44 px box (SP-10): a wider-than-phone window only
             if (twin && window.innerWidth > 480) {
@@ -1876,7 +1916,7 @@ function wireSwipeRows(cellEl) {
                 const k = Math.max(Math.min(cur, floorK), cur * (inner - (tabTop() ? 0 : colW())) / bw * 0.995);
                 if (k < cur - 0.01) {
                     twin.style.setProperty('--mq-k2', `${k.toFixed(2)}px`);
-                    if (fits()) { w.style.overflowX = 'visible'; level(); return; }
+                    if (fits()) { w.style.overflowX = 'visible'; return; }
                     // still too wide: at Chromebook width the row wraps at its full size; narrower, it swipes at the floor
                     if (window.innerWidth >= 1024) { if (twin.dataset.mqK2Orig) twin.style.setProperty('--mq-k2', twin.dataset.mqK2Orig); else twin.style.removeProperty('--mq-k2'); }
                 }
@@ -1911,7 +1951,7 @@ function wireSwipeRows(cellEl) {
             const lead = Math.max(0, a.left - w.getBoundingClientRect().left);
             const n = Math.max(1, Math.floor((avail - lead + gap + 0.5) / pitch));
             // critic C2 r7: when every column of a line fits (the tab above), the window takes the full width and does not scroll
-            if (n >= its.length) { w.style.overflowX = 'visible'; level(); return; }
+            if (n >= its.length) { w.style.overflowX = 'visible'; return; }
             const win = Math.min(avail, lead + n * pitch - gap + 3);
             w.style.width = `${win}px`; w.style.maxWidth = `${Math.floor(avail)}px`;
             frame.style.minWidth = `${Math.ceil(win)}px`;     // the drawing around the window widens with it (it stays centred in the cell)
@@ -2525,86 +2565,6 @@ function restoreAuthor(el) {
 
 const HTML_BORDERS = ['top', 'right', 'bottom', 'left'];
 
-/**
- * Re-ink one element: every computed colour that is not ink, paper, grey or transparent is
- * mapped by luminance. Text is always ink or paper, whichever reads against its (re-inked)
- * background — never grey (INK-3, AX-1).
- */
-function inkOne(el) {
-    if (!el || el.nodeType !== 1) return;
-    if (el.matches && el.matches(SKIP_SELECTOR)) return;
-    if (isFeedbackEl(el)) return;
-    const tag = el.tagName.toLowerCase();
-    if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'option') return;   // CSS owns slots
-    restoreAuthor(el);
-    let rec = WROTE.get(el);
-    if (!rec) { rec = new Map(); WROTE.set(el, rec); }
-    const cs = getComputedStyle(el);
-    const isSvg = el instanceof SVGElement;
-    if (isSvg) {
-        if (tag === 'svg' || tag === 'g' || tag === 'defs' || tag === 'clippath' || tag === 'mask') return;
-        const fill = cs.fill;
-        if (fill && fill.startsWith('url(')) setMono(el, 'fill', GREY, rec);
-        else {
-            const c = parseColor(fill);
-            if (c && c.a > 0 && !isPalette(c)) {
-                // text drawn in SVG is read, so it is ink or paper, never grey
-                const v = (tag === 'text' || tag === 'tspan') ? (lum(c) >= 0.62 ? PAPER : INK) : monoFill(c);
-                setMono(el, 'fill', v, rec);
-            }
-        }
-        const stroke = cs.stroke;
-        if (stroke && stroke.startsWith('url(')) setMono(el, 'stroke', INK, rec);
-        else {
-            const s = parseColor(stroke);
-            if (s && s.a > 0 && !isPalette(s)) setMono(el, 'stroke', monoStroke(s), rec);
-        }
-        return;
-    }
-    // HTML
-    const bg = parseColor(cs.backgroundColor);
-    let bgInk = false;
-    if (bg && bg.a > 0.05) {
-        const v = isPalette(bg) ? null : monoFill(bg);
-        if (v) setMono(el, 'background-color', v, rec);
-        bgInk = (v || monoFill(bg)) === INK;
-    } else {
-        bgInk = inkBehind(el);
-    }
-    const col = parseColor(cs.color);
-    // Text is ink on paper, or paper on ink — whichever reads (INK-3: never grey, AX-1).
-    if (col && col.a > 0) {
-        const want = bgInk ? PAPER : INK;
-        const have = isInk(col) && col.a >= 1 ? INK : isPaper(col) && col.a >= 1 ? PAPER : null;
-        if (have !== want) setMono(el, 'color', want, rec);
-    }
-    // LS-2..LS-4: inside a cell a dashed line means CUT and a dotted line means TRACE. A widget's
-    // dashed drop zone or dotted guide is neither, so it is drawn solid. The missing-digit box
-    // (LS-8) and a tagged cut line keep their dash.
-    const keepDash = el.matches('[data-ws-cut], .ws-box--unknown, [data-ws-shape="box-unknown"]');
-    for (const side of HTML_BORDERS) {
-        const w = parseFloat(cs.getPropertyValue(`border-${side}-width`)) || 0;
-        if (!w) continue;
-        const style = cs.getPropertyValue(`border-${side}-style`);
-        if (!keepDash && (style === 'dashed' || style === 'dotted')) setMono(el, `border-${side}-style`, 'solid', rec);
-        const bc = parseColor(cs.getPropertyValue(`border-${side}-color`));
-        if (bc && bc.a > 0 && !isPalette(bc)) setMono(el, `border-${side}-color`, monoStroke(bc), rec);
-    }
-    const oc = parseColor(cs.outlineColor);
-    if (oc && parseFloat(cs.outlineWidth) > 0 && cs.outlineStyle !== 'none' && !isPalette(oc) && document.activeElement !== el) {
-        setMono(el, 'outline-color', INK, rec);
-    }
-}
-
-function inkBehind(el) {
-    for (let n = el.parentElement, d = 0; n && d < 6; n = n.parentElement, d++) {
-        if (n.classList && n.classList.contains('mq-scell')) return false;
-        const bg = parseColor(getComputedStyle(n).backgroundColor);
-        if (bg && bg.a > 0.05) return monoFill(bg) === INK;
-    }
-    return false;
-}
-
 // INK-7: pictographic code points are wrapped so the mono scope can take their colour away.
 const EMOJI_RE = /(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*)/u;
 function wrapEmoji(root) {
@@ -2635,12 +2595,131 @@ function wrapEmoji(root) {
     }
 }
 
-function inkTree(root) {
-    if (!root || root.nodeType !== 1) return;
-    wrapEmoji(root);
-    inkOne(root);
-    root.querySelectorAll('*').forEach(inkOne);
+// The old pass (inkOne, one element at a time) restyled the page once per element (restore, read, write, read ...): a cell of
+// a few hundred elements re-inked on every mutation cost seconds a question on a Chromebook (speed lane, 2026-11-02).
+// inkTrees() makes the SAME decisions in batches - every author value restored, every colour read, the colours and
+// fills decided and written in document order, then every border and outline read and written - so a pass restyles
+// twice, however big the cell. What inkOne read live it reads from the batch:
+//   - a parent's background (inkBehind) is the value the pass wrote for it, else the colour read before any write
+//     (a background is never inherited, so no write of the pass moves another element's);
+//   - text colour and SVG fill / stroke ARE inherited, but each element's decision depends on its own colour value
+//     only, so an element whose value came from a re-inked parent ends with the parent's decision either way;
+//   - borders and outlines default to currentColor, so they are read AFTER the colours are written, as inkOne did.
+const SVG_CONTAINER = new Set(['svg', 'g', 'defs', 'clippath', 'mask']);
+function inkEligible(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.matches && el.matches(SKIP_SELECTOR)) return false;
+    if (isFeedbackEl(el)) return false;
+    const tag = el.tagName.toLowerCase();
+    return !(tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'option');   // CSS owns slots
 }
+function inkTrees(roots) {
+    const els = [];
+    const seen = new Set();
+    for (const root of roots) {
+        if (!root || root.nodeType !== 1 || !root.isConnected) continue;
+        wrapEmoji(root);
+        for (const el of [root, ...root.querySelectorAll('*')]) if (!seen.has(el)) { seen.add(el); els.push(el); }
+    }
+    if (!els.length) return;
+    // A. put the author's values back (writes only)
+    const ok = els.map(inkEligible);
+    els.forEach((el, i) => { if (ok[i]) restoreAuthor(el); });
+    // B. read every colour once (one restyle). Backgrounds are read for every element and for the ancestors inkBehind
+    //    may reach, so no later read restyles the page.
+    const bgRead = new Map();
+    const readBg = (n) => { if (!bgRead.has(n)) bgRead.set(n, parseColor(getComputedStyle(n).backgroundColor)); return bgRead.get(n); };
+    const reads = els.map((el, i) => {
+        const cs = getComputedStyle(el);
+        const r = { svg: el instanceof SVGElement, tag: el.tagName.toLowerCase() };
+        if (r.svg) { r.fill = cs.fill; r.stroke = cs.stroke; } else { r.color = cs.color; }
+        bgRead.set(el, parseColor(cs.backgroundColor));
+        return ok[i] ? r : null;
+    });
+    for (const root of roots) {
+        if (!root || root.nodeType !== 1) continue;
+        for (let n = root.parentElement, d = 0; n && d < 6; n = n.parentElement, d++) readBg(n);
+    }
+    // C. decide and write colours, fills and backgrounds in document order
+    const bgNow = new Map();   // element -> its background after this pass's write (only those the pass wrote)
+    const bgOf = (n) => bgNow.has(n) ? bgNow.get(n) : (bgRead.has(n) ? bgRead.get(n) : parseColor(getComputedStyle(n).backgroundColor));
+    const behind = (el) => {
+        for (let n = el.parentElement, d = 0; n && d < 6; n = n.parentElement, d++) {
+            if (n.classList && n.classList.contains('mq-scell')) return false;
+            const bg = bgOf(n);
+            if (bg && bg.a > 0.05) return monoFill(bg) === INK;
+        }
+        return false;
+    };
+    const borderEls = [];
+    els.forEach((el, i) => {
+        const r = reads[i];
+        if (!r) return;
+        let rec = WROTE.get(el);
+        if (!rec) { rec = new Map(); WROTE.set(el, rec); }
+        if (r.svg) {
+            if (SVG_CONTAINER.has(r.tag)) return;
+            const fill = r.fill;
+            if (fill && fill.startsWith('url(')) setMono(el, 'fill', GREY, rec);
+            else {
+                const c = parseColor(fill);
+                if (c && c.a > 0 && !isPalette(c)) {
+                    const v = (r.tag === 'text' || r.tag === 'tspan') ? (lum(c) >= 0.62 ? PAPER : INK) : monoFill(c);
+                    setMono(el, 'fill', v, rec);
+                }
+            }
+            const stroke = r.stroke;
+            if (stroke && stroke.startsWith('url(')) setMono(el, 'stroke', INK, rec);
+            else {
+                const st = parseColor(stroke);
+                if (st && st.a > 0 && !isPalette(st)) setMono(el, 'stroke', monoStroke(st), rec);
+            }
+            return;
+        }
+        const bg = bgRead.get(el);
+        let bgInk = false;
+        if (bg && bg.a > 0.05) {
+            const v = isPalette(bg) ? null : monoFill(bg);
+            if (v) { setMono(el, 'background-color', v, rec); bgNow.set(el, parseColor(v === INK ? 'rgb(0,0,0)' : v === PAPER ? 'rgb(255,255,255)' : 'rgb(148,148,148)')); }
+            bgInk = (v || monoFill(bg)) === INK;
+        } else {
+            bgInk = behind(el);
+        }
+        const col = parseColor(r.color);
+        if (col && col.a > 0) {
+            const want = bgInk ? PAPER : INK;
+            const have = isInk(col) && col.a >= 1 ? INK : isPaper(col) && col.a >= 1 ? PAPER : null;
+            if (have !== want) setMono(el, 'color', want, rec);
+        }
+        borderEls.push([el, rec]);
+    });
+    // D. borders and outlines, read after the colours they may follow (currentColor), then written
+    const active = document.activeElement;
+    const bReads = borderEls.map(([el]) => {
+        const cs = getComputedStyle(el);
+        const sides = [];
+        for (const side of HTML_BORDERS) {
+            const w = parseFloat(cs.getPropertyValue(`border-${side}-width`)) || 0;
+            if (!w) continue;
+            sides.push([side, cs.getPropertyValue(`border-${side}-style`), cs.getPropertyValue(`border-${side}-color`)]);
+        }
+        return { sides, oc: cs.outlineColor, ow: cs.outlineWidth, os: cs.outlineStyle };
+    });
+    borderEls.forEach(([el, rec], i) => {
+        const b = bReads[i];
+        if (b.sides.length) {
+            const keepDash = el.matches('[data-ws-cut], .ws-box--unknown, [data-ws-shape="box-unknown"]');
+            for (const [side, style, color] of b.sides) {
+                if (!keepDash && (style === 'dashed' || style === 'dotted')) setMono(el, `border-${side}-style`, 'solid', rec);
+                const bc = parseColor(color);
+                if (bc && bc.a > 0 && !isPalette(bc)) setMono(el, `border-${side}-color`, monoStroke(bc), rec);
+            }
+        }
+        const oc = parseColor(b.oc);
+        if (oc && parseFloat(b.ow) > 0 && b.os !== 'none' && !isPalette(oc) && active !== el) setMono(el, 'outline-color', INK, rec);
+    });
+}
+
 
 const OBSERVERS = new WeakMap();
 const AFTER_INK = new WeakMap();
@@ -2687,7 +2766,7 @@ export function monoCell(root, { afterInk = null } = {}) {
     const run = (targets) => {
         const obs = OBSERVERS.get(root);
         if (obs) obs.disconnect();
-        try { targets.forEach(inkTree); } catch (e) { /* never break a render */ }
+        try { inkTrees(targets); } catch (e) { /* never break a render */ }
         try { targets.forEach(screenCellVerbs); } catch (e) { /* never break a render */ }
         const after = AFTER_INK.get(root);
         if (after) { try { after(root); } catch (e) { /* never break a render */ } }
@@ -2711,9 +2790,22 @@ export function monoCell(root, { afterInk = null } = {}) {
     run([root]);
     // A widget may mount its markup first and its stylesheet a moment later; that changes the
     // computed colours without a mutation inside the cell, so the whole cell is re-read a few
-    // times while it settles.
-    [60, 250, 700].forEach((ms) => setTimeout(() => { if (root.isConnected) run([root]); }, ms));
+    // times while it settles - but only when a stylesheet did arrive since the last read
+    // (Chromebook speed lane, 2026-11-02: each full re-read restyles every element of the cell one
+    // by one, and three unconditional re-reads made a question take up to 3 s at CPU 6x).
+    let sheets = sheetCount();
+    [60, 250, 700].forEach((ms) => setTimeout(() => {
+        if (!root.isConnected) return;
+        const now = sheetCount();
+        if (now === sheets) return;
+        sheets = now;
+        run([root]);
+    }, ms));
 }
+
+const sheetCount = () => {
+    try { return document.styleSheets.length + ((document.adoptedStyleSheets && document.adoptedStyleSheets.length) || 0); } catch (e) { return -1; }
+};
 
 const OBS_OPTS = { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'fill', 'stroke'] };
 
@@ -3251,6 +3343,30 @@ export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     return f;
 }
 
+/**
+ * critic r6 D6-3: cap the height of a dot-array cell on a grid host (the online worksheet). The
+ * array scales to its column's width, so a tall one (9 x 4) made a 535 px cell and left its
+ * row-mate a 290 px white band. The array alone is narrowed (as a percentage of its parent, so the
+ * same at any zoom the digit fit applied) until the whole cell `root` is no taller than `maxPx`;
+ * it never shrinks below `floor` of its drawn size, so the dots stay well above the counting floor.
+ */
+export function capDotArrays(root, maxPx = 420, floor = 0.6) {
+    if (!root || typeof document === 'undefined') return;
+    const svgs = Array.from(root.querySelectorAll('svg.mq-dotarray, svg[aria-label="array of dots"]'));
+    svgs.forEach((svg) => {
+        if (svg.dataset.mqCapMw == null) svg.dataset.mqCapMw = svg.style.maxWidth || '';
+        svg.style.maxWidth = svg.dataset.mqCapMw;
+    });
+    if (svgs.length !== 1) return;
+    const svg = svgs[0];
+    const over = root.getBoundingClientRect().height - maxPx;
+    const r = svg.getBoundingClientRect(), pr = svg.parentElement && svg.parentElement.getBoundingClientRect();
+    if (!(over > 0) || !r.height || !pr || !pr.width) return;
+    const k = Math.max(floor, (r.height - over) / r.height);
+    svg.style.setProperty('max-width', (100 * (r.width / pr.width) * k).toFixed(2) + '%');
+    svg.style.setProperty('height', 'auto');
+}
+
 // Answer types whose drawing is a live widget (drag, build, plot) or a screen twin already drawn
 // at the digit size: never scaled as a picture.
 const NO_FIT_TYPES = new Set([
@@ -3282,6 +3398,27 @@ export function cellDigitTarget(cellEl) {
  *   build    the body holds a build mat (mountBuild writes the mat's value into the input)
  * null: the item keeps the host's legacy path.
  */
+/** Does the drawing show every number the prompt names (so the prompt only restates the cell)? */
+function _visualSaysNumbers(text, visual) {
+    const nums = (s) => (String(s || '').replace(/<[^>]+>/g, ' ').match(/\d+(?:[.,]\d+)*/g) || []);
+    const want = nums(plainText(text));
+    if (!want.length) return false;
+    const have = new Set(nums(visual));
+    return want.every((n) => have.has(n));
+}
+
+/**
+ * critic r3 D11: the card's prompt for a kit twin whose drawing already shows every number of the
+ * item's text: the paper's instruction (the caller swaps its verbs), or '' to keep the text.
+ */
+export function kitTwinPrompt(q, categoryId = '') {
+    if (!q || q.screenInstr) return '';
+    const v = String(q.visual || '');
+    if (!/class="k2-twin"|data-mq-blank=/.test(v)) return '';
+    if (!_visualSaysNumbers(q.text, v)) return '';
+    return printInstructionFor(q, categoryId);
+}
+
 export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     if (!q) return null;
     // skip-count r2 (critic r1 D3): a count-by row's 24 px phone gap is applied at layout time by wireSwipeRows (phoneGap)
@@ -3318,9 +3455,13 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
         const said = _normText(q.text);
         // `q.screenInstr`: a generator's own instruction for a twin that prints its whole sentence
         // (add_three: "Add." over `8 + 5 + 3 = [ ]`, never the sentence twice).
+        // critic r3 D11: a prompt whose every number the drawing already shows ("Multiply the
+        // array: 2 rows × 4 columns = ?" over a cell reading "2 rows × 4 columns / 2 × 4 = [ ]")
+        // restates the cell; the card prints the paper's instruction instead (its verbs swapped).
+        const paperInstr = _visualSaysNumbers(q.text, q.visual) ? printInstructionFor(q, categoryId) : '';
         const instr = q.screenInstr ? q.screenInstr : isNumberLineItem(q) ? NUMBER_LINE_INSTRUCTION
             : (said && said.length > 12 && _normText(q.visual).includes(said)) ? 'Read the story. Write the answer.'
-                : plainText(q.text);
+                : paperInstr || plainText(q.text);
         return { mode: 'kit', html: q.visual, instr, count: cells > 1 ? cells : 0 };
     }
     // the place-value disk mat (round 3: the worksheet and quiz drew an empty cell for pv_disks_build)
@@ -3385,7 +3526,14 @@ export function fitTwinRows(root) {
     twins.forEach((twin) => {
         const cell = twin.closest('.mq-scell, .ws-cell, #visualAid') || twin.parentElement;
         if (!cell) return;
-        const box = cell.getBoundingClientRect();
+        let box = cell.getBoundingClientRect();
+        // critic r5 D5-6.4: a counters drawing keeps the cell's inner padding (screen-cell.css), so
+        // its fit measures against the cell's CONTENT box, never letting shapes run into the border
+        if (twin.getAttribute('data-mq-template') === 'counters') {
+            const cs = getComputedStyle(cell);
+            const pl = parseFloat(cs.paddingLeft) || 0, pr = parseFloat(cs.paddingRight) || 0;
+            if (pl || pr) box = { left: box.left + pl, right: box.right - pr, top: box.top, bottom: box.bottom, width: box.width - pl - pr, height: box.height };
+        }
         if (box.width <= 0) return;
         // A clock face is read, so it keeps a reading size (about 120 px) - the row wraps instead
         // of shrinking three faces to 100 px each on a phone.
@@ -3649,11 +3797,170 @@ function _wireRoundLines() {
 }
 
 /**
+ * A MISSING-NUMBER equation (the kit `equation` template with its unknown on a factor / addend,
+ * or a page that boxes every unknown, `resultBox`): the screen draws the paper's own sentence with
+ * its BOX (critic r3 D9: the worksheet drew the legacy text with an underline where paper boxes,
+ * and the card printed the equation again above the cell). The instruction is the skill's print
+ * instruction, never the equation. Returns undefined when the item is not such a cell (the caller
+ * goes on), null when it is but cannot be drawn.
+ */
+function equationKitTwin(q, categoryId = '') {
+    const c = q && q.cell;
+    if (!c || c.template !== 'equation' || !c.payload || typeof c.payload !== 'object') return undefined;
+    const p = c.payload;
+    const u = p.unknown || 'result';
+    if (!(u === 'a' || u === 'b' || (u === 'result' && p.resultBox))) return undefined;
+    if (p.notation === 'fraction' || p.notation === 'bracket') return undefined;
+    if (q.answerType && q.answerType !== 'number') return undefined;
+    // a generator's numeric distractors (`buildNumericOptions`) on a typed item are the game's
+    // fallback, not a multiple-choice cell (round 5: missing_mult_div kept them, so its card and
+    // worksheet fell back to the legacy text with a line); a real choice item stays out
+    if (Array.isArray(q.options) && q.options.length && q.answerType && q.answerType !== 'number') return undefined;
+    // a drawing of its own (a rule box, a tick list) is the item's cell: it stays. A visual that is
+    // only the equation's own words restated (no drawing, every number already in the sentence)
+    // is not a drawing, and the kit sentence replaces it.
+    const _vis = String(q.visual || '').replace(/<span class="answer-blank-inline"><\/span>/g, ' ').trim();
+    if (_vis && (/<(svg|img|table|canvas|input|button)\b|class=/i.test(_vis) || !_visualSaysNumbers(_vis, String(q.text || '')))) return undefined;
+    if (typeof document === 'undefined') return undefined;
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        html = renderCell(Object.assign({}, q, { cell: { template: 'equation', payload: p, v: 1 } }), ctx);
+    } catch (e) { return undefined; }
+    if (!html || /data-ws-refused/.test(html)) return undefined;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]')).filter((s) => s.getAttribute('data-ws-graded') !== '0');
+    if (slots.length !== 1) return undefined;
+    const b = document.createElement('span');
+    b.className = 'mq-kblank mq-kblank--box';
+    b.setAttribute('data-mq-blank', 'box');
+    slots[0].replaceWith(b);
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="equation" data-mq-kind="missing">${wrap.innerHTML}</div>`;
+    // round 5 D-D: one instruction for the one box; the equation is said once, in the cell
+    const instr = 'Type the missing number.';
+    return { mode: 'blank', html: body, instr, count: 0, kit: 'equation' };
+}
+
+/**
+ * Round 5 (critic r4, number families): the screen hosts drew the legacy family ("(Easy)" heading,
+ * coloured rows, a black "Check Answers" button inside the cell) while paper prints the kit's
+ * `number-family` cell. `familyScreenVisual(q)` draws the SAME kit cell (B&W, Andika, the three
+ * numbers in their box, one equation per line) and puts one typed box per missing number, in the
+ * key's order, as the legacy `<input class="number-family-input" data-eq data-pos data-answer>`
+ * every host already wires and checks (any order, number-family-check.js). '' when the item is not
+ * a number family the kit can draw (the caller keeps the stored visual).
+ */
+export function familyScreenVisual(q) {
+    const d = q && q.numberFamilyData;
+    if (!d || !Array.isArray(d.equations) || !Array.isArray(d.missingPositions)) return '';
+    if (d.equations.some((e) => !e || !Array.isArray(e.nums) || e.nums.length !== 3)) return '';
+    if (typeof document === 'undefined') return '';
+    const payload = {
+        nums: [d.a, d.b, d.c].filter((v) => v !== undefined && v !== null),
+        eqs: d.equations.map((e) => ({ nums: e.nums.slice(), op: e.op })),
+        miss: d.equations.map((_, i) => (Array.isArray(d.missingPositions[i]) ? d.missingPositions[i].slice() : [])),
+    };
+    // the kit's blank order (family.js nfBlanks): equation by equation, positions ascending
+    const order = [];
+    payload.eqs.forEach((eq, i) => payload.miss[i].slice().sort((x, y) => x - y).forEach((k) => order.push({ i, k, v: eq.nums[k] })));
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        html = renderCell({ cell: { template: 'number-family', payload, v: 1 }, text: '', ans: '' }, ctx);
+    } catch (e) { return ''; }
+    if (!html || /data-ws-refused/.test(html)) return '';
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]'));
+    if (slots.length !== order.length) return '';
+    slots.forEach((sl, n) => {
+        const o = order[n];
+        const st = sl.getAttribute('style') || '';
+        const w = (st.match(/(?:^|;)\s*width:\s*([^;]+)/) || [])[1] || '2.2em';
+        const h = (st.match(/(?:^|;)\s*height:\s*([^;]+)/) || [])[1] || '1.4em';
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'number-family-input';
+        inp.setAttribute('data-eq', String(o.i));
+        inp.setAttribute('data-pos', String(o.k));
+        inp.setAttribute('data-answer', String(o.v));
+        inp.setAttribute('inputmode', 'numeric');
+        inp.setAttribute('autocomplete', 'off');
+        inp.setAttribute('aria-label', `missing number ${n + 1}`);
+        inp.setAttribute('style', `width:${w};height:${h};`);
+        sl.replaceWith(inp);
+    });
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    return `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin mq-nfkit" data-mq-kit="number-family">${wrap.innerHTML}</div>`;
+}
+
+/** The instruction the screen hosts print over a kit number family (the cell says the rest). */
+export const FAMILY_SCREEN_INSTRUCTION = 'Type the missing numbers.';
+
+/**
  * The screen twin of a kit-drawn cell, or null when the item has no kit cell this can draw.
  * @returns {{mode: 'blank'|'slots', html: string, instr: string, count: number, kit: string}|null}
  */
+/**
+ * The `pv-times` twin (lesson 6, 4.NBT.A.1): the paper's own cell - the two-row place chart, a typed box for each
+ * value the paper asks for, and the two printed words to ring, which on screen are tapped (the cloze bank tiles
+ * write the word into the cell's last box). Same item, same response as the paper.
+ */
+function pvTimesTwin(q, categoryId) {
+    if (typeof document === 'undefined') return null;
+    const p = q.cell.payload;
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        html = renderCell(Object.assign({}, q, { cell: { template: 'pv-times', payload: p, v: 1 } }), ctx);
+    } catch (e) { return null; }
+    if (!html) return null;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const boxes = Array.from(tpl.content.querySelectorAll('[data-ws-slot^="v"]'));
+    const w = Math.max(2, ...(p.rows || []).map((r) => String(r.n).replace(/[^0-9]/g, '').length));
+    boxes.forEach((s, k) => { const t = document.createElement('template'); t.innerHTML = cellSlot(w, `value ${k + 1}`); s.replaceWith(t.content.firstChild); });
+    const rings = Array.from(tpl.content.querySelectorAll('[data-ws-slot="rel"]'));
+    if (!rings.length) return null;
+    const k = boxes.length;
+    rings.forEach((r) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mq-banktile';
+        b.dataset.mqBankFor = String(k);
+        b.dataset.v = r.textContent.trim();
+        b.textContent = r.textContent.trim();
+        r.replaceWith(b);
+    });
+    // the ringed word's box: filled by a tap on a word (it can still be typed), read last
+    const t = document.createElement('template');
+    t.innerHTML = cellSlot(8, 'the words you circle');
+    const relBox = t.content.firstChild;
+    relBox.setAttribute('data-mq-kind', 'word');
+    relBox.setAttribute('data-mq-max', '16');
+    const say = tpl.content.querySelector('.pv-times-say');
+    (say || tpl.content).appendChild(relBox);
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin mq-cloze" data-mq-join=", " data-mq-kit="pv-times">${wrap.innerHTML}</div>`;
+    return { mode: 'slots', html: body, instr: printInstructionFor(q, categoryId) || plainText(q.text), count: k + 1, kit: 'pv-times' };
+}
+
 export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const c = q && q.cell;
+    if (c && c.template === 'pv-times' && c.payload) return pvTimesTwin(q, categoryId);
+    const eqTwin = equationKitTwin(q, categoryId);
+    if (eqTwin !== undefined) return eqTwin;
     if (!c || c.template !== 'pv' || !c.payload || typeof c.payload !== 'object') return null;
     if (typeof document === 'undefined') return null;
     const p = c.payload;

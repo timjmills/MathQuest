@@ -145,7 +145,7 @@ function shellHTML() {
     <div class="tv-panel-head">
       <div class="tv-row" style="justify-content:space-between;">
         <div class="tv-step"><span class="tv-step-num" aria-hidden="true">2</span><h2 class="tv-h2" id="tvSetH">Your set</h2></div>
-        <div class="tv-row"><span class="tv-cap" id="tvSetCount"></span><button type="button" class="tv-link" data-act="clear" style="font-size:12px;">Clear all</button></div>
+        <div class="tv-row"><span class="tv-cap" id="tvSetCount"></span><button type="button" class="tv-link" data-act="clear">Clear all</button></div>
       </div>
       <div>
         <label class="tv-sr" for="tvSetName">Set name</label>

@@ -1,0 +1,100 @@
+diff --git a/js/modules/sheet/contract.js b/js/modules/sheet/contract.js
+index 1d4e4442..95c4664d 100644
+--- a/js/modules/sheet/contract.js
++++ b/js/modules/sheet/contract.js
+@@ -110,6 +110,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
+     graph: 'Use the graph. Answer the questions.',
+     table: 'Use the rule. Fill in the table.',
+     match: 'Draw a line to match.',
++    'match-letter': 'Write the letter under its picture.',
+     story: 'Read the story. Fill in the diagram. Solve.',
+     'story-v2': 'Solve. Write the number and the label.',
+     'story-k': 'Show the story with lines. Write the equation.',
+diff --git a/js/modules/sheet/lesson-css.js b/js/modules/sheet/lesson-css.js
+index c1f381c8..38d18733 100644
+--- a/js/modules/sheet/lesson-css.js
++++ b/js/modules/sheet/lesson-css.js
+@@ -87,6 +87,11 @@ ${ICON_CSS}
+ :is(.ws-page,.ws-sheet) .mq-lvpic-in{min-height:12mm;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
+ :is(.ws-page,.ws-sheet) .mq-lvword{display:flex;flex-direction:column;align-items:center;gap:1.5mm;font-size:var(--ws-text)}
+ :is(.ws-page,.ws-sheet) .mq-lvword b{font-weight:700}
++:is(.ws-page,.ws-sheet) .mq-lvocab--letter .mq-lvrow--pics{margin-top:calc(var(--ws-hw) * .6)}
++:is(.ws-page,.ws-sheet) .mq-lvocab--letter .mq-lvpic{justify-content:flex-start}
++:is(.ws-page,.ws-sheet) .mq-lvocab--letter .mq-lvpic{gap:2mm}
++:is(.ws-page,.ws-sheet) .mq-lvocab--letter .ws-box{font-size:var(--ws-digit);font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none}
++:is(.ws-page,.ws-sheet) .mq-lvlet{font-weight:700;margin-right:.15em}
+ :is(.ws-page,.ws-sheet) .mq-ldot{display:block;width:2mm;height:2mm;border-radius:50%;background:#000}
+ :is(.ws-page,.ws-sheet) .mq-lvgap{position:relative;height:calc(var(--ws-hw) * 1.05)}
+ :is(.ws-page,.ws-sheet) .mq-lvgap>svg{position:absolute;left:0;top:-1mm;width:100%;height:calc(100% + 2mm);overflow:visible}
+diff --git a/js/modules/sheet/roles/lesson.js b/js/modules/sheet/roles/lesson.js
+index e99799b1..eb9e9d42 100644
+--- a/js/modules/sheet/roles/lesson.js
++++ b/js/modules/sheet/roles/lesson.js
+@@ -15,8 +15,8 @@
+ //     Say:          the oral frame filled with the example's numbers (P-17, BD-8)
+ //     Rule:         the lesson's chant, where it has one ("Top too small? Take a ten!")
+ //   Page 2 on, the LESSON SHEET (full header, lettered and scored):
+-//     Vocabulary:   the lesson's words (at most 3, P-LG-6), each matched to its line-art picture:
+-//                   "Draw a line to match." The key draws the lines.
++//     Vocabulary:   the lesson's words (at most 3, P-LG-6), lettered A, B, C, each matched to its
++//                   line-art picture: "Write the letter under its picture." The key writes the letters.
+ //     Remember:     the one concept the skill leans on ("1 ten is 10 ones.")
+ //     Warm-up:      the prerequisite SKILLS, one or two quick items each from the skill's own
+ //                   generator (host: generateQuestionFor), side by side (or one full-width row each
+@@ -1196,29 +1196,32 @@ export const vocabOrder = (n, seed) => {
+     return Array.from({ length: n }, (_, i) => (i + r) % n);
+ };
+ 
+-/** The vocabulary match: pictures on top, the words below in another order; the key draws the lines. */
++/**
++ * The vocabulary match (owner change 2026-10-17: write the letter, not draw a line): the words
++ * on top, each with a bold letter A, B, C, in a rotated order (no word over its own picture);
++ * the pictures below, each with ONE single-character letter box (the kit's box slot, Andika,
++ * digit size). The key writes each picture's letter in its box (AK-2).
++ */
+ export function vocabItem(vocab, seed) {
+     const list = (vocab || []).slice(0, 3);
+     if (!list.length) return null;
+     const order = vocabOrder(list.length, seed);          // word position j holds list[order[j]]
++    const LET = 'ABC';
++    const letterOf = (i) => LET[order.indexOf(i)];       // picture i's matching word letter
++    const slots = {};
++    list.forEach((_, i) => { slots[`vocab-${i}`] = { value: letterOf(i) }; });
+     const render = (c) => {
+-        const answered = c.state && c.state !== 'blank';
+-        const pics = list.map((v) => `<div class="mq-lvpic"><div class="mq-lvpic-in">${vocabPicture(v.picture, c)}</div><i class="mq-ldot"></i></div>`).join('');
+-        const words = order.map((i) => `<div class="mq-lvword"><i class="mq-ldot"></i><b>${esc(list[i].word)}</b></div>`).join('');
+-        const n = list.length;
+-        // The key: a line from each picture's dot to its word's dot (AK-2: the answer drawn where
+-        // the pupil draws it).
+-        const lines = answered ? list.map((_, i) => {
+-            const j = order.indexOf(i);
+-            return `<line x1="${((i + 0.5) * 100) / n}" y1="0" x2="${((j + 0.5) * 100) / n}" y2="100" stroke="#000" stroke-width="1pt" vector-effect="non-scaling-stroke" data-ws-ink="solid"/>`;
+-        }).join('') : '';
+-        return `<div class="mq-lvocab" style="--n:${n}"><div class="mq-lvrow">${pics}</div>`
+-            + `<div class="mq-lvgap" data-ws-slot="match" data-ws-shape="draw">${lines ? `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>` : ''}</div>`
+-            + `<div class="mq-lvrow">${words}</div></div>`;
++        const st = c.state === 'traced' ? 'traced' : (c.state && c.state !== 'blank' ? 'answered' : 'blank');
++        const sc = resolveCtx({ size: c.size, look: c.look, mode: 'print', state: st });
++        const words = order.map((i, j) => `<div class="mq-lvword"><b><span class="mq-lvlet">${LET[j]}</span> ${esc(list[i].word)}</b></div>`).join('');
++        const pics = list.map((v, i) => `<div class="mq-lvpic"><div class="mq-lvpic-in">${vocabPicture(v.picture, c)}</div>`
++            + `${blank({ id: `vocab-${i}`, kind: 'text', shape: 'box', digits: 1, graded: true }, sc, st === 'blank' ? null : { slots: { [`vocab-${i}`]: { value: letterOf(i) } } })}</div>`).join('');
++        return `<div class="mq-lvocab mq-lvocab--letter" style="--n:${list.length}"><div class="mq-lvrow">${words}</div>`
++            + `<div class="mq-lvrow mq-lvrow--pics">${pics}</div></div>`;
+     };
+     return {
+         q: null, render,
+-        key: { value: '', display: '', slots: {} },
++        key: { value: list.map((_, i) => letterOf(i)).join(' '), display: list.map((_, i) => letterOf(i)).join(' '), slots },
+         drawsAnswer: true, visual: false,
+         cellCls: 'mq-lvocabcell',
+         footprint: { wMm: 180, hMm: null, measure: true, maxCols: 1 },
+@@ -1492,7 +1495,7 @@ export function plan(input = {}) {
+         const vh = Math.max(20, hOf(vocab, 1));
+         const vgrid = gridPart([planItem(vocab, { cols: 1, nolabel: true })], { cols: 1, rows: 1, cellH: vh, labels: 'none' });
+         // (It takes a share of a page's spare height only when no Independent row fits, below.)
+-        groups.push(band(m.strip + vh, { kind: 'band', label: 'Vocabulary:', instr: instructionText('match'), content: vgrid }, { h: vh, grid: [vgrid], cap: 0, capIfEmpty: 0.3 }));
++        groups.push(band(m.strip + vh, { kind: 'band', label: 'Vocabulary:', instr: instructionText('match-letter'), content: vgrid }, { h: vh, grid: [vgrid], cap: 0, capIfEmpty: 0.3 }));
+     }
+     const concept = data && data.concepts && data.concepts[0] ? data.concepts[0].text : '';
+     if (concept) groups.push(band(m.strip, { kind: 'band', label: 'Remember:', instr: concept, html: '' }));

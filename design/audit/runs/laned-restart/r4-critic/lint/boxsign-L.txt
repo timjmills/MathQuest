@@ -1,0 +1,13 @@
+ws-print-lint: source kit, 1 skill(s)
+  division:div_facts: 2+1 pages, 0 finding(s)
+  division:div_facts#test: 2+1 pages, 0 finding(s)
+  division:div_facts#review: 2+1 pages, 0 finding(s)
+
+document                        pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+division:div_facts                2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#test           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+division:div_facts#review         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                     .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+wrote design/audit/runs/laned-restart/r4-critic/lint/boxsign-L.json
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))

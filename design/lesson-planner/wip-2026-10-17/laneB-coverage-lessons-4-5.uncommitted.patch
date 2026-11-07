@@ -1,0 +1,1528 @@
+diff --git a/design/BUILD_LIST.md b/design/BUILD_LIST.md
+index 692ae9ac..6118107a 100644
+--- a/design/BUILD_LIST.md
++++ b/design/BUILD_LIST.md
+@@ -19,9 +19,9 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
+ 
+ ## Summary
+ 
+-- 275 entries: **132 new skills, 88 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
++- 275 entries: **131 new skills, 89 new options, 2 repairs**, and **53 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 28 option, 1 skill, 6 migration, 1 band).
+ - 162 from the White Rose audit (42 extended for standards), 60 from the standards audit.
+-- They close 114 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
++- They close 113 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
+ - The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
+ - 30 new sheet-kit templates and panes are needed; each is owned by one lane.
+ - Lanes `k2` and `operations` were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.
+@@ -31,7 +31,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
+ | Counting and early number (K-1 pictures) (`k2`) | 35 | 16 | 7 | 0 | 12 | 20 | 34 | 55 | 454 |
+ | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 40 | 18 | 10 | 1 | 11 | 21 | 50 | 35 | 316 |
+ | Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 9 | 36 | 23 | 327 |
+-| Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 19 | 20 | 17 | 104 |
++| Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 13 | 11 | 0 | 4 | 18 | 20 | 17 | 104 |
+ | Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
+ | Geometry, area, volume, coordinates (`geometry`) | 46 | 30 | 12 | 1 | 3 | 35 | 78 | 33 | 144 |
+ | Measurement (length, mass, capacity, conversions) (`measurement`) | 23 | 12 | 9 | 0 | 2 | 14 | 34 | 11 | 74 |
+@@ -1429,19 +1429,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Ladder:** O2 within 100 → 1,000; two steps → three · O3 bar model and step boxes → step boxes → none · O6 pictures / plain.
+ - **Misconceptions:** answers the first step; uses the letter as a label, not a number; ignores the remainder.
+ 
+-### 16. What Do You Notice? — `patterns_notice`
+-
+-- **What:** new skill `patterns:notice_patterns`. Grade 3-4 · family algebra · source standards audit.
+-- **Closes (standards):** 3.OA.D.9, 4.OA.C.5 · tag with CCSS 3.OA.D.9, 4.OA.C.5, EE M.EE.3.OA.8, M.EE.4.OA.5
+-- **Closes (White Rose steps):** none · strengthens Y3.B3.S13, Y4.B4.S15
+-- **Teaches:** identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even).
+-- **Problem types:** (1) shade the pattern in the table, tick what you notice; (2) true or false: every product in the 5 row ends in 0 or 5; (3) generate the terms, then say what alternates; (4) why is 4 × n always even? (reason bank); (5) predict the 10th term.
+-- **Representation:** Templates: `mult-grid`, `count-row`.
+-- **Answer:** tick statements from a bank; write terms.
+-- **Ladder:** O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track.
+-- **Misconceptions:** a pattern seen in three terms always continues; odd × odd is even.
+-
+-### 17. Compare Number Sentences — `compare_sentences`
++### 16. Compare Number Sentences — `compare_sentences`
+ 
+ - **What:** new skill `algebra:compare_number_sentences`. Grade 1 · family operations · source White Rose audit.
+ - **Closes (standards):** 1.OA.D.7 · tag with CCSS 1.OA.D.7, EE M.EE.1.OA.7
+@@ -1453,7 +1441,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Ladder:** O2 one change → two changes · O3 matching parts linked → none · O6 plain.
+ - **Misconceptions:** calculates every side; bigger first number means bigger.
+ 
+-### 18. Count in 50s, 100s and 1,000s (option) — `count_50s`
++### 17. Count in 50s, 100s and 1,000s (option) — `count_50s`
+ 
+ - **What:** option on `patterns:count_by_step_up`: steps 50, 100, 1,000. Grade 2-3 · family algebra · source White Rose audit.
+ - **Closes (standards):** none not already full · tag with CCSS 2.NBT.A.1, 2.NBT.A.2, 4.NBT.A.1, 4.NBT.A.2, EE M.EE.2.NBT.1, M.EE.2.NBT.2, M.EE.4.NBT.2
+@@ -1465,7 +1453,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Ladder:** O2 step 100 → 50 → 1,000, forwards then backwards · O3 base-10 picture above each term → none · O6 track / number line.
+ - **Misconceptions:** changes the wrong digit (350 + 50 = 355); forgets the crossing of 1,000 (950, 1,000, 1,050).
+ 
+-### 19. Formulae — `formulae`
++### 18. Formulae — `formulae`
+ 
+ - **What:** new skill `algebra:use_formulae`. Grade 5 · family algebra · source White Rose audit.
+ - **Closes (standards):** 6.EE.A.2c · tag with CCSS 5.OA.A.2, 6.EE.A.2c, EE -
+@@ -1478,7 +1466,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Ladder:** O2 one operation → two operations → brackets and powers (V = s³) · O3 substitution line printed (P = 2 × ( __ + __ )) → none · O6 formula in words / letters.
+ - **Misconceptions:** adds instead of multiplying where letters touch (2l = 2 + l); ignores the brackets.
+ 
+-### 20. Why Does It Work? — `explain_strategy`
++### 19. Why Does It Work? — `explain_strategy`
+ 
+ - **What:** new skill `number_sense:why_it_works`. Grade 2 · family operations · source standards audit.
+ - **Closes (standards):** 2.NBT.B.9 · tag with CCSS 2.NBT.B.9, EE -
+@@ -1491,7 +1479,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Misconceptions:** compensation changes the answer; the order of subtraction does not matter.
+ - **After:** `add_sub_patterns` (lane `operations`).
+ 
+-### 21. Write and Graph Inequalities (option) — `inequality_write_graph`
++### 20. Write and Graph Inequalities (option) — `inequality_write_graph`
+ 
+ - **What:** option on `algebra:inequalities`: task "write it from words" (x > c) and "show the solutions on a number line" (open/closed circle, arrow). Grade 6 · family algebra · source standards audit.
+ - **Closes (standards):** 6.EE.B.8 · tag with CCSS 6.EE.B.8, EE -
+@@ -1503,7 +1491,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Ladder:** O2 > < → ≥ ≤ · O3 circle drawn, pupil adds the arrow → none · O6 horizontal / vertical line.
+ - **Misconceptions:** only whole numbers are solutions; closed circle for >.
+ 
+-### 22. Subtract Back Through Ten (option) — `make_ten_subtract`
++### 21. Subtract Back Through Ten (option) — `make_ten_subtract`
+ 
+ - **What:** option on `number_sense:make_a_ten`: subtraction: back through ten (13 − 4 = 13 − 3 − 1). Grade 1 · family operations · source standards audit.
+ - **Closes (standards):** 1.OA.C.6 · tag with CCSS 1.OA.C.6, EE -
+@@ -1515,7 +1503,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Ladder:** O2 teens − 1-digit crossing 10 · O3 ten frame pair drawn → number line → none · O6 frames / line.
+ - **Misconceptions:** takes the whole second number from 10; splits the wrong number.
+ 
+-### 23. Parts of an Expression — `parts_of_expression`
++### 22. Parts of an Expression — `parts_of_expression`
+ 
+ - **What:** new skill `algebra:parts_of_expression`. Grade 6 · family algebra · source standards audit.
+ - **Closes (standards):** 6.EE.A.2b · tag with CCSS 6.EE.A.2b, EE -
+@@ -1527,7 +1515,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Ladder:** O2 numbers → letters → brackets · O3 parts boxed → none · O6 plain.
+ - **Misconceptions:** the coefficient is the letter; 2(8 + 7) has three terms.
+ 
+-### 24. Two Patterns as Ordered Pairs (option) — `pattern_pairs_graph`
++### 23. Two Patterns as Ordered Pairs (option) — `pattern_pairs_graph`
+ 
+ - **What:** option on `patterns:pattern_relationship`: task "make the pairs and plot them" on a quadrant-I grid. Grade 5 · family algebra · source standards audit.
+ - **Closes (standards):** 5.OA.B.3 · tag with CCSS 5.OA.B.3, EE M.EE.5.OA.3
+@@ -1539,6 +1527,18 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
+ - **Ladder:** O2 add rules → multiply relationship · O3 first terms given → none · O6 grid size.
+ - **Misconceptions:** pairs terms from different positions; plots (y, x).
+ 
++### 24. What Do You Notice? Rule Sequences (option) — `patterns_notice`
++
++- **What:** option on `patterns:notice_patterns`: npTable "rule sequences": generate the terms of a rule ("start at 1, add 3"), then check what alternates (odd, even, odd ...) from a bank. Grade 4 · family algebra · source standards audit.
++- **Closes (standards):** 4.OA.C.5 · tag with CCSS 4.OA.C.5, EE M.EE.4.OA.5
++- **Closes (White Rose steps):** none
++- **Teaches:** features of a rule sequence not explicit in the rule (add 3 from 1 alternates odd, even), explained informally.
++- **Problem types:** (1) generate the terms, then check what alternates; (2) true or false: every term is odd; (3) predict the 10th term: odd or even?.
++- **Representation:** Templates: `count-row`, `parity`.
++- **Answer:** write terms; check a statement from a bank.
++- **Ladder:** O2 add an even step → add an odd step → multiply · O3 terms given → write them · O6 track / plain.
++- **Misconceptions:** a pattern seen in three terms always continues; odd + odd is odd.
++
+ ### 25. Two Quantities That Change Together — `two_variables`
+ 
+ - **What:** new skill `algebra:two_variable_relationships`. Grade 6 · family algebra · source standards audit.
+diff --git a/design/STANDARDS_COVERAGE.md b/design/STANDARDS_COVERAGE.md
+index 95938d85..7708f1d8 100644
+--- a/design/STANDARDS_COVERAGE.md
++++ b/design/STANDARDS_COVERAGE.md
+@@ -24,23 +24,23 @@ Sources:
+ 
+ ## Summary
+ 
+-- Skills mapped: 601 live skills; 492 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
++- Skills mapped: 603 live skills; 494 carry at least one CCSS code, 15 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+ - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
+-- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
++- **Full coverage: CCSS 77 of 177 standards FULL, 89 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 104 FULL, 91 PARTIAL, 22 GAP.
+ - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
+ - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
+-- The one build list: 275 entries — 132 new skills, 88 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
++- The one build list: 275 entries — 131 new skills, 89 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 60 from this audit, 53 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
+ 
+ | Level | CCSS standards: full / partial / gap | Leaves and parts: full / partial / gap | Essential Elements: full / partial / gap | Tagged (old): CCSS, EE |
+ |---|---|---|---|---|
+ | K | 10 / 11 / 1 of 22 (45% full) | 11 / 12 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
+ | 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
+ | 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
+-| 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
++| 3 | 13 / 12 / 0 of 25 (52% full) | 19 / 14 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
+ | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
+ | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
+ | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
+-| **All** | **76 / 90 / 11 of 177 (43% full)** | **103 / 92 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
++| **All** | **77 / 89 / 11 of 177 (44% full)** | **104 / 91 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+ 
+ ## Tag fixes made by this audit
+ 
+@@ -357,24 +357,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership 
+ | 11 | **Collect and Represent Data** (`collect_data`) | new `graphs:collect_and_represent` | - | 1 |
+ | 12 | **Dual Bar Charts** (`dual_bar`) | new `graphs:dual_bar_charts` | - | 1 |
+ 
+-### Algebra and patterns (13)
+-
+-| # | Entry | Kind | Closes standards | Closes WRM steps |
+-|---|---|---|---|---|
+-| 1 | **Make a Pattern** (`pattern_make`) | new `patterns:make_a_pattern` | - | 6 |
+-| 2 | **Equivalent Expressions? (option)** (`equiv_expressions`) | option on `algebra:combine_like_terms` | 6.EE.A.4, M.EE.6.EE.3 | - |
+-| 3 | **Two-Step Problems With All Four Operations (option)** (`multi_step_four_ops`) | option on `algebra:multi_step_word` | 3.OA.D.8, 4.OA.A.3 | - |
+-| 4 | **What Do You Notice?** (`patterns_notice`) | new `patterns:notice_patterns` | 3.OA.D.9, 4.OA.C.5 | - |
+-| 5 | **Count in 50s, 100s and 1,000s (option)** (`count_50s`) | option on `patterns:count_by_step_up` | - | 3 |
+-| 6 | **Formulae** (`formulae`) | new `algebra:use_formulae` | 6.EE.A.2c | 1 |
+-| 7 | **Write and Graph Inequalities (option)** (`inequality_write_graph`) | option on `algebra:inequalities` | 6.EE.B.8 | - |
+-| 8 | **Pairs of Values and Two Unknowns** (`pairs_values`) | new `algebra:pairs_of_values` | - | 2 |
+-| 9 | **Parts of an Expression** (`parts_of_expression`) | new `algebra:parts_of_expression` | 6.EE.A.2b | - |
+-| 10 | **Two Patterns as Ordered Pairs (option)** (`pattern_pairs_graph`) | option on `patterns:pattern_relationship` | 5.OA.B.3 | - |
+-| 11 | **Write Number Expressions (option)** (`write_numeric_expression`) | option on `algebra:write_expression` | 5.OA.A.2 | - |
+-| 12 | **Function Machines** (`function_machine`) | new `algebra:function_machines` | - | 1 |
+-| 13 | **Two Quantities That Change Together** (`two_variables`) | new `algebra:two_variable_relationships` | 6.EE.C.9 | - |
+-
+ ### Decimals and percents (13)
+ 
+ | # | Entry | Kind | Closes standards | Closes WRM steps |
+@@ -393,6 +375,24 @@ representation, answer, option ladder, misconceptions, lane and file ownership 
+ | 12 | **Percentages: Multi-Step and Missing Values (option)** (`percent_multi`) | option on `conversions:percent_of_number` | - | 1 |
+ | 13 | **Ratio and Fractions (option)** (`ratio_fraction`) | option on `conversions:ratio_intro` | - | 1 |
+ 
++### Algebra and patterns (13)
++
++| # | Entry | Kind | Closes standards | Closes WRM steps |
++|---|---|---|---|---|
++| 1 | **Make a Pattern** (`pattern_make`) | new `patterns:make_a_pattern` | - | 6 |
++| 2 | **Equivalent Expressions? (option)** (`equiv_expressions`) | option on `algebra:combine_like_terms` | 6.EE.A.4, M.EE.6.EE.3 | - |
++| 3 | **Two-Step Problems With All Four Operations (option)** (`multi_step_four_ops`) | option on `algebra:multi_step_word` | 3.OA.D.8, 4.OA.A.3 | - |
++| 4 | **Count in 50s, 100s and 1,000s (option)** (`count_50s`) | option on `patterns:count_by_step_up` | - | 3 |
++| 5 | **Formulae** (`formulae`) | new `algebra:use_formulae` | 6.EE.A.2c | 1 |
++| 6 | **Write and Graph Inequalities (option)** (`inequality_write_graph`) | option on `algebra:inequalities` | 6.EE.B.8 | - |
++| 7 | **Pairs of Values and Two Unknowns** (`pairs_values`) | new `algebra:pairs_of_values` | - | 2 |
++| 8 | **Parts of an Expression** (`parts_of_expression`) | new `algebra:parts_of_expression` | 6.EE.A.2b | - |
++| 9 | **Two Patterns as Ordered Pairs (option)** (`pattern_pairs_graph`) | option on `patterns:pattern_relationship` | 5.OA.B.3 | - |
++| 10 | **What Do You Notice? Rule Sequences (option)** (`patterns_notice`) | option on `patterns:notice_patterns` | 4.OA.C.5 | - |
++| 11 | **Write Number Expressions (option)** (`write_numeric_expression`) | option on `algebra:write_expression` | 5.OA.A.2 | - |
++| 12 | **Function Machines** (`function_machine`) | new `algebra:function_machines` | - | 1 |
++| 13 | **Two Quantities That Change Together** (`two_variables`) | new `algebra:two_variable_relationships` | 6.EE.C.9 | - |
++
+ ### Integers (2)
+ 
+ | # | Entry | Kind | Closes standards | Closes WRM steps |
+@@ -659,10 +659,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership 
+   Taught in part by: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`)  
+   Missing: two-step problems with × and ÷ (the skill's two steps are + and − only); an equation with a letter for the unknown; one-step pools and tape diagrams were tagged here: tags moved to the one-step standards  
+   Build: Two-Step Problems With All Four Operations (option) (`multi_step_four_ops`); Mental Calculation and Estimation (`mental_estimate`)
+-- **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
+-  Taught in part by: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
+-  Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even)  
+-  Build: What Do You Notice? (`patterns_notice`)
+ - **3.NF.A.3a** — PARTIAL. Understand two fractions as equivalent (equal) if they are the same size, or the same point on a number line.  
+   Taught in part by: Equivalent Fractions (Visual) (`fractions:equiv_frac_visual`)  
+   Missing: equivalent fractions as the same point on a number line  
+@@ -737,7 +733,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership 
+ - **4.OA.C.5** — PARTIAL. Generate a number or shape pattern that follows a given rule. Identify apparent features of the pattern that were not explicit in the rule itself. For example, given the rule “Add 3” and the starting number 1, generate terms in the resulting sequence and observe that the terms appear to alternate between odd and even numbers. Explain informally why the numbers will continue to alternate in this way.  
+   Taught in part by: Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Shape Patterns (Visual) (`patterns:shape_pattern`); Number Patterns (`patterns:number_pattern`)  
+   Missing: identify features of the pattern not explicit in the rule, and explain them informally  
+-  Build: What Do You Notice? (`patterns_notice`)
++  Build: What Do You Notice? Rule Sequences (option) (`patterns_notice`)
+ - **4.NBT.A.1** — PARTIAL. Recognize that in a multi-digit whole number, a digit in one place represents ten times what it represents in the place to its right. For example, recognize that 700 ÷ 70 = 10 by applying concepts of place value and division.  
+   Taught in part by: Value of a Digit (`placevalue:value`); Name the Place (`placevalue:identify`); Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`)  
+   Missing: a digit is worth ten times what it is worth in the place to its right (700 ÷ 70 = 10)  
+@@ -1364,9 +1360,8 @@ representation, answer, option ladder, misconceptions, lane and file ownership 
+   In part: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`)  
+   Missing: two-step problems with × and ÷ (the skill's two steps are + and − only); an equation with a letter for the unknown; one-step pools and tape diagrams were tagged here: tags moved to the one-step standards → `multi_step_four_ops`, `mental_estimate`  
+   Also tagged: `algebra:multi_step_word_plain`, `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_sum`, `number_sense:estimate_diff`
+-- **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
+-  In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
+-  Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even) → `patterns_notice`  
++- **3.OA.D.9** — FULL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
++  Taught by: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`); Even or Odd? Patterns in the Addition and Multiplication Tables (`patterns:notice_patterns`); Function Tables - Easy (Visual) (`algebra:function_table_easy`); Function Table Stories: Find the Rule (`algebra:function_table_story`) — multiplication table: mult_chart task even and notice_patterns (npTable mult); addition table: notice_patterns (npTable add); explain with a property: notice_patterns npWhy (the reason bank); rules: function tables and number_patterns_rule (lessons 4-5 coverage, 2026-10-17)  
+   Also tagged: `multiplication:mult_chart_easy`, `multiplication:count_by_tables`, `patterns:count_by_step_up`, `patterns:count_by_step_down`
+ #### Number and Operations in Base Ten (3.NBT)
+ 
+@@ -1492,7 +1487,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership 
+ - **4.OA.C.5** — PARTIAL. Generate a number or shape pattern that follows a given rule. Identify apparent features of the pattern that were not explicit in the rule itself. For example, given the rule “Add 3” and the starting number 1, generate terms in the resulting sequence and observe that the terms appear to alternate between odd and even numbers. Explain informally why the numbers will continue to alternate in this way.  
+   In part: Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Shape Patterns (Visual) (`patterns:shape_pattern`); Number Patterns (`patterns:number_pattern`)  
+   Missing: identify features of the pattern not explicit in the rule, and explain them informally → `patterns_notice`  
+-  Also tagged: `algebra:function_table_easy`, `algebra:function_table_hard`
++  Also tagged: `algebra:function_table_easy`, `algebra:function_table_story`, `algebra:function_table_hard`
+ #### Number and Operations in Base Ten (4.NBT)
+ 
+ *A. Generalize place value understanding for multi-digit whole numbers.*
+diff --git a/design/lesson-planner/DETAILED_MAKER.md b/design/lesson-planner/DETAILED_MAKER.md
+index 27cb2e7b..66e726e7 100644
+--- a/design/lesson-planner/DETAILED_MAKER.md
++++ b/design/lesson-planner/DETAILED_MAKER.md
+@@ -204,3 +204,16 @@ Built for `g4-nbt1-ten-times-value` and meant for lesson 9 (5.NBT.A.1, decimals)
+ - **Bridge** `q.dealAnswer` (print-sheet.js `dlAns`): what tells an item apart when its answer is one of two words (a
+   ring), so two ring items of one page are not the same answer. Absent on every other item: lessons 1-5 render
+   byte-identical.
++
++## Skill coverage lane B additions (lessons 4-5, 2026-10-17)
++
++- **`q.storyLines`** (print-sheet.js, P5): when a lesson's `wordProblem` has no `lines`, the P5 story is the dealt
++  item's own `q.storyLines` (a story skill's sentences), before the old fallback of splitting `q.text`. Lesson 4 deals
++  P5 from `patterns:notice_patterns {npStory: true}`, lesson 5 from `algebra:function_table_story`: no hand-written
++  story. Absent on every other lesson.
++- **`dlNoStory`** (print-sheet.js, P5 `tableItem`): a story table's cell (payload `story`) is drawn under the story
++  without its sentences, which the page already prints.
++- New skills / options the lessons pass: `mult_chart` `skipTen` (lesson 4: the chart reads 2-9, 11, 12, products to
++  100 - the old `chartIn9` / `chartFresh` filters now always pass), `function_table_*` `ftSteps: '2-10'` and `ftZero`
++  (lesson 5; `ftTrap: true` on the Check Question and exit c), `patterns:notice_patterns` (template `parity`) and
++  `algebra:function_table_story` (template `function-table` with payload `story`).
+diff --git a/js/modules/adaptive-engine.js b/js/modules/adaptive-engine.js
+index 07c5fb3d..7c7dbad6 100644
+--- a/js/modules/adaptive-engine.js
++++ b/js/modules/adaptive-engine.js
+@@ -179,7 +179,9 @@ function findVariantLadder(skillId) {
+     if (!skillId) return null;
+     for (const base of Object.keys(VARIANT_LADDERS)) {
+         // Match base prefix (e.g., 'oop_easy' → base 'oop').
+-        if (skillId === base || skillId.startsWith(base + '_')) {
++        // (a skill that only shares the prefix - function_table_story, 2026-10-17 - is its own skill, never a rung)
++        const rungs = Object.values(VARIANT_LADDERS[base]);
++        if (skillId === base || (skillId.startsWith(base + '_') && rungs.includes(skillId))) {
+             return VARIANT_LADDERS[base];
+         }
+     }
+diff --git a/js/modules/build-list.js b/js/modules/build-list.js
+index 731ca78e..da4ffd53 100644
+--- a/js/modules/build-list.js
++++ b/js/modules/build-list.js
+@@ -588,14 +588,17 @@ export const STANDARD_PROPOSALS = {
+     }),
+ 
+     // ------------------------------------------------------------------ algebra / patterns
++    // (lessons 4-5 coverage lane B, 2026-10-17: patterns:notice_patterns is BUILT for 3.OA.D.9 - even or odd in the addition
++    // and multiplication tables with the reason bank (npTable, npWhy, npStory); what is left is the 4.OA.C.5 rule-sequence part)
+     patterns_notice: P({
+-        kind: 'new', skill: 'patterns:notice_patterns', name: 'What Do You Notice?', grade: '3-4', family: 'algebra',
+-        standards: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'],
+-        teaches: 'identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)',
+-        problemTypes: ['shade the pattern in the table, tick what you notice', 'true or false: every product in the 5 row ends in 0 or 5', 'generate the terms, then say what alternates', 'why is 4 × n always even? (reason bank)', 'predict the 10th term'],
+-        templates: ['mult-grid', 'count-row'], newTemplates: [], answer: 'tick statements from a bank; write terms',
+-        ladder: 'O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track',
+-        misconceptions: ['a pattern seen in three terms always continues', 'odd × odd is even'], wrmSteps: ['Y3.B3.S13', 'Y4.B4.S15'], after: [],
++        kind: 'option', skill: 'patterns:notice_patterns', option: 'npTable "rule sequences": generate the terms of a rule ("start at 1, add 3"), then check what alternates (odd, even, odd ...) from a bank',
++        name: 'What Do You Notice? Rule Sequences (option)', grade: '4', family: 'algebra',
++        standards: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'],
++        teaches: 'features of a rule sequence not explicit in the rule (add 3 from 1 alternates odd, even), explained informally',
++        problemTypes: ['generate the terms, then check what alternates', 'true or false: every term is odd', 'predict the 10th term: odd or even?'],
++        templates: ['count-row', 'parity'], newTemplates: [], answer: 'write terms; check a statement from a bank',
++        ladder: 'O2 add an even step → add an odd step → multiply · O3 terms given → write them · O6 track / plain',
++        misconceptions: ['a pattern seen in three terms always continues', 'odd + odd is odd'], wrmSteps: [], after: [],
+     }),
+     multi_step_four_ops: P({
+         kind: 'option', skill: 'algebra:multi_step_word', also: ['algebra:multi_step_word_plain'], option: 'two steps with × and ÷ (3 packs of 6, 4 eaten), write the equation with a letter for the unknown, remainder steps, and a "reasonable?" estimate',
+diff --git a/js/modules/data.js b/js/modules/data.js
+index 448484f6..fce4d9ca 100644
+--- a/js/modules/data.js
++++ b/js/modules/data.js
+@@ -98,7 +98,7 @@ export const SKILL_GRADES = {
+     'missing_mult_div': 3, 'mixed_mult_div': 3, 'mult_properties': 3, 'mult_chart': 3,
+     'mult_chart_easy': 3, 'mult_chart_medium': 4, 'mult_chart_hard': 5,
+     // 2026-09-25: count by 1-12 (3.OA.7 prep) and number patterns with a rule (3.OA.9 / 4.OA.5)
+-    'count_by_tables': 3, 'number_patterns_rule': 3,
++    'count_by_tables': 3, 'number_patterns_rule': 3, 'notice_patterns': 3, 'function_table_story': 3,
+     'number_families_mixed_med': 3, 'word_problems_mixed': 3, 'word_problems_mixed_plain': 3,
+     'number_families_mult_hard': 4, 'number_families_mixed_hard': 4,
+     'div_remainders': 4, 'area_model_mult': 4, 'area_model_div_2by1': 4,
+@@ -1107,6 +1107,8 @@ export const SKILLS = {
+         { v: "mixed_patterns", l: "Mixed Patterns" },
+         // APPENDED 2026-09-25 (owner): count on / back / double from ones to thousands, with the rule.
+         { v: "number_patterns_rule", l: "Number Patterns: Count On, Count Back, Double" },
++        // Lessons 4-5 coverage (2026-10-17; build list patterns_notice) — APPEND ONLY.
++        { v: "notice_patterns", l: "Even or Odd? Patterns in the Addition and Multiplication Tables" },
+     ],
+     algebra: [
+         { v: "tape_diagram", l: "Tape Diagrams / Bar Models (Visual)" },
+@@ -1133,6 +1135,8 @@ export const SKILLS = {
+         { v: "build_expr_addsub", l: "Build the Expression: +/−" },
+         { v: "build_expr_multdiv", l: "Build the Expression: ×/÷" },
+         { v: "mixed_algebra", l: "Mixed Algebra" },
++        // Lessons 4-5 coverage (2026-10-17) — APPEND ONLY.
++        { v: "function_table_story", l: "Function Table Stories: Find the Rule" },
+     ],
+     order_of_operations: [
+         { v: "oop_easy", l: "OoO Easy: Two Ops, No Parens" },
+@@ -1735,7 +1739,7 @@ export const SKILL_TIME_CATEGORY = {
+     evaluate_expression: "quick", write_expression: "extended", inequalities: "quick",
+     solve_unknown: "quick",
+     build_expr_addsub: "extended", build_expr_multdiv: "extended",
+-    function_table_easy: "extended", function_table_hard: "extended",
++    function_table_easy: "extended", function_table_hard: "extended", function_table_story: "extended", notice_patterns: "quick",
+     tape_diagram: "extended",
+     pattern_relationship: "extended",
+     count_by_fill: "quick", skip_count_line: "quick", skip_count_grid: "quick",
+@@ -2037,7 +2041,7 @@ export const SKILL_PRINT_SIZE = {
+     composite_shapes: "wide",
+     area_unit_squares: "wide", perimeter_grid: "wide",
+     volume: "wide", volume_composite: "wide",
+-    function_table_easy: "wide", function_table_hard: "wide",
++    function_table_easy: "wide", function_table_hard: "wide", function_table_story: "wide", notice_patterns: "medium",
+     tape_diagram: "wide",
+     pattern_relationship: "wide",
+     // Grid-fill counting/sequencing skills (multi-row grids → wide layout)
+diff --git a/js/modules/gen-algebraic.js b/js/modules/gen-algebraic.js
+index f28bede0..07f7c7dc 100644
+--- a/js/modules/gen-algebraic.js
++++ b/js/modules/gen-algebraic.js
+@@ -6,7 +6,8 @@ import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
+ import { optionsFor, pvCap } from './skill-options.js';
+ import { generatePvRounding, generatePvPlaceValue, generatePvEstimation, pvSpan, pvRefuse, pvOptions } from './gen-pv.js';
+ import { numeralTracksHTML } from './sheet/index.js';
+-import { generateFunctionTable } from './gen-function-table.js';
++import { generateFunctionTable, generateFunctionTableStory } from './gen-function-table.js';
++import { genNoticePatterns } from './gen-notice-patterns.js';
+ import { genNumberPatterns } from './gen-mult-patterns.js';
+ 
+ // ===========================================================================
+@@ -1127,6 +1128,9 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
+     // Number patterns with a rule (owner, 2026-09-25): count on / back, double / halve, x 10,
+     // growing steps, from the ones to the thousands. See gen-mult-patterns.js genNumberPatterns.
+     if (mappedSkill === 'number_patterns_rule') { genNumberPatterns(q); return; }
++    // Lessons 4-5 coverage (2026-10-17): even or odd in the tables, and function tables told as stories.
++    if (mappedSkill === 'notice_patterns') { genNoticePatterns(q); return; }
++    if (mappedSkill === 'function_table_story') { generateFunctionTableStory(q); return; }
+     const { rng, range, applyDecimals, ensureTables } = helpers;
+             const start = rng(1, range);
+             // allowRuleQ: only true for mixed patterns, not specific ones like seq_2, seq_5, etc.
+diff --git a/js/modules/gen-function-table.js b/js/modules/gen-function-table.js
+index ae990a6e..7a6c19a8 100644
+--- a/js/modules/gen-function-table.js
++++ b/js/modules/gen-function-table.js
+@@ -28,7 +28,7 @@ import { randInt, shuffle } from './utils.js';
+ import { optionsFor, normalizeOptions, pvCap } from './skill-options.js';
+ import { renderCell, applyRule, ruleText, ftSlots } from './sheet/index.js';
+ 
+-export const FUNCTION_TABLE_SKILLS = Object.freeze(['function_table_easy', 'function_table_hard']);
++export const FUNCTION_TABLE_SKILLS = Object.freeze(['function_table_easy', 'function_table_hard', 'function_table_story']);
+ 
+ let _cursor = 0;
+ 
+@@ -74,9 +74,11 @@ function inputPool(rule, cap) {
+ }
+ 
+ /** One rule of the asked kind, inside the band. */
+-function makeRule(kind, steps, cap, need, factors = null) {
++function makeRule(kind, steps, cap, need, factors = null, small = false) {
+     const hi = (k) => Math.max(2, Math.min(10, Math.floor(cap / Math.max(1, k))));
+     if (steps === 1) {
++        // (`ftSteps` '2-10', lessons 4-5 coverage: + / − by 2 to 10 only)
++        if ((kind === '+' || kind === '-') && small) return [{ op: kind, n: randInt(2, Math.max(2, Math.min(10, cap - need))) }];
+         if (kind === '+' || kind === '-') {
+             const top = cap <= 10 ? 5 : cap <= 20 ? 9 : cap <= 50 ? 20 : cap <= 100 ? 30 : Math.floor(cap / 4);
+             return [{ op: kind, n: niceAmount(1, Math.max(1, Math.min(top, cap - need)), cap) }];
+@@ -132,9 +134,9 @@ const HINT = {
+ export function generateFunctionTable(q, skillId) {
+     const o = ftOptions(skillId);
+     const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _cursor++;
+-    const taskRaw = String(o.ftTask || '');
++    const taskRaw = String(o.ftTask || (skillId === 'function_table_story' ? 'rule' : ''));
+     const task = ['outputs', 'rule', 'inputs', 'mixed', 'make'].includes(taskRaw.replace(/-check$/, '')) ? taskRaw.replace(/-check$/, '') : 'outputs';
+-    const band = [10, 20, 50, 100, 1000].includes(Number(o.band)) ? Number(o.band) : (skillId === 'function_table_hard' ? 100 : 20);
++    const band = [10, 20, 50, 100, 1000].includes(Number(o.band)) ? Number(o.band) : (skillId === 'function_table_hard' ? 100 : skillId === 'function_table_story' ? 50 : 20);
+     const cap = Math.max(10, pvCap(band, state.range));
+     const tableV = Number(o.ftTable);
+     const rowsN = [3, 4, 5].includes(Math.floor(tableV / 10)) ? Math.floor(tableV / 10) : 4;
+@@ -157,10 +159,12 @@ export function generateFunctionTable(q, skillId) {
+     }
+ 
+     let rule = null, pool = [];
++    const small = o.ftSteps === '2-10';
+     const attempt = (k, st) => {
+         for (let tries = 0; tries < 40 && !rule; tries++) {
+-            const r = makeRule(k, st, cap, need, o.ftFactors === '2-5-10' ? [2, 5, 10] : o.ftFactors === '2-3-5-10' ? [2, 3, 5, 10] : null);
+-            const p = inputPool(r, cap);
++            const r = makeRule(k, st, cap, need, o.ftFactors === '2-5-10' ? [2, 5, 10] : o.ftFactors === '2-3-5-10' ? [2, 3, 5, 10] : null, small);
++            // (`ftSteps` '2-10': the In numbers start at 2 - row 1 of 1 fits a + rule and a × rule)
++            const p = inputPool(r, cap).filter((x) => !small || x >= 2);
+             if (p.length >= need) { rule = r; pool = p; }
+         }
+     };
+@@ -181,8 +185,11 @@ export function generateFunctionTable(q, skillId) {
+         const want = r0.op === '+' ? r0.n : r0.op === '-' ? 2 * r0.n : r0.op === 'x' ? (pool.includes(r0.n) ? r0.n : pool[0]) : pool[0];
+         if (pool.includes(want) && pool.length >= need) trapX = want;
+     }
++    // ftZero: decided once for the table; the zero row is In = the rule's number (n − n = 0), so the pool must hold it.
++    const zeroWant = o.ftZero === true && rule.length === 1 && rule[0].op === '-' && pool.includes(rule[0].n) && trapX === null ? randInt(0, 1) === 1 : null;
+     for (let tries = 0; tries < 40; tries++) {
+         let pickd = shuffle(pool.slice()).slice(0, need);
++        if (zeroWant === true && !pickd.slice(0, rowsN).includes(rule[0].n)) pickd = [rule[0].n, ...shuffle(pool.filter((v) => v !== rule[0].n)).slice(0, need - 1)];
+         if (trapX !== null) {
+             // the trap leads; the rest are bigger when the table runs in order (so it stays row 1)
+             const rest = pool.filter((v) => v !== trapX && (scrambled || v > trapX));
+@@ -206,6 +213,13 @@ export function generateFunctionTable(q, skillId) {
+         }
+         const pairs = xs.map((x) => [x, applyRule(rule, x)]);
+         if (task === 'rule' && rulesFitting(pairs, cap) !== 1) continue;
++        // (`ftSteps` '2-10': row 1 of a + / − table fits no × / ÷ rule of 2 to 10 - unless ftTrap asks for it)
++        if (small && trapX === null && rule.length === 1 && (rule[0].op === '+' || rule[0].op === '-') && tries < 39) {
++            const [x1, y1] = pairs[0];
++            if ([2, 3, 4, 5, 6, 7, 8, 9, 10].some((m) => x1 * m === y1 || y1 * m === x1)) continue;
++        }
++        // (`ftZero`: about half the − tables hold an Out of 0; off, an Out of 0 only by chance)
++        if (zeroWant !== null && tries < 39 && pairs.some(([, y]) => y === 0) !== zeroWant) continue;
+         check = cx === null || cx === undefined ? null : { x: cx, y: applyRule(rule, cx) };
+         break;
+     }
+@@ -258,3 +272,49 @@ export function generateFunctionTable(q, skillId) {
+     q.ftRule = ruleText(rule);
+     return true;
+ }
++
++// ---- STORY TABLES (algebra:function_table_story, lessons 4-5 coverage, 2026-10-17) -------------------
++// A one-step find-the-rule table told as a story: each row is a sentence ("When Ben is 4, Ann is 9."),
++// then the question; the table itself is printed under the story and the pupil writes the rule in the
++// frame. The numbers are the dealt table's own, so the story and the table always agree. Contexts that
++// make sense for the rule: ages (+ / -, never an age of 0), groups of a fixed count (x), and a number
++// machine (any rule, an Out of 0 too). Our own wording.
++const STORY_NAMES = [['Ben', 'Ann'], ['Sam', 'Mia'], ['Leo', 'Zara'], ['Omar', 'Lily'], ['Ravi', 'Ella'], ['Noah', 'Ivy'], ['Max', 'Ada'], ['Kai', 'Rosa']];
++const STORY_BAGS = { 2: ['bike', 'bikes', 'wheels'], 3: ['tricycle', 'tricycles', 'wheels'], 5: ['hand', 'hands', 'fingers'], 10: ['pack', 'packs', 'pencils'] };
++function storyLines(rule, rows, at) {
++    const [A, B] = STORY_NAMES[(at + randInt(0, STORY_NAMES.length - 1)) % STORY_NAMES.length];
++    const r = rule[0];
++    const minY = Math.min(...rows.map((w) => w.y));
++    // (ages for every + / − table whose ages are all 1 or more; groups for a × table of 2, 3, 5 or 10; else the machine)
++    if ((r.op === '+' || r.op === '-') && minY >= 1) {
++        return { context: 'ages', names: [A, B], lines: [...rows.map((w) => `When ${A} is ${w.x}, ${B} is ${w.y}.`), `What is the rule from ${A}'s age to ${B}'s age?`] };
++    }
++    if (r.op === 'x' && STORY_BAGS[r.n]) {
++        const [one, many, things] = STORY_BAGS[r.n];
++        return { context: 'groups', names: [many, things], lines: [...rows.map((w) => `${w.x} ${w.x === 1 ? one : many} ${w.x === 1 ? 'has' : 'have'} ${w.y} ${things}.`), `What is the rule from ${many} to ${things}?`] };
++    }
++    return { context: 'machine', names: [A, A], lines: [...rows.map((w) => `${A} puts in ${w.x}. Out comes ${w.y}.`), `What is the rule of ${A}'s machine?`] };
++}
++
++/** Fill `q` with one story table (find the rule). Returns true. */
++export function generateFunctionTableStory(q) {
++    generateFunctionTable(q, 'function_table_story');
++    const p = q.cell.payload;
++    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _cursor;
++    const st = storyLines(p.rule, p.rows, at);
++    const story = st.lines;
++    p.story = story;
++    p.storyContext = st.context;
++    p.storyNames = st.names;
++    try {
++        q.visual = renderCell({ cell: q.cell }, { mode: 'screen', static: true, size: 'L', look: 'ican', state: 'blank' });
++    } catch (e) { q.visual = ''; }
++    // The story's sentences, for a host that prints them itself (the lesson Word problem page, print-sheet.js).
++    q.storyLines = story.slice();
++    q.text = 'Read the story. Find the rule. Write the rule.';
++    q.printText = q.text;
++    q.instructionKey = 'table-rule-story';
++    q.hint = 'Make each sentence a row: In, then Out. Test the rule on every row.';
++    q.skillLabel = 'Function Table Stories';
++    return true;
++}
+diff --git a/js/modules/gen-mult-patterns.js b/js/modules/gen-mult-patterns.js
+index cf474f7e..ea78926d 100644
+--- a/js/modules/gen-mult-patterns.js
++++ b/js/modules/gen-mult-patterns.js
+@@ -442,6 +442,23 @@ export function genMultChart(q, skill) {
+         const c0 = inRows ? randInt(lo, T - C + 1) : place(C, focus);
+         rows = Array.from({ length: R }, (_, i) => r0 + i);
+         cols = Array.from({ length: C }, (_, j) => c0 + j);
++        // skipTen (lesson 4 coverage, 2026-10-17): the chart's numbers skip 10 (..., 8, 9, 11, 12) and no
++        // product passes 100 - a window never holds the 10 row or column, whose products show the pattern for free.
++        if (opt('skipTen') === true) {
++            const axis = allT.filter(v => v !== 10 && v >= lo);
++            const nR = Math.min(R, axis.length), nC = Math.min(C, axis.length);
++            const at = (n, want) => {
++                const ok = [];
++                for (let s = 0; s + n <= axis.length; s++) if (want === null || axis.slice(s, s + n).includes(want)) ok.push(s);
++                return ok.length ? ok[randInt(0, ok.length - 1)] : randInt(0, axis.length - n);
++            };
++            for (let t = 0; t < 60; t++) {
++                const fr = inRows && axis.includes(focus) ? focus : null, fc = !inRows && axis.includes(focus) ? focus : null;
++                const a = at(nR, t < 30 ? fr : null), b = at(nC, t < 30 ? fc : null);
++                rows = axis.slice(a, a + nR); cols = axis.slice(b, b + nC);
++                if (rows[rows.length - 1] * cols[cols.length - 1] <= 100) break;
++            }
++        }
+     }
+     const payload = { rows, cols, blanks: [] };
+     const cellOK = (i, j) => tabSet.has(rows[i]) || tabSet.has(cols[j]);
+diff --git a/js/modules/gen-notice-patterns.js b/js/modules/gen-notice-patterns.js
+new file mode 100644
+index 00000000..0ad2b071
+--- /dev/null
++++ b/js/modules/gen-notice-patterns.js
+@@ -0,0 +1,107 @@
++// gen-notice-patterns.js — patterns:notice_patterns, "Even or Odd? Patterns in the Tables"
++// (build list patterns_notice; 3.OA.D.9, lessons 4-5 coverage lane B, 2026-10-17).
++//
++// 3.OA.D.9: identify arithmetic patterns, including patterns in the ADDITION table and the
++// MULTIPLICATION table, and explain them using properties of operations ("4 times a number is always
++// even, because 4 x n can be split into two equal addends"). One item: two numbers, joined by x or +,
++// and the question "Is the product (sum) even or odd?" - read from the two numbers, never worked out:
++//   x : one or both numbers even -> even; both odd -> odd (an even number splits into two equal parts)
++//   + : both even or both odd -> even; one of each -> odd
++// With `npWhy` the pupil checks one of four sentences, the parity WITH its reason (the explain clause),
++// and the wrong sentences are the real errors ("Even. Both numbers are odd." - odd x odd taken as even;
++// "Odd. One or both numbers are even." - any odd number taken to make the product odd).
++// With `npStory` the two numbers come in a short story (bags of apples; red and blue cubes).
++//
++// The kit template is `parity` (sheet/cells/parity.js): one decision, one slot, the same check boxes on
++// paper, on the key and on screen (wireTickBoxes).
++
++import { state } from './state.js';
++import { randInt } from './utils.js';
++import { optionsFor, normalizeOptions } from './skill-options.js';
++import { k2Twin } from './sheet/index.js';
++
++let _cursor = 0;
++
++function npOptions() {
++    const mine = state.skill === 'notice_patterns' && state.skillOptions && typeof state.skillOptions === 'object' ? state.skillOptions : {};
++    try { return normalizeOptions('patterns', 'notice_patterns', mine); } catch (e) { /* defaults */ }
++    const out = {};
++    try { for (const d of optionsFor('patterns', 'notice_patterns')) out[d.id] = d.default; } catch (e) { /* none */ }
++    return out;
++}
++
++export const NP_LABELS = Object.freeze({
++    x: Object.freeze(['Even. One or both numbers are even.', 'Even. Both numbers are odd.', 'Odd. One or both numbers are even.', 'Odd. Both numbers are odd.']),
++    '+': Object.freeze(['Even. Both are even, or both are odd.', 'Even. One is even, one is odd.', 'Odd. Both are even, or both are odd.', 'Odd. One is even, one is odd.']),
++});
++
++const MULT_STORIES = [
++    ['bags', 'bag', 'apples'], ['boxes', 'box', 'pens'], ['plates', 'plate', 'cookies'], ['vases', 'vase', 'flowers'], ['nests', 'nest', 'eggs'],
++];
++const NAMES = ['Ben', 'Mia', 'Sam', 'Zara', 'Leo', 'Ivy', 'Omar', 'Ella'];
++
++/** Fill `q` with one even-or-odd item. */
++export function genNoticePatterns(q) {
++    const o = npOptions();
++    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _cursor++;
++    const table = o.npTable === 'mult' || o.npTable === 'add' ? o.npTable : (at % 2 === 0 ? 'mult' : 'add');
++    const op = table === 'mult' ? 'x' : '+';
++    const why = o.npWhy !== false;
++    const story = o.npStory === true;
++    let a, b;
++    if (op === 'x') {
++        const legal = [2, 3, 4, 5, 6, 7, 8, 9, 10];
++        let tabs = (Array.isArray(o.constant) ? o.constant : []).map(Number).filter((v) => legal.includes(v));
++        if (!tabs.length) tabs = legal.slice();
++        // about one item in three is odd x odd, when the ticked tables hold an odd one (the contrast case)
++        const odd = tabs.filter((v) => v % 2 === 1);
++        const bothOdd = odd.length > 0 && randInt(0, 2) === 0;
++        const t = bothOdd ? odd[randInt(0, odd.length - 1)] : tabs[randInt(0, tabs.length - 1)];
++        const pool = bothOdd ? [3, 5, 7, 9] : legal;
++        const other = pool[randInt(0, pool.length - 1)];
++        [a, b] = randInt(0, 1) === 0 ? [t, other] : [other, t];
++    } else {
++        a = randInt(1, 10); b = randInt(1, 10);
++    }
++    const value = op === 'x' ? a * b : a + b;
++    const even = value % 2 === 0;
++    const reasonFirst = op === 'x' ? (a % 2 === 0 || b % 2 === 0) : (a % 2 === b % 2);
++    const labels = why ? NP_LABELS[op].slice() : ['Even', 'Odd'];
++    const correct = why ? (even ? 0 : 2) + (reasonFirst ? 0 : 1) : (even ? 0 : 1);
++    const word = op === 'x' ? 'product' : 'sum';
++    const glyph = op === 'x' ? '×' : '+';
++    const payload = { op, a, b, labels, values: labels.slice(), correct, why };
++    if (story) {
++        const name = NAMES[(at + randInt(0, NAMES.length - 1)) % NAMES.length];
++        if (op === 'x') {
++            const [many, one, things] = MULT_STORIES[randInt(0, MULT_STORIES.length - 1)];
++            payload.story = [`There are ${a} ${a === 1 ? one : many}.`, `Each ${one} has ${b} ${things}.`, `How many ${things}? Even or odd?`];
++            payload.things = things;
++        } else {
++            payload.story = [`${name} has ${a} red cubes and ${b} blue cubes.`, 'How many cubes? Even or odd?'];
++            payload.things = 'cubes';
++        }
++        q.storyLines = payload.story.slice();
++    }
++    q.cell = { template: 'parity', v: 1, payload };
++    q.visual = k2Twin('parity', payload);
++    q.operands = [a, b];
++    q.a = a; q.b = b;
++    q.parity = even ? 'even' : 'odd';
++    q.npValue = value;
++    q.text = story ? payload.story.join(' ') : `Is ${a} ${glyph} ${b} even or odd?${why ? ' Why?' : ''}`;
++    q.printText = why ? 'Even or odd? Why? Check one box.' : 'Even or odd? Check one box.';
++    q.instructionKey = why ? 'parity-why' : 'parity';
++    q.ans = labels[correct];
++    q.printAnswer = labels[correct];
++    q.selfAnswering = true;
++    q.answerType = 'text';
++    q.options = [];
++    q.hint = op === 'x'
++        ? 'Look at the two numbers. Is one of them even? Then the product is even: it splits into two equal parts.'
++        : 'Look at the two numbers. Both even or both odd? Then the sum is even. One of each? The sum is odd.';
++    q.skillLabel = 'Even or Odd? Patterns in the Tables';
++    q.printFormat = 'parity';
++    q._variant = `${table}${why ? '-why' : ''}`;
++    q.npWord = word;
++}
+diff --git a/js/modules/generate-question.js b/js/modules/generate-question.js
+index 8810d952..89635f3b 100644
+--- a/js/modules/generate-question.js
++++ b/js/modules/generate-question.js
+@@ -740,6 +740,7 @@ function generateResolvedQuestion() {
+         'round_decimals': 'rounding',           // In decimals UI category, but gen code is in rounding handler
+         'function_table_easy': 'patterns',      // In algebra UI category, but gen code is in patterns handler
+         'function_table_hard': 'patterns',      // In algebra UI category, but gen code is in patterns handler
++        'function_table_story': 'patterns',     // In algebra UI category, but gen code is in patterns handler (lesson 5 coverage)
+         'order_objects_length': 'measurement',   // In shapes_early UI category, but gen code is in measurement handler
+         'measure_nonstandard': 'measurement',    // In shapes_early UI category, but gen code is in measurement handler
+         'estimate_length': 'measurement',        // In shapes_early UI category, but gen code is in measurement handler
+diff --git a/js/modules/lessons/detailed/g3-oa9-input-output-rule.js b/js/modules/lessons/detailed/g3-oa9-input-output-rule.js
+index dbeff204..9c50bebf 100644
+--- a/js/modules/lessons/detailed/g3-oa9-input-output-rule.js
++++ b/js/modules/lessons/detailed/g3-oa9-input-output-rule.js
+@@ -10,8 +10,13 @@
+ //
+ // Built for it: CASE_TESTS ftAdd / ftSub / ftTimes / ftSubZero / ftEdge (roles/lesson.js), the options ftTrap and
+ // ftFactors, the chart step states (cells/function-table.js), table identity by rule and pairs (print-sheet.js ftClash).
++// Skill coverage lane B (2026-10-17): options ftSteps "2-10" (+ / − by 2 to 10, In from 2, a plain row 1) and ftZero
++// (about half the − tables hold an Out of 0), ftTrap passed on the Check Question and exit c, and the skill
++// algebra:function_table_story, which deals P5 (the story and its table): online practice matches the paper.
+ 
+-const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 50, ftTable: 31, support: 'frame', ftFactors: '2-3-5-10' }, opts || {}) }, extra || {});
++const FT = (opts, extra) => Object.assign({ categoryId: 'algebra', skillId: 'function_table_easy', opts: Object.assign({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 50, ftTable: 31, support: 'frame', ftFactors: '2-3-5-10', ftSteps: '2-10' }, opts || {}) }, extra || {});
++// (lessons 4-5 coverage, 2026-10-17: the P5 story table is dealt by algebra:function_table_story with the same options)
++const FTS = (opts, extra) => Object.assign(FT(opts, extra), { skillId: 'function_table_story' });
+ // P1 bank types: earlier content only (place value: 1 / 10 more and less, compare, unit form), never today's rule-finding.
+ const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
+ const ML = (step, dir, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'more_less_10', opts: { step, dir, band: 100 } }, extra || {});
+@@ -31,7 +36,6 @@ export default {
+     cra: 'Concrete → Pictorial',
+     flowNote: 'One chunk: + rules, then − rules, then × rules; test every row.',
+     followOn: [
+-        { title: 'Input-output stories: find the rule', skill: 'algebra:function_table_story', opts: {}, ccss: '3.OA.D.9' },
+         { title: 'Find the missing In number', skill: 'algebra:function_table_easy', opts: { ftTask: 'inputs' }, ccss: '4.OA.C.5' },
+     ],
+ 
+@@ -46,8 +50,8 @@ export default {
+     edgeOnlyLast: 'ftTimes',
+     practicePages: 2,
+     practiceSheets: [
+-        { steps: true, skill: FT({ ftTable: 41, support: 'frame-bare' }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimes', 'ftSubZero'] } },
+-        { steps: true, skill: FT({ ftTable: 41, support: 'frame-bare' }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftSubZero', 'ftTimes'] } },
++        { steps: true, skill: FT({ ftTable: 41, support: 'frame-bare', ftZero: true }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftTimes', 'ftSubZero'] } },
++        { steps: true, skill: FT({ ftTable: 41, support: 'frame-bare', ftZero: true }, { allTest: 'ftPracticeAny' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['ftSubZero', 'ftTimes'] } },
+     ],
+     // No Mixed page (V22 §9.5: optional): a function table is a tall item, and a page that mixes them with
+     // earlier facts cannot give the lesson's own skill half the page (E33).
+@@ -71,6 +75,8 @@ export default {
+             word: s.op === 'x' ? 'times' : s.op === '-' ? 'take away' : 'add',
+             rows: `${r1.x} → ${r1.y}, ${r2.x} → ${r2.y}, ${r3.x} → ${r3.y}`,
+             next, nextOut, wpAns: nextOut, eqN: nextOut, eqParts: [next, s.n], eqOp: sign,
++            // (a story table's people - function_table_story: "When Ben is 4, Ann is 9." - In first, Out second)
++            ...(Array.isArray(p.storyNames) ? { inName: p.storyNames[0], outName: p.storyNames[1] } : {}),
+         };
+     },
+ 
+@@ -135,18 +141,18 @@ export default {
+     },
+ 
+     // ------------------------------------------------------------------ P5 Word problem
+-    // No skill deals a story read from a table (proposal algebra:function_table_story). Our own
+-    // story; its numbers are a dealt + table (Ann is always k years older than Ben), printed under it.
++    // Dealt by algebra:function_table_story (built 2026-10-17): a + table told as ages (one person is always k years
++    // older than the other), the sentences printed as the story and the table under it.
+     wordProblem: {
+         // (r3, critic D4: the lesson's own task - the story's table printed, find the rule, the rule frame; a + rule
+         // that makes sense: Ann is always the same number of years older than Ben)
+-        ref: FT({ ftRules: ['+'], support: 'frame-bare' }),
++        ref: FTS({ ftRules: ['+'], support: 'frame-bare' }),
+         want: 'ftAdd',
+         tableItem: true,
+         panelRows: [{ icon: 'read', text: 'Read it two times.' }, { icon: 'ringnum', text: 'Circle the numbers.' }, { icon: 'underline', text: 'Underline the question.' },
+             { icon: 'read', text: 'Read the table.' }, { icon: 'check', text: 'Test every row.' }, { icon: 'write', text: 'Write the rule.' }],
+         instruction: 'Find the rule. Write the rule.',
+-        lines: ['When Ben is {wp.x1}, Ann is {wp.y1}.', 'When Ben is {wp.x2}, Ann is {wp.y2}.', 'When Ben is {wp.x3}, Ann is {wp.y3}.', 'What is the rule from Ben to Ann?'],
++        // (the story's sentences are the dealt item's own, q.storyLines)
+         topMm: 112,
+         answerLine: '',
+         say: 'I tested every row. The rule is __.',
+@@ -160,7 +166,7 @@ export default {
+         // a + rule, a − rule, and the Critical Atom's × table whose row 1 also fits + (it is the × item too).
+         { case: 'a + rule', ref: FT({ ftRules: ['+'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftAdd', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Reads down the Out column: the gap between Outs.' },
+         { case: 'a − rule', ref: FT({ ftRules: ['-'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true }, ftRuleMax: 1, dealTries: 3000 }), want: ['ftSub', 'ftSpread'], cols: 3, instr: 'Find the rule. Write the rule.', detects: 'Sign flipped: + when Out is smaller.' },
+-        { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare' }, { cellPayload: { ruleBelow: true } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
++        { case: 'a × rule, row 1 also fits + (Critical Atom)', ref: FT({ ftRules: ['x'], support: 'frame-bare', ftTrap: true }, { cellPayload: { ruleBelow: true } }), want: 'ftTimes', cols: 3, instr: 'Find the rule. Write the rule.', detects: 'One pair only: + read off row 1, never tested on row 2.' },
+     ],
+     // (T2b: what each label means in THIS pack - critic r1 n3: nothing on the Guided page is traced)
+     fadeMeans: [['★', 'Guided: the machine picture and the Steps; the teacher leads'], ['★★', 'Practice: Steps only, no machine picture'], ['★★★', 'Last row: a × table (row 1 also fits +) and a − table with an Out of 0']],
+@@ -219,7 +225,7 @@ export default {
+         { name: 'Sign flipped', step: 2, looks: '+ {exit.1.k} for {exit.1.rows}', fix: '“Bigger or smaller?”', option: '', caught: 'Exit b · Practice 1 and 2 − tables' },
+     ],
+     // (each option the rule as a pupil writes it: "+ 6", never the slot list "+, 6")
+-    checkQuestion: { want: 'ftTimes', ref: FT({ ftRules: ['x'] }, { ftRuleMax: 2, dealTries: 3000 }), correct: 'C', show: (v) => String(v).replace(/^([+−×÷-]),\s*(\d+)$/, '$1 $2') },
++    checkQuestion: { want: 'ftTimes', ref: FT({ ftRules: ['x'], ftTrap: true }, { ftRuleMax: 2, dealTries: 3000 }), correct: 'C', show: (v) => String(v).replace(/^([+−×÷-]),\s*(\d+)$/, '$1 $2') },
+ 
+     // ------------------------------------------------------------------ T3-T5 delivery scripts
+     sections: [
+@@ -285,8 +291,8 @@ export default {
+         { n: 9, name: 'Word problem', min: 5, page: 'P5',
+             rows: [
+                 { do: 'Read the story aloud two times. Pupils tick each box.' },
+-                { ask: 'Ben is In, Ann is Out. Bigger or smaller?', note: 'Bigger: try +. The table is printed under the story.' },
+-                { ask: 'What is the rule? Test every row.', note: 'Expected: [[{wp.rule}]]: Ann is always {wp.k} years older.' },
++                { ask: '{wp.inName} is In, {wp.outName} is Out. Bigger or smaller?', note: 'Bigger: try +. The table is printed under the story.' },
++                { ask: 'What is the rule? Test every row.', note: 'Expected: [[{wp.rule}]]: {wp.outName} is always {wp.k} years older.' },
+             ] },
+         { n: 10, name: 'Plenary and exit slip', min: 4, page: 'P6',
+             rows: [
+@@ -312,6 +318,6 @@ export default {
+         { wrote: '{we.1.wrong.signflip} for {we.1.rows} (Guided 2)', mistake: 'Sign flipped', next: 'Point: is Out smaller? Then −.' },
+         { wrote: '{we.2.wrong.addfortimes} for {we.2.rows} (Guided 3)', mistake: 'One pair only', next: 'Test it on row 2 together.' },
+         { wrote: '{cq.wrong.neighbouroutputs} for {cq.rows} (Check Question)', mistake: 'Down the Out column', next: 'Cover the rows; read one across.' },
+-        { wrote: '{wp.wrong.neighbouroutputs} for the story (Word problem)', mistake: 'Down the Out column', next: 'Read Ben, then Ann, one row.' },
++        { wrote: '{wp.wrong.neighbouroutputs} for the story (Word problem)', mistake: 'Down the Out column', next: 'Read {wp.inName}, then {wp.outName}, one row.' },
+     ],
+ };
+diff --git a/js/modules/lessons/detailed/g3-oa9-mult-table-patterns.js b/js/modules/lessons/detailed/g3-oa9-mult-table-patterns.js
+index a14f7f7e..035c9350 100644
+--- a/js/modules/lessons/detailed/g3-oa9-mult-table-patterns.js
++++ b/js/modules/lessons/detailed/g3-oa9-mult-table-patterns.js
+@@ -12,11 +12,17 @@
+ // 'odd-odd-shaded', window options winRows / winCols / minFactor; CASE_TESTS chartIn9, chartMixed, evenColOnly,
+ // chartOddOdd, chartBigOdd, chartColsOdd, chartColsEven (roles/lesson.js); print-sheet.js window keys (factKeyOf
+ // 'grid r0-r1 x c0-c1:task', turned windows one key) and near twins (gridNear: more than half the boxes shared).
+-// NOT BUILT (proposal, build list `patterns_notice`): B5 patterns:notice_patterns, the Even / Odd check of a fact
+-// with a reason bank. Until then the lesson is windows only: ONE Practice page of six windows and no Mixed page.
++// BUILT 2026-10-17 (skill coverage lane B): mult_chart option skipTen (no 10 row / column, products to 100 - the
++// lesson's chart, so online windows match the paper), and patterns:notice_patterns (build list patterns_notice): even or
++// odd read from the two numbers, with the reason bank (npWhy, the 3.OA.D.9 explain clause), the addition table (npTable
++// 'add', the standard's addition-table clause) and a story form (npStory) that deals P5. The lesson stays windows only:
++// ONE Practice page of six windows and no Mixed page; the reason bank and the addition table are the follow-on.
+ 
+ const CHART = (extra, opts) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_chart', allTest: 'chartIn9', allHard: true, gridApart: true,
+-    opts: Object.assign({ chart: 'window', band: 100, task: 'even', minFactor: 2 }, opts || {}) }, extra || {});
++    opts: Object.assign({ chart: 'window', band: 100, task: 'even', minFactor: 2, skipTen: true }, opts || {}) }, extra || {});
++// (lessons 4-5 coverage, 2026-10-17: the P5 story is dealt by patterns:notice_patterns - a bags-of story, is the number
++// even or odd - so online practice with these options is the paper's item)
++const NOTICE = (opts, extra) => Object.assign({ categoryId: 'patterns', skillId: 'notice_patterns', opts: Object.assign({ npTable: 'mult', npWhy: false, npStory: true, constant: [4, 6, 8] }, opts || {}) }, extra || {});
+ const FACT = (tables, extra) => Object.assign({ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: tables, notation: ['stacked'], band: 100 } }, extra || {});
+ const ML = (step, dir, extra) => Object.assign({ categoryId: 'placevalue', skillId: 'more_less_10', opts: { step, dir, band: 100 } }, extra || {});
+ const CB = (step) => ({ categoryId: 'multiplication', skillId: 'count_by_tables', opts: { rows: [{ step, start: 'step', dir: 'up' }], fill: 'two', times: 'none', missing: 20 } });
+@@ -33,8 +39,11 @@ export default {
+     eeNote: 'owner list (DLM v4) vs repo EE set',
+     cra: 'Concrete → Pictorial',
+     flowNote: 'One chunk: one even row or column number makes the product even.',
+-    buildNeeds: [
+-        { id: 'B5', kind: 'skill', what: 'patterns:notice_patterns (parity first): n × m, check Even / Odd; reason bank "two equal parts"' },
++    buildNeeds: [],
++    // (skill coverage, 2026-10-17: the standard's clauses this lesson does not print, by the skill that deals them)
++    followOn: [
++        { title: 'Even or odd? Say why', skill: 'patterns:notice_patterns', opts: { npTable: 'mult', npWhy: true }, ccss: '3.OA.D.9' },
++        { title: 'Patterns in the addition table', skill: 'patterns:notice_patterns', opts: { npTable: 'add', npWhy: true }, ccss: '3.OA.D.9' },
+     ],
+     // The worked steps B2 adds (CHART_STEPS.even), in teaching order:
+     evenSteps: [
+@@ -93,7 +102,10 @@ export default {
+         const x = Number(b.a), y = Number(b.b);
+         if (!Number.isFinite(x) || !Number.isFinite(y)) return {};
+         const pr = x * y;
+-        return { sum: x + y, p: pr, half: pr % 2 === 0 ? pr / 2 : '', parity: pr % 2 === 0 ? 'even' : 'odd', eqParts: [x, y], eqOp: '×' };
++        const par = q && q.cell && q.cell.template === 'parity' ? q.cell.payload : null;
++        return Object.assign({ sum: x + y, p: pr, half: pr % 2 === 0 ? pr / 2 : '', parity: pr % 2 === 0 ? 'even' : 'odd', eqParts: [x, y], eqOp: '×' },
++            // (the P5 parity item: its own answer is the checked box; the page asks the product too - the equation frame's total)
++            par ? { things: par.things || 'apples', ans: pr, wpAns: pr, eqN: pr } : {});
+     },
+ 
+     lessonData: {
+@@ -144,11 +156,11 @@ export default {
+ 
+     // ------------------------------------------------------------------ P5 Word problem
+     wordProblem: {
+-        ref: FACT([4, 6, 8]),
++        ref: NOTICE(),
+         want: 'bigSecond',
+         instruction: 'Read the story. Draw it. Solve.',
+-        lines: ['There are {wp.a} bags.', 'Each bag has {wp.b} apples.', 'How many apples? Is it even or odd?'],
+-        answerLine: 'There are __ apples.',
++        // (the story's sentences are the dealt item's own, q.storyLines)
++        answerLine: 'There are __ {wp.things}.',
+         // (r5, critic r2 n10: a frame that fits an odd item as well as an even one; the numbers are the story's own)
+         say: 'Is {wp.a} or {wp.b} even? The product is __.',
+         sayAns: '{wp.parity}',
+@@ -275,7 +287,7 @@ export default {
+         { n: 9, name: 'Word problem', min: 5, page: 'P5',
+             rows: [
+                 { do: 'Read the story aloud two times. Pupils tick each box.' },
+-                { ask: 'How many apples? Even or odd?', note: 'Expected: [[{wp.p}]], [[{wp.parity}]].' },
++                { ask: 'How many {wp.things}? Even or odd?', note: 'Expected: [[{wp.p}]], [[{wp.parity}]].' },
+                 { say: '{wp.a} is even. So {wp.p} is even.', note: 'The Say line on the page: one even number is enough.' },
+             ] },
+         { n: 10, name: 'Plenary and exit slip', min: 5, page: 'P6',
+diff --git a/js/modules/print-sheet.js b/js/modules/print-sheet.js
+index a5837324..b5910088 100644
+--- a/js/modules/print-sheet.js
++++ b/js/modules/print-sheet.js
+@@ -3183,6 +3183,14 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
+  * `vars(q, base)` hook adds the lesson's names (place-value parts, story roles ...). No family
+  * code lives here.
+  */
++/** A dealt item whose cell carries story sentences (function_table_story), drawn without them; any other item as it is. */
++function dlNoStory(q) {
++    const p = q && q.cell && q.cell.payload;
++    if (!p || !Array.isArray(p.story)) return q;
++    const rest = Object.assign({}, p); delete rest.story;
++    return Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: rest }) });
++}
++
+ function dlItemVars(q, d) {
+     if (!q) return null;
+     const n = itemNumberOf(q);
+@@ -3431,8 +3439,11 @@ async function buildDetailedLesson(req = {}) {
+     // ---------------------------------------------------------------- P5 Word problem
+     const wpV = dlItemVars(wpD.q, d);
+     const storyText = String(wpD.q.text || '').replace(/<[^>]+>/g, ' ');
++    // (`q.storyLines` - lessons 4-5 coverage, 2026-10-17: a story skill's own sentences, dealt with the item - the
++    // P5 story comes from the skill, never hand-written; absent, as before)
+     const lines = Array.isArray(d.wordProblem.lines) && d.wordProblem.lines.length
+         ? d.wordProblem.lines.map((l) => fillPlaceholders(l, { wp: wpV }))
++        : Array.isArray(wpD.q.storyLines) && wpD.q.storyLines.length ? wpD.q.storyLines.map(String)
+         : storyText.split(/(?<=[.?!])\s+/).map((x) => x.trim()).filter(Boolean);
+     // The equation frame: the lesson's own parts (`vars` hook `eqParts`), else the item's operands.
+     const eqParts = Array.isArray(wpV.eqParts) && wpV.eqParts.length ? wpV.eqParts : [wpV.a, wpV.b].filter((x) => x !== undefined);
+@@ -3447,7 +3458,8 @@ async function buildDetailedLesson(req = {}) {
+         instruction: d.wordProblem.instruction || INSTRUCTION_LIBRARY['story-rcdws'] || INSTRUCTION_LIBRARY.story,
+         // (`wordProblem.tableItem` - lesson 5 r3: the story's own table, its rule frame the answer, under the story)
+         panelRows: d.wordProblem.panelRows || null, topMm: d.wordProblem.topMm || null,
+-        tableItem: d.wordProblem.tableItem ? composePlanItem(hostItem({ q: wpD.q, skill: Object.assign({}, d.wordProblem.ref) }, 0, 'L'), { cols: 1, level: 0 }) : null,
++        // (a story table's sentences are the page's story lines above, so its cell is drawn without them)
++        tableItem: d.wordProblem.tableItem ? composePlanItem(hostItem({ q: dlNoStory(wpD.q), skill: Object.assign({}, d.wordProblem.ref) }, 0, 'L'), { cols: 1, level: 0 }) : null,
+     }, frameP('Word problem', 1));
+     const p5 = renderPlan(wpPlan, { key: true });
+ 
+diff --git a/js/modules/search-terms.js b/js/modules/search-terms.js
+index d6f723cb..6092bc82 100644
+--- a/js/modules/search-terms.js
++++ b/js/modules/search-terms.js
+@@ -460,6 +460,8 @@ export const SKILL_TERMS = {
+     'addition:add_sub_fact_family': ['commutative', 'commutative property', 'commutative property of addition', 'commutative addition',
+         'turnaround facts', 'turn around facts', 'turnaround', 'addition turnaround facts', 'related facts'],
+     'algebra:function_table_easy': ['input output', 'in out', 'function machine'],
++    'algebra:function_table_story': ['input output story', 'function machine story', 'find the rule story', 'ages rule', 'in out word problem'],
++    'patterns:notice_patterns': ['even or odd product', 'odd times odd', 'even sum', 'addition table pattern', 'multiplication table pattern', 'parity', 'odd and even rules'],
+     'algebra:function_table_hard': ['input output', 'in out', 'function machine'],
+     'placevalue:place_value_10x': ['10 times bigger', 'ten times bigger', '10 times smaller', 'ten times as much'],
+     'angles_lines:symmetry': ['symmetry', 'line of symmetry', 'symmetrical', 'mirror line'],
+diff --git a/js/modules/sheet/cells/function-table.js b/js/modules/sheet/cells/function-table.js
+index 094439fd..b1f977e9 100644
+--- a/js/modules/sheet/cells/function-table.js
++++ b/js/modules/sheet/cells/function-table.js
+@@ -238,6 +238,18 @@ const txt = (g, s, { bold = false, em = null } = {}) =>
+ const X = '<span style="font-weight:400">n</span>';
+ const ruleHtml = (rule, variable = true) => `${variable ? `${X} ` : ''}${esc(ruleText(rule, { variable: false }))}`;
+ 
++/**
++ * The story lines of a story table (algebra:function_table_story, payload.story - lessons 4-5 coverage,
++ * 2026-10-17): left-aligned sentences at the text size above the table. Absent on every other table.
++ */
++function storyHtml(p, g) {
++    if (!Array.isArray(p.story) || !p.story.length) return '';
++    return `<div class="ft-story" style="text-align:left;line-height:1.45">`
++        + p.story.map((l) => `<div style="font-size:${g.textEm.toFixed(3)}em;font-weight:400">${esc(String(l))}</div>`).join('') + '</div>';
++}
++const storyH = (p, d) => (Array.isArray(p.story) && p.story.length ? p.story.length * d.textMm * 1.45 + 2 : 0);
++const storyW = (p, d) => (Array.isArray(p.story) && p.story.length ? Math.max(...p.story.map((l) => String(l).length)) * d.textMm * 0.48 : 0);
++
+ /** A right-pointing arrow (mm), black: a hairline shaft and a small solid head (INK-5). */
+ function arrow(g, wMm) {
+     const h = 3;
+@@ -538,7 +550,7 @@ register('function-table', {
+             inner = `<div style="display:flex;align-items:center;justify-content:center;gap:${g.em(WIDE_GAP_MM)}">`
+                 + `<div>${tableHtml(p, g, d, vals, ink, slotsById, ctx, fx)}</div>`
+                 + `<div style="display:flex;flex-direction:column;align-items:center">${sideHtml}</div></div>`;
+-            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
++            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;text-align:center">${storyHtml(p, g)}${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+         }
+         if (p.machine) inner += machine(p, g, d, wMm);
+         else if (p.task !== 'rule') inner += `<div style="text-align:center;margin-bottom:${g.em(1.5)}">${txt(g, `Rule: ${ruleHtml(p.rule)}`, { bold: true })}</div>`;
+@@ -558,6 +570,11 @@ register('function-table', {
+             if (p.check && slotsById.chk) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
+         }
+         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(2.5)};text-align:center">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
++        // (a story table: the sentences on the left, the table on the right - one row, never a tall stack)
++        if (storyH(p, d)) {
++            return root(g, 'function-table', `<div data-mq-join=", " style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;column-gap:${g.em(6)};row-gap:${g.em(3)};text-align:center">`
++                + `<div style="flex:0 1 auto">${storyHtml(p, g)}</div><div style="flex:none">${inner}</div></div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
++        }
+         return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+     },
+     answerKey(p) {
+@@ -574,16 +591,18 @@ register('function-table', {
+         if (wideLayout(p, g, d, ctx)) {
+             const tableH = d.headH + (p.rows || []).length * d.rowH + 2;
+             const sideH = (p.machine ? d.machineH + 1 : 0) + (p.task === 'rule' ? 1.2 + d.signW : 0) + (p.check ? 1 + d.boxH + 2.5 : 0);
+-            return { wMm: Math.ceil(tableWidth(p, d) + fixColW(p, d, ctx) + WIDE_GAP_MM + sideWidth(p, g, d, ctx) + 4), hMm: Math.ceil(Math.max(tableH, sideH) + 4),
+-                measure: true, factLike: false, maxCols: 3 };
++            return { wMm: Math.ceil(Math.max(storyW(p, d), tableWidth(p, d) + fixColW(p, d, ctx) + WIDE_GAP_MM + sideWidth(p, g, d, ctx)) + 4), hMm: Math.ceil(Math.max(tableH, sideH) + storyH(p, d) + 4),
++                measure: true, factLike: false, maxCols: storyH(p, d) ? 1 : 3, ...(storyH(p, d) ? { hardCap: true } : {}) };
+         }
+-        const w = Math.max(tableWidth(p, d) + (checkSide(p, g, d, ctx) ? 7 + sideW(d) : 0), p.machine ? 52 : 0, p.task === 'rule' ? (p.support === 'line' ? lineW(d) + 6 : d.frameW + 2) : 0);
++        const w = (storyH(p, d) ? storyW(p, d) + 6 : 0) + Math.max(tableWidth(p, d) + (checkSide(p, g, d, ctx) ? 7 + sideW(d) : 0), p.machine ? 52 : 0, p.task === 'rule' ? (p.support === 'line' ? lineW(d) + 6 : d.frameW + 2) : 0);
+         let h = d.headH + (p.rows || []).length * d.rowH + 2;
+         if (p.machine || p.task !== 'rule') h += d.machineH + 0.8;
+         if (p.task === 'rule') h += 1.2 + d.signW + (ruleInline(p, g, d, ctx) ? 0 : Math.max(11, g.pt * g.zoneEm) * PT_MM + 0.6);
+         if (p.check && !checkSide(p, g, d, ctx)) h += 1 + d.boxH + 2.5 + (checkInline(d, ctx) ? 0 : d.textMm * 1.4);
+         if (p.note) h += 3 + d.textMm * 1.4;
+-        return { wMm: Math.ceil(w + 4), hMm: Math.ceil(h + 4), measure: true, factLike: false, maxCols: 3 };
++        h = Math.max(h, storyH(p, d));
++        // (a story table takes the row: its sentences never wrap in a narrow column)
++        return { wMm: Math.ceil(w + 4), hMm: Math.ceil(h + 4), measure: true, factLike: false, maxCols: storyH(p, d) ? 1 : 3, ...(storyH(p, d) ? { hardCap: true } : {}) };
+     },
+     inputs(p) {
+         return ftSlots(p).map((s, n) => ({
+diff --git a/js/modules/sheet/cells/parity.js b/js/modules/sheet/cells/parity.js
+new file mode 100644
+index 00000000..ab59cdf5
+--- /dev/null
++++ b/js/modules/sheet/cells/parity.js
+@@ -0,0 +1,66 @@
++// js/modules/sheet/cells/parity.js
++// The `parity` template (patterns:notice_patterns, build list patterns_notice; 3.OA.D.9, lessons 4-5
++// coverage 2026-10-17): is the product (or the sum) even or odd, and why?
++//
++//   The fact "7 × 4" (or "7 + 4") in digit-size bold, or - in a story item (payload.story) - the
++//   story's sentences at text size. Under it, the labelled check boxes (the box on the right of its
++//   label, P-TH-11, as `compare`): "Even" / "Odd", or with the reason bank (payload.why) the four
++//   statements "Even. One or both numbers are even." ... so ONE decision is ONE slot. The pupil never
++//   has to work the product out: the pattern is read from the two numbers (the property).
++//
++// Key (AK-1): the right box checked; Error analysis checks the wrong one (state `wrong`). In the screen
++// twin each row is a label span + an empty bordered box span, which screen-cell.js `wireTickBoxes`
++// turns into one tap target per row.
++//
++// payload: {op: 'x'|'+', a, b, labels: [...], values: [...], correct: i, story?: [lines]}
++//
++// Pure module (SCC-01).
++
++import { register } from '../registry.js';
++import { esc } from '../cell.js';
++import { L, P, root, checkBox, textPt, digitPt } from './k2kit.js';
++
++const GLYPH = { x: '×', '+': '+' };
++
++function checkedIndex(p, ctx) {
++    if (ctx.state === 'blank') return -1;
++    if (ctx.state === 'wrong') {
++        const w = String((ctx.wrong && ctx.wrong.value) || '').trim().toLowerCase();
++        const i = (p.values || []).findIndex((v) => String(v).toLowerCase() === w);
++        const j = (p.labels || []).findIndex((v) => String(v).toLowerCase() === w);
++        return i >= 0 ? i : j >= 0 ? j : (p.correct + 1) % Math.max(2, (p.labels || []).length);
++    }
++    return p.correct || 0;
++}
++
++/** The label column's width (mm): the longest label at the label size, so the boxes stand in one column. */
++const labelMm = (p, ctx) => Math.max(24, Math.ceil(Math.max(0, ...(p.labels || []).map((l) => String(l).length)) * (textPt(ctx) + 2) * 0.52 * 0.3528) + 2);
++
++register('parity', {
++    render(p, ctx) {
++        const on = checkedIndex(p, ctx);
++        const top = Array.isArray(p.story) && p.story.length
++            ? `<div class="par-story" style="display:inline-block;text-align:left;line-height:1.45;">${p.story.map((l) => `<div style="font-size:${P(ctx, textPt(ctx) + 2)};">${esc(String(l))}</div>`).join('')}</div>`
++            : `<div class="par-fact" style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1.2;white-space:nowrap;">${esc(p.a)} ${GLYPH[p.op] || esc(p.op)} ${esc(p.b)}</div>`;
++        const lab = labelMm(p, ctx);
++        const ticks = (p.labels || []).map((t, i) => `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, 1.5)} 0;">`
++            // (the label column is the longest label's width, or the cell's: a narrow host wraps a label, never clips it)
++            + `<span style="flex:0 1 auto;width:${L(ctx, lab)};min-width:0;white-space:normal;text-align:left;line-height:1.25;font-size:${P(ctx, textPt(ctx) + 2)};">${esc(t)}</span>`
++            + checkBox(ctx, { id: `c${i}`, on: on === i, slot: false }) + '</div>').join('');
++        return root(ctx, 'par-cell', `${top}<div style="display:flex;justify-content:center;margin-top:${L(ctx, 3)};"><div data-ws-slot="answer" data-ws-shape="check"`
++            + `${on >= 0 ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : ''} style="display:inline-block;max-width:100%;">${ticks}</div></div>`);
++    },
++    answerKey(p) {
++        const i = p.correct || 0;
++        return { value: (p.values || [])[i], display: (p.labels || [])[i], slots: { answer: { value: (p.labels || [])[i], graded: true } } };
++    },
++    footprint(p) {
++        // (two short labels fit two across; the reason bank or a story takes the row)
++        const wide = !!(p && (p.why || (Array.isArray(p.story) && p.story.length)));
++        return { wMm: wide ? 150 : 70, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
++    },
++    inputs() { return [{ id: 'answer', kind: 'check', shape: 'check', graded: true, order: 0, scopes: ['full'] }]; },
++    layout() { return { card: 'card-medium-visual', checker: 'choice' }; },
++});
++
++export default {};
+diff --git a/js/modules/sheet/contract.js b/js/modules/sheet/contract.js
+index 63d3ed4a..5028a166 100644
+--- a/js/modules/sheet/contract.js
++++ b/js/modules/sheet/contract.js
+@@ -183,6 +183,10 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
+     'money-more': 'Which has more money? Check one box.',
+     // Function tables (2026-09-25): the four table tasks the rule-given 'table' string does not say.
+     'table-rule': 'Find the rule. Write the rule.',
++    'table-rule-story': 'Read the story. Find the rule. Write the rule.',
++    // patterns:notice_patterns (lessons 4-5 coverage, 2026-10-17): even or odd, read from the two numbers.
++    'parity': 'Even or odd? Check one box.',
++    'parity-why': 'Even or odd? Why? Check one box.',
+     'table-in': 'Use the rule backward. Write each In number.',
+     'table-make': 'Write your own In numbers. Use the rule for Out.',
+     // Added 2026-09-25 with count by 1-12, number patterns, the chart tasks and x / ÷ on a line.
+diff --git a/js/modules/sheet/index.js b/js/modules/sheet/index.js
+index 5e0911a0..caa2f05a 100644
+--- a/js/modules/sheet/index.js
++++ b/js/modules/sheet/index.js
+@@ -110,6 +110,7 @@ export {
+ // chart window, arrays, remainder, number line, fact family, cloze bank).
+ export { divisionSteps } from './cells/long-division.js';
+ import './cells/pv-times.js';
++import './cells/parity.js';
+ import './cells/area-model.js';
+ import './cells/mult-chart.js';
+ import './cells/ops-counters.js';
+diff --git a/js/modules/sheet/providers/function-table.js b/js/modules/sheet/providers/function-table.js
+index 70a145e8..89c2d4ad 100644
+--- a/js/modules/sheet/providers/function-table.js
++++ b/js/modules/sheet/providers/function-table.js
+@@ -259,3 +259,20 @@ registerSkill('algebra:function_table_hard', {
+     wrongAnswer,
+     footprint: FOOTPRINT,
+ });
++
++// algebra:function_table_story (lessons 4-5 coverage, 2026-10-17): find the rule of a table told as a story.
++// The payload carries `story` (the sentences printed above the table); the rest is a rule table.
++const STORY_STRINGS = strings({
++    iCan: 'I Can find the rule in a story',
++    instructionKey: 'table-rule-story',
++    steps: ['Read the story. Each sentence is a row: In, then Out.', 'Test the rule on every row, not just one.', 'Write the rule that works for all the rows.'],
++    say: SAY, sayValues,
++});
++registerSkill('algebra:function_table_story', {
++    strings: STORY_STRINGS,
++    misconceptions: MISCONCEPTIONS,
++    workedSteps,
++    wrongAnswer,
++    // (the story takes the row: one table a row, as many rows as the page holds)
++    footprint: { kind: 'table', factLike: false, maxCols: 1, perPage: { ican: 3, daily: 3 } },
++});
+diff --git a/js/modules/sheet/providers/index.js b/js/modules/sheet/providers/index.js
+index ba4bc98f..d33e1c5f 100644
+--- a/js/modules/sheet/providers/index.js
++++ b/js/modules/sheet/providers/index.js
+@@ -19,6 +19,7 @@ import './division.js';
+ import './k2.js';
+ import './time-money.js';
+ import './function-table.js';
++import './parity.js';
+ import './countby.js';
+ import './pv.js';
+ import './word-work.js';
+diff --git a/js/modules/sheet/providers/parity.js b/js/modules/sheet/providers/parity.js
+new file mode 100644
+index 00000000..b4614bc3
+--- /dev/null
++++ b/js/modules/sheet/providers/parity.js
+@@ -0,0 +1,70 @@
++// js/modules/sheet/providers/parity.js
++// The provider of patterns:notice_patterns (the `parity` template; lessons 4-5 coverage, 2026-10-17).
++// The item is the cell payload {op, a, b, labels, correct, why}; nothing here reads the text.
++//
++// Misconceptions (lesson 4 RESEARCH.md, PEDAGOGY P-1 error list):
++//   odd-odd-even     odd x odd taken as even (or odd + odd taken as odd)
++//   any-odd-odd      one odd number taken to make the product odd
++//   reason-only      the right Even / Odd with the wrong reason (the property not read)
++//
++// Pure module (SCC-01).
++
++import { registerSkill } from '../contract.js';
++import { chooseWrong, strings, step } from './util.js';
++
++const payloadOf = (q) => (q && q.cell && q.cell.template === 'parity' && q.cell.payload) || null;
++
++function workedSteps(q) {
++    const p = payloadOf(q);
++    if (!p) return [];
++    const right = p.labels[p.correct];
++    const ev = (n) => (n % 2 === 0 ? 'even' : 'odd');
++    if (p.op === 'x') {
++        const one = p.a % 2 === 0 || p.b % 2 === 0;
++        return [
++            step(`${p.a} is ${ev(p.a)}. ${p.b} is ${ev(p.b)}.`),
++            step(one ? 'One even number is enough: the product splits into two equal parts.' : 'Both are odd: one is left over.'),
++            step(`Check: ${right}`, [{ slot: 'answer', value: right }]),
++        ];
++    }
++    const same = p.a % 2 === p.b % 2;
++    return [
++        step(`${p.a} is ${ev(p.a)}. ${p.b} is ${ev(p.b)}.`),
++        step(same ? 'Both the same: the spare ones pair up. The sum is even.' : 'One of each: one is left over. The sum is odd.'),
++        step(`Check: ${right}`, [{ slot: 'answer', value: right }]),
++    ];
++}
++
++function wrongAnswer(q) {
++    const p = payloadOf(q);
++    if (!p) return null;
++    const L = p.labels;
++    const out = [];
++    if (p.why) {
++        // the parity flipped with the same reason; the right parity with the other reason
++        const flip = (p.correct + 2) % 4, other = p.correct % 2 === 0 ? p.correct + 1 : p.correct - 1;
++        out.push({ value: L[flip], misconception: p.op === 'x' && p.a % 2 && p.b % 2 ? 'odd-odd-even' : 'any-odd-odd', slot: 'answer', explain: 'Read the two numbers, then the rule: the reason and the answer must agree.' });
++        out.push({ value: L[other], misconception: 'reason-only', slot: 'answer', explain: 'The right word with the wrong reason.' });
++    } else {
++        out.push({ value: L[1 - p.correct], misconception: p.op === 'x' && p.a % 2 && p.b % 2 ? 'odd-odd-even' : 'any-odd-odd', slot: 'answer', explain: 'Even and odd swapped.' });
++    }
++    return chooseWrong(q, out);
++}
++
++const def = (key) => strings({
++    iCan: 'I Can tell if a product or a sum is even or odd',
++    instructionKey: key,
++    steps: ['Is each number even or odd?', 'Times: one even number makes it even. Plus: two the same make it even.', 'Check the box.'],
++    say: 'It is __ because __.',
++    sayValues: (q) => { const p = payloadOf(q); if (!p) return null; const t = String(p.labels[p.correct]); const [w, ...r] = t.split('. '); return [w.toLowerCase(), r.join('. ').replace(/\.$/, '').toLowerCase() || (w === 'Even' ? 'it makes pairs' : 'one is left over')]; },
++});
++const WHY = def('parity-why'), PLAIN = def('parity');
++const stringsFn = (ref = {}) => { const p = payloadOf(ref && ref.q); return (p && !p.why ? PLAIN : WHY)(ref); };
++stringsFn.def = WHY.def;
++
++registerSkill('patterns:notice_patterns', {
++    strings: stringsFn,
++    misconceptions: ['odd-odd-even', 'any-odd-odd', 'reason-only'],
++    workedSteps,
++    wrongAnswer,
++});
+diff --git a/js/modules/skill-option-keys.js b/js/modules/skill-option-keys.js
+index d5f61448..3aecdf63 100644
+--- a/js/modules/skill-option-keys.js
++++ b/js/modules/skill-option-keys.js
+@@ -162,6 +162,7 @@ export const MULTI_KEYS = Object.freeze({
+     winRows: '5Q',       // mult_chart (lesson 4, 2026-10-16): rows in the window (2 / 3 / 4)
+     winCols: '5R',       // mult_chart: columns in the window (3 / 4 / 5)
+     minFactor: '5S',     // mult_chart: the window's smallest row / column number (1 or 2)
++    skipTen: '5W',       // mult_chart (lesson 4 coverage, 2026-10-17; lessons sub-range, taken top-down below lane A's 5X-5Z): no 10 row / column, products to 100
+     // NEXT FREE IN BLOCK 2: 2J.
+     // Lane C sub-range 2U-2Z (wave 1): skip-count lines and the number grid.
+     fill: '2U',          // count_by_tables: how many numbers are printed at the start (two / one / half)
+@@ -180,6 +181,12 @@ export const MULTI_KEYS = Object.freeze({
+     ops: '3A',           // function_table_easy / _hard: the operations a rule may use (+ − × ÷)
+     ftTrap: '5T',        // function tables (lesson 5, 2026-10-16): row 1 fits a + and a × rule
+     ftFactors: '5U',     // function tables (lesson 5 r2): the × / ÷ numbers a rule may use (any | 2, 5 and 10)
++    // Build lane algebra sub-range 4P-4Z (lesson 4-5 coverage lane B, 2026-10-17): taken top-down, below lane A's 4X-4Z.
++    ftSteps: '4W',       // function tables: the + / − numbers a rule may use (any | 2 to 10, with a plain row 1)
++    ftZero: '4V',        // function tables: about half the − tables hold a row whose Out is 0
++    npTable: '4U',       // notice_patterns: the table the pattern is read from (multiplication / addition / both)
++    npWhy: '4T',         // notice_patterns: check the reason from a bank (the property) as well as Even / Odd
++    npStory: '4S',       // notice_patterns: the two numbers told as a short story
+     // NEXT FREE IN BLOCK 3: 3C.
+ 
+     // Block 4 — SUPPORTS (S2: `cover` and `mix` are live; `touch` is unused - touch dots are
+@@ -373,6 +380,8 @@ export const VALUE_TOKENS = Object.freeze({
+     ftTask: Object.freeze({ outputs: 'G', 'outputs-check': 'H', rule: 'Y', 'rule-check': 'Z', inputs: 'V', 'inputs-check': 'W',
+         mixed: 'M', 'mixed-check': 'N', make: 'K' }),
+     ftFactors: Object.freeze({ any: 'A', '2-5-10': 'T', '2-3-5-10': 'F' }),
++    ftSteps: Object.freeze({ any: 'A', '2-10': 'T' }),
++    npTable: Object.freeze({ mult: 'M', add: 'A', both: 'B' }),
+     // block 1 (P10 time + money)
+     review: Object.freeze({ none: 'N', some: 'S' }),
+     stimulus: Object.freeze({ clock: 'C', words: 'W', 'words-past': 'P', 'words-oh': 'O' }),
+@@ -450,6 +459,8 @@ export const SCALAR_ONLY = Object.freeze({
+     winRows: 'decimal', winCols: 'decimal', minFactor: 'decimal', ftTrap: 'bool',
+     // lesson 6 (2026-10-17)
+     tenValues: 'bool', tenPlain: 'bool',
++    // lessons 4-5 coverage (2026-10-17)
++    skipTen: 'bool', ftZero: 'bool', npWhy: 'bool', npStory: 'bool',
+     // wave 5.2: the number line (Start / End are signed decimals: N = minus, P = point)
+     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
+ });
+diff --git a/js/modules/skill-options.js b/js/modules/skill-options.js
+index e33ab288..2bf47740 100644
+--- a/js/modules/skill-options.js
++++ b/js/modules/skill-options.js
+@@ -1512,6 +1512,11 @@ const CB_CHART_LINE_OPTIONS = {
+             values: [{ v: 1, l: 'From 1 (the 1 row and column may show)' }, { v: 2, l: 'From 2 (no 1 row, no 1 column)' }],
+             help: 'From 2 keeps the 1 row and the 1 column out of the window, where every product is just the other number.',
+         },
++        {
++            // Lesson 4 coverage (2026-10-17): the lesson's chart is 2-12 without the 10s, products to 100.
++            id: 'skipTen', label: 'Skip the 10s', type: 'bool', default: false, group: 'difficulty',
++            help: 'On: a window never holds the 10 row or the 10 column (the chart reads 8, 9, 11, 12), and no product is over 100. A window only.',
++        },
+     ],
+     'multiplication:mult_chart_easy': [
+         levelSubset([2, 1, 0], 2, 'The same chart every time: level 2 leaves 8 cells to fill, level 1 leaves 16, '
+@@ -1955,6 +1960,17 @@ const _ftOptions = (easy) => [
+         values: [{ v: 'any', l: 'Any number to 10' }, { v: '2-5-10', l: '2, 5 and 10 only' }, { v: '2-3-5-10', l: '2, 3, 5 and 10 only' }],
+         help: 'The number a × or ÷ rule uses. "2, 5 and 10 only" keeps the rules to the facts a Grade 3 class learns first.',
+     },
++    {
++        // Lessons 4-5 coverage (2026-10-17): + and − rules by the steps a Grade 3 class adds and takes in its head.
++        id: 'ftSteps', label: '+ and − by', type: 'enum', default: 'any', group: 'difficulty',
++        values: [{ v: 'any', l: 'Any number the band allows' }, { v: '2-10', l: '2 to 10 only' }],
++        help: '"2 to 10 only" keeps a + or − rule to the facts to 20, starts the In numbers at 2, and (unless First row fits two rules is on) never lets row 1 of a + or − table also fit a × or ÷ rule.',
++    },
++    {
++        // Lessons 4-5 coverage: the − edge case, a row whose Out is 0.
++        id: 'ftZero', label: 'Out of 0', type: 'bool', default: false, group: 'difficulty',
++        help: 'On: about half the − tables hold a row whose Out is 0 (7 − 7 = 0). Off: an Out of 0 comes up only by chance.',
++    },
+     {
+         id: 'support', label: 'Support', type: 'enum', default: 'frame', group: 'support',
+         values: [
+@@ -2020,6 +2036,37 @@ SKILL_OPTIONS['algebra:function_table_easy'] = _ftOptions(true);
+ SKILL_OPTIONS['algebra:function_table_hard'] = _ftOptions(false);
+ OPTION_FOLDS['algebra:function_table_easy'] = _ftFold(true);
+ OPTION_FOLDS['algebra:function_table_hard'] = _ftFold(false);
++// patterns:notice_patterns (build list patterns_notice; lessons 4-5 coverage, 2026-10-17): is the product or
++// the sum even or odd, read from the two numbers, and why (the property). Read by gen-notice-patterns.js.
++SKILL_OPTIONS['patterns:notice_patterns'] = [
++    {
++        id: 'npTable', label: 'Table', type: 'enum', default: 'both', group: 'difficulty',
++        values: [{ v: 'mult', l: 'Multiplication table (7 × 4: even or odd?)' }, { v: 'add', l: 'Addition table (7 + 4: even or odd?)' }, { v: 'both', l: 'Both, dealt in turn' }],
++        help: 'Which table the pattern comes from. Multiplication: one even number makes the product even. Addition: two evens or two odds make an even sum.',
++    },
++    {
++        id: 'npWhy', label: 'Say why', type: 'bool', default: true, group: 'difficulty',
++        help: 'On: the pupil checks one of four sentences, Even or Odd with the reason ("Even. One or both numbers are even."). Off: just Even or Odd.',
++    },
++    {
++        id: 'npStory', label: 'Story', type: 'bool', default: false, group: 'layout',
++        help: 'On: the two numbers come in a short story ("There are 4 bags. Each bag has 7 apples."). Off: the fact alone (4 × 7).',
++    },
++    {
++        id: 'constant', label: 'Tables', type: 'set', group: 'difficulty',
++        default: [2, 3, 4, 5, 6, 7, 8, 9, 10],
++        values: Array.from({ length: 9 }, (_, k) => ({ v: k + 2, l: String(k + 2) })),
++        allLabel: 'All (2 to 10)', titleVerb: 'Times tables',
++        help: 'Multiplication items: one of the two numbers comes from the ticked tables; the other is 2 to 10.',
++    },
++];
++
++// The story tables (lesson 5 coverage, 2026-10-17): find the one-step rule of a table told as a story.
++// The same schema, the one-step rules only; the task is always "find the rule".
++SKILL_OPTIONS['algebra:function_table_story'] = _ftOptions(true)
++    .filter((d) => !d.hidden && d.id !== 'ftTask')
++    .map((d) => (d.id === 'ftRules' ? { ...d, default: ['+', '-', 'x'], values: d.values.filter((v) => v.v.length === 1 && v.v !== '/'), allLabel: 'Every kind (+, − and ×)' }
++        : d.id === 'band' ? { ...d, default: 50 } : d.id === 'ftTable' ? { ...d, default: ftTableValue(3, false) } : d));
+ // ============================ end function tables ============================
+ // ===========================================================================
+ // P12 · EVERY OTHER FAMILY  (design/audit/OPTIONS-RUBRIC.md, 2026-09-25)
+diff --git a/js/modules/standards-audit.js b/js/modules/standards-audit.js
+index 1f558354..7828df3f 100644
+--- a/js/modules/standards-audit.js
++++ b/js/modules/standards-audit.js
+@@ -121,7 +121,7 @@ export const CCSS_AUDIT = {
+     '3.OA.B.6': F(['multiplication:mult_div_fact_family', 'division:missing_mult_div']),
+     '3.OA.C.7': F(['multiplication:mult_facts', 'division:div_facts']),
+     '3.OA.D.8': P(['algebra:multi_step_word', 'number_sense:estimate_sums_diffs'], ['two-step problems with × and ÷ (the skill\'s two steps are + and − only)', 'an equation with a letter for the unknown', 'one-step pools and tape diagrams were tagged here: tags moved to the one-step standards'], ['multi_step_four_ops', 'mental_estimate']),
+-    '3.OA.D.9': P(['multiplication:mult_chart', 'patterns:number_patterns_rule', 'patterns:count_by_fill'], ['patterns in the addition table', 'explain a pattern with a property (4 × n is always even)'], ['patterns_notice']),
++    '3.OA.D.9': F(['multiplication:mult_chart', 'patterns:number_patterns_rule', 'patterns:count_by_fill', 'patterns:notice_patterns', 'algebra:function_table_easy', 'algebra:function_table_story'], 'multiplication table: mult_chart task even and notice_patterns (npTable mult); addition table: notice_patterns (npTable add); explain with a property: notice_patterns npWhy (the reason bank); rules: function tables and number_patterns_rule (lessons 4-5 coverage, 2026-10-17)'),
+     '3.NBT.A.1': F(['number_sense:nearest_10', 'number_sense:nearest_100', 'number_sense:rounding_visual']),
+     '3.NBT.A.2': F(['addition:add_1k_mixed', 'subtraction:sub_1k_mixed']),
+     '3.NBT.A.3': F(['multiplication:mult_zeros']),
+diff --git a/js/modules/standards.js b/js/modules/standards.js
+index 15df29e1..ce4b5845 100644
+--- a/js/modules/standards.js
++++ b/js/modules/standards.js
+@@ -530,6 +530,7 @@ export const SKILL_STANDARDS = {
+     'patterns:pattern_relationship': { ccss: ['5.OA.B.3'], ee: ['M.EE.5.OA.3'] }, // Two Patterns, Find Relationship (Visual)
+     'patterns:mixed_patterns': { ccss: [], ee: [], pool: true }, // Mixed Patterns
+     'patterns:number_patterns_rule': { ccss: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'] }, // Number Patterns: Count On, Count Back, Double
++    'patterns:notice_patterns': { ccss: ['3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Even or Odd? Patterns in the Addition and Multiplication Tables (2026-10-17)
+ 
+     // ---- algebra
+     'algebra:tape_diagram': { ccss: ['2.OA.A.1', '3.NBT.A.2'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Tape Diagrams / Bar Models (Visual)
+@@ -545,6 +546,7 @@ export const SKILL_STANDARDS = {
+     'algebra:combine_like_terms': { ccss: ['6.EE.A.3', '6.EE.A.4'], ee: ['M.EE.6.EE.3'] }, // Combine Like Terms
+     'algebra:distributive_expr': { ccss: ['6.EE.A.3'], ee: ['M.EE.6.EE.3'] }, // Distributive Property of Expressions
+     'algebra:function_table_easy': { ccss: ['4.OA.C.5', '5.OA.B.3', '3.OA.D.9'], ee: ['M.EE.4.OA.5', 'M.EE.5.OA.3', 'M.EE.3.OA.8'] }, // Function Tables - Easy (Visual)
++    'algebra:function_table_story': { ccss: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'] }, // Function Table Stories: Find the Rule (2026-10-17)
+     'algebra:function_table_hard': { ccss: ['4.OA.C.5', '5.OA.B.3', '6.EE.C.9'], ee: ['M.EE.4.OA.5', 'M.EE.5.OA.3'] }, // Function Tables - Hard (Visual)
+     'algebra:algebra_word_mixed': { ccss: ['4.OA.A.3', '3.OA.D.8'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Mixed Algebra Word Problems (Visual)
+     'algebra:algebra_word_mixed_plain': { ccss: ['4.OA.A.3', '3.OA.D.8'], ee: ['M.EE.4.OA.3', 'M.EE.3.OA.7'] }, // Mixed Algebra Word Problems (No Pictures)
+diff --git a/tests/baselines/codec-registry.snapshot.json b/tests/baselines/codec-registry.snapshot.json
+index f189bddf..c2e15bce 100644
+--- a/tests/baselines/codec-registry.snapshot.json
++++ b/tests/baselines/codec-registry.snapshot.json
+@@ -116,7 +116,13 @@
+     "ftFactors": "5U",
+     "tenDir": "4E",
+     "tenValues": "4F",
+-    "tenPlain": "4G"
++    "tenPlain": "4G",
++    "skipTen": "5W",
++    "ftSteps": "4W",
++    "ftZero": "4V",
++    "npTable": "4U",
++    "npWhy": "4T",
++    "npStory": "4S"
+   },
+   "blocks": {
+     "0": {
+@@ -757,7 +763,20 @@
+       "both": "B"
+     },
+     "tenValues": {},
+-    "tenPlain": {}
++    "tenPlain": {},
++    "skipTen": {},
++    "ftSteps": {
++      "any": "A",
++      "2-10": "T"
++    },
++    "ftZero": {},
++    "npTable": {
++      "mult": "M",
++      "add": "A",
++      "both": "B"
++    },
++    "npWhy": {},
++    "npStory": {}
+   },
+   "scalarOnly": {
+     "range": "decimal",
+@@ -801,7 +820,11 @@
+     "minFactor": "decimal",
+     "ftTrap": "bool",
+     "tenValues": "bool",
+-    "tenPlain": "bool"
++    "tenPlain": "bool",
++    "skipTen": "bool",
++    "ftZero": "bool",
++    "npWhy": "bool",
++    "npStory": "bool"
+   },
+   "subranges": {
+     "3B-3M": "build lane k2 (BUILD_LIST.md)",
+diff --git a/tests/scripts/scratch-laneb-kit.cjs b/tests/scripts/scratch-laneb-kit.cjs
+new file mode 100644
+index 00000000..6a5a18d0
+--- /dev/null
++++ b/tests/scripts/scratch-laneb-kit.cjs
+@@ -0,0 +1,27 @@
++// scratch (not committed): render kit independent pages for lane B skills + screen cards
++const fs = require('fs');
++const path = require('path');
++const { open, renderScreen, shoot } = require('../lib/ws-harness.cjs');
++const OUT = process.argv[2];
++(async () => {
++    const app = await open();
++    const jobs = [
++        ['np-default', 'patterns', 'notice_patterns', {}],
++        ['np-plain', 'patterns', 'notice_patterns', { npWhy: false }],
++        ['np-story', 'patterns', 'notice_patterns', { npStory: true, npTable: 'mult', npWhy: false }],
++        ['fts', 'algebra', 'function_table_story', {}],
++    ];
++    for (const [name, categoryId, skillId, opts] of jobs) {
++        const html = await app.page.evaluate(async ({ categoryId, skillId, opts }) => {
++            const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId, skillId, opts }] }], size: 'L', look: 'ican', seed: 77, key: true });
++            return window.sheetDocument(r.docHtml || [r.pupilHtml, r.keyHtml].join('\n'), 'x');
++        }, { categoryId, skillId, opts });
++        const p = await app.page.browser().newPage();
++        await p.goto(app.base ? app.base + '/index.html' : 'about:blank');
++        await p.setContent(html, { waitUntil: 'load' });
++        await p.evaluate(() => document.fonts && document.fonts.ready);
++        await p.pdf({ path: path.join(OUT, name + '.pdf'), format: 'A4', printBackground: true });
++        await p.close();
++    }
++    await app.close();
++})().catch((e) => { console.error(e); process.exit(1); });
+diff --git a/tests/scripts/scratch-laneb-sample.cjs b/tests/scripts/scratch-laneb-sample.cjs
+new file mode 100644
+index 00000000..03b443db
+--- /dev/null
++++ b/tests/scripts/scratch-laneb-sample.cjs
+@@ -0,0 +1,25 @@
++// scratch (not committed): sample the lane B skills / options
++const { open } = require('../lib/ws-harness.cjs');
++(async () => {
++    const app = await open();
++    const res = await app.page.evaluate(() => {
++        const G = (category, skill, opts, i) => window.generateQuestionFor({ category, skill, opts, seed: 1000 + i, itemIndex: i, range: 100, decimals: 0 });
++        const out = {};
++        // mult_chart skipTen
++        let ten = 0, big = 0, n = 0;
++        for (let i = 0; i < 200; i++) { const q = G('multiplication', 'mult_chart', { chart: 'window', band: 144, task: 'even', minFactor: 2, winRows: 2, winCols: 3, skipTen: true }, i); const p = q.cell.payload; n++; if (p.rows.concat(p.cols).includes(10)) ten++; if (Math.max(...p.rows) * Math.max(...p.cols) > 100) big++; }
++        out.chart = { n, ten, big };
++        let in9 = 0;
++        for (let i = 0; i < 100; i++) { const q = G('multiplication', 'mult_chart', { chart: 'window', band: 100, task: 'fill', minFactor: 2, winRows: 2, winCols: 3, skipTen: true }, i); const p = q.cell.payload; if (p.rows.concat(p.cols).every((v) => v <= 9)) in9++; }
++        out.chartFill9 = in9;
++        // function tables
++        const ft = (opts) => { const s = { n: 0, k: {}, zero: 0, x1: 0, plain: 0 }; for (let i = 0; i < 300; i++) { const q = G('algebra', 'function_table_easy', opts, i); const p = q.cell.payload; s.n++; const r = p.rule[0]; s.k[r.op + r.n] = (s.k[r.op + r.n] || 0) + 1; if (p.rows.some((w) => w.y === 0)) s.zero++; if (p.rows[0].x >= 2) s.x1++; } return s; };
++        out.ftLesson = ft({ ftTask: 'rule', ftRules: ['+', '-', 'x'], band: 50, ftTable: 31, support: 'frame', ftFactors: '2-3-5-10', ftSteps: '2-10' });
++        out.ftZero = ft({ ftTask: 'rule', ftRules: ['-'], band: 50, ftTable: 41, support: 'frame-bare', ftFactors: '2-3-5-10', ftSteps: '2-10', ftZero: true });
++        out.story = [0, 1, 2, 3, 4, 5].map((i) => { const q = G('algebra', 'function_table_story', { ftRules: ['+', '-', 'x'], ftSteps: '2-10', ftFactors: '2-3-5-10' }, i); return { lines: q.storyLines, ans: q.ans, text: q.text }; });
++        out.np = [0, 1, 2, 3, 4, 5].map((i) => { const q = G('patterns', 'notice_patterns', i % 3 === 2 ? { npTable: 'mult', npStory: true, npWhy: false, constant: [4, 6, 8] } : {}, i); return { text: q.text, ans: q.ans, ops: q.operands }; });
++        return out;
++    });
++    console.log(JSON.stringify(res, null, 1));
++    await app.close();
++})();
+diff --git a/tests/scripts/ws-content-audit.cjs b/tests/scripts/ws-content-audit.cjs
+index 1595b092..341b9c76 100644
+--- a/tests/scripts/ws-content-audit.cjs
++++ b/tests/scripts/ws-content-audit.cjs
+@@ -78,11 +78,11 @@ const TM_IDS = new Set([
+ ]);
+ // Function tables (2026-09-25): the two algebra skills only, judged by ftRules() below.
+ const FT_CATS = ['algebra'];
+-const FT_SKILLS = new Set(['function_table_easy', 'function_table_hard']);
++const FT_SKILLS = new Set(['function_table_easy', 'function_table_hard', 'function_table_story']);
+ const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS, ...FT_CATS, ...TM_CATS];
+ // Skills audited outside the three families' categories: the number pattern skill of 2026-09-25
+ // is held to its own rule (countByRules) with none of the families' name-readers.
+-const EXTRA_SKILLS = new Map([['patterns:number_patterns_rule', 'patterns']]);
++const EXTRA_SKILLS = new Map([['patterns:number_patterns_rule', 'patterns'], ['patterns:notice_patterns', 'patterns']]);
+ const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : FT_CATS.includes(cat) ? 'ftable' : TM_CATS.includes(cat) ? 'tm' : 'k2');
+ const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS, ftable: FT_CATS, tm: TM_CATS };
+ 
+@@ -630,6 +630,12 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
+             if (Array.isArray(q.options) && q.options.some(o => o && typeof o === 'object' && 'correct' in o)) item.optCorrect = q.options.map(o => ({ label: String(o.label), correct: !!o.correct }));
+             item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
+         }
++        // notice_patterns (lessons 4-5 coverage, 2026-10-17): the parity cell's payload, judged by parityRule below.
++        if (q.cell && q.cell.template === 'parity') {
++            item.cellT = 'parity';
++            try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
++            item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
++        }
+         if (q.cell && q.cell.template && ['counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic'].includes(q.cell.template)) {
+             item.cellT = q.cell.template;
+             try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
+@@ -1458,8 +1464,33 @@ function k2Rules(skill, items, live, r, F, NOTE) {
+     if (mcNumeric) F('mc-parity', `${mcNumeric} of ${live} items turn a NUMBER into a row of buttons; a written-answer item is never converted to multiple choice (P-29)`);
+     if (mcLabel) NOTE('mc-label', `${mcLabel} of ${live} items answer by picking a label from a bank rather than writing; allowed, but the printed cell must draw the same bank`);
+ 
++    // -- even or odd (notice_patterns): the checked sentence is TRUE of the two numbers, recomputed here from
++    // the arithmetic (never from the generator's helper): x even unless both odd; + even when both alike; the
++    // reason half names the two numbers' own parities; the answer shipped is the label checked.
++    const par = items.filter(it => it && it.cellT === 'parity' && it.cellP);
++    if (par.length) {
++        const badP = [];
++        for (const it of par) {
++            const p = it.cellP, a = Number(p.a), b = Number(p.b);
++            const v = p.op === 'x' ? a * b : a + b;
++            const label = String((p.labels || [])[p.correct] || '');
++            const word = v % 2 === 0 ? 'Even' : 'Odd';
++            if (!label.startsWith(word)) badP.push(`${a} ${p.op} ${b} = ${v} keyed "${label}"`);
++            if (p.why) {
++                const alike = a % 2 === b % 2, oneEven = a % 2 === 0 || b % 2 === 0;
++                const want = p.op === 'x' ? (oneEven ? /one or both numbers are even/i : /both numbers are odd/i) : (alike ? /both are even, or both are odd/i : /one is even, one is odd/i);
++                if (!want.test(label)) badP.push(`${a} ${p.op} ${b}: the reason "${label}" is not true of the numbers`);
++            }
++            if (String(it.ans) !== label) badP.push(`answer "${it.ans}" is not the checked label "${label}"`);
++            if (p.op === 'x' && !(a >= 2 && a <= 10 && b >= 2 && b <= 10)) badP.push(`a factor outside 2-10: ${a} x ${b}`);
++            if (p.op === '+' && !(a >= 1 && a <= 10 && b >= 1 && b <= 10)) badP.push(`an addend outside the addition table: ${a} + ${b}`);
++        }
++        r.parityItems = par.length;
++        if (badP.length) F('parity', `${badP.length} of ${par.length} even-or-odd items are wrong: ${[...new Set(badP)].slice(0, 4).join('; ')}`);
++    }
++
+     // -- a last resort: did anything at all get checked? ---------------------
+-    const touched = (r.k2BandChecked || 0) + (r.frameItems || 0) + (r.b10Items || 0) + (r.rodItems || 0)
++    const touched = (r.parityItems || 0) + (r.k2BandChecked || 0) + (r.frameItems || 0) + (r.b10Items || 0) + (r.rodItems || 0)
+         + (r.chartItems || 0) + (r.pictureChecked || 0) + (r.eqChecked || 0);
+     r.k2Touched = touched;
+     if (!touched) NOTE('unaudited', `NOTHING in this skill could be checked against its name: no count band, no declared representation, no countable picture and no readable equation. It is listed as passing only because there is nothing here to fail it.`);
+@@ -2538,7 +2569,7 @@ function selfTest() {
+                     for (let i = 0; i < per; i++) {
+                         try {
+                             const q = window.generateQuestionFor({ category: categoryId, skill: skillId, range: 100, decimals: 0, opts, seed: baseSeed + c * 1000 + i, itemIndex: i });
+-                            const band = opts.band || (q.cell && q.cell.payload ? (skillId === 'function_table_hard' ? 100 : 20) : 0);
++                            const band = opts.band || (q.cell && q.cell.payload ? (skillId === 'function_table_hard' ? 100 : skillId === 'function_table_story' ? 50 : 20) : 0);
+                             out.push({ q: { ans: q.ans, cell: q.cell, printFormat: q.printFormat }, band });
+                         } catch (e) { out.push({ q: null, band: 0 }); }
+                     }

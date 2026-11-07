@@ -21,7 +21,7 @@
 
 import {
     gridHeightMm, bodyHeightMm, headerHeightMm, FULL_HEADER, factRowsCapacity, stackMaxColumns,
-    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit,
+    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt, fillLimit, packByHeight,
 } from '../../js/modules/sheet/layout.js';
 import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
@@ -31,10 +31,12 @@ import {
     renderPlan, sectionInstructionKey, instructionHtml, levelLine, estimateTitleLines,
 } from '../../js/modules/sheet/roles/practice.js';
 import { ROLE_IDS, ROLE_MODULES, ROLE_ALIASES } from '../../js/modules/sheet/roles/index.js';
+import { fineSplit } from '../../js/modules/sheet/roles/practice.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
-import { factRowsLayout, FIT_CLEAR_MM } from '../../js/modules/sheet/roles/fact-rows.js';
+import { factRowsLayout, FIT_CLEAR_MM, plan as factRowsPlan } from '../../js/modules/sheet/roles/fact-rows.js';
+import { compactArc, compactGutterEm } from '../../js/modules/sheet/cells/long-division.js';
 import { LIVE_W_MM } from '../../js/modules/sheet/roles/compose.js';
 import { EM_MM as KIT_EM_MM, FACT_TRACK_EM as KIT_FACT_TRACK_EM, FACT_OP_TRACK_EM as KIT_FACT_OP_TRACK_EM } from '../../js/modules/sheet/index.js';
 
@@ -272,6 +274,7 @@ eq(labelStarts([6, 6, 4, 4]).starts, [1, 7, 13, 17], 'CL-12: letters run on acro
 }
 eq(labelStarts([6, 6, 6, 6, 6], { style: 'tab' }).starts, [1, 7, 13, 19, 25], 'CL-33: Daily tabs number 1 to N across the sheet');
 eq(labelStarts([6, 6], { restartEachPage: true }).starts, [1, 1], 'PT-LBL-7: pages handed out alone restart at a.');
+eq(labelStarts([20, 4, 10], { style: 'letter', pageOf: [0, 0, 1] }).starts, [1, 21, 1], 'CL-13 (letter style, CL-11a made tabs the default): a run restarts at a. only at a page boundary, never inside a page (two parts of one page)');
 eq(scoreDenominator([6, 6, 4, 4]), 20, 'PT-FRM-4: Score = every scored cell on the sheet');
 {
     // Two sections: the second joins the first page only when its instruction and rows fit.
@@ -824,6 +827,126 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     const ink = (KIT_FACT_OP_TRACK_EM + f1.tracks * KIT_FACT_TRACK_EM) * (KIT_EM_MM[f1.digitPt] || (f1.digitPt / 72) * 25.4);
     ok(f1.cols <= 7 && (inner - ink) / 2 >= 1 && FIT_CLEAR_MM >= 2, `F1: sub_10k_no_regroup at S <= 7 columns with >= 1 mm clearance each side (${f1.cols} cols, ${((inner - ink) / 2).toFixed(2)} mm)`);
 }
+// Owner ruling 2026-10-30 (PAGE_TYPES PT-FRW-9): div_facts reaches the full 10 fact-row columns in
+// all three notations - the ÷ sign (Standard / Vertical, stacked), the fraction and the bracket -
+// at Size S Auto and at an explicit 10 at every size; 5 / 6 / 8 are honoured; whole rows (Mix thirds within one);
+// digits never below 16 pt; every form's ink + FIT_CLEAR_MM fits its column (the real-fit gate).
+{
+    const dq = (a, b, form) => ({ q: { a, b, op: '÷', ans: a / b, divForm: form, categoryId: 'division', skillId: 'div_facts', text: `${a} ÷ ${b} = ?`,
+        cell: form === 'long' ? { template: 'division', v: 1, payload: { dividend: a, divisor: b, fact: true } }
+            : { template: form === 'fraction' ? 'equation' : 'fact', v: 1, payload: { a, b, op: '/', ...(form === 'fraction' ? { notation: 'fraction', fact: true } : {}) } } } });
+    // the 12 x 12 band's widest facts (3-digit dividends over 2-digit divisors) and some narrow ones
+    const PAIRS = [[144, 12], [132, 11], [120, 10], [108, 9], [121, 11], [7, 7], [0, 12], [81, 9], [56, 8], [110, 10], [99, 11], [36, 4]];
+    const MIX = ['standard', 'long', 'fraction'];
+    const set = (form) => PAIRS.map(([a, b], i) => dq(a, b, form === 'mix' ? MIX[i % 3] : form));
+    const em = (pt) => KIT_EM_MM[pt] || (pt / 72) * 25.4;
+    for (const form of ['standard', 'vertical', 'long', 'fraction', 'mix']) {
+        for (const size of ['S', 'M', 'L']) {
+            for (const columns of ['auto', 5, 6, 8, 10]) {
+                const want = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
+                const L = factRowsLayout(set(form), { skills: [], ctx: { size }, columns });
+                const tag = `PT-FRW-9 div_facts ${form} ${size} columns ${columns}`;
+                eq(L.cols, want, `${tag}: ${want} columns`);
+                ok(L.digitPt >= 16, `${tag}: digits ${L.digitPt} pt >= 16`);
+                const inner = cellWidthMm(L.cols, LIVE_W_MM, 'daily').inner;
+                // the stacked ÷: the rule spans the 0.62 em ÷ track and three 0.72 em digit tracks
+                const ink = L.row ? L.row.inkMm : (0.62 + L.tracks * KIT_FACT_TRACK_EM) * em(L.digitPt);
+                ok(ink + FIT_CLEAR_MM <= inner + 1e-6, `${tag}: ink ${ink.toFixed(2)} mm + ${FIT_CLEAR_MM} mm fits the ${inner.toFixed(2)} mm cell`);
+                // (critic r1 R1-2: whole rows, no short last row - the dealer's blocks of three keep thirds within one)
+                eq(L.perPage, L.cols * L.rows, `${tag}: whole rows (${L.perPage} a page)`);
+                ok(!L.across, `${tag}: never the 3-column across page`);
+                // (critic r2 R2-1 as a regression guard - the owner keeps the bracket at 10 columns: the model's whites
+                // never under r2's, divisor side >= 0.22 mm (0.27 measured), dividend side >= 0.3 mm)
+                if (L.row && L.row.trackMm) {
+                    const e = em(L.digitPt), t = L.row.trackMm / e, roomEm = L.row.roomMm / e;
+                    for (const [a, b] of PAIRS) {
+                        const A = compactArc(b, a, t, compactGutterEm(b, a, t, e, roomEm), e);
+                        ok(A.a * e >= 0.22 - 1e-9 && A.b * e >= 0.3 - 1e-9, `${tag}: ${b} ) ${a} arc whites ${(A.a * e).toFixed(2)} / ${(A.b * e).toFixed(2)} mm (>= 0.22 divisor, >= 0.3 dividend)`);
+                    }
+                }
+            }
+        }
+    }
+}
+// Owner ruling 2026-10-31 (facts card §5): a fact-rows page MIXES the ÷ forms (fraction, ÷ sign, bracket)
+// with the + - x ÷ fast facts in ONE grid, or shows any of them alone. One grid, one cell width, the columns
+// the narrowest form fits (10 when all fit; a x answer over 99 keeps PT-FRW-5's 8), every form drawn, the
+// real-fit gate on the widest ink, never the across page, never a Mix thirds trim.
+{
+    const fq = (a, b, op, cat, skill, ans, form) => ({ q: { a, b, op, ans, ...(form ? { divForm: form } : {}), categoryId: cat, skillId: skill, text: `${a} ${op} ${b} = ?`,
+        cell: form === 'long' ? { template: 'division', v: 1, payload: { dividend: a, divisor: b, fact: true } }
+            : { template: form === 'fraction' ? 'equation' : 'fact', v: 1, payload: { a, b, op: { '+': '+', '-': '-', '×': 'x', '÷': '/' }[op], ...(form === 'fraction' ? { notation: 'fraction', fact: true } : {}) } } } });
+    const FORMS = ['standard', 'long', 'fraction'];
+    const divs = [[144, 12], [132, 11], [120, 10], [7, 7], [0, 12], [81, 9]].map(([a, b], i) => fq(a, b, '÷', 'division', 'div_facts', a / b, FORMS[i % 3]));
+    const addSub = [fq(9, 8, '+', 'addition', 'add_facts', 17), fq(10, 10, '+', 'addition', 'add_facts', 20), fq(17, 9, '-', 'subtraction', 'sub_facts', 8), fq(20, 7, '-', 'subtraction', 'sub_facts', 13)];
+    const mult = [fq(12, 12, '×', 'multiplication', 'mult_facts', 144), fq(7, 8, '×', 'multiplication', 'mult_facts', 56)];
+    const em = (pt) => KIT_EM_MM[pt] || (pt / 72) * 25.4;
+    const SETS = {
+        'add+sub+div(Mix)': [...addSub, ...divs],
+        'add+sub+mult+div(Mix)': [...addSub, ...mult, ...divs],
+        'add+sub+mult+div(long)': [...addSub, ...mult, ...divs.map((d) => fq(d.q.a, d.q.b, '÷', 'division', 'div_facts', d.q.ans, 'long'))],
+        'add+div(fraction)': [...addSub.slice(0, 2), ...divs.map((d) => fq(d.q.a, d.q.b, '÷', 'division', 'div_facts', d.q.ans, 'fraction'))],
+        'mult+div(standard)': [...mult, ...divs.map((d) => fq(d.q.a, d.q.b, '÷', 'division', 'div_facts', d.q.ans, 'standard'))],
+    };
+    for (const [name, items] of Object.entries(SETS)) {
+        const big = items.some((it) => it.q.op === '×' && it.q.ans > 99);
+        for (const size of ['S', 'M', 'L']) {
+            for (const columns of ['auto', 5, 6, 8, 10]) {
+                const asked = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
+                const want = big ? Math.min(asked, 8) : asked;
+                const L = factRowsLayout(items, { skills: [], ctx: { size }, columns });
+                const tag = `owner 2026-10-31 mixed facts ${name} ${size} columns ${columns}`;
+                eq(L.cols, want, `${tag}: ${want} columns`);
+                ok(L.mixed === true && !L.across && L.forms, `${tag}: one mixed grid of forms, never across`);
+                ok(L.digitPt >= 16, `${tag}: digits ${L.digitPt} pt >= 16`);
+                const inner = cellWidthMm(L.cols, LIVE_W_MM, 'daily').inner;
+                ok(L.row.inkMm + FIT_CLEAR_MM <= inner + 1e-6, `${tag}: widest ink ${L.row.inkMm} mm + ${FIT_CLEAR_MM} mm fits the ${inner.toFixed(2)} mm cell`);
+                eq(L.perPage, L.cols * L.rows, `${tag}: the page is filled (no thirds trim)`);
+                ok(L.rows * L.hMin <= L.gridH, `${tag}: ${L.rows} rows of ${L.hMin} mm fit the ${L.gridH} mm grid`);
+            }
+        }
+    }
+    // R2-2 COUNT-FITS (critic r2): the page is dealt from a PROBE deal's count and laid from the FINAL deal. Over
+    // seeds 1-24, a final deal of the probe's count prints exactly cols x rows = perPage = Score /N, whichever of the
+    // two deals carried a product over 99 (the 8-column clamp). Mixes with x, S / M / L x Auto / 8 / 10.
+    {
+        const rnd = (seed) => { let x = seed * 2654435761 >>> 0; return () => { x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; }; };
+        const deal = (kinds, n, seed) => {
+            const r = rnd(seed); const out = [];
+            for (let i = 0; i < n; i++) {
+                const k = kinds[i % kinds.length];
+                const a = Math.floor(r() * 13), b = Math.floor(r() * 13);
+                if (k === '+') out.push(fq(a, b, '+', 'addition', 'add_facts', a + b));
+                else if (k === '-') out.push(fq(a + b, b, '-', 'subtraction', 'sub_facts', a));
+                // (x facts mostly small: a probe or a final deal may hold no product over 99)
+                else if (k === '×') { const aa = r() < 0.9 ? a % 10 : a, bb = r() < 0.9 ? b % 10 : b; out.push(fq(aa, bb, '×', 'multiplication', 'mult_facts', aa * bb)); }
+                else { const bb = 1 + (b % 12), q = a; out.push(fq(bb * q, bb, '÷', 'division', 'div_facts', q, k.slice(1) || 'standard')); }
+            }
+            return out;
+        };
+        const MIXES = { '+-x÷Mix': ['+', '-', '×', '÷standard', '÷long', '÷fraction'], '+x÷long': ['+', '×', '÷long'], '+x': ['+', '×'], '+-x÷': ['+', '-', '×', '÷standard'] };
+        let worst = '';
+        for (const [name, kinds] of Object.entries(MIXES)) {
+            for (const size of ['S', 'M', 'L']) {
+                for (const columns of ['auto', 8, 10]) {
+                    for (let seed = 1; seed <= 24; seed++) {
+                        const input = { skills: [], ctx: { size }, columns };
+                        const want = factRowsLayout(deal(kinds, 90, seed), input).perPage;       // the probe's count
+                        const items = deal(kinds, want, seed + 1000);                              // the final deal
+                        const P = factRowsPlan(Object.assign({}, input, { items }));
+                        const f = P.meta.fits[0];
+                        const printed = P.meta.items;
+                        if (!(printed === f.perPage && printed === f.cols * f.rows && P.meta.scoreOutOf === printed)) worst = worst || `${name} ${size} ${columns} seed ${seed}: printed ${printed}, fits ${f.cols} x ${f.rows} = ${f.perPage}, Score /${P.meta.scoreOutOf}`;
+                    }
+                }
+            }
+        }
+        ok(!worst, `R2-2 COUNT-FITS: printed = cols x rows = Score /N on seeds 1-24 for every mix with x${worst ? ` (${worst})` : ''}`);
+    }
+    // alone: each fact skill keeps its own page (div_facts Mix still deals thirds)
+    eq(factRowsLayout(addSub.slice(0, 2), { skills: [], ctx: { size: 'S' }, columns: 'auto' }).mixed, undefined, 'owner 2026-10-31: addition alone is not a mixed page');
+    { const L = factRowsLayout(divs, { skills: [], ctx: { size: 'S' }, columns: 'auto' }); eq(L.perPage, L.cols * L.rows, 'owner 2026-10-31: div_facts Mix alone deals whole rows'); }
+}
 // PT-MIX-1..7: Mixed practice - a shelf per skill, each with its own instruction, numbered 1..N.
 {
     const skills4 = [ADD_SKILL, SUB_SKILL, FACT_SKILL, Object.assign({}, ADD_SKILL, { skillId: 'add_100_regroup', label: 'Add within 100' })];
@@ -1089,7 +1212,7 @@ eq(levelLine([2, '3']), 'Level 2-3', 'HD-5: a level range');
 eq(levelLine(['M']), 'All levels', 'HD-5: a multi-level skill');
 eq(sectionInstructionKey(['add', 'add']), 'add', 'BD-13: one key');
 eq(sectionInstructionKey(['multiply', 'divide']), 'mixed-ops', 'BD-13: x and / mixed');
-eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div class="ws-instrline" data-ws-instruction="mixed-sign">Add or subtract. Look at the <u>sign</u>.</div>', 'BD-14: the underlined word of a library string');
+eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div class="ws-instrline" data-ws-instruction="mixed-sign"><span>Add or subtract. Look at the <u>sign</u>.</span></div>', 'BD-14: the underlined word of a library string (in one inline span: the flex line kept no space before it)');
 
 /* ================================================ the lesson (roles/lesson.js, 2026-09-25) */
 {
@@ -1210,6 +1333,97 @@ eq(instructionHtml('mixed-sign', 'Add or subtract. Look at the _sign_.'), '<div 
     ok(dense.packed && dense.perPage > 6, `packing: a dense mixed-height section packs past the practice ceiling (${dense.cols} x ${dense.rows})`);
     const plain = L(items, 'auto', 'S');
     ok(plain.perPage <= dense.perPage, 'packing: a section that is not dense keeps its ceiling');
+}
+
+// Wave 1 lane D (critic 2026-10-02): rows of DIFFERENT heights packed by height never leave an
+// orphan last page (dot_array_mult dealt 4 + 1: a last page three quarters empty). PG-23 for
+// packByHeight: a last page of a third of a page or less is rebalanced across the same pages.
+{
+    const mk = (hs) => hs.map((h, i) => ({ id: `p${i}`, measured: { 1: { hMm: h, fits: true } }, footprint: { measure: true, hMm: null, maxCols: 1 } }));
+    const grid = { gridFirstMm: 240, gridContMm: 250, maxRows: 12, cellH: 60, force: true };
+    const orphan = packByHeight(mk([50, 60, 57, 60, 40]), 1, grid);
+    eq(orphan.map((c) => c.count), [3, 2], 'PG-23 (packByHeight): 4 + 1 rows of mixed height are spread 3 + 2, not left as an orphan page');
+    ok(orphan.every((c, i, a) => i === 0 || c.from === a[i - 1].from + a[i - 1].count), 'PG-23 (packByHeight): no row is lost or repeated');
+    const used = (c, hs) => hs.slice(c.from, c.from + c.count).reduce((a, b) => a + b, 0);
+    ok(orphan.every((c) => used(c, [50, 60, 57, 60, 40]) <= grid.gridFirstMm - 1), 'PG-23 (packByHeight): every page still fits its grid');
+    const full = packByHeight(mk([50, 60, 57, 60, 40, 55, 50, 52, 45]), 1, grid);
+    ok(full.length === 2 && full[1].count * 3 > full[0].count, `PG-23 (packByHeight): a last page is never under a third of the first (${full.map((c) => c.count).join(' + ')})`);
+    const one = packByHeight(mk([50, 60, 57, 40]), 1, grid);
+    eq(one.map((c) => c.count), [4], 'PG-23 (packByHeight): a section that fits one page stays one page');
+}
+
+// Wave 1 lane D (2026-10-02): a mixed section's column problems form a group of their own in more
+// columns than the stories and pictures they are dealt with (RUBRIC H13: a three-digit column fact
+// alone in a 92 mm cell, two thirds of it empty).
+{
+    const story = (i) => ({ id: `w${i}`, template: 'word-work', fclass: 'standard', measured: { 1: { hMm: 50, fits: true }, 2: { hMm: 75, fits: true }, 3: { hMm: 80, fits: false } }, footprint: { wMm: 93, hMm: null, measure: true, maxCols: 2 } });
+    const col = (i) => ({ id: `s${i}`, template: 'stack', fclass: 'standard', measured: { 1: { hMm: 45, fits: true }, 2: { hMm: 45, fits: true }, 3: { hMm: 45, fits: true }, 4: { hMm: 45, fits: true } }, footprint: { wMm: 36, hMm: null, measure: true, maxCols: 4 } });
+    const base = { role: 'independent', columns: 'auto', dense: true };
+    const opts = { size: 'L', look: 'ican', header: FULL_HEADER };
+    const two = fineSplit(base, [story(1), col(1), story(2), col(2)], 'A4', 186, opts);
+    ok(two && two.fine.length === 2 && two.mid.length === 2 && two.cols > 2, `fineSplit: two column facts among stories take their own columns (${two && two.cols})`);
+    const six = fineSplit(base, [story(1), col(1), col(2), col(3), col(4), col(5), col(6)], 'A4', 186, opts);
+    ok(six && six.fine.length % six.cols === 0, `fineSplit: six column facts fill whole rows (${six && six.cols} columns)`);
+    ok(fineSplit(base, [story(1), col(1), story(2)], 'A4', 186, opts) === null, 'fineSplit: one column fact stays with the section');
+    ok(fineSplit(base, [col(1), col(2), col(3)], 'A4', 186, opts) === null, 'fineSplit: a section of column facts only is not split');
+}
+
+/* ============================================== wave 1 lane D round 4 (print layout / density) */
+{
+    const T = (template, payload) => ({ cell: { template, v: 1, payload } });
+    const at = (size, state = 'blank') => ({ mode: 'print', size, look: 'ican', state });
+    // D3 / L1: the one-line add_sub_10s fact follows the sheet size below its 24 pt ceiling
+    const beside = T('fact', { a: 100, b: 10, op: '-', notation: 'horiz', digits: 3, across: 'beside', pt: 24 });
+    const fS = cellFootprint(beside, resolveCtx(at('S'))), fL = cellFootprint(beside, resolveCtx(at('L')));
+    ok(fS.wMm < fL.wMm && fS.hMm < fL.hMm, `D3: the beside fact is smaller at S than at L (${fS.wMm}x${fS.hMm} vs ${fL.wMm}x${fL.hMm})`);
+    ok(/--ws-digit:16pt/.test(renderCell(beside, resolveCtx(at('S')))), 'D3: the beside fact draws 16 pt digits at S');
+    ok(/--ws-digit:24pt/.test(renderCell(beside, resolveCtx(at('L')))), 'D3: the beside fact keeps its 24 pt at L');
+    // D10: the number family is a kit cell sized by the sheet, one box per missing number, keyed
+    const nf = T('number-family', { nums: [5, 4, 9], eqs: [{ nums: [5, 4, 9], op: '+' }, { nums: [4, 5, 9], op: '+' }, { nums: [9, 5, 4], op: '-' }, { nums: [9, 4, 5], op: '-' }], miss: [[2], [2], [2], [2]] });
+    const nk = cellAnswerKey(nf);
+    eq(nk.display, '9, 9, 4, 5', 'D10: the number family keys its four boxes in reading order');
+    const nB = renderCell(nf, resolveCtx(at('S'))), nA = renderCell(nf, resolveCtx(at('S', 'answered')));
+    eq((nB.match(/data-ws-slot="nf\d"/g) || []).length, 4, 'D10: one box per missing number on the pupil page');
+    eq((nA.match(/data-ws-slot="nf\d"/g) || []).length, 4, 'D10: the key has the same four boxes (AK-4)');
+    ok(!/Number Family/.test(nB), 'D10: no heading inside the cell (L7)');
+    ok(cellFootprint(nf, resolveCtx(at('S'))).wMm < cellFootprint(nf, resolveCtx(at('L'))).wMm, 'D10: the family is narrower at S than at L');
+    // D2: a 3 x 10 dot array fits a 2-column cell at L (the drawing is as wide as its dots)
+    const arr = T('arrays', { kind: 'frame', rows: 3, cols: 10 });
+    ok(cellFootprint(arr, resolveCtx(at('L'))).wMm <= 93, `D2: a 3 x 10 array is at most a half page wide at L (${cellFootprint(arr, resolveCtx(at('L'))).wMm} mm)`);
+    // D6: long division at S may take 3 x 3 (dense ceiling 9)
+    const ld = (i) => ({ id: `ld${i}`, template: 'long-division', fclass: 'long', measured: { 1: { hMm: 49, fits: true }, 2: { hMm: 49, fits: true }, 3: { hMm: 49, fits: true }, 4: { hMm: 49, fits: true } }, footprint: { wMm: 40, hMm: null, measure: true, maxCols: 2 } });
+    const Ld = resolveSectionLayout({ role: 'independent', columns: 'auto', dense: true }, Array.from({ length: 9 }, (_, i) => ld(i)), 'A4', 186, { size: 'S', look: 'ican', header: FULL_HEADER });
+    ok(Ld.cols === 3 && Ld.perPage === 9, `D6: long division at S prints 3 x 3 (${Ld.cols} x ${Ld.rows})`);
+}
+
+/* ============================================ wave 1 lane D round 5: free rows, even rows */
+{
+    const { evenRows, TWO_COL_ROWS } = await import('../../js/modules/sheet/layout.js');
+    // D-E: rows of the same content stand at one height (the smallest any of them was given)
+    const H = evenRows([47.6, 47.6, 47.6, 30], [52.4, 56.7, 52.4, 45]);
+    ok(H[0] === 52.4 && H[1] === 52.4 && H[2] === 52.4 && H[3] === 45, `D-E: same-content rows take one height (${H.join(' / ')})`);
+    // D-B / D-D: a section in free rows may take two columns of any row count (CL-2's 2/3/4/5/8 otherwise)
+    const eq = (i) => ({ id: `eq${i}`, template: 'equation', fclass: 'short', measured: { 1: { hMm: 23, fits: true }, 2: { hMm: 23, fits: true } }, footprint: { wMm: 80, hMm: null, measure: true, maxCols: 2 } });
+    const its = Array.from({ length: 18 }, (_, i) => eq(i));
+    const L8 = resolveSectionLayout({ role: 'independent', columns: 2, count: 18, dense: true }, its, 'A4', 186, { size: 'L', look: 'ican', header: FULL_HEADER });
+    const L9 = resolveSectionLayout({ role: 'independent', columns: 2, count: 18, dense: true, freeRows: true }, its, 'A4', 186, { size: 'L', look: 'ican', header: FULL_HEADER });
+    ok(TWO_COL_ROWS.includes(L8.rows), `CL-2: two columns keep a permitted row count without free rows (${L8.rows})`);
+    ok(L9.rows >= 9 && L9.pages === 1, `D-D: free rows hold 18 short problems on one L page in 2 x 9 (${L9.cols} x ${L9.rows}, ${L9.pages} page)`);
+}
+
+/* ============================================== round 6 (critic r5 D5-5): a short last row is re-laid */
+{
+    const { grid: g6 } = await import('../../js/modules/sheet/grid.js');
+    const a = g6(['a', 'b'], { cols: 4 });
+    ok(!/blankrun/.test(a) && /relaid/.test(a) && /repeat\(4,1fr\)/.test(a) && (a.match(/span 2;/g) || []).length === 2, 'D5-5: 2 problems in a 4-column grid share the row (2 + 2 of 4 tracks), no empty area');
+    const b = g6(['a', 'b', 'c'], { cols: 2 });
+    ok(!/blankrun/.test(b) && (b.match(/span 1;/g) || []).length === 2 && (b.match(/span 2;/g) || []).length === 1, 'D5-5: 3 in 2 columns: the last problem takes the whole last row');
+    const c = g6(['a', 'b', 'c', 'd', 'e'], { cols: 3 });
+    ok(/repeat\(6,1fr\)/.test(c) && (c.match(/span 2;/g) || []).length === 3 && (c.match(/span 3;/g) || []).length === 2, 'D5-5: 5 in 3 columns: last row 2 equal cells over 6 tracks');
+    const d = g6(['a', 'b', 'c', 'd'], { cols: 2 });
+    ok(!/relaid|blankrun|span/.test(d), 'D5-5: whole rows are untouched');
+    const e = g6(['a', 'b', 'c'], { cols: 2, rows: 3 });
+    ok(/blankrun/.test(e) && !/class="ws-cell blankrun cut"/.test(e), 'PG-15: an explicit taller grid keeps one blank run inside the closed frame (no `cut`)');
 }
 
 /* ======================================================================= report */

@@ -39,21 +39,22 @@
 #            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
 #            --self-test, ws-text-vs-gen (claims vs the generator), ws-backtest --kind fixture (the S2 checks still
-#            catch their fixtures) and ws-options-pin --gate design/audit/matrix (critic r4 D1: READ-ONLY, node only,
+#            catch their fixtures), ws-lessonfit (every year's WRM site-lesson gate) and ws-options-pin --gate design/audit/matrix (critic r4 D1: READ-ONLY, node only,
 #            no browser slot, seconds: it folds the nightly's options-pin-*.json by `finished`, newest result per skill;
 #            FAIL on a NEW failing pair of a live skill that no later check fixed, WARNING while fewer than 28 slices
 #            are checked or the newest is over 24 h old, FAIL on that age once all 28 are; it never runs the pin);
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
-#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-teacher-wrm, ws-teacher-wrm --fallback,
 #            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/.
 # Session 2  ws-screen-slots in MQ_SLOTS_SHARDS parts (default 4) with --baseline design/audit/baselines/screen-slots.json,
 #            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), the S9 regression (ws-screen-slots on measurement:reading_ruler_hard, card host, seeds 1-40,
 #            --need-ans 1/4,1/2,3/4: readings under an inch show one answer area), and the sweeps on the pinned sample
 #            (tests/fixtures/precritic/sweep-sample.json): ws-screen-slots --dark / --bigboard, ws-chromebook-fit
 #            --dark / --bigboard (chromebook-fit's standing failures are pinned per skill and host in the sample file).
-# Session 3  ws-viewport-check --baseline design/audit/baselines/viewport-check.json (a real session's scroll: the
+# Session 3  ws-chromebook-perf --only load,play (the student-Chromebook load and play-through budgets, 2026-11-02),
+#            ws-viewport-check --baseline design/audit/baselines/viewport-check.json (a real session's scroll: the
 #            R7-D1 class chromebook-fit cannot see; moved here from session 2 for time, MQ_VIEWPORT_SESSION=2 moves it
 #            back), and ws-coverage-matrix on the affected rows with a DOCUMENT BUDGET (§1.6.2): MQ_COVERAGE_ARGS, default
 #            `--all --affected <base>..HEAD --baseline design/audit/matrix/baseline.json --slots 2 --batch 9`, plus
@@ -809,6 +810,11 @@ build_list() {
   browser_gate 1 ws-teacher-library ws-teacher-library.cjs
   browser_gate 1 ws-teacher-preview ws-teacher-preview.cjs
   browser_gate 1 ws-teacher-quiz ws-teacher-quiz.cjs
+  browser_gate 1 ws-pdf-preview ws-pdf-preview.cjs
+  # the ONE simple print fills the paper (owner 2026-11-03; ~45 s): FILL >= 60 % on default prints, DENSITY, fact rows, NOT3
+  browser_gate 1 ws-simple-print ws-simple-print.cjs
+  # the pupil skill explorer (owner 2026-11-05; ~30 s): by grade / by area, picks reach the bottom row, Print and Play
+  browser_gate 1 ws-student-explorer ws-student-explorer.cjs
   browser_gate 1 ws-share-options ws-share-options.cjs
   # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)
   local lf lid
@@ -833,6 +839,7 @@ build_list() {
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
+  node_gate 1 ws-lessonfit ws-lessonfit.mjs   # WRM site lessons, every year (critic 2026-10-30 Y4 F1)
   # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no
   # browser slot, seconds); it never runs the pin itself (the whole pin is ≈ 1 h 52 min on the two slots). On a node
   # worker as nfn, so its exit 4 shows as WARNING.
@@ -861,6 +868,11 @@ build_list() {
   # deployed tip reaches, capped at MQ_MATRIX_BUDGET documents; over it the newest nightly decides (matrix_gate).
   if [ -f "tests/scripts/$cm" ]; then add 3 nfn "ws-coverage-matrix --affected (budget $MATRIX_BUDGET)" "matrix_gate tests/scripts/$cm"
   else add 3 skip "ws-coverage-matrix --affected" "tests/scripts/$cm"; fi
+  # the student-Chromebook speed gate (speed lane 2026-11-02): the pupil link's load (3 runs, median) and its 50-question
+  # play-through at CPU 6x, plus the exact startup byte / module budgets (~4 min). The ~150-skill stress and the
+  # 100-skill teacher tray (~8 min more) run in full with `node tests/scripts/ws-chromebook-perf.cjs` (lanes, nightly).
+  # Timings want a quiet box: a FAIL here is re-run alone by the flake rule. MQ_PERF_SESSION moves it (default 3).
+  browser_gate "${MQ_PERF_SESSION:-3}" "ws-chromebook-perf --only load,play" ws-chromebook-perf.cjs --only load,play
   add 3 notyet "digests hook (M4 record/replay)" "the tip's digests (§1.6.2, ≈ 8 min) need M4 record/replay, which is not built; before M4 the lead accepts this one item by name: --accept-notyet digests" digests
   add 3 fn "owner go (lane manifests)" "deploy_check design/lanes design/status"
 }

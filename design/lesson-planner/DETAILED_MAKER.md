@@ -155,6 +155,25 @@ The pool keys are `factKeyOf(q)` (an operation item's operands and sign, else it
 instruction is `wordProblem.instruction` (fallback: the kit's `story` string); its lines are the
 description's (placeholders) or the dealt item's own story.
 
+## Skill coverage rule (owner, 2026-10-17) — every lesson, lessons 1-5 included
+
+A lesson is not done until its practice skills cover it on screen exactly as the paper does:
+
+1. **Paper = skill + options.** Every item type printed on a pupil page (P0, P1, P2 chart examples, P3 Guided,
+   P4 Practice, Mixed, P5, P6, the Check Question) is dealt by a registered skill with option values — never a
+   hand-written item. A pupil who practises that skill with those options online (practice card, online
+   worksheet, quiz) meets the same item type, the same response (what is written, ringed or chosen), the same
+   number range and the same edge cases as on the paper.
+2. **The skills cover the lesson and its standard.** Taken together, the lesson's skills + options deal every
+   atom and routine step the lesson teaches and every clause of each CCSS standard it is tagged to (its lettered
+   part where tagged). A clause the lesson deliberately leaves to another lesson is named, with that lesson or
+   skill; anything else missing is built (option or skill, per CLAUDE.md) in the same change — not proposed.
+3. **Recorded.** `data/curriculum/detailed-lessons.json` gives each lesson `skills.used` (every page role with its
+   skill key and opts) and `skills.coverage`: one row per standard clause and per lesson atom → the skill + opts
+   that deal it, `full` / `partial` / `elsewhere: <lesson or skill>`. A lesson passes only with no `partial` row.
+4. **Checked.** The critic checks rules 1-3 for every page; a printed item type with no skill + options that
+   deal it, or a standard clause with no covering skill, is a blocker.
+
 ## Adding a lesson
 
 1. Write `js/modules/lessons/detailed/<id>.js` in the format documented at the top of `index.js` (every
@@ -173,7 +192,8 @@ to `SELF-CHECK.md` in V22's table format. They are V22's `js v21-selfcheck` port
 | Check | How it runs here |
 |---|---|
 | E1, E1b, E2–E7, E9, E10, E12–E14, E16, E16b, E17, E17b, E18–E23, E25–E28 | ported from V22 Appendix E |
-| E9b, E11 | the site's own `sheetCheck` (ws-lesson-samples H13 and its body-blank lint), line for line |
+| E9b, E11 | the site's own `sheetCheck` (ws-lesson-samples H13 and its body-blank lint); E11 follows `ws-print-lint` L-DENSITY since CL-4b (owner, 2026-10-23, "top of the box is the default"): under a top cell the band below the item is writing room, judged against its row's other cells (H13-ROW) - 2026-10-30, lesson 6 r4 |
+| E41 | every relation a teacher page states is true of the numbers it names ("100 is 10 times 10", "30 and 300, one tenth of", "Bigger / Smaller, so …" against the pair before it); lesson 6 critic r2 D1; `--e41-fixture` runs it on a text file (ws-backtest row `e41-relation`) |
 | E8 (28 pt working digits) | the kit sets `--ws-digit: 28pt` at L for every pupil page; measured by `ws-print-lint --source kit` |
 | E15 | V22 Appendix C.1 **or** the kit's `INSTRUCTION_LIBRARY` (sheet/contract.js, the PED 10.1 library C.1 copies); strings found only in the kit are listed in the result |
 | E24, E24b | read the `#v21-pool` JSON. Its `places` list is the kit equivalent of V22's `data-item` / `data-rep` / `data-row`: the bridge reads every PRINTED cell from the plans the pages render from. The pool is V22's `{kind: 'list'}` form (the description's range, lesson 1: 21–999). E24b also fails near twins: two one-number items of one skill on a page within 2 (405 / 406, V22 LR-6) |
@@ -190,3 +210,51 @@ to `SELF-CHECK.md` in V22's table format. They are V22's `js v21-selfcheck` port
 | E35 | with `situations`: T4 quotes only story questions the pack prints or writes on the board; any "Steps are at the top of the page" line names a Practice 1 that prints its Steps band |
 | E36 | exit-slip + items: no part equals the difference of the parts (4 + 8: 8 − 4 = 4), and none is a fact (unordered) of any other page |
 | E30 | `boardOnly` (description): numbers shown on the board only (lesson 1: 1,000). The bridge passes them to every ref as a HARD bound (`refHardOk`: never relaxed, not on a ref's last try); E30 fails if one is an item, an answer, or printed (digits or name) on any pupil page or key |
+
+## Lesson 6 additions (10 times and one tenth, 4.NBT.A.1, 2026-10-17)
+
+Built for `g4-nbt1-ten-times-value` and meant for lesson 9 (5.NBT.A.1, decimals) too:
+- **Skill option** `placevalue:value` form `times` (build list `value_ten_times`) with `tenDir` (times / tenth / both),
+  `tenValues` (write both values before ringing) and `tenPlain` (700 and 70); codec keys 4E-4G, `form` token T.
+- **Template** `pv-times` (`sheet/cells/pv-times.js`): a two-row place chart, a worth box per row, the ring sentence.
+  Rows are strings with their places (a point column when a row has decimals), the choices come from the payload.
+  `stepState` draws the chart; `guidedStepOne: true` opts a template into Guided cell 1 drawn at step 1 (roles/lesson.js,
+  generic for any template with a stepState).
+- **Case tests** `ten*` (roles/lesson.js), read from `q.pv` kind `times`.
+- **Bridge** `q.dealAnswer` (print-sheet.js `dlAns`): what tells an item apart when its answer is one of two words (a
+  ring), so two ring items of one page are not the same answer. Absent on every other item: lessons 1-5 render
+  byte-identical.
+
+Lesson 6 round 2 (critic r1 D1-D4):
+- `q.factKey` (print-sheet.js `factKeyOf`): a generator names the fact the pupil produces; for "10 times" items the
+  digit and the place pair, either direction ONE key, so no chart example, Guided item or Practice item returns and
+  no turn-around shares a page (LR-5 / E24 read the same key).
+- `spreadMax` (ref) with `q.spreadKey`: no more than n items of the pack share a spread key (lesson 6: a digit, 2).
+- `pv-times` payload `sayTwo` (the sentence beside the chart, choices stacked) and `oneValue` (one worth box): the
+  exit slip half holds three items that each write a value.
+- P1 rows: the instruction column is 50 mm and a pv frame does not wrap, so a "100 more than ___" row stays on one line.
+- Gate **E40**: no item text or slot drawn outside its cell (a clip inside a fixed-height row passed E9 / E11).
+- Skill coverage (owner rule): the exit item is `placevalue:value` form times `tenWrite: 'top'` (codec 4H) and the word
+  problem `tenTask: 'story'` (4I; `q.storyText` prints the story without its screen blanks). On screen `pv-times` has
+  its own twin (screen-cell.js `pvTimesTwin`): the chart, typed value boxes and the ring words as tap tiles into a word
+  box (slot kind `word`); `ws-screen-answer --skills placevalue:value --opts {...}` passes on card, worksheet and quiz
+  for every form the lesson prints.
+
+## Lesson 7 additions (two-step stories, 3.OA.D.8, 2026-10-17)
+
+Built for `g3-oa8-two-step-wp` (build list `multi_step_four_ops`, first part):
+- **Skill options** `algebra:multi_step_word(_plain)` `msOps` (codec 4P: `addsub` default | `mult` | `div` | `multdiv`): a × or
+  ÷ table fact feeding a + or − step; guards: the Step 2 number is no Step 1 number, the answer is no story number and not
+  the Step 1 answer. The + / − archetypes also lost their cancelling case (got 9, lost 9). Every word-work skill: `wpFrames`
+  (codec 4Q): the compact cell, one number sentence a step (`Step 1: [ ] ( ) [ ] = [ ]`), the unit printed.
+- **Kit** (sheet/cells/word-work.js): `tellTwoStep` × / ÷ grammar; `layout: 'frames'`; `twoStepPart(p, k, ctx)` (a chart
+  panel's own part); `traceOp0` (Guided cell 1's Step 1 sign ringed grey); `factDiv` (a ÷ fact first step: no working rows).
+- **Provider**: four worked steps for a × / ÷-first story (the last unmarked: the chart's closing line), and the two-step
+  wrong answers `ms-stop-step1`, `ms-story-number`, `ms-one-op` (Check Question, T6).
+- **Lesson data**: `chartRow` (with `chartWide`: heads beside the drawings), `noStripChant`, `tailRead`. Case tests `ms*`.
+- **P5** `wordProblem.eqSteps` (with the vars hook `eqSteps`): one number-sentence line a step. Library string `story-steps`.
+- **Round 2 (owner skill coverage rule)**: `msOps` `addmult` / `adddiv` (+ or − first, then × or ÷; tokens P / Q);
+  `msLetter` (codec 4R: one equation with n, brackets when + or − comes first, then n) and `msCheck` (codec 4S: + / −
+  stories - each story number rounded to the nearest ten, the estimate, Yes / No) - both drawn by the frames layout;
+  library strings `story-letter`, `story-check`. The frames layout has a screen twin (inputs for every number and sign,
+  the answer box the host's cell), so wpFrames / msLetter / msCheck practise online as on paper. 3.OA.D.8 is FULL.

@@ -318,7 +318,15 @@ const looksGate = (tag, e, looks) => {
     if (by) {
         if (!declared) m12bad(`${tag} ${e.id}: a response with no answer field: "${looks}"`);
         for (const g of by[1].split(/, | and | or /)) if (!ROOT[g] || !ROOT[g].test(TT.optionResponse(e) || ans)) m12bad(`${tag} ${e.id}: "${g}" is not the declared answer "${ans}"`);
-    } else if (/\bthe pupil\b/i.test(looks) && looks !== P0.plainNote(rep)) m12bad(`${tag} ${e.id}: a response not from the answer field: "${looks}"`);
+    } else if (/\bthe pupil\b/i.test(looks)) {
+        // W2: "the pupil writes the difference and the sentence" — every clause is a clause of the answer field, its verbs
+        // in the third person (checked here by stripping the endings, not by the composer's own code)
+        const said = /; the pupil (.+)\.$/.exec(looks);
+        const norm = (s) => String(s).toLowerCase().replace(/\([^()]*\)/g, '').split(/\s+/).filter(Boolean).map((w) => w.replace(/ies$/, 'y').replace(/(sh|ch|x|s)es$/, '$1').replace(/s$/, '')).join(' ');
+        let left = said ? ` ${norm(said[1])} ` : looks;
+        for (const c of String((e.spec && e.spec.answer) || '').split(';').map((x) => norm(x.trim().replace(/[.,]$/, ''))).filter(Boolean)) left = left.split(` ${c} `).join(' | ');
+        if (!said || left.replace(/\||\band\b/g, '').trim()) m12bad(`${tag} ${e.id}: a response not from the answer field: "${looks}" (left: "${String(left).trim()}")`);
+    }
     if (looks === P0.plainNote(rep)) {
         // a build note shown whole: every response it names is one the entry declares
         for (const [v, re] of Object.entries(NOTE_VERB)) if (new RegExp(`\\b${v}\\b`, 'i').test(looks) && !(declared && re.test(ans))) m12bad(`${tag} ${e.id}: the note says "${v}", the answer is "${ans}"`);
@@ -341,8 +349,45 @@ const looksGate = (tag, e, looks) => {
     for (const w of srcs) left = left.split(w).join('');
     if (left.replace(/,|\band\b/g, '').trim()) m12bad(`${tag} ${e.id}: "${left.trim()}" (of "${shows[1]}") has no source in "${rep.slice(0, 80)}"`);
 };
+let m13 = 0;
+let m13Same = new Map();
+const m13bad = (msg) => { m13 += 1; if (m13 <= 12) console.log('M13', msg); };
+// M13 backtest: the build notes critic 2026-10-30 found shown whole must all read as build notes
+for (const t of ['A comparison-type option on compare/order.', 'A double number-line representation option.', 'Mixed-unit answer option.', 'A time-only unit option.',
+    'A polygon-type option on the perimeter skill.', 'A base option limited to 2, 5 and 10 with numbers to 100.', 'Option: cents to dollars and back.',
+    'A "count" option: faces / edges / vertices / mixed.', 'A "nearest whole" target option with a number-line support.', 'A "find the whole" task option with a bar model support.',
+    'Outline containers with a drawn fill line; circle full/empty or the one that holds more; option: order three.']) ok(TT.LOOKS_BUILD_NOTE.test(t), `M13 backtest: "${t}" is not read as a build note`);
+// W3 (critic 2026-10-30): one piece of planned work is ONE entry. Two entries on the same host skill whose codes
+// overlap, or whose names share 60 % of their words, are a near-duplicate unless DISTINCT_ENTRIES says why not.
+const BLmod = await import('../../js/modules/build-list.js');
+const nearDupes = (items) => {
+    const words = (e) => new Set(TT.todoName(e).toLowerCase().replace(/\([^()]*\)/g, ' ').match(/[a-z0-9]+/g)?.filter((w) => !/^(?:the|a|an|of|and|or|by|with|to|in|on|for|new|option|existing|skill)$/.test(w)) || []);
+    const out = [];
+    for (let i = 0; i < items.length; i += 1) for (let j = i + 1; j < items.length; j += 1) {
+        const a = items[i], b = items[j];
+        const key = [a.id, b.id].sort().join('|');
+        if (BLmod.DISTINCT_ENTRIES[key]) continue;
+        // the same host skill, codes that overlap (or none), and names that share 60 % of their words; or the same name
+        const sameHost = a.skill && a.skill === b.skill && (a.ccss.some((c) => b.ccss.includes(c)) || (!a.ccss.length && !b.ccss.length));
+        const wa = words(a), wb = words(b);
+        const inter = [...wa].filter((w) => wb.has(w)).length;
+        const overlap = inter / Math.max(1, Math.min(wa.size, wb.size));
+        const sameName = wa.size && wa.size === wb.size && inter === wa.size;
+        // a different number range or operation sign is different work ("Roman numerals to 100" / "to 1,000")
+        const marks = (e) => (TT.todoName(e).replace(/\([^()]*\)/g, ' ').replace(/(\d),(\d)/g, '$1$2').match(/\d+|[+−×÷<>=\/]/g) || []).sort().join(' ');
+        const jac = inter / Math.max(1, new Set([...wa, ...wb]).size);
+        if (marks(a) === marks(b) && (sameName || (sameHost && overlap >= 0.6 && jac >= 0.5 && inter >= 2))) out.push(`${a.id} "${TT.todoName(a)}" and ${b.id} "${TT.todoName(b)}"`);
+    }
+    return out;
+};
+ok(nearDupes([{ id: 'x1', name: 'Compare Fractions by Numerator (option)', kind: 'option', skill: 'fractions:compare', ccss: ['3.NF.A.3d'] },
+    { id: 'x2', name: 'Compare Fractions With the Same Numerator or Denominator (option)', kind: 'option', skill: 'fractions:compare', ccss: ['3.NF.A.3d'] }]).length === 1, 'W3 backtest: the 2026-10-30 duplicate pair is caught');
+ok(Object.entries(BLmod.ENTRY_ALIASES).every(([a, b]) => a !== b && !BLmod.ENTRY_ALIASES[b]), 'W3: every merged id points at a kept id');
 const todoGate = (tag, Q) => {
     TT.setTodoNames(Q.items);
+    { const d = nearDupes(Q.items); ok(!d.length, `W3 ${tag}: ${d.length} near-duplicate Skills to be made entries: ${d.slice(0, 5).join('; ')}`);
+        ok(!Q.items.some((e) => BLmod.ENTRY_ALIASES[e.id]), `W3 ${tag}: a merged id is still listed on its own`); }
+    m13Same = new Map();
     for (const e of Q.items) {
         const T = TT.todoTexts(e);
         for (const [f, v] of Object.entries(T)) for (const x of [].concat(v)) {
@@ -351,6 +396,16 @@ const todoGate = (tag, Q) => {
             if (bad) { m11 += 1; if (m11 <= 10) console.log('M11', tag, e.id, f, '|', x); }
         }
         looksGate(tag, e, T.looks);
+        // M13 (critic 2026-10-30 W2, class BUILD-NOTE-SHOWN): "How it looks" is COMPOSED (owner ruling): never the
+        // representation note, never build-note wording, and not one line shared by more than 5 entries (n2)
+        if (T.looks) {
+            const rep = String(e.representation || '').trim();
+            const repN = rep.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            const lkN = T.looks.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            if (TT.LOOKS_BUILD_NOTE.test(T.looks)) m13bad(`${tag} ${e.id}: build-note wording: "${T.looks}"`);
+            else if (rep && (T.looks === P0.plainNote(rep) || (repN.length > 24 && lkN.includes(repN.slice(0, 40))))) m13bad(`${tag} ${e.id}: the note shown as written: "${T.looks}"`);
+            m13Same.set(T.looks, (m13Same.get(T.looks) || 0) + 1);
+        }
         // m18 (critic r8): one lesson title leads at most one gap line (its notes are grouped under it)
         { const labs = T.closes.map((x) => (/^((?:Pre-K|Kindergarten|Grade \d+), "[^"]*")/.exec(x) || [])[1]).filter(Boolean);
             const dup = labs.filter((x, i) => labs.indexOf(x) !== i);
@@ -361,6 +416,7 @@ const todoGate = (tag, Q) => {
         gate(`${tag} ${e.id} steps`, e.wrmSteps.map(stepName));
         gate(`${tag} ${e.id} map`, e.map.map(TT.mapLine), { fragment: false });
     }
+    for (const [t, n] of m13Same) if (n > 5) m13bad(`${tag}: ${n} entries share one "How it looks" line: "${t}"`);
 };
 // SKILLS TO BE MADE PER LESSON AND PER UNIT (owner 2026-10-17): every lesson's card lists exactly the de-duplicated
 // union of its build list, the White Rose proposals and Skills to be made entries naming its step or school lesson, the
@@ -617,6 +673,22 @@ ok(!m11, `M11: ${m11} Skills to be made lines are template-id lists or build syn
 console.log(`M11 gate: template-id / build-syntax lines on Skills to be made: ${m11}`);
 ok(!m12, `M12: ${m12} "How it looks" lines name a response or a drawing the entry does not declare`);
 console.log(`M12 gate: "How it looks" lines against the answer field, the Kind line and the drawing sources: ${m12}`);
+ok(!m13, `M13: ${m13} "How it looks" lines are build notes, notes shown as written, or one line shared by more than 5 entries`);
+console.log(`M13 gate: "How it looks" build-note / as-written / repeated lines: ${m13}`);
+// W1 (critic 2026-10-30, class LINK-DRIFT): every pinned lesson link of every deployed version still opens the lesson it
+// was pinned with (tests/fixtures/wrm-bookmarks.json; a numbered link from before the reorder opens the lesson it
+// was made for, with the notice), every lesson's link is a slug, and the r8 evidence link is named here too
+{
+    const { checkBookmarks } = await import('./ws-wrm-bookmarks.mjs');
+    const r = await checkBookmarks();
+    for (const b of r.bad.slice(0, 10)) console.log('LINK-DRIFT', b);
+    ok(!r.bad.length && r.checked > 2500 && r.versions >= 3, `W1 bookmarks: ${r.bad.length} pinned links open a different lesson (${r.checked} in ${r.versions} versions)`);
+    const W = await import('../../js/modules/wrm-links.js');
+    const p = W.resolveLessonHash('#wrm/3/D1/16');
+    ok(p.lesson && p.lesson.title === 'Patterns on the multiplication table' && p.legacy && p.legacy.alt && p.legacy.alt.title === 'Divide by 10',
+        'W1: #wrm/3/D1/16 (r8: "Patterns on the multiplication table") opens it, with the notice offering "Divide by 10"');
+    console.log(`bookmark gate: ${r.checked} pinned links in ${r.versions} versions, ${r.bad.length} drifted`);
+}
 ok(!truthBad, `truth gate (M8 order / support week, M9 said once): ${truthBad} of ${truthLines} lesson lines`);
 console.log(`truth gate: ${truthLines} lesson lines, ${truthBad} untrue or repeated`);
 ok(!jBad, `plain-English gate: ${jBad} of ${jLines} teacher-facing lines ${JSON.stringify(jByForm)}`);

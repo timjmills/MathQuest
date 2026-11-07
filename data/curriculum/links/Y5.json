@@ -456,6 +456,10 @@
     {
      "key": "placevalue:unit_form",
      "why": "Y2.B1.S5 Partition numbers to 100 (prior learning wk W06)"
+    },
+    {
+     "key": "placevalue:ten_times_value",
+     "why": "each place is 10 times the place to its right, on one digit (detailed lesson 6)"
     }
    ],
    "preBuild": [],
@@ -463,6 +467,14 @@
     {
      "key": "placevalue:value",
      "why": "value of a digit: each place 10 times the next"
+    },
+    {
+     "key": "placevalue:ten_times_value",
+     "why": "the same digit one place apart: 10 times the place to its right (4.NBT.A.1)"
+    },
+    {
+     "key": "placevalue:ten_times_story",
+     "why": "how many times as many: 700 ÷ 70 = 10, the step from one place to the next"
     }
    ],
    "note": "4.NBT.A.1 (each place 10 times the place to its right); exponents are Grade 5 (5.NBT.A.2).",
@@ -2226,6 +2238,10 @@
       "band": 1000
      },
      "why": "Y1.B9.S2 Count in 10s (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:ten_times_value",
+     "why": "a digit one place left is worth 10 times as much (detailed lesson 6)"
     }
    ],
    "preBuild": [],
@@ -2293,6 +2309,10 @@
     {
      "key": "placevalue:unit_form",
      "why": "Y3.B1.S8 Hundreds, tens and ones (prior learning wk W10)"
+    },
+    {
+     "key": "placevalue:one_tenth_value",
+     "why": "a digit one place right is worth one tenth as much (detailed lesson 6)"
     }
    ],
    "preBuild": [],
@@ -8809,7 +8829,17 @@
     "block": null,
     "power": true
    },
-   "direct": [],
+   "direct": [
+    {
+     "key": "placevalue:ten_times_value"
+    },
+    {
+     "key": "placevalue:one_tenth_value"
+    },
+    {
+     "key": "placevalue:ten_times_story"
+    }
+   ],
    "partial": [
     {
      "key": "placevalue:value",
@@ -8830,7 +8860,7 @@
      "missing": "multiplies a number by 10 on a shift chart; never says a digit is worth one tenth of the same digit one place to its left"
     }
    ],
-   "verdict": "partial",
+   "verdict": "full",
    "missing": "comparing the value of the same digit in neighbouring places: 10 times the place to its right and one tenth of the place to its left",
    "build": [
     "value_ten_times"

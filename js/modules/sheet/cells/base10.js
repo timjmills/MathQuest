@@ -105,7 +105,10 @@ register('base10', {
             fix = `<div style="margin-top:${L(ctx, 3)};display:inline-block;">${fixCaption(ctx)}`
                 + `<div data-ws-slot="fix" data-ws-shape="draw"${fInk ? ` data-ws-ink="${fInk}"` : ''}>${mat(fc, fInk, 'fix ')}</div></div>`;
         }
-        return root(ctx, 'k2-base10', `<div style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;margin-bottom:${L(ctx, 3)};">${esc(p.target)}</div>`
+        // `caption` (a draw task dealt onto a pool page whose one instruction is "Solve."): the
+        // verb line in the cell (critic r3 D13), as parity.js does for its sort.
+        const capLine = p.caption && !isTwin(ctx) && ctx.mode !== 'screen' ? `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.3;margin-bottom:${L(ctx, 1.5)};">${esc(String(p.caption))}</div>` : '';
+        return root(ctx, 'k2-base10', capLine + `<div style="font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;margin-bottom:${L(ctx, 3)};">${esc(p.target)}</div>`
             + `<div data-ws-slot="answer" data-ws-shape="draw"${ink ? ` data-ws-ink="${ink}"` : ''}${model} style="display:inline-block;">`
             + `${mat(counts, ink)}</div>`
             + `<div style="display:flex;align-items:center;justify-content:center;font-size:${P(ctx, zonePt(ctx))};margin-top:${L(ctx, 1.5)};">${legend}</div>`

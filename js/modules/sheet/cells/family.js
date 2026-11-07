@@ -34,8 +34,17 @@ const EQ_EM = 0.85;                 // a family line's digit size, relative to t
 
 /* ---------------------------------------------------------------------- fact family */
 
+/** The whole of the family: the sum, or the product when `op` is '*' (multiply and divide). */
+const wholeOf = (p) => (p.op === '*' ? Number(p.a) * Number(p.b) : Number(p.a) + Number(p.b));
 const facts = (p) => {
-    const a = Number(p.a), b = Number(p.b), w = a + b;
+    const a = Number(p.a), b = Number(p.b), w = wholeOf(p);
+    if (p.op === '*') {
+        // multiply and divide: a square number has two facts, not four (2026-10-02, 5 x 5 = 25 and 25 / 5 = 5)
+        const sq = a === b;
+        return sq
+            ? [{ a, op: '×', b, ans: w }, { a: w, op: '÷', b: a, ans: a }]
+            : [{ a, op: '×', b, ans: w }, { a: b, op: '×', b: a, ans: w }, { a: w, op: '÷', b: a, ans: b }, { a: w, op: '÷', b, ans: a }];
+    }
     return [
         { a, op: '+', b, ans: w },
         { a: b, op: '+', b: a, ans: w },
@@ -45,7 +54,7 @@ const facts = (p) => {
 };
 
 function bondSVG(g, p) {
-    const a = Number(p.a), b = Number(p.b), w = a + b;
+    const a = Number(p.a), b = Number(p.b), w = wholeOf(p);
     const fs = g.pt * 0.8 * PT_MM;                   // numbers in the bond, mm
     const r = fs * 0.95;
     const W = r * 6 + 4, H = r * 5 + 2;
@@ -68,7 +77,7 @@ function bondSVG(g, p) {
  *   'answer'            the operands, the answer a box (the old form: complete each fact)
  */
 const GIVEN = {
-    anchor: (f) => (f.op === '+' ? ['a'] : ['b']),
+    anchor: (f) => (f.op === '+' || f.op === '×' ? ['a'] : ['b']),
     none: () => [],
     answer: () => ['a', 'b'],
 };
@@ -115,7 +124,7 @@ register('fact-family', {
             return o;
         });
         // One box width for every box: the whole's digits (L-LEAK: no box tells a length).
-        const n = String(Number(p.a) + Number(p.b)).length;
+        const n = String(wholeOf(p)).length;
         const bw = boxMm(g, n);
         const input = (b) => `<input type="text" class="fact-family-input" inputmode="numeric" autocomplete="off" data-eq="${b.i}" data-part="${b.part}" data-answer="${esc(b.value)}" data-ws-slot="${b.id}" data-ws-shape="box" aria-label="fact ${b.i + 1} ${b.part === 'c' ? 'answer' : 'number'}" `
             + `style="box-sizing:border-box;width:${(bw / (g.E * EQ_EM)).toFixed(3)}em;height:${(g.stripMm / (g.E * EQ_EM)).toFixed(3)}em;border:${HAIR} solid ${INK.ink};border-radius:${(g.rMm / (g.E * EQ_EM)).toFixed(3)}em;background:#fff;color:${INK.ink};font:inherit;font-size:1em;text-align:center;padding:0">`;
@@ -161,7 +170,7 @@ register('fact-family', {
         const bond = bondSVG(g, p);
         // The wider of the bond and one fact line (three places, at most two of them boxes,
         // two operators and four gaps at 0.85 of the digit size), plus the side pads.
-        const n = String(Number(p.a) + Number(p.b)).length;
+        const n = String(wholeOf(p)).length;
         const bw = boxMm(g, n);
         const boxes = Math.max(...facts(p).map((f) => 3 - givenOf(p, ctx)(f).length)) + (p.fix ? 1 : 0);
         const line = (Math.max(0, 3 - boxes) * n * 0.56 + 2 + 4 * 0.28) * g.E * EQ_EM + boxes * bw;
@@ -239,4 +248,98 @@ register('cloze-bank', {
         return ['a', 'b'].map((id, i) => ({ id, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full'] }));
     },
     layout() { return { card: 'card-simple', checker: 'list', requiresVisual: true }; },
+});
+
+/* --------------------------------------------------------------------- number family */
+
+/**
+ * `number-family` (wave 1 lane D round 4, D10 / LESSONS L1): the number_families_add / _mult item
+ * (`q.numberFamilyData`: the three numbers, each equation's numbers and operator, and which of
+ * them are missing) drawn by the kit at the sheet's own size. The legacy print branch drew it in
+ * fixed px, so S printed the same 2 x 2 page as L, and its bold "Number Family (+/-)" heading
+ * repeated the page title (L7). The family's three numbers stand in a thin rounded box (a thing
+ * to read), then one equation per line on one grid, so numbers, operators, "=" and boxes stand in
+ * columns. Every missing number is one box (AK-1: the key writes each).
+ *
+ * Payload: {nums: [a, b, c], eqs: [{nums: [x, y, z], op}], miss: [[positions] per equation]}
+ */
+const nfBlanks = (p) => {
+    const out = [];
+    (p.eqs || []).forEach((eq, i) => {
+        const miss = ((p.miss || [])[i] || []).slice().sort((x, y) => x - y);
+        for (const k of miss) out.push({ id: `nf${out.length}`, i, k, value: String(eq.nums[k]) });
+    });
+    return out;
+};
+const nfDigits = (p) => Math.max(1, ...(p.eqs || []).flatMap((eq) => eq.nums.map((v) => String(v).length)));
+/** The operator track and the column gap, em: tighter at M (critic r8 D8-3), as drawn at S and L otherwise. */
+const nfTracks = (g) => (g.size === 'M' ? { op: 0.7, gap: 0.18 } : { op: 1, gap: 0.28 });
+const nfOp = (op) => ({ '*': '×', x: '×', '/': '÷', '-': '−' })[op] || op;
+/**
+ * The family's ORDER-FREE identity (wave 1 lane D round 6, critic r5 D5-1): 4, 5, 20 and 5, 4, 20
+ * are one family (the same four facts), so a page holds each family once. The key is the set
+ * {a, b, whole} plus the operation kind; buildSheet's de-duplication (print-sheet.js signature)
+ * and the lint's REPEAT check (the cell's data-ws-dedupe) both read it.
+ */
+export const nfDedupeKey = (p) => {
+    const nums = (p && p.nums || []).map(Number).filter(Number.isFinite);
+    if (nums.length < 2) return '';
+    const ops = (p.eqs || []).map((e) => e && e.op).join('');
+    const kind = /[*x×\/÷]/.test(ops) ? 'x' : '+';
+    return `nf${kind}:${nums.slice().sort((a, b) => a - b).join(',')}`;
+};
+
+register('number-family', {
+    render(p, ctx) {
+        const g = geo(ctx);
+        const ink = inkOf(ctx);
+        const blanks = nfBlanks(p);
+        const key = {};
+        for (const b of blanks) key[b.id] = b.value;
+        const vals = slotValues(ctx, key, (w) => {
+            const l = splitList(w);
+            const o = {};
+            blanks.forEach((b, k) => { if (l[k] !== undefined) o[b.id] = l[k]; });
+            return o;
+        });
+        const n = nfDigits(p);
+        const bw = Math.max(g.writeMm * 1.6, (n * 0.62 + 0.8) * g.E);
+        const c = (t, extra = '') => `<span style="${extra}">${t}</span>`;
+        const cells = (p.eqs || []).map((eq, i) => [0, 1, 2].map((k) => {
+            const b = blanks.find((x) => x.i === i && x.k === k);
+            const v = b ? box(g, b.id, { wMm: bw, hMm: g.stripMm, value: vals[b.id] || '', ink, mark: g.twin ? 'cell' : null }) : c(esc(eq.nums[k]), 'text-align:center');
+            return k === 0 ? v : k === 1 ? c(nfOp(eq.op), 'font-weight:700;text-align:center') + v : c('=', 'font-weight:700;text-align:center') + v;
+        }).join('')).join('');
+        // (critic r8 D8-3) at M the operator tracks and gaps are drawn tighter so a family with a
+        // two-digit whole stands in a third of the page (3 x 3 at M, the owner's 8 or more); the
+        // boxes, the digits and the row gap are the size's own
+        const t = nfTracks(g);
+        const lines = `<div style="display:inline-grid;grid-template-columns:auto ${t.op}em auto ${t.op}em auto;column-gap:${t.gap}em;row-gap:${g.em(0.8)};align-items:center;justify-items:center;white-space:nowrap">${cells}</div>`;
+        // (round 5 D-E: the gaps are kept tight so three families stand in a column at L, 2 x 3)
+        const set = `<div style="display:inline-block;white-space:nowrap;border:${HAIR} solid ${INK.ink};border-radius:${g.em(3)};padding:${g.em(0.5)} ${g.em(2.5)};line-height:1">`
+            + (p.nums || []).map((v) => esc(v)).join(', ') + '</div>';
+        const dk = nfDedupeKey(p);
+        const body = `<div${dk ? ` data-ws-dedupe="${esc(dk)}"` : ''} style="display:flex;flex-direction:column;align-items:center;gap:${g.em(1.2)}">${set}${lines}</div>`;
+        return root(g, 'number-family', body, 'text-align:center;', this.footprint(p, ctx).wMm);
+    },
+    answerKey(p) {
+        const blanks = nfBlanks(p);
+        const slots = {};
+        for (const b of blanks) slots[b.id] = { value: b.value, graded: true };
+        const list = blanks.map((b) => b.value).join(', ');
+        return { value: list, display: list, slots };
+    },
+    footprint(p, ctx) {
+        const g = geo(ctx);
+        const n = nfDigits(p);
+        const bw = Math.max(g.writeMm * 1.6, (n * 0.62 + 0.8) * g.E);
+        const t = nfTracks(g);
+        const line = 3 * Math.max(bw, n * 0.56 * g.E) + 2 * t.op * g.E + 4 * t.gap * g.E;
+        return { wMm: Math.ceil(line + 8), hMm: null, measure: true, factLike: false, maxCols: 3 };
+    },
+    inputs(p) {
+        return nfBlanks(p || {}).map((b, k) => ({ id: b.id, kind: 'number', shape: 'box', graded: true, order: k, inputmode: 'numeric', scopes: ['full'] }));
+    },
+    layout() { return { card: 'card-number-family', checker: 'list', requiresVisual: true }; },
+    dedupeKey: nfDedupeKey,
 });

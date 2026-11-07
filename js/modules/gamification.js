@@ -2,6 +2,8 @@ import { state } from './state.js';
 import { randInt } from './utils.js';
 import { setCookie, getCookie, savePersistentData } from './storage.js';
 import { SKILL_TIME_CATEGORY, CODE_TO_SKILL, DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML } from './data.js';
+import { queueUsesInPlay } from './skill-option-store.js';
+import { pupilNameOf } from './pupil-names.js';
 
 // ===== LEVEL SYSTEM =====
 const LEVEL_THRESHOLDS = [0, 100, 250, 450, 750, 1150, 1650, 2300, 3100, 4100, 5300, 6800, 8600, 10800, 13400];
@@ -1366,6 +1368,7 @@ export function removeTabDetection() {
 }
 
 // ===== STUDENT LANDING MODAL =====
+const _escLanding = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export function showStudentLandingModal(parsed) {
     state.landingSettings = parsed;
 
@@ -1379,7 +1382,8 @@ export function showStudentLandingModal(parsed) {
         const weight = weightStr ? parseInt(weightStr, 10) : 0;
         const info = CODE_TO_SKILL[code];
         if (info) {
-            decodedSkills.push({ label: info.skillLabel, weight: isNaN(weight) ? 0 : weight, skillId: info.skillId, categoryId: info.categoryId });
+            // check r2 D1: a pupil's landing names each skill with its pupil name (no "(Visual)")
+            decodedSkills.push({ label: _escLanding(pupilNameOf(info.categoryId, info.skillId, info.skillLabel)), weight: isNaN(weight) ? 0 : weight, skillId: info.skillId, categoryId: info.categoryId });
         }
     }
 
@@ -1454,7 +1458,10 @@ export function showStudentLandingModal(parsed) {
     overlay.id = 'studentLandingOverlay';
     overlay.className = 'landing-overlay';
     overlay.innerHTML = '<div class="landing-modal">' +
-        (manySkills
+        (parsed && parsed.fromPupil
+            // ui3 check D9: a link a pupil sent is not "your teacher": neutral wording only
+            ? '<h2>Practice set: ' + nSkills + ' skill' + (nSkills === 1 ? '' : 's') + '</h2>'
+            : manySkills
             ? '<h2>Ready to Practice ' + nSkills + ' Skills?</h2>' +
               '<p>Your teacher has set up a practice session for you. Click Start Playing!</p>'
             : '<h2>Ready to Practice!</h2>' +
@@ -1462,11 +1469,31 @@ export function showStudentLandingModal(parsed) {
         skillsHTML +
         settingsHTML +
         '<button class="btn btn-primary landing-start-btn" onclick="startFromLanding()">Start Playing!</button>' +
+        // owner 2026-11-03: everyone (pupils too) can print the link's skills; the print loads on the press only
+        '<div><button type="button" class="landing-print-btn" onclick="printFromLanding()" aria-label="Print these skills as a worksheet">' + PRINT_ICON + ' Print</button></div>' +
         '</div>';
     document.body.appendChild(overlay);
     // the pupil can start straight away: Enter or Space presses Start Playing
     const startBtn = overlay.querySelector('.landing-start-btn');
     if (startBtn) try { startBtn.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+}
+
+/** A printer glyph (24 x 24, currentColor) for the student side's Print buttons. */
+export const PRINT_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>';
+
+/** Ready to Practice → Print: the link's skills (with their options) in the simple print, the pop-up left open. */
+export function printFromLanding() {
+    const parsed = state.landingSettings;
+    if (!parsed) return;
+    let skills = [];
+    try { skills = typeof window.parseSkillCodeParts === 'function' ? window.parseSkillCodeParts(parsed.skillsCode) : []; } catch (e) { skills = []; }
+    if (!skills.length) {
+        for (const part of String(parsed.skillsCode || '').split('-')) {
+            const info = CODE_TO_SKILL[part.substring(0, 2).toUpperCase()];
+            if (info) skills.push({ categoryId: info.categoryId, skillId: info.skillId });
+        }
+    }
+    if (typeof window.openSimplePrint === 'function') window.openSimplePrint(skills.map((s) => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts, label: pupilNameOf(s.categoryId, s.skillId) })), { from: 'student' });
 }
 
 export function startFromLanding() {
@@ -1597,6 +1624,10 @@ export function startFromLanding() {
         totalProblemsEnabled: !infinityMode,
         totalProblems: infinityMode ? 0 : problemCount
     };
+    // A link that uses one skill more than once plays every use with its own options
+    // (skill-option-store.js setQueueUses); a link without repeats carries no `uses`.
+    const uses = queueUsesInPlay();
+    if (uses) state.mixedModeSettings.uses = uses;
 
     // Step 4: Set state so startGame sees isMixedMode = true and uses
     // mixedModeSettings instead of reading from HTML dropdowns

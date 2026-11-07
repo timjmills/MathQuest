@@ -6,6 +6,8 @@
 //   Grid       5 columns x 3 rows of vertical facts (Auto is always 5, PT-FPR-1), a 6 mm gap,
 //              then 2 columns x 3 rows of horizontal facts (the last position is the unruled
 //              trailing area, PT-ENG-7). Vertical rows are min(1.3 x hMin, what the page leaves)
+//              Every grid keeps its lattice (`relay: false`, critic r2 R2-3): a short last row - the 20th
+//              across fact, cells 19-20 of 20 in 3 columns - stays in its column, the rest unruled (PG-15)
 //   Strip      multiply and divide sets with one constant k: the skip-count list k to 10k (12k
 //              when the set reaches 11 or 12), side form, in a rounded strip beside the grid
 //              (PT-FPR-3). Add and subtract sets and mixed sets print without a strip (their
@@ -118,7 +120,7 @@ export function plan(input = {}) {
         vRows = FG.rows;
         vH = FG.cellH;
         probeCols = FG.cols;
-        body = gridPart(items.map((it) => planItem(formCell(it, FG), { cols: FG.cols })), { cols: FG.cols, rows: FG.rows, cellH: vH, labels, start: 1, cls: 'facts' });
+        body = gridPart(items.map((it) => planItem(formCell(it, FG), { cols: FG.cols })), { cols: FG.cols, rows: FG.rows, cellH: vH, labels, start: 1, cls: 'facts', relay: false });
     } else if (!fitsAt(items, 5, ctx)) {
         // A cell that does not fit the 5-column grid (div_facts Long division / Fraction / Mix at
         // M or L: the bracket and its quotient boxes are wider than a fifth of the page). The
@@ -143,7 +145,7 @@ export function plan(input = {}) {
         const chunks = [];
         const starts = [];
         for (let k = 0, i = 0; k < nPages && i < items.length; i += rowsOn[k] * cols, k++) { starts.push(i); chunks.push(items.slice(i, i + rowsOn[k] * cols)); }
-        const grids = chunks.map((ch, k) => gridPart(ch.map((it) => planItem(it, { cols })), { cols, rows: Math.ceil(ch.length / cols), cellH: vH, labels, start: 1 + starts[k], cls: 'facts' }));
+        const grids = chunks.map((ch, k) => gridPart(ch.map((it) => planItem(it, { cols })), { cols, rows: Math.ceil(ch.length / cols), cellH: vH, labels, start: 1 + starts[k], cls: 'facts', relay: false }));
         body = grids[0];
         if (grids.length > 1) extraPages = grids.slice(1).map((g) => ({ sections: [g] }));
         probeCols = cols;
@@ -151,11 +153,11 @@ export function plan(input = {}) {
         // No room (or no operands) for the horizontal block: 20 vertical facts, 5 x 4.
         vRows = 4;
         vH = Math.min(1.3 * hMin, G / 4);
-        const grid = gridPart(items.map((it) => planItem(it, { cols: 5 })), { cols: 5, rows: 4, cellH: vH, labels, start: 1, cls: 'facts' });
+        const grid = gridPart(items.map((it) => planItem(it, { cols: 5 })), { cols: 5, rows: 4, cellH: vH, labels, start: 1, cls: 'facts', relay: false });
         body = grid;
     } else {
-        const gV = gridPart(vert.map((it) => planItem(it, { cols: 5 })), { cols: 5, rows: 3, cellH: vH, labels, start: 1, cls: 'facts' });
-        const gH = gridPart(hor.map((it) => planItem(it, { cols: 2 })), { cols: 2, rows: 3, cellH: hH, labels, start: 16 });
+        const gV = gridPart(vert.map((it) => planItem(it, { cols: 5 })), { cols: 5, rows: 3, cellH: vH, labels, start: 1, cls: 'facts', relay: false });
+        const gH = gridPart(hor.map((it) => planItem(it, { cols: 2 })), { cols: 2, rows: 3, cellH: hH, labels, start: 16, relay: false });
         body = { kind: 'col', gap: '6mm', parts: [gV, gH] };
     }
     const sections = [instructionPart(instructionKeyOf(items, input.skills), items)];

@@ -20,7 +20,7 @@
 
 import { state } from './state.js';
 import { pageConstant } from './page-deal.js';
-import { renderCell, wordWorkPayload, wordWorkTwin, WW_TEMPLATE } from './sheet/index.js';
+import { renderCell, wordWorkPayload, wordWorkTwin, wordWorkWrongs, WW_TEMPLATE } from './sheet/index.js';
 
 /** The word-problem skills the cell is for (the ids a generated item carries). */
 const WP_RANGED = /^(add|sub)_wp_(10|20|50|100|1k|10k|100k|1m)(_plain)?$/;
@@ -58,6 +58,15 @@ function skillTracks(skill, op) {
     return String(R).length;
 }
 
+/** The answer bound of a ranged story skill (its band, or the `band` option), else 0. */
+function sentenceBand(skill) {
+    const m = /_wp_(10|20|50|100|1k|10k|100k|1m)(_plain)?$/.exec(String(skill || ''));
+    if (!m) return 0;
+    const BAND = { 10: 10, 20: 20, 50: 50, 100: 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
+    const o = state.skillOptions;
+    return o && Number(o.band) > 0 ? Number(o.band) : BAND[m[1]];
+}
+
 /** The ranged stories' own "Bar model" support (`support: bar`, skill-options.js _opsBar). */
 function barSupport() {
     const o = state.skillOptions;
@@ -87,8 +96,13 @@ export function applyWordWork(q) {
     // different stories (it used to be the same books, stickers, pencils … on every page).
     const k = Number.isFinite(state.itemIndex) ? (state.itemIndex + pageConstant('word-work', 200)) * 5 : Math.floor(Math.random() * 1000);
     const two = TWO_STEP.has(skill) || TWO_STEP.has(outer);
+    // the stories within 20 (the sentence layout) tell ONE schema a page (PEDAGOGY P-21, P-WP-1), drawn once per page from
+    // the seeded rng - never from the item's place (visual-quality critic r1 F12)
+    const band = sentenceBand(skill === outer ? skill : (isWordWorkSkill(skill) ? skill : outer));
+    const variant = band && band <= 20 && !two ? pageConstant('word-work-schema', 2) : null;
     try {
         payload = wordWorkPayload(q, {
+            variant,
             hl: opt('wpCues'), kb: opt('wpBank'), bar: opt('wpBar') || barSupport(), pic, twoStep: two,
             divFirst: /^remainder_/.test(skill) || /^remainder_/.test(outer),
             // the K picture story keeps its own (already controlled) words
@@ -97,8 +111,65 @@ export function applyWordWork(q) {
         if (payload && !two && payload.steps.length === 1 && payload.steps[0].op !== '/') {
             payload.tracks = skillTracks(skill === outer ? skill : (isWordWorkSkill(skill) ? skill : outer), payload.steps[0].op);
         }
+        // A times-as-many story divides a TIMES-TABLE fact (4.OA.2: 45 is 5 times as many as 9):
+        // the division frame keeps the divisor, dividend and quotient boxes but drops the long
+        // division working rows, which a known fact never needs (P-1 writing load; wave 1 lane D:
+        // the working made every cell 120 mm tall, two problems to a page).
+        if (payload && /^mult_comparison(_plain)?$/.test(skill === outer ? skill : (isWordWorkSkill(skill) ? skill : outer))) {
+            for (const st of payload.steps) {
+                if (st.op === '/' && st.bottom > 0 && st.bottom <= 10 && st.top % st.bottom === 0 && st.top / st.bottom <= 10) st.fact = true;
+            }
+            // the pupil CHOOSES × or ÷ here: the work is the neutral [ ] ( ) [ ] = [ ] row, never a
+            // ÷ bracket that prints the answer to "Circle the sign" (wave 1 lane D, critic 2026-10-03)
+            // ONE answer place for the sign (critic r3 D4): the pupil writes it in the ring, so
+            // the frame carries no sign row to circle as well (`signRow: false`).
+            if (payload.steps.length === 1) { payload.neutral = true; payload.inRow = false; payload.signRow = false; }
+        }
+        // A remainder story is division by its name: there is no sign to choose, so no sign row and
+        // no "Circle the sign" (the frame's ÷ bracket would give the choice away).
+        if (payload && (/^remainder_/.test(skill) || /^remainder_/.test(outer)) && payload.steps.length === 1 && payload.steps[0].op === '/') payload.signs = false;
     } catch (e) { payload = null; }
     if (!payload) return q;
+    // `wpFrames` (detailed lesson 7): one number sentence a step (the kit cell's `layout: 'frames'`)
+    if (opt('wpFrames') && !payload.bar) payload.layout = 'frames';
+    // `msLetter` / `msCheck` (3.OA.D.8, detailed lesson 7 round 2): the compact cell answers as ONE equation with a
+    // letter (5 × 4 − 6 = n, then n), or with an estimate from numbers rounded to the nearest ten and a yes / no check
+    if (opt('msLetter') && !payload.bar) { payload.layout = 'frames'; payload.letter = true; }
+    if (opt('msCheck') && !payload.bar && payload.steps.every((st) => st.op === '+' || st.op === '-')) {
+        const r10 = (n) => Math.round(n / 10) * 10;
+        const [s1, s2] = payload.steps;
+        const ea = r10(s1.top), eb = r10(s1.bottom), ec = s2 ? r10(s2.bottom) : 0;
+        const e1 = s1.op === '+' ? ea + eb : ea - eb;
+        const est = s2 ? (s2.op === '+' ? e1 + ec : e1 - ec) : e1;
+        if (e1 >= 0 && est >= 0) { payload.layout = 'frames'; payload.check = { a: ea, b: eb, c: ec, est }; }
+    }
+    // `msChoose` (3.OA.D.8, detailed lesson 7 r3: the board Check Question's A-D online): a two-step story whose first
+    // step is × or ÷ answers by checking one of four - the answer and the three two-step errors, each a different
+    // number (the generator deals only such stories), in an order drawn from the item's place (never always D).
+    if (opt('msChoose') && !payload.bar && payload.steps.length === 2 && (payload.steps[0].op === '*' || payload.steps[0].op === '/')) {
+        let ws = [];
+        try { ws = wordWorkWrongs({ cell: { template: WW_TEMPLATE, payload } }) || []; } catch (e) { ws = []; }
+        const vals = ws.filter((w) => !w.correct).map((w) => Number(w.value));
+        if (vals.length === 3 && new Set([...vals, Number(payload.ans)]).size === 4) {
+            const four = [Number(payload.ans), ...vals];
+            const r = ((k % 4) + 4) % 4;
+            const order = four.slice(r).concat(four.slice(0, r));
+            payload.layout = 'choose';
+            payload.choices = order;
+            payload.correct = order.indexOf(Number(payload.ans));
+        }
+    }
+    // Visual-quality lane (2026-10-31, VQ-3): a one-step + / − story of a skill whose answers are all
+    // <= 20 (add_wp_10 / _20, sub_wp_10 / _20, with or without pictures) draws the number SENTENCE
+    // `[ ] ◯ [ ] = [ ] unit`, not columns, four signs and a word bank (K-1 counts on / makes ten). The
+    // bar option stays (drawn above the sentence); the lesson options (choose / letter / check) win.
+    if (band && band <= 20 && !two && payload.steps.length === 1 && (payload.steps[0].op === '+' || payload.steps[0].op === '-')
+        && Number(payload.ans) <= 20 && !payload.letter && !payload.check && payload.layout !== 'choose') {
+        payload.layout = 'sentence';
+        payload.digits = 2;
+        // the printed label is the plural whatever the answer (critic r1 F5: "stamp" under an empty box gives the answer 1)
+        if (payload.unitMany) payload.unit = payload.unitMany;
+    }
     // the retold story is the item's text on every host (the card, the worksheet, the quiz, print)
     const retold = q.text !== payload.lines.join(' ');
     q.text = payload.lines.join(' ');
@@ -112,9 +183,34 @@ export function applyWordWork(q) {
     q.selfAnswering = true;
     // not a `word*` format: the page measures the cell's columns (print-sheet.js footprintClass)
     q.printFormat = 'story-work';
-    q.printText = 'Circle the sign. Write the numbers in the boxes. Solve.';
+    const ring = payload.neutral && payload.signRow === false;
+    q.printText = payload.signs === false ? 'Write the numbers in the boxes. Divide. Answer the question.'
+        : ring ? 'Write the sign in the circle. Write the numbers. Solve.'
+        : 'Circle the sign. Write the numbers in the boxes. Solve.';
+    if (payload.layout === 'choose') {
+        // (one label span + one box span a row: wireTickBoxes makes each row a tap target on every host)
+        q.printAnswer = `${'ABCD'[payload.correct]}  ${payload.ans}`;
+        q.printText = 'Read the story. Check the right answer.';
+        q.screenInstr = 'Read the story. Tap the right answer.';
+        q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit, choose: true };
+        return q;
+    }
+    if (payload.layout === 'sentence') {
+        q.printText = 'Read the story. Write the number sentence. Solve.';
+        q.screenInstr = 'Read the story. Type the number sentence. Solve.';
+        q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit, sentence: true };
+        return q;
+    }
+    if (payload.letter) { q.printText = 'Read the story. Write the equation. Find n.'; }
+    else if (payload.check) { q.printText = 'Solve. Estimate. Circle Yes or No.'; }
+    else if (payload.layout === 'frames') { q.printText = 'Read the story. Write each step. Solve.'; }
     // the same instruction in screen verbs (PEDAGOGY 10.2): the hosts print it over the cell
-    q.screenInstr = 'Tap the sign. Type the numbers in the boxes. Solve.';
+    q.screenInstr = payload.signs === false ? 'Type the numbers in the boxes. Divide. Answer the question.'
+        : ring ? 'Type the sign in the circle. Type the numbers. Solve.'
+        : 'Tap the sign. Type the numbers in the boxes. Solve.';
+    if (payload.letter) q.screenInstr = 'Read the story. Type the equation. Find n.';
+    else if (payload.check) q.screenInstr = 'Solve. Estimate. Tap Yes or No.';
+    else if (payload.layout === 'frames') q.screenInstr = 'Read the story. Type each step. Solve.';
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };
     return q;

@@ -357,3 +357,11 @@ html:has(body.teacher-mode) { scroll-padding-bottom: 96px; }
 /* owner 2026-10-30: the options sheet's preview shows the whole problem: a taller frame, scaled to fit, never cropped */
 #teacherApp .tc-frame { height: 300px; }
 @media (max-width: 819px) { #teacherApp .tc-frame { height: 260px; } }
+
+/* Teacher follow-ups: the 28 px tray "x" keeps its look but takes a 44 px hit area. */
+#teacherApp .tt-x { position: relative; }
+#teacherApp .tt-x::after { content: ''; position: absolute; inset: -8px; }
+
+/* Checker 2026-10-30: 44 px tall and wider to the right, but never over the chip's own button on its left
+   (a tap on the chip's right edge must not remove the skill). */
+#teacherApp .tt-x::after { inset: -9px -9px -9px 0; }

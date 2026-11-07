@@ -112,14 +112,16 @@ export {
 // The operations templates that are not a plain stack or fact (long division, area model,
 // chart window, arrays, remainder, number line, fact family, cloze bank).
 export { divisionSteps } from './cells/long-division.js';
+import './cells/pv-times.js';
 import './cells/area-model.js';
+import './cells/area-model-div.js';
 import './cells/mult-chart.js';
 import './cells/ops-counters.js';
 import './cells/arrays-turn.js';
 import './cells/number-line.js';
 import './cells/family.js';
-export { factDigitTracks, factGridStyle, FACT_OP_TRACK_EM } from './cells/fact.js';
-export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'arrays-turn', 'remainder', 'number-line', 'fact-family', 'cloze-bank'];
+export { factDigitTracks, factGridStyle, factOpTrackEm, FACT_OP_TRACK_EM, FACT_DIV_OP_TRACK_TIGHT_EM } from './cells/fact.js';
+export const OPS_TEMPLATE_IDS = ['division', 'area-model', 'mult-chart', 'arrays', 'arrays-turn', 'remainder', 'number-line', 'fact-family', 'cloze-bank', 'area-model-div'];
 
 
 // K-2 picture cells: counters, ten frame, base-10 mat, number bond, chart window, number track,
@@ -133,6 +135,15 @@ import './cells/chartwindow.js';
 import './cells/seqstrip.js';
 import './cells/compare.js';
 import './cells/wordpic.js';
+// 2026-09-26: odd and even (pairs, which, sort) and a whole from unit-fraction pieces.
+import './cells/long-multiplication.js';
+import './cells/parity.js';
+import './cells/frac-wall.js';
+// "Is it a fact family?" (visual-quality lane 2026-10-31): the fact triangle and a circled Yes / No.
+import './cells/family-check.js';
+export { FAMILY_CHECK } from './cells/family-check.js';
+// The graphic library (design/GRAPHIC_LIBRARY.md): one drawing per representation, paper and screen.
+export * as graphics from './graphics/index.js';
 // Every whole-number word problem (owner ruling 2026-09-25): story, sign row, column boxes, answer + unit bank.
 export { barMini } from './cells/word-work.js';
 export { wordWorkPayload, wordWorkTwin, solveStory, parseTwoStep, storyLines, unitOf, cueRanges, columnRows, KEYWORD_BANK, WW_TEMPLATE } from './cells/word-work.js';
@@ -186,6 +197,7 @@ export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
     'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work',
     ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS, 'words'];
 
+export { wordWorkWrongs } from './providers/word-work.js';
 /* ------------------------------------------------- skill providers (register on load) */
 // The real per-skill providers (strings, workedSteps, wrongAnswer, stories). Importing the
 // barrel registers them once; a skill without one keeps the default adapters.

@@ -108,8 +108,8 @@ export const supportsOption = (values, { help, labels = {}, render = null, dflt 
     values: values.map(v => ({ v, l: labels[v] || SUPPORT_LABELS[v] || v })),
     allLabel: 'Every support',
     help: help || 'Tick the help to draw on each problem, on paper and on screen. Supports that cannot '
-        + 'share a problem are shared out by section or problem by problem. None ticked is the fade.',
-    helpShort: 'Tick the help each problem carries. None ticked is no help.',
+        + 'share a problem are shared out by section or problem by problem. Leave every box unticked for the fade.',
+    helpShort: 'Tick the help each problem carries. Leave every box unticked for no help.',
 });
 export const supportCoverOption = (render = null) => ({
     id: 'cover', label: 'Which problems get it', type: 'enum', default: 'whole', group: 'support',
@@ -620,9 +620,40 @@ const _pvValueForm = () => ({
         { v: 'value', l: 'The value (700)' },
         { v: 'unit', l: 'Unit form (7 hundreds)' },
         { v: 'notation', l: 'Expanded notation (7 × 100)' },
+        { v: 'times', l: 'Ten times / one tenth (the 7 in 700 and the 7 in 70)' },
     ],
-    help: 'One way per page. Unit form and expanded notation name the place and the digit.',
+    help: 'One way per page. Unit form and expanded notation name the place and the digit. Ten times compares the same digit in two numbers, one place apart (4.NBT.A.1).',
+    // (lesson 6 r4: "times" draws a two-row place chart in each cell - a value that ADDS a drawing may cost page room,
+    // tests/lib/options-render.cjs)
+    addsDrawingValues: ['times'],
 });
+// value_ten_times (4.NBT.A.1, detailed lesson g4-nbt1-ten-times-value): the options of form "times" only.
+// (r4: each applies only with form "times" - `appliesTo` hides it otherwise; `appliesBase` is the context ws-options-verify
+// tries it in, so a control that only works with form times is not read as inert)
+const _pvTenOptions = () => [
+    { id: 'tenDir', label: 'Ten times: which way', type: 'enum', default: 'both', group: 'difficulty', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
+        values: [
+            { v: 'times', l: 'The first digit is one place left: 10 times' },
+            { v: 'tenth', l: 'The first digit is one place right: one tenth' },
+            { v: 'both', l: 'Both, mixed' },
+        ],
+        help: 'Ten times only. One way at a time first; both mixed so the order of the rows never gives the answer.' },
+    { id: 'tenValues', label: 'Ten times: write both values first', type: 'bool', default: true, group: 'support', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
+        help: 'Ten times only. On: the pupil writes what each digit is worth, then circles. Off: circle only (the fade).' },
+    { id: 'tenPlain', label: 'Ten times: the digit and zeros only (700 and 70)', type: 'bool', default: false, group: 'difficulty', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
+        help: 'Ten times only. On: numbers like 700 and 70. Off: other digits round the digit (740 and 372).' },
+    // (lesson 6 r2, owner skill-coverage rule: the exit slip's item and the word problem are skill options, not page code)
+    { id: 'tenWrite', label: 'Ten times: values written', type: 'enum', default: 'both', group: 'support', appliesTo: (cur) => cur.form === 'times' && cur.tenValues !== false && cur.tenTask !== 'story', appliesBase: { form: 'times' },
+        values: [{ v: 'both', l: 'Both values' }, { v: 'top', l: 'The top value only (a short check)' }],
+        help: 'Ten times with values on. Top: one worth box, the first number\'s digit, then circle.' },
+    { id: 'tenTask', label: 'Ten times: the task', type: 'enum', default: 'compare', group: 'layout', appliesTo: (cur) => cur.form === 'times', appliesBase: { form: 'times' },
+        values: [{ v: 'compare', l: 'Compare the digit in two numbers' }, { v: 'story', l: 'A story: how many times as many? (700 ÷ 70 = 10)' }],
+        help: 'Ten times only. Story: two amounts, the digit and zeros (6,000 and 600); the pupil writes the division and 10.' },
+    // (lesson 6 r4, critic r2 D2: the board Check Question's A-D form is a skill option too)
+    { id: 'tenChoice', label: 'Ten times: words to choose from', type: 'enum', default: 'two', group: 'difficulty', appliesTo: (cur) => cur.form === 'times' && cur.tenValues === false && cur.tenTask !== 'story', appliesBase: { form: 'times', tenValues: false },
+        values: [{ v: 'two', l: '10 times or one tenth of' }, { v: 'four', l: 'Four: 10 times, one tenth of, the same as, 100 times' }],
+        help: 'Ten times with values off (circle only). Four adds the two wrong ideas: the same digit is the same value, and two places is 100 times.' },
+];
 const _pvZeroDigit = () => ({
     id: 'zeroDigit', label: 'Ask the value of a 0', type: 'bool', default: false, group: 'difficulty',
     help: 'On underlines a zero on some items: its value is 0, but it holds the place.',
@@ -719,7 +750,7 @@ function _pvRoundNl(id) {
 }
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
-    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
+    'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions()],
     'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {
         id: 'order', label: 'Order of the parts', type: 'enum', default: 'largest', group: 'difficulty',
@@ -1101,6 +1132,14 @@ const P11_OPS_OPTIONS = {
     'addition:add_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same sums as numbers only.' }],
     'subtraction:sub_5_pictures': [{ ...picturesOption(true), help: 'Off writes the same take-away as numbers only.' }],
     'addition:add_wp_10': [{ ...picturesOption(true), help: 'Off prints the same story with no picture row.' }],
+    // the owner's extra help (2026-10-31): a blank number-family chart to fill in, working space only (a plain support toggle,
+    // not a preset skill: it adds no new task, the graded answer stays the one Yes / No circle)
+    'addition:fact_family_sort': [{
+        id: 'familyChart', label: 'Family chart to fill in', type: 'bool', default: false, group: 'support',
+        help: 'Prints four empty number sentences under each triangle (two + and two −) for the pupil to fill in while deciding. '
+            + 'Working space only: the answer is still the circled Yes or No. The answer key fills the chart for a true family.',
+        helpShort: 'Four empty number sentences under the triangle to work in; the answer is still Yes or No.',
+    }],
 
     // --- across zeros: its own bound on the number you start from (OPTIONS-CRITIC-R2 §5 #18) ----
     // The measured "Up to 100" dealt 408 − 89: a borrow can only travel through a zero from 100
@@ -1173,8 +1212,9 @@ for (const op of ['add', 'sub']) {
         }
     }
     // Word problems by band: one ladder too, bands at or below the id's own. The no-picture twins
-    // (_plain) keep the band only: generate-question.js strips their visual after generation, so a
-    // bar model could not reach them. Pictures exist on the stories to 100; the bar model on every band.
+    // (_plain) keep the band here; their bar model is WORD_WORK_OPTIONS' `wpBar` below (a bar is not a
+    // picture: word-work.js draws it from the cell payload, never from the stripped visual). Pictures
+    // exist on the stories to 100; the bar model on every band.
     for (const [code, max] of Object.entries(_OPS_BANDS)) {
         if (op === 'add' && max === 10) continue;      // add_wp_10 is the K picture story (gen-counting.js)
         const bands = Object.values(_OPS_BANDS).filter(b => b <= max && (b >= 20 || (op === 'sub' && b === 10)));
@@ -2082,6 +2122,21 @@ const _p12DivBy = (lo, hi, dflt, help) => {
     };
 };
 const _p12Enum = (id, label, values, dflt, help, group = 'difficulty') => ({ id, label, type: 'enum', group, default: dflt, values, help });
+// Area models (owner 2026-10-16, design/audit/runs/wave1-D/OWNER-REQUESTS-2026-10-16.md). Given is
+// today's sheet; the other choices draw the kit's area-model cells with the edge numbers as boxes.
+// Mixed deals given / blank down the page from the seeded deck (a page of 4+ always has both).
+const _amEdgesOpt = (div = false) => _p12Enum('amEdges', 'Numbers around the box', [
+    { v: 'given', l: div ? 'Given: the divisor is printed on the side' : 'Given: the parts are printed on the edges' },
+    { v: 'blank', l: div ? 'Pupil writes them: the divisor is a box too' : 'Pupil writes them: the edge parts are boxes (30 | 6 and 4)' },
+    { v: 'mixed', l: 'Mixed: some problems given, some to write' }], 'given',
+div ? 'The quotient\'s parts are always the pupil\'s to find. Pupil writes them also leaves the divisor on the side for the pupil to copy in.'
+    : 'Given prints the expanded parts on the edges. Pupil writes them makes the pupil split the numbers first, then find the areas.', 'support');
+const _amFormOpt = () => ({
+    id: 'amForm', label: 'Show the problem as', type: 'set', group: 'layout', default: ['sign'],
+    values: [{ v: 'sign', l: 'Division sign  (84 ÷ 4)' }, { v: 'long', l: 'Long division  (the bracket)' }, { v: 'fraction', l: 'Fraction  (84 over 4)' }],
+    allLabel: 'All three, mixed',
+    help: 'Tick one form for the whole page, or several to mix them down the page.',
+});
 
 const P12_OPTIONS = {
     // ======================= × and ÷ ladder steps (gen-operations.js, gen-counting.js) =========
@@ -2107,10 +2162,10 @@ const P12_OPTIONS = {
     ],
     'multiplication:area_model_mult': [_p12Enum('tiles', 'Digits × digit', [
         { v: null, l: 'Both sizes, dealt' }, { v: 21, l: '2-digit × 1-digit (4 × 36)' }, { v: 31, l: '3-digit × 1-digit (3 × 135)' }],
-    null, 'The size of the number split into parts: two parts (tens, ones) or three (hundreds, tens, ones).')],
+    null, 'The size of the number split into parts: two parts (tens, ones) or three (hundreds, tens, ones).'), _amEdgesOpt()],
     'multiplication:area_model_mult_hard': [_p12Enum('tiles', 'Digits × digits', [
         { v: null, l: 'Both grids, dealt' }, { v: 22, l: '2-digit × 2-digit (a 2 × 2 grid)' }, { v: 23, l: '2-digit × 3-digit (a 2 × 3 grid)' }],
-    null, 'The grid the pupil fills: four partial products, or six.')],
+    null, 'The grid the pupil fills: four partial products, or six.'), _amEdgesOpt()],
     'multiplication:repeated_add_to_mult': [
         _opsBand([25, 36, 100], 36, { label: 'Groups and group size to', labels: { 25: '5', 36: '6', 100: '10' },
             help: 'The most groups and the most in a group: the product is at most 25, 36 or 100.' }),
@@ -2142,8 +2197,8 @@ const P12_OPTIONS = {
         { ..._opsRegroup('mixed'), label: 'Remainders', values: [{ v: 'none', l: 'None (it shares exactly)' }, { v: 'mixed', l: 'Some items' }, { v: 'always', l: 'Every item' }],
             help: 'A remainder is written R in the last box: 437 ÷ 4 = 109 R 1.' },
     ],
-    'division:area_model_div_2by1': [_p12DivBy(2, 9)],
-    'division:area_model_div_3by1': [_p12DivBy(2, 9)],
+    'division:area_model_div_2by1': [_p12DivBy(2, 9), _amEdgesOpt(true), _amFormOpt()],
+    'division:area_model_div_3by1': [_p12DivBy(2, 9), _amEdgesOpt(true), _amFormOpt()],
     'division:share_into_groups': [_opsBand([12, 24], 24, { label: 'Counters to', help: 'The most counters in the picture. 12 keeps it to 2 to 4 groups.' })],
     'division:div_equation_parts': [
         formsOption([{ v: 0, l: 'How many in all' }, { v: 1, l: 'How many in each group' }, { v: 2, l: 'How many groups' }],
@@ -2169,7 +2224,9 @@ const P12_OPTIONS = {
         levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The numbers stay the same size at every level.'),
     ],
     'multiplication:number_families_mult': [
-        _opsBand([25, 100, 144], 25, { label: 'Tables to', labels: { 25: '5 × 5', 100: '10 × 10', 144: '12 × 12' },
+        // (owner 2026-10-10) "6 × 6" is APPENDED: the values keep their order and the default stays
+        // 5 × 5, so every shipped code reads as before; 6 × 6 holds 15 families where 5 × 5 holds 10
+        _opsBand([25, 100, 144, 36], 25, { label: 'Tables to', labels: { 25: '5 × 5', 100: '10 × 10', 144: '12 × 12', 36: '6 × 6' },
             help: 'The largest table in the family, at every support level.' }),
         levelSubset([2, 1, 0], 2, 'Level 2 leaves only each answer blank, level 1 blanks two numbers in every row, level 0 blanks the whole family. The tables stay the same at every level.'),
     ],
@@ -2563,6 +2620,21 @@ Object.assign(P12_OPTIONS, {
         ['Sort by how likely (drag)', 'Drag each']])],
 });
 
+// msOps (3.OA.D.8, detailed lesson g3-oa8-two-step-wp; build list multi_step_four_ops): the first step's
+// operation. 'addsub' = the four + / − archetypes (the default, every old code unchanged); 'mult' / 'div' = a ×
+// or ÷ step that feeds a + or − step (facts within 10 × 10, the answer never a story number).
+const _msOps = () => ({
+    id: 'msOps', label: 'Two steps: the first step', type: 'enum', default: 'addsub', group: 'difficulty',
+    values: [
+        { v: 'addsub', l: 'Add or take away, then add or take away' },
+        { v: 'mult', l: 'Multiply, then add or take away (4 bags of 6, 5 given away)' },
+        { v: 'div', l: 'Divide, then add or take away (24 shared by 4, 2 more each)' },
+        { v: 'multdiv', l: 'Multiply or divide, then add or take away' },
+        { v: 'addmult', l: 'Add or take away, then multiply ((5 + 3) in each of 4 bags)' },
+        { v: 'adddiv', l: 'Add or take away, then divide ((12 + 18) shared by 5)' },
+    ],
+    help: 'The new thing in Grade 3 is a × or ÷ step whose answer is used in the + or − step. One first step at a time, then mixed.',
+});
 // ======================= WORD PROBLEMS: WHAT IS MISSING (gen-operations.js) ===============
 // The story kinds each word-problem generator already rotates through (pickVariant) become the
 // teacher's "What is missing" control, added to the P11 panel. The _plain twin carries the same
@@ -2587,7 +2659,7 @@ Object.assign(P12_OPTIONS, {
     'division:div_word_problems': [...(SKILL_OPTIONS['division:div_word_problems'] || []), _wpDiv()],
     'division:div_word_problems_plain': [_wpDiv()],
     'algebra:multi_step_word_plain': [_p12Variants('multi_step_word', ['add_then_sub', 'sub_then_add', 'add_then_add', 'sub_then_sub'],
-        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
+        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' }), _msOps()],
 });
 
 // ======================= FRACTION AND MEASUREMENT LEFTOVERS =================================
@@ -2614,8 +2686,15 @@ Object.assign(P12_OPTIONS, {
 // items ask, so the teacher can also change the kind of work, not only the size.
 const _ops4 = [['Adding', ' \\+ '], ['Subtracting', ' - '], ['Multiplying', ' × '], ['Dividing', ' ÷ ']];
 Object.assign(P12_OPTIONS, {
-    'composing:odd_even': [_p12Match([['Odd or even? (one number)', '^Is \\d+ odd or even'], ['Click all the even or odd numbers', '^Click all'],
-        ['Which number is even or odd?', '^Which number']])],
+    'composing:odd_even': [_p12Match([['Odd or even? (one number, dots in pairs)', '^Is \\d+ odd or even'], ['Circle the even numbers, cross out the odd', '^Click all'],
+        ['Which number is even or odd?', '^Which number']], { dflt: [0],
+        help: 'One kind to a page: the dots in pairs come first. Tick more kinds to mix them.' })],
+    // One kind to a page by default (kind 0); gen-fractions.js reads `forms` itself.
+    'composing:fraction_number_line': [_p12Denoms(), _p12Match([['Read the dot (0 to 1)', 'show\\? =>'], ['Read the shaded line (0 to 1)', 'shaded\\?'],
+        ['Read a dot past 1', 'past 1'], ['Pick the number line that shows a fraction', '^Which number line'], ['Mark a fraction on the line', '^Put ']], { dflt: [0],
+        help: 'One kind to a page: reading the dot comes first. Tick more kinds to mix them.' })],
+    'composing:whole_as_fraction': [_p12Denoms(), _p12Match([['A whole number over 1 (4 = 4/1)', 'whole number as a fraction'], ['1 as all the parts (1 = 6/6)', '^Write 1 as a fraction']], { dflt: [0],
+        help: 'A whole number over 1 comes first. Tick both to mix them.' })],
     'subtraction:missing_add_sub': [
         _p12Kinds('unknown', 'What is missing', [['The answer (8 + 5 = __)', '= ___ =>'], ['A number before the = sign', '___ [+-]|[+-] ___']]),
         _p12Kinds('task', 'Operation', [['Adding', '\\+'], ['Subtracting', ' - ']]),
@@ -2692,7 +2771,7 @@ Object.assign(P12_OPTIONS, {
     'algebra:tape_diagram_plain': [_p12Kinds('forms', 'The story', [['Joining (gets more)', 'gets \\d+ more'], ['Taking away (used some)', 'used \\d+'],
         ['How many more are needed', 'needs \\d+']])],
     'algebra:multi_step_word': [_p12Variants('multi_step_word', ['add_then_sub', 'sub_then_add', 'add_then_add', 'sub_then_sub'],
-        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' })],
+        ['Add, then take away', 'Take away, then add', 'Add twice', 'Take away twice'], { label: 'The two steps' }), _msOps()],
     'algebra:solve_unknown': [_p12Match([['x + a = b', 'Solve: x \\+'], ['x − a = b', 'Solve: x -'], ['ax = b', 'Solve: \\d+x ='], ['Click the values that work', '^Click ALL']])],
     'algebra:balance_addsub': [_p12Kinds('unknown', 'Where the blank is', [['At the start (___ + 4 = 9 − 2)', 'equal: ___'], ['In the middle (12 − ___ = 3 + 4)', 'equal: \\d+ - ___'],
         ['On the right (5 + 3 = ___ + 2)', '= ___ \\+']])],
@@ -3317,6 +3396,33 @@ const WORD_WORK_OPTIONS = (bar) => [
         const hasBar = cur.some(o => o.id === 'support' && Array.isArray(o.values) && o.values.some(v => v.v === 'bar'));
         SKILL_OPTIONS[key] = [...cur, ...WORD_WORK_OPTIONS(!hasBar)];
     }
+    // The 8 sentence-layout story skills (within 10 and 20) do not offer the keyword supports (lead ruling 2026-10-31,
+    // critic visual-quality r2 N3, PEDAGOGY P-21): a keyword list teaches "in all means +" instead of the story's
+    // structure, and these stories are read for their parts and whole. `hidden` keeps both in the model, so a share
+    // code or saved page that carries them still decodes; the teacher is no longer shown them.
+    for (const op of ['add', 'sub']) for (const code of ['10', '20']) for (const tail of ['', '_plain']) {
+        const key = `${op === 'add' ? 'addition' : 'subtraction'}:${op}_wp_${code}${tail}`;
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map(o => (o.id === 'wpCues' || o.id === 'wpBank' ? { ...o, hidden: true } : o));
+    }
+}
+// `wpFrames` (detailed lesson 7, 2026-10-17): the compact form - one number sentence a step - on the × / ÷ and
+// two-step stories its lesson deals (the exit slip and the Prerequisite Check).
+for (const key of ['multiplication:mult_word_problems', 'division:div_word_problems', 'algebra:multi_step_word']) {
+    for (const k of [key, `${key}_plain`]) SKILL_OPTIONS[k] = [...(SKILL_OPTIONS[k] || []), {
+        id: 'wpFrames', label: 'Number sentences, no column boxes', type: 'bool', default: false, group: 'layout',
+        help: 'Each step is written as one number sentence (Step 1: __ ○ __ = __), the unit word printed. The fade of the column boxes; a compact story.' }];
+}
+// msLetter / msCheck (3.OA.D.8, detailed lesson 7 round 2): the standard's two other clauses as responses.
+for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
+    SKILL_OPTIONS[k] = [...(SKILL_OPTIONS[k] || []),
+        { id: 'msLetter', label: 'Write one equation with a letter', type: 'bool', default: false, group: 'layout',
+            help: 'The pupil writes the whole story as one equation with n for the unknown (5 × 4 − 6 = n; brackets when the + or − comes first), then n.' },
+        { id: 'msCheck', label: 'Estimate to check', type: 'bool', default: false, group: 'layout',
+            help: 'Add and take-away stories: the pupil works the two steps, rounds each story number to the nearest ten, estimates, and rings Yes or No: is my answer close?' },
+        // (lesson 7 r3: the board Check Question's A-D choice is a skill option too - a response mode, no preset skill)
+        { id: 'msChoose', label: 'Choose the answer (A to D)', type: 'bool', default: false, group: 'layout',
+            appliesTo: (cur) => ['mult', 'div', 'multdiv'].includes(cur.msOps), appliesBase: { msOps: 'mult' },
+            help: 'Multiply or divide first, then take away. The pupil checks one of four answers: the right one and the three two-step mistakes (stopped after Step 1, a story number in Step 2, one sign for both).' }];
 }
 
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
@@ -3591,6 +3697,9 @@ const OWNS_ITS_NUMBERS = new Set(['constant', 'band', 'place', 'most']);
 // four story kinds at their own sizes, so "Up to 10" still printed 49 and "Tenths" printed whole
 // numbers (the stories have no decimal form).
 const P12_NO_MEASURED = new Set(['number_ops_mixed:word_problems_mixed', 'number_ops_mixed:word_problems_mixed_plain']);
+// (OPTIONS-CRITIC-R2 §5 #14 asked to drop the measured Decimal places on number_ops_mixed:mixed,
+// algebra:solve_unknown and evaluate_expression; checked 2026-10-30, they DO deal decimals (106.2, 34.5,
+// 1.9 at Tenths), so the control stays: hiding it hid a setting that still applies.)
 
 function _measuredOptions(categoryId, skillId, own) {
     const d = DERIVED[`${categoryId}:${skillId}`];
@@ -3606,7 +3715,8 @@ function _measuredOptions(categoryId, skillId, own) {
         // A decimals skill deals decimals at the app's "whole numbers" setting too, so its null
         // value must not read "Use the Decimals setting (now whole numbers)" (OPTIONS-CRITIC-R2 §5 #9).
         const own = categoryId === 'decimals' || DECIMAL_SKILLS_ELSEWHERE.has(skillId);
-        out.push(own ? { ...decimalsOption(d.decimals), nullLabel: 'Tenths and hundredths (this skill\'s own)' } : decimalsOption(d.decimals));
+        const dec = own ? { ...decimalsOption(d.decimals), nullLabel: 'Tenths and hundredths (this skill\'s own)' } : decimalsOption(d.decimals);
+        out.push(dec);
     }
     return out;
 }

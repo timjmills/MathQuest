@@ -15,7 +15,7 @@ import { getFactorPairs, createFactorLinksSVG } from './modules/svg-factors.js';
 import { linkVocabInText } from './modules/vocab-tooltip.js';
 
 // Layer 2: Gamification
-import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, dismissNudgePopup, showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress, openMyStats, closeMyStats, setupTabDetection, removeTabDetection, showIdleModal, dismissIdleModal } from './modules/gamification.js';
+import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, dismissNudgePopup, showStudentLandingModal, startFromLanding, printFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress, openMyStats, closeMyStats, setupTabDetection, removeTabDetection, showIdleModal, dismissIdleModal } from './modules/gamification.js';
 
 // Layer 2: Core Systems
 import { initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel, updateProgressDisplay, trackPerformance, adjustDifficulty, getAdaptiveRange, openProgressDashboard, closeProgressDashboard, renderProgressDashboard, clearAllProgress, showNotification } from './modules/progress.js';
@@ -30,9 +30,9 @@ import { updateCategoryOptions, updateBreadcrumb, updateSkillOptions, initInline
 import { buildSkillIndex, getSkillIndex, handleSkillSearch, selectSkillFromSearch, showSearchResults, hideSearchResults, clearSkillSearch } from './modules/skill-search.js';
 
 // Layer 3: Skill Management
-import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue } from './modules/unified-skills.js';
+import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue, updateStudentSelBar, playStudentSelection, sendStudentSelection, copyStudentSendLink, printStudentSelection, closeStudentSend, syncSelBarHeight } from './modules/unified-skills.js';
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType, parseSkillCodeParts, buildMixedCode, parseMixedGoals, isSkillCodeWithOptions } from './modules/skill-codes.js';
-import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts } from './modules/quick-skills.js';
+import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill, addSelectionToQuickStart } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
 import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot, renderAdaptiveLevelChip, setAdaptiveModeEnabled, refreshAdaptiveUI } from './modules/adaptive-engine.js';
 import { selectMode, startMode } from "./modules/mode-selection.js";
@@ -58,43 +58,19 @@ import { showHint, speakHint, closeHintPopup, speakQuestion, speakAnswerOption, 
 import { updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed } from './modules/boss-race.js';
 
 // Layer 5: Composite Features
-import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, checkWorksheetMC, showWorksheetScore, wsMagnifyCard, wsSpeak, wsSkipCard, attachWorksheetZoom } from './modules/worksheet.js';
+// The online worksheet mode (worksheet.js) loads on demand too - see WORKSHEET_NAMES below.
 import { showModal, getGameDescriptionText, showEndGameModal, updateGoalProgress, checkProblemGoals, endGame, saveWorksheetToHistory, saveToSessionHistory } from './modules/game-flow.js';
 import { markTodayAsPlayed, updateStreak, renderStreakCalendar, renderBadges, renderDashboard, filterHistory, getFilteredHistory, renderSessionHistory } from './modules/dashboard.js';
 import { openMixedSettings, buildMixedSkillsUI, toggleMixedDomain, toggleDomainCheckbox, updateDomainCheckbox, updateCategoryCheckbox, updateSkillSelection, toggleMixedCategory, toggleCategoryCheckbox, selectAllMixedSkills, deselectAllMixedSkills, setTimeChoice, setModeChoice, toggleTotalProblems, toggleCorrectGoal, getSelectedMixedSkills, skillsToBitfield, bitfieldToSkills, updateMixedCode, copyMixedCode, applyMixedSettings as applyMixedSettingsModal, showMixedError, showMixedSuccess } from './modules/mixed-mode-settings.js';
 import { saveMixedModeSettings, loadMixedModeSettings, updateMixedPlayCardState, showPlayMixedPopup, closePlayMixedPopup, closePlayMixedPopupOutside, getAllSkillsEasySettings, playWithLastSettings, playWithCode, parseSingleSkillCodeForPlay, parseCompactMixedCodeForPlay, parseMixedCodeForPlay, applyAndPlayMixedSettings, showStudentChoiceModal, selectStudentMode, selectStudentTimer, updateStudentPlayButton, startMixedGameFromModal, closeStudentChoiceOutside, showMixedPlayToast, updateModeCardsForMixed } from './modules/mixed-mode-play.js';
 import { initializeMixedSkillsDropdowns, updateMixedSkillsCategorySelect, updateMixedSkillsSkillSelect, addMixedSkillFromSelects, addMixedSkill, removeMixedSkill, renderMixedSkillsList, distributeMixedSkillsEvenly, clearMixedSkillsWeights, clearMixedSkillsList, syncMixedSkillsListToGlobal, handleMixedSkillSearch, addSkillFromMixedSearch, showMixedSkillSearchResults, hideMixedSkillSearchResults, clearMixedSkillSearch, closeMixedSettings } from './modules/mixed-skill-search.js';
 
-// Layer 6: Print System
-import { openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimplePrintModal, generateSimplePrint, generateWorksheetFromSkills, generateWorksheetFromSections, buildQueuedSkillsWeightedSection, removeQueuedSkillWeight, updateQueuedSkillsTotal, distributeQueuedSkillsEvenly, clearQueuedSkillsWeights, getQueuedSkillsWeights, applyQueuedSkillsToPrint, renderPrintSections, addPrintSection, removePrintSection, updatePrintSectionLabel, removePrintSectionSkill, togglePrintSkillOptions, setPrintSkillOption, togglePrintSkillOptionSet, setPrintSkillOptionSetAll, resetPrintSkillOptions, ownPrintSkillOptions, handlePrintSkillDragStart, handlePrintSkillDragEnd, handlePrintSkillDragOver, handlePrintSkillDragLeave, handlePrintSkillDrop, setPrintCountMode, autoGroupPrintSections, handlePrintDialogSearch, togglePrintDialogSkill, hidePrintDialogSearch, calculateProblemsForPages, savePrintSections, loadSavedPrintSections, cancelPrintGeneration, printMapSkillsAsWorksheet } from './modules/print-settings.js';
-import { openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge, initializeAddSkillsDropdowns, updateAddSkillsCategorySelect, updateAddSkillsSkillSelect, addSkillFromModalSelects, addGlobalSkill, removeGlobalSkill, renderGlobalSkillsList, distributeGlobalSkillsEvenly, clearGlobalSkillsWeights, clearGlobalSkillsList, syncGlobalSkillsToWeightedItems, syncWeightedItemsToGlobalSkills, syncMixedSkillsToGlobalSkills, handleAddSkillsSearch, addSkillFromAddSkillsSearch, showAddSkillsSearchResults, hideAddSkillsSearchResults, clearAddSkillsSearch, playWithGlobalSkills, openPrintWithGlobalSkills, quizFromGlobalSkills } from './modules/print-global-skills.js';
-import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrintCategoryCheckbox, updatePrintCategoryCheckbox, selectAllPrintSkills, deselectAllPrintSkills, updateWeightedSectionFromSelections, getSelectedPrintSkillsWithInfo, buildWeightedFromMixedSettings, initializeWeightedSectionOnOpen, generateWeightedSkillsFromDomains, getWeightedCategoryLabel, initializeWeightedDropdowns, updateWeightedCategorySelect, updateWeightedSkillSelect, addWeightedItemFromSelects, addWeightedItem, removeWeightedItem, renderWeightedItemsList, distributeWeightedEvenly, clearAllWeights, clearWeightedList, getWeightedItemsForGeneration, handlePrintSkillSearch, addSkillFromPrintSearch, showPrintSearchResults, hidePrintSearchResults, clearPrintSkillSearch, populateWeightedFromQueue, toggleWeightedDistribution, addWeightedSkill, updateWeightedSkillSelection, updateWeightedRangeSelection, updateWeightedSkillOptions, removeWeightedSkill, updateWeightedTotal, getWeightedSkillsForGeneration, getSelectedPrintSkills } from './modules/print-weighted.js';
-import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
-// The sheet engine bridge (P7.2): page roles -> pupil sheet + facsimile key
-import { buildSheet, sheetDocument, lessonPartSeed, LESSON_PARTS } from './modules/print-sheet.js';
-import { lessonById, lessonData, lessonsForSkill, defaultLessonForSkill } from './modules/lessons/library.js';
-
-// Google Classroom Export
-import { exportPrintToGoogleForms, exportQuizToGoogleForms, openGoogleExportModal, closeGoogleExportModal, startGoogleExport, initGoogleAuth, isGoogleAuthenticated, revokeGoogleToken, listClassroomCourses } from './modules/google-classroom.js';
-
-// Quiz System
-import { initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest, exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './modules/quiz-storage.js';
-import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile, qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput, qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview, addSection, removeSection, reorderSection, setActiveSection, updateSectionLayout, updateSectionLabel, updateSectionInstructions, toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection, openQuizPreview, closeQuizPreview, switchPreviewTab, handleQbQuestionDragStart, handleQbQuestionDragEnd, handleQbSectionDragOver, handleQbSectionDragLeave, handleQbSectionDrop, openBuilderResults, openBuilderMonitor } from './modules/quiz-builder.js';
-import { quizQuestionData, handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults } from './modules/quiz-take.js';
-import { showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest, closeQuizResults, copyQuizLinkFromResults } from './modules/quiz-results.js';
-import { tvqMenu } from './modules/teacher-quiz-ui.js';
-import { openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption, inviteStudents, finishMonitoring, closeQuizMonitor } from './modules/quiz-monitor.js';
-
-// Layer 3: Skills Organizer
-import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory, soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue, soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview, soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz } from './modules/skills-organizer.js';
+// Layer 6 (print, quiz, Google export), the skills organizer, MAP test practice and the teacher site are DEFERRED
+// (Chromebook speed lane, 2026-11-02): ./modules/deferred.js imports them, and loadDeferred() below fetches it on demand
+// or on idle. A pupil's first question never waits for them.
 
 // Learning Stats
 import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails } from './modules/learning-stats.js';
-
-// MAP Test Practice
-import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem, mapJumpToItem, mapResumeCurrent, mapNavBack, mapNavForward } from './modules/map-engine.js';
-import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector, generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink } from './modules/map-mode-ui.js';
-import { renderMapResults, printMapSession, restartMapSession, updateMapGradeContext } from './modules/map-results.js';
 
 // Floating Calculator Widget (lazy-built; visible only on q.calculatorAllowed)
 import { toggleCalculator, showCalculator, hideCalculator } from './modules/calculator.js';
@@ -118,9 +94,6 @@ import { getAvailableVoices, getSelectedVoiceURI, setSelectedVoiceURI, applyVoic
 // Word-problem icons (line-art SVGs replacing the old monochrome BW_ICONS glyphs)
 import { getWordProblemIcon } from './modules/word-problem-icons.js';
 
-// Teacher view shell (approved design 2026-09-24): sidebar + teacher screens, teacher mode only
-import { tvGo } from './modules/teacher-shell.js';
-import './modules/teacher-sheet.js';   // T3b: window.tvOpenSheet (the Worksheet, Quiz and Share sheets)
 // The word-work cell on screen: tap a sign, type in the column boxes, tap a unit word (2026-09-25).
 import './modules/word-work-screen.js';
 // The next answer box pulses yellow on every pupil screen (owner, 2026-10-04).
@@ -150,13 +123,21 @@ function confirmResetAdaptiveLevels() {
     }
 }
 
+// The "skills" count badge of the print dialog. Core code (unified-skills, the mixed settings) refreshes it on every
+// skill change, so it lives here as well as in print-global-skills.js (same body): calling the deferred stub instead
+// pulled the whole teacher / print half into a pupil's game (Chromebook speed lane, 2026-11-02).
+function updateSkillsCountBadge() {
+    const badge = document.getElementById('skillsCountBadge');
+    if (!badge) return;
+    const n = (window.globalSkillsList || []).length;
+    if (n > 0) { badge.textContent = n; badge.style.display = 'flex'; } else badge.style.display = 'none';
+}
+
 // ==========================================
 // Attach ALL functions to window for inline handlers
 // ==========================================
 Object.assign(window, {
-    togglePlayMenu,
-    // Teacher view
-    tvGo,
+    togglePlayMenu, updateSkillsCountBadge,
     // State & Data (needed by some inline handlers and template code)
     state, DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES,
     getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY,
@@ -193,7 +174,7 @@ Object.assign(window, {
     initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay,
     getStatsHistory, renderStatsHistory, toggleCelebrations,
     startQuestionTimer, clearQuestionTimer, dismissNudgePopup,
-    showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress,
+    showStudentLandingModal, startFromLanding, printFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress,
     openMyStats, closeMyStats, setupTabDetection, removeTabDetection,
     showIdleModal, dismissIdleModal,
 
@@ -242,7 +223,7 @@ Object.assign(window, {
     UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue,
     toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems,
     handleSearchBlur, checkLinksInput, showQueueFeedback,
-    playSelectedSkills, printSelectedSkills, printFromQueue,
+    playSelectedSkills, printSelectedSkills, printFromQueue, updateStudentSelBar, playStudentSelection, sendStudentSelection, copyStudentSendLink, printStudentSelection, closeStudentSend, syncSelBarHeight,
 
     // Skill Codes
     generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay,
@@ -260,7 +241,7 @@ Object.assign(window, {
     removeQuickSkill, removeStudentQuickSkill, addToQuickSkills,
     resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults,
     toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility,
-    toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts,
+    toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts, printQuickSkill, addSelectionToQuickStart,
 
     // Grade-Level Batch Assign Chips (research Feature 2)
     initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips,
@@ -332,16 +313,6 @@ Object.assign(window, {
     // Boss & Race
     updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed,
 
-    // Worksheet
-    initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet,
-    toggleHint, closeHint, checkWorksheetAnswerFromColumns,
-    checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded,
-    checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer,
-    advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet,
-    checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer,
-    checkAreaModelInput, checkWorksheetNumberFamily, checkWorksheetMC, showWorksheetScore,
-    wsMagnifyCard, wsSpeak, wsSkipCard, attachWorksheetZoom,
-
     // Game Flow
     showModal, getGameDescriptionText, showEndGameModal,
     updateGoalProgress, checkProblemGoals, endGame,
@@ -377,102 +348,6 @@ Object.assign(window, {
     syncMixedSkillsListToGlobal, handleMixedSkillSearch, addSkillFromMixedSearch,
     showMixedSkillSearchResults, hideMixedSkillSearchResults, clearMixedSkillSearch,
     closeMixedSettings,
-
-    // Print Settings
-    openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimplePrintModal,
-    generateSimplePrint, generateWorksheetFromSkills, generateWorksheetFromSections,
-    buildQueuedSkillsWeightedSection, removeQueuedSkillWeight,
-    updateQueuedSkillsTotal, distributeQueuedSkillsEvenly,
-    clearQueuedSkillsWeights, getQueuedSkillsWeights, applyQueuedSkillsToPrint,
-    renderPrintSections, addPrintSection, removePrintSection,
-    updatePrintSectionLabel, removePrintSectionSkill,
-    togglePrintSkillOptions, setPrintSkillOption, togglePrintSkillOptionSet,
-    setPrintSkillOptionSetAll, resetPrintSkillOptions, ownPrintSkillOptions,
-    handlePrintSkillDragStart, handlePrintSkillDragEnd,
-    handlePrintSkillDragOver, handlePrintSkillDragLeave, handlePrintSkillDrop,
-    setPrintCountMode, autoGroupPrintSections, handlePrintDialogSearch,
-    togglePrintDialogSkill, hidePrintDialogSearch, calculateProblemsForPages,
-    savePrintSections, loadSavedPrintSections, cancelPrintGeneration,
-    printMapSkillsAsWorksheet,
-
-    // Print Global Skills
-    openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge,
-    initializeAddSkillsDropdowns, updateAddSkillsCategorySelect,
-    updateAddSkillsSkillSelect, addSkillFromModalSelects,
-    addGlobalSkill, removeGlobalSkill, renderGlobalSkillsList,
-    distributeGlobalSkillsEvenly, clearGlobalSkillsWeights, clearGlobalSkillsList,
-    syncGlobalSkillsToWeightedItems, syncWeightedItemsToGlobalSkills,
-    syncMixedSkillsToGlobalSkills, handleAddSkillsSearch, addSkillFromAddSkillsSearch,
-    showAddSkillsSearchResults, hideAddSkillsSearchResults, clearAddSkillsSearch,
-    playWithGlobalSkills, openPrintWithGlobalSkills, quizFromGlobalSkills,
-
-    // Print Weighted
-    togglePrintSource, buildPrintSkillsUI, togglePrintCategory,
-    togglePrintCategoryCheckbox, updatePrintCategoryCheckbox,
-    selectAllPrintSkills, deselectAllPrintSkills,
-    updateWeightedSectionFromSelections, getSelectedPrintSkillsWithInfo,
-    buildWeightedFromMixedSettings, initializeWeightedSectionOnOpen,
-    generateWeightedSkillsFromDomains, getWeightedCategoryLabel,
-    initializeWeightedDropdowns, updateWeightedCategorySelect,
-    updateWeightedSkillSelect, addWeightedItemFromSelects,
-    addWeightedItem, removeWeightedItem, renderWeightedItemsList,
-    distributeWeightedEvenly, clearAllWeights, clearWeightedList,
-    getWeightedItemsForGeneration, handlePrintSkillSearch, addSkillFromPrintSearch,
-    showPrintSearchResults, hidePrintSearchResults, clearPrintSkillSearch,
-    populateWeightedFromQueue, toggleWeightedDistribution, addWeightedSkill,
-    updateWeightedSkillSelection, updateWeightedRangeSelection,
-    updateWeightedSkillOptions, removeWeightedSkill, updateWeightedTotal,
-    getWeightedSkillsForGeneration, getSelectedPrintSkills,
-
-    // Print Generate
-    generatePrintProblem, formatProblemForPrint, generateWorksheetHTML,
-    generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType,
-    closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet,
-    buildSheet, sheetDocument, lessonPartSeed, LESSON_PARTS, lessonById, lessonData, lessonsForSkill, defaultLessonForSkill,
-
-    // Skills Organizer
-    openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory,
-    soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue,
-    soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview,
-    soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz,
-
-    // Quiz System
-    initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest,
-    exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL,
-    migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount,
-    openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill,
-    addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion,
-    duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting,
-    openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink,
-    printQuiz, exportQuiz, importQuizFile,
-    qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput,
-    qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview,
-    addSection, removeSection, reorderSection, setActiveSection,
-    updateSectionLayout, updateSectionLabel, updateSectionInstructions,
-    toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection,
-    handleQbQuestionDragStart, handleQbQuestionDragEnd,
-    handleQbSectionDragOver, handleQbSectionDragLeave, handleQbSectionDrop, openBuilderResults, openBuilderMonitor,
-    openQuizPreview, closeQuizPreview, switchPreviewTab,
-    quizQuestionData, handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer,
-    navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion,
-    showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults,
-    showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest, closeQuizResults, copyQuizLinkFromResults, tvqMenu,
-
-    // Google Classroom Export
-    exportPrintToGoogleForms, exportQuizToGoogleForms, openGoogleExportModal, closeGoogleExportModal, startGoogleExport, initGoogleAuth, isGoogleAuthenticated, revokeGoogleToken, listClassroomCourses,
-
-    // Quiz Monitor
-    openQuizMonitor, closeQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption,
-    inviteStudents, finishMonitoring,
-
-    // MAP Test Practice
-    openMapTest, initMapSelector, startMapFromUI, selectMapTier,
-    toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands,
-    setMapItemCount, setMapMode, printMapFromSelector,
-    generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink,
-    startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem,
-    mapJumpToItem, mapResumeCurrent, mapNavBack, mapNavForward,
-    renderMapResults, printMapSession, restartMapSession, updateMapGradeContext,
 
     // Calculator Widget
     toggleCalculator, showCalculator, hideCalculator,
@@ -565,8 +440,219 @@ document.addEventListener('click', function(e) {
     if (text) window.speak(text);
 });
 
+// ==========================================
+// The deferred half (Chromebook speed lane, 2026-11-02)
+// ==========================================
+// Every name below lives in ./modules/deferred.js. Until that file has loaded, window.<name> is a thin async stub:
+// calling it loads the deferred half, then calls the real function (so the 200+ inline onclick handlers keep
+// working). Once loaded, each stub is replaced by the real function, so later calls are synchronous again.
+const DEFERRED_NAMES = [
+    'openPrintSettings', 'closePrintSettings', 'openSimplePrintDialog', 'closeSimplePrintModal',
+    'generateSimplePrint', 'generateWorksheetFromSkills', 'generateWorksheetFromSections',
+    'buildQueuedSkillsWeightedSection', 'removeQueuedSkillWeight', 'updateQueuedSkillsTotal',
+    'distributeQueuedSkillsEvenly', 'clearQueuedSkillsWeights', 'getQueuedSkillsWeights', 'applyQueuedSkillsToPrint',
+    'renderPrintSections', 'addPrintSection', 'removePrintSection', 'updatePrintSectionLabel',
+    'removePrintSectionSkill', 'togglePrintSkillOptions', 'setPrintSkillOption', 'togglePrintSkillOptionSet',
+    'setPrintSkillOptionSetAll', 'resetPrintSkillOptions', 'ownPrintSkillOptions', 'handlePrintSkillDragStart',
+    'handlePrintSkillDragEnd', 'handlePrintSkillDragOver', 'handlePrintSkillDragLeave', 'handlePrintSkillDrop',
+    'setPrintCountMode', 'autoGroupPrintSections', 'handlePrintDialogSearch', 'togglePrintDialogSkill',
+    'hidePrintDialogSearch', 'calculateProblemsForPages', 'savePrintSections', 'loadSavedPrintSections',
+    'cancelPrintGeneration', 'printMapSkillsAsWorksheet', 'openAddSkillsModal', 'closeAddSkillsModal',
+    'updateSkillsCountBadge', 'initializeAddSkillsDropdowns', 'updateAddSkillsCategorySelect',
+    'updateAddSkillsSkillSelect', 'addSkillFromModalSelects', 'addGlobalSkill', 'removeGlobalSkill',
+    'renderGlobalSkillsList', 'distributeGlobalSkillsEvenly', 'clearGlobalSkillsWeights', 'clearGlobalSkillsList',
+    'syncGlobalSkillsToWeightedItems', 'syncWeightedItemsToGlobalSkills', 'syncMixedSkillsToGlobalSkills',
+    'handleAddSkillsSearch', 'addSkillFromAddSkillsSearch', 'showAddSkillsSearchResults',
+    'hideAddSkillsSearchResults', 'clearAddSkillsSearch', 'playWithGlobalSkills', 'openPrintWithGlobalSkills',
+    'quizFromGlobalSkills', 'togglePrintSource', 'buildPrintSkillsUI', 'togglePrintCategory',
+    'togglePrintCategoryCheckbox', 'updatePrintCategoryCheckbox', 'selectAllPrintSkills', 'deselectAllPrintSkills',
+    'updateWeightedSectionFromSelections', 'getSelectedPrintSkillsWithInfo', 'buildWeightedFromMixedSettings',
+    'initializeWeightedSectionOnOpen', 'generateWeightedSkillsFromDomains', 'getWeightedCategoryLabel',
+    'initializeWeightedDropdowns', 'updateWeightedCategorySelect', 'updateWeightedSkillSelect',
+    'addWeightedItemFromSelects', 'addWeightedItem', 'removeWeightedItem', 'renderWeightedItemsList',
+    'distributeWeightedEvenly', 'clearAllWeights', 'clearWeightedList', 'getWeightedItemsForGeneration',
+    'handlePrintSkillSearch', 'addSkillFromPrintSearch', 'showPrintSearchResults', 'hidePrintSearchResults',
+    'clearPrintSkillSearch', 'populateWeightedFromQueue', 'toggleWeightedDistribution', 'addWeightedSkill',
+    'updateWeightedSkillSelection', 'updateWeightedRangeSelection', 'updateWeightedSkillOptions',
+    'removeWeightedSkill', 'updateWeightedTotal', 'getWeightedSkillsForGeneration', 'getSelectedPrintSkills',
+    'generatePrintProblem', 'formatProblemForPrint', 'generateWorksheetHTML', 'generateWorkedSolution',
+    'formatWorkedSolutionForPrint', 'toggleAnswerKeyType', 'closePrintPreview', 'printWorksheet', 'downloadPDF',
+    'downloadWorksheet', 'buildSheet', 'sheetDocument', 'exportPrintToGoogleForms', 'exportQuizToGoogleForms',
+    'openGoogleExportModal', 'closeGoogleExportModal', 'startGoogleExport', 'initGoogleAuth', 'isGoogleAuthenticated',
+    'revokeGoogleToken', 'listClassroomCourses', 'initQuizDB', 'saveTest', 'loadTest', 'listTests', 'deleteTest',
+    'saveResult', 'getResultsForTest', 'exportTestJSON', 'importTestJSON', 'exportResultsCSV', 'compressTestForURL',
+    'decompressTestFromURL', 'migrateTestToSections', 'getAllQuestionsFlat', 'getGlobalOffset',
+    'getTotalQuestionCount', 'openQuizBuilder', 'openMyQuizzes', 'confirmDeleteQuiz', 'handleQuizSkillSearch',
+    'selectQuizSkill', 'addSelectedQuestions', 'addQuizQuestion', 'addMultipleQuestions', 'regenerateQuizQuestion',
+    'duplicateQuizQuestion', 'removeQuizQuestion', 'updateQuizQuestionPoints', 'updateQuizName', 'updateQuizSetting',
+    'openQuizSettings', 'closeQuizSettings', 'saveQuiz', 'generateQuizLink', 'printQuiz', 'exportQuiz',
+    'importQuizFile', 'qbFilterDomain', 'qbFilterCategory', 'qbFilterGrade', 'qbSearchInput', 'qbPreviewHover',
+    'qbPreviewClick', 'qbRefreshPreview', 'qbAddFromPreview', 'addSection', 'removeSection', 'reorderSection',
+    'setActiveSection', 'updateSectionLayout', 'updateSectionLabel', 'updateSectionInstructions',
+    'toggleSectionCollapse', 'shuffleSectionQuestions', 'moveQuestionToSection', 'openQuizPreview',
+    'closeQuizPreview', 'switchPreviewTab', 'handleQbQuestionDragStart', 'handleQbQuestionDragEnd',
+    'handleQbSectionDragOver', 'handleQbSectionDragLeave', 'handleQbSectionDrop', 'openBuilderResults',
+    'openBuilderMonitor', 'quizQuestionData', 'handleQuizURL', 'startQuizTest', 'submitQuizMC',
+    'submitQuizTextAnswer', 'navigateQuizQuestion', 'jumpToQuizQuestion', 'flagQuizQuestion', 'showQuizReview',
+    'jumpFromReview', 'backFromReview', 'submitQuiz', 'downloadQuizStudentResults', 'showQuizResults',
+    'showStudentQuizDetail', 'exportQuizCSV', 'importStudentResultsFile', 'printQuizTest', 'closeQuizResults',
+    'copyQuizLinkFromResults', 'tvqMenu', 'openQuizMonitor', 'stopMonitoring', 'toggleMonitorPause',
+    'toggleMonitorOption', 'inviteStudents', 'finishMonitoring', 'closeQuizMonitor', 'openSkillsOrganizer',
+    'soInitialize', 'soApplyFilters', 'soFilterDomain', 'soFilterCategory', 'soFilterGrade', 'soSearchInput',
+    'soToggleSkill', 'soRenderQueuePanel', 'soRemoveFromQueue', 'soClearQueue', 'soPreviewHover', 'soPreviewLeave',
+    'soPreviewClick', 'soGeneratePreview', 'soRefreshPreview', 'soPlay', 'soPrint', 'soShare', 'soShowCode',
+    'soSelectAllVisible', 'soDeselectAllVisible', 'soUpdateCategoryDropdown', 'soQuiz', 'startMapSession',
+    'nextMapItem', 'recordMapAnswer', 'finalizeMapSession', 'releaseMapSessionScaffold', 'skipMapItem',
+    'mapJumpToItem', 'mapResumeCurrent', 'mapNavBack', 'mapNavForward', 'openMapTest', 'initMapSelector',
+    'startMapFromUI', 'selectMapTier', 'toggleMapBand', 'toggleMapDomain', 'selectAllMapBands', 'clearMapBands',
+    'setMapItemCount', 'setMapMode', 'printMapFromSelector', 'generateMapShareLink', 'copyMapShareLink',
+    'parseMapShareLink', 'loadMapShareLink', 'renderMapResults', 'printMapSession', 'restartMapSession',
+    'updateMapGradeContext', 'tvGo', 'tvOpenSheet', 'openSimplePrint', 'closeSimplePrint',
+];
+// The deferred half's stylesheets: <link data-mq-href> in index.html, in their cascade place, given their href now.
+function loadDeferredCss() {
+    const links = [...document.querySelectorAll('link[rel="stylesheet"][data-mq-href]')];
+    return Promise.all(links.map((l) => new Promise((resolve) => {
+        if (l.getAttribute('href')) { resolve(); return; }
+        l.addEventListener('load', resolve, { once: true });
+        l.addEventListener('error', resolve, { once: true });   // a missing sheet never blocks the teacher site
+        l.setAttribute('href', l.dataset.mqHref);
+    })));
+}
+// One lazy part: a thin async stub on window for each name until importer() resolves to { name: fn }, then the real
+// functions replace the stubs. A failed load (a Wi-Fi drop) is retried by the next call.
+// Chrome remembers a failed import() of a URL for the life of the page, so a retry imports a fresh URL (?retry=n; the
+// module's own imports keep their stamped URLs). If that fails too, the teacher is told to reload (checker r1 D1).
+let lazyNotice = 0;
+function lazyFailed(label) {
+    if (Date.now() - lazyNotice < 8000) return;
+    lazyNotice = Date.now();
+    const msg = `The ${label} tools did not load (the connection dropped). Reload the page to try again.`;
+    try { if (typeof window.showToast === 'function') window.showToast(msg, 'error'); else console.warn(msg); } catch (e) { /* no toast */ }
+}
+function makeLazy(label, importer, names) {
+    let promise = null;
+    let tries = 0;
+    const load = () => {
+        if (!promise) {
+            const n = tries++;
+            promise = importer(n).then((api) => { Object.assign(window, api); return api; }).catch((err) => {
+                promise = null;
+                console.warn(`[MathQuest] the ${label} part did not load:`, err);
+                if (n >= 1) lazyFailed(label);
+                throw err;
+            });
+        }
+        return promise;
+    };
+    for (const name of names) {
+        if (typeof window[name] === 'function') continue;   // (an element id like soSearchInput is replaced, as before)
+        const stub = function (...args) {
+            (window.__mqStubCalls = window.__mqStubCalls || []).push(name);   // which stub pulled a part in (perf gate)
+            return load().then((api) => {
+                const fn = (api && typeof api[name] === 'function') ? api[name] : window[name];
+                if (typeof fn !== 'function' || fn === stub) throw new Error(name + ' is not in the ' + label + ' part');
+                return fn.apply(this, args);
+            });
+        };
+        stub.__mqStub = true;
+        window[name] = stub;
+    }
+    return load;
+}
+// The shared arrays the print modules used to create at import: create them here so a late import never resets them.
+if (!Array.isArray(window.globalSkillsList)) window.globalSkillsList = [];
+if (!Array.isArray(window.weightedItems)) window.weightedItems = [];
+const loadDeferred = makeLazy('teacher / print', (n) => Promise.all([
+    n ? import(`./modules/deferred.js?retry=${n}`) : import('./modules/deferred.js'), loadDeferredCss(),
+]).then(([m]) => {
+    Object.assign(window, m.LESSON_API || {});   // lesson lookups (not stubbed: no inline handler calls them)
+    window.__mqDeferredLoaded = true;
+    try { document.dispatchEvent(new CustomEvent('mq:deferred-ready')); } catch (e) { /* old browser */ }
+    return m.API;
+}), DEFERRED_NAMES);
+window.__mqLoadDeferred = loadDeferred;
+window.__mqLazyNames = { deferred: DEFERRED_NAMES };   // ws-chromebook-perf: every one must be real once loaded
+
+// The online worksheet mode (165 KB): only a worksheet game (initWorksheet) and the markup it draws call into it.
+const WORKSHEET_NAMES = [
+    'initWorksheet', 'newWorksheet', 'addMoreProblems', 'finishUnlimitedWorksheet', 'toggleHint', 'closeHint',
+    'checkWorksheetAnswerFromColumns', 'checkWorksheetAnswerFromFuncTable', 'renderWorksheetOrdering',
+    'renderWorksheetExpanded', 'checkWorksheetOrderingAnswer', 'checkWorksheetExpandedAnswer', 'advanceToNextProblem',
+    'checkWorksheetAnswer', 'checkAllWorksheet', 'checkWorksheetDualAnswer', 'checkWorksheetCoordinateAnswer',
+    'checkAreaModelInput', 'checkWorksheetNumberFamily', 'checkWorksheetMC', 'showWorksheetScore', 'wsMagnifyCard',
+    'wsSpeak', 'wsSkipCard', 'attachWorksheetZoom',
+];
+const loadWorksheet = makeLazy('worksheet', (n) => (n ? import(`./modules/worksheet.js?retry=${n}`) : import('./modules/worksheet.js'))
+    .then((m) => Object.fromEntries(WORKSHEET_NAMES.map((n) => [n, m[n]]))), WORKSHEET_NAMES);
+window.__mqLoadWorksheet = loadWorksheet;
+window.__mqLazyNames.worksheet = WORKSHEET_NAMES;
+
+// The pupil skill explorer (owner 2026-11-05): browse by grade / by area and pick skills. Loaded on the first press only.
+const EXPLORER_NAMES = ['openStudentExplorer', 'closeStudentExplorer', 'studentExplorerState'];
+window.__mqLoadExplorer = makeLazy('skill explorer', (n) => (n ? import(`./modules/student-explorer.js?retry=${n}`) : import('./modules/student-explorer.js'))
+    .then((m) => Object.fromEntries(EXPLORER_NAMES.map((k) => [k, m[k]]))), EXPLORER_NAMES);
+// (not in __mqLazyNames: that list is what the teacher prefetch must have made real; the explorer is pupil-only, on demand)
+
+// Who needs the deferred half BEFORE init runs (so they see exactly what they saw before the split):
+//   a MAP or quiz link (?map= / ?quiz=), a Send link's &set=, the teacher board (?board=1 on a teacher device),
+//   a teacher-site hash route, or a device that opens in teacher view ("Open the site in: Last view used").
+function deferredNeededAtBoot() {
+    try {
+        const p = new URLSearchParams(window.location.search);
+        if (p.get('map') || p.get('quiz') || p.get('set')) return true;
+        const saved = localStorage.getItem('mathquest_user_role') || 'student';
+        if (p.get('board') === '1' && saved === 'teacher') return true;
+        if (['c', 'code', 'qs'].some((k) => p.get(k))) return false;   // a pupil link always opens in student view
+        if (/^#(wrm|todo|map|tv)/.test(window.location.hash || '') && saved === 'teacher') return true;
+        return localStorage.getItem('mathquest_start_role') === 'last' && saved === 'teacher';
+    } catch (e) { return false; }
+}
+// A pupil link (?c= / ?code= / ?qs=) never prefetches: the pupil's Chromebook spends its CPU and Wi-Fi on the game.
+function isPupilLink() {
+    try { const p = new URLSearchParams(window.location.search); return ['c', 'code', 'qs'].some((k) => p.get(k)); } catch (e) { return false; }
+}
+// A link that opens in worksheet mode (|Gw, or |G? = the pupil chooses) fetches the worksheet part straight away.
+try {
+    const code = new URLSearchParams(window.location.search).get('c') || new URLSearchParams(window.location.search).get('code') || '';
+    if (/\|(?:[^|]*-)?G[w?](?:-|$)/i.test(code)) loadWorksheet().catch(() => {});
+} catch (e) { /* no location */ }
+if (deferredNeededAtBoot()) {
+    try { await loadDeferred(); } catch (e) { /* stubs retry on first use */ }
+}
+
 // Bootstrap the application
 bootstrap();
+try { updateStudentSelBar(); } catch (e) { /* the pupil bar follows the queue from here on */ }
 installActiveBox();
 installTouchTap();
 installPlayCompact();
+// Chromebook load fix (2026-11-02): tell the inline loading indicator the app is ready, then cache the stamped
+// modules on the device (sw.js) so the next visit does not download them again over school Wi-Fi.
+window.__mqBooted = true;
+// Teachers (who boot in student view by default) get the deferred half on idle, so it is there before they reach for it;
+// switching to teacher view loads it at once.
+// The worksheet part is small: every visit fetches it once the page is idle, so choosing worksheet mode never waits.
+if ('requestIdleCallback' in window) window.requestIdleCallback(() => { loadWorksheet().catch(() => {}); }, { timeout: 5000 });
+else setTimeout(() => { loadWorksheet().catch(() => {}); }, 2500);
+if (!window.__mqDeferredLoaded) {
+    const prefetch = () => { loadDeferred().catch(() => {}); };
+    if (!isPupilLink()) {
+        if ('requestIdleCallback' in window) window.requestIdleCallback(prefetch, { timeout: 4000 });
+        else setTimeout(prefetch, 1500);
+    }
+    const roleWatch = new MutationObserver(() => {
+        if (!document.body.classList.contains('teacher-mode')) return;
+        roleWatch.disconnect();
+        // still downloading (a slow connection): say so, rather than a half-built screen (checker r1 D4)
+        if (!window.__mqDeferredLoaded) { try { window.showToast('Loading the teacher tools…', 'info'); } catch (e) { /* no toast */ } }
+        prefetch();
+    });
+    if (document.body.classList.contains('teacher-mode')) prefetch();
+    else roleWatch.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    const registerWorker = () => navigator.serviceWorker.register('sw.js').catch((err) => console.warn('service worker not registered:', err));
+    if (document.readyState === 'complete') registerWorker();
+    else window.addEventListener('load', registerWorker);
+}

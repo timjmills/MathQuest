@@ -1330,6 +1330,9 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `unit-form` | Write how many of each place. | unit form: hundreds, tens and ones (already in the kit library; recorded 2026-10-16, detailed lessons) |
 | `number-words` | Write the number in words. | numeral to number name (added 2026-10-16, detailed lessons, composing:number_word_form) |
 | `story-bar` | Read the story. Fill in the bar. Solve. | word problem with a part-whole bar to fill (added 2026-10-16, detailed lesson 2) |
+| `story-steps` | Read the story. Write each step. Solve. | word problem written as one number sentence a step (added 2026-10-17, detailed lesson 7) |
+| `story-letter` | Read the story. Write the equation. Find n. | two-step story as one equation with a letter (msLetter, 2026-10-17) |
+| `story-check` | Solve. Estimate. Circle Yes or No. | two-step story checked by an estimate from tens (msCheck, 2026-10-17) |
 | `turn-facts` | Look at the array. Write two facts. | an array and its turn: write both multiplication facts (added 2026-10-16, mult_properties form 0) |
 | `turn-new` | Turn the array. Write the new fact. | one fact known, write the turned fact (added 2026-10-16, mult_properties form 0) |
 | `turn-look` | Look at the turned array. Write the new fact. | the turned array is drawn; write its fact (added 2026-10-17, detailed lesson 3a) |

@@ -192,6 +192,22 @@ export const MULTI_KEYS = Object.freeze({
     mix: '4C',
     anchors: '4D',
     // NEXT FREE IN BLOCK 4: 4E.
+    // Build lane placevalue (sub-range 4E-4O): value_ten_times (detailed lesson 6, 2026-10-17).
+    tenDir: '4E',        // value form times: the first digit one place left (times) / right (tenth) / both
+    tenValues: '4F',     // value form times: write both values before circling
+    tenPlain: '4G',      // value form times: the digit and zeros only (700 and 70)
+    tenWrite: '4H',      // value form times: both values / the top value only (lesson 6 r2)
+    tenTask: '4I',       // value form times: compare / story (700 ÷ 70 = 10)
+    tenChoice: '4J',     // value form times, ring only: two words / four (the Check Question's A-D: + the same as, 100 times) - lesson 6 r4 (critic r2 D2)
+    familyChart: '4K',   // fact_family_sort (visual-quality lane, owner 2026-10-31): a blank number-family chart to fill in (working space)
+    // NEXT FREE IN 4E-4O: 4L.
+    // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
+    msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
+    wpFrames: '4Q',      // every word-work story: one number sentence a step, no column boxes (detailed lesson 7)
+    msLetter: '4R',      // multi_step_word(_plain): write the story as one equation with a letter (5 × 4 − 6 = n), then n
+    msCheck: '4S',       // multi_step_word(_plain): + / − stories - estimate from tens, then judge the answer
+    msChoose: '4T',      // multi_step_word(_plain), × / ÷ first: choose the answer from four (A-D), the three two-step errors (lesson 7 r3)
+    // NEXT FREE IN 4P-4Z: 4U (lane A/B fixers take 4Z downwards).
 
     // Block 5 — P12 (were "XA"–"XM" before any of them shipped)
     members: '5A',       // mixed pools: which member skills / categories the pool draws from
@@ -208,7 +224,10 @@ export const MULTI_KEYS = Object.freeze({
     units: '5L',         // measurement: which units
     parts: '5M',         // equal parts, or the parts a figure is split into
     divForm: '5N',       // div_facts: standard / long division / fraction / vertical / mix (2026-10-03)
-    // NEXT FREE IN BLOCK 5: 5P.
+    // (Lane D 2026-10-16 had 5P / 5Q, which main gave to answerSlot / winRows; the port moved them to 5V / 5W.)
+    amEdges: '5V',       // area models: the numbers around the box given / pupil writes them / mixed (2026-10-16)
+    amForm: '5W',        // area-model division: the problem shown as ÷ sign / long division / fraction (a set)
+    // NEXT FREE IN BLOCK 5: 5X (5P-5U are taken above: answerSlot, winRows, winCols, minFactor, ftTrap, ftFactors).
 
     // Block 6 — O2 easier / harder ladders (design/audit/OPTIONS-CRITIC-R2.md §5 #5, #13; 2026-09-25).
     // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
@@ -337,10 +356,17 @@ export const VALUE_TOKENS = Object.freeze({
     units: Object.freeze({ metric: 'M', customary: 'C', mixed: 'X' }),
     // Numeric sets whose members are not all under 36: one digit per power of ten.
     // P9 step 8 (block 0)
-    form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S' }),
+    form: Object.freeze({ value: 'V', unit: 'U', notation: 'N', sum: 'S', times: 'T' }),
+    tenDir: Object.freeze({ times: 'T', tenth: 'E', both: 'B' }),
+    tenWrite: Object.freeze({ both: 'B', top: 'T' }),
+    tenTask: Object.freeze({ compare: 'C', story: 'S' }),
+    tenChoice: Object.freeze({ two: 'T', four: 'F' }),
+    msOps: Object.freeze({ addsub: 'A', mult: 'M', div: 'D', multdiv: 'B', addmult: 'P', adddiv: 'Q' }),
     frame: Object.freeze({ boxes: 'B', line: 'L' }),
     responseScope: Object.freeze({ full: 'F', notation: 'N', decision: 'D', judge: 'J' }),
     divForm: Object.freeze({ standard: 'S', long: 'L', fraction: 'F', vertical: 'V', mix: 'M' }),
+    amEdges: Object.freeze({ given: 'G', blank: 'B', mixed: 'M' }),
+    amForm: Object.freeze({ sign: 'S', long: 'L', fraction: 'F' }),
     bins: Object.freeze({ adjacent: 'A', apart: 'P', three: 'T' }),
     blank: Object.freeze({ column: 'C', row: 'R' }),
     line: Object.freeze({ plotted: 'P', mark: 'M', ends: 'E' }),
@@ -423,7 +449,7 @@ export const NUMERIC_SET_VALUES = Object.freeze({
 // that carry their own tokens on the def: they have no one-character union table of their own.
 export const SCALAR_ONLY = Object.freeze({
     range: 'decimal', decimals: 'decimal', band: 'decimal', tiles: 'decimal', place: 'decimal',
-    simplestForm: 'bool', pictures: 'bool',
+    simplestForm: 'bool', pictures: 'bool', familyChart: 'bool',
     // P9 step 8 (block 0)
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
     // block 2 (2026-09-25)
@@ -441,11 +467,13 @@ export const SCALAR_ONLY = Object.freeze({
     // `cover` and `mix` were built by S2 and now carry VALUE_TOKENS; `touch` rides in `support`.)
     touch: 'reserved', cover: 'reserved', mix: 'reserved', anchors: 'reserved',
     // block 8 (word problems)
-    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool',
+    wpCues: 'bool', wpBank: 'bool', wpBar: 'bool', wpFrames: 'bool', msLetter: 'bool', msCheck: 'bool',
     // Wave 1 lane A
     calculator: 'bool', skipAfter: 'decimal',
     // lessons 4 and 5 (2026-10-16)
     winRows: 'decimal', winCols: 'decimal', minFactor: 'decimal', ftTrap: 'bool',
+    // lesson 6 (2026-10-17)
+    tenValues: 'bool', tenPlain: 'bool',
     // wave 5.2: the number line (Start / End are signed decimals: N = minus, P = point)
     nlOn: 'bool', nlHops: 'bool', nlFrom: 'decimal', nlTo: 'decimal',
 });

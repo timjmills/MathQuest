@@ -24,9 +24,9 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 715 live skills; 606 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 724 live skills; 615 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
-- **Full coverage: CCSS 76 of 177 standards FULL, 90 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 103 FULL, 92 PARTIAL, 22 GAP.
+- **Full coverage: CCSS 77 of 177 standards FULL, 89 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 104 FULL, 91 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
 - Tag fixes: 8 mis-tags corrected, 1 broken skill flagged, 68 missing tags added (below).
 - The one build list: 277 entries — 133 new skills, 88 options on existing skills, 2 repairs; 162 from the White Rose audit (42 of them extended to close standards clauses), 61 from this audit, 54 added from the White Rose visual catalogue (`design/wrm-visuals/INDEX.md`).
@@ -36,11 +36,11 @@ Sources:
 | K | 10 / 11 / 1 of 22 (45% full) | 11 / 12 / 1 of 24 | 6 / 4 / 0 of 10 (60% full) | 21/22, 10/10 |
 | 1 | 11 / 10 / 0 of 21 (52% full) | 13 / 10 / 0 of 23 | 10 / 5 / 1 of 16 (63% full) | 21/21, 16/16 |
 | 2 | 12 / 10 / 4 of 26 (46% full) | 12 / 9 / 6 of 27 | 11 / 7 / 1 of 19 (58% full) | 22/26, 18/19 |
-| 3 | 12 / 13 / 0 of 25 (48% full) | 18 / 15 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
+| 3 | 13 / 12 / 0 of 25 (52% full) | 19 / 14 / 0 of 33 | 15 / 2 / 0 of 17 (88% full) | 25/25, 17/17 |
 | 4 | 14 / 13 / 1 of 28 (50% full) | 19 / 13 / 2 of 34 | 16 / 4 / 0 of 20 (80% full) | 27/28, 20/20 |
 | 5 | 10 / 14 / 2 of 26 (38% full) | 16 / 13 / 5 of 34 | 13 / 4 / 1 of 18 (72% full) | 24/26, 17/18 |
 | 6 | 7 / 19 / 3 of 29 (24% full) | 14 / 20 / 8 of 42 | 10 / 7 / 0 of 17 (59% full) | 26/29, 17/17 |
-| **All** | **76 / 90 / 11 of 177 (43% full)** | **103 / 92 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
+| **All** | **77 / 89 / 11 of 177 (44% full)** | **104 / 91 / 22 of 217** | **81 / 33 / 3 of 117 (69% full)** | 166/177, 115/117 |
 
 ## Tag fixes made by this audit
 
@@ -252,26 +252,26 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 15 | **Add or Subtract 1 or 2** (`add_sub_1_2`) | new `addition:add_sub_1_or_2` | K.CC.B.4c | 1 |
 | 16 | **Compare Number Sentences** (`compare_sentences`) | new `algebra:compare_number_sentences` | 1.OA.D.7 | 1 |
 | 17 | **Make Equal Groups** (`equal_groups_early`) | new `multiplication:make_equal_groups` | 2.OA.C.4 | 1 |
-| 18 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | 3.OA.D.8 | 1 |
-| 19 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
-| 20 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
-| 21 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
-| 22 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
-| 23 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
-| 24 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
-| 25 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
-| 26 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
-| 27 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
-| 28 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
-| 29 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
-| 30 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
-| 31 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
-| 32 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
-| 33 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
-| 34 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
-| 35 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
-| 36 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
-| 37 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
+| 18 | **Part-Whole Model** (`part_whole`) | new `composing:part_whole_model` | K.OA.A.1 | 1 |
+| 19 | **Bonds to 100** (`bonds_100`) | new `addition:bonds_to_100` | - | 2 |
+| 20 | **Times as Many: Statements and Equations (option)** (`comparison_statements`) | option on `multiplication:mult_comparison` | 4.OA.A.1 | - |
+| 21 | **True or False Equations (repair)** (`equal_sign_repair`) | repair on `addition:equal_sign` | 1.OA.D.7 | - |
+| 22 | **Why Does It Work?** (`explain_strategy`) | new `number_sense:why_it_works` | 2.NBT.B.9 | - |
+| 23 | **Subtract Back Through Ten (option)** (`make_ten_subtract`) | option on `number_sense:make_a_ten` | 1.OA.C.6 | - |
+| 24 | **Multiply a 4-Digit Number by a 1-Digit Number (option)** (`mult_4x1`) | option on `multiplication:multiply` | 4.NBT.B.5 | - |
+| 25 | **Write the Number Sentence for the Picture (option)** (`pictures_to_sentence`) | option on `addition:add_5_pictures` | K.OA.A.1 | - |
+| 26 | **What Do +, − and = Mean? (option)** (`sign_meanings`) | option on `number_ops_mixed:which_sign` | M.EE.2.NBT.5 | - |
+| 27 | **Number Bonds to 20** (`bonds_20`) | new `composing:bonds_to_20` | - | 1 |
+| 28 | **Correspondence Problems** (`correspondence`) | new `multiplication:correspondence_problems` | - | 1 |
+| 29 | **Find the Difference** (`difference`) | new `subtraction:find_the_difference` | - | 1 |
+| 30 | **Division Using Factors** (`div_factors`) | new `division:divide_using_factors` | - | 1 |
+| 31 | **How Many Ways?** (`how_many_ways`) | new `multiplication:how_many_ways` | - | 1 |
+| 32 | **Inverse Operations (option)** (`inverse_check`) | option on `subtraction:sub_check_by_adding` | - | 1 |
+| 33 | **Reason from Known Facts** (`known_facts`) | new `multiplication:reason_from_known_facts` | - | 1 |
+| 34 | **Long Division with Remainders (option)** (`long_div_rem`) | option on `division:long_div_2digit` | - | 1 |
+| 35 | **Mental or Written?** (`make_decisions`) | new `addition:choose_a_method` | - | 1 |
+| 36 | **Mental Addition and Subtraction** (`mental_add_sub`) | new `addition:mental_strategies` | - | 1 |
+| 37 | **Mental Calculation and Estimation** (`mental_estimate`) | new `number_sense:estimate_and_check` | - | 1 |
 | 38 | **Multiples of 10, 100 and 1,000 (option)** (`mult_multiples`) | option on `multiplication:mult_zeros` | - | 1 |
 | 39 | **Partition to Multiply** (`informal_mult`) | new `multiplication:partition_multiply` | - | - |
 
@@ -358,24 +358,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 11 | **Collect and Represent Data** (`collect_data`) | new `graphs:collect_and_represent` | - | 1 |
 | 12 | **Dual Bar Charts** (`dual_bar`) | new `graphs:dual_bar_charts` | - | 1 |
 
-### Algebra and patterns (13)
-
-| # | Entry | Kind | Closes standards | Closes WRM steps |
-|---|---|---|---|---|
-| 1 | **Make a Pattern** (`pattern_make`) | new `patterns:make_a_pattern` | - | 6 |
-| 2 | **Equivalent Expressions? (option)** (`equiv_expressions`) | option on `algebra:combine_like_terms` | 6.EE.A.4, M.EE.6.EE.3 | - |
-| 3 | **Two-Step Problems With All Four Operations (option)** (`multi_step_four_ops`) | option on `algebra:multi_step_word` | 3.OA.D.8, 4.OA.A.3 | - |
-| 4 | **What Do You Notice?** (`patterns_notice`) | new `patterns:notice_patterns` | 3.OA.D.9, 4.OA.C.5 | - |
-| 5 | **Count in 50s, 100s and 1,000s (option)** (`count_50s`) | option on `patterns:count_by_step_up` | - | 3 |
-| 6 | **Formulae** (`formulae`) | new `algebra:use_formulae` | 6.EE.A.2c | 1 |
-| 7 | **Write and Graph Inequalities (option)** (`inequality_write_graph`) | option on `algebra:inequalities` | 6.EE.B.8 | - |
-| 8 | **Pairs of Values and Two Unknowns** (`pairs_values`) | new `algebra:pairs_of_values` | - | 2 |
-| 9 | **Parts of an Expression** (`parts_of_expression`) | new `algebra:parts_of_expression` | 6.EE.A.2b | - |
-| 10 | **Two Patterns as Ordered Pairs (option)** (`pattern_pairs_graph`) | option on `patterns:pattern_relationship` | 5.OA.B.3 | - |
-| 11 | **Write Number Expressions (option)** (`write_numeric_expression`) | option on `algebra:write_expression` | 5.OA.A.2 | - |
-| 12 | **Function Machines** (`function_machine`) | new `algebra:function_machines` | - | 1 |
-| 13 | **Two Quantities That Change Together** (`two_variables`) | new `algebra:two_variable_relationships` | 6.EE.C.9 | - |
-
 ### Decimals and percents (13)
 
 | # | Entry | Kind | Closes standards | Closes WRM steps |
@@ -393,6 +375,24 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 | 11 | **Decimal Sequences** (`dec_sequence`) | new `patterns:decimal_sequences` | - | 1 |
 | 12 | **Percentages: Multi-Step and Missing Values (option)** (`percent_multi`) | option on `conversions:percent_of_number` | - | 1 |
 | 13 | **Ratio and Fractions (option)** (`ratio_fraction`) | option on `conversions:ratio_intro` | - | 1 |
+
+### Algebra and patterns (13)
+
+| # | Entry | Kind | Closes standards | Closes WRM steps |
+|---|---|---|---|---|
+| 1 | **Make a Pattern** (`pattern_make`) | new `patterns:make_a_pattern` | - | 6 |
+| 2 | **Equivalent Expressions? (option)** (`equiv_expressions`) | option on `algebra:combine_like_terms` | 6.EE.A.4, M.EE.6.EE.3 | - |
+| 3 | **What Do You Notice?** (`patterns_notice`) | new `patterns:notice_patterns` | 3.OA.D.9, 4.OA.C.5 | - |
+| 4 | **Count in 50s, 100s and 1,000s (option)** (`count_50s`) | option on `patterns:count_by_step_up` | - | 3 |
+| 5 | **Formulae** (`formulae`) | new `algebra:use_formulae` | 6.EE.A.2c | 1 |
+| 6 | **Write and Graph Inequalities (option)** (`inequality_write_graph`) | option on `algebra:inequalities` | 6.EE.B.8 | - |
+| 7 | **Two-Step Problems With All Four Operations (option)** (`multi_step_four_ops`) | option on `algebra:multi_step_word` | 4.OA.A.3 | - |
+| 8 | **Pairs of Values and Two Unknowns** (`pairs_values`) | new `algebra:pairs_of_values` | - | 2 |
+| 9 | **Parts of an Expression** (`parts_of_expression`) | new `algebra:parts_of_expression` | 6.EE.A.2b | - |
+| 10 | **Two Patterns as Ordered Pairs (option)** (`pattern_pairs_graph`) | option on `patterns:pattern_relationship` | 5.OA.B.3 | - |
+| 11 | **Write Number Expressions (option)** (`write_numeric_expression`) | option on `algebra:write_expression` | 5.OA.A.2 | - |
+| 12 | **Function Machines** (`function_machine`) | new `algebra:function_machines` | - | 1 |
+| 13 | **Two Quantities That Change Together** (`two_variables`) | new `algebra:two_variable_relationships` | 6.EE.C.9 | - |
 
 ### Integers (2)
 
@@ -656,10 +656,6 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Taught in part by: Multiplication Properties (Visual) (`multiplication:mult_properties`)  
   Missing: the associative property (3 × 5 × 2 = 3 × 10); the skill offers order, breaking apart, × 1 and × 0  
   Build: Multiply Three Numbers (`mult_three`)
-- **3.OA.D.8** — PARTIAL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
-  Taught in part by: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`)  
-  Missing: two-step problems with × and ÷ (the skill's two steps are + and − only); an equation with a letter for the unknown; one-step pools and tape diagrams were tagged here: tags moved to the one-step standards  
-  Build: Two-Step Problems With All Four Operations (option) (`multi_step_four_ops`); Mental Calculation and Estimation (`mental_estimate`)
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
   Taught in part by: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
   Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even)  
@@ -1267,7 +1263,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 
 - **2.NBT.B.5** — FULL. Fluently add and subtract within 100 using strategies based on place value, properties of operations, and/or the relationship between addition and subtraction.  
   Taught by: Add within 100 (`addition:add_100_mixed`); Subtract within 100 (`subtraction:sub_100_mixed`); Compensation Strategy (`number_sense:compensation`); Mixed Addition & Subtraction (`subtraction:mixed_add_sub`)  
-  Also tagged: `addition:add`, `addition:add_50_no_regroup`, `addition:add_50_regroup`, `addition:add_50_mixed`, `addition:add_100_no_regroup`, `addition:add_100_regroup`, `subtraction:subtract`, `subtraction:sub_50_no_regroup`, `subtraction:sub_50_regroup`, `subtraction:sub_50_mixed`, `subtraction:sub_100_no_regroup`, `subtraction:sub_100_regroup`
+  Also tagged: `addition:add`, `addition:add_50_no_regroup`, `addition:add_50_regroup`, `addition:add_50_mixed`, `addition:add_100_no_regroup`, `addition:add_100_regroup`, `subtraction:subtract`, `subtraction:sub_50_no_regroup`, `subtraction:sub_50_regroup`, `subtraction:sub_50_mixed`, `subtraction:sub_100_no_regroup`, `subtraction:sub_100_regroup`, `subtraction:sub_2d_1d`
 - **2.NBT.B.6** — FULL. Add up to four two-digit numbers using strategies based on place value and properties of operations.  
   Taught by: Add Three or Four Numbers in Columns (`addition:add_column_multi`)  
 - **2.NBT.B.7** — PARTIAL. Add and subtract within 1000, using concrete models or drawings and strategies based on place value, properties of operations, and/or the relationship between addition and subtraction; relate the strategy to a written method. Understand that in adding or subtracting three-digit numbers, one adds or subtracts hundreds and hundreds, tens and tens, ones and ones; and sometimes it is necessary to compose or decompose tens or hundreds.  
@@ -1363,10 +1359,9 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
   Also tagged: `multiplication:multiply`, `multiplication:mult_div_fact_family`, `multiplication:number_families_mult`, `multiplication:mult_chart`, `multiplication:mult_chart_easy`, `multiplication:nl_mult`, `multiplication:count_by_tables`, `division:divide`, `division:nl_div`, `division:mixed_mult_div`, `multiplication:mult_chart_headers`, `multiplication:count_by_2s`, `multiplication:count_by_3s`, `multiplication:count_by_4s`, `multiplication:count_by_5s`, `multiplication:count_by_6s`, `multiplication:count_by_7s`, `multiplication:count_by_8s`, `multiplication:count_by_9s`, `multiplication:count_by_10s`, `multiplication:count_by_11s`, `multiplication:count_by_12s`
 *D. Solve problems involving the four operations, and identify and explain patterns in arithmetic.*
 
-- **3.OA.D.8** — PARTIAL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
-  In part: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`)  
-  Missing: two-step problems with × and ÷ (the skill's two steps are + and − only); an equation with a letter for the unknown; one-step pools and tape diagrams were tagged here: tags moved to the one-step standards → `multi_step_four_ops`, `mental_estimate`  
-  Also tagged: `algebra:multi_step_word_plain`, `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_sum`, `number_sense:estimate_diff`
+- **3.OA.D.8** — FULL. Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
+  Taught by: Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Multi-Step Word Problems (No Pictures) (`algebra:multi_step_word_plain`); Two-Step Word Problems: Multiply or Divide First (`algebra:two_step_mult_div_first`); Two-Step Word Problems: Add or Take Away, Then Multiply (`algebra:two_step_add_then_mult`); Two-Step Word Problems: Add or Take Away, Then Divide (`algebra:two_step_add_then_div`); Two-Step Word Problems: One Equation With a Letter (`algebra:two_step_letter_equation`); Two-Step Word Problems: Estimate to Check (`algebra:two_step_estimate_check`); Estimate Sums & Differences (`number_sense:estimate_sums_diffs`) — two steps, four operations: msOps addsub / mult / div / multdiv (× or ÷ first) and addmult / adddiv (+ or − first, brackets); the equation with a letter: msLetter; reasonableness by rounding to tens: msCheck (detailed lesson 7, 2026-10-17)  
+  Also tagged: `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_sum`, `number_sense:estimate_diff`
 - **3.OA.D.9** — PARTIAL. Identify arithmetic patterns (including patterns in the addition table or multiplication table), and explain them using properties of operations. For example, observe that 4 times a number is always even, and explain why 4 times a number can be decomposed into two equal addends.  
   In part: Multiplication Chart (Visual) (`multiplication:mult_chart`); Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Count-By Fill-In (1-12) (`patterns:count_by_fill`)  
   Missing: patterns in the addition table; explain a pattern with a property (4 × n is always even) → `patterns_notice`  
@@ -1489,7 +1484,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.OA.A.3** — PARTIAL. Solve multistep word problems posed with whole numbers and having whole-number answers using the four operations, including problems in which remainders must be interpreted. Represent these problems using equations with a letter standing for the unknown quantity. Assess the reasonableness of answers using mental computation and estimation strategies including rounding.  
   In part: Interpret the Remainder (Word Problems) (`division:remainder_interpret`); Remainder Contexts (Buses, Boxes, Cookies, Money, Cars) (`division:remainder_contexts`); Multi-Step Word Problems (Visual) (`algebra:multi_step_word`); Estimate Products (`number_sense:estimate_products`)  
   Missing: multistep problems using × and ÷; an equation with a letter for the unknown → `multi_step_four_ops`  
-  Also tagged: `algebra:multi_step_word_plain`, `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_quotient`, `number_sense:reasonable_quotients`
+  Also tagged: `algebra:multi_step_word_plain`, `algebra:algebra_word_mixed`, `algebra:algebra_word_mixed_plain`, `number_sense:estimate_quotient`, `algebra:two_step_mult_div_first`, `algebra:two_step_add_then_mult`, `algebra:two_step_add_then_div`, `algebra:two_step_letter_equation`, `algebra:two_step_estimate_check`, `number_sense:reasonable_quotients`
 *B. Gain familiarity with factors and multiples.*
 
 - **4.OA.B.4** — FULL. Find all factor pairs for a whole number in the range 1–100. Recognize that a whole number is a multiple of each of its factors. Determine whether a given whole number in the range 1–100 is a multiple of a given one-digit number. Determine whether a given whole number in the range 1–100 is prime or composite.  
@@ -1508,7 +1503,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 - **4.NBT.A.1** — PARTIAL. Recognize that in a multi-digit whole number, a digit in one place represents ten times what it represents in the place to its right. For example, recognize that 700 ÷ 70 = 10 by applying concepts of place value and division.  
   In part: Value of a Digit (`placevalue:value`); Name the Place (`placevalue:identify`); Write the Digits in a Place-Value Chart (`placevalue:pv_digit_drag`)  
   Missing: a digit is worth ten times what it is worth in the place to its right (700 ÷ 70 = 10) → `value_ten_times`  
-  Also tagged: `multiplication:mult_by_ten`, `multiplication:mult_by_hundred`, `placevalue:digit_value_unit_form`
+  Also tagged: `multiplication:mult_by_ten`, `multiplication:mult_by_hundred`, `placevalue:digit_value_unit_form`, `placevalue:ten_times_value`, `placevalue:one_tenth_value`, `placevalue:ten_times_story`
 - **4.NBT.A.2** — FULL. Read and write multi-digit whole numbers using base-ten numerals, number names, and expanded form. Compare two multi-digit numbers based on meanings of the digits in each place, using >, =, and < symbols to record the results of comparisons.  
   Taught by: Choose the Word Name (`placevalue:number_word_names`); Expanded Form (`placevalue:expand`); Compare Numbers (>, <, =) (`placevalue:compare`); Standard Form (`placevalue:combine`)  
   Also tagged: `composing:number_chart_fill`, `placevalue:pv_digit_drag`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least`, `placevalue:expanded_notation`, `placevalue:digit_value_notation`

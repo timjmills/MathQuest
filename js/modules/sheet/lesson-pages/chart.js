@@ -17,7 +17,7 @@ import { factMarks, panelHops } from '../lesson-arch/fact.js';
 import { checkStackOf } from '../lesson-arch/column.js';
 import { roundState, isRound, chartLineMmOf } from '../lesson-arch/line.js';
 import { pvNumberOf, isExpand, expandState } from '../lesson-arch/pv.js';
-import { isWordBar, chartStepsOf, barState } from '../lesson-arch/story.js';
+import { isWordBar, chartStepsOf, barState, msOf, twoState, isWordSentence, sentenceState } from '../lesson-arch/story.js';
 import { EXAMPLE_KEYS, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, hOf } from './common.js';
 
 /**
@@ -95,6 +95,8 @@ export function otherExamples(input, example, data) {
 
 /** The drawing of state k of the example (no slots: the Model is never scored, AK-1). */
 export function stateDrawing(it, steps, groups, k, c) {
+    if (msOf({ q: it.q }) && steps.length === 4 && groups.length === 3) return unslot(twoState(it, k, c));
+    if (isWordSentence(it) && groups.length >= 2) return unslot(sentenceState(it, groups, k, c));
     if (isWordBar(it) && steps.length && /^bar-step-/.test((((steps[0] || {}).marks || [])[0] || {}).slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
     const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
@@ -123,7 +125,7 @@ export function stateDrawing(it, steps, groups, k, c) {
 }
 
 /** The chart layout by state count: 4 -> 2 x 2 panels; 2 or 3 -> full-width rows. */
-export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: 'col' }
+export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols: 1, rows: n, variant: data.chartRow ? 'row' : 'col' }
     : n >= 4 ? { cols: 2, rows: Math.ceil(n / 2), variant: 'col' } : { cols: 1, rows: n, variant: 'row' });
 // `chartWide` (lesson data; the detailed lesson maker, 2026-10-16): a drawing too wide for half the
 // page (expanded form, 3 boxes) - every panel is a full-width row, the step head above its drawing.
@@ -189,7 +191,8 @@ export function stateItems(example, data) {
     }));
     const tails = tail.length ? [Object.assign({}, base, {
         lessonTail: true, cellCls: 'mq-ctailcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 },
-        render: (c) => `<div class="mq-ctail">${tail.map((i) => `<div class="mq-chead">${stepMarker(i + 1)}${stepIcon(named[i].icon, c.size, { mm: { S: 7, M: 8.5, L: 10 }[c.size] || 10 })}<b>${esc(named[i].name)}</b>`
+        // (`tailRead`, lesson data - the detailed lesson maker, lesson 7: the closing line is read, not worked: a reading cell)
+        render: (c) => `<div class="mq-ctail"${data && data.tailRead ? ' data-read' : ''}>${tail.map((i) => `<div class="mq-chead">${stepMarker(i + 1)}${stepIcon(named[i].icon, c.size, { mm: { S: 7, M: 8.5, L: 10 }[c.size] || 10 })}<b>${esc(named[i].name)}</b>`
             + `${named[i].words ? `<span class="mq-ctailw">${esc(named[i].words)}</span>` : ''}</div>`).join('')}</div>`,
     })] : [];
     // Lessons r2: the same closing step as a PANEL, for the 3-column chart (its words in the

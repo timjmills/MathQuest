@@ -34,7 +34,8 @@ export function makePracticeLink(items) {
     try {
         state.shareSettings = { timer: '?', problemCount: '?', gameMode: 'practice', range: '?', decimals: '?', quickStartLocked: '?' };
         state.shareLinkType = 'direct';
-        link = window.generateShareableLink ? window.generateShareableLink() : '';
+        // each (skill, options) use is encoded, not the de-duplicated queue: a skill used twice keeps both option sets
+        link = window.generateShareableLink ? window.generateShareableLink(items) : '';
     } catch (e) {
         link = '';
     } finally {

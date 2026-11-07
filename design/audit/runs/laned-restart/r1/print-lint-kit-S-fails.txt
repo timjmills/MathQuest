@@ -1,0 +1,8 @@
+addition:add_facts#scripted-model 2+1k . . . . . . 6 1 . . . . . . . . . FAIL
+addition:add_facts#reason-it 2+1k . . . . . . . . . . . . . . . 6 . FAIL
+subtraction:sub_facts#scripted-model 2+1k . . . . . . 8 1 . . . . . . . . . FAIL
+subtraction:sub_facts#reason-it 2+1k . . . . . . . . . . . . . . . 6 . FAIL
+subtraction:sub_facts#lesson 6+3k . . . . . . . . . . . . . . . . 4 FAIL
+multiplication:mult_facts#scripted-model 2+1k . . . . . . 8 1 . . . . . . . . . FAIL
+multiplication:mult_facts#reason-it 2+1k . . . . . . . . . . . . . . . 6 . FAIL
+division:div_facts#scripted-model 2+1k . . . . . . 8 2 . . . . . . . . . FAIL

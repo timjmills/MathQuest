@@ -258,7 +258,7 @@ lesson(G5 + 'fractionlineplots',
     build=['make_line_plot'],
     pre=[('fraction_operations:add_frac_unlike', {'denoms': [2]}, 'Y6.B3.S5', 'adding halves, quarters and eighths (5/8 + 1/2): totals of plotted values'),
          ('fraction_operations:mult_frac_whole', {}, 'Y6.B4.S1', 'a fraction times a whole number: several equal measurements'),
-         ('fraction_operations:div_unit_frac_nv', {'forms': [2, 3]}, 'Y6.B4.S3', 'mostly a unit fraction divided by a whole number (1/4 ÷ 2 = 1/8), with some clicks of a whole number divided by a unit fraction: sharing a total equally')],
+         ('fraction_operations:div_unit_frac_nv', {'forms': [2, 3]}, 'Y6.B4.S3', 'a unit fraction divided by a whole number (1/4 ÷ 2 = 1/8), worked out or with a number missing: sharing a part equally')],
     related=[('graphs:line_plot', {}, 'reading a line plot of plant heights in quarters and eighths')],
     note='Awsaj supplement lesson, W25-W26, 5.MD.B.2 (block Y6.B11). make_line_plot (STANDARD_PROPOSALS, the Y5 lane\'s text) makes the plot and solves problems from it, Grade 5 redistribution included.')
 
