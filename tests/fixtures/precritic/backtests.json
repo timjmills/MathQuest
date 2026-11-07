@@ -1670,6 +1670,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "optin-options-render-bands",
+   "check": "ws-options-verify --render --bands (opt-in): the number-size values of band are printed and judged on L-OVERFLOW / L-WRAP against the default page",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --render --bands (critic lf-placevalue r1 F19 / F20; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "expand band=9999 / 99999 / 999999 and unit_form band=9999 at L: frames 12.7-114 mm out of their cells (critic r1: 13-16 mm at 9,999)"
+   },
+   "pass": {
+    "commit": "b1094401",
+    "state": "the pv builder's r1 fix: every band page at L inside its cells"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:expand,placevalue:unit_form --sizes L --bands --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
