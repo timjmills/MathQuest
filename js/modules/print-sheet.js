@@ -205,7 +205,8 @@ function normaliseRequest(req = {}) {
     // drawn: none ticked, or the array past 50) prints each fact over its answer line (the Test's form, DN-22), so the
     // one-line fact no longer sits in a row of 22-28 mm with half of it empty (54 % at S). div_facts only: the passed
     // add / sub / mult fact pages keep their layout.
-    if (role === 'independent' || role === 'review') {
+    // (a sheet with worked examples keeps its own layout: the anchors' blocks size its rows, ws-sibling-compare ex-group L)
+    if ((role === 'independent' || role === 'review') && (!req.anchors || req.anchors === 'off')) {
         // (the rows then take what the page holds of the two-line cell, up to DN-1's 30 / 24 / 20: at L 15 in 42 mm rows
         // left 34 % under the line, 18 in 37 mm rows leave 25 %)
         for (const sec of sections) {
