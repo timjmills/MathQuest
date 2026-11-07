@@ -416,7 +416,75 @@ export const LESSONS = Object.freeze({
     // The steps match the provider's four worked steps (sheet/providers/countby.js rowSteps): the jump, the first gap,
     // the next gap, every gap and the check.
     ...skipCountLessons(),
+
+    // ------------------------- Arrays, equal groups and the order property (3; lane lf-ops, ops-tables card §9 Q3)
+    // The BUILD lesson "Properties of multiplication" (3.OA.B.5) and the array lesson it rests on (3.OA.A.1, 2.OA.C.4).
+    // The steps match each provider's worked steps (sheet/providers/multiplication.js): arrays_groups 4, the order
+    // property ('both' task) 5. The Warm-up deals short tracks and across facts only (an array in the Warm-up ran it
+    // past half a page at L, as on count_by_tables).
+    ...opsTablesLessons(),
 });
+
+function opsTablesLessons() {
+    const by5 = { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' }, why: 'Skip counting by 5s: how a row of dots is counted fast.' };
+    const by2 = { key: 'counting:number_seq_fill', opts: { step: 2, dir: 'forward' }, why: 'Skip counting by 2s: the 2 times-table as a count.' };
+    const x2 = { key: 'multiplication:mult_facts', opts: { constant: [2], notation: ['across'], band: 100 }, why: 'A known times fact: the fact an array is named by.' };
+    return {
+        'multiplication:arrays_groups': {
+            skills: [by2, by5],
+            concepts: [
+                { id: 'equal', text: 'Every row (or group) holds the same number.' },
+                { id: 'count-by', text: 'Count by the row size, once for each row.' },
+                { id: 'in-all', text: 'The last number said is how many in all.' },
+            ],
+            vocab: [
+                { word: 'row', meaning: 'a line of dots going across', picture: { kind: 'text', text: '● ● ● ●' } },
+                { word: 'array', meaning: 'equal rows of dots', picture: { kind: 'text', text: '3 rows of 4' } },
+                { word: 'in all', meaning: 'the total: every dot counted', picture: { kind: 'text', text: '12 in all' } },
+            ],
+            steps: [
+                { icon: 'count', text: 'Count the rows.' },
+                { icon: 'look', text: 'Count one row.' },
+                { icon: 'count', text: 'Count by that number.' },
+                { icon: 'write', text: 'Write how many in all.' },
+            ],
+            chant: '',
+            format: {
+                kind: 'numbered steps with icons',
+                why: 'Four counting actions said in order, each one a box the pupil fills; no decision to cue, so no chant.',
+            },
+            example: { match: 'Count by' },
+            mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }, { key: 'addition:add_facts', opts: { band: 20 } }],
+        },
+        'multiplication:mult_properties': {
+            skills: [by5, x2],
+            concepts: [
+                { id: 'rows-cols', text: 'An array is rows times the number in each row.' },
+                { id: 'turn', text: 'Turning an array swaps the rows and the columns.' },
+                { id: 'same', text: 'Turning adds no dot and takes none away: the product stays the same.' },
+            ],
+            vocab: [
+                { word: 'array', meaning: 'equal rows of dots', picture: { kind: 'text', text: '3 rows of 4' } },
+                { word: 'turn', meaning: 'the rows become the columns', picture: { kind: 'text', text: '3 × 4 → 4 × 3' } },
+                { word: 'product', meaning: 'the answer of a times fact', picture: { kind: 'text', text: '3 × 4 = 12' } },
+            ],
+            steps: [
+                { icon: 'look', text: 'Look at the array.' },
+                { icon: 'write', text: 'Write the fact.' },
+                { icon: 'start', text: 'Turn the array.' },
+                { icon: 'write', text: 'Write the new fact.' },
+                { icon: 'check', text: 'Check: same product.' },
+            ],
+            chant: 'Turn it round, the same amount!',
+            format: {
+                kind: 'numbered steps with icons + a chant',
+                why: 'The one idea pupils lose is that the turn keeps the product (they recount); a short chant said at step 5 is the check.',
+            },
+            example: { match: 'Turn the array' },
+            mixWith: [{ key: 'multiplication:arrays_groups', opts: { forms: [0] } }, { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }],
+        },
+    };
+}
 
 function skipCountLessons() {
     const VOCAB = [
