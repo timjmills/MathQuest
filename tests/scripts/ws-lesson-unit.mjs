@@ -48,6 +48,33 @@ const LATE = {
         const v = f([{ part: 'practice', plans: [plan([3, 3])] }], cellsOf);
         eq(v.length, 2, 'practice-units: a plan without `sheet` stays one unit a page (every other lesson as before)');
     },
+    // (E24b attempt 2, lesson 2: the GREEDY deal order left Practice 1 the near twins 7 + 4 / 8 + 5 at seed 4242 though a set
+    // without them existed. A `solve` sheet's stories are solved before it is dealt (print-sheet.js solveStoryFacts) and the
+    // generator is pinned to the solved pairs (page-deal.js setDealPin). Read from the source, no browser.)
+    async 'solve-story'() {
+        const src = fs.readFileSync(path.join(ROOT, 'js/modules/print-sheet.js'), 'utf8');
+        const m = src.match(/export function solveStoryFacts[\s\S]*?\n}\n/);
+        ok(!!m, 'solve-story: print-sheet.js exports solveStoryFacts (a Practice page\'s stories solved before the deal)');
+        if (!m) return;
+        const solve = new Function(`${m[0].replace('export ', '')}; return solveStoryFacts;`)();
+        // (lesson 2 at seed 4242: the chart, Guided and the reserved slip / Check Question facts, as dealt before Practice 1)
+        const avoid = ['9+6', '6+9', '9+2', '2+9', '7+7', '7+8', '7+5', '9+5', '8+4'];
+        const r = solve({ partMin: 2, noPart: [10], sums: [20] }, avoid, 4, 4242);
+        ok(!!r && r.at.length === 4, 'solve-story: four stories solved for Practice 1 at 4242');
+        if (!r) return;
+        const o = r.at.map((k) => k.split('+').map(Number));
+        const twins = [];
+        for (let i = 0; i < o.length; i++) for (let j = i + 1; j < o.length; j++) if (Math.abs(o[i][0] - o[j][0]) <= 2 && Math.abs(o[i][1] - o[j][1]) <= 2) twins.push(`${r.at[i]} / ${r.at[j]}`);
+        eq(twins, [], 'solve-story: no near twins among the solved stories (E24b)');
+        eq(new Set(o.map((x) => x[0])).size, 4, 'solve-story: every first addend different, so any deal order keeps LR-6');
+        eq(new Set(o.map((x) => x[0] + x[1])).size, 4, 'solve-story: every whole different (no twin answers)');
+        ok(o.every((x) => x.every((v) => v >= 2 && v <= 9) && x[0] + x[1] >= 11 && !avoid.includes(`${x[0]}+${x[1]}`) && !avoid.includes(`${x[1]}+${x[0]}`)), 'solve-story: crossing-ten facts, parts 2-9, none the pack has dealt (LR-5, either order)');
+        ok(/^(\d)\+\1$/.test(r.edge[0]) && r.edge.slice(1).every((k) => k.split('+').map(Number).reduce((a, b) => a + b) === 20), 'solve-story: the edge set is one equal-parts fact and wholes of 20');
+        const pd = fs.readFileSync(path.join(ROOT, 'js/modules/page-deal.js'), 'utf8');
+        ok(/export function setDealPin\(/.test(pd) && /if \(_pin && _pin\.key === key\)/.test(pd), 'solve-story: page-deal.js freshDeal honours a deal pin (set round one generateQuestionFor call only)');
+        const L = Object.values(DET.DETAILED_LESSONS);
+        eq(L.filter((d) => (d.practiceSheets || []).some((ps) => ps.solve)).map((d) => d.id), ['g1-oa1-bar-model-wp-20'], 'solve-story: only lesson 2 sets `solve` (every other lesson deals as before)');
+    },
     // (P1d, owner rulings 2026-11-07 - lesson 2 E24b, lesson 3a LP-FAMILY-REPEAT: the POOL CAPACITY a pack needs. A pack
     // whose places need more distinct facts than its rule holds - LR-5 one fact a pack, LR-6 no near twins on a page - deals
     // a repeat or a twin on its last try, at some seeds only. Read from the record, no browser.)

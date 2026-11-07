@@ -154,7 +154,8 @@ None.
             "edgeTest": "wpEdge",
             "tries": 600
           },
-          "edgeLast": {"per":6,"cols":2,"wants":["wpEqual","wpWhole20"],"first":true}
+          "edgeLast": {"per":6,"cols":2,"wants":["wpEqual","wpWhole20"],"first":true},
+          "solve": {"partMin":2,"noPart":[10],"sums":[20],"dealPin":"wp:add:20"}
         }
       ],
       "edgeTest": "wpEdge",
