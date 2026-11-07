@@ -4454,7 +4454,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Max Number (5 x 7 and 6 x 4 were dealt at range 100).
                 const arrMaxRows = 5;
                 const arrMaxCols = 5;
-                const rows = rng(2, arrMaxRows);
+                // (lane lf-ops, print-lint H13-ROW: a page of ONE kind - arrays only or groups only - has no common picture box, so a
+                // 2-row array stood beside a 5-row one) such a page deals its rows (or groups) in a band per block of six problems:
+                // 2-3 or 4-5, the band of each block from the seeded deal, so a row of the page holds pictures of one height class.
+                const _agOneKind = !!_p12Narrowed('forms') && _p12Narrowed('forms').length === 1;
+                const _agBand = _agOneKind && Number.isFinite(state.itemIndex) ? blockPermutation('ag-band', 2, Math.floor(state.itemIndex / 6))[0] : -1;
+                const rows = _agBand === 0 ? rng(2, 3) : _agBand === 1 ? rng(4, arrMaxRows) : rng(2, arrMaxRows);
                 const cols = rng(2, arrMaxCols);
                 const total = rows * cols;
 
@@ -4503,7 +4508,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // per blank, all keyed. The screen twin draws the same picture.
                 const _agPayload = { kind: questionType, rows, cols };
                 // (lane lf-ops: a page mixing arrays and ringed groups draws every picture in one picture box - H13-ROW)
-                if (!_p12Narrowed('forms') || _p12Narrowed('forms').length > 1) _agPayload.picBox = true;
+                // (and a page of ringed groups alone: a ring layout's height turns on the group size as well as the count of groups)
+                if (!_p12Narrowed('forms') || _p12Narrowed('forms').length > 1 || questionType === 'equal_groups') _agPayload.picBox = true;
                 q.cell = { template: 'arrays', v: 1, payload: _agPayload };
                 q.visual = _kitTwin('arrays', _agPayload);
                 q.printFormat = 'arrays-groups';
@@ -4594,9 +4600,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // lf-ops (ops-tables card §2 / §3, 3.OA.B.5): ONE array broken into two parts by a gap and a
                     // bracket (never colour), drawn by the kit's `arrays-turn` cell (type 'split'); the pupil writes
                     // each part's product and then the whole: "2 × 4 = [ ]", "3 × 4 = [ ]", "5 × 4 = [ ]". The old
-                    // item coloured the two parts green and orange and printed the rule. Rows 4-7 (each part at
-                    // least 2 rows), at most 5 in a row (RP-21); pictures off prints the three facts alone.
-                    const rows = rng(4, 7);
+                    // item coloured the two parts green and orange and printed the rule. Rows 4-6 (each part at
+                    // least 2 rows; rows to 6 so two problems stand down a page at L), at most 5 in a row (RP-21); pictures off prints the three facts alone.
+                    const rows = rng(4, 6);
                     const cols = rng(2, 5);
                     const top = rng(2, rows - 2);
                     const p1 = top * cols, p2 = (rows - top) * cols, product = rows * cols;
