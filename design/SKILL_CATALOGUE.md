@@ -11,64 +11,64 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 - **n/a**: fact layouts apply to fact-like skills only.
 - **broken**: the generator threw or returned nothing in this run.
 
-## Totals (732 skills)
+## Totals (737 skills)
 
 | Role group | ready | basic | author | wrap | n/a | broken |
 |---|---|---|---|---|---|---|
-| Practice / review / test | 732 | 0 | 0 | 0 | 0 | 0 |
-| Answer key (every page) | 732 | 0 | 0 | 0 | 0 | 0 |
-| Opener / Model / Guided | 0 | 675 | 57 | 0 | 0 | 0 |
-| Error analysis / T-F / Reason It | 0 | 386 | 346 | 0 | 0 | 0 |
-| Sub-skill pages | 0 | 0 | 732 | 0 | 0 | 0 |
-| Stretch | 0 | 336 | 396 | 0 | 0 | 0 |
-| Word problems | 0 | 111 | 0 | 621 | 0 | 0 |
-| Fact layouts | 0 | 92 | 0 | 0 | 640 | 0 |
+| Practice / review / test | 737 | 0 | 0 | 0 | 0 | 0 |
+| Answer key (every page) | 737 | 0 | 0 | 0 | 0 | 0 |
+| Opener / Model / Guided | 0 | 680 | 57 | 0 | 0 | 0 |
+| Error analysis / T-F / Reason It | 0 | 394 | 343 | 0 | 0 | 0 |
+| Sub-skill pages | 0 | 0 | 737 | 0 | 0 | 0 |
+| Stretch | 0 | 340 | 397 | 0 | 0 | 0 |
+| Word problems | 0 | 112 | 0 | 625 | 0 | 0 |
+| Fact layouts | 0 | 93 | 0 | 0 | 644 | 0 |
 
 ## Design and content flags
 
 | Flag | Skills |
 |---|---|
 | Generator error or empty question | 0 |
-| Colour inside the question or its visual | 332 |
-| Emoji inside the question or its visual | 27 |
-| Multiple choice on screen (check print/screen parity) | 105 |
-| No print format set | 72 |
-| No worked steps from either source | 44 |
+| Colour inside the question or its visual | 323 |
+| Emoji inside the question or its visual | 25 |
+| Multiple choice on screen (check print/screen parity) | 104 |
+| No print format set | 71 |
+| No worked steps from either source | 43 |
 | No hint | 0 |
-| Low variety (fewer than half the samples distinct) | 43 |
+| Low variety (fewer than half the samples distinct) | 45 |
 | Leaves `state.skill` changed after generating | 0 |
 
 ## Page tags
 
 **Base pages** are open to every skill and need no tag: opener, scripted model, guided, independent, more practice, error analysis, review, test A/B, pre-skill check, daily spiral, mixed skill practice, Daily 4, True or False?, Reason It, stretch, steps card, anchor chart, blank template. **Every page of every skill also prints a facsimile answer key.**
 
-**Host layout** (exactly one per skill) is the practice grid the skill's cell naturally sits in. **Specialised pages** are offered only to skills that carry the tag. Tags are derived from behaviour, then corrected by the family reviews in `design/catalogue/*.overrides.json` (573 of 732 skills reviewed so far).
+**Host layout** (exactly one per skill) is the practice grid the skill's cell naturally sits in. **Specialised pages** are offered only to skills that carry the tag. Tags are derived from behaviour, then corrected by the family reviews in `design/catalogue/*.overrides.json` (573 of 737 skills reviewed so far).
 
 | Host layout | Skills |
 |---|---|
 | computation-grid | 71 |
 | equation-drill | 148 |
-| long-division | 5 |
-| visual-grid | 311 |
+| long-division | 6 |
+| visual-grid | 313 |
 | k-counting | 13 |
 | chart-table | 84 |
-| word-problems | 93 |
+| word-problems | 95 |
 | unassigned | 7 |
 
 | Specialised page tag | Pages it unlocks | Skills |
 |---|---|---|
-| fact-layouts | fact rows 5-10 columns, fact fluency probe, practice strips, cumulative fact review | 68 |
-| fact-family | fact-family intro, warm-up, probe A-D | 14 |
-| flashcards | flashcards (hands-on) | 125 |
+| fact-layouts | fact rows 5-10 columns, fact fluency probe, practice strips, cumulative fact review | 69 |
+| fact-family | fact-family intro, warm-up, probe A-D | 15 |
+| flashcards | flashcards (hands-on) | 126 |
 | todays-number | Today's Number | 70 |
 | k-one-page | K one-page lesson (2 model / 2 guided / 2 alone) | 88 |
 | sub-decide | sub-skill: decide-only | 106 |
 | sub-notate | sub-skill: notate-only | 97 |
-| sub-setup | sub-skill: set-up (rewrite horizontal to vertical) | 76 |
+| sub-setup | sub-skill: set-up (rewrite horizontal to vertical) | 74 |
 | schema-story | schema word problems v1 / v2 / two-step, keyword panel | 96 |
-| hands-sort | cut-and-glue sort | 89 |
-| hands-order | cut-and-order | 21 |
-| hands-match | match with a line | 79 |
+| hands-sort | cut-and-glue sort | 90 |
+| hands-order | cut-and-order | 23 |
+| hands-match | match with a line | 78 |
 | hands-find | find-and-colour | 16 |
 | hands-strips | layered place-value strips | 3 |
 
@@ -78,38 +78,38 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 |---|---|---|---|---|---|---|---|---|---|
 | counting | 4 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 |
 | comparing | 4 | 0 | 0 | 0 | 0 | 4 | 0 | 0 | 0 |
-| composing | 19 | 0 | 6 | 0 | 3 | 19 | 4 | 0 | 0 |
+| composing | 19 | 0 | 2 | 0 | 0 | 19 | 1 | 0 | 0 |
 | counting_mixed | 1 | 0 | 1 | 0 | 0 | 1 | 1 | 0 | 0 |
 | addition | 61 | 0 | 31 | 0 | 0 | 61 | 0 | 20 | 17 |
 | subtraction | 57 | 0 | 22 | 0 | 0 | 57 | 0 | 21 | 15 |
-| multiplication | 52 | 0 | 11 | 0 | 0 | 52 | 1 | 6 | 30 |
-| division | 28 | 0 | 6 | 0 | 0 | 28 | 0 | 10 | 18 |
+| multiplication | 52 | 0 | 8 | 0 | 0 | 52 | 1 | 6 | 30 |
+| division | 29 | 0 | 4 | 0 | 0 | 29 | 0 | 10 | 19 |
 | integers | 12 | 0 | 3 | 0 | 2 | 12 | 3 | 0 | 4 |
 | number_ops_mixed | 9 | 0 | 5 | 0 | 0 | 9 | 0 | 3 | 0 |
-| fractions | 33 | 0 | 14 | 3 | 7 | 33 | 15 | 0 | 0 |
-| fraction_operations | 41 | 0 | 9 | 0 | 4 | 41 | 30 | 6 | 0 |
+| fractions | 33 | 0 | 14 | 2 | 8 | 33 | 15 | 0 | 0 |
+| fraction_operations | 41 | 0 | 8 | 0 | 2 | 41 | 28 | 6 | 0 |
 | decimals | 15 | 0 | 8 | 6 | 2 | 15 | 3 | 0 | 0 |
 | conversions | 19 | 0 | 10 | 0 | 3 | 19 | 9 | 4 | 0 |
-| frac_dec_mixed | 4 | 0 | 4 | 1 | 3 | 4 | 3 | 0 | 0 |
-| shapes_early | 17 | 0 | 14 | 0 | 5 | 17 | 8 | 1 | 0 |
+| frac_dec_mixed | 4 | 0 | 4 | 1 | 2 | 4 | 4 | 0 | 0 |
+| shapes_early | 17 | 0 | 14 | 0 | 5 | 17 | 7 | 1 | 0 |
 | area_perimeter | 17 | 0 | 13 | 0 | 0 | 17 | 0 | 7 | 3 |
-| angles_lines | 10 | 0 | 9 | 0 | 0 | 5 | 5 | 4 | 0 |
-| shapes_classify | 6 | 0 | 5 | 0 | 3 | 4 | 5 | 1 | 0 |
+| angles_lines | 10 | 0 | 9 | 0 | 0 | 6 | 5 | 4 | 0 |
+| shapes_classify | 6 | 0 | 5 | 0 | 3 | 3 | 5 | 1 | 0 |
 | coordinates | 23 | 0 | 21 | 0 | 2 | 3 | 14 | 1 | 0 |
 | measurement | 61 | 0 | 7 | 3 | 3 | 59 | 6 | 0 | 0 |
-| geo_mixed | 3 | 0 | 2 | 0 | 1 | 1 | 2 | 0 | 0 |
+| geo_mixed | 3 | 0 | 3 | 1 | 2 | 1 | 3 | 0 | 0 |
 | graphs | 13 | 0 | 5 | 0 | 0 | 1 | 4 | 0 | 0 |
-| data_analysis | 10 | 0 | 8 | 0 | 3 | 10 | 6 | 0 | 0 |
+| data_analysis | 10 | 0 | 8 | 0 | 2 | 10 | 7 | 0 | 0 |
 | probability | 2 | 0 | 2 | 0 | 0 | 2 | 2 | 2 | 0 |
 | data_mixed | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 0 |
-| patterns | 16 | 0 | 11 | 2 | 1 | 16 | 1 | 1 | 2 |
-| algebra | 40 | 0 | 22 | 6 | 0 | 40 | 5 | 12 | 3 |
-| order_of_operations | 14 | 0 | 0 | 1 | 1 | 14 | 5 | 0 | 0 |
+| patterns | 20 | 0 | 11 | 1 | 2 | 20 | 2 | 2 | 2 |
+| algebra | 40 | 0 | 22 | 5 | 0 | 40 | 6 | 12 | 3 |
+| order_of_operations | 14 | 0 | 0 | 2 | 2 | 14 | 5 | 0 | 0 |
 | placevalue | 23 | 0 | 0 | 0 | 3 | 23 | 4 | 3 | 0 |
 | number_sense | 32 | 0 | 4 | 0 | 2 | 32 | 2 | 6 | 0 |
-| number_theory | 19 | 0 | 15 | 0 | 0 | 8 | 8 | 3 | 0 |
-| algebra_mixed | 7 | 0 | 4 | 3 | 2 | 6 | 3 | 0 | 0 |
-| all_mixed | 9 | 0 | 9 | 2 | 4 | 8 | 7 | 0 | 0 |
+| number_theory | 19 | 0 | 15 | 0 | 0 | 8 | 7 | 3 | 0 |
+| algebra_mixed | 7 | 0 | 5 | 2 | 4 | 6 | 6 | 0 | 0 |
+| all_mixed | 9 | 0 | 8 | 2 | 4 | 8 | 7 | 0 | 0 |
 | vocabulary | 50 | 0 | 50 | 0 | 50 | 50 | 50 | 0 | 0 |
 
 ## Every skill
@@ -142,19 +142,19 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `make_ten` Make 10 (Visual) | K | compact | number | (none) | ready | ready | basic | basic | author | basic | wrap | n/a | V | k-counting (reviewed) | fact-layouts, flashcards, todays-number, k-one-page |
 | `teen_compose` Teen Numbers: 10 + Ones (Visual) | K | standard | number | (none) | ready | ready | basic | basic | author | basic | wrap | n/a | V | k-counting (reviewed) | todays-number, k-one-page |
 | `tens_foundation_visual` How Many Tens? (Visual) | K | medium | number | tens-foundation | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) | todays-number, k-one-page |
-| `hundreds_chart_fill` Hundreds Chart - Find the Missing Number (Visual) | 1 | medium | number, text | hundreds-chart-fill | ready | ready | basic | author | author | author | wrap | n/a | V | chart-table (reviewed) | todays-number, k-one-page |
+| `hundreds_chart_fill` Hundreds Chart - Find the Missing Number (Visual) | 1 | medium | text, number | hundreds-chart-fill | ready | ready | basic | author | author | author | wrap | n/a | V | chart-table (reviewed) | todays-number, k-one-page |
 | `ten_frame_build` Build a Number on a Ten Frame | K | wide | ten-frame-build | ten-frame-build | ready | ready | basic | basic | author | basic | wrap | n/a | V | k-counting (reviewed) | todays-number, k-one-page |
 | `ten_frame_build_teen` Build a Teen Number on Two Ten Frames | K | wide | ten-frame-build | ten-frame-build | ready | ready | basic | basic | author | basic | wrap | n/a |  | k-counting (reviewed) | todays-number, k-one-page |
 | `base10_build` Build a Number with Base-10 Blocks | 1 | wide | base10-build | base10-build | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) | todays-number, k-one-page |
 | `base10_regroup` Regroup with Base-10 Blocks | 2 | wide | base10-build | base10-build | ready | ready | basic | basic | author | basic | wrap | n/a |  | visual-grid (reviewed) | todays-number, sub-decide, sub-notate |
 | `base10_build_hundreds` Build 3-Digit Numbers with Flats | 2 | wide | base10-build | base10-build | ready | ready | basic | basic | author | basic | wrap | n/a |  | visual-grid (reviewed) | todays-number, hands-strips |
-| `odd_even` Odd or Even? (Visual) | 2 | compact | text, odd-even-select, multiple-choice | odd-even | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | todays-number, hands-sort, hands-find |
+| `odd_even` Odd or Even? (Visual) | 2 | compact | text | odd-even | ready | ready | basic | author | author | author | wrap | n/a | VD | visual-grid (reviewed) | todays-number, hands-sort |
 | `select_even_odd` Circle the Even or Odd Numbers (MAP) | 2 | medium | multi-select-check | multi-select | ready | ready | basic | basic | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-sort |
 | `number_word_form` Number Word Form | 2 | standard | number | (none) | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | todays-number, hands-match |
-| `fraction_number_line` Fractions on Number Line (Visual) | 3 | medium | fraction-input, multiple-choice, number-line-place | fraction-number-line | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `whole_as_fraction` Whole Numbers as Fractions (Visual) | 3 | standard | fraction-input | (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `fraction_number_line` Fractions on Number Line (Visual) | 3 | medium | text | (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
+| `whole_as_fraction` Whole Numbers as Fractions (Visual) | 3 | standard | number | (none) | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
 | `compose_whole` Compose 1 Whole from Unit Fractions | 3 | wide | compose-fraction-tiles | compose-fraction-tiles | ready | ready | basic | author | author | author | wrap | n/a | VD | visual-grid (reviewed) |  |
-| `mixed_composing` Mixed Number Sense | M | standard | ten-frame-build, text, number, odd-even-select, multiple-choice, fraction-input | ten-frame-build, hundreds-chart-fill, (none), odd-even, tens-foundation | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_composing` Mixed Number Sense | M | standard | ten-frame-build, text, number, base10-build, compose-fraction-tiles | ten-frame-build, hundreds-chart-fill, (none), odd-even, base10-build, compose-fraction-tiles, tens-foundation | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `number_chart_fill` Number Chart - Find the Missing Number (to 1,000 and beyond) | M | medium | text, number | hundreds-chart-fill | ready | ready | basic | author | author | author | wrap | n/a | V | chart-table |  |
 | `write_numbers_in_words` Write Numbers in Words | 2 | standard | text | (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid |  |
 
@@ -162,7 +162,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `counting_all` All Counting & Cardinality | M | standard | number, fraction-input, text, multi-select-check | tens-foundation, (none), hundreds-chart-fill, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | k-counting (reviewed) | hands-sort |
+| `counting_all` All Counting & Cardinality | M | standard | number, multi-select-check, text, base10-build, ten-frame-build | (none), multi-select, base10-build, hundreds-chart-fill, ten-frame-build | ready | ready | basic | author | author | author | wrap | n/a | CV | k-counting (reviewed) | hands-sort |
 
 ### addition
 
@@ -225,10 +225,10 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `nl_add` Addition Number Line (Visual) | 1 | medium | number | number-line-visual | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid (reviewed) | k-one-page |
 | `number_line_add` Number Line Addition (B&W) | 1 | medium | number | number-line-visual | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid (reviewed) | k-one-page |
 | `cloze_addition` Pick the Missing Addends | 2 | medium | text | inline-cloze | ready | ready | basic | author | author | author | wrap | basic | V | equation-drill (reviewed) | todays-number |
-| `mixed_addition` Mixed Addition | M | standard | number, number-family | column-add, story-work, number-line-visual, number-family-add-sub | ready | ready | basic | basic | author | basic | basic | n/a | CV | computation-grid (reviewed) | schema-story |
+| `mixed_addition` Mixed Addition | M | standard | number, number-family, fact-family | column-add, story-work, number-line-visual, number-family-add-sub, fact-family-add-sub, (none) | ready | ready | basic | basic | author | basic | wrap | n/a | CV | computation-grid (reviewed) |  |
 | `add_column_multi` Add Three or Four Numbers in Columns | 2 | standard | number | column-add-multi | ready | ready | basic | basic | author | basic | wrap | n/a | V | computation-grid | sub-decide, sub-setup |
 | `add_missing_digit` Find the Missing Digit (Addition) | 3 | standard | number | column-add | ready | ready | basic | basic | author | basic | wrap | n/a | V | computation-grid | sub-decide, sub-setup |
-| `fact_family_sort` Is It a Fact Family? (+/−) | 1 | standard | text | fact-family-sort | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid | fact-family, k-one-page, hands-sort |
+| `fact_family_sort` Is It a Fact Family? (+/−) | 1 | standard | text | fact-family-sort | ready | ready | basic | author | author | author | basic | n/a | V | word-problems | fact-family, k-one-page, schema-story, hands-sort |
 
 ### subtraction
 
@@ -284,7 +284,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `nl_sub` Subtraction Number Line (Visual) | 1 | medium | number | number-line-visual | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid (reviewed) | k-one-page |
 | `number_line_sub` Number Line Subtraction (B&W) | 1 | medium | number | number-line-visual | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid (reviewed) | k-one-page |
 | `mixed_add_sub` Mixed Addition & Subtraction | 2 | standard | number | column-sub, column-add | ready | ready | basic | basic | author | basic | wrap | n/a | CV | computation-grid (reviewed) | sub-decide, sub-setup |
-| `mixed_subtraction` Mixed Subtraction | M | standard | number | missing-number, story-work, column-sub, number-line-visual | ready | ready | basic | basic | author | basic | wrap | n/a | CV | computation-grid (reviewed) |  |
+| `mixed_subtraction` Mixed Subtraction | M | standard | number | missing-number, story-work, column-sub, number-line-visual, sub-facts-vertical | ready | ready | basic | basic | author | basic | wrap | n/a | CV | computation-grid (reviewed) |  |
 | `sub_across_zeros` Subtract Across Zeros | 3 | standard | number | column-sub | ready | ready | basic | basic | author | basic | wrap | n/a | V | computation-grid | sub-decide, sub-notate, sub-setup |
 | `sub_missing_digit` Find the Missing Digit (Subtraction) | 3 | standard | number | column-sub | ready | ready | basic | basic | author | basic | wrap | n/a | V | computation-grid | sub-decide, sub-setup |
 | `sub_check_by_adding` Check a Subtraction by Adding | 3 | medium | number | sub-check-judge | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid |  |
@@ -299,15 +299,15 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `mult_facts` Multiplication Facts (1-12) | 3 | compact | number | mult-facts-vertical | ready | ready | basic | basic | author | basic | wrap | basic | CV | equation-drill (reviewed) | fact-layouts, flashcards |
 | `multiply` Basic Multiplication | 3 | compact | number | mult-facts-vertical | ready | ready | basic | basic | author | basic | wrap | basic | CV | computation-grid (reviewed) | fact-layouts, flashcards, sub-setup |
 | `arrays_groups` Arrays & Equal Groups (Visual) | 2 | medium | inline-blanks | arrays-groups | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
-| `dot_array_mult` Dot Array Multiplication (B&W) | 2 | medium | number | dot-array-visual | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `dot_array_mult` Dot Array Multiplication (B&W) | 2 | medium | number | dot-array-visual | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
 | `mult_properties` Multiplication Properties (Visual) | 3 | medium | text, number | mult-properties | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `mult_word_problems` Multiplication Word Problems | 3 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | basic | V | word-problems (reviewed) | schema-story |
 | `mult_word_problems_plain` Multiplication Word Problems (No Pictures) | 3 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | basic | V | word-problems (reviewed) | schema-story |
 | `mult_comparison` Times as Many Word Problems (Visual) | 4 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems (reviewed) | schema-story |
 | `mult_comparison_plain` Times as Many (No Pictures) | 4 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems (reviewed) | schema-story |
 | `area_model_mult` Area Model Multiplication | 4 | medium | area-model | area-model-mult | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
-| `area_model_mult_hard` Area Model (2×2 and 2×3) | 5 | medium | area-model | area-model-mult-hard | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `mult_div_fact_family` Multiplication Fact Families | 3 | wide | fact-family | fact-family-mult-div | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-family, flashcards |
+| `area_model_mult_hard` Area Model (2×2 and 2×3) | 5 | medium | area-model | area-model-mult-hard | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
+| `mult_div_fact_family` Multiplication Fact Families | 3 | wide | fact-family | fact-family-mult-div | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | fact-family, flashcards |
 | `number_families_mult` Number Families (Multiply & Divide) | 3 | wide | number-family | number-family-mult-div | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-family |
 | `number_families_mult_med` Number Families - Medium | 3 | wide | number-family | number-family-mult-div | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-family |
 | `number_families_mult_hard` Number Families - Hard | 4 | wide | number-family | number-family-mult-div | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-family |
@@ -316,7 +316,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `mult_chart_medium` Multiplication Chart - Medium (6 missing) | 4 | wide | text | mult-grid | ready | ready | basic | author | author | author | wrap | basic | V | chart-table (reviewed) | fact-layouts, flashcards |
 | `mult_chart_hard` Multiplication Chart - Hard (22 missing) | 5 | wide | text | mult-grid | ready | ready | basic | author | author | author | wrap | basic | V | chart-table (reviewed) | fact-layouts, flashcards |
 | `nl_mult` Multiplication Number Line (Visual) | 3 | medium | number | hop-line | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid (reviewed) |  |
-| `mixed_multiplication` Mixed Multiplication | M | standard | number-family, number, area-model, inline-blanks | number-family-mult-div, mult-facts-vertical, column-mult, repeated-add-mult, hop-line, mult-properties, story-work, area-model-mult, arrays-groups | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | sub-setup |
+| `mixed_multiplication` Mixed Multiplication | M | standard | number-family, number, inline-blanks, text | number-family-mult-div, story-work, hop-line, mult-facts-horizontal, mult-placeholder-zero, mult-properties, arrays-groups, mult-grid | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `repeated_add_to_mult` Write Repeated Addition as Multiplication (Visual) | 2 | medium | number | repeated-add-mult | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid | fact-layouts, flashcards |
 | `equal_or_unequal_groups` Equal Groups or Not? (Visual) | 2 | medium | text | equal-groups-decide | ready | ready | basic | author | author | author | basic | n/a | V | word-problems | schema-story |
 | `mult_zeros` Multiply by 10, 100 and Multiples of Ten | 3 | compact | number | mult-facts-horizontal | ready | ready | basic | basic | author | basic | wrap | basic |  | equation-drill | fact-layouts, flashcards |
@@ -362,16 +362,16 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `remainder_contexts` Remainder Contexts (Buses, Boxes, Cookies, Money, Cars) | 4 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | basic | V | word-problems (reviewed) | schema-story |
 | `box_division_easy` Box Method Division (2÷1 digit) | 3 | wide | box-division | box-division | ready | ready | basic | basic | author | basic | wrap | basic | CV | visual-grid (reviewed) |  |
 | `box_division_hard` Box Method Division (3÷1 digit) | 4 | wide | box-division | box-division | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `area_model_div_2by1` Area Model Division (2÷1 digit) | 4 | medium | area-model-div | area-model-div | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `area_model_div_3by1` Area Model Division (3÷1 digit) | 5 | medium | area-model-div | area-model-div | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `area_model_div_2by1` Area Model Division (2÷1 digit) | 4 | medium | area-model | area-model-div | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
+| `area_model_div_3by1` Area Model Division (3÷1 digit) | 5 | medium | area-model | area-model-div | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
 | `long_div_2digit` Divide by 2-Digit Numbers (Visual) | 5 | standard | number | long-div-kit | ready | ready | basic | basic | author | basic | wrap | n/a | V | long-division (reviewed) | sub-decide, sub-notate |
 | `missing_mult_div` Missing Factors (×/÷) | 3 | standard | number | missing-factor | ready | ready | basic | basic | author | basic | wrap | basic | V | equation-drill (reviewed) |  |
 | `nl_div` Division Number Line (Visual) | 3 | medium | number | hop-line | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid (reviewed) |  |
 | `mixed_mult_div` Mixed Multiplication & Division | 3 | standard | number | div-facts-horizontal, mult-facts-vertical | ready | ready | basic | basic | author | basic | wrap | basic | CV | visual-grid (reviewed) |  |
-| `mixed_division` Mixed Division | M | standard | box-division, number, text, area-model-div | box-division, story-work, remainder-judge, long-div-kit, long-division, area-model-div | ready | ready | basic | author | author | author | basic | n/a | CV | visual-grid (reviewed) | schema-story |
+| `mixed_division` Mixed Division | M | standard | box-division, number, text, area-model | box-division, story-work, remainder-judge, long-div-kit, short-div-kit, div-equation-parts, area-model-div | ready | ready | basic | author | author | author | basic | n/a | CV | visual-grid (reviewed) | schema-story |
 | `share_into_groups` Make Equal Groups to Divide (Visual) | 3 | medium | number | share-into-groups | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid | fact-layouts, flashcards |
 | `div_equation_parts` Parts of a Division Equation (Visual) | 3 | medium | number | div-equation-parts | ready | ready | basic | basic | author | basic | basic | basic | V | word-problems | fact-layouts, flashcards, schema-story |
-| `div_zero_in_quotient` Zero in the Quotient | 4 | medium | number | long-division | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid |  |
+| `div_zero_in_quotient` Zero in the Quotient | 4 | medium | number | short-div-kit | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid |  |
 | `remainder_too_big` Is the Remainder Finished? | 4 | medium | text | remainder-judge | ready | ready | basic | author | author | author | basic | basic | V | word-problems | fact-layouts, flashcards, schema-story |
 | `div_check_by_multiplying` Check a Division by Multiplying | 4 | medium | number | div-check-judge | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid | fact-layouts, flashcards |
 | `div_fix_estimate` Fix the Estimate (Long Division) | 5 | medium | number | div-fix-estimate | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems | schema-story |
@@ -381,6 +381,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `div_3by2_long` Divide 3-Digit by 2-Digit Numbers (Long Division) | 5 | compact | number | long-div-kit | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid |  |
 | `div_sharing_word_problems` Division Word Problems: Sharing | 3 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | basic | V | word-problems | fact-layouts, flashcards, schema-story |
 | `div_grouping_word_problems` Division Word Problems: Grouping | 3 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | basic | V | word-problems | fact-layouts, flashcards, schema-story |
+| `div_facts_long` Divide: Long-Division Form | 3 | compact | number | div-facts-long | ready | ready | basic | basic | author | basic | wrap | basic | V | long-division | fact-layouts, flashcards |
 
 ### integers
 
@@ -391,9 +392,9 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `add_int` Adding Integers | 6 | standard | number | number-line-visual | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid (reviewed) | sub-decide |
 | `sub_int` Subtracting Integers | 6 | standard | number | number-line-visual | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid (reviewed) | sub-decide |
 | `order_negatives` Order Integers: Least to Greatest | 6 | wide | interactive | ordering | ready | ready | basic | author | author | author | wrap | n/a |  | visual-grid (reviewed) | hands-order |
-| `integer_nl_drag` Place Integers on a Number Line | 6 | wide | text | nl-drag | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
-| `mixed_integers` Mixed Integers | M | standard | multiple-choice, interactive, number | wide, ordering, number-line-visual, compact, integer-number-line | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `abs_value` Absolute Value | 6 | compact | number, text | compact | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) |  |
+| `integer_nl_drag` Place Integers on a Number Line | 6 | wide | text | nl-drag | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
+| `mixed_integers` Mixed Integers | M | standard | interactive, number, multiple-choice, text | ordering, integer-number-line, compact, wide, nl-drag, number-line-visual | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `abs_value` Absolute Value | 6 | compact | text, number | compact | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) |  |
 | `opposite_numbers` Opposites of Integers | 6 | compact | number | compact | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) |  |
 | `ordering_rationals` Order Rationals on a Number Line | 6 | wide | multiple-choice | wide | ready | ready | basic | basic | author | author | wrap | n/a |  | visual-grid (reviewed) | hands-order |
 | `add_negative` Add a Negative Number | 6 | standard | number | number-line-visual | ready | ready | basic | basic | author | basic | wrap | basic | V | visual-grid | fact-layouts, flashcards |
@@ -403,13 +404,13 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `mixed` All Four Operations (+ − × ÷) | M | standard | number | mult-facts-vertical, column-add, div-facts-horizontal, column-sub | ready | ready | basic | basic | author | basic | wrap | n/a | CV | computation-grid (reviewed) | sub-setup |
+| `mixed` All Four Operations (+ − × ÷) | M | standard | number | column-add, column-sub, mult-facts-vertical, div-facts-horizontal | ready | ready | basic | basic | author | basic | wrap | n/a | CV | computation-grid (reviewed) | sub-setup |
 | `word_problems_mixed` Mixed Word Problems (+−×÷) (Visual) | 3 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems (reviewed) | schema-story |
 | `word_problems_mixed_plain` Mixed Word Problems (+−×÷) (No Pictures) | 3 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems (reviewed) | schema-story |
 | `number_families_mixed` Number Families (All Four Operations) | 2 | wide | number-family | number-family-all-four | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-family |
 | `number_families_mixed_med` Number Families (All 4 Ops) - Medium | 3 | wide | number-family | number-family-all-four | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-family |
 | `number_families_mixed_hard` Number Families (All 4 Ops) - Hard | 4 | wide | number-family | number-family-all-four | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-family |
-| `operations_all` All Operations Skills | M | standard | number, text | column-sub, (none), nl-drag, mult-grid, div-check-judge, mult-facts-vertical, column-add, sub-check-judge | ready | ready | basic | basic | author | basic | wrap | n/a | CV | computation-grid (reviewed) |  |
+| `operations_all` All Operations Skills | M | standard | inline-blanks, number | arrays-groups, column-add, long-div-kit, story-work, column-add-multi, column-sub, number-line-visual | ready | ready | basic | basic | author | basic | wrap | n/a | CV | computation-grid (reviewed) |  |
 | `which_sign` Which Sign Makes It True? (+ − × ÷) | M | compact | text | missing-operator | ready | ready | basic | author | author | author | basic | n/a | V | word-problems | schema-story |
 | `missing_factor_or_addend` Missing Addend or Missing Factor? | 3 | standard | number | missing-number | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid |  |
 
@@ -417,28 +418,28 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `identify` Identify Fractions (Visual) | 3 | compact | text, multiple-choice, number | (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | hands-match, hands-find |
+| `identify` Identify Fractions (Visual) | 3 | compact | multiple-choice, number, text | (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | hands-match, hands-find |
 | `write_fraction` Write the Fraction Shown | 3 | medium | text | write-fraction | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-notate |
 | `shade_fraction` Shade the Fraction | 3 | medium | shade-parts | shade-fraction | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) | hands-find |
-| `equiv_frac_visual` Equivalent Fractions (Visual) | 3 | medium | number, symbol, text | equiv-frac-visual | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | hands-match |
-| `equiv_frac_nv` Equivalent Fractions (No Visuals) | 3 | medium | text, multi-select-check, dnd-generic, number | equiv-frac-nv, multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-notate, hands-sort |
+| `equiv_frac_visual` Equivalent Fractions (Visual) | 3 | medium | number, text, symbol | equiv-frac-visual | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | hands-match |
+| `equiv_frac_nv` Equivalent Fractions (No Visuals) | 3 | medium | text, number, multi-select-check, dnd-generic | equiv-frac-nv, multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-notate, hands-sort |
 | `select_equiv_frac` Circle the Equivalent Fractions (MAP) | 4 | medium | multi-select-check | multi-select | ready | ready | basic | basic | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-sort |
-| `equivalent` Equivalent Fractions | 4 | standard | multi-select-check, number, multiple-choice, drag-fill | multi-select, (none), drag-fill | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-sort |
+| `equivalent` Equivalent Fractions | 4 | standard | number, multi-select-check, multiple-choice | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-sort |
 | `fraction_of_set` Fraction of a Set (Visual) | 3 | medium | number, multi-select-check | fraction-of-set, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) | sub-notate, schema-story |
 | `fraction_of_set_hard` Fraction of a Set - Hard (Visual) | 4 | medium | number, multi-select-check | fraction-of-set, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) | schema-story |
-| `compare` Compare Fractions (>, <, =) | 4 | compact | symbol | fraction-compare, (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide |
-| `simplify` Simplify Fractions | 4 | standard | text, number, multiple-choice, multi-select-check | fraction-simplify, (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate, hands-sort |
-| `improper_mixed` Improper ↔ Mixed Numbers | 4 | standard | text, multi-select-check | improper-to-mixed, mixed-improper-visual, mixed-to-improper, multi-select | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, sub-notate, hands-sort, hands-match |
+| `compare` Compare Fractions (>, <, =) | 4 | compact | symbol | (none), fraction-compare | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide |
+| `simplify` Simplify Fractions | 4 | standard | number, multiple-choice, text, multi-select-check | (none), fraction-simplify, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate, hands-sort |
+| `improper_mixed` Improper ↔ Mixed Numbers | 4 | standard | text, multi-select-check | improper-to-mixed, multi-select, mixed-improper-visual, mixed-to-improper | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, sub-notate, hands-sort, hands-match |
 | `mixed_improper_visual` Mixed ↔ Improper (Visual Pizza) | 4 | medium | dual-fraction | mixed-improper-visual | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `mixed_fractions` Mixed Fractions | M | standard | text, dnd-generic, multi-select-check, dual-fraction, symbol, number | mixed-improper-visual, dnd-generic, multi-select, nl-drag, equiv-frac-visual, fraction-compare, fraction-of-set, fraction-of-set-nv | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
+| `mixed_fractions` Mixed Fractions | M | standard | text, shade-parts, multiple-choice, number, number-line-place | nl-drag, equiv-frac-nv, shade-fraction, fraction-bar-visual, fraction-numline-order, fraction-of-set, fraction-numberline, equiv-frac-visual | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-order, hands-find |
 | `compose_target_frac` Compose a Target Fraction | 4 | wide | compose-fraction-tiles | compose-fraction-tiles | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `identify_nv` Identify Fractions (No Visuals) | 3 | medium | fraction-input | identify-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | schema-story |
-| `fraction_of_set_nv` Fraction of a Set (No Visuals) | 3 | medium | multi-select-check, number, text | multi-select, fraction-of-set-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | schema-story |
-| `fraction_of_set_hard_nv` Fraction of a Set - Hard (No Visuals) | 4 | medium | number, multi-select-check, text | fraction-of-set-hard-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | schema-story |
+| `fraction_of_set_nv` Fraction of a Set (No Visuals) | 3 | medium | number, text, multi-select-check | fraction-of-set-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | schema-story |
+| `fraction_of_set_hard_nv` Fraction of a Set - Hard (No Visuals) | 4 | medium | text, number, multi-select-check | fraction-of-set-hard-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | schema-story |
 | `order_fractions` Order Fractions | 4 | medium | interactive, dnd-generic | fraction-order, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | hands-order |
 | `order_frac_numline` Fractions on Number Line | 4 | wide | multiple-choice, dnd-generic | fraction-numline-order, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-order |
-| `benchmark_fractions` Benchmark Fractions (0, ¼, ½, ¾, 1) | 4 | standard | multiple-choice, multi-select-check, dnd-generic | fraction-benchmark, multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `compare_frac_lcd` Compare Fractions (LCD) | 4 | medium | dnd-generic, multiple-choice | dnd-generic, fraction-compare-lcd | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
+| `benchmark_fractions` Benchmark Fractions (0, ¼, ½, ¾, 1) | 4 | standard | dnd-generic, multi-select-check, multiple-choice | dnd-generic, multi-select, fraction-benchmark | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
+| `compare_frac_lcd` Compare Fractions (LCD) | 4 | medium | multiple-choice, dnd-generic | fraction-compare-lcd, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
 | `graph_fractions` Place Fractions on Number Line | 3 | medium | number-line-place | fraction-numberline | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | sub-notate |
 | `round_fractions` Round Mixed Numbers | 4 | standard | text | fraction-round | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | sub-decide |
 | `fraction_bar_ops` Fraction Bar Operations (Visual) | 3 | medium | text, fraction-input | fraction-bar-visual | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide |
@@ -455,47 +456,47 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `add_fractions_like` Add Fractions (Like Denom) (Visual) | 4 | medium | multi-select-check, text | multi-select, (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
+| `add_fractions_like` Add Fractions (Like Denom) (Visual) | 4 | medium | text | (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `sub_fractions_like` Subtract Fractions (Like Denom) (Visual) | 4 | medium | text | (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
-| `add_mixed_like` Add Mixed Numbers (Like Denom) (Visual) | 4 | medium | text, dnd-generic, multi-select-check | (none), dnd-generic, multi-select | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide |
+| `add_mixed_like` Add Mixed Numbers (Like Denom) (Visual) | 4 | medium | dnd-generic, text, multi-select-check | dnd-generic, (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide |
 | `sub_mixed_like` Subtract Mixed Numbers (Like Denom) (Visual) | 4 | medium | text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
 | `mult_frac_whole` Fraction × Whole Number (Visual) | 4 | standard | text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | hands-match |
-| `decompose_fractions` Decompose to Unit Fractions (Visual) | 4 | standard | text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-match |
-| `frac_word_problems` Fraction Word Problems (+/−) (Visual) | 4 | spacious | multi-select-check, fraction-input, text | multi-select, (none) | ready | ready | basic | author | author | author | basic | n/a | CV | word-problems (reviewed) | sub-decide, schema-story |
-| `frac_word_problems_plain` Fraction Word Problems (No Pictures) | 4 | spacious | fraction-input, text, multi-select-check | word-plain | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide, schema-story |
+| `decompose_fractions` Decompose to Unit Fractions (Visual) | 4 | standard | multi-select-check, text | multi-select, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-match |
+| `frac_word_problems` Fraction Word Problems (+/−) (Visual) | 4 | spacious | fraction-input, text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | basic | n/a | CV | word-problems (reviewed) | sub-decide, schema-story |
+| `frac_word_problems_plain` Fraction Word Problems (No Pictures) | 4 | spacious | fraction-input, multi-select-check, text | word-plain | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide, schema-story |
 | `frac_10_100` Fractions /10 as /100 (Visual) | 4 | standard | fraction-input, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-match |
-| `add_frac_unlike` Add Fractions (Unlike Denom) (Visual) | 5 | medium | text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
-| `sub_frac_unlike` Subtract Fractions (Unlike Denom) (Visual) | 5 | medium | multi-select-check, text | multi-select, (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
-| `add_mixed_unlike` Add Mixed Numbers (Unlike Denom) (Visual) | 5 | medium | dnd-generic, multi-select-check, text | dnd-generic, multi-select, (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
-| `sub_mixed_unlike` Subtract Mixed Numbers (Unlike Denom) (Visual) | 5 | medium | text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
-| `add_frac_like_nv` Add Fractions (Like Denom) (No Visuals) | 4 | medium | text, dnd-generic, fraction-input | frac-add-like-nv, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
-| `sub_frac_like_nv` Subtract Fractions (Like Denom) (No Visuals) | 4 | medium | fraction-input, text, dnd-generic | frac-sub-like-nv, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
-| `add_frac_unlike_nv` Add Fractions (Unlike Denom) (No Visuals) | 5 | medium | text, dnd-generic, fraction-input | frac-add-unlike-nv, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
+| `add_frac_unlike` Add Fractions (Unlike Denom) (Visual) | 5 | medium | multi-select-check, text | multi-select, (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
+| `sub_frac_unlike` Subtract Fractions (Unlike Denom) (Visual) | 5 | medium | text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
+| `add_mixed_unlike` Add Mixed Numbers (Unlike Denom) (Visual) | 5 | medium | text, multi-select-check, dnd-generic | (none), multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
+| `sub_mixed_unlike` Subtract Mixed Numbers (Unlike Denom) (Visual) | 5 | medium | text | (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | sub-decide, sub-notate |
+| `add_frac_like_nv` Add Fractions (Like Denom) (No Visuals) | 4 | medium | text, dnd-generic | frac-add-like-nv, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
+| `sub_frac_like_nv` Subtract Fractions (Like Denom) (No Visuals) | 4 | medium | fraction-input, dnd-generic, text | frac-sub-like-nv, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
+| `add_frac_unlike_nv` Add Fractions (Unlike Denom) (No Visuals) | 5 | medium | fraction-input, dnd-generic, text | frac-add-unlike-nv, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `sub_frac_unlike_nv` Subtract Fractions (Unlike Denom) (No Visuals) | 5 | medium | fraction-input, text, dnd-generic | frac-sub-unlike-nv, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `add_mixed_like_nv` Add Mixed Numbers (Like Denom) (No Visuals) | 4 | medium | text | frac-add-mixed-like-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide |
 | `sub_mixed_like_nv` Subtract Mixed Numbers (Like Denom) (No Visuals) | 4 | medium | text, fraction-input | frac-sub-mixed-like-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `add_mixed_unlike_nv` Add Mixed Numbers (Unlike Denom) (No Visuals) | 5 | medium | text | frac-add-mixed-unlike-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `sub_mixed_unlike_nv` Subtract Mixed Numbers (Unlike Denom) (No Visuals) | 5 | medium | fraction-input, text | frac-sub-mixed-unlike-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
-| `mult_frac_whole_nv` Fraction × Whole Number (No Visuals) | 4 | medium | text, multi-select-check, number | mult-frac-whole-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-match |
-| `decompose_frac_nv` Decompose to Unit Fractions (No Visuals) | 4 | medium | multi-select-check, text, number | multi-select, decompose-frac-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-match |
-| `frac_10_100_nv` Fractions /10 as /100 (No Visuals) | 4 | medium | number, fraction-input, multi-select-check | frac-10-100-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-match |
-| `mult_frac_frac_nv` Fraction × Fraction (No Visuals) | 5 | medium | multi-select-check, fraction-input, number | multi-select, mult-frac-frac-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
+| `mult_frac_whole_nv` Fraction × Whole Number (No Visuals) | 4 | medium | multi-select-check, number, text | multi-select, mult-frac-whole-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-match |
+| `decompose_frac_nv` Decompose to Unit Fractions (No Visuals) | 4 | medium | number, multi-select-check, text | decompose-frac-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-match |
+| `frac_10_100_nv` Fractions /10 as /100 (No Visuals) | 4 | medium | multi-select-check, fraction-input, number | multi-select, frac-10-100-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-match |
+| `mult_frac_frac_nv` Fraction × Fraction (No Visuals) | 5 | medium | fraction-input, number, multi-select-check | mult-frac-frac-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
 | `div_unit_frac_nv` Divide with Unit Fractions (No Visuals) | 5 | medium | number, fraction-input, multi-select-check | div-unit-frac-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
-| `frac_as_div_nv` Fraction as Division (No Visuals) | 5 | medium | fraction-input, text, multi-select-check | frac-as-div-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-match |
+| `frac_as_div_nv` Fraction as Division (No Visuals) | 5 | medium | text, multi-select-check, fraction-input | frac-as-div-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-match |
 | `frac_as_div_word` Fraction as Division Word Problems | 5 | spacious | fraction-input, text | word-problem | ready | ready | basic | author | author | author | wrap | n/a |  | word-problems (reviewed) | schema-story |
-| `mult_scaling_nv` Multiplication as Scaling (No Visuals) | 5 | medium | multiple-choice, dnd-generic, multi-select-check, text | mult-scaling-nv, dnd-generic, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-sort |
+| `mult_scaling_nv` Multiplication as Scaling (No Visuals) | 5 | medium | dnd-generic, text, multi-select-check | dnd-generic, mult-scaling-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | hands-sort |
 | `mult_frac_frac` Fraction × Fraction (Visual) | 5 | standard | text, multi-select-check, dnd-generic | (none), multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `div_unit_fraction` Divide with Unit Fractions (Visual) | 5 | standard | text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
-| `frac_as_division` Fraction as Division (a/b = a÷b) (Visual) | 5 | standard | text, fraction-input, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | word-problems (reviewed) | schema-story |
-| `mult_scaling` Multiplication as Scaling (Visual) | 5 | standard | multiple-choice, dnd-generic, multi-select-check | (none), dnd-generic, multi-select | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `frac_mult_word` Fraction Mult/Div Word Problems (Visual) | 5 | spacious | text, fraction-input, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | basic | n/a | CV | word-problems (reviewed) | sub-decide, schema-story |
+| `frac_as_division` Fraction as Division (a/b = a÷b) (Visual) | 5 | standard | fraction-input, multi-select-check, text | (none), multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | word-problems (reviewed) | schema-story |
+| `mult_scaling` Multiplication as Scaling (Visual) | 5 | standard | multiple-choice, multi-select-check, dnd-generic | (none), multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
+| `frac_mult_word` Fraction Mult/Div Word Problems (Visual) | 5 | spacious | fraction-input, text, multi-select-check | (none), multi-select | ready | ready | basic | author | author | author | basic | n/a | CV | word-problems (reviewed) | sub-decide, schema-story |
 | `frac_mult_word_plain` Fraction Mult/Div Word (No Pictures) | 5 | spacious | fraction-input, text, multi-select-check | word-plain | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide, schema-story |
-| `frac_word_mixed` Mixed Fraction Word Problems (Visual) | 4 | spacious | multi-select-check, fraction-input, text | multi-select, (none) | ready | ready | basic | author | author | author | basic | n/a | CV | word-problems (reviewed) | sub-decide |
-| `frac_word_mixed_plain` Mixed Fraction Word Problems (No Pictures) | 4 | spacious | multi-select-check, text, fraction-input | word-plain | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide |
-| `mixed_fraction_ops` Mixed Fraction Operations | 5 | standard | fraction-input, multi-select-check, dnd-generic, text, multiple-choice | (none), div-unit-frac-nv, word-plain, multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `frac_word_mixed` Mixed Fraction Word Problems (Visual) | 4 | spacious | multi-select-check, text, fraction-input | multi-select, (none) | ready | ready | basic | author | author | author | basic | n/a | CV | word-problems (reviewed) | sub-decide |
+| `frac_word_mixed_plain` Mixed Fraction Word Problems (No Pictures) | 4 | spacious | fraction-input, text, multi-select-check | word-plain | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide |
+| `mixed_fraction_ops` Mixed Fraction Operations | 5 | standard | dnd-generic, text, fraction-input, multi-select-check | dnd-generic, word-plain, (none), mult-frac-frac-nv, multi-select, frac-sub-mixed-unlike-nv | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
 | `estimate_frac_ops` Estimate Fraction Sums/Differences | 5 | standard | multiple-choice | fraction-estimate | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
 | `unit_frac_div_whole` Divide a Unit Fraction by a Whole Number | 5 | medium | fraction-input, number | div-unit-frac-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill |  |
-| `whole_div_unit_frac` Divide a Whole Number by a Unit Fraction | 5 | medium | number, multi-select-check | div-unit-frac-nv, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill | hands-sort |
+| `whole_div_unit_frac` Divide a Whole Number by a Unit Fraction | 5 | medium | multi-select-check, number | multi-select, div-unit-frac-nv | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill | hands-sort |
 
 ### decimals
 
@@ -505,13 +506,13 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `sub_decimal` Subtracting Decimals | 5 | standard | col-arith | decimal-column-sub | ready | ready | basic | basic | author | basic | wrap | n/a |  | computation-grid (reviewed) | sub-decide, sub-notate, sub-setup, schema-story |
 | `mult_decimal` Multiplying Decimals | 5 | standard | number | decimal-mult | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | computation-grid (reviewed) | sub-notate, sub-setup, schema-story |
 | `div_decimal` Dividing Decimals | 6 | standard | text | decimal-div | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | long-division (reviewed) | sub-decide, sub-notate, sub-setup, schema-story |
-| `compare_decimal` Comparing Decimals | 4 | compact | multi-select-check, choice, dnd-generic | multi-select, decimal-compare, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) | sub-decide, sub-notate, sub-setup, hands-order |
+| `compare_decimal` Comparing Decimals | 4 | compact | choice, multi-select-check, dnd-generic | decimal-compare, multi-select, dnd-generic | ready | ready | basic | basic | author | author | wrap | n/a | CEV | equation-drill (reviewed) | sub-decide, sub-notate, sub-setup, hands-order |
 | `compare_thousandths` Compare Decimals to Thousandths | 5 | compact | multiple-choice | compact | ready | ready | basic | basic | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-notate, sub-setup |
 | `round_decimals` Round Decimals (Visual) | 5 | standard | number | (none) | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | todays-number, sub-decide, sub-notate |
 | `round_thousandths` Round Thousandths | 5 | standard | text | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | todays-number, sub-decide, sub-notate |
 | `order_decimals` Order Decimals | 5 | standard | interactive, dnd-generic | decimal-order, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-setup, hands-order |
 | `decimal_nl_drag` Place Decimals on a Number Line | 4 | wide | text | nl-drag | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) | sub-notate |
-| `mixed_decimals` Mixed Decimals | M | standard | interactive, text, number, multiple-choice, col-arith, choice | decimal-order, decimal-div, (none), compact, decimal-mult, decimal-column-add, standard, decimal-compare | ready | ready | basic | author | author | author | wrap | n/a | CEV | computation-grid (reviewed) | hands-order |
+| `mixed_decimals` Mixed Decimals | M | standard | text, interactive, multiple-choice, multi-select-check, number, col-arith | decimal-div, decimal-order, nl-drag, compact, multi-select, decimal-mult, decimal-column-add | ready | ready | basic | author | author | author | wrap | n/a | CEV | computation-grid (reviewed) | hands-sort, hands-order |
 | `div_decimal_by_whole` Divide a Decimal by a Whole Number | 5 | standard | text | decimal-div | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | long-division |  |
 | `div_by_decimal` Divide by a Decimal | 6 | standard | text | decimal-div | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | long-division |  |
 | `round_to_tenth` Round Decimals to the Nearest Tenth | 5 | standard | text | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill | todays-number |
@@ -521,20 +522,20 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `f_to_d` Fraction → Decimal | 4 | standard | number, dnd-generic | (none), dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | flashcards, sub-notate, hands-sort, hands-match |
-| `d_to_f` Decimal → Fraction | 4 | standard | dnd-generic, text | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | flashcards, sub-decide, hands-sort, hands-match |
-| `f_to_p` Fraction → Percent | 6 | standard | text, dnd-generic | (none), dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | flashcards, hands-sort, hands-match |
-| `p_to_f` Percent → Fraction | 6 | standard | dnd-generic, text | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CVD | equation-drill (reviewed) | flashcards, hands-sort, hands-match |
+| `f_to_d` Fraction → Decimal | 4 | standard | dnd-generic, number | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | flashcards, sub-notate, hands-sort, hands-match |
+| `d_to_f` Decimal → Fraction | 4 | standard | text, dnd-generic | (none), dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | flashcards, sub-decide, hands-sort, hands-match |
+| `f_to_p` Fraction → Percent | 6 | standard | dnd-generic, text | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | flashcards, hands-sort, hands-match |
+| `p_to_f` Percent → Fraction | 6 | standard | text, dnd-generic | (none), dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CVD | equation-drill (reviewed) | flashcards, hands-sort, hands-match |
 | `d_to_p` Decimal → Percent | 6 | compact | text | conversion | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | flashcards, hands-match |
 | `p_to_d` Percent → Decimal | 6 | compact | text | conversion | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | flashcards, hands-match |
-| `percent_visual` Percent Grid (Visual) | 6 | medium | fraction-input, number, multi-select-check | percent-grid, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-match |
-| `percent_of_number` Percent of a Number | 6 | standard | number, multi-select-check | percent-of, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, schema-story |
-| `find_whole_from_pct` Find the Whole from Percent | 6 | standard | multi-select-check, number | multi-select, percent-find-whole | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, schema-story |
+| `percent_visual` Percent Grid (Visual) | 6 | medium | number, fraction-input, multi-select-check | percent-grid, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-match |
+| `percent_of_number` Percent of a Number | 6 | standard | multi-select-check, number | multi-select, percent-of | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, schema-story |
+| `find_whole_from_pct` Find the Whole from Percent | 6 | standard | number, multi-select-check | percent-find-whole, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, schema-story |
 | `order_fdp` Order Fractions, Decimals & Percents | 6 | medium | interactive | fdp-order | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | hands-order |
-| `ratio_intro` Write Ratios (a:b) | 6 | standard | number, text | ratio-intro | ready | ready | basic | author | author | author | basic | n/a |  | visual-grid (reviewed) | sub-decide, schema-story |
+| `ratio_intro` Write Ratios (a:b) | 6 | standard | text, number | ratio-intro | ready | ready | basic | author | author | author | basic | n/a |  | visual-grid (reviewed) | sub-decide, schema-story |
 | `unit_rate_intro` Compute Unit Rates | 6 | standard | number | unit-rate-intro | ready | ready | basic | basic | author | basic | basic | n/a |  | word-problems (reviewed) | sub-decide, schema-story |
 | `double_num_line` Double Number Lines (Visual) | 6 | wide | number | double-num-line | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | schema-story |
-| `mixed_conversions` Mixed Conversions | M | standard | text, interactive, number, fraction-input, multiple-choice | conversion, ratio-intro, fdp-order, standard, percent-grid, percent-find-whole, (none), unit-rate-intro | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_conversions` Mixed Conversions | M | standard | dnd-generic, number, text, fraction-input, interactive, multiple-choice | dnd-generic, unit-rate-intro, conversion, percent-grid, wide, fdp-order, standard | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
 | `equiv_ratios` Equivalent Ratios | 6 | standard | multiple-choice, number, text | standard | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-notate |
 | `ratio_tables` Ratio Tables (Find Missing Value) | 6 | wide | number | wide | ready | ready | basic | basic | author | basic | basic | n/a | V | chart-table (reviewed) | sub-notate, schema-story |
 | `ratio_part_to_part` Write a Part-to-Part Ratio | 6 | standard | text | ratio-intro | ready | ready | basic | author | author | author | basic | n/a |  | word-problems |  |
@@ -545,17 +546,17 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `fractions_all` All Fraction Skills | M | standard | text, fraction-input, number, dual-fraction, symbol, dnd-generic | write-fraction, identify-nv, fraction-bar-visual, equiv-frac-visual, (none), mixed-improper-visual, fraction-of-set, nl-drag, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `decimals_all` All Decimal Skills | M | standard | multiple-choice, number, text, col-arith, choice | compact, decimal-mult, decimal-div, decimal-column-sub, decimal-compare, standard, decimal-column-add | ready | ready | basic | author | author | author | wrap | n/a | CEV | computation-grid (reviewed) |  |
-| `conversions_all` All Conversion Skills | M | standard | text, interactive, multiple-choice, number, multi-select-check | standard, fdp-order, conversion, ratio-intro, wide, unit-rate-intro, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `fdp_all` All FDP Skills | M | standard | text, col-arith, symbol, multiple-choice, drag-fill, multi-select-check | ratio-intro, nl-drag, (none), decimal-column-add, drag-fill, decimal-column-sub, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-setup |
+| `fractions_all` All Fraction Skills | M | standard | dual-fraction, text, dnd-generic, symbol, number, multiple-choice | mixed-improper-visual, write-fraction, dnd-generic, fraction-compare, nl-drag, (none), equiv-frac-nv, fraction-round | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `decimals_all` All Decimal Skills | M | standard | text, col-arith, multi-select-check, dnd-generic, number | standard, decimal-div, nl-drag, decimal-column-sub, multi-select, dnd-generic, decimal-column-add, decimal-mult | ready | ready | basic | author | author | author | wrap | n/a | CEV | computation-grid (reviewed) | hands-sort |
+| `conversions_all` All Conversion Skills | M | standard | multiple-choice, text, number | standard, conversion, unit-rate-intro, percent-find-whole, ratio-intro | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `fdp_all` All FDP Skills | M | standard | text, multi-select-check, symbol, fraction-input, number, dual-fraction | (none), multi-select, fraction-compare, frac-add-like-nv, fraction-round, ratio-intro, mult-frac-frac-nv, fraction-of-set-hard-nv, standard, mixed-improper-visual | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 
 ### shapes_early
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `name_2d_shapes` Identify 2D Shapes (Visual) | K | medium | multiple-choice, multi-select-check | geometry-2d-shapes, multi-select | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | k-one-page, hands-sort, hands-find |
-| `name_3d_shapes` Identify 3D Shapes (Visual) | K | medium | multi-select-check, multiple-choice | multi-select, geometry-3d-shapes | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | k-one-page, hands-sort |
+| `name_2d_shapes` Identify 2D Shapes (Visual) | K | medium | multi-select-check, multiple-choice | multi-select, geometry-2d-shapes | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | k-one-page, hands-sort, hands-find |
+| `name_3d_shapes` Identify 3D Shapes (Visual) | K | medium | multiple-choice, multi-select-check | geometry-3d-shapes, multi-select | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | k-one-page, hands-sort |
 | `shape_name_match_2d` Match Names to 2D Shapes | M | wide | dnd-generic | shape-name-match | ready | ready | basic | author | author | author | wrap | n/a | D | visual-grid (reviewed) | hands-match |
 | `shape_name_match_3d` Match Names to 3D Shapes | M | wide | dnd-generic | shape-name-match | ready | ready | basic | author | author | author | wrap | n/a | D | visual-grid (reviewed) | hands-match |
 | `shape_positions` Shape Positions: Above/Below/Beside (Visual) | K | medium | multiple-choice | geometry-positions | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | k-one-page |
@@ -567,10 +568,10 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `compose_shapes` Combine Shapes (Visual) | K | medium | multiple-choice | geometry-compose | ready | ready | basic | basic | author | author | wrap | n/a | CVD | visual-grid (reviewed) | k-one-page |
 | `compose_hexagon` Compose a Hexagon from Pattern Blocks | 1 | wide | compose-shape-blocks | compose-shape-blocks | ready | ready | basic | author | author | author | wrap | n/a | CVD | visual-grid (reviewed) | k-one-page |
 | `compose_rect_from_squares` Compose a Rectangle from Squares | 2 | wide | compose-shape-blocks | compose-shape-blocks | ready | ready | basic | author | author | author | wrap | n/a | CVD | visual-grid (reviewed) |  |
-| `partition_shapes` Halves/Thirds/Fourths (Visual) | 1 | medium | text, number | geometry-partitions | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | k-one-page |
-| `shape_attributes` Shapes by Attributes (Visual) | 1 | medium | number, multi-select-check | geometry-attributes, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | k-one-page, hands-sort |
+| `partition_shapes` Halves/Thirds/Fourths (Visual) | 1 | medium | number, text | geometry-partitions | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | k-one-page |
+| `shape_attributes` Shapes by Attributes (Visual) | 1 | medium | number | geometry-attributes | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | k-one-page |
 | `compose_from_attributes` Find Shapes by Attributes (Multi-Select) | M | wide | multi-select-check | compose-from-attributes | ready | ready | basic | basic | author | author | basic | n/a |  | visual-grid (reviewed) | hands-sort |
-| `mixed_shapes_early` Mixed Early Shapes | M | standard | multiple-choice, multi-select-check, dnd-generic, number | geometry-compose, compose-from-attributes, geometry-3d-shapes, dnd-generic, count-efv, shape-corners, geometry-positions, geometry-attributes, geometry-partitions, measurement-nonstandard | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_shapes_early` Mixed Early Shapes | M | standard | number, multiple-choice, compose-shape-blocks, dnd-generic | measurement-nonstandard, geometry-compose, geometry-2d-shapes, compose-shape-blocks, count-efv, geometry-attributes, geometry-3d-shapes, shape-name-match, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 
 ### area_perimeter
 
@@ -579,16 +580,16 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `perimeter_intro` Perimeter Intro - Sum the Sides (Visual) | 3 | medium | number | perimeter-intro | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
 | `area_unit_squares` Area - Unit Square Counting (Visual) | 3 | wide | number | area-unit-squares | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `perimeter_grid` Perimeter - Grid Counting (Visual) | 3 | wide | number | perimeter-grid | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `perimeter` Perimeter Only | 3 | wide | number | spacious, standard, geometry-perimeter | ready | ready | basic | basic | author | basic | basic | n/a | CV | visual-grid (reviewed) | sub-notate |
-| `area` Area Only | 3 | wide | number | spacious, geometry-area, standard | ready | ready | basic | basic | author | basic | basic | n/a | CV | visual-grid (reviewed) |  |
+| `perimeter` Perimeter Only | 3 | wide | number | spacious, geometry-perimeter, standard | ready | ready | basic | basic | author | basic | basic | n/a | CV | visual-grid (reviewed) | sub-notate |
+| `area` Area Only | 3 | wide | number | geometry-area, spacious, standard | ready | ready | basic | basic | author | basic | basic | n/a | CV | visual-grid (reviewed) |  |
 | `area_perimeter` Area AND Perimeter | 4 | wide | dual | geometry-area-perimeter | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide |
 | `area_distributive_visual` Distributive Area Model (Visual) | 4 | medium | number | area-distributive | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `area_triangle` Area of a Triangle (b×h÷2) | 6 | medium | number | area-triangle | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `area_polygon_decompose` Decompose Polygon Area (L/T/U) | 6 | wide | number | area-polygon-decompose | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | sub-notate |
-| `composite_shapes` Composite Shapes (L, T, U) | 6 | wide | number, dual | geometry-composite | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-notate |
-| `volume` Volume (Rectangular Prisms) | 5 | wide | number | spacious, geometry-volume, standard | ready | ready | basic | basic | author | basic | basic | n/a | CV | visual-grid (reviewed) | sub-decide, sub-notate |
+| `composite_shapes` Composite Shapes (L, T, U) | 6 | wide | dual, number | geometry-composite | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-notate |
+| `volume` Volume (Rectangular Prisms) | 5 | wide | number | spacious, standard, geometry-volume | ready | ready | basic | basic | author | basic | basic | n/a | CV | visual-grid (reviewed) | sub-decide, sub-notate |
 | `volume_composite` Composite 3D Volume (Visual) | 5 | wide | number | geometry-volume | ready | ready | basic | basic | author | basic | basic | n/a | CV | visual-grid (reviewed) |  |
-| `mixed_area_perimeter` Mixed Area & Perimeter | M | standard | number, dual | perimeter-grid, geometry-composite, geometry-perimeter, spacious, geometry-volume, area-triangle, area-unit-squares, perimeter-intro | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_area_perimeter` Mixed Area & Perimeter | M | standard | dual, number | geometry-area-perimeter, area-polygon-decompose, perimeter-intro, area-unit-squares, geometry-perimeter, geometry-composite, perimeter-grid | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `area_missing_side` Find a Missing Side from the Area | 3 | wide | number | standard | ready | ready | basic | basic | author | basic | basic | basic |  | word-problems | fact-layouts, flashcards |
 | `perimeter_missing_side` Find a Missing Side from the Perimeter | 3 | wide | number | standard | ready | ready | basic | basic | author | basic | basic | basic |  | word-problems | fact-layouts, flashcards |
 | `volume_missing_edge` Find a Missing Edge from the Volume | 5 | wide | number | standard | ready | ready | basic | basic | author | basic | basic | basic |  | word-problems | fact-layouts, flashcards |
@@ -598,13 +599,13 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `identify_angles` Identify Angles | 4 | compact | multi-select-check, choice | multi-select, geometry-angles | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort, hands-find |
+| `identify_angles` Identify Angles | 4 | compact | choice, multi-select-check | geometry-angles, multi-select | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort, hands-find |
 | `measure_angles` Measure/Estimate Angles | 4 | standard | choice | geometry-measure-angle | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide |
 | `identify_lines` Identify Lines (∥, ⊥) | 4 | compact | choice, multi-select-check, hot-spot | geometry-lines, multi-select, hot-spot | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort, hands-find |
-| `symmetry` Lines of Symmetry | 4 | medium | number, multi-select-check, hot-spot | geometry-symmetry, multi-select, hot-spot | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
+| `symmetry` Lines of Symmetry | 4 | medium | hot-spot, multi-select-check, number | hot-spot, multi-select, geometry-symmetry | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
 | `place_symmetry_lines` Draw Lines of Symmetry | 4 | medium | place-symmetry-lines | place-symmetry-lines | ready | ready | author | author | author | author | wrap | n/a |  | visual-grid (reviewed) |  |
 | `additive_angles` Two Angles Sum (Visual) | 4 | medium | number | geometry-additive-angles | ready | ready | basic | basic | author | basic | basic | n/a | CV | visual-grid (reviewed) | sub-decide |
-| `mixed_angles_lines` Mixed Angles & Lines | M | standard | number, multi-select-check, choice, place-symmetry-lines | geometry-additive-angles, multi-select, geometry-angles, geometry-measure-angle, place-symmetry-lines, geometry-lines, geometry-symmetry | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_angles_lines` Mixed Angles & Lines | M | standard | number, multi-select-check, choice, place-symmetry-lines, hot-spot | geometry-symmetry, geometry-additive-angles, multi-select, geometry-measure-angle, place-symmetry-lines, hot-spot | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `angles_in_right_angle` Missing Angle in a Right Angle (90°) | 4 | medium | number | geometry-additive-angles | ready | ready | basic | basic | author | basic | basic | n/a | CV | word-problems |  |
 | `angles_on_straight_line` Angles on a Straight Line (180°) | 4 | medium | number | geometry-additive-angles | ready | ready | basic | basic | author | basic | basic | n/a | CV | word-problems |  |
 | `angles_around_point` Angles Around a Point (360°) | 4 | medium | number | geometry-additive-angles | ready | ready | basic | basic | author | basic | basic | n/a | CV | word-problems | todays-number |
@@ -613,18 +614,18 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `classify_triangles` Classify Triangles | 4 | medium | multi-select-check, choice | multi-select, geometry-triangles | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
+| `classify_triangles` Classify Triangles | 4 | medium | choice, multi-select-check | geometry-triangles, multi-select | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
 | `classify_quads` Classify Quadrilaterals | 5 | medium | multi-select-check | geometry-quads, multi-select | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `hotspot_quads` Circle the Quadrilaterals | 3 | medium | image-hotspot | image-hotspot | ready | ready | basic | author | author | author | wrap | n/a |  | visual-grid (reviewed) | hands-sort, hands-find |
+| `hotspot_quads` Circle the Quadrilaterals | 3 | medium | image-hotspot | image-hotspot | ready | ready | basic | author | author | author | wrap | n/a | D | visual-grid (reviewed) | hands-sort, hands-find |
 | `net_identify` Identify Net of 3D Shape (Visual) | 5 | wide | multiple-choice | net-identify | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-match |
 | `cross_section_3d` Cross-Section of 3D Shape (Visual) | 6 | wide | multiple-choice | cross-section-3d | ready | ready | basic | basic | author | author | basic | n/a | CV | visual-grid (reviewed) |  |
-| `mixed_shapes` Mixed Shape Classification | M | standard | multi-select-check, multiple-choice, image-hotspot, choice | multi-select, cross-section-3d, geometry-quads, net-identify, image-hotspot, geometry-triangles | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_shapes` Mixed Shape Classification | M | standard | multiple-choice, image-hotspot, multi-select-check, choice | cross-section-3d, image-hotspot, geometry-quads, net-identify, geometry-triangles | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 
 ### coordinates
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `coordinate_q1` Coordinates (Quadrant I) | 5 | wide | coord-input, coord-plot | coord-input, geometry-coordinates | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-notate |
+| `coordinate_q1` Coordinates (Quadrant I) | 5 | wide | coord-plot, coord-input | geometry-coordinates, coord-input | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-notate |
 | `coordinate_all` Coordinates (All 4 Quadrants) | 6 | wide | coord-plot, coord-input | geometry-coordinates, coord-input | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `coordinate_graph` Coordinate Graphing | 5 | wide | coord-plot, coord-input | geometry-coordinates, coord-input | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `coord_distance_q1` Distance Between Points (Visual, Q1) | 5 | wide | number | coord-distance | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
@@ -633,7 +634,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `geo_reflect` Reflections (Visual, MC) | 5 | wide | multi-select-check | geo-transform-mc | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `geo_rotate` Rotations (Visual, MC) | 5 | wide | multi-select-check | geo-transform-mc | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `geo_translate` Translations (Visual, MC) | 5 | wide | multi-select-check | geo-transform-mc | ready | ready | author | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `mixed_coordinates` Mixed Coordinates | M | standard | multi-select-check, coord-plot, coord-input, multiple-choice, number | geo-transform-mc, geometry-coordinates, coord-input, net-surface-area | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_coordinates` Mixed Coordinates | M | standard | number, coord-input, multi-select-check, coord-plot, multiple-choice | coord-distance, coord-input, geo-transform-mc, geometry-coordinates, net-surface-area | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `coordinates_read_q1` Read Coordinates in the First Quadrant | 5 | wide | coord-input | coord-input | ready | ready | author | author | author | author | wrap | n/a | CVD | visual-grid |  |
 | `coordinates_plot_q1` Plot Points in the First Quadrant | 5 | wide | coord-plot | geometry-coordinates | ready | ready | author | author | author | author | wrap | n/a |  | unassigned |  |
 | `coordinates_read_all` Read Coordinates in All Four Quadrants | 6 | wide | coord-input | coord-input | ready | ready | author | author | author | author | wrap | n/a | CVD | visual-grid |  |
@@ -674,7 +675,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `heavier_lighter_visual` Heavier or Lighter? (Visual) | K | compact | multiple-choice | heavier-lighter | ready | ready | basic | basic | author | author | wrap | n/a | CEV | visual-grid (reviewed) | k-one-page |
 | `pictograph_intro` Picture Graph Intro (Visual) | 1 | medium | number | pictograph-intro | ready | ready | author | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) | k-one-page |
 | `bar_graph_intro` Bar Graph Intro (Visual) | K | wide | number, text | bar-graph-intro | ready | ready | author | author | author | author | wrap | n/a | V | visual-grid (reviewed) | k-one-page |
-| `reading_ruler` Reading a Ruler (Visual) | 2 | medium | number | reading-ruler | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
+| `reading_ruler` Reading a Ruler (Visual) | 2 | medium | number | reading-ruler | ready | ready | basic | basic | author | basic | wrap | n/a | VD | visual-grid (reviewed) |  |
 | `reading_ruler_hard` Reading a Ruler - Quarter Inches (Visual) | 3 | medium | text | reading-ruler | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `money_count` Count Coins and Notes | 2 | standard | number | tm-coins | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
 | `money` Add Money | 2 | standard | number | tm-money-columns | ready | ready | basic | basic | author | basic | wrap | n/a | V | computation-grid (reviewed) | sub-decide, sub-notate |
@@ -682,14 +683,14 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `enough_money` Is There Enough Money? | 2 | medium | text | tm-coins | ready | ready | basic | author | author | author | wrap | n/a | VD | visual-grid (reviewed) |  |
 | `make_change_least_coins` Make an Amount With the Fewest Coins | 3 | medium | text | tm-coins | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `temperature` Temperature (°C/°F) | 3 | standard | number | measurement-temp | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
-| `capacity` Capacity/Volume Units | 4 | standard | number, multi-select-check | measurement-capacity, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, hands-sort |
-| `unit_conversions` Measurement Conversions (Visual) | 4 | standard | number, multi-select-check | measurement-conversions, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, hands-match |
+| `capacity` Capacity/Volume Units | 4 | standard | number, multi-select-check, dnd-generic | measurement-capacity, multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, hands-sort |
+| `unit_conversions` Measurement Conversions (Visual) | 4 | standard | number, multi-select-check | measurement-conversions, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-decide, hands-match |
 | `length_customary` Customary Length (in/ft/yd/mi) | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide |
 | `length_metric` Metric Length (mm/cm/m/km) | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide |
 | `unit_conversion_word` Unit Conversion Word Problems | 4 | spacious | col-arith | unit-conversion-word | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | word-problems (reviewed) | sub-decide, sub-setup, schema-story |
-| `mass_volume_liquid` Grams, kg, Liters (Visual) | 3 | medium | number, multi-select-check, dnd-generic | measurement-mass-volume, multi-select, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `estimate_length` Estimate Lengths (Visual) | 2 | medium | multi-select-check, multiple-choice, dnd-generic | multi-select, measurement-estimate, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `mixed_measurement` Mixed Measurement | M | standard | text, number, multiple-choice | tm-money-columns, tm-clock, pictograph-intro, heavier-lighter, tm-timeline | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
+| `mass_volume_liquid` Grams, kg, Liters (Visual) | 3 | medium | multi-select-check, number | multi-select, measurement-mass-volume | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
+| `estimate_length` Estimate Lengths (Visual) | 2 | medium | multiple-choice, multi-select-check, dnd-generic | measurement-estimate, multi-select, dnd-generic | ready | ready | basic | basic | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
+| `mixed_measurement` Mixed Measurement | M | standard | text, number, multiple-choice | tm-timeline, tm-clock, standard, tm-money-columns, heavier-lighter | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
 | `mixed_time` Mixed Time Skills | M | standard | text | tm-clock | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `clock_parts` Parts of a Clock | 1 | medium | text | tm-clock | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid | k-one-page |
 | `time_fives_ring` Count the Minutes by Fives | 2 | medium | text | tm-clock | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid |  |
@@ -703,10 +704,10 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `count_notes_and_coins` Count Notes and Coins | 2 | standard | text | tm-notes-coins | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid |  |
 | `convert_feet_to_inches` Convert Feet to Inches | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 | `convert_yards_to_feet` Convert Yards to Feet | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
-| `convert_yards_to_inches` Convert Yards to Inches | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a | D | equation-drill |  |
+| `convert_yards_to_inches` Convert Yards to Inches | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 | `convert_miles_to_feet` Convert Miles to Feet | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
-| `convert_cm_to_mm` Convert Centimeters to Millimeters | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
-| `convert_m_to_cm` Convert Meters to Centimeters | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a | D | equation-drill |  |
+| `convert_cm_to_mm` Convert Centimeters to Millimeters | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a | D | equation-drill |  |
+| `convert_m_to_cm` Convert Meters to Centimeters | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 | `convert_m_to_mm` Convert Meters to Millimeters | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 | `convert_km_to_m` Convert Kilometers to Meters | 4 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 | `clock_hands` The Hour Hand and the Minute Hand | 1 | medium | text | tm-clock-hands | ready | ready | basic | author | author | author | wrap | n/a | VD | visual-grid | k-one-page |
@@ -718,9 +719,9 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `geometry_all` All Geometry Skills | M | standard | number, multi-select-check, multiple-choice, choice | shape-corners, geo-transform-mc, net-identify, geometry-measure-angle, geometry-additive-angles, measurement-nonstandard, spacious | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `measurement_all` All Measurement Skills | M | standard | text, number | tm-clock, tm-timeline, tm-clock-hands, tm-coins, standard | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
-| `geo_meas_all` All Geometry & Measurement | M | standard | text, coord-plot, number, multi-select-check | bar-graph-intro, geometry-coordinates, coord-distance, tm-notes, net-surface-area, geo-transform-mc, reading-ruler, standard, tm-clock | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `geometry_all` All Geometry Skills | M | standard | multiple-choice, multi-select-check, number, coord-input, compose-shape-blocks | geometry-compose, multi-select, cross-section-3d, geo-transform-mc, shape-corners, geometry-volume, coord-input, measurement-nonstandard, compose-shape-blocks | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `measurement_all` All Measurement Skills | M | standard | text, dnd-generic, number, multiple-choice | tm-timeline, dnd-generic, tm-notes, tm-clock, heavier-lighter, standard, measurement-conversions | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
+| `geo_meas_all` All Geometry & Measurement | M | standard | multi-select-check, number, coord-plot, text | geo-transform-mc, count-2d-attrs, measurement-temp, geometry-coordinates, standard, area-distributive, shape-corners, tm-clock | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 
 ### graphs
 
@@ -728,14 +729,14 @@ Columns: grade, print size class, answer types, print formats, then role readine
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `bar_graph` Bar Graphs | 3 | wide | number, text | data-bar-graph | ready | ready | author | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `build_bar_graph` Build a Bar Graph | 3 | wide | graph-builder | build-bar-graph | ready | ready | author | author | author | author | wrap | n/a |  | visual-grid (reviewed) |  |
-| `pictograph` Pictographs | 3 | wide | number, text | data-pictograph | ready | ready | author | basic | author | basic | wrap | n/a | V | visual-grid (reviewed) |  |
+| `pictograph` Pictographs | 3 | wide | number, text | data-pictograph | ready | ready | author | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
 | `build_pictograph` Build a Pictograph | 2 | wide | graph-builder | build-pictograph | ready | ready | author | author | author | author | wrap | n/a |  | visual-grid (reviewed) |  |
 | `tally_chart` Tally Charts | 2 | wide | number, text | data-tally | ready | ready | author | basic | author | basic | wrap | n/a | V | chart-table (reviewed) |  |
-| `line_plot` Line Plots | 3 | wide | number, choice | data-line-plot | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `line_plot_g2` Line Plots (Grade 2) | 2 | wide | number, text | wide | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `line_plot_fractions` Line Plots with Fractions (Visual) | 4 | medium | choice, number | line-plot-fractions | ready | ready | author | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `pie_chart` Pie Charts | 5 | wide | number, choice | data-pie | ready | ready | author | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `mixed_graphs` Mixed Graphs | M | standard | number, graph-builder, text, choice | data-tally, line-plot-fractions, data-line-plot, data-pie, build-pictograph, data-bar-graph, build-bar-graph | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `line_plot` Line Plots | 3 | wide | number, choice | data-line-plot | ready | ready | author | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `line_plot_g2` Line Plots (Grade 2) | 2 | wide | text, number | wide | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `line_plot_fractions` Line Plots with Fractions (Visual) | 4 | medium | number, choice | line-plot-fractions | ready | ready | author | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `pie_chart` Pie Charts | 5 | wide | number, choice | data-pie | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_graphs` Mixed Graphs | M | standard | number, choice, graph-builder | data-tally, data-pictograph, data-line-plot, wide, build-pictograph, data-pie, build-bar-graph | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `pictograph_how_many_more` Pictographs: How Many More? | 3 | wide | number | data-pictograph | ready | ready | author | basic | author | basic | wrap | n/a | V | visual-grid |  |
 | `bar_graph_how_many_more` Bar Graphs: How Many More? | 3 | wide | number | data-bar-graph | ready | ready | author | basic | author | basic | wrap | n/a | V | visual-grid |  |
 | `tally_how_many_more` Tally Charts: How Many More? | 2 | wide | number | data-tally | ready | ready | author | basic | author | basic | wrap | n/a | V | chart-table |  |
@@ -744,37 +745,37 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `mean` Mean (Average) | 6 | standard | number | data-mean | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `median` Median | 6 | standard | number, multi-select-check | data-median, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | hands-sort |
+| `mean` Mean (Average) | 6 | standard | number, multi-select-check | data-mean, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `median` Median | 6 | standard | number, multi-select-check | data-median, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | hands-sort |
 | `mode` Mode | 6 | standard | number, multi-select-check | data-mode, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `range` Range | 6 | standard | number, multi-select-check | data-range, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `box_plot_intro` Box Plot - Median, IQR, Range (Visual) | 5 | wide | number, text | box-plot-intro | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `range` Range | 6 | standard | number, multi-select-check | data-range, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `box_plot_intro` Box Plot - Median, IQR, Range (Visual) | 5 | wide | text, number | box-plot-intro | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `histogram_read` Read a Histogram (Visual) | 6 | wide | number, multiple-choice | histogram-read | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `mad` Mean Absolute Deviation (MAD) | 6 | standard | number | standard | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) |  |
-| `statistical_question` Identify Statistical Questions | 6 | standard | multiple-choice | standard | ready | ready | basic | basic | author | author | wrap | n/a | D | equation-drill (reviewed) |  |
-| `mixed_data_analysis` Mixed Data Analysis | M | standard | number, multi-select-check, multiple-choice | standard, multi-select, histogram-read, box-plot-intro, data-mean, data-mode | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `statistical_question` Identify Statistical Questions | 6 | standard | multiple-choice | standard | ready | ready | basic | basic | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
+| `mixed_data_analysis` Mixed Data Analysis | M | standard | number, multi-select-check | data-mean, data-median, multi-select, standard, box-plot-intro, data-mode, data-range | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `box_plot_quartiles` Quartiles and the Interquartile Range (Box Plot) | 6 | wide | text, number | box-plot-intro | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid |  |
 
 ### probability
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `probability_basic` Basic Probability | 6 | standard | fraction-input, multi-select-check, dnd-generic | data-probability, multi-select, dnd-generic | ready | ready | basic | author | author | author | basic | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `mixed_probability` Mixed Probability | M | standard | multi-select-check, fraction-input, dnd-generic | multi-select, data-probability, dnd-generic | ready | ready | basic | author | author | author | basic | n/a | CV | visual-grid (reviewed) |  |
+| `probability_basic` Basic Probability | 6 | standard | dnd-generic, fraction-input, multi-select-check | dnd-generic, data-probability, multi-select | ready | ready | basic | author | author | author | basic | n/a | CV | visual-grid (reviewed) | hands-sort |
+| `mixed_probability` Mixed Probability | M | standard | fraction-input, dnd-generic, multi-select-check | data-probability, dnd-generic, multi-select | ready | ready | basic | author | author | author | basic | n/a | CV | visual-grid (reviewed) |  |
 
 ### data_mixed
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `data_stats_all` All Data & Stats Skills | M | standard | number, text, graph-builder, multiple-choice | data-tally, data-pictograph, data-mean, data-bar-graph, wide, data-range, build-bar-graph, standard, box-plot-intro, histogram-read | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `data_stats_all` All Data & Stats Skills | M | standard | graph-builder, text, multiple-choice, number | build-pictograph, data-tally, standard, data-pictograph, data-line-plot, wide, data-bar-graph, box-plot-intro | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 
 ### patterns
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `seq_2` Count by 2s | 2 | standard | number, dnd-generic | (none), dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-order |
+| `seq_2` Count by 2s | 2 | standard | dnd-generic, number | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-order |
 | `seq_5` Count by 5s | 2 | standard | dnd-generic, number | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-order |
-| `seq_10` Count by 10s | 2 | standard | dnd-generic, number | dnd-generic, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-order |
+| `seq_10` Count by 10s | 2 | standard | number, dnd-generic | (none), dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-notate, hands-order |
 | `count_by_fill` Count-By Fill-In (1-12) | 2 | standard | text, dnd-generic | pattern-count-by-fill, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) | hands-order |
 | `skip_count_line` Skip counting on a number line (2s, 5s, 10s) | 2 | medium | text | count-row | ready | ready | basic | author | author | author | wrap | basic | V | visual-grid (reviewed) | fact-layouts, flashcards, todays-number, sub-notate |
 | `skip_count_grid` Skip counting by 2s, 5s and 10s (rows) | 2 | medium | text | count-row | ready | ready | basic | author | author | author | wrap | basic | V | chart-table (reviewed) | fact-layouts, flashcards, todays-number |
@@ -784,10 +785,14 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `double` Doubling | 2 | compact | number | (none) | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | fact-layouts, flashcards, todays-number |
 | `halve` Halving | 2 | compact | number | (none) | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | fact-layouts, flashcards, todays-number |
 | `shape_pattern` Shape Patterns (Visual) | 4 | medium | text | shape-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `number_pattern` Number Patterns | 4 | standard | dnd-generic, text | dnd-generic, number-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
-| `pattern_relationship` Two Patterns, Find Relationship (Visual) | 5 | wide | multiple-choice, dnd-generic | (none), dnd-generic | ready | ready | basic | basic | author | author | basic | n/a | CV | chart-table (reviewed) |  |
-| `mixed_patterns` Mixed Patterns | M | standard | text, number, grid-fill | count-row, (none), pattern-count-by-fill, number-pattern, grid-fill | ready | ready | basic | author | author | author | wrap | n/a | CEV | chart-table (reviewed) |  |
+| `number_pattern` Number Patterns | 4 | standard | text, dnd-generic | number-pattern, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
+| `pattern_relationship` Two Patterns, Find Relationship (Visual) | 5 | wide | multiple-choice, dnd-generic | (none), dnd-generic | ready | ready | basic | author | author | author | basic | n/a | CV | chart-table (reviewed) |  |
+| `mixed_patterns` Mixed Patterns | M | standard | dnd-generic, text, number, multiple-choice, grid-fill | dnd-generic, count-row, growing-pattern, number-pattern, (none), grid-fill, shape-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) |  |
 | `number_patterns_rule` Number Patterns: Count On, Count Back, Double | 3 | wide | text | count-row | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid |  |
+| `notice_patterns` What Do You Notice? Even and Odd Products, Pattern Features | 3 | medium | text | notice-pattern | ready | ready | basic | author | author | author | wrap | n/a | VD | visual-grid |  |
+| `growing_shape_patterns` Growing Shape Patterns: Draw and Count the Next Term | 4 | wide | number | growing-pattern | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems |  |
+| `pattern_features` Features of a Number Pattern: Odd, Even and Ones Digits | 4 | medium | text | notice-pattern | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid |  |
+| `follow_given_rule` Follow a Given Rule: Extend a Number Pattern | 4 | wide | text | count-row | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid |  |
 
 ### algebra
 
@@ -799,23 +804,23 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `multi_step_word_plain` Multi-Step Word Problems (No Pictures) | 4 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems (reviewed) | schema-story |
 | `solve_unknown` Solve for Unknown (x + 5 = 12) | 6 | standard | number, multi-select-check | algebra-solve, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
 | `balance_addsub` Balance Equations (7 + 5 = __ + 3) (MAP) | 3 | standard | number | word-problem | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | sub-decide |
-| `write_expression` Write Expressions from Words | 6 | standard | multi-select-check, text | multi-select, algebra-write | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) | hands-match |
-| `evaluate_expression` Evaluate Expressions (Easy) | 6 | standard | number, multi-select-check | algebra-evaluate, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
-| `evaluate_expression_hard` Evaluate Expressions (Multi-Step) | 6 | medium | number, multi-select-check | algebra-evaluate, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
-| `inequalities` Inequalities (>, <, ≥, ≤) | 6 | standard | choice, number-line-extended, dnd-generic | algebra-inequality, number-line-extended, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
-| `combine_like_terms` Combine Like Terms | 6 | standard | number, text | standard | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, hands-sort |
+| `write_expression` Write Expressions from Words | 6 | standard | text, multi-select-check | algebra-write, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) | hands-match |
+| `evaluate_expression` Evaluate Expressions (Easy) | 6 | standard | multi-select-check, number | multi-select, algebra-evaluate | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `evaluate_expression_hard` Evaluate Expressions (Multi-Step) | 6 | medium | multi-select-check, number | multi-select, algebra-evaluate | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `inequalities` Inequalities (>, <, ≥, ≤) | 6 | standard | dnd-generic, choice, number-line-extended | dnd-generic, algebra-inequality, number-line-extended | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `combine_like_terms` Combine Like Terms | 6 | standard | text, number | standard | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, hands-sort |
 | `distributive_expr` Distributive Property of Expressions | 6 | standard | text | standard | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide |
 | `function_table_easy` Function Tables - Easy (Visual) | 4 | wide | text | function-table | ready | ready | basic | author | author | author | wrap | n/a | V | chart-table (reviewed) | sub-decide |
 | `function_table_hard` Function Tables - Hard (Visual) | 5 | wide | text | function-table | ready | ready | basic | author | author | author | wrap | n/a | V | chart-table (reviewed) | sub-decide |
-| `algebra_word_mixed` Mixed Algebra Word Problems (Visual) | 4 | spacious | number | tape-diagram, story-work | ready | ready | basic | basic | author | basic | basic | n/a | CV | word-problems (reviewed) | schema-story |
-| `algebra_word_mixed_plain` Mixed Algebra Word Problems (No Pictures) | 4 | spacious | number, col-arith | word-plain | ready | ready | basic | basic | author | basic | basic | n/a |  | word-problems (reviewed) | schema-story |
-| `solve_eq_addsub` Solve One-Step Equations (+/−) | 5 | spacious | number, dnd-generic | algebra-solve, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
+| `algebra_word_mixed` Mixed Algebra Word Problems (Visual) | 4 | spacious | number | story-work, tape-diagram | ready | ready | basic | basic | author | basic | basic | n/a | CV | word-problems (reviewed) | schema-story |
+| `algebra_word_mixed_plain` Mixed Algebra Word Problems (No Pictures) | 4 | spacious | col-arith, number | word-plain | ready | ready | basic | basic | author | basic | basic | n/a |  | word-problems (reviewed) | schema-story |
+| `solve_eq_addsub` Solve One-Step Equations (+/−) | 5 | spacious | number, dnd-generic | algebra-solve, dnd-generic | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
 | `solve_eq_multdiv` Solve One-Step Equations (×/÷) | 5 | spacious | dnd-generic, number | dnd-generic, algebra-solve | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
 | `solve_eq_twostep` Solve Two-Step Equations | 6 | spacious | number | algebra-twostep | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
 | `write_equation` Write Equations from Words | 6 | spacious | text | algebra-write-eq | ready | ready | basic | author | author | author | wrap | n/a | CV | word-problems (reviewed) | hands-match |
 | `build_expr_addsub` Build the Expression: +/− | 3 | wide | build-expr | build-expr | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide, schema-story |
 | `build_expr_multdiv` Build the Expression: ×/÷ | 4 | wide | build-expr | build-expr | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide, schema-story |
-| `mixed_algebra` Mixed Algebra | M | standard | number, text, build-expr | tape-diagram, word-plain, function-table, standard, algebra-twostep, build-expr, algebra-write, story-work | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `mixed_algebra` Mixed Algebra | M | standard | number, text, multi-select-check, dnd-generic, build-expr | tape-diagram, standard, function-table, multi-select, dnd-generic, build-expr | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
 | `solve_x_plus_a` Solve x + a = b | 6 | spacious | number | algebra-solve | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid |  |
 | `solve_x_minus_a` Solve x − a = b | 6 | spacious | number | algebra-solve | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid |  |
 | `solve_ax_eq_b` Solve ax = b | 6 | spacious | number | algebra-solve | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid |  |
@@ -839,8 +844,8 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `oop_easy` OoO Easy: Two Ops, No Parens | 4 | medium | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
-| `oop_medium` OoO Medium: Parentheses | 5 | medium | multi-select-check, number | multi-select, order-of-ops | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
-| `oop_hard` OoO Hard: Brackets & Exponents | 6 | medium | multi-select-check, number | multi-select, order-of-ops | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
+| `oop_medium` OoO Medium: Parentheses | 5 | medium | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
+| `oop_hard` OoO Hard: Brackets & Exponents | 6 | medium | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `two_ops_no_paren` Level 1: Two Operations | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `three_ops_no_paren` Level 2: Three Operations | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `multi_ops_no_paren` Level 3: Four to Six Operations | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-notate |
@@ -848,8 +853,8 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `paren_multi` Level 5: Multiple Ops with Parens | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `nested_complex` Level 6: Complex Nested Brackets | 6 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-notate |
 | `exponents_simple` Level 7: Exponents | 6 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-notate |
-| `compare_expressions` Compare Expressions (=, ≠, <, >) | 5 | medium | dnd-generic, multiple-choice | dnd-generic, compare-expressions | ready | ready | basic | author | author | author | wrap | n/a | E | equation-drill (reviewed) | sub-notate |
-| `mixed_order_ops` Mixed Order of Operations | M | standard | number, dnd-generic, multi-select-check | order-of-ops, dnd-generic, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) |  |
+| `compare_expressions` Compare Expressions (=, ≠, <, >) | 5 | medium | multiple-choice, dnd-generic | compare-expressions, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | E | equation-drill (reviewed) | sub-notate |
+| `mixed_order_ops` Mixed Order of Operations | M | standard | multi-select-check, number, dnd-generic, multiple-choice | multi-select, order-of-ops, dnd-generic, compare-expressions | ready | ready | basic | author | author | author | wrap | n/a | E | equation-drill (reviewed) |  |
 | `square_numbers` Square Numbers (5²) | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 | `cube_numbers` Cube Numbers (5³) | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 
@@ -871,7 +876,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `combine` Standard Form | 2 | medium | number | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a | V | equation-drill (reviewed) | todays-number, hands-strips |
 | `order_least_to_greatest` Order: Least to Greatest | M | wide | interactive | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | todays-number, hands-order |
 | `order_greatest_to_least` Order: Greatest to Least | M | wide | interactive | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | todays-number, hands-order |
-| `mixed_placevalue` Mixed Place Value | M | standard | interactive, number, symbol, pv-build, multiple-choice | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
+| `mixed_placevalue` Mixed Place Value | M | standard | number, inline-blanks, interactive, multiple-choice | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
 | `unit_form` Unit Form (4 hundreds 7 tens 6 ones) | 2 | standard | inline-blanks | pv-cell | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill | todays-number |
 | `expanded_notation` Write Numbers in Expanded Notation | 4 | medium | inline-blanks | pv-cell | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill | todays-number |
 | `digit_value_unit_form` Value of a Digit in Unit Form (7 Hundreds) | 2 | compact | inline-blanks | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid | todays-number |
@@ -909,7 +914,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `make_a_ten` Make a Ten Strategy | 1 | medium | number, multiple-choice | make-a-ten | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-layouts, flashcards, k-one-page |
 | `doubles_near_doubles` Doubles & Near Doubles | 1 | medium | number | doubles | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | fact-layouts, flashcards, k-one-page |
 | `compensation` Compensation Strategy | 2 | medium | number | compensation | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `mixed_number_sense` Mixed Rounding & Estimation | M | standard | dnd-generic, inline-blanks, number, number-line-extended | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
+| `mixed_number_sense` Mixed Rounding & Estimation | M | standard | number-line-extended, dnd-generic, inline-blanks, number | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
 | `between_tens` Find the Two Tens a Number Is Between | 3 | compact | inline-blanks | pv-cell | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill | todays-number |
 | `place_on_number_line` Mark a Number on a Number Line | 2 | wide | number-line-extended | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill | todays-number |
 | `round_nl_thousands` Round on a Number Line: Thousands | 4 | wide | inline-blanks | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid | todays-number |
@@ -922,20 +927,20 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `prime_composite` Prime vs Composite | 4 | compact | dnd-generic, number, multi-select-check, choice | dnd-generic, nt-prime-compare, multi-select, nt-prime | ready | ready | basic | author | author | author | wrap | n/a | CVD | equation-drill (reviewed) | flashcards, todays-number, hands-sort |
+| `prime_composite` Prime vs Composite | 4 | compact | dnd-generic, number, choice, multi-select-check | dnd-generic, nt-prime-compare, nt-prime, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | flashcards, todays-number, hands-sort |
 | `factors_identify` Identify Factors (Circle All) | 4 | medium | factor-pairs | factor-pairs | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | todays-number, hands-find |
 | `factor_tchart_easy` Factor T-Chart - Easy (Visual) | 4 | medium | tchart-cells | nt-factor-tchart-medium | ready | ready | author | author | author | author | basic | n/a | CV | chart-table (reviewed) |  |
 | `factor_tchart_medium` Factor T-Chart - Medium (Visual) | 4 | medium | tchart-cells | nt-factor-tchart-medium | ready | ready | author | author | author | author | basic | n/a | CV | chart-table (reviewed) |  |
 | `factor_tchart_hard` Factor T-Chart - Hard (Visual) | 4 | medium | tchart-cells | nt-factor-tchart-medium | ready | ready | author | author | author | author | basic | n/a | CV | chart-table (reviewed) |  |
-| `factor_links_easy` Factor Links - Easy (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `factor_links_medium` Factor Links - Medium (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CVD | visual-grid (reviewed) |  |
-| `factor_links_hard` Factor Links - Hard (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `multiples` Multiples of a Number | 4 | standard | multi-select-check, text, multi-select | multi-select, nt-multiples, nt-multiples-fill, nt-multiples-identify | ready | ready | author | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | todays-number, hands-sort, hands-find |
-| `gcf_easy` Greatest Common Factor (Easy) | 6 | standard | number, multi-select-check | nt-gcf-easy, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `gcf_hard` Greatest Common Factor (Hard) | 6 | standard | multi-select-check, number | multi-select, nt-gcf-easy | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `lcm` Least Common Multiple | 6 | standard | number, multi-select-check | nt-lcm, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `factor_links_easy` Factor Links - Easy (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CVD | visual-grid (reviewed) |  |
+| `factor_links_medium` Factor Links - Medium (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `factor_links_hard` Factor Links - Hard (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CVD | visual-grid (reviewed) |  |
+| `multiples` Multiples of a Number | 4 | standard | text, multi-select, multi-select-check | nt-multiples, nt-multiples-fill, nt-multiples-identify, multi-select | ready | ready | author | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | todays-number, hands-sort, hands-find |
+| `gcf_easy` Greatest Common Factor (Easy) | 6 | standard | number | nt-gcf-easy | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `gcf_hard` Greatest Common Factor (Hard) | 6 | standard | multi-select-check, number | multi-select, nt-gcf-easy | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `lcm` Least Common Multiple | 6 | standard | multi-select-check, number | multi-select, nt-lcm | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
 | `divisibility_sort` Divisibility Sort | 4 | medium | divisibility-sort | nt-divisibility-sort | ready | ready | author | author | author | author | wrap | n/a | CV | chart-table (reviewed) | todays-number, hands-sort |
-| `mixed_number_theory` Mixed Number Theory | M | standard | number, tchart-cells, multi-select-check, factor-pairs, choice, factor-links, text | nt-lcm, nt-factor-tchart-easy, nt-factor-tchart-hard, multi-select, factor-pairs, nt-prime, factor-links-hard, nt-multiples-fill | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_number_theory` Mixed Number Theory | M | standard | factor-links, choice, tchart-cells, multi-select-check, number, text | factor-links-hard, nt-prime, nt-factor-tchart-easy, factor-links-medium, multi-select, factor-links-easy, nt-lcm, nt-multiples-fill, nt-factor-tchart-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `sort_prime_composite` Sort Numbers into Prime and Composite | 4 | compact | dnd-generic | dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | VD | visual-grid | hands-sort |
 | `list_multiples` List the First Multiples of a Number | 4 | standard | text | nt-multiples | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid |  |
 | `missing_multiples` Fill In the Missing Multiples | 4 | standard | text | nt-multiples-fill | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid |  |
@@ -946,79 +951,79 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `patterns_all` All Pattern Skills | M | standard | number, grid-fill, text | (none), grid-fill, count-row, shape-pattern, number-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) |  |
-| `algebra_all` All Algebra Skills | M | standard | number, text | algebra-evaluate, algebra-solve, tape-diagram, story-work, algebra-write-eq, algebra-twostep, word-plain | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | equation-drill (reviewed) |  |
-| `order_ops_all` All Order of Operations | M | standard | number, multi-select-check, dnd-generic, multiple-choice | order-of-ops, multi-select, dnd-generic, compare-expressions | ready | ready | basic | author | author | author | wrap | n/a | E | equation-drill (reviewed) |  |
-| `placevalue_all` All Place Value Skills | M | standard | interactive, pv-build, inline-blanks, number, multiple-choice, symbol | pv-cell, (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
-| `number_sense_all` All Number Sense Skills | M | standard | number, dnd-generic, inline-blanks | pv-cell, doubles | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
-| `number_theory_all` All Number Theory Skills | M | standard | multi-select-check, text, tchart-cells, factor-pairs, factor-links | multi-select, nt-multiples, nt-factor-tchart-medium, nt-multiples-fill, factor-pairs, factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `algebraic_all` All Algebraic Thinking | M | standard | number, text, factor-pairs, number-line-extended | pv-cell, function-table, factor-pairs, count-row, algebra-write, number-pattern, compensation, number-line-extended, order-of-ops, nt-multiples-fill | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `patterns_all` All Pattern Skills | M | standard | number, multiple-choice, dnd-generic, text | (none), dnd-generic, notice-pattern, number-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) |  |
+| `algebra_all` All Algebra Skills | M | standard | number, build-expr, text, multi-select-check | algebra-twostep, tape-diagram, build-expr, algebra-solve, word-plain, standard, story-work, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `order_ops_all` All Order of Operations | M | standard | number, multiple-choice | order-of-ops, compare-expressions | ready | ready | basic | basic | author | basic | wrap | n/a | E | equation-drill (reviewed) |  |
+| `placevalue_all` All Place Value Skills | M | standard | inline-blanks, interactive, number, multiple-choice, pv-build | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
+| `number_sense_all` All Number Sense Skills | M | standard | inline-blanks, multiple-choice, number | pv-cell, compensation, make-a-ten | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `number_theory_all` All Number Theory Skills | M | standard | dnd-generic, factor-links, tchart-cells, number, text, multi-select-check | dnd-generic, factor-links-medium, nt-factor-tchart-medium, nt-gcf-easy, nt-multiples-fill, nt-prime-compare, multi-select | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `algebraic_all` All Algebraic Thinking | M | standard | number, dnd-generic, text, inline-blanks, grid-fill | algebra-solve, pv-cell, (none), function-table, number-pattern, word-problem, dnd-generic, grid-fill, count-row | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
 
 ### all_mixed
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `all_domains_mixed` All Skills from All Domains | M | standard | multiple-choice, number, choice, dnd-generic, multi-select-check, vocab-match | vocab-mc, column-sub, vocab-tf, data-mode, dnd-generic, multi-select, heavier-lighter, vocab-match, standard, (none), column-add | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) | sub-setup, hands-match |
-| `custom_mixed` Custom Mixed (From Settings) | M | standard | inline-blanks, choice, coord-input, dnd-generic, number, multi-select-check, text | pv-cell, vocab-tf, coord-input, (none), standard, geo-transform-mc, story-work, multi-select, nl-drag | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
-| `grade_k_mixed` All Kindergarten Skills | null | standard | vocab-match, number, choice, multiple-choice | vocab-match, sub-5-pictures, column-add, shape-corners, vocab-tf, (none), story-work, geometry-3d-shapes | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-match |
-| `grade_1_mixed` All Grade 1 Skills | null | standard | number, compose-shape-blocks, multi-select-check | tm-coins, story-work, column-add, make-a-ten, pv-cell, number-line-visual, compose-shape-blocks, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `grade_2_mixed` All Grade 2 Skills | null | standard | number, interactive, multi-select-check, text, multiple-choice | unknown-start-wp, pv-cell, multi-select, tm-coins, (none), story-work, vocab-mc, tm-clock, column-sub | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
-| `grade_3_mixed` All Grade 3 Skills | null | standard | inline-blanks, text, number, fraction-input | pv-cell, count-row, mult-facts-vertical, geometry-area, area-unit-squares, share-into-groups, fraction-bar-visual, story-work, div-equation-parts | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `grade_4_mixed` All Grade 4 Skills | null | standard | text, tchart-cells, number, inline-blanks, dual, fraction-input | decompose-frac-nv, nt-factor-tchart-medium, nl-drag, story-work, standard, pv-cell, geometry-area-perimeter, (none), order-of-ops, column-sub | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-setup |
-| `grade_5_mixed` All Grade 5 Skills | null | standard | coord-input, multi-select-check, number, dnd-generic, col-arith | coord-input, multi-select, geo-transform-mc, order-of-ops, mult-frac-frac-nv, geometry-quads, story-work, (none), column-add, dnd-generic, decimal-column-add | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `grade_6_mixed` All Grade 6 Skills | null | standard | number, text, multiple-choice, coord-plot | unit-rate-intro, nl-drag, compact, standard, net-surface-area, area-triangle, geometry-coordinates, number-line-visual, wide, nt-lcm, vocab-mc, histogram-read | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `all_domains_mixed` All Skills from All Domains | M | standard | choice, number, text, multi-select-check, inline-blanks, col-arith | vocab-tf, algebra-twostep, tm-clock, function-table, geo-transform-mc, pv-cell, story-work, order-of-ops, decimal-column-sub, data-pictograph, tm-coins, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-setup |
+| `custom_mixed` Custom Mixed (From Settings) | M | standard | multi-select-check, multiple-choice, text, interactive, area-model, grid-fill, number | multi-select, vocab-mc, tm-money-columns, fdp-order, shape-pattern, count-row, area-model-mult-hard, grid-fill, write-fraction, pv-cell, remainder-judge | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-order |
+| `grade_k_mixed` All Kindergarten Skills | null | standard | number, multiple-choice, text, multi-select-check | story-work, heavier-lighter, column-add, geometry-positions, geometry-2d-shapes, (none), multi-select, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) | hands-sort |
+| `grade_1_mixed` All Grade 1 Skills | null | standard | number, vocab-match, text | number-line-visual, column-add, story-work, vocab-match, add-facts-vertical, tm-clock, sub-facts-vertical, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `grade_2_mixed` All Grade 2 Skills | null | standard | number, multiple-choice, text | tm-notes, vocab-mc, column-sub, column-add, count-row, story-work, wide, dot-array-visual, equal-groups-decide | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `grade_3_mixed` All Grade 3 Skills | null | standard | number, text, shade-parts, fact-family, build-expr | div-facts-long, column-sub, data-bar-graph, shade-fraction, data-pictograph, fact-family-mult-div, build-expr, story-work, notice-pattern, (none) | ready | ready | author | author | author | author | wrap | n/a | V | visual-grid (reviewed) | fact-family |
+| `grade_4_mixed` All Grade 4 Skills | null | standard | choice, text, number, multi-select-check, inline-blanks | geometry-lines, count-row, long-div-kit, multi-select, column-sub, mult-grid, geometry-measure-angle, pv-cell, (none), geometry-triangles | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-setup |
+| `grade_5_mixed` All Grade 5 Skills | null | standard | multiple-choice, dnd-generic, vocab-match, number, multi-select-check, choice | compare-expressions, dnd-generic, vocab-match, story-work, geo-transform-mc, vocab-mc, column-sub, box-plot-intro, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
+| `grade_6_mixed` All Grade 6 Skills | null | standard | number, text, choice, multi-select-check | algebra-solve, standard, (none), integer-compare, multi-select, conversion | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
 
 ### vocabulary
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `vocab_grade_K` Math Vocabulary – Kindergarten (Match) | K | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1` Math Vocabulary – Grade 1 (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_2` Math Vocabulary – Grade 2 (Match) | 2 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_3` Math Vocabulary – Grade 3 (Match) | 3 | wide | vocab-match, multiple-choice, multi-select-check | vocab-match, vocab-mc, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_4` Math Vocabulary – Grade 4 (Match) | 4 | wide | choice, multiple-choice, vocab-match | vocab-tf, vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_5` Math Vocabulary – Grade 5 (Match) | 5 | wide | choice, multiple-choice, vocab-match | vocab-tf, vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_6` Math Vocabulary – Grade 6 (Match) | 6 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_K_operations` Math Vocabulary – Kindergarten: Operations (Match) | K | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
-| `vocab_grade_K_counting` Math Vocabulary – Kindergarten: Counting (Match) | K | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_K_geometry` Math Vocabulary – Kindergarten: Geometry (Match) | K | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
-| `vocab_grade_K_data` Math Vocabulary – Kindergarten: Data (Match) | K | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_K_algebra` Math Vocabulary – Kindergarten: Algebra (Match) | K | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_K_measurement` Math Vocabulary – Kindergarten: Measurement (Match) | K | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1_operations` Math Vocabulary – Grade 1: Operations (Match) | 1 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
-| `vocab_grade_1_counting` Math Vocabulary – Grade 1: Counting (Match) | 1 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1_geometry` Math Vocabulary – Grade 1: Geometry (Match) | 1 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
-| `vocab_grade_1_data` Math Vocabulary – Grade 1: Data (Match) | 1 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1_algebra` Math Vocabulary – Grade 1: Algebra (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1_measurement` Math Vocabulary – Grade 1: Measurement (Match) | 1 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_2_operations` Math Vocabulary – Grade 2: Operations (Match) | 2 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_2_counting` Math Vocabulary – Grade 2: Counting (Match) | 2 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_2_fractions` Math Vocabulary – Grade 2: Fractions (Match) | 2 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_2_geometry` Math Vocabulary – Grade 2: Geometry (Match) | 2 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_2_data` Math Vocabulary – Grade 2: Data (Match) | 2 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_2_algebra` Math Vocabulary – Grade 2: Algebra (Match) | 2 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_2_measurement` Math Vocabulary – Grade 2: Measurement (Match) | 2 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_3_operations` Math Vocabulary – Grade 3: Operations (Match) | 3 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_3_fractions` Math Vocabulary – Grade 3: Fractions (Match) | 3 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_3_geometry` Math Vocabulary – Grade 3: Geometry (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_3_data` Math Vocabulary – Grade 3: Data (Match) | 3 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_3_algebra` Math Vocabulary – Grade 3: Algebra (Match) | 3 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_3_measurement` Math Vocabulary – Grade 3: Measurement (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_4_operations` Math Vocabulary – Grade 4: Operations (Match) | 4 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_4_fractions` Math Vocabulary – Grade 4: Fractions (Match) | 4 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_4_geometry` Math Vocabulary – Grade 4: Geometry (Match) | 4 | wide | choice, vocab-match, multiple-choice, multi-select-check | vocab-tf, vocab-match, vocab-mc, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_4_data` Math Vocabulary – Grade 4: Data (Match) | 4 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_4_algebra` Math Vocabulary – Grade 4: Algebra (Match) | 4 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_4_measurement` Math Vocabulary – Grade 4: Measurement (Match) | 4 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_5_operations` Math Vocabulary – Grade 5: Operations (Match) | 5 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_5_fractions` Math Vocabulary – Grade 5: Fractions (Match) | 5 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_5_geometry` Math Vocabulary – Grade 5: Geometry (Match) | 5 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_5_data` Math Vocabulary – Grade 5: Data (Match) | 5 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_K` Math Vocabulary – Kindergarten (Match) | K | wide | choice, multiple-choice, vocab-match | vocab-tf, vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1` Math Vocabulary – Grade 1 (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_2` Math Vocabulary – Grade 2 (Match) | 2 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_3` Math Vocabulary – Grade 3 (Match) | 3 | wide | multiple-choice, vocab-match, multi-select-check | vocab-mc, vocab-match, multi-select | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_4` Math Vocabulary – Grade 4 (Match) | 4 | wide | vocab-match, multi-select-check, multiple-choice | vocab-match, multi-select, vocab-mc | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_5` Math Vocabulary – Grade 5 (Match) | 5 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_6` Math Vocabulary – Grade 6 (Match) | 6 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_K_operations` Math Vocabulary – Kindergarten: Operations (Match) | K | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
+| `vocab_grade_K_counting` Math Vocabulary – Kindergarten: Counting (Match) | K | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_K_geometry` Math Vocabulary – Kindergarten: Geometry (Match) | K | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
+| `vocab_grade_K_data` Math Vocabulary – Kindergarten: Data (Match) | K | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_K_algebra` Math Vocabulary – Kindergarten: Algebra (Match) | K | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_K_measurement` Math Vocabulary – Kindergarten: Measurement (Match) | K | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1_operations` Math Vocabulary – Grade 1: Operations (Match) | 1 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
+| `vocab_grade_1_counting` Math Vocabulary – Grade 1: Counting (Match) | 1 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1_geometry` Math Vocabulary – Grade 1: Geometry (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
+| `vocab_grade_1_data` Math Vocabulary – Grade 1: Data (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1_algebra` Math Vocabulary – Grade 1: Algebra (Match) | 1 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1_measurement` Math Vocabulary – Grade 1: Measurement (Match) | 1 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_2_operations` Math Vocabulary – Grade 2: Operations (Match) | 2 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_2_counting` Math Vocabulary – Grade 2: Counting (Match) | 2 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_2_fractions` Math Vocabulary – Grade 2: Fractions (Match) | 2 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_2_geometry` Math Vocabulary – Grade 2: Geometry (Match) | 2 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_2_data` Math Vocabulary – Grade 2: Data (Match) | 2 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_2_algebra` Math Vocabulary – Grade 2: Algebra (Match) | 2 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_2_measurement` Math Vocabulary – Grade 2: Measurement (Match) | 2 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_3_operations` Math Vocabulary – Grade 3: Operations (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_3_fractions` Math Vocabulary – Grade 3: Fractions (Match) | 3 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_3_geometry` Math Vocabulary – Grade 3: Geometry (Match) | 3 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_3_data` Math Vocabulary – Grade 3: Data (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_3_algebra` Math Vocabulary – Grade 3: Algebra (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_3_measurement` Math Vocabulary – Grade 3: Measurement (Match) | 3 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_4_operations` Math Vocabulary – Grade 4: Operations (Match) | 4 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_4_fractions` Math Vocabulary – Grade 4: Fractions (Match) | 4 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_4_geometry` Math Vocabulary – Grade 4: Geometry (Match) | 4 | wide | multiple-choice, choice, multi-select-check, vocab-match | vocab-mc, vocab-tf, multi-select, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_4_data` Math Vocabulary – Grade 4: Data (Match) | 4 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_4_algebra` Math Vocabulary – Grade 4: Algebra (Match) | 4 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_4_measurement` Math Vocabulary – Grade 4: Measurement (Match) | 4 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_5_operations` Math Vocabulary – Grade 5: Operations (Match) | 5 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_5_fractions` Math Vocabulary – Grade 5: Fractions (Match) | 5 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_5_geometry` Math Vocabulary – Grade 5: Geometry (Match) | 5 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_5_data` Math Vocabulary – Grade 5: Data (Match) | 5 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
 | `vocab_grade_5_algebra` Math Vocabulary – Grade 5: Algebra (Match) | 5 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_5_measurement` Math Vocabulary – Grade 5: Measurement (Match) | 5 | wide | multiple-choice, choice | vocab-mc, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards |
-| `vocab_grade_6_operations` Math Vocabulary – Grade 6: Operations (Match) | 6 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_5_measurement` Math Vocabulary – Grade 5: Measurement (Match) | 5 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_6_operations` Math Vocabulary – Grade 6: Operations (Match) | 6 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
 | `vocab_grade_6_fractions` Math Vocabulary – Grade 6: Fractions (Match) | 6 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_6_geometry` Math Vocabulary – Grade 6: Geometry (Match) | 6 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_6_geometry` Math Vocabulary – Grade 6: Geometry (Match) | 6 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
 | `vocab_grade_6_data` Math Vocabulary – Grade 6: Data (Match) | 6 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_6_algebra` Math Vocabulary – Grade 6: Algebra (Match) | 6 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_6_measurement` Math Vocabulary – Grade 6: Measurement (Match) | 6 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_6_algebra` Math Vocabulary – Grade 6: Algebra (Match) | 6 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_6_measurement` Math Vocabulary – Grade 6: Measurement (Match) | 6 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |

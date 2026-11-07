@@ -30,6 +30,8 @@ import './skill-options-derived.js';
 // own pitch / support (option-panel round 3), which poolMemberOptions() hands to each member.
 import { poolMemberOptions } from './skill-options-pools.js';
 import { queueUsesInPlay } from './skill-option-store.js';
+// lane lf-algebra (2026-11-07): notice_patterns and growing_shape_patterns (skillCategoryOverride -> 'patterns_notice').
+import { generatePatternsNotice } from './gen-patterns-notice.js';
 
 // P12: "What the items ask" (`forms` with a `variantKey`, skill-options.js formsOption). When the
 // teacher has ticked some of a skill's item forms, pickVariant() for that key deals only those,
@@ -846,6 +848,8 @@ function generateResolvedQuestion() {
         // Build-expression (drag tiles): addsub variant lives in gen-operations.js
         // (multdiv variant lives in gen-algebraic.js algebra branch — no override needed).
         'build_expr_addsub': 'operations',
+        'notice_patterns': 'patterns_notice',
+        'growing_shape_patterns': 'patterns_notice',
     };
     if (!forcedMappedCategory && skillCategoryOverride[mappedSkill]) {
         mappedCategory = skillCategoryOverride[mappedSkill];
@@ -891,6 +895,10 @@ function generateResolvedQuestion() {
             break;
         case "patterns":
             generatePatternsQuestion(q, mappedSkill, helpers);
+            break;
+        // lane lf-algebra (2026-11-07): the two kit-cell patterns skills (gen-patterns-notice.js)
+        case "patterns_notice":
+            generatePatternsNotice(q, mappedSkill);
             break;
         case "rounding":
             generateRoundingQuestion(q, mappedSkill, helpers);

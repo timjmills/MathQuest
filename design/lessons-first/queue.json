@@ -42,10 +42,10 @@
   "ready": 7,
   "skillsNotPassed": 259,
   "blocked": 551,
-  "skills": 343,
+  "skills": 347,
   "skillsPassed": 11,
-  "buildEntries": 303,
-  "buildEntriesLinksOnly": 125,
+  "buildEntries": 301,
+  "buildEntriesLinksOnly": 124,
   "buildEntriesUnknown": 0,
   "shapeCount": {
    "A5": 63,
@@ -126,12 +126,12 @@
    "ccssLessons": 85,
    "buildLessons": 11,
    "products": 166,
-   "newSkills": 59,
+   "newSkills": 63,
    "newSkillsPassed": 3,
-   "builds": 32,
+   "builds": 30,
    "lanes": {
     "k2": 9,
-    "algebra": 13,
+    "algebra": 17,
     "placevalue": 19,
     "operations": 9,
     "numtheory": 6
@@ -2349,10 +2349,10 @@
     "ready": 0,
     "skillsNotPassed": 12,
     "blockedByGaps": 5,
-    "skills": 21,
+    "skills": 22,
     "skillsPassed": 3,
-    "newSkills": 17,
-    "buildEntries": 5
+    "newSkills": 18,
+    "buildEntries": 4
    },
    "shapes": [
     "A2",
@@ -2365,7 +2365,7 @@
      "passed": 3
     },
     "algebra": {
-     "skills": 7,
+     "skills": 8,
      "passed": 0
     },
     "placevalue": {
@@ -2442,6 +2442,17 @@
      "live": true,
      "category": "multiplication",
      "lane": "operations",
+     "passed": false
+    },
+    {
+     "key": "patterns:notice_patterns",
+     "opts": {
+      "patTask": "parity"
+     },
+     "label": "What Do You Notice? Even and Odd Products, Pattern Features",
+     "live": true,
+     "category": "patterns",
+     "lane": "algebra",
      "passed": false
     },
     {
@@ -2586,6 +2597,7 @@
     "multiplication:mult_facts",
     "division:div_facts",
     "multiplication:mult_properties",
+    "patterns:notice_patterns",
     "algebra:function_table_easy",
     "addition:add_facts",
     "subtraction:sub_facts",
@@ -2623,14 +2635,6 @@
      "skill": "multiplication:multiply_three_numbers",
      "name": "Multiply Three Numbers",
      "lane": "operations",
-     "source": "build-list"
-    },
-    {
-     "id": "patterns_notice",
-     "kind": "new",
-     "skill": "patterns:notice_patterns",
-     "name": "What Do You Notice?",
-     "lane": "algebra",
      "source": "build-list"
     },
     {
@@ -2791,7 +2795,8 @@
      "skillSource": "SKILL_WRM",
      "skills": [],
      "partial": [
-      "multiplication:mult_chart"
+      "multiplication:mult_chart",
+      "patterns:notice_patterns"
      ],
      "build": [
       "tables_links"
@@ -2998,9 +3003,10 @@
       "W04",
       "W05"
      ],
-     "verdict": "partial",
+     "verdict": "direct",
      "skillSource": "links",
      "skills": [
+      "patterns:notice_patterns",
       "multiplication:mult_chart",
       "multiplication:count_by_tables",
       "multiplication:mult_facts [8/10]"
@@ -3008,11 +3014,9 @@
      "partial": [
       "multiplication:mult_chart"
      ],
-     "build": [
-      "patterns_notice"
-     ],
+     "build": [],
      "shape": "A5",
-     "short": null,
+     "short": "lesson data exists",
      "long": "g3-oa9-mult-table-patterns: passed"
     },
     {
@@ -3148,10 +3152,10 @@
     "ready": 0,
     "skillsNotPassed": 3,
     "blockedByGaps": 10,
-    "skills": 7,
+    "skills": 10,
     "skillsPassed": 0,
-    "newSkills": 7,
-    "buildEntries": 8
+    "newSkills": 10,
+    "buildEntries": 6
    },
    "shapes": [
     "A2",
@@ -3166,7 +3170,7 @@
      "passed": 0
     },
     "algebra": {
-     "skills": 1,
+     "skills": 4,
      "passed": 0
     }
    },
@@ -3220,6 +3224,40 @@
      "passed": false
     },
     {
+     "key": "patterns:pattern_features",
+     "label": "Features of a Number Pattern: Odd, Even and Ones Digits",
+     "live": true,
+     "category": "patterns",
+     "lane": "algebra",
+     "passed": false
+    },
+    {
+     "key": "patterns:growing_shape_patterns",
+     "label": "Growing Shape Patterns: Draw and Count the Next Term",
+     "live": true,
+     "category": "patterns",
+     "lane": "algebra",
+     "passed": false
+    },
+    {
+     "key": "patterns:follow_given_rule",
+     "opts": {
+      "pattern": [
+       "add",
+       "sub"
+      ],
+      "places": [
+       10,
+       100
+      ]
+     },
+     "label": "Follow a Given Rule: Extend a Number Pattern",
+     "live": true,
+     "category": "patterns",
+     "lane": "algebra",
+     "passed": false
+    },
+    {
      "key": "patterns:number_patterns_rule",
      "opts": {
       "pattern": [
@@ -3246,6 +3284,9 @@
     "number_theory:factor_tchart_medium",
     "number_theory:factor_links_medium",
     "number_theory:prime_composite",
+    "patterns:pattern_features",
+    "patterns:growing_shape_patterns",
+    "patterns:follow_given_rule",
     "patterns:number_patterns_rule"
    ],
    "builds": [
@@ -3272,22 +3313,6 @@
      "name": "Multiples of 10, 100 and 1,000 (option)",
      "lane": "operations",
      "source": "build-list"
-    },
-    {
-     "id": "patterns_notice",
-     "kind": "new",
-     "skill": "patterns:notice_patterns",
-     "name": "What Do You Notice?",
-     "lane": "algebra",
-     "source": "build-list"
-    },
-    {
-     "id": "growing_shape_patterns",
-     "kind": "new",
-     "skill": "patterns:growing_shape_patterns",
-     "name": "Growing Shape Patterns",
-     "lane": "algebra",
-     "source": "links-proposal"
     },
     {
      "id": "comparison_statements",
@@ -3482,17 +3507,17 @@
       "W02",
       "W03"
      ],
-     "verdict": "partial",
+     "verdict": "direct",
      "skillSource": "links",
-     "skills": [],
+     "skills": [
+      "patterns:pattern_features"
+     ],
      "partial": [
       "patterns:number_patterns_rule"
      ],
-     "build": [
-      "patterns_notice"
-     ],
+     "build": [],
      "shape": "A9",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -3508,17 +3533,17 @@
       "W03",
       "W04"
      ],
-     "verdict": "partial",
+     "verdict": "direct",
      "skillSource": "links",
-     "skills": [],
+     "skills": [
+      "patterns:growing_shape_patterns"
+     ],
      "partial": [
       "patterns:number_patterns_rule"
      ],
-     "build": [
-      "growing_shape_patterns"
-     ],
+     "build": [],
      "shape": "A5",
-     "short": null,
+     "short": "lesson data exists",
      "long": null,
      "attachedBy": "nearest same-domain block"
     },
@@ -3537,12 +3562,13 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
+      "patterns:follow_given_rule",
       "patterns:number_patterns_rule"
      ],
      "partial": [],
      "build": [],
      "shape": "A5",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -15361,7 +15387,7 @@
      "partial": [],
      "build": [],
      "shape": "A5",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -17817,7 +17843,10 @@
      "verdict": "gap",
      "skillSource": "SKILL_WRM",
      "skills": [],
-     "partial": [],
+     "partial": [
+      "patterns:pattern_features",
+      "patterns:follow_given_rule"
+     ],
      "build": [
       "dec_sequence"
      ],

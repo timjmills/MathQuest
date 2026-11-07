@@ -25,6 +25,7 @@
 // a page; the ticked operations and step counts are dealt round-robin by state.itemIndex.
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
+import { freshDeal } from './page-deal.js';
 import { optionsFor, normalizeOptions, pvCap } from './skill-options.js';
 import { renderCell, applyRule, ruleText, ftSlots } from './sheet/index.js';
 
@@ -164,7 +165,17 @@ export function generateFunctionTable(q, skillId) {
             if (p.length >= need) { rule = r; pool = p; }
         }
     };
-    attempt(kind, steps);
+    if (task === 'make') {
+        // (lf-algebra r3, options-render REPEAT at S: a "make" table prints only its rule and its In range, so two tables
+        // with one rule on a page look identical) the rule is dealt fresh on the page (page-deal.js freshDeal: no rule twice
+        // in the page window; a band with too few rules falls back to the first new draw)
+        const got = freshDeal(`ft:make:${cap}:${need}`, () => {
+            rule = null; pool = [];
+            attempt(kind, steps);
+            return rule ? { rule, pool } : null;
+        }, { sig: (v) => (v ? ruleText(v.rule) : '-'), window: 11 });
+        rule = got ? got.rule : null; pool = got ? got.pool : [];
+    } else attempt(kind, steps);
     // A band too small for the ask (two steps inside 10): one step of the same kind, then + 1.
     if (!rule && steps === 2) { steps = 1; kind = kind[0]; attempt(kind, 1); }
     if (!rule) { steps = 1; rule = [{ op: '+', n: 1 }]; pool = inputPool(rule, cap); }
@@ -220,12 +231,12 @@ export function generateFunctionTable(q, skillId) {
         rows.forEach((r, i) => { r.hide = outs.has(i) ? 'out' : 'in'; });
     }
 
-    let note;
+    // (r2, options-render: the 'make' range was a note line under the table, as wide as a sentence - it cost a page half
+    // its tables. It is now the In column's head: "In: 1–10", or "In: 4s to 40" for a ÷ rule)
+    let inHead;
     if (task === 'make') {
         const lo = pool[0], hi = pool[pool.length - 1];
-        note = rule[0].op === '/'
-            ? `Use In numbers you can divide by ${rule[0].n}, up to ${hi}.`
-            : `Use In numbers from ${lo} to ${hi}.`;
+        inHead = rule[0].op === '/' ? `In: ${rule[0].n}s to ${hi}` : `In: ${lo}–${hi}`;
     }
 
     const payload = {
@@ -234,7 +245,7 @@ export function generateFunctionTable(q, skillId) {
         support: /^line/.test(String(o.support)) ? 'line' : 'frame',
         machine: !/-bare$/.test(String(o.support)) && o.pictures !== false,
     };
-    if (note) payload.note = note;
+    if (inHead) payload.inHead = inHead;
 
     const parts = ftSlots(payload).map((s) => s.value);
     q.cell = { template: 'function-table', v: 1, payload };
@@ -256,5 +267,9 @@ export function generateFunctionTable(q, skillId) {
     q.printFormat = 'function-table';
     q.skillLabel = skillId === 'function_table_hard' ? 'Function Table' : 'Function Table';
     q.ftRule = ruleText(rule);
+    // (lf-algebra r1, the card's rulings block: ws-card-rulings reads q.a / q.b) a = the biggest number in the table
+    // (Check row included), b = the rule's first number: "Numbers to N" and "× 2 to × 5 at 20" are checkable
+    q.a = Math.max(...rows.flatMap((r) => [r.x, r.y]), ...(check ? [check.x, check.y] : []), ...rule.map((st) => st.n));
+    q.b = rule[0].n;
     return true;
 }

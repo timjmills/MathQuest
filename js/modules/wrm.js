@@ -1174,6 +1174,10 @@ export const SKILL_WRM = {
     'number_theory:list_multiples': ['Y5.B3.S1'],
     'number_theory:common_factors': [{ step: 'Y5.B3.S4', partial: 'picking every common factor from a set of numbers, not writing the list' }, { step: 'Y6.B2.S2', partial: 'picking every common factor from a set, not writing the list' }],
     'number_theory:common_multiples': [{ step: 'Y5.B3.S2', partial: 'picking every common multiple from a set of numbers, not writing the list' }, { step: 'Y6.B2.S3', partial: 'picking every common multiple from a set, not writing the list' }],
+    'patterns:notice_patterns': [{ step: 'Y4.B4.S6', partial: 'the patterns in the times-tables: even and odd products, the ones digits (not the 3, 6, 9 doubling link)' }],
+    'patterns:growing_shape_patterns': [{ step: 'Y6.B7.S1', partial: 'the one-step rule of a growing pattern of shapes (term 4, term 10), not yet the rule in words for any term' }],
+    'patterns:pattern_features': [{ step: 'Y5.B12.S9', partial: 'features of a sequence that its rule does not state (odd / even, the ones digits), with whole numbers, not decimals' }],
+    'patterns:follow_given_rule': [{ step: 'Y5.B12.S9', partial: 'extend a whole-number sequence from a given rule (add, subtract, double), not decimals' }],
 };
 
 export const WRM_PROPOSALS = {

@@ -1,0 +1,653 @@
+{
+ "id": "function-table",
+ "kind": "template",
+ "title": "Function tables: In / Out tables ruled by a rule (`function-table`)",
+ "template": {
+  "id": "function-table",
+  "source": "js/modules/sheet/cells/function-table.js",
+  "also": "js/modules/gen-function-table.js deals the item (every option read there); js/modules/sheet/providers/function-table.js supplies strings, worked steps, wrong answers and misconceptions; screen-cell.js draws the same cell on the practice card, online worksheet and quiz (one input per slot, checked by ftAnswerMatches)"
+ },
+ "families": [
+  "algebra"
+ ],
+ "findingsMatch": {
+  "templates": [
+   "function-table"
+  ]
+ },
+ "skills": {
+  "include": [
+   "algebra:function_table_easy",
+   "algebra:function_table_hard"
+  ]
+ },
+ "excerptChars": 140,
+ "summary": "One kit cell, five tasks: an In / Out table under a black-and-white function machine (In -> [rule] -> Out). Use the rule (write each Out), find the rule (every row printed; the pupil writes the sign and the number IN the machine's box where it fits a third of the page, else in the frame under the table), work the rule backward (write each In), mixed blanks, or make your own table. A Check row can follow any task but make. function_table_easy defaults to one + / - step with numbers to 20, four rows in order, filling the Out column; function_table_hard to every rule kind, numbers to 100, three rows out of order, find the rule then Check. Paper, key and the three screen hosts are one drawing.",
+ "teaches": "Use and find the rule of an input-output table (3.OA.D.9 arithmetic patterns, 4.OA.C.5 generate a pattern that follows a given rule, 5.OA.B.3; EE M.EE.3.OA.8, M.EE.4.OA.5). Owner's lessons: #5 'Find the rule in an input-output table' (Y4 links, G3, W05: ftTask rule, + / - to 100 and x / / to 20) and #20 'Follow a given rule to extend a number pattern' (Y5 links, G4, W09: related, ftTask outputs with + / -).",
+ "research": "From repo sources: the owner's sample sheet ('Find the rule for each function table', 'Complete each function table', 2026-09-25, gen-function-table.js header), EXTENSION_PLAYBOOK 4.15 PF-M3 / PF-M5, the detailed lesson g3-oa9-input-output-rule (its research section 4), data/curriculum/links/Y4.json and Y5.json notes. MW4K / IXL not opened this round (budget); the design standards outrank them.",
+ "problemTypes": [
+  "outputs: the rule is given (machine box), the In numbers printed, write each Out (the worked column 'n + 7' beside each In prints on Model / first Guided rows only: a hint that fades)",
+  "rule: every row printed; write the rule as a sign in a circle and a number in a box (two pairs for a two-step rule), in the machine's box at S / M, under the table where the machine row would not fit a third of the page",
+  "inputs: the rule is given, the Out numbers printed, write each In (the rule worked backward)",
+  "mixed: each row has one blank, some In and some Out",
+  "make: the rule is given and a note says which In numbers to use; the pupil chooses the In numbers and writes their Outs (any rows that follow the rule are right)",
+  "-check: one more In number in a Check row under (or beside) the table; write its Out"
+ ],
+ "progression": [
+  "outputs with + / - to 20 (easy default) -> outputs with x / / to 20 (table facts) -> inputs (backward) -> mixed -> rule (+ / - to 100, then x / / to 20, lesson #5) -> rule with a first row that fits two rules (ftTrap) -> two-step rules (x then +) -> make your own",
+  "one change a step (P-1): the task, the rule kind or the number size changes, never two at once; the worked column and the machine picture are the hint scaffolds that fade (support frame -> frame-bare -> line -> line-bare)"
+ ],
+ "drawing": {
+  "sizes": "XP-D-15: heavy outer rule, hairline inner rules, heavy rule under the head row, head row bold on the single grey (white when photocopy-safe). Row height Hw + 4 mm (10 / 12 / 14 mm S / M / L); every writing box at least 14 / 14 / 16 mm wide and the same width in every blank (no length leak); numbers at the digit size, heads and rule text at the text size. The machine: 'In', a 4.5 mm arrow, a heavy box, a 4.5 mm arrow, 'Out', 1 mm gaps. Footprint 56 x 61 mm at S (outputs, 4 rows), 55 x 62 mm find-the-rule at S (frame in the machine), 56 x 81 / 56 x 93 mm at L.",
+  "notes": [
+   "Capacity: Independent / test page, 4-row tables: S 9 (3 x 3), M 9, L 6 (3 x 2) for outputs, inputs, mixed and rule (rule at S / M with the frame in the machine). A Check row or a 5-row table is a bigger drawing: S 6, L 4 (skill-options addsDrawingValues).",
+   "payload: {task, rule [{op, n}], rows [{x, y, hide: null|in|out|both}], check {x, y}|null, support frame|line, machine bool, note?, trap?}; slots in reading order r<i>in / r<i>out, s0 n0 [s1 n1] (frame) or rule (line), chk; q.ans joins them ', '.",
+   "find the rule: exactly one rule of the rule space (+k, -k, xk, /k, xa +/- b, /a +/- b) fits the rows (rulesFitting === 1), so + and x can never both be right; at least three rows.",
+   "Numbers to N (band) caps EVERY number in the table, the rule's own numbers and the Check row included; Max Number lowers it only when set below the band (pvCap). Division is always exact.",
+   "Key (AK-1): the same table with every blank written; a make table shows one right set and accepts any rows that follow the rule on screen.",
+   "Lesson (detailed g3-oa9-input-output-rule and the packet): the anchor chart's step states write the tried rule in the machine's box (machineText), so the chart never puts the frame in the box."
+  ]
+ },
+ "ruleGroups": [
+  {
+   "title": "Key and the one answer place (quoted)",
+   "core": true,
+   "chars": 400,
+   "rules": [
+    "AK-1",
+    "AK-2",
+    "H13"
+   ]
+  },
+  {
+   "title": "Visual quality bar",
+   "chars": 160,
+   "rules": [
+    "VQ-1",
+    "VQ-2",
+    "VQ-3",
+    "VQ-6",
+    "VQ-8",
+    "VQ-9",
+    "VQ-10"
+   ]
+  },
+  {
+   "title": "Cell, slots, density and screen",
+   "chars": 120,
+   "rules": [
+    "CL-40",
+    "SL-6",
+    "SL-11",
+    "SP-1",
+    "SCC-01",
+    "P-1",
+    "P-7"
+   ]
+  },
+  {
+   "title": "Cited by critics (rubric caps)",
+   "chars": 100,
+   "rules": [
+    "H1@RUBRIC",
+    "H2@RUBRIC",
+    "H3@RUBRIC",
+    "H5@RUBRIC",
+    "H9",
+    "H10",
+    "L1",
+    "L3",
+    "L6",
+    "L10",
+    "L11",
+    "AX-4",
+    "P-3"
+   ]
+  }
+ ],
+ "ownerRulings": [
+  {
+   "date": "2026-09-25",
+   "ruling": "Function tables from the owner's sample sheet: 'Find the rule for each function table' and 'Complete each function table' (In (x) | x + 7 | Out), rebuilt as one kit cell and extended: missing In numbers, mixed blanks, make your own, a function-machine header, a Check row, a rule frame that fades to a line, In numbers out of order.",
+   "source": "owner request 2026-09-25 (gen-function-table.js header)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "Lesson #5 (Y4 links, G3, W05, 3.OA.D.9): function_table_easy {ftTask: rule} with + / - rules to 100 and x / / rules with EVERY number to 20, so every row is a table fact (x 2 to x 5, / 2 to / 5); two-step rules left out at W05.",
+   "source": "owner's BUILD lesson list, data/curriculum/links/Y4.json note"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "Lesson #20 (Y5 links, G4, W09, 4.OA.C.5): function_table_easy {ftTask: outputs, ftRules: [+, -]} is the related skill: the same given rule applied to each In number.",
+   "source": "owner's BUILD lesson list, data/curriculum/links/Y5.json"
+  },
+  {
+   "date": "2026-10-23",
+   "ruling": "Top of the box is the default (CL-4b); content never shrinks to fit; one answer place per answer (VQ-2).",
+   "source": "WORKSHEET_DESIGN_STANDARD.md, owner ruling 2026-10-23"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "F1 The rule is written IN the machine box at S and M, under the table at L (one rule place).",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "F2 × 6 is allowed on 3-row tables at band 20 for lesson #5 (the rows are table facts; ftFactors restricts).",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "F3 Check rows and 5-row tables count as adding a drawing (options-render capacity).",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "F4 Two-step rules stay offered on function_table_easy, off by default.",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "Every PROPOSED decision of section 7a is accepted as written.",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "M-FT1",
+   "error": "adds instead of multiplies: reads the rule off one row as the gap (add-for-times)",
+   "wrong": "2 -> 6, 3 -> 9: writes + 4"
+  },
+  {
+   "id": "M-FT2",
+   "error": "reads down the Out column, not across the row: the gap between neighbouring Outs (neighbour-outputs)",
+   "wrong": "Outs 6, 9, 12: writes + 3 for a x 3 table"
+  },
+  {
+   "id": "M-FT3",
+   "error": "uses the rule backwards: does the rule forward to an Out to find its In (backwards)",
+   "wrong": "x 3, Out 12: writes In 36"
+  },
+  {
+   "id": "M-FT4",
+   "error": "applies the rule twice: to the In and then to the Out (rule-on-output)",
+   "wrong": "+ 4, Check In 5: writes 13"
+  },
+  {
+   "id": "M-FT5",
+   "error": "sign flipped: + when the Out is smaller (sign-flip)",
+   "wrong": "9 -> 5: writes + 4"
+  }
+ ],
+ "options": [
+  "Every option is read by gen-function-table.js (ftOptions); the five panel controls (Task, Rules, Numbers to, Table, Support) plus ftTrap and ftFactors (lesson 5). Old ids fold on decode (_ftFold).",
+  "addsDrawingValues (lf-algebra r1): ftTask *-check and ftTable 51 / 52 add a drawing (the Check row, a fifth row), so a page of them may hold fewer tables.",
+  "Preset skills: algebra:function_table_find_rule {ftTask: rule}, algebra:function_table_find_inputs {ftTask: inputs} (skill-presets.js)."
+ ],
+ "gates": [
+  {
+   "cmd": "node tests/scripts/ws-precritic.cjs --skill algebra:function_table_easy --strict",
+   "note": "and algebra:function_table_hard"
+  },
+  {
+   "cmd": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-input-output-rule --check --repeats",
+   "note": "the passed long lesson that deals function_table_easy"
+  },
+  {
+   "cmd": "node tests/scripts/ws-card-rulings.mjs --skill algebra:function_table_easy",
+   "note": "the rulings block (bands, x / / at 20)"
+  },
+  {
+   "cmd": "node tests/scripts/ws-content-audit.cjs --skill algebra:function_table_easy",
+   "note": "every row fits the rule, numbers inside the band, one rule fits"
+  },
+  {
+   "cmd": "node tests/scripts/ws-options-verify.cjs --render --skill algebra:function_table_easy",
+   "note": "no value costs the page items without a drawing"
+  }
+ ],
+ "openQuestions": [],
+ "rulings": {
+  "rulings": [
+   {
+    "id": "R-EASY-20",
+    "source": "§1 (easy default: numbers to 20)",
+    "skills": [
+     "algebra:function_table_easy"
+    ],
+    "assert": "range",
+    "of": "a",
+    "min": 1,
+    "max": 20
+   },
+   {
+    "id": "R-L5-ADD-100",
+    "source": "§5.2 (lesson #5: + / - rules to 100)",
+    "skills": [
+     "algebra:function_table_easy"
+    ],
+    "opts": {
+     "ftTask": "rule",
+     "ftRules": [
+      "+",
+      "-"
+     ],
+     "band": 100
+    },
+    "assert": "range",
+    "of": "a",
+    "min": 1,
+    "max": 100
+   },
+   {
+    "id": "R-L5-MUL-20",
+    "source": "§5.2 (lesson #5: x / / with every number to 20)",
+    "skills": [
+     "algebra:function_table_easy"
+    ],
+    "opts": {
+     "ftTask": "rule",
+     "ftRules": [
+      "x",
+      "/"
+     ],
+     "band": 20
+    },
+    "assert": "range",
+    "of": "a",
+    "min": 1,
+    "max": 20
+   },
+   {
+    "id": "R-L5-FACTOR",
+    "source": "§5.2; §9.2 (x 2 to x 5 on a 4-row table at 20: table facts)",
+    "skills": [
+     "algebra:function_table_easy"
+    ],
+    "opts": {
+     "ftTask": "rule",
+     "ftRules": [
+      "x",
+      "/"
+     ],
+     "band": 20
+    },
+    "assert": "range",
+    "of": "b",
+    "min": 2,
+    "max": 5
+   },
+   {
+    "id": "R-L20-OUT",
+    "source": "§5.3 (lesson #20: outputs, + / -, numbers to 20)",
+    "skills": [
+     "algebra:function_table_easy"
+    ],
+    "opts": {
+     "ftTask": "outputs",
+     "ftRules": [
+      "+",
+      "-"
+     ]
+    },
+    "assert": "range",
+    "of": "a",
+    "min": 1,
+    "max": 20
+   },
+   {
+    "id": "R-HARD-100",
+    "source": "§1 (hard default: numbers to 100)",
+    "skills": [
+     "algebra:function_table_hard"
+    ],
+    "assert": "range",
+    "of": "a",
+    "min": 1,
+    "max": 100
+   }
+  ],
+  "notOffered": [
+   {
+    "id": "N-PICTURES-FUNCTION-TABLE-EASY",
+    "source": "§3 (one black-and-white look: no picture themes)",
+    "skills": [
+     "algebra:function_table_easy"
+    ],
+    "option": "pictures"
+   }
+  ]
+ },
+ "decisions": {
+  "options": [
+   {
+    "option": "ftTask",
+    "values": [
+     "outputs",
+     "rule",
+     "inputs",
+     "mixed",
+     "make"
+    ],
+    "d": "offered",
+    "source": "owner request 2026-09-25; lesson #5 / #20",
+    "why": "the five tasks; one task a page so the instruction says one thing",
+    "proposed": false
+   },
+   {
+    "option": "ftTask",
+    "values": [
+     "outputs-check",
+     "rule-check",
+     "inputs-check",
+     "mixed-check"
+    ],
+    "d": "offered",
+    "source": "skill-options.js; lf-algebra r1 addsDrawingValues",
+    "why": "a Check row: one more In number to test the rule on; adds a drawing (S 6 a page)",
+    "proposed": false
+   },
+   {
+    "option": "ftRules",
+    "values": [
+     "+",
+     "-",
+     "x",
+     "/"
+    ],
+    "d": "offered",
+    "source": "lesson #5",
+    "why": "one-step rules; lesson #5 deals + / - and x / /",
+    "proposed": false
+   },
+   {
+    "option": "ftRules",
+    "values": [
+     "x+",
+     "x-",
+     "/+",
+     "/-"
+    ],
+    "d": "offered",
+    "source": "skill-options.js; §9.4",
+    "why": "two-step rules, off on easy by default (lesson #5 leaves them out at W05); hard deals them",
+    "proposed": false
+   },
+   {
+    "option": "band",
+    "values": [
+     "10",
+     "20",
+     "50",
+     "100",
+     "1000"
+    ],
+    "d": "offered",
+    "source": "skill-options.js; lesson #5",
+    "why": "Numbers to N caps every number in the table (pvCap); lesson #5 deals 100 and 20",
+    "proposed": false
+   },
+   {
+    "option": "ftTable",
+    "values": [
+     "31",
+     "32",
+     "41",
+     "42"
+    ],
+    "d": "offered",
+    "source": "skill-options.js",
+    "why": "3 or 4 rows, In numbers in or out of order",
+    "proposed": false
+   },
+   {
+    "option": "ftTable",
+    "values": [
+     "51",
+     "52"
+    ],
+    "d": "offered",
+    "source": "skill-options.js; lf-algebra r1 addsDrawingValues",
+    "why": "5 rows: a taller drawing (fewer a page)",
+    "proposed": false
+   },
+   {
+    "option": "ftTrap",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "offered",
+    "source": "detailed lesson 5",
+    "why": "first row fits a + rule and a x rule, so the pupil tests every row (lesson 5)",
+    "proposed": false
+   },
+   {
+    "option": "ftFactors",
+    "values": [
+     "any",
+     "2-5-10",
+     "2-3-5-10"
+    ],
+    "d": "offered",
+    "source": "detailed lesson 5 r2",
+    "why": "x and / only by the facts the class has learned (lesson 5 r2)",
+    "proposed": false
+   },
+   {
+    "option": "support",
+    "values": [
+     "frame",
+     "frame-bare",
+     "line",
+     "line-bare"
+    ],
+    "d": "offered",
+    "source": "skill-options.js (option panel round 3)",
+    "why": "the rule frame and the machine picture: a fading support",
+    "proposed": false
+   },
+   {
+    "option": "calculator",
+    "values": [
+     "true",
+     "false"
+    ],
+    "d": "out of scope",
+    "source": "skill-options.js play controls",
+    "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card",
+    "proposed": false
+   },
+   {
+    "option": "skipAfter",
+    "values": [
+     "*"
+    ],
+    "d": "out of scope",
+    "source": "skill-options.js play controls",
+    "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
+    "proposed": false
+   }
+  ],
+  "roles": [
+   {
+    "key": "role:independent",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "the pass bar (RUBRIC scope)",
+    "proposed": false
+   },
+   {
+    "key": "role:more-practice",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "the pass bar",
+    "proposed": false
+   },
+   {
+    "key": "role:test",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "the pass bar",
+    "proposed": false
+   },
+   {
+    "key": "role:lesson",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "the pass bar; function_table_easy has lesson data (prereqs.js, lf-algebra r1); function_table_hard still falls back (its lesson data is a follow-up)",
+    "proposed": false
+   },
+   {
+    "key": "role:scripted-model",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "provider workedSteps real (derived from the item)",
+    "proposed": false
+   },
+   {
+    "key": "role:guided",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "provider workedSteps real",
+    "proposed": false
+   },
+   {
+    "key": "role:opener",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "any skill on any page type",
+    "proposed": false
+   },
+   {
+    "key": "role:error-analysis",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "provider wrongAnswer real (five misconceptions); the cell draws its own Fix places",
+    "proposed": false
+   },
+   {
+    "key": "role:review",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "any skill on any page type",
+    "proposed": false
+   },
+   {
+    "key": "role:pre-skill-check",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "any skill on any page type",
+    "proposed": false
+   },
+   {
+    "key": "role:mixed-practice",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "any skill on any page type",
+    "proposed": false
+   },
+   {
+    "key": "role:true-false",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "provider wrongAnswer real",
+    "proposed": false
+   },
+   {
+    "key": "role:reason-it",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "provider workedSteps and wrongAnswer real",
+    "proposed": false
+   },
+   {
+    "key": "role:stretch",
+    "d": "offered",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "any skill on any page type",
+    "proposed": false
+   },
+   {
+    "key": "role:word-problems",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "no stories for a table; function_table_story is the story skill",
+    "proposed": false
+   },
+   {
+    "key": "role:fact-rows",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "not a fact skill: the role reports unsupported",
+    "proposed": false
+   },
+   {
+    "key": "role:fact-probe",
+    "d": "out of scope",
+    "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
+    "why": "not a fact skill: the role reports unsupported",
+    "proposed": false
+   }
+  ],
+  "hosts": [
+   {
+    "key": "host:practice-card",
+    "d": "offered",
+    "source": "RUBRIC (every screen host)",
+    "why": "one drawing with print; the pass bar",
+    "proposed": false
+   },
+   {
+    "key": "host:online-worksheet",
+    "d": "offered",
+    "source": "RUBRIC (every screen host)",
+    "why": "one drawing with print; the pass bar",
+    "proposed": false
+   },
+   {
+    "key": "host:quiz",
+    "d": "offered",
+    "source": "RUBRIC (every screen host)",
+    "why": "one drawing with print; the pass bar",
+    "proposed": false
+   },
+   {
+    "key": "host:boss",
+    "d": "out of scope",
+    "source": "RUBRIC scope",
+    "why": "game host draws the same card; graded by ws-chromebook-fit, not by this card's critic",
+    "proposed": false
+   },
+   {
+    "key": "host:race",
+    "d": "out of scope",
+    "source": "RUBRIC scope",
+    "why": "game host draws the same card; graded by ws-chromebook-fit",
+    "proposed": false
+   },
+   {
+    "key": "host:map",
+    "d": "out of scope",
+    "source": "RUBRIC scope",
+    "why": "draws the same card; graded by ws-screen-slots",
+    "proposed": false
+   },
+   {
+    "key": "host:mode-dark",
+    "d": "out of scope",
+    "source": "RUBRIC scope",
+    "why": "display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots",
+    "proposed": false
+   },
+   {
+    "key": "host:mode-bigboard",
+    "d": "out of scope",
+    "source": "RUBRIC scope",
+    "why": "display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots",
+    "proposed": false
+   }
+  ]
+ },
+ "sourceChars": 90
+}

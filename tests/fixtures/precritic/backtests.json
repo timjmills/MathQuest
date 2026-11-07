@@ -1330,6 +1330,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "dealer-declared-set",
+   "check": "ws-dealer-uniform judges an item that is not 'a op b' against the valid set its generator declares (q.dealSet): page caps, uniform pair, items outside the set",
+   "kind": "commit-pair",
+   "rule": "ws-dealer-uniform DECLARED / PAGE (lf-algebra r2): growing_shape_patterns read as op '?' and judged against no set",
+   "fail": {
+    "commit": "e59e2bf3",
+    "state": "lf-algebra r1: the (start, step) pair dealt from a block of 25 that a page of 20 crosses, a pair twice on a page; no declared set (op '?', UNIFORM not judgeable)"
+   },
+   "pass": {
+    "commit": "6e4efe2b",
+    "state": "r2: the pair drawn uniformly and fresh on the page (freshDeal), the set declared on the item; judged OK against 25 declared pairs"
+   },
+   "command": "node tests/scripts/ws-dealer-uniform.mjs --root {root} --skill patterns:growing_shape_patterns",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

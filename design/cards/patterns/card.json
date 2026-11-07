@@ -1,0 +1,1645 @@
+{
+  "id": "patterns",
+  "kind": "family",
+  "title": "What Do You Notice? (`notice`) and Growing Shape Patterns (`growing-pattern`)",
+  "template": {
+    "id": "notice",
+    "source": "js/modules/sheet/cells/notice.js",
+    "also": "The same card covers the `growing-pattern` cell (`js/modules/sheet/cells/growing-pattern.js`, patterns:growing_shape_patterns) and the preset patterns:pattern_features (notice_patterns with patTask 'feature'). Generators: `js/modules/gen-patterns-notice.js`; provider: `js/modules/sheet/providers/patterns.js`. `screen-cell.js` draws the same cells on the practice card, online worksheet and quiz (wireTickBoxes for the words and the sentence list, wireCellSlots for the number boxes)"
+  },
+  "families": [
+    "patterns"
+  ],
+  "findingsMatch": {
+    "templates": [
+      "notice",
+      "growing-pattern"
+    ]
+  },
+  "skills": {
+    "include": [
+      "patterns:notice_patterns",
+      "patterns:pattern_features",
+      "patterns:growing_shape_patterns",
+      "patterns:number_patterns_rule",
+      "patterns:follow_given_rule"
+    ]
+  },
+  "excerptChars": 140,
+  "summary": "Two new kit cells for the lessons-first wave (lane lf-algebra). `notice`: one decision a cell - circle Even / Odd for the product of a fact (G3 'Patterns on the multiplication table', B5), check the ONE true sentence of three about a rule's numbers (G4 'Find emergent features'), or circle True / False for a sentence about one times-table. `growing-pattern`: Terms 1-3 of a growing pattern of dots or squares in equal boxes, an empty Term 4 box to draw in (working space), a count row; the answer is a number (Term 4's count; + the rule; or Term 10's count). Paper, key and the three screen hosts are one drawing.",
+  "teaches": "3.OA.D.9 (identify arithmetic patterns in the multiplication table and explain them: an even factor makes an even product, odd x odd is odd; the 5s end in 0 or 5, the 9s' ones digits go down by 1) and 4.OA.C.5 (generate a number or shape pattern that follows a given rule; identify features of the pattern not explicit in the rule: the numbers alternate odd and even, the ones digits repeat; extend a growing shape pattern and count its terms). EE M.EE.3.OA.8, M.EE.4.OA.5.",
+  "research": "Repo sources only (no WebSearch / site logins in this container this round): js/modules/build-list.js `patterns_notice`; data/curriculum/links/Y4.json lesson G3|-|patternsonthemultiplicationtable and Y5.json lessons G4|-|findemergentfeaturesegunitsdigitcycle, G4|-|extendgrowingshapepatterns (their missing clauses and envisioned representations); js/modules/lessons/detailed/g3-oa9-mult-table-patterns.js (B5 and the lesson's even-product steps); the CCSS 3.OA.D.9 / 4.OA.C.5 text. The common published forms (from general knowledge of MathWorksheets4Kids / K5 / IXL 'patterns' units, no wording copied): even-or-odd product sorts, 'which statement about the pattern is true', true-or-false about a times-table, and 'draw the next figure / how many in figure 10' growing-pattern sheets. Our version takes one item a cell, one answer place and the scaffold fade from the standards, not the sites' density.",
+  "problemTypes": [
+    "notice parity: a fact a x b (factors 2-5 / 2-10 / 2-12); circle Even or Odd for the product. Odd products are dealt 1 : 1 with even ones (the non-example, P-10); even ones split among even x even, even x odd, odd x even. Hint: even / odd under each factor (fades).",
+    "notice feature (= preset pattern_features): 'Start at s. Add d each time.' and six numbers (printed, or the first printed and five working boxes); three sentences (every number even / odd, odd-even alternate, every number ends in d, the ones digits go a, b, a, b or a 5-cycle), EXACTLY one true; check it. The true sentence is about odd / even or about the ones digits, dealt 1 : 1.",
+    "notice truefalse: 'Every product in the 5 times-table ends in 0 or 5.' and the row n x 1 .. n x 10 (hint, fades); circle True or False, dealt 1 : 1; the sentence kind dealt (all even, all odd, odd-even, ends in 0 or 5, ends in 0, the 9s' ones go down by 1).",
+    "growing next: Terms 1-3 of a pattern (a line growing by 1; 2 or 3 rows growing by 2 or 3; an L by 2; a T by 3; a plus by 4) in 7 x 7-unit boxes; draw Term 4 in the empty box (working space); write how many Term 4 has.",
+    "growing rule: the same and the rule '+ [ ]' (two graded boxes, one per answer).",
+    "growing far: write how many Term 10 has (Term 4's count box is working space)."
+  ],
+  "progression": [
+    "notice: parity with the factor labels -> parity without -> true / false about one row with the row printed -> without the row -> pattern features with the numbers printed -> the pupil writes the numbers (one change a step, P-1)",
+    "growing: next with the counts of Terms 1-3 printed -> counts to write -> Term 4 and the rule -> Term 10 (answers to 10 -> 20 -> 50)",
+    "the reason bank ('an even number is two equal groups'; 'one product that does not fit makes it false'; 'each term has 2 more') is on the teaching pages only (model / guided / lesson: worked steps and the Say line), never in a practice cell"
+  ],
+  "drawing": {
+    "sizes": "notice: the fact at the working digit size (ctx.metrics digitPt), the hint word at text size in the single grey; Even / Odd and True / False at text size + 6 pt, 12 mm apart, the key ring 1.5 pt; feature track tiles 10 / 11.5 / 13 mm (S / M / L), the sentence check boxes the kit's checkMm (5 / 6 / 7 mm); the times-table row tiles 7.8-10.4 mm. growing-pattern: unit u = 2.5 / 2.5 / 2.6 mm, each term box 7.8 u square (19.5 / 19.5 / 20.3 mm), dots 0.8 u, squares 1 u, strokes 0.75 pt; count boxes 10 / 11.5 / 13 mm; the answer box the library's answerArea (1.5 pt). S fits two growing cells across (82 mm), M and L one; the notice fact fits three across, the sentence tasks two across at S and one at M / L.",
+    "notes": [
+      "notice payload: parity {task, a, b, product, operands, labels ['Even','Odd'], correct, show}; feature {task, start, step, terms[6], choices[3], kinds, correct, about, show}; truefalse {task, table, products, statement, kind, isTrue, labels ['True','False'], correct, show}.",
+      "ONE graded slot a notice cell (`data-ws-slot=answer`: shape choice for the words, check for the sentence list). The feature track's empty tiles are `data-ws-graded=0` on paper and `input.mq-wwork` on screen (typed, checked live, never the answer).",
+      "The product is never printed on a parity item (the lesson is to know it from the factors); a feature item's sentences are judged against twelve numbers of the rule, so a cycle of five is seen twice; a true / false sentence's truth is computed from the printed row (L4).",
+      "growing payload: {fam, e, shape, ask, step, counts[4], count10, operands [Term 1's count, step], show, unit}. Every term box is the same 7 x 7-unit square, so the empty Term 4 box never shows how big Term 4 is (L3); Term 4 is drawn only on the key. The (start, step) pair is dealt over every pair the band allows (page-deal.js block: each pair once a block).",
+      "growing screen twin: Terms 1-3 the same SVGs; the Term 4 box is a 7 x 7 grid of 44 px toggles (a tap puts a dot / square, a second tap takes it away; working, never graded); the answer box(es) the host's inputs (`data-mq-cell`), joined ', ' for the rule task."
+    ]
+  },
+  "ruleGroups": [
+    {
+      "title": "Visual quality bar (WORKSHEET_DESIGN_STANDARD section 18, quoted in full)",
+      "core": true,
+      "full": true,
+      "rules": [
+        "VQ-1",
+        "VQ-2",
+        "VQ-3",
+        "VQ-6",
+        "VQ-8"
+      ]
+    },
+    {
+      "title": "Key and the one answer place (quoted)",
+      "core": true,
+      "chars": 400,
+      "rules": [
+        "AK-1",
+        "AK-2",
+        "H13"
+      ]
+    },
+    {
+      "title": "Visual quality, the rest",
+      "chars": 120,
+      "rules": [
+        "VQ-4",
+        "VQ-5",
+        "VQ-7",
+        "VQ-9",
+        "VQ-10"
+      ]
+    },
+    {
+      "title": "Cell, slots, density, pedagogy and screen",
+      "chars": 120,
+      "rules": [
+        "CL-40",
+        "SL-11",
+        "SP-1",
+        "SCC-01",
+        "P-1",
+        "P-10"
+      ]
+    },
+    {
+      "title": "Lessons learned and rubric caps",
+      "chars": 100,
+      "rules": [
+        "C1",
+        "C2",
+        "H1@RUBRIC",
+        "H2@RUBRIC",
+        "H3@RUBRIC",
+        "H4@RUBRIC",
+        "H5@RUBRIC",
+        "H6",
+        "H7",
+        "H8",
+        "H9",
+        "H10",
+        "H11",
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "L6",
+        "L10"
+      ]
+    }
+  ],
+  "ownerRulings": [
+    {
+      "date": "2026-11-07",
+      "ruling": "Skill cards need owner approval; build the decided parts meanwhile (lead brief, lane lf-algebra). No owner sign-off of skill cards in the lessons-first program: lanes decide from the standards, the owner reviews finished work.",
+      "source": "lead brief 2026-11-07; design/STATUS.md 2026-11-07 owner decisions"
+    },
+    {
+      "date": "2026-10-17",
+      "ruling": "A distinct option is ALSO a findable skill: each task kind that is its own lesson is a preset skill. Decided here: patTask 'feature' (its own G4 lesson, 4.OA.C.5) is the preset patterns:pattern_features; 'truefalse' stays a plain option value (a check form of the same 3.OA.D.9 lesson as 'parity'); the growing tasks next / rule / far stay options (one lesson, one ladder).",
+      "source": "CLAUDE.md 'A distinct option is ALSO a findable skill'"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "\"Within N\" bounds the answer: notice band = the biggest product / pattern number (25, 50, 100, 144); growing band = the biggest answer count (10, 20, 50).",
+      "source": "CLAUDE.md governing rules"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "P1 No separate True-or-false preset for now (patTask truefalse stays a plain option value).",
+      "source": "owner 2026-11-07, all as suggested (via lead)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "P2 Parity items hide the product: the pupil decides from the factors (3.OA.D.9).",
+      "source": "owner 2026-11-07, all as suggested (via lead)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "P3 Growing patterns on screen: a 7 x 7 tap grid is the ungraded working space for drawing Term 4; the graded answer is the number on paper and screen.",
+      "source": "owner 2026-11-07, all as suggested (via lead)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "P4 WRM tags: notice_patterns Y4.B4.S6, pattern_features Y5.B12.S9, growing_shape_patterns Y6.B7.S1, all partial.",
+      "source": "owner 2026-11-07, all as suggested (via lead)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "P5 The fading hint patShow is on by default for both skills.",
+      "source": "owner 2026-11-07, all as suggested (via lead)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "P6 ws-card-rulings reads word answers and payload fields (additive, self-tested, backtested); the notice, feature, number_patterns_rule and follow_given_rule rulings are machine-checked.",
+      "source": "owner 2026-11-07, all as suggested (via lead)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "P7 A new preset skill patterns:follow_given_rule 'Follow a Given Rule: Extend a Number Pattern' = number_patterns_rule with rule off, for BUILD lesson #20 (4.OA.C.5); it is on this card.",
+      "source": "owner 2026-11-07, all as suggested (via lead)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Every PROPOSED decision of section 7a is accepted as written (number_patterns_rule's and follow_given_rule's included).",
+      "source": "owner 2026-11-07, all as suggested (via lead)"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "M-N1",
+      "error": "odd x odd is even (the adding rule carried over)",
+      "wrong": "5 x 7: Even"
+    },
+    {
+      "id": "M-N2",
+      "error": "decides by the first factor only",
+      "wrong": "3 x 4: Odd"
+    },
+    {
+      "id": "M-N3",
+      "error": "a pattern seen in the first numbers is taken to hold for all",
+      "wrong": "5, 10, 15: every number is odd"
+    },
+    {
+      "id": "M-N4",
+      "error": "a sentence that fits some products is called true",
+      "wrong": "every product in the 5 times-table ends in 5: True"
+    },
+    {
+      "id": "M-G1",
+      "error": "the next term has one more, whatever the step",
+      "wrong": "3, 5, 7 -> 8"
+    },
+    {
+      "id": "M-G2",
+      "error": "doubles the last term",
+      "wrong": "3, 5, 7 -> 14"
+    },
+    {
+      "id": "M-G3",
+      "error": "reads the rule across two terms",
+      "wrong": "1, 3, 5: rule + 4"
+    },
+    {
+      "id": "M-G4",
+      "error": "Term 10 = 10 x the step, the start forgotten",
+      "wrong": "1, 4, 7: Term 10 = 30"
+    }
+  ],
+  "options": [
+    "patTask (notice_patterns): enum parity | feature | truefalse, default parity, group difficulty; share key 4U, tokens P / F / T. 'feature' is ALSO the preset skill patterns:pattern_features (code ZY).",
+    "patTask (growing_shape_patterns): enum next | rule | far, default next; the same key 4U, tokens N / R / X.",
+    "band: notice 25 | 50 | 100 | 144 (default 100), growing 10 | 20 | 50 (default 20; far moves the default to 50); the shared key B; it bounds the ANSWER.",
+    "patShow: bool, default on, group support (key 4V): the fading hint - factor labels / the pattern's numbers / the times-table row / the counts of Terms 1-3.",
+    "growShape (growing_shape_patterns): dots | squares | mixed, default dots, group appearance (key 4W). notice_patterns has no appearance option: one black-and-white look, nothing to vary (stated reason, L8)."
+  ],
+  "rulings": {
+    "rulings": [
+      {
+        "id": "R-GROW-ANS",
+        "source": "§1; §7 (band 20 bounds Term 4's count)",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "assert": "range",
+        "of": "ans",
+        "min": 2,
+        "max": 20
+      },
+      {
+        "id": "R-GROW-FAR",
+        "source": "§1; §7 (far: band 50 bounds Term 10's count)",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "opts": {
+          "patTask": "far"
+        },
+        "assert": "range",
+        "of": "ans",
+        "min": 10,
+        "max": 50
+      },
+      {
+        "id": "R-GROW-TEN",
+        "source": "§7 (band 10: Term 4 has at most 10)",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "opts": {
+          "band": 10
+        },
+        "assert": "range",
+        "of": "ans",
+        "min": 2,
+        "max": 10
+      },
+      {
+        "id": "R-GROW-STEP",
+        "source": "§2 (grows by 1 to 5)",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "assert": "range",
+        "of": "b",
+        "min": 1,
+        "max": 5
+      },
+      {
+        "id": "R-GROW-START",
+        "source": "§2 (Term 1 has 1 to 10)",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "assert": "range",
+        "of": "a",
+        "min": 1,
+        "max": 10
+      },
+      {
+        "id": "R-GROW-STEP1-SHARE",
+        "source": "§2 (the rule varies: + 1 on at most a third of the items)",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "assert": "maxShare",
+        "when": {
+          "eq": [
+            "b",
+            1
+          ]
+        },
+        "max": 0.34
+      },
+      {
+        "id": "R-PAR-FACTOR",
+        "source": "§2; §7 (band 100: factors 2 to 10)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "assert": "range",
+        "of": "payload.a",
+        "min": 2,
+        "max": 10
+      },
+      {
+        "id": "R-PAR-FACTOR-B",
+        "source": "§2; §7 (band 100: factors 2 to 10)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "assert": "range",
+        "of": "payload.b",
+        "min": 2,
+        "max": 10
+      },
+      {
+        "id": "R-PAR-PRODUCT",
+        "source": "§5.3 (within N bounds the answer: the product to 100)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "assert": "range",
+        "of": "payload.product",
+        "min": 4,
+        "max": 100
+      },
+      {
+        "id": "R-PAR-25",
+        "source": "§7 (band 25: factors 2 to 5)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "opts": {
+          "band": 25
+        },
+        "assert": "range",
+        "of": "payload.a",
+        "min": 2,
+        "max": 5
+      },
+      {
+        "id": "R-PAR-25-B",
+        "source": "§7 (band 25: factors 2 to 5)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "opts": {
+          "band": 25
+        },
+        "assert": "range",
+        "of": "payload.b",
+        "min": 2,
+        "max": 5
+      },
+      {
+        "id": "R-PAR-144",
+        "source": "§7 (band 144: factors 2 to 12)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "opts": {
+          "band": 144
+        },
+        "assert": "range",
+        "of": "payload.a",
+        "min": 2,
+        "max": 12
+      },
+      {
+        "id": "R-PAR-ODD-MAX",
+        "source": "§2 (odd products dealt 1 : 1, P-10)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "assert": "maxShare",
+        "when": {
+          "is": [
+            "ans",
+            "odd"
+          ]
+        },
+        "max": 0.6
+      },
+      {
+        "id": "R-PAR-ODD-MIN",
+        "source": "§2 (odd products dealt 1 : 1, P-10)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "assert": "minShare",
+        "when": {
+          "is": [
+            "ans",
+            "odd"
+          ]
+        },
+        "min": 0.4
+      },
+      {
+        "id": "R-TF-TRUE-MAX",
+        "source": "§2 (true and false dealt 1 : 1)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "opts": {
+          "patTask": "truefalse"
+        },
+        "assert": "maxShare",
+        "when": {
+          "is": [
+            "ans",
+            "true"
+          ]
+        },
+        "max": 0.6
+      },
+      {
+        "id": "R-TF-TRUE-MIN",
+        "source": "§2 (true and false dealt 1 : 1)",
+        "skills": [
+          "patterns:notice_patterns"
+        ],
+        "opts": {
+          "patTask": "truefalse"
+        },
+        "assert": "minShare",
+        "when": {
+          "is": [
+            "ans",
+            "true"
+          ]
+        },
+        "min": 0.4
+      },
+      {
+        "id": "R-FEAT-START",
+        "source": "§2 (feature: start 1 to 12)",
+        "skills": [
+          "patterns:pattern_features"
+        ],
+        "assert": "range",
+        "of": "payload.start",
+        "min": 1,
+        "max": 12
+      },
+      {
+        "id": "R-FEAT-STEP",
+        "source": "§2 (feature: add 1 to 5, 10 or 20)",
+        "skills": [
+          "patterns:pattern_features"
+        ],
+        "assert": "range",
+        "of": "payload.step",
+        "min": 1,
+        "max": 20
+      },
+      {
+        "id": "R-FEAT-PARITY",
+        "source": "§2 (the true sentence is about odd / even or the ones digits, dealt 1 : 1)",
+        "skills": [
+          "patterns:pattern_features"
+        ],
+        "assert": "minShare",
+        "when": {
+          "is": [
+            "payload.about",
+            "parity"
+          ]
+        },
+        "min": 0.4
+      },
+      {
+        "id": "R-FEAT-ONES",
+        "source": "§2 (the true sentence is about odd / even or the ones digits, dealt 1 : 1)",
+        "skills": [
+          "patterns:pattern_features"
+        ],
+        "assert": "minShare",
+        "when": {
+          "is": [
+            "payload.about",
+            "ones"
+          ]
+        },
+        "min": 0.4
+      },
+      {
+        "id": "R-FEAT-AT-0",
+        "source": "L10 (the true sentence's place is dealt: first on a fifth or more)",
+        "skills": [
+          "patterns:pattern_features"
+        ],
+        "assert": "minShare",
+        "when": {
+          "eq": [
+            "payload.correct",
+            0
+          ]
+        },
+        "min": 0.2
+      },
+      {
+        "id": "R-FEAT-AT-2",
+        "source": "L10 (the true sentence's place is dealt: last on a fifth or more)",
+        "skills": [
+          "patterns:pattern_features"
+        ],
+        "assert": "minShare",
+        "when": {
+          "eq": [
+            "payload.correct",
+            2
+          ]
+        },
+        "min": 0.2
+      },
+      {
+        "id": "R-NPR-START",
+        "source": "§2 number_patterns_rule (start in the ones or the tens: places 1, 10)",
+        "skills": [
+          "patterns:number_patterns_rule"
+        ],
+        "assert": "range",
+        "of": "payload.values.0",
+        "min": 1,
+        "max": 99
+      },
+      {
+        "id": "R-NPR-LEN",
+        "source": "§2 number_patterns_rule (a track of 4 to 8 numbers)",
+        "skills": [
+          "patterns:number_patterns_rule"
+        ],
+        "assert": "range",
+        "of": "payload.values.length",
+        "min": 4,
+        "max": 8
+      },
+      {
+        "id": "R-NPR-DOUBLE",
+        "source": "§2 number_patterns_rule (R3: doubling dealt by default)",
+        "skills": [
+          "patterns:number_patterns_rule"
+        ],
+        "assert": "minShare",
+        "when": {
+          "is": [
+            "payload.ruleBox.pre",
+            [
+              "Rule: multiply by",
+              "Rule: divide by"
+            ]
+          ]
+        },
+        "min": 0.2
+      },
+      {
+        "id": "R-NPR-ADD",
+        "source": "§2 number_patterns_rule (count on dealt by default)",
+        "skills": [
+          "patterns:number_patterns_rule"
+        ],
+        "assert": "minShare",
+        "when": {
+          "is": [
+            "payload.ruleBox.pre",
+            "Rule: add"
+          ]
+        },
+        "min": 0.2
+      },
+      {
+        "id": "R-NPR-SUB",
+        "source": "§2 number_patterns_rule (count back dealt by default)",
+        "skills": [
+          "patterns:number_patterns_rule"
+        ],
+        "assert": "minShare",
+        "when": {
+          "is": [
+            "payload.ruleBox.pre",
+            "Rule: subtract"
+          ]
+        },
+        "min": 0.2
+      },
+      {
+        "id": "R-FGR-START",
+        "source": "§2 follow_given_rule (start in the ones or the tens: places 1, 10)",
+        "skills": [
+          "patterns:follow_given_rule"
+        ],
+        "assert": "range",
+        "of": "payload.values.0",
+        "min": 1,
+        "max": 99
+      },
+      {
+        "id": "R-FGR-LEN",
+        "source": "§2 follow_given_rule (a track of 4 to 8 numbers)",
+        "skills": [
+          "patterns:follow_given_rule"
+        ],
+        "assert": "range",
+        "of": "payload.values.length",
+        "min": 4,
+        "max": 8
+      },
+      {
+        "id": "R-FGR-GAPS",
+        "source": "§2 follow_given_rule (1 to 5 numbers to write)",
+        "skills": [
+          "patterns:follow_given_rule"
+        ],
+        "assert": "range",
+        "of": "payload.blanks.length",
+        "min": 1,
+        "max": 5
+      },
+      {
+        "id": "R-FGR-NO-RULE-BOX",
+        "source": "P7 (the rule is given: no rule box to fill)",
+        "skills": [
+          "patterns:follow_given_rule"
+        ],
+        "assert": "maxShare",
+        "when": {
+          "is": [
+            "payload.ruleBox.pre",
+            [
+              "Rule: add",
+              "Rule: subtract",
+              "Rule: multiply by",
+              "Rule: divide by"
+            ]
+          ]
+        },
+        "max": 0
+      }
+    ],
+    "notOffered": [
+      {
+        "id": "N-NUMBERLINE",
+        "source": "§3 (no number line on these cells)",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "option": "nlOn"
+      },
+      {
+        "id": "N-PICTURES",
+        "source": "§3 (one black-and-white look; growShape is the only appearance choice)",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "option": "pictures"
+      },
+      {
+        "id": "N-PICTURES-NUMBER-PATTERNS-RULE",
+        "source": "§3 (one black-and-white look: no picture themes)",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "option": "pictures"
+      }
+    ]
+  },
+  "gates": [
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --skill patterns:notice_patterns,patterns:growing_shape_patterns --strict",
+      "note": "and the preset patterns:pattern_features"
+    },
+    {
+      "cmd": "node tests/scripts/ws-visual-quality.mjs --skill patterns:notice_patterns",
+      "note": "VQ-REP / VQ-ONEANSWER / VQ-LIVE / VQ-TITLE / VQ-NOLEGACY; and growing_shape_patterns"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/patterns/patterns.md",
+      "note": "build-start gate (unsigned: INCOMPLETE by design)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-card-rulings.mjs --card design/cards/patterns/patterns.md",
+      "note": "300 seeded items a ruling"
+    },
+    {
+      "cmd": "node tests/scripts/ws-presets-unit.mjs",
+      "note": "pattern_features opens notice_patterns with patTask feature"
+    },
+    {
+      "cmd": "node tests/scripts/ws-grade-render.cjs --skills patterns:notice_patterns,patterns:growing_shape_patterns --size S,M,L",
+      "note": "renders for the critic"
+    }
+  ],
+  "openQuestions": [],
+  "sourceChars": 90,
+  "decisions": {
+    "options": [
+      {
+        "option": "patTask",
+        "values": [
+          "parity",
+          "feature",
+          "truefalse"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features"
+        ],
+        "source": "§1, §2; build list patterns_notice",
+        "why": "one task a page; feature is also the preset pattern_features",
+        "proposed": false
+      },
+      {
+        "option": "patTask",
+        "values": [
+          "next",
+          "rule",
+          "far"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "source": "§2; Y5 links G4 extendgrowingshapepatterns",
+        "why": "Term 4; Term 4 + the rule; Term 10",
+        "proposed": false
+      },
+      {
+        "option": "band",
+        "values": [
+          "25",
+          "50",
+          "100",
+          "144"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features"
+        ],
+        "source": "§5.3 (within N bounds the answer)",
+        "why": "the biggest product / pattern number",
+        "proposed": false
+      },
+      {
+        "option": "band",
+        "values": [
+          "10",
+          "20",
+          "50"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "source": "§5.3",
+        "why": "the biggest answer count (Term 4, or Term 10 on far)",
+        "proposed": false
+      },
+      {
+        "option": "patShow",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "source": "§2 progression; L8 fading support",
+        "why": "the hint that fades: factor labels / the numbers / the row / the counts of Terms 1-3",
+        "proposed": false
+      },
+      {
+        "option": "growShape",
+        "values": [
+          "dots",
+          "squares",
+          "mixed"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:growing_shape_patterns"
+        ],
+        "source": "§3 (appearance, O6)",
+        "why": "what each term is made of, black outline only",
+        "proposed": false
+      },
+      {
+        "option": "calculator",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns",
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "Wave 1 lane A universal play control",
+        "why": "a pupil play control, not part of the item; graded with the play controls, not on this card"
+      },
+      {
+        "key": "skipAfter=*",
+        "d": "out of scope",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns",
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "Wave 1 lane A universal play control",
+        "why": "a pupil play control (when Skip appears), not part of the item"
+      },
+      {
+        "option": "pattern",
+        "values": [
+          "add",
+          "sub",
+          "double",
+          "times10",
+          "grow"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "§2 number_patterns_rule (count on, count back, double; x 10 and growing steps for the later lessons)",
+        "why": "the rule kinds dealt"
+      },
+      {
+        "option": "places",
+        "values": [
+          "1",
+          "10",
+          "100",
+          "1000"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "§2 number_patterns_rule (the size ladder)",
+        "why": "where the pattern starts: ones, tens, hundreds, thousands"
+      },
+      {
+        "option": "missing",
+        "values": [
+          "null",
+          "20",
+          "50",
+          "70",
+          "80",
+          "90",
+          "100"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "L8 fading support",
+        "why": "how many numbers are left blank"
+      },
+      {
+        "option": "rule",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "status open question (lesson #20 Follow a given rule = rule off)",
+        "why": "on: find and write the rule; off: the rule is given"
+      },
+      {
+        "option": "shape",
+        "values": [
+          "box",
+          "circle",
+          "hex",
+          "mixed"
+        ],
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "§3 (appearance, O6)",
+        "why": "the box shape of the track, black outline only"
+      },
+      {
+        "option": "nlOn",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "number-line pane (universal nline options)",
+        "why": "the optional number-line pane under the track: graded on the number-line pane, not on this card"
+      },
+      {
+        "option": "nlFrom",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "number-line pane (universal nline options)",
+        "why": "the optional number-line pane under the track: graded on the number-line pane, not on this card"
+      },
+      {
+        "option": "nlTo",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "number-line pane (universal nline options)",
+        "why": "the optional number-line pane under the track: graded on the number-line pane, not on this card"
+      },
+      {
+        "option": "nlStep",
+        "values": [
+          "1",
+          "2",
+          "5",
+          "10",
+          "20",
+          "25",
+          "50",
+          "100",
+          "1000",
+          "auto",
+          "1/2",
+          "1/3",
+          "1/4",
+          "1/5",
+          "1/6",
+          "1/8",
+          "1/10",
+          "1/12",
+          "0.1",
+          "0.01"
+        ],
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "number-line pane (universal nline options)",
+        "why": "the optional number-line pane under the track: graded on the number-line pane, not on this card"
+      },
+      {
+        "option": "nlLabels",
+        "values": [
+          "auto",
+          "all",
+          "2",
+          "5",
+          "10",
+          "ends",
+          "none"
+        ],
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "number-line pane (universal nline options)",
+        "why": "the optional number-line pane under the track: graded on the number-line pane, not on this card"
+      },
+      {
+        "option": "nlMinor",
+        "values": [
+          "auto",
+          "0",
+          "2",
+          "4",
+          "5",
+          "10"
+        ],
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "number-line pane (universal nline options)",
+        "why": "the optional number-line pane under the track: graded on the number-line pane, not on this card"
+      },
+      {
+        "option": "nlHops",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "number-line pane (universal nline options)",
+        "why": "the optional number-line pane under the track: graded on the number-line pane, not on this card"
+      }
+    ],
+    "roles": [
+      {
+        "key": "role:independent",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items, one task a page"
+      },
+      {
+        "key": "role:more-practice",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "role:opener",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "role:scripted-model",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider workedSteps derived from the item (the reason bank lives here)"
+      },
+      {
+        "key": "role:guided",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider workedSteps derived from the item"
+      },
+      {
+        "key": "role:error-analysis",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider wrongAnswer from the named misconceptions"
+      },
+      {
+        "key": "role:review",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "earlier skills in data.js order plus this one"
+      },
+      {
+        "key": "role:test",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "role:pre-skill-check",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "earlier skills"
+      },
+      {
+        "key": "role:fact-probe",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "role:true-false",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider wrongAnswer"
+      },
+      {
+        "key": "role:reason-it",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider workedSteps + wrongAnswer"
+      },
+      {
+        "key": "role:stretch",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items, harder option values"
+      },
+      {
+        "key": "role:lesson",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "FALLBACK lesson data (warm-up from the earlier skills); no prereqs.js entry yet"
+      },
+      {
+        "key": "role:word-problems",
+        "d": "out of scope",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "CLAUDE.md (fact layouts are for fact skills); mixed-pages lane",
+        "why": "no stories: these skills are not word problems (default provider)"
+      },
+      {
+        "key": "role:fact-rows",
+        "d": "out of scope",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "CLAUDE.md (fact layouts are for fact skills); mixed-pages lane",
+        "why": "not a fact skill: the 5-10 column fact layouts are for fact and operations skills"
+      },
+      {
+        "key": "role:mixed-practice",
+        "d": "out of scope",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "CLAUDE.md (fact layouts are for fact skills); mixed-pages lane",
+        "why": "graded on the mixed-pages card, not here"
+      },
+      {
+        "key": "role:independent",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items, one task a page"
+      },
+      {
+        "key": "role:more-practice",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "role:opener",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "role:scripted-model",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider workedSteps derived from the item (the reason bank lives here)"
+      },
+      {
+        "key": "role:guided",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider workedSteps derived from the item"
+      },
+      {
+        "key": "role:error-analysis",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider wrongAnswer from the named misconceptions"
+      },
+      {
+        "key": "role:review",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "earlier skills in data.js order plus this one"
+      },
+      {
+        "key": "role:test",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "role:pre-skill-check",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "earlier skills"
+      },
+      {
+        "key": "role:fact-probe",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items"
+      },
+      {
+        "key": "role:true-false",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider wrongAnswer"
+      },
+      {
+        "key": "role:reason-it",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "provider workedSteps + wrongAnswer"
+      },
+      {
+        "key": "role:stretch",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "the skill's own items, harder option values"
+      },
+      {
+        "key": "role:lesson",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: every page role builds and prints a key",
+        "why": "prereqs.js lesson data (lf-algebra block; chartWide)"
+      },
+      {
+        "key": "role:word-problems",
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "CLAUDE.md (fact layouts are for fact skills); mixed-pages lane",
+        "why": "no stories: these skills are not word problems (default provider)"
+      },
+      {
+        "key": "role:fact-rows",
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "CLAUDE.md (fact layouts are for fact skills); mixed-pages lane",
+        "why": "not a fact skill: the 5-10 column fact layouts are for fact and operations skills"
+      },
+      {
+        "key": "role:mixed-practice",
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "CLAUDE.md (fact layouts are for fact skills); mixed-pages lane",
+        "why": "graded on the mixed-pages card, not here"
+      }
+    ],
+    "hosts": [
+      {
+        "key": "host:practice-card",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the same kit cell, buttons / inputs >= 44 px"
+      },
+      {
+        "key": "host:online-worksheet",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the same kit cell"
+      },
+      {
+        "key": "host:quiz",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the same kit cell"
+      },
+      {
+        "key": "host:mode-dark",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the cell stays black on white inside its card"
+      },
+      {
+        "key": "host:mode-bigboard",
+        "d": "offered",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the same cell, scaled"
+      },
+      {
+        "key": "host:boss",
+        "d": "out of scope",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "game modes draw the practice card's cell; graded on the practice card"
+      },
+      {
+        "key": "host:race",
+        "d": "out of scope",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "as boss"
+      },
+      {
+        "key": "host:map",
+        "d": "out of scope",
+        "skills": [
+          "patterns:notice_patterns",
+          "patterns:pattern_features",
+          "patterns:growing_shape_patterns"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "MAP-style host graded on the MAP cards"
+      },
+      {
+        "key": "host:practice-card",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the same kit cell, buttons / inputs >= 44 px"
+      },
+      {
+        "key": "host:online-worksheet",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the same kit cell"
+      },
+      {
+        "key": "host:quiz",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the same kit cell"
+      },
+      {
+        "key": "host:mode-dark",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the cell stays black on white inside its card"
+      },
+      {
+        "key": "host:mode-bigboard",
+        "d": "offered",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "the same cell, scaled"
+      },
+      {
+        "key": "host:boss",
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "game modes draw the practice card's cell; graded on the practice card"
+      },
+      {
+        "key": "host:race",
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "as boss"
+      },
+      {
+        "key": "host:map",
+        "d": "out of scope",
+        "skills": [
+          "patterns:number_patterns_rule",
+          "patterns:follow_given_rule"
+        ],
+        "proposed": false,
+        "source": "brief: the three screen hosts",
+        "why": "MAP-style host graded on the MAP cards"
+      }
+    ]
+  }
+}
