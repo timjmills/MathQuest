@@ -180,6 +180,13 @@ export function turnRender(p, ctx) {
             + `<div style="margin-top:${g.em(p.type === 'known' ? 1.5 : 3)};display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">`
             + `<div>${factLine(g, f1, at)}</div><div style="visibility:${showF2 ? 'visible' : 'hidden'}">${factLine(g, f2, at)}</div></div>`;
     }
+    // (lane lf-ops, CL-40: a pictured array's first dot reached 4.6 mm across, 4.5 mm down - inside the number tab's
+    // keep-out - at M and L. The pair stands on one base line, so the FIRST array's top-left dot is at the cell's top
+    // only when that array is the taller one (rows >= its row length) and the pair spans the column; then, on paper,
+    // the drawing starts below the keep-out (--ws-koin, the kit's CL-40 edge). A split array is one array: always.)
+    const colW = Number(ctx.columns) > 0 ? 186 / Number(ctx.columns) - 6 : 0;
+    const firstTall = p.type === 'split' || N(p.rows) >= N(p.cols);
+    if (geom.pictures && !g.twin && colW && colW - geom.wMm < 7 && firstTall) inner = `<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>${inner}`;
     return root(g, 'arrays-turn', inner, 'text-align:center;width:100%;', turnFootprint(p, ctx).wMm);
 }
 

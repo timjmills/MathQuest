@@ -481,6 +481,9 @@ function opsTablesLessons() {
                 why: 'The one idea pupils lose is that the turn keeps the product (they recount); a short chant said at step 5 is the check.',
             },
             example: { match: 'Turn the array' },
+            // (an array and its turn side by side is wider than half the page at L: the chart's panels and the Guided
+            // problems take full-width rows, as the count rows do)
+            chartWide: true, guidedRows: 2,
             mixWith: [{ key: 'multiplication:arrays_groups', opts: { forms: [0] } }, { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }],
         },
     };

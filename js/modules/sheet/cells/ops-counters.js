@@ -139,7 +139,7 @@ function arraysPicture(g, p) {
                 body += dot(ox + pad + r + off + inLine * pitch, oy + pad + r + line * pitch, r, false);
             }
         }
-        return { svg: svgMm(g, W, H, body, `${rows} groups`), wMm: W };
+        return { svg: svgMm(g, W, H, body, `${rows} groups`), wMm: W, hMm: H };
     }
     if (p.kind === 'frame' || p.kind === 'count_all') {
         // dot_array_mult (owner 2026-10-09): a much smaller array, so 8 / 6 / 4-6 cells fill a page
@@ -150,14 +150,28 @@ function arraysPicture(g, p) {
         const W0 = at(cols - 1) + dd + 2 * m0, H0 = at(rows - 1) + dd + 2 * m0;
         let b = '';
         for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) b += dot(m0 + rr + at(j), m0 + rr + at(i), rr, false);
-        return { svg: svgMm(g, W0, H0, b, 'array of dots'), wMm: W0 };
+        return { svg: svgMm(g, W0, H0, b, 'array of dots'), wMm: W0, hMm: H0 };
     }
     // The picture is as wide as its dots (wave 1 lane D round 4, D2): a half pitch of white on each
     // side made a 3 x 10 array 90 mm at L, too wide for a 2-column cell, so it took a full row.
     const m = 0.2;
     const W = (cols - 1) * pitch + d + 2 * m, H = (rows - 1) * pitch + d + 2 * m;
     for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) body += dot(m + r + j * pitch, m + r + i * pitch, r, false);
-    return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W };
+    return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W, hMm: H };
+}
+
+/**
+ * arrays_groups (lane lf-ops 2026-11-07, print-lint H13-ROW at L / M): on a page that MIXES arrays and ringed groups
+ * (payload `picBox`, set by the generator when both kinds are dealt) the pictures stand in ONE picture box per size - as tall as the tallest picture the skill deals (5 rows / 5 groups of 5, the 2.OA.4
+ * band) - each picture centred in it, so a short array beside five rings never leaves a row sized for the other.
+ */
+const SENTENCE_KINDS = ['write_mult', 'equal_groups'];
+const _picBoxH = {};
+function pictureBoxH(g) {
+    if (_picBoxH[g.size] !== undefined) return _picBoxH[g.size];
+    let h = 0;
+    for (const kind of SENTENCE_KINDS) for (let rows = 2; rows <= 5; rows++) for (let cols = 2; cols <= 5; cols++) h = Math.max(h, arraysPicture(g, { kind, rows, cols }).hMm);
+    return (_picBoxH[g.size] = h);
 }
 
 /** One answer box: count_all (the pupil counts) and frame (the rows and columns are given). */
@@ -195,7 +209,15 @@ register('arrays', {
         // the twin draws the picture alone; the count-all box is the one answer (SL-7).
         const showSentence = !g.twin || oneBox(p);
         const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1 }) : '';
-        return root(g, 'arrays', `${pic.svg}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
+        // (lane lf-ops: on paper the rows-of / groups-of picture sits in the skill's one picture box, below the number
+        // tab's keep-out - CL-40: a wide ring row reached 4.7 mm across, 3.5 mm down at M - a fixed spacer of
+        // (tab side - 2 mm), as the kit's counters and remainder cells take)
+        const boxed = !g.twin && SENTENCE_KINDS.includes(p.kind) && Number(p.rows) <= 5 && Number(p.cols) <= 5;
+        const spacer = boxed ? '<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>' : '';
+        const picHtml = boxed && p.picBox
+            ? `${spacer}<div style="height:${g.em(pictureBoxH(g))};display:flex;align-items:center;justify-content:center">${pic.svg}</div>`
+            : `${spacer}${pic.svg}`;
+        return root(g, 'arrays', `${picHtml}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
         const k = arraysKey(p);
