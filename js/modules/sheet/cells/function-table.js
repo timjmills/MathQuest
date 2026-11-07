@@ -197,7 +197,9 @@ function dims(p, g) {
     const maxDigits = Math.max(2, ...vals.map((v) => String(v).length));
     // the key writes in bold (wider figures): room for them plus air on both sides
     const boxW = Math.max((BOX_MIN_MM[g.size] || 14) + (g.size === 'L' ? 1 : 0), maxDigits * digitMm * 1.05 + 4);
-    const boxH = g.writeMm + 1;
+    // (lf-algebra r1) on screen a box is at least 1.25 em tall, so it stays a >= 44 px target when the drawing scales down
+    // to a phone card or the online worksheet (render-gate measured 42-43 px)
+    const boxH = g.screen ? Math.max(g.writeMm + 1, 1.25 * g.E) : g.writeMm + 1;
     const colW = Math.max(boxW + 4, 16);
     // The rule column (task 'outputs' with the frame): "12 × 2 + 1" at the text size.
     const textMm = g.pt * g.textEm * PT_MM;              // one em of the text size, in mm

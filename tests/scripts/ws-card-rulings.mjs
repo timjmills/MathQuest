@@ -145,7 +145,7 @@ export function itemPasses(r, x) {
 const fmtItem = (x) => `${x.a} ${x.op || '−'} ${x.b} = ${x.ans}${x.boxes != null ? ` [${x.boxes} boxes]` : ''}`;
 
 /** {a, b, ans, boxes, op} from a generated question, or null. */
-export function readItem(q) {
+export function readItem(q, { listAns = false } = {}) {
     if (!q) return null;
     const p = q.cell && q.cell.payload;
     let a, b, op;
@@ -160,7 +160,8 @@ export function readItem(q) {
     const one = String(q.ans).replace(/(\d),(\d{3})(?!\d)/g, '$1$2');
     const ans = /^\s*-?\d+(\.\d+)?\s*$/.test(one) ? Number(one) : NaN;
     if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
-    if (!Number.isFinite(ans) && !(Number.isFinite(q.a) && Number.isFinite(q.b))) return null;
+    // (only the rulings check reads such items: ws-dealer-uniform, which deals operands evenly, keeps a numeric answer)
+    if (!Number.isFinite(ans) && !(listAns && Number.isFinite(q.a) && Number.isFinite(q.b))) return null;
     return { a, b, ans, op, boxes: p && p.ansDigits != null ? +p.ansDigits : null };
 }
 
@@ -183,7 +184,8 @@ function selfTest() {
     const it = readItem({ text: '4,367 − 2,244 = ?', ans: 2123 });
     t(it && it.a === 4367 && it.b === 2244, 'readItem from comma text');
     t(readItem({ cell: { payload: { operands: [57, 23], op: '-', ansDigits: 2 } }, ans: 34 }).boxes === 2, 'readItem boxes');
-    t(readItem({ a: 20, b: 4, ans: '8, 12, 16' }).a === 20 && Number.isNaN(readItem({ a: 20, b: 4, ans: '8, 12, 16' }).ans), 'readItem list answer: a / b read, ans NaN');
+    t(readItem({ a: 20, b: 4, ans: '8, 12, 16' }, { listAns: true }).a === 20 && Number.isNaN(readItem({ a: 20, b: 4, ans: '8, 12, 16' }, { listAns: true }).ans), 'readItem list answer: a / b read, ans NaN');
+    t(readItem({ a: 20, b: 4, ans: '8, 12, 16' }) === null, 'readItem list answer without listAns: unreadable (dealer-uniform)');
     t(readItem({ text: 'Find the rule.', ans: '8, 12' }) === null, 'readItem list answer, no operands: unreadable');
     t(readItem({ text: '4,367 − 2,244 = ?', ans: '2,123' }).ans === 2123, 'readItem thousands-comma answer');
     const blk = parseRulings('x\n<!-- rulings\n{"v":1,"skills":["a:b"],"rulings":[{"assert":"range","of":"a","min":1,"max":9}],"notOffered":[{"option":"band"}]}\n-->\n', 'card.md');
@@ -277,7 +279,7 @@ async function main() {
                 for (let i = 0; i < N; i++) {
                     let q = null;
                     try { q = app.gq.generateQuestionFor({ category, skill, opts: r.opts || undefined, seed: (fnv(`${key}:${JSON.stringify(r.opts || {})}`) + i) >>> 0, itemIndex: i, itemCount: N }); } catch (e) { errors++; firstErr = firstErr || e.message; continue; }
-                    const x = readItem(q);
+                    const x = readItem(q, { listAns: true });
                     if (!x) { unread++; continue; }
                     items.push(x);
                 }
