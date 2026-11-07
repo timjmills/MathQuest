@@ -7590,7 +7590,12 @@
   "Y5.B12.S9": {
    "title": "Decimal sequences",
    "direct": [],
-   "partial": [],
+   "partial": [
+    {
+     "key": "patterns:pattern_features",
+     "missing": "features of a whole-number sequence that its rule does not state (odd and even, the ones digits); no decimal sequences"
+    }
+   ],
    "verdict": "gap",
    "missing": "no skill continues or finds the rule of decimal sequences (0.2, 0.4, 0.6; 1.5, 1.25, 1.0)",
    "build": [
@@ -9022,7 +9027,12 @@
     "block": null,
     "power": false
    },
-   "direct": [],
+   "direct": [
+    {
+     "key": "patterns:growing_shape_patterns",
+     "why": "Terms 1 to 3 of a growing pattern of dots or squares; the pupil draws Term 4 and writes how many it has (harder tasks: the rule, and Term 10)"
+    }
+   ],
    "partial": [
     {
      "key": "patterns:number_patterns_rule",
@@ -9037,11 +9047,9 @@
      "missing": "the number sequence of a growing pattern (find and continue the +3 rule); no pictured shapes that grow, and no drawing of the next term"
     }
    ],
-   "verdict": "partial",
-   "missing": "a pictured growing pattern of dots or squares: draw the next term and count it",
-   "build": [
-    "growing_shape_patterns"
-   ],
+   "verdict": "direct",
+   "missing": "",
+   "build": [],
    "pre": [
     {
      "key": "patterns:shape_pattern",
@@ -9083,19 +9091,13 @@
       ]
      },
      "why": "term number in, number of squares out: the same growing rule as an In/Out table"
+    },
+    {
+     "key": "patterns:pattern_features",
+     "why": "what else a number pattern shows (odd and even, the ones digits): the same standard, 4.OA.C.5"
     }
    ],
-   "note": "Domain-test build lesson (W09, OA unit; intervention track W09, standard W10).",
-   "envision": [
-    {
-     "proposal": "growing_shape_patterns",
-     "name": "Growing Shape Patterns",
-     "kind": "new skill patterns:growing_shape_patterns",
-     "teaches": "drawing the next term of a growing pattern of dots or squares (1, 3, 5 …), counting each term and writing the number sequence and its rule",
-     "closes": "a pictured growing pattern of dots or squares: draw the next term and count it",
-     "representation": "one boxed cell: three pictured terms (dots or squares) in boxes, an empty box to draw term 4, a count row under the terms"
-    }
-   ]
+   "note": "Domain-test build lesson (W09, OA unit; intervention track W09, standard W10)."
   },
   "G4|-|findemergentfeaturesegunitsdigitcycle": {
    "title": "Find emergent features (e.g., units digit cycle)",
@@ -9114,7 +9116,12 @@
     "block": "Y5.B3",
     "power": false
    },
-   "direct": [],
+   "direct": [
+    {
+     "key": "patterns:pattern_features",
+     "why": "a rule (start 5, add 5) and its numbers; the pupil checks the one true sentence about what the rule does not say: the numbers go odd, even, odd, even; every number is even; the ones digits repeat 5, 0"
+    }
+   ],
    "partial": [
     {
      "key": "patterns:number_patterns_rule",
@@ -9130,11 +9137,9 @@
      "missing": "finds and continues the rule; never asks what else the pattern shows (the terms alternate odd and even, the ones digit repeats 5, 0, 5, 0)"
     }
    ],
-   "verdict": "partial",
-   "missing": "naming a feature of the pattern that the rule does not state (odd / even alternation, a repeating ones digit) and explaining it",
-   "build": [
-    "patterns_notice"
-   ],
+   "verdict": "direct",
+   "missing": "",
+   "build": [],
    "pre": [
     {
      "key": "composing:odd_even",
@@ -9153,6 +9158,13 @@
       "band": 50
      },
      "why": "Y1.B9.S1 Count in 2s (lower grade, same idea; this option skip counts in 2s, 5s and 10s)"
+    },
+    {
+     "key": "patterns:notice_patterns",
+     "opts": {
+      "patTask": "parity"
+     },
+     "why": "G3 Patterns on the multiplication table (the year before): even and odd products"
     }
    ],
    "preBuild": [],
@@ -9160,19 +9172,13 @@
     {
      "key": "patterns:pattern_relationship",
      "why": "two patterns side by side and what links them: the next idea after one pattern's features"
+    },
+    {
+     "key": "patterns:growing_shape_patterns",
+     "why": "a shape pattern grown by a rule: the same standard (4.OA.C.5), the next lesson in the unit"
     }
    ],
-   "note": "Awsaj supplement lesson in Y5.B3 (Multiplication and division A), W09.",
-   "envision": [
-    {
-     "proposal": "patterns_notice",
-     "name": "What Do You Notice?",
-     "kind": "new skill patterns:notice_patterns",
-     "teaches": "identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)",
-     "closes": "naming a feature of the pattern that the rule does not state (odd / even alternation, a repeating ones digit) and explaining it",
-     "representation": "one boxed cell: a pattern row or a times-table strip, a \"what do you notice?\" sentence frame with a word bank (odd, even, ones digit, repeats) and a …"
-    }
-   ]
+   "note": "Awsaj supplement lesson in Y5.B3 (Multiplication and division A), W09."
   },
   "G4|-|followagivenruletoextendanumberpattern": {
    "title": "Follow a given rule to extend a number pattern",
@@ -12448,79 +12454,6 @@
    ],
    "closes": {
     "G4|-|multiplyanddividemultiplesof10usingbasicfactseg90x5030030": "a multiple of ten times a multiple of ten (90 × 50) and dividing multiples of ten with a basic fact (300 ÷ 30, 2,400 ÷ 6)"
-   }
-  },
-  "growing_shape_patterns": {
-   "kind": "new",
-   "skill": "patterns:growing_shape_patterns",
-   "name": "Growing Shape Patterns",
-   "teaches": "drawing the next term of a growing pattern of dots or squares (1, 3, 5 …), counting each term and writing the number sequence and its rule",
-   "representation": "one boxed cell: three pictured terms (dots or squares) in boxes, an empty box to draw term 4, a count row under the terms",
-   "family": "patterns",
-   "ccss": [
-    "4.OA.C.5"
-   ],
-   "why": "patterns:shape_pattern deals repeating patterns only (AB, ABC); no skill pictures a pattern that grows",
-   "steps": [],
-   "reused": false,
-   "lessons": [
-    "G4|-|extendgrowingshapepatterns"
-   ],
-   "closes": {
-    "G4|-|extendgrowingshapepatterns": "a pictured growing pattern of dots or squares: draw the next term and count it"
-   }
-  },
-  "patterns_notice": {
-   "kind": "new",
-   "skill": "patterns:notice_patterns",
-   "name": "What Do You Notice?",
-   "grade": "3-4",
-   "family": "algebra",
-   "standards": [
-    "3.OA.D.9",
-    "4.OA.C.5"
-   ],
-   "ee": [
-    "M.EE.3.OA.8",
-    "M.EE.4.OA.5"
-   ],
-   "teaches": "identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)",
-   "problemTypes": [
-    "shade the pattern in the table, tick what you notice",
-    "true or false: every product in the 5 row ends in 0 or 5",
-    "generate the terms, then say what alternates",
-    "why is 4 × n always even? (reason bank)",
-    "predict the 10th term"
-   ],
-   "templates": [
-    "mult-grid",
-    "count-row"
-   ],
-   "newTemplates": [],
-   "answer": "tick statements from a bank; write terms",
-   "ladder": "O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track",
-   "misconceptions": [
-    "a pattern seen in three terms always continues",
-    "odd × odd is even"
-   ],
-   "wrmSteps": [
-    "Y3.B3.S13",
-    "Y4.B4.S15"
-   ],
-   "after": [],
-   "steps": [],
-   "reused": true,
-   "source": "STANDARD_PROPOSALS",
-   "representation": "one boxed cell: a pattern row or a times-table strip, a \"what do you notice?\" sentence frame with a word bank (odd, even, ones digit, repeats) and a check-box choice",
-   "correctionWhy": "representation written in our boxed-cell terms (the build-list entry names templates only)",
-   "corrected": [
-    "representation"
-   ],
-   "lessons": [
-    "G4|-|findemergentfeaturesegunitsdigitcycle"
-   ],
-   "closes": {
-    "G4|-|findemergentfeaturesegunitsdigitcycle": "naming a feature of the pattern that the rule does not state (odd / even alternation, a repeating ones digit) and explaining it"
    }
   },
   "comparison_statements": {

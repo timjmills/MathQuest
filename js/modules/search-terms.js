@@ -340,6 +340,9 @@ export const CONCEPT_RULES = [
     [/number_sense_all|mixed_number_sense/, ['rounding', 'estimate', 'strategies']],
     [/estimate_sum|estimate_diff|estimate_sums/, ['addition', 'subtraction']], [/estimate_products/, ['multiplication']],
     [/estimate_quotient/, ['division']],
+    [/^patterns:notice_patterns$/, ['patterns', 'odd_even', 'times_tables']],
+    [/^patterns:growing_shape_patterns$/, ['patterns']],
+    [/^patterns:pattern_features$/, ['patterns', 'odd_even']],
 ];
 
 /* ================================================================= hand-written terms */
@@ -643,6 +646,9 @@ export const SKILL_TERMS = {
     'order_of_operations:exponents_simple': ['square numbers', 'square number', 'squared', 'cube numbers', 'cubed', 'powers'],
     'area_perimeter:composite_shapes': ['compound shapes', 'composite shapes', 'rectilinear shapes', 'l shapes', 'compound area', 'compound perimeter'],
     'decimals:decimal_nl_drag': ['decimals', 'decimal place value', 'tenths and hundredths', 'decimals on a number line'],
+    'patterns:notice_patterns': ['what do you notice', 'notice patterns', 'even or odd product', 'is the product even or odd', 'odd times odd', 'even times odd', 'patterns in the multiplication table', 'times table patterns', 'true or false times table', 'explain a pattern', '4 times a number is always even', 'ones digit pattern'],
+    'patterns:growing_shape_patterns': ['growing pattern', 'growing patterns', 'growing shape pattern', 'shape pattern that grows', 'next term', 'draw the next term', 'term 4', 'term 10', 'dot pattern', 'square pattern', 'visual pattern', 'pattern rule add 2'],
+    'patterns:pattern_features': ['pattern features', 'features of a pattern', 'emergent features', 'units digit cycle', 'ones digit repeats', 'odd even alternate', 'alternates odd and even', 'what else does the pattern show', 'start at 5 add 5'],
 };
 
 /* ================================================================= misspellings */

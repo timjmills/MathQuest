@@ -269,6 +269,13 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'read-ruler': 'Read the ruler. Write the number the arrow points to.',
     'add-sides': 'Add the lengths of all the sides. Write the perimeter.',
     tally: 'Use the tally chart. Answer the questions.',
+    // lane lf-algebra (2026-11-07), APPEND ONLY: notice_patterns (the notice cell) and growing_shape_patterns.
+    'product-even-odd': 'Is the product even or odd? Circle one.',
+    'pattern-true-one': 'Read the pattern. Check the sentence that is true.',
+    'row-true-false': 'Read the sentence. Circle True or False.',
+    'grow-next': 'Draw Term 4. Write how many it has.',
+    'grow-rule': 'Draw Term 4. Write how many it has. Write the rule.',
+    'grow-far': 'Find the rule. Write how many Term 10 has.',
     // The five the DEFAULT ADAPTER may choose from, and nothing else (section 4.5).
     'default-write': 'Solve. Write the answer.',
     'default-circle': 'Circle the answer.',
@@ -326,6 +333,9 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Mark the number with a dot', 'Tap the line to place the number'],
     ['Shade the fraction', 'Tap the parts of the fraction'],
     ['Draw the hands', 'Drag the hands'],
+    // lane lf-algebra (2026-11-07): the growing pattern's Term 4 is made on a tap grid; the notice cell's sentence list
+    ['Draw Term 4', 'Make Term 4 on the grid'],
+    ['Check the sentence that is true', 'Tap the sentence that is true'],
     // round 4 (H7): the paper verbs the screen sweep (ws-screen-slots) still found
     ['Draw the lines of symmetry', 'Tap the lines of symmetry'],
     ['Draw disks to show', 'Tap the mat to show'],

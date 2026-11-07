@@ -22,9 +22,9 @@ Sources:
 ## Summary
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
-- Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
+- Covered 513 (59%), partial only 150 (17%), gap 209 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 397 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 400 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -33,9 +33,9 @@ Sources:
 | Year 2 | 1 | 11 | 124 | 80 (65%) | 18 | 26 |
 | Year 3 | 2 | 12 | 134 | 78 (58%) | 24 | 32 |
 | Year 4 | 3 | 14 | 129 | 81 (63%) | 18 | 30 |
-| Year 5 | 4 | 15 | 136 | 81 (60%) | 22 | 33 |
+| Year 5 | 4 | 15 | 136 | 81 (60%) | 23 | 32 |
 | Year 6 | 5 | 13 | 114 | 63 (55%) | 15 | 36 |
-| **All** | | **97** | **872** | **513 (59%)** | **149** | **210** |
+| **All** | | **97** | **872** | **513 (59%)** | **150** | **209** |
 
 ## Source disagreements
 
@@ -2529,6 +2529,7 @@ whatever happens to the WRM gaps.
 - **Y4.B4.S6** The 3, 6 and 9 times-tables — PARTIAL. _3.OA.C.7, 3.OA.D.9, M.EE.3.OA.6, M.EE.3.OA.8_  
   Partial: Multiplication Chart (Visual) (`multiplication:mult_chart`), missing the links between the 3, 6 and 9 tables  
   Partial: Multiplication Chart: Find the Pattern in a Row (`multiplication:mult_chart_pattern`), missing the links between the 3, 6 and 9 tables  
+  Partial: What Do You Notice? Even and Odd Products, Pattern Features (`patterns:notice_patterns`), missing the patterns in the times-tables: even and odd products, the ones digits (not the 3, 6, 9 doubling link)  
   Proposal: Related Times-Tables  
   Vocabulary: multiple, double, treble  
 - **Y4.B4.S7** Multiply and divide by 7 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
@@ -3285,7 +3286,8 @@ whatever happens to the WRM gaps.
 - **Y5.B12.S8** Efficient strategies for adding and subtracting decimals — GAP. _4.NBT.B.4, 5.NBT.B.7, M.EE.4.NBT.4, M.EE.5.NBT.7_  
   Proposal: Decimals from Known Facts  
   Vocabulary: efficient, strategy, adjust, compensate  
-- **Y5.B12.S9** Decimal sequences — GAP. _4.OA.C.5, 5.NBT.B.7, M.EE.4.OA.5, M.EE.5.NBT.7_  
+- **Y5.B12.S9** Decimal sequences — PARTIAL. _4.OA.C.5, 5.NBT.B.7, M.EE.4.OA.5, M.EE.5.NBT.7_  
+  Partial: Features of a Number Pattern: Odd, Even and Ones Digits (`patterns:pattern_features`), missing features of a sequence that its rule does not state (odd / even, the ones digits), with whole numbers, not decimals  
   Proposal: Decimal Sequences  
   Vocabulary: sequence, term, rule, increasing, decreasing  
 - **Y5.B12.S10** Multiply by 10, 100 and 1,000 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  
@@ -3566,6 +3568,7 @@ whatever happens to the WRM gaps.
 
 - **Y6.B7.S1** 1-step function machines — covered. _5.OA.A.2_  
   Skills: Function Tables - Easy (Visual) (`algebra:function_table_easy`)  
+  Partial: Growing Shape Patterns: Draw and Count the Next Term (`patterns:growing_shape_patterns`), missing the one-step rule of a growing pattern of shapes (term 4, term 10), not yet the rule in words for any term  
   Vocabulary: input, output, function  
 - **Y6.B7.S2** 2-step function machines — PARTIAL. _5.OA.A.2_  
   Partial: Function Tables - Hard (Visual) (`algebra:function_table_hard`), missing two operations in sequence and working backwards  

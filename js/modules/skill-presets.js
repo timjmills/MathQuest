@@ -157,6 +157,7 @@ export const SKILL_PRESETS = Object.freeze({
     // 2026-10-31 (owner, facts card Q4): the long-division bracket on division facts is its own lesson; the
     // fraction form stays an option.
     'division:div_facts_long': { skill: 'div_facts', opts: { divForm: 'long' } },
+    'patterns:pattern_features': { skill: 'notice_patterns', opts: { patTask: 'feature' } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

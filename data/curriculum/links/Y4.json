@@ -2596,6 +2596,14 @@
        9
       ]
      }
+    },
+    {
+     "key": "patterns:notice_patterns",
+     "opts": {
+      "patTask": "truefalse",
+      "band": 100
+     },
+     "missing": "tests a sentence about one times-table (every product even, odd and even in turn, the ones digits); never asks the link between the 3, 6 and 9 tables (doubling, tripling)"
     }
    ],
    "verdict": "partial",
@@ -10008,54 +10016,6 @@
    "reused": true,
    "source": "WRM_PROPOSALS"
   },
-  "patterns_notice": {
-   "after": [],
-   "answer": "tick statements from a bank; write terms",
-   "closes": {
-    "G3|-|patternsonthemultiplicationtable": "explaining the patterns of the multiplication table with the properties of multiplication: the table is the same on both sides of its diagonal (3 × 7 = 7 × 3), an even factor makes an even product (4 × a number is always even: it is double 2 × that number), the 9s go up one ten and down one one"
-   },
-   "ee": [
-    "M.EE.3.OA.8",
-    "M.EE.4.OA.5"
-   ],
-   "family": "algebra",
-   "grade": "3-4",
-   "kind": "new",
-   "ladder": "O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track",
-   "lessons": [
-    "G3|-|patternsonthemultiplicationtable"
-   ],
-   "misconceptions": [
-    "a pattern seen in three terms always continues",
-    "odd × odd is even"
-   ],
-   "name": "What Do You Notice?",
-   "newTemplates": [],
-   "problemTypes": [
-    "shade the pattern in the table, tick what you notice",
-    "true or false: every product in the 5 row ends in 0 or 5",
-    "generate the terms, then say what alternates",
-    "why is 4 × n always even? (reason bank)",
-    "predict the 10th term"
-   ],
-   "reused": true,
-   "skill": "patterns:notice_patterns",
-   "source": "STANDARD_PROPOSALS",
-   "standards": [
-    "3.OA.D.9",
-    "4.OA.C.5"
-   ],
-   "steps": [],
-   "teaches": "identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even)",
-   "templates": [
-    "mult-grid",
-    "count-row"
-   ],
-   "wrmSteps": [
-    "Y3.B3.S13",
-    "Y4.B4.S15"
-   ]
-  },
   "multi_step_four_ops": {
    "after": [],
    "also": [
@@ -12344,7 +12304,15 @@
     "block": "Y4.B4",
     "power": true
    },
-   "direct": [],
+   "direct": [
+    {
+     "key": "patterns:notice_patterns",
+     "opts": {
+      "patTask": "parity"
+     },
+     "why": "is the product of a fact even or odd, decided from its factors (an even factor makes an even product; odd x odd is odd); the same skill's True or False task tests a sentence about one times-table (the 5s end in 0 or 5, the 9s' ones digits go down by 1). The turn-around across the diagonal is mult_properties."
+    }
+   ],
    "partial": [
     {
      "key": "multiplication:mult_chart",
@@ -12361,11 +12329,9 @@
      "missing": "shades every even product in a window of the chart; never asks which factors make an even product or why"
     }
    ],
-   "verdict": "partial",
-   "missing": "explaining the patterns of the multiplication table with the properties of multiplication: the table is the same on both sides of its diagonal (3 × 7 = 7 × 3), an even factor makes an even product (4 × a number is always even: it is double 2 × that number), the 9s go up one ten and down one one",
-   "build": [
-    "patterns_notice"
-   ],
+   "verdict": "direct",
+   "missing": "",
+   "build": [],
    "pre": [
     {
      "key": "multiplication:count_by_tables",
@@ -12393,6 +12359,10 @@
       ]
      },
      "why": "Y4.B4.S8 7 times-table and division facts (taught earlier this year, wk W03): the 7 times-table facts"
+    },
+    {
+     "key": "composing:odd_even",
+     "why": "Y2.B5.S12 Odd and even numbers (lower grade): is a number odd or even"
     }
    ],
    "preBuild": [],
@@ -12403,17 +12373,7 @@
     }
    ],
    "note": "Awsaj supplement lesson, W05-W06, 3.OA.C.7 and 3.OA.D.9, block Y4.B4. Y4.B4.S6 \"The 3, 6 and 9 times-tables\" (W02) uses the lesson's own mult_chart key, so it is not listed as a pre (one key, one role). mult_chart finds a pattern but never explains it, which is the core of 3.OA.D.9 (\"observe that 4 times a number is always even, and explain why\").",
-   "rule5": "Searched skill-options.js and the generators for an item that explains a multiplication-table pattern: mult_chart tasks fill / headers / shade / pattern / even (none asks why), mult_chart_easy (the same tasks), mult_properties forms 0-3 (one property at a time, never read off the table), count_by_tables, number_patterns_rule (sequences, not the table). None explains a pattern; patterns_notice (STANDARD_PROPOSALS) is the build.",
-   "envision": [
-    {
-     "proposal": "patterns_notice",
-     "name": "What Do You Notice?",
-     "kind": "new skill patterns:notice_patterns",
-     "teaches": "identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even",
-     "closes": "explaining the patterns of the multiplication table with the properties of multiplication: the table is the same on both sides of its diagonal (3 × 7 = 7 × 3), an even factor makes an even product (4 × a number is always even: it is double 2 × that number), the 9s go up one ten and down one one",
-     "representation": "one boxed cell: a window of the multiplication table with a pattern shaded, the question \"What do you notice? Why?\" and a sentence frame with a property …"
-    }
-   ]
+   "rule5": "Searched skill-options.js and the generators for an item that explains a multiplication-table pattern: mult_chart tasks fill / headers / shade / pattern / even (none asks why), mult_chart_easy (the same tasks), mult_properties forms 0-3 (one property at a time, never read off the table), count_by_tables, number_patterns_rule (sequences, not the table). None explains a pattern; patterns_notice (STANDARD_PROPOSALS) is the build."
   },
   "G3|-|propertiesofmultiplicationcommutativeidentityanddistributive": {
    "title": "Properties of multiplication: commutative, identity and distributive",

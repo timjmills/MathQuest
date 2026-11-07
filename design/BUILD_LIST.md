@@ -19,9 +19,9 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 
 ## Summary
 
-- 277 entries: **133 new skills, 88 new options, 2 repairs**, and **54 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 29 option, 1 skill, 6 migration, 1 band).
+- 277 entries: **132 new skills, 89 new options, 2 repairs**, and **54 added from the visual catalogue** (1 wiring, 10 template, 6 pane, 29 option, 1 skill, 6 migration, 1 band).
 - 162 from the White Rose audit (42 extended for standards), 61 from the standards audit.
-- They close 113 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
+- They close 112 CCSS leaves and parts and 36 Essential Elements that are not FULL today, and every White Rose small step without a full-coverage skill.
 - The visual catalogue: 210 representations (MATCH 6, PARTIAL 103, GAP 101); every PARTIAL and GAP one is on an entry below.
 - 30 new sheet-kit templates and panes are needed; each is owned by one lane.
 - Lanes `k2` and `operations` were already building from this list: their entries keep their order and names, and the catalogue's entries are APPENDED after them.
@@ -31,7 +31,7 @@ FULL in `standards-audit.js`, and delete the entry (the WRM gate and `ws-standar
 | Counting and early number (K-1 pictures) (`k2`) | 35 | 16 | 7 | 0 | 12 | 20 | 34 | 55 | 454 |
 | Operations (+ − × ÷, facts, multi-digit, integers arithmetic) (`operations`) | 42 | 19 | 10 | 1 | 12 | 21 | 50 | 35 | 316 |
 | Place value, rounding and estimation (the pv kit) (`placevalue`) | 21 | 4 | 8 | 0 | 9 | 8 | 36 | 23 | 327 |
-| Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 14 | 10 | 0 | 4 | 18 | 20 | 17 | 104 |
+| Patterns, algebra, order of operations, strategies (gen-algebraic) (`algebra`) | 28 | 13 | 11 | 0 | 4 | 17 | 20 | 17 | 104 |
 | Fractions, decimals, conversions, ratio (`fractions`) | 45 | 17 | 21 | 0 | 7 | 19 | 49 | 23 | 233 |
 | Geometry, area, volume, coordinates (`geometry`) | 46 | 30 | 12 | 1 | 3 | 35 | 78 | 33 | 144 |
 | Measurement (length, mass, capacity, conversions) (`measurement`) | 23 | 12 | 9 | 0 | 2 | 14 | 34 | 11 | 74 |
@@ -1439,19 +1439,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 like terms → distributive → both · O3 substitution table → none · O6 plain.
 - **Misconceptions:** one value that works proves equivalence; 3y = y + 3.
 
-### 15. What Do You Notice? — `patterns_notice`
-
-- **What:** new skill `patterns:notice_patterns`. Grade 3-4 · family algebra · source standards audit.
-- **Closes (standards):** 3.OA.D.9, 4.OA.C.5 · tag with CCSS 3.OA.D.9, 4.OA.C.5, EE M.EE.3.OA.8, M.EE.4.OA.5
-- **Closes (White Rose steps):** none · strengthens Y3.B3.S13, Y4.B4.S15
-- **Teaches:** identifying arithmetic patterns in the addition and multiplication tables and in rule sequences, and explaining them with properties (4 × a number is always even; add 3 from 1 alternates odd, even).
-- **Problem types:** (1) shade the pattern in the table, tick what you notice; (2) true or false: every product in the 5 row ends in 0 or 5; (3) generate the terms, then say what alternates; (4) why is 4 × n always even? (reason bank); (5) predict the 10th term.
-- **Representation:** Templates: `mult-grid`, `count-row`.
-- **Answer:** tick statements from a bank; write terms.
-- **Ladder:** O2 addition table → multiplication table → rule sequences · O3 pattern shaded → none · O6 table / track.
-- **Misconceptions:** a pattern seen in three terms always continues; odd × odd is even.
-
-### 16. Compare Number Sentences — `compare_sentences`
+### 15. Compare Number Sentences — `compare_sentences`
 
 - **What:** new skill `algebra:compare_number_sentences`. Grade 1 · family operations · source White Rose audit.
 - **Closes (standards):** 1.OA.D.7 · tag with CCSS 1.OA.D.7, EE M.EE.1.OA.7
@@ -1463,7 +1451,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 one change → two changes · O3 matching parts linked → none · O6 plain.
 - **Misconceptions:** calculates every side; bigger first number means bigger.
 
-### 17. Count in 50s, 100s and 1,000s (option) — `count_50s`
+### 16. Count in 50s, 100s and 1,000s (option) — `count_50s`
 
 - **What:** option on `patterns:count_by_step_up`: steps 50, 100, 1,000. Grade 2-3 · family algebra · source White Rose audit.
 - **Closes (standards):** none not already full · tag with CCSS 2.NBT.A.1, 2.NBT.A.2, 4.NBT.A.1, 4.NBT.A.2, EE M.EE.2.NBT.1, M.EE.2.NBT.2, M.EE.4.NBT.2
@@ -1475,7 +1463,7 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Ladder:** O2 step 100 → 50 → 1,000, forwards then backwards · O3 base-10 picture above each term → none · O6 track / number line.
 - **Misconceptions:** changes the wrong digit (350 + 50 = 355); forgets the crossing of 1,000 (950, 1,000, 1,050).
 
-### 18. Formulae — `formulae`
+### 17. Formulae — `formulae`
 
 - **What:** new skill `algebra:use_formulae`. Grade 5 · family algebra · source White Rose audit.
 - **Closes (standards):** 6.EE.A.2c · tag with CCSS 5.OA.A.2, 6.EE.A.2c, EE -
@@ -1487,6 +1475,18 @@ Owns: `js/modules/gen-algebraic.js`, `js/modules/gen-function-table.js`, `js/mod
 - **Answer:** write the value.
 - **Ladder:** O2 one operation → two operations → brackets and powers (V = s³) · O3 substitution line printed (P = 2 × ( __ + __ )) → none · O6 formula in words / letters.
 - **Misconceptions:** adds instead of multiplying where letters touch (2l = 2 + l); ignores the brackets.
+
+### 18. Patterns in the Addition Table — `addition_table_patterns`
+
+- **What:** option on `patterns:notice_patterns`: patTask 'addtable': a window of the addition table; circle what you notice (each row goes up by 1; the sums on a diagonal are equal; even + even is even). Grade 3 · family algebra · source standards audit.
+- **Closes (standards):** 3.OA.D.9 · tag with CCSS 3.OA.D.9, EE M.EE.3.OA.8
+- **Closes (White Rose steps):** none
+- **Teaches:** identifying arithmetic patterns in the addition table and explaining them with properties (the turn-around: the table is the same on both sides of its diagonal; odd + odd is even).
+- **Problem types:** (1) a window of the addition table: true or false about it; (2) odd + odd: even or odd?; (3) which sums on the diagonal are equal?.
+- **Representation:** Templates: `notice`.
+- **Answer:** circle a word; check one sentence.
+- **Ladder:** O2 sums to 10 -> to 20 · O3 window shaded -> none · O6 table / plain.
+- **Misconceptions:** odd + odd is odd; a row pattern read off two cells.
 
 ### 19. Why Does It Work? — `explain_strategy`
 
@@ -1824,15 +1824,15 @@ Owns: `js/modules/gen-fractions.js`, `js/modules/sheet/cells/{frac-model,hundred
 - **Ladder:** O2 halves → thirds → quarters; draw the whole · O3 grid under the shape → none · O6 shapes / strips.
 - **Misconceptions:** counts parts without checking they are equal; thinks equal parts must look the same.
 
-### 18. Compare Fractions by Numerator (option) — `compare_numerator`
+### 18. Compare Fractions With the Same Numerator or Denominator (option) — `compare_numerator`
 
-- **What:** option on `fractions:compare`: same numerator. Grade 5 · family fractions · source White Rose audit.
+- **What:** option on `fractions:compare`: pairs "same numerator" | "same denominator". Grade 5 · family fractions · source White Rose audit.
 - **Closes (standards):** 3.NF.A.3d, M.EE.6.NS.1 · tag with CCSS 4.NF.A.2, 3.NF.A.3d, EE M.EE.4.NF.2, M.EE.6.NS.1
 - **Closes (White Rose steps):** Y6.B3.S4
-- **Teaches:** comparing and ordering fractions with the same numerator (3/5 > 3/7) and by denominators.
+- **Teaches:** comparing and ordering unit fractions (1/3 > 1/5) and two fractions that share a numerator (3/5 > 3/7) or a denominator (3/8 < 5/8), with bars of the same whole, and saying why.
 - **Extended for the standards:** Grade 3 same-numerator comparisons and unit fractions (1/3 vs 1/5) with models, for the EE.
 - **Problem types:** (1) same numerator: which is greater?; (2) unit fractions (1/3 vs 1/5, EE); (3) order by numerator; (4) same whole? can we compare?.
-- **Representation:** a comparison-type option on compare/order. Templates: `frac-model`, `compare`.
+- **Representation:** the existing compare cell with two bars of the same whole; the < > = answer box. Templates: `frac-model`, `compare`.
 - **Answer:** write <, > or =.
 - **Ladder:** O2 unit fractions → same numerator → mixed · O3 bars under each → none · O6 bars / circles.
 - **Misconceptions:** 1/5 > 1/3 because 5 > 3; compares fractions of different wholes.
