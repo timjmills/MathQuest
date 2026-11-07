@@ -324,7 +324,37 @@ function frameHTML(ctx, text, key, digits, ghostExpr = '') {
         const ghostPair = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:end;align-items:end;">`
             + `<span style="grid-area:1 / 1;${nb}">${piece(ctx, c)}</span>`
             + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;${nb}">${piece(ctx, ghostExpr)}</span></span>`;
-        const head = chunks.map((c) => (exprOnly && ghostExpr && c.includes(' ') ? ghostPair(c)
+        // lf-placevalue r2 (combine band=999999: "300,000 + 50,000 + 3,000 + 400 + 40 + 7" is wider than the page at L,
+        // even in one column): a section whose widest expression has six or more parts draws every expression on two
+        // fixed lines - the first half of the parts, then "+" opening the second half (a line never ends on a sign,
+        // WRAP-OP) - each line as wide as the same line of the widest expression, so every item keeps one geometry (F9)
+        // and the height never depends on the column width it is measured at.
+        const ghostNums = ghostExpr ? String(ghostExpr).trim().split(/\s+/).filter((w) => /^\d/.test(w)) : [];
+        const halves = (e, k) => {
+            const nums = String(e).trim().split(/\s+/).filter((w) => /^\d/.test(w));
+            return [nums.slice(0, k).join(' + '), nums.length > k ? '+ ' + nums.slice(k).join(' + ') : ''];
+        };
+        const splitPair = (c) => {
+            const k = Math.ceil(ghostNums.length / 2);
+            const [a, b] = halves(c, k);
+            const [ga, gb] = halves(ghostExpr, k);
+            const line = (v, g) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:end;align-items:end;">`
+                + `<span style="grid-area:1 / 1;${nb}">${v ? piece(ctx, v) : ''}</span>`
+                + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;${nb}">${piece(ctx, g)}</span></span>`;
+            return `${line(a, ga)}<span class="pv-break" style="flex-basis:100%;height:0;"></span>${line(b, gb)}`;
+        };
+        const split = exprOnly && ghostNums.length >= 6;
+        // (lf-placevalue r2: a cell drawn three or more across - Reason It's A / B panels - is narrower than "400 + 60 + 4":
+        // there the expression wraps between its units, "+ 60" opening the next line, never a line ending on a sign)
+        const units = (c) => {
+            const nums = String(c).trim().split(/\s+/).filter((w) => /^\d/.test(w));
+            return nums.map((v, i) => `<span class="pv-pair" style="${nb}">${piece(ctx, (i ? '+ ' : '') + v)}</span>`).join('');
+        };
+        if (exprOnly && Number(ctx.columns) >= 3) {
+            const head3 = chunks.map((c) => (c.includes(' ') ? units(c) : piece(ctx, c))).join('');
+            return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${head3}${grp}</div>`;
+        }
+        const head = chunks.map((c) => (exprOnly && ghostExpr && c.includes(' ') ? (split ? splitPair(c) : ghostPair(c))
             : c.includes(' ') ? `<span class="pv-pair" style="${nb}">${piece(ctx, c)}</span>` : piece(ctx, c))).join('');
         return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:${ghostExpr ? 1 : 2}mm;">${head}${grp}</div>`;
     }
@@ -378,7 +408,8 @@ function unitBlanksHTML(ctx, p, keys, floor) {
     // (a frame of four or more places, or expanded notation, may wrap between its units - one line is wider than the
     // page at L; a 3-place unit-form frame is one line, so a lesson anchor that scales its drawing to the panel scales it whole)
     // (a cell drawn three or more across - Reason It's A / B panels - is narrower than any 3-place row: it wraps too)
-    const narrow = Number(ctx.columns) >= 3;
+    // (lf-placevalue r2: and the opener's half-width Model cell, `wrapToCell`, measured wrapped there)
+    const narrow = Number(ctx.columns) >= 3 || !!ctx.wrapToCell;
     const wrap = p.oneLine || (parts.length - 1 < 4 && !/×/.test(String(p.frame || '')) && !narrow) ? 'nowrap;white-space:nowrap' : 'wrap';
     return `<div class="ws-eq pv-frame pv-blanks pv-hw" style="font-weight:700;flex-wrap:${wrap};justify-content:center;row-gap:2mm;column-gap:0.3em;">${units.join('')}</div>`;
 }
@@ -459,7 +490,9 @@ function expandHTML(p, ctx) {
     const digits = String(p.n).length;
     const boxes = parts.map((v, i) => blank({ id: `part${i}`, kind: 'number', shape: 'box', digits, graded: true, order: i,
         scopes: ['full', 'answer-only'] }, ctx, fmt(v)));
-    if (p.inPlace && (parts.length >= 4 || Number(ctx.columns) >= 3)) {
+    // (lf-placevalue r2: the opener's Model sits in the half-width Model cell, `wrapToCell` - there a 3-place row wraps too,
+    // between its units; it is measured wrapped in that cell, so the Model band is as tall as the drawing)
+    if (p.inPlace && (parts.length >= 4 || Number(ctx.columns) >= 3 || ctx.wrapToCell)) {
         // lf-placevalue r1 F19: a 4- or 5-place frame at L is wider than the page (13-16 mm out of its cell). The row may
         // wrap, only between its units: "4,230 =", the first box, then "+ [ ]" pairs - the sign starts its line and never
         // ends one (WRAP-OP), and a box never parts from its sign. A row that fits stays one line.
