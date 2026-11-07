@@ -436,6 +436,8 @@ export const LESSONS = Object.freeze({
         example: { match: 'place' },
         // The ring row of place names wraps in half the page: one panel a row, its step beside the drawing.
         chartWide: true, chartRow: true,
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
         mixWith: [{ key: 'placevalue:identify', opts: { band: 99 } }, { key: 'placevalue:more_less_10' }],
     },
     'placevalue:value': {
@@ -461,6 +463,8 @@ export const LESSONS = Object.freeze({
         chant: '',
         format: { kind: 'numbered steps with icons', why: 'The value is the place step plus one: the steps of identify, then multiply.' },
         example: { match: 'place' },
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
         mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
     },
     'placevalue:expand': {
@@ -488,6 +492,8 @@ export const LESSONS = Object.freeze({
         example: { match: 'place' },
         // The expanded-form row (288 = [ ] + [ ] + [ ]) is wider than half the page: one panel a row.
         chartWide: true,
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
         mixWith: [{ key: 'placevalue:value' }, { key: 'placevalue:more_less_10' }],
     },
     'placevalue:combine': {
@@ -517,6 +523,8 @@ export const LESSONS = Object.freeze({
         chartWide: true,
         // The closing step ("Read it: 464.") writes nothing new: it is the line under the panels.
         tailLast: true,
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
         mixWith: [{ key: 'placevalue:expand' }, { key: 'placevalue:more_less_10' }],
     },
     'placevalue:unit_form': {
@@ -544,6 +552,8 @@ export const LESSONS = Object.freeze({
         example: { match: 'hundreds' },
         // The unit-form frame (__ hundreds __ tens __ ones) is wider than half the page: one panel a row.
         chartWide: true,
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
         mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
     },
 });

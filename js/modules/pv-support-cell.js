@@ -57,7 +57,7 @@ export function placeChartHTML(n, { underline = 0, size = '1.9em' } = {}) {
     const s = String(Math.floor(Math.abs(Number(n) || 0)));
     const places = Array.from({ length: s.length }, (_, i) => 10 ** (s.length - 1 - i));
     const bd = `border:${HAIR_PT}pt solid #000;`;
-    const heads = places.map(p => `<td style="${bd}padding:0.15em 0.3em;font-size:0.36em;font-weight:700;text-align:center;`
+    const heads = places.map(p => `<td style="${bd}padding:0.15em 0.3em;font-size:max(0.36em, 8.5pt);font-weight:700;text-align:center;`
         + `line-height:1.2;white-space:normal;width:3.2em;">${PLACE_NAME[p] || fmt(p)}</td>`).join('');
     const digits = places.map((p, i) => `<td style="${bd}padding:0.05em 0.2em;text-align:center;line-height:1.15;">`
         + (p === underline

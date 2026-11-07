@@ -304,9 +304,15 @@ function frameHTML(ctx, text, key, digits) {
         // lf-placevalue (WRAP-OP, combine's lesson panels "400 + 60 + / 4 ="): an expression of numbers and
         // signs only never breaks; the whole of it goes with the slot. A row too wide for its column is then
         // measured as not fitting and the layout takes fewer columns (DN-10), never a broken expression.
+        // On a narrow screen the line may break only BEFORE "=": the expression is one group, "= ____" the other.
         const exprOnly = pre.length > 2 && pre.every((w) => /^\d[\d,.]*$|^[+−×÷=≈-]$/.test(w));
-        let lastN = exprOnly ? chunks.length : pre.length <= 2 ? chunks.length : Math.min(1, chunks.length);
-        if (lastN < chunks.length && /^[=≈]$/.test(chunks[chunks.length - lastN] || '')) lastN++;
+        if (exprOnly && /^[=≈]$/.test(chunks[chunks.length - 1] || '')) {
+            const eq = chunks.pop();
+            const expr = chunks.splice(0).join(' ');
+            chunks.push(expr, eq);
+        }
+        let lastN = exprOnly ? 1 : pre.length <= 2 ? chunks.length : Math.min(1, chunks.length);
+        if (!exprOnly && lastN < chunks.length && /^[=≈]$/.test(chunks[chunks.length - lastN] || '')) lastN++;
         const tail = chunks.splice(chunks.length - lastN).join(' ');
         const nb = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
         const grp = `<span class="pv-slotgroup" style="${nb}">${piece(ctx, tail)}${slot}${piece(ctx, parts[1])}</span>`;

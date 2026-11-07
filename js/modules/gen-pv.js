@@ -480,13 +480,11 @@ function genExpandCombine(q, skill, o) {
             setCell(q, { kind: 'blanks', n, frame: `${fmt(n)} = ${frameText}`, keys: ds.slice(), keyValue: q.ans, bigNumerals: true });
             return;
         }
-        q.text = `Write ${fmt(n)} in expanded form.`;
-        q.answerType = 'interactive';
-        q.interactiveType = 'expanded';
-        q.expandedNumber = n;
-        q.expandedDigits = ds.slice();
-        q.expandedValues = parts.slice();
-        q.expandedPlaceIdx = ds.map((_, i) => ds.length - 1 - i);
+        // lf-placevalue (ws-chromebook-fit, L5): the boxes ARE the inputs on every host - the kit cell's
+        // inline blanks, as the notation form does, never the legacy 'expanded' card (digit tiles naming
+        // each place over its box, no Check button). A part is accepted with or without its comma.
+        inlineBlanks(q, `${fmt(n)} = ${parts.map(() => '___').join(' + ')}`, [parts.map(fmt), parts.map(String)],
+            parts.map(() => Math.max(2, String(hi).length + 1)));
         q.ans = parts.map(fmt).join(' + ');
         q.printAnswer = q.ans;
         setCell(q, { kind: 'expand', n, parts, keyValue: q.ans });
