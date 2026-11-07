@@ -43,6 +43,11 @@ Critic rounds: 1, FAIL (all five; min 1 stretch, core 4-6)
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-07 lead rulings after r1: D1 lane owns the additive checks H13-ABS, WRONG-FITS per slot, GRID-EVEN all sections,
+  SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-verify bands (opt-in, precritic --skill only); precritic plan-from-card is lf-ops'
+  (fix4 branch, merge when it lands). D2 stretch: owner asked; carried "offered, not graded" (RUBRIC scope note), no re-sign.
+  D3 engine findings (F2 opener, F17 reason-it, F21 pagination: shared-roles lane, wave 2; F18 lesson half: lf-engine) are graded
+  in critic r2 but do not hold the pv skills. Two builders running: pv fixes (gen-pv / cells / provider) and the checks.
 - 2026-11-07 critic r1 (design/audit/runs/lf-placevalue/critic-r1.md): FAIL on identify, value, expand, combine, unit_form; 23 findings
   (F1 H13 empty bands, F3 wrongAnswer per slot, F4 writeValue missing, F5-F7 paper / screen parity and screen digits, F8 Size S on
   unit_form, F9 two geometries, F10 slot width, F11-F14 worked-step text, F2 / F17 / F18 / F21 engine roles). Rule-00 lists in
