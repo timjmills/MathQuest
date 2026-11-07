@@ -837,6 +837,7 @@ build_list() {
     browser_gate 1 "ws-detailed-lesson --check $lid" ws-detailed-lesson.cjs --lesson "$lid" --check --out "/tmp/mq-deploy-dl/$lid"
   done
   node_gate 1 "ws-lessons-first-queue --check" ws-lessons-first-queue.cjs --check
+  node_gate 1 "ws-lessons-first-queue --build-only --check" ws-lessons-first-queue.cjs --build-only --check
   browser_gate 1 ws-presets-unit ws-presets-unit.mjs
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
