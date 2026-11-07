@@ -803,13 +803,21 @@ function buildPlan(ctx) {
         // independent, guided, test and review at S / M / L. Skills no card covers keep the fixed role list.
         const plans = cardPlans(keys);
         const carded = keys.filter((k) => plans[k] && plans[k].cards.length);
-        const plain = keys.filter((k) => !carded.includes(k));
-        if (plain.length) add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${plain.length <= 3 ? plain.join(', ') : plain.length + ' skills'} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
-            ['--skills', plain.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: plain.length }));
+        // (every skill keeps the lesson / test / independent gate; a carded skill's other offered roles render in a gate of its own)
+        add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
+            ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        const BASE_ROLES = ['lesson', 'test', 'independent'];
+        // (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: two lane skills on one card print together as a SECTIONS sheet of 2
+        // pages - page 1 held 2 items, 64 % empty - at S and L, every page filled, the last one at least half)
+        if (carded.length >= 2) for (const sz of ['S', 'L']) {
+            add(gate(`print-lint-sections-${sz}`, `ws-print-lint --source kit --kind sections --pages 2 --size ${sz} --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet)`, `${carded.join(' + ')} × sections × 2 pages × ${sz}`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--kind', 'sections', '--pages', '2', '--size', sz, '--lints', 'L-DENSITY', '--skills', carded.join(',')], { parse: PARSE.printLint }));
+        }
         for (const k of carded) {
             const pl = plans[k], sid = k.split(':')[1];
-            add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${pl.roles.length} roles × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
-                ['--skills', k, '--roles', pl.roles.join(','), '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+            const more = pl.roles.filter((r) => !BASE_ROLES.includes(r));
+            if (more.length) add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every other role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${more.length} roles × S/M/L`, 'browser', 'ws-grade-render',
+                ['--skills', k, '--roles', more.join(','), '--size', 'S,M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
             add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × S/M/L`, 'browser', 'ws-cell-checks',
                 ['--skills', k, '--card', '--card-opts'], { needFlags: ['card-opts'], expect: { mention: [k] }, missingMsg: 'ws-cell-checks is not in this tree' }));
         }

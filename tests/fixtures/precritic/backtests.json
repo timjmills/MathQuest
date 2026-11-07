@@ -1705,7 +1705,27 @@
     "commit": "TBD-lf-ops-fix4",
     "state": "the lf-ops fix4 commit (filled when the fixes land)"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties,multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-card-overflow-cbt",
+   "check": "Every page role and option value the signed card offers is rendered and checked for overflow (critic lf-ops r1 check 2: Reason It arrays / count rows out of the A / B boxes and off the page; forms 1 lesson model overflow)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --card --card-opts OVERFLOW",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1725,7 +1745,7 @@
     "commit": "TBD-lf-ops-fix4",
     "state": "the lf-ops fix4 commit (filled when the fixes land)"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups,multiplication:mult_properties --roles error-analysis --rules TAGINK --show 20",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules TAGINK --show 20",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1766,6 +1786,66 @@
     "state": "the lf-ops fix4 commit (filled when the fixes land)"
    },
    "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules SIZE-S --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-title",
+   "check": "The title, Rule and vocabulary follow the options dealt; a card-decided title is printed exactly (critic lf-ops r1 check 7: forms 1-3 kept the order title; count-row Q6 'I Can count by 2s to 12s'; no '(15 jumps)')",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE, LESSON-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-title-cbt",
+   "check": "The title, Rule and vocabulary follow the options dealt; a card-decided title is printed exactly (critic lf-ops r1 check 7: forms 1-3 kept the order title; count-row Q6 'I Can count by 2s to 12s'; no '(15 jumps)')",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE, LESSON-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pl-sections-pagefill",
+   "check": "A two-skill sections sheet fills its pages and its last page to half (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: page 1 held 2 items, 64 % empty)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL / PG-23 (sections)",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size S --lints L-DENSITY --skills multiplication:mult_properties,multiplication:arrays_groups",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
