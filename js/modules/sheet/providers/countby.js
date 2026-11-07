@@ -241,10 +241,15 @@ registerSkill('patterns:number_patterns_rule', {
         const d = patternData(q);
         if (!d) return [];
         const out = rowSteps(d.values, d.blanks, `The rule: ${RULE_WORDS[d.kind](d)}.`, JUMP[d.kind](d));
-        if (d.ruleHidden) {
+        if (d.ruleHidden && out.length >= 2) {
+            // lf-algebra r1: finding the rule never STARTS by stating it. Four steps (the lesson's chart): look at the jumps,
+            // name the rule (written in its box), use it at the first gap, then every gap.
+            const J = JUMP[d.kind](d);
             const last = out[out.length - 1];
             last.marks = last.marks.concat([{ slot: 'rule', value: String(d.rule) }]);
-            out.splice(1, 0, step(`${fmt(d.values[0])}, ${fmt(d.values[1])}, ${fmt(d.values[2])}: the rule is ${RULE_WORDS[d.kind](d)}.`));
+            out[0] = step(`${fmt(d.values[0])} to ${fmt(d.values[1])} is ${J(1)}. ${fmt(d.values[1])} to ${fmt(d.values[2])} is ${J(2)}.`);
+            out.splice(1, 0, step(`The rule: ${RULE_WORDS[d.kind](d)}. Write ${fmt(d.rule)}.`, [{ slot: 'rule', value: String(d.rule) }]));
+            if (out.length > 4) out.splice(3, out.length - 4);
         }
         return clampSteps(out);
     },

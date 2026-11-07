@@ -1983,6 +1983,9 @@ const _ftOptions = (easy) => [
             ..._FT_TASKS.flatMap(([v, l]) => [{ v, l }, { v: `${v}-check`, l: `${l.replace(/ \(.*$/, '')}, then a Check row` }]),
             { v: 'make', l: 'Make your own (the rule is given, the pupil chooses the In numbers)' },
         ],
+        // lf-algebra r1 (options-render H13): a Check row is a second small table drawn under or beside the main one, so a
+        // page of them may hold fewer tables (6 at S where 9 plain tables fit)
+        addsDrawingValues: _FT_TASKS.map(([v]) => `${v}-check`),
         helpShort: 'One task per page. A Check row adds one more In number under the table to test the rule on.',
         help: 'One task per page, so the instruction says one thing. A Check row gives one more In number under the table to test the rule on. "Make your own" accepts any rows that follow the rule.',
     },
@@ -2003,6 +2006,8 @@ const _ftOptions = (easy) => [
             { v: ftTableValue(r, false), l: `${r} rows, In numbers in order` },
             { v: ftTableValue(r, true), l: `${r} rows, In numbers out of order` },
         ]),
+        // lf-algebra r1 (options-render H13): a five-row table is a taller drawing, so a page holds fewer of them
+        addsDrawingValues: [ftTableValue(5, false), ftTableValue(5, true)],
         helpShort: 'Three rows are enough to find a rule. Out of order stops the pupil just reading down the Out column.',
         help: 'Three rows are enough to find a rule. Out of order stops the pupil just following the Out column down. A tall table fits four to a page instead of six.',
     },

@@ -408,6 +408,81 @@ export const LESSONS = Object.freeze({
         // 100, which comes after, and never two "Number Sense" sections).
         mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
     },
+
+    // ======================================================== lf-algebra (lessons-first wave 1, 2026-11-07)
+    // Lane lf-algebra appends here (a per-skill data registry; node-lint LESSON-DATA). Two entries.
+
+    // ------------------------------------------------ Function tables: use a rule (3.OA.D.9, 4.OA.C.5)
+    // The skill's default page (ftTask 'outputs'): the rule is given, the pupil writes each Out. The four
+    // steps are the provider's four worked steps (sheet/providers/function-table.js): read the rule, work
+    // row 1, work row 2, every row the same way. The Warm-up deals the + / − facts each row is.
+    'algebra:function_table_easy': {
+        skills: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each row of a + rule is an addition fact.' },
+            { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'Each row of a − rule is a take-away fact.' },
+        ],
+        concepts: [
+            { id: 'in-out', text: 'A number goes in. The rule changes it. A number comes out.' },
+            { id: 'same-rule', text: 'Every row uses the same rule.' },
+            { id: 'across', text: 'Read each row across: In, then Out.' },
+        ],
+        vocab: [
+            { word: 'In', meaning: 'the number that goes in', picture: { kind: 'text', text: 'In: 3' } },
+            { word: 'rule', meaning: 'what happens to every In number', picture: { kind: 'text', text: 'n + 7' } },
+            { word: 'Out', meaning: 'the number that comes out', picture: { kind: 'text', text: 'Out: 10' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the rule.' },
+            { icon: 'start', text: 'Do it to the In.' },
+            { icon: 'write', text: 'Write the Out.' },
+            { icon: 'check', text: 'Same rule, every row.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'numbered steps with icons',
+            why: 'Four short actions done the same on every row; the Say band reads one row aloud ("When the input is 3, the output is 10"), so a chant would only add words.',
+        },
+        example: { match: 'The rule is' },
+        mixWith: [{ key: 'addition:add_facts', opts: { band: 20 } }, { key: 'subtraction:subtract', opts: { band: 20 } }],
+    },
+
+    // ------------------------------------------------ Number patterns: find and use the rule (3.OA.D.9, 4.OA.C.5)
+    // The skill's default page finds the rule (option `rule` on): look at the jumps, name the rule, then use it at
+    // every gap. The pattern track is wider than half the page (8 tiles), so every chart panel is a full-width row
+    // (`chartWide`). The four steps are the provider's four worked steps (sheet/providers/countby.js).
+    'patterns:number_patterns_rule': {
+        skills: [
+            // (one row of column facts: a skip-count line here took a second Warm-up row and pushed Guided Practice to the
+            // next page, DN-2)
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each jump of a count-on pattern is an addition fact.' },
+            { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'Each jump of a count-back pattern is a take-away fact.' },
+        ],
+        concepts: [
+            { id: 'jump', text: 'The jump is the change from one number to the next.' },
+            { id: 'same-jump', text: 'The rule makes every jump the same.' },
+            { id: 'test', text: 'Test the rule on more than one pair.' },
+        ],
+        vocab: [
+            { word: 'pattern', meaning: 'numbers that follow a rule', picture: { kind: 'text', text: '5, 10, 15, 20' } },
+            { word: 'rule', meaning: 'what makes the next number', picture: { kind: 'text', text: 'add 5' } },
+            { word: 'jump', meaning: 'from one number to the next', picture: { kind: 'text', text: '5 → 10' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Look at the jumps.' },
+            { icon: 'decide', text: 'Name the rule.' },
+            { icon: 'write', text: 'Use the rule at the gap.' },
+            { icon: 'check', text: 'Every gap. Check each jump.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'numbered steps with icons',
+            why: 'The skill is one decision (which rule?) and then the same move at every gap; the Say band names the rule aloud, so no chant.',
+        },
+        chartWide: true,
+        // the chart models a count-on pattern (the default page mixes in doubling; the Guided rows show it)
+        example: { match: ' is \\+ \\d' },
+        mixWith: [{ key: 'patterns:skip_count_line' }, { key: 'addition:add_facts', opts: { band: 20 } }],
+    },
 });
 
 /** The lesson data of a skill, or null (a skill with no authored lesson yet). */

@@ -155,8 +155,12 @@ export function readItem(q) {
         const m = /([\d,]+)\s*([−\-+])\s*([\d,]+)/.exec(String(q.text || ''));
         if (m) { a = +m[1].replace(/,/g, ''); b = +m[3].replace(/,/g, ''); op = m[2]; }
     }
-    const ans = Number(String(q.ans).replace(/,/g, ''));
-    if (!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(ans)) return null;
+    // (lf-algebra r1) a list answer (a function table's "10, 14, 15") reads as NaN: the item still carries its a / b, so a
+    // ruling on a or b is checked; a ruling `of: "ans"` fails on NaN (never a silent pass)
+    const one = String(q.ans).replace(/(\d),(\d{3})(?!\d)/g, '$1$2');
+    const ans = /^\s*-?\d+(\.\d+)?\s*$/.test(one) ? Number(one) : NaN;
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+    if (!Number.isFinite(ans) && !(Number.isFinite(q.a) && Number.isFinite(q.b))) return null;
     return { a, b, ans, op, boxes: p && p.ansDigits != null ? +p.ansDigits : null };
 }
 
@@ -179,6 +183,9 @@ function selfTest() {
     const it = readItem({ text: '4,367 − 2,244 = ?', ans: 2123 });
     t(it && it.a === 4367 && it.b === 2244, 'readItem from comma text');
     t(readItem({ cell: { payload: { operands: [57, 23], op: '-', ansDigits: 2 } }, ans: 34 }).boxes === 2, 'readItem boxes');
+    t(readItem({ a: 20, b: 4, ans: '8, 12, 16' }).a === 20 && Number.isNaN(readItem({ a: 20, b: 4, ans: '8, 12, 16' }).ans), 'readItem list answer: a / b read, ans NaN');
+    t(readItem({ text: 'Find the rule.', ans: '8, 12' }) === null, 'readItem list answer, no operands: unreadable');
+    t(readItem({ text: '4,367 − 2,244 = ?', ans: '2,123' }).ans === 2123, 'readItem thousands-comma answer');
     const blk = parseRulings('x\n<!-- rulings\n{"v":1,"skills":["a:b"],"rulings":[{"assert":"range","of":"a","min":1,"max":9}],"notOffered":[{"option":"band"}]}\n-->\n', 'card.md');
     t(blk && blk.rulings[0].id === 'R1' && blk.notOffered[0].id === 'N1', 'parse block');
     t(parseRulings('no block', 'x.md') === null, 'no block -> null');
