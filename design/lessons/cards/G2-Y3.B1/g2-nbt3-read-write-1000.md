@@ -16,7 +16,7 @@ lane decides every open question (its `answer` and the `rule` it rests on) and c
 | P2-P4 lesson skill | @R1 |  |
 | P4 Practice 1 | @R1 |  |
 | P4 Practice 2 | @R4 |  |
-| Mixed 1 | @R5 |  |
+| Mixed 1 | @R1 |  |
 | Mixed 2 | `composing:number_word_form` | {"opts":{"wordform":["to_number"],"band":1000,"zeroPlace":"some","answerSlot":"hto"},"minNum":101,"maxNum":999,"sectionLabel":"Number names"} |
 | Mixed 3 | @R2 |  |
 | Mixed 4 | @R3 |  |
@@ -33,7 +33,7 @@ lane decides every open question (its `answer` and the `rule` it rests on) and c
 | P5 word problem | @R5 |  |
 | P6 exit 1: name, no 0 place | @R4 |  |
 | P6 exit 2: name, no tens word (Critical Atom) | @R4 |  |
-| P6 exit 3: expanded form to the numeral, no 0 place | @R5 |  |
+| P6 exit 3: numeral to expanded form, no 0 place (R9: combine is modelled nowhere) | @R1 |  |
 | P6 exit 4: numeral to expanded form, a 0 place | @R1 |  |
 | Spaced retrieval 1 | `placevalue:more_less_10` | {"opts":{"step":10,"dir":"more","band":100},"minNum":21,"maxNum":89} |
 | Spaced retrieval 2 | `placevalue:unit_form` | {"opts":{"band":99},"minNum":21,"maxNum":99} |
@@ -127,7 +127,7 @@ Hand-written lines (story, hook, teaching notes, mistakes' words): **116**.
     "practice": {"pages":2,"sheets":[{},{"skill":"@R4","shape":[8,2],"chunk":"b","edgeLast":{"per":8,"cols":2,"wants":["pvZeroTens","pvTeen"]}}],"edgeTest":"pvEdge"},
     "mixed": {
       "skills": [
-        "@R5",
+        "@R1",
         {
           "categoryId": "composing",
           "skillId": "number_word_form",
@@ -179,11 +179,11 @@ Hand-written lines (story, hook, teaching notes, mistakes' words): **116**.
           "detects": "Drops the 0: six hundred five = 65."
         },
         {
-          "case": "expanded form to the numeral, no 0 place",
-          "ref": "@R5",
+          "case": "numeral to expanded form, no 0 place",
+          "ref": "@R1",
           "want": "pvNoZero",
-          "instr": "Write the number.",
-          "detects": "Parts side by side: 500 + 30 + 9 = 500309."
+          "instr": "Write the number in expanded form.",
+          "detects": "Writes the digits, not their worth: 539 = 5 + 3 + 9."
         },
         {
           "case": "numeral to expanded form, a 0 place",

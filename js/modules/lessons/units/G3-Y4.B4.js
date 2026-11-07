@@ -1381,7 +1381,7 @@ export const CARDS = Object.freeze({
       "instruction": "Read the story. Draw it. Solve.",
       "lines": ["There are {wp.a} bags.","Each bag has {wp.b} apples.","How many apples? Is it even or odd?"],
       "answerLine": "There are __ apples.",
-      "say": "Is {wp.a} or {wp.b} even? The product is __.",
+      "say": "Is one of the numbers even? The product is __.",
       "sayAns": "{wp.parity}"
     },
     "hook": ["Even numbers make pairs.","Today we find them in the times table."],

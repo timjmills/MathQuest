@@ -90,7 +90,7 @@ export const CARDS = Object.freeze({
       "practice": {"pages":2,"sheets":[{},{"skill":"@R4","shape":[8,2],"chunk":"b","edgeLast":{"per":8,"cols":2,"wants":["pvZeroTens","pvTeen"]}}],"edgeTest":"pvEdge"},
       "mixed": {
         "skills": [
-          "@R5",
+          "@R1",
           {
             "categoryId": "composing",
             "skillId": "number_word_form",
@@ -142,11 +142,11 @@ export const CARDS = Object.freeze({
             "detects": "Drops the 0: six hundred five = 65."
           },
           {
-            "case": "expanded form to the numeral, no 0 place",
-            "ref": "@R5",
+            "case": "numeral to expanded form, no 0 place",
+            "ref": "@R1",
             "want": "pvNoZero",
-            "instr": "Write the number.",
-            "detects": "Parts side by side: 500 + 30 + 9 = 500309."
+            "instr": "Write the number in expanded form.",
+            "detects": "Writes the digits, not their worth: 539 = 5 + 3 + 9."
           },
           {
             "case": "numeral to expanded form, a 0 place",

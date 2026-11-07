@@ -15,8 +15,8 @@ lane decides every open question (its `answer` and the `rule` it rests on) and c
 | P0 question 3 → 3.NBT.A.3 Multiply by 10 | `placevalue:place_value_10x` | {"opts":{"op":"x","power":[10],"band":1000}} |
 | P0 question 4 → 4.NBT.B.6 Divide by 10 | `placevalue:place_value_10x` | {"opts":{"op":"/","power":[10],"band":1000}} |
 | P2-P4 lesson skill | `placevalue:value` | {"spreadMax":2,"opts":{"form":"times","band":9999,"tenDir":"both","tenValues":true,"tenPlain":false},"allTest":"tenMixed"} |
-| P4 Practice 1 | `placevalue:value` | {"spreadMax":2,"opts":{"form":"times","band":9999,"tenDir":"both","tenValues":true,"tenPlain":false},"allTest":"tenNoOnes"} |
-| P4 Practice 2 | `placevalue:value` | {"spreadMax":2,"opts":{"form":"times","band":99999,"tenDir":"both","tenValues":true,"tenPlain":false},"allTest":"tenMixed"} |
+| P4 Practice 1 | `placevalue:value` | {"spreadMax":2,"opts":{"form":"times","band":9999,"tenDir":"both","tenValues":true,"tenPlain":false},"allTest":"tenNoOnes","nearLook":true} |
+| P4 Practice 2 | `placevalue:value` | {"spreadMax":2,"opts":{"form":"times","band":99999,"tenDir":"both","tenValues":true,"tenPlain":false},"allTest":"tenMixed","nearLook":true} |
 | P1 band A row 1 | `placevalue:more_less_100` | {"opts":{"step":10,"dir":"more"},"minNum":120,"maxNum":880} |
 | P1 band A row 2 | `placevalue:compare` | {"opts":{"band":999,"closeness":"far"},"minNum":100} |
 | P1 band A row 3 | `placevalue:more_less_100` | {"opts":{"step":100,"dir":"less"},"minNum":200,"maxNum":980} |
@@ -139,7 +139,8 @@ Hand-written lines (story, hook, teaching notes, mistakes' words): **81**.
             "skillId": "value",
             "spreadMax": 2,
             "opts": {"form":"times","band":9999,"tenDir":"both","tenValues":true,"tenPlain":false},
-            "allTest": "tenNoOnes"
+            "allTest": "tenNoOnes",
+            "nearLook": true
           },
           "shape": [4,1],
           "edgeLast": {"per":4,"cols":1,"wants":["tenThouTenth"]}
@@ -151,7 +152,8 @@ Hand-written lines (story, hook, teaching notes, mistakes' words): **81**.
             "skillId": "value",
             "spreadMax": 2,
             "opts": {"form":"times","band":99999,"tenDir":"both","tenValues":true,"tenPlain":false},
-            "allTest": "tenMixed"
+            "allTest": "tenMixed",
+            "nearLook": true
           },
           "shape": [4,1],
           "edgeLast": {"per":4,"cols":1,"wants":["tenOnesTimes"]}

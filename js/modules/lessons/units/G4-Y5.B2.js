@@ -106,7 +106,8 @@ export const CARDS = Object.freeze({
               "skillId": "value",
               "spreadMax": 2,
               "opts": {"form":"times","band":9999,"tenDir":"both","tenValues":true,"tenPlain":false},
-              "allTest": "tenNoOnes"
+              "allTest": "tenNoOnes",
+              "nearLook": true
             },
             "shape": [4,1],
             "edgeLast": {"per":4,"cols":1,"wants":["tenThouTenth"]}
@@ -118,7 +119,8 @@ export const CARDS = Object.freeze({
               "skillId": "value",
               "spreadMax": 2,
               "opts": {"form":"times","band":99999,"tenDir":"both","tenValues":true,"tenPlain":false},
-              "allTest": "tenMixed"
+              "allTest": "tenMixed",
+              "nearLook": true
             },
             "shape": [4,1],
             "edgeLast": {"per":4,"cols":1,"wants":["tenOnesTimes"]}
