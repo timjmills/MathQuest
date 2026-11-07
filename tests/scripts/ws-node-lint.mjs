@@ -37,7 +37,8 @@
 //   ws-precritic runs them per skill against tests/fixtures/precritic/node-lint-s1.baseline.json):
 //   LESSON-DATA     the lesson page has lesson data: lessons/prereqs.js lessonFor(category, skill) is not null (else
 //                   sheet/roles/lesson.js prints "No lesson data for this skill yet" and the Warm-up falls back to the
-//                   skills listed before it; critic pilot-su-c r1 D4), and its `skills` / `mixWith` refs are live skills.
+//                   skills listed before it; critic pilot-su-c r1 D4), and its `skills` / `mixWith` refs are live skills
+//                   that never deal a screen task on paper (24 seeded items each, with the ref's opts; critic skip-count r5 SC3).
 //   OPTION-HELP     every value an option's help / helpShort names ("3 traces the answer, 2 adds ...", "level 1") is a
 //                   value offeredOptionsFor() offers the skill - the panel as shown, inherited _ap4* patches included
 //                   (critic pilot-su-c r2 N3). A number names a value when it opens a clause or follows "level"; a
@@ -1031,9 +1032,26 @@ function ruleLessonData(key, cat, skill) {
         for (const ref of Array.isArray(list) ? list : []) {
             const k = ref && ref.key;
             if (k && !LIVE_KEYS.has(k)) find(key, 'LESSON-DATA', 0, 'dead-ref', `LESSONS[${key}].${field} names ${k}, which is not a live skill`, `${field}:${k}`);
+            // critic skip-count r5 SC3 (H7): the Warm-up and Mixed practice print on PAPER, so a ref (with its opts) must never deal a
+            // screen task ("Drag the numbers in counting order"). Which item a page deals depends on the seed, so the browser lint
+            // L-VERBS saw it only on some deals: here every ref deals WARM_N seeded items and each one is read.
+            else if (k && gq && typeof gq.generateQuestionFor === 'function') {
+                const [rc, rs] = k.split(':');
+                for (let i = 0; i < WARM_N; i++) {
+                    let q = null;
+                    mute();
+                    try { q = gq.generateQuestionFor({ category: rc, skill: rs, opts: ref.opts ? Object.assign({}, ref.opts) : undefined, seed: hashSeed(`${key}|${field}|${k}`) + i, itemIndex: i, itemCount: WARM_N }); } catch (e) { q = null; } finally { unmute(); }
+                    const t = String((q && (q.text || q.question)) || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                    const m = WARM_SCREEN.exec(t);
+                    if (m) { find(key, 'LESSON-DATA', 0, 'screen-task', `LESSONS[${key}].${field} ${k}${ref.opts ? ` ${JSON.stringify(ref.opts)}` : ''} deals a screen task on paper (item ${i + 1}: "${clip(t, 70)}"): pick opts that deal a written task, or another skill`, `${field}:${k}:${m[1].toLowerCase()}`); break; }
+                }
+            }
         }
     }
 }
+/** How many items each Warm-up / Mixed ref deals for the screen-task check, and the screen verbs it looks for (print-lint L-VERBS). */
+const WARM_N = 24;
+const WARM_SCREEN = /\b(drag(?:s|ged|ging)?|click(?:s|ed|ing)?|tap(?:s|ped|ping)?|swipe(?:s|d)?|hover(?:s|ed|ing)?)\b/i;
 
 /**
  * OPTION-HELP (lane S1, the cheap half; critic pilot-su-c r2 N3): every value an option's help text (help, helpShort;

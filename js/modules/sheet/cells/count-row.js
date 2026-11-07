@@ -278,7 +278,9 @@ function tightGeom(p, ctx, c) {
 /** The one-page sheet's single line of `n` boxes in `avail` mm: {w, gap, pt} or null (two lines). Mirrored by count-rows.js rowLines. */
 // Owner / coordinator 2026-10-03: keep 12 per line; every gap holds a REAL arrow (COMPACT_ARROW_MM, the same on every row) with
 // 1 mm clear each side. Only a box needs writing width; a printed number takes its glyph width (+ 0.3 mm each side).
-export const COMPACT_MIN_BOX = 9, COMPACT_ARROW_MM = 2.2, COMPACT_MIN_GAP = COMPACT_ARROW_MM + 2;
+// (skip-count fix 2026-10-30, small-fixes r11 G2: a 3-digit given's ink ran 0.06 mm past its glyph estimate and left the arrow 0.94 mm
+// clear; the arrow is 2.0 mm, the gap stays 4.2 mm (count-rows.js S_GAP), so it keeps >= 1 mm of INK clearance - ws-print-lint L-OVERLAP ARROW)
+export const COMPACT_MIN_BOX = 9, COMPACT_ARROW_MM = 2.0, COMPACT_MIN_GAP = 4.2;
 /**
  * `nBox` of the `n` numbers are boxes (the rest printed). Returns {w (box), gw (printed), gap, pt} or null (two lines). The digits
  * keep the working size whenever the line holds them; only a row too full even then (very many boxes of 3+ digits) shrinks them
@@ -642,8 +644,10 @@ register('count-row', {
                 }
                 return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: text, shown: over !== undefined });
             }
-            const val = over !== undefined ? String(over) : shown[k];
-            const vInk = over !== undefined ? 'solid' : val !== '' ? ink : null;
+            // (the anchor chart's step states, `stepSlots`: each answer written so far, the newest grey - stepState below)
+            const ss = p.stepSlots && p.stepSlots[`b${k}`];
+            const val = ss ? String(ss.value) : over !== undefined ? String(over) : shown[k];
+            const vInk = ss ? ss.ink : over !== undefined ? 'solid' : val !== '' ? ink : null;
             if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits, full: rowMax });
             return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full: rowMax });
         });
@@ -722,6 +726,25 @@ register('count-row', {
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).
         return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (vpadOf(p, ctx))), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };
+    },
+    /**
+     * The lesson's anchor chart (critic skip-count r5 SC1): state k of the worked steps (sheet/providers/countby.js rowSteps,
+     * marks on slots blank0, blank1 ...) draws every answer written up to step k - the ones written at step k grey (the newest,
+     * P-LC-9), the earlier ones black - so the chart shows the count growing box by box, never three blank rows and a finished one.
+     */
+    // (named `lessonStepState`, not `stepState`: the S6 anchors read `stepState` and draw a count row WHOLE - a band of states of a
+    // full-width row clipped its cell, precritic slot-clip on skip_count_line single/ex-group)
+    lessonStepState(p, steps, k, ctx) {
+        const slots = {};
+        (steps || []).slice(0, k + 1).forEach((g, gi) => {
+            for (const m of (g && g.marks) || []) {
+                const id = /^blank(\d+)$/.exec(String(m && m.slot || ''));
+                if (id) slots[`b${id[1]}`] = { value: String(m.value), ink: gi === k ? 'trace' : 'solid' };
+            }
+        });
+        // (a slot written earlier and named again by step k - "Do the same at every gap" - keeps its black)
+        (steps || []).slice(0, k).forEach((g) => { for (const m of (g && g.marks) || []) { const id = /^blank(\d+)$/.exec(String(m && m.slot || '')); if (id) slots[`b${id[1]}`].ink = 'solid'; } });
+        return this.render(Object.assign({}, p, { stepSlots: slots }), Object.assign({}, ctx, { state: 'blank' }));
     },
     inputs(p) {
         const out = (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));

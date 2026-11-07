@@ -106,7 +106,8 @@ function cbPage(q, ref = {}) {
     return { dir: !downs ? 'up' : downs === rows.length ? 'down' : 'mixed', steps, from: rows.length && froms.length === 1 && froms[0] !== null ? froms[0] : null };
 }
 // The steps in the order the rows are listed (and print), every one of them: the title never shortens to "and 5 more".
-const stepWords = (steps) => (!steps.length ? '1 to 12'
+// (critic skip-count r5 SC6: "I Can count by 1 to 12" read oddly; the numbers are named as numbers)
+const stepWords = (steps) => (!steps.length ? 'the numbers 1 to 12'
     : steps.length === 1 ? fmt(steps[0])
         : `${steps.slice(0, -1).map(fmt).join(', ')} and ${fmt(steps[steps.length - 1])}`);
 
