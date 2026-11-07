@@ -1260,6 +1260,13 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
     28 pt). Where Medium or Big digits do not fit, the digits drop to the largest that fits and the dialog SAYS SO ("Big
     digits don't fit 9 columns; printing at 16 pt."); the size buttons then read "8 columns · 16 pt", what prints at that
     size and those columns.
+  - **The teacher's order (r7, owner rule 6).** The sections print in the list's order: In sections, each run of + − ×
+    skills between ÷ skills is one section and the ÷ part stands where the list puts it (÷ + prints ÷ then +; − ÷ + prints −,
+    ÷, +); Mixed up, the + − × skills share one grid and the ÷ section goes before it when the list puts ÷ first. A page's
+    title names the operations in that order ("Division and addition facts").
+  - **Columns 5 and up for facts (r7 D-R7-2).** Fact rows print 5 to 10 across (9 with ÷), so an all-fact list offers
+    Columns 5 and up; a saved 1-4 prints 5 and the note says so. Any section that prints other columns than the ones picked
+    says why in the dialog. Dialog notes are plain sentences, never an internal code.
   - **The bracket alone keeps 2 mm a side (r6 D-R6-5).** A bracket section's track is chosen with 0.6 mm more room than the ink
     model (the arc and the first digit measured wider), for every 3-digit fact the section's skills can reach (144 ÷ 12, laid
     for on every page whatever it dealt); at Small "12)144" then takes 8 columns, and the dialog says so. Its row holds the

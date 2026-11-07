@@ -142,7 +142,8 @@ export function factTitle(items, skills = null) {
     // four operations on one page: "Mixed facts"
     const ops = opsOf(items);
     if (ops.size > 1) {
-        const names = ['add', 'subtract', 'multiply', 'divide'].filter((o) => ops.has(o)).map((o) => OP_NAME[o]);
+        // (facts-print-fix r7: in the order the operations PRINT - the teacher's list order - "Division and addition facts")
+        const names = [...new Set(items.map((it) => opOf(it.q || {})))].filter((o) => OP_NAME[o]).map((o) => OP_NAME[o]);
         if (names.length !== ops.size || names.length > 3) return 'Mixed facts';
         const t = `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]} facts`;
         return t.charAt(0).toUpperCase() + t.slice(1);
@@ -426,7 +427,8 @@ function mixKeepOutMm(size, look, cols, labels) {
  * with h the tallest form's need, stretch cap 1.3. Mix deals its forms in thirds (within one on a full page).
  */
 function formRows(items, input, ctx, G, labels, forms) {
-    let asked = input.columns && input.columns !== 'auto' ? Math.max(2, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
+    // (r7 D-R7-2: ÷ form sections floor at 5 across, as the stacked facts do)
+    let asked = input.columns && input.columns !== 'auto' ? Math.max(5, Math.min(10, Number(input.columns) || 5)) : AUTO[ctx.size];
     // a page mixing operations (owner ruling 2026-10-31): one grid, the columns the narrowest form
     // fits; a + - x answer over 99 keeps its 8-column clamp (PT-FRW-5)
     const mixed = opsOf(items).size > 1;

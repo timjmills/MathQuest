@@ -539,12 +539,28 @@ async function buildFacts(list, amounts, o) {
     const DIV_SPLIT = ['standard', 'long', 'fraction'];
     const groups = [];
     const mainParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => !isDivisionFact(p.s) && live(p.i));
-    if (mainParts.length) groups.push({ parts: mainParts, div: false });
     const divParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => isDivisionFact(p.s) && live(p.i));
     const splitDiv = !mixed && list.length >= 2 && divParts.length === 1 && divParts[0].s.skillId === 'div_facts' && (divParts[0].s.opts || {}).divForm === 'mix';
-    if (splitDiv) {
-        for (const f of DIV_SPLIT) groups.push({ parts: [{ s: Object.assign({}, divParts[0].s, { opts: Object.assign({}, divParts[0].s.opts, { divForm: f }) }), i: divParts[0].i, w: 1 / 3 }], div: true, form: f });
-    } else if (divParts.length) groups.push({ parts: divParts, div: true });
+    const divGroups = () => (splitDiv
+        ? DIV_SPLIT.map((f) => ({ parts: [{ s: Object.assign({}, divParts[0].s, { opts: Object.assign({}, divParts[0].s.opts, { divForm: f }) }), i: divParts[0].i, w: 1 / 3 }], div: true, form: f }))
+        : divParts.length ? [{ parts: divParts, div: true }] : []);
+    // facts-print-fix r7 (critic D-R7-1, owner rule 6 "the teacher's order"): the sections print in the LIST's order.
+    //   In sections: each run of + − × skills between ÷ skills is one section, the ÷ part where the list puts it (− ÷ + prints
+    //   −, then ÷, then +).
+    //   Mixed up: the + − × skills interleave in one grid; the ÷ section goes before it when the list puts ÷ first.
+    if (mixed) {
+        const main = mainParts.length ? [{ parts: mainParts, div: false }] : [];
+        const divFirst = divParts.length && mainParts.length && Math.min(...divParts.map((p) => p.i)) < Math.min(...mainParts.map((p) => p.i));
+        groups.push(...(divFirst ? [...divGroups(), ...main] : [...main, ...divGroups()]));
+    } else {
+        let run = null;
+        let divDone = false;
+        for (const p of [...mainParts, ...divParts].sort((a, b) => a.i - b.i)) {
+            if (!isDivisionFact(p.s)) { if (!run) { run = { parts: [], div: false }; groups.push(run); } run.parts.push(p); continue; }
+            run = null;
+            if (!divDone) { groups.push(...divGroups()); divDone = true; }
+        }
+    }
     // the asked count of each part (Problems): a split ÷ skill's count shared over its forms in thirds
     const splitN = splitDiv && problems ? apportion([1, 1, 1], asked[divParts[0].i]) : null;
     // r3 D2 / D4: what each group's skills can REACH, from one probe of the skills - never the facts dealt on a page
@@ -727,8 +743,9 @@ async function buildFacts(list, amounts, o) {
             // forms share ONE section, mixed cell by cell (one frame a cell), and the note says so
             const d = divParts[0];
             const k0 = groups.findIndex((x) => x.form);
-            groups.splice(k0, groups.length - k0, { parts: [{ s: d.s, i: d.i, w: 1 }], div: true });
-            reach.splice(k0, reach.length - k0, (() => { const x = reachOf(d.s); return { tracks: Math.max(2, x.tracks), ans: 0 }; })());
+            const nForms = groups.filter((x) => x.form).length;
+            groups.splice(k0, nForms, { parts: [{ s: d.s, i: d.i, w: 1 }], div: true });
+            reach.splice(k0, nForms, (() => { const x = reachOf(d.s); return { tracks: Math.max(2, x.tracks), ans: 0 }; })());
             cap = 0;
             await probeAll();
             best = await settle();
@@ -812,6 +829,8 @@ async function buildFacts(list, amounts, o) {
     }
     // (D-R4-8: Pages n with ÷ on fewer pages than groups prints n pages; the note says the ÷ shares the page)
     out.notes.push(...planNotes);
+    // (r7 D-R7-2: fact rows floor at 5 across - a picked 1-4 says so)
+    if (colsAsked(o) && colsAsked(o) < 5) out.notes.push(`Fact rows print 5 to ${groups.some((x) => x.div) ? 9 : 10} across; Columns ${colsAsked(o)} prints 5 columns.`);
     // (r6: a plan that cannot fill every page - even each page stretching its own rows to 1.3 - says so, and the dialog then
     // never claims "every page is full": Columns 1-2 of ÷ forms, 5 rows of 2 cells at 1.3 leave 9 mm)
     if (pages && !filled && built.some(({ parts }, i) => i < built.length - 1 || !problems)) {
@@ -829,6 +848,11 @@ async function buildFacts(list, amounts, o) {
     // ORPHAN (r5, D-R5-3): a last page that holds less than a row says so
     if (out.perPage.length > 1 && out.perPage[out.perPage.length - 1] < out.lastCols) out.notes.push(`The last page holds only ${out.perPage[out.perPage.length - 1]} problem${out.perPage[out.perPage.length - 1] === 1 ? '' : 's'}: the pages before it are full.`);
     if (!problems && pages && pages.some((pg) => pg.rows.filter(Boolean).length > 1)) out.notes.push(`${pagesN === 1 ? 'Pages 1' : `Pages ${pagesN}`}: the division ${groups.filter((x) => x.div).length > 1 ? 'sections share' : 'section shares'} a page with the other facts.`);
+    // (r7 NOTEPLAIN, critic: the notes ran to 5-6 sentences and showed "(PT-FRW-5)"): each note one plain sentence - no
+    // internal codes, no repeats, and not the engine's bookkeeping ("as written ...: 9 columns x 7 rows", "Digits 16 pt so
+    // ..."; the size note says what a reader needs about the digits)
+    out.notes = [...new Set(out.notes.flatMap((t) => String(t).replace(/\s*\((?:PT|PG|CL|VA|TY|DN)-[A-Z0-9-]+\)/g, '').split(/(?<=[.!?])\s+(?=[A-Z])/))
+        .map((t) => t.trim()).filter((t) => t && !/^(Division facts|Facts) as written\b/.test(t) && !/^Digits \d+ pt so\b/.test(t)))];
     const f = out.fits || {};
     const pupilHtml = nowrapFooterNames(renumberFooters(out.pupil.join('\n')));
     const keyHtml = o.key ? nowrapFooterNames(renumberFooters(out.key.join('\n'))) : '';
@@ -1328,10 +1352,13 @@ function render() {
     // a set with division facts offers 1–9, never 10 (owner 2026-11-05); a saved 10 shows as 9 (+ − × parts keep 10)
     const hasDiv = !!(S && S.list.some((s) => isFactSkill(s) && isDivisionFact(s)));
     const colMax = hasFacts() ? (hasDiv ? DIV_MAX_COLS : FACT_MAX_COLS) : CELL_MAX_COLS;
-    const colsNow = o.cols !== 'auto' && Number(o.cols) > colMax ? colMax : o.cols;
+    // (facts-print-fix r7 D-R7-2: fact rows print 5 to 10 across, so an all-fact list offers Columns 5 and up - a saved 1-4
+    // shows as 5)
+    const colMin = S && S.list.length && S.list.every(isFactSkill) ? 5 : 1;
+    const colsNow = o.cols !== 'auto' && Number(o.cols) > colMax ? colMax : o.cols !== 'auto' && Number(o.cols) < colMin ? colMin : o.cols;
     h += `</div><label class="sp-cols"><span>Columns</span><select id="spCols" data-sp-cols>
         <option value="auto"${colsNow === 'auto' ? ' selected' : ''}>Auto — fitted by size${autoCols ? ` (${autoCols})` : ''}</option>
-        ${Array.from({ length: colMax }, (_, k) => k + 1).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c === 1 ? '1 (across the page)' : c}</option>`).join('')}
+        ${Array.from({ length: colMax - colMin + 1 }, (_, k) => k + colMin).map((c) => `<option value="${c}"${Number(colsNow) === c ? ' selected' : ''}>${c === 1 ? '1 (across the page)' : c}</option>`).join('')}
     </select></label>`;
     if (colsNow !== 'auto') h += `<div class="sp-row sp-cmode"><div class="sp-seg" role="radiogroup" aria-label="Columns mode">${[['aim', `Aim for ${colsNow}`], ['exact', `Exactly ${colsNow}`]].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="cmode" data-v="${v}" aria-checked="${P.colsMode === v}">${l}</button>`).join('')}</div><span class="sp-hint">${P.colsMode === 'exact' ? `every part ${colsNow} across; bigger problems at their own max` : `${colsNow} across where it fits (one fewer when that ends a part on a full row), else the most that fit`}</span></div>`;
     h += `</section>`;

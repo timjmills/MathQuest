@@ -344,3 +344,43 @@ ws-screen-answer OK; ws-student-explorer OK; ws-chromebook-perf --only load OK; 
 - Measuring costs what trusting the plan costs: a reused print-emulated frame draws a build in ~0.2 s. The full sweep found
   the last slices (Columns 1-4 of ÷ forms) that the default sweep does not reach; `SWEEP_GREP=<regex>` re-runs a slice in
   minutes. The dialog check needed `bringToFront` and setting every control.
+
+## Round 7 (fixer, Opus medium: one regression and two carried items, critic lowest 5) — 2bebf4f94
+
+Critic r7: every r6 fix held (owner's page 9 / 8 / 8 / 9; 1,523 key cells right; the critic's own 4,743-print measured sweep
+clean on totals, fill and notes). FAIL on D-R7-1: ÷ printed last whatever the teacher's order (a regression against master),
+hidden by DIVORDER's exemption for lists that start with ÷; D-R7-2 Columns 1-4 with facts; D-R7-3 bracket clearance 1.72 mm
+in mixed sections; notes showing "(PT-FRW-5)" and running to 5-6 sentences.
+
+**Checks first** (added to `--sweep`; on 2bebf4f94 via MQ_ROOT: ORDER 84, NOTEPLAIN 272, COLNOTE 8, SHARES 3 - FAIL):
+ORDER (lists ÷ +, ÷Mix −, ÷Mix × − +, − ÷Mix + in both arrangements, Problems and Pages; DIVORDER's exemption removed),
+COLNOTE (a section printing other columns than picked carries a note; the dialog offers an all-fact list Columns 5 and up),
+BRKCLEAR (2 mm on the glyph ink, in bracket and mixed sections), NOTEPLAIN (no internal code, at most two sentences). Default
+sweep 753 prints, about 4 minutes with the dialog check; `--sweep-full` 9,549 prints, clean.
+
+### Fixes
+1. **D-R7-1** (`simple-print.js` buildFacts): the groups follow the list. In sections, each run of + − × skills between ÷
+   skills is its own section and the ÷ part stands where the list puts it; Mixed up, the ÷ section goes before the + − × grid
+   when the list puts ÷ first. The rebalance remainder goes to the group that is really last; the merge of the ÷ forms keeps
+   their place. `factTitle` names the operations in printed order ("Subtraction, division and addition facts").
+2. **D-R7-2**: the dialog offers an all-fact list Columns 5 and up (a saved 1-4 shows as 5); ÷ form sections floor at 5 as the
+   stacked facts do; a picked 1-4 prints 5 and says "Fact rows print 5 to 9 across; Columns 2 prints 5 columns."
+3. **Notes**: each note one plain sentence, internal codes stripped, repeats and the engine's bookkeeping ("... as written ...:
+   9 columns x 7 rows", "Digits 16 pt so ...") dropped.
+4. **D-R7-3 - held as measured on the INK, an owner question.** The bracket's glyph ink and drawn arc and bar keep >= 2 mm
+   from the border in every section (BRKCLEAR, full sweep). The critic's 1.72 mm is measured on the text BOXES, which include
+   the "1"'s empty side bearing; the sweep reports the closest box (1.58 mm) as INFO. Making the boxes keep 2 mm at 9 columns
+   (16 pt) was tried: either the arc's whites fall to 0.15 mm (the owner's 0.3 mm floor, ws-layout-unit PT-FRW-9) or the
+   section drops to 8 columns (against "columns win" and the owner's 9-column page). **Owner question:** is 2 mm of ink, with
+   the box of a "1" nearer, acceptable, or should mixed ÷ sections drop to 8 columns at Small?
+
+### Gates (one at a time; the long ones waited on)
+ws-simple-print --facts-print OK; full ws-simple-print OK; --sweep-full OK (9,549 prints); ws-layout-unit OK (1766);
+ws-print-lint kit S OK, M OK, L only the pre-existing sub_facts#review H13 ×4; ws-content-audit division:div_facts OK;
+ws-code-snapshot OK (732); ws-boot-smoke OK; ws-pdf-preview OK; ws-screen-answer OK; ws-student-explorer OK;
+ws-chromebook-perf --only load OK; ws-stamp-assets + --check OK.
+
+### Evidence (design/status/facts-print-fix/r7/)
+`d1-divAdd-pr40-S-sections-p1.png`, `d1-divAdd-pr40-S-mixed-p1.png`, `d1-subDivMixAdd-pr50-S-sections-p1.png` (order);
+`d2-ownerMix-c2-pr20-S-p1.png` (Columns 2 prints 5, noted); `d3-divMix-alone-pr63-S-p1.png`, `d3-ownerMix-L-c9-pages1-p1.png`
+(bracket clearance).

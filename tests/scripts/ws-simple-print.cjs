@@ -1104,20 +1104,27 @@ async function factsR5(app) {
  *   PAGESFULL  measured white under the grid <= 8 mm beyond a full page's own on every page but a set's last, and in Pages
  *              mode on the last page too (the dialog says "every page is full" there)
  *   BLANKMID / DIVORDER (r5) and STRETCH: no row taller than 1.3 x its section's minimum
+ *   r7 (critic 2026-11-07 on 2bebf4f94): ORDER - the sections print in the teacher's list order (lists ÷ +, ÷Mix −,
+ *   ÷Mix × − +, − ÷Mix +; DIVORDER no longer exempts a list that starts with ÷); COLNOTE - a section printing other columns
+ *   than the ones picked carries a note, and the dialog offers an all-fact list Columns 5 and up; BRKCLEAR - a bracket's
+ *   INK 2 mm from its border in its own section and in a grid mixing forms (the text boxes reported as INFO); NOTEPLAIN -
+ *   no internal code in a note, at most two sentences each
  * Default (`--sweep`, inside --facts-print): ~900 prints; `--sweep-full` (critic / deploy): every count, Columns 1-10.
  */
 const SW_LISTS = (() => {
     const A = OWNER[0], S = OWNER[1], M = OWNER[2], D = OWNER[3], DM = Object.assign({}, OWNER[3], { opts: { divForm: 'mix' } });
-    return { owner: [A, S, M, D], ownerMix: [A, S, M, DM], addDiv: [A, D], multDiv: [M, DM], addSub: [A, S], asm: [A, S, M], divMix: [DM], mult: [M] };
+    return { owner: [A, S, M, D], ownerMix: [A, S, M, DM], addDiv: [A, D], multDiv: [M, DM], addSub: [A, S], asm: [A, S, M], divMix: [DM], mult: [M],
+        // (r7 ORDER: the teacher's own order, ÷ first or between)
+        divAdd: [D, A], divMixSub: [DM, S], divMixMSA: [DM, M, S, A], subDivMixAdd: [S, DM, A] };
 })();
 function sweepCases(full) {
     const cases = [];
     const C = (list, o) => cases.push({ list, o: Object.assign({ how: 'problems', n: 50, sets: 1, size: 'S', cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o) });
     const sizes = ['S', 'M', 'L'];
     // ÷ Mix In sections, the small counts (D-R6-1)
-    for (const size of sizes) for (const cols of ['auto', 7, 9]) for (let n = 10; n <= 60; n += full ? 1 : 3) C('ownerMix', { size, cols, n });
+    for (const size of sizes) for (const cols of ['auto', 7, 9]) for (let n = 10; n <= 60; n += full ? 1 : 4) C('ownerMix', { size, cols, n });
     // the owner's set, every count 1-150 by 5 (by 1 in full), Columns Auto / 7 / 9, both arrangements
-    for (const size of sizes) for (const cols of full ? ['auto', 6, 7, 8, 9, 10] : ['auto', 7, 9]) for (const arrange of full ? ['sections', 'mixed'] : ['sections']) for (let n = 1; n <= 150; n += full ? 1 : 7) C('owner', { size, cols, n, arrange });
+    for (const size of sizes) for (const cols of full ? ['auto', 6, 7, 8, 9, 10] : ['auto', 7, 9]) for (const arrange of full ? ['sections', 'mixed'] : ['sections']) for (let n = 1; n <= 150; n += full ? 1 : 9) C('owner', { size, cols, n, arrange });
     // Pages 1-4, every list, Columns Auto and 1-10 (a sample of them by default)
     const pcols = full ? ['auto', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : ['auto', 6, 7, 9, 10];
     for (const list of Object.keys(SW_LISTS)) for (const size of sizes) for (const cols of pcols) for (const n of full ? [1, 2, 3, 4] : [1, 2, 3]) {
@@ -1130,6 +1137,13 @@ function sweepCases(full) {
     for (const list of ['addDiv', 'multDiv']) for (const size of sizes) for (const cols of ['auto', 9]) for (let n = 4; n <= 130; n += full ? 3 : 9) C(list, { size, cols, n, arrange: 'mixed' });
     // Sets 2
     for (const size of sizes) { C('owner', { size, n: 63, sets: 2 }); C('ownerMix', { size, how: 'pages', n: 2, sets: 2 }); }
+    // ORDER (r7 D-R7-1): lists in unusual orders, both arrangements, Problems and Pages
+    for (const list of ['divAdd', 'divMixSub', 'divMixMSA', 'subDivMixAdd']) for (const size of sizes) for (const arrange of ['sections', 'mixed']) {
+        for (const n of full ? [5, 23, 40, 50, 97, 150] : [23, 97]) C(list, { size, n, arrange });
+        for (const n of [1, 2]) C(list, { size, how: 'pages', n, arrange });
+    }
+    // COLNOTE (r7 D-R7-2): every picked Columns, Pages 1 and Problems 50
+    for (const list of ['owner', 'ownerMix']) for (const size of sizes) for (const cols of full ? [1, 2, 3, 4, 5, 8] : [2, 5, 8]) { C(list, { size, cols, how: 'pages', n: 1 }); C(list, { size, cols, n: 50 }); }
     // (dev: SWEEP_GREP=<regex> keeps the cases whose JSON matches - a quick re-run of a failing slice)
     const g = process.env.SWEEP_GREP ? new RegExp(process.env.SWEEP_GREP) : null;
     return g ? cases.filter((c) => g.test(JSON.stringify(c))) : cases;
@@ -1164,13 +1178,40 @@ async function factsSweep(app, full) {
                         const cols = fd.defaultView.getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length;
                         const ops = {};
                         cells.forEach((x) => { const o = x.querySelector('.ws-fact .op'); const k = x.querySelector('[data-ws-ops="division"], [data-ws-notation]') || (o && /÷/.test(o.textContent)) ? 'div' : o ? o.textContent.trim() : '?'; ops[k] = (ops[k] || 0) + 1; });
-                        return { n: cells.length, cols, ops, div: !!ops.div, rowH: cells[0] ? mm(cells[0].getBoundingClientRect().height) : 0, bottom: g.getBoundingClientRect().bottom };
+                        // (the skills in the order their first cell prints; BRKCLEAR: each bracket's ink - text boxes, rules, the arc -
+                        // to its cell's inner edges, as the critic measures it)
+                        const seq = [];
+                        cells.forEach((x) => { const o = x.querySelector('.ws-fact .op'); const k = x.querySelector('[data-ws-ops="division"], [data-ws-notation]') || (o && /÷/.test(o.textContent)) ? 'div' : o ? o.textContent.trim() : '?'; if (!seq.includes(k)) seq.push(k); });
+                        let brk = Infinity, brkBox = Infinity;
+                        const cv = fd.createElement('canvas').getContext('2d');
+                        for (const x of cells) {
+                            if (!x.querySelector('[data-ws-ops="division"]')) continue;
+                            const cr = x.getBoundingClientRect(); const cs = fd.defaultView.getComputedStyle(x);
+                            const L0 = cr.left + parseFloat(cs.borderLeftWidth), R0 = cr.right - parseFloat(cs.borderRightWidth);
+                            const xs = [];
+                            const tw = fd.createTreeWalker(x, 4); let tn;
+                            const bx = [];
+                            while ((tn = tw.nextNode())) {
+                                if (!tn.textContent.trim() || tn.parentElement.closest('.ws-tab')) continue;
+                                const rg = fd.createRange(); rg.selectNodeContents(tn);
+                                const q = rg.getBoundingClientRect(); bx.push([q.left, q.right]);
+                                // (the glyph's INK, canvas measureText: a "1" box carries 0.1 em of empty side bearing)
+                                const ts = fd.defaultView.getComputedStyle(tn.parentElement); cv.font = `${ts.fontStyle} ${ts.fontWeight} ${ts.fontSize} ${ts.fontFamily}`;
+                                const mt = cv.measureText(tn.textContent);
+                                xs.push([q.left - mt.actualBoundingBoxLeft, q.left + mt.actualBoundingBoxRight]);
+                            }
+                            for (const e of x.querySelectorAll('*')) { if (e.closest('.ws-tab')) continue; const es = fd.defaultView.getComputedStyle(e); const q = e.getBoundingClientRect(); if (((parseFloat(es.borderTopWidth) > 0 && !/rgba\(0, 0, 0, 0\)|transparent/.test(es.borderTopColor)) || (parseFloat(es.borderBottomWidth) > 0 && !/rgba\(0, 0, 0, 0\)|transparent/.test(es.borderBottomColor))) && q.width > 2) xs.push([q.left, q.right]); if (e.tagName.toLowerCase() === 'path') xs.push([q.left, q.right]); }
+                            if (xs.length) brk = Math.min(brk, mm(Math.min(...xs.map((v) => v[0])) - L0), mm(R0 - Math.max(...xs.map((v) => v[1]))));
+                            const all = [...bx, ...xs];
+                            if (all.length) brkBox = Math.min(brkBox, mm(Math.min(...all.map((v) => v[0])) - L0), mm(R0 - Math.max(...all.map((v) => v[1]))));
+                        }
+                        return { n: cells.length, cols, ops, seq, brk: Number.isFinite(brk) ? brk : null, brkBox: Number.isFinite(brkBox) ? brkBox : null, div: !!ops.div, mixed: new Set(cells.map((x) => (x.querySelector('[data-ws-ops="division"]') ? 'b' : x.querySelector('[data-ws-notation]') ? 'f' : 's'))).size > 1, rowH: cells[0] ? mm(cells[0].getBoundingClientRect().height) : 0, bottom: g.getBoundingClientRect().bottom };
                     });
                     const last = grids.length ? Math.max(...grids.map((g) => g.bottom)) : 0;
                     return { grids: grids.map(({ bottom, ...x }) => x), white: foot && grids.length ? mm(Math.min(foot.getBoundingClientRect().top, (pg.querySelector('.ws-body') || foot).getBoundingClientRect().bottom) - last) : null,
                         setNo: Number(((/Set (\d+) of/.exec(foot ? foot.textContent : '') || [])[1]) || 1) };
                 });
-                r.push({ pages, counts: b.counts, total: b.total, notes: b.notes || [], factPages: b.factPages || null, sets: b.sets || 1,
+                r.push({ pages, counts: b.counts, total: b.total, notes: b.notes || [], line: m.summaryLine(b, c.o), factPages: b.factPages || null, sets: b.sets || 1,
                     pts: [...new Set([...String(b.pupilHtml).matchAll(/--fd:(\d+(?:\.\d+)?)pt|font-size:(\d+(?:\.\d+)?)pt;height:[\d.]+mm;margin-top|<div style="--ws-digit:(\d+(?:\.\d+)?)pt">/g)].map((x) => Number(x[1] || x[2] || x[3])))] });
             }
             return r;
@@ -1183,6 +1224,7 @@ async function factsSweep(app, full) {
     const SIZEPT = { S: 16, M: 24, L: 28 };
     const KEY = { '+': 'add_facts', '−': 'sub_facts', '-': 'sub_facts', '×': 'mult_facts', x: 'mult_facts', div: 'div_facts' };
     const tally = {};
+    let brkBoxMin = Infinity;
     const F = (k, t) => { tally[k] = (tally[k] || 0) + 1; if (tally[k] <= 25) fails.push(t); };
     for (const { c, r } of out) {
         const o = c.o;
@@ -1208,6 +1250,19 @@ async function factsSweep(app, full) {
                 const rough = r.notes.some((t) => /roughly even/.test(t));
                 for (const id of ids) if (!rough && Math.abs((cnt[id] || 0) - share) > (colOf[id] || 9) + 0.01) F('SHARES', `${tag}: SHARES ${id} ${cnt[id] || 0} of ${total} (share ${share.toFixed(1)}, a row ${colOf[id] || '?'})`);
             }
+            // ORDER (r7 D-R7-1): In sections, the skills print in the teacher's list order (each run of + − × between ÷ its own
+            // section); Mixed up, the ÷ section stands where the list puts it against the + − × grid
+            {
+                const KEYOP = { '+': 'add_facts', '−': 'sub_facts', '-': 'sub_facts', '×': 'mult_facts', x: 'mult_facts', div: 'div_facts' };
+                const firsts = [];
+                ps.forEach((p) => p.grids.forEach((g) => g.seq.forEach((op) => { const k2 = KEYOP[op] || op; if (!firsts.includes(k2)) firsts.push(k2); })));
+                const want = ids.filter((id) => firsts.includes(id));
+                if (o.arrange === 'mixed' && ids.length > 1) {
+                    const divAt = firsts.indexOf('div_facts'), mainAt = firsts.findIndex((id) => id !== 'div_facts');
+                    const listDivFirst = ids.indexOf('div_facts') >= 0 && ids.indexOf('div_facts') < ids.findIndex((id) => id !== 'div_facts');
+                    if (divAt >= 0 && mainAt >= 0 && (divAt < mainAt) !== listDivFirst) F('ORDER', `${tag}: ORDER the ÷ section prints ${divAt < mainAt ? 'before' : 'after'} the + − × facts; the list puts ÷ ${listDivFirst ? 'first' : 'after them'}`);
+                } else if (firsts.join() !== want.join()) F('ORDER', `${tag}: ORDER prints ${firsts.join(' > ')}, the list is ${ids.join(' > ')}`);
+            }
             let seenDiv = false;
             ps.forEach((p, k) => {
                 const lastOfSet = k === ps.length - 1;
@@ -1215,7 +1270,16 @@ async function factsSweep(app, full) {
                     const empty = g.cols ? Math.ceil(g.n / g.cols) * g.cols - g.n : 0;
                     // (a section of less than one row - a few asked - may stand short before the next section on the last page)
                     if (empty && (!lastOfSet || (gi < p.grids.length - 1 && g.n >= g.cols))) F('BLANKMID', `${tag} page ${k + 1}: BLANKMID ${empty} empty cell(s) mid-print (grid ${gi + 1}, ${g.n} in ${g.cols} columns)`);
-                    if (g.div) seenDiv = true; else if (seenDiv && ids[0] !== 'div_facts') F('DIVORDER', `${tag} page ${k + 1}: DIVORDER + − × after ÷`);
+                    // (r7: DIVORDER no longer exempts a list that starts with ÷ - ORDER below compares with the list itself)
+                    if (g.div) seenDiv = true; else if (seenDiv && ids.indexOf('div_facts') > Math.max(...ids.map((id, x) => (id === 'div_facts' ? -1 : x)))) F('DIVORDER', `${tag} page ${k + 1}: DIVORDER + − × after ÷ (the list puts ÷ last)`);
+                    // BRKCLEAR (r7 D-R7-3): 2 mm each side of a bracket, in its own section and in a grid mixing forms
+                    // (measured on the glyph INK and the drawn arc and bar - what prints; the text BOXES, with a "1"'s empty side
+                    // bearing, are tallied as INFO: 2 mm on the boxes at 9 columns would cost the owner's 0.3 mm arc whites)
+                    if (g.brk !== null && g.brk < 1.95) F('BRKCLEAR', `${tag} page ${k + 1}: BRKCLEAR a bracket's ink ${g.brk.toFixed(2)} mm from its cell's border (${g.mixed ? 'mixed' : 'bracket'} section, ${g.cols} columns)`);
+                    if (g.brkBox !== null) brkBoxMin = Math.min(brkBoxMin, g.brkBox);
+                    // COLNOTE (r7 D-R7-2): a section printing other columns than the ones picked says why
+                    const pick = o.cols === 'auto' ? 0 : Number(o.cols);
+                    if (pick && g.cols !== pick && !r.notes.some((t) => new RegExp(`\\b${g.cols} columns\\b`).test(t)) && !(pick > 9 && g.div && g.cols === 9 && /max 9 with division/.test(r.line || ''))) F('COLNOTE', `${tag} page ${k + 1}: COLNOTE a ${g.div ? '÷' : '+ − ×'} section prints ${g.cols} columns for ${pick} picked and no note says why (notes: "${r.notes.join(' | ').slice(0, 100)}")`);
                 });
                 // (excused only where the dialog says whole rows cannot fill every page - and then it does not claim they do)
                 if (p.white !== null && (!lastOfSet || o.how === 'pages') && p.white > fullWhite + 8 && !r.notes.some((t) => /cannot fill every page/.test(t))) F('PAGESFULL', `${tag} page ${k + 1} of ${ps.length}: PAGESFULL ${p.white.toFixed(1)} mm of white under the grid (a full page ${fullWhite.toFixed(1)}; at most 8 more)${o.how === 'pages' ? ' - the dialog says every page is full' : ''}`);
@@ -1224,6 +1288,11 @@ async function factsSweep(app, full) {
                 const fp = r.factPages && sn === 0 ? r.factPages[base + k] : null;
                 p.grids.forEach((g, j) => { const h = fp && fp[j] && fp[j].hMin; if (h && g.rowH > h * 1.3 + 0.6) F('STRETCH', `${tag} page ${k + 1}: STRETCH rows ${g.rowH.toFixed(1)} mm, ${(g.rowH / h).toFixed(2)} x their minimum`); });
             });
+        }
+        // NOTEPLAIN (r7): a dialog note never shows an internal code ("(PT-FRW-5)") and keeps to two sentences
+        for (const t of r.notes) {
+            if (/\((?:PT|PG|CL|VA|TY|DN)-[A-Z0-9-]+\)|\b(?:PT|PG)-[A-Z]*-?\d/.test(t)) F('NOTEPLAIN', `${tag}: NOTEPLAIN a note shows an internal code: "${t.slice(0, 100)}"`);
+            if ((t.match(/[.!?](?=\s|$)/g) || []).length > 2) F('NOTEPLAIN', `${tag}: NOTEPLAIN a note runs to ${(t.match(/[.!?](?=\s|$)/g) || []).length} sentences: "${t.slice(0, 100)}"`);
         }
         // SIZENOTE
         const pt = r.pts.length ? Math.min(...r.pts) : 0;
@@ -1258,7 +1327,7 @@ async function factsSweep(app, full) {
             const bb = await m.buildSets(list, { how: pr.how, n: pr.n, sets: 1, size: pr.size, cols: pr.cols, colsMode: pr.colsMode, key: false, arrange: pr.arrange, seed: 918528, title: true, paper: 'A4' });
             const html = bb.pupilHtml || '';
             const pts = [...String(html).matchAll(/--fd:(\d+(?:\.\d+)?)pt/g)].map((x) => Number(x[1]));
-            out[size] = { btn, notes, pt: pts.length ? Math.min(...pts) : 0 };
+            out[size] = { btn, notes, pt: pts.length ? Math.min(...pts) : 0, colOpts: [...document.querySelectorAll('#spCols option')].map((x) => x.value) };
             set('#spCols', 'auto', 'change'); await idle();
             window.closeSimplePrint();
         }
@@ -1267,9 +1336,12 @@ async function factsSweep(app, full) {
     for (const [size, u] of Object.entries(ui)) {
         const nm = { L: 'Big', M: 'Medium' }[size];
         rows.push(`SIZEBTN @${size} Columns 9: button "${u.btn}", prints ${u.pt} pt; notes "${u.notes.slice(0, 140)}"`);
+        // (r7 D-R7-2: an all-fact list offers Columns 5 and up - fact rows floor at 5 across)
+        if (u.colOpts.some((v) => /^[1-4]$/.test(v))) F('COLNOTE', `COLNOTE the dialog offers Columns ${u.colOpts.filter((v) => /^[1-4]$/.test(v)).join(', ')} for an all-fact list (fact rows print 5 to 10 across)`);
         if (!new RegExp(`\\b${u.pt} pt\\b`).test(u.btn)) F('SIZEBTN', `SIZEBTN @${size} Columns 9: the ${nm} button reads "${u.btn}" but the print is ${u.pt} pt`);
         if (u.pt < { L: 28, M: 24 }[size] && !new RegExp(`${nm}\\b[^.]*\\b${u.pt} pt`).test(u.notes)) F('SIZEBTN', `SIZEBTN @${size} Columns 9: the dialog's notes do not say ${nm} prints at ${u.pt} pt ("${u.notes.slice(0, 120)}")`);
     }
+    rows.push(`SWEEP BRKCLEAR info: the closest bracket text BOX to a border ${Number.isFinite(brkBoxMin) ? brkBoxMin.toFixed(2) : '-'} mm (the ink is held to 2 mm)`);
     rows.push(`SWEEP ${full ? 'full ' : ''}${out.length} prints measured in ${((Date.now() - T0) / 1000).toFixed(0)} s (a full page ${fullWhite.toFixed(1)} mm under its grid); ${Object.keys(tally).length ? Object.entries(tally).map(([k, v]) => `${k} ${v}`).join(', ') : 'no findings'}`);
     return { rows, fails };
 }
