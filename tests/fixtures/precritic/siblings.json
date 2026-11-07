@@ -1,41 +1,128 @@
 {
  "about": "ws-sibling-compare: the APPROVED skills of each kit template (process rule 0b: a lane's red matrix row is engine debt only at or below these skills' counts on the same row and size). A skill is listed here when it passed its critic on that template; changed only with a STATUS note. Siblings must have the lane skill's SHAPE (template + digit tracks over 24 seeded items; lead ruling 2026-10-24); `peers` (optional) are same-shape comparison skills used, measured like siblings, when no approved sibling has that shape. `pairs` (optional) gives a lane skill the siblings of its own size band, as the pilot-su-c lead's comparison did (design/audit/runs/pilot-su-c/sibling-compare.cjs); without a pair every approved sibling of the template is used.",
  "mainRed": [
-  { "row": "division:div_facts|mixed/defaults", "size": "L", "rule": "L-DENSITY PG-23", "n": 2, "proof": "lead ruling 2026-11-03 (Lane D R4): red on the main tip cd81c8e7 with the same 2 findings (ws-print-lint --source kit --kind mixed, div_facts + add_facts + tape_diagram + perimeter_intro, L: last page 2 holds 2 items); the mixed-practice role is the mixed-m2 lane's" }
+  {
+   "row": "division:div_facts|mixed/defaults",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "proof": "lead ruling 2026-11-03 (Lane D R4): red on the main tip cd81c8e7 with the same 2 findings (ws-print-lint --source kit --kind mixed, div_facts + add_facts + tape_diagram + perimeter_intro, L: last page 2 holds 2 items); the mixed-practice role is the mixed-m2 lane's"
+  }
  ],
  "templates": {
   "fact": {
-   "approved": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
+   "approved": [
+    "addition:add_facts",
+    "subtraction:sub_facts",
+    "multiplication:mult_facts",
+    "division:div_facts_long"
+   ],
    "source": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",
-   "peers": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
+   "peers": [
+    "addition:add_facts",
+    "subtraction:sub_facts",
+    "multiplication:mult_facts",
+    "division:div_facts_long"
+   ],
    "peersSource": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",
-   "pairs": { "division:div_facts": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"] }
+   "pairs": {
+    "division:div_facts": [
+     "addition:add_facts",
+     "subtraction:sub_facts",
+     "multiplication:mult_facts",
+     "division:div_facts_long"
+    ]
+   }
   },
   "equation": {
-   "approved": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
+   "approved": [
+    "addition:add_facts",
+    "subtraction:sub_facts",
+    "multiplication:mult_facts",
+    "division:div_facts_long"
+   ],
    "source": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",
-   "peers": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
+   "peers": [
+    "addition:add_facts",
+    "subtraction:sub_facts",
+    "multiplication:mult_facts",
+    "division:div_facts_long"
+   ],
    "peersSource": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",
-   "pairs": { "division:div_facts": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"] }
+   "pairs": {
+    "division:div_facts": [
+     "addition:add_facts",
+     "subtraction:sub_facts",
+     "multiplication:mult_facts",
+     "division:div_facts_long"
+    ]
+   }
   },
   "stack": {
    "approved": [
-    "addition:add_100_regroup", "subtraction:sub_100_regroup", "addition:add_1k_regroup", "subtraction:sub_1k_regroup",
-    "addition:add_10k_regroup", "subtraction:sub_10k_regroup", "subtraction:sub_100k_regroup", "subtraction:sub_1m_regroup"
+    "addition:add_100_regroup",
+    "subtraction:sub_100_regroup",
+    "addition:add_1k_regroup",
+    "subtraction:sub_1k_regroup",
+    "addition:add_10k_regroup",
+    "subtraction:sub_10k_regroup",
+    "subtraction:sub_100k_regroup",
+    "subtraction:sub_1m_regroup"
    ],
    "source": "the siblings the pilot-su-c lead and critic r1 compared against (critic-r1.md engine rulings; pilot status 2026-10-23 19:40)",
-   "peers": ["subtraction:sub_100_no_regroup", "subtraction:sub_50_no_regroup"],
+   "peers": [
+    "subtraction:sub_100_no_regroup",
+    "subtraction:sub_50_no_regroup"
+   ],
    "peersSource": "lead ruling 2026-10-24 (rule 0b compares SAME-SHAPE siblings: template + digit tracks): the 2-track stack has no approved same-shape sibling (add_100_regroup's answers reach 100, 3 tracks), so sub_100_regroup is compared with these same-shape peers, measured like siblings (pins, plus a fresh sibling run with --run-siblings: their pins predate the newer print-lint rules). Used only when no approved sibling of the skill's shape exists.",
    "pairs": {
-    "subtraction:sub_50_no_regroup": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
-    "subtraction:sub_100_no_regroup": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
-    "subtraction:sub_2d_1d": ["addition:add_100_regroup", "subtraction:sub_100_regroup"],
-    "subtraction:sub_1k_no_regroup": ["addition:add_1k_regroup", "subtraction:sub_1k_regroup"],
-    "subtraction:sub_10k_no_regroup": ["addition:add_10k_regroup", "subtraction:sub_10k_regroup"],
-    "subtraction:sub_100k_no_regroup": ["subtraction:sub_100k_regroup"],
-    "subtraction:sub_1m_no_regroup": ["subtraction:sub_1m_regroup"]
+    "subtraction:sub_50_no_regroup": [
+     "addition:add_100_regroup",
+     "subtraction:sub_100_regroup"
+    ],
+    "subtraction:sub_100_no_regroup": [
+     "addition:add_100_regroup",
+     "subtraction:sub_100_regroup"
+    ],
+    "subtraction:sub_2d_1d": [
+     "addition:add_100_regroup",
+     "subtraction:sub_100_regroup"
+    ],
+    "subtraction:sub_1k_no_regroup": [
+     "addition:add_1k_regroup",
+     "subtraction:sub_1k_regroup"
+    ],
+    "subtraction:sub_10k_no_regroup": [
+     "addition:add_10k_regroup",
+     "subtraction:sub_10k_regroup"
+    ],
+    "subtraction:sub_100k_no_regroup": [
+     "subtraction:sub_100k_regroup"
+    ],
+    "subtraction:sub_1m_no_regroup": [
+     "subtraction:sub_1m_regroup"
+    ]
    }
   }
  },
- "ownerSkipped": [{"skill": "multiplication:count_by_tables", "template": "count-row", "proof": "count-row card §9 Q2(a) (signed 2026-11-07, lane decision under owner rule 2026-11-07): the first count-row drawing has no approved sibling; sibling-compare is SKIPPED-owner until the card's skills pass", "until": "count_by_tables in js/modules/redesign-passed.js"}]
+ "ownerSkipped": [
+  {
+   "skill": "multiplication:count_by_tables",
+   "template": "count-row",
+   "proof": "count-row card §9 Q2(a) (signed 2026-11-07, lane decision under owner rule 2026-11-07): the first count-row drawing has no approved sibling; sibling-compare is SKIPPED-owner until the card's skills pass",
+   "until": "count_by_tables in js/modules/redesign-passed.js"
+  },
+  {
+   "skill": "multiplication:mult_properties",
+   "template": "arrays-turn",
+   "proof": "lead ruling 2026-11-07 (session_01HVwpAE3g6EZH8idgErP6LP): first family on template; critic grades the named pages",
+   "until": "mult_properties in js/modules/redesign-passed.js, then added here as an approved sibling"
+  },
+  {
+   "skill": "multiplication:arrays_groups",
+   "template": "arrays",
+   "proof": "lead ruling 2026-11-07 (session_01HVwpAE3g6EZH8idgErP6LP): first family on template; critic grades the named pages",
+   "until": "arrays_groups in js/modules/redesign-passed.js, then added here as an approved sibling"
+  }
+ ]
 }
