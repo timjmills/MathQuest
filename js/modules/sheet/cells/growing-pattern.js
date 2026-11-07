@@ -27,7 +27,10 @@ import { answerArea } from '../graphics/answer-area.js';
 
 export const GROW_TEMPLATE = 'growing-pattern';
 const GRID = 7;                                   // every term fits 7 x 7 units at Term 4
-const UNIT = { S: 2.0, M: 2.4, L: 2.6 };   // (r2: M 2.8 / L 3.3 -> 2.4 / 2.6 and the pad 0.9 -> 0.4, so two Guided rows fit under a lesson's Warm-up)
+// (r2: M 2.8 / L 3.3 -> 2.4 / 2.6 and the pad 0.9 -> 0.4, so two Guided rows fit under a lesson's Warm-up)
+// (r3: the unit never goes under the standard's smallest unit square, base-10 u = 2.5 mm at S (WORKSHEET_DESIGN_STANDARD
+// 11.2): the S dot was 1.6 mm across, too small to count for this pupil; S now fits fewer terms a row, it never shrinks)
+const UNIT = { S: 2.5, M: 2.5, L: 2.6 };
 const PAD = 0.4;                                  // units of white round the drawing inside its box
 
 /** How many objects Term t has (start + (t - 1) × step); NaN for an unknown family. */

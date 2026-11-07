@@ -128,14 +128,16 @@ function noticeSteps(q) {
     const ans = [{ slot: 'answer', value: q.printAnswer || '' }];
     if (p.task === 'parity') {
         const even = p.product % 2 === 0;
-        const out = [step(`Look at ${p.a}. ${p.a} is ${pe(p.a)}.`), step(`Look at ${p.b}. ${p.b} is ${pe(p.b)}.`)];
+        // (lf-algebra r3, H13 on the side twin: a long step wrapped to 6 lines in the twin's column and made its pair row
+        // 113 mm tall over a 45 mm problem) one short line a step, the same four steps
+        const out = [step(`${p.a} is ${pe(p.a)}.`), step(`${p.b} is ${pe(p.b)}.`)];
         if (even) {
-            const e = p.a % 2 === 0 ? p.a : p.b, o = e === p.a ? p.b : p.a;
-            out.push(step(`${e} is even: two equal groups. ${p.a} × ${p.b} is ${o} lots of ${e}, so it splits into two equal groups too.`));
+            const e = p.a % 2 === 0 ? p.a : p.b;
+            out.push(step(`${e} is even, so ${p.a} × ${p.b} makes two equal groups.`));
         } else {
-            out.push(step(`Both are odd. Each odd number has one left over, so ${p.a} × ${p.b} has one left over: odd.`));
+            out.push(step('Odd × odd leaves one over: odd.'));
         }
-        out.push(step(`The product ${p.product} is ${even ? 'even' : 'odd'}. Circle ${even ? 'Even' : 'Odd'}.`, ans));
+        out.push(step(`${p.product} is ${even ? 'even' : 'odd'}. Circle ${even ? 'Even' : 'Odd'}.`, ans));
         return clampSteps(out);
     }
     if (p.task === 'feature') {
