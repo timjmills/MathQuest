@@ -152,7 +152,8 @@ Times: builder R4 checks, start 2026-11-07T06:30Z, end 2026-11-07T07:45Z, profil
 Times: lane day-1 cards + merge, start 2026-11-07T06:25Z, end 2026-11-07T06:47Z, profile lane session
 
 ## Log
-- 2026-11-07 ~13:50: hand-over. Cost: lead read cost_usd $55.23 at 09:34 UTC; later sub-agent runs (fix4 ~0.6 M tokens, #7 ~0.7 M, three critics ~0.9 M) are not read yet - the lead reads the session's cost_usd (session_013pHDnQ7sfFBg45rrEDgLdJ) for the final figure ($20 ~ 1 % of the week).
+- 2026-11-07: COST (lead reading): session cost_usd $200.65 at 13:21 UTC = about 10.0 % of the weekly limit ($20 = 1 %), of the lane's $250 cap (80 %). Lane paused to next week; the lead confirmed the next-week order.
+- 2026-11-07 ~13:50: hand-over. Cost (superseded above): lead read cost_usd $55.23 at 09:34 UTC; later sub-agent runs (fix4 ~0.6 M tokens, #7 ~0.7 M, three critics ~0.9 M) are not read yet - the lead reads the session's cost_usd (session_013pHDnQ7sfFBg45rrEDgLdJ) for the final figure ($20 ~ 1 % of the week).
 - 2026-11-07: owner scope decision received (BUILD only, no sign-off); re-aimed to round-1 BUILD skills (adds mult_comparison, remainder_interpret; drops tables_links, div_by_itself, mult_three); cards decided by the lane, left unsigned pending the lead's gate ruling.
 - 2026-11-07: lane started; skip-count fix merged; count-row and ops-tables cards drafted; owner sheet sent to the lead.
 
