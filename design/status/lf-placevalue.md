@@ -3,15 +3,42 @@ Title: Lessons-first wave 1 — place value and decimals skills of the overdue B
 Session: session_013pHDnMCXcY6kXV15KHf4Yp
 Branch: claude/lf-placevalue
 Owner of files: gen-pv.js, sheet/cells/{pv,value-line,line-labels,gattegno}.js, pv-support-cell.js, sheet/providers/pv.js, panes/{place,extras,pv-exchange}.js, design/cards/pv/
-State: building
+State: fix
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
 Critic rounds: 1, FAIL (all five; min 1 stretch, core 4-6)
 
 ## Now
-- pv spec card drafted (`design/cards/pv/pv.md`): green except the owner signature; questions sent to the lead 2026-11-07.
-- Precritic r0 on the #1 skills: running; first reds are combine (L10 zero-place cycle, page repeats, CL40-INK) and LESSON-DATA.
-- Checks first: backtest rows for each red, then fixes in gen-pv.js / pv.js.
+- HAND-OVER 2026-11-07 ~13:30 UTC (budget: week at ~60 %, no new work after 14:10). Branch claude/lf-placevalue @ a2c0e635, PR #35.
+- Critic r1 FAIL (all five lesson #1 skills); r1 fix round done; precritic r3 (design/audit/runs/lf-placevalue/precritic-r3.md) is
+  18 FAIL / 21 PASS — mostly NEW reds from the plan-from-card gates (every offered role × option value). Critic r2 NOT run (rule 0b).
+- The pv card needs ONE re-sign (a2c0e635: body changed only by rule-index hashes from the integration merge).
+- Next round (lane, medium): the "What remains" list below, then precritic r4 and critic r2 (brief ready: critic-r2-brief.md).
+
+## Hand-over (2026-11-07)
+**Cost:** $93.49 session cost_usd (≈ 4.7 % of the weekly limit, 37 % of the $250 cap), sub-agents included.
+**Times:** start 06:53; precritic r0 07:00-07:45; fixes + r1 08:20-09:05; r2 08:37-09:15; critic r1 09:36-10:24 (47 min);
+builder r1 10:13-12:07 + checks builder 10:24-11:20 (parallel); r3 12:24-13:12.
+**Critic verdicts:** r1 FAIL (design/audit/runs/lf-placevalue/critic-r1.md): identify / value / expand / combine / unit_form, core
+pages 4-6. No skill passed; redesign-passed.js unchanged.
+**Precritic r3 reds (what remains):**
+1. cell-checks / render-gate OVERFLOW on option values × roles (plan-from-card, new): value form=unit and identify band=99999
+   (and higher bands) on lesson / test / review pages; combine lesson S/M; expand lesson + test (all sizes); unit_form test / review.
+   Cause: pv cells sized for the default band / form; the fit must hold for every offered option value (lane files).
+2. ws-screen-slots --screen-digit: 27 misses (identify / expand screen numerals < 56 / 48 / 40 px or not bold) — r1 F7, host side
+   (screen-cell.js / question-render.js: not lane files; needs an owner).
+3. print-lint lesson L / S: identify#lesson DN-2 / H13 (writeValue taller cells; lesson.js pagination, lf-engine).
+4. print-lint sections pages 2 S / L (new two-skill sheet gate): PAGEFILL / PG-23 — the engine's sections pagination (r1 F21, shared roles).
+5. options-render --bands: combine band=999999 at L.
+6. sibling-compare (first family, lead R1: rows go to the critic) and spec-card-signed (re-sign) — process, not defects.
+**Fixed this session (all pushed):** r0 → r2: dealer, CL-40, WRAP-OP, lesson data, expand kit card, chart heads, practiceShapes;
+r1 fix round: F1, F3, F4 (paper + key), F5, F8, F9, F10, F11, F12, F13, F19, F20, F22; D4 / D5; writeValue share code 4L.
+**Checks built (each with a backtest):** pv-combine-dealer, pv-equation-row-cl40, pv-lesson-data, pv-expand-card-kit,
+card-rulings-value-reader, precritic-offered-na, pv-r1-* (4), optin-* (8: H13-ABS 35 %, GRID-EVEN-ALL, WRONG-FITS-SLOTS, WRONG-FILL,
+SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
+**Not built / not started:** #6 build entry value_ten_times (presets exist; closes with an 8/10 pass), #9, #10 thousandths_pv and
+#14 / #15 decimals (fractions lane; sized: a full family lane for wave 2), #12 pv10_exponents.
+**Owner / lead questions open:** none blocking; the card re-sign (a2c0e635).
 
 ## Owner go
 
