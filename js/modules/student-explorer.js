@@ -194,6 +194,7 @@ function bodyHTML() {
 function render({ keepScroll = false } = {}) {
     const r = ui.root;
     if (!r) return;
+    hideThumb();   // the cards under a thumbnail are about to be drawn again
     for (const t of r.querySelectorAll('.mqx-tab')) {
         const on = t.dataset.tab === ui.tab;
         t.setAttribute('aria-selected', String(on));
@@ -225,6 +226,7 @@ function updateCount() {
 }
 
 function toggle(card) {
+    hideThumb();   // a pick (a click, or Space / Enter on a focused card) puts the thumbnail away
     const s = byKey().get(card.dataset.key);
     if (!s) return;
     if (isSelected(s)) {
@@ -249,20 +251,42 @@ const exampleQueue = [];
 let idleHandle = 0;
 const ric = (fn) => (typeof requestIdleCallback === 'function' ? requestIdleCallback(fn, { timeout: 800 }) : setTimeout(() => fn({ timeRemaining: () => 8 }), 60));
 
+// One seeded sample per skill (seed 11), shared by the card's short example and the hover thumbnail, so the two always
+// show the same item. `ms` is how long the generator took: a slow one (> THUMB_SLOW_MS) gets the text example only.
+const sampleCache = new Map();
+function sampleOf(s) {
+    if (sampleCache.has(s.key)) return sampleCache.get(s.key);
+    let out;
+    const t0 = performance.now();
+    try {
+        const q = generateQuestionFor({ category: s.categoryId, skill: s.skillId, seed: 11 });
+        out = { q: q && (q.text || q.visual) ? q : null, ms: performance.now() - t0, err: false };
+    } catch (e) {
+        out = { q: null, ms: performance.now() - t0, err: true };
+    }
+    sampleCache.set(s.key, out);
+    return out;
+}
+
+/** The question the pupil reads, as one line of plain text (never the answer). */
+function questionText(q) {
+    if (!q) return '';
+    const div = document.createElement('div');
+    div.innerHTML = String(q.text || '');
+    // check r4 D4: an exponent is a <sup>; textContent would flatten (4 + 5)<sup>2</sup> into "(4 + 5)2"
+    const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+    for (const el of div.querySelectorAll('sup')) {
+        const t = el.textContent.trim();
+        el.textContent = /^\d+$/.test(t) ? [...t].map((d) => SUP[d]).join('') : `^${t}`;
+    }
+    return (div.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
 function exampleFor(s) {
     if (exampleCache.has(s.key)) return exampleCache.get(s.key);
     let text = '';
     try {
-        const q = generateQuestionFor({ category: s.categoryId, skill: s.skillId, seed: 11 });
-        const div = document.createElement('div');
-        div.innerHTML = String((q && q.text) || '');
-        // check r4 D4: an exponent is a <sup>; textContent would flatten (4 + 5)<sup>2</sup> into "(4 + 5)2"
-        const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
-        for (const el of div.querySelectorAll('sup')) {
-            const t = el.textContent.trim();
-            el.textContent = /^\d+$/.test(t) ? [...t].map((d) => SUP[d]).join('') : `^${t}`;
-        }
-        text = (div.textContent || '').replace(/\s+/g, ' ').trim();
+        text = questionText(sampleOf(s).q);
         // a bare instruction ("What is the perimeter?") or a long word problem is no example (a sweep of all 716: ~0.6 ms each)
         if (!/\d/.test(text) || text.length < 3) text = '';   // an example shows numbers; a bare question does not
         if (text.length > 44) text = '';
@@ -298,6 +322,638 @@ function watchExamples() {
         if (exampleQueue.length && !idleHandle) idleHandle = ric(pumpExamples);
     }, { root: ui.root.querySelector('#mqxBody'), rootMargin: '200px 0px' });
     for (const el of ui.root.querySelectorAll('.mqx-card')) if (!exampleCache.has(el.dataset.key)) ui.io.observe(el);
+}
+
+// ---- the hover thumbnail (owner, 2026-11-05: "give a thumbnail of the skill when mousing over") ----------------
+// Hovering a card with a mouse (or focusing it with the keyboard) shows, after a short delay, the card's sample item
+// drawn the way the pupil will see it: the black-and-white paper cell of the practice card, with the skill's visual.
+// The drawing is teacher-preview.js's (mountQuestion: the same cell the teacher's hover preview draws); that module is
+// loaded on the first hover only, never at startup. The question only — the cell's answer slots are empty. A skill whose
+// generator throws or is slow (> THUMB_SLOW_MS) shows its text example instead. Ideas from the Skills Navigator's
+// so-hover-popup (a delay, a cache) and teacher-preview's placement (beside the anchor, never over the pointer).
+// Touch screens (hover: none / pointer: coarse) get no hover thumbnail: a tap still picks the skill.
+const THUMB_ID = 'mqxThumb';
+const THUMB_DELAY = 500;
+const THUMB_WARM = 150;          // moving straight from one card to the next
+const THUMB_SLOW_MS = 50;
+const th = { el: null, timer: 0, pending: null, card: null, byFocus: false, token: 0, lastHide: 0, pointer: { x: -1, y: -1 }, mode: '', key: '' };
+let previewMod = null;
+let previewPromise = null;
+function loadPreview() {
+    if (previewMod) return Promise.resolve(previewMod);
+    if (!previewPromise) {
+        previewPromise = import('./teacher-preview.js').then((m) => (previewMod = m)).catch((e) => { previewPromise = null; throw e; });
+    }
+    return previewPromise;
+}
+// A touch screen (its main pointer is a finger, and nothing on it can hover) never gets a hover thumbnail. Only a real
+// mouse or pen pointer event opens one, so a device that reports no pointer at all (hover: none, pointer: none) still
+// shows it when a mouse is moved; a tablet with a trackpad (any-hover: hover) shows it for the trackpad.
+function noHover() {
+    try { return window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(any-hover: hover)').matches; } catch (e) { return false; }
+}
+function thumbEl() {
+    if (th.el && th.el.isConnected) return th.el;
+    const el = document.createElement('div');
+    el.id = THUMB_ID;
+    el.className = 'mqx-thumb';
+    el.setAttribute('role', 'tooltip');
+    el.hidden = true;
+    ui.root.appendChild(el);
+    th.el = el;
+    return el;
+}
+const thumbOpen = () => !!(th.el && !th.el.hidden);
+
+function setDescribed(card, on) {
+    if (!card) return;
+    const ids = (card.getAttribute('aria-describedby') || '').split(/\s+/).filter((x) => x && x !== THUMB_ID);
+    if (on) ids.push(THUMB_ID);
+    if (ids.length) card.setAttribute('aria-describedby', ids.join(' ')); else card.removeAttribute('aria-describedby');
+}
+
+function hideThumb() {
+    clearTimeout(th.timer);
+    th.timer = 0;
+    th.pending = null;
+    th.token++;
+    if (thumbOpen()) th.lastHide = Date.now();
+    if (th.el) { th.el.hidden = true; th.el.innerHTML = ''; }
+    setDescribed(th.card, false);
+    th.card = null;
+    th.byFocus = false;
+    th.mode = '';
+    th.key = '';
+}
+
+function scheduleThumb(card, byFocus) {
+    if (th.card === card && thumbOpen()) { th.byFocus = th.byFocus || byFocus; return; }
+    if (th.pending === card) return;
+    clearTimeout(th.timer);
+    if (thumbOpen()) hideThumb();
+    th.pending = card;
+    loadPreview().catch(() => { /* the text example stands in */ });
+    const delay = Date.now() - th.lastHide < 400 ? THUMB_WARM : THUMB_DELAY;
+    th.timer = setTimeout(() => { th.timer = 0; showThumb(card, byFocus); }, delay);
+}
+
+// ---- critic r1 / r2 (2026-11-07): a picture whenever the skill has one, and never text a pupil cannot read.
+// The plate is as large as the room beside (or above / below) the card allows. The drawing is tidied for pupils (no CCSS
+// code, no Hint / Check buttons, no screen-only wording, no second copy of the question, no extra answer line) and then:
+//   1. 'cell'  the whole drawing, fitted by its real painted box, when the question line renders >= 14 px, the scale is
+//              >= 0.6 and every text renders >= 10 px (the practice card draws a number line's ticks at 17-24 px, so a
+//              plate showing them at 9.6 px would be smaller than the card: measured, r2 PARITY);
+//   2. 'crop'  otherwise, when the item has a figure: the question line over a window on the figure, scaled (up to
+//              CROP_MAX, so a tick label drawn at 7 px reaches 10 px) until every text is legible, the figure's start
+//              shown and the cut edges faded — never words alone for a skill whose task needs its picture;
+//   3. 'text'  only for an item with no figure at all: its question in large print.
+// L is taller than the brief's 480 x 320 (W): with the height, 613 of 716 skills draw whole (critic r1 D1). B (480 x 228)
+// fits above or below a card in the middle column of a 1024 x 768 grid, where no wide plate fits beside it (r2 fix 4).
+const SIZES = { L: { w: 480, h: 400 }, W: { w: 480, h: 320 }, B: { w: 480, h: 228 }, M: { w: 400, h: 260 }, S: { w: 340, h: 210 } };
+const CAP_H = 76;                 // plate padding + gap + a two-line caption
+const LEGIBLE = { q: 14.1, min: 10.05, scale: 0.605 };   // a hair over the gate's 14 / 10 / 0.6
+const CROP_MAX = 3;               // a crop may draw a figure up to this much larger than its own layout
+const CONTROL_RE = /\b(hint|check|submit|reset|clear|undo|try again|show me|listen|read aloud|speak|zoom)\b|🔊/i;
+// screen-only or colour wording (critic r2 R2-D2): the clause goes, the rest of the sentence stays
+const SCREEN_WORDS = [
+    /\s*[—–-]\s*both cells turn green when a pair is correct\.?/gi,
+    /\s*\(harder: green cells are blank\)/gi,
+    /\s*After each number, press Space\.?/gi,
+    /\s*[^.!?]*\b(turns? green|press (Space|Enter)|green cells?)\b[^.!?]*[.!?]?/gi,
+];
+const screenClean = (t) => SCREEN_WORDS.reduce((acc, re) => acc.replace(re, ''), String(t || '')).replace(/\s+([.,!?])/g, '$1').replace(/\s{2,}/g, ' ');
+const normText = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+const isVisible = (n) => (typeof n.checkVisibility === 'function' ? n.checkVisibility({ visibilityProperty: true }) : n.offsetParent !== null);
+const FIGURE_SEL = 'svg, img, canvas, table, .k2-twin, [data-mq-blank], [data-mq-cell], .ws-fact, .ws-stack, .ws-eq';
+
+/** Hide what is not for a pupil's first look: teacher codes, screen controls, a repeated question, the answer row. */
+function tidyThumb(frame) {
+    const cell = frame.querySelector('.tvp-cell');
+    if (!cell) return;
+    for (const n of cell.querySelectorAll('*')) {
+        const own = [...n.childNodes].filter((c) => c.nodeType === 3).map((c) => c.textContent).join(' ').trim();
+        if (own && /^CCSS\b/.test(own)) n.style.display = 'none';   // "CCSS: 5.MD.B.2 | Line Plot" (gen-data-stats) is teacher text
+        if (own && /^Drag the ruler\b/i.test(own)) n.style.display = 'none';   // a widget's label, not the question (r2 R2-D2)
+    }
+    // screen-only or colour wording inside the drawing's text (r2 R2-D2)
+    const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+    for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+        const v = t.textContent;
+        if (v && /green|press (Space|Enter)/i.test(v)) t.textContent = screenClean(v);
+    }
+    for (const b of cell.querySelectorAll('button, [role="button"]')) {
+        if (CONTROL_RE.test(`${b.textContent || ''} ${b.getAttribute('aria-label') || ''} ${b.className && b.className.baseVal == null ? b.className : ''}`)) b.style.display = 'none';
+    }
+    for (const n of cell.querySelectorAll('[class*="hint"], [class*="Hint"]')) {
+        if (n.querySelector('button') || /button|btn/i.test(n.className)) n.style.display = 'none';
+    }
+    // the play answer row: the thumbnail shows the question, and the row only ever doubled an item's own blank (D6) or
+    // stood beside its counters like one more square (D7)
+    for (const r of cell.querySelectorAll('.tvp-answerrow')) r.remove();
+    // a K counting row draws its answer square beside the counted squares (D7): in a first look it reads as one more
+    // square to count, so the thumbnail leaves it out
+    for (const b of cell.querySelectorAll('[data-mq-template="counters"] [data-mq-blank], [data-mq-template="counters"] [data-ws-slot]')) b.style.display = 'none';
+    // the question twice (D3): the line above the drawing goes when the drawing restates it (split over lines, or reworded
+    // with the same words)
+    const line = cell.querySelector('.tvp-q');
+    const vis = cell.querySelector('.tvp-visual, .tvp-printed');
+    if (line && vis && isVisible(line)) {
+        const nl = normText(line.textContent);
+        const nv = normText(vis.innerText || vis.textContent);
+        const words = nl.split(' ').filter((w) => w.length > 2);
+        const have = new Set(nv.split(' '));
+        const overlap = words.length ? words.filter((w) => have.has(w)).length / words.length : 0;
+        if (nl.length >= 12 && (nv.includes(nl) || (words.length >= 5 && overlap >= 0.8))) line.style.display = 'none';
+    }
+}
+
+/** The painted box of `root` and everything in it (an overhanging child included), at the root's current transform. */
+function paintedBox(root) {
+    const sr = root.getBoundingClientRect();
+    let x0 = sr.left, y0 = sr.top, x1 = sr.right, y1 = sr.bottom;
+    const add = (b) => {
+        if (b.width < 0.5 || b.height < 0.5) return;
+        x0 = Math.min(x0, b.left); y0 = Math.min(y0, b.top); x1 = Math.max(x1, b.right); y1 = Math.max(y1, b.bottom);
+    };
+    for (const n of root.querySelectorAll('*')) {
+        if (n.ownerSVGElement) continue;                 // inside a picture: its svg's content box below covers it
+        add(n.getBoundingClientRect());
+        if (n.tagName.toLowerCase() === 'svg') {
+            // what the picture paints, overflowing labels included: its content box, mapped to the screen
+            try {
+                const bb = n.getBBox();
+                const m = n.getScreenCTM();
+                if (m && bb.width + bb.height > 0) {
+                    const pts = [[bb.x, bb.y], [bb.x + bb.width, bb.y], [bb.x, bb.y + bb.height], [bb.x + bb.width, bb.y + bb.height]]
+                        .map(([x, y]) => new DOMPoint(x, y).matrixTransform(m));
+                    const xs = pts.map((q) => q.x), ys = pts.map((q) => q.y);
+                    add({ left: Math.min(...xs), top: Math.min(...ys), right: Math.max(...xs), bottom: Math.max(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) });
+                }
+            } catch (e) { /* an svg that cannot be measured counts by its own box */ }
+        }
+    }
+    // a word that is a bare text node in an overflowing row ("Start" before a time box) paints outside every element box
+    const range = document.createRange();
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+        const pe = t.parentElement;
+        if (!pe || pe.ownerSVGElement || pe.tagName.toLowerCase() === 'svg' || !t.textContent.trim() || !isVisible(pe)) continue;
+        range.selectNodeContents(t);
+        add(range.getBoundingClientRect());
+    }
+    return { x0, y0, x1, y1, w: Math.max(1, x1 - x0), h: Math.max(1, y1 - y0), sr };
+}
+
+function resetStage(stage) {
+    stage.style.left = '0px';
+    stage.style.top = '0px';
+    stage.style.transformOrigin = '0 0';
+    stage.style.transform = 'none';
+}
+
+/** Every visible text in `root` with its rendered px: [{ n, px, q }] (q: it is the question line). */
+function textList(root) {
+    const out = [];
+    for (const n of root.querySelectorAll('*')) {
+        const tag = n.tagName.toLowerCase();
+        if (n.closest('svg') && tag !== 'text' && tag !== 'tspan') continue;
+        if (![...n.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim())) continue;
+        if (!isVisible(n)) continue;
+        const b = n.getBoundingClientRect();
+        if (!b.width || !b.height) continue;
+        const fs = parseFloat(getComputedStyle(n).fontSize) || 0;
+        let px;
+        if (n instanceof SVGElement) {
+            const svg = n.ownerSVGElement;
+            if (!svg) px = fs;
+            else {
+                const sb = svg.getBoundingClientRect();
+                const vb = svg.viewBox && svg.viewBox.baseVal;
+                const w = vb && vb.width ? vb.width : (svg.width && svg.width.baseVal && svg.width.baseVal.value) || sb.width;
+                const h = vb && vb.height ? vb.height : (svg.height && svg.height.baseVal && svg.height.baseVal.value) || sb.height;
+                px = fs * Math.min(sb.width / (w || 1), sb.height / (h || 1));
+            }
+        } else px = fs * (n.offsetWidth > 0 ? b.width / n.offsetWidth : 1);
+        out.push({ n, px, q: !!n.closest('.tvp-q, .tvp-instr, .mqx-thumb-crophead') });
+    }
+    return out;
+}
+
+/** The smallest scale at which every text renders >= 10 px and the question line >= 14 px (may be over 1). */
+function minLegibleScale(list, s) {
+    let need = LEGIBLE.scale;
+    for (const t of list) {
+        const nat = t.px / (s || 1);                 // its size with the drawing at scale 1
+        if (!(nat > 0)) continue;
+        need = Math.max(need, LEGIBLE.min / nat);
+        if (t.q) need = Math.max(need, LEGIBLE.q / nat);
+    }
+    return need;
+}
+
+/** Does the drawing hold a figure (a picture, a model, boxes to fill), or only words? */
+function hasFigure(frame, q) {
+    const vis = String((q && q.visual) || '');
+    // any drawing on the practice card counts (a T-chart, a tile row drawn in boxes): the pupil sees it there
+    if (/<(svg|img|canvas|table)\b/i.test(vis) || vis.replace(/<[^>]*>/g, ' ').trim()) return true;
+    const stage = frame.querySelector('.tvp-stage');
+    return !!(stage && [...stage.querySelectorAll(FIGURE_SEL)].some((n) => isVisible(n) && n.getBoundingClientRect().width > 8));
+}
+
+/** The figure a crop centres on: the largest picture / model in the stage. */
+function mainFigure(stage) {
+    let best = null, area = 0;
+    for (const n of stage.querySelectorAll(FIGURE_SEL)) {
+        if (!isVisible(n) || n.closest('.tvp-q, .tvp-instr')) continue;
+        const b = n.getBoundingClientRect();
+        const a = b.width * b.height;
+        if (a > area) { area = a; best = n; }
+    }
+    return best;
+}
+
+/**
+ * The crop (r2 fix 2): the question line, in large type, over a window on the main figure, at the smallest scale (>= 0.6,
+ * <= CROP_MAX) at which the figure's own labels render >= 10 px. The window shows the whole drawing when it fits, else the
+ * whole figure, else the figure from its top-left (where a row, a grid or an axis begins), and fades the edges it cuts.
+ * Returns false when no crop can be made.
+ */
+function cropStage(frame, s, q) {
+    const stage = frame.querySelector('.tvp-stage');
+    if (!stage) return false;
+    let head = frame.querySelector(':scope > .mqx-thumb-crophead');
+    let win = frame.querySelector(':scope > .mqx-thumb-window');
+    if (!head) {
+        const line = [...stage.querySelectorAll('.tvp-q, .tvp-instr')].find((n) => isVisible(n));
+        const said = screenClean(line ? line.textContent : questionText(q)).replace(/\s+/g, ' ').trim();
+        for (const n of stage.querySelectorAll('.tvp-q, .tvp-instr')) n.style.display = 'none';
+        // the head says the question: a line of the drawing that restates it ("Tap ALL the quadrilaterals." under
+        // "Click ALL the quadrilaterals.") goes, so the window shows the figure (NODUP)
+        if (said) {
+            const have = new Set(normText(said).split(' '));
+            for (const n of stage.querySelectorAll('*')) {
+                if (n.closest('svg') || !isVisible(n)) continue;
+                const own = [...n.childNodes].filter((c) => c.nodeType === 3).map((c) => c.textContent).join(' ');
+                const words = normText(own).split(' ').filter((w) => w.length > 1);
+                if (words.length >= 3 && words.filter((w) => have.has(w)).length / words.length >= 0.75) n.style.display = 'none';
+            }
+        }
+        head = document.createElement('p');
+        head.className = 'mqx-thumb-crophead';
+        head.textContent = said || s.label;
+        win = document.createElement('div');
+        win.className = 'mqx-thumb-window';
+        frame.insertBefore(head, stage);
+        frame.appendChild(win);
+        win.appendChild(stage);
+        frame.classList.add('mqx-thumb-cropframe');
+    }
+    // the question line: 20 px, down to 16 px to keep it to four lines and under 40 % of the frame
+    let hs = 20;
+    head.style.fontSize = `${hs}px`;
+    while (hs > 16 && head.offsetHeight > Math.max(60, frame.clientHeight * 0.4)) { hs -= 1; head.style.fontSize = `${hs}px`; }
+    const top = head.offsetTop + head.offsetHeight + 6;
+    win.style.top = `${top}px`;
+    const ww = win.clientWidth, wh = win.clientHeight;
+    if (wh < 40) return false;
+    resetStage(stage);
+    for (const n of stage.querySelectorAll('[data-mqx-cropped]')) { n.style.visibility = ''; n.removeAttribute('data-mqx-cropped'); }
+    const list = textList(stage);
+    const fig = mainFigure(stage) || stage;
+    const all = paintedBox(stage);
+    const fb = fig === stage ? all : (() => { const b = fig.getBoundingClientRect(); return { x0: b.left, y0: b.top, w: b.width, h: b.height }; })();
+    // the scale is set by the FIGURE's own labels (a tick, an axis number), not by a stray caption elsewhere: one 4 px
+    // note no longer zooms the whole drawing three times over and leaves the window on a fragment (r2 S plates)
+    const inFig = (t) => fig === stage || fig.contains(t.n) || (t.n.ownerSVGElement && fig.contains(t.n.ownerSVGElement));
+    const figTexts = list.filter(inFig);
+    const need = minLegibleScale(figTexts.length ? figTexts : list, 1);
+    const fit = Math.min(1, (ww - 12) / fb.w, (wh - 12) / fb.h);
+    const sc = Math.min(CROP_MAX, Math.max(need, fit));
+    const ox = all.sr.left, oy = all.sr.top;
+    const fx = (fb.x0 - ox) * sc, fy = (fb.y0 - oy) * sc, fW = fb.w * sc, fH = fb.h * sc;
+    const aW = all.w * sc, aH = all.h * sc, ax = (all.x0 - ox) * sc, ay = (all.y0 - oy) * sc;
+    // across: the whole drawing centred when it fits; else the figure whole with as much to its left as fits; else from the figure's left
+    // edge (where a row, a time line or an axis starts; the cut falls on the right, faded)
+    let tx;
+    if (aW <= ww - 12) tx = (ww - aW) / 2 - ax;
+    else if (fW <= ww - 12) tx = Math.min(6 - ax, ww - 6 - (fx + fW));   // the figure whole, read from the left ("Start 6:45 …")
+    else tx = 6 - fx;
+    // down: the whole drawing centred when it fits; else from the figure's top, so the window shows the picture
+    let ty;
+    if (aH <= wh - 12) ty = (wh - aH) / 2 - ay;
+    else if (fH <= wh - 12) ty = Math.min(6 - ay, Math.max(wh - 6 - (ay + aH), (wh - fH) / 2 - fy));   // the figure whole, as much around it as fits
+    else ty = 6 - fy;
+    stage.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${sc.toFixed(4)})`;
+    frame.dataset.scale = sc.toFixed(3);
+    const wr = win.getBoundingClientRect();
+    // words the window cuts across, or that stay too small to read at this scale, are left out (a half word, "2/4 o",
+    // or a 6 px caption, is no help); the figure's own labels are what the scale was chosen for
+    for (const t of list) {
+        const b = t.n.getBoundingClientRect();
+        if (b.bottom <= wr.top || b.top >= wr.bottom || b.right <= wr.left || b.left >= wr.right) continue;
+        const px = t.px * sc;
+        const cutV = b.top < wr.top - 1 || b.bottom > wr.bottom + 1;
+        const cutH = (b.left < wr.left - 1 || b.right > wr.right + 1) && b.width < ww * 0.9;
+        if (px < LEGIBLE.min - 0.05 || ((cutV || cutH) && !inFig(t))) {
+            t.n.style.visibility = 'hidden';
+            t.n.setAttribute('data-mqx-cropped', '');
+        }
+    }
+    // fade the edges the window cuts
+    const p = paintedBox(stage);
+    win.classList.toggle('is-cut-r', p.x1 > wr.right + 1);
+    win.classList.toggle('is-cut-b', p.y1 > wr.bottom + 1);
+    win.classList.toggle('is-cut-l', p.x0 < wr.left - 1);
+    if (frame.parentElement) frame.parentElement.dataset.judge = `crop ${sc.toFixed(2)} need ${need.toFixed(2)} head ${hs}`;
+    return true;
+}
+
+/** The large-print plate, for an item with no figure: the question itself (never the answer), 16 px at the least. */
+function textPlate(frame, s, q) {
+    // a question that ends on a colon pointed at its picture; the plate shows the words alone, so it ends as a sentence
+    const full = screenClean(questionText(q) || exampleFor(s)).replace(/\s*:\s*$/, '.').trim();
+    frame.className = 'mqx-thumb-frame mqx-thumb-textframe';
+    frame.removeAttribute('role');
+    frame.removeAttribute('aria-label');
+    frame.innerHTML = `<p class="mqx-thumb-text"></p>`;
+    const p = frame.firstChild;
+    let words = (full || s.label).split(' ');
+    let size = 26;
+    p.textContent = words.join(' ');
+    const over = () => frame.scrollHeight > frame.clientHeight + 1 || frame.scrollWidth > frame.clientWidth + 1;
+    p.style.fontSize = `${size}px`;
+    while (over() && size > 16) { size -= 2; p.style.fontSize = `${size}px`; }
+    while (over() && words.length > 4) { words = words.slice(0, -1); p.textContent = `${words.join(' ')} …`; }
+}
+
+/** Lay a mounted drawing out as a whole cell, or a crop, or (no figure) words; returns the mode. */
+function layoutPlate(frame, s, q) {
+    const stage = frame.querySelector('.tvp-stage');
+    if (!stage) return 'text';
+    if (!frame.classList.contains('mqx-thumb-cropframe')) {
+        // measured once, at scale 1: the scale that fits and the scale every text needs come from the same layout
+        resetStage(stage);
+        const box = paintedBox(stage);
+        const texts = textList(stage);
+        if (!texts.some((t) => t.q) && texts.length) texts[0].q = true;   // no question line: the first text the pupil reads
+        const fw = frame.clientWidth, fh = frame.clientHeight;
+        const sc = Math.min(1, (fw - 12) / box.w, (fh - 12) / box.h);
+        const need = minLegibleScale(texts, 1);
+        if (frame.parentElement) frame.parentElement.dataset.judge = `${sc.toFixed(2)} need ${need.toFixed(2)}`;
+        if (sc >= need - 1e-3) {
+            const tx = (fw - box.w * sc) / 2 - (box.x0 - box.sr.left) * sc;
+            const ty = (fh - box.h * sc) / 2 - (box.y0 - box.sr.top) * sc;
+            stage.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${sc.toFixed(4)})`;
+            frame.dataset.scale = sc.toFixed(3);
+            return 'cell';
+        }
+        if (!hasFigure(frame, q)) { textPlate(frame, s, q); return 'text'; }
+    }
+    if (cropStage(frame, s, q)) return 'crop';
+    textPlate(frame, s, q);
+    return 'text';
+}
+
+/**
+ * Fill a plate (`el`, a .mqx-thumb) for skill `s` at size `size`. Returns 'cell', 'crop' or 'text'. `onSettled(mode)`
+ * runs once the drawing has settled (the mono pass let go; laid out again, so late fonts or images are allowed for).
+ */
+function fillPlate(el, s, size, mod, onSettled) {
+    const data = sampleOf(s);
+    const z = SIZES[size] || SIZES.S;
+    el.classList.remove('mqx-thumb--L', 'mqx-thumb--W', 'mqx-thumb--B', 'mqx-thumb--M', 'mqx-thumb--S');
+    el.classList.add(`mqx-thumb--${size}`);
+    el.style.setProperty('--mqx-thumb-w', `${z.w}px`);
+    el.style.setProperty('--mqx-thumb-h', `${z.h}px`);
+    el.innerHTML = `<div class="tvp-frame mqx-thumb-frame"></div><p class="mqx-thumb-cap">${esc(s.label)}</p>`;
+    el.hidden = false;
+    const frame = el.querySelector('.mqx-thumb-frame');
+    let mode = 'text';
+    const drawable = mod && data.q && !data.err && data.ms <= THUMB_SLOW_MS;
+    const settle = () => {
+        if (frame.isConnected && (el.dataset.mode === 'cell' || el.dataset.mode === 'crop') && frame.querySelector('.tvp-stage')) {
+            el.dataset.mode = layoutPlate(frame, s, data.q);
+        }
+        if (onSettled) onSettled(el.dataset.mode);
+    };
+    if (drawable) {
+        let mounted = false;
+        try { mounted = !!mod.mountQuestion(frame, data.q, s.skillId, { fit: false, onSettled: settle }); } catch (e) { mounted = false; }
+        // a cell that drew nothing readable (no text, no drawing) is no picture of the skill
+        if (mounted && !frame.querySelector('.tvp-cell svg, .tvp-cell img, .tvp-cell canvas') && !(frame.querySelector('.tvp-cell') || {}).textContent) mounted = false;
+        if (mounted) {
+            tidyThumb(frame);
+            mode = layoutPlate(frame, s, data.q);
+        }
+    }
+    if (mode === 'text' && !frame.classList.contains('mqx-thumb-textframe')) textPlate(frame, s, data.q);
+    el.dataset.mode = mode;
+    if (mode === 'text' && onSettled) setTimeout(() => onSettled('text'), 0);
+    return mode;
+}
+
+/** Where a plate of pw x ph goes beside `card`: { x, y, clean } (clean: inside the window, off the card and pointer). */
+function placement(card, pw, ph) {
+    const r = card.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+    const vh = window.innerHeight;
+    const g = 12, m = 8;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const midY = clamp(r.top + r.height / 2 - ph / 2, m, Math.max(m, vh - ph - m));
+    const leftX = clamp(r.left, m, Math.max(m, vw - pw - m));
+    const cands = [
+        { x: r.right + g, y: midY },          // beside the card: the side with room first
+        { x: r.left - g - pw, y: midY },
+        { x: leftX, y: r.bottom + g },
+        { x: leftX, y: r.top - g - ph },
+    ];
+    const p = th.byFocus ? null : th.pointer;
+    const fits = (c) => c.x >= m && c.y >= m && c.x + pw <= vw - m && c.y + ph <= vh - m;
+    const over = (c, a) => c.x < a.right && c.x + pw > a.left && c.y < a.bottom && c.y + ph > a.top;
+    const onCard = (c) => over(c, { left: r.left - 2, right: r.right + 2, top: r.top - 2, bottom: r.bottom + 2 });
+    const onPointer = (c) => !!p && p.x >= 0 && over(c, { left: p.x - 12, right: p.x + 12, top: p.y - 12, bottom: p.y + 12 });
+    const pick = cands.find((c) => fits(c) && !onCard(c) && !onPointer(c));
+    if (pick) return { ...pick, clean: true };
+    // a small window: clamp each side into the viewport and take the first that still keeps off the card and pointer
+    const clamped = cands.map((c) => ({ x: clamp(c.x, m, Math.max(m, vw - pw - m)), y: clamp(c.y, m, Math.max(m, vh - ph - m)) }));
+    return { ...(clamped.find((c) => !onCard(c) && !onPointer(c)) || clamped.find((c) => !onPointer(c)) || clamped[0]), clean: false };
+}
+
+/**
+ * The largest plate that sits cleanly beside the card (or above / below it), never on the card or the pointer. At 1024 px
+ * and wider that is L (480 x 400) beside any card where the window is tall enough, else W (480 x 320); a portrait tablet (820 x 1180) gets L above or below the card when the
+ * side has no room, so a pupil there is not left with the small plate.
+ */
+function sizeFor(card) {
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+    const order = ['L', 'W', 'B', 'M', 'S'];
+    for (const k of order) {
+        const z = SIZES[k];
+        if (z.w > vw - 16) continue;
+        if (placement(card, z.w, z.h + CAP_H).clean) return k;
+    }
+    return 'S';
+}
+
+function placeThumb(card) {
+    const el = th.el;
+    if (!el || el.hidden || !card) return;
+    const pick = placement(card, el.offsetWidth, el.offsetHeight);
+    el.style.left = `${Math.round(pick.x)}px`;
+    el.style.top = `${Math.round(pick.y)}px`;
+}
+
+async function showThumb(card, byFocus) {
+    th.pending = null;
+    if (!ui.root || ui.root.hidden || !card || !card.isConnected) return;
+    const s = byKey().get(card.dataset.key);
+    if (!s) return;
+    const token = ++th.token;
+    const data = sampleOf(s);
+    let mod = previewMod;
+    if (!mod && data.q && !data.err && data.ms <= THUMB_SLOW_MS) { try { mod = await loadPreview(); } catch (e) { mod = null; } }
+    if (token !== th.token || !card.isConnected || ui.root.hidden) return;
+    th.byFocus = byFocus;
+    const el = thumbEl();
+    el.style.left = '-9999px';
+    el.style.top = '0px';
+    let mode = '';
+    const still = () => token === th.token && th.card === card && thumbOpen();
+    try {
+        mode = fillPlate(el, s, sizeFor(card), mod, (m) => {
+            if (!still()) return;
+            th.mode = m;
+            placeThumb(card);
+        });
+    } catch (e) { mode = ''; }
+    if (!mode) { el.hidden = true; return; }
+    th.card = card;
+    th.mode = mode;
+    th.key = s.key;
+    placeThumb(card);
+    setDescribed(card, true);
+}
+
+function cardOf(node) {
+    const el = node && node.nodeType === 1 ? node : node && node.parentElement;
+    const c = el && el.closest ? el.closest('.mqx-card') : null;
+    return c && ui.root && ui.root.contains(c) ? c : null;
+}
+
+function wireThumbs(r) {
+    r.addEventListener('pointermove', (e) => { th.pointer = { x: e.clientX, y: e.clientY }; }, { passive: true });
+    r.addEventListener('pointerover', (e) => {
+        if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+        th.pointer = { x: e.clientX, y: e.clientY };
+        if (noHover()) return;
+        const card = cardOf(e.target);
+        if (!card) return;
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        scheduleThumb(card, false);
+    });
+    r.addEventListener('pointerout', (e) => {
+        const card = cardOf(e.target);
+        if (!card) return;
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        if (th.byFocus && th.card === card && document.activeElement === card) return;   // a keyboard thumbnail stays with its focus
+        if (th.card === card || th.pending === card) hideThumb();
+    });
+    r.addEventListener('pointerdown', () => { hideThumb(); }, true);
+    r.addEventListener('focusin', (e) => {
+        const card = cardOf(e.target);
+        if (!card) { if (thumbOpen() || th.pending) hideThumb(); return; }
+        let keyboard = false;
+        try { keyboard = e.target.matches(':focus-visible'); } catch (err) { keyboard = true; }
+        if (!keyboard) return;
+        scheduleThumb(card, true);
+    });
+    r.addEventListener('focusout', (e) => {
+        const card = cardOf(e.target);
+        if (!card) return;
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        if (th.card === card || th.pending === card) hideThumb();
+    });
+    // A scroll hides a hover thumbnail. A keyboard one follows its card (focusing a card scrolls it into view) while the
+    // card is still in the list's window, and hides once it leaves.
+    r.addEventListener('scroll', () => {
+        if (!thumbOpen() && !th.pending) return;
+        const card = th.card || th.pending;
+        if (th.byFocus && card && card === document.activeElement) {
+            const b = r.querySelector('#mqxBody').getBoundingClientRect(), c = card.getBoundingClientRect();
+            if (c.bottom > b.top && c.top < b.bottom) { if (thumbOpen()) placeThumb(card); return; }
+        }
+        if (th.pending && document.activeElement === th.pending) return;   // still waiting for a focused card: keep it
+        hideThumb();
+    }, true);
+    window.addEventListener('resize', () => { if (thumbOpen() || th.pending) hideThumb(); });
+    window.addEventListener('blur', () => { if (thumbOpen() || th.pending) hideThumb(); });
+}
+
+function visualText(html) {
+    const div = document.createElement('div');
+    div.innerHTML = String(html || '');
+    return (div.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * For tests (ws-student-explorer THUMB sweep): draw the thumbnail of `key` at once (no delay) and report what it shows.
+ * The question only: `ans` is returned so the gate can check the drawing never shows it.
+ */
+export async function studentExplorerThumbProbe(key) {
+    if (!ui.root) return { err: 'explorer not open' };
+    const s = byKey().get(key);
+    if (!s) return { err: `no skill ${key}` };
+    hideThumb();
+    const data = sampleOf(s);
+    let mod = null;
+    try { mod = await loadPreview(); } catch (e) { mod = null; }
+    const el = thumbEl();
+    el.style.left = '-9999px';
+    el.style.top = '0px';
+    const mode = fillPlate(el, s, 'L', mod, null);
+    const stage = el.querySelector('.tvp-stage');
+    const out = {
+        key, mode, ms: Math.round(data.ms * 10) / 10, err: data.err,
+        cell: !!el.querySelector('.ws-cell, .mq-scell'),
+        text: (stage ? stage.textContent : el.querySelector('.mqx-thumb-frame').textContent).replace(/\s+/g, ' ').trim(),
+        qText: questionText(data.q), qVisual: data.q && data.q.visual ? visualText(data.q.visual) : '',
+        ans: data.q && data.q.ans != null && typeof data.q.ans !== 'object' ? String(data.q.ans) : '',
+        // a box the pupil types into holds nothing; a tap box (a checkbox) is not ticked
+        filled: [...el.querySelectorAll('input, textarea')].filter((i) => (i.type === 'checkbox' || i.type === 'radio' ? i.checked : i.value)).length,
+        hasOptions: !!(data.q && Array.isArray(data.q.options) && data.q.options.length),
+    };
+    hideThumb();
+    return out;
+}
+
+/**
+ * For tests (ws-student-explorer THUMB legible sweep): draw the plates of `keys` side by side, off screen, at `size`
+ * (L / M / S), and resolve once every one has settled (refit and judged again after the mono pass). Each plate is a
+ * .mqx-thumb.mqx-thumb-probe carrying data-key and data-mode. Called with [] it removes the plates.
+ */
+export async function studentExplorerThumbBatch(keys, { size = 'L' } = {}) {
+    if (!ui.root) return 0;
+    for (const old of ui.root.querySelectorAll('.mqx-thumb-probe')) old.remove();
+    if (!keys || !keys.length) return 0;
+    let mod = null;
+    try { mod = await loadPreview(); } catch (e) { mod = null; }
+    const waits = [];
+    keys.forEach((key, i) => {
+        const s = byKey().get(key);
+        if (!s) return;
+        const el = document.createElement('div');
+        el.className = 'mqx-thumb mqx-thumb-probe';
+        el.dataset.key = key;
+        el.style.left = `${-6000 + (i % 6) * 520}px`;
+        el.style.top = `${Math.floor(i / 6) * 420}px`;
+        ui.root.appendChild(el);
+        waits.push(new Promise((res) => {
+            const t = setTimeout(res, 3000);   // a plate that never settles is measured as it stands
+            try { fillPlate(el, s, size, mod, () => { clearTimeout(t); res(); }); } catch (e) { el.dataset.mode = 'error'; clearTimeout(t); res(); }
+        }));
+    });
+    await Promise.all(waits);
+    return waits.length;
 }
 
 // ---- events -----------------------------------------------------------------------------------------------------
@@ -346,7 +1002,13 @@ function setTab(tab) {
 }
 
 function onKey(e) {
-    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        // the first Esc hides a showing thumbnail; the next one closes the explorer
+        if (thumbOpen()) { e.stopPropagation(); hideThumb(); return; }
+        close();
+        return;
+    }
     const t = e.target;
     if (t.getAttribute && t.getAttribute('role') === 'tab' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
         e.preventDefault();
@@ -399,6 +1061,7 @@ export async function openStudentExplorer(opts = {}) {
         r.addEventListener('click', onClick);
         r.addEventListener('keydown', onKey);
         r.addEventListener('input', onInput);
+        wireThumbs(r);
         document.body.appendChild(r);
         ui.root = r;
     }
@@ -422,6 +1085,7 @@ export function closeStudentExplorer() { close(); }
 
 function close() {
     if (!ui.root || ui.root.hidden) return;
+    hideThumb();
     ui.root.hidden = true;
     if (ui.io) ui.io.disconnect();
     document.documentElement.classList.remove('mqx-open');
@@ -441,5 +1105,6 @@ function close() {
 /** For tests: what the explorer is showing. */
 export function studentExplorerState() {
     if (!ui.root) return null;
-    return { open: !ui.root.hidden, tab: ui.tab, grade: ui.grade, gradeArea: ui.gradeArea, domain: ui.domain, query: ui.query, cards: ui.root.querySelectorAll('.mqx-card').length, examples: exampleCache.size };
+    return { open: !ui.root.hidden, tab: ui.tab, grade: ui.grade, gradeArea: ui.gradeArea, domain: ui.domain, query: ui.query, cards: ui.root.querySelectorAll('.mqx-card').length, examples: exampleCache.size,
+        thumb: { open: thumbOpen(), key: th.key, mode: th.mode, byFocus: th.byFocus, pending: !!th.pending } };
 }
