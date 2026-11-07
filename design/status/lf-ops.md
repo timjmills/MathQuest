@@ -47,6 +47,18 @@ Red rows, with cause where known:
 - ws-options-verify --render: 25 value pages worse than the default (count_by_tables onePage / jumps=15 / shapes at S: count-row card ruling (b) accepts fewer rows if H13 holds).
 - ws-spec-card: was unsigned at the time; signed since (7f06c72).
 
+## Build #4 properties of multiplication (2026-11-07, builder mq-opus-medium, first build on the ops-tables / count-row pair)
+- Skills: multiplication:mult_properties, arrays_groups, count_by_tables. Precritic before: 9 FAIL / 16 PASS / 1 N/A / 2 SKIPPED of 28 (log pc-0).
+- mult_properties forms 1-3 moved off coloured legacy HTML: break apart = arrays-turn type 'split' (one array, gap + bracket, three
+  boxes); x 1 / x 0 = the equation cell. Real provider hooks (workedSteps, wrongAnswer MU-M4/M5/M7, strings + Say) for every kind.
+  forms default [0] (one property a page), appended in skill-options.
+- Lesson data (ops-tables 9 Q3) for arrays_groups and mult_properties in prereqs.js; arrays template got lessonStepState.
+- arrays_groups: picture box on mixed / groups-only pages, rows banded per block of six on one-kind pages (H13-ROW); CL-40 spacers.
+- count-row (for lf-algebra, lead request): train wraps to a narrow cell, shaped tiles keep the box pitch, twin tiles >= 44 px input,
+  one-page row clears the label keep-out.
+- New check: ws-visual-quality VQ-NOLEGACY some-legacy (backtest vq-some-legacy-lf). sibling-compare `ownerSkipped` (count-row
+  card 9 Q2(a)). options-render pin: count_by_tables jumps=15 (card 9 Q2(b)); shape pages no longer need a pin.
+
 ## Owner go
 
 ## Open questions
