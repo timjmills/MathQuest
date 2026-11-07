@@ -1450,6 +1450,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "facts-print-fix-r7",
+   "check": "the measured sweep with lists in the teacher's unusual orders (÷ +, ÷Mix −, ÷Mix × − +, − ÷Mix +; both arrangements, Problems and Pages) and every picked Columns: the sections print in the list's order (ORDER; DIVORDER no longer exempts a ÷-first list), a section printing other columns than picked says why and the dialog offers facts Columns 5 and up (COLNOTE), a bracket's ink 2 mm from its border in bracket and mixed sections (BRKCLEAR), notes plain - no internal codes, at most two sentences (NOTEPLAIN) (print critic r7 2026-11-07, lowest 5)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --sweep ORDER / COLNOTE / BRKCLEAR / NOTEPLAIN",
+   "browser": true,
+   "fail": {
+    "commit": "2bebf4f94",
+    "state": "÷ printed last whatever the list's order; Columns 1-4 printed 5 across silently; notes showed '(PT-FRW-5)' in 3-6 sentences (ORDER 84, NOTEPLAIN 272, COLNOTE 8)"
+   },
+   "pass": {
+    "commit": "313a81983",
+    "state": "facts-print-fix r7: groups in list order, Columns 5+ for facts with a note for a saved 1-4, one plain sentence a note"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
