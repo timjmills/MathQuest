@@ -6,7 +6,7 @@ Owner of files: gen-pv.js, sheet/cells/{pv,value-line,line-labels,gattegno}.js, 
 State: fix
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 1, FAIL (all five; min 1 stretch, core 4-6)
+Critic rounds: 2, FAIL (r2: identify C2 3, value C3 6, expand C3 5, combine C2 4, unit_form C3 5)
 
 ## Now
 - HAND-OVER 2026-11-07 ~13:30 UTC (budget: week at ~60 %, no new work after 14:10). Branch claude/lf-placevalue @ a2c0e635, PR #35.
@@ -70,6 +70,14 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-07 resumed round (lead, $80): merged integration; builder r2 (9f483f78, 9b67cd84): every pv cell fits every offered option on
+  its own pages (cell-checks combine 196→0, value 48→0, expand 32→24 lesson.js, unit_form 22→10 reason-it.js); precritic r4 12 FAIL, all
+  owned elsewhere or process; fact-rows opEm crash = master hotfix 1000d1ad9 cherry-picked (38be3ad1). Critic r2 (critic-r2.md): FAIL all
+  five — N1 identify T/F key wrong (C2 3), N2 instruction, N3 combine band 99 one-part (C2 4), N4 'hundreds' on 2-digit, N5 / N6 band
+  pages' empty bands, N7 review mixes two layouts (r1 F9 again), N8 2-column request ignored (r1 F21 again). RULE 7: N7 / N8 survived two
+  medium rounds -> build loop stopped; checks for N1-N3 built, N4-N8 proposed; LESSONS_LEARNED L25-L28 + the r2 section; speed-audit.
+  Shared-role findings filed by the critic: R-a true-false.js:43 answer line by digit count; R-b guided.js:606 three hint lines; R-c review
+  rows grow to the fill limit; R-d true-false 4 items at S like L.
 - 2026-11-07 lead D4 / D5: (D4) writeValue: false added to the identify Warm-up / mixWith refs OUTSIDE the lane block in
   js/modules/lessons/prereqs.js — the addition no-regroup lessons (the `pv` ref ~line 91 and the three mixWith refs ~96 / 101 / 107)
   and number_sense:nearest_10 (skills ~373, mixWith ~409); they practise the place, not the value. MERGE TRAIN: lf-engine moves

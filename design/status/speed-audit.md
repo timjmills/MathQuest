@@ -840,3 +840,21 @@ Details and the reflection: design/status/s1-checks.md.
 - The pv card's §7a offered every role and host, but the precritic --skill path renders only 3 roles: 12 of 23 findings were on roles no gate rendered. Fix: precritic --skill renders every §7a-offered role (one change, saves a critic round per family).
 - First family on a template had no siblings: 90 rows went to the critic by hand (lead R1); the critic ran 47 min. Fix: the first family's critic gets the rows sampled by the brief (done) — keep.
 - Builder strength right (medium); waits: browser slots shared with precritic (~2 min a gate). No owner-question delays (lead answered within 10-20 min).
+
+### lf-placevalue critic r2 (2026-11-07): FAIL on all five pv skills; rule 7 stop (N7, N8 survived two medium rounds)
+**Which earlier check would have caught each finding, or why none did:**
+- N1 (identify T/F key wrong): node-lint WRONG-FILL ran the real roles but only for multi-slot WRITE-IN cells; identify's ring + value line was
+  not in its set, and providers-unit's distractor test compared joined strings. Now WRONG-DIFFERS per slot (L26).
+- N2 (instruction): no check read the item-less print path; providers-unit tested q.printText only. Now PRINTED-INSTRUCTION (L27).
+- N3 (combine band 99 one-part): ws-dealer-uniform and content-audit ran the default band only. Now COMBINE-PARTS on every band (L28).
+- N4 ("hundreds" on 2-digit): VQ-LIVE ran at the default band 999 only — proposed at every band.
+- N5 / N6 (band pages with 43–57 % bands): H13-ABS ran on default pages; options-render --bands judged rises against the default page,
+  which shared the finding — proposed per page, absolute.
+- N7 (two layouts in review): GRID-EVEN-ALL was wired to independent pages only — proposed on every offered role.
+- N8 (2 columns ignored): the matrix more-cols2 rows were PENDING(no-baseline), so nothing judged them — proposed judged rows.
+**Speed-ups:**
+- The single biggest loss of the lane: cells were tuned on default pages for two rounds before the plan-from-card gate showed 548 option
+  OVERFLOWs (L25). Next family: run `ws-cell-checks --card --card-opts` on every skill BEFORE the first critic.
+- A 2-round loss on N7 / N8 because the gates that would show them (GRID-EVEN-ALL on review, more-cols2 rows) were opt-in on the wrong roles
+  or PENDING: wire a lane's opt-in rules on EVERY §7a-offered role, not the three default ones.
+- Builder / critic strength right (medium); critic r2 35 min; one builder round 63 min; precritic 50 min (the plan-from-card gates add ~20).
