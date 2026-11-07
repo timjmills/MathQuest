@@ -1470,6 +1470,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "facts-print-fix-r8",
+   "check": "the measured sweep with Sets 2/3 over ÷-first and ÷-between lists (÷Mix −, − ÷Mix +, ÷Mix × − +, owner ÷ Mix; Problems and Pages): every set prints set 1's per-skill counts (SETSKILLDIFF) and sections a page (SETSHAPE) and keeps the shares; the ÷ cells' printed ink, rasterised at 300 dpi, >= 2.0 mm from the cell rules at 9 columns, Small and Big (BRKINK) (print critic r8 2026-11-07, lowest 6)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --sweep SETSKILLDIFF / SETSHAPE / SHARES / BRKINK",
+   "browser": true,
+   "fail": {
+    "commit": "e0d7d1b09",
+    "state": "Sets 2 re-decided the ÷-form merge (÷ 15 against set 1's 20); the answer line printed 1.78 mm from the rule at Big, 9 columns (SETSHAPE 8, SETSKILLDIFF 6, SHARES 4, BRKINK 1)"
+   },
+   "pass": {
+    "commit": "cdaa80fc2",
+    "state": "facts-print-fix r8: sets reuse set 1's plan; the answer line and the mixed bracket room keep the printed ink >= 2.03 mm"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
