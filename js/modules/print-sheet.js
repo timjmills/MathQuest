@@ -162,6 +162,9 @@ function normaliseRequest(req = {}) {
             // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
             // gaps) - the caller has chosen a count whose cells stay under H13's band.
             noCap: !!(s && s.noCap),
+            // (`capFillCont`, lesson 3a P1d - E12: a page-capped sheet over two pages fills its continuation page to the FIRST
+            // page's grid height too, so every cell keeps one height; absent: unchanged)
+            capFillCont: !!(s && s.capFillCont),
             // A single-skill page held short by its own pool, laid in fewer, longer columns
             // (buildSheet): two columns may take any row count, not only CL-2's 2/3/4/5/8.
             freeRows: !!(s && s.freeRows),
@@ -3559,7 +3562,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}) })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -4576,7 +4579,7 @@ async function buildLesson(n, metaOf) {
                 // (`pageCap`, R2 - since 6bc3cbd8 layout.js packs rows of NEARLY one height by their own heights (r12c
                 // nearPack): a 4 x 1 sheet laid 5 rows for its 4 items left a fifth of the page blank. The sheet's shape is its
                 // page: at most its count, and the rows it keeps share the whole grid.)
-                sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true, pageCap: shape[0] }],
+                sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true, pageCap: shape[0], ...(ps.equalPages ? { capFillCont: true } : {}) }],
                 seed: (seeds.practice + 7919 * (k - 1)) >>> 0,
                 // (`strip`: another chunk's step strip - the words sheet carries the words steps.)
                 stepStrip: ps.strip && ps.strip.html ? ps.strip : withStrip ? { html: stripHtml, hMm: stripH } : undefined,

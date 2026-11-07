@@ -209,6 +209,9 @@ function measure(LIBRARY) {
         P.panelRows = [...pg.querySelectorAll('[data-panel-row]')].map((e) => Math.round(e.getBoundingClientRect().height / MM * 10) / 10);
         P.kaCount = pg.querySelectorAll('[data-ka], [data-ws-key-ans], .ws-key-stamp').length;
         P.perRow = [...pg.querySelectorAll('svg[data-per-row]')].map((e) => +e.dataset.perRow);
+        // (E27, owner ruling 2026-11-07 lesson 3a: the drawn x of each counter row's first row - a 6- to 10-wide row passes
+        // only when the 5-group gap is drawn)
+        P.perRowXs = [...pg.querySelectorAll('svg[data-per-row]')].map((e) => { const cs = [...e.querySelectorAll('circle')]; if (!cs.length) return []; const y0 = cs[0].getAttribute('cy'); return cs.filter((c) => c.getAttribute('cy') === y0).map((c) => +c.getAttribute('cx')); });
         P.halfW = pg.classList.contains('dl-land') ? [...pg.querySelectorAll('.dl-halves > .mq-rowcol')].filter((x) => x.querySelector('.dl-half')).map((x) => Math.round(x.getBoundingClientRect().width / MM * 10) / 10) : [];
         P.sizeMm = [Math.round(pg.getBoundingClientRect().width / MM), Math.round(pg.getBoundingClientRect().height / MM)];
         // E26: chart step panels (the lesson role's state cells) each show a grey mark
@@ -269,6 +272,23 @@ function relationCheck(texts) {
         }
     }
     return { probs, n };
+}
+/* E27 (pure): counters in rows of at most 5 - or 6 to 10 a row with the 5-group gap drawn (a step after the 5th counter
+   larger than the row's pitch: RP-21 subitising gap; owner ruling 2026-11-07, lesson 3a arrays to 6 x 6, lead-approved).
+   `--e27-fixture <file.json>` ([{perRow, xs}]) runs it on rows read elsewhere (ws-backtest rows e27-five-gap). */
+function e27RowOk(n, xs) {
+    if (n <= 5) return true;
+    if (n > 10 || !Array.isArray(xs) || xs.length < 6) return false;
+    const x = xs.slice().sort((a, b) => a - b), d = x.slice(1).map((v, i) => v - x[i]);
+    const pitch = Math.min(...d.filter((v, i) => i !== 4));
+    return d[4] > pitch + 0.5;
+}
+if (has('e27-fixture')) {
+    const rows = JSON.parse(fs.readFileSync(path.resolve(ROOT, arg('e27-fixture')), 'utf8'));
+    const bad = rows.filter((r) => !e27RowOk(r.perRow, r.xs));
+    for (const r of bad) console.log(`  E27 a row of ${r.perRow} with no 5-group gap`);
+    console.log(`ws-detailed-lesson --e27-fixture: ${bad.length ? 'FAIL' : 'OK'}`);
+    process.exit(bad.length ? 1 : 0);
 }
 if (has('e41-fixture')) {
     const r = relationCheck([{ id: 'fixture', text: fs.readFileSync(path.resolve(ROOT, arg('e41-fixture')), 'utf8').replace(/\s+/g, ' ') }]);
@@ -745,7 +765,7 @@ function evaluate(R, pdfPages, LIB, KIT = []) {
     }
     const p4 = pages.filter((p) => /^P4/.test(p.id)), extra = p4.flatMap((p) => p.bandLabels.filter((t) => /^(Say|Rule|Remember):/.test(t)).map((t) => `${p.id} ${t}`));
     row('E28', 'No Say:, Rule: or Remember: band on a Practice page', `${p4.length} Practice / Mixed pages; extra bands ${extra.join(', ') || 0}`, p4.length > 0 && !extra.length);
-    row('E27', 'Counters in rows of at most 5', pupil.flatMap((p) => p.perRow.map((n) => `${p.id}:${n}`)).join(', ') || 'no counters', pupil.every((p) => p.perRow.every((n) => n <= 5)));
+    row('E27', 'Counters in rows of at most 5 (6 to 10 with the 5-group gap drawn)', pupil.flatMap((p) => p.perRow.map((n) => `${p.id}:${n}`)).join(', ') || 'no counters', pupil.every((p) => p.perRow.every((n, i) => e27RowOk(n, (p.perRowXs || [])[i]))));
     const chs = pages.filter((p) => /^P2[a-z]?$/.test(p.id));
     row('E26', 'Every anchor-chart step panel adds a grey (newest) mark', chs.length ? chs.map((ch) => `${ch.id} ${ch.panels.filter(Boolean).length} / ${ch.panels.length} panels`).join('; ') : 'no chart', chs.length > 0 && chs.every((ch) => ch.panels.length > 0 && ch.panels.every(Boolean)));
     row('E25', 'One key per pupil page (anchor chart included)', `${pupil.length} pupil pages, ${keys.length} keys`, pupil.length === keys.length && pupil.every((p) => keys.some((k) => k.id === `${p.id}-key`)));

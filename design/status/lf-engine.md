@@ -35,6 +35,15 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 **Gates at hand-over (lane head):** ws-detailed-lesson --check --repeats lessons 1, 3a, 4, 5, 6 OK, 2 and 7 FAIL (above); ws-teacher-wrm OK; ws-precritic --role lesson --strict FAIL (12 other-family pin rises, master too, + add_facts DN-2); ws-lesson-check 667 (LR-5 434, LR-13 133, LR-1 62, LR-6 23, LR-7 10, LR-10 3, LR-16 2); ws-lesson-unit (194), ws-layout-unit (1758), ws-lesson-coverage, ws-lesson-compile-unit (45), ws-lesson-card --check, ws-lesson-seed --check, ws-boot-smoke, ws-code-snapshot (732) OK; ws-backtest 81 PASS 1 FAIL (simple-print-exact-missing, fails in both states, not this lane). ws-lesson-baseline vs master: 148 of 303 differ = 120 samples + lesson 1 (R2, R9), 2 (builds), 4 (Say line), 5 (R6), 6 (R2, R8).
 **Owner questions:** none open (rulings recorded above).
 
+## Merge notes for lf-ops
+Three lead-approved additive changes outside the lesson engine (lesson 3a owner ruling 2026-11-07, P1d e13ef858 / live 538c2b58);
+lf-ops keeps or re-applies them when its branch merges:
+- `js/modules/skill-options.js` - `multiplication:mult_properties` band option gains 36 ("6 (6 x 6)"): `_opsBand([25, 36, 81], 25, ...)`.
+- `js/modules/gen-operations.js` - mult_properties: band 36 gives factors to 6 and pictured arrays a side of 6 (`hi = ... : Math.min(_band, 6)`); bands 25 / 81 deal exactly as before.
+- `js/modules/sheet/cells/arrays-turn.js` - dotsSvg draws RP-21's 1.5 mm gap after the 5th dot when a line holds more than 5; arrays of 5 or less are byte-identical.
+P1d round 2 adds two more, both gated on a flag only lesson 3a sets (every other sheet byte-identical): `print-sheet.js` section `capFillCont`
+(from a practiceSheets entry's `equalPages`) and `sheet/roles/practice.js` capFill on every page of such a sheet (E12).
+
 ## Log
 - 2026-11-07 — Merge: phase 0 + integration tip 623fdd6 (744aa9e5); 5 conflicts; master's lesson 6/7 + visual-quality hunks ported into lesson-pages/* and lesson-arch/*; master's new lesson records ported into families/addsub.js, multdiv.js. Oracle ws-lesson-baseline vs master: 183/183 detailed hashes identical, 120 sample hashes differ (LR-17, intended). Lesson 2 errors on master too (R1).
 - 2026-11-07 — P2 compiler (fbdd7a08, 33c12857, merged feea00b2): card format (design/lessons/cards/README.md), ws-lesson-card (--draft, --check, --check-decided), compileLesson, shapes/, units/, SHAPES.md, queue reads SHAPES.md; DIFF.md structural diff of 1-7.

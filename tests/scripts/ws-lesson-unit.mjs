@@ -136,7 +136,7 @@ const LATE = {
     // a 4 x 1 sheet's 4 items). A detailed Practice sheet's shape is its page: pageCap = its count, passed through normaliseRequest.
     async 'r2-practice-cap'() {
         const ps = readSrc('js/modules/print-sheet.js');
-        ok(/sections: \[\{ skills: \[sk1\], count: shape\[0\], columns: shape\[1\], noCap: true, pageCap: shape\[0\] \}\]/.test(ps), 'R2: a detailed Practice sheet is capped at its shape count');
+        ok(/sections: \[\{ skills: \[sk1\], count: shape\[0\], columns: shape\[1\], noCap: true, pageCap: shape\[0\](, \.\.\.\(ps\.equalPages \? \{ capFillCont: true \} : \{\}\))? \}\]/.test(ps), 'R2: a detailed Practice sheet is capped at its shape count');
         ok(/pageCap: s && Number\(s\.pageCap\) > 0 \? Number\(s\.pageCap\) : undefined/.test(ps), 'R2: normaliseRequest keeps a section pageCap');
         const L = await tryImp('js/modules/sheet/layout.js');
         ok(L && /Number\(section\.pageCap\) > 0 && rows \* cols > Number\(section\.pageCap\)/.test(readSrc('js/modules/sheet/layout.js')), 'R2: layout.js applies the cap after the near-height pack');

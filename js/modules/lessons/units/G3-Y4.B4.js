@@ -121,7 +121,8 @@ export const CARDS = Object.freeze({
               "instructionKey": "turn-look"
             },
             "shape": [4,1],
-            "edgeLast": {"per":4,"cols":1,"wants":["arrBigSquare"]}
+            "edgeLast": {"per":4,"cols":1,"wants":["arrBigSquare"]},
+            "equalPages": true
           },
           {
             "skill": {

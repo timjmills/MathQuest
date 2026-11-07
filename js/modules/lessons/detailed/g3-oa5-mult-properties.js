@@ -69,9 +69,9 @@ export default {
     // facts only, the missing number, its last row a square and a 5.
     practiceSheets: [
         // OWNER RULING 2026-11-07 (LP-FAMILY-REPEAT): Practice 1 is FULL-WIDTH taller cells, ONE item a row, arrays up to
-        // 6 x 6 (band 36), each with its turn; every fact family once in the pack. (The half-width cells capped the pool at
+        // 6 x 6 (band 36), each with its turn; every fact family once in the pack. (`equalPages`: its two pages' cells one height - E12) (The half-width cells capped the pool at
         // products 16-18 with no 5s: 4-5 families, so a family had to repeat.) The last row: the one square (4 x 4 to 6 x 6).
-        { skill: Object.assign(TURN(1, { minNum: 6, maxNum: 36, allTest: 'arrP1', instructionKey: 'turn-look' }), { opts: { forms: [0], task: [1], band: 36 } }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['arrBigSquare'] } },
+        { skill: Object.assign(TURN(1, { minNum: 6, maxNum: 36, allTest: 'arrP1', instructionKey: 'turn-look' }), { opts: { forms: [0], task: [1], band: 36 } }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['arrBigSquare'] }, equalPages: true },
         { skill: FACTS({ minNum: 12, factorCap: 4, allTest: 'arrP2' }), shape: [10, 2], edgeLast: { per: 10, cols: 2, first: true, wants: ['arrSquare', 'arrFive'] } },
     ],
     // No Mixed page: a Mixed page leads with the lesson skill (half its items), and only ten arrays up to
