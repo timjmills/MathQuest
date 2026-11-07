@@ -26,7 +26,7 @@ import { generateQuestionFor as _generateQuestionFor, configuredItem } from './g
 import { resetPageDeals } from './page-deal.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
@@ -53,7 +53,7 @@ import {
 } from './sheet/anchors.js';
 import {
     allocateSupports, alternativesOf, TOUCH_IDS, normCoverage, normMix, TOUCH_MIN_PT,
-    canDraw, supportNeeds, supportOpKey as opKey,
+    canDraw, supportNeeds, supportOpKey as opKey, fadeTo, fadeLevel,
 } from './sheet/index.js';
 
 /* ======================================================================== constants */
@@ -1261,10 +1261,20 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def) return null;
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    let chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
     if (!chosen.length) return null;
     const p = q.cell.payload || {};
-    let worst = chosen.filter((id) => canDraw(id, p, template));
+    // Facts card F2 (owner 2026-11-07; critic laned-restart r4 R4-2): div_facts' array is a TRUE array, offered only
+    // while every dividend of the section is 50 or less (the options' reach, skill-options.js divFactsMaxDividend); past
+    // it the support is not drawn on any fact (arrayDropNote names them in the fits line). Kept, it is drawn on EVERY
+    // fact in one frame for the section: the largest divisor's columns by the band's top quotient's rows.
+    const divArr = sk.categoryId === 'division' && sk.skillId === 'div_facts' && opKey(p.op) === '/' && chosen.includes('array');
+    const arrayOff = divArr && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    // (dropped, it is no alternative either: the clashing supports are dealt as if it had not been ticked)
+    if (arrayOff) chosen = chosen.filter((x) => x !== 'array');
+    if (!chosen.length) return null;
+    const frameP = divArr && !arrayOff ? Object.assign({}, p, { arrayFrame: true }) : p;
+    let worst = chosen.filter((id) => !(arrayOff && id === 'array') && canDraw(id, frameP, template));
     if (!worst.length) return null;
     // Section by section across a page of several sections, a section only ever carries ITS
     // alternative (supports.js deals mixKey % alternatives), so that is all it keeps room for.
@@ -1281,7 +1291,10 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     const touch = worst.some((x) => TOUCH_IDS.includes(x));
     // Touch dots need 24 pt digits: a stack or a sentence at M / S is drawn at L (owner ruling); a
     // fact takes the fact ladder, capped at 6 columns (24 pt) by its footprint.
-    const forceL = touch && template !== 'fact' && (SIZES[size] || SIZES.L).digitPt < TOUCH_MIN_PT;
+    // (critic laned-restart r4 SCC-T10, one geometry a page: the sub-sections of a support split share the page, so when
+    // ANY of its alternatives carries touch dots every sub-section is drawn at that size - one digit size, one answer place)
+    const splitTouch = mix && Number.isFinite(mix.alt) && chosen.some((x) => TOUCH_IDS.includes(x) && canDraw(x, p, template));
+    const forceL = (touch || splitTouch) && template !== 'fact' && (SIZES[size] || SIZES.L).digitPt < TOUCH_MIN_PT;
     const extra = {};
     const op = opKey(p.op);
     if (op === '*' && Array.isArray(o.constant)) {
@@ -1290,6 +1303,7 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     }
     // ÷: the tally row is the same length for every item of the section: 12 on a 12s set.
     if (op === '/') extra.tally = Number(o.band) >= 144 ? 12 : 10;
+    if (divArr && !arrayOff && worst.includes('array')) extra.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(o) / extra.tally), rows: extra.tally };
     return {
         chosen, worst, need, forceL, extra,
         cover: o.cover || 'whole', mix: o.mix || 'section',
@@ -1308,7 +1322,9 @@ function splitBySupports(sec, gi, n) {
     if (!def) return [sec];
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
     if ((n.mix || o.mix || 'section') !== 'section') return [sec];
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    // (facts card F2: div_facts' array past dividends of 50 is drawn nowhere, so it makes no sub-section of its own)
+    const arrOff = sk.categoryId === 'division' && sk.skillId === 'div_facts' && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v) && !(arrOff && v === 'array'));
     const alts = alternativesOf(chosen);
     // Up to four alternatives. A page-driven split is checked once its parts are measured (buildSheet
     // undoes it when one row of each does not fit a page, or when it holds fewer problems than the
@@ -1327,6 +1343,62 @@ function splitBySupports(sec, gi, n) {
         group: { id: `sup${gi}`, share: 1 / k },
         supportAlt: i,
     })).filter((x) => !counts || x.count);
+}
+
+/** Facts card F2: is div_facts' array asked for this item's section and NOT drawn (a dividend past 50)? */
+function arrayDroppedFor(sk, q) {
+    if (!sk || sk.categoryId !== 'division' || sk.skillId !== 'div_facts' || !q || !q.cell) return false;
+    const p = q.cell.payload || {};
+    if (opKey(p.op) !== '/') return false;
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    return (Array.isArray(o.support) ? o.support : []).includes('array') && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+}
+/** The fits line's words for the facts that carry no array (facts card F2), each named as it prints. */
+function arrayDropNote(items) {
+    const facts = [];
+    let o = null;
+    for (const it of items || []) {
+        if (!it || !it.arrayDropped) continue;
+        const p = (it.q && it.q.cell && it.q.cell.payload) || {};
+        const a = p.a !== undefined ? p.a : p.dividend, b = p.b !== undefined ? p.b : p.divisor;
+        if (a === undefined || b === undefined) continue;
+        const t = `${a} ÷ ${b}`;
+        if (!facts.includes(t)) facts.push(t);
+        if (!o && it.skillRef) o = normalizeOptions('division', 'div_facts', it.skillRef.opts || {});
+    }
+    if (!facts.length) return '';
+    return `Array support not drawn: every dividend must be ${DIV_ARRAY_MAX} or less (these tables go to ${divFactsMaxDividend(o || {})}). No array on ${facts.join(', ')}.`;
+}
+
+/**
+ * Facts card F4: one faded section of k >= 2 pages and one skill with supports, as k one-page sections, page j carrying
+ * the supports of fade level fadeLevel(j, k) (3 all, 2 the light part, 1 none) - every problem of a page alike, so the
+ * packet never adds help back (L-FADE-ORDER). A level whose supports clash keeps its fullest alternative. null: not a
+ * faded packet.
+ */
+function fadeStages(sec, n) {
+    if (!sec || sec.group || !sec.skills || sec.skills.length !== 1 || sec.count) return null;
+    const k = Math.floor(Number(sec.pages) || 1);
+    if (k < 2) return null;
+    const sk = sec.skills[0];
+    let def = null;
+    try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return null;
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    if ((n.coverage || o.cover) !== 'fade') return null;
+    // (div_facts' array past dividends of 50 is not drawn at all: it takes no stage of its own)
+    const arrOff = sk.categoryId === 'division' && sk.skillId === 'div_facts' && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v) && !(arrOff && v === 'array'));
+    if (!chosen.length) return null;
+    const stage = (level) => {
+        const alts = alternativesOf(fadeTo(chosen, level));
+        return alts.length ? alts.reduce((a, b) => (b.length > a.length ? b : a)) : [];
+    };
+    return Array.from({ length: k }, (_, j) => Object.assign({}, sec, {
+        pages: 1,
+        fadeStage: fadeLevel(j, k),
+        skills: [Object.assign({}, sk, { opts: Object.assign({}, sk.opts || {}, { support: stage(fadeLevel(j, k)), cover: 'whole' }) })],
+    }));
 }
 
 /** The sheet-level mix, when the request sets one. */
@@ -1355,7 +1427,8 @@ function allocateHostSupports(items, n) {
     if (!list.length) return;
     // A More Practice set's letters are ONE sheet (coordinator, 2026-09-25): a skill fades down the
     // whole set, and its section is dealt across the letters, A before B.
-    const skillKey = (it) => it.skill;
+    // (facts card F4: each stage of a faded packet is a section of its own with its own supports, so it is dealt apart)
+    const skillKey = (it) => (it.supportsBox && it.supportsBox.stage ? `${it.skill}@fade${it.supportsBox.stage}` : it.skill);
     const chosen = {}, cover = {}, mix = {};
     for (const it of list) {
         const pl = it.supportsBox.plan;
@@ -1424,7 +1497,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     // S2: the supports this item may carry. Until the sheet is allocated it draws the worst case
     // (every support it could carry), which is what it is measured at; the allocation then swaps
     // what it does not draw for invisible reserve, so the geometry is the one measured.
-    const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined };
+    const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined, stage: mix && mix.stage ? mix.stage : undefined };
     if (supportsBox.plan) supportsBox.cur = Object.assign({}, supportsBox.plan.extra, { on: supportsBox.plan.worst.slice(), reserve: [] });
     const forceL = !!(supportsBox.plan && supportsBox.plan.forceL);
     // The item's floor size (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN.md 8a): the page's size
@@ -1577,6 +1650,9 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         canShow,
         // S2: the supports box (shared by every clone a role makes of this item) and what it holds.
         supportsBox,
+        // facts card F2: div_facts' array asked but past dividends of 50, so not drawn (the fits line names the fact)
+        arrayDropped: withSupports && arrayDroppedFor(g.skill, q),
+        skillRef: g.skill,
     };
     return item;
 }
@@ -1799,8 +1875,8 @@ function measureSide2(pairs, { size, look, tpl = '', mdoc = null }) {
     if (typeof document === 'undefined' || !document.body || !pairs.length) return '';
     const { root, done } = measureHost(size, look, mdoc);
     const PX_PER_MM = 96 / 25.4;
-    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
-    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: Number.isFinite(lvl) ? lvl : 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(Number.isFinite(x.measureLevel) ? x.measureLevel : 1), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
     try {
         if (!tpl) {
             // the pupil's column: the widest problem at its own width (a max-content column)
@@ -1845,8 +1921,8 @@ function measureSide4(pairs, { size, look, mdoc = null }) {
     const { root, done } = measureHost(size, look, mdoc);
     const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
     const PX_PER_MM = 96 / 25.4;
-    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
-    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: Number.isFinite(lvl) ? lvl : 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(Number.isFinite(x.measureLevel) ? x.measureLevel : 1), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
     // the content's ink extent in a cell, and whether it stays inside the cell's padding box
     const ink = (cell) => {
         const r = cell.getBoundingClientRect();
@@ -1954,7 +2030,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const bodies = new Map();
         for (const it of items) {
             bodies.set(it, cols.map((c) => MEASURE_STATES.map((state) => {
-                try { return it.render(ctxOf(state, it.measureLevel || 1, it), { cols: c }); } catch (e) { return ''; }
+                try { return it.render(ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it), { cols: c }); } catch (e) { return ''; }
             })));
         }
         // a cell measured before Andika has loaded (fontsReady gives up after 3 s) is never
@@ -1964,7 +2040,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const dpr = typeof window !== 'undefined' && window.devicePixelRatio ? window.devicePixelRatio : 1;
         const keyOf = (it) => {
             if (noCache || !faceReady || Array.isArray(it.judgeModes) || it.colsLayout) return null;
-            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, it.measureLevel || 1].join('|');
+            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1)].join('|');
             const text = `${size}|${look}|${cols.join(',')}|${flags}|${bodies.get(it).map((b) => b.join('\u0001')).join('\u0002')}`;
             return `${hash53(text)}:${text.length}`;
         };
@@ -2159,13 +2235,13 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (cells && !cells.every((el) => el && el.nodeType === 1 && el.classList.contains('ws-cell') && el.parentNode === root)) cells = null;
                 if (cells) {
                     BUILD_STATS.layouts++;
-                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, it.measureLevel || 1, it)));
+                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it)));
                     items.forEach((it, i) => fold(it, c, inner, readings[i]));
                 } else {
                     items.forEach((it, i) => {
                         root.innerHTML = list[i][1];
                         BUILD_STATS.layouts++;
-                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, it.measureLevel || 1, it)));
+                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it)));
                     });
                 }
             });
@@ -2347,16 +2423,12 @@ function optionTitleBase(sk, baseICan) {
 
 /** The page title for the chosen options; a count-by row of 15 jumps says so; the tables stay 1 to 12 (wave 1 lane C). */
 function optionTitle(sk, baseICan) {
-    const t = optionTitleBase(sk, baseICan);
-    try {
-        if (sk.skillId === 'count_by_tables' && Number(normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}).jumps) === 15) {
-            const base = t || baseICan || '';
-            return /\(15 jumps\)/.test(base) ? base : `${base} (15 jumps)`;   // the tables stay 1 to 12; the row is 15 jumps long
-        }
-    } catch (e) { /* keep the base title */ }
-    return t;
+    // (lane lf-ops critic r1 D-CB-2, count-row card §9 Q6: the 15-jump row no longer adds "(15 jumps)" - an option value is
+    // never part of the I Can line)
+    return optionTitleBase(sk, baseICan);
 }
 
+const TITLE_FROM_OPTS = new Set(['count_by_tables', 'mult_properties', 'arrays_groups']);
 /** Skill metadata the frame prints: label, level, and the strings the role reads. */
 function skillMeta(sk, q) {
     // A ranged + / − id whose band (or regrouping, on a _mixed id) is set below its own name
@@ -2375,7 +2447,9 @@ function skillMeta(sk, q) {
     }
     // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
     let titleOpts = {};
-    if (sk.skillId === 'count_by_tables') {
+    // (lane lf-ops critic r1 D-MP-8: mult_properties' title, Rule and vocabulary follow the property dealt - its `forms` -
+    // so its strings read the options as count_by_tables' do; arrays_groups names arrays or equal groups the same way)
+    if (TITLE_FROM_OPTS.has(sk.skillId)) {
         try {
             const no = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
             // the one-page sheet prints only the rows that fit: the title names those, in the order they print
@@ -2821,6 +2895,13 @@ async function buildSheetDeal(req = {}) {
     // becomes one sub-section per alternative (section A touch dots, section B dot tiles). Each
     // sub-section lays out and reserves room for its OWN support only, so a page is as full as it
     // is without supports, less that support's own size.
+    // Facts card F4 (owner 2026-11-07; critic laned-restart r4 R4-5): a FADED PACKET of several pages is dealt in support
+    // order, one stage a page (all, then the light part, then none: supports.js fadeTo / fadeLevel), each page its own
+    // section, so its rows are sized to the supports THAT page carries - never to the first page's reserved room.
+    if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') {
+        const staged = fadeStages(n.sections[0], n);
+        if (staged) { n.sections = staged; n.coverage = undefined; }
+    }
     const unsplit = n.sections;
     if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') n.sections = n.sections.flatMap((sec, gi) => splitBySupports(sec, gi, n));
 
@@ -2888,7 +2969,7 @@ async function buildSheetDeal(req = {}) {
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
-        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt };
+        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt, stage: sec.fadeStage };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
@@ -3165,6 +3246,10 @@ async function buildSheetDeal(req = {}) {
             // only grows as items are added, so the capacity can only fall; the loop settles.
             const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
+            // (facts card F4: a later stage of a faded packet holds at most twice the first stage's page - every page of
+            // the packet at least half used, PG-20 / DN-2 - so the bare last page is not a crowd beside a supported first)
+            // (held to the cap, the count is the page's own: its rows are spread down the page, never half of it left bare)
+            if (sec.fadeCap && want > sec.fadeCap) { want = sec.fadeCap; sec.count = want; }
             let items = [];
             // A MIXED POOL (mixed_composing, counting_all ...) is one skill whose items come from
             // many templates, 25 to 110 mm tall. Its probe's tallest item sized every page, so a page
@@ -3179,7 +3264,7 @@ async function buildSheetDeal(req = {}) {
                 if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
                 sec.floor = floorWith(si, pool ? items : probe.items.concat(items));
                 if (sec.count) break;
-                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
+                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, sec.fadeCap || MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
                 if (pool) {
                     if (again >= want) fitBest = Math.max(fitBest, want);
                     if (again === want) break;
@@ -3390,6 +3475,7 @@ async function buildSheetDeal(req = {}) {
                 } catch (e) { /* keep the count */ }
             }
             hostItems = hostItems.concat(markSectionWriteAbove(items));
+            if (sec.fadeStage && si === 0) for (const s2 of n.sections.slice(1)) if (s2.fadeStage) s2.fadeCap = 2 * items.length;
         }
     } else {
         // MORE PRACTICE: each letter under its own seed (PT-MPR-2). The first letter's probe fixes
@@ -3542,6 +3628,7 @@ async function buildSheetDeal(req = {}) {
     const f0 = fitsList[0] || {};
     const pageCount = out.pupilPages.length;
     notes.push(...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes);
+    { const an = arrayDropNote(hostItems); if (an) notes.push(an); }
     // DN-21: the dialog's "Fits:" line (it already carries the layout's own clamp note, DN-14),
     // then any note the layout line does not already say.
     const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
@@ -3812,7 +3899,10 @@ async function buildRoleSheet(n, metaOf) {
         header.refBand = nline.html;
     }
     const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
-    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];
+    // (critic laned-restart r4 R4-2c: a role may measure one more column count for a section of supported problems -
+    // review.js - so the sheet says when any skill ticks a support)
+    const supported = n.sections.some((sec) => (sec.skills || []).some((sk) => sk && sk.opts && Array.isArray(sk.opts.support) && sk.opts.support.length));
+    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(Object.assign({}, ctx, { supported })) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
     const strictShow = n.role === 'error-analysis';
     const input = {
@@ -3932,7 +4022,7 @@ async function buildRoleSheet(n, metaOf) {
             if (!prepared) return false;
             prepared.pool = pool.id;
             // A role that draws Model / Guided cells measures them at their tallest level.
-            if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
+            if (mod.MEASURE_LEVEL !== undefined && mod.MEASURE_LEVEL !== null) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
             // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
             // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
             if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
@@ -4241,6 +4331,7 @@ async function buildRoleSheet(n, metaOf) {
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t)), ...dealNotes];
     if (numberLine && numberLine.warn) notes.push(numberLine.warn);
+    { const an = arrayDropNote(items); if (an) notes.push(an); }
     // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
     // are raised to L; the fit line says so instead of the page's own digit size alone.
     const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
@@ -4297,7 +4388,7 @@ const LESSON_OFF_OPTS = ['familyChart'];
 
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
-    const data0 = n.lessonData || lessonFor(sk0.categoryId, sk0.skillId);
+    const data0 = n.lessonData || lessonFor(sk0.categoryId, sk0.skillId, sk0.opts || null);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
     if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
@@ -4313,12 +4404,15 @@ async function buildLesson(n, metaOf) {
     // Practice-page supports a lesson never draws (critic visual-quality r2 N1): the blank family chart is working
     // space for the practice pages; on the lesson's model, steps and guided frames it crowds the step column off
     // the sheet. The lesson draws the bare family-check cell; the option stays on the skill for every other role.
-    if (sk.opts && LESSON_OFF_OPTS.some((k) => sk.opts[k] === true)) {
-        sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(LESSON_OFF_OPTS.map((k) => [k, false]))) });
+    // (lane lf-ops: lesson data may name more - `offOpts`: the x / ÷ story lessons leave the practice bar model off, whose
+    // full-width bar ran their chart off the page, ws-cell-checks OVERFLOW)
+    const offOpts = LESSON_OFF_OPTS.concat(data0 && Array.isArray(data0.offOpts) ? data0.offOpts : []);
+    if (sk.opts && offOpts.some((k) => sk.opts[k] === true)) {
+        sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(offOpts.map((k) => [k, false]))) });
     }
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
-    const data = n.lessonData || lessonFor(sk.categoryId, sk.skillId);
+    const data = n.lessonData || lessonFor(sk.categoryId, sk.skillId, sk.opts || null);
     const warmSkills = data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
@@ -4402,6 +4496,8 @@ async function buildLesson(n, metaOf) {
     // columns prints [count, cols] a page instead (expanded form: 8 x 1).
     // (`practiceShapes`: the shapes to try, densest first - the first that prints on its pages wins; visual-quality r2:
     // eight stories at M, six at L, never six over a 25 % strip)
+    // `practiceShapes` (lesson data; critic skip-count r5 SC3): several [count, cols], the fullest first - the first one
+    // whose whole rows fit the practice pages prints (a count row: 8 rows at M, fewer where the strip or wraps need room).
     const stackShapes = data && Array.isArray(data.practiceShapes) && data.practiceShapes.length ? data.practiceShapes
         : data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]];
     // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a

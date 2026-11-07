@@ -10,7 +10,13 @@
 //                  array's fact is three boxes "[ ] × [ ] = [ ]": its rows, its row length, its product.
 //   type 'missing' no pictures (abstract, ★★★): the known fact "r × c = P" and its turn with one box,
 //                  `ask` 'product' ("c × r = [ ]") or 'factor' ("c × [ ] = P").
-//   draw 'none'    (on 'known') no pictures: the known fact and the three boxes of its turn.
+//   draw 'none'    (on 'known' or 'split') no pictures: the facts and their boxes alone.
+//   type 'split'   (mult_properties form 1, the distributive property, 3.OA.B.5; ops-tables card §2):
+//                  ONE array of `rows` rows of `cols`, broken after `top` rows by a gap and a bracket
+//                  on the left of each part (never colour); three facts under it, one a line:
+//                  "top × cols = [ ]", "(rows − top) × cols = [ ]", "rows × cols = [ ]" - the two
+//                  parts, then the whole the parts add to. Slots p1 p2 t. The bracket marks each part
+//                  and is never labelled (RP-1).
 // Nothing names the property (RP-1: a heading naming the rule tells the pupil what to do), and no
 // product sits beside the question that asks for it, except the known fact of 'known' / 'missing',
 // which is the fact the pupil is meant to use.
@@ -40,9 +46,14 @@ export function turnKey(p) {
     const r = N(p.rows), c = N(p.cols), P = product(p);
     if (p.type === 'both') return { a: String(P), b: String(P) };
     if (p.type === 'missing') return { m: String(p.ask === 'factor' ? r : P) };
+    if (p.type === 'split') { const t = splitTop(p); return { p1: String(t * c), p2: String((r - t) * c), t: String(P) }; }
     return { b1: String(c), b2: String(r), b3: String(P) };
 }
-const SLOT_ORDER = { both: ['a', 'b'], known: ['b1', 'b2', 'b3'], missing: ['m'] };
+const SLOT_ORDER = { both: ['a', 'b'], known: ['b1', 'b2', 'b3'], missing: ['m'], split: ['p1', 'p2', 't'] };
+/** The rows of the split's first part (1 .. rows - 1). */
+export const splitTop = (p) => { const r = N(p.rows), t = Math.round(N(p.top)); return Number.isFinite(t) && t >= 1 && t < r ? t : Math.max(1, Math.floor(r / 2)); };
+const SPLIT_GAP = { S: 3.5, M: 4, L: 4.5 };   // mm of white between the two parts (the break)
+const BRACKET = 2.5;                           // mm: the bracket's arm, and its gap to the dots
 const slotIds = (p) => SLOT_ORDER[p.type] || SLOT_ORDER.known;
 
 function dotsSvg(g, rows, cols, ink, label) {
@@ -61,7 +72,32 @@ function dotsSvg(g, rows, cols, ink, label) {
     return { svg, wMm: W, hMm: H };
 }
 
-const boxW = (g, digits) => Math.max(g.writeMm * (digits > 1 ? 1.8 : 1.2), digits * 0.62 * g.E + 3);
+/** The split array: `top` rows, a gap, the other rows; a bracket left of each part (0.75 pt). */
+function splitSvg(g, p, ink) {
+    const pitch = PITCH[g.size] || PITCH.L;
+    const r = Math.min(DOT[g.size] || DOT.L, pitch - 2.5) / 2;
+    const rows = N(p.rows), cols = N(p.cols), top = splitTop(p), gap = SPLIT_GAP[g.size] || SPLIT_GAP.L;
+    const x0 = BRACKET * 2;                       // the brackets' column
+    const W = x0 + cols * pitch, H = rows * pitch + gap;
+    const yOf = (i) => pitch / 2 + i * pitch + (i >= top ? gap : 0);
+    const fill = ink === 'trace' ? INK.grey : INK.ink;
+    let body = '';
+    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+        body += `<circle cx="${(x0 + pitch / 2 + j * pitch).toFixed(2)}" cy="${yOf(i).toFixed(2)}" r="${r.toFixed(2)}" fill="${fill}"/>`;
+    }
+    const bracket = (y1, y2) => `<path d="M${(BRACKET * 1.6).toFixed(2)} ${y1.toFixed(2)} H${(BRACKET * 0.6).toFixed(2)} V${y2.toFixed(2)} H${(BRACKET * 1.6).toFixed(2)}" fill="none" stroke="${INK.ink}" stroke-width="0.265"/>`;
+    body += bracket(yOf(0) - r, yOf(top - 1) + r) + bracket(yOf(top) - r, yOf(rows - 1) + r);
+    const label = `${rows} rows of ${cols} dots, broken into ${top} rows and ${rows - top} rows`;
+    const svg = `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" data-per-row="${cols}" role="img" aria-label="${esc(label)}" `
+        + `style="display:block;margin:0 auto;width:${g.em(W)};height:${g.screen ? 'auto' : g.em(H)};max-width:${g.screen ? '100%' : 'none'};overflow:visible">${body}</svg>`;
+    return { svg, wMm: W, hMm: H };
+}
+
+// (critic lf-ops r1 D-MP-2: boxes were 6.9 mm for a 1-digit answer and 10.6 mm for a 2-digit one - SL-1 wants 14 mm,
+// SL-2 one width a section, or the width gives the answer's size away. Every box takes the widest answer's width, two
+// digits at least, never under SLOT_MIN_MM.)
+const SLOT_MIN_MM = { S: 14, M: 14, L: 17 };
+const boxW = (g, digits) => Math.max(SLOT_MIN_MM[g.size] || 14, g.writeMm * 1.8, Math.max(2, digits) * 0.62 * g.E + 3);
 const SIGN_MM = (g) => 0.9 * g.E;   // a sign and its spaces
 
 /** One fact line: parts are numbers/signs (strings) or {id, digits} slots. */
@@ -87,6 +123,14 @@ function factWidth(g, parts) {
 function facts(p) {
     const r = String(N(p.rows)), c = String(N(p.cols)), P = String(product(p)), d = P.length;
     if (p.type === 'both') return [[r, '×', c, '=', { id: 'a', digits: d }], [c, '×', r, '=', { id: 'b', digits: d }]];
+    if (p.type === 'split') {
+        const t = splitTop(p), R = N(p.rows), C = N(p.cols);
+        // (one box width for the three: the section's widest answer, never each answer's own length - L3)
+        const w = Math.max(2, d);
+        return [[String(t), '×', c, '=', { id: 'p1', digits: w }],
+            [String(R - t), '×', c, '=', { id: 'p2', digits: w }],
+            [r, '×', c, '=', { id: 't', digits: w }]];
+    }
     if (p.type === 'missing') {
         const turned = p.ask === 'factor' ? [c, '×', { id: 'm', digits: r.length, mark: 'blank' }, '=', P] : [c, '×', r, '=', { id: 'm', digits: d, mark: 'blank' }];
         return [[r, '×', c, '=', P], turned];
@@ -95,8 +139,9 @@ function facts(p) {
 }
 
 function geometry(g, p) {
-    const [f1, f2] = facts(p);
-    const fw = Math.max(factWidth(g, f1), factWidth(g, f2));
+    const fs = facts(p);
+    const fw = Math.max(...fs.map((f) => factWidth(g, f)));
+    if (p.type === 'split') return p.draw === 'none' ? { wMm: fw, pictures: false } : { wMm: Math.max(splitSvg(g, p, 'solid').wMm, fw), pictures: true, split: true };
     // (`draw` 'none' on a 'known' item - lesson 3a exit a: the known fact and three boxes, no array to recount)
     if (p.type === 'missing' || p.draw === 'none') return { wMm: fw, pictures: false };
     // The two arrays side by side, the two facts under them, one line each (the array first,
@@ -114,10 +159,17 @@ export function turnRender(p, ctx) {
     const vals = slotValues(ctx, key, (w) => { const l = splitList(w); const o = {}; ids.forEach((id, i) => { o[id] = l[i]; }); return o; });
     const sv = ctx.stepVals || null;
     const at = (id) => (sv ? { value: (sv[id] && sv[id].value) || '', ink: (sv[id] && sv[id].ink) || null } : { value: vals[id] || '', ink });
-    const [f1, f2] = facts(p);
+    const fs = facts(p);
+    const [f1, f2] = fs;
     const geom = geometry(g, p);
     let inner;
-    if (!geom.pictures) {
+    const lines = (list) => `<div style="display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">${list.map((f) => `<div>${factLine(g, f, at)}</div>`).join('')}</div>`;
+    if (p.type === 'split') {
+        // (a step state: the array first, then each fact as its step writes it - a line keeps its place)
+        const inkA = sv ? (sv.array ? sv.array.ink : 'solid') : 'solid';
+        const pic = geom.pictures ? `${splitSvg(g, p, inkA).svg}<div style="height:${g.em(3)}"></div>` : '';
+        inner = pic + lines(fs);
+    } else if (!geom.pictures) {
         inner = `<div style="display:flex;flex-direction:column;align-items:center;gap:${g.em(3)}">${factLine(g, f1, at)}${factLine(g, f2, at)}</div>`;
     } else {
         // Step state: an array not drawn yet keeps its space (the cell never jumps between steps).
@@ -132,6 +184,13 @@ export function turnRender(p, ctx) {
             + `<div style="margin-top:${g.em(p.type === 'known' ? 1.5 : 3)};display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">`
             + `<div>${factLine(g, f1, at)}</div><div style="visibility:${showF2 ? 'visible' : 'hidden'}">${factLine(g, f2, at)}</div></div>`;
     }
+    // (lane lf-ops, CL-40: a pictured array's first dot reached 4.6 mm across, 4.5 mm down - inside the number tab's
+    // keep-out - at M and L. The pair stands on one base line, so the FIRST array's top-left dot is at the cell's top
+    // only when that array is the taller one (rows >= its row length) and the pair spans the column; then, on paper,
+    // the drawing starts below the keep-out (--ws-koin, the kit's CL-40 edge). A split array is one array: always.)
+    const colW = Number(ctx.columns) > 0 ? 186 / Number(ctx.columns) - 6 : 0;
+    const firstTall = N(p.rows) >= N(p.cols);
+    if (geom.pictures && !g.twin && (p.type === 'split' || (colW && colW - geom.wMm < 7 && firstTall))) inner = `<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>${inner}`;
     return root(g, 'arrays-turn', inner, 'text-align:center;width:100%;', turnFootprint(p, ctx).wMm);
 }
 
@@ -147,7 +206,11 @@ export function turnAnswerKey(p) {
 export function turnFootprint(p, ctx) {
     const g = geo(ctx);
     const geom = geometry(g, p);
-    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures ? 2 : 3 };
+    // (critic lf-ops r1 D-MP-3, GRID-EVEN at L - a row of 2, then one full-width 5 x 4 pair - is NOT fixed here: every pair
+    // full width at L broke the detailed lesson g3-oa5's practice grid (E12, E24b); a known finding for the next round)
+    // (not `inPlace`: held to its content the pair left a 18-22 % strip under the detailed lesson's practice grid - E9b - and
+    // the height grouping moved its edge case off the last row - E24b; D-MP-1's bands stay a known finding)
+    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures || p.type === 'split' ? 2 : 3 };
 }
 
 export function turnInputs(p) {
@@ -161,7 +224,7 @@ export function turnStepState(p, steps, k, ctx) {
         let id = m.slot;
         if (id === 'fact') id = 'a';
         else if (id === 'turned') id = p.type === 'both' ? 'b' : 'b3';
-        else if (id === 'answer') id = p.type === 'missing' ? 'm' : p.type === 'both' ? 'b' : 'b3';
+        else if (id === 'answer') id = p.type === 'missing' ? 'm' : p.type === 'both' ? 'b' : p.type === 'split' ? 't' : 'b3';
         sv[id] = { value: m.value, ink: m.ink };
     }
     return turnRender(p, Object.assign({}, ctx, { state: 'blank', stepVals: sv }));

@@ -188,6 +188,7 @@ const OWN = {
     'division:remainder_interpret': 'I Can solve division stories with remainders',
     'division:remainder_contexts': 'I Can solve division stories with remainders',
 };
+const PLAIN_OWN = new Set(['multiplication:mult_word_problems_plain', 'division:div_word_problems_plain']);
 for (const [key, iCan] of Object.entries(OWN)) {
     // a remainder story is division by its name: its page never asks for a sign (no sign row)
     // a times-as-many story writes its sign in the neutral sentence's ring: one sign place
@@ -213,5 +214,68 @@ for (const [key, iCan] of Object.entries(OWN)) {
         })
         : wordWorkProvider(iCan);
     registerSkill(key, def);
-    if (!/remainder_/.test(key)) registerSkill(`${key}_plain`, def);
+    // (the plain x / ÷ stories register their own members below: no key words in their Model)
+    if (!/remainder_/.test(key) && !PLAIN_OWN.has(`${key}_plain`)) registerSkill(`${key}_plain`, def);
+}
+
+// ------------------------------------------------------------------ the plain x / ÷ stories (lane lf-ops, 2026-11-07)
+// The signed ops-tables card (§7a) hides the key-word cues and the bank on mult_word_problems_plain and
+// div_word_problems_plain: a key-word list teaches "each means ×" (M-S1). Their Model therefore never says "look at
+// the key words"; it names the story's STRUCTURE instead (equal groups: how many groups, how many in each; or the
+// total and the equal groups it is split into), and the Say frame says that structure back with the answer.
+// The other members (the wrong operation for Error analysis, the bar wrongs) are the shared ones.
+function plainGroupsStep(st, schema) {
+    // (× : top = the number in each group, bottom = the number of groups - the column work writes "8 × 2")
+    if (st.op === '*') return `There are ${fmt(st.bottom)} equal groups of ${fmt(st.top)}.`;
+    // sharing: the groups are known, the size is asked; grouping: the size is known, the groups are asked
+    if (st.op === '/' && schema === 'grouping') return `${fmt(st.top)} in groups of ${fmt(st.bottom)}. How many groups?`;
+    if (st.op === '/') return `${fmt(st.top)} in ${fmt(st.bottom)} equal groups. How many in each?`;
+    return null;
+}
+/** Four moves, one chart panel each: read and name the groups, choose the sign, work the fact, the answer and its label. */
+export function plainStorySteps(q) {
+    const p = payloadOf(q);
+    if (!p || p.steps.length !== 1 || p.layout === 'sentence' || p.layout === 'choose' || p.letter || p.check) return wordWorkSteps(q);
+    const st = p.steps[0];
+    const gs = plainGroupsStep(st, p.schema);
+    if (!gs) return wordWorkSteps(q);
+    return [
+        step(`Read the story two times. ${gs}`),
+        p.signs === false ? step(`${VERB[st.op]}.`) : step(`Circle ${GLYPH[st.op]}. ${VERB[st.op]}.`, [{ slot: 'op0', value: GLYPH[st.op] }]),
+        // (the fact joined with no-break spaces: a chart panel never breaks it after its sign - print-lint WRAP-OP)
+        step(`Write ${fmt(st.top)} and ${fmt(st.bottom)} in the boxes. ${workLine(st).replace(/ /g, '\u00a0')}`),
+        step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }]),
+    ];
+}
+const unitFor = (p) => (Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit);
+for (const [key, iCan, op] of [
+    ['multiplication:mult_word_problems_plain', 'I Can solve multiplication stories', '*'],
+    ['division:div_word_problems_plain', 'I Can solve division stories', '/'],
+]) {
+    registerSkill(key, wordWorkProvider(iCan, {
+        strings: strings({
+            iCan,
+            instructionKey: 'story-work',
+            steps: op === '*' ? [
+                'Read the story. Find the groups and how many in each.',
+                'Circle the sign.',
+                'Write the numbers in the boxes. Solve.',
+                'Write the answer and its label word.',
+            ] : [
+                'Read the story. Find the total and the equal groups.',
+                'Circle the sign.',
+                'Write the numbers in the boxes. Solve.',
+                'Write the answer and its label word.',
+            ],
+            say: op === '*' ? '__ groups of __ is __ __.' : '__ divided by __ is __ __.',
+            sayValues: (q) => {
+                const p = payloadOf(q);
+                const st = p && p.steps.length === 1 ? p.steps[0] : null;
+                if (!st || !p.unit) return null;
+                return op === '*' ? [fmt(st.bottom), fmt(st.top), fmt(p.ans), unitFor(p)] : [fmt(st.top), fmt(st.bottom), fmt(p.ans), unitFor(p)];
+            },
+        }),
+        misconceptions: op === '*' ? ['wrong-operation', 'groups-as-total'] : ['wrong-operation', 'divisor-as-answer'],
+        workedSteps: plainStorySteps,
+    }));
 }

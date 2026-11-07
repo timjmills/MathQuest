@@ -624,6 +624,15 @@ const PARSE = {
     },
 };
 
+/* ============================================================== the signed cards' plan (tests/lib/ws-card-plan.mjs) */
+/** {cat:skill -> {cards, roles, variants}} from the signed spec cards (lane lf-ops critic r1, check 2). {} when the reader fails. */
+function cardPlans(keys) {
+    const file = path.join(ROOT, 'tests', 'lib', 'ws-card-plan.mjs');
+    if (!keys.length || !fs.existsSync(file)) return {};
+    const r = spawnSync(process.execPath, [file, '--root', ROOT, '--skill', keys.join(',')], { encoding: 'utf8', timeout: 60000 });
+    try { return Object.fromEntries(JSON.parse(String(r.stdout || '').trim().split('\n').pop()).map((p) => [p.skill, p])); } catch (e) { return {}; }
+}
+
 /* ============================================================== plan */
 function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
@@ -731,6 +740,30 @@ function buildPlan(ctx) {
                 add(gate(`print-lint-supports-${sup}-S`, `ws-print-lint --source kit --supports ${sup} --size S --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
                     ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
             }
+            // Critic laned-restart r4 (2026-11-03; lane lf-ops checks H13-INK, COVER, SCC-T10 one geometry, DV-02, PG-12 lone wide
+            // row, PT-REV-1, FADE-ORDER): the critic graded each support alone at S / M / L on the pages ws-grade-render deals
+            // (`--seed render`: hash(cat__skill:role) % 1e6), and a 3-page faded packet at M; precritic ran S at its own seeds only.
+            // Each support alone at M and L on those pages, the Review at S on its page (PT-REV-1 is seed-dependent: r4's Review S
+            // printed 7), and the faded packet.
+            const fnv = (t) => { let h = 2166136261; for (const c of String(t)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+            const renderId = (k, role) => `${k}${role !== 'independent' ? '#' + role : ''}@${fnv(`${k.replace(':', '__')}:${role}`) % 1000000}`;
+            for (const sup of singles) {
+                const ks = factKeys.filter((k) => (FACT_SUPPORTS[k] || []).includes(sup));
+                for (const sz of ['M', 'L']) {
+                    add(gate(`print-lint-supports-${sup}-${sz}`, `ws-print-lint --source kit --supports ${sup} --size ${sz} --roles ${SUP_ROLES} --seed render (critic r4: each support alone at M / L on the critic's pages)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES} × ${sz}`, 'browser', 'ws-print-lint',
+                        ['--source', 'kit', '--supports', sup, '--size', sz, '--roles', SUP_ROLES, '--seed', 'render', '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks.flatMap((k) => SUP_ROLES.split(',').map((r) => renderId(k, r))) } }));
+                }
+                add(gate(`print-lint-supports-${sup}-S-review`, `ws-print-lint --source kit --supports ${sup} --size S --roles review --seed render (critic r4 R4-2c: PT-REV-1 on the critic's Review page)`, `${ks.join(', ')} × ${sup} × review × S`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', 'review', '--seed', 'render', '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks.map((k) => renderId(k, 'review')) } }));
+            }
+            // div_facts critic r5 (facts card F1: H13 wins over the PT-TST fixed cells): H13-INK now measures Test pages, and
+            // `--h13-ink plain` measures the supports-off page too - Independent and Test at S / M / L on the critic's seeds.
+            for (const sz of ['S', 'M', 'L']) {
+                add(gate(`print-lint-h13-plain-${sz}`, `ws-print-lint --source kit --h13-ink plain --size ${sz} --roles independent,test --seed render --lints L-DENSITY (critic r5 / F1: H13-INK on Test and supports-off pages)`, `${factKeys.join(', ')} × independent,test × ${sz}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--h13-ink', 'plain', '--size', sz, '--roles', 'independent,test', '--seed', 'render', '--lints', 'L-DENSITY', '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys.flatMap((k) => ['independent', 'test'].map((r) => renderId(k, r))) } }));
+            }
+            add(gate('print-lint-fade-packet-M', 'ws-print-lint --source kit --supports all --fade packet --pages 3 --size M (critic r4 R4-5: a faded packet withdraws help in order; H13-INK on reserved zones)', `${factKeys.join(', ')} × faded packet × M`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--supports', 'all', '--fade', 'packet', '--pages', '3', '--size', 'M', '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
         }
         // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
         // the across block, and the ÷ probes at L re-laid cells 19-20 at 1.5 columns; L-DENSITY GRID-EVEN now reads every
@@ -746,8 +779,32 @@ function buildPlan(ctx) {
         // cell edge, never content run into the pad; no screen gate measured target size). --gate makes those measurements a
         // verdict: every overflow on the lane skills' lesson, test and independent pages at S, M and L, and every card-390 /
         // card-820 target under 44 px (RUBRIC H6). The renders land in the log dir for the critic too.
+        // Lane lf-ops critic r1 (check 2, speed-up 3; the lead, 2026-11-07: THE plan for every lane): a skill a SIGNED spec
+        // card covers is rendered on every page role the card's §7a offers, not lesson / test / independent only (Reason It
+        // OVERFLOW sat in the logs of all three r1 skills and nothing failed), one skill a run (speed-up 1: three skills x
+        // nine roles hit the 10-minute limit). And ws-cell-checks (seconds a page, no PDF) checks those roles AND every
+        // option value the card offers (each non-default value, and every value of a set option at once) on lesson,
+        // independent, guided, test and review at S / M / L. Skills no card covers keep the fixed role list.
+        const plans = cardPlans(keys);
+        const carded = keys.filter((k) => plans[k] && plans[k].cards.length);
+        // (every skill keeps the lesson / test / independent gate; a carded skill's other offered roles render in a gate of its own)
         add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
             ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        const BASE_ROLES = ['lesson', 'test', 'independent'];
+        // (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: two lane skills on one card print together as a SECTIONS sheet of 2
+        // pages - page 1 held 2 items, 64 % empty - at S and L, every page filled, the last one at least half)
+        if (carded.length >= 2) for (const sz of ['S', 'L']) {
+            add(gate(`print-lint-sections-${sz}`, `ws-print-lint --source kit --kind sections --pages 2 --size ${sz} --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet)`, `${carded.join(' + ')} × sections × 2 pages × ${sz}`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--kind', 'sections', '--pages', '2', '--size', sz, '--lints', 'L-DENSITY', '--skills', carded.join(',')], { parse: PARSE.printLint }));
+        }
+        for (const k of carded) {
+            const pl = plans[k], sid = k.split(':')[1];
+            const more = pl.roles.filter((r) => !BASE_ROLES.includes(r));
+            if (more.length) add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every other role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${more.length} roles × S/M/L`, 'browser', 'ws-grade-render',
+                ['--skills', k, '--roles', more.join(','), '--size', 'S,M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+            add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × S/M/L`, 'browser', 'ws-cell-checks',
+                ['--skills', k, '--card', '--card-opts'], { needFlags: ['card-opts'], expect: { mention: [k] }, missingMsg: 'ws-cell-checks is not in this tree' }));
+        }
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));

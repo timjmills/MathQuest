@@ -423,6 +423,10 @@ not improve** (3 if r3 passes = the old median per run). The ≥ 5× claim is no
 | F7 | If the next family also misses: certify `stack` × Single skill before any further family on it | lead | conditional |
 
 **Per-round findings audit (owner rule):** pilot r1 + r2 listed **18 automatic checks and 10 speed-ups**. Built so far: **3**
+
+- 2026-11-07 lf-ops plain stories critic r1 (FAIL, lowest 3): the mult `forms` option was dead (389/389 items one story) and options-verify did not see it because rendered text always differs by its numbers. Checks: FORMS-LIVE (mask digits / names, compare structure), DEAD-BOX over 20 seeds, SLOT-DOUBLE, paper = screen frame order. Speed-up: hand-over notes paste the full red list of a lint, so a ruling covers every case.
+- 2026-11-07 lf-ops div_facts critic r5 (narrow; FAIL, lowest 6): every r4 defect fixed, but Test rows stretched (fillToCeiling) and the lane's own H13-INK excluded Test under an r4 ruling that owner ruling F1 had replaced. Rule: when a card ruling changes, grep every check citing the old ruling. Checks: ink H13 on every role incl. Test and supports-off; RP-81 array gap; S > M per support; shrink-to-fit on support SVGs; one fact x per section / packet.
+- 2026-11-07 lf-ops critic r1 (build #4: mult_properties, arrays_groups, count_by_tables; FAIL, lowest 2): most reds sat on roles / option values precritic does not plan (Reason It, Error analysis, forms 1-3, times=each Test). Checks: band-anywhere H13, grade-render --gate on every 7a-offered role x forms, slot >= 14 mm + one width a section, S > M capacity, last-page PAGEFILL, title from dealt forms, L-KEY one answer a slot, tag/slot overlap, paper = screen frame. Speed-ups: plan precritic from the signed card's 7a offered list; per-page max-band % in grade-render; one skill per critic render run.
 (rules 0a, 0b and the per-round findings rule). Real checks built with a backtest: **0**. Every other item has an owner (W0-A for
 the checks, W0-B2 for the card, lead for rules). The count is re-taken at each reflection.
 
@@ -759,6 +763,12 @@ under CL-4b (owner), band instruction for presets.
 | r2 | **PASS 9 / 9 / 8** | stale-pin report for pinned findings (N-r2-3); precritic-plan coverage for gates whose rows name no skill (N-r2-1) | narrow r2 scope (fixes + regressions) in 21 min; one real precritic run of an approved sibling and `--role lesson` on the merged tree before the critic caught 4 of the lane's 5 setup traps |
 
 Details and the reflection: design/status/s1-checks.md.
+
+### skip-count · critic r5 (2026-10-30, FAIL 3) - fix round
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r5 | FAIL 3 (Lesson C1/C3), 390 card 6 | SC1: `ws-print-lint --roles lesson` existed on precritic's path and was not run (now 0 at S/M/L). SC2: `ws-phone-card` FOCUS / INVIEW existed (now 0) + NEW ROW-LINES (a swiping row on one line), and phone-card joins ws-deploy-gates.sh. SC3: NEW ws-node-lint LESSON-DATA `screen-task` (24 seeded deals of each Warm-up / Mixed ref; backtested). SC4: NEW phone-card swipe-window fixtures. G2-G4 (small-fixes r11, re-checked on today's row): NEW phone-card ROW-ARROW, NEXT-INVIEW (360x780, 844x390), ROTATE. Details: design/status/skip-count.md. | Render every role in the scope (the Lesson) in the fix loop; the family's own phone test (wave1-c2-phone) is off precritic's path, so its essentials moved into ws-phone-card. |
 
 ### Lane lessons-6-7 (detailed lessons 6 + 7) — builder rounds before critic r3 / r1 (2026-10-30)
 

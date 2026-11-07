@@ -204,6 +204,26 @@
       "date": "2026-09-19",
       "ruling": "\"Within N\" / \"facts to N\" bounds the ANSWER (the sum, the minuend, the product, the dividend), never the operands alone.",
       "source": "CLAUDE.md"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "F1. Test pages: H13 (empty band < 30 %) wins over the PT-TST fixed large cells for a horizontal fact, so Test rows are sized to the cell's footprint like Independent.",
+      "source": "owner decision 2026-11-07 (\"All as suggested\", given directly in the lead session session_01HVwpAE3g6EZH8idgErP6LP), div_facts support aids from critic r4"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "F2. Array support: draw a true array (quotient rows of the divisor) on EVERY fact of the section; the option is offered only while the section's largest dividend is <= 50 (else greyed in the panel with the reason, and the fits line names it).",
+      "source": "owner decision 2026-11-07 (\"All as suggested\", given directly in the lead session session_01HVwpAE3g6EZH8idgErP6LP), div_facts support aids from critic r4"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "F3. Skip strip: draw to 10 x or 12 x the divisor (the band's top), in two lines of 6 like the touch row, no term marked.",
+      "source": "owner decision 2026-11-07 (\"All as suggested\", given directly in the lead session session_01HVwpAE3g6EZH8idgErP6LP), div_facts support aids from critic r4"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "F4. Fade packet: dealt in support order (all -> fewer -> none, a block per stage), each page's rows sized to the supports that page carries, the fact left-anchored at one x.",
+      "source": "owner decision 2026-11-07 (\"All as suggested\", given directly in the lead session session_01HVwpAE3g6EZH8idgErP6LP), div_facts support aids from critic r4"
     }
   ],
   "misconceptions": [

@@ -13,6 +13,14 @@
 //             text, the drawn problem (every visible element inside #questionPaper), the answer inputs and Check / Next
 //             is cut off sideways: each lies inside the viewport's width AND inside every ancestor up to #questionCard
 //             whose overflow-x clips (hidden / clip / auto / scroll) by more than 1 px.
+//             A number or box inside an owner-ruled SWIPE WINDOW (a count row's [data-mq-swiperow], WORKSHEET_DESIGN_STANDARD
+//             SP-11a: the row swipes sideways inside its own cell on a phone) is clipped by design and not checked; the window
+//             itself is (it must fit the card). Critic skip-count r5 SC4: 246 CLIP-X findings were the swipe window's own content.
+//   ROW-LINES / ROW-ARROW / NEXT-INVIEW / ROTATE   count rows (small-fixes critic r11 G1-G4, skip-count fix 2026-10-30): a
+//             swiping row stands on one line, a fitting row never one number a line or over 60 % of the screen; every jump arrow
+//             keeps 1.0 mm of ink clearance; after Tab the next box is on screen; turned portrait <-> landscape the row lays out as
+//             a fresh load. A skill whose card draws a count row is also measured at 360x780 and 844x390, with count_by_tables'
+//             wide-number cases (1,000,000 and 25,000 rows).
 //   FOCUS     the answer input the pupil writes first has the keyboard focus after load: the first non-optional answer
 //             input in ENTRY order (DOM order, except that a row of column digit boxes is entered ones first, right to
 //             left, as active-box.js / wireStackEntry order it; regroup and carry boxes are optional and never first).
@@ -36,6 +44,7 @@
 const fs = require('fs');
 const path = require('path');
 const { open, ROOT } = require('../lib/ws-harness.cjs');
+const { ARROW_CLEAR } = require('../lib/ws-arrow-clear.cjs');
 
 const TOOL = 'ws-phone-card';
 const argv = process.argv.slice(2);
@@ -46,7 +55,7 @@ const say = (...a) => console.log(...a);
 const hash = (s) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
 /* In the page: the checks. Pure DOM, so the self-test runs it on a fixture page too. */
-function PROBE() {
+function PROBE(arrowSrc) {
     const W = innerWidth, H = innerHeight, TOL = 1;
     const card = document.getElementById('questionCard');
     if (!card) return { error: 'no #questionCard' };
@@ -136,9 +145,12 @@ function PROBE() {
     };
     const seen = new Set();
     const cut = [];
+    // (SC4) inside a swipe window: clipped by design; the window element itself stays a subject
+    const inSwipe = (el) => { const sw = el.parentElement && el.parentElement.closest('[data-mq-swiperow]'); return !!sw && sw !== el; };
     for (const el of subjects) {
         if (seen.has(el)) continue;
         seen.add(el);
+        if (inSwipe(el)) continue;
         const r = el.getBoundingClientRect();
         if (r.width < 1) continue;
         let why = '';
@@ -159,7 +171,13 @@ function PROBE() {
     const act = document.activeElement;
     let focus = 'n/a';
     if (graded.length) {
-        const want = graded[0];
+        let want = graded[0];
+        // WORD-WORK COPY BOXES (lane lf-ops, lead ruling 2026-11-07): a story's column copy box whose place holds no digit
+        // (data-mq-expect="") stays BLANK (active-box D6: pulsing it would invite a wrong digit), so the item marks the box
+        // it writes first (data-mq-first-write, question-render _firstWriteBox). Focus there is right when every box before
+        // it in entry order is such a blank copy box.
+        const fw = card.querySelector('[data-mq-first-write]');
+        if (fw && graded.includes(fw) && graded.slice(0, graded.indexOf(fw)).every((el) => el.matches('input.mq-wwork') && el.getAttribute('data-mq-expect') === '')) want = fw;
         if (act === want) focus = 'ok';
         else {
             focus = 'FAIL';
@@ -168,10 +186,34 @@ function PROBE() {
             const where = act && act !== document.body ? `${name(act)}${graded.includes(act) ? (columnItem ? (pa ? ` (the answer box at place ${pa.place}, counted from the ones = place 0, by ${pa.how}; ${graded.length} answer boxes)` : ` (an answer box of ${graded.length} with no place)`) : ` (answer box ${graded.indexOf(act) + 1} of ${graded.length} in entry order)`) : ''}` : 'nothing (body)';
             findings.push({ rule: 'FOCUS', msg: `focus is on ${where}; the pupil writes first in ${columnItem ? `the ones box (place 0, by ${onesHow || 'entry order'}) ` : ''}${name(want)}` });
         }
-        const fr = (act && graded.includes(act) ? act : want).getBoundingClientRect();
+        const fe = act && graded.includes(act) ? act : want;
+        const fr = fe.getBoundingClientRect();
+        // (SC4) ... and inside every box that clips it sideways - a swipe window scrolled away from it hides it in the viewport
+        const hid = clippers(fe).find((a) => { const ar = a.getBoundingClientRect(); return fr.left < ar.left - TOL || fr.right > ar.right + TOL; });
+        if (hid && !(fr.left < -TOL || fr.right > W + TOL)) findings.push({ rule: 'INVIEW', msg: `the first answer box is hidden sideways inside ${name(hid)} (overflow-x ${getComputedStyle(hid).overflowX}): left ${Math.round(fr.left)}, right ${Math.round(fr.right)}` });
         if (fr.left < -TOL || fr.right > W + TOL || fr.top < -TOL || fr.bottom > H + TOL) findings.push({ rule: 'INVIEW', msg: `the first answer box is not in view (left ${Math.round(fr.left)}, right ${Math.round(fr.right)}, top ${Math.round(fr.top)}, bottom ${Math.round(fr.bottom)} in ${W} x ${H})` });
     }
-    return { focus, columnItem, onesHow, inputs: graded.length, findings: findings.map((f) => ({ rule: f.rule, msg: f.msg })), paperW: paper ? Math.round(paper.getBoundingClientRect().width) : 0 };
+    // COUNT ROWS (small-fixes critic r11 G1 / G2, carried into the skip-count fix 2026-10-30): a count row's swipe window
+    //   ROW-LINES  a row that swipes stands on ONE line (SC2); a row that fits never stands one number a line (G1: the 1,000,000
+    //              row stood 12 lines, 840 px, on a 780 px phone), and is never taller than 60 % of the screen
+    //   ROW-ARROW  every jump arrow's ink keeps >= 1.0 mm from the ink of the number or box on each side (G2, SL-3a; a given that
+    //              overhangs its box counts), measured by tests/lib/ws-arrow-clear.cjs
+    const rows = Array.from(card.querySelectorAll('[data-mq-swiperow]')).filter(vis);
+    for (const w of rows) {
+        const conts = Array.from(w.querySelectorAll('.k2-countrow-line > div > [data-mq-wrapped]')).filter(vis);
+        const swipes = w.scrollWidth > w.clientWidth + 1;
+        const tops = [...new Set(conts.map((c) => Math.round(c.getBoundingClientRect().top / 3)))];
+        const h = w.getBoundingClientRect().height;
+        if (swipes && tops.length > 1) findings.push({ rule: 'ROW-LINES', msg: `the row swipes on ${tops.length} lines (a swiping row stands on one line): ${name(w)}` });
+        if (!swipes && conts.length > 1 && conts.some((c) => c.children.length < 2)) findings.push({ rule: 'ROW-LINES', msg: `the row stands one number a line (${conts.length} lines, ${Math.round(h)} px)` });
+        if (h > 0.6 * H) findings.push({ rule: 'ROW-LINES', msg: `the row is ${Math.round(h)} px tall, over 60 % of the ${H} px screen` });
+    }
+    let arrow = null;
+    if (rows.length && arrowSrc) {
+        arrow = (new Function('return (' + arrowSrc + ')'))()({ root: card });
+        if (arrow.below.length) findings.push({ rule: 'ROW-ARROW', msg: `${arrow.below.length} jump arrow side(s) under 1.0 mm from the ink beside them; worst ${arrow.worst}` });
+    }
+    return { swipeRows: rows.length, arrowMin: arrow ? arrow.min : null, focus, columnItem, onesHow, inputs: graded.length, findings: findings.map((f) => ({ rule: f.rule, msg: f.msg })), paperW: paper ? Math.round(paper.getBoundingClientRect().width) : 0 };
 }
 
 const FIXTURE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px;overflow:hidden}
@@ -189,6 +231,24 @@ const BARE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{marg
 input{width:40px;height:40px}</style><div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"><div><span>4,367</span><span>- 2,244</span></div>
 <div><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"></div></div><button id="qcCheckBtn">Check</button></div>
 <script>window.state = { currentQ: { printFormat: 'column-sub', cell: { template: 'stack' } } }; (() => { const b = document.querySelectorAll('input.mq-cellslot')[${variant === 'bare-right' ? 3 : 0}]; b.classList.add('mq-active-box'); b.focus(); })();</script>`;
+// lane lf-ops (lead ruling 2026-11-07, D6): a story's column copy boxes - the first holds no digit (expect "") and stays
+// blank; the item marks its first write box. 'ww-marked' focuses the marked box (ok); 'ww-unmarked' the same box with no
+// mark (FOCUS, the old reading); 'ww-late' marks and focuses a box after a copy box that DOES expect a digit (FOCUS).
+const WWORK = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px}
+input{width:44px;height:44px}</style><div id="questionCard"><div id="questionText">Circle the sign. Write the numbers. Solve.</div><div id="questionPaper">
+<div><input class="mq-wwork" data-mq-expect="${variant === 'ww-late' ? '1' : ''}"><input class="mq-wwork" data-mq-expect="8"></div>
+<div><input class="mq-wwork" data-mq-expect=""><input class="mq-wwork" data-mq-expect="2"></div>
+<div><input class="mq-cellslot"><input class="mq-cellslot"></div></div><button id="qcCheckBtn">Check</button></div>
+<script>window.state = null; (() => { const b = document.querySelectorAll('input.mq-wwork')[1]; if (${variant !== 'ww-unmarked'}) b.setAttribute('data-mq-first-write', '1'); b.focus(); })();</script>`;
+// critic skip-count r5 SC4: a count row's swipe window ([data-mq-swiperow], overflow-x auto) holds a row wider than the card.
+// 'swipe' scrolls it to its first box (focused, in view): no CLIP-X, no INVIEW. 'swipe-wide' makes the WINDOW itself wider than
+// the card (CLIP-X on the window). 'swipe-hidden' leaves the focused box scrolled out of the window (INVIEW).
+const SWIPE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px;overflow:hidden}
+[data-mq-swiperow]{overflow-x:auto;width:${variant === 'swipe-wide' ? '600px' : '340px'}}.ln{display:flex;gap:20px;width:900px}.ln>*{flex:none;width:50px;height:44px}</style>
+<div id="questionCard"><div id="questionText">Count by 4.</div><div id="questionPaper"><div data-mq-swiperow="1"><div class="ln">
+<span>4</span><span>8</span><span>12</span><span>16</span><span>20</span><input id="b0" data-mq-cell="1"><span>28</span><span>32</span><input data-mq-cell="1"><span>40</span><span>44</span><span>48</span>
+</div></div></div><button id="qcCheckBtn">Check</button></div>
+<script>window.state = null; (() => { const w = document.querySelector('[data-mq-swiperow]'); const b = document.getElementById('b0'); b.focus({ preventScroll: true }); w.scrollLeft = ${variant === 'swipe-hidden' ? 0 : '(b.offsetLeft + b.offsetWidth) - w.clientWidth'}; })();</script>`;
 const LEGACY = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px}
 .column-answer-input{width:24px;height:24px}.mq-active-box{position:relative;top:-4px}</style>
 <div id="questionCard"><div id="questionText">Add.</div><div id="questionPaper"><div class="column-problem"><div>4 3 6 7</div><div>+ 1 2 2 1</div>
@@ -223,9 +283,23 @@ async function selfTest() {
         if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
         const br = await runB('bare-right');
         if (br.focus !== 'ok') fails.push(`r1 twin, ones box focused: must be ok (${JSON.stringify(br.findings)})`);
+        const runS = async (v) => { await page.setContent(SWIPE(v)); await page.waitForFunction(() => document.readyState === 'complete'); return page.evaluate(PROBE); };
+        const sw = await runS('swipe');
+        if (sw.findings.length || sw.focus !== 'ok') fails.push(`swipe window at its first box: no finding (SC4: its content is clipped by design) (${JSON.stringify(sw.findings)})`);
+        const sww = await runS('swipe-wide');
+        if (!sww.findings.some((x) => x.rule === 'CLIP-X')) fails.push('swipe window wider than the card: a CLIP-X finding on the window');
+        const runW = async (v) => { await page.setContent(WWORK(v)); await page.waitForFunction(() => document.readyState === 'complete'); return page.evaluate(PROBE); };
+        const wm = await runW('ww-marked');
+        if (wm.focus !== 'ok') fails.push(`story copy boxes, the marked first write box after a blank copy box focused: must be ok (${JSON.stringify(wm.findings)})`);
+        const wu = await runW('ww-unmarked');
+        if (!wu.findings.some((x) => x.rule === 'FOCUS')) fails.push('story copy boxes, the same box focused with no first-write mark: a FOCUS finding');
+        const wl = await runW('ww-late');
+        if (!wl.findings.some((x) => x.rule === 'FOCUS')) fails.push('story copy boxes, marked box after a copy box that expects a digit: a FOCUS finding');
+        const swh = await runS('swipe-hidden');
+        if (!swh.findings.some((x) => x.rule === 'INVIEW')) fails.push('focused box scrolled out of its swipe window: an INVIEW finding');
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 7 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 13 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -259,13 +333,13 @@ async function main() {
     const rows = [], sibRows = [];
     let mark = 0;
     const take = () => { const p = app.problems.slice(mark); mark = app.problems.length; return p; };
-    const measure = async (list, items, out, outFails, label) => {
-        for (const size of sizes) {
+    const measure = async (list, items, out, outFails, label, sizeList = sizes, opts = null, optsName = '') => {
+        for (const size of sizeList) {
             await page.setViewport({ width: size.w, height: size.h, deviceScaleFactor: 1 });
             for (const s of list) {
                 const [c, k] = s.split(':');
                 for (let it = 0; it < items; it++) {
-                    const tag = `${label}${s} ${size.w}x${size.h} item ${it + 1}`;
+                    const tag = `${label}${s}${optsName ? ` [${optsName}]` : ''} ${size.w}x${size.h} item ${it + 1}`;
                     let m;
                     try {
                         await page.reload({ waitUntil: 'networkidle2' });
@@ -281,13 +355,32 @@ async function main() {
                         await sleep(900);
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await sleep(400);
-                        m = await page.evaluate(PROBE);
+                        if (opts) await page.evaluate((c, k, o) => {
+                            // (a count-row option case: the card's question redrawn with the skill's option values, as the teacher sets them)
+                            window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true });
+                            window.state.currentQ = window.generateQuestion(); window.renderQuestion();
+                        }, c, k, opts);
+                        if (opts) await sleep(1300);
+                        m = await page.evaluate(PROBE, ARROW_CLEAR.toString());
+                        // NEXT (G3): the pupil's next box - a Tab from the first box - is fully on screen too (both axes, inside its window)
+                        if (m.focus === 'ok' && m.inputs > 1) {
+                            await page.keyboard.press('Tab'); await sleep(450);
+                            const nx = await page.evaluate(() => {
+                                const a = document.activeElement, card = document.getElementById('questionCard');
+                                if (!a || !card || !card.contains(a) || a.tagName !== 'INPUT') return null;
+                                const r = a.getBoundingClientRect();
+                                let why = r.left < -1 || r.right > innerWidth + 1 || r.top < -1 || r.bottom > innerHeight + 1 ? `outside the ${innerWidth} x ${innerHeight} screen (top ${Math.round(r.top)}, bottom ${Math.round(r.bottom)}, left ${Math.round(r.left)}, right ${Math.round(r.right)})` : '';
+                                for (let el = a.parentElement; !why && el && el !== card; el = el.parentElement) { if (getComputedStyle(el).overflowX === 'visible') continue; const b = el.getBoundingClientRect(); if (r.left < b.left - 1 || r.right > b.right + 1) why = 'hidden sideways in its window'; }
+                                return why;
+                            });
+                            if (nx) m.findings.push({ rule: 'NEXT-INVIEW', msg: `after Tab the next box is ${nx}` });
+                        }
                         if (m.error) throw new Error(m.error);
                     } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
                     if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: path.join(SHOTS, `${label ? 'sibling-' : ''}${size.w}x${size.h}-${c}-${k}-${it + 1}.png`) }); }
                     for (const f of m.findings) outFails.push(`${tag}: ${f.rule} ${f.msg}`);
-                    out.push({ skill: s, size: `${size.w}x${size.h}`, item: it + 1, focus: m.focus, ones: m.onesHow || null, inputs: m.inputs, findings: m.findings });
+                    out.push({ skill: s, opts: optsName || undefined, swipeRows: m.swipeRows, arrowMin: m.arrowMin, size: `${size.w}x${size.h}`, item: it + 1, focus: m.focus, ones: m.onesHow || null, inputs: m.inputs, findings: m.findings });
                     say(`${tag}: ${m.findings.length ? 'FAIL' : 'ok'} (focus ${m.focus}${m.columnItem ? ` (column: ones first, the ones box by ${m.onesHow || 'entry order'})` : ''}, ${m.inputs} answer box(es), paper ${m.paperW} px)${m.findings.length ? '\n' + m.findings.map((f) => `    ${f.rule} ${f.msg}`).join('\n') : ''}`);
                 }
             }
@@ -303,6 +396,43 @@ async function main() {
         sibs = sibs.filter((k) => live.includes(k));
         take();
         await measure(skills, ITEMS, rows, fails, '');
+        // COUNT ROWS (small-fixes critic r11 G1-G4, the skip-count fix 2026-10-30): a skill whose card drew a count-row swipe window
+        // is measured again on a 360 x 780 phone and in landscape 844 x 390 (G3: the next box below the fold), with its wide-number
+        // option cases (count_by_tables: the 1,000,000 row and the 25,000 row, G1 / G2), and turned between portrait and landscape
+        // without a reload (G4: the row must lay out as a fresh load does)
+        const rowSkills = [...new Set(rows.filter((r) => r.swipeRows > 0).map((r) => r.skill))];
+        const EXTRA = [{ w: 360, h: 780 }, { w: 844, h: 390 }];
+        const WIDE = { 'multiplication:count_by_tables': { '1,000,000 by 100,000 (15)': { rows: [{ step: 100000, start: 'custom', at: 1000000 }], jumps: 15 }, 'by 25,000': { rows: [{ step: 25000 }] } } };
+        if (rowSkills.length) {
+            say(`count rows: ${rowSkills.join(', ')} again at ${EXTRA.map((z) => `${z.w}x${z.h}`).join(', ')}, with the wide-number cases, and turned`);
+            await measure(rowSkills, 1, rows, fails, '', EXTRA);
+            for (const s of rowSkills) for (const [nm, o] of Object.entries(WIDE[s] || {})) await measure([s], 1, rows, fails, '', [{ w: 360, h: 780 }, { w: 390, h: 844 }], o, nm);
+            // ROTATE (G4)
+            const sig = () => page.evaluate(() => { const w = [...document.querySelectorAll('#questionCard [data-mq-swiperow]')].find((x) => x.offsetParent); if (!w) return null; const g = w.querySelector('.k2-given, input.mq-cellslot');
+                const tops = [...new Set([...w.querySelectorAll('.k2-countrow-line > div > [data-mq-wrapped]')].map((c) => Math.round(c.getBoundingClientRect().top / 3)))];
+                return { px: g ? Math.round(parseFloat(getComputedStyle(g).fontSize)) : 0, lines: tops.length, swipes: w.scrollWidth > w.clientWidth + 1, page: document.documentElement.scrollWidth - innerWidth }; });
+            const load = async (c, k, seed) => {
+                await page.reload({ waitUntil: 'networkidle2' });
+                await page.waitForFunction(() => typeof window.playSelectedSkills === 'function' && !!window.SKILLS, { timeout: 30000 });
+                await page.evaluate((c, k, seed) => { if (window.__wsReseed) window.__wsReseed(seed); if (window.setUserRole) window.setUserRole('student', { persist: false }); window.state.quizMode = false; window.skillQueue.length = 0; window.skillQueue.push({ categoryId: c, skillId: k, skillLabel: k }); window.playSelectedSkills('practice'); }, c, k, seed);
+                await sleep(1400);
+            };
+            for (const s of rowSkills) {
+                const [c, k] = s.split(':');
+                for (const [a, b] of [[{ w: 390, h: 844 }, { w: 844, h: 390 }], [{ w: 844, h: 390 }, { w: 390, h: 844 }]]) {
+                    const tag = `${s} turned ${a.w}x${a.h} -> ${b.w}x${b.h}`;
+                    const seed = hash(`${s}:phone:0`);
+                    await page.setViewport({ width: b.w, height: b.h, deviceScaleFactor: 1 }); await load(c, k, seed); const fresh = await sig();
+                    await page.setViewport({ width: a.w, height: a.h, deviceScaleFactor: 1 }); await load(c, k, seed);
+                    await page.setViewport({ width: b.w, height: b.h, deviceScaleFactor: 1 }); await sleep(1500); const turned = await sig();
+                    const same = fresh && turned && Math.abs(fresh.px - turned.px) <= 1 && fresh.lines === turned.lines && fresh.swipes === turned.swipes && turned.page <= 1;
+                    const f = same ? [] : [{ rule: 'ROTATE', msg: `turned: ${JSON.stringify(turned)}; a fresh load: ${JSON.stringify(fresh)}` }];
+                    for (const x of f) fails.push(`${tag}: ${x.rule} ${x.msg}`);
+                    rows.push({ skill: s, size: `${a.w}x${a.h}->${b.w}x${b.h}`, item: 1, findings: f });
+                    say(`${tag}: ${same ? 'ok' : 'FAIL'} (${JSON.stringify(turned)})${f.length ? '\n    ' + f[0].rule + ' ' + f[0].msg : ''}`);
+                }
+            }
+        }
         if (sibs.length) { say(`A14 siblings clean: ${sibs.length} approved skill(s) the probe must pass`); await measure(sibs, SIB_ITEMS, sibRows, sibFails, 'A14 sibling '); }
     } finally { await app.close(); }
     const secs = ((Date.now() - T0) / 1000).toFixed(1);

@@ -176,21 +176,38 @@ export function factCue(p, { px = 0 } = {}) {
     }
     if (kind === 'skip') {
         const step = div ? b : a;
-        const n = 5, bw = 8, gap = 1.2, w = n * (bw + gap) + 6, h = 7;
+        // Facts card F3 (owner 2026-11-07; critic laned-restart r4 R4-3): on a ÷ fact the strip runs to the band's top
+        // multiple (`p.n`: 10 x or 12 x the divisor, the section's one length - never the quotient), in two lines like
+        // the touch tally row, every term alike, so it reaches every dividend of the section. A × strip keeps its five
+        // terms and "...".
+        const full = div && Number(p.n) > 5;
+        const n = full ? Math.floor(Number(p.n)) : 5, per = full ? Math.ceil(n / 2) : n;
+        const lines = Math.ceil(n / per), bw = 8, gap = 1.2, lh = 7.2;
+        const w = per * (bw + gap) + (full ? 0 : 6), h = (lines - 1) * lh + 7;
         let body = '';
         // Lane D R4 prep (RP-1 ruling): every term is drawn alike in its own group (`data-ws-term`), and the strip says
         // what it counts by (`data-ws-skipstrip`), so the lint can tell a plain count-by list of the divisor's
         // multiples - which may happen to hold the quotient - from a strip that marks one term out.
         for (let i = 0; i < n; i++) {
-            const x = i * (bw + gap);
-            body += `<g data-ws-term="${step * (i + 1)}"><rect x="${f2(x + 0.2)}" y="0.2" width="${bw}" height="6" rx="1" fill="none" stroke="${INK}" stroke-width="0.35"/>`
-                + `${text(x + 0.2 + bw / 2, 4.4, step * (i + 1))}</g>`;
+            const x = (i % per) * (bw + gap), y = Math.floor(i / per) * lh;
+            body += `<g data-ws-term="${step * (i + 1)}"><rect x="${f2(x + 0.2)}" y="${f2(y + 0.2)}" width="${bw}" height="6" rx="1" fill="none" stroke="${INK}" stroke-width="0.35"/>`
+                + `${text(x + 0.2 + bw / 2, y + 4.4, step * (i + 1))}</g>`;
         }
-        body += text(n * (bw + gap) + 1, 4.4, '…', 3.2, 'start');
-        return wrap(w, h, body, `count by ${step}`).replace('<svg class="ws-factcue-svg"', `<svg class="ws-factcue-svg" data-ws-skipstrip="${step}"`);
+        if (!full) body += text(n * (bw + gap) + 1, 4.4, '…', 3.2, 'start');
+        return wrap(w, h, body, `count by ${step}${full ? ` to ${step * n}` : ''}`).replace('<svg class="ws-factcue-svg"', `<svg class="ws-factcue-svg" data-ws-skipstrip="${step}"`);
     }
     if (kind === 'array') {
         const cols = div ? b : a, rows = div ? (b ? a / b : 0) : b;
+        // Facts card F2 (owner 2026-11-07; critic laned-restart r4 R4-2): on a ÷ fact the support is a TRUE array - the
+        // quotient's rows of the divisor's dots - drawn top-left in ONE frame for the section (`p.frame`: the largest
+        // divisor's columns by the band's top rows), so every cell of the section has one geometry and one answer place.
+        if (div && p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
+            const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = 2.6, r = 0.98, pad = 0.8;
+            const w = fc * pitch + 2 * pad, h = fr * pitch + 2 * pad;
+            let body = `<rect x="0.2" y="0.2" width="${f2(w - 0.4)}" height="${f2(h - 0.4)}" rx="1.2" fill="none" stroke="${INK}" stroke-width="0.3"/>`;
+            if (Number.isInteger(rows) && rows > 0) for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(pad + x * pitch + pitch / 2, pad + y * pitch + pitch / 2, r, false);
+            return wrap(w, h, body, rows > 0 ? `array, ${rows} rows of ${cols}` : 'no dots');
+        }
         if (!cols || !rows) return '';
         const pitch = Math.min(3, 36 / Math.max(cols, rows)), r = pitch * 0.32;
         let body = '';
