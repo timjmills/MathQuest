@@ -1530,6 +1530,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "optin-h13-abs",
+   "check": "ws-print-lint --rules H13-ABS (opt-in): the empty band under the lowest ink of every kit cell is under 30 % of the cell less Hw; H13 / H13-ROW judged only against the row",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY H13-ABS (critic lf-placevalue r1 F1; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/h13-abs/fail.html",
+    "state": "placevalue:value independent L at 24b0c88a (critic r1 state): 12 cells of 51.5 mm, 14.6 mm empty under the 'worth ___' line in each (critic: 34 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/h13-abs/pass.html",
+    "state": "the same page with rows sized to the item: 15 cells of 41.6 mm (F1 fix: value L 12 -> >= 15)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --rules H13-ABS --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
