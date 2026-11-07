@@ -377,7 +377,9 @@ function unitBlanksHTML(ctx, p, keys, floor) {
     // answers never sit on two lines)
     // (a frame of four or more places, or expanded notation, may wrap between its units - one line is wider than the
     // page at L; a 3-place unit-form frame is one line, so a lesson anchor that scales its drawing to the panel scales it whole)
-    const wrap = p.oneLine || (parts.length - 1 < 4 && !/×/.test(String(p.frame || ''))) ? 'nowrap;white-space:nowrap' : 'wrap';
+    // (a cell drawn three or more across - Reason It's A / B panels - is narrower than any 3-place row: it wraps too)
+    const narrow = Number(ctx.columns) >= 3;
+    const wrap = p.oneLine || (parts.length - 1 < 4 && !/×/.test(String(p.frame || '')) && !narrow) ? 'nowrap;white-space:nowrap' : 'wrap';
     return `<div class="ws-eq pv-frame pv-blanks pv-hw" style="font-weight:700;flex-wrap:${wrap};justify-content:center;row-gap:2mm;column-gap:0.3em;">${units.join('')}</div>`;
 }
 
@@ -457,7 +459,7 @@ function expandHTML(p, ctx) {
     const digits = String(p.n).length;
     const boxes = parts.map((v, i) => blank({ id: `part${i}`, kind: 'number', shape: 'box', digits, graded: true, order: i,
         scopes: ['full', 'answer-only'] }, ctx, fmt(v)));
-    if (p.inPlace && parts.length >= 4) {
+    if (p.inPlace && (parts.length >= 4 || Number(ctx.columns) >= 3)) {
         // lf-placevalue r1 F19: a 4- or 5-place frame at L is wider than the page (13-16 mm out of its cell). The row may
         // wrap, only between its units: "4,230 =", the first box, then "+ [ ]" pairs - the sign starts its line and never
         // ends one (WRAP-OP), and a box never parts from its sign. A row that fits stays one line.
