@@ -21,6 +21,9 @@ import { winShare } from '../lesson-arch/grid.js';
 import { sigOf, digitsOfOps, kindOf, opKindOf, namedSteps, stepMarker, band, hAt, fitsWidth, hOf } from './common.js';
 import { stripHtml } from './practice.js';
 
+/** The full-width Guided rows of a `chartWide` lesson: `guidedRows` 1-4 (1 only when asked), 2 when absent. */
+export const guidedRowsOf = (data) => (data && Number(data.guidedRows) === 1 ? 1 : Math.max(2, Math.min(4, Number(data && data.guidedRows) || 2)));
+
 /** The Guided ("we do") items: the example's kind first (same strategy, same digit shape). */
 export function pickWeDo(items, example, data, n) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
@@ -187,9 +190,10 @@ export function weDoBand(env) {
     let top = null;
     // `chartWide` (the detailed lesson maker): a Guided problem too wide to stand beside the Steps
     // takes the strip over the cells and two full-width rows (cell 1 the Model's case).
+    // (`guidedRows: 1` - lf-algebra: ONE full-width row when the lesson asks for it; 2-4 as before, 2 when absent)
     const wideG = !!(data && data.chartWide);
     if (wideG && stepsZone && stripX && example) {
-        const gw = Math.max(2, Math.min(4, Number(data.guidedRows) || 2));
+        const gw = guidedRowsOf(data);
         const set = pickWeDo(weDoPool, example, data, gw).slice(0, gw);
         if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
     } else if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {

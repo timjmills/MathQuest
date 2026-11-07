@@ -45,6 +45,7 @@ import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './she
 import { practiceSection, practiceStackShapes, practiceRequest, practiceBlocksOf, practiceBlockSections } from './sheet/lesson-pages/practice.js';
 import { mixedRequest } from './sheet/lesson-pages/mixed.js';
 import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './sheet/lesson-pages/index.js';
+import { guidedRowsOf } from './sheet/lesson-pages/we-do.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
@@ -5316,7 +5317,7 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
     // (the Guided cells the lesson sheet PRINTS: its first dealt grid - lesson 2's sheet fits one, not guidedRows)
     const g0 = teachCells[0];
     const nPrinted = g0 ? teachCells.filter((c) => c.page === g0.page && c.grid === g0.grid).length : 0;
-    const nGuided = nPrinted > 0 && nPrinted < 2 ? nPrinted : Math.max(2, Math.min(4, Number(d.lessonData && d.lessonData.guidedRows) || 2));
+    const nGuided = nPrinted > 0 && nPrinted < 2 ? nPrinted : guidedRowsOf(d.lessonData);
     const p0Cells = cellsOf([p0.plan]);
     const V = {
         chart: dlItemVars(chartQ[0], d), chart2: dlItemVars(chartQ[1] || chartQ[0], d), chart3: dlItemVars(chartQ[2] || chartQ[1] || chartQ[0], d),
@@ -5367,7 +5368,7 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
     for (const { ch, r } of chunkRes) {
         const qs = ((r.lesson && r.lesson.chart && r.lesson.chart.exampleQs) || []).filter(Boolean);
         const tc = uniqQ(cellsOf(((r.partPlans || []).filter((x) => x.part === 'teach')).flatMap((x) => x.plans)));
-        const ng = Math.max(2, Math.min(4, Number(ch.lessonData && ch.lessonData.guidedRows) || 2));
+        const ng = guidedRowsOf(ch.lessonData);
         V[ch.id] = { chart: dlItemVars(qs[0], d), chart2: dlItemVars(qs[1] || qs[0], d), chart3: dlItemVars(qs[2] || qs[1] || qs[0], d), we: tc.slice(0, ng).map((c) => dlItemVars(c.q, d)), indep: tc.slice(ng).map((c) => dlItemVars(c.q, d)) };
         while (V[ch.id].we.length < 2) V[ch.id].we.push(V[ch.id].chart);
         V[ch.id].indepList = V[ch.id].indep.map((x) => x.ans).join(' · ');

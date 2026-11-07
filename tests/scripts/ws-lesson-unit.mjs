@@ -34,6 +34,17 @@ const PRE = await imp('js/modules/lessons/prereqs.js');
 const BL = await imp('js/modules/build-list.js');
 const DET = await imp('js/modules/lessons/detailed/index.js');
 const LATE = {
+    // P1c item 2 (lf-algebra): `guidedRows: 1` - a chartWide lesson's Guided band may be ONE full-width row; absent: 2.
+    async 'guided-rows'() {
+        const WD = await tryImp('js/modules/sheet/lesson-pages/we-do.js');
+        const g = WD && WD.guidedRowsOf;
+        eq(g ? [g(null), g({}), g({ guidedRows: 1 }), g({ guidedRows: 2 }), g({ guidedRows: 3 }), g({ guidedRows: 9 }), g({ guidedRows: 0 })] : [], [2, 2, 1, 2, 3, 4, 2], 'guidedRows: 1 when asked, 2 when absent, 2-4 as before');
+        eq([SCHEMA.validateGuidedRows(undefined).length, SCHEMA.validateGuidedRows(1).length, SCHEMA.validateGuidedRows(0).length, SCHEMA.validateGuidedRows('2').length], [0, 0, 1, 1], 'guidedRows: schema takes 1-4');
+        const wd = readSrc('js/modules/sheet/lesson-pages/we-do.js');
+        ok(/const gw = guidedRowsOf\(data\);/.test(wd) && /cols: 1, rows: set\.length/.test(wd), 'guidedRows: the chartWide band reads guidedRowsOf and keeps one column');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/: guidedRowsOf\(d\.lessonData\);/.test(ps) && /const ng = guidedRowsOf\(ch\.lessonData\);/.test(ps), 'guidedRows: the detailed lesson reads the same count for {we}');
+    },
     // P1c item 1 (lf-ops): `practiceBlocks` [{shape: [count, cols], opts?}] (1-3) on a short lesson - the Practice page prints
     // one section per block, the block's opts over the lesson's practice opts, its own grid, the step strip once.
     async 'practice-blocks'() {
