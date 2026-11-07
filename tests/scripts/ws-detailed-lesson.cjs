@@ -9,6 +9,16 @@
 //   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --repeats                    # GATE: repeats only (S2), no PDF
 //     (R-ANSWER / R-TURN / R-CELL, see repeatsCheck; prints `ws-detailed-lesson --repeats: OK` / `FAIL (n)`;
 //      with --check as well, the repeats join the self-check's verdict)
+//   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --lp                         # GATE: the lesson precritic checks
+//     (LESSONS_FIRST_PLAN §6.3, tests/lib/ws-lesson-lp.cjs: LP-FAMILY-REPEAT, LP-TEXT, LP-GIVEAWAY, LP-MODELLED, LP-NUMBERS,
+//      LP-FALLBACK, LP-PREREQ, LP-MEASURE on the rendered pack, LP-RASTER on its PDF at 72 and 93 dpi); prints
+//      `ws-detailed-lesson --lp: OK` / `FAIL (n)`. --only LP-X,LP-Y runs those; --packet-out <json> saves what was read;
+//      --packet <json> runs the pure checks on a saved packet, no browser (fixtures); --raster <pdf> runs LP-RASTER on a
+//      PDF as is (every page); --lp-self-test checks the checks.
+//   node tests/scripts/ws-detailed-lesson.cjs --lesson <id> --sweep                      # GATE: LP-SWEEP, no layout
+//     (seeds 1-25 [--seeds N] x refresh 0-2 when the builder takes `refresh`, every part of the pack, built HTML parsed in
+//      a detached document, --jobs 3 pages at once: LP-FAMILY-REPEAT, LP-GIVEAWAY, LP-MODELLED per seed; --seed-list a,b
+//      sweeps those seeds, --save-packets <json> keeps the builds read, --sweep-packets <json> re-checks saved builds; prints `ws-detailed-lesson --sweep: OK` / `FAIL (n)`)
 //
 // Writes pack.html, pack.pdf, page-NN.png (PyMuPDF raster, like ws-lesson-samples) and, with
 // --check, SELF-CHECK.md (the table format of design/lesson-planner/sample-v22/SELF-CHECK.md) to
@@ -28,6 +38,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { ROOT, open } = require('../lib/ws-harness.cjs');
+const LP = require('../lib/ws-lesson-lp.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = (k) => process.argv.includes('--' + k);
@@ -764,7 +775,91 @@ function selfCheckMd(rows, pages, info) {
         '', ...(info.notes.length ? ['## Notes from the build', '', ...info.notes.map((n) => `- ${n}`), ''] : [])].join('\n') + '\n';
 }
 
-(async () => {
+/* ------------------------------------------------------------------ --lp / --sweep (lane lf-checks) */
+const ONLY = (arg('only', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
+function lpReport(rows, label) {
+    for (const r of rows) console.log(`${r.id.padEnd(17)} ${r.na ? 'N/A ' : r.pass ? 'PASS' : 'FAIL'} ${String(r.msg).slice(0, 400)}`);
+    const bad = rows.filter((r) => !r.pass).length;
+    console.log(`ws-detailed-lesson --${label}: ${bad ? `FAIL (${bad})` : 'OK'}`);
+    return bad;
+}
+async function sweepMain() {
+    const N = parseInt(arg('seeds', '25'), 10);
+    const app = await open({ seed: 1 });
+    let bad = 0; const fails = [];
+    try {
+        // does the builder take `refresh`? (phase 0 adds it; the live builder ignores it, so refresh 1-2 would repeat seed s)
+        let refreshes = await app.page.evaluate(async (L) => { try { const a = await window.buildSheet({ role: 'detailed-lesson', lessonId: L, seed: 1, paper: 'A4', year: 2026, refresh: 0 });
+            const b = await window.buildSheet({ role: 'detailed-lesson', lessonId: L, seed: 1, paper: 'A4', year: 2026, refresh: 1 }); return a.html === b.html ? [0] : [0, 1, 2]; } catch (e) { return { error: String(e && e.message || e) }; } }, LESSON);
+        // (a seed whose build fails is a finding of the sweep, not the end of it: the probe falls back to refresh 0 alone)
+        let probeNote = '';
+        if (refreshes.error) { probeNote = ` (refresh probe at seed 1 did not build: ${refreshes.error.slice(0, 100)})`; refreshes = [0]; }
+        const only = ONLY.length ? ONLY : ['LP-FAMILY-REPEAT', 'LP-GIVEAWAY', 'LP-MODELLED'];
+        let n = 0;
+        // one browser process, JOBS pages building at once (a detailed pack takes ~20 s to build: the builder measures)
+        const JOBS = Math.max(1, parseInt(arg('jobs', '3'), 10));
+        const pages = [app.page];
+        for (let j = 1; j < JOBS; j++) { const pg = await app.browser.newPage(); await pg.goto(app.page.url(), { waitUntil: 'load' }); await pg.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 }); pages.push(pg); }
+        const todo = [];
+        const SEEDS = arg('seed-list', '') ? arg('seed-list').split(',').map(Number) : Array.from({ length: N }, (_, i) => i + 1);
+        for (const seed of SEEDS) for (const refresh of refreshes) todo.push({ seed, refresh });
+        const results = [];
+        await Promise.all(pages.map(async (pg) => {
+            while (todo.length) {
+                const { seed, refresh } = todo.shift();
+                const pk = await pg.evaluate(async ({ L, seed, refresh, fn }) => {
+                    try { const r = await window.buildSheet({ role: 'detailed-lesson', lessonId: L, seed, paper: 'A4', year: 2026, refresh });
+                        const doc = new DOMParser().parseFromString(r.html, 'text/html');
+                        const f = new Function(`return (${fn})`)();
+                        return f({ layout: false, doc });
+                    } catch (e) { return { error: String((e && e.message) || e) }; }
+                }, { L: LESSON, seed, refresh, fn: LP.lpMeasure.toString() });
+                results.push({ seed, refresh, pk });
+            }
+        }));
+        results.sort((x, y) => x.seed - y.seed || x.refresh - y.refresh);
+        if (arg('save-packets', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('save-packets')), JSON.stringify({ lesson: LESSON, note: arg('note', ''), seeds: results.map((r) => Object.assign({ seed: r.seed, refresh: r.refresh }, r.pk)) }));
+        for (const { seed, refresh, pk } of results) {
+            n++;
+            if (pk.error) { fails.push(`seed ${seed} r${refresh}: build error ${pk.error.slice(0, 160)}`); bad++; continue; }
+            for (const r of LP.lpChecks(pk, only)) if (!r.pass) { bad++; fails.push(`seed ${seed} r${refresh} ${r.id}: ${r.msg.slice(0, 200)}`); }
+        }
+        console.log(`${LESSON} sweep: ${n} builds (seeds ${arg('seed-list', '') || `1-${N}`} x refresh ${refreshes.join('/')}${refreshes.length === 1 ? ': the builder takes no refresh' : ''}${probeNote}), checks ${only.join(', ')}`);
+        for (const f of fails.slice(0, 30)) console.log(`  ${f}`);
+        if (fails.length > 30) console.log(`  ... ${fails.length - 30} more`);
+        console.log(`ws-detailed-lesson --sweep: ${bad ? `FAIL (${bad})` : 'OK'}`);
+        process.exitCode = bad ? 1 : 0;
+    } finally { await app.close(); }
+}
+
+if (has('lp-self-test')) {
+    const r = LP.selfTest();
+    console.log(r.bad.length ? `ws-detailed-lesson --lp-self-test: FAIL (${r.bad.length} of ${r.n})\n  ${r.bad.join('\n  ')}` : `ws-detailed-lesson --lp-self-test: OK (${r.n} cases)`);
+    process.exit(r.bad.length ? 1 : 0);
+}
+if (has('packet')) {
+    const pk = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), arg('packet')), 'utf8'));
+    const rows = LP.lpChecks(pk, ONLY.filter((x) => x !== 'LP-RASTER'));
+    console.log(`${pk.lesson || LESSON}: packet ${arg('packet')} (${pk.pages.length} pages${pk.commit ? `, read on ${pk.commit}` : ''})`);
+    process.exit(lpReport(rows, 'lp') ? 1 : 0);
+}
+if (has('raster')) {
+    // LP-RASTER on a PDF given as is (a seeded fixture, or a pack.pdf): every page
+    const r = LP.lpRaster(path.resolve(process.cwd(), arg('raster')), execFileSync);
+    process.exit(lpReport([r], 'lp') ? 1 : 0);
+}
+if (has('sweep-packets')) {
+    // LP-SWEEP's pure part on saved seed packets (a fixture): {lesson, seeds: [{seed, refresh, pages, pool}]}
+    const fx = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), arg('sweep-packets')), 'utf8'));
+    const only = ONLY.length ? ONLY : ['LP-FAMILY-REPEAT', 'LP-GIVEAWAY', 'LP-MODELLED'];
+    let bad = 0;
+    for (const pk of fx.seeds) for (const r of LP.lpChecks(pk, only)) if (!r.pass) { bad++; console.log(`  seed ${pk.seed} r${pk.refresh} ${r.id}: ${r.msg.slice(0, 200)}`); }
+    console.log(`${fx.lesson} sweep: ${fx.seeds.length} saved builds (seeds ${fx.seeds.map((x) => x.seed).join(', ')}), checks ${only.join(', ')}`);
+    console.log(`ws-detailed-lesson --sweep: ${bad ? `FAIL (${bad})` : 'OK'}`);
+    process.exit(bad ? 1 : 0);
+}
+if (has('sweep')) { sweepMain().catch((e) => { console.error(e); console.log('ws-detailed-lesson --sweep: FAIL'); process.exit(1); }); }
+else (async () => {
     fs.rmSync(OUT, { recursive: true, force: true });
     fs.mkdirSync(OUT, { recursive: true });
     const md = fs.readFileSync(V22, 'utf8'); const c1 = md.slice(md.indexOf('### C.1'), md.indexOf('### C.2'));
@@ -776,7 +871,7 @@ function selfCheckMd(rows, pages, info) {
             try { const r = await window.buildSheet({ role: 'detailed-lesson', lessonId: LESSON, seed: SEED, paper: 'A4', year: 2026 });
                 const kit = await import('./js/modules/sheet/contract.js');
                 r.kitLib = Object.values(kit.INSTRUCTION_LIBRARY).map((x) => String(x).replace(/_/g, ''));
-                return { html: r.html, ids: r.pages.map((p) => `${p.id}:${p.kind}`), notes: r.notes, vars: r.vars, flow: r.flow, tags: r.tags, debug: r.debug, kitLib: r.kitLib };
+                return { html: r.html, ids: r.pages.map((p) => `${p.id}:${p.kind}`), notes: r.notes, vars: r.vars, flow: r.flow, tags: r.tags, debug: r.debug, kitLib: r.kitLib, chartSizing: r.chartSizing || null, chartsOk: r.chartsOk };
             } catch (e) { return { error: (e && e.stack) || String(e) }; }
         }, { LESSON, SEED });
         if (built.error) { console.log(`ws-detailed-lesson: FAIL (build) ${built.error}`); process.exit(1); }
@@ -804,9 +899,21 @@ function selfCheckMd(rows, pages, info) {
             }
             if (reps.length) failed = true;
         }
+        const lpPk = has('lp') ? await sheet.evaluate(LP.lpMeasure, { layout: true }) : null;
         const pdf = path.join(OUT, 'pack.pdf');
         await sheet.pdf({ path: pdf, printBackground: true, preferCSSPageSize: true });
         await sheet.close();
+        if (lpPk) {
+            lpPk.lesson = LESSON; lpPk.seed = SEED; lpPk.sizing = (Array.isArray(built.chartSizing) && (built.chartSizing.find((x) => x && x.fallback) || built.chartSizing[0])) || (built.debug && built.debug.sizing) || null;
+            try { lpPk.commit = execFileSync('git', ['-C', ROOT, 'rev-parse', '--short=8', 'HEAD'], { encoding: 'utf8' }).trim(); } catch (e) { /* not a checkout */ }
+            if (arg('packet-out', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('packet-out')), JSON.stringify(lpPk));
+            const rows = LP.lpChecks(lpPk, ONLY.filter((x) => x !== 'LP-RASTER'));
+            if (!ONLY.length || ONLY.includes('LP-RASTER')) rows.push(LP.lpRaster(pdf, execFileSync, [72, 93], lpPk.pages.map((p, i) => (p.kind === 'teacher' ? 0 : i + 1)).filter(Boolean), lpPk.pages.length));
+            console.log(`${LESSON}: ${lpPk.pages.length} pages read (seed ${SEED})`);
+            const lpBad = lpReport(rows, 'lp');
+            if (!has('check')) { await app.close(); process.exit(lpBad ? 1 : 0); }
+            if (lpBad) failed = true;
+        }
         // pack.html: the stylesheets resolve from the repo, two levels below design/ or tests/audit-runs/.
         const rel = path.relative(OUT, ROOT).split(path.sep).join('/') + '/';
         fs.writeFileSync(path.join(OUT, 'pack.html'), built.html.split(base).join(rel));
@@ -819,7 +926,7 @@ function selfCheckMd(rows, pages, info) {
             const rows = evaluate(R, rast, LIB, built.kitLib);
             fs.writeFileSync(path.join(OUT, 'SELF-CHECK.md'), selfCheckMd(rows, R.pages, { lesson: LESSON, seed: SEED, notes: built.notes || [] }));
             for (const r of rows) console.log(`${r.id.padEnd(5)} ${r.pass ? 'PASS' : 'FAIL'} ${String(r.measured).slice(0, 260)}`);
-            failed = rows.some((r) => !r.pass);
+            failed = failed || rows.some((r) => !r.pass);
             if (has('debug')) fs.writeFileSync(path.join(OUT, 'measure.json'), JSON.stringify(R, null, 1));
         }
         if (has('copy')) {
