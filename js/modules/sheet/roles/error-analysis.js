@@ -43,6 +43,9 @@ import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
 import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
 
+/** Templates whose fix-it letters stand outside the answer box (critic lf-ops r1 D-MP-5 / D-AG-3). */
+const TAG_OUTSIDE = new Set(['arrays', 'arrays-turn']);
+
 export const ROLE_ID = 'error-analysis';
 // WORKSHEET_DESIGN_STANDARD 12.1: Error analysis 6 / 4 / 2-4 (the 04-E mock-up's 2 x 3 at L
 // predates the ceiling; the standard is law for capacity).
@@ -663,7 +666,10 @@ export function prepare(it, info = {}) {
         if (tagged) {
             tagged.forEach((id, i) => {
                 const re = new RegExp(`(<[a-z][a-z0-9]*\\b[^>]*\\sdata-ws-slot="${id}"[^>]*)>`, 'i');
-                body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag">${'ABCDEF'[i]}</i>`);
+                // (lane lf-ops critic r1 D-MP-5 / D-AG-3: in an array's small answer boxes the letter printed over the grey
+                // made-up number; there it stands OUTSIDE the box, left of it, in room the box keeps for it)
+                const out = TAG_OUTSIDE.has(it.template) ? ' mq-tagout' : '';
+                body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag${out}">${'ABCDEF'[i]}</i>`);
             });
         }
         const shownWork = `<div class="mq-judge-work"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}">${esc(who)} ${verb}:</span>${task}${kind === 'draw' ? body : pupilInk(body)}`
