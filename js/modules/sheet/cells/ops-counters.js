@@ -57,8 +57,10 @@ const dot = (cx, cy, r, open) => `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed
  * every column count - so the drawing is the same in 1 column and in 2 (DN-10: a narrower
  * column never re-flows it), and each line is at most about 66 mm wide at L.
  */
-function sentence(g, parts, { vals, ink, twin, textEm, inks = null }) {
-    const bw = Math.max(g.writeMm * 1.8, 2 * 0.62 * g.E + 3);
+/** SL-1 (critic lf-ops r1 D-AG-7 / D-MP-2): an answer box is at least 14 mm wide (17 mm at L), every box of a section one width. */
+export const SLOT_MIN_MM = { S: 14, M: 14, L: 17 };
+function sentence(g, parts, { vals, ink, twin, textEm, inks = null, minW = 0 }) {
+    const bw = Math.max(g.writeMm * 1.8, 2 * 0.62 * g.E + 3, minW);
     const clauses = [];
     let cur = [];
     for (const part of parts) {
@@ -77,9 +79,12 @@ function sentence(g, parts, { vals, ink, twin, textEm, inks = null }) {
  * MIN_PITCH) until the picture fits PIC_BOX. For equal groups it also picks how many rings
  * stand in a row: the most that fit the box's width at the largest pitch.
  */
+// (critic lf-ops r1 D-AG-2, L1 "Size S ignored": at S arrays_groups laid out exactly as M. At S its pictures fit a
+// third of the page - a 56 mm box - so S prints three columns)
+const PIC_BOX_S3 = [52, 46];
 function arrayGeometry(size, p) {
     const rows = Number(p.rows), cols = Number(p.cols);
-    const [bw, bh] = PIC_BOX[size] || PIC_BOX.L;
+    const [bw, bh] = size === 'S' && SENTENCE_KINDS.includes(p.kind) ? PIC_BOX_S3 : PIC_BOX[size] || PIC_BOX.L;
     const top = PITCH[size], min = MIN_PITCH[size], d0 = DOT[size];
     const clamp = (v) => Math.max(min, Math.min(top, v));
     if (p.kind !== 'equal_groups') {
@@ -161,21 +166,8 @@ function arraysPicture(g, p) {
     return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W, hMm: H };
 }
 
-/**
- * arrays_groups (lane lf-ops 2026-11-07, print-lint H13-ROW at L / M): on a page that MIXES arrays and ringed groups
- * (payload `picBox`, set by the generator when both kinds are dealt) the pictures stand in ONE picture box per size - as tall as the tallest picture the skill deals (5 rows / 5 groups of 5, the 2.OA.4
- * band) - each picture at the top of it (CL-4b: top of the box), the sentence at one place in every cell, so a short
- * array beside five rings never leaves a row sized for the other.
- */
+/** The kinds that carry the rows-of / groups-of sentence (arrays_groups). */
 const SENTENCE_KINDS = ['write_mult', 'equal_groups'];
-const _picBoxH = {};
-function pictureBoxH(g) {
-    if (_picBoxH[g.size] !== undefined) return _picBoxH[g.size];
-    let h = 0;
-    for (const kind of SENTENCE_KINDS) for (let rows = 2; rows <= 5; rows++) for (let cols = 2; cols <= 5; cols++) h = Math.max(h, arraysPicture(g, { kind, rows, cols }).hMm);
-    return (_picBoxH[g.size] = h);
-}
-
 /** One answer box: count_all (the pupil counts) and frame (the rows and columns are given). */
 const oneBox = (p) => p.kind === 'count_all' || p.kind === 'frame';
 
@@ -217,16 +209,18 @@ register('arrays', {
         // On screen the rows-of / groups-of sentence is the host's own inline-blank prompt, so
         // the twin draws the picture alone; the count-all box is the one answer (SL-7).
         const showSentence = !g.twin || oneBox(p);
-        const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1, inks }) : '';
+        const sentKind = SENTENCE_KINDS.includes(p.kind);
+        const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1, inks, minW: sentKind ? SLOT_MIN_MM[g.size] || 14 : 0 }) : '';
         // (lane lf-ops: on paper the rows-of / groups-of picture sits in the skill's one picture box, below the number
         // tab's keep-out - CL-40: a wide ring row reached 4.7 mm across, 3.5 mm down at M - a fixed spacer of
         // (tab side - 2 mm), as the kit's counters and remainder cells take)
         const boxed = !g.twin && SENTENCE_KINDS.includes(p.kind) && Number(p.rows) <= 5 && Number(p.cols) <= 5;
         const spacer = boxed ? '<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>' : '';
         // (a lesson chart's state draws its one example: no page of pictures to share a box with)
-        const picHtml = boxed && p.picBox && !ctx.stepVals
-            ? `${spacer}<div style="height:${g.em(pictureBoxH(g))};display:flex;align-items:flex-start;justify-content:center">${pic.svg}</div>`
-            : `${spacer}${pic.svg}`;
+        // (critic lf-ops r1 D-AG-1: the shared picture box - as tall as the tallest picture the skill deals - left 40-54 %
+        // of a cell empty between a short picture and its sentence. The sentence now stands right under its OWN picture;
+        // each row is as tall as what it holds (layout rowShape) and the cell is answered in place (footprint inPlace).)
+        const picHtml = `${spacer}${pic.svg}`;
         return root(g, 'arrays', `${picHtml}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
@@ -239,7 +233,10 @@ register('arrays', {
         const g = geo(ctx);
         const pic = arraysPicture(g, p);
         // The picture or the widest sentence line (about 66 mm at L), plus the pads.
-        return { wMm: Math.ceil(Math.max(pic.wMm, 66) + 6), hMm: null, measure: true, factLike: false, maxCols: 2 };
+        const sentKind = SENTENCE_KINDS.includes(p.kind);
+        // (S: the sentence lines at S type, boxes 14 mm, are about 50 mm: three columns - critic lf-ops r1 D-AG-2)
+        const s3 = sentKind && g.size === 'S';
+        return { wMm: Math.ceil(Math.max(pic.wMm, s3 ? 50 : 66) + 6), hMm: null, measure: true, factLike: false, maxCols: s3 ? 3 : 2, ...(sentKind && !g.twin ? { inPlace: true } : {}) };
     },
     /** The lesson chart's state k (provider marks: first / second / total; `groups` / `size` read as first / second). */
     lessonStepState(p, steps, k, ctx) {

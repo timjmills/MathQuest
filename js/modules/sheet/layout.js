@@ -958,7 +958,11 @@ export function groupByHeight(items, cols) {
     if (!known.length || known.length < items.length / 2) return items;
     const hs = hs0.map((h) => h || Math.max(...known));
     const lo = Math.min(...hs), hi = Math.max(...hs);
-    if (!(hi > lo * 1.6)) return items;
+    // (lane lf-ops critic r1 D-MP-1 / D-AG-1: cells answered in place - footprint `inPlace`, an array and its turn, an
+    // array and its sentence - keep no writing room, so a short one beside a tall one is pure empty band: they are
+    // grouped by height from a 1.2 x spread, not 1.6 x)
+    const inPlaceAll = items.every((it) => it && it.footprint && it.footprint.inPlace);
+    if (!(hi > lo * (inPlaceAll ? 1.2 : 1.6))) return items;
     // Wave 1 C2: a one-page count-by sheet is the teacher's row list, printed in the teacher's order (its title names that order).
     if (items.every((it) => it && it.q && it.q.countBy && it.q.countBy.onePage)) return items;
     // div_facts Mix (`divForm`, owner 2026-10-03): the page interleaves Standard, Long division and
