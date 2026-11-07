@@ -96,7 +96,7 @@ const vpadOf = (p, ctx) => (ctx && ctx.tightRows ? 0 : Number(p.vpad) > 0 ? Numb
  * starts 1.5 mm in from the left: no height, and the one-page line, which fills its cell, gives the 1.5 mm out of its width.
  */
 const INSET_MM = 1.5;
-/** mm a compact (one-page) paper row keeps clear on its left for the cell's CL-40 label keep-out (--ws-koin is at most 3 mm). */
+/** mm a compact (one-page) paper row keeps clear on its left for the cell's label keep-out (--ws-koin is at most 3 mm). */
 const KO_RESERVE_MM = 3;
 const koReserve = (p, ctx) => (p && p.compact && !isTwin(ctx) && !insetOf(ctx) ? KO_RESERVE_MM : 0);
 const insetOf = (ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? INSET_MM : 0);
@@ -128,7 +128,7 @@ function labelAt(p, ctx, i) {
  * about ten tables); otherwise (L, or a shaped track) it wraps to two even lines of six, so no box
  * is ever squeezed below the size's writing width (RUBRIC H9: 14 mm at L).
  */
-/** The screen twin's least box width (mm at the twin's 3.4 px/mm): a typed box is at least 44 px wide (RUBRIC H6, SP-10). */
+/** The screen twin's least box width (mm at the twin's 3.4 px/mm): a typed box is at least 44 px wide (the rubric's touch-target floor). */
 const TWIN_MIN_BOX_MM = 44 / 3.4 + 0.1;
 function geom(p, ctx) {
     const g = geomRaw(p, ctx);
@@ -171,7 +171,7 @@ function geomRaw(p, ctx) {
     // full 178 mm line), so 108 / 121 / 144 sit with clear space in the pupil's box and in the key.
     // owner 2026-10-03: the arcs are gone, so the one-page sheet gives their 3 mm to the boxes (the page stays as full as before)
     const baseH = S(ctx).writeMm + (p.compact ? 6.4 : 2.5);
-    // (lane lf-ops, CL-40: on the one-page sheet the step tab stood in the number tab's keep-out at 4 mm across, 2 mm down) a compact
+    // (lane lf-ops, label keep-out: on the one-page sheet the step tab stood in the number tab's keep-out at 4 mm across, 2 mm down) a compact
     // paper row starts right of the keep-out (--ws-koin, render) and keeps that much less line
     const live = narrowLive(p, ctx, p.compact ? COMPACT_LIVE_MM - insetOf(ctx) - koReserve(p, ctx) : LIVE_MM);
     // THE ONE-PAGE SHEET (owner 2026-10-02 ruling): "All rows on one page" keeps its compact SINGLE line of 12 numbers at the
@@ -467,7 +467,7 @@ function arcsGeom(p, ctx, c) {
     const boxMin = Math.max(MIN_BOX[size], glyphMm, wideNeed);   // wide enough for today's digits (and a wide row's hand)
     const boxCap = PITCH[size] + 2;                             // a table's box stays near today's writing width
     let boxW = maxW >= boxMin ? Math.min(maxW, Math.max(boxMin, wideNeed ? boxMin : boxCap)) : maxW;
-    // (lane lf-ops 2026-11-07, options-verify --render capacity H13: a circle grew to 14.5 mm and a hexagon to 14 mm tall at S, so a
+    // (lane lf-ops 2026-11-07, options-verify --render capacity: a circle grew to 14.5 mm and a hexagon to 14 mm tall at S, so a
     // shape page held 5 rows where the box page holds 8-9) a shaped tile keeps the box tile's height and the row's pitch: a circle as
     // wide as the box is tall, a hexagon the box's width; the line breaks exactly where the box row's does.
     const sz = shape === 'box' ? { w: boxW, h: baseH }
@@ -645,7 +645,7 @@ function turnArrow(ctx, g, kind, w) {
 /**
  * (lane lf-ops for lf-algebra 2026-11-07, grade-render card-390 / 1280: the typed box was 40 px wide - the host scales --mq-k2 down
  * and the tile's heavy outline takes its share) on screen a writing tile is never narrower than TWIN_TILE_PX, so its input keeps
- * >= 44 px (RUBRIC H6, SP-10). Paper is untouched.
+ * >= 44 px (the touch-target floor). Paper is untouched.
  */
 const TWIN_TILE_PX = 50;
 const twinFloor = (ctx, html) => (isTwin(ctx)
