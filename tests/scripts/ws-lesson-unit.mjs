@@ -76,6 +76,14 @@ const LATE = {
         ok(/Object\.assign\(\{ lr6: true, distinctAnswer: true \}, p\.ref\)/.test(readSrc('js/modules/print-sheet.js')), 'N4: the lesson check refs hold LR-6');
         ok(!/10 \* em - 24\)/.test(src) && /ROUTE_TABLE_FIXED_MM/.test(src), 'D16: routePlan names its fixed margins');
     },
+    // R4 / R5 (lf-engine P1b): a detailed pack builds at every seed (a late item that finds its case spent is reserved and the
+    // pack rebuilt); a spent pool never deals a chart example, its turn, or an item already on the page, while another is left.
+    async 'r4-r5-dealer'() {
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/async function buildDetailedLesson\(req = \{\}\) \{\n    const late = new Set\(\);/.test(ps) && /late\.add\(e\.dlLate\)/.test(ps), 'R4: buildDetailedLesson rebuilds with the failing late item reserved');
+        ok((ps.match(/lateTag\('(wp|cq)'|lateTag\(`exit\$\{i\}`/g) || []).length === 3, 'R4: the word problem, the Check Question and every exit item name themselves when they fail');
+        ok(/if \(!strict && Array\.isArray\(sk\.chartKeys\) && k < tries\)/.test(ps) && /lr6: true, chartKeys \}/.test(ps), 'R5: the relaxed pass keeps chart examples and page repeats last');
+    },
     async 'r1-page-fresh'() {
         globalThis.window = globalThis.window || globalThis;
         const G = await tryImp('js/modules/generate-question.js'), PD = await tryImp('js/modules/page-deal.js');

@@ -828,6 +828,13 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 const strict = soft && !(relaxLast && k === tries);
                 if (hard && !refHardOk(sk, cand)) continue;
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
+                // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
+                // or its turn - and an item already on this page are still the last thing taken: lesson 3a dealt the chart's
+                // 2 x 3 again, turned, on Practice 1 at 7 of 25 seeds. `chartKeys`: the chart's keys, a detailed pack only.)
+                if (!strict && Array.isArray(sk.chartKeys) && k < tries) {
+                    const fk = factKeyOf(cand), tk = turnedKeyOf(cand);
+                    if (fk !== null && (sk.chartKeys.includes(fk) || mulUsed(fk, sk.chartKeys) || (tk !== null && sk.chartKeys.includes(tk)) || seen.has(`key:${fk}`) || (tk !== null && seen.has(`key:${tk}`)) || (plusTurn(fk) && sk.chartKeys.includes(plusTurn(fk))))) { if (!got) got = cand; continue; }
+                }
                 // A MIXED POOL page is one look (wave 1 lane D, critic 2026-10-03; round 8, critic r6 D6-2):
                 // a member drawn in the legacy look (no kit cell: a long "Answer:" line, a chart with
                 // nothing to write; two answer places, H8) is passed over for another draw while a few
@@ -4466,7 +4473,9 @@ async function buildLesson(n, metaOf) {
     // (lesson 7 D2: the chart examples' families and story frames too, on a `repeatKey` ref)
     if (packNums && sk.repeatKey) packNums.push(...chartQs.flatMap(dlRepeatKeys));
     // (`lr6`: the detailed lesson maker's printed pages hold LR-6 for + / − items and stories - lesson 2 r4)
-    if (packNums) practiceSk = Object.assign({}, practiceSk, { avoidKeys: packNums, lr6: true }, n.edgeLast ? { edgeLast: n.edgeLast } : {});
+    // (R5: the chart's own keys, the last thing a spent pool deals again - generateRun)
+    const chartKeys = packNums ? [...planKeys(chart), ...chartQs.map(factKeyOf)].filter((k) => k !== null) : null;
+    if (packNums) practiceSk = Object.assign({}, practiceSk, { avoidKeys: packNums, lr6: true, chartKeys }, n.edgeLast ? { edgeLast: n.edgeLast } : {});
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.
@@ -4502,7 +4511,7 @@ async function buildLesson(n, metaOf) {
         let k = 0;
         for (const ps of n.practiceSheets) {
             k++;
-            const own0 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true } : {}) : practiceSk;
+            const own0 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true, chartKeys } : {}) : practiceSk;
             // (`gridRevisit`, lesson 4 r5: the windows as the chart and the lesson sheet DRAW them, so a revisit is drawn turned)
             const planQs = (res) => { const out = []; for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) out.push(it.q); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
             const own = ps.skill && ps.skill.gridRevisit ? Object.assign({}, own0, { gridShown: [...planQs(chart), ...chartQs, ...planQs(teach)].map(gridShownOf).filter(Boolean) }) : own0;
@@ -5495,7 +5504,8 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
         // was drawn at a fallback zoom under 1, a failure the compiler refuses)
         chartSizing: [{ id: 'P2', sizing: lesson.chartSizing || null }, ...chunkRes.map(({ ch, r }) => ({ id: `P2${ch.id}`, sizing: r.chartSizing || null }))],
         chartsOk: [lesson.chartSizing, ...chunkRes.map(({ r }) => r.chartSizing)].every((z) => !z || z.ok !== false),
-        vars: V, debug: { glance, est: Object.fromEntries(groups.map((g, i) => [g, groupPages[g].map((pg) => pg.bands.map((b) => b.blocks.length))])), heights: Object.fromEntries(groups.map((g, i) => [g, { over: measured[i][0] && measured[i][0].over, hs: measured[i].map((a) => a.map((x) => Math.round(x))) }])) },
+        // (`debug.sizing`: the P2 chart's sizing, read by lf-checks' LP-FALLBACK - patch lf-checks-to-lf-engine §1)
+        vars: V, debug: { sizing: lesson.chartSizing || null, glance, est: Object.fromEntries(groups.map((g, i) => [g, groupPages[g].map((pg) => pg.bands.map((b) => b.blocks.length))])), heights: Object.fromEntries(groups.map((g, i) => [g, { over: measured[i][0] && measured[i][0].over, hs: measured[i].map((a) => a.map((x) => Math.round(x))) }])) },
     };
 }
 
