@@ -677,5 +677,22 @@
         "proposed": true
       }
     ]
+  },
+  "rulings": {
+    "rulings": [
+      {
+        "id": "R-COMBINE-999",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:combine"
+        ],
+        "assert": "range",
+        "of": "ans",
+        "min": 101,
+        "max": 999
+      }
+    ],
+    "notOffered": [],
+    "todo_note": "R-VALUE-999 (ans 1..900), R-PV10-BAND (ans <= 100000), R-COMBINE-99 wait for a pv reader in ws-card-rulings (q.pv.n / q.ans without operands): asked of lf-checks 2026-11-07"
   }
 }
