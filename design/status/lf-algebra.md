@@ -42,6 +42,7 @@ Critic rounds: 0, none
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: fix r2, start 2026-11-07T08:36Z, end 2026-11-07T10:44Z, profile mq-opus-medium
 Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end 2026-11-07T08:31Z, profile mq-opus-medium
 Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end 2026-11-07T08:27Z, profile mq-opus-medium
 
@@ -53,7 +54,84 @@ Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-1
 - options-verify --render: 22 values worse than default (ftTask values / ftTable 51-52 lose capacity, H13; ftTask=rule L CL40-INK)
 - card-rulings SKIPPED / spec-card N/A: no card yet
 
+## Precritic r2 (head after 4f887f28, 6 skills incl. the preset follow_given_rule, --strict; logs /tmp/mq-precritic/20261107-095337-25319)
+| Gate | Scope | Result | Findings vs baseline | Seconds |
+|---|---|---|---|---|
+| ws-node-lint | 6 skills | PASS | 0 found, 0 pinned, 0 new | 1 |
+| ws-providers-unit --skill | 6 skills | PASS | 2 of 6 skills checked; not covered: patterns:notice_patterns, patterns:pattern_features, patterns:growing_shape_patterns, patterns:follow_given_rule | 0 |
+| ws-content-audit --skill | 6 skills | PASS | 2 skill(s) audited (4 of the 6 in scope are outside the audited families) | 8 |
+| ws-options-verify --skill | 6 skills | PASS (baseline) | 189 value(s) checked; 6 failing, 6 pinned, 0 new | 111 |
+| ws-presets-unit | 5 preset / host skill(s) | PASS | - | 111 (104 waiting) |
+| ws-lessonfit (WRM site lessons, every year) | site lessons Y1, Y4, Y6 | PASS | - | 25 |
+| ws-coverage-matrix --skills | 6 skills × kinds × S/M/L | PASS | 46 of 200 row(s) run × S/M/L: OK 46, RED 0, ERROR 0; PENDING 118, N/A 36 | 1696 |
+| ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) | 6 skills | PASS | 0 found (6 doc(s)) | 83 (51 waiting) |
+| ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) | 6 skills | PASS | 0 found (6 doc(s), unpinned) | 98 (62 waiting) |
+| ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) | 6 skills | PASS | 0 found (6 doc(s), unpinned) | 100 (66 waiting) |
+| ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) | 6 skills | FAIL | 39 found in 5 of 6 doc(s); 10 (document, lint, rule) count(s) above the pin; lesson page not pinned at L: algebra:function_table_easy, patterns:number_patterns_rule, patterns:notice_patterns, patterns:pattern_features, patterns:growing_shape_patterns, patterns:follow_given_rule (must be clean) | 97 (51 waiting) |
+| ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) | 6 skills | FAIL | 41 found in 5 of 6 doc(s); 13 (document, lint, rule) count(s) above the pin; lesson page not pinned at S: algebra:function_table_easy, patterns:number_patterns_rule, patterns:notice_patterns, patterns:pattern_features, patterns:growing_shape_patterns, patterns:follow_given_rule (must be clean) | 109 (61 waiting) |
+| ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px) | 6 skills × lesson, test, independent × S/M/L + screen hosts | FAIL | ws-grade-render: FAIL - 102 finding(s) (102 overflow, 0 small target) in 6 unit(s) | 500 (54 waiting) |
+| ws-screen-slots --skills | 6 skills | PASS | 0 found, 0 pinned, 0 new (30 host renders, --baseline design/audit/baselines/screen-slots.json) | 101 (75 waiting) |
+| ws-screen-answer --skills | 6 skills | PASS | - | 181 (112 waiting) |
+| ws-chromebook-fit --skills | 6 skills | PASS | - | 377 (108 waiting) |
+| ws-code-snapshot | all share codes | PASS | - | 3 |
+| ws-boot-smoke | app boot | PASS | - | 67 (63 waiting) |
+| ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) | 6 skills: matrix rows with findings | FAIL | worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 114 with no sibling measured, 0 ERROR row(s); 0 at or below (engine) in 34 printed row(s) with findings (PENDING(no-baseline) 34; siblings per skill: function_table_easy: 0, number_patterns_rule: 0, notice_patterns: 0, pattern_features: 0, growing_shape_patterns: 0, follow_given_rule: 0) | 1 |
+| ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) | 6 skills × matrix rows × S/M/L + extras at S | PASS | 80 matrix row(s) × S/M/L + 12 extra document(s) (test, more-practice, supports on): 252 document(s), SLOT 0 / CLIP 0 finding(s), 7394 box segment(s) and 0 head(s) probed (SLOT-W N/A on 52, HEADS N/A on 252 document(s): no digit strip / no heads); every SLOT / CLIP count at or below the approved siblings | 1298 |
+| ws-phone-card (practice card at 390 px: clip, first-box focus) | 6 skills × 390x844, 390x664 | PASS | - | 271 (106 waiting) |
+| ws-card-rulings --check rulings (spec card numeric rulings, 300 items) | 6 skills | PASS | - | 4 |
+| ws-card-rulings --check offered (panel offers nothing the card bans) | 6 skills | PASS | - | 0 |
+| ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) | 6 skills | PASS | - | 2 |
+| ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell) | 6 skills | PASS | 6 skill(s), 0 pinned finding(s), 0 stale pin(s), 1.2 s | 1 |
+| ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot) | 6 skills | PASS | 0 found, 0 pinned, 0 new | 1 |
+| ws-spec-card --check-signed --skill (card signed; every host, role and option value decided) | 6 skills | INCOMPLETE (unsigned card) | needs owner signature: design/cards/function-table/function-table.md, design/cards/patterns/patterns.md (everything else green) | 2 |
+| ws-options-verify --render (each offered appearance value at S / L vs the default page) | 6 skills × S/L | FAIL | 13 value page(s) worse than the default: function_table_easy ftTask="make" @S, number_patterns_rule shape="circle" @S, number_patterns_rule shape="hex" @S, number_patterns_rule shape="mixed" @S, follow_given_rule missing | 746 (78 waiting) |
+
+ws-precritic: FAIL: 5 FAIL, 22 PASS (1 on the baseline), 0 N/A, 0 SKIPPED-NOT-BUILT, 1 SKIPPED / INCOMPLETE (no or partial rulings) of 28 (FAIL: print-lint-lesson-L, print-lint-lesson-S, render-gate, sibling-compare, options-render; SKIPPED / INCOMPLETE (no or partial rulings: not all checked, not passed): spec-card-signed)
+
+Remaining non-green rows, cause by cause:
+- print-lint lesson L/S + grade-render --gate: (a) number_patterns_rule / follow_given_rule anchor chart overflows 6.5-13 mm
+  (and the L-INK / L-OVERLAP SECTION findings are the same overflow running under the Say band): CAUSED BY the cherry-picked
+  lf-ops count-row 3d8bca1b - the 'train' row now wraps (8 tiles -> 4 + 4) in the chart panel because the panel's ctx carries
+  columns > 1 although the panel is full width (184.9 mm). Before the cherry-pick the same lesson pages were clean at S/M/L
+  (render 2026-11-07 ~09:00, scratch rl2). Request to lf-ops (or lf-engine: the anchor ctx's columns). (b) Our pagination
+  rows: pattern_features / growing L: Guided Practice (two full-width chartWide rows + the strip, ~122 mm) misses page 2 by a
+  few mm after the L Vocabulary + Warm-up (DN-2); S: pattern_features one Independent cell alone on page 3 (LONE / DN-2);
+  notice / growing / pattern_features practice page PAGEFILL 27-42 %. Two attempts made (cell geometry, warm-ups, short
+  steps); root cause: lesson.js packs chartWide Guided as >= 2 full-width rows (guidedRows min 2) and Independent rows by
+  whole rows; asking lf-engine for `guidedRows: 1` or a 2-across Guided for chartWide skills.
+- sibling-compare: 114 NO-SIBLING counts (no approved sibling on any of these templates; L-DENSITY PAGEFILL 24, H13 21,
+  DN-2 21, PG-23 19, SPREAD 11, GRID-EVEN 8, LONE 6, CL40-INK 3) across sections / mixed / pages-N matrix rows; 34 more are
+  partner-skill counts (reported non-blocking by the tool). Not brought to 0 this round.
+- options-render: number_patterns_rule / follow_given_rule shape=circle|hex|mixed capacity (S 5 vs 8, L 7 vs 8): lf-ops'
+  shaped-tile capacity, still red after the cherry-pick; follow_given_rule missing=50|80|90 H13 (count-row, lf-ops);
+  function_table_easy ftTask=make S: REPEAT (two make tables with the same rule look identical - no numbers printed) - ours,
+  open.
+- spec-card INCOMPLETE: both cards unsigned by design (owner answers recorded; cards ready to sign).
+
 ## Log
+- 2026-11-07 fix r2 (Opus medium; precritic red after r1, machine checks only). Done:
+  - Lesson anchor overflow (108 overflow): `stepState` on `notice` (sentence task drawn at S, tight rows) and `growing-pattern`
+    (four terms in ONE row at S, Term 4 grey on its step, black after); chartRow on growing / features (words beside the
+    drawing); feature cell puts rule + track on one line; growing geometry u 2.0 / 2.4 / 2.6 mm, pad 0.4 u; short lesson
+    steps; warm-ups on kit cells (shape_pattern legacy cell gone, BD-12); odd_even warm-up at range 10. grade-render --gate
+    lesson pages: no overflow on our skills.
+  - options-render: addsDrawingValues on notice patTask feature / truefalse, growing patTask rule / far (each adds a drawn
+    part or an answer line), function_table_easy ftTask rule (the rule's write frame); ftTask make: the range is now the In
+    column's head ("In: 1–10"), the note line is gone.
+  - ws-dealer-uniform: DECLARED valid set (q.dealSet, non-enumerable; growing_shape_patterns declares its (start, step)
+    pairs); generator draws the pair uniformly and fresh on the page (freshDeal; a window of half the set when it is small,
+    never a forced cycle). Self-test 24 cases; backtest row dealer-declared-set (FAIL e59e2bf3, OK 6e4efe2b).
+  - ws-card-rulings: `of: "payload.<path>"` and `{"is": [field, word|words]}` (marked block, self-test 28); rulings for
+    notice / feature / number_patterns_rule / follow_given_rule; not-offered entries for function_table_easy and
+    number_patterns_rule.
+  - Owner answered both cards "all as suggested" (2026-11-07, via lead): answers recorded as ownerRulings, every decision
+    decided (0 PROPOSED, 0 UNDECIDED), open questions empty; number_patterns_rule and the new preset are on the patterns
+    card. Cards NOT signed. New preset patterns:follow_given_rule (number_patterns_rule rule off, lesson #20, code ZZ via the
+    manifest + ws-integrate), tagged 4.OA.C.5 / M.EE.4.OA.5, Y5.B12.S9 partial, Y5 lesson followagivenrule direct,
+    related / pre on the growing and features lessons, lesson data in prereqs.js.
+  - codec-registry: our keys 4U / 4V / 4W pinned (only ours); msChoose FAIL is red on origin/claude/sweet-newton-c8wrv1 too
+    (pre-existing, not ours).
+  - lf-ops count-row commit 3d8bca1b cherry-picked (4e4af534).
 - 2026-11-07: owner approved both cards in the lead session, "All as suggested" (F1-F4, P1-P7 and all 50 PROPOSED
   decisions). The r2 fixer records them on the cards, adds the P7 preset "Follow a given rule" and every ruling; then the lead signs.
 - 2026-11-07: r1 build merged (e59e2bf3). New: patterns:notice_patterns (patTask parity / feature / truefalse, band, patShow),
