@@ -194,6 +194,7 @@ function bodyHTML() {
 function render({ keepScroll = false } = {}) {
     const r = ui.root;
     if (!r) return;
+    hideThumb();   // the cards under a thumbnail are about to be drawn again
     for (const t of r.querySelectorAll('.mqx-tab')) {
         const on = t.dataset.tab === ui.tab;
         t.setAttribute('aria-selected', String(on));
@@ -249,20 +250,42 @@ const exampleQueue = [];
 let idleHandle = 0;
 const ric = (fn) => (typeof requestIdleCallback === 'function' ? requestIdleCallback(fn, { timeout: 800 }) : setTimeout(() => fn({ timeRemaining: () => 8 }), 60));
 
+// One seeded sample per skill (seed 11), shared by the card's short example and the hover thumbnail, so the two always
+// show the same item. `ms` is how long the generator took: a slow one (> THUMB_SLOW_MS) gets the text example only.
+const sampleCache = new Map();
+function sampleOf(s) {
+    if (sampleCache.has(s.key)) return sampleCache.get(s.key);
+    let out;
+    const t0 = performance.now();
+    try {
+        const q = generateQuestionFor({ category: s.categoryId, skill: s.skillId, seed: 11 });
+        out = { q: q && (q.text || q.visual) ? q : null, ms: performance.now() - t0, err: false };
+    } catch (e) {
+        out = { q: null, ms: performance.now() - t0, err: true };
+    }
+    sampleCache.set(s.key, out);
+    return out;
+}
+
+/** The question the pupil reads, as one line of plain text (never the answer). */
+function questionText(q) {
+    if (!q) return '';
+    const div = document.createElement('div');
+    div.innerHTML = String(q.text || '');
+    // check r4 D4: an exponent is a <sup>; textContent would flatten (4 + 5)<sup>2</sup> into "(4 + 5)2"
+    const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+    for (const el of div.querySelectorAll('sup')) {
+        const t = el.textContent.trim();
+        el.textContent = /^\d+$/.test(t) ? [...t].map((d) => SUP[d]).join('') : `^${t}`;
+    }
+    return (div.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
 function exampleFor(s) {
     if (exampleCache.has(s.key)) return exampleCache.get(s.key);
     let text = '';
     try {
-        const q = generateQuestionFor({ category: s.categoryId, skill: s.skillId, seed: 11 });
-        const div = document.createElement('div');
-        div.innerHTML = String((q && q.text) || '');
-        // check r4 D4: an exponent is a <sup>; textContent would flatten (4 + 5)<sup>2</sup> into "(4 + 5)2"
-        const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
-        for (const el of div.querySelectorAll('sup')) {
-            const t = el.textContent.trim();
-            el.textContent = /^\d+$/.test(t) ? [...t].map((d) => SUP[d]).join('') : `^${t}`;
-        }
-        text = (div.textContent || '').replace(/\s+/g, ' ').trim();
+        text = questionText(sampleOf(s).q);
         // a bare instruction ("What is the perimeter?") or a long word problem is no example (a sweep of all 716: ~0.6 ms each)
         if (!/\d/.test(text) || text.length < 3) text = '';   // an example shows numbers; a bare question does not
         if (text.length > 44) text = '';
@@ -298,6 +321,249 @@ function watchExamples() {
         if (exampleQueue.length && !idleHandle) idleHandle = ric(pumpExamples);
     }, { root: ui.root.querySelector('#mqxBody'), rootMargin: '200px 0px' });
     for (const el of ui.root.querySelectorAll('.mqx-card')) if (!exampleCache.has(el.dataset.key)) ui.io.observe(el);
+}
+
+// ---- the hover thumbnail (owner, 2026-11-05: "give a thumbnail of the skill when mousing over") ----------------
+// Hovering a card with a mouse (or focusing it with the keyboard) shows, after a short delay, the card's sample item
+// drawn the way the pupil will see it: the black-and-white paper cell of the practice card, with the skill's visual.
+// The drawing is teacher-preview.js's (mountQuestion: the same cell the teacher's hover preview draws); that module is
+// loaded on the first hover only, never at startup. The question only — the cell's answer slots are empty. A skill whose
+// generator throws or is slow (> THUMB_SLOW_MS) shows its text example instead. Ideas from the Skills Navigator's
+// so-hover-popup (a delay, a cache) and teacher-preview's placement (beside the anchor, never over the pointer).
+// Touch screens (hover: none / pointer: coarse) get no hover thumbnail: a tap still picks the skill.
+const THUMB_ID = 'mqxThumb';
+const THUMB_DELAY = 500;
+const THUMB_WARM = 150;          // moving straight from one card to the next
+const THUMB_SLOW_MS = 50;
+const th = { el: null, timer: 0, pending: null, card: null, byFocus: false, token: 0, lastHide: 0, pointer: { x: -1, y: -1 }, mode: '', key: '' };
+let previewMod = null;
+let previewPromise = null;
+function loadPreview() {
+    if (previewMod) return Promise.resolve(previewMod);
+    if (!previewPromise) {
+        previewPromise = import('./teacher-preview.js').then((m) => (previewMod = m)).catch((e) => { previewPromise = null; throw e; });
+    }
+    return previewPromise;
+}
+// A touch screen (its main pointer is a finger, and nothing on it can hover) never gets a hover thumbnail. Only a real
+// mouse or pen pointer event opens one, so a device that reports no pointer at all (hover: none, pointer: none) still
+// shows it when a mouse is moved; a tablet with a trackpad (any-hover: hover) shows it for the trackpad.
+function noHover() {
+    try { return window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(any-hover: hover)').matches; } catch (e) { return false; }
+}
+function thumbEl() {
+    if (th.el && th.el.isConnected) return th.el;
+    const el = document.createElement('div');
+    el.id = THUMB_ID;
+    el.className = 'mqx-thumb';
+    el.setAttribute('role', 'tooltip');
+    el.hidden = true;
+    ui.root.appendChild(el);
+    th.el = el;
+    return el;
+}
+const thumbOpen = () => !!(th.el && !th.el.hidden);
+
+function setDescribed(card, on) {
+    if (!card) return;
+    const ids = (card.getAttribute('aria-describedby') || '').split(/\s+/).filter((x) => x && x !== THUMB_ID);
+    if (on) ids.push(THUMB_ID);
+    if (ids.length) card.setAttribute('aria-describedby', ids.join(' ')); else card.removeAttribute('aria-describedby');
+}
+
+function hideThumb() {
+    clearTimeout(th.timer);
+    th.timer = 0;
+    th.pending = null;
+    th.token++;
+    if (thumbOpen()) th.lastHide = Date.now();
+    if (th.el) { th.el.hidden = true; th.el.innerHTML = ''; }
+    setDescribed(th.card, false);
+    th.card = null;
+    th.byFocus = false;
+    th.mode = '';
+    th.key = '';
+}
+
+function scheduleThumb(card, byFocus) {
+    if (th.card === card && thumbOpen()) { th.byFocus = th.byFocus || byFocus; return; }
+    if (th.pending === card) return;
+    clearTimeout(th.timer);
+    if (thumbOpen()) hideThumb();
+    th.pending = card;
+    loadPreview().catch(() => { /* the text example stands in */ });
+    const delay = Date.now() - th.lastHide < 400 ? THUMB_WARM : THUMB_DELAY;
+    th.timer = setTimeout(() => { th.timer = 0; showThumb(card, byFocus); }, delay);
+}
+
+/** Fill the thumbnail for skill `s`; resolves to 'cell' (the paper cell) or 'text' (the text example). */
+async function fillThumb(s, token) {
+    const data = sampleOf(s);
+    let mod = previewMod;
+    if (!mod && data.q && !data.err && data.ms <= THUMB_SLOW_MS) { try { mod = await loadPreview(); } catch (e) { mod = null; } }
+    if (token !== th.token) return '';
+    const el = thumbEl();
+    el.innerHTML = `<div class="tvp-frame mqx-thumb-frame"></div><p class="mqx-thumb-cap">${esc(s.label)}</p>`;
+    el.hidden = false;
+    el.style.left = '-9999px';
+    el.style.top = '0px';
+    const frame = el.querySelector('.mqx-thumb-frame');
+    let mode = 'text';
+    if (mod && data.q && !data.err && data.ms <= THUMB_SLOW_MS) {
+        try { if (mod.mountQuestion(frame, data.q, s.skillId)) mode = 'cell'; } catch (e) { mode = 'text'; }
+        // a cell that drew nothing readable (no text, no drawing) is no picture of the skill
+        if (mode === 'cell' && !frame.querySelector('.tvp-cell svg, .tvp-cell img, .tvp-cell canvas') && !(frame.querySelector('.tvp-cell') || {}).textContent) mode = 'text';
+    }
+    if (mode === 'text') {
+        const full = questionText(data.q);
+        const text = exampleFor(s) || (full.length > 140 ? `${full.slice(0, 137).replace(/\s+\S*$/, '')} …` : full);
+        frame.className = 'mqx-thumb-frame mqx-thumb-textframe';
+        frame.removeAttribute('role');
+        frame.removeAttribute('aria-label');
+        frame.innerHTML = `<p class="mqx-thumb-text">${text ? esc(text) : 'A sample is not ready for this skill yet.'}</p>`;
+    }
+    el.dataset.mode = mode;
+    return mode;
+}
+
+function placeThumb(card) {
+    const el = th.el;
+    if (!el || el.hidden || !card) return;
+    const r = card.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+    const vh = window.innerHeight;
+    const pw = el.offsetWidth, ph = el.offsetHeight;
+    const g = 12, m = 8;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const midY = clamp(r.top + r.height / 2 - ph / 2, m, Math.max(m, vh - ph - m));
+    const leftX = clamp(r.left, m, Math.max(m, vw - pw - m));
+    const cands = [
+        { x: r.right + g, y: midY },          // beside the card: the side with room first
+        { x: r.left - g - pw, y: midY },
+        { x: leftX, y: r.bottom + g },
+        { x: leftX, y: r.top - g - ph },
+    ];
+    const p = th.byFocus ? null : th.pointer;
+    const fits = (c) => c.x >= m && c.y >= m && c.x + pw <= vw - m && c.y + ph <= vh - m;
+    const over = (c, a) => c.x < a.right && c.x + pw > a.left && c.y < a.bottom && c.y + ph > a.top;
+    const onCard = (c) => over(c, { left: r.left - 2, right: r.right + 2, top: r.top - 2, bottom: r.bottom + 2 });
+    const onPointer = (c) => !!p && p.x >= 0 && over(c, { left: p.x - 12, right: p.x + 12, top: p.y - 12, bottom: p.y + 12 });
+    let pick = cands.find((c) => fits(c) && !onCard(c) && !onPointer(c));
+    if (!pick) {
+        // a small window: clamp each side into the viewport and take the first that still keeps off the card and pointer
+        const clamped = cands.map((c) => ({ x: clamp(c.x, m, Math.max(m, vw - pw - m)), y: clamp(c.y, m, Math.max(m, vh - ph - m)) }));
+        pick = clamped.find((c) => !onCard(c) && !onPointer(c)) || clamped.find((c) => !onPointer(c)) || clamped[0];
+    }
+    el.style.left = `${Math.round(pick.x)}px`;
+    el.style.top = `${Math.round(pick.y)}px`;
+}
+
+async function showThumb(card, byFocus) {
+    th.pending = null;
+    if (!ui.root || ui.root.hidden || !card || !card.isConnected) return;
+    const s = byKey().get(card.dataset.key);
+    if (!s) return;
+    const token = ++th.token;
+    let mode = '';
+    try { mode = await fillThumb(s, token); } catch (e) { mode = ''; }
+    if (!mode || token !== th.token || !card.isConnected || ui.root.hidden) { if (token === th.token && th.el) th.el.hidden = true; return; }
+    th.card = card;
+    th.byFocus = byFocus;
+    th.mode = mode;
+    th.key = s.key;
+    placeThumb(card);
+    setDescribed(card, true);
+    // the cell settles its scale after the mono pass (teacher-preview refits at ~0.9 s): keep the thumbnail placed
+    setTimeout(() => { if (token === th.token && th.card === card && thumbOpen()) placeThumb(card); }, 950);
+}
+
+function cardOf(node) {
+    const el = node && node.nodeType === 1 ? node : node && node.parentElement;
+    const c = el && el.closest ? el.closest('.mqx-card') : null;
+    return c && ui.root && ui.root.contains(c) ? c : null;
+}
+
+function wireThumbs(r) {
+    r.addEventListener('pointermove', (e) => { th.pointer = { x: e.clientX, y: e.clientY }; }, { passive: true });
+    r.addEventListener('pointerover', (e) => {
+        if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+        th.pointer = { x: e.clientX, y: e.clientY };
+        if (noHover()) return;
+        const card = cardOf(e.target);
+        if (!card) return;
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        scheduleThumb(card, false);
+    });
+    r.addEventListener('pointerout', (e) => {
+        const card = cardOf(e.target);
+        if (!card) return;
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        if (th.byFocus && th.card === card && document.activeElement === card) return;   // a keyboard thumbnail stays with its focus
+        if (th.card === card || th.pending === card) hideThumb();
+    });
+    r.addEventListener('pointerdown', () => { hideThumb(); }, true);
+    r.addEventListener('focusin', (e) => {
+        const card = cardOf(e.target);
+        if (!card) { if (thumbOpen() || th.pending) hideThumb(); return; }
+        let keyboard = false;
+        try { keyboard = e.target.matches(':focus-visible'); } catch (err) { keyboard = true; }
+        if (!keyboard) return;
+        scheduleThumb(card, true);
+    });
+    r.addEventListener('focusout', (e) => {
+        const card = cardOf(e.target);
+        if (!card) return;
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        if (th.card === card || th.pending === card) hideThumb();
+    });
+    // A scroll hides a hover thumbnail. A keyboard one follows its card (focusing a card scrolls it into view) while the
+    // card is still in the list's window, and hides once it leaves.
+    r.addEventListener('scroll', () => {
+        if (!thumbOpen() && !th.pending) return;
+        const card = th.card || th.pending;
+        if (th.byFocus && card && card === document.activeElement) {
+            const b = r.querySelector('#mqxBody').getBoundingClientRect(), c = card.getBoundingClientRect();
+            if (c.bottom > b.top && c.top < b.bottom) { if (thumbOpen()) placeThumb(card); return; }
+        }
+        if (th.pending && document.activeElement === th.pending) return;   // still waiting for a focused card: keep it
+        hideThumb();
+    }, true);
+    window.addEventListener('resize', () => { if (thumbOpen() || th.pending) hideThumb(); });
+    window.addEventListener('blur', () => { if (thumbOpen() || th.pending) hideThumb(); });
+}
+
+function visualText(html) {
+    const div = document.createElement('div');
+    div.innerHTML = String(html || '');
+    return (div.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * For tests (ws-student-explorer THUMB sweep): draw the thumbnail of `key` at once (no delay) and report what it shows.
+ * The question only: `ans` is returned so the gate can check the drawing never shows it.
+ */
+export async function studentExplorerThumbProbe(key) {
+    if (!ui.root) return { err: 'explorer not open' };
+    const s = byKey().get(key);
+    if (!s) return { err: `no skill ${key}` };
+    hideThumb();
+    const token = ++th.token;
+    const mode = await fillThumb(s, token);
+    const el = th.el;
+    const data = sampleOf(s);
+    const stage = el.querySelector('.tvp-stage');
+    const out = {
+        key, mode, ms: Math.round(data.ms * 10) / 10, err: data.err,
+        cell: !!el.querySelector('.ws-cell, .mq-scell'),
+        text: (stage ? stage.textContent : el.querySelector('.mqx-thumb-frame').textContent).replace(/\s+/g, ' ').trim(),
+        qText: questionText(data.q), qVisual: data.q && data.q.visual ? visualText(data.q.visual) : '',
+        ans: data.q && data.q.ans != null && typeof data.q.ans !== 'object' ? String(data.q.ans) : '',
+        // a box the pupil types into holds nothing; a tap box (a checkbox) is not ticked
+        filled: [...el.querySelectorAll('input, textarea')].filter((i) => (i.type === 'checkbox' || i.type === 'radio' ? i.checked : i.value)).length,
+        hasOptions: !!(data.q && Array.isArray(data.q.options) && data.q.options.length),
+    };
+    hideThumb();
+    return out;
 }
 
 // ---- events -----------------------------------------------------------------------------------------------------
@@ -346,7 +612,13 @@ function setTab(tab) {
 }
 
 function onKey(e) {
-    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        // the first Esc hides a showing thumbnail; the next one closes the explorer
+        if (thumbOpen()) { e.stopPropagation(); hideThumb(); return; }
+        close();
+        return;
+    }
     const t = e.target;
     if (t.getAttribute && t.getAttribute('role') === 'tab' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
         e.preventDefault();
@@ -399,6 +671,7 @@ export async function openStudentExplorer(opts = {}) {
         r.addEventListener('click', onClick);
         r.addEventListener('keydown', onKey);
         r.addEventListener('input', onInput);
+        wireThumbs(r);
         document.body.appendChild(r);
         ui.root = r;
     }
@@ -422,6 +695,7 @@ export function closeStudentExplorer() { close(); }
 
 function close() {
     if (!ui.root || ui.root.hidden) return;
+    hideThumb();
     ui.root.hidden = true;
     if (ui.io) ui.io.disconnect();
     document.documentElement.classList.remove('mqx-open');
@@ -441,5 +715,6 @@ function close() {
 /** For tests: what the explorer is showing. */
 export function studentExplorerState() {
     if (!ui.root) return null;
-    return { open: !ui.root.hidden, tab: ui.tab, grade: ui.grade, gradeArea: ui.gradeArea, domain: ui.domain, query: ui.query, cards: ui.root.querySelectorAll('.mqx-card').length, examples: exampleCache.size };
+    return { open: !ui.root.hidden, tab: ui.tab, grade: ui.grade, gradeArea: ui.gradeArea, domain: ui.domain, query: ui.query, cards: ui.root.querySelectorAll('.mqx-card').length, examples: exampleCache.size,
+        thumb: { open: thumbOpen(), key: th.key, mode: th.mode, byFocus: th.byFocus, pending: !!th.pending } };
 }

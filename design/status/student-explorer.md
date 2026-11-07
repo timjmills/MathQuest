@@ -154,3 +154,46 @@ round that leaves a defect open starts by making the check fail on the failed co
   Backtest: FAIL (7) on f6b8d19f4, OK on this head.
 - Merged origin/master and restamped. Gates OK: ws-student-explorer, boot-smoke, search-terms, code-snapshot (732), teacher-shell,
   simple-print, screen-answer, chromebook-perf --only load (first 6.7-7.1 s), stamp --check.
+
+## Hover thumbnails (owner, 2026-11-05: "on the students skills navigator page give a thumbnail of the skill when mousing over")
+
+Built (Opus medium: the first build of a new screen element), `js/modules/student-explorer.js` + `css/student-explorer.css`
+(additive):
+
+- Hovering a card with a mouse or pen, or focusing it with the keyboard (`:focus-visible`), shows a thumbnail after 500 ms
+  (150 ms when moving straight from one card to the next). It is the card's seeded sample item (seed 11, the same item as
+  the card's short text example, cached per skill), drawn as the black-and-white paper cell the pupil sees: teacher-preview.js
+  `mountQuestion` (the cell the teacher's hover preview draws: `.mq-scell.ws-cell`, the skill's visual, the screen verb
+  swap, `monoCell`), scaled to fit a 340 px x 210 px frame, with the pupil name (pupil-names.js) as its caption. Question
+  only: the answer slots are empty, and a drawing that already carries its own answer boxes gets no second answer line.
+- teacher-preview.js is imported on the first hover only (nothing added to startup); a skill whose generator throws or
+  takes > 50 ms shows its text example instead (today: 0 of 716).
+- Placement: beside the card on the side with room (right, left, below, above), clamped inside the viewport, never over the
+  pointer or the card (so never over its tick); `position: fixed`, `pointer-events: none`, so no sideways scroll and it
+  never traps the mouse.
+- Hides on mouse leave, any press, a scroll of the list (a keyboard thumbnail follows its focused card instead while the card
+  is in view), Esc (the first Esc hides it and keeps the dialog; the next closes the dialog), blur, window resize / blur, and
+  every re-render (`render()` and `close()` call `hideThumb()`). A token guards the async show, so a late show never sticks.
+- Touch screens (`(pointer: coarse)` with no `(any-hover: hover)`) get no hover thumbnail; only a real mouse/pen pointer event
+  opens one (headless Chrome reports `pointer: none`, which is not treated as touch). A tap still picks. The optional
+  "Look" button was not added.
+- Accessible: `role="tooltip"` (`#mqxThumb`), `aria-describedby` on the hovered / focused card while it shows, focus never
+  moves.
+
+Gate: THUMB checks in `tests/scripts/ws-student-explorer.cjs` (hover at 1366x768 and 820x1180 on a left and a right card:
+shown within 1 s, a `.ws-cell`/`.mq-scell`, no filled box, no answer token the question does not carry, 260-360 px, inside
+the viewport, off the pointer and the card's tick, no sideways scroll, aria-describedby, caption = pupil name; hides on mouse
+leave, Esc (dialog stays, next Esc closes), scroll, re-render; keyboard Tab shows it without moving focus, Esc hides it, blur
+hides it; 390x844 touch: a tap picks and no thumbnail appears; sweep of all 716 skills: 716 cells, 0 text fallbacks, no
+throw, no console error, no answer shown). The checks fail on f08bd11b1 (no thumbnail) and pass now.
+
+Gates (one at a time): ws-student-explorer OK · ws-boot-smoke OK · ws-simple-print OK · ws-teacher-shell OK ·
+ws-screen-answer OK · ws-chromebook-perf --only load OK (first load 7174 / 7094 / 6972 ms, under 7.3 s; 191 startup modules,
+unchanged: the thumbnail code is inside the lazy explorer module) · ws-stamp-assets + --check OK.
+
+Screenshots (`design/status/student-explorer/`): `explorer-thumb-1366.png`, `explorer-thumb-820.png` (hover),
+`explorer-thumb-none-390.png` (touch: tap picked, no thumbnail), `explorer-thumb-samples-1366.png` (12 thumbnails: clock,
+fraction bars, number line, bar graph, area, rounding, coins, angle, pictograph, shape, array, compare fractions).
+
+Not yet graded by an independent critic. Known limits: small text in dense legacy visuals (bar graph, angle) is scaled to
+fit the 340 px frame; a few legacy items keep teacher-preview's extra answer line under a "= ?" written in text.
