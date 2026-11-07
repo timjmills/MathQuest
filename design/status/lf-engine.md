@@ -4,16 +4,15 @@ Session: session_013pHDnLTpMERUWs7oNEgzJ3
 Branch: claude/sweet-newton-c8wrv1-lf-engine
 Owner of files: lessons/{library,schema,compile}.js, lessons/shapes|units|families, sheet/lesson-pages|lesson-arch, roles/{lesson,detailed-lesson,pre-skill-check}.js, print-sheet buildLesson/buildDetailedLesson, ws-lesson-{card,seed,coverage,hash,unit,baseline}, design/lessons/
 Builder profile: mq-opus-medium
-State: fix
+State: paused
 Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
-- Live fixes R1 R2 R4 R5 verified on master-shaped branch `claude/sweet-newton-c8wrv1-lf-engine-live` (517b8a39, cbd58203, 0ae3ded2; boot-smoke, teacher-wrm, detailed-lesson 1/3a/4/5/6 OK) — sent to the lead for deploy.
-- Critic r2 FAIL min 6; P1b fixed N1 (sub L Independent row back), N2 floor, N3, N4, D16, lesson 7 D2 (repeatKey), R1 R2 R4, R5 in part (rule 7: 3a turned-array repeats need a content/check ruling).
-- P1c running (stops 15:00 UTC): practiceBlocks (lf-ops), guidedRows (lf-algebra), R6 R8 R9, lesson 2 gate findings, N5-N8 + layout switches, samples' Practice/Mixed fill, re-render for critic r3.
-- P2 compiler merged; P2b proof (render diff 1-5, hold-outs 6, 7) not started — next after critic r3, next week's budget.
-- Pilot command ready: `node tests/scripts/ws-lesson-card.mjs --draft --unit G3-Y4.B4`.
+- PAUSED at the week's budget stop (14:35 UTC, session $132.31 ≈ 6.6 %). Hand-over below ("Hand-over 2026-11-07").
+- Live: R1 R2 R4 R5 on master (ef532943). Ready for the next deploy on `claude/sweet-newton-c8wrv1-lf-engine-live` (from ef532943): 804b7e7d R9, b6c02e4e R8, 9988cce1 R6, 76fd396d lesson 2 E24, 39244416 lesson 4 LP-GIVEAWAY - each `ws-detailed-lesson --check --repeats` on that tree.
+- Phase 0 pages: critic r2 FAIL min 6; N1 N3 N4 fixed, N2 floor fixed; samples re-rendered (7744c2b4); critic r3 not run.
+- Compiler (P2) merged; proof P2b not started.
 
 ## Owner go
 
@@ -21,6 +20,19 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 - Owner ruling 2026-11-07 (via the lead), lesson 3a g3-oa5-mult-properties: every fact family once, arrays up to 6 × 6 (products ≤ 36, ~15 pairs); the only turned pair is the one the task asks the pupil to draw; the lf-checks LP-FAMILY-REPEAT gate is right; 3a's Practice pages need a re-grade. Queued after lesson 2 + lesson 4 LP-GIVEAWAY.
 - Owner 2026-11-07: lesson 2 shipped with its 4 gate findings (live fixes on master ef532943a).
 (none: owner ruling 2026-11-07, the lane decides card lines from the standards; decisions are in LESSON_RULES LR-17a and the cards)
+
+## Hand-over 2026-11-07
+**State.** Merge oracle holds (detailed lessons byte-identical to master except the listed fixes). Phase 0 fix round: D1-D18, D20, L7 D1; critic r2 FAIL min 6 (add + round sheets PASS 8; check / routing pages 7; sub L sheet 6 -> fixed N1 since). Compiler E4 built: card format, ws-lesson-card, compileLesson, shapes, SHAPES.md (843 lessons; 19 of 64 BUILD lessons in passed shapes, 45 need new shapes), 7 proof cards compile. Keys for other lanes: practiceBlocks 6bcfe3cc (lf-ops), guidedRows 50c1eca6 (lf-algebra).
+**Remaining, in order (next week, Opus medium):**
+1. Deploy the -live branch's 5 commits (R9, R8, R6, lesson 2 E24, lesson 4 Say line).
+2. Lesson 2 (g1-oa1) E24b: pool exhausted (crossing-ten stories with parts 3-9 ≈ 15 facts; chart, sheet, P5, P6, Check Question take 9; the ±2 near-twin rule leaves no 4th Practice story) - needs a data decision: widen the parts to 2-9 / sums to 18 with ±1 near-twin, or Practice 3 stories. E35 (lessons 2 and 7): probably ws-detailed-lesson's bodyText joins text nodes with " | " (lf-checks: compare against printed.replace(/ \| /g, ' ')). E9 P6 +5 mm: not investigated.
+3. Lesson 3a owner ruling (every family once, arrays to 6): not done (rule 7). Practice 1's arrP1 pool (non-square, no 5s, products <= 16-18 so array + turn fit a half cell at L) has only 4-5 families. Needs a layout decision for Practice 1: one column of taller cells (cells full width), or drop "no 5s". Array-family support in repeatKeysOf is in (88266322).
+4. Phase 0 pages to critic r3: N2 narrower re-choice; N5 tab padding; N6 paired-band alignment; N7 titles with a topic; N8 (stack.js draws T O heads and answer boxes only at scaffold >= 2 while the rows are measured at 1 - set heads/answer on the payload before measuring); add_facts#lesson DN-2 0->1; samples' Practice / Mixed page fill (round cells 61 x 42 mm, 49 % bands: design call - 15-item ceiling vs the faded number line on Practice cells). Then critic r3 on design/lesson-samples (re-rendered 7744c2b4), r2 PNGs for side-by-side in the critic r2 commit.
+5. `ws-lesson-hash --sheets`: 25 of 46 library sheets have no Independent row - the prereqsPending lessons (no-regroup subtraction, stories, fact_family_sort): fix with the sheet reflow or give them Prerequisite Checks.
+6. P2b proof: render each compiled lesson 1-7 (`buildSheet({role:'detailed-lesson', description})` now takes a compiled description) and diff against the passed pack (design/lessons/proof/DIFF.md has the structural diff); critic; then swap the registry to compiled descriptions.
+7. Pilot: `node tests/scripts/ws-lesson-card.mjs --draft --unit G3-Y4.B4`.
+**Gates at hand-over (lane head):** ws-detailed-lesson --check --repeats lessons 1, 3a, 4, 5, 6 OK, 2 and 7 FAIL (above); ws-teacher-wrm OK; ws-precritic --role lesson --strict FAIL (12 other-family pin rises, master too, + add_facts DN-2); ws-lesson-check 667 (LR-5 434, LR-13 133, LR-1 62, LR-6 23, LR-7 10, LR-10 3, LR-16 2); ws-lesson-unit (194), ws-layout-unit (1758), ws-lesson-coverage, ws-lesson-compile-unit (45), ws-lesson-card --check, ws-lesson-seed --check, ws-boot-smoke, ws-code-snapshot (732) OK; ws-backtest 81 PASS 1 FAIL (simple-print-exact-missing, fails in both states, not this lane). ws-lesson-baseline vs master: 148 of 303 differ = 120 samples + lesson 1 (R2, R9), 2 (builds), 4 (Say line), 5 (R6), 6 (R2, R8).
+**Owner questions:** none open (rulings recorded above).
 
 ## Log
 - 2026-11-07 — Merge: phase 0 + integration tip 623fdd6 (744aa9e5); 5 conflicts; master's lesson 6/7 + visual-quality hunks ported into lesson-pages/* and lesson-arch/*; master's new lesson records ported into families/addsub.js, multdiv.js. Oracle ws-lesson-baseline vs master: 183/183 detailed hashes identical, 120 sample hashes differ (LR-17, intended). Lesson 2 errors on master too (R1).
@@ -78,6 +90,11 @@ Automatic checks: a source-level unit + backtest for every dealer flag (pageFres
 Speed-ups: a small build harness (one build, page hashes, console capture) found R1, R2, N1 in minutes each (move to tests/lib); page-by-page hashing against a known-good older tree proved R2 restored; chain long browser gates in one background job; per-page CSS inline (shared LESSON_CSS edits change every page's hash).
 For lf-checks: ws-detailed-lesson protocolTimeout 0 + polling; LP-FAMILY-REPEAT vs factKeyOf on turned arrays (3a ruling); precritic --lesson builds the compiled description (req.description).
 
+### P1c (11:14-14:30 UTC)
+Automatic checks: `ws-lesson-hash --sheets` (built, backtest lesson-sheet-indep); routing-page overflow on precritic's path; a pool-capacity check per detailed lesson (facts available vs facts the pack needs under LR-5 / LR-6 - would have flagged lesson 2 and 3a before any deal); E35 text-node normalisation (lf-checks); a backtest's pass commit re-checked when its test group grows.
+Speed-ups: lf-checks `--lp` / `--sweep` with MQ_ROOT on any tree gives a 1-5 min proof per live fix; ws-backtest with MQ_BACKTEST_TMP on a large disk, or prune /tmp/mq-backtest-* first (3.7 GB of stale worktrees filled the disk); ws-lesson-samples `--copy` deletes the committed S/ folders (fix it, lf-checks).
+
 ## Cost
 - 08:20 UTC: session cost_usd $39.56 (≈ 2.0 % of the weekly limit at $20 ≈ 1 %).
 - 11:00 UTC: session cost_usd $80.04 (≈ 4.0 %). Cap $470 (23.5 %).
+- 14:31 UTC (hand-over): session cost_usd $132.31 ≈ 6.6 % of the weekly limit ($20 ≈ 1 %), sub-agents included. P1 ≈ $85, P2 ≈ $25, coordination ≈ $20 (estimates from the running total).
