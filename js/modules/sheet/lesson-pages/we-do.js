@@ -25,7 +25,7 @@ import { stripHtml } from './practice.js';
 export const guidedRowsOf = (data) => (data && Number(data.guidedRows) === 1 ? 1 : Math.max(2, Math.min(4, Number(data && data.guidedRows) || 2)));
 
 /** The Guided ("we do") items: the example's kind first (same strategy, same digit shape). */
-export function pickWeDo(items, example, data, n) {
+export function pickWeDo(items, example, data, n, others = []) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const ex = sigOf(example);
     const shape = digitsOfOps(example);
@@ -50,7 +50,8 @@ export function pickWeDo(items, example, data, n) {
         // nor the same answer; a + item only, so other lessons' wants pick as before)
         const plus = (x) => { const q = (x && x.q) || {}; const st = q.cell && q.cell.payload && (q.cell.payload.steps || [])[0]; const o = operandsOf(q).map(Number); return (q.op === '+' || (st && st.op === '+')) && o.length >= 2 ? o : null; };
         const twin = (x, y) => { const a = plus(x), b = plus(y); if (!a || !b) return false; const da = Math.abs(a[0] - b[0]), db = Math.abs(a[1] - b[1]); return a[0] + a[1] === b[0] + b[1] || (da <= 2 && db <= 2); };
-        // (the chart's own fact or its turn-around - LR-5, critic r3 D1)
+        // (the chart's own fact or its turn-around - LR-5, critic r3 D1; `others`: the chart's other examples too - P1c item 4,
+        // lesson 2's E24: the second example 7 + 5 came back as Guided cell 2)
         const sameFact = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && (a.join() === b.join() || a.join() === [b[1], b[0]].join()); };
         // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
         // (lesson 2 r5, critic r3 m3: no story person twice on the sheet while the deal can - "Lena has 7 cards" and "Lena has 6")
@@ -63,7 +64,7 @@ export function pickWeDo(items, example, data, n) {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
             if (!t) return pickLead(k + 1, chosen, nm);
-            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !msTwin(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
+            for (const x of order) if (!chosen.includes(x) && t(x) && !chosen.some((y) => meets(x, y, nm)) && !sameFact(x, example) && !others.some((e) => sameFact(x, e)) && !msTwin(x, example) && !winShare(x, example)) { const r = pickLead(k + 1, [...chosen, x], nm); if (r) return r; }
             return null;
         };
         const fit = pickLead(0, [], true) || pickLead(0, [], false);
@@ -177,7 +178,8 @@ export function weDoBand(env) {
     const stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
     if (stackRows) gk = stackRows;
     const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4);
-    let weDo = example ? pickWeDo(weDoPool, example, data, gk) : rest.slice(0, gk);
+    const exOthers = [example2, example3, example4].filter(Boolean);
+    let weDo = example ? pickWeDo(weDoPool, example, data, gk, exOthers) : rest.slice(0, gk);
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);
     const gH = stackRows ? Math.max(20, hAt(weDo, 2) + lineExtra(weDo)) * stackRows : Math.max(hAt(weDo, gcols) + lineExtra(weDo), 20) + (cue(weDo) ? 2 : 0);
     const weH = Math.max(gH, zH);
@@ -194,10 +196,10 @@ export function weDoBand(env) {
     const wideG = !!(data && data.chartWide);
     if (wideG && stepsZone && stripX && example) {
         const gw = guidedRowsOf(data);
-        const set = pickWeDo(weDoPool, example, data, gw).slice(0, gw);
+        const set = pickWeDo(weDoPool, example, data, gw, exOthers).slice(0, gw);
         if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
     } else if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
-        const w3 = example ? pickWeDo(weDoPool, example, data, 3) : rest.slice(0, 3);
+        const w3 = example ? pickWeDo(weDoPool, example, data, 3, exOthers) : rest.slice(0, 3);
         const k = w3.length >= 3 && fitsWidth(w3.slice(0, 3), 3) ? 3 : Math.min(2, w3.length);
         const set = w3.slice(0, k);
         const tc = k === 3 ? 3 : 2;
