@@ -36,7 +36,15 @@ Critic rounds: 0, none
 | 13 | Count on to 120 (1.NBT.A.1) | out | k2 lane's skills and build |
 | 14, 15 | × decimals by decimals; ÷ by a decimal (5.NBT.B.7) | sizing only | gen-fractions.js (fractions lane) |
 
+## Process rules recorded here
+- First family on a template (lead ruling R1, 2026-11-07): ws-sibling-compare cannot prove rule 0b when no approved sibling exists;
+  the NO-SIBLING matrix rows go to the critic as named pages to grade (listed in the brief), and the family's passing skills are added
+  to tests/fixtures/precritic/siblings.json as approved siblings in the same change as redesign-passed.js. Sent to lf-checks for LESSONS_LEARNED.
+- A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
+
 ## Log
+- 2026-11-07 precritic r2 (9888bad1 = integration tip + lane): 25 PASS, 2 FAIL (sibling-compare, options-render combine zeroPlace=none L),
+  1 SKIPPED (card-not-offered); lead rulings R1-R3 (owner pin "Yes, accept 10"); critic r1 launched.
 - 2026-11-07 r0 → fixes (4193f4b, a73304fd): combine dealer (dealIndex + freshDeal), CL-40 spacer for pv / pv-support equation rows
   (page + measuring cell), WRAP-OP (no-break expression; numeric frames never break), lesson data for 5 skills (chartWide / chartRow /
   tailLast), combine's worked steps write one digit a step. Backtests pv-combine-dealer, pv-lesson-data, pv-equation-row-cl40: PASS.

@@ -13,6 +13,12 @@
     "why": "owner ruling 2026-11-07 (lf-placevalue Q4, \"Yes, accept all four\", via the lead): the longer written answer is the form being taught; the page stays full at its own column count. Measured r0: S 10 vs 20, L 4 vs 12"
    }
   },
+  "placevalue:combine": {
+   "zeroPlace": {
+    "values": ["none"],
+    "why": "owner ruling 2026-11-07 (lf-placevalue R3, \"Yes, accept 10\", via the lead): with no zero place every item has three parts and is wider than the mixed default page; the longer written answer is the form being taught. Measured r2: L 10 vs 11"
+   }
+  },
   "placevalue:value": {
    "form": {
     "values": ["unit", "notation"],

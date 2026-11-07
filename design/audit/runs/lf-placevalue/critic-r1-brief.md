@@ -28,3 +28,102 @@ zero place kept, nothing in the drawing giving the answer away, instructions / s
 grades and the cap applied; then numbered findings `F1 …` each with the page, what is wrong, the rule id, and whether a
 machine could have measured it (name the check). End with `VERDICT: PASS` (every graded page ≥ 8 on every criterion)
 or `VERDICT: FAIL` and the list of failing (skill, page, criterion). Do not edit any other file.
+
+**Named pages to grade (lead ruling R1, 2026-11-07: pv is the template's FIRST family, so these matrix rows have no approved
+sibling to compare against; you grade them).** Each is `skill|kind/row size lint rule (count)` from ws-coverage-matrix, run
+`/tmp/mq-precritic/20261107-083738-28224`; render each with `node tests/scripts/ws-coverage-matrix.cjs --skills <skill> --rows <kind/row>` or
+read the row's saved document in that run. Judge whether the density finding is a real defect (C2 / H13) on that page:
+
+- `placevalue:combine|mixed/defaults S L-DENSITY PG-23 (2)`
+- `placevalue:combine|mixed/defaults M L-DENSITY PG-23 (2)`
+- `placevalue:combine|sections/ex-each S L-DENSITY GRID-EVEN (2)`
+- `placevalue:combine|sections/ex-each M L-DENSITY DN-2 (2)`
+- `placevalue:combine|sections/ex-each L L-DENSITY PG-23 (2)`
+- `placevalue:combine|sections/ex-each L L-DENSITY SPREAD (1)`
+- `placevalue:combine|sections/ex-group S L-DENSITY DN-2 (2)`
+- `placevalue:combine|sections/ex-group M L-DENSITY DN-2 (2)`
+- `placevalue:combine|sections/pages-2 S L-DENSITY DN-2 (4)`
+- `placevalue:combine|sections/pages-2 S L-DENSITY PAGEFILL (2)`
+- `placevalue:combine|sections/pages-2 M L-DENSITY DN-2 (4)`
+- `placevalue:combine|sections/pages-2 M L-DENSITY PAGEFILL (2)`
+- `placevalue:combine|sections/pages-2 L L-DENSITY DN-2 (2)`
+- `placevalue:combine|sections/pages-2 L L-DENSITY LONE (1)`
+- `placevalue:combine|sections/pages-2 L L-DENSITY PAGEFILL (2)`
+- `placevalue:combine|single/ex-each S L-DENSITY GRID-EVEN (2)`
+- `placevalue:combine|single/ex-each M L-DENSITY GRID-EVEN (2)`
+- `placevalue:combine|single/more-cols2+afterpage M L-DENSITY H13 (6)`
+- `placevalue:combine|single/more-cols2+short M L-DENSITY H13 (3)`
+- `placevalue:combine|single/pages-3 L L-DENSITY PAGEFILL (1)`
+- `placevalue:expand|mixed/defaults S L-DENSITY PG-23 (2)`
+- `placevalue:expand|mixed/defaults M L-DENSITY PG-23 (2)`
+- `placevalue:expand|sections/ex-each S L-DENSITY GRID-EVEN (2)`
+- `placevalue:expand|sections/ex-group S L-DENSITY DN-2 (2)`
+- `placevalue:expand|sections/pages-2 S L-DENSITY DN-2 (4)`
+- `placevalue:expand|sections/pages-2 S L-DENSITY PAGEFILL (3)`
+- `placevalue:expand|sections/pages-2 M L-DENSITY DN-2 (4)`
+- `placevalue:expand|sections/pages-2 M L-DENSITY LONE (1)`
+- `placevalue:expand|sections/pages-2 M L-DENSITY PAGEFILL (3)`
+- `placevalue:expand|sections/pages-2 L L-DENSITY DN-2 (2)`
+- `placevalue:expand|sections/pages-2 L L-DENSITY LONE (1)`
+- `placevalue:expand|sections/pages-2 L L-DENSITY PAGEFILL (2)`
+- `placevalue:expand|single/ex-each S L-DENSITY GRID-EVEN (2)`
+- `placevalue:expand|single/more-cols2+afterpage M L-DENSITY PAGEFILL (1)`
+- `placevalue:expand|single/more-cols2+afterpage L L-DENSITY PAGEFILL (1)`
+- `placevalue:expand|single/more-cols2+short M L-DENSITY PAGEFILL (1)`
+- `placevalue:expand|single/more-cols2+short L L-DENSITY PAGEFILL (1)`
+- `placevalue:identify|mixed/defaults M L-DENSITY PG-23 (2)`
+- `placevalue:identify|sections/ex-each L L-DENSITY SPREAD (1)`
+- `placevalue:identify|sections/pages-2 S L-DENSITY DN-2 (4)`
+- `placevalue:identify|sections/pages-2 S L-DENSITY PAGEFILL (2)`
+- `placevalue:identify|sections/pages-2 S L-DENSITY SPREAD (1)`
+- `placevalue:identify|sections/pages-2 M L-DENSITY DN-2 (4)`
+- `placevalue:identify|sections/pages-2 M L-DENSITY PAGEFILL (2)`
+- `placevalue:identify|sections/pages-2 M L-DENSITY SPREAD (1)`
+- `placevalue:identify|sections/pages-2 L L-DENSITY DN-2 (4)`
+- `placevalue:identify|sections/pages-2 L L-DENSITY PAGEFILL (3)`
+- `placevalue:identify|sections/pages-2 L L-DENSITY PG-23 (2)`
+- `placevalue:identify|single/ex-each S L-DENSITY GRID-EVEN (2)`
+- `placevalue:identify|single/ex-each S L-DENSITY SPREAD (1)`
+- `placevalue:identify|single/ex-each L L-DENSITY GRID-EVEN (2)`
+- `placevalue:identify|single/ex-each L L-DENSITY SPREAD (1)`
+- `placevalue:unit_form|mixed/defaults S L-DENSITY PG-23 (2)`
+- `placevalue:unit_form|mixed/defaults M L-DENSITY PG-23 (2)`
+- `placevalue:unit_form|sections/ex-each L L-DENSITY SPREAD (1)`
+- `placevalue:unit_form|sections/pages-2 S L-DENSITY DN-2 (4)`
+- `placevalue:unit_form|sections/pages-2 S L-DENSITY LONE (1)`
+- `placevalue:unit_form|sections/pages-2 S L-DENSITY PAGEFILL (2)`
+- `placevalue:unit_form|sections/pages-2 M L-DENSITY DN-2 (4)`
+- `placevalue:unit_form|sections/pages-2 M L-DENSITY LONE (1)`
+- `placevalue:unit_form|sections/pages-2 M L-DENSITY PAGEFILL (2)`
+- `placevalue:unit_form|sections/pages-2 L L-DENSITY DN-2 (2)`
+- `placevalue:unit_form|sections/pages-2 L L-DENSITY LONE (1)`
+- `placevalue:unit_form|sections/pages-2 L L-DENSITY PAGEFILL (2)`
+- `placevalue:unit_form|single/more-cols2+afterpage S L-DENSITY PAGEFILL (1)`
+- `placevalue:unit_form|single/more-cols2+afterpage M L-DENSITY PAGEFILL (1)`
+- `placevalue:unit_form|single/more-cols2+afterpage L L-DENSITY PAGEFILL (1)`
+- `placevalue:unit_form|single/more-cols2+short S L-DENSITY PAGEFILL (1)`
+- `placevalue:unit_form|single/more-cols2+short M L-DENSITY PAGEFILL (1)`
+- `placevalue:unit_form|single/more-cols2+short L L-DENSITY PAGEFILL (1)`
+- `placevalue:value|mixed/defaults S L-DENSITY PG-23 (2)`
+- `placevalue:value|mixed/defaults M L-DENSITY PG-23 (2)`
+- `placevalue:value|sections/ex-each S L-DENSITY DN-2 (2)`
+- `placevalue:value|sections/ex-group S L-DENSITY DN-2 (2)`
+- `placevalue:value|sections/ex-group M L-DENSITY DN-2 (2)`
+- `placevalue:value|sections/ex-group L L-DENSITY PG-23 (2)`
+- `placevalue:value|sections/pages-2 S L-DENSITY DN-2 (2)`
+- `placevalue:value|sections/pages-2 S L-DENSITY PAGEFILL (2)`
+- `placevalue:value|sections/pages-2 S L-DENSITY SPREAD (1)`
+- `placevalue:value|sections/pages-2 M L-DENSITY DN-2 (2)`
+- `placevalue:value|sections/pages-2 M L-DENSITY PAGEFILL (2)`
+- `placevalue:value|sections/pages-2 M L-DENSITY SPREAD (1)`
+- `placevalue:value|sections/pages-2 L L-DENSITY DN-2 (6)`
+- `placevalue:value|sections/pages-2 L L-DENSITY PAGEFILL (3)`
+- `placevalue:value|sections/pages-2 L L-DENSITY PG-23 (2)`
+- `placevalue:value|single/ex-each S L-DENSITY GRID-EVEN (2)`
+- `placevalue:value|single/ex-each M L-DENSITY GRID-EVEN (2)`
+- `placevalue:value|single/ex-each L L-DENSITY GRID-EVEN (2)`
+- `placevalue:value|single/more-cols2+afterpage S L-DENSITY H13 (20)`
+- `placevalue:value|single/more-cols2+short S L-DENSITY H13 (10)`
+
+**Also ruled (lead, 2026-11-07):** ws-card-rulings `--check offered` SKIPPED is green for this card (every §7a option is offered);
+capacity pins (owner): expand form=notation, value form=unit / notation, identify response=bank, combine zeroPlace=none.
