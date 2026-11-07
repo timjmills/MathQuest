@@ -624,6 +624,15 @@ const PARSE = {
     },
 };
 
+/* ============================================================== the signed cards' plan (tests/lib/ws-card-plan.mjs) */
+/** {cat:skill -> {cards, roles, variants}} from the signed spec cards (lane lf-ops critic r1, check 2). {} when the reader fails. */
+function cardPlans(keys) {
+    const file = path.join(ROOT, 'tests', 'lib', 'ws-card-plan.mjs');
+    if (!keys.length || !fs.existsSync(file)) return {};
+    const r = spawnSync(process.execPath, [file, '--root', ROOT, '--skill', keys.join(',')], { encoding: 'utf8', timeout: 60000 });
+    try { return Object.fromEntries(JSON.parse(String(r.stdout || '').trim().split('\n').pop()).map((p) => [p.skill, p])); } catch (e) { return {}; }
+}
+
 /* ============================================================== plan */
 function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
@@ -764,8 +773,24 @@ function buildPlan(ctx) {
         // cell edge, never content run into the pad; no screen gate measured target size). --gate makes those measurements a
         // verdict: every overflow on the lane skills' lesson, test and independent pages at S, M and L, and every card-390 /
         // card-820 target under 44 px (RUBRIC H6). The renders land in the log dir for the critic too.
-        add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
-            ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+        // Lane lf-ops critic r1 (check 2, speed-up 3; the lead, 2026-11-07: THE plan for every lane): a skill a SIGNED spec
+        // card covers is rendered on every page role the card's §7a offers, not lesson / test / independent only (Reason It
+        // OVERFLOW sat in the logs of all three r1 skills and nothing failed), one skill a run (speed-up 1: three skills x
+        // nine roles hit the 10-minute limit). And ws-cell-checks (seconds a page, no PDF) checks those roles AND every
+        // option value the card offers (each non-default value, and every value of a set option at once) on lesson,
+        // independent, guided, test and review at S / M / L. Skills no card covers keep the fixed role list.
+        const plans = cardPlans(keys);
+        const carded = keys.filter((k) => plans[k] && plans[k].cards.length);
+        const plain = keys.filter((k) => !carded.includes(k));
+        if (plain.length) add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${plain.length <= 3 ? plain.join(', ') : plain.length + ' skills'} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
+            ['--skills', plain.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: plain.length }));
+        for (const k of carded) {
+            const pl = plans[k], sid = k.split(':')[1];
+            add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${pl.roles.length} roles × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
+                ['--skills', k, '--roles', pl.roles.join(','), '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+            add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × S/M/L`, 'browser', 'ws-cell-checks',
+                ['--skills', k, '--card', '--card-opts'], { needFlags: ['card-opts'], expect: { mention: [k] }, missingMsg: 'ws-cell-checks is not in this tree' }));
+        }
         const ssFile = scriptPath('ws-screen-slots');
         const ss = ['--skills', keys.join(',')];
         if (ssFile && srcHas(ssFile, 'baseline') && fs.existsSync(SLOTS_BASE)) ss.push('--baseline', rel(SLOTS_BASE));
