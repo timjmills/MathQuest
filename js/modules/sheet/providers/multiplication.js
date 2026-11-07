@@ -98,8 +98,8 @@ registerSkill('multiplication:arrays_groups', {
         }
         const many = p.kind === 'row' ? 'rows' : 'groups';
         return [
-            step(`Count the ${many}: ${p.groups}.`, [{ slot: 'groups', value: String(p.groups) }]),
-            step(`Count one ${p.kind}: ${p.size} in each.`, [{ slot: 'size', value: String(p.size) }]),
+            step(`Count the ${many}: ${p.groups}.`, [{ slot: 'first', value: String(p.groups) }]),
+            step(`Count one ${p.kind}: ${p.size} in each.`, [{ slot: 'second', value: String(p.size) }]),
             step(`Count by ${p.size}, ${p.groups} times: ${countList(p.size, p.total, p.size)}.`),
             step(`${p.groups} ${many} of ${p.size} is ${p.total}. Write ${p.total}.`, [{ slot: 'total', value: String(p.total) }]),
         ];
@@ -116,10 +116,10 @@ registerSkill('multiplication:arrays_groups', {
         }
         return chooseWrong(q, [
             { value: p.groups + p.size, misconception: 'added', slot: 'total',
-                slots: { groups: String(p.groups), size: String(p.size), total: String(p.groups + p.size) },
+                slots: { first: String(p.groups), second: String(p.size), total: String(p.groups + p.size) },
                 explain: `Added ${p.groups} and ${p.size} instead of counting ${p.groups} groups of ${p.size}.` },
             { value: p.total - p.size, misconception: 'one-group-short', slot: 'total',
-                slots: { groups: String(p.groups), size: String(p.size), total: String(p.total - p.size) },
+                slots: { first: String(p.groups), second: String(p.size), total: String(p.total - p.size) },
                 explain: `Skip counted ${p.groups - 1} times, not ${p.groups}.` },
         ].map((c) => Object.assign(c, { value: typeof q.ans === 'string' ? String(c.value) : c.value })));
     },

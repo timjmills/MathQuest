@@ -22,6 +22,7 @@ import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, splitRemainder, HAIR, HEAVY } from './ops-common.js';
 import { INK } from '../tokens.js';
 import { looseArray } from './k2kit.js';
+import { stepMarks } from '../steps.js';
 
 /* ------------------------------------------------------------------ shared drawing */
 
@@ -56,7 +57,7 @@ const dot = (cx, cy, r, open) => `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed
  * every column count - so the drawing is the same in 1 column and in 2 (DN-10: a narrower
  * column never re-flows it), and each line is at most about 66 mm wide at L.
  */
-function sentence(g, parts, { vals, ink, twin, textEm }) {
+function sentence(g, parts, { vals, ink, twin, textEm, inks = null }) {
     const bw = Math.max(g.writeMm * 1.8, 2 * 0.62 * g.E + 3);
     const clauses = [];
     let cur = [];
@@ -64,7 +65,7 @@ function sentence(g, parts, { vals, ink, twin, textEm }) {
         if (part === '|') { clauses.push(cur); cur = []; continue; }
         cur.push(typeof part === 'string'
             ? `<span style="font-size:${textEm.toFixed(3)}em">${esc(part)}</span>`
-            : box(g, part.id, { wMm: part.wMm || bw, hMm: g.stripMm, value: vals[part.id] || '', ink, mark: twin ? part.mark || 'cell' : null }));
+            : box(g, part.id, { wMm: part.wMm || bw, hMm: g.stripMm, value: vals[part.id] || '', ink: inks && inks[part.id] !== undefined ? inks[part.id] : ink, mark: twin ? part.mark || 'cell' : null }));
     }
     if (cur.length) clauses.push(cur);
     return `<div style="margin-top:${g.em(2.5)};display:flex;flex-direction:column;align-items:center;gap:${g.em(1.5)};line-height:1.15">`
@@ -193,6 +194,13 @@ register('arrays', {
             if (oneBox(p) || l.length === 1) return { total: l[l.length - 1] };
             return { first: l[0], second: l[1], total: l[2] };
         });
+        // (lane lf-ops: a lesson chart's step state - `stepVals` {slot: {value, ink}} - writes only the slots its steps have reached)
+        let inks = null;
+        if (ctx.stepVals) {
+            inks = {};
+            for (const id of Object.keys(vals)) delete vals[id];
+            for (const [id, v] of Object.entries(ctx.stepVals)) { vals[id] = v.value; inks[id] = v.ink; }
+        }
         const pic = arraysPicture(g, p);
         const rows = Number(p.rows), cols = Number(p.cols);
         // "[ ] groups of [ ]." mirrors "[ ] rows of [ ]." ("There are" made the line 97 mm at L,
@@ -209,13 +217,14 @@ register('arrays', {
         // On screen the rows-of / groups-of sentence is the host's own inline-blank prompt, so
         // the twin draws the picture alone; the count-all box is the one answer (SL-7).
         const showSentence = !g.twin || oneBox(p);
-        const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1 }) : '';
+        const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1, inks }) : '';
         // (lane lf-ops: on paper the rows-of / groups-of picture sits in the skill's one picture box, below the number
         // tab's keep-out - CL-40: a wide ring row reached 4.7 mm across, 3.5 mm down at M - a fixed spacer of
         // (tab side - 2 mm), as the kit's counters and remainder cells take)
         const boxed = !g.twin && SENTENCE_KINDS.includes(p.kind) && Number(p.rows) <= 5 && Number(p.cols) <= 5;
         const spacer = boxed ? '<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>' : '';
-        const picHtml = boxed && p.picBox
+        // (a lesson chart's state draws its one example: no page of pictures to share a box with)
+        const picHtml = boxed && p.picBox && !ctx.stepVals
             ? `${spacer}<div style="height:${g.em(pictureBoxH(g))};display:flex;align-items:flex-start;justify-content:center">${pic.svg}</div>`
             : `${spacer}${pic.svg}`;
         return root(g, 'arrays', `${picHtml}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
@@ -231,6 +240,13 @@ register('arrays', {
         const pic = arraysPicture(g, p);
         // The picture or the widest sentence line (about 66 mm at L), plus the pads.
         return { wMm: Math.ceil(Math.max(pic.wMm, 66) + 6), hMm: null, measure: true, factLike: false, maxCols: 2 };
+    },
+    /** The lesson chart's state k (provider marks: first / second / total; `groups` / `size` read as first / second). */
+    lessonStepState(p, steps, k, ctx) {
+        const sv = {};
+        const alias = { groups: 'first', size: 'second', rows: 'first', cols: 'second', answer: 'total' };
+        for (const m of stepMarks(steps, k)) { const id = alias[m.slot] || m.slot; if (['first', 'second', 'total'].includes(id)) sv[id] = { value: m.value, ink: m.ink }; }
+        return this.render(p, Object.assign({}, ctx, { state: 'blank', stepVals: sv }));
     },
     inputs(p) {
         const ids = oneBox(p) ? ['total'] : ['first', 'second', 'total'];

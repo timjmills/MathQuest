@@ -438,13 +438,13 @@ function opsTablesLessons() {
                 { id: 'in-all', text: 'The last number said is how many in all.' },
             ],
             vocab: [
-                { word: 'row', meaning: 'a line of dots going across', picture: { kind: 'text', text: '● ● ● ●' } },
+                { word: 'row', meaning: 'a line of dots going across', picture: { kind: 'text', text: '4 in a row' } },
                 { word: 'array', meaning: 'equal rows of dots', picture: { kind: 'text', text: '3 rows of 4' } },
                 { word: 'in all', meaning: 'the total: every dot counted', picture: { kind: 'text', text: '12 in all' } },
             ],
             steps: [
-                { icon: 'count', text: 'Count the rows.' },
-                { icon: 'look', text: 'Count one row.' },
+                { icon: 'count', text: 'Count the rows or groups.' },
+                { icon: 'look', text: 'Count how many in one.' },
                 { icon: 'count', text: 'Count by that number.' },
                 { icon: 'write', text: 'Write how many in all.' },
             ],
@@ -454,6 +454,8 @@ function opsTablesLessons() {
                 why: 'Four counting actions said in order, each one a box the pupil fills; no decision to cue, so no chant.',
             },
             example: { match: 'Count by' },
+            // (two pictures a row: a picture alone in a full-width row left a third of it empty - print-lint H13)
+            practiceShapes: [[6, 2], [4, 2], [2, 2]],
             mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }, { key: 'addition:add_facts', opts: { band: 20 } }],
         },
         'multiplication:mult_properties': {
@@ -483,7 +485,9 @@ function opsTablesLessons() {
             example: { match: 'Turn the array' },
             // (an array and its turn side by side is wider than half the page at L: the chart's panels and the Guided
             // problems take full-width rows, as the count rows do)
-            chartWide: true, guidedRows: 2,
+            guidedRows: 2,
+            // (an array and its turn, two a row: one cell width per section - print-lint GRID-EVEN, LONE)
+            practiceShapes: [[8, 2], [6, 2], [4, 2], [2, 2]],
             mixWith: [{ key: 'multiplication:arrays_groups', opts: { forms: [0] } }, { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }],
         },
     };
