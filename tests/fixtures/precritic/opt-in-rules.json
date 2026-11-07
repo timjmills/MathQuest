@@ -1,0 +1,19 @@
+{
+ "about": "OPT-IN machine checks per lane (lead ruling D1, 2026-11-07: a lane gets the ADDITIVE version of a check proposed by its critic; default off everywhere else, so deploy gates and every pinned baseline read as before). ws-precritic --skill adds a lane's args to the named gate rows ONLY when the scope holds that lane's skills, with --rule-skills <the scope's skills of that lane>, so a rule judges only the opted-in lane's skills and never turns another lane's --skill run red on skills it did not opt in. Gate ids are ws-precritic's (print-lint-kit = size L independent, print-lint-kit-S / -M, node-lint-s1, slot-clip, screen-slots, options-render). Each rule's backtest is a row of tests/fixtures/precritic/backtests.json. Another lane opts in by appending its own entry (its critic named the rule; its own skills).",
+ "lanes": [
+  {
+   "lane": "lf-placevalue",
+   "why": "critic r1 (design/audit/runs/lf-placevalue/critic-r1.md section 5): F1 H13-ABS, F3 WRONG-FITS per slot, F7 SCREEN-DIGIT, F9 GRID-EVEN-ALL, F10 SLOT-W-EQUAL, F15 DRAW-CAP, F19 / F20 options-render bands",
+   "skills": ["placevalue:identify", "placevalue:value", "placevalue:combine", "placevalue:expand", "placevalue:unit_form"],
+   "gates": {
+    "print-lint-kit": { "args": ["--rules", "H13-ABS,GRID-EVEN-ALL"] },
+    "print-lint-kit-S": { "args": ["--rules", "H13-ABS,GRID-EVEN-ALL"] },
+    "print-lint-kit-M": { "args": ["--rules", "H13-ABS,GRID-EVEN-ALL"] },
+    "node-lint-s1": { "addRules": ["WRONG-FITS-SLOTS", "WRONG-FILL"] },
+    "slot-clip": { "args": ["--slot-w-equal", "--draw-cap"] },
+    "screen-slots": { "args": ["--screen-digit"] },
+    "options-render": { "args": ["--bands"] }
+   }
+  }
+ ]
+}

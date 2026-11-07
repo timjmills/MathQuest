@@ -88,23 +88,23 @@ function subNoRegroupLessons() {
     // the facts a row of their own, four across, on the S and M lesson sheets: in a half-page cell a
     // one-digit column left 34 % of the width empty. At L the extra row does not fit the sheet.)
     const facts10 = { key: 'subtraction:subtract', opts: { band: 10, notation: ['stacked'] }, why: 'Each column is a take-away fact within 10.' };
-    const pv = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' };
+    const pv = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Name the tens digit and the ones digit.' };
     const rung = (key, why) => ({ key, why });
     return {
         'subtraction:sub_50_no_regroup': base({
             skills: [facts10, pv], warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1,
-            mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+            mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
         }),
         'subtraction:sub_100_no_regroup': base({
             skills: [rung('subtraction:sub_50_no_regroup', 'The same column steps with smaller numbers.'), facts10],
             vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1,
-            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
         }),
         // The preset (host sub_100_no_regroup, lengths: shorter): every bottom number is one digit,
         // so `maxSmall` (one one-place take-away a page) does not apply; its tens step writes the tens.
         'subtraction:sub_2d_1d': base({
             skills: [facts10, pv], warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2('Write the tens.'), checkRow: true,
-            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+            mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
         }),
         'subtraction:sub_1k_no_regroup': base({
             skills: [rung('subtraction:sub_100_no_regroup', 'The same column steps with two places.'), facts10],
@@ -370,7 +370,7 @@ export const LESSONS = Object.freeze({
     'number_sense:nearest_10': {
         skills: [
             { key: 'number_sense:between_tens', why: 'Rounding starts by naming the two tens.' },
-            { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Rounding reads the tens digit and the ones digit.' },
+            { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Rounding reads the tens digit and the ones digit.' },
         ],
         concepts: [
             { id: 'between', text: 'A number sits between two tens.' },
@@ -406,7 +406,163 @@ export const LESSONS = Object.freeze({
         words: [{ from: '^The digit after the cut is (\\d+):.*$', to: 'The ones digit is $1.' }],
         // Mixed practice: EARLIER skills only, each from its own strand (lessons r1: never nearest
         // 100, which comes after, and never two "Number Sense" sections).
-        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
+        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
+    },
+
+    /* ---------------------------------------------------------- lf-placevalue (2026-11-07): read and write to 1,000
+       (2.NBT.A.3, CCSS BUILD lesson 1). One block, appended; the Warm-up reviews the 2-digit version of the same idea. */
+    'placevalue:identify': {
+        skills: [
+            { key: 'placevalue:identify', opts: { band: 99, writeValue: false }, why: 'Tens and ones first: the same question with two places.' },
+            { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'A 2-digit number is tens and ones.' },
+        ],
+        concepts: [
+            { id: 'places', text: 'Each digit sits in a place: hundreds, tens, ones.' },
+            { id: 'right-to-left', text: 'The ones place is on the right.' },
+        ],
+        vocab: [
+            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: 'underlined', meaning: 'the line is under it', picture: { kind: 'text', text: '4 7 2 → 7' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the underlined digit.' },
+            { icon: 'look', text: 'Read the letter above it.' },
+            { icon: 'decide', text: 'Say the place name.' },
+            { icon: 'write', text: 'Circle the place.' },
+            // lf-placevalue r1 F4 (writeValue, owner 2026-10-10): the value line is the last step
+            { icon: 'write', text: 'Write its value.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'Five actions, the same on every item: find, read, say, circle, write the value.' },
+        example: { match: 'place' },
+        // The ring row of place names wraps in half the page: one panel a row, its step beside the drawing.
+        chartWide: true, chartRow: true,
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
+        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, writeValue: false } }, { key: 'placevalue:more_less_10' }],
+    },
+    'placevalue:value': {
+        skills: [
+            // (the Warm-up names the place only: lf-placevalue r1, the value line is the lesson's own step)
+            { key: 'placevalue:identify', opts: { writeValue: false }, why: 'The value starts from the place.' },
+            { key: 'placevalue:unit_form', opts: { band: 99 }, why: '6 tens is 60.' },
+        ],
+        concepts: [
+            { id: 'value', text: 'A digit is worth its place: 6 in the hundreds is 600.' },
+            { id: 'not-digit', text: 'The value is not the digit alone.' },
+        ],
+        vocab: [
+            { word: 'value', meaning: 'what a digit is worth', picture: { kind: 'text', text: '6 → 600' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: 'worth', meaning: 'how much it is', picture: { kind: 'text', text: '600' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the underlined digit.' },
+            { icon: 'look', text: 'Name its place.' },
+            // lf-placevalue r1 F12: Grade 2 says the value with its place ("3 tens is 30"), never ×
+            { icon: 'say', text: 'Say the digit with its place.' },
+            { icon: 'write', text: 'Write the value.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'The value is the place step plus one: the steps of identify, then multiply.' },
+        example: { match: 'place' },
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
+        mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
+    },
+    'placevalue:expand': {
+        skills: [
+            { key: 'placevalue:value', why: 'Each part of the expanded form is a value.' },
+            { key: 'placevalue:expand', opts: { band: 99 }, why: 'Tens and ones first: 47 = 40 + 7.' },
+        ],
+        concepts: [
+            { id: 'parts', text: 'A number is the sum of its place values.' },
+            { id: 'zero-place', text: 'A zero place is written too: 405 = 400 + 0 + 5.' },
+        ],
+        vocab: [
+            { word: 'expanded form', meaning: 'the parts added', picture: { kind: 'text', text: '400 + 70 + 2' } },
+            { word: 'value', meaning: 'what a digit is worth', picture: { kind: 'text', text: '7 → 70' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Hundreds digit: its value.' },
+            { icon: 'look', text: 'Tens digit: its value.' },
+            { icon: 'look', text: 'Ones digit: its value.' },
+            { icon: 'write', text: 'Write the parts with +.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'One step per place, left to right, so the zero place is never skipped.' },
+        example: { match: 'place' },
+        // The expanded-form row (288 = [ ] + [ ] + [ ]) is wider than half the page: one panel a row.
+        chartWide: true,
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        // lf-placevalue r1 F18: at M and L the row takes the full width, so the one-column shapes fill ONE page
+        // (the two-column shapes spilled six items over two pages, 4 + 2).
+        practiceShapes: [[12, 2], [10, 2], [12, 1], [10, 1], [8, 1], [6, 1]],
+        mixWith: [{ key: 'placevalue:value' }, { key: 'placevalue:more_less_10' }],
+    },
+    'placevalue:combine': {
+        skills: [
+            { key: 'placevalue:expand', why: 'Combine undoes the expanded form.' },
+            { key: 'placevalue:combine', opts: { band: 99 }, why: 'Tens and ones first: 40 + 7 = 47.' },
+        ],
+        concepts: [
+            { id: 'one-digit-each', text: 'Each place gets one digit.' },
+            { id: 'zero-holds', text: 'A place with no part gets a 0: 300 + 5 = 305.' },
+        ],
+        vocab: [
+            { word: 'standard form', meaning: 'the number in digits', picture: { kind: 'text', text: '472' } },
+            { word: 'expanded form', meaning: 'the parts added', picture: { kind: 'text', text: '400 + 70 + 2' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+        ],
+        steps: [
+            { icon: 'write', text: 'Hundreds: write the digit.' },
+            { icon: 'write', text: 'Tens: write the digit.' },
+            { icon: 'write', text: 'Ones: write the digit.' },
+            { icon: 'say', text: 'Read the number.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'One step per place, so an empty place gets its 0.' },
+        example: { match: 'Write' },
+        // The parts row (500 + 10 + 5 = ____) is wider than half the page: one panel a row.
+        chartWide: true,
+        // The closing step ("Read it: 464.") writes nothing new: it is the line under the panels.
+        tailLast: true,
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        // lf-placevalue r1 (F9 one geometry, F18): every item takes the widest frame's room, which is one column at L.
+        practiceShapes: [[12, 2], [10, 2], [12, 1], [10, 1], [8, 1], [6, 1]],
+        mixWith: [{ key: 'placevalue:expand' }, { key: 'placevalue:more_less_10' }],
+    },
+    'placevalue:unit_form': {
+        skills: [
+            { key: 'placevalue:identify', opts: { writeValue: false }, why: 'Unit form names each place.' },
+            { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'Tens and ones first.' },
+        ],
+        concepts: [
+            { id: 'units', text: 'A number is hundreds, tens and ones.' },
+            { id: 'count-each', text: 'The digit says how many of each.' },
+        ],
+        vocab: [
+            { word: 'hundreds', meaning: 'groups of 100', picture: { kind: 'text', text: '300' } },
+            { word: 'tens', meaning: 'groups of 10', picture: { kind: 'blocks', tens: 3, ones: 0 } },
+            { word: 'ones', meaning: 'single ones', picture: { kind: 'blocks', tens: 0, ones: 4 } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the number.' },
+            { icon: 'write', text: 'How many hundreds?' },
+            { icon: 'write', text: 'How many tens?' },
+            { icon: 'write', text: 'How many ones?' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'One blank per place, the same order as the frame.' },
+        example: { match: 'hundreds' },
+        // The unit-form frame (__ hundreds __ tens __ ones) is wider than half the page: one panel a row.
+        chartWide: true,
+        // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
+        // lf-placevalue r1 F18: one-column shapes, so the page is filled on ONE page where two columns do not fit.
+        practiceShapes: [[12, 2], [10, 2], [12, 1], [10, 1], [8, 1], [6, 1]],
+        mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
     },
 });
 

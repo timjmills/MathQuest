@@ -55,7 +55,7 @@ function htoRow(p, ctx, valueOf, inkOf) {
         const dPt = m.digitPt || 28;
         html = html.replace('style="--w:', `style="height:${(dPt * 0.3528 * 1.3).toFixed(2)}mm;min-width:${(dPt * 0.3528 * 1.05).toFixed(2)}mm;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-size:${pt(dPt)};box-sizing:border-box;--w:`);
         if (ink === 'trace') html = html.replace('class="ws-box', 'class="ws-box ws-trace').replace(/ data-ws-ink="[a-z]+"/, '').replace('<span ', '<span data-ws-ink="trace" ');
-        return `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:1mm;"><b style="font-size:${pt(textPt)};line-height:1;">${letters[i]}</b>${html}</span>`;
+        return `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:1mm;"><span style="font-size:${pt(textPt)};font-weight:700;line-height:1;">${letters[i]}</span>${html}</span>`;
     }).join('');
     return `<span class="ws-words-hto" data-ws-hto style="display:inline-flex;gap:2.5mm;align-items:flex-end;font-size:${pt(m.digitPt || 28)};font-weight:700;">${boxes}</span>`;
 }

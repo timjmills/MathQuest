@@ -53,6 +53,10 @@
 // --source kit, and FAILS where a value's page has more findings of a (lint, rule) than the skill's default page at the
 // same size and seed (tests/lib/options-render.cjs). Node; print-lint takes one browser slot (/tmp/mq-browser-run.sh,
 // or the slot it is already in). Verdict `ws-options-verify --render: OK|FAIL (...)`.
+//   --bands (OPT-IN; lf-placevalue critic r1 F19 / F20): also render the number-size values of `band` and FAIL on an
+//   L-OVERFLOW / L-WRAP rise against the default page (other rises and capacity listed, not failed); --rule-skills a:b,c:d
+//   renders the band pages only for those skills (ws-precritic passes the lane's); --options band,notation renders only
+//   those option ids (a short run, e.g. a backtest).
 const fs = require('fs');
 const path = require('path');
 
@@ -77,7 +81,8 @@ if (has('render')) {
     const keys = (arg('skill', '') || '').split(',').map(s => s.trim()).filter(Boolean);
     const sizes = (arg('sizes', 'S,L') || 'S,L').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const root = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
-    require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m) })
+    const list = (k) => (arg(k, '') || '').split(',').map((x) => x.trim()).filter(Boolean);
+    require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m), bands: has('bands'), ruleSkills: list('rule-skills'), onlyOptions: list('options') })
         .then((code) => process.exit(has('report-only') ? 0 : code), (e) => { console.log(e && e.stack || e); console.log('ws-options-verify --render: FAIL (crashed)'); process.exit(1); });
     return;
 }

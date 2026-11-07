@@ -817,3 +817,26 @@ Details and the reflection: design/status/s1-checks.md.
 | critic r2 FAIL (min 6) | Mixed fallback summary, fact card summary; page-1 fill is engine pagination | SUMMARY over Mixed + fact card (backtest FAIL on r2 code) | a probe (one row more on each part) separated lane vs engine faults in one run — do it before a fix round |
 | critic r3 PASS (lane part) | footer ids fixed; per-type summary added after | FOOTER gate (backtest FAIL on the r2 head) | 9 owner additions arrived DURING r3: queuing them (process rule 0) kept the round valid; resuming the same critic for r2/r3 cost 144k → 162k → 192k tokens (its context grows): a fresh narrow critic with a short brief is cheaper after r2 |
 | simple-print-2 critic r1 FAIL (C2 6, C3 7) | Aim = Exactly; Tables-to band shown as Highest number; × 6–8 column cycle; footer label; "Facts" for column work; key PNG captured the app | EXACT (differs), WITHIN 12-admitted, FACTPATTERN (backtest: old gen FAILs whole columns at M), FOOTER options, SUMMARY Facts naming, evidence asserts Answer Key | the builder's own render pass looked at page 1 only: read every PNG incl. the key, and run each mode pair through a "plans differ" check before the critic |
+
+### lf-placevalue critic r1 (2026-11-07): FAIL on all five pv skills (lesson #1)
+**Automatic checks** (critic findings a machine could have measured; owner of each below):
+- F1 H13 absolute band: print-lint H13 compares a cell with its row only; proposed H13-ABS (band under the lowest ink ≥ 30 % of the cell, less Hw) — backtest value independent L 34 %. Owner: checks lane (shared print-lint).
+- F2 / F18 opener and lesson overflow / fill: ws-grade-render --gate and print-lint PAGEFILL run only on lesson / test / independent in precritic --skill; extend to every §7a-offered role. Owner: precritic --skill rows (lf-placevalue holds the R2 parser; extension asked of the lead).
+- F3 wrongAnswer one string in every slot: node-lint WRONG-FITS checks one slot; make it per slot. Owner: checks lane.
+- F4 owner ruling with no assert (identify writeValue): card rulings todo T-5.1 → a ws-card-rulings assert (graded value slot). Owner: lf-placevalue (reader is ours).
+- F5 / F6 paper ≠ screen heads / answer kind: proposed host-parity check. Owner: checks lane.
+- F7 screen numeral size: proposed SCREEN-DIGIT in ws-screen-slots. Owner: checks lane.
+- F8 Size S ignored: ws-columns --sizes exists but is not on precritic's --skill path. Owner: precritic --skill rows.
+- F9 two cell geometries in one section: GRID-EVEN scoped to fact grids; widen to every kit section. Owner: checks lane.
+- F10 slot width tells the answer: proposed SLOT-W-EQUAL in ws-slot-clip. Owner: checks lane.
+- F11 "1 hundreds": proposed providers-unit PLURAL rule. Owner: lf-placevalue (pv provider tests).
+- F12 × on grade-2 steps; F13 model item on the ones place; F14 step k draws the first k answers: providers-unit rules. Owner: lf-placevalue.
+- F15 draw zone too small: proposed DRAW-CAP in ws-slot-clip. Owner: checks lane.
+- F16 offered role that cannot render (stretch): ws-card-rulings --check offered should render each offered role. Owner: lead ruling first.
+- F19 / F20 band values and wraps on option renders: options-verify --render covers appearance values only; add band + WRAP. Owner: checks lane.
+- F22 dealer per page: ws-dealer-uniform per page for case mix. Owner: checks lane.
+
+**Speed-ups:**
+- The pv card's §7a offered every role and host, but the precritic --skill path renders only 3 roles: 12 of 23 findings were on roles no gate rendered. Fix: precritic --skill renders every §7a-offered role (one change, saves a critic round per family).
+- First family on a template had no siblings: 90 rows went to the critic by hand (lead R1); the critic ran 47 min. Fix: the first family's critic gets the rows sampled by the brief (done) — keep.
+- Builder strength right (medium); waits: browser slots shared with precritic (~2 min a gate). No owner-question delays (lead answered within 10-20 min).

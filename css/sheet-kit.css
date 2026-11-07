@@ -534,3 +534,20 @@
    More practice and Review at M and L) put its first digit inside the tab's keep-out (L-OVERLAP CL40-INK). The same
    shrinkable spacer now stands above such a supported fact. */
 .ws-page .ws-grid > .ws-cell:has(> :is(.ws-tab, .ws-letter)):has(> .ws-supported > .ws-with-pane[data-ws-pane-place="under"] > .ws-pane-problem > .ws-eq[data-ws-across]):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: 0 1 max(0mm, calc(var(--ws-tab, 5mm) - 2mm - 0.2 * var(--ws-digit, 22pt))); min-height: 0; }
+
+/* 2026-11-07 (lf-placevalue, CL-40, ws-print-lint L-OVERLAP CL40-INK on combine L / expand S): a pv cell whose
+   first content is a one-line equation row ("800 + 40 + 5 = ____", "405 = [ ] + [ ] + [ ]") is wider than the
+   room beside the number tab and put its first digit inside the tab's keep-out. It takes the same fixed top
+   spacer as the word-work / counters cells above (tab side - 2 mm), on the page and on the measuring cell, so
+   rows are sized with it. Cells that start with the numeral (identify, value) are unchanged. Additive. */
+.ws-page .ws-grid > .ws-cell:is([data-ws-cell="pv"], .mqt--pv, [data-ws-cell="pv-support"], .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not([data-ws-writeabove]):not(.blankrun)::before,
+.ws-sheet > .ws-cell:is(.mqt--pv, .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
+
+/* 2026-11-07 (lf-placevalue r1 F8, L1; additive): the frame boxes of the five read-and-write skills (unit form, value in
+   unit form / notation, expanded notation - class pv-hw) are the WRITING HEIGHT of the size (Hw + stroke: 6 / 8 / 10 mm),
+   not a fixed 14 mm at every size, so a page at S draws smaller boxes and holds more rows than L. Other frames keep the
+   14 mm rule above. */
+:is(.ws-page, .ws-sheet) .pv-cell .pv-blanks.pv-hw .ws-box { height: calc(var(--ws-hw) + 2 * var(--ws-hair)); line-height: var(--ws-hw); min-width: 0; }
+/* 2026-11-07 (lf-placevalue r1; additive): on a screen card (.mq-kittwin) the read-and-write frame (pv-hw) wraps between
+   its "[ ] hundreds" units at any width, as the paper's 4-place frames do, so a phone never cuts the row off. */
+.mq-kittwin .pv-cell .pv-blanks.pv-hw { flex-wrap: wrap !important; white-space: normal !important; max-width: 100%; }

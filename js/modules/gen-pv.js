@@ -38,6 +38,7 @@
 
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
+import { dealIndex, freshDeal } from './page-deal.js';
 import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand, ROUND_NL } from './skill-options.js';
 import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js';
 import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine, stripHTML, shiftChartHTML, roundingTableHTML } from './pv-support-cell.js';
@@ -185,7 +186,12 @@ function genPlace(q, skill, o) {
     if (!ticked.length) ticked = bandPlaces;
     // Every place once per block of items, but in a different order each block, so the answers
     // never run ones, tens, hundreds, ones, tens ... down the page (round-3 finding).
-    let place = ticked[blockOrder(ticked.length)[slot(ticked.length)]];
+    // lf-placevalue r1 F13: item 0 of a page is the Model's item (scripted model, lesson anchor): it never asks the ones
+    // place, the one case where the value IS the digit. Block 0's order swaps its first two places when ones leads, so
+    // the block still asks every place once.
+    const ord = blockOrder(ticked.length);
+    if (_at < ticked.length && ticked[ord[0]] === 1 && ord.length > 1) [ord[0], ord[1]] = [ord[1], ord[0]];
+    let place = ticked[ord[slot(ticked.length)]];
     if (place > hi) { lo = place; hi = place * 10 - 1; nd = String(hi).length; }
     // PN-7: the value of a zero, on about a third of items. A zero is never the leading digit, so
     // a leading place hands its zero to a lower place.
@@ -232,10 +238,13 @@ function genPlace(q, skill, o) {
     const readHint = support === 'chart' ? 'Read the place name above the underlined digit.'
         : support === 'none' ? 'Count the places from the right: ones, tens, hundreds, thousands.'
             : 'Read the letter above the underlined digit.';
+    // lf-placevalue r1: the cell is answered in place (F1 `inPlace`: packed to its ink), and the letters it prints follow
+    // the item's own support on every page role (F5, paper = screen: labels prints H T O, as the card does).
     const cellFor = (payload) => {
-        if (support === 'labels') { setCell(q, payload); return; }
+        const own = { inPlace: true, heads: support === 'labels', ...payload };
+        if (support === 'labels') { setCell(q, own); return; }
         q.cell = { template: 'pv-support', v: 1, payload: { picture: support === 'chart' ? 'chart' : 'plain', n, place,
-            base: { keyValue: q.ans, ...payload, hideNumeral: true } } };
+            base: { keyValue: q.ans, ...own, hideNumeral: true } } };
         q.printFormat = 'pv-cell';
     };
     if (skill === 'identify') {
@@ -246,10 +255,15 @@ function genPlace(q, skill, o) {
         q.ans = PLACE_WORD[place];
         q.hint = readHint;
         q.skillLabel = 'Name the Place';
+        // F4 (owner 2026-10-10): the pupil also writes the value of the underlined digit ("Value ____"); the key
+        // writes it, q.valueAns carries it for the hosts.
+        const writeValue = o.writeValue !== false;
+        const wv = writeValue ? { writeValue: true, value: digit * place } : {};
+        if (writeValue) { q.valueAns = digit * place; q.printAnswer = `${PLACE_WORD[place]}, ${fmt(digit * place)}`; }
         if (o.response === 'bank') {
             // PN-4: the words move to a bank; the pupil copies one onto the line (a production
             // item on paper stays a typed word on screen, never a choice).
-            q.text = 'Write the place of the underlined digit.';
+            q.text = writeValue ? 'Write the place. Write the value of the underlined digit.' : 'Write the place of the underlined digit.';
             q.printText = q.text;
             q.answerType = 'text';
             q.options = [];
@@ -257,16 +271,16 @@ function genPlace(q, skill, o) {
             q.wordBank = words.slice();
             q.visual = `${numeralVis}<div class="pv-bank" style="margin:8px auto 0;display:table;border:2px solid #000;border-radius:10px;`
                 + `padding:4px 14px;font-weight:700;color:#000;">${words.join('&nbsp;&nbsp;&nbsp;')}</div>`;
-            q.pv = { kind: 'place', n, place, digit, support, response: 'bank', repeat };
-            cellFor({ kind: 'place-bank', n, place, words, keyValue: q.ans });
+            q.pv = { kind: 'place', n, place, digit, support, response: 'bank', repeat, writeValue };
+            cellFor({ kind: 'place-bank', n, place, words, keyValue: q.ans, ...wv });
             return;
         }
         q.text = 'Which place is the underlined digit in?';
-        q.printText = 'Circle the place of the underlined digit.';
+        q.printText = writeValue ? 'Circle the place. Write the value of the underlined digit.' : 'Circle the place of the underlined digit.';
         q.answerType = 'multiple-choice';
         q.options = words;
-        q.pv = { kind: 'place', n, place, digit, support, response: 'circle', repeat };
-        cellFor({ kind: 'place', n, place, words });
+        q.pv = { kind: 'place', n, place, digit, support, response: 'circle', repeat, writeValue };
+        cellFor({ kind: 'place', n, place, words, ...wv });
         return;
     }
     if (skill === 'value' && o.form === 'times') { genTimesValue(q, o); return; }
@@ -288,11 +302,15 @@ function genPlace(q, skill, o) {
     if (form === 'unit') {
         inlineBlanks(q, 'The underlined digit is worth ___ ___.', [[digit, word], [digit, plural(word, digit)], [digit, word.replace(/s$/, '')]], [2, 9]);
         q.ans = `${digit} ${plural(word, digit)}`;
-        cellFor({ kind: 'blanks', n, place, frame: 'worth ____ ____', keys: [digit, plural(word, digit)], keyValue: q.ans });
+        // F10 (L3, H16): both boxes one width, from the widest place word this number could ask, and labelled - the
+        // second box's width no longer tells "tens" from "hundreds", and each box says what goes in it.
+        const widest = Math.max(...Array.from({ length: String(n).length }, (_, i) => PLACE_WORD[10 ** i].length));
+        cellFor({ kind: 'blanks', n, place, frame: 'worth ____ ____', keys: [digit, plural(word, digit)], keyValue: q.ans,
+            slotChars: widest, slotLabels: ['how many', 'place'], oneLine: true });
     } else {
         inlineBlanks(q, 'The underlined digit is worth ___ × ___.', [[digit, place]], [2, String(place).length + 2]);
         q.ans = `${digit} × ${fmt(place)}`;
-        cellFor({ kind: 'blanks', n, place, frame: 'worth ____ × ____', keys: [digit, fmt(place)], keyValue: q.ans });
+        cellFor({ kind: 'blanks', n, place, frame: 'worth ____ × ____', keys: [digit, fmt(place)], keyValue: q.ans, oneLine: true });
     }
 }
 
@@ -400,8 +418,10 @@ function genTimesValue(q, o) {
     q.factKey = `ten:${d}:${P}/${P / 10}`;
 }
 
-function wantZero(o) {
-    return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && slot(2) === 1);
+// L10 (lf-placevalue, ws-dealer-uniform PERIOD zeroCase): "some" deals the zero place from the
+// page dealer, never from the item's position (slot(2) put every zero item at an odd position).
+function wantZero(o, key = 'pv:zero') {
+    return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && dealIndex(key, 2) === 1);
 }
 
 /** Every order of a short list (up to 5 parts; longer lists keep the given order and its reverse). */
@@ -418,14 +438,24 @@ function genExpandCombine(q, skill, o) {
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
     const zero = wantZero(o);
-    let ds = [];
-    for (let t = 0; t < 60; t++) {
-        ds = digitsNumber(nd, { zero });
-        const v = fromDigits(ds);
-        if (v >= lo && v <= hi) break;
-    }
+    // lf-placevalue r1 F22: WHERE the zero goes (tens or ones of 305 / 350) is dealt down the page by the page dealer,
+    // so no page holds only zero-tens items; the digits around it stay the seeded draw.
+    const zpos = zero && nd >= 2 ? 1 + dealIndex(`pv:${skill}:zeropos`, nd - 1) : -1;
+    // ws-dealer-uniform PAGE (lf-placevalue): a number the page already holds is redrawn, and no
+    // leading part (700) is dealt more than three times, nor its first two parts (700 + 20) twice, in
+    // the last 19 items.
+    const draw = () => {
+        let d = [];
+        for (let t = 0; t < 60; t++) {
+            d = digitsNumber(nd, {});
+            if (zpos > 0) d[zpos] = 0;
+            const v = fromDigits(d);
+            if (v >= lo && v <= hi) return d;
+        }
+        return String(randInt(lo, hi)).split('').map(Number);
+    };
+    let ds = freshDeal(`pv:${skill}:n`, draw, { sig: (d) => d.join(''), tags: (d) => [String(d[0]), d.slice(0, 2).join('')], caps: [3, 1] });
     let n = fromDigits(ds);
-    if (n < lo || n > hi) { n = randInt(lo, hi); ds = String(n).split('').map(Number); }
     // ONE PART PER PLACE, zeros included (§2.4 rule 1): the box count never tells the pupil how
     // many non-zero parts there are, and the key writes the zero part.
     const parts = ds.map((d, i) => d * 10 ** (ds.length - 1 - i));
@@ -459,7 +489,7 @@ function genExpandCombine(q, skill, o) {
             q.ans = nonZero.join(' + ');
             q.acceptedAnswers = [...accept];
             q.printAnswer = q.ans;
-            setCell(q, { kind: 'expand-line', n, keyValue: q.ans, also: all.length !== nonZero.length ? all.join(' + ') : '' });
+            setCell(q, { kind: 'expand-line', n, keyValue: q.ans, also: all.length !== nonZero.length ? all.join(' + ') : '', inPlace: true });
             return;
         }
         if (form === 'notation') {
@@ -468,19 +498,17 @@ function genExpandCombine(q, skill, o) {
             inlineBlanks(q, `${fmt(n)} = ${ds.map((_, i) => `___ × ${fmt(places[i])}`).join(' + ')}`, [ds.slice()], ds.map(() => 2));
             q.ans = ds.map((d, i) => term(d, places[i])).join(' + ');
             q.printAnswer = q.ans;
-            setCell(q, { kind: 'blanks', n, frame: `${fmt(n)} = ${frameText}`, keys: ds.slice(), keyValue: q.ans, bigNumerals: true });
+            setCell(q, { kind: 'blanks', n, frame: `${fmt(n)} = ${frameText}`, keys: ds.slice(), keyValue: q.ans, bigNumerals: true, inPlace: true, slotDigits: 1 });
             return;
         }
-        q.text = `Write ${fmt(n)} in expanded form.`;
-        q.answerType = 'interactive';
-        q.interactiveType = 'expanded';
-        q.expandedNumber = n;
-        q.expandedDigits = ds.slice();
-        q.expandedValues = parts.slice();
-        q.expandedPlaceIdx = ds.map((_, i) => ds.length - 1 - i);
+        // lf-placevalue (ws-chromebook-fit, L5): the boxes ARE the inputs on every host - the kit cell's
+        // inline blanks, as the notation form does, never the legacy 'expanded' card (digit tiles naming
+        // each place over its box, no Check button). A part is accepted with or without its comma.
+        inlineBlanks(q, `${fmt(n)} = ${parts.map(() => '___').join(' + ')}`, [parts.map(fmt), parts.map(String)],
+            parts.map(() => Math.max(2, String(hi).length + 1)));
         q.ans = parts.map(fmt).join(' + ');
         q.printAnswer = q.ans;
-        setCell(q, { kind: 'expand', n, parts, keyValue: q.ans });
+        setCell(q, { kind: 'expand', n, parts, keyValue: q.ans, inPlace: true });
         return;
     }
     // combine: the non-zero parts only, so 300 + 5 makes the pupil supply the 0 digit (M-V7).
@@ -500,7 +528,10 @@ function genExpandCombine(q, skill, o) {
     q.hint = 'Add the parts. A place with no part gets a 0.';
     q.skillLabel = 'Standard Form';
     q.pv = { kind: 'combine', n, parts: shown };
-    setCell(q, { kind: 'frame', frame: `${expr} = ____` });
+    // F9 (AX-4): every item of the section reserves the widest frame its band deals (one part a place, 8s), so a
+    // two-part item never takes a half-width cell beside a three-part row.
+    const ghost = `${Array.from({ length: nd }, (_, i) => fmt(8 * 10 ** (nd - 1 - i))).join(' + ')} = ____`;
+    setCell(q, { kind: 'frame', frame: `${expr} = ____`, inPlace: true, ghost, slotDigits: nd });
 }
 
 /** EF-9 / EF-10: unit form, and renaming more than 9 of one place (47 tens, 3 hundreds 15 tens). */
@@ -531,7 +562,7 @@ function genUnitForm(q, skill, o) {
             q.answerType = 'number';
             q.hint = 'Every hundred is 10 tens. Count all the tens.';
             q.pv = { kind: 'unit', n, rename: true, counts: { 10: count, 1: ones } };
-            setCell(q, { kind: 'frame', frame: `${fmt(n)} = ____ tens ${ones} ${plural('ones', ones)}`, keyValue: count, words: true });
+            setCell(q, { kind: 'frame', frame: `${fmt(n)} = ____ tens ${ones} ${plural('ones', ones)}`, keyValue: count, words: true, inPlace: true });
             return;
         }
         // a hundreds (or tens) count plus 10-19 of the next place down.
@@ -546,7 +577,7 @@ function genUnitForm(q, skill, o) {
         q.answerType = 'number';
         q.hint = `Ten ${wb} make one ${PLACE_ONE[hiP]}.`;
         q.pv = { kind: 'unit', n: total, rename: true, counts: { [hiP]: a, [loP]: b } };
-        setCell(q, { kind: 'frame', frame: `${a} ${plural(wa, a)} ${b} ${wb} = ____`, keyValue: total, words: true });
+        setCell(q, { kind: 'frame', frame: `${a} ${plural(wa, a)} ${b} ${wb} = ____`, keyValue: total, words: true, inPlace: true });
         return;
     }
     const words = places.map(p => PLACE_WORD[p]);
@@ -558,7 +589,7 @@ function genUnitForm(q, skill, o) {
     q.printAnswer = q.ans;
     q.hint = 'Each digit tells how many of its place. A zero means none of that place.';
     q.pv = { kind: 'unit', n, rename: false, counts: Object.fromEntries(places.map((p, i) => [p, ds[i]])) };
-    setCell(q, { kind: 'blanks', n, frame: `${fmt(n)} = ${words.map(w => `____ ${w}`).join(' ')}`, keys: ds.slice(), keyValue: q.ans, words: true });
+    setCell(q, { kind: 'blanks', n, frame: `${fmt(n)} = ${words.map(w => `____ ${w}`).join(' ')}`, keys: ds.slice(), keyValue: q.ans, words: true, inPlace: true, slotDigits: 1 });
 }
 
 function genMoreLess(q, skill, o) {
