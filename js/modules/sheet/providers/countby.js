@@ -86,6 +86,13 @@ function rowWrongs(q, values, blanks, stepN, { rule = null } = {}) {
         if (v[k] >= 0) c.push({ value: joinLike(q, [...v, ...tail]), misconception: 'hundred-slip', slot: `b${k}`, slots: { [`b${k}`]: String(v[k]) },
             explain: `Crossed the hundred and ${sgn < 0 ? 'gained' : 'lost'} a ten: wrote ${fmt(v[k])}, not ${fmt(values[i2])}.` });
     }
+    // (critic r1 D-CB-6: True or False? finishes with the fix - the frame names the box the wrong answer changed:
+    // "After 9 comes ___." on a row whose slip was the box after 9; the number before it is given or a known count)
+    for (const x of c) {
+        const k = Number(String(x.slot || '').replace(/^b/, ''));
+        const i = blanks[k];
+        if (rule === null && Number.isFinite(k) && i > 0) x.frame = { stem: `After ${fmt(values[i - 1])} comes `, value: String(values[i]) };
+    }
     const w = chooseWrong(q, c);
     if (w && key.length) w.display = String(Array.isArray(w.value) ? w.value.join(', ') : w.value);
     return w;
@@ -106,19 +113,26 @@ function cbPage(q, ref = {}) {
     return { dir: !downs ? 'up' : downs === rows.length ? 'down' : 'mixed', steps, from: rows.length && froms.length === 1 && froms[0] !== null ? froms[0] : null };
 }
 // The steps in the order the rows are listed (and print), every one of them: the title never shortens to "and 5 more".
-// (critic skip-count r5 SC6: "I Can count by 1 to 12" read oddly; the numbers are named as numbers)
-const stepWords = (steps) => (!steps.length ? 'the numbers 1 to 12'
-    : steps.length === 1 ? fmt(steps[0])
-        : `${steps.slice(0, -1).map(fmt).join(', ')} and ${fmt(steps[steps.length - 1])}`);
+// (count-row card §9 Q6, signed: the I Can line names the counts as counts - "I Can count by 3s", "count by 3s, 4s and
+// 6s"; the default rows, the tables 2 to 12, read "I Can count by 2s to 12s", and any run of three or more steps in a
+// row is "Ns to Ms". Critic r1 D-CB-2: "the numbers 1 to 12" named a count by 1s the page never holds.)
+const stepS = (n) => `${fmt(n)}s`;
+const stepWords = (steps) => {
+    if (!steps.length) return 'by 2s to 12s';
+    const run = steps.length >= 3 && steps.every((v, i) => i === 0 || Number(v) === Number(steps[i - 1]) + 1);
+    if (run) return `by ${stepS(steps[0])} to ${stepS(steps[steps.length - 1])}`;
+    return `by ${steps.length === 1 ? stepS(steps[0]) : `${steps.slice(0, -1).map(stepS).join(', ')} and ${stepS(steps[steps.length - 1])}`}`;
+};
 
 registerSkill('multiplication:count_by_tables', {
     // The "I Can" line follows the row's length (12 or 15 jumps), the typed step, the direction and a typed start:
     // derived from the item (or the section's options), never fixed.
     strings: stringsBy((q, ref = {}) => {
         const { dir, steps, from } = cbPage(q, ref);
-        const verb = dir === 'down' ? 'count back by' : dir === 'mixed' ? 'count on and back by' : 'count by';
+        const verb = dir === 'down' ? 'count back' : dir === 'mixed' ? 'count on and back' : 'count';
         const what = stepWords(steps);
-        const jumps = (q && q.countBy && q.countBy.jumps === 15) || (!q && ref && ref.opts && Number(ref.opts.jumps) === 15) ? ' (15 jumps)' : '';
+        // (critic r1 D-CB-2: an option value - "(15 jumps)" - is never part of the I Can line; the row length is layout)
+        const jumps = '';
         const key = dir === 'down' ? 'count-back-row' : dir === 'mixed' ? 'count-sign-row' : 'count-by-row';
         return {
             iCan: `I Can ${verb} ${what}${from !== null ? ` from ${fmt(from)}` : ''}${jumps}`,

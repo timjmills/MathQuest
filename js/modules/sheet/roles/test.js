@@ -24,6 +24,9 @@ export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
 const DENSE = CEILING;          // 12.1 is law: 20 / 16 / 12 (L-DENSITY holds it)
 
+// (lane lf-ops critic r1 D-CB-3: a Test draws at scaffold level 0 - hints dropped, P-7 - but its cells were measured at
+// level 1, so a count row's times labels kept their room: a 39-45 % empty band in every row. Measured as drawn.)
+export const MEASURE_LEVEL = 0;
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3, 4];
 
