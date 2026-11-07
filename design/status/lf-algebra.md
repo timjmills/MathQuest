@@ -42,6 +42,8 @@ Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-1
 - card-rulings SKIPPED / spec-card N/A: no card yet
 
 ## Log
+- 2026-11-07: lf-ops accepted count-row requests 1-3 (train wraps to cell, shaped tiles at box pitch, >= 44 px screen boxes);
+  they land on claude/sweet-newton-c8wrv1-lf-ops, lf-ops sends the commit.
 - 2026-11-07: composing:number_word_form (BUILD lesson #1) handed to lf-placevalue (session_013pHDnMCXcY6kXV15KHf4Yp): they own only
   its blocks in gen-algebraic.js (the WHICH WAY ROUND comment ~l.45-60 and the number_word_form branch ~l.2469); their precritic r0
   findings (LESSON-DATA, lesson S H13/PAGEFILL, answerSlot=hto weight 900, to_words capacity) are theirs to fix.
