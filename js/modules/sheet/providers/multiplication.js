@@ -443,10 +443,10 @@ function mpWrong(q) {
             // MU-M7: the second part written as its rows alone (6 × 7 = (6 × 5) + 2), or the whole read as one part.
             const dropped = sp.p1 + sp.rest;
             return chooseWrong(q, [
-                { value: `${sp.p1}, ${sp.rest}, ${dropped}`, misconception: 'split-drop-part', slot: 'p2',
+                { value: `${sp.p1}, ${sp.rest}, ${dropped}`, misconception: 'split-drop-part', slot: 'p2', frame: { stem: `${sp.rest} × ${sp.cols} = `, value: String(sp.p2) },
                     slots: { p1: String(sp.p1), p2: String(sp.rest), t: String(dropped) },
                     explain: `Wrote ${sp.rest} for ${sp.rest} × ${sp.cols}: the bottom part is ${sp.rest} rows of ${sp.cols}, ${sp.p2}.` },
-                { value: `${sp.p1}, ${sp.p2}, ${sp.p1}`, misconception: 'split-one-part', slot: 't',
+                { value: `${sp.p1}, ${sp.p2}, ${sp.p1}`, misconception: 'split-one-part', slot: 't', frame: { stem: `${sp.rows} × ${sp.cols} = `, value: String(sp.product) },
                     slots: { p1: String(sp.p1), p2: String(sp.p2), t: String(sp.p1) },
                     explain: `Wrote one part as the whole. The whole is both parts: ${sp.p1} + ${sp.p2} = ${sp.product}.` },
             ]);
@@ -465,19 +465,19 @@ function mpWrong(q) {
         const recount = P - r;
         if (t.type === 'both') {
             return chooseWrong(q, [
-                { value: `${P}, ${recount}`, misconception: 'turn-recount', slot: 'b', slots: { a: String(P), b: String(recount) },
+                { value: `${P}, ${recount}`, misconception: 'turn-recount', slot: 'b', slots: { a: String(P), b: String(recount) }, frame: { stem: `${c} × ${r} = `, value: String(P) },
                     explain: `Counted the turned array again and missed a row: ${recount}. Turning it does not change the total.` },
             ]);
         }
         if (t.type === 'known') {
             const cands = [
-                { value: `${c}, ${r}, ${recount}`, misconception: 'turn-recount', slot: 'b3', slots: { b1: String(c), b2: String(r), b3: String(recount) },
+                { value: `${c}, ${r}, ${recount}`, misconception: 'turn-recount', slot: 'b3', slots: { b1: String(c), b2: String(r), b3: String(recount) }, frame: { stem: `${c} × ${r} = `, value: String(P) },
                     explain: `Counted the turned array again and got ${recount}. It is the same ${P} dots.` },
-                { value: `${c}, ${P}, ${P}`, misconception: 'turn-product-factor', slot: 'b2', slots: { b1: String(c), b2: String(P), b3: String(P) },
+                { value: `${c}, ${P}, ${P}`, misconception: 'turn-product-factor', slot: 'b2', slots: { b1: String(c), b2: String(P), b3: String(P) }, frame: { stem: `The turned array has ${c} rows of `, value: String(r) },
                     explain: `Wrote the product ${P} as a factor. The new fact is ${c} × ${r}.` },
             ];
             // Wrote the same order: only a different answer when the array is not a square.
-            if (r !== c) cands.unshift({ value: `${r}, ${c}, ${P}`, misconception: 'turn-no-swap', slot: 'b1', slots: { b1: String(r), b2: String(c), b3: String(P) },
+            if (r !== c) cands.unshift({ value: `${r}, ${c}, ${P}`, misconception: 'turn-no-swap', slot: 'b1', slots: { b1: String(r), b2: String(c), b3: String(P) }, frame: { stem: 'The turned array has this many rows: ', value: String(c) },
                 explain: `Wrote ${r} × ${c} again. The turned array has ${c} rows of ${r}.` });
             return chooseWrong(q, cands);
         }

@@ -32,15 +32,21 @@ export function prepare(it, info = {}) {
     const wrong = wrongOf(it);
     const isFalse = !!(wrong && info.wrong);
     const shown = isFalse ? wrong.value : correct;
-    const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
-    const key = slotKey({ 'tf-true': isFalse ? '' : '✓', 'tf-false': isFalse ? '✓' : '', 'tf-ans': correct }, correct);
+    // (lane lf-ops critic r1 D-MP-6 / D-CB-6: an item with several answer boxes - an array and its turn, a count row - wrote
+    // all its answers, "15, 15", into the ONE blank of the frame, and asked for the given fact. A provider's wrong answer
+    // may name the frame for the box it changed, `frame: {stem, value}` ("2 × 4 = ___", "After 9 comes ___"): the
+    // pupil writes the one corrected number. Without one, the frame is as before.)
+    const fr = wrong && wrong.frame && typeof wrong.frame.stem === 'string' && wrong.frame.value !== undefined ? wrong.frame : null;
+    const frameVal = fr ? String(fr.value) : correct;
+    const digits = Math.max(2, Math.min(6, frameVal.replace(/[^0-9]/g, '').length || 2));
+    const key = slotKey({ 'tf-true': isFalse ? '' : '✓', 'tf-false': isFalse ? '✓' : '', 'tf-ans': frameVal }, frameVal);
     // the short key's line (critic r1, B2): the judgement, then the answer the frame asks for
-    key.short = `${isFalse ? 'False' : 'True'}; ${correct}`;
+    key.short = `${isFalse ? 'False' : 'True'}; ${frameVal}`;
     // 09-A mock-up: the frame restates the problem ("6 x 7 = ____."), so the pupil writes the
     // true answer beside its own question; a skill with no operation says "The answer is ____."
     const ops = operandsOf(it.q || {});
     const glyph = opGlyphOf(opOf(it.q || {}));
-    const stem = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : 'The answer is ';
+    const stem = fr ? fr.stem : ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : 'The answer is ';
     const render = (c, o = {}) => {
         const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }));
         return `<div class="mq-judge mq-tf">`
@@ -54,7 +60,7 @@ export function prepare(it, info = {}) {
         // The judgement column sits beside the work, so a cell is at most half the page wide; a
         // word problem or a wide picture keeps its own single column (PT-WPR-1).
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(2, (it.footprint && it.footprint.maxCols) || 2) }),
-        fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong: isFalse },
+        fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct: frameVal, isWrong: isFalse },
         cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
     });
 }

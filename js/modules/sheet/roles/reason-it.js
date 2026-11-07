@@ -18,7 +18,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
-    labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern,
+    labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern, esc,
 } from './compose.js';
 
 export const ROLE_ID = 'reason-it';
@@ -35,8 +35,12 @@ export function prepare(it, info = {}) {
     // (`wrongFlags`, handed in as `info.wrong`), so there is no A / B tell to learn.
     const aRight = info.wrong !== undefined ? !!info.wrong : rng(deriveSeed(info.seed === undefined ? 0 : info.seed, ROLE_ID, info.index || 0))() < 0.5;
     const right = aRight ? 'A' : 'B';
-    const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
-    const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
+    // (lane lf-ops critic r1 check 8: an item with several boxes - a count row, an array and its turn - wrote every answer
+    // into the ONE "The answer is ___" blank; the provider's frame for the box the wrong answer changed asks for one number)
+    const fr = wrong.frame && typeof wrong.frame.stem === 'string' && wrong.frame.value !== undefined ? wrong.frame : null;
+    const ansVal = fr ? String(fr.value) : correct;
+    const digits = Math.max(2, Math.min(6, ansVal.replace(/[^0-9]/g, '').length || 2));
+    const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': ansVal }, `${right}: ${ansVal}`);
     // (a sentence-layout story - word-work `layout: 'sentence'` - is a story over a number sentence 60+ mm wide: in a
     // third of the row its frame ran over the A panel's border; critic visual-quality r2 N4. It takes the wide form
     // below, B under A, drawn as a half-page column so its unit word still sits beside the box; the story once on top)
@@ -44,20 +48,32 @@ export function prepare(it, info = {}) {
     const sentence = it.template === 'word-work' && pl.layout === 'sentence';
     // (a sentence story prints ONCE, over both panels; each panel holds its number sentence only - critic r3 N12: a
     // panel that repeated the story held one item a page at L. `noFrame` + `bar: false`: the story with no work zone)
-    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }, sentence ? { payload: { noStory: true } } : {}));
     const story = (c) => (sentence ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: { noFrame: true, bar: false } })}</div>` : '');
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
     // box; the response column stays beside both.
-    const wide = sentence || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
-    const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
-    const render = (c, o = {}) => story(c) + `<div class="mq-ab"${wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
-        + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
-        + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
-        + `<div class="mq-abresp"${at(2, '1 / 3')}>`
+    // (lane lf-ops critic r1 D-MP-4 / D-CB-1: an array and its turn, or a count row, is wider than its panel too - the
+    // A / B panels ran over each other and off the page. Any item wider than a panel beside the response (about 55 mm)
+    // takes a form that holds it: `pair` - A and B side by side across the cell, the response under them (up to half the
+    // cell, about 83 mm); `full` - A over B over the response, each the cell's width, drawn at the full-line geometry
+    // (cols 1). The equation and sentence forms keep B under A with the response beside, as before.)
+    const fw = Number((it.footprint || {}).wMm);
+    const panelW = (LIVE_W_MM - 6 - 52 - 10) / 2 - 4, halfW = (LIVE_W_MM - 6 - 5) / 2 - 4;
+    const over = !sentence && Number.isFinite(fw) && fw > panelW;
+    const legacyWide = sentence || (it.template === 'equation' && over);
+    const pair = !legacyWide && over && fw <= halfW;
+    const full = !legacyWide && over && fw > halfW;
+    const wide = legacyWide;
+    const at = (col, row) => (full ? ` style="grid-column:1;grid-row:${row}"` : pair ? ` style="grid-column:${col};grid-row:1"` : wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
+    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : full ? 1 : pair || wide ? 2 : 3, shown: v, prompt: false }, sentence ? { payload: { noStory: true } } : {}));
+    const respStyle = ' style="grid-column:1 / -1;grid-row:' + (full ? 3 : 2) + ';display:flex;flex-wrap:wrap;align-items:center;column-gap:8mm;row-gap:2mm"';
+    const render = (c, o = {}) => story(c) + `<div class="mq-ab"${full ? ' style="grid-template-columns:1fr;row-gap:3mm"' : pair ? ' style="grid-template-columns:1fr 1fr;row-gap:3mm"' : wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
+        + `<div class="mq-abbox"${full ? at(1, 1) : pair ? at(1) : at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
+        + `<div class="mq-abbox"${full ? at(1, 2) : pair ? at(2) : at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
+        + `<div class="mq-abresp"${full || pair ? respStyle : at(2, '1 / 3')}>`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + `<div class="mq-frame">${writeLine('ri-who', c, key, 1)} is correct.</div>`
-        + `<div class="mq-frame">The answer is ${writeLine('ri-ans', c, key, digits)}.</div>`
+        + `<div class="mq-frame">${fr ? esc(fr.stem) : 'The answer is '}${writeLine('ri-ans', c, key, digits)}.</div>`
         + `</div></div>`;
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true,
