@@ -282,3 +282,15 @@ every common width including 1024x768 and 360x740.
 grades them by eye; when the critic passes the family, its skills are added to `siblings.json` as approved siblings, so the
 second family on the template is machine-compared. Applied to pv (lf-placevalue) and arrays / arrays-turn (lf-ops).
 A card that offers every §7a option and has no `notOffered` entry reads card-not-offered as N/A, not a failure.
+
+## lf-vocab (vocabulary pictures) precritic r1-r5 and critics r1-r2 (2026-11-07): one line per finding, the check that catches it
+| Finding | Rule | Check |
+|---|---|---|
+| A picture's word could be read off a second picture in the same item (row/column, term/sequence, round up/quotient) | Words whose pictures share a mark are `notWith`; every word set splits into two clash-free trios | ws-vocab-unit V3-V7; backtest row `vocab-sets-split` |
+| Pictures too small to teach (ten rod 3.4 mm, lone 12 mm square, 10 pt text) | A picture's marks span >= 50 % of its drawing area both ways; picture text >= 7 canvas units | ws-vocab-unit V8 |
+| K-1 number strips at 11 pt | Printed picture text >= 16 pt for K-1, >= 14 pt for grades 2-5, at every host, grade and size | ws-vocab-unit V9 |
+| Footer named the skill's grade-3 tags on grade 1, 2, 4 pages | A page dealt from one word set carries that set's grade and CCSS (items carry `q.sheetTags`) | ws-vocab-unit V10 |
+| Match 3 page scored /4 for 12 words | A template declares its points (`footprint().points`); the page Score sums them | ws-vocab-unit V11 |
+| Guided hint repeated the instruction; error-analysis wrong word not a real mistake | A hint names the cue; a wrong word is a look-alike or a misspelling | ws-vocab-unit V12, V13 |
+| A role the card offers declined the skill (a 'choice' slot) / drew the key as the wrong work | Every role on the card's §7a renders the skill; a Fix item's shown work differs from its key | critic-caught; run every offered role in the local loop (ws-grade-render --roles <card's offered roles>) |
+| Match 3 guided at S overflows (r3 render) while precritic is green | precritic's render gate (lesson, test, independent) does not draw guided / more-practice / error-analysis: render EVERY role the card offers before calling a page clean | proposed: ws-precritic --skill runs ws-grade-render --gate on the card's offered roles (lead) |
