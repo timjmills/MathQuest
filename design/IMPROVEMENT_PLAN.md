@@ -1,5 +1,11 @@
 # Improvement plan — faster building, a simple teacher site, truly mixed pages (v20.4, 2026-10-23)
 
+> **2026-11-07 — current work order: `design/LESSONS_FIRST_PLAN.md`.** The owner made the K–5 short and long lessons of all
+> CCSS lessons, and the skill families they practise, the first priority (STATUS 2026-11-07), unit by unit by time of year,
+> every agent on Opus 5.5 medium, stop near 70 % of the weekly limit. That plan brings §1.6.5 "Lessons" and E4 forward (they
+> were "a later wave"), parks E1–E3 for skills no lesson uses, and says which queued lanes move up or wait (its §2.3). The
+> queue is generated: `node tests/scripts/ws-lessons-first-queue.cjs` → `design/lessons-first/QUEUE.md`.
+
 ## In short (for the owner)
 
 1. **Faster building, same quality.** Most of the time goes on critic rounds (median about 5 per lane), and most of
