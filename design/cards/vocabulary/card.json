@@ -1,0 +1,450 @@
+{
+  "id": "vocabulary",
+  "kind": "template",
+  "title": "Vocabulary with pictures: Match 3 pictures (`vocab-match3`) and 1 picture, 3 words (`vocab-pick3`), the lesson vocabulary page and the picture set",
+  "template": {
+    "id": "vocab-match3",
+    "source": "js/modules/sheet/cells/vocab-match3.js",
+    "also": "The same card covers `vocab-pick3` (js/modules/sheet/cells/vocab-pick3.js), the shared picture set (js/modules/sheet/graphics/vocab-pictures.js, graphic library), the lesson word sets (js/modules/sheet/lesson-pages/vocab-words.js), the lesson part `vocab-page` (js/modules/sheet/lesson-pages/vocab-pages.js, registered in lesson-pages/index.js) and the generator branch `_genPictureTask` (js/modules/gen-vocabulary.js) with its provider (js/modules/sheet/providers/vocabulary.js). screen-cell.js draws the same cells on the practice card, online worksheet and quiz."
+  },
+  "families": [
+    "vocabulary"
+  ],
+  "findingsMatch": {
+    "templates": [
+      "vocab-match3",
+      "vocab-pick3",
+      "lesson-vocab"
+    ]
+  },
+  "skills": {
+    "include": [
+      "vocabulary:vocab_grade_pictures",
+      "vocabulary:vocab_pick3_words"
+    ]
+  },
+  "excerptChars": 140,
+  "sourceChars": 90,
+  "summary": "The owner's vocabulary redesign (2026-10-25, IMPROVEMENT_PLAN 'Vocabulary redesign and the graphic library'), scoped by the owner on 2026-11-07 to the words of the 64 CCSS BUILD lessons, earliest rounds first (round 1 = 11 BUILD lessons, the pilot unit G3-Y4.B4 first). Two problem types, each one boxed cell: MATCH 3 PICTURES (three pictures lettered A B C, three words; write the letter beside each word; 4 a page) and 1 PICTURE, 3 WORDS (copy the right word from a bank of three onto a line; K-1 4, grades 2-3 6, grades 4-5 8 a page). One shared picture set (47 black-and-white drawings, the graphic library) serves the lesson's opening vocabulary page AND the practice skills. Each task kind is also a findable preset skill.",
+  "teaches": "The language of the lessons, not one standard: each word set is the vocabulary of one CCSS BUILD lesson (round 1: 1.NBT.A.1, 2.NBT.A.3, 3.OA.B.5, 3.OA.C.7, 3.OA.D.8, 3.OA.D.9, 4.OA.A.1, 4.OA.A.3, 4.OA.C.5), decided from the standard's text and, where a long lesson exists, its own vocabulary (owner 2026-11-07: decide from the standards). Receptive (match a word to its picture) then productive (copy the word that names a picture) - the catalogue's VC-R1 and VC-P1 rungs (design/catalogue/vocabulary.md).",
+  "research": "From repo sources: design/catalogue/vocabulary.md (the family audit: ladders VC-R / VC-P, the defects of today's six-variant mix), the owner's design in IMPROVEMENT_PLAN, the owner's 10-17 letter change (design/lesson-planner/wip-2026-10-17/vocab-letters.uncommitted.patch, superseded by the 10-25 design: the PICTURES are lettered and the box is beside the WORD), data/standards/ccss-math.json for the word sets, the detailed lessons' own vocabulary. MathWorksheets4Kids / IXL not opened this round (budget; the owner's design is explicit and outranks them): their vocabulary pages are picture-word matching with lines and a word bank, the same grammar in a denser layout.",
+  "problemTypes": [
+    "Match 3 pictures (vocab-match3): three pictures in a row lettered A, B, C; under them the three words in another order (never a word under its own picture), each with one letter box; the pupil writes the picture's letter in each box. Screen: the same three letter boxes, one character each (type the letter): the response is the same, never multiple choice.",
+    "1 picture, 3 words (vocab-pick3): one picture, a bank of three words in a thin box under it, a writing line; the pupil copies the right word onto the line. Screen: the three words are buttons; a tap drops the word onto the line (the cell's :has() rule), one graded answer.",
+    "The lesson vocabulary page (lesson part vocab-page, a lesson whose record names its vocabSet): band 'Match the pictures:' two Match 3 cells (all six words), band 'Name the picture:' 1-picture cells for the core words (K-1 and grades 2-3: 2, grades 4-5: 4); key on the facsimile page."
+  ],
+  "progression": [
+    "Match 3 pictures (receptive: recognise the word; three pairs, the picture labelled) -> 1 picture, 3 words (productive: choose and write the word). One change a step (P-1): the response changes from a letter to a word.",
+    "One lesson's six words (vocabSet) -> every word of the grade's lessons (vocabGrade): the pool grows, the task does not change.",
+    "A page uses every word of its pool once before any word comes back; no item offers two words whose pictures could be read the same (notWith), so every item has one right answer."
+  ],
+  "drawing": {
+    "sizes": "Pictures on a 60 x 40 canvas scaled to the width the cell gives: Match 3 at 38 / 40 / 40 mm (S / M / L); 1 picture, 3 words at 80 / 40 / 34 mm for grades K-1 / 2-3 / 4-5 (x 0.88 at S, x 0.94 at M). Strokes non-scaling: structure / the named mark 1.5 pt, parts 1 pt, fine rules 0.75 pt. Picture text >= 5.8 canvas units (11 pt at 40 mm). Match 3: letters A B C at text + 5 pt, words at text + 3 pt bold, letter box Hw + 2 mm square, 1.5 pt. 1 picture: bank words at text + 5 / + 2 / + 1 pt (K-1 / 2-3 / 4-5) in a 0.75 pt box, one line when they fit else one word a line; the writing line 1.5 pt, as wide as the longest bank word. Cell minimum heights 96 / 61 / 45 mm (+ 6 mm cell padding): 2 / 3 / 4 rows on A4 (grid 227 mm) and Letter (209 mm).",
+    "notes": "Black ink on white, no grey and no colour in a picture (INK-1). A picture never prints its own word (L-LEAK); the part the word names is its ONE heavy mark (a ring, a box, an outline, an arrow). Words whose pictures could be read as each other list each other in notWith (vocab-words.js) and are never offered in one item. Measured counts (ws-grade-render, independent role): Match 3 = 4 a page and grade-3 picture = 6 a page at S, M and L on A4 and Letter.",
+    "capacity": []
+  },
+  "ruleGroups": [
+    {
+      "title": "Visual quality bar (quoted in full)",
+      "core": true,
+      "full": true,
+      "rules": [
+        "VQ-1",
+        "VQ-2",
+        "VQ-3",
+        "VQ-6",
+        "VQ-8"
+      ]
+    },
+    {
+      "title": "Key and the one answer place (quoted)",
+      "core": true,
+      "chars": 400,
+      "rules": [
+        "AK-1",
+        "AK-2",
+        "H13"
+      ]
+    },
+    {
+      "title": "Visual quality, the rest",
+      "chars": 120,
+      "rules": [
+        "VQ-4",
+        "VQ-5",
+        "VQ-7",
+        "VQ-9",
+        "VQ-10"
+      ]
+    },
+    {
+      "title": "Cell, slots, density and screen",
+      "chars": 120,
+      "rules": [
+        "CL-40",
+        "SL-11",
+        "SP-1",
+        "SCC-01",
+        "P-1",
+        "P-10"
+      ]
+    },
+    {
+      "title": "Cited by critics (rubric, page and slot rules)",
+      "chars": 100,
+      "rules": [
+        "C1",
+        "C2",
+        "H1@RUBRIC",
+        "H2@RUBRIC",
+        "H3@RUBRIC",
+        "H4@RUBRIC",
+        "H5@RUBRIC",
+        "H6",
+        "H7",
+        "H8",
+        "H9",
+        "H10",
+        "H11",
+        "L1",
+        "L3",
+        "L6",
+        "BD-4",
+        "BD-11",
+        "RP-1",
+        "RP-20",
+        "SL-2",
+        "SL-3",
+        "SP-2"
+      ]
+    }
+  ],
+  "ownerRulings": [
+    {
+      "date": "2026-10-25",
+      "ruling": "Two problem types, both one boxed cell: Match 3 pictures (three words, three pictures labelled A, B, C; write the letter in a box beside each word; on screen the letter is chosen per word, same response, no MC swap) and 1 picture, 3 words (one picture, a three-word bank; copy the right word onto a line under the picture; on screen tapping the word drops it onto the line).",
+      "source": "design/IMPROVEMENT_PLAN.md 'Vocabulary redesign and the graphic library' item 1"
+    },
+    {
+      "date": "2026-10-25",
+      "ruling": "Per page: Match 3 pictures = 4; 1 picture, 3 words: K-1 4, grades 2-3 6, grades 4-6 8.",
+      "source": "IMPROVEMENT_PLAN item 2"
+    },
+    {
+      "date": "2026-10-25",
+      "ruling": "Pictures very high quality, black and white, drawn by the app; ONE shared set serves the lesson's vocabulary page and the vocabulary practice; every approved drawing joins the graphic library.",
+      "source": "IMPROVEMENT_PLAN items 3-4"
+    },
+    {
+      "date": "2026-10-25",
+      "ruling": "Each problem type is a distinct task kind, so it is ALSO a findable preset skill with standards, WRM, search terms and share codes.",
+      "source": "IMPROVEMENT_PLAN item 5; CLAUDE.md owner rule 2026-10-17"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Scope: only the 64 CCSS BUILD lessons, their vocabulary first, earliest rounds first. Grade map K = Y1 ... G5 = Y6.",
+      "source": "lead's launch message (owner decisions 2026-11-07, design/STATUS.md:713)"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "\"All as suggested\": the card approved as the lane decided it (section 9 answered as recommended).",
+      "source": "owner in the lead session, relayed by the lead 2026-11-07"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Q1: role:lesson is OUT OF SCOPE for vocabulary:vocab_grade_pictures and vocabulary:vocab_pick3_words: their lesson is the lesson part vocab-page inside each BUILD lesson.",
+      "source": "owner in the lead session, relayed by the lead 2026-11-07"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Q2: the page counts 4 / 6 / 8 (1 picture, 3 words at K-1 / grades 2-3 / grades 4-5) and 4 (Match 3) are the owner's: a value that prints fewer items than the default page for that reason is owner-ruled capacity (tests/fixtures/precritic/options-render.pins.json), not an H13 cost.",
+      "source": "owner in the lead session, relayed by the lead 2026-11-07"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "M-V1",
+      "error": "reads a look-alike picture as the word (row / column, input / output, factor / product, divisor / dividend: the heavy mark is on the other part)",
+      "wrong": "row -> the picture with the column outlined"
+    },
+    {
+      "id": "M-V2",
+      "error": "chooses a bank word by its sound or first letter, not by the picture",
+      "wrong": "product for the picture of a factor"
+    },
+    {
+      "id": "M-V3",
+      "error": "matches by position (writes A, B, C in order) instead of reading each picture",
+      "wrong": "A, B, C"
+    },
+    {
+      "id": "M-V4",
+      "error": "copies the word with a letter missing or swapped (productive load)",
+      "wrong": "remiander"
+    }
+  ],
+  "options": [
+    "vocabTask (host vocab_grade_pictures): match3 | pick3, default match3, share key 6C (M / P). The host IS the Match 3 pictures skill (it defaults to that value: the owner rule's 'a skill that defaults to that option'); 1 picture, 3 words is the preset vocab_pick3_words. (A Match 3 preset was tried and dropped: ws-presets-unit fails a preset whose values change nothing.)",
+    "vocabGrade: 1 | 2 | 3 | 4, default 3 (the grades whose BUILD lessons have word sets today; K's BUILD lessons start in round 5). Share key 6D.",
+    "vocabSet: null (every word of the grade) | 0-10 (one BUILD lesson's six words, VOCAB_SETS position, append-only). Overrides the grade. Share key 6E."
+  ],
+  "gates": [
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --skill vocabulary:vocab_grade_pictures --strict",
+      "note": "and vocabulary:vocab_pick3_words"
+    },
+    {
+      "cmd": "node tests/scripts/ws-visual-quality.mjs --skill vocabulary:vocab_grade_pictures",
+      "note": "and the pick preset"
+    },
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --role lesson --strict",
+      "note": "lesson pages (H13 on the lesson cells)"
+    },
+    {
+      "cmd": "node tests/scripts/ws-presets-unit.mjs",
+      "note": "the two presets open the host with their values"
+    },
+    {
+      "cmd": "node tests/scripts/ws-standards.cjs",
+      "note": ""
+    },
+    {
+      "cmd": "node tests/scripts/ws-search-terms.cjs",
+      "note": ""
+    },
+    {
+      "cmd": "node tests/scripts/ws-code-snapshot.mjs",
+      "note": "two appended codes VS VZ"
+    }
+  ],
+  "openQuestions": [
+    {
+      "q": "Screen response for Match 3: type the letter in each box (built), or tap A / B / C under each word?",
+      "recommended": "Type the letter (built): it is the paper response itself; a tap row can come later without changing paper. (Owner: as suggested, 2026-11-07.)"
+    },
+    {
+      "q": "Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in round order?",
+      "recommended": "Yes, round 2's BUILD lessons next (7 lessons), the same picture rules. (Owner: as suggested, 2026-11-07.)"
+    }
+  ],
+  "decisions": {
+    "options": [
+      {
+        "option": "vocabTask",
+        "values": [
+          "match3",
+          "pick3"
+        ],
+        "d": "offered",
+        "source": "owner design 2026-10-25 (IMPROVEMENT_PLAN item 1)",
+        "why": "the two problem types; the host is the Match 3 skill, vocab_pick3_words the 1-picture preset"
+      },
+      {
+        "option": "vocabGrade",
+        "values": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "d": "offered",
+        "source": "lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "the grades whose round-1 BUILD lessons have word sets; default 3 (the pilot unit G3-Y4.B4)"
+      },
+      {
+        "option": "vocabSet",
+        "values": [
+          "null",
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "d": "offered",
+        "source": "lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "one BUILD lesson's six words (append-only positions), or every word of the grade"
+      },
+      {
+        "option": "calculator",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js play controls",
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card"
+      },
+      {
+        "option": "skipAfter",
+        "values": [
+          "*"
+        ],
+        "d": "out of scope",
+        "source": "skill-options.js play controls",
+        "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR"
+      }
+    ],
+    "roles": [
+      {
+        "key": "role:independent",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "the pass bar (RUBRIC scope)"
+      },
+      {
+        "key": "role:more-practice",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "the pass bar"
+      },
+      {
+        "key": "role:test",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "the pass bar"
+      },
+      {
+        "key": "role:lesson",
+        "d": "out of scope",
+        "source": "owner 2026-11-07 (Q1, via the lead)",
+        "why": "a vocabulary skill's lesson is the lesson part vocab-page inside each BUILD lesson; its own standard packet is not printed for it"
+      },
+      {
+        "key": "role:scripted-model",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "provider workedSteps real: look, say what each picture shows, write"
+      },
+      {
+        "key": "role:guided",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "provider workedSteps real"
+      },
+      {
+        "key": "role:opener",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:error-analysis",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "provider wrongAnswer real: two letters swapped / a bank word not the picture's"
+      },
+      {
+        "key": "role:review",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:pre-skill-check",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:mixed-practice",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:true-false",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "provider wrongAnswer real"
+      },
+      {
+        "key": "role:reason-it",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "provider workedSteps and wrongAnswer real"
+      },
+      {
+        "key": "role:stretch",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "any skill on any page type"
+      },
+      {
+        "key": "role:word-problems",
+        "d": "out of scope",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "no stories for a vocabulary item; the role falls back"
+      },
+      {
+        "key": "role:fact-rows",
+        "d": "out of scope",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "not fact skills: the role reports unsupported"
+      },
+      {
+        "key": "role:fact-probe",
+        "d": "out of scope",
+        "source": "CLAUDE.md (any skill on any page type); lf-vocab lane decision under the owner's 2026-11-07 rule (no card sign-off; decide from the standards and record)",
+        "why": "not fact skills: the role reports unsupported"
+      }
+    ],
+    "hosts": [
+      {
+        "key": "host:practice-card",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:online-worksheet",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:quiz",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "one drawing with print; the pass bar"
+      },
+      {
+        "key": "host:boss",
+        "d": "out of scope",
+        "source": "as family-check",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic"
+      },
+      {
+        "key": "host:race",
+        "d": "out of scope",
+        "source": "as family-check",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, not by this card's critic"
+      },
+      {
+        "key": "host:map",
+        "d": "out of scope",
+        "source": "as family-check",
+        "why": "game / display hosts draw the same card; graded by ws-screen-slots, not by this card's critic"
+      },
+      {
+        "key": "host:mode-dark",
+        "d": "out of scope",
+        "source": "as family-check",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic"
+      },
+      {
+        "key": "host:mode-bigboard",
+        "d": "out of scope",
+        "source": "as family-check",
+        "why": "game / display hosts draw the same card; graded by ws-chromebook-fit, ws-screen-slots, not by this card's critic"
+      }
+    ]
+  }
+}

@@ -37,6 +37,10 @@ import {
     createAngleSVG
 } from './svg-geometry.js';
 import { createAnalogClockSVG, createDigitalClockHTML } from './svg-clock.js';
+// The vocabulary redesign (lane lf-vocab, 2026-11-07): the lesson word sets and the kit cells.
+import { VOCAB_SETS, VOCAB_WORDS, vocabSetAt, gradeWords, compatible, VOCAB_GRADES } from './sheet/lesson-pages/vocab-words.js';
+import { k2Twin as _vk2Twin } from './sheet/index.js';
+import { onNewPage as _vOnNewPage } from './page-deal.js';
 
 // Small inline speaker button for vocab cards/visuals. The actual TTS
 // dispatch is wired via a global delegated click listener in globals.js
@@ -122,6 +126,9 @@ const CATEGORY_SETS = [
 ];
 
 export function generateVocabularyQuestion(q, mappedSkill, helpers) {
+    // THE PICTURE TASKS (design/cards/vocabulary/vocabulary.md): Match 3 pictures and 1 picture 3 words,
+    // on the lesson word sets' pictures (graphics/vocab-pictures.js). Its own branch: none of the card pools below.
+    if (mappedSkill === 'vocab_grade_pictures') { _genPictureTask(q); return; }
     const { grade, domain } = parseVocabSkillId(mappedSkill);
 
     let pool = domain
@@ -576,4 +583,105 @@ function escapeHTML(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+
+// ---------- THE PICTURE TASKS (lane lf-vocab, 2026-11-07) ----------
+//
+// `vocab_grade_pictures` (Match 3 pictures) and its preset vocab_pick3_words (1 picture, 3 words). Options
+// (skill-options.js): vocabTask 'match3' | 'pick3' (default match3), vocabGrade 1-4 (the grades
+// with lesson sets; default 3), vocabSet null (every word of the grade's sets) | a set index
+// (one BUILD lesson's words). Every word drawn has a library picture; no item offers two words
+// whose pictures read the same (vocab-words.js notWith), so every item has one right answer.
+
+const _VT_LET = ['A', 'B', 'C'];
+// Words already shown on this printed page: a page uses every word of its pool once before any comes back
+// (critic pre-check 2026-11-07: "column" printed in two Match 3 cells of one page). Forgotten at each new page.
+let _vtUsed = new Set();
+_vOnNewPage(() => { _vtUsed = new Set(); });
+/** The pool with this page's unused words first (all words again once every one has been shown). */
+function _freshFirst(pool, need) {
+    const fresh = pool.filter((w) => !_vtUsed.has(w));
+    if (fresh.length < need) { _vtUsed = new Set(); return pool.slice(); }
+    return fresh;
+}
+/** The words a page draws from. */
+function _pictureWords() {
+    const o = (state.skillOptions || {});
+    const set = o.vocabSet !== null && o.vocabSet !== undefined ? vocabSetAt(o.vocabSet) : null;
+    if (set) return { words: set.words.slice(), grade: set.grade };
+    const g = VOCAB_GRADES.includes(Number(o.vocabGrade)) ? Number(o.vocabGrade) : 3;
+    return { words: gradeWords(g), grade: g };
+}
+/** `n` words from `pool` that may sit together, starting with `first` when given; this page's unused words first. */
+function _compatiblePick(pool, n, first) {
+    for (let tries = 0; tries < 60; tries++) {
+        const out = first ? [first] : [];
+        const rest = pool.filter((x) => x !== first);
+        for (const w of shuffle(rest.filter((x) => !_vtUsed.has(x))).concat(shuffle(rest.filter((x) => _vtUsed.has(x))))) {
+            if (out.length >= n) break;
+            if (compatible(out.concat([w]))) out.push(w);
+        }
+        if (out.length === n) return out;
+    }
+    return null;
+}
+function _genPictureTask(q) {
+    const o = (state.skillOptions || {});
+    const task = o.vocabTask === 'pick3' ? 'pick3' : 'match3';
+    const { words, grade } = _pictureWords();
+    q.answerType = 'text';
+    q.options = [];
+    q.printFormat = 'vocab-match';
+    if (task === 'match3') {
+        if (words.every((w) => _vtUsed.has(w))) _vtUsed = new Set();
+        // a trio whose leftover unused words can still make a trio of their own, so the page shows every word once
+        // before any comes back (ws-vocab-unit V5)
+        let trio = null;
+        for (let t = 0; t < 40 && !trio; t++) {
+            const cand = _compatiblePick(words, 3);
+            if (!cand) break;
+            const left = words.filter((w) => !_vtUsed.has(w) && !cand.includes(w));
+            if (left.length !== 3 || compatible(left)) trio = cand;
+        }
+        trio = trio || _compatiblePick(words, 3) || words.slice(0, 3);
+        trio.forEach((w) => _vtUsed.add(w));
+        // the word row: a rotation, so no word sits under its own picture
+        const order = Math.random() < 0.5 ? [1, 2, 0] : [2, 0, 1];
+        const letters = order.map((i) => _VT_LET[i]);
+        const payload = { words: trio, order, grade };
+        q.cell = { template: 'vocab-match3', v: 1, payload };
+        try { q.visual = _vk2Twin('vocab-match3', payload); } catch (e) { q.visual = ''; }
+        q.text = 'Write the letter of its picture next to each word.';
+        q.printText = q.text;
+        q.screenInstr = 'Type the letter of its picture next to each word.';
+        q.ans = letters.join(', ');
+        q.acceptedAnswers = [letters.join(','), letters.join(' '), letters.join(', ').toLowerCase(), letters.join('').toLowerCase(), letters.join('')];
+        q.keyParts = letters.slice();
+        q.selfAnswering = true;
+        q.skillLabel = 'Match 3 Pictures';
+        q.hint = `Look at each picture. ${trio.map((w) => `${w}: ${VOCAB_WORDS[w].meaning}.`).join(' ')}`;
+        q.dupKey = `vocab-match3:${trio.slice().sort().join('|')}`;
+        q.vocabWords = trio.slice();
+        return;
+    }
+    const pickFrom = words.length >= 3 ? words : gradeWords(grade);
+    const target = pick(_freshFirst(pickFrom, 1));
+    _vtUsed.add(target);
+    const three = _compatiblePick(pickFrom, 3, target) || [target].concat(pickFrom.filter((w) => w !== target).slice(0, 2));
+    const bank = shuffle(three.slice());
+    const payload = { word: target, bank, grade };
+    q.cell = { template: 'vocab-pick3', v: 1, payload };
+    try { q.visual = _vk2Twin('vocab-pick3', payload); } catch (e) { q.visual = ''; }
+    q.text = 'Look at the picture. Write its word on the line.';
+    q.printText = q.text;
+    q.screenInstr = 'Look at the picture. Tap its word.';
+    q.ans = target;
+    q.acceptedAnswers = [target, target.toLowerCase()];
+    q.selfAnswering = true;
+    q.printAnswer = target;
+    q.skillLabel = '1 Picture, 3 Words';
+    q.hint = `${target}: ${VOCAB_WORDS[target].meaning}.`;
+    q.dupKey = `vocab-pick3:${target}`;
+    q.vocabWords = bank.slice();
 }

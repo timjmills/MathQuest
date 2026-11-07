@@ -1330,6 +1330,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-sets-split",
+   "check": "Every lesson word set splits into two clash-free Match 3 trios (ws-vocab-unit V7; lane lf-vocab build 1: the G4 remainder set repeated a word on a Match 3 page)",
+   "kind": "fixture",
+   "rule": "ws-vocab-unit V7",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/vocab-sets.fail.mjs",
+    "state": "remainder, round up and equal groups in one set: they all read as each other (notWith)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/vocab-sets.pass.mjs",
+    "state": "equation for equal groups: two clash-free trios"
+   },
+   "command": "node tests/scripts/ws-vocab-unit.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

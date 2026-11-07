@@ -566,6 +566,7 @@ if (!Array.isArray(window.weightedItems)) window.weightedItems = [];
 const loadDeferred = makeLazy('teacher / print', (n) => Promise.all([
     n ? import(`./modules/deferred.js?retry=${n}`) : import('./modules/deferred.js'), loadDeferredCss(),
 ]).then(([m]) => {
+    Object.assign(window, m.LESSON_API || {});   // lesson lookups (not stubbed: no inline handler calls them)
     window.__mqDeferredLoaded = true;
     try { document.dispatchEvent(new CustomEvent('mq:deferred-ready')); } catch (e) { /* old browser */ }
     return m.API;

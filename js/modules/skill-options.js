@@ -2273,6 +2273,30 @@ const _vocabWordSet = (size) => {
 };
 let _P12_VOCAB = null;
 const _VOCAB_BY_SIZE = {};
+// THE PICTURE TASKS (lane lf-vocab, 2026-11-07; design/cards/vocabulary/vocabulary.md §7): the host
+// `vocab_grade_pictures` (Match 3 pictures, its default) and its preset vocab_pick3_words. vocabTask is the task
+// kind (a distinct task, so each value is ALSO a findable skill, owner rule 2026-10-17); vocabGrade and vocabSet choose the words (the lesson
+// sets of sheet/lesson-pages/vocab-words.js: grades 1-4 today; a set index is append-only).
+let _VOCAB_PIC_OPTS = null;
+function _vocabPictureOptions() {
+    if (!_VOCAB_PIC_OPTS) {
+        _VOCAB_PIC_OPTS = [
+            { id: 'vocabTask', label: 'Task', type: 'enum', group: 'difficulty', default: 'match3',
+                values: [{ v: 'match3', l: 'Match 3 pictures (write the letter)' }, { v: 'pick3', l: '1 picture, 3 words (copy the word)' }],
+                help: 'Match 3 pictures: three pictures A, B, C and three words; write the letter beside each word (4 a page). 1 picture, 3 words: copy the right word from a bank of three onto the line (K-1 4, grades 2-3 6, grades 4-5 8 a page).' },
+            { id: 'vocabGrade', label: 'Grade of the words', type: 'enum', group: 'range', default: 3,
+                values: [{ v: 1, l: 'Grade 1' }, { v: 2, l: 'Grade 2' }, { v: 3, l: 'Grade 3' }, { v: 4, l: 'Grade 4' }],
+                help: 'Every word of that grade\'s lessons that has a picture. Choose one lesson below for its words only.' },
+            { id: 'vocabSet', label: 'Words of one lesson', type: 'enum', group: 'range', default: null,
+                values: [{ v: null, l: 'Every word of the grade' }, { v: 0, l: 'Gr 3: Patterns on the multiplication table' }, { v: 1, l: 'Gr 3: Find the rule in an input-output table' },
+                    { v: 2, l: 'Gr 3: Properties of multiplication' }, { v: 3, l: 'Gr 3: Two-step word problems' }, { v: 4, l: 'Gr 1: Count on to 120' },
+                    { v: 5, l: 'Gr 2: Read and write numbers to 1,000' }, { v: 6, l: 'Gr 4: Units digit cycle' }, { v: 7, l: 'Gr 4: Growing shape patterns' },
+                    { v: 8, l: 'Gr 4: Follow a rule to extend a pattern' }, { v: 9, l: 'Gr 4: Times as many' }, { v: 10, l: 'Gr 4: Divide and interpret the remainder' }],
+                help: 'One lesson\'s six words (its vocabulary page uses the same pictures). It overrides the grade.' },
+        ];
+    }
+    return _VOCAB_PIC_OPTS;
+}
 function _vocabOptions(skillId) {
     const m = String(skillId).match(/^vocab_grade_(k|\d)(?:_(\w+))?$/i);
     const key = m ? (m[1].toUpperCase() + (m[2] ? '_' + m[2] : '')) : '';
@@ -2311,6 +2335,7 @@ export function ownOptionsFor(categoryId, skillId) {
     if (pre) return pre;
     const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId];
     if (own) return own;
+    if (categoryId === 'vocabulary' && String(skillId) === 'vocab_grade_pictures') return _vocabPictureOptions();
     if (categoryId === 'vocabulary' && /^vocab_grade_/.test(String(skillId))) return _vocabOptions(skillId);
     if (_poolOptions) {
         try { const p = _poolOptions(categoryId, skillId); if (p) return p; } catch (e) { /* no pool */ }

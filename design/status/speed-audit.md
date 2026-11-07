@@ -760,6 +760,11 @@ under CL-4b (owner), band instruction for presets.
 
 Details and the reflection: design/status/s1-checks.md.
 
+## 2026-10-30 · lessons-phase0 r1 (FAIL, min 3) — per-round findings
+Automatic checks and speed-ups: `design/status/lessons-phase0.md` "Per-round findings". Headline: 5 of 13 content defects
+(D2 D3 D5 D7 D8) are prerequisite-item choices no gate deals and reads; 2 (D6 AK-4, D9 H13) were measured by existing tools
+that are not blocking on the lesson path. Lane paused by the owner after r1; fixes assigned to the r2 builder when resumed.
+
 ### Lane lessons-6-7 (detailed lessons 6 + 7) — builder rounds before critic r3 / r1 (2026-10-30)
 
 | Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |

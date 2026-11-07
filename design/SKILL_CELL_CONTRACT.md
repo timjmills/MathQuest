@@ -918,6 +918,51 @@ The instruction library gained ten keys with these providers (`line-jumps`, `dra
 `draw-blocks-100`, `check-groups`, `how-many-left`, `ring-remainder`, `pick-parts`, `fact-family`,
 `chart-fill`, `groups-total`), added in `contract.js` and in PEDAGOGY_STANDARD.md 10.1 together.
 
+### 3.9 Lesson page data: what a skill supplies to the lesson page builders (2026-10-30)
+
+Owner ruling 2026-09-26 (`design/LESSON_LIBRARY_PLAN.md` §8c, §8e) and lane `lessons-phase0` (lead decisions D1, D2):
+one design per page job, shared by the lesson packet and any skill's Practice or Quiz paper. The builders live in
+`sheet/lesson-pages/*`; `roles/lesson.js` only composes them into the packet's anchor chart and lesson sheet.
+
+| Builder | Module | Page job it replaces |
+|---|---|---|
+| anchor chart | `lesson-pages/chart.js` (`pickExample`, `otherExamples`, `stateItems`, `finalItems`, `secondItems`, `chartPage`) | Worked example (scripted Model) |
+| vocabulary | `lesson-pages/vocab.js` (`vocabItem`, `vocabBands`: the match and the Remember strip) | - |
+| warm-up band | `lesson-pages/warm-up.js` (`warmShape`, `warmUpBand`) | the standard sheet's Warm-up. The Prerequisite Check PAGE is `roles/pre-skill-check.js` (PAGE_TYPES 2.10), the one page for that job (D1) |
+| We Do | `lesson-pages/we-do.js` (`pickWeDo`, `stepsItem`, `weDoBand`, `weDoRender`) | Guided |
+| practice | `lesson-pages/practice.js` (`independentBand`, `stripHtml`, `practiceSection`, `practiceRequest`) | Independent, More practice |
+| mixed | `lesson-pages/mixed.js` (`mixedRequest`) | Review, Mixed practice |
+
+**The registry (D2).** `lesson-pages/index.js` keeps the packet's PARTS by id, in order - `chart` (10), `sheet` (20),
+`practice` (30), `mixed` (40); `registerLessonPart({id, order, role, name, sheet, offset, size, inPacket, plan})` - and
+the lesson sheet's BANDS - `vocab` (10), `warm-up` (20), `guided` (30); `registerSheetBand({id, order, build(env)})`. A
+new page job (the planned vocabulary pages) registers a part or a band there; `roles/lesson.js` lays out whatever bands
+the registry lists and hands any part it does not plan itself to that part's `plan`, so the role is not edited.
+
+The ARCHETYPE decides only how a worked example is drawn step by step and which cases it names
+(`sheet/lesson-arch/*.js`: `fact`, `column`, `line` - the three samples - and `pv`, `story`, `array`, `grid`, `table` -
+the detailed lessons; every archetype's `CASES` merged into `CASE_TESTS` in `lesson-arch/index.js`, a case name unique
+across them). The builders are the same for every archetype.
+
+**The items.** Every builder takes host-shaped items (6.2: `{q, render, template, measured, footprint, fclass, pool}`),
+measured by the host at the builder's column counts, and reads an item only through these provider members:
+
+| Member | Read by | What it gives |
+|---|---|---|
+| `workedSteps(q)` (3.3), through `anchors.js workedStepsOf` | chart (states, panels, words), We Do (cell 1's grey first step), practice strip | the worked steps, each `{text, marks}`; step n of the lesson's step list IS worked step n |
+| the template's `stepState(payload, groups, k, ctx)` (through `anchors.js stepTemplateOf`) | chart panels, We Do | the problem drawn after step k (newest marks grey, earlier black) |
+| `strings(ref)` (3.4, 3.8): `instructionKey`, `say` | every band's instruction, the chart's Say line | the library instruction, the oral frame |
+| `answerKey` / `q.ans` | We Do variety, keys | the answer |
+| `footprint(p, ctx).minSize` | practice, mixed | the item's size floor on an S / M page |
+
+**The lesson page data** (`lessons/prereqs.js` LESSONS shape; a detailed lesson's `lessonData`) tells the builders what
+the skill teaches: `steps`, `example` / `second` / `third` / `fourth` (case names from `CASE_TESTS`), `guided`,
+`guidedWants`, `independent`, `vocab`, `concepts`, `chant`, `words`, `notes`, `chartSteps`, `chartWide`, `practiceShape`,
+`mixWith`, and the deal floors (`minOperand`, `minTop`, `maxTop`, `distinctFirst`, `distinctAnswer`, `maxSmall`). A skill
+with no lesson data gets the provider's words and the icon of their first verb; the chart then draws the worked example
+alone (no other case), and a provider without `stepState` gets the problem blank, then answered in grey on the last
+state (`lesson-pages/chart.js stateDrawing`).
+
 ---
 
 ## 4. Default adapters: every existing skill works immediately

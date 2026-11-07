@@ -1,0 +1,13 @@
+{"item":"add-within-10/pupil-p1 (Prerequisite Check, L+S)","criteria":{"c1":7,"c2":6,"c3":6,"c4":6},"min":6,"findings":["D1","D2","D3","D4","D13"]}
+{"item":"add-within-10/key-p1 (check key, L+S)","criteria":{"c1":7,"c2":6,"c3":6,"c4":6},"min":6,"findings":["D1","D2","D4"]}
+{"item":"add-within-10/key-p2 (routing table, L+S)","criteria":{"c1":8,"c2":6,"c3":6,"c4":7},"min":6,"findings":["D2","D12","D13"]}
+{"item":"add-within-10/pupil-p3 + key-p4 (lesson sheet, no Warm-up, L+S)","criteria":{"c1":8,"c2":8,"c3":8,"c4":8},"min":8,"findings":[]}
+{"item":"subtract-2-digit-regroup/pupil-p1 (Prerequisite Check, L+S)","criteria":{"c1":6,"c2":6,"c3":6,"c4":7},"min":6,"findings":["D4","D8","D9","D13"]}
+{"item":"subtract-2-digit-regroup/key-p1 (check key, L+S)","criteria":{"c1":7,"c2":7,"c3":6,"c4":7},"min":6,"findings":["D8","D9"]}
+{"item":"subtract-2-digit-regroup/key-p2 (routing table, L+S)","criteria":{"c1":8,"c2":7,"c3":6,"c4":7},"min":6,"findings":["D12","D13"]}
+{"item":"subtract-2-digit-regroup/pupil-p3 + key-p4 (lesson sheet, no Warm-up, L+S)","criteria":{"c1":7,"c2":8,"c3":6,"c4":7},"min":6,"findings":["D10"]}
+{"item":"round-nearest-10/pupil-p1 (Prerequisite Check, L+S)","criteria":{"c1":6,"c2":4,"c3":5,"c4":6},"min":4,"findings":["D4","D5","D7","D9","D13","D20"]}
+{"item":"round-nearest-10/key-p1 (check key, L+S)","criteria":{"c1":6,"c2":3,"c3":5,"c4":5},"min":3,"findings":["D5","D6","D7"]}
+{"item":"round-nearest-10/key-p2 (routing table, L+S)","criteria":{"c1":8,"c2":4,"c3":6,"c4":7},"min":4,"findings":["D5","D12"]}
+{"item":"round-nearest-10/pupil-p3 + key-p4 (lesson sheet, no Warm-up, L+S)","criteria":{"c1":8,"c2":8,"c3":7,"c4":8},"min":7,"findings":["D11"]}
+{"item":"engine (library, schema, families, lesson-pages, lesson-arch, roles/lesson, pre-skill-check routes, buildLesson, ws-lesson-* gates, browser-lock)","criteria":{"c1":6,"c2":7,"c3":7,"c4":6},"min":6,"findings":["D5","D6","D10","D14","D15","D16","D17","D18"]}
