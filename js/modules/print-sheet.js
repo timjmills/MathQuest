@@ -54,7 +54,7 @@ import {
 } from './sheet/anchors.js';
 import {
     allocateSupports, alternativesOf, TOUCH_IDS, normCoverage, normMix, TOUCH_MIN_PT,
-    canDraw, supportNeeds, supportOpKey as opKey,
+    canDraw, supportNeeds, supportOpKey as opKey, fadeTo, fadeLevel,
 } from './sheet/index.js';
 
 /* ======================================================================== constants */
@@ -1440,6 +1440,37 @@ function arrayDropNote(items) {
     return `Array support not drawn: every dividend must be ${DIV_ARRAY_MAX} or less (these tables go to ${divFactsMaxDividend(o || {})}). No array on ${facts.join(', ')}.`;
 }
 
+/**
+ * Facts card F4: one faded section of k >= 2 pages and one skill with supports, as k one-page sections, page j carrying
+ * the supports of fade level fadeLevel(j, k) (3 all, 2 the light part, 1 none) - every problem of a page alike, so the
+ * packet never adds help back (L-FADE-ORDER). A level whose supports clash keeps its fullest alternative. null: not a
+ * faded packet.
+ */
+function fadeStages(sec, n) {
+    if (!sec || sec.group || !sec.skills || sec.skills.length !== 1 || sec.count) return null;
+    const k = Math.floor(Number(sec.pages) || 1);
+    if (k < 2) return null;
+    const sk = sec.skills[0];
+    let def = null;
+    try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return null;
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    if ((n.coverage || o.cover) !== 'fade') return null;
+    // (div_facts' array past dividends of 50 is not drawn at all: it takes no stage of its own)
+    const arrOff = sk.categoryId === 'division' && sk.skillId === 'div_facts' && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v) && !(arrOff && v === 'array'));
+    if (!chosen.length) return null;
+    const stage = (level) => {
+        const alts = alternativesOf(fadeTo(chosen, level));
+        return alts.length ? alts.reduce((a, b) => (b.length > a.length ? b : a)) : [];
+    };
+    return Array.from({ length: k }, (_, j) => Object.assign({}, sec, {
+        pages: 1,
+        fadeStage: fadeLevel(j, k),
+        skills: [Object.assign({}, sk, { opts: Object.assign({}, sk.opts || {}, { support: stage(fadeLevel(j, k)), cover: 'whole' }) })],
+    }));
+}
+
 /** The sheet-level mix, when the request sets one. */
 const n_mix = (mix) => (mix && mix.sheet) || null;
 
@@ -1466,7 +1497,8 @@ function allocateHostSupports(items, n) {
     if (!list.length) return;
     // A More Practice set's letters are ONE sheet (coordinator, 2026-09-25): a skill fades down the
     // whole set, and its section is dealt across the letters, A before B.
-    const skillKey = (it) => it.skill;
+    // (facts card F4: each stage of a faded packet is a section of its own with its own supports, so it is dealt apart)
+    const skillKey = (it) => (it.supportsBox && it.supportsBox.stage ? `${it.skill}@fade${it.supportsBox.stage}` : it.skill);
     const chosen = {}, cover = {}, mix = {};
     for (const it of list) {
         const pl = it.supportsBox.plan;
@@ -1535,7 +1567,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     // S2: the supports this item may carry. Until the sheet is allocated it draws the worst case
     // (every support it could carry), which is what it is measured at; the allocation then swaps
     // what it does not draw for invisible reserve, so the geometry is the one measured.
-    const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined };
+    const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined, stage: mix && mix.stage ? mix.stage : undefined };
     if (supportsBox.plan) supportsBox.cur = Object.assign({}, supportsBox.plan.extra, { on: supportsBox.plan.worst.slice(), reserve: [] });
     const forceL = !!(supportsBox.plan && supportsBox.plan.forceL);
     // The item's floor size (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN.md 8a): the page's size
@@ -2935,6 +2967,13 @@ async function buildSheetDeal(req = {}) {
     // becomes one sub-section per alternative (section A touch dots, section B dot tiles). Each
     // sub-section lays out and reserves room for its OWN support only, so a page is as full as it
     // is without supports, less that support's own size.
+    // Facts card F4 (owner 2026-11-07; critic laned-restart r4 R4-5): a FADED PACKET of several pages is dealt in support
+    // order, one stage a page (all, then the light part, then none: supports.js fadeTo / fadeLevel), each page its own
+    // section, so its rows are sized to the supports THAT page carries - never to the first page's reserved room.
+    if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') {
+        const staged = fadeStages(n.sections[0], n);
+        if (staged) { n.sections = staged; n.coverage = undefined; }
+    }
     const unsplit = n.sections;
     if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') n.sections = n.sections.flatMap((sec, gi) => splitBySupports(sec, gi, n));
 
@@ -3002,7 +3041,7 @@ async function buildSheetDeal(req = {}) {
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
-        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt };
+        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt, stage: sec.fadeStage };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
@@ -3279,6 +3318,10 @@ async function buildSheetDeal(req = {}) {
             // only grows as items are added, so the capacity can only fall; the loop settles.
             const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
+            // (facts card F4: a later stage of a faded packet holds at most twice the first stage's page - every page of
+            // the packet at least half used, PG-20 / DN-2 - so the bare last page is not a crowd beside a supported first)
+            // (held to the cap, the count is the page's own: its rows are spread down the page, never half of it left bare)
+            if (sec.fadeCap && want > sec.fadeCap) { want = sec.fadeCap; sec.count = want; }
             let items = [];
             // A MIXED POOL (mixed_composing, counting_all ...) is one skill whose items come from
             // many templates, 25 to 110 mm tall. Its probe's tallest item sized every page, so a page
@@ -3293,7 +3336,7 @@ async function buildSheetDeal(req = {}) {
                 if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
                 sec.floor = floorWith(si, pool ? items : probe.items.concat(items));
                 if (sec.count) break;
-                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
+                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, sec.fadeCap || MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
                 if (pool) {
                     if (again >= want) fitBest = Math.max(fitBest, want);
                     if (again === want) break;
@@ -3504,6 +3547,7 @@ async function buildSheetDeal(req = {}) {
                 } catch (e) { /* keep the count */ }
             }
             hostItems = hostItems.concat(markSectionWriteAbove(items));
+            if (sec.fadeStage && si === 0) for (const s2 of n.sections.slice(1)) if (s2.fadeStage) s2.fadeCap = 2 * items.length;
         }
     } else {
         // MORE PRACTICE: each letter under its own seed (PT-MPR-2). The first letter's probe fixes
