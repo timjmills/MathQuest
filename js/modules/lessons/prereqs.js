@@ -413,7 +413,7 @@ export const LESSONS = Object.freeze({
        (2.NBT.A.3, CCSS BUILD lesson 1). One block, appended; the Warm-up reviews the 2-digit version of the same idea. */
     'placevalue:identify': {
         skills: [
-            { key: 'placevalue:identify', opts: { band: 99 }, why: 'Tens and ones first: the same question with two places.' },
+            { key: 'placevalue:identify', opts: { band: 99, writeValue: false }, why: 'Tens and ones first: the same question with two places.' },
             { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'A 2-digit number is tens and ones.' },
         ],
         concepts: [
@@ -440,11 +440,12 @@ export const LESSONS = Object.freeze({
         chartWide: true, chartRow: true,
         // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
         practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
-        mixWith: [{ key: 'placevalue:identify', opts: { band: 99 } }, { key: 'placevalue:more_less_10' }],
+        mixWith: [{ key: 'placevalue:identify', opts: { band: 99, writeValue: false } }, { key: 'placevalue:more_less_10' }],
     },
     'placevalue:value': {
         skills: [
-            { key: 'placevalue:identify', why: 'The value starts from the place.' },
+            // (the Warm-up names the place only: lf-placevalue r1, the value line is the lesson's own step)
+            { key: 'placevalue:identify', opts: { writeValue: false }, why: 'The value starts from the place.' },
             { key: 'placevalue:unit_form', opts: { band: 99 }, why: '6 tens is 60.' },
         ],
         concepts: [
@@ -529,12 +530,13 @@ export const LESSONS = Object.freeze({
         // The closing step ("Read it: 464.") writes nothing new: it is the line under the panels.
         tailLast: true,
         // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
-        practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
+        // lf-placevalue r1 (F9 one geometry, F18): every item takes the widest frame's room, which is one column at L.
+        practiceShapes: [[12, 2], [10, 2], [12, 1], [10, 1], [8, 1], [6, 1]],
         mixWith: [{ key: 'placevalue:expand' }, { key: 'placevalue:more_less_10' }],
     },
     'placevalue:unit_form': {
         skills: [
-            { key: 'placevalue:identify', why: 'Unit form names each place.' },
+            { key: 'placevalue:identify', opts: { writeValue: false }, why: 'Unit form names each place.' },
             { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'Tens and ones first.' },
         ],
         concepts: [

@@ -321,7 +321,7 @@ function frameHTML(ctx, text, key, digits, ghostExpr = '') {
         // lf-placevalue r1 F9 (AX-4, one geometry a section): `ghostExpr` - the widest expression the section deals - is
         // drawn invisibly in the same grid area as the expression, so every item's expression is as wide as the widest,
         // and every item wraps (or not) exactly as the widest does: one line on every cell, or two on every cell.
-        const ghostPair = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:center;align-items:end;">`
+        const ghostPair = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:end;align-items:end;">`
             + `<span style="grid-area:1 / 1;${nb}">${piece(ctx, c)}</span>`
             + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;${nb}">${piece(ctx, ghostExpr)}</span></span>`;
         const head = chunks.map((c) => (exprOnly && ghostExpr && c.includes(' ') ? ghostPair(c)
