@@ -33,7 +33,48 @@ const SCHEMA = await imp('js/modules/lessons/schema.js');
 const PRE = await imp('js/modules/lessons/prereqs.js');
 const BL = await imp('js/modules/build-list.js');
 const DET = await imp('js/modules/lessons/detailed/index.js');
-const LATE = {};   // (engine groups defined further down: parts-plugin, chart-sizing)
+const LATE = {
+    // D18: the parts registry is fully plug-in - a dummy part registers with its own build hook and the host's dispatch
+    // builds it, with no edit of roles/lesson.js or print-sheet.js buildLesson (which names no core part list).
+    async 'parts-plugin'() {
+        const R = await tryImp('js/modules/sheet/lesson-pages/index.js');
+        ok(R && typeof R.buildPluggedParts === 'function', 'D18: lesson-pages/index.js exports buildPluggedParts (the host dispatch)');
+        if (!R || typeof R.buildPluggedParts !== 'function') return;
+        eq(['prereq', 'chart', 'sheet', 'practice', 'mixed'].map((x) => !!(R.lessonPart(x) || {}).core), [true, true, true, true, true], 'D18: the five core parts are marked core in the registry');
+        const seen = [];
+        R.registerLessonPart({ id: 'zz-dummy', order: 50, role: 'lesson', name: 'Dummy', build: async (api) => { seen.push([api.part.id, api.seed]); return { pageCount: 1, pupilHtml: '<section class="ws-page">dummy</section>' }; } });
+        R.registerLessonPart({ id: 'zz-plan', order: 60, role: 'lesson', name: 'Planned', plan: () => [] });
+        try {
+            const ids = R.lessonPartIds();
+            eq(ids.slice(-2), ['zz-dummy', 'zz-plan'], 'D18: a registered part takes its place in packet order');
+            const rolled = [];
+            const out = await R.buildPluggedParts(ids, { seedOf: (x) => (x === 'zz-dummy' ? 77 : 88), lessonRolePart: async (x, seed) => { rolled.push([x, seed]); return { pageCount: 2 }; } });
+            eq(out.map((p) => [p.part, p.role, p.res.pageCount]), [['zz-dummy', 'lesson', 1], ['zz-plan', 'lesson', 2]], 'D18: the dispatch builds each plugged part (own hook, else the lesson role) and no core part');
+            eq([seen, rolled], [[['zz-dummy', 77]], [['zz-plan', 88]]], 'D18: each with its own seed');
+        } finally { R.unregisterLessonPart('zz-dummy'); R.unregisterLessonPart('zz-plan'); }
+        eq(R.lessonPartIds().filter((x) => /^zz-/.test(x)), [], 'D18: a test part unregisters');
+        const ps = readSrc('js/modules/print-sheet.js');
+        const body = ps.slice(ps.indexOf('async function buildLesson('), ps.indexOf('async function buildDetailedLesson('));
+        ok(!/\[\s*'prereq',\s*'chart',\s*'sheet',\s*'practice',\s*'mixed'\s*\]/.test(code(body)) && /buildPluggedParts\(/.test(body), 'D18: buildLesson names no list of the core parts and builds the rest through the registry');
+    },
+    // Lesson 7 D1 (brief step 2.4): the anchor chart reports its sizing; a fallback zoom under 1 is a failure.
+    async 'chart-sizing'() {
+        const CH = await tryImp('js/modules/sheet/lesson-pages/chart.js');
+        const C = await tryImp('js/modules/sheet/roles/compose.js');
+        ok(CH && typeof CH.chartSizingOf === 'function', 'lesson 7 D1: chart.js exports chartSizingOf');
+        if (!CH || !C || typeof CH.chartSizingOf !== 'function') return;
+        const fake = (h) => ({ measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: h, fits: true }])), render: () => '<i></i>', cellCls: '', q: { text: '1 + 1', ans: 2 } });
+        const input = { ctx: { size: 'L', paper: 'A4' }, skills: [{ categoryId: 'addition', skillId: 'add', iCan: 'I Can add' }] };
+        const ctx = C.ctxOf(input);
+        const run = (h, n, tail) => { const st = Array.from({ length: n }, () => fake(h)); return CH.chartPage(input, ctx, null, st[0], st, st, [], tail ? fake(20) : null, [], null).sizing; };
+        const a = run(40, 4, false), b = run(150, 3, true);
+        eq([a.mode, a.fallback, a.ok, a.zoom >= 1], ['one', false, true, true], 'lesson 7 D1: a chart that fits reports mode, zoom >= 1, ok');
+        eq([b.fallback, b.ok, b.zoom < 1], [true, false, true], 'lesson 7 D1: a fallback zoom under 1 is reported as a failure (ok false)');
+        eq(CH.chartSizingOf({ plan: { meta: { chartSizing: b } } }), { mode: b.mode, zoom: b.zoom, fallback: true, ok: false }, 'lesson 7 D1: the build result carries it (chartSizing)');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/chartSizing: chartSizingOf\(chart\)/.test(ps) && /chartsOk:/.test(ps), 'lesson 7 D1: buildLesson and buildDetailedLesson surface the chart sizing');
+    },
+};
 
 /* ============================================================ the ENGINE checks (lf-engine P1, critic r1) */
 const readSrc = (rel) => { try { return fs.readFileSync(path.join(ROOT, rel), 'utf8'); } catch (e) { return ''; } };

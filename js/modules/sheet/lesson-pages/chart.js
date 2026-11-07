@@ -391,7 +391,15 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // band; below zoom 1 the drawing shrinks a little rather than spill past the grid's rule)
     // (the band's grid takes its own frame rule: a panel measured one-up may still wrap its name - leave it 4 mm a row)
     const availP = tailItem ? avail - 4 * lay.rows : avail;
-    if (mode === 'one') z = solve((q) => lay.rows * H(q), availP, 1, zMax) || (tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1);
+    // (lesson 7 D1: when even zoom 1 does not fit, the old fallback drew the chart at 0.7-1 silently - its stories at
+    // 12-13 pt. It is now REPORTED: sizing.fallback, and sizing.ok false when the zoom is under 1, so the host fails the
+    // build result and the compiler refuses the chart. The drawing itself is unchanged.)
+    let fallback = false;
+    if (mode === 'one') {
+        const z1 = solve((q) => lay.rows * H(q), availP, 1, zMax);
+        if (z1) z = z1;
+        else { fallback = true; z = tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1; }
+    }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
     let rowH;
@@ -443,8 +451,16 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {
         header, sections, zoom: z, second: shown, mode,
-        sizing: { mode, avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
+        // `ok`: drawn at its planned size - a fallback zoom under 1 is a FAILURE (lesson 7 D1; print-sheet chartSizing)
+        sizing: { mode, zoom: z, fallback, ok: !(fallback && z < 1), avail: +avail.toFixed(1), room: +room.toFixed(1), rowH: +rowH.toFixed(1), base: base.map((v) => +v.toFixed(1)), dH: dH.map((v) => +v.toFixed(1)), zMax: +zMax.toFixed(2), h2: +h2.toFixed(1), k2, hF: +hF.toFixed(1), h3: cells3.map((x) => +hOf(x, 3).toFixed(1)), fits3: cells3.map(fits3), why3: cells3.map((x) => (x.measureWhy && x.measureWhy[3]) || '') },
     };
 }
 
-export default { pickExample, pickSecond, otherExamples, stateDrawing, chartLayout, stateItems, finalItems, finalDrawing, secondItems, sameFactForms, chartPage };
+/** The anchor chart's sizing as a build result reports it (lesson 7 D1): {mode, zoom, fallback, ok}, or null. */
+export function chartSizingOf(chartRes) {
+    const sz = chartRes && chartRes.plan && chartRes.plan.meta && chartRes.plan.meta.chartSizing;
+    if (!sz) return null;
+    return { mode: sz.mode, zoom: sz.zoom, fallback: !!sz.fallback, ok: sz.ok !== false };
+}
+
+export default { chartSizingOf, pickExample, pickSecond, otherExamples, stateDrawing, chartLayout, stateItems, finalItems, finalDrawing, secondItems, sameFactForms, chartPage };

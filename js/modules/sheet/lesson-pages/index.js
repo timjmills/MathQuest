@@ -51,6 +51,12 @@ const PARTS = new Map();
  *   inPacket(n)   true when the default packet (no `parts` asked) prints it; absent: always
  *   plan(input, ctx)   for a NEW part drawn by the lesson role: its PagePlan pages ({header, sections}[], compose.js);
  *                      the built-in chart and sheet are planned by roles/lesson.js itself
+ *   build(api)         THE PART'S OWN BUILD HOOK (critic lessons-phase0 r1 D18): how the host builds it - an async
+ *                      function of the host api {part, seed, avoid, n, header, lessonInput, buildRoleSheet,
+ *                      lessonRolePart} returning the part's sheet result ({pupilHtml, keyHtml, pageCount, ...}). A part
+ *                      without one and with role 'lesson' is built by the lesson role (its `plan`). The five core parts
+ *                      (`core: true`) are built by the host's own packet code; every other part - the vocabulary lane's
+ *                      pages - registers here and needs no edit of roles/lesson.js or print-sheet.js buildLesson.
  */
 export function registerLessonPart(def) {
     if (!def || !def.id) throw new Error('registerLessonPart: an id is required');
@@ -69,11 +75,32 @@ export const lessonPartIds = () => lessonParts().map((p) => p.id);
 
 // LR-17 (plan §8b, lead D1): a lesson whose record declares `prereqs` opens with its Prerequisite Check, drawn by
 // roles/pre-skill-check.js (one question per prerequisite, each with its route; the routing table on the key).
-registerLessonPart({ id: 'prereq', order: 5, role: 'pre-skill-check', name: PREREQ_CHECK_TITLE, sheet: 'lesson-prereq', offset: 31357, inPacket: (n) => !!n.prereqCheck });
-registerLessonPart({ id: 'chart', order: 10, role: 'lesson', name: 'Anchor chart', sheet: 'lesson-chart', offset: 0, size: 'L' });
-registerLessonPart({ id: 'sheet', order: 20, role: 'lesson', name: 'Lesson', sheet: 'lesson-sheet', offset: 0 });
-registerLessonPart({ id: 'practice', order: 30, role: 'independent', name: 'Practice', sheet: 'lesson-practice', offset: 7919, inPacket: (n) => n.practicePages > 0 });
-registerLessonPart({ id: 'mixed', order: 40, role: 'mixed-practice', name: 'Mixed', sheet: 'lesson-mixed', offset: 15838, inPacket: (n) => !!n.mixed });
+registerLessonPart({ core: true, id: 'prereq', order: 5, role: 'pre-skill-check', name: PREREQ_CHECK_TITLE, sheet: 'lesson-prereq', offset: 31357, inPacket: (n) => !!n.prereqCheck });
+registerLessonPart({ core: true, id: 'chart', order: 10, role: 'lesson', name: 'Anchor chart', sheet: 'lesson-chart', offset: 0, size: 'L' });
+registerLessonPart({ core: true, id: 'sheet', order: 20, role: 'lesson', name: 'Lesson', sheet: 'lesson-sheet', offset: 0 });
+registerLessonPart({ core: true, id: 'practice', order: 30, role: 'independent', name: 'Practice', sheet: 'lesson-practice', offset: 7919, inPacket: (n) => n.practicePages > 0 });
+registerLessonPart({ core: true, id: 'mixed', order: 40, role: 'mixed-practice', name: 'Mixed', sheet: 'lesson-mixed', offset: 15838, inPacket: (n) => !!n.mixed });
+
+/**
+ * Build the PLUGGED parts of a packet (every registered part that is not core), in packet order (critic r1 D18): a part's
+ * own `build(api)` hook, else - role 'lesson' - the lesson role through `api.lessonRolePart(id, seed)`. `api.seedOf(id)`
+ * gives a part's seed; `api.avoid` (optional) its refresh avoidance. Returns [{part, role, res}]. Pure dispatch: the host
+ * supplies every effect.
+ */
+export async function buildPluggedParts(ids, api) {
+    const out = [];
+    for (const x of ids) {
+        const d = lessonPart(x);
+        if (!d || d.core) continue;
+        const seed = api.seedOf(x);
+        if (typeof d.build === 'function') out.push({ part: x, role: d.role, res: await d.build(Object.assign({}, api, { part: d, seed })) });
+        else if (d.role === 'lesson') out.push({ part: x, role: 'lesson', res: await api.lessonRolePart(x, seed) });
+    }
+    return out;
+}
+
+/** Unregister a part (tests only: a dummy part must not leak into later packets). */
+export function unregisterLessonPart(id) { const d = PARTS.get(String(id)); if (d && !d.core) PARTS.delete(String(id)); return !!d; }
 
 /* ======================================================================= the sheet bands */
 
@@ -101,4 +128,4 @@ registerSheetBand({ id: 'vocab', order: 10, build: (env) => { env.groups.push(..
 registerSheetBand({ id: 'warm-up', order: 20, build: (env) => warmUp.warmUpBand(env) });
 registerSheetBand({ id: 'guided', order: 30, build: (env) => weDo.weDoBand(env) });
 
-export default { chart, vocab, warmUp, weDo, practice, mixed, common, registerLessonPart, lessonPart, lessonParts, lessonPartIds, registerSheetBand, sheetBands };
+export default { chart, vocab, warmUp, weDo, practice, mixed, common, registerLessonPart, lessonPart, lessonParts, lessonPartIds, registerSheetBand, sheetBands, buildPluggedParts, unregisterLessonPart };

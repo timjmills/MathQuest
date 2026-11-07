@@ -42,7 +42,8 @@ import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
 import { practiceSection, practiceStackShapes, practiceRequest } from './sheet/lesson-pages/practice.js';
 import { mixedRequest } from './sheet/lesson-pages/mixed.js';
-import { lessonPart, lessonPartIds } from './sheet/lesson-pages/index.js';
+import { lessonPart, lessonPartIds, buildPluggedParts } from './sheet/lesson-pages/index.js';
+import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill } from './lessons/library.js';
@@ -4551,11 +4552,9 @@ async function buildLesson(n, metaOf) {
         seed, size: (lessonPart(x) || {}).size || nz.size, role: 'lesson', header, look: 'ican',
         lessonInput: Object.assign({}, lessonInput, { part: x }, extra.lessonInput || {}),
     }, extra.sections ? { sections: extra.sections } : {}), metaOf);
-    for (const x of built) {
-        const d = lessonPart(x);
-        if (['prereq', 'chart', 'sheet', 'practice', 'mixed'].includes(x) || !d || d.role !== 'lesson') continue;
-        parts.push({ part: x, role: 'lesson', res: await lessonRolePart(x, lessonPartSeed(n.seed, x)) });
-    }
+    // Every other registered part (critic r1 D18): its own build hook, or the lesson role (lesson-pages/index.js).
+    const partApi = { n: nz, header, lessonInput, lessonRolePart, buildRoleSheet: (req) => buildRoleSheet(Object.assign({}, nz, { header, look: 'ican' }, req), metaOf) };
+    parts.push(...await buildPluggedParts(built, Object.assign({}, partApi, { seedOf: (x) => lessonPartSeed(n.seed, x) })));
 
     // REFRESHED parts (LR-18): each dealt again with its own seed, avoiding every OTHER part's problems (soft:
     // `avoidTexts`, the dealer relaxes it only when a skill runs out) - the other parts never change.
@@ -4577,7 +4576,9 @@ async function buildLesson(n, metaOf) {
         const others = [...new Set(parts.filter((p) => p.part !== key).flatMap((p) => textsOf(p.res)))];
         const avoid = (r) => Object.assign({}, r, { avoidTexts: others.concat(Array.isArray(r.avoidTexts) ? r.avoidTexts : []) });
         let res;
-        if (x === 'prereq') res = await buildPrereq(seeds.prereq, avoid);
+        const dx = lessonPart(x);
+        if (dx && !dx.core && typeof dx.build === 'function') res = await dx.build(Object.assign({}, partApi, { part: dx, seed: seeds[x], avoid }));
+        else if (x === 'prereq') res = await buildPrereq(seeds.prereq, avoid);
         else if (x === 'chart' || x === 'sheet' || parts[at].role === 'lesson') {
             res = await lessonRolePart(x, seeds[x], { lessonInput: { warmSkills: warmSkills.map(avoid) }, sections: [Object.assign({}, nz.sections[0], { skills: [avoid(sk)] }), ...nz.sections.slice(1)] });
             if (x === 'chart') chart = res;
@@ -4617,6 +4618,9 @@ async function buildLesson(n, metaOf) {
     const tagPages = (list, p) => { const ids = sheetIds(p); return (list || []).map((h, i) => tagSheets(h, i === 0 ? ids[0] : ids[1], ids[1])); };
     return {
         pupilHtml, keyHtml, pageCount, keyPageCount,
+        // (lesson 7 D1: the anchor chart's sizing - {mode, zoom, fallback, ok}; ok false = a fallback zoom under 1, a
+        // FAILURE the compiler refuses and the gates report; null without a chart)
+        chartSizing: chartSizingOf(chart),
         pupilPages: parts.flatMap((p) => tagPages(p.res.pupilPages, p)),
         keyPages: n.key ? parts.flatMap((p) => tagPages(p.res.keyPages, p)) : [],
         keyPlans: parts.flatMap((p) => p.res.keyPlans || [p.res.plan]),
@@ -5423,6 +5427,10 @@ async function buildDetailedLesson(req = {}) {
         pupilHtml: bodyHtml, keyHtml: '', docHtml: bodyHtml, keyPageCount: 0,
         fits: { cols: 1, rows: 1, pages: pages.length, note: `Detailed lesson: ${pages.filter((p) => p.kind === 'teacher').length} teacher pages, ${pages.filter((p) => p.kind === 'pupil').length} pupil pages, ${pages.filter((p) => p.kind === 'key').length} keys.`, sections: [] },
         items: [{ skill: `${d.skill.categoryId}:${d.skill.skillId}` }], problemCount: places.length, gaps: [],
+        // (lesson 7 D1: every anchor chart of the pack - P2, then each chunk's - with its sizing; `chartsOk` false when any
+        // was drawn at a fallback zoom under 1, a failure the compiler refuses)
+        chartSizing: [{ id: 'P2', sizing: lesson.chartSizing || null }, ...chunkRes.map(({ ch, r }) => ({ id: `P2${ch.id}`, sizing: r.chartSizing || null }))],
+        chartsOk: [lesson.chartSizing, ...chunkRes.map(({ r }) => r.chartSizing)].every((z) => !z || z.ok !== false),
         vars: V, debug: { glance, est: Object.fromEntries(groups.map((g, i) => [g, groupPages[g].map((pg) => pg.bands.map((b) => b.blocks.length))])), heights: Object.fromEntries(groups.map((g, i) => [g, { over: measured[i][0] && measured[i][0].over, hs: measured[i].map((a) => a.map((x) => Math.round(x))) }])) },
     };
 }
