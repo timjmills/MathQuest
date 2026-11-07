@@ -249,7 +249,7 @@ Each runs as `node tests/scripts/<script> …`.
 7. **mult_chart look-up: drop the factor pairs from the prompt (the old 'Fill in the missing products: 1x11, 3x7' leak) and shade the row and the column in the single grey on every task? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes (no answer given away; black and white).
 8. **Build entry comparison_statements (G4-Y5.B3 BUILD 'Multiplicative comparison: times as many', option on mult_comparison): the pupil writes the comparison statement and the equation ('18 is 3 times as many as 6'; '18 = 3 x 6') from a bar pair. A distinct new task, so an option `task: statement` AND a preset skill 'Write multiplicative comparison statements' (owner rule 2026-10-17)? **ANSWER — lane decision 2026-11-07: as recommended.**** Recommended: Yes: option task=statement plus a preset skill, tagged 4.OA.A.1, WRM Y5.B3.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-07
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)

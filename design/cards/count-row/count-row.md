@@ -232,7 +232,7 @@ Each runs as `node tests/scripts/<script> …`.
 6. **I Can line: count_by_tables titles itself from its rows ("I can count by 3s", "I can count back by 5s from 60"); with the default rows (tables 2 to 12) it reads "I can count by 2s to 12s" (critic r5 SC6 flagged "count by 1 to 12"). Accept? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes.
 7. **G1-Y2.B1 build entry count_row_end (an option on count_by_tables, links proposal only): the row ENDS at a given number (count by 2s to 20, 5s to 50, 10s to 100), as WRM Y2.B1.S15. Make it an option `endAt` (a number), a plain option (not a preset skill: it is a range tweak)? **ANSWER — lane decision 2026-11-07 (owner rule 2026-11-07: no owner sign-off; lines decided from the standards and recorded): as recommended.**** Recommended: Yes: plain option, built in this lane after signing.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-07
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
