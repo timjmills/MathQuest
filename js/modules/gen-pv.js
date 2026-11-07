@@ -38,6 +38,7 @@
 
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
+import { dealIndex, freshDeal } from './page-deal.js';
 import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand, ROUND_NL } from './skill-options.js';
 import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js';
 import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine, stripHTML, shiftChartHTML, roundingTableHTML } from './pv-support-cell.js';
@@ -400,8 +401,10 @@ function genTimesValue(q, o) {
     q.factKey = `ten:${d}:${P}/${P / 10}`;
 }
 
-function wantZero(o) {
-    return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && slot(2) === 1);
+// L10 (lf-placevalue, ws-dealer-uniform PERIOD zeroCase): "some" deals the zero place from the
+// page dealer, never from the item's position (slot(2) put every zero item at an odd position).
+function wantZero(o, key = 'pv:zero') {
+    return o.zeroPlace === 'always' || (o.zeroPlace === 'some' && dealIndex(key, 2) === 1);
 }
 
 /** Every order of a short list (up to 5 parts; longer lists keep the given order and its reverse). */
@@ -418,14 +421,20 @@ function genExpandCombine(q, skill, o) {
     const [lo, hi] = digitSpan(cap);
     const nd = String(hi).length;
     const zero = wantZero(o);
-    let ds = [];
-    for (let t = 0; t < 60; t++) {
-        ds = digitsNumber(nd, { zero });
-        const v = fromDigits(ds);
-        if (v >= lo && v <= hi) break;
-    }
+    // ws-dealer-uniform PAGE (lf-placevalue): a number the page already holds is redrawn, and no
+    // leading part (700) is dealt more than three times, nor its first two parts (700 + 20) twice, in
+    // the last 19 items.
+    const draw = () => {
+        let d = [];
+        for (let t = 0; t < 60; t++) {
+            d = digitsNumber(nd, { zero });
+            const v = fromDigits(d);
+            if (v >= lo && v <= hi) return d;
+        }
+        return String(randInt(lo, hi)).split('').map(Number);
+    };
+    let ds = freshDeal(`pv:${skill}:n`, draw, { sig: (d) => d.join(''), tags: (d) => [String(d[0]), d.slice(0, 2).join('')], caps: [3, 1] });
     let n = fromDigits(ds);
-    if (n < lo || n > hi) { n = randInt(lo, hi); ds = String(n).split('').map(Number); }
     // ONE PART PER PLACE, zeros included (§2.4 rule 1): the box count never tells the pupil how
     // many non-zero parts there are, and the key writes the zero part.
     const parts = ds.map((d, i) => d * 10 ** (ds.length - 1 - i));

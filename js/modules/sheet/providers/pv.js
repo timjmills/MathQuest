@@ -201,7 +201,7 @@ registerSkill('placevalue:value', {
         return [
             step(`The underlined digit is ${v.digit}.`),
             step(`It is in the ${v.word} place.`),
-            v.digit === 0 ? step('A zero is worth nothing. It holds the place.') : step(`${v.digit} ${v.word} is ${v.digit} × ${f(v.place)} = ${f(v.value)}.`),
+            v.digit === 0 ? step('A zero is worth nothing. It holds the place.') : /* WRAP-OP (lf-placevalue): the expression never breaks after its operator */ step(`${v.digit} ${v.word} is ${v.digit}\u00a0×\u00a0${f(v.place)}\u00a0=\u00a0${f(v.value)}.`),
             last,
         ];
     },

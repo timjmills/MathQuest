@@ -408,6 +408,142 @@ export const LESSONS = Object.freeze({
         // 100, which comes after, and never two "Number Sense" sections).
         mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
     },
+
+    /* ---------------------------------------------------------- lf-placevalue (2026-11-07): read and write to 1,000
+       (2.NBT.A.3, CCSS BUILD lesson 1). One block, appended; the Warm-up reviews the 2-digit version of the same idea. */
+    'placevalue:identify': {
+        skills: [
+            { key: 'placevalue:identify', opts: { band: 99 }, why: 'Tens and ones first: the same question with two places.' },
+            { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'A 2-digit number is tens and ones.' },
+        ],
+        concepts: [
+            { id: 'places', text: 'Each digit sits in a place: hundreds, tens, ones.' },
+            { id: 'right-to-left', text: 'The ones place is on the right.' },
+        ],
+        vocab: [
+            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: 'underlined', meaning: 'the line is under it', picture: { kind: 'text', text: '4 7 2 → 7' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the underlined digit.' },
+            { icon: 'look', text: 'Read the letter above it.' },
+            { icon: 'decide', text: 'Say the place name.' },
+            { icon: 'write', text: 'Write the place.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'Four actions, the same on every item: find, read, say, write.' },
+        example: { match: 'place' },
+        // The ring row of place names wraps in half the page: one panel a row, its step beside the drawing.
+        chartWide: true, chartRow: true,
+        mixWith: [{ key: 'placevalue:identify', opts: { band: 99 } }, { key: 'placevalue:more_less_10' }],
+    },
+    'placevalue:value': {
+        skills: [
+            { key: 'placevalue:identify', why: 'The value starts from the place.' },
+            { key: 'placevalue:unit_form', opts: { band: 99 }, why: '6 tens is 60.' },
+        ],
+        concepts: [
+            { id: 'value', text: 'A digit is worth its place: 6 in the hundreds is 600.' },
+            { id: 'not-digit', text: 'The value is not the digit alone.' },
+        ],
+        vocab: [
+            { word: 'value', meaning: 'what a digit is worth', picture: { kind: 'text', text: '6 → 600' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: 'worth', meaning: 'how much it is', picture: { kind: 'text', text: '600' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Find the underlined digit.' },
+            { icon: 'look', text: 'Name its place.' },
+            { icon: 'count', text: 'Digit times the place.' },
+            { icon: 'write', text: 'Write the value.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'The value is the place step plus one: the steps of identify, then multiply.' },
+        example: { match: 'place' },
+        mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
+    },
+    'placevalue:expand': {
+        skills: [
+            { key: 'placevalue:value', why: 'Each part of the expanded form is a value.' },
+            { key: 'placevalue:expand', opts: { band: 99 }, why: 'Tens and ones first: 47 = 40 + 7.' },
+        ],
+        concepts: [
+            { id: 'parts', text: 'A number is the sum of its place values.' },
+            { id: 'zero-place', text: 'A zero place is written too: 405 = 400 + 0 + 5.' },
+        ],
+        vocab: [
+            { word: 'expanded form', meaning: 'the parts added', picture: { kind: 'text', text: '400 + 70 + 2' } },
+            { word: 'value', meaning: 'what a digit is worth', picture: { kind: 'text', text: '7 → 70' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Hundreds digit: its value.' },
+            { icon: 'look', text: 'Tens digit: its value.' },
+            { icon: 'look', text: 'Ones digit: its value.' },
+            { icon: 'write', text: 'Write the parts with +.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'One step per place, left to right, so the zero place is never skipped.' },
+        example: { match: 'place' },
+        // The expanded-form row (288 = [ ] + [ ] + [ ]) is wider than half the page: one panel a row.
+        chartWide: true,
+        mixWith: [{ key: 'placevalue:value' }, { key: 'placevalue:more_less_10' }],
+    },
+    'placevalue:combine': {
+        skills: [
+            { key: 'placevalue:expand', why: 'Combine undoes the expanded form.' },
+            { key: 'placevalue:combine', opts: { band: 99 }, why: 'Tens and ones first: 40 + 7 = 47.' },
+        ],
+        concepts: [
+            { id: 'one-digit-each', text: 'Each place gets one digit.' },
+            { id: 'zero-holds', text: 'A place with no part gets a 0: 300 + 5 = 305.' },
+        ],
+        vocab: [
+            { word: 'standard form', meaning: 'the number in digits', picture: { kind: 'text', text: '472' } },
+            { word: 'expanded form', meaning: 'the parts added', picture: { kind: 'text', text: '400 + 70 + 2' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Hundreds: write the digit.' },
+            { icon: 'look', text: 'Tens: write the digit.' },
+            { icon: 'look', text: 'Ones: write the digit.' },
+            { icon: 'write', text: 'Read the number.' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'One step per place, so an empty place gets its 0.' },
+        example: { match: 'Write' },
+        // The parts row (500 + 10 + 5 = ____) is wider than half the page: one panel a row.
+        chartWide: true,
+        mixWith: [{ key: 'placevalue:expand' }, { key: 'placevalue:more_less_10' }],
+    },
+    'placevalue:unit_form': {
+        skills: [
+            { key: 'placevalue:identify', why: 'Unit form names each place.' },
+            { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'Tens and ones first.' },
+        ],
+        concepts: [
+            { id: 'units', text: 'A number is hundreds, tens and ones.' },
+            { id: 'count-each', text: 'The digit says how many of each.' },
+        ],
+        vocab: [
+            { word: 'hundreds', meaning: 'groups of 100', picture: { kind: 'text', text: '300' } },
+            { word: 'tens', meaning: 'groups of 10', picture: { kind: 'blocks', tens: 3, ones: 0 } },
+            { word: 'ones', meaning: 'single ones', picture: { kind: 'blocks', tens: 0, ones: 4 } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the number.' },
+            { icon: 'write', text: 'How many hundreds?' },
+            { icon: 'write', text: 'How many tens?' },
+            { icon: 'write', text: 'How many ones?' },
+        ],
+        chant: '',
+        format: { kind: 'numbered steps with icons', why: 'One blank per place, the same order as the frame.' },
+        example: { match: 'hundreds' },
+        // The unit-form frame (__ hundreds __ tens __ ones) is wider than half the page: one panel a row.
+        chartWide: true,
+        mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
+    },
 });
 
 /** The lesson data of a skill, or null (a skill with no authored lesson yet). */

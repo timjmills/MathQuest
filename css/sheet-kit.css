@@ -534,3 +534,11 @@
    More practice and Review at M and L) put its first digit inside the tab's keep-out (L-OVERLAP CL40-INK). The same
    shrinkable spacer now stands above such a supported fact. */
 .ws-page .ws-grid > .ws-cell:has(> :is(.ws-tab, .ws-letter)):has(> .ws-supported > .ws-with-pane[data-ws-pane-place="under"] > .ws-pane-problem > .ws-eq[data-ws-across]):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: 0 1 max(0mm, calc(var(--ws-tab, 5mm) - 2mm - 0.2 * var(--ws-digit, 22pt))); min-height: 0; }
+
+/* 2026-11-07 (lf-placevalue, CL-40, ws-print-lint L-OVERLAP CL40-INK on combine L / expand S): a pv cell whose
+   first content is a one-line equation row ("800 + 40 + 5 = ____", "405 = [ ] + [ ] + [ ]") is wider than the
+   room beside the number tab and put its first digit inside the tab's keep-out. It takes the same fixed top
+   spacer as the word-work / counters cells above (tab side - 2 mm), on the page and on the measuring cell, so
+   rows are sized with it. Cells that start with the numeral (identify, value) are unchanged. Additive. */
+.ws-page .ws-grid > .ws-cell:is([data-ws-cell="pv"], .mqt--pv):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not([data-ws-writeabove]):not(.blankrun)::before,
+.ws-sheet > .ws-cell.mqt--pv:has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
