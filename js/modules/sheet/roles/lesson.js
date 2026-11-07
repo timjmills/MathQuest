@@ -333,7 +333,8 @@ export const CASE_TESTS = Object.freeze({
     // (Practice 1, critic D1: row 1 two non-squares - one with no 5, and 2 rows of 5 -, the last row the one square,
     // 4 x 4, and 5 rows of 3: the 5s spent where they teach)
     // (r4, critic r2 m1: row 1 2 x 4 and 3 x 5 - no first factor twice in a row -, the last row 4 x 4 and 5 rows of 2)
-    arrP1: (it) => { const p = arrTurnOf(it); return !!p && ((CASE_TESTS.arrNonSq(it) && p.rows !== 5 && p.cols !== 5) || (p.rows === 3 && p.cols === 5) || (p.rows === 5 && p.cols === 2) || CASE_TESTS.arrBigSquare(it)); },
+    // (owner ruling 2026-11-07: full-width cells, arrays to 6 x 6 - any non-square, or a square of 4 or more; the square on the last row only; never 2 x 6 - the Prerequisite Check's x 2 facts are 2 x 6 to 2 x 9)
+    arrP1: (it) => { const p = arrTurnOf(it); return !!p && (CASE_TESTS.arrNonSq(it) || CASE_TESTS.arrBigSquare(it)) && !(Math.min(p.rows, p.cols) === 2 && Math.max(p.rows, p.cols) === 6); },
     // The detailed lesson maker, lesson 4 (even products, 3.OA.D.9): a mult-grid shading window.
     // chartMixed: even and odd rows AND even and odd columns (every case on one window).
     // (lesson 4 r3: the chart example stays on the 2-9 chart; the Check Question shows the 11 / 12 rows first, critic r1 D3)
