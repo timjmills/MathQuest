@@ -3,17 +3,26 @@ Title: Lessons-first wave 1: the pilot unit's operations skills to 8/10 (G3-Y4.B
 Session: https://claude.ai/code/session_013pHDnQ7sfFBg45rrEDgLdJ
 Branch: claude/sweet-newton-c8wrv1-lf-ops
 Owner of files: LANES.operations (gen-operations.js, gen-mult-patterns.js, the ops cells and providers), design/cards/count-row/, design/cards/ops-tables/, design/lanes/lf-ops/
-State: building
+State: paused
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 2, FAIL (r1 build #4: lowest 2; div_facts r5: lowest 6)
+Critic rounds: 3, FAIL (build #4 r1 lowest 2; div_facts r5 lowest 6; plain stories r1 lowest 3)
 
 ## Now
-- 2026-11-07 owner scope (via lead): BUILD lessons only, no owner sign-off of cards. Re-aimed below ("Scope after the 2026-11-07 decision").
-- Cards: count-row and ops-tables have every 7a line and every 9 question DECIDED by the lane (recorded as "lane decision 2026-11-07"). `--check-signed` reports "needs owner signature (everything else green)". The lane did NOT write "Signed: owner" (it would misstate who signed); the lead decides how the card gate reads a lane decision (question to the lead below).
-- div_facts F1-F4 are lane decisions recorded here, NOT written into the owner-signed facts card (that card stays as the owner signed it on 2026-10-31).
-- Step 2 done: six R4 checks in ws-print-lint (225eb3e), each FAILS on head; 7 backtest rows (pass commit TBD until the fix). Precritic red list below.
-- BLOCKED for this session: recording F1-F4 on the owner-signed facts card (the session's permission check refuses edits to that card); the owner or lead adds them and re-signs. The div_facts aid fixes wait for it.
+- HAND-OVER 2026-11-07 ~13:50 UTC (lead: no new work after ~14:10, week at ~44-60 %). Nothing passed; nothing added to redesign-passed.js. Draft PR #38 into claude/sweet-newton-c8wrv1.
+- #4 Properties (mult_properties, arrays_groups, count_by_tables): critic r1 FAIL, fix round (fix4, merged) stopped by rule 7; PARKED to next week - fresh-builder brief below.
+- #7 Two-step: div_facts support aids critic r5 FAIL lowest 6 (rule 7, H13 class; root cause fillToCeiling in roles/test.js, now caught by H13-INK on Test); plain x / ÷ stories critic r1 FAIL lowest 3 (WP-1 mult forms dead, D-1 division worked in the long-division bracket).
+- Next week, in order: div_facts fresh builder (Test stretch, supports-off page, RP-81, fade one-x); the stories fix round (WP / M / D list below); the #4 fresh builder; then #8 mult_zeros, #2 / #16-17 bar-model stories, #18 add_column_multi, #3 mult_chart, mult_comparison, remainder_interpret.
+
+## Hand-over findings (not this lane's files)
+- Shared composer js/modules/sheet/roles/practice.js (the shared-roles lane): a story sub-section continues into the previous page's leftover room, so a later page holds one row (DN-2, PG-23). Fires on `ws-print-lint --kind sections` at S with the defaults, on ex-each L, ex-group L and on --pages 2 S / L (critic wp r1 widened the list).
+- Shared word-work screen: the answer-digit inputs are 40 x 44 px on the 390 px card (H6, ws-grade-render TARGET).
+
+## Critic plain stories r1 (critic-wp-r1.md, d26d2c4) - FAIL: mult_word_problems_plain lowest C2 4, div_word_problems_plain lowest C2 3 (forms [2])
+- WP-1 (critical) mult `forms` dead: arrays [1] and comparison [2] print the equal-groups story (389 / 389); `tellStory` in cells/word-work.js maps every x story to groups. WP-2 (major) div forms [2] "remainder to interpret" never deals a remainder. WP-3 (major) paper != screen (bank and label line order, the sign box square vs circle, a 1- vs 2-column division grid). WP-4 (minor) a wrapped story moves its grid down at L. WP-5 (major) the lesson vocabulary match gives itself away, division reuses the x words. WP-6 (minor) Model panels do not build up. M-1 (major) the x sign in two places on the key. M-2 (major) 5 of 10 x digit boxes never used. M-3 (minor) Model 8 x 2 vs Say "2 groups of 8". M-4 (minor) duplicate bank word. M-5 (major) lesson Warm-up 51 % empty. M-6 (minor) ex-each L worked example at S type. D-1 (critical) division worked in the long-division bracket on grade-3 facts (copy row, remainder 0). D-3 (minor) filler words "days" / "boxes" in 17 / 20 banks.
+- Passed: no key-word teaching, nothing given away, units written, one frame a section, B&W, Say frames, keys, sensible numbers.
+- Automatic checks: FORMS-LIVE (a schema signature per offered value in ws-options-verify, digits and names masked); SLOT-DOUBLE; DEAD-BOX / LIVE-ROWS over 20 seeds; paper = screen frame order (critic check 10, still unwritten); slot-y spread a row <= 2 mm; VOCAB-ECHO; MODEL-PROGRESS; SAY factor order; BANK-UNIQUE + filler variety; lesson Warm-up H13; anchor font >= 0.9 x item font.
+- Speed-ups: --save-html relative CSS (or --png); ws-grade-render --help exits; options-verify masks digits before comparing (would have caught WP-1); hand-over notes paste the lint's full red list.
 
 ## Scope after the 2026-11-07 decision (BUILD lessons, earliest rounds first)
 Operations skills used by BUILD lessons that are not at 8/10 (design/lessons-first/queue.json, kind "build"):
@@ -133,9 +142,17 @@ F3. Skip strip: draw to 10 x or 12 x the divisor (the band's top), in two lines 
 F4. Fade packet: dealt in support order (all -> fewer -> none, a block per stage), each page's rows sized to the supports that page carries, the fact left-anchored at one x. Suggested: yes.
 
 ## Times
-Times: builder day-1 cards + merge, start 2026-11-07T00:00Z, end —, profile mq-opus-medium (lane session)
+Times: critic plain stories r1, start 2026-11-07T13:22Z, end 2026-11-07T13:43Z, profile mq-opus-medium
+Times: critic div_facts r5, start 2026-11-07T12:48Z, end 2026-11-07T13:04Z, profile mq-opus-medium
+Times: builder #7 (div_facts aids + stories), start 2026-11-07T09:37Z, end 2026-11-07T13:18Z, profile mq-opus-medium
+Times: fix #4 (fix4), start 2026-11-07T09:50Z, end 2026-11-07T11:10Z, profile mq-opus-medium
+Times: critic #4 r1, start 2026-11-07T09:36Z, end 2026-11-07T10:13Z, profile mq-opus-medium
+Times: builder #4, start 2026-11-07T07:40Z, end 2026-11-07T09:20Z, profile mq-opus-medium
+Times: builder R4 checks, start 2026-11-07T06:30Z, end 2026-11-07T07:45Z, profile mq-opus-medium
+Times: lane day-1 cards + merge, start 2026-11-07T06:25Z, end 2026-11-07T06:47Z, profile lane session
 
 ## Log
+- 2026-11-07 ~13:50: hand-over. Cost: lead read cost_usd $55.23 at 09:34 UTC; later sub-agent runs (fix4 ~0.6 M tokens, #7 ~0.7 M, three critics ~0.9 M) are not read yet - the lead reads the session's cost_usd (session_013pHDnQ7sfFBg45rrEDgLdJ) for the final figure ($20 ~ 1 % of the week).
 - 2026-11-07: owner scope decision received (BUILD only, no sign-off); re-aimed to round-1 BUILD skills (adds mult_comparison, remainder_interpret; drops tables_links, div_by_itself, mult_three); cards decided by the lane, left unsigned pending the lead's gate ruling.
 - 2026-11-07: lane started; skip-count fix merged; count-row and ops-tables cards drafted; owner sheet sent to the lead.
 
