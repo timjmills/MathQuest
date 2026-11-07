@@ -5,7 +5,7 @@
 //
 //   strings       per task: Match 3 pictures -> "Write the letter of its picture next to each word."
 //                 1 picture 3 words -> "Look at the picture. Write its word on the line."
-//   workedSteps   the Model: look at each picture and say what it shows, read the words, write
+//   workedSteps   the Model, three steps (SCC-P4): look, say / read, write
 //   wrongAnswer   Match 3: two letters swapped (the two pictures read the wrong way round);
 //                 1 picture 3 words: a bank word that is not the picture's (picked by its sound or
 //                 its first letter, not by the picture)
@@ -49,21 +49,18 @@ registerSkill('vocabulary:vocab_grade_pictures', {
     workedSteps: (q) => {
         const p = q && q.cell && q.cell.payload;
         if (!p) return [];
+        // three steps of at most 10 words (SCC-P4), one per step of the routine (lessons/families/multdiv.js)
         if (templateOf(q) === 'vocab-pick3') {
             return clampSteps([
-                step(`Look at the picture. It shows: ${meaningOf(p.word)}.`),
-                step(`Read the three words: ${(p.bank || []).join(', ')}.`),
-                step(`The word for this picture is "${p.word}".`),
-                step(`Write ${p.word} on the line.`, [{ slot: 'answer', value: p.word }]),
+                step('Look at the picture.'),
+                step('Read the three words in the box.'),
+                step(`Write "${p.word}" on the line.`, [{ slot: 'answer', value: p.word }]),
             ]);
         }
-        // four steps, one per step of the routine (lessons/families/multdiv.js vocab-picture-words): look, say, find, write
         const order = p.order || [0, 1, 2];
-        const words = p.words || [];
         return clampSteps([
             step('Look at pictures A, B and C.'),
-            step(`Say what each one shows: ${words.map((w, i) => `${LET[i]}, ${meaningOf(w)}`).join('; ')}.`),
-            step(`Find the word for each: ${words.map((w, i) => `${LET[i]} is "${w}"`).join(', ')}.`),
+            step('Say what each picture shows.'),
             step('Write each letter next to its word.', order.map((wi, n) => ({ slot: `letter-${n}`, value: LET[wi] }))),
         ]);
     },

@@ -40,7 +40,7 @@ export const ROUTINES = Object.freeze({
     },
     // ------------------------------------------------------- Lesson words with pictures (lane lf-vocab, 2026-11-07)
     // vocabulary:vocab_grade_pictures (Match 3 pictures): its default words are the pilot unit's (G3-Y4.B4, grade 3
-    // multiplication and division). Four steps, one per worked step of the provider (three pictures, then write).
+    // multiplication and division). Three steps, one per worked step of the provider (look, say, write).
     'vocab-picture-words': {
         archetype: 'fact',
         // a full-width drawing: the anchor chart's panels one column (chart.js chartLayout; precritic render gate r1)
@@ -57,14 +57,13 @@ export const ROUTINES = Object.freeze({
         ],
         steps: [
             { icon: 'look', text: 'Look at pictures A, B and C.' },
-            { icon: 'say', text: 'Say what each one shows.' },
-            { icon: 'decide', text: 'Find the word for each.' },
-            { icon: 'write', text: 'Write the letter.' },
+            { icon: 'say', text: 'Say what each picture shows.' },
+            { icon: 'write', text: 'Write each letter next to its word.' },
         ],
         chant: '',
         format: {
             kind: 'icons + very short steps',
-            why: 'Four actions a pupil repeats for each picture; the Say band is the oral frame, so no chant.',
+            why: 'Three moves (SCC-P4: 3-6 steps), one anchor-chart panel each in one column, so a panel is wide and tall enough for the whole cell; the Say band is the oral frame, so no chant.',
         },
         example: { match: '[\\s\\S]' },
     },
@@ -73,6 +72,8 @@ export const ROUTINES = Object.freeze({
         archetype: 'fact',
         // a full-width drawing: the anchor chart's panels one column (chart.js chartLayout; precritic render gate r1)
         chartWide: true,
+        // (each panel a row: the cell beside the step's words, so three panels fit one page - r2 render: col panels ran off)
+        chartRow: true,
         casesPending: 'Lane lf-vocab: the cases are the lesson word sets (sheet/lesson-pages/vocab-words.js); carded in design/cards/vocabulary.',
         concepts: [
             { id: 'picture', text: 'Each picture shows one math word.' },
@@ -85,14 +86,13 @@ export const ROUTINES = Object.freeze({
         ],
         steps: [
             { icon: 'look', text: 'Look at the picture.' },
-            { icon: 'say', text: 'Read the three words.' },
-            { icon: 'decide', text: 'Choose its word.' },
-            { icon: 'write', text: 'Write it on the line.' },
+            { icon: 'say', text: 'Read the three words in the box.' },
+            { icon: 'write', text: 'Write its word on the line.' },
         ],
         chant: '',
         format: {
             kind: 'icons + very short steps',
-            why: 'Four actions; the Say band is the oral frame, so no chant.',
+            why: 'Three moves (SCC-P4), one anchor-chart panel each in one column, so a panel holds the whole cell; the Say band is the oral frame.',
         },
         example: { match: '[\\s\\S]' },
     },
