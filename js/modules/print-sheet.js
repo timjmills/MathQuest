@@ -23,6 +23,7 @@
 // app's print branches.
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
+import { resetPageDeals } from './page-deal.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
 import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
@@ -4750,6 +4751,10 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
     for (let k = 0; k < T; k++) {
         let q = null;
         // (`itemSpread`, lesson 2 r5: a story's name and noun follow the item index, so it runs through all of them, not six)
+        // (`pageFresh`, lesson 2 R1: a page constant - the story schema of a set within 20, word-work.js since 944afb79 - is
+        // drawn once a page; an `itemSpread` ref never re-opens its page (item 0 only), so every try told the first try's
+        // schema and a put-together want never met. Each try opens its own page: the schema is drawn from that try's seed.)
+        if (ref.pageFresh && k > 0) resetPageDeals();
         try { q = generateQuestionFor(Object.assign({ category: ref.categoryId, skill: ref.skillId, opts: ref.opts, seed: (seed + 7919 * k) >>> 0, itemIndex: ref.itemSpread ? k : k % 6 }, ref.range ? { range: ref.range } : {})); } catch (e) { q = null; }
         if (!q) continue;
         if (ref.cellPayload && q.cell && q.cell.payload) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, ref.cellPayload) }) });
