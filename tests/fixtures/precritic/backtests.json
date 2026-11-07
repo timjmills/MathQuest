@@ -1490,6 +1490,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson2-page-fresh",
+   "check": "R1: lesson 2 (g1-oa1-bar-model-wp-20) builds - a story ref re-opens its page per try (pageFresh, both dealers) and reserves its rare late items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r1-page-fresh (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "no add_wp_20 item for the exit slip's put-together case: the story schema held for every try"
+   },
+   "pass": {
+    "commit": "4ab65c7b",
+    "state": "pageFresh + reserve: the lesson builds at seed 4242"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r1-page-fresh",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
