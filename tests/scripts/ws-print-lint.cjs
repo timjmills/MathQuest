@@ -142,10 +142,12 @@
 //              sized for a taller item, critic r2 N2. Findings carry `skill` (data-ws-skill) for D1 attribution.)
 //   OPT-IN RULES (--rules; findings are L-DENSITY, so --lints L-DENSITY keeps them):
 //   H13-ABS    (critic lf-placevalue r1 F1) in every kit cell of a pupil page, the empty band under the LOWEST INK (text,
-//              a drawing, a stroked box or line; tabs and labels excluded) down to the cell's bottom pad is under 30 % of
+//              a drawing, a stroked box or line; tabs and labels excluded) down to the cell's bottom pad is under 35 % of
 //              the cell height less the answer's own writing room Hw (--ws-hw: 6 / 8 / 10 mm at S / M / L):
-//              band >= 0.3 x (H - Hw) is a finding. H13 / H13-ROW judge a top cell only against its row; this judges
-//              it absolutely (value L 34 %, every row alike, passed H13-ROW).
+//              band >= 0.35 x (H - Hw) is a finding (lead ruling T1 2026-11-07: 35 %, not 30 %, so the approved stack
+//              and fact pages - sub_50 / sub_2d_1d L 27 % raw, add_facts L 30 % - pass while the pv bands of 34-55 % fail).
+//              H13 / H13-ROW judge a top cell only against its row; this judges it absolutely. Sibling rule: H13-ANY (an
+//              empty band ANYWHERE in a cell, e.g. between a picture and its slots) lives in tests/scripts/ws-cell-checks.cjs (lf-ops).
 //   GRID-EVEN-ALL (critic lf-placevalue r1 F9, lf-ops r1) one cell geometry per SECTION: every cell of the grids of one
 //              section (consecutive .ws-grid siblings with no instruction, strip or other text between them, on one
 //              pupil page) has one width within 0.2 mm - a full-width cell included (GRID-EVEN exempts it): combine L
@@ -1052,8 +1054,8 @@ function wsLintPage(cfg) {
                     let low = inkBot;
                     for (const sl of c.querySelectorAll('[data-ws-slot]')) { if (!visible(sl) || sl.closest('[data-ws-label]') || sl.textContent.trim()) continue; const r = sl.getBoundingClientRect(); if (r.height) low = Math.max(low, r.bottom); }
                     const below = Math.max(inner.b - low, 0);
-                    const lim = 0.3 * Math.max(H - hw, 0);
-                    if (lim > 0 && below >= lim) F('L-DENSITY', 'H13-ABS', 'major', c, `an empty band ${mm(below)} mm tall under the lowest ink of a ${mm(H)} mm cell (${Math.round((below / H) * 100)}%; limit 30 % of the cell less Hw ${mm(hw)} mm = ${mm(lim)} mm): size the row to the item's ink plus its writing room (RUBRIC H13, H13-ABS)`, 'band under the lowest ink');
+                    const lim = 0.35 * Math.max(H - hw, 0);
+                    if (lim > 0 && below >= lim) F('L-DENSITY', 'H13-ABS', 'major', c, `an empty band ${mm(below)} mm tall under the lowest ink of a ${mm(H)} mm cell (${Math.round((below / H) * 100)}%; limit 35 % of the cell less Hw ${mm(hw)} mm = ${mm(lim)} mm): size the row to the item's ink plus its writing room (RUBRIC H13, H13-ABS)`, 'band under the lowest ink');
                 }
             }
             /* H13-ROW (RUBRIC H13 "a row ... sized for a taller item than it holds"; pilot-su-c critic r2 N2: a lesson

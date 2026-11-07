@@ -145,12 +145,15 @@ const SCREEN_DIGIT = has('screen-digit');
 const RULE_SKILLS = (arg('rule-skills', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
 const DIGIT_VIEWPORTS = [{ w: 1280, h: 900, px: 56 }, { w: 820, h: 1180, px: 48 }, { w: 390, h: 844, px: 40 }];
 /** The verdict on one measured numeral {px, weight, family} at a viewport width: null when it passes, else why. */
-function digitVerdict(m, width) {
+// Lead ruling T2 (2026-11-07): the size floor holds for every skill; weight >= 700 only where the paper prints the numeral
+// bold - the place-value numerals (`bold`, true for placevalue:*). add_facts and other non-bold skills are exempt.
+const BOLD_NUMERAL = (key) => /^placevalue:/.test(String(key || ''));
+function digitVerdict(m, width, bold = true) {
     const vp = DIGIT_VIEWPORTS.find((v) => v.w === width) || DIGIT_VIEWPORTS[0];
     if (!m || !(m.px > 0)) return 'no numeral found in the cell';
     const why = [];
     if (m.px < vp.px - 0.5) why.push(`${Math.round(m.px * 10) / 10} px (want >= ${vp.px} px at ${vp.w})`);
-    if (!(Number(m.weight) >= 700)) why.push(`weight ${m.weight} (want >= 700)`);
+    if (bold && !(Number(m.weight) >= 700)) why.push(`weight ${m.weight} (want >= 700)`);
     if (!/andika/i.test(String(m.family || '').split(',')[0])) why.push(`font ${String(m.family || '').split(',')[0].trim() || '?'} (want Andika)`);
     return why.length ? `the numeral "${m.text}" is ${why.join(', ')}` : null;
 }
@@ -197,11 +200,12 @@ if (has('self-test')) {
         ['SCREEN-DIGIT 56 px Andika 700 at 1280', { px: 56, weight: '700', family: 'Andika, sans-serif', text: '403' }, 1280, null],
         ['SCREEN-DIGIT 44 px at 390 (target 40)', { px: 44, weight: '700', family: '"Andika", sans-serif', text: '7' }, 390, null],
         ['SCREEN-DIGIT 47 px at 820 (target 48)', { px: 47, weight: '700', family: 'Andika', text: '7' }, 820, /47 px/],
+        ['SCREEN-DIGIT T2: a regular numeral passes where the paper is not bold', { px: 60, weight: '400', family: 'Andika', text: '7', bold: false }, 1280, null],
         ['SCREEN-DIGIT a fallback face', { px: 60, weight: '700', family: 'Arial, sans-serif', text: '7' }, 1280, /font Arial/],
         ['SCREEN-DIGIT no numeral', null, 1280, /no numeral/],
     ];
     for (const [name, m, wpx, want] of dcases) {
-        const v = digitVerdict(m, wpx);
+        const v = digitVerdict(m, wpx, !(m && m.bold === false));
         const ok = want ? !!v && want.test(v) : v === null;
         if (!ok) bad++;
         console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${v || 'passes'}`);
@@ -606,7 +610,7 @@ if (arg('digit-fixture', null)) {
                 if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
                 const judge = (host, m) => {
                     checked++;
-                    const v = digitVerdict(m, vp.w);
+                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key));
                     if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-DIGIT ${v}`; findings.push({ key, id: `${host}@${vp.w}:digit`, line: l }); console.log(l); }
                 };
                 try {

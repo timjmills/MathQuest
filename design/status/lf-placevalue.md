@@ -43,6 +43,10 @@ Critic rounds: 1, FAIL (all five; min 1 stretch, core 4-6)
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-07 lead rulings T1 / T2 on the opt-in checks: H13-ABS limit 35 % of (cell − Hw), not 30 % (evidence: approved
+  sub_50_no_regroup / sub_2d_1d L 27 % raw, add_facts L 30 % fire at 30 %; pv value L 34 %, the critic's pv bands 34–55 %; backtest
+  optin-h13-abs still FAIL 14.6 mm ≥ 14.5 mm limit / OK); SCREEN-DIGIT keeps the size floor for every skill, weight ≥ 700 only for
+  placevalue:* (paper bold); backtest optin-screen-digit PASS. Sibling: H13-ANY (band anywhere) stays in lf-ops' ws-cell-checks.
 - 2026-11-07 lead rulings after r1: D1 lane owns the additive checks H13-ABS, WRONG-FITS per slot, GRID-EVEN all sections,
   SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-verify bands (opt-in, precritic --skill only); precritic plan-from-card is lf-ops'
   (fix4 branch, merge when it lands). D2 stretch: owner asked; carried "offered, not graded" (RUBRIC scope note), no re-sign.
