@@ -38,12 +38,12 @@ function sayValues(q) {
 
 const BY_TASK = {
     outputs: {
-        iCan: 'I Can use a rule to complete a table',
+        iCan: 'I Can use a rule to complete an In and Out table',
         instructionKey: 'table',
         steps: ['Read the rule.', 'Do the rule to each In number.', 'Write each Out number.'],
     },
     rule: {
-        iCan: 'I Can find the rule of a table',
+        iCan: 'I Can find the rule of an In and Out table',
         instructionKey: 'table-rule',
         steps: ['Look at how each In number changes to its Out.', 'Test +, −, × and ÷ on every row, not just one.', 'Write the rule that works for all the rows.'],
     },
@@ -66,7 +66,10 @@ const BY_TASK = {
 const STRINGS = Object.fromEntries(Object.entries(BY_TASK).map(([k, d]) => [k, strings({ ...d, say: SAY, sayValues })]));
 
 function stringsFor(defaultTask) {
-    const fn = (ref = {}) => STRINGS[taskOf(ref && ref.q) || defaultTask](ref);
+    // with no item (the page title), the section's own ftTask option says the task (lf-algebra r1: a "find the rule" page
+    // was titled "use a rule to complete")
+    const optTask = (ref) => { const t = String((ref && ref.opts && ref.opts.ftTask) || '').replace(/-check$/, ''); return STRINGS[t] ? t : null; };
+    const fn = (ref = {}) => STRINGS[taskOf(ref && ref.q) || optTask(ref) || defaultTask](ref);
     fn.def = STRINGS[defaultTask].def;
     return fn;
 }
@@ -87,7 +90,9 @@ function workedSteps(q) {
         const [a, b] = p.rows;
         out.push(step(`In ${a.x} gives Out ${a.y}. In ${b.x} gives Out ${b.y}.`));
         if (rule.length === 1 && (rule[0].op === 'x' || rule[0].op === '/')) {
-            out.push(step(`Test + ${a.y - a.x}: ${b.x} + ${a.y - a.x} = ${b.x + a.y - a.x}, not ${b.y}.`));
+            // the + / − a pupil reads off row 1 (never "+ -6": a smaller Out is a − try)
+            const gap = a.y - a.x, sg = gap >= 0 ? '+' : '−', gn = Math.abs(gap);
+            out.push(step(`Test ${sg} ${gn}: ${b.x} ${sg} ${gn} = ${b.x + gap}, not ${b.y}.`));
         } else if (rule.length === 1) {
             // Lesson 5 order for + / − (the sign picks the variant): bigger or smaller first, then the change.
             const bigger = rule[0].op === '+';
@@ -110,8 +115,9 @@ function workedSteps(q) {
         return clampSteps(out);
     }
     out.push(step(`The rule is ${ruleText(rule)}: ${rule.map((s) => `${opWord[s.op]} ${s.n}`).join(', then ')}.`));
+    // Four steps (the lesson's anchor chart is four panels): the rule, two rows worked, then every row.
     for (const s of slots) {
-        if (out.length >= 4) break;
+        if (out.length >= 3) break;
         const r = p.rows[s.row];
         if (!r) continue;
         if (s.col === 'out') out.push(step(`${ruleOn(rule, r.x)} = ${r.y}. Write ${r.y}.`, [{ slot: s.id, value: s.value }]));

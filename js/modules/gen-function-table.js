@@ -256,5 +256,9 @@ export function generateFunctionTable(q, skillId) {
     q.printFormat = 'function-table';
     q.skillLabel = skillId === 'function_table_hard' ? 'Function Table' : 'Function Table';
     q.ftRule = ruleText(rule);
+    // (lf-algebra r1, the card's rulings block: ws-card-rulings reads q.a / q.b) a = the biggest number in the table
+    // (Check row included), b = the rule's first number: "Numbers to N" and "× 2 to × 5 at 20" are checkable
+    q.a = Math.max(...rows.flatMap((r) => [r.x, r.y]), ...(check ? [check.x, check.y] : []), ...rule.map((st) => st.n));
+    q.b = rule[0].n;
     return true;
 }

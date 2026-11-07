@@ -22,11 +22,16 @@ Critic rounds: 0, none
 ## Owner go
 
 ## Open questions
-- (cards' undecided lines are listed here as they are drafted)
+- function-table card (design/cards/function-table/function-table.md, unsigned; 35 PROPOSED decisions, accepted by signing):
+  1. Write the rule IN the machine box at S/M, under the table at L? Suggested: yes (one rule place).
+  2. x 6 on a 3-row table at band 20 for lesson #5? Suggested: yes (rows are table facts; ftFactors restricts).
+  3. Check rows and 5-row tables count as "adds a drawing" (capacity)? Suggested: yes.
+  4. Two-step rules stay offered on easy, off by default? Suggested: yes.
+- number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
 Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end —, profile mq-opus-medium
-Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end —, profile mq-opus-medium
+Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end 2026-11-07T08:27Z, profile mq-opus-medium
 
 ## Baseline precritic (head 9398c3a, --skill function_table_easy,number_patterns_rule --strict): 6 FAIL
 - print-lint lesson L/S: function_table_easy L-TOPSTART CL-4b, L-ANSAREA SL-6, L-DENSITY DN-2; number_patterns_rule L-OVERFLOW PG-12 (x8)
@@ -40,6 +45,14 @@ Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-1
 - 2026-11-07: composing:number_word_form (BUILD lesson #1) handed to lf-placevalue (session_013pHDnMCXcY6kXV15KHf4Yp): they own only
   its blocks in gen-algebraic.js (the WHICH WAY ROUND comment ~l.45-60 and the number_word_form branch ~l.2469); their precritic r0
   findings (LESSON-DATA, lesson S H13/PAGEFILL, answerSlot=hto weight 900, to_words capacity) are theirs to fix.
+- 2026-11-07 r1 build (Opus medium, first redesign on uncertified pairs): function_table_easy + number_patterns_rule.
+  function-table: find-the-rule frame IN the machine box (S/M), short machine arrows (CL40 at L), note tightened, top-aligned
+  root (L-TOPSTART), >= 1.25 em screen boxes (44 px), provider steps 4 (lesson chart), "+ -6" step fixed, title from ftTask;
+  skill-options addsDrawingValues (Check rows, 5-row tables); gen q.a / q.b for the card rulings. Lesson data for both
+  skills (prereqs.js, lf-algebra block; number_patterns_rule chartWide). number_patterns_rule: find-the-rule worked steps
+  no longer state the rule first; Max Number obeyed on x 10 rows; a three-term row keeps one number to write.
+  Card design/cards/function-table (unsigned, 4 open questions). ws-card-rulings reads list-answer items (listAns).
+  Asked lf-ops (count-row.js): train wraps to its cell; shaped tiles at box pitch; >= 44 px screen boxes.
 - 2026-11-07: lf-ops agreed (session_013pHDnQ7sfFBg45rrEDgLdJ): lf-algebra owns ONLY genNumberPatterns + its dispatch line in
   gen-mult-patterns.js and the registerSkill('patterns:number_patterns_rule') block in providers/countby.js; count-row.js stays
   lf-ops' (ask for changes, its 'train' look is number_patterns_rule's track); read-only use of the mult-grid payload is fine.
