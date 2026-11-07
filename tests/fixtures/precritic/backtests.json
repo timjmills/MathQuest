@@ -1650,6 +1650,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "optin-screen-digit",
+   "check": "ws-screen-slots --screen-digit (opt-in): the item's numeral on the card / worksheet / quiz is >= 56 / 48 / 40 px at 1280 / 820 / 390, Andika at weight >= 700",
+   "kind": "fixture",
+   "rule": "ws-screen-slots SCREEN-DIGIT (critic lf-placevalue r1 F7; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-digit/fail.html",
+    "state": "placevalue:expand practice card at 1280, commit 53dd45c9: the number 24 px, weight 400"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-digit/pass.html",
+    "state": "placevalue:value practice card at 1280, commit b1094401: 56 px Andika 700"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --digit-fixture {fixture} --viewport 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

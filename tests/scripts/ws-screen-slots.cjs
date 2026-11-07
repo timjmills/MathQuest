@@ -55,6 +55,15 @@
 // FAIL and name what was wrong.
 //   node tests/scripts/ws-screen-slots.cjs --self-test         # the selection rules on a fixture list (no browser)
 //
+// OPT-IN SCREEN-DIGIT (--screen-digit; lf-placevalue critic r1 F7, lead ruling D1 2026-11-07; default off, so every pin
+// and deploy shard reads as before): after the host checks, each skill's practice card, online worksheet (card 1) and
+// quiz question are rendered again at 1280 x 900, 820 x 1180 and 390 x 844, and the item's numeral - the largest-type
+// text run of digits in the cell (tabs, labels, the instruction and screen-only chrome excluded) - must be at least
+// 56 / 48 / 40 px at those widths, in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
+// kind), e.g. "card@1280:digit". --rule-skills a:b,c:d judges it only on those skills (ws-precritic passes the lane's).
+//   node tests/scripts/ws-screen-slots.cjs --digit-fixture file.html --viewport 1280   # the measure on a saved cell
+//                              ([data-mq-digit-root] or the body): OK / FAIL (a backtest fixture)
+//
 // Prints one line per doubled skill x host, a count, then `ws-screen-slots: OK` or `FAIL`.
 const fs = require('fs');
 const path = require('path');
@@ -131,6 +140,38 @@ function selectSkills(all, { only = [], categories = [], sample = null, from = 0
     return { skills, errors };
 }
 
+// ---- SCREEN-DIGIT (opt-in): the targets and the in-page measure
+const SCREEN_DIGIT = has('screen-digit');
+const RULE_SKILLS = (arg('rule-skills', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
+const DIGIT_VIEWPORTS = [{ w: 1280, h: 900, px: 56 }, { w: 820, h: 1180, px: 48 }, { w: 390, h: 844, px: 40 }];
+/** The verdict on one measured numeral {px, weight, family} at a viewport width: null when it passes, else why. */
+function digitVerdict(m, width) {
+    const vp = DIGIT_VIEWPORTS.find((v) => v.w === width) || DIGIT_VIEWPORTS[0];
+    if (!m || !(m.px > 0)) return 'no numeral found in the cell';
+    const why = [];
+    if (m.px < vp.px - 0.5) why.push(`${Math.round(m.px * 10) / 10} px (want >= ${vp.px} px at ${vp.w})`);
+    if (!(Number(m.weight) >= 700)) why.push(`weight ${m.weight} (want >= 700)`);
+    if (!/andika/i.test(String(m.family || '').split(',')[0])) why.push(`font ${String(m.family || '').split(',')[0].trim() || '?'} (want Andika)`);
+    return why.length ? `the numeral "${m.text}" is ${why.join(', ')}` : null;
+}
+/** In the page: the largest-type run of digits under `rootSel` (labels, tabs, the instruction, screen-only chrome out). */
+function MEASURE_DIGIT(rootSel) {
+    const root = document.querySelector(rootSel);
+    if (!root) return null;
+    let best = null;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n = w.nextNode(); n; n = w.nextNode()) {
+        const el = n.parentElement;
+        const t = n.nodeValue.trim();
+        if (!/\d/.test(t) || !el || !el.getClientRects().length) continue;
+        if (el.closest('.ws-tab, [data-ws-label], .ws-letter, .mq-instr, .mq-tn-count, [data-mq-screen-only], .pv-tracks tr:first-child, input, button, label')) continue;
+        const cs = getComputedStyle(el);
+        const px = parseFloat(cs.fontSize) || 0;
+        if (!best || px > best.px) best = { px, weight: cs.fontWeight, family: cs.fontFamily, text: t.slice(0, 16) };
+    }
+    return best;
+}
+
 if (has('self-test')) {
     const L = [
         { categoryId: 'measurement', skillId: 'time_5min', label: 'Time' }, { categoryId: 'measurement', skillId: 'reading_ruler_hard', label: 'Ruler' },
@@ -150,6 +191,21 @@ if (has('self-test')) {
         ['--category measurement (valid)', { categories: ['measurement'] }, null],
     ];
     let bad = 0;
+    // SCREEN-DIGIT (critic lf-placevalue r1 F7): expand's 24 px regular numeral at 1280 fails, a 56 px Andika 700 one passes
+    const dcases = [
+        ['SCREEN-DIGIT 24 px regular at 1280', { px: 24, weight: '400', family: 'Andika, sans-serif', text: '403' }, 1280, /24 px.*weight 400/],
+        ['SCREEN-DIGIT 56 px Andika 700 at 1280', { px: 56, weight: '700', family: 'Andika, sans-serif', text: '403' }, 1280, null],
+        ['SCREEN-DIGIT 44 px at 390 (target 40)', { px: 44, weight: '700', family: '"Andika", sans-serif', text: '7' }, 390, null],
+        ['SCREEN-DIGIT 47 px at 820 (target 48)', { px: 47, weight: '700', family: 'Andika', text: '7' }, 820, /47 px/],
+        ['SCREEN-DIGIT a fallback face', { px: 60, weight: '700', family: 'Arial, sans-serif', text: '7' }, 1280, /font Arial/],
+        ['SCREEN-DIGIT no numeral', null, 1280, /no numeral/],
+    ];
+    for (const [name, m, wpx, want] of dcases) {
+        const v = digitVerdict(m, wpx);
+        const ok = want ? !!v && want.test(v) : v === null;
+        if (!ok) bad++;
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${v || 'passes'}`);
+    }
     for (const [name, o, want] of cases) {
         const r = selectSkills(L, o);
         const ok = want ? r.errors.some((e) => want.test(e)) : (!r.errors.length && r.skills.length > 0);
@@ -356,7 +412,23 @@ async function prep(page, role) {
     }, role);
 }
 
-(async () => {
+// --digit-fixture file.html --viewport W: the SCREEN-DIGIT measure on one saved cell (a backtest fixture)
+if (arg('digit-fixture', null)) {
+    (async () => {
+        const width = parseInt(arg('viewport', '1280'), 10);
+        const vp = DIGIT_VIEWPORTS.find((v) => v.w === width);
+        if (!vp) fail(`--viewport takes ${DIGIT_VIEWPORTS.map((v) => v.w).join(', ')}`);
+        const app = await open({ seed: 1, viewport: { width: vp.w, height: vp.h, deviceScaleFactor: 1 } });
+        try {
+            await app.page.setContent(fs.readFileSync(path.resolve(arg('digit-fixture')), 'utf8').replace(/https?:\/\/(?:127\.0\.0\.1|localhost):\d+\//g, '/'), { waitUntil: 'networkidle0' });
+            await app.page.evaluate(() => document.fonts && document.fonts.ready);
+            const m = await app.page.evaluate(MEASURE_DIGIT, (await app.page.$('[data-mq-digit-root]')) ? '[data-mq-digit-root]' : 'body');
+            const v = digitVerdict(m, vp.w);
+            console.log(`  measured ${m ? `"${m.text}" ${m.px} px, weight ${m.weight}, ${String(m.family).split(',')[0]}` : 'nothing'} at ${vp.w}`);
+            if (v) { console.log(`  SCREEN-DIGIT: ${v}`); console.log('ws-screen-slots: FAIL'); process.exitCode = 1; } else console.log(`ws-screen-slots: OK (SCREEN-DIGIT at ${vp.w}: >= ${vp.px} px, Andika >= 700)`);
+        } finally { await app.close(); }
+    })().catch((e) => { console.error(e); console.log('ws-screen-slots: FAIL'); process.exit(1); });
+} else (async () => {
     const app = await open({ seed: 1, viewport: { width: BIGBOARD ? 1366 : 1280, height: BIGBOARD ? 768 : 900, deviceScaleFactor: 1 } });
     const { page } = app;
     const allSkills = await listSkills(page);
@@ -518,13 +590,60 @@ async function prep(page, role) {
             }
         }
     }
+    // ---- SCREEN-DIGIT (opt-in): the item's numeral on the card, the worksheet's first card and the quiz, at three widths
+    if (SCREEN_DIGIT && !SWEEP) {
+        const judged = skills.filter((s) => !RULE_SKILLS.length || RULE_SKILLS.includes(`${s.categoryId}:${s.skillId}`));
+        for (const vp of DIGIT_VIEWPORTS) {
+            await page.setViewport({ width: vp.w, height: vp.h, deviceScaleFactor: 1 });
+            for (let n = 0; n < judged.length; n++) {
+                const { categoryId: c, skillId: k } = judged[n];
+                const key = `${c}:${k}`;
+                if (n % 25 === 0) {
+                    await page.reload({ waitUntil: 'networkidle2' });
+                    await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
+                    await prep(page, ROLES[0]);
+                }
+                if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
+                const judge = (host, m) => {
+                    checked++;
+                    const v = digitVerdict(m, vp.w);
+                    if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-DIGIT ${v}`; findings.push({ key, id: `${host}@${vp.w}:digit`, line: l }); console.log(l); }
+                };
+                try {
+                    const okc = await page.evaluate((c, k) => {
+                        try { const st = window.state; st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false; window.showView('gameView');
+                            st.currentQ = window.generateQuestionFor({ category: c, skill: k, seed: 3 }); if (!st.currentQ) return false; window.renderQuestion(); return true; } catch (e) { return false; }
+                    }, c, k);
+                    if (okc) { await sleep(350); judge('card', await page.evaluate(MEASURE_DIGIT, '#questionPaper') || await page.evaluate(MEASURE_DIGIT, '#visualAid')); }
+                    const okw = await page.evaluate((c, k) => {
+                        try { const st = window.state; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 2; window.initWorksheet(); return true; } catch (e) { return false; }
+                    }, c, k);
+                    if (okw) { await sleep(1100); judge('worksheet', await page.evaluate(MEASURE_DIGIT, '#ws_card_0 .mq-wspaper') || await page.evaluate(MEASURE_DIGIT, '#ws_card_0')); }
+                    const okq = await page.evaluate((c, k) => {
+                        try {
+                            const q = window.generateQuestionFor({ category: c, skill: k, seed: 7, itemIndex: 0 });
+                            const questions = [{ id: 0, skillId: k, points: 1, questionData: window.quizQuestionData(Object.assign({ categoryId: c }, q)) }];
+                            const test = { id: null, name: 'Digits', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }],
+                                settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+                            window.handleQuizURL(window.compressTestForURL(test));
+                            const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
+                            window.startQuizTest(); return true;
+                        } catch (e) { return false; }
+                    }, c, k);
+                    if (okq) { await sleep(400); judge('quiz', await page.evaluate(MEASURE_DIGIT, '#quizTakeView .mq-qtpaper')); }
+                    await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
+                } catch (e) { const l = `${key} ERR SCREEN-DIGIT @${vp.w} ${String(e.message || e).split('\n')[0]}`; errors.push(l); console.log(l); }
+            }
+        }
+        console.log(`SCREEN-DIGIT: ${judged.length} skill(s) x card, worksheet, quiz x ${DIGIT_VIEWPORTS.map((v) => `${v.w} (>= ${v.px} px)`).join(', ')}: ${findings.filter((f) => /:digit$/.test(f.id)).length} miss(es)`);
+    }
     await app.close();
     doubled.forEach((l) => console.log(l));
     paperVerbs.forEach((l) => console.log(l));
     contrast.forEach((l) => console.log(l));
     if (suspects.length) { console.log('\nsuspects (an empty drawn box beside a visible host field; not failed):'); suspects.forEach((l) => console.log('  ' + l)); }
     const what = `${MODE ? `${MODE} sweep (${ROLES.join(', ')}), ` : ''}${SHARD ? `shard ${SHARD.i}/${SHARD.n}, ` : ''}`;
-    console.log(`\n${what}${skills.length} skills, ${checked} host renders, ${doubled.length} doubled answer area(s), ${paperVerbs.length} paper verb(s) on screen${SWEEP ? `, ${contrast.length} low-contrast host(s)` : ''}`);
+    console.log(`\n${what}${skills.length} skills, ${checked} host renders, ${doubled.length} doubled answer area(s), ${paperVerbs.length} paper verb(s) on screen${SWEEP ? `, ${contrast.length} low-contrast host(s)` : ''}${SCREEN_DIGIT && !SWEEP ? `, ${findings.filter((f) => /:digit$/.test(f.id)).length} screen-digit miss(es)` : ''}`);
     if (arg('json', null)) {
         const bySkill = {};
         for (const f of findings) (bySkill[f.key] = bySkill[f.key] || []).push(f.id);
