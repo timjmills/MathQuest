@@ -100,6 +100,12 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol>.ws-instrline{padding-left:3mm;padding-right:2mm}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol.mq-lwarm2>.ws-instrline{height:calc(var(--ws-instr) * 1.75);line-height:1.2;align-items:center}
 :is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol .ws-grid{border-left-width:0}
+/* critic r2 N1: the Vocabulary match drawn smaller so one Independent row fits (roles/lesson.js) */
+:is(.ws-page,.ws-sheet) .mq-lvz75 .mq-lvocab{zoom:0.75}
+:is(.ws-page,.ws-sheet) .mq-lvz80 .mq-lvocab{zoom:0.8}
+:is(.ws-page,.ws-sheet) .mq-lvz85 .mq-lvocab{zoom:0.85}
+:is(.ws-page,.ws-sheet) .mq-lvz90 .mq-lvocab{zoom:0.9}
+:is(.ws-page,.ws-sheet) .mq-lvz95 .mq-lvocab{zoom:0.95}
 `;
 
 /**

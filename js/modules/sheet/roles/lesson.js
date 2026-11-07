@@ -221,6 +221,7 @@ function planOnce(input = {}) {
     /* ---- pack the bands onto pages (PG-21: a band is never split) */
     const pages = [];
     let cur = { sections: [], used: 0, budget: m.budget, grows: [] };
+    const VOCAB_PAD_MM = 6, VOCAB_ZOOM_MIN = 0.75;
     pages.push(cur);
     for (const g of groups) {
         if (cur.used && cur.used + g.h > cur.budget) { cur = { sections: [], used: 0, budget: mCont.budget, grows: [] }; pages.push(cur); }
@@ -230,7 +231,24 @@ function planOnce(input = {}) {
     }
 
     /* ---- Independent Practice: whole rows filling the last page (PT-OPN-7, H5; lesson-pages/practice.js) */
-    const indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });
+    let indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });
+    // (critic r2 N1: a lesson sheet never drops its Independent Practice row - the Score and the pupil's own work - for a
+    // few millimetres: the Vocabulary match on that page is drawn smaller, down to VOCAB_ZOOM_MIN, to make room for one
+    // row; only when that is not enough does the row go. A sheet whose row fits is unchanged.)
+    const vocabG = vocab ? groups.find((g) => g.sections[0] && g.sections[0].label === 'Vocabulary:' && cur.sections.includes(g.sections[0])) : null;
+    if (!indep.length && cur.indepShort > 0 && vocabG && vocabG.grow) {
+        const content = Math.max(1, vocabG.grow.h - VOCAB_PAD_MM);
+        const z = Math.floor((1 - (cur.indepShort + 1) / content) * 20) / 20;
+        if (z >= VOCAB_ZOOM_MIN) {
+            const save = vocabG.grow.h - (content * z + VOCAB_PAD_MM);
+            const vg = vocabG.grow.grid[0];
+            vg.height = `${Math.round((vocabG.grow.h - save) * 100) / 100}mm`;
+            vg.cls = `${vg.cls || ''} mq-lvz${Math.round(z * 100)}`.trim();
+            vocabG.grow.h -= save;
+            cur.used -= save;
+            indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });
+        }
+    }
 
     /* ---- the spare height of a page goes back into its grids (at most a quarter of a cell) */
     // Lessons r1: a page with no Independent rows (they did not fit) shares its spare height more
