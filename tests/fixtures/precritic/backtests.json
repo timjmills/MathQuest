@@ -1710,6 +1710,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "phone-focus-first-write-lf",
+   "check": "FOCUS on a story worked in column boxes: the item's marked first write box after blank copy boxes (expect '') is right; the blank copy boxes stay blank (lead ruling 2026-11-07, active-box D6)",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS (data-mq-first-write)",
+   "browser": true,
+   "fail": {
+    "commit": "797371e",
+    "state": "lf-ops head before the marker: focus on the first copy box holding a digit, no mark - FOCUS x6 on mult_word_problems_plain"
+   },
+   "pass": {
+    "commit": "290c5a8",
+    "state": "lf-ops: _firstWriteBox marks the box; the checker accepts it"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills multiplication:mult_word_problems_plain",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
