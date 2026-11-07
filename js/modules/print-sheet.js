@@ -24,6 +24,7 @@
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals } from './page-deal.js';
+import { repeatKeysOf as dlRepeatKeys } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
 import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
@@ -425,6 +426,8 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
     // (`factorCap` n, lesson 3a: no factor on more than n items of a page - a facts page that leans on 7s)
     if (sk.factorCap !== undefined && [...new Set(ops)].some((f) => (kept.get(`fac:${key}:${f}`) || 0) >= Number(sk.factorCap))) return false;
     if (Array.isArray(sk.avoidTexts) && sk.avoidTexts.includes(refText(cand))) return false;
+    // (lesson 7 D2: a `repeatKey` ref holds a family and a story frame once in the pack - this page and every page before it)
+    if (sk.repeatKey && dlRepeatKeys(cand).some((k) => seen.has(k) || (Array.isArray(sk.avoidKeys) && sk.avoidKeys.includes(k)))) return false;
     // The detailed lesson maker (LR-5, V22 §9.5): `avoidKeys` - never an item (its fact key) another
     // page of the pack dealt; `minNum` / `maxNum` - the item's number (or answer) in range; `edge`
     // with `edgeTest` - only the lesson's edge cases (roles/lesson.js CASE_TESTS). Absent on every
@@ -727,6 +730,7 @@ function refRecord(sk, q, key, seen, kept, pg = '', row = '') {
     if (sk.avoidKeys) seen.add(`ansAll${pg}:${dlAns(q).replace(/[^0-9a-z<>=]/gi, '')}`);
     if (sk.avoidKeys && nearKeyOf(q) !== null) seen.add(`near:${key}:${nearKeyOf(q)}`);
     if (sk.lr6) lr6Record(q, key, seen, pg, row);
+    if (sk.repeatKey) for (const k of dlRepeatKeys(q)) seen.add(k);
     if (sk.noTurnaround && ops.length >= 2) seen.add(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`);
     if (sk.maxSmall !== undefined && ops.length >= 2 && ops[1] < 10) kept.set(`small:${key}`, (kept.get(`small:${key}`) || 0) + 1);
     if (sk.avoidKeys || sk.minNum !== undefined || sk.maxNum !== undefined || sk.edge || sk.boardOnly || sk.gridApart) { const k = factKeyOf(q); if (k !== null) seen.add(`key:${k}`); }
@@ -4453,11 +4457,13 @@ async function buildLesson(n, metaOf) {
     let practiceSk = data && data.checkRow ? Object.assign({}, sk, { check: true }) : sk;
     // The detailed lesson maker (LR-5): a ref that carries `avoidNums` never deals, on Practice or
     // Mixed, a number the chart or the lesson sheet dealt. (Standard lessons carry no avoidNums.)
-    const planKeys = (res) => { const out = []; for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { const k = it && it.q ? factKeyOf(it.q) : null; if (k !== null) out.push(k); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
+    const planKeys = (res) => { const out = []; for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { const k = it && it.q ? factKeyOf(it.q) : null; if (k !== null) out.push(k); if (sk.repeatKey && it && it.q) out.push(...dlRepeatKeys(it.q)); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
     const chartQs = (chart.plan && chart.plan.meta && chart.plan.meta.exampleQs) || [];
     const packNums = Array.isArray(sk.avoidKeys) ? [...sk.avoidKeys, ...planKeys(chart), ...chartQs.map(factKeyOf).filter((k) => k !== null), ...planKeys(teach)] : null;
     // (the detailed lesson maker: a chart example's turn-around is never dealt either - V22 LR-5, lesson 2 r5)
     if (packNums) packNums.push(...[...planKeys(chart), ...chartQs.map(factKeyOf)].map(plusTurn).filter(Boolean));
+    // (lesson 7 D2: the chart examples' families and story frames too, on a `repeatKey` ref)
+    if (packNums && sk.repeatKey) packNums.push(...chartQs.flatMap(dlRepeatKeys));
     // (`lr6`: the detailed lesson maker's printed pages hold LR-6 for + / − items and stories - lesson 2 r4)
     if (packNums) practiceSk = Object.assign({}, practiceSk, { avoidKeys: packNums, lr6: true }, n.edgeLast ? { edgeLast: n.edgeLast } : {});
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
@@ -4801,6 +4807,9 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (grp && spans(key).some((sp) => rowMates.some((u) => spans(u).includes(sp)))) { why.near++; continue; }
         if (avoidAns && avoidAns.has(dlAns(q))) { why.ans++; continue; }
         if (!refHardOk(ref, q)) { why.hard++; continue; }
+        // (lesson 7 D2: a `repeatKey` ref - its family and story frame once in the pack)
+        const rks = ref.repeatKey ? dlRepeatKeys(q) : [];
+        if (rks.some((x) => used.has(x))) { why.used++; continue; }
         // (`near`: the page's one-number items by skill - LR-6 no near twins, critic r3 N1)
         const nv = near ? nearKeyOf(q) : null;
         if (nv !== null && [-2, -1, 1, 2].some((dv) => near.has(`${ref.skillId}:${nv + dv}`))) { why.near++; continue; }
@@ -4812,6 +4821,7 @@ function dealOne1(ref, seed, used, want, avoidAns, near, names, fresh) {
         if (nv !== null) near.add(`${ref.skillId}:${nv}`);
         if (near) lr6Record(q, ref.skillId, near);
         for (const x of nms) names.add(x);
+        for (const x of rks) used.add(x);
         used.add(key);
         if (spg) spg.set(ref.spreadPage, (spg.get(ref.spreadPage) || []).concat([q.spreadKey]));
         if (grp) grp.set(ref.pageGroup, (grp.get(ref.pageGroup) || []).concat([key]));
@@ -4955,7 +4965,9 @@ async function buildDetailedLesson(req = {}) {
 }
 
 async function buildDetailedLesson1(req = {}, late = new Set()) {
-    const d = detailedLessonFor(req.lessonId);
+    // (`description`: a description object built elsewhere - a unit's compiled description, lessons/units/*.js DETAILED - in
+    // place of the registry's; the proof of lesson 7 D2 builds the compiled lesson 7 this way)
+    const d = req.description && typeof req.description === 'object' ? req.description : detailedLessonFor(req.lessonId);
     if (!d) throw new Error(`buildSheet: no detailed lesson "${req.lessonId}"`);
     const errs = validateDescription(d);
     if (errs.length) throw new Error(`detailed lesson ${d.id}: ${errs.join('; ')}`);
@@ -4988,7 +5000,8 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
     const boardOnly = Array.isArray(d.boardOnly) ? d.boardOnly.map(Number).filter(Number.isFinite) : [];
     const bo = (r) => (r && boardOnly.length ? Object.assign({}, r, { boardOnly }) : r);
     const withAvoid = (r) => Object.assign({}, bo(r), { avoidKeys: [...used], tries: 300 });
-    const recordPlan = (plan) => { for (const c of planCells(plan)) { const k = factKeyOf(c.q); if (k !== null) used.add(k); } };
+    // (lesson 7 D2: a description with `repeatKey` records each dealt item's family and story frame too)
+    const recordPlan = (plan) => { for (const c of planCells(plan)) { const k = factKeyOf(c.q); if (k !== null) used.add(k); if (d.repeatKey) for (const x of dlRepeatKeys(c.q)) used.add(x); } };
     const partPlan = (part) => ((lesson && lesson.partPlans) || []).filter((x) => x.part === part).flatMap((x) => x.plans);
     const record = (res) => { for (const pp of res.partPlans || []) for (const pl of pp.plans) recordPlan(pl); if (res.plan) recordPlan(res.plan); };
     const shape = (d.lessonData && d.lessonData.practiceShape) || [6, 2];
@@ -5034,7 +5047,7 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
     // (the chart's board examples too - lesson 2's add-to story is written on the board, not printed - so no
     // later page deals one: LR-5, E24 "chart examples never return")
     // (and their turn-arounds: a chart example never returns turned round either - V22 LR-5, lesson 2 critic r3 D1)
-    for (const q of ((lesson.lesson && lesson.lesson.chart && lesson.lesson.chart.exampleQs) || []).filter(Boolean)) { const k = factKeyOf(q); if (k !== null) { used.add(k); if (plusTurn(k)) used.add(plusTurn(k)); } }
+    for (const q of ((lesson.lesson && lesson.lesson.chart && lesson.lesson.chart.exampleQs) || []).filter(Boolean)) { const k = factKeyOf(q); if (k !== null) { used.add(k); if (plusTurn(k)) used.add(plusTurn(k)); } if (d.repeatKey) for (const x of dlRepeatKeys(q)) used.add(x); }
 
     // ---------------------------------------------------------------- P0 Prerequisite Check
     const p0 = await buildSheet({

@@ -163,4 +163,35 @@ export function packetViolations({ lesson, placed, chartCases = [], sizePrinted,
     return out;
 }
 
-export default { itemKey, opOfItem, nearTwins, CASE_FAMILIES, casesOf, packetViolations };
+/**
+ * Lesson 7 D2 (`repeatKey: 'family+frame'` on a compiled description's refs - lessons/compile.js ruling family-repeats): the
+ * keys an item may hold ONCE in a pack - its unordered x / ÷ family (`rk:fam:4,6,24`; a two-step story's x / ÷ step) and each
+ * story frame of its text, a total and its object (`rk:frame:20 marble`, as tests/lib/ws-lesson-lp.cjs LP-FAMILY-REPEAT reads
+ * them). print-sheet.js refAccepts / dealOne1 read it only on a ref that carries `repeatKey`.
+ */
+export function repeatKeysOf(q) {
+    if (!q) return [];
+    const out = [];
+    const p = (q.cell && q.cell.payload) || {};
+    const glyph = (o) => (o === '*' || o === 'x' || o === '×' ? '*' : o === '/' || o === '÷' ? '/' : '');
+    const fam = (op, a, b) => {
+        a = Number(String(a).replace(/,/g, '')); b = Number(String(b).replace(/,/g, ''));
+        if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+        if (op === '*') { const [x, y] = [a, b].sort((m, n) => m - n); return `${x},${y},${a * b}`; }
+        if (op !== '/' || !b || a % b) return null;
+        const [x, y] = [b, a / b].sort((m, n) => m - n); return `${x},${y},${a}`;
+    };
+    const st = Array.isArray(p.steps) ? p.steps.find((x) => x && glyph(x.op)) : null;
+    const f = st ? fam(glyph(st.op), st.a !== undefined ? st.a : st.top, st.b !== undefined ? st.b : st.bottom)
+        : fam(glyph(p.op || q.op), p.a !== undefined ? p.a : q.a, p.b !== undefined ? p.b : q.b);
+    if (f) out.push(`rk:fam:${f}`);
+    const sing = (w) => String(w).replace(/ies$/, 'y').replace(/(ch|sh|x|ss)es$/, '$1').replace(/([^s])s$/, '$1');
+    const text = String((Array.isArray(p.lines) && p.lines.length ? p.lines.join(' ') : q.storyText || q.text) || '').replace(/<[^>]+>/g, ' ');
+    for (const m of text.matchAll(/\b(?:has|have|had|buys|bakes|makes|picks|collects|gets|finds|sees|sells|packs|puts|takes) (\d+) ([a-z]+)/g)) {
+        if (['more', 'fewer', 'less', 'each', 'groups', 'group', 'equal', 'of'].includes(m[2])) continue;
+        out.push(`rk:frame:${m[1]} ${sing(m[2])}`);
+    }
+    return [...new Set(out)];
+}
+
+export default { itemKey, opOfItem, nearTwins, CASE_FAMILIES, casesOf, packetViolations, repeatKeysOf };

@@ -47,6 +47,21 @@ const LATE = {
         const L = await tryImp('js/modules/sheet/layout.js');
         ok(L && /Number\(section\.pageCap\) > 0 && rows \* cols > Number\(section\.pageCap\)/.test(readSrc('js/modules/sheet/layout.js')), 'R2: layout.js applies the cap after the near-height pack');
     },
+    // Lesson 7 D2 (lf-engine P1b): the compiled card's `repeatKey: 'family+frame'` is read by both dealers - an item's
+    // unordered x / ÷ family and its story frames are held once across the pack.
+    async 'd2-repeat-key'() {
+        const ws = { cell: { template: 'word-work', payload: { steps: [{ op: '*', a: 4, b: 6, ans: 24 }, { op: '+', a: 24, b: 3 }], lines: ['Ravi has 4 bags.', 'Each bag has 6 marbles.', 'How many marbles in all?'] } } };
+        eq(LR.repeatKeysOf(ws), ['rk:fam:4,6,24', 'rk:frame:4 bag', 'rk:frame:6 marble'], 'D2: a two-step story keys its x step family and its frames');
+        eq(LR.repeatKeysOf({ cell: { payload: { op: '/', a: 24, b: 6 } } }), ['rk:fam:4,6,24'], 'D2: 24 ÷ 6 is the family of 4 x 6');
+        eq(LR.repeatKeysOf({ cell: { payload: { op: '+', a: 7, b: 5 } } }), [], 'D2: a + item has no x / ÷ family');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/if \(sk\.repeatKey && dlRepeatKeys\(cand\)\.some/.test(ps) && /if \(sk\.repeatKey\) for \(const k of dlRepeatKeys\(q\)\) seen\.add\(k\)/.test(ps), 'D2: refAccepts / refRecord read repeatKey (the role dealer)');
+        ok(/const rks = ref\.repeatKey \? dlRepeatKeys\(q\) : \[\];/.test(ps) && /if \(d\.repeatKey\) for \(const x of dlRepeatKeys\(c\.q\)\) used\.add\(x\)/.test(ps), 'D2: the detailed dealer and the pack record read repeatKey');
+        const U = await tryImp('js/modules/lessons/units/G3-Y4.B4.js');
+        const l7 = U && Object.values(U.DETAILED || {}).find((x) => x && x.id === 'g3-oa8-two-step-wp');
+        ok(l7 && l7.repeatKey && l7.skill.repeatKey === 'family+frame', 'D2: the compiled lesson 7 carries repeatKey on the description and its refs');
+        ok(!DET.DETAILED_LESSONS['g3-oa8-two-step-wp'] || !DET.DETAILED_LESSONS['g3-oa8-two-step-wp'].repeatKey, 'D2: the hand-written lesson 7 has none (its render is unchanged)');
+    },
     async 'r1-page-fresh'() {
         globalThis.window = globalThis.window || globalThis;
         const G = await tryImp('js/modules/generate-question.js'), PD = await tryImp('js/modules/page-deal.js');
