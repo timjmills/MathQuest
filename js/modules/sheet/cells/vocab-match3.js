@@ -50,7 +50,8 @@ register(MATCH3_TEMPLATE, {
         const letters = match3Letters({ order });
         const row = order.map((wi, n) => {
             const val = show ? letters[n] : '';
-            const hook = twin ? ' data-mq-cell="1" data-mq-w="1"' : '';
+            // (data-mq-kind="word": the screen slot keeps a letter; a plain slot keeps digits only - precritic ws-screen-answer r1)
+            const hook = twin ? ' data-mq-cell="1" data-mq-w="1" data-mq-kind="word"' : '';
             const boxHtml = `<span class="mq-vm-box" data-ws-slot="letter-${n}" data-ws-shape="box"${show ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : ''}${hook}`
                 + ` style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, side)};height:${L(ctx, side)};`
                 + `border:${B(ctx, 1.5)} solid ${INK};background:#fff;font-size:${P(ctx, tp + 6)};font-weight:700;line-height:1;color:${ink};flex:none;${KEY_FEATURES}">${esc(val)}</span>`;

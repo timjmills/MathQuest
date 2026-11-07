@@ -43,6 +43,8 @@ export const ROUTINES = Object.freeze({
     // multiplication and division). Four steps, one per worked step of the provider (three pictures, then write).
     'vocab-picture-words': {
         archetype: 'fact',
+        // a full-width drawing: the anchor chart's panels one column (chart.js chartLayout; precritic render gate r1)
+        chartWide: true,
         casesPending: 'Lane lf-vocab: the cases are the lesson word sets (sheet/lesson-pages/vocab-words.js); carded in design/cards/vocabulary.',
         concepts: [
             { id: 'picture', text: 'Each picture shows one math word.' },
@@ -54,9 +56,9 @@ export const ROUTINES = Object.freeze({
             { word: 'row', meaning: 'a line going across', picture: { kind: 'array', rows: 1, cols: 4, mark: 'row' } },
         ],
         steps: [
-            { icon: 'look', text: 'Look at picture A.' },
-            { icon: 'say', text: 'Say what it shows.' },
-            { icon: 'decide', text: 'Find its word.' },
+            { icon: 'look', text: 'Look at pictures A, B and C.' },
+            { icon: 'say', text: 'Say what each one shows.' },
+            { icon: 'decide', text: 'Find the word for each.' },
             { icon: 'write', text: 'Write the letter.' },
         ],
         chant: '',
@@ -69,6 +71,8 @@ export const ROUTINES = Object.freeze({
     // vocabulary:vocab_pick3_words (1 picture, 3 words): the same words, the productive step.
     'vocab-name-picture': {
         archetype: 'fact',
+        // a full-width drawing: the anchor chart's panels one column (chart.js chartLayout; precritic render gate r1)
+        chartWide: true,
         casesPending: 'Lane lf-vocab: the cases are the lesson word sets (sheet/lesson-pages/vocab-words.js); carded in design/cards/vocabulary.',
         concepts: [
             { id: 'picture', text: 'Each picture shows one math word.' },

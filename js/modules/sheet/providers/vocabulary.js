@@ -57,10 +57,15 @@ registerSkill('vocabulary:vocab_grade_pictures', {
                 step(`Write ${p.word} on the line.`, [{ slot: 'answer', value: p.word }]),
             ]);
         }
+        // four steps, one per step of the routine (lessons/families/multdiv.js vocab-picture-words): look, say, find, write
         const order = p.order || [0, 1, 2];
-        const out = (p.words || []).map((w, i) => step(`Picture ${LET[i]} shows: ${meaningOf(w)}. That is "${w}".`));
-        out.push(step('Write each letter next to its word.', order.map((wi, n) => ({ slot: `letter-${n}`, value: LET[wi] }))));
-        return clampSteps(out);
+        const words = p.words || [];
+        return clampSteps([
+            step('Look at pictures A, B and C.'),
+            step(`Say what each one shows: ${words.map((w, i) => `${LET[i]}, ${meaningOf(w)}`).join('; ')}.`),
+            step(`Find the word for each: ${words.map((w, i) => `${LET[i]} is "${w}"`).join(', ')}.`),
+            step('Write each letter next to its word.', order.map((wi, n) => ({ slot: `letter-${n}`, value: LET[wi] }))),
+        ]);
     },
     wrongAnswer: (q) => {
         const p = q && q.cell && q.cell.payload;
