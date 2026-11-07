@@ -1410,6 +1410,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-expand-card-kit",
+   "check": "placevalue:expand on the practice card / boss / race: the kit cell's boxes are the inputs and a Check / Next button is found (not the legacy expanded interactive)",
+   "kind": "commit-pair",
+   "rule": "ws-chromebook-fit (L5 paper = screen)",
+   "browser": true,
+   "fail": {
+    "commit": "4a137b93",
+    "state": "precritic r1: card / boss / race 'no Check / Next found' at 1366x650 and 1280x600"
+   },
+   "pass": {
+    "commit": "66c23cb5",
+    "state": "expand default form on inlineBlanks + the kit cell"
+   },
+   "command": "node tests/scripts/ws-chromebook-fit.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
