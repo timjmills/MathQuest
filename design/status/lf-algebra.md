@@ -4,7 +4,7 @@ Session: session_013pHDnKpNaW4JzSJ8QNo1H7
 Branch: claude/sweet-newton-c8wrv1-lf-algebra
 Owner of files: gen-algebraic.js, gen-function-table.js, gen-patterns-notice.js (new), sheet/cells/{function-table,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, design/cards/{function-table,patterns}/
 State: building
-Updated: 2026-11-07 (fix r3)
+Updated: 2026-11-07 (fix r4)
 Builder profile: mq-opus-medium
 Critic rounds: 0, none
 
@@ -42,6 +42,7 @@ Critic rounds: 0, none
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: fix r4, start 2026-11-07T12:13Z, end 2026-11-07T12:50Z, profile mq-opus-medium
 Times: fix r3, start 2026-11-07T11:00Z, end 2026-11-07T12:11Z, profile mq-opus-medium
 Times: fix r2, start 2026-11-07T08:36Z, end 2026-11-07T10:44Z, profile mq-opus-medium
 Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end 2026-11-07T08:31Z, profile mq-opus-medium
@@ -108,6 +109,52 @@ Remaining non-green rows, cause by cause:
   function_table_easy ftTask=make S: REPEAT (two make tables with the same rule look identical - no numbers printed) - ours,
   open.
 - spec-card INCOMPLETE: both cards unsigned by design (owner answers recorded; cards ready to sign).
+
+## Precritic r4 (head b0ca7395, 2 skills patterns:notice_patterns, patterns:pattern_features, --strict --browser-jobs 1; logs /tmp/mq-precritic/20261107-122629-29669, wall 948 s)
+| Gate | Scope | Result | Findings vs baseline | Seconds |
+|---|---|---|---|---|
+| ws-node-lint | patterns:notice_patterns, patterns:pattern_features | PASS | 0 found, 0 pinned, 0 new | 0 |
+| ws-providers-unit --skill | patterns:notice_patterns, patterns:pattern_features | N/A | no provider test for patterns:notice_patterns, patterns:pattern_features | 0 |
+| ws-content-audit --skill | patterns:notice_patterns, patterns:pattern_features | N/A | outside the audited families (+ - × ÷, K-2, place value, time and money, function tables) | 4 |
+| ws-options-verify --skill | patterns:notice_patterns, patterns:pattern_features | PASS | 20 value(s) checked; 0 failing, 0 pinned, 0 new | 69 (51 waiting) |
+| ws-presets-unit | 2 preset / host skill(s) | PASS | - | 37 (31 waiting) |
+| ws-lessonfit (WRM site lessons, every year) | site lessons Y1, Y4, Y6 | PASS | - | 26 |
+| ws-coverage-matrix --skills | patterns:notice_patterns, patterns:pattern_features × kinds × S/M/L | PASS | 17 of 66 row(s) run × S/M/L: OK 17, RED 0, ERROR 0; PENDING 37, N/A 12 | 274 |
+| ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) | patterns:notice_patterns, patterns:pattern_features | PASS | 0 found (2 doc(s)) | 54 (39 waiting) |
+| ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) | patterns:notice_patterns, patterns:pattern_features | PASS | 0 found (2 doc(s), unpinned) | 22 (5 waiting) |
+| ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) | patterns:notice_patterns, patterns:pattern_features | PASS | 0 found (2 doc(s), unpinned) | 45 (28 waiting) |
+| ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) | patterns:notice_patterns, patterns:pattern_features | FAIL | 3 found in 2 of 2 doc(s); 2 (document, lint, rule) count(s) above the pin; lesson page not pinned at L: patterns:notice_patterns, patterns:pattern_features (must be clean) | 48 (25 waiting) |
+| ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) | patterns:notice_patterns, patterns:pattern_features | FAIL | 5 found in 2 of 2 doc(s); 4 (document, lint, rule) count(s) above the pin; lesson page not pinned at S: patterns:notice_patterns, patterns:pattern_features (must be clean) | 72 (52 waiting) |
+| ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px) | patterns:notice_patterns, patterns:pattern_features × lesson, test, independent × S/M/L + screen hosts | PASS | - | 200 (41 waiting) |
+| ws-screen-slots --skills | patterns:notice_patterns, patterns:pattern_features | PASS | 0 found, 0 pinned, 0 new (10 host renders, --baseline design/audit/baselines/screen-slots.json) | 30 (16 waiting) |
+| ws-screen-answer --skills | patterns:notice_patterns, patterns:pattern_features | PASS | - | 40 (14 waiting) |
+| ws-chromebook-fit --skills | patterns:notice_patterns, patterns:pattern_features | PASS | - | 180 (12 waiting) |
+| ws-code-snapshot | all share codes | PASS | - | 2 |
+| ws-boot-smoke | app boot | PASS | - | 4 |
+| ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) | patterns:notice_patterns, patterns:pattern_features: matrix rows with findings | FAIL | worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 34 with no sibling measured, 0 ERROR row(s); 0 at or below (engine) in 9 printed row(s) with findings (PENDING(no-baseline) 9; siblings per skill: notice_patterns: 0, pattern_features: 0) | 1 |
+| ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) | patterns:notice_patterns, patterns:pattern_features × matrix rows × S/M/L + extras at S | PASS | 26 matrix row(s) × S/M/L + 4 extra document(s) (test, more-practice, supports on): 82 document(s), SLOT 0 / CLIP 0 finding(s), 250 box segment(s) and 0 head(s) probed (SLOT-W N/A on 52, HEADS N/A on 82 document(s): no digit strip / no heads); every SLOT / CLIP count at or below the approved siblings | 536 |
+| ws-phone-card (practice card at 390 px: clip, first-box focus) | patterns:notice_patterns, patterns:pattern_features × 390x844, 390x664 | PASS | - | 79 |
+| ws-card-rulings --check rulings (spec card numeric rulings, 300 items) | patterns:notice_patterns, patterns:pattern_features | PASS | - | 1 |
+| ws-card-rulings --check offered (panel offers nothing the card bans) | patterns:notice_patterns, patterns:pattern_features | PASS | - | 1 |
+| ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) | patterns:notice_patterns, patterns:pattern_features | N/A | no operand-dealt items (nothing to deal evenly): patterns:notice_patterns, patterns:pattern_features | 1 |
+| ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell) | patterns:notice_patterns, patterns:pattern_features | PASS | 2 skill(s), 0 pinned finding(s), 0 stale pin(s), 1.1 s | 1 |
+| ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot) | patterns:notice_patterns, patterns:pattern_features | PASS | 0 found, 0 pinned, 0 new | 1 |
+| ws-spec-card --check-signed --skill (card signed; every host, role and option value decided) | patterns:notice_patterns, patterns:pattern_features | INCOMPLETE (unsigned card) | needs owner signature: design/cards/patterns/patterns.md (everything else green) | 2 |
+| ws-options-verify --render (each offered appearance value at S / L vs the default page) | patterns:notice_patterns, patterns:pattern_features × S/L | PASS | 12 value page(s) (2 skill(s) x S/L) against 4 default page(s) through ws-print-lint --source kit in 63 s; 0 n/a | 64 |
+
+ws-precritic: FAIL: 3 FAIL, 21 PASS, 3 N/A, 1 INCOMPLETE of 28. Settled:
+- spec-card INCOMPLETE: expected - the patterns card was regenerated with --resign this round (b0ca7395); the lead re-signs.
+- print-lint lesson S / L: the same rows as r3 (notice_patterns PAGEFILL p3; pattern_features DN-2 / LONE / PAGEFILL):
+  lesson.js chartWide Guided / Independent packing, lf-engine (r4 changes only the parity cell's finished-work state,
+  never drawn on a lesson page).
+- sibling-compare: 34 NO-SIBLING counts, 0 above a sibling, 0 ERROR: SKIPPED by the lead's first-family ruling (as r3).
+- Off plan, the r4 targets: ws-print-lint --roles error-analysis notice_patterns + pattern_features, --baseline: S OK
+  (print-lint.S.json), L OK (print-lint.json); was S x12 / L x8 H13. Renders design/audit/runs/lf-algebra/r4/.
+- ws-content-audit --skill: N/A (outside the audited families; --category patterns: OK). ws-detailed-lesson
+  g3-oa9-mult-table-patterns --check --repeats: OK.
+- Seen, not touched (not this round's items): notice_patterns reason-it L H13 x4 + CL40-INK x4 (same counts before and
+  after r4); the EA fix choices print the answer's own case ("odd" beside "Even": q.ans is lowercase and the role's
+  choicesOf keeps the answer's case) - ours, one line in gen-patterns-notice.js (q.ans 'Even' / 'Odd' / 'True' / 'False').
 
 ## Precritic r3 (head 8cb67599; ab38364f after it, 6 skills, --strict; logs /tmp/mq-precritic/20261107-112151-19552)
 | Gate | Scope | Result | Findings vs baseline | Seconds |
@@ -205,6 +252,16 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-07 fix r4 (Opus medium; two machine-check reds). (1) notice_patterns error-analysis H13 S x12 / L x8 -> 0: in the
+  finished-work state ('wrong') the parity cell reads "The product is [Even] Odd" as one sentence where the column is wide
+  enough and marks that column data-ws-anscol, so the EA role puts Correct / Fix-it under it (intoAnswerColumn, AX-4 'incol'):
+  S 2 x 3 (was 2 x 3 beside with a 31 mm band), L 1 x 4 beside (was 2 x 2, 45 mm band). Tried first: the anscol on the whole
+  root (judgement under the fact: the role chose 3 x 2, 108 mm rows) and the judgement beside the choice (90 mm wide, wraps
+  at 2 columns). Other states unchanged; true-false / reason-it lint counts unchanged. (2) patterns card.json growing unit
+  2.5 / 2.5 / 2.6 mm, box 7.8 u (19.5 / 19.5 / 20.3 mm), dots 0.8 u (the code since r3); patterns.md regenerated --family
+  patterns --resign: UNSIGNED, the lead re-signs (commit b0ca7395). Stale cell comment fixed (u 2.0 / 2.4 / 2.6).
+  Speed: the EA row rule (grow 1.4 x, emptiness by ink width) decides the layout, so a cell fix is read off the measured
+  modes / inkW (meta.json) before trying - one probe of the host's mode measure found the wrap in 1 run.
 - 2026-11-07 fix r3 (Opus medium; machine checks only, after r2). Lead rulings this round: both cards signed (800dad86);
   sibling-compare NO-SIBLING rows are SKIPPED, "first family on template; critic grades the named pages" (LESSONS_LEARNED,
   first family on a template), only real layout defects of our cells fixed. Done:
