@@ -1987,7 +1987,9 @@ const _ftOptions = (easy) => [
         // page of them may hold fewer tables (6 at S where 9 plain tables fit)
         // lf-algebra r2: 'rule' too - its machine holds the pupil's write frame for the rule (an answer place the given-rule
         // tasks print as text), 1.6 mm taller at S; that is the frame, not spare room
-        addsDrawingValues: [..._FT_TASKS.map(([v]) => `${v}-check`), 'rule'],
+        // lf-algebra r3: 'make' too - both columns are the pupil's writing places (the In numbers are chosen and written,
+        // under an In head that prints their range "In: 1–15"), 9 tables at S where 12 given-In tables fit
+        addsDrawingValues: [..._FT_TASKS.map(([v]) => `${v}-check`), 'rule', 'make'],
         helpShort: 'One task per page. A Check row adds one more In number under the table to test the rule on.',
         help: 'One task per page, so the instruction says one thing. A Check row gives one more In number under the table to test the rule on. "Make your own" accepts any rows that follow the rule.',
     },
