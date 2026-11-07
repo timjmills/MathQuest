@@ -34,6 +34,24 @@ const PRE = await imp('js/modules/lessons/prereqs.js');
 const BL = await imp('js/modules/build-list.js');
 const DET = await imp('js/modules/lessons/detailed/index.js');
 const LATE = {
+    // R1 (lf-engine P1b): lesson 2 did not build since 944afb79 - a story within 20 tells ONE schema a page (word-work.js
+    // pageConstant 'word-work-schema'), and an `itemSpread` ref never re-opens its page, so every try told the first try's
+    // schema and the exit slip's put-together case was never met. `pageFresh` re-opens the page per try (both dealers), and
+    // `reserve` deals the late items whose cases a 15-fact pool can run out of before any page.
+    async 'r1-page-fresh'() {
+        globalThis.window = globalThis.window || globalThis;
+        const G = await tryImp('js/modules/generate-question.js'), PD = await tryImp('js/modules/page-deal.js');
+        if (!G || !PD) { ok(false, 'R1: generate-question.js / page-deal.js import'); return; }
+        const opts = { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false };
+        const kinds = (fresh) => { const out = new Set(); for (let k = 0; k < 40; k++) { if (fresh && k > 0) PD.resetPageDeals(); const q = G.generateQuestionFor({ category: 'addition', skill: 'add_wp_20', opts, seed: (4242 + 7919 * k) >>> 0, itemIndex: k }); const t = String((q && q.text) || ''); out.add(/\bin all\b/.test(t) ? 'put-together' : /\bmore\b/.test(t) ? 'add-to' : 'other'); } return [...out].sort(); };
+        eq(kinds(false).length, 1, 'R1: the trap - an item-spread deal without a fresh page tells one schema on every try');
+        eq(kinds(true), ['add-to', 'put-together'], 'R1: pageFresh - a fresh page per try deals both schemas');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok((ps.match(/if \((ref|sk)\.pageFresh && k > 0\) resetPageDeals\(\);/g) || []).length === 2, 'R1: both dealers (dealOne1, generateRun) re-open the page per try on a pageFresh ref');
+        const l2 = DET.DETAILED_LESSONS['g1-oa1-bar-model-wp-20'] || Object.values(DET.DETAILED_LESSONS).find((x) => x.id === 'g1-oa1-bar-model-wp-20');
+        ok(l2 && l2.skill.pageFresh && l2.wordProblem.ref.pageFresh && l2.exit.every((e) => e.ref.pageFresh), 'R1: lesson 2 story refs are pageFresh');
+        ok(l2 && l2.exit[0].reserve && l2.checkQuestion.reserve, 'R1: lesson 2 reserves the exit put-together item and the Check Question');
+    },
     // D18: the parts registry is fully plug-in - a dummy part registers with its own build hook and the host's dispatch
     // builds it, with no edit of roles/lesson.js or print-sheet.js buildLesson (which names no core part list).
     async 'parts-plugin'() {

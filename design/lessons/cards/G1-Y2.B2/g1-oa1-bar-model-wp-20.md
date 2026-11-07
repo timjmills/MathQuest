@@ -71,6 +71,7 @@ None.
       "shortQuestion": true,
       "fresh": true,
       "itemSpread": true,
+      "pageFresh": true,
       "dealTries": 4000,
       "lr6Names": true,
       "minNum": 11,
@@ -145,6 +146,7 @@ None.
             "shortQuestion": true,
             "fresh": true,
             "itemSpread": true,
+            "pageFresh": true,
             "dealTries": 4000,
             "lr6Names": true,
             "minNum": 11,
@@ -192,6 +194,7 @@ None.
         "shortQuestion": true,
         "fresh": true,
         "itemSpread": true,
+        "pageFresh": true,
         "dealTries": 4000
       },
       "want": "wpBridgeSmallFirst",
@@ -215,12 +218,14 @@ None.
             "shortQuestion": true,
             "fresh": true,
             "itemSpread": true,
+            "pageFresh": true,
             "dealTries": 4000,
             "lr6Names": true,
             "minNum": 14,
             "maxNum": 19
           },
           "want": ["wpBridgeHigh","wpBridgeBigFirst","wpPutTogether","wpClean"],
+          "reserve": true,
           "detects": "Copies a story number as the answer; count slip past 10."
         },
         {
@@ -238,6 +243,7 @@ None.
             "shortQuestion": true,
             "fresh": true,
             "itemSpread": true,
+            "pageFresh": true,
             "dealTries": 4000,
             "lr6Names": true,
             "minNum": 11,
@@ -263,7 +269,7 @@ None.
         "ask": "Solve the fact on the board."
       }
     ],
-    "checkQuestion": {"want":["wpBridgeBigFirst","wpClean"],"correct":"D","board":"Read the story: {cq.text}"}
+    "checkQuestion": {"want":["wpBridgeBigFirst","wpClean"],"correct":"D","reserve":true,"board":"Read the story: {cq.text}"}
   },
   "timing": {"1":5,"2":5,"3":3,"4":2,"5":10,"6":8,"7":3,"8":10,"9":5,"10":5,"transitions":4},
   "ranges": {

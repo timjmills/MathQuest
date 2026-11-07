@@ -810,6 +810,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 // time: critic r5 D5-1) repeats however the seed moves. After half the retries the item is
                 // asked for at a later page position, which deals from a fresh block.
                 const at = k >= tries / 2 ? itemIndex + 6 * (k - Math.floor(tries / 2) + 1) + (k % 5) : itemIndex;
+                // (`pageFresh`, lesson 2 R1 - see dealOne1: each try opens its own page, so a page constant - the story
+                // schema, the story's person and noun walk - is drawn from the try's seed, not held from the slot's first)
+                if (sk.pageFresh && k > 0) resetPageDeals();
                 try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
                 if (!cand) continue;
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
@@ -4967,16 +4970,16 @@ async function buildDetailedLesson(req = {}) {
     const partPlan = (part) => ((lesson && lesson.partPlans) || []).filter((x) => x.part === part).flatMap((x) => x.plans);
     const record = (res) => { for (const pp of res.partPlans || []) for (const pl of pp.plans) recordPlan(pl); if (res.plan) recordPlan(res.plan); };
     const shape = (d.lessonData && d.lessonData.practiceShape) || [6, 2];
-    // (`exit[i].reserve`, lesson 2 R1: an exit case so rare the pack's other pages can spend all of its facts - a
-    // put-together story, big part first, a whole of 14 or more: six facts - is dealt FIRST, before any page, and its fact
-    // and turn-around go into `used`, so no page deals it; the slip prints it in its place. Absent: dealt in turn, as before.)
-    const reserved = new Map();
-    for (const [i, e] of (d.exit || []).entries()) {
-        if (!e || !e.reserve) continue;
-        const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, null, null, null, null);
-        if (plusTurn(x.key)) used.add(plusTurn(x.key));
-        reserved.set(i, x);
-    }
+    // (`reserve`, lesson 2 R1: the pack's late items with hard cases - the word problem, the Check Question, an exit item -
+    // can find every fact of a small pool (lesson 2: 15 crossing-ten + facts) spent by the pages dealt before them, the
+    // Prerequisite Check last of all. A `reserve: true` item is dealt FIRST, before any page, with the seed and the story
+    // names it has in turn; its fact and turn-around go into `used`, so no page deals it, and it prints in its own place.
+    // Absent on every other lesson: dealt in turn, as before.)
+    const reserved = new Map(), resNames = new Set();
+    const reserve = (k, ref, s1, want) => { const x = dealOne(bo(ref), s1, used, want, null, null, resNames, null); if (plusTurn(x.key)) used.add(plusTurn(x.key)); reserved.set(k, x); };
+    if (d.wordProblem && d.wordProblem.reserve) reserve('wp', d.wordProblem.ref, (seed + 307) >>> 0, d.wordProblem.want);
+    if (d.checkQuestion && d.checkQuestion.reserve) reserve('cq', d.checkQuestion.ref || d.skill, (seed + 601) >>> 0, d.checkQuestion.want || '');
+    for (const [i, e] of (d.exit || []).entries()) if (e && e.reserve) reserve(`exit${i}`, e.ref, (seed + 401 + 97 * i) >>> 0, e.want);
 
     // ---------------------------------------------------------------- Chunked Flow (V22): chunks 2..n
     // A description with `chunks` teaches its routine in paired I Do / We Do cycles. Chunk 1 is the
@@ -5055,16 +5058,17 @@ async function buildDetailedLesson(req = {}) {
     // (`lessonKeys`: the facts the chart, the lesson sheet and Practice teach, for a `fresh` ref - lesson 2 r5)
     const lessonKeys = new Set([...['chart', 'teach', 'practice'].flatMap((pt) => partPlan(pt).flatMap((pl) => planCells(pl).map((c) => factKeyOf(c.q)))),
         ...((lesson.lesson && lesson.lesson.chart && lesson.lesson.chart.exampleQs) || []).filter(Boolean).map(factKeyOf)].filter((k) => k !== null));
-    const wpD = dealOne(bo(d.wordProblem.ref), (seed + 307) >>> 0, used, d.wordProblem.want, null, null, storyNames, lessonKeys);
+    for (const nm of resNames) storyNames.add(nm);
+    const wpD = reserved.get('wp') || dealOne(bo(d.wordProblem.ref), (seed + 307) >>> 0, used, d.wordProblem.want, null, null, storyNames, lessonKeys);
     lessonKeys.add(wpD.key);
     // (`checkQuestion.first`, lesson 4 r4: the Check Question is dealt before the exit slip - both must be fresh against
     // every page, and the slip's three windows, dealt first, left no fresh window with the row-only case; absent, as before)
     const cqFirst = !!(d.checkQuestion && d.checkQuestion.first);
-    const cqDeal = () => dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
+    const cqDeal = () => reserved.get('cq') || dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
     const cqD0 = cqFirst ? cqDeal() : null;
     // (a reserved item - dealt before every page - holds its place on the slip: its answer, near twins and names first)
-    for (const [i, x] of reserved) { const sk = d.exit[i].ref.skillId; exAns.add(dlAns(x.q)); const nv = nearKeyOf(x.q); if (nv !== null) exNear.add(`${sk}:${nv}`); lr6Record(x.q, sk, exNear); for (const nm of lr6Of(x.q).names) storyNames.add(nm); }
-    const exitD = d.exit.map((e, i) => { if (reserved.has(i)) return reserved.get(i); const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys); exAns.add(dlAns(x.q)); return x; });
+    for (const [i, e] of d.exit.entries()) { const x = reserved.get(`exit${i}`); if (!x) continue; exAns.add(dlAns(x.q)); const nv = nearKeyOf(x.q); if (nv !== null) exNear.add(`${e.ref.skillId}:${nv}`); lr6Record(x.q, e.ref.skillId, exNear); }
+    const exitD = d.exit.map((e, i) => { if (reserved.has(`exit${i}`)) return reserved.get(`exit${i}`); const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys); exAns.add(dlAns(x.q)); return x; });
     // (`want` on a retrieval row - lesson 3a r2: no x 0 or x 1 fact, lesson 3b's content; absent = any, as before)
     const retD = (d.retrieval || []).map((r, i) => dealOne(bo(r.ref), (seed + 503 + 89 * i) >>> 0, used, r.want));
     // (`checkQuestion.ref`, lesson 3a: the Check Question's own form of the skill; absent = the lesson skill)

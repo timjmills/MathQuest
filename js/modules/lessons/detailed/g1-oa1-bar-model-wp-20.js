@@ -61,7 +61,7 @@ export default {
     // ten (both parts 9 or less) or a whole of 20 - and every other skill's places by list. E24 recomputes it.
     pool: { kind: 'plus', skill: 'add_wp_20', partMin: 3, noPart: [10], crossTen: true, sums: [20], maxSum: 20 },
     // (`wpClean`: no part is the difference of the parts, so option C's wrong-sign top is no story number - critic r3 D3)
-    checkQuestion: { want: ['wpBridgeBigFirst', 'wpClean'], correct: 'D' },
+    checkQuestion: { want: ['wpBridgeBigFirst', 'wpClean'], correct: 'D', reserve: true },
     practicePages: 1,
     // No Mixed page (V22 §9.5: optional). Lesson 2 r5: a + fact is ONE fact across the pack in either order (LR-5,
     // lead ruling 2026-10-17), and the crossing-ten stories with parts 3 to 9 are 15 facts. The chart (2), Guided (2),
