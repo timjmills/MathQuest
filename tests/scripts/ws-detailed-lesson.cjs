@@ -871,7 +871,7 @@ else (async () => {
             try { const r = await window.buildSheet({ role: 'detailed-lesson', lessonId: LESSON, seed: SEED, paper: 'A4', year: 2026 });
                 const kit = await import('./js/modules/sheet/contract.js');
                 r.kitLib = Object.values(kit.INSTRUCTION_LIBRARY).map((x) => String(x).replace(/_/g, ''));
-                return { html: r.html, ids: r.pages.map((p) => `${p.id}:${p.kind}`), notes: r.notes, vars: r.vars, flow: r.flow, tags: r.tags, debug: r.debug, kitLib: r.kitLib };
+                return { html: r.html, ids: r.pages.map((p) => `${p.id}:${p.kind}`), notes: r.notes, vars: r.vars, flow: r.flow, tags: r.tags, debug: r.debug, kitLib: r.kitLib, chartSizing: r.chartSizing || null, chartsOk: r.chartsOk };
             } catch (e) { return { error: (e && e.stack) || String(e) }; }
         }, { LESSON, SEED });
         if (built.error) { console.log(`ws-detailed-lesson: FAIL (build) ${built.error}`); process.exit(1); }
@@ -904,7 +904,7 @@ else (async () => {
         await sheet.pdf({ path: pdf, printBackground: true, preferCSSPageSize: true });
         await sheet.close();
         if (lpPk) {
-            lpPk.lesson = LESSON; lpPk.seed = SEED; lpPk.sizing = (built.debug && built.debug.sizing) || null;
+            lpPk.lesson = LESSON; lpPk.seed = SEED; lpPk.sizing = (Array.isArray(built.chartSizing) && (built.chartSizing.find((x) => x && x.fallback) || built.chartSizing[0])) || (built.debug && built.debug.sizing) || null;
             try { lpPk.commit = execFileSync('git', ['-C', ROOT, 'rev-parse', '--short=8', 'HEAD'], { encoding: 'utf8' }).trim(); } catch (e) { /* not a checkout */ }
             if (arg('packet-out', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('packet-out')), JSON.stringify(lpPk));
             const rows = LP.lpChecks(lpPk, ONLY.filter((x) => x !== 'LP-RASTER'));

@@ -320,7 +320,7 @@ function numbers(pk) {
 function fallback(pk) {
     const probs = [];
     const sizing = pk.sizing || null; // the role's sizing.mode once lf-engine returns it
-    if (sizing && /fallback/i.test(String(sizing.mode || sizing))) probs.push(`chart sizing mode ${sizing.mode || sizing}`);
+    if (sizing && (sizing.fallback === true || sizing.ok === false || /fallback/i.test(String(sizing.mode || '')))) probs.push(`the role reports the chart's sizing as a fallback (mode ${sizing.mode || '?'}, zoom ${sizing.zoom != null ? sizing.zoom : '?'})`);
     const FLOOR = { final: 0.85, grid3: 0.8, one: 1, row: 1 };
     for (const p of pk.pages) {
         const mode = (sizing && sizing.mode) || p.chartMode || 'one'; const floor = FLOOR[mode] || 1;
@@ -464,6 +464,7 @@ function selfTest() {
     eq('level is not a hint', giveaway({ pages: [pg('P3', 'pupil', { bands: [{ label: 'Guided Practice:', cells: [cell({ level: 2 })] }, { label: 'Independent Practice:', cells: [cell({ level: 1 })] }] })] }).pass, false);
     eq('grey ring is a hint', giveaway({ pages: [pg('P3', 'pupil', { bands: [{ label: 'Guided Practice:', cells: [cell({ greyLine: 2 })] }, { label: 'Independent Practice:', cells: [cell({})] }] })] }).pass, true);
     eq('exchange box on a check cell', prereq({ pages: [pg('P0', 'pupil', { cells: [cell({ regroup: 2 })] }), pg('P0-key', 'key', { cells: [cell({ keyAns: ['8'] })] })] }).pass, false);
+    eq('fallback by sizing', fallback({ sizing: { mode: 'one', zoom: 0.7, fallback: true, ok: false }, pages: [] }).pass, false);
     eq('fallback', fallback({ pages: [pg('P2', 'pupil', { zooms: [0.77] })] }).pass, false);
     eq('prereq slots', prereq({ pages: [pg('P0', 'pupil', { cells: [cell({ slots: 2 })] }), pg('P0-key', 'key', { cells: [cell({ keyAns: ['14'], writing: 2, keyEmpty: 1 })] })] }).pass, false);
     eq('modelled', modelled({ pool: { places: [{ page: 'P2', item: '1', rep: 'a' }, { page: 'P4-1', item: '2', rep: 'b' }] }, pages: [] }).pass, false);
