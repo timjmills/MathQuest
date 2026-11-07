@@ -804,6 +804,13 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 const strict = soft && !(relaxLast && k === tries);
                 if (hard && !refHardOk(sk, cand)) continue;
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
+                // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
+                // or its turn - and an item already on this page are still the last thing taken: lesson 3a dealt the chart's
+                // 2 x 3 again, turned, on Practice 1 at 7 of 25 seeds. `chartKeys`: the chart's keys, a detailed pack only.)
+                if (!strict && Array.isArray(sk.chartKeys) && k < tries) {
+                    const fk = factKeyOf(cand), tk = turnedKeyOf(cand);
+                    if (fk !== null && (sk.chartKeys.includes(fk) || mulUsed(fk, sk.chartKeys) || (tk !== null && sk.chartKeys.includes(tk)) || seen.has(`key:${fk}`) || (tk !== null && seen.has(`key:${tk}`)) || (plusTurn(fk) && sk.chartKeys.includes(plusTurn(fk))))) { if (!got) got = cand; continue; }
+                }
                 // A MIXED POOL page is one look (wave 1 lane D, critic 2026-10-03; round 8, critic r6 D6-2):
                 // a member drawn in the legacy look (no kit cell: a long "Answer:" line, a chart with
                 // nothing to write; two answer places, H8) is passed over for another draw while a few
@@ -4368,7 +4375,9 @@ async function buildLesson(n, metaOf) {
     // (the detailed lesson maker: a chart example's turn-around is never dealt either - V22 LR-5, lesson 2 r5)
     if (packNums) packNums.push(...[...planKeys(chart), ...chartQs.map(factKeyOf)].map(plusTurn).filter(Boolean));
     // (`lr6`: the detailed lesson maker's printed pages hold LR-6 for + / − items and stories - lesson 2 r4)
-    if (packNums) practiceSk = Object.assign({}, practiceSk, { avoidKeys: packNums, lr6: true }, n.edgeLast ? { edgeLast: n.edgeLast } : {});
+    // (R5: the chart's own keys, the last thing a spent pool deals again - generateRun)
+    const chartKeys = packNums ? [...planKeys(chart), ...chartQs.map(factKeyOf)].filter((k) => k !== null) : null;
+    if (packNums) practiceSk = Object.assign({}, practiceSk, { avoidKeys: packNums, lr6: true, chartKeys }, n.edgeLast ? { edgeLast: n.edgeLast } : {});
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.
@@ -4416,7 +4425,7 @@ async function buildLesson(n, metaOf) {
         let k = 0;
         for (const ps of n.practiceSheets) {
             k++;
-            const own0 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true } : {}) : practiceSk;
+            const own0 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true, chartKeys } : {}) : practiceSk;
             // (`gridRevisit`, lesson 4 r5: the windows as the chart and the lesson sheet DRAW them, so a revisit is drawn turned)
             const planQs = (res) => { const out = []; for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) out.push(it.q); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
             const own = ps.skill && ps.skill.gridRevisit ? Object.assign({}, own0, { gridShown: [...planQs(chart), ...chartQs, ...planQs(teach)].map(gridShownOf).filter(Boolean) }) : own0;
@@ -4791,7 +4800,23 @@ async function measureTeacherBlocks(bandsList) {
     } finally { frame.remove(); }
 }
 
+/**
+ * R4 (lf-engine P1b): at some seeds a late item's case - lesson 6's exit "tenTimesMid", lesson 4's "chartOddOdd" - finds every
+ * item of its kind spent by the pages dealt before it, and the pack did not build (a teacher who reprints with another seed got
+ * an error). The pack is then built again with that item RESERVED (dealt before any page, its rules all held - see `reserve`),
+ * one late item more each time, until it builds. A seed that built before builds exactly as it did (no retry is taken).
+ */
 async function buildDetailedLesson(req = {}) {
+    const late = new Set();
+    for (;;) {
+        try { return await buildDetailedLesson1(req, late); } catch (e) {
+            if (!e || !e.dlLate || late.has(e.dlLate) || late.size >= 6) throw e;
+            late.add(e.dlLate);
+        }
+    }
+}
+
+async function buildDetailedLesson1(req = {}, late = new Set()) {
     const d = detailedLessonFor(req.lessonId);
     if (!d) throw new Error(`buildSheet: no detailed lesson "${req.lessonId}"`);
     const errs = validateDescription(d);
@@ -4836,9 +4861,10 @@ async function buildDetailedLesson(req = {}) {
     // Absent on every other lesson: dealt in turn, as before.)
     const reserved = new Map(), resNames = new Set();
     const reserve = (k, ref, s1, want) => { const x = dealOne(bo(ref), s1, used, want, null, null, resNames, null); if (plusTurn(x.key)) used.add(plusTurn(x.key)); reserved.set(k, x); };
-    if (d.wordProblem && d.wordProblem.reserve) reserve('wp', d.wordProblem.ref, (seed + 307) >>> 0, d.wordProblem.want);
-    if (d.checkQuestion && d.checkQuestion.reserve) reserve('cq', d.checkQuestion.ref || d.skill, (seed + 601) >>> 0, d.checkQuestion.want || '');
-    for (const [i, e] of (d.exit || []).entries()) if (e && e.reserve) reserve(`exit${i}`, e.ref, (seed + 401 + 97 * i) >>> 0, e.want);
+    // (`late`: the items a failed build named - buildDetailedLesson - reserved as if the description said so)
+    if (d.wordProblem && (d.wordProblem.reserve || late.has('wp'))) reserve('wp', d.wordProblem.ref, (seed + 307) >>> 0, d.wordProblem.want);
+    if (d.checkQuestion && (d.checkQuestion.reserve || late.has('cq'))) reserve('cq', d.checkQuestion.ref || d.skill, (seed + 601) >>> 0, d.checkQuestion.want || '');
+    for (const [i, e] of (d.exit || []).entries()) if (e && (e.reserve || late.has(`exit${i}`))) reserve(`exit${i}`, e.ref, (seed + 401 + 97 * i) >>> 0, e.want);
 
     // ---------------------------------------------------------------- Chunked Flow (V22): chunks 2..n
     // A description with `chunks` teaches its routine in paired I Do / We Do cycles. Chunk 1 is the
@@ -4918,16 +4944,17 @@ async function buildDetailedLesson(req = {}) {
     const lessonKeys = new Set([...['chart', 'teach', 'practice'].flatMap((pt) => partPlan(pt).flatMap((pl) => planCells(pl).map((c) => factKeyOf(c.q)))),
         ...((lesson.lesson && lesson.lesson.chart && lesson.lesson.chart.exampleQs) || []).filter(Boolean).map(factKeyOf)].filter((k) => k !== null));
     for (const nm of resNames) storyNames.add(nm);
-    const wpD = reserved.get('wp') || dealOne(bo(d.wordProblem.ref), (seed + 307) >>> 0, used, d.wordProblem.want, null, null, storyNames, lessonKeys);
+    const lateTag = (k, f) => { try { return f(); } catch (e) { if (e && typeof e === 'object' && !e.dlLate) e.dlLate = k; throw e; } };
+    const wpD = reserved.get('wp') || lateTag('wp', () => dealOne(bo(d.wordProblem.ref), (seed + 307) >>> 0, used, d.wordProblem.want, null, null, storyNames, lessonKeys));
     lessonKeys.add(wpD.key);
     // (`checkQuestion.first`, lesson 4 r4: the Check Question is dealt before the exit slip - both must be fresh against
     // every page, and the slip's three windows, dealt first, left no fresh window with the row-only case; absent, as before)
     const cqFirst = !!(d.checkQuestion && d.checkQuestion.first);
-    const cqDeal = () => reserved.get('cq') || dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames);
+    const cqDeal = () => reserved.get('cq') || lateTag('cq', () => dealOne(bo((d.checkQuestion || {}).ref || d.skill), (seed + 601) >>> 0, used, (d.checkQuestion || {}).want || '', null, null, storyNames));
     const cqD0 = cqFirst ? cqDeal() : null;
     // (a reserved item - dealt before every page - holds its place on the slip: its answer, near twins and names first)
     for (const [i, e] of d.exit.entries()) { const x = reserved.get(`exit${i}`); if (!x) continue; exAns.add(dlAns(x.q)); const nv = nearKeyOf(x.q); if (nv !== null) exNear.add(`${e.ref.skillId}:${nv}`); lr6Record(x.q, e.ref.skillId, exNear); }
-    const exitD = d.exit.map((e, i) => { if (reserved.has(`exit${i}`)) return reserved.get(`exit${i}`); const x = dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys); exAns.add(dlAns(x.q)); return x; });
+    const exitD = d.exit.map((e, i) => { if (reserved.has(`exit${i}`)) return reserved.get(`exit${i}`); const x = lateTag(`exit${i}`, () => dealOne(bo(e.ref), (seed + 401 + 97 * i) >>> 0, used, e.want, exAns, exNear, storyNames, lessonKeys)); exAns.add(dlAns(x.q)); return x; });
     // (`want` on a retrieval row - lesson 3a r2: no x 0 or x 1 fact, lesson 3b's content; absent = any, as before)
     const retD = (d.retrieval || []).map((r, i) => dealOne(bo(r.ref), (seed + 503 + 89 * i) >>> 0, used, r.want));
     // (`checkQuestion.ref`, lesson 3a: the Check Question's own form of the skill; absent = the lesson skill)
