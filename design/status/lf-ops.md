@@ -137,3 +137,12 @@ Times: builder day-1 cards + merge, start 2026-11-07T00:00Z, end —, profile mq
   (groups named, no key words) + Say frame; lesson data (4 steps, 2-panel chart); lesson print-lint S/M/L 0 findings.
 - Check change for the lead: ws-options-verify tries a panel-locked set value in the context where it is offered (`valueBase`,
   div_facts array with the 2-4 tables), compared with that context's default.
+- 2026-11-07 12:50 UTC, merged lf-ops-fix4 (7f82e6a). Precritic --strict on the merged tree (log /tmp/mq-precritic/20261107-114813-16988):
+  8 FAIL / 61 PASS / 2 SKIPPED-INCOMPLETE of 71. Fixed after it: cell-checks x3 (div_facts TITLE via optionICan, story lesson
+  wpBar OVERFLOW via offOpts; re-run OK, 738 pages, 3ed796e). Still red: (1) sibling-compare - word-work plain stories have no
+  approved sibling (35 unproven; needs the lead's ownerSkipped ruling as for arrays); (2) print-lint --kind sections --pages 2 S/L -
+  the 3-skill sheet continues the mult-story sub-section into page 2's leftover and leaves page 3 one row (DN-2 / PG-23 /
+  PAGEFILL): engine page flow (practice.js composer), not fixed; (3) grade-render --gate TARGET - word-work answer digit inputs
+  40 x 44 px at card-390 (shared word-work twin, also on mult_word_problems); (4) phone-card FOCUS on mult stories - the checker
+  wants the first copy box even when it must stay blank (expect ''), active-box D6 keeps it blank: a checker vs D6 conflict for
+  the lead. card-rulings offered INCOMPLETE: the facts card has no notOffered entry for div_facts (card data).
