@@ -4492,9 +4492,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // R3: one sentence with no full stop between the blanks, so a wrapped line
                     // never starts with a stray '.' on screen; the screen instruction says what
                     // the three boxes are for (it was a bare "Solve.").
+                    // (lane lf-ops critic r1 D-AG-4: the paper frame's words - "[ ] groups of [ ]", "[ ] in all." - on screen
+                    // too; "make" was a screen-only word)
                     q.text = isGroups
-                        ? `___ groups of ___ make ___ in all.`
-                        : `___ rows of ___ make ___ in all.`;
+                        ? `___ groups of ___, ___ in all.`
+                        : `___ rows of ___, ___ in all.`;
                     q.screenInstr = isGroups
                         ? 'Write the groups, the number in each group, and the total.'
                         : 'Write the rows, the number in each row, and the total.';
@@ -4524,7 +4526,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const _agPayload = { kind: questionType, rows, cols };
                 // (lane lf-ops: a page mixing arrays and ringed groups draws every picture in one picture box - H13-ROW)
                 // (and a page of ringed groups alone: a ring layout's height turns on the group size as well as the count of groups)
-                if (!_p12Narrowed('forms') || _p12Narrowed('forms').length > 1 || questionType === 'equal_groups') _agPayload.picBox = true;
+                // (critic lf-ops r1 D-AG-1: the shared picture box is gone - the sentence stands under its own picture - so no
+                // `picBox` is set; the template ignores it)
                 q.cell = { template: 'arrays', v: 1, payload: _agPayload };
                 q.visual = _kitTwin('arrays', _agPayload);
                 q.printFormat = 'arrays-groups';
