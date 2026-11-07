@@ -30,6 +30,7 @@ import * as weDo from './we-do.js';
 import * as practice from './practice.js';
 import * as mixed from './mixed.js';
 import * as common from './common.js';
+import { PREREQ_CHECK_TITLE } from '../roles/pre-skill-check.js';
 
 export { chart, vocab, warmUp, weDo, practice, mixed, common };
 
@@ -68,7 +69,7 @@ export const lessonPartIds = () => lessonParts().map((p) => p.id);
 
 // LR-17 (plan §8b, lead D1): a lesson whose record declares `prereqs` opens with its Prerequisite Check, drawn by
 // roles/pre-skill-check.js (one question per prerequisite, each with its route; the routing table on the key).
-registerLessonPart({ id: 'prereq', order: 5, role: 'pre-skill-check', name: 'Prerequisite Check', sheet: 'lesson-prereq', offset: 31357, inPacket: (n) => !!n.prereqCheck });
+registerLessonPart({ id: 'prereq', order: 5, role: 'pre-skill-check', name: PREREQ_CHECK_TITLE, sheet: 'lesson-prereq', offset: 31357, inPacket: (n) => !!n.prereqCheck });
 registerLessonPart({ id: 'chart', order: 10, role: 'lesson', name: 'Anchor chart', sheet: 'lesson-chart', offset: 0, size: 'L' });
 registerLessonPart({ id: 'sheet', order: 20, role: 'lesson', name: 'Lesson', sheet: 'lesson-sheet', offset: 0 });
 registerLessonPart({ id: 'practice', order: 30, role: 'independent', name: 'Practice', sheet: 'lesson-practice', offset: 7919, inPacket: (n) => n.practicePages > 0 });

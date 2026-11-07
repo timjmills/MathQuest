@@ -44,7 +44,10 @@
 //     warmup:   [{key, opts?, why, ...floors}]         the Warm-up's prerequisite skills (the engine's
 //                                                      `skills`; a lesson with `prereqs` replaces its
 //                                                      Warm-up with the Prerequisite Check, LR-17)
-//     prereqs?: [{lesson, title, key, opts?, why, items?, ...floors}]
+//     prereqs?: [{lesson, title, key, opts?, why, checks, items?, ...floors}]
+//                                                      `checks`: what the question asks, in the
+//                                                      pupil-facing words the routing table prints
+//                                                      (critic r1 D12; `why` is the design reason)
 //                                                      THE PREREQUISITE CHECK (LR-17, owner ruling
 //                                                      2026-09-26, plan §8b): 3-4 questions, most basic
 //                                                      first, each tied to ONE prerequisite lesson (a
@@ -178,6 +181,12 @@ export function validatePrereqs(ownerId, list, known = {}) {
         if (!isSkillKey(n.key)) e(`${at}: "${n.key}" is not a skill key`);
         else if (known.skillExists && !known.skillExists(n.key)) e(`${at}: ${n.key} is not live`);
         if (p && p.ref === undefined && !String(p.why || '').trim()) e(`${at}: no why`);
+        // (critic r1 D12: the routing table prints what each question asks, never the design `why`)
+        if (known.strictIds && p && p.ref === undefined) {
+            const c = String(p.checks || '').trim();
+            if (!c) e(`${at}: no checks (what the question asks, for the routing table)`);
+            else if (c === String(p.why || '').trim()) e(`${at}: checks repeats the design why`);
+        }
     }
     return bad;
 }

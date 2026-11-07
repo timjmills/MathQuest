@@ -67,9 +67,9 @@ for (const id of Object.keys(LIB.LESSONS)) {
     ok(!('prereqs' in f), `prereqs.js: lessonFor(${ref.categoryId}, ${ref.skillId}) carries no prereqs (byte-identical packets)`);
 }
 const yp = LIB.lessonData('Y2.B2.S18').prereqs;
-eq(yp.map((p) => Object.keys(p).sort().join(',')), ['lesson,ref,title,why', 'lesson,ref,title,why', 'lesson,ref,title,why', 'lesson,ref,title,why'], 'LR-17: each question {lesson, title, why, ref}');
-eq(yp[0], { lesson: 'Y2.B1.S4', title: 'Use a place value chart', why: 'Regrouping reads the tens digit and the ones digit.', ref: { categoryId: 'placevalue', skillId: 'identify', opts: { band: 99, places: [1, 10] } } }, 'LR-17: question 1 of Y2.B2.S18');
-eq(yp[2].ref, { categoryId: 'subtraction', skillId: 'sub_10_regroup', check: true }, 'LR-17: a question ref carries its floors (check)');
+eq(yp.map((p) => Object.keys(p).sort().join(',')), ['checks,lesson,ref,title,why', 'checks,lesson,ref,title,why', 'checks,lesson,ref,title,why', 'checks,lesson,ref,title,why'], 'LR-17: each question {lesson, title, why, checks, ref}');
+eq(yp[0], { lesson: 'Y2.B1.S4', title: 'Use a place value chart', why: 'Regrouping reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.', ref: { categoryId: 'placevalue', skillId: 'identify', opts: { band: 99, places: [1, 10] } } }, 'LR-17: question 1 of Y2.B2.S18');
+eq(yp[2].ref, { categoryId: 'subtraction', skillId: 'subtract', opts: { band: 20, regroup: 'always', notation: ['stacked'] }, minTop: 11, maxTop: 18, maxBottom: 9 }, 'LR-17: a question ref carries its floors (critic r1 D8: a kit fact, no exchange box, no Check line)');
 yp[0].ref.opts.band = 1;
 eq(LIB.lessonData('Y2.B2.S18').prereqs[0].ref.opts.band, 99, 'library: lessonData hands out fresh objects');
 eq(LIB.lessonData('Y2.B2.S17').prereqs, undefined, 'LR-17: a lesson whose check is pending has no prereqs (keeps its Warm-up)');
@@ -82,7 +82,7 @@ eq(PRE.lessonFor('subtraction', 'sub_10k_no_regroup').steps[2].text, 'Each place
 eq(PRE.lessonFor('addition', 'add_10_regroup'), null, 'prereqs.js: a skill with no lesson is null');
 
 // The prerequisite skills (plan §8e): a lesson's own check, else its Warm-up, else the seed's fallback.
-eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup').map((p) => p.skillId).join(','), 'identify,expand,sub_10_regroup,sub_100_no_regroup', 'library: a skill with a lesson lists its Prerequisite Check skills');
+eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup').map((p) => p.skillId).join(','), 'identify,expand,subtract,sub_100_no_regroup', 'library: a skill with a lesson lists its Prerequisite Check skills');
 eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_100_regroup')[0].lesson, 'Y2.B1.S4', 'library: each with the lesson it routes to');
 eq(LIB.prerequisiteSkillsFor('subtraction', 'sub_1k_no_regroup').map((p) => p.skillId).join(','), 'sub_100_no_regroup,subtract', 'library: a lesson with no check lists its Warm-up');
 const mf = LIB.prerequisiteSkillsFor('multiplication', 'mult_facts');

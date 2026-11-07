@@ -66,10 +66,10 @@ export const LESSONS = Object.freeze({
         ],
         // LR-17: the Prerequisite Check, most basic first.
         prereqs: [
-            { lesson: 'Y1.B9.S2', title: 'Count in 10s', key: 'patterns:seq_10', opts: { forms: [0], unknown: [1] }, why: 'The tens a number is rounded to: 10, 20, 30 ...' },
-            { lesson: 'Y2.B1.S4', title: 'Use a place value chart', key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Rounding reads the tens digit and the ones digit.' },
-            { lesson: 'Y2.B1.S10', title: '10s and 1s on the number line to 100', key: 'number_sense:between_tens', why: 'Rounding starts by naming the two tens.' },
-            { lesson: 'Y2.B2.S13', title: '10 more, 10 less', key: 'placevalue:more_less_10', why: 'The ten before and the ten after a number: 10 less, 10 more.' },
+            { lesson: 'Y1.B9.S2', title: 'Count in 10s', key: 'patterns:skip_count_line', opts: { step: [2] }, why: 'The tens a number is rounded to: 10, 20, 30 ...', checks: 'Count in 10s on a number line: 10, 20, 30 ...' },
+            { lesson: 'Y2.B1.S4', title: 'Use a place value chart', key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Rounding reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.' },
+            { lesson: 'Y2.B1.S10', title: '10s and 1s on the number line to 100', key: 'number_sense:between_tens', why: 'Rounding starts by naming the two tens.', checks: 'Name the two tens a number is between.' },
+            { lesson: 'Y2.B2.S13', title: '10 more, 10 less', key: 'placevalue:more_less_10', opts: { step: 10, dir: 'both' }, why: 'The ten before and the ten after a number: 10 less, 10 more.', checks: 'Find 10 more or 10 less than a 2-digit number.' },
         ],
         // Mixed practice: EARLIER skills only, each from its own strand (lessons r1: never nearest
         // 100, which comes after, and never two "Number Sense" sections).

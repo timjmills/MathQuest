@@ -95,7 +95,7 @@ function refOf(entry) {
     const [categoryId, skillId] = String(entry.key || '').split(':');
     const ref = { categoryId, skillId };
     if (entry.opts) ref.opts = clone(entry.opts);
-    for (const [k, v] of Object.entries(entry)) if (!['key', 'opts', 'why', 'lesson', 'title', 'items'].includes(k)) ref[k] = clone(v);
+    for (const [k, v] of Object.entries(entry)) if (!['key', 'opts', 'why', 'checks', 'lesson', 'title', 'items'].includes(k)) ref[k] = clone(v);
     return ref;
 }
 
@@ -124,7 +124,7 @@ export function lessonData(idOrSlug) {
     if (!out) return null;
     const l = lessonById(idOrSlug);
     if (Array.isArray(l.prereqs) && l.prereqs.length) {
-        out.prereqs = l.prereqs.map((p) => Object.assign({ lesson: p.lesson, title: p.title || '', why: p.why || '', ref: refOf(p) }, p.items ? { items: p.items } : {}));
+        out.prereqs = l.prereqs.map((p) => Object.assign({ lesson: p.lesson, title: p.title || '', why: p.why || '', checks: p.checks || '', ref: refOf(p) }, p.items ? { items: p.items } : {}));
     }
     return out;
 }

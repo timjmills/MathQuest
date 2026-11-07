@@ -43,6 +43,7 @@ import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './she
 import { practiceSection, practiceStackShapes, practiceRequest } from './sheet/lesson-pages/practice.js';
 import { mixedRequest } from './sheet/lesson-pages/mixed.js';
 import { lessonPart, lessonPartIds } from './sheet/lesson-pages/index.js';
+import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
@@ -1957,7 +1958,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const bodies = new Map();
         for (const it of items) {
             bodies.set(it, cols.map((c) => MEASURE_STATES.map((state) => {
-                try { return it.render(ctxOf(state, it.measureLevel || 1, it), { cols: c }); } catch (e) { return ''; }
+                try { return it.render(ctxOf(state, (it.measureLevel ?? 1), it), { cols: c }); } catch (e) { return ''; }
             })));
         }
         // a cell measured before Andika has loaded (fontsReady gives up after 3 s) is never
@@ -1967,7 +1968,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const dpr = typeof window !== 'undefined' && window.devicePixelRatio ? window.devicePixelRatio : 1;
         const keyOf = (it) => {
             if (noCache || !faceReady || Array.isArray(it.judgeModes) || it.colsLayout) return null;
-            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, it.measureLevel || 1].join('|');
+            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, (it.measureLevel ?? 1)].join('|');
             const text = `${size}|${look}|${cols.join(',')}|${flags}|${bodies.get(it).map((b) => b.join('\u0001')).join('\u0002')}`;
             return `${hash53(text)}:${text.length}`;
         };
@@ -2162,13 +2163,13 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (cells && !cells.every((el) => el && el.nodeType === 1 && el.classList.contains('ws-cell') && el.parentNode === root)) cells = null;
                 if (cells) {
                     BUILD_STATS.layouts++;
-                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, it.measureLevel || 1, it)));
+                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, (it.measureLevel ?? 1), it)));
                     items.forEach((it, i) => fold(it, c, inner, readings[i]));
                 } else {
                     items.forEach((it, i) => {
                         root.innerHTML = list[i][1];
                         BUILD_STATS.layouts++;
-                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, it.measureLevel || 1, it)));
+                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, (it.measureLevel ?? 1), it)));
                     });
                 }
             });
@@ -4415,9 +4416,11 @@ async function buildLesson(n, metaOf) {
     let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
     // The Prerequisite Check (LR-17): first in the packet; its key ends with the routing table.
     const buildPrereq = (seed, avoid = (r) => r) => buildRoleSheet(Object.assign({}, nz, {
-        seed, role: 'pre-skill-check', header, look: 'ican', perQuestion: 1, checkFor: meta,
+        // (LR-17: each question deals its `items`, ROUTE_ITEMS = 2 by default - the role drops a question to one item
+        // when the page would not hold it; `checks` is what the question asks, the routing table's words - critic r1 D12)
+        seed, role: 'pre-skill-check', header, look: 'ican', perQuestion: prereqs.map((p) => Number(p.items) || 2), checkFor: meta,
         sections: [{ skills: prereqs.map((p) => avoid(Object.assign({}, p.ref))) }],
-        routes: prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', checks: p.why || '' })),
+        routes: prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', checks: p.checks || '' })),
         lessonInput: undefined,
     }), metaOf);
     if (prereqs && built.includes('prereq')) parts.unshift({ part: 'prereq', role: 'pre-skill-check', res: await buildPrereq(lessonPartSeed(n.seed, 'prereq')) });
@@ -4609,7 +4612,7 @@ async function buildLesson(n, metaOf) {
     const pageCount = parts.reduce((a, p) => a + (p.res.pageCount || 0), 0);
     const keyPageCount = n.key ? parts.reduce((a, p) => a + (p.res.keyPageCount || 0), 0) : 0;
     const notes = [...new Set(sizeNote.concat(parts.flatMap((p) => p.res.notes || [])))];
-    const PART_NAME = { prereq: 'Prerequisite Check', chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
+    const PART_NAME = { prereq: PREREQ_CHECK_TITLE, chart: 'Anchor chart', teach: 'Lesson', practice: 'Practice', mixed: 'Mixed' };
     const line = parts.map((p) => `${PART_NAME[p.part] || (lessonPart(p.part) || {}).name || p.part}: ${p.res.pageCount} page${p.res.pageCount === 1 ? '' : 's'}`).join(' · ');
     const tagPages = (list, p) => { const ids = sheetIds(p); return (list || []).map((h, i) => tagSheets(h, i === 0 ? ids[0] : ids[1], ids[1])); };
     return {
@@ -4639,7 +4642,7 @@ async function buildLesson(n, metaOf) {
         lesson: {
             id: libId, skill: `${sk.categoryId}:${sk.skillId}`, tags: { ccss, ee, line: tagLine },
             // LR-17: the Prerequisite Check's questions and routes (null without one).
-            prereqCheck: prereqs ? prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', why: p.why || '', skill: `${p.ref.categoryId}:${p.ref.skillId}` })) : null,
+            prereqCheck: prereqs ? prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', why: p.why || '', checks: p.checks || '', skill: `${p.ref.categoryId}:${p.ref.skillId}` })) : null,
             prerequisites: data
                 ? { skills: data.skills.map((s) => s.key), concepts: data.concepts.map((c) => c.text), vocab: data.vocab.map((v) => v.word) }
                 : { skills: warmSkills.map((s) => `${s.categoryId}:${s.skillId}`), concepts: [], vocab: [] },
