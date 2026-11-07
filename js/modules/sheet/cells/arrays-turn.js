@@ -206,11 +206,11 @@ export function turnAnswerKey(p) {
 export function turnFootprint(p, ctx) {
     const g = geo(ctx);
     const geom = geometry(g, p);
-    // (critic lf-ops r1 D-MP-3, GRID-EVEN: at L a 5 x 4 pair is wider than half the page, so the section printed a row of
-    // 2 and then one full-width pair; at L every pictured pair takes the full width - one column count a section)
+    // (critic lf-ops r1 D-MP-3, GRID-EVEN at L - a row of 2, then one full-width 5 x 4 pair - is NOT fixed here: every pair
+    // full width at L broke the detailed lesson g3-oa5's practice grid (E12, E24b); a known finding for the next round)
     // (not `inPlace`: held to its content the pair left a 18-22 % strip under the detailed lesson's practice grid - E9b - and
     // the height grouping moved its edge case off the last row - E24b; D-MP-1's bands stay a known finding)
-    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures && !geom.split && g.size === 'L' ? 1 : geom.pictures || p.type === 'split' ? 2 : 3, ...(geom.pictures && !geom.split && g.size === 'L' ? { hardCap: true } : {}) };
+    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures || p.type === 'split' ? 2 : 3 };
 }
 
 export function turnInputs(p) {
