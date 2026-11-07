@@ -609,6 +609,13 @@ const PARSE = {
     },
     /** ws-card-rulings: NO-RULINGS (exit 4) is SKIPPED, never PASS. */
     cardRulings(g, out, code) {
+        // Lead ruling R2 (lf-placevalue, 2026-11-07): the --check offered row of a card that HAS a rulings block but no
+        // notOffered entry (every §7a option offered: a hidden decision always becomes a notOffered entry) has nothing to
+        // check - N/A with that reason, not SKIPPED. A card with no rulings block at all stays SKIPPED below.
+        if (code === 4 && g.args.includes('offered') && /^ws-card-rulings: NO-RULINGS \(the blocks hold no notOffered entries/m.test(out)
+            && /: rulings block present\b/m.test(out)) {
+            return { result: 'N/A', findings: 'every §7a option offered; no notOffered entry in the card (lead ruling R2, 2026-11-07)', detail: [], explainsExit: true };
+        }
         if (/^ws-card-rulings: NO-RULINGS\b/m.test(out) && code === 4) {
             const m = /^ws-card-rulings: no card under (\S+) has a rulings block for (.*)$/m.exec(out);
             return { result: 'SKIPPED (no rulings)', findings: `no machine-readable rulings block (<!-- rulings {json} -->, tests/scripts/ws-card-rulings.mjs) in the spec card${m ? ` for ${listShort(m[2].split(', '), 4)}` : ''}: not checked`, detail: [], explainsExit: true };
