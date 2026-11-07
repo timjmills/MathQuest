@@ -129,6 +129,11 @@
       "date": "2026-11-07",
       "ruling": "Grade map K = Y1 … G5 = Y6.",
       "source": "lead launch message"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Stretch is out of scope for the pv card for now: no pv challenge item yet (one will be designed later).",
+      "source": "owner via the lead (D2)"
     }
   ],
   "misconceptions": [
@@ -496,6 +501,19 @@
         "source": "skill-options.js",
         "why": "unit_form: standard unit form, then more than 9 of one place (34 tens)",
         "proposed": true
+      },
+      {
+        "option": "writeValue",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "owner ruling 2026-10-10 (card §5.1); built after critic r1 F4",
+        "why": "identify: also write the value of the underlined digit on a line under the ring row (default on)",
+        "skills": [
+          "placevalue:identify"
+        ]
       }
     ],
     "roles": [
@@ -585,10 +603,9 @@
       },
       {
         "key": "stretch",
-        "d": "offered",
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
-        "why": "the skill's own items",
-        "proposed": true
+        "d": "out of scope",
+        "source": "owner ruling 2026-11-07 (lead D2)",
+        "why": "no pv stretch item yet; owner 2026-11-07"
       },
       {
         "key": "lesson",
