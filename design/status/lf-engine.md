@@ -17,6 +17,7 @@ Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 ## Owner go
 
 ## Open questions
+- Lead ruling 2026-11-07: lesson 3a's pre-existing H13 bands (P0 item 7, 2 × 2 beside 5 × 5, 53 %; P6 cells 2-3, 42 %) - unchanged from master's passed render - are held for the next FULL 3a re-grade; the narrow live critic grades only the changed pages.
 - Owner ruling 2026-11-07 (via the lead), lesson 3a g3-oa5-mult-properties: every fact family once, arrays up to 6 × 6 (products ≤ 36, ~15 pairs); the only turned pair is the one the task asks the pupil to draw; the lf-checks LP-FAMILY-REPEAT gate is right; 3a's Practice pages need a re-grade. Queued after lesson 2 + lesson 4 LP-GIVEAWAY.
 - Owner 2026-11-07: lesson 2 shipped with its 4 gate findings (live fixes on master ef532943a).
 (none: owner ruling 2026-11-07, the lane decides card lines from the standards; decisions are in LESSON_RULES LR-17a and the cards)
