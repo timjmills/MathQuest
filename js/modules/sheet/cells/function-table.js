@@ -21,7 +21,8 @@
 //             "rule" when the pupil has to find it. No picture, no colour: a box and two arrows.
 //   check     (payload.check) a separate Check row under the table: a new In number, and an Out
 //             box where the pupil tests the rule once more.
-//   note      (task 'make') one line saying which In numbers to use, printed on the pupil page
+//   note      (task 'make', saved items before r2) one line saying which In numbers to use; new items carry `inHead`
+//             instead: the In column's head names the range ("In: 1–10"), so no extra line
 //             AND the key, so both have the same geometry (AK-1).
 //
 // Drawing: XP-D-15 (EXTENSION_PLAYBOOK): heavy outer rule, hairline inner rules, a heavy rule
@@ -200,7 +201,9 @@ function dims(p, g) {
     // (lf-algebra r1) on screen a box is at least 1.25 em tall, so it stays a >= 44 px target when the drawing scales down
     // to a phone card or the online worksheet (render-gate measured 42-43 px)
     const boxH = g.screen ? Math.max(g.writeMm + 1, 1.25 * g.E) : g.writeMm + 1;
-    const colW = Math.max(boxW + 4, 16);
+    // (the 'make' head "In: 1–10" is bold text-size: its column is at least as wide as the head)
+    const textMm0 = g.pt * g.textEm * PT_MM;
+    const colW = Math.max(boxW + 4, 16, p.inHead ? String(p.inHead).length * 0.56 * textMm0 + 3 : 0);
     // The rule column (task 'outputs' with the frame): "12 × 2 + 1" at the text size.
     const textMm = g.pt * g.textEm * PT_MM;              // one em of the text size, in mm
     const exprChars = Math.max(ruleText(p.rule).length, ...(p.rows || []).map((r) => ruleOn(p.rule, r.x).length));
@@ -344,7 +347,7 @@ function tableHtml(p, g, d, vals, ink, slotsById, ctx, fx = { on: false }) {
     const pcs = !!ctx.photocopySafe;
     const fixCol = fx.on && (p.rows || []).some((r, i) => slotsById[`r${i}in`] || slotsById[`r${i}out`]);
     const expr = hasExprCol(p);
-    const heads = [td(g, txt(g, `In (${X})`, { bold: true }), { w: d.colW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};` })];
+    const heads = [td(g, txt(g, p.inHead ? esc(p.inHead) : `In (${X})`, { bold: true }), { w: d.colW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};` })];
     if (expr) heads.push(td(g, txt(g, ruleHtml(p.rule), { bold: true }), { w: d.exprW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};` }));
     heads.push(td(g, txt(g, 'Out', { bold: true }), { w: d.colW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};` }));
     if (fixCol) heads.push(td(g, txt(g, 'Fix', { bold: true }), { w: d.colW, h: d.headH, head: true, photocopySafe: pcs, extra: `border-bottom:${HEAVY} solid ${INK.ink};border-left:${HEAVY} solid ${INK.ink};` }));

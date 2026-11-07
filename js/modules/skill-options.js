@@ -1985,7 +1985,9 @@ const _ftOptions = (easy) => [
         ],
         // lf-algebra r1 (options-render H13): a Check row is a second small table drawn under or beside the main one, so a
         // page of them may hold fewer tables (6 at S where 9 plain tables fit)
-        addsDrawingValues: _FT_TASKS.map(([v]) => `${v}-check`),
+        // lf-algebra r2: 'rule' too - its machine holds the pupil's write frame for the rule (an answer place the given-rule
+        // tasks print as text), 1.6 mm taller at S; that is the frame, not spare room
+        addsDrawingValues: [..._FT_TASKS.map(([v]) => `${v}-check`), 'rule'],
         helpShort: 'One task per page. A Check row adds one more In number under the table to test the rule on.',
         help: 'One task per page, so the instruction says one thing. A Check row gives one more In number under the table to test the rule on. "Make your own" accepts any rows that follow the rule.',
     },
@@ -3863,6 +3865,9 @@ const LF_ALGEBRA_OPTIONS = {
                 { v: 'feature', l: 'What a number pattern shows (start 5, add 5: check the true sentence)' },
                 { v: 'truefalse', l: 'True or false about a times-table (every product in the 5s ends in 0 or 5)' },
             ],
+            // (r2, options-render H13: the pattern task draws a six-number track and three sentences, the true / false task a
+            // sentence box and the times-table row - drawings the parity fact does not have, so a page holds fewer)
+            addsDrawingValues: ['feature', 'truefalse'],
             helpShort: 'One task a page. Each has one answer: a circled word or one checked sentence.',
             help: 'One task a page, so the instruction says one thing. Even or odd: a multiplication fact, the pupil circles whether the product is even or odd '
                 + '(half the products are odd). Pattern: a rule and its first numbers; three sentences, exactly one true. True or false: one sentence about one times-table.',
@@ -3890,6 +3895,8 @@ const LF_ALGEBRA_OPTIONS = {
                 { v: 'rule', l: 'Term 4 and the rule (+ 2)' },
                 { v: 'far', l: 'How many Term 10 has (find the rule first)' },
             ],
+            // (r2, options-render H13: 'rule' adds the line "Rule: + [ ]", 'far' the line "Term 10 has [ ]" under the terms)
+            addsDrawingValues: ['rule', 'far'],
             helpShort: 'Draw the next term and count it; then also write the rule; then jump to Term 10.',
             help: 'Terms 1, 2 and 3 are drawn; the box for Term 4 is empty for the pupil to draw in (working, not marked). '
                 + 'The answer is a number: how many Term 4 has, plus the rule on the second task, or how many Term 10 has on the third.',

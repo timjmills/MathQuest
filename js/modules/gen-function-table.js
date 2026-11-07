@@ -220,12 +220,12 @@ export function generateFunctionTable(q, skillId) {
         rows.forEach((r, i) => { r.hide = outs.has(i) ? 'out' : 'in'; });
     }
 
-    let note;
+    // (r2, options-render: the 'make' range was a note line under the table, as wide as a sentence - it cost a page half
+    // its tables. It is now the In column's head: "In: 1–10", or "In: 4s to 40" for a ÷ rule)
+    let inHead;
     if (task === 'make') {
         const lo = pool[0], hi = pool[pool.length - 1];
-        note = rule[0].op === '/'
-            ? `Use In numbers you can divide by ${rule[0].n}, up to ${hi}.`
-            : `Use In numbers from ${lo} to ${hi}.`;
+        inHead = rule[0].op === '/' ? `In: ${rule[0].n}s to ${hi}` : `In: ${lo}–${hi}`;
     }
 
     const payload = {
@@ -234,7 +234,7 @@ export function generateFunctionTable(q, skillId) {
         support: /^line/.test(String(o.support)) ? 'line' : 'frame',
         machine: !/-bare$/.test(String(o.support)) && o.pictures !== false,
     };
-    if (note) payload.note = note;
+    if (inHead) payload.inHead = inHead;
 
     const parts = ftSlots(payload).map((s) => s.value);
     q.cell = { template: 'function-table', v: 1, payload };
