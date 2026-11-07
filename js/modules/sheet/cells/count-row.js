@@ -201,12 +201,17 @@ function geomRaw(p, ctx) {
     }
     let boxW = 14 + wide;
     let perRow = n;
-    const sz = shape === 'box' ? { w: boxW, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, boxW, baseH);
+    // (lf-algebra options-verify --render, 2026-11-07: a circle / hexagon train tile grew past the box - S held 5 rows a page where
+    // the box page holds 8; as on the arcs row, a shaped tile keeps the box's height and pitch: a circle as wide as the box is tall)
+    const sz = shape === 'box' ? { w: boxW, h: baseH } : shape === 'circle' ? { w: Math.min(boxW, baseH), h: Math.min(boxW, baseH) } : { w: boxW, h: baseH };
     const pitch = sz.w + gap;
     // (lane lf-ops for lf-algebra, 2026-11-07: a 'train' row in a cell narrower than the page - the Reason It page's A and B side by
     // side - wraps to ITS cell's width, as wrapToCell rows do; it took the full 172 mm and overflowed at S, M and L)
-    const trainCols = look === 'train' && !isTwin(ctx) && Number(ctx && ctx.columns) > 1 ? Number(ctx.columns) : 1;
-    const liveT = trainCols > 1 ? Math.min(live, 186 / trainCols - 22) : live;   // a third of the row less its panel frame and pads
+    // (lf-algebra regression 2026-11-07: keyed on ctx.columns, the train also wrapped inside FULL-WIDTH panels - the lesson anchor
+    // chart's 185 mm panel printed 8 tiles as 4 + 4 and overflowed. The wrap is decided on the room the row really has: the line's
+    // own live width. Reason It now gives a row wider than its panel a panel as wide as the row (reason-it.js pair / full), so no
+    // caller needs a narrower train.)
+    const liveT = live;
     const fitN = Math.max(1, Math.floor((liveT - tab + gap) / pitch));
     if (fitN < perRow) perRow = Math.ceil(n / Math.ceil(n / fitN));
     if (isTwin(ctx) && perRow > TWIN_ROW) perRow = Math.ceil(n / Math.ceil(n / TWIN_ROW));
@@ -758,7 +763,7 @@ register('count-row', {
     footprint(p, ctx) {
         let g = geom(p, Object.assign({}, ctx || {}, { columns: 1 }));   // item 7: the full-line geometry, so maxCols is unchanged
         // (lane lf-ops for lf-algebra: a 'train' row in a narrow cell wraps to it (geom), so its height is the wrapped one)
-        if (g.look === 'train' && Number(ctx && ctx.columns) > 1 && !isTwin(ctx)) { const gn = geom(p, ctx); g = Object.assign({}, g, { rows: gn.rows }); }
+        // (the train no longer wraps on ctx.columns - lf-algebra regression - so its height is the full-line one)
         const w = g.tab + g.perRow * g.pitch - g.gap + 4 + insetOf(ctx);
         const lg = lineGapOf(ctx, g);
         const h = g.rows * (g.arcH + (g.axisH || 0) + g.h + g.lblH) + (g.rows - 1) * lg + (g.tight && g.tabAbove ? tabLineH(g, ctx) + g.lblH + lg : 0) + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
