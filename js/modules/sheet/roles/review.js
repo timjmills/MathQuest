@@ -22,6 +22,8 @@ import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } fro
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
 const rowLimit = (m) => fillLimit(m);
+/** div_facts Review rows: their measured height plus this room at most (critic r5 R5-2). */
+const FACT_ROOM = 1.15;
 
 export const ROLE_ID = 'review';
 const CEILING = { S: 16, M: 12, L: 12 };
@@ -288,7 +290,11 @@ export function plan(input = {}) {
         const x = sum(hs) / hs.length;
         return Math.max(x, Math.min(x * k, rowLimit(Math.min(...hs))));
     };
-    const cellsM = hsM.map((hs) => cellOf(hs, hM));
+    // div_facts critic r5 R5-2 (RUBRIC H13 on ink): a band of div_facts facts grows to at most FACT_ROOM x its rows' own
+    // height (pads and tab keep-out included), never by the page's share - 26-33 mm rows held a 20 mm fact (35-40 %).
+    // div_facts only: the passed fact Reviews keep their rows.
+    const factBand = (gr) => gr.length > 0 && gr.every((it) => /div_facts(?!_)/.test(String((it && it.skill) || '')));
+    const cellsM = hsM.map((hs, gi) => (factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM)));
     const cellM = cellsM[0] || hM;
     const cellE = cellOf(hsE, hE);
     const cellEW = cellOf(hsEW, g.ehw || hE);

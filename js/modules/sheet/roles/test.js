@@ -38,7 +38,9 @@ export const measureCols = () => [1, 2, 3, 4];
  * where the page strip under them is under a fifth (PG-14), each cell at least its measured
  * height; an explicit column count from the teacher is left alone (DN-12).
  */
-function fillToCeiling(L, size, columns) {
+/** div_facts Test rows: the measured height (pads and tab keep-out included) plus this room (critic r5 R5-1). */
+const FACT_TEST_ROOM = 1.15;
+function fillToCeiling(L, size, columns, opts = {}) {
     const ceil = CEILING[size] || CEILING.L;
     if (!L || (columns && columns !== 'auto') || !(L.hMin > 0) || L.cols < 2) return L;
     const G = L.gridH;
@@ -56,6 +58,13 @@ function fillToCeiling(L, size, columns) {
     // share, and never shorter than the layout made them.
     const even = (G - SAFETY_H_MM) / rows;
     // (an in-place cell - layout.js IN_PLACE_FILL - keeps its capped height: it holds no working space)
+    // div_facts critic r5 R5-1 (facts card F1: H13 wins over the PT-TST fixed cells): a Test of div_facts facts sizes its
+    // rows to the problems' footprint (FACT_TEST_ROOM x the measured height), never to the grid; the rest of the page stays
+    // under the rows. Only div_facts (`opts.footprintRows`): the passed + - x fact Tests keep their geometry.
+    if (opts.footprintRows) {
+        const capH = Math.round(Math.min(even, Math.max(L.hMin, Math.min(L.cellH, L.hMin * FACT_TEST_ROOM))) * 1000) / 1000;
+        return Object.assign({}, L, { rows, perPage, cellH: capH, fill: capH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
+    }
     const cellH = Math.round(Math.min(even, L.inPlace ? Math.max(L.cellH, L.hMin) : Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
     if (rows === L.rows && cellH <= L.cellH + 0.01) return L;
     return Object.assign({}, L, { rows, perPage, cellH, fill: cellH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
@@ -78,7 +87,8 @@ function layout(items, input, count) {
             target: { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
             ceiling: CEILING, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
-        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns);
+        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns,
+        { footprintRows: items.every((it) => /div_facts(?!_)/.test(String(it.skill || ''))) });
     }
     const sec = (columns) => ({
         role: 'test', columns, count: count || items.length,
