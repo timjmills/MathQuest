@@ -6,7 +6,7 @@ Owner of files: LANES.operations (gen-operations.js, gen-mult-patterns.js, the o
 State: building
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 0, none
+Critic rounds: 1, FAIL (r1 build #4: lowest 2)
 
 ## Now
 - 2026-11-07 owner scope (via lead): BUILD lessons only, no owner sign-off of cards. Re-aimed below ("Scope after the 2026-11-07 decision").
@@ -60,6 +60,12 @@ Red rows, with cause where known:
   one-page row clears the label keep-out.
 - New check: ws-visual-quality VQ-NOLEGACY some-legacy (backtest vq-some-legacy-lf). sibling-compare `ownerSkipped` (count-row
   card 9 Q2(a)). options-render pin: count_by_tables jumps=15 (card 9 Q2(b)); shape pages no longer need a pin.
+
+## Critic r1 (build #4, c37053c) - per-round findings (rule 00)
+Verdict: FAIL all three - mult_properties lowest 2 (Reason It arrays spill out of the A/B boxes, H2), arrays_groups lowest 4 (Error analysis tags over the grey answers, H2), count_by_tables lowest 2 (Reason It rows overprint, off the page). Report design/audit/runs/lf-ops/critic-r1.md.
+Automatic checks (would have caught each finding): 1 band-anywhere H13 for non-fact templates; 2 grade-render --gate on EVERY role the signed card offers x every forms value (Reason It OVERFLOW was in the logs); 3 slot >= 14 mm and one width per section; 4 capacity S > M where the template measures smaller; 5 PAGEFILL on the last page of multi-section sheets + lesson Practice; 6 GRID-EVEN on every kit grid; 7 title / Rule / vocab from the forms dealt + card-rulings string check for decided titles; 8 L-KEY one answer per slot; 9 tag-vs-slot overlap; 10 paper / screen frame equality; 11 options-verify: fewer rows AND an H13 band is a defect.
+Speed-ups: 1 critic renders one skill a run (the 3-skill render hit the 10-minute limit); 2 a per-page max-band % in ws-grade-render meta.json (builder sees H13 first); 3 generate precritic's plan from the signed card's 7a offered roles x option values (most reds were outside the plan); 4 --save-html with relative CSS; 5 a lint for a lesson rendered for an option value with no lesson entry.
+Lane root cause: the builder's precritic was green on roles it ran, but precritic does not run Reason It / Error analysis / True or False / forms 1-3 / times=each Test. Next round: the fix builder runs grade-render --gate and print-lint on every 7a-offered role at S/M/L first.
 
 ## Hand-offs with other lanes
 - lf-engine (session_013pHDnLTpMERUWs7oNEgzJ3): (1) adds lesson key `practiceBlocks: [{shape:[count,cols], opts?}]` (1-3 blocks); when it lands, set mult_properties' lesson data to `practiceBlocks: [{shape:[4,2]}, {shape:[4,2], opts:{task:[2], pictures:false}}]` (the properties lesson does not pass before this). (2) Its branch moves lesson records to js/modules/lessons/families/*.js: after the lead merges lf-engine into the integration branch, re-apply this lane's prereqs.js entries (arrays_groups, mult_properties, div_facts, mult/div_word_problems_plain, count_by_tables) as ROUTINE + LESSON records in families/multdiv.js (patterns:* in families/algebra.js; schema lessons/schema.js; gates ws-lesson-coverage, ws-lesson-unit), and stop editing prereqs.js.

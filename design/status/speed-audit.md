@@ -423,6 +423,8 @@ not improve** (3 if r3 passes = the old median per run). The ≥ 5× claim is no
 | F7 | If the next family also misses: certify `stack` × Single skill before any further family on it | lead | conditional |
 
 **Per-round findings audit (owner rule):** pilot r1 + r2 listed **18 automatic checks and 10 speed-ups**. Built so far: **3**
+
+- 2026-11-07 lf-ops critic r1 (build #4: mult_properties, arrays_groups, count_by_tables; FAIL, lowest 2): most reds sat on roles / option values precritic does not plan (Reason It, Error analysis, forms 1-3, times=each Test). Checks: band-anywhere H13, grade-render --gate on every 7a-offered role x forms, slot >= 14 mm + one width a section, S > M capacity, last-page PAGEFILL, title from dealt forms, L-KEY one answer a slot, tag/slot overlap, paper = screen frame. Speed-ups: plan precritic from the signed card's 7a offered list; per-page max-band % in grade-render; one skill per critic render run.
 (rules 0a, 0b and the per-round findings rule). Real checks built with a backtest: **0**. Every other item has an owner (W0-A for
 the checks, W0-B2 for the card, lead for rules). The count is re-taken at each reflection.
 
