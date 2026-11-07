@@ -182,7 +182,10 @@ export function repeatKeysOf(q) {
         const [x, y] = [b, a / b].sort((m, n) => m - n); return `${x},${y},${a}`;
     };
     const st = Array.isArray(p.steps) ? p.steps.find((x) => x && glyph(x.op)) : null;
+    // (an ARRAY - rows by cols, an array and its turn - is the x family of its two sides: lesson 3a, owner ruling 2026-11-07)
+    const arr = !Array.isArray(p.rows) && !Array.isArray(p.cols) && Number(p.rows) > 0 && Number(p.cols) > 0 && !st && !glyph(p.op || q.op);
     const f = st ? fam(glyph(st.op), st.a !== undefined ? st.a : st.top, st.b !== undefined ? st.b : st.bottom)
+        : arr ? fam('*', p.rows, p.cols)
         : fam(glyph(p.op || q.op), p.a !== undefined ? p.a : q.a, p.b !== undefined ? p.b : q.b);
     if (f) out.push(`rk:fam:${f}`);
     const sing = (w) => String(w).replace(/ies$/, 'y').replace(/(ch|sh|x|ss)es$/, '$1').replace(/([^s])s$/, '$1');

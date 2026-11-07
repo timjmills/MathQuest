@@ -96,6 +96,7 @@ const LATE = {
         eq(LR.repeatKeysOf(ws), ['rk:fam:4,6,24', 'rk:frame:4 bag', 'rk:frame:6 marble'], 'D2: a two-step story keys its x step family and its frames');
         eq(LR.repeatKeysOf({ cell: { payload: { op: '/', a: 24, b: 6 } } }), ['rk:fam:4,6,24'], 'D2: 24 ÷ 6 is the family of 4 x 6');
         eq(LR.repeatKeysOf({ cell: { payload: { op: '+', a: 7, b: 5 } } }), [], 'D2: a + item has no x / ÷ family');
+        eq(LR.repeatKeysOf({ cell: { template: 'arrays-turn', payload: { rows: 3, cols: 4 } } }), ['rk:fam:3,4,12'], 'lesson 3a ruling: an array is the x family of its sides');
         const ps = readSrc('js/modules/print-sheet.js');
         ok(/if \(sk\.repeatKey && dlRepeatKeys\(cand\)\.some/.test(ps) && /if \(sk\.repeatKey\) for \(const k of dlRepeatKeys\(q\)\) seen\.add\(k\)/.test(ps), 'D2: refAccepts / refRecord read repeatKey (the role dealer)');
         ok(/const rks = ref\.repeatKey \? dlRepeatKeys\(q\) : \[\];/.test(ps) && /if \(d\.repeatKey\) for \(const x of dlRepeatKeys\(c\.q\)\) used\.add\(x\)/.test(ps), 'D2: the detailed dealer and the pack record read repeatKey');
