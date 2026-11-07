@@ -1450,6 +1450,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-r1-wrong-per-slot",
+   "check": "a True or False? / Reason It statement given as one string is written slot by slot in a multi-slot pv frame (expand boxes, unit-form, value unit / notation)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F3 (critic lf-placevalue r1 F3)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: expand / unit_form true-false: the whole statement in each box"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F3",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-plural",
+   "check": "no \"1 ones\" / \"1 tens\" / \"1 hundreds\" in any pv worked step, step band, Say line or wrong work",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F11 (critic lf-placevalue r1 F11)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: \"1 hundreds is 1 × 100\", \"1 ones.\""
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F11",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-grade2-times",
+   "check": "a placevalue:value item outside form=notation has no × in its steps or Say line",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F12 (critic lf-placevalue r1 F12)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: \"Multiply the digit by its place: 3 tens is 3 × 10 = 30\" on a 2.NBT.1 page"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F12",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-model-not-ones",
+   "check": "item 0 of an identify / value page (the Model item) never asks the ones place",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F13 (critic lf-placevalue r1 F13)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: scripted model 559 with the ones digit underlined"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F13",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
