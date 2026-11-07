@@ -1610,6 +1610,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "optin-slot-w-equal",
+   "check": "ws-slot-clip --slot-w-equal (opt-in): graded write-in slots of one kind in one section have one width (a width that tracks the answer gives it away)",
+   "kind": "fixture",
+   "rule": "ws-slot-clip SLOT-W-EQUAL (critic lf-placevalue r1 F10, L3; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/slot-w-equal/fail.html",
+    "state": "placevalue:value form=unit independent L at 53dd45c9: the place-word box 32 mm for tens / ones, 62 mm for hundreds"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/slot-w-equal/pass.html",
+    "state": "the same page at b1094401 (the pv builder's fix): every word box 44 mm"
+   },
+   "command": "node tests/scripts/ws-slot-clip.cjs --doc-fixture {fixture} --slot-w-equal",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-draw-cap",
+   "check": "ws-slot-clip --draw-cap (opt-in): each place zone of a draw zone holds the item's digit x (8 mm)^2",
+   "kind": "fixture",
+   "rule": "ws-slot-clip DRAW-CAP (critic lf-placevalue r1 F15, H12; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/draw-cap/fail.html",
+    "state": "placevalue:identify review L at 53dd45c9 with the 691 mat at the critic's measured 19 x 19 mm zones: 9 tens disks need 576 mm2, the zone holds 361"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/draw-cap/pass.html",
+    "state": "the same page as printed at 53dd45c9: 38 mm place zones"
+   },
+   "command": "node tests/scripts/ws-slot-clip.cjs --doc-fixture {fixture} --draw-cap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
