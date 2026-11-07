@@ -293,7 +293,7 @@ export function plan(input = {}) {
     // div_facts critic r5 R5-2 (RUBRIC H13 on ink): a band of div_facts facts grows to at most FACT_ROOM x its rows' own
     // height (pads and tab keep-out included), never by the page's share - 26-33 mm rows held a 20 mm fact (35-40 %).
     // div_facts only: the passed fact Reviews keep their rows.
-    const factBand = (gr) => gr.length > 0 && gr.every((it) => /div_facts(?!_)/.test(String((it && it.skill) || '')));
+    const factBand = (gr) => gr.length > 0 && gr.every((it) => !!it && (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))));
     const cellsM = hsM.map((hs, gi) => (factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM)));
     const cellM = cellsM[0] || hM;
     const cellE = cellOf(hsE, hE);
