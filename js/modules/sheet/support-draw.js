@@ -388,7 +388,10 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
         groups.beside = new Map([...m.entries()].sort((x, y) => fixed(x) - fixed(y)));
     }
     // One row: its pieces overlaid in one grid cell (only one of them is ever drawn).
-    const rows = (m, j = 'center') => [...m.values()].map((list) => `<div class="ws-support-row" style="display:grid;justify-items:${j};align-items:start">${list.join('')}</div>`);
+    // (critic laned-restart r4 H13-INK: a row that overlays clashing supports - the touch tally or the skip strip - keeps
+    // the tallest one's room; the shorter one stands at the row's FOOT, so the room it leaves is inside the cell, between
+    // its supports, never an empty band under the cell's last ink)
+    const rows = (m, j = 'center') => [...m.values()].map((list) => `<div class="ws-support-row" style="display:grid;justify-items:${j};align-items:${list.length > 1 ? 'end' : 'start'}">${list.join('')}</div>`);
     groups['over-ones'] = rows(groups['over-ones']);
     groups.before = rows(groups.before);
     // R3-1: beside a ÷ fact on paper, each support starts at the zone's left edge (one x per section).
