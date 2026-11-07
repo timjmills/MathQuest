@@ -48,17 +48,17 @@
   "buildEntriesLinksOnly": 125,
   "buildEntriesUnknown": 0,
   "shapeCount": {
-   "A5": 63,
+   "A2": 81,
    "A6": 48,
-   "A4": 80,
+   "A4": 81,
    "A3": 34,
-   "A2": 74,
+   "A5": 54,
+   "A7": 21,
    "A13": 28,
-   "A9": 83,
-   "A11": 135,
+   "A9": 82,
+   "A11": 130,
    "A1": 28,
-   "A8": 151,
-   "A7": 13,
+   "A8": 150,
    "A12": 28,
    "A10": 52
   }
@@ -398,9 +398,9 @@
     "buildEntries": 6
    },
    "shapes": [
+    "A2",
     "A3",
     "A4",
-    "A5",
     "A6"
    ],
    "lanes": {
@@ -562,7 +562,7 @@
      "build": [
       "oral_count"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null,
      "attachedBy": "nearest same-domain block",
@@ -2357,6 +2357,7 @@
    "shapes": [
     "A2",
     "A5",
+    "A7",
     "A13"
    ],
    "lanes": {
@@ -3011,7 +3012,7 @@
      "build": [
       "patterns_notice"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": "g3-oa9-mult-table-patterns: passed"
     },
@@ -3067,7 +3068,7 @@
      ],
      "partial": [],
      "build": [],
-     "shape": "A5",
+     "shape": "A7",
      "short": null,
      "long": "g3-oa5-mult-properties: passed",
      "attachedBy": "nearest same-domain block"
@@ -3517,7 +3518,7 @@
      "build": [
       "growing_shape_patterns"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null,
      "attachedBy": "nearest same-domain block"
@@ -5631,6 +5632,7 @@
    },
    "shapes": [
     "A1",
+    "A2",
     "A4",
     "A5",
     "A8",
@@ -6033,7 +6035,7 @@
      "build": [
       "add_sub_patterns"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null
     },
@@ -9467,7 +9469,7 @@
     "buildEntries": 7
    },
    "shapes": [
-    "A5",
+    "A2",
     "A11"
    ],
    "lanes": {
@@ -9877,7 +9879,7 @@
      "build": [
       "pattern_3d"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null
     },
@@ -11893,7 +11895,7 @@
      "build": [
       "value_ten_times"
      ],
-     "shape": "A8",
+     "shape": "A4",
      "short": null,
      "long": "g4-nbt1-ten-times-value: passed",
      "attachedBy": "nearest same-domain block"
@@ -11938,7 +11940,6 @@
    "shapes": [
     "A2",
     "A4",
-    "A5",
     "A8"
    ],
    "lanes": {
@@ -12420,7 +12421,7 @@
      "build": [
       "pv10_exponents"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null,
      "attachedBy": "nearest same-domain block"
@@ -16502,7 +16503,7 @@
     "buildEntries": 3
    },
    "shapes": [
-    "A5",
+    "A7",
     "A11"
    ],
    "lanes": {
@@ -16618,7 +16619,7 @@
      "build": [
       "movement"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     },
@@ -16641,7 +16642,7 @@
      "build": [
       "turns"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     },
@@ -16664,7 +16665,7 @@
      "build": [
       "pattern_turns"
      ],
-     "shape": "A5",
+     "shape": "A7",
      "short": null,
      "long": null
     }
@@ -19822,6 +19823,7 @@
     "buildEntries": 4
    },
    "shapes": [
+    "A7",
     "A9",
     "A11"
    ],
@@ -20039,7 +20041,7 @@
      "build": [
       "area_split_tiles"
      ],
-     "shape": "A9",
+     "shape": "A7",
      "short": null,
      "long": null
     }
@@ -26885,6 +26887,7 @@
     "buildEntries": 5
    },
    "shapes": [
+    "A7",
     "A9",
     "A11"
    ],
@@ -27054,7 +27057,7 @@
      "build": [
       "turns_angles"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     },
@@ -28212,6 +28215,7 @@
     "buildEntries": 2
    },
    "shapes": [
+    "A7",
     "A11"
    ],
    "lanes": {
@@ -28274,7 +28278,7 @@
      "build": [
       "turns"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     },
@@ -30399,7 +30403,7 @@
     "buildEntries": 4
    },
    "shapes": [
-    "A5",
+    "A2",
     "A11"
    ],
    "lanes": {
@@ -30695,7 +30699,7 @@
      "build": [
       "pattern_make"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null
     }
@@ -31444,6 +31448,7 @@
     "buildEntries": 3
    },
    "shapes": [
+    "A7",
     "A11"
    ],
    "lanes": {
@@ -31728,7 +31733,7 @@
      "build": [
       "turns_angles"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     }
