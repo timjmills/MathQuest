@@ -1829,6 +1829,11 @@ html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swi
     .k2-countrow-keys .k2-keys-type { display: none; }
     .k2-countrow-keys .k2-keys-touch { display: inline; }
 }
+/* (lane lf-ops critic r1 D-CB-9, BD-11: a phone-width screen is a touch screen - the tap wording, not the Space key) */
+@media (max-width: 480px) {
+    .k2-countrow-keys .k2-keys-type { display: none; }
+    .k2-countrow-keys .k2-keys-touch { display: inline; }
+}
 
 /* ---- Bracket hug (owner 2026-10-09; critic div-facts-forms R4 nit c, "7)  28", "2)  8"): the
    dividend's column is as wide as its digits, as on paper, so the arc and the vinculum hug them.
