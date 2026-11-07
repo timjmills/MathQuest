@@ -4390,8 +4390,11 @@ async function buildLesson(n, metaOf) {
     // Practice-page supports a lesson never draws (critic visual-quality r2 N1): the blank family chart is working
     // space for the practice pages; on the lesson's model, steps and guided frames it crowds the step column off
     // the sheet. The lesson draws the bare family-check cell; the option stays on the skill for every other role.
-    if (sk.opts && LESSON_OFF_OPTS.some((k) => sk.opts[k] === true)) {
-        sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(LESSON_OFF_OPTS.map((k) => [k, false]))) });
+    // (lane lf-ops: lesson data may name more - `offOpts`: the x / ÷ story lessons leave the practice bar model off, whose
+    // full-width bar ran their chart off the page, ws-cell-checks OVERFLOW)
+    const offOpts = LESSON_OFF_OPTS.concat(data0 && Array.isArray(data0.offOpts) ? data0.offOpts : []);
+    if (sk.opts && offOpts.some((k) => sk.opts[k] === true)) {
+        sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(offOpts.map((k) => [k, false]))) });
     }
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);

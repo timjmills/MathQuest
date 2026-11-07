@@ -455,7 +455,8 @@ function timesStoryLessons() {
     const divFacts = { key: 'division:div_facts', opts: { band: 100, constant: [2, 3, 4, 5] }, why: 'The story is solved with a division fact.' };
     // (the column work is wider and taller than half a chart: two full-width panels, the drawing beside its step heads -
     // read and choose the sign, then the numbers, the fact and the answer)
-    const base = { format: FORMAT, chartStates: 2, practiceShapes: [[6, 2], [4, 2], [4, 1], [2, 1]] };
+    // (`offOpts`: the practice-page bar model is left off the lesson - its full-width bar ran the chart off the page)
+    const base = { format: FORMAT, chartStates: 2, practiceShapes: [[6, 2], [4, 2], [4, 1], [2, 1]], offOpts: ['wpBar'] };
     return {
         'multiplication:mult_word_problems_plain': Object.assign({}, base, {
             skills: [multFacts],

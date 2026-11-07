@@ -4146,3 +4146,26 @@ export const divArrayWhy = (opts) => `An array is drawn while every dividend is 
     // (where the array IS offered - the 2 to 4 tables - ws-options-verify tries it)
     if (sup) sup.valueBase = { array: { constant: [2, 3, 4] } };
 }
+
+// ============================ lane lf-ops (2026-11-07): the I Can line a fact drill's options give it ============
+// The same words print-sheet.js optionTitleBase prints over the page (a ticked fact set names it: "I Can divide by 6";
+// a band other than the default is said), so a provider's strings for THESE options say what the page says
+// (ws-cell-checks TITLE, VQ-9 / H17). '' keeps the skill's own line.
+export function optionICan(categoryId, skillId, opts, baseICan) {
+    let set = '', bandDef = null, band;
+    try {
+        set = factSetTitle(categoryId, skillId, opts || {});
+        if (set || optionsFor(categoryId, skillId).some((d) => d.id === 'constant')) {
+            bandDef = optionsFor(categoryId, skillId).find((d) => d.id === 'band') || null;
+            band = bandDef ? normalizeOptions(categoryId, skillId, opts || {}).band : undefined;
+        }
+    } catch (e) { return ''; }
+    const bandMoved = bandDef && band !== undefined && band !== null && band !== bandDef.default;
+    const hit = bandMoved ? (bandDef.values || []).find((x) => x.v === band) : null;
+    const bandPhrase = hit ? `${String(bandDef.label).toLowerCase()} ${hit.l}` : '';
+    if (set) return `I Can ${set.charAt(0).toLowerCase()}${set.slice(1)}${bandPhrase ? ` (${bandPhrase})` : ''}`;
+    if (!bandPhrase) return '';
+    const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
+    const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
+    return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
+}
