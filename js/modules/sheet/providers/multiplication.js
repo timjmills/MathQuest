@@ -277,8 +277,9 @@ registerSkill('multiplication:area_model_mult_hard', {
 
 
 /* ===================================================================== mult_properties */
-// Form 0 (the order property, lesson 3a) draws the `arrays-turn` cell; forms 1-3 are still legacy
-// items, so every hook below answers for a turn item and stays out of the way of the others.
+// Form 0 (the order property, lesson 3a) and form 1 (the distributive split, lf-ops 2026-11-07) draw the
+// `arrays-turn` cell; forms 2-3 (times 1, times 0) draw the `equation` cell. Each hook answers for its kind
+// (ops-tables card §6: MU-M3 turn-recount, MU-M4 times-zero, MU-M5 times-one, MU-M7 split-drop-part).
 
 const turnOf = (q) => {
     const c = q && q.cell;
@@ -288,6 +289,28 @@ const turnOf = (q) => {
     const rows = num(p.rows), cols = num(p.cols);
     if (!Number.isFinite(rows) || !Number.isFinite(cols)) return null;
     return { rows, cols, product: rows * cols, type: p.type || 'known', ask: p.ask || 'product' };
+};
+
+/** A distributive split item (arrays-turn type 'split'), or null. */
+const splitOf = (q) => {
+    const t = turnOf(q);
+    if (!t || t.type !== 'split') return null;
+    const p = q.cell.payload;
+    const top = Math.round(num(p.top));
+    if (!(top >= 1 && top < t.rows)) return null;
+    return { rows: t.rows, cols: t.cols, top, rest: t.rows - top, p1: top * t.cols, p2: (t.rows - top) * t.cols, product: t.product, bare: p.draw === 'none' };
+};
+/** A times-1 / times-0 fact (equation cell, forms 2-3), or null. */
+const unitOf = (q) => {
+    const c = q && q.cell;
+    if (!c || c.template !== 'equation') return null;
+    const p = obj(c.payload);
+    const a = num(p && p.a), b = num(p && p.b);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+    const k = a === 0 || b === 0 ? 0 : a === 1 || b === 1 ? 1 : null;
+    if (k === null) return null;
+    const n = (a === k ? b : a);
+    return { a, b, k, n, first: a === k, product: a * b };
 };
 
 const TURN_STRINGS = {
@@ -312,6 +335,22 @@ const TURN_STRINGS = {
         say: '__ times __ equals __ times __.',
         sayValues: (q) => { const t = turnOf(q); return t ? [t.rows, t.cols, t.cols, t.rows] : ''; },
     }),
+    split: strings({
+        iCan: 'I Can break apart an array to multiply',
+        instructionKey: 'missing-many',
+        steps: ['Look at the two parts of the array.', 'Multiply the top part.', 'Multiply the bottom part.', 'Add the two parts. Write the whole.'],
+        say: '__ times __ is __ plus __.',
+        sayValues: (q) => { const t = splitOf(q); return t ? [t.rows, t.cols, t.p1, t.p2] : ''; },
+        vocabulary: ['array', 'row', 'part'],
+    }),
+    unit: strings({
+        iCan: 'I Can multiply by 1 and by 0',
+        instructionKey: 'multiply',
+        steps: ['Read the fact.', 'Find the 1 or the 0.', 'Times 1: the other number. Times 0: zero.', 'Write the product.'],
+        say: '__ times __ equals __.',
+        sayValues: (q) => { const u = unitOf(q); return u ? [u.a, u.b, u.product] : ''; },
+        vocabulary: ['times', 'zero', 'product'],
+    }),
     other: strings({
         iCan: 'I Can use the properties of multiplication',
         instructionKey: 'missing',
@@ -326,11 +365,36 @@ registerSkill('multiplication:mult_properties', {
         const t = turnOf(ref && ref.q);
         const q = ref && ref.q;
         if (t) return TURN_STRINGS[t.type] ? TURN_STRINGS[t.type](ref) : TURN_STRINGS.known(ref);
-        // A page with no item yet (the dialog, the anchor chart before dealing): the order property.
-        return q ? TURN_STRINGS.other(ref) : TURN_STRINGS.both(ref);
+        if (unitOf(q)) return TURN_STRINGS.unit(ref);
+        if (q) return TURN_STRINGS.other(ref);
+        // A page with no item yet (the dialog, the title from the options): the ticked property; the order
+        // property by default; several ticked, the family's own line.
+        let f = ref && ref.opts && ref.opts.forms;
+        if (typeof f === 'number') f = [f];
+        f = Array.isArray(f) ? [...new Set(f.map(Number))] : [0];
+        if (f.length === 1 && f[0] === 1) return TURN_STRINGS.split(ref);
+        if (f.length && f.every((v) => v === 2 || v === 3)) return TURN_STRINGS.unit(ref);
+        if (f.length === 1 && f[0] === 0) return TURN_STRINGS.both(ref);
+        return TURN_STRINGS.other(ref);
     },
-    misconceptions: ['turn-recount', 'turn-no-swap', 'turn-product-factor'],
+    misconceptions: ['turn-recount', 'turn-no-swap', 'turn-product-factor', 'split-drop-part', 'split-one-part', 'times-one', 'times-zero'],
     workedSteps: (q) => {
+        const sp = splitOf(q);
+        if (sp) {
+            return [
+                sp.bare ? step(`Break ${sp.rows} × ${sp.cols} into ${sp.top} × ${sp.cols} and ${sp.rest} × ${sp.cols}.`)
+                    : step(`Look at the parts: ${sp.top} rows of ${sp.cols} and ${sp.rest} rows of ${sp.cols}.`, [{ slot: 'array', value: 'shown' }]),
+                step(`${sp.top} × ${sp.cols} = ${sp.p1}. Write ${sp.p1}.`, [{ slot: 'p1', value: String(sp.p1) }]),
+                step(`${sp.rest} × ${sp.cols} = ${sp.p2}. Write ${sp.p2}.`, [{ slot: 'p2', value: String(sp.p2) }]),
+                step(`Add the parts: ${sp.p1} + ${sp.p2} = ${sp.product}. So ${sp.rows} × ${sp.cols} = ${sp.product}.`, [{ slot: 't', value: String(sp.product) }]),
+            ];
+        }
+        const u = unitOf(q);
+        if (u) {
+            const done = step(`Write ${u.product}.`, [{ slot: 'answer', value: String(u.product) }]);
+            if (u.k === 1) return [step(`Read the fact: ${u.a} × ${u.b}.`), step(u.first ? `1 group of ${u.n} is ${u.n}.` : `${u.n} groups of 1 is ${u.n}.`), step(`Times 1 keeps the number: ${u.n}.`), done];
+            return [step(`Read the fact: ${u.a} × ${u.b}.`), step(u.first ? `0 groups of ${u.n} is nothing.` : `${u.n} groups of 0 is nothing.`), step('Times 0 makes 0.'), done];
+        }
         const t = turnOf(q);
         if (!t) return [];
         const { rows: r, cols: c, product: P } = t;
@@ -360,6 +424,26 @@ registerSkill('multiplication:mult_properties', {
         ];
     },
     wrongAnswer: (q) => {
+        const sp = splitOf(q);
+        if (sp) {
+            // MU-M7: the second part written as its rows alone (6 × 7 = (6 × 5) + 2), or the whole read as one part.
+            const dropped = sp.p1 + sp.rest;
+            return chooseWrong(q, [
+                { value: `${sp.p1}, ${sp.rest}, ${dropped}`, misconception: 'split-drop-part', slot: 'p2',
+                    slots: { p1: String(sp.p1), p2: String(sp.rest), t: String(dropped) },
+                    explain: `Wrote ${sp.rest} for ${sp.rest} × ${sp.cols}: the bottom part is ${sp.rest} rows of ${sp.cols}, ${sp.p2}.` },
+                { value: `${sp.p1}, ${sp.p2}, ${sp.p1}`, misconception: 'split-one-part', slot: 't',
+                    slots: { p1: String(sp.p1), p2: String(sp.p2), t: String(sp.p1) },
+                    explain: `Wrote one part as the whole. The whole is both parts: ${sp.p1} + ${sp.p2} = ${sp.product}.` },
+            ]);
+        }
+        const u = unitOf(q);
+        if (u) {
+            // MU-M5: times 1 adds one; MU-M4: times 0 gives the other number.
+            return u.k === 1
+                ? chooseWrong(q, [{ value: u.n + 1, misconception: 'times-one', slot: 'answer', explain: `Added 1. ${u.a} × ${u.b} is ${u.first ? `1 group of ${u.n}` : `${u.n} groups of 1`}: ${u.n}.` }], { rotate: false })
+                : chooseWrong(q, [{ value: u.n, misconception: 'times-zero', slot: 'answer', explain: `Wrote ${u.n}. ${u.first ? `0 groups of ${u.n}` : `${u.n} groups of 0`} is 0.` }], { rotate: false });
+        }
         const t = turnOf(q);
         if (!t) return null;
         const { rows: r, cols: c, product: P } = t;

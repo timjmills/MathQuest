@@ -4099,3 +4099,18 @@ export function describeOptions(categoryId, skillId, opts) {
     }
     return parts.join(' · ');
 }
+
+// ============================ lane lf-ops (2026-11-07): mult_properties, ops-tables card ====================
+// Appended (skill-options is append-only for lanes): the card's "one frame per section" (P11, SCC-T10) - an
+// untouched page deals ONE property, the order property of lesson 3a (3.OA.B.5); ticking more mixes them. The
+// task help named "3 × 4" in a way the panel read as a value (node-lint OPTION-HELP); it now names no number.
+{
+    const _mp = SKILL_OPTIONS['multiplication:mult_properties'] || [];
+    const _mpForms = _mp.find((o) => o.id === 'forms');
+    if (_mpForms) {
+        _mpForms.default = [0];
+        _mpForms.help = 'One property to a page: the order property (an array and its turn) comes first. Tick more to mix them.';
+    }
+    const _mpTask = _mp.find((o) => o.id === 'task');
+    if (_mpTask) _mpTask.help = 'Order items only. One kind is one page instruction; tick more to mix them. The pictured arrays are at most 5 rows of 5.';
+}
