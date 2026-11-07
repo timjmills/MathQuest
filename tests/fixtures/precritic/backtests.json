@@ -2010,6 +2010,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-r2-option-fit",
+   "check": "Every pv cell fits every option value the signed card offers on every role (lf-placevalue precritic r3: combine band=999999 ran 13 mm past the page at L on test / review / guided / independent and on every lesson page; expand / unit_form opener Model and combine Reason It panels ran out of their cells)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (--card --card-opts); SCC-T4 content never shrinks, wrap only between units / before =",
+   "browser": true,
+   "fail": {
+    "commit": "b7962be0",
+    "state": "lf-placevalue critic r1 fix-round tree merged with the integration branch: combine 196 OVERFLOW findings"
+   },
+   "pass": {
+    "commit": "9f483f78",
+    "state": "lf-placevalue r2: two fixed lines for six-part expressions, Model and Reason It rows wrap between units"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:combine --card --card-opts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
