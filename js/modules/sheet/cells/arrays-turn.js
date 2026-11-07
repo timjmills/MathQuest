@@ -93,7 +93,11 @@ function splitSvg(g, p, ink) {
     return { svg, wMm: W, hMm: H };
 }
 
-const boxW = (g, digits) => Math.max(g.writeMm * (digits > 1 ? 1.8 : 1.2), digits * 0.62 * g.E + 3);
+// (critic lf-ops r1 D-MP-2: boxes were 6.9 mm for a 1-digit answer and 10.6 mm for a 2-digit one - SL-1 wants 14 mm,
+// SL-2 one width a section, or the width gives the answer's size away. Every box takes the widest answer's width, two
+// digits at least, never under SLOT_MIN_MM.)
+const SLOT_MIN_MM = { S: 14, M: 14, L: 17 };
+const boxW = (g, digits) => Math.max(SLOT_MIN_MM[g.size] || 14, g.writeMm * 1.8, Math.max(2, digits) * 0.62 * g.E + 3);
 const SIGN_MM = (g) => 0.9 * g.E;   // a sign and its spaces
 
 /** One fact line: parts are numbers/signs (strings) or {id, digits} slots. */
@@ -202,6 +206,10 @@ export function turnAnswerKey(p) {
 export function turnFootprint(p, ctx) {
     const g = geo(ctx);
     const geom = geometry(g, p);
+    // (critic lf-ops r1 D-MP-3, GRID-EVEN at L - a row of 2, then one full-width 5 x 4 pair - is NOT fixed here: every pair
+    // full width at L broke the detailed lesson g3-oa5's practice grid (E12, E24b); a known finding for the next round)
+    // (not `inPlace`: held to its content the pair left a 18-22 % strip under the detailed lesson's practice grid - E9b - and
+    // the height grouping moved its edge case off the last row - E24b; D-MP-1's bands stay a known finding)
     return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures || p.type === 'split' ? 2 : 3 };
 }
 

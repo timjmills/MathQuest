@@ -550,8 +550,96 @@ function opsTablesLessons() {
             // (an array and its turn, two a row: one cell width per section - print-lint GRID-EVEN, LONE)
             practiceShapes: [[8, 2], [6, 2], [4, 2], [2, 2]],
             mixWith: [{ key: 'multiplication:arrays_groups', opts: { forms: [0] } }, { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }],
+            // (lane lf-ops critic r1 D-MP-7 / D-MP-8 / D-MP-12: the lesson for each property it can deal - `forms` - has its own
+            // concepts, vocabulary, steps (the provider's worked steps, sheet/providers/multiplication.js mpSteps) and Rule;
+            // the order-property data above is forms [0]. lessonFor(cat, skill, opts) merges the entry the opts pick.)
+            byOption: {
+                forms: {
+                    1: {
+                        concepts: [
+                            { id: 'parts', text: 'An array can be broken into two parts.' },
+                            { id: 'each-part', text: 'Multiply each part.' },
+                            { id: 'add', text: 'Add the two parts: that is the whole array.' },
+                        ],
+                        vocab: [
+                            { word: 'array', meaning: 'equal rows of dots', picture: { kind: 'text', text: '6 rows of 2' } },
+                            { word: 'part', meaning: 'some of the rows', picture: { kind: 'text', text: '3 rows of 2' } },
+                            { word: 'whole', meaning: 'both parts together', picture: { kind: 'text', text: '6 + 6 = 12' } },
+                        ],
+                        steps: [
+                            { icon: 'look', text: 'Look at the two parts.' },
+                            { icon: 'write', text: 'Multiply the top part.' },
+                            { icon: 'write', text: 'Multiply the bottom part.' },
+                            { icon: 'check', text: 'Add the parts. Write the whole.' },
+                        ],
+                        chant: 'Break it, multiply, add!',
+                        format: { kind: 'numbered steps with icons + a rule', why: 'The step pupils drop is the second part (MU-M7): the rule names all three moves.' },
+                        example: { match: 'Look at the parts' },
+                        // (critic r1 D-MP-7: one split array and THREE facts is taller than a half-page panel - 131 mm in a
+                        // 106 mm panel at L, the facts over the Say band: each panel a full-width row, two states)
+                        chartWide: true, chartRow: true, chartStates: 2,
+                    },
+                    unit: {
+                        concepts: [
+                            { id: 'one', text: 'Times 1: one group of the number, or the number of groups of 1.' },
+                            { id: 'same', text: 'Times 1 keeps the number the same.' },
+                            { id: 'zero', text: 'Times 0: no groups, or groups of nothing. The product is 0.' },
+                        ],
+                        vocab: [
+                            { word: 'times 1', meaning: 'one group', picture: { kind: 'text', text: '1 × 7 = 7' } },
+                            { word: 'times 0', meaning: 'no groups', picture: { kind: 'text', text: '0 × 7 = 0' } },
+                            { word: 'product', meaning: 'the answer of a times fact', picture: { kind: 'text', text: '7 × 1 = 7' } },
+                        ],
+                        steps: [
+                            { icon: 'look', text: 'Read the fact.' },
+                            { icon: 'decide', text: 'Find the 1 or the 0.' },
+                            { icon: 'check', text: 'Times 1: the other number. Times 0: zero.' },
+                            { icon: 'write', text: 'Write the product.' },
+                        ],
+                        chant: 'Times 1, the same. Times 0, zero!',
+                        format: { kind: 'numbered steps with icons + a rule', why: 'Pupils add 1 (MU-M5) or keep the number for times 0 (MU-M4): the rule says both.' },
+                        example: { match: 'Read the fact' },
+                        // (a times 1 / times 0 fact is one short line: the practice page holds a full page of them)
+                        practiceShapes: [[24, 3], [18, 3], [12, 3], [8, 2]],
+                        guidedRows: 3,
+                    },
+                    // several properties on one page (forms [0..3]): the page's own title (strings 'other') and a rule
+                    // that names none of them in particular
+                    mixed: {
+                        concepts: [
+                            { id: 'same-product', text: 'Turning an array keeps the product.' },
+                            { id: 'parts', text: 'An array broken into parts: add the parts.' },
+                            { id: 'one-zero', text: 'Times 1 keeps the number; times 0 makes 0.' },
+                        ],
+                        vocab: [
+                            { word: 'turn', meaning: 'the rows become the columns', picture: { kind: 'text', text: '3 × 4 → 4 × 3' } },
+                            { word: 'part', meaning: 'some of the rows', picture: { kind: 'text', text: '2 rows of 4' } },
+                            { word: 'product', meaning: 'the answer of a times fact', picture: { kind: 'text', text: '1 × 4 = 4' } },
+                        ],
+                        chant: 'Look first: turn it, break it, or times 1 or 0?',
+                    },
+                },
+            },
         },
     };
+}
+
+/** The lesson entry an option set picks (`byOption`, lane lf-ops critic r1): {forms: {1: {...}, unit: {...}}} - a set
+ *  option holding ONE value takes that value's entry; forms 2 and 3 (times 1, times 0) alone or together take `unit`;
+ *  any other mix takes `mixed`. */
+function optionLesson(data, opts) {
+    if (!data || !data.byOption || !opts) return data;
+    let out = data;
+    for (const [id, table] of Object.entries(data.byOption)) {
+        let v = opts[id];
+        if (v === undefined || v === null) continue;
+        const list = Array.isArray(v) ? [...new Set(v.map(String))] : [String(v)];
+        const hit = list.length === 1 && table[list[0]] ? table[list[0]]
+            : table.unit && list.length && list.every((x) => x === '2' || x === '3') ? table.unit
+                : list.length > 1 && table.mixed ? table.mixed : null;
+        if (hit) out = Object.assign({}, out, hit);
+    }
+    return out;
 }
 
 function skipCountLessons() {
@@ -607,8 +695,9 @@ function skipCountLessons() {
 }
 
 /** The lesson data of a skill, or null (a skill with no authored lesson yet). */
-export function lessonFor(categoryId, skillId) {
-    return LESSONS[`${categoryId}:${skillId}`] || null;
+export function lessonFor(categoryId, skillId, opts = null) {
+    const d = LESSONS[`${categoryId}:${skillId}`] || null;
+    return d && d.byOption ? optionLesson(d, opts) : d;
 }
 
 /** `{categoryId, skillId, opts?}` of a 'category:skill' key. */

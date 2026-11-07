@@ -1,0 +1,210 @@
+// tests/lib/ws-cell-checks.cjs - the in-page cell checks of lane lf-ops critic r1 (build #4, 2026-11-07), shared by
+// tests/scripts/ws-cell-checks.cjs (the fast gate: buildSheet -> sheetDocument -> these checks, every card role and
+// option value) and tests/scripts/ws-grade-render.cjs --gate (the same findings on the critic's renders).
+//
+// `cellChecksInPage(opts)` runs IN the printed sheet document (page.evaluate) and returns
+//   { problems: [...overflow, as ws-grade-render sheetCheck], findings: [{rule, page, cell, msg}], cells: [{page, tmpl, inkH, h}] }
+// The finding rules (critic-r1.md "Automatic checks"):
+//   BAND      check 1  band-anywhere H13: the largest empty horizontal band ANYWHERE in a picture cell (over the first ink,
+//                      between two inks - the picture-to-slot gap - or under the last ink), measured on ink, >= 30 % of the
+//                      cell's height (RUBRIC H13; D-MP-1, D-AG-1, D-CB-3/4/5). Picture templates only (BAND_TEMPLATES).
+//   SLOT      check 3  a stand-alone answer box of a picture template narrower than 14 mm (SL-1; D-MP-2, D-AG-7, D-CB-7/8), and
+//                      on arrays / arrays-turn two box widths in one page's cells of one template (SL-2: a box's width gives the
+//                      answer's size away; D-MP-2).
+//   TAGINK    check 9  an item tag (A / B / C on an error-analysis fix, .mq-slottag) whose ink meets the slot's own content
+//                      (H2, CL-40; D-MP-5, D-AG-3).
+//   KEYJOIN   check 8  (keys) one answer slot written with two joined answers ("15, 15") (H1; D-MP-6).
+//   GRIDEVEN  check 6  a practice page (independent / more-practice / test) whose cells of one template stand at two widths
+//                      (a row of 2, then a full-width cell: GRID-EVEN, PG-12; D-MP-3).
+// Exempt everywhere: anchor / model cells ([data-ws-anchor], .mq-anchorgrid), the label tabs, hidden ink.
+// Pure in-page code: the function is serialised whole, so it uses nothing from outside its body.
+
+/* eslint-disable no-var */
+function cellChecksInPage(opts) {
+    opts = opts || {};
+    var PX = 96 / 25.4;
+    var mm = function (px) { return Math.round((px / PX) * 10) / 10; };
+    var BAND_T = ['arrays', 'arrays-turn', 'count-row'];
+    var SLOT_T = ['arrays', 'arrays-turn', 'count-row'];
+    var UNIFORM_T = ['arrays', 'arrays-turn'];
+    var bandFloor = Number(opts.bandFloor) || 0.3;
+    var role = opts.role || '';
+    var isKey = !!opts.key;
+    var out = { problems: [], findings: [], cells: [] };
+    var LABEL = '[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab';
+    var shownEl = function (el) {
+        for (var e = el; e && e.nodeType === 1; e = e.parentElement) {
+            var s = getComputedStyle(e);
+            if (s.display === 'none' || s.visibility === 'hidden' || Number(s.opacity) === 0) return false;
+        }
+        return true;
+    };
+    var rectsOfText = function (root, skip) {
+        var o = [];
+        var tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        for (var n = tw.nextNode(); n; n = tw.nextNode()) {
+            if (!n.nodeValue.trim()) continue;
+            var p = n.parentElement;
+            if (!p || (skip && p.closest(skip)) || !shownEl(p)) continue;
+            var rg = document.createRange();
+            rg.selectNodeContents(n);
+            var rs = rg.getClientRects();
+            for (var i = 0; i < rs.length; i++) if (rs[i].width > 0 && rs[i].height > 0) o.push(rs[i]);
+        }
+        return o;
+    };
+    var inkRects = function (cell) {
+        var o = rectsOfText(cell, LABEL);
+        cell.querySelectorAll('svg').forEach(function (svg) {
+            if (svg.closest(LABEL) || !shownEl(svg)) return;
+            var shapes = svg.querySelectorAll('circle, ellipse, rect, path, line, polyline, polygon, text, use, image');
+            if (!shapes.length) { var r0 = svg.getBoundingClientRect(); if (r0.width && r0.height) o.push(r0); return; }
+            shapes.forEach(function (sh) {
+                var cs = getComputedStyle(sh);
+                if (cs.visibility === 'hidden' || cs.display === 'none') return;
+                if ((sh.getAttribute('fill') === 'none' || cs.fill === 'none') && (cs.stroke === 'none' || !sh.getAttribute('stroke') && cs.stroke === 'none')) return;
+                var r = sh.getBoundingClientRect();
+                if (r.width > 0 || r.height > 0) o.push(r);
+            });
+        });
+        cell.querySelectorAll('*').forEach(function (el) {
+            if (el instanceof SVGElement || el.closest(LABEL)) return;
+            var cs = getComputedStyle(el);
+            var b = ['Top', 'Bottom', 'Left', 'Right'].filter(function (k) { return parseFloat(cs['border' + k + 'Width']) > 0 && cs['border' + k + 'Style'] !== 'none'; });
+            if (!b.length || !shownEl(el)) return;
+            var r = el.getBoundingClientRect();
+            if (r.width > 0 && r.height > 0) o.push(r);
+        });
+        return o;
+    };
+    var pages = Array.prototype.slice.call(document.querySelectorAll('.ws-page'));
+    pages.forEach(function (pg, pi) {
+        var P = pi + 1;
+        // ---- overflow (as ws-grade-render sheetCheck)
+        if (pg.scrollHeight > pg.clientHeight + 1 || pg.scrollWidth > pg.clientWidth + 1) out.problems.push('page ' + P + ': content overflows the sheet');
+        var body = pg.querySelector('.ws-body');
+        if (body && body.scrollHeight > body.clientHeight + 1) out.problems.push('page ' + P + ': the body overflows by ' + mm(body.scrollHeight - body.clientHeight) + ' mm');
+        var pr = pg.getBoundingClientRect();
+        var cells = Array.prototype.slice.call(pg.querySelectorAll('[data-ws-cell]'));
+        cells.forEach(function (c, k) {
+            var cr = c.getBoundingClientRect();
+            if (c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1) out.problems.push('page ' + P + ' cell ' + (k + 1) + ': content overflows its cell');
+            var els = c.querySelectorAll('*');
+            for (var i = 0; i < els.length; i++) {
+                var r = els[i].getBoundingClientRect();
+                if (!r.width && !r.height) continue;
+                if (r.right > cr.right + 1 || r.bottom > cr.bottom + 1 || r.left < cr.left - 1) { out.problems.push('page ' + P + ' cell ' + (k + 1) + ': <' + els[i].tagName.toLowerCase() + '> leaves the cell'); break; }
+                if (r.left < pr.left - 1 || r.right > pr.right + 1) { out.problems.push('page ' + P + ' cell ' + (k + 1) + ': <' + els[i].tagName.toLowerCase() + '> leaves the page'); break; }
+            }
+        });
+        var problemCells = cells.filter(function (c) {
+            if (c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]') || c.hasAttribute('data-ws-anchor')) return false;
+            // a cell inside another cell (a Reason It panel, an error-analysis mat) is judged by its host
+            var up = c.parentElement && c.parentElement.closest('[data-ws-cell]');
+            return !up;
+        });
+        var tmplOf = function (c) {
+            var t = c.getAttribute('data-ws-cell') || '';
+            var inner = c.querySelector('[data-ws-cell]');
+            return inner ? inner.getAttribute('data-ws-cell') || t : t;
+        };
+        var uniform = {};
+        problemCells.forEach(function (c) {
+            var cr = c.getBoundingClientRect();
+            var cs = getComputedStyle(c);
+            var tmpl = tmplOf(c);
+            var lab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > [data-ws-label]');
+            var no = lab ? (lab.textContent || '').trim() : '?';
+            var top = cr.top + (parseFloat(cs.borderTopWidth) || 0), bot = cr.bottom - (parseFloat(cs.borderBottomWidth) || 0);
+            var H = bot - top;
+            var ink = inkRects(c).filter(function (r) { return r.bottom > top && r.top < bot; });
+            var inkH = 0;
+            if (ink.length) {
+                var iv = ink.map(function (r) { return [Math.max(r.top, top), Math.min(r.bottom, bot)]; }).sort(function (a, b) { return a[0] - b[0]; });
+                inkH = iv[iv.length - 1][1] - iv[0][0];
+                var gap = 0, where = '';
+                if (iv[0][0] - top > gap) { gap = iv[0][0] - top; where = 'over the first ink'; }
+                var end = iv[0][1];
+                for (var j = 1; j < iv.length; j++) {
+                    if (iv[j][0] - end > gap) { gap = iv[j][0] - end; where = 'between two inks (picture and answer)'; }
+                    end = Math.max(end, iv[j][1]);
+                }
+                if (bot - end > gap) { gap = bot - end; where = 'under the last ink'; }
+                if (!isKey && BAND_T.indexOf(tmpl) >= 0 && H > 12 * PX && gap >= bandFloor * H) {
+                    out.findings.push({ rule: 'BAND', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ' (' + tmpl + '): an empty band ' + mm(gap) + ' mm ' + where + ' in a ' + mm(H) + ' mm cell (' + Math.round((gap / H) * 100) + ' %, band-anywhere H13, critic lf-ops r1 check 1)' });
+                }
+            }
+            out.cells.push({ page: P, tmpl: tmpl, inkH: mm(inkH), h: mm(H), w: mm(cr.width) });
+            // ---- SLOT: stand-alone answer boxes of the picture templates
+            if (!isKey && SLOT_T.indexOf(tmpl) >= 0) {
+                c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
+                    var ss = getComputedStyle(s);
+                    var boxed = ['Top', 'Bottom', 'Left', 'Right'].every(function (k2) { return parseFloat(ss['border' + k2 + 'Width']) > 0 && ss['border' + k2 + 'Style'] !== 'none'; });
+                    var shaped = s.closest('.k2-shape');
+                    if (!boxed && !shaped) return;
+                    if (!shownEl(s)) return;
+                    // a finished solution shown to be judged (True or False?, Reason It, Error analysis) is not a writing place
+                    if (s.closest('.mq-judge-work, .mq-abbox, .mq-checkline, .mq-abchoice')) return;
+                    var r = (shaped || s).getBoundingClientRect();
+                    var w = r.width;
+                    if (w < 13.9 * PX) out.findings.push({ rule: 'SLOT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ' (' + tmpl + '): answer box ' + mm(w) + ' mm wide, under 14 mm (SL-1, critic lf-ops r1 check 3)' });
+                    if (UNIFORM_T.indexOf(tmpl) >= 0) (uniform[tmpl] = uniform[tmpl] || []).push({ w: w, no: no });
+                });
+            }
+            // ---- TAGINK: an item tag over its slot's own content
+            c.querySelectorAll('.mq-slottag, [data-ws-tag]').forEach(function (t) {
+                if (!shownEl(t)) return;
+                var host = t.parentElement && (t.parentElement.closest('[data-ws-tagged], [data-ws-slot]'));
+                if (!host) return;
+                var tr = t.getBoundingClientRect();
+                var hits = rectsOfText(host, '.mq-slottag, [data-ws-tag]').filter(function (r) {
+                    var ix = Math.min(r.right, tr.right) - Math.max(r.left, tr.left), iy = Math.min(r.bottom, tr.bottom) - Math.max(r.top, tr.top);
+                    return ix > 0.3 * PX && iy > 0.3 * PX;
+                });
+                if (hits.length) out.findings.push({ rule: 'TAGINK', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the tag "' + (t.textContent || '').trim() + '" prints over the answer in its box (H2, CL-40, critic lf-ops r1 check 9)' });
+            });
+            // ---- KEYJOIN: one slot, two answers
+            if (isKey) {
+                c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
+                    if (s.querySelector('[data-ws-slot]')) return;
+                    var txt = rectsOfText(s, '.mq-slottag').length ? (s.textContent || '') : '';
+                    if (/\d\s*,\s+\d/.test(txt)) out.findings.push({ rule: 'KEYJOIN', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the key writes "' + txt.trim().slice(0, 24) + '" into ONE answer slot (H1: one answer a slot, critic lf-ops r1 check 8)' });
+                });
+            }
+        });
+        // ---- SLOT uniform: one box width a page for each picture template (SL-2)
+        Object.keys(uniform).forEach(function (t) {
+            var ws = uniform[t].map(function (x) { return x.w; });
+            var lo = Math.min.apply(null, ws), hi = Math.max.apply(null, ws);
+            if (hi - lo > 0.6 * PX) out.findings.push({ rule: 'SLOT', page: P, cell: '*', msg: 'page ' + P + ' (' + t + '): answer boxes ' + mm(lo) + ' to ' + mm(hi) + ' mm wide on one page: one box width a section (SL-2: a width gives the answer size away, critic lf-ops r1 check 3)' });
+        });
+        // ---- GRIDEVEN on the practice pages
+        if (!isKey && /^(independent|more-practice|test)$/.test(role)) {
+            var byT = {};
+            problemCells.forEach(function (c) { var t = tmplOf(c); var w = Math.round(c.getBoundingClientRect().width / PX); (byT[t] = byT[t] || {})[w] = ((byT[t] || {})[w] || 0) + 1; });
+            Object.keys(byT).forEach(function (t) {
+                var ws = Object.keys(byT[t]).map(Number).sort(function (a, b) { return a - b; });
+                if (ws.length > 1 && ws[ws.length - 1] - ws[0] > 2) out.findings.push({ rule: 'GRIDEVEN', page: P, cell: '*', msg: 'page ' + P + ' (' + t + '): cells at ' + ws.map(function (w) { return w + ' mm (' + byT[t][w] + ')'; }).join(', ') + ': one column count a section (GRID-EVEN, PG-12, critic lf-ops r1 check 6)' });
+            });
+        }
+    });
+    return out;
+}
+
+/** Cross-size rule (check 4, L1 "Size S ignored", D-AG-2): a practice role whose S page places the same count in the same
+ *  columns as M while its drawings measure smaller at S. `runs` = [{role, size, perPage, cols, cells: [{tmpl, inkH}]}]. */
+function sizeSFindings(runs) {
+    const out = [];
+    const med = (a) => { const s = a.slice().sort((x, y) => x - y); return s.length ? s[Math.floor((s.length - 1) / 2)] : 0; };
+    const PIC = new Set(['arrays', 'arrays-turn']);
+    for (const r of runs.filter((x) => x.size === 'S' && /^(independent|more-practice|test)$/.test(x.role))) {
+        const m = runs.find((x) => x.size === 'M' && x.role === r.role && x.optsKey === r.optsKey && x.skill === r.skill);
+        if (!m || !r.perPage || r.perPage !== m.perPage || r.cols !== m.cols) continue;
+        const pick = (x) => x.cells.filter((c) => PIC.has(c.tmpl)).map((c) => c.inkH);
+        const s = med(pick(r)), mm = med(pick(m));
+        if (s > 0 && mm > 0 && s < 0.92 * mm) out.push({ rule: 'SIZE-S', msg: `${r.skill} ${r.role}${r.optsKey ? ' ' + r.optsKey : ''}: S places ${r.perPage} in ${r.cols} column(s) as M does, with drawings ${s} mm against ${mm} mm tall: S only adds white space (L1, DN-1a, critic lf-ops r1 check 4)` });
+    }
+    return out;
+}
+
+module.exports = { cellChecksInPage, sizeSFindings };

@@ -2356,6 +2356,9 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const body = p.footRect[1] - (p.padT || 0);
                 const used = p.gridBottom - p.gridTop;
                 if (body > 0 && used < body / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx}: its problems fill ${Math.round((used / body) * 100)}% of the page body, under a third: the rows were not rebalanced across the sheet's pages (PG-23)`, 'orphan last page');
+                // (lane lf-ops critic r1 D-MP-13 / D-AG-8, check 5: a SECTIONS sheet - two skills, each its own section - printed
+                // its last page with 2 items and 55 % empty; a sheet of sections is rebalanced to at least half its last page)
+                else if (body > 0 && arg('kind', 'single') === 'sections' && used < body / 2) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} of a sections sheet: its problems fill ${Math.round((used / body) * 100)}% of the page body, under half: rebalance the sections across the pages (PG-23, critic lf-ops r1 check 5)`, 'half-empty last page of a sections sheet');
             }
             // L-DENSITY SPREAD (wave 1 lane D, critic 2026-10-03, RUBRIC C3): rows stretched to share a
             // page read as padding when the page holds few problems. With the count on Auto, the

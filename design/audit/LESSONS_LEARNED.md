@@ -224,3 +224,11 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
 A check that two clamped cards show different strings passed "Subtract within 1,000,000 (N…" beside "Subtract within 1,000,000…".
 Rule: the first word where two names differ must be visible WHOLE on both. Check: ws-student-explorer QSVISIBLE (diff word), at
 every common width including 1024x768 and 360x740.
+
+### Process rule (lead, 2026-11-07, lessons-first): a template's FIRST family has no sibling to compare
+`ws-sibling-compare` cannot pass for the first family on a template (no approved sibling in
+`tests/fixtures/precritic/siblings.json`). Rule: its NO-SIBLING matrix rows are recorded SKIPPED with the reason
+"first family on template; critic grades the named pages", the lane lists those pages in the critic brief and the critic
+grades them by eye; when the critic passes the family, its skills are added to `siblings.json` as approved siblings, so the
+second family on the template is machine-compared. Applied to pv (lf-placevalue) and arrays / arrays-turn (lf-ops).
+A card that offers every §7a option and has no `notOffered` entry reads card-not-offered as N/A, not a failure.
