@@ -649,7 +649,7 @@ Each runs as `node tests/scripts/<script> …`.
 1. **Screen response for Match 3: type the letter in each box (built), or tap A / B / C under each word?** Recommended: Type the letter (built): it is the paper response itself; a tap row can come later without changing paper. (Owner: as suggested, 2026-11-07.)
 2. **Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in round order?** Recommended: Yes, round 2's BUILD lessons next (7 lessons), the same picture rules. (Owner: as suggested, 2026-11-07.)
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-07
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
