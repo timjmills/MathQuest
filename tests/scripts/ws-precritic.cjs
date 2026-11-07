@@ -786,6 +786,12 @@ function buildPlan(ctx) {
         // VQ-ONEANSWER, VQ-LIVE, VQ-TITLE, VQ-NOLEGACY (node, seeded); pins in tests/fixtures/precritic/vq-baseline.json
         // (shrink-only). A pinned finding is PASS (baseline); any other finding, or a skill missing from the output, is FAIL.
         add(gate('visual-quality', 'ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell)', scope, 'node', 'ws-visual-quality', ['--skill', keys.join(',')], { parse: PARSE.visualQuality, keys, expect: { mention: keys } }));
+        // ---- lane lf-vocab (2026-11-07; design/cards/vocabulary): the picture vocabulary rules V1-V7 (every word drawn, one
+        // right answer an item, no word twice on a page, every lesson set splits into two clash-free trios) whenever a picture
+        // vocabulary skill is in scope. Default parse: its last "ws-vocab-unit: OK|FAIL" line and its exit code.
+        if (keys.some((k) => /^vocabulary:vocab_(grade_pictures|pick3_words)$/.test(k))) {
+            add(gate('vocab-unit', 'ws-vocab-unit (picture vocabulary: every word drawn, one right answer, no word twice on a page, sets split into trios)', scope, 'node', 'ws-vocab-unit', []));
+        }
         const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
         add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
         // W0-B2 (lane S1): the spec card that covers these skills is signed, its rulings / notOffered / decisions are as

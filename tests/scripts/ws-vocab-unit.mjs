@@ -2,6 +2,7 @@
 // design/cards/vocabulary/vocabulary.md). Node only (the app's generator through ws-card-rulings loadApp).
 //
 //   node tests/scripts/ws-vocab-unit.mjs            # prints ws-vocab-unit: OK | FAIL
+//   node tests/scripts/ws-vocab-unit.mjs --fixture tests/fixtures/precritic/vocab-sets.fail.mjs   # the data rules on a fixture
 //
 // V1  every word of every lesson set has a library picture, a meaning (<= 8 words) and only known notWith words
 // V2  every picture's alt text never contains its own word (a screen reader would give the answer away, L-LEAK)
@@ -22,8 +23,19 @@ const imp = (p) => import(pathToFileURL(path.join(ROOT, p)).href);
 const fails = [];
 const fail = (m) => fails.push(m);
 
-const W = await imp('js/modules/sheet/lesson-pages/vocab-words.js');
+// --fixture <file.mjs>: check a fixture's {VOCAB_WORDS, VOCAB_SETS} (the data rules V1, V6, V7 only; the backtest rows in
+// tests/fixtures/precritic/backtests.json), with the library's pictures and compatible() rule.
+const fxAt = process.argv.indexOf('--fixture');
+const FIXTURE = fxAt > 0 ? process.argv[fxAt + 1] : null;
+const W0 = await imp('js/modules/sheet/lesson-pages/vocab-words.js');
 const P = await imp('js/modules/sheet/graphics/vocab-pictures.js');
+let W = W0;
+if (FIXTURE) {
+    const fx = await import(pathToFileURL(path.resolve(FIXTURE)).href);
+    const words = fx.VOCAB_WORDS || W0.VOCAB_WORDS;
+    const compatible = (ws) => { for (const a of ws) for (const b of ws) if (a !== b && ((words[a] || {}).notWith || []).includes(b)) return false; return true; };
+    W = { VOCAB_WORDS: words, VOCAB_SETS: fx.VOCAB_SETS, compatible, VOCAB_GRADES: [], gradeWords: () => [] };
+}
 
 // V1, V2, V6
 for (const s of W.VOCAB_SETS) {
@@ -46,6 +58,12 @@ for (const s of W.VOCAB_SETS) {
 for (const [w, e] of Object.entries(W.VOCAB_WORDS)) for (const n of e.notWith) if (!W.VOCAB_WORDS[n]) fail(`V1 "${w}": notWith "${n}" is not a word`);
 for (const w of P.VOCAB_PICTURE_IDS) if (new RegExp(`\\b${w}\\b`, 'i').test(P.vocabPictureAlt(w))) fail(`V2 "${w}": its alt text names the word`);
 
+if (FIXTURE) {
+    console.log(`ws-vocab-unit: fixture ${path.basename(FIXTURE)}, ${W.VOCAB_SETS.length} lesson sets (data rules V1, V6, V7)`);
+    for (const f of fails.slice(0, 40)) console.log(`  - ${f}`);
+    console.log(`ws-vocab-unit: ${fails.length ? `FAIL (${fails.length})` : 'OK'}`);
+    process.exit(fails.length ? 1 : 0);
+}
 // V3-V5 through the app's generator
 const { loadApp } = await imp('tests/scripts/ws-card-rulings.mjs');
 const app = await loadApp(ROOT);
