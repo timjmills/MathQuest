@@ -57,7 +57,12 @@ export const RADIUS = {
 
 // Helper: get a soft fill from a base color
 export function softFill(hex) {
-    return hex + COLORS.softAlphaSuffix;
+    const c = String(hex);
+    if (/^#[0-9a-f]{6}$/i.test(c)) return c + COLORS.softAlphaSuffix;
+    // A CSS colour that is not a 6-digit hex (svg-geometry passes `var(--mq-purple, #1e88e5)`): appending "2E" made an
+    // invalid fill that SVG paints solid black (explorer thumbnails r1 D5). The same 18 % wash, as a colour-mix.
+    const pct = Math.round((parseInt(COLORS.softAlphaSuffix, 16) / 255) * 100);
+    return `color-mix(in srgb, ${c} ${pct}%, transparent)`;
 }
 
 // Helper: pick a category color by index (cycles)

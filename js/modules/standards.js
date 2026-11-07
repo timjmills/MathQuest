@@ -214,7 +214,7 @@ export const SKILL_STANDARDS = {
     'multiplication:count_by_tables': { ccss: ['3.OA.C.7', '3.OA.D.9'], ee: ['M.EE.3.OA.8'] }, // Skip counting: count by 1–12 (3.OA.7 prep: skip-counting the tables)
 
     // ---- division
-    'division:div_facts': { ccss: ['3.OA.C.7'], ee: ['M.EE.3.OA.6'] }, // Division Facts (1-12)
+    'division:div_facts': { ccss: ['3.OA.C.7'], ee: ['M.EE.3.OA.6'] }, // Division Facts (÷1 to ÷12)
     'division:divide': { ccss: ['3.OA.C.7', '4.NBT.B.6'], ee: ['M.EE.3.OA.6'] }, // Basic Division
     'division:div_remainders': { ccss: ['4.NBT.B.6'], ee: [] }, // Division with Remainders (Visual)
     'division:div_word_problems': { ccss: ['3.OA.A.3', '3.OA.A.2'], ee: ['M.EE.3.OA.2', 'M.EE.5.NBT.6', 'M.EE.6.NS.2'] }, // Division Word Problems

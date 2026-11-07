@@ -35,7 +35,7 @@ import { fineSplit } from '../../js/modules/sheet/roles/practice.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, getProvider } from '../../js/modules/sheet/index.js';
 import { stack, regroupWorking } from '../../js/modules/sheet/cells/stack.js';
 import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
-import { factRowsLayout, FIT_CLEAR_MM, plan as factRowsPlan } from '../../js/modules/sheet/roles/fact-rows.js';
+import { factRowsLayout, FIT_CLEAR_MM, AUTO_DIV_ROOM_MM, plan as factRowsPlan } from '../../js/modules/sheet/roles/fact-rows.js';
 import { compactArc, compactGutterEm } from '../../js/modules/sheet/cells/long-division.js';
 import { LIVE_W_MM } from '../../js/modules/sheet/roles/compose.js';
 import { EM_MM as KIT_EM_MM, FACT_TRACK_EM as KIT_FACT_TRACK_EM, FACT_OP_TRACK_EM as KIT_FACT_OP_TRACK_EM } from '../../js/modules/sheet/index.js';
@@ -787,9 +787,12 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     const pic = (pool, sk, i) => Object.assign(stackQ(3 + i, 2), { skillId: 'number_line_add', printFormat: 'number-line-visual' });
     ok(typeof hostPlan('fact-rows', [ADD_SKILL], pic).unsupported === 'string', 'PT-CMP-2: Fact rows refuse a number-line skill, with a reason');
     ok(typeof hostPlan('fact-probe', [ADD_SKILL], storyMake).unsupported === 'string', 'PT-CMP-2: the Fact probe refuses a story skill');
-    const fr = hostPlan('fact-rows', [FACT_SKILL], (pool, sk, i) => factQ(2 + (i % 11), 3), { h: 30 });
+    // (facts-print-fix r5 TITLEONE: "Multiply by 3" only when the skill's option fixes the 3 - its constant set is [3])
+    const fr = hostPlan('fact-rows', [Object.assign({}, FACT_SKILL, { opts: { constant: [3] } })], (pool, sk, i) => factQ(2 + (i % 11), 3), { h: 30 });
     eq(fr.plan.pages[0].sections.find((s) => s.kind === 'grid').cols, 5, 'PT-FRW-2: Fact rows Auto 5 columns at L');
     eq(fr.plan.header.title, 'Multiply by 3', 'HD-13: the fact stub title');
+    const frAny = hostPlan('fact-rows', [FACT_SKILL], (pool, sk, i) => factQ(2 + (i % 11), 3), { h: 30 });
+    eq(frAny.plan.header.title, 'Multiplication facts', 'TITLEONE (r5): facts that only happen to share a 3 keep the generic title');
     eq(fr.plan.ctx.look, 'daily', 'PAGE_TYPES appendix 4: Fact rows default to the Daily look');
     // Critic round 2: a TRUE fact-row page - every cell the fact template, filled to table 4.1.
     ok(fr.plan.meta.items >= 25, `PT 4.1: Fact rows at L hold 25 facts (${fr.plan.meta.items})`);
@@ -816,11 +819,13 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     const many = (f) => Array.from({ length: 20 }, (_, i) => f(i));
     const S = (items, extra = {}) => factRowsLayout(items, Object.assign({ skills: [], ctx: { size: 'S' } }, extra));
     const addF = many((i) => fq(9, 2 + (i % 8), '+', 11 + (i % 8)));
-    eq(S(addF).cols, 10, 'R1 / PT-FRW-2: add_facts at S keep Auto 10 columns');
+    // (facts-print-fix r3, owner rule 2026-11-05: "Columns: Auto = 9; 10 only if the owner picks it" - PT-FRW-2 Auto 9 / 6 / 5)
+    eq(S(addF).cols, 9, 'R1 / PT-FRW-2: add_facts at S take Auto 9 columns (owner rule 2026-11-05)');
     eq(S(addF, { columns: 10 }).cols, 10, 'R1: an explicit 10 columns on add_facts at S is kept');
-    eq(S(many(() => fq(18, 9, '-', 9))).cols, 10, 'R1 / PT-FRW-2: sub_facts at S keep Auto 10 columns');
+    eq(S(many(() => fq(18, 9, '-', 9))).cols, 9, 'R1 / PT-FRW-2: sub_facts at S take Auto 9 columns (owner rule 2026-11-05)');
     eq(S(many(() => fq(12, 12, '×', 144))).cols, 8, 'R1 / PT-FRW-5: mult_facts at S print 8 columns');
-    eq(S(many(() => fq(87, 35, '-', 52))).cols, 10, 'R1: sub_100_no_regroup at S keeps 10 columns');
+    eq(S(many(() => fq(87, 35, '-', 52))).cols, 9, 'R1: sub_100_no_regroup at S keeps the Auto 9 columns');
+    eq(S(many(() => fq(87, 35, '-', 52)), { columns: 10 }).cols, 10, 'R1: sub_100_no_regroup at S keeps an explicit 10 columns');
     eq(S(many(() => fq(876, 345, '-', 531))).cols, 8, 'R1: sub_1k_no_regroup at S keeps 8 columns');
     const f1 = S(many(() => fq(8765, 4321, '-', 4444)));
     const inner = cellWidthMm(f1.cols, LIVE_W_MM, 'daily').inner;
@@ -843,7 +848,15 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
     for (const form of ['standard', 'vertical', 'long', 'fraction', 'mix']) {
         for (const size of ['S', 'M', 'L']) {
             for (const columns of ['auto', 5, 6, 8, 10]) {
-                const want = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
+                // facts-print-fix (owner 2026-11-05: 3-digit dividends "crowd the box" at 10): at AUTO a stacked ÷ page
+                // whose dividends reach 3 digits takes the most columns with 2 mm of white each side - 9 at S; an asked
+                // 10 still prints 10 (PT-FRW-9), and the bracket / fraction rows keep their own 10
+                const stackedAuto = columns === 'auto' && /^(standard|vertical)$/.test(form);
+                // owner ruling 2026-11-05 ("If division is included don't make 10 columns an option, just 9"): every ÷ page at most 9
+                // (facts-print-fix r6 D-R6-5: a bracket section of its own keeps 2 mm a side for "12)144" - 8 columns where 9 cannot,
+                // the layout's note saying so)
+                const want0 = Math.min(9, columns === 'auto' ? { S: stackedAuto ? 9 : 10, M: 6, L: 5 }[size] : columns);
+                const want = form === 'long' && want0 === 9 ? 8 : want0;
                 const L = factRowsLayout(set(form), { skills: [], ctx: { size }, columns });
                 const tag = `PT-FRW-9 div_facts ${form} ${size} columns ${columns}`;
                 eq(L.cols, want, `${tag}: ${want} columns`);
@@ -852,6 +865,7 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
                 // the stacked ÷: the rule spans the 0.62 em ÷ track and three 0.72 em digit tracks
                 const ink = L.row ? L.row.inkMm : (0.62 + L.tracks * KIT_FACT_TRACK_EM) * em(L.digitPt);
                 ok(ink + FIT_CLEAR_MM <= inner + 1e-6, `${tag}: ink ${ink.toFixed(2)} mm + ${FIT_CLEAR_MM} mm fits the ${inner.toFixed(2)} mm cell`);
+                if (stackedAuto) ok((inner - ink) / 2 >= AUTO_DIV_ROOM_MM - 1e-6, `${tag}: ${((inner - ink) / 2).toFixed(2)} mm of white each side >= ${AUTO_DIV_ROOM_MM} (AUTO room)`);
                 // (critic r1 R1-2: whole rows, no short last row - the dealer's blocks of three keep thirds within one)
                 eq(L.perPage, L.cols * L.rows, `${tag}: whole rows (${L.perPage} a page)`);
                 ok(!L.across, `${tag}: never the 3-column across page`);
@@ -893,7 +907,8 @@ eq(hostPlan('true-false', [ADD_SKILL], addMake).plan.header.title, 'True or Fals
         for (const size of ['S', 'M', 'L']) {
             for (const columns of ['auto', 5, 6, 8, 10]) {
                 const asked = columns === 'auto' ? { S: 10, M: 6, L: 5 }[size] : columns;
-                const want = big ? Math.min(asked, 8) : asked;
+                // (every set here holds ÷ facts: at most 9, owner ruling 2026-11-05)
+                const want = Math.min(big ? Math.min(asked, 8) : asked, 9);
                 const L = factRowsLayout(items, { skills: [], ctx: { size }, columns });
                 const tag = `owner 2026-10-31 mixed facts ${name} ${size} columns ${columns}`;
                 eq(L.cols, want, `${tag}: ${want} columns`);

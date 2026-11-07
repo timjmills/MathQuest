@@ -824,7 +824,7 @@ export const SKILLS = {
         { v: "count_by_12s", l: "Count by 12s", presetOf: "count_by_tables" },
     ],
     division: [
-        { v: "div_facts", l: "Division Facts (1-12)" },
+        { v: "div_facts", l: "Division Facts (÷1 to ÷12)" },
         { v: "divide", l: "Basic Division" },
         { v: "div_remainders", l: "Division with Remainders (Visual)" },
         { v: "div_word_problems", l: "Division Word Problems" },
