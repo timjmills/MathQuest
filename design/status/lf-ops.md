@@ -12,7 +12,8 @@ Critic rounds: 0, none
 - 2026-11-07 owner scope (via lead): BUILD lessons only, no owner sign-off of cards. Re-aimed below ("Scope after the 2026-11-07 decision").
 - Cards: count-row and ops-tables have every 7a line and every 9 question DECIDED by the lane (recorded as "lane decision 2026-11-07"). `--check-signed` reports "needs owner signature (everything else green)". The lane did NOT write "Signed: owner" (it would misstate who signed); the lead decides how the card gate reads a lane decision (question to the lead below).
 - div_facts F1-F4 are lane decisions recorded here, NOT written into the owner-signed facts card (that card stays as the owner signed it on 2026-10-31).
-- Step 2 running: R4 machine checks (builder sub-agent); precritic on the scope skills.
+- Step 2 done: six R4 checks in ws-print-lint (225eb3e), each FAILS on head; 7 backtest rows (pass commit TBD until the fix). Precritic red list below.
+- BLOCKED for this session: recording F1-F4 on the owner-signed facts card (the session's permission check refuses edits to that card); the owner or lead adds them and re-signs. The div_facts aid fixes wait for it.
 
 ## Scope after the 2026-11-07 decision (BUILD lessons, earliest rounds first)
 Operations skills used by BUILD lessons that are not at 8/10 (design/lessons-first/queue.json, kind "build"):
@@ -31,6 +32,20 @@ Priority order (lead, 2026-11-07, from data/curriculum/ccss-build-lessons.json, 
 7. #3 Patterns on the multiplication table (3.OA.D.9 / C.7): mult_chart (count_by_tables shared with #4)
 Then: mult_comparison + comparison_statements (#22), remainder_interpret.
 - Already at 8/10 and left alone: mult_facts, add_facts, sub_facts (and add_wp_20 as marked in the queue).
+
+## Precritic before any fix (step 2; run on 6d015f2-era tree before the cards were signed; log scratchpad precritic-0.txt)
+Red rows, with cause where known:
+- print-lint independent S / M / L: a few counts above the pin in 2 of 7 skills (to triage per skill in the build rounds).
+- print-lint --roles lesson S / L: 24-25 findings in 5 of 7; lesson pages not pinned for count_by_tables, mult_chart, mult_properties, ... (no real lesson data yet: ops-tables Q3).
+- div_facts single-support and all-supports print-lint at S: 13-39 findings (the R4-1..R4-5 defects, now caught by the new checks of 225eb3e).
+- ws-grade-render --gate: 36 overflow, 5 small targets in 7 units.
+- ws-sibling-compare: 150 rows with no sibling measured (count-row card ruling (a): SKIPPED-owner until its skills pass).
+- ws-phone-card: FOCUS x 6.
+- ws-card-rulings --check offered: wpCues / wpBank still offered on the two plain story skills while the signed card hides them (fix in skill-options, as family-check did).
+- ws-dealer-uniform: mult_word_problems_plain (24), div_word_problems_plain (20).
+- ws-node-lint LESSON-DATA etc: 7 found, all pinned (exit 1 unexplained; recheck).
+- ws-options-verify --render: 25 value pages worse than the default (count_by_tables onePage / jumps=15 / shapes at S: count-row card ruling (b) accepts fewer rows if H13 holds).
+- ws-spec-card: was unsigned at the time; signed since (7f06c72).
 
 ## Owner go
 
