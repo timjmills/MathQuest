@@ -2903,6 +2903,8 @@ async function buildSheetOnce(req = {}) {
  * naming the page's own digit size alone.
  */
 function touchFitLine(line, html, size) {
+    // (critic r5 R5-7: a ÷ fact's touch support is a tally row that carries no ws-tn, and the fact prints at L's digits)
+    if (size !== 'L' && !/ws-tn/.test(html || '') && /data-ws-support-on="touch"/.test(html || '')) return line.replace(/Digits (\d+) pt\./, (m, pt) => `Digits ${pt} pt; touch-dot facts ${SIZES.L.digitPt} pt.`);
     if (size === 'L' || !/ws-tn/.test(html || '')) return line;
     const stack = /class="ws-stack/.test(html), fact = /class="ws-fact/.test(html);
     const what = stack && fact ? 'touch-dot cells 24-28 pt' : stack ? 'touch-dot cells 28 pt' : 'touch-dot facts 24 pt or more';
