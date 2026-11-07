@@ -109,3 +109,16 @@ Times: builder day-1 cards + merge, start 2026-11-07T00:00Z, end —, profile mq
 ## Log
 - 2026-11-07: owner scope decision received (BUILD only, no sign-off); re-aimed to round-1 BUILD skills (adds mult_comparison, remainder_interpret; drops tables_links, div_by_itself, mult_three); cards decided by the lane, left unsigned pending the lead's gate ruling.
 - 2026-11-07: lane started; skip-count fix merged; count-row and ops-tables cards drafted; owner sheet sent to the lead.
+
+## Build #7 two-step word problems (3.OA.D.8): div_facts R4 aids + plain x / ÷ stories (2026-11-07, builder mq-opus-medium)
+- div_facts R4-1..R4-5 to facts card F1-F4: ÷ supported rows at the Test's 1.05 room (touch S/M 3 x 5); skip strip to the band's top
+  multiple in two lines (dc67f40); true array (quotient rows of the divisor) in one frame a section, offered only to dividends <= 50
+  (panel greys "Dot array" with the reason, fits line names each fact; d08bcc7, 5342758); sign box under a ÷ fact whose line cannot
+  stand beside it (no lone full-width row, Test L 3 x 4); faded packet dealt as one-page stages all -> light -> none, rows per page,
+  later stages <= 2 x the first page (f2d1e8d); all-supports page: the dropped array is no alternative, split shares the touch size,
+  clash rows foot-aligned (1b8580f). Every R4 check green on each support alone S/M/L x independent/more-practice/test/review
+  (--seed render) and the fade packet M; backtest rows pass f2d1e8d (skip-strip-reach-lf, fade-order-lf confirmed).
+- Plain stories: wpCues / wpBank hidden (4 skills, card 7a); story numbers freshDeal (dealer-uniform OK); structure-first Model
+  (groups named, no key words) + Say frame; lesson data (4 steps, 2-panel chart); lesson print-lint S/M/L 0 findings.
+- Check change for the lead: ws-options-verify tries a panel-locked set value in the context where it is offered (`valueBase`,
+  div_facts array with the 2-4 tables), compared with that context's default.
