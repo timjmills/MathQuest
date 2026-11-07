@@ -30,6 +30,7 @@ import * as weDo from './we-do.js';
 import * as practice from './practice.js';
 import * as mixed from './mixed.js';
 import * as common from './common.js';
+import { VOCAB_PAGE_PART } from './vocab-pages.js';
 
 export { chart, vocab, warmUp, weDo, practice, mixed, common };
 
@@ -73,6 +74,8 @@ registerLessonPart({ id: 'chart', order: 10, role: 'lesson', name: 'Anchor chart
 registerLessonPart({ id: 'sheet', order: 20, role: 'lesson', name: 'Lesson', sheet: 'lesson-sheet', offset: 0 });
 registerLessonPart({ id: 'practice', order: 30, role: 'independent', name: 'Practice', sheet: 'lesson-practice', offset: 7919, inPacket: (n) => n.practicePages > 0 });
 registerLessonPart({ id: 'mixed', order: 40, role: 'mixed-practice', name: 'Mixed', sheet: 'lesson-mixed', offset: 15838, inPacket: (n) => !!n.mixed });
+// The vocabulary page that opens a lesson (lane lf-vocab, the vocabulary redesign): only a lesson whose record names a `vocabSet`.
+registerLessonPart(VOCAB_PAGE_PART);
 
 /* ======================================================================= the sheet bands */
 
