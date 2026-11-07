@@ -210,7 +210,7 @@ Each runs as `node tests/scripts/<script> …`.
 
 (none)
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-07
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
