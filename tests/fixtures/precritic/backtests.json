@@ -1530,6 +1530,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vq-some-legacy-lf",
+   "check": "Every sampled item of a skill draws a kit cell: a half-migrated skill (some items kit, some legacy HTML) fails (lane lf-ops build, mult_properties: times 1 / times 0 / break-apart items printed coloured legacy HTML beside the kit's order items)",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-NOLEGACY some-legacy",
+   "browser": false,
+   "fail": {
+    "commit": "61946c8",
+    "state": "lf-ops head before the build: mult_properties forms 1-3 legacy (coloured 'Identity Property' / green-orange split array), form 0 on arrays-turn"
+   },
+   "pass": {
+    "commit": "fe48418",
+    "state": "lf-ops build: forms 1-3 on arrays-turn (split) and equation, black and white"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --skill multiplication:mult_properties",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
