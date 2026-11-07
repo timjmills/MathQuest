@@ -92,7 +92,7 @@ register(PICK3_TEMPLATE, {
         const picW = beside ? Math.max(34, Math.min(pick3PicW(p), 76 - 3 - Math.max(bankMm, lineW))) : pick3PicW(p);
         // the picture fills a box as tall as before and as wide as the cell allows, so a flat picture (the ten rod, a line of
         // digits) prints large (r3, rule 5: critic r2 #2 - the ten rod 3.4 mm tall in a 90 mm cell; ws-vocab-unit V9)
-        const box = twin ? { wMm: picW } : beside ? { wMm: Math.max(picW, 76 - 3 - Math.max(bankMm, lineW)), hMm: 24 } : { wMm: 76, hMm: picW * 2 / 3 };
+        const box = twin ? { wMm: picW } : beside ? { wMm: Math.max(picW, 76 - 3 - Math.max(bankMm, lineW)), hMm: 24 } : { wMm: 72, hMm: picW * 2 / 3 };   // (76 stuck out 0.4 mm at S: precritic r4)
         const pic = vocabPictureSVG(ctx, p.word, Object.assign(box, { minPx: twin ? 220 : 0 }));
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
         const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}`;

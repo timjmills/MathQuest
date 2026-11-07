@@ -288,7 +288,7 @@ const PICS = {
     },
     sequence: {
         alt: '5, 10, 15 and so on, numbers in order with commas',
-        draw: () => tx(30, 20, 0, '5, 10, 15, …', { size: 9 }),
+        draw: () => tx(30, 20, 0, '5, 10, 15…', { size: 9 }),
     },
     cycle: {
         alt: 'four numbers 2, 4, 8, 6 in a ring of arrows going round and back to the start',
@@ -320,13 +320,13 @@ const PICS = {
     },
     'first term': {
         alt: '3, 7, 11: the 3 at the start in a heavy box',
-        draw: () => rect(3, 11, 13, 18, W.heavy) + tx(9.5, 20, 0, '3', { size: 9 }) + tx(17, 20, 0, ', 7, 11, …', { size: 9, anchor: 'start' }),
+        draw: () => rect(3, 11, 13, 18, W.heavy) + tx(9.5, 20, 0, '3', { size: 9 }) + tx(17, 20, 0, ', 7, 11…', { size: 9, anchor: 'start' }),
     },
     /* ---- Grade 4: multiplicative comparison (4.OA.A.1) */
     'times as many': {
         alt: 'a short bar of one part and a bar three times as long, of three equal parts',
         draw: () => rect(6, 7, 14, 10, W.part) + [0, 1, 2].map((i) => rect(6 + i * 14, 23, 14, 10, W.part)).join('')
-            + `<path d="M6 36 V37.5 H48 V36" fill="none" stroke="#000" stroke-width="${W.heavy}" ${NS}/>` + tx(54.5, 28, 0, '×3', { size: 8 }),
+            + `<path d="M6 36 V37.5 H48 V36" fill="none" stroke="#000" stroke-width="${W.heavy}" ${NS}/>` + tx(54.5, 28, 0, '×3', { size: 8.5 }),
     },
     compare: {
         alt: 'a long bar over a short bar, a double arrow from the end of the short bar to the end of the long one',
@@ -376,7 +376,7 @@ export const vocabPictureAlt = (id) => (hasVocabPicture(id) ? PICS[id].alt : '')
 
 /**
  * The extent of a picture's marks on the canvas, {x, y, w, h} in canvas units (strokes, dot radii and text boxes
- * included; text at 0.56 em a character). The picture is drawn CROPPED to it (r3, rule 5: a flat picture - the ten
+ * included; text at 0.62 em a character). The picture is drawn CROPPED to it (r3, rule 5: a flat picture - the ten
  * rod, one line of digits - used 13-20 % of the 60 x 40 canvas height, so it printed 3.4 mm tall: critic r1 #13, r2 #2).
  */
 const EXTENT = new Map();
@@ -400,9 +400,10 @@ export function vocabPictureExtent(id) {
         }
     }
     for (const [, t, txt] of body.matchAll(/<text ([^>]*)>([^<]*)<\/text>/g)) {
-        const sz = num(t, 'font-size'), w = txt.replace(/&[a-z#0-9]+;/g, 'x').length * 0.56 * sz;
+        const sz = num(t, 'font-size'), w = txt.replace(/&[a-z#0-9]+;/g, 'x').length * 0.62 * sz;   // (0.62 em: Andika bold, so a text never runs past its box - precritic r4 PG-12)
         const k = /text-anchor="start"/.test(t) ? 0 : /text-anchor="end"/.test(t) ? 1 : 0.5;
-        add(num(t, 'x') - k * w, num(t, 'y') - sz / 2); add(num(t, 'x') + (1 - k) * w, num(t, 'y') + sz / 2);
+        // (the text's line box, 1.25 em tall, as a browser measures it - a 26-unit "7" ran 1.7 mm out of its cell: precritic r4)
+        add(num(t, 'x') - k * w, num(t, 'y') - sz * 0.625); add(num(t, 'x') + (1 - k) * w, num(t, 'y') + sz * 0.625);
     }
     const pad = 1;   // the stroke's half-width and the arc bulge
     const e = Number.isFinite(b.x0) ? { x: b.x0 - pad, y: b.y0 - pad, w: b.x1 - b.x0 + 2 * pad, h: b.y1 - b.y0 + 2 * pad } : { x: 0, y: 0, w: PIC_CANVAS.w, h: PIC_CANVAS.h };

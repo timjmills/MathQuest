@@ -34,7 +34,7 @@ export const MATCH3_PIC_W = Object.freeze({ S: 38, M: 40, L: 40 });
  * of the page) and wider, so a flat picture (the ten rod, a number track, one line of digits) is drawn larger (r3, rule 5:
  * grade 1 strips at 11 pt, the ten rod's 3.5 mm units - critic r1 #13 / #17, r2 #2 / #10; ws-vocab-unit V9).
  */
-export const MATCH3_PIC_BOX = Object.freeze({ S: [46, 25.4], M: [48, 26.7], L: [48, 26.7] });
+export const MATCH3_PIC_BOX = Object.freeze({ S: [43, 25.4], M: [45, 26.7], L: [45, 26.7] });   // (46 / 48 stuck out of the cell by 2.4-2.6 mm: precritic r4 slot-clip)
 
 /** The letters, in word-row order: the key. */
 export const match3Letters = (p) => (p.order || [0, 1, 2]).map((i) => LET[i]);
@@ -66,8 +66,13 @@ register(MATCH3_TEMPLATE, {
             return `<span class="mq-vm-word" style="display:inline-flex;align-items:center;gap:${L(ctx, 2.5)};flex:${twin ? '0 0 auto' : '1 1 0'};white-space:nowrap;justify-content:center;min-width:0;">`
                 + `<b style="font-size:${P(ctx, tp + 3)};line-height:1.15;text-align:right;">${esc(words[wi])}</b>${boxHtml}</span>`;
         }).join('');
+        // (a practice page's cell keeps a quarter page's height, so a set of flat pictures - the growing-patterns set - still
+        // fills the page, 4 a page on A4 and on Letter: precritic r4 L-DENSITY, 37-41 % empty strip; a chart panel or a lesson
+        // band sets its own height)
+        const inChart = (ctx.chartZoom !== undefined && ctx.chartZoom !== null) || Number(ctx.scaffoldLevel) >= 2;
+        const fill = twin || inChart ? '' : 'min-height:44mm;height:100%;';
         return `<div class="mq-vm k2-cell" data-ws-vocab="match3"${twin ? ' data-mq-k2="1" data-mq-join=", "' : ''} style="color:${INK};${FONT}width:100%;box-sizing:border-box;`
-            + `display:flex;flex-direction:column;gap:${L(ctx, 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">`
+            + `display:flex;flex-direction:column;justify-content:space-evenly;${fill}gap:${L(ctx, 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">`
             + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};">${pics}</div>`
             + `<div class="mq-vm-words" style="display:flex;justify-content:space-around;align-items:center;gap:${L(ctx, 4)};flex-wrap:${twin ? 'wrap' : 'nowrap'};">${row}</div></div>`;
     },

@@ -53,11 +53,11 @@ export const VOCAB_WORDS = Object.freeze({
     'number name': { meaning: 'the number written in words', notWith: [] },
     'ones digit': { meaning: 'the digit in the ones place', notWith: ['digit'] },
     repeat: { meaning: 'the same part comes again', notWith: ['pattern', 'cycle'] },
-    sequence: { meaning: 'numbers in order, one after another', notWith: ['pattern', 'multiple', 'term', 'first term', 'grow'] },
+    sequence: { meaning: 'numbers in order, one after another', notWith: ['pattern', 'multiple', 'term', 'first term'] },
     cycle: { meaning: 'goes round and back to the start', notWith: ['repeat'] },
-    // (grow / sequence: critic r2 #3. grow / pattern would leave the growing-patterns set no clash-free split (V7): pattern
-    // and sequence already clash, so grow must share a trio with one of them)
-    grow: { meaning: 'gets bigger each time', notWith: ['sequence'] },
+    // (grow / sequence and grow / pattern (critic r2 #3) are NOT listed: pattern and sequence already clash, so the
+    // growing-patterns set would keep one clash-free split and print 2 Match 3 cells a page - precritic r4 options-render)
+    grow: { meaning: 'gets bigger each time', notWith: [] },
     term: { meaning: 'one number in a sequence', notWith: ['first term', 'sequence'] },
     'first term': { meaning: 'the number a sequence starts with', notWith: ['term', 'sequence'] },
     'times as many': { meaning: 'the same amount, again and again', notWith: ['compare'] },
