@@ -4502,6 +4502,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // at any column count), equal groups ringed in a subitisable pattern, and one box
                 // per blank, all keyed. The screen twin draws the same picture.
                 const _agPayload = { kind: questionType, rows, cols };
+                // (lane lf-ops: a page mixing arrays and ringed groups draws every picture in one picture box - H13-ROW)
+                if (!_p12Narrowed('forms') || _p12Narrowed('forms').length > 1) _agPayload.picBox = true;
                 q.cell = { template: 'arrays', v: 1, payload: _agPayload };
                 q.visual = _kitTwin('arrays', _agPayload);
                 q.printFormat = 'arrays-groups';

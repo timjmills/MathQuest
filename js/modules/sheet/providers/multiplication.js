@@ -364,6 +364,10 @@ const TURN_STRINGS = {
     }),
 };
 
+/** A fact never breaks after its sign: "3 × 4 = 12" joined with no-break spaces (print-lint WRAP-OP, lane lf-ops). */
+const nbFacts = (steps) => (Array.isArray(steps) ? steps.map((s) => (s && typeof s.text === 'string'
+    ? Object.assign({}, s, { text: s.text.replace(/(\d) ([×=+]) (?=\d)/g, '$1\u00a0$2\u00a0') }) : s)) : steps);
+
 registerSkill('multiplication:mult_properties', {
     strings: (ref = {}) => {
         const t = turnOf(ref && ref.q);
@@ -382,7 +386,12 @@ registerSkill('multiplication:mult_properties', {
         return TURN_STRINGS.other(ref);
     },
     misconceptions: ['turn-recount', 'turn-no-swap', 'turn-product-factor', 'split-drop-part', 'split-one-part', 'times-one', 'times-zero'],
-    workedSteps: (q) => {
+    workedSteps: (q) => nbFacts(mpSteps(q)),
+    wrongAnswer: (q) => mpWrong(q),
+    footprint: { kind: 'arrays-turn', factLike: false, maxCols: 2, measure: true },
+});
+
+function mpSteps(q) {
         const sp = splitOf(q);
         if (sp) {
             return [
@@ -426,8 +435,9 @@ registerSkill('multiplication:mult_properties', {
             // prints it as the line under its panels and the Steps list carries it)
             step(`Check: same product, ${P}. No recount.`),
         ];
-    },
-    wrongAnswer: (q) => {
+}
+
+function mpWrong(q) {
         const sp = splitOf(q);
         if (sp) {
             // MU-M7: the second part written as its rows alone (6 × 7 = (6 × 5) + 2), or the whole read as one part.
@@ -481,6 +491,4 @@ registerSkill('multiplication:mult_properties', {
             { value: recount, misconception: 'turn-recount', slot: 'answer', explain: `Worked it out again and got ${recount}. Turning a fact keeps the product: ${P}.` },
             { value: r + c, misconception: 'turn-product-factor', slot: 'answer', explain: `Added ${r} and ${c}. The product is ${P}.` },
         ]);
-    },
-    footprint: { kind: 'arrays-turn', factLike: false, maxCols: 2, measure: true },
-});
+}
