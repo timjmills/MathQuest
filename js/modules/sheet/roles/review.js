@@ -35,14 +35,26 @@ export const sources = (skills, { earlier }) => {
     if (prev.length) out.push({ id: 'earlier', skills: prev });
     return out;
 };
-export const measureCols = () => [1, 2, 3, 4];
+// (a section of supported problems at S is also measured at 5 columns: a narrow fact with its support under it may need
+// the fifth column to keep its side bands under 30 %, critic laned-restart r4 R4-2c, sectionFit)
+export const measureCols = (ctx) => (ctx && ctx.supported && ctx.size === 'S' ? [1, 2, 3, 4, 5] : [1, 2, 3, 4]);
 
 /** A section's columns and the height one of its rows needs (its own items, measured). */
 function sectionFit(items, ctx) {
     if (!items.length) return { cols: 1, h: 0 };
     const opts = [AUTO_COLS[ctx.size], 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= AUTO_COLS[ctx.size]);
-    const cols = bestCols(items, opts, ctx);
-    const h = hMinAt(items, cols, ctx);
+    let cols = bestCols(items, opts, ctx);
+    let h = hMinAt(items, cols, ctx);
+    // Critic laned-restart r4 R4-2c (div_facts array Review S printed 7, PT-REV-1): a supported problem stands its support
+    // BESIDE it in a wide cell and UNDER it in a narrow one, so more columns can hold FEWER problems a page. A section of
+    // supported problems takes the column count that holds the most problems per mm of height (cols / row height).
+    if (items.some((it) => it && it.supportsBox && it.supportsBox.plan)) {
+        for (const c of (ctx.size === 'S' ? [5, ...opts] : opts)) {
+            if (c === cols || !fitsAt(items, c, ctx) || (c > cols && !items.every((it) => it.measured && it.measured[c]))) continue;
+            const hc = hMinAt(items, c, ctx);
+            if (Number.isFinite(hc) && hc > 0 && Number.isFinite(h) && h > 0 && c / hc > cols / h + 1e-9) { cols = c; h = hc; }
+        }
+    }
     return { cols, h: Number.isFinite(h) ? h : 0 };
 }
 

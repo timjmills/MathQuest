@@ -3835,7 +3835,10 @@ async function buildRoleSheet(n, metaOf) {
         header.refBand = nline.html;
     }
     const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
-    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];
+    // (critic laned-restart r4 R4-2c: a role may measure one more column count for a section of supported problems -
+    // review.js - so the sheet says when any skill ticks a support)
+    const supported = n.sections.some((sec) => (sec.skills || []).some((sk) => sk && sk.opts && Array.isArray(sk.opts.support) && sk.opts.support.length));
+    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(Object.assign({}, ctx, { supported })) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
     const strictShow = n.role === 'error-analysis';
     const input = {

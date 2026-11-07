@@ -363,6 +363,8 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
             const pl = piece.foot.placements || ['beside', 'under'];
             place = placeOf(piece);
             if (pl.includes('beside') && problemWMm + PANE_GAP_MM + piece.foot.wMm <= cellWMm) place = 'beside';
+            // (facts card F2: the framed array beside a ÷ fact keeps the beside group's 2 mm inset clear of the cell's edge)
+            if (place === 'beside' && id === 'array' && s.arrayFrame && problemWMm + 5 + PANE_GAP_MM + piece.foot.wMm + 2.5 > cellWMm) place = 'under';
             // (a ÷ fact's footprint counts its answer line UNDER it - equation.js - but beside a picture in a full-width
             // cell the line stands beside the fact, so the line is counted too; the beside group's inset clears the tab)
             const lineW = template === 'equation' && opKey(p.op) === '/' ? blankWidth(Number(p.digits) || 2, ctx.size) : 0;
@@ -459,7 +461,8 @@ export function supportFootprint(fp, p, template, ctx = {}) {
     // (the practice roles split the picture-less facts into columns of their own).
     const s = supportsOf(p);
     const pp = panePayloadOf(p, template);
-    if (pp && pp.op === '/' && s && s.on.includes('array')) {
+    // (facts card F2: the true array in its section frame is a narrow column of dots - the generic measured cell below)
+    if (pp && pp.op === '/' && s && s.on.includes('array') && !s.arrayFrame) {
         const piece = pieceOf('array', p, template, { size: ctx.size, mode: 'print', metrics: null });
         // (hardCap: a measured cell's cap is otherwise the widest grid it measured as fitting - under the fact)
         if (piece && piece.foot) return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, hardCap: true,
