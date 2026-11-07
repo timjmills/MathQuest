@@ -108,6 +108,8 @@ export const factFillOfColumn = (cols, liveWMm = 186) => factWidthMm(cols) / (li
  *   think  the think box of a ÷ fact: b × [ ] = a
  * `px` > 0 draws it for a screen host at that many CSS px per mm; 0 is paper (mm).
  */
+/** WDS RP-81: the subitising gap after every 5th row and column of an array over 5 (mm). */
+const ARRAY_GAP_MM = 1.5;
 export function factCue(p, { px = 0 } = {}) {
     const kind = p && p.cue;
     if (!kind) return '';
@@ -203,9 +205,12 @@ export function factCue(p, { px = 0 } = {}) {
         // divisor's columns by the band's top rows), so every cell of the section has one geometry and one answer place.
         if (div && p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
             const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = 2.6, r = 0.98, pad = 0.8;
-            const w = fc * pitch + 2 * pad, h = fr * pitch + 2 * pad;
+            // WDS RP-81 (critic r5 R5-3): a 1.5 mm subitising gap after every 5th row and column of an array over 5
+            const gap = (n) => Math.floor(n / 5) * ARRAY_GAP_MM;
+            const span = (n) => n * pitch + (n > 5 ? gap(n - 1) : 0);
+            const w = span(fc) + 2 * pad, h = span(fr) + 2 * pad;
             let body = `<rect x="0.2" y="0.2" width="${f2(w - 0.4)}" height="${f2(h - 0.4)}" rx="1.2" fill="none" stroke="${INK}" stroke-width="0.3"/>`;
-            if (Number.isInteger(rows) && rows > 0) for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(pad + x * pitch + pitch / 2, pad + y * pitch + pitch / 2, r, false);
+            if (Number.isInteger(rows) && rows > 0) for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(pad + x * pitch + pitch / 2 + (fc > 5 ? gap(x) : 0), pad + y * pitch + pitch / 2 + (fr > 5 ? gap(y) : 0), r, false);
             return wrap(w, h, body, rows > 0 ? `array, ${rows} rows of ${cols}` : 'no dots');
         }
         if (!cols || !rows) return '';
