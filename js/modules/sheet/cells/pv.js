@@ -410,6 +410,14 @@ function unitBlanksHTML(ctx, p, keys, floor) {
     // (a cell drawn three or more across - Reason It's A / B panels - is narrower than any 3-place row: it wraps too)
     // (lf-placevalue r2: and the opener's half-width Model cell, `wrapToCell`, measured wrapped there)
     const narrow = Number(ctx.columns) >= 3 || !!ctx.wrapToCell;
+    // (lf-placevalue r2, value form=unit in a half-page lesson panel: "worth [how many] [place]" is 10 mm wider than the
+    // panel. A `oneLine` frame keeps its slots as ONE unit - the two answers never part - and only its lead word
+    // ("worth") may stand on the line above them when the row is wider than its cell)
+    if (p.oneLine && parts[0].trim() && units.length > 2) {
+        const slotsOnly = units.slice(1).join('');
+        return `<div class="ws-eq pv-frame pv-blanks pv-hw" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:1mm;column-gap:0.3em;">`
+            + `${units[0]}<span class="pv-slotgroup" style="${nb}column-gap:0.3em;">${slotsOnly}</span></div>`;
+    }
     const wrap = p.oneLine || (parts.length - 1 < 4 && !/×/.test(String(p.frame || '')) && !narrow) ? 'nowrap;white-space:nowrap' : 'wrap';
     return `<div class="ws-eq pv-frame pv-blanks pv-hw" style="font-weight:700;flex-wrap:${wrap};justify-content:center;row-gap:2mm;column-gap:0.3em;">${units.join('')}</div>`;
 }
