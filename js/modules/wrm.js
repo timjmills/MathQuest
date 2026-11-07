@@ -1177,6 +1177,7 @@ export const SKILL_WRM = {
     'patterns:notice_patterns': [{ step: 'Y4.B4.S6', partial: 'the patterns in the times-tables: even and odd products, the ones digits (not the 3, 6, 9 doubling link)' }],
     'patterns:growing_shape_patterns': [{ step: 'Y6.B7.S1', partial: 'the one-step rule of a growing pattern of shapes (term 4, term 10), not yet the rule in words for any term' }],
     'patterns:pattern_features': [{ step: 'Y5.B12.S9', partial: 'features of a sequence that its rule does not state (odd / even, the ones digits), with whole numbers, not decimals' }],
+    'patterns:follow_given_rule': [{ step: 'Y5.B12.S9', partial: 'extend a whole-number sequence from a given rule (add, subtract, double), not decimals' }],
 };
 
 export const WRM_PROPOSALS = {

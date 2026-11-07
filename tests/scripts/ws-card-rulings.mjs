@@ -127,6 +127,7 @@ export const PRED = {
     columnZero: (x) => String(x.ans).includes('0'),
     ansShorter: (x) => digitsOf(x.ans) < digitsOf(x.a),
 };
+// ==== lf-algebra r2 (2026-11-07) BEGIN: the payload / word-answer reader (fieldOf, needsRaw; rawItem below) ====
 /** A field of an item: "a" / "b" / "ans", or "payload.<dotted path>" read from the item's payload. */
 export function fieldOf(x, f) {
     if (!x) return undefined;
@@ -135,6 +136,7 @@ export function fieldOf(x, f) {
 }
 /** Does the ruling read a payload field or a word (then items are read whole: rawItem)? */
 export const needsRaw = (r) => /"payload\./.test(JSON.stringify(r || {})) || !!(r && r.when && r.when.is);
+// ==== lf-algebra r2 END (fieldOf, needsRaw) ====
 export function predicate(when) {
     if (typeof when === 'string') { if (!PRED[when]) throw new Error(`unknown predicate "${when}"`); return PRED[when]; }
     if (when && Array.isArray(when.eq)) { const [f, v] = when.eq; return (x) => fieldOf(x, f) === (typeof v === 'string' ? fieldOf(x, v) : v); }
@@ -147,6 +149,7 @@ export function predicate(when) {
 }
 export function itemPasses(r, x) {
     switch (r.assert) {
+        // (lf-algebra r2: range / digits / is read their field through fieldOf, so "payload.<path>" works)
         case 'range': { const v = fieldOf(x, r.of); return typeof v === 'number' && v >= r.min && v <= r.max; }
         case 'digits': {
             const d = digitsOf(fieldOf(x, r.of));
@@ -166,6 +169,7 @@ const fmtItem = (x) => (x && x.payload
     ? `[${x.payload.task || ''}${Array.isArray(x.payload.operands) ? ` ${x.payload.operands.join(', ')}` : ''}] → ${x.ans}`
     : `${x.a} ${x.op || '−'} ${x.b} = ${x.ans}${x.boxes != null ? ` [${x.boxes} boxes]` : ''}`);
 
+// ==== lf-algebra r2 BEGIN: rawItem ====
 /** An item read whole (a ruling on a payload field or a word): its operands where it has them, its payload, its answer
  *  as written (a number when it is one, else the word); null only when there is no item. */
 export function rawItem(q) {
@@ -175,6 +179,7 @@ export function rawItem(q) {
     const ans = /^\s*-?\d+(\.\d+)?\s*$/.test(one) ? Number(one) : String(q.ans);
     return Object.assign({}, base, { ans, payload: (q.cell && q.cell.payload) || {} });
 }
+// ==== lf-algebra r2 END: rawItem ====
 
 /** {a, b, ans, boxes, op} from a generated question, or null. */
 export function readItem(q, { listAns = false } = {}) {

@@ -7594,6 +7594,10 @@
     {
      "key": "patterns:pattern_features",
      "missing": "features of a whole-number sequence that its rule does not state (odd and even, the ones digits); no decimal sequences"
+    },
+    {
+     "key": "patterns:follow_given_rule",
+     "missing": "extending a whole-number sequence from a given rule (add, subtract, double); no decimal sequences"
     }
    ],
    "verdict": "gap",
@@ -9095,6 +9099,10 @@
     {
      "key": "patterns:pattern_features",
      "why": "what else a number pattern shows (odd and even, the ones digits): the same standard, 4.OA.C.5"
+    },
+    {
+     "key": "patterns:follow_given_rule",
+     "why": "generate the pattern from its given rule first (4.OA.C.5)"
     }
    ],
    "note": "Domain-test build lesson (W09, OA unit; intervention track W09, standard W10)."
@@ -9165,6 +9173,10 @@
       "patTask": "parity"
      },
      "why": "G3 Patterns on the multiplication table (the year before): even and odd products"
+    },
+    {
+     "key": "patterns:follow_given_rule",
+     "why": "write the numbers of a pattern from its rule before judging its features"
     }
    ],
    "preBuild": [],
@@ -9176,6 +9188,10 @@
     {
      "key": "patterns:growing_shape_patterns",
      "why": "a shape pattern grown by a rule: the same standard (4.OA.C.5), the next lesson in the unit"
+    },
+    {
+     "key": "patterns:follow_given_rule",
+     "why": "generate the pattern from its given rule first (4.OA.C.5)"
     }
    ],
    "note": "Awsaj supplement lesson in Y5.B3 (Multiplication and division A), W09."
@@ -9198,6 +9214,19 @@
     "power": false
    },
    "direct": [
+    {
+     "key": "patterns:follow_given_rule",
+     "opts": {
+      "pattern": [
+       "add",
+       "sub"
+      ],
+      "places": [
+       10,
+       100
+      ]
+     }
+    },
     {
      "key": "patterns:number_patterns_rule",
      "opts": {

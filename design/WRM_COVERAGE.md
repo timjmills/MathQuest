@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 150 (17%), gap 209 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 400 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 401 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -3288,6 +3288,7 @@ whatever happens to the WRM gaps.
   Vocabulary: efficient, strategy, adjust, compensate  
 - **Y5.B12.S9** Decimal sequences — PARTIAL. _4.OA.C.5, 5.NBT.B.7, M.EE.4.OA.5, M.EE.5.NBT.7_  
   Partial: Features of a Number Pattern: Odd, Even and Ones Digits (`patterns:pattern_features`), missing features of a sequence that its rule does not state (odd / even, the ones digits), with whole numbers, not decimals  
+  Partial: Follow a Given Rule: Extend a Number Pattern (`patterns:follow_given_rule`), missing extend a whole-number sequence from a given rule (add, subtract, double), not decimals  
   Proposal: Decimal Sequences  
   Vocabulary: sequence, term, rule, increasing, decreasing  
 - **Y5.B12.S10** Multiply by 10, 100 and 1,000 — covered. _4.NBT.A.1, 5.NBT.A.2, M.EE.5.NBT.2_  

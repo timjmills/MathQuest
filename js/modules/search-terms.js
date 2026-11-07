@@ -343,6 +343,7 @@ export const CONCEPT_RULES = [
     [/^patterns:notice_patterns$/, ['patterns', 'odd_even', 'times_tables']],
     [/^patterns:growing_shape_patterns$/, ['patterns']],
     [/^patterns:pattern_features$/, ['patterns', 'odd_even']],
+    [/^patterns:follow_given_rule$/, ['patterns']],
 ];
 
 /* ================================================================= hand-written terms */
@@ -649,6 +650,7 @@ export const SKILL_TERMS = {
     'patterns:notice_patterns': ['what do you notice', 'notice patterns', 'even or odd product', 'is the product even or odd', 'odd times odd', 'even times odd', 'patterns in the multiplication table', 'times table patterns', 'true or false times table', 'explain a pattern', '4 times a number is always even', 'ones digit pattern'],
     'patterns:growing_shape_patterns': ['growing pattern', 'growing patterns', 'growing shape pattern', 'shape pattern that grows', 'next term', 'draw the next term', 'term 4', 'term 10', 'dot pattern', 'square pattern', 'visual pattern', 'pattern rule add 2'],
     'patterns:pattern_features': ['pattern features', 'features of a pattern', 'emergent features', 'units digit cycle', 'ones digit repeats', 'odd even alternate', 'alternates odd and even', 'what else does the pattern show', 'start at 5 add 5'],
+    'patterns:follow_given_rule': ['follow a given rule', 'follow the rule', 'extend a number pattern', 'use the rule', 'given rule pattern', 'continue the pattern from the rule', 'start at 3 add 4', 'rule add each time', 'generate a number pattern', 'next numbers in the pattern'],
 };
 
 /* ================================================================= misspellings */

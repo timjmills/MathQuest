@@ -11,28 +11,28 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 - **n/a**: fact layouts apply to fact-like skills only.
 - **broken**: the generator threw or returned nothing in this run.
 
-## Totals (736 skills)
+## Totals (737 skills)
 
 | Role group | ready | basic | author | wrap | n/a | broken |
 |---|---|---|---|---|---|---|
-| Practice / review / test | 736 | 0 | 0 | 0 | 0 | 0 |
-| Answer key (every page) | 736 | 0 | 0 | 0 | 0 | 0 |
-| Opener / Model / Guided | 0 | 679 | 57 | 0 | 0 | 0 |
-| Error analysis / T-F / Reason It | 0 | 391 | 345 | 0 | 0 | 0 |
-| Sub-skill pages | 0 | 0 | 736 | 0 | 0 | 0 |
-| Stretch | 0 | 344 | 392 | 0 | 0 | 0 |
-| Word problems | 0 | 113 | 0 | 623 | 0 | 0 |
-| Fact layouts | 0 | 93 | 0 | 0 | 643 | 0 |
+| Practice / review / test | 737 | 0 | 0 | 0 | 0 | 0 |
+| Answer key (every page) | 737 | 0 | 0 | 0 | 0 | 0 |
+| Opener / Model / Guided | 0 | 680 | 57 | 0 | 0 | 0 |
+| Error analysis / T-F / Reason It | 0 | 394 | 343 | 0 | 0 | 0 |
+| Sub-skill pages | 0 | 0 | 737 | 0 | 0 | 0 |
+| Stretch | 0 | 340 | 397 | 0 | 0 | 0 |
+| Word problems | 0 | 112 | 0 | 625 | 0 | 0 |
+| Fact layouts | 0 | 93 | 0 | 0 | 644 | 0 |
 
 ## Design and content flags
 
 | Flag | Skills |
 |---|---|
 | Generator error or empty question | 0 |
-| Colour inside the question or its visual | 324 |
-| Emoji inside the question or its visual | 24 |
-| Multiple choice on screen (check print/screen parity) | 103 |
-| No print format set | 69 |
+| Colour inside the question or its visual | 323 |
+| Emoji inside the question or its visual | 25 |
+| Multiple choice on screen (check print/screen parity) | 104 |
+| No print format set | 71 |
 | No worked steps from either source | 43 |
 | No hint | 0 |
 | Low variety (fewer than half the samples distinct) | 45 |
@@ -42,14 +42,14 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 
 **Base pages** are open to every skill and need no tag: opener, scripted model, guided, independent, more practice, error analysis, review, test A/B, pre-skill check, daily spiral, mixed skill practice, Daily 4, True or False?, Reason It, stretch, steps card, anchor chart, blank template. **Every page of every skill also prints a facsimile answer key.**
 
-**Host layout** (exactly one per skill) is the practice grid the skill's cell naturally sits in. **Specialised pages** are offered only to skills that carry the tag. Tags are derived from behaviour, then corrected by the family reviews in `design/catalogue/*.overrides.json` (573 of 736 skills reviewed so far).
+**Host layout** (exactly one per skill) is the practice grid the skill's cell naturally sits in. **Specialised pages** are offered only to skills that carry the tag. Tags are derived from behaviour, then corrected by the family reviews in `design/catalogue/*.overrides.json` (573 of 737 skills reviewed so far).
 
 | Host layout | Skills |
 |---|---|
 | computation-grid | 71 |
 | equation-drill | 148 |
 | long-division | 6 |
-| visual-grid | 312 |
+| visual-grid | 313 |
 | k-counting | 13 |
 | chart-table | 84 |
 | word-problems | 95 |
@@ -58,7 +58,7 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 | Specialised page tag | Pages it unlocks | Skills |
 |---|---|---|
 | fact-layouts | fact rows 5-10 columns, fact fluency probe, practice strips, cumulative fact review | 69 |
-| fact-family | fact-family intro, warm-up, probe A-D | 14 |
+| fact-family | fact-family intro, warm-up, probe A-D | 15 |
 | flashcards | flashcards (hands-on) | 126 |
 | todays-number | Today's Number | 70 |
 | k-one-page | K one-page lesson (2 model / 2 guided / 2 alone) | 88 |
@@ -66,9 +66,9 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 | sub-notate | sub-skill: notate-only | 97 |
 | sub-setup | sub-skill: set-up (rewrite horizontal to vertical) | 74 |
 | schema-story | schema word problems v1 / v2 / two-step, keyword panel | 96 |
-| hands-sort | cut-and-glue sort | 89 |
-| hands-order | cut-and-order | 22 |
-| hands-match | match with a line | 79 |
+| hands-sort | cut-and-glue sort | 90 |
+| hands-order | cut-and-order | 23 |
+| hands-match | match with a line | 78 |
 | hands-find | find-and-colour | 16 |
 | hands-strips | layered place-value strips | 3 |
 
@@ -102,14 +102,14 @@ Readiness is measured against the role groups in `design/PAGE_TYPES.md` section 
 | data_analysis | 10 | 0 | 8 | 0 | 2 | 10 | 7 | 0 | 0 |
 | probability | 2 | 0 | 2 | 0 | 0 | 2 | 2 | 2 | 0 |
 | data_mixed | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 0 |
-| patterns | 19 | 0 | 11 | 1 | 2 | 19 | 2 | 2 | 2 |
-| algebra | 40 | 0 | 22 | 5 | 0 | 40 | 5 | 12 | 3 |
-| order_of_operations | 14 | 0 | 0 | 1 | 1 | 14 | 4 | 0 | 0 |
+| patterns | 20 | 0 | 11 | 1 | 2 | 20 | 2 | 2 | 2 |
+| algebra | 40 | 0 | 22 | 5 | 0 | 40 | 6 | 12 | 3 |
+| order_of_operations | 14 | 0 | 0 | 2 | 2 | 14 | 5 | 0 | 0 |
 | placevalue | 23 | 0 | 0 | 0 | 3 | 23 | 4 | 3 | 0 |
-| number_sense | 32 | 0 | 4 | 0 | 2 | 32 | 2 | 7 | 0 |
-| number_theory | 19 | 0 | 15 | 0 | 0 | 9 | 7 | 3 | 0 |
-| algebra_mixed | 7 | 0 | 5 | 2 | 4 | 5 | 6 | 0 | 0 |
-| all_mixed | 9 | 0 | 9 | 2 | 4 | 8 | 8 | 0 | 0 |
+| number_sense | 32 | 0 | 4 | 0 | 2 | 32 | 2 | 6 | 0 |
+| number_theory | 19 | 0 | 15 | 0 | 0 | 8 | 7 | 3 | 0 |
+| algebra_mixed | 7 | 0 | 5 | 2 | 4 | 6 | 6 | 0 | 0 |
+| all_mixed | 9 | 0 | 8 | 2 | 4 | 8 | 7 | 0 | 0 |
 | vocabulary | 50 | 0 | 50 | 0 | 50 | 50 | 50 | 0 | 0 |
 
 ## Every skill
@@ -792,6 +792,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `notice_patterns` What Do You Notice? Even and Odd Products, Pattern Features | 3 | medium | text | notice-pattern | ready | ready | basic | author | author | author | wrap | n/a | VD | visual-grid |  |
 | `growing_shape_patterns` Growing Shape Patterns: Draw and Count the Next Term | 4 | wide | number | growing-pattern | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems |  |
 | `pattern_features` Features of a Number Pattern: Odd, Even and Ones Digits | 4 | medium | text | notice-pattern | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid |  |
+| `follow_given_rule` Follow a Given Rule: Extend a Number Pattern | 4 | wide | text | count-row | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid |  |
 
 ### algebra
 
@@ -801,25 +802,25 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `tape_diagram_plain` Tape Diagrams (No Pictures) | 4 | spacious | number | word-plain | ready | ready | basic | basic | author | basic | wrap | n/a |  | word-problems (reviewed) | schema-story |
 | `multi_step_word` Multi-Step Word Problems (Visual) | 4 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems (reviewed) | sub-decide, schema-story |
 | `multi_step_word_plain` Multi-Step Word Problems (No Pictures) | 4 | spacious | number | story-work | ready | ready | basic | basic | author | basic | basic | n/a | V | word-problems (reviewed) | schema-story |
-| `solve_unknown` Solve for Unknown (x + 5 = 12) | 6 | standard | number | algebra-solve | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `solve_unknown` Solve for Unknown (x + 5 = 12) | 6 | standard | number, multi-select-check | algebra-solve, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
 | `balance_addsub` Balance Equations (7 + 5 = __ + 3) (MAP) | 3 | standard | number | word-problem | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | sub-decide |
-| `write_expression` Write Expressions from Words | 6 | standard | multi-select-check, text | multi-select, algebra-write | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) | hands-match |
-| `evaluate_expression` Evaluate Expressions (Easy) | 6 | standard | number, multi-select-check | algebra-evaluate, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
-| `evaluate_expression_hard` Evaluate Expressions (Multi-Step) | 6 | medium | multi-select-check, number | multi-select, algebra-evaluate | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `write_expression` Write Expressions from Words | 6 | standard | text, multi-select-check | algebra-write, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) | hands-match |
+| `evaluate_expression` Evaluate Expressions (Easy) | 6 | standard | multi-select-check, number | multi-select, algebra-evaluate | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `evaluate_expression_hard` Evaluate Expressions (Multi-Step) | 6 | medium | multi-select-check, number | multi-select, algebra-evaluate | ready | ready | basic | basic | author | basic | wrap | n/a | CEV | equation-drill (reviewed) |  |
 | `inequalities` Inequalities (>, <, ≥, ≤) | 6 | standard | dnd-generic, choice, number-line-extended | dnd-generic, algebra-inequality, number-line-extended | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
-| `combine_like_terms` Combine Like Terms | 6 | standard | number, text | standard | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, hands-sort |
+| `combine_like_terms` Combine Like Terms | 6 | standard | text, number | standard | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, hands-sort |
 | `distributive_expr` Distributive Property of Expressions | 6 | standard | text | standard | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide |
 | `function_table_easy` Function Tables - Easy (Visual) | 4 | wide | text | function-table | ready | ready | basic | author | author | author | wrap | n/a | V | chart-table (reviewed) | sub-decide |
 | `function_table_hard` Function Tables - Hard (Visual) | 5 | wide | text | function-table | ready | ready | basic | author | author | author | wrap | n/a | V | chart-table (reviewed) | sub-decide |
 | `algebra_word_mixed` Mixed Algebra Word Problems (Visual) | 4 | spacious | number | story-work, tape-diagram | ready | ready | basic | basic | author | basic | basic | n/a | CV | word-problems (reviewed) | schema-story |
-| `algebra_word_mixed_plain` Mixed Algebra Word Problems (No Pictures) | 4 | spacious | col-arith, number | word-plain | ready | ready | basic | basic | author | basic | wrap | n/a |  | word-problems (reviewed) |  |
+| `algebra_word_mixed_plain` Mixed Algebra Word Problems (No Pictures) | 4 | spacious | col-arith, number | word-plain | ready | ready | basic | basic | author | basic | basic | n/a |  | word-problems (reviewed) | schema-story |
 | `solve_eq_addsub` Solve One-Step Equations (+/−) | 5 | spacious | number, dnd-generic | algebra-solve, dnd-generic | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
-| `solve_eq_multdiv` Solve One-Step Equations (×/÷) | 5 | spacious | number | algebra-solve | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
+| `solve_eq_multdiv` Solve One-Step Equations (×/÷) | 5 | spacious | dnd-generic, number | dnd-generic, algebra-solve | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
 | `solve_eq_twostep` Solve Two-Step Equations | 6 | spacious | number | algebra-twostep | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) | sub-decide, sub-notate |
 | `write_equation` Write Equations from Words | 6 | spacious | text | algebra-write-eq | ready | ready | basic | author | author | author | wrap | n/a | CV | word-problems (reviewed) | hands-match |
 | `build_expr_addsub` Build the Expression: +/− | 3 | wide | build-expr | build-expr | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide, schema-story |
 | `build_expr_multdiv` Build the Expression: ×/÷ | 4 | wide | build-expr | build-expr | ready | ready | basic | author | author | author | basic | n/a |  | word-problems (reviewed) | sub-decide, schema-story |
-| `mixed_algebra` Mixed Algebra | M | standard | multi-select-check, number, text, build-expr | multi-select, tape-diagram, word-plain, standard, story-work, algebra-write-eq, function-table, build-expr | ready | ready | basic | author | author | author | basic | n/a | CV | equation-drill (reviewed) | schema-story |
+| `mixed_algebra` Mixed Algebra | M | standard | number, text, multi-select-check, dnd-generic, build-expr | tape-diagram, standard, function-table, multi-select, dnd-generic, build-expr | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
 | `solve_x_plus_a` Solve x + a = b | 6 | spacious | number | algebra-solve | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid |  |
 | `solve_x_minus_a` Solve x − a = b | 6 | spacious | number | algebra-solve | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid |  |
 | `solve_ax_eq_b` Solve ax = b | 6 | spacious | number | algebra-solve | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid |  |
@@ -842,9 +843,9 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `oop_easy` OoO Easy: Two Ops, No Parens | 4 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
-| `oop_medium` OoO Medium: Parentheses | 5 | medium | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
-| `oop_hard` OoO Hard: Brackets & Exponents | 6 | medium | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
+| `oop_easy` OoO Easy: Two Ops, No Parens | 4 | medium | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
+| `oop_medium` OoO Medium: Parentheses | 5 | medium | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
+| `oop_hard` OoO Hard: Brackets & Exponents | 6 | medium | number, multi-select-check | order-of-ops, multi-select | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `two_ops_no_paren` Level 1: Two Operations | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `three_ops_no_paren` Level 2: Three Operations | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-decide, sub-notate |
 | `multi_ops_no_paren` Level 3: Four to Six Operations | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-notate |
@@ -853,7 +854,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `nested_complex` Level 6: Complex Nested Brackets | 6 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-notate |
 | `exponents_simple` Level 7: Exponents | 6 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | sub-notate |
 | `compare_expressions` Compare Expressions (=, ≠, <, >) | 5 | medium | multiple-choice, dnd-generic | compare-expressions, dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | E | equation-drill (reviewed) | sub-notate |
-| `mixed_order_ops` Mixed Order of Operations | M | standard | number, multi-select-check, dnd-generic | order-of-ops, multi-select, dnd-generic | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) |  |
+| `mixed_order_ops` Mixed Order of Operations | M | standard | multi-select-check, number, dnd-generic, multiple-choice | multi-select, order-of-ops, dnd-generic, compare-expressions | ready | ready | basic | author | author | author | wrap | n/a | E | equation-drill (reviewed) |  |
 | `square_numbers` Square Numbers (5²) | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 | `cube_numbers` Cube Numbers (5³) | 5 | medium | number | order-of-ops | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill |  |
 
@@ -875,7 +876,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `combine` Standard Form | 2 | medium | number | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a | V | equation-drill (reviewed) | todays-number, hands-strips |
 | `order_least_to_greatest` Order: Least to Greatest | M | wide | interactive | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | todays-number, hands-order |
 | `order_greatest_to_least` Order: Greatest to Least | M | wide | interactive | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill (reviewed) | todays-number, hands-order |
-| `mixed_placevalue` Mixed Place Value | M | standard | number, multiple-choice, interactive | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
+| `mixed_placevalue` Mixed Place Value | M | standard | number, inline-blanks, interactive, multiple-choice | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
 | `unit_form` Unit Form (4 hundreds 7 tens 6 ones) | 2 | standard | inline-blanks | pv-cell | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill | todays-number |
 | `expanded_notation` Write Numbers in Expanded Notation | 4 | medium | inline-blanks | pv-cell | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill | todays-number |
 | `digit_value_unit_form` Value of a Digit in Unit Form (7 Hundreds) | 2 | compact | inline-blanks | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid | todays-number |
@@ -913,7 +914,7 @@ Columns: grade, print size class, answer types, print formats, then role readine
 | `make_a_ten` Make a Ten Strategy | 1 | medium | number, multiple-choice | make-a-ten | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | fact-layouts, flashcards, k-one-page |
 | `doubles_near_doubles` Doubles & Near Doubles | 1 | medium | number | doubles | ready | ready | basic | basic | author | basic | wrap | n/a | CV | visual-grid (reviewed) | fact-layouts, flashcards, k-one-page |
 | `compensation` Compensation Strategy | 2 | medium | number | compensation | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `mixed_number_sense` Mixed Rounding & Estimation | M | standard | inline-blanks, number, dnd-generic | pv-cell | ready | ready | basic | basic | author | basic | basic | n/a | V | equation-drill (reviewed) |  |
+| `mixed_number_sense` Mixed Rounding & Estimation | M | standard | number-line-extended, dnd-generic, inline-blanks, number | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | equation-drill (reviewed) |  |
 | `between_tens` Find the Two Tens a Number Is Between | 3 | compact | inline-blanks | pv-cell | ready | ready | basic | author | author | author | wrap | n/a |  | equation-drill | todays-number |
 | `place_on_number_line` Mark a Number on a Number Line | 2 | wide | number-line-extended | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a |  | equation-drill | todays-number |
 | `round_nl_thousands` Round on a Number Line: Thousands | 4 | wide | inline-blanks | pv-cell | ready | ready | basic | basic | author | basic | wrap | n/a | V | visual-grid | todays-number |
@@ -926,20 +927,20 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `prime_composite` Prime vs Composite | 4 | compact | dnd-generic, choice, multi-select-check, number | dnd-generic, nt-prime, multi-select, nt-prime-compare | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | flashcards, todays-number, hands-sort |
+| `prime_composite` Prime vs Composite | 4 | compact | dnd-generic, number, choice, multi-select-check | dnd-generic, nt-prime-compare, nt-prime, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | flashcards, todays-number, hands-sort |
 | `factors_identify` Identify Factors (Circle All) | 4 | medium | factor-pairs | factor-pairs | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) | todays-number, hands-find |
-| `factor_tchart_easy` Factor T-Chart - Easy (Visual) | 4 | medium | tchart-cells | nt-factor-tchart-medium | ready | ready | author | author | author | author | basic | n/a | CVD | chart-table (reviewed) |  |
+| `factor_tchart_easy` Factor T-Chart - Easy (Visual) | 4 | medium | tchart-cells | nt-factor-tchart-medium | ready | ready | author | author | author | author | basic | n/a | CV | chart-table (reviewed) |  |
 | `factor_tchart_medium` Factor T-Chart - Medium (Visual) | 4 | medium | tchart-cells | nt-factor-tchart-medium | ready | ready | author | author | author | author | basic | n/a | CV | chart-table (reviewed) |  |
 | `factor_tchart_hard` Factor T-Chart - Hard (Visual) | 4 | medium | tchart-cells | nt-factor-tchart-medium | ready | ready | author | author | author | author | basic | n/a | CV | chart-table (reviewed) |  |
-| `factor_links_easy` Factor Links - Easy (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `factor_links_medium` Factor Links - Medium (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CVD | visual-grid (reviewed) |  |
-| `factor_links_hard` Factor Links - Hard (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `multiples` Multiples of a Number | 4 | standard | multi-select-check, multi-select, text | multi-select, nt-multiples-identify, nt-multiples-fill | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | todays-number, hands-sort, hands-find |
-| `gcf_easy` Greatest Common Factor (Easy) | 6 | standard | number, multi-select-check | nt-gcf-easy, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `gcf_hard` Greatest Common Factor (Hard) | 6 | standard | number | nt-gcf-easy | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `lcm` Least Common Multiple | 6 | standard | multi-select-check, number | multi-select, nt-lcm | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `factor_links_easy` Factor Links - Easy (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CVD | visual-grid (reviewed) |  |
+| `factor_links_medium` Factor Links - Medium (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `factor_links_hard` Factor Links - Hard (Visual) | 4 | medium | factor-links | factor-links-medium | ready | ready | author | author | author | author | wrap | n/a | CVD | visual-grid (reviewed) |  |
+| `multiples` Multiples of a Number | 4 | standard | text, multi-select, multi-select-check | nt-multiples, nt-multiples-fill, nt-multiples-identify, multi-select | ready | ready | author | author | author | author | wrap | n/a | CV | equation-drill (reviewed) | todays-number, hands-sort, hands-find |
+| `gcf_easy` Greatest Common Factor (Easy) | 6 | standard | number | nt-gcf-easy | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `gcf_hard` Greatest Common Factor (Hard) | 6 | standard | multi-select-check, number | multi-select, nt-gcf-easy | ready | ready | basic | basic | author | basic | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `lcm` Least Common Multiple | 6 | standard | multi-select-check, number | multi-select, nt-lcm | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
 | `divisibility_sort` Divisibility Sort | 4 | medium | divisibility-sort | nt-divisibility-sort | ready | ready | author | author | author | author | wrap | n/a | CV | chart-table (reviewed) | todays-number, hands-sort |
-| `mixed_number_theory` Mixed Number Theory | M | standard | factor-links, tchart-cells, dnd-generic, multi-select-check, divisibility-sort, factor-pairs | factor-links-hard, nt-factor-tchart-hard, dnd-generic, factor-links-easy, multi-select, nt-divisibility-sort, nt-factor-tchart-easy, factor-pairs | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `mixed_number_theory` Mixed Number Theory | M | standard | factor-links, choice, tchart-cells, multi-select-check, number, text | factor-links-hard, nt-prime, nt-factor-tchart-easy, factor-links-medium, multi-select, factor-links-easy, nt-lcm, nt-multiples-fill, nt-factor-tchart-medium | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
 | `sort_prime_composite` Sort Numbers into Prime and Composite | 4 | compact | dnd-generic | dnd-generic | ready | ready | basic | author | author | author | wrap | n/a | VD | visual-grid | hands-sort |
 | `list_multiples` List the First Multiples of a Number | 4 | standard | text | nt-multiples | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid |  |
 | `missing_multiples` Fill In the Missing Multiples | 4 | standard | text | nt-multiples-fill | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid |  |
@@ -950,79 +951,79 @@ Columns: grade, print size class, answer types, print formats, then role readine
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `patterns_all` All Pattern Skills | M | standard | number, multiple-choice, text, grid-fill | (none), notice-pattern, grid-fill, growing-pattern, number-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) |  |
-| `algebra_all` All Algebra Skills | M | standard | number, text, multi-select-check, build-expr | algebra-solve, standard, multi-select, tape-diagram, algebra-evaluate, algebra-write, story-work, build-expr | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
-| `order_ops_all` All Order of Operations | M | standard | number, dnd-generic, multiple-choice | order-of-ops, dnd-generic, compare-expressions | ready | ready | basic | basic | author | basic | wrap | n/a | E | equation-drill (reviewed) |  |
-| `placevalue_all` All Place Value Skills | M | standard | inline-blanks, number, pv-build, multiple-choice, symbol | pv-cell, (none) | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
-| `number_sense_all` All Number Sense Skills | M | standard | inline-blanks, number-line-extended, dnd-generic, number, multiple-choice | pv-cell, doubles | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
-| `number_theory_all` All Number Theory Skills | M | standard | multi-select-check, dnd-generic, number, text, tchart-cells | multi-select, dnd-generic, nt-gcf-easy, nt-multiples, nt-factor-tchart-medium, nt-multiples-fill | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `algebraic_all` All Algebraic Thinking | M | standard | dnd-generic, inline-blanks, factor-links, tchart-cells, build-expr, text, number | pv-cell, (none), factor-links-medium, nt-factor-tchart-medium, build-expr, count-row, order-of-ops, algebra-solve, standard | ready | ready | author | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `patterns_all` All Pattern Skills | M | standard | number, multiple-choice, dnd-generic, text | (none), dnd-generic, notice-pattern, number-pattern | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) |  |
+| `algebra_all` All Algebra Skills | M | standard | number, build-expr, text, multi-select-check | algebra-twostep, tape-diagram, build-expr, algebra-solve, word-plain, standard, story-work, multi-select | ready | ready | basic | author | author | author | wrap | n/a | CEV | equation-drill (reviewed) |  |
+| `order_ops_all` All Order of Operations | M | standard | number, multiple-choice | order-of-ops, compare-expressions | ready | ready | basic | basic | author | basic | wrap | n/a | E | equation-drill (reviewed) |  |
+| `placevalue_all` All Place Value Skills | M | standard | inline-blanks, interactive, number, multiple-choice, pv-build | pv-cell | ready | ready | basic | author | author | author | wrap | n/a | V | visual-grid (reviewed) |  |
+| `number_sense_all` All Number Sense Skills | M | standard | inline-blanks, multiple-choice, number | pv-cell, compensation, make-a-ten | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
+| `number_theory_all` All Number Theory Skills | M | standard | dnd-generic, factor-links, tchart-cells, number, text, multi-select-check | dnd-generic, factor-links-medium, nt-factor-tchart-medium, nt-gcf-easy, nt-multiples-fill, nt-prime-compare, multi-select | ready | ready | author | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `algebraic_all` All Algebraic Thinking | M | standard | number, dnd-generic, text, inline-blanks, grid-fill | algebra-solve, pv-cell, (none), function-table, number-pattern, word-problem, dnd-generic, grid-fill, count-row | ready | ready | basic | author | author | author | wrap | n/a | CV | equation-drill (reviewed) |  |
 
 ### all_mixed
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `all_domains_mixed` All Skills from All Domains | M | standard | number, multi-select-check, text, compose-shape-blocks, compose-fraction-tiles | column-mult, multi-select, column-sub, column-add, tm-clock, story-work, compose-shape-blocks, compose-fraction-tiles, wide, measurement-conversions | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-setup |
-| `custom_mixed` Custom Mixed (From Settings) | M | standard | choice, number, col-arith, text, multiple-choice | vocab-tf, algebra-twostep, unit-conversion-word, frac-add-mixed-unlike-nv, tm-clock, mult-scaling-nv, story-work, wide, pv-cell, vocab-mc, nt-prime, number-line-visual | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
-| `grade_k_mixed` All Kindergarten Skills | null | standard | number, multiple-choice, text | story-work, (none), add-5-pictures, sub-5-pictures, bar-graph-intro, geometry-compose, column-sub | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `grade_1_mixed` All Grade 1 Skills | null | standard | compose-shape-blocks, number, vocab-match, text, choice | compose-shape-blocks, column-sub, vocab-match, tm-clock, vocab-tf, story-work, tm-coins, number-line-visual, sub-facts-vertical | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `grade_2_mixed` All Grade 2 Skills | null | standard | number, inline-blanks, text | column-sub, pv-cell, column-add, tm-coins, count-row, story-work, repeated-add-mult | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `grade_3_mixed` All Grade 3 Skills | null | standard | text, number, build-expr, multiple-choice, number-line-place | tm-clock, story-work, column-add, build-expr, vocab-mc, count-row, missing-number, mult-facts-horizontal, fraction-numberline, tm-timeline, write-fraction | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
-| `grade_4_mixed` All Grade 4 Skills | null | standard | fraction-input, text, vocab-match, dnd-generic, inline-blanks, number, multi-select-check, place-symmetry-lines | frac-10-100-nv, shape-pattern, (none), vocab-match, pv-cell, column-add, multi-select, story-work, place-symmetry-lines | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-setup, hands-match |
-| `grade_5_mixed` All Grade 5 Skills | null | standard | text, number, multi-select-check, coord-plot | decimal-div, story-work, multi-select, (none), geometry-coordinates, data-pie, div-unit-frac-nv, order-of-ops, long-div-kit, standard, geo-transform-mc | ready | ready | author | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
-| `grade_6_mixed` All Grade 6 Skills | null | standard | number, number-line-extended, coord-plot, dnd-generic, multiple-choice | order-of-ops, percent-of, number-line-extended, compact, geometry-coordinates, net-surface-area, wide, dnd-generic, algebra-solve, nt-gcf-easy, unit-rate-intro, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
+| `all_domains_mixed` All Skills from All Domains | M | standard | choice, number, text, multi-select-check, inline-blanks, col-arith | vocab-tf, algebra-twostep, tm-clock, function-table, geo-transform-mc, pv-cell, story-work, order-of-ops, decimal-column-sub, data-pictograph, tm-coins, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-setup |
+| `custom_mixed` Custom Mixed (From Settings) | M | standard | multi-select-check, multiple-choice, text, interactive, area-model, grid-fill, number | multi-select, vocab-mc, tm-money-columns, fdp-order, shape-pattern, count-row, area-model-mult-hard, grid-fill, write-fraction, pv-cell, remainder-judge | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-order |
+| `grade_k_mixed` All Kindergarten Skills | null | standard | number, multiple-choice, text, multi-select-check | story-work, heavier-lighter, column-add, geometry-positions, geometry-2d-shapes, (none), multi-select, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) | hands-sort |
+| `grade_1_mixed` All Grade 1 Skills | null | standard | number, vocab-match, text | number-line-visual, column-add, story-work, vocab-match, add-facts-vertical, tm-clock, sub-facts-vertical, (none) | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `grade_2_mixed` All Grade 2 Skills | null | standard | number, multiple-choice, text | tm-notes, vocab-mc, column-sub, column-add, count-row, story-work, wide, dot-array-visual, equal-groups-decide | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) |  |
+| `grade_3_mixed` All Grade 3 Skills | null | standard | number, text, shade-parts, fact-family, build-expr | div-facts-long, column-sub, data-bar-graph, shade-fraction, data-pictograph, fact-family-mult-div, build-expr, story-work, notice-pattern, (none) | ready | ready | author | author | author | author | wrap | n/a | V | visual-grid (reviewed) | fact-family |
+| `grade_4_mixed` All Grade 4 Skills | null | standard | choice, text, number, multi-select-check, inline-blanks | geometry-lines, count-row, long-div-kit, multi-select, column-sub, mult-grid, geometry-measure-angle, pv-cell, (none), geometry-triangles | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | sub-setup |
+| `grade_5_mixed` All Grade 5 Skills | null | standard | multiple-choice, dnd-generic, vocab-match, number, multi-select-check, choice | compare-expressions, dnd-generic, vocab-match, story-work, geo-transform-mc, vocab-mc, column-sub, box-plot-intro, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CEV | visual-grid (reviewed) |  |
+| `grade_6_mixed` All Grade 6 Skills | null | standard | number, text, choice, multi-select-check | algebra-solve, standard, (none), integer-compare, multi-select, conversion | ready | ready | basic | author | author | author | wrap | n/a | CV | visual-grid (reviewed) | hands-sort |
 
 ### vocabulary
 
 | Skill | Gr | Size | Answer types | Print formats | core | key | model | error | sub | stretch | word | fact | Flags | Host layout | Specialised pages |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `vocab_grade_K` Math Vocabulary – Kindergarten (Match) | K | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1` Math Vocabulary – Grade 1 (Match) | 1 | wide | choice, multiple-choice, vocab-match | vocab-tf, vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_2` Math Vocabulary – Grade 2 (Match) | 2 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_3` Math Vocabulary – Grade 3 (Match) | 3 | wide | choice, vocab-match, multi-select-check, multiple-choice | vocab-tf, vocab-match, multi-select, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_4` Math Vocabulary – Grade 4 (Match) | 4 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_5` Math Vocabulary – Grade 5 (Match) | 5 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_6` Math Vocabulary – Grade 6 (Match) | 6 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_K_operations` Math Vocabulary – Kindergarten: Operations (Match) | K | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
-| `vocab_grade_K_counting` Math Vocabulary – Kindergarten: Counting (Match) | K | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_K_geometry` Math Vocabulary – Kindergarten: Geometry (Match) | K | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
-| `vocab_grade_K_data` Math Vocabulary – Kindergarten: Data (Match) | K | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_K` Math Vocabulary – Kindergarten (Match) | K | wide | choice, multiple-choice, vocab-match | vocab-tf, vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1` Math Vocabulary – Grade 1 (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_2` Math Vocabulary – Grade 2 (Match) | 2 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_3` Math Vocabulary – Grade 3 (Match) | 3 | wide | multiple-choice, vocab-match, multi-select-check | vocab-mc, vocab-match, multi-select | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_4` Math Vocabulary – Grade 4 (Match) | 4 | wide | vocab-match, multi-select-check, multiple-choice | vocab-match, multi-select, vocab-mc | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_5` Math Vocabulary – Grade 5 (Match) | 5 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_6` Math Vocabulary – Grade 6 (Match) | 6 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_K_operations` Math Vocabulary – Kindergarten: Operations (Match) | K | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
+| `vocab_grade_K_counting` Math Vocabulary – Kindergarten: Counting (Match) | K | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_K_geometry` Math Vocabulary – Kindergarten: Geometry (Match) | K | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
+| `vocab_grade_K_data` Math Vocabulary – Kindergarten: Data (Match) | K | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
 | `vocab_grade_K_algebra` Math Vocabulary – Kindergarten: Algebra (Match) | K | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_K_measurement` Math Vocabulary – Kindergarten: Measurement (Match) | K | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1_operations` Math Vocabulary – Grade 1: Operations (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
-| `vocab_grade_1_counting` Math Vocabulary – Grade 1: Counting (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1_geometry` Math Vocabulary – Grade 1: Geometry (Match) | 1 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
+| `vocab_grade_K_measurement` Math Vocabulary – Kindergarten: Measurement (Match) | K | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1_operations` Math Vocabulary – Grade 1: Operations (Match) | 1 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
+| `vocab_grade_1_counting` Math Vocabulary – Grade 1: Counting (Match) | 1 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1_geometry` Math Vocabulary – Grade 1: Geometry (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-sort, hands-match |
 | `vocab_grade_1_data` Math Vocabulary – Grade 1: Data (Match) | 1 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1_algebra` Math Vocabulary – Grade 1: Algebra (Match) | 1 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_1_measurement` Math Vocabulary – Grade 1: Measurement (Match) | 1 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
-| `vocab_grade_2_operations` Math Vocabulary – Grade 2: Operations (Match) | 2 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_2_counting` Math Vocabulary – Grade 2: Counting (Match) | 2 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_1_algebra` Math Vocabulary – Grade 1: Algebra (Match) | 1 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_1_measurement` Math Vocabulary – Grade 1: Measurement (Match) | 1 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, k-one-page, hands-match |
+| `vocab_grade_2_operations` Math Vocabulary – Grade 2: Operations (Match) | 2 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_2_counting` Math Vocabulary – Grade 2: Counting (Match) | 2 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
 | `vocab_grade_2_fractions` Math Vocabulary – Grade 2: Fractions (Match) | 2 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_2_geometry` Math Vocabulary – Grade 2: Geometry (Match) | 2 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_2_data` Math Vocabulary – Grade 2: Data (Match) | 2 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_2_algebra` Math Vocabulary – Grade 2: Algebra (Match) | 2 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_2_measurement` Math Vocabulary – Grade 2: Measurement (Match) | 2 | wide | choice, multiple-choice, vocab-match | vocab-tf, vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_3_operations` Math Vocabulary – Grade 3: Operations (Match) | 3 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_3_fractions` Math Vocabulary – Grade 3: Fractions (Match) | 3 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_3_geometry` Math Vocabulary – Grade 3: Geometry (Match) | 3 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_3_data` Math Vocabulary – Grade 3: Data (Match) | 3 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_2_geometry` Math Vocabulary – Grade 2: Geometry (Match) | 2 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_2_data` Math Vocabulary – Grade 2: Data (Match) | 2 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_2_algebra` Math Vocabulary – Grade 2: Algebra (Match) | 2 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_2_measurement` Math Vocabulary – Grade 2: Measurement (Match) | 2 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_3_operations` Math Vocabulary – Grade 3: Operations (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_3_fractions` Math Vocabulary – Grade 3: Fractions (Match) | 3 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_3_geometry` Math Vocabulary – Grade 3: Geometry (Match) | 3 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_3_data` Math Vocabulary – Grade 3: Data (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
 | `vocab_grade_3_algebra` Math Vocabulary – Grade 3: Algebra (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_3_measurement` Math Vocabulary – Grade 3: Measurement (Match) | 3 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_4_operations` Math Vocabulary – Grade 4: Operations (Match) | 4 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_4_fractions` Math Vocabulary – Grade 4: Fractions (Match) | 4 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_4_geometry` Math Vocabulary – Grade 4: Geometry (Match) | 4 | wide | multiple-choice, multi-select-check, vocab-match, choice | vocab-mc, multi-select, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_4_data` Math Vocabulary – Grade 4: Data (Match) | 4 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_4_algebra` Math Vocabulary – Grade 4: Algebra (Match) | 4 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_4_measurement` Math Vocabulary – Grade 4: Measurement (Match) | 4 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_5_operations` Math Vocabulary – Grade 5: Operations (Match) | 5 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_5_fractions` Math Vocabulary – Grade 5: Fractions (Match) | 5 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_3_measurement` Math Vocabulary – Grade 3: Measurement (Match) | 3 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_4_operations` Math Vocabulary – Grade 4: Operations (Match) | 4 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_4_fractions` Math Vocabulary – Grade 4: Fractions (Match) | 4 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_4_geometry` Math Vocabulary – Grade 4: Geometry (Match) | 4 | wide | multiple-choice, choice, multi-select-check, vocab-match | vocab-mc, vocab-tf, multi-select, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_4_data` Math Vocabulary – Grade 4: Data (Match) | 4 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_4_algebra` Math Vocabulary – Grade 4: Algebra (Match) | 4 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_4_measurement` Math Vocabulary – Grade 4: Measurement (Match) | 4 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_5_operations` Math Vocabulary – Grade 5: Operations (Match) | 5 | wide | multiple-choice, choice, vocab-match | vocab-mc, vocab-tf, vocab-match | ready | ready | basic | basic | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_5_fractions` Math Vocabulary – Grade 5: Fractions (Match) | 5 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
 | `vocab_grade_5_geometry` Math Vocabulary – Grade 5: Geometry (Match) | 5 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_5_data` Math Vocabulary – Grade 5: Data (Match) | 5 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_5_algebra` Math Vocabulary – Grade 5: Algebra (Match) | 5 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_5_measurement` Math Vocabulary – Grade 5: Measurement (Match) | 5 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_6_operations` Math Vocabulary – Grade 6: Operations (Match) | 6 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
-| `vocab_grade_6_fractions` Math Vocabulary – Grade 6: Fractions (Match) | 6 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_6_geometry` Math Vocabulary – Grade 6: Geometry (Match) | 6 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_5_data` Math Vocabulary – Grade 5: Data (Match) | 5 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_5_algebra` Math Vocabulary – Grade 5: Algebra (Match) | 5 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_5_measurement` Math Vocabulary – Grade 5: Measurement (Match) | 5 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_6_operations` Math Vocabulary – Grade 6: Operations (Match) | 6 | wide | vocab-match, multiple-choice | vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
+| `vocab_grade_6_fractions` Math Vocabulary – Grade 6: Fractions (Match) | 6 | wide | choice, vocab-match, multiple-choice | vocab-tf, vocab-match, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_6_geometry` Math Vocabulary – Grade 6: Geometry (Match) | 6 | wide | vocab-match, choice, multiple-choice | vocab-match, vocab-tf, vocab-mc | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-sort, hands-match |
 | `vocab_grade_6_data` Math Vocabulary – Grade 6: Data (Match) | 6 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
-| `vocab_grade_6_algebra` Math Vocabulary – Grade 6: Algebra (Match) | 6 | wide | vocab-match, multiple-choice, choice | vocab-match, vocab-mc, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
+| `vocab_grade_6_algebra` Math Vocabulary – Grade 6: Algebra (Match) | 6 | wide | multiple-choice, vocab-match | vocab-mc, vocab-match | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |
 | `vocab_grade_6_measurement` Math Vocabulary – Grade 6: Measurement (Match) | 6 | wide | multiple-choice, vocab-match, choice | vocab-mc, vocab-match, vocab-tf | ready | ready | basic | author | author | author | wrap | n/a | CV | chart-table (reviewed) | flashcards, hands-match |

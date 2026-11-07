@@ -1,6 +1,6 @@
 <!-- spec-card
-{"card":"function-table","kind":"template","template":"function-table","families":["algebra"],"match":{"templates":["function-table"]},"config":"design/cards/function-table/card.json","indexSha":"9ad4eb57ab31f4193fcb2c0f8ffd3adbc6a4cc76","bodySha":"59a4f1185b0d1119","format":2,"configSha":"39a9719c6c7c"}
-{"cited":"AX-4 E36 H1 H5 H13 L1 L3 L11 LR-5 LR-6 P-1 P-3","rules":"AK-1 a0cc12 2 d4709f H13 36f579 VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 9 0b5532 10 2ed85c CL-40 2a6dbb SL-6 7a1453 11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 7 aa3040 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H5@RUBRIC b3892d H9 fd82d1 10 fbd802 L1 799b66 3 901e56 6 6e19d8 10 d2ca35 11 9ebe19 AX-4 2eb6c1 P-3 833e8c INK-5 631a6d P-LC-9 bc47bd TY-2 510243","entries":"R%3AR-EASY-20 d0472c R%3AR-L5-ADD-100 50dce7 R%3AR-L5-MUL-20 730ee8 R%3AR-L5-FACTOR 789377 R%3AR-L20-OUT db1257 R%3AR-HARD-100 7b457d N%3AN-PICTURES-FUNCTION-TABLE-EASY 258e48 D%3AftTask%3Doutputs bcefeb D%3AftTask%3Drule bcefeb D%3AftTask%3Dinputs bcefeb D%3AftTask%3Dmixed bcefeb D%3AftTask%3Dmake bcefeb D%3AftTask%3Doutputs-check 972948 D%3AftTask%3Drule-check 972948 D%3AftTask%3Dinputs-check 972948 D%3AftTask%3Dmixed-check 972948 D%3AftRules%3D%2B bcefeb D%3AftRules%3D- bcefeb D%3AftRules%3Dx bcefeb D%3AftRules%3D%2F bcefeb D%3AftRules%3Dx%2B 972948 D%3AftRules%3Dx- 972948 D%3AftRules%3D%2F%2B 972948 D%3AftRules%3D%2F- 972948 D%3Aband%3D10 bcefeb D%3Aband%3D20 bcefeb D%3Aband%3D50 bcefeb D%3Aband%3D100 bcefeb D%3Aband%3D1000 bcefeb D%3AftTable%3D31 bcefeb D%3AftTable%3D32 bcefeb D%3AftTable%3D41 bcefeb D%3AftTable%3D42 bcefeb D%3AftTable%3D51 972948 D%3AftTable%3D52 972948 D%3AftTrap%3Dtrue bcefeb D%3AftTrap%3Dfalse bcefeb D%3AftFactors%3Dany bcefeb D%3AftFactors%3D2-5-10 bcefeb D%3AftFactors%3D2-3-5-10 bcefeb D%3Asupport%3Dframe bcefeb D%3Asupport%3Dframe-bare bcefeb D%3Asupport%3Dline bcefeb D%3Asupport%3Dline-bare bcefeb D%3Acalculator%3Dtrue 11baa8 D%3Acalculator%3Dfalse 11baa8 D%3AskipAfter%3D* 11baa8 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Atest 972948 D%3Arole%3Alesson 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aopener 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 972948 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 11baa8 D%3Arole%3Afact-probe 11baa8 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-dark 11baa8 D%3Ahost%3Amode-bigboard 11baa8"}
+{"card":"function-table","kind":"template","template":"function-table","families":["algebra"],"match":{"templates":["function-table"]},"config":"design/cards/function-table/card.json","indexSha":"9ad4eb57ab31f4193fcb2c0f8ffd3adbc6a4cc76","bodySha":"c4ee6bea1aa8efa6","format":2,"configSha":"2f3c021fc400"}
+{"cited":"AX-4 E36 H1 H5 H13 L1 L3 L11 LR-5 LR-6 P-1 P-3","rules":"AK-1 a0cc12 2 d4709f H13 36f579 VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 9 0b5532 10 2ed85c CL-40 2a6dbb SL-6 7a1453 11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 7 aa3040 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H5@RUBRIC b3892d H9 fd82d1 10 fbd802 L1 799b66 3 901e56 6 6e19d8 10 d2ca35 11 9ebe19 AX-4 2eb6c1 P-3 833e8c INK-5 631a6d P-LC-9 bc47bd TY-2 510243","entries":"R%3AR-EASY-20 d0472c R%3AR-L5-ADD-100 50dce7 R%3AR-L5-MUL-20 730ee8 R%3AR-L5-FACTOR 789377 R%3AR-L20-OUT db1257 R%3AR-HARD-100 7b457d N%3AN-PICTURES-FUNCTION-TABLE-EASY 258e48 D%3AftTask%3Doutputs bcefeb D%3AftTask%3Drule bcefeb D%3AftTask%3Dinputs bcefeb D%3AftTask%3Dmixed bcefeb D%3AftTask%3Dmake bcefeb D%3AftTask%3Doutputs-check bcefeb D%3AftTask%3Drule-check bcefeb D%3AftTask%3Dinputs-check bcefeb D%3AftTask%3Dmixed-check bcefeb D%3AftRules%3D%2B bcefeb D%3AftRules%3D- bcefeb D%3AftRules%3Dx bcefeb D%3AftRules%3D%2F bcefeb D%3AftRules%3Dx%2B bcefeb D%3AftRules%3Dx- bcefeb D%3AftRules%3D%2F%2B bcefeb D%3AftRules%3D%2F- bcefeb D%3Aband%3D10 bcefeb D%3Aband%3D20 bcefeb D%3Aband%3D50 bcefeb D%3Aband%3D100 bcefeb D%3Aband%3D1000 bcefeb D%3AftTable%3D31 bcefeb D%3AftTable%3D32 bcefeb D%3AftTable%3D41 bcefeb D%3AftTable%3D42 bcefeb D%3AftTable%3D51 bcefeb D%3AftTable%3D52 bcefeb D%3AftTrap%3Dtrue bcefeb D%3AftTrap%3Dfalse bcefeb D%3AftFactors%3Dany bcefeb D%3AftFactors%3D2-5-10 bcefeb D%3AftFactors%3D2-3-5-10 bcefeb D%3Asupport%3Dframe bcefeb D%3Asupport%3Dframe-bare bcefeb D%3Asupport%3Dline bcefeb D%3Asupport%3Dline-bare bcefeb D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Alesson bcefeb D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Aword-problems 04b8b3 D%3Arole%3Afact-rows 04b8b3 D%3Arole%3Afact-probe 04b8b3 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 04b8b3 D%3Ahost%3Arace 04b8b3 D%3Ahost%3Amap 04b8b3 D%3Ahost%3Amode-dark 04b8b3 D%3Ahost%3Amode-bigboard 04b8b3"}
 -->
 <!-- rulings
 {"v": 1, "card": "function-table",
@@ -19,9 +19,11 @@
 "todo": [
  {"id":"T-5.1","source":"§5.1","text":"Function tables from the owner's sample sheet: 'Find the rule for each function table' ..."},
  {"id":"T-5.4","source":"§5.4","text":"Top of the box is the default (CL-4b); content never shrinks to fit; one answer place p..."},
- {"id":"T-9.1","source":"§9.1","text":"Find the rule: write the rule IN the machine's box (one rule place) where the machine r..."},
- {"id":"T-9.3","source":"§9.3","text":"A Check row and a 5-row table hold fewer tables a page (S 6 where 9 plain tables fit). ..."},
- {"id":"T-9.4","source":"§9.4","text":"Two-step rules (x then +) stay offered on function_table_easy (off by default)?"}
+ {"id":"T-5.5","source":"§5.5","text":"F1 The rule is written IN the machine box at S and M, under the table at L (one rule pl..."},
+ {"id":"T-5.6","source":"§5.6","text":"F2 × 6 is allowed on 3-row tables at band 20 for lesson #5 (the rows are table facts; f..."},
+ {"id":"T-5.7","source":"§5.7","text":"F3 Check rows and 5-row tables count as adding a drawing (options-render capacity)."},
+ {"id":"T-5.8","source":"§5.8","text":"F4 Two-step rules stay offered on function_table_easy, off by default."},
+ {"id":"T-5.9","source":"§5.9","text":"Every PROPOSED decision of section 7a is accepted as written."}
 ]
 }
 -->
@@ -119,6 +121,11 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - **2026-11-07** — Lesson #5 (Y4 links, G3, W05, 3.OA.D.9): function_table_easy {ftTask: rule} with + / - rules to 100 and x / / rules with EVERY number to 20, so every row is a table fact (x 2 to x 5, / 2 to / 5); two-step rules left out at W05. (`owner's BUILD lesson list, data/curriculum/links/Y4.json note`)
 - **2026-11-07** — Lesson #20 (Y5 links, G4, W09, 4.OA.C.5): function_table_easy {ftTask: outputs, ftRules: [+, -]} is the related skill: the same given rule applied to each In number. (`owner's BUILD lesson list, data/curriculum/links/Y5.json`)
 - **2026-10-23** — Top of the box is the default (CL-4b); content never shrinks to fit; one answer place per answer (VQ-2). (`WORKSHEET_DESIGN_STANDARD.md, owner ruling 2026-10-23`)
+- **2026-11-07** — F1 The rule is written IN the machine box at S and M, under the table at L (one rule place). (`owner 2026-11-07, all as suggested (via lead)`)
+- **2026-11-07** — F2 × 6 is allowed on 3-row tables at band 20 for lesson #5 (the rows are table facts; ftFactors restricts). (`owner 2026-11-07, all as suggested (via lead)`)
+- **2026-11-07** — F3 Check rows and 5-row tables count as adding a drawing (options-render capacity). (`owner 2026-11-07, all as suggested (via lead)`)
+- **2026-11-07** — F4 Two-step rules stay offered on function_table_easy, off by default. (`owner 2026-11-07, all as suggested (via lead)`)
+- **2026-11-07** — Every PROPOSED decision of section 7a is accepted as written. (`owner 2026-11-07, all as suggested (via lead)`)
 
 ## 6. Misconceptions
 
@@ -146,48 +153,48 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 **Option values (offeredOptionsFor)**
 
 - `ftTask=outputs | rule | inputs | mixed | make` — **offered** — the five tasks; one task a page so the instruction says one thing (owner request 2026-09-25; lesson #5 / #20)
-- `ftTask=outputs-check | rule-check | inputs-check | mixed-check` — **offered** (PROPOSED) — a Check row: one more In number to test the rule on; adds a drawing (S 6 a page) (skill-options.js; lf-algebra r1 addsDrawingValues)
+- `ftTask=outputs-check | rule-check | inputs-check | mixed-check` — **offered** — a Check row: one more In number to test the rule on; adds a drawing (S 6 a page) (skill-options.js; lf-algebra r1 addsDrawingValues)
 - `ftRules=+ | - | x | /` — **offered** — one-step rules; lesson #5 deals + / - and x / / (lesson #5)
-- `ftRules=x+ | x- | /+ | /-` — **offered** (PROPOSED) — two-step rules, off on easy by default (lesson #5 leaves them out at W05); hard deals them (skill-options.js; §9.4)
+- `ftRules=x+ | x- | /+ | /-` — **offered** — two-step rules, off on easy by default (lesson #5 leaves them out at W05); hard deals them (skill-options.js; §9.4)
 - `band=10 | 20 | 50 | 100 | 1000` — **offered** — Numbers to N caps every number in the table (pvCap); lesson #5 deals 100 and 20 (skill-options.js; lesson #5)
 - `ftTable=31 | 32 | 41 | 42` — **offered** — 3 or 4 rows, In numbers in or out of order (skill-options.js)
-- `ftTable=51 | 52` — **offered** (PROPOSED) — 5 rows: a taller drawing (fewer a page) (skill-options.js; lf-algebra r1 addsDrawingValues)
+- `ftTable=51 | 52` — **offered** — 5 rows: a taller drawing (fewer a page) (skill-options.js; lf-algebra r1 addsDrawingValues)
 - `ftTrap=true | false` — **offered** — first row fits a + rule and a x rule, so the pupil tests every row (lesson 5) (detailed lesson 5)
 - `ftFactors=any | 2-5-10 | 2-3-5-10` — **offered** — x and / only by the facts the class has learned (lesson 5 r2) (detailed lesson 5 r2)
 - `support=frame | frame-bare | line | line-bare` — **offered** — the rule frame and the machine picture: a fading support (skill-options.js (option panel round 3))
-- `calculator=true | false` — **out of scope** (PROPOSED) — a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card (skill-options.js play controls)
-- `skipAfter=*` — **out of scope** (PROPOSED) — a play control on every skill; graded by ws-options-verify BEHAVIOUR (skill-options.js play controls)
+- `calculator=true | false` — **out of scope** — a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card (skill-options.js play controls)
+- `skipAfter=*` — **out of scope** — a play control on every skill; graded by ws-options-verify BEHAVIOUR (skill-options.js play controls)
 
 **Page roles (buildSheet)**
 
-- `role:independent` — **offered** (PROPOSED) — the pass bar (RUBRIC scope) (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:more-practice` — **offered** (PROPOSED) — the pass bar (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:test` — **offered** (PROPOSED) — the pass bar (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:lesson` — **offered** (PROPOSED) — the pass bar; function_table_easy has lesson data (prereqs.js, lf-algebra r1); function_table_hard still falls back (its lesson data is a follow-up) (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:scripted-model` — **offered** (PROPOSED) — provider workedSteps real (derived from the item) (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:guided` — **offered** (PROPOSED) — provider workedSteps real (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:opener` — **offered** (PROPOSED) — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:error-analysis` — **offered** (PROPOSED) — provider wrongAnswer real (five misconceptions); the cell draws its own Fix places (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:review` — **offered** (PROPOSED) — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:pre-skill-check` — **offered** (PROPOSED) — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:mixed-practice` — **offered** (PROPOSED) — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:true-false` — **offered** (PROPOSED) — provider wrongAnswer real (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:reason-it` — **offered** (PROPOSED) — provider workedSteps and wrongAnswer real (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:stretch` — **offered** (PROPOSED) — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:word-problems` — **out of scope** (PROPOSED) — no stories for a table; function_table_story is the story skill (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:fact-rows` — **out of scope** (PROPOSED) — not a fact skill: the role reports unsupported (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
-- `role:fact-probe` — **out of scope** (PROPOSED) — not a fact skill: the role reports unsupported (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:independent` — **offered** — the pass bar (RUBRIC scope) (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:more-practice` — **offered** — the pass bar (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:test` — **offered** — the pass bar (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:lesson` — **offered** — the pass bar; function_table_easy has lesson data (prereqs.js, lf-algebra r1); function_table_hard still falls back (its lesson data is a follow-up) (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:scripted-model` — **offered** — provider workedSteps real (derived from the item) (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:guided` — **offered** — provider workedSteps real (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:opener` — **offered** — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:error-analysis` — **offered** — provider wrongAnswer real (five misconceptions); the cell draws its own Fix places (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:review` — **offered** — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:pre-skill-check` — **offered** — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:mixed-practice` — **offered** — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:true-false` — **offered** — provider wrongAnswer real (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:reason-it` — **offered** — provider workedSteps and wrongAnswer real (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:stretch` — **offered** — any skill on any page type (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:word-problems` — **out of scope** — no stories for a table; function_table_story is the story skill (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:fact-rows` — **out of scope** — not a fact skill: the role reports unsupported (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
+- `role:fact-probe` — **out of scope** — not a fact skill: the role reports unsupported (CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26)
 
 **Screen hosts**
 
 - `host:practice-card` — **offered** — one drawing with print; the pass bar (RUBRIC (every screen host))
 - `host:online-worksheet` — **offered** — one drawing with print; the pass bar (RUBRIC (every screen host))
 - `host:quiz` — **offered** — one drawing with print; the pass bar (RUBRIC (every screen host))
-- `host:boss` — **out of scope** (PROPOSED) — game host draws the same card; graded by ws-chromebook-fit, not by this card's critic (RUBRIC scope)
-- `host:race` — **out of scope** (PROPOSED) — game host draws the same card; graded by ws-chromebook-fit (RUBRIC scope)
-- `host:map` — **out of scope** (PROPOSED) — draws the same card; graded by ws-screen-slots (RUBRIC scope)
-- `host:mode-dark` — **out of scope** (PROPOSED) — display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots (RUBRIC scope)
-- `host:mode-bigboard` — **out of scope** (PROPOSED) — display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots (RUBRIC scope)
+- `host:boss` — **out of scope** — game host draws the same card; graded by ws-chromebook-fit, not by this card's critic (RUBRIC scope)
+- `host:race` — **out of scope** — game host draws the same card; graded by ws-chromebook-fit (RUBRIC scope)
+- `host:map` — **out of scope** — draws the same card; graded by ws-screen-slots (RUBRIC scope)
+- `host:mode-dark` — **out of scope** — display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots (RUBRIC scope)
+- `host:mode-bigboard` — **out of scope** — display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots (RUBRIC scope)
 
 ## 8. Gates
 
@@ -201,10 +208,7 @@ Each runs as `node tests/scripts/<script> …`.
 
 ## 9. Open questions (recommended answers)
 
-1. **Find the rule: write the rule IN the machine's box (one rule place) where the machine row fits a third of the page (S, M), and under the table at L. Keep?** Recommended: Yes: one place to write the rule; the old box saying 'rule' over a second frame doubled the answer area and cost a row of tables at S.
-2. **x and / rules at Numbers to 20: the rule number is 2 to 5 on a 4-row table (6 on a 3-row table) so every row is a table fact. Is x 6 on a 3-row table at 20 acceptable for lesson #5?** Recommended: Yes: 1 -> 6, 2 -> 12, 3 -> 18 are table facts; lessons that want only 2, 3, 5 and 10 tick ftFactors.
-3. **A Check row and a 5-row table hold fewer tables a page (S 6 where 9 plain tables fit). Accept them as 'adds a drawing'?** Recommended: Yes: both add a part to the drawing (a second small table, a fifth row); content never shrinks to fit.
-4. **Two-step rules (x then +) stay offered on function_table_easy (off by default)?** Recommended: Yes, off by default: lesson #5 leaves them out at W05; function_table_hard deals them.
+(none)
 
 Signed: (not yet signed)
 
@@ -216,22 +220,22 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 **Option values (offeredOptionsFor)** (40 lines; 0 undecided)
 
 - `ftTask=outputs` Task [difficulty], default on function_table_easy (all 2) [offered]
-- `ftTask=outputs-check` Task [difficulty] (all 2) [offered, PROPOSED]
+- `ftTask=outputs-check` Task [difficulty] (all 2) [offered]
 - `ftTask=rule` Task [difficulty] (all 2) [offered]
-- `ftTask=rule-check` Task [difficulty], default on function_table_hard (all 2) [offered, PROPOSED]
+- `ftTask=rule-check` Task [difficulty], default on function_table_hard (all 2) [offered]
 - `ftTask=inputs` Task [difficulty] (all 2) [offered]
-- `ftTask=inputs-check` Task [difficulty] (all 2) [offered, PROPOSED]
+- `ftTask=inputs-check` Task [difficulty] (all 2) [offered]
 - `ftTask=mixed` Task [difficulty] (all 2) [offered]
-- `ftTask=mixed-check` Task [difficulty] (all 2) [offered, PROPOSED]
+- `ftTask=mixed-check` Task [difficulty] (all 2) [offered]
 - `ftTask=make` Task [difficulty] (all 2) [offered]
 - `ftRules=+` Rules [difficulty], default (all 2) [offered]
 - `ftRules=-` Rules [difficulty], default (all 2) [offered]
 - `ftRules=x` Rules [difficulty], default on function_table_hard (all 2) [offered]
 - `ftRules=/` Rules [difficulty], default on function_table_hard (all 2) [offered]
-- `ftRules=x+` Rules [difficulty], default on function_table_hard (all 2) [offered, PROPOSED]
-- `ftRules=x-` Rules [difficulty], default on function_table_hard (all 2) [offered, PROPOSED]
-- `ftRules=/+` Rules [difficulty], default on function_table_hard (all 2) [offered, PROPOSED]
-- `ftRules=/-` Rules [difficulty], default on function_table_hard (all 2) [offered, PROPOSED]
+- `ftRules=x+` Rules [difficulty], default on function_table_hard (all 2) [offered]
+- `ftRules=x-` Rules [difficulty], default on function_table_hard (all 2) [offered]
+- `ftRules=/+` Rules [difficulty], default on function_table_hard (all 2) [offered]
+- `ftRules=/-` Rules [difficulty], default on function_table_hard (all 2) [offered]
 - `band=10` Numbers to [difficulty] (all 2) [offered]
 - `band=20` Numbers to [difficulty], default on function_table_easy (all 2) [offered]
 - `band=50` Numbers to [difficulty] (all 2) [offered]
@@ -241,8 +245,8 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `ftTable=32` Table [difficulty], default on function_table_hard (all 2) [offered]
 - `ftTable=41` Table [difficulty], default on function_table_easy (all 2) [offered]
 - `ftTable=42` Table [difficulty] (all 2) [offered]
-- `ftTable=51` Table [difficulty] (all 2) [offered, PROPOSED]
-- `ftTable=52` Table [difficulty] (all 2) [offered, PROPOSED]
+- `ftTable=51` Table [difficulty] (all 2) [offered]
+- `ftTable=52` Table [difficulty] (all 2) [offered]
 - `ftTrap=true` First row fits two rules [difficulty] (all 2) [offered]
 - `ftTrap=false` First row fits two rules [difficulty], default (all 2) [offered]
 - `ftFactors=any` × and ÷ by [difficulty], default (all 2) [offered]
@@ -252,40 +256,40 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `support=frame-bare` Support [support] (all 2) [offered]
 - `support=line` Support [support] (all 2) [offered]
 - `support=line-bare` Support [support] (all 2) [offered]
-- `calculator=true` Calculator [play] (all 2) [out of scope, PROPOSED]
-- `calculator=false` Calculator [play], default (all 2) [out of scope, PROPOSED]
-- `skipAfter=*` Skip appears after [play] (all 2) [out of scope, PROPOSED]
+- `calculator=true` Calculator [play] (all 2) [out of scope]
+- `calculator=false` Calculator [play], default (all 2) [out of scope]
+- `skipAfter=*` Skip appears after [play] (all 2) [out of scope]
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
-- `role:independent` — the skill's own items (all 2) [offered, PROPOSED]
-- `role:more-practice` — the skill's own items (all 2) [offered, PROPOSED]
-- `role:opener` (also lesson-opener) — the skill's own items (all 2) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 2/2 (all 2) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 2/2 (all 2) [offered, PROPOSED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 2/2; provider misconceptions: real 2/2 (all 2) [offered, PROPOSED]
-- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 2) [offered, PROPOSED]
-- `role:test` (also test-a, test-b) — the skill's own items (all 2) [offered, PROPOSED]
-- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 2) [offered, PROPOSED]
-- `role:word-problems` — provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [out of scope, PROPOSED]
-- `role:fact-rows` — provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [out of scope, PROPOSED]
-- `role:fact-probe` — the skill's own items (all 2) [out of scope, PROPOSED]
-- `role:mixed-practice` (also mixed) — provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [offered, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 2/2 (all 2) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 2/2; provider wrongAnswer: real 2/2 (all 2) [offered, PROPOSED]
-- `role:stretch` — the skill's own items (all 2) [offered, PROPOSED]
-- `role:lesson` — lesson data: prereqs.js 1/2 (FALLBACK, warm-up from the earlier skills in data.js order, on function_table_hard); provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [offered, PROPOSED]
+- `role:independent` — the skill's own items (all 2) [offered]
+- `role:more-practice` — the skill's own items (all 2) [offered]
+- `role:opener` (also lesson-opener) — the skill's own items (all 2) [offered]
+- `role:scripted-model` (also model) — provider workedSteps: real 2/2 (all 2) [offered]
+- `role:guided` — provider workedSteps: real 2/2 (all 2) [offered]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 2/2; provider misconceptions: real 2/2 (all 2) [offered]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 2) [offered]
+- `role:test` (also test-a, test-b) — the skill's own items (all 2) [offered]
+- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 2) [offered]
+- `role:word-problems` — provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [out of scope]
+- `role:fact-rows` — provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [out of scope]
+- `role:fact-probe` — the skill's own items (all 2) [out of scope]
+- `role:mixed-practice` (also mixed) — provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [offered]
+- `role:true-false` — provider wrongAnswer: real 2/2 (all 2) [offered]
+- `role:reason-it` (also reason) — provider workedSteps: real 2/2; provider wrongAnswer: real 2/2 (all 2) [offered]
+- `role:stretch` — the skill's own items (all 2) [offered]
+- `role:lesson` — lesson data: prereqs.js 1/2 (FALLBACK, warm-up from the earlier skills in data.js order, on function_table_hard); provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [offered]
 
 **Screen hosts** (8 lines; 0 undecided)
 
-- `host:boss` — driven by ws-chromebook-fit (all 2) [out of scope, PROPOSED]
-- `host:map` — driven by ws-screen-slots (all 2) [out of scope, PROPOSED]
-- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 2) [out of scope, PROPOSED]
-- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 2) [out of scope, PROPOSED]
+- `host:boss` — driven by ws-chromebook-fit (all 2) [out of scope]
+- `host:map` — driven by ws-screen-slots (all 2) [out of scope]
+- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 2) [out of scope]
+- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 2) [out of scope]
 - `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 2) [offered]
 - `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 2) [offered]
 - `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 2) [offered]
-- `host:race` — driven by ws-chromebook-fit (all 2) [out of scope, PROPOSED]
+- `host:race` — driven by ws-chromebook-fit (all 2) [out of scope]
 
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 

@@ -588,6 +588,37 @@ export const LESSONS = Object.freeze({
         example: { match: 'Write' },
         mixWith: [{ key: 'patterns:shape_pattern' }, { key: 'patterns:number_patterns_rule', opts: { pattern: ['add'], places: [1] } }],
     },
+    // Follow a Given Rule (4.OA.C.5, BUILD lesson #20; owner 2026-11-07 P7): the preset number_patterns_rule rule:false.
+    // Four steps, as many as the provider's worked steps (countby.js: the rule, the first gap, the next gap, every gap).
+    'patterns:follow_given_rule': {
+        skills: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Each step of an add rule is an addition fact.' },
+            { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'Each step of a take-away rule is a subtraction fact.' },
+        ],
+        concepts: [
+            { id: 'given', text: 'The rule is given. Do it to each number.' },
+            { id: 'from-last', text: 'Start from the number before the gap.' },
+            { id: 'same', text: 'Do the same thing every time.' },
+        ],
+        vocab: [
+            { word: 'rule', meaning: 'what to do each time', picture: { kind: 'text', text: 'add 4' } },
+            { word: 'pattern', meaning: 'numbers made by a rule', picture: { kind: 'text', text: '3, 7, 11, 15' } },
+            { word: 'extend', meaning: 'write the next numbers', picture: { kind: 'text', text: '15, 19, 23' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the rule.' },
+            { icon: 'start', text: 'Do it to the number.' },
+            { icon: 'write', text: 'Write the next one.' },
+            { icon: 'check', text: 'Every gap, same rule.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'numbered steps with icons',
+            why: 'The same move at every gap; the Say band reads one step aloud, so no chant.',
+        },
+        chartWide: true,
+        mixWith: [{ key: 'patterns:skip_count_line' }, { key: 'addition:add_facts', opts: { band: 20 } }],
+    },
     // ---- end lf-algebra
 });
 

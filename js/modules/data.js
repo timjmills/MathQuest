@@ -317,6 +317,7 @@ export const SKILL_GRADES = {
     'notice_patterns': 3,
     'growing_shape_patterns': 4,
     'pattern_features': 4,
+    'follow_given_rule': 4,
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -1258,6 +1259,7 @@ export const SKILLS = {
         { v: "notice_patterns", l: "What Do You Notice? Even and Odd Products, Pattern Features" },
         { v: "growing_shape_patterns", l: "Growing Shape Patterns: Draw and Count the Next Term" },
         { v: "pattern_features", l: "Features of a Number Pattern: Odd, Even and Ones Digits", presetOf: "notice_patterns" },
+        { v: "follow_given_rule", l: "Follow a Given Rule: Extend a Number Pattern", presetOf: "number_patterns_rule" },
     ],
     algebra: [
         { v: "tape_diagram", l: "Tape Diagrams / Bar Models (Visual)" },

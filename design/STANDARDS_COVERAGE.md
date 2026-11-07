@@ -24,7 +24,7 @@ Sources:
 
 ## Summary
 
-- Skills mapped: 728 live skills; 619 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
+- Skills mapped: 729 live skills; 620 carry at least one CCSS code, 31 of them approximately; 56 are mixed review pools; 53 have no standard, with a reason (50 vocabulary games, 3 beyond grade 6).
 - Database: 177 CCSS standards K-6 plus 61 lettered parts; 117 Wisconsin Essential Elements K-6.
 - **Full coverage: CCSS 78 of 177 standards FULL, 88 PARTIAL, 11 GAP** (tagged: 166). Counting leaves and lettered parts (217): 105 FULL, 90 PARTIAL, 22 GAP.
 - **Essential Elements: 81 of 117 FULL, 33 PARTIAL, 3 GAP** (tagged: 115).
@@ -1489,7 +1489,7 @@ representation, answer, option ladder, misconceptions, lane and file ownership �
 *C. Generate and analyze patterns.*
 
 - **4.OA.C.5** — FULL. Generate a number or shape pattern that follows a given rule. Identify apparent features of the pattern that were not explicit in the rule itself. For example, given the rule “Add 3” and the starting number 1, generate terms in the resulting sequence and observe that the terms appear to alternate between odd and even numbers. Explain informally why the numbers will continue to alternate in this way.  
-  Taught by: Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Shape Patterns (Visual) (`patterns:shape_pattern`); Number Patterns (`patterns:number_pattern`); Features of a Number Pattern: Odd, Even and Ones Digits (`patterns:pattern_features`); Growing Shape Patterns: Draw and Count the Next Term (`patterns:growing_shape_patterns`) — lf-algebra 2026-11-07: features not explicit in the rule (pattern_features) and growing shape patterns  
+  Taught by: Number Patterns: Count On, Count Back, Double (`patterns:number_patterns_rule`); Shape Patterns (Visual) (`patterns:shape_pattern`); Number Patterns (`patterns:number_pattern`); Features of a Number Pattern: Odd, Even and Ones Digits (`patterns:pattern_features`); Growing Shape Patterns: Draw and Count the Next Term (`patterns:growing_shape_patterns`); Follow a Given Rule: Extend a Number Pattern (`patterns:follow_given_rule`) — lf-algebra 2026-11-07: features not explicit in the rule (pattern_features) and growing shape patterns  
   Also tagged: `algebra:function_table_easy`, `algebra:function_table_hard`, `algebra:function_table_find_rule`, `algebra:function_table_find_inputs`, `patterns:notice_patterns`
 #### Number and Operations in Base Ten (4.NBT)
 

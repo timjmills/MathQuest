@@ -158,6 +158,7 @@ export const SKILL_PRESETS = Object.freeze({
     // fraction form stays an option.
     'division:div_facts_long': { skill: 'div_facts', opts: { divForm: 'long' } },
     'patterns:pattern_features': { skill: 'notice_patterns', opts: { patTask: 'feature' } },
+    'patterns:follow_given_rule': { skill: 'number_patterns_rule', opts: { rule: false } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

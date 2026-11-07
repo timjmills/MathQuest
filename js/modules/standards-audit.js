@@ -152,7 +152,7 @@ export const CCSS_AUDIT = {
     '4.OA.A.2': P(['multiplication:mult_comparison', 'multiplication:mult_comparison_plain'], ['distinguish multiplicative comparison from additive comparison'], ['add_or_mult']),
     '4.OA.A.3': P(['division:remainder_interpret', 'division:remainder_contexts', 'algebra:multi_step_word', 'number_sense:estimate_products'], ['multistep problems using × and ÷', 'an equation with a letter for the unknown'], ['multi_step_four_ops']),
     '4.OA.B.4': F(['number_theory:factor_tchart_easy', 'number_theory:factors_identify', 'number_theory:multiples', 'number_theory:prime_composite', 'number_theory:divisibility_sort']),
-    '4.OA.C.5': F(['patterns:number_patterns_rule', 'patterns:shape_pattern', 'patterns:number_pattern', 'patterns:pattern_features', 'patterns:growing_shape_patterns'], 'lf-algebra 2026-11-07: features not explicit in the rule (pattern_features) and growing shape patterns'),
+    '4.OA.C.5': F(['patterns:number_patterns_rule', 'patterns:shape_pattern', 'patterns:number_pattern', 'patterns:pattern_features', 'patterns:growing_shape_patterns', 'patterns:follow_given_rule'], 'lf-algebra 2026-11-07: features not explicit in the rule (pattern_features) and growing shape patterns'),
     '4.NBT.A.1': P(['placevalue:value', 'placevalue:identify', 'placevalue:pv_digit_drag'], ['a digit is worth ten times what it is worth in the place to its right (700 ÷ 70 = 10)'], ['value_ten_times']),
     '4.NBT.A.2': F(['placevalue:number_word_names', 'placevalue:expand', 'placevalue:compare', 'placevalue:combine']),
     '4.NBT.A.3': F(['number_sense:nearest_1000', 'number_sense:nearest_10000', 'number_sense:nearest_100000', 'number_sense:round_nl_thousands']),

@@ -125,6 +125,31 @@
    "date": "2026-10-23",
    "ruling": "Top of the box is the default (CL-4b); content never shrinks to fit; one answer place per answer (VQ-2).",
    "source": "WORKSHEET_DESIGN_STANDARD.md, owner ruling 2026-10-23"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "F1 The rule is written IN the machine box at S and M, under the table at L (one rule place).",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "F2 × 6 is allowed on 3-row tables at band 20 for lesson #5 (the rows are table facts; ftFactors restricts).",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "F3 Check rows and 5-row tables count as adding a drawing (options-render capacity).",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "F4 Two-step rules stay offered on function_table_easy, off by default.",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
+  },
+  {
+   "date": "2026-11-07",
+   "ruling": "Every PROPOSED decision of section 7a is accepted as written.",
+   "source": "owner 2026-11-07, all as suggested (via lead)"
   }
  ],
  "misconceptions": [
@@ -181,24 +206,7 @@
    "note": "no value costs the page items without a drawing"
   }
  ],
- "openQuestions": [
-  {
-   "q": "Find the rule: write the rule IN the machine's box (one rule place) where the machine row fits a third of the page (S, M), and under the table at L. Keep?",
-   "recommended": "Yes: one place to write the rule; the old box saying 'rule' over a second frame doubled the answer area and cost a row of tables at S."
-  },
-  {
-   "q": "x and / rules at Numbers to 20: the rule number is 2 to 5 on a 4-row table (6 on a 3-row table) so every row is a table fact. Is x 6 on a 3-row table at 20 acceptable for lesson #5?",
-   "recommended": "Yes: 1 -> 6, 2 -> 12, 3 -> 18 are table facts; lessons that want only 2, 3, 5 and 10 tick ftFactors."
-  },
-  {
-   "q": "A Check row and a 5-row table hold fewer tables a page (S 6 where 9 plain tables fit). Accept them as 'adds a drawing'?",
-   "recommended": "Yes: both add a part to the drawing (a second small table, a fifth row); content never shrinks to fit."
-  },
-  {
-   "q": "Two-step rules (x then +) stay offered on function_table_easy (off by default)?",
-   "recommended": "Yes, off by default: lesson #5 leaves them out at W05; function_table_hard deals them."
-  }
- ],
+ "openQuestions": [],
  "rulings": {
   "rulings": [
    {
@@ -323,7 +331,8 @@
     ],
     "d": "offered",
     "source": "owner request 2026-09-25; lesson #5 / #20",
-    "why": "the five tasks; one task a page so the instruction says one thing"
+    "why": "the five tasks; one task a page so the instruction says one thing",
+    "proposed": false
    },
    {
     "option": "ftTask",
@@ -336,7 +345,7 @@
     "d": "offered",
     "source": "skill-options.js; lf-algebra r1 addsDrawingValues",
     "why": "a Check row: one more In number to test the rule on; adds a drawing (S 6 a page)",
-    "proposed": true
+    "proposed": false
    },
    {
     "option": "ftRules",
@@ -348,7 +357,8 @@
     ],
     "d": "offered",
     "source": "lesson #5",
-    "why": "one-step rules; lesson #5 deals + / - and x / /"
+    "why": "one-step rules; lesson #5 deals + / - and x / /",
+    "proposed": false
    },
    {
     "option": "ftRules",
@@ -361,7 +371,7 @@
     "d": "offered",
     "source": "skill-options.js; §9.4",
     "why": "two-step rules, off on easy by default (lesson #5 leaves them out at W05); hard deals them",
-    "proposed": true
+    "proposed": false
    },
    {
     "option": "band",
@@ -374,7 +384,8 @@
     ],
     "d": "offered",
     "source": "skill-options.js; lesson #5",
-    "why": "Numbers to N caps every number in the table (pvCap); lesson #5 deals 100 and 20"
+    "why": "Numbers to N caps every number in the table (pvCap); lesson #5 deals 100 and 20",
+    "proposed": false
    },
    {
     "option": "ftTable",
@@ -386,7 +397,8 @@
     ],
     "d": "offered",
     "source": "skill-options.js",
-    "why": "3 or 4 rows, In numbers in or out of order"
+    "why": "3 or 4 rows, In numbers in or out of order",
+    "proposed": false
    },
    {
     "option": "ftTable",
@@ -397,7 +409,7 @@
     "d": "offered",
     "source": "skill-options.js; lf-algebra r1 addsDrawingValues",
     "why": "5 rows: a taller drawing (fewer a page)",
-    "proposed": true
+    "proposed": false
    },
    {
     "option": "ftTrap",
@@ -407,7 +419,8 @@
     ],
     "d": "offered",
     "source": "detailed lesson 5",
-    "why": "first row fits a + rule and a x rule, so the pupil tests every row (lesson 5)"
+    "why": "first row fits a + rule and a x rule, so the pupil tests every row (lesson 5)",
+    "proposed": false
    },
    {
     "option": "ftFactors",
@@ -418,7 +431,8 @@
     ],
     "d": "offered",
     "source": "detailed lesson 5 r2",
-    "why": "x and / only by the facts the class has learned (lesson 5 r2)"
+    "why": "x and / only by the facts the class has learned (lesson 5 r2)",
+    "proposed": false
    },
    {
     "option": "support",
@@ -430,7 +444,8 @@
     ],
     "d": "offered",
     "source": "skill-options.js (option panel round 3)",
-    "why": "the rule frame and the machine picture: a fading support"
+    "why": "the rule frame and the machine picture: a fading support",
+    "proposed": false
    },
    {
     "option": "calculator",
@@ -441,7 +456,7 @@
     "d": "out of scope",
     "source": "skill-options.js play controls",
     "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR, not by this card",
-    "proposed": true
+    "proposed": false
    },
    {
     "option": "skipAfter",
@@ -451,7 +466,7 @@
     "d": "out of scope",
     "source": "skill-options.js play controls",
     "why": "a play control on every skill; graded by ws-options-verify BEHAVIOUR",
-    "proposed": true
+    "proposed": false
    }
   ],
   "roles": [
@@ -460,119 +475,119 @@
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "the pass bar (RUBRIC scope)",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:more-practice",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "the pass bar",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:test",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "the pass bar",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:lesson",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "the pass bar; function_table_easy has lesson data (prereqs.js, lf-algebra r1); function_table_hard still falls back (its lesson data is a follow-up)",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:scripted-model",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "provider workedSteps real (derived from the item)",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:guided",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "provider workedSteps real",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:opener",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "any skill on any page type",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:error-analysis",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "provider wrongAnswer real (five misconceptions); the cell draws its own Fix places",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:review",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "any skill on any page type",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:pre-skill-check",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "any skill on any page type",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:mixed-practice",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "any skill on any page type",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:true-false",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "provider wrongAnswer real",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:reason-it",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "provider workedSteps and wrongAnswer real",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:stretch",
     "d": "offered",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "any skill on any page type",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:word-problems",
     "d": "out of scope",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "no stories for a table; function_table_story is the story skill",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:fact-rows",
     "d": "out of scope",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "not a fact skill: the role reports unsupported",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "role:fact-probe",
     "d": "out of scope",
     "source": "CLAUDE.md (any skill on any page type); RUBRIC scope notes 2026-09-26",
     "why": "not a fact skill: the role reports unsupported",
-    "proposed": true
+    "proposed": false
    }
   ],
   "hosts": [
@@ -580,54 +595,57 @@
     "key": "host:practice-card",
     "d": "offered",
     "source": "RUBRIC (every screen host)",
-    "why": "one drawing with print; the pass bar"
+    "why": "one drawing with print; the pass bar",
+    "proposed": false
    },
    {
     "key": "host:online-worksheet",
     "d": "offered",
     "source": "RUBRIC (every screen host)",
-    "why": "one drawing with print; the pass bar"
+    "why": "one drawing with print; the pass bar",
+    "proposed": false
    },
    {
     "key": "host:quiz",
     "d": "offered",
     "source": "RUBRIC (every screen host)",
-    "why": "one drawing with print; the pass bar"
+    "why": "one drawing with print; the pass bar",
+    "proposed": false
    },
    {
     "key": "host:boss",
     "d": "out of scope",
     "source": "RUBRIC scope",
     "why": "game host draws the same card; graded by ws-chromebook-fit, not by this card's critic",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "host:race",
     "d": "out of scope",
     "source": "RUBRIC scope",
     "why": "game host draws the same card; graded by ws-chromebook-fit",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "host:map",
     "d": "out of scope",
     "source": "RUBRIC scope",
     "why": "draws the same card; graded by ws-screen-slots",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "host:mode-dark",
     "d": "out of scope",
     "source": "RUBRIC scope",
     "why": "display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots",
-    "proposed": true
+    "proposed": false
    },
    {
     "key": "host:mode-bigboard",
     "d": "out of scope",
     "source": "RUBRIC scope",
     "why": "display mode of the same card; graded by ws-chromebook-fit, ws-screen-slots",
-    "proposed": true
+    "proposed": false
    }
   ]
  },

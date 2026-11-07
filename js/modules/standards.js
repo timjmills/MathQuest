@@ -837,6 +837,7 @@ export const SKILL_STANDARDS = {
     'patterns:notice_patterns': { ccss: ['3.OA.D.9', '4.OA.C.5'], ee: ['M.EE.3.OA.8', 'M.EE.4.OA.5'] }, // What Do You Notice? Even and Odd Products, Pattern Features
     'patterns:growing_shape_patterns': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Growing Shape Patterns: Draw and Count the Next Term
     'patterns:pattern_features': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Features of a Number Pattern: Odd, Even and Ones Digits
+    'patterns:follow_given_rule': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Follow a Given Rule: Extend a Number Pattern
 };
 
 /* ================================================================= lookup */

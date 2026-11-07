@@ -42,7 +42,7 @@
   "ready": 7,
   "skillsNotPassed": 259,
   "blocked": 551,
-  "skills": 346,
+  "skills": 347,
   "skillsPassed": 11,
   "buildEntries": 301,
   "buildEntriesLinksOnly": 124,
@@ -126,12 +126,12 @@
    "ccssLessons": 85,
    "buildLessons": 11,
    "products": 166,
-   "newSkills": 62,
+   "newSkills": 63,
    "newSkillsPassed": 3,
    "builds": 30,
    "lanes": {
     "k2": 9,
-    "algebra": 16,
+    "algebra": 17,
     "placevalue": 19,
     "operations": 9,
     "numtheory": 6
@@ -3152,9 +3152,9 @@
     "ready": 0,
     "skillsNotPassed": 3,
     "blockedByGaps": 10,
-    "skills": 9,
+    "skills": 10,
     "skillsPassed": 0,
-    "newSkills": 9,
+    "newSkills": 10,
     "buildEntries": 6
    },
    "shapes": [
@@ -3170,7 +3170,7 @@
      "passed": 0
     },
     "algebra": {
-     "skills": 3,
+     "skills": 4,
      "passed": 0
     }
    },
@@ -3240,6 +3240,24 @@
      "passed": false
     },
     {
+     "key": "patterns:follow_given_rule",
+     "opts": {
+      "pattern": [
+       "add",
+       "sub"
+      ],
+      "places": [
+       10,
+       100
+      ]
+     },
+     "label": "Follow a Given Rule: Extend a Number Pattern",
+     "live": true,
+     "category": "patterns",
+     "lane": "algebra",
+     "passed": false
+    },
+    {
      "key": "patterns:number_patterns_rule",
      "opts": {
       "pattern": [
@@ -3268,6 +3286,7 @@
     "number_theory:prime_composite",
     "patterns:pattern_features",
     "patterns:growing_shape_patterns",
+    "patterns:follow_given_rule",
     "patterns:number_patterns_rule"
    ],
    "builds": [
@@ -3543,6 +3562,7 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
+      "patterns:follow_given_rule",
       "patterns:number_patterns_rule"
      ],
      "partial": [],
@@ -17824,7 +17844,8 @@
      "skillSource": "SKILL_WRM",
      "skills": [],
      "partial": [
-      "patterns:pattern_features"
+      "patterns:pattern_features",
+      "patterns:follow_given_rule"
      ],
      "build": [
       "dec_sequence"
