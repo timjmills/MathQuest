@@ -13,9 +13,10 @@ Critic rounds: 0, none
   the critic: precritic is red on roles these skills print, and every remaining red but one belongs to lf-ops / lf-engine.
 - Six skills built or fixed for BUILD lessons #3 #5 #19 #20 #21: algebra:function_table_easy, patterns:number_patterns_rule,
   patterns:follow_given_rule (preset, new), patterns:notice_patterns (new), patterns:pattern_features (preset, new),
-  patterns:growing_shape_patterns (new). Cards: function-table SIGNED (800dad86d); patterns RE-SIGN NEEDED (b0ca7395 resized
-  the growing unit to the standard's minimum, 2.5/2.5/2.6 mm, dots 0.8 u, box 7.8 u).
-- Next, in order: (1) lead re-signs patterns; (2) take lf-ops' count-row fix for the wrap root cause (we hold an interim
+  patterns:growing_shape_patterns (new). Cards: function-table SIGNED (800dad86d); patterns: re-sign pending (lead 2026-11-07: NOT re-signed.
+  b0ca7395 moved the growing unit 2.0/2.8/3.3 -> 2.5/2.5/2.6 mm, so M and L got SMALLER and the sizes nearly match: a design
+  change. Next round: S 2.5 mm, M and L kept at >= 2.8 / 3.3 mm; if they cannot stay, an owner question with a suggested answer).
+- Next, in order: (1) growing unit S 2.5 / M >= 2.8 / L >= 3.3 mm in code and card.json, then the lead re-signs patterns; (2) take lf-ops' count-row fix for the wrap root cause (we hold an interim
   revert of 3d8bca1's wrap hunk, 2cfeb1d7) and lf-engine's `guidedRows: 1|2` key, then set guidedRows: 1 in our lesson data
   (after lf-engine merges, our 6 lesson-data entries move from lessons/prereqs.js to lessons/families/algebra.js); (3) ours:
   capitalise the parity answer (gen-patterns-notice.js:72 'even'/'odd' -> 'Even'/'Odd', then check the card rulings and the
@@ -263,6 +264,7 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-07 12:45: lead: patterns card re-sign pending (M/L shrank in b0ca7395, see Now); no further work this week.
 - 2026-11-07 ~12:50: hand-over. Merged the integration tip (14 commits, clean); on the merged tree ws-code-snapshot (736 codes),
   ws-standards, ws-search-terms, ws-presets-unit (126), ws-redesign-passed, ws-wrm-page-unit, ws-lessons-first-queue --check and
   ws-spec-card --check-signed (before the patterns re-sign) all OK. No skill added to redesign-passed.js (no critic yet).
