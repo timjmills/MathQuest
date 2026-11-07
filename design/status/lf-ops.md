@@ -33,6 +33,8 @@ Priority order (lead, 2026-11-07, from data/curriculum/ccss-build-lessons.json, 
 Then: mult_comparison + comparison_statements (#22), remainder_interpret.
 - Already at 8/10 and left alone: mult_facts, add_facts, sub_facts (and add_wp_20 as marked in the queue).
 
+- Build #4 (mult_properties, arrays_groups, count_by_tables), builder r1-r2, head 0f2aeec: precritic --strict 9 FAIL -> 2 FAIL (log /tmp/mq-precritic/20261107-090028-14093; lessonfit and spec-card re-run green after 0f2aeec / f31a5b7). Still red, stopped by rule 7 (two rounds): (1) sibling-compare: 36 unproven counts, arrays / arrays-turn have no approved sibling (mostly page-level DN-2 / PG-23 / PAGEFILL); (2) print-lint --roles lesson S: mult_properties lesson Practice SPREAD 49 % (limit 50 %), 4 turn-array problems a page at lesson L type. Both to the lead for a ruling.
+
 ## Precritic before any fix (step 2; run on 6d015f2-era tree before the cards were signed; log scratchpad precritic-0.txt)
 Red rows, with cause where known:
 - print-lint independent S / M / L: a few counts above the pin in 2 of 7 skills (to triage per skill in the build rounds).
