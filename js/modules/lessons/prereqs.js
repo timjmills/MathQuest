@@ -423,7 +423,67 @@ export const LESSONS = Object.freeze({
     // property ('both' task) 5. The Warm-up deals short tracks and across facts only (an array in the Warm-up ran it
     // past half a page at L, as on count_by_tables).
     ...opsTablesLessons(),
+
+    // ---------------------------- The plain × / ÷ stories (3; lane lf-ops, ops-tables card §9 Q3, BUILD lesson #7)
+    // The stories the two-step lesson (3.OA.D.8) rests on (3.OA.A.3). The lesson teaches the STRUCTURE, never key
+    // words (the card hides the cues and the bank, M-S1): equal groups - how many groups, how many in each - or a
+    // total split into equal groups. The six steps are the provider's six worked steps (providers/word-work.js
+    // plainStorySteps: read, the groups, the sign, the boxes, the fact, the answer and its label).
+    ...timesStoryLessons(),
 });
+
+function timesStoryLessons() {
+    const FORMAT = {
+        kind: 'numbered steps with icons + a rule',
+        why: 'The one decision pupils get wrong is the sign; naming the equal groups first decides it, and the rule says it in four words.',
+    };
+    const steps = (groups) => [
+        { icon: 'look', text: 'Read the story two times.' },
+        { icon: 'decide', text: groups },
+        { icon: 'decide', text: 'Circle the sign.' },
+        { icon: 'write', text: 'Write the numbers in the boxes.' },
+        { icon: 'count', text: 'Solve the fact.' },
+        { icon: 'write', text: 'Write the answer and its label.' },
+    ];
+    const vocab = (fact) => [
+        { word: 'equal groups', meaning: 'groups with the same number in each', picture: { kind: 'text', text: '3 groups of 4' } },
+        { word: 'in each', meaning: 'how many one group has', picture: { kind: 'text', text: '4 in each' } },
+        { word: 'fact', meaning: 'the numbers and the sign', picture: { kind: 'text', text: fact } },
+    ];
+    const multFacts = { key: 'multiplication:mult_facts', opts: { notation: ['across'], band: 100 }, why: 'The story is solved with a times fact.' };
+    const arrays = { key: 'multiplication:arrays_groups', opts: { forms: [0] }, why: 'Equal groups: how many groups, how many in each, how many in all.' };
+    const divFacts = { key: 'division:div_facts', opts: { band: 100 }, why: 'The story is solved with a division fact.' };
+    const timesStory = { key: 'multiplication:mult_word_problems_plain', why: 'A times story names the same equal groups; a division story asks for one of its numbers.' };
+    const base = { format: FORMAT, practiceShapes: [[6, 2], [4, 2], [4, 1], [2, 1]] };
+    return {
+        'multiplication:mult_word_problems_plain': Object.assign({}, base, {
+            skills: [multFacts, arrays],
+            concepts: [
+                { id: 'equal-groups', text: 'A times story has equal groups.' },
+                { id: 'groups-times-each', text: 'Groups × the number in each = how many in all.' },
+                { id: 'unit', text: 'The answer is a number of things: say the label.' },
+            ],
+            vocab: vocab('5 × 6 = 30'),
+            steps: steps('Find the groups and how many in each.'),
+            chant: 'Equal groups? Multiply.',
+            example: { match: 'equal groups' },
+            mixWith: [{ key: 'multiplication:mult_facts', opts: { notation: ['across'], band: 100 } }, { key: 'addition:add_facts', opts: { band: 20 } }],
+        }),
+        'division:div_word_problems_plain': Object.assign({}, base, {
+            skills: [divFacts, timesStory],
+            concepts: [
+                { id: 'total-split', text: 'A division story splits a total into equal groups.' },
+                { id: 'missing-number', text: 'It asks for the number in each group, or the number of groups.' },
+                { id: 'unit', text: 'The answer is a number of things: say the label.' },
+            ],
+            vocab: vocab('15 ÷ 5 = 3'),
+            steps: steps('Find the total and the equal groups.'),
+            chant: 'Split it equally? Divide.',
+            example: { match: 'The total is' },
+            mixWith: [{ key: 'division:div_facts', opts: { band: 100 } }, { key: 'multiplication:mult_facts', opts: { notation: ['across'], band: 100 } }],
+        }),
+    };
+}
 
 function opsTablesLessons() {
     const by5 = { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' }, why: 'Skip counting by 5s: how a row of dots is counted fast.' };

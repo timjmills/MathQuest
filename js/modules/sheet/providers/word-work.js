@@ -188,6 +188,7 @@ const OWN = {
     'division:remainder_interpret': 'I Can solve division stories with remainders',
     'division:remainder_contexts': 'I Can solve division stories with remainders',
 };
+const PLAIN_OWN = new Set(['multiplication:mult_word_problems_plain', 'division:div_word_problems_plain']);
 for (const [key, iCan] of Object.entries(OWN)) {
     // a remainder story is division by its name: its page never asks for a sign (no sign row)
     // a times-as-many story writes its sign in the neutral sentence's ring: one sign place
@@ -213,5 +214,65 @@ for (const [key, iCan] of Object.entries(OWN)) {
         })
         : wordWorkProvider(iCan);
     registerSkill(key, def);
-    if (!/remainder_/.test(key)) registerSkill(`${key}_plain`, def);
+    // (the plain x / ÷ stories register their own members below: no key words in their Model)
+    if (!/remainder_/.test(key) && !PLAIN_OWN.has(`${key}_plain`)) registerSkill(`${key}_plain`, def);
+}
+
+// ------------------------------------------------------------------ the plain x / ÷ stories (lane lf-ops, 2026-11-07)
+// The signed ops-tables card (§7a) hides the key-word cues and the bank on mult_word_problems_plain and
+// div_word_problems_plain: a key-word list teaches "each means ×" (M-S1). Their Model therefore never says "look at
+// the key words"; it names the story's STRUCTURE instead (equal groups: how many groups, how many in each; or the
+// total and the equal groups it is split into), and the Say frame says that structure back with the answer.
+// The other members (the wrong operation for Error analysis, the bar wrongs) are the shared ones.
+function plainGroupsStep(st, schema) {
+    if (st.op === '*') return step(`There are ${fmt(st.a)} equal groups. Each group has ${fmt(st.b)}.`);
+    // sharing: the groups are known, the size is asked; grouping: the size is known, the groups are asked
+    if (st.op === '/' && schema === 'grouping') return step(`The total is ${fmt(st.top)}. Each group has ${fmt(st.bottom)}. How many groups?`);
+    if (st.op === '/') return step(`The total is ${fmt(st.top)}. There are ${fmt(st.bottom)} equal groups. How many in each?`);
+    return null;
+}
+export function plainStorySteps(q) {
+    const p = payloadOf(q);
+    if (!p || p.steps.length !== 1 || p.layout === 'sentence' || p.layout === 'choose' || p.letter || p.check) return wordWorkSteps(q);
+    const st = p.steps[0];
+    const gs = plainGroupsStep(st, p.schema);
+    if (!gs) return wordWorkSteps(q);
+    const out = [step('Read the story two times.'), gs];
+    out.push(p.signs === false ? step(`${VERB[st.op]}.`) : step(`Circle ${GLYPH[st.op]}. ${VERB[st.op]}.`, [{ slot: 'op0', value: GLYPH[st.op] }]));
+    out.push(step(`Write ${fmt(st.top)} and ${fmt(st.bottom)} in the boxes.`));
+    out.push(step(workLine(st)));
+    out.push(step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }]));
+    return clampSteps(out);
+}
+const unitFor = (p) => (Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit);
+for (const [key, iCan, op] of [
+    ['multiplication:mult_word_problems_plain', 'I Can solve multiplication stories', '*'],
+    ['division:div_word_problems_plain', 'I Can solve division stories', '/'],
+]) {
+    registerSkill(key, wordWorkProvider(iCan, {
+        strings: strings({
+            iCan,
+            instructionKey: 'story-work',
+            steps: op === '*' ? [
+                'Read the story two times.',
+                'Find how many groups and how many in each group.',
+                'Circle the sign. Write the numbers in the boxes. Solve.',
+                'Write the answer and its label word.',
+            ] : [
+                'Read the story two times.',
+                'Find the total and the equal groups.',
+                'Circle the sign. Write the numbers in the boxes. Solve.',
+                'Write the answer and its label word.',
+            ],
+            say: op === '*' ? '__ groups of __ is __ __.' : '__ divided by __ is __ __.',
+            sayValues: (q) => {
+                const p = payloadOf(q);
+                const st = p && p.steps.length === 1 ? p.steps[0] : null;
+                if (!st || !p.unit) return null;
+                return op === '*' ? [fmt(st.a), fmt(st.b), fmt(p.ans), unitFor(p)] : [fmt(st.top), fmt(st.bottom), fmt(p.ans), unitFor(p)];
+            },
+        }),
+        misconceptions: op === '*' ? ['wrong-operation', 'groups-as-total'] : ['wrong-operation', 'divisor-as-answer'],
+        workedSteps: plainStorySteps,
+    }));
 }
