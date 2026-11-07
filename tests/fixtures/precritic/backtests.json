@@ -1703,6 +1703,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "practice-units",
+   "check": "{p4.last} names Practice SHEETS: a sheet over two pages is one Practice k, its last row on its last page",
+   "kind": "commit-pair",
+   "rule": "lesson 3a live critic (T5 Watch 'Practice 3'), lf-engine P1d r3",
+   "browser": false,
+   "fail": {
+    "commit": "8f51b557",
+    "state": "one Practice k a page: Practice 1's second page named Practice 3"
+   },
+   "pass": {
+    "commit": "30e2825b",
+    "state": "practiceUnits: one unit a sheet"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only practice-units",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
