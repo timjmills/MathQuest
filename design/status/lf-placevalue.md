@@ -70,6 +70,9 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-08 ROUND 4 (lead, cap $35; branch claude/lf-placevalue-r4 from master 8573c66a): identify E-A1 (lead ruling: pv-owned) - the
+  "ones" vocabulary picture drawn compact (lesson.js `blocks` opt-in `compact`); unit_form G2 - rename frames' write line +2 digits at S.
+  Checks first: ws-empty-band --vocab-ink (EB-VOCAB) on precritic's path, `--only`; backtests pv-identify-vocab-ink, pv-unit-form-rename-side.
 - 2026-11-08 critic r3c (critic-r3c.md, on ce9a2fc4): expand still PASSES on the new deal; **placevalue:value and placevalue:combine
   PASSED** (redesign-passed.js, pv approved siblings; PNGs design/status/lf-placevalue/{value-pass,combine-pass,expand-r3c}/).
   identify PASSES if the lead rules E-A1 (lesson.js blocks picture height) engine; else its lesson p2 is C3 7. unit_form not graded (G2 open).

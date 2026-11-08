@@ -145,7 +145,9 @@ function judge(cells, where, F) {
 
 async function main() {
     const findings = []; const notes = []; let renders = 0, cellsRead = 0;
-    const F = (rule, where, msg) => findings.push({ rule, where, msg });
+    // (`--only R1,R2`: judge only these rules - a backtest row proves one rule alone)
+    const ONLY = arg('only', null) ? arg('only').split(',') : null;
+    const F = (rule, where, msg) => { if (!ONLY || ONLY.includes(rule)) findings.push({ rule, where, msg }); };
     const app = await open({ seed: 1 });
     const { page } = app;
     const T0 = Date.now();

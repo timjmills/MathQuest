@@ -338,3 +338,13 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 - E-B2 error-analysis combine M: 37 % empty under the correct-answer line, which ws-empty-band passes -> PROPOSED: EB-BAND reads the
   error-analysis cell's own rows (the box under the answer line is in the measured ink today).
 - Speed: a page-hash diff (graded commit vs head) limited the re-grade to the changed pages; one critic did four skills in 18 min.
+
+## lf-placevalue round 4 (2026-11-08): identify E-A1 and unit_form G2, the checks first
+- E-A1 -> ws-empty-band `--vocab-ink` (EB-VOCAB: each lesson vocabulary picture's drawing against its own box, 70 %), opt-in for
+  the lane on precritic's path; backtest `pv-identify-vocab-ink` (8573c66a FAIL 3 -> 64f70063 OK). Fix: the `blocks` picture's
+  opt-in `compact` (ones only: one cube tall), set only where the lane's data asks, so no other lesson's picture moved.
+- G2 -> the existing EB-SIDE on every §7a option value at S (the default plan ran variants at L only: r3 F2's lesson); backtest
+  `pv-unit-form-rename-side` (EB-SIDE 27 -> 0). Fix: unit form's full-width rename frames take a write line two digits longer at S
+  (one width for every item: the line never tells the answer).
+- Tool: ws-empty-band `--only R1,R2` so a backtest row proves one rule even where another rule is red on both commits.
+- Process: a merged lane branch is never force-pushed; the follow-up round takes a new branch from master (claude/lf-placevalue-r4).

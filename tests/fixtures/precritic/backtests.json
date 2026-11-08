@@ -2447,6 +2447,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-identify-vocab-ink",
+   "check": "placevalue:identify lesson: every vocabulary picture's drawing fills at least 70 % of its own box (critic r3c E-A1: 4 ones drawn in a ten-rod's height left the vocabulary cell 43 % empty)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-VOCAB (--vocab-ink)",
+   "browser": true,
+   "fail": {
+    "commit": "8573c66a",
+    "state": "critic r3c: EB-VOCAB 3 (lesson S / M / L)"
+   },
+   "pass": {
+    "commit": "64f70063",
+    "state": "blocks picture `compact`: a ones-only picture one cube tall"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --hosts none --vocab-ink --no-baseline --only EB-VOCAB",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-unit-form-rename-side",
+   "check": "placevalue:unit_form rename=more at S: no cell has an empty band of 30 % or more beside its ink (critic r3b G2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE",
+   "browser": true,
+   "fail": {
+    "commit": "8573c66a",
+    "state": "EB-SIDE 27 (independent / more-practice / test / review S)"
+   },
+   "pass": {
+    "commit": "64f70063",
+    "state": "rename frames' write line two digits longer at S"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts {\"rename\":\"more\"} --roles independent,more-practice,test,review --hosts none --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
