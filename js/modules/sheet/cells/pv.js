@@ -25,7 +25,7 @@
 
 import { esc, blank } from '../cell.js';
 import { register } from '../registry.js';
-import { SIZES } from '../tokens.js';
+import { SIZES, blankWidth } from '../tokens.js';
 
 export const DISK_SIZES = {
     S: { d: 8, head: 4, pt: 9 },
@@ -323,7 +323,10 @@ function frameHTML(ctx, text, key, digits, ghostExpr = '') {
         // lf-placevalue r1 F9 (AX-4, one geometry a section): `ghostExpr` - the widest expression the section deals - is
         // drawn invisibly in the same grid area as the expression, so every item's expression is as wide as the widest,
         // and every item wraps (or not) exactly as the widest does: one line on every cell, or two on every cell.
-        const ghostPair = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:end;align-items:end;">`
+        // (lf-placevalue r3 F1 / F2, H13 side bands: the expression is CENTRED in the ghost-sized box, not right-aligned on
+        // an "=" column - "800 + 10" in the box of "800 + 10 + 4" left 54-60 mm (30-34 %) on its left in a full-width row;
+        // centred, the spare width splits each side of the ink and every cell keeps the same box)
+        const ghostPair = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:center;align-items:end;">`
             + `<span style="grid-area:1 / 1;${nb}">${piece(ctx, c)}</span>`
             + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;${nb}">${piece(ctx, ghostExpr)}</span></span>`;
         // lf-placevalue r2 (combine band=999999: "300,000 + 50,000 + 3,000 + 400 + 40 + 7" is wider than the page at L,
@@ -367,6 +370,31 @@ function frameHTML(ctx, text, key, digits, ghostExpr = '') {
             const nParts = (ghostExpr ? ghostNums : String(chunks.join(' ')).trim().split(/\s+/).filter((w) => /^\d/.test(w))).length;
             const brk = nParts <= 2 ? '<span class="pv-break" style="flex-basis:100%;height:0;"></span>' : '';
             return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${head3}${brk}${grp}</div>`;
+        }
+        // (lf-placevalue r3, H13 side bands, combine Test at M two across: "800 + 80 + 8 = ____" is about 1 mm wider than
+        // the 86 mm cell, so "= ____" wrapped under a CENTRED two-part expression and both lines' ink was 34 mm of 86
+        // (30-31 % each side). Where the one-line frame cannot fit the cell (estimated from the working digit size and the
+        // kit's blank width), the frame is drawn on two STEPPED lines in one box as wide as the widest line: the expression
+        // from the box's left, "= ____" ending at its right - every item the same box, the ink spanning it)
+        if (exprOnly && ghostExpr && !split && Number(ctx.columns) >= 2 && ctx.metrics && ctx.metrics.digitPt) {
+            const em = (ctx.metrics.digitPt / 72) * 25.4;
+            const toks = String(ghostExpr).trim().split(/\s+/);
+            const digitsN = toks.join('').replace(/[^0-9]/g, '').length;
+            const commasN = toks.join('').replace(/[^,.]/g, '').length;
+            const opsN = toks.filter((t) => !/^\d/.test(t)).length;
+            const exprMm = em * (0.55 * digitsN + 0.25 * commasN + 1.57 * opsN);
+            const grpMm = em * 1.37 + blankWidth(Math.max(1, Number(digits) || 1), ctx.size);
+            const innerMm = 186 / Number(ctx.columns) - 6.6;
+            if (exprMm + em * 0.28 + grpMm > innerMm) {
+                const lineBox = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:start;align-items:end;grid-row:1;">`
+                    + `<span style="grid-area:1 / 1;${nb}">${piece(ctx, c)}</span>`
+                    + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;${nb}">${piece(ctx, ghostExpr)}</span></span>`;
+                const exprC = chunks.find((c) => c.includes(' ')) || chunks[0] || '';
+                const rest = chunks.filter((c) => c !== exprC).map((c) => piece(ctx, c)).join('');
+                return `<div class="ws-eq pv-frame pv-stepped" style="font-weight:700;justify-content:center;">`
+                    + `<span style="display:inline-grid;row-gap:1mm;align-items:end;">${lineBox(exprC)}`
+                    + `<span style="grid-row:2;justify-self:end;display:inline-flex;align-items:flex-end;column-gap:0.2em;">${rest}${grp}</span></span></div>`;
+            }
         }
         const head = chunks.map((c) => (exprOnly && ghostExpr && c.includes(' ') ? (split ? splitPair(c) : ghostPair(c))
             : c.includes(' ') ? `<span class="pv-pair" style="${nb}">${piece(ctx, c)}</span>` : piece(ctx, c))).join('');
@@ -935,7 +963,9 @@ register('pv', {
             // in 5 x 6 rows held to the 82 % page fill left 33 %. Held to three across, the two-line cells take 3 x 9 rows
             // as tall as their ink: 27 a page, every cell full)
             const twoPart = p.kind === 'frame' && p.ghost && String(p.ghost).split(/\s+/).filter((w) => /^\d/.test(w)).length <= 2;
-            if (twoPart && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true };
+            // (lf-placevalue r3 F2: held to 3 across at S, "10 + 4" / "= ____" in a 62 mm cell left 32-35 % each side; four
+            // across, the two-line frame fills its 46 mm cell - the layout still takes fewer where the measured fit says so)
+            if (twoPart && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 4, denseRoom: 1, inPlace: true, hardCap: true };
             return { wMm: wideIn ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wideIn ? 1 : 2, denseRoom: 1, inPlace: true, ...(wideIn ? { hardCap: true } : {}) };
         }
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
