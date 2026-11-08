@@ -1820,6 +1820,11 @@ function wsLintPage(cfg) {
                 slots: cells.reduce((n, c) => n + c.slots, 0), instructions: ri.instructions,
                 // the supports-off div_facts page (owner 2026-11-08: 36 a page at S): its bare facts carry .ws-eq-divplain
                 divUnder: ri.cells.some(c => c.querySelector('.ws-eq-divplain, .ws-eq-under')),
+                // a div_facts across fact (only div_facts' equation payload `fact` emits data-ws-across): its Test follows the
+                // Independent capacity (owner 2026-11-08, critic r6 R6-1)
+                divAcross: ri.cells.some(c => c.querySelector('.ws-eq[data-ws-across]')),
+                // the supports the page's problems carry (a faded packet's stage)
+                supKey: [...new Set(ri.cells.map(c => { const e = c.querySelector('[data-ws-supports]'); return e ? e.getAttribute('data-ws-supports') : ''; }))].sort().join('|'),
             });
         }
     } else {
@@ -2309,6 +2314,8 @@ function lintKitGeometry(dom, pdf, info, F) {
             }
             // owner 2026-11-08 (div_facts r6 follow-up): the supports-off div_facts page holds up to 36 at S
             if (c && p.divUnder && p.size === 'S' && /^(independent|more-practice|review)$/.test(p.role)) c = { n: Math.max(c.n, 36), name: `${c.name} (div_facts supports-off at S, owner 2026-11-08)` };
+            // owner 2026-11-08 (critic r6 R6-1, option a): a div_facts fact Test follows the Independent page's capacity (36 / 24 / 20)
+            if (c && p.divAcross && /^test\b/.test(p.role)) c = { n: Math.max(c.n, { S: 36, M: 24, L: 20 }[p.size] || 20), name: `${c.name} (div_facts fact Test = the Independent capacity, owner 2026-11-08)` };
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
             const last = j === pt.pages.length - 1;
@@ -2317,7 +2324,10 @@ function lintKitGeometry(dom, pdf, info, F) {
             // B's. A page with no letter (any other role) is compared across its whole sheet as before.
             const dnLetter = (q) => { const m = /\bPractice ([A-J])\b/.exec((q.tab || []).join(' ')); return q.role === 'more-practice' && m ? m[1] : ''; };
             const dnL = dnLetter(p);
-            const dnGroup = dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages;
+            // (a faded packet's stages carry different supports, so their cells are not one size: a page's count is compared
+            // with the pages of its own stage only - div_facts critic r6 R6-4, the bare last stage fills its page)
+            const fadeKey = arg('fade', null) === 'packet' ? (q) => q.supKey : () => '';
+            const dnGroup = (dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages).filter(q => fadeKey(q) === fadeKey(p));
             const dnMax = Math.max(...dnGroup.map(q => q.items));
             const dnLast = dnGroup[dnGroup.length - 1] === p;
             if (comparable && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
