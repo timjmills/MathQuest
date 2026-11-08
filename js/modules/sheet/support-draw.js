@@ -286,7 +286,8 @@ function pieceOf(id, p, template, ctx) {
         // TRUE array, the quotient's rows of the divisor's dots, in the section's one frame `supports.arrayFrame`)
         const af = pp.op === '/' && id === 'array' && p.supports && p.supports.arrayFrame;
         if (af) {
-            const cp = { a: pp.a, b: pp.b, op: '/', cue: 'array', frame: af };
+            // (critic r5 R5-4: at S the dots take a 2.25 mm pitch, so the S page holds a 4th row of arrays - S denser than M)
+            const cp = { a: pp.a, b: pp.b, op: '/', cue: 'array', frame: ctx && ctx.size === 'S' ? Object.assign({}, af, { pitch: 2.25 }) : af };
             const html = factCueOf(cp, twin);
             const m = MM_RE.exec(factCueOf(cp, false)) || [];
             return html ? { html: `<div class="ws-factcue">${html}</div>`, foot: { wMm: Number(m[1]) || 16, hMm: Number(m[2]) || 38, placements: ['beside', 'under'] }, place: null } : null;
