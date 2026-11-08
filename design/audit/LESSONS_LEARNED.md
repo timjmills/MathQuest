@@ -297,3 +297,17 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 - N7 unit_form review mixes two combine layouts (r1 F9, survived 2 rounds) -> PROPOSED GRID-EVEN-ALL on every offered role, not only independent.
 - N8 a 2-column request ignored on expand / unit_form, page 55–65 % empty (r1 F21 half, survived 2 rounds) -> PROPOSED: matrix more-cols2 rows judged (red until a critic rules), not PENDING(no-baseline).
 - Rule 7 applied: N7 and N8 survived two medium rounds -> the lane stopped its build loop; root causes above, next builder briefed fresh.
+
+## lf-placevalue critic r3 / r3b (2026-11-08): one line per finding, the check that catches it (or PROPOSED)
+- F3 identify lesson vocab: the "underlined" picture drew no underline (the H T O picture carried the rule) -> PROPOSED LESSON-DATA
+  rule: a vocabulary picture for a word that names a mark (underlined, circled) draws that mark, and no other picture carries it.
+- G1 value lesson vocab: "worth" and "value" meant the same (two right matches) -> PROPOSED LESSON-DATA rule: no vocab meaning uses
+  another vocab word of the same lesson, and no picture's text sits inside another's.
+- F4 identify lesson Warm-up heading asked for the value its cells do not have -> lesson.js now takes the items' own instructionKey
+  (lead 2026-11-08); PROPOSED: the N2 printed-instruction check over every lesson section's heading.
+- F1 / F2 combine side bands (a right-aligned frame in a full-width cell; band 99 held to 3 across) -> ws-empty-band EB-SIDE was
+  ALREADY red in precritic r5 ([pv]) and went to the critic anyway: an EB-SIDE [pv] row on independent / more-practice must block
+  (process: a [pv]-tagged red row is never "owned elsewhere"); backtest `pv-combine-side-band`.
+- G2 unit_form rename=more S side bands -> ws-empty-band option variants run at L only; PROPOSED: every §7a option value at S / M / L.
+- First PASS of the family: placevalue:expand. What made it pass: the cell fits every offered value (L26), per-slot answers (L27),
+  the option-aware instruction (L28), every band judged (L29), and two critics splitting the render load (r3 timed out at 50 min).

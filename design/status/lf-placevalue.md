@@ -70,6 +70,12 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-08 critic r3 (critic-r3.md) + r3b (critic-r3b.md): **placevalue:expand PASSED** (redesign-passed.js 4db17849, pv approved
+  sibling; 41 expand pages byte-identical HEAD vs the graded aacae5ea). identify (F3 vocab fixed aacae5ea, F4 heading fixed in
+  lesson.js 70e35893 - other short lessons byte-identical), value (G1 vocab fixed 94de4e16 / 671014c0), combine (F1 fixed, F2 S fixed
+  deb9e426; band 99 M EB-BAND and test L EB-SIDE are layout / test.js), unit_form (G2 rename=more S side bands open) - each needs a
+  re-grade of only those pages. Evidence PNGs: design/status/lf-placevalue/expand-pass/. Deploy gates on 4db17849: ws-redesign-passed,
+  code-snapshot, standards, search-terms, providers-unit, boot-smoke OK; ws-stamp-assets --check stale (integrator stamps).
 - 2026-11-08 SMALL FIX PASS before critic r3 (builder, mq-opus-medium), 064e243e: (2) combine band=99 S: two-part frames held to
   3 across at S (footprint hardCap 3) and, 3+ across, "= ____" on its own line: 3x10 one-line cells at 35 % -> 3x9 two-line cells
   as tall as their ink; (3) expand band=99 S: the 2-place row may stand 3 across at S, the number over "= [ ] + [ ]" (S only: two

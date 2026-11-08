@@ -894,3 +894,12 @@ ws-lesson-samples --check in parallel pages (about 1 min, not 3.5); freeze or ta
 
 **Root cause of the stop:** hand-edited pass fixtures. Rule for every checks lane: a pass state is a commit (or a fixture
 re-rendered from a commit), never a packet edited by hand; where no fix commit exists yet, the row's pass side is pending.
+
+### lf-placevalue critic r3 / r3b (2026-11-08): expand PASS; identify, value, combine, unit_form FAIL (one or two pv findings each)
+**Which earlier check missed each finding, or why none did:** F3 / G1 (lesson vocabulary data) — LESSON-DATA checks only that the
+entry exists and its refs are live, never the pictures or meanings: proposed rules in LESSONS_LEARNED. F4 — the N2 instruction check
+covered pages, not lesson section headings. F1 / F2 — ws-empty-band EB-SIDE caught them in precritic r5 but the lane sent the red
+[pv] rows to the critic as "owned elsewhere": process fix, a [pv] row is never owned elsewhere. G2 — option variants rendered at L only.
+**Speed-ups:** the first r3 critic timed out (50 min) on the full matrix; splitting the batch by skill across two critics finished it.
+Next family: one critic per 2-3 skills, rendered in parallel slots. The detailed lessons are not deterministic across runs of the same
+code (hash check impossible): give buildDetailedLesson a seeded, deterministic path (lf-engine).
