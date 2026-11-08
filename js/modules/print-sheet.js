@@ -223,12 +223,15 @@ function normaliseRequest(req = {}) {
     // one-line fact no longer sits in a row of 22-28 mm with half of it empty (54 % at S). div_facts only: the passed
     // add / sub / mult fact pages keep their layout.
     // (a sheet with worked examples keeps its own layout: the anchors' blocks size its rows, ws-sibling-compare ex-group L)
-    if ((role === 'independent' || role === 'review') && (!req.anchors || req.anchors === 'off')) {
+    if ((role === 'independent' || role === 'review' || role === 'more-practice') && (!req.anchors || req.anchors === 'off')) {
         // (the rows then take what the page holds of the two-line cell, up to DN-1's 30 / 24 / 20: at L 15 in 42 mm rows
         // left 34 % under the line, 18 in 37 mm rows leave 25 %)
         for (const sec of sections) {
             if (!divFactsPlainSection(sec)) continue;
             sec.divUnder = true;
+            // (ws-empty-band EB-FOOT / EB-BAND, lf-checks L25: the rows are the facts' measured height and 1.1 x room, never
+            // stretched to the grid, so the drawn cell is the footprint and no band of 30 % is left under the line)
+            sec.noStretch = 1.1;
             if (sec.dense === true && sec.columns === 'auto') sec.dense = { S: 36, M: 24, L: 20 };
         }
     }
@@ -2640,7 +2643,7 @@ function heightClassOf(sec, items, gridMm) {
     if (sec.heightClass) for (const it of items) if (it) it.hClass = true;
 }
 
-const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows, ...(section.noStretch ? { noStretch: true } : {}) });
+const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows, ...(section.noStretch ? { noStretch: section.noStretch } : {}) });
 
 /**
  * The column-work group a practice page splits off (practice.js fineSplit), exactly as the role
@@ -3103,7 +3106,7 @@ async function buildSheetDeal(req = {}) {
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen0 = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
-        const gen = sec.divFade ? gen0.map((g, _i, all) => factFade(g, sec, fadeFactEm(all))) : gen0.map((g) => (sec.divUnder ? factUnder(g) : g));
+        const gen = sec.divFade ? gen0.map((g, _i, all) => factFade(g, sec, fadeFactEm(all))) : gen0.map((g) => (sec.divUnder ? factUnder(g, { plain: true }) : g));
         const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt, stage: sec.fadeStage };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
@@ -3713,7 +3716,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}), ...(s.noStretch ? { noStretch: true } : {}) })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}), ...(s.noStretch ? { noStretch: s.noStretch } : {}) })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -4143,7 +4146,7 @@ async function buildRoleSheet(n, metaOf) {
                 ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
                 : g0;
             // (critic r5 R5-2: a Review's bare div_facts facts print over their answer line, as on the Independent page)
-            const gU = n.sections.some((sec) => sec.divUnder) && g.skill && g.skill.categoryId === 'division' && g.skill.skillId === 'div_facts' ? factUnder(g) : g;
+            const gU = n.sections.some((sec) => sec.divUnder) && g.skill && g.skill.categoryId === 'division' && g.skill.skillId === 'div_facts' ? factUnder(g, { plain: true }) : g;
             const it = settlePrompts([hostItem(gU, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
             if (keepPrompts) it.stripPrompt = false;
             // Error analysis never falls back to an "Answer:" line under the cell: the shown work
