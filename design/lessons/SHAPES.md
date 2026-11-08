@@ -42,6 +42,10 @@ Lessons 6 (g4-nbt1-ten-times-value) and 7 (g3-oa8-two-step-wp) are the compiler'
   to them - print-sheet.js solveStoryFacts, page-deal.js setDealPin): `ws-lesson-unit --only solve-story` (lesson 2, attempt 2).
   A pack that needs nearly every fact of its pool (lesson 2: ~18 of 20) is not fixed by solving one page first - the shortage
   moves to the next page (lesson 2 solve-first, 2026-11-08): count the WHOLE pack in node per seed, then solve it jointly or widen the data.
+  CHECK FIRST (owner ruling 2026-11-08): a Prerequisite Check never draws from the lesson's own story pool (lesson 2: its +
+  facts are a teen and ones, 12 + 5); count every place that does - chart, Guided, Practice, word problem, slip, Check
+  Question - per seed with lessons/pack-solve.js (`ws-lesson-unit --only pack-feasible`) BEFORE any render, and take Practice's
+  set from that whole-pack solution.
 - `property` (from lesson 3a, LP-FAMILY-REPEAT): size the Practice cell from the families the pack needs (owner ruling: full-width
   cells, one item a row, arrays up to 6 x 6), never the families from the cell; every dealt ref keeps one spare fact family
   (the x 2 check: 2 x 6 to 2 x 10 for four items). Note: arrays past 5 a row fail gate E27 (rows of at most 5) until lf-checks reads the ruling.

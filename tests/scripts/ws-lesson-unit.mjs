@@ -48,6 +48,28 @@ const LATE = {
         const v = f([{ part: 'practice', plans: [plan([3, 3])] }], cellsOf);
         eq(v.length, 2, 'practice-units: a plan without `sheet` stays one unit a page (every other lesson as before)');
     },
+    // (E24b, owner ruling 2026-11-08 - lesson 2: CHECK FIRST, the WHOLE PACK. Every place that draws from the lesson's + pool
+    // (chart 3, Guided 2, Practice 1's 4 + equal parts, the word problem, the exit slip 2, the Check Question - and the
+    // Prerequisite Check only while a ref of it can deal a pool fact) gets a fact under LR-5 and LR-6 at seeds 1-25 + 4242
+    // (lessons/pack-solve.js), and no Prerequisite Check ref draws from the lesson's own pool. The solver is the lane's when
+    // the tree read (MQ_ROOT) has none, so the record of any tree is judged. No browser.)
+    async 'pack-feasible'() {
+        const own = path.join(ROOT, 'js/modules/lessons/pack-solve.js');
+        const PS = await import(pathToFileURL(fs.existsSync(own) ? own : path.join(path.dirname(fileURLToPath(import.meta.url)), '../../js/modules/lessons/pack-solve.js')).href);
+        const d = (await imp('js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js')).default;
+        const draws = (d.prerequisites || []).flatMap((p) => PS.prereqPoolDraws(p.ref, d.pool));
+        eq(draws.length, 0, `pack-feasible: lesson 2's Prerequisite Check draws no fact of the lesson's crossing-ten pool (owner ruling 2026-11-08; it could deal ${draws.slice(0, 4).join(', ')}${draws.length > 4 ? ' ...' : ''})`);
+        const places = PS.packPlaces(d);
+        ok(!!places && places.length >= 14, 'pack-feasible: lesson 2 has a + pool and at least 14 places that draw from it');
+        if (!places) return;
+        const seeds = [...Array(25)].map((_, i) => i + 1).concat([4242]);
+        const none = seeds.filter((s) => !PS.solvePack(d.pool, places, [], s));
+        eq(none, [], `pack-feasible: a whole-pack assignment (${places.length} places, LR-5 + LR-6) exists at seeds 1-25 + 4242`);
+        if (process.argv.includes('--verbose')) for (const s of seeds) { const r = PS.solvePack(d.pool, places, [], s); log(`  seed ${s}: ${r ? Object.entries(r.byId).map(([k, v]) => `${k} ${v}`).join(', ') : 'NONE'}`); }
+        // (Practice 1's set taken from a whole-pack solution: its zone sizes, and the pack's spent keys left out)
+        const r = PS.solvePracticeFromPack(d, { partMin: 2, noPart: [10], sums: [20] }, ['9+6', '6+9'], 4242);
+        ok(!!r && r.at.length === 4 && /^(\d)\+\1$/.test(r.edge[0]) && !r.at.concat(r.edge).some((k) => k === '9+6' || k === '6+9'), 'pack-feasible: solvePracticeFromPack gives 4 stories + an equal-parts edge, none spent');
+    },
     // (E24b attempt 2, lesson 2: the GREEDY deal order left Practice 1 the near twins 7 + 4 / 8 + 5 at seed 4242 though a set
     // without them existed. A `solve` sheet's stories are solved before it is dealt (print-sheet.js solveStoryFacts) and the
     // generator is pinned to the solved pairs (page-deal.js setDealPin). Read from the source, no browser.)
@@ -80,6 +102,7 @@ const LATE = {
     // a repeat or a twin on its last try, at some seeds only. Read from the record, no browser.)
     async 'pool-capacity'() {
         const L = Object.values(DET.DETAILED_LESSONS);
+        const PSOLVE = await tryImp('js/modules/lessons/pack-solve.js');
         // (a) a + story pool (`pool.kind: 'plus'`, crossing ten): every page's places dealt from unordered facts, each fact
         // once in the pack, no two on a page near twins (both numbers within 2, either order of a fact chosen to dodge).
         const twin = (x, y) => Math.abs(x[0] - y[0]) <= 2 && Math.abs(x[1] - y[1]) <= 2;
@@ -90,7 +113,8 @@ const LATE = {
             const sq = (f) => f[0] === f[1];
             const ld = d.lessonData || {};
             const pages = [];
-            const pre = (d.prerequisites || []).filter((p) => p.ref && p.ref.categoryId === 'addition' && p.ref.skillId === 'add_facts');
+            // (owner ruling 2026-11-08: a Prerequisite Check ref counts only while it can deal a pool fact - lessons/pack-solve.js)
+            const pre = (d.prerequisites || []).filter((p) => p.ref && p.ref.categoryId === 'addition' && p.ref.skillId === 'add_facts' && (!PSOLVE || PSOLVE.prereqPoolDraws(p.ref, d.pool).length > 0));
             for (const p of pre) pages.push({ n: Number(p.items) || 2, s: 0, cap: Number(p.ref.maxNum) || 20, lo: Number(p.ref.minNum) || 0, anySq: true });
             pages.push({ n: 1 + (ld.second ? 1 : 0), s: ld.third && /Equal/.test(ld.third.test) ? 1 : 0, cap: 20 });
             pages.push({ n: Number(ld.guidedRows) || 2, s: 0, cap: 20 });

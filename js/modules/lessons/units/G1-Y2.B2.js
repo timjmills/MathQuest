@@ -69,10 +69,18 @@ export const CARDS = Object.freeze({
           "atom": {"n":2,"type":"Conceptual","skill":"Parts and whole: two parts make a whole"}
         },
         {
-          "ref": {"categoryId":"addition","skillId":"add_facts","opts":{"band":20,"notation":["stacked"]},"minNum":11,"maxNum":16,"noPart":[10]},
+          "ref": {
+            "categoryId": "addition",
+            "skillId": "add_facts",
+            "opts": {"band":20,"notation":["stacked"],"constant":[11,12,13]},
+            "minNum": 13,
+            "maxNum": 19,
+            "partMin": 2,
+            "noPart": [10]
+          },
           "items": 4,
           "lesson": {"id":"G1 OA 6","title":"Add within 20"},
-          "atom": {"n":3,"type":"Fact","skill":"Add within 20: count on past 10"}
+          "atom": {"n":3,"type":"Fact","skill":"Add within 20: a teen and ones"}
         }
       ],
       "chart": {
@@ -254,6 +262,11 @@ export const CARDS = Object.freeze({
         "id": "owner-2026-11-07-parts-2-9",
         "text": "Owner ruling 2026-11-07 (E24b): story parts 2 to 9, so the pack has enough distinct crossing-ten facts; never near twins (e.g. 7 + 5 and 8 + 5) on one page.",
         "field": "ranges.partMin"
+      },
+      {
+        "id": "owner-2026-11-08-p0-no-cross",
+        "text": "Owner ruling 2026-11-08 (E24b): the Prerequisite Check's addition questions are facts within 20 that do NOT cross ten (a teen and ones, e.g. 12 + 5), so they never draw from the lesson's crossing-ten story pool; the 20 facts (parts 2-9) are the stories' alone (LR-5 one fact a pack, LR-6 no near twins on a page).",
+        "field": "prereqs"
       }
     ],
     "misconceptions": [

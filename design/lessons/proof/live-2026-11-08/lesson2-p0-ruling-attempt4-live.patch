@@ -1,0 +1,304 @@
+diff --git a/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js b/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
+index 7dab431d..3dc6fb29 100644
+--- a/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
++++ b/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
+@@ -124,7 +124,10 @@ export default {
+         // or more and no first part twice: not 2 and 7 / 2 and 3 - critic r3 m2)
+         { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 3, partMin: 3, minNum: 6, distinctFirst: true },
+             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
+-        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 16, noPart: [10] },
++        // (OWNER RULING 2026-11-08, E24b: the Prerequisite Check's + facts are within 20 and do NOT cross ten - a teen and ones,
++        // 12 + 5 - so they never draw from the lesson's crossing-ten story pool: the 20 facts (parts 2-9) are the stories' alone,
++        // ~14 places under LR-5 / LR-6. lessons/pack-solve.js prereqPoolDraws holds it; ws-lesson-unit pack-feasible is the gate.)
++        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'], constant: [11, 12, 13] }, minNum: 13, maxNum: 19, partMin: 2, noPart: [10] },
+             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },
+     ],
+ 
+@@ -191,7 +194,7 @@ export default {
+     atoms: [
+         { type: 'Fact', prereq: true, skill: 'Count a set: the last number is how many', notes: 'Prerequisite Check {pre.0.letters}.' },
+         { type: 'Conceptual', prereq: true, skill: 'Parts and whole: two parts make a whole', notes: 'Prerequisite Check {pre.1.letters}.' },
+-        { type: 'Fact', prereq: true, skill: 'Add within 20: count on past 10', notes: 'Prerequisite Check {pre.2.letters}.' },
++        { type: 'Fact', prereq: true, skill: 'Add within 20: a teen and ones', notes: 'Prerequisite Check {pre.2.letters}.' },
+         { type: 'Category', prereq: true, skill: 'Missing whole: then add', notes: 'Checked again at step 3.' },
+         { type: 'Category', skill: 'Story numbers are parts', notes: 'Point at each number.' },
+         { type: 'Conceptual', critical: true, skill: 'Bar: whole on top, parts below', notes: 'Cubes on the mat first.' },
+diff --git a/js/modules/lessons/pack-solve.js b/js/modules/lessons/pack-solve.js
+new file mode 100644
+index 00000000..fc770f22
+--- /dev/null
++++ b/js/modules/lessons/pack-solve.js
+@@ -0,0 +1,167 @@
++// js/modules/lessons/pack-solve.js
++// THE WHOLE-PACK FACT SOLVER of a detailed lesson whose story facts come from one small pool (lesson 2 E24b, owner ruling
++// 2026-11-08). A pack of + stories - the chart, Guided, Practice, the word problem, the exit slip, the Check Question - all
++// draw from the lesson's pool (lesson 2: crossing-ten facts, parts 2 to 9: 20 facts) under LR-5 (one fact a pack, either
++// order) and LR-6 (on a page: no near twins - both numbers within 2, place by place -, no first addend twice, no whole twice).
++// Solving ONE page at a time (attempt 2: Practice 1 after the chart, Guided and the reserved items; attempt 3: Practice 1
++// first) left another place short. This module models EVERY place that draws from the pool, as the description declares
++// it, and solves them together; the dealer then takes Practice 1's part of a whole-pack solution. A Prerequisite Check never
++// draws from the lesson's own pool (owner ruling 2026-11-08): `prereqPoolDraws` names a prerequisite ref that would.
++// Pure: no DOM, no state, no Math.random (the search order is seeded).
++
++/** The + facts of a `pool: {kind: 'plus', partMin, noPart, crossTen}` rule, unordered [a, b] with a <= b; null for any other pool. */
++export function poolFacts(pool) {
++    if (!pool || pool.kind !== 'plus') return null;
++    const pm = Number(pool.partMin) || 1, no = (pool.noPart || []).map(Number), out = [];
++    for (let a = pm; a <= 9; a++) for (let b = a; b <= 9; b++) {
++        if (no.includes(a) || no.includes(b)) continue;
++        if (pool.crossTen && a + b < 11) continue;
++        if (pool.maxSum !== undefined && a + b > Number(pool.maxSum)) continue;
++        out.push([a, b]);
++    }
++    return out;
++}
++
++// The case tests a pool place may declare (roles/lesson.js CASE_TESTS, read on the two numbers as written). A place
++// that is not the equal-parts edge never takes equal parts (edgeOnly: equal parts only on Practice's last row).
++const CLEAN = (a, b) => a !== Math.abs(a - b) && b !== Math.abs(a - b);
++const CASES = {
++    wpBridgeSmallFirst: (a, b) => a < b, wpBridgeSmallFirstAT: (a, b) => a < b, wpBridgeBigFirst: (a, b) => a > b,
++    wpBridgeHigh: (a, b) => a + b >= 14, wpClean: CLEAN, wpEqual: (a, b) => a === b,
++    wpBridgePT: () => true, wpPutTogether: () => true, wpAddTo: () => true, wpAddToAny: () => true,
++};
++const wantsOf = (w) => (Array.isArray(w) ? w : w ? [w] : []);
++function caseTest(wants, ref) {
++    const ws = wantsOf(wants);
++    for (const w of ws) if (!CASES[w]) throw new Error(`pack-solve: no model of the case "${w}"`);
++    const eqp = ws.includes('wpEqual');
++    const lo = ref && ref.minNum !== undefined ? Number(ref.minNum) : -Infinity, hi = ref && ref.maxNum !== undefined ? Number(ref.maxNum) : Infinity;
++    return (a, b) => (eqp ? a === b : a !== b) && a + b >= lo && a + b <= hi && ws.every((w) => CASES[w](a, b));
++}
++
++/** The + facts of the lesson's pool a prerequisite ref can deal (unordered keys "a+b", a <= b); [] when it can deal none. */
++export function prereqPoolDraws(ref, pool) {
++    const facts = poolFacts(pool);
++    if (!facts || !ref || ref.categoryId !== 'addition') return [];
++    const o = ref.opts || {};
++    const band = Number(o.band) || 20, lo = ref.minNum !== undefined ? Number(ref.minNum) : 0, hi = ref.maxNum !== undefined ? Number(ref.maxNum) : band;
++    const pm = ref.partMin !== undefined ? Number(ref.partMin) : 0, no = (ref.noPart || []).map(Number);
++    const cs = Array.isArray(o.constant) && o.constant.length ? o.constant.map(Number) : null;
++    return facts.filter(([a, b]) => a >= pm && !no.includes(a) && !no.includes(b) && a + b >= lo && a + b <= Math.min(hi, band)
++        && (!cs || cs.includes(a) || cs.includes(b))).map(([a, b]) => `${a}+${b}`);
++}
++
++/**
++ * Every place of a detailed lesson description `d` that draws from its pool, in the description's own terms: {id, page,
++ * test(a, b)} with the numbers as written. Chart (example, second, third), Guided (guidedWants), Practice 1 (its places above
++ * the last row, then the equal-parts edge), the word problem, the exit slip, the Check Question and - only while a ref of it
++ * can deal a pool fact - the Prerequisite Check. Returns null when `d` has no + pool.
++ */
++export function packPlaces(d) {
++    if (!d || !poolFacts(d.pool)) return null;
++    const L = d.lessonData || {}, out = [];
++    const add = (id, page, wants, ref) => out.push({ id, page, test: caseTest(wants, ref) });
++    if (L.example) add('chart.0', 'chart', L.example.test, null);
++    if (L.second) add('chart.1', 'chart', L.second.test, null);
++    if (L.third) add('chart.2', 'chart', L.third.test, null);
++    (L.guidedWants || []).forEach((w, i) => add(`guided.${i}`, 'guided', w, null));
++    const ps = (d.practiceSheets || [])[0];
++    if (ps) {
++        const el = ps.edgeLast || {};
++        const n = Number(el.per || (L.practiceShape || [6, 2])[0]) - Number(el.cols || (L.practiceShape || [6, 2])[1]);
++        for (let i = 0; i < n; i++) add(`practice.${i}`, 'practice', [], ps.skill);
++        if ((el.wants || []).includes('wpEqual')) add('practice.edge', 'practice', 'wpEqual', null);
++    }
++    if (d.wordProblem) add('wp', 'wp', d.wordProblem.want, d.wordProblem.ref);
++    (d.exit || []).forEach((e, i) => add(`exit.${i}`, 'exit', e.want, e.ref));
++    if (d.checkQuestion) add('cq', 'cq', d.checkQuestion.want, d.checkQuestion.ref || d.skill);
++    (d.prerequisites || []).forEach((p, j) => {
++        const can = new Set(prereqPoolDraws(p.ref, d.pool));
++        if (!can.size) return;
++        for (let i = 0; i < (p.items || 2); i++) out.push({ id: `p0.${j}.${i}`, page: 'p0', test: (a, b) => can.has(`${Math.min(a, b)}+${Math.max(a, b)}`) });
++    });
++    return out;
++}
++
++/**
++ * One whole-pack assignment: every place of `places` a pool fact (as written), LR-5 across the pack (no fact twice in either
++ * order, none in `avoid`), LR-6 on each page. Most-constrained place first; facts in a seeded order, so seeds differ. Returns
++ * {byId: {id: 'a+b'}, nodes} or null (none within `cap` search nodes, or none at all).
++ */
++export function solvePack(pool, places, avoid = [], seed = 1, cap = 3000, restarts = 300) {
++    // (seeded restarts, each a short search: one long search from a bad first choice thrashes - 200 000 nodes found
++    // nothing at most seeds - while the pack has thousands of solutions)
++    for (let r = 0; r < restarts; r++) {
++        const got = solvePack1(pool, places, avoid, (Number(seed) + 7919 * r) >>> 0, cap);
++        if (got) return Object.assign(got, { restart: r });
++    }
++    return null;
++}
++function solvePack1(pool, places, avoid, seed, cap) {
++    const facts = poolFacts(pool);
++    if (!facts || !places) return null;
++    const spent = new Set(avoid || []);
++    let s = (Number(seed) >>> 0) || 1;
++    const rnd = () => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return s / 4294967296; };
++    const order = facts.filter(([a, b]) => !spent.has(`${a}+${b}`) && !spent.has(`${b}+${a}`)).map((f) => [f, rnd()]).sort((x, y) => x[1] - y[1]).map((x) => x[0]);
++    const forms = order.flatMap(([a, b]) => (a === b ? [[a, b]] : rnd() < 0.5 ? [[a, b], [b, a]] : [[b, a], [a, b]]));
++    const twin = (x, y) => Math.abs(x[0] - y[0]) <= 2 && Math.abs(x[1] - y[1]) <= 2;
++    const pick = new Array(places.length).fill(null), used = new Set();
++    let nodes = 0;
++    const fits = (i, x) => {
++        if (used.has(`${Math.min(x[0], x[1])}+${Math.max(x[0], x[1])}`) || !places[i].test(x[0], x[1])) return false;
++        for (let j = 0; j < places.length; j++) {
++            const y = pick[j];
++            if (!y || places[j].page !== places[i].page) continue;
++            if (twin(x, y) || x[0] === y[0] || x[0] + x[1] === y[0] + y[1]) return false;
++        }
++        return true;
++    };
++    const rec = (left) => {
++        if (!left) return true;
++        if (++nodes > cap) return false;
++        let best = -1, bestC = null;
++        for (let i = 0; i < places.length; i++) {
++            if (pick[i]) continue;
++            const c = forms.filter((x) => fits(i, x));
++            if (!c.length) return false;
++            if (!bestC || c.length < bestC.length) { best = i; bestC = c; }
++        }
++        for (const x of bestC) {
++            const k = `${Math.min(x[0], x[1])}+${Math.max(x[0], x[1])}`;
++            pick[best] = x; used.add(k);
++            if (rec(left - 1)) return true;
++            pick[best] = null; used.delete(k);
++            if (nodes > cap) return false;
++        }
++        return false;
++    };
++    if (!rec(places.length)) return null;
++    const byId = {};
++    places.forEach((p, i) => { byId[p.id] = `${pick[i][0]}+${pick[i][1]}`; });
++    return { byId, nodes };
++}
++
++/**
++ * Practice 1's solved set from a whole-pack solution, in the form print-sheet.js `solveStoryFacts` returns: {at, edge} -
++ * `at` the places above the last row, `edge` the equal-parts fact, then every edge whole (`rule.sums`) in both orders that is
++ * no near twin of them (parts from rule.partMin, never a noPart, the pack's spent keys left out). null when no solution.
++ */
++export function solvePracticeFromPack(d, rule, avoid, seed) {
++    const places = packPlaces(d);
++    const sol = places ? solvePack(d.pool, places, avoid, seed) : null;
++    if (!sol) return null;
++    const at = places.filter((p) => /^practice\.\d+$/.test(p.id)).map((p) => sol.byId[p.id]);
++    const sq = sol.byId['practice.edge'];
++    if (!sq) return null;
++    const pm = Number(rule.partMin) || 1, no = (rule.noPart || []).map(Number), spent = new Set(avoid || []);
++    const two = (k) => String(k).split('+').map(Number);
++    const twin = (x, y) => Math.abs(x[0] - y[0]) <= 2 && Math.abs(x[1] - y[1]) <= 2;
++    const edge = [sq];
++    for (const w of (rule.sums || []).map(Number)) for (let a = pm; a <= w - pm; a++) {
++        const x = [a, w - a];
++        if (a === w - a || no.includes(a) || no.includes(w - a) || spent.has(`${a}+${w - a}`)) continue;
++        if (!twin(x, two(sq)) && at.every((k) => !twin(x, two(k)))) edge.push(`${a}+${w - a}`);
++    }
++    return { at, edge, pack: sol.byId };
++}
+diff --git a/js/modules/print-sheet.js b/js/modules/print-sheet.js
+index 8d2de63f..3fa2c374 100644
+--- a/js/modules/print-sheet.js
++++ b/js/modules/print-sheet.js
+@@ -24,6 +24,7 @@
+ 
+ import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
+ import { resetPageDeals, setDealPin } from './page-deal.js';
++import { solvePracticeFromPack } from './lessons/pack-solve.js';
+ // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
+ const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
+ import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
+@@ -484,7 +485,7 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true)
+  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
+  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
+  */
+-export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen || Array.isArray(sk.onlyKeys));
++export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen || Array.isArray(sk.onlyKeys) || Array.isArray(sk.hardAvoid));
+ export function refHardOk(sk, cand) {
+     if (!refHasHard(sk)) return true;
+     // (`allHard`, lesson 4 r3: the ref's `allTest` is a HARD bound - a window never takes a 10 row on a relaxed try)
+@@ -505,6 +506,10 @@ export function refHardOk(sk, cand) {
+     // (`onlyKeys`, lesson 2 E24b attempt 2: the facts a Practice place may deal - its zone of the page's SOLVED set,
+     // solveStoryFacts; absent on every other ref: unchanged)
+     if (Array.isArray(sk.onlyKeys) && !sk.onlyKeys.includes(factKeyOf(cand))) return false;
++    // (`hardAvoid`, lesson 2 E24b solve-first: the facts solved for Practice 1 before the pack - and their turn-arounds - a HARD bound
++    // on every other ref of the pack, so no relaxed last try (the lesson sheet's pool, the chart examples drawn from it) takes one;
++    // absent on every other ref: unchanged)
++    if (Array.isArray(sk.hardAvoid)) { const hk = factKeyOf(cand); if (hk !== null && (sk.hardAvoid.includes(hk) || sk.hardAvoid.includes(plusTurn(hk)))) return false; }
+     if (Array.isArray(sk.boardOnly) && sk.boardOnly.length) {
+         const bo = sk.boardOnly.map(Number);
+         const a = String(dlAns(cand)).replace(/,(?=\d{3})/g, '');
+@@ -4515,13 +4520,17 @@ async function buildLesson(n, metaOf) {
+         let k = 0;
+         for (const ps of n.practiceSheets) {
+             k++;
+-            const own00 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true, chartKeys } : {}) : practiceSk;
++            // (`solved`, lesson 2 E24b solve-first: the set solved before the pack - its keys and turn-arounds are in the pack's
++            // avoid list, and this sheet alone is exempt from them)
++            const preKeys = ps.solved ? new Set([...ps.solved.at, ps.solved.edge[0]].flatMap((x) => [x, plusTurn(x)]).filter(Boolean)) : null;
++            const avoidOwn = packNums ? (preKeys ? packNums.filter((x) => !preKeys.has(x)) : packNums.slice()) : null;
++            const own00 = ps.skill ? Object.assign({}, ps.skill, ps.solved ? { hardAvoid: undefined } : {}, packNums ? { avoidKeys: avoidOwn, tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true, chartKeys } : {}) : practiceSk;
+             // (`solve`, lesson 2 E24b attempt 2: the page's story facts SOLVED from the facts left before it is dealt, and each
+             // ZONE of the page - the places above the last row, the last row - held to its part of the set, in any order; the
+             // set is chosen so every order keeps LR-6. Absent on every other description: as before.)
+             const shape0 = Array.isArray(ps.shape) ? ps.shape : stackShapes[stackShapes.length - 1];
+             const el0 = ps.edgeLast || n.edgeLast || { per: shape0[0], cols: shape0[1] };
+-            const solved = ps.solve && packNums ? solveStoryFacts(ps.solve, packNums, Number(el0.per) - Number(el0.cols), (n.seed + 7919 * k) >>> 0) : null;
++            const solved = ps.solved && packNums ? Object.assign({}, ps.solved, { edge: ps.solved.edge.filter((x, i) => i === 0 || !avoidOwn.includes(x)) }) : ps.solve && packNums ? solveStoryFacts(ps.solve, packNums, Number(el0.per) - Number(el0.cols), (n.seed + 7919 * k) >>> 0) : null;
+             const own0 = solved ? Object.assign({}, own00, { onlyKeysAt: solved.at, onlyKeysEdge: solved.edge, dealPin: ps.solve.dealPin }) : own00;
+             // (`gridRevisit`, lesson 4 r5: the windows as the chart and the lesson sheet DRAW them, so a revisit is drawn turned)
+             const planQs = (res) => { const out = []; for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) out.push(it.q); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
+@@ -4949,7 +4958,8 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
+     // `boardOnly` (critic r3 S1): numbers the lesson shows on the board only - every ref of the pack
+     // carries them as a HARD bound (refHardOk), so no pupil page or key ever deals one.
+     const boardOnly = Array.isArray(d.boardOnly) ? d.boardOnly.map(Number).filter(Number.isFinite) : [];
+-    const bo = (r) => (r && boardOnly.length ? Object.assign({}, r, { boardOnly }) : r);
++    let hardAvoid = null;   // (lesson 2 solve-first: Practice 1's solved facts, a hard bound on every other ref - set below)
++    const bo = (r) => { const r1 = r && boardOnly.length ? Object.assign({}, r, { boardOnly }) : r; return r1 && hardAvoid ? Object.assign({}, r1, { hardAvoid }) : r1; };
+     const withAvoid = (r) => Object.assign({}, bo(r), { avoidKeys: [...used], tries: 300 });
+     const recordPlan = (plan) => { for (const c of planCells(plan)) { const k = factKeyOf(c.q); if (k !== null) used.add(k); } };
+     const partPlan = (part) => ((lesson && lesson.partPlans) || []).filter((x) => x.part === part).flatMap((x) => x.plans);
+@@ -4960,6 +4970,18 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
+     // Prerequisite Check last of all. A `reserve: true` item is dealt FIRST, before any page, with the seed and the story
+     // names it has in turn; its fact and turn-around go into `used`, so no page deals it, and it prints in its own place.
+     // Absent on every other lesson: dealt in turn, as before.)
++    // (`solve` FIRST, lesson 2 E24b at every seed - lead's order 2026-11-08: Practice 1's stories are SOLVED before the reserved
++    // items and the chart, from the whole pool, and their facts (and turn-arounds) go into `used`, so every later deal avoids them;
++    // Practice 1 is exempt from its own set (buildLesson, `solved`). Attempt 2 solved them from the facts LEFT after the chart,
++    // Guided, the slip and the Check Question: at seeds 1-3 no valid page was left. Absent on every other description: as before.)
++    const ps1 = (d.practiceSheets || [])[0];
++    const el1 = ps1 && ps1.solve ? (ps1.edgeLast || { per: (ps1.shape || shape)[0], cols: (ps1.shape || shape)[1] }) : null;
++    // (owner ruling 2026-11-08: Practice 1's set is taken from a WHOLE-PACK solution - lessons/pack-solve.js: every place that
++    // draws from the pool, LR-5 and LR-6 - so the facts left keep a valid chart, Guided, word problem, slip and Check Question;
++    // solveStoryFacts alone when the pack has no solution)
++    const solved1 = el1 ? (solvePracticeFromPack(d, ps1.solve, [...used], (seed + 7919) >>> 0) || solveStoryFacts(ps1.solve, [...used], Number(el1.per) - Number(el1.cols), (seed + 7919) >>> 0)) : null;
++    if (solved1) for (const k of [...solved1.at, solved1.edge[0]]) { used.add(k); if (plusTurn(k)) used.add(plusTurn(k)); }
++    if (solved1) hardAvoid = [...solved1.at, solved1.edge[0]];
+     const reserved = new Map(), resNames = new Set();
+     const reserve = (k, ref, s1, want) => { const x = dealOne(bo(ref), s1, used, want, null, null, resNames, null); if (plusTurn(x.key)) used.add(plusTurn(x.key)); reserved.set(k, x); };
+     // (`late`: the items a failed build named - buildDetailedLesson - reserved as if the description said so)
+@@ -4988,7 +5010,7 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
+     // The standard lesson packet, fed the description's chart data (prereqs.js untouched).
+     const lesson = await buildSheet({
+         role: 'lesson', sections: [{ skills: [withAvoid(Object.assign({ edgeTest: d.edgeTest }, d.skill))] }], lessonData: d.lessonData, size: 'L', paper, seed, key: true,
+-        practicePages: d.practicePages || 1, practiceSheets: d.practiceSheets ? d.practiceSheets.map((ps) => Object.assign({}, ps, ps.skill ? { skill: bo(ps.skill) } : {}, ps.chunk ? { strip: chunkStrip(ps.chunk) } : {})) : null,
++        practicePages: d.practicePages || 1, practiceSheets: d.practiceSheets ? d.practiceSheets.map((ps, i) => Object.assign({}, ps, ps.skill ? { skill: bo(ps.skill) } : {}, ps.chunk ? { strip: chunkStrip(ps.chunk) } : {}, i === 0 && solved1 ? { solved: solved1 } : {})) : null,
+         mixed: !!d.mixed, mixedSkills: d.mixed ? d.mixed.skills.map(bo) : null, mixedLattice: d.mixed && d.mixed.lattice, mixedLeadDrop: !!(d.mixed && d.mixed.leadDrop), mixedStrip: d.mixed && d.mixed.strip === false ? false : undefined,
+         ...(chunks ? { lesson: `1${chunks[0].id}` } : {}),
+         header: { title: d.title, year }, tagLine, packTab: [`Level ${d.level}`, d.strand], edgeLast: req.edgeLast || { per: shape[0], cols: shape[1] },
+diff --git a/js/modules/sheet/roles/lesson.js b/js/modules/sheet/roles/lesson.js
+index 8c2de156..1087de9c 100644
+--- a/js/modules/sheet/roles/lesson.js
++++ b/js/modules/sheet/roles/lesson.js
+@@ -609,7 +609,10 @@ export function pickWeDo(items, example, data, n, others = []) {
+         // (lesson 7 r2: two two-step stories never share a Step 1 number or a Step 1 answer - "30 shared by 6", "30 shared by 5")
+         const ms1 = (x) => { const s = x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.steps; return Array.isArray(s) && s.length === 2 && s[0] ? [s[0].a, s[0].b, s[0].ans] : null; };
+         const msTwin = (x, y) => { const a = ms1(x), b = ms1(y); return !!a && !!b && (a[0] === b[0] || a[2] === b[2] || (a[0] === b[1] && a[1] === b[0])); };
+-        const meets = (x, y, nm) => twin(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
++        const meets = (x, y, nm) => twin(x, y) || sameSecond(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
++        // (lesson 2 solve-first, seed 1: the set below then dropped a cell that adds the same number as another - "no two Guided
++        // cells add the same number", 5 + 7 / 8 + 7 - and refilled it with a near twin, 3 + 8; + items only, as that rule reads them)
++        const sameSecond = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && a[1] === b[1]; };
+         const pickLead = (k, chosen, nm) => {
+             if (k === data.guidedWants.length) return chosen;
+             const t = CASE_TESTS[data.guidedWants[k]];
