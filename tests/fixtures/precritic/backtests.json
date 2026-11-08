@@ -1702,6 +1702,166 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-vocab-match3-guided",
+   "check": "Match 3 pictures on the GUIDED page: 32-35 % empty bands under the ink at S and L (lf-vocab critic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (30 % of the cell under the ink, every offered role / host)",
+   "browser": true,
+   "fail": {
+    "commit": "bebf5b36",
+    "state": "lf-vocab critic r3 FAIL head; ws-empty-band FAIL 4 (guided S Model 35.0 %, cell 2 32.4 %; guided L Model 33.5 %), 2026-11-08"
+   },
+   "pass": {
+    "commit": "917807f4",
+    "state": "lf-vocab r5: Match 3 guided cells fill their row (EB-BAND OK at S and L), 2026-11-08"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v11r-score-roles",
+   "check": "The per-word Score (Match 3: 3 a cell) on guided, more-practice, test and error-analysis too (critic r3 #2: guided /5 and /4 for 15 and 12 words)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V11R",
+   "browser": true,
+   "fail": {
+    "commit": "8c9034bb",
+    "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+   },
+   "pass": {
+    "commit": "917807f4",
+    "state": "lf-vocab r5 fix"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V11R",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v14-hint-unique",
+   "check": "A Guided cue hint picks out exactly one bank word (critic r3 #5: \"starts with c\" with column and commutative in the bank)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V14",
+   "browser": false,
+   "fail": {
+    "commit": "8c9034bb",
+    "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+   },
+   "pass": {
+    "commit": "917807f4",
+    "state": "lf-vocab r5 fix"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V14",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v15-writeline",
+   "check": "The 1 picture, 3 words answer line >= 1.2 x the widest bank word; grades 4-5 >= 55 mm (critic r3 #7: ~36 mm for \"times as many\")",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V15",
+   "browser": false,
+   "fail": {
+    "commit": "8c9034bb",
+    "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+   },
+   "pass": {
+    "commit": "917807f4",
+    "state": "lf-vocab r5 fix"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V15",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v16-base10-unit",
+   "check": "one, ten and hundred print one unit square (critic r3 #8: a \"one\" bigger than a unit of the ten)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V16",
+   "browser": false,
+   "fail": {
+    "commit": "8c9034bb",
+    "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+   },
+   "pass": {
+    "commit": "917807f4",
+    "state": "lf-vocab r5 fix"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V16",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v17-lookalikes",
+   "check": "Every critic-found look-alike pair is notWith, append-only (critic r3 #9: grow with sequence in the bank)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V17",
+   "browser": false,
+   "fail": {
+    "commit": "8c9034bb",
+    "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+   },
+   "pass": {
+    "commit": "917807f4",
+    "state": "lf-vocab r5 fix"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V17",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v18-guided-rows",
+   "check": "1 picture, 3 words Guided rows equal at S, M and L (critic r3 #6: 379 / 291 px at L)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V18",
+   "browser": true,
+   "fail": {
+    "commit": "8c9034bb",
+    "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+   },
+   "pass": {
+    "commit": "917807f4",
+    "state": "lf-vocab r5 fix"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V18",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v19-ws-tiles",
+   "check": "One worksheet-1280 tile layout per template (critic r1 #10, r2 #7, r3 #4: 2 + 1 words, pills wrapping, line y varying)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V19",
+   "browser": true,
+   "fail": {
+    "commit": "8c9034bb",
+    "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+   },
+   "pass": {
+    "commit": "917807f4",
+    "state": "lf-vocab r5 fix"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V19",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

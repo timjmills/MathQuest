@@ -72,7 +72,7 @@ register(MATCH3_TEMPLATE, {
                 + ` style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${twin ? `max(48px, ${L(ctx, side)})` : L(ctx, side)};height:${twin ? `max(48px, ${L(ctx, side)})` : L(ctx, side)};`
                 + `border:${B(ctx, 1.5)} solid ${INK};background:#fff;font-size:${P(ctx, tp + 6)};font-weight:700;line-height:1;color:${ink};flex:none;${KEY_FEATURES}">${esc(val)}</span>`;
             // (screen: a word and its box never part - critic r1 D10: the box jumped under its word)
-            return `<span class="mq-vm-word" style="display:inline-flex;align-items:center;gap:${L(ctx, 2.5)};flex:${twin ? '0 0 auto' : '1 1 0'};white-space:nowrap;justify-content:center;min-width:0;">`
+            return `<span class="mq-vm-word" style="display:inline-flex;align-items:center;gap:${L(ctx, 2.5)};flex:${twin ? '0 0 auto' : '1 1 auto'};white-space:nowrap;justify-content:center;min-width:0;">`
                 + `<b style="font-size:${P(ctx, tp + 3)};line-height:1.15;text-align:right;">${esc(words[wi])}</b>${boxHtml}</span>`;
         }).join('');
         // (a practice page's cell keeps a quarter page's height, so a set of flat pictures - the growing-patterns set - still
@@ -85,9 +85,10 @@ register(MATCH3_TEMPLATE, {
         const chart = ctx.chartZoom !== undefined && ctx.chartZoom !== null;
         const inChart = chart || Number(ctx.scaffoldLevel) >= 2;
         const guidedRow = !twin && !chart && Number(ctx.scaffoldLevel) >= 2;
-        // (a practice page's cell: 48 mm, a quarter of the A4 grid less the cell's pads, so the row a page gives it is within
-        // 10 % of its footprint - ws-empty-band EB-FOOT, r5: 44 mm was stretched 13 % on mixed practice)
-        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:48mm;height:100%;';
+        // (a practice page's cell: at least 44 mm and at most 48 mm, so a row a page stretches (mixed practice, review) keeps the
+        // drawing within 10 % of its footprint and leaves under 30 % below it - ws-empty-band EB-FOOT / EB-BAND, r5; 48 mm
+        // as a minimum pushed the lesson Warm-up 3.4 mm off its page)
+        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:48mm;';
         // (the online worksheet's tile: ONE fixed layout in every tile - each picture in a slot of one height, scaled to it; the
         // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
         // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
@@ -100,7 +101,7 @@ register(MATCH3_TEMPLATE, {
             + '.mq-wspaper .mq-vm{justify-content:flex-start!important;gap:16px!important}.mq-wspaper .k2-twin:has(> .mq-vm){align-self:stretch;width:100%}</style>' : '';
         const wrapCss = tileCss + (guidedRow ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vm){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vm{flex:1 1 auto;height:auto!important}</style>' : '');
         return `<div class="mq-vm k2-cell" data-ws-vocab="match3"${twin ? ' data-mq-k2="1" data-mq-join=", "' : ''} style="color:${INK};${FONT}width:100%;box-sizing:border-box;`
-            + `display:flex;flex-direction:column;justify-content:space-evenly;${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
+            + `display:flex;flex-direction:column;justify-content:${fill.includes('max-height') ? 'space-between' : 'space-evenly'};${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
             + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};">${pics}</div>`
             + `<div class="mq-vm-words" style="display:flex;justify-content:space-around;align-items:center;gap:${L(ctx, 4)};flex-wrap:${twin ? 'wrap' : 'nowrap'};">${row}</div></div>`;
     },

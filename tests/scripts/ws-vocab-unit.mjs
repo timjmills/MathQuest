@@ -18,10 +18,13 @@
 import { pathToFileURL } from 'url';
 import path from 'path';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+// (MQ_ROOT: check another checkout - ws-backtest's commit-pair rows run today's checks on the failed head)
+const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+// --only V14,V15: judge only those checks (a backtest row proves one check)
+const ONLY = (() => { const i = process.argv.indexOf('--only'); return i > 0 ? process.argv[i + 1].split(',').map((x) => x.trim()) : null; })();
 const imp = (p) => import(pathToFileURL(path.join(ROOT, p)).href);
 const fails = [];
-const fail = (m) => fails.push(m);
+const fail = (m) => { if (!ONLY || ONLY.some((k) => String(m).startsWith(k + ' ') || String(m).startsWith(k + ':'))) fails.push(m); };
 
 // --fixture <file.mjs>: check a fixture's {VOCAB_WORDS, VOCAB_SETS} (the data rules V1, V6, V7 only; the backtest rows in
 // tests/fixtures/precritic/backtests.json), with the library's pictures and compatible() rule.
