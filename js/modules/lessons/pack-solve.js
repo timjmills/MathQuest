@@ -165,3 +165,68 @@ export function solvePracticeFromPack(d, rule, avoid, seed) {
     }
     return { at, edge, pack: sol.byId };
 }
+
+/* ===================================================================== each place's OWN item source (E24b attempt 5) */
+// (lead's order 2026-11-08, after attempt 4: the whole-pack count was green while the deal failed at seeds 2 and 5 - it
+// modelled every place as drawing from the story pool, but P0's count and bond questions draw from their OWN small ranges,
+// and the chart's other examples from the MAIN pool the Practice hard bound thins. Each place is modelled from its source.)
+
+const NEAR = 2;   // LR-6: two one-number items of a skill on a page within 2 are near twins
+/** Every greedy deal of `items` values from `values`, one at a time (any value that fits, as the dealer takes them) ends with `items`
+ *  values pairwise more than NEAR apart; false when some first choices leave the question short (17-20: 18 first leaves nothing). */
+export function greedySafe(values, items) {
+    const vs = [...new Set(values.map(Number))];
+    const go = (chosen) => {
+        if (chosen.length === items) return true;
+        const fit = vs.filter((v) => chosen.every((c) => Math.abs(c - v) > NEAR));
+        return fit.length > 0 && fit.every((v) => go(chosen.concat(v)));
+    };
+    return items <= 1 ? vs.length > 0 : go([]);
+}
+
+/** A Prerequisite Check question's one-number source, from its own ref: count_objects - the numbers; number_bonds - the wholes
+ *  (parts from partMin / minOperand); null for any other ref (+ facts are a teen and ones, LR-6 read on both numbers). */
+export function p0Values(ref) {
+    if (!ref) return null;
+    const o = ref.opts || {}, band = Number(o.band) || 20;
+    const lo = ref.minNum !== undefined ? Number(ref.minNum) : 1, hi = Math.min(band, ref.maxNum !== undefined ? Number(ref.maxNum) : band);
+    if (ref.skillId === 'count_objects') { const out = []; for (let v = Math.max(1, lo); v <= hi; v++) out.push(v); return out; }
+    if (ref.skillId === 'number_bonds') {
+        const pm = Math.max(1, Number(ref.partMin) || 0, Number(ref.minOperand) || 0), out = [];
+        for (let w = Math.max(lo, 2 * pm); w <= hi; w++) out.push(w);
+        return out;
+    }
+    return null;
+}
+
+/**
+ * Each place of lesson description `d` from its OWN item source, at `seed`: [{place, source, ok, why}].
+ *  - p0.<j>: the question's own range (p0Values) - every greedy deal of its items keeps them 3 apart (greedySafe);
+ *  - chart.1 / chart.2 (`second` / `third`): a case drawn from the MAIN pool fails (the pool is a random deal the Practice hard
+ *    bound thins - seed 2 held neither case); from its own case pool (`ref`) it needs a pool fact of its case outside Practice 1's
+ *    solved set;
+ *  - practice: Practice 1's set solved from a whole-pack solution (solvePracticeFromPack) exists.
+ */
+export function placeSources(d, seed) {
+    const out = [];
+    (d.prerequisites || []).forEach((p, j) => {
+        const vs = p0Values(p.ref);
+        if (!vs) return;
+        const items = p.items || 2, ok = greedySafe(vs, items);
+        out.push({ place: `p0.${j}`, source: `${p.ref.skillId} ${vs[0]}-${vs[vs.length - 1]}`, ok, why: ok ? '' : `${items} items from ${vs.length} values: a first choice leaves no value 3 apart` });
+    });
+    const ps = (d.practiceSheets || [])[0];
+    const solved = ps && ps.solve ? solvePracticeFromPack(d, ps.solve, [], (Number(seed) + 7919) >>> 0) : null;
+    if (ps && ps.solve) out.push({ place: 'practice', source: 'whole-pack solution', ok: !!solved, why: solved ? '' : 'no whole-pack solution' });
+    const spent = new Set(solved ? [...solved.at, solved.edge[0]].flatMap((k) => { const [a, b] = String(k).split('+'); return [`${a}+${b}`, `${b}+${a}`]; }) : []);
+    const L = d.lessonData || {};
+    ['second', 'third'].forEach((k, i) => {
+        if (!L[k]) return;
+        const id = `chart.${i + 1}`;
+        if (!L[k].ref) { out.push({ place: id, source: 'main pool', ok: false, why: `the ${k} example (${L[k].test}) is drawn from the main pool, which Practice 1's hard bound thins: no case pool of its own` }); return; }
+        const t = caseTest(L[k].test, null), facts = (poolFacts(d.pool) || []).flatMap(([a, b]) => (a === b ? [[a, b]] : [[a, b], [b, a]]));
+        const left = facts.filter(([a, b]) => t(a, b) && !spent.has(`${a}+${b}`));
+        out.push({ place: id, source: `case pool ${L[k].ref.allTest || L[k].test}`, ok: left.length > 0, why: left.length ? '' : `no ${L[k].test} fact outside Practice 1's set` });
+    });
+    return out;
+}
