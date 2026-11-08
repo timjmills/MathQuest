@@ -96,6 +96,8 @@ const acrossBesideMm = (p, ctx) => {
     const aLen = Math.max(String(p.a).length, d + 1), bLen = Math.max(String(p.b).length, d);
     return em * (0.56 * (aLen + bLen) + 2 * ACROSS_OP_EM + 4 * ACROSS_GAP_EM) + blankWidth(d, ctx.size);
 };
+/** div_facts' across fact: the left inset of its sentence, the number tab's keep-out (mm; 8.3 at M's 5 mm tab, measured). */
+const divKeepOutMm = (ctx) => 1.66 * ((ctx && ctx.metrics && ctx.metrics.tabMm) || 5);
 /** The answer line under the sentence: on paper, in a column narrower than the line beside needs. */
 const acrossBelow = (p, ctx) => {
     if (!ctx || ctx.mode === 'screen') return false;
@@ -103,7 +105,9 @@ const acrossBelow = (p, ctx) => {
     if (p.mix) return true;
     const cols = Number(ctx.columns || (ctx.options && ctx.options.factColumns)) || 0;
     if (!cols) return false;
-    return acrossBesideMm(p, ctx) > 186 / cols - 6.6 - 1;
+    // (div_facts critic r6 R6-2, CL-8: the sentence starts at the number tab's keep-out - about 1.66 tab sides from the cell's
+    // left edge - and ends at the 3 mm right pad, so the line beside "110 ÷ 11 =" ran 0.5-0.8 mm from the right rule at M)
+    return acrossBesideMm(p, ctx) > 184 / cols - 3 - divKeepOutMm(ctx);
 };
 const slotShape = (p) => {
     const u = p.unknown || 'result';

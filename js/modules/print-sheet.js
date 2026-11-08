@@ -2212,6 +2212,28 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
 }
 
 /** Lay out and read the cells not measured before (measureItems); `serial` measures one cell at a time. */
+/**
+ * div_facts critic r6 R6-2 / R6-3 (WDS CL-8, the fact's 3 mm side pad): the measuring cell carries a one-letter label, so it
+ * misses the page's number tab keep-out (a two-digit tab is 1.4 tab sides + 1 mm) and passed "110 ÷ 10 =" in 4 columns at M
+ * (0.7 mm from the right rule) and "48 ÷ 4 =" in 4 columns at L (1.5 mm). A div_facts fact (payload `fact`, across) is too
+ * wide for a column when its sentence's ink (Andika digits 0.58 em, the 0.8 em operator tracks, measured 5.07 em for
+ * "108 ÷ 12 =") from the two-digit tab's keep-out plus the 3 mm right pad passes the cell. div_facts only.
+ */
+function divFactTooWide(it, size, innerMm) {
+    const q = it && it.q;
+    const p = q && q.skillId === 'div_facts' && q.cell && q.cell.template === 'equation' && q.cell.payload;
+    if (!p || !p.fact || p.notation) return false;
+    const s = SIZES[size] || SIZES.L;
+    const em = (s.digitPt / 72) * 25.4;
+    const digits = String(p.a).length + String(p.b).length;
+    // (OPEN at L, lead question: "1xx ÷ 1x =" at 28 pt is 50 mm of ink, so beside a page past 9's w2 tab inset (9.7 mm) a
+    // third of the page (61.5 mm) cannot hold it with its 3 mm pad - the guard would put every 3-digit band's L page in 2
+    // columns of 92 mm cells, 31 % empty beside the fact (EB-SIDE). L keeps its 3 columns for those facts until ruled.)
+    if (size === 'L' && digits >= 5) return false;
+    const ink = em * (0.58 * digits + 2 * 0.8 + 3 * 0.18);
+    // (the left inset of a page numbered past 9 - sheet-kit.css "grid past 9": the w2 tab's keep-out + 0.3 mm - and the 3 mm pad)
+    return ink + Math.max(s.tabMm * 1.4 + 1.3, s.tabMm + 1.3) + 3 > innerMm;
+}
 function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }) {
     // every DOM use in the measuring frame's document (measureDocument; main 2026-10-30), read with that frame's window
     const document = MDOC && MDOC.body ? MDOC : globalThis.document;
@@ -2385,7 +2407,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
             for (const it of items) {
                 const b = best.get(it);
                 it.measured = it.measured || {};
-                it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits };
+                it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits && !divFactTooWide(it, size, inner) };
                 if (Number.isFinite(b.slackMm)) it.measured[c].slackMm = Math.floor(b.slackMm * 10) / 10;
                 if (b.modes && Object.keys(b.modes).length) {
                     it.measured[c].modes = {};
@@ -3615,7 +3637,9 @@ async function buildSheetDeal(req = {}) {
                 } catch (e) { /* keep the count */ }
             }
             hostItems = hostItems.concat(markSectionWriteAbove(items));
-            if (sec.fadeStage && si === 0) for (const s2 of n.sections.slice(1)) if (s2.fadeStage) s2.fadeCap = 2 * items.length;
+            // (div_facts critic r6 R6-4: its bare last stage takes its page - 12 unstretched rows of the twice-cap left 129 mm
+            // white at M, H5; each stage's rows are sized to its own supports, F4 - so div_facts' stages are not capped)
+            if (sec.fadeStage && si === 0 && !sec.divFade) for (const s2 of n.sections.slice(1)) if (s2.fadeStage) s2.fadeCap = 2 * items.length;
         }
     } else {
         // MORE PRACTICE: each letter under its own seed (PT-MPR-2). The first letter's probe fixes
