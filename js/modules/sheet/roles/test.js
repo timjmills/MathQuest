@@ -37,6 +37,8 @@ export const measureCols = () => [1, 2, 3, 4];
  */
 /** div_facts Test rows: the measured height (pads and tab keep-out included) plus this room (critic r5 R5-1). */
 const FACT_TEST_ROOM = 1.15;
+/** div_facts Test ceiling: the Independent page's capacity (DN-1's 36 / 24 / 20; owner 2026-11-08 on critic r6 R6-1). */
+const FACT_TEST_PAGE = { S: 36, M: 24, L: 20 };
 function fillToCeiling(L, size, columns, opts = {}) {
     const ceil = CEILING[size] || CEILING.L;
     if (!L || (columns && columns !== 'auto') || !(L.hMin > 0) || L.cols < 2) return L;
@@ -59,6 +61,18 @@ function fillToCeiling(L, size, columns, opts = {}) {
     // rows to the problems' footprint (FACT_TEST_ROOM x the measured height), never to the grid; the rest of the page stays
     // under the rows. Only div_facts (`opts.footprintRows`): the passed + - x fact Tests keep their geometry.
     if (opts.footprintRows) {
+        // Owner ruling 2026-11-08 (critic r6 R6-1, option a): a div_facts fact Test's count follows the Independent page's
+        // capacity, so the Test page is full - whole rows of the facts' footprint down the grid, up to the Independent
+        // ceiling (FACT_TEST_PAGE), lifting 12.1's 20 / 16 / 12 for these pages only. Rows stay sized to the problems (F1).
+        const rowH = L.hMin * FACT_TEST_ROOM;
+        const fitRows = Math.floor((G - SAFETY_H_MM - GRID_BORDERS_MM) / rowH + 1e-9);
+        const cap = Math.floor((FACT_TEST_PAGE[size] || FACT_TEST_PAGE.L) / L.cols) * L.cols;
+        const fitAll = Math.min(cap, fitRows * L.cols);
+        if (fitAll > perPage) {
+            rows = fitAll / L.cols;
+            perPage = fitAll;
+            note = `Test: ${fitAll} problems, ${L.cols} x ${rows} (the Independent capacity, owner 2026-11-08).`;
+        }
         const capH = Math.round(Math.min(even, Math.max(L.hMin, Math.min(L.cellH, L.hMin * FACT_TEST_ROOM))) * 1000) / 1000;
         return Object.assign({}, L, { rows, perPage, cellH: capH, fill: capH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
     }
