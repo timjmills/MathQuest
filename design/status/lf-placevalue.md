@@ -70,6 +70,9 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-08 OWNER RULINGS (via the lead, "yes to your recommendations"): (1) fact-probe is OUT OF SCOPE for pv - card re-signed
+  (lead 1e2422e7, merged into r4). (2) combine band 99 at S: the side space is ACCEPTED, the line is not widened - an OWNER-RULED
+  PIN on that cell geometry (combine band=99, size S, the two-part frame cells): a side-band finding there is not a pv defect.
 - 2026-11-08 ROUND 4 (lead, cap $35; branch claude/lf-placevalue-r4 from master 8573c66a): identify E-A1 (lead ruling: pv-owned) - the
   "ones" vocabulary picture drawn compact (lesson.js `blocks` opt-in `compact`); unit_form G2 - rename frames' write line +2 digits at S.
   Checks first: ws-empty-band --vocab-ink (EB-VOCAB) on precritic's path, `--only`; backtests pv-identify-vocab-ink, pv-unit-form-rename-side.
