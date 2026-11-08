@@ -1086,6 +1086,12 @@ export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols:
  * newest marks grey, earlier ones black, P-LC-9), and the provider's words for THIS problem.
  * Host-shaped so the host measures them; `drawOnly` measures the drawing alone (for its zoom).
  */
+/** The library key every Warm-up item names itself (q.instructionKey), or '' when any item names none or they differ. */
+function warmItemKey(items) {
+    const keys = (items || []).map((it) => String((it && it.q && it.q.instructionKey) || ''));
+    return keys.length && keys[0] && keys.every((k) => k === keys[0]) ? keys[0] : '';
+}
+
 export function stateItems(example, data) {
     const ws = data && Array.isArray(data.chartSteps) && isWordBar(example) ? chartStepsOf(example, data) : workedStepsOf(example);
     // `tailLast` (lesson data; the detailed lesson maker): the closing step ("Read it with plus")
@@ -1741,7 +1747,11 @@ function planOnce(input = {}) {
             const short = true;
             const part = {
                 kind: 'col', cls: 'mq-lwarmcol',
-                parts: [instructionPart(instructionKeyOf(its, input.skills), its),
+                // lf-placevalue critic r3 F4 (lead ruling 2026-11-08): when every Warm-up item names its own library
+                // instruction (q.instructionKey, set by its generator from the item's options - identify with
+                // writeValue off is "Circle the place …", not the lesson skill's "… Write the value …"), the heading
+                // is that key. Items that name none keep the skill-level key, so every other lesson is unchanged.
+                parts: [instructionPart(warmItemKey(its) || instructionKeyOf(its, input.skills), its),
                     gridPart(its.map((it) => planItem(short ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: shape[id].cols })), { cols: shape[id].k, rows: rowsOf(id), cellH: (stacked ? hOwn(id) : hW) / rowsOf(id), labels, start: letter })],
             };
             letter += its.length;
