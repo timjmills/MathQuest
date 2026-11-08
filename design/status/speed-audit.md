@@ -903,3 +903,11 @@ covered pages, not lesson section headings. F1 / F2 — ws-empty-band EB-SIDE ca
 **Speed-ups:** the first r3 critic timed out (50 min) on the full matrix; splitting the batch by skill across two critics finished it.
 Next family: one critic per 2-3 skills, rendered in parallel slots. The detailed lessons are not deterministic across runs of the same
 code (hash check impossible): give buildDetailedLesson a seeded, deterministic path (lf-engine).
+
+### lf-placevalue deploy hold (2026-11-08): lesson 1 regressed on the lane's pv changes
+**Which check missed it:** none on the lane's path built a detailed lesson; the lead's deploy gate (`ws-detailed-lesson --check`)
+was the first. **Lost:** one deploy cycle and a stopped targeted critic (r3c, killed when the hold arrived). **Fix:** the five passed
+detailed lessons that deal a pv skill are opt-in precritic rows (opt-in-rules.json), backtest `pv-detailed-lesson-1`.
+**Speed-ups:** bisect by copying one changed file at a time into a clean master worktree with a 40 s probe (the lesson sheet's item
+count) instead of the 2 min full gate: the CSS file was found in four probes. A probe that `git stash`es while a background gate runs
+is unsafe: use a second worktree.

@@ -2427,6 +2427,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-detailed-lesson-1",
+   "check": "the live detailed lesson 1 (g2-nbt3-read-write-1000) self-check stays green on the lane's pv changes (lead 2026-11-08: E9c T4 90 %, E11 P4-1 cells 30 % empty, E24 606 repeat of a chart example, E24b twin answer 80 on P0)",
+   "kind": "commit-pair",
+   "rule": "ws-detailed-lesson --check E9c / E11 / E24 / E24b",
+   "browser": true,
+   "fail": {
+    "commit": "9b0972f7",
+    "state": "lead deploy hold: E9c, E11, E24, E24b FAIL"
+   },
+   "pass": {
+    "commit": "8d80d13b",
+    "state": "zero place drawn in the fresh deal, P0 dealt as one page, lesson refs noTabSpacer / inPlace false"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g2-nbt3-read-write-1000 --check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

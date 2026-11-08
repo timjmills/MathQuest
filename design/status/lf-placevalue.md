@@ -70,6 +70,14 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-08 DEPLOY HOLD (lead): lesson 1 (g2-nbt3) `ws-detailed-lesson --check` FAILED on 9b0972f7 (E9c, E11, E24, E24b; master OK).
+  Fixed 8d80d13b + the zero-cap follow-up: E24 zero place drawn in the fresh deal (not dealIndex), E24b the Prerequisite Check dealt as
+  one page (print-sheet pageLr6), E11 / E9c / E9b the pack's refs `cellPayload {noTabSpacer, inPlace: false}`. Lesson 1 --check and
+  --repeats OK; lessons 3, 5a, 5b, 6 --check OK; g1-oa1 and g3-oa8 FAIL identically on master (E9 / E35: not pv). The five passed
+  lessons are opt-in precritic rows; backtest pv-detailed-lesson-1 PASS. ws-dealer-uniform combine some / always OK; combine
+  zeroPlace=none FAIL (21) is pre-existing (same at 9b0972f7). Expand / combine pages now DEAL different numbers (zero position
+  spread by the fresh deal's cap, not by index): layout unchanged, but the graded expand pages are not byte-identical any more.
+  Targeted critic r3c (identify / value lessons, combine changed pages) was stopped when the hold came: waits for the lead.
 - 2026-11-08 critic r3 (critic-r3.md) + r3b (critic-r3b.md): **placevalue:expand PASSED** (redesign-passed.js 4db17849, pv approved
   sibling; 41 expand pages byte-identical HEAD vs the graded aacae5ea). identify (F3 vocab fixed aacae5ea, F4 heading fixed in
   lesson.js 70e35893 - other short lessons byte-identical), value (G1 vocab fixed 94de4e16 / 671014c0), combine (F1 fixed, F2 S fixed

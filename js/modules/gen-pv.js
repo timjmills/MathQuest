@@ -445,7 +445,8 @@ function genExpandCombine(q, skill, o) {
     // so no page holds only zero-tens items; the digits around it stay the seeded draw.
     // (ws-detailed-lesson E24, lead 2026-11-08: the position is drawn inside the fresh deal below, never fixed by the item's
     // index - a lesson dealer that retries one index under new seeds must be able to reach the other zero position; the
-    // fresh deal's third tag spreads it, at most two of one position in the window, and an item with no zero tags NaN,
+    // fresh deal's third tag spreads it, at most six of one position in the window (about half the window's items hold a zero:
+    // a tighter cap relaxes every cap at once - ws-dealer-uniform PAGE caught 560 and 565 on one page), and an item with no zero tags NaN,
     // which matches nothing)
     // lf-placevalue critic r2 N3: a 2-digit combine item with a zero place shows ONE part ("60 = ___", its own answer);
     // combine shows >= 2 parts at every band, so its zero place starts at 3 digits (305, 350).
@@ -464,7 +465,7 @@ function genExpandCombine(q, skill, o) {
         }
         return String(randInt(lo, hi)).split('').map(Number);
     };
-    let ds = freshDeal(`pv:${skill}:n`, draw, { sig: (d) => d.join(''), tags: (d) => [String(d[0]), d.slice(0, 2).join(''), zeroOn ? String(d.indexOf(0, 1)) : NaN], caps: [3, 1, 2] });
+    let ds = freshDeal(`pv:${skill}:n`, draw, { sig: (d) => d.join(''), tags: (d) => [String(d[0]), d.slice(0, 2).join(''), zeroOn ? String(d.indexOf(0, 1)) : NaN], caps: [3, 1, 6] });
     let n = fromDigits(ds);
     // ONE PART PER PLACE, zeros included (§2.4 rule 1): the box count never tells the pupil how
     // many non-zero parts there are, and the key writes the zero part.

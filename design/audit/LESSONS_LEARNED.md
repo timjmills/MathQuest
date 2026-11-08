@@ -311,3 +311,22 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 - G2 unit_form rename=more S side bands -> ws-empty-band option variants run at L only; PROPOSED: every §7a option value at S / M / L.
 - First PASS of the family: placevalue:expand. What made it pass: the cell fits every offered value (L26), per-slot answers (L27),
   the option-aware instruction (L28), every band judged (L29), and two critics splitting the render load (r3 timed out at 50 min).
+
+## lf-placevalue deploy hold (lead, 2026-11-08): a skill change regressed a LIVE detailed lesson; the check that now catches it
+- Lesson 1 (g2-nbt3) failed `ws-detailed-lesson --check` on the lane branch (E9c T4 90 %, E11 P4-1 cells 30 % empty, E24 a chart
+  example dealt again, E24b twin answer 80 on P0); every lane gate was green, because none built a detailed lesson. Causes, each
+  bisected by swapping one file at a time into a master worktree:
+  - E24: a page-dealer choice fixed by the item index (dealIndex for the zero position) — the lesson dealer retries ONE index under
+    new seeds, so it could never reach the other zero position. Rule: a dealt choice that a lesson ref may constrain (a case, a zero
+    place) is drawn inside freshDeal with a cap, never pinned to the index. A cap is sized to the window's real share (about half the
+    window holds a zero, so cap 6 of 19): a too-tight cap relaxes EVERY cap of the deal (ws-dealer-uniform PAGE caught 560 / 565).
+  - E24b: the Prerequisite Check dealt each question's skill against its own seen set, so a value item and a number name could both
+    answer 80 (master was lucky). print-sheet `pageLr6` now covers `pre-skill-check` with `perQuestion` too.
+  - E11 / E9c / E9b: the CL-40 top spacer and the in-place row cap (both lane changes for the skill pages) also reached the pack's
+    rows; the measured cell (spacer) cost the lesson sheet an item, and the in-place cap left Practice 1 15 % blank. The pack's refs
+    now carry `cellPayload {noTabSpacer, inPlace: false}`, so measured and printed cells agree and the pack prints as signed off.
+- CHECK (precritic path, opt-in-rules.json): `ws-detailed-lesson --check` on every passed detailed lesson that deals a pv skill
+  (lessons 1, 3, 5a, 5b, 6) plus lesson 1 `--repeats`; backtest `pv-detailed-lesson-1` (9b0972f7 FAIL -> 8d80d13b OK).
+- RULE for every lane: a change to a generator, cell template, provider or kit CSS runs `ws-detailed-lesson --check` on each passed
+  detailed lesson that deals one of its skills BEFORE commit; a lesson failing on master too (g1-oa1, g3-oa8 on 2026-11-08) is
+  recorded, not counted.
