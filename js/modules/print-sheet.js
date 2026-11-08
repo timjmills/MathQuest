@@ -274,8 +274,6 @@ function normaliseRequest(req = {}) {
             ? Object.fromEntries(lessonPartIds().filter((x) => req.lessonSeeds[x] !== undefined && req.lessonSeeds[x] !== null && req.lessonSeeds[x] !== '' && Number.isFinite(Number(req.lessonSeeds[x]))).map((x) => [x, Number(req.lessonSeeds[x]) >>> 0]))
             : null,
         perQuestion: Array.isArray(req.perQuestion) ? req.perQuestion.map(Number) : Number(req.perQuestion) >= 1 ? Math.floor(Number(req.perQuestion)) : undefined,
-        // (`dealExact`, lesson 2 only: a routed check deals each question its own items - pre-skill-check.js counts)
-        dealExact: req.dealExact ? true : undefined,
         // A Prerequisite Check's routes (pre-skill-check.js, plan §8b, lessons-phase0 D1): per question
         // {lesson, title, checks?} - its "If missed" teacher tag and the key's routing table. Absent otherwise.
         routes: Array.isArray(req.routes) && req.routes.length ? req.routes.map((r) => (r && typeof r === 'object' ? { lesson: String(r.lesson || ''), title: String(r.title || ''), checks: r.checks ? String(r.checks) : undefined } : null)) : undefined,
@@ -3960,7 +3958,6 @@ async function buildRoleSheet(n, metaOf) {
         leadDrop: !!n.leadDrop || undefined,
         // The detailed lesson's Prerequisite Check: items per question (absent otherwise).
         perQuestion: n.perQuestion || undefined,
-        dealExact: n.dealExact || undefined,
         // (a Prerequisite Check's routes: absent on every other sheet)
         routes: n.routes || undefined,
         checkFor: n.checkFor || undefined,
@@ -5194,7 +5191,7 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
 
     // ---------------------------------------------------------------- P0 Prerequisite Check
     const p0 = await buildSheet({
-        role: 'pre-skill-check', sections: [{ skills: d.prerequisites.map((p) => Object.assign(withAvoid(p.ref), { lr6: true })) }], perQuestion: d.prerequisites.map((p) => p.items || 2), ...(d.p0DealExact ? { dealExact: true } : {}),
+        role: 'pre-skill-check', sections: [{ skills: d.prerequisites.map((p) => Object.assign(withAvoid(p.ref), { lr6: true })) }], perQuestion: d.prerequisites.map((p) => p.items || 2),
         size: 'L', paper, seed: (seed + 101) >>> 0, key: true, header: header('Prerequisite'),
     });
     record(p0);

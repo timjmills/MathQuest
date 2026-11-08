@@ -159,11 +159,7 @@ export function routePlan(input, rows) {
 
 // (a lesson's routed check is dealt a whole row's worth - up to PER_QUAD - and `plan` keeps what one page holds)
 const routedCheck = (input) => !!(input && input.perQuestion && Array.isArray(input.routes) && input.routes.some(Boolean));
-// (`dealExact`, lesson 2 E24b at every seed - lead's order 2026-11-08: a routed check deals each question its OWN items only, as
-// master's engine does; PER_QUAD's spare items put their answers in the page's avoid set, so lesson 2's + facts - answers 13-19 -
-// had to dodge four counts in 11-20 and dealt twin answers at their last try. Absent on every other lesson: PER_QUAD as before.)
-const exactOf = (input, id) => { const k = Number((input.perQuestion || [])[Number(String(id).replace(/\D/g, '')) || 0]); return k > 0 ? k : PER_QUAD; };
-export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).map((id) => [id, routedCheck(input) ? (input.dealExact ? exactOf(input, id) : PER_QUAD) : perQuad(input, Number(String(id).replace(/\D/g, '')) || 0)]));
+export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).map((id) => [id, routedCheck(input) ? PER_QUAD : perQuad(input, Number(String(id).replace(/\D/g, '')) || 0)]));
 
 export function plan(input = {}) {
     if (!(Array.isArray(input.routes) && input.routes.some(Boolean))) return planCheck(input, 1);
