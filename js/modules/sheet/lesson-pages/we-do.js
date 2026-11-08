@@ -59,7 +59,10 @@ export function pickWeDo(items, example, data, n, others = []) {
         // (lesson 7 r2: two two-step stories never share a Step 1 number or a Step 1 answer - "30 shared by 6", "30 shared by 5")
         const ms1 = (x) => { const s = x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.steps; return Array.isArray(s) && s.length === 2 && s[0] ? [s[0].a, s[0].b, s[0].ans] : null; };
         const msTwin = (x, y) => { const a = ms1(x), b = ms1(y); return !!a && !!b && (a[0] === b[0] || a[2] === b[2] || (a[0] === b[1] && a[1] === b[0])); };
-        const meets = (x, y, nm) => twin(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        const meets = (x, y, nm) => twin(x, y) || sameSecond(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        // (lesson 2 solve-first, seed 1: the set below then dropped a cell that adds the same number as another - "no two Guided
+        // cells add the same number", 5 + 7 / 8 + 7 - and refilled it with a near twin, 3 + 8; + items only, as that rule reads them)
+        const sameSecond = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && a[1] === b[1]; };
         const pickLead = (k, chosen, nm) => {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
