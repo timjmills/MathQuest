@@ -75,15 +75,14 @@
     "state": "lf-ops head; ws-empty-band FAIL 119 (EB-BAND 90, EB-SIDE 29)"
    },
    "pass": {
-    "commit": "TBD",
-    "state": "lf-ops's fix: set the commit, drop \"pending\", append the row to backtests.json"
+    "commit": "35ede15a",
+    "state": "lf-ops fix: div_facts supports-off rows sized to the measured fact (noStretch, kept on the pool-capped re-lay); ws-empty-band OK"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --sizes S --hosts none",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   },
-   "pending": true
+   }
   }
  ]
 }

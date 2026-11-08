@@ -2103,6 +2103,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-ops-divfacts-S",
+   "check": "division:div_facts at S on every card role: 35 % bands (more-practice equation cells 7.9 mm under 22.5 mm) and side bands (lf-ops div_facts r5, H13 class)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (30 % of the cell under the ink, every offered role / host)",
+   "browser": true,
+   "fail": {
+    "commit": "b23e418d",
+    "state": "lf-ops head; ws-empty-band FAIL 119 (EB-BAND 90, EB-SIDE 29)"
+   },
+   "pass": {
+    "commit": "35ede15a",
+    "state": "lf-ops fix: div_facts supports-off rows sized to the measured fact (noStretch, kept on the pool-capped re-lay); ws-empty-band OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --sizes S --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
