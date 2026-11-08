@@ -51,11 +51,14 @@ export function pvRoundingErrors(n, P) {
 }
 
 /** A strings member chosen per item (the scope or task changes the instruction). */
-function stringsBy(pickDef, fallbackDef) {
+function stringsBy(pickDef, fallbackDef, fromOpts = null) {
     const cache = new Map();
     const get = (def) => { if (!cache.has(def)) cache.set(def, strings(def)); return cache.get(def); };
     const fn = (ref = {}) => {
-        const def = (ref && ref.q && pickDef(ref.q)) || fallbackDef;
+        // critic r2 N2: a caller with no item (skillWords: the print page's instruction line) still names the skill's
+        // options; `fromOpts` turns them into the item's pv shape so the pick follows the options, not the fallback.
+        const optQ = !(ref && ref.q) && fromOpts ? fromOpts(ref && ref.opts && typeof ref.opts === 'object' ? ref.opts : {}) : null;
+        const def = (ref && ref.q && pickDef(ref.q)) || (optQ && pickDef(optQ)) || fallbackDef;
         return get(def)(ref);
     };
     fn.def = fallbackDef;
@@ -99,7 +102,9 @@ const withValue = (set, q) => (pvOf(q).writeValue ? { ...set, instructionKey: `$
 registerSkill('placevalue:identify', {
     strings: stringsBy((q) => withValue(pvOf(q).response === 'bank'
         ? (placeSteps(q) === PLACE_STEPS ? PLACE_BANK : PLACE_BANK_3)
-        : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3), q), PLACE_CIRCLE_3),
+        : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3), q), PLACE_CIRCLE_3,
+    // the item-less pick: writeValue is on unless the options turn it off (gen-pv); the band sets the steps' places
+    (o) => ({ pv: { response: o.response === 'bank' ? 'bank' : 'circle', writeValue: o.writeValue !== false, n: Number(o.band) >= 9999 ? 1000 : 100 } })),
     misconceptions: ['M-V1', 'M-V3', 'M-V14'],
     workedSteps: (q) => {
         const p = pvOf(q);
@@ -133,8 +138,11 @@ registerSkill('placevalue:identify', {
         // F4 / F3: with the value line, the wrong work is the place AND the value that place gives ("ones, 3"),
         // one value a slot, so a True or False? statement writes each where it belongs.
         if (p.writeValue) {
+            // critic r2 N1: the joined "tens, 60" never equals q.ans ("tens"), so chooseWrong's equality filter missed
+            // the right place word: M-V1 "counted from the left" IS the right place for a middle digit (564, the 6).
+            // Drop every candidate naming the right place, so the wrong work differs from the key in a graded slot.
             const byWord = Object.fromEntries(Object.entries(PLACE_WORD).map(([k, v]) => [v, Number(k)]));
-            return choose(q, c.map((x) => { const v = f(p.digit * (byWord[x.value] || 1)); return { ...x, value: `${x.value}, ${v}`, slots: { answer: x.value, value: v } }; }));
+            return choose(q, c.filter((x) => x.value !== PLACE_WORD[p.place]).map((x) => { const v = f(p.digit * (byWord[x.value] || 1)); return { ...x, value: `${x.value}, ${v}`, slots: { answer: x.value, value: v } }; }));
         }
         return choose(q, c);
     },

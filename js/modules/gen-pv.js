@@ -248,10 +248,10 @@ function genPlace(q, skill, o) {
         q.printFormat = 'pv-cell';
     };
     if (skill === 'identify') {
-        // Three printed place words to ring at up to 999 (PN-1 prints all three even for a 2-digit
-        // number); above that, one word per place the number has.
+        // lf-placevalue critic r2 N4 (H15): only the places the number has - a 2-digit number offers ones / tens, never
+        // a dead "hundreds" (cell, bank and screen options all read this list).
         const allPlaces = Array.from({ length: nd }, (_, i) => 10 ** i);
-        const words = (nd <= 3 ? [1, 10, 100] : allPlaces).map(p => PLACE_WORD[p]);
+        const words = allPlaces.map(p => PLACE_WORD[p]);
         q.ans = PLACE_WORD[place];
         q.hint = readHint;
         q.skillLabel = 'Name the Place';
@@ -265,6 +265,8 @@ function genPlace(q, skill, o) {
             // item on paper stays a typed word on screen, never a choice).
             q.text = writeValue ? 'Write the place. Write the value of the underlined digit.' : 'Write the place of the underlined digit.';
             q.printText = q.text;
+            // critic r2 N2: the item names its library key, so the printed instruction follows the options
+            q.instructionKey = writeValue ? 'place-write-value' : 'place-write';
             q.answerType = 'text';
             q.options = [];
             q.acceptedAnswers = [PLACE_WORD[place], PLACE_WORD[place].replace(/s$/, '')];
@@ -277,6 +279,7 @@ function genPlace(q, skill, o) {
         }
         q.text = 'Which place is the underlined digit in?';
         q.printText = writeValue ? 'Circle the place. Write the value of the underlined digit.' : 'Circle the place of the underlined digit.';
+        q.instructionKey = writeValue ? 'place-circle-value' : 'place-circle';
         q.answerType = 'multiple-choice';
         q.options = words;
         q.pv = { kind: 'place', n, place, digit, support, response: 'circle', repeat, writeValue };
@@ -440,7 +443,10 @@ function genExpandCombine(q, skill, o) {
     const zero = wantZero(o);
     // lf-placevalue r1 F22: WHERE the zero goes (tens or ones of 305 / 350) is dealt down the page by the page dealer,
     // so no page holds only zero-tens items; the digits around it stay the seeded draw.
-    const zpos = zero && nd >= 2 ? 1 + dealIndex(`pv:${skill}:zeropos`, nd - 1) : -1;
+    const zpos0 = zero && nd >= 2 ? 1 + dealIndex(`pv:${skill}:zeropos`, nd - 1) : -1;
+    // lf-placevalue critic r2 N3: a 2-digit combine item with a zero place shows ONE part ("60 = ___", its own answer);
+    // combine shows >= 2 parts at every band, so its zero place starts at 3 digits (305, 350).
+    const zpos = skill === 'combine' && nd < 3 ? -1 : zpos0;
     // ws-dealer-uniform PAGE (lf-placevalue): a number the page already holds is redrawn, and no
     // leading part (700) is dealt more than three times, nor its first two parts (700 + 20) twice, in
     // the last 19 items.
@@ -450,6 +456,7 @@ function genExpandCombine(q, skill, o) {
             d = digitsNumber(nd, {});
             if (zpos > 0) d[zpos] = 0;
             const v = fromDigits(d);
+            if (skill === 'combine' && d.filter(Boolean).length < 2) continue;
             if (v >= lo && v <= hi) return d;
         }
         return String(randInt(lo, hi)).split('').map(Number);
