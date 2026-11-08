@@ -278,8 +278,8 @@ async function main() {
                 }
                 // (these jobs are judged by the page rules only: the cell bands of the support pages are the critic's, and a
                 // probe deals the widest facts alone, a page no one prints as a band sample)
-                // (a probe page is held short by its pool - {constant: [12]} deals 13 facts - so EB-PAGE does not judge it)
-                for (const st of sets) for (const role of ['independent', 'test']) for (const size of SIZES) jobs.push({ role, size, opts: Object.assign({}, OPTS || {}, st.opts), tag: `${role} ${size} ${st.tag}`, pr: true, prOnly: true, noPage: !!st.probe, colKey: `${role} ${st.tag}` });
+                // (a probe page is held short by its pool - {constant: [12]} deals 13 facts - so EB-PAGE and EB-COLS do not judge it)
+                for (const st of sets) for (const role of ['independent', 'test']) for (const size of SIZES) jobs.push({ role, size, opts: Object.assign({}, OPTS || {}, st.opts), tag: `${role} ${size} ${st.tag}`, pr: true, prOnly: true, noPage: !!st.probe, colKey: st.probe ? null : `${role} ${st.tag}` });
                 if (sups.length) for (const size of SIZES) jobs.push({ role: 'independent', size, opts: Object.assign({}, OPTS || {}, { support: sups.slice() }), fade: FADE_PAGES, tag: `fade packet ${FADE_PAGES}p ${size}`, pr: true, prOnly: true });
             }
             // the card's grid roles at the skill's defaults take the page rules too (not the option variants: a pool-capped
