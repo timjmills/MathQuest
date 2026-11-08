@@ -571,7 +571,7 @@ function genUnitForm(q, skill, o) {
             q.answerType = 'number';
             q.hint = 'Every hundred is 10 tens. Count all the tens.';
             q.pv = { kind: 'unit', n, rename: true, counts: { 10: count, 1: ones } };
-            setCell(q, { kind: 'frame', frame: `${fmt(n)} = ____ tens ${ones} ${plural('ones', ones)}`, keyValue: count, words: true, inPlace: true, rowOnly: true });
+            setCell(q, { kind: 'frame', frame: `${fmt(n)} = ____ tens ${ones} ${plural('ones', ones)}`, keyValue: count, words: true, inPlace: true, rowOnly: true, slotDigits: 5 });
             return;
         }
         // a hundreds (or tens) count plus 10-19 of the next place down.
@@ -586,7 +586,7 @@ function genUnitForm(q, skill, o) {
         q.answerType = 'number';
         q.hint = `Ten ${wb} make one ${PLACE_ONE[hiP]}.`;
         q.pv = { kind: 'unit', n: total, rename: true, counts: { [hiP]: a, [loP]: b } };
-        setCell(q, { kind: 'frame', frame: `${a} ${plural(wa, a)} ${b} ${wb} = ____`, keyValue: total, words: true, inPlace: true, rowOnly: true });
+        setCell(q, { kind: 'frame', frame: `${a} ${plural(wa, a)} ${b} ${wb} = ____`, keyValue: total, words: true, inPlace: true, rowOnly: true, slotDigits: 5 });
         return;
     }
     const words = places.map(p => PLACE_WORD[p]);
