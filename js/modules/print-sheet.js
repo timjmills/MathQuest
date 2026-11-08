@@ -87,7 +87,7 @@ const PAGE_CAP = Object.freeze({
 function factUnder(g) {
     const c = g && g.q && g.q.cell;
     if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact) return g;
-    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { mix: true }) }) }) });
+    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { mix: true, under: true }) }) }) });
 }
 /** Is this section div_facts alone, in its Standard (across) form, with no support drawn on any fact? */
 function divFactsPlainSection(sec) {
@@ -212,7 +212,7 @@ function normaliseRequest(req = {}) {
         for (const sec of sections) {
             if (!divFactsPlainSection(sec)) continue;
             sec.divUnder = true;
-            if (sec.dense === true && sec.columns === 'auto') sec.dense = { S: 30, M: 24, L: 20 };
+            if (sec.dense === true && sec.columns === 'auto') sec.dense = { S: 36, M: 24, L: 20 };
         }
     }
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE

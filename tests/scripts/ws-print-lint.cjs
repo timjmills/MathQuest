@@ -1690,6 +1690,8 @@ function wsLintPage(cfg) {
                     // page too (12.1: up to 16; the engine's dense packing calls them `short`)
                     || ((/^test\b/.test(role) || role === 'independent') && items.length > 0 && items.every(c => c.short)),
                 slots: cells.reduce((n, c) => n + c.slots, 0), instructions: ri.instructions,
+                // the supports-off div_facts page (owner 2026-11-08: 36 a page at S): its bare facts carry .ws-eq-under
+                divUnder: ri.cells.some(c => c.querySelector('.ws-eq-under')),
             });
         }
     } else {
@@ -2173,6 +2175,8 @@ function lintKitGeometry(dom, pdf, info, F) {
                 // (DN-1a, LESSONS_LEARNED L1: S no longer prints L's 3 x 4).
                 else if (info.mode === 'kit') c = { n: Math.max(c.n, { S: 30, M: 20, L: 12 }[p.size] || 12), name: `${c.name} (12.3 dense capacity)` };
             }
+            // owner 2026-11-08 (div_facts r6 follow-up): the supports-off div_facts page holds up to 36 at S
+            if (c && p.divUnder && p.size === 'S' && /^(independent|more-practice|review)$/.test(p.role)) c = { n: Math.max(c.n, 36), name: `${c.name} (div_facts supports-off at S, owner 2026-11-08)` };
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
             const last = j === pt.pages.length - 1;

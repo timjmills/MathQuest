@@ -579,3 +579,9 @@
    and the frame are one solid stroke when a PDF is rasterised (two abutting anti-aliased edges left a light seam: the frame
    read as a double line at 93 dpi). Additive. */
 .ws-page .ws-grid.facts > .ws-cell { background-clip: padding-box; }
+
+/* div_facts supports-off page (owner 2026-11-08, critic r5 R5-2): the fact prints over its answer line and the line sits at
+   the foot of the cell, so the room above the line is writing room and no empty band is left under the last ink (H13).
+   Only the div_facts bare-fact payload (`under`) emits .ws-eq-under. */
+:is(.ws-page, .ws-sheet) .ws-cell > .ws-eq-under { flex: 1 1 auto; align-self: stretch; }
+:is(.ws-page, .ws-sheet) .ws-eq-under > [data-ws-slot] { margin-top: auto; }
