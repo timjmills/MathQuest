@@ -9,7 +9,7 @@ Builder profile: mq-opus-medium
 Critic rounds: 3: r3 FAIL min 6, r2 FAIL min 7, r1 FAIL min 1 (report design/lanes/lf-vocab/critic-r3.md)
 
 ## Round 5 (2026-11-08, fresh builder, rule 5, Opus medium): critic r3 #1-#10
-Times: start 12:52 UTC, end 15:12 UTC.
+Times: start 12:52 UTC, end 14:39 UTC.
 
 Checks first (each FAILed on 8c9034bb before its fix; backtest rows in tests/fixtures/precritic/backtests.json, pass 6cec18b7):
 - ws-empty-band (lf-checks) FAIL 49 before: Match 3 guided S/L 30-34 %, Match 3 error analysis S/M/L 32-37 %, pick3 error analysis
