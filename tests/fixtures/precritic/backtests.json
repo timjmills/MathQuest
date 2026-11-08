@@ -2037,15 +2037,13 @@
    "kind": "commit-pair",
    "rule": "ws-providers-unit --pv-r2 N1 WRONG-DIFFERS (critic lf-placevalue r2 N1)",
    "browser": false,
-   "pending": true,
-   "pendingReason": "pv fix not built yet: set pass.commit to the lf-placevalue fix commit and drop pending (the fail state is runnable today: the command FAILs on 528707e8)",
    "fail": {
     "commit": "528707e8",
     "state": "critic r2: 564, the 6 underlined: wrong work 'tens, 60' is the key (M-V1 counted from the left lands on the middle digit); 23 of 2400 on HEAD"
    },
    "pass": {
-    "commit": null,
-    "state": "pv fix not built yet"
+    "commit": "4a57b5c2",
+    "state": "identify writeValue wrong work drops every candidate naming the right place (providers/pv.js); 0 of 2400"
    },
    "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N1",
    "expect": {
@@ -2059,15 +2057,13 @@
    "kind": "commit-pair",
    "rule": "ws-providers-unit --pv-r2 N2 PRINTED-INSTRUCTION (critic lf-placevalue r2 N2)",
    "browser": false,
-   "pending": true,
-   "pendingReason": "pv fix not built yet: set pass.commit to the lf-placevalue fix commit and drop pending (the fail state is runnable today: the command FAILs on 528707e8)",
    "fail": {
     "commit": "528707e8",
     "state": "critic r2: every identify page prints 'Circle the place of the underlined digit.' (skillWords calls strings() with no item: PLACE_CIRCLE_3); 120 of 160 pages on HEAD"
    },
    "pass": {
-    "commit": null,
-    "state": "pv fix not built yet"
+    "commit": "4a57b5c2",
+    "state": "the item names its library key (gen-pv q.instructionKey) and stringsBy's item-less pick reads the options; 0 of 160"
    },
    "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N2",
    "expect": {
@@ -2081,15 +2077,13 @@
    "kind": "commit-pair",
    "rule": "ws-providers-unit --pv-r2 N3 COMBINE-PARTS (critic lf-placevalue r2 N3)",
    "browser": false,
-   "pending": true,
-   "pendingReason": "pv fix not built yet: set pass.commit to the lf-placevalue fix commit and drop pending (the fail state is runnable today: the command FAILs on 528707e8)",
    "fail": {
     "commit": "528707e8",
     "state": "critic r2: band 99 zeroPlace=some deals '60 = ___' (one part, its own answer); 180 of 1800 on HEAD"
    },
    "pass": {
-    "commit": null,
-    "state": "pv fix not built yet"
+    "commit": "4a57b5c2",
+    "state": "combine's zero place starts at 3 digits, a combine draw has >= 2 non-zero parts (gen-pv); 0 of 1800"
    },
    "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N3",
    "expect": {
@@ -2103,15 +2097,13 @@
    "kind": "commit-pair",
    "rule": "ws-providers-unit --pv-r2 N4 PLACE-WORD-LIVE (VQ-LIVE for pv; critic lf-placevalue r2 N4, r1 band=99)",
    "browser": false,
-   "pending": true,
-   "pendingReason": "pv fix not built yet: set pass.commit to the lf-placevalue fix commit and drop pending (the fail state is runnable today: the command FAILs on 528707e8)",
    "fail": {
     "commit": "528707e8",
     "state": "critic r2: 'ones tens hundreds' printed on 48 at band 99; 96 of 480 cells on HEAD"
    },
    "pass": {
-    "commit": null,
-    "state": "pv fix not built yet"
+    "commit": "4a57b5c2",
+    "state": "identify offers one word per place the number has (gen-pv words = its places); 0 of 480"
    },
    "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N4",
    "expect": {
