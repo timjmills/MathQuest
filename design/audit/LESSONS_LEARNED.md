@@ -348,3 +348,6 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
   (one width for every item: the line never tells the answer).
 - Tool: ws-empty-band `--only R1,R2` so a backtest row proves one rule even where another rule is red on both commits.
 - Process: a merged lane branch is never force-pushed; the follow-up round takes a new branch from master (claude/lf-placevalue-r4).
+- critic r4 (2026-11-08): identify and unit_form PASS (E-A1, G2 fixed). N-r4-1: G2 passes by 0.1 point (29.9 % against 30 %): a fix
+  that lands within 2 points of a limit is fragile -> PROPOSED: ws-empty-band warns (not fails) on bands of 28-30 %, and a lane
+  sizes its fix to clear a limit by at least 3 points. E-r4-1 (lesson.js page split: identify L p2 43 % empty) is ENGINE-ROLES.

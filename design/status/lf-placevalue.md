@@ -70,6 +70,9 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-08 critic r4 (critic-r4.md, 98fb4236): **placevalue:identify and placevalue:unit_form PASSED** (redesign-passed.js PV4, pv approved
+  siblings; PNGs design/status/lf-placevalue/{identify-pass,unit_form-pass}/). All five lesson #1 skills now pass. Open: G2 margin 0.1 point
+  (N-r4-1), G5 error-analysis Fix-it singular word (out of bar), E-r4-1 lesson.js page split, the unit_form worksheet host band (legacy, 32 %).
 - 2026-11-08 OWNER RULINGS (via the lead, "yes to your recommendations"): (1) fact-probe is OUT OF SCOPE for pv - card re-signed
   (lead 1e2422e7, merged into r4). (2) combine band 99 at S: the side space is ACCEPTED, the line is not widened - an OWNER-RULED
   PIN on that cell geometry (combine band=99, size S, the two-part frame cells): a side-band finding there is not a pv defect.

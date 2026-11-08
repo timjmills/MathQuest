@@ -44,9 +44,14 @@ const PV3C = 'Lane lf-placevalue, critic r3 + r3b grades for unchanged pages, cr
 const PV_IDS = [
     'placevalue:expand',
 ];
+const PV4 = 'Lane lf-placevalue, critic r3 / r3b / r3c grades for unchanged pages, critic r4 PASS for the changed pages (independent Opus medium critics; identify E-A1 compact ones picture, unit_form G2 rename=more at S; every pv-owned page type at S / M / L, every §7a option value, card 1280 / 820 / 390, worksheet, quiz >= 8; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-r3.md + critic-r3b.md + critic-r3c.md + critic-r4.md, 2026-11-08';
+const PV4_IDS = [
+    'placevalue:identify',
+    'placevalue:unit_form',
+];
 const PV3C_IDS = [
     'placevalue:value',
     'placevalue:combine',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C])]);
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4])]);
