@@ -35,6 +35,18 @@
 //   QSTYPE   a Quick Start name is >= 13 px and clamps at 3 lines                                (check r2 D2)
 //   CHIPWIDTH  at 1366 a selection chip shows its whole name when the row has room (no 26ch cut) (check r2 D5)
 //   TOPIC    no fraction skill is filed under Counting (By area, and inside Grade 3); they are under Fractions (r2 D6)
+//   THUMB    hover thumbnails (owner 2026-11-05): at 1366x768 and 820x1180 a mouse on a card shows, within 1 s, a
+//            role="tooltip" thumbnail holding the paper cell or the large-print question, and the pupil name, never the answer
+//            (no filled box; no answer token the question itself does not carry), 260-490 px wide, inside the viewport,
+//            off the pointer and off the card (its tick), no sideways scroll, aria-describedby on the card; 340-480 px wide (r1 D1); mouse leave,
+//            Esc (the dialog stays; the next Esc closes it), a scroll of the list and a re-render each hide it.
+//            Keyboard: Tab onto a card shows it without moving focus; the first Esc hides it, blur hides it.
+//            Touch (390x844, hasTouch): a tap picks and no thumbnail appears, even on a mouse event.
+//            Sweep: every live skill (716) draws a cell or the text fallback, no throw, no console error, no answer.
+//            Legible (critic r1): TEXTSIZE (question line >= 14 px, no text < 10 px), SCALE (a drawn cell >= 0.6), INFRAME
+//            (nothing painted outside the frame), NODUP (the question once, normalised compare), NOTEACHER (no CCSS code, no
+//            Hint / Check control), NOEXTRA (no second answer line under an item's own blank): by real hover on the 13 skills
+//            the critic found worst (1366x768, 820x1180), then every live skill at the L and S plates (studentExplorerThumbBatch).
 //   KEYS     Esc closes; arrow keys move between the tabs
 //   TARGETS  every control in the explorer and the Explore button >= 44 x 44 at 1366 / 820 / 390
 //   NOSCROLL no horizontal scroll at 390 (the page and the explorer panel)
@@ -53,6 +65,8 @@ const SHOTS = arg('shots', '');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // a card name split into head + tail (check r3 R1) reads the same words as the full name: compare the words only
 const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replace(/\s+/g, ' ').trim();
+
+const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-measure.cjs');
 
 (async () => {
     const app = await open({ seed: 7, viewport: { width: 1366, height: 900, deviceScaleFactor: 1 } });
@@ -671,6 +685,366 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
             await sleep(200);
         }
 
+        if (process.env.MQX_TRACE) console.log('step', '// THUMB mouse');
+        // THUMB (owner 2026-11-05: "give a thumbnail of the skill when mousing over"). At 1366x768 and 820x1180 with a mouse:
+        // hovering a card shows a thumbnail within 1 s; it holds the paper cell (.ws-cell / .mq-scell), never the answer; it
+        // sits inside the viewport, off the pointer and off the card's tick, with no sideways scroll; mouse leave, Esc
+        // (the dialog stays open; the next Esc closes it), a scroll of the list and a re-render each hide it.
+        const thumbState = () => page.evaluate(() => (window.studentExplorerState() || {}).thumb || {});
+        const waitThumb = async (want, ms) => {
+            const t0 = Date.now();
+            for (;;) {
+                const st = await thumbState();
+                if (!!st.open === want) return { st, ms: Date.now() - t0 };
+                if (Date.now() - t0 > ms) return { st, ms: Date.now() - t0, timeout: true };
+                await sleep(40);
+            }
+        };
+        const probe = (key) => page.evaluate(async (k) => {
+            const m = await import('./js/modules/student-explorer.js');
+            return m.studentExplorerThumbProbe(k);
+        }, key);
+        // a drawn answer: the answer's token in the thumbnail that the question itself (its text and visual) does not carry
+        const leaks = (p) => {
+            if (!p || !p.ans || p.hasOptions) return false;
+            const a = p.ans.trim();
+            if (!a || a.length > 24) return false;
+            const re = new RegExp(`(^|[^0-9A-Za-z.,/])${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^0-9A-Za-z.,/])`);
+            const norm = (t) => String(t || '').replace(/\s+/g, ' ').replace(/\s+([,.;:])/g, '$1');
+            return re.test(norm(p.text)) && !re.test(norm(p.qText)) && !re.test(norm(p.qVisual));
+        };
+        const mouseHome = async () => {   // the dialog's title: off every card
+            const r = await page.evaluate(() => { const b = document.getElementById('mqxTitle').getBoundingClientRect(); return { x: b.left + 10, y: b.top + b.height / 2 }; });
+            await page.mouse.move(r.x, r.y);
+        };
+        for (const [w, h] of [[1366, 768], [820, 1180]]) {
+            await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+            await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.showView) window.showView('homeView'); window.UnifiedSkills.clear(); });
+            await sleep(200);
+            await page.evaluate(() => window.openStudentExplorer({ tab: 'grade', grade: '2' }));
+            await sleep(400);
+            // headless Chrome reports no pointer at all (hover: none, pointer: none); it must not read as a touch screen
+            const touchy = await page.evaluate(() => window.matchMedia('(pointer: coarse)').matches);
+            if (touchy) F(`THUMB @${w}x${h} the mouse test page reports a touch screen (pointer: coarse)`);
+            // the first card (left column) and the last card of the first row (right column): both sides get tried
+            const targets = await page.evaluate(() => {
+                const cards = [...document.querySelectorAll('#mqxBody .mqx-card')];
+                const top0 = Math.round(cards[0].getBoundingClientRect().top);
+                const row = cards.filter((c) => Math.round(c.getBoundingClientRect().top) === top0);
+                return [...new Set([0, cards.indexOf(row[row.length - 1])])];
+            });
+            let shot = false;
+            let cellsSeen = 0;
+            for (const idx of targets) {
+                await mouseHome();
+                await sleep(500);
+                const pt = await page.evaluate((i) => { const c = document.querySelectorAll('#mqxBody .mqx-card')[i]; const b = c.getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height * 0.5), key: c.dataset.key }; }, idx);
+                await page.mouse.move(pt.x, pt.y, { steps: 3 });
+                const shown = await waitThumb(true, 1000);
+                if (shown.timeout) { F(`THUMB @${w}x${h} hovering ${pt.key} shows no thumbnail within 1 s`); continue; }
+                await sleep(1000);   // the cell's mono pass settles (~0.9 s) and the thumbnail re-places
+                const g2 = await page.evaluate((i, p) => {
+                    const el = document.getElementById('mqxThumb');
+                    const card = document.querySelectorAll('#mqxBody .mqx-card')[i];
+                    const r = el.getBoundingClientRect(), tick = card.querySelector('.mqx-tick').getBoundingClientRect(), cr = card.getBoundingClientRect();
+                    const over = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+                    return { role: el.getAttribute('role'), cell: !!el.querySelector('.ws-cell, .mq-scell'), mode: el.dataset.mode, w: Math.round(r.width), h: Math.round(r.height),
+                        inside: r.left >= 0 && r.top >= 0 && r.right <= document.documentElement.clientWidth && r.bottom <= window.innerHeight,
+                        onPointer: p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom, onTick: over(r, tick), onCard: over(r, cr),
+                        x: document.documentElement.scrollWidth - window.innerWidth, described: (card.getAttribute('aria-describedby') || '').includes('mqxThumb'),
+                        cap: (el.querySelector('.mqx-thumb-cap') || {}).textContent || '', name: card.querySelector('.mqx-name').firstChild.textContent,
+                        filled: [...el.querySelectorAll('input, textarea')].filter((x) => (x.type === 'checkbox' || x.type === 'radio' ? x.checked : x.value)).length,
+                        bigText: (() => { const t = el.querySelector('.mqx-thumb-text'); return !!t && parseFloat(getComputedStyle(t).fontSize) >= 16 && !!t.textContent.trim(); })() };
+                }, idx, pt);
+                const what = `@${w}x${h} card ${pt.key}`;
+                if (g2.role !== 'tooltip') F(`THUMB ${what}: the thumbnail is not role="tooltip"`);
+                // the paper cell, or (critic r1 D1) the large-print question when the drawing would be too small to read
+                if (g2.cell) cellsSeen++;
+                else if (g2.mode !== 'text' || !g2.bigText) F(`THUMB ${what}: the thumbnail holds neither a paper cell (.ws-cell / .mq-scell) nor the large-print question (mode ${g2.mode})`);
+                if (!g2.inside) F(`THUMB ${what}: the thumbnail leaves the viewport`);
+                if (g2.onPointer) F(`THUMB ${what}: the thumbnail covers the pointer`);
+                if (g2.onTick || g2.onCard) F(`THUMB ${what}: the thumbnail covers the card${g2.onTick ? "'s tick" : ''}`);
+                if (g2.x > 0) F(`THUMB ${what}: the page scrolls sideways by ${g2.x}px`);
+                if (g2.w < 260 || g2.w > 490) F(`THUMB ${what}: the thumbnail is ${g2.w}px wide (want 260-490: S 340 up to L 480, critic r1 D1)`);
+                if (!g2.described) F(`THUMB ${what}: the card has no aria-describedby to the thumbnail`);
+                if (g2.cap.trim() !== g2.name.trim()) F(`THUMB ${what}: the caption "${g2.cap}" is not the pupil name "${g2.name}"`);
+                if (g2.filled) F(`THUMB ${what}: ${g2.filled} answer boxes are filled`);
+                if (SHOTS && !shot) { shot = true; await page.screenshot({ path: path.join(SHOTS, `explorer-thumb-${w}.png`) }); }
+                // mouse leave
+                await mouseHome();
+                const gone = await waitThumb(false, 400);
+                if (gone.timeout) F(`THUMB ${what}: the thumbnail stays after the mouse leaves`);
+                const desc = await page.evaluate((i) => document.querySelectorAll('#mqxBody .mqx-card')[i].getAttribute('aria-describedby'), idx);
+                if (desc && desc.includes('mqxThumb')) F(`THUMB ${what}: aria-describedby stays after it hides`);
+                // the answer is never drawn
+                const pr = await probe(pt.key);
+                if (leaks(pr)) F(`THUMB ${what}: the thumbnail shows the answer ${pr.ans}`);
+            }
+            if (!cellsSeen) F(`THUMB @${w}x${h} no hovered card drew its paper cell (every one fell back to text)`);
+            // Esc: the first hides the thumbnail and the dialog stays; the next closes the dialog
+            await mouseHome(); await sleep(500);
+            let pt = await page.evaluate(() => { const b = document.querySelector('#mqxBody .mqx-card').getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height / 2) }; });
+            await page.mouse.move(pt.x, pt.y, { steps: 3 });
+            if ((await waitThumb(true, 1000)).timeout) F(`THUMB @${w}x${h} (Esc) no thumbnail to hide`);
+            else {
+                await page.keyboard.press('Escape');
+                await sleep(150);
+                const e1 = await page.evaluate(() => ({ thumb: window.studentExplorerState().thumb.open, open: !document.getElementById('studentExplorer').hidden }));
+                if (e1.thumb) F(`THUMB @${w}x${h} the first Esc does not hide the thumbnail`);
+                if (!e1.open) F(`THUMB @${w}x${h} the first Esc closes the explorer (it should only hide the thumbnail)`);
+                await page.keyboard.press('Escape');
+                await sleep(200);
+                if (!(await page.evaluate(() => document.getElementById('studentExplorer').hidden))) F(`THUMB @${w}x${h} the second Esc does not close the explorer`);
+                await page.evaluate(() => window.openStudentExplorer({ tab: 'grade', grade: '2' }));
+                await sleep(300);
+            }
+            // a scroll of the list hides it
+            await mouseHome(); await sleep(500);
+            pt = await page.evaluate(() => { const b = document.querySelector('#mqxBody .mqx-card').getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height / 2) }; });
+            await page.mouse.move(pt.x, pt.y, { steps: 3 });
+            if ((await waitThumb(true, 1000)).timeout) F(`THUMB @${w}x${h} (scroll) no thumbnail to hide`);
+            else {
+                const sc = await page.evaluate(async () => {
+                    const b = document.getElementById('mqxBody');
+                    b.scrollTop += 120;
+                    await new Promise((r) => setTimeout(r, 60));
+                    return window.studentExplorerState().thumb.open;
+                });
+                if (sc) F(`THUMB @${w}x${h} a scroll of the list does not hide the thumbnail`);
+                await page.evaluate(() => { document.getElementById('mqxBody').scrollTop = 0; });
+            }
+            // a re-render (a grade chip) hides it
+            await mouseHome(); await sleep(500);
+            pt = await page.evaluate(() => { const b = document.querySelector('#mqxBody .mqx-card').getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height / 2) }; });
+            await page.mouse.move(pt.x, pt.y, { steps: 3 });
+            if ((await waitThumb(true, 1000)).timeout) F(`THUMB @${w}x${h} (re-render) no thumbnail to hide`);
+            else {
+                const rr = await page.evaluate(() => { document.querySelector('.mqx-gchip[data-grade="3"]').click(); const st = window.studentExplorerState().thumb; return st.open || st.pending; });
+                if (rr) F(`THUMB @${w}x${h} the list re-rendered under the thumbnail and it stayed`);
+            }
+            await mouseHome();
+            await sleep(300);
+
+            if (process.env.MQX_TRACE) console.log('step', '// THUMB keyboard', w);
+            // Keyboard: Tab onto a card shows the thumbnail (focus stays on the card); the first Esc hides it and keeps the dialog
+            await page.evaluate(() => window.openStudentExplorer({ tab: 'grade', grade: '1' }));
+            await sleep(300);
+            await page.evaluate(() => document.querySelector('.mqx-gchip[aria-checked="true"]').focus());
+            let onCard = false;
+            for (let i = 0; i < 12 && !onCard; i++) {
+                await page.keyboard.press('Tab');
+                onCard = await page.evaluate(() => !!(document.activeElement && document.activeElement.classList.contains('mqx-card')));
+            }
+            if (!onCard) F(`THUMB @${w}x${h} Tab never reaches a card`);
+            else {
+                const k = await waitThumb(true, 1000);
+                if (k.timeout) F(`THUMB @${w}x${h} keyboard focus on a card shows no thumbnail within 1 s`);
+                else {
+                    const kf = await page.evaluate(() => {
+                        const a = document.activeElement;
+                        const r = document.getElementById('mqxThumb').getBoundingClientRect();
+                        return { card: a.classList.contains('mqx-card'), key: a.dataset.key, st: window.studentExplorerState().thumb, described: (a.getAttribute('aria-describedby') || '').includes('mqxThumb'),
+                            inside: r.left >= 0 && r.top >= 0 && r.right <= document.documentElement.clientWidth && r.bottom <= window.innerHeight };
+                    });
+                    if (!kf.card || kf.st.key !== kf.key) F(`THUMB @${w}x${h} keyboard: focus moved, or the thumbnail is for another card (${kf.st.key} vs ${kf.key})`);
+                    if (!kf.described) F(`THUMB @${w}x${h} keyboard: the focused card has no aria-describedby to the thumbnail`);
+                    if (!kf.inside) F(`THUMB @${w}x${h} keyboard: the thumbnail leaves the viewport`);
+                    await page.keyboard.press('Escape');
+                    await sleep(150);
+                    const ke = await page.evaluate(() => ({ thumb: window.studentExplorerState().thumb.open, open: !document.getElementById('studentExplorer').hidden, onCard: document.activeElement.classList.contains('mqx-card') }));
+                    if (ke.thumb) F(`THUMB @${w}x${h} keyboard: the first Esc does not hide the thumbnail`);
+                    if (!ke.open) F(`THUMB @${w}x${h} keyboard: the first Esc closes the explorer`);
+                    if (!ke.onCard) F(`THUMB @${w}x${h} keyboard: Esc moved focus off the card`);
+                    // the next card by Tab: blur of the first hides, the next one's thumbnail follows
+                    await page.keyboard.press('Tab');
+                    await sleep(60);
+                    const kb = await page.evaluate(() => window.studentExplorerState().thumb);
+                    if (kb.open) F(`THUMB @${w}x${h} keyboard: the thumbnail of the card left behind stays on blur`);
+                    await page.keyboard.press('Escape');
+                    await sleep(200);
+                    if (!(await page.evaluate(() => document.getElementById('studentExplorer').hidden))) F(`THUMB @${w}x${h} keyboard: Esc with no thumbnail does not close the explorer`);
+                }
+            }
+            await page.evaluate(() => window.closeStudentExplorer && window.closeStudentExplorer());
+            await sleep(200);
+        }
+
+        if (process.env.MQX_TRACE) console.log('step', '// THUMB sweep');
+        // THUMB sweep: every live skill draws a thumbnail (the paper cell, or the text example when its generator throws or is
+        // slow) with no throw and no console error, and none shows its answer
+        {
+            await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+            await page.evaluate(() => window.openStudentExplorer({ tab: 'grade', grade: 'K' }));
+            await sleep(300);
+            const keys = await page.evaluate(async () => {
+                const set = new Set();
+                for (const g of [...document.querySelectorAll('.mqx-gchip')].map((c) => c.dataset.grade)) {
+                    document.querySelector(`.mqx-gchip[data-grade="${g}"]`).click();   // the chips are drawn again on each click
+                    await new Promise((r) => setTimeout(r, 20));
+                    for (const k of document.querySelectorAll('#mqxBody .mqx-card')) set.add(k.dataset.key);
+                }
+                return [...set];
+            });
+            const tally = { cell: 0, text: 0, slow: 0, err: 0 };
+            const bad = [];
+            for (const key of keys) {
+                const before = app.problems.length;
+                let pr;
+                try { pr = await probe(key); } catch (e) { pr = { err: String(e && e.message || e) }; }
+                if (!pr || typeof pr.err === 'string') { bad.push(`${key} threw: ${pr && pr.err}`); continue; }
+                if (pr.mode === 'cell' || pr.mode === 'crop') { tally[pr.mode] = (tally[pr.mode] || 0) + 1; if (!pr.cell) bad.push(`${key} ${pr.mode} mode without a .ws-cell`); } else if (pr.mode === 'text') tally.text++; else bad.push(`${key} drew nothing (${pr.mode})`);
+                if (pr.err) tally.err++;
+                if (pr.ms > 50) tally.slow++;
+                if (pr.filled) bad.push(`${key} ${pr.filled} answer boxes filled`);
+                if (leaks(pr)) bad.push(`${key} shows its answer ${pr.ans}`);
+                const errs = app.problems.slice(before).filter((p) => !/favicon/.test(p.text));
+                if (errs.length) bad.push(`${key} console: ${errs[0].type} ${errs[0].text.slice(0, 120)}`);
+            }
+            if (keys.length < 700) F(`THUMB sweep reached only ${keys.length} skills`);
+            if (bad.length) F(`THUMB sweep ${bad.length} of ${keys.length} skills fail: ${bad.slice(0, 6).join(' | ')}`);
+            for (const b of bad.slice(6, 40)) console.error(`    THUMB sweep: ${b}`);
+            console.log(`  THUMB sweep: ${keys.length} skills — ${tally.cell} cells, ${tally.crop || 0} crops, ${tally.text} text (${tally.slow} slow, ${tally.err} generator errors)`);
+
+            if (process.env.MQX_TRACE) console.log('step', '// THUMB legible (hard set, real hover)');
+            // THUMB legibility (critic r1 D1-D6, r2 R2-D1). Measured on what a pupil sees after the thumbnail settles
+            // (tests/lib/ws-thumb-measure.cjs):
+            //   TEXTSIZE  the question line renders >= 14 px
+            //   PARITY    a text renders under 10 px only where the skill's own practice card (1366) shows it that small,
+            //             and never smaller than there (r2: an axis tick the card shows at 7 px may stay 7 px)
+            //   SCALE     a drawn cell or crop is scaled >= 0.6
+            //   INFRAME   a fitted cell paints nothing outside the frame; a crop keeps its question line whole and a figure
+            //             in its window
+            //   NODUP     the question is not shown twice (normalised text compare, so a story split over lines counts)
+            //   NOTEACHER no "CCSS:" code, no Hint / Check button, no screen-only control
+            //   NOEXTRA   no extra answer line under an item that already has its own blank ("___", "= ?", a box)
+            //   NOPICLESS a skill whose question needs its drawing (a practice-card visual, or words that point at a picture)
+            //             is never words-only at the L, W, B or M plates, and words-only text never points at a picture
+            //   WORDSONLY the count of words-only plates per size stays under its ceiling (WORDS_CEILING, below)
+            // First a REAL HOVER on the skills the critics found worst (this half runs on any build), then every live skill
+            // at every plate size. 1024 x 768: the middle grid column gets an L, W or B plate, never S (r2 fix 4).
+            await page.evaluate(installThumbMeasure, POINTING.source);
+            const cardCache = new Map();
+            const cardSizes = async (key) => {
+                if (!cardCache.has(key)) {
+                    const sizes = await page.evaluate((k) => window.__mqxCardSizes(k), key);
+                    await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.state) { window.state.isPlaying = false; } });
+                    cardCache.set(key, sizes);
+                }
+                return cardCache.get(key);
+            };
+            const HARD = ['graphs:bar_graph', 'coordinates:coordinate_all', 'fractions:mixed_improper_visual', 'addition:add_word_problems',
+                'subtraction:sub_wp_20', 'graphs:line_plot', 'graphs:pie_chart', 'coordinates:geo_reflect', 'area_perimeter:area',
+                'area_perimeter:area_perimeter', 'probability:probability_basic', 'multiplication:mult_chart_easy', 'counting:count_objects',
+                'coordinates:coordinate_q1', 'data_analysis:box_plot_intro', 'fractions:fraction_of_set', 'measurement:elapsed_hour',
+                'addition:nl_add', 'area_perimeter:perimeter_grid', 'number_theory:factor_tchart_easy'];
+            const hovered = [];
+            for (const [w, h] of [[1366, 768], [820, 1180]]) {
+                await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+                await sleep(200);
+                for (const key of HARD) {
+                    const g = await page.evaluate(async (k) => {
+                        for (const gr of ['K', '1', '2', '3', '4', '5', '6', 'M']) {
+                            await window.openStudentExplorer({ tab: 'grade', grade: gr });
+                            const c = document.querySelector(`#mqxBody .mqx-card[data-key="${k}"]`);
+                            if (c) { c.scrollIntoView({ block: 'center' }); return gr; }
+                        }
+                        return null;
+                    }, key);
+                    if (!g) { F(`THUMB legible: ${key} is not in the explorer`); continue; }
+                    await mouseHome(); await sleep(450);
+                    const pt = await page.evaluate((k) => { const b = document.querySelector(`#mqxBody .mqx-card[data-key="${k}"]`).getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height * 0.35) }; }, key);
+                    await page.mouse.move(pt.x, pt.y, { steps: 3 });
+                    if ((await waitThumb(true, 1000)).timeout) { F(`THUMB legible @${w}: hovering ${key} shows no thumbnail`); continue; }
+                    await sleep(1200);   // settled: the mono pass let go and the refit ran
+                    const m = await page.evaluate((k) => window.__mqxMeasure(document.getElementById('mqxThumb'), k), key);
+                    if (SHOTS && w === 1366) await page.screenshot({ path: path.join(SHOTS, `thumb-hard-${key.replace(/\W+/g, '_')}.png`) }).catch(() => {});   // no clip: a clipped shot resizes the page, which hides the thumbnail
+                    hovered.push({ w, key, m });
+                }
+            }
+            await mouseHome();
+            for (const { w, key, m } of hovered) {
+                const card = m.small && m.small.length ? await cardSizes(key) : null;
+                for (const f of thumbFaults(m, { card })) F(`THUMB legible @${w} hover ${key}: ${f}`);
+            }
+            // 1024 x 768: the middle column of the grid (no room beside it for a large plate) gets L, W or B above / below
+            {
+                await page.setViewport({ width: 1024, height: 768, deviceScaleFactor: 1 });
+                await sleep(200);
+                const small1024 = [];
+                for (const gr of ['K', '3']) {
+                    await page.evaluate((g) => window.openStudentExplorer({ tab: 'grade', grade: g }), gr);
+                    await sleep(300);
+                    const mids = await page.evaluate(() => {
+                        const cards = [...document.querySelectorAll('#mqxBody .mqx-card')];
+                        const lefts = [...new Set(cards.map((c) => Math.round(c.getBoundingClientRect().left)))].sort((a, b) => a - b);
+                        if (lefts.length < 3) return [];
+                        const body = document.getElementById('mqxBody').getBoundingClientRect();
+                        return cards.filter((c) => Math.round(c.getBoundingClientRect().left) === lefts[1]).map((c) => c.getBoundingClientRect()).filter((b) => b.top > body.top && b.bottom < body.bottom - 60)
+                            .slice(0, 3).map((b) => ({ x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height * 0.35) }));
+                    });
+                    if (!mids.length) F(`THUMB @1024 grade ${gr}: no middle grid column to test`);
+                    for (const pt of mids) {
+                        await mouseHome(); await sleep(450);
+                        await page.mouse.move(pt.x, pt.y, { steps: 3 });
+                        if ((await waitThumb(true, 1000)).timeout) { F(`THUMB @1024 grade ${gr}: a middle-column card shows no thumbnail`); continue; }
+                        const sz = await page.evaluate(() => ((document.getElementById('mqxThumb').className || '').match(/mqx-thumb--(\w)/) || [])[1] || '?');
+                        if (!['L', 'W', 'B'].includes(sz)) small1024.push(`${gr}@${pt.x},${pt.y}=${sz}`);
+                    }
+                }
+                if (small1024.length) F(`THUMB @1024x768 middle-column cards get a small plate (want L / W / B): ${small1024.join(', ')}`);
+                await mouseHome();
+                await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+                await sleep(200);
+            }
+
+            if (process.env.MQX_TRACE) console.log('step', '// THUMB legible sweep');
+            // WORDS_CEILING: words-only plates per size (the full sweeps, L and S). Words-only is allowed only for an item
+            // with no drawing on its practice card: a build widget ("Build a bar graph showing: Mon=7 ...") or a text-only
+            // item too long to fit. On 2026-11-07 that is 2 at L (both build widgets) and 25 at S; the ceilings add room for
+            // a seeded item changing (+2 / +5) and no more, so a figure skill falling back to words shows up at once. At
+            // L, W, B and M no figure skill may be words-only at all (NOPICLESS). W, B and M are each swept on a third of
+            // the skills (a different third each, so together they cover all 716) to keep the gate under 10 minutes.
+            const WORDS_CEILING = { L: 4, S: 30 };
+            const hasBatch = await page.evaluate(async () => typeof (await import('./js/modules/student-explorer.js')).studentExplorerThumbBatch === 'function');
+            if (!hasBatch) F('THUMB legible sweep: student-explorer.js has no studentExplorerThumbBatch (the sweep cannot draw the plates)');
+            else {
+                const all = [];
+                for (const size of ['L', 'W', 'B', 'M', 'S']) {
+                    const tl = { cell: 0, crop: 0, text: 0 };
+                    const third = { W: 0, B: 1, M: 2 }[size];
+                    const sk = third == null ? keys : keys.filter((_, k) => k % 3 === third);
+                    for (let i = 0; i < sk.length; i += 60) {
+                        const batch = sk.slice(i, i + 60);
+                        const before = app.problems.length;
+                        const ms = await page.evaluate(async (b, sz) => {
+                            const m = await import('./js/modules/student-explorer.js');
+                            await m.studentExplorerThumbBatch(b, { size: sz });
+                            return [...document.querySelectorAll('.mqx-thumb-probe')].map((el) => window.__mqxMeasure(el, el.dataset.key));
+                        }, batch, size);
+                        await page.evaluate(async () => (await import('./js/modules/student-explorer.js')).studentExplorerThumbBatch([]));
+                        for (const m of ms) { tl[m.mode] = (tl[m.mode] || 0) + 1; all.push({ size, m }); }
+                        const errs = app.problems.slice(before).filter((p) => !/favicon/.test(p.text));
+                        if (errs.length) F(`THUMB legible sweep (${size}) batch ${i}: console ${errs[0].text.slice(0, 120)}`);
+                    }
+                    console.log(`  THUMB legible sweep (${size}${third == null ? '' : ', a third'}): ${tl.cell} cells, ${tl.crop || 0} crops, ${tl.text} words-only`);
+                    if (WORDS_CEILING[size] != null && tl.text > WORDS_CEILING[size]) F(`THUMB WORDSONLY (${size}): ${tl.text} words-only plates (ceiling ${WORDS_CEILING[size]})`);
+                }
+                // PARITY needs the practice card of every skill that has a text under 10 px in any plate
+                const faults = {};
+                for (const { size, m } of all) {
+                    const card = m.small && m.small.length ? await cardSizes(m.key) : null;
+                    for (const f of thumbFaults(m, { size, card })) (faults[size] = faults[size] || []).push(`${m.key}: ${f}`);
+                }
+                await page.evaluate(() => { if (window.showView) window.showView('homeView'); });
+                for (const [size, list] of Object.entries(faults)) {
+                    F(`THUMB legible sweep (${size}): ${list.length} faults: ${list.slice(0, 5).join(' | ')}`);
+                    for (const f of list.slice(5, 25)) console.error(`    THUMB legible ${size}: ${f}`);
+                }
+            }
+            await page.evaluate(() => window.closeStudentExplorer && window.closeStudentExplorer());
+            await sleep(200);
+        }
+
         if (process.env.MQX_TRACE) console.log('step', '// KEYS + TARGETS');
         // KEYS + TARGETS + NOSCROLL at each width
         for (const [w, h] of [[1366, 900], [820, 1180], [390, 844]]) {
@@ -747,6 +1121,34 @@ const qsWords = (s) => String(s == null ? '' : s).replace(/[(),:]/g, ' ').replac
         }
         const homeX = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
         if (homeX > 0) F(`NOSCROLL @390 the pupil home scrolls sideways by ${homeX}px`);
+
+        if (process.env.MQX_TRACE) console.log('step', '// THUMB touch');
+        // THUMB touch: at 390x844 with touch emulation (hover: none), no hover thumbnail ever appears; a tap still picks
+        {
+            await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true });   // reloads the page
+            await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS && !!window.openStudentExplorer, { timeout: 30000 });
+            await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.state) { window.state.isPlaying = false; window.state.isMixedMode = false; } if (window.showView) window.showView('homeView'); window.UnifiedSkills.clear(); });
+            await sleep(300);
+            await page.evaluate(() => window.openStudentExplorer({ tab: 'grade', grade: '2' }));
+            await page.waitForFunction(() => { const r = document.getElementById('studentExplorer'); return r && !r.hidden && r.querySelectorAll('.mqx-card').length > 0; }, { timeout: 20000 });
+            await sleep(400);
+            const media = await page.evaluate(() => window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(any-hover: hover)').matches);
+            if (!media) F('THUMB @390 touch emulation does not report (pointer: coarse) without hover: the touch check cannot judge');
+            const pt = await page.evaluate(() => { const c = document.querySelector('#mqxBody .mqx-card'); const b = c.getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height / 2), key: c.dataset.key }; });
+            await page.touchscreen.tap(pt.x, pt.y);
+            await sleep(1100);
+            const t1 = await page.evaluate((k) => ({ st: window.studentExplorerState().thumb, picked: document.querySelector(`#mqxBody .mqx-card[data-key="${k}"]`).getAttribute('aria-pressed') }), pt.key);
+            if (t1.st.open || t1.st.pending) F('THUMB @390 touch: a tap on a card opens a hover thumbnail');
+            if (t1.picked !== 'true') F('THUMB @390 touch: a tap no longer picks the skill');
+            await page.mouse.move(pt.x + 5, pt.y + 5);   // even a mouse event on a hover-less screen shows none
+            await sleep(1100);
+            const t2 = await page.evaluate(() => window.studentExplorerState().thumb);
+            if (t2.open || t2.pending) F('THUMB @390 touch: a hover thumbnail appears on a hover-less screen');
+            const tx = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            if (tx > 0) F(`THUMB @390 touch: the page scrolls sideways by ${tx}px`);
+            if (SHOTS) await page.screenshot({ path: path.join(SHOTS, 'explorer-thumb-none-390.png') });
+            await page.evaluate(() => { window.closeStudentExplorer && window.closeStudentExplorer(); window.UnifiedSkills.clear(); });
+        }
 
         // CONSOLE
         const errs = app.problems.filter((p) => !/favicon/.test(p.text));
