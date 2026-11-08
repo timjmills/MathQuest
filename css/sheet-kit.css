@@ -597,3 +597,10 @@
 :is(.ws-page, .ws-sheet) .ws-eq-left { min-width: var(--mq-fw, auto); }
 :is(.ws-page, .ws-sheet) .ws-eq-left > span:first-child { align-self: flex-start; }
 :is(.ws-page, .ws-sheet) .ws-eq-left > .ws-line { align-self: stretch; width: auto; }
+
+/* div_facts' fade packet, one x across ALL its pages (critic r6 R6-5, facts card F4; additive): a page numbered past 9 gives its
+   equation cells the two-digit tab's keep-out as their left inset (the rule above, "grid past 9"), a page of 6 does not, so the
+   fact moved 5 mm between packet page 1 and pages 2-3. Every cell of the packet takes that one inset, with no extra margin.
+   Only div_facts' packet emits .ws-eq-left. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell]:has(> .ws-tab, > .ws-letter):has(.ws-eq-left):not(.blankrun) {
+    padding-left: max(calc(var(--ws-tab, 5mm) * 1.4 + 1.3mm), calc(var(--ws-ko, 6mm) + 0.3mm)) !important; --mq-fx: 0mm; }
