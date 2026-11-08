@@ -120,8 +120,10 @@ export function factCue(p, { px = 0 } = {}) {
     const INK = '#000';
     const f2 = (v) => Number(v).toFixed(2);
     const size = (w, h) => (px ? `width="${Math.round(w * px)}" height="${Math.round(h * px)}" data-px="1"` : `width="${f2(w)}mm" height="${f2(h)}mm"`);
+    // (critic r5 R5-5: the think box (div_facts only) never scales to its pane - content never shrinks to fit - so a page
+    // draws every box at its one measured width; the other cues keep their max-width)
     const wrap = (w, h, body, label) => `<svg class="ws-factcue-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(w)} ${f2(h)}" ${size(w, h)} `
-        + `role="img" aria-label="${label}" style="display:block;margin:0 auto;max-width:100%;overflow:visible;${px ? `width:${Math.round(w * px)}px;height:auto;` : ''}">${body}</svg>`;
+        + `role="img" aria-label="${label}" style="display:block;margin:0 auto;${kind === 'think' ? '' : 'max-width:100%;'}overflow:visible;${px ? `width:${Math.round(w * px)}px;height:auto;` : ''}">${body}</svg>`;
     const dot = (x, y, r, open) => `<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(r)}" ${open ? `fill="none" stroke="${INK}" stroke-width="0.35"` : `fill="${INK}"`}/>`;
     const cross = (x, y, r) => `<path d="M${f2(x - r)} ${f2(y - r)}L${f2(x + r)} ${f2(y + r)}M${f2(x + r)} ${f2(y - r)}L${f2(x - r)} ${f2(y + r)}" stroke="${INK}" stroke-width="0.5"/>`;
     // `ref`: a number of an evenly printed reference scale (the number line's 0, 5, 10 ...), never
@@ -204,7 +206,7 @@ export function factCue(p, { px = 0 } = {}) {
         // quotient's rows of the divisor's dots - drawn top-left in ONE frame for the section (`p.frame`: the largest
         // divisor's columns by the band's top rows), so every cell of the section has one geometry and one answer place.
         if (div && p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
-            const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = 2.6, r = 0.98, pad = 0.8;
+            const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = Number(p.frame.pitch) || 2.6, r = Math.min(0.98, pitch * 0.377), pad = 0.8;
             // WDS RP-81 (critic r5 R5-3): a 1.5 mm subitising gap after every 5th row and column of an array over 5
             const gap = (n) => Math.floor(n / 5) * ARRAY_GAP_MM;
             const span = (n) => n * pitch + (n > 5 ? gap(n - 1) : 0);
