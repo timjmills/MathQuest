@@ -309,3 +309,12 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 | Pick 3 guided rows unequal at L only (S and M fixed): r1 #6, r2 #4 and r3 #6 is the third round | Row equality is checked at every size | The guided row-equality check runs at S, M and L (it ran at one size) |
 | The worksheet-1280 tile layout differs between tiles (2 + 1 vs one a row): r1 #10, r2 #7 and r3 #4, three rounds | A screen tile's layout is fixed per template, never left to the flex-wrap of its content | NEW: worksheet-1280 tiles of one template have equal slot x-positions and the same word-row structure |
 | The grade 1 and 4 lesson renders showed the pilot lesson's title and footer | Render each word set inside its own BUILD lesson, never in a borrowed host | The render harness takes the set's own lesson id |
+
+### lf-vocab critic r4 (2026-11-08, FAIL min 6): the checks passed what the critic failed
+| Finding | Rule | Check |
+|---|---|---|
+| Pick 3 error analysis at S: the critic measured 30.1-30.2 % empty bands while ws-empty-band PASSed | A check and the critic must measure the SAME band. If they differ, the check is wrong until it is aligned (a 0.2 % margin is not a pass). | ws-empty-band: state which ink counts (empty answer slots, text, rules) and match the critic's column-aware row-ink scan. Add a backtest row on 31bee0fb for pick3 error-analysis S (lf-checks owns it). |
+| Pick 3 guided rows unequal at L (377 vs 290 px) in the 4th round (r1 #6, r2 #4, r3 #6, r4 #2) while V18 PASSed | A row-equality check measures the rendered ROW boxes on the printed page, at every size, with no "when there is room" exemption. | V18: measure the page's row boxes in px from the print render that ws-grade-render writes, not the cell's planned height |
+| Match 3 error analysis at S drawn at L's height (24-28 %, a near-miss) | A cell at S that draws less is shorter than at L | NEW: cell height at S <= 0.9 x height at L when its content shrinks |
+| "number name" offered with "hundred" while the picture prints "three hundred forty-seven" | A bank word that appears in the picture's printed text is a look-alike | NEW: no bank word in the picture's text (V17 extension) |
+| The "left" picture reads as take away (it marks what goes, not what stays) | A picture marks its referent with a heavy mark | NEW: each picture declares its referent, and a test checks that the referent carries the heavy mark |

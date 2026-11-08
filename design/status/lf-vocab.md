@@ -6,7 +6,7 @@ Owner of files: sheet/graphics/vocab-pictures.js, sheet/cells/vocab-*.js, sheet/
 State: r5 rebuild done, clean before critic (sibling-compare structural only); ready for critic r4
 Updated: 2026-11-08
 Builder profile: mq-opus-medium
-Critic rounds: 3: r3 FAIL min 6, r2 FAIL min 7, r1 FAIL min 1 (report design/lanes/lf-vocab/critic-r3.md)
+Critic rounds: 4: r4 FAIL min 6 (design/lanes/lf-vocab/critic-r4.md), r3 FAIL min 6, r2 FAIL min 7, r1 FAIL min 1 (report design/lanes/lf-vocab/critic-r3.md)
 
 ## Round 5 (2026-11-08, fresh builder, rule 5, Opus medium): critic r3 #1-#10
 Times: start 12:52 UTC, end 14:39 UTC.
@@ -44,6 +44,32 @@ Open / judgement calls for the critic:
   box). V9's box floor for these three ids is 2.3 mm (was 4 mm). A critic may find "one" too small; the alternative is an owner
   ruling to draw the hundred larger than the other pictures.
 - Reason It on Match 3 is legible but plain (the answer line asks for "C, A, B").
+
+## Round 5 result (2026-11-08): critic r4 FAIL, min 6
+- Precritic r7 --strict (manifest applied, master merged): 1 FAIL / 26 PASS (sibling-compare only, structural).
+  ws-empty-band OK.
+- Critic r4: 8 of the 10 r3 defects are FIXED. Everything below is 8 or above:
+  - independent, more-practice and test on both skills at S/M/L;
+  - Match 3 guided at S/M/L;
+  - error analysis at M/L;
+  - pick3 guided at S/M;
+  - all 10 screen hosts;
+  - grades 1, 3 and 4;
+  - the four lesson pages.
+- Below 8:
+  - pick3 error analysis at S: H13 at 30.1 %, scored 6;
+  - pick3 guided rows at L: 377/290 px (4th round);
+  - Match 3 error analysis at S drawn at L's height;
+  - "number name" with "hundred" in one bank;
+  - the "left" picture;
+  - grade 2 base-ten size (owner question OQ-1).
+- Root cause: two checks PASS what the critic FAILs.
+  - ws-empty-band counts an empty answer slot as ink; the critic's scan does not.
+  - V18 does not measure the rendered row boxes at L.
+  - These are the shared check (lf-checks) and the lane check to align first.
+- Owner question OQ-1: may the base-ten hundred be drawn larger than the picture box, or may one / ten use a larger
+  unit when no hundred is on the item, so the unit can be 5 mm or more (about 2.5 mm today)?
+- NOT in redesign-passed.js. The manifest is not applied on the branch.
 
 ## Round 4 (2026-11-07, cap $35): critic r3 FAIL, min 6
 - Done:
