@@ -1755,8 +1755,8 @@
     "state": "P0 add_facts sums 11-16, parts to 9: 18 crossing-ten facts of the pool"
    },
    "pass": {
-    "commit": "bed7067a",
-    "state": "P0 add_facts a teen and ones (constant 11-13, sums 13-19): no pool fact; 14 places solved at 26/26 seeds"
+    "commit": "ceb557b5",
+    "state": "P0 add_facts a teen and ones (constant 11-13, sums 13-19): no pool fact; 14 places solved at 26/26 seeds (was bed7067a; the check grew each place's own source on 2026-11-08, so the pass state is the first commit that holds both)"
    },
    "command": "node tests/scripts/ws-lesson-unit.mjs --only pack-feasible",
    "expect": {
