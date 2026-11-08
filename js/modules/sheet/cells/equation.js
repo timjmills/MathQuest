@@ -107,6 +107,8 @@ const acrossBelow = (p, ctx) => {
     if (!cols) return false;
     // (div_facts critic r6 R6-2, CL-8: the sentence starts at the number tab's keep-out - about 1.66 tab sides from the cell's
     // left edge - and ends at the 3 mm right pad, so the line beside "110 ÷ 11 =" ran 0.5-0.8 mm from the right rule at M)
+    // (`keepout`: the grid pages print-sheet.js marks; other pages keep the 2026-10 threshold)
+    if (!p.keepout) return acrossBesideMm(p, ctx) > 186 / cols - 6.6 - 1;
     return acrossBesideMm(p, ctx) > 184 / cols - 3 - divKeepOutMm(ctx);
 };
 const slotShape = (p) => {
