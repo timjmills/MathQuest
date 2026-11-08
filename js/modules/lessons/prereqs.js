@@ -454,7 +454,7 @@ export const LESSONS = Object.freeze({
             { id: 'not-digit', text: 'The value is not the digit alone.' },
         ],
         vocab: [
-            { word: 'value', meaning: 'what a digit is worth', picture: { kind: 'text', text: '6 → 600' } },
+            { word: 'value', meaning: 'how much it is worth', picture: { kind: 'text', text: '6 → 600' } },
             { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
             // critic r3b G1: 'worth' meant the same as 'value' (two right matches); the third word is 'digit'
             { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
