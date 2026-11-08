@@ -45,6 +45,19 @@ Open / judgement calls for the critic:
   ruling to draw the hundred larger than the other pictures.
 - Reason It on Match 3 is legible but plain (the answer line asks for "C, A, B").
 
+## Owner ruling OQ-1 (2026-11-08, relayed by the lead): pending card change, to be re-signed next round
+- Ruling: YES. When an item has no hundred, the one and ten blocks may be drawn with a larger unit. Each item uses one
+  base-ten scale.
+- The card is NOT edited yet: it is signed, and an edit would turn ws-spec-card --check-signed red on a paused branch.
+  At the START of the next round, write this into design/cards/vocabulary/card.json (and regenerate vocabulary.md),
+  then the lead re-signs it.
+- Next round, in order:
+  1. OQ-1 in vocab-pictures.js: the base-ten unit is per item; V16 means one unit within an item.
+  2. Critic r4 #1-#5.
+  3. Align ws-empty-band's empty-slot rule with the critic's scan (with lf-checks).
+  4. Critic r5.
+- The lane is paused (the week's budget is nearly used).
+
 ## Round 5 result (2026-11-08): critic r4 FAIL, min 6
 - Precritic r7 --strict (manifest applied, master merged): 1 FAIL / 26 PASS (sibling-compare only, structural).
   ws-empty-band OK.
@@ -67,7 +80,7 @@ Open / judgement calls for the critic:
   - ws-empty-band counts an empty answer slot as ink; the critic's scan does not.
   - V18 does not measure the rendered row boxes at L.
   - These are the shared check (lf-checks) and the lane check to align first.
-- Owner question OQ-1: may the base-ten hundred be drawn larger than the picture box, or may one / ten use a larger
+- Owner question OQ-1 (ANSWERED YES, 2026-11-08: see above): may the base-ten hundred be drawn larger than the picture box, or may one / ten use a larger
   unit when no hundred is on the item, so the unit can be 5 mm or more (about 2.5 mm today)?
 - NOT in redesign-passed.js. The manifest is not applied on the branch.
 
