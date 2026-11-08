@@ -6,7 +6,7 @@ Owner of files: LANES.operations (gen-operations.js, gen-mult-patterns.js, the o
 State: paused
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 3, FAIL (build #4 r1 lowest 2; div_facts r5 lowest 6; plain stories r1 lowest 3)
+Critic rounds: 4, FAIL (build #4 r1 lowest 2; div_facts r5 lowest 6, r6 lowest 5; plain stories r1 lowest 3)
 
 ## Now
 - HAND-OVER 2026-11-07 ~13:50 UTC (lead: no new work after ~14:10, week at ~44-60 %). Nothing passed; nothing added to redesign-passed.js. Draft PR #38 into claude/sweet-newton-c8wrv1.
@@ -111,6 +111,16 @@ Fresh builder (mq-opus-medium). Merged origin/master 5cbe360 (8cb16bd; backtests
 - Open: fade packet page 3 at M about 40 % used (rows unstretched, stage capped at 2 x page 1).
 - Learning rows: checks - a new shared check that renders every card-offered role (ws-empty-band) found 160+ findings on roles no div_facts critic round ever graded (lesson, opener, guided, fact-probe, scripted-model, mixed); run it at the start of a round, not after the fixes. Speed-ups - one-skill hash checks (72 PNG / 36 HTML) prove a shared layout change byte-safe in minutes: make it a standard gate for any shared-file edit.
 
+## Critic div_facts r6 (narrow, 49a7b12a, 2026-11-08) - FAIL, lowest 5 (C3, fade packet page 3); no deploy
+Report design/audit/runs/lf-ops/critic-divfacts-r6.md. Every r5 defect fixed (Test cell bands 21-24 %, supports-off S holds 36, the array's subitising gap, S > M, one think-box size, one answer form in the packet, the touch fits line). Keys correct. Regression add / mult facts, div_facts_long pixel-identical to r5. All other in-scope pages 8/8/8/8.
+- R6-1 (RULING NEEDED): supports-off and greyed-array Test pages: the cells pass but the grid stops half way (Test S 49.7 % of the page, 117 mm white; M 50 %; L 61 %); think Test S / M leave 50 / 64 mm. F1 sizes rows to the problems while WDS 12.1 caps a Test at 20 / 16 / 12. Options: the Test count follows Independent capacity; Form A and B on one sheet; or the owner accepts a short Test page.
+- R6-2: 3-digit facts at M: the answer line ends 0.53-0.79 mm from the cell's right rule (CL-8 needs 3 mm) on skip / think Independent, More practice, Test M (C3 7).
+- R6-3: the drawn array (tables 2-4) at L takes 4 columns where M takes 3: the fact 1.85 mm from the rule in 7-10 of 12 cells (C3 7).
+- R6-4: fade packet page 3 uses 40 % of the page (129 mm white) while Independent M holds 24 (H5, C3 5).
+- R6-5: the fact's left edge moves 5.0 mm between packet page 1 and pages 2-3 (F4 one x).
+Learning rows (rule 00): checks - EB-PAGE: white under the grid per page vs one row pitch (the cell-only gate let F1 move the space from the cells to the page); a side-gap check (ink to each side rule >= the CL-8 pad, probed with the band's widest fact) and columns(L) <= columns(M); fact-left-x across ALL pages of a packet; fits-line vs drawn rows. Speed-ups - run the page and cell measures together when a ruling moves space; a page < 70 % used at a role ceiling is a precritic WARN naming the colliding rule, so the lead rules it before a critic; shot.cjs needs an absolute path.
+Lesson regression check (lead rule 2026-11-08, before any deploy): branch vs origin/master, ws-detailed-lesson --check / --repeats on the 5 lessons using lane skills: g3-oa5, g3-oa9-input-output, g3-oa9-mult-table (E2 font flake, re-run OK), g4-nbt1 all match; g3-oa8-two-step-wp (not passed) WORSE on the branch: E9b 13-14 % strip and E12 unequal grids on P2 / P2b (master fails E35 only) - to next week's stories round with a bisect (likely the plain-story lesson data / word-work layout or fix4's in-place height grouping).
+
 ## Brief for the FRESH #4 builder (lead ruling 2026-11-07: after the Thursday 22:00 UTC reset; Opus medium, a rebuild after two failed rounds)
 Skills: multiplication:mult_properties, multiplication:arrays_groups, multiplication:count_by_tables (BUILD lesson #4, Properties of multiplication, 3.OA.B.5). Cards: design/cards/ops-tables/ops-tables.md, design/cards/count-row/count-row.md (signed). Defects: design/audit/runs/lf-ops/critic-r1.md; what fix4 already fixed: section "Fix round after critic r1" above.
 ROOT CAUSE to fix first: cell heights come from each template's TALLEST POSSIBLE item (footprint per template), not from the items actually dealt; the lesson / guided / Test roles reserve the same. So pages of small arrays or short rows carry 30-43 % empty bands (D-MP-1, D-CB-4/5) and every attempt to shrink one role broke another. Make the footprint per DEALT item in cells/arrays.js, cells/arrays-turn.js and cells/count-row.js (footprint(payload, ctx) from the payload's own rows / cols / tiles / times labels), and let layout band rows by the dealt heights (layout.js already groups in-place cells by height from 1.2x). Do not size rows by the band's maximum.
@@ -167,6 +177,7 @@ Times: builder R4 checks, start 2026-11-07T06:30Z, end 2026-11-07T07:45Z, profil
 Times: lane day-1 cards + merge, start 2026-11-07T06:25Z, end 2026-11-07T06:47Z, profile lane session
 
 ## Log
+- 2026-11-08: div_facts aids r7 fixes + empty-band pins (master-equal) + critic r6 FAIL (lowest 5: R6-1 Test page half empty needs a ruling, R6-4 packet page 3); lesson check found the g3-oa8 P2 regression; no deploy.
 - 2026-11-07 evening: div_facts aids r6 rebuild (lead resume, $50): 4 fixes, not clean (4 precritic reds), R5-2 S and R5-6 stopped by rule 7; no critic run.
 - 2026-11-07: COST (lead reading): session cost_usd $200.65 at 13:21 UTC = about 10.0 % of the weekly limit ($20 = 1 %), of the lane's $250 cap (80 %). Lane paused to next week; the lead confirmed the next-week order.
 - 2026-11-07 ~13:50: hand-over. Cost (superseded above): lead read cost_usd $55.23 at 09:34 UTC; later sub-agent runs (fix4 ~0.6 M tokens, #7 ~0.7 M, three critics ~0.9 M) are not read yet - the lead reads the session's cost_usd (session_013pHDnQ7sfFBg45rrEDgLdJ) for the final figure ($20 ~ 1 % of the week).
