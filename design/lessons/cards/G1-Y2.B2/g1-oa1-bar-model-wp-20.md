@@ -10,8 +10,8 @@ lane decides every open question (its `answer` and the `rule` it rests on) and c
 
 | Part | Skill | Options and floors |
 |---|---|---|
-| P0 question 1 → K CC 5 Count to 20 | `counting:count_objects` | {"opts":{"band":20,"objects":"frame"},"minNum":17,"maxNum":20} |
-| P0 question 2 → Y1 B2 S2 Part-whole model | `composing:number_bonds` | {"opts":{"band":10,"unknown":"answer","orientation":"horizontal"},"minOperand":3,"partMin":3,"minNum":6,"distinctFirst":true} |
+| P0 question 1 → K CC 5 Count to 20 | `counting:count_objects` | {"opts":{"band":20,"objects":"frame"},"minNum":11,"maxNum":20} |
+| P0 question 2 → Y1 B2 S2 Part-whole model | `composing:number_bonds` | {"opts":{"band":10,"unknown":"answer","orientation":"horizontal"},"minOperand":1,"partMin":1,"maxNum":10,"distinctFirst":true} |
 | P0 question 3 → G1 OA 6 Add within 20 | `addition:add_facts` | {"opts":{"band":20,"notation":["stacked"],"constant":[11,12,13]},"minNum":13,"maxNum":19,"partMin":2,"noPart":[10]} |
 | P2-P4 lesson skill | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":2,"noPart":[10],"crossTen":true,"crossTenExcept":[],"cellPayload":{ |
 | P4 Practice 1 | `addition:add_wp_20` | {"opts":{"band":20,"pictures":false,"support":"bar","wpCues":false,"wpBank":false},"partMin":2,"noPart":[10],"crossTen":true,"crossTenExcept":[20],"cellPayload" |
@@ -80,7 +80,7 @@ None.
     },
     "prereqs": [
       {
-        "ref": {"categoryId":"counting","skillId":"count_objects","opts":{"band":20,"objects":"frame"},"minNum":17,"maxNum":20},
+        "ref": {"categoryId":"counting","skillId":"count_objects","opts":{"band":20,"objects":"frame"},"minNum":11,"maxNum":20},
         "lesson": {"id":"K CC 5","title":"Count to 20"},
         "atom": {"n":1,"type":"Fact","skill":"Count a set: the last number is how many"}
       },
@@ -89,9 +89,9 @@ None.
           "categoryId": "composing",
           "skillId": "number_bonds",
           "opts": {"band":10,"unknown":"answer","orientation":"horizontal"},
-          "minOperand": 3,
-          "partMin": 3,
-          "minNum": 6,
+          "minOperand": 1,
+          "partMin": 1,
+          "maxNum": 10,
           "distinctFirst": true
         },
         "lesson": {"id":"Y1 B2 S2","title":"Part-whole model"},
@@ -124,8 +124,8 @@ None.
         "why": "The step pupils break is step 2 (the whole in a part box); the chant names where each number goes."
       },
       "example": {"match":"story","test":"wpBridgePT"},
-      "second": {"test":"wpAddTo","label":"Gets more? That is a part."},
-      "third": {"test":"wpEqual","label":"Equal parts? Still add the parts."},
+      "second": {"test":"wpAddTo","label":"Gets more? That is a part.","ref":{"allTest":"wpAddTo","tries":600}},
+      "third": {"test":"wpEqual","label":"Equal parts? Still add the parts.","ref":{"allTest":"wpEqual","tries":600}},
       "mixWith": [{"key":"composing:number_bonds","opts":{"band":10,"unknown":"answer"}},{"key":"addition:add_facts","opts":{"band":20}}]
     },
     "weDo": {"guidedRows":2,"guidedStack":2,"guidedWants":["wpBridgeSmallFirstAT","wpBridgePT"],"practiceShape":[6,2]},
@@ -280,7 +280,8 @@ None.
   "edgeCases": {"edgeTest":"wpEdge","caseNames":{}},
   "rulings": [
     {"id": "owner-2026-11-07-parts-2-9", "text": "Owner ruling 2026-11-07 (E24b): story parts 2 to 9, so the pack has enough distinct crossing-ten facts; never near twins (e.g. 7 + 5 and 8 + 5) on one page.", "field": "ranges.partMin"},
-    {"id": "owner-2026-11-08-p0-no-cross", "text": "Owner ruling 2026-11-08 (E24b): the Prerequisite Check's addition questions are facts within 20 that do NOT cross ten (a teen and ones, e.g. 12 + 5), so they never draw from the lesson's crossing-ten story pool; the 20 facts (parts 2-9) are the stories' alone (LR-5 one fact a pack, LR-6 no near twins on a page).", "field": "prereqs"}
+    {"id": "owner-2026-11-08-p0-no-cross", "text": "Owner ruling 2026-11-08 (E24b): the Prerequisite Check's addition questions are facts within 20 that do NOT cross ten (a teen and ones, e.g. 12 + 5), so they never draw from the lesson's crossing-ten story pool; the 20 facts (parts 2-9) are the stories' alone (LR-5 one fact a pack, LR-6 no near twins on a page).", "field": "prereqs"},
+    {"id": "lead-2026-11-08-p0-ranges", "text": "Lead's order 2026-11-08 (E24b at every seed): P0 counts 11 to 20 and bonds within 10 with parts 1 or more - two items a question need two values 3 apart under any first choice; the chart's add-to and equal-parts examples come from case pools of their own (E31).", "field": "prereqs"}
   ],
   "misconceptions": [
     {
