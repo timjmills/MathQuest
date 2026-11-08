@@ -232,7 +232,7 @@ function normaliseRequest(req = {}) {
             // (ws-empty-band EB-FOOT / EB-BAND, lf-checks L25: the rows are the facts' measured height and 1.1 x room, never
             // stretched to the grid, so the drawn cell is the footprint and no band of 30 % is left under the line)
             // (Auto columns only: a teacher's column count keeps its page fill - ws-sibling-compare more-cols2 PAGEFILL)
-            if (sec.columns === 'auto') sec.noStretch = 1.1;
+            if (!sec.columns || sec.columns === 'auto') sec.noStretch = 1.1;
             if (sec.dense === true && sec.columns === 'auto') sec.dense = { S: 36, M: 24, L: 20 };
         }
     }
