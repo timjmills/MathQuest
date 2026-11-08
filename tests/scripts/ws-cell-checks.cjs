@@ -56,7 +56,7 @@ function selfTest() {
         { name: 'tag outside the box (TAGINK control)', html: page(cell({ h: 36, val: '<span style="color:#888;padding-left:8mm">10</span>', tag: 'A', w: 22 })), want: null, rules: ['TAGINK'] },
         { name: 'two answers in one key slot (KEYJOIN)', html: page(cell({ h: 36, val: '15, 15' })), want: 'KEYJOIN', key: true },
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
-        // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.35 x (60 - 8) = 18.2 mm; the 36 mm control: 5 mm < 9.8 mm)
+        // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.30 x 60 = 18 mm; the 36 mm control: 5 mm < 10.8 mm)
         { name: 'empty band under the lowest ink (H13-ABS, opt-in)', html: page(cell({ h: 60, val: '7' })), want: 'H13-ABS', h13abs: true },
         { name: 'a row sized to its ink (H13-ABS control)', html: page(cell({ h: 36, val: '7' })), want: null, h13abs: true, rules: ['H13-ABS'] },
         { name: 'the 60 mm cell with the rule off (H13-ABS opt-in control)', html: page(cell({ h: 60, val: '7' })), want: null, rules: ['H13-ABS'] },
