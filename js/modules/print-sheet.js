@@ -232,7 +232,8 @@ function normaliseRequest(req = {}) {
             // (ws-empty-band EB-FOOT / EB-BAND, lf-checks L25: the rows are the facts' measured height and 1.1 x room, never
             // stretched to the grid, so the drawn cell is the footprint and no band of 30 % is left under the line)
             // (Auto columns only: a teacher's column count keeps its page fill - ws-sibling-compare more-cols2 PAGEFILL)
-            if (!sec.columns || sec.columns === 'auto') sec.noStretch = 1.1;
+            // (and on the engine's own re-lay of a pool-capped page, `freeRows` + a column count: div_facts {constant: [3]} at L)
+            if (!sec.columns || sec.columns === 'auto' || sec.freeRows) sec.noStretch = 1.1;
             if (sec.dense === true && sec.columns === 'auto') sec.dense = { S: 36, M: 24, L: 20 };
         }
     }
@@ -6168,7 +6169,10 @@ async function buildSheetFill0(req = {}) {
                 const relay = async (pick0) => {
                     const c0 = Number(best.fits && best.fits.cols) || 1;
                     let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
-                    for (let c = c0; c >= 1; c--) {
+                    // (a bare div_facts page never re-lays in fewer, wider columns: its narrow facts would leave a 30 % band
+                    // beside them, ws-empty-band EB-SIDE - it keeps its columns and its unstretched rows)
+                    const cMin = divFactsPlainSection(s) ? c0 : 1;
+                    for (let c = c0; c >= cMin; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c || n > ceil() * wanted) continue;
                             const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n, columns: c, freeRows: true })] }));
