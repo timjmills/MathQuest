@@ -1709,7 +1709,9 @@
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "pending": true,
+   "pendingReason": "lead ruling 2026-11-08: H13-ABS now uses RUBRIC H13 (30 % of the full cell, as ws-empty-band EB-BAND); this fail fixture (14.6 mm under the ink of a 51.5 mm cell, 28.3 %) is below the shared threshold. The live cases are covered by ws-empty-band rows eb-pv-value-band9999-L and eb-pv-unitform-more-S (lf-checks); re-arm with a fixture above 30 % when one is captured, never by editing this one."
   },
   {
    "id": "optin-grid-even-all",
