@@ -2482,7 +2482,7 @@
     "commit": "64f70063",
     "state": "rename frames' write line two digits longer at S"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts {\"rename\":\"more\"} --roles independent,more-practice,test,review --hosts none --no-baseline",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --hosts none --no-baseline",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
