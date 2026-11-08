@@ -862,3 +862,22 @@ Full report: design/status/lf-checks/critic-eb-r1.md. Backtests held (all four c
 **Automatic checks:** a host that reads 0 cells is an EB-READ FAILURE, not a note (the practice card was silently unmeasured: its cell is `.mq-scell`); a synthetic `--html` fixture per band position (under / above / between) in the backtest table; an offered-but-not-composed role FAILs (EB-ROLE); the pin is generated from `redesign-passed.js` (every passed skill), not a hand list; a tool header's numeric claim ("separates the classes") is backed by a recorded measurement or removed.
 
 **Speed-ups:** freeze the branch while a critic runs (two commits landed mid-round; the critic graded a `git archive`); pin runs (~2.5 min a skill) go to the background the moment the rule is fixed; one shared measure (`measureCells`) for print and host keeps a fix in one place.
+
+### lf-checks · ws-empty-band critic r2 (2026-11-08, FAIL 6 / 4 / 7 / 6; loop stopped by rule 7)
+
+Full report: design/status/lf-checks/critic-eb-r2.md. r1 D2-D6 confirmed fixed; the four failing-head backtests FAIL (4, 112, 12, 16).
+New: D7 the r1 fix's colour test read rgb(0, 0, 0) as transparent (black SVG invisible: false "above the ink" bands, an inflated
+pin - add_wp_10 238 pinned vs 40 true); D8 ws-card-plan (lf-ops) drops an "on" list after "(PROPOSED)" and ignores "out of scope"
+(false EB-ROLE on fact_family_sort word-problems); D9 = r1 D1 left half-open (a host that does not render was a note).
+
+**Automatic checks:** a colour-classifier fixture with black SVG fill and stroke (built: eb-fixture-svg-black, FAILs the r1
+code's pass state); host coverage: every host renders and reads a cell or EB-READ (built); a ws-card-plan self-test with
+"(PROPOSED) on" and "out of scope" lines (lf-ops' file - sent to lf-ops); before a re-pin, sampled crops and a refusal when a
+count is over 3x the last raw count (proposed).
+
+**Speed-ups:** reuse tests/lib/ws-ink.cjs (pixels) instead of a DOM colour classifier; dump every cell's bands in --json, not
+only findings; a no-browser --self-test; the branch freeze worked (no re-run).
+
+**Stop (rule 7):** host coverage (r1 D1 -> r2 D9) survived two rounds. Root cause: the host loop treated "nothing to measure" as
+a note in two places; the machine check is the EB-READ rule now applied to both (a host that does not render, a host with no
+cell). Fixed after r2 with D7 and re-pinned; NOT re-graded.
