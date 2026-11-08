@@ -76,7 +76,10 @@ export function sources(skills, helpers = {}) {
     // bottom number; a number in the 90s) gets a pool of its own, dealt to the case's `ref`
     // floors (print-sheet.js refAccepts) - the chart's other examples come from it.
     const data = helpers.lesson && helpers.lesson.data;
-    const extra = EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => ({
+    // (lesson 2 E24b / E31, lead's order 2026-11-08: a main ref with a `hardAvoid` - lesson 2 alone - gives its case pools the
+    // WHOLE main ref, its avoid keys and hard bounds too, so a case example is never a fact the pack spent; absent: as before)
+    const caseRef = (k) => (Array.isArray(main.hardAvoid) ? [Object.assign({}, main, data[k].ref)] : null);
+    const extra = EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => caseRef(k) ? { id: `x${k}`, skills: caseRef(k) } : ({
         id: `x${k}`, skills: [Object.assign({ categoryId: main.categoryId, skillId: main.skillId }, main.opts ? { opts: main.opts } : {}, main.minTop !== undefined ? { minTop: main.minTop } : {}, main.maxTop !== undefined ? { maxTop: main.maxTop } : {}, data[k].ref)],
     }));
     return [{ id: 'main', skills: [main] }, ...pre.map((s, i) => ({ id: `w${i}`, skills: [s] })), ...extra];
