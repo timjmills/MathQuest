@@ -254,7 +254,8 @@ export const CARDS = Object.freeze({
     "timing": {"1":5,"2":5,"3":3,"4":2,"5":10,"6":8,"7":3,"8":10,"9":5,"10":5,"transitions":4},
     "ranges": {
       "pool": {"kind":"plus","skill":"add_wp_20","partMin":2,"noPart":[10],"crossTen":true,"sums":[20],"maxSum":20},
-      "lesson": {"minNum":11,"maxNum":18,"band":20}
+      "lesson": {"minNum":11,"maxNum":18,"band":20},
+      "p0DealExact": true
     },
     "edgeCases": {"edgeTest":"wpEdge","caseNames":{}},
     "rulings": [

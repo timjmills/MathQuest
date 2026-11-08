@@ -5191,7 +5191,7 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
 
     // ---------------------------------------------------------------- P0 Prerequisite Check
     const p0 = await buildSheet({
-        role: 'pre-skill-check', sections: [{ skills: d.prerequisites.map((p) => Object.assign(withAvoid(p.ref), { lr6: true })) }], perQuestion: d.prerequisites.map((p) => p.items || 2),
+        role: 'pre-skill-check', sections: [{ skills: d.prerequisites.map((p) => Object.assign(withAvoid(p.ref), { lr6: true })) }], perQuestion: d.prerequisites.map((p) => p.items || 2), ...(d.p0DealExact ? { dealExact: true } : {}),
         size: 'L', paper, seed: (seed + 101) >>> 0, key: true, header: header('Prerequisite'),
     });
     record(p0);

@@ -119,6 +119,9 @@ export default {
     },
 
     // ------------------------------------------------------------------ P0 Prerequisite Check
+    // (lead's order 2026-11-08: each P0 question deals its own items only - pre-skill-check.js `dealExact`; the lane engine
+    // dealt 4 a question, and the spare counts' answers left the + facts twin answers)
+    p0DealExact: true,
     prerequisites: [
         // (lesson 2 E24b at every seed, lead's order 2026-11-08: 11 to 20 - two items a question need two numbers 3 apart, and
         // 17-20 held one such pair: seed 2 dealt 18 / 19. pack-solve.js p0Sources models it; ws-lesson-unit pack-feasible is the gate.)

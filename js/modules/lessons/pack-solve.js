@@ -215,6 +215,16 @@ export function placeSources(d, seed) {
         const items = p.items || 2, ok = greedySafe(vs, items);
         out.push({ place: `p0.${j}`, source: `${p.ref.skillId} ${vs[0]}-${vs[vs.length - 1]}`, ok, why: ok ? '' : `${items} items from ${vs.length} values: a first choice leaves no value 3 apart` });
     });
+    // (a P0 one-number range that shares answers with another P0 question's range - counts 11-20 and + facts 13-19 - needs each
+    // question dealt its own items only, `p0DealExact`: the lane engine's 4 a question put spare answers in the page's avoid set
+    // and the + facts dealt twin answers at seeds 1, 2, 4, 5 and 4242)
+    const pre = d.prerequisites || [];
+    pre.forEach((p, j) => {
+        const vs = p0Values(p.ref);
+        if (!vs) return;
+        const hit = pre.some((q, i) => i !== j && q.ref && q.ref.categoryId === 'addition' && vs.some((v) => v >= Number(q.ref.minNum || 0) && v <= Number(q.ref.maxNum || 20)));
+        if (hit) out.push({ place: `p0.${j}.answers`, source: 'P0 page answers', ok: !!d.p0DealExact, why: d.p0DealExact ? '' : 'its range shares answers with a + question and the check deals spare items (no p0DealExact)' });
+    });
     const ps = (d.practiceSheets || [])[0];
     const solved = ps && ps.solve ? solvePracticeFromPack(d, ps.solve, [], (Number(seed) + 7919) >>> 0) : null;
     if (ps && ps.solve) out.push({ place: 'practice', source: 'whole-pack solution', ok: !!solved, why: solved ? '' : 'no whole-pack solution' });

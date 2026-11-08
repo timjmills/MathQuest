@@ -328,6 +328,8 @@ function detailedOf(card, parts, shape, notes) {
     d.skill = clone(parts.lesson);
     if (ranges.pool) d.pool = clone(ranges.pool);
     if (ranges.boardOnly) d.boardOnly = clone(ranges.boardOnly);
+    // (lesson 2, lead's order 2026-11-08: each Prerequisite Check question deals its own items only - pre-skill-check.js dealExact)
+    if (ranges.p0DealExact) d.p0DealExact = true;
     if (prac.edgeTest) d.edgeTest = prac.edgeTest;
     if (prac.edgeOnlyLast) d.edgeOnlyLast = prac.edgeOnlyLast;
     d.practicePages = prac.pages || 1;
