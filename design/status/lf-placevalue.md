@@ -4,7 +4,7 @@ Session: session_013pHDnMCXcY6kXV15KHf4Yp
 Branch: claude/lf-placevalue
 Owner of files: gen-pv.js, sheet/cells/{pv,value-line,line-labels,gattegno}.js, pv-support-cell.js, sheet/providers/pv.js, panes/{place,extras,pv-exchange}.js, design/cards/pv/
 State: fix
-Updated: 2026-11-07
+Updated: 2026-11-08
 Builder profile: mq-opus-medium
 Critic rounds: 2, FAIL (r2: identify C2 3, value C3 6, expand C3 5, combine C2 4, unit_form C3 5)
 
@@ -70,6 +70,20 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-08 FRESH BUILDER r3 (rule 7, mq-opus-medium), commits 4a57b5c2..HEAD. N1-N4 FIXED (providers/pv.js, gen-pv.js): checks
+  --pv-r2 N1..N4 FAIL on b28a0867 (23/2400, 120/160, 180/1800, 96/480) -> OK; backtests pv-r2-wrong-differs / printed-instruction /
+  combine-parts / place-word-live armed (pass 4a57b5c2), PASS. N5-N8 checks BUILT (opt-in via opt-in-rules.json; default runs unchanged):
+  N5 options-render --band-h13, N6 ws-cell-checks --h13-abs (30 % of the full cell, lead ruling 2026-11-08), N7 precritic `newRow`
+  review rows + lesson rows with --rules H13-ABS,GRID-EVEN-ALL, N8 ws-coverage-matrix --red-no-baseline PAGEFILL,H5. Backtests
+  pv-r2-band-h13 / cell-h13-abs / review-one-layout PASS (fail 5aadc52d, pass dca16b12); pv-r2-red-no-baseline PENDING. Cell fixes:
+  N5 comma track on the digits' line height (value band 9,999 L 12 -> 18 items); N6 rename frames one full-width row (`rowOnly`) with
+  a 5-digit write line (S 16 in 2x8 at 44 % bands -> 15 in 1x15); N7 3-across combine frames ghost-backed (unit_form review S 0 findings).
+  NOT FIXED (owner elsewhere): N8 the 2-column request - sheet/layout.js resolveSectionLayout gives Auto and an explicit N the same item
+  cap (itemCap / fp.maxCols / hardCap); a footprint cannot say "1 column on Auto, 2 when asked" (proposed: an `autoMaxCols` footprint
+  field read in the Auto `top` and the dense `colOpts`); allowing 2 columns in the cell made Auto pick 3x9 wrapped expand rows at S.
+  Remaining at the 30 % rule: combine band=99 S/M independent (3x10 rows held by DENSE_CEILING S 30, one-line 2-part frames in 22.8 mm
+  cells) and expand band=99 S (2-place row in a full-width cell, 34 % side bands) - pv, not started (time); review / lesson / guided
+  H13-ABS rows (review.js R-c, lesson.js warm-up rows, guided.js R-e) - roles.
 - 2026-11-07 ~20:00 FINAL HAND-OVER of the resumed round. Checks from critic r2 (62b1bdcd): ws-providers-unit `--pv-r2 N1,N2,N3,N4`
   (WRONG-DIFFERS per slot 23/2400, PRINTED-INSTRUCTION 120/160, COMBINE-PARTS 180/1800, PLACE-WORD-LIVE 96/480 — all FAIL on HEAD),
   wired via opt-in-rules.json `providers`; default run unchanged (105431 OK); four PENDING backtest rows (arm with the fix commit).
