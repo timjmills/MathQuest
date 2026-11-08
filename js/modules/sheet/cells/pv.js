@@ -154,7 +154,9 @@ export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, si
         // the digits on their own line heights, so the cell is as tall as its ink and a page holds more rows)
         : td(LETTER[c.place] || '', `width:2.2em;font-size:max(0.42em, 8pt);line-height:${tight === 'S' ? 1.1 : tight ? 1.25 : 1.6};font-weight:${cutAt(c) ? 700 : 400};`
             + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
-    const digits = cols.map(c => c.comma ? td(',', 'width:0.3em;')
+    // (critic r2 N5: the comma track takes the digits' line height - on the table's own line height it made every 4-digit
+    // row 1.7 mm taller at L, and the band 9,999 page lost its fill to 4 rows of 43 % bands)
+    const digits = cols.map(c => c.comma ? td(',', `width:0.3em;line-height:${tight ? 1.05 : 1.15};`)
         : td(c.place === underline
             ? `<span style="display:inline-block;line-height:1;border-bottom:0.08em solid #000;padding:0 0.04em 0.04em;">${c.digit}</span>` : c.digit,
             `width:0.95em;line-height:${tight ? 1.05 : 1.15};` + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
@@ -351,7 +353,13 @@ function frameHTML(ctx, text, key, digits, ghostExpr = '') {
             return nums.map((v, i) => `<span class="pv-pair" style="${nb}">${piece(ctx, (i ? '+ ' : '') + v)}</span>`).join('');
         };
         if (exprOnly && Number(ctx.columns) >= 3) {
-            const head3 = chunks.map((c) => (c.includes(' ') ? units(c) : piece(ctx, c))).join('');
+            // (critic r2 N7, AX-4 in a mixed review 3 across: "700 + 1 = ___" on one line beside "600 + 10 + 1 / = ___" on two.
+            // With the section's widest expression (`ghostExpr`), the units wrap inside a box as wide as the ghost's, the
+            // ghost drawn invisibly in the same grid area: every item is as wide and as tall as the widest, one geometry)
+            const ghostUnits = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;align-items:end;justify-items:center;max-width:100%;">`
+                + `<span style="grid-area:1 / 1;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;row-gap:2mm;">${units(c)}</span>`
+                + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;row-gap:2mm;">${units(ghostExpr)}</span></span>`;
+            const head3 = chunks.map((c) => (c.includes(' ') ? (ghostExpr ? ghostUnits(c) : units(c)) : piece(ctx, c))).join('');
             return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${head3}${grp}</div>`;
         }
         const head = chunks.map((c) => (exprOnly && ghostExpr && c.includes(' ') ? (split ? splitPair(c) : ghostPair(c))
@@ -901,6 +909,8 @@ register('pv', {
         if (p.inPlace) {
             // (an expanded-form row is one line of boxes: one row a line, the boxes never wrapped below 4 places, so its
             // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)
+            // (`rowOnly`, critic r2 N6: unit form's one-line rename frames, one full-width row a line at every size)
+            if (p.rowOnly) return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true, hardCap: true };
             const wideIn = p.kind === 'expand' || p.kind === 'expand-line';
             return { wMm: wideIn ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wideIn ? 1 : 2, denseRoom: 1, inPlace: true, ...(wideIn ? { hardCap: true } : {}) };
         }

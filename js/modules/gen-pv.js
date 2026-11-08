@@ -559,6 +559,8 @@ function genUnitForm(q, skill, o) {
     q.printText = 'Write the missing number.';
     if (o.rename === 'more') {
         // Renaming, dealt in turn: "476 = __ tens 6 ones" (47), and "3 hundreds 15 tens = __".
+        // (critic r2 N6: `rowOnly` - a one-line rename frame is one full-width row a line, as unit form is: at S / M two
+        // half-width columns took the CL-2 2 x 8 grid, 16 one-line items in 23 mm cells, 44-57 % bands)
         const big = places[0];
         if (slot(2) === 0 && ds.length >= 3) {
             const unit = 10;                               // rename everything above the ones as tens
@@ -569,7 +571,7 @@ function genUnitForm(q, skill, o) {
             q.answerType = 'number';
             q.hint = 'Every hundred is 10 tens. Count all the tens.';
             q.pv = { kind: 'unit', n, rename: true, counts: { 10: count, 1: ones } };
-            setCell(q, { kind: 'frame', frame: `${fmt(n)} = ____ tens ${ones} ${plural('ones', ones)}`, keyValue: count, words: true, inPlace: true });
+            setCell(q, { kind: 'frame', frame: `${fmt(n)} = ____ tens ${ones} ${plural('ones', ones)}`, keyValue: count, words: true, inPlace: true, rowOnly: true });
             return;
         }
         // a hundreds (or tens) count plus 10-19 of the next place down.
@@ -584,7 +586,7 @@ function genUnitForm(q, skill, o) {
         q.answerType = 'number';
         q.hint = `Ten ${wb} make one ${PLACE_ONE[hiP]}.`;
         q.pv = { kind: 'unit', n: total, rename: true, counts: { [hiP]: a, [loP]: b } };
-        setCell(q, { kind: 'frame', frame: `${a} ${plural(wa, a)} ${b} ${wb} = ____`, keyValue: total, words: true, inPlace: true });
+        setCell(q, { kind: 'frame', frame: `${a} ${plural(wa, a)} ${b} ${wb} = ____`, keyValue: total, words: true, inPlace: true, rowOnly: true });
         return;
     }
     const words = places.map(p => PLACE_WORD[p]);
