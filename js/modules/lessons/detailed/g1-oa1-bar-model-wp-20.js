@@ -9,7 +9,10 @@
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
-const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 3, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true, fresh: true, itemSpread: true, pageFresh: true, dealTries: 4000, lr6Names: true }, extra || {});
+// OWNER RULING 2026-11-07 (E24b): story parts 2 to 9 (was 3 to 9) - the crossing-ten stories with parts 3-9 are 15
+// facts and the chart, sheet, P5, P6 and Check Question take 9, so LR-6 (no near twins on a page, e.g. 7 + 5 and 8 + 5)
+// left no 4th Practice story. Near twins stay banned on every page.
+const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 2, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true, fresh: true, itemSpread: true, pageFresh: true, dealTries: 4000, lr6Names: true }, extra || {});
 // (`fresh` / `itemSpread` - the items dealt one by one (exit slip, Check Question): first a story whose turn-around no
 // page dealt (V22: a turn-around only when the pool is spent), and every name and noun the generator has - critic r3 D3, m3)
 // (`shortQuestion`: the question in its short form - "How many books now?", "How many books in all?" -
@@ -43,10 +46,12 @@ export default {
     // put-together stories for the chart AND Guided cell 2; the whole of 20 is the Practice page's ★★★ case)
     skill: WP({ minNum: 11, maxNum: 18, crossTenExcept: [], sectionLabel: 'Stories' }),
     // The last row of every Practice page (★★★): the edge cases - equal parts and a whole of 20
-    // (RESEARCH.md §5; every other story crosses ten with parts of 3 to 9: partMin / noPart / crossTen on every story ref).
+    // (RESEARCH.md §5; every other story crosses ten with parts of 2 to 9 - owner ruling 2026-11-07: partMin / noPart / crossTen on every story ref).
     edgeTest: 'wpEdge',
     // (`first`: the last row is dealt first, so the rows above keep LR-6 against its equal parts - critic r2 D2)
-    practiceSheets: [{ skill: WP({ minNum: 11, maxNum: 20, edgeTest: 'wpEdge', tries: 600 }), edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'], first: true } }],
+    // (`solve`, E24b attempt 2 - owner ruling 2026-11-07: the page's stories SOLVED from the facts left before it is dealt -
+    // no near twins, every first addend and whole different; the greedy deal left 7 + 4 / 8 + 5 for its last places at 4242)
+    practiceSheets: [{ skill: WP({ minNum: 11, maxNum: 20, edgeTest: 'wpEdge', tries: 600 }), edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'], first: true }, solve: { partMin: 2, noPart: [10], sums: [20], dealPin: 'wp:add:20' } }],
     // The lesson's own placeholder names: the story's unit word and its parts.
     vars: (q, b) => {
         const p = (q && q.cell && q.cell.payload) || {};
@@ -57,9 +62,9 @@ export default {
         const lines = Array.isArray(p.lines) ? p.lines : [];
         return { unit: p.unit || '', parts: st.a !== undefined ? `${st.a} + ${st.b}` : '', whole, slip: Number.isFinite(Number(whole)) ? Number(whole) - 1 : '', question: lines.length ? lines[lines.length - 1] : '' };
     },
-    // The pool by its rule (V22 §9.5 `decl`; critic r3 m7): the stories' + facts - parts 3 or more, never 10, crossing
+    // The pool by its rule (V22 §9.5 `decl`; critic r3 m7): the stories' + facts - parts 2 or more (owner 2026-11-07), never 10, crossing
     // ten (both parts 9 or less) or a whole of 20 - and every other skill's places by list. E24 recomputes it.
-    pool: { kind: 'plus', skill: 'add_wp_20', partMin: 3, noPart: [10], crossTen: true, sums: [20], maxSum: 20 },
+    pool: { kind: 'plus', skill: 'add_wp_20', partMin: 2, noPart: [10], crossTen: true, sums: [20], maxSum: 20 },
     // (`wpClean`: no part is the difference of the parts, so option C's wrong-sign top is no story number - critic r3 D3)
     checkQuestion: { want: ['wpBridgeBigFirst', 'wpClean'], correct: 'D', reserve: true },
     practicePages: 1,
@@ -136,7 +141,7 @@ export default {
     // ------------------------------------------------------------------ P5 Word problem
     // The same skill with the bar OFF: the pupil draws the bar (the fade).
     wordProblem: {
-        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 3, noPart: [10], crossTen: true, shortQuestion: true, fresh: true, itemSpread: true, pageFresh: true, dealTries: 4000 },
+        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 2, noPart: [10], crossTen: true, shortQuestion: true, fresh: true, itemSpread: true, pageFresh: true, dealTries: 4000 },
         want: 'wpBridgeSmallFirst',
         // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
         answerLine: 'The answer: __ {wp.unit}.',

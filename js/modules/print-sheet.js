@@ -23,7 +23,7 @@
 // app's print branches.
 
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
-import { resetPageDeals } from './page-deal.js';
+import { resetPageDeals, setDealPin } from './page-deal.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
 import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
@@ -154,6 +154,9 @@ function normaliseRequest(req = {}) {
             // A lesson practice page (lessons r1): the rows share the whole grid (no FILL_CAP row
             // gaps) - the caller has chosen a count whose cells stay under H13's band.
             noCap: !!(s && s.noCap),
+            // (`capFillCont`, lesson 3a P1d - E12: a page-capped sheet over two pages fills its continuation page to the FIRST
+            // page's grid height too, so every cell keeps one height; absent: unchanged)
+            capFillCont: !!(s && s.capFillCont),
             // A single-skill page held short by its own pool, laid in fewer, longer columns
             // (buildSheet): two columns may take any row count, not only CL-2's 2/3/4/5/8.
             freeRows: !!(s && s.freeRows),
@@ -481,7 +484,7 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
  */
-export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen);
+export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen || Array.isArray(sk.onlyKeys));
 export function refHardOk(sk, cand) {
     if (!refHasHard(sk)) return true;
     // (`allHard`, lesson 4 r3: the ref's `allTest` is a HARD bound - a window never takes a 10 row on a relaxed try)
@@ -499,6 +502,9 @@ export function refHardOk(sk, cand) {
         // whole is one of `crossTenExcept` (lesson 2: a whole of exactly 20, its edge case))
         if (sk.crossTen && !(o[0] <= 9 && o[1] <= 9 && o[0] + o[1] >= 11) && !(Array.isArray(sk.crossTenExcept) && sk.crossTenExcept.map(Number).includes(o[0] + o[1]))) return false;
     }
+    // (`onlyKeys`, lesson 2 E24b attempt 2: the facts a Practice place may deal - its zone of the page's SOLVED set,
+    // solveStoryFacts; absent on every other ref: unchanged)
+    if (Array.isArray(sk.onlyKeys) && !sk.onlyKeys.includes(factKeyOf(cand))) return false;
     if (Array.isArray(sk.boardOnly) && sk.boardOnly.length) {
         const bo = sk.boardOnly.map(Number);
         const a = String(dlAns(cand)).replace(/,(?=\d{3})/g, '');
@@ -531,6 +537,42 @@ export function itemNumberOf(q) {
 
 /** An arrays-turn item's turned fact key (4 x 3 for 3 x 4), else null: a page never prints both (LR-6 twins). */
 /** A + fact key turned round ("7+5" -> "5+7"); null for anything else (lesson 2 r5, V22 LR-5 turn-arounds). */
+/**
+ * A Practice page's story facts SOLVED before it is dealt (lesson 2 E24b, owner ruling 2026-11-07: the greedy deal spent the
+ * spread facts on its first places and left near twins - 7 + 4 / 8 + 5 at seed 4242 - for the last). `rule` {partMin, noPart,
+ * sums}: the crossing-ten + facts (both parts partMin..9, never a noPart) and the edge wholes; `avoid`: the pack's keys so far
+ * (a fact or its turn-around in it is spent); `n` the page's non-edge places. Returns {at, edge}: `at` n facts as written -
+ * pairwise no near twins (both numbers within 2), every first addend and every whole different (so ANY order the dealer
+ * lays them in keeps LR-6) - and `edge` one equal-parts fact clear of them and of their wholes, plus every edge whole
+ * (`sums`) in both orders that is no near twin of them; null when no such set exists (the page then deals as before).
+ * The search starts at a seeded offset, so seeds vary. Pure.
+ */
+export function solveStoryFacts(rule, avoid, n, seed) {
+    const pm = Number(rule.partMin) || 1, no = (rule.noPart || []).map(Number), sums = (rule.sums || []).map(Number);
+    const spent = new Set(avoid || []);
+    const free = (a, b) => !spent.has(`${a}+${b}`) && !spent.has(`${b}+${a}`);
+    const facts = [], squares = [];
+    for (let a = pm; a <= 9; a++) for (let b = a; b <= 9; b++) if (a + b >= 11 && !no.includes(a) && !no.includes(b) && free(a, b)) (a === b ? squares : facts).push([a, b]);
+    if (!facts.length || !squares.length) return null;
+    const off = (Number(seed) >>> 0) % facts.length;
+    const order = facts.slice(off).concat(facts.slice(0, off));
+    const twin = (x, y) => Math.abs(x[0] - y[0]) <= 2 && Math.abs(x[1] - y[1]) <= 2;
+    const okWith = (o, x) => o.every((y) => !twin(x, y) && y[0] !== x[0] && y[0] + y[1] !== x[0] + x[1]) && !sums.includes(x[0] + x[1]);
+    let out = null;
+    const rec = (start, picked) => {
+        if (picked.length === n) {
+            const sq = squares.slice().reverse().find((q) => okWith(picked, q) || picked.every((y) => !twin(q, y) && y[0] + y[1] !== q[0] + q[1]));
+            if (sq) { out = { picked, sq }; return true; }
+            return false;
+        }
+        for (let j = start; j < order.length; j++) for (const x of ((Number(seed) >>> 3) % 2 ? [order[j], [order[j][1], order[j][0]]] : [[order[j][1], order[j][0]], order[j]])) if (okWith(picked, x) && rec(j + 1, picked.concat([x]))) return true;
+        return false;
+    };
+    if (!rec(0, [])) return null;
+    const edge = [`${out.sq[0]}+${out.sq[1]}`];
+    for (const w of sums) for (let a = pm; a <= w - pm; a++) if (a !== w - a && !no.includes(a) && !no.includes(w - a) && free(a, w - a) && !twin([a, w - a], out.sq) && out.picked.every((y) => !twin([a, w - a], y))) edge.push(`${a}+${w - a}`);
+    return { at: out.picked.map((x) => `${x[0]}+${x[1]}`), edge };
+}
 export const plusTurn = (k) => { const m = String(k === null || k === undefined ? '' : k).match(/^(\d+)\+(\d+)$/); return m && m[1] !== m[2] ? `${m[2]}+${m[1]}` : null; };
 /** A x fact key's identity across the pack, the unordered pair ("2×8", "8x2" -> "2x8"); null for any other key
  *  (lesson 3a r2, critic D6: P0 wrote "2×8", an array "2x8" - one fact. Only x keys, so no other pack deals differently). */
@@ -807,6 +849,10 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // escape it), and only then are the SOFT floors relaxed, the hard bounds still held. A ref
         // without them deals exactly as before (the standard lesson maker is unchanged).
         const hard = refHasHard(sk);
+        // (`onlyKeysAt` / `onlyKeysEdge`, lesson 2 E24b attempt 2: a solved page - the places above the last row deal only the
+        // solved facts, the last row only its edge facts - the sheet's FIRST page, the one the set was solved for (a probe's longer deal past it
+        // deals as before); absent on every other ref: skH is sk)
+        const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast && i < Number(sk.edgeLast.per) ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeysEdge : sk.onlyKeysAt }) : sk;
         const pass = (rotate, relaxLast, soft, words = true) => {
             let got = null;
             for (let k = 0; k <= tries; k++) {
@@ -820,13 +866,17 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 // (`pageFresh`, lesson 2 R1 - see dealOne1: each try opens its own page, so a page constant - the story
                 // schema, the story's person and noun walk - is drawn from the try's seed, not held from the slot's first)
                 if (sk.pageFresh && k > 0) resetPageDeals();
-                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; }
+                // (`onlyKeys` with a `dealPin` key - lesson 2 E24b attempt 2: the generator is asked for the zone's solved pairs
+                // only, so a place deals one of them on its first try; absent on every other ref: no pin)
+                const pin = skH !== sk && skH.dealPin ? skH.onlyKeys.map((x) => String(x).split('+').map(Number)) : null;
+                if (pin) setDealPin(skH.dealPin, pin);
+                try { cand = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: edgeWant || rotate ? itemIndex + k : at, itemCount: perSkill ? perSkill.get(key) : undefined }, sk.range ? { range: sk.range } : {})); } catch (e) { cand = null; } finally { if (pin) setDealPin(null); }
                 if (!cand) continue;
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
                 const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
                 const strict = soft && !(relaxLast && k === tries);
-                if (hard && !refHardOk(sk, cand)) continue;
+                if (hard && !refHardOk(skH, cand)) continue;
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
                 // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
                 // or its turn - and an item already on this page are still the last thing taken: lesson 3a dealt the chart's
@@ -3515,7 +3565,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}) })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -4463,7 +4513,14 @@ async function buildLesson(n, metaOf) {
         let k = 0;
         for (const ps of n.practiceSheets) {
             k++;
-            const own0 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true, chartKeys } : {}) : practiceSk;
+            const own00 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true, chartKeys } : {}) : practiceSk;
+            // (`solve`, lesson 2 E24b attempt 2: the page's story facts SOLVED from the facts left before it is dealt, and each
+            // ZONE of the page - the places above the last row, the last row - held to its part of the set, in any order; the
+            // set is chosen so every order keeps LR-6. Absent on every other description: as before.)
+            const shape0 = Array.isArray(ps.shape) ? ps.shape : stackShapes[stackShapes.length - 1];
+            const el0 = ps.edgeLast || n.edgeLast || { per: shape0[0], cols: shape0[1] };
+            const solved = ps.solve && packNums ? solveStoryFacts(ps.solve, packNums, Number(el0.per) - Number(el0.cols), (n.seed + 7919 * k) >>> 0) : null;
+            const own0 = solved ? Object.assign({}, own00, { onlyKeysAt: solved.at, onlyKeysEdge: solved.edge, dealPin: ps.solve.dealPin }) : own00;
             // (`gridRevisit`, lesson 4 r5: the windows as the chart and the lesson sheet DRAW them, so a revisit is drawn turned)
             const planQs = (res) => { const out = []; for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) out.push(it.q); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
             const own = ps.skill && ps.skill.gridRevisit ? Object.assign({}, own0, { gridShown: [...planQs(chart), ...chartQs, ...planQs(teach)].map(gridShownOf).filter(Boolean) }) : own0;
@@ -4479,7 +4536,7 @@ async function buildLesson(n, metaOf) {
                 // (`pageCap`, R2 - since 6bc3cbd8 layout.js packs rows of NEARLY one height by their own heights (r12c
                 // nearPack): a 4 x 1 sheet laid 5 rows for its 4 items left a fifth of the page blank. The sheet's shape is its
                 // page: at most its count, and the rows it keeps share the whole grid.)
-                sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true, pageCap: shape[0] }],
+                sections: [{ skills: [sk1], count: shape[0], columns: shape[1], noCap: true, pageCap: shape[0], ...(ps.equalPages ? { capFillCont: true } : {}) }],
                 seed: (n.seed + 7919 * k) >>> 0,
                 // (`strip`: another chunk's step strip - the words sheet carries the words steps.)
                 stepStrip: ps.strip && ps.strip.html ? ps.strip : withStrip ? { html: stripHtml, hMm: stripH } : undefined,
@@ -4549,7 +4606,7 @@ async function buildLesson(n, metaOf) {
         keyPages: n.key ? parts.flatMap((p) => tagPages(p.res.keyPages, p)) : [],
         keyPlans: parts.flatMap((p) => p.res.keyPlans || [p.res.plan]),
         // Each part's plans (the detailed lesson maker reads the printed items from them).
-        partPlans: parts.map((p) => ({ part: p.part, plans: p.res.keyPlans || [p.res.plan] })),
+        partPlans: parts.map((p) => Object.assign({ part: p.part, plans: p.res.keyPlans || [p.res.plan] }, p.sheet !== undefined ? { sheet: p.sheet } : {})),
         fits: { cols: teach.fits.cols, rows: teach.fits.rows, pages: pageCount, note: [`${line}.`, teach.fits.note].filter(Boolean).join(' '), sections: teach.fits.sections },
         items: parts.flatMap((p) => (p.res.items || []).map((it) => Object.assign({ part: p.part }, it))),
         // The problems the pupil does (lessons r3: the print panel counted every dealt pool item,
@@ -5189,11 +5246,14 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
         const named = (q) => { for (const [t, w] of Object.entries(d.caseNames || {})) { const f = LESSON_CASE_TESTS[t]; if (f && f({ q })) return w; } return ''; };
         const parts = [];
         let k = 0;
-        for (const pl of partPlan('practice')) {
-            const cs = planCells(pl);
-            for (const pg of [...new Set(cs.map((c) => c.page))]) {
+        // (a `practiceSheets` sheet is ONE Practice k however many pages it prints: its last row is on its LAST page -
+        // lesson 3a P1d r3, critic: "Practice 3" named Practice 1's second page. Every other plan: one Practice k a page, as before)
+        const pEntries = ((lesson && lesson.partPlans) || []).filter((x) => x.part === 'practice');
+        const pUnits = pEntries.flatMap((x) => x.plans.flatMap((pl) => { const cs = planCells(pl); const pgs = [...new Set(cs.map((c) => c.page))];
+            return x.sheet !== undefined ? [cs.filter((c) => c.page === pgs[pgs.length - 1])] : pgs.map((pg) => cs.filter((c) => c.page === pg)); }));
+        {
+            for (const its of pUnits) {
                 k++;
-                const its = cs.filter((c) => c.page === pg);
                 const last = Math.max(...its.map((c) => c.row));
                 // (a function table - lesson 5: its rule as written, "n + 9", not its slot list)
                 // (`lastName(q)` on the description - lesson 4 r5, critic r2 n8: the lesson's own words for a last-row item,
@@ -5235,14 +5295,22 @@ async function buildDetailedLesson1(req = {}, late = new Set()) {
         if (V[ch.id].indep.length) glance.push({ page: `P3${ch.id} Independent`, answers: V[ch.id].indep.map((x) => x.ans).join(' · '), fade: '★★' });
     }
     let pNo = 0;
-    for (const pl of partPlan('practice')) {
+    // (a `practiceSheets` sheet over several pages - lesson 3a P1d r3, critic: its ★★★ row is on its LAST page only, and each
+    // of its pages is named "P4-n Practice k"; every single-page sheet and every other plan: as before)
+    const pSheets = ((lesson && lesson.partPlans) || []).filter((e) => e.part === 'practice');
+    const anyMulti = pSheets.some((x) => x.sheet !== undefined && x.plans.some((pl) => new Set(planCells(pl).map((c) => c.page)).size > 1));
+    for (const x of pSheets) for (const pl of x.plans) {
         const cs = planCells(pl);
-        for (const pg of [...new Set(cs.map((c) => c.page))]) {
+        const pgs = [...new Set(cs.map((c) => c.page))];
+        const multi = x.sheet !== undefined && pgs.length > 1;
+        for (const pg of pgs) {
             pNo++;
             const its = cs.filter((c) => c.page === pg);
             const last = Math.max(...its.map((c) => c.row));
-            glance.push({ page: `P4-${pNo} Practice, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
-            glance.push({ page: `P4-${pNo} Practice, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
+            const nm = anyMulti && x.sheet !== undefined ? `P4-${pNo} Practice ${x.sheet}` : `P4-${pNo} Practice`;
+            if (multi && pg !== pgs[pgs.length - 1]) { glance.push({ page: `${nm}, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.map((c) => dlAns(c.q)).join(' · '), fade: '★★' }); continue; }
+            glance.push({ page: `${nm}, ${last === 1 ? 'row 1' : `rows 1–${last}`}`, answers: its.filter((c) => c.row < last).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
+            glance.push({ page: `${nm}, last row`, answers: its.filter((c) => c.row === last).map((c) => dlAns(c.q)).join(' · '), fade: '★★★' });
         }
     }
     if (mixedNo) glance.push({ page: 'P4 Mixed', answers: cellsOf(partPlan('mixed')).map((c) => dlAns(c.q)).join(' · '), fade: '★★' });
