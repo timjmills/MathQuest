@@ -138,7 +138,7 @@ function countsOf(doc) {
     return m;
 }
 
-async function main({ root, here, keys, sizes, json, verbose, say, bands = false, ruleSkills = null, onlyOptions = null }) {
+async function main({ root, here, keys, sizes, json, verbose, say, bands = false, ruleSkills = null, onlyOptions = null, bandH13 = false }) {
     if (!keys.length) { say('ws-options-verify --render: FAIL (usage: --render needs --skill cat:skill[,...]: the touched skills)'); return 2; }
     const skills = await readOffered(root, keys, { bands, ruleSkills, onlyOptions });
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mq-options-render-'));
@@ -163,6 +163,9 @@ async function main({ root, here, keys, sizes, json, verbose, say, bands = false
     }
     if (!jobs.length) { say(`ws-options-verify --render: OK (nothing to render: no appearance value offered on ${keys.join(', ')})`); return 0; }
     const jobsFile = path.join(tmp, 'jobs.json'), outFile = path.join(tmp, 'print-lint.json');
+    // --band-h13 (OPT-IN, critic lf-placevalue r2 N5): print-lint measures H13-ABS on every page (default and value);
+    // a job's flags replace the command line's (print-lint --jobs), so the rule goes on each job
+    if (bandH13) for (const j of jobs) j.args.push('--rules', 'H13-ABS');
     fs.writeFileSync(jobsFile, JSON.stringify(jobs, null, 1));
     const lint = path.join(here, 'ws-print-lint.cjs');
     const cmd = [process.execPath, lint, '--source', 'kit', '--jobs', jobsFile, '--json', outFile, '--report-only'];
@@ -198,7 +201,15 @@ async function main({ root, here, keys, sizes, json, verbose, say, bands = false
             const was = cb.get(k) || 0;
             const sameRate = was > 0 && iv && ib && n / iv <= (was / ib) * 1.0001;
             // a band (difficulty) page is judged on overflow and wrap only: a longer number may raise other counts
-            if (p.difficulty && !/^L-(OVERFLOW|WRAP) /.test(k)) { row.debt.push(`${k} ${n}${n > was ? ` (${was} on the default page; a band page is judged on L-OVERFLOW / L-WRAP only)` : ''}`); continue; }
+            // --band-h13 (OPT-IN, critic lf-placevalue r2 N5: value band=9999 L kept 43 % empty bands and passed as "the
+            // default page has it too"): on a band page H13-ABS is judged ABSOLUTELY (any finding fails: the lead's T1
+            // limit, never the default page's count), and H13 / H13-ROW lose the band exemption (judged as any value's rise)
+            if (bandH13 && p.difficulty && k === 'L-DENSITY H13-ABS' && n > 0) {
+                const ex = d.findings.filter((f) => !f.waived && `${f.lint} ${f.rule}` === k).slice(0, 1).map((f) => f.msg)[0] || '';
+                row.rises.push(`${k}: ${n} on a band page (judged absolutely, --band-h13)${ex ? ` (${String(ex).slice(0, 140)})` : ''}`);
+                continue;
+            }
+            if (p.difficulty && !/^L-(OVERFLOW|WRAP) /.test(k) && !(bandH13 && /^L-DENSITY H13(-ROW)?$/.test(k))) { row.debt.push(`${k} ${n}${n > was ? ` (${was} on the default page; a band page is judged on L-OVERFLOW / L-WRAP only)` : ''}`); continue; }
             if (n > was && !sameRate) {
                 const ex = d.findings.filter((f) => !f.waived && `${f.lint} ${f.rule}` === k).slice(0, 1).map((f) => f.msg)[0] || '';
                 row.rises.push(`${k}: ${was} -> ${n}${ex ? ` (${String(ex).slice(0, 140)})` : ''}`);

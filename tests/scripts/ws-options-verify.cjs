@@ -57,6 +57,8 @@
 //   L-OVERFLOW / L-WRAP rise against the default page (other rises and capacity listed, not failed); --rule-skills a:b,c:d
 //   renders the band pages only for those skills (ws-precritic passes the lane's); --options band,notation renders only
 //   those option ids (a short run, e.g. a backtest).
+//   --band-h13 (OPT-IN; lf-placevalue critic r2 N5, with --bands): print-lint runs --rules H13-ABS, and on a band page an
+//   L-DENSITY H13-ABS finding FAILS on its own (absolute, not against the default page); H13 / H13-ROW rises fail too.
 const fs = require('fs');
 const path = require('path');
 
@@ -82,7 +84,7 @@ if (has('render')) {
     const sizes = (arg('sizes', 'S,L') || 'S,L').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const root = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
     const list = (k) => (arg(k, '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-    require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m), bands: has('bands'), ruleSkills: list('rule-skills'), onlyOptions: list('options') })
+    require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m), bands: has('bands'), bandH13: has('band-h13'), ruleSkills: list('rule-skills'), onlyOptions: list('options') })
         .then((code) => process.exit(has('report-only') ? 0 : code), (e) => { console.log(e && e.stack || e); console.log('ws-options-verify --render: FAIL (crashed)'); process.exit(1); });
     return;
 }

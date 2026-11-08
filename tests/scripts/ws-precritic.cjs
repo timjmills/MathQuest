@@ -658,6 +658,13 @@ function applyOptIn(rows, keys) {
         const mine = keys.filter((k) => (lane.skills || []).includes(k));
         if (!mine.length) continue;
         for (const [id, g] of Object.entries(lane.gates || {})) {
+            // `newRow` (critic lf-placevalue r2 N7): a gate row the --skill plan has no row for (the review role's print-lint)
+            // is ADDED for this lane's skills only, with the lane's args; another lane's run never sees it
+            if (g.newRow && !rows.some((x) => x.id === id)) {
+                const nr = g.newRow;
+                rows.push(gate(id, nr.name || id, mine.join(', '), nr.kind || 'browser', nr.script, [...(nr.args || []), '--skills', mine.join(',')],
+                    { parse: nr.parse && PARSE[nr.parse] ? PARSE[nr.parse] : null, expect: nr.idSuffix ? { ids: mine.map((k) => `${k}${nr.idSuffix}`) } : null }));
+            }
             const r = rows.find((x) => x.id === id);
             if (!r || r.missing || !r.file) continue;
             const flags = [...(g.args || []).filter((a) => /^--/.test(a)).map((a) => a.slice(2)), 'rule-skills'];

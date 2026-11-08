@@ -8,6 +8,7 @@
 //   TAGINK    check 9  an item tag (A / B / C on an error-analysis fix, .mq-slottag) whose ink meets the slot's own content
 //                      (H2, CL-40; D-MP-5, D-AG-3).
 //   KEYJOIN   check 8  (keys) one answer slot written with two joined answers ("15, 15") (H1; D-MP-6).
+//   H13-ABS   OPT-IN (opts.h13abs; critic lf-placevalue r2 N6): print-lint's H13-ABS band under the lowest ink, per cell.
 // Exempt everywhere: anchor / model cells ([data-ws-anchor], .mq-anchorgrid), the label tabs, hidden ink.
 // Pure in-page code: the function is serialised whole, so it uses nothing from outside its body.
 
@@ -123,6 +124,37 @@ function cellChecksInPage(opts) {
                 });
                 if (hits.length) out.findings.push({ rule: 'TAGINK', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the tag "' + (t.textContent || '').trim() + '" prints over the answer in its box (H2, CL-40, critic lf-ops r1 check 9)' });
             });
+            // ---- H13-ABS (OPT-IN, opts.h13abs; critic lf-placevalue r2 N6): print-lint's H13-ABS measure, ported whole -
+            // the band under the LOWEST INK of the cell (own text, an svg / img / canvas, a stroked box; labels and absolute
+            // pieces out) or of an EMPTY answer slot, inside the bottom pad, against 35 % of the cell less its writing room
+            // Hw (--ws-hw, else 6 / 8 / 10 mm at S / M / L): lead ruling T1 (unit_form rename=more S 57 %, value band 9999 L 43 %)
+            if (opts.h13abs && !isKey && !c.classList.contains('blankrun') && cr.height >= 12 * PX && cr.width >= 12 * PX) {
+                var vis = function (el) { if (typeof el.checkVisibility === 'function') return el.checkVisibility({ checkVisibilityCSS: true }); return shownEl(el); };
+                var inkBot = -Infinity;
+                c.querySelectorAll('*').forEach(function (d) {
+                    if (!vis(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) return;
+                    var ds = getComputedStyle(d);
+                    if (ds.position === 'absolute') return;
+                    var own = Array.prototype.some.call(d.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+                    var inkEl = own || /^(svg|img|canvas)$/i.test(d.tagName) || ['Top', 'Bottom', 'Left', 'Right'].some(function (k) { return parseFloat(ds['border' + k + 'Width']) > 0 && ds['border' + k + 'Style'] !== 'none'; });
+                    if (!inkEl) return;
+                    var r = d.getBoundingClientRect();
+                    if (!r.width && !r.height) return;
+                    inkBot = Math.max(inkBot, r.bottom);
+                });
+                if (inkBot > -Infinity) {
+                    var low = inkBot;
+                    c.querySelectorAll('[data-ws-slot]').forEach(function (sl) { if (!vis(sl) || sl.closest('[data-ws-label]') || sl.textContent.trim()) return; var r = sl.getBoundingClientRect(); if (r.height) low = Math.max(low, r.bottom); });
+                    var hw = 0;
+                    var hv = cs.getPropertyValue('--ws-hw').trim();
+                    if (hv) { var probe = document.createElement('div'); probe.style.cssText = 'position:absolute;visibility:hidden;height:' + hv; c.appendChild(probe); hw = probe.getBoundingClientRect().height; probe.remove(); }
+                    if (!(hw > 0)) { var pgc = c.closest('.ws-page'); var szmm = pgc && (pgc.classList.contains('ws-S') ? 6 : pgc.classList.contains('ws-M') ? 8 : pgc.classList.contains('ws-L') ? 10 : 0); hw = (szmm || 8) * PX; }
+                    var innerB = cr.bottom - (parseFloat(cs.paddingBottom) || 0);
+                    var below = Math.max(innerB - low, 0);
+                    var lim = 0.35 * Math.max(cr.height - hw, 0);
+                    if (lim > 0 && below >= lim) out.findings.push({ rule: 'H13-ABS', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': an empty band ' + mm(below) + ' mm under the lowest ink of a ' + mm(cr.height) + ' mm cell (' + Math.round((below / cr.height) * 100) + '%; limit 35 % of the cell less Hw ' + mm(hw) + ' mm = ' + mm(lim) + ' mm): size the row to the item (RUBRIC H13, H13-ABS; critic lf-placevalue r2 N6)' });
+                }
+            }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {
                 c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
