@@ -616,10 +616,9 @@
       },
       {
         "key": "fact-probe",
-        "d": "offered",
-        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
-        "why": "the fact probe (PT 4.2)",
-        "proposed": true
+        "d": "out of scope",
+        "source": "ws-empty-band 2026-11-08: role refuses pv",
+        "why": "the fact probe composes facts and one-step computations only (\"not composed\" for pv); the pv Test is the probe"
       },
       {
         "key": "word-problems",
