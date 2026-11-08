@@ -1690,8 +1690,8 @@ function wsLintPage(cfg) {
                     // page too (12.1: up to 16; the engine's dense packing calls them `short`)
                     || ((/^test\b/.test(role) || role === 'independent') && items.length > 0 && items.every(c => c.short)),
                 slots: cells.reduce((n, c) => n + c.slots, 0), instructions: ri.instructions,
-                // the supports-off div_facts page (owner 2026-11-08: 36 a page at S): its bare facts carry .ws-eq-under
-                divUnder: ri.cells.some(c => c.querySelector('.ws-eq-under')),
+                // the supports-off div_facts page (owner 2026-11-08: 36 a page at S): its bare facts carry .ws-eq-divplain
+                divUnder: ri.cells.some(c => c.querySelector('.ws-eq-divplain, .ws-eq-under')),
             });
         }
     } else {

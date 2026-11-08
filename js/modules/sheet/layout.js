@@ -876,7 +876,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     let cellH = r3(capped ? Math.min(even, fillLimit(hMin)) : even);
     // (`noStretch`, owner 2026-11-08: div_facts' fade packet - a page under 80 % full keeps rows sized to what they hold)
     if (capped && rows * cellH < 0.8 * G && !section.noStretch) cellH = r3(Math.min(even, hMin * FILL_CAP));
-    if (capped && section.noStretch) cellH = r3(Math.min(even, hMin * NO_STRETCH_ROOM));
+    if (capped && section.noStretch) cellH = r3(Math.min(even, hMin * (typeof section.noStretch === 'number' ? section.noStretch : NO_STRETCH_ROOM)));
     // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
     const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
     // (and to what THESE items measure: the skill's floor sized the page's rows for its tallest item - a K story with a
