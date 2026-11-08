@@ -106,6 +106,17 @@ function fadeFactEm(gen) {
     }
     return Math.round(w * 100) / 100 || null;
 }
+/**
+ * div_facts critic r6 R6-2 (CL-8): on the grid pages the critic graded, a div_facts across fact keeps its answer line beside
+ * it only when the line fits right of the number tab's keep-out (`keepout`, equation.js acrossBelow); else the line goes under.
+ * Other roles keep their geometry (the shared guided / lesson pages are pinned).
+ */
+const KEEPOUT_ROLES = new Set(['independent', 'more-practice', 'test', 'review']);
+function factKeepout(g) {
+    const c = g && g.q && g.q.cell;
+    if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact || c.payload.notation || g.q.skillId !== 'div_facts') return g;
+    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { keepout: true }) }) }) });
+}
 /** Is this section div_facts alone, in its Standard (across) form, with no support drawn on any fact? */
 function divFactsPlainSection(sec) {
     const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
@@ -3130,7 +3141,7 @@ async function buildSheetDeal(req = {}) {
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen0 = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
-        const gen = sec.divFade ? gen0.map((g, _i, all) => factFade(g, sec, fadeFactEm(all))) : gen0.map((g) => (sec.divUnder ? factUnder(g, { plain: true }) : g));
+        const gen = sec.divFade ? gen0.map((g, _i, all) => factFade(g, sec, fadeFactEm(all))) : gen0.map((g) => (sec.divUnder ? factUnder(g, { plain: true }) : KEEPOUT_ROLES.has(n.role) ? factKeepout(g) : g));
         const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt, stage: sec.fadeStage };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
@@ -4172,7 +4183,7 @@ async function buildRoleSheet(n, metaOf) {
                 ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
                 : g0;
             // (critic r5 R5-2: a Review's bare div_facts facts print over their answer line, as on the Independent page)
-            const gU = n.sections.some((sec) => sec.divUnder) && g.skill && g.skill.categoryId === 'division' && g.skill.skillId === 'div_facts' ? factUnder(g, { plain: true }) : g;
+            const gU = n.sections.some((sec) => sec.divUnder) && g.skill && g.skill.categoryId === 'division' && g.skill.skillId === 'div_facts' ? factUnder(g, { plain: true }) : KEEPOUT_ROLES.has(n.role) ? factKeepout(g) : g;
             const it = settlePrompts([hostItem(gU, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
             if (keepPrompts) it.stripPrompt = false;
             // Error analysis never falls back to an "Answer:" line under the cell: the shown work

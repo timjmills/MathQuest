@@ -71,7 +71,7 @@ function fillToCeiling(L, size, columns, opts = {}) {
         const fitRows = Math.floor((G - SAFETY_H_MM - GRID_BORDERS_MM) / rowH + 1e-9);
         const cap = Math.floor((FACT_TEST_PAGE[size] || FACT_TEST_PAGE.L) / L.cols) * L.cols;
         const fitAll = Math.min(cap, fitRows * L.cols);
-        if (fitAll > perPage) {
+        if (opts.fullPage && fitAll > perPage) {
             rows = fitAll / L.cols;
             perPage = fitAll;
             note = `Test: ${fitAll} problems, ${L.cols} x ${rows} (the Independent capacity, owner 2026-11-08).`;
@@ -102,7 +102,9 @@ function layout(items, input, count) {
             ceiling: CEILING, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
         }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns,
-        { footprintRows: items.every((it) => (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || '')))) });
+        { footprintRows: items.every((it) => (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || '')))),
+            // (R6-1's full page: the one-line across fact only - div_facts' Long division and Fraction forms keep 12.1's ceiling)
+            fullPage: items.every((it) => { const pl = it.q && it.q.cell && it.q.cell.payload; return !!(pl && pl.fact && it.q.cell.template === 'equation' && !pl.notation); }) });
     }
     const sec = (columns) => ({
         role: 'test', columns, count: count || items.length,
