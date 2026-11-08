@@ -1743,6 +1743,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pack-feasible-p0",
+   "check": "lesson 2's Prerequisite Check draws no fact of the lesson's crossing-ten story pool, and a whole-pack assignment (every place that draws from the pool, LR-5 + LR-6) exists at seeds 1-25 + 4242 (lessons/pack-solve.js)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-08 (lesson 2 E24b): a Prerequisite Check never draws from the lesson's own pool; check the whole pack first",
+   "browser": false,
+   "fail": {
+    "commit": "24e55369",
+    "state": "P0 add_facts sums 11-16, parts to 9: 18 crossing-ten facts of the pool"
+   },
+   "pass": {
+    "commit": "bed7067a",
+    "state": "P0 add_facts a teen and ones (constant 11-13, sums 13-19): no pool fact; 14 places solved at 26/26 seeds"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pack-feasible",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
