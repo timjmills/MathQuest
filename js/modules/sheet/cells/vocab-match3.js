@@ -93,12 +93,12 @@ register(MATCH3_TEMPLATE, {
         // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
         // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
         const tileCss = twin ? '<style>.mq-wspaper .mq-vm .mq-vm-pics{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:10px!important}'
-            + '.mq-wspaper .mq-vm .mq-vm-pic{flex:none!important;height:120px;align-items:center!important;justify-content:flex-start!important;min-width:0}'
+            + '.mq-wspaper .mq-vm .mq-vm-pic{flex:none!important;height:96px;align-items:center!important;justify-content:flex-start!important;min-width:0}'
             + '.mq-wspaper .mq-vm .mq-vm-pic > span:last-child{flex:1 1 0!important;min-width:0}'
-            + '.mq-wspaper .mq-vm .mq-vm-pic svg{max-height:120px;max-width:100%;margin:0 auto}'
-            + '.mq-wspaper .mq-vm .mq-vm-words{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:10px!important}'
+            + '.mq-wspaper .mq-vm .mq-vm-pic svg{max-height:96px;max-width:100%;margin:0 auto}'
+            + '.mq-wspaper .mq-vm .mq-vm-words{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:6px!important}'
             + '.mq-wspaper .mq-vm .mq-vm-word{flex:none!important;justify-content:flex-end!important;padding-right:14%}'
-            + '.mq-wspaper .mq-vm{justify-content:flex-start!important;gap:16px!important}.mq-wspaper .k2-twin:has(> .mq-vm){align-self:stretch;width:100%}</style>' : '';
+            + '.mq-wspaper .mq-vm{justify-content:flex-start!important;gap:12px!important}.mq-wspaper .k2-twin:has(> .mq-vm){align-self:stretch;width:100%}</style>' : '';
         const wrapCss = tileCss + (guidedRow ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vm){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vm{flex:1 1 auto;height:auto!important}</style>' : '');
         return `<div class="mq-vm k2-cell" data-ws-vocab="match3"${twin ? ' data-mq-k2="1" data-mq-join=", "' : ''} style="color:${INK};${FONT}width:100%;box-sizing:border-box;`
             + `display:flex;flex-direction:column;justify-content:${fill.includes('max-height') ? 'space-between' : 'space-evenly'};${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
