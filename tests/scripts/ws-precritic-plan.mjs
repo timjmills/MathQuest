@@ -15,6 +15,10 @@
 // none is not applicable here. Rows with no skill (fixtures of a tool's own data, card files) are not applicable.
 // OPT-IN lane rules (tests/fixtures/precritic/opt-in-rules.json): each lane's flags are on its --skill plan (with
 // --rule-skills) and on no other skill's plan (one addition skill's plan is checked).
+// A LESSON row (lane lf-checks, 2026-11-07): a command that runs tests/scripts/ws-detailed-lesson on `--lesson <id>` (a
+// detailed lesson) is checked against `ws-precritic --lesson <id> --dry-run`: the plan must run ws-detailed-lesson on that
+// lesson in the row's mode (--repeats, --check, --lp, --sweep; a row on a saved packet `--packet` or a PDF `--raster` is
+// the --lp mode on fixtures, so --lp must be planned).
 // Prints `ws-precritic-plan: OK` / `FAIL (n)`; exits 1 on FAIL, 2 on usage.
 
 import { spawnSync } from 'node:child_process';
@@ -42,6 +46,21 @@ export function readCommand(cmd) {
     return { tool, skills, roles };
 }
 
+/** {tool, lesson, mode} of a backtest command on a detailed lesson, or null. Pure. */
+export function readLessonCommand(cmd) {
+    const c = String(cmd);
+    if (!/tests\/scripts\/ws-detailed-lesson\.cjs/.test(c)) return null;
+    const tail = c.slice(c.lastIndexOf('ws-detailed-lesson.'));
+    const lesson = (/--lesson[ =]([\w-]+)/.exec(tail) || [])[1];
+    if (!lesson) return null;
+    const mode = /--sweep(?:-packets)?\b/.test(tail) ? 'sweep' : /--(lp|packet|raster)\b/.test(tail) ? 'lp' : /--repeats\b/.test(tail) ? 'repeats' : 'check';
+    return { tool: 'ws-detailed-lesson', lesson, mode };
+}
+/** The plan lines that run ws-detailed-lesson on `lesson` in `mode`. Pure. */
+export function planHasLesson(planText, { lesson, mode }) {
+    return planText.split('\n').filter((l) => l.includes('tests/scripts/ws-detailed-lesson.') && new RegExp(`--lesson ${lesson}(\\s|$)`).test(l) && new RegExp(`--${mode}\\b`).test(l));
+}
+
 /** The plan lines of a dry run that run `tool` on every skill of `skills` (and with --roles R when given). Pure. */
 export function planHas(planText, { tool, skills, roles }) {
     return planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
@@ -59,6 +78,11 @@ function selfTest() {
     const plan = '  [browser] lint — node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills subtraction:sub_50_no_regroup\n  [node] x — node tests/scripts/ws-dealer-uniform.mjs --skill subtraction:sub_50_no_regroup';
     eq('planned lesson', planHas(plan, { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson' }).length, 1);
     eq('not planned at another role', planHas(plan, { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'test' }).length, 0);
+    eq('lesson lp row', readLessonCommand('node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --packet {fixture} --only LP-TEXT'), { tool: 'ws-detailed-lesson', lesson: 'g3-oa8-two-step-wp', mode: 'lp' });
+    eq('lesson repeats row', readLessonCommand('node tests/scripts/ws-detailed-lesson.cjs --lesson g4-nbt1-ten-times-value --repeats'), { tool: 'ws-detailed-lesson', lesson: 'g4-nbt1-ten-times-value', mode: 'repeats' });
+    const lplan = '  [browser] x — tests/scripts/mq-browser-run.sh node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --lp --out /tmp/x\n  [browser] y — node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --check --repeats --out /tmp/y';
+    eq('lesson lp planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'lp' }).length, 1);
+    eq('lesson sweep not planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'sweep' }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
     console.log(bad.length ? `${TOOL}: FAIL (self-test, ${bad.length} of ${n})\n  ${bad.join('\n  ')}` : `${TOOL}: OK (self-test, ${n} cases)`);
     process.exit(bad.length ? 1 : 0);
@@ -81,7 +105,20 @@ else {
         return plans.get(key);
     };
     const fails = []; const na = []; let checked = 0;
+    const lplans = new Map();
     for (const row of table.rows || []) {
+        const lc = readLessonCommand(row.command || '');
+        if (lc) {
+            if (!lplans.has(lc.lesson)) { const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic.cjs'), '--lesson', lc.lesson, '--dry-run'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 }); lplans.set(lc.lesson, { ok: r.status === 0, text: `${r.stdout || ''}${r.stderr || ''}` }); }
+            const p = lplans.get(lc.lesson);
+            checked++;
+            const via = `ws-precritic --lesson ${lc.lesson}`;
+            if (!p.ok) { fails.push(`${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}`); continue; }
+            const hit = planHasLesson(p.text, lc);
+            console.log(`  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ws-detailed-lesson --${lc.mode} on lesson ${lc.lesson} (via ${via})`);
+            if (!hit.length) fails.push(`${row.id}: ${via} plans no ws-detailed-lesson --${lc.mode} on it (the check is backtested but not on the lane's path)`);
+            continue;
+        }
         const c0 = readCommand(row.command || '');
         if (!c0) { na.push(row.id); continue; }
         const gone = c0.skills.filter((k) => !live.has(k));

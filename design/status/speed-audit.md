@@ -844,9 +844,9 @@ Details and the reflection: design/status/s1-checks.md.
 ### lf-placevalue critic r2 (2026-11-07): FAIL on all five pv skills; rule 7 stop (N7, N8 survived two medium rounds)
 **Which earlier check would have caught each finding, or why none did:**
 - N1 (identify T/F key wrong): node-lint WRONG-FILL ran the real roles but only for multi-slot WRITE-IN cells; identify's ring + value line was
-  not in its set, and providers-unit's distractor test compared joined strings. Now WRONG-DIFFERS per slot (L26).
-- N2 (instruction): no check read the item-less print path; providers-unit tested q.printText only. Now PRINTED-INSTRUCTION (L27).
-- N3 (combine band 99 one-part): ws-dealer-uniform and content-audit ran the default band only. Now COMBINE-PARTS on every band (L28).
+  not in its set, and providers-unit's distractor test compared joined strings. Now WRONG-DIFFERS per slot (L27).
+- N2 (instruction): no check read the item-less print path; providers-unit tested q.printText only. Now PRINTED-INSTRUCTION (L28).
+- N3 (combine band 99 one-part): ws-dealer-uniform and content-audit ran the default band only. Now COMBINE-PARTS on every band (L29).
 - N4 ("hundreds" on 2-digit): VQ-LIVE ran at the default band 999 only — proposed at every band.
 - N5 / N6 (band pages with 43–57 % bands): H13-ABS ran on default pages; options-render --bands judged rises against the default page,
   which shared the finding — proposed per page, absolute.
@@ -854,7 +854,43 @@ Details and the reflection: design/status/s1-checks.md.
 - N8 (2 columns ignored): the matrix more-cols2 rows were PENDING(no-baseline), so nothing judged them — proposed judged rows.
 **Speed-ups:**
 - The single biggest loss of the lane: cells were tuned on default pages for two rounds before the plan-from-card gate showed 548 option
-  OVERFLOWs (L25). Next family: run `ws-cell-checks --card --card-opts` on every skill BEFORE the first critic.
+  OVERFLOWs (L26). Next family: run `ws-cell-checks --card --card-opts` on every skill BEFORE the first critic.
 - A 2-round loss on N7 / N8 because the gates that would show them (GRID-EVEN-ALL on review, more-cols2 rows) were opt-in on the wrong roles
   or PENDING: wire a lane's opt-in rules on EVERY §7a-offered role, not the three default ones.
 - Builder / critic strength right (medium); critic r2 35 min; one builder round 63 min; precritic 50 min (the plan-from-card gates add ~20).
+### lf-checks · critic r1 (2026-11-07, FAIL 7 / 7 / 8 / 8: the lesson precritic checks)
+
+Full report: design/status/lf-checks/critic-r1.md.
+
+**Automatic checks** (what would have caught each finding):
+
+| Finding | Check | State |
+|---|---|---|
+| D1 LP-GIVEAWAY counted `data-ws-level` as a hint, so Guided = Independent passed; the row stayed green on other defects | backtest rows name each cited defect (a `failNames` substring list); a FAIL that lacks one fails the row | proposed (ws-backtest) |
+| D2 LP-NUMBERS flagged "(7000 or 7,000)", a deliberate accepted-answers quote | the checks run on every PASSED lesson's packet (known-true corpus); a new FAIL there is ruled real or false before it is accepted | done by hand this round; proposed as a self-test |
+| D3 seeded LP-PREREQ fixture seeded a trace, the real D8 is an exchange box | seed the DOM, not the packet (`--packet-html`), so the extractor is in the proof | proposed |
+| D4 hand-edited pass fixtures not reachable states (story vs pool) | fixture-consistency lint: story numbers match the pool item | proposed |
+| D5 an empty read passed 7 of 8 checks | `lpChecks` fails "nothing read" on 0 pupil pages / 0 cells / no pool; self-test case | built (self-test 30 cases) |
+| n8 PDF pages vs packet pages | lpRaster asserts the counts are equal | built |
+
+**Speed-ups:** a tool critic grades from the builder's saved packets (`--packet-out`, 0.2 s re-checks) and renders only a
+sample; `ws-backtest --kind fixture` spends 21 min in older browser fixture rows: a `--fast` filter (rows without
+`browser: true`) gives the lesson rows' proof in under 5 s; other lanes' browser runs held both slots for ~4 of 9 minutes
+of the critic's live runs.
+
+### lf-checks · critic r2 (2026-11-07, FAIL 7 / 7 / 8 / 8; lane stopped by rule 7)
+
+Full report: design/status/lf-checks/critic-r2.md.
+
+**Automatic checks:** one backtest row per rule a tool header names, FAILing on that rule alone (ws-precritic-plan parses the
+header) - PC-CLIP had none and could not see its D10; a fixture-consistency lint over every `*.pass.json` (story = pool, key
+working = story, place-value digit present, one right answer) - the surviving defect; a new blocking gate is run once on head
+before commit and its red rows recorded (R-n) in the status file; a known-true corpus self-test for PC-NAME / PC-RANGE; a
+"read nothing" guard in ws-lesson-samples (built).
+
+**Speed-ups:** save fail-side packets of the phase-0 rows so a critic re-judges offline; run the content seeds of
+ws-lesson-samples --check in parallel pages (about 1 min, not 3.5); freeze or tag the graded head before the critic starts
+(two pushes landed mid-round).
+
+**Root cause of the stop:** hand-edited pass fixtures. Rule for every checks lane: a pass state is a commit (or a fixture
+re-rendered from a commit), never a packet edited by hand; where no fix commit exists yet, the row's pass side is pending.
