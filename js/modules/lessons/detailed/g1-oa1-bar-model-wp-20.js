@@ -108,8 +108,10 @@ export default {
         // (the chart: a crossing-ten PUT TOGETHER story such as 6 and 7, RESEARCH §E - pinned, critic r2 D1; the
         // second example an ADD TO story, modelled on the board in I Do)
         example: { match: 'story', test: 'wpBridgePT' },
-        second: { test: 'wpAddTo', label: 'Gets more? That is a part.' },
-        third: { test: 'wpEqual', label: 'Equal parts? Still add the parts.' },
+        // (lesson 2 E24b / E31 at every seed, lead's order 2026-11-08: each from its OWN case pool - the main pool, thinned by
+        // Practice 1's solved set, held neither case at seed 2; roles/lesson.js sources gives the pool the pack's avoid keys)
+        second: { test: 'wpAddTo', label: 'Gets more? That is a part.', ref: { allTest: 'wpAddTo', tries: 600 } },
+        third: { test: 'wpEqual', label: 'Equal parts? Still add the parts.', ref: { allTest: 'wpEqual', tries: 600 } },
         mixWith: [
             { key: 'composing:number_bonds', opts: { band: 10, unknown: 'answer' } },
             { key: 'addition:add_facts', opts: { band: 20 } },
@@ -118,11 +120,15 @@ export default {
 
     // ------------------------------------------------------------------ P0 Prerequisite Check
     prerequisites: [
-        { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 17, maxNum: 20 },
+        // (lesson 2 E24b at every seed, lead's order 2026-11-08: 11 to 20 - two items a question need two numbers 3 apart, and
+        // 17-20 held one such pair: seed 2 dealt 18 / 19. pack-solve.js p0Sources models it; ws-lesson-unit pack-feasible is the gate.)
+        { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 11, maxNum: 20 },
             lesson: { id: 'K CC 5', title: 'Count to 20' } },
-        // (both parts 3 or more: "4 and 1" can be answered by "one more", with no part-whole idea - critic r2 n5; a whole of 6
-        // or more and no first part twice: not 2 and 7 / 2 and 3 - critic r3 m2)
-        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 3, partMin: 3, minNum: 6, distinctFirst: true },
+        // (no first part twice: not 2 and 7 / 2 and 3 - critic r3 m2. Critic r2 n5's parts 3+ and r3 m2's whole 6+ are lifted by
+        // the lead's order 2026-11-08 below - they left too few wholes for two items at every seed)
+        // (lesson 2 E24b at every seed, lead's order 2026-11-08: within 10, parts 1 or more - parts 3+ and a whole of 6+ left 1-3
+        // pairs of wholes 3 apart, and seed 5 dealt 9 / 10)
+        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 1, partMin: 1, maxNum: 10, distinctFirst: true },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
         // (OWNER RULING 2026-11-08, E24b: the Prerequisite Check's + facts are within 20 and do NOT cross ten - a teen and ones,
         // 12 + 5 - so they never draw from the lesson's crossing-ten story pool: the 20 facts (parts 2-9) are the stories' alone,

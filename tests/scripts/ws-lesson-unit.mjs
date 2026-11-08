@@ -69,6 +69,14 @@ const LATE = {
         // (Practice 1's set taken from a whole-pack solution: its zone sizes, and the pack's spent keys left out)
         const r = PS.solvePracticeFromPack(d, { partMin: 2, noPart: [10], sums: [20] }, ['9+6', '6+9'], 4242);
         ok(!!r && r.at.length === 4 && /^(\d)\+\1$/.test(r.edge[0]) && !r.at.concat(r.edge).some((k) => k === '9+6' || k === '6+9'), 'pack-feasible: solvePracticeFromPack gives 4 stories + an equal-parts edge, none spent');
+        // (lead's order 2026-11-08, attempt 5: the count above was green while the deal failed at seeds 2 and 5 - each place is
+        // modelled from its OWN source: P0's count / bond ranges, the chart's case pools, Practice 1's solved set)
+        if (typeof PS.placeSources !== 'function') { ok(false, 'pack-feasible: pack-solve.js placeSources models each place from its own item source'); return; }
+        const bad = [];
+        for (const s of seeds) { const rs = PS.placeSources(d, s); for (const x of rs.filter((y) => !y.ok)) bad.push(`seed ${s} ${x.place} (${x.source}): ${x.why}`); if (process.argv.includes('--verbose')) log(`  seed ${s} sources: ${rs.map((x) => `${x.place} ${x.source} ${x.ok ? 'ok' : 'FAIL'}`).join('; ')}`); }
+        eq([...new Set(bad.map((b) => b.replace(/^seed \d+ /, '')))], [], `pack-feasible: every place keeps its own item source at seeds 1-25 + 4242 (${bad.length} place-seeds short)`);
+        const srcPs = fs.readFileSync(path.join(ROOT, 'js/modules/sheet/roles/lesson.js'), 'utf8');
+        ok(/Array\.isArray\(main\.hardAvoid\) \? \[Object\.assign\(\{\}, main, data\[k\]\.ref\)\]/.test(srcPs), 'pack-feasible: roles/lesson.js sources gives a hard-bound lesson\'s case pools the whole main ref (its avoid keys too)');
     },
     // (E24b attempt 2, lesson 2: the GREEDY deal order left Practice 1 the near twins 7 + 4 / 8 + 5 at seed 4242 though a set
     // without them existed. A `solve` sheet's stories are solved before it is dealt (print-sheet.js solveStoryFacts) and the
