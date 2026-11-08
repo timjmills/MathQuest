@@ -40,6 +40,8 @@ Lessons 6 (g4-nbt1-ten-times-value) and 7 (g3-oa8-two-step-wp) are the compiler'
   pool-capacity`, then the 25-seed `ws-detailed-lesson --sweep`. A pack that needs every fact of its pool fails at some seed.
   If a set exists but the greedy deal misses it, give the Practice sheet `solve` (its stories solved first, the generator pinned
   to them - print-sheet.js solveStoryFacts, page-deal.js setDealPin): `ws-lesson-unit --only solve-story` (lesson 2, attempt 2).
+  A pack that needs nearly every fact of its pool (lesson 2: ~18 of 20) is not fixed by solving one page first - the shortage
+  moves to the next page (lesson 2 solve-first, 2026-11-08): count the WHOLE pack in node per seed, then solve it jointly or widen the data.
 - `property` (from lesson 3a, LP-FAMILY-REPEAT): size the Practice cell from the families the pack needs (owner ruling: full-width
   cells, one item a row, arrays up to 6 x 6), never the families from the cell; every dealt ref keeps one spare fact family
   (the x 2 check: 2 x 6 to 2 x 10 for four items). Note: arrays past 5 a row fail gate E27 (rows of at most 5) until lf-checks reads the ruling.

@@ -9,6 +9,7 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
+- Lesson 2 E24b solve-first (2026-11-08): STOPPED (rule 7). Solving Practice 1 first clears Practice 1 at every seed tried, but the pool (20 facts; the pack needs ~18 under LR-5 / LR-6) moves the twins to P0 (seeds 1, 2, 5) and Guided (4242); seeds 3-4 time out. Not committed; patches in design/lessons/proof/live-2026-11-08/. Next: a whole-pack solver or an owner data decision (wider parts / sums, or fewer places).
 - LIVE: lesson 2 attempt 2 is master 5404c6477 (lead's gates green). Stopped for the week; next week starts with lesson 2 solve-first.
 - Lesson 2 E24b attempt 2: fixed at seed 4242 (solveStoryFacts + setDealPin, lesson 2 only), on `claude/sweet-newton-c8wrv1-lf-engine-live-l2` 444c50d4 (from master 5cbe360d2) - sent to the lead. Seeds 1-3 still infeasible (no valid Practice 1 after the chart, Guided, exit and Check Question deal): next step solve Practice FIRST and add its set to `used`; node count of valid pages per seed before any render. Session $184.88 ≈ 9.2 %.
 - LIVE: master 5cbe360d2 (lesson 3a owner rulings + lesson 2 parts 2-9; lead's gates green). Stopped for the week; next week starts with lesson 2 attempt 2 (pin the generator's case - sum and parts - not the exact fact).
