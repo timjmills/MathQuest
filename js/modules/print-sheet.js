@@ -83,10 +83,28 @@ const PAGE_CAP = Object.freeze({
  * A div_facts across fact printed over its answer line (equation.js acrossBelow reads the payload's `mix`: paper only,
  * the screen keeps the line beside) - critic r5 R5-2 / R5-6.
  */
-function factUnder(g) {
+function factUnder(g, extra = { under: true }) {
     const c = g && g.q && g.q.cell;
     if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact) return g;
-    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { mix: true, under: true }) }) }) });
+    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { mix: true }, extra) }) }) });
+}
+/**
+ * div_facts' fade packet (owner 2026-11-08, critic r5 R5-6 / facts card F4): every stage prints the fact over its line (one
+ * answer form) left-anchored at one x (`left`); the bare last stage puts the line at the cell foot (`under`) as the
+ * supports-off page does.
+ */
+function factFade(g, sec, fw) {
+    const sup = sec && sec.skills && sec.skills[0] && sec.skills[0].opts && sec.skills[0].opts.support;
+    return factUnder(g, Object.assign({ left: true, fw }, Array.isArray(sup) && sup.length ? {} : { under: true }));
+}
+/** The em width of a stage's widest fact sentence ("a ÷ b ="), so every fact block of the stage, and its line, is one width. */
+function fadeFactEm(gen) {
+    let w = 0;
+    for (const g of gen) {
+        const p = g && g.q && g.q.cell && g.q.cell.payload;
+        if (p && p.fact) w = Math.max(w, 0.56 * (String(p.a).length + String(p.b).length) + 2 * 0.8 + 3 * 0.18);
+    }
+    return Math.round(w * 100) / 100 || null;
 }
 /** Is this section div_facts alone, in its Standard (across) form, with no support drawn on any fact? */
 function divFactsPlainSection(sec) {
@@ -1453,7 +1471,15 @@ function fadeStages(sec, n) {
         const alts = alternativesOf(fadeTo(chosen, level));
         return alts.length ? alts.reduce((a, b) => (b.length > a.length ? b : a)) : [];
     };
-    return Array.from({ length: k }, (_, j) => Object.assign({}, sec, {
+    // (owner 2026-11-08, div_facts r5 R5-6: div_facts' packet prints one answer form - the fact over its line - with the fact
+    // left-anchored at one x, and its rows are never stretched past what they hold: `divFade`, `noStretch`)
+    const divFade = sk.categoryId === 'division' && sk.skillId === 'div_facts';
+    // (the bare last stage at S takes the supports-off page's 4 columns: left-anchored S facts in a third of the page left
+    // a 37-42 % band right of the line, H13)
+    // (and keeps the page's row fill - its line sits at the cell foot, so the taller row is writing room, not an H13 band;
+    // 12 unstretched S rows used 28 % of the page, PG-23, and a larger count breaks DN-2's half-of-the-fullest-page)
+    const bareCols = (j) => (divFade && n.size === 'S' && (!sec.columns || sec.columns === 'auto') && !stage(fadeLevel(j, k)).length ? { columns: 4, noStretch: false } : {});
+    return Array.from({ length: k }, (_, j) => Object.assign({}, sec, divFade ? { divFade: true, noStretch: true } : {}, bareCols(j), {
         pages: 1,
         fadeStage: fadeLevel(j, k),
         skills: [Object.assign({}, sk, { opts: Object.assign({}, sk.opts || {}, { support: stage(fadeLevel(j, k)), cover: 'whole' }) })],
@@ -2567,7 +2593,7 @@ function heightClassOf(sec, items, gridMm) {
     if (sec.heightClass) for (const it of items) if (it) it.hClass = true;
 }
 
-const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows });
+const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows, ...(section.noStretch ? { noStretch: true } : {}) });
 
 /**
  * The column-work group a practice page splits off (practice.js fineSplit), exactly as the role
@@ -3029,7 +3055,8 @@ async function buildSheetDeal(req = {}) {
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
-        const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra)).map((g) => (sec.divUnder ? factUnder(g) : g));
+        const gen0 = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
+        const gen = sec.divFade ? gen0.map((g, _i, all) => factFade(g, sec, fadeFactEm(all))) : gen0.map((g) => (sec.divUnder ? factUnder(g) : g));
         const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt, stage: sec.fadeStage };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
@@ -3639,7 +3666,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}) })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}), ...(s.noStretch ? { noStretch: true } : {}) })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,

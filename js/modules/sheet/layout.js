@@ -134,6 +134,8 @@ export const FILL_CAP = 1.8;
  * (items) where the role's count allows, else stays under the grid.
  */
 export const CONTENT_FILL = 1.5;
+/** `noStretch` sections (div_facts' fade packet, owner 2026-11-08): a row takes its measured height and this much room. */
+export const NO_STRETCH_ROOM = 1.25;
 export const CELL_PAD_MM = 7;
 export const fillLimit = (h) => (h > 0 ? Math.min(FILL_CAP * h, CONTENT_FILL * Math.max(1, h - CELL_PAD_MM) + CELL_PAD_MM) : h);
 /** Page fill: the practice roles take more rows when less than this share of the grid is used. */
@@ -872,7 +874,9 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     // grid under the rows (a page of tiny problems held to DN-1's 20), the rows take up to
     // FILL_CAP x their measurement instead - the page is filled before a strip is left.
     let cellH = r3(capped ? Math.min(even, fillLimit(hMin)) : even);
-    if (capped && rows * cellH < 0.8 * G) cellH = r3(Math.min(even, hMin * FILL_CAP));
+    // (`noStretch`, owner 2026-11-08: div_facts' fade packet - a page under 80 % full keeps rows sized to what they hold)
+    if (capped && rows * cellH < 0.8 * G && !section.noStretch) cellH = r3(Math.min(even, hMin * FILL_CAP));
+    if (capped && section.noStretch) cellH = r3(Math.min(even, hMin * NO_STRETCH_ROOM));
     // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
     const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
     // (and to what THESE items measure: the skill's floor sized the page's rows for its tallest item - a K story with a
