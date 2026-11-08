@@ -1703,6 +1703,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-fixture-svg-black",
+   "check": "ws-empty-band reads black SVG ink (critic eb-r2 D7: rgb(0, 0, 0) was classed as transparent, so a black array drawing read as a 60 % band and the pin was inflated): a black drawing with ~44 mm empty under it FAILS, the same drawing filling its cell passes",
+   "kind": "fixture",
+   "rule": "ws-empty-band measureCells paints() + EB-BAND",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/svg-black.fail.html",
+    "state": "seeded: black SVG array + answer box in a 100 mm cell"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/svg-black.pass.html",
+    "state": "the same in a 60 mm cell (FAILED before the D7 fix: band read \"above\" the invisible drawing)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

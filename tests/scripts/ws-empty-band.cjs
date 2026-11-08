@@ -101,7 +101,9 @@ function measureCells(scope) {
                 const st = getComputedStyle(d);
                 const ownText = !(d instanceof SVGElement) && [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
                 const stroked = (parseFloat(st.borderTopWidth) > 0 && st.borderTopStyle !== 'none') || (parseFloat(st.borderBottomWidth) > 0 && st.borderBottomStyle !== 'none') || (parseFloat(st.borderLeftWidth) > 0 && st.borderLeftStyle !== 'none');
-                const paints = (v) => v && v !== 'none' && !/^rgba?\([^)]*,\s*0\)$|transparent/.test(v) && !/^(#fff(fff)?|white|rgb\(255,\s*255,\s*255\))$/i.test(v);
+                // transparent only when its ALPHA is 0 (critic eb-r2 D7: the old pattern also matched rgb(0, 0, 0), so black
+                // SVG ink was invisible); white paints nothing on white paper
+                const paints = (v) => !!v && v !== 'none' && v !== 'transparent' && !/^rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(v) && !/^(#fff(fff)?|white|rgb\(255,\s*255,\s*255\))$/i.test(v);
                 const svgInk = d instanceof SVGElement && SHAPES.test(d.tagName) && (d.tagName.toLowerCase() === 'text' || paints(st.stroke) || paints(st.fill));
                 const drawn = !(d instanceof SVGElement) && /^(img|canvas|input)$/i.test(d.tagName);
                 const slot = d.hasAttribute('data-ws-slot');
@@ -172,6 +174,7 @@ async function main() {
             for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
             const vSize = ['L', 'M', 'S'].find((z) => SIZES.includes(z)) || SIZES[0];
             for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
+            if (!plan.cards.length) notes.push(`${key}: no signed card - EB-ROLE not judged (default roles)`);
             notes.push(`${key}: card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
             for (const j of jobs) {
                 const b = await page.evaluate(async ({ categoryId, skillId, j, SEED }) => {
@@ -224,7 +227,8 @@ async function main() {
                         return null;
                     } catch (e) { return 'ERR ' + String((e && e.message) || e).slice(0, 150); }
                 }, { c: categoryId, k: skillId, host, SEED, OPTS });
-                if (!ok || /^ERR/.test(ok)) { notes.push(`${key} ${host} ${w}: not rendered (${ok})`); continue; }
+                // a host that does not render is a failure, like a host that reads no cell (critic eb-r2 D9)
+                if (!ok || /^ERR/.test(ok)) { F('EB-READ', `${key} ${host} ${w}px`, `the host did not render (${ok})`); continue; }
                 await new Promise((r) => setTimeout(r, 450));
                 const cells = await page.evaluate(measureCells, ok);
                 renders++; cellsRead += cells.length;
