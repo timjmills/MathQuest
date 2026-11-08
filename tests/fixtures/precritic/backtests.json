@@ -2112,6 +2112,88 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-r2-band-h13",
+   "check": "ws-options-verify --render --bands --band-h13 (opt-in): on a band page an H13-ABS finding fails on its own (30 % of the full cell), never excused as 'the default page has it too'",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --band-h13 (critic lf-placevalue r2 N5)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "value band=9999 L: 12 items 3x4, every cell 36-38 % empty under the worth line (the comma track on the table line height made each row 1.7 mm taller, so the page fill stopped at 4 rows)"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "the comma track takes the digits line height: value band=9999 L 18 items 3x6, no H13-ABS"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:value --sizes L --bands --band-h13 --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-cell-h13-abs",
+   "check": "ws-cell-checks --h13-abs (opt-in): H13-ABS on every --card-opts option page (30 % of the full cell)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks H13-ABS (critic lf-placevalue r2 N6)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "unit_form rename=more S / M: 16 one-line items in 2 x 8 half-width cells of 23-26 mm, 36-44 % bands"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "rename frames are one full-width row a line (rowOnly): S 1 x 15, no band"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:unit_form --card --card-opts --h13-abs --opt-roles independent --rules H13-ABS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-review-one-layout",
+   "check": "ws-print-lint --roles review with the lane's opt-in H13-ABS / GRID-EVEN-ALL (the precritic review rows opt-in-rules.json adds): one layout in a mixed review section",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 / H13-ROW / H13-ABS on the review role (critic lf-placevalue r2 N7)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "unit_form review S: the mixed combine cells 3 across, '700 + 1 = ___' one line beside '600 + 10 + 1 / = ___' two (H13-ROW x6, cells 11 / 12 / 15)"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "3-across combine frames wrap inside a ghost-wide box: every cell one geometry, 0 findings"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills placevalue:unit_form --roles review --size S --rules H13-ABS,GRID-EVEN-ALL --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-red-no-baseline",
+   "check": "ws-coverage-matrix --red-no-baseline PAGEFILL,H5 --rule-skills (opt-in): a lane's own row with a PAGEFILL / H5 finding and no baseline entry is RED, not PENDING(no-baseline)",
+   "kind": "commit-pair",
+   "rule": "ws-coverage-matrix --red-no-baseline (critic lf-placevalue r2 N8)",
+   "browser": true,
+   "pending": true,
+   "pendingReason": "the fix is in sheet/layout.js resolveSectionLayout (not a lane file): a footprint cannot say '1 column on Auto, 2 when asked'; set pass.commit when the engine change lands (the fail state runs today: RED on 5aadc52d and on dca16b12)",
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "expand / unit_form more-cols2: 1 column, 4 items, PAGEFILL at S / M / L"
+   },
+   "pass": {
+    "commit": null,
+    "state": "engine change not built (layout.js)"
+   },
+   "command": "node tests/scripts/ws-coverage-matrix.cjs --skills placevalue:expand,placevalue:unit_form --rows 'placevalue:expand|single/more-cols2+short,placevalue:unit_form|single/more-cols2+short' --baseline design/audit/matrix/baseline.json --red-no-baseline PAGEFILL,H5 --rule-skills placevalue:expand,placevalue:unit_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
