@@ -456,7 +456,8 @@ export const LESSONS = Object.freeze({
         vocab: [
             { word: 'value', meaning: 'what a digit is worth', picture: { kind: 'text', text: '6 → 600' } },
             { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
-            { word: 'worth', meaning: 'how much it is', picture: { kind: 'text', text: '600' } },
+            // critic r3b G1: 'worth' meant the same as 'value' (two right matches); the third word is 'digit'
+            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
         ],
         steps: [
             { icon: 'look', text: 'Find the underlined digit.' },
