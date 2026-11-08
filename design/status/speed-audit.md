@@ -833,3 +833,39 @@ that are not blocking on the lesson path. Lane paused by the owner after r1; fix
 | critic r1 FAIL (min 1; 4 without EA) | pick3 declined error analysis (choice slot); Match 3 EA drew the key as the wrong work; bank words not delimited; answer place moves; screen picture text 6-9 px; look-alike pairs; 4 pictures at 6 | V-EA (every role the card offers renders, shown work differs from the key on a Fix item); V-BANK (no bank line holds two words without a divider); L-SLOTPOS (slot position and width equal across a section); a screen picture floor (picture text >= 14 px); V-CLASH (pictures sharing a mark are notWith) | render pictures at the smallest real host widths; run precritic against the card's offered roles; one seed across grade and lesson renders so rounds diff |
 | r3 rebuild (fresh builder, rule 5) | 5 survivors each got a check that FAILed on r2 code and passes (V8-V11, + V12 / V13); precritic r5 3 FAIL: 2 from master's fact-rows.js opEm TDZ (facts lane), 1 sibling-compare (first family); my critic render found Match 3 guided at S overflowing - not on precritic's path | render-gate on every offered role (see LESSONS_LEARNED lf-vocab last row) | **The next lesson's vocabulary page must check first:** (1) ws-vocab-unit (V1-V13) on its word set; (2) ws-grade-render --gate --roles independent,more-practice,test,guided,error-analysis at S, M and L for both picture skills with that set's vocabSet; (3) the lesson part vocab-page rendered at the lesson's grade, its footer naming the set's grade |
 | r4 small round + critic r3 FAIL (min 6) | Guided overflow fixed with a static hMm, which turned it into H13 emptiness at S/L. Also: error-analysis 2 a page with 35-40 % bands; worksheet-1280 tile layout (3rd round); guided Score not per word; grow/sequence (a deliberate notWith omission); grade 4 lines short; base-ten scales; ambiguous hint; pilot frame on the other sets' lesson renders. Precritic was green apart from sibling-compare and one card-ruled S-not-more pin. | An H13 row-ink empty-band scan per cell on every offered role and host; drawn height vs footprint hMm (±10 %); V11 on every role; a look-alike list that FAILs on removal; line length vs the widest bank word; hint uniqueness; base-ten unit equality; guided row equality at S/M/L; worksheet tile structure equal | **Check first next time:** (1) the empty-band scan and the drawn-vs-footprint check on guided, error-analysis and worksheet-1280 BEFORE spending a critic; (2) a fix for overflow is checked for emptiness in the same run; (3) render each lesson set in its own lesson. Rule 5: worksheet tile layout and guided row equality survived 3 rounds, so stop and hand over the root cause |
+### lf-checks · critic r1 (2026-11-07, FAIL 7 / 7 / 8 / 8: the lesson precritic checks)
+
+Full report: design/status/lf-checks/critic-r1.md.
+
+**Automatic checks** (what would have caught each finding):
+
+| Finding | Check | State |
+|---|---|---|
+| D1 LP-GIVEAWAY counted `data-ws-level` as a hint, so Guided = Independent passed; the row stayed green on other defects | backtest rows name each cited defect (a `failNames` substring list); a FAIL that lacks one fails the row | proposed (ws-backtest) |
+| D2 LP-NUMBERS flagged "(7000 or 7,000)", a deliberate accepted-answers quote | the checks run on every PASSED lesson's packet (known-true corpus); a new FAIL there is ruled real or false before it is accepted | done by hand this round; proposed as a self-test |
+| D3 seeded LP-PREREQ fixture seeded a trace, the real D8 is an exchange box | seed the DOM, not the packet (`--packet-html`), so the extractor is in the proof | proposed |
+| D4 hand-edited pass fixtures not reachable states (story vs pool) | fixture-consistency lint: story numbers match the pool item | proposed |
+| D5 an empty read passed 7 of 8 checks | `lpChecks` fails "nothing read" on 0 pupil pages / 0 cells / no pool; self-test case | built (self-test 30 cases) |
+| n8 PDF pages vs packet pages | lpRaster asserts the counts are equal | built |
+
+**Speed-ups:** a tool critic grades from the builder's saved packets (`--packet-out`, 0.2 s re-checks) and renders only a
+sample; `ws-backtest --kind fixture` spends 21 min in older browser fixture rows: a `--fast` filter (rows without
+`browser: true`) gives the lesson rows' proof in under 5 s; other lanes' browser runs held both slots for ~4 of 9 minutes
+of the critic's live runs.
+
+### lf-checks · critic r2 (2026-11-07, FAIL 7 / 7 / 8 / 8; lane stopped by rule 7)
+
+Full report: design/status/lf-checks/critic-r2.md.
+
+**Automatic checks:** one backtest row per rule a tool header names, FAILing on that rule alone (ws-precritic-plan parses the
+header) - PC-CLIP had none and could not see its D10; a fixture-consistency lint over every `*.pass.json` (story = pool, key
+working = story, place-value digit present, one right answer) - the surviving defect; a new blocking gate is run once on head
+before commit and its red rows recorded (R-n) in the status file; a known-true corpus self-test for PC-NAME / PC-RANGE; a
+"read nothing" guard in ws-lesson-samples (built).
+
+**Speed-ups:** save fail-side packets of the phase-0 rows so a critic re-judges offline; run the content seeds of
+ws-lesson-samples --check in parallel pages (about 1 min, not 3.5); freeze or tag the graded head before the critic starts
+(two pushes landed mid-round).
+
+**Root cause of the stop:** hand-edited pass fixtures. Rule for every checks lane: a pass state is a commit (or a fixture
+re-rendered from a commit), never a packet edited by hand; where no fix commit exists yet, the row's pass side is pending.

@@ -129,6 +129,12 @@ export function dealAt(key, n, at, weights = null) {
 // is a plain draw from the seeded rng instead: nothing cached, so the page still reproduces.
 let _redraw = false;
 export function setRedraw(on) { _redraw = !!on; }
+// (`setDealPin`, the detailed lesson maker - lesson 2 E24b attempt 2: a Practice page whose stories are SOLVED before it is
+// dealt asks the story generator for one of the solved pairs - `values` - under the deal key `key` ('wp:add:20'); freshDeal
+// then returns one of them, drawn from the item's seeded random. Set and cleared round ONE generateQuestionFor call by
+// print-sheet.js generateRun; never set anywhere else, so every other deal is unchanged.)
+let _pin = null;
+export function setDealPin(key, values) { _pin = key && Array.isArray(values) && values.length ? { key, values } : null; }
 function redrawIndex(n, weights) {
     n = Math.floor(Number(n));
     const w = Array.from({ length: n }, (_, i) => {
@@ -195,6 +201,7 @@ export function dealPick(key, list, weights = null) {
 const _freshCursors = new Map();
 export function freshDeal(key, draw, o = {}) {
     if (_redraw) return draw();
+    if (_pin && _pin.key === key) return _pin.values[Math.floor(Math.random() * _pin.values.length) % _pin.values.length].slice();
     const sigOf = o.sig || ((v) => JSON.stringify(v));
     const tagsOf = o.tags || (() => []);
     const caps = Array.isArray(o.caps) ? o.caps : [];
