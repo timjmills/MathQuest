@@ -604,3 +604,6 @@
    Only div_facts' packet emits .ws-eq-left. */
 .ws-page .ws-grid > .ws-cell[data-ws-cell]:has(> .ws-tab, > .ws-letter):has(.ws-eq-left):not(.blankrun) {
     padding-left: max(calc(var(--ws-tab, 5mm) * 1.4 + 1.3mm), calc(var(--ws-ko, 6mm) + 0.3mm)) !important; --mq-fx: 0mm; }
+/* (at L the packet's one x stays the earlier inset plus the fade margin - the bare page prints in 2 columns of 92 mm, where the
+   w2 inset alone left a 33-37 % band right of the fact, H13; S and M keep the w2 inset alone, their 3-column cells need it) */
+.ws-page.ws-L .ws-grid > .ws-cell[data-ws-cell]:has(> .ws-tab, > .ws-letter):has(.ws-eq-left):not(.blankrun) { --mq-fx: calc(var(--ws-tab, 6mm) * 1.5 - 2mm); }
