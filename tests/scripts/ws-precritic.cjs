@@ -54,6 +54,8 @@
 //               values; the provider's wrongAnswer fits the item's answer boxes; pins in
 //               tests/fixtures/precritic/node-lint-s1.baseline.json), and ws-presets-unit checks that every preset's
 //               items obey its preset values
+//             ws-empty-band --skill (lead 2026-11-08, L22: every role the signed card offers at S / M / L + its option
+//               variants + the screen hosts, measured for empty bands under / beside the ink and drawn height vs footprint),
 //             ws-grade-render --gate (visual-quality critic r1, 2026-10-31: the lane skills' lesson, test and independent
 //               pages at S / M / L must not overflow - content run into a cell's pad counts - and no card-390 / card-820
 //               touch target may be under 44 px, H6),
@@ -680,6 +682,10 @@ function buildPlan(ctx) {
         if (presetTouch.length) add(gate('presets', 'ws-presets-unit', `${presetTouch.length} preset / host skill(s)`, 'browser', 'ws-presets-unit', []));
         // critic 2026-10-30 (WRM Y4 lessons F1, GATE-DRIFT): a skill, option or preset change can turn a site-lesson claim false;
         // every year's lessonfit runs on any skill scope (node, about a minute)
+        // the ONE shared empty-band check (lead 2026-11-08, LESSONS_LEARNED L25): every role the skill's signed card offers
+        // at S / M / L, its option variants, and the screen hosts (card 390 / 820 / 1280, worksheet, quiz), measured for
+        // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json
+        add(gate('empty-band', 'ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × S/M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(',')], { missingMsg: 'ws-empty-band is not in this tree' }));
         add(gate('lessonfit', 'ws-lessonfit (WRM site lessons, every year)', 'site lessons Y1, Y4, Y6', 'node', 'ws-lessonfit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it
         // runs as a NODE gate, as ws-deploy-gates.sh runs it: wrapping it in the runner would hold a slot while its own

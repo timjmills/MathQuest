@@ -3,12 +3,15 @@ Title: Lessons-first wave 1: the lesson precritic checks, backtests and gate hyg
 Session: session_013pHDnLVzZVKhyoyiPRYBZA (launched by the lead session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-lf-checks
 Owner of files: tests/lib/ws-lesson-lp.cjs (new), tests/scripts/ws-detailed-lesson.cjs, ws-precritic.cjs (lesson scope), ws-precritic-plan.mjs (lesson rows), ws-deploy-gates.sh (lesson rows, perf slots), tests/fixtures/precritic/backtests.json (rows appended) + lesson-* fixtures, design/lessons-first/units/_TEMPLATE.md, design/lessons-first/patches/lf-checks-to-lf-engine.md
-State: paused
-Updated: 2026-11-07
+State: building
+Updated: 2026-11-08
 Builder profile: — (the lane session builds; Opus 5.5, effort medium per the brief)
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
+- 2026-11-08 (lead, resumed, cap $60): ws-empty-band.cjs - the ONE shared empty-band / footprint check (L25) - built, on `ws-precritic --skill`;
+  FAILs on the three critic-failed heads (lf-vocab bebf5b36, lf-placevalue b28a0867 N5 / N6, lf-ops b23e418d div_facts S); add_facts OK against its pin.
+  Not independently critiqued yet.
 - STOPPED after critic r2 (rule 7): the hand-edited pass fixtures (r1 D4 -> r2 D2) survived two rounds. Root cause and check below.
 - Built and wired: LP checks (`ws-detailed-lesson --lp / --sweep`), PC checks (`ws-lesson-samples --check`, phase 0), `ws-precritic --lesson / --unit`,
   `ws-lessons-first-queue --build-only` (BUILD_QUEUE.md), deploy-gate lesson rows, perf run alone; 10 backtest rows PASS + 9 phase-0 rows pending lf-engine.
@@ -115,6 +118,7 @@ self-test; a backtest row per PC rule that FAILs only that rule (PC-CLIP has non
 Lane session cost_usd $20.33 at 07:56Z (the lead's reading of the session record); ≈ $32 at 08:45Z by scaling my token estimate to that reading, plus two critic sub-agents (~390k tokens) - about $40 in all, ≈ 1.4 % of the weekly limit ($28 ≈ 1 %); cap $100.
 
 ## Log
+- 2026-11-08 — ws-empty-band (EB-BAND 30 % of the cell, EB-SIDE 30 % of the width, EB-FOOT ±10 % on grid roles), roles from tests/lib/ws-card-plan.mjs (lf-ops, taken unchanged), pin design/audit/baselines/empty-band.json (add_facts, mult_facts: 55 keys - the passed fact family's guided / scripted-model / error-analysis pages carry real bands no gate rendered: e.g. add_facts guided S 33-41 %, scripted-model 63-67 %, also flagged by ws-print-lint H13; pinned so lanes are not blocked, listed for the facts lane), backtests-empty-band.json (4 rows, pending each lane's fix), LESSONS_LEARNED L25. Calibration: on today's head lf-placevalue's H13-ABS (35 % of H less Hw) FAILS the approved add_facts / mult_facts / sub_facts L pages (17.0 mm under 56.75 mm cells = 29.96 %); every critic-failed band is 32-57 %; so EB-BAND uses H13's 30 % of the full cell - lf-placevalue may align H13-ABS to it.
 - 2026-11-07 — critic r2 FAIL; small fixes after it (not re-graded); stopped per rule 7; hand-over to the lead.
 - 2026-11-07 — lead's asks: --build-only BUILD_QUEUE.md (owner order), phase-0 checks D1-D10 (ws-lesson-samples --check, print-lint blocking rows, backtests-phase0.json), lf-engine's (a) ws-lesson-unit / ws-lesson-coverage on the lesson scope, chartSizing[] read by LP-FALLBACK.
 - 2026-11-07 — build: LP checks, --lp / --sweep / --packet / --raster, precritic --lesson / --unit, 10 backtests, deploy-gate rows, units template, lf-engine patch; bisected R1 / R2; critic r1 launched.
