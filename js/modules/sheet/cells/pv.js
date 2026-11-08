@@ -360,7 +360,13 @@ function frameHTML(ctx, text, key, digits, ghostExpr = '') {
                 + `<span style="grid-area:1 / 1;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;row-gap:2mm;">${units(c)}</span>`
                 + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;row-gap:2mm;">${units(ghostExpr)}</span></span>`;
             const head3 = chunks.map((c) => (c.includes(' ') ? (ghostExpr ? ghostUnits(c) : units(c)) : piece(ctx, c))).join('');
-            return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${head3}${grp}</div>`;
+            // (lf-placevalue r3, H13-ABS combine band=99: a two-part frame "30 + 6 = ____" is one short line, and three
+            // across at S the dense rows stretch it into a 35 % empty band under the ink. Three or more across, a
+            // frame of at most two parts puts "= ____" on its own line under the parts: the cell is as tall as its
+            // two lines of ink, the type never smaller)
+            const nParts = (ghostExpr ? ghostNums : String(chunks.join(' ')).trim().split(/\s+/).filter((w) => /^\d/.test(w))).length;
+            const brk = nParts <= 2 ? '<span class="pv-break" style="flex-basis:100%;height:0;"></span>' : '';
+            return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${head3}${brk}${grp}</div>`;
         }
         const head = chunks.map((c) => (exprOnly && ghostExpr && c.includes(' ') ? (split ? splitPair(c) : ghostPair(c))
             : c.includes(' ') ? `<span class="pv-pair" style="${nb}">${piece(ctx, c)}</span>` : piece(ctx, c))).join('');
@@ -513,8 +519,16 @@ function expandHTML(p, ctx) {
         // wrap, only between its units: "4,230 =", the first box, then "+ [ ]" pairs - the sign starts its line and never
         // ends one (WRAP-OP), and a box never parts from its sign. A row that fits stays one line.
         const nb = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;';
-        const units = [`<span class="pv-pair" style="${nb}"><span>${esc(fmt(p.n))}</span><span class="o">=</span></span>`]
-            .concat(boxes.map((b, i) => `<span class="pv-pair" style="${nb}">${i ? '<span class="o">+</span>' : ''}${b}</span>`));
+        // (lf-placevalue r3, H13-ABS expand band=99: three or more across, a 2-place row "47 = [ ] + [ ]" is one short
+        // line in a dense row stretched 35 % past it; there the number stands on its own line and "= [ ] + [ ]" under
+        // it, as combine's "30 + 6" / "= ____": the cell is as tall as its two lines of ink, the type never smaller)
+        const twoLine = parts.length <= 2 && Number(ctx.columns) >= 3 && !ctx.wrapToCell;
+        const units = (twoLine
+            ? [`<span class="pv-pair" style="${nb}"><span>${esc(fmt(p.n))}</span></span><span class="pv-break" style="flex-basis:100%;height:0;"></span>`,
+                `<span class="pv-pair" style="${nb}"><span class="o">=</span>${boxes[0] || ''}</span>`]
+            : [`<span class="pv-pair" style="${nb}"><span>${esc(fmt(p.n))}</span><span class="o">=</span></span>`]
+                .concat(boxes.slice(0, 1).map((b) => `<span class="pv-pair" style="${nb}">${b}</span>`)))
+            .concat(boxes.slice(1).map((b) => `<span class="pv-pair" style="${nb}"><span class="o">+</span>${b}</span>`));
         return `<div class="ws-eq pv-expand" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${units.join('')}</div>`;
     }
     // The kit's equation row: boxes bottom-aligned with the digits, `+` and `=` in 1 em slots (TY-25).
@@ -911,7 +925,17 @@ register('pv', {
             // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)
             // (`rowOnly`, critic r2 N6: unit form's one-line rename frames, one full-width row a line at every size)
             if (p.rowOnly) return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true, hardCap: true };
-            const wideIn = p.kind === 'expand' || p.kind === 'expand-line';
+            // (lf-placevalue r3, H13 side bands: at S a 2-place expanded row "47 = [ ] + [ ]" is a third of the full width - it
+            // may stand more across where the measured fit allows (three across it is drawn on two lines, expandHTML);
+            // M and L, and 3 places and more, keep the full-width row: two across the 2-column grid takes 8 rows, and
+            // their one line of ink left a 45 % band under it)
+            const wideIn = (p.kind === 'expand' && (nd > 2 || ctx.size !== 'S')) || p.kind === 'expand-line';
+            // (lf-placevalue r3, H13-ABS combine band=99 at S: a two-part frame is one 14.5 mm line, so the S dense page
+            // (30) stretched 3 x 10 rows 35 % past it, and its two-line form ("30 + 6" / "= ____", three or more across)
+            // in 5 x 6 rows held to the 82 % page fill left 33 %. Held to three across, the two-line cells take 3 x 9 rows
+            // as tall as their ink: 27 a page, every cell full)
+            const twoPart = p.kind === 'frame' && p.ghost && String(p.ghost).split(/\s+/).filter((w) => /^\d/.test(w)).length <= 2;
+            if (twoPart && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true };
             return { wMm: wideIn ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wideIn ? 1 : 2, denseRoom: 1, inPlace: true, ...(wideIn ? { hardCap: true } : {}) };
         }
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
