@@ -2134,6 +2134,26 @@
    }
   },
   {
+   "id": "pv-r3-band99-s",
+   "check": "ws-options-verify --render --bands --band-h13 (opt-in) on combine and expand band=99 at S: H13-ABS / H13 side bands on the 2-digit band page",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --band-h13 (lf-placevalue r3 small fix pass; brief items 2 and 3)",
+   "browser": true,
+   "fail": {
+    "commit": "ce2d4c96",
+    "state": "combine band=99 S: 3x10 one-line \"30 + 6 = ____\" cells, 7.9 mm (35 %) under the ink of a 22.4 mm cell; expand band=99 S: one 2-place row in a 184.9 mm cell, 63.3 mm (34 %) side band"
+   },
+   "pass": {
+    "commit": "064e243e",
+    "state": "combine: two-part frames held to 3 across at S, \"= ____\" on its own line, 3x9 cells as tall as their ink; expand: the 2-place row stands 3 across at S, the number over \"= [ ] + [ ]\""
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:combine,placevalue:expand --sizes S --bands --band-h13 --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "pv-r2-cell-h13-abs",
    "check": "ws-cell-checks --h13-abs (opt-in): H13-ABS on every --card-opts option page (30 % of the full cell)",
    "kind": "commit-pair",

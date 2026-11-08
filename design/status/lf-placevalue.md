@@ -70,6 +70,16 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-08 SMALL FIX PASS before critic r3 (builder, mq-opus-medium), 064e243e: (2) combine band=99 S: two-part frames held to
+  3 across at S (footprint hardCap 3) and, 3+ across, "= ____" on its own line: 3x10 one-line cells at 35 % -> 3x9 two-line cells
+  as tall as their ink; (3) expand band=99 S: the 2-place row may stand 3 across at S, the number over "= [ ] + [ ]" (S only: two
+  across, TWO_COL_ROWS 8 rows stretched M to 45 %). options-verify --band-h13 combine,expand FAIL (2) -> OK; backtest pv-r3-band99-s
+  PASS (fail ce2d4c96). (1) EB-FOOT on mixed-practice NOT a pv footprint: ws-empty-band pairs each cell with measured[fits[0].cols],
+  but mixed-practice's fits[0].cols is the LATTICE N (4 / 6), not the count across (identify L 2 across, measured[2] 45.0 = drawn
+  45.4; expand M 1 across, measured[1] 18.0 vs drawn 19.6) - the check's pairing (tests/scripts/ws-empty-band.cjs, lf-checks).
+  Left at the 30 % rules (band=99, independent / test / review): combine S EB-SIDE 32 % (two-line ink 26 mm in a 61.5 mm cell),
+  combine M independent EB-BAND 30.0 % and expand M EB-SIDE 33 % (pre-existing: TWO_COL_ROWS / full-width row), combine test L
+  EB-SIDE 30 % (pre-existing).
 - 2026-11-08 FRESH BUILDER r3 (rule 7, mq-opus-medium), commits 4a57b5c2..HEAD. N1-N4 FIXED (providers/pv.js, gen-pv.js): checks
   --pv-r2 N1..N4 FAIL on b28a0867 (23/2400, 120/160, 180/1800, 96/480) -> OK; backtests pv-r2-wrong-differs / printed-instruction /
   combine-parts / place-word-live armed (pass 4a57b5c2), PASS. N5-N8 checks BUILT (opt-in via opt-in-rules.json; default runs unchanged):
