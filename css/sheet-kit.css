@@ -548,9 +548,12 @@
    first content is a one-line equation row ("800 + 40 + 5 = ____", "405 = [ ] + [ ] + [ ]") is wider than the
    room beside the number tab and put its first digit inside the tab's keep-out. It takes the same fixed top
    spacer as the word-work / counters cells above (tab side - 2 mm), on the page and on the measuring cell, so
-   rows are sized with it. Cells that start with the numeral (identify, value) are unchanged. Additive. */
-.ws-page .ws-grid > .ws-cell:is([data-ws-cell="pv"], .mqt--pv, [data-ws-cell="pv-support"], .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not([data-ws-writeabove]):not(.blankrun)::before,
-.ws-sheet > .ws-cell:is(.mqt--pv, .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
+   rows are sized with it. Cells that start with the numeral (identify, value) are unchanged. Additive.
+   (2026-11-08, ws-detailed-lesson E11 / E9c: not on a cell marked pv-nospacer - a detailed lesson's refs, cellPayload
+   noTabSpacer - whose rows centre the equation clear of the tab; the spacer left lesson 1's Practice 1 rows 30 % empty
+   and, measured, cost its lesson sheet an item.) */
+.ws-page .ws-grid > .ws-cell:is([data-ws-cell="pv"], .mqt--pv, [data-ws-cell="pv-support"], .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not(:has(> :is(.pv-cell, .ws-cell-body > .pv-cell).pv-nospacer)):not([data-ws-writeabove]):not(.blankrun)::before,
+.ws-sheet > .ws-cell:is(.mqt--pv, .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not(:has(> :is(.pv-cell, .ws-cell-body > .pv-cell).pv-nospacer)):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
 
 /* 2026-11-07 (lf-placevalue r1 F8, L1; additive): the frame boxes of the five read-and-write skills (unit form, value in
    unit form / notation, expanded notation - class pv-hw) are the WRITING HEIGHT of the size (Hw + stroke: 6 / 8 / 10 mm),

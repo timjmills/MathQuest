@@ -4181,7 +4181,9 @@ async function buildRoleSheet(n, metaOf) {
     // (LR-6 across the skills of ONE page - the detailed lesson maker's Mixed page, refs with
     // `avoidKeys`; lesson 2 r4, critic r2 D2: no answer twice, no near twins, no story name or unit
     // word twice on the page. Each later skill is dealt against the items already placed.)
-    const pageLr6 = n.role === 'mixed-practice' && pools.some((p) => p.skills.some((s) => s.lr6)) ? new Set() : null;
+    // (and the detailed lesson's Prerequisite Check - `perQuestion`, lf-placevalue 2026-11-08: its questions are pools of one
+    // page, so a value item's 80 and a number name's 80 were twins E24b read; every other page deals as before)
+    const pageLr6 = (n.role === 'mixed-practice' || (n.role === 'pre-skill-check' && n.perQuestion)) && pools.some((p) => p.skills.some((s) => s.lr6)) ? new Set() : null;
     // A Mixed practice page (critic M1 r2) is dealt pool after pool against the fact families
     // already on the page, and its answer zones follow the widest fact DEALT: should a dealt item
     // be wider than the probe's, the page is dealt again at that width (seeded, so the same items).

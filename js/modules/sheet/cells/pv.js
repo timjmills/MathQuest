@@ -702,7 +702,10 @@ export function pvSlotsFromWork(p, value) {
 }
 
 function pvRender(p, ctx0) {
-    return pvRenderBody(p, ctx0);
+    const h = pvRenderBody(p, ctx0);
+    // (`noTabSpacer`, a detailed lesson's ref - cellPayload, 2026-11-08 ws-detailed-lesson E11 / E9c: its rows centre the equation
+    // clear of the number tab, so the CL-40 top spacer of sheet-kit.css is left off - on the page and on the measuring cell alike)
+    return p.noTabSpacer ? String(h).replace(/^<div class="pv-cell"/, '<div class="pv-cell pv-nospacer"') : h;
 }
 
 function pvRenderBody(p, ctx0) {

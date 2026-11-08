@@ -443,10 +443,13 @@ function genExpandCombine(q, skill, o) {
     const zero = wantZero(o);
     // lf-placevalue r1 F22: WHERE the zero goes (tens or ones of 305 / 350) is dealt down the page by the page dealer,
     // so no page holds only zero-tens items; the digits around it stay the seeded draw.
-    const zpos0 = zero && nd >= 2 ? 1 + dealIndex(`pv:${skill}:zeropos`, nd - 1) : -1;
+    // (ws-detailed-lesson E24, lead 2026-11-08: the position is drawn inside the fresh deal below, never fixed by the item's
+    // index - a lesson dealer that retries one index under new seeds must be able to reach the other zero position; the
+    // fresh deal's third tag spreads it, at most two of one position in the window, and an item with no zero tags NaN,
+    // which matches nothing)
     // lf-placevalue critic r2 N3: a 2-digit combine item with a zero place shows ONE part ("60 = ___", its own answer);
     // combine shows >= 2 parts at every band, so its zero place starts at 3 digits (305, 350).
-    const zpos = skill === 'combine' && nd < 3 ? -1 : zpos0;
+    const zeroOn = zero && nd >= 2 && !(skill === 'combine' && nd < 3);
     // ws-dealer-uniform PAGE (lf-placevalue): a number the page already holds is redrawn, and no
     // leading part (700) is dealt more than three times, nor its first two parts (700 + 20) twice, in
     // the last 19 items.
@@ -454,14 +457,14 @@ function genExpandCombine(q, skill, o) {
         let d = [];
         for (let t = 0; t < 60; t++) {
             d = digitsNumber(nd, {});
-            if (zpos > 0) d[zpos] = 0;
+            if (zeroOn) d[randInt(1, nd - 1)] = 0;
             const v = fromDigits(d);
             if (skill === 'combine' && d.filter(Boolean).length < 2) continue;
             if (v >= lo && v <= hi) return d;
         }
         return String(randInt(lo, hi)).split('').map(Number);
     };
-    let ds = freshDeal(`pv:${skill}:n`, draw, { sig: (d) => d.join(''), tags: (d) => [String(d[0]), d.slice(0, 2).join('')], caps: [3, 1] });
+    let ds = freshDeal(`pv:${skill}:n`, draw, { sig: (d) => d.join(''), tags: (d) => [String(d[0]), d.slice(0, 2).join(''), zeroOn ? String(d.indexOf(0, 1)) : NaN], caps: [3, 1, 2] });
     let n = fromDigits(ds);
     // ONE PART PER PLACE, zeros included (§2.4 rule 1): the box count never tells the pupil how
     // many non-zero parts there are, and the key writes the zero part.
