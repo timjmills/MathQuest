@@ -9,6 +9,7 @@
 //   node tests/scripts/ws-empty-band.cjs --skill a:b,c:d --sizes L --hosts none
 //   node tests/scripts/ws-empty-band.cjs --skill a:b --roles independent,guided --opts '{"band":20}'
 //   node tests/scripts/ws-empty-band.cjs --skill a:b --json out.json --report-only
+//   node tests/scripts/ws-empty-band.cjs --html <page.html>                   # measure a saved page as is (fixtures, no pin)
 //
 // WHAT IS RENDERED (the plan): the roles the skill's SIGNED spec card offers (tests/lib/ws-card-plan.mjs, lf-ops: §7a
 // "offered" page roles minus "hidden"), each at sizes S, M and L with the skill's defaults; the card's option variants on the
@@ -17,15 +18,17 @@
 // cannot compose for the skill is listed as "not composed", never passed.
 //
 // WHAT IS MEASURED, per kit cell ([data-ws-cell], top-level; print pupil pages; the B&W screen cell on a host):
-//   EB-BAND   the empty band UNDER the item: from the lowest ink (text, a drawing, a stroked / bordered box; an EMPTY answer
-//             slot counts as the item's own writing room, as in lf-placevalue's H13-ABS; the tab / letter label does not
-//             count) to the cell's inner bottom. FAIL at >= 30 % of the cell height (RUBRIC H13's 30 %), judged on EVERY cell
-//             of every role and host. Harmonised with H13-ABS (35 % of the cell less Hw): measured on today's head the
-//             approved fact pages sit at 29.96 % (17.0 mm under a 56.75 mm cell at L, so H13-ABS's 16.5 mm limit now FAILS
-//             them), while every critic-failed band sits at 34-57 % (lf-vocab Match 3 guided 34-37 %, error-analysis 35-40 %;
-//             lf-placevalue N5 43 %, N6 57 %): 30 % of the full cell separates the two classes, H13-ABS's limit does not.
+//   EB-BAND   the largest empty band in the cell - UNDER the lowest ink, ABOVE the highest, or BETWEEN two blocks of ink
+//             (critic eb-r1 D2) - at >= 30 % of the cell height FAILS (lead ruling 2026-11-08: RUBRIC H13's 30 % of the
+//             full cell is the shared rule; lf-placevalue's H13-ABS aligns to it). Ink is measured primitive by primitive: text
+//             line boxes, each painting SVG shape (not the whole <svg> box), images, bordered boxes, and every answer slot
+//             (an empty slot is the item's own writing room, as in H13-ABS); the tab / letter label does not count. Compared
+//             unrounded. NOT a separating threshold: approved fact pages sit at 29.8-34 % on some roles (add_facts independent
+//             L 29.8 %, test M 30.1 %, review 34.1 %) and critic-failed bands at 32-57 %; the lead ruled the approved ones
+//             real defects (facts-lane task), pinned below, so the rule is H13's and the pin carries the known debt.
 //   EB-SIDE   the content PINNED to one side (RUBRIC H13 "pinned to one side"): an empty band >= 30 % of the cell width on one
 //             side of the ink box while the other side has <= 10 %. A centred item (a fact in a wide screen card) is not a band.
+//   EB-ROLE   a role the signed card offers that buildSheet cannot compose for the skill (critic eb-r1 D3).
 //   EB-FOOT   the drawn height vs the footprint: the cell's needed height (top pad + ink + empty slots + bottom pad) against
 //             the hMm the bridge measured for the item at the page's column count (buildSheet items[i].measured[cols].hMm);
 //             FAIL when they differ by more than 10 %. Judged on the grid roles that lay out from that measure (independent,
@@ -50,7 +53,8 @@ const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
-if (!SKILLS.length || SKILLS.some((s) => !s.includes(':'))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
+const HTML = arg('html', null);
+if (!HTML && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
 const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
@@ -87,28 +91,34 @@ function measureCells(scope) {
             const cr = c.getBoundingClientRect(); if (cr.height < 10 * MM || cr.width < 10 * MM) return;
             const cs = getComputedStyle(c);
             const inner = { t: cr.top + parseFloat(cs.paddingTop) + parseFloat(cs.borderTopWidth), b: cr.bottom - parseFloat(cs.paddingBottom) - parseFloat(cs.borderBottomWidth), l: cr.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth), r: cr.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth) };
-            let box = null;
-            const take = (r) => { if (!r.width || !r.height) return; box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right }; };
+            // the ink, primitive by primitive: text line boxes, each SVG shape that paints (not the whole <svg> box: critic
+            // eb-r1 D2), images / canvases / inputs, bordered boxes, and every answer slot (the item's own writing room)
+            let box = null; const rects = [];
+            const take = (r) => { if (!r.width || !r.height) return; rects.push({ t: r.top, b: r.bottom }); box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right }; };
+            const SHAPES = /^(text|rect|circle|ellipse|line|path|polygon|polyline|image|use)$/i;
             for (const d of c.querySelectorAll('*')) {
                 if (d.closest('[data-ws-label], .ws-letter, .ws-tab') || !visible(d)) continue;
                 const st = getComputedStyle(d);
-                const ownText = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+                const ownText = !(d instanceof SVGElement) && [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
                 const stroked = (parseFloat(st.borderTopWidth) > 0 && st.borderTopStyle !== 'none') || (parseFloat(st.borderBottomWidth) > 0 && st.borderBottomStyle !== 'none') || (parseFloat(st.borderLeftWidth) > 0 && st.borderLeftStyle !== 'none');
-                const drawn = d instanceof SVGElement ? /^(svg)$/i.test(d.tagName) : /^(img|canvas|input)$/i.test(d.tagName);
+                const paints = (v) => v && v !== 'none' && !/^rgba?\([^)]*,\s*0\)$|transparent/.test(v) && !/^(#fff(fff)?|white|rgb\(255,\s*255,\s*255\))$/i.test(v);
+                const svgInk = d instanceof SVGElement && SHAPES.test(d.tagName) && (d.tagName.toLowerCase() === 'text' || paints(st.stroke) || paints(st.fill));
+                const drawn = !(d instanceof SVGElement) && /^(img|canvas|input)$/i.test(d.tagName);
                 const slot = d.hasAttribute('data-ws-slot');
                 if (ownText) { const rg = document.createRange(); rg.selectNodeContents(d); for (const r of rg.getClientRects()) take(r); continue; }
-                if (drawn || stroked || slot) take(d.getBoundingClientRect());
+                if (svgInk || drawn || stroked || slot) take(d.getBoundingClientRect());
             }
             if (!box) return;
+            // the largest empty band BETWEEN blocks of ink (merged vertical intervals)
+            rects.sort((a, b) => a.t - b.t); let between = 0, reach = rects.length ? rects[0].b : 0;
+            for (const r of rects) { if (r.t > reach) between = Math.max(between, r.t - reach); reach = Math.max(reach, r.b); }
             const H = inner.b - inner.t, W = inner.r - inner.l;
-            const hwVar = parseFloat(getComputedStyle(c).getPropertyValue('--ws-hw')) || 0;
-            const hw = /mm/.test(getComputedStyle(c).getPropertyValue('--ws-hw')) ? hwVar * MM : hwVar;
-            const below = Math.max(inner.b - box.b, 0);
+            const below = Math.max(inner.b - box.b, 0), above = Math.max(box.t - inner.t, 0);
             const gl = Math.max(box.l - inner.l, 0), gr = Math.max(inner.r - box.r, 0);
             // pinned to one side: the wide gap on one side, (almost) none on the other - a centred item is not a band
             const side = Math.min(gl, gr) <= 0.10 * (inner.r - inner.l) ? Math.max(gl, gr) : 0;
             out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
-                innerMm: +(H / MM).toFixed(1), belowMm: +(below / MM).toFixed(1), sideMm: +(side / MM).toFixed(1), hwMm: +(hw / MM).toFixed(1), innerW: +(W / MM).toFixed(1),
+                innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM,
                 neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || (c.classList.contains('mq-scell') ? 'screen-cell' : '') });
         });
     });
@@ -117,10 +127,32 @@ function measureCells(scope) {
 
 function judge(cells, where, F) {
     for (const c of cells) {
-        const lim = BAND * c.hMm;
-        if (c.belowMm >= lim) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${c.belowMm} mm under the ink of a ${c.hMm} mm cell (${(c.belowMm / c.hMm * 100).toFixed(1)} %; limit 30 % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
-        if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${c.sideMm} mm beside the ink of a ${c.wMm} mm wide cell (${Math.round(c.sideMm / c.innerW * 100)} %) [${c.tmpl}]`);
+        // compared unrounded (critic eb-r1 D5); rounded only for the message
+        const lim = BAND * c.hRaw;
+        const bands = [['under', c.belowMm], ['between the blocks of', c.betweenMm], ['above', c.aboveMm]].sort((a, b) => b[1] - a[1]);
+        const [where2, band] = bands[0];
+        if (band >= lim) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / c.hRaw * 100).toFixed(1)} %; limit 30 % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
+        if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `content pinned to one side: ${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.wMm} mm wide cell (${Math.round(c.sideMm / c.innerW * 100)} %) [${c.tmpl}]`);
     }
+}
+
+async function htmlMain() {
+    const findings = []; const F = (rule, where, msg) => findings.push({ rule, where, msg });
+    const app = await open({ seed: 1 });
+    try {
+        const sh = await app.browser.newPage();
+        await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+        await sh.goto(app.page.url(), { waitUntil: 'domcontentloaded' });
+        await sh.setContent(fs.readFileSync(path.resolve(process.cwd(), HTML), 'utf8'), { waitUntil: 'networkidle0', timeout: 60000 });
+        await sh.emulateMediaType('print');
+        const cells = await sh.evaluate(measureCells, 'body > section.ws-page, body > .ws-page');
+        if (!cells.length) F('EB-READ', HTML, 'no kit cell read');
+        judge(cells, path.basename(HTML), F);
+        for (const x of findings) console.log(`${x.rule} ${x.where}: ${x.msg}`);
+        console.log(`(${cells.length} cells)`);
+    } finally { await app.close(); }
+    console.log(`ws-empty-band: ${findings.length ? `FAIL (${findings.length})` : 'OK'}`);
+    process.exit(findings.length ? 1 : 0);
 }
 
 async function main() {
@@ -138,7 +170,8 @@ async function main() {
             const variants = Array.from({ length: Math.min(NVAR, vlist.length) }, (_, i) => vlist[Math.floor(i * step)]);
             const jobs = [];
             for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
-            for (const v of variants) jobs.push({ role: 'independent', size: 'L', opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent L {${v.option}: ${v.value}}` });
+            const vSize = ['L', 'M', 'S'].find((z) => SIZES.includes(z)) || SIZES[0];
+            for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
             notes.push(`${key}: card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
             for (const j of jobs) {
                 const b = await page.evaluate(async ({ categoryId, skillId, j, SEED }) => {
@@ -149,7 +182,9 @@ async function main() {
                         return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), cols, sections, measured: (r.items || []).map((it) => (it.measured && cols && it.measured[cols] ? it.measured[cols].hMm : null)) };
                     } catch (e) { return { error: String((e && e.message) || e).slice(0, 200) }; }
                 }, { categoryId, skillId, j, SEED });
-                if (b.error) { notes.push(`${key} ${j.tag}: not composed (${b.error})`); continue; }
+                // a role the signed card OFFERS that the app cannot compose is a failure, not a note (critic eb-r1 D3); with no
+                // card (the default role list) it is a note
+                if (b.error) { if (plan.cards.length && plan.cards[0] !== '--roles') F('EB-ROLE', `${key} ${j.tag}`, `the card offers it, the app does not compose it: ${b.error}`); else notes.push(`${key} ${j.tag}: not composed (${b.error})`); continue; }
                 const sh = await app.browser.newPage();
                 try {
                     await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
@@ -177,7 +212,7 @@ async function main() {
                         const st = window.state;
                         if (OPTS && window.setSetOptions) { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, OPTS, { silent: true }); }
                         if (host === 'card') { st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false; window.showView('gameView'); st.currentQ = window.generateQuestionFor({ category: c, skill: k, seed: SEED }); window.renderQuestion(); return '#gameView'; }
-                        if (host === 'worksheet') { st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 2; window.initWorksheet(); return '#worksheetView .mq-wspaper'; }
+                        if (host === 'worksheet') { st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 6; window.initWorksheet(); return '#worksheetView .mq-wspaper'; }
                         if (host === 'quiz') {
                             const q = window.generateQuestionFor({ category: c, skill: k, seed: SEED, itemIndex: 0 });
                             const questions = [{ id: 0, skillId: k, points: 1, questionData: window.quizQuestionData(Object.assign({ categoryId: c }, q)) }];
@@ -193,7 +228,8 @@ async function main() {
                 await new Promise((r) => setTimeout(r, 450));
                 const cells = await page.evaluate(measureCells, ok);
                 renders++; cellsRead += cells.length;
-                if (!cells.length) { notes.push(`${key} ${host} ${w}: no kit cell on the host (legacy screen item?)`); continue; }
+                // a host that reads no cell is a failure (critic eb-r1 D1: the card was silently unmeasured)
+                if (!cells.length) { F('EB-READ', `${key} ${host} ${w}px`, 'no kit cell and no screen cell (.mq-scell) read on the host'); continue; }
                 judge(cells, `${key} ${host} ${w}px`, F);
                 await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
             }
@@ -215,7 +251,7 @@ async function main() {
         for (const k of Object.keys(pin)) if (SKILLS.some((sk) => k.startsWith(sk + ' ')) && (counts[k] || 0) < pin[k]) notes.push(`pin ${k}: ${pin[k]} -> ${counts[k] || 0} (fixed: tighten the pin)`);
         for (let i = findings.length - 1; i >= 0; i--) if (!over.has(keyOf(findings[i]))) findings.splice(i, 1);
     }
-    const rules = ['EB-BAND', 'EB-SIDE', 'EB-FOOT', 'EB-READ'];
+    const rules = ['EB-BAND', 'EB-SIDE', 'EB-FOOT', 'EB-ROLE', 'EB-READ'];
     for (const n of notes) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);
@@ -224,4 +260,4 @@ async function main() {
     console.log(`ws-empty-band: ${bad ? `FAIL (${findings.length || 'nothing rendered'})` : 'OK'}`);
     process.exit(bad && !has('report-only') ? 1 : 0);
 }
-main().catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });
+(HTML ? htmlMain() : main()).catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });

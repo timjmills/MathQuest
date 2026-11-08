@@ -854,3 +854,11 @@ ws-lesson-samples --check in parallel pages (about 1 min, not 3.5); freeze or ta
 
 **Root cause of the stop:** hand-edited pass fixtures. Rule for every checks lane: a pass state is a commit (or a fixture
 re-rendered from a commit), never a packet edited by hand; where no fix commit exists yet, the row's pass side is pending.
+
+### lf-checks · ws-empty-band critic r1 (2026-11-08, FAIL 5 / 6 / 7 / 7)
+
+Full report: design/status/lf-checks/critic-eb-r1.md. Backtests held (all four critic-failed heads FAIL); the defects were coverage and pin.
+
+**Automatic checks:** a host that reads 0 cells is an EB-READ FAILURE, not a note (the practice card was silently unmeasured: its cell is `.mq-scell`); a synthetic `--html` fixture per band position (under / above / between) in the backtest table; an offered-but-not-composed role FAILs (EB-ROLE); the pin is generated from `redesign-passed.js` (every passed skill), not a hand list; a tool header's numeric claim ("separates the classes") is backed by a recorded measurement or removed.
+
+**Speed-ups:** freeze the branch while a critic runs (two commits landed mid-round; the critic graded a `git archive`); pin runs (~2.5 min a skill) go to the background the moment the rule is fixed; one shared measure (`measureCells`) for print and host keeps a fix in one place.

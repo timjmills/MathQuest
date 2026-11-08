@@ -1683,6 +1683,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-fixture-band",
+   "check": "ws-empty-band EB-BAND: an empty band of >= 30 % of the cell under the ink fails, a cell sized to its item passes (the shared check of LESSONS_LEARNED L25; the real-head rows are in backtests-empty-band.json, pending each lane's fix)",
+   "kind": "fixture",
+   "rule": "ws-empty-band --html (measureCells + judge on a saved page)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/fail.html",
+    "state": "seeded: two 60 mm fact cells, ink ends at ~30 mm (45 % band)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+    "state": "the same items in 36 mm cells"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
