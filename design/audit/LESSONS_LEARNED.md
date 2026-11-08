@@ -330,3 +330,11 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 - RULE for every lane: a change to a generator, cell template, provider or kit CSS runs `ws-detailed-lesson --check` on each passed
   detailed lesson that deals one of its skills BEFORE commit; a lesson failing on master too (g1-oa1, g3-oa8 on 2026-11-08) is
   recorded, not counted.
+
+## lf-placevalue critic r3c (2026-11-08): expand (re-check on the new deal), value, combine PASS; identify PASS pending E-A1
+- E-A1 identify lesson p2: the "ones" vocabulary picture (unit blocks, no tens) is drawn at a ten-rod's height by lesson.js `blocks`,
+  leaving 43-44 % of the vocabulary cell empty -> PROPOSED VOCAB-INK: each vocabulary picture's ink box against its SVG box (ws-empty-band
+  does not read the vocabulary row today). Lead to rule engine (D3) or pv (the picture was chosen in pv's prereqs.js data).
+- E-B2 error-analysis combine M: 37 % empty under the correct-answer line, which ws-empty-band passes -> PROPOSED: EB-BAND reads the
+  error-analysis cell's own rows (the box under the answer line is in the measured ink today).
+- Speed: a page-hash diff (graded commit vs head) limited the re-grade to the changed pages; one critic did four skills in 18 min.

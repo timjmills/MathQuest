@@ -40,8 +40,13 @@ const VQ5_IDS = [
 ];
 // lf-placevalue (lessons-first wave 1, CCSS BUILD lesson 1, 2.NBT.A.3): the first family on the pv template (lead ruling R1).
 const PV = 'Lane lf-placevalue, critic r3 + r3b PASS (independent Opus medium critics; every pv-owned page type at S / M / L, every §7a option value, card 1280 / 820 / 390, worksheet, quiz >= 8; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-r3.md + critic-r3b.md, 2026-11-08';
+const PV3C = 'Lane lf-placevalue, critic r3 + r3b grades for unchanged pages, critic r3c PASS for every changed page (independent Opus medium critics; every pv-owned page type at S / M / L, every §7a option value, card 1280 / 820 / 390, worksheet, quiz >= 8; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-r3.md + critic-r3b.md + critic-r3c.md, 2026-11-08';
 const PV_IDS = [
     'placevalue:expand',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV])]);
+const PV3C_IDS = [
+    'placevalue:value',
+    'placevalue:combine',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C])]);

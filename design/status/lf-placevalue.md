@@ -70,6 +70,9 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-08 critic r3c (critic-r3c.md, on ce9a2fc4): expand still PASSES on the new deal; **placevalue:value and placevalue:combine
+  PASSED** (redesign-passed.js, pv approved siblings; PNGs design/status/lf-placevalue/{value-pass,combine-pass,expand-r3c}/).
+  identify PASSES if the lead rules E-A1 (lesson.js blocks picture height) engine; else its lesson p2 is C3 7. unit_form not graded (G2 open).
 - 2026-11-08 DEPLOY HOLD (lead): lesson 1 (g2-nbt3) `ws-detailed-lesson --check` FAILED on 9b0972f7 (E9c, E11, E24, E24b; master OK).
   Fixed 8d80d13b + the zero-cap follow-up: E24 zero place drawn in the fresh deal (not dealIndex), E24b the Prerequisite Check dealt as
   one page (print-sheet pageLr6), E11 / E9c / E9b the pack's refs `cellPayload {noTabSpacer, inPlace: false}`. Lesson 1 --check and
