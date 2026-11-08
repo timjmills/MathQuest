@@ -1,6 +1,6 @@
 # lf-placevalue critic r3c — targeted re-grade brief (independent critic, Opus medium)
 
-You are an INDEPENDENT critic. You did not build this work. Grade it; do not fix it. Branch `claude/lf-placevalue` at HEAD (9b0972f7).
+You are an INDEPENDENT critic. You did not build this work. Grade it; do not fix it. Branch `claude/lf-placevalue` at ce9a2fc4 (grade this commit; do not pull).
 Hard limit: about 30 minutes; be lean (render only the pages named below).
 
 **Read first (skim what you need):** `design/audit/RUBRIC.md` (criteria C1–C4, caps H1–H17, "How a page counts as graded"),
@@ -9,6 +9,11 @@ and `critic-r3b.md` (value G1). Their grades STAND for every page not listed bel
 vs HEAD, seed 7, pupil + key HTML) shows those pages are byte-identical.
 
 **Changed pages to grade (the only ones):**
+- Part 0 (FIRST, lead 2026-11-08) — `placevalue:expand` quick re-check: it PASSED r3 / r3b, and since then only the DEAL changed (gen-pv:
+  the zero place's position is drawn in the fresh deal with a cap, not fixed by the item's index; layout code unchanged). Render
+  independent, more-practice, test, review, true-false, guided, error-analysis at S / M / L and band 99 at S / L. Confirm: zero items keep
+  their box, the zero position is spread (no page with only zero-tens), no repeated number or near-repeat leading parts on a page, no page
+  of a new size class, every grade still >= 8. Write the expand verdict FIRST in the report.
 - Part A — `placevalue:identify` lesson S/M/L and `placevalue:value` lesson S/M/L. Say for F3, F4 (identify) and G1 (value): FIXED / NOT FIXED.
 - Part B — `placevalue:combine`: independent L, more-practice L, test M/L, review L, true-false S/M/L, guided S/M/L, error-analysis S/M/L,
   scripted-model S/M/L, opener M/L, lesson S/M/L; plus option band 99 at S and M on the independent page. Say for F1, F2: FIXED / NOT FIXED.
@@ -29,5 +34,5 @@ numerals. Stretch, fact-probe and fact-rows are OUT OF SCOPE. A pv-owned page pa
 
 **Write** `design/audit/runs/lf-placevalue/critic-r3c.md`: a grade table per page (C1–C4, cap), the finding status lines, any new
 findings (page, what, rule id, which machine check could catch it), ENGINE-ROLES list, then `VERDICT: PASS` / `VERDICT: FAIL`
-for each of identify, value and combine (counting r3 / r3b grades for unchanged pages). For each PASS list the PNG paths you graded.
+for each of expand, identify, value and combine (counting r3 / r3b grades for unchanged pages). For each PASS list the PNG paths you graded.
 Do not edit any other file.
