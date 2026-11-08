@@ -687,6 +687,8 @@ function _genPictureTask(q) {
     q.printAnswer = target;
     q.skillLabel = '1 Picture, 3 Words';
     q.hint = `${target}: ${VOCAB_WORDS[target].meaning}.`;
-    q.dupKey = `vocab-pick3:${target}`;
+    // (the bank is part of the key: a one-lesson set has 6 words and grades 4-6 print 8 a page (owner Q2), so once every
+    // picture has been dealt (_freshFirst, V5) a picture may come back with another bank - r5: 6 cells stretched over 8)
+    q.dupKey = `vocab-pick3:${target}:${three.slice().sort().join('|')}`;
     q.vocabWords = bank.slice();
 }

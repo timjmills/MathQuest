@@ -39,6 +39,7 @@ import {
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf,
 } from './compose.js';
 import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
+import { scorePoints } from '../paginate.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
 import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
@@ -998,7 +999,8 @@ export function plan(input = {}) {
     // shape (critic regrade 5: a box on one item, a line on the next). Stable: deal order kept.
     const isPick = (it) => (it.thinking && it.thinking.kind === 'choice' ? 1 : 0);
     const items = (M ? M.items : balanced(all, L.perPage)).slice().sort((a, b) => isPick(a) - isPick(b));
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: items.length });
+    // (Q-C: a per-word template scores its words; every other item 1 - paginate.js scorePoints; lf-vocab r5)
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: scorePoints(items) });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one fix width for every cell of the page: the widest item's (critic pv-r2)
     const pageRoom = Math.max(0, ...items.map((it) => Number(it.fixRoom) || 0));
@@ -1027,7 +1029,7 @@ export function plan(input = {}) {
     // some fixes are written and some checked (a graph page: "How many?" and "Which has the most?")
     const someChecked = items.some((it) => it.thinking && it.thinking.kind === 'choice');
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : checked ? 'check-fix-check' : someChecked ? 'check-fix-mixed' : 'check-fix-write'), grid] }], {
-        meta: { items: items.length, scoreOutOf: items.length, wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
+        meta: { items: items.length, scoreOutOf: scorePoints(items), wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
     });
 }
 

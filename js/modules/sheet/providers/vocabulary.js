@@ -66,8 +66,12 @@ registerSkill('vocabulary:vocab_grade_pictures', {
         if (templateOf(q) === 'vocab-pick3') {
             // (step 1 is the Guided page's grey hint, guided.js hintOf: it names a cue - the word's first letter - never the
             // instruction again: critic r2 #5; ws-vocab-unit V12)
+            // (the cue picks out ONE bank word: the first letter only when no other bank word starts with it, else the
+            // word's meaning - critic r3 #5: "starts with c" with column and commutative in the bank; ws-vocab-unit V14)
+            const first = String(p.word).charAt(0).toLowerCase();
+            const unique = (p.bank || []).filter((w) => String(w).charAt(0).toLowerCase() === first).length === 1;
             return clampSteps([
-                step(`Look at the picture. Its word starts with "${String(p.word).charAt(0)}".`),
+                step(unique ? `Its word starts with "${first}".` : `Its word means ${meaningOf(p.word)}.`),
                 step('Read the three words in the box.'),
                 step(`Write "${p.word}" on the line.`, [{ slot: 'answer', value: p.word }]),
             ]);

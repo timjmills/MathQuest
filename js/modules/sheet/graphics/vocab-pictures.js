@@ -31,6 +31,9 @@ export const PIC_WIDTHS = Object.freeze({ min: 34, max: 82 });
 
 const W = { heavy: 2, part: 1.333, fine: 1 };          // px, non-scaling (1.5 / 1 / 0.75 pt)
 const NS = 'vector-effect="non-scaling-stroke"';
+/** The base-ten unit square (canvas units) and the pictures drawn on it, scaled as one set (critic r3 #8). */
+const BASE10_U = 5;
+export const BASE10_IDS = Object.freeze(['one', 'ten', 'hundred']);
 const r2 = (v) => Math.round(v * 100) / 100;
 const ln = (x1, y1, x2, y2, w = W.part, extra = '') => `<line x1="${r2(x1)}" y1="${r2(y1)}" x2="${r2(x2)}" y2="${r2(y2)}" stroke="#000" stroke-width="${w}" ${NS} stroke-linecap="round"${extra}/>`;
 const rect = (x, y, w, h, sw = W.part, rx = 0) => `<rect x="${r2(x)}" y="${r2(y)}" width="${r2(w)}" height="${r2(h)}"${rx ? ` rx="${rx}"` : ''} fill="none" stroke="#000" stroke-width="${sw}" ${NS}/>`;
@@ -160,8 +163,9 @@ const PICS = {
         alt: 'two, four, six, eight, each one two more, with a hop of plus two between',
         draw: () => {
             let b = '';
-            [2, 4, 6, 8].forEach((v, i) => { b += tx(6 + i * 15, 30, 0, String(v), { size: 9 }); if (i) b += hop(6 + (i - 1) * 15 + 2.5, 6 + i * 15 - 2.5, 24, 4) + tx(6 + (i - 0.5) * 15, 11, 0, '+2', { size: 8, weight: 400 }); });
-            return b + tx(56, 30, 0, '…', { size: 9 });
+            [2, 4, 6, 8].forEach((v, i) => { b += tx(6 + i * 14, 30, 0, String(v), { size: 9 }); if (i) b += hop(6 + (i - 1) * 14 + 2.5, 6 + i * 14 - 2.5, 24, 4) + tx(6 + (i - 0.5) * 14, 11, 0, '+2', { size: 8, weight: 400 }); });
+            // (the ellipsis starts just after the 8, inside the cropped drawing: its third dot was cut off - critic r3 "8..")
+            return b + tx(51.5, 30, 0, '…', { size: 9, anchor: 'start' });
         },
     },
     /* ---- Grade 3: properties of multiplication (3.OA.B.5) */
@@ -184,8 +188,9 @@ const PICS = {
     },
     distributive: {
         alt: 'three rows of seven dots split by a line into three by five and three by two',
-        draw: () => dots(3, 7, 8, 5, 6, 1.9) + ln(8 + 4.5 * 6, 1.5, 8 + 4.5 * 6, 21.5, W.heavy)
-            + tx(30, 32, 0, '3 × 5 + 3 × 2', { size: 8 }),
+        // (a dot's width of clear paper each side of the split line, so the two arrays read as two - critic r3)
+        draw: () => dots(3, 5, 5, 5, 6, 1.9) + ln(34.7, 1.5, 34.7, 21.5, W.heavy) + dots(3, 2, 40.4, 5, 6, 1.9)
+            + tx(26, 32, 0, '3 × 5 + 3 × 2', { size: 8 }),
     },
     /* ---- Grade 3: two-step word problems (3.OA.D.8) */
     step: {
@@ -245,19 +250,20 @@ const PICS = {
         draw: () => table([[94, 95, 96], [104, 105, 106], [114, 115, 116]], { x0: 7, y0: 3.5, cw: 15.5, ch: 11, size: 8.5 }),
     },
     /* ---- Grade 2: read and write numbers to 1,000 (2.NBT.A.3) */
+    // (one, ten and hundred share ONE unit square, U canvas units, and are scaled together - BASE10_IDS, vocabPictureFit:
+    // the "one" is one unit, the ten 10 units long, the hundred 10 x 10, so a pupil never sees a "one" bigger than a unit of
+    // the ten - critic r3 #8 / VQ-1; ws-vocab-unit V16)
     hundred: {
         alt: 'a flat square of ten by ten small squares',
-        draw: () => { const u = 3.3, x = 13.5, y = 3.5; let b = rect(x, y, u * 10, u * 10, W.part); for (let j = 1; j < 10; j++) b += ln(x, y + u * j, x + u * 10, y + u * j, W.fine) + ln(x + u * j, y, x + u * j, y + u * 10, W.fine); return b; },
+        draw: () => { const u = BASE10_U, x = 5, y = 0; let b = rect(x, y, u * 10, u * 10, W.part); for (let j = 1; j < 10; j++) b += ln(x, y + u * j, x + u * 10, y + u * j, W.fine) + ln(x + u * j, y, x + u * j, y + u * 10, W.fine); return b; },
     },
     ten: {
         alt: 'a rod of 10 small squares in a line',
-        // (lying across the canvas, 5 mm squares at 60 mm: big enough to count - critic r1 D13)
-        draw: () => { const u = 5.2, x = 4, y = 16; let b = rect(x, y, u * 10, u, W.part); for (let j = 1; j < 10; j++) b += ln(x + u * j, y, x + u * j, y + u, W.fine); return b; },
+        draw: () => { const u = BASE10_U, x = 5, y = 17.5; let b = rect(x, y, u * 10, u, W.part); for (let j = 1; j < 10; j++) b += ln(x + u * j, y, x + u * j, y + u, W.fine); return b; },
     },
     one: {
-        // (r3: a unit cube, its top and side drawn - a lone square read as "square" or "box", critic r2)
-        alt: 'a single small cube',
-        draw: () => rect(20, 14, 18, 18, W.part) + `<path d="M20 14 L26 8 H44 L38 14 M44 8 V26 L38 32" fill="none" stroke="#000" stroke-width="${W.part}" ${NS} stroke-linejoin="round"/>`,
+        alt: 'a single small square',
+        draw: () => rect(27.5, 17.5, BASE10_U, BASE10_U, W.part),
     },
     digit: {
         alt: 'one large figure seven',
@@ -400,7 +406,7 @@ export function vocabPictureExtent(id) {
         }
     }
     for (const [, t, txt] of body.matchAll(/<text ([^>]*)>([^<]*)<\/text>/g)) {
-        const sz = num(t, 'font-size'), w = txt.replace(/&[a-z#0-9]+;/g, 'x').length * 0.62 * sz;   // (0.62 em: Andika bold, so a text never runs past its box - precritic r4 PG-12)
+        const sz = num(t, 'font-size'), w = (txt.replace(/&[a-z#0-9]+;/g, 'x').length + (txt.match(/…/g) || []).length * 0.7) * 0.62 * sz;   // (… is a wide glyph: its third dot was cut off - critic r3 "8..")   // (0.62 em: Andika bold, so a text never runs past its box - precritic r4 PG-12)
         const k = /text-anchor="start"/.test(t) ? 0 : /text-anchor="end"/.test(t) ? 1 : 0.5;
         // (the text's line box, 1.25 em tall, as a browser measures it - a 26-unit "7" ran 1.7 mm out of its cell: precritic r4)
         add(num(t, 'x') - k * w, num(t, 'y') - sz * 0.625); add(num(t, 'x') + (1 - k) * w, num(t, 'y') + sz * 0.625);
@@ -420,7 +426,10 @@ export function vocabPictureFit(id, wMm = 46, hMm) {
     if (!e) return null;
     const bw = Math.max(PIC_WIDTHS.min, Math.min(PIC_WIDTHS.max, Number(wMm) || 46));
     const bh = Number(hMm) > 0 ? Number(hMm) : bw * PIC_CANVAS.h / PIC_CANVAS.w;
-    const scale = Math.min(bw / e.w, bh / e.h);
+    // a base-ten picture takes the scale at which ALL three fit the box, so one unit prints the same in each
+    const scale = BASE10_IDS.includes(String(id))
+        ? Math.min(...BASE10_IDS.map((b) => { const eb = vocabPictureExtent(b); return Math.min(bw / eb.w, bh / eb.h); }))
+        : Math.min(bw / e.w, bh / e.h);
     return { wMm: r2(e.w * scale), hMm: r2(e.h * scale), scale };
 }
 
@@ -439,6 +448,8 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0 } = {}) {
     // than letting them spill over the letters - precritic print-lint lesson L, 2026-11-07: L-OVERFLOW / ILLEGIBLE)
     // (screen: `minPx` keeps the picture's text >= 14 px on a phone - critic r1 D8: 6-9 px digits at 390 px)
     const ar = `aspect-ratio:${r2(e.w)} / ${r2(e.h)};`;
+    // (a base-ten picture's screen floor is the set's: the hundred's floor, the ten and one in proportion - one unit)
+    if (minPx && BASE10_IDS.includes(String(id))) minPx = minPx * e.w / Math.max(...BASE10_IDS.map((b) => vocabPictureExtent(b).w));
     const size = isTwin(ctx) ? `width:${minPx ? `max(${minPx}px, ${L(ctx, w)})` : L(ctx, w)};max-width:100%;height:auto;${ar}` : `width:${r2(w)}mm;max-width:100%;height:auto;${ar}`;
     return `<svg class="mq-vpic" data-vpic="${esc(id)}" viewBox="${r2(e.x)} ${r2(e.y)} ${r2(e.w)} ${r2(e.h)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(PICS[id].alt)}"`
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;

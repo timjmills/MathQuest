@@ -169,7 +169,10 @@ for (const id of P.VOCAB_PICTURE_IDS) {
                 const sc = pic.wMm / pic.vb[2];
                 const minT = Math.min(...pic.texts) * sc / PT, minR = Math.min(...pic.rects) * sc, minC = Math.min(...pic.circles) * sc;
                 if (pic.texts.length && minT < floor - 0.05) fail(`V9 ${tpl} ${size} grade ${g} "${id}": text ${minT.toFixed(1)} pt (need ${floor})`);
-                if (pic.rects.length && minR < 4 - 0.05) fail(`V9 ${tpl} ${size} grade ${g} "${id}": a box ${minR.toFixed(1)} mm (need 4)`);
+                // (one, ten and hundred print ONE unit square, the hundred's tenth (V16): their box floor is 2.3 mm (the hundred flat's unit in a 25 mm box) -
+                // a 4 mm "one" would need a 40 mm hundred, taller than any cell's picture box; critic r3 #8)
+                const boxFloor = (P.BASE10_IDS || []).includes(id) ? 2.3 : 4;
+                if (pic.rects.length && minR < boxFloor - 0.05) fail(`V9 ${tpl} ${size} grade ${g} "${id}": a box ${minR.toFixed(1)} mm (need ${boxFloor})`);
                 if (pic.circles.length && minC < 2.5 - 0.05) fail(`V9 ${tpl} ${size} grade ${g} "${id}": a ring or dot ${minC.toFixed(1)} mm (need 2.5)`);
             }
         }
@@ -233,6 +236,139 @@ else {
         const ok = (dist(v, w) >= 1 && dist(v, w) <= 2) || (W.VOCAB_WORDS[w].notWith || []).includes(v);
         if (!ok) fail(`V13 grade ${g} "${w}": the wrong word "${v}" is neither a misspelling nor a look-alike`);
     }
+}
+
+// ---- round 5 (rule 5, critic r3): the checks of critic r3's findings, written before the fixes -----------------------
+// V14 (hint uniqueness, critic r3 #5): the Guided page's grey hint (worked step 1) picks out exactly ONE bank word. A
+// first-letter cue counts only when one bank word starts with that letter; otherwise the hint must give the word's meaning.
+{
+    const prov = K.getProvider('vocabulary', 'vocab_grade_pictures');
+    for (const r of runs) for (const q of deal('vocab_pick3_words', r.opts, 8, 7900)) {
+        const p = q.cell.payload, t = String(((prov.workedSteps(q) || [])[0] || {}).text || '');
+        const m = /starts with "(.)"/.exec(t);
+        if (m) {
+            const hits = p.bank.filter((w) => String(w).charAt(0).toLowerCase() === m[1].toLowerCase());
+            if (hits.length !== 1) fail(`V14 ${JSON.stringify(r.opts)} "${p.word}": the hint "${t}" fits ${hits.length} bank words (${p.bank.join(', ')})`);
+        } else if (!t.toLowerCase().includes(String((W.VOCAB_WORDS[p.word] || {}).meaning || '@@').toLowerCase())) fail(`V14 ${JSON.stringify(r.opts)} "${p.word}": the hint "${t}" names no cue that picks one bank word`);
+    }
+}
+// V15 (write-line length, critic r3 #7): the 1 picture, 3 words answer line is >= 1.2 x the widest bank word at the answer
+// font (Andika bold, 0.6 em a character), at every grade and size; grades 4-5 at least 55 mm.
+{
+    for (const size of ['S', 'M', 'L']) for (const g of W.VOCAB_GRADES) {
+        const ctx = K.resolveCtx({ size, mode: 'print' });
+        const words = W.gradeWords(g);
+        const longest = words.slice().sort((a, b) => b.length - a.length);
+        const bank = [longest[0], ...longest.slice(1).filter((w) => W.compatible([longest[0], w])).slice(0, 2)];
+        const html = K.renderCell({ cell: { template: 'vocab-pick3', v: 1, payload: { word: bank[0], bank, grade: g } } }, ctx);
+        const ln = /class="mq-vp-line"[^>]*?width:([\d.]+)mm[^>]*?font-size:([\d.]+)pt/.exec(html);
+        if (!ln) { fail(`V15 ${size} grade ${g}: no answer line read`); continue; }
+        const lineMm = Number(ln[1]), pt = Number(ln[2]);
+        const needMm = Math.max(...bank.map((w) => String(w).length)) * pt * PT * 0.6 * 1.2;
+        if (lineMm < needMm - 0.05) fail(`V15 ${size} grade ${g}: the answer line is ${lineMm} mm, under 1.2 x "${bank[0]}" at ${pt} pt (${needMm.toFixed(1)} mm)`);
+        if (classOf(g) === 2 && lineMm < 55) fail(`V15 ${size} grade ${g}: the answer line is ${lineMm} mm (grades 4-5 need 55 mm)`);
+    }
+}
+// V16 (one base-ten unit, critic r3 #8 / VQ-1): one, ten and hundred, drawn in the same box (every host box), print ONE
+// unit square: one's square, the ten rod's short side and a tenth of the hundred flat are the same in mm (within 3 %).
+{
+    const unitOf = (svg, id) => {
+        const r = readSvg(svg), sc = r.wMm / r.vb[2];
+        const sides = [...svg.matchAll(/<rect [^>]*width="([\d.]+)" height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+        const big = sides.sort((a, b) => b[0] * b[1] - a[0] * a[1])[0];
+        return (id === 'hundred' ? Math.min(...big) / 10 : Math.min(...big)) * sc;
+    };
+    const boxes = [['match3 S', { wMm: 43, hMm: 25.4 }], ['match3 L', { wMm: 45, hMm: 26.7 }], ['pick3 2-3', { wMm: 72, hMm: 38 * 2 / 3 }], ['pick3 K-1', { wMm: 72, hMm: 70 * 2 / 3 }]];
+    for (const [tag, box] of boxes) {
+        const u = ['one', 'ten', 'hundred'].map((id) => unitOf(P.vocabPictureSVG(K.resolveCtx({ size: 'L', mode: 'print' }), id, Object.assign({}, box)), id));
+        if (Math.max(...u) > Math.min(...u) * 1.03) fail(`V16 ${tag}: the base-ten units differ (one ${u[0].toFixed(2)} mm, ten ${u[1].toFixed(2)} mm, hundred ${u[2].toFixed(2)} mm)`);
+    }
+}
+// V17 (look-alikes, critic r1-r3): every critic-found look-alike pair is never offered together (notWith on either side).
+// APPEND-ONLY: a pair leaves only by an owner ruling. If a pair breaks a set's split (V7), change the set's words.
+export const LOOKALIKES = [['term', 'sequence'], ['first term', 'sequence'], ['round up', 'quotient'], ['round up', 'remainder'], ['multiple', 'pattern'],
+    ['grow', 'sequence'], ['grow', 'pattern']];
+for (const [a, b] of LOOKALIKES) if (W.compatible([a, b])) fail(`V17 "${a}" / "${b}": a critic-found look-alike pair is not notWith`);
+
+// ---- --browser: the checks only a browser can measure (on precritic's path as gate vocab-unit-browser) -----------------
+if (process.argv.includes('--browser')) await browserChecks();
+async function browserChecks() {
+    const { createRequire } = await import('module');
+    const require = createRequire(import.meta.url);
+    const { open } = require(path.join(ROOT, 'tests', 'lib', 'ws-harness.cjs'));
+    const app2 = await open({ seed: 1 });
+    const { page } = app2;
+    const build = (skillId, role, size, opts) => page.evaluate(async (a) => {
+        try {
+            const r = await window.buildSheet({ role: a.role, sections: [{ skills: [Object.assign({ categoryId: 'vocabulary', skillId: a.skillId }, a.opts ? { opts: a.opts } : {})] }], size: a.size, paper: 'A4', seed: 7, key: false });
+            return { html: window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }) };
+        } catch (e) { return { error: String(e && e.message || e) }; }
+    }, { skillId, role, size, opts });
+    const sheet = async (html, fn, arg) => {
+        const sh = await app2.browser.newPage();
+        try {
+            await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+            await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
+            await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
+            await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+            await sh.emulateMediaType('print');
+            return await sh.evaluate(fn, arg);
+        } finally { await sh.close(); }
+    };
+    try {
+        // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
+        // points (Match 3 3 a cell, 1 picture 3 words 1), the Model unscored.
+        for (const [skillId, pts] of [['vocab_grade_pictures', 3], ['vocab_pick3_words', 1]]) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) {
+            const b = await build(skillId, role, size);
+            if (b.error) { fail(`V11R ${skillId} ${role} ${size}: not composed (${b.error})`); continue; }
+            const got = await sheet(b.html, () => {
+                const pages = [...document.querySelectorAll('body > section.ws-page, body > .ws-page')];
+                const sc = pages.map((pg) => { const s = pg.querySelector('.ws-field.score b'); return s ? Number(s.textContent.replace(/\D/g, '')) : null; }).filter((x) => x != null);
+                const cells = pages.flatMap((pg) => [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]') && !c.closest('.mq-modelcell') && !/\bModel\b/.test((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '')));
+                return { score: sc[0], cells: cells.length };
+            });
+            if (got.score == null) fail(`V11R ${skillId} ${role} ${size}: no Score on the page`);
+            else if (got.score !== got.cells * pts) fail(`V11R ${skillId} ${role} ${size}: Score /${got.score} for ${got.cells} scored cells (owner Q-C: /${got.cells * pts})`);
+        }
+        // V18 (critic r1 #6, r2 #4, r3 #6): the 1 picture, 3 words Guided rows are equal at S, M AND L (within 1 mm)
+        for (const size of ['S', 'M', 'L']) {
+            const b = await build('vocab_pick3_words', 'guided', size, { vocabGrade: 3 });
+            if (b.error) { fail(`V18 guided ${size}: not composed (${b.error})`); continue; }
+            const hs = await sheet(b.html, () => {
+                const pg = document.querySelector('body > section.ws-page, body > .ws-page');
+                const tops = new Map();
+                for (const c of pg.querySelectorAll('[data-ws-cell]')) { if (c.parentElement.closest('[data-ws-cell]')) continue; const r = c.getBoundingClientRect(); const k = Math.round(r.top); tops.set(k, Math.max(tops.get(k) || 0, r.height)); }
+                return [...tops.values()].map((h) => h * 25.4 / 96);
+            });
+            if (hs.length > 1 && Math.max(...hs) - Math.min(...hs) > 1) fail(`V18 guided ${size}: rows ${hs.map((h) => h.toFixed(1)).join(' / ')} mm (need equal within 1 mm)`);
+        }
+        // V19 (critic r1 #10, r2 #7, r3 #4): the online worksheet at 1280 px: every tile of one template has the same
+        // structure - Match 3 one word a row in a fixed column, every letter box at the same x in its tile; 1 picture, 3 words
+        // the same picture height and answer-line y in every tile, its pills on one row or one a row (never 2 + 1)
+        await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+        for (const skillId of ['vocab_grade_pictures', 'vocab_pick3_words']) {
+            const res = await page.evaluate(async (k) => {
+                const st = window.state; st.category = 'vocabulary'; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 6; window.initWorksheet();
+                await new Promise((r) => setTimeout(r, 600));
+                const tiles = [...document.querySelectorAll('#worksheetView .mq-wspaper')];
+                return tiles.map((t) => {
+                    const tr = t.getBoundingClientRect();
+                    const rel = (e) => { const r = e.getBoundingClientRect(); return { x: Math.round(r.left - tr.left), y: Math.round(r.top - tr.top), w: Math.round(r.width), h: Math.round(r.height), b: Math.round(r.bottom - tr.top) }; };
+                    const words = [...t.querySelectorAll('.mq-vm-word')].map(rel), boxes = [...t.querySelectorAll('.mq-vm-box')].map(rel);
+                    const pills = [...t.querySelectorAll('.mq-vp-btn')].map(rel), line = t.querySelector('.mq-vp-line'), pics = [...t.querySelectorAll('svg.mq-vpic')].map(rel);
+                    return { words, boxes, pills, line: line ? rel(line) : null, pics, h: Math.round(tr.height) };
+                });
+            }, skillId);
+            if (!res.length) { fail(`V19 ${skillId}: no worksheet tiles`); continue; }
+            const sig = (t) => (skillId === 'vocab_grade_pictures'
+                ? `rows ${new Set(t.words.map((w) => w.y)).size} box-x ${t.boxes.map((b) => b.x).join(',')}`
+                : `pill-rows ${new Set(t.pills.map((p) => p.y)).size} line-y ${t.line ? t.line.y : '-'} pic-h ${t.pics.map((p) => p.h).join(',')}`);
+            const sigs = res.map(sig);
+            if (new Set(sigs).size > 1) fail(`V19 ${skillId} worksheet-1280: the tiles differ (${[...new Set(sigs)].join(' | ')})`);
+            if (skillId === 'vocab_grade_pictures' && res.some((t) => new Set(t.words.map((w) => w.y)).size !== t.words.length)) fail(`V19 ${skillId} worksheet-1280: the words are not one a row (${sigs[0]})`);
+            if (skillId === 'vocab_pick3_words' && res.some((t) => ![1, t.pills.length].includes(new Set(t.pills.map((p) => p.y)).size))) fail(`V19 ${skillId} worksheet-1280: the pills wrap 2 + 1 (${sigs.join(' | ')})`);
+        }
+    } finally { await app2.close(); }
 }
 
 console.log(`ws-vocab-unit: ${W.VOCAB_SETS.length} lesson sets, ${P.VOCAB_PICTURE_IDS.length} pictures, ${items} items dealt`);

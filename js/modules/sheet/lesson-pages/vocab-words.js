@@ -55,9 +55,9 @@ export const VOCAB_WORDS = Object.freeze({
     repeat: { meaning: 'the same part comes again', notWith: ['pattern', 'cycle'] },
     sequence: { meaning: 'numbers in order, one after another', notWith: ['pattern', 'multiple', 'term', 'first term'] },
     cycle: { meaning: 'goes round and back to the start', notWith: ['repeat'] },
-    // (grow / sequence and grow / pattern (critic r2 #3) are NOT listed: pattern and sequence already clash, so the
-    // growing-patterns set would keep one clash-free split and print 2 Match 3 cells a page - precritic r4 options-render)
-    grow: { meaning: 'gets bigger each time', notWith: [] },
+    // (a growing stack of squares is also a sequence and a pattern: critic r2 #3, r3 #9. A known look-alike is ALWAYS
+    // listed; the growing-patterns set's words changed instead - ws-vocab-unit V17)
+    grow: { meaning: 'gets bigger each time', notWith: ['sequence', 'pattern'] },
     term: { meaning: 'one number in a sequence', notWith: ['first term', 'sequence'] },
     'first term': { meaning: 'the number a sequence starts with', notWith: ['term', 'sequence'] },
     'times as many': { meaning: 'the same amount, again and again', notWith: ['compare'] },
@@ -93,7 +93,9 @@ export const VOCAB_SETS = Object.freeze([
     { lesson: 'G4|-|findemergentfeaturesegunitsdigitcycle', title: 'Find emergent features (units digit cycle)', grade: 4, round: 1, ccss: ['4.OA.C.5'],
         words: ['ones digit', 'cycle', 'sequence', 'repeat', 'multiple', 'product'] },
     { lesson: 'G4|-|extendgrowingshapepatterns', title: 'Extend growing shape patterns', grade: 4, round: 1, ccss: ['4.OA.C.5'],
-        words: ['grow', 'term', 'rule', 'pattern', 'sequence', 'equation'] },
+        // (r5: 'sequence' gave way to 'first term' - grow / sequence and grow / pattern are look-alikes, and with sequence
+        // the six words had no two clash-free trios; edited in place, the set keeps its position)
+        words: ['grow', 'term', 'rule', 'pattern', 'first term', 'equation'] },
     { lesson: 'G4|-|followagivenruletoextendanumberpattern', title: 'Follow a given rule to extend a number pattern', grade: 4, round: 1, ccss: ['4.OA.C.5'],
         words: ['rule', 'first term', 'ones digit', 'term', 'repeat', 'pattern'] },
     { lesson: 'G4|-|multiplicativecomparisontimesasmany', title: 'Multiplicative comparison: times as many', grade: 4, round: 1, ccss: ['4.OA.A.1'],

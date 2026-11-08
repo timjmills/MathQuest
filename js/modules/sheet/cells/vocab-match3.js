@@ -48,18 +48,24 @@ register(MATCH3_TEMPLATE, {
         const words = (p.words || []).slice(0, 3);
         const order = Array.isArray(p.order) && p.order.length === words.length ? p.order : words.map((_, i) => i);
         const tp = textPt(ctx);
-        const [picW, picH] = MATCH3_PIC_BOX[sizeOf(ctx)] || MATCH3_PIC_BOX.L;
+        const [picW, picH0] = MATCH3_PIC_BOX[sizeOf(ctx)] || MATCH3_PIC_BOX.L;
+        // (Error analysis shows the work at 2 mm less, and its letter boxes at the writing square, so 3 a page fit at L with
+        // the Correct / Fix-it row under it: lf-vocab r5, critic r3 #3 - 2 a page left 35-40 % of each cell empty)
+        const ea = ctx.state === 'wrong';
+        const picH = ea ? picH0 - 2 : picH0;
         const show = ctx.state === 'answered' || ctx.state === 'traced' || ctx.state === 'wrong';
         const ink = ctx.state === 'traced' ? GREY : INK;
         // the letter at the picture's top left, beside it (not above: the cell stays a quarter of the page)
         const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : '1 1 0'};min-width:0;">`
             + `<span class="mq-vm-let" style="font-size:${P(ctx, tp + 5)};font-weight:700;line-height:1;flex:none;">${LET[i]}</span>`
             + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: picW, hMm: picH, minPx: twin ? 160 : 0 })}</span></div>`).join('');
-        const side = (S(ctx).writeMm || 10) + 2;
+        const side = (S(ctx).writeMm || 10) + (ea ? 0 : 2);
         const letters = match3Letters({ order });
         const row = order.map((wi, n) => {
             // (Error analysis: the wrong work's letter in this box - ctx.wrong.slots - never the key's; critic r1 D1)
-            const val = show ? slotValue(ctx, `letter-${n}`, letters[n]) : '';
+            // (a shown work given as one value - Reason It's "A, C, B" - is split into its letters, one a box: lf-vocab r5)
+            const w = ctx.state === 'wrong' && ctx.wrong && !(ctx.wrong.slots && ctx.wrong.slots[`letter-${n}`] !== undefined) ? String(ctx.wrong.value || '').split(/\s*,\s*|\s+/) : null;
+            const val = show ? (w && w.length === words.length ? w[n] : slotValue(ctx, `letter-${n}`, letters[n])) : '';
             // (data-mq-kind="word": the screen slot keeps a letter; a plain slot keeps digits only - precritic ws-screen-answer r1)
             const hook = twin ? ' data-mq-cell="1" data-mq-w="1" data-mq-kind="word"' : '';
             const boxHtml = `<span class="mq-vm-box" data-ws-slot="letter-${n}" data-ws-shape="box"${show ? ` data-ws-ink="${ctx.state === 'traced' ? 'trace' : 'solid'}"` : ''}${hook}`
@@ -72,10 +78,29 @@ register(MATCH3_TEMPLATE, {
         // (a practice page's cell keeps a quarter page's height, so a set of flat pictures - the growing-patterns set - still
         // fills the page, 4 a page on A4 and on Letter: precritic r4 L-DENSITY, 37-41 % empty strip; a chart panel or a lesson
         // band sets its own height)
-        const inChart = (ctx.chartZoom !== undefined && ctx.chartZoom !== null) || Number(ctx.scaffoldLevel) >= 2;
-        const fill = twin || inChart ? '' : 'min-height:44mm;height:100%;';
+        // (lf-vocab r5, critic r3 #1 / #3: the footprint is the height the cell DRAWS in each role. A practice page's cell
+        // holds a quarter page; a Guided cell (scaffold 2-3, not a chart panel) fills its row and spreads its pictures and
+        // words over it, so the row the Guided page gives it is never an empty band under the letters (EB-BAND); an Error
+        // analysis work (state `wrong`, error-analysis.js) draws at its natural height, so three fit a page)
+        const chart = ctx.chartZoom !== undefined && ctx.chartZoom !== null;
+        const inChart = chart || Number(ctx.scaffoldLevel) >= 2;
+        const guidedRow = !twin && !chart && Number(ctx.scaffoldLevel) >= 2;
+        // (a practice page's cell: 48 mm, a quarter of the A4 grid less the cell's pads, so the row a page gives it is within
+        // 10 % of its footprint - ws-empty-band EB-FOOT, r5: 44 mm was stretched 13 % on mixed practice)
+        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:48mm;height:100%;';
+        // (the online worksheet's tile: ONE fixed layout in every tile - each picture in a slot of one height, scaled to it; the
+        // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
+        // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
+        const tileCss = twin ? '<style>.mq-wspaper .mq-vm .mq-vm-pics{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:10px!important}'
+            + '.mq-wspaper .mq-vm .mq-vm-pic{flex:none!important;height:120px;align-items:center!important;justify-content:flex-start!important;min-width:0}'
+            + '.mq-wspaper .mq-vm .mq-vm-pic > span:last-child{flex:1 1 0!important;min-width:0}'
+            + '.mq-wspaper .mq-vm .mq-vm-pic svg{max-height:120px;max-width:100%;margin:0 auto}'
+            + '.mq-wspaper .mq-vm .mq-vm-words{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:10px!important}'
+            + '.mq-wspaper .mq-vm .mq-vm-word{flex:none!important;justify-content:flex-end!important;padding-right:14%}'
+            + '.mq-wspaper .mq-vm{justify-content:flex-start!important;gap:16px!important}.mq-wspaper .k2-twin:has(> .mq-vm){align-self:stretch;width:100%}</style>' : '';
+        const wrapCss = tileCss + (guidedRow ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vm){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vm{flex:1 1 auto;height:auto!important}</style>' : '');
         return `<div class="mq-vm k2-cell" data-ws-vocab="match3"${twin ? ' data-mq-k2="1" data-mq-join=", "' : ''} style="color:${INK};${FONT}width:100%;box-sizing:border-box;`
-            + `display:flex;flex-direction:column;justify-content:space-evenly;${fill}gap:${L(ctx, 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">`
+            + `display:flex;flex-direction:column;justify-content:space-evenly;${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
             + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};">${pics}</div>`
             + `<div class="mq-vm-words" style="display:flex;justify-content:space-around;align-items:center;gap:${L(ctx, 4)};flex-wrap:${twin ? 'wrap' : 'nowrap'};">${row}</div></div>`;
     },

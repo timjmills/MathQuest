@@ -40,6 +40,7 @@ import {
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
 import { FILL_CAP, groupByHeight, fillLimit } from '../layout.js';
+import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
 const isMixItem = (it) => !!(it && it.q && it.q.divMix);
@@ -915,7 +916,9 @@ export function plan(input = {}) {
     // worked example carries the "Model" tab and is not scored; the rest run a. b. c. ...
     const worked = use.length > 1 && !!answerOf(use[0]);
     const nModels = worked ? mixModels(use) : 0;
-    const scored = use.length - nModels;
+    // (owner ruling Q-C, 2026-11-07: a template that scores per word - Match 3, `footprint.points` 3 - scores so here too;
+    // every other template 1 a cell, as before: paginate.js scorePoints; lf-vocab r5, critic r3 #2)
+    const scored = scorePoints(use.slice(nModels));
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: scored });
     // The partial stage is the rest of the Model's row (or the first row of tries), partialEndOf.
     // (a Mix page led by a Model per form: its first tries are the whole next row - every cell of
@@ -984,8 +987,10 @@ export function plan(input = {}) {
         // first try's hint line fit in a row as tall as the others: every row takes the same share, when that share holds the
         // tallest row's content. Opt-in, so no other template's page changes - lane lf-vocab r3, critic r2 #4: 405 / 340 px)
         if (rows > 1 && host.length && host.every((it) => it.footprint && it.footprint.evenRows)) {
-            const even = Hr.reduce((a, b) => a + b, 0) / rows;
-            if (even >= Math.max(...w)) Hr = Hr.map(() => even);
+            // (the share is at least the tallest row's content when the page holds that many rows of it: lf-vocab r5, critic r3
+            // #6 - at L the Model row's tab and the hint line made it taller than the average, so the rows stayed 99 / 78 mm)
+            const even = Math.max(Hr.reduce((a, b) => a + b, 0) / rows, Math.max(...w));
+            if (even * rows <= pg.avail + 0.5) Hr = Hr.map(() => even);
         }
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
