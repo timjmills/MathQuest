@@ -2407,6 +2407,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-combine-side-band",
+   "check": "placevalue:combine independent / more-practice / test / review at S, M and L: no cell has an empty band of 30 % or more of its width beside the ink (critic r3 F1: two-part rows right-aligned on a 3-part ghost left 54-60 mm on the left of a 185 mm cell; test M wrapped '= ____' under a centred expression)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE",
+   "browser": true,
+   "fail": {
+    "commit": "aacae5ea",
+    "state": "critic r3: EB-SIDE 28 (independent / more-practice L 30-34 %, test M 30-31 %)"
+   },
+   "pass": {
+    "commit": "deb9e426",
+    "state": "expression centred in the ghost box; stepped two-line frame where one line cannot fit"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles independent,more-practice,test,review --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
