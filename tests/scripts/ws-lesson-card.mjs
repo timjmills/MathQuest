@@ -243,6 +243,9 @@ function shapesMarkdown(queue, keep) {
     L.push('  to them - print-sheet.js solveStoryFacts, page-deal.js setDealPin): `ws-lesson-unit --only solve-story` (lesson 2, attempt 2).');
     L.push('  A pack that needs nearly every fact of its pool (lesson 2: ~18 of 20) is not fixed by solving one page first - the shortage');
     L.push('  moves to the next page (lesson 2 solve-first, 2026-11-08): count the WHOLE pack in node per seed, then solve it jointly or widen the data.');
+    L.push('  The whole-pack count models each place from its OWN source (lesson 2 attempt 4: green while seeds 2 and 5 failed): a P0 range');
+    L.push('  must survive any greedy first choice (two items need values 3 apart: 17-20 does not), and a narrow chart case (equal parts) gets');
+    L.push('  its own case pool with the pack\'s avoid keys - `ws-lesson-unit --only pack-feasible` (pack-solve.js placeSources).');
     L.push('  CHECK FIRST (owner ruling 2026-11-08): a Prerequisite Check never draws from the lesson\'s own story pool (lesson 2: its +');
     L.push('  facts are a teen and ones, 12 + 5); count every place that does - chart, Guided, Practice, word problem, slip, Check');
     L.push('  Question - per seed with lessons/pack-solve.js (`ws-lesson-unit --only pack-feasible`) BEFORE any render, and take Practice\'s');

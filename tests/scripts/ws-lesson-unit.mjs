@@ -55,7 +55,10 @@ const LATE = {
     // the tree read (MQ_ROOT) has none, so the record of any tree is judged. No browser.)
     async 'pack-feasible'() {
         const own = path.join(ROOT, 'js/modules/lessons/pack-solve.js');
-        const PS = await import(pathToFileURL(fs.existsSync(own) ? own : path.join(path.dirname(fileURLToPath(import.meta.url)), '../../js/modules/lessons/pack-solve.js')).href);
+        const mine = path.join(path.dirname(fileURLToPath(import.meta.url)), '../../js/modules/lessons/pack-solve.js');
+        const PS0 = await import(pathToFileURL(fs.existsSync(own) ? own : mine).href);
+        // (a tree whose solver predates placeSources - attempt 4 - is judged by today's model of each place's own source)
+        const PS = typeof PS0.placeSources === 'function' ? PS0 : await import(pathToFileURL(mine).href);
         const d = (await imp('js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js')).default;
         const draws = (d.prerequisites || []).flatMap((p) => PS.prereqPoolDraws(p.ref, d.pool));
         eq(draws.length, 0, `pack-feasible: lesson 2's Prerequisite Check draws no fact of the lesson's crossing-ten pool (owner ruling 2026-11-08; it could deal ${draws.slice(0, 4).join(', ')}${draws.length > 4 ? ' ...' : ''})`);

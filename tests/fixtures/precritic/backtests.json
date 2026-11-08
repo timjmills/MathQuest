@@ -1763,6 +1763,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pack-feasible-sources",
+   "check": "each place of lesson 2's pack keeps its OWN item source at seeds 1-25 + 4242: P0's count / bond ranges survive any greedy first choice (two items 3 apart), the chart's add-to / equal-parts examples come from case pools of their own (with the pack's avoid keys) holding a fact outside Practice 1's solved set, Practice 1 has a whole-pack solution (lessons/pack-solve.js placeSources)",
+   "kind": "commit-pair",
+   "rule": "lead's order 2026-11-08 (lesson 2 E24b attempt 4 failed at seeds 2 and 5 while the whole-pack count was green): model each place's own item source",
+   "browser": false,
+   "fail": {
+    "commit": "00ca4b10",
+    "state": "attempt 4: P0 count 17-20, bonds 6-10 parts 3+; chart second / third from the main pool"
+   },
+   "pass": {
+    "commit": "ceb557b5",
+    "state": "P0 count 11-20, bonds within 10 parts 1+; second / third from case pools with the pack's avoid keys"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pack-feasible",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
