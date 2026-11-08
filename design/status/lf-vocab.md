@@ -3,10 +3,47 @@ Title: Vocabulary redesign (Match 3 pictures, 1 picture 3 words, lesson vocabula
 Session: session_013pHDnPdbZEh2qA1Sgch4GR
 Branch: claude/sweet-newton-c8wrv1-lf-vocab
 Owner of files: sheet/graphics/vocab-pictures.js, sheet/cells/vocab-*.js, sheet/lesson-pages/vocab-*.js, sheet/providers/vocabulary.js, gen-vocabulary.js picture branch, design/cards/vocabulary/, design/lanes/lf-vocab/, tests/scripts/ws-vocab-unit.mjs
-State: stopped (rule 5, critic r3 FAIL min 6); hand-over to the lead
-Updated: 2026-11-07
+State: r5 rebuild done, clean before critic (sibling-compare structural only); ready for critic r4
+Updated: 2026-11-08
 Builder profile: mq-opus-medium
 Critic rounds: 3: r3 FAIL min 6, r2 FAIL min 7, r1 FAIL min 1 (report design/lanes/lf-vocab/critic-r3.md)
+
+## Round 5 (2026-11-08, fresh builder, rule 5, Opus medium): critic r3 #1-#10
+Times: start 12:52 UTC, end 15:12 UTC.
+
+Checks first (each FAILed on 8c9034bb before its fix; backtest rows in tests/fixtures/precritic/backtests.json, pass 6cec18b7):
+- ws-empty-band (lf-checks) FAIL 49 before: Match 3 guided S/L 30-34 %, Match 3 error analysis S/M/L 32-37 %, pick3 error analysis
+  L 33 %, pick3 scripted-model 69-79 %, reason-it L, EB-FOOT on mixed practice and grade 4 pick3. After: `ws-empty-band: OK`.
+- ws-vocab-unit V11R (browser) per-word Score on independent, guided, more-practice, test, error-analysis at S/M/L: FAIL (guided
+  /5, EA /2) -> OK.
+- V14 hint picks one bank word: FAIL ("starts with c", column + commutative) -> OK.
+- V15 answer line >= 1.2 x widest bank word, grades 4-5 >= 55 mm: FAIL (36 mm) -> OK.
+- V16 one base-ten unit (one / ten / hundred): FAIL (17.6 / 4.1 / 2.4 mm) -> OK.
+- V17 append-only look-alike list (grow/sequence, grow/pattern ...): FAIL -> OK.
+- V18 pick3 guided rows equal at S, M and L: FAIL (98.9 / 77.6 mm at L) -> OK.
+- V19 worksheet-1280 tiles one layout per template: FAIL (2 + 1 words, box x varies; pills wrap, line y and picture height vary)
+  -> OK. V11R/V18/V19 run as `ws-vocab-unit --browser`, on precritic as gate vocab-unit-browser.
+
+Fixes: guided cells fill their row (Match 3) and rows equal when the page holds them (guided.js evenRows); error analysis draws
+its work at natural height (3 a page at S/M/L); guided and error-analysis Score via scorePoints (Q-C); pick3 hint = meaning
+when the first letter is not unique; grade 4-5 line under picture and bank (55 mm+); base-ten one unit; distributive gap;
+pattern ellipsis; grow notWith sequence/pattern and set 7 words (sequence -> first term, position kept); worksheet tiles fixed
+layout (scoped to .mq-wspaper), screen fit ignores box-less elements (a cell's <style> read as overflow and shrank tiles to
+57 %); pick3 page min heights = page shares; pick3 repeats a picture with a new bank after the set is used (grade 4 sets now
+8 a page, Q2); Reason It lays Match 3 B under A and splits its letters; Scripted Model draws pick3 states full width.
+
+Gates (branch merged with origin/master; manifest applied for the run, not committed):
+- ws-empty-band --skill both: OK (no new pins)
+- ws-vocab-unit: OK; ws-vocab-unit --browser: OK
+- ws-precritic --strict: 2 FAIL / 25 PASS (3 on baseline) / 3 N/A / 2 SKIPPED (no rulings): sibling-compare (structural: first
+  family, no approved sibling) and chromebook-fit (Match 3 worksheet tile 654 px > 650 fold) -> fixed in c474fc1b, rerun alone OK.
+- ws-backtest on the 8 new rows (eb-vocab-match3-guided, V11R, V14-V19): 8 PASS, `ws-backtest: OK`.
+
+Open / judgement calls for the critic:
+- Base-ten one unit: at a shared scale the "one" is one 2.5 mm square and the ten rod 2.5 mm tall (the hundred's unit in a 25 mm
+  box). V9's box floor for these three ids is 2.3 mm (was 4 mm). A critic may find "one" too small; the alternative is an owner
+  ruling to draw the hundred larger than the other pictures.
+- Reason It on Match 3 is legible but plain (the answer line asks for "C, A, B").
 
 ## Round 4 (2026-11-07, cap $35): critic r3 FAIL, min 6
 - Done:
