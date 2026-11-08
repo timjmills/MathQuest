@@ -2123,6 +2123,106 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-page-divfacts-test",
+   "check": "division:div_facts fact Test pages half empty (critic r6 R6-1: Test S 117 mm white, M 116, L 91)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE (white under the grid vs one row pitch)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: Test S 4 x 5, 119 mm white under the grid (pitch 23 mm); M 118 mm; L 93 mm"
+   },
+   "pass": {
+    "commit": "893377fa",
+    "state": "owner ruling 2026-11-08 (a): the Test takes the Independent capacity (4a07ada1), 3 columns at M for 3-digit facts (c05a5dae); EB-PAGE OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^test [SML]$' --rules EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-page-divfacts-fade",
+   "check": "division:div_facts fade packet page 3 at M 40 % used (critic r6 R6-4: 129 mm white)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE on the faded packet",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: fade packet M p3 131.5 mm white (12 bare facts, the 2 x page-1 stage cap)"
+   },
+   "pass": {
+    "commit": "893377fa",
+    "state": "div_facts' stages uncapped: page 3 takes its page; EB-PAGE OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^fade packet' --sizes M --rules EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-pad-divfacts-M",
+   "check": "division:div_facts skip / think at M: the answer line 0.5-0.8 mm from the right rule on 3-digit facts (critic r6 R6-2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAD (CL-8 3 mm side pad, probed with the widest facts)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: skip / think Independent and Test M, ink 0.72 mm from the right rule"
+   },
+   "pass": {
+    "commit": "893377fa",
+    "state": "the beside line counts the tab keep-out (skip / think M print the line under the fact); EB-PAD OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^(independent|test) M .support: (skip|think)}$' --sizes M --rules EB-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-cols-divfacts-array",
+   "check": "division:div_facts array (tables 2-4) at L in 4 columns where M takes 3, the fact 1.85 mm from the rule (critic r6 R6-3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-COLS (columns(L) <= columns(M) for no fewer problems) + EB-PAD",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: L 4 x 3 = 12 against M 3 x 4 = 12; EB-PAD 1.48 mm in 8 of 12 L cells"
+   },
+   "pass": {
+    "commit": "893377fa",
+    "state": "the measure guard (w2 tab inset + 3 mm pad) gives L 3 columns; EB-COLS / EB-PAD OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^independent [ML] .support: array, .constant' --sizes M,L --rules EB-COLS,EB-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-factx-divfacts",
+   "check": "division:div_facts fade packet: the fact's left edge moves 5.0 mm between page 1 and pages 2-3 (critic r6 R6-5)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-FACTX (fact left x spread across all packet pages <= 0.5 mm)",
+   "browser": true,
+   "fail": {
+    "commit": "49a7b12a",
+    "state": "lf-ops 49a7b12a: spread 5.30 mm (p1 8.5 mm, p2 13.8 mm in the cell)"
+   },
+   "pass": {
+    "commit": "893377fa",
+    "state": "every packet cell takes the one w2 left inset; EB-FACTX OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^fade packet' --sizes M --rules EB-FACTX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
