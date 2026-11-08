@@ -3,7 +3,7 @@ Title: Lessons-first wave 1: the lesson precritic checks, backtests and gate hyg
 Session: session_013pHDnLVzZVKhyoyiPRYBZA (launched by the lead session_01HVwpAE3g6EZH8idgErP6LP)
 Branch: claude/sweet-newton-c8wrv1-lf-checks
 Owner of files: tests/lib/ws-lesson-lp.cjs (new), tests/scripts/ws-detailed-lesson.cjs, ws-precritic.cjs (lesson scope), ws-precritic-plan.mjs (lesson rows), ws-deploy-gates.sh (lesson rows, perf slots), tests/fixtures/precritic/backtests.json (rows appended) + lesson-* fixtures, design/lessons-first/units/_TEMPLATE.md, design/lessons-first/patches/lf-checks-to-lf-engine.md
-State: building
+State: paused
 Updated: 2026-11-08
 Builder profile: — (the lane session builds; Opus 5.5, effort medium per the brief)
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
@@ -125,6 +125,7 @@ self-test; a backtest row per PC rule that FAILs only that rule (PC-CLIP has non
 Lane session cost_usd $20.33 at 07:56Z (the lead's reading of the session record); ≈ $32 at 08:45Z by scaling my token estimate to that reading, plus two critic sub-agents (~390k tokens) - about $40 in all, ≈ 1.4 % of the weekly limit ($28 ≈ 1 %); cap $100.
 
 ## Log
+- 2026-11-08 — pin re-generated with every fix (D7 black SVG, D9, EB-FOOT per-row k, lf-ops' card-plan D8 fix): 20 passed skills, 925 band / 214 side / 218 footprint / 12 role findings pinned (add_wp_10 30, was 238 with the D7 bug). State: paused after critic eb-r2 (rule 7); the post-r2 fixes are not re-graded.
 - 2026-11-08 — ws-empty-band critic r2 FAIL 6/4/7/6 (critic-eb-r2.md); stopped by rule 7 (host coverage r1 D1 -> r2 D9). Fixed after r2, NOT re-graded: D7 black SVG ink (paints() alpha-only; fixture row eb-fixture-svg-black), D9 a host that does not render is EB-READ, m9 no-card note; pin re-generated from the corrected run. Open: D8 belongs to lf-ops' ws-card-plan.mjs ("(PROPOSED) on" lists, "out of scope" lines) - sent to lf-ops; m1 footprint on guided / lesson; m7 above / between fixtures; m8 EB-SIDE on mult_properties card 820 / 1280 not eyeballed.
 - 2026-11-08 — ws-empty-band critic r1 FAIL 5/6/7/7 (critic-eb-r1.md). Fixed: D1 card host measured (.mq-scell); D2 bands above / between blocks of ink, SVG measured shape by shape, worksheet 6 items; D3 an offered role the app cannot compose FAILs (EB-ROLE); D4 the pin is every skill in redesign-passed.js (20); D5 header no longer claims 30 % separates the classes (approved fact pages at 29.8-34 % are the lead's facts-lane debt), compared unrounded, dead Hw removed; D6 runnable fixture row eb-fixture-band (--html, seeded fail / pass page) in backtests.json; m4 variants at the largest size asked. Not changed: m1 footprint on guided / lesson (their cells do not pair with measured items), m2 the pin counts per render, m6 ws-card-plan.mjs is lf-ops' file byte for byte (one file after merge).
 - 2026-11-08 — lead rulings applied: sub_facts + div_facts_long pinned (99 keys after the side-rule change); the practice card host is now measured (its B&W screen cell .mq-scell, not a kit cell; before, the card widths read "no kit cell"); EB-SIDE = content pinned to one side (>= 30 % one side, <= 10 % the other), so a centred screen fact is not a band.
