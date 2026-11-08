@@ -30,7 +30,8 @@
 //                 "?", no sign pair ("+/−", "×/÷"), no "is it", no "is / are / does" after "I Can <verb>", no label
 //                 that starts with another verb pasted after the verb, no doubled word (VQ-9).
 //   VQ-NOLEGACY   a skill with no kit cell on any sampled item is a legacy skill; the pinned list may only shrink: a skill
-//                 not on it that emits no kit cell fails (VQ-10).
+//                 not on it that emits no kit cell fails (VQ-10). A skill with a kit cell on SOME sampled items and none
+//                 on others is half-migrated ('some-legacy', lane lf-ops 2026-11-07), pinned the same way.
 //   VQ-ONCE       a Reason It item (the kit's reason-it role `prepare`, drawn through the pure kit with the role's own
 //                 per-panel payload) prints a word-work story ONCE: the story's first sentence appears at most once in the
 //                 item's HTML (critic visual-quality r3 N12: each A / B panel repeated the whole story, one item a page at L).
@@ -84,6 +85,9 @@ export function isRelationSkill({ id = '', label = '', ccss = [] }) {
     if (/\bfact famil|\bnumber famil|\bbonds?\b|part[ -]?whole|\bmake (ten|10)\b|\bmaking (ten|10)\b/.test(t)) return true;
     return (ccss || []).some((c) => /^K\.OA\.A?\.?[34]$/.test(String(c)));
 }
+
+/** A mixed pool (mixed_*, *_mixed, *_all, the *_mixed categories): it deals other skills, so half kit is its nature. */
+export const isPoolSkill = (key = '') => { const [c = '', k = ''] = String(key).split(':'); return /_mixed$/.test(c) || /^mixed_|_mixed$|_all$/.test(k); };
 
 /** Does this item's kit cell draw the relation? */
 export function drawsRelation(it) {
@@ -214,6 +218,9 @@ export function judgeSkill(f, rules = RULES) {
     if (tp.length) add('VQ-TITLE', 'title', `"${f.iCan}": ${tp.join('; ')}`);
     // VQ-NOLEGACY
     if (!kit.length) add('VQ-NOLEGACY', 'no-kit-cell', `no kit cell on any of ${items.length} item(s) (${[...new Set(items.map((it) => it.kind))].join(', ')})`);
+    // (lane lf-ops 2026-11-07, mult_properties: the order items drew the kit cell, the times 1 / times 0 / break-apart
+    // items still printed coloured legacy HTML - "no kit cell on ANY item" let a half-migrated skill pass)
+    else if (kit.length < items.length && !isPoolSkill(f.key)) add('VQ-NOLEGACY', 'some-legacy', `${items.length - kit.length} of ${items.length} item(s) print no kit cell (a half-migrated skill: every item a kit cell, VQ-10)`);
     return out;
 }
 
@@ -359,6 +366,11 @@ function selfTest() {
     eq('VQ-LIVE: + − on a K-2 add page is allowed', judgeSkill({ ...base, items: [wwItem(['+', '-'], false, [])] }), []);
     eq('VQ-LIVE: grade 3 × page may offer ÷, not +', judgeSkill({ ...base, grade: '3', items: [{ ...wwItem(['+', '*', '/'], false, []), ops: ['*'], maxAns: 40 }] }).map((x) => x.sig), ['dead-signs:+']);
     const ffs = { key: 'addition:fact_family_sort', id: 'fact_family_sort', label: 'Is It a Fact Family? (+/−)', grade: '1', ccss: ['1.OA.B.3'], iCan: 'I Can add is it a fact family? +/−' };
+    // (lane lf-ops: a half-migrated skill - mult_properties' order items on the kit, its times 1 / 0 items legacy)
+    const mp = { key: 'multiplication:mult_properties', id: 'mult_properties', label: 'Multiplication Properties (Visual)', grade: '3', ccss: ['3.OA.B.5'], iCan: 'I Can turn an array to multiply' };
+    eq('VQ-NOLEGACY some-legacy: a kit item beside a legacy one', judgeSkill({ ...mp, items: [{ kind: 'kit', template: 'arrays-turn' }, { kind: 'legacy', resp: {} }] }).map((x) => x.sig), ['some-legacy']);
+    eq('VQ-NOLEGACY some-legacy: every item a kit cell passes', judgeSkill({ ...mp, items: [{ kind: 'kit', template: 'arrays-turn' }, { kind: 'kit', template: 'equation' }] }), []);
+    eq('VQ-NOLEGACY some-legacy: a mixed pool is exempt', judgeSkill({ ...mp, key: 'multiplication:mixed_multiplication', items: [{ kind: 'kit', template: 'fact' }, { kind: 'legacy', resp: {} }] }), []);
     eq('fact_family_sort base fails four rules', judgeSkill({ ...ffs, items: [{ kind: 'legacy', resp: { choice: 2, answerLine: false, sayBlanks: true } }] }).map((x) => x.rule), ['VQ-REP', 'VQ-ONEANSWER', 'VQ-TITLE', 'VQ-NOLEGACY']);
     eq('fact_family_sort fixed passes', judgeSkill({ ...ffs, iCan: 'I Can tell if three numbers make a fact family', items: [{ kind: 'kit', template: 'family-check', resp: { choice: 2, answerLine: false, sayBlanks: false } }] }), []);
     eq('--rules filters', judgeSkill({ ...ffs, items: [{ kind: 'legacy', resp: null }] }, ['VQ-TITLE']).map((x) => x.rule), ['VQ-TITLE']);

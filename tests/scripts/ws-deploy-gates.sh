@@ -46,14 +46,19 @@
 #            and the browser gates, two at a time: ws-presets-unit, ws-anchors-unit, ws-boot-smoke, ws-content-audit,
 #            ws-print-lint --source kit (--baseline design/audit/baselines/print-lint.json when it exists; else the
 #            accepted limit MQ_PRINT_LINT_LIMIT, default 461 findings / 33 documents), ws-screen-answer,
-#            ws-share-options, ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-teacher-wrm, ws-teacher-wrm --fallback,
-#            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/.
+#            ws-share-options, ws-phone-card (the swipe-row family at 390 px), ws-teacher-shell, -library, -preview, -quiz, ws-pdf-preview, ws-simple-print, ws-student-explorer, ws-teacher-wrm, ws-teacher-wrm --fallback,
+#            and ws-detailed-lesson --lesson <id> --repeats for every lesson in js/modules/lessons/detailed/, plus
+#            ws-detailed-lesson --lesson <id> --check for every PASSED long lesson (data/curriculum/detailed-lessons.json
+#            critic verdict PASS: the gate-drift guard, lf-checks 2026-11-07: a kit ruling or a merge cannot silently turn a
+#            passed lesson red again) and ws-lessons-first-queue --check (node).
 # Session 2  ws-screen-slots in MQ_SLOTS_SHARDS parts (default 4) with --baseline design/audit/baselines/screen-slots.json,
 #            ws-chromebook-fit in MQ_FIT_SHARDS parts (default 2), the S9 regression (ws-screen-slots on measurement:reading_ruler_hard, card host, seeds 1-40,
 #            --need-ans 1/4,1/2,3/4: readings under an inch show one answer area), and the sweeps on the pinned sample
 #            (tests/fixtures/precritic/sweep-sample.json): ws-screen-slots --dark / --bigboard, ws-chromebook-fit
 #            --dark / --bigboard (chromebook-fit's standing failures are pinned per skill and host in the sample file).
-# Session 3  ws-chromebook-perf --only load,play (the student-Chromebook load and play-through budgets, 2026-11-02),
+# Session 3  ws-chromebook-perf --only load,play (the student-Chromebook load and play-through budgets, 2026-11-02;
+#            kind `excl`: it runs AFTER every other gate of its session, alone, holding BOTH browser slots - the runner
+#            twice - since a perf number measured beside another browser process is void; LESSONS_FIRST_PLAN §4.2),
 #            ws-viewport-check --baseline design/audit/baselines/viewport-check.json (a real session's scroll: the
 #            R7-D1 class chromebook-fit cannot see; moved here from session 2 for time, MQ_VIEWPORT_SESSION=2 moves it
 #            back), and ws-coverage-matrix on the affected rows with a DOCUMENT BUDGET (§1.6.2): MQ_COVERAGE_ARGS, default
@@ -744,7 +749,7 @@ let fail = 0, untimedAll = 0;
 for (const s of want) {
   const mine = gates.filter((g) => g.s === s);
   const rigidB = [], rigidN = [], rows = [], untimed = [];
-  let div = 0;
+  let div = 0, serial = 0;
   for (const g of mine) {
     const key = norm(g.name), m = meas.get(key);
     if (g.kind === 'skip' || g.kind === 'notyet') { rows.push([g.name, g.kind, '0', g.kind === 'skip' ? 'SKIPPED: does not run' : 'NOT YET: does not run']); continue; }
@@ -757,12 +762,13 @@ for (const s of want) {
       const w = m.s * (m.slots || 2);
       div += w; rows.push([g.name, `${g.kind}, slots`, w.toFixed(0), `${m.s.toFixed(1)} s x ${m.slots || 2} slots it drives itself (${m.from}), spread over the ${bw} slots`]); continue;
     }
+    if (g.kind === 'excl') { serial += m.s; rows.push([g.name, g.kind, m.s.toFixed(1), `${m.from}; alone after the rest, both slots`]); continue; }
     ((g.kind === 'browser' || g.kind === 'fn') ? rigidB : rigidN).push(m.s + PAUSE);
     rows.push([g.name, g.kind, m.s.toFixed(1), m.from]);
   }
   const loadB = sched(rigidB, Number(bw), false), loadN = sched(rigidN, Number(nw), false);
   const spanB = fill(loadB, div), spanN = Math.max(0, ...loadN), spanLpt = fill(sched(rigidB, Number(bw), true), div);
-  const pred = Math.max(spanB, spanN);
+  const pred = Math.max(spanB, spanN) + serial;
   const over = pred > Number(budgetMin) * 60;
   const workB = rigidB.reduce((a, x) => a + x, 0) + div;
   console.log(`budget: session ${s}: predicted ${fmt(pred)} (${pred.toFixed(0)} s) - browser ${bw} slots ${fmt(spanB)} (${workB.toFixed(0)} slot-s of work incl. ${PAUSE} s pauses; floor ${fmt(workB / Number(bw))}; longest-first order ${fmt(spanLpt)}), node ${nw} workers ${fmt(spanN)}; budget ${budgetMin} min: ${over ? 'OVER' : 'within'}${untimed.length ? `; ${untimed.length} UNTIMED` : ''}`);
@@ -796,6 +802,10 @@ browser_gate() {
   local s=$1 n=$2 f=$3; shift 3
   if [ -f "tests/scripts/$f" ]; then add "$s" browser "$n" "node tests/scripts/$f $*"; else add "$s" skip "$n" "tests/scripts/$f"; fi
 }
+exclusive_gate() {   # a browser gate that runs alone after its session's other gates, holding both slots (timings)
+  local s=$1 n=$2 f=$3; shift 3
+  if [ -f "tests/scripts/$f" ]; then add "$s" excl "$n" "node tests/scripts/$f $*"; else add "$s" skip "$n" "tests/scripts/$f"; fi
+}
 first_of() { local f; for f in "$@"; do [ -f "tests/scripts/$f" ] && { echo "$f"; return 0; }; done; echo "$1"; }
 
 build_list() {
@@ -816,12 +826,20 @@ build_list() {
   # the pupil skill explorer (owner 2026-11-05; ~30 s): by grade / by area, picks reach the bottom row, Print and Play
   browser_gate 1 ws-student-explorer ws-student-explorer.cjs
   browser_gate 1 ws-share-options ws-share-options.cjs
+  # critic skip-count r5 SC2: the swipe-row family on a phone (opens at the first answer box, focused; nothing cut but by its window)
+  browser_gate 1 "ws-phone-card (swipe rows)" ws-phone-card.cjs --skills patterns:skip_count_grid,patterns:skip_count_line,multiplication:count_by_tables
   # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)
   local lf lid
   for lf in js/modules/lessons/detailed/*.js; do
     lid=$(basename "$lf" .js); [ "$lid" = index ] && continue
     browser_gate 1 "ws-detailed-lesson --repeats $lid" ws-detailed-lesson.cjs --lesson "$lid" --repeats
   done
+  # the gate-drift guard (lessons-6-7 hand-over; lf-checks 2026-11-07): every PASSED long lesson keeps its self-check green
+  for lid in $(node -e 'const d=require("./data/curriculum/detailed-lessons.json");console.log((d.lessons||[]).filter((l)=>l.critic&&l.critic.verdict==="PASS").map((l)=>l.id).join(" "))' 2>/dev/null); do
+    browser_gate 1 "ws-detailed-lesson --check $lid" ws-detailed-lesson.cjs --lesson "$lid" --check --out "/tmp/mq-deploy-dl/$lid"
+  done
+  node_gate 1 "ws-lessons-first-queue --check" ws-lessons-first-queue.cjs --check
+  node_gate 1 "ws-lessons-first-queue --build-only --check" ws-lessons-first-queue.cjs --build-only --check
   browser_gate 1 ws-presets-unit ws-presets-unit.mjs
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
@@ -872,7 +890,7 @@ build_list() {
   # play-through at CPU 6x, plus the exact startup byte / module budgets (~4 min). The ~150-skill stress and the
   # 100-skill teacher tray (~8 min more) run in full with `node tests/scripts/ws-chromebook-perf.cjs` (lanes, nightly).
   # Timings want a quiet box: a FAIL here is re-run alone by the flake rule. MQ_PERF_SESSION moves it (default 3).
-  browser_gate "${MQ_PERF_SESSION:-3}" "ws-chromebook-perf --only load,play" ws-chromebook-perf.cjs --only load,play
+  exclusive_gate "${MQ_PERF_SESSION:-3}" "ws-chromebook-perf --only load,play" ws-chromebook-perf.cjs --only load,play
   add 3 notyet "digests hook (M4 record/replay)" "the tip's digests (§1.6.2, ≈ 8 min) need M4 record/replay, which is not built; before M4 the lead accepts this one item by name: --accept-notyet digests" digests
   add 3 fn "owner go (lane manifests)" "deploy_check design/lanes design/status"
 }
@@ -918,6 +936,8 @@ run_gate() {   # index [retry]
             else echo "NOT YET: $cmd" > "$log"; res="NOT YET"; fi; rc=0 ;;
     node)   ( eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
     browser) eval "MQ_BROWSER_WAIT_LOG=1 \"\$RUNNER\" $cmd" > "$log" 2>&1; rc=$? ;;
+    # both slots: the outer runner takes one, the inner one waits for the other (nothing else can then start a browser)
+    excl)   eval "MQ_BROWSER_WAIT_LOG=1 \"\$RUNNER\" \"\$RUNNER\" $cmd" > "$log" 2>&1; rc=$? ;;
     fn|nfn) ( [ -n "$tag" ] && export MQ_GATE_RETRY=1; eval "$cmd" ) > "$log" 2>&1; rc=$? ;;
   esac
   t1=$(now_ms)
@@ -952,7 +972,7 @@ run_session() {
   : > "$qb"; : > "$qn"
   for i in "${!G_SES[@]}"; do
     [ "${G_SES[$i]}" = "$s" ] || continue
-    case "${G_KIND[$i]}" in browser|fn) echo "$i" >> "$qb" ;; *) echo "$i" >> "$qn" ;; esac   # nfn, node, skip, notyet
+    case "${G_KIND[$i]}" in browser|fn) echo "$i" >> "$qb" ;; excl) ;; *) echo "$i" >> "$qn" ;; esac   # nfn, node, skip, notyet
   done
   echo "== session $s ($(wc -l < "$qb") browser / fn, $(wc -l < "$qn") node / other; logs $LOGDIR)" >&2
   t0=$(now_ms)
@@ -968,6 +988,8 @@ run_session() {
   for w in $(seq 1 "$BROWSER_WORKERS"); do worker "$qb" & pids+=($!); done
   for w in $(seq 1 "$NODE_WORKERS"); do worker "$qn" & pids+=($!); done
   for w in "${pids[@]}"; do wait "$w"; done
+  # the exclusive gates last, one at a time, with both browser slots (every other gate of the session has finished)
+  for i in "${!G_SES[@]}"; do [ "${G_SES[$i]}" = "$s" ] && [ "${G_KIND[$i]}" = excl ] && run_gate "$i"; done
   # flakes: every FAIL once more, alone
   local line ses name res secs wt log idx item rres
   while IFS=$'\t' read -r ses name res secs wt log idx; do
@@ -1079,6 +1101,7 @@ if [ "$MODE" = list ]; then
     k=${G_KIND[$i]}; c=${G_CMD[$i]}
     [ "$k" = skip ] && c="SKIPPED (tool not built; the run is INCOMPLETE): $c"; [ "$k" = notyet ] && c="NOT YET [--accept-notyet ${G_KEY[$i]}]: $c"
     [ "$k" = browser ] && c="$RUNNER $c"
+    [ "$k" = excl ] && c="$RUNNER $RUNNER $c   (alone, both slots, after the session's other gates)"
     printf '%-8s %-8s %-50s %s\n' "${G_SES[$i]}" "$k" "${G_NAME[$i]}" "$c"
   done
   echo "(matrix: budget $MATRIX_BUDGET documents; base MQ_DEPLOY_BASE, else merge-base origin/master: $(deploy_base 2>&1 | tail -n 1))"

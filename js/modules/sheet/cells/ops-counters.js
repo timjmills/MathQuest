@@ -22,6 +22,7 @@ import { register } from '../registry.js';
 import { geo, root, inkOf, slotValues, box, esc, splitList, splitRemainder, HAIR, HEAVY } from './ops-common.js';
 import { INK } from '../tokens.js';
 import { looseArray } from './k2kit.js';
+import { stepMarks } from '../steps.js';
 
 /* ------------------------------------------------------------------ shared drawing */
 
@@ -56,15 +57,17 @@ const dot = (cx, cy, r, open) => `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed
  * every column count - so the drawing is the same in 1 column and in 2 (DN-10: a narrower
  * column never re-flows it), and each line is at most about 66 mm wide at L.
  */
-function sentence(g, parts, { vals, ink, twin, textEm }) {
-    const bw = Math.max(g.writeMm * 1.8, 2 * 0.62 * g.E + 3);
+/** SL-1 (critic lf-ops r1 D-AG-7 / D-MP-2): an answer box is at least 14 mm wide (17 mm at L), every box of a section one width. */
+export const SLOT_MIN_MM = { S: 14, M: 14, L: 17 };
+function sentence(g, parts, { vals, ink, twin, textEm, inks = null, minW = 0 }) {
+    const bw = Math.max(g.writeMm * 1.8, 2 * 0.62 * g.E + 3, minW);
     const clauses = [];
     let cur = [];
     for (const part of parts) {
         if (part === '|') { clauses.push(cur); cur = []; continue; }
         cur.push(typeof part === 'string'
             ? `<span style="font-size:${textEm.toFixed(3)}em">${esc(part)}</span>`
-            : box(g, part.id, { wMm: part.wMm || bw, hMm: g.stripMm, value: vals[part.id] || '', ink, mark: twin ? part.mark || 'cell' : null }));
+            : box(g, part.id, { wMm: part.wMm || bw, hMm: g.stripMm, value: vals[part.id] || '', ink: inks && inks[part.id] !== undefined ? inks[part.id] : ink, mark: twin ? part.mark || 'cell' : null }));
     }
     if (cur.length) clauses.push(cur);
     return `<div style="margin-top:${g.em(2.5)};display:flex;flex-direction:column;align-items:center;gap:${g.em(1.5)};line-height:1.15">`
@@ -76,9 +79,12 @@ function sentence(g, parts, { vals, ink, twin, textEm }) {
  * MIN_PITCH) until the picture fits PIC_BOX. For equal groups it also picks how many rings
  * stand in a row: the most that fit the box's width at the largest pitch.
  */
+// (critic lf-ops r1 D-AG-2, L1 "Size S ignored": at S arrays_groups laid out exactly as M. At S its pictures fit a
+// third of the page - a 56 mm box - so S prints three columns)
+const PIC_BOX_S3 = [52, 46];
 function arrayGeometry(size, p) {
     const rows = Number(p.rows), cols = Number(p.cols);
-    const [bw, bh] = PIC_BOX[size] || PIC_BOX.L;
+    const [bw, bh] = size === 'S' && SENTENCE_KINDS.includes(p.kind) ? PIC_BOX_S3 : PIC_BOX[size] || PIC_BOX.L;
     const top = PITCH[size], min = MIN_PITCH[size], d0 = DOT[size];
     const clamp = (v) => Math.max(min, Math.min(top, v));
     if (p.kind !== 'equal_groups') {
@@ -139,7 +145,7 @@ function arraysPicture(g, p) {
                 body += dot(ox + pad + r + off + inLine * pitch, oy + pad + r + line * pitch, r, false);
             }
         }
-        return { svg: svgMm(g, W, H, body, `${rows} groups`), wMm: W };
+        return { svg: svgMm(g, W, H, body, `${rows} groups`), wMm: W, hMm: H };
     }
     if (p.kind === 'frame' || p.kind === 'count_all') {
         // dot_array_mult (owner 2026-10-09): a much smaller array, so 8 / 6 / 4-6 cells fill a page
@@ -150,16 +156,18 @@ function arraysPicture(g, p) {
         const W0 = at(cols - 1) + dd + 2 * m0, H0 = at(rows - 1) + dd + 2 * m0;
         let b = '';
         for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) b += dot(m0 + rr + at(j), m0 + rr + at(i), rr, false);
-        return { svg: svgMm(g, W0, H0, b, 'array of dots'), wMm: W0 };
+        return { svg: svgMm(g, W0, H0, b, 'array of dots'), wMm: W0, hMm: H0 };
     }
     // The picture is as wide as its dots (wave 1 lane D round 4, D2): a half pitch of white on each
     // side made a 3 x 10 array 90 mm at L, too wide for a 2-column cell, so it took a full row.
     const m = 0.2;
     const W = (cols - 1) * pitch + d + 2 * m, H = (rows - 1) * pitch + d + 2 * m;
     for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) body += dot(m + r + j * pitch, m + r + i * pitch, r, false);
-    return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W };
+    return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W, hMm: H };
 }
 
+/** The kinds that carry the rows-of / groups-of sentence (arrays_groups). */
+const SENTENCE_KINDS = ['write_mult', 'equal_groups'];
 /** One answer box: count_all (the pupil counts) and frame (the rows and columns are given). */
 const oneBox = (p) => p.kind === 'count_all' || p.kind === 'frame';
 
@@ -178,6 +186,13 @@ register('arrays', {
             if (oneBox(p) || l.length === 1) return { total: l[l.length - 1] };
             return { first: l[0], second: l[1], total: l[2] };
         });
+        // (lane lf-ops: a lesson chart's step state - `stepVals` {slot: {value, ink}} - writes only the slots its steps have reached)
+        let inks = null;
+        if (ctx.stepVals) {
+            inks = {};
+            for (const id of Object.keys(vals)) delete vals[id];
+            for (const [id, v] of Object.entries(ctx.stepVals)) { vals[id] = v.value; inks[id] = v.ink; }
+        }
         const pic = arraysPicture(g, p);
         const rows = Number(p.rows), cols = Number(p.cols);
         // "[ ] groups of [ ]." mirrors "[ ] rows of [ ]." ("There are" made the line 97 mm at L,
@@ -194,8 +209,19 @@ register('arrays', {
         // On screen the rows-of / groups-of sentence is the host's own inline-blank prompt, so
         // the twin draws the picture alone; the count-all box is the one answer (SL-7).
         const showSentence = !g.twin || oneBox(p);
-        const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1 }) : '';
-        return root(g, 'arrays', `${pic.svg}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
+        const sentKind = SENTENCE_KINDS.includes(p.kind);
+        const sent = showSentence ? sentence(g, words, { vals, ink, twin: g.twin, textEm: g.textEm * 1.1, inks, minW: sentKind ? SLOT_MIN_MM[g.size] || 14 : 0 }) : '';
+        // (lane lf-ops: on paper the rows-of / groups-of picture sits in the skill's one picture box, below the number
+        // tab's keep-out - CL-40: a wide ring row reached 4.7 mm across, 3.5 mm down at M - a fixed spacer of
+        // (tab side - 2 mm), as the kit's counters and remainder cells take)
+        const boxed = !g.twin && SENTENCE_KINDS.includes(p.kind) && Number(p.rows) <= 5 && Number(p.cols) <= 5;
+        const spacer = boxed ? '<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>' : '';
+        // (a lesson chart's state draws its one example: no page of pictures to share a box with)
+        // (critic lf-ops r1 D-AG-1: the shared picture box - as tall as the tallest picture the skill deals - left 40-54 %
+        // of a cell empty between a short picture and its sentence. The sentence now stands right under its OWN picture;
+        // each row is as tall as what it holds (layout rowShape) and the cell is answered in place (footprint inPlace).)
+        const picHtml = `${spacer}${pic.svg}`;
+        return root(g, 'arrays', `${picHtml}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
         const k = arraysKey(p);
@@ -207,7 +233,17 @@ register('arrays', {
         const g = geo(ctx);
         const pic = arraysPicture(g, p);
         // The picture or the widest sentence line (about 66 mm at L), plus the pads.
-        return { wMm: Math.ceil(Math.max(pic.wMm, 66) + 6), hMm: null, measure: true, factLike: false, maxCols: 2 };
+        const sentKind = SENTENCE_KINDS.includes(p.kind);
+        // (S: the sentence lines at S type, boxes 14 mm, are about 50 mm: three columns - critic lf-ops r1 D-AG-2)
+        const s3 = sentKind && g.size === 'S';
+        return { wMm: Math.ceil(Math.max(pic.wMm, s3 ? 50 : 66) + 6), hMm: null, measure: true, factLike: false, maxCols: s3 ? 3 : 2, ...(sentKind && !g.twin ? { inPlace: true } : {}) };
+    },
+    /** The lesson chart's state k (provider marks: first / second / total; `groups` / `size` read as first / second). */
+    lessonStepState(p, steps, k, ctx) {
+        const sv = {};
+        const alias = { groups: 'first', size: 'second', rows: 'first', cols: 'second', answer: 'total' };
+        for (const m of stepMarks(steps, k)) { const id = alias[m.slot] || m.slot; if (['first', 'second', 'total'].includes(id)) sv[id] = { value: m.value, ink: m.ink }; }
+        return this.render(p, Object.assign({}, ctx, { state: 'blank', stepVals: sv }));
     },
     inputs(p) {
         const ids = oneBox(p) ? ['total'] : ['first', 'second', 'total'];

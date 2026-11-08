@@ -1550,6 +1550,8 @@ function _applyMapSlots(q) {
         input.style.setProperty('display', 'none', 'important');
         visualAid.classList.add('mq-map-cellslots');
         const first = _firstWriteBox(visualAid);
+        // (the box the pupil writes first, named for the checks: a blank story copy box before it stays blank, D6)
+        if (first) first.setAttribute('data-mq-first-write', '1');
         if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
     }
 }
@@ -1562,6 +1564,13 @@ function _firstWriteBox(visualAid) {
     const sentence = visualAid.querySelector('.mq-wwsentence');
     if (sentence) {
         const box = [...sentence.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
+            .find((el) => !el.disabled && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
+        if (box) return box;
+    }
+    // (lane lf-ops 2026-11-07, ws-phone-card FOCUS on the plain x / ÷ stories: a story worked in COLUMN boxes is written
+    // from its first box in reading order - the sign and the story's numbers come before the answer - so it takes the focus)
+    if (visualAid.querySelector('.mq-scell input.mq-wwork, input.mq-wwork')) {
+        const box = [...visualAid.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
             .find((el) => !el.disabled && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
         if (box) return box;
     }
@@ -1717,6 +1726,7 @@ function _applyScreenCell() {
             paper.classList.add('mq-slot-moved');
             visualAid.dataset.mqNoZoom = '1';
             const first = _firstWriteBox(visualAid);
+            if (first) first.setAttribute('data-mq-first-write', '1');
             if (first && !state.hasAnswered) {
                 try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
             }

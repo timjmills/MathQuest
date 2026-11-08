@@ -560,3 +560,21 @@
    and the frame are one solid stroke when a PDF is rasterised (two abutting anti-aliased edges left a light seam: the frame
    read as a double line at 93 dpi). Additive. */
 .ws-page .ws-grid.facts > .ws-cell { background-clip: padding-box; }
+
+/* div_facts supports-off page (owner 2026-11-08, critic r5 R5-2): the fact prints over its answer line and the line sits at
+   the foot of the cell, so the room above the line is writing room and no empty band is left under the last ink (H13).
+   Only the div_facts bare-fact payload (`under`) emits .ws-eq-under. */
+:is(.ws-page, .ws-sheet) .ws-cell > .ws-eq-under { flex: 1 1 auto; align-self: stretch; }
+:is(.ws-page, .ws-sheet) .ws-eq-under > [data-ws-slot] { margin-top: auto; }
+
+/* div_facts' fade packet (owner 2026-11-08, critic r5 R5-6, facts card F4): the fact (over its line) is left-anchored at ONE x
+   in every cell of the packet - a fixed inset that clears a two-digit number tab - and its supports start at that x too.
+   Only div_facts' packet emits .ws-eq-left. */
+:is(.ws-page, .ws-sheet) .ws-cell:has(.ws-eq-left) { align-items: flex-start; --mq-fx: calc(var(--ws-tab, 6mm) * 1.5 - 2mm); }
+:is(.ws-page, .ws-sheet) .ws-cell:has(.ws-eq-left) > :is(.ws-eq-left, .ws-L, .ws-supported) { margin-left: var(--mq-fx); }
+:is(.ws-page, .ws-sheet) .ws-cell:has(.ws-eq-left) .ws-with-pane { align-items: flex-start !important; }
+:is(.ws-page, .ws-sheet) .ws-cell:has(.ws-eq-left) .ws-with-pane > div { align-items: flex-start !important; }
+:is(.ws-page, .ws-sheet) .ws-cell > .ws-eq-under.ws-eq-left { align-self: flex-start; }
+:is(.ws-page, .ws-sheet) .ws-eq-left { min-width: var(--mq-fw, auto); }
+:is(.ws-page, .ws-sheet) .ws-eq-left > span:first-child { align-self: flex-start; }
+:is(.ws-page, .ws-sheet) .ws-eq-left > .ws-line { align-self: stretch; width: auto; }

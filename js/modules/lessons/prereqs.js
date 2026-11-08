@@ -408,11 +408,297 @@ export const LESSONS = Object.freeze({
         // 100, which comes after, and never two "Number Sense" sections).
         mixWith: [{ key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }, { key: 'addition:add_100_regroup', minOperand: 10 }],
     },
+
+    // ------------------------------------ Skip counting: the count-row family (2, 3; critic skip-count r5 SC3)
+    // One family, one drawing (sheet/cells/count-row.js): a row of up to 12 numbers is too wide for half the page, so
+    // the anchor chart stacks its four steps as full-width rows (`chartWide`) and the Guided problems take full-width
+    // rows under the step strip; the practice pages fill with whole rows (`practiceShapes`, the most that fit first).
+    // The steps match the provider's four worked steps (sheet/providers/countby.js rowSteps): the jump, the first gap,
+    // the next gap, every gap and the check.
+    ...skipCountLessons(),
+
+    // ------------------------- Arrays, equal groups and the order property (3; lane lf-ops, ops-tables card §9 Q3)
+    // The BUILD lesson "Properties of multiplication" (3.OA.B.5) and the array lesson it rests on (3.OA.A.1, 2.OA.C.4).
+    // The steps match each provider's worked steps (sheet/providers/multiplication.js): arrays_groups 4, the order
+    // property ('both' task) 5. The Warm-up deals short tracks and across facts only (an array in the Warm-up ran it
+    // past half a page at L, as on count_by_tables).
+    ...opsTablesLessons(),
+
+    // ---------------------------- The plain × / ÷ stories (3; lane lf-ops, ops-tables card §9 Q3, BUILD lesson #7)
+    // The stories the two-step lesson (3.OA.D.8) rests on (3.OA.A.3). The lesson teaches the STRUCTURE, never key
+    // words (the card hides the cues and the bank, M-S1): equal groups - how many groups, how many in each - or a
+    // total split into equal groups. The four steps are the provider's four worked steps (providers/word-work.js
+    // plainStorySteps: read and name the groups, the sign, the numbers and the fact, the answer and its label).
+    ...timesStoryLessons(),
 });
 
+function timesStoryLessons() {
+    const FORMAT = {
+        kind: 'numbered steps with icons + a rule',
+        why: 'The one decision pupils get wrong is the sign; naming the equal groups first decides it, and the rule says it in four words.',
+    };
+    const steps = (groups) => [
+        { icon: 'look', text: groups },
+        { icon: 'decide', text: 'Circle the sign.' },
+        { icon: 'write', text: 'Write the numbers. Solve.' },
+        { icon: 'write', text: 'Write the answer and its label.' },
+    ];
+    const vocab = (fact) => [
+        { word: 'equal groups', meaning: 'groups with the same number in each', picture: { kind: 'text', text: '3 groups of 4' } },
+        { word: 'in each', meaning: 'how many one group has', picture: { kind: 'text', text: '4 in each' } },
+        { word: 'fact', meaning: 'the numbers and the sign', picture: { kind: 'text', text: fact } },
+    ];
+    // (the Warm-up deals one row of across facts: a second row - an array, a count-by track - ran it past half a page and
+    // pushed Guided Practice onto a page of its own, print-lint DN-2)
+    // (one row of four across facts, the tables to 5: a two-digit factor in a quarter-width cell ran into its number tab)
+    const multFacts = { key: 'multiplication:mult_facts', opts: { notation: ['across'], band: 100, constant: [2, 3, 4, 5] }, why: 'The story is solved with a times fact.' };
+    const divFacts = { key: 'division:div_facts', opts: { band: 100, constant: [2, 3, 4, 5] }, why: 'The story is solved with a division fact.' };
+    // (the column work is wider and taller than half a chart: two full-width panels, the drawing beside its step heads -
+    // read and choose the sign, then the numbers, the fact and the answer)
+    // (`offOpts`: the practice-page bar model is left off the lesson - its full-width bar ran the chart off the page)
+    const base = { format: FORMAT, chartStates: 2, practiceShapes: [[6, 2], [4, 2], [4, 1], [2, 1]], offOpts: ['wpBar'] };
+    return {
+        'multiplication:mult_word_problems_plain': Object.assign({}, base, {
+            skills: [multFacts],
+            concepts: [
+                { id: 'equal-groups', text: 'A times story has equal groups.' },
+                { id: 'groups-times-each', text: 'Groups × the number in each = how many in all.' },
+                { id: 'unit', text: 'The answer is a number of things: say the label.' },
+            ],
+            vocab: vocab('5 × 6 = 30'),
+            steps: steps('Read the story. Find the groups and how many in each.'),
+            chant: 'Equal groups? Multiply.',
+            example: { match: 'equal groups' },
+            mixWith: [{ key: 'multiplication:mult_facts', opts: { notation: ['across'], band: 100 } }, { key: 'addition:add_facts', opts: { band: 20 } }],
+        }),
+        'division:div_word_problems_plain': Object.assign({}, base, {
+            skills: [divFacts],
+            concepts: [
+                { id: 'total-split', text: 'A division story splits a total into equal groups.' },
+                { id: 'missing-number', text: 'It asks for the number in each group, or the number of groups.' },
+                { id: 'unit', text: 'The answer is a number of things: say the label.' },
+            ],
+            vocab: vocab('15 ÷ 5 = 3'),
+            steps: steps('Read the story. Find the total and the equal groups.'),
+            chant: 'Split it equally? Divide.',
+            example: { match: 'equal groups|How many groups' },
+            mixWith: [{ key: 'division:div_facts', opts: { band: 100 } }, { key: 'multiplication:mult_facts', opts: { notation: ['across'], band: 100 } }],
+        }),
+    };
+}
+
+function opsTablesLessons() {
+    const by5 = { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' }, why: 'Skip counting by 5s: how a row of dots is counted fast.' };
+    const by2 = { key: 'counting:number_seq_fill', opts: { step: 2, dir: 'forward' }, why: 'Skip counting by 2s: the 2 times-table as a count.' };
+    const x2 = { key: 'multiplication:mult_facts', opts: { constant: [2], notation: ['across'], band: 100 }, why: 'A known times fact: the fact an array is named by.' };
+    return {
+        'multiplication:arrays_groups': {
+            skills: [by2, by5],
+            concepts: [
+                { id: 'equal', text: 'Every row (or group) holds the same number.' },
+                { id: 'count-by', text: 'Count by the row size, once for each row.' },
+                { id: 'in-all', text: 'The last number said is how many in all.' },
+            ],
+            vocab: [
+                { word: 'row', meaning: 'a line of dots going across', picture: { kind: 'text', text: '4 in a row' } },
+                { word: 'array', meaning: 'equal rows of dots', picture: { kind: 'text', text: '3 rows of 4' } },
+                { word: 'in all', meaning: 'the total: every dot counted', picture: { kind: 'text', text: '12 in all' } },
+            ],
+            steps: [
+                { icon: 'count', text: 'Count the rows or groups.' },
+                { icon: 'look', text: 'Count how many in one.' },
+                { icon: 'count', text: 'Count by that number.' },
+                { icon: 'write', text: 'Write how many in all.' },
+            ],
+            chant: '',
+            format: {
+                kind: 'numbered steps with icons',
+                why: 'Four counting actions said in order, each one a box the pupil fills; no decision to cue, so no chant.',
+            },
+            example: { match: 'Count by' },
+            // (two pictures a row: a picture alone in a full-width row left a third of it empty - print-lint H13)
+            practiceShapes: [[6, 2], [4, 2], [2, 2]],
+            mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }, { key: 'addition:add_facts', opts: { band: 20 } }],
+        },
+        'multiplication:mult_properties': {
+            skills: [by5, x2],
+            concepts: [
+                { id: 'rows-cols', text: 'An array is rows times the number in each row.' },
+                { id: 'turn', text: 'Turning an array swaps the rows and the columns.' },
+                { id: 'same', text: 'Turning adds no dot and takes none away: the product stays the same.' },
+            ],
+            vocab: [
+                { word: 'array', meaning: 'equal rows of dots', picture: { kind: 'text', text: '3 rows of 4' } },
+                { word: 'turn', meaning: 'the rows become the columns', picture: { kind: 'text', text: '3 × 4 → 4 × 3' } },
+                { word: 'product', meaning: 'the answer of a times fact', picture: { kind: 'text', text: '3 × 4 = 12' } },
+            ],
+            steps: [
+                { icon: 'look', text: 'Look at the array.' },
+                { icon: 'write', text: 'Write the fact.' },
+                { icon: 'start', text: 'Turn the array.' },
+                { icon: 'write', text: 'Write the new fact.' },
+                { icon: 'check', text: 'Check: same product.' },
+            ],
+            chant: 'Turn it round, the same amount!',
+            format: {
+                kind: 'numbered steps with icons + a chant',
+                why: 'The one idea pupils lose is that the turn keeps the product (they recount); a short chant said at step 5 is the check.',
+            },
+            example: { match: 'Turn the array' },
+            // (an array and its turn side by side is wider than half the page at L: the chart's panels and the Guided
+            // problems take full-width rows, as the count rows do)
+            guidedRows: 2,
+            // (an array and its turn, two a row: one cell width per section - print-lint GRID-EVEN, LONE)
+            practiceShapes: [[8, 2], [6, 2], [4, 2], [2, 2]],
+            mixWith: [{ key: 'multiplication:arrays_groups', opts: { forms: [0] } }, { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }],
+            // (lane lf-ops critic r1 D-MP-7 / D-MP-8 / D-MP-12: the lesson for each property it can deal - `forms` - has its own
+            // concepts, vocabulary, steps (the provider's worked steps, sheet/providers/multiplication.js mpSteps) and Rule;
+            // the order-property data above is forms [0]. lessonFor(cat, skill, opts) merges the entry the opts pick.)
+            byOption: {
+                forms: {
+                    1: {
+                        concepts: [
+                            { id: 'parts', text: 'An array can be broken into two parts.' },
+                            { id: 'each-part', text: 'Multiply each part.' },
+                            { id: 'add', text: 'Add the two parts: that is the whole array.' },
+                        ],
+                        vocab: [
+                            { word: 'array', meaning: 'equal rows of dots', picture: { kind: 'text', text: '6 rows of 2' } },
+                            { word: 'part', meaning: 'some of the rows', picture: { kind: 'text', text: '3 rows of 2' } },
+                            { word: 'whole', meaning: 'both parts together', picture: { kind: 'text', text: '6 + 6 = 12' } },
+                        ],
+                        steps: [
+                            { icon: 'look', text: 'Look at the two parts.' },
+                            { icon: 'write', text: 'Multiply the top part.' },
+                            { icon: 'write', text: 'Multiply the bottom part.' },
+                            { icon: 'check', text: 'Add the parts. Write the whole.' },
+                        ],
+                        chant: 'Break it, multiply, add!',
+                        format: { kind: 'numbered steps with icons + a rule', why: 'The step pupils drop is the second part (MU-M7): the rule names all three moves.' },
+                        example: { match: 'Look at the parts' },
+                        // (critic r1 D-MP-7: one split array and THREE facts is taller than a half-page panel - 131 mm in a
+                        // 106 mm panel at L, the facts over the Say band: each panel a full-width row, two states)
+                        chartWide: true, chartRow: true, chartStates: 2,
+                    },
+                    unit: {
+                        concepts: [
+                            { id: 'one', text: 'Times 1: one group of the number, or the number of groups of 1.' },
+                            { id: 'same', text: 'Times 1 keeps the number the same.' },
+                            { id: 'zero', text: 'Times 0: no groups, or groups of nothing. The product is 0.' },
+                        ],
+                        vocab: [
+                            { word: 'times 1', meaning: 'one group', picture: { kind: 'text', text: '1 × 7 = 7' } },
+                            { word: 'times 0', meaning: 'no groups', picture: { kind: 'text', text: '0 × 7 = 0' } },
+                            { word: 'product', meaning: 'the answer of a times fact', picture: { kind: 'text', text: '7 × 1 = 7' } },
+                        ],
+                        steps: [
+                            { icon: 'look', text: 'Read the fact.' },
+                            { icon: 'decide', text: 'Find the 1 or the 0.' },
+                            { icon: 'check', text: 'Times 1: the other number. Times 0: zero.' },
+                            { icon: 'write', text: 'Write the product.' },
+                        ],
+                        chant: 'Times 1, the same. Times 0, zero!',
+                        format: { kind: 'numbered steps with icons + a rule', why: 'Pupils add 1 (MU-M5) or keep the number for times 0 (MU-M4): the rule says both.' },
+                        example: { match: 'Read the fact' },
+                        // (a times 1 / times 0 fact is one short line: the practice page holds a full page of them)
+                        practiceShapes: [[24, 3], [18, 3], [12, 3], [8, 2]],
+                        guidedRows: 3,
+                    },
+                    // several properties on one page (forms [0..3]): the page's own title (strings 'other') and a rule
+                    // that names none of them in particular
+                    mixed: {
+                        concepts: [
+                            { id: 'same-product', text: 'Turning an array keeps the product.' },
+                            { id: 'parts', text: 'An array broken into parts: add the parts.' },
+                            { id: 'one-zero', text: 'Times 1 keeps the number; times 0 makes 0.' },
+                        ],
+                        vocab: [
+                            { word: 'turn', meaning: 'the rows become the columns', picture: { kind: 'text', text: '3 × 4 → 4 × 3' } },
+                            { word: 'part', meaning: 'some of the rows', picture: { kind: 'text', text: '2 rows of 4' } },
+                            { word: 'product', meaning: 'the answer of a times fact', picture: { kind: 'text', text: '1 × 4 = 4' } },
+                        ],
+                        chant: 'Look first: turn it, break it, or times 1 or 0?',
+                    },
+                },
+            },
+        },
+    };
+}
+
+/** The lesson entry an option set picks (`byOption`, lane lf-ops critic r1): {forms: {1: {...}, unit: {...}}} - a set
+ *  option holding ONE value takes that value's entry; forms 2 and 3 (times 1, times 0) alone or together take `unit`;
+ *  any other mix takes `mixed`. */
+function optionLesson(data, opts) {
+    if (!data || !data.byOption || !opts) return data;
+    let out = data;
+    for (const [id, table] of Object.entries(data.byOption)) {
+        let v = opts[id];
+        if (v === undefined || v === null) continue;
+        const list = Array.isArray(v) ? [...new Set(v.map(String))] : [String(v)];
+        const hit = list.length === 1 && table[list[0]] ? table[list[0]]
+            : table.unit && list.length && list.every((x) => x === '2' || x === '3') ? table.unit
+                : list.length > 1 && table.mixed ? table.mixed : null;
+        if (hit) out = Object.assign({}, out, hit);
+    }
+    return out;
+}
+
+function skipCountLessons() {
+    const VOCAB = [
+        { word: 'skip count', meaning: 'count on by the same jump', picture: { kind: 'text', text: '5, 10, 15, 20' } },
+        { word: 'jump', meaning: 'how much is added each time', picture: { kind: 'glyph', text: '+5' } },
+        { word: 'missing', meaning: 'the number in the empty box', picture: { kind: 'text', text: '10, ?, 30' } },
+    ];
+    const STEPS = [
+        { icon: 'look', text: 'Find the jump.' },
+        { icon: 'count', text: 'Add the jump.' },
+        { icon: 'write', text: 'Write the next number.' },
+        { icon: 'check', text: 'Every gap. Check each jump.' },
+    ];
+    const FORMAT = {
+        kind: 'numbered steps with icons + a chant',
+        why: 'The one thing pupils lose is the size of the jump at a gap; saying the count aloud in the jump keeps it the same every time.',
+    };
+    // Counting on by 1s and by 10s: the counts every skip count stands on (written answers only: no drag task on paper).
+    const after = { key: 'counting:count_sequence', opts: { band: 100, dir: 'forward' }, why: 'Say the number after: counting on by 1.' };
+    const tens = { key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward' }, why: 'Counting on by 10s: the first skip count.' };
+    const base = (o) => Object.assign({
+        concepts: [
+            { id: 'same-jump', text: 'Every jump is the same size.' },
+            { id: 'add-jump', text: 'Add the jump to get the next number.' },
+        ],
+        vocab: VOCAB, steps: STEPS, chant: 'Same jump, every time!', format: FORMAT,
+        example: { match: 'each jump adds' },
+        // (a count row is too wide for half the page: the chart's panels and the Guided cells take full-width rows)
+        chartWide: true, chartStates: 3, guidedRows: 2,
+        // (the practice pages: the most whole rows a page holds, most first; critic SC3, H13 - 6 rows in 2 x 3 left each cell half empty)
+        practiceShapes: [[8, 1], [7, 1], [6, 1], [5, 1], [4, 1]],
+    }, o);
+    return {
+        'patterns:skip_count_line': base({
+            skills: [tens, after],
+            mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward' } }, { key: 'counting:count_sequence', opts: { band: 100, dir: 'forward' } }],
+        }),
+        'patterns:skip_count_grid': base({
+            skills: [tens, after],
+            mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward' } }, { key: 'counting:count_sequence', opts: { band: 100, dir: 'forward' } }],
+        }),
+        'multiplication:count_by_tables': base({
+            // (a skip-count row of its own - or an array beside a track - ran the Warm-up to 118 mm and pushed Guided overleaf at L:
+            // the friendly counts by 5s and by 2s, each in one short track, are what every table count builds on)
+            skills: [
+                { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' }, why: 'Skip counting by 5s: a friendly count the tables build on.' },
+                { key: 'counting:number_seq_fill', opts: { step: 2, dir: 'forward' }, why: 'Skip counting by 2s: the 2 times-table as a count.' },
+            ],
+            mixWith: [{ key: 'patterns:skip_count_grid' }, { key: 'multiplication:arrays_groups' }],
+        }),
+    };
+}
+
 /** The lesson data of a skill, or null (a skill with no authored lesson yet). */
-export function lessonFor(categoryId, skillId) {
-    return LESSONS[`${categoryId}:${skillId}`] || null;
+export function lessonFor(categoryId, skillId, opts = null) {
+    const d = LESSONS[`${categoryId}:${skillId}`] || null;
+    return d && d.byOption ? optionLesson(d, opts) : d;
 }
 
 /** `{categoryId, skillId, opts?}` of a 'category:skill' key. */

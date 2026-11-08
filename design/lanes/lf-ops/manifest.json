@@ -1,0 +1,10 @@
+{
+  "$schema": "../manifest.schema.json",
+  "version": 1,
+  "lane": "lf-ops",
+  "mergeOrder": 60,
+  "description": "Lessons-first wave 1, operations lane (pilot unit G3-Y4.B4). New skills and presets (related_tables, multiply_three_numbers, the div_by_itself preset) are added here after the ops-tables card is signed.",
+  "skills": [],
+  "providers": [],
+  "lessons": []
+}

@@ -423,6 +423,12 @@ not improve** (3 if r3 passes = the old median per run). The ≥ 5× claim is no
 | F7 | If the next family also misses: certify `stack` × Single skill before any further family on it | lead | conditional |
 
 **Per-round findings audit (owner rule):** pilot r1 + r2 listed **18 automatic checks and 10 speed-ups**. Built so far: **3**
+
+- 2026-11-08 lf-ops div_facts aids r7: support pages clean, but the new shared ws-empty-band (every card-offered role) found ~160 findings on roles no div_facts round had graded (lesson, opener, guided, fact-probe, scripted-model, mixed); run it at a round's start. A one-skill byte-hash check (72 PNG / 36 HTML) proved a shared layout.js flag safe in minutes: make it the standard gate for any shared-file edit.
+- 2026-11-07 lf-ops div_facts aids rebuild r6 (no critic: precritic red): a master merge changed the rule index, so the signed facts card failed --check-signed unseen until precritic; re-run --check-signed on every card after a merge, before the builder starts. R5-6 sat in shared layout code (layout.js / equation.js) the brief did not give the builder: rule the owner of every layer a defect lives in before the round.
+- 2026-11-07 lf-ops plain stories critic r1 (FAIL, lowest 3): the mult `forms` option was dead (389/389 items one story) and options-verify did not see it because rendered text always differs by its numbers. Checks: FORMS-LIVE (mask digits / names, compare structure), DEAD-BOX over 20 seeds, SLOT-DOUBLE, paper = screen frame order. Speed-up: hand-over notes paste the full red list of a lint, so a ruling covers every case.
+- 2026-11-07 lf-ops div_facts critic r5 (narrow; FAIL, lowest 6): every r4 defect fixed, but Test rows stretched (fillToCeiling) and the lane's own H13-INK excluded Test under an r4 ruling that owner ruling F1 had replaced. Rule: when a card ruling changes, grep every check citing the old ruling. Checks: ink H13 on every role incl. Test and supports-off; RP-81 array gap; S > M per support; shrink-to-fit on support SVGs; one fact x per section / packet.
+- 2026-11-07 lf-ops critic r1 (build #4: mult_properties, arrays_groups, count_by_tables; FAIL, lowest 2): most reds sat on roles / option values precritic does not plan (Reason It, Error analysis, forms 1-3, times=each Test). Checks: band-anywhere H13, grade-render --gate on every 7a-offered role x forms, slot >= 14 mm + one width a section, S > M capacity, last-page PAGEFILL, title from dealt forms, L-KEY one answer a slot, tag/slot overlap, paper = screen frame. Speed-ups: plan precritic from the signed card's 7a offered list; per-page max-band % in grade-render; one skill per critic render run.
 (rules 0a, 0b and the per-round findings rule). Real checks built with a backtest: **0**. Every other item has an owner (W0-A for
 the checks, W0-B2 for the card, lead for rules). The count is re-taken at each reflection.
 
@@ -760,6 +766,12 @@ under CL-4b (owner), band instruction for presets.
 
 Details and the reflection: design/status/s1-checks.md.
 
+### skip-count · critic r5 (2026-10-30, FAIL 3) - fix round
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| r5 | FAIL 3 (Lesson C1/C3), 390 card 6 | SC1: `ws-print-lint --roles lesson` existed on precritic's path and was not run (now 0 at S/M/L). SC2: `ws-phone-card` FOCUS / INVIEW existed (now 0) + NEW ROW-LINES (a swiping row on one line), and phone-card joins ws-deploy-gates.sh. SC3: NEW ws-node-lint LESSON-DATA `screen-task` (24 seeded deals of each Warm-up / Mixed ref; backtested). SC4: NEW phone-card swipe-window fixtures. G2-G4 (small-fixes r11, re-checked on today's row): NEW phone-card ROW-ARROW, NEXT-INVIEW (360x780, 844x390), ROTATE. Details: design/status/skip-count.md. | Render every role in the scope (the Lesson) in the fix loop; the family's own phone test (wave1-c2-phone) is off precritic's path, so its essentials moved into ws-phone-card. |
+
 ### Lane lessons-6-7 (detailed lessons 6 + 7) — builder rounds before critic r3 / r1 (2026-10-30)
 
 | Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
@@ -817,3 +829,40 @@ Details and the reflection: design/status/s1-checks.md.
 | critic r2 FAIL (min 6) | Mixed fallback summary, fact card summary; page-1 fill is engine pagination | SUMMARY over Mixed + fact card (backtest FAIL on r2 code) | a probe (one row more on each part) separated lane vs engine faults in one run — do it before a fix round |
 | critic r3 PASS (lane part) | footer ids fixed; per-type summary added after | FOOTER gate (backtest FAIL on the r2 head) | 9 owner additions arrived DURING r3: queuing them (process rule 0) kept the round valid; resuming the same critic for r2/r3 cost 144k → 162k → 192k tokens (its context grows): a fresh narrow critic with a short brief is cheaper after r2 |
 | simple-print-2 critic r1 FAIL (C2 6, C3 7) | Aim = Exactly; Tables-to band shown as Highest number; × 6–8 column cycle; footer label; "Facts" for column work; key PNG captured the app | EXACT (differs), WITHIN 12-admitted, FACTPATTERN (backtest: old gen FAILs whole columns at M), FOOTER options, SUMMARY Facts naming, evidence asserts Answer Key | the builder's own render pass looked at page 1 only: read every PNG incl. the key, and run each mode pair through a "plans differ" check before the critic |
+
+### lf-checks · critic r1 (2026-11-07, FAIL 7 / 7 / 8 / 8: the lesson precritic checks)
+
+Full report: design/status/lf-checks/critic-r1.md.
+
+**Automatic checks** (what would have caught each finding):
+
+| Finding | Check | State |
+|---|---|---|
+| D1 LP-GIVEAWAY counted `data-ws-level` as a hint, so Guided = Independent passed; the row stayed green on other defects | backtest rows name each cited defect (a `failNames` substring list); a FAIL that lacks one fails the row | proposed (ws-backtest) |
+| D2 LP-NUMBERS flagged "(7000 or 7,000)", a deliberate accepted-answers quote | the checks run on every PASSED lesson's packet (known-true corpus); a new FAIL there is ruled real or false before it is accepted | done by hand this round; proposed as a self-test |
+| D3 seeded LP-PREREQ fixture seeded a trace, the real D8 is an exchange box | seed the DOM, not the packet (`--packet-html`), so the extractor is in the proof | proposed |
+| D4 hand-edited pass fixtures not reachable states (story vs pool) | fixture-consistency lint: story numbers match the pool item | proposed |
+| D5 an empty read passed 7 of 8 checks | `lpChecks` fails "nothing read" on 0 pupil pages / 0 cells / no pool; self-test case | built (self-test 30 cases) |
+| n8 PDF pages vs packet pages | lpRaster asserts the counts are equal | built |
+
+**Speed-ups:** a tool critic grades from the builder's saved packets (`--packet-out`, 0.2 s re-checks) and renders only a
+sample; `ws-backtest --kind fixture` spends 21 min in older browser fixture rows: a `--fast` filter (rows without
+`browser: true`) gives the lesson rows' proof in under 5 s; other lanes' browser runs held both slots for ~4 of 9 minutes
+of the critic's live runs.
+
+### lf-checks · critic r2 (2026-11-07, FAIL 7 / 7 / 8 / 8; lane stopped by rule 7)
+
+Full report: design/status/lf-checks/critic-r2.md.
+
+**Automatic checks:** one backtest row per rule a tool header names, FAILing on that rule alone (ws-precritic-plan parses the
+header) - PC-CLIP had none and could not see its D10; a fixture-consistency lint over every `*.pass.json` (story = pool, key
+working = story, place-value digit present, one right answer) - the surviving defect; a new blocking gate is run once on head
+before commit and its red rows recorded (R-n) in the status file; a known-true corpus self-test for PC-NAME / PC-RANGE; a
+"read nothing" guard in ws-lesson-samples (built).
+
+**Speed-ups:** save fail-side packets of the phase-0 rows so a critic re-judges offline; run the content seeds of
+ws-lesson-samples --check in parallel pages (about 1 min, not 3.5); freeze or tag the graded head before the critic starts
+(two pushes landed mid-round).
+
+**Root cause of the stop:** hand-edited pass fixtures. Rule for every checks lane: a pass state is a commit (or a fixture
+re-rendered from a commit), never a packet edited by hand; where no fix commit exists yet, the row's pass side is pending.

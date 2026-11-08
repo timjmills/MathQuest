@@ -1829,6 +1829,11 @@ html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swi
     .k2-countrow-keys .k2-keys-type { display: none; }
     .k2-countrow-keys .k2-keys-touch { display: inline; }
 }
+/* (lane lf-ops critic r1 D-CB-9, BD-11: a phone-width screen is a touch screen - the tap wording, not the Space key) */
+@media (max-width: 480px) {
+    .k2-countrow-keys .k2-keys-type { display: none; }
+    .k2-countrow-keys .k2-keys-touch { display: inline; }
+}
 
 /* ---- Bracket hug (owner 2026-10-09; critic div-facts-forms R4 nit c, "7)  28", "2)  8"): the
    dividend's column is as wide as its digits, as on paper, so the arc and the vinculum hug them.
@@ -1869,6 +1874,23 @@ html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsb
     .mq-scell .mq-kit .ws-stack:is([style*="--t:7"], [style*="--t:8"]) { --ws-track: 46px; --mq-optrack: 32px; }
 }
 
+/* critic skip-count r5 SC2 (2026-10-30), additive: a count row that SWIPES on a phone stands on ONE line - its lines side by side
+   (screen-cell.js wireSwipeRows oneLine), a jump arrow into each later line's first box, the turn arrows hidden - so a 3-column
+   window never shows two lines whose numbers read as neighbours. */
+.mq-scell [data-mq-swiperow] [data-mq-flatjump] { display: none; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] .k2-countrow-body { display: inline-flex !important; flex-wrap: nowrap; align-items: flex-end; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] .k2-countrow-line { flex: none; margin-top: 0 !important; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] .k2-countrow-line > div + span { display: none !important; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] [data-mq-flatfirst] { position: relative; }
+.mq-scell [data-mq-swiperow][data-mq-oneline] [data-mq-flatjump] { display: block; }
+/* (SC2) only a line's own columns are snap points: the joining arrow and the inner rows fitTwinRows marks `data-mq-wrapped` inside
+   a column are not (a snap 24 px left of a column cut the next number at the window's right edge) */
+.mq-scell [data-mq-swiperow] [data-mq-flatjump],
+.mq-scell [data-mq-swiperow] .k2-countrow-line > div > [data-mq-wrapped] > * [data-mq-wrapped] > * { scroll-snap-align: none !important; }
+/* small-fixes critic r11 G2 (re-checked 2026-10-30 on today's row): a jump arrow keeps >= 1.0 mm of ink clearance from the number
+   or box on each side on every screen host (the phone worksheet's 24 px gap left 0.98 mm): the arrow draws 1.5 px in from each
+   end of its gap. Measured by tests/lib/ws-arrow-clear.cjs (ws-phone-card ROW-ARROW). Additive. */
+.mq-scell .k2-jump { padding: 0 1.5px; box-sizing: border-box; }
 /* Teacher follow-ups (2026-10-30, BACKLOG "cellboxes have a double edge on the practice card (expand)"):
    expanded form's place boxes carry an inline 4 px border, and the focused one also took the cell's
    3 px black focus outline 1 px outside it: a box inside a box. The box is ONE edge at the slot

@@ -194,7 +194,9 @@ register('equation', {
             const o = (g) => `<span class="o" style="width:${ACROSS_OP_EM}em">${g}</span>`;
             const sentence = `<span>${num('a')}</span>${o(opGlyph(p.op))}<span>${num('b')}</span>${o('=')}`;
             if (acrossBelow(p, ctx)) {
-                return `<div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
+                // (`under`: the supports-off div_facts page, owner 2026-11-08 - the line sits at the foot of the cell, the
+                // room above it is the writing room, so the cell holds no empty band under its last ink: RUBRIC H13)
+                return `<div class="ws-eq ws-eq-below${p.under ? ' ws-eq-under' : ''}${p.left ? ' ws-eq-left' : ''}${p.plain ? ' ws-eq-divplain' : ''}" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em${p.left && p.fw ? `;--mq-fw:${p.fw}em` : ''}">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_GAP_EM}em;white-space:nowrap">${sentence}</span>${slotHtml}</div>`;
             }
             return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
