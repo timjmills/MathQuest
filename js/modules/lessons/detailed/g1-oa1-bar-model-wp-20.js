@@ -49,7 +49,9 @@ export default {
     // (RESEARCH.md §5; every other story crosses ten with parts of 2 to 9 - owner ruling 2026-11-07: partMin / noPart / crossTen on every story ref).
     edgeTest: 'wpEdge',
     // (`first`: the last row is dealt first, so the rows above keep LR-6 against its equal parts - critic r2 D2)
-    practiceSheets: [{ skill: WP({ minNum: 11, maxNum: 20, edgeTest: 'wpEdge', tries: 600 }), edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'], first: true } }],
+    // (`solve`, E24b attempt 2 - owner ruling 2026-11-07: the page's stories SOLVED from the facts left before it is dealt -
+    // no near twins, every first addend and whole different; the greedy deal left 7 + 4 / 8 + 5 for its last places at 4242)
+    practiceSheets: [{ skill: WP({ minNum: 11, maxNum: 20, edgeTest: 'wpEdge', tries: 600 }), edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'], first: true }, solve: { partMin: 2, noPart: [10], sums: [20], dealPin: 'wp:add:20' } }],
     // The lesson's own placeholder names: the story's unit word and its parts.
     vars: (q, b) => {
         const p = (q && q.cell && q.cell.payload) || {};

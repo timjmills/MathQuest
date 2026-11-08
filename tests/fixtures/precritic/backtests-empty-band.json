@@ -1,0 +1,89 @@
+{
+ "about": "ws-empty-band backtests (lf-checks 2026-11-08, from the lead). Every row FAILS on its lane's critic-failed head (proven 2026-11-08 with MQ_ROOT worktrees, see design/status/lf-checks.md); the pass side is that lane's fix, not yet made, so each row is pending. The lane sets pass.commit, deletes \"pending\" and appends the row to backtests.json in the same change as its fix. Known-good control: addition:add_facts on 5e9ac838 is OK against design/audit/baselines/empty-band.json (171 findings within the pin, 0 above). List: node tests/scripts/ws-backtest.mjs --table tests/fixtures/precritic/backtests-empty-band.json --list",
+ "rows": [
+  {
+   "id": "eb-vocab-match3-guided",
+   "check": "Match 3 pictures on the GUIDED page: 32-35 % empty bands under the ink at S and L (lf-vocab critic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (30 % of the cell under the ink, every offered role / host)",
+   "browser": true,
+   "fail": {
+    "commit": "bebf5b36",
+    "state": "lf-vocab critic r3 FAIL head; ws-empty-band FAIL 4 (guided S Model 35.0 %, cell 2 32.4 %; guided L Model 33.5 %), 2026-11-08"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-vocab's fix: set the commit, drop \"pending\", append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "eb-pv-value-band9999-L",
+   "check": "placevalue:value band=9999 independent L: 36.8 % bands in 56 mm cells (lf-placevalue critic r2 N5)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (30 % of the cell under the ink, every offered role / host)",
+   "browser": true,
+   "fail": {
+    "commit": "b28a0867",
+    "state": "lf-placevalue head; ws-empty-band FAIL 12 (20.6 mm under the ink of 56 mm cells)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-placevalue's fix: set the commit, drop \"pending\", append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:value --roles independent --sizes L --hosts none --opts {\"band\":9999}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "eb-pv-unitform-more-S",
+   "check": "placevalue:unit_form rename=more independent S: 39.6 % bands in 26 mm cells (lf-placevalue critic r2 N6)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (30 % of the cell under the ink, every offered role / host)",
+   "browser": true,
+   "fail": {
+    "commit": "b28a0867",
+    "state": "lf-placevalue head; ws-empty-band FAIL 16"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-placevalue's fix: set the commit, drop \"pending\", append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --roles independent --sizes S --hosts none --opts {\"rename\":\"more\"}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "eb-ops-divfacts-S",
+   "check": "division:div_facts at S on every card role: 35 % bands (more-practice equation cells 7.9 mm under 22.5 mm) and side bands (lf-ops div_facts r5, H13 class)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (30 % of the cell under the ink, every offered role / host)",
+   "browser": true,
+   "fail": {
+    "commit": "b23e418d",
+    "state": "lf-ops head; ws-empty-band FAIL 119 (EB-BAND 90, EB-SIDE 29)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-ops's fix: set the commit, drop \"pending\", append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --sizes S --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  }
+ ]
+}
