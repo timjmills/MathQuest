@@ -719,7 +719,7 @@ function layoutSheet(role, sectionsIn, itemsBySection, { size, look, paper, head
         // takes the band off the page; s3 precritic-2 ex-group H13).
         const aMm0 = anchorBandOf(anchors, si);
         const L0 = resolveBandedLayout(
-            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage }, aMm0,
+            { role, columns: sec.columns, count: itemsBySection[si].length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: true } : {}) }, aMm0,
             itemsBySection[si], paper, availableWidthMm, { size, look, header: headerFirst },
         );
         // A split section's two parts share the page: their rows are sized to what they hold.
@@ -932,7 +932,7 @@ export function splitWide(role, norm, sheetItems, { availableWidthMm = LIVE_W_MM
         const its = sheetItems[si] || [];
         const keep = () => { sections.push(Object.assign({}, sec, { srcIndex: si })); items.push(its); };
         if (its.length < 2 || its.some((it) => it.anchor)) return keep();
-        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage };
+        const base = { role, columns: sec.columns, count: its.length, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: true } : {}) };
         const whole = resolveSectionLayout(Object.assign({ floor: sec.floor }, base), its, paper, availableWidthMm, { size, look });
         const one = (it) => it.fclass === 'word' || it.fclass === 'wide'
             || itemCap(itemInfo(it, { size, look, paper, mode: 'print' })) < 2;
@@ -1053,7 +1053,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     if (!input.anchors) {
         sheetItems = sheetItems.map((its, si) => {
             const sec = norm.sections[si] || {};
-            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage },
+            const Lp = resolveSectionLayout({ role, columns: sec.columns, count: its.length, floor: sec.floor, gridH: sec.gridH, dense: sec.dense, maxCols: sec.maxCols, noCap: sec.noCap, pageCap: sec.pageCap, freeRows: sec.freeRows, sharedPage: sec.sharedPage, ...(sec.noStretch ? { noStretch: true } : {}) },
                 its, norm.paper, Number(norm.ctxIn.availableWidthMm) || LIVE_W_MM, { size, look });
             return groupByHeight(its, Lp.cols);
         });
@@ -1168,7 +1168,9 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // spare height as whitespace between its rows (grid.js rowGap), never inside cells.
             const avail = pg.cont ? L.gridHCont : L.gridH;
             const baseMm = shape ? shape.heightMm : fillByFlex ? 0 : part.chunk.rows * L.cellH;
-            const gap = lone && baseMm && !noCapSec && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
+            // (`noStretch`, owner 2026-11-08: div_facts' fade packet - a short grid stays short, no gaps, no spread)
+            const noStretchSec = !!(norm.sections[part.section] || {}).noStretch;
+            const gap = lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) ? rowGapFor(part.chunk.rows, baseMm, avail) : { gap: 0 };
             // SPREAD (wave 1 lane D, 2026-10-02): a lone grid that leaves more than a fifth of its
             // page under it (a count the teacher set, a page at its item ceiling) shares the page
             // height among its rows instead - each row up to SPREAD_CAP x what it holds, every
@@ -1177,7 +1179,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // (one-page sections only: a section over several pages keeps one cell height, PT-ENG-6)
             const chunks = laidOut.chunksBySection[part.section] || [];
             let spread = null;
-            if (!gap.gap && lone && baseMm && !noCapSec && !its.some((it) => it.anchor) && !L.blocks) {
+            if (!gap.gap && lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks) {
                 if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin);
                 else if (chunks.every((c) => !c.blocks)) {
                     // a section over several pages: the FIRST page's stretch, applied to every page

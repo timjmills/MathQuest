@@ -196,7 +196,7 @@ register('equation', {
             if (acrossBelow(p, ctx)) {
                 // (`under`: the supports-off div_facts page, owner 2026-11-08 - the line sits at the foot of the cell, the
                 // room above it is the writing room, so the cell holds no empty band under its last ink: RUBRIC H13)
-                return `<div class="ws-eq ws-eq-below${p.under ? ' ws-eq-under' : ''}" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
+                return `<div class="ws-eq ws-eq-below${p.under ? ' ws-eq-under' : ''}${p.left ? ' ws-eq-left' : ''}" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em${p.left && p.fw ? `;--mq-fw:${p.fw}em` : ''}">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_GAP_EM}em;white-space:nowrap">${sentence}</span>${slotHtml}</div>`;
             }
             return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
