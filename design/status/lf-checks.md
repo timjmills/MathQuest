@@ -22,6 +22,13 @@ Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect clas
 (none: tools, no owner picture sheet)
 
 ## Open questions
+0. (lead ruling 2026-11-08, done) EB-BAND = RUBRIC H13, 30 % of the full cell, the shared rule; lf-placevalue aligns H13-ABS. The four passed
+   fact skills (add_facts, mult_facts, sub_facts, div_facts_long) are pinned in design/audit/baselines/empty-band.json (99 keys).
+
+**Facts-lane task (for design/STATUS.md, next week's list):** "Passed fact skills (add_facts, mult_facts, sub_facts, div_facts_long):
+real empty bands on pages no gate rendered before ws-empty-band - guided 33-41 %, scripted-model 63-67 % (also ws-print-lint H13),
+error-analysis bands, and drawn height vs footprint off by more than 10 % on several roles; pinned 2026-11-08 (empty-band.json, 99 keys)
+so lanes are not blocked; fix and tighten the pin."
 1. LP-MODELLED flags lesson 1 (g2-nbt3, passed r4) exit item "combine" (expanded form -> numeral) that no anchor chart models.
    Suggested answer: a real gap (PEDAGOGY P-1); fix the lesson (a board row in T4 §5 or a chart panel), do not exempt it.
 2. LP-NUMBERS: lesson 6's two minors n1 / n2 (critic r3, accepted as minors) now fail a gate. Suggested answer: fix them
@@ -118,6 +125,7 @@ self-test; a backtest row per PC rule that FAILs only that rule (PC-CLIP has non
 Lane session cost_usd $20.33 at 07:56Z (the lead's reading of the session record); ≈ $32 at 08:45Z by scaling my token estimate to that reading, plus two critic sub-agents (~390k tokens) - about $40 in all, ≈ 1.4 % of the weekly limit ($28 ≈ 1 %); cap $100.
 
 ## Log
+- 2026-11-08 — lead rulings applied: sub_facts + div_facts_long pinned (99 keys after the side-rule change); the practice card host is now measured (its B&W screen cell .mq-scell, not a kit cell; before, the card widths read "no kit cell"); EB-SIDE = content pinned to one side (>= 30 % one side, <= 10 % the other), so a centred screen fact is not a band.
 - 2026-11-08 — ws-empty-band (EB-BAND 30 % of the cell, EB-SIDE 30 % of the width, EB-FOOT ±10 % on grid roles), roles from tests/lib/ws-card-plan.mjs (lf-ops, taken unchanged), pin design/audit/baselines/empty-band.json (add_facts, mult_facts: 55 keys - the passed fact family's guided / scripted-model / error-analysis pages carry real bands no gate rendered: e.g. add_facts guided S 33-41 %, scripted-model 63-67 %, also flagged by ws-print-lint H13; pinned so lanes are not blocked, listed for the facts lane), backtests-empty-band.json (4 rows, pending each lane's fix), LESSONS_LEARNED L25. Calibration: on today's head lf-placevalue's H13-ABS (35 % of H less Hw) FAILS the approved add_facts / mult_facts / sub_facts L pages (17.0 mm under 56.75 mm cells = 29.96 %); every critic-failed band is 32-57 %; so EB-BAND uses H13's 30 % of the full cell - lf-placevalue may align H13-ABS to it.
 - 2026-11-07 — critic r2 FAIL; small fixes after it (not re-graded); stopped per rule 7; hand-over to the lead.
 - 2026-11-07 — lead's asks: --build-only BUILD_QUEUE.md (owner order), phase-0 checks D1-D10 (ws-lesson-samples --check, print-lint blocking rows, backtests-phase0.json), lf-engine's (a) ws-lesson-unit / ws-lesson-coverage on the lesson scope, chartSizing[] read by LP-FALLBACK.

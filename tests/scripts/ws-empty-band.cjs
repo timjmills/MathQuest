@@ -24,7 +24,8 @@
 //             approved fact pages sit at 29.96 % (17.0 mm under a 56.75 mm cell at L, so H13-ABS's 16.5 mm limit now FAILS
 //             them), while every critic-failed band sits at 34-57 % (lf-vocab Match 3 guided 34-37 %, error-analysis 35-40 %;
 //             lf-placevalue N5 43 %, N6 57 %): 30 % of the full cell separates the two classes, H13-ABS's limit does not.
-//   EB-SIDE   the empty band BESIDE the ink (left or right of the ink box): FAIL at >= 30 % of the cell width (RUBRIC H13).
+//   EB-SIDE   the content PINNED to one side (RUBRIC H13 "pinned to one side"): an empty band >= 30 % of the cell width on one
+//             side of the ink box while the other side has <= 10 %. A centred item (a fact in a wide screen card) is not a band.
 //   EB-FOOT   the drawn height vs the footprint: the cell's needed height (top pad + ink + empty slots + bottom pad) against
 //             the hMm the bridge measured for the item at the page's column count (buildSheet items[i].measured[cols].hMm);
 //             FAIL when they differ by more than 10 %. Judged on the grid roles that lay out from that measure (independent,
@@ -79,7 +80,9 @@ function measureCells(scope) {
     const out = [];
     const roots = [...document.querySelectorAll(scope)];
     roots.forEach((rt, pi) => {
-        const cells = [...rt.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]') && visible(c));
+        // a print page's kit cells; on a screen host the B&W screen cell (.mq-scell, screen-cell.js) when it holds no kit cell
+        let cells = [...rt.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]') && visible(c));
+        if (!cells.length) cells = (rt.matches('.mq-scell') ? [rt] : [...rt.querySelectorAll('.mq-scell')]).filter(visible);
         cells.forEach((c, ci) => {
             const cr = c.getBoundingClientRect(); if (cr.height < 10 * MM || cr.width < 10 * MM) return;
             const cs = getComputedStyle(c);
@@ -101,10 +104,12 @@ function measureCells(scope) {
             const hwVar = parseFloat(getComputedStyle(c).getPropertyValue('--ws-hw')) || 0;
             const hw = /mm/.test(getComputedStyle(c).getPropertyValue('--ws-hw')) ? hwVar * MM : hwVar;
             const below = Math.max(inner.b - box.b, 0);
-            const side = Math.max(box.l - inner.l, inner.r - box.r, 0);
+            const gl = Math.max(box.l - inner.l, 0), gr = Math.max(inner.r - box.r, 0);
+            // pinned to one side: the wide gap on one side, (almost) none on the other - a centred item is not a band
+            const side = Math.min(gl, gr) <= 0.10 * (inner.r - inner.l) ? Math.max(gl, gr) : 0;
             out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: +(H / MM).toFixed(1), belowMm: +(below / MM).toFixed(1), sideMm: +(side / MM).toFixed(1), hwMm: +(hw / MM).toFixed(1), innerW: +(W / MM).toFixed(1),
-                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '' });
+                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || (c.classList.contains('mq-scell') ? 'screen-cell' : '') });
         });
     });
     return out;
@@ -171,7 +176,7 @@ async function main() {
                     try {
                         const st = window.state;
                         if (OPTS && window.setSetOptions) { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, OPTS, { silent: true }); }
-                        if (host === 'card') { st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false; window.showView('gameView'); st.currentQ = window.generateQuestionFor({ category: c, skill: k, seed: SEED }); window.renderQuestion(); return '#visualAid'; }
+                        if (host === 'card') { st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false; window.showView('gameView'); st.currentQ = window.generateQuestionFor({ category: c, skill: k, seed: SEED }); window.renderQuestion(); return '#gameView'; }
                         if (host === 'worksheet') { st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 2; window.initWorksheet(); return '#worksheetView .mq-wspaper'; }
                         if (host === 'quiz') {
                             const q = window.generateQuestionFor({ category: c, skill: k, seed: SEED, itemIndex: 0 });
