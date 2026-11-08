@@ -548,7 +548,7 @@ export const LESSONS = Object.freeze({
         vocab: [
             { word: 'hundreds', meaning: 'groups of 100', picture: { kind: 'text', text: '300' } },
             { word: 'tens', meaning: 'groups of 10', picture: { kind: 'blocks', tens: 3, ones: 0 } },
-            { word: 'ones', meaning: 'single ones', picture: { kind: 'blocks', tens: 0, ones: 4 } },
+            { word: 'ones', meaning: 'single ones', picture: { kind: 'blocks', tens: 0, ones: 4, compact: true } },
         ],
         steps: [
             { icon: 'look', text: 'Read the number.' },
