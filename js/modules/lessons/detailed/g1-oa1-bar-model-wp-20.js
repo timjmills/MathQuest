@@ -124,7 +124,10 @@ export default {
         // or more and no first part twice: not 2 and 7 / 2 and 3 - critic r3 m2)
         { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 3, partMin: 3, minNum: 6, distinctFirst: true },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
-        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 16, noPart: [10] },
+        // (OWNER RULING 2026-11-08, E24b: the Prerequisite Check's + facts are within 20 and do NOT cross ten - a teen and ones,
+        // 12 + 5 - so they never draw from the lesson's crossing-ten story pool: the 20 facts (parts 2-9) are the stories' alone,
+        // ~14 places under LR-5 / LR-6. lessons/pack-solve.js prereqPoolDraws holds it; ws-lesson-unit pack-feasible is the gate.)
+        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'], constant: [11, 12, 13] }, minNum: 13, maxNum: 19, partMin: 2, noPart: [10] },
             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },
     ],
 
@@ -191,7 +194,7 @@ export default {
     atoms: [
         { type: 'Fact', prereq: true, skill: 'Count a set: the last number is how many', notes: 'Prerequisite Check {pre.0.letters}.' },
         { type: 'Conceptual', prereq: true, skill: 'Parts and whole: two parts make a whole', notes: 'Prerequisite Check {pre.1.letters}.' },
-        { type: 'Fact', prereq: true, skill: 'Add within 20: count on past 10', notes: 'Prerequisite Check {pre.2.letters}.' },
+        { type: 'Fact', prereq: true, skill: 'Add within 20: a teen and ones', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Category', prereq: true, skill: 'Missing whole: then add', notes: 'Checked again at step 3.' },
         { type: 'Category', skill: 'Story numbers are parts', notes: 'Point at each number.' },
         { type: 'Conceptual', critical: true, skill: 'Bar: whole on top, parts below', notes: 'Cubes on the mat first.' },
