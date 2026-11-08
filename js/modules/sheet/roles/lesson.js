@@ -1339,8 +1339,11 @@ function vocabPicture(pic, c) {
                 for (let j = 1; j < 10; j++) parts.push(`<line x1="${x}" y1="${0.5 + u * j}" x2="${x + u}" y2="${0.5 + u * j}" stroke-width="${(0.5 * PT_MM).toFixed(3)}"/>`);
                 x += u + 2;
             }
-            for (let i = 0; i < (pic.ones || 0); i++) { parts.push(`<rect x="${x}" y="${0.5 + u * 9}" width="${u}" height="${u}"/>`); x += u + 1.5; }
-            const W = x + 0.5, H = u * 10 + 1;
+            // (`compact`, lf-placevalue critic r3c E-A1: a picture of ones only is one cube tall, not a ten-rod's height - the
+            // vocabulary cell was 43 % empty above it; opt-in, so every other picture draws as before)
+            const low = !!pic.compact && !(pic.tens > 0);
+            for (let i = 0; i < (pic.ones || 0); i++) { parts.push(`<rect x="${x}" y="${low ? 0.5 : 0.5 + u * 9}" width="${u}" height="${u}"/>`); x += u + 1.5; }
+            const W = x + 0.5, H = low ? u + 1 : u * 10 + 1;
             return `<svg viewBox="0 0 ${W} ${H}" width="${mm(W)}" height="${mm(H)}" aria-hidden="true"><g fill="none" stroke="#000" stroke-width="${(0.75 * PT_MM).toFixed(3)}">${parts.join('')}</g></svg>`;
         }
         case 'trade': {

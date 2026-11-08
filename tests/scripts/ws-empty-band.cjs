@@ -30,6 +30,7 @@
 //             FAIL when they differ by more than 10 %. Judged on the grid roles that lay out from that measure (independent,
 //             more-practice, test, review, mixed-practice) where the page's cells and its measured items pair one to one; a
 //             role that draws its own cell (fact-probe rows, word-problems stories, the guided model) is not judged by it.
+//   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab).
 // Cells under 10 mm are not judged (a tick box, a choice ring). A finding names role, size (or host and width), page, cell.
 //
 // PIN (--baseline <file>, default design/audit/baselines/empty-band.json when it exists; --no-baseline for raw): the counts of
@@ -110,6 +111,30 @@ function measureCells(scope) {
     return out;
 }
 
+// EB-VOCAB (opt-in --vocab-ink; lf-placevalue critic r3c E-A1, lead 2026-11-08): a lesson's vocabulary picture whose drawing fills
+// less than 70 % of its own picture box, up and down or across (a picture of 4 ones drawn in a ten-rod's height left the
+// vocabulary cell 43 % empty above it). Reads every `.mq-lvpic-in svg` on the page: its drawn content (getBBox of its
+// children, scaled from the viewBox) against the svg's own box. Additive: absent the flag nothing is read.
+function measureVocab(scope) {
+    const out = [];
+    [...document.querySelectorAll(scope)].forEach((rt, pi) => {
+        [...rt.querySelectorAll('.mq-lvpic-in svg')].forEach((svg, i) => {
+            const r = svg.getBoundingClientRect(); if (!r.width || !r.height) return;
+            let bb = null;
+            for (const ch of svg.querySelectorAll('rect, line, path, circle, ellipse, polygon, polyline, text')) {
+                let b; try { b = ch.getBBox(); } catch (e) { continue; }
+                if (!b.width && !b.height) continue;
+                bb = bb ? { x0: Math.min(bb.x0, b.x), y0: Math.min(bb.y0, b.y), x1: Math.max(bb.x1, b.x + b.width), y1: Math.max(bb.y1, b.y + b.height) } : { x0: b.x, y0: b.y, x1: b.x + b.width, y1: b.y + b.height };
+            }
+            if (!bb) return;
+            const vb = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.height ? svg.viewBox.baseVal : { width: r.width, height: r.height };
+            const word = ((svg.closest('.mq-lvpic') || {}).textContent || '').trim().slice(0, 20);
+            out.push({ page: pi + 1, pic: i + 1, word, fillH: +((bb.y1 - bb.y0) / vb.height).toFixed(3), fillW: +((bb.x1 - bb.x0) / vb.width).toFixed(3), hMm: +(r.height / (96 / 25.4)).toFixed(1) });
+        });
+    });
+    return out;
+}
+
 function judge(cells, where, F) {
     for (const c of cells) {
         const lim = BAND * c.hMm;
@@ -156,6 +181,10 @@ async function main() {
                     renders++; cellsRead += cells.length;
                     if (!cells.length) { F('EB-READ', `${key} ${j.tag}`, 'no kit cell read on the page (markup changed?)'); continue; }
                     judge(cells, `${key} ${j.tag}`, F);
+                    // (`--rule-skills a:b,...`, ws-precritic opt-in: the opt-in rule judges only the opted-in lane's skills)
+                    if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocab, 'body > section.ws-page, body > .ws-page')) {
+                        if (v.fillH < 0.7 || v.fillW < 0.7) F('EB-VOCAB', `${key} ${j.tag} p${v.page} vocab picture ${v.pic}`, `the drawing fills ${Math.round(v.fillH * 100)} % of its ${v.hMm} mm picture box up and down, ${Math.round(v.fillW * 100)} % across (limit 70 %)`);
+                    }
                     // EB-FOOT: pairs only where the page's cells and the measured items are one to one
                     const m = b.measured;
                     if (GRID_ROLES.has(j.role) && b.sections <= 1 && m.length === cells.length && m.every((x) => x != null)) {
@@ -210,7 +239,7 @@ async function main() {
         for (const k of Object.keys(pin)) if (SKILLS.some((sk) => k.startsWith(sk + ' ')) && (counts[k] || 0) < pin[k]) notes.push(`pin ${k}: ${pin[k]} -> ${counts[k] || 0} (fixed: tighten the pin)`);
         for (let i = findings.length - 1; i >= 0; i--) if (!over.has(keyOf(findings[i]))) findings.splice(i, 1);
     }
-    const rules = ['EB-BAND', 'EB-SIDE', 'EB-FOOT', 'EB-READ'];
+    const rules = ['EB-BAND', 'EB-SIDE', 'EB-FOOT', 'EB-READ', 'EB-VOCAB'];
     for (const n of notes) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);

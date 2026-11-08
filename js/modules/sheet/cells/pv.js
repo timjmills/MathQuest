@@ -740,7 +740,10 @@ function pvRenderBody(p, ctx0) {
         const kv = typeof p.keyValue === 'number' ? fmt(p.keyValue) : p.keyValue;
         // A slot's width never tells the answer (round-3 re-grade): at least the longest number the
         // item prints, plus one where the answer can gain a digit (rounding, estimating).
-        const digits = Math.max(keyDigits(kv), slotFloor(p, p.kind !== 'value'));
+        // (lf-placevalue critic r3b G2: unit form's rename frames - `rowOnly`, one full-width row each - are about 76 mm of ink at S,
+        // 30 % empty each side of a 185 mm cell; their write line takes two more digits at S, the same on every item, so the
+        // line never tells the answer and the row reads as one band across the page)
+        const digits = Math.max(keyDigits(kv), slotFloor(p, p.kind !== 'value')) + (p.rowOnly && ctx.size === 'S' ? 2 : 0);
         const top = p.hideNumeral ? '' : undefined;
         // "Name the place": the letter over the underlined digit IS the answer, so the letters are
         // a hint here and fade by page role — Model and Guided keep them, Independent, More
