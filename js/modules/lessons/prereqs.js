@@ -423,7 +423,8 @@ export const LESSONS = Object.freeze({
         vocab: [
             { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
             { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
-            { word: 'underlined', meaning: 'the line is under it', picture: { kind: 'text', text: '4 7 2 → 7' } },
+            // critic r3 F3: a picture for a mark must draw the mark; the text picture cannot underline, so the third word is "ones"
+            { word: 'ones', meaning: 'the right-hand place', picture: { kind: 'blocks', tens: 0, ones: 4 } },
         ],
         steps: [
             { icon: 'look', text: 'Find the underlined digit.' },
