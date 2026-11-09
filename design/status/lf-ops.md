@@ -158,6 +158,7 @@ Five-lesson check (lead rule) on 17ce2fe1 vs origin/master 2fe21f2b: g3-oa5, g3-
 - Critic r8 (narrow re-check of every support's Test S/M/L + fade L, b43bf8b9): PASS, lowest 8; R7-1 and R7-2 fixed, no new defect. Report design/audit/runs/lf-ops/critic-divfacts-r8.md; renders committed in design/audit/runs/lf-ops/r8-renders/ (off-test-M, boxsign-test-M, fade-L-page-3, off-test-M-key). Minor unscored: answer-line lengths vary on fade page 3; fact 2.91 mm from the left rule.
 - Five-lesson check b43bf8b9 vs origin/master 16e0014a: g3-oa5, g3-oa9 x 2, g4-nbt1 match on --check and --repeats; g3-oa8 (not passed) worse on the branch (E9b, E12) from the stories work - excluded from the narrow deploy.
 - redesign-passed.js: NOT added (lead ruling 2026-11-09): the rule is every page type and every host, so div_facts waits for the facts-roles task (the pinned shared fact roles) and the screen-host grading.
+- DEPLOY BRANCH claude/sweet-newton-c8wrv1-lf-ops-divfacts-deploy @ bac3192d (pushed): 26 div_facts app commits cherry-picked onto master 16e0014a (skill-options.js keeps only the div_facts appended blocks; 3ed796e4's story-lesson prereqs hunk dropped; tests/ files kept as master's) + the div_facts empty-band pin. Gates on it vs master 16e0014a: ws-boot-smoke OK; ws-simple-print OK; hash (add / mult / sub facts, div_facts_long x Independent / Test / Review x S/M/L) 36 / 36 identical; ws-empty-band div_facts OK (161 within the pin); ws-detailed-lesson --check / --repeats on g3-oa5, g3-oa8, g3-oa9 x 2, g4-nbt1 all equal to master (g3-oa8 fails E35 on both: its branch regression came from the stories / fix4 work, not deployed). Not on the deploy branch: this lane's check scripts and backtest rows (they stay on the lane branch for the merge train).
 - Findings -> checks: R7-1 -> EB-TESTEQ (test-eq-ind-divfacts, would have saved r7); R7-2 -> EB-GAP (eb-gap-divfacts, would have saved r7). Both on precritic's path via ws-empty-band.
 
 ## Brief for the FRESH #4 builder (lead ruling 2026-11-07: after the Thursday 22:00 UTC reset; Opus medium, a rebuild after two failed rounds)
@@ -216,6 +217,7 @@ Times: builder R4 checks, start 2026-11-07T06:30Z, end 2026-11-07T07:45Z, profil
 Times: lane day-1 cards + merge, start 2026-11-07T06:25Z, end 2026-11-07T06:47Z, profile lane session
 
 ## Log
+- 2026-11-09: narrow deploy branch built (bac3192d), gates equal to master.
 - 2026-11-09: div_facts aids r9: TEST-EQ-IND + EB-GAP, critic r8 narrow re-check PASS (lowest 8); deploy branch pending the lead.
 - 2026-11-09: L-width fix (a4c6b694, 17ce2fe1) + master merge (11720699); critic r7 FAIL lowest 7 (R7-1 Test M 21 vs 24, R7-2 fade L gap); stopped at the $35 cap.
 - 2026-11-09: resumed ($35 cap); owner ruling (a) on the L width; master 2fe21f2b merge conflicts in backtests.json, options-render.pins.json, ws-cell-checks (lib + script), ws-empty-band -> given to the builder.
