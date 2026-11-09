@@ -35,3 +35,4 @@ since the merge base against the lane's extracted copies before rendering anythi
 | 2026-11-09 | lf-ops | Fact-to-line gap 20 mm when the fact starts under the tab (R7-2) | EB-GAP (new) | eb-gap-divfacts | precritic | 1 round |
 | 2026-11-09 | lf-ops | R5-3 array gap, R5-5 think shrink, R5-7 fits-line wording | none: reasons in design/status/lf-ops.md | — | — | — |
 | 2026-11-09 | lf-vocab | R-1/R-2 screen feedback r7 (Match 3 line names word not letter; all pictures glow; ladder repeats; unequal blocks; key halo; hard words) | V22+, V24+, V25+ built; V26, V27 specified | V22–V25 rows | precritic | next round |
+| 2026-11-09 | lf-engine | ws-backtest checkouts filled the disk; full re-run then hung silently (prints only at the end) | tool fix c3245504 (checkout removed after each state); PROPOSED: --row per-row runs, per-row timeout, stream each row | — | — | ≈ 2.5 h lost |
